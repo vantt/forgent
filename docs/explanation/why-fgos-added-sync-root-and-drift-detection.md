@@ -119,7 +119,7 @@ before and after the fix.
 
 ## Validation constraints carried into execution
 
-`fgos-validating` returned READY WITH CONSTRAINTS, not a plain pass,
+`fgos-coding-validating` returned READY WITH CONSTRAINTS, not a plain pass,
 carrying four explicit constraints forward: `sync-root` must reuse
 `mergeRunnerItem`/`mergeRunnerItemLocked`'s existing lock path;
 `driftStatus` must resolve the real main checkout before any git

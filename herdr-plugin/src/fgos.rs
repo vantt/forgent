@@ -73,16 +73,28 @@ struct WorkItemRaw {
 
 /// tsk-4vo D2: Tier A (`awaiting-approval`, closest to done) sorts first;
 /// Tier B (`doing`) sub-sorts by stage in pipeline order — `executing`
-/// (closest to `compound-learn`) before `decompose` before `clarify`.
+/// (closest to `compound-learn`) before `planning` before `exploring`
+/// before `discovery`.
+///
+/// The arms mirror `DOMAINS.coding.stages` (`src/state/workflow-stage-
+/// graphs.mjs`) read back-to-front, so a stage the engine can actually
+/// hand this dashboard always ranks. `decompose` is kept, sharing
+/// `planning`'s rank rather than getting one of its own: it is that same
+/// stage under its pre-rename name, still held by the few items open when
+/// the rename landed, and the engine's own skill map aliases the two to
+/// one skill. It goes when the last item drains off it. `clarify` is not
+/// kept — that stage retired with its items migrated off, so no item can
+/// hold it and an arm for it would rank nothing.
 fn doing_tier(status: &str, stage: &str) -> u8 {
     if status == "awaiting-approval" {
         return 0;
     }
     match stage {
         "executing" => 1,
-        "decompose" => 2,
-        "clarify" => 3,
-        _ => 4,
+        "planning" | "decompose" => 2,
+        "exploring" => 3,
+        "discovery" => 4,
+        _ => 5,
     }
 }
 
@@ -516,17 +528,21 @@ mod tests {
 
     /// tsk-4vo D1/D2: one `awaiting-approval` row, plus `doing` rows at
     /// every pipeline stage, deliberately listed out of sort order in the
-    /// raw JSON to prove `parse_doing` does the sorting itself.
+    /// raw JSON to prove `parse_doing` does the sorting itself. The stages
+    /// here are the ones the coding domain actually declares today
+    /// (`DOMAINS.coding.stages`, `src/state/workflow-stage-graphs.mjs`) —
+    /// `discovery`/`exploring`/`planning`/`executing` — plus the drain-only
+    /// legacy alias `decompose` that a few pre-rename items still hold.
     const TIER_SORT_FIXTURE: &str = r#"{
         "contract": "fgos.v1",
         "generated_at": "2026-07-29T15:41:13.319Z",
         "data_hash": "abc",
         "data": {
             "work": {
-                "tsk-clarify": {
+                "tsk-exploring": {
                     "title": "Still fuzzy",
                     "status": "doing",
-                    "stage": "clarify",
+                    "stage": "exploring",
                     "statusCategory": "in-progress"
                 },
                 "tsk-approval": {
@@ -542,8 +558,20 @@ mod tests {
                     "stage": "executing",
                     "statusCategory": "in-progress"
                 },
-                "tsk-decompose": {
+                "tsk-discovery": {
+                    "title": "Machine-alone research",
+                    "status": "doing",
+                    "stage": "discovery",
+                    "statusCategory": "in-progress"
+                },
+                "tsk-planning": {
                     "title": "Shaping",
+                    "status": "doing",
+                    "stage": "planning",
+                    "statusCategory": "in-progress"
+                },
+                "tsk-decompose": {
+                    "title": "Shaping, still on the legacy stage name",
                     "status": "doing",
                     "stage": "decompose",
                     "statusCategory": "in-progress"
@@ -613,13 +641,25 @@ mod tests {
     fn sort_status_tier_ranks_awaiting_approval_first_then_stage_order() {
         let rows = parse_doing(TIER_SORT_FIXTURE).expect("fixture should parse");
         let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
-        // D2: awaiting-approval first, then doing sub-sorted executing ->
-        // decompose -> clarify. "blocked" status never appears (D4's
-        // combined parkReason+statusCategory predicate excludes it via
+        // D2: awaiting-approval first, then doing sub-sorted in reverse
+        // pipeline order — executing -> planning -> exploring -> discovery,
+        // with the legacy `decompose` alias sharing planning's rank (it is
+        // the same stage under its pre-rename name, so `tsk-decompose` and
+        // `tsk-planning` tie and fall back to id ascending). A row at a
+        // stage this dashboard doesn't know sorts after all of them.
+        // "blocked" status never appears (D4's combined
+        // parkReason+statusCategory predicate excludes it via
         // parkReason == "system-error").
         assert_eq!(
             ids,
-            vec!["tsk-approval", "tsk-executing", "tsk-decompose", "tsk-clarify"]
+            vec![
+                "tsk-approval",
+                "tsk-executing",
+                "tsk-decompose",
+                "tsk-planning",
+                "tsk-exploring",
+                "tsk-discovery",
+            ]
         );
         assert!(rows.iter().all(|r| r.id != "tsk-blocked"));
     }

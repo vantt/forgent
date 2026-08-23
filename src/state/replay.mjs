@@ -9,9 +9,30 @@
 // Deterministic: folding the same ordered event array (or rebuilding from
 // the same log) twice always yields deep-equal views.
 
+import fs from 'node:fs';
+import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { readEvents } from './events.mjs';
+import { readEvents, readLastLineBefore, readEventsFromByte } from './events.mjs';
 import { DEFAULTS } from './work.mjs';
+
+// tsk-49e: every top-level key applyEvent ever writes to `view` is either an
+// array `.push`ed onto in place (only `decisions`) or reassigned via a
+// `{...oldValue, ...patch}` spread (every other container: work, gates,
+// settlements, learnings, decisionsById, outcomes, discovery, tools, and any
+// future one applyEvent adds) — never mutated two levels deep in place. A
+// generic ONE-LEVEL shallow clone of each top-level key is therefore
+// sufficient to protect a seed view's own nested references: `foldEvents`
+// only ever needs to guarantee its OWN `view` object (and each of its direct
+// children) is a fresh reference, never that every nested object is.
+function cloneTopLevel(seedView) {
+  const out = {};
+  for (const [key, value] of Object.entries(seedView)) {
+    if (Array.isArray(value)) out[key] = [...value];
+    else if (value && typeof value === 'object') out[key] = { ...value };
+    else out[key] = value;
+  }
+  return out;
+}
 
 /**
  * Fold an ordered array of events (as returned by `readEvents`) into a state
@@ -26,9 +47,15 @@ import { DEFAULTS } from './work.mjs';
  * old and new logs (and a log mixing old events followed by new ones) all
  * fold into a view shaped the same way. This module declares no default of
  * its own.
+ *
+ * `seedView` (tsk-49e, optional): when supplied, folding starts from a
+ * shallow clone of it (`cloneTopLevel`, above) instead of an empty view —
+ * `events` is then expected to be only the events NOT already folded into
+ * `seedView`, e.g. the incremental-snapshot read path in `rebuildView`
+ * below. Omitting it is byte-identical to every pre-tsk-49e caller.
  */
-export function foldEvents(events) {
-  const view = { work: {}, decisions: [] };
+export function foldEvents(events, seedView) {
+  const view = seedView ? cloneTopLevel(seedView) : { work: {}, decisions: [] };
   for (const event of events) {
     applyEvent(view, event);
   }
@@ -45,7 +72,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
+      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, mergedSha, mergedInto, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -168,6 +195,17 @@ function applyEvent(view, event) {
       // whichever field the move actually carried.
       if (item && to === 'awaiting-approval' && branchHeadAtReturn !== undefined) {
         item.branchHeadAtReturn = branchHeadAtReturn;
+      }
+      // Merge-evidence provenance (tsk-5dk), same fold-onto-item shape as
+      // headAtReturn/branchHeadAtReturn above, gated on THIS move's own
+      // `to === 'delivered'` — a hand-typed move (or a verify-only
+      // pull-door delivery) never carries these, so their absence on the
+      // folded item is itself evidence, not a gap.
+      if (item && to === 'delivered' && mergedSha !== undefined) {
+        item.mergedSha = mergedSha;
+      }
+      if (item && to === 'delivered' && mergedInto !== undefined) {
+        item.mergedInto = mergedInto;
       }
       // Human-gate ask/answer (per async-human-gate D2/D5), mirroring the
       // work.outcome lazy-key/merge-by-id precedent above: the ask (entry
@@ -380,22 +418,117 @@ function applyEvent(view, event) {
       }
       // Settlement channel, third kind (mirrors the work.move case above):
       // a clarify-pass is the third settling event type per the S3-closeout
-      // design — settlement means "left clarify carrying a verify" (D10),
-      // which is what `from === 'clarify'` actually tests. Guarded on the
-      // origin rather than `to === 'executing'` (stage-decompose D2): once
-      // cell 3 retargets the discovery engine onto `clarify -> decompose`,
-      // that edge must still settle even though it no longer lands on
-      // `executing`; `decompose -> executing` does NOT settle here (it never
-      // carries a `from === 'clarify'`), so it stays undocumented until a
-      // future spec pass. Guarded on `item` for the same ghost-id no-op
-      // reason as work.move above.
-      if (item && from === 'clarify') {
+      // design — settlement means "left the domain's entry stage carrying a
+      // verify" (D10), originally what `from === 'clarify'` tested. tsk-qod
+      // D1/D2: `clarify` retires entirely for coding — `discovery`
+      // (`stages[0]`) is now that entry stage, so this gate moves with it;
+      // no live coding item can ever produce `from === 'clarify'` again
+      // (only the historical migration edges do, which never carry a
+      // `role`/`verify` settlement shape to begin with). Guarded on the
+      // origin rather than `to === 'executing'` (stage-decompose D2): the
+      // discovery engine's first real hop off `discovery` must still settle
+      // even though it no longer lands on `executing` directly;
+      // `exploring -> planning`/`planning -> executing` do NOT settle here
+      // (they never carry a `from === 'discovery'`), so they stay
+      // undocumented until a future spec pass. Guarded on `item` for the
+      // same ghost-id no-op reason as work.move above.
+      //
+      // tsk-31lz: leaving `discovery` stopped being sufficient once tsk-30v
+      // made an UNCLEAR verdict advance the stage too (`discovery ->
+      // exploring`) while the item parks in `awaiting-human` with an open
+      // question — that path recorded a "passed" settlement for an item
+      // just judged NOT clear, with the FALLBACK_VERIFY placeholder as its
+      // `detail`. The verdict, not the destination, is what decides: the
+      // gate keys off the `work.discovery` record `resolveDiscovery`
+      // appends immediately before its own `moveStage` (discovery.mjs), so
+      // this stays a plain forward fold over data the log ALREADY carries.
+      //
+      // Deliberately not `to !== 'exploring'`: that reads the arrival edge,
+      // which RUL27 (`docs/specs/work-state.md`) locks against precisely so
+      // inserting a stage in the middle cannot silence an existing
+      // settlement — and it would retroactively silence every real
+      // `discovery -> exploring` settlement in this repo's own live log (all
+      // 45 of them, written before tsk-30v, when that edge WAS the clear
+      // path). Deliberately not a new payload field stamped in
+      // discovery.mjs either: replay is a pure fold over events already
+      // written, so a source-side marker would only ever fix moves made
+      // AFTER the fix, leaving any already-logged unclear move settling
+      // wrongly on every replay forever.
+      //
+      // A log line with no readable verdict (legacy, or a hand-run `fgos
+      // stage` move) settles exactly as it did before this fix — only an
+      // explicit `clear: false` suppresses.
+      const drivingVerdict = view.discovery?.[id]?.at(-1);
+      if (item && from === 'discovery' && drivingVerdict?.clear !== false) {
         if (!view.settlements) {
           view.settlements = {};
         }
         view.settlements[id] = [
           ...(view.settlements[id] ?? []),
           { kind: 'clarify-pass', role: role ?? null, ts: event.ts, detail: verify ?? null },
+        ];
+      }
+      break;
+    }
+    case 'work.handoff': {
+      // Additive event type (tsk-2t9c D1/D4/D8): an ASYNC call — the item
+      // parks for another role, `holder` changes. Two lazy structures,
+      // same absent-key-means-never-happened shape `view.outcomes`/
+      // `view.discovery` already use: `view.work[id].holder` is a
+      // latest-write-wins field (mirrors `item.stage` above); `callThreads`
+      // is an APPEND-only per-id log (mirrors `view.discovery`), the
+      // record a replaying reader needs to derive open-call depth for the
+      // callstack cap (src/state/handoff.mjs's own `openCallDepth` input
+      // is computed by the caller from this array, never stored as a
+      // counter field — a counter can drift from the log; a fold cannot).
+      const raw = event.payload ?? {};
+      const id = raw.id;
+      // tsk-397 D16 renamed the coding roleGraph's 'human-advisor' role to
+      // 'advisor'. events.jsonl is append-only and already carries real
+      // pre-rename 'human-advisor' handoffs (e.g. seq 18440, tsk-1yf) --
+      // without this normalization, replay reconstructs a `holder` value
+      // the new vocabulary rejects (WorkValidationError on any later write
+      // to that item), permanently stranding it. Map the retired literal
+      // forward on both fields a reader might compare against the current
+      // roleGraph vocabulary -- `from`/`to` are historical record either
+      // way, so normalizing here (not just `to`) keeps replay internally
+      // consistent instead of only patching the field that happens to
+      // throw today.
+      const normalizeRole = (role) => (role === 'human-advisor' ? 'advisor' : role);
+      const from = normalizeRole(raw.from);
+      const to = normalizeRole(raw.to);
+      const { reason, mode, returning, note } = raw;
+      const item = view.work[id];
+      if (item && typeof to === 'string') {
+        item.holder = to;
+      }
+      if (typeof id === 'string') {
+        if (!view.callThreads) {
+          view.callThreads = {};
+        }
+        view.callThreads[id] = [
+          ...(view.callThreads[id] ?? []),
+          { kind: 'handoff', from, to, reason, mode: mode ?? 'async', returning: Boolean(returning), note: note ?? null, ts: event.ts },
+        ];
+      }
+      break;
+    }
+    case 'work.call-summary': {
+      // Additive event type (tsk-2t9c D8): a SYNC in-session call
+      // (subagent) — the ball never leaves the session, so `holder` is
+      // deliberately left untouched here (the D8 invariant: holder
+      // changes only via work.handoff above). A compact record still
+      // folds into the same `callThreads[id]` array so compound-learn can
+      // see the full team-interaction picture without the state machine
+      // ever treating a sync call as a role change.
+      const { id, calleeRole, reason, outcome } = event.payload ?? {};
+      if (typeof id === 'string') {
+        if (!view.callThreads) {
+          view.callThreads = {};
+        }
+        view.callThreads[id] = [
+          ...(view.callThreads[id] ?? []),
+          { kind: 'call-summary', calleeRole, reason, outcome: outcome ?? null, ts: event.ts },
         ];
       }
       break;
@@ -425,8 +558,8 @@ function applyEvent(view, event) {
       // from the ask/answer fold above (that pair is the `awaiting-human`
       // park, a different mechanism). Three parallel fields live side by
       // side in the SAME lazy `gates[id]` object the ask/answer fold already
-      // creates: `contextApprove` (fgos-exploring), `planApprove`
-      // (fgos-planning), `validateApprove` (fgos-validating) — each an
+      // creates: `contextApprove` (fgos-coding-exploring), `planApprove`
+      // (fgos-coding-planning), `validateApprove` (fgos-coding-validating) — each an
       // OVERWRITE of just that one field (last approve wins per gate, mirrors
       // how a fresh `ask` overwrites the prior one above), never merged with
       // the other two gates' fields. `gates` stays the same LAZY key as
@@ -481,32 +614,35 @@ function applyEvent(view, event) {
       }
       break;
     }
-    case 'tool.register': {
-      // Additive event type (tsk-1dj, tool-registry-capability port): a full
-      // record OVERWRITE keyed by name, mirroring work.add's per-id shape —
-      // register never merges partial fields (there is no `tool.edit`).
-      // `tools` is a LAZY key exactly like `outcomes`/`frictions`/`gates`:
-      // absent from the view until the first tool.register event folds
-      // (backward-compat).
-      const tool = event.payload;
-      if (tool && typeof tool === 'object' && typeof tool.name === 'string') {
-        if (!view.tools) {
-          view.tools = {};
+    case 'work.resolve-park-reason': {
+      // Clears reason/parkReason from the live item view on terminal items,
+      // and records the note additively in view.parkResolutions[id].
+      const { id, writer } = event.payload ?? {};
+      const item = view.work[id];
+      if (item) {
+        delete item.reason;
+        delete item.parkReason;
+        if (writer !== undefined) {
+          item.writer = writer;
         }
-        view.tools[tool.name] = { ...tool };
+      }
+      if (typeof id === 'string') {
+        if (!view.parkResolutions) {
+          view.parkResolutions = {};
+        }
+        view.parkResolutions[id] = [
+          ...(view.parkResolutions[id] ?? []),
+          { ...event.payload, ts: event.ts },
+        ];
       }
       break;
     }
-    case 'tool.remove': {
-      // Mirrors tool.register above — deletes the keyed entry outright
-      // (never a tombstone/soft-delete); a remove for a name that was never
-      // registered, or already removed, is a no-op guarded by `view.tools`.
-      const { name } = event.payload ?? {};
-      if (typeof name === 'string' && view.tools) {
-        delete view.tools[name];
-      }
-      break;
-    }
+    // tsk-in1-1 D1: `tool.register`/`tool.remove` retired — a tool provider
+    // is now declared directly in `runner.executors.<id>` (config-edited,
+    // never event-sourced). Historical events of either type already in
+    // `.fgos/events.jsonl` fall through to `default` below and are skipped,
+    // same forward-compatible "unknown type, not an error" treatment any
+    // other retired event type gets.
     default:
       // Forward-compatible: an event type this view does not (yet) know how
       // to fold is skipped, not an error — readEvents already guarantees
@@ -515,12 +651,67 @@ function applyEvent(view, event) {
   }
 }
 
+// tsk-49e: state.json's own sibling `snapshot` field (written by
+// store.mjs's refreshView) — {size, mtimeMs, lastLine} as of the last
+// successful full read. Returns the persisted view directly (zero bytes of
+// `logPath` read) when the log is byte-for-byte unchanged since that
+// snapshot; folds only the NEW bytes onto it when the log has safely grown
+// past it (verified via readLastLineBefore); returns null (falls back to a
+// full read) on any doubt at all — a wrong-in-doubt design that can only
+// ever cost a slower call, never a wrong view. See docs/history/
+// tsk-49e-incremental-read-snapshot/RESEARCH.md for why mtime+size (not a
+// content hash of the whole prefix) is the right signal here, and why the
+// last-line fingerprint is proven safe against all 3 known log-rewrite
+// paths (repairTruncatedLastLine, fixEventsJsonlContiguity --fix, git's own
+// merge=union driver).
+function tryIncrementalRebuild(logPath) {
+  const viewPath = path.join(path.dirname(logPath), 'state.json');
+  let persisted;
+  try {
+    persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
+  } catch {
+    return null;
+  }
+  if (!persisted || typeof persisted !== 'object') return null;
+  const snap = persisted.snapshot;
+  if (!snap || typeof snap.size !== 'number' || typeof snap.mtimeMs !== 'number' || typeof snap.lastLine !== 'string') return null;
+
+  let stat;
+  try {
+    stat = fs.statSync(logPath);
+  } catch {
+    return null;
+  }
+
+  // Destructured only to exclude these two sibling fields (revision/
+  // snapshot) from the returned view shape -- everything else in
+  // `persisted` IS the real view, per writeView's own "additive sibling
+  // field, never folded back" pattern (see viewRevision's own doc comment).
+  const { revision, snapshot, ...savedView } = persisted;
+
+  if (stat.mtimeMs === snap.mtimeMs && stat.size === snap.size) {
+    return savedView; // untouched since the snapshot -- zero-read shortcut
+  }
+  if (stat.size <= snap.size) return null; // shrank, or same-size-different-mtime rewrite -- never safe to trust the prefix
+
+  const stillThere = readLastLineBefore(logPath, snap.size) === snap.lastLine;
+  if (!stillThere) return null; // prefix was rewritten (or the check itself failed) -- fall back, never guess
+
+  const newEvents = readEventsFromByte(logPath, snap.size);
+  return foldEvents(newEvents, savedView);
+}
+
 /**
  * Read every event from `logPath` (via `readEvents`) and fold it into a
  * fresh state view. This is the `fgos rebuild` primitive: rebuilding twice
- * from the same log must produce deep-equal views (D3 determinism).
+ * from the same log must produce deep-equal views (D3 determinism) —
+ * including via the tsk-49e snapshot fast path above, which is why that
+ * path is tried FIRST here but always falls back to this exact full-read
+ * shape on any doubt, never a partial or best-effort result.
  */
 export function rebuildView(logPath) {
+  const fast = tryIncrementalRebuild(logPath);
+  if (fast) return fast;
   const events = readEvents(logPath);
   return foldEvents(events);
 }
@@ -539,6 +730,13 @@ export function rebuildView(logPath) {
  * called on that pure shape (the on-disk `state.json` stamps this hash as a
  * sibling field; it is never folded back into the view a rebuild returns).
  */
-export function viewRevision(view) {
-  return createHash('sha256').update(JSON.stringify(view)).digest('hex');
+export function serializeView(view) {
+  const viewStr = JSON.stringify(view);
+  const revision = createHash('sha256').update(viewStr).digest('hex');
+  return { viewStr, revision };
 }
+
+export function viewRevision(view) {
+  return serializeView(view).revision;
+}
+

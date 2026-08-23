@@ -179,7 +179,7 @@ Ra: item `status: todo`, `stage: clarify`. Hợp đồng CTR001.
 Socratic theo phản xạ.
 
 - Gặp khái niệm/thư viện lạ → gọi `fgos-researching` tự tra trước, không hỏi người.
-- Còn gray area sản phẩm thật → `fgos-exploring` chốt quyết định cùng người, ghi `CONTEXT.md`.
+- Còn gray area sản phẩm thật → `fgos-coding-exploring` chốt quyết định cùng người, ghi `CONTEXT.md`.
 - Không tự quyết nổi → `fgos ask <id> --text "<đúng một câu hỏi>"` → `awaiting-human`. **Hệ không
   đứng im**; item khác chạy tiếp (CTR004).
 
@@ -188,10 +188,10 @@ phiên sống đã tự suy luận cấp thẳng verdict, bỏ qua judge subproc
 
 ### Khâu 3 — Decompose (chia việc)
 
-`fgos-planning` viết **kế hoạch nhỏ nhất trung thực** (`plan.md`); `fgos-validating` **đối chiếu kế
+`fgos-coding-planning` viết **kế hoạch nhỏ nhất trung thực** (`plan.md`); `fgos-coding-validating` **đối chiếu kế
 hoạch với repo thật** — reality check, không phải chỉ nghe hợp lý.
 
-Verb: `fgos decompose <id>` — pass-through nếu đủ nhỏ, hoặc **tách thành n item con độc lập**,
+Verb: `fgos plan <id>` — pass-through nếu đủ nhỏ, hoặc **tách thành n item con độc lập**,
 dependency rõ. Safety gate (heavy-risk / blast-radius / footprint-overlap) áp **vô điều kiện**, kể
 cả khi caller tự cấp verdict.
 
@@ -199,7 +199,7 @@ cả khi caller tự cấp verdict.
 
 `fgos pick <id>` → claim + **dựng worktree cô lập `fgw/<id>`** trong một bước.
 
-`fgos-code-implement` viết code thật, tự chạy `verify` của chính item đó, rồi gọi `fgos return
+`fgos-coding-implement` viết code thật, tự chạy `verify` của chính item đó, rồi gọi `fgos return
 <id>` → `awaiting-approval` (verify xanh) hoặc `blocked` (verify đỏ).
 
 **Song song:** khi một item đã tách con, `fgos-fanout` sóng các con qua `computeSchedule`, bắn tối
@@ -223,7 +223,7 @@ nhất theo `rankImpact` trong số item **đã hết dep chờ và không đụ
 ### Khâu 7 — Compound-learn
 
 `fgos retrospective` quét mọi item `delivered` → `retrospective`.
-`fgos-compounding` đọc capture thật, phân loại Diataxis, viết **tài liệu người-dùng-cuối** có trích
+`fgos-coding-compounding` đọc capture thật, phân loại Diataxis, viết **tài liệu người-dùng-cuối** có trích
 dẫn bằng chứng. `fgos-indexing` / `fgos docs-index` sinh lại index đọc-theo-tag.
 
 ### Khâu 8 — Cleanup

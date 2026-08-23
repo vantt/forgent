@@ -1,5 +1,5 @@
 // retro-pool.mjs (tsk-3o3) — picks the next single item for a
-// retro-loop iteration to run `fgos-compounding` synthesis on. PURE: no
+// retro-loop iteration to run `fgos-coding-compounding` synthesis on. PURE: no
 // fs, no `.fgos/` read, same discipline as cleanup-pool.mjs/
 // discover-pool.mjs/frontier.mjs/impact.mjs.
 //

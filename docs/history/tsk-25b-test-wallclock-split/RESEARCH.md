@@ -89,10 +89,10 @@ hai file test giống hệt nhau, mỗi file 2 test, mỗi test `execFileSync('s
 ### Still open (dành cho stage sau, không chặn `discovery`)
 
 - Chẻ `fgos.test.mjs` theo *đường cắt* nào (theo verb? theo vùng chức năng?)
-  và bao nhiêu nhóm — đây là quyết định shape, thuộc `fgos-exploring`/
-  `fgos-planning`, không phải finding.
+  và bao nhiêu nhóm — đây là quyết định shape, thuộc `fgos-coding-exploring`/
+  `fgos-coding-planning`, không phải finding.
 - Trong `checks.test.mjs`, hai test nặng nhất (12.2s + 10.7s, dựng môi
   trường thật) nằm cùng một nhóm thì nhóm đó thành trần mới; cách phân bổ
   là việc của plan.
 - Có nên đồng thời hạ *tổng* chi phí (gộp fixture, bớt spawn) hay chỉ trải
-  song song — câu hỏi scope, để `fgos-exploring` chốt.
+  song song — câu hỏi scope, để `fgos-coding-exploring` chốt.

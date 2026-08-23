@@ -31,3 +31,29 @@ jobs:
       # fresh-runner fgos doctor proof, D4) on every OS in the matrix above.
       - name: npm test (includes install-packaging matrix proof)
         run: npm test
+
+  # `npm test` is `node --test test/**/*.test.mjs` and cannot see the Rust
+  # crate at all, so until this job existed herdr-plugin had no automated
+  # coverage anywhere — not locally, not here. It bit for real (tsk-1l9): a
+  # one-line stage fixture change in src/app.rs broke an assertion in
+  # src/ui.rs, and only a hand-typed `cargo test` caught it.
+  #
+  # One OS, not the matrix above: this crate is a local developer dashboard,
+  # not a shipped cross-platform artifact, so per-OS proof would buy nothing
+  # for the runtime cost. Widen it the day the crate is actually distributed.
+  #
+  # No toolchain action: ubuntu-latest ships a working Rust toolchain, so the
+  # job needs no third-party action beyond the checkout this repo already
+  # trusts. `rustup show` fails loudly if that ever stops being true, instead
+  # of letting a missing toolchain read as a passing job.
+  herdr-plugin:
+    name: cargo test (herdr-plugin)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Rust toolchain
+        run: rustup show && cargo --version
+
+      - name: cargo test
+        run: cargo test --manifest-path herdr-plugin/Cargo.toml

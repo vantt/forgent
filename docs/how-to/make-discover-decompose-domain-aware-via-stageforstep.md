@@ -18,7 +18,7 @@ existing `coding` items.
      `stage !== 'decompose'`.
    - `src/intake/discovery.mjs` — `moveStage(..., to: 'decompose',
      expectedStage: 'clarify', ...)`.
-   - `src/intake/decompose.mjs` — `moveStage(..., to: 'executing',
+   - `src/intake/plan.mjs` — `moveStage(..., to: 'executing',
      expectedStage: 'decompose', ...)`.
 
 2. **Resolve the domain first.** `work.domain` is already in scope at every
@@ -112,7 +112,7 @@ Found by grepping `rg -n "addWork\(dir" src` (confirmed exhaustive: only
 the `addWork` definition plus the affected call sites matched — no
 call site was missed):
 
-- `src/intake/decompose.mjs` — child `addWork` call when a
+- `src/intake/plan.mjs` — child `addWork` call when a
   `verdict.kind === 'decompose'` split creates children: had
   `stage: 'executing'` hardcoded, no `domain` key at all, even though the
   parent's `domain` was already resolved one line away in the same

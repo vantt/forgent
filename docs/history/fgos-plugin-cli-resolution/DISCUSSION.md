@@ -28,8 +28,8 @@ hành thật (không chỉ chẩn đoán), có doctor check, có test thật. `t
 giờ đóng hẳn discussion, thu hẹp còn đúng 1 gap cụ thể còn sót lại —
 `fgos setup` không init `~/.fgos/config.json` — cộng việc sửa
 `docs/history/global-project-config-awareness/CONTEXT.md` đang stale.
-Không còn câu hỏi kiến trúc mở nào — sẵn sàng giao `fgos-exploring`/
-`fgos-planning`.
+Không còn câu hỏi kiến trúc mở nào — sẵn sàng giao `fgos-coding-exploring`/
+`fgos-coding-planning`.
 
 Item nền `tsk-1no` (fix hẹp 23 file, PATH-fallback) đang đứng chờ approve
 gate riêng, độc lập với discussion này — không bị ảnh hưởng bởi kết luận
@@ -238,7 +238,7 @@ global config nào") **sai** — chỉ grep `src/setup/config-merge.mjs` +
   được hỏi, khớp với đọc code trực tiếp.
 - Project config đã dời hẳn sang `.fgos/config.json` từ trước (không còn
   `.fgos-runner.json` nào được đọc thật trong code sản phẩm — chỉ còn sót
-  trong một fixture test không liên quan, `test/intake/decompose.test.mjs`).
+  trong một fixture test không liên quan, `test/intake/plan.test.mjs`).
 - `scripts/fgos-shell-integration.sh` đã có fallback D2 (`command fgos`)
   từ trước — không phải gap.
 
@@ -252,7 +252,7 @@ Trình bày phát hiện này cho người trước khi hỏi tiếp (đúng D6)
 người: đóng hẳn tsk-1ri (mục tiêu herdr-gateway đã đạt qua tsk-1no rồi),
 hay thu hẹp còn đúng gap setup-init + sửa doc stale, hay vẫn muốn đào sâu
 thêm góc nào khác của pillar 6. **Người chọn: thu hẹp về đúng gap +
-doc-refresh, đóng discussion, giao fgos-exploring/fgos-planning.**
+doc-refresh, đóng discussion, giao fgos-coding-exploring/fgos-coding-planning.**
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -336,7 +336,7 @@ init).
 npm test && node bin/fgos.mjs setup --dir <tmp-empty-project> && test -f ~/.fgos/config.json
 ```
 (chính xác hoá path/cách test global config không đụng máy thật khi
-`fgos-planning` thi công — cần cô lập `HOME`/`os.homedir()` giống cách
+`fgos-coding-planning` thi công — cần cô lập `HOME`/`os.homedir()` giống cách
 `test/config/global-config.test.mjs` đã làm, không chạy trực tiếp lên
 `~/.fgos/config.json` thật của máy dev).
 

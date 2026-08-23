@@ -4,11 +4,27 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { appendEvent } from '../../src/state/events.mjs';
-import { foldEvents, rebuildView, viewRevision } from '../../src/state/replay.mjs';
+import { foldEvents, rebuildView, viewRevision, serializeView } from '../../src/state/replay.mjs';
+import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
+import { fixEventsJsonlContiguity } from '../../src/state/events-jsonl-contiguity.mjs';
+import { repairTruncatedLastLine } from '../../src/state/events.mjs';
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpLogPath() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-'));
+  return path.join(dir, 'events.jsonl');
+}
+
+// tsk-49e: a full `.fgos`-shaped dir with a real state.json snapshot,
+// written through store.mjs's own real write path (never hand-crafted) --
+// the snapshot fast path only ever exists on disk this way in production.
+function tmpFgosDir() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-snapshot-'));
+  initStore(dir);
+  return dir;
+}
+
+function logPathOf(dir) {
   return path.join(dir, 'events.jsonl');
 }
 
@@ -314,31 +330,82 @@ test('foldEvents on a log with no work.discovery events yields a view with no "d
 // per D3/R3): 'clarify-pass' (work.stage -> executing), 'answer' (work.move
 // carrying an answer), 'close' (work.move -> done). `role` rides on the
 // SAME event's payload (additive, optional) rather than a separate write.
+//
+// tsk-qod D1/D2: the settlement gate itself moved from `from === 'clarify'`
+// to `from === 'discovery'` (replay.mjs) — `discovery` (`stages[0]`) is now
+// the coding domain's own entry stage, since `clarify` retired entirely.
+// The settlement `kind` string stays the literal 'clarify-pass' (a stable,
+// already-persisted event-history label, never renamed retroactively).
 
-test('foldEvents derives a clarify-pass settlement from work.stage -> executing, carrying role + verify as detail', () => {
+test('foldEvents derives a clarify-pass settlement from work.stage -> exploring, carrying role + verify as detail', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test -- a', role: 'runner' }, v: 2 },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test -- a', role: 'runner' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
   assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
 });
 
-test('foldEvents derives a clarify-pass settlement from work.stage clarify -> decompose too (settlement keys off leaving clarify, not landing on executing)', () => {
+test('foldEvents derives a clarify-pass settlement from work.stage discovery -> planning too (settlement keys off leaving the entry stage, not landing on executing)', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'decompose', verify: 'npm test -- a', role: 'runner' }, v: 2 },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'planning', verify: 'npm test -- a', role: 'runner' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
   assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
 });
 
-test('foldEvents does NOT derive a settlement from work.stage decompose -> executing (it never leaves clarify)', () => {
+// tsk-31lz: since tsk-30v, an UNCLEAR discovery verdict also leaves
+// `discovery` (-> `exploring`) while the item parks in `awaiting-human`
+// with an open question. `from === 'discovery'` alone therefore no longer
+// means "settled" — the gate has to read the verdict that drove the move.
+// The verdict is already in the log as the `work.discovery` event this same
+// `resolveDiscovery` call appends immediately BEFORE its `moveStage`
+// (discovery.mjs), so the fold can read it with no new payload field and no
+// change to already-written events.
+
+test('foldEvents does NOT derive a clarify-pass settlement when the discovery verdict that drove the discovery -> exploring move was unclear', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'decompose' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'decompose', to: 'executing' }, v: 2 },
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.discovery', payload: { id: 'a', clear: false, question: 'Which auth provider?' }, v: 2 },
+    { seq: 3, ts: '2026-08-12T00:00:02.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'chưa xác định — bổ sung thủ công', role: 'session' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('settlements' in view, false);
+});
+
+test('foldEvents still derives a clarify-pass settlement when the discovery verdict that drove the move was clear', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.discovery', payload: { id: 'a', clear: true }, v: 2 },
+    { seq: 3, ts: '2026-08-12T00:00:02.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'planning', verify: 'npm test -- a', role: 'session' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a.length, 1);
+  assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'session', ts: '2026-08-12T00:00:02.000Z', detail: 'npm test -- a' });
+});
+
+// Legacy-log guard (RUL20: the fold never silences a settlement a real
+// historical log already earned). Every `from === 'discovery'` event in this
+// repo's own live log predates tsk-30v, when `discovery -> exploring` WAS
+// the clear path — a log line that carries no readable verdict at all must
+// keep settling exactly as it did before this fix.
+test('foldEvents still derives a clarify-pass settlement from discovery -> exploring when the log carries no work.discovery verdict at all (legacy log)', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test -- a', role: 'runner' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a.length, 1);
+  assert.equal(view.settlements.a[0].kind, 'clarify-pass');
+});
+
+test('foldEvents does NOT derive a settlement from work.stage exploring -> planning (it never leaves discovery)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'exploring' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'exploring', to: 'planning' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal('settlements' in view, false);
@@ -367,8 +434,8 @@ test('foldEvents derives a close settlement from a work.move -> done, with a nul
 
 test('foldEvents settlement APPENDS across multiple settling transitions on the same id — none erase a prior one', () => {
   const events = [
-    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
-    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test', role: 'runner' }, v: 2 },
+    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test', role: 'runner' }, v: 2 },
     { seq: 3, ts: '2026-07-15T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'awaiting-human', ask: 'sure?' }, v: 2 },
     { seq: 4, ts: '2026-07-15T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'todo', answer: 'yes', role: 'human' }, v: 2 },
     { seq: 5, ts: '2026-07-15T00:00:04.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'done', role: 'human' }, v: 2 },
@@ -652,11 +719,57 @@ test('foldEvents ignores branchHeadAtReturn on a proposed move for an id that wa
   assert.equal('ghost' in view.work, false);
 });
 
+// `mergedSha`/`mergedInto` (tsk-5dk) fold onto the item on the SAME
+// `to: 'delivered'` edge the payload actually carries them on — never
+// inferred, never re-derived from git, straight off the event exactly like
+// headAtReturn/branchHeadAtReturn above.
+
+test('foldEvents folds mergedSha and mergedInto onto the item from a delivered move that carries them', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'awaiting-approval' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'delivered', role: 'human', mergedSha: 'deadbeefcafe', mergedInto: 'main' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.mergedSha, 'deadbeefcafe');
+  assert.equal(view.work.a.mergedInto, 'main');
+});
+
+test('foldEvents leaves mergedSha/mergedInto absent for a delivered move that never carried them (hand-typed move, or a verify-only pull-door delivery)', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'awaiting-approval' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'delivered', role: 'human' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('mergedSha' in view.work.a, false);
+  assert.equal('mergedInto' in view.work.a, false);
+});
+
+test('foldEvents ignores mergedSha/mergedInto on a non-delivered move even when the payload carries them (only the delivered edge sets them)', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', mergedSha: 'ignored-on-this-edge', mergedInto: 'ignored-on-this-edge' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('mergedSha' in view.work.a, false);
+  assert.equal('mergedInto' in view.work.a, false);
+});
+
 // --- work-graph-intelligence S3: view revision-hash -----------------------
 // A deterministic fingerprint of a folded view (C1 data_hash pattern), so a
 // consumer can tell "did the folded state change?" without re-folding — and
 // WITHOUT the hash leaking into the fold return shape (which whole-view
 // snapshot + backward-compat tests pin).
+
+test('serializeView returns serialized JSON string and matching revision hash (tsk-37d)', () => {
+  const logPath = tmpLogPath();
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
+  const view = rebuildView(logPath);
+
+  const { viewStr, revision } = serializeView(view);
+  assert.equal(typeof viewStr, 'string');
+  assert.equal(revision, viewRevision(view));
+  assert.deepEqual(JSON.parse(viewStr), view);
+});
 
 test('viewRevision is deterministic: rebuilding the same log twice yields byte-identical revisions', () => {
   const logPath = tmpLogPath();
@@ -757,34 +870,246 @@ test("foldEvents on a log with no tool.register events yields a view with no too
   assert.equal(Object.hasOwn(view, "tools"), false);
 });
 
-test("foldEvents folds tool.register into view.tools keyed by name", () => {
+test("foldEvents skips retired tool.register/tool.remove events (tsk-in1-1 D1) — forward-compatible, never an error, never creates view.tools", () => {
   const events = [
-    {
-      seq: 1,
-      ts: "2026-07-31T00:00:00.000Z",
-      type: "tool.register",
-      payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus", scanTarget: ".gitnexus" },
-    },
-  ];
-  const view = foldEvents(events);
-  assert.deepEqual(view.tools.gitnexus, { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus", scanTarget: ".gitnexus" });
-});
-
-test("foldEvents folds tool.remove by deleting the keyed entry", () => {
-  const events = [
-    { seq: 1, ts: "2026-07-31T00:00:00.000Z", type: "tool.register", payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus" } },
+    { seq: 1, ts: "2026-07-31T00:00:00.000Z", type: "tool.register", payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus", scanTarget: ".gitnexus" } },
     { seq: 2, ts: "2026-07-31T00:00:01.000Z", type: "tool.remove", payload: { name: "gitnexus" } },
   ];
   const view = foldEvents(events);
-  assert.equal(view.tools.gitnexus, undefined);
+  assert.equal(Object.hasOwn(view, "tools"), false);
 });
 
-test("foldEvents' tool.register is a full-record overwrite, never a merge with a prior registration under the same name", () => {
-  const events = [
-    { seq: 1, ts: "2026-07-31T00:00:00.000Z", type: "tool.register", payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus", responsibility: "Verification" } },
-    { seq: 2, ts: "2026-07-31T00:00:01.000Z", type: "tool.remove", payload: { name: "gitnexus" } },
-    { seq: 3, ts: "2026-07-31T00:00:02.000Z", type: "tool.register", payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus" } },
-  ];
-  const view = foldEvents(events);
-  assert.equal(view.tools.gitnexus.responsibility, undefined);
+// ─── tsk-49e: incremental-read snapshot fast path ──────────────────────────
+
+test('rebuildView takes the zero-read fast path when the log is byte-identical to the snapshot -- spies on real fs reads', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+
+  let readCount = 0;
+  const originalReadFileSync = fs.readFileSync;
+  const originalReadSync = fs.readSync;
+  fs.readFileSync = function patched(target, ...rest) {
+    if (target === logPath) readCount++;
+    return originalReadFileSync.call(fs, target, ...rest);
+  };
+  fs.readSync = function patched(fd, ...rest) {
+    // readSync's first arg is a numeric fd, not a path -- can't filter by
+    // path directly, but nothing else in this test touches fs.readSync, so
+    // any call here is real signal.
+    readCount++;
+    return originalReadSync.call(fs, fd, ...rest);
+  };
+  try {
+    rebuildView(logPath);
+  } finally {
+    fs.readFileSync = originalReadFileSync;
+    fs.readSync = originalReadSync;
+  }
+  assert.equal(readCount, 0, 'an unchanged log must read zero bytes of events.jsonl -- only state.json (a different path) and a stat call');
 });
+
+test('rebuildView via the zero-read fast path still returns a view deep-equal to a fresh full read', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  moveWork(dir, { id: 'a', to: 'doing', expectedStatus: 'todo' });
+
+  const viaFastPath = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(viaFastPath, freshFold);
+});
+
+test('rebuildView incrementally folds new events after the snapshot, deep-equal to a fresh full read', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  // state.json now snapshots the log as of the addWork above. Append MORE
+  // events directly (bypassing store.mjs's own refreshView) so the log
+  // genuinely outgrows the snapshot without state.json itself moving.
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+  appendEvent(logPath, { type: 'work.edit', payload: { id: 'a', patch: { priority: 42 } } });
+
+  const incremental = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(incremental, freshFold);
+  assert.equal(incremental.work.a.status, 'doing');
+  assert.equal(incremental.work.a.priority, 42);
+});
+
+test('rebuildView incremental path reads only the NEW bytes, not the whole file', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  const sizeAtSnapshot = fs.statSync(logPath).size;
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+
+  const originalReadFileSync = fs.readFileSync;
+  let sawFullFileRead = false;
+  fs.readFileSync = function patched(target, ...rest) {
+    if (target === logPath) sawFullFileRead = true;
+    return originalReadFileSync.call(fs, target, ...rest);
+  };
+  try {
+    rebuildView(logPath);
+  } finally {
+    fs.readFileSync = originalReadFileSync;
+  }
+  assert.equal(sawFullFileRead, false, 'the incremental path must never call fs.readFileSync on the full log path');
+  assert.ok(fs.statSync(logPath).size > sizeAtSnapshot, 'sanity: the log genuinely grew past the snapshot');
+});
+
+test('rebuildView falls back to a full read when the log SHRANK since the snapshot (never trusts a smaller file)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  addWork(dir, { id: 'b', title: 'B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  // Truncate the log back to something SMALLER than the snapshot recorded --
+  // simulates any pathological external rewrite that shrinks the file.
+  const raw = fs.readFileSync(logPath, 'utf8');
+  const firstLineEnd = raw.indexOf('\n') + 1;
+  fs.writeFileSync(logPath, raw.slice(0, firstLineEnd), 'utf8');
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold, 'must still produce a CORRECT view of the (now-shrunk) real log, never a stale cached one');
+});
+
+test('rebuildView is safe against repairTruncatedLastLine (tail-only rewrite -- prefix genuinely untouched)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  // Simulate a crash mid-append: a genuinely corrupt trailing line.
+  fs.appendFileSync(logPath, '{"seq":999,"type":"work.move","payload":{"id":"a"', 'utf8'); // no closing brace, no trailing \n
+  repairTruncatedLastLine(logPath);
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold, 'must still produce a view identical to a fresh full read of the repaired log');
+  assert.ok(view.work.a, 'the item added before the corruption must still be present');
+});
+
+test('rebuildView falls back to a full read after fixEventsJsonlContiguity rewrites the log (resort+reseq changes the fingerprint)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  // Craft a real seq duplicate/gap directly on the log -- the shape
+  // fixEventsJsonlContiguity's own module exists to repair.
+  const raw = fs.readFileSync(logPath, 'utf8');
+  const lastEvent = JSON.parse(raw.trim().split('\n').pop());
+  const duplicateLine = `${JSON.stringify({ ...lastEvent, ts: '2026-08-11T00:00:00.000Z' })}\n`;
+  fs.appendFileSync(logPath, duplicateLine, 'utf8');
+
+  const result = fixEventsJsonlContiguity(logPath);
+  assert.equal(result.fixed, true, 'sanity: the crafted duplicate seq was actually detected and fixed');
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold, 'must still produce a view identical to a fresh full read of the fixed log');
+});
+
+test('rebuildView falls back to a full read after a wholesale reordering rewrite (git merge=union stand-in)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+
+  // Simulate what git's own docs say merge=union produces: the same lines,
+  // reordered, never a targeted edit -- a real union merge could ALSO
+  // reorder lines that were already part of the pre-snapshot prefix.
+  const lines = fs.readFileSync(logPath, 'utf8').trim().split('\n');
+  const reordered = [...lines].reverse().map((l) => `${l}\n`).join('');
+  fs.writeFileSync(logPath, reordered, 'utf8');
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold, 'must still produce a view identical to a fresh full read of the reordered log');
+});
+
+test('rebuildView falls back to a full read when state.json has no snapshot field at all (pre-tsk-49e state.json, or hand-edited)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  const viewPath = path.join(dir, 'state.json');
+  const persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
+  delete persisted.snapshot;
+  fs.writeFileSync(viewPath, JSON.stringify(persisted), 'utf8');
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold);
+});
+
+test('rebuildView falls back to a full read when the snapshot sub-fields are malformed (wrong type, not absent)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  const viewPath = path.join(dir, 'state.json');
+  const persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
+  persisted.snapshot.size = 'not-a-number';
+  fs.writeFileSync(viewPath, JSON.stringify(persisted), 'utf8');
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold);
+});
+
+test('rebuildView zero-read fast path never mutates the persisted view when a caller mutates the returned object (cloneTopLevel protects the snapshot)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+  appendEvent(logPath, { type: 'work.edit', payload: { id: 'a', patch: { priority: 7 } } });
+
+  const first = rebuildView(logPath); // incremental fold onto the snapshot's savedView
+  first.decisions.push({ text: 'mutated by caller, must not leak' });
+  first.work.a.priority = 999;
+
+  const second = rebuildView(logPath); // same log, same snapshot -- must be unaffected by the mutation above
+  assert.deepEqual(second.decisions, []);
+  assert.equal(second.work.a.priority, 7);
+});
+
+test('determinism: the zero-read fast path\'s round-tripped view is deep-equal to a fresh fold for a multi-field, realistic item', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, {
+    id: 'a', title: 'A realistic item', kind: 'feature', status: 'todo', deps: [], risk: 'standard', refs: ['docs/x.md'],
+    verify: 'npm test', tier: 'standard', description: 'a full description', footprint: ['src/a.mjs'],
+  });
+  moveWork(dir, { id: 'a', to: 'doing', expectedStatus: 'todo' });
+
+  const viaFastPath = rebuildView(logPath); // exact-match zero-read shortcut
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(viaFastPath, freshFold, 'the round-trip through state.json (JSON.stringify/parse) must never drop or alter a field a fresh fold would carry');
+});
+
+test('work.handoff replay normalizes the retired human-advisor literal to advisor (tsk-397 D16 rename) -- an append-only log already carrying pre-rename events must not strand an item with a holder the current vocabulary rejects', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+  // Raw pre-rename event shape, exactly as a real log written before D16 has it
+  // (.fgos/events.jsonl seq 18440, tsk-1yf) -- never re-authored to the new
+  // literal, since the whole point is proving replay heals an already-written
+  // retired value, not that a fresh write uses the new one.
+  appendEvent(logPath, { type: 'work.handoff', payload: { id: 'a', from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' } });
+
+  const view = rebuildView(logPath);
+  assert.equal(view.work.a.holder, 'advisor');
+  assert.equal(view.callThreads.a.at(-1).to, 'advisor');
+
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold, 'the snapshot fast path and a fresh full fold must normalize identically');
+});
+
+// Local helper: reads the whole log via a bypass path (never through
+// rebuildView, so these tests' own "fresh full read" oracle is never
+// itself affected by the snapshot fast path under test).
+function readEventsWhole(logPath) {
+  const raw = fs.readFileSync(logPath, 'utf8');
+  return raw
+    .split('\n')
+    .filter((l) => l !== '')
+    .map((l) => JSON.parse(l));
+}

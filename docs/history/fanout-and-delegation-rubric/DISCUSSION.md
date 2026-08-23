@@ -46,7 +46,7 @@ lại chờ `#task-skill`.
 
 **Discussion coi như đã hội tụ.** Bước tiếp theo là handoff: gắn `refs` của
 `tsk-5kn` (hoặc từng item con sau khi split) vào đúng anchor `{#task-...}`,
-rồi claim item và chạy `fgos-exploring` → `fgos-planning` ngay trong session
+rồi claim item và chạy `fgos-coding-exploring` → `fgos-coding-planning` ngay trong session
 có đầy đủ ngữ cảnh này.
 
 **⚠ Ranh giới phạm vi — đọc trước khi tưởng discussion này giải hết fan-out.**
@@ -99,8 +99,8 @@ doctrine tương đương nhiều tháng) nhưng không được import mù: bee
 | 4 | `AGENTS.md` (tầng luôn nạp) hoàn toàn im lặng về delegation; mọi luật delegation chỉ nạp khi 1 skill trỏ vào hoặc đọc-khi-gọi-tên | **Rõ** | `CLAUDE.md:6` `@AGENTS.md`; `AGENTS.md` 133 dòng, không mục nào về dispatch/subagent |
 | 5 | Fan-out **execute** N children không bị luật nào chặn — children của decompose là rootTask thật, dispatch song song = kích hoạt N rootTask đúng định nghĩa 0026 | **Rõ** | `0026:34-56`; demo `tsk-1sj`→`tsk-30z`/`tsk-50ic` đã chạy thật, ~184s overlap đo được |
 | 6 | Cái bị D4 gác là "exec packet" — helper ghi file mà không mang vòng đời. D9 mở lại khi (a) `tsk-3xd` merged [đã thoả 2026-08-06] + (b) ≥2 ca thật [chưa] | **Rõ** | `two-layer-dispatch/DISCUSSION.md:120,126,546-549` |
-| 7 | **Ô L1-whether KHÔNG trống** — `tsk-29i` đã cố ý đặt luật cấm ad-hoc Task/Agent delegation vào `fgos-exploring`, `fgos-planning`, `fgos-validating`, `fgos-code-implement`; `fgos-coding-driving` audit xong kết luận không cần | **Rõ** | `fgos-stage-skills-task-delegation-audit/CONTEXT.md` D1/D2 |
-| 8 | Luật `tsk-29i` nêu lý do là "re-deriving what a live soul already knows", nhưng văn bản lại cấm cả bước **scout** (`Bash/Grep/rg/Read/WebSearch`) — thứ session *chưa* biết. Lý do nêu và phạm vi cấm có khớp nhau không? | **Gần rõ** (vòng 2) — không khớp; trục đúng là "đã cầm trong tay chưa", không phải "có phải scout không". Chờ giữ nguyên thêm 1 vòng trước khi mint D-ID | `fgos-exploring/SKILL.md:47-64`; §5 vòng 2 |
+| 7 | **Ô L1-whether KHÔNG trống** — `tsk-29i` đã cố ý đặt luật cấm ad-hoc Task/Agent delegation vào `fgos-coding-exploring`, `fgos-coding-planning`, `fgos-coding-validating`, `fgos-coding-implement`; `fgos-coding-driving` audit xong kết luận không cần | **Rõ** | `fgos-stage-skills-task-delegation-audit/CONTEXT.md` D1/D2 |
+| 8 | Luật `tsk-29i` nêu lý do là "re-deriving what a live soul already knows", nhưng văn bản lại cấm cả bước **scout** (`Bash/Grep/rg/Read/WebSearch`) — thứ session *chưa* biết. Lý do nêu và phạm vi cấm có khớp nhau không? | **Gần rõ** (vòng 2) — không khớp; trục đúng là "đã cầm trong tay chưa", không phải "có phải scout không". Chờ giữ nguyên thêm 1 vòng trước khi mint D-ID | `fgos-coding-exploring/SKILL.md:47-64`; §5 vòng 2 |
 | 8b | Rubric 3 ca (đã-biết ⇒ inline · chưa-biết + chỉ cần kết luận ⇒ delegate · chưa-biết + cần byte thô ⇒ inline) có phải hình dạng đúng của L1-whether không | **Chưa rõ — đề xuất vòng 2, chưa giữ qua vòng nào** | §5 vòng 2 |
 | 8c | Tiết kiệm context và tăng tốc là **hai lợi ích độc lập** (context có kể cả khi dispatch tuần tự 1 con; tốc độ chỉ có khi bắn đồng thời). D2 đã có vế tốc độ, thiếu đúng vế context | **Rõ** | `two-layer-dispatch/DISCUSSION.md:576-577`; đo thật §5 vòng 2 |
 | 9 | `fgos-coding-shaping` (skill đang chạy discussion này) **không** nằm trong phạm vi audit `tsk-29i`, nên hiện không có luật cấm delegate — nhất quán hay là lỗ hổng? | **Chưa rõ** | `tsk-29i` CONTEXT.md liệt kê 4 skill, không có coding-shaping |
@@ -110,11 +110,11 @@ doctrine tương đương nhiều tháng) nhưng không được import mù: bee
 | 13 | Tên gọi vai trò (đề xuất "rootTask host", 0026 đã tự dùng chữ "host" trong prose) | **Chưa rõ** | `0026:58-65` |
 | 14 | Thứ tự làm: fan-out gather trước hay execute trước | **Chưa rõ** | — |
 | 15 | Item nào mang việc này: mới, nối lineage `tsk-29i`, hay mục mở `docs/backlog.md:86` ("audit ranh giới planner-vs-orchestrator và chốt bằng decision record") | **Chưa rõ** | `docs/backlog.md:86` |
-| 16 | **Ngân sách research + quyền fan-out đang nằm sai phía**: tiến trình spawn (ít thông tin hơn) được khuyến khích fan-out Task song song + ~5 lượt research; session sống (đầy đủ context) bị cấm delegate + đúng 1 lượt grep | **Rõ** | prompt `src/intake/discovery.mjs` bước 4 vs `tsk-29i` + `fgos-exploring/SKILL.md` Flow bước 1; §5 vòng 3 |
-| 17 | **Pha "discovery" (máy một mình: scout hệ sinh thái + research online + tự đánh giá) không tồn tại dưới dạng skill** — chỉ tồn tại như prompt bên trong spawn. `fgos-exploring` hướng về người ngay bước 1 | **Rõ** | §5 vòng 3 |
+| 16 | **Ngân sách research + quyền fan-out đang nằm sai phía**: tiến trình spawn (ít thông tin hơn) được khuyến khích fan-out Task song song + ~5 lượt research; session sống (đầy đủ context) bị cấm delegate + đúng 1 lượt grep | **Rõ** | prompt `src/intake/discovery.mjs` bước 4 vs `tsk-29i` + `fgos-coding-exploring/SKILL.md` Flow bước 1; §5 vòng 3 |
+| 17 | **Pha "discovery" (máy một mình: scout hệ sinh thái + research online + tự đánh giá) không tồn tại dưới dạng skill** — chỉ tồn tại như prompt bên trong spawn. `fgos-coding-exploring` hướng về người ngay bước 1 | **Rõ** | §5 vòng 3 |
 | 18 | Có tách `clarify` thành hai pha tường minh (discovery máy-một-mình → park → exploring máy+người) không, hay giữ một stage và chỉ chuyển ngân sách research sang session sống? | **Gần rõ (vòng 4)** — người dùng chọn **Hình 1: tách stage**. Chờ giữ nguyên thêm 1 vòng trước khi mint D-ID | §5 vòng 4 |
 | 21 | Stage và skill là **hai trục vuông góc**: stage `discovery` (vị trí vòng đời) + skill `fgos-researching` (năng lực tái dùng, gọi được cả từ giữa chừng exploring). Skill phải **stage-agnostic** | **Gần rõ (vòng 4)** | §5 vòng 4, yêu cầu re-entrancy của người dùng |
-| 22 | **`tsk-29i` KHÔNG cần sửa** — luật cấm "ad hoc sub-dispatch" và tự chỉ đường "route it explicitly through the capacity-dispatch mechanism". Skill research có hợp đồng chính là đường đó. Vòng 1-2 đuổi sai hướng | **Rõ** | nguyên văn `fgos-exploring/SKILL.md:47-64`; §5 vòng 4 |
+| 22 | **`tsk-29i` KHÔNG cần sửa** — luật cấm "ad hoc sub-dispatch" và tự chỉ đường "route it explicitly through the capacity-dispatch mechanism". Skill research có hợp đồng chính là đường đó. Vòng 1-2 đuổi sai hướng | **Rõ** | nguyên văn `fgos-coding-exploring/SKILL.md:47-64`; §5 vòng 4 |
 | 23 | Nguyên nhân `claude -p`: **ranh giới tiến trình**. Verb Node là tiến trình con của Bash tool, không còn Task. Transparent dispatch chỉ tác dụng PHÍA TRÊN ranh giới (tầng skill). Dời research lên skill ⇒ ăn ngay, không cần cơ chế mới. `claude -p` về đúng vai đường-lui-khi-không-có-soul-sống (0026 quy tắc 3/4) | **Rõ** | §5 vòng 4; `capacity-dispatch-fallback.md` Step B.5 |
 | 24 | **Đính chính hàng 10**: fan-out nhiều nhánh **đã hợp lệ** dưới lý do 4 ("chạy song song cho nhanh"). Chỉ ca **một-nhánh-nặng** mới không lọt lý do nào ⇒ việc thêm lý do thứ 5 nhỏ hơn nhiều so với ước lượng vòng 2 | **Rõ** | §5 vòng 4 |
 | 25 | Ghi nhận research hỏng 3 đường: ghi đè thay vì tích luỹ · chỉ bắt `rg` (mất WebSearch/WebFetch) · cơ chế cạo-transcript sẽ chết khi research lên skill | **Rõ** | `discovery.mjs:384-385`; `judge-executor.mjs:147`, `:125-192` |
@@ -172,7 +172,7 @@ thật qua `fgos decision --id tsk-5kn`.
 
 **Phát hiện chính:** tiền đề "ô L1-whether trống" **sai**. `tsk-29i` đã điền
 vào ô đó một chữ "không", có chủ đích, qua audit, với 2 quyết định khoá
-(D1: `fgos-validating` được luật riêng thay vì dựa vào D6 sẵn có; D2: mở
+(D1: `fgos-coding-validating` được luật riêng thay vì dựa vào D6 sẵn có; D2: mở
 rộng phạm vi audit sang `fgos-coding-driving`).
 
 **Căng thẳng lộ ra:** lý do nêu trong luật và phạm vi luật cấm không khớp
@@ -183,7 +183,7 @@ discussion này đã dispatch 5 Explore subagent để scout (bee swarming,
 two-layer-dispatch, bản đồ vocabulary "orchestrator", ngữ nghĩa fork của
 Claude Code, delegation contract của bee). Mỗi cái trả về digest. Tổng dung
 lượng nguồn đọc qua chỉ riêng `beegog.md` là 105KB. Session này **không**
-chạy `fgos-exploring`/`fgos-planning` nên không vi phạm luật `tsk-29i` —
+chạy `fgos-coding-exploring`/`fgos-coding-planning` nên không vi phạm luật `tsk-29i` —
 nhưng nó là một mẫu quan sát được về đúng hành vi đang bàn.
 
 ### 2026-08-06 — Vòng 2: đo thật chi phí, và trục phân biệt được đặt lại
@@ -233,7 +233,7 @@ thứ mình đã cầm trong tay"*. Từ đó ra rubric 3 ca (đề xuất, chư
 | 2 | Chưa | Không, chỉ cần kết luận | **delegate** — thắng cả context lẫn tốc độ |
 | 3 | Chưa | **Có** — phải trích nguyên văn, hoặc phải tự nhìn sắc thái mới nghĩ ra câu hỏi | **inline** — digest làm mất đúng thứ cần |
 
-Ca 3 giữ lại được thứ `tsk-29i` muốn bảo vệ ở `fgos-exploring`. Nên hướng
+Ca 3 giữ lại được thứ `tsk-29i` muốn bảo vệ ở `fgos-coding-exploring`. Nên hướng
 xử lý không phải lật ngược luật, mà **thu phạm vi**: từ "cấm delegate scout"
 xuống "cấm delegate thứ đã cầm", cộng ca 3 làm ngoại lệ có lý do nêu rõ.
 
@@ -385,7 +385,7 @@ cho những việc con đó"*.
 | Nơi | Chế độ nạp |
 |---|---|
 | `AGENTS.md` (qua `CLAUDE.md:6` `@AGENTS.md`) | **luôn nạp, mọi session, mọi turn** — và **im lặng hoàn toàn về delegation** (133 dòng, không mục nào) |
-| `_shared/capacity-dispatch-fallback.md` | chỉ nạp khi 1 skill trỏ vào — 5 skill đang trỏ (`fgos-exploring:63`, `fgos-planning:64`, `fgos-validating:73`, `fgos-code-implement:50`, `fgos-submit-assist:50`) |
+| `_shared/capacity-dispatch-fallback.md` | chỉ nạp khi 1 skill trỏ vào — 5 skill đang trỏ (`fgos-coding-exploring:63`, `fgos-coding-planning:64`, `fgos-coding-validating:73`, `fgos-coding-implement:50`, `fgos-submit-assist:50`) |
 | `docs/decisions/0026-*.md` | đọc-khi-được-gọi-tên |
 | `docs/how-to/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md` | đọc-khi-được-gọi-tên |
 | `docs/history/two-layer-dispatch/{CONTEXT,DISCUSSION}.md` | đọc-khi-được-gọi-tên |
@@ -459,7 +459,7 @@ nhánh:**
 
 | Nhánh | Điều kiện | Có gọi model không |
 |---|---|---|
-| **A** | `callerVerdict` được truyền vào | **Không** — ghi decision *"caller-supplied: session already reasoned live (fgos-exploring)"* (`tsk-27y` D2) |
+| **A** | `callerVerdict` được truyền vào | **Không** — ghi decision *"caller-supplied: session already reasoned live (fgos-coding-exploring)"* (`tsk-27y` D2) |
 | **B1** | `docsRef` trỏ tới `CONTEXT.md` đã commit, không rỗng | **Không** — ghi decision *"trusted committed CONTEXT.md, no model call"* (`tsk-ozl` D2) |
 | **B2** | còn lại | Có — `judgeDiscovery` → `runJudgeExecutor` → `spawnSync` |
 
@@ -493,7 +493,7 @@ song**.
 
 | Ai | Lệnh về fan-out | Ngân sách scout |
 |---|---|---|
-| Session sống (`fgos-exploring`) | **CẤM** delegate qua Task (`tsk-29i`) | đúng **một** lượt `rg ... \| head -20` |
+| Session sống (`fgos-coding-exploring`) | **CẤM** delegate qua Task (`tsk-29i`) | đúng **một** lượt `rg ... \| head -20` |
 | Tiến trình spawn (`judge-discovery`) | **KHUYẾN KHÍCH** fan-out Task song song | ~5 lượt research, có WebSearch/WebFetch |
 
 Bên **ít thông tin hơn** được cấp quyền fan-out và ngân sách nghiên cứu;
@@ -524,8 +524,8 @@ skill**. `tsk-27y` đã dời **verdict** lên; **chưa ai dời phần research
 | | Mô hình người dùng | fgOS hiện tại |
 |---|---|---|
 | Pha 1 | **discovery** — máy một mình: đọc description → scout hệ sinh thái → research online → tự đánh giá rõ/chưa | **không tồn tại dưới dạng skill**; chỉ tồn tại dưới dạng đoạn prompt bên trong tiến trình spawn |
-| Pha 2 | **exploring** — chỉ vào khi pha 1 kết luận *chưa rõ*: park, đợi người, máy+người trao đổi | `fgos-exploring` — hướng về người **ngay từ bước 1** (một lượt grep rồi sinh câu hỏi) |
-| Cửa vào | — | `/fgOS:discover` nghe như pha 1 nhưng route thẳng vào `fgos-exploring`, tức pha 2 |
+| Pha 2 | **exploring** — chỉ vào khi pha 1 kết luận *chưa rõ*: park, đợi người, máy+người trao đổi | `fgos-coding-exploring` — hướng về người **ngay từ bước 1** (một lượt grep rồi sinh câu hỏi) |
+| Cửa vào | — | `/fgOS:discover` nghe như pha 1 nhưng route thẳng vào `fgos-coding-exploring`, tức pha 2 |
 
 ### 2026-08-06 — Vòng 4: chốt hướng Hình 1, và fan-out tìm được nhà
 
@@ -599,7 +599,7 @@ Tầng lớp sạch ra:
 
 | Skill | Độ cao | Fan-out |
 |---|---|---|
-| `fgos-exploring` — đối thoại với người | **decide-altitude** | **cấm** — `tsk-29i` giữ nguyên, và đúng |
+| `fgos-coding-exploring` — đối thoại với người | **decide-altitude** | **cấm** — `tsk-29i` giữ nguyên, và đúng |
 | `fgos-researching` — máy tự tìm | **gather-altitude** | **là chế độ mặc định** |
 
 Ranh giới hai skill này chính là lát cắt decide/gather của bee — nhưng đến
@@ -889,10 +889,10 @@ không có soul tại chỗ.
 **Fan-out có nhà** (D2). Skill research là **gather-altitude** — nó chưa
 biết đáp án, và nó chỉ cần kết luận chứ không cần byte thô — nên fan-out
 song song là chế độ mặc định của nó khi câu hỏi có nhiều nhánh độc lập.
-Luật cấm delegation ở `fgos-exploring` (`tsk-29i`) **giữ nguyên, không
+Luật cấm delegation ở `fgos-coding-exploring` (`tsk-29i`) **giữ nguyên, không
 sửa**: nó cấm *"ad hoc sub-dispatch"* và tự chỉ đường *"route it explicitly
 through the capacity-dispatch mechanism"* — một skill có tên, gọi qua cơ chế
-capacity, chính là đường đó. `fgos-exploring` là decide-altitude và ở lại
+capacity, chính là đường đó. `fgos-coding-exploring` là decide-altitude và ở lại
 decide-altitude.
 
 **Sản phẩm research được giữ lại** (D5). `docs/history/<feature>/RESEARCH.md`,
@@ -1018,7 +1018,7 @@ còn được `discovery.mjs` import.
 
 ### exploring gọi lại research {#task-exploring}
 
-**Mục tiêu.** Nối luật D7/D8 vào `fgos-exploring`: nhận diện lúc người ném
+**Mục tiêu.** Nối luật D7/D8 vào `fgos-coding-exploring`: nhận diện lúc người ném
 vào một tên riêng chưa giải được, gọi `fgos-researching` **trong-stage**,
 nhận kết quả rồi quay lại đối thoại. Không đụng luật `tsk-29i` (D2) — đây
 là dispatch có hợp đồng, không phải ad-hoc.
@@ -1030,7 +1030,7 @@ chưa được giải... đó là lời gọi trong-stage, không phải quay ng
 
 **Quan hệ.** Chờ `#task-skill`. Độc lập với `#task-verb`.
 
-**Verify nháp.** `npm test` + kiểm prose `fgos-exploring/SKILL.md`: có luật
+**Verify nháp.** `npm test` + kiểm prose `fgos-coding-exploring/SKILL.md`: có luật
 gọi lại research với hai nhánh công cụ; **không** có câu tự-đánh-giá kiểu
 "nếu bạn không biết X"; luật cấm ad-hoc delegation của `tsk-29i` còn nguyên
 văn (negative check của D2).

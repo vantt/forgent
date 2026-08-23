@@ -24,7 +24,7 @@ markdown. `tsk-1ud` was a deliberate gate: no skill gets wired to read
 Real counts against `.fgos/state.json`, 2026-08-09:
 
 > "CONTEXT.md: 199 file, ~1.973 token/file (cao nhất 4.978), MỌI skill
-> đọc (fgos-planning/SKILL.md:14,48,66 đọc CONTEXT.md để lấy quyết định
+> đọc (fgos-coding-planning/SKILL.md:14,48,66 đọc CONTEXT.md để lấy quyết định
 > đã lock). state.decisions: 1.711 bản ghi, ~100 token/bản, 0 skill đọc
 > — chỉ `fgos show <id>` và một bộ đếm."
 > — real work item description, id `tsk-1ud`
@@ -39,8 +39,8 @@ enough yet for anything to actually read it.
 Of 1,711 real records, 592 (35%) were pure engine bookkeeping, not design
 decisions at all — identifiable only by matching literal text prefixes
 ("discovery caller-supplied", "decompose verdict", "auto-approved",
-"fgos-validating verdict"), written by `addDecision` calls inside
-`src/intake/discovery.mjs` and `src/intake/decompose.mjs`. The remaining
+"fgos-coding-validating verdict"), written by `addDecision` calls inside
+`src/intake/discovery.mjs` and `src/intake/plan.mjs`. The remaining
 1,119 (65%) were real design decisions, but 130 (12%) had no rationale
 and 180 (16%) had a rationale under 80 characters.
 
@@ -107,7 +107,7 @@ to make a fourth recurrence structurally harder, not just noted as a risk.
 
 ## What deliberately stays out of scope here
 
-Wiring `fgos-planning`/`fgos-validating` to actually read
+Wiring `fgos-coding-planning`/`fgos-coding-validating` to actually read
 `state.decisions` instead of `CONTEXT.md` (the payoff this cleanup makes
 possible) is a separate, hard-dependent follow-up item — this item only
 makes that future read safe, it doesn't perform it. Rewriting

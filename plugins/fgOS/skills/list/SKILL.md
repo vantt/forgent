@@ -24,38 +24,18 @@ never appends an event).
 
 2. **Read the work list.** Run:
 
+   Both branches use `../_shared/fgos-cli-fallback.md`, substituting
+   `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" list --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos list --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   list --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
    — or, when step 1 found `--all`, add that flag to the same call:
 
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" list --all --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos list --all --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   list --all --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
-
-   Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
-   never a relative path — an installed plugin's files run from a copied
-   cache location, not from this repo checkout, so a relative path would
-   resolve to the wrong place or fail outright.
 
    `--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),
    so a bare call from inside one silently reads an empty store — exit 0,
@@ -75,8 +55,9 @@ never appends an event).
 3. **Report as a table and stop.** Render every item from `data.work` as a
    markdown table with exactly these columns, in this order: **id**,
    **status**, **stage**, **goalTier**, **priority**, **title**.
-   - `stage` (`clarify` | `decompose` | `executing` | `compound-learn` per
-     work.mjs's stage domain) is optional on the raw record — an item with
+   - `stage` (`discovery` | `exploring` | `planning` | `executing`, plus
+     the drain-only legacy `decompose`, per the coding domain's own
+     `stages` in workflow-stage-graphs.mjs) is optional on the raw record — an item with
      no `stage` field defaults to `executing` (work-state Data Dictionary
      #12); render that default explicitly as `executing`, not `-` or blank.
    - `goalTier` is optional (`mvp` | `milestone` per work.mjs's

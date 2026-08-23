@@ -16,7 +16,7 @@ console.log(JSON.stringify(classifyIronLaw({ filesChanged, description: item.des
 Result (post-commit, real diff against `main`): `{"required":true,"matchedModules":["src/runner/dispatch.mjs"]}`
 
 `src/runner/dispatch.mjs` matches `MODULE_RULES`'s `src/runner/` prefix rule
-(`src/evolve/iron-law.mjs:21`) — the same fact `fgos-validating` already
+(`src/evolve/iron-law.mjs:21`) — the same fact `fgos-coding-validating` already
 verified against `docs/history/native-first-dispatch-doctrine-phase-4-unify-capacity-and-task-dispatch/plan.md`'s
 own risk map before this item's own `decompose` fired.
 

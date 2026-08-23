@@ -12,8 +12,8 @@
 // which is `tsk-3gx-3`'s (the CLI action layer's) job, "chỉ khi git thành
 // công thật mới set field parent" (the item's own description).
 
-import { createBranchRef, withMergeEphemeralWorktree } from './worktree.mjs';
-import { mergeRunnerItem, detectTrunk, isMainWorktree } from './merge.mjs';
+import { createBranchRef, withMergeEphemeralWorktree, detectTrunk, isMainWorktree } from './worktree.mjs';
+import { mergeRunnerItem } from './merge.mjs';
 import { preflightRetarget } from './promote-preflight.mjs';
 
 /**

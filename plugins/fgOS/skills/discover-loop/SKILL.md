@@ -1,31 +1,33 @@
 ---
 name: discover-loop
 description: >-
-  Use when the user wants every fgOS work item at stage:clarify or
-  stage:decompose processed in sequence, inside an interactive/visible
+  Use when the user wants every fgOS work item at stage:discovery or
+  stage:exploring processed in sequence, inside an interactive/visible
   agent session, until nothing is left or a safety condition trips —
   invoked as /fgOS:discover-loop. Wraps the existing /loop skill around
   /fgOS:discover-next, encoding its stop rules (pool empty, lock-timeout,
   or an iteration cap) so a person never has to restate them by hand.
   Deliberately NOT fgos-runner's background --watch daemon (log-only
   output, not visible in an open terminal). Example: "/fgOS:discover-loop",
-  "clear out the clarify backlog", "run discover on everything".
+  "clear out the discovery backlog", "run discover on everything".
 ---
 
 # fgOS discover-loop
 
 Wraps the existing `loop` skill (invoked as `/loop`) around the existing
 `/fgOS:discover-next` skill so a person can process every
-`stage:clarify`/`stage:decompose` item in sequence, visibly, inside this
+`stage:discovery`/`stage:exploring` item in sequence, visibly, inside this
 same conversation — without hand-typing `/loop /fgOS:discover-next` and
-re-deriving its stop rules every time. Never writes `.fgos/` state
-directly, never re-implements `discover`/`decompose` mechanics, and never
+re-deriving its stop rules every time. The `planning` pool (and its legacy
+`decompose` alias) belongs to `/fgOS:plan-loop`, not this one. Never writes
+`.fgos/` state
+directly, never re-implements `discover` mechanics, and never
 adds a new CLI verb.
 
 Not `fgos-runner`'s `--watch` daemon: that is a separate, always-running
 background process whose progress is only visible by tailing a log file
 (`.fgos/logs/<id>.log`, gitignored). This skill exists specifically so the
-same clarify/decompose sweep is driven turn-by-turn in an open,
+same discovery/exploring sweep is driven turn-by-turn in an open,
 interactive session instead — the reason `tsk-3go` exists at all.
 
 Not `ck-loop`: that is a separate, unrelated skill for mechanical-metric
@@ -62,7 +64,8 @@ interval... omit the interval to let the model self-pace."
 
    - **"pool empty"** — stop the loop cleanly. Nothing to report as a
      problem; skip straight to step 5's summary.
-   - **cleared / decomposed** — increment `cleared`. Continue.
+   - **cleared (the item advanced to `planning`)** — increment `cleared`.
+     Continue.
    - **parked `awaiting-human`** — increment `parked`. Continue — a park
      is a normal, expected outcome here, never a reason to stop (the
      parked item already left the pool; a different item is picked next
@@ -88,7 +91,7 @@ interval... omit the interval to let the model self-pace."
      summary (step 5), distinct from the other stop reasons.
 
 5. **Report on stop.** Whichever condition ended the loop, print a plain
-   summary: `cleared`/`decomposed` count, `parked` count, `skipped` count,
+   summary: `cleared` count, `parked` count, `skipped` count,
    and — only when the stop reason was the iteration cap — how many
    pool items are estimated to remain (re-run the picker's own count, or
    say "unknown, re-run to check" if that is not readily available).

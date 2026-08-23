@@ -89,7 +89,7 @@ below — with only one piece of work and no split, `fgos graph`'s
 
 ## Risk map
 
-| Component | How risky | What proves it (→ `fgos-validating`) |
+| Component | How risky | What proves it (→ `fgos-coding-validating`) |
 |---|---|---|
 | `app.rs` selection index (D2) | Low — mechanical type swap, but no automated test exists today for `select_next`/`select_previous`/`selected_id` (D3 does not require adding one) | `cargo test --manifest-path herdr-plugin/Cargo.toml` compiles and the existing 9 tests still pass; a manual smoke check (arrow keys move selection, wraps at both ends) since this path has no automated coverage |
 | `fgos.rs`/`pick.rs` adapter wrap | Low — existing 2+6 tests exercise the wrapped free functions directly, trait impl is a thin pass-through | `cargo test` — same 8 tests pass unchanged, no test file edits needed |

@@ -39,7 +39,7 @@ decision live in `docs/history/session-claim-liveness/DISCUSSION.md`
 
 | D-ID | Decision |
 |------|----------|
-| D1 | The "still alive" signal is real worktree/file modification activity — never session/process identity (PID, heartbeat) and never pure claim-age. Rejected: PID-based (same shape as `main-checkout-lock`, but same-machine-only and tracks the wrong resource — a lock file, not a worktree); event-log-age (cheap, reuses `staleDoingAdvisory`'s existing idiom, `src/state/store.mjs:1050-1059`, but structurally blind during `fgos-code-implement`'s actual editing — no `.fgos` event fires while a session is just editing files). |
+| D1 | The "still alive" signal is real worktree/file modification activity — never session/process identity (PID, heartbeat) and never pure claim-age. Rejected: PID-based (same shape as `main-checkout-lock`, but same-machine-only and tracks the wrong resource — a lock file, not a worktree); event-log-age (cheap, reuses `staleDoingAdvisory`'s existing idiom, `src/state/store.mjs:1050-1059`, but structurally blind during `fgos-coding-implement`'s actual editing — no `.fgos` event fires while a session is just editing files). |
 | D2 | A session may self-reclaim a quiet `doing` claim with no human confirmation, when all three hold: (a) silence clears a conservative, `claimRole`-scoped threshold (D3); (b) the reclaim is non-destructive — reattach to the existing `fgw/<id>` worktree/branch, never force-remove; (c) the decision is logged with its evidence. Mirrors `main-checkout-lock.mjs`'s own precedent: auto-reclaim on conclusive evidence (`isPidAlive(pid) === false`), fail-closed (`AMBIGUOUS`) only when evidence is genuinely inconclusive. Does not repeal `loop.mjs:364-372`'s "indefinite hold" — adds one conditional door a session walks through deliberately, not an unattended reap. |
 | D3 | Silence threshold reuses `/fgOS:stale`'s existing `agentMs: 15 * 60 * 1000` / `humanMs: 24 * 60 * 60 * 1000` (`src/state/graph-metrics.mjs:483-484`) as-is, same `claimRole` scoping — not a separate, more conservative pair. |
 | D4 | Activity signal = `max(git log -1 --format=%ct on fgw/<id>, newest mtime among files git status --porcelain lists in that worktree)`. Not a blind `find -newermt` tree scan — reuses git's own already-computed dirty/untracked file list, which already excludes `.gitignore`d paths (`node_modules`, etc.) for free. |
@@ -118,7 +118,7 @@ decision live in `docs/history/session-claim-liveness/DISCUSSION.md`
   Informational only per this skill's own instructions; does not gate or
   reshape this document. (A separate backlog item already flags
   GitNexus's index as stale/behind HEAD — worth a live re-check, not a
-  blocker, when `fgos-planning`/`fgos-code-implement` actually touch
+  blocker, when `fgos-coding-planning`/`fgos-coding-implement` actually touch
   `claim-port.mjs`.)
 
 ## Canonical references

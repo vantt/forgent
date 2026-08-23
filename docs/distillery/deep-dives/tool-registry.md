@@ -9,7 +9,7 @@ entries: [repository-harness:tool-registry-capability, repository-harness:doctor
 
 > stale vs repository-harness@0a79bbe (9cc306d→0a79bbe, 2026-08-07) — một health-check THỨ HAI, tách biệt, xuất hiện: crate Rust `harness` mới (khác `harness-cli` được cite ở `doctor-preflight`) tự có `doctor()` riêng (7 check: transaction pending, resolution pending, merge-tool availability, provenance hợp lệ, path-safety từng file quản lý) cho CHÍNH installer/updater engine, không phải cho project-registered tool. Không đụng đến outbound/inbound registry pattern đã cite (đó vẫn là `harness-cli`'s registry) — nhưng nếu re-dive, đáng đối chiếu 2 kiểu "doctor" trong cùng 1 dự án: một cái self-check-cho-chính-harness, một cái registry-cho-tool-ngoài.
 
-**Bottom Line:** repository-harness tách rạch ròi hai chiều — *outbound* (harness's own compiled commands, luôn có) vs *inbound* (project tự đăng ký extra tool: gitnexus/c3/linter — optional, may absent). Cơ chế injection KHÔNG nằm trong code: registry chỉ trả **fact** (`status: present/missing/unknown`), chính **agent** (qua prose contract trong AGENTS.md/doc, không phải compiled logic) đọc fact đó và áp policy. Symphony chứng minh điều này portable — nó KHÔNG viết lại registry, chỉ viết lại policy prose (3-nấc degrade ladder) tái dùng registry của harness. Với fgOS: port một `fgos tool` verb-group tối thiểu (register/check/query, one-door-write qua event-log, không cần SQL riêng), rồi sửa PROSE của fgos-planning/fgos-validating/fgos-code-implement để hỏi capability `impact-analysis` thay vì hardcode tên "GitNexus" — đúng nguyên tắc cốt lõi "core consults capabilities, never tools" (US-027). Đây fix thẳng tsk-1e4: hiện CLAUDE.md bắt cứng MUST chạy GitNexus bất kể máy có cài hay không; thiếu registry nên không phân biệt được "chưa từng đăng ký" (skip sạch) với "đăng ký rồi mà hỏng" (gap thật, cảnh báo).
+**Bottom Line:** repository-harness tách rạch ròi hai chiều — *outbound* (harness's own compiled commands, luôn có) vs *inbound* (project tự đăng ký extra tool: gitnexus/c3/linter — optional, may absent). Cơ chế injection KHÔNG nằm trong code: registry chỉ trả **fact** (`status: present/missing/unknown`), chính **agent** (qua prose contract trong AGENTS.md/doc, không phải compiled logic) đọc fact đó và áp policy. Symphony chứng minh điều này portable — nó KHÔNG viết lại registry, chỉ viết lại policy prose (3-nấc degrade ladder) tái dùng registry của harness. Với fgOS: port một `fgos tool` verb-group tối thiểu (register/check/query, one-door-write qua event-log, không cần SQL riêng), rồi sửa PROSE của fgos-coding-planning/fgos-coding-validating/fgos-coding-implement để hỏi capability `impact-analysis` thay vì hardcode tên "GitNexus" — đúng nguyên tắc cốt lõi "core consults capabilities, never tools" (US-027). Đây fix thẳng tsk-1e4: hiện CLAUDE.md bắt cứng MUST chạy GitNexus bất kể máy có cài hay không; thiếu registry nên không phân biệt được "chưa từng đăng ký" (skip sạch) với "đăng ký rồi mà hỏng" (gap thật, cảnh báo).
 
 ## Câu hỏi
 
@@ -98,7 +98,7 @@ Symphony KHÔNG sửa CLI, KHÔNG thêm retrieval-trigger vào bảng nào — c
 |---|---|---|---|
 | Setup | `fgos tool register --name gitnexus --kind mcp --capability impact-analysis --scan .gitnexus ...` | người (1 lần, việc của tsk-4ad) | lúc onboard repo |
 | Probe | `fgos tool check` — ghi status vào `.fgos/tool-status.local.json` (KHÔNG event-log, xem mục Store ở trên) | agent hoặc `fgos doctor` (entry mới trong `DOCTOR_CHECKS`) | đầu phiên, hoặc lúc `fgos doctor` chạy |
-| **Inject thật** | Sửa PROSE trong `.claude/skills/fgos-validating/SKILL.md` (+ fgos-planning/executing + `CLAUDE.md`) thêm câu: "trước khi yêu cầu impact-analysis evidence trong verify/test scope, chạy `fgos tool query --capability impact-analysis --status present`" | **người viết skill (chính là việc tsk-1e4)** | mỗi lần fgos-validating chạy tới bước cần quyết verify/test scope |
+| **Inject thật** | Sửa PROSE trong `.claude/skills/fgos-coding-validating/SKILL.md` (+ fgos-coding-planning/executing + `CLAUDE.md`) thêm câu: "trước khi yêu cầu impact-analysis evidence trong verify/test scope, chạy `fgos tool query --capability impact-analysis --status present`" | **người viết skill (chính là việc tsk-1e4)** | mỗi lần fgos-coding-validating chạy tới bước cần quyết verify/test scope |
 | Áp policy | 0 registered → inactive, skip; registered nhưng không present → degraded, weak-proof note; present → full, giữ nguyên MUST hiện tại | agent đọc câu ở bước "Inject thật" | ngay sau khi có kết quả query |
 | Ghi vết | note posture (`impact-analysis: full/degraded/inactive`) vào plan.md/verify note | agent | cuối bước validate |
 
@@ -123,7 +123,7 @@ Lấy **data model + degrade ladder của repository-harness/symphony** (vì fgO
 
 **Thiết kế cụ thể:**
 
-1. **Store — SỬA sau consult 2026-07-30 (xem `plans/reports/distill-consult-260730-2152-tool-registry-capability-vocab-report.md`, Trade-off #2):** KHÔNG fold TOÀN BỘ vào event-log chung. `tool.register`/`tool.remove` (quyết định TEAM — "project này dùng gitnexus cho impact-analysis") vẫn qua `.fgos/events.jsonl` fold vào `view.tools: { <name>: {kind, capability, scanTarget, command, responsibility, description} }`, đúng one-door-write. Nhưng `tool.check`'s kết quả (`status`, `checkedAt`) là SỰ THẬT VỀ MÁY NÀY, không phải quyết định team — beegog's `.bee/doctor-attest.json` (never-tracked, tách khỏi `config.json` tracked) là tiền lệ đúng: ghi vào 1 file cục bộ gitignored riêng (`.fgos/tool-status.local.json`), KHÔNG phải event. Fold ngầm lúc query: `view.tools` (đăng ký) overlay file cục bộ (trạng thái máy này) → record đầy đủ. Máy khác không có file đó → mọi tool đã đăng ký hiện `unknown`, đúng ngữ nghĩa gốc của US-027 ("no scan_target hoặc chưa scan → unknown, agent tự confirm").
+1. **Store — SỬA sau consult 2026-07-30 (xem `plans/reports/distill-consult-260730-2152-tool-registry-capability-vocab-report.md`, Trade-off #2):** KHÔNG fold TOÀN BỘ vào event-log chung. `tool.register`/`tool.remove` (quyết định TEAM — "project này dùng gitnexus cho impact-analysis") vẫn qua `.fgos/events.jsonl` fold vào `view.tools: { <name>: {kind, capability, scanTarget, command, responsibility, description} }`, đúng one-door-write. Nhưng `tool.check`'s kết quả (`status`, `checkedAt`) là SỰ THẬT VỀ MÁY NÀY, không phải quyết định team — beehive's `.bee/doctor-attest.json` (never-tracked, tách khỏi `config.json` tracked) là tiền lệ đúng: ghi vào 1 file cục bộ gitignored riêng (`.fgos/tool-status.local.json`), KHÔNG phải event. Fold ngầm lúc query: `view.tools` (đăng ký) overlay file cục bộ (trạng thái máy này) → record đầy đủ. Máy khác không có file đó → mọi tool đã đăng ký hiện `unknown`, đúng ngữ nghĩa gốc của US-027 ("no scan_target hoặc chưa scan → unknown, agent tự confirm").
 2. **Verbs mới** (theo đúng khuôn `fgos <verb> [write|read]` đã thấy trong help output):
    - `fgos tool register --name gitnexus --kind mcp --capability impact-analysis --scan .gitnexus --responsibility Verification --description "..."` [write, qua event-log] — validate: `kind` ∈ cli/binary/mcp/skill/http; `capability` normalize kebab-case; unique `name`.
    - `fgos tool check [--name x] [--json]` [write, nhưng luôn exit 0, ghi file cục bộ KHÔNG qua event-log] — probe theo kind (mcp/skill: path `scanTarget` tồn tại; cli/binary: `command -v`; http: TCP ping ngắn), persist `status`+`checkedAt` vào `.fgos/tool-status.local.json` (thêm vào `.gitignore`).
@@ -131,12 +131,12 @@ Lấy **data model + degrade ladder của repository-harness/symphony** (vì fgO
    - `fgos tool remove --name x` [write, qua event-log].
    - **Không thêm verb `fgos tool doctor` riêng.** fgOS đã có `fgos doctor` (`bin/fgos.mjs:2530`, mảng mở `DOCTOR_CHECKS` tại `src/setup/checks.mjs:173`, mỗi entry `{id, description, check(cwd)}`) — thêm 1 entry mới (`tool-registry-configured`, gọi `tool query`/status cục bộ, báo inactive/degraded/full) vào mảng có sẵn, đúng doctrine "add-through-not-alongside" đã chốt trong `porting-log.md:86` (thêm cạnh mới thay vì đi qua chỗ đã có là red-flag của chính fgOS).
 3. **Capability vocab khởi điểm** (chỉ cần đúng 1 cho use case hiện tại, mở rộng sau theo YAGNI): `impact-analysis` — provider đầu tiên đăng ký sẵn `gitnexus` (kind `mcp`, scan `.gitnexus`).
-4. **Sửa prose 3 skill** (fgos-planning, fgos-validating, fgos-code-implement) + CLAUDE.md — thay hardcode "GitNexus" bằng capability lookup, theo đúng 3-nấc symphony:
+4. **Sửa prose 3 skill** (fgos-coding-planning, fgos-coding-validating, fgos-coding-implement) + CLAUDE.md — thay hardcode "GitNexus" bằng capability lookup, theo đúng 3-nấc symphony:
    - Query trước: `fgos tool query --capability impact-analysis --status present`.
    - 0 provider present VÀ 0 provider registered → **Inactive**: bỏ qua yêu cầu impact analysis trong verify/test scope, ghi `impact-analysis: inactive` vào plan/verify note — không phải thiếu sót, không chặn.
    - Có đăng ký (gitnexus) nhưng `status != present` → **Degraded**: vẫn chạy required test/build khác, nhưng đánh dấu proof weak trong plan.md/verify note, ghi rõ gap ("GitNexus registered but not present on this machine — blast radius not confirmed").
    - Present → **Full**: giữ nguyên hành vi MUST hiện tại của CLAUDE.md (chạy impact trước khi sửa symbol, cảnh báo HIGH/CRITICAL).
-5. **Nguyên tắc khóa cứng** (từ US-027, áp cho fgOS y hệt): fgos-planning/validating tham chiếu **capability** `impact-analysis`, KHÔNG BAO GIỜ tham chiếu tên "GitNexus" trực tiếp trong logic gate — GitNexus chỉ là provider đầu tiên đăng ký. Thêm provider thứ 2 (vd 1 tool khác) sau này không cần sửa lại 3 skill.
+5. **Nguyên tắc khóa cứng** (từ US-027, áp cho fgOS y hệt): fgos-coding-planning/validating tham chiếu **capability** `impact-analysis`, KHÔNG BAO GIỜ tham chiếu tên "GitNexus" trực tiếp trong logic gate — GitNexus chỉ là provider đầu tiên đăng ký. Thêm provider thứ 2 (vd 1 tool khác) sau này không cần sửa lại 3 skill.
 6. **Không port**: SQL schema riêng (không cần, event-log đã đủ), beads's Go-interface compile-time gating (fgOS không có type system tương ứng để ép), audit/`propose` tự động phát hiện drift của US-072 (để dành — YAGNI, port sau nếu thấy cần khi có ≥2 capability).
 
 ## Portable ideas → porting-log candidates
@@ -144,17 +144,27 @@ Lấy **data model + degrade ladder của repository-harness/symphony** (vì fgO
 | Ý | R | E | F | Ghi chú |
 |---|---|---|---|---|
 | `fgos tool` verb-group (register/check/query, event-log-backed, degrade-ladder JSON) | R3 | E2 | F2 | Đã có candidate row `tool-registry-capability` (porting-log.md:34, hiện `R2 E2 F2`) — đề xuất nâng R lên 3 vì giờ có use case cụ thể chặn (tsk-1e4) thay vì "hay ho để học" chung chung |
-| Sửa CLAUDE.md/fgos-planning/validating dùng capability thay vì hardcode tên tool | R3 | E1 | F3 | Chi phí thấp (chỉ sửa prose sau khi có verb ở trên), impact ngay lên tsk-1e4 |
+| Sửa CLAUDE.md/fgos-coding-planning/validating dùng capability thay vì hardcode tên tool | R3 | E1 | F3 | Chi phí thấp (chỉ sửa prose sau khi có verb ở trên), impact ngay lên tsk-1e4 |
 | Phân biệt "0 provider" (inactive) vs "provider registered nhưng missing" (degraded, weak-proof) trong verify note | R2 | E1 | F3 | Cốt lõi US-027; không có thì mọi absence trông giống nhau |
 | `audit`/`propose` tự phát hiện drift giữa story yêu cầu capability và registry status (US-072) | R1 | E3 | F1 | Hoãn — chỉ đáng khi fgOS có ≥2 capability đăng ký thật, hiện chỉ có 1 ứng viên (impact-analysis) |
 
 *(R/E/F giữ nguyên rubric distillery hiện có; đây là đề xuất điều chỉnh dòng đã tồn tại ở porting-log.md:34, không tạo dòng mới trùng — cần human xác nhận trước khi sửa porting-log.)*
 
-## Cấu hình forgentX hiện tại (tsk-4ad)
+## Cấu hình forgentX hiện tại (tsk-4ad; register/remove rút bởi tsk-in1-1 D1)
 
 Verb-group `fgos tool` (port của tsk-1dj) đã sống trong `bin/fgos.mjs`; mục
 này chỉ ghi lại cấu hình THẬT của repo forgentX hôm nay, và cách một người
 khác tự chỉnh/mở rộng nó mà không cần hỏi lại.
+
+> **tsk-in1-1 D1** (sau tsk-4ad): `register`/`remove` — 2 verb CLI mô tả
+> ngay dưới đây — đã bị rút. Provider giờ khai báo thẳng trong
+> `runner.capacities.<id>` (`.fgos/config.json`), sửa file config như mọi
+> `capacities` entry khác (`toolsFromCapacities`, `src/state/
+> tool-registry.mjs`, nhặt entry nào khai `capability`), không qua event-log
+> nữa. Chi tiết shape hiện tại + lý do: `docs/reference/forgentx-tool-
+> registry-configuration.md`. Phần narrative bên trên (trước mục này) là
+> ghi chép thiết kế TẠI THỜI ĐIỂM port (tsk-1dj/tsk-4ad) — giữ nguyên làm
+> lịch sử quyết định, không sửa theo đổi mới này.
 
 **Đăng ký sống** (xác nhận bằng `fgos tool query --capability impact-analysis --json`):
 
@@ -206,7 +216,7 @@ per-branch (ADR0020).
 - **full** — mọi tool đăng ký đều `present`. Giữ nguyên hành vi MUST hiện
   tại không đổi.
 
-Việc CHƯA nằm trong tsk-4ad: sửa prose 3 skill (fgos-planning/validating/
+Việc CHƯA nằm trong tsk-4ad: sửa prose 3 skill (fgos-coding-planning/validating/
 executing) + CLAUDE.md để MỖI BƯỚC workflow tự hỏi capability
 (`fgos tool query --capability impact-analysis --status present`) thay vì
 hardcode tên "GitNexus" trong logic gate — đó là injection thật sự (xem

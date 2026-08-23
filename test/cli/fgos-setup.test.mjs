@@ -20,7 +20,7 @@ import {
   addOk,
   addOutcome,
   addWork,
-  advanceThroughDiscoveryToDecompose,
+  advanceThroughDiscoveryToPlanning,
   assert,
   coexistPath,
   commitFile,

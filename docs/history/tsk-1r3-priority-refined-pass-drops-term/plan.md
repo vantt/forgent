@@ -24,7 +24,7 @@ behavior change (both call sites already produce `semanticRelatedness =
 and absent at the other) — without overclaiming it fixes the
 `blocks`-driven regression (D2, out of scope).
 
-File touched: `src/intake/decompose.mjs` (one call site, ~line 611).
+File touched: `src/intake/plan.mjs` (one call site, ~line 611).
 
 Impact-analysis posture: **degraded** (GitNexus present, stale) — low
 actual risk: additive parameter on a pure function, one call site, already

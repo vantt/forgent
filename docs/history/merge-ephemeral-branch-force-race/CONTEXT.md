@@ -10,7 +10,7 @@ error, no conflict, and both sessions reporting success. Not in scope:
 `createWorktree`'s reclaim/relocate path (a different, already-fixed
 concern — `docs/history/merge-worktree-reclaim-clobbers-kept-checkout/`),
 picking/claiming a worktree, or designing this item's `verify` command
-(left to `fgos-planning`).
+(left to `fgos-coding-planning`).
 
 ## Root cause (scout evidence, verified against live code)
 
@@ -95,4 +95,4 @@ called only by `mergeRunnerItem`.
   implementation choice, not a product decision.
 - The item's `verify` field (currently a placeholder,
   "chưa xác định — P15 bổ sung") needs a concrete, runnable command —
-  left to `fgos-planning`, per this skill's own scope boundary.
+  left to `fgos-coding-planning`, per this skill's own scope boundary.

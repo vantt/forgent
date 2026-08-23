@@ -5,7 +5,7 @@ Mode: standard
 
 ## Lane — how it was counted
 
-No lane was handed off: this item reached `fgos-planning` through
+No lane was handed off: this item reached `fgos-coding-planning` through
 `/fgOS:pick` → `fgos-coding-driving` → `fgos-clarifying`, none of which
 runs `fgos-routing`'s Orient step. Applying `fgos-routing`'s own Mode-gate
 table directly (`.claude/skills/fgos-routing/SKILL.md` §"Mode gate"):
@@ -115,7 +115,7 @@ leverage: detection first, prevention second.
 | `checkRootDrift` filter change | medium — a doctor check flipping to `passed: false` on real repos; today's own scan says 1 root would newly report (`fgw/tsk-4n7`, whose diff is empty) | new test on the pure path with a resolved root at `aheadOfTarget > 0`; plus running `fgos doctor` against this real repo and reading what it now says |
 | `needsSync` left untouched | low — deliberate no-op | regression test: a resolved root still yields `needsSync: false`, so `merge next` behavior is byte-identical |
 | `mergeReadiness` bucket shape | low for piece 1 — unchanged | regression: existing `graph-harness.test.mjs` stays green with no bucket-membership change |
-| leaf `approve` refusal (piece 2) | high — `approve` is the widest-reach path here | its own proof point at `fgos-validating`; not landed in piece 1 |
+| leaf `approve` refusal (piece 2) | high — `approve` is the widest-reach path here | its own proof point at `fgos-coding-validating`; not landed in piece 1 |
 
 Impact-analysis posture: **degraded**. `fgos tool query --capability
 impact-analysis --status present` reports GitNexus `present`, but its index

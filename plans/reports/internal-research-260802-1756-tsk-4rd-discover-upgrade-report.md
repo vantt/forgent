@@ -30,7 +30,7 @@ gì tận dụng được, đặc biệt về kinh tế (capacity) và điều p
 
 ### 2.1 Hai đường dẫn tồn tại song song, khác hẳn năng lực
 
-| | `fgos discover <id>` (mechanical, CLI/runner sweep) | `fgos-exploring` skill (interactive session) |
+| | `fgos discover <id>` (mechanical, CLI/runner sweep) | `fgos-coding-exploring` skill (interactive session) |
 |---|---|---|
 | Nơi chạy | headless: `node bin/fgos.mjs discover` hoặc runner's RUL19 sweep | trong 1 session Claude Code thật, sau `fgos pick` |
 | Model call | 1 lần `claude -p` lồng nhau (`judge-executor.mjs`), tối đa 3 attempt chỉ retry khi *parse* JSON lỗi | agent thật, có toàn bộ tool của session |
@@ -102,10 +102,10 @@ khác nhau, không phải 1:
   không worktree, không lỗi, kết quả đúng. Giới hạn hiện tại thuần túy do
   `--allowedTools` bị khoá cứng ở 3 quyền Bash, không phải giới hạn kỹ thuật
   của headless mode. Đây là thay đổi config, không phải kiến trúc mới.
-- **(B) Đắt, đúng nghĩa "kind: task":** thật sự cho `fgos-exploring` (chạy
+- **(B) Đắt, đúng nghĩa "kind: task":** thật sự cho `fgos-coding-exploring` (chạy
   trong session thật, có Task tool) đảm nhận việc research sâu — tức là
   route MỌI item cần đào sâu (không chỉ item "rõ ràng đơn giản") qua
-  `fgos-exploring` thay vì qua discover-loop mechanical. Đây gần với thiết
+  `fgos-coding-exploring` thay vì qua discover-loop mechanical. Đây gần với thiết
   kế đã có sẵn hôm nay, chỉ cần discover-loop **biết khi nào nhường** thay
   vì tự ôm hết.
 
@@ -138,7 +138,7 @@ question-report.md`, và tự kiểm tra lại cho item này):
   sweep lẫn `discover-loop` chạy tuần tự/song song trên main checkout đều
   an toàn nhờ lock này, không cần cô lập bằng worktree.
 - Item chỉ thật sự cần worktree khi được **claim** (`fgos pick`) để đi vào
-  `fgos-exploring`/`fgos-planning`/`executing` — những skill ĐÓ ghi
+  `fgos-coding-exploring`/`fgos-coding-planning`/`executing` — những skill ĐÓ ghi
   `CONTEXT.md`/code thật và commit lên `fgw/<id>`. Discover không claim
   item, nên chưa tới bước cần worktree.
 
@@ -182,7 +182,7 @@ song nhiều process ck:scout kiểu điều phối từ session cha).
 1. **`brainstorming-hard-gate`** — chính là hình mẫu gần nhất cho yêu cầu #1
    (làm sạch yêu cầu) + #4 (tự nghiên cứu trước khi hỏi người): context →
    questions → 2-3 approach → design write-up, có `<HARD-GATE>` cấm code
-   trước khi design được duyệt. `fgos-exploring` hiện đã là bản rút gọn của
+   trước khi design được duyệt. `fgos-coding-exploring` hiện đã là bản rút gọn của
    pattern này (Socratic, scout trước khi hỏi) — cái thiếu là bản
    **mechanical/headless** của nó, đúng thứ tsk-4rd đang xin.
 
@@ -203,18 +203,18 @@ song nhiều process ck:scout kiểu điều phối từ session cha).
 
 ## 5.5. Unified recipe — 1 năng lực chung "research-and-brainstorm"
 
-Đối chiếu đề xuất của user (discover + fgos-exploring dùng chung 1 năng lực,
+Đối chiếu đề xuất của user (discover + fgos-coding-exploring dùng chung 1 năng lực,
 khác nhau ở có/không có con người) với kiến trúc thật:
 
 ### 5.5.1 Xác nhận: điểm "clear thì skip exploring" đã tồn tại sẵn
 
 Không phải ý tưởng mới — `resolveDiscovery` hôm nay: verdict `clear=true` →
-`moveStage(...to:'decompose')` thẳng, không bao giờ gọi `fgos-exploring`.
+`moveStage(...to:'decompose')` thẳng, không bao giờ gọi `fgos-coding-exploring`.
 Mental model của user khớp thiết kế thật ở điểm này.
 
 ### 5.5.2 Xác nhận: giai đoạn có người đã là collaboration loop dùng lại skill
 
-`fgos-exploring/SKILL.md` bước 2 đã là Socratic loop (scout trước mỗi câu
+`fgos-coding-exploring/SKILL.md` bước 2 đã là Socratic loop (scout trước mỗi câu
 hỏi, `fgos ask`/`fgos answer` park-rồi-resume). 2 case:
 - **Async** (park → người trả lời sau, có thể session khác pick up) — "dùng
   lại skill" đúng nghĩa đen: skill load lại từ đầu ở session mới.
@@ -226,7 +226,7 @@ hỏi, `fgos ask`/`fgos answer` park-rồi-resume). 2 case:
 **Recipe** (scope gray area → scout → enrich từ related item → tự đánh giá
 rõ/chưa → nếu chưa, tự nghiên cứu thêm trước khi hỏi) nên gộp về 1 nguồn
 dùng chung. Hiện tại `discovery.mjs`'s `buildDiscoveryPrompt` (JS template,
-hardcode) và `fgos-exploring/SKILL.md` (markdown prose) định nghĩa "thế nào
+hardcode) và `fgos-coding-exploring/SKILL.md` (markdown prose) định nghĩa "thế nào
 là đủ rõ" **độc lập nhau, không tham chiếu nhau** — rủi ro thật: 2 định
 nghĩa lệch dần theo thời gian khi 1 bên được sửa mà bên kia không theo
 kịp. Gộp về 1 spec/recipe chung, cả 2 nơi cùng trích dẫn, giải quyết đúng
@@ -278,14 +278,14 @@ mode.
 
 1. Viết 1 file recipe dùng chung — VD `docs/specs/research-and-brainstorm-
    recipe.md` hoặc gộp vào 1 reference cả `discovery.mjs` lẫn
-   `fgos-exploring/SKILL.md` cùng trích — nội dung: scope gray area → scout
+   `fgos-coding-exploring/SKILL.md` cùng trích — nội dung: scope gray area → scout
    → enrich từ related item's content thật (không chỉ id) → tự đánh giá →
    nếu chưa rõ, tự nghiên cứu thêm (bao nhiêu round, ngân sách tool-call)
    trước khi: (a) không người → park với câu hỏi cụ thể + toàn bộ evidence
    đã thu thập lưu lại; (b) có người → hỏi qua hội thoại/`fgos ask`.
 2. `buildDiscoveryPrompt` (autonomous layer) load/trích nội dung recipe này
    thay vì tự định nghĩa lại tiêu chí "đủ rõ" như hôm nay.
-3. `fgos-exploring/SKILL.md` bước 1 (Scope the gray areas) trích cùng
+3. `fgos-coding-exploring/SKILL.md` bước 1 (Scope the gray areas) trích cùng
    recipe cho phần "material/grounded/answerable" — hiện đã gần giống, chỉ
    cần thống nhất từ ngữ/tiêu chí với bản autonomous.
 

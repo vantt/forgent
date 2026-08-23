@@ -81,11 +81,11 @@ fix `tsk-28w` (a separate, already-filed crash bug in `fgos catchup`).
 - Exactly where the D1(b) diagnosis-and-fix steps execute (inline in the
   `merge-loop` skill's own session using its existing Bash/Edit access, vs.
   delegated to a spawned subagent) is an implementation shape, not a
-  product decision — left to `fgos-planning`.
+  product decision — left to `fgos-coding-planning`.
 - Whether the D1(a) mechanical auto-resolve lives in `src/runner/merge.mjs`
   itself (a new function alongside `isAlreadyMerged`) or as a pre-step the
   `merge-loop` skill runs before calling `/fgOS:merge-next` again — also an
-  implementation shape, left to `fgos-planning`.
+  implementation shape, left to `fgos-coding-planning`.
 
 ## References
 

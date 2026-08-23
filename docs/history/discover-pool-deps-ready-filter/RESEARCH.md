@@ -36,7 +36,7 @@ runnable today (`node --test 'test/**/*.test.mjs'`, `package.json`'s own
 node --test test/state/discover-pool.test.mjs
 ```
 
-**Still open:** nothing. `fgos-planning` will define the exact new test
+**Still open:** nothing. `fgos-coding-planning` will define the exact new test
 case(s) asserting the deps-not-ready exclusion; this command is the
 existing suite's real entry point to extend, not a placeholder.
 

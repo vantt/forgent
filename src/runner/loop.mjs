@@ -57,6 +57,7 @@ import {
   listWork,
   moveWork,
   addWork,
+  editWork,
   readyWork,
   readRawEvents,
   addOutcome,
@@ -65,7 +66,7 @@ import {
   EXIT_CODES,
 } from '../state/store.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
-import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, resolveWorkflow, stageForStep, classificationVocabulary } from '../state/workflow-stage-graphs.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
   visitCount,
@@ -81,11 +82,15 @@ import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
 import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
-import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
+import { createOwnershipStore, claimRoot, steerFrontier } from './root-affinity.mjs';
+import { resolveRoot, hasOpenDescendant, indexChildrenByParent } from '../state/frontier.mjs';
+import { cleanupMergedBranch } from './merge.mjs';
 import { claimWork, ClaimError } from './claim-port.mjs';
+import { hasWorkerSlotRoom, countWorkerSlots } from '../state/worker-slots.mjs';
+import { readSharedConfig, readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
-import { FALLBACK_VERIFY, resolveDiscovery } from '../intake/discovery.mjs';
-import { resolveDecompose } from '../intake/decompose.mjs';
+import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
+import { resolvePlan } from '../intake/plan.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 
@@ -121,7 +126,14 @@ export const LOCK_FILE = 'runner.lock';
  * declares no `parallel` block at all — every existing config keeps working
  * with zero changes. `maxRoots` caps concurrent ROOTS in flight; the wave a
  * single poll dispatches is bounded by `maxRoots * maxLeavesPerRoot`, and
- * `min(cap, |ready|)` throughout. */
+ * `min(cap, |ready|)` throughout.
+ *
+ * These two no longer decide how much actually runs (docs/history/
+ * orchestrator-worker-slots/DISCUSSION.md D6): they bound the BATCH SIZE
+ * this runner is allowed to propose, and the shared worker-slot ceiling
+ * answers whether that batch runs at all. Same shape `fgos-fanout`'s own
+ * max-batch-of-5 now has — three launchers, one ceiling, instead of three
+ * uncoordinated ceilings (RESEARCH.md F2). */
 export const DEFAULT_MAX_ROOTS = 4;
 export const DEFAULT_MAX_LEAVES_PER_ROOT = 4;
 
@@ -153,7 +165,14 @@ function resolveParallel(config) {
  * to `maxRoots` distinct roots (FIFO), and within each up to
  * `maxLeavesPerRoot` of its ready items (D10). Frontier FIFO order is
  * preserved — `steered` already arrives in frontier order and a `Map` keeps
- * first-insertion root order. */
+ * first-insertion root order.
+ *
+ * This still selects WHICH items are candidates, and only that. Whether the
+ * batch it returns is allowed to run is a separate question the caller asks
+ * the shared ceiling (D6) — deliberately not folded in here, because the
+ * ceiling's answer is whole-batch (D8) while this function's own axis is
+ * root affinity: trimming a wave to the number of free slots would drop a
+ * whole lineage rather than one item. */
 function selectWave(steered, view, { maxRoots, maxLeavesPerRoot }) {
   const byRoot = new Map();
   for (const item of steered) {
@@ -421,8 +440,20 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
 
   const pruned = [];
   const kept = [];
+  const childrenByParent = indexChildrenByParent(view.work);
   for (const { branch, aheadCount } of listLeftovers(repoRoot)) {
     const branchId = branch.startsWith('fgw/') ? branch.slice('fgw/'.length) : branch;
+    const itemStatus = view.work[branchId]?.status;
+
+    if (itemStatus === 'wontfix' && !hasOpenDescendant(branchId, view.work, childrenByParent)) {
+      if (!dryRun) {
+        cleanupMergedBranch(repoRoot, branch);
+        log(`fgos-runner: pruned orphan branch ${branch} (wontfix)`);
+      }
+      pruned.push(branch);
+      continue;
+    }
+
     if (aheadCount === 0 && hasStillNeededDescendant(branchId, view.work)) {
       log(
         `fgos-runner: keeping ${branch} (0 commits ahead, but a descendant still needs this ref — not yet done/wontfix)`,
@@ -584,11 +615,38 @@ export function parseVerdictBlock(output) {
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) continue;
     if (typeof parsed.clear !== 'boolean') continue;
     verdict = parsed.clear
-      ? { clear: true, verify: typeof parsed.verify === 'string' ? parsed.verify : undefined }
+      ? {
+          clear: true,
+          verify: typeof parsed.verify === 'string' ? parsed.verify : undefined,
+          // D12/D17 (tsk-2yo): optional classification data a headless worker
+          // reports alongside a clear verdict, additive to the existing
+          // {clear, verify} shape -- each key is only present at all when
+          // the worker actually reported it (conditional spread, not an
+          // always-present `undefined`-valued key), so a fence that predates
+          // this parses to the exact same two-key object as before: an
+          // extra key present-but-undefined would still change the object's
+          // own key set and could trip a deepEqual comparison even though
+          // the value itself is absent either way. Vocabulary/enum
+          // validation happens where these are actually applied (editWork),
+          // not here -- this parse step stays fail-safe-only, same as its
+          // sibling `parseDiscoveredBlocks`.
+          ...(typeof parsed.tier === 'string' ? { tier: parsed.tier } : {}),
+          ...(typeof parsed.kind === 'string' ? { kind: parsed.kind } : {}),
+          ...(typeof parsed.risk === 'string' ? { risk: parsed.risk } : {}),
+        }
       : { clear: false, question: typeof parsed.question === 'string' ? parsed.question : undefined };
   }
   return verdict;
 }
+
+// D12/D17: the classification guard used to be defined here, when the
+// headless sweep below was the only path that applied tier/kind/risk. The
+// interactive `discover` verb now applies it too, so the function moved down
+// into `src/intake/discovery.mjs` — the engine module BOTH paths already
+// call — and is re-exported here unchanged. One door, checked in one place;
+// this line only keeps `src/runner/loop.mjs` a valid import site for callers
+// that already read it from here.
+export { classificationPatchFromVerdict };
 
 // Per-dispatch ceiling on how many fgos-discovered blocks a single worker
 // output can mint into items (review-fix S10, P2 finding): untrusted worker
@@ -661,6 +719,11 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
         }
         const id = generateId(block.title, Object.keys(view));
         const derived = classify(block.title);
+        const domainObj = getDomain(item.domain);
+        const validKinds = classificationVocabulary(domainObj, 'kind');
+        const validRisks = classificationVocabulary(domainObj, 'risk');
+        const kindValid = validKinds ? validKinds.includes(block.kind) : typeof block.kind === 'string' && block.kind.length > 0;
+        const riskValid = validRisks ? validRisks.includes(block.risk) : typeof block.risk === 'string' && block.risk.length > 0;
         addWork(dir, {
           id,
           title: block.title,
@@ -671,18 +734,30 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           // the third write path this item's own scout found mid-planning.
           description:
             typeof block.description === 'string' && block.description.trim() ? block.description : block.title,
-          kind: block.kind ?? derived.kind,
+          kind: kindValid ? block.kind : derived.kind,
           status: 'todo',
           deps: [],
-          risk: block.risk ?? derived.risk,
+          risk: riskValid ? block.risk : derived.risk,
           refs: [],
           verify: FALLBACK_VERIFY,
           tier: derived.tier,
-          stage: stageForStep(getDomain(item.domain), 'Clarify'),
+          // tsk-qod D1/D2: `stageForStep(domain, 'Clarify')` resolves to
+          // `undefined` for a domain that retired `clarify` entirely
+          // (today: only `coding`) -- assigning `stage: undefined` here
+          // would silently corrupt this new item's own required field.
+          // Falls back to the domain's own first declared stage instead
+          // (`stages[0]`), which for `coding` post-retirement is
+          // `discovery` -- exactly D5's own intent: a runner-created item
+          // (already has title/description, needs no clarify pass) enters
+          // the same stage a migrated pre-existing item now lands on
+          // (`scripts/migrate-clarify-split.mjs`'s own "untouched" target).
+          // A domain that still has a real Clarify-mapped stage (e.g.
+          // `triage`) is unaffected -- the `??` never fires for it.
+          stage: stageForStep(domainObj, 'Clarify') ?? domainObj.stages?.[0],
           domain: item.domain,
           discoveredFrom: item.id,
         });
-        log(`fgos-runner: discovered work "${id}" from "${item.id}" (runner-created, stage clarify)`);
+        log(`fgos-runner: discovered work "${id}" from "${item.id}"`);
       });
     } catch (err) {
       log(`fgos-runner: discovery-report create skipped for "${item.id}" ("${sanitizeTitleForLog(block.title)}"): ${err.message}`);
@@ -720,8 +795,13 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       if (rootId !== item.id) {
         // Leaf: idempotent — createBranchRef is a no-op if fgw/<rootId>
         // already exists (an earlier sibling leaf, or the root's own prior
-        // dispatch, already created it).
-        createBranchRef(repoRoot, rootId, { baseRef: 'main' });
+        // dispatch, already created it). No explicit baseRef here (tsk-386):
+        // createBranchRef's own default already resolves through
+        // detectTrunk(repoRoot) — this call site no longer needs its own
+        // copy of that resolution, and relying on the sibling function's
+        // default here (rather than a second detectTrunk call) avoids
+        // duplicating the same git call for no reason.
+        createBranchRef(repoRoot, rootId);
         wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir, baseRef: branchNameFor(rootId) });
       } else {
         wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
@@ -743,7 +823,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       // rejected proposal. Read fresh: `item` predates this claim's moves.
       const feedbackView = listWork(dir);
       const worker = await spawnWorker(item, config, wt.path, {
-        // tsk-62v D6: lets a `kind: "cli"` capacity's presence be checked
+        // tsk-62v D6: lets a `kind: "cli"` executor's presence be checked
         // via `fgos tool query`'s own functions instead of re-probing PATH.
         fgosDir: dir,
         feedback: {
@@ -758,7 +838,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       });
       lastWorkerOutput = worker.stdout ?? ''; // wgi-8: terminal-outcome discovery source (success/verify-miss)
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
-      // Capacity-aware dispatch announce/audit (D8, tsk-62v): one line to
+      // Executor-aware dispatch announce/audit (D8, tsk-62v): one line to
       // stderr/logs, plus one event appended to the existing `.fgos/
       // events.jsonl` one-door-write log — reused, not a new file.
       // `replay.mjs` ignores unknown event types by design (see its own
@@ -767,20 +847,20 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       // write at this call site already uses, closing the synthesis
       // report's concurrent-session write-race concern (§3) for this
       // append too.
-      log(`fgos-runner: ${worker.capacityId} — ${worker.provider} — ${worker.model}`);
+      log(`fgos-runner: ${worker.executorId} — ${worker.provider} — ${worker.model}`);
       await queue.enqueue(async () => {
         appendEvent(path.join(dir, 'events.jsonl'), {
-          type: 'capacity.dispatch',
+          type: 'executor.dispatch',
           // baseCommit/headRef (tsk-4hl, D1/D3 of docs/history/parallel-
           // decomposition-footprint-avoidance/CONTEXT.md — mức 1): the
           // dispatch-time attestation captured inside spawnWorker, now
           // actually persisted (independent review after tsk-2ig merged
           // found it captured then discarded) -- same audit-only,
           // ignored-by-replay.mjs event this call site already uses for
-          // capacityId/provider/model, no new event type invented.
+          // executorId/provider/model, no new event type invented.
           payload: {
             id: item.id,
-            capacityId: worker.capacityId,
+            executorId: worker.executorId,
             provider: worker.provider,
             // command (tsk-33w D9): the command actually spawned, alongside
             // the freely-overridable `provider` label above -- so this audit
@@ -995,6 +1075,22 @@ async function claimAndDispatch(ctx) {
     }
     return await dispatchClaimedItem({ ...ctx, priorVisits, rootId: decision.root });
   } catch (err) {
+    // A worker-slot refusal is an ANSWER, not a failure (D6): the launcher
+    // asked, the engine said no, and nothing was stood up. It reaches here
+    // only for the tail of a batch the pre-check above granted whole (D8) —
+    // claimWork's own enforcing gate counts per item, so between "asked, saw
+    // room" and "actually claimed" the last free slot can go to a sibling in
+    // the same wave, or to another launcher entirely. That race is accepted
+    // on purpose (worker-slots.mjs), which makes this landing load-bearing:
+    // without it, `validation` category routing below would turn the very
+    // overshoot D8 designs for into a halted drain-run with a non-zero exit.
+    // `claim-rejected` is the outcome that already means "never dispatched,
+    // left for a later poll" — the refused item keeps its place in the
+    // frontier and the next poll picks it up once a slot frees.
+    if (err instanceof ClaimError && err.code === 'worker-slot-ceiling') {
+      log(`fgos-runner: claim for "${item.id}" refused — ${err.message}; left for a later poll`);
+      return { outcome: 'claim-rejected', id: item.id, reason: 'worker-slot-ceiling', exitCode: 0 };
+    }
     const category = categoryOf(err);
     const exitCode = EXIT_CODES[category];
     if (exitCode === undefined) throw err; // a real bug — surfaces via runOnce's outer catch (exit 1)
@@ -1067,11 +1163,12 @@ export async function runOnce(options = {}) {
     // use (CONTEXT.md's own instruction), just pointed at `fgos-researching`
     // via `opts.stage: 'discovery'` (dispatch.mjs). Discovery is a pure
     // machine-alone pass (D3 — "pha máy-một-mình tách khỏi pha máy+người"):
-    // there is no verdict to gate the transition on here, unlike the
-    // clarify->decompose engine's own edge — the worker records
-    // its findings in `RESEARCH.md` and the item unconditionally advances
-    // `discovery -> exploring` once dispatch settles; the human-facing
-    // decision-lock happens at `exploring`, not here. Sequential (mirrors
+    // the worker's own {clear, question?, verify?} verdict (parsed below,
+    // tsk-4v6) gates the transition through the same `resolveDiscovery`
+    // the interactive `discover` verb calls — the item never advances
+    // unconditionally. A `clear` verdict skips `exploring` and lands on
+    // `planning` directly; `unclear` advances to `exploring` (tsk-30v
+    // D2/D6), where the human-facing decision-lock happens. Sequential (mirrors
     // this sweep's own pre-tsk-5mj simplicity), not the parallel drain-run
     // below — that stays scoped to `stage: executing` only, unchanged. No
     // dispatch under dry-run, same rule the old sweep already followed.
@@ -1084,8 +1181,30 @@ export async function runOnce(options = {}) {
       // equivalent (tsk-1w7 D10) — no other registered domain ever declares
       // a stage named 'discovery' at all, so this direct literal comparison
       // can never wrongly match a non-coding item.
+      // This sweep stands a REAL worker process up, so it has to obey the
+      // shared ceiling like every other launcher (D6/D7) — the whole point of
+      // one engine-owned total is that no launcher keeps a private one. It is
+      // the one dispatch path that never claims: the item stays `todo` and
+      // moves to `doing` only inside the worker itself, so `countWorkerSlots`
+      // (which counts `doing`) cannot see this process at all. Left ungated,
+      // a full lane refused the execution wave below and then spawned research
+      // workers anyway, and `fgos slots` under-reported the machine while
+      // every other launcher decided on that undercount.
+      //
+      // Asked per item, not once for the sweep: these run sequentially and
+      // each one occupies the lane only while it runs, so a fresh read is both
+      // cheaper and more accurate than a batch grant. `break`, not `continue`
+      // — the answer will not change within this pass.
       for (const item of Object.values(listWork(dir).work)) {
         if (item.stage !== 'discovery' || item.status !== 'todo') continue;
+        const researchRoom = hasWorkerSlotRoom(listWork(dir), {
+          ceiling: readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling,
+          excludeId: item.id,
+        });
+        if (!researchRoom.allowed) {
+          log(`fgos-runner: no worker-slot room for research on "${item.id}" — ${researchRoom.occupied} of ${researchRoom.ceiling} slot(s) in use; left for a later poll`);
+          break;
+        }
         let wt = null;
         try {
           wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
@@ -1137,6 +1256,29 @@ export async function runOnce(options = {}) {
             const callerVerdict = parseVerdictBlock(worker.stdout ?? '');
             const result = resolveDiscovery(dir, item.id, config, 'runner', callerVerdict);
             log(`fgos-runner: discovery dispatch for "${item.id}" resolved outcome "${result.outcome}"`);
+            // D12/D17 (tsk-2yo): headless classification application --
+            // resolveDiscovery itself is never touched (it stays the exact
+            // engine function the interactive `fgos discover` verb also
+            // calls, tsk-4v6's own driver/launcher parity); applying
+            // tier/kind/risk is a separate, additive edit here, same
+            // "block overrides win, only apply what the worker actually
+            // reported" idiom captureDiscoveredWork already uses above.
+            // A worker report carrying no classification fields is
+            // byte-identical to today (patch stays empty, editWork never
+            // called). Never lets an out-of-vocabulary value block the
+            // already-resolved discover outcome above -- editWork's own
+            // enum validation (work.mjs, `classificationVocabulary`/`TIERS`)
+            // is the enforcement; a rejected value is logged and dropped,
+            // not retried with a guess.
+            const classificationPatch = classificationPatchFromVerdict(result.outcome, callerVerdict);
+            if (Object.keys(classificationPatch).length > 0) {
+              try {
+                editWork(dir, { id: item.id, patch: classificationPatch, role: 'runner' });
+                log(`fgos-runner: applied headless classification for "${item.id}": ${JSON.stringify(classificationPatch)}`);
+              } catch (err) {
+                log(`fgos-runner: headless classification for "${item.id}" rejected (${JSON.stringify(classificationPatch)}), dropped: ${err.message}`);
+              }
+            }
           }
         } catch (err) {
           // Fail-safe (matches the old sweep's own never-halt-the-whole-tick
@@ -1149,23 +1291,36 @@ export async function runOnce(options = {}) {
         }
       }
 
-      // DECOMPOSE SWEEP (stage-decompose D2/D4, mirrors the discovery
-      // dispatch above one stage over): re-reads the view FRESH rather than
-      // reusing the loop above's snapshot, so an item this same tick already
-      // carried through clarify/discovery/exploring is swept in the same
-      // `--once` pass too (the chain must not wait a full extra tick to
-      // continue). Only `todo` is touched, same R15 rule as above — an item
-      // already parked in `awaiting-human` (D3's need-human/risk-heavy gate)
-      // is never re-swept.
+      // PLAN SWEEP (renamed from DECOMPOSE SWEEP, tsk-403 D11 — stage
+      // `decompose` renamed to `planning`; stage-decompose D2/D4, mirrors
+      // the discovery dispatch above one stage over): re-reads the view
+      // FRESH rather than reusing the loop above's snapshot, so an item
+      // this same tick already carried through clarify/discovery/exploring
+      // is swept in the same `--once` pass too (the chain must not wait a
+      // full extra tick to continue). Only `todo` is touched, same R15
+      // rule as above — an item already parked in `awaiting-human` (D3's
+      // need-human/risk-heavy gate) is never re-swept.
       for (const item of Object.values(listWork(dir).work)) {
         const domain = getDomain(item.domain, {
           onUnrecognized: (bad) =>
-            log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "coding".`),
+            log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "${DEFAULT_DOMAIN}".`),
         });
-        const decomposeStage = stageForStep(domain, 'Divide');
-        if (decomposeStage !== undefined && item.stage === decomposeStage && item.status === 'todo') {
-          resolveDecompose(dir, item.id, config, 'runner');
-          log(`fgos-runner: chia-việc swept decompose item "${item.id}"`);
+        const planningStage = stageForStep(domain, 'Divide');
+        // tsk-403 D18: also sweep the legacy `decompose` alias — an item
+        // still parked there (from before the rename) must keep draining
+        // through the SAME mechanical sweep, not be silently excluded from
+        // it just because `stageForStep` no longer resolves NEW items
+        // there. Only activates when a domain declares both names
+        // distinctly (today: only `coding`).
+        const workflow = resolveWorkflow(domain, item.kind);
+        const legacyPlanStage = (workflow?.stages ?? domain.stages)?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+        if (
+          planningStage !== undefined &&
+          (item.stage === planningStage || item.stage === legacyPlanStage) &&
+          item.status === 'todo'
+        ) {
+          resolvePlan(dir, item.id, config, 'runner');
+          log(`fgos-runner: chia-việc swept plan item "${item.id}"`);
         }
       }
     }
@@ -1208,8 +1363,22 @@ export async function runOnce(options = {}) {
     const ownershipStore = createOwnershipStore();
     const ownerIdentity = options.ownerIdentity ?? RUNNER_OWNER_IDENTITY;
     const parallel = resolveParallel(config);
+    // The shared execution-lane ceiling (docs/history/orchestrator-worker-
+    // slots/plan.md §Shape T4, D6). Read once for the whole drain-run: this
+    // is CONFIGURATION, while the occupancy it is compared against is STATE
+    // — and the state half is already re-read every poll, through `view`
+    // below. `dir` is the `.fgos` directory, so its parent is the project
+    // root readSharedConfig expects — resolved the same way claimWork's own
+    // gate does (claim-port.mjs), rather than from `repoRoot`, which callers
+    // set independently. An absent `workerSlots.ceiling` means no ceiling at
+    // all, so this whole gate stays inert until a project configures one.
+    const ceiling = readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling;
     const dispatched = [];
     let haltExitCode = null;
+    // Set whenever the worker-slot gate refused or trimmed a wave, so the
+    // "nothing dispatched" branch below can tell a full lane from an empty
+    // frontier instead of reporting both as the same silent idle.
+    let roomRefused = false;
 
     while (true) {
       const frontierItems = readyWork(dir);
@@ -1240,8 +1409,37 @@ export async function runOnce(options = {}) {
       const wave = selectWave(steered, view, parallel);
       if (wave.length === 0) break; // nothing dispatchable — drain complete
 
-      const ctxBase = { repoRoot, dir, config, worktreeDir, breaker, queue, log, ownershipStore, ownerIdentity };
-      const settled = await Promise.allSettled(wave.map((item) => claimAndDispatch({ ...ctxBase, item })));
+      // Ask the engine for room BEFORE standing any worker up (D6), then
+      // TRIM the wave to what it granted. The batch is never offered whole:
+      // the enforcing gate inside `claimWork` claims one item at a time and
+      // re-folds the log per call, so it cannot honor a whole-batch grant —
+      // dispatching more than `granted` just sends the tail to a claim that
+      // refuses it. See `hasWorkerSlotRoom` for the supersede of D8's
+      // whole-batch rule. With no ceiling armed, `granted` is the whole wave,
+      // so this slice is a no-op and behavior is identical to before.
+      // `break`, not `continue`: a drain-run is bounded (D15), so re-polling
+      // a full lane would only see it full again; `--watch`'s next cycle is
+      // where waiting belongs.
+      const room = hasWorkerSlotRoom(view, { ceiling, batchSize: wave.length });
+      if (!room.allowed) {
+        // Name the ids actually holding the lane. Without this, a lane wedged
+        // by claims nobody is working (a closed terminal, a crashed session --
+        // `startupReap` skips human/session claims by design) is invisible:
+        // every launcher is refused and the only clue is a count.
+        const holders = countWorkerSlots(view).execution.items.map((i) => i.id);
+        log(`fgos-runner: no worker-slot room — ${room.occupied} of ${room.ceiling} slot(s) in use by ${holders.join(', ')}; ${wave.length} ready item(s) left for a later poll`);
+        roomRefused = true;
+        break;
+      }
+
+      const admitted = wave.slice(0, room.granted);
+      if (admitted.length < wave.length) {
+        log(`fgos-runner: worker-slot ceiling admits ${admitted.length} of ${wave.length} ready item(s) — ${room.occupied} of ${room.ceiling} slot(s) in use; the rest wait for a later poll`);
+        roomRefused = true;
+      }
+
+      const ctxBase ={ repoRoot, dir, config, worktreeDir, breaker, queue, log, ownershipStore, ownerIdentity };
+      const settled = await Promise.allSettled(admitted.map((item) => claimAndDispatch({ ...ctxBase, item })));
 
       let progressed = false;
       for (const s of settled) {
@@ -1258,8 +1456,17 @@ export async function runOnce(options = {}) {
     }
 
     if (dispatched.length === 0) {
+      // "Nothing to do" and "work is waiting behind a full lane" are opposite
+      // situations that used to print the same line and return the same
+      // envelope. A caller polling `outcome: 'idle'` could not tell a quiet
+      // backlog from a wedged one, and the log flatly contradicted the
+      // refusal message printed moments earlier.
+      if (roomRefused) {
+        log('fgos-runner: nothing dispatched — the worker-slot lane is full; see the refusal above.');
+        return { outcome: 'idle', reason: 'worker-slot-ceiling', reap, parked, dispatched, exitCode: 0 };
+      }
       log('fgos-runner: frontier empty — nothing to do.');
-      return { outcome: 'idle', reap, parked, dispatched, exitCode: 0 };
+      return { outcome: 'idle', reason: 'frontier-empty', reap, parked, dispatched, exitCode: 0 };
     }
     return { outcome: 'drained', dispatched, parked, reap, exitCode: haltExitCode ?? 0 };
   } catch (err) {

@@ -88,8 +88,8 @@ proof points above are carried as real regression tests, not left as guesses.
   empty/partial file — simulate by intercepting/timing a concurrent read
   during acquire, or by asserting the implementation never opens the target
   path before content is fully written (whichever proves the property without
-  a flaky timing-dependent test — implementer's call at `fgos-validating`/
-  `fgos-code-implement`, this plan only requires the property be proven); (b) a
+  a flaky timing-dependent test — implementer's call at `fgos-coding-validating`/
+  `fgos-coding-implement`, this plan only requires the property be proven); (b) a
   test proving two racing fresh-creates still yield exactly one ACQUIRED;
   (c) a test proving the self-recognition refresh path also never exposes
   partial content.
@@ -119,8 +119,8 @@ confirms `tsk-2tm` is a size-1 component with nothing depending on it.
 
 - The exact shape of the new regression test(s) proving "no torn read" (timing
   simulation vs. structural assertion) is an implementation detail left to
-  `fgos-code-implement` — not material to scope/behavior/acceptance criteria,
-  only to how the proof is constructed. `fgos-validating`'s reality gate
+  `fgos-coding-implement` — not material to scope/behavior/acceptance criteria,
+  only to how the proof is constructed. `fgos-coding-validating`'s reality gate
   checks this assumption is either resolved or flagged unproven before
   `executing` starts.
 

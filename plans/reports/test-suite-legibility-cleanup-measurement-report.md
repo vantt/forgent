@@ -62,7 +62,7 @@ the actual measurement does not support.
 
 ## Coverage (no real assurance lost)
 
-The baseline coverage run captured at `fgos-validating` (before any edit
+The baseline coverage run captured at `fgos-coding-validating` (before any edit
 in this lineage): 93.13% line / 83.83% branch / 91.21% function, 1549
 pass / 0 fail. Every test removed during tsk-3wr-2 was individually
 verified via source-reading (not assumed) to be a true duplicate of

@@ -21,7 +21,7 @@ regressing the already-passing fix/test pair for no benefit — `CONTEXT.md`
 D1 already forecloses this path.
 
 Impact-analysis posture (`CLAUDE.md`'s gate, `fgos tool query --capability
-impact-analysis --status present`, checked fresh in `fgos-exploring`'s
+impact-analysis --status present`, checked fresh in `fgos-coding-exploring`'s
 CONTEXT.md step): **full** (`gitnexus`, `status: present`). No edit is
 planned, so this is recorded for the audit trail only — GitNexus's own
 `branchContentMismatch` lookup already confirmed its only caller is
@@ -36,7 +36,7 @@ other file.
 
 ## Proof point
 
-**Revised at `fgos-validating` (round 2):** a bare `npm test` run on this
+**Revised at `fgos-coding-validating` (round 2):** a bare `npm test` run on this
 branch was actually executed and does NOT pass clean — 2 of 2852 tests
 fail, both confirmed pre-existing at this branch's own base commit
 (`git show 725c292a:<path>`, i.e. present before this item's own branch

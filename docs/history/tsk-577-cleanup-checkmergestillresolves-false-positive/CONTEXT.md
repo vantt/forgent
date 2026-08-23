@@ -85,12 +85,12 @@ general content/diff-based merge-verification rewrite.
   queries "does this branch's item have open leaf descendants" (a fresh
   `view.work` scan filtered by `parent === id` and open status, mirroring
   the anchor-check pattern `fgos-coding-driving` already uses) — an
-  implementation choice, left to `fgos-planning`.
+  implementation choice, left to `fgos-coding-planning`.
 - Exact mechanism for D1's symptom-side fix: how `checkMergeStillResolves`
   distinguishes "ref missing" (git's "unknown revision"/"malformed object
   name" error) from "ref exists, sha unreachable" (the genuine force-push
   case) within its existing `try/catch`, and what it falls back to
-  checking once a ref is confirmed missing — left to `fgos-planning`.
+  checking once a ref is confirmed missing — left to `fgos-coding-planning`.
 - Whether D2's remediation (rerunning `fgos cleanup` on the 14 items) is
-  driven by this item directly or delegated — left to `fgos-planning`'s
+  driven by this item directly or delegated — left to `fgos-coding-planning`'s
   own shaping.

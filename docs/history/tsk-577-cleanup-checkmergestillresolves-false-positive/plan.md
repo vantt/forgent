@@ -21,7 +21,7 @@ last indexed `251d0b5`) is 224 commits behind current HEAD (surfaced by the
 post-commit hook during clarify). Ran `impact()` anyway as weak
 corroborating evidence, cross-checked against a direct `grep`/`rg` sweep
 (more trustworthy here given the stale index) already done during
-`fgos-exploring`'s scouting (see `CONTEXT.md`'s Scout evidence — confirmed
+`fgos-coding-exploring`'s scouting (see `CONTEXT.md`'s Scout evidence — confirmed
 `loop.mjs:393` and `merge.mjs:948` are the ONLY two `git branch -D` call
 sites in `src/`, `merge.mjs:948`'s self-scoped/pre-guarded).
 
@@ -155,7 +155,7 @@ match D1's already-locked scope is not a new decision — D1 already
 committed to fixing both source and symptom; this only corrects the
 machine-checkable command to actually prove what D1 already locked. Not
 material under the mid-planning-gap filter (scope/behavior/acceptance
-unchanged), so pinned here rather than handed back to `fgos-exploring`:
+unchanged), so pinned here rather than handed back to `fgos-coding-exploring`:
 
 ```
 node --test test/state/cleanup-harness.test.mjs test/runner/loop.test.mjs

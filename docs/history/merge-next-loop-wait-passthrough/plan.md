@@ -27,7 +27,7 @@ so a wait-budget override there would have nothing to attach to.
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `plugins/fgOS/skills/merge-next/SKILL.md` step 1/2 | low — prose-only, no `src/`/`bin/` touch | verify's POSITIVE grep below, plus a manual `/fgOS:merge-next --wait 5000` dry description trace (`fgos-validating`) |
+| `plugins/fgOS/skills/merge-next/SKILL.md` step 1/2 | low — prose-only, no `src/`/`bin/` touch | verify's POSITIVE grep below, plus a manual `/fgOS:merge-next --wait 5000` dry description trace (`fgos-coding-validating`) |
 | `plugins/fgOS/skills/merge-loop/SKILL.md` step 1/3 | low — prose-only, changes what prompt string gets forwarded to `/loop` | verify's POSITIVE grep below, plus a manual trace that the built prompt string is `/fgOS:merge-next --wait <ms>` when the flag is present, and bare `/fgOS:merge-next` when absent (unchanged default) |
 
 No medium/high risk in this map — both changes are additive prose edits
@@ -62,7 +62,7 @@ One piece, not split (D4 — see below). Two files change:
      so every subsequent loop iteration keeps forwarding the same
      explicit budget, not just the first one.
 
-### Sketch of cases worth proving (`fgos-validating`)
+### Sketch of cases worth proving (`fgos-coding-validating`)
 
 - No flags passed to either skill — behavior byte-identical to today
   (bare `fgos merge next` / bare `/fgOS:merge-next` prompt).
@@ -97,7 +97,7 @@ npm test && grep -q -- '--wait' plugins/fgOS/skills/merge-next/SKILL.md && grep 
 - `npm test` first, per the how-to doc's required shape.
 
 Runtime-proof ownership (per the same how-to doc, since no shell command
-can assert the prose is followed correctly): `fgos-validating`'s reality
+can assert the prose is followed correctly): `fgos-coding-validating`'s reality
 check traces the four cases in the sketch above by reading both `SKILL.md`
 files directly, not by executing them.
 

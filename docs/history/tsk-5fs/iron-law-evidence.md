@@ -14,7 +14,7 @@ Test command: `bash docs/history/submit-add-field-parity-goaltier-editable/verif
 
 ## Failing-before
 
-Run against the pre-implementation codebase (during `fgos-exploring`, before
+Run against the pre-implementation codebase (during `fgos-coding-exploring`, before
 either `bin/fgos.mjs` or `src/state/store.mjs` were touched):
 
 ```

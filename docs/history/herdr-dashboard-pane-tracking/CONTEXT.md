@@ -86,7 +86,7 @@ lifecycle.
 
 - Poll cadence for the pane scan (reuse `tsk-3t9-1`'s existing 5s
   `POLL_INTERVAL` in one unified tick, vs. a separate interval) —
-  performance-tuning, `fgos-planning`'s/the implementer's call.
+  performance-tuning, `fgos-coding-planning`'s/the implementer's call.
 - Debounce/consecutive-miss threshold before flagging orphaned (vs.
   flagging on the very first miss) — implementation detail; the
   description's own "quét lại để cập nhật danh sách pane sống" framing
@@ -95,4 +95,4 @@ lifecycle.
 - Exact `TerminalUi`/`WorkItemSource`-style port shape for the pane-scan
   adapter (new port vs. extending an existing one) — `tsk-3t9`'s hexagonal
   seams are the pattern to follow, but the concrete trait shape is
-  `fgos-planning`'s call.
+  `fgos-coding-planning`'s call.

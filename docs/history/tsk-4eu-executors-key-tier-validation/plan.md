@@ -67,7 +67,7 @@ present, BUT its index is flagged stale (`last indexed: 19bc5e4`, 8
 commits behind this branch's base HEAD, including a commit that touched
 `src/runner/dispatch.mjs` itself — `8b9a6ec`). Posture: **degraded** —
 `gitnexus present`, but its blast-radius answer for
-`dispatch.mjs`/`work.mjs` is not provably fresh, so `fgos-code-implement`
+`dispatch.mjs`/`work.mjs` is not provably fresh, so `fgos-coding-implement`
 must still run `impact()` per `CLAUDE.md`'s MUST rules but treat that
 evidence as weak and name the gap. This plan's own "Verified against the
 real repo" section above already cross-checked the touched symbols by

@@ -5,6 +5,16 @@ in `tsk-1dj`'s `fgos tool register/check/query/remove` port of
 repository-harness's tool-registry-capability
 (`docs/distillery/sources/repository-harness.md#tool-registry-capability`).
 
+> **Superseded (tsk-in1-1 D1):** the worked example's own `register`/
+> `remove` verbs (event-log-backed, sections 2/5/6 below) were retired — a
+> tool provider is now declared directly in `runner.executors.<id>`
+> (`.fgos/config.json`), config-edited, never through the event log. The
+> general lessons in sections 1 (team-decision vs per-machine-fact), 3
+> (scan-not-shell presence), 4 (doctor posture check), and 7 (test layers)
+> still hold; only the CONCRETE code in sections 2/5/6 is now historical,
+> not something a new port should copy verbatim. Current shape: `docs/
+> reference/forgentx-tool-registry-configuration.md`.
+
 ## 1. Split "team decision" from "fact about this machine" before writing any code
 
 The registry's own header comment states the split this whole recipe hinges

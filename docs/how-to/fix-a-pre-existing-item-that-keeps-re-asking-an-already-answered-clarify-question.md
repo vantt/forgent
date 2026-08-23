@@ -1,10 +1,10 @@
 # Fix a pre-existing item that keeps re-asking an already-answered clarify question
 
-`fgos-exploring`'s trust-skip mechanism (see
+`fgos-coding-exploring`'s trust-skip mechanism (see
 `docs/explanation/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md`)
 only kicks in when the item's own `docsRef` field is set and points at a
 real, non-empty `CONTEXT.md`. If an item was created before you ever ran
-`fgos-exploring` on it — or before this field existed on the item at all —
+`fgos-coding-exploring` on it — or before this field existed on the item at all —
 `docsRef` can be empty even after you've written and committed a
 `CONTEXT.md` for it. When that happens, `fgos discover <id>` has nothing
 to trust, falls back to a full re-judgment, and can ask a brand-new
@@ -16,7 +16,7 @@ This has happened twice, independently, on real items:
   (pre-existing item, field never set) -- now set via `fgos edit
   --docs-ref`, so the committed CONTEXT.md is discoverable going
   forward." (recorded settlement, human answer, 2026-08-01)
-- **`tsk-2ta`**: the same symptom — `fgos-exploring` locked D1/D2 in
+- **`tsk-2ta`**: the same symptom — `fgos-coding-exploring` locked D1/D2 in
   `CONTEXT.md`, `fgos discover tsk-2ta` was called next, and it came back
   `unclear` with a fresh restatement of the exact question `CONTEXT.md`
   had already answered. The item's `docsRef` was empty; the committed

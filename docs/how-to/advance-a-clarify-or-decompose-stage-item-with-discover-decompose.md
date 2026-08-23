@@ -27,7 +27,7 @@ checks the item's stage before doing anything:
 
 - `fgos discover <id>` — runs context-discovery. Only works on an item at
   stage `clarify`.
-- `fgos decompose <id>` — runs split-work judgment (chia-việc). Only works
+- `fgos plan <id>` — runs split-work judgment (chia-việc). Only works
   on an item at stage `decompose`.
 
 Calling the wrong one for the item's current stage is now a hard error, not
@@ -35,9 +35,9 @@ a silent wrong-branch dispatch:
 
 ```
 $ fgos discover tsk-2b0
-fgos: discover: work "tsk-2b0" is at stage "decompose", not "clarify" -- use "fgos decompose tsk-2b0" instead.
+fgos: discover: work "tsk-2b0" is at stage "decompose", not "clarify" -- use "fgos plan tsk-2b0" instead.
 
-$ fgos decompose tsk-2b0
+$ fgos plan tsk-2b0
 fgos: decompose: work "tsk-2b0" is at stage "clarify", not "decompose" -- use "fgos discover tsk-2b0" instead.
 ```
 
@@ -59,14 +59,14 @@ untouched — no partial write, safe to retry with the right verb.
    An `unclear` verdict parks it in `awaiting-human` with a question —
    still at stage `clarify`.
 
-3. **At stage `decompose`, run `fgos decompose <id>`**, not `discover`
+3. **At stage `decompose`, run `fgos plan <id>`**, not `discover`
    again. Outcomes: `pass-through`/`noop` (item now `executing`),
    `decompose` (split into children, see `data.childIds`), `need-human`
    (parked in `awaiting-human` with a split-work proposal), or `invalid`
    (judgment came back unusable, item left untouched — retry later).
 
 4. **Inside a Claude Code session**, `/fgOS:discover <id>` and
-   `/fgOS:decompose <id>` claim the item if needed, then dispatch it
+   `/fgOS:plan <id>` claim the item if needed, then dispatch it
    through `fgos-coding-driving` (`ceiling: stage:decompose` /
    `ceiling: stage:executing` respectively) instead of calling either verb
    directly — the live session does the real Socratic/shaping reasoning
@@ -80,6 +80,6 @@ untouched — no partial write, safe to retry with the right verb.
 
 Any script, skill, or habit that called `fgos discover <id>` a second time
 expecting it to silently run the decompose-stage judgment now needs to call
-`fgos decompose <id>` for that second hop instead. This affected real code
+`fgos plan <id>` for that second hop instead. This affected real code
 at the time of the split: `test/e2e/runner-loop.test.mjs`'s S2-pull scenario
 did exactly this and had to be updated in the same change.

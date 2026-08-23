@@ -28,23 +28,11 @@ liveness judgment `acquireMainCheckoutLock`
 
 2. **Clear the lock.** Run:
 
-   ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" unlock --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos unlock --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
-   ```
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
 
-   Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
-   never a relative path — an installed plugin's files run from a copied
-   cache location, not from this repo checkout, so a relative path would
-   resolve to the wrong place or fail outright.
+   ```
+   unlock --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+   ```
 
    `--dir` (tsk-56t): the `take`/`pick` that just failed may have been a
    tsk-424 chained pick from inside an existing linked worktree, which

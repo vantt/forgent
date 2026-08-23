@@ -81,7 +81,7 @@ runs this call.
 ## Outstanding questions deferred to planning
 
 - Exact wording of the refusal error message and exception type/exit
-  code — `fgos-planning` picks the matching shape, following tsk-nfa's own
+  code — `fgos-coding-planning` picks the matching shape, following tsk-nfa's own
   precedent (`StoreError`) unless a concrete reason argues otherwise.
 - Whether the check is best expressed as its own early guard (checked
   once, before the `if (typeof verdict.verify === 'string' ...)` block

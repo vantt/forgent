@@ -11,9 +11,9 @@
 ```
 
 `bin/fgos.mjs` trips the self-modifying module gate. Verify command:
-`node --test test/cli/fgos.test.mjs test/intake/decompose.test.mjs
+`node --test test/cli/fgos.test.mjs test/intake/plan.test.mjs
 test/runner/loop.test.mjs test/runner/main-checkout-reset-guard.test.mjs
-test/skills/fgos-exploring-root-fix.test.mjs && node --test
+test/skills/fgos-coding-exploring-root-fix.test.mjs && node --test
 'test/**/*.test.mjs'`. Full suite: 2665 pass / 0 fail / 5 skip (baseline
 2656/0/5 before this item).
 
@@ -59,11 +59,11 @@ Guard temporarily removed (`covered.add(f);` unconditional, no
 
 ```
     actual: TypeError: Cannot read properties of null (reading 'replace')
-        at isCoveredByDirectory (.../src/intake/decompose.mjs:536:21)
-        at file:///.../src/intake/decompose.mjs:562:32
+        at isCoveredByDirectory (.../src/intake/plan.mjs:536:21)
+        at file:///.../src/intake/plan.mjs:562:32
         at Array.filter (<anonymous>)
-        at findUncoveredLockedDecisions (.../src/intake/decompose.mjs:561:20)
-        at file:///.../test/intake/decompose.test.mjs:2151:23
+        at findUncoveredLockedDecisions (.../src/intake/plan.mjs:561:20)
+        at file:///.../test/intake/plan.test.mjs:2151:23
     expected: undefined,
     operator: 'doesNotThrow'
 ```

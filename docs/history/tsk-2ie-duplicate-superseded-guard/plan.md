@@ -23,7 +23,7 @@ area with real regression exposure (`mergeReadiness`) — not **small**.
 ## Impact-analysis posture
 
 `impact-analysis: full` (GitNexus present, confirmed via `fgos tool query
---capability impact-analysis --status present`). `fgos-code-implement` must run
+--capability impact-analysis --status present`). `fgos-coding-implement` must run
 `impact()` on `mergeReadiness`, `validateWorkShape`, and `editWork` before
 editing any of them (CLAUDE.md gate) and report the blast radius before
 proceeding.
@@ -42,7 +42,7 @@ reference to this precedent.
 ### Files touched, in order
 
 0. **Set a real `verify` command on tsk-2ie itself.** Caught at
-   `fgos-validating`'s reality gate: `fgos list --id tsk-2ie --json` shows
+   `fgos-coding-validating`'s reality gate: `fgos list --id tsk-2ie --json` shows
    `work.verify` is currently the literal placeholder string `"chưa xác
    định — P15 bổ sung"` — not runnable. Execute's mechanical proof path
    (and `return`'s re-verify) runs this field verbatim, so it must become a
@@ -53,7 +53,7 @@ reference to this precedent.
    ```
    Scoped to exactly the four touched-behavior test files (narrowest
    useful test first, per dev rules) rather than the full `npm test`
-   suite — `fgos-code-implement`/`return` can still broaden to the full suite
+   suite — `fgos-coding-implement`/`return` can still broaden to the full suite
    if a shared contract turns out touched.
 1. **`src/state/work.mjs`** — `validateWorkShape`: add a `supersededBy`
    block (optional non-empty string, self-reference rejected — mirrors
@@ -66,7 +66,7 @@ reference to this precedent.
    (`work.mjs:523-529`), alongside the existing `validateDeps`/
    `validateMergeAfter` calls at `work.mjs:526-527` — confirmed by direct
    read that this is where those two calls actually live, not `store.mjs`
-   (caught at `fgos-validating`'s reality gate: the plan's first draft
+   (caught at `fgos-coding-validating`'s reality gate: the plan's first draft
    mis-cited this as a `store.mjs` change).
 2. **`src/state/store.mjs`** — add `'supersededBy'`, `'duplicates'` to
    `EDITABLE_FIELDS` (`store.mjs:192`). No other `store.mjs` change is
@@ -98,7 +98,7 @@ reference to this precedent.
 
 ### Risk map
 
-| Component | Risk | Proof point (fgos-validating) |
+| Component | Risk | Proof point (fgos-coding-validating) |
 |---|---|---|
 | `work.mjs` validation blocks | low — mirrors `mergeAfter` verbatim | existing `work.test.mjs` `mergeAfter` cases re-read as a template; new cases for both fields (shape, self-ref, dangling-target-rejected) |
 | `store.mjs` wiring | low — one-line `EDITABLE_FIELDS` add, two mirrored validator calls | existing `store.test.mjs`/`fgos.test.mjs` `--merge-after` round-trip tests re-read as a template; new `--superseded-by`/`--duplicates` round-trip cases |

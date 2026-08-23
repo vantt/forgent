@@ -11,7 +11,7 @@ behavior, weak proof around the area, multi-domain):
 | Flag | Applies? | Why |
 |---|---|---|
 | audit/security (hard-gate) | **yes** | This change modifies the anti-cheat gate that protects `return`'s core contract — "prove real work happened between claim and return." Loosening it, even in a narrowly-gated way (D2), is exactly the class of change `claim-reclaim-branchhead-reset`'s own D2 revision treated as high-stakes. |
-| public contracts | yes | `fgos return` is a documented CLI verb (`docs/specs/runner.md`, `docs/specs/work-state.md`) with real callers depending on its exact exit behavior — `fgos-code-implement`, the runner's own return path, and scripted flows. A new flag/verb must not change existing `return`'s behavior for callers that don't opt in. |
+| public contracts | yes | `fgos return` is a documented CLI verb (`docs/specs/runner.md`, `docs/specs/work-state.md`) with real callers depending on its exact exit behavior — `fgos-coding-implement`, the runner's own return path, and scripted flows. A new flag/verb must not change existing `return`'s behavior for callers that don't opt in. |
 | existing covered behavior | yes | `return`'s branch-source and main-source paths already carry substantial coverage (`test/cli/fgos.test.mjs`, `test/state/store.test.mjs`, `test/state/replay.test.mjs`, `test/e2e/pr-gate.test.mjs`). New logic must not regress any of it. |
 | auth / authorization | no | No user-auth surface touched. |
 | data model | no | No new field or event kind (per D1's own "no invented schema" framing) — reuses `outcomes[id].actual`, existing `status` transitions. |
@@ -89,7 +89,7 @@ blocked-retake case).
 
 ## Risk map
 
-| Component | Risk | Proof point (carried to `fgos-validating`) |
+| Component | Risk | Proof point (carried to `fgos-coding-validating`) |
 |---|---|---|
 | Skipping the advance-check | High — this is the exact anti-cheat gate `claim-reclaim-branchhead-reset` protects | Prove: flag on a genuinely-fresh (never-blocked) item with zero new commits and a passing verify succeeds and records `actual` with `aheadCount: 0`; flag on a never-blocked item with a FAILING verify still parks `blocked` + friction (flag never bypasses verify itself, only the advance-check) |
 | D2 gate (prior-blocked detection) | High — this is the only thing stopping the flag from becoming a blanket cheat path | Prove: item with any prior `outcomes[id].actual.outcome === 'blocked'` entry refuses the flag with a clear error, even after a blocked-retake resets `branchHeadAtTake` |
@@ -110,7 +110,7 @@ blocked-retake case).
   change per the mode-gate table above).
 - `docs/history/return-close-pre-done-work/CONTEXT.md`,
   `plan.md` — already written; no further changes expected unless
-  `fgos-validating` surfaces a gap.
+  `fgos-coding-validating` surfaces a gap.
 
 No split: this is one cohesive piece of work — one flag, one gate
 condition, applied to two already-parallel code blocks under one

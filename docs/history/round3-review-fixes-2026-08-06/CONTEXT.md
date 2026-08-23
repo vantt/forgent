@@ -32,18 +32,18 @@ external contract beyond what's listed below.
   schedule, gate-bypass, doc-sources, lock-status`. Missing: `evolve`,
   `docs-index`, `main-checkout-reset` (all `requiresExistingStore:false`
   per `src/cli/command-registry.mjs`).
-- `test/intake/decompose.test.mjs` (tsk-297 test) + `src/intake/decompose.mjs:514-563`
+- `test/intake/plan.test.mjs` (tsk-297 test) + `src/intake/plan.mjs:514-563`
   — confirmed by 4/4 independent reviewers: the shipped crash-guard fixture
   `footprint:[null,'important.mjs']` against decision `'important.mjs'`
   never reaches `isCoveredByDirectory` because `covered.has(p)` short-circuits
   first.
-- `.claude/skills/fgos-exploring/SKILL.md:196` and its `.agents/skills` mirror
+- `.claude/skills/fgos-coding-exploring/SKILL.md:196` and its `.agents/skills` mirror
   — `fgos add` example uses `--dir "$root"` with no `root=` assignment in
   that code block (only unrelated assignments at lines 112/231). Same
   commit (d3ae2cb) added `root=$(git rev-parse --path-format=absolute
-  --git-common-dir | xargs dirname)` next door in `fgos-planning/SKILL.md`
+  --git-common-dir | xargs dirname)` next door in `fgos-coding-planning/SKILL.md`
   for the identical defect class.
-- `src/intake/decompose.mjs` `isDirectoryContainingCoverage` (tsk-297) —
+- `src/intake/plan.mjs` `isDirectoryContainingCoverage` (tsk-297) —
   one nested file fully covers a directory-shaped locked decision.
   `PATH_TOKEN_PATTERN` requires 2+ path segments, so a bare top-level dir
   can never be captured (bounds the blast radius somewhat).
@@ -83,7 +83,7 @@ external contract beyond what's listed below.
   planning's judgment on scope/risk — deferred, not required for this fix.
 - **D4 (MEDIUM-3)**: add the identical `root=$(git rev-parse
   --path-format=absolute --git-common-dir | xargs dirname)` line before the
-  `fgos-exploring/SKILL.md` `fgos add` example, in both `.claude/skills` and
+  `fgos-coding-exploring/SKILL.md` `fgos add` example, in both `.claude/skills` and
   `.agents/skills` copies, keeping them byte-identical per the repo's
   existing dual-root convention.
 - **D5 (MEDIUM-4 scope)**: fix left to planning's judgment between (a)
@@ -94,7 +94,7 @@ external contract beyond what's listed below.
   false positives. Deferred — implementation-level, not product-level, per
   this skill's own scope rule (advisory-only signal-quality tuning belongs
   to whoever builds it).
-- **D6 (HIGH-1)**: fix the `test/intake/decompose.test.mjs` crash-guard
+- **D6 (HIGH-1)**: fix the `test/intake/plan.test.mjs` crash-guard
   fixture so it actually reaches `isCoveredByDirectory`'s non-string path
   (no exact-match coverage present) — mechanical, no ambiguity.
 

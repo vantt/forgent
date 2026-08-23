@@ -1,4 +1,4 @@
-# Plan: fgos-planning hand-back path for a material CONTEXT.md gap
+# Plan: fgos-coding-planning hand-back path for a material CONTEXT.md gap
 
 ## Mode
 
@@ -18,14 +18,14 @@ per D1/D3 this is a text-only fix to two skill docs' prose, nothing
 mechanical to build.
 
 **File-scope correction found during bootstrap** (not a new product
-decision — a mechanical fact, diffed directly): `fgos-planning/SKILL.md`
-and `fgos-exploring/SKILL.md` each exist as two byte-identical copies with
+decision — a mechanical fact, diffed directly): `fgos-coding-planning/SKILL.md`
+and `fgos-coding-exploring/SKILL.md` each exist as two byte-identical copies with
 no sync script between them:
 
-- `.claude/skills/fgos-planning/SKILL.md` / `.agents/skills/fgos-planning/SKILL.md`
+- `.claude/skills/fgos-coding-planning/SKILL.md` / `.agents/skills/fgos-coding-planning/SKILL.md`
   (verified identical via `diff`, no sync script found under
   `scripts/`/`package.json`)
-- `.claude/skills/fgos-exploring/SKILL.md` / `.agents/skills/fgos-exploring/SKILL.md`
+- `.claude/skills/fgos-coding-exploring/SKILL.md` / `.agents/skills/fgos-coding-exploring/SKILL.md`
   (same)
 
 So the real file list is 4 files, not 2 — both copies of both docs must be
@@ -43,8 +43,8 @@ Alternatives rejected:
 
 | Component | How risky | What would prove it |
 |---|---|---|
-| `fgos-planning/SKILL.md` prose (both copies) | low — additive text, no existing flow step removed or reworded | re-read the Flow/Handoff sections after the edit: existing steps 1-6 and the Handoff paragraph must still read identically except for the new hand-back clause |
-| `fgos-exploring/SKILL.md` opening line (both copies) | low — one sentence corrected, no flow step touched | re-read the corrected line: it must state the path can also start mid-`decompose` via a direct `fgos-planning` invocation, without weakening or removing the original clarify-stage description |
+| `fgos-coding-planning/SKILL.md` prose (both copies) | low — additive text, no existing flow step removed or reworded | re-read the Flow/Handoff sections after the edit: existing steps 1-6 and the Handoff paragraph must still read identically except for the new hand-back clause |
+| `fgos-coding-exploring/SKILL.md` opening line (both copies) | low — one sentence corrected, no flow step touched | re-read the corrected line: it must state the path can also start mid-`decompose` via a direct `fgos-coding-planning` invocation, without weakening or removing the original clarify-stage description |
 | Drift between `.claude/` and `.agents/` copies | low-medium if missed — silent doc divergence, no test catches it today (see below) | `diff` the two SKILL.md pairs after editing; must be byte-identical, same as verified pre-edit |
 
 No proof point here leans on code blast-radius / call-graph evidence —
@@ -66,39 +66,39 @@ silently, per "weak proof" honesty.
 
 One direct piece of work, no split (see below). Two edits:
 
-1. **`fgos-planning/SKILL.md` — add hand-back route.** In the Flow section
+1. **`fgos-coding-planning/SKILL.md` — add hand-back route.** In the Flow section
    (after step 1 Bootstrap, or as its own short addition near step 4
    Shape/Handoff — exact placement is an editorial call, not locked by
    CONTEXT.md), add: when `CONTEXT.md`'s locked decisions are silent on
    something the plan needs and that gap is material (fails the same
-   material/grounded/answerable filter `fgos-exploring` already uses),
-   invoke `fgos-exploring`'s flow directly in this same session — no stage
+   material/grounded/answerable filter `fgos-coding-exploring` already uses),
+   invoke `fgos-coding-exploring`'s flow directly in this same session — no stage
    move, `item.stage` stays `decompose` (cite D1). If the gap is not
    material, pin it as a labeled assumption in this item's own `plan.md`
    Assumptions (cite the non-material path already documented in
-   `CONTEXT.md`, container already checked by `fgos-validating` line 75 —
+   `CONTEXT.md`, container already checked by `fgos-coding-validating` line 75 —
    no new mechanism to build). Apply to both `.claude/` and `.agents/`
    copies (cite D2).
 
-2. **`fgos-exploring/SKILL.md` — correct opening line.** The current line
+2. **`fgos-coding-exploring/SKILL.md` — correct opening line.** The current line
    "This skill runs while a claimed item's `stage` is `clarify`" is
    accurate for the normal entry path but no longer complete once (1)
-   exists — `fgos-planning` can invoke this flow directly while
+   exists — `fgos-coding-planning` can invoke this flow directly while
    `item.stage` stays `decompose`. Correct it to say both: the normal
    entry (claimed item at stage `clarify`) and the direct-invocation entry
-   (called by `fgos-planning` mid-`decompose` for a material gap, no stage
+   (called by `fgos-coding-planning` mid-`decompose` for a material gap, no stage
    change). Apply to both copies (cite D2).
 
 Concrete cases worth checking after the edit (small mode, lighter sketch
 than standard/high-risk):
-- A reader opening only `fgos-planning/SKILL.md` cold can find the
-  hand-back rule without needing to already know `fgos-exploring`'s
+- A reader opening only `fgos-coding-planning/SKILL.md` cold can find the
+  hand-back rule without needing to already know `fgos-coding-exploring`'s
   internals.
-- A reader opening only `fgos-exploring/SKILL.md` cold is not confused
+- A reader opening only `fgos-coding-exploring/SKILL.md` cold is not confused
   about why it might already be running against an item whose `stage`
   reads `decompose`, not `clarify`.
-- Neither edit reopens or restates any of `fgos-planning`'s or
-  `fgos-exploring`'s existing hard rules (e.g. "do not reopen a locked
+- Neither edit reopens or restates any of `fgos-coding-planning`'s or
+  `fgos-coding-exploring`'s existing hard rules (e.g. "do not reopen a locked
   decision") — the new text only adds the missing exit path, cites
   `CONTEXT.md`'s D1, and does not relax anything already there.
 
@@ -116,8 +116,8 @@ Per the locked pattern that Execute/`return` already have a working
 mechanical path, this plan names one proof point rather than designing new
 machinery:
 
-**Verify:** `diff .claude/skills/fgos-planning/SKILL.md .agents/skills/fgos-planning/SKILL.md && diff .claude/skills/fgos-exploring/SKILL.md .agents/skills/fgos-exploring/SKILL.md && grep -q "material" .claude/skills/fgos-planning/SKILL.md && grep -q "fgos-planning" .claude/skills/fgos-exploring/SKILL.md`
+**Verify:** `diff .claude/skills/fgos-coding-planning/SKILL.md .agents/skills/fgos-coding-planning/SKILL.md && diff .claude/skills/fgos-coding-exploring/SKILL.md .agents/skills/fgos-coding-exploring/SKILL.md && grep -q "material" .claude/skills/fgos-coding-planning/SKILL.md && grep -q "fgos-coding-planning" .claude/skills/fgos-coding-exploring/SKILL.md`
 
 (both copy-pairs stay identical after the edit; the new hand-back clause
-exists in `fgos-planning/SKILL.md`; the corrected opening line in
-`fgos-exploring/SKILL.md` mentions being invocable from `fgos-planning`.)
+exists in `fgos-coding-planning/SKILL.md`; the corrected opening line in
+`fgos-coding-exploring/SKILL.md` mentions being invocable from `fgos-coding-planning`.)

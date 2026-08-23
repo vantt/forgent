@@ -73,14 +73,14 @@ Alternatives rejected — recorded so they are not re-proposed:
 | Component | Risk | What would prove it |
 |---|---|---|
 | `fgos compound`'s new refusal | **high** | test that it refuses an absent path, refuses a path present-but-uncommitted (untracked *and* staged-only), and accepts only a path committed at the main checkout's HEAD — verify clause (1) |
-| `fgos-compounding` step 3 ↔ 4 inversion | **medium** | test that a synthesis run whose cwd is inside a linked worktree lands its document at the main checkout — verify clause (2) |
+| `fgos-coding-compounding` step 3 ↔ 4 inversion | **medium** | test that a synthesis run whose cwd is inside a linked worktree lands its document at the main checkout — verify clause (2) |
 | Existing `compound` callers and tests | **medium** | full `npm test` green; blast radius over `compound` cross-checked with `rg` (GitNexus degraded, see above) |
 | Regrown document fidelity | low | verify clause (3): the file exists with content sourced from `tsk-5z2`'s own decision record and the shipped `lock-status` behaviour, quoted not paraphrased |
 
 ### Files likely touched
 
-- `.claude/skills/fgos-compounding/SKILL.md` **and**
-  `.agents/skills/fgos-compounding/SKILL.md` — both copies exist and are
+- `.claude/skills/fgos-coding-compounding/SKILL.md` **and**
+  `.agents/skills/fgos-coding-compounding/SKILL.md` — both copies exist and are
   kept in sync; invert steps 3/4 and add main-checkout root resolution to
   the document-writing step (D1).
 - `bin/fgos.mjs`, `compound` case (~line 1165–1182) — add the
@@ -103,7 +103,7 @@ in ceremony than it saves.
 staged-only / committed), then make it pass. This phase alone closes the
 invariant; the rest is what makes it usable.
 
-**Phase 2 — the step inversion, skill-side.** Invert `fgos-compounding`
+**Phase 2 — the step inversion, skill-side.** Invert `fgos-coding-compounding`
 steps 3 and 4 in both skill copies, and give the write step the same root
 resolution step 3 already carries. Cross-check `compound`'s callers with
 `rg` before editing, per the degraded impact-analysis posture.
@@ -123,7 +123,7 @@ correction.
 
 Also in scope, one line: correct the stale `docPath` for
 `str89-case-study-executing` to
-`docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md`.
+`docs/how-to/smoke-test-fgos-coding-implement-with-a-trivial-item.md`.
 
 ### Cases worth proving against
 
@@ -148,7 +148,7 @@ Scaled to high-risk mode:
 ## Assumptions
 
 Pinned rather than asked — none of these change scope, behavior, data
-shape, or acceptance criteria (`fgos-planning`'s own material test):
+shape, or acceptance criteria (`fgos-coding-planning`'s own material test):
 
 - The committed-at-main check reads git state at the main checkout root
   resolved the same way every other verb already resolves it

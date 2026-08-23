@@ -35,8 +35,8 @@ Ngoài phạm vi item này (deferred, không mở rộng scope):
 | D1 | Shared file (`.fgos/config.json`) là multi-section, lồng theo module — project config runner nằm dưới key `runner` (`config.runner.*`), KHÔNG phải copy phẳng nội dung `.fgos-runner.json` vào root. Mọi điểm đọc config runner đổi từ đọc phẳng sang đọc `config.runner.*`. | Kế thừa `tsk-2cs` D6 (quyết định trực tiếp chủ sản phẩm, đã merge/done) — không re-litigate, chỉ pin |
 | D2 | `fgos setup` là verb thực hiện move thật (`.fgos-runner.json` → `.fgos/config.json`'s `runner` section). Khi `.fgos/config.json` chưa tồn tại nhưng `.fgos-runner.json` cũ còn, đọc file cũ làm fallback thay vì coi project là chưa cấu hình — file cũ không bị xoá tự động. | Kế thừa `tsk-2ta` plan.md §Assumptions + `tsk-2cs` D4 (đã đọc trực tiếp trên nhánh `fgw/tsk-2ta`, đã merge) |
 | D3 | Di dời `.fgos/gate-bypass.json` vào file chung nằm ngoài phạm vi item này — `tsk-2qz` là consumer đầu tiên thật của registry, làm việc đó khi nó thi công. | Kế thừa `tsk-2cs` D5 + `tsk-2qz`'s description ("tsk-2qz (D1) đang chờ đúng file này") |
-| D4 | `src/runner/dispatch.mjs`/`bin/fgos.mjs`'s 5 call site đọc/ghi `.fgos/config.json` qua một assembler tổng quát dẫn động bởi `CONFIG_DEFAULT_REGISTRATIONS` (`registerConfigDefault`, đã có sẵn từ `tsk-2cs` nhưng chưa có consumer thật nào — grep xác nhận 0 điểm đọc ngoài test) — KHÔNG hardcode đọc thẳng key `runner`. Làm cho registry của `tsk-2cs` thật sự có hiệu lực (load-bearing) lần đầu, cho `tsk-2qz`'s gate-bypass entry một pattern thật để theo sau. | Quyết định của người, chốt trong phiên `fgos-exploring` này (AskUserQuestion, chọn "Generic: registry-driven assembler" thay vì hardcode) |
-| D5 | `checkConfigNotStale` (`src/setup/checks.mjs`) và `describeConfigAwareness`'s default `projectConfigPath` (`src/config/global-config.mjs`) được cập nhật trỏ vào `.fgos/config.json` TRONG item này, không để lại làm follow-up riêng. | Quyết định của người, chốt trong phiên `fgos-exploring` này (AskUserQuestion, chọn "Update both now") — khớp AGENTS.md's install/setup/doctor gate ("phải register vào doctor's check registry — không đứng riêng, không bị doctor phát hiện") |
+| D4 | `src/runner/dispatch.mjs`/`bin/fgos.mjs`'s 5 call site đọc/ghi `.fgos/config.json` qua một assembler tổng quát dẫn động bởi `CONFIG_DEFAULT_REGISTRATIONS` (`registerConfigDefault`, đã có sẵn từ `tsk-2cs` nhưng chưa có consumer thật nào — grep xác nhận 0 điểm đọc ngoài test) — KHÔNG hardcode đọc thẳng key `runner`. Làm cho registry của `tsk-2cs` thật sự có hiệu lực (load-bearing) lần đầu, cho `tsk-2qz`'s gate-bypass entry một pattern thật để theo sau. | Quyết định của người, chốt trong phiên `fgos-coding-exploring` này (AskUserQuestion, chọn "Generic: registry-driven assembler" thay vì hardcode) |
+| D5 | `checkConfigNotStale` (`src/setup/checks.mjs`) và `describeConfigAwareness`'s default `projectConfigPath` (`src/config/global-config.mjs`) được cập nhật trỏ vào `.fgos/config.json` TRONG item này, không để lại làm follow-up riêng. | Quyết định của người, chốt trong phiên `fgos-coding-exploring` này (AskUserQuestion, chọn "Update both now") — khớp AGENTS.md's install/setup/doctor gate ("phải register vào doctor's check registry — không đứng riêng, không bị doctor phát hiện") |
 
 ## Pinned terms
 
@@ -100,11 +100,11 @@ Ngoài phạm vi item này (deferred, không mở rộng scope):
 - Tên hàm/module chính xác cho assembler (D4) — file mới trong `src/setup/`
   hay `src/config/`, chữ ký hàm, nơi gọi `mergeWithGlobalConfig` trong luồng
   đó (trước hay sau assembler gộp default) — chi tiết implementer,
-  `fgos-planning` quyết.
+  `fgos-coding-planning` quyết.
 - Thứ tự sửa 5 call site (`bin/fgos.mjs` x4, `bin/fgos-runner.mjs` x1) và có
   cần một helper dùng chung để tránh lặp `path.join(..., '.fgos','config.json')`
   5 lần hay không — implementer detail.
 - `fgos setup`'s write-first-time behavior khi CẢ `.fgos-runner.json` cũ lẫn
   `.fgos/config.json` mới đều chưa tồn tại (first run thật) — có viết default
   runner section ngay, hay chỉ khi `ensureRunnerConfig` được gọi lần đầu —
-  `fgos-planning` cân nhắc cùng risk map.
+  `fgos-coding-planning` cân nhắc cùng risk map.

@@ -23,8 +23,18 @@ commit that file on this branch. Once you are done recording your findings,
 report your verdict as DATA ONLY by emitting exactly one fenced block:
 
 ```fgos-verdict
-{"clear": true, "verify": "<a real, runnable command that proves the goal>"}
+{"clear": true, "verify": "<a real, runnable command that proves the goal>", "tier": "<optional>", "kind": "<optional>", "risk": "<optional>"}
 ```
+
+`tier`/`kind`/`risk` are optional (D12/D17, tsk-2yo): when the skill's own
+flow judged them from the same evidence, report them here as DATA so the
+runner can apply them — you still MUST NOT call `fgos edit` yourself. Pick
+`kind`/`risk` from the domain's own declared vocabulary
+(`classificationVocabulary(domain, field)`,
+`src/state/workflow-stage-graphs.mjs`) and `tier` from the global `TIERS`
+(`src/state/work.mjs`) — never invent a value outside either list, and
+omit a field entirely rather than guess when the evidence does not
+support a judgment for it.
 
 or, if you could not resolve the goal from the evidence you gathered:
 
@@ -52,7 +62,4 @@ one fenced block per discovery in your output:
 {"title": "<one-line title>", "kind": "<optional>", "risk": "<optional>", "description": "<optional>"}
 ```
 
-`title` is required; `kind`/`risk`/`description` are optional. This is a
-report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The
-runner reads these blocks after you finish and creates each item itself,
-stamping it as discovered-from this item.
+`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.

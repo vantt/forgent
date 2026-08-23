@@ -67,22 +67,11 @@ export class EventLogError extends Error {
   }
 }
 
-/**
- * Read every event from the append-only log at `logPath`, in append order.
- *
- * Returns `[]` when the log does not exist yet (uninitialized log — not an
- * error). Throws `EventLogError('corrupt-log')` the moment any line fails to
- * parse as JSON — a corrupt or truncated line (e.g. a crash mid-append) is
- * never silently skipped or auto-repaired.
- */
-export function readEvents(logPath) {
-  let raw;
-  try {
-    raw = fs.readFileSync(logPath, 'utf8');
-  } catch (err) {
-    if (err.code === 'ENOENT') return [];
-    throw err;
-  }
+// Shared core (tsk-49e): splits `raw` into JSON Lines and parses each one,
+// throwing the same EventLogError('corrupt-log') shape readEvents always
+// has. Used by readEvents (whole-file) and readEventsFromByte (partial,
+// incremental-snapshot read) below — one parsing implementation, never two.
+export function parseEventLines(raw, logPath) {
   if (raw === '') return [];
 
   const lines = raw.split('\n');
@@ -105,6 +94,83 @@ export function readEvents(logPath) {
     events.push(parsed);
   }
   return events;
+}
+
+/**
+ * Read every event from the append-only log at `logPath`, in append order.
+ *
+ * Returns `[]` when the log does not exist yet (uninitialized log — not an
+ * error). Throws `EventLogError('corrupt-log')` the moment any line fails to
+ * parse as JSON — a corrupt or truncated line (e.g. a crash mid-append) is
+ * never silently skipped or auto-repaired.
+ */
+export function readEvents(logPath) {
+  let raw;
+  try {
+    raw = fs.readFileSync(logPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return [];
+    throw err;
+  }
+  return parseEventLines(raw, logPath);
+}
+
+/**
+ * tsk-49e: reads a bounded window of raw bytes ending exactly at `atByte`
+ * and returns the raw text of the LAST COMPLETE line in that window (the
+ * line ending immediately before `atByte`) — or `null` if the window holds
+ * no complete line at all (defensive; should never happen for an `atByte`
+ * that was itself a prior valid file length, since every write here is
+ * line-terminated). Never throws on a missing file — callers treat `null`
+ * as "snapshot fast path unavailable, fall back to a full read".
+ */
+export function readLastLineBefore(logPath, atByte, windowBytes = 8192) {
+  if (typeof atByte !== 'number' || atByte <= 0) return null;
+  let fd;
+  try {
+    fd = fs.openSync(logPath, 'r');
+  } catch {
+    return null;
+  }
+  try {
+    const start = Math.max(0, atByte - windowBytes);
+    const length = atByte - start;
+    if (length <= 0) return null;
+    const buffer = Buffer.alloc(length);
+    fs.readSync(fd, buffer, 0, length, start);
+    const text = buffer.toString('utf8');
+    if (!text.endsWith('\n')) return null; // atByte did not land on a line boundary -- not a byte length this module ever wrote
+    const trimmed = text.slice(0, -1);
+    const lastNewline = trimmed.lastIndexOf('\n');
+    return lastNewline === -1 ? trimmed : trimmed.slice(lastNewline + 1);
+  } catch {
+    return null;
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+/**
+ * tsk-49e: reads raw bytes from `fromByte` to EOF and parses them as JSON
+ * Lines via the same `parseEventLines` core `readEvents` uses — the
+ * incremental counterpart to a full-file read. Same fail-closed corrupt-log
+ * throw; never silently skips a bad line just because it is in the "new"
+ * range.
+ */
+export function readEventsFromByte(logPath, fromByte) {
+  const fd = fs.openSync(logPath, 'r');
+  let raw;
+  try {
+    const stat = fs.fstatSync(fd);
+    const length = stat.size - fromByte;
+    if (length <= 0) return [];
+    const buffer = Buffer.alloc(length);
+    fs.readSync(fd, buffer, 0, length, fromByte);
+    raw = buffer.toString('utf8');
+  } finally {
+    fs.closeSync(fd);
+  }
+  return parseEventLines(raw, logPath);
 }
 
 function parsesAsJson(line) {

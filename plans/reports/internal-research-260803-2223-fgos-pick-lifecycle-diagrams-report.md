@@ -19,10 +19,10 @@ flowchart TD
     P -->|"claim: status todo→doing\nEnterWorktree vào fgw/&lt;id&gt;"| D["fgos-coding-driving\n(vòng lặp mechanical)"]
     D -->|"đọc stage/domain thật"| R["fgos-routing\nskillForStage(domain, stage)"]
 
-    R -->|"stage: clarify"| EX["fgos-exploring"]
-    R -->|"stage: decompose (shaping)"| PL["fgos-planning"]
-    R -->|"stage: decompose (proving)"| VA["fgos-validating"]
-    R -->|"stage: executing"| EC["fgos-code-implement"]
+    R -->|"stage: clarify"| EX["fgos-coding-exploring"]
+    R -->|"stage: decompose (shaping)"| PL["fgos-coding-planning"]
+    R -->|"stage: decompose (proving)"| VA["fgos-coding-validating"]
+    R -->|"stage: executing"| EC["fgos-coding-implement"]
 
     EX -->|"fgos discover --verdict clear\n(caller-supplied, tsk-27y)"| PL
     EX -.->|"unclear"| AH["awaiting-human\n(fgos ask / fgos answer)"]
@@ -41,7 +41,7 @@ flowchart TD
     MG -->|"verify lại + merge sạch"| DEL["status: delivered\n(code vào main)"]
     MG -.->|"iron-law / conflict / verify-fail"| BL
 
-    DEL --> RETRO["status: retrospective\n(fgos-compounding: viết end-user doc)"]
+    DEL --> RETRO["status: retrospective\n(fgos-coding-compounding: viết end-user doc)"]
     RETRO --> CLEAN["status: cleanup\n(TTL, giải phóng worktree)"]
     CLEAN --> DONE["status: done\n(1 cửa duy nhất: cleanup→done)"]
 ```
@@ -52,14 +52,14 @@ flowchart TD
 |---|---|---|---|---|
 | Claim | `/fgOS:pick` → `fgos pick` CLI | Mechanical (Node CLI, one-door-write) | id (optional, mặc định frontier head) | `status: doing`, worktree `.claude/worktrees/<id>-*` đứng lên, branch `fgw/<id>` |
 | Điều phối | `fgos-coding-driving` | Mechanical loop — đọc `stage`, gọi `fgos-routing`'s registry, KHÔNG tự suy ra mapping | item id | không tự ghi state — chỉ load đúng skill và lặp tới ceiling |
-| Route | `fgos-routing` | Mechanical lookup: `skillForStage(getDomain(domain), stage)` từ `src/state/workflow-stage-graphs.mjs` | `stage`, `domain` | tên skill (`fgos-exploring`/`fgos-planning`/`fgos-validating`/`fgos-code-implement`) |
-| `clarify` | `fgos-exploring` | **Native LLM trước** — session tự đọc description/refs/deps, tự scout (`rg`, capability-gate), tự Socratic; chỉ SAU đó gọi `fgos discover --verdict clear --verify "<...>"` — bypass hẳn `judgeDiscovery` subprocess | title/description/refs/deps, capability-gate impact-analysis | `docs/history/<feature>/CONTEXT.md` (D-ID, bằng chứng scout), gate `contextApprove` (human), `stage: clarify→decompose` |
-| `decompose` — shaping | `fgos-planning` | Native LLM — mode gate (10 cờ), risk map, chọn approach, viết plan.md | CONTEXT.md, item's tier/risk | `docs/history/<feature>/plan.md`, gate `planApprove` (human), verify command thật gắn vào item |
-| `decompose` — proving | `fgos-validating` | Native LLM — feasibility matrix, mỗi dòng cần bằng chứng thật (file đọc, lệnh chạy, test có sẵn), KHÔNG chấp nhận "should work" | plan.md, CONTEXT.md, capability-gate | Gate `validateApprove` (human) + verdict READY/NOT READY; nếu READY, **tự gọi** `fgos decompose --verdict pass-through\|decompose --children '<...>'` — bypass hẳn `judgeDecompose` subprocess (tsk-27y D1/D2), `stage: decompose→executing` |
-| `executing` | `fgos-code-implement` | Native LLM implement thật; verify **chạy thật** (không nhận lời khẳng định) | docsRef (CONTEXT.md/plan.md nếu có), item's `verify` command | code diff thật, `iron-law-evidence.md` nếu `classifyIronLaw` yêu cầu, 1 commit/item |
-| Return | `fgos return <id>` (gọi từ trong `fgos-code-implement`) | Mechanical — tự chạy lại `verify`, check working-tree sạch + commit history tiến | commit(s), verify command | `status: awaiting-approval` (verify pass) hoặc `status: blocked` (verify fail) |
+| Route | `fgos-routing` | Mechanical lookup: `skillForStage(getDomain(domain), stage)` từ `src/state/workflow-stage-graphs.mjs` | `stage`, `domain` | tên skill (`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`) |
+| `clarify` | `fgos-coding-exploring` | **Native LLM trước** — session tự đọc description/refs/deps, tự scout (`rg`, capability-gate), tự Socratic; chỉ SAU đó gọi `fgos discover --verdict clear --verify "<...>"` — bypass hẳn `judgeDiscovery` subprocess | title/description/refs/deps, capability-gate impact-analysis | `docs/history/<feature>/CONTEXT.md` (D-ID, bằng chứng scout), gate `contextApprove` (human), `stage: clarify→decompose` |
+| `decompose` — shaping | `fgos-coding-planning` | Native LLM — mode gate (10 cờ), risk map, chọn approach, viết plan.md | CONTEXT.md, item's tier/risk | `docs/history/<feature>/plan.md`, gate `planApprove` (human), verify command thật gắn vào item |
+| `decompose` — proving | `fgos-coding-validating` | Native LLM — feasibility matrix, mỗi dòng cần bằng chứng thật (file đọc, lệnh chạy, test có sẵn), KHÔNG chấp nhận "should work" | plan.md, CONTEXT.md, capability-gate | Gate `validateApprove` (human) + verdict READY/NOT READY; nếu READY, **tự gọi** `fgos plan --verdict pass-through\|decompose --children '<...>'` — bypass hẳn `judgeDecompose` subprocess (tsk-27y D1/D2), `stage: decompose→executing` |
+| `executing` | `fgos-coding-implement` | Native LLM implement thật; verify **chạy thật** (không nhận lời khẳng định) | docsRef (CONTEXT.md/plan.md nếu có), item's `verify` command | code diff thật, `iron-law-evidence.md` nếu `classifyIronLaw` yêu cầu, 1 commit/item |
+| Return | `fgos return <id>` (gọi từ trong `fgos-coding-implement`) | Mechanical — tự chạy lại `verify`, check working-tree sạch + commit history tiến | commit(s), verify command | `status: awaiting-approval` (verify pass) hoặc `status: blocked` (verify fail) |
 | Merge | `/fgOS:merge-next` → `fgos merge next` → `approve` | Mechanical — CTR005/Iron Law gate, re-verify, ranking (dependency-wait, no footprint conflict, `rankImpact`) | ranking từ `fgos merge list` | `status: delivered` (merge sạch) hoặc giữ `awaiting-approval`/`blocked` (iron-law/conflict/verify-fail) |
-| Retrospective | `fgos-compounding` (qua `/fgOS:retro-next`) | Native LLM — phân loại Diataxis, viết end-user doc từ tín hiệu thật đã capture | item's discovery/decisions/gates/outcome/friction đã ghi suốt vòng đời | end-user doc (`docType`/`docPath`), `status: retrospective→cleanup` |
+| Retrospective | `fgos-coding-compounding` (qua `/fgOS:retro-next`) | Native LLM — phân loại Diataxis, viết end-user doc từ tín hiệu thật đã capture | item's discovery/decisions/gates/outcome/friction đã ghi suốt vòng đời | end-user doc (`docType`/`docPath`), `status: retrospective→cleanup` |
 | Cleanup | `/fgOS:cleanup-next` | Mechanical, TTL-bounded | — | giải phóng worktree, `status: cleanup→done` (1 cửa duy nhất) |
 
 ## 3. Cơ chế dispatch — 2 đường discover/decompose khác hẳn nhau
@@ -68,7 +68,7 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-    participant S as Session sống (fgos-exploring/planning/validating)
+    participant S as Session sống (fgos-coding-exploring/planning/validating)
     participant CLI as bin/fgos.mjs discover/decompose
     participant J as judgeDiscovery/judgeDecompose (subprocess claude -p)
 
@@ -78,13 +78,13 @@ sequenceDiagram
     CLI-->>S: ghi state trực tiếp, KHÔNG spawn J
     Note over CLI,J: judgeDiscovery/judgeDecompose KHÔNG BAO GIỜ được gọi trên đường này
 
-    Note over CLI: Đường khác — gọi /fgOS:discover hoặc /fgOS:decompose LẺ (không qua exploring/planning), hoặc fgos-runner headless
+    Note over CLI: Đường khác — gọi /fgOS:discover hoặc /fgOS:plan LẺ (không qua exploring/planning), hoặc fgos-runner headless
     CLI->>J: không có --verdict → spawn subprocess mù (judge-executor.mjs)
     J-->>CLI: {clear/unclear, verify?} hoặc {pass-through/decompose, children?}
 ```
 
 - **FSM thật** (routing → coding-driving → exploring/planning/validating) **luôn** đi nhánh trên — native, session tự suy luận trước, CLI chỉ ghi nhận (`resolveDiscovery`/`resolveDecompose` thấy `callerVerdict` thì bỏ qua hẳn `judgeDiscovery`/`judgeDecompose`).
-- Nhánh subprocess mù chỉ bị chạm ở 2 nơi, cả 2 NGOÀI FSM: (1) `fgos-runner`/`loop.mjs` headless (không có soul để suy luận trước, cố ý theo thiết kế); (2) gọi tay `/fgOS:discover <id>`/`/fgOS:decompose <id>` như 1 lệnh lẻ, tách biệt khỏi vòng lặp routing/driving.
+- Nhánh subprocess mù chỉ bị chạm ở 2 nơi, cả 2 NGOÀI FSM: (1) `fgos-runner`/`loop.mjs` headless (không có soul để suy luận trước, cố ý theo thiết kế); (2) gọi tay `/fgOS:discover <id>`/`/fgOS:plan <id>` như 1 lệnh lẻ, tách biệt khỏi vòng lặp routing/driving.
 - Helper quyết định native-vs-cli/spawn chung (`decideCapacityDispatchMechanism`, `src/runner/dispatch.mjs`, xây ở tsk-3ik Pha 4) **không áp dụng** cho `judgeDiscovery`/`judgeDecompose` — lớp đó là hàm Node thuần, cấu trúc không thể có live Task access dù caller là ai (tsk-3ik-2 tự điều tra và đóng dạng pass-through). Helper đó chỉ thật sự dùng ở `capacities.submit-assist-classify` (skill-facing, có thể chạy trong session sống).
 
 ## 3.5. Vấn đề đặt tên — 4 tầng đang bị gộp lẫn dưới cùng 1-2 chữ
@@ -102,15 +102,15 @@ flowchart LR
 
     subgraph L2["Tầng 2 - VERB (lệnh CLI đổi stage)"]
         V1["fgos discover<br/>(clarify to decompose)"]
-        V2["fgos decompose<br/>(decompose to executing)"]
+        V2["fgos plan<br/>(decompose to executing)"]
         V3["fgos return<br/>(executing to awaiting-approval)"]
     end
 
     subgraph L3["Tầng 3 - SKILL (workflow phiên sống cung cấp phán đoán)"]
-        SK1["fgos-exploring"]
-        SK2["fgos-planning<br/>(decompose - shaping)"]
-        SK3["fgos-validating<br/>(decompose - proving)"]
-        SK4["fgos-code-implement"]
+        SK1["fgos-coding-exploring"]
+        SK2["fgos-coding-planning<br/>(decompose - shaping)"]
+        SK3["fgos-coding-validating<br/>(decompose - proving)"]
+        SK4["fgos-coding-implement"]
     end
 
     subgraph L4["Tầng 4 - MECHANISM (ai thật sự trả lời verb)"]
@@ -145,7 +145,7 @@ vừa là verb, vừa là tên hàm judge subprocess.
   — thay vì để trần `judgeDiscovery`/`judgeDecompose` (dễ lẫn với verb) hay
   mượn chữ "native" (đã có nghĩa khác ở doctrine 0026: native-vs-cli/spawn
   dispatch cho Task tool, không cùng khái niệm).
-- Mọi chỗ nhắc `fgos-validating` nên kèm `(stage: decompose — proving)` —
+- Mọi chỗ nhắc `fgos-coding-validating` nên kèm `(stage: decompose — proving)` —
   tên skill không tự nói nó thuộc stage nào, phải tra bảng mới biết.
 - Đặt tên prose chính thức cho 2 pha con của stage `decompose`:
   "decompose-shaping" / "decompose-proving" — data field vẫn giữ nguyên 1
@@ -199,7 +199,7 @@ stateDiagram-v2
     todo --> wontfix
     doing --> wontfix
     blocked --> wontfix
-    delivered --> retrospective: fgos-compounding sweep
+    delivered --> retrospective: fgos-coding-compounding sweep
     retrospective --> cleanup: retro-next
     cleanup --> done: cleanup-next, 1 cửa duy nhất
 ```
@@ -210,21 +210,21 @@ stateDiagram-v2
 |---|---|---|
 | `.fgos/events.jsonl` | mọi verb one-door-write (pick/discover/decompose/gate-approve/return/approve/move) | Có — nguồn sự thật |
 | `.fgos/state.json` | dựng lại từ events.jsonl | Không — gitignored, view |
-| `docs/history/<feature>/CONTEXT.md` | `fgos-exploring` | Có, trên branch `fgw/<id>` trước khi gọi `fgos discover` |
-| `docs/history/<feature>/plan.md` | `fgos-planning`, có thể sửa bởi `fgos-validating` (NOT READY loop) | Có, trước khi `fgos-validating` gọi `fgos decompose` |
-| `docs/history/<id>/iron-law-evidence.md` | `fgos-code-implement`, chỉ khi `classifyIronLaw` trả `required:true` | Có, cùng commit implementation |
-| commit(s) trên `fgw/<id>` | `fgos-code-implement` (1 commit/item, id trong message) | Có |
-| end-user doc (Diataxis) | `fgos-compounding` tại status `retrospective` | Có |
+| `docs/history/<feature>/CONTEXT.md` | `fgos-coding-exploring` | Có, trên branch `fgw/<id>` trước khi gọi `fgos discover` |
+| `docs/history/<feature>/plan.md` | `fgos-coding-planning`, có thể sửa bởi `fgos-coding-validating` (NOT READY loop) | Có, trước khi `fgos-coding-validating` gọi `fgos plan` |
+| `docs/history/<id>/iron-law-evidence.md` | `fgos-coding-implement`, chỉ khi `classifyIronLaw` trả `required:true` | Có, cùng commit implementation |
+| commit(s) trên `fgw/<id>` | `fgos-coding-implement` (1 commit/item, id trong message) | Có |
+| end-user doc (Diataxis) | `fgos-coding-compounding` tại status `retrospective` | Có |
 
 ## Unresolved questions
 
 - `fgos-routing/SKILL.md`'s bảng route ghi `executing` load skill `null`
   ("today", tức "chưa có skill") nhưng code thật
-  (`src/state/workflow-stage-graphs.mjs`) đã có `executing: 'fgos-code-implement'`
+  (`src/state/workflow-stage-graphs.mjs`) đã có `executing: 'fgos-coding-implement'`
   từ `str89-fgos-domain-skills D4/D6` — SKILL.md đang lệch so với code, có
-  thể chỉ chưa update sau khi `fgos-code-implement` được thêm. Không tự sửa doc
+  thể chỉ chưa update sau khi `fgos-coding-implement` được thêm. Không tự sửa doc
   ở đây vì ngoài phạm vi câu hỏi gốc.
 - Chưa xác nhận trực tiếp `approve`/CTR005/Iron Law gate implementation
   (`src/runner/merge.mjs`, `src/evolve/iron-law.mjs`) — chỉ dựa vào mô tả
-  trong `merge-next/SKILL.md` và `fgos-code-implement/SKILL.md`'s iron-law-evidence
+  trong `merge-next/SKILL.md` và `fgos-coding-implement/SKILL.md`'s iron-law-evidence
   bước, chưa đọc trực tiếp 2 file nguồn đó trong phiên này.

@@ -57,10 +57,10 @@ without a reason to be one.
 
 Impact-analysis capability gate (`CLAUDE.md`): `fgos tool query
 --capability impact-analysis --status present` → GitNexus `present` →
-posture **full** (same read `fgos-exploring` already recorded in
+posture **full** (same read `fgos-coding-exploring` already recorded in
 CONTEXT.md). Binding below: the new module is additive-only (no existing
 symbol is edited), so no upstream-impact run is owed before adding it;
-`fgos-code-implement` still owes a real `impact()` call before touching anything
+`fgos-coding-implement` still owes a real `impact()` call before touching anything
 inside `cleanup-harness.mjs` or `bin/fgos.mjs`'s `case 'cleanup'` should
 either turn out to need a change during build (not expected — see Scope
 boundary in CONTEXT.md — but the gate stays live regardless of plan intent).
@@ -165,7 +165,7 @@ actually has.
 | `cleanup-next` skill | low — thin CLI wrapper, exit-code classification already proven by `discover-next`'s own use of the same `EXIT_CODES` contract | manual dry run: pick an existing (or a locally-created throwaway) `status:cleanup` item and confirm the null/done/blocked paths report correctly |
 | `cleanup-loop` skill | low — markdown-only, no logic beyond stop-rule bookkeeping already proven correct by `merge-loop`/`discover-loop`'s own live use | structural read against `merge-loop`/`discover-loop`'s SKILL.md shape (no automated harness exists for skill-markdown files in this repo) |
 
-No proof point above is medium/high risk, so `fgos-validating` has no
+No proof point above is medium/high risk, so `fgos-coding-validating` has no
 carried-forward proof obligation beyond running `cleanup-pool.test.mjs`
 and the full `npm test` suite (AGENTS.md's own definition-of-done: "npm
 test ... green; new or changed behavior gets a matching test").
@@ -179,7 +179,7 @@ left open (exact module path/name, `cleanup-next` as a real separate
 skill, `node -e` invocation shape, no "waiting" count in the loop's
 report, test shape) are all decided directly above, as this plan's own
 implementation shape — none of them change scope, behavior, or acceptance
-criteria, so none needed a hand-back to `fgos-exploring`.
+criteria, so none needed a hand-back to `fgos-coding-exploring`.
 
 ## Split
 

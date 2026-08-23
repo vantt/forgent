@@ -15,7 +15,7 @@ returned exactly one provider (gitnexus), `status: present`, checked fresh
 this session — posture is **full**. 1 flag → **small** lane (a few files,
 no gray areas — narrower than the item's own submission-time `tier:
 standard`, which predates this design pass; `plan.md`'s `Mode:` line is
-the authoritative lane per `fgos-planning`, not `item.tier`).
+the authoritative lane per `fgos-coding-planning`, not `item.tier`).
 
 No `CONTEXT.md` for this feature dir — same precedent `tsk-469`'s own
 `plan.md` already set (see its own `## Scope` note): the item's
@@ -114,7 +114,7 @@ plumbing at all.
 
 ## Risk map
 
-| Component | Risk | Proof point (→ `fgos-validating`) |
+| Component | Risk | Proof point (→ `fgos-coding-validating`) |
 |---|---|---|
 | `test/setup/checks.test.mjs`'s existing `DOCTOR_CHECKS has exactly the ... checks` assertion | medium — the one flagged "existing covered behavior" touch; forgetting to add `changelog-unreleased-stale` to that list fails an existing test, not a new one | run the existing test unmodified first to see it fail on the new registration, then update the `deepEqual` list — same forcing-function precedent `checks.test.mjs`'s own file history already relies on for every prior new check |
 | Heading-extraction regex correctness against the real, already-existing `CHANGELOG.md` (tsk-469 already landed it) | low — verified directly this session by reading the real file: `## [Unreleased]` at line 8, four empty `###` sub-headings, next `## ` heading (`## [0.1.0]`) at line 18 | unit test both the doctor check and the nag's shared helper against the real repo-root `CHANGELOG.md` fixture shape (empty Unreleased) plus a fixture with a real bullet added |
@@ -122,7 +122,7 @@ plumbing at all.
 
 `impact-analysis: full` (GitNexus present, checked fresh this session) —
 `collectCheckData` (an existing, already-covered symbol) gets one new
-field added to its return object; `fgos-code-implement` runs
+field added to its return object; `fgos-coding-implement` runs
 `impact({target: "collectCheckData", direction: "upstream"})` before
 editing it, per the repo's own Always-Do gate, and reports the blast
 radius before touching it.

@@ -28,13 +28,13 @@ heuristic).
 ## Test command
 
 ```
-node --test --test-name-pattern="tsk-3xd D2" test/intake/decompose.test.mjs
+node --test --test-name-pattern="tsk-3xd D2" test/intake/plan.test.mjs
 ```
 
 ## Failing-test-first proof (before the fix)
 
 With `normalizeChild`'s new `action`/D-ID-citation check temporarily
-disabled (commented out) in `src/intake/decompose.mjs`, the same command
+disabled (commented out) in `src/intake/plan.mjs`, the same command
 above produced 2 real failures — the two tests that actually assert the
 new requirement:
 
@@ -90,7 +90,7 @@ Restoring the real `normalizeChild` (as committed), same command:
 
 ## Broader verify
 
-The item's own recorded verify, `node --test test/intake/decompose.test.mjs`
+The item's own recorded verify, `node --test test/intake/plan.test.mjs`
 (113 tests), and the full repo suite (`node --test 'test/**/*.test.mjs'`,
 2701 tests) both pass, with one pre-existing, unrelated failure noted and
 left untouched (see item decision log): `docs/architecture-manifest.json`

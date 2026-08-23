@@ -46,7 +46,7 @@ hạng của verb `merge`, cạnh `targets`. Phần thiếu là **một bộ dis
 
 | Thành phần | Mức | Cái gì chứng minh được |
 |---|---|---|
-| Đổi chữ ký `computeSchedule` | **trung bình** | `src/state/store.mjs:1100` là caller đã biết. **Proof point cho `fgos-validating`**: grep/rg toàn repo tìm mọi caller (**không** tin riêng gitnexus — posture degraded), và `npm test` xanh chứng minh không caller nào gãy |
+| Đổi chữ ký `computeSchedule` | **trung bình** | `src/state/store.mjs:1100` là caller đã biết. **Proof point cho `fgos-coding-validating`**: grep/rg toàn repo tìm mọi caller (**không** tin riêng gitnexus — posture degraded), và `npm test` xanh chứng minh không caller nào gãy |
 | Đụng hợp đồng anchor của `fgos-coding-driving` (D8) | **cao** | năm caller cùng đọc hợp đồng. **Proof point**: liệt kê thật cả năm từ `SKILL.md:277-283` và nói rõ từng cái đổi hay không đổi hành vi. Đây là rủi ro cao nhất của item |
 | Trần 5 Agent (D7) | thấp | một hằng số; sai thì chậm hoặc quá tải, không sai thiết kế |
 | Tự động approve lá (D2) | **trung bình** | **Proof point**: chứng minh cổng root **vẫn hỏi**, và lá chạm risk-keyword **vẫn hỏi** (ngoại lệ `gateBypass` D4 giữ nguyên) |
@@ -98,13 +98,13 @@ ba mảnh của nó là một chuỗi tuần tự, không có nhánh song song n
   báo lỗi, cha xếp lại wave sau. Tiền-kiểm là *advisory*, `claimWork` là
   *thẩm quyền* (D5).
 
-## Giả định (chưa chứng minh — để `fgos-validating` soi)
+## Giả định (chưa chứng minh — để `fgos-coding-validating` soi)
 
 1. **Một Agent subagent chạy được `/fgOS:pick`** và vào được worktree của
    nó. Bằng chứng gián tiếp: demo `tsk-1sj` đã làm đúng vậy bằng tay. Chưa
    xác minh trực tiếp cho đường tự động.
 2. **Đợi hết wave rồi mới bắn wave sau** (khuôn runner
-   `Promise.allSettled` rồi re-poll) là đủ. Nếu `fgos-validating` thấy cần
+   `Promise.allSettled` rồi re-poll) là đủ. Nếu `fgos-coding-validating` thấy cần
    bù chỗ trống ngay khi một Agent xong, thì trần 5 (D7) phải áp lên *số
    đang bay*, không phải *kích thước wave*.
 3. **Bậc mặc định cho phần tự động approve lá** trong khuôn `gateBypass`
@@ -119,7 +119,7 @@ ba mảnh của nó là một chuỗi tuần tự, không có nhánh song song n
   **xử lý**. Mảnh 3 dưới đây chọn: viết hợp đồng ở driving (một nơi duy
   nhất định nghĩa caller phải làm gì) **và** nối `/fgOS:cook` làm caller
   cụ thể đầu tiên. Bốn caller còn lại kế thừa hợp đồng nhưng **không** được
-  sửa trong item này — nếu `fgos-validating` thấy đó là bỏ sót chứ không
+  sửa trong item này — nếu `fgos-coding-validating` thấy đó là bỏ sót chứ không
   phải phạm vi, mảnh 3 phải rộng ra.
 - `scripts/verify-fanout-overlap.mjs` (D10) chưa tồn tại. Nó thuộc mảnh
   nào? Plan này đặt nó ở **mảnh 3** — mảnh cuối, vì chỉ khi đó mới có

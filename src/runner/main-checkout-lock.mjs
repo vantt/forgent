@@ -48,6 +48,36 @@ import path from 'node:path';
 
 export const LOCK_FILE = 'main-checkout.lock';
 
+/**
+ * Maps a target ref (e.g. `fgw/tsk-51m`, `main`) to a collision-free,
+ * filesystem-safe lock filename for the target-ref merge queue (tsk-xyr,
+ * §E of the Merge Conductor design). Pure: no fs access, no side effects.
+ *
+ * Uses `encodeURIComponent` over the WHOLE ref, not a hand-picked
+ * character substitution (e.g. `/` -> `-`) — the naive substitution is
+ * NOT injective: `fgw/tsk-51m` and a (hypothetical but not disallowed by
+ * git-check-ref-format) `fgw-tsk-51m` would both collapse onto
+ * `merge-slot--fgw-tsk-51m.lock`, silently serializing two unrelated
+ * targets onto one lock file, or letting one target's slot stand in for
+ * another's — exactly the data-loss class this queue exists to close.
+ * `encodeURIComponent` is a byte-for-byte reversible encoding (every
+ * character outside `A-Za-z0-9-_.!~*'()` becomes a distinct `%XX`
+ * escape), so distinct input refs always produce distinct output
+ * filenames, and its output charset is itself filesystem-safe (no `/`,
+ * no null bytes, no path traversal).
+ */
+export function mergeSlotLockFile(targetRef) {
+  return `merge-slot--${encodeURIComponent(targetRef)}.lock`;
+}
+
+/**
+ * Maps a working directory path (cwd) to a collision-free, filesystem-safe
+ * lock filename for per-item dispatch concurrency protection (tsk-64hk). Pure.
+ */
+export function dispatchLockFile(cwd) {
+  return `dispatch--${encodeURIComponent(cwd)}.lock`;
+}
+
 /** Formats a millisecond duration (lockAgeMs/remainingTtlMs) as a short
  * human-readable string ("2m15s", "45s") for CLI messages. Non-numeric or
  * negative input (no known duration) formats as "unknown" rather than
@@ -99,6 +129,22 @@ export const DEFAULT_TTL_MS = 3 * 60 * 1000;
 // protection window to that same duration, down from 3 minutes --
 // thinner, not eliminated.
 export const HOOK_TTL_MS = 20 * 1000;
+
+// HOLDER_PID_ENV_VAR (tsk-70l): the env var merge.mjs's root->main path
+// (mergeRunnerItem's non-targetSlot branch) sets, scoped to the one
+// `execFileSync` call that spawns the `git commit` triggering
+// `.githooks/pre-commit` -- carrying that process's own pid, the same
+// numeric identity it acquired this lock under (D6 self-recognition
+// above needs a caller's OWN identity to literally equal the record's
+// identity to recognize a refresh; a child process can never share its
+// parent's pid, so it cannot self-recognize on its own). The hook reads
+// this var when present and uses its value AS ITS OWN identity for this
+// one acquire call, letting the existing self-recognition equality
+// check above match it against the record the parent wrote -- with zero
+// change to that check's own logic. Absent (a bare `git commit`
+// unrelated to any `fgos approve`), the hook falls back to its own
+// `resolveWriterIdentity()` exactly as before this item.
+export const HOLDER_PID_ENV_VAR = 'FGOS_MAIN_LOCK_HOLDER_PID';
 
 export const ACQUIRED = 'acquired';
 export const HELD = 'held-by-live-other-pid';
@@ -186,10 +232,11 @@ function writeAtomicReplace(lockPath, content) {
  * locks' single-attempt primitive for the create/EEXIST/liveness/reclaim
  * shape — diverging only where `parseLockContent` returns null (AMBIGUOUS),
  * where the recorded identity matches the caller's own (self-recognition,
- * always ACQUIRED), and where a string-identity holder is judged by
- * `ttlMs` freshness alone (never a liveness probe).
+ * always ACQUIRED unless `allowSelfRecognition` is false), and where a
+ * string-identity holder is judged by `ttlMs` freshness alone (never a
+ * liveness probe).
  */
-function tryAcquireOnce(lockPath, identity, now, ttlMs) {
+function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = true) {
   try {
     writeAtomicCreate(lockPath, JSON.stringify({ pid: identity, ts: now }));
     return { status: ACQUIRED };
@@ -212,8 +259,15 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
 
   // Self-recognition (D6): the caller's own identity always refreshes,
   // regardless of ttlMs or liveness — this is the same writer continuing
-  // its own session, never a competing holder.
-  if (record.pid === identity) {
+  // its own session, never a competing holder. tsk-1wr: an env-derived
+  // session id is inherited byte-identically by every forked child, so for
+  // a lock keyed on that identity two genuinely separate OS processes can
+  // read as "the same writer" here. `allowSelfRecognition: false` is for
+  // call sites (the merge target-ref slot) where a real cross-process
+  // exclusion guarantee matters more than same-session reentrancy — that
+  // lock is always released in the same call that acquired it, so it has
+  // no legitimate re-entry to protect.
+  if (allowSelfRecognition && record.pid === identity) {
     writeAtomicReplace(lockPath, JSON.stringify({ pid: identity, ts: now }));
     return { status: ACQUIRED };
   }
@@ -318,12 +372,12 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
  * accumulating listeners across repeated acquire/release cycles in the
  * same process.
  */
-export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now(), releaseOnExit = false } = {}) {
+export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now(), releaseOnExit = false, lockFile = LOCK_FILE, allowSelfRecognition = true } = {}) {
   fs.mkdirSync(dir, { recursive: true });
-  const lockPath = path.join(dir, LOCK_FILE);
+  const lockPath = path.join(dir, lockFile);
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    const res = tryAcquireOnce(lockPath, identity, now, ttlMs);
+    const res = tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition);
     if (res.status === ACQUIRED) {
       let released = false;
       const release = () => {
@@ -334,7 +388,14 @@ export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, no
           process.removeListener('SIGINT', onSignal);
           process.removeListener('SIGTERM', onSignal);
         }
-        releaseMainCheckoutLock(dir);
+        // tsk-22c: this closure is called after an arbitrarily long
+        // wrapped operation (mergeRunnerItem's verify, claimWork's state
+        // mutation) — by then this call can no longer assume it is still
+        // the recorded holder (TTL may have lapsed and a different session
+        // legitimately reclaimed). An unconditional unlink here would
+        // delete that live reclaimer's lock. releaseMainCheckoutLockIfOwn
+        // only unlinks when `identity` still matches what's on disk.
+        releaseMainCheckoutLockIfOwn(dir, identity, { lockFile });
       };
       let onExit;
       let onSignal;
@@ -379,8 +440,8 @@ export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, no
 /** Removes `.fgos/main-checkout.lock` under `dir` if present. Idempotent — a
  * caller releasing a lock already reclaimed/removed by someone else is not
  * an error. */
-export function releaseMainCheckoutLock(dir) {
-  const lockPath = path.join(dir, LOCK_FILE);
+export function releaseMainCheckoutLock(dir, { lockFile = LOCK_FILE } = {}) {
+  const lockPath = path.join(dir, lockFile);
   try {
     fs.unlinkSync(lockPath);
   } catch (err) {
@@ -419,8 +480,8 @@ export function releaseMainCheckoutLock(dir) {
  * the first read and this call's unlink, and changed content must never be
  * touched on a stale judgment.
  */
-export function releaseMainCheckoutLockIfOwn(dir, identity) {
-  const lockPath = path.join(dir, LOCK_FILE);
+export function releaseMainCheckoutLockIfOwn(dir, identity, { lockFile = LOCK_FILE } = {}) {
+  const lockPath = path.join(dir, lockFile);
 
   const readRecord = () => {
     let raw;
@@ -483,8 +544,8 @@ export function releaseMainCheckoutLockIfOwn(dir, identity) {
  * could reclaim the lock between the first read and this call's write, and
  * changed content must never be overwritten on a stale judgment.
  */
-export function renewMainCheckoutLockIfOwn(dir, identity, { now = Date.now() } = {}) {
-  const lockPath = path.join(dir, LOCK_FILE);
+export function renewMainCheckoutLockIfOwn(dir, identity, { now = Date.now(), lockFile = LOCK_FILE } = {}) {
+  const lockPath = path.join(dir, lockFile);
 
   const readRecord = () => {
     let raw;
@@ -532,8 +593,8 @@ export function renewMainCheckoutLockIfOwn(dir, identity, { now = Date.now() } =
  * `lockAgeMs`/`remainingTtlMs` follow the same never-fabricate rule as
  * `acquireMainCheckoutLock`'s own HELD/AMBIGUOUS shape.
  */
-export function inspectMainCheckoutLock(dir, { ttlMs, now = Date.now() } = {}) {
-  const lockPath = path.join(dir, LOCK_FILE);
+export function inspectMainCheckoutLock(dir, { ttlMs, now = Date.now(), lockFile = LOCK_FILE } = {}) {
+  const lockPath = path.join(dir, lockFile);
 
   let raw;
   try {
@@ -591,8 +652,8 @@ export function inspectMainCheckoutLock(dir, { ttlMs, now = Date.now() } = {}) {
  *   - 'reclaimed'         -- content still unparseable on the second read;
  *     removed
  */
-export function forceReclaimAmbiguousLock(dir) {
-  const lockPath = path.join(dir, LOCK_FILE);
+export function forceReclaimAmbiguousLock(dir, { lockFile = LOCK_FILE } = {}) {
+  const lockPath = path.join(dir, lockFile);
 
   let raw;
   try {

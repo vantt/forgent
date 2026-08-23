@@ -27,7 +27,7 @@ chọn wave, vòng bắn/đợi/gom, và chỗ nối để năng lực này tự
 **Ngoài phạm vi, không có item:** fan-out A (gather) — đó là `tsk-5kn`;
 ô review-class của bee; `fgos-runner` chạy được thật.
 
-## Quyết định đã khoá
+## Locked decisions
 
 | D-ID | Quyết định | seq |
 |---|---|---|
@@ -66,7 +66,7 @@ Hạ tầng **đã tồn tại** (phần lớn công sức của item này là *
 
 | Đã có | Đường dẫn |
 |---|---|
-| decompose sinh `deps` giữa các con | `src/intake/decompose.mjs:992` |
+| decompose sinh `deps` giữa các con | `src/intake/plan.mjs:992` |
 | con sinh thẳng ở `stage: executing`, mang `action` prose | `decompose.mjs:1001,1008` |
 | item còn dep chưa xong bị loại khỏi frontier | `src/state/frontier.mjs` |
 | **lá còn dep chưa merge bị TỪ CHỐI claim** (`deps-not-merged`) | `src/runner/claim-port.mjs:158-166` |
@@ -115,7 +115,7 @@ chuỗi rỗng/placeholder ('chưa xác định — P15 bổ sung'), không ph�
 shell nào cả"*. Item bị park sang `awaiting-human`, `stage` giữ nguyên
 `clarify`.
 
-Judge đúng: item được submit với verify placeholder, và `fgos-exploring`
+Judge đúng: item được submit với verify placeholder, và `fgos-coding-exploring`
 theo luật của chính nó chỉ **chụp lại** verify item đang mang chứ không tự
 thiết kế verify mới. Điểm dừng này cần người, và người đã duyệt hình dạng
 verify ở D10 (`fgos answer` seq 8960, `fgos edit --verify` seq 8961). Lần

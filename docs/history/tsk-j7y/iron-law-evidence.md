@@ -2,7 +2,7 @@
 
 `classifyIronLaw({ filesChanged, description })` result, computed against
 this item's real diff at `fgw/tsk-j7y` and its own event-log description
-(command run from the main checkout, per fgos-code-implement's own step 4):
+(command run from the main checkout, per fgos-coding-implement's own step 4):
 
 ```json
 {"required":true,"matchedFlags":["delete"],"matchedModules":[]}
@@ -15,8 +15,8 @@ description text (quoting the original bug report's "drop and recreate the
 FTS index") trips a `HEAVY_KEYWORDS` match on `delete` — the over-reporting
 direction `iron-law.mjs`'s own header calls safe (D13).
 
-Verify command (the item's own, locked at `fgos-planning`/
-`fgos-validating`): `node --test test/state/tool-registry.test.mjs`
+Verify command (the item's own, locked at `fgos-coding-planning`/
+`fgos-coding-validating`): `node --test test/state/tool-registry.test.mjs`
 
 ## Failing-test-first proof
 

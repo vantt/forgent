@@ -10,7 +10,7 @@ cleanup half:
 - `src/state/retro-pool.mjs` — a pure picker (no fs, no `.fgos/` read
   directly — same discipline as `cleanup-pool.mjs`/`discover-pool.mjs`)
   returning the single next item at status `retrospective`.
-- `fgOS:retro-next` skill — single item: pick, run `fgos-compounding`
+- `fgOS:retro-next` skill — single item: pick, run `fgos-coding-compounding`
   synthesis on it (settlement/decision/enduser-docs), then
   `fgos move <id> --to cleanup` on success.
 - `fgOS:retro-loop` skill — wraps the built-in `/loop` skill around
@@ -18,7 +18,7 @@ cleanup half:
   `cleanup-loop` (`docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`).
 
 No CLI/FSM change needed — `fgos retrospective` (the sweep verb) and
-`fgos-compounding`'s retarget to status `retrospective` already exist
+`fgos-coding-compounding`'s retarget to status `retrospective` already exist
 (`tsk-3wo`, `tsk-1zi`, both `done`).
 
 ### Prior scope, superseded
@@ -69,7 +69,7 @@ only registration; grep across `src/bin/test/docs/dogfood-fixture/
   items by their **status**, unrelated to `tsk-3o3`'s own stage/status.
 - **sweep** — the mechanical, no-LLM-cost `delivered → retrospective`
   batch move performed by `fgos retrospective`. Distinct from
-  **synthesis** (fgos-compounding's real work: settlement/decision/
+  **synthesis** (fgos-coding-compounding's real work: settlement/decision/
   enduser-docs), which is the expensive, per-item, LLM-judgment step.
 
 ## Scout evidence
@@ -90,38 +90,38 @@ only registration; grep across `src/bin/test/docs/dogfood-fixture/
   lock-timeout stop rules. **Caveat**: cleanup-loop's own per-item step
   is *purely mechanical* (a deterministic TTL/content/merge check) and
   therefore has no iteration cap (D3 in `docs/history/fgos-cleanup-loop/
-  CONTEXT.md`). `retro-next`'s own per-item step (`fgos-compounding`) is
+  CONTEXT.md`). `retro-next`'s own per-item step (`fgos-coding-compounding`) is
   *not* mechanical — it is real LLM judgment, same cost profile as
-  `discover-next`'s `fgos discover`/`fgos decompose` calls.
+  `discover-next`'s `fgos discover`/`fgos plan` calls.
 - `plugins/fgOS/skills/discover-next/SKILL.md` +
   `plugins/fgOS/skills/discover-loop/SKILL.md` — the LLM-cost-loop
   precedent: `discover-loop` caps at 15 iterations specifically because
   each iteration carries real judgment cost, unlike `cleanup-loop`. Given
-  `retro-next` also carries real per-item LLM cost (`fgos-compounding`),
+  `retro-next` also carries real per-item LLM cost (`fgos-coding-compounding`),
   `retro-loop`'s stop rules likely need to follow `discover-loop`'s
   shape (pool-empty / lock-timeout / iteration cap) rather than
   `cleanup-loop`'s (pool-empty / lock-timeout only, no cap) — left as an
-  implementation judgment for `fgos-planning`, not locked here (it
+  implementation judgment for `fgos-coding-planning`, not locked here (it
   doesn't change the item's own scope or acceptance criteria, only the
   loop skill's internal tuning).
-- `.claude/skills/fgos-compounding/SKILL.md` — **stale**: frontmatter and
+- `.claude/skills/fgos-coding-compounding/SKILL.md` — **stale**: frontmatter and
   step 1 still describe the trigger as "a claimed item's stage reads
   `compound-learn`" and "this step only runs once the item is already at
   stage `compound-learn`". Per `src/state/workflow-stage-graphs.mjs:25-28,
   48-49,80-81`, that stage is retired (D11) and the trigger is now status
   `retrospective`, "driven by the retrospective loop" (i.e. by the very
   skill this item builds) — the doc text was never updated when `tsk-1zi`
-  ("Retire compound-learn stage; retarget fgos-compounding skill to
+  ("Retire compound-learn stage; retarget fgos-coding-compounding skill to
   retrospective status", `done`) landed. `retro-next` is the first real
-  caller of `fgos-compounding` under the new trigger, so fixing this
+  caller of `fgos-coding-compounding` under the new trigger, so fixing this
   skill doc's trigger description belongs in this item's own
   implementation scope (it directly wires into it) — deferred to
-  `fgos-planning`, not asked here per this skill's own rule (implementer
+  `fgos-coding-planning`, not asked here per this skill's own rule (implementer
   concern, not a product decision).
 - `fgos tool query --capability impact-analysis --status present` →
   GitNexus registered and `present`. Per `CLAUDE.md`'s capability gate:
   **full** — impact-analysis MUST run before editing any symbol during
-  implementation (`fgos-compounding`'s own symbol, any FSM/CLI touch,
+  implementation (`fgos-coding-compounding`'s own symbol, any FSM/CLI touch,
   etc.), and HIGH/CRITICAL blast radius must be reported before
   proceeding.
 
@@ -143,6 +143,6 @@ only registration; grep across `src/bin/test/docs/dogfood-fixture/
 - Whether `retro-loop` needs an iteration cap (discover-loop shape) —
   scout evidence above strongly suggests yes, final number left to
   planning.
-- Whether to fix `fgos-compounding`'s stale stage-based trigger wording
+- Whether to fix `fgos-coding-compounding`'s stale stage-based trigger wording
   as part of this item's implementation — scout evidence says it's in
   scope; planning confirms.

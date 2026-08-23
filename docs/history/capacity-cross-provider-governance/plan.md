@@ -31,10 +31,10 @@ control on an already-covered, already-shared resolver function.
 provider, `gitnexus`, `status: "present"` → **full** per `CLAUDE.md`'s
 capability gate. `impact({target: "resolveExecutorConfig", direction:
 "upstream"})` MUST run (and its risk level reported) before
-`fgos-code-implement` edits `resolveExecutorConfig`/`validateCapacityShape`.
+`fgos-coding-implement` edits `resolveExecutorConfig`/`validateCapacityShape`.
 Note: GitNexus's own index was stale twice this session (last indexed
 `1ac5a85`, then `6a7d210`, both predating this session's `fgw/tsk-64p`
-merge) — `fgos-code-implement` must re-run `gitnexus analyze` before trusting
+merge) — `fgos-coding-implement` must re-run `gitnexus analyze` before trusting
 impact output for the post-merge code, not just run `impact()` against a
 stale graph.
 
@@ -73,7 +73,7 @@ happens.
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | D2 detection + D3 refusal inside `resolveExecutorConfig` | High — false negative is a real data leak (item's entire purpose defeated); false positive blocks legitimate dispatch | New tests: (a) `kind:"cli"` + unrecognized `command` + no `allowCrossProvider` → throws `RunnerConfigError`, no dispatch attempted; (b) same capacity + `allowCrossProvider: true` → resolves normally; (c) `kind:"cli"` capacity with **no** `command`/`adapter` override (falls through to global `executor`, which is `'claude'`) → resolves WITHOUT requiring `allowCrossProvider` — this is the exact false-positive scenario D2 was written to rule out, must be a real regression-guard test, not just a design note; (d) capacity `kind` other than `"cli"` (e.g. `"task"`) → governance never triggers regardless of `allowCrossProvider` (D4 scope floor); (e) `cfg.capacities` absent entirely → byte-identical to pre-this-item behavior (existing suite must pass unchanged, per item's own acceptance text). |
 | `validateCapacityShape` boolean-type check for `allowCrossProvider` (`dispatch.mjs:353-364`) | Low | New test: `allowCrossProvider` present but non-boolean → `RunnerConfigError` at config-load time, same style as the existing `kind` shape check immediately above it in the same function. |
@@ -142,7 +142,7 @@ test"`, `impactScore: 58`).
   time (next available number in that doc) — an implementation detail, not
   decided here.
 
-## Validating findings (fgos-validating, READY WITH CONSTRAINTS)
+## Validating findings (fgos-coding-validating, READY WITH CONSTRAINTS)
 
 Reality gate: all PASS (mode fit, repo fit, assumptions, smaller path, proof
 surface, impact-analysis posture — live `fgos tool query

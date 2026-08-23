@@ -44,7 +44,7 @@ option or a rejected alternative.
 
 ## The gap that matters most: `decompose` captures less than `clarify` does
 
-Tracing `judgeDecompose` directly (`src/intake/decompose.mjs:290-360`) shows
+Tracing `judgeDecompose` directly (`src/intake/plan.mjs:290-360`) shows
 its common outcomes — `pass-through` and `decompose`-with-children — leave
 **no trace of their own reasoning at all**. This was confirmed live during
 the very audit that produced this document: `tsk-ma4`'s own
@@ -57,8 +57,8 @@ earlier one, not equally.
 
 ## The one mechanism that does capture the why — and why it's not enough
 
-`docs/history/<feature>/CONTEXT.md`, written by the `fgos-exploring` and
-`fgos-planning` skills during `clarify`/`decompose`, is a real structured
+`docs/history/<feature>/CONTEXT.md`, written by the `fgos-coding-exploring` and
+`fgos-coding-planning` skills during `clarify`/`decompose`, is a real structured
 why/tradeoff record — the same shape bee's own `CONTEXT.md` takes (written
 at exploring/qualifying, "always — locked decisions, source of truth," per
 `scan-260728-1233-bee-doc-types-lifecycle-report.md`). fgOS already
@@ -88,8 +88,8 @@ STR70b, STR71) targets this case — they are all scoped to the async
 ### Status (re-checked 2026-08-02, tsk-42i): still open, one narrow slice now covered
 
 Tracked as fgOS work item `tsk-42i`. Confirmed still unaddressed in general:
-`fgos-planning-context-gap-handback` (done) now gives `fgos-planning` a
-documented path to invoke `fgos-exploring`'s Socratic-lock flow directly,
+`fgos-coding-planning-context-gap-handback` (done) now gives `fgos-coding-planning` a
+documented path to invoke `fgos-coding-exploring`'s Socratic-lock flow directly,
 mid-session, when it finds `CONTEXT.md` silent on something material —
 that exchange gets appended as a new D-ID decision. This closes exactly
 **one** case (planning discovers a gap) — the general case (any
@@ -125,7 +125,7 @@ The gap named two sections up — `judgeDecompose`'s `pass-through` and
 `decompose`-with-children branches leaving "no trace of their own
 reasoning at all" — is closed. `resolveDecompose`'s four outcome branches
 (`invalid`/`need-human`/`pass-through`/`decompose`) each now call
-`addDecision` (`src/intake/decompose.mjs`), folding into
+`addDecision` (`src/intake/plan.mjs`), folding into
 `view.decisionsById[id]` — the same per-item, append-only shape
 `view.discovery[id]` already had, so a decompose-stage judgment can no
 longer move or park an item while leaving zero trace behind.

@@ -39,7 +39,7 @@ tracing `judgeDecompose`/`judgeDiscovery` directly:**
    one open question string.
 
 2. **`judgeDecompose` records literally nothing.** Traced directly
-   (`src/intake/decompose.mjs:290-360`) and confirmed live: this session's
+   (`src/intake/plan.mjs:290-360`) and confirmed live: this session's
    own `fgos discover tsk-ma4` call at the decompose→executing edge hit
    exactly the `pass-through` branch (`decompose.mjs:328-331`) —
    `moveStage(...); releaseClaimOnExecuting(); return { outcome: 'pass-through', id };`
@@ -72,7 +72,7 @@ tracing `judgeDecompose`/`judgeDiscovery` directly:**
   its own `docs/backlog.md:31` entry): a settle record bundling **why** the
   decision landed, the **exchange milestones** on the way, and the
   **tradeoffs accepted** — a structure, not `reason`'s one line.
-- **`fgos-compounding` SKILL.md:47-51** — the real, current input contract
+- **`fgos-coding-compounding` SKILL.md:47-51** — the real, current input contract
   for the layer that writes the end-user doc: `fgos check <id>` (predicted/
   actual outcome + friction) plus, when present, `docs/history/<feature>/`
   for "the fuller story behind the capture." If that directory doesn't
@@ -82,13 +82,13 @@ tracing `judgeDecompose`/`judgeDiscovery` directly:**
   bee's `CONTEXT.md` is written at **exploring/qualifying**, not at close —
   "always — locked decisions, source of truth" — and `.bee/decisions.jsonl`
   logs decisions in real time as the source doc gets built later. **fgOS's
-  own `fgos-exploring`/`fgos-planning` skills already replicate exactly this
+  own `fgos-coding-exploring`/`fgos-coding-planning` skills already replicate exactly this
   pattern** — this session wrote `docs/history/recording-points-audit/CONTEXT.md`
   and `plan.md` *during* clarify/decompose, not at close, the same shape bee
   uses. The gap is not that fgOS lacks the mechanism — it's that, unlike
   bee's mandatory Gate 1/Gate 4 checkpoints, **nothing in fgOS's engine
   requires or checks that CONTEXT.md gets written at all**; it depends
-  entirely on whichever session runs `fgos-exploring` choosing to write real
+  entirely on whichever session runs `fgos-coding-exploring` choosing to write real
   prose.
 
 ## Comparison table — measured, not speculated
@@ -131,8 +131,8 @@ further here.
   **nothing at all** in its common `pass-through`/`decompose` outcomes —
   strictly worse than `clarify`'s thin `view.discovery` record.
 - The one place fgOS *does* get a real, structured why/tradeoff record —
-  `docs/history/<feature>/CONTEXT.md`, written by `fgos-exploring`/
-  `fgos-planning` — is unenforced: only ~23% of items ever point at one,
+  `docs/history/<feature>/CONTEXT.md`, written by `fgos-coding-exploring`/
+  `fgos-coding-planning` — is unenforced: only ~23% of items ever point at one,
   and nothing in the engine checks it happened.
 - `gates[id]` (the `awaiting-human` async dialogue) has raw `ask`/`answer`
   text but **no actor/role**, confirmed live: `answerAwaiting` already

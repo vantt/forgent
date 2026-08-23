@@ -1,6 +1,6 @@
 ---
 area: system-overview
-updated: 2026-07-23
+updated: 2026-08-12
 decisions: [ca7de3cf, ae461c8b, ed953e09, 14ebeea9, 1a80b4d3, 65c642a8, 43f257ae, 6f2cbc47, a30a3d3c, 1359ab5e, b2d18cc7, 1d336d8a, 02623bff, c74bcef9]
 coverage: partial
 ---
@@ -13,7 +13,7 @@ coverage: partial
 
 - platform-foundations — 8 luật thiết kế đã khóa đứng trên mọi code của compound stack; spec: platform-foundations.md
 - work-state — bộ nhớ công việc tự quản của forgent (cửa lệnh `fgos`, nhật ký sự kiện là truth, bản chiếu dựng lại được); spec: work-state.md
-- enduser-docs-authoring — soạn & nuôi tài liệu người-dùng-cuối ở khâu compound-learn: biến capture thật thành tài liệu theo ngăn Diataxis, một tài liệu sống trên mỗi đường dẫn, tích luỹ không mất (write-side); spec: enduser-docs-authoring.md
+- enduser-docs-authoring — soạn & nuôi tài liệu người-dùng-cuối ở khâu tổng-hợp, tức khi việc mang status `retrospective`: biến capture thật thành tài liệu theo ngăn Diataxis, một tài liệu sống trên mỗi đường dẫn, tích luỹ không mất (write-side); spec: enduser-docs-authoring.md
 - enduser-docs-index — chỉ mục đọc-theo-tag máy-đọc-được của tài liệu người-dùng-cuối, sinh từ cây tài liệu + capture (`fgos docs-index`), giữ móc truy ngược tài liệu↔việc, và verb `fgos doc-sources` gom mọi capture của một đường dẫn (read-side); spec: enduser-docs-index.md
 - runner — vòng tự hành: lấy việc từ frontier, giao trợ lý nền trong nhánh cô lập, tự chấm, ghi đề xuất chờ duyệt; spec: runner.md
 - fgos-plugin — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 12 verb wrapper one-door-write bọc quanh CLI `fgos`; spec: fgos-plugin.md
@@ -50,7 +50,7 @@ coverage: partial
 
 **Cửa pull giao–nhận việc (work-state, thay thế runner cho MỘT item):** một tác nhân ngoài runner — người, một phiên đang sống, hay một runner thứ hai — `fgos take` đúng một item từ CÙNG tập frontier runner dùng, rồi tự `fgos return`; `return` không tin lời người gọi, tự đo working tree sạch + HEAD tiến + verify thật trước khi item thành `awaiting-approval` mang `headAtReturn` — mirror đúng contract `awaiting-approval` của runner. Gặt-lại lúc khởi động của runner không bao giờ giẫm lên claim này (xem docs/specs/work-state.md "Cửa pull giao–nhận việc", docs/specs/runner.md). Dải `headAtTake→headAtReturn` là nguồn diff của đề xuất này khi nó tới cổng duyệt PR nội bộ (trên).
 
-**Vòng tài liệu người-dùng-cuối (enduser-docs-authoring → enduser-docs-index):** ở khâu compound-learn, kỷ luật soạn tài liệu đọc capture thật của việc, phân đúng một ngăn Diataxis, lưu tag + móc đường-dẫn lên capture (`fgos compound --doc-type --doc-path`), gom **mọi** capture của đường dẫn đó (`fgos doc-sources`), rồi grow-or-create một tài liệu sống theo tồn-tại-tệp — tích luỹ không mất (write-side). Sau đó `fgos docs-index` liệt kê tài liệu và truy ngược mỗi tài liệu về capture qua `docPath` (read-side); tài liệu how-to đầu tiên nay liên kết thật tới capture `doc-fgos-rollup-howto`. Ngăn Diataxis là trục cấu trúc duy nhất; purpose/audience là metadata, không phải trục thứ hai (per D16).
+**Vòng tài liệu người-dùng-cuối (enduser-docs-authoring → enduser-docs-index):** khi việc mang status `retrospective`, kỷ luật soạn tài liệu đọc capture thật của việc, phân đúng một ngăn Diataxis, lưu tag + móc đường-dẫn lên capture (`fgos compound --doc-type --doc-path`), gom **mọi** capture của đường dẫn đó (`fgos doc-sources`), rồi grow-or-create một tài liệu sống theo tồn-tại-tệp — tích luỹ không mất (write-side). Sau đó `fgos docs-index` liệt kê tài liệu và truy ngược mỗi tài liệu về capture qua `docPath` (read-side); tài liệu how-to đầu tiên nay liên kết thật tới capture `doc-fgos-rollup-howto`. Ngăn Diataxis là trục cấu trúc duy nhất; purpose/audience là metadata, không phải trục thứ hai.
 
 **Hướng mặt-người đa-surface (đã chốt, chưa xây — backlog STR37/STR38, per D b2d18cc7):** mọi mặt người — cửa lệnh hôm nay, web/chat/webhook mai sau — là DA; ruột chỉ có một, và chỗ da gặp ruột là hợp đồng cửa-lệnh (envelope kết quả + phân loại exit đóng). Một listener nhận transport ngoài (web/chat) sống ở đất host-adapter và DỊCH yêu cầu thành verb — gọi cửa lệnh như một người dùng, không bao giờ mở đường ghi riêng; kèm cổng xác danh "ai được nói verb nào" trước khi dịch (mô tả tự do đổ vào intake là vector tiêm lệnh vì proof của việc chạy như lệnh — nguồn chưa kiểm phải qua cổng). Chuẩn hóa đi trước **đã xong** (STR37): envelope bọc kết quả trên MỌI verb qua một cửa in duy nhất + một manifest verb máy-đọc (`--help --json`, mỗi verb có cờ `access` read/mutation) để mọi surface sinh giao diện từ manifest thay vì hard-code. Còn lại của hướng này: listener host-adapter + cổng xác danh (backlog STR38). Chiều hệ→người chủ động (kênh chú-ý) chưa xây — surface tạm poll danh sách việc + so hash thay đổi của envelope; poll bắt đầu khó chịu là tín hiệu kênh chú-ý đến lượt.
 
@@ -68,3 +68,102 @@ coverage: partial
 - `README.md` — mô tả sản phẩm + mục lục tài liệu
 - `.agents/skills/distill/SKILL.md` — định nghĩa skill distill (Node zero-dep)
 - `node .claude/skills/distill/scripts/distill.mjs check` — lệnh verify hiện hành (ghi tại `.bee/config.json`)
+
+## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
+
+Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
+
+
+### 0016 — Mốc MVP của fgOS
+
+#### Bối cảnh
+
+Trước quyết định này fgOS chưa có phát biểu MVP/milestone chính thức nào — grep "MVP"/"milestone" trong `docs/` trả 0 hit. Định nghĩa "có harness" ở `platform-foundations.md` L5 (sáu câu hỏi) và thang trưởng thành hạ tầng L6 (F0–F5, fgOS tự tuyên F4 tại 2026-07-16) đo ĐỘ CHÍN CỦA HẠ TẦNG, không đo "người dùng cuối LÀM ĐƯỢC GÌ". Một câu MVP nháp xuất hiện trong báo cáo tích hợp P50 (2026-07-20) nhưng gắn nhãn "chưa chốt" và chỉ sống trong một file HTML report — không phải tài liệu sản phẩm đã ship.
+
+Mốc dogfood tự-phát-triển (STR25) đã ĐẠT 2026-07-17: item thật đi trọn vòng submit→clarify→decompose→execute→PR→merge, không cần bee đỡ. Nghĩa là VÒNG cốt lõi đã chạy; cái còn thiếu để thành "sản phẩm cho người lạ" là hai điều trong chính câu MVP: người-mới-chỉ-dùng-tài-liệu-đã-ship, và tối-thiểu-ngồi-canh.
+
+#### Quyết định
+
+1. **Phát biểu MVP của fgOS (chốt):**
+
+   > Một người mới — không có ngữ cảnh trước, chỉ dựa vào tài liệu ĐÃ SHIP — cài fgOS, nộp MỘT yêu cầu thật bằng văn xuôi tự do, và nhận lại một thay đổi code thật: chạy được, có test, sẵn sàng merge — với tối thiểu sự canh chừng của con người.
+
+2. **"Tối thiểu ngồi canh" có răng đo được:** con người chỉ can thiệp ở các CỔNG-NGƯỜI thật sự cần một quyết định (clarify không hội tụ được vì thiếu thông tin chỉ người có; duyệt/merge). Con người KHÔNG phải can thiệp để gỡ hệ tự-kẹt (park oan, loop lỗi, phán đoán lồng-nhau hỏng). Một lần bắt người gỡ-kẹt là một lỗi tính vào MVP, không phải một cổng-người hợp lệ.
+
+3. **Trục MVP bổ sung cho L5/L6, không thay thế:** L5 (định nghĩa "có harness") và L6 (thang chín hạ tầng) đo phía HỆ; câu MVP này đo phía NGƯỜI DÙNG CUỐI. Ba trục cùng tồn tại, không trùng.
+
+4. **Phạm vi MVP là "một yêu cầu → một code change".** Nó KHÔNG đòi goal-directed planning (khai goal → tự sắp cả backlog, STR67) — đó là tính năng lớn hơn, mở rộng CƠ HỘI vượt MVP tối thiểu, không phải điều kiện của MVP.
+
+#### Hệ quả
+
+- **Ưu tiên hướng MVP** (dẫn ra từ phát biểu này): (a) độ tin cậy của loop tự chạy — mọi "gỡ-kẹt-thủ-công" là bug MVP (ví dụ STR68: phán đoán discovery lồng-nhau trả văn xuôi thay vì JSON → park oan item rõ ràng, vi phạm trực tiếp "tối thiểu ngồi canh"); (b) chất lượng tài liệu ĐÃ SHIP đủ cho người lạ (STR64); (c) trải nghiệm cổng-người khi loop THẬT SỰ cần người (STR61 đã ship; STR69/STR70 là enabler).
+- **STR67 (goal-directed planning)** dùng chính câu MVP này làm target đầu vào cho ca dogfood đầu tiên của nó — nhưng nằm NGOÀI phạm vi MVP tối thiểu (điểm 4).
+- **Không supersede gì** — thêm một trục mục tiêu sản phẩm mới, không đổi luật L1–L10.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0018 — Mốc MVP2 của fgOS
+
+#### Bối cảnh
+
+Quyết định `0016` chốt phát biểu MVP của fgOS: một người mới nộp MỘT yêu cầu
+thật bằng văn xuôi tự do và nhận lại một thay đổi code thật, chạy được, có
+test, sẵn sàng merge — với tối thiểu sự canh chừng của con người. MVP1 đã
+chứng minh vế đó khi con người là người BẤM NÚT khởi động vòng lặp: nộp yêu
+cầu rồi tự tay `pick` để hệ chạy tiếp không cần canh (`0016` điểm 2).
+
+Việc còn lại là kiểm tra vế thứ hai: liệu VÒNG LÕI ấy (discover → decompose →
+implement → return → review tới `done`) có ra kết cục TƯƠNG ĐƯƠNG hay không
+khi không có bất kỳ cú bấm-tay nào khởi động nó — một dispatcher chạy độc lập
+(`fgos-runner --once`) tự claim và tự đóng vòng, không cần con người chọn
+việc. Đây chính là nội dung CoS đã amend của PBI `p-52601a01`
+(`.bee/backlog.jsonl`, 2026-07-27T11:09:16Z): dựng và đối chiếu hai ca dry-run
+sống trên testbed `repo/dogfood-fixture/` đã có sẵn — một do
+`/fgOS:submit` + `/fgOS:pick` trong cùng phiên tương tác kích hoạt, một do
+`/fgOS:submit` + `fgos-runner --once` độc lập kích hoạt — và ghi nhận kết
+quả đối chiếu, không phải chỉ lập kế hoạch.
+
+#### Quyết định
+
+1. **Phát biểu MVP2 (chốt, mở rộng `0016`):**
+
+   > MVP1 (`0016`) đã chứng minh một yêu cầu do con người BẤM NÚT khởi động
+   > đi trọn vòng lõi tới `done`. MVP2 chứng minh CHÍNH vòng lõi đó
+   > (discover → decompose → implement → return → review tới `done`) đạt
+   > kết cục TƯƠNG ĐƯƠNG khi khởi động **không có bất kỳ cú bấm-tay nào** —
+   > một dispatcher chạy độc lập (headless) tự đóng trọn vòng, không cần
+   > con người chọn việc.
+
+2. **"Tương đương" có răng đo được (kế thừa khung đo của `0016` điểm 2):**
+   cả hai ca — ca tương tác (`/fgOS:pick`) và ca headless
+   (`fgos-runner --once`) — phải cùng đạt: verify xanh, một commit thật trên
+   nhánh riêng của item, và dọn worktree sạch sau khi xong. Một khác biệt
+   giữa hai kết cục là một GAP THẬT, được ghi nhận thành một dòng `proposed`
+   mới trong `repo/docs/backlog.md`, không âm thầm bỏ qua.
+
+3. **Trục MVP2 bổ sung cho trục MVP1, không thay thế:** `0016` chứng minh
+   vòng lõi CHẠY ĐƯỢC khi con người khởi động; `0018` chứng minh CHÍNH vòng
+   lõi ấy chạy được khi con người KHÔNG khởi động. Đây là cùng một vòng lõi
+   được kiểm chứng dưới hai đường kích hoạt khác nhau, không phải một tính
+   năng mới.
+
+4. **Phạm vi MVP2 vẫn là "một yêu cầu → một code change"** — kế thừa nguyên
+   trạng giới hạn phạm vi của `0016` điểm 4 (không đòi goal-directed
+   planning). MVP2 chỉ đổi CÁCH vòng lõi được khởi động, không mở rộng
+   những gì vòng lõi phải làm.
+
+#### Hệ quả
+
+- Testbed và hạ tầng dùng để chứng minh MVP2 (`repo/dogfood-fixture/`,
+  `repo/.fgos-runner.json`, `src/runner/worktree.mjs`) đã có sẵn từ trước —
+  quyết định này không kéo theo việc dựng hạ tầng mới, chỉ ghi nhận phát
+  biểu mốc và kết quả đối chiếu hai ca chạy thật.
+- Bất kỳ khoảng cách nào giữa ca tương tác và ca headless được đối chiếu ra
+  (kể cả trường hợp một trong hai đường không thể chạy an toàn với hạ tầng
+  hiện có) là một phát hiện gap thật của chính mốc MVP2 này, được nạp vào
+  `repo/docs/backlog.md` như một dòng `proposed`, không phải điều kiện thất
+  bại của quyết định — quyết định vẫn đứng, gap trở thành việc kế tiếp.
+- **Không supersede `0016`** — `0018` mở rộng trục MVP đã chốt bằng vế
+  headless, không đổi phát biểu MVP1 hay luật L1–L10.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

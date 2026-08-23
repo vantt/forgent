@@ -63,7 +63,7 @@ Are the item's own claims true as written, from repo evidence:
   `docs/journals/260728-2245-lifecycle-sync-gates-three-latent-bugs.md:72`
   records tsk-3ld — tests that "pass in isolation, flake intermittently in
   full suite". A whole-suite merge gate would convert those flakes into
-  merge blocks. Finding only; the scope call belongs to `fgos-planning`.
+  merge blocks. Finding only; the scope call belongs to `fgos-coding-planning`.
 - `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md:13,60`
   already tells a person to "rule out an unrelated failure elsewhere in
   the full suite first" — i.e. the narrow/broad divergence is already
@@ -90,5 +90,5 @@ with it — a planning-stage decision, not settled here.
 - What "broader" means concretely — full `npm test`, or a targeted
   always-on subset (e.g. `test/architecture.test.mjs`) — and whether it
   runs at `return`, at `approve`, or both. Product/scope call:
-  `fgos-planning`.
+  `fgos-coding-planning`.
 - How the flake risk above is absorbed. Same owner.

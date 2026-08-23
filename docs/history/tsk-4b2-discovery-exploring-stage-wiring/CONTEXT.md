@@ -61,7 +61,7 @@ natively (in-session — Native-First rule 2: same provider, already has
 soul, no spawn) and apply the verdict itself — `clear` moves the item to
 `exploring`; `unclear` parks it via `fgos ask` with the concrete question
 `fgos-researching` returned, never guessed past. For `exploring`: invoke
-`fgos-exploring` the same way it already runs (Socratic lock →
+`fgos-coding-exploring` the same way it already runs (Socratic lock →
 `CONTEXT.md`), same as this item's own exploring pass just did.
 
 **D5 — `fgos-runner`'s background DISCOVERY DISPATCH sweep
@@ -73,15 +73,15 @@ own `{clear, question}` verdict at all — it unconditionally advances
 parity, this must change to capture and act on the real verdict
 (park via `fgos ask` on `unclear`), exactly like the interactive path in
 D4. Whether this lands as the same piece as D3/D4 or its own child item is
-`fgos-planning`'s call, not locked here.
+`fgos-coding-planning`'s call, not locked here.
 
-**D6 — a real `exploring -> decompose` edge, fired from `fgos-exploring`
-itself.** `fgos-exploring/SKILL.md`'s own Gate today still calls
+**D6 — a real `exploring -> decompose` edge, fired from `fgos-coding-exploring`
+itself.** `fgos-coding-exploring/SKILL.md`'s own Gate today still calls
 `fgos discover --verdict clear` — stale prose written for when this skill
 ran AT stage `clarify`. It needs its own forward move once `CONTEXT.md` is
 locked and approved. Exact mechanism (extend `discovery.mjs`'s existing
 `expectedStage` gate to also accept `'exploring'`, vs. a distinct call) is
-an implementation-shape choice, left to `fgos-planning`/`fgos-validating`
+an implementation-shape choice, left to `fgos-coding-planning`/`fgos-coding-validating`
 to size — not a product decision this record needs to lock.
 
 **D7 — `fgos-clarifying`'s own hand-off prose needs no change.** It already
@@ -89,20 +89,20 @@ says an understood item "proceeds to stage `discovery`'s next step" — this
 was already correct, just previously unreachable.
 
 **D8 — `fgos-routing/SKILL.md:137-143`'s stage table gets two fixes.**
-(a) The wrong `clarify` → `fgos-exploring` line becomes `clarify` →
+(a) The wrong `clarify` → `fgos-coding-exploring` line becomes `clarify` →
 `fgos-clarifying`, matching what the registry (`skillForStage`) actually
 returns — this is a plain factual bug regardless of D1-D6. (b) The table
 gains real rows for `discovery` → `fgos-researching` and `exploring` →
-`fgos-exploring`, since those stages are no longer theoretical once D3-D6
+`fgos-coding-exploring`, since those stages are no longer theoretical once D3-D6
 land.
 
-**D9 — `fgos-exploring/SKILL.md`'s own prose gets updated to match its
+**D9 — `fgos-coding-exploring/SKILL.md`'s own prose gets updated to match its
 real stage.** Its header currently states "This skill normally runs while
 a claimed item's `stage` is `clarify`" — becomes `exploring`. Its Gate's
 engine call changes per D6.
 
 **D10 — mirror requirement stands.** Every change under
-`.claude/skills/{fgos-coding-driving,fgos-exploring,fgos-routing}/
+`.claude/skills/{fgos-coding-driving,fgos-coding-exploring,fgos-routing}/
 SKILL.md` gets a byte-identical mirror under `.agents/skills/` (existing
 project rule, `test/skills/fgos-mirror.test.mjs`).
 
@@ -126,7 +126,7 @@ project rule, `test/skills/fgos-mirror.test.mjs`).
 - `.claude/skills/fgos-researching/SKILL.md:5-9,166-176` — already
   stage-agnostic, already returns the exact `{clear, question}` contract
   needed; no change needed to this skill itself.
-- `.claude/skills/fgos-exploring/SKILL.md:14-20,301-329` — stale
+- `.claude/skills/fgos-coding-exploring/SKILL.md:14-20,301-329` — stale
   "runs at clarify" framing, stale `fgos discover` hand-off call.
 - `.claude/skills/fgos-clarifying/SKILL.md` Flow step 3 — already correct.
 - `.claude/skills/fgos-routing/SKILL.md:137-143` — wrong table line + gap.
@@ -138,7 +138,7 @@ project rule, `test/skills/fgos-mirror.test.mjs`).
   present`, checked this session) — blast radius across
   `fgos-coding-driving`/`loop.mjs` callers not confirmed by the tool
   itself; this record's own file-read trace (above) is the substitute
-  evidence for `fgos-validating`'s reality gate.
+  evidence for `fgos-coding-validating`'s reality gate.
 
 ## Canonical references
 

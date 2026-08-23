@@ -182,7 +182,7 @@ Việc thiếu: (a) chọn executor theo **capacity/skill** (không chỉ theo t
 
 Không cần bịa khái niệm mới. `capacityId` = 1 trong 2 dạng đã tồn tại:
 
-- **skill name** trực tiếp (`"distill"`, `"fgos-planning"`, `"research"`...)
+- **skill name** trực tiếp (`"distill"`, `"fgos-coding-planning"`, `"research"`...)
   — namespace đã có (`.claude/skills/<name>/`).
 - **`domain:stage`** cặp (`"coding:executing"`) khi capacity gắn với 1 bước
   FSM — resolve ra skill name qua `skillForStage` sẵn có, KHÔNG cần bảng
@@ -240,7 +240,7 @@ thêm việc dispatch), nhưng THỐNG NHẤT từ vựng và khử trùng lặp
       "target": "general-purpose",  // subagent_type khi kind=task; command name khi kind=cli
       "tier": "standard"            // optional — resolve model qua "models" như cũ, tách riêng khỏi target
     },
-    "fgos-planning": {
+    "fgos-coding-planning": {
       "kind": "cli",
       "adapter": "cli-spawn",       // trỏ thẳng EXECUTOR_ADAPTERS key đã có — domain 1 dùng lại y nguyên
       "tier": "heavy"

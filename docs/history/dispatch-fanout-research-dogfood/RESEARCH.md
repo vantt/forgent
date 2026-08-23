@@ -3,7 +3,7 @@
 ## Round 1 — 2026-08-08
 
 **Asked:** gather real evidence for the two independent risk-map rows in
-`plan.md`, required by `fgos-validating`'s feasibility matrix (P1: repo,
+`plan.md`, required by `fgos-coding-validating`'s feasibility matrix (P1: repo,
 P2: external — deliberately unrelated topics, dispatched as two
 independent branches per D2's fan-out rule).
 

@@ -10,7 +10,7 @@ tests exercise these sentences. → tiny.
 
 ## Source of locked decisions
 
-This item has no `CONTEXT.md`/`fgos-exploring` pass of its own — it is a
+This item has no `CONTEXT.md`/`fgos-coding-exploring` pass of its own — it is a
 doc-fix task anchored into `tsk-5td`'s coding-shape discussion
 (`docs/history/dispatch-concept-boundary/DISCUSSION.md`, branch
 `fgw/tsk-5td`, not yet merged to `main`). The three fixes below and their

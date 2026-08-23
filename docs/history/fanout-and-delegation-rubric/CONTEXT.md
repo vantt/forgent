@@ -35,7 +35,7 @@ Vòng `clarify` của chính item này bổ sung D9–D14. Vòng `decompose` c�
 - Sửa luật cấm ad-hoc delegation của `tsk-29i` — D2 đã chốt là **không
   cần sửa**.
 
-## Quyết định đã khoá
+## Locked decisions
 
 ### Từ vòng shaping (`DISCUSSION.md`)
 
@@ -66,7 +66,7 @@ Vòng `clarify` của chính item này bổ sung D9–D14. Vòng `decompose` c�
 | D-ID | Quyết định |
 |---|---|
 | D16 | `resolveDecompose` **không đối xứng** với `resolveDiscovery` — nhánh không-verdict của nó rơi vào `judgeDecompose` thật (chỉ miễn khi `plan.md` ghi `tiny`/`small`). `runOnce` (`loop.mjs:1051`) là caller **duy nhất** không truyền verdict. Quyết định: `callerVerdict` bắt buộc; nhánh không-verdict thành **no-op an toàn** (không throw, không gọi judge) — không phải lỗi. Áp dụng cùng logic D6 đã dùng cho discovery: runner chưa từng chạy thật, no-op không đổi hành vi quan sát được nào trong dogfood history hôm nay; throw mới là regression thật nếu ai đó bật runner sau này |
-| D17 | `judgeVerifySemanticCorrectness` chạy **không điều kiện** trên mọi `verdict.clear`, kể cả `callerVerdict` — khác hẳn `judgeDiscovery`/`judgeDecompose` (đọc `discovery.mjs:671`/`decompose.mjs:893` xác nhận). Bằng chứng sống: cả 2 dispute thật hôm nay trên `tsk-5kn` xảy ra dù luôn truyền `--verdict`. Quyết định: **giữ nhánh mechanical** (`matchesKnownBadVerifyPattern`, không subprocess) **trong verb**; **gỡ hẳn nhánh LLM-fallback** (gọi `runJudgeExecutor`) — verb là hàm Node thuần, không gọi Task được, cùng giới hạn cấu trúc D1 đã chỉ ra. Chi phí thật: verb không còn tự bắt được lỗi kiểu dispute #2 (regex false-negative theo cấu trúc) — trách nhiệm chuyển sang skill gọi verb + kỷ luật `fgos-validating` |
+| D17 | `judgeVerifySemanticCorrectness` chạy **không điều kiện** trên mọi `verdict.clear`, kể cả `callerVerdict` — khác hẳn `judgeDiscovery`/`judgeDecompose` (đọc `discovery.mjs:671`/`decompose.mjs:893` xác nhận). Bằng chứng sống: cả 2 dispute thật hôm nay trên `tsk-5kn` xảy ra dù luôn truyền `--verdict`. Quyết định: **giữ nhánh mechanical** (`matchesKnownBadVerifyPattern`, không subprocess) **trong verb**; **gỡ hẳn nhánh LLM-fallback** (gọi `runJudgeExecutor`) — verb là hàm Node thuần, không gọi Task được, cùng giới hạn cấu trúc D1 đã chỉ ra. Chi phí thật: verb không còn tự bắt được lỗi kiểu dispute #2 (regex false-negative theo cấu trúc) — trách nhiệm chuyển sang skill gọi verb + kỷ luật `fgos-coding-validating` |
 
 ## Thuật ngữ đã ghim
 
@@ -86,7 +86,7 @@ Vòng `clarify` của chính item này bổ sung D9–D14. Vòng `decompose` c�
 
 - `runJudgeExecutor` có **ba** consumer — `judgeDiscovery`
   (`src/intake/discovery.mjs`), `judgeDecompose`
-  (`src/intake/decompose.mjs`), `judgeVerifySemanticCorrectness`
+  (`src/intake/plan.mjs`), `judgeVerifySemanticCorrectness`
   (`src/intake/judge-executor.mjs`). Xác nhận bằng `rg` + GitNexus call
   graph. → D9.
 - Domain `coding` hiện: `stages = ['clarify','decompose','executing']`;
@@ -124,7 +124,7 @@ Nếu chạy thật một thời gian mà thấy agent thường xuyên hỏi c�
 trong một lượt **không cần research xen giữa**, thì hai stage đó đúng là
 nên gộp. Đó là tín hiệu **đo được sau**, không phải phán đoán bây giờ.
 
-## Câu còn để lại cho `fgos-planning`
+## Câu còn để lại cho `fgos-coding-planning`
 
 - **Hình chia việc.** `DISCUSSION.md` §7 đã đề xuất 5 hạng mục, nhưng đó là
   bản trước D9. D9 (gỡ cả ba judge) mở rộng phạm vi thật, và D10 thêm một
@@ -136,7 +136,7 @@ nên gộp. Đó là tín hiệu **đo được sau**, không phải phán đoá
   `runJudgeExecutor` — gỡ hẳn, hay chuyển thành một lời gọi từ soul như hai
   cái kia. Việc đặt tên nó thành lớp *review-class* thì nằm ngoài phạm vi
   (xem Feature boundary).
-- **`verify` thật cho item này** — chưa có; `fgos-exploring` không thiết kế
+- **`verify` thật cho item này** — chưa có; `fgos-coding-exploring` không thiết kế
   verify (luật "không nghiên cứu implementation"). Hình dạng bắt buộc đã
   ghi ở mục Bằng chứng scout.
 

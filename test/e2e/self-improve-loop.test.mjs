@@ -225,7 +225,7 @@ test(
     assert.equal(submit.status, 0, `evolve --submit failed: ${submit.stderr}`);
     const submitted = envelopeData(submit.stdout);
     assert.equal(submitted.status, 'todo');
-    assert.equal(submitted.stage, 'clarify');
+    assert.equal(submitted.stage, 'discovery');
     assert.match(submitted.description, /Self-improve candidate self-fix-source/);
     assert.match(submitted.description, /schema migration/);
     commitPending(repoRoot, `state: evolve --submit ${submitted.id}`);
@@ -257,7 +257,7 @@ test(
     // A real runner config must exist BEFORE either CLI call: even
     // with an explicit --verdict, `discover`/`decompose`'s own bin/fgos.mjs
     // case still unconditionally calls `ensureRunnerConfigForDir` to resolve
-    // `cfg` (unused inside resolveDiscovery/resolveDecompose now, but the
+    // `cfg` (unused inside resolveDiscovery/resolvePlan now, but the
     // parameter itself is still threaded through, per this item's own D9
     // finding) — with no config on disk yet, that bootstraps a DEFAULT one
     // into `.fgos/config.json` pointed at whatever real agent CLI it
@@ -265,15 +265,13 @@ test(
     // dispatch time instead of this test's own fake worker script.
     writeRunnerConfig(repoRoot, writeCommittingExecutor(scriptDir, 'fixed.txt'));
 
-    // tsk-4b2 D3/D6: three explicit discover calls walk clarify->discovery->
-    // exploring->decompose (was one call directly to decompose before this item).
+    // tsk-30v D2/D6: `clarify` is retired entirely -- a fresh item now
+    // starts at `discovery` (`stages[0]`) directly, and a clear verdict
+    // there skips exploring, landing on planning in ONE explicit discover
+    // call.
     const discovered = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f fixed.txt && echo FIX_OK']);
-    assert.equal(discovered.status, 0, `discover failed: ${discovered.stderr}`);
-    const discovered2 = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f fixed.txt && echo FIX_OK']);
-    assert.equal(discovered2.status, 0, `discover (discovery->exploring) failed: ${discovered2.stderr}`);
-    const discovered3 = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f fixed.txt && echo FIX_OK']);
-    assert.equal(discovered3.status, 0, `discover (exploring->decompose) failed: ${discovered3.stderr}`);
-    const decomposed = fgos(repoRoot, ['decompose', submitted.id, '--verdict', 'pass-through', '--reason', 'single self-improve fix, no split needed']);
+    assert.equal(discovered.status, 0, `discover (discovery->planning) failed: ${discovered.stderr}`);
+    const decomposed = fgos(repoRoot, ['plan', submitted.id, '--verdict', 'pass-through', '--reason', 'single self-improve fix, no split needed']);
     assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
     commitPending(repoRoot, `state: discover+decompose ${submitted.id}`);
 
@@ -331,7 +329,7 @@ test(
     // record satisfies D8's content check (the D3 alternate pass).
     assert.equal(fgos(repoRoot, ['move', submitted.id, '--to', 'retrospective']).status, 0);
     assert.equal(fgos(repoRoot, ['move', submitted.id, '--to', 'cleanup']).status, 0);
-    assert.equal(fgos(repoRoot, ['decision', '--id', submitted.id, '--text', 'retrospective done', '--rationale', 'test fixture']).status, 0);
+    assert.equal(fgos(repoRoot, ['decision', '--id', submitted.id, '--text', 'retrospective done', '--rationale', 'test fixture', '--relation', 'none']).status, 0);
     fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
     fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays: 0 } }));
     const cleanupResult = fgos(repoRoot, ['cleanup', submitted.id]);

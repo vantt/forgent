@@ -18,7 +18,7 @@ independent of any single hard-gate flag):
 | external systems | **yes** | the semantic-correctness check (D2) is expected to add a second nested `claude -p` executor call, the same external process `judge-executor.mjs` already spawns |
 | public contracts | **yes** | `work.mjs`'s `validateWork` acceptance shape is a public contract other callers (`add`/`edit --acceptance`, `src/state/store.mjs`) already depend on; changing it changes what `edit --acceptance`/`add --acceptance` accept |
 | cross-platform | no | — |
-| existing covered behavior | **yes** | `test/intake/discovery.test.mjs` and `test/intake/decompose.test.mjs` carry ~24+ existing tests asserting today's fail-safe/pass-through shapes; both mechanisms below must not regress them |
+| existing covered behavior | **yes** | `test/intake/discovery.test.mjs` and `test/intake/plan.test.mjs` carry ~24+ existing tests asserting today's fail-safe/pass-through shapes; both mechanisms below must not regress them |
 | weak proof around the area | **yes** | this item's entire premise is "nothing proves `verify`/`acceptance` before the item is trusted" |
 | multi-domain | no | both tracks sit inside the intake/state layer, not genuinely separate product domains |
 
@@ -68,10 +68,10 @@ are shaped as two separate child items (Split, below), not one.
 - **Risk map**:
   | Component | Risk | What would prove it |
   |---|---|---|
-  | Adds a second `spawnSync` call per clarify/decompose resolution | medium | timing/perf: does a doubled judge-call cost meaningfully change the runner sweep's cadence? — `fgos-validating` should read `runner-loop.test.mjs`'s existing timeout assumptions and/or run the sweep once with the change to observe |
+  | Adds a second `spawnSync` call per clarify/decompose resolution | medium | timing/perf: does a doubled judge-call cost meaningfully change the runner sweep's cadence? — `fgos-coding-validating` should read `runner-loop.test.mjs`'s existing timeout assumptions and/or run the sweep once with the change to observe |
   | `judgeDiscovery`'s and `judgeDecompose`'s existing fail-safe contract (never throw, fold any failure to "not clear"/`invalid`) must extend cleanly to a second-pass failure too | high | must be proven against `test/intake/discovery.test.mjs`'s and `decompose.test.mjs`'s own fail-safe test blocks — a second-pass spawn error must fold to the same "not clear"/`invalid` outcome, never a thrown error |
   | Existing tests hardcode a single-call shape (`runJudgeExecutor` called once per resolve) | medium | read `test/intake/discovery.test.mjs`/`decompose.test.mjs`'s mock/stub shape before assuming a second call slots in without rewriting test scaffolding |
-- **Files likely touched**: `src/intake/discovery.mjs`, `src/intake/decompose.mjs`, `src/intake/judge-executor.mjs` (if the second pass reuses the shared spawn/parse/retry helper), `test/intake/discovery.test.mjs`, `test/intake/decompose.test.mjs`.
+- **Files likely touched**: `src/intake/discovery.mjs`, `src/intake/plan.mjs`, `src/intake/judge-executor.mjs` (if the second pass reuses the shared spawn/parse/retry helper), `test/intake/discovery.test.mjs`, `test/intake/plan.test.mjs`.
 - **Concrete cases to prove**: (1) first pass says `clear:true` with a bogus `verify`, second pass disagrees → item parks in `awaiting-human`, both verdicts visible; (2) first pass says `clear:true`, second pass agrees → item advances exactly as today; (3) second pass itself fails to spawn/parse → folds to the same fail-safe outcome as a first-pass failure, never a thrown error; (4) `judgeDecompose`'s per-child `verify` gets the same second-pass treatment, a bad child `verify` invalidates only that child's normalization, not silently accepted.
 
 ### Track B — acceptance write-time evidence-traceability gate (D1, D3)
@@ -91,7 +91,7 @@ are shaped as two separate child items (Split, below), not one.
 - **Risk map**:
   | Component | Risk | What would prove it |
   |---|---|---|
-  | What "traceable" mechanically means (file-exists check vs. decision-log cross-reference vs. both) | high | needs a proof point at `fgos-validating`: read `docs/specs/work-state.md`'s exact RUL58/Data Dictionary #24 wording again against whatever check shape gets proposed, and confirm against `test/state/work.test.mjs`'s existing acceptance-shape tests that no currently-passing case starts failing |
+  | What "traceable" mechanically means (file-exists check vs. decision-log cross-reference vs. both) | high | needs a proof point at `fgos-coding-validating`: read `docs/specs/work-state.md`'s exact RUL58/Data Dictionary #24 wording again against whatever check shape gets proposed, and confirm against `test/state/work.test.mjs`'s existing acceptance-shape tests that no currently-passing case starts failing |
   | `validateWork` is called from both `addWork` and `editWork` (`add`/`edit --acceptance`) | medium | confirm both call sites in `src/state/store.mjs` route through the same shape check unchanged, so the new condition applies uniformly, not just to one verb |
   | False positives — a real, well-evidenced clause getting rejected because its citation doesn't match the traceability heuristic | high | needs at least one worked example against a REAL existing item's acceptance array (e.g. `tsk-d3c`'s own, read in this item's CONTEXT.md scout evidence) proving the heuristic accepts good citations and rejects the actually-bad tsk-d3c pair |
 - **Files likely touched**: `src/state/work.mjs`, `src/state/store.mjs` (only if the check needs data `validateWork` doesn't currently receive, e.g. `view.decisions` for cross-referencing), `test/state/work.test.mjs`, `test/cli/fgos.test.mjs` (add/edit --acceptance CLI-level coverage).
@@ -106,7 +106,7 @@ no cross-item ordering signal to defer to). Both parent `tsk-5q5`.
 **Write mechanism (repo-fit correction):** neither `add`, `submit`, nor
 `edit` exposes a `--parent` flag anywhere in `bin/fgos.mjs` (confirmed by a
 full grep across all verb cases) — `parent` is only ever set inside
-`resolveDecompose`'s own `addWork` call (`src/intake/decompose.mjs:380-395`),
+`resolveDecompose`'s own `addWork` call (`src/intake/plan.mjs:380-395`),
 fired by the `fgos discover` verb (or the runner's async sweep) once
 `judgeDecompose`'s model verdict resolves to `decompose`. There is no
 session-side CLI door to hand-write a parent-tagged child directly. This
@@ -123,7 +123,7 @@ the actual write step.
 
 1. **`tsk-5q5-1`** — "Add a second-pass semantic-correctness check to
    judgeDiscovery/judgeDecompose's verify, parking on disagreement"
-   Verify: `node --test test/intake/discovery.test.mjs test/intake/decompose.test.mjs`
+   Verify: `node --test test/intake/discovery.test.mjs test/intake/plan.test.mjs`
 2. **`tsk-5q5-2`** — "Add a narrow write-time evidence-traceability gate to
    work.acceptance for clauses supplying text+evidence together"
    Verify: `node --test test/state/work.test.mjs test/cli/fgos.test.mjs`
@@ -147,15 +147,15 @@ gap this plan needs to close.
 (`decompose.mjs:144-168`) and `resolveDecompose`'s `addWork` call
 (`decompose.mjs:380-395`) only carry `title`/`verify`/`kind`/`risk`/`refs`/
 `footprint`/`deps`/`parent`/`tier` onto a new child — no `description`, no
-`docsRef`. `fgos-code-implement`'s own Orient step only reads a `docsRef` "if
-present" (`.claude/skills/fgos-code-implement/SKILL.md:57-59`), and absent one,
+`docsRef`. `fgos-coding-implement`'s own Orient step only reads a `docsRef` "if
+present" (`.claude/skills/fgos-coding-implement/SKILL.md:57-59`), and absent one,
 treats the bare title as the whole spec. Without a fix, `tsk-5q5-1`/
 `tsk-5q5-2` would be born with only their one-line titles, orphaned from
 every risk-map row, file list, and concrete case in this plan. Mitigation:
 immediately after `fgos discover tsk-5q5` creates the children, run
 `fgos edit --id tsk-5q5-1 --docs-ref docs/history/judge-verdict-evidence-discipline/`
 and the same for `tsk-5q5-2` — both children point at the same shared
-`CONTEXT.md`/`plan.md` (one plan covers both tracks), so `fgos-code-implement`'s
+`CONTEXT.md`/`plan.md` (one plan covers both tracks), so `fgos-coding-implement`'s
 Orient step picks up this plan's Track A/Track B detail instead of working
 from title alone. This is a real, available `edit` call (confirmed generic,
 not root-only, at `bin/fgos.mjs`'s `edit` verb) — the next session handling
@@ -166,5 +166,5 @@ executed.
 
 Both children's `verify` above is the one proof command each needs; how
 Execute actually runs and re-verifies them is the existing mechanical
-build/verify/return path (`fgos-code-implement`) — this plan does not re-design
+build/verify/return path (`fgos-coding-implement`) — this plan does not re-design
 that.

@@ -15,7 +15,7 @@ verb.
 | D1 | `repoRoot` in the `docs-index` handler must resolve from the same main-checkout root as `dir` (the `--dir`-resolved store path), not raw `process.cwd()`. `fgos-indexing` SKILL.md must be updated to have callers pass `--dir <mainRoot>`, matching the convention every other cross-worktree verb already follows. |
 | D2 | Registry flags for `docs-index` in `src/cli/command-registry.mjs`: `externalEffect: true` (real write outside `.fgos/`); `touchesState` stays `false` (never appends an event or overwrites `.fgos/state.json`). ~~`requiresExistingStore: true`~~ — superseded by D4. |
 | D3 | No `main-checkout-lock` for `docs-index`. Add a write-only-if-changed guard (skip `fs.writeFileSync` when the newly computed JSON is byte-identical to what's on disk) and a deterministic sort of `docEntries` (currently unsorted `fs.readdirSync` order). The true-simultaneous-same-root-race-with-differing-content case is left unguarded (YAGNI — no observed instance, and D1 removes the dominant real-world trigger). |
-| D4 | `requiresExistingStore` for `docs-index` stays `false`, contra D2's original text. `test/cli/fgos-manifest.test.mjs:60-67` (tsk-4fu-2) enforces `requiresExistingStore: true` implies `touchesState: true` for every entry except `init`; flipping `requiresExistingStore` alone would fail that existing test, and flipping `touchesState` too would be factually wrong (docs-index never writes `.fgos/state.json`). D1's fix (repoRoot/dir resolved consistently, callers pass `--dir`) already addresses the practical missing-store-silent-degrade concern that originally motivated D2's `requiresExistingStore` clause. Found during `fgos-validating`'s reality gate. |
+| D4 | `requiresExistingStore` for `docs-index` stays `false`, contra D2's original text. `test/cli/fgos-manifest.test.mjs:60-67` (tsk-4fu-2) enforces `requiresExistingStore: true` implies `touchesState: true` for every entry except `init`; flipping `requiresExistingStore` alone would fail that existing test, and flipping `touchesState` too would be factually wrong (docs-index never writes `.fgos/state.json`). D1's fix (repoRoot/dir resolved consistently, callers pass `--dir`) already addresses the practical missing-store-silent-degrade concern that originally motivated D2's `requiresExistingStore` clause. Found during `fgos-coding-validating`'s reality gate. |
 
 ## Scout evidence
 
@@ -56,7 +56,7 @@ verb.
   primitive anywhere in this codebase; adopting it for `docs-index` would
   convert today's silent-overwrite behavior into an outright failure
   (exit 7, same as `take`/`pick`) on a route that fires after every
-  `fgos-compounding` doc — the user flagged this as unwanted
+  `fgos-coding-compounding` doc — the user flagged this as unwanted
   lock/bottleneck proliferation, which is why D3 rejects it.
 - `bin/fgos.mjs:1283-1305` (`scanDirAsQuadrant`) — `docEntries` is
   appended in raw `fs.readdirSync` order with no sort anywhere downstream
@@ -86,4 +86,4 @@ other verbs is in scope.
 ## Outstanding questions deferred to planning
 
 None — every implementation-level "how" (exact guard shape, exact sort
-key, exact SKILL.md wording) is `fgos-planning`'s call, not locked here.
+key, exact SKILL.md wording) is `fgos-coding-planning`'s call, not locked here.

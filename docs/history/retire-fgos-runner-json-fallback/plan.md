@@ -24,7 +24,7 @@ setup` would silently lose its effective config to
 project exists yet, but the characteristic itself is real, which is what
 the flag is naming). One hard-gate flag (data loss) alone forces
 **high-risk** regardless of total flag count — no `Lane:` renaming; this
-line is `plan.md`'s parsed `Mode:` token per `fgos-planning`'s own
+line is `plan.md`'s parsed `Mode:` token per `fgos-coding-planning`'s own
 Bootstrap rule.
 
 ## Impact-analysis posture
@@ -76,7 +76,7 @@ as one piece, in this order:
    second JSON parse here. This is the item's original root bug, closed by
    construction: there is no longer a second file for it to diverge from.
 
-   **Correction (fgos-validating round 1, FAIL — repo fit / proof
+   **Correction (fgos-coding-validating round 1, FAIL — repo fit / proof
    surface):** `readRunnerModels(repoRoot)` must NOT be called with the
    module's own `REPO_ROOT = path.resolve(import.meta.dirname, '..')`
    (line ~33) for this lookup. `.fgos/` is unconditionally wiped from
@@ -102,7 +102,7 @@ as one piece, in this order:
    checked-out branch, unlike `.fgos/`.
 
    **Second correction (found during Implement itself, not by
-   fgos-validating — the plan's first fix was ALSO wrong):**
+   fgos-coding-validating — the plan's first fix was ALSO wrong):**
    `resolveRepoRoot()` (`src/runner/paths.mjs`) does not actually resolve
    the main checkout — tested live and confirmed it returns
    `git rev-parse --show-toplevel`, which inside a worktree is the
@@ -141,10 +141,10 @@ as one piece, in this order:
    `src/runner/prompt-templates.mjs`, `bin/fgos.mjs` (3 spots) — reword
    historical/illustrative references to cite `.fgos/config.json` instead.
    **Exception (locked in CONTEXT.md, extended during Implement):**
-   `src/intake/decompose.mjs`'s dotfile-tokenizer example comment keeps
+   `src/intake/plan.mjs`'s dotfile-tokenizer example comment keeps
    `.fgos-runner.json` as an illustrative dotfile name — it demonstrates
    generic tokenizer behavior on dotfiles, not this file's existence. Its
-   own test file, `test/intake/decompose.test.mjs`, carries the same
+   own test file, `test/intake/plan.test.mjs`, carries the same
    exception for the same reason: its `findUncoveredLockedDecisions`
    dotfile-tokenizer regression tests (`tsk-gio`, citing "the tsk-2ta
    case") reproduce a real historical bug report that used
@@ -208,19 +208,19 @@ proceeds as itself.
 
 ## Verify
 
-Strengthened after `fgos-validating` round 1's FAIL (proof surface): the
+Strengthened after `fgos-coding-validating` round 1's FAIL (proof surface): the
 `project-agents.mjs` POSITIVE clause now pins the specific correct
 helper/import, not just the string "config.json":
 
 ```
-npm test && test ! -e .fgos-runner.json && grep -q 'resolveMainCheckoutRoot' scripts/project-agents.mjs && grep -q "runner/paths.mjs" scripts/project-agents.mjs && grep -q 'config.json' .claude/skills/_shared/capacity-dispatch-fallback.md && grep -q 'config.json' .agents/skills/_shared/capacity-dispatch-fallback.md && ! rg --hidden -l '\.fgos-runner\.json' --glob '!.git' --glob '!node_modules' --glob '!.claude/worktrees/**' --glob '!.fgos/events.jsonl*' --glob '!docs/history/**' --glob '!docs/decisions/**' --glob '!plans/reports/**' --glob '!src/intake/decompose.mjs' --glob '!test/intake/decompose.test.mjs' --glob '!docs/how-to/fix-fgos-write-rejected-merge-block.md' --glob '!docs/backlog.md' .
+npm test && test ! -e .fgos-runner.json && grep -q 'resolveMainCheckoutRoot' scripts/project-agents.mjs && grep -q "runner/paths.mjs" scripts/project-agents.mjs && grep -q 'config.json' .claude/skills/_shared/capacity-dispatch-fallback.md && grep -q 'config.json' .agents/skills/_shared/capacity-dispatch-fallback.md && ! rg --hidden -l '\.fgos-runner\.json' --glob '!.git' --glob '!node_modules' --glob '!.claude/worktrees/**' --glob '!.fgos/events.jsonl*' --glob '!docs/history/**' --glob '!docs/decisions/**' --glob '!plans/reports/**' --glob '!src/intake/plan.mjs' --glob '!test/intake/plan.test.mjs' --glob '!docs/how-to/fix-fgos-write-rejected-merge-block.md' --glob '!docs/backlog.md' .
 ```
 
 ## Assumptions
 
 - The skill-fragment shape note in Approach step 5 (legacy top-level
   `capacities` → shared file's nested `runner.capacities`) — **proven** at
-  `fgos-validating` round 1 by reading both `.fgos-runner.json` and the
+  `fgos-coding-validating` round 1 by reading both `.fgos-runner.json` and the
   main checkout's `.fgos/config.json` live: confirmed exactly as stated
   (`capacities` at legacy top level; `runner.capacities` nested in the
   shared file).
@@ -228,4 +228,4 @@ npm test && test ! -e .fgos-runner.json && grep -q 'resolveMainCheckoutRoot' scr
   function's returned shape after step 1 lands is exactly `{runner:
   {models: {...}, ...}}` — same shape it already returns for the
   shared-file case today. Not re-verified here — remains open for
-  `fgos-validating`'s next pass or for execution itself to confirm.
+  `fgos-coding-validating`'s next pass or for execution itself to confirm.

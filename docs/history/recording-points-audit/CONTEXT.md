@@ -17,7 +17,7 @@ puts two columns side by side and reaches a verdict:
 - **Column A** — what fgOS captures today, automatically, without a person,
   scattered across the item lifecycle (not batched at close).
 - **Column B** — what the tổng-hợp-viết (synthesis) layer actually needs to
-  write a real end-user document (per `fgos-compounding` and the
+  write a real end-user document (per `fgos-coding-compounding` and the
   `gate-dialogue-continuity` D3 record).
 
 The report must answer definitively: (a) is there a real gap and where,
@@ -31,7 +31,7 @@ signal, superseding decision `9c67c3d1`); tsk-ma4 only proves or disproves
 tsk-4op's founding hypothesis (does Column A capture the WHAT but not the
 WHY/tradeoffs) before any of that redesign work is scoped.
 
-## 2. Locked decisions
+## Locked decisions
 
 ### D1 — Column A search widens beyond the six named mechanisms
 
@@ -118,7 +118,7 @@ downside if the bee report turns out to add nothing beyond what
 - `/home/vantt/projects/forgent/docs/history/gate-dialogue-continuity/CONTEXT.md`
   (sibling checkout) — D1-D6, especially D3 (three-part settle record:
   why/exchange-points/tradeoffs) and D4 (actor-fold prerequisite).
-- `.claude/skills/fgos-compounding/SKILL.md:45-51` — synthesis layer's real
+- `.claude/skills/fgos-coding-compounding/SKILL.md:45-51` — synthesis layer's real
   input contract (`fgos check <id>` + `docs/history/<feature>/`).
 - `/home/vantt/projects/forgent/plans/reports/scan-260728-1233-bee-doc-types-lifecycle-report.md`
   (sibling checkout, per D2) — bee's 11 doc types, early-CONTEXT.md

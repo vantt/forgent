@@ -54,49 +54,89 @@ test('computeEntropy weighs an "awaiting-human" item at ×2', () => {
   assert.equal(parts.find((p) => p.label === 'awaiting-human').count, 1);
 });
 
-test('computeEntropy weighs an item still sitting in stage "clarify" at ×3', () => {
-  const view = { work: { a: { id: 'a', status: 'todo', stage: 'clarify' } } };
+test("computeEntropy weighs an item still sitting at its domain's entry stage at ×3", () => {
+  const view = { work: { a: { id: 'a', status: 'todo', stage: 'discovery' } } };
   const { score, parts } = computeEntropy(view);
   assert.equal(score, 3);
-  assert.equal(parts.find((p) => p.label === 'stage-clarify').count, 1);
+  assert.equal(parts.find((p) => p.label === 'stage-entry').count, 1);
 });
 
-test('computeEntropy does not flag an item whose stage has already advanced past clarify', () => {
+test('computeEntropy does not flag an item whose stage has already advanced past the entry stage', () => {
   const view = { work: { a: { id: 'a', status: 'todo', stage: 'executing' } } };
   assert.equal(computeEntropy(view).score, 0);
 });
 
+// tsk-2t3: this signal used to filter on the literal stage name 'clarify'.
+// That stage was retired outright for the coding domain (gone from `stages`,
+// `skillMap` and `stepMap`), so the filter silently reported 0 forever while
+// every open item genuinely waiting at coding's real entry stage --
+// `discovery`, i.e. `stages[0]` -- went uncounted. The signal now resolves
+// each item's OWN domain entry stage, so a leftover `clarify` on a coding
+// item is a historical artifact, not a live signal.
+test('computeEntropy does not flag a coding item still carrying the retired stage "clarify"', () => {
+  const view = { work: { a: { id: 'a', status: 'todo', stage: 'clarify' } } };
+  const { parts } = computeEntropy(view);
+  assert.equal(parts.find((p) => p.label === 'stage-entry').count, 0);
+});
+
+// Per-domain resolution, not a global rename of one literal to another:
+// 'fixture-marketing' really does declare 'clarify' as its own entry stage
+// and 'triage' declares 'triage' -- an item at its own domain's entry stage
+// counts no matter which literal that domain chose.
+test("computeEntropy flags an item at its own domain's entry stage even when that literal differs per domain", () => {
+  const view = {
+    work: {
+      a: { id: 'a', status: 'todo', domain: 'fixture-marketing', stage: 'clarify' },
+      b: { id: 'b', status: 'todo', domain: 'triage', stage: 'triage' },
+      c: { id: 'c', status: 'todo', stage: 'discovery' },
+    },
+  };
+  const { parts } = computeEntropy(view);
+  assert.equal(parts.find((p) => p.label === 'stage-entry').count, 3);
+});
+
+test("computeEntropy does not flag an item sitting at ANOTHER domain's entry stage name", () => {
+  const view = {
+    work: {
+      a: { id: 'a', status: 'todo', domain: 'triage', stage: 'discovery' },
+      b: { id: 'b', status: 'todo', domain: 'fixture-marketing', stage: 'discovery' },
+    },
+  };
+  const { parts } = computeEntropy(view);
+  assert.equal(parts.find((p) => p.label === 'stage-entry').count, 0);
+});
+
 // wontfix-terminal-status-filter-consistency D3: status is never reset by a
 // stage transition and vice versa -- an item closed done/wontfix while
-// still carrying its old stage:'clarify' must not inflate this signal, since
+// still carrying the entry stage must not inflate this signal, since
 // nothing further will ever happen at that stage for a resolved item.
 for (const status of ['done', 'wontfix']) {
-  test(`computeEntropy does not flag a "${status}" item still carrying stage "clarify" -- resolved items are no longer waiting anywhere (D3)`, () => {
-    const view = { work: { a: { id: 'a', status, stage: 'clarify' } } };
+  test(`computeEntropy does not flag a "${status}" item still carrying the entry stage -- resolved items are no longer waiting anywhere (D3)`, () => {
+    const view = { work: { a: { id: 'a', status, stage: 'discovery' } } };
     const { parts } = computeEntropy(view);
-    assert.equal(parts.find((p) => p.label === 'stage-clarify').count, 0);
+    assert.equal(parts.find((p) => p.label === 'stage-entry').count, 0);
   });
 }
 
 for (const status of ['todo', 'doing', 'blocked', 'awaiting-human']) {
-  test(`computeEntropy still flags a "${status}" item at stage "clarify" (D3 does not over-broaden past done/wontfix)`, () => {
-    const view = { work: { a: { id: 'a', status, stage: 'clarify' } } };
+  test(`computeEntropy still flags a "${status}" item at the entry stage (D3 does not over-broaden past done/wontfix)`, () => {
+    const view = { work: { a: { id: 'a', status, stage: 'discovery' } } };
     const { parts } = computeEntropy(view);
-    assert.equal(parts.find((p) => p.label === 'stage-clarify').count, 1);
+    assert.equal(parts.find((p) => p.label === 'stage-entry').count, 1);
   });
 }
 
-// tsk-38t-4 (decision record 0027, D2): countStageClarify now reads
+// tsk-38t-4 (decision record 0027, D2): the entry-stage count reads
 // isResolvedStatus(item), a hybrid of literal tail-status + statusCategory
 // === 'canceled', instead of a flat RESOLVED_STATUSES.has(item.status) Set
 // -- this is the whole point of the migration: a domain that relabels its
 // wontfix-equivalent status away from the literal string 'wontfix' must
 // still be recognized as resolved, via the frozen-at-write-time
 // statusCategory field, not a literal string match.
-test("computeEntropy does not flag a stage:clarify item with a DIFFERENT domain's canceled-equivalent label + statusCategory 'canceled' (proves category-based recognition, not a literal 'wontfix' match)", () => {
-  const view = { work: { a: { id: 'a', status: 'declined', statusCategory: 'canceled', stage: 'clarify' } } };
+test("computeEntropy does not flag an entry-stage item with a DIFFERENT domain's canceled-equivalent label + statusCategory 'canceled' (proves category-based recognition, not a literal 'wontfix' match)", () => {
+  const view = { work: { a: { id: 'a', status: 'declined', statusCategory: 'canceled', stage: 'discovery' } } };
   const { parts } = computeEntropy(view);
-  assert.equal(parts.find((p) => p.label === 'stage-clarify').count, 0);
+  assert.equal(parts.find((p) => p.label === 'stage-entry').count, 0);
 });
 
 test('computeEntropy weighs a friction record with no later settlement on the same id at ×2', () => {
@@ -141,7 +181,7 @@ test('computeEntropy sums multiple contributing signals across different items i
     work: {
       a: { id: 'a', status: 'doing' },
       b: { id: 'b', status: 'awaiting-human' },
-      c: { id: 'c', status: 'todo', stage: 'clarify' },
+      c: { id: 'c', status: 'todo', stage: 'discovery' },
     },
   };
   assert.equal(computeEntropy(view).score, 5 + 2 + 3);

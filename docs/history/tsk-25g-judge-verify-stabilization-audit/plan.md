@@ -29,7 +29,7 @@ informed by graph unblock data, since there is none to read here.
 **No split — one honest piece of work, two phases.** D1 (bimodal,
 `discovery.mjs`) and D2 (deterministic, `decompose.mjs`) touch different
 files with no dependency between them, which would normally argue for a
-split (fgos-planning step 4). Kept as one item instead: both phases are
+split (fgos-coding-planning step 4). Kept as one item instead: both phases are
 small (a handful of lines each, matching an already-existing sibling
 implementation for D2), both belong to the same underlying fix
 (`judgeVerifySemanticCorrectness`'s two call sites), and this item's own
@@ -46,7 +46,7 @@ depends on nothing D2 produces, so doing it second costs nothing.
 ### Phase 1 — D2: decompose-path parity (deterministic)
 
 Extend `resolveDecompose`'s per-child verify check
-(`src/intake/decompose.mjs:699-714`) to match what `resolveDiscovery`
+(`src/intake/plan.mjs:699-714`) to match what `resolveDiscovery`
 already has:
 
 - Thread `priorRejection` into the per-child
@@ -66,7 +66,7 @@ already has:
   parameters (`src/cli/command-registry.mjs`, currently absent — confirmed
   by reading the full parameter list, no `force` key exists there today,
   unlike `discover`'s `command-registry.mjs:142`), same description shape.
-- Test coverage: extend `test/intake/decompose.test.mjs` with a disputed
+- Test coverage: extend `test/intake/plan.test.mjs` with a disputed
   per-child verify case exercising both the refusal paths (mechanical,
   already-parked) and the successful override.
 
@@ -111,7 +111,7 @@ structural objection, propose a fix addressing it, get an execution
 objection contradicting the structural one) against a live or scripted
 two-round dispute on a throwaway item, with the strengthened prompt
 active. This is exactly the mode this item's own D1 decision already
-named as "one more attempt" — `fgos-validating`'s reality check is where
+named as "one more attempt" — `fgos-coding-validating`'s reality check is where
 this proof gets executed and judged, not here.
 
 **Bimodal outcome, both branches already scoped:**
@@ -127,7 +127,7 @@ this proof gets executed and judged, not here.
   satisfies this item's own verify (`grep -q "D1-resolved:"`).
 
 **Impact-analysis posture:** `impact-analysis: degraded` (revised at
-`fgos-validating` — GitNexus registered and `status: "present"`
+`fgos-coding-validating` — GitNexus registered and `status: "present"`
 [`fgos tool query`], but its index was flagged stale mid-session, last
 indexed at commit `251d0b5`, behind this item's own two doc-only commits
 on `fgw/tsk-25g`; CONTEXT.md's original scout call recorded `full` when it
@@ -146,23 +146,23 @@ fresh index is cheap insurance either way.
 | Component | Risk | Proof point |
 |---|---|---|
 | `decompose.mjs` per-child check (D2) | LOW — mirrors an already-shipped pattern exactly | the 2 structural greps (already RED-confirmed, already accepted by the second-pass judge as this item's own verify) |
-| `command-registry.mjs` `--force` flag on `decompose` (D2) | LOW — additive CLI param, no existing flag renamed/removed | `fgos decompose --help`-equivalent (schema listing) shows the new flag; covered by the same test file addition |
+| `command-registry.mjs` `--force` flag on `decompose` (D2) | LOW — additive CLI param, no existing flag renamed/removed | `fgos plan --help`-equivalent (schema listing) shows the new flag; covered by the same test file addition |
 | `replay.mjs` `askHistory` accumulation (D1) | MEDIUM — touches a shared fold function every gate-bearing item's view passes through | targeted `test/state/replay.test.mjs` (or nearest existing replay test file) case: an item with 2+ ask events accumulates all of them in `askHistory` while `ask` itself keeps overwriting as before (no regression to the existing single-slot consumer) |
-| `discovery.mjs`/`judge-executor.mjs` full-history prompt (D1) | MEDIUM-HIGH — the actual empirical bet; may not fix the instability | the adjacent-round re-test described in Phase 2 above, run for real at `fgos-validating`; **this is the one proof point this plan cannot pre-verify** — it is the reality check itself |
+| `discovery.mjs`/`judge-executor.mjs` full-history prompt (D1) | MEDIUM-HIGH — the actual empirical bet; may not fix the instability | the adjacent-round re-test described in Phase 2 above, run for real at `fgos-coding-validating`; **this is the one proof point this plan cannot pre-verify** — it is the reality check itself |
 
 ## Assumptions
 
 - `replay.mjs`'s `ask`/`answer` fold is the only place `gates[id].ask` is
   written (confirmed by reading the two fold sites at `replay.mjs:200-205`
   and `:428-431` — the second is a disjoint set of gate keys, not another
-  `ask` writer). If a further writer exists elsewhere, `fgos-validating`
+  `ask` writer). If a further writer exists elsewhere, `fgos-coding-validating`
   should re-grep before trusting this.
 - Adding `askHistory` does not require a schema migration for existing
   items with no prior `ask` events — the array is built purely from
   events already in the log on next replay, same as every other
   `view.*` derived field.
 
-## Validated at `fgos-validating`
+## Validated at `fgos-coding-validating`
 
 - **`askHistory` additive safety (was: "confirm no other code path reads
   `.ask` assuming it is the only history"):** RESOLVED. Grepped every

@@ -16,7 +16,7 @@ export const RISK_DISCOUNTS = Object.freeze({ light: 1, standard: 0.85, heavy: 0
 export const EFFORT_FLOOR = 1;
 export const PRIORITY_SCALE = 10000;
 
-// D5: reuses fgos-planning's own mode vocabulary (SKILL.md step 2's mode
+// D5: reuses fgos-coding-planning's own mode vocabulary (SKILL.md step 2's mode
 // gate: tiny/small/standard/high-risk/spike) rather than a bespoke numeric
 // estimator with no precedent in the repo. `spike` gets a low number
 // deliberately: a spike's own effort (answering one yes/no question) is

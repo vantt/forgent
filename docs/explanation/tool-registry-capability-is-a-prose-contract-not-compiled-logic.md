@@ -85,10 +85,10 @@ skip) from "registered but broken" (a real gap worth warning about). The
 deep-dive's proposed fix follows the harness/symphony shape: fgOS
 consults a `impact-analysis` **capability**, never the literal string
 "GitNexus," so a second provider could register later without any of the
-three consuming skills (`fgos-planning`, `fgos-validating`,
-`fgos-code-implement`) needing to change:
+three consuming skills (`fgos-coding-planning`, `fgos-coding-validating`,
+`fgos-coding-implement`) needing to change:
 
-> fgos-planning/validating tham chiếu **capability** `impact-analysis`,
+> fgos-coding-planning/validating tham chiếu **capability** `impact-analysis`,
 > KHÔNG BAO GIỜ tham chiếu tên "GitNexus" trực tiếp trong logic gate —
 > GitNexus chỉ là provider đầu tiên đăng ký.
 
@@ -96,3 +96,28 @@ That prose rewrite is `tsk-1e4`'s job, not this item's — porting the
 `fgos tool` verb-group itself is `tsk-1dj`, and registering GitNexus
 against it is `tsk-4ad`. This item's own job ended at producing the
 synthesis those three build on.
+
+## A second real fgOS capability, beyond impact-analysis (`tsk-3ac`)
+
+`impact-analysis` was the first capability registered against `fgos tool`
+(GitNexus as its provider), but not the last. `tsk-3ac` — part of the
+worker-slot design
+(`docs/explanation/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md`'s
+D5) — turned the herdr pane-labeling helper (`plugins/fgOS/skills/
+terminal/rename.sh`) into a second real capability consumer: it declares
+a pane-labeling capability through `fgos tool register`
+(`src/state/tool-registry.mjs`) and gates the helper on `fgos tool
+query`, rather than hardcoding an assumption about whether the calling
+environment has any concept of a labelable pane at all.
+
+Confirming the "absent capability = clean skip, never a failure"
+convergence point from the four upstream sources above: `rename.sh`
+already had this shape before the capability gate existed — it exits `0`
+silently outside a herdr pane — and the gate formalizes that same
+behavior through the registry instead of a hardcoded environment check.
+The registry's single-consuming-call-site discipline applies here too:
+`tsk-3ac` pinned the execution-lane call to `fgos-coding-driving` (which
+knows the item id earliest and sees every stage change) and removed the
+scattered rename calls that used to live elsewhere (`discover-next`'s own
+step 6) — one call site per capability consumer, not one per place that
+happened to know the id.

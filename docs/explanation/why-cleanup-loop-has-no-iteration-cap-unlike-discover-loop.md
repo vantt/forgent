@@ -69,7 +69,7 @@ not an LLM judgment call.
 `discover-loop` (cap 15) and `retro-loop` (cap 15, this session's own
 skill) both bound their iteration count because their per-item step
 calls a real LLM judge (`judgeDiscovery`/`judgeDecompose`, or
-`fgos-compounding`'s synthesis) — real, variable cost per call that
+`fgos-coding-compounding`'s synthesis) — real, variable cost per call that
 needs bounding. `cleanup-loop`'s own per-item step (`fgos cleanup <id>`)
 is a **deterministic mechanical check** — TTL, content, and merge
 verification, no model call anywhere in the path. There's no variable

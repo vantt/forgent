@@ -10,7 +10,7 @@ bug — see Canonical references in CONTEXT.md). No hard-gate flag applies
 (no auth/authorization/data-loss/external-provider/removed-validation) —
 git commits are never lost by this bug, only a worktree's on-disk files
 go stale, so this stays `standard` rather than `high-risk`. Direct-entry:
-this session reached `decompose` via `fgos-exploring`'s own hand-off
+this session reached `decompose` via `fgos-coding-exploring`'s own hand-off
 (pick → coding-driving → exploring → here), never through
 `fgos-routing`'s Orient step, so per this skill's Bootstrap direct-entry
 fallback the lane above was derived fresh from `fgos-routing`'s own
@@ -33,16 +33,16 @@ plus a git-shelling caller in `src/runner/worktree.mjs`, wired into
 validating`'s repo-fit check from the item's own original `2798-2804`
 citation; re-grep before editing).
 
-**Why `createClaimWorktree`'s reattach path, not `fgos-code-implement`'s
+**Why `createClaimWorktree`'s reattach path, not `fgos-coding-implement`'s
 Orient step (CONTEXT.md's other named candidate).** Scout during this
-planning pass (not available to `fgos-exploring`, which correctly deferred
+planning pass (not available to `fgos-coding-exploring`, which correctly deferred
 the choice) found the deciding evidence: `decompose.mjs`'s
-`releaseClaimOnExecuting()` (`src/intake/decompose.mjs:488-496`) releases
+`releaseClaimOnExecuting()` (`src/intake/plan.mjs:488-496`) releases
 an item's claim back to `todo` on **every** `decompose → executing`
 transition — both the split path (line 527, `already-decomposed`) and the
 non-split pass-through path (line 583) call it unconditionally. So by the
 time ANY coding item reaches `executing`, its claim has already been
-released; the session must re-claim it before `fgos-code-implement` can
+released; the session must re-claim it before `fgos-coding-implement` can
 run, and for a worktree-backed domain that re-claim always goes through
 `createClaimWorktree`. Concretely for this bug's own repro: a root
 item's claim releases the moment it decomposes into children (even while
@@ -54,15 +54,15 @@ again re-claims it — `createClaimWorktree` finds the branch already
 checked out at the original `.claude/worktrees/<root>-<hash>` path
 (`reattachableCheckout`) and, today, "gets that same checkout back,
 untouched" (the function's own docstring) — exactly the stale hand-off
-into `fgos-code-implement`'s Implement/Verify steps that the incident
+into `fgos-coding-implement`'s Implement/Verify steps that the incident
 describes. Guarding here means the check runs exactly once, right before
 work starts, for every worktree-backed item, split or not — no second copy
-of this logic needed at `fgos-code-implement`'s own Orient step, matching
+of this logic needed at `fgos-coding-implement`'s own Orient step, matching
 the sibling item's own lesson (`docs/history/merge-worktree-reclaim-
 clobbers-kept-checkout/CONTEXT.md`: "a correct fix belongs at the shared
 primitive, not one call site").
 
-**Rejected alternative:** guard at the head of `fgos-code-implement`
+**Rejected alternative:** guard at the head of `fgos-coding-implement`
 (CONTEXT.md's other named candidate). Rejected because it would be
 redundant once the primitive-level guard exists (every route into that
 skill already passes through the re-claim above first), and because a
@@ -137,17 +137,17 @@ between decision and git-shelling caller; only the two booleans'
 
 **Proof surface.** `impact-analysis: full` (GitNexus present, freshly
 checked this session via `fgos tool query --capability impact-analysis
---status present`) — `fgos-code-implement`'s own Step 2 will run
+--status present`) — `fgos-coding-implement`'s own Step 2 will run
 `impact({target: "createClaimWorktree", direction: "upstream"})` before
 editing it, per `CLAUDE.md`'s MUST rule; not re-run here, this plan only
 records the posture.
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | New resync-decision logic (ancestor+clean → resync vs refuse, derived from the worktree's own HEAD reflog rather than live `rev-parse HEAD`) | medium — subtle git semantics; CONFIRMED empirically this session that the originally-planned `rev-parse HEAD`/`isCheckoutDirty`-against-HEAD design does not work (both resolve/compare against the live, already-moved ref) — the reflog-based `lastSynced` replacement was validated end-to-end in a real scratch repo before writing any code | Unit tests in `test/runner/worktree.test.mjs` covering: same-tip no-op (`lastSynced == branchTip`), ancestor+clean auto-resync, dirty-and-behind refuses, non-ancestor (diverged) refuses, dirty-but-NOT-behind still succeeds unchanged — simulating the real mechanism by advancing a branch via `git branch -f` from a second DETACHED checkout while the first stays behind, the same operation `withMergeEphemeralWorktree` performs in production |
-| Wiring into `createClaimWorktree`'s `reused: true` branch | medium — this is a shared primitive (`pick`'s CLI case and any other reattach caller); found during `fgos-validating`: an existing test (`test/runner/worktree.test.mjs:527`, "createClaimWorktree reattaches a DIRTY checkout with its uncommitted work intact") asserts a dirty reattach must still succeed — the new guard must never regress it | Traced: that test never moves `fgw/reattach-dirty`'s branch ref (no external merge happens in it), so `worktreeHead === branchTip` holds and the guard's own first check (no-op when the worktree's HEAD already equals the branch tip) returns before the dirty/ancestor check is ever reached — the guard is provably a no-op on that exact test. Add an explicit new test alongside it (not just rely on the trace): a THIRD checkout of the same branch, detached (same technique `withMergeEphemeralWorktree` uses in production, empirically confirmed this session — see below), commits and force-moves the branch ref forward while the claim worktree is left dirty and behind — asserts the guard refuses rather than silently resyncing over real uncommitted work. |
+| Wiring into `createClaimWorktree`'s `reused: true` branch | medium — this is a shared primitive (`pick`'s CLI case and any other reattach caller); found during `fgos-coding-validating`: an existing test (`test/runner/worktree.test.mjs:527`, "createClaimWorktree reattaches a DIRTY checkout with its uncommitted work intact") asserts a dirty reattach must still succeed — the new guard must never regress it | Traced: that test never moves `fgw/reattach-dirty`'s branch ref (no external merge happens in it), so `worktreeHead === branchTip` holds and the guard's own first check (no-op when the worktree's HEAD already equals the branch tip) returns before the dirty/ancestor check is ever reached — the guard is provably a no-op on that exact test. Add an explicit new test alongside it (not just rely on the trace): a THIRD checkout of the same branch, detached (same technique `withMergeEphemeralWorktree` uses in production, empirically confirmed this session — see below), commits and force-moves the branch ref forward while the claim worktree is left dirty and behind — asserts the guard refuses rather than silently resyncing over real uncommitted work. |
 | `bin/fgos.mjs:2798-2804` comment correction | low — text only | Read-diff at review; no functional check needed |
 
 ## Files likely touched
@@ -179,7 +179,7 @@ no multi-item ordering decision for graph output to inform here.
 
 - `git merge-base --is-ancestor` exits non-zero (not an error/exception —
   a plain exit 1) when the first commit is NOT an ancestor of the second,
-  and exit 0 when it is. CONFIRMED empirically during `fgos-validating`
+  and exit 0 when it is. CONFIRMED empirically during `fgos-coding-validating`
   (real git binary, this machine): built a 3-commit scratch repo (linear
   c1->c2, and a diverged c3 off c1), ran `git merge-base --is-ancestor c1
   c2` (exit 0) and `git merge-base --is-ancestor c3 c2` (exit 1, clean,

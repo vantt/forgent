@@ -3,7 +3,7 @@
 ## 1. Trạng thái hiện tại
 
 Vòng 6. D1-D6 đã chốt (§4) — không còn điểm mở nào. §6/§7 đã viết. Sẵn
-sàng cho terminal handoff (`fgos-exploring` → `fgos-planning`) khi người
+sàng cho terminal handoff (`fgos-coding-exploring` → `fgos-coding-planning`) khi người
 dùng xác nhận thiết kế ở §6 là đúng.
 
 ## 2. Mục tiêu & đề bài

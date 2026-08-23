@@ -8,7 +8,7 @@ source_capture_ids: [tsk-52g]
 ## The real capture
 
 `tsk-52g`'s `discovery` log records the engine's own machine judgment
-(`judgeDiscovery`) firing *after* `fgos-exploring`'s decisions (D1–D6) were
+(`judgeDiscovery`) firing *after* `fgos-coding-exploring`'s decisions (D1–D6) were
 already written to `docs/history/work-item-title-contract/CONTEXT.md` and
 explicitly approved by a person at that skill's own gate:
 
@@ -31,7 +31,7 @@ item via `fgos answer`, at which point the same judge re-ran and returned:
 `judgeDiscovery` (`src/intake/discovery.mjs`) builds its prompt from the
 work item's own fields and its own `gates`/`discovery` event history — not
 from `docs/history/<feature>/CONTEXT.md`. A person approving CONTEXT.md at
-`fgos-exploring`'s gate is a decision made *in conversation*, visible to
+`fgos-coding-exploring`'s gate is a decision made *in conversation*, visible to
 whoever is in that session, but invisible to the judge unless it is also
 recorded on the item itself through `fgos answer`. The two are different
 audiences for the same decision: CONTEXT.md is the durable, git-versioned
@@ -47,7 +47,7 @@ item itself leaves the judge asking the same question again, indefinitely.
 
 ## What this means for the next clarify round
 
-Locking a decision at `fgos-exploring`'s own gate is necessary but not
+Locking a decision at `fgos-coding-exploring`'s own gate is necessary but not
 sufficient to unblock the engine's own `clarify` → `decompose` judgment.
 When `fgos discover` reports `clear: false` on an item whose `CONTEXT.md`
 already has the answer, the fix is not a new decision — it is `fgos answer

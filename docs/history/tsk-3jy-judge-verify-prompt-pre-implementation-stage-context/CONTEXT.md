@@ -58,7 +58,7 @@ reasoned through a disagreement live).
   ngờ" asks for this item) into `priorRejection`, so the judge already sees
   full round history — confirms the fix only needs new PROMPT TEXT, the
   history-threading plumbing already exists.
-- `src/intake/decompose.mjs:835` — decompose-stage caller, same function,
+- `src/intake/plan.mjs:835` — decompose-stage caller, same function,
   confirms both stages are pre-implementation and share one fix.
 - `docs/explanation/judge-verdict-second-pass-semantic-check.md` — confirms
   disagreement always parks via `putInAwaiting`, by design; this fix does
@@ -78,7 +78,7 @@ reasoned through a disagreement live).
 
 - `src/intake/judge-executor.mjs`
 - `src/intake/discovery.mjs`
-- `src/intake/decompose.mjs`
+- `src/intake/plan.mjs`
 - `docs/explanation/judge-verdict-second-pass-semantic-check.md`
 
 ## Outstanding questions deferred to planning

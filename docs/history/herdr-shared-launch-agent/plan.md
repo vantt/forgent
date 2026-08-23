@@ -112,7 +112,7 @@ layout plumbing.
 
 ## Risk map
 
-| Component | Risk | Proof (→ `fgos-validating`) |
+| Component | Risk | Proof (→ `fgos-coding-validating`) |
 |---|---|---|
 | `FGOS_HERDR_SKIP_PERMISSIONS` default-on behavior (D1, audit/security hard gate) | High — a wrong default means every unattended future launch bypasses all permission checks silently | Unit tests: env unset → flag present; env=`"0"` → flag absent; must be exercised explicitly, never inferred |
 | 2×2 split-target algorithm | Was the plan's weak-proof risk; resolved this session via real `pane layout`/`tab list` capture above | Unit tests against the captured fixtures for `pane_count` 1, 2, 3 |

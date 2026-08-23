@@ -45,7 +45,7 @@ means Bước A must also work with no live session present, which rules out
 Whether the headless case is served by a capacity-dispatch call, a
 deterministic keyword classifier mirroring `src/intake/classify.mjs`'s
 existing mechanical-fallback shape, or something else, is an implementation
-choice — left to `fgos-planning` (see Outstanding questions).
+choice — left to `fgos-coding-planning` (see Outstanding questions).
 
 ### D2 rationale
 
@@ -131,7 +131,7 @@ genuinely high, since there is no later chance to correct it.
 
 ## Outstanding questions
 
-- Mechanism for Bước A (implementation choice, for `fgos-planning`): given
+- Mechanism for Bước A (implementation choice, for `fgos-coding-planning`): given
   D1 (must work headlessly too), what actually produces the classified
   `domain` value — a capacity-dispatch call (the item's own original open
   question (iii)), a deterministic keyword classifier mirroring
@@ -144,9 +144,9 @@ genuinely high, since there is no later chance to correct it.
 - Where Bước A's new step actually lives (a new step in
   `plugins/fgOS/skills/submit/SKILL.md` before today's step 4 `fgos submit`
   call, a new capacity registered in `.fgos/config.json`, or something
-  else) — implementation detail, for `fgos-planning`.
+  else) — implementation detail, for `fgos-coding-planning`.
 - What a runnable `verify` command for this item looks like given D2 +
   the YAGNI caveat (only `coding` is a real production domain today, so
   most classify outcomes are trivially `coding` either way) — the item's
   own `verify` field currently reads "chưa xác định — P15 bổ sung"; for
-  `fgos-planning` to resolve.
+  `fgos-coding-planning` to resolve.

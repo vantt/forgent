@@ -31,7 +31,7 @@ carries: the whole reason it exists is to touch a corruption guard by hand.
 
 ### What actually needs fixing (scout correction, not a new decision)
 
-`fgos-exploring`'s CONTEXT.md scoped this as "clear a stuck lock," but a
+`fgos-coding-exploring`'s CONTEXT.md scoped this as "clear a stuck lock," but a
 closer read of `src/runner/main-checkout-lock.mjs`'s own reclaim loop
 (`tryAcquireOnce`, called from `acquireMainCheckoutLock`) shows a
 dead-pid/expired-ttl `HELD` lock **already self-heals** on the very next
@@ -79,7 +79,7 @@ genuinely-new code is smaller than it first looked — one case, not three.
 
 3. **`.claude/skills/fgos/fgos-unlock/SKILL.md`** (new file, new directory
    — mirrors the existing one-skill-per-directory layout used by
-   `fgos-routing`/`fgos-exploring`/etc.). Deciding this now closes
+   `fgos-routing`/`fgos-coding-exploring`/etc.). Deciding this now closes
    CONTEXT.md's third deferred question: a dedicated file, not a section
    folded into `fgos-routing`'s gate contract, because this isn't a stage
    -routing concern (`fgos-routing`'s whole job is orienting on stage) —
@@ -94,13 +94,13 @@ genuinely-new code is smaller than it first looked — one case, not three.
 
 ### Alternatives rejected
 
-- **Fold the fix into `fgos doctor --fix`.** Rejected in `fgos-exploring`
+- **Fold the fix into `fgos doctor --fix`.** Rejected in `fgos-coding-exploring`
   (D1) — `doctor` is explicitly documented and tested as read-only
   (`bin/fgos.mjs`'s `case 'doctor'` comment: "Never writes anything"); a
   `--fix` mode would be a second write path bolted onto a verb whose
   contract currently promises none.
 - **Skill-only, no CLI verb, just document `rm .fgos/main-checkout.lock`.**
-  Rejected in `fgos-exploring` (D1/D2) — no code path could enforce the
+  Rejected in `fgos-coding-exploring` (D1/D2) — no code path could enforce the
   live-holder refusal; an agent following prose instructions has no way to
   safely tell `HELD`-by-live-pid apart from `AMBIGUOUS` before deleting.
 - **Reimplement staleness/parsing logic inline in `bin/fgos.mjs`.** Rejected
@@ -112,13 +112,13 @@ genuinely-new code is smaller than it first looked — one case, not three.
 
 ## Risk map
 
-| Component | How risky | Proof point (for `fgos-validating`) |
+| Component | How risky | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `forceReclaimAmbiguousLock`'s re-read-before-unlink | High — a race here is exactly the STR65 corruption class this lock exists to prevent | Unit test: two identities racing where one writes a *valid* record between the function's first and second read must NOT be unlinked (mirrors `test/runner/main-checkout-lock.test.mjs`'s existing stale-pid race test at line ~173) |
 | Verb's `ACQUIRED`/`HELD` branching | Medium — reuses `acquireMainCheckoutLock` as-is, but wrong branch mapping would silently hold or silently refuse-when-clear | Unit test per status: free, dead-pid-stale, live-pid-held, corrupt-content — asserting the verb's reported outcome, not just the primitive's |
 | `COMMAND_REGISTRY` entry / `--help --json` manifest | Low-medium — mechanical, but `fgos-manifest.test.mjs` already asserts registry shape | Run `test/cli/fgos-manifest.test.mjs` and `test/cli/fgos-help.test.mjs` unmodified-assertions still pass, plus one new assertion for the added entry |
 | End-to-end: verb run against a real corrupt lock file in a temp repo | Medium — integration surface, easy to get fs paths wrong | Extend `test/e2e/main-checkout-lock-hook.test.mjs`'s temp-repo harness (or a sibling e2e test) with one real corrupt-lock-file + verb-invocation case |
-| Skill file content | Low — docs only | Read-through against `fgos-exploring`/`fgos-planning`'s own frontmatter + hard-rules + gate shape for consistency |
+| Skill file content | Low — docs only | Read-through against `fgos-coding-exploring`/`fgos-coding-planning`'s own frontmatter + hard-rules + gate shape for consistency |
 
 ## Files touched
 
@@ -155,7 +155,7 @@ graph --what-if` was not run for alternate splits because there is no
 second candidate piece to compare against — nothing here is independently
 shippable.
 
-## Cases to prove (input for `fgos-validating`)
+## Cases to prove (input for `fgos-coding-validating`)
 
 - Lock file missing → verb reports "already clear," no file written.
 - Lock file with a dead numeric pid → reclaimed and released in one call.

@@ -62,7 +62,7 @@ reliability bug, not a correctness one):
 
 ```
 $ git -C "$root" log --oneline -5 fgw/tsk-3lx
-a9cf847 docs(tsk-3lx): append validated git-worktree-move constraint from fgos-validating
+a9cf847 docs(tsk-3lx): append validated git-worktree-move constraint from fgos-coding-validating
 562db90 docs(tsk-3lx): shape plan.md for pick worktree-reclaim zero-destroy fix
 0010c99 docs(tsk-3lx): lock CONTEXT.md for pick worktree-reclaim zero-destroy fix
 f861595 chore(fgos): sync event log state

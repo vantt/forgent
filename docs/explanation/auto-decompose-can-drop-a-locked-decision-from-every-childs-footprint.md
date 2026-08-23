@@ -1,9 +1,9 @@
 # Auto-decompose can drop a locked decision from every child's footprint
 
-`tsk-2ta` locked two decisions in its `CONTEXT.md` during `fgos-exploring`:
+`tsk-2ta` locked two decisions in its `CONTEXT.md` during `fgos-coding-exploring`:
 D1 (global config at `~/.fgos/config.json`, project always wins), and D1
 amended (move the project config file from its old legacy flat filename to
-`.fgos/config.json` to match the global path's shape). `fgos decompose`
+`.fgos/config.json` to match the global path's shape). `fgos plan`
 then split the item into four children automatically. None of the four —
 `tsk-2ta-1` (global read+merge), `tsk-2ta-2` (doctor check), `tsk-2ta-3`
 (shell fallback, actually D2, a separate decision), `tsk-2ta-4` (this
@@ -29,7 +29,7 @@ moved — by `tsk-5hv`.)
 
 Fixing it here — inside `tsk-2ta-4`, whose own `footprint` names only
 `CONTEXT.md` — would have been scope creep into architecture no child was
-built for the same way `fgos-code-implement`'s own rules already warn against
+built for the same way `fgos-coding-implement`'s own rules already warn against
 ("the fix would require redesigning scope... beyond what the item
 describes → stop"). The honest move was the one taken: name the gap
 plainly in the synthesized `CONTEXT.md`, cite exactly which decision
@@ -58,7 +58,7 @@ decompose` now cross-references every locked decision in the parent's
 `CONTEXT.md` against the combined `footprint` of every child it just
 generated, right when the children are created — not only after the fact
 in a synthesis document like this one. `findUncoveredLockedDecisions`
-(`src/intake/decompose.mjs`) is the mechanism.
+(`src/intake/plan.mjs`) is the mechanism.
 
 This check is deliberately narrower than "does every decision get done":
 it flags only decisions whose own text names a **path-shaped token** —
@@ -114,7 +114,7 @@ actually catch what it was built to catch:
   by a child footprint that declared `src/` rather than the exact file.
 
 Verified with a real command
-(`node --test test/intake/decompose.test.mjs`), not just code review.
+(`node --test test/intake/plan.test.mjs`), not just code review.
 Source: `tsk-gio`, filed as an independent code-review finding after
 `tsk-1gr` merged — `fgos show tsk-gio` has the full record.
 
@@ -140,14 +140,14 @@ real issues in the same `findUncoveredLockedDecisions` mechanism:
   case still broken: a decision whose own text names a *directory*
   (e.g. `src/intake/`) was still flagged as uncovered even when a
   child's footprint declared a specific file *inside* that directory
-  (e.g. `src/intake/decompose.mjs`) — the exact reverse direction of the
+  (e.g. `src/intake/plan.mjs`) — the exact reverse direction of the
   same coverage question. Fixed to check both directions symmetrically.
   Verified against the real corpus, not a synthetic case: 20+ real
   instances of this exact directory-names-a-decision shape were found in
   actual `CONTEXT.md` files across the repo.
 
 Verified with a real command
-(`node --test test/intake/decompose.test.mjs`), not just code review.
+(`node --test test/intake/plan.test.mjs`), not just code review.
 Source: `tsk-297`, filed as an independent code-review finding after
 `tsk-gio` merged — `fgos show tsk-297` has the full record.
 

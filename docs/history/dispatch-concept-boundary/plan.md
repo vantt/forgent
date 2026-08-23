@@ -15,7 +15,7 @@ says "bốn cụm đã có item" (four of eight §7 clusters have an item) — t
 branch's own tree — this branch is 215 commits behind `main`, and the
 lock this item produced lives in the shared `.fgos` event log, not in a
 branch-local `CONTEXT.md`, since this item went through `fgos-coding-
-shaping` rather than `fgos-exploring`) shows all eight clusters now have
+shaping` rather than `fgos-coding-exploring`) shows all eight clusters now have
 one, and every one of them is `cleanup`/`done`:
 
 | §7 cluster | D-ID | Item | Status |

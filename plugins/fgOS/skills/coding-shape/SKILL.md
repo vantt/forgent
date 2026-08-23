@@ -37,6 +37,6 @@ every `DISCUSSION.md` edit, every hand-off decision belongs to
    pauses mid-discussion for the next round (a normal, expected outcome —
    multi-day, multi-session discussion is this skill's common case, not an
    edge case), or reaches convergence and fires its own native-first
-   handoff into `fgos-exploring`/`fgos-planning`. Report back whichever of
+   handoff into `fgos-coding-exploring`/`fgos-coding-planning`. Report back whichever of
    those `fgos-coding-shaping` actually reached — this wrapper does not
    add a second stopping condition of its own.

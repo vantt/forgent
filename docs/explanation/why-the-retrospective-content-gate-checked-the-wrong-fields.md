@@ -17,7 +17,7 @@ hasDecision = decisionsById[id].length > 0
 
 `outcome.actual` and `outcome.predicted` are written by `addOutcome` at
 ordinary claim/return time — they exist for every item that went through
-a normal work lifecycle, whether or not `fgos-compounding` ever ran
+a normal work lifecycle, whether or not `fgos-coding-compounding` ever ran
 against it. The gate was measuring "did this item get claimed and
 returned," not "did retrospective produce anything." D8 named `docType`
 specifically; the code never read it.

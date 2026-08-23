@@ -1,4 +1,4 @@
-# Plan — rename `fgos-executing` → `fgos-code-implement`
+# Plan — rename `fgos-executing` → `fgos-coding-implement`
 
 ## Mode
 
@@ -72,7 +72,7 @@ just a note.
 | Doc rename + index cascade (D2) | Low — one file rename + one JSON index entry | `verify`'s `test -f` on the new doc path; index entry update is a plain text/JSON edit, no schema risk |
 | `docs/history/*`, `plans/*`, `plans/reports/*` full rewrite (D1 override) | Low-medium — largest file count (~130+), purely textual, but a missed file leaves a stale reference with no automated catch beyond `verify`'s repo-wide grep | `verify`'s `rg --hidden` content check already covers this — a missed file fails verify directly |
 
-**File touch order** (informational — `fgos-code-implement` still designs
+**File touch order** (informational — `fgos-coding-implement` still designs
 its own execution steps per this skill's "leave execution alone" rule):
 skill dir rename first (so the new name exists before anything references
 it), then the live code (`workflow-stage-graphs.mjs`, impact-checked),
@@ -97,5 +97,5 @@ No split. One honest piece of work — see "Chosen path" above.
 The item's own `verify` (locked during `clarify`, unchanged here):
 
 ```
-npm test && test -f .claude/skills/fgos-code-implement/SKILL.md && test -f .agents/skills/fgos-code-implement/SKILL.md && grep -q "^name: fgos-code-implement$" .claude/skills/fgos-code-implement/SKILL.md && grep -q "^name: fgos-code-implement$" .agents/skills/fgos-code-implement/SKILL.md && test -f docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md && grep -q "executing: .fgos-code-implement." src/state/workflow-stage-graphs.mjs && ! rg -l --hidden "fgos-executing" --glob "!node_modules" --glob "!.git" --glob "!.claude/worktrees/**" --glob "!.fgos/state.json" --glob "!.fgos/events.jsonl*" --glob "!docs/history/rename-fgos-executing-to-fgos-code-implement/**" . && ! git ls-files | grep "fgos-executing" | grep -v "^docs/history/rename-fgos-executing-to-fgos-code-implement/"
+npm test && test -f .claude/skills/fgos-coding-implement/SKILL.md && test -f .agents/skills/fgos-coding-implement/SKILL.md && grep -q "^name: fgos-coding-implement$" .claude/skills/fgos-coding-implement/SKILL.md && grep -q "^name: fgos-coding-implement$" .agents/skills/fgos-coding-implement/SKILL.md && test -f docs/how-to/smoke-test-fgos-coding-implement-with-a-trivial-item.md && grep -q "executing: .fgos-coding-implement." src/state/workflow-stage-graphs.mjs && ! rg -l --hidden "fgos-executing" --glob "!node_modules" --glob "!.git" --glob "!.claude/worktrees/**" --glob "!.fgos/state.json" --glob "!.fgos/events.jsonl*" --glob "!docs/history/rename-fgos-executing-to-fgos-coding-implement/**" . && ! git ls-files | grep "fgos-executing" | grep -v "^docs/history/rename-fgos-executing-to-fgos-coding-implement/"
 ```

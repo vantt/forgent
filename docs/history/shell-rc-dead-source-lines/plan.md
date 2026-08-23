@@ -73,7 +73,7 @@ so the "run fgos setup" prompt keeps firing. Treats the symptom.
 | Component | Risk | What would prove it |
 |---|---|---|
 | `--git-common-dir` resolves to main checkout from a linked worktree | **low — already proven** | Run in this very worktree during clarify: `git rev-parse --path-format=absolute --git-common-dir \| xargs dirname` → `/home/vantt/projects/forgentX`. Empirically confirmed, not assumed. |
-| Pre-existing main-checkout line must be recognized, not duplicated | **medium** | One of the 2 alive lines already points at `/home/vantt/projects/forgentX/scripts/fgos-shell-integration.sh`. After D2, `hasSourceLine` must match it and setup must report `alreadyConfigured` — never append a 42nd line. Proof point for `fgos-validating`: real rc fixture containing that exact line. |
+| Pre-existing main-checkout line must be recognized, not duplicated | **medium** | One of the 2 alive lines already points at `/home/vantt/projects/forgentX/scripts/fgos-shell-integration.sh`. After D2, `hasSourceLine` must match it and setup must report `alreadyConfigured` — never append a 42nd line. Proof point for `fgos-coding-validating`: real rc fixture containing that exact line. |
 | win32 branch not disturbed | **medium** | `detectRcFiles` returns PowerShell paths on win32 while `insertSourceLine` is bash/zsh-only by design (`shell-rc.mjs:10-14`). D3's decline path must not make the win32 detection throw. Proof point: unit test passing `platform: 'win32'`. |
 | `run()` HOME sandbox breaks unrelated CLI tests | **medium** | `test/cli/fgos.test.mjs:41` currently inherits `process.env` deliberately ("keeping every existing call site byte-identical"). Proof point: full `npm test` green, not just the setup tests. |
 | Doctor check-contract change | **low** | Grepped for consumers: only `bin/fgos.mjs:2518`, the `--pretty` renderer (`bin/fgos.mjs:2663`), and `test/setup/checks.test.mjs`. `merge.mjs:703,749`'s `check.passed` is `runGoalCheck`, unrelated. Confirmed, not assumed. |
@@ -143,10 +143,10 @@ which under D1 stays dirty until a human edits it — so `runGoalCheck`
 (`merge.mjs:748`) could never see it pass. `npm test` is the honest gate:
 the regression this item fixes is fully expressible as tests over a
 sandboxed `HOME` (D4), with no dependence on one machine's shell profile.
-Flagged here as a proof point for `fgos-validating`; this plan does not edit
+Flagged here as a proof point for `fgos-coding-validating`; this plan does not edit
 the field itself.
 
-## Validated at `fgos-validating` — READY WITH CONSTRAINTS
+## Validated at `fgos-coding-validating` — READY WITH CONSTRAINTS
 
 Reality gate: all five dimensions PASS. Mode, shape, and ordering unchanged.
 Baseline suite green before any change: **1827 tests, 1822 pass, 0 fail, 5

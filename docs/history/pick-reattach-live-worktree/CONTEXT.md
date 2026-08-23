@@ -8,7 +8,7 @@ working `tsk-598`.
 In scope: what happens when a session re-claims an item that was already
 claimed once, released back to `status: todo` by the claim-lock §3b
 release at the `decompose → executing` boundary
-(`src/intake/decompose.mjs`'s `releaseClaimOnExecuting`), and whose
+(`src/intake/plan.mjs`'s `releaseClaimOnExecuting`), and whose
 `fgw/<id>` branch — and often a live worktree checked out on it — still
 stands.
 
@@ -36,7 +36,7 @@ call sites.
 ## Pinned terms
 
 - **claim-lock §3b release** — `releaseClaimOnExecuting`
-  (`src/intake/decompose.mjs`) putting an item held at stage `decompose`
+  (`src/intake/plan.mjs`) putting an item held at stage `decompose`
   back to `status: todo` the moment it reaches `executing`, so the same or
   another session can claim it again for the executing phase on the same
   branch. Prose: `docs/specs/runner.md:163-168`.
@@ -101,7 +101,7 @@ call sites.
   --to blocked` + `take` detour costly: it resets the progress baseline to
   the live branch tip, discarding the §3b preservation `tsk-2zv` bought.
 - `rg reattach src bin` — no `reattach` verb or flag exists today; only
-  prose comments (`src/intake/decompose.mjs:287`, `bin/fgos.mjs:1557`).
+  prose comments (`src/intake/plan.mjs:287`, `bin/fgos.mjs:1557`).
 - `docs/how-to/claim-a-clarify-or-decompose-stage-item.md` — covers the
   fresh-claim case and states outright "not to resuming an item you
   already claimed". The natural home for D1's doc line.

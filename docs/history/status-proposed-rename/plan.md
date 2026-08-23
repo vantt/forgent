@@ -27,7 +27,7 @@
 - Giữ `proposed` vĩnh viễn + shim dịch 2 chiều trong `replay.mjs` — loại theo D4, vì miễn trừ 0019 làm rewrite rẻ hơn một shim sống mãi.
 - Đổi tên gắn nghĩa "merge" (`awaiting-merge`) — loại theo D1, sai bản chất domain-agnostic.
 
-**Ranh giới 2 pha — sửa sau verdict NOT READY của `fgos-validating` (trích `src/runner/merge.mjs:452,458`):**
+**Ranh giới 2 pha — sửa sau verdict NOT READY của `fgos-coding-validating` (trích `src/runner/merge.mjs:452,458`):**
 
 `merge.mjs` abort cứng bất kỳ diff nào của nhánh `fgw/<id>` chạm path dưới `.fgos/`
 (bằng chứng: `merge.mjs:452` lọc `stagedPaths` theo prefix `.fgos`, dòng 458 abort
@@ -106,7 +106,7 @@ ngoài item tsk-66l — nêu rõ cho người chạy Pha B, không tự ý sửa
 
 ## Risk map
 
-| Thành phần | Rủi ro | Điểm chứng minh (cho fgos-validating) |
+| Thành phần | Rủi ro | Điểm chứng minh (cho fgos-coding-validating) |
 |---|---|---|
 | Migration script đúng field-path, không blind replace | CAO | Dry-run diff trên bản sao kho thật trước khi ghi kho thật; xác nhận CHỈ field `status`/`work.move.to`/`work.move.from`/`outcome.actual.outcome` đổi — text tự do (title/description) chứa chữ "proposed" không bị đụng |
 | Migration đủ cả 3 kho, đúng phạm vi 0019 | CAO | Checklist tường minh: kho sống dùng chung, `dogfood-fixture/.fgos` (đã xác nhận tồn tại), `fgos-test-drive` tại `/home/vantt/projects/fgos-test-drive/.fgos` (đã xác nhận tồn tại, có `events.jsonl`); `test/fixtures/phase1-events.jsonl` byte-diff = rỗng (đã đo: 0 chỗ chứa `"proposed"`) |
@@ -129,6 +129,6 @@ npm test && npm run cli -- list | head -10
 
 ## Câu hỏi còn mở (kế thừa từ CONTEXT.md, chưa cần chặn kế hoạch)
 
-- ~~Đường dẫn thật của kho `fgos-test-drive`~~ — đã xác nhận: `/home/vantt/projects/fgos-test-drive/.fgos` (giải quyết tại `fgos-validating`).
-- Có cần 1 test migration riêng (giống `test/state/backward-compat.test.mjs`) khoá hành vi replay sau rewrite hay không — quyết định cụ thể để `fgos-code-implement` cân nhắc.
-- ~~Cách nối Pha B vào main-checkout-lock của Pha A~~ — không cần nữa: đo lại (`fgos-validating`, vòng 2) xác nhận rủi ro khe hở THẤP và tự-chữa-lành, không cần cơ chế khoá.
+- ~~Đường dẫn thật của kho `fgos-test-drive`~~ — đã xác nhận: `/home/vantt/projects/fgos-test-drive/.fgos` (giải quyết tại `fgos-coding-validating`).
+- Có cần 1 test migration riêng (giống `test/state/backward-compat.test.mjs`) khoá hành vi replay sau rewrite hay không — quyết định cụ thể để `fgos-coding-implement` cân nhắc.
+- ~~Cách nối Pha B vào main-checkout-lock của Pha A~~ — không cần nữa: đo lại (`fgos-coding-validating`, vòng 2) xác nhận rủi ro khe hở THẤP và tự-chữa-lành, không cần cơ chế khoá.

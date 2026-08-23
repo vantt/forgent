@@ -566,3 +566,183 @@ nguyên định dạng hiện tại, không đầu tư đổi tên/migrate (khun
 4. **CTR001 live.** Envelope port đầu tại STR14 (`submit`), nay đủ trên MỌI verb qua một cửa in duy nhất, kèm sổ verb máy-đọc `--help --json` (STR37, per D b2d18cc7/b0da87aa).
 5. **Registry-manifest + 2 phép kiểm máy (§9.3).** **Chốt:** đứng riêng **trước
    S2** — là PBI **STR20** trong backlog; nó canh mọi feature sau.
+
+## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
+
+Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4, D5) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
+
+
+### 0010 — Bản đồ kiến trúc là bản chuẩn
+
+**Ngày:** 2026-07-16 · **Trạng thái:** chốt
+
+#### Bối cảnh
+
+Hệ chuẩn bị nhận một loạt thành phần mới (S2 friction capture, STR14–STR17 lifecycle
+stages, STR8 signal). Trước đó các khái niệm kiến trúc nằm rải trong tài liệu bàn
+luận (ba trục ngang hàng, người đọc tự hợp nhất, tên va chạm, contract không tên).
+`docs/architecture-map.md` được viết làm đề xuất hợp nhất, qua hai vòng phản biện
+có kiểm chứng trên code: vòng 1 soi tự-nhất-quán (chiều phụ thuộc, maturity nói
+thật), vòng 2 soi không-gian-âm (sổ thiếu module, chỗ đứng trong hệ docs) — và
+việc dò tay toàn bộ đồ thị import khi viết lại đã phát hiện thứ tự tầng ban đầu
+sai giữa Domain và Infra.
+
+#### Quyết định
+
+1. **`docs/architecture-map.md` v0.2 là bản chuẩn kiến trúc của fgOS.** Khung
+   chính: 5 tầng `Entry → Use-case → Infra → Domain → Kernel`, phụ thuộc một
+   chiều xuống (được nhảy tầng), đo trên đồ thị import thật. Host Adapter là ổ
+   cắm (port + config), không phải tầng import. Hai lớp phủ: physics (5 từ dành
+   riêng `store/event/state/signal/run`) và authority (6 vai). Hai sổ đăng ký:
+   component (14/14 module, tách row component/slice) và contract (C1–C9).
+2. **Nghi thức "thẻ căn cước trước code"** (map §9.1) có hiệu lực như **phụ lục
+   definition-of-done**: một module/slice mới phải có row trong sổ §6 trước khi
+   có code. Không sửa văn bản luật L5 tại chỗ, không mở luật mới — khi L5 tới
+   ngưỡng xem lại thì gộp chính thức lúc supersede.
+3. **Năm câu hỏi mở của bản đồ chốt theo đề xuất:** (a) nợ C2 một-cửa-ghi
+   per-process giải ở PBI riêng trước STR6 fan-out, không chặn STR15; (b) xử lý L5
+   như trên; (c) `dispatch.mjs` giữ một file ở Infra, chỉ tách khi STR8/STR16 đòi;
+   (d) C1 envelope đợi STR14; (e) registry-manifest + 2 phép kiểm máy (chiều
+   import + đủ sổ) là **PBI STR20, đứng trước S2-friction**.
+4. Bản đồ nối vào đường đọc chuẩn: `docs/specs/reading-map.md` + mục lục README.
+   Tài liệu bàn luận gốc ở xưởng hạ thành thinking record.
+
+#### Hệ quả
+
+- Mọi feature mới đi qua nghi thức 3 bước của map §9 trong exploring/planning;
+  registry không drift vì STR20 giao cho máy giữ (verify đỏ khi import ngược tầng
+  hoặc file thiếu row).
+- Đổi bản đồ = decision record mới supersede 0010 + nâng version, không sửa ngầm.
+- Nợ có tên còn mở: C2 cross-process lease (trước STR6), C6 designed-chưa-code,
+  C3 partial (3 field RUN_CONTRACT vay khi fan-out).
+
+### 0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009
+
+#### Bối cảnh
+
+`docs/id-systems-audit.md` (STR47) rà soát toàn bộ hệ đặt tên/đánh mã đang chạy
+song song trong repo và phát hiện contract registry (`architecture-map.md`
+§7) là hệ duy nhất còn dùng định danh một-chữ-cái-trần (`C1`-`C9`) — khác mọi
+hệ đã có tiền tố 3-chữ tự khai type (`TSK`, `ADR`, `RUL`, `STR`). Một định
+danh trần như `C2` không tự nói nó là contract khi xuất hiện lẻ trong chat,
+git diff, hay log — người đọc phải tra ngược ngữ cảnh. Audit #6 chốt hướng
+đổi sang tiền tố `CTR` (contract), cùng quy ước 3-digit zero-pad với `RUL<n>`
+(ví dụ `RUL042`) để số lượng contract có thể vượt quá 9 mà không đổi độ rộng
+định danh giữa chừng — ví dụ khoá trong audit: `CTR009`.
+
+Backlog `STR54` submit hướng này thành việc thi công cụ thể: đổi mọi citation
+`C1`-`C9` genuine trong 7 file + `architecture-map.md` chính nó, không đổi ý
+nghĩa/ranh giới/maturity của bất kỳ contract nào.
+
+#### Quyết định
+
+1. **Định danh contract đổi từ `C<n>` (một chữ số, không pad) sang `CTR<n>`
+   3-digit zero-padded** — `C1` → `CTR001`, …, `C9` → `CTR009`. Tiền tố `CTR`
+   bake-in type vào chính chuỗi id, tự khai "đây là contract" ở mọi nơi id
+   xuất hiện, không phụ thuộc tầng hiển thị nào ghép nhãn hộ.
+2. **Đây là đổi tên thuần (rename), không đổi nghĩa.** `CTR001` là cùng một
+   contract với `C1` trước đây — cùng ranh giới, cùng hợp đồng, cùng
+   maturity. Không có contract nào được thêm/bớt/định nghĩa lại bởi record
+   này.
+3. **`architecture-map.md` là bản chuẩn (record 0010) của registry này** —
+   đổi tên áp dụng trước tiên ở đó (§6, §7, hai sơ đồ mermaid, changelog,
+   câu hỏi mở), theo đúng nghi thức đổi bản đồ của chính nó (§9 luật 5: qua
+   decision record + nâng version, không sửa ngầm) — nâng v0.4 → v0.5.
+4. **Mọi nơi khác cite `C1`-`C9`** (specs, `platform-foundations.md`,
+   `docs/decisions/0000-index.md`, `docs/backlog.md`) đổi theo cùng quy ước,
+   trừ các chỗ đã xác nhận không phải citation của registry này (ví dụ một
+   bảng verdict nội bộ không liên quan dùng trùng ký hiệu `C1`/`C2`/`C3`) —
+   những chỗ đó giữ nguyên, không đổi.
+
+#### Hệ quả
+
+- **0010 không bị supersede** — 0015 chỉ đổi cách viết định danh của registry
+  đã khoá ở 0010, không đổi cấu trúc hay nội dung registry.
+- **Không đổi schema, không đổi code** — đây là rename thuần văn bản trong
+  tài liệu; không có contract nào đổi hành vi.
+- **Nhất quán với các hệ đã đổi trước đó** (`TSK<hash>` cho work id, `ADR<n>`
+  cho decision record, `RUL<n>` cho business rule) — hoàn tất mảnh #6 trong
+  bảng audit `id-systems-audit.md`.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0017 — Đóng audit hệ id/tên gọi (STR47)
+
+#### Bối cảnh
+
+`docs/id-systems-audit.md` (STR47, thảo luận đầu 2026-07-18) rà soát 13 hệ
+id/tên gọi song song đang sống trong workshop + sản phẩm fgOS, tách thành hai
+nhóm: 6 hệ **fgOS — sản phẩm vĩnh viễn** (#1-#6) và 7 hệ **bee — giàn giáo
+tạm** (#7-#13), theo khung quyết định `0004-pham-vi-va-non-goal.md` (fgOS
+chạy song song, không thay thế bee cho tới ngưỡng-có-tên). Sáu hướng đổi
+định dạng mà audit chốt cho nhóm fgOS (#1, #3, #4, #5, #6 — #2 giữ nguyên)
+đã lần lượt được submit thành các PBI riêng và thi công xong:
+
+- STR53 — `work.id` bỏ slug, đổi sang `tsk-<hash>`
+- STR54 — `C1`-`C9` → `CTR<n>` (decision `0015`)
+- STR55 — chuẩn hoá trích dẫn rút gọn ADR → `ADR<n>`
+- STR56 — `R#` → `RUL<n>`
+- STR57 — Story (đổi tên khỏi "PBI") `P<n>` → `STR<n>`
+- STR58 — script `next-doc-id` cho họ "next free integer thủ công"
+
+Cả sáu đều mang trạng thái `done` trong `docs/backlog.md`. Nhóm bee (#7-#10)
+— D-hex/D-local shape collision, cell-id, feature slug — chưa từng được bàn
+tới điểm chốt trong bản DRAFT 2026-07-18. Record này đóng audit: khoá hướng
+cho #7-#10, sửa `id-systems-audit.md` khỏi các chỗ đã trôi khỏi thực tế
+shipped (draft viết trước khi STR53-STR58 thi công), và trả lời câu hỏi CoS
+gốc của STR47 — giữ đa hệ có chủ đích hay hợp nhất.
+
+#### Quyết định
+
+1. **Giữ đa hệ có chủ đích — không hợp nhất.** Sáu hệ fgOS (#1-#6) và bảy hệ
+   bee (#7-#13) tiếp tục sống song song, mỗi hệ phục vụ đúng một tầng: fgOS
+   là sản phẩm vĩnh viễn (tự sinh/tự đọc không phụ thuộc bee), bee là giàn
+   giáo tạm cho giai đoạn xây fgOS (khung: `0004-pham-vi-va-non-goal.md`).
+   Ranh giới dùng-khi-nào của cả 13 hệ được tài liệu hoá tại
+   `docs/id-systems-audit.md` (nguồn) và `docs/architecture-map.md` Phụ lục B
+   (bản tóm tắt, §12 trỏ vào).
+2. **#7/#8 (D-hex global vs `D<n>` local) — không rename, khoá luật citation.**
+   Thay vì đổi D-local thành `L<n>` hay bỏ hẳn bảng cục bộ, luật được khoá:
+   **D-local không bao giờ được trích dẫn ngoài file `CONTEXT.md` gốc của
+   nó.** D-local vốn đã single-file trong thực tế — rủi ro thật chỉ là kỷ
+   luật trích dẫn, không phải hình dạng chữ `D` dùng chung; luật này đóng
+   đúng rủi ro đó với chi phí migrate bằng 0.
+3. **#9 (cell-id) và #10 (feature slug) — giữ nguyên, không format mới.**
+   Cả hai convention-scoped (không phải enforced bằng regex chặt): cell-id
+   (`.bee/bin/lib/cells.mjs` `ID_PATTERN`) chỉ có nguy cơ trùng trong PHẠM VI
+   một feature và chưa từng va chạm thật; feature slug có tính duy nhất nhờ
+   hiệu ứng phụ của cửa tạo worktree (`bee worktree new` từ chối branch/dir
+   đã tồn tại), không phải nhờ định dạng id. Theo khung "giàn giáo tạm", cả
+   hai không đáng đầu tư thêm.
+4. **Phụ lục boundary cuối cùng đặt tại `docs/architecture-map.md`** (Phụ lục
+   B mới, §12 thêm một dòng trỏ vào), không phải `docs/specs/reading-map.md`.
+   `architecture-map.md` đã là nhà của sổ đăng ký anh em (contract registry
+   §7, đổi tên bởi decision `0015`) — cùng một họ tài liệu. `reading-map.md`
+   là bản đồ locator thuần cho toàn bộ tài liệu khác trong repo (không có
+   mục `##` nào, mỗi dòng một bullet trỏ ra ngoài) — giữ nguyên vai trò đó,
+   chỉ sửa một dòng mô tả đã trôi (§ dưới).
+5. **`id-systems-audit.md` được cập nhật khỏi trạng thái DRAFT sang FINAL**,
+   sửa mọi chỗ đã trôi khỏi thực tế shipped: §1 dòng #1 (định dạng đúng là
+   `tsk-<hash>`, chữ thường + gạch nối — không phải `TSK<hash>` như draft đề
+   xuất ban đầu), §4 (6 dòng migrate đổi từ "chốt hướng/chưa migrate" sang
+   "đã migrate" kèm PBI đóng), câu "Chưa áp dụng gì vào code/docs thật" (sai
+   sau khi STR53-STR58 chạy xong), và frontmatter (`status: DRAFT` →
+   `FINAL`). `docs/specs/reading-map.md`'s mô tả `classify.mjs` (`generateId
+   (slug+hash chống trùng)`) cũng sửa theo cùng lý do — cùng gốc trôi thời
+   gian (draft viết 2026-07-18, trước khi migration chạy).
+
+#### Hệ quả
+
+- **STR47 đóng** (`docs/backlog.md`: `in-flight` → `done`) — không có
+  migration mới nào mở ra từ record này; mọi migration mà audit từng đề
+  xuất (#1, #3, #4, #5, #6) đã thi công xong trước record này qua
+  STR53-STR58.
+- **Không đổi schema, không đổi code.** Đây là record đóng-audit + sửa tài
+  liệu trôi thời gian; không hệ id nào đổi hành vi runtime bởi chính record
+  này (các hệ #1/#3/#4/#5/#6 đã đổi hành vi từ trước, qua các PBI riêng của
+  chúng — record này chỉ cập nhật tài liệu cho khớp).
+- **0004 và 0015 không bị supersede** — 0017 chỉ đóng vòng lặp mà 0004 mở ra
+  (khung giữ-đa-hệ) và xác nhận 0015 (CTR rename) là một trong sáu migration
+  đã hoàn tất, không đổi nội dung của cả hai.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

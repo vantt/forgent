@@ -42,4 +42,4 @@ implied).
 - None. All three decisions above (location, shape, verify) fully bound the
   implementation — nothing implementation-specific (styling, additional
   files, etc.) was asked for, so there is nothing left to hand to
-  `fgos-planning` beyond confirming this is simple enough to skip a split.
+  `fgos-coding-planning` beyond confirming this is simple enough to skip a split.

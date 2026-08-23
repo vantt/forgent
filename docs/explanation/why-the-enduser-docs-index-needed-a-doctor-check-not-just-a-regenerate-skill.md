@@ -7,7 +7,7 @@ source_capture_ids: [tsk-1m0]
 # Why `docs/enduser-docs-index.json` needed a doctor check, not just a regenerate skill
 
 `fgos-indexing` exists specifically to regenerate
-`docs/enduser-docs-index.json` after every `fgos-compounding` write — the
+`docs/enduser-docs-index.json` after every `fgos-coding-compounding` write — the
 skill's whole job is keeping the index current. It wasn't being run, and
 nothing noticed.
 

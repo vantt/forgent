@@ -115,4 +115,4 @@ chưa ai xử lý.
   guard `acquireMainCheckoutLock` (mirror guard 2), hay giữ nguyên vì có
   lý do chưa lộ ra (ví dụ: worktree commit vẫn có thể tình cờ trùng thời
   điểm với `approve`'s commit lên main theo cách khác)? Không phải việc
-  của report này quyết — để `fgos-exploring` cho tsk-sir tự khóa.
+  của report này quyết — để `fgos-coding-exploring` cho tsk-sir tự khóa.

@@ -35,7 +35,7 @@ contract-compatibility proof this item actually needs.
 
 `fgos tool query --capability impact-analysis --status present` returned
 the `gitnexus` provider as `present` → **full**. Per `CLAUDE.md`'s gate,
-`fgos-code-implement` MUST run `impact({target: "isAlreadyMerged",
+`fgos-coding-implement` MUST run `impact({target: "isAlreadyMerged",
 direction: "upstream"})` and `impact({target: "mergeRunnerItemLocked",
 direction: "upstream"})` before editing either function, and report the
 blast radius before proceeding.
@@ -65,9 +65,9 @@ design instead of shipping the fix that already has a locked shape.
 
 ### Risk map
 
-| # | Component | Risk | Proof point (owned by `fgos-validating`) |
+| # | Component | Risk | Proof point (owned by `fgos-coding-validating`) |
 |---|-----------|------|-------------------------------------------|
-| 1 | Reproduction of the false-positive | **High** — this session's code reading of `isAlreadyMerged` (`git merge-base --is-ancestor <branch> HEAD`) shows the check is cryptographically sound for the two already-tested cases (genuine prior merge; unrelated post-merge regression). No specific trigger for a *false* positive was found on file for this item (no `view.discovery` verdict, no decision-log entry beyond this session's D1-D3, item description is the only record). This is the plan's central open risk — the exact reproducing scenario is not yet known. | Attempt to construct a failing test in `test/runner/merge.test.mjs` that makes `isAlreadyMerged` return `true` while HEAD's tree does *not* actually reflect all of branch's committed content (candidate shapes to try: branch ref moved/rebased after an earlier partial merge; a merge commit landed via a route where `is-ancestor` reads true through incidental history rather than a real completed merge of *this* branch's current tip). If, after a genuine attempt, no such scenario reproduces, `fgos-validating` must say so plainly and this item's fix becomes a defense-in-depth hardening (an explicit invariant assertion) rather than a literal bug repro — never silently reclassify the item as "no bug" without surfacing that finding. |
+| 1 | Reproduction of the false-positive | **High** — this session's code reading of `isAlreadyMerged` (`git merge-base --is-ancestor <branch> HEAD`) shows the check is cryptographically sound for the two already-tested cases (genuine prior merge; unrelated post-merge regression). No specific trigger for a *false* positive was found on file for this item (no `view.discovery` verdict, no decision-log entry beyond this session's D1-D3, item description is the only record). This is the plan's central open risk — the exact reproducing scenario is not yet known. | Attempt to construct a failing test in `test/runner/merge.test.mjs` that makes `isAlreadyMerged` return `true` while HEAD's tree does *not* actually reflect all of branch's committed content (candidate shapes to try: branch ref moved/rebased after an earlier partial merge; a merge commit landed via a route where `is-ancestor` reads true through incidental history rather than a real completed merge of *this* branch's current tip). If, after a genuine attempt, no such scenario reproduces, `fgos-coding-validating` must say so plainly and this item's fix becomes a defense-in-depth hardening (an explicit invariant assertion) rather than a literal bug repro — never silently reclassify the item as "no bug" without surfacing that finding. |
 | 2 | Integrity-check design (D1) | Medium | New check must reject the constructed failure case from risk #1 while keeping both existing `isAlreadyMerged` tests (`:628` idempotent-merged, `:643` verify-fail-on-regression) passing unchanged. |
 | 3 | Contract compatibility | Medium | Every existing caller of `mergeRunnerItem`'s outcome (`bin/fgos.mjs`'s approve path) must keep working against `'merged'`/`'conflict'`/`'verify-fail'`/`'fgos-write-rejected'` unchanged — an added check should surface as one of these existing outcomes (most likely `'verify-fail'` or a documented new sub-case) never a silently different shape. |
 | 4 | Regression-test placement | Low | `test/runner/merge.test.mjs` already has an established pattern for this exact fast path (lines 622-656) — extend it there, not a new file. |
@@ -90,7 +90,7 @@ of work — proceeds as itself, not decomposed into child items.
 
 **Verify command**: `node --test test/runner/merge.test.mjs`
 
-## Assumptions (unproven, flagged for `fgos-validating`)
+## Assumptions (unproven, flagged for `fgos-coding-validating`)
 
 - That a genuine false-positive trigger for `isAlreadyMerged` exists and
   is reproducible in a unit test (risk #1) — not yet proven; this plan's
@@ -100,7 +100,7 @@ of work — proceeds as itself, not decomposed into child items.
   a new outcome value — reasonable given the existing outcome enum, but
   not verified against the as-yet-unknown exact trigger shape.
 
-## Feasibility validation (`fgos-validating`, this session)
+## Feasibility validation (`fgos-coding-validating`, this session)
 
 Both assumptions above are now resolved with real, executed evidence —
 neither is "unproven" anymore.
@@ -109,12 +109,12 @@ neither is "unproven" anymore.
 
 | Dimension | Result | Evidence |
 |---|---|---|
-| Mode fit | PASS | high-risk confirmed correct — the bug is real, not hypothetical (see repro below), and still carries the same 4 flags from `fgos-planning`. |
+| Mode fit | PASS | high-risk confirmed correct — the bug is real, not hypothetical (see repro below), and still carries the same 4 flags from `fgos-coding-planning`. |
 | Repo fit | PASS | Every path/function this plan cites was read directly: `isAlreadyMerged` (`src/runner/merge.mjs:682-692`), `mergeRunnerItemLocked` (`:694-707`), `changedFiles` (`:316-330`), existing tests (`test/runner/merge.test.mjs:622,628,643`). |
 | Assumptions | PASS | See "Central risk #1 — proven" below. |
 | Smaller path | PASS | No smaller mode overlooked. The confirmed fix (content-diff check via the already-existing `changedFiles` primitive) is well-contained, but the surrounding proof (contract compatibility, not regressing 2 existing tests, audit implications) still legitimately needs high-risk's fuller map. |
 | Proof surface | PASS | `node --test test/runner/merge.test.mjs` run for real just now: **51/51 passing**, confirmed baseline before any fix lands. |
-| Impact-analysis posture | PASS | Re-queried `fgos tool query --capability impact-analysis --status present` this session — still returns `gitnexus`/`present` → `full`, matching this plan's recorded posture exactly (no drift since `fgos-planning` ran). |
+| Impact-analysis posture | PASS | Re-queried `fgos tool query --capability impact-analysis --status present` this session — still returns `gitnexus`/`present` → `full`, matching this plan's recorded posture exactly (no drift since `fgos-coding-planning` ran). |
 
 ### Central risk #1 — proven, not hypothetical
 

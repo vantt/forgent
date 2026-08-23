@@ -104,7 +104,7 @@ Two artifacts, one item:
 
 | Component | Risk | What would prove it |
 |---|---|---|
-| Verdict correctness per PBI row (is it *really* resolved?) | **Medium** — the item exists because plausible-looking records were wrong twice in one day | Each `resolved`/`partial` verdict cites a `path:line` read in this worktree, not a state field or a prior report. `fgos-validating` spot-proves a sample, starting with the item's own worked case `p-73d99989` → `src/runner/worktree.mjs:201`. |
+| Verdict correctness per PBI row (is it *really* resolved?) | **Medium** — the item exists because plausible-looking records were wrong twice in one day | Each `resolved`/`partial` verdict cites a `path:line` read in this worktree, not a state field or a prior report. `fgos-coding-validating` spot-proves a sample, starting with the item's own worked case `p-73d99989` → `src/runner/worktree.mjs:201`. |
 | Checker parsing `docs/backlog.md` | **Medium** (upgraded from Low at the reality gate — proven, not hypothetical) | Run it against today's file: it must find exactly 30 `proposed` ids. See the binding constraint below. |
 | Scope creep into flipping PBI status | Low | Footprint contains no backlog/`.bee` write path; the deliverable is additive only. |
 

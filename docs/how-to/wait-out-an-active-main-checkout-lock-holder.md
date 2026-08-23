@@ -117,6 +117,34 @@ boundary.
 - No fairness/queueing between multiple waiters — this only lets one
   waiter outlast one active holder's TTL snapshot.
 
+## Update (`tsk-328`): `/fgOS:merge-next` and `/fgOS:merge-loop` now forward `--wait`/`--no-wait`/`--timeout` too
+
+The "no automated caller... passes `--wait` today" bullet above no longer
+covers every skill-level caller. `fgos merge next` (the CLI verb) already
+recursed into `approve` and already forwarded `--wait <ms>`/`--no-wait`/
+`--timeout <ms>` to it — the capability already existed at the CLI layer;
+only the `/fgOS:merge-next` and `/fgOS:merge-loop` skill wrappers never
+exposed it, silently ignoring any such flags in `$ARGUMENTS`.
+
+Both wrappers now parse `$ARGUMENTS` for exactly these three flags and
+forward whichever were present, verbatim, onto the underlying `merge
+next` call:
+
+```
+/fgOS:merge-next --wait 300000
+```
+
+Omitting all three keeps today's default lock-wait behavior byte-
+identical — this is additive, not a behavior change for a caller passing
+nothing. `fgos catchup` is explicitly unaffected: it never acquires
+`.fgos/main-checkout.lock` in current code, so it was never in scope for
+this passthrough.
+
+Use this when an unattended `/fgOS:merge-loop` run (or a person driving
+`/fgOS:merge-next` by hand) hits sustained lock contention and needs to
+widen the retry budget without dropping to the raw `fgos merge next
+--wait <ms>` CLI call directly.
+
 ## Related
 
 - `docs/how-to/clear-a-stuck-main-checkout-lock.md` — the stale/dead-lock

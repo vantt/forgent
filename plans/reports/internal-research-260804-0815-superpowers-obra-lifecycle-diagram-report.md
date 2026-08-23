@@ -82,7 +82,7 @@ flowchart TD
 ### 4.1 Giải thích dễ hiểu từng dòng (ví dụ cụ thể)
 
 - **Trigger:** fgOS có 1 ô dữ liệu `stage` trên item — code tra bảng
-  `{clarify: fgos-exploring}` như tra từ điển, không cần nghĩ. superpowers
+  `{clarify: fgos-coding-exploring}` như tra từ điển, không cần nghĩ. superpowers
   không có ô nào cả — mỗi skill tự có 1 đoạn "khi nào tôi nên chạy", và
   chính AI phải tự đọc yêu cầu rồi tự phán có nên gọi skill này không —
   như thủ thư đoán sách bằng cảm nhận, không tra mã số.
@@ -165,12 +165,12 @@ mới — là cơ chế `tsk-27y` đã xây, chỉ cần LUÔN đi đúng nhánh
 flowchart TD
     Start(["Cần chuyển stage:<br/>clarify to decompose<br/>hoac decompose to executing"]) --> Q1{"Đang đi qua FSM thật không?<br/>(pick to routing to coding-driving)"}
 
-    Q1 -->|"CO<br/>fgos-exploring/planning/validating"| Live["Session song tu doc:<br/>description goc, related items that,<br/>Q&amp;A voi nguoi, lich su verdict cu<br/>+ tu scout (rg/Read/WebSearch/Task,<br/>KHONG gioi han so luot)"]
+    Q1 -->|"CO<br/>fgos-coding-exploring/planning/validating"| Live["Session song tu doc:<br/>description goc, related items that,<br/>Q&amp;A voi nguoi, lich su verdict cu<br/>+ tu scout (rg/Read/WebSearch/Task,<br/>KHONG gioi han so luot)"]
 
     Q1 -->|"KHONG<br/>headless fgos-runner sweep,<br/>hoac goi tay /fgOS:discover le"| Blind1["Goi bin/fgos.mjs discover/decompose<br/>KHONG kem --verdict"]
 
     Live --> Verdict["Session tu chot verdict<br/>(clear/unclear, pass-through/decompose)"]
-    Verdict --> CallVerb["fgos discover --verdict clear --verify '...'<br/>hoac<br/>fgos decompose --verdict pass-through --reason '...'"]
+    Verdict --> CallVerb["fgos discover --verdict clear --verify '...'<br/>hoac<br/>fgos plan --verdict pass-through --reason '...'"]
 
     CallVerb --> Resolve["resolveDiscovery / resolveDecompose<br/>(discovery.mjs / decompose.mjs)"]
     Blind1 --> Resolve
@@ -205,11 +205,11 @@ kiểm tra đúng 1 điều kiện này để chọn nhánh.
 tới `Q2 = CÓ`:**
 
 1. Luôn để item đi qua đúng cửa `fgos-routing` → `fgos-coding-driving` →
-   `fgos-exploring`/`fgos-planning`/`fgos-validating` (nhánh `Q1 = CÓ`).
+   `fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating` (nhánh `Q1 = CÓ`).
    3 skill này đã tự động gọi `--verdict` sẵn (code đã xác nhận trước:
-   `fgos-exploring/SKILL.md:237`, `fgos-validating/SKILL.md`'s Gate
+   `fgos-coding-exploring/SKILL.md:237`, `fgos-coding-validating/SKILL.md`'s Gate
    section) — không cần sửa gì thêm, chỉ cần KHÔNG bỏ qua đường này.
-2. Tránh gọi `/fgOS:discover <id>`/`/fgOS:decompose <id>` như 1 lệnh lẻ,
+2. Tránh gọi `/fgOS:discover <id>`/`/fgOS:plan <id>` như 1 lệnh lẻ,
    tách khỏi luồng FSM (dù đang ngồi trong agent-terminal thật) — wrapper
    skill đó tự nó không suy luận trước, luôn rơi vào `Q2 = KHÔNG` (đã xác
    nhận: `discover/SKILL.md` không hề truyền `--verdict`).

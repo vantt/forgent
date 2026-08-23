@@ -92,7 +92,7 @@ chuỗi" framing, same shape `tsk-4eu` used for this exact area):
 4. Update the one existing test that breaks (`test/runner/
    loop.test.mjs:309-343`): widen the closed-key `rest` assertion to
    include `command: process.execPath` (this test's fixture dispatches
-   through `fgos-code-implement`, whose resolved `command` and `provider`
+   through `fgos-coding-implement`, whose resolved `command` and `provider`
    are both `process.execPath` in this fixture — not the differing-value
    case, that's covered by the new regression test below).
 5. Add two new pinned tests:
@@ -123,7 +123,7 @@ Impact-analysis capability gate (`CLAUDE.md`): `fgos tool query
 BUT its index (`lastCommit: 19bc5e4`) is 16 commits behind this branch's
 base HEAD, including `987c132` (tsk-4eu) which touched `src/runner/
 dispatch.mjs` itself — the exact file this item edits. Posture:
-**degraded** — `fgos-code-implement` must still run `impact()` per
+**degraded** — `fgos-coding-implement` must still run `impact()` per
 `CLAUDE.md`'s MUST rules but treat that evidence as weak and name the gap;
 this plan's own "Verified against the real repo" section above already
 cross-checked every touched line by direct read against the current file

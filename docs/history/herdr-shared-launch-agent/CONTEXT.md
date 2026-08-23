@@ -38,7 +38,7 @@ call needed.
 
 | ID | Decision |
 |----|----------|
-| D1 | `--dangerously-skip-permissions` is the default for every agent this function launches (matches the item's own description), but an env/config escape hatch must exist so an operator can turn it off for a more cautious launch mode. Exact env var/config key name is `fgos-planning`'s call. |
+| D1 | `--dangerously-skip-permissions` is the default for every agent this function launches (matches the item's own description), but an env/config escape hatch must exist so an operator can turn it off for a more cautious launch mode. Exact env var/config key name is `fgos-coding-planning`'s call. |
 | D2 | This function (or the dashboard's own startup path) renames its own containing tab to `fg:cockpit` if it isn't already — an active responsibility of this item, not an assumed operator convention. No existing code sets any tab label today (`herdr-plugin.toml` only declares `placement = "overlay"`, no tab-naming logic anywhere). |
 | D3 | Renaming the *new agent pane itself* to the locked pane-label convention is **not** this function's job — it is already delivered by `/fgOS:pick`'s own flow (`plugins/fgOS/skills/pick/SKILL.md` step 3, via `fgOS:terminal`'s rename) once the newly-launched session runs the typed `/fgOS:pick <task-id>` prompt. This function's own responsibility ends at correct tab/group placement; it never calls `herdr pane rename` itself, and never needs a separate "register with tsk-4zo" step — tsk-4zo's periodic scan (`herdr pane list`) already finds any correctly-labeled pane on its own. |
 
@@ -56,7 +56,7 @@ call needed.
   skip-permissions flag, no tab-layout awareness) is the function this
   item extends into that shared shape — not a second, parallel function
   left alongside the old one. Exact code-level shape (extend in place vs.
-  new module) is `fgos-planning`'s call.
+  new module) is `fgos-coding-planning`'s call.
 
 ## Scout evidence
 
@@ -102,7 +102,7 @@ call needed.
 ## Deferred (out of scope, noted not absorbed)
 
 - Exact env var/config key name for D1's skip-permissions escape hatch —
-  implementation detail, `fgos-planning`'s call.
+  implementation detail, `fgos-coding-planning`'s call.
 - Exact split-call sequence to produce a 2×2 corner grid from herdr's
   2-way `pane split --direction right|down` primitive — implementation
   detail for planning.

@@ -82,7 +82,7 @@ verify field):
   xanh`, i.e. just "does `npm test` pass", none of the specific
   fixture/count assertions are actually machine-checked). Per that exact
   precedent, this item's `verify` field should be corrected to a real
-  single command during Implement/Verify (`fgos-code-implement`), not
+  single command during Implement/Verify (`fgos-coding-implement`), not
   guessed here — flagged as a known follow-up for that stage, not a gap
   in this plan's own shape.
 - No test file needs new cases: the checker's pure functions

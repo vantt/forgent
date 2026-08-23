@@ -34,7 +34,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { resolveWriterIdentity } from '../runner/session-identity.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
 
 export const INVOCATION_FAULT_LOG_BASENAME = 'invocation-faults.jsonl';
 

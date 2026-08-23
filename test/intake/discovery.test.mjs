@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { resolveDiscovery, RETIRED_P14_PLACEHOLDER, FALLBACK_VERIFY } from '../../src/intake/discovery.mjs';
+import { resolveDiscovery, RETIRED_P14_PLACEHOLDER, FALLBACK_VERIFY, classificationPatchFromVerdict, assertCallerClassification } from '../../src/intake/discovery.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
@@ -61,7 +61,10 @@ function sampleWork(overrides = {}) {
     // fixture literal -- resolveDiscovery's verify-overwrite guard treats
     // any OTHER string as "already real" and protects it.
     verify: RETIRED_P14_PLACEHOLDER,
-    stage: 'clarify',
+    // tsk-qod D1/D2: `clarify` is retired as a stage entirely for the coding
+    // domain -- `discovery` (`stages[0]`) is the real entry point a fresh
+    // item now starts at, so that is what this default fixture represents.
+    stage: 'discovery',
     ...overrides,
   };
 }
@@ -84,7 +87,7 @@ test('resolveDiscovery with no callerVerdict, no locked CONTEXT.md, and role "ru
   assert.equal(result.outcome, 'noop');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'clarify');
+  assert.equal(view.work['item-x'].stage, 'discovery');
   assert.equal(view.work['item-x'].status, 'todo');
 });
 
@@ -123,7 +126,7 @@ function mkLockedContextFixture(storeDir, content = '# CONTEXT\n\nD1: locked.\n'
   return path.basename(featureDir);
 }
 
-test('resolveDiscovery advances to discovery when docsRef points at a real, non-empty CONTEXT.md, with no verdict required (tsk-4b2 D3)', () => {
+test('resolveDiscovery advances to planning when docsRef points at a real, non-empty CONTEXT.md, with no verdict required (tsk-30v D2/D6: trust-signal skip is a clear verdict, skips exploring)', () => {
   const storeDir = tmpStoreDir();
   const docsRef = mkLockedContextFixture(storeDir);
   addWork(storeDir, sampleWork({ docsRef }));
@@ -133,7 +136,7 @@ test('resolveDiscovery advances to discovery when docsRef points at a real, non-
   assert.equal(result.verdict.skipped, true);
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'discovery');
+  assert.equal(view.work['item-x'].stage, 'planning');
   assert.equal(view.discovery['item-x'].length, 1);
   assert.equal(view.discovery['item-x'][0].clear, true);
   const decisions = view.decisionsById?.['item-x'] ?? [];
@@ -184,6 +187,22 @@ test('resolveDiscovery skip path preserves an existing real work.verify instead 
 
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].verify, 'node --test test/real-locked-item.test.mjs');
+});
+
+test('resolveDiscovery skip path treats a free-text "chưa xác định —" placeholder as fake, not real (tsk-13b: pattern match, not exact-match against the 2 known constants)', () => {
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef, verify: 'chưa xác định — clarify sẽ khoá' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session');
+  assert.equal(result.outcome, 'clear');
+
+  const view = listWork(storeDir);
+  // A placeholder that doesn't match FALLBACK_VERIFY/RETIRED_P14_PLACEHOLDER
+  // verbatim must still be recognized as fake and replaced by the real
+  // fallback -- before tsk-13b's fix this free-text variant slipped past
+  // hasRealVerify's exact-match check and was kept as-is.
+  assert.equal(view.work['item-x'].verify, FALLBACK_VERIFY);
 });
 
 // --- resolveContentRoot end-to-end through resolveDiscovery (tsk-1ni D1) --
@@ -254,7 +273,7 @@ test('resolveDiscovery skip path finds CONTEXT.md via a real registered worktree
 // --- caller-supplied verdict (tsk-27y D1/D2): the ONLY way an interactive
 // caller reaches a clear/unclear outcome now that judgeDiscovery is retired.
 
-test('resolveDiscovery advances to discovery on a caller-supplied clear verdict at clarify (tsk-4b2 D3)', () => {
+test('resolveDiscovery advances to planning on a caller-supplied clear verdict at discovery (tsk-30v D2/D6: clear skips exploring)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
 
@@ -262,14 +281,14 @@ test('resolveDiscovery advances to discovery on a caller-supplied clear verdict 
   assert.equal(result.outcome, 'clear');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'discovery');
+  assert.equal(view.work['item-x'].stage, 'planning');
   assert.equal(view.work['item-x'].verify, 'npm test -- caller');
   assert.equal(view.discovery['item-x'].at(-1).clear, true);
   const decisions = view.decisionsById?.['item-x'] ?? [];
   assert.ok(decisions.some((d) => d.text.startsWith('discovery caller-supplied:')), 'caller-supplied path must log a distinct audit-trail decision');
 });
 
-test('resolveDiscovery advances discovery -> exploring on a caller-supplied clear verdict (tsk-4b2 D3/D6, nextDiscoveryEdge)', () => {
+test('resolveDiscovery advances discovery -> planning on a caller-supplied clear verdict, skipping exploring (tsk-30v D2/D6, nextDiscoveryEdge)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork({ stage: 'discovery' }));
 
@@ -277,7 +296,7 @@ test('resolveDiscovery advances discovery -> exploring on a caller-supplied clea
   assert.equal(result.outcome, 'clear');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'exploring');
+  assert.equal(view.work['item-x'].stage, 'planning');
 });
 
 test('resolveDiscovery advances exploring -> decompose on a caller-supplied clear verdict (tsk-4b2 D6)', () => {
@@ -288,7 +307,7 @@ test('resolveDiscovery advances exploring -> decompose on a caller-supplied clea
   assert.equal(result.outcome, 'clear');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].stage, 'planning');
   assert.equal(view.work['item-x'].verify, 'npm test -- exploring');
 });
 
@@ -313,16 +332,67 @@ test('resolveDiscovery keeps the direct clarify->decompose edge unchanged for a 
   assert.equal(view.work['item-x'].stage, 'shaping', 'triage domain has no discovery/exploring -- Clarify->Divide stays direct, same as before tsk-4b2');
 });
 
-test('resolveDiscovery parks in awaiting-human on a caller-supplied unclear verdict, with the caller-supplied question', () => {
+test('resolveDiscovery at discovery advances to exploring AND parks in awaiting-human on a caller-supplied unclear verdict (tsk-30v D2/D3: unclear no longer parks in place)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
 
-  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: 'Which auth provider?' });
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe payment integration needs to pick an OAuth provider.\n\n## Why this matters\n\nThis directly affects the outcome: Which auth provider?' });
   assert.equal(result.outcome, 'unclear');
 
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].status, 'awaiting-human');
-  assert.equal(view.gates?.['item-x']?.ask, 'Which auth provider?');
+  assert.equal(view.work['item-x'].stage, 'exploring', 'unclear at discovery must advance stage, not park in place');
+  assert.equal(view.gates?.['item-x']?.ask, '## Context\n\nThe payment integration needs to pick an OAuth provider.\n\n## Why this matters\n\nThis directly affects the outcome: Which auth provider?');
+});
+
+// tsk-31lz: the stage move above is real, but it is NOT a settlement — the
+// item was just judged not clear and is parked with an open question. This
+// is the end-to-end guard for the replay gate (test/state/replay.test.mjs
+// covers the fold in isolation); it also pins the write ORDER the gate
+// depends on, since the fold reads the verdict from the work.discovery event
+// this call appends before its moveStage.
+test('resolveDiscovery records NO clarify-pass settlement for an unclear verdict at discovery, even though the item leaves the stage (tsk-31lz)', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe payment integration needs to pick an OAuth provider.\n\n## Why this matters\n\nThis directly affects the outcome: Which auth provider?' });
+  assert.equal(result.outcome, 'unclear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'exploring');
+  assert.equal(
+    view.settlements?.['item-x'],
+    undefined,
+    'an unclear verdict must never fold into the settlement channel as a pass',
+  );
+});
+
+test('resolveDiscovery DOES record a clarify-pass settlement for a clear verdict at discovery, carrying the real verify as detail (tsk-31lz: the fix narrows the unclear path only)', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true, verify: 'npm test -- item-x' });
+  assert.equal(result.outcome, 'clear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.settlements['item-x'].length, 1);
+  assert.equal(view.settlements['item-x'][0].kind, 'clarify-pass');
+  assert.equal(view.settlements['item-x'][0].detail, 'npm test -- item-x');
+});
+
+test('resolveDiscovery keeps park-in-place for an unclear verdict outside discovery (tsk-30v D6: scoped to discovery only, using the triage domain-agnostic fixture)', () => {
+  const storeDir = tmpStoreDir();
+  // triage domain's own Clarify-mapped stage is literally named 'triage'
+  // (stepMap.triage = 'Clarify', workflow-stage-graphs.mjs) -- matches the
+  // existing domain-agnostic test's own fixture shape (line ~308 above).
+  addWork(storeDir, sampleWork({ domain: 'triage', stage: 'triage' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe migration script needs a concrete target to run against.\n\n## Why this matters\n\nThis directly affects the outcome: Which target?' });
+  assert.equal(result.outcome, 'unclear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].status, 'awaiting-human');
+  assert.equal(view.work['item-x'].stage, 'triage', 'a non-discovery stage must keep parking in place, unaffected by tsk-30v');
 });
 
 test('resolveDiscovery caller-supplied verdict takes precedence over the readLockedContext trust signal (D2)', () => {
@@ -349,7 +419,7 @@ test('resolveDiscovery on a caller-supplied clear verdict with no verify falls b
 
   resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true });
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'discovery');
+  assert.equal(view.work['item-x'].stage, 'planning');
   assert.notEqual(view.work['item-x'].verify, RETIRED_P14_PLACEHOLDER);
   assert.equal(view.work['item-x'].verify, FALLBACK_VERIFY);
 });
@@ -362,7 +432,7 @@ test('resolveDiscovery on a SECOND consecutive caller-supplied unclear verdict f
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
 
-  const first = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: 'Which endpoint?' });
+  const first = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe client needs a concrete endpoint to call.\n\n## Why this matters\n\nThis directly affects the outcome: Which endpoint?' });
   assert.equal(first.outcome, 'unclear');
   assert.equal(listWork(storeDir).work['item-x'].status, 'awaiting-human');
 
@@ -370,14 +440,14 @@ test('resolveDiscovery on a SECOND consecutive caller-supplied unclear verdict f
 
   let second;
   assert.doesNotThrow(() => {
-    second = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: 'Still which endpoint, now with more detail?' });
+    second = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe client still needs a concrete endpoint to call, now with more detail.\n\n## Why this matters\n\nThis directly affects the outcome: Still which endpoint, now with more detail?' });
   });
   assert.equal(second.outcome, 'unclear');
 
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].status, 'awaiting-human');
   assert.equal(view.discovery['item-x'].length, 2);
-  assert.equal(view.discovery['item-x'][1].question, 'Still which endpoint, now with more detail?');
+  assert.equal(view.discovery['item-x'][1].question, '## Context\n\nThe client still needs a concrete endpoint to call, now with more detail.\n\n## Why this matters\n\nThis directly affects the outcome: Still which endpoint, now with more detail?');
 });
 
 // claim-lock §5.1: the item's OWN status at the moment of park rides the
@@ -387,7 +457,7 @@ test('resolveDiscovery on a caller-supplied unclear verdict stamps statusAtAsk f
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
 
-  resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: 'Which endpoint?' });
+  resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe client needs a concrete endpoint to call.\n\n## Why this matters\n\nThis directly affects the outcome: Which endpoint?' });
   const view = listWork(storeDir);
   assert.equal(view.gates['item-x'].statusAtAsk, 'todo');
 });
@@ -397,7 +467,7 @@ test('resolveDiscovery on a caller-supplied unclear verdict stamps statusAtAsk "
   addWork(storeDir, sampleWork());
   moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
 
-  resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: 'Which endpoint?' });
+  resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe client needs a concrete endpoint to call.\n\n## Why this matters\n\nThis directly affects the outcome: Which endpoint?' });
   const view = listWork(storeDir);
   assert.equal(view.gates['item-x'].statusAtAsk, 'doing');
 });
@@ -408,7 +478,7 @@ test('resolveDiscovery refuses a caller-supplied clear verdict when work.status 
   // Simulates an earlier round's verify-dispute park -- same shape
   // resolveDiscovery's own dispute branch produces (putInAwaiting with
   // statusAtAsk), without needing a full first discover round.
-  putInAwaiting(storeDir, { id: 'item-x', ask: 'Đề xuất verify bị nghi ngờ...', statusAtAsk: 'todo' });
+  putInAwaiting(storeDir, { id: 'item-x', ask: '## Context\n\nĐề xuất verify bị nghi ngờ, cần xác nhận trước khi ghi vào planning.\n\n## Why this matters\n\nThis directly affects the outcome: Vòng kiểm tra độc lập không đồng ý với đề xuất ban đầu.', statusAtAsk: 'todo' });
 
   assert.throws(
     () => resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true, verify: 'npm test -- corrected' }),
@@ -422,7 +492,7 @@ test('resolveDiscovery refuses a caller-supplied clear verdict when work.status 
 
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].status, 'awaiting-human', 'refused before touching status');
-  assert.equal(view.work['item-x'].stage, 'clarify', 'refused before touching stage');
+  assert.equal(view.work['item-x'].stage, 'discovery', 'refused before touching stage');
 });
 
 test('resolveDiscovery still advances normally on a caller-supplied clear verdict when work.status is not awaiting-human (tsk-60r D1, unchanged behavior)', () => {
@@ -433,7 +503,7 @@ test('resolveDiscovery still advances normally on a caller-supplied clear verdic
   assert.equal(result.outcome, 'clear');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'discovery');
+  assert.equal(view.work['item-x'].stage, 'planning');
   assert.notEqual(view.work['item-x'].status, 'awaiting-human');
 });
 
@@ -557,6 +627,35 @@ test('resolveDiscovery still updates priority on a legacy-invalid item shape —
 
   assert.doesNotThrow(() => resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true, verify: 'npm test -- discovered' }));
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'discovery');
+  assert.equal(view.work['item-x'].stage, 'planning');
   assert.equal(typeof view.work['item-x'].priority, 'number');
+});
+
+// --- D12 classification door: the interactive `discover` verb and the
+// headless runner sweep must share ONE guard, not two copies that can drift.
+
+test('the headless sweep and the interactive verb read the SAME classification guard, not a copy of it', async () => {
+  const { classificationPatchFromVerdict: fromLoop } = await import('../../src/runner/loop.mjs');
+  assert.equal(fromLoop, classificationPatchFromVerdict, 'src/runner/loop.mjs must re-export discovery.mjs\'s function, never define its own');
+});
+
+test('assertCallerClassification refuses an out-of-vocabulary value and passes a valid one, without writing anything', () => {
+  const work = { ...sampleWork(), domain: 'coding' };
+
+  assert.throws(
+    () => assertCallerClassification(work, { clear: true, kind: 'bogus' }),
+    (err) => categoryOf(err) === 'validation' && /work\.kind must be one of/.test(err.message),
+  );
+  assert.throws(
+    () => assertCallerClassification(work, { clear: true, tier: 'enormous' }),
+    (err) => categoryOf(err) === 'validation' && /work\.tier must be one of/.test(err.message),
+  );
+  assert.doesNotThrow(() => assertCallerClassification(work, { clear: true, tier: 'heavy', kind: 'bug', risk: 'heavy' }));
+});
+
+test('assertCallerClassification is a no-op on an unclear verdict, even one carrying a bad classification', () => {
+  const work = { ...sampleWork(), domain: 'coding' };
+  assert.doesNotThrow(() => assertCallerClassification(work, { clear: false, question: 'which one?', kind: 'bogus' }));
+  assert.doesNotThrow(() => assertCallerClassification(work, undefined));
+  assert.doesNotThrow(() => assertCallerClassification(work, { clear: true }));
 });

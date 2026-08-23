@@ -155,7 +155,7 @@ daemon)**, không phải cùng loại với discover-loop bạn muốn xây.
 TRONG agent-terminal đang mở (interactive `/loop` session) — thấy được từng
 bước, từng quyết định, ngay trên màn hình đang tương tác, không phải tail
 log file riêng. Về mặt kỹ thuật, discover-loop gọi **đúng cùng 2 verb**
-(`fgos discover <id>`, `fgos decompose <id>`) mà runner gọi bên trong —
+(`fgos discover <id>`, `fgos plan <id>`) mà runner gọi bên trong —
 khác nhau ở chỗ driver là 1 agent session tương tác (nhìn thấy trực tiếp,
 dừng được bất cứ lúc nào, không cần daemon/process riêng) thay vì 1 tiến
 trình nền vô hình. Không cạnh tranh nhau về mặt dữ liệu — cả hai đều ghi
@@ -179,7 +179,7 @@ clarify/decompose sang bước dispatch execute ngay sau, `src/runner/
 loop.mjs:970-1000` → tiếp theo trong cùng file).
 
 Điều kiện duy nhất cần giữ kỷ luật ở tầng `/fgOS:discover-next` (SKILL.md,
-không phải code lõi): chỉ gọi `fgos discover`/`fgos decompose`, KHÔNG được
+không phải code lõi): chỉ gọi `fgos discover`/`fgos plan`, KHÔNG được
 tự thêm bước gọi `fgos take`/`pick`/`execute` sau khi thấy verdict `clear`
 (item vừa chuyển `stage: executing`) — đó là việc của `/fgOS:pick`, ngoài
 scope tsk-3go. Đây là 1 việc "đừng làm thêm" ở cấp thiết kế skill, không
@@ -198,11 +198,11 @@ cố ý, không phải bug. Xác nhận `docs/reference/work-item-pipeline-stage
 verbs-and-handoffs.md:69-70`: "cùng 1 shape lặp lại ở cả `clarify` và
 `decompose`: 1 mechanical judge riêng mỗi tầng":
 - `judgeDiscovery` (stage `clarify`) — hỏi: item MUỐN LÀM GÌ đã rõ chưa
-  (product-level ambiguity). Skill người dùng tương ứng: `fgos-exploring`.
+  (product-level ambiguity). Skill người dùng tương ứng: `fgos-coding-exploring`.
 - `judgeDecompose` (stage `decompose`, verb riêng) — hỏi câu KHÁC hẳn:
   biết muốn làm gì rồi, nhưng chia sao/kích cỡ/effort/blast-radius rõ chưa
-  để tách con hay pass-through. Skill tương ứng: `fgos-planning`/
-  `fgos-validating`.
+  để tách con hay pass-through. Skill tương ứng: `fgos-coding-planning`/
+  `fgos-coding-validating`.
 
 Vậy "discover clear" chỉ nghĩa **tầng 1 hết mơ hồ**, KHÔNG có nghĩa "xong
 hẳn, không hỏi nữa" — item qua `stage:decompose` có thể vẫn unclear ở tầng
@@ -218,7 +218,7 @@ không cần logic chờ/nối giữa 2 tầng.
 
 - `/fgOS:discover-next`: tự quét `stage in {clarify, decompose}, status:todo`,
   ưu tiên clarify trước, sort theo `priority` có sẵn (thiếu thì xếp cuối),
-  gọi `fgos discover <id>` / `fgos decompose <id>` trực tiếp trên main
+  gọi `fgos discover <id>` / `fgos plan <id>` trực tiếp trên main
   checkout — không worktree, không branch, không merge (đã confirm ở báo
   cáo trước).
 - `/fgOS:discover-loop`: `/loop` bọc quanh discover-next. Stop rules:
@@ -237,7 +237,7 @@ không cần logic chờ/nối giữa 2 tầng.
 ## Câu hỏi chưa giải quyết
 
 - Cap iteration mặc định: số cụ thể — để implementer quyết ở
-  `fgos-planning`.
+  `fgos-coding-planning`.
 - Có nên in tổng kết cuối loop (N cleared, N parked awaiting-human, N lỗi)
   để người xem lại nhanh không — chưa quyết, hợp lý nhưng để planning.
 - Không tìm thấy UI "resume từ chỗ loop dừng" nào ngoài `fgos show`/`gates` —

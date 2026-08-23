@@ -1,14 +1,15 @@
 ---
 area: enduser-docs-authoring
-updated: 2026-07-21
-sources: [compound-learn-enduser-docs]
+updated: 2026-08-12
+sources: [compound-learn-enduser-docs, spec-docs-lifecycle-realignment]
 decisions: [02623bff, c74bcef9]
 coverage: full
 ---
 
 # Spec: Soạn & nuôi tài liệu người-dùng-cuối (enduser-docs-authoring)
 
-Ở khâu **compound-learn** của vòng đời một việc, một kỷ luật soạn tài liệu biến outcome
+Khi một việc mang status **`retrospective`** — khâu tổng-hợp của vòng đời, sau
+`delivered` và trước `cleanup` — một kỷ luật soạn tài liệu biến outcome
 đã capture thật của việc thành một **tài liệu người-dùng-cuối thật**, xếp theo ngăn
 Diataxis. Mỗi đường dẫn tài liệu là một **tài liệu sống**: các capture kế tiếp cùng khai
 một đường dẫn được **tích luỹ** vào tài liệu đó mà không mất chi tiết đã có. Đây là mặt
@@ -16,12 +17,12 @@ write-side, đối trọng với mặt read-side (area `enduser-docs-index` — 
 
 ## Entry Points & Triggers
 
-- **Việc tới khâu compound-learn** — người hoặc agent thực thi kỷ luật soạn tài liệu cho
-  việc đó. Không có lịch tự động; kỷ luật chạy khi việc ở đúng khâu này.
+- **Việc tới status `retrospective`** — người hoặc agent thực thi kỷ luật soạn tài liệu
+  cho việc đó. Không có lịch tự động; kỷ luật chạy khi việc ở đúng status này.
 - **`fgos compound <id> --doc-type <quadrant> --doc-path <path>`** — bề mặt producer duy
   nhất được phép dùng: nó lưu **tag ngăn Diataxis** và **móc đường-dẫn** lên capture của
-  việc trong một lần gọi. Vì chỉ chạy khi việc đã ở compound-learn, lần gọi này chỉ gắn
-  tag, không dời khâu thêm.
+  việc trong một lần gọi. Vì chỉ chạy khi việc đã ở status `retrospective`, lần gọi này
+  chỉ gắn tag, không dời khâu thêm.
 - **`fgos doc-sources <docPath>`** (đọc-thuần, area `enduser-docs-index`) — gom **mọi**
   capture đã liên kết tới một đường dẫn, làm nguồn để dựng/nuôi tài liệu không mất chi
   tiết.
@@ -39,7 +40,7 @@ write-side, đối trọng với mặt read-side (area `enduser-docs-index` — 
 
 ### Soạn / nuôi một tài liệu người-dùng-cuối
 
-- **Triggers:** việc ở khâu compound-learn; agent thực thi kỷ luật.
+- **Triggers:** việc ở status `retrospective`; agent thực thi kỷ luật.
 - **Điều gì xảy ra:**
   1. **Gom capture thật.** Đọc outcome dự-đoán/thực-tế và friction của việc; nếu việc có
      tham chiếu lịch sử, đọc thêm câu chuyện đầy đủ ở đó. Đây là bằng chứng DUY NHẤT được
@@ -71,7 +72,7 @@ write-side, đối trọng với mặt read-side (area `enduser-docs-index` — 
 
 ## Actors & Access
 
-- **Agent/kỹ năng soạn tài liệu ở compound-learn** — đọc capture, viết tài liệu, lưu tag
+- **Agent/kỹ năng soạn tài liệu ở status `retrospective`** — đọc capture, viết tài liệu, lưu tag
   + móc qua bề mặt producer. Không vai trò đặc quyền; đi qua đúng cửa lệnh có sẵn.
 - **Hệ tiêu thụ** — area `enduser-docs-index` (liệt kê tài liệu đã soạn); người đọc tài
   liệu (nhận một tài liệu người-dùng-cuối sống).
@@ -81,16 +82,15 @@ write-side, đối trọng với mặt read-side (area `enduser-docs-index` — 
 - **R1 (chỉ soạn từ capture thật).** Tài liệu chỉ được tổng hợp từ outcome/friction thật
   của việc (và lịch sử tham chiếu nếu có), không bao giờ từ tiêu đề hay phán đoán.
 - **R2 (một tài liệu sống trên mỗi đường dẫn).** Các capture cùng khai một `docPath` tích
-  luỹ vào đúng một tài liệu tại đường dẫn đó — độ mịn là theo-đường-dẫn (per D17).
+  luỹ vào đúng một tài liệu tại đường dẫn đó — độ mịn là theo-đường-dẫn.
 - **R3 (nuôi là bổ sung, không mất).** Khi nuôi tài liệu đã có, chỉ thêm phần mới; không
-  xoá, rút gọn, hay xáo lại prose/cấu trúc đã có — tài liệu giữ trọn chi tiết cũ (per
-  D13).
+  xoá, rút gọn, hay xáo lại prose/cấu trúc đã có — tài liệu giữ trọn chi tiết cũ.
 - **R4 (grow-vs-create theo tồn-tại-tệp).** Phân biệt nuôi hay tạo hoàn toàn bằng việc
   tệp tại `docPath` đã tồn tại chưa — không cờ phụ, không dấu trên capture.
 - **R5 (Diataxis là trục cấu trúc DUY NHẤT).** Ngăn Diataxis là trục cấu trúc duy nhất
   của một tài liệu; không tổ chức lại theo trục thứ hai (đối tượng/persona, mảng sản
   phẩm) bên trong. Thư mục tài liệu khớp tag ngăn của nó. Chỉ cân nhắc trục thứ hai khi
-  tài liệu thật va chạm (per D16).
+  tài liệu thật va chạm.
 - **R6 (trích, không diễn giải lại).** Nội dung được trích từ capture thật, không diễn
   giải lại hay bịa.
 - **R7 (tag và tài liệu đi liền).** Một tag không có tài liệu, hoặc một tài liệu không có
@@ -115,10 +115,10 @@ write-side, đối trọng với mặt read-side (area `enduser-docs-index` — 
 
 ## Pointers (implementation)
 
-- Kỷ luật soạn: kỹ năng `fgos-compounding` (cả hai gốc `repo/.claude/skills/` và
+- Kỷ luật soạn: kỹ năng `fgos-coding-compounding` (cả hai gốc `repo/.claude/skills/` và
   `repo/.agents/skills/`), Flow bước 1-5 — gom capture, phân ngăn, lưu tag+móc, gom
   mọi nguồn qua `fgos doc-sources` rồi grow-or-create theo tồn-tại-tệp, xác nhận.
-- Producer tag+móc: nhánh `compound` trong `repo/bin/fgos.mjs` (nhánh compound-learn ghi
+- Producer tag+móc: nhánh `compound` trong `repo/bin/fgos.mjs` (nhánh tổng-hợp ghi
   outcome mang `docPath`).
 - Gom nguồn: verb `fgos doc-sources` (area `enduser-docs-index`).
 - Tài liệu thật đầu tiên: `repo/docs/how-to/check-rollup-progress.md`, liên kết tới

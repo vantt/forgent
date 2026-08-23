@@ -38,7 +38,7 @@ tsk-5lr, tsk-49u...) tới khi có người vấp phải, phải mở commit ri�
 *không ai chạy nó ở đúng thời điểm*, nên lỗi do người phát hiện muộn và tốn
 một item riêng. Đây đúng thứ ưu tiên #2 (Release con người) cấm.
 
-## Quyết định đã khoá
+## Locked decisions
 
 | ID | Quyết định | Vì sao |
 |----|-----------|--------|

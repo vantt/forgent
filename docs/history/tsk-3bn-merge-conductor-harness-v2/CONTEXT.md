@@ -185,7 +185,7 @@ redefined.)
 
 - Filing structure — single item vs. a small root with children
   (drift-detection / merge-set-clustering / sync-root-action) — is
-  `fgos-planning`'s own shaping judgment per this skill's hard rules, not
+  `fgos-coding-planning`'s own shaping judgment per this skill's hard rules, not
   decided here. The design report's own filing recommendation (heavy item
   or root + 2-3 children) is a starting suggestion, not a lock.
 - Exact `driftStatus` file placement (new file vs. new export in

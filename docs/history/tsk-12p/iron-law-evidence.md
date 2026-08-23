@@ -48,7 +48,7 @@ npm test \
   && grep -q "\`fgos-clarifying\`" .claude/skills/fgos-routing/SKILL.md \
   && grep -q "| \`discovery\` |" .claude/skills/fgos-routing/SKILL.md \
   && grep -q "| \`exploring\` |" .claude/skills/fgos-routing/SKILL.md \
-  && ! grep -q "\`clarify\`.*\`fgos-exploring\`" .claude/skills/fgos-routing/SKILL.md
+  && ! grep -q "\`clarify\`.*\`fgos-coding-exploring\`" .claude/skills/fgos-routing/SKILL.md
 ```
 
 All four checks pass; `npm test` passes 2745/2750 (5 pre-existing skips, 0

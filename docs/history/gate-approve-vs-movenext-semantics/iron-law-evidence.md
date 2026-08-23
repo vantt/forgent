@@ -116,7 +116,7 @@ verify run before its own `fgos return`, already detailed in each child's
 own commit): `tsk-19j-1` — `test/state/store.test.mjs` (2 new
 `recordGateApprove` tests) + `test/state/replay.test.mjs`/
 `test/state/gate-bypass.test.mjs` regression. `tsk-19j-2` —
-`test/intake/discovery.test.mjs`/`test/intake/decompose.test.mjs` (5 new
+`test/intake/discovery.test.mjs`/`test/intake/plan.test.mjs` (5 new
 tests: skip-and-advance for `mode: tiny`/`small`, no-skip for `standard`/
 `high-risk`, real-verify preference on both discovery's and decompose's
 skip/real paths). `tsk-19j-3` — `test/state/frontier.test.mjs` (3 new

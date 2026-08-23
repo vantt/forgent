@@ -154,24 +154,24 @@
   ],
   "test/runner/dispatch.test.mjs": [
     "test('buildPrompt omitting stage defaults to \"executing\", byte-identical to every pre-tsk-5mj call', () => {",
-    "test('CAPACITY_KINDS reuses tool-registry\\'s KINDS verbatim plus \"task\" (D2) — never a separate vocabulary', () => {",
-    "test('loadRunnerConfig accepts a config with no \"capacities\" block at all — pre-tsk-62v shape, unchanged', () => {",
-    "test('the committed .fgos/config.json runner section no longer declares a coding-classify-intake capacity (tsk-49u): tsk-4ns already stripped its only consumer (fgos-submit-assist\\'s dispatch-fallback branch), leaving the config entry orphaned, so it was removed via the same ADR0020 hand-commit-to-main path its own rename (tsk-3fj) originally used', () => {",
-    "test('the committed .fgos/config.json runner section declares the gather capacity (tsk-28o): for \"gather\", needs \"prompt-completion\", carries \"repo-content\" (D1, gather-capacity-purpose-binding CONTEXT.md), kind cli, allowCrossProvider true, well-formed {prompt}/{model} args', () => {",
+    "test('EXECUTOR_KINDS reuses tool-registry\\'s KINDS verbatim plus \"task\" (D2) — never a separate vocabulary', () => {",
+    "test('loadRunnerConfig accepts a config with no \"executors\" block at all — pre-tsk-62v shape, unchanged', () => {",
+    "test('the committed .fgos/config.json runner section no longer declares a coding-classify-intake executor (tsk-49u): tsk-4ns already stripped its only consumer (fgos-submit-assist\\'s dispatch-fallback branch), leaving the config entry orphaned, so it was removed via the same ADR0020 hand-commit-to-main path its own rename (tsk-3fj) originally used', () => {",
+    "test('the committed .fgos/config.json runner section declares the gather executor (tsk-28o): for \"gather\", needs \"prompt-completion\", carries \"repo-content\" (D1, gather-executor-purpose-binding CONTEXT.md), kind cli, allowCrossProvider true, well-formed {prompt}/{model} args', () => {",
     "test('detectAssistantCli delegates to tool-registry.mjs\\'s shared findExecutableOnPath (D5) — same result, one implementation', () => {",
     "test('resolveExecutorCommand: attestRoot, when given, is read INSTEAD of fgosDir\\'s own root (tsk-4hl fix)', () => {",
-    "test('resolveExecutorCommand still skips both the presence check and the cross-provider check for a kind:\"task\" capacity, even unregistered and non-Claude-shaped (D13: kind !== \"task\" excludes task by construction)', () => {",
-    "test('decideCapacityCli omits agentType entirely for a kind:\"cli\" capacity that declares none (tsk-3ik-3)', async () => {",
+    "test('resolveExecutorCommand still skips both the presence check and the cross-provider check for a kind:\"task\" executor, even unregistered and non-Claude-shaped (D13: kind !== \"task\" excludes task by construction)', () => {",
+    "test('decideExecutorCli omits agentType entirely for a kind:\"cli\" executor that declares none (tsk-3ik-3)', async () => {",
     "test('spawnWorker attests its OWN cwd (the dispatch worktree), never opts.fgosDir\\'s root (tsk-4hl fix)', async () => {",
-    "test('resolveExecutorCommand with no capacities block at all never triggers cross-provider governance, byte-identical to pre-tsk-32n behavior', () => {",
-    "test('resolveExecutorCommand throws for a non-Claude \"cli\" capacity even when fgosDir is given and the D6 registration/presence check already passed', () => {",
-    "test('resolveCapacityCli honors a caller-supplied model override over both the capacity\\'s own model and modelForTier (tsk-2k1, D10)', async () => {",
-    "test('resolveCapacityCli honors a caller-supplied tier override, feeding it into modelForTier when no model is also supplied (tsk-2k1, D10)', async () => {",
+    "test('resolveExecutorCommand with no executors block at all never triggers cross-provider governance, byte-identical to pre-tsk-32n behavior', () => {",
+    "test('resolveExecutorCommand throws for a non-Claude \"cli\" executor even when fgosDir is given and the D6 registration/presence check already passed', () => {",
+    "test('resolveExecutorCli honors a caller-supplied model override over both the executor\\'s own model and modelForTier (tsk-2k1, D10)', async () => {",
+    "test('resolveExecutorCli honors a caller-supplied tier override, feeding it into modelForTier when no model is also supplied (tsk-2k1, D10)', async () => {",
     "test('the \"resolve\" CLI entry point honors --model, overriding the computed default (tsk-2k1, D10)', () => {",
     "test('the \"resolve\" CLI entry point honors --tier, changing which configured model resolves (tsk-2k1, D10)', () => {",
-    "test('CAPACITY_CARRIES is exactly the two D15-locked values, never a free string vocabulary', () => {",
-    "test('resolveExecutorCommand refuses a \"carries: user-text\" capacity handed repo-content — refused before spawn (D15 verify item 8)', () => {",
-    "test('resolveExecutorCommand never triggers the carries gate for a capacity that declares no carries at all — byte-identical to every pre-D15 capacity', () => {"
+    "test('EXECUTOR_CARRIES is exactly the two D15-locked values, never a free string vocabulary', () => {",
+    "test('resolveExecutorCommand refuses a \"carries: user-text\" executor handed repo-content — refused before spawn (D15 verify item 8)', () => {",
+    "test('resolveExecutorCommand never triggers the carries gate for a executor that declares no carries at all — byte-identical to every pre-D15 executor', () => {"
   ],
   "test/runner/frozen-judge.test.mjs": [
     "test('footprintDiffHits: NO declared footprint (absent) exempts the whole diff -- empty hits (D5)', () => {",
@@ -182,7 +182,7 @@
     "test('withLockRetry: does not busy-spin in the BOUNDARY_GRACE_MS tail -- bounded call count even for a tiny budget (tsk-mgb)', async () => {"
   ],
   "test/runner/loop.test.mjs": [
-    "test('runOnce\\'s capacity.dispatch audit event records the REAL spawned command even when a capacity declares a different provider label (tsk-33w D9: the audit must not lie when the two diverge)', async () => {",
+    "test('runOnce\\'s executor.dispatch audit event records the REAL spawned command even when a executor declares a different provider label (tsk-33w D9: the audit must not lie when the two diverge)', async () => {",
     "test('runOnce: an item already advanced to decompose (via an explicit prior discover call, the only live path left post-tsk-5mj) still gets swept to executing and dispatched in the SAME runOnce pass; the clarify-pass settlement recorded at that prior call reads role \"session\"', async () => {",
     "test('startup reap: a zero-ahead root branch with an open (non-done/wontfix) leaf descendant is kept, not pruned (tsk-577)', async () => {",
     "test('startup reap: a zero-ahead root branch whose only descendant is already done/wontfix is still pruned normally (tsk-577 regression guard)', async () => {",
@@ -211,9 +211,6 @@
   "test/runner/prompt-templates.test.mjs": [
     "test('selectTemplate omitting stage entirely (every pre-tsk-5mj call site) still resolves to the skill-pointer template, byte-identical to before', () => {"
   ],
-  "test/runner/session-identity.test.mjs": [
-    "test('ppidOf passes a bounded timeout to execFileSync, so a hung ps command cannot block the caller forever (tsk-13m)', () => {"
-  ],
   "test/runner/worktree.test.mjs": [
     "test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout that resolves to repoRoot itself (tsk-k8u D1)', () => {",
     "test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout that is the calling session\\'s own live cwd (tsk-1tm, exact-match)', () => {",
@@ -239,9 +236,9 @@
   "test/setup/self-uninstall-spike.test.mjs": [
     "test('SPIKE: fgos uninstall --yes --remove-package removes a real npm -g installed package on this platform', { skip: isWin && 'spike is scoped to Linux/macOS only (D1) — Windows self-deletion is a separate, still-unresolved risk' }, () => {"
   ],
-  "test/skills/fgos-compounding-doc-write-path.test.mjs": [
-    "test('fgos-compounding writes the document before it stores the tag (D1/D3 order)', () => {",
-    "test('fgos-compounding\\'s tag-storing step names the D3 refusal it now depends on', () => {",
+  "test/skills/fgos-coding-compounding-doc-write-path.test.mjs": [
+    "test('fgos-coding-compounding writes the document before it stores the tag (D1/D3 order)', () => {",
+    "test('fgos-coding-compounding\\'s tag-storing step names the D3 refusal it now depends on', () => {",
     "test('the regrown document is sourced from tsk-5z2\\'s own decision record and the shipped lock-status behaviour, not fabricated', () => {"
   ],
   "test/state/awaiting.test.mjs": [
@@ -347,5 +344,8 @@
   ],
   "test/state/working-tree-clean-unified.test.mjs": [
     "test(\"isWorkingTreeClean scope:'subtree' still threads ownFileSet through exactly like scope:'whole-repo' (tsk-598)\", () => {"
+  ],
+  "test/util/session-identity.test.mjs": [
+    "test('ppidOf passes a bounded timeout to execFileSync, so a hung ps command cannot block the caller forever (tsk-13m)', () => {"
   ]
 }

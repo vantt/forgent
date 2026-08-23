@@ -5,7 +5,7 @@ locked and approved, gate-bypass level `standard`). This plan covers ONLY
 tsk-4uj's own scope; tsk-5vl's `catchup` fix is already delivered
 separately (same feature dir, same CONTEXT.md, different D-ID).
 
-**Revision note:** `fgos-validating`'s first pass on this plan found two
+**Revision note:** `fgos-coding-validating`'s first pass on this plan found two
 things this revision addresses: (1) `promote-to-component` shares the
 same guard pattern but is explicitly OUT of scope per CONTEXT.md D4
 (filed as `tsk-2bg`) — see the Approach section's own out-of-scope note;
@@ -65,7 +65,7 @@ Per CONTEXT.md's pinned assumption: no skill call-site wiring is in
 scope — the flag's user is a person invoking `fgos approve --trust-dir
 <id>` / `fgos sync-root --trust-dir <id>` by hand while sitting inside a
 worktree session, not an automated caller (neither `fgos-coding-driving`
-nor `fgos-code-implement` ever calls `approve` themselves — that stays a
+nor `fgos-coding-implement` ever calls `approve` themselves — that stays a
 human gate per AGENTS.md's own boundary).
 
 **Explicitly out of scope (CONTEXT.md D4):** `promote-to-component`
@@ -86,7 +86,7 @@ its guard only fires `if (flags.dir === undefined &&
 *already* full trust there, no separate flag required. This plan
 deliberately does NOT follow that precedent for `approve`/`sync-root`:
 every automated caller in this codebase (`fgos-coding-driving`,
-`fgos-code-implement`) already always passes `--dir` on every call, so
+`fgos-coding-implement`) already always passes `--dir` on every call, so
 adopting `main-checkout-reset`'s convention verbatim would silently
 relax `approve`/`sync-root`'s trust boundary for all of them at once —
 exactly the broad, unreviewed change D3's explicit opt-in flag exists to
@@ -104,7 +104,7 @@ fresh this session). GitNexus `impact()` MUST run before editing the
 `approve`/`sync-root` handlers and `isMainWorktree`
 (`src/runner/merge.mjs`) — CLAUDE.md's Always-Do rules — this is the
 blast-radius proof point for the risk-map rows below, carried to
-`fgos-validating`.
+`fgos-coding-validating`.
 
 ### Changes
 
@@ -133,16 +133,16 @@ blast-radius proof point for the risk-map rows below, carried to
    whoever implements decides which reads better) explaining when a human
    should reach for the new flag: recovering `approve`/`sync-root` while
    still inside the item's own worktree session, mirroring the
-   `fgos-code-implement/SKILL.md` Return-step callout tsk-5vl already
+   `fgos-coding-implement/SKILL.md` Return-step callout tsk-5vl already
    added for `catchup`. Must explicitly warn about the trust trade-off
    (citing `P44`/`review-260718`) — this is a deliberate escape hatch from
    an incident-driven guard, not a routine convenience flag.
 
 ### Risk map
 
-| Component | Risk | Proof point (carried to `fgos-validating`) |
+| Component | Risk | Proof point (carried to `fgos-coding-validating`) |
 |---|---|---|
-| `approve`'s guard interaction with the new flag | **High** — `approve` is the final merge-to-main gate with a two-incident history (`P44`, `review-260718`) of real false-verification failures when its worktree-identity check was bypassed or mispositioned | `impact({target: "isMainWorktree", direction: "upstream"})` already run during `fgos-validating`'s own pass on THIS plan: GitNexus's index was confirmed stale (`last indexed 4ce7a96`, behind current HEAD) and returned only 1 of 7 real callers — degraded posture, named plainly, not silently dropped. Manual `grep -n "isMainWorktree(" bin/fgos.mjs src/runner/promote-engine.mjs` cross-check substituted and is what surfaced D4's `promote-to-component` finding — re-run both (GitNexus + grep cross-check) again at implementation time in case the index has since been refreshed. Full existing `approve` suite green with UNCHANGED pass/fail set when the new flag is NOT passed (regression baseline); every existing P44/session-nesting/`--github` guard test still refuses exactly as today when the flag is omitted |
+| `approve`'s guard interaction with the new flag | **High** — `approve` is the final merge-to-main gate with a two-incident history (`P44`, `review-260718`) of real false-verification failures when its worktree-identity check was bypassed or mispositioned | `impact({target: "isMainWorktree", direction: "upstream"})` already run during `fgos-coding-validating`'s own pass on THIS plan: GitNexus's index was confirmed stale (`last indexed 4ce7a96`, behind current HEAD) and returned only 1 of 7 real callers — degraded posture, named plainly, not silently dropped. Manual `grep -n "isMainWorktree(" bin/fgos.mjs src/runner/promote-engine.mjs` cross-check substituted and is what surfaced D4's `promote-to-component` finding — re-run both (GitNexus + grep cross-check) again at implementation time in case the index has since been refreshed. Full existing `approve` suite green with UNCHANGED pass/fail set when the new flag is NOT passed (regression baseline); every existing P44/session-nesting/`--github` guard test still refuses exactly as today when the flag is omitted |
 | `sync-root`'s guard interaction with the new flag | Medium — same guard shape as `approve`, one layer instead of two, lower stakes (internal decision-record op, never the final done/delivered edge) | Full existing `sync-root` suite green, unchanged pass/fail set, when the flag is omitted |
 | New CLI-level regression coverage for the flag itself (currently absent, by definition — the flag doesn't exist yet) | The whole point of this item — nothing today can prove the opt-in path actually works OR that the default path is truly unchanged | New tests in `test/cli/fgos.test.mjs`: (a) `approve`/`sync-root` with the new flag, cwd inside the item's own linked worktree, `--dir` at the main checkout — succeeds, no worktree-refusal error; (b) the SAME setup WITHOUT the flag — still refuses exactly as today (this is the regression guard that proves the default is untouched); (c) every existing P44/session-nesting/`--github` test re-run unmodified to confirm zero behavior change without the flag |
 | Doc addition | Low — prose-only | `docs/how-to/write-verify-for-a-skill-prose-change.md`'s shape does not apply here (this is a `docs/how-to/*` page, not a `SKILL.md` change) — a plain markdown read-through is enough proof |
@@ -181,8 +181,8 @@ blast-radius proof point for the risk-map rows below, carried to
   organization choice, not a product decision (CONTEXT.md's own pinned
   assumption already defers this).
 - GitNexus's index was confirmed stale during tsk-5vl's own work in this
-  same feature area (`last indexed: 4ce7a96`) — `fgos-validating`/
-  `fgos-code-implement` should re-check freshness rather than assume it
+  same feature area (`last indexed: 4ce7a96`) — `fgos-coding-validating`/
+  `fgos-coding-implement` should re-check freshness rather than assume it
   has since been fixed; if still stale, the impact-analysis proof points
   above degrade per CLAUDE.md's own gate (manual grep cross-check
   substitutes, named plainly as weaker evidence).

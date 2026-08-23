@@ -37,7 +37,7 @@ Một mạch thay đổi cho **một cơ chế duy nhất**: *khi nào chạy c�
 chứng minh cây sắp land là xanh*. Bốn phase, mỗi phase một commit riêng để
 review được từng mảnh — đặc biệt phase 4, mảnh gỡ bớt kiểm tra.
 
-**Không tách thành item con.** Tiêu chí tách của `fgos-planning` là "các
+**Không tách thành item con.** Tiêu chí tách của `fgos-coding-planning` là "các
 mảnh *độc lập làm được*". Ở đây phase 2–4 đều sửa cùng vùng
 `src/runner/merge.mjs` + `bin/fgos.mjs`, footprint chồng nhau nên sibling
 sẽ phải chạy tuần tự chứ không song song được — tách chỉ nhân đôi chi phí
@@ -48,7 +48,7 @@ bằng commit-per-phase thay vì item-per-phase.
 ### Phương án đã loại
 
 - **Tách 2 item (A: thêm check, B: bỏ lần thừa).** Loại vì lý do footprint
-  chồng ngay trên. Nếu `fgos-validating` chứng minh được footprint không
+  chồng ngay trên. Nếu `fgos-coding-validating` chứng minh được footprint không
   thực sự chồng, đây là phương án dự phòng đầu tiên nên xét lại.
 - **Module mới `src/runner/invariant-check.mjs`.** Loại: logic spawn cần
   dùng đã nằm nguyên trong `src/runner/goal-check.mjs:33-106` (kèm hợp
@@ -66,7 +66,7 @@ bằng commit-per-phase thay vì item-per-phase.
 | # | Thành phần | Mức | Cái gì chứng minh được nó đúng |
 |---|-----------|-----|------------------------------|
 | R1 | Điều kiện bỏ qua re-verify (D5, phase 4) | **cao** | Test chứng minh cả hai chiều: (a) main **không** tiến lên ⇒ bỏ qua, và cây sau merge thật sự bằng cây tại `branchHeadAtReturn`; (b) main **đã** tiến lên ⇒ **không** bỏ qua, `runGoalCheck` vẫn chạy trên cây đã merge. Sai chiều (b) là ca hỏng chết người: cây chưa ai verify được land. |
-| R2 | Cách chứng minh "cây y hệt" | **cao** | D5 khoá điều kiện là *HEAD là ancestor của branch **và** branch tip == `branchHeadAtReturn`*. Có một cách chứng minh trực tiếp hơn: sau `git merge --no-commit`, so tree đã stage với `<branchHeadAtReturn>^{tree}` — bằng nhau là bằng chứng thẳng thay vì suy ra từ ancestry. Phase 4 **triển khai đúng điều kiện D5 đã khoá**; cách so tree được nêu ở đây như proof point để `fgos-validating` xác nhận nó có thoả đúng vị từ của D5 hay không trước khi ai đổi gì. Không tự đổi ở phase này. |
+| R2 | Cách chứng minh "cây y hệt" | **cao** | D5 khoá điều kiện là *HEAD là ancestor của branch **và** branch tip == `branchHeadAtReturn`*. Có một cách chứng minh trực tiếp hơn: sau `git merge --no-commit`, so tree đã stage với `<branchHeadAtReturn>^{tree}` — bằng nhau là bằng chứng thẳng thay vì suy ra từ ancestry. Phase 4 **triển khai đúng điều kiện D5 đã khoá**; cách so tree được nêu ở đây như proof point để `fgos-coding-validating` xác nhận nó có thoả đúng vị từ của D5 hay không trước khi ai đổi gì. Không tự đổi ở phase này. |
 | R3 | Hard gate ở merge (D4) chặn item không liên quan | trung bình | Test: main đang đỏ bất biến ⇒ merge của một item sạch bị chặn với lý do đọc được, và abort merge sạch (không để lại trạng thái nửa vời) — đường `merge.mjs:938-947` đã có sẵn, phải chứng minh nó vẫn đúng khi lý do đỏ đến từ check bất biến chứ không từ `item.verify`. |
 | R4 | Tương thích ngược khi config vắng | trung bình | Test: config không có key ⇒ không check bất biến nào chạy, hành vi giống hệt hôm nay. Đây là điều kiện để không phá 300+ item đang trong backlog và mọi repo khác dùng fgOS. |
 | R5 | Ngữ nghĩa timeout (tsk-53o) | thấp | Check bất biến đi qua cùng `runCommand` nên thừa hưởng `timedOut`; test: check bất biến timeout ⇒ phân biệt được với đỏ thật, không park nhầm thành `verify-fail`. |
@@ -75,7 +75,7 @@ bằng commit-per-phase thay vì item-per-phase.
 **impact-analysis: degraded** — GitNexus `status: present` nhưng index cũ
 (`4ce7a96`), nên blast radius **chưa được xác nhận**. Mọi điểm gọi liệt kê
 trong `CONTEXT.md` là kết quả `rg`/`Read` trực tiếp, không lấy từ code
-graph. `fgos-validating` nên coi phần blast-radius là bằng chứng yếu và
+graph. `fgos-coding-validating` nên coi phần blast-radius là bằng chứng yếu và
 cross-check bằng grep, không tin số của graph.
 
 ## Phase
@@ -126,7 +126,7 @@ Xong khi: R3 có test; `node --test test/runner/merge.test.mjs` xanh.
 - Chỉ áp dụng cho return nguồn branch. Return nguồn main-source dùng
   `headAtReturn`, không nằm trong phạm vi D5 — không đụng.
 
-Xong khi: R1 có test cả hai chiều; R2 được `fgos-validating` chốt.
+Xong khi: R1 có test cả hai chiều; R2 được `fgos-coding-validating` chốt.
 
 ## Trường hợp phải chứng minh
 
@@ -175,7 +175,7 @@ manifest mới.
 npm test
 ```
 
-Chọn bằng số đo, không bằng khẩu hiệu. Vòng `fgos-validating` đầu tiên đã
+Chọn bằng số đo, không bằng khẩu hiệu. Vòng `fgos-coding-validating` đầu tiên đã
 đánh trượt phương án "4 file phủ đúng code bị đổi" ở dòng *smaller path*,
 với bằng chứng đo trong chính worktree này (2026-08-11, mỗi phép đo chạy
 một mình):

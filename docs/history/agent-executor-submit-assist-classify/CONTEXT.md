@@ -26,7 +26,7 @@ provider, `gitnexus`, `status: "present"` → **full** per `AGENTS.md`'s
 gate: `impact()` MUST be run (and risk reported) before editing
 `resolveExecutorConfig`, `resolveExecutorCommand`, `spawnWorker`, or
 `fgos-submit-assist/SKILL.md`'s classify step, once this item reaches
-`fgos-code-implement`.
+`fgos-coding-implement`.
 
 ## Feature boundary
 
@@ -42,7 +42,7 @@ change to domain 1's headless runner path.
 | ID | Decision |
 |----|----------|
 | D1 | `.fgos-runner.json` gains `capacities.submit-assist-classify`: `kind: "cli"` (not `invocation`/`cli-spawn` — that vocabulary is stale per tsk-62v's own rename), `adapter: "cli-spawn"` (the `EXECUTOR_ADAPTERS` selector, reused as-is), `tier: "light"`. Restated from the item's own scope point 1 and tsk-62v's D1/D2/D4 — not a new judgment. |
-| D2 | Which real CLI backend the entry's `command` points at (`agy`, `codex`, `gemini`, or whatever else) is a build-time probe, not a clarify-time guess — the item's own scope point 1 says so explicitly ("pick whatever is really available on this machine at build time... do not hardcode a guess now"). Scouted this session: `agy` and `codex` are present on this machine, `gemini` is not — informational for `fgos-code-implement`, not a lock on which one gets picked. |
+| D2 | Which real CLI backend the entry's `command` points at (`agy`, `codex`, `gemini`, or whatever else) is a build-time probe, not a clarify-time guess — the item's own scope point 1 says so explicitly ("pick whatever is really available on this machine at build time... do not hardcode a guess now"). Scouted this session: `agy` and `codex` are present on this machine, `gemini` is not — informational for `fgos-coding-implement`, not a lock on which one gets picked. |
 | D3 | The external CLI must be registered via `fgos tool register --kind cli --capability submit-assist-classify ...` before `resolveExecutorConfig` can resolve `kind: "cli"` capacities (tsk-62v D6) — this also satisfies `AGENTS.md`'s install/setup/doctor gate for free via `checkToolRegistryConfigured` (`src/setup/checks.mjs`), same mechanism tsk-62v already relies on. Restated from the item's own scope point 2. |
 | D4 | `dispatch.mjs` gains a small CLI entry point, `node src/runner/dispatch.mjs resolve <capacityId>`, printing `{command,args,provider,model}` as JSON by reusing `resolveExecutorConfig`/`resolveExecutorCommand` verbatim — confirmed this session that `dispatch.mjs` currently has **no** CLI entry point at all (no `process.argv` handling), so this is new, not a rename. No second argv-building implementation. Restated from the item's own scope point 3. |
 | D5 | `fgos-submit-assist/SKILL.md`'s step 2 branches: `submit-assist-classify` configured AND its registered backend is `present` → shell out via Bash using the resolved command/args to get the external suggestion. Not configured, or configured but backend missing → fall back to **exactly** today's inline-reasoning behavior — a regression test pins this as byte-identical for the default/no-config case. Restated from the item's own scope point 4. |

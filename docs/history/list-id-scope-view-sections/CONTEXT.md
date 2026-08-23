@@ -10,7 +10,7 @@ rest of the raw view (`decisions`, `discovery`, `gates`, `settlements`,
 `outcomes`, `frictions`, `learnings`, `decisionsById`, `tools`) unfiltered
 from the entire backlog. This contradicts documented behavior in
 `plugins/fgOS/skills/pick/SKILL.md` step 3 ("filtered to just this item so
-the call never dumps the whole backlog") and `fgos-exploring/SKILL.md` step
+the call never dumps the whole backlog") and `fgos-coding-exploring/SKILL.md` step
 1 (reads `view.discovery["<item-id>"]`, implying scoped access). Confirmed
 live: a single-item lookup on this repo's real `.fgos/` store returned
 2.2MB (1334 decisions entries, 201 discovery keys, 138 gates keys, etc.)
@@ -73,7 +73,7 @@ bug is a response-SIZE/token-cost problem, not a correctness problem.
 - Documented (contradicted) behavior:
   `plugins/fgOS/skills/pick/SKILL.md` step 3 ("filtered to just this item
   so the call never dumps the whole backlog"),
-  `.claude/skills/fgos-exploring/SKILL.md` step 1 (`fgos list surfaces
+  `.claude/skills/fgos-coding-exploring/SKILL.md` step 1 (`fgos list surfaces
   view.discovery["<item-id>"]`).
 - Impact-analysis capability gate (`fgos tool query --capability
   impact-analysis --status present`): GitNexus present → posture `full`.
@@ -85,7 +85,7 @@ bug is a response-SIZE/token-cost problem, not a correctness problem.
   handler scopes from)
 - `src/state/awaiting-context.mjs` (the one existing consumer of
   `singleView` beyond the return value itself)
-- `plugins/fgOS/skills/pick/SKILL.md`, `.claude/skills/fgos-exploring/
+- `plugins/fgOS/skills/pick/SKILL.md`, `.claude/skills/fgos-coding-exploring/
   SKILL.md` — the documented (currently contradicted) behavior this fix
   makes true.
 

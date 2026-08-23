@@ -96,9 +96,10 @@ function stateView(cwd) {
 }
 
 function addOk(cwd, id, extra = {}) {
-  // add-stage-default-gap D1/D2: add now stamps stage 'clarify' by default
-  // (same door submit has always had), instead of the old implicit
-  // 'executing'. Every pre-existing call site of this helper (ready/take/
+  // add-stage-default-gap D1/D2: add now stamps an entry stage by default
+  // (same door submit has always had — 'discovery' as of tsk-qod D1/D2,
+  // 'clarify' before it), instead of the old implicit 'executing'. Every
+  // pre-existing call site of this helper (ready/take/
   // pick/conflicts/triage/ask-answer tests, none of which are testing add's
   // own stage semantics) relied on that old implicit default to get an
   // immediately frontier-ready item — default this helper's own --stage to
@@ -305,7 +306,7 @@ function addGoalItem(cwd, id, goalTier = 'mvp') {
 function toProposed(cwd, id) {
   addOk(cwd, id);
   run(cwd, ['move', id, '--to', 'doing']);
-  return run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  return run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 }
 
 // Walk awaiting-approval -> delivered -> retrospective -> cleanup -> done via
@@ -372,17 +373,13 @@ const SUBMIT_BAD_FLAG_CASES = [
   ['an empty --kind ""', ['--kind', '']],
 ];
 
-// tsk-4b2 D3/D6: coding's own clarify clear verdict now lands on
-// `discovery`, not `decompose` directly -- two more explicit `discover`
-// calls walk it through discovery->exploring->decompose. Shared by every
-// test below that needs an item actually AT decompose for its own setup.
-function advanceThroughDiscoveryToDecompose(cwd, id, verify = 'npm test -- proven') {
+// tsk-30v D2/D6: a clear verdict at `discovery` now skips `exploring` and
+// lands directly on `planning` in ONE `discover` call (previously two
+// explicit calls walked discovery->exploring->planning). Shared by every
+// test below that needs an item actually AT `planning` for its own setup.
+function advanceThroughDiscoveryToPlanning(cwd, id, verify = 'npm test -- proven') {
   const step1 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', verify]);
-  assert.equal(step1.status, 0, `expected clarify->discovery to succeed: ${step1.stderr}`);
-  const step2 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', verify]);
-  assert.equal(step2.status, 0, `expected discovery->exploring to succeed: ${step2.stderr}`);
-  const step3 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', verify]);
-  assert.equal(step3.status, 0, `expected exploring->decompose to succeed: ${step3.stderr}`);
+  assert.equal(step1.status, 0, `expected discovery->planning to succeed: ${step1.stderr}`);
 }
 
 // tsk-3vo D2/D3/D5: omitting --timeout on return/approve/catchup used to
@@ -498,7 +495,7 @@ function makeRunnerProposedItem(cwd, id, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -509,7 +506,7 @@ function makeRunnerProposedItem(cwd, id, extra = {}) {
 // that root branch's TIP, carrying a real commit — with the leaf item's own
 // status independently moved to `proposed` and `parent: rootId` set
 // directly through store.mjs's addWork (the CLI's `add` verb has no
-// --parent flag; only decompose.mjs writes it in production). The root
+// --parent flag; only plan.mjs writes it in production). The root
 // item itself is added but never dispatched through the CLI — only its
 // existence (for `resolveRoot` to resolve against) and its branch matter to
 // these tests.
@@ -558,7 +555,7 @@ function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, `state: propose ${leafId}`);
 }
 
@@ -588,7 +585,7 @@ function makeRunnerProposedItemTouching(cwd, id, relPath, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -678,7 +675,7 @@ function makeMilestone(cwd, id, targets) {
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id, title: `Title ${id}`, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', targets });
   run(cwd, ['move', id, '--to', 'doing']);
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -765,7 +762,7 @@ function addBareOrigin(cwd) {
 function makeLegacyProposedItem(cwd, id) {
   addOk(cwd, id);
   run(cwd, ['move', id, '--to', 'doing']);
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 }
 
 // --- catchup (D6/D7/D11: unified catch-up-by-merge for a merge-related park) ---
@@ -918,7 +915,7 @@ function makeSessionSafeRunnerItem(cwd, id, extra = {}) {
   gitAtCwd(cwd, ['add', `${id}-produced.txt`]);
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 }
 
 // --- approve ad-hoc (unregistered) worktree guard (P44) --------------------
@@ -991,7 +988,7 @@ export {
   addOk,
   addOutcome,
   addWork,
-  advanceThroughDiscoveryToDecompose,
+  advanceThroughDiscoveryToPlanning,
   assert,
   coexistPath,
   commitFile,

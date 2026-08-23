@@ -20,7 +20,7 @@ không phải một tác vụ đơn giản một dòng.
 - Không sửa hành vi, không kết luận D7/parallel-config — chỉ số liệu.
 - Ba khoảng xám phương pháp đã ghi lại trong CONTEXT.md, giao cho bước
   Approach dưới đây tự quyết (không cần hỏi lại người, đã qua bộ lọc
-  material/grounded/answerable ở fgos-exploring và trượt cả ba — xem
+  material/grounded/answerable ở fgos-coding-exploring và trượt cả ba — xem
   CONTEXT.md § Locked decisions):
   1. Tách timeout khỏi verify-fail thật trong `errorClass: 'verify-miss'`.
   2. Cộng dồn số lần chạy full verify qua nhiều verb (`return` + `approve`).

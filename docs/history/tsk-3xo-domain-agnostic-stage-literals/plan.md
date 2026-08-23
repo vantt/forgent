@@ -60,7 +60,7 @@ build-order requirement):
 2. `bin/fgos.mjs:955,979` — the 2 CLI-gate literals (`discover`/`decompose`
    verbs).
 3. `src/intake/discovery.mjs:593-599,663-669` — the 2 `moveStage` literals.
-4. `src/intake/decompose.mjs:542,604,685,759` — the 4 `moveStage` literals.
+4. `src/intake/plan.mjs:542,604,685,759` — the 4 `moveStage` literals.
 5. `tsk-3w3`'s decision-log correction — a `fgos decision` call (not a code
    change), correcting the stale claim per D1.
 6. New e2e test (see Proof surface below).
@@ -72,7 +72,7 @@ item — noted, not omitted.
 
 **Impact-analysis posture:** `fgos tool query --capability impact-analysis
 --status present` re-run fresh this stage → `gitnexus` present. Per
-`CLAUDE.md`'s gate: **full** — `fgos-code-implement` MUST run `impact()` on each
+`CLAUDE.md`'s gate: **full** — `fgos-coding-implement` MUST run `impact()` on each
 of the 7 call sites' enclosing functions (at minimum: the `discover` and
 `decompose` CLI verb handlers in `bin/fgos.mjs`, and whichever named
 functions in `discovery.mjs`/`decompose.mjs` own the 6 `moveStage` calls)
@@ -80,9 +80,9 @@ before editing, and report blast radius — not optional for this item.
 
 ## Risk map
 
-| Component | Risk | Proof point (carried to fgos-validating) |
+| Component | Risk | Proof point (carried to fgos-coding-validating) |
 |---|---|---|
-| `bin/fgos.mjs` CLI gates (955, 979) | medium — sync CLI is the most-used entry point; a mistake here breaks `fgos discover`/`fgos decompose` for every existing coding item | `impact()` on both verb handlers before editing; full existing test suite (`npm test`) green after the change, since this path is covered by existing coding-domain tests |
+| `bin/fgos.mjs` CLI gates (955, 979) | medium — sync CLI is the most-used entry point; a mistake here breaks `fgos discover`/`fgos plan` for every existing coding item | `impact()` on both verb handlers before editing; full existing test suite (`npm test`) green after the change, since this path is covered by existing coding-domain tests |
 | `discovery.mjs`/`decompose.mjs` `moveStage` calls (6 sites) | medium — these are the actual engine transitions; `judgeDiscovery`/`judgeDecompose` outcomes depend on them succeeding | `impact()` on the enclosing functions; `npm test` green; the new e2e test (below) exercising the previously-unreachable cross-domain path |
 | doc-comment + decision-log correction | low — no code path, text only | none needed beyond a read-back that the corrected text matches CONTEXT.md's Evidence section |
 | new e2e test itself | medium — must actually exercise the previously-broken path, not a no-op | test fails on `HEAD~` (pre-fix) and passes post-fix — verified by running it before and after the literal-replacement commits |
@@ -121,10 +121,10 @@ proceeds as itself, parented under `tsk-3w3` (CONTEXT.md D2), no children.
 - `work.domain` (or the equivalent field read via `listWork(dir).work[id]`)
   is reliably in scope at all 7 call sites without adding a new parameter
   — stated as fact in CONTEXT.md's Evidence, not re-derived here; if
-  `fgos-validating` finds a site where it is not actually in scope, that
+  `fgos-coding-validating` finds a site where it is not actually in scope, that
   is a plan-invalidating finding, not a minor implementation detail.
 - The `synthetic` domain fixture (or a disposable second domain) can be
   extended with a `Clarify`-mapped stage without breaking
   `test/e2e/synthetic-domain.test.mjs`'s own existing assertions — not
-  verified yet; `fgos-validating` should confirm before `fgos-code-implement`
+  verified yet; `fgos-coding-validating` should confirm before `fgos-coding-implement`
   commits to that specific fixture shape.

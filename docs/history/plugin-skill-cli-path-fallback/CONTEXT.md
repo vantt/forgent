@@ -103,7 +103,7 @@ first slash-command use.
 
 - Exact fallback shell snippet wording/shape to paste into all 23 files
   (a literal shared block vs. a short one-liner per file) — an
-  implementation choice, `fgos-planning`'s call.
+  implementation choice, `fgos-coding-planning`'s call.
 - Exact doctor-check name/id and what "actually invocable" checks for
   (e.g. `fgos --version` exit 0 vs. a deeper check) — implementation
   detail.
@@ -115,4 +115,4 @@ first slash-command use.
   skill prose (`plugins/fgOS/skills/**/SKILL.md`) — must follow
   `docs/how-to/write-verify-for-a-skill-prose-change.md`'s
   `npm test && POSITIVE && NEGATIVE` shape; not written here since this
-  skill does not design verify, `fgos-planning` does.
+  skill does not design verify, `fgos-coding-planning` does.

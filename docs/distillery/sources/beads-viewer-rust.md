@@ -10,7 +10,7 @@ domains_covered: [harness, hooks, workflow, orchestration, routing, integration-
 
 # beads-viewer-rust (bvr) — Feature Index
 
-**Tầng phân-tích + trực-quan-hóa + xuất-máy-đọc ĐẶT TRÊN `beads`** (Rust rewrite của beads-viewer gốc, Dicklesworthstone, ~77k dòng Rust + JS/wasm frontend). Nó KHÔNG phải tracker — nó ĐỌC đồ thị issue của `beads` (`sources/beads.md`) rồi sinh ba mặt: **robot** (JSON/TOON máy-đọc cho agent), **TUI** (12 view mode cho người), **static pages** (viewer offline sql.js/wasm). Vì vậy đây là **anh em ruột của `beads`** — chỗ để học "sau khi có đồ thị-việc, làm gì với nó": triage giải-thích-được, forecast, drift, what-if, gợi ý tự-chỉnh. Đồng thời bản thân bvr là một **cuộc port spec-first** (giống repository-harness→bee) nên có bài học riêng về kỷ luật port + conformance.
+**Tầng phân-tích + trực-quan-hóa + xuất-máy-đọc ĐẶT TRÊN `beads`** (Rust rewrite của beads-viewer gốc, Dicklesworthstone, ~77k dòng Rust + JS/wasm frontend). Nó KHÔNG phải tracker — nó ĐỌC đồ thị issue của `beads` (`sources/beads.md`) rồi sinh ba mặt: **robot** (JSON/TOON máy-đọc cho agent), **TUI** (12 view mode cho người), **static pages** (viewer offline sql.js/wasm). Vì vậy đây là **anh em ruột của `beads`** — chỗ để học "sau khi có đồ thị-việc, làm gì với nó": triage giải-thích-được, forecast, drift, what-if, gợi ý tự-chỉnh. Đồng thời bản thân bvr là một **cuộc port spec-first** (giống repository-harness→beehive) nên có bài học riêng về kỷ luật port + conformance.
 
 Scope scan: intelligence subsystem (`src/analysis/` 23 module) + core app (robot/tui/loader/model/export) + agent-facing docs (README/AGENTS/FEATURE_PARITY/TUI_GAP_ANALYSIS) + test discipline + frontend fallback. Inventory gốc: `plans/reports/distill-beadsviewerrust-analysis-260715-report.md`, `plans/reports/distill-beadsviewerrust-coreapp-260715-report.md`, `plans/reports/distill-beadsviewerrust-docs-260715-report.md`, `plans/reports/distill-beadsviewerrust-frontend-tests-config-260715-report.md`.
 
@@ -92,7 +92,7 @@ Scope scan: intelligence subsystem (`src/analysis/` 23 module) + core app (robot
 ### mcp-agent-mail-coordination
 - **What:** Điều phối ĐA-AGENT qua **MCP Agent Mail** + `.agent-mail.yaml`: agent làm việc cùng-repo phối hợp qua kênh mail chuyên dụng (mục "Same Repository Workflow" trong AGENTS.md), phân biệt macro vs granular tool.
 - **Where:** `AGENTS.md`, `.agent-mail.yaml`, `.agent-mail-project-id`
-- **Notable:** Đây là cơ chế multi-agent-coordination KHÁC với các nguồn khác trong corpus: beegog/repository-harness dùng reservation/claim + file hold; symphony dùng typed runtime boundary; bvr dùng **message-passing (mail) giữa agent**. Trực tiếp liên quan hướng fgOS "multi-agent parallel + reactive fan-out" — một điểm thiết kế thứ ba để cân nhắc cho anti-loop coordination.
+- **Notable:** Đây là cơ chế multi-agent-coordination KHÁC với các nguồn khác trong corpus: beehive/repository-harness dùng reservation/claim + file hold; symphony dùng typed runtime boundary; bvr dùng **message-passing (mail) giữa agent**. Trực tiếp liên quan hướng fgOS "multi-agent parallel + reactive fan-out" — một điểm thiết kế thứ ba để cân nhắc cho anti-loop coordination.
 - **Keywords:** agent mail, MCP, multi-agent coordination, same-repo workflow, message passing
 - **Seen:** 7f96da4
 
@@ -133,7 +133,7 @@ Scope scan: intelligence subsystem (`src/analysis/` 23 module) + core app (robot
 ### agent-guardrail-doctrine
 - **What:** AGENTS.md đặt luật cứng cho agent: **RULE 0 "Fundamental Override Prerogative"**, **RULE 1 "NO FILE DELETION"**, **"Irreversible Git & Filesystem Actions — DO NOT EVER BREAK GLASS"** (cấm thao tác không-hoàn-tác), chỉ dùng branch `main`, cấm sửa-code-bằng-script. Ở tầng code: lint `unsafe_code = forbid`; test đi bộ `src/` bắt version literal hard-code (bắt phải `env!("CARGO_PKG_VERSION")`), allowlist agents.rs + viewer_assets.rs.
 - **Where:** `AGENTS.md`, `src/lib.rs`, `Cargo.toml`
-- **Notable:** **Hội tụ với guardrail của bee/fgOS** (privacy, no-break-glass, verify-before-destroy trong rules ta) nhưng phát biểu như "prerogative + no-delete + never-break-glass" ở tầng agent-instructions. Test-bắt-version-literal là mẹo hay: guardrail thành TEST chạy được, không chỉ lời dặn.
+- **Notable:** **Hội tụ với guardrail của beehive/fgOS** (privacy, no-break-glass, verify-before-destroy trong rules ta) nhưng phát biểu như "prerogative + no-delete + never-break-glass" ở tầng agent-instructions. Test-bắt-version-literal là mẹo hay: guardrail thành TEST chạy được, không chỉ lời dặn.
 - **Keywords:** RULE 0, no file deletion, never break glass, forbid unsafe, version-literal guard test
 - **Seen:** 7f96da4
 
@@ -158,7 +158,7 @@ Scope scan: intelligence subsystem (`src/analysis/` 23 module) + core app (robot
 ### evidence-gated-parity-ledger
 - **What:** `FEATURE_PARITY.md` là **sổ cái** 126+ flag: mỗi flag đánh trạng thái (complete/partial/missing/excluded/bvr-only) và CHỈ được `complete` khi có conformance test chống lưng; kèm bảng tóm tắt máy-đọc để coverage audit-được. `TUI_GAP_ANALYSIS.md` là tài-liệu-lỗ-hổng: audit phát hiện parity-claim TUI không có chứng cứ → đánh dấu partial để chuyển hướng effort về việc thật. Luật: "parity claims require evidence not aspiration".
 - **Where:** `FEATURE_PARITY.md`, `TUI_GAP_ANALYSIS.md`, `PLAN_TO_PORT_BEADS_VIEWER_TO_RUST.md`
-- **Notable:** Doc-as-ledger + audit-as-gap-doc: tuyên bố "xong" phải trỏ chứng cứ, không phải "hầu hết đã chạy". Cùng tinh thần verify-enforced-close của bee/harness nhưng áp cho DOC coverage. Mẫu tốt cho roadmap fgOS tránh over-claim.
+- **Notable:** Doc-as-ledger + audit-as-gap-doc: tuyên bố "xong" phải trỏ chứng cứ, không phải "hầu hết đã chạy". Cùng tinh thần verify-enforced-close của beehive/harness nhưng áp cho DOC coverage. Mẫu tốt cho roadmap fgOS tránh over-claim.
 - **Keywords:** parity ledger, evidence-gated, gap analysis doc, complete-only-when-tested, coverage audit
 - **Seen:** 7f96da4
 
@@ -167,7 +167,7 @@ Scope scan: intelligence subsystem (`src/analysis/` 23 module) + core app (robot
 ### spec-first-port-then-conform
 - **What:** Port được làm SPEC-TRƯỚC: trích behavior/spec từ Go legacy (`EXISTING_BEADS_VIEWER_STRUCTURE.md` = nguồn-sự-thật hành vi) → cài Rust từ spec → verify bằng conformance fixture + benchmark, KHÔNG dịch dòng-dòng. Chia phase (CHANGELOG phase 1-7), mỗi phase có tiêu chí verify; phase xong → việc sau là "post-parity enhancement" chứ không phải "parity recovery".
 - **Where:** `PLAN_TO_PORT_BEADS_VIEWER_TO_RUST.md`, `CHANGELOG.md`, `EXISTING_BEADS_VIEWER_STRUCTURE.md`
-- **Notable:** Kỷ luật port qua spec + phase-locked completion tránh cargo-cult và cho một mốc "done" rõ. So được với repository-harness→bee (chưng cất qua numbered-docs). Bổ trợ cho conformance-against-reference: spec định nghĩa, conformance chứng minh.
+- **Notable:** Kỷ luật port qua spec + phase-locked completion tránh cargo-cult và cho một mốc "done" rõ. So được với repository-harness→beehive (chưng cất qua numbered-docs). Bổ trợ cho conformance-against-reference: spec định nghĩa, conformance chứng minh.
 - **Keywords:** spec-first port, phase-locked, post-parity, behavior source of truth
 - **Seen:** 7f96da4
 

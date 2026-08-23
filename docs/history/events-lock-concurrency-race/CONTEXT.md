@@ -93,12 +93,12 @@ either.
 - Whether the race-test's own parameters (`N_PROC`/`N_APPEND`, currently
   6×40) should be scaled toward the ≥20-concurrency bar (D2) as part of
   proving D1, and how to do that without making the default `npm test` run
-  slow/flaky for everyone — implementation choice, left to `fgos-planning`.
+  slow/flaky for everyone — implementation choice, left to `fgos-coding-planning`.
 - If scenario (a) is confirmed (a real race under ≥20-concurrency load): the
   specific code fix to `acquireEventsLock`/`tryAcquireEventsLockOnce` —
-  implementation work, left to `fgos-planning`.
+  implementation work, left to `fgos-coding-planning`.
 - If scenario (b) is confirmed: whether the remedy is loosening the test's
   threshold/retry, or excluding this test from the default full-suite run
   (behind a flag) — the item's own description already poses both as valid
   options; picking between them is implementation/workflow judgment left to
-  `fgos-planning`, informed by whatever the D1 reproduction actually shows.
+  `fgos-coding-planning`, informed by whatever the D1 reproduction actually shows.

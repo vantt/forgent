@@ -99,15 +99,15 @@ Ngoài phạm vi item này (deferred, không mở rộng scope):
 
 - Thứ tự thi công thật giữa tsk-2cs và tsk-2ta: cả hai đụng
   `src/runner/dispatch.mjs` (D6 ở đây, path-move assumption ở tsk-2ta) và
-  cùng file cấu hình chung. `fgos-planning` cho tsk-2cs cần đọc lại trạng
+  cùng file cấu hình chung. `fgos-coding-planning` cho tsk-2cs cần đọc lại trạng
   thái merge thật của `fgw/tsk-2ta` tại thời điểm thi công (đã merge vào
   main hay chưa) để quyết thứ tự — không giả định trước ở đây.
 - Tên `id`/key chính xác cho từng section trong file chung (`runner`,
   `gateBypass`, tên field bên trong `registrations.mjs`) — chi tiết
-  implementer, `fgos-planning` quyết.
+  implementer, `fgos-coding-planning` quyết.
 - `fgos setup` có phải nơi ghi giá trị mặc định của registry vào file chung
   lần đầu hay không (khác với `doctor`, vốn read-only theo RUL9) — implementer
-  detail, `fgos-planning` cân nhắc cùng lúc với D1's registrations.mjs shape.
+  detail, `fgos-coding-planning` cân nhắc cùng lúc với D1's registrations.mjs shape.
 
 ## Outstanding questions
 

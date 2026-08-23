@@ -49,11 +49,11 @@ cho 2 con vì chúng không cạnh tranh thứ tự — file-disjoint hoàn toà
 được thật, không đứa nào unblock đứa kia.
 
 Impact-analysis capability: `present` (GitNexus), Full mode — xác nhận
-lại fresh trong `fgos-exploring` round (seq đã ghi, xem CONTEXT.md).
+lại fresh trong `fgos-coding-exploring` round (seq đã ghi, xem CONTEXT.md).
 
 ### Risk map
 
-| Thành phần | Rủi ro | Bằng chứng cần (→ fgos-validating) |
+| Thành phần | Rủi ro | Bằng chứng cần (→ fgos-coding-validating) |
 |---|---|---|
 | `computeSchedule`/`detectCycles` (mới, `graph-metrics.mjs`) | Trung bình — thuật toán mới (Kahn+Tarjan), sai có thể báo sai sóng | Unit test: 1 cặp chồng footprint + 1 cặp không chồng + 1 chu trình dep giả → đúng số sóng, đúng thành viên, cycle bị từ chối tại cửa ghi deps |
 | Chụp `baseCommit`/`headRef` quanh `resolveExecutorConfig` | Thấp — chỉ đọc, không ghi state mới | Test: giá trị chụp khớp `git rev-parse HEAD` thật tại thời điểm gọi |
@@ -65,7 +65,7 @@ lại fresh trong `fgos-exploring` round (seq đã ghi, xem CONTEXT.md).
 **Phase A — `computed-parallel-wave-schedule`** (file: `src/state/graph-metrics.mjs`, `src/cli/command-registry.mjs`, `bin/fgos.mjs`):
 1. `detectCycles(view)` — Tarjan, quét MỌI cell bất kể status, self-dep = cycle 1 phần tử (mẫu theo beegog, cite deep-dive).
 2. `computeSchedule(view)` — Kahn layering trên `frontier()`, item chồng footprint dời sang wave sau (tái dùng `footprintOverlapAmong` đã có).
-3. Verb đọc-only mới đăng ký qua `command-registry.mjs` (tên cụ thể để `fgos-validating`/implementer chọn — không khoá tên verb ở plan này, chỉ khoá shape input/output: trả `{waves: [[ids...]], cycleRefused: bool}`).
+3. Verb đọc-only mới đăng ký qua `command-registry.mjs` (tên cụ thể để `fgos-coding-validating`/implementer chọn — không khoá tên verb ở plan này, chỉ khoá shape input/output: trả `{waves: [[ids...]], cycleRefused: bool}`).
 
 **Phase B — `worktree-dispatch-attestation`** (file: `src/runner/dispatch.mjs`, `src/runner/frozen-judge.mjs`):
 1. `dispatch.mjs`: chụp `baseCommit` (`git rev-parse HEAD`)/`headRef` ngay trước lời gọi `resolveExecutorConfig` khi target là `cli`-kind cross-provider — ghi vào đâu (log/decision/trace) là chi tiết implementer, plan chỉ khoá: PHẢI chụp TRƯỚC dispatch, không phải sau.

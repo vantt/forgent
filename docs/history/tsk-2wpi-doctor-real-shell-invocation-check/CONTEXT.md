@@ -3,7 +3,7 @@
 Item: `tsk-2wpi`. Written retroactively (same structural gap noted across
 this scan's other items — `clarify` jumps straight to `decompose`).
 
-## Decisions
+## Locked decisions
 
 - **D0.** Root cause confirmed by reading `src/setup/registrations.mjs`'s
   `checkShellIntegrationSourced` (:241-282) and `hasSourceLine`

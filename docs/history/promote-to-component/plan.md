@@ -71,7 +71,7 @@ new but small; no existing helper does it today (confirmed: no hits for
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | Merge-based retarget (reused `mergeRunnerItem`) | Medium — mechanism is proven, but this is its first use outside `sync-root`'s own item-to-known-parent shape | Confirm a scripted 2-member promote against a disposable fixture branch pair produces the same `merged`/`conflict`/`verify-fail` outcomes `sync-root` already produces for the analogous case |
 | New active/dirty-worktree bail check (D3.ii) | High — new code, the exact gap tsk-3au's incident exposed | Prove: (a) a member with a clean, non-checked-out branch proceeds; (b) a member whose branch is checked out in a worktree with uncommitted changes bails without touching git; (c) the check runs *before* any git mutation for that member, never after |
@@ -139,7 +139,7 @@ parallelism benefit to splitting either.
   không an toàn") and D3, both phrased per-member. Partial success (some
   members promoted, others left flat with a reported reason) is an
   acceptable, expected outcome — not a failure requiring rollback of the
-  members that did succeed. Not asked back to `fgos-exploring`: doesn't
+  members that did succeed. Not asked back to `fgos-coding-exploring`: doesn't
   change scope/acceptance, only clarifies an already-per-member-shaped
   mechanism.
 - **New-root branch seeds from `detectTrunk`, uniformly** — even the

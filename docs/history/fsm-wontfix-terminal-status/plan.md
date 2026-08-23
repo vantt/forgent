@@ -43,7 +43,7 @@ mirror.
 
 ### Risk map
 
-| Component | Risk | Proof point (validated at `fgos-validating`, executed at `fgos-code-implement`) |
+| Component | Risk | Proof point (validated at `fgos-coding-validating`, executed at `fgos-coding-implement`) |
 |---|---|---|
 | `src/state/fsm.mjs` (`TRANSITIONS`) | medium — a wrong edge set is a silent modeling bug, not a crash | `fsm.test.mjs`: each of the 3 new edges (`blocked→wontfix`, `todo→wontfix`, `doing→wontfix`) transitions cleanly; every edge OUT of `wontfix` is rejected (`precondition`), mirroring the existing `done`-is-terminal test. |
 | `src/state/work.mjs` (`STATUSES`) | medium — every event validator and `backward-compat.test.mjs` reads this list | `work.test.mjs`: `wontfix` accepted as a valid `work.status`; `backward-compat.test.mjs` still green (legacy events with no `v` still replay). |

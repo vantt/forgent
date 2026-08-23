@@ -45,7 +45,7 @@ There is nothing left to change in the codebase for this item's stated
 goal — the fix already exists and the verify command already passes.
 
 **Still open:** none — the technical question is fully resolved. What
-remains is process only (how `fgos-planning`/`fgos-code-implement` want to
+remains is process only (how `fgos-coding-planning`/`fgos-coding-implement` want to
 handle an item whose fix already landed via a different path), which is
 outside this skill's remit.
 

@@ -24,7 +24,7 @@ item does not re-derive it, only locks the product-level scope gaps that
 doc left open.
 
 **Out of scope** (belongs to a sibling item, not this one):
-- `tsk-1e4` — rewriting fgos-planning/fgos-validating/fgos-code-implement
+- `tsk-1e4` — rewriting fgos-coding-planning/fgos-coding-validating/fgos-coding-implement
   prose (and `CLAUDE.md`) to consult the `impact-analysis` capability
   instead of hardcoding "GitNexus". Building the registry does not by
   itself make anyone ask it (deep-dive's own finding: injection is a

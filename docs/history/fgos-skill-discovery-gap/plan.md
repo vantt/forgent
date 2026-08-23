@@ -2,7 +2,7 @@
 
 ## Mode
 
-**Standard.** *Reshaped at `fgos-code-implement`*: the first pass at this plan
+**Standard.** *Reshaped at `fgos-coding-implement`*: the first pass at this plan
 (below, kept for the record) classified this as a `spike` because a
 single yes/no question decides whether any fix is real — that framing
 still holds for the *hypothesis*, but executing found the actual blast
@@ -27,7 +27,7 @@ fixing), recounted with the real scope now known:
 
 3 flags (2 hard-gate-adjacent: covered dispatch behavior + a tested
 invariant) puts this at `standard`, not `spike` — the original mode
-undercounted because `fgos-planning`'s first pass only grepped
+undercounted because `fgos-coding-planning`'s first pass only grepped
 `AGENTS.md`/`CLAUDE.md`, never `src/`/`test/`.
 
 ## Approach
@@ -127,8 +127,8 @@ top-level directory**, matching `distill`'s proven shape exactly.
 
 **Target layout:** `.claude/skills/fgos/<name>/SKILL.md` →
 `.claude/skills/<name>/SKILL.md` for all 9 names (`fgos-routing`,
-`fgos-exploring`, `fgos-planning`, `fgos-validating`, `fgos-code-implement`,
-`fgos-compounding`, `fgos-indexing`, `fgos-submit-assist`,
+`fgos-coding-exploring`, `fgos-coding-planning`, `fgos-coding-validating`, `fgos-coding-implement`,
+`fgos-coding-compounding`, `fgos-indexing`, `fgos-submit-assist`,
 `fgos-unlock`) — no shared parent folder at all. Same flatten for
 `.agents/skills/fgos/<name>/` → `.agents/skills/<name>/`.
 
@@ -139,7 +139,7 @@ count as the rename pass, confirming nothing else changed underneath):**
 |---|---|---|
 | Skill content | `.claude/skills/fgos/<name>/SKILL.md` (9) | `git mv` each to `.claude/skills/<name>/SKILL.md` — 9 separate moves, no parent dir survives |
 | Mirror | `.agents/skills/fgos/<name>/SKILL.md` (9) | Same flatten to `.agents/skills/<name>/SKILL.md` |
-| Runtime | `src/runner/dispatch.mjs:124` | `` `.claude/skills/fgos/${skillName}/SKILL.md` `` → `` `.claude/skills/${skillName}/SKILL.md` `` (`skillName` already resolves to e.g. `fgos-code-implement`, confirmed by `skillForStage`'s own test) |
+| Runtime | `src/runner/dispatch.mjs:124` | `` `.claude/skills/fgos/${skillName}/SKILL.md` `` → `` `.claude/skills/${skillName}/SKILL.md` `` (`skillName` already resolves to e.g. `fgos-coding-implement`, confirmed by `skillForStage`'s own test) |
 | Tests (string) | `test/runner/dispatch.test.mjs:149`, `test/runner/prompt-templates.test.mjs:119,127` | Literal path strings updated to the flat form |
 | **Test (structural — new, not just a string swap)** | `test/skills/fgos-mirror.test.mjs` | `CLAUDE_SKILLS_DIR`/`AGENTS_SKILLS_DIR` currently point at one parent (`.claude/skills/fgos`) and recursively diff its contents. After flattening there is no single parent — the test must instead: (a) list top-level dirs under `.claude/skills/` matching `fgos-*`, (b) do the same under `.agents/skills/`, (c) assert the two name-sets are equal, then (d) byte-compare each matched pair's files, same as today just per-skill instead of per-parent |
 | Specs | `docs/specs/runner.md` (7), `docs/specs/reading-map.md` (1), `docs/specs/enduser-docs-authoring.md` (2), `docs/backlog.md` (3) | Path-string update: `.claude/skills/fgos/<name>/` → `.claude/skills/<name>/` |

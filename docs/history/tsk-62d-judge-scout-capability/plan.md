@@ -32,13 +32,13 @@ It isn't — RUL6 exists because this exact class of change (subprocess
 `allowedTools`) was already the site of a prior real failure mode (`git
 commit` hanging without the allowlist, per RUL6's own root-cause note).
 The extra rigor `high-risk` buys (fuller risk map, explicit proof points
-per component, no proof-point guessing left to `fgos-validating`) is
+per component, no proof-point guessing left to `fgos-coding-validating`) is
 proportionate to that history, not decorative.
 
 ## Approach
 
 **Chosen path** (per CONTEXT.md D2/D4, cited not reopened) — REVISED after a
-`fgos-validating` "smaller path" catch (below): `resolveExecutorConfig`
+`fgos-coding-validating` "smaller path" catch (below): `resolveExecutorConfig`
 (`dispatch.mjs:404-411`) already resolves `cfg.executors[tier]` as a fully
 generic string-keyed map — `validateRunnerConfigShape` (`dispatch.mjs:350-357`)
 validates every key in `cfg.executors` uniformly, with no restriction to
@@ -65,7 +65,7 @@ today, for the WORKER — RUL6's own text describes the worker's headless
 calls inside one spawn, gated by the SAME `--allowedTools` mechanism this
 plan reuses. This is running, tested behavior, not a hypothesis — no
 separate spike needed to answer that question; it's evidence, cited here
-so `fgos-validating` doesn't have to re-derive it.
+so `fgos-coding-validating` doesn't have to re-derive it.
 
 **Alternatives rejected** (both already closed in CONTEXT.md, cited here
 for the plan's own audit trail):
@@ -97,7 +97,7 @@ item, no cross-item constraint to honor.
    construction, the same fallback path `tier`-based overrides already
    exercise for real tiers).
 2. *(folded into step 1 — no separate config-plumbing step needed; the
-   smaller path found at `fgos-validating` removed this as its own
+   smaller path found at `fgos-coding-validating` removed this as its own
    phase.)*
 3. **Shared prompt-template file + prompt wiring.** New
    `src/runner/prompt-templates/judge-scout-instructions.txt` (RUL44
@@ -119,7 +119,7 @@ per `CLAUDE.md`'s binding rule at this posture level — not optional here.
 
 ## Risk map
 
-| Component | Risk | Proof point (carried to `fgos-validating`) |
+| Component | Risk | Proof point (carried to `fgos-coding-validating`) |
 |---|---|---|
 | `dispatch.mjs` (`resolveExecutorCommand`/`resolveExecutorConfig`) | None — file not edited (smaller-path finding: existing generic `tier`-keyed lookup already covers this need) | `dispatch.test.mjs` stays green unmodified — the absence of a diff here IS the proof; no `impact()` needed since no symbol in this file changes |
 | `judge-executor.mjs`'s call site (passes `tier: 'judge'`) | Low — a 1-line change to which string is passed, not to resolution logic itself | `impact({target: "spawnAttempt", direction: "upstream"})` before editing (full posture); existing `judge-executor.test.mjs` green; new test asserting `tier: 'judge'` reaches `resolveExecutorCommand` and resolves `cfg.executors.judge` when present |
@@ -151,7 +151,7 @@ real verify command already proposed at `clarify`
 (`npm test test/intake/judge-executor.test.mjs -- --timeout 30000`,
 `fgos discover` verdict) — broadened here to also cover
 `test/runner/dispatch.test.mjs`, `test/intake/discovery.test.mjs`, and
-`test/intake/decompose.test.mjs`, since all four are touched. Splitting
+`test/intake/plan.test.mjs`, since all four are touched. Splitting
 into separate items would separate config plumbing from the capability
 grant it exists to serve, with no independent value for either half on
 its own (per CONTEXT.md's own feature boundary — this is not a project

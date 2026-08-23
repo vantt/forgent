@@ -79,7 +79,7 @@ per D4.
 ## Why this stayed a single-plan, no-split item
 
 `judgeDecompose` returned pass-through: the design (D1–D4) was already
-locked, `fgos-validating` had already confirmed READY with a real test
+locked, `fgos-coding-validating` had already confirmed READY with a real test
 run (2233 pass / 0 fail), and the change was scoped to exactly four
 files (`work.mjs` validation, `store.mjs` `EDITABLE_FIELDS`,
 `graph-harness.mjs`'s new `supersededOut` bucket, `bin/fgos.mjs` CLI

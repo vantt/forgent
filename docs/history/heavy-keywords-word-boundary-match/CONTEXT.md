@@ -38,8 +38,8 @@ mechanism) — out of scope.
   or as "auth," but not inside "authoring"/"author"/"authentic". The exact
   regex/Unicode-boundary implementation (plain ASCII `\b`, which does not
   reliably bound Vietnamese diacritic letters, vs. a Unicode-aware
-  alternative) is an implementation choice for `fgos-planning`/
-  `fgos-code-implement`, not locked here — several `HEAVY_KEYWORDS`/
+  alternative) is an implementation choice for `fgos-coding-planning`/
+  `fgos-coding-implement`, not locked here — several `HEAVY_KEYWORDS`/
   `LIGHT_KEYWORDS`/`KIND_KEYWORDS` entries are Vietnamese
   ("bảo mật", "thanh toán", "đổi tên"...).
 
@@ -75,11 +75,11 @@ mechanism) — out of scope.
   `fgos tool query --capability impact-analysis --status present` →
   GitNexus registered, `status: present`. Posture: **full** — informational
   only; this item edits existing functions (`classifyIronLaw`,
-  `countMatches`), so `fgos-planning`/`fgos-code-implement` may lean on this for
+  `countMatches`), so `fgos-coding-planning`/`fgos-coding-implement` may lean on this for
   a blast-radius proof point if the risk map calls for one.
 - Prior `judgeDiscovery` verdicts for `tsk-2as`: none (fresh item).
 
-## Deferred to fgos-planning
+## Deferred to fgos-coding-planning
 
 - The exact word-boundary implementation (regex `\b`, Unicode property
   escapes, or a manual boundary check) — especially handling Vietnamese

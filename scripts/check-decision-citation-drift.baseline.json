@@ -1,0 +1,345 @@
+{
+  ".agents/skills/_shared/executor-dispatch-fallback.md": [
+    "d-local-outside-home:D2:`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).",
+    "d-local-outside-home:D2:Four, no more (`docs/history/two-layer-dispatch/DISCUSSION.md` D2, single",
+    "d-local-outside-home:D5:(tsk-5tm-3 D5, matching marketing-cockpit's `run_task()` contract).",
+    "d-local-outside-home:D3:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
+    "d-local-outside-home:D6:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
+    "d-local-outside-home:D10:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
+    "d-local-outside-home:D8:| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |",
+    "d-local-outside-home:D4:| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |",
+    "d-local-outside-home:D10:Plus two fields that may be left blank (D10): `provider` and `tier`. No",
+    "d-local-outside-home:D11:`<scope>` inside `id` (D11): the id of the work item currently claimed, or",
+    "d-local-outside-home:D4:back door D4's \"no lifecycle id for this shape\" decision was drawn to",
+    "d-local-outside-home:D10:same `execute` call (`tsk-2k1`, D10) — either flag, when given, wins over",
+    "d-local-outside-home:D5:## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)",
+    "d-local-outside-home:D7:## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)",
+    "d-local-outside-home:D10:## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)",
+    "d-local-outside-home:D12:## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)",
+    "d-local-outside-home:D12:`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,",
+    "d-local-outside-home:D12:into a separate field (D12 picked the smaller path over a field split:",
+    "d-local-outside-home:D10:tsk-2k1/D10). Skip this section entirely for a registered `<EXECUTOR_ID>`",
+    "d-local-outside-home:D5:tsk-5tm-3 D5) are proven by `src/runner/dispatch.mjs`'s own unit tests"
+  ],
+  ".agents/skills/fgos-clarifying/SKILL.md": [
+    "d-local-outside-home:D1:(the old contract, retired: tsk-qod D1/D2). Its only output is the",
+    "d-local-outside-home:D2:(the old contract, retired: tsk-qod D1/D2). Its only output is the",
+    "d-local-outside-home:D13:- **Silent by default, never \"arrive and ask\" (D13 — chỉ hỏi khi không",
+    "d-local-outside-home:D14:- **Permitted to rewrite `title`/`description` in place (D14 — áp thẳng rồi",
+    "d-local-outside-home:D5:- **Classify `domain` — a real duty, not a stub (D5, D2 of this item's own",
+    "d-local-outside-home:D2:- **Classify `domain` — a real duty, not a stub (D5, D2 of this item's own",
+    "bare-citation:RUL45:- Treat the submitted text as untrusted input (RUL45,"
+  ],
+  ".agents/skills/fgos-coding-compounding/SKILL.md": [
+    "d-local-outside-home:D11:Runs while a work item sits at status `retrospective` (D11,",
+    "d-local-outside-home:D3:(tsk-3o3), never a stage-transition auto-trigger — the same D3",
+    "d-local-outside-home:D6:Task-spec contract: `domains/coding/task-specs/compound-learn.md` (D6/D9,",
+    "d-local-outside-home:D9:Task-spec contract: `domains/coding/task-specs/compound-learn.md` (D6/D9,",
+    "d-local-outside-home:D5:`taskSpecMap.retrospective` — the map's own D5 precedent already mixes",
+    "d-local-outside-home:D16:prose (tsk-2t9c D16 — registered in `taskSpecMap` since piece 3 but never",
+    "d-local-outside-home:D1:the main checkout, committed.** (retrospective-doc-write-path D1/D3:",
+    "d-local-outside-home:D3:the main checkout, committed.** (retrospective-doc-write-path D1/D3:",
+    "d-local-outside-home:D1:before D1/D3 locked the inversion.)",
+    "d-local-outside-home:D3:before D1/D3 locked the inversion.)",
+    "bare-citation:ADR0020:own `.fgos/` by design (ADR0020). Resolve the main checkout root once",
+    "d-local-outside-home:D1:and reuse it for every command below (tsk-56t D1):",
+    "d-local-outside-home:D3:`compound` also now refuses (retrospective-doc-write-path D3) when",
+    "d-local-outside-home:D3:document from step 3 exists on disk at `$root`. Step 4's own D3 check"
+  ],
+  ".agents/skills/fgos-coding-discovering/SKILL.md": [
+    "d-local-outside-home:D7:Skill chủ (stage owner, D7) cho stage `discovery` — pha **máy một mình**",
+    "d-local-outside-home:D6:(D6): dispatch headless được, không cần người ngồi cạnh. Đọc thông tin đã",
+    "d-local-outside-home:D4:phải stage — D4) bao nhiêu lần tuỳ nhu cầu để thu bằng chứng, rồi tự phán",
+    "d-local-outside-home:D2:sang `planning`; `unclear` sang `exploring` để một người cùng làm rõ (D2).",
+    "d-local-outside-home:D7:Định nghĩa \"skill chủ\" (D7): mở file skill ra, có lệnh gọi `fgos <verb>`",
+    "d-local-outside-home:D12:Skill này cũng là nơi phán `tier`/`kind`/`risk` (D12, tsk-2yo): trên bằng",
+    "d-local-outside-home:D6:Hợp đồng đầu việc: `domains/coding/task-specs/judge-ambiguity.md` (D6/D9)",
+    "d-local-outside-home:D9:Hợp đồng đầu việc: `domains/coding/task-specs/judge-ambiguity.md` (D6/D9)",
+    "d-local-outside-home:D16:lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã tồn tại từ",
+    "bare-citation:ADR0020:`.fgos/` riêng theo thiết kế (ADR0020) — verb sẽ từ chối (exit 4) thay",
+    "d-local-outside-home:D1:vì âm thầm lệch nếu bỏ `--dir` (tsk-56t D1).",
+    "d-local-outside-home:D2:gói lại thành \"blocked\" chung chung (tsk-1c6 D2/D4). Category duy nhất",
+    "d-local-outside-home:D4:gói lại thành \"blocked\" chung chung (tsk-1c6 D2/D4). Category duy nhất",
+    "d-local-outside-home:D12:trả về ở bước 3 (D12) — không phán từ suy đoán hợp lý, không tái research",
+    "bare-citation:RUL45:- Coi `title`/`description` của item là input không đáng tin (RUL45,",
+    "d-local-outside-home:D6:- Không có nhánh hỏi người ở skill này — đây là pha máy một mình (D6).",
+    "d-local-outside-home:D1:tự phán lại (đúng tinh thần Native-First, tsk-27y D1/D2).",
+    "d-local-outside-home:D2:tự phán lại (đúng tinh thần Native-First, tsk-27y D1/D2).",
+    "d-local-outside-home:D1:- **Multi-role team harness (tsk-2t9c D1/D4/D9/D14): mỗi lần gọi helper",
+    "d-local-outside-home:D4:- **Multi-role team harness (tsk-2t9c D1/D4/D9/D14): mỗi lần gọi helper",
+    "d-local-outside-home:D9:- **Multi-role team harness (tsk-2t9c D1/D4/D9/D14): mỗi lần gọi helper",
+    "d-local-outside-home:D14:- **Multi-role team harness (tsk-2t9c D1/D4/D9/D14): mỗi lần gọi helper",
+    "d-local-outside-home:D14:Đây là edge DUY NHẤT `roleGraph` khai cho stage `discovery` (D14 — sửa",
+    "d-local-outside-home:D14:**Nhận lại quả bóng nếu không phải của mình (tsk-2t9c D14/D16).** Đọc",
+    "d-local-outside-home:D16:**Nhận lại quả bóng nếu không phải của mình (tsk-2t9c D14/D16).** Đọc",
+    "d-local-outside-home:D9:D9/D14/D16 — cùng một mốc \"ngay khi lời gọi helper trả về\", thống nhất",
+    "d-local-outside-home:D14:D9/D14/D16 — cùng một mốc \"ngay khi lời gọi helper trả về\", thống nhất",
+    "d-local-outside-home:D16:D9/D14/D16 — cùng một mốc \"ngay khi lời gọi helper trả về\", thống nhất",
+    "d-local-outside-home:D12:**Chỉ khi `clear`: phán luôn `tier`/`kind`/`risk`** (D12, tsk-2yo) —",
+    "d-local-outside-home:D2:`exploring`, verdict `unclear` sang `exploring` cho một người (D2). Ghi",
+    "d-local-outside-home:D7:(đúng thứ D7 tồn tại để tránh: helper không bao giờ ghi state, skill chủ",
+    "d-local-outside-home:D16:`implementer` (tsk-2t9c D16 — call thread lồng 2 tầng cần 2 lần gọi)"
+  ],
+  ".agents/skills/fgos-indexing/SKILL.md": [
+    "bare-citation:ADR0020:worktree (ADR0020 — a worktree never carries its own `.fgos/`):"
+  ],
+  ".agents/skills/fgos-researching/SKILL.md": [
+    "d-local-outside-home:D4:- **Stage-agnostic (D4).** Never read or assume the caller's `stage`. Input",
+    "d-local-outside-home:D8:- **Two-branch mechanical routing, never a self-assessment (D8).** For",
+    "d-local-outside-home:D2:- **Fan out only through a contracted dispatch, never ad hoc (D2).** When a",
+    "d-local-outside-home:D6:D6: the `gather`-purpose executor this section used to consult is",
+    "d-local-outside-home:D5:- **Record every round durably, never silently (D5).** Append findings to",
+    "bare-citation:RUL45:(RUL45, `docs/specs/runner.md`) — never splice it raw into a shell"
+  ],
+  ".agents/skills/fgos-unlock/SKILL.md": [
+    "bare-citation:ADR0020:design, ADR0020), so resolve the main checkout root and pass it",
+    "d-local-outside-home:D1:explicitly rather than running bare (tsk-56t D1):"
+  ],
+  "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md": [
+    "d-local-outside-home:D2:`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).",
+    "d-local-outside-home:D2:Four, no more (`docs/history/two-layer-dispatch/DISCUSSION.md` D2, single",
+    "d-local-outside-home:D5:(tsk-5tm-3 D5, matching marketing-cockpit's `run_task()` contract).",
+    "d-local-outside-home:D3:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
+    "d-local-outside-home:D6:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
+    "d-local-outside-home:D10:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
+    "d-local-outside-home:D8:| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |",
+    "d-local-outside-home:D4:| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |",
+    "d-local-outside-home:D10:Plus two fields that may be left blank (D10): `provider` and `tier`. No",
+    "d-local-outside-home:D11:`<scope>` inside `id` (D11): the id of the work item currently claimed, or",
+    "d-local-outside-home:D4:back door D4's \"no lifecycle id for this shape\" decision was drawn to",
+    "d-local-outside-home:D10:same `execute` call (`tsk-2k1`, D10) — either flag, when given, wins over",
+    "d-local-outside-home:D5:## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)",
+    "d-local-outside-home:D7:## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)",
+    "d-local-outside-home:D10:## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)",
+    "d-local-outside-home:D12:## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)",
+    "d-local-outside-home:D12:`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,",
+    "d-local-outside-home:D12:into a separate field (D12 picked the smaller path over a field split:",
+    "d-local-outside-home:D10:tsk-2k1/D10). Skip this section entirely for a registered `<EXECUTOR_ID>`",
+    "d-local-outside-home:D5:tsk-5tm-3 D5) are proven by `src/runner/dispatch.mjs`'s own unit tests"
+  ],
+  "plugins/fgOS/skills/answer/SKILL.md": [
+    "bare-citation:ADR0020:`.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves"
+  ],
+  "plugins/fgOS/skills/ask/SKILL.md": [
+    "bare-citation:ADR0020:`.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves"
+  ],
+  "plugins/fgOS/skills/check/SKILL.md": [
+    "bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),"
+  ],
+  "plugins/fgOS/skills/cleanup-loop/SKILL.md": [
+    "d-local-outside-home:D2:merge no longer resolves, per D2 below — plus any per-item CAS",
+    "d-local-outside-home:D3:fgos-cleanup-loop/CONTEXT.md D3). Nothing to report as a problem; skip",
+    "d-local-outside-home:D2:block) — **D2**: scoped to this one item, never a systemic problem.",
+    "d-local-outside-home:D3:5. **No iteration cap (D3).** Unlike `/fgOS:discover-loop`'s cap-of-15,"
+  ],
+  "plugins/fgOS/skills/cleanup-next/SKILL.md": [
+    "d-local-outside-home:D2:tsk-59x D2) so the picker's TTL window always matches what the verb",
+    "d-local-outside-home:D5:`0027` D5: \"pure harness, no skill ever loads for it\"), so a driver",
+    "d-local-outside-home:D4:retro-next-shared-driving/CONTEXT.md` D4).",
+    "d-local-outside-home:D2:for this one category (tsk-1c6 D2/D4), so a caller never has to infer",
+    "d-local-outside-home:D4:for this one category (tsk-1c6 D2/D4), so a caller never has to infer"
+  ],
+  "plugins/fgOS/skills/conflicts/SKILL.md": [
+    "bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),"
+  ],
+  "plugins/fgOS/skills/cook/SKILL.md": [
+    "d-local-outside-home:D1:`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1 —",
+    "d-local-outside-home:D1:`canAutoApproveMergedGate`, `docs/history/gate-bypass/CONTEXT.md` D1-D6,",
+    "d-local-outside-home:D6:`canAutoApproveMergedGate`, `docs/history/gate-bypass/CONTEXT.md` D1-D6,",
+    "d-local-outside-home:D9:D9-D11) and only skip their own question when that check returns true —",
+    "d-local-outside-home:D11:D9-D11) and only skip their own question when that check returns true —"
+  ],
+  "plugins/fgOS/skills/discover/SKILL.md": [
+    "d-local-outside-home:D1:CONTEXT.md` D1).",
+    "d-local-outside-home:D1:tsk-2b0 D1 (hard split, no fallback): `discover` runs the `discovery` ->",
+    "d-local-outside-home:D11:tsk-403 D11). Use `/fgOS:plan <id>` for that; `discover` errors if",
+    "d-local-outside-home:D1:maps to any stage (tsk-qod D1/D2), so the entry drops out — only a domain",
+    "d-local-outside-home:D2:maps to any stage (tsk-qod D1/D2), so the entry drops out — only a domain",
+    "d-local-outside-home:D10:(tsk-lya D10 — it delegates down here rather than dispatching",
+    "d-local-outside-home:D1:(`docs/history/fgos-terminal-close-autoclose/CONTEXT.md` D1: opt-in",
+    "d-local-outside-home:D1:CONTEXT.md` D1, D6), and it never crosses into `planning`'s own",
+    "d-local-outside-home:D6:CONTEXT.md` D1, D6), and it never crosses into `planning`'s own",
+    "d-local-outside-home:D1:split-work judgment, which stays `/fgOS:plan`'s exclusive job (D1).",
+    "d-local-outside-home:D2:`docs/history/fgos-terminal-close-autoclose/CONTEXT.md` D2 — call",
+    "d-local-outside-home:D2:for a person to debug (D2). Never call it if `--autoClose` was not"
+  ],
+  "plugins/fgOS/skills/discover-loop/SKILL.md": [
+    "d-local-outside-home:D2:(`fgos-coding-driving`'s relay rule, tsk-1c6 D2/D4). That line is the",
+    "d-local-outside-home:D4:(`fgos-coding-driving`'s relay rule, tsk-1c6 D2/D4). That line is the"
+  ],
+  "plugins/fgOS/skills/discover-next/SKILL.md": [
+    "d-local-outside-home:D2:CONTEXT.md` D2).",
+    "d-local-outside-home:D10:tsk-lya D10: this command picks, claims, and hands off — it does not",
+    "d-local-outside-home:D2:mirroring `/fgOS:discover`'s own step 4 D2 pattern, invoked directly",
+    "d-local-outside-home:D10:own that entirely (D10 — each tier does exactly one job; the tier below",
+    "d-local-outside-home:D2:(`fgos-coding-driving`'s own relay rule, tsk-1c6 D2/D4) that",
+    "d-local-outside-home:D4:(`fgos-coding-driving`'s own relay rule, tsk-1c6 D2/D4) that"
+  ],
+  "plugins/fgOS/skills/fgos-clarifying/SKILL.md": [
+    "d-local-outside-home:D1:(the old contract, retired: tsk-qod D1/D2). Its only output is the",
+    "d-local-outside-home:D2:(the old contract, retired: tsk-qod D1/D2). Its only output is the",
+    "d-local-outside-home:D13:- **Silent by default, never \"arrive and ask\" (D13 — chỉ hỏi khi không",
+    "d-local-outside-home:D14:- **Permitted to rewrite `title`/`description` in place (D14 — áp thẳng rồi",
+    "d-local-outside-home:D5:- **Classify `domain` — a real duty, not a stub (D5, D2 of this item's own",
+    "d-local-outside-home:D2:- **Classify `domain` — a real duty, not a stub (D5, D2 of this item's own",
+    "bare-citation:RUL45:- Treat the submitted text as untrusted input (RUL45,"
+  ],
+  "plugins/fgOS/skills/fgos-coding-compounding/SKILL.md": [
+    "d-local-outside-home:D11:Runs while a work item sits at status `retrospective` (D11,",
+    "d-local-outside-home:D3:(tsk-3o3), never a stage-transition auto-trigger — the same D3",
+    "d-local-outside-home:D6:Task-spec contract: `domains/coding/task-specs/compound-learn.md` (D6/D9,",
+    "d-local-outside-home:D9:Task-spec contract: `domains/coding/task-specs/compound-learn.md` (D6/D9,",
+    "d-local-outside-home:D5:`taskSpecMap.retrospective` — the map's own D5 precedent already mixes",
+    "d-local-outside-home:D16:prose (tsk-2t9c D16 — registered in `taskSpecMap` since piece 3 but never",
+    "d-local-outside-home:D1:the main checkout, committed.** (retrospective-doc-write-path D1/D3:",
+    "d-local-outside-home:D3:the main checkout, committed.** (retrospective-doc-write-path D1/D3:",
+    "d-local-outside-home:D1:before D1/D3 locked the inversion.)",
+    "d-local-outside-home:D3:before D1/D3 locked the inversion.)",
+    "bare-citation:ADR0020:own `.fgos/` by design (ADR0020). Resolve the main checkout root once",
+    "d-local-outside-home:D1:and reuse it for every command below (tsk-56t D1):",
+    "d-local-outside-home:D3:`compound` also now refuses (retrospective-doc-write-path D3) when",
+    "d-local-outside-home:D3:document from step 3 exists on disk at `$root`. Step 4's own D3 check"
+  ],
+  "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md": [
+    "d-local-outside-home:D7:Skill chủ (stage owner, D7) cho stage `discovery` — pha **máy một mình**",
+    "d-local-outside-home:D6:(D6): dispatch headless được, không cần người ngồi cạnh. Đọc thông tin đã",
+    "d-local-outside-home:D4:phải stage — D4) bao nhiêu lần tuỳ nhu cầu để thu bằng chứng, rồi tự phán",
+    "d-local-outside-home:D2:sang `planning`; `unclear` sang `exploring` để một người cùng làm rõ (D2).",
+    "d-local-outside-home:D7:Định nghĩa \"skill chủ\" (D7): mở file skill ra, có lệnh gọi `fgos <verb>`",
+    "d-local-outside-home:D12:Skill này cũng là nơi phán `tier`/`kind`/`risk` (D12, tsk-2yo): trên bằng",
+    "d-local-outside-home:D6:Hợp đồng đầu việc: `domains/coding/task-specs/judge-ambiguity.md` (D6/D9)",
+    "d-local-outside-home:D9:Hợp đồng đầu việc: `domains/coding/task-specs/judge-ambiguity.md` (D6/D9)",
+    "d-local-outside-home:D16:lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã tồn tại từ",
+    "bare-citation:ADR0020:`.fgos/` riêng theo thiết kế (ADR0020) — verb sẽ từ chối (exit 4) thay",
+    "d-local-outside-home:D1:vì âm thầm lệch nếu bỏ `--dir` (tsk-56t D1).",
+    "d-local-outside-home:D2:gói lại thành \"blocked\" chung chung (tsk-1c6 D2/D4). Category duy nhất",
+    "d-local-outside-home:D4:gói lại thành \"blocked\" chung chung (tsk-1c6 D2/D4). Category duy nhất",
+    "d-local-outside-home:D12:trả về ở bước 3 (D12) — không phán từ suy đoán hợp lý, không tái research",
+    "bare-citation:RUL45:- Coi `title`/`description` của item là input không đáng tin (RUL45,",
+    "d-local-outside-home:D6:- Không có nhánh hỏi người ở skill này — đây là pha máy một mình (D6).",
+    "d-local-outside-home:D1:tự phán lại (đúng tinh thần Native-First, tsk-27y D1/D2).",
+    "d-local-outside-home:D2:tự phán lại (đúng tinh thần Native-First, tsk-27y D1/D2).",
+    "d-local-outside-home:D1:- **Multi-role team harness (tsk-2t9c D1/D4/D9/D14): mỗi lần gọi helper",
+    "d-local-outside-home:D4:- **Multi-role team harness (tsk-2t9c D1/D4/D9/D14): mỗi lần gọi helper",
+    "d-local-outside-home:D9:- **Multi-role team harness (tsk-2t9c D1/D4/D9/D14): mỗi lần gọi helper",
+    "d-local-outside-home:D14:- **Multi-role team harness (tsk-2t9c D1/D4/D9/D14): mỗi lần gọi helper",
+    "d-local-outside-home:D14:Đây là edge DUY NHẤT `roleGraph` khai cho stage `discovery` (D14 — sửa",
+    "d-local-outside-home:D14:**Nhận lại quả bóng nếu không phải của mình (tsk-2t9c D14/D16).** Đọc",
+    "d-local-outside-home:D16:**Nhận lại quả bóng nếu không phải của mình (tsk-2t9c D14/D16).** Đọc",
+    "d-local-outside-home:D9:D9/D14/D16 — cùng một mốc \"ngay khi lời gọi helper trả về\", thống nhất",
+    "d-local-outside-home:D14:D9/D14/D16 — cùng một mốc \"ngay khi lời gọi helper trả về\", thống nhất",
+    "d-local-outside-home:D16:D9/D14/D16 — cùng một mốc \"ngay khi lời gọi helper trả về\", thống nhất",
+    "d-local-outside-home:D12:**Chỉ khi `clear`: phán luôn `tier`/`kind`/`risk`** (D12, tsk-2yo) —",
+    "d-local-outside-home:D2:`exploring`, verdict `unclear` sang `exploring` cho một người (D2). Ghi",
+    "d-local-outside-home:D7:(đúng thứ D7 tồn tại để tránh: helper không bao giờ ghi state, skill chủ",
+    "d-local-outside-home:D16:`implementer` (tsk-2t9c D16 — call thread lồng 2 tầng cần 2 lần gọi)"
+  ],
+  "plugins/fgOS/skills/fgos-indexing/SKILL.md": [
+    "bare-citation:ADR0020:worktree (ADR0020 — a worktree never carries its own `.fgos/`):"
+  ],
+  "plugins/fgOS/skills/fgos-researching/SKILL.md": [
+    "d-local-outside-home:D4:- **Stage-agnostic (D4).** Never read or assume the caller's `stage`. Input",
+    "d-local-outside-home:D8:- **Two-branch mechanical routing, never a self-assessment (D8).** For",
+    "d-local-outside-home:D2:- **Fan out only through a contracted dispatch, never ad hoc (D2).** When a",
+    "d-local-outside-home:D6:D6: the `gather`-purpose executor this section used to consult is",
+    "d-local-outside-home:D5:- **Record every round durably, never silently (D5).** Append findings to",
+    "bare-citation:RUL45:(RUL45, `docs/specs/runner.md`) — never splice it raw into a shell"
+  ],
+  "plugins/fgOS/skills/fgos-unlock/SKILL.md": [
+    "bare-citation:ADR0020:design, ADR0020), so resolve the main checkout root and pass it",
+    "d-local-outside-home:D1:explicitly rather than running bare (tsk-56t D1):"
+  ],
+  "plugins/fgOS/skills/goal/SKILL.md": [
+    "bare-citation:ADR0020:design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves to the main"
+  ],
+  "plugins/fgOS/skills/graph/SKILL.md": [
+    "bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),"
+  ],
+  "plugins/fgOS/skills/list/SKILL.md": [
+    "bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),"
+  ],
+  "plugins/fgOS/skills/merge-list/SKILL.md": [
+    "bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),"
+  ],
+  "plugins/fgOS/skills/merge-next/SKILL.md": [
+    "d-local-outside-home:D6:CONTEXT.md` D6).",
+    "d-local-outside-home:D6:This runs unattended by design (D6) — do not add a confirmation prompt",
+    "d-local-outside-home:D2:the user a command to type (D2, `docs/history/iron-law-gate-human-ux/"
+  ],
+  "plugins/fgOS/skills/move/SKILL.md": [
+    "bare-citation:ADR0020:`.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves"
+  ],
+  "plugins/fgOS/skills/plan/SKILL.md": [
+    "d-local-outside-home:D11:past `planning` (renamed from `decompose`, tsk-403 D11 — `decompose`",
+    "d-local-outside-home:D18:survives only as a legacy, drain-only stage alias, D18) without",
+    "d-local-outside-home:D1:verdict-routing/CONTEXT.md` D1).",
+    "d-local-outside-home:D1:tsk-2b0 D1 (hard split, no fallback): `plan` is the sibling of `discover`",
+    "d-local-outside-home:D1:answer here — it retired as a stage entirely (tsk-qod D1/D2), and",
+    "d-local-outside-home:D2:answer here — it retired as a stage entirely (tsk-qod D1/D2), and",
+    "d-local-outside-home:D1:wrapper-verdict-routing/CONTEXT.md` D1, D6). A real split (a",
+    "d-local-outside-home:D6:wrapper-verdict-routing/CONTEXT.md` D1, D6). A real split (a",
+    "d-local-outside-home:D11:`decompose` verdict — the value name is unchanged, D11 — with real"
+  ],
+  "plugins/fgOS/skills/plan-loop/SKILL.md": [
+    "d-local-outside-home:D2:(`fgos-coding-driving`'s relay rule, tsk-1c6 D2/D4). That line is the",
+    "d-local-outside-home:D4:(`fgos-coding-driving`'s relay rule, tsk-1c6 D2/D4). That line is the"
+  ],
+  "plugins/fgOS/skills/plan-next/SKILL.md": [
+    "d-local-outside-home:D11:tsk-lya D11: this is the dedicated `<root>-next` picker the `planning`",
+    "d-local-outside-home:D18:legacy, drain-only alias, tsk-403 D18 — still a valid pool candidate,",
+    "d-local-outside-home:D2:(`fgos-coding-driving`'s own relay rule, tsk-1c6 D2/D4) that",
+    "d-local-outside-home:D4:(`fgos-coding-driving`'s own relay rule, tsk-1c6 D2/D4) that"
+  ],
+  "plugins/fgOS/skills/ready/SKILL.md": [
+    "bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),"
+  ],
+  "plugins/fgOS/skills/retro-loop/SKILL.md": [
+    "d-local-outside-home:D3:(`docs/history/fgos-cleanup-loop/CONTEXT.md` D3). `retro-next`'s own"
+  ],
+  "plugins/fgOS/skills/retro-next/SKILL.md": [
+    "d-local-outside-home:D17:A launcher, in the exact sense decision record `0029` D17 pins: it",
+    "d-local-outside-home:D3:(`docs/history/retro-next-shared-driving/CONTEXT.md` D3). Observable",
+    "d-local-outside-home:D1:(`docs/history/fgos-retro-loop/CONTEXT.md` D1: each item's own",
+    "d-local-outside-home:D2:D2/D3).",
+    "d-local-outside-home:D3:D2/D3).",
+    "d-local-outside-home:D5:item.domain), 'retrospective')`, decision record `0027` D5, which for",
+    "d-local-outside-home:D2:is the channel (tsk-1c6 D2/D4), the same way `/fgOS:discover-next`",
+    "d-local-outside-home:D4:is the channel (tsk-1c6 D2/D4), the same way `/fgOS:discover-next`"
+  ],
+  "plugins/fgOS/skills/return/SKILL.md": [
+    "bare-citation:ADR0020:`.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves"
+  ],
+  "plugins/fgOS/skills/rollup/SKILL.md": [
+    "bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),"
+  ],
+  "plugins/fgOS/skills/show/SKILL.md": [
+    "bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),"
+  ],
+  "plugins/fgOS/skills/stale/SKILL.md": [
+    "bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),"
+  ],
+  "plugins/fgOS/skills/submit/SKILL.md": [
+    "d-local-outside-home:D12:This value is only ever a TEMP placeholder now (D12, tsk-2yo): the real",
+    "d-local-outside-home:D2:What changed (tsk-qod D2, supersedes tsk-5wz's own ordering): when this",
+    "d-local-outside-home:D1:it (tsk-qod D1/D2, `clarify` retired as a stage entirely): it is now a",
+    "d-local-outside-home:D2:it (tsk-qod D1/D2, `clarify` retired as a stage entirely): it is now a",
+    "d-local-outside-home:D12:all (D12, tsk-2yo) — `discovery`'s own skill chủ (`fgos-coding-discovering`)",
+    "d-local-outside-home:D4:response — this is a hard requirement (D4), not a convenience default.",
+    "d-local-outside-home:D2:clarify BEFORE the item exists (tsk-qod D2).**",
+    "d-local-outside-home:D1:only — it writes no state itself, tsk-qod D1/D2):",
+    "d-local-outside-home:D2:only — it writes no state itself, tsk-qod D1/D2):",
+    "bare-citation:ADR0020:`.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves",
+    "d-local-outside-home:D12:(D12, tsk-2yo) — `discovery`'s own skill chủ judges the real values"
+  ],
+  "plugins/fgOS/skills/terminal/SKILL.md": [
+    "d-local-outside-home:D5:herdr (D5,",
+    "d-local-outside-home:D1:entry (tsk-in1-1 D1: config-declared, not a CLI verb):",
+    "d-local-outside-home:D2:**Labels are write-only, for humans** (D2). Nothing in fgOS may ever read a"
+  ],
+  "plugins/fgOS/skills/triage/SKILL.md": [
+    "bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),"
+  ],
+  "plugins/fgOS/skills/unlock/SKILL.md": [
+    "bare-citation:ADR0020:never carries its own `.fgos/` by design (ADR0020) —"
+  ]
+}

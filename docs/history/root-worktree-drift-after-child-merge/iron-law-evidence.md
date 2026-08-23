@@ -86,7 +86,7 @@ $ npm test
 ℹ skipped 5
 ```
 
-(Baseline before this item's implementation, run during `fgos-validating`:
+(Baseline before this item's implementation, run during `fgos-coding-validating`:
 `npm test` → 2621 pass / 0 fail / 5 skipped out of 2626. This item's 5 new
 tests account for the full delta.)
 

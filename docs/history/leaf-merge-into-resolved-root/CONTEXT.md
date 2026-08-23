@@ -18,14 +18,14 @@ by hand via `fgos sync-root`. See `plan.md` for the final approach
 decision (piece 2's own (a) vs (b) call, and the graph-harness.mjs
 consistency fix this uncovered).
 
-## Decisions
+## Locked decisions
 
 | ID | Decision |
 |---|---|
 | D1 | ~~The set of "resolved" root statuses this block checks against is the SAME `COMPLETED_ROOT_STATUSES` set `checkRootDrift` already uses: `{delivered, retrospective, cleanup, done}`. `wontfix` stays excluded.~~ **Superseded by D2.** |
 | D2 | The resolved-root check uses `isResolvedStatus` (`src/state/frontier.mjs:247`), NOT the narrower `COMPLETED_ROOT_STATUSES` D1 named — `wontfix` IS blocking, same as `delivered`/`retrospective`/`cleanup`/`done`. Found mid-planning: every other "is this ancestor closed out" gate already inside `mergeReadiness` (deps/mergeAfter/supersededOut, `src/state/graph-harness.mjs:107,109,155`) uses `isResolvedStatus`, which already treats `wontfix` as resolved via `statusCategory === 'canceled'`. D1's citation of tsk-4qu's Assumption #1 only justified piece 1's *reporting* exemption for `wontfix` ("an abandoned branch is supposed to sit unmerged, no need to flag its drift") — that reasoning does not transfer to piece 2's *prevention* gate: a leaf merging into a wontfix root's branch is stranded exactly the same way as one merging into a delivered root's branch, arguably worse since nobody is watching a wontfix branch at all. Confirmed with the user in conversation before locking. |
 
-**Explicitly deferred to `fgos-planning`, not decided here:** which of the
+**Explicitly deferred to `fgos-coding-planning`, not decided here:** which of the
 item's own two proposed directions to implement —
 (a) reroute `mergeTier` to `root-to-main` for a leaf whose root is
 resolved, letting it merge straight to main, vs.
@@ -33,9 +33,9 @@ resolved, letting it merge straight to main, vs.
 handling.
 The item's own description already assigns this choice to planning
 ("Hai huong de xuat, quyet luc plan") — this is an existing, explicit
-decision made by whoever wrote the item, not a gap `fgos-exploring` found;
+decision made by whoever wrote the item, not a gap `fgos-coding-exploring` found;
 overriding it here would silently relitigate a decision the item's author
-already made. `fgos-planning`'s own reality-check step is also the right
+already made. `fgos-coding-planning`'s own reality-check step is also the right
 place to answer the risk the item itself names for option (a): does
 merging straight to main skip any ordering constraint `approve` normally
 enforces for a leaf-to-root merge.

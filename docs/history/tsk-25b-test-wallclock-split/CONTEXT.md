@@ -13,7 +13,7 @@ còn đang bay trỏ vào đường dẫn cũ; ghi lại số đo trước/sau.
 harness sang spawn bất đồng bộ); dựng cơ chế kiểm tự động enforce ngưỡng
 thời gian; đụng vào bất kỳ file test nào khác hai file trên.
 
-## Quyết định đã chốt
+## Locked decisions
 
 | ID | Quyết định | Lý do |
 |---|---|---|

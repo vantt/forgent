@@ -148,22 +148,28 @@ field `parent` (cây decompose), KHÔNG đọc `targets` (goalTier) — chạy
 milestone/MVP này phải tự `fgos show <id>` rồi đối chiếu status từng target
 bằng tay; không có lệnh rollup tự động cho goal-tier item ở thời điểm này.
 
-Mỗi milestone vẫn phải qua `fgos-exploring` cho từng target-item để chốt câu
-hỏi mở tương ứng (§5) trước khi `fgos-planning`/thi công — chưa item nào
-được tự thi công thẳng.
+Mỗi milestone vẫn phải qua `fgos-coding-exploring` cho từng target-item để
+chốt câu hỏi mở tương ứng (§5) trước khi `fgos-coding-planning`/thi công —
+chưa item nào được tự thi công thẳng.
 
 ## 7. Backlog liên quan
 
-- `tsk-2qz` (stage `clarify`, todo, `deps: [tsk-2cs]`) — thêm khả năng
+- `tsk-2qz` (done, `deps: [tsk-2cs]`) — thêm khả năng
   `fgos doctor` tự fix `.fgos/gate-bypass.json`; slice đầu tiên của trụ cột
   3, làm ĐÚNG như entry đầu tiên của registry `tsk-2cs`.
-- `tsk-2cs` (stage `clarify`, todo) — registry mở-rộng-được cho
+- `tsk-2cs` (done) — registry mở-rộng-được cho
   doctor-checks + config-defaults (trụ cột 4).
-- `tsk-2ta` (stage `clarify`, todo) — global/project config precedence +
+- `tsk-2ta` (done) — global/project config precedence +
   dev-checkout self-hosting awareness, gồm cả context thứ 3 (trụ cột 6).
-- `tsk-49r` (stage `clarify`, todo) — CI/GitHub Actions workflow như một
+- `tsk-49r` (done) — CI/GitHub Actions workflow như một
   phần của setup (trụ cột 7).
-- `tsk-1qm` (stage `clarify`, todo, `deps: [tsk-2cs, tsk-2qz]`) — đóng spec
+- `tsk-1qm` (done, `deps: [tsk-2cs, tsk-2qz]`) — đóng spec
   `docs/specs/distribution.md` (supersede RUL11 + Data Dictionary #7).
 - `tsk-3nx`, `tsk-4c05`, `tsk-3uj`, `tsk-2jc` (goalTier `milestone`) +
   `tsk-4bc` (goalTier `mvp`) — xem bảng §6.
+- `tsk-32b` (done) — Claude Code plugin skill set (`plugins/fgOS/skills/`)
+  giờ đóng gói cả 14 coding-domain dev-skill (trước đó chỉ tồn tại ở
+  `.claude/skills/`, khiến session ở repo khác cài fgOS thuần plugin gặp
+  "Unknown skill" dù `plugin-skill-cli-reachable` báo CLI reachable bình
+  thường); thêm doctor check `plugin-dev-skills-packaged` bắt thiếu-đồng-bộ
+  trước khi release — xem `docs/specs/distribution.md` Data Dictionary #4b/#7.

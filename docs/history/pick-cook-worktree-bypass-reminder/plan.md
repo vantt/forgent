@@ -25,7 +25,7 @@ dependencies, so blast-radius ordering does not apply here; this is a
 standalone item, not part of a dependency chain.
 
 `impact-analysis` capability posture: **full** (GitNexus `present`, checked
-during `fgos-exploring`'s own scout). Not load-bearing for this plan — no
+during `fgos-coding-exploring`'s own scout). Not load-bearing for this plan — no
 proof point here leans on blast-radius evidence, since every touched file
 is Markdown (a journal entry plus two skill docs), not application code.
 
@@ -39,7 +39,7 @@ choice left for this skill to make beyond sequencing.
 
 Risk map: none of the three touched files carry a risk above "low" — all
 Markdown, no runtime behavior, no public contract. No proof point needs to
-be carried to `fgos-validating` beyond the verify command itself (below).
+be carried to `fgos-coding-validating` beyond the verify command itself (below).
 
 Files touched, in order:
 
@@ -63,7 +63,7 @@ citable evidence the reminder notes point back to), not derived from
 
 # Shape
 
-One direct piece, no split — `fgos-planning` step 5 does not apply: the
+One direct piece, no split — `fgos-coding-planning` step 5 does not apply: the
 work is honestly one small item, not several independently workable ones.
 No child items are created; tsk-4hk proceeds as itself into `executing`.
 
@@ -89,16 +89,16 @@ Execute's mechanical path alone per its own "leave execution alone" rule):
 grep -rlq --include='*.md' 'fgw/retro-loop-docs-260802' docs/ && grep -rlq --include='*.md' 'fgw/dispatch-terminology-rename-260803' docs/ && grep -rliq --include='*.md' 'worktree' docs/ && npm test
 ```
 
-This is the one command that proves the item done — `fgos-validating`
-checks it holds up against reality; `fgos-code-implement` runs it to gate
+This is the one command that proves the item done — `fgos-coding-validating`
+checks it holds up against reality; `fgos-coding-implement` runs it to gate
 `fgos return`.
 
 # Assumptions
 
 - The reminder note's exact wording/placement inside each `SKILL.md` is
-  left to `fgos-code-implement` (flagged as an implementation-only detail in
+  left to `fgos-coding-implement` (flagged as an implementation-only detail in
   `CONTEXT.md`'s own "Outstanding questions deferred to planning" — not
   material to scope, behavior, or acceptance criteria, since **D2** already
   locks *that* a note goes in both files, just not its prose).
 - The journal entry's exact filename and full prose are likewise left to
-  `fgos-code-implement`; only its required content (**D1**, **D3**) is locked.
+  `fgos-coding-implement`; only its required content (**D1**, **D3**) is locked.

@@ -30,22 +30,22 @@ written down:
    from an invoked stage-skill's engine-verb call is relayed verbatim,
    never paraphrased into a generic "blocked". Honors D2 (fix at the root)
    and D4 (the literal token).
-2. **`fgos-exploring/SKILL.md`**, **`fgos-planning/SKILL.md`**,
-   **`fgos-validating/SKILL.md`** — each runs state-writing `fgos` verbs
+2. **`fgos-coding-exploring/SKILL.md`**, **`fgos-coding-planning/SKILL.md`**,
+   **`fgos-coding-validating/SKILL.md`** — each runs state-writing `fgos` verbs
    against the shared `.fgos/events.jsonl` lock and is therefore a layer
    that can be the first to see a lock-timeout. Each gains the instruction
    to carry the token verbatim into its hand-back. Honors CONTEXT.md's
    "propagation" pinned term.
 
    Verb inventory, read off the real files (`rg` on each SKILL.md), which
-   corrects an earlier draft of this plan that named `fgos-planning` as the
-   `fgos decompose` caller and excluded `fgos-validating` entirely:
+   corrects an earlier draft of this plan that named `fgos-coding-planning` as the
+   `fgos plan` caller and excluded `fgos-coding-validating` entirely:
 
    | Skill | State-writing verbs it runs |
    |---|---|
-   | `fgos-exploring` | `fgos discover`, `add`, `ask`, `answer`, `decision`, `gate-approve` |
-   | `fgos-planning` | `fgos decision`, `gate-approve` |
-   | `fgos-validating` | `fgos decompose`, `decision`, `gate-approve` |
+   | `fgos-coding-exploring` | `fgos discover`, `add`, `ask`, `answer`, `decision`, `gate-approve` |
+   | `fgos-coding-planning` | `fgos decision`, `gate-approve` |
+   | `fgos-coding-validating` | `fgos plan`, `decision`, `gate-approve` |
    | `fgos-coding-driving` | `fgos list`, `fgos pick` |
 
    The trigger is therefore "any state-writing `fgos` verb", not
@@ -89,7 +89,7 @@ roles.
 |---|---|---|
 | Token agreed across 4 callers | medium | `discover-next`'s new classification branch and `discover-loop`'s step-4 rule both name the exact same string D4 pinned — read both files side by side, not just grep |
 | `.claude` / `.agents` copy drift | low | `diff -q` on all three pairs after the edit; the verify's per-copy greps also catch a one-sided edit |
-| Runtime relay actually happens | medium, **proof is partial by construction** | Not provable by `verify` (D3). Owned by `docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md` plus event-log observation, per tsk-4l9's standard |
+| Runtime relay actually happens | medium, **proof is partial by construction** | Not provable by `verify` (D3). Owned by `docs/how-to/smoke-test-fgos-coding-implement-with-a-trivial-item.md` plus event-log observation, per tsk-4l9's standard |
 | Removing `discover-next`'s "Known gap" paragraph | low | NEGATIVE half of the verify; the paragraph is the item's own stated obsolete state |
 
 `impact-analysis: degraded` — `fgos tool query --capability
@@ -115,19 +115,19 @@ Files touched (10):
 ```
 .claude/skills/fgos-coding-driving/SKILL.md
 .agents/skills/fgos-coding-driving/SKILL.md
-.claude/skills/fgos-exploring/SKILL.md
-.agents/skills/fgos-exploring/SKILL.md
-.claude/skills/fgos-planning/SKILL.md
-.agents/skills/fgos-planning/SKILL.md
-.claude/skills/fgos-validating/SKILL.md
-.agents/skills/fgos-validating/SKILL.md
+.claude/skills/fgos-coding-exploring/SKILL.md
+.agents/skills/fgos-coding-exploring/SKILL.md
+.claude/skills/fgos-coding-planning/SKILL.md
+.agents/skills/fgos-coding-planning/SKILL.md
+.claude/skills/fgos-coding-validating/SKILL.md
+.agents/skills/fgos-coding-validating/SKILL.md
 plugins/fgOS/skills/discover-next/SKILL.md
 plugins/fgOS/skills/discover-loop/SKILL.md
 ```
 
 ### Cases worth proving against
 
-- **A lock-timeout raised by `fgos-planning`, not `fgos-exploring`** — the
+- **A lock-timeout raised by `fgos-coding-planning`, not `fgos-coding-exploring`** — the
   relay must work from either stage-skill, since `discover-next` routes
   `decompose`-stage items through the same driver.
 - **A non-lock-timeout block** — must still surface as generic `blocked`
@@ -142,7 +142,7 @@ plugins/fgOS/skills/discover-loop/SKILL.md
 The one command that proves this item done:
 
 ```
-npm test && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-coding-driving/SKILL.md && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-coding-driving/SKILL.md && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-exploring/SKILL.md && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-exploring/SKILL.md && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-planning/SKILL.md && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-planning/SKILL.md && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-validating/SKILL.md && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-validating/SKILL.md && grep -q 'stop-reason: lock-timeout' plugins/fgOS/skills/discover-next/SKILL.md && grep -q 'stop-reason: lock-timeout' plugins/fgOS/skills/discover-loop/SKILL.md && ! grep -q 'Known gap, not fixed by this item' plugins/fgOS/skills/discover-next/SKILL.md
+npm test && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-coding-driving/SKILL.md && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-coding-driving/SKILL.md && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-coding-exploring/SKILL.md && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-coding-exploring/SKILL.md && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-coding-planning/SKILL.md && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-coding-planning/SKILL.md && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-coding-validating/SKILL.md && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-coding-validating/SKILL.md && grep -q 'stop-reason: lock-timeout' plugins/fgOS/skills/discover-next/SKILL.md && grep -q 'stop-reason: lock-timeout' plugins/fgOS/skills/discover-loop/SKILL.md && ! grep -q 'Known gap, not fixed by this item' plugins/fgOS/skills/discover-next/SKILL.md
 ```
 
 Shape per tsk-4l9's standard (`docs/how-to/write-verify-for-a-skill-prose-change.md`,
@@ -150,12 +150,12 @@ commit `5c738bd` on `fgw/tsk-4l9`): `npm test` + POSITIVE + NEGATIVE.
 
 ## Assumptions
 
-- **`fgos-validating` needs the same relay instruction.** CONTEXT.md left
+- **`fgos-coding-validating` needs the same relay instruction.** CONTEXT.md left
   this open ("Outstanding questions deferred to planning"). **Resolved, not
   assumed** — an earlier draft of this plan pinned the opposite as an
-  assumption and `fgos-validating`'s own reality gate caught it: `rg` on
-  `.claude/skills/fgos-validating/SKILL.md` shows it fires
-  `node "$root/bin/fgos.mjs" decompose` in its own Gate section, so it is
+  assumption and `fgos-coding-validating`'s own reality gate caught it: `rg` on
+  `.claude/skills/fgos-coding-validating/SKILL.md` shows it fires
+  `node "$root/bin/fgos.mjs" plan` in its own Gate section, so it is
   squarely a layer that observes this failure. Its file pair is in scope
   (verified byte-identical with `diff -q`).
 - **The `.agents` copies stay byte-identical to their `.claude`

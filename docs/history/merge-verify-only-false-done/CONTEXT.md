@@ -33,7 +33,7 @@ which is separate, not-yet-built work.
 
 | ID | Decision |
 |----|----------|
-| D1 | The fix keeps the `isAlreadyMerged` short-circuit (needed for tsk-3yl's retry-after-partial-failure case) but adds an explicit integrity check before trusting it — never bare `is-ancestor` alone as sufficient proof the merge is real and complete. The exact shape of that check (e.g., confirming the existing merge commit's second parent is genuinely branch's tip) is left to `fgos-planning`/implementation, not locked here. |
+| D1 | The fix keeps the `isAlreadyMerged` short-circuit (needed for tsk-3yl's retry-after-partial-failure case) but adds an explicit integrity check before trusting it — never bare `is-ancestor` alone as sufficient proof the merge is real and complete. The exact shape of that check (e.g., confirming the existing merge commit's second parent is genuinely branch's tip) is left to `fgos-coding-planning`/implementation, not locked here. |
 | D2 | Acceptance/verify for this item requires a regression test that constructs the `isAlreadyMerged` false-trust scenario and asserts the fixed code now catches/rejects it — not just "existing suite still green." Fills the item's previously-unset `verify` field. |
 | D3 | Scope is a standalone fix to `merge.mjs`'s `isAlreadyMerged` path today, independent of merge-harness-v2's `driftStatus`/`sync-root` design timeline — matches yesterday's research report calling this fix "independent, mechanical, can proceed in parallel." Not folded into or blocked on harness v2 landing. |
 
@@ -67,8 +67,8 @@ which is separate, not-yet-built work.
   (checked via `fgos list --id tsk-15k --json`).
 - Impact-analysis capability: **full** — GitNexus registered and
   `present` (`fgos tool query --capability impact-analysis --status
-  present` returned the `gitnexus` provider). `fgos-planning`/
-  `fgos-validating`/`fgos-code-implement` should run real impact analysis on
+  present` returned the `gitnexus` provider). `fgos-coding-planning`/
+  `fgos-coding-validating`/`fgos-coding-implement` should run real impact analysis on
   `mergeRunnerItemLocked`/`isAlreadyMerged` before editing, per the
   project's impact-analysis gate.
 

@@ -27,7 +27,7 @@ port method, any TUI layout change. No new feature — bug fix only.
 
 | ID | Decision |
 |----|----------|
-| D1 | Missing `stage` on a work item defaults to `"executing"` inside `WorkItemRaw`/parsing, matching the JS engine's own established convention for a missing stage (`item.stage ?? 'executing'` / `item.stage ?? stageForStep(domain, 'Execute')`), applied unconditionally regardless of `status`. Pinned from existing codebase precedent (`src/state/frontier.mjs:105`, `src/intake/decompose.mjs:645`, `src/state/impact.mjs:128`, `src/state/stage-fsm.mjs:85`) — not asked as a question since the convention already conclusively answers it. |
+| D1 | Missing `stage` on a work item defaults to `"executing"` inside `WorkItemRaw`/parsing, matching the JS engine's own established convention for a missing stage (`item.stage ?? 'executing'` / `item.stage ?? stageForStep(domain, 'Execute')`), applied unconditionally regardless of `status`. Pinned from existing codebase precedent (`src/state/frontier.mjs:105`, `src/intake/plan.mjs:645`, `src/state/impact.mjs:128`, `src/state/stage-fsm.mjs:85`) — not asked as a question since the convention already conclusively answers it. |
 | D2 | When 2+ of the 5 sources fail within the same `refresh_from_fgos` call, the status bar shows the **first** error encountered in call order (triage → doing → need_answer → after_deliver → merge_list). Once an error is recorded during a refresh cycle, no later branch in that same cycle — success or failure — overwrites it. Confirmed by user. |
 
 ## Pinned terms
@@ -56,7 +56,7 @@ port method, any TUI layout change. No new feature — bug fix only.
   `last_error` (red) takes priority over `pick_status`/filter text when
   present.
 - JS engine's missing-stage convention: `src/state/frontier.mjs:105`,
-  `src/intake/decompose.mjs:645`, `src/state/impact.mjs:128,155`,
+  `src/intake/plan.mjs:645`, `src/state/impact.mjs:128,155`,
   `src/state/stage-fsm.mjs:85` — all read `item.stage ?? <Execute stage>`.
 - Impact-analysis capability gate (`CLAUDE.md`): `fgos tool query
   --capability impact-analysis --status present` returned GitNexus,
@@ -82,13 +82,13 @@ and `app.rs`'s test module respectively — a generic `cargo test` run
 --manifest-path herdr-plugin/Cargo.toml"` used elsewhere) does not
 distinguish fixed from unfixed here, since neither bug currently has a
 regression test — the existing suite passes identically before and after
-the fix. Test bodies (fixture shape, assertions) are `fgos-planning`'s
+the fix. Test bodies (fixture shape, assertions) are `fgos-coding-planning`'s
 call, not designed here — this only fixes their names as the proof
 target, following this crate's own existing verify convention of naming a
 specific test filter (e.g. `"cargo test --manifest-path herdr-plugin/
 Cargo.toml pane_focus"`).
 
-**Update (fgos-validating round 1):** the command above was found to not
+**Update (fgos-coding-validating round 1):** the command above was found to not
 discriminate fixed vs unfixed (a zero-match `cargo test <filter>` exits 0
 under this crate's nextest alias) — see `plan.md`'s "Validating round 1"
 section for the evidence and the corrected, `grep`-gated verify actually
@@ -98,4 +98,4 @@ locked on the item now.
 
 - Exact fixture shape and assertions for `need_answer_survives_missing_stage`
   and `last_error_first_error_wins` (see Verify above). Implementation
-  concern — left to `fgos-planning`.
+  concern — left to `fgos-coding-planning`.

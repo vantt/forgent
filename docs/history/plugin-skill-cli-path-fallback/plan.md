@@ -129,7 +129,7 @@ registerCheck({
 });
 ```
 
-FIXED at fgos-validating (reality-gate repo-fit check, tsk-1no): the
+FIXED at fgos-coding-validating (reality-gate repo-fit check, tsk-1no): the
 earlier draft claimed this mirrors "checkNodeAndGit's existing PATH-lookup
 helper" — false, verified by reading `registrations.mjs:228-239` directly.
 `checkNodeAndGit` has no reusable PATH-lookup helper; it only wraps

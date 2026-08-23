@@ -46,8 +46,8 @@ branch.
 ## Why this was a mid-planning decision, not a pre-locked one
 
 The OS matrix itself (D3: run on ubuntu + macOS + windows) was locked
-earlier, during `fgos-exploring`. This path-layout mismatch surfaced only
-after that, during `fgos-planning` — a genuine mid-planning gap under that
+earlier, during `fgos-coding-exploring`. This path-layout mismatch surfaced only
+after that, during `fgos-coding-planning` — a genuine mid-planning gap under that
 skill's own material/grounded/answerable filter, not a re-litigation of
 the OS-matrix decision itself. Locking "which OSes to test on" and
 discovering "does the existing test's assumptions hold on all of them"

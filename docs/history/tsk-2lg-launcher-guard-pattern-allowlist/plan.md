@@ -7,7 +7,7 @@ flags apply; a single-file, additive logic change).
 
 No local `CONTEXT.md` — direct-entry item (the `clarify -> decompose`
 dormant edge fired straight through: `fgos-clarifying`'s own intent
-verdict was `clear`, so `fgos-exploring` never ran). The item's own
+verdict was `clear`, so `fgos-coding-exploring` never ran). The item's own
 description already carries the full spec: the repeated pattern (5
 separate manual `ALLOWED_FILES` additions across tsk-33w, tsk-4eu, tsk-2uo
 x2, and the automated-changelog-compound-learn item), the proposed fix

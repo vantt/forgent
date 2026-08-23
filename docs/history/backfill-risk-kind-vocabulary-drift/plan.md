@@ -5,9 +5,9 @@ Mode: high-risk
 
 ## Lane
 
-No `Mode:` hand-off existed when this session opened `fgos-planning` (this
+No `Mode:` hand-off existed when this session opened `fgos-coding-planning` (this
 item went `clarify -> decompose` directly — its intent was already clear,
-no `fgos-exploring` pass ever ran, so no lane was ever decided upstream).
+no `fgos-coding-exploring` pass ever ran, so no lane was ever decided upstream).
 Applying `fgos-routing`'s Mode-gate directly (direct-entry fallback):
 
 - auth/authorization: no.
@@ -34,7 +34,7 @@ alone (2 soft + 1 hard) would otherwise land on `standard`.
 
 ## Decisions this plan is built on
 
-No `CONTEXT.md` exists for this item (no `fgos-exploring` pass ever ran —
+No `CONTEXT.md` exists for this item (no `fgos-coding-exploring` pass ever ran —
 clarify's own lightweight judge found the description already fully scoped:
 concrete remap table, explicit in/out-of-scope sections, explicit run
 procedure, explicit pre-flight check). This plan is built directly on the
@@ -44,7 +44,7 @@ item's own description, cross-checked against the live repo below.
 description):**
 
 - `decompose.mjs`'s `keywordRiskGate = work.risk === HEAVY_RISK` — confirmed
-  live, only `'heavy'` ever fires it (`src/intake/decompose.mjs`, the
+  live, only `'heavy'` ever fires it (`src/intake/plan.mjs`, the
   `resolveDecompose` risk-gate block).
 - `priority-formula.mjs`: `discountForRisk` does
   `RISK_DISCOUNTS[risk] ?? RISK_DISCOUNTS.standard` — confirmed live
@@ -164,7 +164,7 @@ bijection exists for `kind` the way it does for `risk`):
 | tsk-1ab-2 | documentation | Finalize fgOS choke-point survey report with no-fix decision | docs | direct synonym |
 | tsk-62x-1 | feat | tạo skill /fgOS:terminal với verb rename... | feature | mechanical typo fix |
 | tsk-62x-2 | feat | nâng cấp /fgOS:pick để gọi /fgOS:terminal rename... | feature | mechanical typo fix |
-| tsk-1ni-3 | test | Update test fixture in test/intake/decompose.test.mjs | task | test-fixture maintenance |
+| tsk-1ni-3 | test | Update test fixture in test/intake/plan.test.mjs | task | test-fixture maintenance |
 | tsk-1ni-4 | test | Update test fixture in test/intake/discovery.test.mjs | task | test-fixture maintenance |
 
 All 9 are already `status: done` — zero live behavior change (confirmed
@@ -254,7 +254,7 @@ same direction, not a new import shape.
   views and never invoke `fgos doctor` or this check — confirmed by reading
   both files' imports (neither imports `registrations.mjs`/`checks.mjs`).
   So the new check cannot observe or break their frozen legacy fixtures;
-  this is a proof point (read, not run yet — `fgos-validating` re-confirms
+  this is a proof point (read, not run yet — `fgos-coding-validating` re-confirms
   before executing).
 
 ## Proof surface (for `fgos gate-approve --verify`)

@@ -35,7 +35,7 @@ entirely (bigger behavior change, no backup story yet) and guard-only
 (only detects after the fact, doesn't prevent loss — the exact gap that
 let this recur three times since tsk-n4i).
 
-**Revised twice at `fgos-validating` time (Smaller-path / Repo-fit
+**Revised twice at `fgos-coding-validating` time (Smaller-path / Repo-fit
 checks, still honoring D1's underlying decision — never reopened, only
 its technical realization corrected against reality):**
 
@@ -136,7 +136,7 @@ smallest, fully independent of the other three, no reason to block on it.
 
 ## Risk map
 
-| Component | How risky | Proof point (for `fgos-validating`) |
+| Component | How risky | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `union` driver correctness (D1's core fix) | Medium (down from the first draft's High — this is now git's own battle-tested built-in, not custom parsing code; the only real unknown is whether it behaves as documented for THIS repo's real branch-divergence shapes) | A live/simulated repro: create two divergent branches each appending real events to `.fgos/events.jsonl` since a common ancestor, run an ad hoc `git merge` (not through `fgos merge`) with `.gitattributes` wired, assert the merge completes with no conflict and the result contains every event from both sides (order/seq not yet fixed at this point — that's component 3's job) — same "actual repro, not just a unit test" bar `tsk-18a` D2 already set for this class of bug |
 | `--check`/`--fix` correctness | Medium — getting dedup/reseq wrong is worse than leaving it alone (could silently fabricate a seq or drop a genuine duplicate) | Run `--check`/`--fix` against a synthetic fixture with an injected duplicate-seq and an injected gap; also run `--fix` on the output of the live repro above and assert the result is fully contiguous with no event lost |
@@ -186,7 +186,7 @@ narrower perspective, so that guard still fires there exactly as before).
 
 The item's own top-level proof, recorded on `tsk-3wq`'s `verify` field —
 **corrected during Implement (tsk-56t-class bug, found and fixed
-directly per `fgos-code-implement`'s "blocking issue in the path" rule):
+directly per `fgos-coding-implement`'s "blocking issue in the path" rule):
 the original draft (`node scripts/events-jsonl-contiguity.mjs --check
 .fgos/events.jsonl && ...`) is not portable — a worktree-backed item's
 `fgos return` runs verify from inside its own worktree, which never

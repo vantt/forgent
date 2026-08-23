@@ -3,17 +3,17 @@
 ## Feature boundary
 
 Give `judgeDiscovery` (`src/intake/discovery.mjs`) and `judgeDecompose`
-(`src/intake/decompose.mjs`) — the two nested-`claude -p` real-model judges
+(`src/intake/plan.mjs`) — the two nested-`claude -p` real-model judges
 gating stage `clarify`/`decompose` — real autonomous scout capability
 (grep/read the repo for grounding evidence) that they run BEFORE ever
-parking an item in `awaiting-human`. Only fall through to `fgos-exploring`'s
+parking an item in `awaiting-human`. Only fall through to `fgos-coding-exploring`'s
 human conversation when the item is still unclear after that scout attempt.
 Boundary excludes: changing what the judges are allowed to decide, changing
 the picker/dispatch selection loop, changing worker (`spawnWorker`)
 permissions, and building a reusable Skill-tool artifact (ruled out, D3).
 
 Sibling items (same problem area, filed separately, not hard dependencies):
-`tsk-4xr` (fgos-exploring re-scout mid-conversation — cheaper, SKILL.md-only
+`tsk-4xr` (fgos-coding-exploring re-scout mid-conversation — cheaper, SKILL.md-only
 fix) and `tsk-3go` (discover-loop skill — shares a per-run cost concern with
 this item, see D5).
 
@@ -23,8 +23,8 @@ this item, see D5).
 |------|----------|
 | D1 | Purpose confirmed: judges gain scout capability to gather grounding evidence themselves before parking to `awaiting-human`; falls to human conversation only when still unclear after scout. |
 | D2 | Permission mechanism: **Option A — role-scoped executor override**. Add a `role`-keyed override (e.g. `cfg.executors.judge`) parallel to the existing `cfg.executors[tier]` per-tier override (P41, `dispatch.mjs:404-411`), carrying its own `allowedTools` (e.g. adds `Bash(rg:*)` to the existing `Bash(git add:*),Bash(git commit:*)`). Rejected: hard-coding args directly in `judge-executor.mjs` (Option B) — breaks the "template in config, not code" precedent (RUL44) and would require code changes to tune/disable scout instead of config. `resolveExecutorCommand` gains a `role` dimension alongside its existing `tier` dimension; `DEFAULT_RUNNER_CONFIG.executor` (used by `spawnWorker`) stays untouched. |
-| D3 | No dedicated Claude Code Skill for scout. Reason: RUL6 (`docs/specs/runner.md:853`) — headless `claude -p` defends via minimal explicit `--allowedTools` + instructions, never a sandbox; the Skill tool is a distinct, broader surface than a scoped `Bash(rg:*)` grant, and would violate the "TỐI THIỂU" (minimum) discipline. Also wrong execution layer: `judgeDiscovery`/`judgeDecompose` spawn as a nested `claude -p` **subprocess**, which does not inherit the parent session's interactive skill catalog — a Skill artifact would not even be reachable from inside that subprocess. `fgos-exploring`'s own step-1 scout (relevant to sibling `tsk-4xr`) needs no such mechanism either — it already runs inside a live interactive session with Grep/Bash on hand. |
-| D4 | DRY for the "how to run one scout pass" wording, shared across `fgos-exploring` SKILL.md step 1, `judgeDiscovery`'s prompt, and `judgeDecompose`'s prompt: **a committed prompt-template file**, following the existing pattern at `src/runner/prompt-templates/*.txt` (RUL44 — substitution only, no logic in the template). Not a Skill artifact (see D3). |
+| D3 | No dedicated Claude Code Skill for scout. Reason: RUL6 (`docs/specs/runner.md:853`) — headless `claude -p` defends via minimal explicit `--allowedTools` + instructions, never a sandbox; the Skill tool is a distinct, broader surface than a scoped `Bash(rg:*)` grant, and would violate the "TỐI THIỂU" (minimum) discipline. Also wrong execution layer: `judgeDiscovery`/`judgeDecompose` spawn as a nested `claude -p` **subprocess**, which does not inherit the parent session's interactive skill catalog — a Skill artifact would not even be reachable from inside that subprocess. `fgos-coding-exploring`'s own step-1 scout (relevant to sibling `tsk-4xr`) needs no such mechanism either — it already runs inside a live interactive session with Grep/Bash on hand. |
+| D4 | DRY for the "how to run one scout pass" wording, shared across `fgos-coding-exploring` SKILL.md step 1, `judgeDiscovery`'s prompt, and `judgeDecompose`'s prompt: **a committed prompt-template file**, following the existing pattern at `src/runner/prompt-templates/*.txt` (RUL44 — substitution only, no logic in the template). Not a Skill artifact (see D3). |
 | D5 | Confirmed non-decision / settled question: RUL42 (`docs/specs/runner.md:893`) does not block this feature. RUL42 locks the **picker/dispatch selection loop** mechanical forever; `judgeDiscovery`/`judgeDecompose` are the "bộ não thông minh ở giai đoạn làm-rõ/chia-việc" — RUL42's own named door (1) for intelligence to enter the system. The judges still only write conclusions through the standard doors (`addDiscovery`/`addDecision`/`moveStage`) exactly as before; adding scout capability changes their input, not their write surface or the picker. |
 
 ## Pinned terms
@@ -32,7 +32,7 @@ this item, see D5).
 - **Scout (in this item's scope)** — one bounded, tool-using pass (grep/read,
   not open-ended browsing) a judge runs against the checked-out repo to
   gather grounding evidence before rendering its clear/unclear verdict.
-  Mirrors the shape `fgos-exploring` step 1 already uses ("one keyword
+  Mirrors the shape `fgos-coding-exploring` step 1 already uses ("one keyword
   pass"), not a new investigative capability.
 - **Role-scoped executor override** — a `cfg.executors.<role>` config key
   (role = `judge` here) read by `resolveExecutorCommand` ahead of the
@@ -65,7 +65,7 @@ this item, see D5).
   signal (tsk-ozl D1-D3, shipped 2026-07-31) that skips `judgeDiscovery`
   entirely once a human has already locked decisions here — this is the
   same doc this CONTEXT.md is an instance of.
-- `src/intake/decompose.mjs:43-57` (`readLockedContext`) and `:377-379` —
+- `src/intake/plan.mjs:43-57` (`readLockedContext`) and `:377-379` —
   `judgeDecompose` reads the same `CONTEXT.md`/`plan.md` as grounding
   context passed into its own prompt (no auto-skip like discovery, but
   avoids re-deriving blind).

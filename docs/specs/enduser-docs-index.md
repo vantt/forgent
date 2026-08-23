@@ -1,7 +1,7 @@
 ---
 area: enduser-docs-index
-updated: 2026-07-22
-sources: [compound-learn-enduser-docs, str64-backfill]
+updated: 2026-08-12
+sources: [compound-learn-enduser-docs, str64-backfill, spec-docs-lifecycle-realignment]
 decisions: [1d336d8a, 02623bff, c74bcef9, acda11a7]
 coverage: full
 ---
@@ -27,7 +27,8 @@ cung cấp truy vấn ngược "một tài liệu sinh ra từ những capture n
   bề mặt duy nhất; không có lịch chạy tự động, không có sự kiện nào kích hoạt nó. Bề
   mặt CLI sống ở area work-state (cửa lệnh `fgos` một cửa); hành vi sống ở đây.
 - Kỳ vọng chạy sau khi một tài liệu người-dùng-cuối mới được soạn ở khâu
-  compound-learn, để chỉ mục bắt kịp tài liệu và linkage mới.
+  tổng-hợp (việc mang status `retrospective`), để chỉ mục bắt kịp tài liệu và
+  linkage mới.
 - **`fgos doc-sources <docPath>`** — người hoặc agent gọi verb này để lấy **mọi**
   capture đã liên kết tới một đường dẫn tài liệu (truy vấn ngược nhiều-kết-quả), làm
   nguồn cho area `enduser-docs-authoring` dựng lại tài liệu không mất chi tiết. Cũng
@@ -87,8 +88,7 @@ duy nhất của linkage vẫn là nhật ký capture, tra qua `fgos doc-sources
      `purpose`/`audience` từ bảng cố định, đọc `title` là tiêu đề cấp cao nhất đầu tiên
      của tệp, và ghi `docPath`.
   3. Truy `sourceCaptureId`: kiểm nhật ký sự kiện (`events.jsonl` dưới `.fgos/`) có
-     tới được không (tsk-f31) — nhật ký vắng mặt (vd một worktree theo ADR0020, không
-     mang `.fgos/` riêng) khác với nhật ký tới được nhưng thật sự rỗng; `.fgos/` bản
+     tới được không (tsk-f31) — nhật ký vắng mặt (vd một worktree theo ADR0020 (chặn .fgos/ khỏi worktree worker — fgw/<id> không mang .fgos/ riêng, xóa hẳn khỏi checkout), không mang `.fgos/` riêng) khác với nhật ký tới được nhưng thật sự rỗng; `.fgos/` bản
      thân thư mục có thể tồn tại (giữ mỗi `main-checkout.lock`) trong khi
      `events.jsonl` bên trong vắng mặt — tín hiệu đúng là sự tồn tại của chính tệp
      nhật ký, không phải thư mục `.fgos/`. Nhật ký tới được: dựng bản chiếu capture
@@ -118,7 +118,7 @@ duy nhất của linkage vẫn là nhật ký capture, tra qua `fgos doc-sources
   liệu.
 - **Sau đó, hệ tiêu thụ quan sát:** danh sách đầy đủ các capture của đường dẫn đó
   (rỗng nếu không có capture nào liên kết) — đây là bề mặt gom-nguồn mà area
-  `enduser-docs-authoring` dùng để nuôi tài liệu không mất chi tiết (per D13/D17).
+  `enduser-docs-authoring` dùng để nuôi tài liệu không mất chi tiết.
 
 ## Actors & Access
 
@@ -132,48 +132,46 @@ duy nhất của linkage vẫn là nhật ký capture, tra qua `fgos doc-sources
 
 - **R1 (chỉ mục là dẫn xuất, không phải nguồn).** Manifest được sinh lại được hoàn
   toàn từ cây tài liệu trên đĩa và nhật ký capture; nó không giữ sự-thật nào của riêng
-  mình. Xóa đi rồi chạy lại verb cho ra cùng nội dung (per D12). **Mở rộng (per D3 của
-  str64-backfill):** đầu-mô-tả riêng của mỗi tài liệu (self-description header) là một
+  mình. Xóa đi rồi chạy lại verb cho ra cùng nội dung. **Mở rộng (str64-backfill):**
+  đầu-mô-tả riêng của mỗi tài liệu (self-description header) là một
   bề mặt KHÁC, tồn tại song song — nó KHÔNG đổi tính chất dẫn-xuất-thuần của manifest.
   Manifest vẫn tính lại 100% từ đĩa+log mỗi lần chạy; đầu-mô-tả là bản sao ghi-lúc-soạn,
   không quyền, chỉ để tài liệu tự-đọc-được (xem R11).
 - **R2 (chỉ liệt kê và liên kết, không viết lại).** Verb là đọc-thuần với tài liệu:
-  không hợp nhất, không sửa, không sinh tài liệu. Việc gộp tài liệu là slice sau (per
-  D10/D12).
+  không hợp nhất, không sửa, không sinh tài liệu. Việc gộp tài liệu là slice sau.
 - **R3 (linkage nguồn↔tài-liệu là bắt buộc-nếu-có, không bắt buộc-phải-có).** Mỗi mục
   cố truy `sourceCaptureId` qua `docPath` đã ghi lúc capture; tài liệu không có capture
   nào khai linkage vẫn được liệt kê với `sourceCaptureId: null`. Linkage đảm bảo slice
-  gộp-sống dựng lại tài liệu không mất chi tiết/cấu trúc (per D13).
+  gộp-sống dựng lại tài liệu không mất chi tiết/cấu trúc.
 - **R4 (bảng quadrant→{mục-đích,đối-tượng} có đúng MỘT nguồn sự-thật).** Cặp
   purpose/audience của mỗi ngăn được định nghĩa một chỗ duy nhất trong phần hiện thực
   và mọi nơi khác (kỹ năng `fgos-indexing`, tài liệu) TRỎ tới nó, không chép lại giá
   trị. Ý nghĩa từng ngăn theo Diataxis: `tutorial` — dẫn người mới học qua một trải
   nghiệm; `how-to` — chỉ các bước đạt một mục tiêu cụ thể đã hiểu rõ; `reference` — tra
   cứu chính xác, khô khan; `explanation` — làm rõ bối cảnh/lý do. Câu chữ đích xác của
-  từng cặp là của phần hiện thực (per D12/D14).
+  từng cặp là của phần hiện thực.
 - **R5 (tự-mô-tả; Diataxis là trục cấu trúc DUY NHẤT).** Vì mỗi mục mang sẵn
   purpose+audience chứ không chỉ tên ngăn, người đọc chỉ mục hiểu ngay "để làm gì / ai
   dùng" mà không cần thuộc Diataxis. Nghi vấn "Diataxis một mình có đủ không" đã được
   **chốt**: ngăn Diataxis là trục cấu trúc duy nhất của tài liệu; purpose/audience là
   trường **mô tả** (metadata), không phải trục cấu trúc thứ hai. Chỉ thêm trục thứ hai
-  (vd đối tượng/persona) khi tài liệu thật va chạm — rẻ vì audience đã là trường sẵn có
-  (per D16, giải quyết nghi vấn D14).
+  (vd đối tượng/persona) khi tài liệu thật va chạm — rẻ vì audience đã là trường sẵn có.
 - **R9 (truy nguồn là gom NHIỀU, khác móc chỉ mục gom MỘT).** `fgos doc-sources` trả về
   mọi capture của một đường dẫn; móc `sourceCaptureId` trong manifest chỉ giữ capture
   đầu tiên khớp. Sự khác biệt là có chủ đích: chỉ mục cần một con trỏ gọn, còn việc nuôi
-  tài liệu cần trọn nguồn để không mất chi tiết (per D13/D17).
+  tài liệu cần trọn nguồn để không mất chi tiết.
 - **R6 (dung sai ngăn vắng).** Ngăn chưa có thư mục trên đĩa (chính lẫn thay thế) bị bỏ
   qua sạch; verb không bao giờ gãy vì thiếu ngăn. Hiện `how-to` và `explanation` đã có
-  tài liệu thật; `tutorial`/`reference` còn trống (per D12, ràng buộc validation
-  bước-3; mở rộng per str64-backfill).
+  tài liệu thật; `tutorial`/`reference` còn trống (ràng buộc validation
+  bước-3; mở rộng theo str64-backfill).
 - **R7 (idempotent).** Chạy lại verb không sinh mục trùng cho cùng
   `docPath`/`sourceCaptureId`.
 - **R8 (vị trí manifest ngoài cây spec).** Manifest KHÔNG sống dưới cây tài liệu tham
-  chiếu BA nội bộ; nó là artifact sản phẩm ở vị trí riêng (per D8/D12).
+  chiếu BA nội bộ; nó là artifact sản phẩm ở vị trí riêng.
 - **R10 (một ngăn có thể nhận thêm ĐÚNG MỘT vị trí thay thế đã khai — không phải cơ chế
   đa-vị-trí chung).** Hiện chỉ ngăn `explanation` có vị trí thay thế: sổ quyết định
   sản phẩm đã tồn tại từ trước, đã tự chưng cất product-facing, được công nhận là một
-  nguồn hợp lệ của ngăn `explanation` thay vì di dời/viết lại (per D2 của
+  nguồn hợp lệ của ngăn `explanation` thay vì di dời/viết lại (theo
   str64-backfill). Đây là một khai báo tường minh cho từng ngăn, không phải quy tắc
   "mọi ngăn đều có thể có nhiều vị trí" — thêm vị trí thay thế cho một ngăn khác cần
   quyết định riêng, không suy diễn từ R10.
@@ -181,25 +179,26 @@ duy nhất của linkage vẫn là nhật ký capture, tra qua `fgos doc-sources
   mỗi tài liệu mang thêm `nhãn` tự do theo chủ đề/thực thể — độc lập với `purpose`/
   `audience` (đã gieo theo quadrant, R4) và không thay thế Diataxis làm trục cấu trúc
   (R5 giữ nguyên). `nhãn` cho phép lọc theo thực thể/chủ đề (vd "tất cả tài liệu về
-  X") mà không cần đổi cấu trúc thư mục (per D3 của str64-backfill).
+  X") mà không cần đổi cấu trúc thư mục (theo str64-backfill).
 
 ## Edge Cases Settled
 
 - Ngăn Diataxis chưa có thư mục (vd `tutorial`/`reference` hiện chưa tồn tại): bỏ qua,
-  không lỗi, không mục — verb vẫn chạy trọn và ghi manifest cho các ngăn đã có (per
-  D12, ràng buộc validation).
+  không lỗi, không mục — verb vẫn chạy trọn và ghi manifest cho các ngăn đã có (ràng
+  buộc validation).
 - Tài liệu không có capture nào khai `docPath` tới nó: vẫn được liệt kê,
-  `sourceCaptureId: null` — không phải lỗi (per D13/D15). (Tài liệu how-to đầu tiên nay
+  `sourceCaptureId: null` — không phải lỗi. (Tài liệu how-to đầu tiên nay
   ĐÃ được liên kết tới capture `doc-fgos-rollup-howto` qua slice gộp-sống, nên mục của
   nó mang `sourceCaptureId` thật, không còn `null`.)
-- Nhật ký sự kiện không tới được (vd một worktree theo ADR0020) trong khi manifest đang
+- Nhật ký sự kiện không tới được (vd một worktree theo ADR0020 (chặn .fgos/ khỏi worktree worker)) trong khi manifest đang
   có trên đĩa đã mang `sourceCaptureId` thật cho một `docPath`: khác với bullet trên —
   đây KHÔNG phải "tài liệu không có capture", giá trị thật vẫn tồn tại, chỉ là lần chạy
   này không tra được. Giữ nguyên giá trị cũ trên đĩa thay vì null-hóa (tsk-f31; xem
   bước 3 ở trên).
-- Tài liệu backfill từ nội dung di sản (không qua compound-learn): đầu-mô-tả của nó
-  khai `móc-liên-kết-nguồn` rỗng một cách trung thực — không bịa linkage giả (per D1/D4
-  của str64-backfill).
+- Tài liệu backfill từ nội dung di sản (không qua khâu tổng-hợp ở status
+  `retrospective`): đầu-mô-tả của nó
+  khai `móc-liên-kết-nguồn` rỗng một cách trung thực — không bịa linkage giả (theo
+  str64-backfill).
 - Chạy `fgos docs-index` nhiều lần liên tiếp: manifest hội tụ, không mục trùng (R7).
 
 ## Open Gaps

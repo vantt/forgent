@@ -31,7 +31,7 @@ Why a smaller mode would not honestly cover this: `small`/`standard` would not
 carry a required proof point for either of the two things that actually cost
 something if wrong — (a) argv content reaching a plaintext log, and (b) a
 regression in exit codes or stderr text that every fgOS skill shells out
-against. Both need proving at `fgos-validating`, not asserting here. The
+against. Both need proving at `fgos-coding-validating`, not asserting here. The
 reality check earning a `NOT READY` on exactly (a) is this mode doing its job.
 
 ## Approach
@@ -189,7 +189,7 @@ test/cli/fgos-manifest.test.mjs && npm test` (the manifest test is in there
 because a new verb needs a registry row).
 
 Lineage is recorded as `discoveredFrom: tsk-5z0`, **not** `parent`, for two
-reasons: no CLI flag sets `parent` at all — `src/intake/decompose.mjs:392` is
+reasons: no CLI flag sets `parent` at all — `src/intake/plan.mjs:392` is
 its only writer, the engine's own split path — and `parent` would be wrong here
 anyway, because `src/state/frontier.mjs` blocks a parent until every descendant
 is `done`, which would hold `tsk-5z0` open waiting on a read surface it does
@@ -209,7 +209,7 @@ command specifically because of P2.
 
 ### Revision 4 — scope narrowed to what the handler can see (D7)
 
-`fgos-validating` returned `NOT READY` a second time, on Assumptions again.
+`fgos-coding-validating` returned `NOT READY` a second time, on Assumptions again.
 Two things were proven false by reading, not argued:
 
 1. **`parseArgs` runs outside the `try`** — `bin/fgos.mjs:2717` vs the `try` at
@@ -251,7 +251,7 @@ renderer with `setup` — its audience is "did I install fgOS correctly", not
 
 ### Revision 2 — after the reality check
 
-`fgos-validating` returned `NOT READY - RETURN TO PLANNING` on the Assumptions
+`fgos-coding-validating` returned `NOT READY - RETURN TO PLANNING` on the Assumptions
 dimension. Three things changed; no locked decision was reopened.
 
 1. **Disproven assumption, now a mandatory step.** Revision 1's risk map claimed

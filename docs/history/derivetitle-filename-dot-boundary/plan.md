@@ -34,7 +34,7 @@ Risk map:
 |---|---|---|
 | `deriveTitle` boundary regex | low — single-line, deterministic, no external state | the 3 new tests (D3) plus the 5 existing tests, all via `npm test -- classify.test.mjs` |
 
-No medium/high-risk entries — nothing here needs a `fgos-validating` proof
+No medium/high-risk entries — nothing here needs a `fgos-coding-validating` proof
 point beyond confirming the test file runs green, since the fix is a pure
 regex swap with no behavioral surface outside `deriveTitle`'s return
 value.

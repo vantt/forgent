@@ -30,8 +30,8 @@ the one before it fixes):
    skill. Fixes the actual contract: reads/writes
    `docs/history/<feature>/DISCUSSION.md` per D3's 7-section shape, runs
    the open-conversational brainstorm loop per D4, and on convergence sets
-   `refs` + hands off to `fgos-exploring` then `fgos-planning` per D2 —
-   the same "Handoff" prose pattern `fgos-exploring`/`fgos-planning`
+   `refs` + hands off to `fgos-coding-exploring` then `fgos-coding-planning` per D2 —
+   the same "Handoff" prose pattern `fgos-coding-exploring`/`fgos-coding-planning`
    already use (a session-visible instruction to invoke the next skill
    next, not a nested in-skill call), so this reuses an existing pattern
    rather than inventing a new dispatch mechanism.
@@ -56,11 +56,11 @@ into a real skill under `.claude/skills/`, never carry their own logic.
 
 | Component | Risk | What proves it |
 |---|---|---|
-| `DISCUSSION.md` 7-section schema (D3) matches what `fgos-exploring` actually reads (`refs`, title, `docsRef`) | low | already grounded — `fgos-exploring/SKILL.md` step 1 already reads `refs` today, unchanged by this item |
-| Native-first handoff (D2) actually reaches `fgos-exploring`/`fgos-planning` the same way this very session's own drive of tsk-69g just did | low | this item's own `fgos-coding-driving` → `fgos-exploring` → `fgos-planning` sequence in this session is itself the working precedent; no new mechanism to prove |
+| `DISCUSSION.md` 7-section schema (D3) matches what `fgos-coding-exploring` actually reads (`refs`, title, `docsRef`) | low | already grounded — `fgos-coding-exploring/SKILL.md` step 1 already reads `refs` today, unchanged by this item |
+| Native-first handoff (D2) actually reaches `fgos-coding-exploring`/`fgos-coding-planning` the same way this very session's own drive of tsk-69g just did | low | this item's own `fgos-coding-driving` → `fgos-coding-exploring` → `fgos-coding-planning` sequence in this session is itself the working precedent; no new mechanism to prove |
 | Wrapper dispatch (D1) actually names and reaches `fgos-coding-shaping` | low | covered directly by this item's own `--verify` (below) |
 
-No medium/high risk entries — nothing here needs a `fgos-validating` proof
+No medium/high risk entries — nothing here needs a `fgos-coding-validating` proof
 point beyond the verify command itself, consistent with `small` mode.
 
 ## Shape
@@ -91,17 +91,17 @@ against.
 ## Assumptions
 
 - The exact prose/wording inside each new `SKILL.md` (beyond the D-ID
-  contracts above) is `fgos-code-implement`'s own call at build time — this
+  contracts above) is `fgos-coding-implement`'s own call at build time — this
   plan fixes the contract each file must satisfy, not its literal text.
 
 ## Proof (leave execution alone, step 6)
 
 The one command that proves this item done — already locked as the
-item's own `verify` field via this session's `fgos-exploring` pass
+item's own `verify` field via this session's `fgos-coding-exploring` pass
 (`fgos discover --verdict clear --verify "..."`, outcome `clear`):
 
 ```
-test -f .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "DISCUSSION.md" .claude/skills/fgos-coding-shaping/SKILL.md && grep -qi "native-first" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "fgos-exploring" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "fgos-planning" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "^name: coding-shape$" plugins/fgOS/skills/coding-shape/SKILL.md && grep -qi "fgos-coding-shaping" plugins/fgOS/skills/coding-shape/SKILL.md && grep -q "^name: coding-shape-distill$" plugins/fgOS/skills/coding-shape-distill/SKILL.md && grep -qi "fgos-coding-shaping" plugins/fgOS/skills/coding-shape-distill/SKILL.md && grep -qi "doc-path" plugins/fgOS/skills/coding-shape-distill/SKILL.md
+test -f .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "DISCUSSION.md" .claude/skills/fgos-coding-shaping/SKILL.md && grep -qi "native-first" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "fgos-coding-exploring" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "fgos-coding-planning" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "^name: coding-shape$" plugins/fgOS/skills/coding-shape/SKILL.md && grep -qi "fgos-coding-shaping" plugins/fgOS/skills/coding-shape/SKILL.md && grep -q "^name: coding-shape-distill$" plugins/fgOS/skills/coding-shape-distill/SKILL.md && grep -qi "fgos-coding-shaping" plugins/fgOS/skills/coding-shape-distill/SKILL.md && grep -qi "doc-path" plugins/fgOS/skills/coding-shape-distill/SKILL.md
 ```
 
 This plan does not re-design it — it already survived a two-pass

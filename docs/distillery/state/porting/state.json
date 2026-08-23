@@ -311,6 +311,22 @@
     "feedback-source-sweep": {
       "id": "feedback-source-sweep",
       "status": "candidate"
+    },
+    "decision-citation-and-reversal-sweep": {
+      "id": "decision-citation-and-reversal-sweep",
+      "status": "candidate"
+    },
+    "one-line-cite-plus-local-delta": {
+      "id": "one-line-cite-plus-local-delta",
+      "status": "candidate"
+    },
+    "doc-rot-close-gate-bundle": {
+      "id": "doc-rot-close-gate-bundle",
+      "status": "candidate"
+    },
+    "pi-executor-runtime-capacity": {
+      "id": "pi-executor-runtime-capacity",
+      "status": "adapted"
     }
   }
 }

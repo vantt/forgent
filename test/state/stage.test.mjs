@@ -29,19 +29,31 @@ function addSampleWork(dir, overrides = {}) {
     risk: 'light',
     refs: [],
     verify: 'P15 will fill this in',
-    stage: 'clarify',
+    // tsk-qod D1/D2: `clarify` is retired as a stage entirely for the
+    // coding domain -- `discovery` (`stages[0]`) is the real entry point a
+    // fresh item now starts at.
+    stage: 'discovery',
     ...overrides,
   });
 }
 
-test('transitionStage allows clarify -> executing and returns a validated event', () => {
-  const event = transitionStage({ work: work('clarify'), to: 'executing' });
-  assert.deepEqual(event, { type: 'work.stage', payload: { id: 'w1', from: 'clarify', to: 'executing' } });
+test('transitionStage allows the two clarify-sourced FSM-legality edges kept for historical migration (tsk-qod D1/D2): clarify -> discovery and clarify -> exploring', () => {
+  const toDiscovery = transitionStage({ work: work('clarify'), to: 'discovery' });
+  assert.deepEqual(toDiscovery, { type: 'work.stage', payload: { id: 'w1', from: 'clarify', to: 'discovery' } });
+
+  const toExploring = transitionStage({ work: work('clarify'), to: 'exploring' });
+  assert.deepEqual(toExploring, { type: 'work.stage', payload: { id: 'w1', from: 'clarify', to: 'exploring' } });
 });
 
-test('transitionStage allows clarify -> decompose', () => {
-  const event = transitionStage({ work: work('clarify'), to: 'decompose' });
-  assert.deepEqual(event, { type: 'work.stage', payload: { id: 'w1', from: 'clarify', to: 'decompose' } });
+test('transitionStage refuses clarify -> executing and clarify -> decompose now that those edges are retired (tsk-qod D1/D2 — clarify carries no stages/skillMap/stepMap entry anymore, only the two FSM-legality edges above survive, kept for scripts/migrate-clarify-split.mjs)', () => {
+  assert.throws(
+    () => transitionStage({ work: work('clarify'), to: 'executing' }),
+    (err) => err instanceof FsmError && err.category === 'precondition',
+  );
+  assert.throws(
+    () => transitionStage({ work: work('clarify'), to: 'decompose' }),
+    (err) => err instanceof FsmError && err.category === 'precondition',
+  );
 });
 
 test('transitionStage allows decompose -> executing', () => {
@@ -57,25 +69,27 @@ test('transitionStage reads a missing stage as "executing" (lazy default)', () =
 });
 
 test('transitionStage carries verify in the payload when supplied, and omits it when not', () => {
-  const withVerify = transitionStage({ work: work('clarify'), to: 'executing', verify: 'npm test -- discovered' });
+  const withVerify = transitionStage({ work: work('clarify'), to: 'discovery', verify: 'npm test -- discovered' });
   assert.deepEqual(withVerify, {
     type: 'work.stage',
-    payload: { id: 'w1', from: 'clarify', to: 'executing', verify: 'npm test -- discovered' },
+    payload: { id: 'w1', from: 'clarify', to: 'discovery', verify: 'npm test -- discovered' },
   });
 
-  const withoutVerify = transitionStage({ work: work('clarify'), to: 'executing' });
+  const withoutVerify = transitionStage({ work: work('clarify'), to: 'discovery' });
   assert.equal('verify' in withoutVerify.payload, false);
 });
 
-test('transitionStage rejects edges outside the three legal ones (clarify->executing, clarify->decompose, decompose->executing) as precondition', () => {
+test('transitionStage rejects edges outside the legal ones (clarify->discovery, clarify->exploring, decompose->executing, exploring->decompose, discovery->exploring, exploring->planning, planning->executing) as precondition', () => {
   const illegalPairs = [
     ['executing', 'clarify'],
     ['executing', 'executing'],
     ['clarify', 'clarify'],
-    ['clarify', 'planning'],
     ['decompose', 'clarify'],
     ['decompose', 'decompose'],
     ['executing', 'decompose'],
+    ['planning', 'clarify'],
+    ['planning', 'planning'],
+    ['executing', 'planning'],
   ];
   for (const [from, to] of illegalPairs) {
     assert.throws(
@@ -87,14 +101,14 @@ test('transitionStage rejects edges outside the three legal ones (clarify->execu
 });
 
 test('transitionStage CAS: matching expectedStage proceeds normally', () => {
-  const event = transitionStage({ work: work('clarify'), to: 'executing', expectedStage: 'clarify' });
+  const event = transitionStage({ work: work('clarify'), to: 'discovery', expectedStage: 'clarify' });
   assert.equal(event.payload.from, 'clarify');
-  assert.equal(event.payload.to, 'executing');
+  assert.equal(event.payload.to, 'discovery');
 });
 
 test('transitionStage CAS: mismatched expectedStage is refused as conflict, not precondition', () => {
   assert.throws(
-    () => transitionStage({ work: work('clarify'), to: 'executing', expectedStage: 'executing' }),
+    () => transitionStage({ work: work('clarify'), to: 'discovery', expectedStage: 'executing' }),
     (err) => err instanceof FsmError && err.category === 'conflict',
   );
 });
@@ -142,9 +156,9 @@ test('transitionStage requires a non-empty "to"', () => {
 
 test('moveStage then rebuild -> stage executing + verify replaced (one event does both)', () => {
   const dir = tmpDir();
-  addSampleWork(dir);
+  addSampleWork(dir, { stage: 'planning' });
 
-  const { view } = moveStage(dir, { id: 'item-x', to: 'executing', expectedStage: 'clarify', verify: 'npm test -- item-x' });
+  const { view } = moveStage(dir, { id: 'item-x', to: 'executing', expectedStage: 'planning', verify: 'npm test -- item-x' });
   assert.equal(view.work['item-x'].stage, 'executing');
   assert.equal(view.work['item-x'].verify, 'npm test -- item-x');
 
@@ -153,14 +167,14 @@ test('moveStage then rebuild -> stage executing + verify replaced (one event doe
   assert.equal(rebuilt.work['item-x'].verify, 'npm test -- item-x');
 });
 
-test('moveStage carries an item clarify -> decompose -> executing', () => {
+test('moveStage carries an item exploring -> planning -> executing (tsk-qod: the live chain a new item walks now that clarify is retired)', () => {
   const dir = tmpDir();
-  addSampleWork(dir);
+  addSampleWork(dir, { stage: 'exploring' });
 
-  const decomposed = moveStage(dir, { id: 'item-x', to: 'decompose', expectedStage: 'clarify' });
-  assert.equal(decomposed.view.work['item-x'].stage, 'decompose');
+  const planned = moveStage(dir, { id: 'item-x', to: 'planning', expectedStage: 'exploring' });
+  assert.equal(planned.view.work['item-x'].stage, 'planning');
 
-  const { view } = moveStage(dir, { id: 'item-x', to: 'executing', expectedStage: 'decompose' });
+  const { view } = moveStage(dir, { id: 'item-x', to: 'executing', expectedStage: 'planning' });
   assert.equal(view.work['item-x'].stage, 'executing');
 
   const rebuilt = listWork(dir);
@@ -188,14 +202,14 @@ test('moveStage with a stale expectedStage -> conflict, no event appended (must_
 // its transition table via the item's own domain, defaulting to 'coding' ---
 
 test('transitionStage behaves identically with an explicit domain: "coding" as with no domain at all', () => {
-  const explicit = transitionStage({ work: work('clarify', { domain: 'coding' }), to: 'executing' });
-  const implicit = transitionStage({ work: work('clarify'), to: 'executing' });
+  const explicit = transitionStage({ work: work('clarify', { domain: 'coding' }), to: 'discovery' });
+  const implicit = transitionStage({ work: work('clarify'), to: 'discovery' });
   assert.deepEqual(explicit, implicit);
 });
 
 test('transitionStage folds an unrecognized work.domain to "coding" and never throws for that reason alone', () => {
-  const event = transitionStage({ work: work('clarify', { domain: 'bogus-domain' }), to: 'executing' });
-  assert.deepEqual(event, { type: 'work.stage', payload: { id: 'w1', from: 'clarify', to: 'executing' } });
+  const event = transitionStage({ work: work('clarify', { domain: 'bogus-domain' }), to: 'discovery' });
+  assert.deepEqual(event, { type: 'work.stage', payload: { id: 'w1', from: 'clarify', to: 'discovery' } });
 });
 
 test('transitionStage with an unrecognized work.domain warns once via console.warn (fail-safe, not silent)', () => {
@@ -203,7 +217,7 @@ test('transitionStage with an unrecognized work.domain warns once via console.wa
   const calls = [];
   console.warn = (...args) => calls.push(args);
   try {
-    transitionStage({ work: work('clarify', { domain: 'bogus-domain' }), to: 'executing' });
+    transitionStage({ work: work('clarify', { domain: 'bogus-domain' }), to: 'discovery' });
     assert.equal(calls.length, 1);
     assert.match(calls[0][0], /bogus-domain/);
   } finally {

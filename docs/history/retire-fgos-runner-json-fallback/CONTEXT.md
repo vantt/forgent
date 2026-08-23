@@ -93,7 +93,7 @@ by what actually needs to change vs. what's inert prose:
 **Comment-only mentions (no runtime behavior, narrative cleanup only where
 touched):** `src/setup/config-merge.mjs`, `src/state/gate-bypass.mjs`,
 `src/runner/loop.mjs`, `src/runner/prompt-templates.mjs`,
-`src/intake/decompose.mjs` (a dotfile-tokenizer regex example — the
+`src/intake/plan.mjs` (a dotfile-tokenizer regex example — the
 comment can keep `.fgos-runner.json` as an illustrative dotfile name even
 after the file itself is gone, since it is demonstrating tokenizer
 behavior on dotfiles generically, not documenting this file's existence),
@@ -151,7 +151,7 @@ deleted instead of correctly changed.
   its own minimal parse — an implementation choice, not a product decision.
 - Whether the 17 affected test files and ~15 affected docs get handled in
   this one item or split into children at decompose — sizing/splitting is
-  `fgos-planning`'s judgment, not locked here.
+  `fgos-coding-planning`'s judgment, not locked here.
 - Exact wording for `src/cli/command-registry.mjs`'s help text and for the
   `config-not-stale` doctor check's new (fallback-free) description —
   implementation detail.

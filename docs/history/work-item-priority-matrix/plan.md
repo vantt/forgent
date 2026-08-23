@@ -35,7 +35,7 @@ Step 5 of this skill directs creating child items via `parent` lineage.
 Checked before deciding: `add`/`edit`'s real CLI parameter lists
 (`bin/fgos.mjs:726-816`, `src/cli/command-registry.mjs`) have **no
 `--parent` flag** — confirmed by direct code read during `tsk-4y5`'s own
-`fgos-exploring` pass, filed as `tsk-1xx`. The only writer of `parent` in
+`fgos-coding-exploring` pass, filed as `tsk-1xx`. The only writer of `parent` in
 the repo is `decompose.mjs`'s own internal `addWork()` call inside
 `judgeDecompose`'s auto-split path — not something a skill session can
 invoke under one-door-write discipline. Splitting `tsk-4y5` into
@@ -46,7 +46,7 @@ for exactly this case, which is worse than not splitting.
 
 **Decision:** `tsk-4y5` proceeds as one item, high-risk mode, with an
 internal phased approach (three phases, one commit per phase, single
-`fgos return` at the end per `fgos-code-implement`'s existing "one commit per
+`fgos return` at the end per `fgos-coding-implement`'s existing "one commit per
 item" habit interpreted as "one commit per phase, one return for the
 whole item" — no schema/verb change needed to allow this). Re-visit
 splitting into real children once `tsk-1xx` ships.
@@ -62,7 +62,7 @@ absent-leaves-undefined), `impact` (optional non-negative number),
 `--effort` flags on `add` and `edit`, mirroring `--priority`/`--intent`'s
 existing wiring exactly. Risk: breaking `validateWorkShape`'s existing
 contract for old events with no such fields. Proof point (→
-`fgos-validating`): full `npm test` green, plus the existing
+`fgos-coding-validating`): full `npm test` green, plus the existing
 `work.test.mjs` schema-validation suite specifically, run against a
 fixture event log with zero occurrences of the three new fields (byte-
 identical validation for every pre-existing item, same discipline
@@ -77,7 +77,7 @@ write `priority` (not `intent`) via the existing second `editWork` call
 per D7 ("stop writing `intent`, do not remove it"). `src/intake/
 decompose.mjs` (refined pass): extend `buildDecomposePrompt`'s judge
 context with the real `impact-analysis` query result (present today, see
-posture above) and `fgos-planning`'s own mode/flag-count (this skill,
+posture above) and `fgos-coding-planning`'s own mode/flag-count (this skill,
 step 2 — needs its own `plan.md` to already exist, which it does by
 construction since this skill runs before the refined pass fires); write
 the refined `priority` via `edit --priority`. Risk: sign/inversion bug
@@ -118,12 +118,12 @@ never removes it).
 - Partial failure: `impact-analysis` capability degrades mid-flight
   (`present` at Phase A's `plan.md` write time, `missing`/`unknown` by the
   time Phase B's refined pass actually runs) — refined pass must re-query
-  live (never trust a stale posture note), matching `fgos-validating`'s
+  live (never trust a stale posture note), matching `fgos-coding-validating`'s
   own existing discipline for this exact capability.
 
 ## Execution notes
 
 Leaving Execute/verify alone per this skill's own rule — each phase above
-names one real, runnable command as its proof point; `fgos-code-implement`
+names one real, runnable command as its proof point; `fgos-coding-implement`
 runs them, `fgos return` re-verifies, same mechanical path as any other
 item.

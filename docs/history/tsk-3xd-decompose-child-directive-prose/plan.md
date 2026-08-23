@@ -5,7 +5,7 @@ Mode: **standard**
 Lane decided via `fgos-routing`'s Mode-gate (direct-entry fallback — no
 prior Orient handoff existed for this item in this session): 3 flags
 counted — **data model** (two new optional work-item fields), **public
-contract** (`fgos decompose --children`'s caller-supplied child schema
+contract** (`fgos plan --children`'s caller-supplied child schema
 gains new accepted keys), **existing covered behavior** (`test/intake/
 decompose.test.mjs` already asserts `normalizeChild`'s exact output shape,
 e.g. the footprint tests at :701-741). No hard-gate flag (not auth, not
@@ -14,9 +14,9 @@ validation) and fewer than 4 flags → standard, not high-risk.
 
 ## Proof surface (whole item)
 
-`node --test test/intake/decompose.test.mjs` — real, runnable, verified
+`node --test test/intake/plan.test.mjs` — real, runnable, verified
 passing today (107/107, ~3.2s) as this plan was written. NOT `npm test --
-test/intake/decompose.test.mjs`: `npm test` is `node --test 'test/**/*.test.mjs'`
+test/intake/plan.test.mjs`: `npm test` is `node --test 'test/**/*.test.mjs'`
 (package.json:23) and `npm run`'s `--` args are appended after the script's
 own glob argument, not substituted for it — so that form still runs the
 WHOLE suite (confirmed: it produced an unrelated coverage-manifest
@@ -63,12 +63,12 @@ for the record, never reopened):
   rejected, `CONTEXT.md` D3 (separate CLI surface, already tsk-535's scope).
 
 **Files touched:**
-- `src/intake/decompose.mjs` — judge-scout prompt template (tầng 1),
+- `src/intake/plan.mjs` — judge-scout prompt template (tầng 1),
   `normalizeChild` (tầng 2), `addWork` loop (tầng 3).
 - `src/runner/prompt-templates/worker-prompt-default.txt` — add
   `{read_first}`/`{action}` interpolation.
 - `src/runner/prompt-templates/worker-prompt-skill-pointer.txt` — same.
-- `test/intake/decompose.test.mjs` — new assertions (existing file, 2284
+- `test/intake/plan.test.mjs` — new assertions (existing file, 2284
   lines, already covers `normalizeChild`/`resolveDecompose` exhaustively —
   no new test file needed, matches its own established per-behavior
   `test()` convention).
@@ -84,7 +84,7 @@ splitting it further.
 
 ## Risk map
 
-| Component | Risk | Proof point (for fgos-validating) |
+| Component | Risk | Proof point (for fgos-coding-validating) |
 |---|---|---|
 | `action`/`read_first` as new optional work-item fields | LOW — additive, no `SCHEMA_VERSION` bump (precedent: `footprint`/`domain` both added under version 2 unchanged, `work.mjs:422,439-460`) | Unit test: `SCHEMA_VERSION` still 3 after the change; a child carrying `action`/`read_first` survives `normalizeChild` → `addWork` unchanged. |
 | Judge-scout prompt requiring `action` cite a real D-ID | MEDIUM — model output quality: could omit `action` or cite a fabricated D-ID | Unit test mirroring the existing missing-`verify` pattern (`decompose.test.mjs:270`): a child with `action` missing, or citing a D-ID absent from `CONTEXT.md`, invalidates the whole verdict — never silently drops just that child. |
@@ -92,12 +92,12 @@ splitting it further.
 | `{read_first}`/`{action}` interpolation in both worker-prompt-templates | LOW — mechanical string templating, same shape as existing `{description}`/`{refs}` | Direct render check: a work item with `footprint`/`action` set produces a prompt string containing both, for each template. |
 | `buildDecomposeChildrenVerdict`'s shared caller-supplied `--children` path | LOW — already covered by the same `normalizeChild`/`addWork` change, no separate code path | Existing `--children`-branch tests (decompose.test.mjs) continue passing unchanged; add one asserting a caller-supplied child's `action`/`read_first` survive the same way. |
 
-## Assumptions (unproven, flagged for fgos-validating)
+## Assumptions (unproven, flagged for fgos-coding-validating)
 
 - The judge-scout LLM, when re-prompted with the D-ID-citation requirement,
   reliably produces a citable `action` in practice (not just in the
   fixture tests above) — genuinely unproven until real dispatch runs
-  post-merge; `fgos-validating`'s reality check should weigh whether this
+  post-merge; `fgos-coding-validating`'s reality check should weigh whether this
   needs a bypass/soft-fail path (e.g. treat a missing citation as
   `need-human` rather than hard-`invalid`) or whether hard-`invalid` (this
   plan's current choice, matching the existing missing-`verify` precedent)
@@ -107,7 +107,7 @@ splitting it further.
   most children; if most existing callers leave `footprint` empty in
   practice, `read_first` will often be empty too. This is an existing,
   pre-existing gap (footprint is already optional today), not one this
-  item worsens — worth naming so `fgos-validating` doesn't treat an empty
+  item worsens — worth naming so `fgos-coding-validating` doesn't treat an empty
   `read_first` on some children as a regression.
 
 ## Split decision

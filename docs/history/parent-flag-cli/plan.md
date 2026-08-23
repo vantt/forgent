@@ -75,7 +75,7 @@ changes).
 
 ## Risk map
 
-| Component | Risk | Proof point (carried to fgos-validating) |
+| Component | Risk | Proof point (carried to fgos-coding-validating) |
 |---|---|---|
 | `store.mjs` `EDITABLE_FIELDS` + cycle guard | medium | **New test**: an `editWork` patch that sets `parent` alone (no `deps` involved) into a cycle is rejected. This is a genuinely new attack surface — today it's structurally impossible since `parent` isn't editable, so no existing test covers it. The existing test at `store.test.mjs:433` covers a *deps*-patch closing a cycle against a fixed parent edge; that scenario is unaffected and must still pass unmodified. |
 | `bin/fgos.mjs` edit handler (`""` → `null` mapping) | low-medium | **New test/CLI check**: `fgos edit <id> --parent ""` clears the field (candidate ends up with `parent: null` or absent, not the literal string `""`, which `work.mjs:256` would otherwise reject as an empty string). |

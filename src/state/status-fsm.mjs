@@ -43,7 +43,7 @@
 // pair. It exists for fan-out-parallel's drift reconcile (CONTEXT.md
 // D7/D8/D11): a root parked via `awaiting-approval -> blocked` (reason
 // `integration-drift`) after a clean catch-up + re-verify needs to return to
-// `proposed` directly, without re-entering `doing`. Re-entering `doing`
+// `awaiting-approval` directly, without re-entering `doing`. Re-entering `doing`
 // would wrongly count as an anti-loop visit — `visitCount` in
 // `runner/anti-loop.mjs` counts any `work.move` event whose `payload.to` is
 // `'doing'`, and a mechanical reconcile retry is not the kind of rework that
@@ -97,6 +97,15 @@ export { STATUSES };
 // produced real content); `blocked -> delivered` above is how a
 // mechanical retry re-enters this chain.
 const TRANSITIONS = Object.freeze([
+  // work-item-backlog-status D1: `backlog` (an idea not yet committed to
+  // work) has exactly one door out, to `todo`, and zero doors in — an item
+  // is created at `backlog` or never reaches it. Plain edge, no
+  // `reason`/`ask`/`answer`, same shape as `blocked -> todo` below; D1
+  // settled that only a human fires it, and `role` is attribution-only
+  // here (never an ACL — see transitionWork), so "human-only" is enforced
+  // the way every other human-only edge in this codebase already is: the
+  // CLI verb that exposes the edge stamps `role: 'human'`, not this table.
+  Object.freeze({ from: 'backlog', to: 'todo' }),
   Object.freeze({ from: 'todo', to: 'doing' }),
   Object.freeze({ from: 'todo', to: 'blocked' }),
   Object.freeze({ from: 'doing', to: 'blocked' }),
@@ -107,7 +116,7 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'doing', to: 'awaiting-approval' }),
   // Claim release (claim-lock §3b): the clarify/decompose -> executing
   // boundary hands a held pick claim back to `todo` the moment the item is
-  // actually ready for its executing phase (resolveDecompose, after its own
+  // actually ready for its executing phase (resolvePlan, after its own
   // moveStage(...,'executing',...)) — silent, no `reason` required, mirroring
   // `blocked -> todo`'s own no-reason shape immediately above. This is the
   // one new status edge the design needs beyond the awaiting-human ones: a
@@ -252,6 +261,37 @@ export function transitionWork({ work, to, expectedStatus, reason, ask, answer }
       throw new FsmError(
         'validation',
         `transitionWork: "ask" is required and must be a non-empty string when moving work "${work.id}" into awaiting-human.`,
+      );
+    }
+    const lines = ask.split(/\r?\n/);
+    const sections = { context: [], whyThisMatters: [] };
+    let currentSection = null;
+    for (const line of lines) {
+      const headingMatch = line.match(/^\s*#+\s+(.+)$/);
+      if (headingMatch) {
+        const headingText = headingMatch[1].trim().toLowerCase();
+        if (/^context\b/i.test(headingText)) {
+          currentSection = 'context';
+        } else if (/^why\s+this\s+matters\b/i.test(headingText)) {
+          currentSection = 'whyThisMatters';
+        } else {
+          currentSection = null;
+        }
+      } else if (currentSection) {
+        sections[currentSection].push(line);
+      }
+    }
+    const missing = [];
+    if (sections.context.join('\n').trim().length < 20) {
+      missing.push('## Context');
+    }
+    if (sections.whyThisMatters.join('\n').trim().length < 20) {
+      missing.push('## Why this matters');
+    }
+    if (missing.length > 0) {
+      throw new FsmError(
+        'validation',
+        `transitionWork: "ask" for work "${work.id}" must contain structurally complete Markdown headings with at least 20 characters of content under each. Missing or incomplete: ${missing.join(', ')}.`,
       );
     }
     payload.ask = ask.trim();

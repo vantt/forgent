@@ -40,15 +40,37 @@ export function findDecisionCodeFindings(files) {
   return findings;
 }
 
+// Occurrence-count consumption (tsk-1pf, porting tsk-6at's own fix for
+// the sibling check-decision-citation-drift.mjs): a file can legitimately
+// carry two or more findings with identical text (a repeated test-name
+// pattern). Membership alone (`.includes`) would treat every such repeat
+// as "already known" forever, missing a genuinely new Nth occurrence.
 export function findNewFindings(findings, baseline) {
+  const remaining = Object.create(null);
+  for (const [file, texts] of Object.entries(baseline)) {
+    const counts = new Map();
+    for (const text of texts) {
+      counts.set(text, (counts.get(text) || 0) + 1);
+    }
+    remaining[file] = counts;
+  }
   return findings.filter((f) => {
-    const known = baseline[f.file];
-    return !known || !known.includes(f.text);
+    const counts = remaining[f.file];
+    if (!counts) return true;
+    const left = counts.get(f.text) || 0;
+    if (left > 0) {
+      counts.set(f.text, left - 1);
+      return false;
+    }
+    return true;
   });
 }
 
 export function baselineFromFindings(findings) {
-  const baseline = {};
+  // Object.create(null) (tsk-1pf): a plain `{}` literal would let a
+  // source file path literally equal to "__proto__" reassign the
+  // object's own prototype instead of creating a normal property.
+  const baseline = Object.create(null);
   for (const f of findings) {
     if (!baseline[f.file]) baseline[f.file] = [];
     baseline[f.file].push(f.text);
@@ -86,7 +108,7 @@ function loadSourceFiles(testDir, cwd, exclude) {
 }
 
 function loadBaseline(baselinePath) {
-  if (!fs.existsSync(baselinePath)) return {};
+  if (!fs.existsSync(baselinePath)) return Object.create(null);
   return JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
 }
 

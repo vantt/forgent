@@ -28,7 +28,7 @@ edits; either could go first, this plan does the field first since it is
 the smaller, mechanically-verifiable half.
 
 `fgos tool query --capability impact-analysis --status present`: GitNexus
-present (checked during `fgos-exploring`, CONTEXT.md's scout evidence).
+present (checked during `fgos-coding-exploring`, CONTEXT.md's scout evidence).
 Not applicable here — neither edit touches a function/class/method
 symbol, so no blast-radius proof point is needed.
 

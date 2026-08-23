@@ -62,7 +62,7 @@ edit at all.
 
 ## Risk map
 
-| Component | Risk | Proof point (→ fgos-validating) |
+| Component | Risk | Proof point (→ fgos-coding-validating) |
 |---|---|---|
 | `putInAwaiting`'s param-to-payload rename (`rationale`→`askRationale` etc.) | low — confirmed zero existing test coverage of `ask --rationale`'s current target key | Grep confirms no test asserts `ask`'s rationale lands in `gates[id].rationale`; `answerAwaiting` (untouched) still does, confirmed by its own existing tests |
 | `gates[id]` fold gains 3 new guarded fields | low — same idiom as 4 fields already there (`parentSnapshotAtAsk`/`statusAtAsk`/`rationale`/`alternatives`/`source`), no existing fixture sets `askRationale` so no accidental leak into old `deepEqual` assertions | Confirm `test/state/replay.test.mjs`'s existing decision-fold tests stay green unmodified (none touch `work.move`'s gates fold) |

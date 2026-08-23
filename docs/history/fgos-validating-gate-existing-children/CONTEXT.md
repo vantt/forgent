@@ -1,15 +1,15 @@
-# fgos-validating Gate: missing case for already-created children
+# fgos-coding-validating Gate: missing case for already-created children
 
 tsk-1x7
 
 ## Feature boundary
 
-`fgos-validating`'s Gate section (`.claude/skills/fgos-validating/SKILL.md`)
+`fgos-coding-validating`'s Gate section (`.claude/skills/fgos-coding-validating/SKILL.md`)
 names exactly two verdict commands for the `decompose`→`executing` edge:
 `--verdict pass-through` ("one honest piece") and `--verdict decompose
 --children [...]` ("plan.md listed real child pieces"). It gives no
 guidance for the case where `plan.md`'s listed child pieces were already
-created as real work items during `fgos-planning`'s own step 4 (`fgos add
+created as real work items during `fgos-coding-planning`'s own step 4 (`fgos add
 --parent --footprint`), rather than existing only as a JSON blob still to
 be materialized.
 
@@ -21,7 +21,7 @@ already equals the id) while orphaning the real ones — their `parent` field
 still points correctly, but the FSM's own decompose-verdict record never
 references them.
 
-This item's fix is scoped to `fgos-validating/SKILL.md`'s Gate section
+This item's fix is scoped to `fgos-coding-validating/SKILL.md`'s Gate section
 prose only: name the third case explicitly and point it at
 `--verdict pass-through`, citing the already-existing children. No other
 document repeats this Gate pattern (confirmed by grep across the worktree's
@@ -33,27 +33,27 @@ change to `decompose.mjs` is in scope (see D1).
 
 | D-ID | Decision |
 |------|----------|
-| D1 | Fix is doc-only: edit `fgos-validating/SKILL.md`'s Gate section to name a third case (children already created via `fgos-planning`'s step 4 → use `--verdict pass-through`, citing the existing children, never `--verdict decompose --children`). No code-level idempotency check is added to `decompose.mjs`'s `addWork` loop. User confirmed this scope explicitly over the alternative (doc fix + defensive check in `decompose.mjs`), matching the item description's own "Fix" wording, which asked for Gate-section guidance only. |
+| D1 | Fix is doc-only: edit `fgos-coding-validating/SKILL.md`'s Gate section to name a third case (children already created via `fgos-coding-planning`'s step 4 → use `--verdict pass-through`, citing the existing children, never `--verdict decompose --children`). No code-level idempotency check is added to `decompose.mjs`'s `addWork` loop. User confirmed this scope explicitly over the alternative (doc fix + defensive check in `decompose.mjs`), matching the item description's own "Fix" wording, which asked for Gate-section guidance only. |
 
 ## Pinned terms
 
 - **"already-created children"** — work items with `parent == <root id>`
   that exist in the store (via `fgos add --parent --footprint`,
-  `fgos-planning` step 4) *before* `fgos-validating`'s Gate fires, as
+  `fgos-coding-planning` step 4) *before* `fgos-coding-validating`'s Gate fires, as
   opposed to a `--children` JSON array describing pieces not yet written
   as items.
 
 ## Scout evidence
 
-- `.claude/skills/fgos-validating/SKILL.md` (Gate section, lines 155-193 as
+- `.claude/skills/fgos-coding-validating/SKILL.md` (Gate section, lines 155-193 as
   read this session): only two verdict commands shown, no third case for
   pre-existing children.
-- `.claude/skills/fgos-planning/SKILL.md` (step 4, "Decide the split, if
+- `.claude/skills/fgos-coding-planning/SKILL.md` (step 4, "Decide the split, if
   any", lines 157-191 as read this session): confirms real child items are
   created here via `fgos add --title ... --parent <id> --footprint ...`
-  during planning, independent of whatever `fgos-validating`'s Gate later
+  during planning, independent of whatever `fgos-coding-validating`'s Gate later
   does.
-- `src/intake/decompose.mjs` lines 929-945 (`verdict.children.forEach(...)
+- `src/intake/plan.mjs` lines 929-945 (`verdict.children.forEach(...)
   addWork(dir, {...})`): confirmed unconditional — no read-before-write
   check against an item already carrying `parent == id`.
 - `rg -n "decompose --children" --glob "*.md"` across the worktree: only
@@ -78,14 +78,14 @@ change to `decompose.mjs` is in scope (see D1).
 
 ## Canonical references
 
-- `.claude/skills/fgos-validating/SKILL.md`
-- `.claude/skills/fgos-planning/SKILL.md`
-- `src/intake/decompose.mjs`
+- `.claude/skills/fgos-coding-validating/SKILL.md`
+- `.claude/skills/fgos-coding-planning/SKILL.md`
+- `src/intake/plan.mjs`
 
 ## Outstanding questions deferred to planning
 
 None. The fix's shape, location, and acceptance criteria are already fully
 specified by the item's own description and this session's confirmed D1;
-`fgos-planning` only needs to write the exact prose addition and a verify
+`fgos-coding-planning` only needs to write the exact prose addition and a verify
 command that proves it (e.g. that the Gate section names the third case
 and points it at `pass-through`).

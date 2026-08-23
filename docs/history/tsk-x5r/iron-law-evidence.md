@@ -26,7 +26,7 @@ $ node --test test/runner/loop.test.mjs   # on main, pre-fix
   + actual - expected
     {
   +   baseCommit: 'fcd7e09fe3ab897c82a449e21028a103590e5e17',
-      capacityId: 'fgos-code-implement',
+      capacityId: 'fgos-coding-implement',
   +   headRef: 'fgw/item-announce',
       ...
     }

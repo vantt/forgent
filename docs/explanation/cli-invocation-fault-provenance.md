@@ -22,7 +22,7 @@ signal with expected, correct events.
 The scope actually shipped is narrower than the item's own original
 description. Locked decision D1 named four fault classes: unknown verb,
 missing required flag, invalid id, wrong cwd. D7 — added after
-`fgos-validating` proved the boundary by reading the code, not arguing it —
+`fgos-coding-validating` proved the boundary by reading the code, not arguing it —
 cut this to exactly what the single failure handler in `main()`'s `catch`
 can observe: unknown verb, the `requiresExistingStore` refusal, the
 `init`-inside-worktree refusal, `dataDir`/`--dir` faults, and arg-parse
@@ -89,7 +89,7 @@ repo, so this gap was accepted rather than solved.
 
 ## Why one added stderr line, decided after the fact
 
-D6, added after `fgos-planning`, makes the fault record visible
+D6, added after `fgos-coding-planning`, makes the fault record visible
 in-process: one *added* stderr line naming where it was recorded. Exit
 codes and existing stderr text stay unchanged — this only appends. The
 concern was measured, not assumed: 85 of 97 stderr assertions under `test/`
@@ -99,4 +99,7 @@ individually. Without this, the log's known failure mode is that nobody
 reads it and the feature's own purpose — being able to "soi lại sau" (look
 back later) — never materializes. A machine-readable read surface (a
 `fgos faults` verb) was left as separate follow-on work, not part of this
-item.
+item — landed by `tsk-1wdf`: `fgos faults [--limit N]` reads the same
+`.fgos/invocation-faults.jsonl` back, resolving it the same worktree-safe
+way it is written (D5), so a linked worktree with no `--dir` still sees the
+main checkout's real records instead of an empty view.

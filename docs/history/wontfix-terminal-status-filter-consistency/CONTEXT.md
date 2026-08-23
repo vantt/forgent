@@ -16,7 +16,7 @@ internally-consistent story for `wontfix`.
 Scope is the 6 sites named in tsk-37u's own submission text (status axis
 #1-5, stage axis #6), re-scoped below by the decisions this doc locks —
 not a re-open of `fsm-wontfix-terminal-status` itself, and not a design
-of *how* to implement the fix (that's `fgos-planning`'s job next).
+of *how* to implement the fix (that's `fgos-coding-planning`'s job next).
 
 ## Locked decisions
 
@@ -138,7 +138,7 @@ terminal status (`done` or `wontfix`).**
   `hasOpenDescendant`, and the existing `RESOLVED_STATUSES = new
   Set(['done', 'wontfix'])` constant already used for lineage (D1's
   natural implementation should reuse this same set for `deps`, not
-  invent a second one — a note for `fgos-planning`, not a decision this
+  invent a second one — a note for `fgos-coding-planning`, not a decision this
   doc locks).
 - `src/runner/claim-port.mjs:120-158` — `unmergedDeps` guard and its
   "done guarantees merged content" rationale.
@@ -161,7 +161,7 @@ terminal status (`done` or `wontfix`).**
 ## Outstanding questions deferred to planning
 
 - None outstanding on the "what" — all three axes (deps-gating,
-  reporting, entropy) are locked (D1/D2/D3). `fgos-planning` decides how
+  reporting, entropy) are locked (D1/D2/D3). `fgos-coding-planning` decides how
   to implement (e.g. whether `frontier.mjs`'s existing `RESOLVED_STATUSES`
   constant is exported and reused across the other 5 sites, or each site
   gets its own local constant) and whether this splits into multiple

@@ -36,7 +36,7 @@ dedicated regression pass. This mirrors `CONTEXT.md`'s own D1→D16 layering
 
 **Alternatives rejected**: a single monolithic PR touching all of
 `fsm.mjs`/`frontier.mjs`/`workflow-stage-graphs.mjs`/the new harness at
-once — rejected because `fgos-validating`'s reality check and any human
+once — rejected because `fgos-coding-validating`'s reality check and any human
 review would have no way to isolate which of the 4 flags above broke if
 something regresses. Splitting by "file touched" instead of by "decision
 group" was also considered and rejected: `fsm.mjs` alone serves both D1/D2
@@ -48,7 +48,7 @@ reading `work.status`.
 **Impact-analysis posture**: `full` (GitNexus `present`, checked via
 `fgos tool query --capability impact-analysis --status present`). Every
 proof point below that claims a blast radius is backed by a real `impact()`
-call at `fgos-code-implement` time, not a guess.
+call at `fgos-coding-implement` time, not a guess.
 
 ### Risk map
 
@@ -93,7 +93,7 @@ of 1-4 to exist to regression-test against.
    blocks live in `src/state/store.mjs`'s `moveWork`, NOT `fsm.mjs` (both
    are separate `if (to === 'done')` blocks, lines ~501-536, that run
    after `transitionWork`'s pure edge check and before the event append —
-   confirmed by reading the file at `fgos-validating` time). Move the
+   confirmed by reading the file at `fgos-coding-validating` time). Move the
    acceptance-clause block's condition to `to === 'delivered'` (D3); leave
    the compound-learn block's condition at `to === 'done'` but retarget it
    to read `retrospective`/`cleanup` completion instead of stage
@@ -106,11 +106,11 @@ of 1-4 to exist to regression-test against.
    assertions — sequential, not a conflict, but noted so whoever executes
    either piece doesn't clobber the other's edits.)
 
-2. **Retire `compound-learn` stage; retarget `fgos-compounding`** (`tsk-1zi`, dep tsk-5e9)
+2. **Retire `compound-learn` stage; retarget `fgos-coding-compounding`** (`tsk-1zi`, dep tsk-5e9)
    Remove `compound-learn` from `coding`'s `stages`/`stepMap`/
    `transitions`/`skillMap` in `workflow-stage-graphs.mjs` (supersedes
    RUL49); remove the `compound` verb's stage-move behavior (supersedes
-   RUL51); `fgos-compounding` now triggers on `status==='retrospective'`
+   RUL51); `fgos-coding-compounding` now triggers on `status==='retrospective'`
    instead of `stage==='compound-learn'` (D11). Rewrite
    `compound-learn-done-gate.test.mjs`/`compound-learn-lifecycle.test.mjs`
    to assert the new trigger.
@@ -125,7 +125,7 @@ of 1-4 to exist to regression-test against.
 4. **cleanup harness, retrospective loop, TTL config, reject/retry edges** (`tsk-3wo`, deps tsk-5e9,tsk-1zi)
    Two new runtime pieces: (a) a retrospective loop, run-once-per-
    invocation, scanning `status==='delivered'` items, invoking
-   `fgos-compounding`'s work, transitioning `delivered->retrospective-
+   `fgos-coding-compounding`'s work, transitioning `delivered->retrospective-
    >cleanup` on success, with dedup/idempotency guarding
    `addOutcome`/`addDecision` against a crashed-and-retried item
    (`CONTEXT.md`'s deferred item 1); (b) a cleanup harness verifying (i)
@@ -148,7 +148,7 @@ of 1-4 to exist to regression-test against.
    backfill). Full-suite regression close-out.
    Verify: `npm test`
 
-## Assumptions (unproven here, `fgos-validating` to check)
+## Assumptions (unproven here, `fgos-coding-validating` to check)
 
 - The new cleanup-harness/retrospective-loop module names and CLI verb
   names are implementer's choice at execute time (`CONTEXT.md` "Deferred to
@@ -161,5 +161,5 @@ of 1-4 to exist to regression-test against.
 - The consumer audit `CONTEXT.md` flags as deferred (CLI display/triage-
   table columns, discovery-judge, beyond the 6 already named in D13) is
   assumed complete once piece 3's listed test files are green — if
-  `fgos-validating` or `fgos-code-implement`'s own `impact()` call surfaces a
+  `fgos-coding-validating` or `fgos-coding-implement`'s own `impact()` call surfaces a
   7th consumer, it folds into piece 3, not a new piece.

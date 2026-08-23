@@ -22,7 +22,7 @@ TTL-vs-verify-window gap itself, and no other backlog item currently tracks
 that root fix. Asked the user directly (2026-08-11): keep this item
 investigation-only and split the fix into a new item, or extend this
 item's own scope to include it. **Answered: extend this item — B.**
-`fgos-planning` designs and implements the fix as part of tsk-4l8 itself.
+`fgos-coding-planning` designs and implements the fix as part of tsk-4l8 itself.
 
 ## Scout evidence
 
@@ -40,7 +40,7 @@ item's own scope to include it. **Answered: extend this item — B.**
 - `fgos tool query --capability impact-analysis --status present` →
   GitNexus present. Per `CLAUDE.md`'s three-way framing this reads
   **full**: `impact` MUST be run on `main-checkout-lock.mjs`/`merge.mjs`
-  symbols before `fgos-planning`/`fgos-code-implement` edit them.
+  symbols before `fgos-coding-planning`/`fgos-coding-implement` edit them.
 
 ## Canonical references
 

@@ -1,17 +1,20 @@
 #!/usr/bin/env node
 // .githooks/pre-commit -- git-native hard block for the STR65 main-checkout
-// activity lock (D2/D3, str65-worktree-isolation-enforcement). Fires for
-// ANY `git commit` against this checkout, regardless of actor (human
+// activity lock (D2/D3, str65-worktree-isolation-enforcement), plus a
+// staged-`.fgos/`-deletion guard (tsk-56u) that runs unconditionally. Fires
+// for ANY `git commit` against this checkout, regardless of actor (human
 // terminal, agent session, or CI) -- not only writes made through fgOS's
-// own CLI verbs, per D2. The guards below only actually APPLY when this
-// hook is running "at home" -- see hookRunsAtHome below (tsk-sir): a
-// linked fgOS worktree (fgos pick's fgw/<id> branch) shares this repo's
-// single core.hooksPath setting with its main checkout, so this exact
-// file also fires for a commit made entirely inside that OTHER, unrelated
-// worktree -- one that writes to its own separate index and branch and
-// never touches this checkout's own lock hazard at all (see
-// docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md
-// D1/D2/D7).
+// own CLI verbs, per D2. The STR65 lock/branch guards below only actually
+// APPLY when this hook is running "at home" -- see hookRunsAtHome below
+// (tsk-sir): a linked fgOS worktree (fgos pick's fgw/<id> branch) shares
+// this repo's single core.hooksPath setting with its main checkout, so
+// this exact file also fires for a commit made entirely inside that
+// OTHER, unrelated worktree -- one that writes to its own separate index
+// and branch and never touches this checkout's own lock hazard at all
+// (see docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md
+// D1/D2/D7). The staged-`.fgos/`-deletion guard (tsk-56u) is the opposite
+// case: it protects exactly that "away from home" worktree, so it is
+// never gated by hookRunsAtHome -- see stagedFgosDeletions below.
 //
 // Installed via `git config core.hooksPath .githooks` (wiring is cell -6's
 // job, out of scope here). Lives at <repoRoot>/.githooks/pre-commit and
@@ -22,8 +25,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { acquireMainCheckoutLock, HELD, AMBIGUOUS, HOOK_TTL_MS } from '../src/runner/main-checkout-lock.mjs';
-import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
+import { acquireMainCheckoutLock, HELD, AMBIGUOUS, HOOK_TTL_MS, HOLDER_PID_ENV_VAR } from '../src/runner/main-checkout-lock.mjs';
+import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -39,6 +42,29 @@ function resolveTtlMs() {
   if (raw === undefined) return HOOK_TTL_MS;
   const parsed = Number(raw);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : HOOK_TTL_MS;
+}
+
+// resolveIdentity (tsk-70l): when HOLDER_PID_ENV_VAR is set to a valid
+// positive integer, this commit is a child of the process that set it --
+// merge.mjs's own root->main path (mergeRunnerItem), scoped to the one
+// `execFileSync` call that spawns this exact commit. Using ITS pid as
+// this acquire call's own identity lets main-checkout-lock.mjs's
+// existing self-recognition equality check (D6) match it against the
+// record that parent process already wrote there, with zero change to
+// that check's own logic -- this hook still cannot share its parent's
+// pid outright (a child process always gets its own), so it borrows the
+// parent's instead of trying to be recognized as itself. Anything else
+// (absent, unparseable, non-positive) falls back to this hook's own
+// resolveWriterIdentity() exactly as before this item -- a bare
+// `git commit` unrelated to any `fgos approve` never sets this var at
+// all, so that case is untouched.
+function resolveIdentity(fgosDir) {
+  const raw = process.env[HOLDER_PID_ENV_VAR];
+  if (raw !== undefined) {
+    const parsed = Number(raw);
+    if (Number.isInteger(parsed) && parsed > 0) return parsed;
+  }
+  return resolveWriterIdentity(fgosDir).id;
 }
 
 function refuse(message) {
@@ -58,15 +84,83 @@ function refuse(message) {
 // "at home" -- either the true main checkout, or a self-contained
 // worktree that was deliberately given its own independent hooksPath copy
 // (bee's --with-companion / fgOS's own "session start" shape, e2e-tested
-// separately from fgos pick's linked-worktree shape) -- and every guard
-// below should apply, using repoRoot as it always did. When they DIFFER,
-// this file is running away from home: invoked for a DIFFERENT checkout
-// than the one whose `.fgos`/lock/branch state it would otherwise act on
-// -- exactly the fgos-pick shared-hooksPath case -- and no guard below has
-// anything real to protect there.
-function hookRunsAtHome(repoRoot) {
-  const actualToplevel = execFileSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).trim();
+// separately from fgos pick's linked-worktree shape) -- and every STR65
+// guard below should apply, using repoRoot as it always did. When they
+// DIFFER, this file is running away from home: invoked for a DIFFERENT
+// checkout than the one whose `.fgos`/lock/branch state it would
+// otherwise act on -- exactly the fgos-pick shared-hooksPath case -- and
+// no STR65 guard below has anything real to protect there. The
+// staged-`.fgos/`-deletion guard is the one exception -- see
+// stagedFgosDeletions below.
+function hookRunsAtHome(repoRoot, actualToplevel) {
   return actualToplevel === repoRoot;
+}
+
+// STAGED-FGOS-DELETION (tsk-56u): refuses any commit that stages a
+// deletion under `.fgos/` -- the git-tracked runner state a linked
+// worktree never carries in its own working tree (ADR0020:
+// `src/runner/worktree.mjs`'s `createWorktree` always `fs.rmSync`'s the
+// checked-out `.fgos/` right after `git worktree add`, without ever
+// `git rm`-ing it from the index -- the working tree loses the files but
+// the index still has them). A bare `git add -A` inside that worktree
+// therefore stages every one of those files as deleted; committing that
+// silently destroys the live event log the moment the branch is later
+// merged/synced back, and the existing `fgos-write-rejected` check
+// (`src/runner/merge.mjs`) only catches this at merge time, not here at
+// the moment the destructive commit itself is made.
+//
+// Runs UNCONDITIONALLY in main() below, never gated by hookRunsAtHome --
+// the worktree "away from home" case is exactly where this hazard lives,
+// the opposite of the STR65 guards' own scope. Checks the diff against
+// `committingToplevel` (the checkout actually running this commit, per
+// tsk-sir), never `repoRoot` (wherever this script file itself lives) --
+// the two differ precisely in the case this guard exists to catch.
+//
+// Mirrors merge.mjs's own `fgos-write-rejected` staged-diff filter
+// (`git diff --name-only --cached`, `.fgos`/`.fgos/`-prefixed paths) but
+// scoped to deletions (`--diff-filter=D`): a worktree can only ever stage
+// a `.fgos` DELETION (it was rmSync'd, never re-created), never an
+// addition/modification, so narrowing to deletions loses no real coverage
+// for this hazard while leaving fgOS's own legitimate `.fgos` writes
+// (additions/modifications, made directly by the `fgos` CLI verbs against
+// the main checkout) untouched.
+function stagedFgosDeletions(committingToplevel) {
+  const output = execFileSync(
+    'git',
+    ['diff', '--cached', '--name-only', '--diff-filter=D'],
+    { cwd: committingToplevel, encoding: 'utf8' },
+  );
+  return output
+    .split('\n')
+    .filter((p) => p !== '')
+    .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
+}
+
+// tsk-5pb -- any staged path under .fgos/ (Added, Modified, Deleted) on a
+// worker's fgw/* branch is forbidden. Git manual merge materialization can stage
+// a .fgos/* blob as Modified; worker branches must never commit changes under .fgos/.
+function stagedFgosChangesOnWorkerBranch(committingToplevel) {
+  let branch;
+  try {
+    branch = execFileSync(
+      'git',
+      ['symbolic-ref', '--short', '-q', 'HEAD'],
+      { cwd: committingToplevel, encoding: 'utf8' },
+    ).trim();
+  } catch {
+    return [];
+  }
+  if (!/^fgw\//.test(branch)) return [];
+
+  const output = execFileSync(
+    'git',
+    ['diff', '--cached', '--name-only'],
+    { cwd: committingToplevel, encoding: 'utf8' },
+  );
+  return output
+    .split('\n')
+    .filter((p) => p !== '')
+    .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
 }
 
 // tsk-4hkd -- the main checkout must never sit on a fgw/<id> branch itself;
@@ -91,10 +185,162 @@ function currentFgwBranchIfMainCheckout(repoRoot) {
   return /^fgw\//.test(branch) ? branch : null;
 }
 
+function countLines(str) {
+  let count = 0;
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === '\n') count++;
+  }
+  return count;
+}
+
+// tsk-1i3 -- staged .fgos/* content-precedence guard on main/default branch.
+// Refuses any commit staging a modification (--diff-filter=M) under .fgos/
+// whose staged line count is strictly lower than HEAD's own line count for that
+// same path (D1-D4).
+function stagedFgosModificationsRegressLineCount(committingToplevel) {
+  let branch;
+  try {
+    branch = execFileSync(
+      'git',
+      ['symbolic-ref', '--short', '-q', 'HEAD'],
+      { cwd: committingToplevel, encoding: 'utf8' },
+    ).trim();
+  } catch {
+    branch = '';
+  }
+  if (/^fgw\//.test(branch)) return { regressedPaths: [] };
+
+  let output;
+  try {
+    output = execFileSync(
+      'git',
+      ['diff', '--cached', '--name-only', '--diff-filter=M'],
+      { cwd: committingToplevel, encoding: 'utf8' },
+    );
+  } catch (err) {
+    return { error: `commit refused: could not run "git diff --cached" to check staged modifications under ".fgos/" (${err.message}) -- refusing to commit (fail-closed).` };
+  }
+
+  const modifiedFgosPaths = output
+    .split('\n')
+    .filter((p) => p !== '')
+    .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
+
+  if (modifiedFgosPaths.length === 0) return { regressedPaths: [] };
+
+  const regressedPaths = [];
+  for (const p of modifiedFgosPaths) {
+    let headContent, stagedContent;
+    try {
+      // maxBuffer (tsk-1i3 follow-up hotfix): execFileSync's default 1MB
+      // maxBuffer is smaller than .fgos/events.jsonl's real size (10MB+),
+      // throwing ENOBUFS on every commit that touches it and wrongly
+      // refusing the commit as "could not read blob" -- raised generously
+      // since this reads a whole git blob into memory once per commit.
+      const maxBuffer = 1024 * 1024 * 200;
+      headContent = execFileSync('git', ['show', `HEAD:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });
+      stagedContent = execFileSync('git', ['show', `:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });
+    } catch (err) {
+      return { error: `commit refused: could not read blob for "${p}" via "git show" -- refusing to commit against an unreadable ref/blob (fail-closed).` };
+    }
+
+    const headLines = countLines(headContent);
+    const stagedLines = countLines(stagedContent);
+    if (stagedLines < headLines) {
+      regressedPaths.push({ path: p, headLines, stagedLines });
+    }
+  }
+
+  return { regressedPaths };
+}
+
+// STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/
+// CONTEXT.md D1/D2): a linked worktree checked out on a `fgw/*` branch can
+// go stale when an external process (e.g. `approve`'s leaf->root merge)
+// force-moves that branch's ref without ever touching THIS worktree's own
+// working tree/index. `HEAD` still reads the new commit correctly (a
+// symbolic ref that follows the branch), but files-on-disk + the index are
+// still the OLD tree -- a narrowly-staged commit from here would silently
+// carry the OLD content of every other tracked file along with it,
+// reverting them (this happened for real: commit 2cb6519e).
+//
+// Read-only, never mutates -- matches src/runner/worktree.mjs's own
+// `lastSyncedCommit`/`resyncClaimWorktree` pattern (reflog, not `rev-parse
+// HEAD`, which lies once an external `git branch -f` has moved the branch
+// ref out from under a symbolic HEAD). Runs UNCONDITIONALLY, same as
+// `stagedFgosDeletions` below where it exists -- scoped to `fgw/*`
+// branches internally (the "away from home" worktree case this guard
+// protects), never gated by `hookRunsAtHome` (the main checkout is
+// separately guarded against ever sitting on a `fgw/*` branch at all, by
+// `currentFgwBranchIfMainCheckout` below).
+function staleWorktreeIndexRefusal(committingToplevel) {
+  let branch;
+  try {
+    branch = execFileSync('git', ['symbolic-ref', '--short', '-q', 'HEAD'], { cwd: committingToplevel, encoding: 'utf8' }).trim();
+  } catch {
+    return null; // detached HEAD -- no branch this guard scopes to
+  }
+  if (!/^fgw\//.test(branch)) return null;
+
+  let lastSynced;
+  try {
+    lastSynced = execFileSync('git', ['reflog', 'show', 'HEAD', '-n', '1', '--format=%H'], { cwd: committingToplevel, encoding: 'utf8' }).trim();
+  } catch {
+    lastSynced = '';
+  }
+  if (!lastSynced) {
+    return `commit refused: could not read this worktree's own HEAD reflog to determine what commit it was last synced to on "${branch}" -- refusing to commit against an unknown sync point (fail-closed). Inspect this worktree by hand.`;
+  }
+
+  let branchTip;
+  try {
+    branchTip = execFileSync('git', ['rev-parse', branch], { cwd: committingToplevel, encoding: 'utf8' }).trim();
+  } catch {
+    // tsk-2cl: the branch name itself was already read successfully via
+    // symbolic-ref above, so rev-parse failing right after implies a
+    // transient ref-read race or on-disk ref corruption -- fail closed,
+    // same as an unreadable reflog (above) or a diverged branch (below),
+    // rather than silently letting the commit through unguarded.
+    return `commit refused: could not read "${branch}"'s current tip via "git rev-parse" -- refusing to commit against an unreadable branch ref (fail-closed). Inspect this worktree by hand.`;
+  }
+  if (lastSynced === branchTip) return null; // in sync, no-op
+
+  let isAncestor = true;
+  try {
+    execFileSync('git', ['merge-base', '--is-ancestor', lastSynced, branchTip], { cwd: committingToplevel, encoding: 'utf8' });
+  } catch {
+    isAncestor = false;
+  }
+  if (!isAncestor) {
+    return `commit refused: this worktree's last-synced commit (${lastSynced}) is not an ancestor of "${branch}"'s current tip (${branchTip}) -- refusing to commit against a diverged index (fail-closed). Inspect this worktree by hand.`;
+  }
+
+  return `commit refused: "${branch}" has moved to ${branchTip} since this worktree was last synced (${lastSynced}) -- likely an external force-move (e.g. approve's merge landing a sibling child). This worktree's files/index are stale and a commit right now would silently carry the OLD content of every other tracked file, reverting them. Run "fgos resync-worktree" in this worktree to repair it, then retry the commit.`;
+}
+
 function main() {
   const repoRoot = path.resolve(__dirname, '..');
+  const committingToplevel = execFileSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).trim();
 
-  if (!hookRunsAtHome(repoRoot)) {
+  const staleIndexRefusal = staleWorktreeIndexRefusal(committingToplevel);
+  if (staleIndexRefusal) {
+    refuse(staleIndexRefusal);
+    return;
+  }
+
+  const fgosDeletions = stagedFgosDeletions(committingToplevel);
+  if (fgosDeletions.length > 0) {
+    refuse(`commit refused: this commit stages a deletion under ".fgos/" (${fgosDeletions.join(', ')}) -- .fgos/ is fgOS's own runner state and must never be committed as deleted. A linked worktree never keeps a working-tree copy of .fgos/ by design (ADR0020); if you ran "git add -A" here, unstage these paths first (e.g. "git restore --staged .fgos").`);
+    return;
+  }
+
+  const fgosWorkerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);
+  if (fgosWorkerChanges.length > 0) {
+    refuse(`commit refused: this commit on a worker branch stages changes under ".fgos/" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
+    return;
+  }
+
+  if (!hookRunsAtHome(repoRoot, committingToplevel)) {
     // A different, unrelated checkout (sharing this repo's core.hooksPath)
     // is committing -- nothing here concerns it, per the header comment.
     process.exit(0);
@@ -102,7 +348,7 @@ function main() {
   }
 
   const fgosDir = path.join(repoRoot, '.fgos');
-  const { id } = resolveWriterIdentity(fgosDir);
+  const id = resolveIdentity(fgosDir);
   const ttlMs = resolveTtlMs();
 
   const result = acquireMainCheckoutLock(fgosDir, { identity: id, ttlMs });
@@ -119,6 +365,17 @@ function main() {
   const fgwBranch = currentFgwBranchIfMainCheckout(repoRoot);
   if (fgwBranch) {
     refuse(`commit refused: main checkout is on branch ${fgwBranch} -- checkout back to the default branch and use "fgos pick <id>" for item work.`);
+    return;
+  }
+
+  const fgosRegressed = stagedFgosModificationsRegressLineCount(committingToplevel);
+  if (fgosRegressed.error) {
+    refuse(fgosRegressed.error);
+    return;
+  }
+  if (fgosRegressed.regressedPaths.length > 0) {
+    const paths = fgosRegressed.regressedPaths.map((r) => r.path).join(', ');
+    refuse(`commit refused: this commit stages a modification under ".fgos/" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
     return;
   }
 

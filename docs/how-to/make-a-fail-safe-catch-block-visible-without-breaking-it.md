@@ -13,7 +13,7 @@ without changing that fail-safe behavior.
 
 ## The trap
 
-`src/intake/discovery.mjs` and `src/intake/decompose.mjs` both write an
+`src/intake/discovery.mjs` and `src/intake/plan.mjs` both write an
 auto-computed `priority` via `editWork(dir, {id, patch: {priority}, role})`
 inside a try/catch with an empty catch body, commented "Swallowed
 intentionally." The reasoning is sound on its own: the

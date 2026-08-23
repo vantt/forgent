@@ -28,7 +28,7 @@ provider/removed-validation) → **standard** mode. Matches the item's own
 ## Impact-analysis posture
 
 `fgos tool query --capability impact-analysis --status present` (run
-during `fgos-exploring`): GitNexus registered and `present` →
+during `fgos-coding-exploring`): GitNexus registered and `present` →
 `impact-analysis: full` per `CLAUDE.md`'s gate — `impact()` run on both
 target symbols before naming proof points below.
 
@@ -46,10 +46,10 @@ orphaned entry point.
 
 | Component | How risky | What proves it |
 |---|---|---|
-| `src/intake/decompose.mjs:744-757` (child `addWork`) | Medium (corrected from GitNexus's under-reported LOW — real caller `loop.mjs:997` `resolveDecompose`, itself inside the runner's decompose-dispatch path). Change is additive (one new key + one literal swap) and reuses the exact `stageForStep` substitution already live one line below at `decompose.mjs:761` — same function, same `domain` variable already in scope. | New test: `"domain-aware decompose child addWork inherits parent domain+stage"` — a real `verdict.kind:'decompose'` split for the `triage` fixture domain, asserting children carry `domain: 'triage'` and the `triage` domain's own Execute-mapped stage (not `'executing'`). Full existing suite must stay green (coding-domain children unaffected — `stageForStep(getDomain(undefined), 'Execute')` resolves to the same `'executing'` literal). |
+| `src/intake/plan.mjs:744-757` (child `addWork`) | Medium (corrected from GitNexus's under-reported LOW — real caller `loop.mjs:997` `resolveDecompose`, itself inside the runner's decompose-dispatch path). Change is additive (one new key + one literal swap) and reuses the exact `stageForStep` substitution already live one line below at `decompose.mjs:761` — same function, same `domain` variable already in scope. | New test: `"domain-aware decompose child addWork inherits parent domain+stage"` — a real `verdict.kind:'decompose'` split for the `triage` fixture domain, asserting children carry `domain: 'triage'` and the `triage` domain's own Execute-mapped stage (not `'executing'`). Full existing suite must stay green (coding-domain children unaffected — `stageForStep(getDomain(undefined), 'Execute')` resolves to the same `'executing'` literal). |
 | `src/runner/loop.mjs:593-606` (discovered-from `addWork`, inside `captureDiscoveredWork`) | High per `impact()`: upstream chain `dispatchClaimedItem` → `claimAndDispatch` → `runOnce`, the runner's core per-tick dispatch loop (`impactedCount: 3`, `processes_affected: 3`, confidence 0.85 at every hop). Same additive-diff mitigation as above — `stageForStep`/`getDomain` already imported in this file (`loop.mjs:68`), no new import, no signature change. | New test: `"domain-aware discovered-from addWork inherits parent domain+stage"` — a runner-sweep-level assertion (same shape as the existing `test/e2e/domain-aware-stage-literals.test.mjs:209` runner-sweep test) that a discovered-from item captured while dispatching a non-`coding`-domain item carries that domain and its own Clarify-mapped stage. Full existing suite green, with particular attention to `test/e2e/domain-aware-stage-literals.test.mjs`'s existing runner-sweep test (line 209) and any `loop.mjs`/`captureDiscoveredWork` unit coverage — this is the HIGH-blast-radius edit. |
 
-Both proof points are carried to `fgos-validating` per this skill's own
+Both proof points are carried to `fgos-coding-validating` per this skill's own
 rule (a medium/high risk-map entry needs a proof point there, not a guess
 here).
 
@@ -67,7 +67,7 @@ has) behind an implicit fallback instead of fixing the caller.
 
 Files touched, in order:
 
-1. `src/intake/decompose.mjs:744-757` — add `domain: work.domain` and
+1. `src/intake/plan.mjs:744-757` — add `domain: work.domain` and
    change `stage: 'executing'` to `stage: stageForStep(domain, 'Execute')`
    (the `domain` local is already resolved at line 521; `stageForStep` is
    already imported at line 29). Zero new imports.

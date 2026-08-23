@@ -28,7 +28,7 @@ enum once it lands — real rework, not parallelizable. **Keyboard piece
 goes first; mouse piece depends on it.**
 
 Impact-analysis posture (CLAUDE.md gate) — corrected during
-`fgos-validating` (tsk-4n7): `fgos tool query --capability impact-analysis
+`fgos-coding-validating` (tsk-4n7): `fgos tool query --capability impact-analysis
 --status present` reports `status: present`, but that alone is not
 freshness (CLAUDE.md's own warning). Cross-checked via `list_repos`:
 forgentX's GitNexus index is **390 commits behind HEAD**
@@ -40,7 +40,7 @@ Rust symbol. Posture is **degraded**, not full: both pieces below
 substitute a direct `rg`/grep cross-check of real call sites for the
 blast-radius evidence a fresh GitNexus `impact()` would normally give
 (already done for `switch_panel`/`Panel`/`Tab` — see Feasibility matrix
-in `fgos-validating`'s own pass), and still run `impact()`/
+in `fgos-coding-validating`'s own pass), and still run `impact()`/
 `detect_changes()` before/after each edit per CLAUDE.md's MUST-run rule,
 but treat any GitNexus "not found"/empty result as inconclusive rather
 than a clean bill of health, falling back to grep to confirm.
@@ -49,7 +49,7 @@ than a clean bill of health, falling back to grep to confirm.
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `Panel`/focus-tracking widening (`app.rs`) | Medium — touches state a locked test suite already covers (`app.rs:780-824`) | `impact({target:"switch_panel", direction:"upstream"})` before editing (CLAUDE.md MUST-run rule; degraded posture — cross-check with `rg "switch_panel\(" herdr-plugin/src` if GitNexus returns not-found/empty, same as `fgos-validating` already did); existing focus tests must still pass plus new ones added |
+| `Panel`/focus-tracking widening (`app.rs`) | Medium — touches state a locked test suite already covers (`app.rs:780-824`) | `impact({target:"switch_panel", direction:"upstream"})` before editing (CLAUDE.md MUST-run rule; degraded posture — cross-check with `rg "switch_panel\(" herdr-plugin/src` if GitNexus returns not-found/empty, same as `fgos-coding-validating` already did); existing focus tests must still pass plus new ones added |
 | Tab-enum rename (status columns → avoid Tab-key name clash) | Low — pure rename, `rename` MCP tool (never find-replace) per CLAUDE.md Never-Do | `detect_changes({scope:"compare", base_ref:"main"})` shows only the expected symbol renamed |
 | Mouse hit-testing beyond `detail_modal` (`ui.rs`) | Medium-high — zero existing coverage, new `Rect` bookkeeping per box/row, easy to get row-Y math wrong | New unit tests asserting hit-test → correct `focused_panel`/`selected` index for known `Rect`/click-coordinate fixtures |
 | On-screen hint text | Low — text-only | Manual read of the rendered hint against the full keybinding set (Tab/Shift+Tab, `]`/`[`, mouse) |
@@ -59,7 +59,7 @@ than a clean bill of health, falling back to grep to confirm.
 Two sequential pieces (D1's "cân nhắc tách 2 task con" from `CONTEXT.md`,
 now decided: split, sequential not parallel — see Approach above for why).
 Each gets its own real verify command, matching the two test-name scopes
-already locked into `tsk-4n7`'s own verify during `fgos-exploring`
+already locked into `tsk-4n7`'s own verify during `fgos-coding-exploring`
 (`focus_cycle`, `mouse_click_to_focus`).
 
 ### Piece 1 — keyboard focus expansion
@@ -129,7 +129,7 @@ Verify: `cargo test --manifest-path herdr-plugin/Cargo.toml mouse_click_to_focus
 
 ## Open questions
 
-None carried into `fgos-validating` — `CONTEXT.md`'s only
+None carried into `fgos-coding-validating` — `CONTEXT.md`'s only
 deferred-to-planning items are resolved above (rename approach, hint
 text scope, click hit-testing mechanics, Shift+Tab feasibility flagged
 as an assumption to prove, not an open question).

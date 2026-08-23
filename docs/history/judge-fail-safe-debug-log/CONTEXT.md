@@ -3,7 +3,7 @@
 ## Feature boundary
 
 `judgeDiscovery` (src/intake/discovery.mjs) and `judgeDecompose`
-(src/intake/decompose.mjs) both call the shared retry core in
+(src/intake/plan.mjs) both call the shared retry core in
 src/intake/judge-executor.mjs. Both are designed to never throw: any
 failure folds into a generic fail-safe verdict (`{clear: false, question:
 DEFAULT_UNCLEAR_QUESTION}` for discovery; the analogous unclear/invalid
@@ -86,14 +86,14 @@ through either caller, out of scope.)
 - Escalation-path (`escalateTier`) logging not needed — unreachable from
   either caller today.
 - Whether to eventually also expose `researchToolCallCount`/attempt count
-  in the log is left to `fgos-planning`'s own judgment on how much detail
+  in the log is left to `fgos-coding-planning`'s own judgment on how much detail
   the implementation adds per branch — not a locked product decision here,
   the reason tag (D3) is the only mandatory content.
 
 ## Canonical references
 
 - src/intake/discovery.mjs (`judgeDiscovery`, `resolveDiscovery`)
-- src/intake/decompose.mjs (`judgeDecompose`)
+- src/intake/plan.mjs (`judgeDecompose`)
 - src/intake/judge-executor.mjs (`runJudgeExecutor`, `runRetryingExecutor`,
   `runBoundedAttempts`, `spawnAttempt`, `parseVerdict`)
 - src/runner/worker-log.mjs (existing `.fgos/logs/` sole-writer pattern,

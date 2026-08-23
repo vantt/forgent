@@ -41,7 +41,7 @@ import {
 test('fgos setup --pretty prints colored ANSI text describing what it did, not JSON', () => {
   const cwd = mkTemp('setup-cli-pretty-');
   const homeDir = mkTemp('setup-cli-pretty-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup', '--pretty'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'setup', '--pretty'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
   assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
@@ -56,7 +56,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   // profile leaves a `source` line that outlives the directory.
   const copyRoot = mkTemp('checks-nongit-copy-');
   const repoRoot = path.resolve(__dirname, '../..');
-  for (const entry of ['bin', 'src', 'scripts', 'package.json']) {
+  for (const entry of ['bin', 'src', 'scripts', 'domains', 'package.json']) {
     fs.cpSync(path.join(repoRoot, entry), path.join(copyRoot, entry), { recursive: true });
   }
   assert.equal(fs.existsSync(path.join(copyRoot, '.git')), false);
@@ -68,7 +68,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   const result = spawnSync(process.execPath, [path.join(copyRoot, 'bin', 'fgos.mjs'), 'setup'], {
     cwd: copyRoot,
     encoding: 'utf8',
-    env: { ...process.env, HOME: homeDir },
+    env: { ...NO_CLAUDE_ENV, HOME: homeDir },
   });
 
   assert.equal(result.status, 0, `setup failed: ${result.stderr}`);

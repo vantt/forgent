@@ -1,13 +1,13 @@
 ---
 type: how-to
-title: How to smoke-test fgos-code-implement with a trivial verify=true item
+title: How to smoke-test fgos-coding-implement with a trivial verify=true item
 tags: []
 timestamp: 2026-07-29T00:00:00.000Z
 source_capture_ids: [str89-case-study-executing]
 ---
-# How to smoke-test fgos-code-implement with a trivial verify=true item
+# How to smoke-test fgos-coding-implement with a trivial verify=true item
 
-Use this when you want to confirm `fgos-code-implement`'s own claim-to-proposed
+Use this when you want to confirm `fgos-coding-implement`'s own claim-to-proposed
 path still works end to end, without risking a real feature's scope —
 add a throwaway chore item whose `verify` is the literal string `"true"`
 (a no-op that always passes) and run it through the normal claim flow.
@@ -21,13 +21,13 @@ add a throwaway chore item whose `verify` is the literal string `"true"`
    ```
 
    The real item this doc is grounded in was added this way — title
-   `"STR89 case study: exercise fgos-code-implement"`, `kind: "chore"`,
+   `"STR89 case study: exercise fgos-coding-implement"`, `kind: "chore"`,
    `risk: "low"`, `verify: "true"`, no `description` field at all:
 
-   > `{"type":"work.add","payload":{"id":"str89-case-study-executing","title":"STR89 case study: exercise fgos-code-implement","kind":"chore","status":"todo","deps":[],"risk":"low","refs":[],"verify":"true","tier":"standard"}}`
+   > `{"type":"work.add","payload":{"id":"str89-case-study-executing","title":"STR89 case study: exercise fgos-coding-implement","kind":"chore","status":"todo","deps":[],"risk":"low","refs":[],"verify":"true","tier":"standard"}}`
    > — real `work.add` capture, id `str89-case-study-executing`, `.fgos/events.jsonl:97`
 
-2. Claim/pick it and let `fgos-code-implement` run. With `verify: "true"` there
+2. Claim/pick it and let `fgos-coding-implement` run. With `verify: "true"` there
    is no real implementation to write — the skill's own verify step passes
    trivially. The real run's predicted-outcome capture at claim time:
 
@@ -48,7 +48,7 @@ add a throwaway chore item whose `verify` is the literal string `"true"`
 ## What a clean smoke-test run confirms
 
 `attempts: 1` and `errorClass: null` together mean the claim went through
-`fgos-code-implement` without the skill needing a retry or hitting a verify
+`fgos-coding-implement` without the skill needing a retry or hitting a verify
 failure — a single-pass happy path. `aheadCount: 1` confirms the return
 carried exactly one real commit forward, so the no-op `verify` did not
 mask a claim that made no commit at all.
@@ -58,20 +58,20 @@ mask a claim that made no commit at all.
 A `chore` item like this still has to clear the normal `compound-learn`
 gate (RUL50: `src/state/store.mjs`) before it can move `proposed` → `done` —
 landing on `proposed` only proves the claim-to-return path works, not that
-the item is finished. See `fgos-compounding`'s own skill doc for that step.
+the item is finished. See `fgos-coding-compounding`'s own skill doc for that step.
 
 ## Related
 
 - `fgos check <id>` — full predicted/actual/friction/settlement history for
   an item, including the entries quoted above.
-- `fgos-code-implement` skill — the skill this smoke test exercises.
+- `fgos-coding-implement` skill — the skill this smoke test exercises.
 
 ## Document history (compound-learn capture linkage)
 
 This doc's path
-(`docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md`) is linked
+(`docs/how-to/smoke-test-fgos-coding-implement-with-a-trivial-item.md`) is linked
 to one real compound-learn capture, gathered via `fgos doc-sources
-docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md`:
+docs/how-to/smoke-test-fgos-coding-implement-with-a-trivial-item.md`:
 
 > ```json
 > {
@@ -79,7 +79,7 @@ docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md`:
 >   "predicted": {"tier":"standard","deps":0,"priorVisits":0,"actor":"session","headAtTake":"de941511dd770d216ec71e529f0b5ab3cb6621f7"},
 >   "actual": {"outcome":"proposed","passed":true,"attempts":1,"errorClass":null,"aheadCount":1},
 >   "docType": "how-to",
->   "docPath": "docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md"
+>   "docPath": "docs/how-to/smoke-test-fgos-coding-implement-with-a-trivial-item.md"
 > }
 > ```
 > — real `work.outcome` capture, id `str89-case-study-executing`

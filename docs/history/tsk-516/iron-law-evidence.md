@@ -2,7 +2,7 @@
 
 Classification run against the real committed diff (`changedFiles` +
 `classifyIronLaw`, after the implementation commit `4fec241c`, per
-`fgos-code-implement`'s own ordering rule):
+`fgos-coding-implement`'s own ordering rule):
 
 ```
 classify: {"required":true,"matchedFlags":[],"matchedModules":["bin/fgos.mjs","src/runner/goal-check.mjs","src/runner/merge.mjs"]}

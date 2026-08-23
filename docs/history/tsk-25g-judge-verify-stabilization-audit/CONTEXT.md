@@ -22,7 +22,7 @@ independent `judgeVerifySemanticCorrectness` pass and its two call sites.
 | ID | Decision |
 |----|----------|
 | D1 | One more stabilization attempt only, then stop either way: extend `judgeVerifySemanticCorrectness`'s `priorRejection` context in `resolveDiscovery` (`src/intake/discovery.mjs:643-660`) from threading only the single most-recent rejection reason (`view.gates[id].ask`, a last-value-only slot) to threading the FULL accumulated rejection history for the item's current verify-dispute streak. Empirically re-test on a live dispute. If the judge still contradicts an earlier round's own stated criteria after this change, close the stabilization angle permanently — document that `--force` is the accepted answer and do not attempt a third mechanism. |
-| D2 | Fold the decompose-path gap into this item's scope: extend `resolveDecompose`'s per-child `judgeVerifySemanticCorrectness` call (`src/intake/decompose.mjs:703`) to also thread `priorRejection` context and accept a `--force` override, matching what `resolveDiscovery` already has. Same root function, same already-designed fix shape — mechanical extension, not new design work. |
+| D2 | Fold the decompose-path gap into this item's scope: extend `resolveDecompose`'s per-child `judgeVerifySemanticCorrectness` call (`src/intake/plan.mjs:703`) to also thread `priorRejection` context and accept a `--force` override, matching what `resolveDiscovery` already has. Same root function, same already-designed fix shape — mechanical extension, not new design work. |
 
 ## Pinned terms
 
@@ -40,7 +40,7 @@ independent `judgeVerifySemanticCorrectness` pass and its two call sites.
 - **"full accumulated rejection history" (D1)** — every rejection reason
   recorded across the item's current unbroken dispute streak for this
   verify field, not just the immediately-prior round. Exact storage/plumbing
-  shape (new field vs. reusing an existing log) is left to `fgos-planning`.
+  shape (new field vs. reusing an existing log) is left to `fgos-coding-planning`.
 - **"one more attempt" (D1)** — exactly one round of empirical re-test with
   the strengthened mechanism; a further contradiction after this ends the
   stabilization angle, mirroring the "try at most one more round" limit
@@ -69,7 +69,7 @@ independent `judgeVerifySemanticCorrectness` pass and its two call sites.
   `matchesKnownBadVerifyPattern` mechanical pre-check (tsk-12t) runs before
   the LLM spawn and is explicitly `--force`-immune (D6, checked in the
   `resolveDiscovery` override branch).
-- `src/intake/decompose.mjs:699-714` (`resolveDecompose`'s per-child check)
+- `src/intake/plan.mjs:699-714` (`resolveDecompose`'s per-child check)
   — calls `judgeVerifySemanticCorrectness({title, tier}, child.verify, cfg)`
   with only 3 args: no `priorRejection` threaded, and the surrounding
   `if (disputedChild)` branch has no `--force`/`callerVerdict.force` check
@@ -109,7 +109,7 @@ independent `judgeVerifySemanticCorrectness` pass and its two call sites.
 
 - Exact plumbing for "full accumulated rejection history" (D1) — new
   stored field vs. deriving it from existing decision/ask log entries — is
-  an implementation choice for `fgos-planning`.
+  an implementation choice for `fgos-coding-planning`.
 - Exact empirical re-test procedure for D1's "one more attempt" (which
   live or synthetic dispute scenario proves the strengthened mechanism
   either holds or still contradicts) is left to planning/execution to
@@ -117,5 +117,5 @@ independent `judgeVerifySemanticCorrectness` pass and its two call sites.
   `tsk-5mc`'s own CONTEXT.md already used for its verify text.
 - Exact `--force`/`priorRejection` wiring shape for `resolveDecompose`
   (D2) — e.g. whether the CLI-level `--force` flag needs a new surface on
-  `fgos decompose` or reuses `fgos discover`'s existing flag plumbing — is
-  an implementation choice for `fgos-planning`.
+  `fgos plan` or reuses `fgos discover`'s existing flag plumbing — is
+  an implementation choice for `fgos-coding-planning`.

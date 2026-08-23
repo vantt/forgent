@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { LOCK_FILE, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 import { initStore, addWork, moveWork, listWork, FsmError, readRawEvents } from '../../src/state/store.mjs';
+import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 
 // claim-port.mjs's claimWork shares main-checkout.lock with .githooks/
 // pre-commit (tsk-3w8) — the hook writes a STRING-identity record per commit
@@ -63,7 +64,7 @@ function writeHookStyleLock(dir, ageMs) {
 // docs/history/tsk-3jh-dedupe-redundant-state-reads/RESEARCH.md). Counts
 // real fs.readFileSync calls against the log path to prove the dedupe, not
 // just the resulting shape.
-test('claimWork reads the event log 6 times per call, not 7 (tsk-3jh dedupe of the listWork + readRawEvents pair)', () => {
+test('claimWork reads the event log fully 3 times per call, not 6 or 7 (tsk-3jh dedupe + tsk-49e incremental snapshot)', () => {
   const { repoRoot, dir } = setup();
   const logPath = path.join(dir, 'events.jsonl');
   const originalReadFileSync = fs.readFileSync;
@@ -78,12 +79,20 @@ test('claimWork reads the event log 6 times per call, not 7 (tsk-3jh dedupe of t
     fs.readFileSync = originalReadFileSync;
   }
 
-  // 6 reads: claimWork's own single combined read, moveWork's CAS
-  // pre-read, moveWork's appendEventCore seq-read, moveWork's
-  // post-append refreshView read, addOutcome's appendEventCore seq-read,
-  // addOutcome's post-append refreshView read. Pre-fix this was 7 (an
-  // extra listWork call ahead of the same readRawEvents call).
-  assert.equal(logReadCount, 6);
+  // 3 FULL fs.readFileSync reads remain: claimWork's own single combined
+  // read, moveWork's appendEventCore seq-read, addOutcome's
+  // appendEventCore seq-read (none of these three go through rebuildView,
+  // so tsk-49e's snapshot fast path never applies to them). tsk-3jh's own
+  // dedupe (7->6, listWork+readRawEvents collapsed to one read) is still
+  // intact here. The further 6->3 drop is tsk-49e's own snapshot fast
+  // path: moveWork's CAS pre-read and both post-append refreshView reads
+  // all go through rebuildView, which by this point in the call always
+  // finds the log has grown past state.json's own last snapshot -- so
+  // each now takes the INCREMENTAL path (a bounded fs.readSync of only the
+  // new bytes, never fs.readFileSync on the whole file), correctly
+  // dropping out of this full-read counter without this test needing to
+  // assert on fs.readSync's own call count too.
+  assert.equal(logReadCount, 3);
 });
 
 test('claimWork reclaims a stale hook-written (string-identity) lock past DEFAULT_TTL_MS, instead of failing lock-ambiguous forever', () => {
@@ -340,6 +349,54 @@ test('claimWork transparently reclaims a conclusively-quiet session doing claim 
   assert.equal(evidenceDecisions.length, 1, 'the release must be logged with its evidence (D2c) — reason itself is not stamped for the doing->todo edge (status-fsm.mjs:216-232)');
 });
 
+// tsk-37t: a repo drifted over its own worker-slot ceiling (occupied >
+// ceiling, e.g. the ceiling was lowered or stale claims piled up) used to
+// refuse EVERY claim, including a stale-claim reclaim that doesn't add net
+// occupancy — the one claim that would actually clear the drift. This
+// exercises the real gate end-to-end via claimWork, not just
+// hasWorkerSlotRoom in isolation.
+
+test('tsk-37t: a stale-claim reclaim succeeds even when the repo is already drifted past its worker-slot ceiling', () => {
+  const { repoRoot, dir } = setup();
+  writeSharedConfig(repoRoot, { workerSlots: { ceiling: 1 } });
+
+  // item-a is claimed and its worktree goes conclusively quiet.
+  const first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
+  commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
+
+  // A second, unrelated item is also `doing` -- with ceiling 1, occupied
+  // (excluding item-a) is already 1, at/over ceiling before the reclaim.
+  addWork(dir, { id: 'item-b', title: 'Item B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  moveWork(dir, { id: 'item-b', to: 'doing', expectedStatus: 'todo' });
+
+  // Reclaiming item-a must succeed: it was already `doing` (occupying its
+  // slot) before this call, and stays `doing` after -- no net new
+  // occupancy, so the ceiling has nothing real to refuse.
+  const second = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  assert.equal(second.to, 'doing');
+  assert.equal(second.branch, 'fgw/item-a');
+});
+
+test('tsk-37t: a genuinely NEW claim still refuses when the repo is at ceiling, unchanged (the exemption never widens past reclaims)', () => {
+  const { repoRoot, dir } = setup();
+  writeSharedConfig(repoRoot, { workerSlots: { ceiling: 1 } });
+
+  addWork(dir, { id: 'item-b', title: 'Item B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  moveWork(dir, { id: 'item-b', to: 'doing', expectedStatus: 'todo' });
+
+  // item-a (todo, never claimed) is a genuinely NEW claim -- not a reclaim
+  // of an already-doing item -- so it must still be refused at ceiling 1.
+  assert.throws(
+    () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot }),
+    (err) => {
+      assert.ok(err instanceof ClaimError);
+      assert.equal(err.code, 'worker-slot-ceiling');
+      return true;
+    },
+  );
+});
+
 // tsk-2ec regression: the literal shape of the bug report that started this
 // item -- a claim with real, recent activity must still refuse exactly as
 // today, unconditionally.
@@ -421,3 +478,20 @@ test('claimWork pre-check never fires for take (isolate:false), even against a c
   const after = listWork(dir).work['item-a'];
   assert.equal(after.claimRole, 'session', 'take must never reclaim, even a quiet claim -- pick is the only door (D5 scope narrowing)');
 });
+
+test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and succeeds even when truncation guard detects a break', () => {
+  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
+  const { repoRoot, dir } = setup();
+  const guardPath = path.join(dir, 'events-jsonl.truncation-guard.json');
+  const warnPath = path.join(dir, 'main-checkout-guard-warnings.jsonl');
+  const logPath = path.join(dir, 'events.jsonl');
+
+  // Seed a guard mark
+  fs.writeFileSync(guardPath, JSON.stringify({ seq: 9999, hash: 'badhash' }));
+
+  // claimWork should succeed normally despite truncation break, and write warning
+  const res = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
+  assert.ok(res);
+  assert.equal(fs.existsSync(warnPath), true, 'warning file must be created on truncation break during claimWork');
+});
+

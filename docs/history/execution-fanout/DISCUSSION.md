@@ -285,7 +285,7 @@ chuyện gì xảy ra khi một worker chết giữa chừng.
 | 12 | Gom kết quả về: mỗi child tự chạy tới `awaiting-approval` rồi dừng (luật dừng của `fgos-coding-driving`). Vậy "gom về" là gom **báo cáo** hay chỉ là đợi rồi đọc lại state? | **Chưa rõ** | `fgos-coding-driving/SKILL.md:75-84` |
 | 13 | Ý "mảnh việc không cần work item hoàn chỉnh" **không phải ý mới** — nó là ô **B2 "exec packet"** (helper CÓ ghi file, id ephemeral) mà `D4` gác. Lý do gác: *"hễ cần reserve, attest, commit và merge thì đã là vòng đời, mà vòng đời là thứ định nghĩa rootTask"* ⇒ mở nó phải nới `capacity` cho ghi file **hoặc** supersede `0026`, cả hai đụng luật khoá | **Rõ** | `docs/history/two-layer-dispatch/DISCUSSION.md` §4 D4, §5:544-549 |
 | 14 | `D9` đặt điều kiện mở lại D4, **AND hai vế**: (a) `tsk-3xd` đã merge — **ĐÃ THỎA 2026-08-06**; (b) **≥2 ca thật**, ghi bằng capture/friction, cha cần con GHI file mà việc đó không đáng thành work item — **CHƯA**. Thiếu (b) thì D4 giữ nguyên vô thời hạn ("YAGNI có răng, đo bằng ca thật chứ không phải cảm giác") | **Rõ** | `two-layer-dispatch/DISCUSSION.md` §4 D9 |
-| 15 | **Phép thử của chính D4 giờ trả lời được, và trả lời NGƯỢC tiền đề**: D4 viết *"xét lại sau khi `tsk-3xd` xong: nếu con work-item thật đã mang được `action` prose thì B2 có thể thừa"*. Code hôm nay: con của decompose sinh ra với `stage: stageForStep(domain, 'Execute')` — **bỏ qua cả clarify lẫn decompose** — và mang `action: child.action` (đúng lỗ `tsk-3xd` vá). Tức **không có tiến trình hành chính nào ở đầu vào** để mà cồng kềnh | **Rõ — phát hiện vòng 2** | `src/intake/decompose.mjs:988-1012` (`stage` :1008, `action` :1001, `parent` :1009) |
+| 15 | **Phép thử của chính D4 giờ trả lời được, và trả lời NGƯỢC tiền đề**: D4 viết *"xét lại sau khi `tsk-3xd` xong: nếu con work-item thật đã mang được `action` prose thì B2 có thể thừa"*. Code hôm nay: con của decompose sinh ra với `stage: stageForStep(domain, 'Execute')` — **bỏ qua cả clarify lẫn decompose** — và mang `action: child.action` (đúng lỗ `tsk-3xd` vá). Tức **không có tiến trình hành chính nào ở đầu vào** để mà cồng kềnh | **Rõ — phát hiện vòng 2** | `src/intake/plan.mjs:988-1012` (`stage` :1008, `action` :1001, `parent` :1009) |
 | 15b | Thứ còn lại sau khi bỏ front-end **không phải giấy tờ mà là bốn cơ chế**: claim+worktree = cách ly (N agent không ghi chung một cây) · verify = quy trách nhiệm lỗi theo mảnh · merge vào `fgw/<root>` = đường bytes quay về · retrospective/cleanup = TTL cơ học, không có người. Đúng câu D4 đã nói | **Rõ** | `claim-port.mjs:130-160`; `/fgOS:retro-loop`, `/fgOS:cleanup-loop` |
 | 16 | **Có BA ca, không phải hai**: (1) mảnh chỉ ĐỌC, trả digest ⇒ không vòng đời — nhưng đó là **fan-out A**, đất của `tsk-5kn`, không thuộc file này · (2) mảnh GHI thẳng vào worktree **cha đã claim sẵn**, cha commit+merge một lần cho cả cụm ⇒ mảnh không claim/reserve/verify/merge gì · (3) mảnh GHI và cần nhánh + rollback riêng ⇒ **là work item, theo định nghĩa** | **Chưa rõ — nêu vòng 2** | §5 vòng 2 |
 | 17 | **Ca (2) có thể đã hợp lệ sẵn dưới D3, không bị D4 gác.** Cổng của D4 đặt trên **vòng đời**, không phải trên chuyện ghi byte: hợp đồng gói viết *"never a lifecycle id: no claim, no reserve, no cap, no merge"* — không chỗ nào nói read-only. Và ô `boundary` của D6 đọc nguyên văn *"what must not be touched/written"* ⇒ **tiền giả định worker CÓ thể ghi** | **Chưa rõ — nêu vòng 2, cần người quyết** | `_shared/capacity-dispatch-fallback.md:131,134` |
@@ -311,10 +311,10 @@ chuyện gì xảy ra khi một worker chết giữa chừng.
 | 63 | **Giá thật của khuyến nghị 62 — độ mịn review**, không phải an toàn: người xem **một diff hợp nhất** ở root thay vì N diff nhỏ. Union to thì review kém đi. Giảm nhẹ (chi tiết cho planning): approve của root hiển thị diff **theo từng lá** | **Rõ — vòng 7** | §5 vòng 7 |
 | 64 | **Ngoại lệ duy nhất nên giữ**: risk-keyword ghi đè cứng của `gateBypass` D4 — lá chạm vùng risk vẫn hỏi. Gần như miễn phí, và giữ nhất quán với một quyết định đang khoá thay vì mở một đường tự-động thứ hai không cùng luật | **Chưa chốt — đề xuất vòng 7** | `gate-bypass.mjs:1-14` |
 | 45 | **Decompose sinh ra một ĐỒ THỊ PHỤ THUỘC, tiến trình hỗn hợp tuần tự+song song** — A xong, merge vào cha, B mới fork và dùng code đã merge của A; nhánh độc lập chạy song song merge tuỳ thích; cuối cùng cha nhận hết | **Rõ — người dùng nêu vòng 6** | §5 vòng 6 |
-| 46 | **Harness cho chuỗi tuần tự ĐÃ CÓ ĐỦ, không phải xây.** `claim-port.mjs:158-166` từ chối claim lá còn dep chưa `done` (`ClaimError('deps-not-merged')`), nguyên văn *"forking from `<rootBranch>` now risks missing their content; approve/merge them into `<rootBranch>` first"*. Cộng: `decompose.mjs:992` sinh sẵn `deps` giữa các con · lá fork từ `fgw/<root>` (đã chứa nội dung A) · `frontier` loại item còn dep chưa xong | **Rõ — scout vòng 6** | `src/runner/claim-port.mjs:158-166`; `src/intake/decompose.mjs:992`; `src/state/frontier.mjs` |
+| 46 | **Harness cho chuỗi tuần tự ĐÃ CÓ ĐỦ, không phải xây.** `claim-port.mjs:158-166` từ chối claim lá còn dep chưa `done` (`ClaimError('deps-not-merged')`), nguyên văn *"forking from `<rootBranch>` now risks missing their content; approve/merge them into `<rootBranch>` first"*. Cộng: `decompose.mjs:992` sinh sẵn `deps` giữa các con · lá fork từ `fgw/<root>` (đã chứa nội dung A) · `frontier` loại item còn dep chưa xong | **Rõ — scout vòng 6** | `src/runner/claim-port.mjs:158-166`; `src/intake/plan.mjs:992`; `src/state/frontier.mjs` |
 | 47 | **Hai tầng lọc đã đúng chỗ, không chồng nhau**: `frontier` lo **deps** (thứ tự), `computeSchedule` lo **footprint** (đụng file). Nên bộ chọn wave của fan-out B = `computeSchedule` ∩ `children(parent)` — khớp đúng phát hiện vòng 1 (hàng 8/9) | **Rõ — vòng 6** | `graph-metrics.mjs:704`; hàng 46 |
 | 48 | ⇒ **Thứ thiếu duy nhất là bộ dispatcher chạy phần song song đồng thời** — đúng bằng phạm vi `tsk-umc`, không hơn. Mô hình, cưỡng chế thứ tự, topology nhánh: đủ cả | **Rõ — vòng 6** | hàng 46/47 |
-| 49 | **"Không cần hỏi người" — fgOS đã tự động hoá cổng thiết kế, cố ý chừa `approve`.** `gate-bypass.mjs` auto-approve *"fgos-exploring's 'Approve CONTEXT.md?', fgos-planning's 'Approve work shape?'"*, và *"Never touches the `awaiting-human` park"*; không chỗ nào đụng `approve`. ⇒ lượt người duy nhất còn lại trong một fan-out là **approve từng lá** = đúng nửa sau Fix A | **Rõ — scout vòng 6** | `src/state/gate-bypass.mjs:1-14` |
+| 49 | **"Không cần hỏi người" — fgOS đã tự động hoá cổng thiết kế, cố ý chừa `approve`.** `gate-bypass.mjs` auto-approve *"fgos-coding-exploring's 'Approve CONTEXT.md?', fgos-coding-planning's 'Approve work shape?'"*, và *"Never touches the `awaiting-human` park"*; không chỗ nào đụng `approve`. ⇒ lượt người duy nhất còn lại trong một fan-out là **approve từng lá** = đúng nửa sau Fix A | **Rõ — scout vòng 6** | `src/state/gate-bypass.mjs:1-14` |
 | 50 | **Nếu tự động hoá approve của lá thì phải theo hình dạng gateBypass đã có**, không phải "không bao giờ hỏi": có **bậc** theo tier (`LEVELS = ['off', ...TIERS]`) · **cơ học** chứ không đọc-độ-tự-tin (D2: zero open items) · **fail closed** (mọi lỗi đọc rơi về an toàn nhất) · **risk-keyword ghi đè cứng** (D4). Đây là tiền lệ ràng buộc, không phải gợi ý | **Rõ — vòng 6** | `gate-bypass.mjs:1-14,23-26` |
 | 51 | **Footprint là TỰ KHAI, không cưỡng chế** — `footprintOverlapAmong` là *"advisory, never blocking"*, và *"an item with no declared footprint never conflicts with anything"*. Nên "wave không đụng file" là **lời khai của agent**, không phải sự thật đã kiểm | **Rõ — vòng 6** | `src/state/graph-metrics.mjs:690-701` |
 | 52 | **Dựa vào footprint tự khai để bỏ cách ly = đúng thứ `D8` của two-layer-dispatch đã bác** cho một field khác: *"một cờ tự khai là chỗ DUY NHẤT agent tự phong, mà người viết cờ chính là agent muốn qua cổng"*. Cùng một sai lầm, hạ xuống tầng an toàn | **Rõ — vòng 6** | `two-layer-dispatch/DISCUSSION.md` §4 D8 |
@@ -465,7 +465,7 @@ ghi bằng capture/friction, không phải một đề xuất trong phòng thi�
 **Phát hiện vòng 2 — phép thử của chính D4 giờ trả lời được, và nó trả
 lời ngược tiền đề.** D4 tự đặt hạn: *"xét lại sau khi `tsk-3xd` xong: nếu
 con work-item thật đã mang được `action` prose thì B2 có thể thừa."* Đọc
-`src/intake/decompose.mjs:988-1012`:
+`src/intake/plan.mjs:988-1012`:
 
 ```js
 addWork(dir, {
@@ -976,7 +976,7 @@ hiện vòng 1.
 #### (3) — fgOS đã tự động hoá cổng thiết kế, cố ý chừa `approve`
 
 `src/state/gate-bypass.mjs:1-14` nói rõ phạm vi: auto-approve *"fgos-
-exploring's 'Approve CONTEXT.md?', fgos-planning's 'Approve work shape?'"*,
+exploring's 'Approve CONTEXT.md?', fgos-coding-planning's 'Approve work shape?'"*,
 và *"Never touches the `awaiting-human` park"*. Không dòng nào đụng
 `approve`.
 
@@ -1360,7 +1360,7 @@ lỗi**. Verify đỏ ⇒ báo người.
 2. Chốt "gom = đọc state + approve theo ranking của verb `merge`, không
    giao thức báo cáo" chứ? Chốt thì mint D6.
 3. Chốt xong hai câu này là §6 dựng được và §7 chia hạng mục — hết vòng
-   thảo luận, sang `fgos-exploring`/`fgos-planning`.
+   thảo luận, sang `fgos-coding-exploring`/`fgos-coding-planning`.
 
 ### 2026-08-07 — Vòng 10: hội tụ
 
@@ -1427,7 +1427,7 @@ lớn công sức của item này là **đừng xây lại**:
 
 | Đã có | Ở đâu |
 |---|---|
-| decompose sinh `deps` giữa các con | `src/intake/decompose.mjs:992` |
+| decompose sinh `deps` giữa các con | `src/intake/plan.mjs:992` |
 | con sinh thẳng ở `stage: executing`, mang `action` prose | `decompose.mjs:1001,1008` |
 | item còn dep chưa xong bị loại khỏi frontier | `src/state/frontier.mjs` |
 | **lá còn dep chưa merge bị TỪ CHỐI claim** | `src/runner/claim-port.mjs:158-166` (`deps-not-merged`) |

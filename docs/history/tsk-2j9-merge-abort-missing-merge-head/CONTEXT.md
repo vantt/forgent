@@ -66,7 +66,7 @@ the merge sequence, not the broader main-checkout-writer lock audit (see D3).
 - Impact-analysis capability gate (`CLAUDE.md`): queried
   `fgos tool query --capability impact-analysis --status present` — one
   provider (`gitnexus`) registered and `present` → posture is **full**.
-  The `fgos-code-implement`/`fgos-planning`/`fgos-validating` MUST rules apply
+  The `fgos-coding-implement`/`fgos-coding-planning`/`fgos-coding-validating` MUST rules apply
   as written once this item reaches implementation: run `impact()` on
   `mergeRunnerItemLocked` before editing it, and `detect_changes()` before
   committing.

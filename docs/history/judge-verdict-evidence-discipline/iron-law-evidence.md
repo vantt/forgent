@@ -29,7 +29,7 @@ traceability gate, touching `src/state/store.mjs`/`work.mjs` —
 evidence file; `tsk-5q5`'s own stage move to `executing` is the
 pass-through this plan documented once both children landed
 (`plan.md`'s "Split" section), and this is the point in the lifecycle
-where `fgos-code-implement`'s own Iron Law step runs against the parent's full
+where `fgos-coding-implement`'s own Iron Law step runs against the parent's full
 changed-file set. This evidence therefore covers Track B (the only track
 that actually touches a self-modifying-capable module) — Track A's diff
 has no module-rule match and needed no failing-test-first proof beyond
@@ -93,7 +93,7 @@ $ node --test test/state/work.test.mjs test/cli/fgos.test.mjs
 ## Item-scoped verify (tsk-5q5's own recorded `verify`, both tracks)
 
 ```
-$ node --test test/intake/discovery.test.mjs test/intake/decompose.test.mjs test/state/work.test.mjs test/cli/fgos.test.mjs
+$ node --test test/intake/discovery.test.mjs test/intake/plan.test.mjs test/state/work.test.mjs test/cli/fgos.test.mjs
 ℹ tests 616
 ℹ pass 616
 ℹ fail 0

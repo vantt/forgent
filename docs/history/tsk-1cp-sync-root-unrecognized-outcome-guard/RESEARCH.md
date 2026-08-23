@@ -51,7 +51,7 @@ tsk-4hj's actual merge commit SHA on `main` is not yet known (still
 under `docs/history/tsk-1cp-sync-root-unrecognized-outcome-guard/`) can be
 drafted now with the branch-relative citations above, then have the real
 merge commit SHA filled in once `fgos merge`/approve lands tsk-4hj on
-`main` — this is squarely `fgos-exploring`'s/`fgos-planning`'s call, not
+`main` — this is squarely `fgos-coding-exploring`'s/`fgos-coding-planning`'s call, not
 this skill's.
 
 **Verdict:** `clear` — verify: `node --test test/cli/fgos.test.mjs`

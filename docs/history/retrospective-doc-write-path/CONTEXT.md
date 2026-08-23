@@ -26,7 +26,7 @@ Deferred).
 ## Pinned terms
 
 - **retrospective document** — the end-user Diataxis document produced by
-  `fgos-compounding` step 4 and recorded on the item's capture via
+  `fgos-coding-compounding` step 4 and recorded on the item's capture via
   `fgos compound --doc-path`. It is a repo-level knowledge artifact, not
   an item artifact: `fgos doc-sources <docPath>` gathers *every* capture
   linked to that path, and measurement shows 18 of 155 distinct paths are
@@ -35,16 +35,16 @@ Deferred).
   item's outcome record. Today it is a claim about a document, checked by
   nothing at the moment it is written.
 - **CONTEXT.md** — this file. An *item* artifact, committed to `fgw/<id>`
-  per `fgos-exploring`'s own rule. Deliberately not covered by D1, which
+  per `fgos-coding-exploring`'s own rule. Deliberately not covered by D1, which
   governs retrospective documents only.
 
 ## Locked decisions
 
 | ID | Decision |
 |----|----------|
-| D1 | A retrospective document is always **written and committed at the main checkout**, regardless of where the session invoking synthesis is standing. The document-writing step resolves the main checkout root the same way `fgos-compounding` step 3 already resolves it for the `.fgos/` store (`git rev-parse --path-format=absolute --git-common-dir \| xargs dirname`). This removes the asymmetry, not the ability to run synthesis from a worktree: a session inside a worktree still synthesizes its own item, its document simply lands where every other document lands. No new lifecycle edge, no locked law reopened. |
+| D1 | A retrospective document is always **written and committed at the main checkout**, regardless of where the session invoking synthesis is standing. The document-writing step resolves the main checkout root the same way `fgos-coding-compounding` step 3 already resolves it for the `.fgos/` store (`git rev-parse --path-format=absolute --git-common-dir \| xargs dirname`). This removes the asymmetry, not the ability to run synthesis from a worktree: a session inside a worktree still synthesizes its own item, its document simply lands where every other document lands. No new lifecycle edge, no locked law reopened. |
 | D2 | The one unrecoverable document, `docs/how-to/check-main-checkout-lock-status-before-retrying.md` (`tsk-5z2`), is **regrown inside this item**. Not split into a separate item, and its `docPath` is not cleared. Its source is `tsk-5z2`'s own decision record (`docs/history/lock-status-visibility/` — `CONTEXT.md` and `plan.md`, both present on main) together with the shipped behaviour of `fgos lock-status`. **Not** `fgos doc-sources`: that verb was run against this path and returns capture metadata only (`predicted`/`actual`/`docType`/`docPath`), no prose — an earlier draft of this decision named it as the source and was wrong. |
-| D3 | **Write first, tag second, and fail closed at the tag.** The document is written and committed at the main checkout *before* `fgos compound` records its tag, and `compound` refuses a `--doc-path` whose file is not present at the main checkout. This inverts `fgos-compounding`'s current step 3 → step 4 order, under which the tag necessarily precedes the file it names and therefore can never be validated. The invariant "a tag exists ⟹ its document exists on main" becomes impossible to violate rather than detected later. |
+| D3 | **Write first, tag second, and fail closed at the tag.** The document is written and committed at the main checkout *before* `fgos compound` records its tag, and `compound` refuses a `--doc-path` whose file is not present at the main checkout. This inverts `fgos-coding-compounding`'s current step 3 → step 4 order, under which the tag necessarily precedes the file it names and therefore can never be validated. The invariant "a tag exists ⟹ its document exists on main" becomes impossible to violate rather than detected later. |
 
 ## Why the alternatives were rejected
 
@@ -70,7 +70,7 @@ system emits calls it harmless.
 
 **Splitting by activity** (a worktree writes "its own" document, the main
 checkout runs sweeps) fails on the same timing wall, and additionally on
-the shared-document measurement above: `fgos-compounding` step 4 decides
+the shared-document measurement above: `fgos-coding-compounding` step 4 decides
 create-vs-grow by file existence on disk, so two worktrees targeting one
 path each see "absent", each create, and the second silently replaces the
 first.
@@ -91,7 +91,7 @@ content is still in hand.
 
 ## Scout evidence
 
-- `.claude/skills/fgos-compounding/SKILL.md` — step 3 resolves the main
+- `.claude/skills/fgos-coding-compounding/SKILL.md` — step 3 resolves the main
   checkout root explicitly (`--dir "$root"`, citing ADR0020 and tsk-56t
   D1) while step 4, ten lines later, writes the document at a
   cwd-relative `docs/<quadrant>/<file>.md`. Step 3 states the session is
@@ -133,7 +133,7 @@ content is still in hand.
 - Whether `docPath` should follow a file rename. One record is currently
   stale (`str89-case-study-executing` points at
   `smoke-test-fgos-executing-with-a-trivial-item.md`, renamed to
-  `...-fgos-code-implement-...` by `8eba4a40`). Correcting that one record
+  `...-fgos-coding-implement-...` by `8eba4a40`). Correcting that one record
   is in scope; building a general rename-tracking mechanism is not —
   1 occurrence in 155 does not yet justify one.
 - Exactly where D3's file-presence check lives inside the `compound` verb,

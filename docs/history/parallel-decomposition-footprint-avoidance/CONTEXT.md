@@ -41,7 +41,7 @@ item to an external agent executor):
 
 | D-ID | Summary | Rationale (short) |
 |---|---|---|
-| D1 | Children cover **≥ 2 themes** — `computed-parallel-wave-schedule`-shaped work + `worktree-dispatch-attestation`-shaped work (2 candidates from `docs/distillery/porting-log.md`, deep-dive `docs/distillery/deep-dives/parallel-decomposition-and-merge.md`). This is a THEME count, not a locked item count — whether either theme becomes 1 work item or splits further (e.g. `worktree-dispatch-attestation`'s two file-disjoint halves, `src/runner/dispatch.mjs` vs `src/runner/frozen-judge.mjs`, §7 of `DISCUSSION.md`) is `fgos-planning`'s own shaping call, not decided here | User directed using this pre-existing item as root instead of submitting duplicates. Item-count NOT pinned here per this skill's own hard rule ("do not decide how big... or split it into pieces") |
+| D1 | Children cover **≥ 2 themes** — `computed-parallel-wave-schedule`-shaped work + `worktree-dispatch-attestation`-shaped work (2 candidates from `docs/distillery/porting-log.md`, deep-dive `docs/distillery/deep-dives/parallel-decomposition-and-merge.md`). This is a THEME count, not a locked item count — whether either theme becomes 1 work item or splits further (e.g. `worktree-dispatch-attestation`'s two file-disjoint halves, `src/runner/dispatch.mjs` vs `src/runner/frozen-judge.mjs`, §7 of `DISCUSSION.md`) is `fgos-coding-planning`'s own shaping call, not decided here | User directed using this pre-existing item as root instead of submitting duplicates. Item-count NOT pinned here per this skill's own hard rule ("do not decide how big... or split it into pieces") |
 | D2 | Wave-schedule algorithm is SEPARATE (Kahn layering + Tarjan cycle-detection), does NOT reuse `graph-harness.mjs`'s `mergeReadiness` connected-component+order logic | Different problem: dispatch needs "how many parallel right now", merge only needs "what order" |
 | D3 | `worktree-dispatch-attestation` = level 1, advisory-only: capture `baseCommit`/`headRef` around `resolveExecutorConfig` before dispatch + broaden `frozen-judge.mjs` to flag ANY diff outside declared footprint (not just test/CI/lockfile/manifest) — flag only, never block | Real breakage is already caught by `merge.mjs`'s existing staged verify-gate; this targets a narrower risk (scope creep that still passes verify) where advisory (STR63 precedent) fits, not a hard gate |
 | D4 | The completeness gap is OUT of `tsk-66o`'s scope, filed separately as `tsk-1gr` (sibling, no logical dep) | Different failure mode (no child claims a decision) than collision (two children fight over one file) |
@@ -84,8 +84,8 @@ Full evidence and reasoning for each: `docs/history/parallel-decomposition-footp
 ## Outstanding questions deferred to planning
 
 None material — D1-D5 cover the product shape completely; `refs` already
-points `fgos-planning` at `DISCUSSION.md`'s `#design` (parent) and each
+points `fgos-coding-planning` at `DISCUSSION.md`'s `#design` (parent) and each
 child's own `#task-<slug>` anchor, which already carries a draft goal,
 D-IDs, sibling relationships, and a draft verify sketch per task. Naming
 choices (e.g. the exact CLI verb for the wave-schedule query) and other
-implementation-level decisions belong to `fgos-planning`, not here.
+implementation-level decisions belong to `fgos-coding-planning`, not here.

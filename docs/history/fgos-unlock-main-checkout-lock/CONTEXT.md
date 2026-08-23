@@ -15,7 +15,7 @@ lineage, same problem class, not requested here — see D3).
 
 | ID | Decision |
 |----|----------|
-| D1 | A new `fgos` CLI verb does the real work of clearing the lock (exact verb name/flags left to `fgos-planning`, e.g. `fgos unlock`); the user/agent-facing "skill" from the item title is a thin wrapper that calls that verb — it never mutates `.fgos/main-checkout.lock` itself. Matches the pattern every existing fgOS skill already follows (`fgos-routing`'s `fgos take`/`fgos ask`, etc.): skills call verbs, they don't reimplement engine logic. |
+| D1 | A new `fgos` CLI verb does the real work of clearing the lock (exact verb name/flags left to `fgos-coding-planning`, e.g. `fgos unlock`); the user/agent-facing "skill" from the item title is a thin wrapper that calls that verb — it never mutates `.fgos/main-checkout.lock` itself. Matches the pattern every existing fgOS skill already follows (`fgos-routing`'s `fgos take`/`fgos ask`, etc.): skills call verbs, they don't reimplement engine logic. |
 | D2 | The verb must not blindly delete the lock file. It reuses `acquireMainCheckoutLock`'s own staleness/liveness judgment (`src/runner/main-checkout-lock.mjs`) before removing anything: if a *different* identity's lock is still live (numeric pid alive, or string identity within its `ttlMs` freshness window), the verb refuses and reports that holder's identity rather than clearing it. Only a stale, corrupt, or otherwise reclaimable lock is actually removed. This preserves the STR65 concurrent-writer guarantee the lock lineage exists for (`.git/index` clobbering, decision 0021) — a force-delete would silently reopen that exact race. |
 | D3 | Scoped to `.fgos/main-checkout.lock` only. `runner.lock` (`src/runner/loop.mjs`), `sessions.lock` (`src/runner/session.mjs`), and `events.lock` (`src/state/events.mjs`) are the same wx-atomic-create + stale-pid-reclaim lineage and share the same stuck-lock failure mode, but generalizing to all four is a bigger surface than the item's title ("git main checkout lock") asked for. A future item can extend this verb's shape to the other three if that need shows up. |
 
@@ -86,6 +86,6 @@ lineage, same problem class, not requested here — see D3).
   removing anything, or reporting is fully covered by the refusal message
   in D2.
 - Whether the skill wrapper (D1) is a new file under `.claude/skills/fgos/`
-  alongside the existing `fgos-routing`/`fgos-exploring`/etc. skills, or
+  alongside the existing `fgos-routing`/`fgos-coding-exploring`/etc. skills, or
   folded into `fgos-routing`'s own gate-contract section — a shaping call,
   not a clarify-stage one.

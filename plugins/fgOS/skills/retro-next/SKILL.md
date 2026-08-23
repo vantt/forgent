@@ -19,7 +19,7 @@ item (`pickNextRetrospectiveItem`, `src/state/retro-pool.mjs`), sets that
 item's ceiling, and hands it to `fgos-coding-driving` — the `driver` cell
 of the same grid. It never resolves which skill runs synthesis, never
 invokes it, and never moves the item afterwards; the driver owns all three,
-the same way `/fgOS:pick`, `/fgOS:discover`, `/fgOS:decompose`, and
+the same way `/fgOS:pick`, `/fgOS:discover`, `/fgOS:plan`, and
 `/fgOS:discover-next` already hand their own picked item over.
 
 Before this shape it hand-rolled that sequence inline — resolving the skill
@@ -108,7 +108,7 @@ and never re-implements that skill's synthesis
    The driver resolves which skill runs synthesis through the same registry
    lookup it uses for every other position — `skillForStage(getDomain(
    item.domain), 'retrospective')`, decision record `0027` D5, which for
-   `coding` resolves to `fgos-compounding` today. This skill never
+   `coding` resolves to `fgos-coding-compounding` today. This skill never
    re-derives that mapping, and never second-guesses the classification or
    the document the resolved skill produces.
 

@@ -118,9 +118,9 @@ session (`mcp__gitnexus__*` tools available; used to confirm
 - Exact mechanism to satisfy D1 given git's one-checkout-per-branch limit
   (e.g. merge on a scratch branch/commit and fast-forward the target ref
   instead of literally checking out the target branch) — implementation
-  choice, left to `fgos-planning`.
+  choice, left to `fgos-coding-planning`.
 - Whether a shared helper/guard should be added once, at the primitive
   level, so all 4 call sites inherit the fix automatically, vs. patched
-  per call site — left to `fgos-planning`.
+  per call site — left to `fgos-coding-planning`.
 - Verify command for this item (currently unset) — left to whichever
   stage defines it (this item's `verify` field is still "chưa xác định").

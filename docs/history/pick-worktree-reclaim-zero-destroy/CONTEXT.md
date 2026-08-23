@@ -109,7 +109,7 @@ written as the manual-recovery complement to `tsk-4m0`'s fix.
   old checkout" — git refuses to check out the same branch at two paths
   simultaneously, so a literal "add new, then remove old" reordering
   cannot check out `branch` at both paths at once. Candidate shapes (not
-  decided here, implementation is fgos-planning's job): a detached-HEAD
+  decided here, implementation is fgos-coding-planning's job): a detached-HEAD
   bridge checkout at the branch's current tip SHA before removing the
   named-branch checkout, or an in-place directory move/rename of the
   existing checkout to the new mkdtemp path (avoiding remove+add

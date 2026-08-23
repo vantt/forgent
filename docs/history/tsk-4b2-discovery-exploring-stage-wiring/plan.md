@@ -57,10 +57,10 @@ piece. Per `CONTEXT.md` D3/D4/D6/D9:
   D10): add inline, native handling for stages `discovery` and
   `exploring` under a new `## Discovery and exploring stages` section —
   same shape as the existing `clarify`/`decompose` handling: invoke
-  `fgos-researching`/`fgos-exploring` in-session (Native-First rule 2,
+  `fgos-researching`/`fgos-coding-exploring` in-session (Native-First rule 2,
   no spawn), apply the verdict directly (`clear` → `moveStage`;
   `unclear` → `fgos ask`, per D4).
-- `.claude/skills/fgos-exploring/SKILL.md` (+ `.agents/` mirror, D10):
+- `.claude/skills/fgos-coding-exploring/SKILL.md` (+ `.agents/` mirror, D10):
   fix the stale "runs while `stage` is `clarify`" framing to `exploring`
   (D9); update its Gate's engine call from `fgos discover --verdict
   clear` to the exploring->decompose mechanism piece 1 adds above.
@@ -78,8 +78,8 @@ piece. Per `CONTEXT.md` D3/D4/D6/D9:
     && grep -q "expectedStage: 'exploring'" src/intake/discovery.mjs \
     && grep -q "## Discovery and exploring stages" .claude/skills/fgos-coding-driving/SKILL.md \
     && grep -q "## Discovery and exploring stages" .agents/skills/fgos-coding-driving/SKILL.md \
-    && grep -q '`stage` is `exploring`' .claude/skills/fgos-exploring/SKILL.md \
-    && ! grep -q '`stage` is `clarify`' .claude/skills/fgos-exploring/SKILL.md
+    && grep -q '`stage` is `exploring`' .claude/skills/fgos-coding-exploring/SKILL.md \
+    && ! grep -q '`stage` is `clarify`' .claude/skills/fgos-coding-exploring/SKILL.md
   ```
   (corrected during Execute: the original grep patterns above dropped the
   backticks around `stage` itself, a genuine typo caught by running the
@@ -91,7 +91,7 @@ piece. Per `CONTEXT.md` D3/D4/D6/D9:
 (~1030-1108) currently advances `discovery -> exploring` on any real
 commit, ignoring the worker's own `{clear, question}` verdict.
 
-  **Revised during `fgos-validating`'s reality gate for `tsk-4v6`
+  **Revised during `fgos-coding-validating`'s reality gate for `tsk-4v6`
   (evidence, not the original guess above):** `src/intake/discovery.mjs`'s
   own header comment (:27, added by piece 1) names this item directly —
   *"`src/runner/loop.mjs`'s own direct `moveStage` call for `discovery ->
@@ -164,7 +164,7 @@ commit, ignoring the worker's own `{clear, question}` verdict.
 
 **Piece 3 (new child) — fix the `fgos-routing` table (`CONTEXT.md`
 D8).** `.claude/skills/fgos-routing/SKILL.md:137-143`'s table currently
-says `clarify` → `fgos-exploring` (wrong; registry says
+says `clarify` → `fgos-coding-exploring` (wrong; registry says
 `fgos-clarifying`) and has no rows for `discovery`/`exploring` at all.
 Fix the wrong line, add the two missing rows. Zero code dependency on
 either other piece — this is a pure docs-table correction, true
@@ -179,7 +179,7 @@ merged first to be written correctly).
     && grep -q "\`fgos-clarifying\`" .claude/skills/fgos-routing/SKILL.md \
     && grep -q "| \`discovery\` |" .claude/skills/fgos-routing/SKILL.md \
     && grep -q "| \`exploring\` |" .claude/skills/fgos-routing/SKILL.md \
-    && ! grep -q "\`clarify\`.*\`fgos-exploring\`" .claude/skills/fgos-routing/SKILL.md
+    && ! grep -q "\`clarify\`.*\`fgos-coding-exploring\`" .claude/skills/fgos-routing/SKILL.md
   ```
 
 ## Cases sketched (high-risk depth)

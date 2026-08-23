@@ -6,7 +6,7 @@ working the rest of this same backlog: every `fgos pick` blocked on lock
 contention printed nothing but a stray `TimeoutNegativeWarning`, exactly
 matching this item's own evidence.
 
-## Decisions
+## Locked decisions
 
 - **D0 (bug 1 — progress line).** Root cause confirmed by reading
   `src/runner/lock-wait.mjs:76` in full: the print guard is `delayMs > 0

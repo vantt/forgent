@@ -45,7 +45,7 @@ verified, never a half-edited file.
   not surface tsk-37u or any of its pieces as high-leverage picks, further
   confirming no urgency to reorder or parallelize.
 - *Fix D2 without D1 (reporting-only, leave gating as-is).* This was the
-  original framing before `fgos-exploring`'s scout — rejected in
+  original framing before `fgos-coding-exploring`'s scout — rejected in
   CONTEXT.md itself: doing only D2 would make triage/list show an item as
   unblocked while `frontier.mjs` still refuses to actually let it be
   claimed, a worse (silently misleading) state than today's status quo.
@@ -61,7 +61,7 @@ verified, never a half-edited file.
 
 **Risk map:**
 
-| Component | Risk | Proof point for `fgos-validating` |
+| Component | Risk | Proof point for `fgos-coding-validating` |
 |---|---|---|
 | `frontier.mjs:89` `depsReady` | high — changes real claim eligibility | new test: a dep at `wontfix` unblocks its dependent (no existing test currently covers a dep's own status against readiness with `wontfix`, confirmed by reading `test/state/frontier.test.mjs`'s existing coverage — only the *item's own* status-not-todo exclusion and the *lineage* wontfix case are tested today, not a *dep's* wontfix status) |
 | `claim-port.mjs:152` `unmergedDeps` | medium — changes leaf-fork eligibility | `test/runner/claim-port.test.mjs`: a leaf whose dep is `wontfix` (not `done`) is allowed to fork, no `deps-not-merged` throw |
@@ -125,7 +125,7 @@ closed before ever being explored) no longer contributes to the
 definition of done — state + cli + runner + e2e), then
 `detect_changes({scope: "compare", base_ref: "main"})` (per this repo's
 GitNexus contract) to confirm the affected-symbol set matches exactly
-this plan's file list before handing to `fgos-validating`.
+this plan's file list before handing to `fgos-coding-validating`.
 
 ## Split decision
 

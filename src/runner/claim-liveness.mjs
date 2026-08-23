@@ -51,19 +51,39 @@ export function lastActivityAt(repoRoot, id) {
 
   let statusOutput;
   try {
-    statusOutput = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--', ':!.fgos']);
+    // tsk-f8f: `-z` (NUL-terminated records), not the human-readable
+    // newline format -- `git status --porcelain` (no `-z`) C-style-quotes
+    // any path containing whitespace or other "unusual" characters (`??
+    // "my file.txt"`), which the old `trimmed.split(/\s+/).pop()` parse
+    // took literally, yielding a fragment like `file.txt"` (a lone
+    // trailing quote character) that never matches a real file --
+    // `statSync` fails, the entry is silently skipped, and that file's
+    // mtime never contributes to the activity signal. `-z` mode never
+    // quotes paths at all (verified empirically: a path with spaces comes
+    // through raw, byte-for-byte), so there is no escape/quote format to
+    // parse in the first place.
+    statusOutput = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '-z', '--', ':!.fgos']);
   } catch {
     return commitTs ?? null;
   }
 
   let newestMtime;
-  for (const line of statusOutput.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-    // Porcelain short format is "XY path" (or "XY orig -> path" for a
-    // rename) -- the touched path is always the last whitespace-separated
-    // token on the line.
-    const filePath = trimmed.split(/\s+/).pop();
+  // Each record is `XY<space>path`, NUL-terminated -- never newline-
+  // terminated, so a path itself containing a literal newline (unusual,
+  // but valid on POSIX filesystems) can never be mistaken for a record
+  // boundary either, a second correctness gain `-z` gives for free. A
+  // rename/copy record (X or Y is 'R'/'C') is followed by ONE MORE
+  // NUL-terminated token, the origin path -- consumed and discarded here,
+  // exactly mirroring the old code's own behavior of taking only the
+  // destination path for a "orig -> path" rename line, never the origin.
+  const records = statusOutput.split('\0').filter((entry) => entry.length > 0);
+  for (let i = 0; i < records.length; i += 1) {
+    const entry = records[i];
+    const statusCode = entry.slice(0, 2);
+    const filePath = entry.slice(3);
+    if (statusCode.includes('R') || statusCode.includes('C')) {
+      i += 1; // skip the origin-path token that follows a rename/copy record
+    }
     try {
       const mtime = fs.statSync(path.join(worktreePath, filePath)).mtimeMs;
       if (newestMtime === undefined || mtime > newestMtime) newestMtime = mtime;

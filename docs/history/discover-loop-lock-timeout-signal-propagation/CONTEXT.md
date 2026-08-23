@@ -8,13 +8,13 @@ CLI subprocess call) — a real systemic signal, since `.fgos/events.jsonl`'s
 lock is shared by every item and continuing would very likely hit the same
 stuck lock again. After tsk-31l switched `discover-next` from a raw CLI
 subprocess call to dispatching through the `fgos-coding-driving` skill
-(which invokes `fgos-exploring`/`fgos-planning` in-session rather than as a
+(which invokes `fgos-coding-exploring`/`fgos-coding-planning` in-session rather than as a
 subprocess), that distinct exit code stopped surfacing — a lock-timeout
 several layers inside those skills now looks identical to any other
 one-off `blocked` outcome to `discover-next`/`discover-loop`.
 
 This item's boundary: restore a **lock-timeout-specific** signal that
-survives the trip from wherever a `fgos discover`/`fgos decompose` call
+survives the trip from wherever a `fgos discover`/`fgos plan` call
 actually fails, up through `fgos-coding-driving`'s own stop-report
 contract, to `discover-next`'s classification step and
 `discover-loop`'s stop rule. It does **not** touch the underlying lock
@@ -27,8 +27,8 @@ policy itself (`.fgos/events.lock`'s 2s/10ms retry in `events.mjs`, RUL10)
 |----|----------|
 | D1 | Propagation scope is **`lock-timeout` only** — the one category that ever stopped the whole loop. `session-fail`/`merge-fail`/CAS-`validation` conflicts keep being handled per-item ("skipped"), unchanged. An adjacent idea — the underlying `.fgos/events.lock` retry policy being a fixed 2s/10ms regardless of what kind of work is holding it, versus an adaptive timeout or a liveness probe ("is the holder still alive?") instead of a fixed timeout — is a different layer (the lock's own policy in `events.mjs`, not the propagation-through-skill-layers problem this item scopes) and is **deferred to tsk-r87** (`discoveredFrom: tsk-1c6`). |
 | D2 | Fix lives at the **root**: `fgos-coding-driving`'s own stop-report contract gains the structured lock-timeout signal, not a narrow patch scoped only to `discover-next`'s own dispatch handling. This means the change is visible to every caller of `fgos-coding-driving` (`/fgOS:cook`, `/fgOS:pick`, any future sweep), not just `discover-next` — intentional, since `fgos-coding-driving` is the shared orchestration point and there are separate ongoing discussions about upgrading the routing mechanism it sits under. |
-| D3 | **Reversed twice; final form here.** Originally locked as a mechanical grep-consistency check, disputed 5 times by the engine's `judgeVerifySemanticCorrectness` second pass on `fgos discover --verdict clear --verify` — consistently, and correctly: the claim is a **runtime behavior of SKILL.md prose**, and no static grep proves that. It was then re-locked as "wait for tsk-4l9's verify harness". **That premise no longer holds:** tsk-4l9 investigated and concluded a harness is YAGNI — the spawn-a-real-session mechanism already exists as `docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md`, and what was actually missing was a written standard. tsk-4l9's real deliverable is `docs/how-to/write-verify-for-a-skill-prose-change.md` (commit `5c738bd` on `fgw/tsk-4l9`), which rules: a skill-prose item's `verify` is `npm test && <POSITIVE> && <NEGATIVE>`, and proving runtime behavior is **not** the `verify` field's job — that belongs to the smoke-test how-to plus event-log observation. tsk-1c6 adopts that standard. The five disputes are not overturned; they are answered — no shell command can carry that claim, so `verify` stops being asked to. |
-| D4 | The stop-report's lock-timeout signal is identified by the literal token **`stop-reason: lock-timeout`**. This is a locked contract string, not an implementation detail: whoever implements D2 must emit exactly this token, and `fgos-exploring`/`fgos-planning` must relay exactly this token when their own engine-verb call fails that way. Locking it here is what makes D3's POSITIVE assertion a real check rather than a guess at unwritten wording — the failure mode the second pass caught on tsk-1tm (`rg` for a guessed identifier name that a correct fix might never use). How the token is threaded through each layer stays with `fgos-planning`. |
+| D3 | **Reversed twice; final form here.** Originally locked as a mechanical grep-consistency check, disputed 5 times by the engine's `judgeVerifySemanticCorrectness` second pass on `fgos discover --verdict clear --verify` — consistently, and correctly: the claim is a **runtime behavior of SKILL.md prose**, and no static grep proves that. It was then re-locked as "wait for tsk-4l9's verify harness". **That premise no longer holds:** tsk-4l9 investigated and concluded a harness is YAGNI — the spawn-a-real-session mechanism already exists as `docs/how-to/smoke-test-fgos-coding-implement-with-a-trivial-item.md`, and what was actually missing was a written standard. tsk-4l9's real deliverable is `docs/how-to/write-verify-for-a-skill-prose-change.md` (commit `5c738bd` on `fgw/tsk-4l9`), which rules: a skill-prose item's `verify` is `npm test && <POSITIVE> && <NEGATIVE>`, and proving runtime behavior is **not** the `verify` field's job — that belongs to the smoke-test how-to plus event-log observation. tsk-1c6 adopts that standard. The five disputes are not overturned; they are answered — no shell command can carry that claim, so `verify` stops being asked to. |
+| D4 | The stop-report's lock-timeout signal is identified by the literal token **`stop-reason: lock-timeout`**. This is a locked contract string, not an implementation detail: whoever implements D2 must emit exactly this token, and `fgos-coding-exploring`/`fgos-coding-planning` must relay exactly this token when their own engine-verb call fails that way. Locking it here is what makes D3's POSITIVE assertion a real check rather than a guess at unwritten wording — the failure mode the second pass caught on tsk-1tm (`rg` for a guessed identifier name that a correct fix might never use). How the token is threaded through each layer stays with `fgos-coding-planning`. |
 
 ## Pinned terms
 
@@ -41,7 +41,7 @@ policy itself (`.fgos/events.lock`'s 2s/10ms retry in `events.mjs`, RUL10)
   `discover-loop/SKILL.md` today and therefore proves nothing on its own.
 - **"propagation" (this item's scope)** — making a category that is only
   ever directly observed by the acting session at the point a bash call
-  fails (e.g. inside `fgos-exploring`'s gate step running `fgos discover`)
+  fails (e.g. inside `fgos-coding-exploring`'s gate step running `fgos discover`)
   survive being handed back up through each prose-only skill-invocation
   layer, instead of being lost to generic "blocked" paraphrasing.
 
@@ -90,12 +90,12 @@ policy itself (`.fgos/events.lock`'s 2s/10ms retry in `events.mjs`, RUL10)
 npm test \
   && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-coding-driving/SKILL.md \
   && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-coding-driving/SKILL.md \
-  && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-exploring/SKILL.md \
-  && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-exploring/SKILL.md \
-  && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-planning/SKILL.md \
-  && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-planning/SKILL.md \
-  && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-validating/SKILL.md \
-  && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-validating/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-coding-exploring/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-coding-exploring/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-coding-planning/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-coding-planning/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-coding-validating/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-coding-validating/SKILL.md \
   && grep -q 'stop-reason: lock-timeout' plugins/fgOS/skills/discover-next/SKILL.md \
   && grep -q 'stop-reason: lock-timeout' plugins/fgOS/skills/discover-loop/SKILL.md \
   && ! grep -q 'Known gap, not fixed by this item' plugins/fgOS/skills/discover-next/SKILL.md
@@ -105,14 +105,14 @@ POSITIVE: D4's locked token present in all ten touched files (all ten
 confirmed to exist on this branch). NEGATIVE: the superseded paragraph at
 `plugins/fgOS/skills/discover-next/SKILL.md:99` is gone.
 
-File count corrected from eight to ten during `fgos-validating`'s reality
-gate: `fgos-validating` itself fires `fgos decompose` (its own Gate
+File count corrected from eight to ten during `fgos-coding-validating`'s reality
+gate: `fgos-coding-validating` itself fires `fgos plan` (its own Gate
 section) and so is in scope. See `plan.md`'s verb-inventory table.
 
 What this deliberately does **not** prove: that an LLM reading the updated
 prose actually relays the token across skill-invocation hops at runtime.
 Per tsk-4l9's standard that proof is owned by
-`docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md` plus
+`docs/how-to/smoke-test-fgos-coding-implement-with-a-trivial-item.md` plus
 event-log observation, not by this field.
 
 ## Real dependency
@@ -126,11 +126,11 @@ event-log observation, not by this field.
 
 ## Outstanding questions deferred to planning
 
-- Exact mechanism for how a stage-skill (`fgos-exploring`/`fgos-planning`)
-  detects a `lock-timeout` from its own `fgos discover`/`fgos decompose`
+- Exact mechanism for how a stage-skill (`fgos-coding-exploring`/`fgos-coding-planning`)
+  detects a `lock-timeout` from its own `fgos discover`/`fgos plan`
   call and how `fgos-coding-driving`'s loop pseudocode/hard-rules should
   state relaying it verbatim — this is implementation/architecture, left
-  to `fgos-planning` per this skill's own scope limit.
-- Whether `fgos-validating` (invoked mid-`decompose` by `fgos-planning`)
+  to `fgos-coding-planning` per this skill's own scope limit.
+- Whether `fgos-coding-validating` (invoked mid-`decompose` by `fgos-coding-planning`)
   also needs this same detection, given `discover-next` routes
   `decompose`-stage items through the same driver.

@@ -72,7 +72,7 @@ resolution module's own legacy-read branch, global-config's "either file
 counts as project-present" check, the doctor's `config-not-stale` check,
 and the direct-read bug itself in `project-agents.mjs`. A fifth,
 easy-to-miss location carried the same bug in a different form: a *skill
-prose* file (`.claude/skills/_shared/capacity-dispatch-fallback.md`, and
+prose* file (`.claude/skills/_shared/executor-dispatch-fallback.md`, and
 its byte-identical, hand-maintained duplicate under `.agents/skills/`)
 had a config-check script literally parsing `.fgos-runner.json` directly
 in its own Step A — confirmed to have no projection script keeping the

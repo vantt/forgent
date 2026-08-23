@@ -2,7 +2,7 @@
 
 ## Feature boundary
 
-`fgos-exploring/SKILL.md` (commit `2bc193d`, corrected `8c1dab1`) gained a
+`fgos-coding-exploring/SKILL.md` (commit `2bc193d`, corrected `8c1dab1`) gained a
 hard rule forbidding ad hoc Agent/Task-tool delegation for its own
 scout/reasoning steps: a live session already holding full context should
 do that work itself (Bash/Grep/`rg`/Read/WebSearch), not re-derive it one
@@ -13,21 +13,21 @@ through the existing capacity-dispatch mechanism
 (`.claude/skills/_shared/capacity-dispatch-fallback.md`) instead.
 
 This item audits the other coding-domain stage-skills for the same gap and
-applies the equivalent fix where it's real: `fgos-planning`,
-`fgos-validating`, `fgos-code-implement` (the item's own original text),
+applies the equivalent fix where it's real: `fgos-coding-planning`,
+`fgos-coding-validating`, `fgos-coding-implement` (the item's own original text),
 widened to also cover `fgos-coding-driving` (D2 below).
 
 ## Locked decisions
 
 | D-ID | Decision |
 |------|----------|
-| D1 | `fgos-validating` gets a new, parallel Task-tool/capacity-dispatch hard rule of its own — it does not rely on its existing D6 "no second reader/review pass" rule to already cover this. Reason: D6 is scoped to a different concern (no multi-pass review ceremony, explicitly out of scope this slice) and says nothing about Task-tool delegation or the capacity-dispatch escape valve the other files' rule points to. User chose explicit consistency across all 3 skills over relying on the narrower existing rule. |
-| D2 | Audit scope widens past the item's original text (which named only `fgos-planning`/`fgos-validating`/`fgos-code-implement`) to also cover `fgos-coding-driving`, the mechanical stage-dispatch loop those 3 skills sit under. |
+| D1 | `fgos-coding-validating` gets a new, parallel Task-tool/capacity-dispatch hard rule of its own — it does not rely on its existing D6 "no second reader/review pass" rule to already cover this. Reason: D6 is scoped to a different concern (no multi-pass review ceremony, explicitly out of scope this slice) and says nothing about Task-tool delegation or the capacity-dispatch escape valve the other files' rule points to. User chose explicit consistency across all 3 skills over relying on the narrower existing rule. |
+| D2 | Audit scope widens past the item's original text (which named only `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`) to also cover `fgos-coding-driving`, the mechanical stage-dispatch loop those 3 skills sit under. |
 
 ## Scout evidence
 
-- Read `fgos-planning/SKILL.md` (241 lines), `fgos-validating/SKILL.md`
-  (207 lines), `fgos-code-implement/SKILL.md` (181 lines),
+- Read `fgos-coding-planning/SKILL.md` (241 lines), `fgos-coding-validating/SKILL.md`
+  (207 lines), `fgos-coding-implement/SKILL.md` (181 lines),
   `fgos-coding-driving/SKILL.md` (already read earlier this session) in
   full.
 - `rg capacity-dispatch-fallback ...` — only real consumer today is
@@ -40,18 +40,18 @@ widened to also cover `fgos-coding-driving` (D2 below).
   commit — per `CLAUDE.md`'s gate this reads **degraded**, not full: a
   present-but-possibly-stale index. This item produces no code and no
   proof points, so the posture is recorded here informationally only, same
-  as `fgos-exploring`'s own step 1 already does — it never gates or
+  as `fgos-coding-exploring`'s own step 1 already does — it never gates or
   reshapes the questions above.
 - Per-file finding:
-  - **`fgos-planning`** — same gap as `fgos-exploring` had: no rule at all
+  - **`fgos-coding-planning`** — same gap as `fgos-coding-exploring` had: no rule at all
     governs whether its own reasoning steps (step 3 "Approach"/risk-map,
     step 4 "Shape") should be done directly vs. delegated. Needs the
     equivalent rule, worded against this skill's own actual reasoning
     surface.
-  - **`fgos-code-implement`** — same gap: no rule at all. Its own
+  - **`fgos-coding-implement`** — same gap: no rule at all. Its own
     reasoning surface is step 2 "Implement" (and, narrower, step 4's Iron
     Law classification). Needs the equivalent rule.
-  - **`fgos-validating`** — has a related but narrower existing rule
+  - **`fgos-coding-validating`** — has a related but narrower existing rule
     ("Do not dispatch a second reader or a review pass over this plan...
     out of scope this slice (cite D6)") — same spirit (keep judgment in
     this one session) but framed around review-pass ceremony, not
@@ -70,12 +70,12 @@ widened to also cover `fgos-coding-driving` (D2 below).
 ## Outstanding questions deferred to planning
 
 None — this is a doc-only prose change (mirrored hard rules across 3
-skill files, in the same shape already proven on `fgos-exploring`), no
-implementation-only detail left for `fgos-planning` to resolve.
+skill files, in the same shape already proven on `fgos-coding-exploring`), no
+implementation-only detail left for `fgos-coding-planning` to resolve.
 
 ## References
 
-- `.claude/skills/fgos-exploring/SKILL.md` — the precedent rule this item
+- `.claude/skills/fgos-coding-exploring/SKILL.md` — the precedent rule this item
   mirrors (post-correction, commit `8c1dab1`).
 - `.claude/skills/_shared/capacity-dispatch-fallback.md` — the
   capacity-dispatch escape valve every mirrored rule points to.

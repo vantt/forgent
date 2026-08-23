@@ -15,7 +15,7 @@ already context-aware (see Scout evidence below).
 
 `resolveDiscovery` (discovery.mjs:231-273) calls `judgeDiscovery`
 unconditionally on every invocation — both the sync `fgos discover <id>`
-verb (role `session`, called by a live session right after `fgos-exploring`
+verb (role `session`, called by a live session right after `fgos-coding-exploring`
 locks decisions) and the runner's RUL19 safety-net sweep (role `runner`,
 scans every `stage:clarify && status:todo` item each loop, specifically to
 catch items no live session ever touched).
@@ -23,7 +23,7 @@ catch items no live session ever touched).
 `buildDiscoveryPrompt` (discovery.mjs:77-151) builds the model prompt from:
 title, kind, risk, refs, deps, graph/impact context, `work.description`,
 the latest gate ask/answer, and prior `judgeDiscovery` verdicts. It never
-reads `work.docsRef` or `CONTEXT.md` at all — so even when `fgos-exploring`
+reads `work.docsRef` or `CONTEXT.md` at all — so even when `fgos-coding-exploring`
 has already locked every decision and written them to `CONTEXT.md`, the
 next `fgos discover` call is blind to that artifact and can re-derive a
 fresh, possibly contradictory judgment, including asking a brand-new
@@ -43,13 +43,13 @@ just finished locking—share one function with no way to tell them apart.
 - `src/intake/discovery.mjs:231-273` (`resolveDiscovery`) — confirmed:
   calls `judgeDiscovery` unconditionally, no docsRef/CONTEXT.md check
   before the model call.
-- `src/intake/decompose.mjs:36-50` (`readLockedContext`) — the sibling
+- `src/intake/plan.mjs:36-50` (`readLockedContext`) — the sibling
   stage's engine already has exactly this pattern: best-effort read of
   `<docsRef>/CONTEXT.md` and `<docsRef>/plan.md`, folded into
   `buildDecomposePrompt` (decompose.mjs:116-118), with the prompt
   instructing the model the locked content is authoritative and must not
   be contradicted.
-- `src/intake/decompose.mjs:96-99` (`buildDecomposePrompt`'s gate section)
+- `src/intake/plan.mjs:96-99` (`buildDecomposePrompt`'s gate section)
   — also already consults `view.gates[id]` so a human's prior answer
   changes the next verdict instead of being re-asked identical questions.
   Comment at decompose.mjs:90-95 names the exact prior bug this fixed
@@ -62,7 +62,7 @@ just finished locking—share one function with no way to tell them apart.
   runner sweep judges every `stage:clarify && status:todo` item each loop,
   regardless of `mode`, specifically so a dead session or an unresponsive
   submitter never leaves an item invisibly stuck.
-- `.claude/skills/fgos-exploring/SKILL.md` "Gate" section — confirmed: on
+- `.claude/skills/fgos-coding-exploring/SKILL.md` "Gate" section — confirmed: on
   the auto-approve path a `fgos decision` call logs
   `"auto-approved: CONTEXT.md (gate-bypass level <level>)"`; on the
   human-approval path (the `false` branch, asking "Decisions locked.
@@ -115,10 +115,10 @@ session (recommended options accepted on all three).
 ## Canonical references
 
 - `src/intake/discovery.mjs` — engine being fixed.
-- `src/intake/decompose.mjs` — sibling engine whose existing
+- `src/intake/plan.mjs` — sibling engine whose existing
   `readLockedContext`/gate-consult pattern is the model to mirror.
 - `bin/fgos.mjs:861-884` — CLI verb dispatch (`discover`).
 - `docs/specs/work-state.md:1054` (RUL19) — sweep's legitimate purpose,
   must remain intact for items with no trust signal.
-- `.claude/skills/fgos-exploring/SKILL.md` — "Gate" section, approval
+- `.claude/skills/fgos-coding-exploring/SKILL.md` — "Gate" section, approval
   logging asymmetry noted in scout evidence.

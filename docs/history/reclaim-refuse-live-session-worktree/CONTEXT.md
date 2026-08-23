@@ -85,14 +85,14 @@ and reordering cleanup to wait on the full approve operation's success
 ## Verify
 
 `rg -n 'live session|isLiveSessionWorktree' -i src/runner/worktree.mjs && node --test test/runner/worktree.test.mjs`
-— fails today (the guard does not exist yet), passes once `fgos-planning`/
-`fgos-code-implement` lands D1/D2's fix plus its regression test. Named after
+— fails today (the guard does not exist yet), passes once `fgos-coding-planning`/
+`fgos-coding-implement` lands D1/D2's fix plus its regression test. Named after
 D1's pinned term "live session worktree"; the exact symbol name is
-`fgos-planning`'s call, not locked here.
+`fgos-coding-planning`'s call, not locked here.
 
 ## Outstanding questions deferred to planning
 
 - None material to product scope. Implementation questions (exact
   mechanism for detecting "session is standing inside this checkout or an
   ancestor of it" — cwd walk vs. claim/session-role state lookup) belong
-  to `fgos-planning`, not this document.
+  to `fgos-coding-planning`, not this document.

@@ -1,12 +1,12 @@
 ---
 type: how-to
-title: How to pass a caller-supplied verdict to fgos discover/fgos decompose
+title: How to pass a caller-supplied verdict to fgos discover/fgos plan
 tags: []
 source_capture_ids: [tsk-27y]
 ---
-# How to pass a caller-supplied verdict to `fgos discover`/`fgos decompose`
+# How to pass a caller-supplied verdict to `fgos discover`/`fgos plan`
 
-Use this when a live session (e.g. `fgos-exploring`/`fgos-planning`) has
+Use this when a live session (e.g. `fgos-coding-exploring`/`fgos-coding-planning`) has
 already done the real Socratic/mode-gate reasoning itself and wants to
 skip `judgeDiscovery`/`judgeDecompose`'s own blind subprocess judge for
 this one call, instead of relying on the `readLockedContext` heuristic
@@ -44,12 +44,12 @@ fgos discover <id> --verdict unclear --question "<the concrete question>"
 Omit `--verdict` entirely to run the normal `judgeDiscovery` subprocess
 judge (or the `readLockedContext` trust-signal skip, if applicable).
 
-## `fgos decompose` — pass-through / need-human / decompose
+## `fgos plan` — pass-through / need-human / decompose
 
 ```bash
-fgos decompose <id> --verdict pass-through --reason "<why no split needed>"
-fgos decompose <id> --verdict need-human --reason "<why a person must confirm>"
-fgos decompose <id> --verdict decompose --reason "<why this split>" \
+fgos plan <id> --verdict pass-through --reason "<why no split needed>"
+fgos plan <id> --verdict need-human --reason "<why a person must confirm>"
+fgos plan <id> --verdict decompose --reason "<why this split>" \
   --children '[{"title":"...","verify":"...","kind":"bug","risk":"light","refs":[],"footprint":["path/a"],"deps":[]}]'
 ```
 
@@ -96,9 +96,9 @@ stays the fallback for callers that pass no explicit verdict).
 
 ## Watch out for: children already created via `fgos add --parent` need `pass-through`, never `decompose --children`
 
-`tsk-1x7` found a real trap for the case where `fgos-planning`'s own
+`tsk-1x7` found a real trap for the case where `fgos-coding-planning`'s own
 split step already created real child work items (via `fgos add --parent
---footprint ...`), and the root item is now at `fgos-validating`'s Gate,
+--footprint ...`), and the root item is now at `fgos-coding-validating`'s Gate,
 deciding which decompose verdict to fire.
 
 `decompose <id> --verdict decompose --children [...]` is for the case
@@ -116,7 +116,7 @@ them, since the verdict call never named them.
 `decompose <id> --verdict pass-through --reason "<cites the already-
 existing children>"` — never `--verdict decompose --children [...]`.
 `pass-through` says "no split needed *by this call*" — which is true,
-because the split already happened earlier in `fgos-planning`'s own
+because the split already happened earlier in `fgos-coding-planning`'s own
 step. Real precedent: `tsk-66o` (children `tsk-3c7`/`tsk-2ig` created via
 `fgos add --parent` during planning) fired `pass-through` at its own
 Gate, not `decompose --children` — the same pattern independently
@@ -129,7 +129,7 @@ dispatch demo family kept as living evidence).
   full decision record and scout evidence.
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
   — Native-First Dispatch Doctrine; this item is Phase 2 of 5 (Phase 1:
-  `tsk-1ni`'s repoRoot fix; Phase 3: `tsk-53h`'s shared capacity-dispatch
+  `tsk-1ni`'s repoRoot fix; Phase 3: `tsk-53h`'s shared executor-dispatch
   helper).
 - `docs/explanation/discovery-decompose-reporoot-verify-overwrite.md` —
   the repoRoot bug and verify-overwrite guard this item's caller-verdict

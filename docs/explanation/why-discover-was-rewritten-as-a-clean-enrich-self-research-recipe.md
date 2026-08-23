@@ -11,7 +11,7 @@ human, and only *then* judge clear vs. unclear.
 ## What shipped — Route A
 
 > Route A shipped for discover research-and-clean recipe:
-> `capacities.judge-discovery` widened (Task/WebSearch/WebFetch/Read
+> `executors.judge-discovery` widened (Task/WebSearch/WebFetch/Read
 > allowedTools), `buildDiscoveryPrompt` rewritten as 5-step recipe
 > (clean ask, enrich real dep content, self-assess, self-research before
 > parking, degrade with no tools), verdict gains optional
@@ -39,7 +39,7 @@ investigation — fixed to capture fresh scout-notes on every call.
 
 ## Route B was considered and rejected — with a concrete reason
 
-> Route B (route research through fgos-exploring's interactive session
+> Route B (route research through fgos-coding-exploring's interactive session
 > instead of widening the headless judge) considered and not chosen —
 > rejected after a live test showed headless `claude -p` already
 > supports parallel Task-tool dispatch, closing most of the capability
@@ -66,7 +66,7 @@ observe real tool-call counts across real runs — threaded additively
 through `runJudgeExecutor` so `judgeDecompose`/`runWatch` stayed
 byte-identical, verified by test.
 
-## A separate, real diagnosis: why `fgos-exploring` felt worse than `ck:research`
+## A separate, real diagnosis: why `fgos-coding-exploring` felt worse than `ck:research`
 
 > Root cause của cảm giác 'exploring ép chọn options, mất thông tin' so
 > với `ck:research`: skill text vốn đã cho phép trả lời mở ('point at a
@@ -74,7 +74,7 @@ byte-identical, verified by test.
 > `AskUserQuestion` (ép 2-4 option định trước) nên tự giới hạn không
 > gian câu trả lời xuống cái agent đã tưởng tượng sẵn.
 
-The gap wasn't in the skill's own design — `fgos-exploring`'s SKILL.md
+The gap wasn't in the skill's own design — `fgos-coding-exploring`'s SKILL.md
 already permitted open-ended prose answers. The gap was in execution
 default: agents defaulted to `AskUserQuestion`'s structured 2–4 option
 format for exploratory questions, self-limiting the answer space to

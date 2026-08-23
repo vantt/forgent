@@ -42,7 +42,7 @@ What remains real, confirmed by further scouting:
 | D1 | Item scope covers both: (a) add the missing positive-path regression test for the already-implemented leaf base-ref fork (`claim-port.mjs`), and (b) fix the sibling-merge-ordering gap in session `pick` — not just close the item as a stale duplicate. |
 | D2 | The sibling-merge-ordering fix is a hard guard: `pick` refuses the claim outright (no worktree created, no state mutated) when a leaf's dep isn't yet `done`. Not a warn-and-allow, not docs-only. |
 
-## Pinned technical note (implementer-level, deferred to `fgos-planning`)
+## Pinned technical note (implementer-level, deferred to `fgos-coding-planning`)
 
 - `approve`'s only path to `status: 'done'` for a leaf item is through a
   successful merge into `fgw/<rootId>` (`bin/fgos.mjs:1856`, inside the
@@ -51,7 +51,7 @@ What remains real, confirmed by further scouting:
   guarantees its content is merged into the root branch — D2's guard can
   reuse the existing `deps.every((dep) => work[dep]?.status === 'done')`
   predicate (`src/state/frontier.mjs:89`) rather than writing a new
-  git-ancestor walk. Confirming this is `fgos-planning`'s call, not
+  git-ancestor walk. Confirming this is `fgos-coding-planning`'s call, not
   re-decided here.
 
 ## Scout evidence cited
@@ -98,4 +98,4 @@ What remains real, confirmed by further scouting:
 
 ## Outstanding questions
 
-None — D1/D2 locked. Implementation shape is `fgos-planning`'s job.
+None — D1/D2 locked. Implementation shape is `fgos-coding-planning`'s job.

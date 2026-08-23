@@ -15,7 +15,7 @@ command that repeatedly merges ready items, encoding the stop rules a
 person would otherwise have to remember to state every time they call
 `/loop /fgOS:merge-next` themselves.
 
-**Correction (found at `fgos-validating`, 2026-07-29):** the requester's
+**Correction (found at `fgos-coding-validating`, 2026-07-29):** the requester's
 own description parenthetically called this "`/loop` (ck-loop)", treating
 `/loop` and the ClaudeKit `ck-loop` skill as the same thing. They are not.
 Reading `~/.claude/skills/ck-loop/SKILL.md` directly shows `ck-loop` is an
@@ -72,7 +72,7 @@ iteration:
   grounds D1.
 - `docs/backlog.md:127` (STR88) — mutation vs read/check grouping this item
   cites for its own classification.
-- `~/.claude/skills/ck-loop/SKILL.md` — read in full at `fgos-validating`
+- `~/.claude/skills/ck-loop/SKILL.md` — read in full at `fgos-coding-validating`
   and confirmed to be a *different* skill (mechanical-metric optimization,
   Goal/Scope/Verify-number/Guard config) than the one this item needs;
   cited here only to record why it was ruled out, not as the recursion
@@ -95,6 +95,6 @@ iteration:
 
 None outstanding — the requester's own description already pins the
 implementation shape (recurse into `/loop`, no new CLI verb, exact stop
-JSON shapes). `fgos-planning` still owns deciding whether this is small
+JSON shapes). `fgos-coding-planning` still owns deciding whether this is small
 enough for a single pass or needs its own split, and the concrete
 implementation steps.

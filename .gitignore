@@ -25,6 +25,12 @@ output.txt
 # events.jsonl (tsk-1dj, tool-registry-capability port)
 .fgos/tool-status.local.json
 
+# events.jsonl truncation-guard mark — a high-water-mark that must live
+# OUTSIDE git tracking to work at all: a git operation reverting the
+# tracked events.jsonl must never also revert this (tsk-cgg,
+# docs/history/events-jsonl-git-tracked-truncation/)
+.fgos/events-jsonl.truncation-guard.json
+
 # BEE:START
 .bee/state.json
 .bee/reservations.json
@@ -59,3 +65,7 @@ output.txt
 
 # Rust build output
 /herdr-plugin/target/
+# tsk-48w: herdr-plugin/web's bundled output, embedded into the binary at
+# compile time (RustEmbed) -- never committed, herdr-plugin/build.rs
+# guarantees this directory exists even when npm run bundle hasn't run.
+/herdr-plugin/static/

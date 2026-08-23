@@ -74,7 +74,7 @@ long-term path; this item replaces it with a real one.
   whose D2 revision (blocked-retake explicitly out of scope, auto-detect
   broadening rejected as anti-cheat risk) is the direct precedent for
   this item's D1.
-- `src/intake/decompose.mjs:294-300` — `releaseClaimOnExecuting`, the one
+- `src/intake/plan.mjs:294-300` — `releaseClaimOnExecuting`, the one
   release path tsk-2zv's marker mechanism covers; confirms tsk-4j9's
   parent/children shape is not this same transition.
 - No existing `docs/decisions/` entry or `docs/backlog.md` row references

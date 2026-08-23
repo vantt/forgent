@@ -20,7 +20,7 @@ import {
   addOk,
   addOutcome,
   addWork,
-  advanceThroughDiscoveryToDecompose,
+  advanceThroughDiscoveryToPlanning,
   assert,
   coexistPath,
   commitFile,
@@ -119,13 +119,13 @@ test('return (verify passes, main-source): a live main-checkout.lock recorded un
   const sessionId = 'tsk-45z-test-session-ok';
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-releases-own-lock', { verify: 'test -f proof.txt' });
-  assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock'], { BEE_SESSION_ID: sessionId }).status, 0);
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock'], { FGOS_SESSION_ID: sessionId }).status, 0);
   commitFile(cwd, 'proof.txt');
 
   const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
   fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
 
-  const result = run(cwd, ['return', 'pull-return-releases-own-lock'], { BEE_SESSION_ID: sessionId });
+  const result = run(cwd, ['return', 'pull-return-releases-own-lock'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.equal(envelopeData(result.stdout).to, 'awaiting-approval');
   assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock once verify passes and the item settles to proposed');
@@ -136,13 +136,13 @@ test('return (verify FAILS, main-source): a live own-identity lock is released t
   const sessionId = 'tsk-45z-test-session-blocked';
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-own-lock-blocked', { verify: 'test -f proof.txt' });
-  assert.equal(run(cwd, ['take', '--id', 'pull-return-own-lock-blocked'], { BEE_SESSION_ID: sessionId }).status, 0);
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-own-lock-blocked'], { FGOS_SESSION_ID: sessionId }).status, 0);
   commitFile(cwd, 'wrong-file.txt'); // advances HEAD, never satisfies verify
 
   const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
   fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
 
-  const result = run(cwd, ['return', 'pull-return-own-lock-blocked'], { BEE_SESSION_ID: sessionId });
+  const result = run(cwd, ['return', 'pull-return-own-lock-blocked'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
   assert.equal(envelopeData(result.stdout).to, 'blocked');
   assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock even when verify fails and the item settles to blocked');
@@ -152,13 +152,13 @@ test('return (main-source) never touches a DIFFERENT session\'s live lock — ne
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-other-untouched', { verify: 'test -f proof.txt' });
-  assert.equal(run(cwd, ['take', '--id', 'pull-return-other-untouched'], { BEE_SESSION_ID: 'tsk-45z-this-session' }).status, 0);
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-other-untouched'], { FGOS_SESSION_ID: 'tsk-45z-this-session' }).status, 0);
   commitFile(cwd, 'proof.txt');
 
   const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
   fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-a-different-live-session', ts: Date.now() }));
 
-  const result = run(cwd, ['return', 'pull-return-other-untouched'], { BEE_SESSION_ID: 'tsk-45z-this-session' });
+  const result = run(cwd, ['return', 'pull-return-other-untouched'], { FGOS_SESSION_ID: 'tsk-45z-this-session' });
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.equal(envelopeData(result.stdout).to, 'awaiting-approval');
   assert.equal(fs.existsSync(lockPath), true, 'a different session\'s live lock must survive this return untouched');
@@ -471,6 +471,39 @@ test('return still refuses when cwd is a subdirectory and a non-.fgos file is di
   assert.equal(stateView(cwd).work['sub-return-dirty'].status, 'doing');
 });
 
+test('return refuses a main-source claim whose verify is still a discovery-stage placeholder — clean validation, exit 4, item stays doing (tsk-1zo: previously shelled out to the placeholder text itself, "<word>: not found", exit 127)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-placeholder', { verify: 'chưa xác định — P15 bổ sung' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-placeholder']).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', 'pull-return-placeholder']);
+  assert.equal(result.status, 4, `expected a clean validation refusal, got: ${result.stderr}`);
+  assert.match(result.stderr, /placeholder verify/);
+  assert.doesNotMatch(result.stderr, /not found/);
+  assert.equal(stateView(cwd).work['pull-return-placeholder'].status, 'doing');
+});
+
+test('return refuses a branch-source claim whose verify is still a discovery-stage placeholder — clean validation, exit 4, item stays doing (tsk-1zo)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'branch-return-placeholder', { verify: 'chưa xác định — P15 bổ sung' });
+
+  const pickResult = run(cwd, ['pick', '--id', 'branch-return-placeholder']);
+  assert.equal(pickResult.status, 0, `pick failed: ${pickResult.stderr}`);
+  const pickData = envelopeData(pickResult.stdout);
+  fs.writeFileSync(path.join(pickData.worktree.path, 'proof.txt'), 'built by the pick\n');
+  execFileSync('git', ['add', '-A'], { cwd: pickData.worktree.path });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd: pickData.worktree.path });
+
+  const result = run(cwd, ['return', 'branch-return-placeholder']);
+  assert.equal(result.status, 4, `expected a clean validation refusal, got: ${result.stderr}`);
+  assert.match(result.stderr, /placeholder verify/);
+  assert.doesNotMatch(result.stderr, /not found/);
+  assert.equal(stateView(cwd).work['branch-return-placeholder'].status, 'doing');
+});
+
 test('return refuses when HEAD has not advanced past headAtTake — a clean tree with zero real progress — as validation, exit 4, item stays doing', () => {
   // `.fgos/` entirely gitignored here (unlike initGitCwd's `.fgos/state.json`
   // only) so the tree is genuinely clean right after `take` with no commit
@@ -684,7 +717,7 @@ test('reject without --reason is rejected as validation, exit 4, item stays prop
   const cwd = tmpCwd();
   addOk(cwd, 'reject-no-reason-item');
   run(cwd, ['move', 'reject-no-reason-item', '--to', 'doing']);
-  run(cwd, ['move', 'reject-no-reason-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'reject-no-reason-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['reject', 'reject-no-reason-item']);
   assert.equal(result.status, 4);
@@ -837,7 +870,7 @@ test('return on a branch-source take never touches a live main-checkout.lock (ts
   const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
   fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-branch-session', ts: Date.now() }));
 
-  const result = run(cwd, ['return', 'branch-return-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-branch-session' });
+  const result = run(cwd, ['return', 'branch-return-lock-untouched'], { FGOS_SESSION_ID: 'tsk-45z-branch-session' });
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.match(result.stdout, /awaiting-approval/);
   assert.equal(fs.existsSync(lockPath), true, 'a branch-source return must never touch main-checkout.lock, even one it could self-recognize');
@@ -1013,4 +1046,84 @@ test('return succeeds unchanged from inside a real session worktree (created via
   } finally {
     endSession(cwd, session.sessionId, { force: true });
   }
+});
+
+test('tsk-ikd: return refuses from an ad-hoc worktree never created through "fgos session start" (main-source take) — item stays doing, never reaches awaiting-approval, exit 4', () => {
+  // The actual Finding 4 failure scenario: a main-source claim (via `take`)
+  // returned from inside a leftover/unrelated linked worktree instead of
+  // main. Before this fix, `return`'s main-source path had no guard at all
+  // (unlike `approve`/`sync-root`/`promote-to-component`, all of which
+  // already refuse here) -- it would read `currentHead`/run verify against
+  // WHATEVER cwd happens to be, record `headAtReturn` against a sha that
+  // may never actually be reachable from main's own history the way this
+  // item's claim assumes. This is deliberately the OPPOSITE fixture from
+  // the session-worktree test above: an ad-hoc worktree is never registered
+  // via "fgos session start" (no `sessions.json` entry), so it must be
+  // refused exactly like approve's own adhoc-worktree tests prove for
+  // approve.
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  commitPending(cwd, 'state: init');
+  addOk(cwd, 'return-adhoc-mainsource', { verify: 'test -f proof.txt' });
+  commitPending(cwd, 'state: add');
+  run(cwd, ['take', '--id', 'return-adhoc-mainsource']);
+  commitPending(cwd, 'state: take');
+  // Real progress actually committed to main -- would satisfy verify if this
+  // guard did not fire first, proving the refusal is structural (WHERE this
+  // runs), never a proxy for "would verify have passed anyway".
+  commitFile(cwd, 'proof.txt');
+
+  const worktreePath = addAdHocWorktree(cwd, 'adhoc-return-mainsource-branch');
+  try {
+    assert.equal(stateView(cwd).work['return-adhoc-mainsource'].status, 'doing', 'sanity: the ad-hoc worktree really does see the item (real committed events log)');
+    const result = run(worktreePath, ['return', 'return-adhoc-mainsource']);
+    assert.equal(result.status, 4, `expected a clean validation refusal, not a return recorded against an unregistered worktree: ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, /registered "fgos session start" worktree/);
+    assert.equal(stateView(cwd).work['return-adhoc-mainsource'].status, 'doing', 'item is untouched -- never reaches awaiting-approval from an unregistered worktree');
+  } finally {
+    removeAdHocWorktree(cwd, worktreePath);
+  }
+});
+
+test('return --worker-verified-sha skips runGoalCheck when sha matches branchHead, moving item to awaiting-approval with verify skipped output', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'worker-verified-item', { verify: 'exit 1' });
+  const pickResult = run(cwd, ['pick', '--id', 'worker-verified-item']);
+  assert.equal(pickResult.status, 0);
+  const pickData = envelopeData(pickResult.stdout);
+
+  fs.writeFileSync(path.join(pickData.worktree.path, 'proof.txt'), 'built by worker\n');
+  execFileSync('git', ['add', '-A'], { cwd: pickData.worktree.path });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd: pickData.worktree.path });
+
+  const branchHead = gitAtCwd(cwd, ['rev-parse', 'fgw/worker-verified-item']).trim();
+
+  const result = run(cwd, ['return', 'worker-verified-item', '--worker-verified-sha', branchHead]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /verify skipped/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['worker-verified-item'].status, 'awaiting-approval');
+  assert.equal(view.work['worker-verified-item'].branchHeadAtReturn, branchHead);
+});
+
+test('return --worker-verified-sha falls through to real verify when sha is stale or mismatched', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'worker-stale-item', { verify: 'exit 1' });
+  const pickResult = run(cwd, ['pick', '--id', 'worker-stale-item']);
+  assert.equal(pickResult.status, 0);
+  const pickData = envelopeData(pickResult.stdout);
+
+  fs.writeFileSync(path.join(pickData.worktree.path, 'proof.txt'), 'built by worker\n');
+  execFileSync('git', ['add', '-A'], { cwd: pickData.worktree.path });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd: pickData.worktree.path });
+
+  const staleSha = '0000000000000000000000000000000000000000';
+
+  const result = run(cwd, ['return', 'worker-stale-item', '--worker-verified-sha', staleSha]);
+  // Should fall through to real verify (which is `exit 1`), so return moves item to blocked
+  const view = stateView(cwd);
+  assert.equal(view.work['worker-stale-item'].status, 'blocked');
 });

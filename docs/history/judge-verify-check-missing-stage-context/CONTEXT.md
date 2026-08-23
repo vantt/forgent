@@ -14,7 +14,7 @@ grep-based command, however precisely targeted, can ever prove prose
 readability — so it re-fires every round regardless of how the verify
 command is strengthened.
 
-Reproduced live on tsk-1x7 (a doc-only fix to `fgos-validating/SKILL.md`'s
+Reproduced live on tsk-1x7 (a doc-only fix to `fgos-coding-validating/SKILL.md`'s
 Gate section): 3 dispute-park-retry rounds, each with the judge raising the
 same unfalsifiable objection against a progressively stronger grep chain
 (bare phrase match → scoped to the Gate section → two required phrases
@@ -25,7 +25,7 @@ checked). Resolved only via `fgos discover --force` (tsk-5cf D1b path).
 | D-ID | Decision |
 |------|----------|
 | D1 | Park tsk-rlv until tsk-3jy resolves. Both items point at the same function (`buildVerifyCheckPrompt`, `judge-executor.mjs:329`) — tsk-3jy is currently claimed by a different live session (`writer.id: 7ec38246-a1fd-4413-9b8f-8819d92f638a`), still at stage `clarify`, not yet locked. Proceeding independently risks a merge conflict or duplicate/conflicting fix to the same function. User confirmed this over proceeding independently and accepting the collision risk. |
-| D2 | Scope narrows, after resume, to: link `docs/how-to/write-verify-for-a-skill-prose-change.md` (tsk-4l9, already merged before tsk-1x7/tsk-rlv existed) from `fgos-exploring`'s and/or `fgos-planning`'s `SKILL.md`, so a session writing `verify` for an item touching `.claude/skills/**/SKILL.md` / `.agents/skills/**/SKILL.md` / `plugins/fgOS/skills/**/SKILL.md` is pointed at the `npm test && <POSITIVE> && <NEGATIVE>` standard — and the doc's own pre-written rebuttal for a comprehension-style second-pass objection — before writing a verify command that gets disputed. No change to `judge-executor.mjs`/`discovery.mjs`/`decompose.mjs`. User confirmed this over closing tsk-rlv outright or still modifying judge code. |
+| D2 | Scope narrows, after resume, to: link `docs/how-to/write-verify-for-a-skill-prose-change.md` (tsk-4l9, already merged before tsk-1x7/tsk-rlv existed) from `fgos-coding-exploring`'s and/or `fgos-coding-planning`'s `SKILL.md`, so a session writing `verify` for an item touching `.claude/skills/**/SKILL.md` / `.agents/skills/**/SKILL.md` / `plugins/fgOS/skills/**/SKILL.md` is pointed at the `npm test && <POSITIVE> && <NEGATIVE>` standard — and the doc's own pre-written rebuttal for a comprehension-style second-pass objection — before writing a verify command that gets disputed. No change to `judge-executor.mjs`/`discovery.mjs`/`decompose.mjs`. User confirmed this over closing tsk-rlv outright or still modifying judge code. |
 
 ## Scout evidence
 
@@ -90,8 +90,8 @@ checks, no `npm test`, not POSITIVE/NEGATIVE shaped) did not follow this
 existing standard — part of why it kept getting disputed was a real,
 self-inflicted verify-shape gap, not solely judge overreach.
 
-D2 (above) locks the real remaining gap: neither `fgos-exploring` nor
-`fgos-planning`'s own `SKILL.md` points a session at this how-to doc when
+D2 (above) locks the real remaining gap: neither `fgos-coding-exploring` nor
+`fgos-coding-planning`'s own `SKILL.md` points a session at this how-to doc when
 an item touches a skill-prose file, so the standard existed but was never
 surfaced at the point a session actually writes the verify command.
 
@@ -99,6 +99,6 @@ surfaced at the point a session actually writes the verify command.
 
 None — D2 fully scopes the remaining work: add one pointer line to
 `docs/how-to/write-verify-for-a-skill-prose-change.md` in
-`fgos-exploring`'s and/or `fgos-planning`'s `SKILL.md`, conditioned on the
-item touching a skill-prose path. `fgos-planning` still owns exactly where
+`fgos-coding-exploring`'s and/or `fgos-coding-planning`'s `SKILL.md`, conditioned on the
+item touching a skill-prose path. `fgos-coding-planning` still owns exactly where
 in each file's flow the pointer belongs and its precise wording.

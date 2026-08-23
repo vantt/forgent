@@ -65,7 +65,7 @@ not reproduced verbatim here).
 - Exact shape of the new `resolveExecutorConfig` branch (where the
   agentType-only args template gets built from, e.g. deriving from
   `DEFAULT_RUNNER_CONFIG.executor`'s own args minus `--model`) —
-  implementation shaping, `fgos-planning`'s call.
+  implementation shaping, `fgos-coding-planning`'s call.
 - Whether `validateCapacityShape`'s static check for `agentType` (non-empty
   string when present, same pattern as `model`/`allowCrossProvider`) needs
   any additional shape rule — planning's call once the resolve-branch shape

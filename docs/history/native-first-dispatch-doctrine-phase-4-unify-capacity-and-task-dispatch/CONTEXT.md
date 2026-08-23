@@ -31,7 +31,7 @@ correction; only "how do we decide native vs cli/spawn" is shared).
 |---|---|
 | D1 | Scope is **broad**, not narrowed to capacity-shaped helpers: the shared decision protocol must govern BOTH `capacities.<id>` config-driven dispatch AND any skill's direct Agent/Task-tool subTask calls, not just the former. Reason (user, verbatim intent): doing this lets fgOS flexibly use many different models across ALL its tools, not just the fgOS-specific capacity mechanism — the payoff is model flexibility for every dispatch path, not just the narrow judge/classify helpers. |
 | D2 | This item builds the FIRST real native-Task-dispatch branch itself, now — it is not deferred to a later proving item, despite `docs/decisions/0026-...md`'s phase table implying the pattern would already be "proven on two separate real cases" (`tsk-27y`'s engine-verb case, `tsk-53h`'s skill-facing-helper case) before Phase 4 starts. Scout evidence below shows `tsk-53h` never actually built a native-Task branch — this item is where that first proof happens. Reason (user, verbatim): "the discover phase has many candidates for that" — confirmed real, already-wired candidates exist (see scout evidence) to build and validate the native branch against. |
-| D3 | Full scope is "wire everything": every real existing `capacities.<id>` consumer, AND every direct Task/Agent-tool call site in fgOS's own skill catalog (this repo), migrates onto the shared decision protocol. Scout confirms fgOS's own skill catalog (`.claude/skills/`, `plugins/fgOS/skills/`) has ZERO existing direct Task/Agent-tool call sites today (see scout evidence) — so the "direct-call" half of this migration has no existing code to retrofit; it is establishing the mandatory-consult convention any *future* direct-dispatch skill work must follow, not a rewrite of dozens of existing files. The `capacities.<id>` half has three real, already-wired consumers to migrate (see D2). Splitting this into child work items, and continuously building/merging each child rather than one big-bang change, is explicit user instruction — the concrete split (how many children, which consumer first) is `fgos-planning`/`fgos-decompose`'s own shaping call, not decided here. |
+| D3 | Full scope is "wire everything": every real existing `capacities.<id>` consumer, AND every direct Task/Agent-tool call site in fgOS's own skill catalog (this repo), migrates onto the shared decision protocol. Scout confirms fgOS's own skill catalog (`.claude/skills/`, `plugins/fgOS/skills/`) has ZERO existing direct Task/Agent-tool call sites today (see scout evidence) — so the "direct-call" half of this migration has no existing code to retrofit; it is establishing the mandatory-consult convention any *future* direct-dispatch skill work must follow, not a rewrite of dozens of existing files. The `capacities.<id>` half has three real, already-wired consumers to migrate (see D2). Splitting this into child work items, and continuously building/merging each child rather than one big-bang change, is explicit user instruction — the concrete split (how many children, which consumer first) is `fgos-coding-planning`/`fgos-decompose`'s own shaping call, not decided here. |
 
 ## Pinned terms
 
@@ -75,7 +75,7 @@ correction; only "how do we decide native vs cli/spawn" is shared).
 - `src/intake/judge-executor.mjs:417` (`runJudgeExecutor`) — confirmed a
   SECOND real, already-wired `capacities.<id>` consumer distinct from
   `fgos-submit-assist`: `src/intake/discovery.mjs:383` and
-  `src/intake/decompose.mjs:317` both call `runJudgeExecutor` with a
+  `src/intake/plan.mjs:317` both call `runJudgeExecutor` with a
   hardcoded `'judge-discovery'`/`'judge-decompose'` capacity id, which
   `runJudgeExecutor` resolves via `resolveExecutorConfig` (`dispatch.mjs`)
   as a synthetic role key. Both always cli/spawn a blind `claude -p` judge
@@ -108,14 +108,14 @@ correction; only "how do we decide native vs cli/spawn" is shared).
 - `.claude/skills/_shared/capacity-dispatch-fallback.md` — the shared
   fragment whose Step C needs the new native-Task branch.
 - `src/intake/judge-executor.mjs`, `src/intake/discovery.mjs`,
-  `src/intake/decompose.mjs` — the `judge-discovery`/`judge-decompose`
+  `src/intake/plan.mjs` — the `judge-discovery`/`judge-decompose`
   capacity consumers this item migrates.
 
 ## Outstanding questions deferred to planning
 
 - Exact shape of the shared native-vs-cli/spawn decision helper (a
   function, a CLI subcommand, a shared skill-facing fragment addition) and
-  where it lives — `fgos-planning`'s implementation-shaping call.
+  where it lives — `fgos-coding-planning`'s implementation-shaping call.
 - How to split this item into child work items (one per consumer:
   `judge-discovery`, `judge-decompose`, `submit-assist-classify`, plus the
   shared-helper build itself, plus the "future direct-dispatch skills must

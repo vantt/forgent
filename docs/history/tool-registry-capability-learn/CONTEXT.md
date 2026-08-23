@@ -16,7 +16,7 @@ row for it stands.
 **Out of scope** (belongs to sibling items, not this one):
 - `tsk-1dj` — actually porting the `tool-registry-capability` idea into
   fgOS (verb-group, store, schema).
-- `tsk-1e4` — rewriting fgos-planning/fgos-validating prose to consult a
+- `tsk-1e4` — rewriting fgos-coding-planning/fgos-coding-validating prose to consult a
   capability instead of hardcoding "GitNexus".
 - `tsk-4ad` — registering gitnexus itself for this repo once the verb-group
   exists.

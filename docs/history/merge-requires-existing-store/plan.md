@@ -96,11 +96,11 @@ item, no ordering decision to make.
 
 ## Risk map
 
-| Component | Risk | Proof point (→ fgos-validating) |
+| Component | Risk | Proof point (→ fgos-coding-validating) |
 |---|---|---|
 | `command-registry.mjs` field flip | low | `fgos-manifest.test.mjs`'s existing invariant test still passes (already confirmed true/true pairing by reading, per Files touched above); re-confirm by actually running the suite once the flip lands. |
 | New refusal-path test(s) | low | The tests themselves are the proof — `node --test test/cli/fgos.test.mjs` green, specifically the new cases below. |
-| Downstream skill consumers (`merge-next`/`merge-loop`) | low | No code in these files changes (D3). The claim that `merge-next`'s step 2 already separates "command fails" from "reported blocked outcome" is a prose-reading claim from `fgos-exploring`'s scout, not something `npm test` covers — `fgos-validating` should re-read `plugins/fgOS/skills/merge-next/SKILL.md` lines 39-42 directly as its proof point, not take CONTEXT.md's citation on faith. |
+| Downstream skill consumers (`merge-next`/`merge-loop`) | low | No code in these files changes (D3). The claim that `merge-next`'s step 2 already separates "command fails" from "reported blocked outcome" is a prose-reading claim from `fgos-coding-exploring`'s scout, not something `npm test` covers — `fgos-coding-validating` should re-read `plugins/fgOS/skills/merge-next/SKILL.md` lines 39-42 directly as its proof point, not take CONTEXT.md's citation on faith. |
 
 ## Shape (standard)
 
@@ -140,5 +140,5 @@ regression/refusal test coverage, one commit, no child items.
 covers the new refusal-path tests, the two unchanged empty-store tests,
 and the manifest's structural invariant test, all in the two files this
 item actually touches. (Supersedes the work record's placeholder "chưa
-xác định — P15 bổ sung" — `fgos-validating`/execution should set this as
+xác định — P15 bổ sung" — `fgos-coding-validating`/execution should set this as
 the item's real `verify` command.)

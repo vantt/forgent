@@ -27,7 +27,7 @@ THẬT, cập nhật mới nhất. Report này (bên dưới) là nhật ký qu�
 
 `tsk-ozl` + `tsk-2b0` (cả 2 done, phát hiện qua nhánh `tsk-4y5`) đã:
 
-- Tách verb `fgos discover` (clarify-only)/`fgos decompose` (decompose-only),
+- Tách verb `fgos discover` (clarify-only)/`fgos plan` (decompose-only),
   hard-split, không dispatch theo stage nữa.
 - Fix ĐÚNG bug round-3 (`resolveDiscovery` mù với CONTEXT.md): giờ có
   **trust signal content-based** — CONTEXT.md tồn tại+non-empty → bỏ qua
@@ -43,7 +43,7 @@ Toàn bộ D1-D6 bên dưới (round 1-4) giữ nguyên làm lịch sử/bằng 
 **D4/D5/D6 đã bị rút lại** (không cần verb/skill/ceiling-signal mới) —
 thay bằng **D7/D8** trong CONTEXT.md
 (`docs/history/gate-approve-vs-movenext-semantics/CONTEXT.md`, nguồn đầy đủ
-và cập nhật nhất — đọc file đó trước khi bắt tay `fgos-planning`, report này
+và cập nhật nhất — đọc file đó trước khi bắt tay `fgos-coding-planning`, report này
 giữ nguyên làm nhật ký quá trình, không sửa lại các round cũ).
 
 ## Executive Summary
@@ -57,7 +57,7 @@ environment approval gates). Cả hai đều tách rõ: (1) approval là bản g
 hành vi khác nhau tuỳ policy/environment.
 
 Soi code fgOS hiện tại (`bin/fgos.mjs`, `src/intake/discovery.mjs`,
-`.claude/skills/fgos-exploring|planning|routing/SKILL.md`) cho thấy: fgOS **đã
+`.claude/skills/fgos-coding-exploring|planning|routing/SKILL.md`) cho thấy: fgOS **đã
 làm đúng một nửa** — skill-embedded Gate (approve CONTEXT.md/plan.md) không tự
 áp move (`fgos-routing` D8: "stage transitions are always the engine's own
 machine judgment, never applied by this skill"). Nhưng nửa còn lại — ghi nhận
@@ -100,15 +100,15 @@ Repo có **hai cơ chế khác tên nhưng đều gọi là "gate"**:
   `src/state/replay.mjs:162-191`) — câu hỏi/trả lời khi cần người quyết một
   điều cụ thể giữa chừng. Đã có ghi nhận bền (`ask`, `answer`,
   `rationale`/`alternatives`/`source`).
-- **Skill-embedded confirmation Gate** (`fgos-exploring`/`fgos-planning`'s
+- **Skill-embedded confirmation Gate** (`fgos-coding-exploring`/`fgos-coding-planning`'s
   "Approve CONTEXT.md?"/"Approve plan.md?") — đúng đối tượng tsk-19j đang nói
   tới. Cơ chế: `gate-bypass.mjs`'s `canAutoApprove` quyết auto-pass hay hỏi.
 
 ### 2. Tách move-next khỏi gate — ĐÃ CÓ một phần, chỉ chưa hoàn chỉnh
 
-`fgos-exploring/SKILL.md` bước 4 (Hand off) nói thẳng: *"Locking decisions
+`fgos-coding-exploring/SKILL.md` bước 4 (Hand off) nói thẳng: *"Locking decisions
 here never decides the item's next edge... this skill never adds one, never
-removes one, and never applies the move itself."* `fgos-planning/SKILL.md`
+removes one, and never applies the move itself."* `fgos-coding-planning/SKILL.md`
 Gate section: *"The mode decision reached in step 2 does not, by itself, move
 the item anywhere... the engine is still the only thing that validates and
 applies that move."* `fgos-routing/SKILL.md` D8: *"stage transitions are
@@ -121,7 +121,7 @@ thiết kế sai từ đầu — mà là **thực thi chưa trọn** (xem #3, #4
 
 ### 3. Lỗ hổng thật: approve thủ công KHÔNG được ghi nhận
 
-`fgos-exploring/SKILL.md` dòng 174-184, `fgos-planning/SKILL.md` dòng 147-158:
+`fgos-coding-exploring/SKILL.md` dòng 174-184, `fgos-coding-planning/SKILL.md` dòng 147-158:
 
 - Nhánh `true` (auto-approve): gọi `fgos decision --text "auto-approved..."`
   → có bản ghi bền, có audit trail (D3).
@@ -155,7 +155,7 @@ if (verdict.clear) {
 Không có cách nào gọi "chỉ judge, ghi lại verdict, không move" rồi sau đó ở
 một session/environment khác gọi riêng "move-next nếu đã judge pass" — hai
 việc **luôn đi cùng nhau trong một lệnh, một lần gọi**. `resolveDecompose`
-(`src/intake/decompose.mjs:279+`) cùng pattern.
+(`src/intake/plan.mjs:279+`) cùng pattern.
 
 ⇒ Đây là đúng cái user mô tả: "việc có đi qua bước kế tiếp hay không là một
 feature cơ học khác, đặt ở cuối tiến trình" — **hiện KHÔNG tách được**, vì
@@ -197,7 +197,7 @@ tranh cãi.
 ## Implementation Recommendations
 
 Không tự ý mở rộng scope — đây là báo cáo research cho tsk-19j, còn ở stage
-`clarify`. Khuyến nghị hướng cho `fgos-exploring` (khi item này được claim):
+`clarify`. Khuyến nghị hướng cho `fgos-coding-exploring` (khi item này được claim):
 
 1. **Vá lỗ hổng #3 trước, rẻ nhất, không đổi contract**: thêm bước ghi
    `fgos decision --text "CONTEXT.md/plan.md approved (manual)"` ngay sau khi
@@ -206,13 +206,13 @@ Không tự ý mở rộng scope — đây là báo cáo research cho tsk-19j, c
    verb mới.
 2. **Việc tách judge/move của `resolveDiscovery`/`resolveDecompose` (#4) là
    scope lớn hơn hẳn** — đụng vào cơ chế lõi `fgos discover`, ảnh hưởng mọi
-   domain qua `workflow-stage-graphs.mjs`. Nên để `fgos-planning` (không phải
-   `fgos-exploring`) đánh giá — đúng ranh giới "implementation/architecture
-   thuộc planning, không thuộc exploring" mà chính `fgos-exploring/SKILL.md`
+   domain qua `workflow-stage-graphs.mjs`. Nên để `fgos-coding-planning` (không phải
+   `fgos-coding-exploring`) đánh giá — đúng ranh giới "implementation/architecture
+   thuộc planning, không thuộc exploring" mà chính `fgos-coding-exploring/SKILL.md`
    dòng 27-29 đã tự giới hạn.
 3. **Khái niệm "environment/mode quyết move-next"** hoàn toàn chưa có tiền lệ
    trong code (đã rà — không tìm thấy field nào tương đương). Đây là quyết
-   định thiết kế mới thật sự, không phải bug — cần `fgos-planning` cân nhắc
+   định thiết kế mới thật sự, không phải bug — cần `fgos-coding-planning` cân nhắc
    độ lớn (có thể cần tách item con).
 
 ## Đào sâu thêm (round 2) — trả lời một phần Q1/Q2 cũ, xác nhận Q3 vẫn mở
@@ -263,7 +263,7 @@ field lên cùng chỗ.
 
 Đối chiếu trực tiếp hai file:
 
-- `src/intake/decompose.mjs:36-38` có hàm riêng `readLockedContext(repoRoot,
+- `src/intake/plan.mjs:36-38` có hàm riêng `readLockedContext(repoRoot,
   docsRef)` — đọc `CONTEXT.md`/`plan.md` thật từ đĩa qua `work.docsRef`.
   `resolveDecompose` (dòng 330-331) gọi nó rồi truyền `lockedContext` vào
   `judgeDecompose` → `buildDecomposePrompt` (dòng 85-88) đưa NGUYÊN VĂN nội
@@ -275,7 +275,7 @@ field lên cùng chỗ.
   không phải lịch sử), và `view.discovery[id]` (lịch sử verdict cũ). **Không
   một dòng nào đọc `work.docsRef` hay nội dung CONTEXT.md.**
 
-⇒ Hệ quả thật, không phải giả thuyết: khi một người chạy `fgos-exploring`
+⇒ Hệ quả thật, không phải giả thuyết: khi một người chạy `fgos-coding-exploring`
 đàng hoàng — scout kỹ, hỏi-đáp Socratic nhiều vòng, viết CONTEXT.md đầy đủ,
 được người dùng bấm "Approve CONTEXT.md" — rồi skill gọi `fgos discover <id>`
 (theo đúng flow `/fgOS:cook` bước 2 mô tả), thì `resolveDiscovery` bên trong
@@ -325,14 +325,14 @@ phải bỏ qua câu hỏi).
 không phải engine tự động. `/fgOS:cook` (môi trường "full-pipeline"): sau khi
 người approve CONTEXT.md, TỰ GỌI `fgos discover <id>` ngay trong cùng bước —
 tương đương "move-next auto-chạy" user mô tả. Một session chạy
-`fgos-exploring` ĐƠN LẺ (không qua cook): skill hand-off cho `fgos-routing`
-(dòng 138-147 `fgos-exploring/SKILL.md`), và **không có bước nào tự gọi
+`fgos-coding-exploring` ĐƠN LẺ (không qua cook): skill hand-off cho `fgos-routing`
+(dòng 138-147 `fgos-coding-exploring/SKILL.md`), và **không có bước nào tự gọi
 `discover`** — người phải tự tay gọi `/fgOS:discover <id>` sau đó (có thể ở
 session khác hẳn) — tương đương "chỉ ghi nhận, dừng lại" user mô tả cho môi
 trường planning-only.
 
 ⇒ Trả lời một phần Q1 (round 2 để mở): "môi trường" **hiện đã tồn tại dưới
-dạng ẨN — là SKILL nào đang chạy (`cook` vs standalone `fgos-exploring`)**,
+dạng ẨN — là SKILL nào đang chạy (`cook` vs standalone `fgos-coding-exploring`)**,
 không phải field cấu hình tường minh nào trên item/registry. Cook luôn move;
 standalone luôn dừng, chờ tay. Đây là bằng chứng thật cho hướng thiết kế
 (field tường minh hoá thứ đã tồn tại ngầm), không phải bịa từ đầu — nhưng
@@ -368,13 +368,13 @@ nguồn đầy đủ, đã gắn `docsRef` lên item).
 | ID | Quyết định | Vì sao |
 |---|---|---|
 | D1 | Approve record = field có cấu trúc trong `gates[id]` (không chỉ text trong decision log) | Tra nhanh, không phải parse text giòn; cùng khuôn `ask`/`answer`/`statusAtAsk` đã có |
-| D2 | Scope = làm trọn A+B+D trong 1 plan qua `fgos-planning`, không chỉ vá nhỏ round-1 | User chọn tường minh, ưu tiên nhìn trọn trước khi code |
+| D2 | Scope = làm trọn A+B+D trong 1 plan qua `fgos-coding-planning`, không chỉ vá nhỏ round-1 | User chọn tường minh, ưu tiên nhìn trọn trước khi code |
 | D3 | Đã approved → bỏ HẲN LLM judge; `verify` phải do exploring/planning tự đề xuất lúc approve | User chọn "bỏ hẳn LLM" thay vì "vẫn gọi LLM chỉ để lấy verify" |
 | D4 | Move-next = primitive dùng chung mới (verb/skill), KHÔNG sửa `workflow-stage-graphs.mjs` | Khớp finding round 3 (cook vs standalone lệch nhau); tránh rủi ro sửa registry dùng chung mọi domain |
 | D5 | Ceiling = TÊN STAGE tuyệt đối (`FGOS_MOVE_NEXT_CEILING=<stage>`, so rank qua `domain.stages` có sẵn), thay hẳn mô hình continue/stop nhị phân | Validate bằng `/fgOS:discover` (đã là ceiling="1 bước") vs `/fgOS:cook` (ceiling="hết mức") — cùng 1 tham số. Số bước tương đối bị loại: cook đã hardcode tên stage rồi (không domain-portable thật), và có cạnh nhảy thẳng clarify→executing khiến "số bước" không ổn định |
 | D6 | `move-next` chỉ áp đúng 1 transition/lần gọi — vòng lặp tới ceiling do session/skill đang chạy tự làm (cook's Drain-the-queue có sẵn) | Khớp `fgos-routing` D8 (verb chỉ áp transition, không routing) — tránh trùng logic |
 
-### Câu hỏi mở, giao lại `fgos-planning` (chi tiết đầy đủ trong CONTEXT.md §3)
+### Câu hỏi mở, giao lại `fgos-coding-planning` (chi tiết đầy đủ trong CONTEXT.md §3)
 
 - **Q-approve-field-shape:** field D1 là object hay 2 field rời
   (`contextApproved`/`planApproved`)? Có cần phân biệt actor (người vs
@@ -384,10 +384,10 @@ nguồn đầy đủ, đã gắn `docsRef` lên item).
   `resolveDiscovery`/`resolveDecompose` cho MỌI item `todo` ở đúng stage,
   KHÔNG qua gate approve nào — D3 (bỏ judge khi approved) chỉ áp dụng nhánh
   có field D1; sweep vẫn phải judge bình thường khi field vắng mặt.
-  `fgos-planning` cần xác nhận 2 nhánh không lẫn nhau.
+  `fgos-coding-planning` cần xác nhận 2 nhánh không lẫn nhau.
 - **Q-verb-call-sites:** 5 chỗ gọi cần sửa đồng bộ theo D4 — 4 stage-skill
-  (`fgos-exploring`/`planning`/`validating`/`executing`) + `/fgOS:cook` bước
-  2. `fgos-validating`/`fgos-code-implement` chưa được scout trong research này —
+  (`fgos-coding-exploring`/`planning`/`validating`/`executing`) + `/fgOS:cook` bước
+  2. `fgos-coding-validating`/`fgos-coding-implement` chưa được scout trong research này —
   cần đọc trước khi shape plan.
 
 ## Unresolved Questions (round 1-3, giữ nguyên để đối chiếu)
@@ -401,7 +401,7 @@ nguồn đầy đủ, đã gắn `docsRef` lên item).
    khác nhau, hay là config field mới? **Vẫn mở** — round 2 xác nhận claim-lock
    §3a/§3b/§3c (pick/release/re-pick) là trục "ai giữ session" gần nhất hiện
    có, nhưng nó KHÔNG mang nghĩa "môi trường quyết move" — không thể tái dùng
-   thẳng, chỉ là tham khảo gần nhất. Chưa đủ để `fgos-planning` thiết kế field
+   thẳng, chỉ là tham khảo gần nhất. Chưa đủ để `fgos-coding-planning` thiết kế field
    cụ thể.
 2. ~~Khi move-next "chỉ ghi nhận... đóng process" — "đóng process" nghĩa là
    gì với claim-lock §3b?~~ **Đã trả lời một phần (round 2):** §3b hiện chỉ
@@ -420,14 +420,14 @@ nguồn đầy đủ, đã gắn `docsRef` lên item).
    option "giữ cache" có thể tái dùng field NÀY thay vì thêm field mới, nếu
    `resolveDiscovery` được tách để đọc verdict mới nhất từ đó thay vì luôn
    gọi `judgeDiscovery` lại. Chưa xác minh `judgeDecompose` có kho tương đương
-   hay không — cần `fgos-planning` kiểm khi thiết kế.
+   hay không — cần `fgos-coding-planning` kiểm khi thiết kế.
 4. **Mới (round 2):** thêm field kiểu `transitions[].autoAdvance` vào
    `workflow-stage-graphs.mjs` là thay đổi SCHEMA của registry dùng chung cho
    MỌI domain (`coding`, `synthetic`, và domain tương lai) — cần xác nhận có
    phá vỡ `test/architecture.test.mjs`'s "one-way-down import" check hay giả
    định nào khác đang test riêng registry này hay không trước khi
-   `fgos-planning` chốt shape field.
-5. **Mới (round 3), câu hỏi thiết kế cụ thể cần `fgos-planning` chốt:** khi
+   `fgos-coding-planning` chốt shape field.
+5. **Mới (round 3), câu hỏi thiết kế cụ thể cần `fgos-coding-planning` chốt:** khi
    dạy `resolveDiscovery` bỏ qua `judgeDiscovery` nếu đã có approve ghi nhận
    (fix 3.2) — bỏ qua HOÀN TOÀN (chỉ `moveStage`, không gọi LLM, không có
    `verify` do model đề xuất — vậy `verify` lấy từ đâu, CONTEXT.md không có
@@ -437,11 +437,11 @@ nguồn đầy đủ, đã gắn `docsRef` lên item).
    đã approve — mâu thuẫn ngược lại)? Round 3 không đủ bằng chứng để chọn,
    cả hai đều có tiền lệ một phần (`gate-bypass.mjs` bỏ hẳn câu hỏi = hướng 1;
    `readLockedContext` đưa thêm ngữ cảnh vào prompt = hướng 2).
-6. **Mới (round 3):** `/fgOS:cook` và standalone `fgos-exploring` hiện lệch
+6. **Mới (round 3):** `/fgOS:cook` và standalone `fgos-coding-exploring` hiện lệch
    hành vi (move-next auto vs thủ công) mà KHÔNG có test nào khoá sự lệch đó
    lại — nếu về sau ai sửa `cook`'s bước 2 mà quên sửa hướng dẫn tương đương
    cho standalone (hay ngược lại), hai "môi trường" trôi xa nhau âm thầm.
-   Cần `fgos-planning` cân nhắc: có nên rút hành vi "gọi discover sau approve"
+   Cần `fgos-coding-planning` cân nhắc: có nên rút hành vi "gọi discover sau approve"
    RA KHỎI riêng `cook`, đưa vào một field/verb chung mà cả hai đường đều gọi
    — đúng tinh thần "move-next là 1 feature cơ học dùng chung" user đề xuất,
    thay vì mỗi skill tự cài logic riêng.
@@ -461,10 +461,10 @@ nguồn đầy đủ, đã gắn `docsRef` lên item).
 
 - `bin/fgos.mjs:871-884` (`case 'discover'`)
 - `src/intake/discovery.mjs:231-271` (`resolveDiscovery`)
-- `src/intake/decompose.mjs:279+` (`resolveDecompose`)
+- `src/intake/plan.mjs:279+` (`resolveDecompose`)
 - `src/state/gate-bypass.mjs` (`canAutoApprove`, `readGateBypassLevel`)
-- `.claude/skills/fgos-exploring/SKILL.md:138-184` (Hand off + Gate)
-- `.claude/skills/fgos-planning/SKILL.md:122-165` (Gate)
+- `.claude/skills/fgos-coding-exploring/SKILL.md:138-184` (Hand off + Gate)
+- `.claude/skills/fgos-coding-planning/SKILL.md:122-165` (Gate)
 - `.claude/skills/fgos-routing/SKILL.md:128-138` (D8 precedence)
 - `docs/history/gate-dialogue-continuity/CONTEXT.md` (bề mặt `awaiting-human`
   gate khác — KHÔNG cùng bề mặt với tsk-19j, tránh nhầm khi đọc lại)
@@ -474,7 +474,7 @@ nguồn đầy đủ, đã gắn `docsRef` lên item).
   tĩnh, không có field môi trường, round 2)
 - `src/intake/discovery.mjs:1-30,77-151` (import list + `buildDiscoveryPrompt`
   — KHÔNG đọc CONTEXT.md, round 3, finding chính)
-- `src/intake/decompose.mjs:36-38,80-88,330-331` (`readLockedContext`,
+- `src/intake/plan.mjs:36-38,80-88,330-331` (`readLockedContext`,
   `buildDecomposePrompt`, call site — tiền lệ đối chứng, round 3)
 - `plugins/fgOS/skills/cook/SKILL.md:57-105` (bước 2 — nơi duy nhất chủ động
   gọi `fgos discover` sau Gate approve, round 3)

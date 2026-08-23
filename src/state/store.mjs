@@ -27,20 +27,21 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { readEvents, withEventsLock, appendEventLocked } from './events.mjs';
-import { rebuildView, viewRevision } from './replay.mjs';
+import { execFileSync } from 'node:child_process';
+import { readEvents, parseEventLines, withEventsLock, appendEventLocked, readLastLineBefore } from './events.mjs';
+import { rebuildView, viewRevision, serializeView } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
-import { getDomain, statusCategoryFor, parkReasonForStatus } from './workflow-stage-graphs.mjs';
+import { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor, effectiveStage } from './workflow-stage-graphs.mjs';
+import { evaluateHandoff } from './handoff.mjs';
 import { EventLogError } from './events.mjs';
-import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
 import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
-import { resolveWriterIdentity } from '../runner/session-identity.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
 
-export { FsmError, WorkValidationError, EventLogError, ToolRegistryError };
+export { FsmError, WorkValidationError, EventLogError };
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class StoreError extends Error {
@@ -89,7 +90,7 @@ function paths(dir) {
   return { logPath: path.join(dir, 'events.jsonl'), viewPath: path.join(dir, 'state.json') };
 }
 
-function writeView(viewPath, view) {
+function writeView(viewPath, view, snapshot) {
   fs.mkdirSync(path.dirname(viewPath), { recursive: true });
   // work-graph-intelligence S3: stamp a deterministic revision-hash onto the
   // ON-DISK derived view only. `view` (what refreshView returns to store
@@ -97,13 +98,22 @@ function writeView(viewPath, view) {
   // a sibling field written to state.json, never folded back into the view a
   // rebuild returns. Determinism (same log -> same revision) keeps the
   // rebuild-determinism e2e's before/after deep-equal green.
-  const persisted = { ...view, revision: viewRevision(view) };
+  // tsk-49e: `snapshot` ({size, mtimeMs, lastLine} of events.jsonl as of
+  // this write) is the same kind of additive sibling field — read back only
+  // by replay.mjs's own incremental-rebuild fast path, never folded into the
+  // view a rebuild returns.
+  // tsk-37d: reuse the once-serialized view string to derive the revision hash
+  // and construct the persisted JSON without a second JSON.stringify pass over
+  // view.
+  const { viewStr, revision } = serializeView(view);
+  const snapshotPart = snapshot !== undefined ? `,"snapshot":${JSON.stringify(snapshot)}` : '';
+  const persistedContent = `${viewStr.slice(0, -1)},"revision":${JSON.stringify(revision)}${snapshotPart}}\n`;
   // tsk-4mx: write to a uniquely-named temp file, then rename(2) it onto
   // viewPath -- an atomic replace on POSIX, so a reader can never observe a
   // truncated/partial state.json, same pattern as main-checkout-lock.mjs's
   // own writeAtomicReplace.
   const tmpPath = `${viewPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  fs.writeFileSync(tmpPath, `${JSON.stringify(persisted, null, 2)}\n`, 'utf8');
+  fs.writeFileSync(tmpPath, persistedContent, 'utf8');
   fs.renameSync(tmpPath, viewPath);
 }
 
@@ -112,8 +122,15 @@ function writeView(viewPath, view) {
 // caused the change has already been appended — never before.
 function refreshView(dir) {
   const { logPath, viewPath } = paths(dir);
-  const view = rebuildView(logPath);
-  writeView(viewPath, view);
+  const view = rebuildView(logPath); // may itself take replay.mjs's own snapshot fast path -- still correct either way
+  // tsk-49e: captures the exact {size, mtimeMs} events.jsonl has RIGHT NOW,
+  // plus the raw text of its own last line -- safe to stat/read here
+  // uncontended: refreshView always runs inside withEventsLockAndRefresh's
+  // held lock (tsk-1q5), so no concurrent append can land between
+  // rebuildView's own read above and this stat/tail-read.
+  const stat = fs.statSync(logPath);
+  const lastLine = readLastLineBefore(logPath, stat.size);
+  writeView(viewPath, view, { size: stat.size, mtimeMs: stat.mtimeMs, lastLine });
   return view;
 }
 
@@ -260,7 +277,7 @@ export function addWork(dir, work) {
 // write path (identity is immutable; `status` is `move`'s; `stage` is
 // `moveStage`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier']);
+const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'action', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door
@@ -298,6 +315,27 @@ export function editWork(dir, { id, patch, role } = {}) {
           `edit cannot change "${key}" — allowed fields are: ${[...EDITABLE_FIELDS].join(', ')}.`,
         );
       }
+    }
+    // tsk-2t9c D16: `kind` selects which workflow's stage graph an item
+    // follows (`resolveWorkflow`, `src/state/workflow-stage-graphs.mjs`).
+    // `status: 'todo'` is the ONLY status a claimed item's `stage` is still
+    // free to move through discovery/exploring/planning under -- claim
+    // (`todo` -> `doing`) happens right before the FIRST invocation of the
+    // `executing`-stage skill, never earlier (fgos-coding-driving's own
+    // hard rule), so every stage-graph-consuming call an item makes while
+    // still `todo` already reflects `kind`'s CURRENT value at read time.
+    // Refusing this edit once `status` has left `todo` means `kind` can
+    // never drift out from under a stage graph the item is actively
+    // walking -- no separate frozen `workflow` field needed, no second
+    // write door, no validated-change verb to get subtly wrong: `kind`
+    // itself simply stops being a live variable once it would matter.
+    if (patch.kind !== undefined && work.status !== 'todo') {
+      throw new StoreError(
+        'validation',
+        `edit cannot change "kind" on work "${id}" -- status is "${work.status}", not "todo". `
+        + `kind selects the item's workflow/stage graph; it can only change while status is still todo, `
+        + `before a claim lets the item start walking that graph.`,
+      );
     }
 
     // Per work-item-title-contract D2/D5, the same title bound addWork applies,
@@ -367,6 +405,40 @@ export function editWork(dir, { id, patch, role } = {}) {
     // this path.
     payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(logPath, { type: 'work.edit', payload });
+  });
+}
+
+/**
+ * Clear/annotate a stale reason/parkReason on a done or wontfix work item.
+ * Appends a 'work.resolve-park-reason' event carrying { id, note, role, writer }.
+ */
+export function resolveParkReason(dir, { id, note, role } = {}) {
+  const { logPath } = paths(dir);
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    const before = rebuildView(logPath);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
+    }
+    if (!note || typeof note !== 'string' || note.trim() === '') {
+      throw new StoreError('validation', 'resolve-park-reason requires a non-empty --note.');
+    }
+    if (work.status !== 'done' && work.status !== 'wontfix') {
+      throw new StoreError(
+        'validation',
+        `resolve-park-reason can only clear reason/parkReason on terminal items (status "done" or "wontfix"); work "${id}" has status "${work.status}".`,
+      );
+    }
+    if (role !== undefined && role !== 'human' && role !== 'session') {
+      throw new StoreError('validation', `resolve-park-reason role must be "human" or "session" (got "${role}").`);
+    }
+
+    const payload = { id, note: note.trim() };
+    if (role !== undefined) {
+      payload.role = role;
+    }
+    payload.writer = resolveWriterIdentity(dir);
+    return appendEventLocked(logPath, { type: 'work.resolve-park-reason', payload });
   });
 }
 
@@ -461,6 +533,54 @@ export function assertAcceptanceEvidence(id, work) {
 }
 
 /**
+ * tsk-2p6: a risk:heavy item reaching `delivered` with no `plan.md` in its
+ * own docs history means its risk map was never written down for evidence
+ * to be checked against (found live: tsk-4ax/tsk-55p, docs/history/<id>/
+ * carrying only iron-law-evidence.md). Same shape as
+ * `assertAcceptanceEvidence` (RUL58) immediately above — a small assert
+ * called from both `moveWork`'s `to === 'delivered'` backstop and
+ * `approve`'s pre-flight call sites (`bin/fgos.mjs`) — but NOT pure: it
+ * checks the item's own `fgw/<id>` branch via `git cat-file -e`, never a
+ * plain `fs.existsSync` on the caller's current working tree, so the same
+ * function is correct both before a merge (pre-flight, branch not yet in
+ * `repoRoot`'s checkout) and after (backstop, already merged).
+ *
+ * `risk === 'heavy'` only, not a live re-derivation of "touches an
+ * Iron-Law-gated module" — that classification is the separate, existing
+ * Iron Law gate's own job; `heavy` is this codebase's own established
+ * mechanical proxy for "this needed a written risk map" (same trigger
+ * `fgos-coding-validating`'s own heavy-risk human-confirmation gate uses).
+ *
+ * Deliberately never re-evaluates an item that reached `delivered` before
+ * this gate existed (tsk-4ax/tsk-55p stay untouched) — this only fires at
+ * the moment of a NEW transition into `delivered`, never as a standing
+ * scan over history a retroactive plan.md could never honestly satisfy.
+ */
+export function assertPlanEvidence(id, work, repoRoot) {
+  if (work.risk !== 'heavy') return;
+  const branch = `fgw/${id}`;
+  const candidates = [];
+  if (typeof work.docsRef === 'string' && work.docsRef.trim()) {
+    candidates.push(path.posix.join(work.docsRef.replace(/\/+$/, ''), 'plan.md'));
+  }
+  candidates.push(`docs/history/${id}/plan.md`);
+  const hasPlan = candidates.some((candidate) => {
+    try {
+      execFileSync('git', ['cat-file', '-e', `${branch}:${candidate}`], { cwd: repoRoot, stdio: 'ignore' });
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  if (!hasPlan) {
+    throw new StoreError(
+      'precondition',
+      `work "${id}" cannot move to "delivered" — risk:heavy but no plan.md found on branch "${branch}" (checked ${candidates.join(', ')}); write one before landing.`,
+    );
+  }
+}
+
+/**
  * Move a work item to a new status. Looks the item up fresh from the log,
  * delegates the precondition/CAS decision to status-fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
@@ -473,9 +593,9 @@ export function assertAcceptanceEvidence(id, work) {
  * first's event already in the log, so its own `expectedStatus` compare
  * correctly conflicts.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askRationale, askAlternatives, askSource } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askRationale, askAlternatives, askSource, mergedSha, mergedInto } = {}) {
   const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  const result = withEventsLockAndRefresh(dir, logPath, () => {
   const before = rebuildView(logPath);
   const work = before.work[id];
   if (!work) {
@@ -561,6 +681,18 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   if (branchHeadAtReturn !== undefined) {
     rawEvent.payload.branchHeadAtReturn = branchHeadAtReturn;
+  }
+  // Merge-evidence provenance (tsk-5dk): the same additive, fsm-ignored
+  // post-transition stamp pattern as branchHeadAtTake/branchHeadAtReturn
+  // above, carried only by `approve`'s real merge/GitHub-merge call sites
+  // on the SAME `to === 'delivered'` move — a hand-typed `fgos move --to
+  // delivered` or a verify-only pull-door delivery never supplies these,
+  // so their absence from an event is itself evidence, not a gap.
+  if (mergedSha !== undefined) {
+    rawEvent.payload.mergedSha = mergedSha;
+  }
+  if (mergedInto !== undefined) {
+    rawEvent.payload.mergedInto = mergedInto;
   }
   // Claim-trigger marker (claim-lock §7, additive, NOT `claimRole`): who/what
   // dispatched this claim (e.g. `'herdr'`) — audit-only, never a safety
@@ -661,6 +793,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // that don't go through that pre-flight.
   if (to === 'delivered') {
     assertAcceptanceEvidence(id, work);
+    assertPlanEvidence(id, work, path.dirname(dir));
   }
 
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
@@ -692,6 +825,72 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   return appendEventLocked(logPath, rawEvent); // captures the real seq; rawEvent itself has none
   });
+  // tsk-2t9c D16: `delivered` is a terminal state for the role/holder axis
+  // -- no stage skill ever re-enters an item past this point (every wired
+  // reclaim lives at a stage-skill's own entry point), so an async call
+  // left open on it (most commonly D14's own `review` handoff on the
+  // approve path: nothing calls `handoff-return` between `awaiting-
+  // approval` and `delivered`) would sit "open" forever. A read-time
+  // consumer of `callThreads` (compound-learn, retrospective) would then
+  // misread every delivered item as carrying unresolved work rather than
+  // settled history. Close every still-open frame the exact same way a
+  // live reclaim would -- one `recordCallReturn` per frame, deepest first
+  // (the LIFO order `openCallStack` already enforces) -- never inventing a
+  // second closing mechanism. Runs AFTER the lock above releases (this
+  // function is fully synchronous, so there is no nesting risk), and only
+  // when the domain actually declares a `roleGraph` -- a domain with none
+  // never opens a call in the first place, so there is nothing to close.
+  if (result.event.payload.to === 'delivered') {
+    try {
+      const domain = getDomain(result.view.work[id]?.domain);
+      if (roleGraphFor(domain)) {
+        let stack = openCallStack(result.view.callThreads?.[id]);
+        while (stack.length > 0) {
+          const closeResult = recordCallReturn(dir, { id, note: 'auto-closed at delivered (tsk-2t9c D16)' });
+          stack = openCallStack(closeResult.view.callThreads?.[id]);
+        }
+      }
+    } catch {
+      // Best-effort, same fail-safe discipline as the `learning` compose
+      // above: the item already reached `delivered` -- that transition is
+      // what matters and must never be undone or reported as failed over a
+      // cleanup step that is not itself correctness-critical.
+    }
+  }
+  // tsk-2t9c D18: found via a real end-to-end run (a fresh agent following
+  // fgos-coding-implement's own Return-step prose, verbatim, top to
+  // bottom, on a real item) that never fired `handoff --to reviewer
+  // --reason review` even though the item genuinely reached `awaiting-
+  // approval` -- the instruction is imperative and unmissable in
+  // isolation, but sits trailing after several paragraphs of blocked/
+  // catchup caveats, is duplicated once per door into this status
+  // (`return`, `catchup`, and any future one), and nothing gates on it:
+  // skipping it produces no error, no red test, no symptom the skipping
+  // agent would ever notice. Same class of gap D16 already fixed for
+  // `delivered` (a skill-remembered side effect vs. an engine-guaranteed
+  // one) -- and the same fix: every door into `awaiting-approval`
+  // converges on this one `moveWork` call, so firing the review handoff
+  // HERE covers `return`/`catchup`/anything else at once, where the
+  // prose needed a copy per door and still wasn't reliably read. This
+  // does not change what the prose already prescribes -- it relocates
+  // who is responsible for making it actually happen. `recordCall` runs
+  // its own `evaluateHandoff` guard internally (fromRole read off the
+  // item's live `holder`, defaulting to the role graph's `defaultRole`),
+  // so a domain/stage/holder combination where this edge is not legal
+  // (or that already carries a role other than the review edge's `from`)
+  // simply refuses, caught and ignored below -- same "must never block
+  // the transition" fail-safe as every sibling block in this function.
+  if (result.event.payload.to === 'awaiting-approval') {
+    try {
+      const domain = getDomain(result.view.work[id]?.domain);
+      if (roleGraphFor(domain)) {
+        recordCall(dir, { id, toRole: 'reviewer', reason: 'review', note: 'auto-fired on reaching awaiting-approval (tsk-2t9c D18)' });
+      }
+    } catch {
+      // Best-effort -- see the block's own comment above.
+    }
+  }
+  return result;
 }
 
 /**
@@ -774,6 +973,138 @@ export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
 }
 
 /**
+ * Rebuild the stack of currently-open async calls on `id`'s own
+ * call-thread, purely from the log (tsk-2t9c D8/R7 — never a stored
+ * counter, which can drift; a fold cannot). A plain `handoff` (`returning`
+ * falsy) PUSHES itself as newly open; a `handoff` written by
+ * `recordCallReturn` (`returning: true`) POPS the most recently opened
+ * one — a genuine LIFO stack, not a flag compared against the current
+ * holder, which cannot tell an open call from the very return event that
+ * just closed it (both can carry the same `to`). `call-summary` entries
+ * never touch the stack — sync calls do not nest against the async
+ * callstack cap (handoff.mjs's own contract).
+ */
+function openCallStack(callThreadEntries) {
+  if (!Array.isArray(callThreadEntries)) return [];
+  const stack = [];
+  for (const entry of callThreadEntries) {
+    if (entry.kind !== 'handoff') continue;
+    if (entry.returning) {
+      stack.pop();
+    } else {
+      stack.push(entry);
+    }
+  }
+  return stack;
+}
+
+/**
+ * The single door for a role/holder call (tsk-2t9c D1/D4/D5/D8/D9): guards
+ * the proposed call through handoff.mjs's pure `evaluateHandoff`, then
+ * appends exactly the event kind the matched edge's own `mode` calls for —
+ * never a caller choice. `mode: 'async'` writes `work.handoff` (holder
+ * changes, full checkpoint); `mode: 'sync'` writes `work.call-summary`
+ * (holder untouched, compact record) — same fresh-lookup -> guard ->
+ * append shape every other mutation in this file already uses, one held
+ * lock, one critical section.
+ *
+ * A REFUSED call throws `StoreError('validation', ...)` carrying the
+ * refusal reason AND the legal edges as JSON — "chặn và dạy tại chỗ"
+ * (D1): the caller can read the legal edges straight out of the error
+ * message without a second round trip.
+ *
+ * `openSyncDepth` (D28, wired review finding H2/tsk-397): unlike
+ * `openCallDepth`, this is NEVER derived from `callThreads` here — a
+ * `work.call-summary` event commits atomically at the exact instant this
+ * function's own door opens (see the `appendEventLocked` call below), so
+ * by the time a genuinely NESTED sync call (the callee's own work needing
+ * a further sync consult before it finishes) would call `recordCall`
+ * again, the outer call's event is already fully committed to the log —
+ * indistinguishable, from replay alone, from two purely sequential sync
+ * calls. Only the CALLER (a skill already inside its own sync-consult
+ * work, about to make a further nested one) knows its real current
+ * depth; it must track and pass that depth itself. Every existing
+ * caller passes none, defaulting to `0` — identical behavior to before
+ * this parameter existed — this only makes the cap genuinely reachable
+ * for a future caller that does track its own nesting, instead of being
+ * permanently unreachable dead code.
+ */
+export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDepth = 0 } = {}) {
+  const { logPath } = paths(dir);
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    const before = rebuildView(logPath);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
+    }
+    const domain = getDomain(work.domain);
+    const roleGraph = roleGraphFor(domain);
+    const fromRole = work.holder ?? roleGraph?.defaultRole;
+    // effectiveStage, not raw work.stage (tsk-2t9c bugfix, found in
+    // self-review): a work item's `stage` is legitimately absent under
+    // D8's lazy-default rule (workflow-stage-graphs.mjs's own
+    // effectiveStage/stage-fsm.mjs precedent) -- reading work.stage
+    // directly here made every handoff attempt on an item that never had
+    // an explicit moveStage refuse with "stage: undefined", including
+    // split children born straight at 'executing' without ever calling
+    // moveStage (src/intake/plan.mjs's normalizeChild path).
+    const stage = effectiveStage(work, domain);
+    const openCallDepth = openCallStack(before.callThreads?.[id]).length;
+
+    const result = evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth, openSyncDepth });
+    if (!result.ok) {
+      throw new StoreError(
+        'validation',
+        `handoff refused: ${result.refusal} -- legal edges: ${JSON.stringify(result.legalEdges)}`,
+      );
+    }
+
+    const rawEvent = result.edge.mode === 'async'
+      ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }
+      : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };
+    rawEvent.payload.writer = resolveWriterIdentity(dir);
+    return appendEventLocked(logPath, rawEvent);
+  });
+}
+
+/**
+ * Close the most recently opened async call on `id`'s own call-thread,
+ * returning the ball to whoever opened it (tsk-2t9c D4: "call = round-trip,
+ * ball returns to sender" -- a return is completing a call the guard
+ * ALREADY approved when it was opened, never a fresh outbound call, so it
+ * deliberately does NOT run back through `evaluateHandoff`/`roleGraph`
+ * edge-legality. Requiring a matching reverse edge for every return would
+ * double the roleGraph's own size for no real legality question -- the
+ * open call already answered "was this allowed".
+ *
+ * Refuses only when there is genuinely no open call to close (nothing in
+ * `callThreads[id]` is a `handoff` the item's current `holder` could be
+ * returning from) -- same StoreError('validation', ...) shape as every
+ * other refusal in this file.
+ */
+export function recordCallReturn(dir, { id, note } = {}) {
+  const { logPath } = paths(dir);
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    const before = rebuildView(logPath);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
+    }
+    const stack = openCallStack(before.callThreads?.[id]);
+    const openCall = stack.at(-1);
+    if (!openCall || openCall.to !== work.holder) {
+      throw new StoreError('validation', `work "${id}" has no open call for its current holder to return from.`);
+    }
+    const rawEvent = {
+      type: 'work.handoff',
+      payload: { id, from: work.holder, to: openCall.from, reason: openCall.reason, mode: 'async', returning: true, note },
+    };
+    rawEvent.payload.writer = resolveWriterIdentity(dir);
+    return appendEventLocked(logPath, rawEvent);
+  });
+}
+
+/**
  * Log a context-discovery verdict event (per stage-clarify D3/D6). Mirrors
  * `addFriction` exactly: no FSM/work validation beyond requiring the `id`
  * the fold appends by; each verdict is its own occurrence (pass or not) —
@@ -840,9 +1171,20 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
  * `kind` (tsk-1ud D7 step 1): `'engine' | 'design'`, optional free text (no
  * enum, same posture as `source`), defaulting to `'design'` when omitted —
  * lets a consumer separate the engine's own bookkeeping records
- * (`resolveDiscovery`/`resolveDecompose`, which pass `kind: 'engine'`
+ * (`resolveDiscovery`/`resolvePlan`, which pass `kind: 'engine'`
  * explicitly) from real design decisions without matching on `text`
  * prefixes.
+ *
+ * `scope` (tsk-1lv-2 D4): optional free text (no enum, same posture as
+ * `source`/`kind`) — an area slug (e.g. `'repo'`, or one matching
+ * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as
+ * opposed to `id`'s per-item scoping. Absent entirely for an item-scoped
+ * or unscoped decision; `src/report/decision-index.mjs`'s
+ * `buildDecisionIndexMarkdown` is the one reader that filters on its
+ * presence to build `docs/decisions/index.md`. This function never
+ * validates or defaults it — same "CLI validates, store persists"
+ * split `relation` already established (see the CLI-layer comment above
+ * `parseDecisionRelation` below).
  */
 export function addDecision(dir, payload) {
   const { logPath } = paths(dir);
@@ -853,7 +1195,80 @@ export function addDecision(dir, payload) {
     throw new StoreError('validation', 'decision requires a non-empty "rationale".');
   }
   const eventPayload = { ...payload, source: payload.source ?? 'session', kind: payload.kind ?? 'design' };
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'decision', payload: eventPayload }));
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    // tsk-37t: unlike every neighbouring id-taking verb (editWork/moveWork
+    // both throw `work "<id>" not found` first), this used to accept any
+    // id at all — a decision scoped to a nonexistent item wrote a success
+    // envelope and a durable event that `fgos show <id>` could never
+    // retrieve (it refuses an unknown id), silently losing the record.
+    // `id` stays optional here (a global decision not scoped to one item is
+    // legitimate, e.g. `fgos decision` with no --id) — only validated when
+    // present.
+    if (payload.id !== undefined && payload.id !== null) {
+      const before = rebuildView(logPath);
+      if (!before.work[payload.id]) {
+        throw new StoreError('validation', `work "${payload.id}" not found.`);
+      }
+    }
+    return appendEventLocked(logPath, { type: 'decision', payload: eventPayload });
+  });
+}
+
+// tsk-1lv-1 (D2/D8): `--relation` is a CLI-surface requirement, not an
+// `addDecision` one — enforcing it inside `addDecision` itself would also
+// require every internal engine bookkeeping call (`resolveDiscovery`/
+// `resolvePlan`, `kind: 'engine'`) and every existing test fixture calling
+// `addDecision` directly to start passing it, which CONTEXT.md D4 pins as
+// explicitly unchanged ("bookkeeping máy → kind:engine, đã có, không
+// đổi"). `bin/fgos.mjs`'s `decision` case is the one CLI surface D1/D2
+// actually target ("mọi write khai quan hệ tường minh" is about the
+// human/skill-facing verb, not every programmatic writer of this event
+// type) — it calls `parseDecisionRelation`/`decisionTextLooksLikeSupersession`
+// below before calling `addDecision`, and `addDecision` itself stores
+// whatever `relation` string it is handed (or none) as a plain optional
+// payload field, same posture as `source`/`alternatives` above.
+
+const SUPERSESSION_PROSE_PATTERN = /\b(supersedes?|superseded|replaces?|overrides?|no longer applies|instead of the previous)\b/i;
+
+/**
+ * Pure: does `text` read like a supersession statement (STR72's own root
+ * cause — bee v2.7.0 audited 70 decide events that narrated a supersession
+ * in prose without declaring the relation flag, vs only 29 that declared it
+ * correctly)? Used to refuse a `fgos decision` write that narrates a
+ * supersession without `--relation supersedes:<id>`.
+ */
+export function decisionTextLooksLikeSupersession(text) {
+  return typeof text === 'string' && SUPERSESSION_PROSE_PATTERN.test(text);
+}
+
+/**
+ * Pure: parse `fgos decision`'s `--relation` value into a structured
+ * relation (D2: "supersedes:<id>|touches:<id>|none", every write declares
+ * one explicitly — no default, no inference). Throws `StoreError('validation', …)`
+ * on anything else, the same error shape every other CLI-facing parse in
+ * this module uses.
+ */
+export function parseDecisionRelation(raw) {
+  if (typeof raw !== 'string' || !raw.trim()) {
+    throw new StoreError(
+      'validation',
+      'decision requires --relation none|supersedes:<id>|touches:<id>.',
+    );
+  }
+  const trimmed = raw.trim();
+  if (trimmed === 'none') return { kind: 'none' };
+  const supersedesMatch = /^supersedes:(.+)$/.exec(trimmed);
+  if (supersedesMatch && supersedesMatch[1].trim()) {
+    return { kind: 'supersedes', id: supersedesMatch[1].trim() };
+  }
+  const touchesMatch = /^touches:(.+)$/.exec(trimmed);
+  if (touchesMatch && touchesMatch[1].trim()) {
+    return { kind: 'touches', id: touchesMatch[1].trim() };
+  }
+  throw new StoreError(
+    'validation',
+    `decision --relation "${raw}" is not one of none|supersedes:<id>|touches:<id>.`,
+  );
 }
 
 // Diataxis doc-type axis (per CONTEXT D5/D6): an OPTIONAL, additive tag on
@@ -922,43 +1337,6 @@ export function addFriction(dir, payload) {
   }
   assertValidDocType(payload);
   return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'work.friction', payload }));
-}
-
-/**
- * Register a new tool against the shared registry (tsk-1dj, tool-registry-
- * capability port). Same existence-check-before-append discipline as
- * `addWork`: `existingNames` is read fresh from the log inside the held
- * lock, so two processes racing a `--name` never both succeed. Validation
- * (kind enum, capability normalization, scan-target-required-for-mcp/skill)
- * is `tool-registry.mjs`'s own pure concern — this door only decides where
- * the event lands, mirroring how `addWork` defers shape validation to
- * `work.mjs`.
- */
-export function registerTool(dir, fields) {
-  const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
-    const existingNames = Object.keys(before.tools ?? {});
-    const record = validateToolRegistration(fields, existingNames); // ToolRegistryError: validation
-    return appendEventLocked(logPath, { type: 'tool.register', payload: record });
-  });
-}
-
-/**
- * Remove a registered tool. Looks the record up fresh from the log inside
- * the held lock (same shape as `registerTool` above) — removing a name that
- * was never registered, or already removed, is refused as `validation`
- * rather than silently no-op'd.
- */
-export function removeTool(dir, { name } = {}) {
-  const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
-    if (!before.tools?.[name]) {
-      throw new StoreError('validation', `tool "${name}" not found.`);
-    }
-    return appendEventLocked(logPath, { type: 'tool.remove', payload: { name } });
-  });
 }
 
 /** Read-only: the current view, rebuilt fresh from the log (never off a stale file). */
@@ -1118,10 +1496,10 @@ export function footprintConflicts(dir) {
  * Same read-facade shape as `footprintConflicts`; the Domain core
  * (`graph-metrics.mjs`) computes both, this just rebuilds the view.
  */
-export function computedSchedule(dir) {
+export function computedSchedule(dir, candidateIds) {
   const { logPath } = paths(dir);
   const view = rebuildView(logPath);
-  return { ...computeSchedule(view), cycles: detectCycles(view) };
+  return { ...computeSchedule(view, candidateIds), cycles: detectCycles(view) };
 }
 
 /**
@@ -1136,6 +1514,18 @@ export function computedSchedule(dir) {
 export function readRawEvents(dir) {
   const { logPath } = paths(dir);
   return readEvents(logPath);
+}
+
+export function readRawEventsAndText(dir) {
+  const { logPath } = paths(dir);
+  let text = '';
+  try {
+    text = fs.readFileSync(logPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return { events: [], text: '' };
+    throw err;
+  }
+  return { events: parseEventLines(text, logPath), text };
 }
 
 /**

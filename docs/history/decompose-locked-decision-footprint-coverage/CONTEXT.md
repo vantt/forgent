@@ -47,7 +47,7 @@ này không đụng lại cơ chế đó, chỉ dùng nó làm input cho check m
 - `docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md` — bằng chứng sống `tsk-2ta` (D1 amended dời `.fgos-runner.json`→`.fgos/config.json`, 4 con không đứa nào chạm, quyết định chưa bao giờ làm dù cả 4 con `done`).
 - `docs/explanation/why-decompose-checks-footprint-overlap-before-creating-children.md` — gate sibling đã có: `footprintOverlapAmong` kiểm collision GIỮA các con dự kiến, TRƯỚC khi tạo, chặn thật (`need-human`) khi có chồng lấn — mẫu hình cho vị trí chạy (decompose-time, trước khi con được tạo) nhưng KHÁC mức nghiêm (D1: advisory, không chặn).
 - `docs/backlog.md` `[p-f86134a0]` — "fgOS split-children creation has no footprint carry-through... — done": cơ chế field footprint cho parent-linked children ĐÃ closed, không phải gap của item này.
-- `src/intake/decompose.mjs` — nơi `verdict.children` được xử lý, chỗ tự nhiên để chèn check completeness cạnh check collision đã có.
+- `src/intake/plan.mjs` — nơi `verdict.children` được xử lý, chỗ tự nhiên để chèn check completeness cạnh check collision đã có.
 - Impact-analysis capability: `present` (GitNexus), Full mode.
 
 ## Canonical references

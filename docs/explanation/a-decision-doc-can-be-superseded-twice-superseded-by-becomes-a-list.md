@@ -14,7 +14,7 @@ field in its frontmatter (precedent: `0023` got `superseded_by: 0025`;
 already been superseded once — it carried `superseded_by: 0028` (the
 orchestrator→launcher rename). Then a second, unrelated set of
 corrections to 0026 (three vocabulary fixes: dropping `rootTask`/`subTask`
-from the dispatch vocabulary, redefining `capacity`, and splitting T1 into
+from the dispatch vocabulary, redefining `executor`, and splitting T1 into
 `launcher`/`driver`) needed to supersede 0026 *again*, in a new doc
 (`0029`).
 
@@ -47,7 +47,7 @@ Per `AGENTS.md`'s "Changing a locked law" rule and `0028`'s own line 73
 editing it in place"), `0026`'s own content was never touched — only its
 frontmatter's `superseded_by` field changed, from a scalar to a list. All
 three actual corrections (dropping `rootTask`/`subTask`, redefining
-`capacity`, splitting T1) live entirely in the new `0029` document, which
+`executor`, splitting T1) live entirely in the new `0029` document, which
 declares `supersedes: [0026]` and cites exactly which of 0026's original
 claims each correction replaces.
 

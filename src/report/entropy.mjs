@@ -13,6 +13,7 @@
 // resolves a data dir and never writes.
 
 import { isResolvedStatus } from '../state/frontier.mjs';
+import { getDomain } from '../state/workflow-stage-graphs.mjs';
 
 // FINAL_STATUSES: statuses at which a goal-check attempt has already run (or
 // been bypassed by a mechanical reconcile — bin/fgos.mjs's sync-root/catchup
@@ -53,12 +54,12 @@ export const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'delivere
 // chosen per this cell's action). Heavier weight for the two signals that
 // mean the predicted->actual loop itself went silent (a final-status item
 // with no actual half, or work sitting in `doing` with nothing to show for
-// it) than for signals that are merely "still waiting" (awaiting-human,
-// stage clarify, an unsettled friction).
+// it) than for signals that are merely "still waiting" (awaiting-human, an
+// item still parked at its domain's entry stage, an unsettled friction).
 export const WEIGHTS = Object.freeze({
   missingActual: 5,
   staleDoing: 5,
-  stageClarify: 3,
+  stageEntry: 3,
   frictionUnsettled: 2,
   awaitingHuman: 2,
 });
@@ -115,17 +116,43 @@ function countAwaitingHuman(view) {
   return Object.values(view.work ?? {}).filter((w) => w.status === 'awaiting-human').length;
 }
 
+// Work still parked at the very front of its lifecycle: an unresolved item
+// sitting at its own domain's ENTRY stage, i.e. `stages[0]` — the same
+// "domain's own entry point" `src/runner/loop.mjs` falls back to when it
+// creates a runner-discovered item. This used to compare against the
+// literal stage name `clarify`, which the coding domain retired entirely
+// (gone from `stages`, `stepMap` and `skillMap`, per tsk-qod D1/D2 in
+// workflow-stage-graphs.mjs). After that retirement the literal matched
+// nothing that could still move, so the signal silently reported 0 while
+// every open item genuinely waiting at coding's real entry stage
+// (`discovery`) went uncounted — precisely the "not yet quality-checked"
+// backlog this signal exists to measure. It never threw, so nothing caught
+// it. Resolving `stages[0]` per item's OWN domain (never a second hardcoded
+// literal) also keeps the count honest for a domain that names its entry
+// stage differently — `triage` still legitimately calls its entry stage
+// `triage`, and `fixture-marketing` still calls its own `clarify`.
+//
+// Compares `w.stage` literally rather than through `effectiveStage`: an
+// item that never had a stage written lazily defaults to the Execute-mapped
+// stage (D8), i.e. explicitly NOT the entry stage — so it is not waiting
+// here, exactly as under the previous literal comparison.
+//
 // wontfix-terminal-status-filter-consistency D3: `stage` is never reset by
 // any status transition (replay.mjs's `work.move` only ever writes
 // `item.status`; only a dedicated move-stage event touches `item.stage`) —
-// so an item closed `done`/`wontfix` while still carrying stage `clarify`
+// so an item closed `done`/`wontfix` while still carrying the entry stage
 // from before it was ever explored would otherwise inflate this signal
 // forever. A RESOLVED item is no longer "waiting" at any stage; its stage
 // field is a historical artifact, not a live entropy signal.
-function countStageClarify(view) {
-  return Object.values(view.work ?? {}).filter(
-    (w) => w.stage === 'clarify' && !isResolvedStatus(w),
-  ).length;
+function countStageEntry(view) {
+  return Object.values(view.work ?? {}).filter((w) => {
+    if (isResolvedStatus(w)) return false;
+    // Swallow the unrecognized-domain diagnostic: this module is PURE (see
+    // the file header) and getDomain's default reporter is a console.warn.
+    // Folding to the default domain is still the registry's own behavior.
+    const domain = getDomain(w.domain, { onUnrecognized: () => {} });
+    return w.stage === domain.stages[0];
+  }).length;
 }
 
 /**
@@ -138,7 +165,7 @@ export function computeEntropy(view) {
   const rows = [
     { label: 'missing-actual', count: countMissingActual(view), weight: WEIGHTS.missingActual },
     { label: 'stale-doing', count: countStaleDoing(view), weight: WEIGHTS.staleDoing },
-    { label: 'stage-clarify', count: countStageClarify(view), weight: WEIGHTS.stageClarify },
+    { label: 'stage-entry', count: countStageEntry(view), weight: WEIGHTS.stageEntry },
     { label: 'friction-unsettled', count: countFrictionUnsettled(view), weight: WEIGHTS.frictionUnsettled },
     { label: 'awaiting-human', count: countAwaitingHuman(view), weight: WEIGHTS.awaitingHuman },
   ];

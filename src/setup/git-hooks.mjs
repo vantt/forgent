@@ -22,11 +22,19 @@ function readHooksPath(repoRoot) {
 }
 
 // core.hooksPath is shared repo-wide config (this repo does not set
-// extensions.worktreeConfig), so a relative value always resolves against
-// the MAIN checkout's own root, never whatever worktree happens to be
-// calling in -- same resolution `resolveMainCheckout` (registrations.mjs)
-// already uses for the same reason. Falls back to `cwd` itself when git
-// can't answer (no .git at all, or git unavailable), matching this
+// extensions.worktreeConfig), but a RELATIVE value does NOT reliably
+// resolve against the MAIN checkout's own root: `.githooks/` is itself a
+// tracked, versioned directory, so every linked worktree carries its own
+// on-disk copy of `.githooks/pre-commit`, frozen at whatever commit that
+// worktree's own branch currently has checked out (tsk-2u5, docs/history/
+// stale-worktree-index-guard/CONTEXT.md D4 -- verified directly: a
+// relative hooksPath runs each worktree's own frozen copy of the hook,
+// never the main checkout's latest). `installGitHooks` below writes an
+// ABSOLUTE path for exactly this reason. This resolver stays for
+// `resolvesToGithooks`'s own comparison (matching either an absolute path
+// already set, or a legacy relative one, against the canonical target)
+// and for `uninstallGitHooks`'s detection. Falls back to `cwd` itself when
+// git can't answer (no .git at all, or git unavailable), matching this
 // module's existing never-throws contract.
 function resolveRepoRoot(cwd) {
   try {
@@ -55,9 +63,12 @@ function resolvesToGithooks(cwd, value) {
 }
 
 /**
- * Sets core.hooksPath to .githooks for the given repo root, if (and only
- * if) a `.git` entry exists there (a directory for a plain clone, a file
- * for a linked worktree -- existsSync is true for both). Idempotent: safe
+ * Sets core.hooksPath to this repo root's own ABSOLUTE `.githooks` path
+ * (never the bare relative string -- see the module-level comment above
+ * `resolveRepoRoot` for why: a relative value resolves per-worktree, not
+ * to this root, once `.githooks/` is a tracked, versioned directory), if
+ * (and only if) a `.git` entry exists there (a directory for a plain
+ * clone, a file for a linked worktree -- existsSync is true for both). Idempotent: safe
  * to run repeatedly (e.g. every `npm install`/`npm pack`, or every `fgos
  * setup`). No-ops silently when installed as a dependency (no `.git`
  * retained, per docs/specs/distribution.md) -- never throws.
@@ -78,7 +89,7 @@ export function installGitHooks(repoRoot) {
   const current = readHooksPath(repoRoot);
   if (resolvesToGithooks(repoRoot, current)) return { wired: true, skippedExisting: null };
   if (current !== '') return { wired: false, skippedExisting: current };
-  execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'core.hooksPath', path.join(repoRoot, '.githooks')], { cwd: repoRoot });
   return { wired: true, skippedExisting: null };
 }
 

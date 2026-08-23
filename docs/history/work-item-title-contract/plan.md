@@ -176,7 +176,7 @@ author actually reads before naming something:
 
 - `.claude/skills/fgos-submit-assist/SKILL.md`
 - `plugins/fgOS/skills/submit/SKILL.md`
-- the `decompose` LLM prompt, `src/intake/decompose.mjs:130`
+- the `decompose` LLM prompt, `src/intake/plan.mjs:130`
 
 Per D6 and CONTEXT.md's "Known limits" #1–2, this is **author guidance, never a
 mechanical assertion** — no code asserts D1 anywhere.
@@ -186,20 +186,20 @@ LLM child path holds **0 of 54** items, so it would have had near-zero present
 effect while every title in the store came through `submit` or `add`.
 
 **Verify:** `npm test` (guards the `decompose` prompt's own snapshot/shape
-tests in `test/intake/decompose.test.mjs`)
+tests in `test/intake/plan.test.mjs`)
 
 ## Risk map
 
 | component | risk | what would prove it |
 |---|---|---|
-| store-door truncation (phase 1) | **medium** — `addWork` and `editWork` are the two doors every mutation passes; a rejection instead of a truncation, or an off-by-one, breaks `add`/`submit`/`edit` for every caller at once | `fgos-validating`: confirm an over-length `add --title` **and** an over-length `edit --title` each return exit 0 with a truncated title, not an error |
-| both doors stay in step (phase 1) | **medium** — two placements can drift; a ceiling on `addWork` alone leaves phase 3's own `edit` writes ungoverned | `fgos-validating`: confirm the same constant governs both call sites, and that no third `EDITABLE_FIELDS` path writes `title` |
-| `deriveTitle` both-branch cap (phase 1) | **medium** — touches behavior locked by 9 existing assertions, including the `tsk-2z3` dot-boundary fix | `fgos-validating`: confirm the new cap cannot re-break the dotted-filename case at `classify.test.mjs:27-39` |
-| re-derive pass (phase 3) | **medium** — writes to all 54 items; a bug corrupts the whole backlog's titles in one run | `fgos-validating`: confirm the rewrite path goes through the `edit` verb (events appended, `rebuild()` recovery intact), and dry-run the diff before writing |
+| store-door truncation (phase 1) | **medium** — `addWork` and `editWork` are the two doors every mutation passes; a rejection instead of a truncation, or an off-by-one, breaks `add`/`submit`/`edit` for every caller at once | `fgos-coding-validating`: confirm an over-length `add --title` **and** an over-length `edit --title` each return exit 0 with a truncated title, not an error |
+| both doors stay in step (phase 1) | **medium** — two placements can drift; a ceiling on `addWork` alone leaves phase 3's own `edit` writes ungoverned | `fgos-coding-validating`: confirm the same constant governs both call sites, and that no third `EDITABLE_FIELDS` path writes `title` |
+| `deriveTitle` both-branch cap (phase 1) | **medium** — touches behavior locked by 9 existing assertions, including the `tsk-2z3` dot-boundary fix | `fgos-coding-validating`: confirm the new cap cannot re-break the dotted-filename case at `classify.test.mjs:27-39` |
+| re-derive pass (phase 3) | **medium** — writes to all 54 items; a bug corrupts the whole backlog's titles in one run | `fgos-coding-validating`: confirm the rewrite path goes through the `edit` verb (events appended, `rebuild()` recovery intact), and dry-run the diff before writing |
 | truncation cut point (phase 1) | low | word-edge vs hard-index is deferred below; either satisfies D2 |
 | skill/prompt prose (phase 4) | low | no runtime behavior; `npm test` covers the prompt's shape tests |
 
-Every medium above carries a named proof point into `fgos-validating`. None is
+Every medium above carries a named proof point into `fgos-coding-validating`. None is
 resolved by assertion here.
 
 ## Cases worth proving against
@@ -225,12 +225,12 @@ resolved by assertion here.
   (`store.mjs:36`), and `src/intake/*` already imports from `src/state/*`
   (`decompose.mjs:24`, `discovery.mjs:27` both take `DEFAULTS` from
   `../state/work.mjs`).
-- **`normalizeChild` length check** (`src/intake/decompose.mjs:146`): **not in
+- **`normalizeChild` length check** (`src/intake/plan.mjs:146`): **not in
   scope.** Child items are created through `addWork` (`decompose.mjs:25`
   imports it directly), so phase 1's door truncates their titles already; a
   second check there would be a duplicate rule at a weaker choke point.
 
-## Still open for `fgos-validating`
+## Still open for `fgos-coding-validating`
 
 - Word-edge versus hard-index truncation, and whether an ellipsis marker is
   wanted at the cut.

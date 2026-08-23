@@ -6,7 +6,7 @@ source_capture_ids: [tsk-516]
 ---
 # Why `fgos` checks repo invariants at `return` and merge instead of running the full test suite
 
-`fgos approve`/`fgos-code-implement`'s re-verify only ever re-ran one
+`fgos approve`/`fgos-coding-implement`'s re-verify only ever re-ran one
 item's own narrow `item.verify` command, never the full `npm test`
 suite (`runGoalCheck` spawns exactly `item.verify`, confirmed by reading
 `src/runner/goal-check.mjs` directly). That let a real regression land on

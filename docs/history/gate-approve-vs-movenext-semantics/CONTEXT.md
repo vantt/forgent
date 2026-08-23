@@ -7,7 +7,7 @@ Item: tsk-19j. Trạng thái: clarify (decisions locked, chờ approve gate).
 `tsk-4y5` (done) tách ra `tsk-2b0` + `tsk-ozl` (cả 2 done, tự phát hiện độc
 lập với item này):
 
-- **`tsk-2b0`**: tách verb `fgos discover` (chỉ clarify)/`fgos decompose`
+- **`tsk-2b0`**: tách verb `fgos discover` (chỉ clarify)/`fgos plan`
   (chỉ decompose), hard-split, không dispatch theo stage nữa.
 - **`tsk-ozl`**: fix đúng root-cause round-3 của item này — `resolveDiscovery`
   giờ có trust signal content-based (CONTEXT.md tồn tại+non-empty → skip
@@ -40,7 +40,7 @@ Tách 3 trục độc lập, đúng đề xuất gốc tsk-19j:
 (xem D10). `docs/specs/work-state.md:356-358` — doc-drift riêng (mô tả
 `discover` cũ, đã lỗi thời sau tsk-2b0), không thuộc scope này.
 
-## 2. Quyết định đã khoá (D1-D10, giữ đủ lịch sử — D4-D8 đã bị supersede, không xoá)
+## Locked decisions (D1-D10, giữ đủ lịch sử — D4-D8 đã bị supersede, không xoá)
 
 | ID | Quyết định | Trạng thái |
 |---|---|---|
@@ -84,8 +84,8 @@ loop:
 **Kiểm biên đã verify:** check ceiling xảy ra TRƯỚC KHI invoke skill của
 stage hiện tại (không phải sau) — đây là điều kiện đúng để discover-loop
 (`ceiling=decompose`) dừng ĐÚNG chỗ: item vào `clarify`, invoke
-fgos-exploring, nó gọi `fgos discover` → item thành `decompose` → vòng lặp
-quay lại, check `decompose >= decompose` → DỪNG, không invoke `fgos-planning`.
+fgos-coding-exploring, nó gọi `fgos discover` → item thành `decompose` → vòng lặp
+quay lại, check `decompose >= decompose` → DỪNG, không invoke `fgos-coding-planning`.
 
 **Cách 5 loop hiện có/dự kiến map vào D9 (đều là driver này, không phải 5 cơ
 chế riêng):**
@@ -130,7 +130,7 @@ khỏi mọi frontier cho tới khi con `done`.
   cũ song song. `decompose-parity` = port nguyên pattern tsk-ozl, không phải
   quyết định mới, không cần D riêng.
 
-Không còn câu hỏi mở nào — sẵn sàng cho `fgos-planning` shape thành plan cụ
+Không còn câu hỏi mở nào — sẵn sàng cho `fgos-coding-planning` shape thành plan cụ
 thể (phases, có tách item con hay không).
 
 ## Outstanding questions
@@ -141,7 +141,7 @@ None
 
 - `src/intake/discovery.mjs:1-33,260-289` — trust-signal skip-and-advance
   (tsk-ozl), vẫn `FALLBACK_VERIFY`.
-- `src/intake/decompose.mjs:36-50,80-99,192,279+,330-331` — `readLockedContext`,
+- `src/intake/plan.mjs:36-50,80-99,192,279+,330-331` — `readLockedContext`,
   chưa có skip-and-advance riêng.
 - `bin/fgos.mjs:871+` — verb `discover`/`decompose` hard-split (tsk-2b0).
 - `src/state/frontier.mjs:78-98,100-115` — `frontier()` hardcode 'Execute';

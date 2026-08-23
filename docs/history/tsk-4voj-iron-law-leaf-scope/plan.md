@@ -10,7 +10,7 @@ Locked decisions: `docs/history/tsk-4voj-iron-law-leaf-scope/CONTEXT.md`
 
 ## Mode
 
-**high-risk**, by the hard-gate flag rule (§2 of `fgos-planning`), not by
+**high-risk**, by the hard-gate flag rule (§2 of `fgos-coding-planning`), not by
 size:
 
 - **audit/security** (hard-gate flag) — the touched code IS fgOS's own
@@ -64,7 +64,7 @@ present) — but `list_repos` shows this repo's index is **168 commits
 behind HEAD** as of this planning pass, so any `impact()` blast-radius
 read taken right now would be unreliable evidence, not a real proof
 point. Recorded here as `impact-analysis: full-but-stale`; execution
-(`fgos-code-implement`) must run `gitnexus analyze` before calling `impact()`
+(`fgos-coding-implement`) must run `gitnexus analyze` before calling `impact()`
 on `changedFiles`/the Iron Law block, per `AGENTS.md`'s own "Index stale?"
 guidance — this plan does not claim a blast-radius proof point it doesn't
 actually have yet.
@@ -80,12 +80,12 @@ actually have yet.
 
 ### Risk map
 
-| Component | Risk | Proof point (for `fgos-validating` / execution) |
+| Component | Risk | Proof point (for `fgos-coding-validating` / execution) |
 |---|---|---|
 | Root-item Iron Law path (`rootId === id`) | Regression — accidentally changing root behavior while fixing leaf behavior | Existing tests at `test/cli/fgos.test.mjs:4756-4826` (self-modifying root item still refuses without ack) must keep passing unmodified — no new fixture needed, just confirm green. |
 | Leaf-item false-positive (this item's own bug) | Fix doesn't actually close the gap, or closes it only for the exact `tsk-52g-2` shape | New test: root item with one child already merged into `fgw/<root>` (a real gated-module touch, e.g. `src/runner/x.mjs`), a second child forked AFTER that merge whose OWN commits touch only ungated files. Assert `approve` on the second child does NOT trip Iron Law (no `--acknowledge-iron-law` needed) — this is the direct regression test for the bug as filed. |
 | Leaf's own genuine hit | Narrowing scope accidentally UNDER-reports — a leaf whose own commits genuinely touch a gated module must still trip Iron Law | New test: same root/child setup as above, but the leaf's own commit touches a gated module (`src/runner/`) itself. Assert `approve` still refuses without `--acknowledge-iron-law` — proves D1 didn't over-correct into a bypass. |
-| Missing root branch (CONTEXT.md D3) | Fail-closed shape not actually exercised, first time this edge is hit for THIS call site | No new test mandated (CONTEXT.md D3 pins the accepted behavior: same `MergeError` shape as the 4 existing call sites, which already carry this same unverified-in-practice edge). If `fgos-validating` finds this cheap to add as a fixture, add it; otherwise it's an accepted, documented gap shared with the 4 precedent call sites, not a new one. |
+| Missing root branch (CONTEXT.md D3) | Fail-closed shape not actually exercised, first time this edge is hit for THIS call site | No new test mandated (CONTEXT.md D3 pins the accepted behavior: same `MergeError` shape as the 4 existing call sites, which already carry this same unverified-in-practice edge). If `fgos-coding-validating` finds this cheap to add as a fixture, add it; otherwise it's an accepted, documented gap shared with the 4 precedent call sites, not a new one. |
 
 ### Order
 
@@ -131,7 +131,7 @@ No dependency ordering needed within the item itself.
   4 existing call sites and not a new exposure this item introduces.
 - No other caller of `changedFiles` outside `bin/fgos.mjs`'s approve
   handler exists that would need the same fix — confirmed by grep during
-  `fgos-exploring` (single call site).
+  `fgos-coding-exploring` (single call site).
 
 ## Split decision
 

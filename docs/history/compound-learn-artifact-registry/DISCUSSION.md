@@ -38,7 +38,7 @@ mới — có gộp doctor check cho index drift vào `tsk-3ip` hay tách riêng
 
 ## 2. Mục tiêu & đề bài
 
-Chủ sản phẩm coi compound-learn (bước `fgos-compounding` chạy khi item ở
+Chủ sản phẩm coi compound-learn (bước `fgos-coding-compounding` chạy khi item ở
 `status: retrospective`, phân loại capture thật thành tài liệu Diataxis)
 là một hướng chiến lược quan trọng, không chỉ công cụ nội bộ. Tầm nhìn: về
 sau muốn hệ thống viết được NHIỀU LOẠI tài liệu hơn, phục vụ NHIỀU
@@ -51,19 +51,19 @@ use case CỤ THỂ đầu tiên của hướng này. Việc ở đây là thi�
 đăng ký (registry) để mỗi audience/loại-tài-liệu mới cắm vào compound-learn
 mà không phải sửa lại logic lõi mỗi lần — nhưng PHẢI giữ nguyên 4 quadrant
 Diataxis hiện có (không đụng, không pha trộn — hard rule của
-`fgos-compounding` cấm thẳng việc bịa quadrant thứ 5).
+`fgos-coding-compounding` cấm thẳng việc bịa quadrant thứ 5).
 
 ## 3. Vấn đề rõ / chưa rõ
 
 | # | Điểm | Trạng thái | Ghi chú |
 |---|---|---|---|
-| 1 | Không đụng 4 quadrant Diataxis hiện có | RÕ | Hard rule `fgos-compounding` SKILL.md, xác nhận lại từ discussion `tsk-12m` |
+| 1 | Không đụng 4 quadrant Diataxis hiện có | RÕ | Hard rule `fgos-coding-compounding` SKILL.md, xác nhận lại từ discussion `tsk-12m` |
 | 2 | Tiền lệ registry mở-rộng-được đã chạy thật trong repo | RÕ, nhưng KHÔNG còn là tiền lệ phù hợp nhất | `registerCheck`/`registerFix` (`src/setup/registrations.mjs:64/85/110`) là registry cho FUNCTION máy tự chạy. Phân loại tài liệu không phải chuyện đó — Bee OKF Profile mới là tiền lệ đúng ngành, và nó chọn NGƯỢC lại (vocabulary đóng). Xem §5 vòng 2 |
 | 3 | fgOS mới port lớp nông nhất của OKF | RÕ (scout vòng 2) | Có: `frontmatter.mjs` (codec phẳng, không nested), `fgos docs-index`. KHÔNG có: checker 2 tầng, `authoritative_for`/anti-fork, `context --budget`, `promote`. Bảng đối chiếu đầy đủ ở §5 |
 | A | **Trục nào?** | **D-tsk28x-1** (vòng 3) | Hai trục, bắt buộc, hiện fgOS mới có một. Diataxis = trục TRẠNG THÁI NHẬN THỨC người đọc; OKF 9-type = trục DANH TÍNH (tài liệu này LÀ gì, của ai, về vấn đề gì). Vuông góc, một tài liệu mang cả hai nhãn |
 | B | Đóng hay mở | **TRẢ LỜI V3** (chưa D-ID) — giải bởi chữ `struggle` | `struggle` KHÔNG nằm trong 4 quadrant Diataxis (Diataxis dựng từ 2 chiều hành-động/nhận-thức × tiếp-thu/vận-dụng, ra đúng 4 ô, không ô nào là struggle). Suy ra: trục trạng-thái-nhận-thức là trục TỔNG QUÁT, Diataxis chỉ là MỘT PROFILE của trục đó (profile cho tài liệu kỹ thuật); marketing có profile riêng trên cùng trục, `struggle` là một trạng thái trong đó. **Trục MỞ (thêm profile mới được) + mỗi profile ĐÓNG (Diataxis mãi đúng 4)** — chính là kiến trúc OKF v0.1 (lỏng) + Bee Profile (đóng) đã dùng. Không phải chọn một trong hai |
 | C | **GHI hay ĐỀ XUẤT** | **TRẢ LỜI V3** (chưa D-ID) — câu hỏi vòng 2 đặt SAI | Không chọn một cho cả hệ thống — tách theo GIAI ĐOẠN. **Thu chất liệu: ghi thẳng, liên tục, không bao giờ dừng để hỏi** (ràng buộc chủ sản phẩm đặt: nhanh, rẻ, ít token, không cắt ngang luồng làm việc khác — loại thẳng mọi phương án gọi LLM phân loại ngay lúc capture). **Tổng hợp: nhiều pha, có triage nổi ứng viên, có người duyệt.** Lý do OKF sợ tự-ghi chỉ áp cho TÀI LIỆU (giả vờ là kết luận đã biên tập), không áp cho CHẤT LIỆU THÔ (chỉ ghi "đã xảy ra chuyện này"). Cửa gác đặt đúng chỗ chất liệu biến thành khẳng định |
-| D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | CHƯA RÕ (chưa bàn vòng 3) | `fgos-compounding` phát hiện grow-vs-create CHỈ bằng `fs.existsSync`. Không có khái niệm chủ-sở-hữu-chủ-đề. OKF trả lời bằng `authoritative_for` + anti-fork gate 3 tầng (sau khi judge độc lập phá bản 1 tầng bằng 4 cách trong một buổi). Càng nhiều profile/audience thì rủi ro 2 tài liệu cùng chủ đề càng cao — port cùng lúc hay để riêng? |
+| D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | CHƯA RÕ (chưa bàn vòng 3) | `fgos-coding-compounding` phát hiện grow-vs-create CHỈ bằng `fs.existsSync`. Không có khái niệm chủ-sở-hữu-chủ-đề. OKF trả lời bằng `authoritative_for` + anti-fork gate 3 tầng (sau khi judge độc lập phá bản 1 tầng bằng 4 cách trong một buổi). Càng nhiều profile/audience thì rủi ro 2 tài liệu cùng chủ đề càng cao — port cùng lúc hay để riêng? |
 | E | Ranh giới scope `tsk-28x` vs `tsk-12m` | CHƯA RÕ, đã đổi bản chất so với vòng 1-2 | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. Cần cắt lại: pha nào thuộc `tsk-12m`, pha nào `tsk-28x`, pha nào là item mới chưa tồn tại. `deps: [tsk-12m]` đặt lúc submit có thể không còn đúng. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay. Kèm đính chính: số đo từ nửa changelog KHÔNG mở khoá nửa storytelling — nửa đó cần phép thử riêng (Cách 1), hai phép thử chạy song song được, không tuần tự |
 | F | Hình dạng pha TRIAGE (pha 1, §6) | ĐỠ MỜ sau vòng 5 — xem J2 | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). **Vòng 5 có ứng viên đầu có căn cứ: round-count trên mỗi item (J2).** Còn mở: đo nó bằng bộ nhãn nào — fgOS vẫn chưa có tập nhãn tay như bee đã có, nên chưa chạy được phép đo AUC tương đương |
 | G | ~~Chất liệu `struggle` đã có sẵn trong `friction`~~ | **RÚT LẠI — SAI** (đo lại vòng 4) | Vòng 3 kết luận "RÕ" từ ĐÚNG MỘT bản ghi (`tsk-1gn`) rồi suy rộng ra cả hệ thống. Đo toàn log: 131 friction = 81 `verify-miss` + 39 `merge-conflict` (92% telemetry máy), `detail` điển hình `goal-check failed on branch "fgw/tsk-puz" (exit null)` — ghi RẰNG hỏng, không ghi ĐÃ THỬ GÌ / VÌ SAO / CHỖ NGOẶT. Không phải chất liệu kể chuyện. Thứ làm vòng 3 phấn khích thực ra là `gates.askHistory`, KHÁC `friction` — vòng 3 lẫn hai thứ |
@@ -88,7 +88,7 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
   (`deps: [tsk-12m]`, dependency candidate `tsk-12m` được xác nhận bởi
   chủ sản phẩm trước khi submit). Scout tái sử dụng từ discussion
   `tsk-12m`: `src/setup/registrations.mjs:64/85/110` (tiền lệ registry),
-  `.claude/skills/fgos-compounding/SKILL.md` (hard rule không bịa
+  `.claude/skills/fgos-coding-compounding/SKILL.md` (hard rule không bịa
   quadrant thứ 5, không ghi ngoài `docs/<quadrant>/`). 3 câu hỏi mở đặt ra
   cho vòng tiếp theo (§3).
 
@@ -365,7 +365,7 @@ fgOS hôm nay phân loại tài liệu người-dùng-cuối bằng đúng một
 bốn quadrant Diataxis (`tutorial` / `how-to` / `reference` / `explanation`,
 đóng cứng trong `DIATAXIS_DOC_TYPES`, `src/state/store.mjs:846`). Trục đó
 đang gánh ba việc cùng lúc: quyết định **cách viết**, quyết định **nơi
-lưu** (hard rule của `fgos-compounding`: không viết ra ngoài
+lưu** (hard rule của `fgos-coding-compounding`: không viết ra ngoài
 `docs/<quadrant>/` khớp tag vừa lưu), và là **danh sách duy nhất** một tài
 liệu có thể thuộc về.
 

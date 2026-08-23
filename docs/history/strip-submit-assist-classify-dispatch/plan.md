@@ -28,8 +28,8 @@ whole redesign exists. Confirmed: strip it.
 The item's own description said "if that was `capacity-dispatch-fallback.md`'s
 only remaining consumer, retire that shared fragment too." Checked with a
 repo-wide grep: it is NOT the only consumer. Six other stage skills
-(`fgos-validating`, `fgos-code-implement`, `fgos-fanout`, `fgos-planning`,
-`fgos-exploring`, `fgos-researching`) cite this fragment's "Valid reasons
+(`fgos-coding-validating`, `fgos-coding-implement`, `fgos-fanout`, `fgos-coding-planning`,
+`fgos-coding-exploring`, `fgos-researching`) cite this fragment's "Valid reasons
 to dispatch" list directly, in their own never-delegate-reasoning rule.
 Deleting the file would leave all six pointing at nothing.
 

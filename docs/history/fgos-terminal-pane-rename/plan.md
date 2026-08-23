@@ -54,7 +54,7 @@ units, not an arbitrary re-split.
 
 ### Risk map
 
-| Component | How risky | Proof point (for fgos-validating) |
+| Component | How risky | Proof point (for fgos-coding-validating) |
 | --- | --- | --- |
 | herdr absent/not managing this pane | low — must be a no-op, never block pick | run `rename.sh` with `HERDR_ENV` unset: exits 0, no `herdr` call attempted |
 | `fg.ssid`/`a.ssid` resolution, unresolved segments | medium — several source env vars, D4's drop-not-"unknown" rule must hold | run `rename.sh` with only `CLAUDE_CODE_SESSION_ID` set (today's real case, confirmed in this very session's env) and with neither session env var set — confirm label drops the missing segment instead of printing "unknown" |
@@ -90,7 +90,7 @@ Two child items, both `parent: tsk-62x`:
    (regression proof for the CLI layer piece 2 must not disturb; the new
    prose-orchestration behavior itself is a skill-instruction change with
    no unit-testable surface in this repo — its real proof is a dogfood
-   run of `/fgOS:pick` inside a herdr pane at `fgos-validating`/execution
+   run of `/fgOS:pick` inside a herdr pane at `fgos-coding-validating`/execution
    time, not a scripted assertion).
 
 ## Execution

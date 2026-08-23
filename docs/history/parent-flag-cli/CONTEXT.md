@@ -16,7 +16,7 @@ directly (`frontier.mjs`, `dep-graph.mjs`'s `buildUnifiedEdges`,
 `impact.mjs`'s blocking-fan-out, `decompose.mjs`'s `hasChildren`
 re-entrancy check — decision 0012). The only writer of `parent` anywhere in
 the repo today is `decompose.mjs:394`, inside `judgeDecompose`'s internal
-`addWork()` call for the auto-split path. `fgos-planning`'s own `SKILL.md`
+`addWork()` call for the auto-split path. `fgos-coding-planning`'s own `SKILL.md`
 (step 5, lines 117-122) tells a session to create child items that "carry
 this item's own id as its `parent`" — language that assumes a CLI path
 that does not exist. STR92 (`docs/backlog.md:132`, 2026-07-23 audit) caught
@@ -91,14 +91,14 @@ without `--parent` already has.
   documenting the current "parent not editable" shortcut's reasoning).
 - `src/state/work.mjs:255-262` (parent shape validation: non-empty string,
   no self-reference).
-- `src/intake/decompose.mjs:322` (`hasChildren` reads `.parent`), `:394`
+- `src/intake/plan.mjs:322` (`hasChildren` reads `.parent`), `:394`
   (only existing writer of `parent`, inside `judgeDecompose`'s auto-split
   `addWork()` call, creation-time only).
 - `docs/decisions/0012-typed-edge-model-supersedes-deps-parent-separation.md`
   — confirms `parent` is a real, separately-stored, load-bearing field
   (not superseded), unified into cycle-check alongside `deps`, and
   explicitly tolerates a dangling (non-existence-checked) `parent`.
-- `.claude/skills/fgos-planning/SKILL.md:117-122` — step 5's child-creation
+- `.claude/skills/fgos-coding-planning/SKILL.md:117-122` — step 5's child-creation
   language ("carries this item's own id as its `parent`") that assumes the
   now-missing CLI path.
 - `docs/backlog.md:132` (STR92 audit) — same-shaped prior gap
@@ -108,7 +108,7 @@ without `--parent` already has.
 
 - `docs/decisions/0012-typed-edge-model-supersedes-deps-parent-separation.md`
 - `docs/backlog.md:132` (STR92)
-- `.claude/skills/fgos-planning/SKILL.md` step 5
+- `.claude/skills/fgos-coding-planning/SKILL.md` step 5
 
 ## Outstanding questions deferred to planning
 

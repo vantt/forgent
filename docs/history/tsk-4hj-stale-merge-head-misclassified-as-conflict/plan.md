@@ -52,13 +52,13 @@ output; does not collide with any existing reason in
 
 ## Risk map
 
-| Component | Risk | Proof point (→ `fgos-validating`) |
+| Component | Risk | Proof point (→ `fgos-coding-validating`) |
 |---|---|---|
 | `mergeHeadExists` pre-call check placement (`merge.mjs:886`) | Medium — must fire ONLY before this call's own attempt, never after (would collapse back into `tsk-18a`'s existing genuine-conflict path if misplaced) | Regression test: stage a real, unfinished `git merge --no-commit --no-ff` for branch A in a throwaway repo, then call `mergeRunnerItemLocked`/`mergeRunnerItem` for an UNRELATED branch B — assert outcome `merge-blocked-other-item`, assert branch A's MERGE_HEAD is still present afterward (proves no abort ran on it) |
 | Two `approve`-path `bin/fgos.mjs` call sites (`~2999` leaf→root, `~3114` leaf→root-with-children/`integration-drift` variant) each need a matching `result.outcome === 'merge-blocked-other-item'` branch, mirroring the existing `merge-failed-unclassified` branch shape exactly (`moveWork(..., reason:)`, `addFriction`, return shape) | Medium — missing either call site leaves that path silently falling through to the generic error/throw instead of a clean `blocked` | `test/cli/fgos.test.mjs` gains one case per call site (matching how `merge-failed-unclassified` is already covered there per `docs/specs/runner.md:1043`'s own test inventory) |
-| `sync-root`'s `runAndReport` (`bin/fgos.mjs:3305-3357`) needs D4's defensive `else` guard (CONTEXT.md D4, found during `fgos-validating`'s first reality-gate pass on this plan) — WITHOUT it, `mergeRunnerItem`'s new outcome falls through to the success block and `sync-root` silently reports `synced` instead of blocked | High — a silent false success is strictly worse than today's `sync-root` behavior (a wrong-but-visible `blocked`/`merge-conflict`); this is the regression D1 would otherwise introduce | `test/cli/fgos.test.mjs:6121+` (existing `sync-root` suite) gains a case: stage a pre-existing MERGE_HEAD from an unrelated branch, run `sync-root`, assert it does NOT return `outcome: 'synced'` and does NOT record a "merged" decision |
+| `sync-root`'s `runAndReport` (`bin/fgos.mjs:3305-3357`) needs D4's defensive `else` guard (CONTEXT.md D4, found during `fgos-coding-validating`'s first reality-gate pass on this plan) — WITHOUT it, `mergeRunnerItem`'s new outcome falls through to the success block and `sync-root` silently reports `synced` instead of blocked | High — a silent false success is strictly worse than today's `sync-root` behavior (a wrong-but-visible `blocked`/`merge-conflict`); this is the regression D1 would otherwise introduce | `test/cli/fgos.test.mjs:6121+` (existing `sync-root` suite) gains a case: stage a pre-existing MERGE_HEAD from an unrelated branch, run `sync-root`, assert it does NOT return `outcome: 'synced'` and does NOT record a "merged" decision |
 | `CATCHUP_REASONS` (`bin/fgos.mjs:3568`) + `docs/specs/runner.md`'s accepted-reason list (~line 1023) must both add `merge-blocked-other-item`, mirroring `tsk-18a` D1's own precedent exactly | Low — mechanical, but a missed spot strands an item `blocked` with no recovery path (the exact gap `tsk-18a` D1 already named for its own sibling reason) | `test/cli/fgos.test.mjs`'s existing catchup precondition test (per `docs/specs/runner.md:1043`, "lý-do-không-áp-dụng-được") extended with this new reason as an ACCEPTED case |
-| `mergeHeadExists` read timing vs. a genuinely concurrent process (TOCTOU: MERGE_HEAD appears between this new pre-check and the `git merge` call itself) | Low — the main-checkout lock (`acquireMainCheckoutLock`, held for the whole window since `tsk-2eq`) already serializes concurrent `approve` calls; this new check only needs to catch a LEFTOVER from a holder that already released, not a live race against a current holder | No new proof needed beyond the existing lock-window guarantee (`tsk-2eq`, already delivered) — noted here so `fgos-validating` does not treat this as an open gap |
+| `mergeHeadExists` read timing vs. a genuinely concurrent process (TOCTOU: MERGE_HEAD appears between this new pre-check and the `git merge` call itself) | Low — the main-checkout lock (`acquireMainCheckoutLock`, held for the whole window since `tsk-2eq`) already serializes concurrent `approve` calls; this new check only needs to catch a LEFTOVER from a holder that already released, not a live race against a current holder | No new proof needed beyond the existing lock-window guarantee (`tsk-2eq`, already delivered) — noted here so `fgos-coding-validating` does not treat this as an open gap |
 
 ## Files touched
 
@@ -80,7 +80,7 @@ outcome, consumed identically by the two `approve` call sites, guarded
 defensively at the one call site — `sync-root` — that cannot name it
 explicitly, plus the catchup allowlist it must join) — not several
 independently workable pieces. A split would separate the code fix from
-its own test proof, which `fgos-validating`'s reality check requires stay
+its own test proof, which `fgos-coding-validating`'s reality check requires stay
 together.
 
 ## Order

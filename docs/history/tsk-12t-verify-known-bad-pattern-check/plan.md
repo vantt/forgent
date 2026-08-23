@@ -8,7 +8,7 @@ external systems (no), public contracts (no — internal function, not a
 CLI/API surface), cross-platform (no), **existing covered behavior (YES —
 `judgeVerifySemanticCorrectness` and `resolveDiscovery`/`resolveDecompose`
 already have test coverage in `test/intake/judge-executor.test.mjs` /
-`test/intake/discovery.test.mjs` / `test/intake/decompose.test.mjs`)**,
+`test/intake/discovery.test.mjs` / `test/intake/plan.test.mjs`)**,
 weak proof around the area (no — this item strengthens proof, doesn't rely
 on weak proof), multi-domain (no).
 
@@ -25,14 +25,14 @@ returns the same `{agrees: false, reason}` shape the function already
 returns for an LLM disagreement, but with a mechanical marker (D3) — e.g.
 `{agrees: false, reason: "...", mechanical: true}`.
 
-**Reality check (fgos-validating, corrected from an earlier draft of this
+**Reality check (fgos-coding-validating, corrected from an earlier draft of this
 plan):** only `resolveDiscovery` (`src/intake/discovery.mjs:653`) actually
 needs a new guard clause — its `callerVerdict?.force === true` branch
 (`discovery.mjs:661`) is the only existing `--force` override path this
 change must narrow: when `secondPass.mechanical === true`, refuse the
 override regardless of `callerVerdict?.force` (D6), instead of falling
 through to that branch. `resolveDecompose`'s own `judgeVerifySemanticCorrectness`
-call (`src/intake/decompose.mjs:703`, per child) has **no** `--force`
+call (`src/intake/plan.mjs:703`, per child) has **no** `--force`
 override path today — reading `decompose.mjs:684-711` confirms a disputed
 child's `secondPass.agrees === false` always parks the whole decompose
 verdict as `need-human` unconditionally, with no force branch to guard.
@@ -52,7 +52,7 @@ free).
 
 ### Risk map
 
-| Component | Risk | Proof point (fgos-validating) |
+| Component | Risk | Proof point (fgos-coding-validating) |
 |---|---|---|
 | `judgeVerifySemanticCorrectness` regex (D2) | medium — false positive on a legitimate non-`node --test` TAP verify, or false negative missing a real variant of the trap | unit test with a known-bad `node --test --test-name-pattern` verify string (must trip) AND a control TAP-consuming verify string that does NOT reference `node --test` (must NOT trip) |
 | `resolveDiscovery` `--force` guard (D6) | medium — `discovery.mjs`'s existing `callerVerdict?.force === true` branch could still fall through for a mechanical-marked rejection if the new guard is misplaced | unit test asserting `--force` cannot move an item past a mechanical-marked rejection at `resolveDiscovery` specifically (`resolveDecompose` needs no equivalent test for D6 — it has no force path to guard, confirmed by reading `decompose.mjs:684-711`) |
@@ -60,7 +60,7 @@ free).
 
 **Impact-analysis capability gate**: `full` — GitNexus present, checked
 fresh via `fgos tool query --capability impact-analysis --status present`
-during `fgos-exploring` (see `CONTEXT.md` scout evidence). GitNexus's own
+during `fgos-coding-exploring` (see `CONTEXT.md` scout evidence). GitNexus's own
 call-graph confirmed exactly 2 callers of `judgeVerifySemanticCorrectness`
 (`resolveDiscovery`, `resolveDecompose`) — both risk-map rows above already
 rely on that confirmed blast radius rather than a guess.
@@ -125,7 +125,7 @@ whole file (`decompose.mjs`) from scope.
 - The exact field name for D3's mechanical marker (`mechanical: true` vs. a
   reason-string prefix) is an implementation detail `CONTEXT.md` correctly
   left open (D3's own "Outstanding questions" note) — not material to scope
-  or acceptance, so no `fgos-exploring` hand-back needed for it.
+  or acceptance, so no `fgos-coding-exploring` hand-back needed for it.
 - The exact regex for D2 (`/\^#\s*(pass|fail)\b/`-shaped, gated on
   `node --test`/`--test-name-pattern` co-occurrence) is likewise an
   implementation detail already scoped by `CONTEXT.md`'s own pinned term

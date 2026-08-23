@@ -70,6 +70,10 @@ function countMatches(text, keywords) {
  * mechanical keyword counting, no LLM call, and never throws — an
  * unrecognized or empty/non-string input falls back to tier: 'standard',
  * kind: 'task', with risk mirroring the tier signal.
+ *
+ * D12 (tsk-2yo): this result is only ever a TEMP placeholder at item
+ * creation time now -- the real judgment happens once, later, at stage
+ * `discovery`, on real research evidence (`fgos-coding-discovering`).
  */
 export function classify(text) {
   const safeText = typeof text === 'string' ? text : '';

@@ -28,7 +28,7 @@ Risk map:
 
 | component | risk | proof point |
 |---|---|---|
-| `list --id` lookup + not-found error | low | `fgos-validating`/tests: unknown id throws `StoreError('validation', 'list: work "<id>" not found.')`, matching D2's cited precedent shape |
+| `list --id` lookup + not-found error | low | `fgos-coding-validating`/tests: unknown id throws `StoreError('validation', 'list: work "<id>" not found.')`, matching D2's cited precedent shape |
 | `--id` bypassing open-only default | low | test: `--id` on a `status: done` item still returns it without `--all` |
 | `pick/SKILL.md` rewiring | low | manual/e2e: `/fgOS:pick` no longer prints the full open-item dump, only the claimed item's title/description |
 

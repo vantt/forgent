@@ -32,7 +32,7 @@ reusing it.
 
 ### Risk map
 
-| Component | Risk | Proof point (→ fgos-validating) |
+| Component | Risk | Proof point (→ fgos-coding-validating) |
 |---|---|---|
 | `rankImpact` new field | Medium — must reuse `buildUnifiedEdges`'s existing `{from, to}` convention correctly in reverse, and keep done-row semantics (`blockedBy: []`) consistent with the existing `blocks: 0` treatment | Unit tests: deps-only, parent-only, combined, done-row, empty-view cases |
 | Existing exact-shape tests | Low — two `deepEqual` assertions need their literal expected objects updated | `npm test` stays green after the field is added |
@@ -91,7 +91,7 @@ names the command that proves this item done:
 node --test --test-name-pattern="rankImpact" test/state/impact.test.mjs
 ```
 
-for the data-layer change (verified during fgos-validating: 22/22 pass on
+for the data-layer change (verified during fgos-coding-validating: 22/22 pass on
 the pre-change suite — `npm test -- --test-name-pattern=...` does NOT
 scope as expected, it silently runs the full suite instead; use the
 `node --test` form directly), broadened to a full `npm test` run before

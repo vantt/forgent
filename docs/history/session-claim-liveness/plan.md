@@ -6,8 +6,8 @@ Item: `tsk-3ni`. Decisions: `docs/history/session-claim-liveness/CONTEXT.md`
 Mode: **high-risk**
 
 Flags counted (per `fgos-routing`'s Mode gate, applied directly — this
-session entered via `fgos-coding-shaping` → `fgos-exploring` →
-`fgos-planning`, never through `fgos-routing`'s own Orient step, so no
+session entered via `fgos-coding-shaping` → `fgos-coding-exploring` →
+`fgos-coding-planning`, never through `fgos-routing`'s own Orient step, so no
 lane was handed off; this is the documented direct-entry fallback):
 
 - **audit/security** (hard-gate flag on its own) — this changes who is
@@ -41,7 +41,7 @@ the class of risk `standard` is too coarse a bar for.
 When `expectedStatus` would not match (`item.status === 'doing'`,
 `isBranchTake` false) AND `item.claimRole` is `human` or `session` AND
 **the NEW claimant's own `actor` is `session` or `human`** (never
-`runner`) — this last condition is a `fgos-validating` finding (below),
+`runner`) — this last condition is a `fgos-coding-validating` finding (below),
 not part of the original Approach: `startupReap`'s own already-locked
 policy (`loop.mjs:372`) deliberately never lets the autonomous runner
 touch a human/session claim; scoping this pre-check to the OLD claim's
@@ -141,7 +141,7 @@ today's ordinary refusal, unchanged.
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `claimWork`'s pre-check (`claim-port.mjs`) | **High** — the actual authorization-adjacent logic; a bug could reclaim a genuinely live claim or fail to reclaim a genuinely dead one | New `claim-port.test.mjs` cases: (a) conclusive-stale `doing`/`session` claim, new claimant `actor: 'session'`, `isolate: true` → release+reclaim succeeds, event trail shows the `doing->todo` release plus an `addDecision(kind:'engine')` evidence entry (implementation finding: `reason` itself is not stamped for this edge — see Approach); (b) recent-activity `doing` claim (regression of the literal `tsk-2ec` shape) → refuses exactly as today, unchanged exit/message; (c) `claimRole: 'runner'` `doing` item → pre-check is a no-op, still plain CAS refuse (this path stays `startupReap`'s alone, D2 scope); (d) **(validating finding)** conclusive-stale `doing`/`session` claim, new claimant `actor: 'runner'` → pre-check must NOT fire — refuses exactly as today; (e) **(implementation finding)** conclusive-stale `doing`/`session` claim, new claimant via `take` (`isolate: false`) → pre-check must NOT fire either — `pick`-only scoping (see Approach). A genuine two-claimant RACE on the release step's own CAS is not separately unit-tested: `claimWork` is fully synchronous (no await/yield point between its state read and its `moveWork` calls), so no interleaving is reachable within one process without mocking against this repo's own real-behavior test convention — the property is proven by direct code reading (the catch-block's `instanceof FsmError && category === 'conflict'` check mirrors the already-tested pattern `tsk-49a`'s own test uses) plus `transitionWork`'s own already-proven CAS guarantee, not a dedicated race test. |
 | Activity-signal helper (new, `src/runner/claim-liveness.mjs`) | **Medium** — correctness of `git log`/`git status` parsing and threshold math, isolated from the claim flow | New `claim-liveness.test.mjs`: fabricate a worktree, backdate a file's mtime (`utimesSync`) and/or a commit's date (`GIT_COMMITTER_DATE`), assert the computed signal and the resulting reclaim/no-reclaim boundary at exactly the threshold |
@@ -156,7 +156,7 @@ today's ordinary refusal, unchanged.
 separate, already-tracked backlog item independently flags this
 machine's GitNexus index as ~434 commits behind HEAD — `present` here
 only means installed, not that its index is fresh. Any `impact()` call
-`fgos-validating`/`fgos-code-implement` runs against `claim-port.mjs`/
+`fgos-coding-validating`/`fgos-coding-implement` runs against `claim-port.mjs`/
 `status-fsm.mjs` should be cross-checked with a plain `rg` for callers
 rather than trusted blindly if it returns something suspiciously
 small/empty.

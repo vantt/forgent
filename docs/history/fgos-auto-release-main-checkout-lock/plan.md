@@ -80,7 +80,7 @@ can guarantee it for every caller, present and future.
 
 ## Risk map
 
-| Component | How risky | Proof point (for `fgos-validating`) |
+| Component | How risky | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | New identity-checked release fn | Low — pure read-compare-unlink, mirrors existing self-recognition logic already tested | Unit test: own-identity lock releases; different-identity lock left untouched; missing lock is a no-op; AMBIGUOUS/corrupt content is a no-op |
 | `return`'s wiring | Medium — must fire on BOTH proposed and blocked outcomes, and must never fire on the branch-source path | Unit/integration test: `return` on a main-source item with a live own-identity lock clears it on both a passing and a failing verify; a branch-source `return` leaves any lock untouched |

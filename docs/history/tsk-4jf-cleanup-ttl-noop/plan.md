@@ -38,7 +38,7 @@ the verb itself.
    `failed`. This is the risk-bearing change (existing covered behavior) —
    proof point: `node --test test/state/cleanup-harness.test.mjs` covering
    all 4 combinations of {TTL elapsed/not} x {D8 checks pass/fail}, carried
-   to `fgos-validating`.
+   to `fgos-coding-validating`.
 2. `bin/fgos.mjs` — `case 'cleanup':` (line ~1056-1098): read the new
    `{ notReadyYet, failed }` shape.
    - `failed` non-empty → `cleanup -> blocked` exactly as today (unchanged
@@ -57,7 +57,7 @@ the verb itself.
    - Proof point: a new CLI-level test in `test/cli/fgos.test.mjs` proving
      TTL-not-elapsed-alone produces zero `work.move` events (the
      `eventLines(cwd).length` before/after pattern already used at
-     lines 1609-1626), carried to `fgos-validating`.
+     lines 1609-1626), carried to `fgos-coding-validating`.
 3. `src/state/cleanup-pool.mjs` — update the TTL pre-filter's comment
    (lines 1-10, 17-22) to say plainly it is now a scheduling optimization,
    not the correctness guard (CONTEXT.md D3). No behavior change — the
@@ -68,12 +68,12 @@ the verb itself.
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `assessCleanupReadiness` return shape | medium — two call sites read it (`bin/fgos.mjs`, indirectly `cleanup-pool.mjs` via `checkCleanupTTLElapsed` which is untouched) | 4-combination unit test, `fgos-validating` confirms both call sites updated together |
+| `assessCleanupReadiness` return shape | medium — two call sites read it (`bin/fgos.mjs`, indirectly `cleanup-pool.mjs` via `checkCleanupTTLElapsed` which is untouched) | 4-combination unit test, `fgos-coding-validating` confirms both call sites updated together |
 | `case 'cleanup':` no-op branch | medium — new code path, first no-op ever added to this verb | CLI-level test asserting zero events on TTL-not-elapsed-alone |
 | `blocked` branch's existing reason-join behavior | low — must stay byte-compatible with `test/cli/fgos.test.mjs:8463-8480` | that existing test, unmodified, still green |
 | `cleanup-pool.mjs` comment | none — comment-only | `test/state/cleanup-pool.test.mjs` still green |
 
-Impact-analysis capability gate, re-checked at `fgos-validating` (not just
+Impact-analysis capability gate, re-checked at `fgos-coding-validating` (not just
 `fgos tool query --status present`, which only proves the tool is
 installed): GitNexus's own index reports `lastCommit: 251d0b5` while this
 branch's HEAD is `5d5b5cc` — the index is behind, so posture is
@@ -98,7 +98,7 @@ confirms a further split would be churn, not clarity.
 ## Assumptions (not material enough to reopen CONTEXT.md)
 
 - No-op return shape (`{ id, to: 'cleanup', noop: true, reasons: ... }`)
-  is an implementation detail, not a locked field name — `fgos-validating`
+  is an implementation detail, not a locked field name — `fgos-coding-validating`
   or execution may adjust field names as long as the no-op behavior
   (no `moveWork`, no event) holds.
 - The `blocked` branch continues to join ALL failing reasons (both

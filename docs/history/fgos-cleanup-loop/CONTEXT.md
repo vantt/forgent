@@ -45,7 +45,7 @@ hasn't elapsed.
 ## Pinned terms
 
 - **pool** — the set of work items currently at `status:cleanup`, mirroring
-  how `fgos-exploring`'s sibling feature already uses "pool" for
+  how `fgos-coding-exploring`'s sibling feature already uses "pool" for
   `stage:clarify`/`stage:decompose` items (`discover-pool.mjs`).
 - **TTL-ready** — a `status:cleanup` item whose `checkCleanupTTLElapsed`
   (`src/state/cleanup-harness.mjs:97-112`) already returns `ok: true` —
@@ -101,7 +101,7 @@ hasn't elapsed.
 - Impact-analysis capability gate (per `CLAUDE.md`): `fgos tool query
   --capability impact-analysis --status present` returned GitNexus
   `present` → posture is **full**. Informational only at this stage —
-  this skill edits no code — binding on `fgos-code-implement` once this item
+  this skill edits no code — binding on `fgos-coding-implement` once this item
   reaches that stage.
 
 ## Deferred to planning (implementer concerns, not locked here)

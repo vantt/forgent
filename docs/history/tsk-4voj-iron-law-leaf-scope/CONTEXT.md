@@ -96,7 +96,7 @@ those are explicitly out of scope, cited only as evidence below.
   decision.
 - Test coverage shape (unit test on `changedFiles` with a leaf/root
   fixture, vs an integration test through `approve`) is
-  `fgos-planning`'s call.
+  `fgos-coding-planning`'s call.
 
 ## References
 

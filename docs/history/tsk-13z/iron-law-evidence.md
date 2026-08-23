@@ -19,7 +19,7 @@ a heavy-risk keyword.
 ## Verify command
 
 ```
-npm test && grep -q "asking a person only when a genuine gap remains" .claude/skills/fgos-routing/SKILL.md && grep -q "asking a person only when a genuine gap remains" .agents/skills/fgos-routing/SKILL.md && grep -q "fgos-clarifying" .claude/skills/fgos-routing/SKILL.md && grep -q "fgos-clarifying" .agents/skills/fgos-routing/SKILL.md && ! grep -qE "clarify.*fgos-exploring" .claude/skills/fgos-routing/SKILL.md && ! grep -qE "clarify.*fgos-exploring" .agents/skills/fgos-routing/SKILL.md
+npm test && grep -q "asking a person only when a genuine gap remains" .claude/skills/fgos-routing/SKILL.md && grep -q "asking a person only when a genuine gap remains" .agents/skills/fgos-routing/SKILL.md && grep -q "fgos-clarifying" .claude/skills/fgos-routing/SKILL.md && grep -q "fgos-clarifying" .agents/skills/fgos-routing/SKILL.md && ! grep -qE "clarify.*fgos-coding-exploring" .claude/skills/fgos-routing/SKILL.md && ! grep -qE "clarify.*fgos-coding-exploring" .agents/skills/fgos-routing/SKILL.md
 ```
 
 (See `CONTEXT.md` D4 for why this replaces the item's original
@@ -33,22 +33,22 @@ item's own implementation step. The Iron Law's failing-test-first proof
 is given honestly here against the concrete, measurable fact the merge
 actually changes: `.claude/skills/fgos-routing/SKILL.md`'s stage-routing
 table, which the RESEARCH.md round 1 pass already confirmed is a real,
-still-live bug on `main` (`clarify` wrongly routed to `fgos-exploring`
+still-live bug on `main` (`clarify` wrongly routed to `fgos-coding-exploring`
 instead of the registry's real `fgos-clarifying`).
 
 ## RED — pre-fix (`main` at commit `11f04361`, the trunk tip this item's
 branch forked from and the same tip the merge landed against)
 
 ```
-$ git show main:.claude/skills/fgos-routing/SKILL.md | grep -n "clarify\` |.*fgos-exploring"
-139:| `clarify` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-exploring` |
+$ git show main:.claude/skills/fgos-routing/SKILL.md | grep -n "clarify\` |.*fgos-coding-exploring"
+139:| `clarify` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-coding-exploring` |
 
 $ git show main:.claude/skills/fgos-routing/SKILL.md > /tmp/main-routing-skill.md
 $ grep -q "asking a person only when a genuine gap remains" /tmp/main-routing-skill.md; echo $?
 1   # not found -- the fixed row text does not exist on main yet
 
-$ grep -qE "clarify.*fgos-exploring" /tmp/main-routing-skill.md; echo $?
-0   # found -- the bug (clarify wrongly paired with fgos-exploring) is present
+$ grep -qE "clarify.*fgos-coding-exploring" /tmp/main-routing-skill.md; echo $?
+0   # found -- the bug (clarify wrongly paired with fgos-coding-exploring) is present
 ```
 
 ## GREEN — post-fix (working tree at the real committed merge on
@@ -63,9 +63,9 @@ $ grep -q "fgos-clarifying" .claude/skills/fgos-routing/SKILL.md; echo $?
 0
 $ grep -q "fgos-clarifying" .agents/skills/fgos-routing/SKILL.md; echo $?
 0
-$ grep -qE "clarify.*fgos-exploring" .claude/skills/fgos-routing/SKILL.md; echo $?
+$ grep -qE "clarify.*fgos-coding-exploring" .claude/skills/fgos-routing/SKILL.md; echo $?
 1   # bug gone
-$ grep -qE "clarify.*fgos-exploring" .agents/skills/fgos-routing/SKILL.md; echo $?
+$ grep -qE "clarify.*fgos-coding-exploring" .agents/skills/fgos-routing/SKILL.md; echo $?
 1   # bug gone
 ```
 

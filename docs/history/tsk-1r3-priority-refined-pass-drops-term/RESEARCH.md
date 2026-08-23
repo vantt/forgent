@@ -3,7 +3,7 @@
 ## Round 1 (tsk-1r3, stage discovery)
 
 **Checked:**
-- `src/intake/decompose.mjs:610-617` — refined pass calls `computeImpact({
+- `src/intake/plan.mjs:610-617` — refined pass calls `computeImpact({
   blocks, blastRadius })`, no `semanticRelatedness` key at all.
 - `src/intake/discovery.mjs:289-294` — rough pass calls `computeImpact({
   blocks, semanticRelatedness: Number.isInteger(verdict.impactScore) ?
@@ -40,4 +40,4 @@ the two call sites, not a claim that this alone fixes the observed
 larger question about whether decompose-time SHOULD re-derive `blocks`
 fresh at all — flagged as an assumption in plan.md, not fixed here).
 
-**Verdict:** `{clear: true, verify: "node --test test/state/priority-formula.test.mjs test/intake/decompose.test.mjs && npm test"}`
+**Verdict:** `{clear: true, verify: "node --test test/state/priority-formula.test.mjs test/intake/plan.test.mjs && npm test"}`

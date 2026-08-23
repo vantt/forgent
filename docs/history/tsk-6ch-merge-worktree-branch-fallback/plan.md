@@ -98,7 +98,7 @@ Concrete cases to prove against (matches the item's own `verify`,
   (`promote-engine.mjs`'s deliberately different choice for its own flow,
   `docs/history/promote-to-component/CONTEXT.md` D1). Not material to this
   item's own scope (an internal fallback default, not a product decision),
-  so pinned here rather than raised as a question — `fgos-validating`'s
+  so pinned here rather than raised as a question — `fgos-coding-validating`'s
   reality gate can flag it if the assumption turns out unproven.
 - `id` values never collide with an existing `branchNameFor` mapping
   ambiguity — already true today (`branchNameFor` is a pure `fgw/${id}`

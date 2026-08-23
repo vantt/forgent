@@ -102,7 +102,7 @@ enforcement mechanism, not something to duplicate in prose here.
 
 - **A1 (assumption, not a locked decision)**: the opt-out flag name for
   restoring today's immediate-fail behavior (candidates: `--no-wait`,
-  `--wait=0`). Pin whichever `fgos-planning` finds least surprising
+  `--wait=0`). Pin whichever `fgos-coding-planning` finds least surprising
   against existing CLI flag conventions in `bin/fgos.mjs`.
 - Backoff schedule (500ms → 1s → 2s, cap at 2s) — already specified in
   the item's own text; implementer detail, not re-litigated here.

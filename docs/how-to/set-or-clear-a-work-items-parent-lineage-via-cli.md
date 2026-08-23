@@ -14,7 +14,7 @@ it directly.
 > `hasChildren` re-entrancy check — decision 0012). The only writer of
 > `parent` anywhere in the repo today is `decompose.mjs:394`, inside
 > `judgeDecompose`'s internal `addWork()` call for the auto-split path.
-> `fgos-planning`'s own `SKILL.md` (step 5, lines 117-122) tells a session
+> `fgos-coding-planning`'s own `SKILL.md` (step 5, lines 117-122) tells a session
 > to create child items that "carry this item's own id as its `parent`" —
 > language that assumes a CLI path that does not exist.
 

@@ -104,7 +104,7 @@ whole-file rewrite (`fgos repair`) is a second, smaller, independently real
 gap worth closing in the same pass, but does not by itself explain the
 full-range write loss tsk-3wq's three new repros describe.
 
-**Still open (for `fgos-planning` to shape, not decided here):**
+**Still open (for `fgos-coding-planning` to shape, not decided here):**
 - Whether the fix is (1) a `.gitattributes` custom merge driver that folds
   two `events.jsonl` histories append-log-aware (union + reseq), (2) making
   `.fgos/events.jsonl` truly never-committed (stronger gitignore + a
@@ -120,7 +120,7 @@ full-range write loss tsk-3wq's three new repros describe.
   left for planning/exploring's own deeper dive, not required to establish
   that the goal itself is clear.
 
-## Round 2 — 2026-08-10 (tsk-3wq, fgos-validating reality gate)
+## Round 2 — 2026-08-10 (tsk-3wq, fgos-coding-validating reality gate)
 
 **Asked:** the first `plan.md` draft proposed wiring a merge-driver fixup
 call into `src/runner/merge.mjs`'s `mergeRunnerItemLocked`, immediately

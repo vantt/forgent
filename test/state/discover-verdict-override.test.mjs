@@ -62,20 +62,28 @@ test('discover --verdict clear without --force still parks in awaiting-human on 
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.work[id].stage, 'discovery');
 });
+
+const VALID_QUESTION = `## Context
+
+We need to clarify which provider should be used for the payment gateway integration.
+
+## Why this matters
+
+The choice of provider determines the SDK dependencies and API configuration required.`;
 
 test('discover --verdict unclear --force is a silent no-op for --force (force only ever applies to the clear branch)', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which provider?', '--force']);
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', VALID_QUESTION, '--force']);
   assert.equal(result.status, 0);
   assert.equal(envelopeData(result.stdout).outcome, 'unclear');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.gates[id].ask, 'Which provider?');
+  assert.equal(view.gates[id].ask, VALID_QUESTION);
 });
 
 // tsk-nfa D1: a --force call on an item a PRIOR discover call already
@@ -104,13 +112,15 @@ test('discover --verdict clear --force refuses when the item is already awaiting
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   // Round 1: parks the item via an unclear verdict.
-  const round1 = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which service?']);
+  const round1 = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', VALID_QUESTION]);
   assert.equal(round1.status, 0);
   assert.equal(envelopeData(round1.stdout).outcome, 'unclear');
 
   let view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'clarify');
+  // tsk-30v D2/D3: unclear no longer parks in place -- it also advances
+  // stage to exploring, even though status stays awaiting-human.
+  assert.equal(view.work[id].stage, 'exploring');
 
   // Round 2: a clear --force call directly on the still-parked item.
   const round2 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- forced', '--force']);
@@ -121,5 +131,5 @@ test('discover --verdict clear --force refuses when the item is already awaiting
   // Refused before touching state: stage/status stay exactly where round 1 left them.
   view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.work[id].stage, 'exploring');
 });

@@ -3,7 +3,7 @@ type: explanation
 title: How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off
 tags: [multi-session, concurrency, worktree, crash-recovery]
 timestamp: 2026-07-22T00:00:00.000Z
-source_capture_ids: [tsk-1jp, tsk-3wn]
+source_capture_ids: [tsk-1jp, tsk-3wn, tsk-597]
 ---
 
 # How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off
@@ -114,7 +114,7 @@ The investigation itself is worth noting for how it corrected course
 mid-stream: its first-pass conclusion (confirm the lock design is sound by
 construction; the flake trigger is the lock's 10-second acquire timeout
 under full-suite CPU/disk contention, not a real race) was reversed once
-`fgos-validating`'s reality check re-read the code and found it had only
+`fgos-coding-validating`'s reality check re-read the code and found it had only
 checked the *stale-holder-reclaim* branch's TOCTOU guard (which is sound)
 and missed the *earlier*, different window — the fast-path create itself.
 Once found, the match to the already-fixed `events.mjs` bug was exact:
@@ -343,6 +343,46 @@ looking at a blocked item after the fact cannot tell which happened
 without re-deriving it by hand — the same ambiguity that made `tsk-4qu`
 and `tsk-104` both look like real regressions when neither one's own
 diff touched `events.lock` at all.
+
+## The same load-flake, a third time — and the fix converged on an existing mechanism (`tsk-597`)
+
+`test/state/porting-store.test.mjs`'s own regression test for the CAS fix
+above — "`addPorting` under concurrent OS processes racing the SAME id:
+exactly one succeeds, the rest see already exists" — hit the identical
+failure shape `tsk-3wn` already diagnosed for `events.test.mjs`: `tsk-31lz`,
+an unrelated item whose diff only touched `src/state/replay.mjs`/
+`src/intake/discovery.mjs`, got pushed to `blocked` with
+`verify-fail-post-merge` because this one test timed out under real
+machine load (162s run vs. the ~47s normal case; the same file alone on
+`main` passed in 344ms; a retry passed immediately).
+
+Confirmed load, not regression, by the same evidence shape as `tsk-3wn`
+above: diffstat against `main` showed zero overlap with porting-store, the
+five intervening commits were docs/herdr-only, and the isolated single-file
+run was clean. The product-side race this test guards against was already
+fixed and merged (`tsk-1jp`, the CAS-inside-lock fix documented above) —
+`tsk-597`'s own scope was explicitly *not* to touch that fix again, only
+to make the *test itself* tolerate load.
+
+**The fix converged on an existing mechanism instead of inventing a new
+one.** The original plan was a bespoke lock-timeout-retry wrapper, mirroring
+`tsk-3wn`'s N_PROC/N_APPEND-shrinking approach. During implementation,
+`raceAcrossProcesses`'s helper turned out to already have a `batchSize`
+option — added the same day by a concurrent session's `tsk-4fx`, fixing
+the identical underlying issue on sibling tests. `tsk-597` reused that
+existing mechanism rather than shipping a second, parallel fix for the
+same problem. Proof that batching actually helps under contention: since
+real load couldn't safely be induced on the shared, actively-used
+development machine, the lock timeout was temporarily shrunk instead
+(mirroring `tsk-3wn`'s own methodology) — 2/2 unbatched runs failed, 3/3
+batched runs passed clean.
+
+This is the third module hitting the same load-flake pattern
+(`events.test.mjs` via `tsk-3wn`, a sibling test via `tsk-4fx`, and
+`porting-store.test.mjs` via this item) — the same open question `tsk-3wn`
+already named still applies unresolved: a verify failure at merge time
+still can't mechanically distinguish "this item's own change is broken"
+from "the infrastructure/a flaky dependency broke."
 
 ---
 

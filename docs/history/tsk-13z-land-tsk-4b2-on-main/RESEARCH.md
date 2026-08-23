@@ -48,7 +48,7 @@ runnable check with no open product/scope question left?
   redundant.
 - Confirmed one concrete still-live bug the merge fixes: current
   `.claude/skills/fgos-routing/SKILL.md` on main (== this worktree's
-  HEAD) still reads `clarify -> fgos-exploring` (wrong — the registry
+  HEAD) still reads `clarify -> fgos-coding-exploring` (wrong — the registry
   resolves `clarify -> fgos-clarifying`, confirmed via
   `src/state/workflow-stage-graphs.mjs:148`). Commit `d7ce57c6` on
   `fgw/tsk-4b2` is exactly this fix, and the merge-tree dry-run shows it
@@ -64,7 +64,7 @@ runnable check with no open product/scope question left?
   (`git merge-base --is-ancestor 7add82b8 main && npm test`) is real and
   runnable as written — no change needed.
 - tsk-4b2's own footprint (`src/intake/discovery.mjs`, `bin/fgos.mjs`,
-  several test files, both `fgos-coding-driving`/`fgos-exploring` SKILL.md
+  several test files, both `fgos-coding-driving`/`fgos-coding-exploring` SKILL.md
   mirrors) is *mostly* already on main via `5b394faf`; the merge only
   needs to land the remaining 9-file delta.
 

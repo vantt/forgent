@@ -2,7 +2,7 @@
 
 ## Round 1 (tsk-6d8, stage discovery)
 
-**Checked:** `src/intake/discovery.mjs:289-310`, `src/intake/decompose.mjs`'s
+**Checked:** `src/intake/discovery.mjs:289-310`, `src/intake/plan.mjs`'s
 priority-write try/catch (the one immediately after the `computePriority`
 call, ~line 609-631 in this branch's current state — note: this branch
 already carries `tsk-4hb`'s merged fix, which added an `addDecision` call

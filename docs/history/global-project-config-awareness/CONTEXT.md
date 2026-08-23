@@ -124,7 +124,7 @@ Trạng thái) cho tình trạng thật.
   công.**~~ Đã xong — `src/config/shared-config-file.mjs`'s
   `sharedConfigFilePath` là nguồn duy nhất hôm nay, `.fgos-runner.json` chỉ
   còn sót trong một fixture test không liên quan
-  (`test/intake/decompose.test.mjs`), không còn cơ chế đọc file cũ nào.
+  (`test/intake/plan.test.mjs`), không còn cơ chế đọc file cũ nào.
 - ~~**Global config chưa được wire vào runtime thật.**~~ Đã xong —
   `src/runner/dispatch.mjs:288,342`'s `loadRunnerConfigFromDir`/
   `ensureRunnerConfigForDir` gọi `mergeWithGlobalConfig` trước khi validate

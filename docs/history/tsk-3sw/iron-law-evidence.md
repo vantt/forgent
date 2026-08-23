@@ -70,5 +70,5 @@ still stands as real regression coverage going forward).
 Full suite (`npm test`) after this change: 2371 tests, 2366 pass, 0 fail,
 5 skipped — no regression to any pre-existing case (`resolveExecutorConfig`
 is a shared hub function per GitNexus's own live impact analysis at
-`fgos-validating`, CRITICAL risk by callgraph position; this change is
+`fgos-coding-validating`, CRITICAL risk by callgraph position; this change is
 purely additive/opt-in, confirmed by the full suite staying green).

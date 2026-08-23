@@ -2,9 +2,9 @@
 
 Distilled from `docs/history/two-layer-dispatch/DISCUSSION.md` (the
 `fgos-coding-shaping` transcript this design was actually worked out in,
-across vòng 1–8c) — this file is `fgos-exploring`'s own terminal artifact
+across vòng 1–8c) — this file is `fgos-coding-exploring`'s own terminal artifact
 for `tsk-2t6`; DISCUSSION.md stays the full evidence/rationale record,
-this is the locked-decisions summary `fgos-planning` reads from.
+this is the locked-decisions summary `fgos-coding-planning` reads from.
 
 ## Feature boundary
 
@@ -97,5 +97,5 @@ porting-log row's real citations/score tags — not just a heading string.)
 
 None open for `tsk-2t6` itself. All three children delivered; this
 item's own doc deliverable is done and verified. Nothing left to design
-or build — `fgos-planning` should find this item ready to close, not
+or build — `fgos-coding-planning` should find this item ready to close, not
 needing a further split.

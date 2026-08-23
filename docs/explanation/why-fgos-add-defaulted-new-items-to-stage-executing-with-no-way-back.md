@@ -1,7 +1,7 @@
 # Why `fgos add` items landed permanently at stage `executing`, with no path back
 
 `tsk-621` found that every item created via `fgos add` skipped
-`fgos-exploring`/`fgos-planning`/`fgos-validating` entirely and
+`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating` entirely and
 permanently — not temporarily, and with no way to recover once it
 happened.
 
@@ -30,7 +30,7 @@ has no mechanism to manufacture a fourth.
 
 ## Why this wasn't a rare edge case
 
-`fgos-planning/SKILL.md`'s own step 4 — the *current, active* instruction
+`fgos-coding-planning/SKILL.md`'s own step 4 — the *current, active* instruction
 every split follows today — teaches splitting a task by calling `fgos add
 --parent <id> --footprint ...`, with no `--stage` option at all. This
 isn't a historical accident affecting old items only; it fires on every

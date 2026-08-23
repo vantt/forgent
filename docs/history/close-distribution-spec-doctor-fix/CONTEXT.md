@@ -1,6 +1,6 @@
 # tsk-1qm — close `docs/specs/distribution.md`'s doctor-fix drift
 
-**Stage:** clarify (fgos-exploring). **Date:** 2026-08-02.
+**Stage:** clarify (fgos-coding-exploring). **Date:** 2026-08-02.
 
 ## Feature boundary
 

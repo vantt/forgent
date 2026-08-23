@@ -13,7 +13,7 @@ judges the specific proposal genuinely unstable / worth a real discussion.
 
 **Checked — repo, mechanical code:**
 
-- `src/intake/decompose.mjs:106-119` — the exact mechanism named in the
+- `src/intake/plan.mjs:106-119` — the exact mechanism named in the
   item:
   ```
   const HEAVY_RISK = 'heavy';
@@ -40,7 +40,7 @@ judges the specific proposal genuinely unstable / worth a real discussion.
   friction the item complains about is exactly one ask per heavy-risk
   root, not a repeated one.
 
-- `src/intake/decompose.mjs:106-109` — a comment directly on `HEAVY_RISK`
+- `src/intake/plan.mjs:106-109` — a comment directly on `HEAVY_RISK`
   states this is a **deliberate, already-decided** design, not an
   oversight:
   > "D3(b): risk-heavy root always routes through the human gate
@@ -50,7 +50,7 @@ judges the specific proposal genuinely unstable / worth a real discussion.
 
   i.e. this exact question — should risk=heavy always force a human gate
   regardless of what the proposal says — was already run through a
-  Feasibility-matrix decision once, at `fgos-validating` time, row 4,
+  Feasibility-matrix decision once, at `fgos-coding-validating` time, row 4,
   during the original `resolveDecompose` build (commit `3a982bd0`,
   2026-07-16, `feat(stage-decompose-2)`). No `docs/history/<feature>/`
   folder survives for that original decision (checked: no
@@ -71,17 +71,17 @@ judges the specific proposal genuinely unstable / worth a real discussion.
   non-negotiable — mirrors bee's own non-negotiable floor for its riskiest
   lane." — this later item explicitly re-affirmed the same floor as
   non-negotiable when building the *separate* mechanical-bypass feature
-  for the OTHER two skill-embedded gates (`fgos-exploring`/`fgos-planning`
+  for the OTHER two skill-embedded gates (`fgos-coding-exploring`/`fgos-coding-planning`
   Approve prompts). D4 there is about NOT letting the config-level bypass
   reach this gate at all — it does not itself re-derive whether the gate
   should exist, it inherits `HEAVY_RISK`'s prior D3(b) decision as a given.
 
-- `test/intake/decompose.test.mjs` — real, existing coverage for this
+- `test/intake/plan.test.mjs` — real, existing coverage for this
   exact gate: `need-human` outcome assertions for heavy-risk/blast-radius/
   footprint-overlap paths (lines ~565, ~606, ~645, plus the
   `heavyRiskAlreadyConfirmed`/`blastRadiusAlreadyConfirmed` skip-on-re-ask
   behavior). A change here has a concrete, runnable verify surface already:
-  `npm test -- test/intake/decompose.test.mjs` (392 lines, exercises
+  `npm test -- test/intake/plan.test.mjs` (392 lines, exercises
   `resolveDecompose`/`judgeDecompose` end to end against a real store
   fixture, not mocked).
 
@@ -96,7 +96,7 @@ judges the specific proposal genuinely unstable / worth a real discussion.
 pure in-repo policy question, no library/framework/concept outside this
 codebase is involved.
 
-**Still open (for `fgos-exploring`/`fgos-planning`, not this skill's job):**
+**Still open (for `fgos-coding-exploring`/`fgos-coding-planning`, not this skill's job):**
 
 - What "the system itself judges the proposal genuinely unstable" should
   be measured BY, mechanically — the item's own text names a negative
@@ -112,7 +112,7 @@ codebase is involved.
   (`decompose.mjs`'s own comment) and gate-bypass's D4 (which inherits
   D3(b) as a given) — `AGENTS.md`'s "Changing a locked law" convention
   says supersede-by-ID, never edit in place; D3(b) has no dedicated
-  history folder to supersede INTO, which `fgos-planning` will need to
+  history folder to supersede INTO, which `fgos-coding-planning` will need to
   decide how to handle (e.g. write it into this item's own new folder).
   Not itself a blocker to `exploring`: this is a documentation-placement
   question, not evidence against the change.
@@ -122,9 +122,9 @@ codebase is involved.
 **Clear.** The goal is well-defined and the code path is fully located and
 read. What remains (the mechanical replacement signal for "genuinely
 unstable", and how to record the supersession of D3(b)) are real design
-decisions for `fgos-exploring`/`fgos-planning`, not gaps in understanding
+decisions for `fgos-coding-exploring`/`fgos-coding-planning`, not gaps in understanding
 what is being asked.
 
 ```json
-{"clear": true, "verify": "npm test -- test/intake/decompose.test.mjs"}
+{"clear": true, "verify": "npm test -- test/intake/plan.test.mjs"}
 ```

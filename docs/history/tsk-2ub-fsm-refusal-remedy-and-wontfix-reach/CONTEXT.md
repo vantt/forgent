@@ -3,7 +3,7 @@
 Item: `tsk-2ub`. Written retroactively (same structural gap as this scan's
 other items).
 
-## Decisions
+## Locked decisions
 
 - **D0 (message bug — safe, no product decision needed).** Root cause:
   `transitionWork`'s precondition refusal (`src/state/status-fsm.mjs:213-

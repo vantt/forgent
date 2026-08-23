@@ -10,7 +10,7 @@ Mode: standard
 
 Lane decided via `fgos-routing`'s own Mode-gate direct-entry fallback (this
 session never ran `fgos-routing`'s Orient step for this item — went
-submit → `fgos-coding-shaping` → `fgos-exploring` directly). Flag count: 2
+submit → `fgos-coding-shaping` → `fgos-coding-exploring` directly). Flag count: 2
 — **public contracts** (`fgos setup`'s documented behavior in
 `docs/specs/distribution.md`/`README.md` changes: it now also writes
 `~/.fgos/config.json`, not just project-local state) and **existing
@@ -50,7 +50,7 @@ project shape). Violates DRY for no gain; the existing function's own
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `bin/fgos.mjs`'s `setup` case calling `ensureSharedConfigDefaults(os.homedir())` | Low — reuses a function with existing test coverage (`test/setup/registrations.test.mjs:163-178`), only a new call site | `fgos-validating`: confirm the call site compiles/runs against a temp `HOME`, doesn't touch this dev machine's real `~/.fgos/config.json` |
+| `bin/fgos.mjs`'s `setup` case calling `ensureSharedConfigDefaults(os.homedir())` | Low — reuses a function with existing test coverage (`test/setup/registrations.test.mjs:163-178`), only a new call site | `fgos-coding-validating`: confirm the call site compiles/runs against a temp `HOME`, doesn't touch this dev machine's real `~/.fgos/config.json` |
 | Test isolation (never write to the real dev machine's `~/.fgos/config.json` while running `npm test`) | Medium — a missed `process.env.HOME` override in a new test would pollute the real machine | Precedent already exists and must be followed exactly: `test/config/global-config.test.mjs:122-134` overrides `process.env.HOME` to a temp dir, restores it in a `finally`. New test for `fgos setup`'s global-write behavior must use the same pattern. |
 | `mergeWithGlobalConfig`'s "project wins" semantics once global commonly holds full defaults too | Low — already covered by `test/config/global-config.test.mjs`'s precedence tests (project value wins even when both levels declare the same key); this item adds no new precedence logic, only populates the global file more often | none needed beyond existing coverage — informational only |
 | `docs/specs/distribution.md`/`README.md` going stale (public-contract flag) | Low, but real — Setup's documented behavior changes | Update `docs/specs/distribution.md` Setup Behaviors + Data Dictionary and `README.md`'s Setup section in the same change, not deferred |
@@ -62,7 +62,7 @@ impact-analysis --status present` → GitNexus `present` but `tsk-1lg`
 small, already-covered-by-tests functions with a well-understood, narrow
 caller set (confirmed by direct `rg` read in `CONTEXT.md`'s Scout
 evidence, not GitNexus) — the degraded posture does not block this plan,
-but `fgos-code-implement` should still run `impact()` on
+but `fgos-coding-implement` should still run `impact()` on
 `ensureSharedConfigDefaults` before editing it and cross-check with `rg`
 if the result looks thin, per `CLAUDE.md`'s gate.
 
@@ -113,10 +113,10 @@ npm test
 ```
 
 (the new integration test named above is added to the suite `npm test`
-already runs — no separate command needed; `fgos-planning` does not invent
+already runs — no separate command needed; `fgos-coding-planning` does not invent
 a new test runner, per this skill's own Proof-surface rule. Exact new
 test file/name is an implementation choice, left to
-`fgos-code-implement`.)
+`fgos-coding-implement`.)
 
 ## Assumptions
 
@@ -133,5 +133,5 @@ test file/name is an implementation choice, left to
 
 None material — `CONTEXT.md`'s two Outstanding items (exact
 function/call-site shape, exact message wording) are implementation
-choices, left to `fgos-code-implement`, not gray areas this plan needs
-`fgos-exploring` for.
+choices, left to `fgos-coding-implement`, not gray areas this plan needs
+`fgos-coding-exploring` for.

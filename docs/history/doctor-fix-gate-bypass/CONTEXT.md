@@ -25,7 +25,7 @@ Ngoài phạm vi item này (deferred, không mở rộng scope):
 
 | ID | Quyết định |
 |----|------------|
-| D1 | Thi công thật của tsk-2qz **chờ** `.fgos/config.json` (shared config file, tsk-2ta) tồn tại thật trước khi build fix logic nhắm vào `config.gateBypass`. Không bootstrap `.fgos/gate-bypass.json` như file riêng lẻ trong lúc chờ — người dùng chọn "Wait on tsk-2ta" thay vì phương án bootstrap riêng lẻ rồi refactor sau. Đây là soft dependency, KHÔNG tự thêm `tsk-2ta` vào `deps` array ở bước này (deps là field do người dùng sở hữu) — `fgos-planning` đọc lại trạng thái merge thật của `fgw/tsk-2ta` tại thời điểm thi công và quyết việc wire deps chính thức, giống hệt tiền lệ chính `tsk-2cs`'s plan.md đã dùng cho rủi ro tương tự (piece 2 chờ tsk-2ta). |
+| D1 | Thi công thật của tsk-2qz **chờ** `.fgos/config.json` (shared config file, tsk-2ta) tồn tại thật trước khi build fix logic nhắm vào `config.gateBypass`. Không bootstrap `.fgos/gate-bypass.json` như file riêng lẻ trong lúc chờ — người dùng chọn "Wait on tsk-2ta" thay vì phương án bootstrap riêng lẻ rồi refactor sau. Đây là soft dependency, KHÔNG tự thêm `tsk-2ta` vào `deps` array ở bước này (deps là field do người dùng sở hữu) — `fgos-coding-planning` đọc lại trạng thái merge thật của `fgw/tsk-2ta` tại thời điểm thi công và quyết việc wire deps chính thức, giống hệt tiền lệ chính `tsk-2cs`'s plan.md đã dùng cho rủi ro tương tự (piece 2 chờ tsk-2ta). |
 | D2 | Cả hai đường ghi cùng tồn tại: `fgos setup` tiếp tục đảm bảo bootstrap đúng lúc khởi đầu (tái dùng pattern `ensureRunnerConfig`: tạo file/key nếu thiếu, merge key thiếu nếu file đã có — `src/runner/dispatch.mjs:278`), VÀ `fgos doctor` có thêm `--fix` thật để sửa/nâng cấp về sau. `doctor` KHÔNG `--fix` vẫn giữ hành vi read-only mặc định. Quyết định này ĐẢO RUL9 + RUL11 (`docs/specs/distribution.md:200,210`) — đảo có chủ đích theo vision doc §3, không phải drift ngoài ý — `tsk-1qm` chịu trách nhiệm supersede chính thức trong spec. |
 | D3 | Khả năng fix là TỔNG QUÁT, không hardcode riêng cho gate-bypass. `src/setup/registrations.mjs` (registry của tsk-2cs) có thêm năng lực đăng ký thứ ba, `fix`, độc lập với `check`/`configDefault` hiện có (cùng phong cách "độc lập, không bắt buộc đi cặp" của D2 bên tsk-2cs). gate-bypass.json là entry đầu tiên đăng ký đủ cả ba (check + configDefault + fix), chứng minh trọn hình dạng registry — không phải một fix one-off. |
 | D4 | D1's "chờ" đã RESOLVED bằng bằng chứng thật, KHÔNG còn là chờ vô thời hạn: `tsk-5vf` (di dời project config, đóng gap D1-amended của `tsk-2ta`) đã merge lên `main` (`af2fc64 Merge branch 'fgw/tsk-5vf'`). `.fgos/config.json` tồn tại thật trên đĩa (multi-section, key `runner` xác nhận bằng đọc trực tiếp). `tsk-5vf`'s D4 xây sẵn một assembler tổng quát, `ensureSharedConfigDefaults(dir)` (`src/setup/registrations.mjs:113`, gọi từ `fgos setup` tại `bin/fgos.mjs:2729`): gộp `shape` của MỌI entry đã `registerConfigDefault` (`CONFIG_DEFAULT_REGISTRATIONS`) vào file chung, ghi khi có key thiếu — một entry `gateBypass` mới đăng ký được assembler này tự động bootstrap, KHÔNG cần sửa `setup`/`dispatch.mjs` thêm. `tsk-5vf`'s D3 tự xác nhận lại ranh giới: gate-bypass fold-in vẫn là việc của `tsk-2qz`, không phải `tsk-5vf`. D2's "setup đảm bảo bootstrap" nay được thoả bằng cơ chế có sẵn này — không cần code setup mới, chỉ cần đăng ký entry. |
@@ -37,7 +37,7 @@ Ngoài phạm vi item này (deferred, không mở rộng scope):
   idempotent, chỉ chạm phạm vi của chính entry — không sửa entry khác.
 - **"Soft dependency" (D1)**: một ràng buộc thứ tự thi công thật, ghi rõ ở
   CONTEXT.md/plan.md, nhưng KHÔNG tự động trở thành một `deps` graph edge —
-  việc wire graph là quyết định của `fgos-planning`/thi công dựa trên bằng
+  việc wire graph là quyết định của `fgos-coding-planning`/thi công dựa trên bằng
   chứng thật tại thời điểm đó, không đoán trước ở đây.
 
 ## Scout evidence
@@ -101,15 +101,15 @@ Ngoài phạm vi item này (deferred, không mở rộng scope):
 
 - D1's câu hỏi gốc (wire `deps: [tsk-2ta]` hay không) **đã giải quyết bởi
   D4** — `tsk-5vf` (không phải `tsk-2ta` trực tiếp) là item thật đã đóng gap;
-  cả hai đã `done`. `fgos-planning` không còn cần cân nhắc deps nữa cho việc
+  cả hai đã `done`. `fgos-coding-planning` không còn cần cân nhắc deps nữa cho việc
   chờ này — piece 2 không còn bị block bên ngoài.
 - Tên field/shape chính xác cho registration `fix` thứ ba trong
   `registrations.mjs` (vd `{ id, fix: async (cwd) => {...} }`, có cần
-  dry-run/preview trước khi ghi không) — chi tiết implementer, `fgos-planning`
+  dry-run/preview trước khi ghi không) — chi tiết implementer, `fgos-coding-planning`
   quyết.
 - `doctor --fix` chạy MỘT entry cụ thể hay TẤT CẢ entry có đăng ký `fix`
   cùng lúc (vd `fgos doctor --fix` chạy hết, `fgos doctor --fix gate-bypass`
-  chạy riêng)? — chi tiết implementer/UX, `fgos-planning` quyết.
+  chạy riêng)? — chi tiết implementer/UX, `fgos-coding-planning` quyết.
 
 ## Outstanding questions
 

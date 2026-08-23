@@ -31,11 +31,11 @@ items.
 ## The one condition narrow enough to be provably safe
 
 ```js
-// The only case where skipping is provably safe is when fgos-planning's
+// The only case where skipping is provably safe is when fgos-coding-planning's
 // own mode gate (SKILL.md step 2) already guarantees no split is
 // possible: `tiny`/`small` mode is single-piece by definition (0-1 risk
 // flags). Detected by reading plan.md's own recorded mode line
-// (fgos-planning always writes one, per its own step 2 "Record the
+// (fgos-coding-planning always writes one, per its own step 2 "Record the
 // count, the flags, and the chosen mode in plan.md itself") — any other
 // mode, or no match at all, falls through to the real judgeDecompose call
 // below unchanged (fail-safe: an uncertain read must never skip a real
@@ -46,7 +46,7 @@ if (lockedContext && passThroughModeMatch) {
   const mode = passThroughModeMatch[1].toLowerCase();
   addDecision(dir, {
     id,
-    text: `decompose skip: plan.md declares mode "${mode}" (tiny/small are single-piece by fgos-planning's own mode gate), no model call`,
+    text: `decompose skip: plan.md declares mode "${mode}" (tiny/small are single-piece by fgos-coding-planning's own mode gate), no model call`,
     source: 'resolveDecompose',
     rationale: 'tsk-19j D7 trust signal: plan.md already committed to no split, so judgeDecompose has nothing to judge — skipping avoids a pointless model round-trip, never a real child-generation decision',
   });
@@ -56,7 +56,7 @@ if (lockedContext && passThroughModeMatch) {
 }
 ```
 
-Only `fgos-planning`'s own mode gate — `tiny`/`small` mode, which is
+Only `fgos-coding-planning`'s own mode gate — `tiny`/`small` mode, which is
 single-piece by definition (0–1 risk flags) — is narrow enough to make
 skipping provably safe. If `plan.md` has already committed to
 single-piece mode, there is nothing left for `judgeDecompose` to judge;
@@ -71,7 +71,7 @@ discipline `discovery.mjs`'s own header already states for
 
 ```js
 // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].planApprove.verify`
-// is the real command fgos-planning/fgos-validating recorded for this item
+// is the real command fgos-coding-planning/fgos-coding-validating recorded for this item
 // — read once, reused by every moveStage call below that advances this item
 // to `executing`, so none of them silently carry FALLBACK_VERIFY or leave
 // `verify` untouched (transitionStage only overwrites it when passed a
@@ -84,7 +84,7 @@ const planApproveVerify = view.gates?.[id]?.planApprove?.verify ?? work.verify;
 Every path through `resolveDecompose` that moves an item to `executing`
 (already-decomposed re-entrancy, the mode-gate skip above, and the
 normal judged path) reads `gates[id].planApprove.verify` — the real
-verify string `fgos-planning`/`fgos-validating` recorded at approval
+verify string `fgos-coding-planning`/`fgos-coding-validating` recorded at approval
 time (`tsk-19j-1`'s own contribution) — once, and reuses it consistently.
 No path silently carries the old `FALLBACK_VERIFY` placeholder or
 leaves `verify` untouched by accident. An item that predates this whole
@@ -109,7 +109,7 @@ item is real again in `fgos-coding-driving`'s own loop, which does
 check a fresh claim status before invoking the `executing`-stage skill,
 exactly per its own hard rule. `tsk-3ev` found the gap wasn't in this
 code at all: **a session driving stage-by-stage by hand** — calling
-`fgos-code-implement` directly instead of returning to
+`fgos-coding-implement` directly instead of returning to
 `fgos-coding-driving`'s loop after `decompose --verdict pass-through` —
 has no signal that its own claim was just silently released.
 
@@ -126,8 +126,8 @@ same item while it briefly sat unclaimed at `todo`/stage `executing` (a
 real, legitimate frontier candidate in that state), a genuine worktree/
 branch conflict could have resulted.
 
-**The fix**: an explicit warning line added to `fgos-validating/
-SKILL.md`'s own Handoff section (and `fgos-code-implement/SKILL.md`'s
+**The fix**: an explicit warning line added to `fgos-coding-validating/
+SKILL.md`'s own Handoff section (and `fgos-coding-implement/SKILL.md`'s
 Orient step, both dual-root copies) — any driving path that does **not**
 go through `fgos-coding-driving`'s own loop must re-check the item's
 live status itself (it may already be back at `todo`) and re-claim

@@ -9,7 +9,7 @@ Split child of `tsk-5td` (dispatch-vocabulary-rearrange session). No local
 `CONTEXT.md` — this item inherited its locked decisions directly from
 `tsk-5td`'s own `docs/history/dispatch-concept-boundary/DISCUSSION.md`
 (a `fgos-coding-shaping` DISCUSSION doc plays the same "already locked,
-cite don't reopen" role a `fgos-exploring` CONTEXT.md would; that item's
+cite don't reopen" role a `fgos-coding-exploring` CONTEXT.md would; that item's
 worktree carries the only checked-in copy today — `.claude/worktrees/
 tsk-5td-pqXr9j/docs/history/dispatch-concept-boundary/DISCUSSION.md`).
 Citations below are D-IDs from that doc, per §7.3 (anchor
@@ -22,7 +22,7 @@ indexed `19bc5e4`, several commits stale as of this plan) — blast radius
 may be stale. None of this plan's own proof points lean on GitNexus
 blast-radius evidence (every risk-map row below cites a real `rg`/`npm
 test` command instead), so this posture change does not weaken any of
-them; `fgos-code-implement` still runs `impact()` on each touched symbol
+them; `fgos-coding-implement` still runs `impact()` on each touched symbol
 per `CLAUDE.md`'s binding gate, treating its result as weak proof per the
 degraded ladder rather than skipping it.
 

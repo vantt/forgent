@@ -3,7 +3,7 @@
 Mode: **standard**
 
 Direct-entry: no `Mode:` line existed yet and this session's own Orient
-step never ran before `fgos-planning` was loaded (entered via `/fgOS:pick`
+step never ran before `fgos-coding-planning` was loaded (entered via `/fgOS:pick`
 → `fgos-coding-driving`, not `fgos-routing`), so the lane was derived here
 per `fgos-routing`'s own Mode-gate table. Flags counted: **existing
 covered behavior** (yes — `parse_need_answer`/`parse_after_deliver` and
@@ -16,7 +16,7 @@ external-provider/validation-removal). 2 flags → standard.
 
 ## Validating round 1 — Proof surface FAIL, verify revised
 
-`fgos-validating`'s reality gate FAILed the Proof surface dimension on the
+`fgos-coding-validating`'s reality gate FAILed the Proof surface dimension on the
 verify this plan originally reused from `discover` (`"cargo test
 --manifest-path herdr-plugin/Cargo.toml need_answer_survives_missing_stage
 && cargo test --manifest-path herdr-plugin/Cargo.toml
@@ -75,7 +75,7 @@ description bundles them:
 
 ### Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `WorkItemRaw`/`parse_need_answer`/`parse_after_deliver` (`fgos.rs`) | Medium — existing, tested parse path; a stage-less fixture must be added and must not regress the two existing fixture tests (`fgos.rs:640,681`) | New test `need_answer_survives_missing_stage`: parse a JSON fixture shaped like real `tsk-mvp-test-1` (no `stage` field, `status: wontfix`) through `parse_need_answer`/`parse_after_deliver` and assert `Ok`, plus the two existing fixture tests still pass |
 | `refresh_from_fgos` (`app.rs`) | Medium — existing, tested method (`main.rs:933` already asserts `last_error.is_none()` on the happy path); ordering fix must not break that assertion | New test `last_error_first_error_wins`: a fake `WorkItemSource` where source N fails and a later source N+k succeeds in the same call, assert `app.last_error` reports source N's error after `refresh_from_fgos` returns |

@@ -109,8 +109,8 @@ unrelated reasons:
 The first failure was `test/skills/fgos-mirror.test.mjs`'s `every mirrored
 file pair is byte-identical`: a genuine pre-existing bug from a different,
 already-merged item (`182f495`, "add required `--rationale` to `fgos
-decision` calls") that updated `.claude/skills/fgos-exploring/SKILL.md`
-and `.claude/skills/fgos-planning/SKILL.md` but never synced the
+decision` calls") that updated `.claude/skills/fgos-coding-exploring/SKILL.md`
+and `.claude/skills/fgos-coding-planning/SKILL.md` but never synced the
 `.agents/skills` mirror counterparts — a file `tsk-2z3`'s own diff never
 touched. Fixed as its own separate commit
 (`7b91834`, syncing the two `.agents/skills` files), confirmed green with

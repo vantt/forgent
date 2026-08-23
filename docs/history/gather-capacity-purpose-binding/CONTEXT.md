@@ -1,10 +1,10 @@
 # gather-capacity-purpose-binding
 
-Claimed item: tsk-2ie5. Written by `fgos-exploring`, invoked directly from
-`fgos-planning`'s own "Mid-planning CONTEXT.md gap" step — the item landed
+Claimed item: tsk-2ie5. Written by `fgos-coding-exploring`, invoked directly from
+`fgos-coding-planning`'s own "Mid-planning CONTEXT.md gap" step — the item landed
 at stage `decompose` (a legal `clarify -> decompose` shortcut edge, fired
 by a caller-supplied `clear` verdict) without ever generating a `CONTEXT.md`
-of its own, so `fgos-planning` could not cite one. `item.stage` stayed
+of its own, so `fgos-coding-planning` could not cite one. `item.stage` stayed
 `decompose` throughout this pass; no backward stage move was applied.
 
 ## Feature boundary
@@ -74,7 +74,7 @@ section:
   skill calls into `dispatch.mjs`'s exported resolution functions
   (`resolveCapacityCli`/`decideCapacityCli`/`resolveExecutorCommand`) and
   what a gather-specific log line looks like is an implementation
-  question for `fgos-planning`, not resolved here — it fails this skill's
+  question for `fgos-coding-planning`, not resolved here — it fails this skill's
   own "material" bar (an implementer's mechanism choice, not a
   scope/behavior/data-shape choice a person needs to weigh in on).
 
@@ -164,7 +164,7 @@ assuming the DISCUSSION.md file, since it is not reachable from here.
   status `present` — but the index itself is stale (hook-reported: "last
   indexed: 4ce7a96", predates this session's own commits on this branch)
   → posture **degraded** per `CLAUDE.md`'s own three-way framing (`present`
-  only means installed, never that the index is fresh). `fgos-planning`'s
+  only means installed, never that the index is fresh). `fgos-coding-planning`'s
   proof points may still use GitNexus output, but must mark that evidence
   weak and cross-check any zero-result/"not found" answer with a direct
   `rg`/`grep` pass before trusting it.
@@ -185,12 +185,12 @@ assuming the DISCUSSION.md file, since it is not reachable from here.
 ## Outstanding questions
 
 None for this skill's own scope (product/behavior/data-shape). Two
-process risks are surfaced for `fgos-planning` to size and structure, not
+process risks are surfaced for `fgos-coding-planning` to size and structure, not
 asked here since neither changes what gets built:
 
 - **ADR0020 split.** This item's footprint includes `.fgos/config.json`.
   A `fgw/tsk-2ie5` branch can never carry a `.fgos/` change through `fgos
-  approve` (ADR0020's `fgos-write-rejected` guard). `fgos-planning` must
+  approve` (ADR0020's `fgos-write-rejected` guard). `fgos-coding-planning` must
   split the config-registration step into its own child item (hand-edited
   on the main checkout) from the start, per precedent (`tsk-5vf`/
   `tsk-n4i-1`/`tsk-5ge`) — never discovered only at merge time.
@@ -199,6 +199,6 @@ asked here since neither changes what gets built:
   item that mints D-IDs but hasn't itself reached `decompose`). Its
   decision log is stable enough to cite (18 rounds, explicitly marked
   "giu qua N vong khong bi lat" / held through N rounds without being
-  overturned, for every D-ID cited above) but `fgos-planning` should note
+  overturned, for every D-ID cited above) but `fgos-coding-planning` should note
   this as a soft dependency risk in `plan.md` rather than silently assume
   it.

@@ -17,7 +17,7 @@ across two skills (two of the three are a byte-identical mirror pair that
 change together), no gray areas — no direct-entry Orient step ran before
 this session reached `decompose` (this item was driven straight from
 `/fgOS:cook`, never routed through `fgos-routing`'s own Orient), so this
-lane was derived directly from the Mode-gate table per `fgos-planning`'s
+lane was derived directly from the Mode-gate table per `fgos-coding-planning`'s
 own direct-entry fallback, not re-derived past an existing hand-off.
 
 Impact-analysis posture: `full` (`gitnexus` present) but not applicable in
@@ -78,14 +78,14 @@ driver mirror independently, `pick` still has its rename call), then
 NEGATIVE (`pick`'s old duplicate print phrase is gone; no `src/` file was
 touched by a prose-only item).
 
-**Correction (`fgos-validating`'s own reality-gate pass, repo-fit FAIL):**
+**Correction (`fgos-coding-validating`'s own reality-gate pass, repo-fit FAIL):**
 the original verify also asserted `diff .claude/skills/fgos-coding-driving/
 SKILL.md .agents/skills/fgos-coding-driving/SKILL.md` (whole-file
 identity). That assumption was true when `CONTEXT.md`/this plan were
 written, but a concurrent session updated `.claude/`'s copy's `/fgOS:cook`
 fan-out row (an unrelated revert) without mirroring it into `.agents/`'s
 copy before this item reached validating — the same dual-mirror drift risk
-`tsk-11f` already flagged for `fgos-exploring`. Fixing that pre-existing,
+`tsk-11f` already flagged for `fgos-coding-exploring`. Fixing that pre-existing,
 unrelated drift is out of this item's own footprint/scope (`CONTEXT.md`
 never decided to take it on); the corrected verify above only proves what
 this item is actually responsible for — its own new anchor phrase landing
@@ -96,7 +96,7 @@ in both copies — dropping the over-strict whole-file-identity assertion.
 - The exact anchor phrase `"once per fgos-coding-driving invocation"` is
   pinned now (verify depends on it literally) — the implementing session
   must use this exact phrase when writing the new step, not a paraphrase.
-- `/fgOS:cook`, `/fgOS:discover`, `/fgOS:decompose`, `/fgOS:discover-next`
+- `/fgOS:cook`, `/fgOS:discover`, `/fgOS:plan`, `/fgOS:discover-next`
   need no edits of their own — they inherit the display purely by already
   invoking `fgos-coding-driving` (CONTEXT.md D1). Not re-verified per-file
   here beyond the driver's own change, since none of those four files are

@@ -60,7 +60,7 @@ in `clarify`, not discover a real seam.
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | Event-log fold (`replay.mjs` 2 new cases) | Diverges from the existing flat-switch fold convention, or corrupts `view.tools` on replay | New cases in `test/state/replay.test.mjs`, following the existing case-test pattern for `work.add`/`decision`/etc. |
 | CLI verb wiring (`bin/fgos.mjs`, `command-registry.mjs`) | Breaks existing verb dispatch or the manifest anti-drift test | `test/cli/fgos-manifest.test.mjs` passes unchanged shape + new entries; `test/cli/fgos.test.mjs` gains `tool` subcommand coverage |

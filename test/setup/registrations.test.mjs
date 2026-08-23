@@ -9,8 +9,19 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
+import { execFileSync } from 'node:child_process';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
+import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-guard-warnings.mjs';
+
+
+const EXPECTED_RUNNER_DEFAULT = {
+  ...DEFAULT_RUNNER_CONFIG,
+  capabilities: DEFAULT_CAPABILITY_SLOTS,
+  modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { lightweight: 'gpt-5.5' } },
+  executors: { pi: PI_EXECUTOR_DEFAULT },
+};
 
 // tsk-4xg: runFixes() below invokes every registered fix, including the
 // real `claude-plugin-marketplace` one, which shells out to a real,
@@ -163,10 +174,16 @@ test('runFixes invokes every registered fix against the given cwd and reports id
 test('ensureSharedConfigDefaults on a fresh dir writes every registered entry under its own key, including the built-in "runner" one', () => {
   const dir = mkTempDir();
   const { config, addedKeys } = ensureSharedConfigDefaults(dir);
-  assert.deepEqual(config.runner, DEFAULT_RUNNER_CONFIG);
+  // tsk-2uf-3: the registered "runner" config-default layers the
+  // advise/execute capability slots onto DEFAULT_RUNNER_CONFIG (that
+  // constant itself, src/runner/dispatch.mjs, stays untouched -- see
+  // registrations.mjs's own `DEFAULT_CAPABILITY_SLOTS` composition), so
+  // the assembled "runner" section is no longer byte-identical to
+  // DEFAULT_RUNNER_CONFIG alone.
+  assert.deepEqual(config.runner, EXPECTED_RUNNER_DEFAULT);
   assert.ok(addedKeys.some((k) => k.startsWith('runner.')) || addedKeys.includes('runner'));
   const written = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8'));
-  assert.deepEqual(written.runner, DEFAULT_RUNNER_CONFIG);
+  assert.deepEqual(written.runner, EXPECTED_RUNNER_DEFAULT);
 });
 
 test('ensureSharedConfigDefaults on an already-complete shared file does not rewrite it', () => {
@@ -239,15 +256,222 @@ test('plugin-skill-cli-reachable passes when no local bin/fgos.mjs exists but fg
   }
 });
 
-test('plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs nor a PATH install exists', () => {
+test('plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs, a project-local install, a cached global path, nor a live PATH install exists', () => {
   const dir = mkTempDir();
+  // HOME override (tsk-2qc-1): resolveFgosBin's tier-3 cache reads
+  // ~/.fgos/config.json by default -- without this override, a real
+  // cached bin.globalFgosPath left on the machine running this test
+  // (from a real `fgos setup`/`doctor --fix` run) would make this check
+  // pass for the wrong reason. Same isolation discipline the
+  // shell-integration-sourced tests already apply via HOME (checks.test.mjs).
+  const homeDir = mkTempDir();
   const originalPath = process.env.PATH;
+  const originalHome = process.env.HOME;
   process.env.PATH = '';
+  process.env.HOME = homeDir;
   try {
     const result = pluginSkillCliReachableCheck()(dir);
     assert.equal(result.passed, false);
     assert.match(result.message, /no bin\/fgos\.mjs at .* and no global fgos install on PATH/);
   } finally {
     process.env.PATH = originalPath;
+    process.env.HOME = originalHome;
   }
 });
+
+// ─── cli-version-visible (tsk-2ej): the running build's own package
+// version/commit/verb-set resolve cleanly -- the "always green on a
+// healthy build" self-check pattern node-version-and-git already uses, so
+// fgos doctor's own report always surfaces the first thing worth comparing
+// when a verb comes back "unknown" on some other machine.
+
+function cliVersionVisibleCheck() {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'cli-version-visible');
+  assert.ok(entry, 'cli-version-visible must be registered');
+  return entry.check;
+}
+
+test('cli-version-visible passes and its message embeds the resolved packageVersion', () => {
+  const result = cliVersionVisibleCheck()();
+  assert.equal(result.passed, true);
+  const { version: packageVersion } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+  assert.ok(result.message.includes(packageVersion), `message "${result.message}" missing packageVersion "${packageVersion}"`);
+});
+
+// ─── plugin-dev-skills-packaged (tsk-32b): confirms the coding-domain
+// dev-skills plugin-skill-cli-reachable never checked (fgos-coding-driving,
+// fgos-routing, ...) are actually present in plugins/fgOS/skills/, so a
+// maintainer who adds/renames one in .claude/skills/ but forgets to copy it
+// forward gets caught at `fgos doctor` time instead of shipping silently.
+
+function pluginDevSkillsPackagedCheck() {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'plugin-dev-skills-packaged');
+  assert.ok(entry, 'plugin-dev-skills-packaged must be registered');
+  return entry.check;
+}
+
+test('plugin-dev-skills-packaged passes cleanly when the project has no .claude/skills or plugins/fgOS/skills at all', () => {
+  const dir = mkTempDir();
+  const result = pluginDevSkillsPackagedCheck()(dir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /not a forgent checkout/);
+});
+
+test('plugin-dev-skills-packaged passes when every .claude/skills/fgos-* dev-skill has a matching plugins/fgOS/skills/ copy', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.claude', 'skills', 'fgos-example'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.claude', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
+  fs.mkdirSync(path.join(dir, 'plugins', 'fgOS', 'skills', 'fgos-example'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'plugins', 'fgOS', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
+  const result = pluginDevSkillsPackagedCheck()(dir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /all 1 coding-domain dev-skills are packaged/);
+});
+
+test('plugin-dev-skills-packaged fails and names any .claude/skills/fgos-* dev-skill missing from plugins/fgOS/skills/', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.claude', 'skills', 'fgos-example'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.claude', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
+  fs.mkdirSync(path.join(dir, 'plugins', 'fgOS', 'skills'), { recursive: true });
+  const result = pluginDevSkillsPackagedCheck()(dir);
+  assert.equal(result.passed, false);
+  assert.match(result.message, /fgos-example/);
+  assert.match(result.message, /Unknown skill/);
+});
+
+// ─── gateway-token-configured (tsk-4r1, found by the gateway audit,
+// Finding 9): the gateway's own token lives in ~/.fgos/config.json (home),
+// never `cwd`'s -- every test below overrides HOME so it never touches
+// this machine's real home config, mirroring plugin-skill-cli-reachable's
+// own HOME-override discipline above.
+
+function gatewayTokenConfiguredCheck() {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'gateway-token-configured');
+  assert.ok(entry, 'gateway-token-configured must be registered');
+  return entry.check;
+}
+
+function gatewayTokenConfiguredFix() {
+  const entry = FIX_REGISTRATIONS.find((f) => f.id === 'gateway-token-configured');
+  assert.ok(entry, 'gateway-token-configured fix must be registered');
+  return entry.fix;
+}
+
+test('gateway-token-configured check fails when HOME has no gateway.token, and fix provisions a real one the check then accepts', () => {
+  const homeDir = mkTempDir();
+  const originalHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const before = gatewayTokenConfiguredCheck()();
+    assert.equal(before.passed, false);
+    assert.match(before.message, /gateway\.token missing/);
+    assert.match(before.message, /fgos doctor --fix/);
+
+    const fixResult = gatewayTokenConfiguredFix()();
+    assert.equal(fixResult.changed, true);
+
+    const written = JSON.parse(fs.readFileSync(path.join(homeDir, '.fgos', 'config.json'), 'utf8'));
+    assert.equal(typeof written.gateway.token, 'string');
+    assert.ok(written.gateway.token.length >= 32, `expected a high-entropy token, got ${written.gateway.token.length} chars`);
+
+    const after = gatewayTokenConfiguredCheck()();
+    assert.equal(after.passed, true);
+  } finally {
+    process.env.HOME = originalHome;
+  }
+});
+
+test('gateway-token-configured fix is idempotent — an existing token is never rotated out from under a client that already has it', () => {
+  const homeDir = mkTempDir();
+  const originalHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+    fs.writeFileSync(
+      path.join(homeDir, '.fgos', 'config.json'),
+      JSON.stringify({ gateway: { port: 4170, token: 'already-set-token' } }),
+    );
+    const fixResult = gatewayTokenConfiguredFix()();
+    assert.equal(fixResult.changed, false);
+    const written = JSON.parse(fs.readFileSync(path.join(homeDir, '.fgos', 'config.json'), 'utf8'));
+    assert.equal(written.gateway.token, 'already-set-token');
+  } finally {
+    process.env.HOME = originalHome;
+  }
+});
+
+test('the gateway config-default is registered under the "gateway" key with port and an unarmed null token', () => {
+  const entry = CONFIG_DEFAULT_REGISTRATIONS.find((c) => c.id === 'gateway');
+  assert.ok(entry, 'the gateway config-default is missing from CONFIG_DEFAULT_REGISTRATIONS');
+  assert.equal(entry.key, 'gateway');
+  assert.equal(entry.shape.port, 4170);
+  assert.equal(entry.shape.token, null);
+});
+
+test('task-specs-resolve doctor check passes when core/task-specs/ and domain task-specs exist', () => {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'task-specs-resolve');
+  assert.ok(entry, 'task-specs-resolve check must be registered');
+  const result = entry.check(process.cwd());
+  assert.equal(result.passed, true, `task-specs-resolve failed: ${result.message}`);
+});
+
+test('agent-type-names-unique doctor check passes when agent-type names are globally unique', () => {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
+  assert.ok(entry, 'agent-type-names-unique check must be registered');
+  const result = entry.check(process.cwd());
+  assert.equal(result.passed, true, `agent-type-names-unique failed: ${result.message}`);
+});
+
+test('agent-type-names-unique doctor check fails when duplicate agent-type names exist across sources (D33)', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-unique-test-'));
+  try {
+    const coreDir = path.join(tempDir, 'core', 'agents');
+    const domainDir = path.join(tempDir, 'domains', 'coding', 'agents');
+    fs.mkdirSync(coreDir, { recursive: true });
+    fs.mkdirSync(domainDir, { recursive: true });
+
+    fs.writeFileSync(path.join(coreDir, 'dup.yaml'), 'name: dup-agent\nversion: 0.1.0\n');
+    fs.writeFileSync(path.join(domainDir, 'dup.yaml'), 'name: dup-agent\nversion: 0.1.0\n');
+
+    const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
+    const result = entry.check(tempDir);
+    assert.equal(result.passed, false);
+    assert.match(result.message, /duplicate agent-type name/);
+    assert.match(result.message, /"dup-agent"/);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test('guard-warnings-surface: main-checkout-guard-warnings doctor check passes when no warnings exist and fails when warnings exist', () => {
+  const dir = mkTempDir();
+
+  // 1. Not in a git checkout
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'main-checkout-guard-warnings');
+  assert.ok(entry, 'main-checkout-guard-warnings check must be registered');
+  const nonGitResult = entry.check(dir);
+  assert.equal(nonGitResult.passed, true);
+  assert.match(nonGitResult.message, /not inside a git checkout/);
+
+  // 2. Fresh checkout (no warnings recorded)
+  const gitDir = mkTempDir();
+  execFileSync('git', ['init'], { cwd: gitDir });
+  const freshResult = entry.check(gitDir);
+  assert.equal(freshResult.passed, true);
+  assert.match(freshResult.message, /no main checkout guard warnings recorded/);
+
+  // 3. Warnings recorded
+  recordMainCheckoutGuardWarning(gitDir, {
+    reason: 'regressed',
+    message: 'current tip seq 22816 is lower than last recorded mark 22850',
+    mark: 22850,
+  });
+
+  const warnedResult = entry.check(gitDir);
+  assert.equal(warnedResult.passed, false);
+  assert.match(warnedResult.message, /1 main checkout guard warning\(s\) recorded/);
+  assert.match(warnedResult.message, /regressed: current tip seq 22816 is lower than last recorded mark 22850/);
+});
+
+
+

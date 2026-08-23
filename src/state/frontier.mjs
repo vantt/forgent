@@ -190,7 +190,7 @@ function compareReadyOrder(a, b) {
 // field never contribute an entry, so a view with no lineage at all yields
 // an empty index and `hasOpenDescendant` below short-circuits to `false` for
 // every id — the exact no-op this filter must be on a parent-less log.
-function indexChildrenByParent(work) {
+export function indexChildrenByParent(work) {
   const index = {};
   for (const id of Object.keys(work)) {
     const parent = work[id].parent;
@@ -244,11 +244,65 @@ function indexChildrenByParent(work) {
 const TAIL_RESOLVED_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'done']);
 const LEGACY_CANCELED_STATUS = 'wontfix';
 
+/** The canceled-only half of `isResolvedStatus` below, extracted (tsk-4bh)
+ * for a caller that needs to tell "abandoned, never had content" apart from
+ * "successfully resolved" — `isResolvedStatus` itself treats both as
+ * equally fine to stop waiting on (deps-readiness, frontier lineage), but
+ * `cleanup-harness.mjs`'s own merge-still-resolves ancestry check needs the
+ * opposite split: skip a canceled/wontfix child entirely (it never had
+ * content to merge, so there is nothing to check), while STILL verifying a
+ * `done`/`delivered` child's recorded sha really is an ancestor (that
+ * verification is the whole point of the check — `isResolvedStatus` alone
+ * would wrongly skip it too). Never returns true for a tail-resolved status
+ * (`done`/`delivered`/`retrospective`/`cleanup`) — those are the opposite
+ * case this function exists to distinguish. */
+export function isCanceledStatus(item) {
+  if (!item) return false;
+  if (TAIL_RESOLVED_STATUSES.has(item.status)) return false;
+  if (item.statusCategory !== undefined) return item.statusCategory === 'canceled';
+  return item.status === LEGACY_CANCELED_STATUS;
+}
+
 export function isResolvedStatus(item) {
   if (!item) return false;
   if (TAIL_RESOLVED_STATUSES.has(item.status)) return true;
-  if (item.statusCategory !== undefined) return item.statusCategory === 'canceled';
-  return item.status === LEGACY_CANCELED_STATUS;
+  return isCanceledStatus(item);
+}
+
+/**
+ * Resolve the root of the lineage tree `id` belongs to: walk `view.work[id].parent`
+ * upward until reaching an item with no `parent` (or whose `parent` does not
+ * resolve to a known item), and return THAT item's id. An item with no
+ * `parent` is its own root and resolves to itself.
+ *
+ * Defensive backstop, mirroring `hasOpenDescendant` below: a `seen` set
+ * guards against a cyclic or malformed parent chain turning this into an
+ * infinite walk. Should not occur on real decompose-produced data — if a
+ * cycle is detected, the walk stops and returns the current id rather than
+ * looping forever.
+ *
+ * Lives here rather than in `runner/root-affinity.mjs` (its original home,
+ * tsk-49i D1): it is a pure read over the same `view.work` parent chain the
+ * rest of this module walks, and `state/` modules needing it had to import
+ * across into `runner/` to get it — one of the import edges that made the
+ * two folders mutually dependent.
+ *
+ * @param {{work: Record<string, {parent?: string|null}>}} view
+ * @param {string} id
+ * @returns {string}
+ */
+export function resolveRoot(view, id) {
+  const work = view?.work ?? {};
+  const seen = new Set();
+  let current = id;
+  while (true) {
+    if (seen.has(current)) return current;
+    seen.add(current);
+    const item = work[current];
+    const parent = item?.parent;
+    if (!parent || !work[parent]) return current;
+    current = parent;
+  }
 }
 
 // True when `id` has any descendant (direct child, or a descendant reachable
@@ -257,7 +311,7 @@ export function isResolvedStatus(item) {
 // this into an infinite walk — it never occurs on data produced by the
 // decompose engine, only a defensive backstop.
 
-function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {
+export function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {
   const children = childrenByParent[id];
   if (!children) return false;
   for (const childId of children) {

@@ -5,7 +5,7 @@ Mode: standard
 Lane-gate: 2 flags apply — (1) public contract: this changes the JSON
 response shape of `fgos list --id <id>` (a machine-readable CLI contract
 multiple skills already parse, e.g. `plugins/fgOS/skills/pick/SKILL.md`,
-`.claude/skills/fgos-exploring/SKILL.md`); (2) existing covered behavior:
+`.claude/skills/fgos-coding-exploring/SKILL.md`); (2) existing covered behavior:
 `test/cli/fgos.test.mjs` already carries an extensive `list`/`list --id`
 test suite (~550 tests total in the file). No auth, no authorization, no
 data model change, no audit/security, no external-system change, no

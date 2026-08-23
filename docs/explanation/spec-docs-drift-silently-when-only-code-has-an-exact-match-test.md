@@ -108,7 +108,7 @@ of exactly that scenario, and confirms the guard held:
 > `registrations.test.mjs`'s enumeration test fails."
 > — real commit message, `f14f1175`, branch `fgw/tsk-2m5`
 
-This was caught at `fgos-validating` — before the item's own plan.md
+This was caught at `fgos-coding-validating` — before the item's own plan.md
 grounding was accepted — not discovered later as a live test failure
 after implementation. The two-way guard did exactly the job `tsk-4y2`
 built it for: a new check registered without its matching spec row

@@ -120,7 +120,7 @@ One chained set of edits, three files touched:
 | New `0029` file content accuracy | Low — three clauses and their D-IDs are already locked and quoted verbatim above, no new judgment needed | `rg -n "rootTask\|subTask" docs/decisions/ src/ bin/` returns 0, or only historical mentions inside `0026`/`0028`'s own frozen prose |
 | `0026` frontmatter edit scope | Low — single line, mechanical | Diff of `0026` shows exactly one line changed (`superseded_by`), body byte-identical |
 | Decision-id collision on merge | Medium — flagged explicitly by the item itself (CAM BAY 2), real given ~100 open worktrees in this repo today | Re-run `ls docs/decisions/` immediately before file creation; if merge still collides, follow `docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md` |
-| Item's own verify rg scope (`docs/decisions/ src/ bin/`) shows non-`0026`/`0028` residue | Medium — found at `fgos-validating`: `src/runner/dispatch.mjs:649,654` already use `subTask` in docstring prose describing the live dispatch-decision helper, unrelated to the vocabulary this item retires, and out of this item's own no-code-edit fence | User confirmed at the validating gate (2026-08-09): `0026`/`0028` in the verify text is an example of acceptable historical residue, not an exhaustive list — `dispatch.mjs`'s prose counts too. Verify passes with these 2 known, pre-existing hits; no follow-up item needed for this alone |
+| Item's own verify rg scope (`docs/decisions/ src/ bin/`) shows non-`0026`/`0028` residue | Medium — found at `fgos-coding-validating`: `src/runner/dispatch.mjs:649,654` already use `subTask` in docstring prose describing the live dispatch-decision helper, unrelated to the vocabulary this item retires, and out of this item's own no-code-edit fence | User confirmed at the validating gate (2026-08-09): `0026`/`0028` in the verify text is an example of acceptable historical residue, not an exhaustive list — `dispatch.mjs`'s prose counts too. Verify passes with these 2 known, pre-existing hits; no follow-up item needed for this alone |
 | `superseded_by` shape (list vs overwrite) | Low once decided — no code reads the field | Resolved above with cited evidence (`rg` confirms no parser); documented so a future third supersede of `0026` has a precedent to extend, not re-litigate |
 
 Impact-analysis capability gate (`CLAUDE.md`): this item touches no code
@@ -142,7 +142,7 @@ compare.
 
 None
 
-## Post-implementation note (fgos-code-implement, 2026-08-09)
+## Post-implementation note (fgos-coding-implement, 2026-08-09)
 
 Two deviations from this plan, both user-confirmed at implementation time:
 

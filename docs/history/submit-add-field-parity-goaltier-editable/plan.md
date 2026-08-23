@@ -72,12 +72,12 @@ rest of the backlog doesn't apply. Both fixes are small (each under ~15
 lines), touch the same two files, share one theme (item creation/edit
 field surface), and already share one proven functional verify
 (`verify.sh`, written and confirmed to fail at the right point during
-`fgos-exploring`). Splitting would only add a `parent`-linked second item
+`fgos-coding-exploring`). Splitting would only add a `parent`-linked second item
 for no real isolation benefit.
 
 ## Risk map
 
-| Component | Risk | Proof point (for fgos-validating) |
+| Component | Risk | Proof point (for fgos-coding-validating) |
 |---|---|---|
 | `submitWork`'s `refs: []` → `opts.refs ?? []` | medium — this is the one line every existing `submit`/`evolve --submit` caller already depends on | `test/e2e/self-improve-loop.test.mjs`'s `evolve --submit` path calls `submitWork(dir, describeCandidate(picked))` with no 3rd `opts` arg (confirmed by reading `bin/fgos.mjs:3259`) — `opts.refs` is `undefined` there, so `opts.refs ?? []` stays byte-identical to today's hardcoded `[]`. Full `npm test` run is the actual proof. |
 | `submit` case's 6 new flags | low — additive, mirrors `add`'s already-shipped pattern verbatim | `verify.sh`'s D1 assertions (submit round-trip) |
@@ -87,7 +87,7 @@ for no real isolation benefit.
 
 Impact-analysis capability posture: **full** (`fgos tool query
 --capability impact-analysis --status present` → GitNexus `present`,
-checked fresh this session). `fgos-code-implement` at `executing` must run
+checked fresh this session). `fgos-coding-implement` at `executing` must run
 `impact({target: "submitWork", direction: "upstream"})` and `impact({target:
 "editWork", direction: "upstream"})` before editing either, per this
 project's own GitNexus gate (`AGENTS.md`) — not performed here, planning

@@ -70,7 +70,7 @@ it implicit:
 
 ## Why the retry is bounded to exactly one attempt
 
-CONTEXT.md D3 (confirmed at `fgos-validating`'s gate, not just asserted):
+CONTEXT.md D3 (confirmed at `fgos-coding-validating`'s gate, not just asserted):
 the stop condition isn't a numeric attempt cap, it's a progress signal —
 attempt the one matching playbook once, retry once, and if the same id
 blocks again for *any* reason afterward, stop immediately. The shipped

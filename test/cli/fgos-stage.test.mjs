@@ -20,7 +20,7 @@ import {
   addOk,
   addOutcome,
   addWork,
-  advanceThroughDiscoveryToDecompose,
+  advanceThroughDiscoveryToPlanning,
   assert,
   coexistPath,
   commitFile,
@@ -108,7 +108,7 @@ test('evolve from a .fgos/-less linked worktree with no --dir warns on stderr in
 // is the next stop before executing. This assertion changed its expected
 // destination from `executing` to `decompose` for exactly that reason (per
 // D2, an intentional contract change, not a test nerf).
-test('discover on a clear verdict moves the submitted item to stage discovery with the caller-supplied verify (tsk-4b2 D3: retargeted from decompose)', () => {
+test('discover on a clear verdict moves the submitted item to stage planning with the caller-supplied verify (tsk-30v D2/D6: clear skips exploring, discovery -> planning directly)', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
@@ -123,7 +123,7 @@ test('discover on a clear verdict moves the submitted item to stage discovery wi
   assert.equal(envelope.data.outcome, 'clear');
 
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.stage, 'discovery');
+  assert.equal(item.stage, 'planning');
   assert.equal(item.verify, 'npm test -- proven');
 });
 
@@ -132,73 +132,73 @@ test('discover on a clear verdict moves the submitted item to stage discovery wi
 // "call discover twice" scenario is split below into its own `decompose`
 // calls plus two new wrong-stage-error tests proving the split actually
 // removed the old dynamic-dispatch fallback, not just renamed it.
-test("decompose on an item sitting at stage decompose dispatches to resolveDecompose and pass-throughs it on to executing (sync/async parity)", () => {
+test("plan on an item sitting at stage planning dispatches to resolvePlan and pass-throughs it on to executing (sync/async parity)", () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  advanceThroughDiscoveryToDecompose(cwd, id);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
+  advanceThroughDiscoveryToPlanning(cwd, id);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning');
 
   // A caller-supplied decompose verdict with a child missing `verify` is
   // not a valid shape — resolveCallerDecomposeVerdict folds it to
   // `invalid`, and resolveDecompose leaves the item exactly where it was
   // for the next call to retry (mẫu C9, unchanged since tsk-1x3).
-  const invalidAttempt = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'x', '--children', '[{"title":"x"}]']);
+  const invalidAttempt = run(cwd, ['plan', id, '--verdict', 'decompose', '--reason', 'x', '--children', '[{"title":"x"}]']);
   assert.equal(invalidAttempt.status, 0);
   assert.equal(JSON.parse(invalidAttempt.stdout).data.outcome, 'invalid');
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'invalid verdict leaves the item untouched, not silently advanced');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning', 'invalid verdict leaves the item untouched, not silently advanced');
 
   // A real pass-through verdict carries the item the rest of the way.
-  const passThrough = run(cwd, ['decompose', id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
+  const passThrough = run(cwd, ['plan', id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
   assert.equal(passThrough.status, 0);
   assert.equal(JSON.parse(passThrough.stdout).data.outcome, 'pass-through');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
 });
 
-test('discover on a decompose-stage item errors instead of silently dispatching to resolveDecompose (tsk-2b0 D1: hard split, no fallback)', () => {
+test('discover on a planning-stage item errors instead of silently dispatching to resolvePlan (tsk-2b0 D1: hard split, no fallback)', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  advanceThroughDiscoveryToDecompose(cwd, id);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
+  advanceThroughDiscoveryToPlanning(cwd, id);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning');
 
   const result = run(cwd, ['discover', id]);
   assert.equal(result.status, 4);
-  assert.match(result.stderr, /not "clarify"/);
-  assert.match(result.stderr, /fgos decompose/);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'a rejected call must never mutate the item');
+  assert.match(result.stderr, /not "discovery"\/"exploring"/);
+  assert.match(result.stderr, /fgos plan/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning', 'a rejected call must never mutate the item');
 });
 
-test('decompose on a clarify-stage item errors instead of silently dispatching to resolveDiscovery (tsk-2b0 D1: hard split, no fallback)', () => {
+test('plan on a discovery-stage item errors instead of silently dispatching to resolveDiscovery (tsk-2b0 D1: hard split, no fallback)', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
 
-  const result = run(cwd, ['decompose', id]);
+  const result = run(cwd, ['plan', id]);
   assert.equal(result.status, 4);
-  assert.match(result.stderr, /not "decompose"/);
+  assert.match(result.stderr, /not "planning"/);
   assert.match(result.stderr, /fgos discover/);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify', 'a rejected call must never mutate the item');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery', 'a rejected call must never mutate the item');
 });
 
-test('decompose with no id is rejected as validation, exit 4', () => {
+test('plan with no id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['decompose']);
+  const result = run(cwd, ['plan']);
   assert.equal(result.status, 4);
 });
 
-test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify', () => {
+test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, and advances it to exploring (tsk-30v D2/D3: unclear no longer parks in place)', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Do the ambiguous work']).stdout).data.id;
 
-  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which service?']);
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which service?']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'clarify');
-  assert.equal(view.gates[id].ask, 'Which service?');
+  assert.equal(view.work[id].stage, 'exploring');
+  assert.equal(view.gates[id].ask, '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which service?');
 });
 
 test('discover with no id is rejected as validation, exit 4', () => {
@@ -231,7 +231,7 @@ test('discover on a fresh cwd with no runner config bootstraps the default confi
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'todo', 'the refused call must never mutate the item');
-  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.work[id].stage, 'discovery');
 });
 
 test('discover --config pointing at a missing path still throws RunnerConfigError unchanged, exit 4', () => {
@@ -251,7 +251,7 @@ test('discover --config pointing at a missing path still throws RunnerConfigErro
 // OPPOSITE verdict from what `--verdict` supplies — proving the flag
 // actually bypassed the judge, not just that a real judge happened to agree.
 
-test('discover --verdict clear --verify moves the item to discovery with that exact verify, bypassing the configured (opposite) judge verdict (tsk-4b2 D3: retargeted from decompose)', () => {
+test('discover --verdict clear --verify moves the item to planning with that exact verify, bypassing the configured (opposite) judge verdict (tsk-30v D2/D6: clear skips exploring)', () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: false, question: 'SHOULD NEVER SURFACE' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -261,24 +261,24 @@ test('discover --verdict clear --verify moves the item to discovery with that ex
   assert.equal(JSON.parse(result.stdout).data.outcome, 'clear');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].stage, 'discovery');
+  assert.equal(view.work[id].stage, 'planning');
   assert.equal(view.work[id].verify, 'npm test -- cli-caller');
   assert.notEqual(view.work[id].status, 'awaiting-human');
 });
 
-test('discover --verdict unclear --question parks in awaiting-human with that exact question, bypassing the configured (opposite) judge verdict', () => {
+test('discover --verdict unclear --question parks in awaiting-human with that exact question and advances to exploring, bypassing the configured (opposite) judge verdict (tsk-30v D2/D3)', () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: true, verify: 'SHOULD NEVER SURFACE' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which provider?']);
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which provider?']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'clarify');
-  assert.equal(view.gates[id].ask, 'Which provider?');
+  assert.equal(view.work[id].stage, 'exploring');
+  assert.equal(view.gates[id].ask, '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which provider?');
 });
 
 test('discover --verdict clear with no --verify is rejected as validation, exit 4', () => {
@@ -297,13 +297,97 @@ test('discover --verdict with an unrecognized value is rejected as validation, e
   assert.match(result.stderr, /"clear" or "unclear"/);
 });
 
-test('decompose --verdict pass-through moves the item to executing', () => {
+// --- caller-supplied classification (D12): `--tier`/`--kind`/`--risk` on
+// `discover` give the interactive path the same data contract the headless
+// worker already has through its `fgos-verdict` block, routed through the
+// SAME guard (`classificationPatchFromVerdict`) rather than a second copy of
+// it. Decided at discovery on real evidence, never guessed from submit text.
+
+test('discover --verdict clear with --tier/--kind/--risk applies the classification to the item', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  advanceThroughDiscoveryToDecompose(cwd, id);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
 
-  const result = run(cwd, ['decompose', id, '--verdict', 'pass-through', '--reason', 'single-piece, no split needed']);
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- classified', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'clear');
+
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.tier, 'heavy');
+  assert.equal(item.kind, 'bug');
+  assert.equal(item.risk, 'heavy');
+  assert.equal(item.stage, 'planning');
+});
+
+test('discover applies only the classification fields actually passed, leaving the rest untouched', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  const before = envelopeData(run(cwd, ['list']).stdout).work[id];
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- partial', '--kind', 'docs']);
+  assert.equal(result.status, 0);
+
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.kind, 'docs');
+  assert.equal(item.tier, before.tier, 'an unpassed field is never rewritten');
+  assert.equal(item.risk, before.risk, 'an unpassed field is never rewritten');
+});
+
+test('discover --verdict unclear never applies classification — the same guard the headless path uses', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  const before = envelopeData(run(cwd, ['list']).stdout).work[id];
+
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which provider?', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
+
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.tier, before.tier);
+  assert.equal(item.kind, before.kind);
+  assert.equal(item.risk, before.risk);
+  assert.equal(item.status, 'awaiting-human');
+});
+
+test('discover with an out-of-vocabulary --kind is rejected as validation (exit 4) before the item moves at all', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-kind', '--kind', 'bogus']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /work\.kind must be one of/);
+
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.stage, 'discovery', 'a rejected classification must never leave the item half-advanced');
+  assert.notEqual(item.kind, 'bogus');
+});
+
+test('discover with an out-of-vocabulary --tier is rejected as validation (exit 4) before the item moves at all', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-tier', '--tier', 'enormous']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /work\.tier must be one of/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+});
+
+test('discover with a bare --risk (no value) is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bare-risk', '--risk']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--risk/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+});
+
+test('plan --verdict pass-through moves the item to executing', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  advanceThroughDiscoveryToPlanning(cwd, id);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning');
+
+  const result = run(cwd, ['plan', id, '--verdict', 'pass-through', '--reason', 'single-piece, no split needed']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'pass-through');
 
@@ -312,12 +396,12 @@ test('decompose --verdict pass-through moves the item to executing', () => {
   assert.equal(Object.values(view.work).some((item) => item.parent === id), false);
 });
 
-test('decompose --verdict need-human --reason parks in awaiting-human with that exact reason', () => {
+test('plan --verdict need-human --reason parks in awaiting-human with that exact reason', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  advanceThroughDiscoveryToDecompose(cwd, id);
+  advanceThroughDiscoveryToPlanning(cwd, id);
 
-  const result = run(cwd, ['decompose', id, '--verdict', 'need-human', '--reason', 'Which auth provider?']);
+  const result = run(cwd, ['plan', id, '--verdict', 'need-human', '--reason', 'Which auth provider?']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'need-human');
 
@@ -326,16 +410,16 @@ test('decompose --verdict need-human --reason parks in awaiting-human with that 
   assert.match(view.gates[id].ask, /Which auth provider\?/);
 });
 
-test('decompose --verdict decompose --children writes real children', () => {
+test('plan --verdict decompose --children writes real children', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  advanceThroughDiscoveryToDecompose(cwd, id);
+  advanceThroughDiscoveryToPlanning(cwd, id);
 
   const children = JSON.stringify([
     { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the parser.' },
     { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the renderer.' },
   ]);
-  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'two independent surfaces', '--children', children]);
+  const result = run(cwd, ['plan', id, '--verdict', 'decompose', '--reason', 'two independent surfaces', '--children', children]);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'decompose');
 
@@ -355,7 +439,7 @@ test('decompose --verdict decompose --children writes real children', () => {
   assert.equal(allView.work[`${id}-2`].title, 'Build renderer');
 });
 
-test('decompose --verdict decompose with malformed --children JSON is rejected as validation, exit 4', () => {
+test('plan --verdict decompose with malformed --children JSON is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
   // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
@@ -363,14 +447,14 @@ test('decompose --verdict decompose with malformed --children JSON is rejected a
   // config answers that prompt, not the (bypassed) first-pass judgeDiscovery.
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  advanceThroughDiscoveryToDecompose(cwd, id, 'npm test');
+  advanceThroughDiscoveryToPlanning(cwd, id, 'npm test');
 
-  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'x', '--children', '{not valid json']);
+  const result = run(cwd, ['plan', id, '--verdict', 'decompose', '--reason', 'x', '--children', '{not valid json']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /--children/);
 });
 
-test('decompose --verdict decompose with no --children at all is rejected as validation, exit 4', () => {
+test('plan --verdict decompose with no --children at all is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
   // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
@@ -378,14 +462,14 @@ test('decompose --verdict decompose with no --children at all is rejected as val
   // config answers that prompt, not the (bypassed) first-pass judgeDiscovery.
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  advanceThroughDiscoveryToDecompose(cwd, id, 'npm test');
+  advanceThroughDiscoveryToPlanning(cwd, id, 'npm test');
 
-  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'x']);
+  const result = run(cwd, ['plan', id, '--verdict', 'decompose', '--reason', 'x']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /--children/);
 });
 
-test('decompose --verdict with an unrecognized value is rejected as validation, exit 4', () => {
+test('plan --verdict with an unrecognized value is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
   // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
@@ -393,9 +477,9 @@ test('decompose --verdict with an unrecognized value is rejected as validation, 
   // config answers that prompt, not the (bypassed) first-pass judgeDiscovery.
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  advanceThroughDiscoveryToDecompose(cwd, id, 'npm test');
+  advanceThroughDiscoveryToPlanning(cwd, id, 'npm test');
 
-  const result = run(cwd, ['decompose', id, '--verdict', 'maybe']);
+  const result = run(cwd, ['plan', id, '--verdict', 'maybe']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /"pass-through", "need-human", or "decompose"/);
 });
@@ -548,7 +632,7 @@ test("evolve --submit <id> with a matching candidate creates exactly one new wor
   assert.equal(envelope.contract, 'fgos.v1');
   const item = envelope.data;
   assert.equal(item.status, 'todo');
-  assert.equal(item.stage, 'clarify');
+  assert.equal(item.stage, 'discovery');
   assert.match(item.description, /Self-improve candidate submit-item/);
   assert.match(item.description, /blocked/);
   assert.match(item.description, /verify-miss/);

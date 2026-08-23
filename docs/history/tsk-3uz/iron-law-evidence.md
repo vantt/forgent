@@ -7,8 +7,8 @@
 ```
 
 `matchedModules` is empty — neither changed file
-(`.claude/skills/fgos-planning/SKILL.md`,
-`.agents/skills/fgos-planning/SKILL.md`) matches any Iron Law
+(`.claude/skills/fgos-coding-planning/SKILL.md`,
+`.agents/skills/fgos-coding-planning/SKILL.md`) matches any Iron Law
 self-modifying-capable module rule (`src/evolve/iron-law.mjs`'s
 `MODULE_RULES`). `required: true` here comes entirely from the item's own
 `description` matching the `audit` HEAVY_KEYWORDS entry — the description
@@ -21,25 +21,25 @@ false-positive on prose that happens to contain the word "audit".
 ## Test command (the item's own recorded `verify`)
 
 ```bash
-awk '/Decide the split/,0' .claude/skills/fgos-planning/SKILL.md | grep -q -- '--footprint' && awk '/Decide the split/,0' .agents/skills/fgos-planning/SKILL.md | grep -q -- '--footprint'
+awk '/Decide the split/,0' .claude/skills/fgos-coding-planning/SKILL.md | grep -q -- '--footprint' && awk '/Decide the split/,0' .agents/skills/fgos-coding-planning/SKILL.md | grep -q -- '--footprint'
 ```
 
 ## Failing before
 
 ```
-$ git show HEAD:.claude/skills/fgos-planning/SKILL.md | awk '/Decide the split/,0' | grep -q -- '--footprint'; echo "before-exit=$?"
+$ git show HEAD:.claude/skills/fgos-coding-planning/SKILL.md | awk '/Decide the split/,0' | grep -q -- '--footprint'; echo "before-exit=$?"
 before-exit=1
-$ git show HEAD:.agents/skills/fgos-planning/SKILL.md | awk '/Decide the split/,0' | grep -q -- '--footprint'; echo "before-exit-agents=$?"
+$ git show HEAD:.agents/skills/fgos-coding-planning/SKILL.md | awk '/Decide the split/,0' | grep -q -- '--footprint'; echo "before-exit-agents=$?"
 before-exit-agents=1
 ```
 
 Matches CONTEXT.md's own scout evidence: `grep -n "footprint"
-.claude/skills/fgos-planning/SKILL.md` → 0 results before this change.
+.claude/skills/fgos-coding-planning/SKILL.md` → 0 results before this change.
 
 ## Passing after
 
 ```
-$ awk '/Decide the split/,0' .claude/skills/fgos-planning/SKILL.md | grep -q -- '--footprint' && awk '/Decide the split/,0' .agents/skills/fgos-planning/SKILL.md | grep -q -- '--footprint' && echo "verify-pass"
+$ awk '/Decide the split/,0' .claude/skills/fgos-coding-planning/SKILL.md | grep -q -- '--footprint' && awk '/Decide the split/,0' .agents/skills/fgos-coding-planning/SKILL.md | grep -q -- '--footprint' && echo "verify-pass"
 verify-pass
 ```
 

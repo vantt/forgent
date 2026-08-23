@@ -58,8 +58,8 @@ This item does **not** cover renaming or general test legibility — that is
 
 - Whether the merge work is small enough for one execution pass or needs
   splitting into child items (e.g., one item per test file) is a shaping
-  judgment for `fgos-planning` — not decided here (out of scope for
-  `fgos-exploring` per its own hard rules).
+  judgment for `fgos-coding-planning` — not decided here (out of scope for
+  `fgos-coding-exploring` per its own hard rules).
 - Exact list of which specific test clusters qualify as "confirmed same
   invariant" vs. must stay separate is an implementation-time judgment for
   whoever executes — this doc does not pre-enumerate every cluster, only

@@ -95,7 +95,7 @@ One command proves this item done — the new + existing tests in
 node --test test/state/discover-verdict-override.test.mjs
 ```
 
-Execute (`fgos-code-implement`) designs the exact error-throw shape
+Execute (`fgos-coding-implement`) designs the exact error-throw shape
 (exception type, exit code) and the new test's assertions; this plan does
 not pre-decide either — implementation detail per CONTEXT.md's own
 "Deferred to planning" note, further deferred here to Execute since it is

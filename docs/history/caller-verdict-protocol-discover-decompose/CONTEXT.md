@@ -1,19 +1,19 @@
 ---
 type: context
-title: "tsk-27y — caller-supplied verdict protocol for fgos discover/fgos decompose"
+title: "tsk-27y — caller-supplied verdict protocol for fgos discover/fgos plan"
 ---
 
-# tsk-27y — caller-supplied verdict protocol for `fgos discover`/`fgos decompose`
+# tsk-27y — caller-supplied verdict protocol for `fgos discover`/`fgos plan`
 
 ## Feature boundary
 
-`fgos discover <id>` and `fgos decompose <id>` (`bin/fgos.mjs:886-919`) always
+`fgos discover <id>` and `fgos plan <id>` (`bin/fgos.mjs:886-919`) always
 call `resolveDiscovery`/`resolveDecompose` (`src/intake/discovery.mjs`,
-`src/intake/decompose.mjs`), which — unless the existing `readLockedContext`
+`src/intake/plan.mjs`), which — unless the existing `readLockedContext`
 trust signal fires (committed CONTEXT.md for discovery; plan.md `mode:
 tiny/small` for decompose) — always spawn `judgeDiscovery`/`judgeDecompose`, a
 blind `claude -p` subprocess judge, even when the CLI caller is itself a live
-session (e.g. `fgos-exploring`/`fgos-planning`) that already did real Socratic
+session (e.g. `fgos-coding-exploring`/`fgos-coding-planning`) that already did real Socratic
 reasoning and has a verdict in hand. This item adds new optional CLI flags on
 both verbs so that caller can pass its own already-rendered verdict directly,
 skipping the subprocess judge call for that invocation. Native-First Dispatch
@@ -42,13 +42,13 @@ callers (including headless/older ones) that pass no explicit verdict flag.
 
 - **caller-supplied verdict** — a verdict shape (matching `judgeDiscovery`'s
   `{clear, question?, verify?}` or `judgeDecompose`'s `{verdict, reason?,
-  children?}`) passed as CLI flags to `fgos discover`/`fgos decompose`,
+  children?}`) passed as CLI flags to `fgos discover`/`fgos plan`,
   bypassing that call's own `judgeDiscovery`/`judgeDecompose` subprocess spawn
   for this one invocation.
 - **Native-First Dispatch Doctrine** — per `docs/decisions/0026-...md`; this
   item is Phase 2 of that doctrine's 5-phase plan.
 
-## Assumptions (implementer-level, not asked — fgos-planning's call to confirm or revise)
+## Assumptions (implementer-level, not asked — fgos-coding-planning's call to confirm or revise)
 
 - Flag shape, discover: `--verdict clear --verify "<cmd>"` (clear path) /
   `--verdict unclear --question "<text>"` (unclear path) — matches the
@@ -86,7 +86,7 @@ callers (including headless/older ones) that pass no explicit verdict flag.
 - `src/intake/discovery.mjs:351-473` (`judgeDiscovery`), `:511-602`
   (`resolveDiscovery`) — verdict shape `{clear, question?, verify?}`; existing
   `readLockedContext` trust-signal skip at `:518-543`.
-- `src/intake/decompose.mjs:46-60` (`readLockedContext`, exported/shared with
+- `src/intake/plan.mjs:46-60` (`readLockedContext`, exported/shared with
   discovery.mjs), `:177-201` (`normalizeChild`), `:232-335` (`judgeDecompose`,
   verdict shape `{kind, reason?, children?}`), `:379-600` (`resolveDecompose`,
   including plan.md tiny/small mode skip at `:457-470` and the three
@@ -104,7 +104,7 @@ callers (including headless/older ones) that pass no explicit verdict flag.
   — Native-First Dispatch Doctrine, this item is Phase 2/5.
 - `docs/history/discovery-decompose-reporoot-verify-overwrite/` — tsk-1ni
   (Phase 1), footprint overlaps this item's own target files
-  (`src/intake/discovery.mjs`, `src/intake/decompose.mjs`) but no logical
+  (`src/intake/discovery.mjs`, `src/intake/plan.mjs`) but no logical
   dependency; tsk-1ni still at stage `decompose` as of this writing (not yet
   landed in those files) so no real merge conflict exists yet.
 
@@ -112,7 +112,7 @@ callers (including headless/older ones) that pass no explicit verdict flag.
 
 - Exact validation-error message wording for a malformed `--children` JSON
   payload or an unrecognized `--verdict` value.
-- Whether `fgos-exploring`/`fgos-planning`'s own SKILL.md files should be
+- Whether `fgos-coding-exploring`/`fgos-coding-planning`'s own SKILL.md files should be
   updated in this same item to actually pass the new flags once their gate
   approves (the original item description names this as in-scope — planning
   to confirm the concrete edit).

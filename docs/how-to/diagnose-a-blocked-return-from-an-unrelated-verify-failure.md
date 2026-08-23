@@ -108,7 +108,7 @@ was pre-existing load noise, not a regression from the rename work.
 
 ## Real example: two genuine gaps in `return`'s own branch-source verify path, not stale tests
 
-Item `tsk-5l2-1` (a new `resolve <capacityId>` CLI subcommand on
+Item `tsk-5l2-1` (a new `resolve <executorId>` CLI subcommand on
 `src/runner/dispatch.mjs`, footprint `src/runner/dispatch.mjs`/`test/`)
 had its own change fully correct and green (`npm test` clean, 2038-2041
 passing across several full runs). `fgos return tsk-5l2-1` still came back

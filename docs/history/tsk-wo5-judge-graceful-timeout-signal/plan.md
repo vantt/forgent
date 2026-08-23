@@ -45,7 +45,7 @@ any interactive caller would ever wait.
 Rejected alternative: convert `spawnAttempt` from `spawnSync` to the async
 `spawn` + `onChunk` heartbeat pattern `dispatch.mjs`'s `runWorkerProcess`
 already uses (see CONTEXT.md's canonical references). Rejected because (a)
-the CLI's own stdout contract for `fgos discover`/`fgos decompose` is a
+the CLI's own stdout contract for `fgos discover`/`fgos plan` is a
 single JSON envelope (`{"contract":"fgos.v1", ..., "data": {...}}`) that
 callers parse whole — any heartbeat line on stdout would break that
 contract; heartbeat-on-stderr-only would not actually help the reported
@@ -69,11 +69,11 @@ cross-item dependency ordering applies.
 
 ## Risk map
 
-| Component | Risk | Proof point (for fgos-validating) |
+| Component | Risk | Proof point (for fgos-coding-validating) |
 |---|---|---|
-| Judge-specific timeout default value | Medium — too short risks false-negatives on a genuinely-slow-but-real judge call (turns a slow success into a spurious disagree/unclear); too long doesn't fix the reported symptom | `fgos-validating` should confirm the chosen default sits comfortably below common external caller budgets (the item's own repro cites a ~120s caller ceiling) while staying above the item's own cited real-world latencies (repro: succeeded "in under 4 minutes" on manual retry — so a bound near that number would still fail the original caller; the fix's job per D3 is a clean fast signal, not guaranteeing the slow case fits under 120s) |
+| Judge-specific timeout default value | Medium — too short risks false-negatives on a genuinely-slow-but-real judge call (turns a slow success into a spurious disagree/unclear); too long doesn't fix the reported symptom | `fgos-coding-validating` should confirm the chosen default sits comfortably below common external caller budgets (the item's own repro cites a ~120s caller ceiling) while staying above the item's own cited real-world latencies (repro: succeeded "in under 4 minutes" on manual retry — so a bound near that number would still fail the original caller; the fix's job per D3 is a clean fast signal, not guaranteeing the slow case fits under 120s) |
 | Backward compatibility of `cfg.timeoutMs`-only configs | Low — every existing runner config already sets the required global `cfg.timeoutMs` (dispatch.mjs:574 validation); adding a judge-specific override with a sane built-in default changes nothing for a config that doesn't set it | none needed beyond existing `judge-executor.test.mjs` coverage staying green |
-| Shared-layer blast radius (D2: all 3 callers) | Medium (impact-analysis degraded) | `fgos-validating` should grep-confirm (not just trust GitNexus's stale index) that `judgeDiscovery`, `judgeDecompose`, and `judgeVerifySemanticCorrectness` are the only 3 callers of `runJudgeExecutor`, so the fix's blast radius claim is grounded in a fresh check, not the stale graph |
+| Shared-layer blast radius (D2: all 3 callers) | Medium (impact-analysis degraded) | `fgos-coding-validating` should grep-confirm (not just trust GitNexus's stale index) that `judgeDiscovery`, `judgeDecompose`, and `judgeVerifySemanticCorrectness` are the only 3 callers of `runJudgeExecutor`, so the fix's blast radius claim is grounded in a fresh check, not the stale graph |
 
 ## Concrete cases to prove against
 
@@ -85,7 +85,7 @@ cross-item dependency ordering applies.
 ## Assumptions
 
 - Root-latency cause (why the nested `claude -p` process is sometimes slow to connect) stays genuinely uninvestigated here, per CONTEXT.md D3 — not re-litigated.
-- The exact numeric default for the judge-specific bound is an implementation choice within this plan's remit (not a CONTEXT.md gap) — `fgos-validating` proves it is reasonable, not that a specific number was pre-approved.
+- The exact numeric default for the judge-specific bound is an implementation choice within this plan's remit (not a CONTEXT.md gap) — `fgos-coding-validating` proves it is reasonable, not that a specific number was pre-approved.
 
 ## Split decision
 

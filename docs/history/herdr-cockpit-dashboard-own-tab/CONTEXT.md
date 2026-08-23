@@ -66,7 +66,7 @@ duplicate-create path.
   whether the plugin itself calls `herdr tab create`/`herdr tab focus`
   before/instead of relying on `placement = "overlay"`, or whether
   `herdr-plugin.toml`'s `placement` value needs to change away from
-  `"overlay"` entirely — is an implementation choice for `fgos-planning`,
+  `"overlay"` entirely — is an implementation choice for `fgos-coding-planning`,
   not decided here.
 - Exact `herdr` CLI calls/tests needed to implement D2/D3 (e.g. `tab list`
   --workspace filtering, focus vs. no-focus semantics) — planning's call.

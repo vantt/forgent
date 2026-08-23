@@ -6,7 +6,7 @@ Item liên quan: `tsk-3ni`.
 
 Cả 5 quyết định (D1-D5, §4) đã chốt — thiết kế đủ cụ thể để tách task
 (§7). Không còn câu hỏi sản phẩm nào mở. Bước tiếp theo: terminal handoff
-sang `fgos-exploring` rồi `fgos-planning` cho `tsk-3ni`.
+sang `fgos-coding-exploring` rồi `fgos-coding-planning` cho `tsk-3ni`.
 
 ## 2. Mục tiêu & đề bài
 
@@ -44,7 +44,7 @@ là auto-reclaim — xem câu hỏi mở ở §5).
 
 | D-ID | Quyết định |
 |------|-----------|
-| D1 | Tín hiệu "còn sống" của một claim là hoạt động chỉnh sửa worktree/file thực tế — không phải danh tính session/process (PID/heartbeat), không phải tuổi-claim đơn thuần. Lý do: người dùng xác nhận framing này hai lần liên tiếp (vòng 1: "active modify... hay đã xong rồi, không cần biết lý do"; vòng 2: "thật ra muốn file edit activities"); event-log-only có lỗ hổng cấu trúc — không event nào bắn ra trong lúc `fgos-code-implement` đang sửa code, nên không phân biệt được phiên đang sửa với phiên đã chết. Ghi qua `fgos decision --id tsk-3ni`. |
+| D1 | Tín hiệu "còn sống" của một claim là hoạt động chỉnh sửa worktree/file thực tế — không phải danh tính session/process (PID/heartbeat), không phải tuổi-claim đơn thuần. Lý do: người dùng xác nhận framing này hai lần liên tiếp (vòng 1: "active modify... hay đã xong rồi, không cần biết lý do"; vòng 2: "thật ra muốn file edit activities"); event-log-only có lỗ hổng cấu trúc — không event nào bắn ra trong lúc `fgos-coding-implement` đang sửa code, nên không phân biệt được phiên đang sửa với phiên đã chết. Ghi qua `fgos decision --id tsk-3ni`. |
 | D2 | Agent được tự reclaim một claim "đứng yên", không cần người xác nhận, MIỄN LÀ: (a) bằng chứng im lặng vượt một ngưỡng bảo thủ theo `claimRole`; (b) hành động reclaim không phá hủy — reattach vào `fgw/<id>` đã có (giống `pick-reattach-live-worktree` D1), không bao giờ force-remove; (c) quyết định được log kèm bằng chứng. Lý do: `main-checkout-lock.mjs` đã có đúng tiền lệ này — tự reclaim khi `isPidAlive(pid)` xác nhận chết, chỉ fail-closed (`AMBIGUOUS`) khi bằng chứng thật sự không kết luận được. File/worktree-quiet là heuristic (không phải bảo đảm cứng như PID), nên độ tin cậy phải đến từ ngưỡng bảo thủ + hành động không phá hủy + log, không phải từ việc luôn chờ người. Người dùng xác nhận "đồng ý". |
 | D3 | Ngưỡng im lặng để đủ điều kiện reclaim dùng lại nguyên `agentMs: 15min` / `humanMs: 24h` đã có ở `/fgOS:stale` (`graph-metrics.mjs:483-485`) — không phải một cặp số bảo thủ hơn riêng cho reclaim. Chốt qua `AskUserQuestion` (3 lựa chọn), người dùng chọn "dùng lại 15p/24h". |
 | D4 | Tín hiệu hoạt động = `max(git log -1 --format=%ct trên fgw/<id>, mtime mới nhất trong số các file mà git status --porcelain liệt kê trong worktree đó)` — không quét mtime toàn bộ cây file. Lý do: tái dùng danh sách file đã bẩn/chưa track mà git đã tính sẵn (tự động loại `node_modules` v.v qua `.gitignore`), rẻ hơn và đúng hơn `find -newermt` tự quản lý ignore-pattern. |
@@ -86,7 +86,7 @@ sẽ như thế nào?
 
 **Trả lời:** trình bày cơ chế cụ thể (map any-event -> timestamp mới nhất,
 so với ngưỡng) + chỉ ra lỗ hổng cấu trúc: không event nào bắn ra trong lúc
-`fgos-code-implement` đang sửa code — event-log không thể phân biệt "đang
+`fgos-coding-implement` đang sửa code — event-log không thể phân biệt "đang
 sửa 40 phút" với "chết 40 phút trước". Người dùng xác nhận: đúng là muốn
 file edit activity thật, không chỉ event-log. → D1 chốt (đã giữ vững qua
 2 vòng, xem §4).
@@ -220,4 +220,4 @@ flowchart TD
   ngưỡng silence → `pick` tự reclaim, có event log mang bằng chứng; item
   `doing` < ngưỡng hoặc bằng chứng không đọc được → vẫn refuse exit 3
   y hệt hôm nay). Câu lệnh/tên test chính xác là việc của
-  `fgos-planning`.
+  `fgos-coding-planning`.

@@ -109,7 +109,7 @@ own shape-invalid check, and judge-executor's reported branch).
      (clear/unclear with `impactScore`/`researchToolCallCount`/proposals)
      are untouched.
 
-4. **`src/intake/decompose.mjs` (`judgeDecompose`).** Same treatment,
+4. **`src/intake/plan.mjs` (`judgeDecompose`).** Same treatment,
    scoped to the ONE entry-level fail-safe check this item's D2 actually
    covers — the shared `!verdict || typeof verdict.verdict !== 'string'`
    check (line 243, structurally identical to discovery.mjs's check) and
@@ -122,12 +122,12 @@ own shape-invalid check, and judge-executor's reported branch).
    out-of-scope assumption below, not silently folded in.
 
 ## Assumptions (pinned, not asked — implementation-level, per
-`fgos-planning`'s own material/grounded/answerable filter)
+`fgos-coding-planning`'s own material/grounded/answerable filter)
 
 - `runJudgeExecutor`'s own signature grows by exactly one optional trailing
   out-param (`failDetailOut`); the actual mechanics of whether it also
   needs `id` threaded in, or the caller writes using its own already-held
-  `work.id`, is an implementation choice for `fgos-code-implement`, not a locked
+  `work.id`, is an implementation choice for `fgos-coding-implement`, not a locked
   product decision — CONTEXT.md's D1-D3 already fix the observable
   contract (location, scope, per-branch tagging), not this internal
   threading detail.
@@ -138,23 +138,23 @@ own shape-invalid check, and judge-executor's reported branch).
   null/wrong-shape check), not every downstream validation branch
   `judgeDecompose` happens to also return `{kind:'invalid'}` from. Revisit
   as a separate item if this turns out to matter in practice.
-- **Correction (fgos-validating reality-gate FAIL, proof surface):** the
+- **Correction (fgos-coding-validating reality-gate FAIL, proof surface):** the
   model's own proposed `verify` from the real `discover` call
   (`npm test -- --grep 'judgeDiscovery.*fail-safe'`) is not runnable —
   this repo's `package.json` test script is `node --test
   'test/**/*.test.mjs'` (Node's built-in test runner), which has no
   `--grep` flag (confirmed: `node --test --help` lists
   `--test-name-pattern`, not `--grep`). Real verify for this item:
-  `node --test test/intake/judge-executor.test.mjs test/intake/discovery.test.mjs test/intake/decompose.test.mjs`
+  `node --test test/intake/judge-executor.test.mjs test/intake/discovery.test.mjs test/intake/plan.test.mjs`
   — the three existing files that already cover
   `judgeDiscovery`/`judgeDecompose`/`judge-executor.mjs`
   (`test/intake/judge-executor.test.mjs`, `test/intake/discovery.test.mjs`,
-  confirmed to exist; `test/intake/decompose.test.mjs` is this same
+  confirmed to exist; `test/intake/plan.test.mjs` is this same
   cluster's third file for `judgeDecompose`), plus the new fail-safe-branch
   tests this item adds to them. `fgos edit tsk-5d2 --verify "..."` applies
-  this before `fgos-code-implement` runs.
+  this before `fgos-coding-implement` runs.
 
-## Proof points (carried to `fgos-validating`)
+## Proof points (carried to `fgos-coding-validating`)
 
 1. **New writer never throws / matches existing convention.** Read
    `worker-log.mjs` and `judge-fail-log.mjs` side by side — same

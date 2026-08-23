@@ -41,7 +41,7 @@ import {
 test('fgos setup run twice does not rewrite an already-complete ~/.fgos/config.json (tsk-1ri D2, fill-missing-only)', () => {
   const cwd = mkTemp('setup-cli-global-config-repeat-');
   const homeDir = mkTemp('setup-cli-global-config-repeat-home-');
-  const env = { ...process.env, HOME: homeDir };
+  const env = { ...NO_CLAUDE_ENV, HOME: homeDir };
   const first = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env });
   assert.equal(first.status, 0, first.stderr);
   const globalPath = JSON.parse(first.stdout).data.globalConfigPath;
@@ -65,7 +65,7 @@ test('setup from a real checkout still writes the rc line and reports no decline
   const result = spawnSync(process.execPath, [FGOS, 'setup'], {
     cwd,
     encoding: 'utf8',
-    env: { ...process.env, HOME: homeDir },
+    env: { ...NO_CLAUDE_ENV, HOME: homeDir },
   });
 
   assert.equal(result.status, 0, `setup failed: ${result.stderr}`);

@@ -23,7 +23,7 @@ detector.
 | D1 | Scope is landing `7add82b8` only — the `checkMergeStillResolves` decomposed-root detector gap stays with its own sibling item, not this one (see Feature boundary). |
 | D2 | **SUPERSEDED by D4.** The item's own `verify` command is correct and runnable as stated — confirmed via `fgos-researching`'s round 1 (`docs/history/tsk-13z-land-tsk-4b2-on-main/RESEARCH.md`): `git merge-base --is-ancestor 7add82b8 main && npm test`. "Runnable" was true, but the command is unsatisfiable through the mechanical gate pipeline — see D4. |
 | D3 | No `CHANGELOG.md` entry — per `AGENTS.md`'s install/setup/doctor gate ("does this change something a user of fgOS would see?"), this restores intended-but-never-landed internal wiring (a `fgos-routing` table correction plus discovery/exploring stage refinements already documented as landed in `5b394faf`'s commit message); it is not new user-visible behavior. |
-| D4 | **Supersedes D2.** Found during `fgos-code-implement`, after the real merge landed: `fgos approve`'s goal-check (`src/runner/merge.mjs`'s `mergeRunnerItemLocked`, lines ~929-1016) runs the item's `verify` on a `git merge --no-commit --no-ff` staged tree — BEFORE the `git commit` (line 1036) that would actually advance the `main` ref. At that exact moment `main` still points to its pre-merge SHA, so `git merge-base --is-ancestor 7add82b8 main` can never return true through this pipeline — confirmed empirically both by tracing the code and by running the exact command in this worktree after a real merge commit on `fgw/tsk-13z` (still reports NOT ANCESTOR, since `main` is a ref shared across all worktrees and hadn't moved). Replaced with a content-based `npm test && POSITIVE && NEGATIVE` check per `docs/how-to/write-verify-for-a-skill-prose-change.md` (this item touches `.claude/skills/fgos-routing/SKILL.md`, a skill-prose path): asserts the fixed `clarify -> fgos-clarifying` row is present in both `.claude/` and `.agents/` mirrors, and that no line still pairs `clarify` with the wrong `fgos-exploring` target. Empirically confirmed to FAIL against current `main` (bug present) and PASS against the merged content (bug fixed) — a real discriminating check, evaluable at both `fgos return` and `fgos approve`'s staged-pre-commit point, unlike the original. Confirmed with the user via `AskUserQuestion` before editing the item's `verify` field (an acceptance-criteria change, not silently swapped). |
+| D4 | **Supersedes D2.** Found during `fgos-coding-implement`, after the real merge landed: `fgos approve`'s goal-check (`src/runner/merge.mjs`'s `mergeRunnerItemLocked`, lines ~929-1016) runs the item's `verify` on a `git merge --no-commit --no-ff` staged tree — BEFORE the `git commit` (line 1036) that would actually advance the `main` ref. At that exact moment `main` still points to its pre-merge SHA, so `git merge-base --is-ancestor 7add82b8 main` can never return true through this pipeline — confirmed empirically both by tracing the code and by running the exact command in this worktree after a real merge commit on `fgw/tsk-13z` (still reports NOT ANCESTOR, since `main` is a ref shared across all worktrees and hadn't moved). Replaced with a content-based `npm test && POSITIVE && NEGATIVE` check per `docs/how-to/write-verify-for-a-skill-prose-change.md` (this item touches `.claude/skills/fgos-routing/SKILL.md`, a skill-prose path): asserts the fixed `clarify -> fgos-clarifying` row is present in both `.claude/` and `.agents/` mirrors, and that no line still pairs `clarify` with the wrong `fgos-coding-exploring` target. Empirically confirmed to FAIL against current `main` (bug present) and PASS against the merged content (bug fixed) — a real discriminating check, evaluable at both `fgos return` and `fgos approve`'s staged-pre-commit point, unlike the original. Confirmed with the user via `AskUserQuestion` before editing the item's `verify` field (an acceptance-criteria change, not silently swapped). |
 
 No candidate question in this round met the material+grounded+answerable
 bar — the item's own description already fully specifies the fix and the
@@ -34,7 +34,7 @@ The remaining open item — *which concrete git/state mechanism actually
 lands the branch* (re-driving `tsk-4b2`'s own already-terminal status
 machine vs. merging `fgw/tsk-4b2` directly into `fgw/tsk-13z` and landing
 through this item's own lifecycle) — is an implementation-strategy choice
-for whoever builds it, not a product decision; left to `fgos-planning`.
+for whoever builds it, not a product decision; left to `fgos-coding-planning`.
 
 ## Pinned terms
 
@@ -43,7 +43,7 @@ for whoever builds it, not a product decision; left to `fgos-planning`.
   main" (main already has *part* of tsk-4b2's own fix through unrelated
   commit `5b394faf` — see RESEARCH.md — but the literal ancestor check
   still fails, and a real, still-live bug remains: `.claude/skills/fgos-
-  routing/SKILL.md` on main still reads `clarify -> fgos-exploring`
+  routing/SKILL.md` on main still reads `clarify -> fgos-coding-exploring`
   instead of the registry's real `clarify -> fgos-clarifying`).
 
 ## Scout evidence

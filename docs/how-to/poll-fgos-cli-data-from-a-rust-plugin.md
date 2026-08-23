@@ -43,7 +43,7 @@ pub fn repo_root() -> io::Result<PathBuf> {
 ```
 
 This is the exact `git rev-parse --path-format=absolute --git-common-dir`
-resolution `fgos-routing`/`fgos-code-implement` already use from shell — same
+resolution `fgos-routing`/`fgos-coding-implement` already use from shell — same
 idea, just called from Rust via `git`'s own CLI rather than a shell
 snippet.
 

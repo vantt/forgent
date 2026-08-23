@@ -33,7 +33,7 @@ skipped `--what-if` accordingly (nothing to compare against).
      `blocks` (via `rankImpact`, `src/state/impact.mjs:88` — same function
      `blocksForItem`, `src/intake/discovery.mjs:66-69`, already calls; NOT
      `graph-harness.mjs`, which only calls `rankImpact` internally for its
-     own unrelated `mergeReadiness`, corrected at `fgos-validating` time)
+     own unrelated `mergeReadiness`, corrected at `fgos-coding-validating` time)
      DESC, then `urgent` (truthy first), then declaration order (FIFO) —
      clarify always wins over decompose when both pools are non-empty, per
      the original description's "prioritizing clarify first."
@@ -52,7 +52,7 @@ skipped `--what-if` accordingly (nothing to compare against).
 2. `plugins/fgOS/skills/discover-next/SKILL.md` (new) — mirrors
    `merge-next`'s shape:
    - Step 1: run an inline `node -e` script (same pattern the gate-bypass
-     check in `fgos-exploring`/`fgos-planning` already uses) that imports
+     check in `fgos-coding-exploring`/`fgos-coding-planning` already uses) that imports
      `listWork` (`src/state/store.mjs`) and `pickNextDiscoverItem`
      (piece 1), resolves the main-checkout root the same way every other
      `requiresExistingStore` verb in these skills does (`git rev-parse
@@ -62,10 +62,10 @@ skipped `--what-if` accordingly (nothing to compare against).
      stop (this is `discover-loop`'s own D5(a) stop signal, read from this
      skill's own report, not a separate check).
    - Step 3: else run `fgos discover <id> --dir <root>` (stage `clarify`)
-     or `fgos decompose <id> --dir <root>` (stage `decompose`) — the
+     or `fgos plan <id> --dir <root>` (stage `decompose`) — the
      existing verbs, unchanged (D7/D8: no new verb, no worktree).
    - Step 4: classify and report the result per D5's 3-way split. `fgos
-     discover`/`fgos decompose` run as a **Bash subprocess**, not a JS
+     discover`/`fgos plan` run as a **Bash subprocess**, not a JS
      import — there is no JS `Error` object to inspect here, only the
      process's own exit code and JSON stdout/stderr. Classify by **exit
      code**, per the real CLI contract (`EXIT_CODES`, `src/state/
@@ -108,9 +108,9 @@ skipped `--what-if` accordingly (nothing to compare against).
 
 **Risk map:** all three pieces are additive (new file, two new skill
 directories) — nothing existing changes shape or behavior. No proof point
-needed at `fgos-validating` that leans on blast-radius evidence (no
+needed at `fgos-coding-validating` that leans on blast-radius evidence (no
 existing code is being modified), so the impact-analysis capability
-posture (`full` — `gitnexus` present, confirmed at `fgos-exploring` time)
+posture (`full` — `gitnexus` present, confirmed at `fgos-coding-exploring` time)
 is recorded here for completeness but not load-bearing for any proof
 point in this plan.
 
@@ -130,14 +130,14 @@ candidates → picks by `priority` ASC (undefined-last) then FIFO;
 The two `SKILL.md` prose files have no automated verify of their own (same
 as every other skill in `plugins/fgOS/skills/` — none carry tests); a
 manual smoke run of `/fgOS:discover-next` once against real state, and
-`/fgOS:discover-loop` for a couple of iterations, is `fgos-validating`'s
+`/fgOS:discover-loop` for a couple of iterations, is `fgos-coding-validating`'s
 job to call for explicitly, not encoded here as a scripted command.
 
 ## Assumptions
 
 - The exact default iteration cap (15) is a reasonable starting point
   carried over from the prior report's cost estimate, not re-derived
-  fresh here — `fgos-validating` or the person running this can adjust it
+  fresh here — `fgos-coding-validating` or the person running this can adjust it
   before/after first real use; it's a loop argument, not a hardcoded
   constant baked into `discover-pool.mjs`.
 - `blocksForItem`/`rankImpact` computation cost on the current ~253-node

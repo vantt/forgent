@@ -10,7 +10,7 @@ itself (`CONTEXT.md`), already written and committed — no code changes.
 
 ## Approach
 
-None needed beyond what `fgos-exploring` already produced. `CONTEXT.md`
+None needed beyond what `fgos-coding-exploring` already produced. `CONTEXT.md`
 (D1-D4) is the full deliverable this item promises (per its own
 description: "KHÔNG code trước khi chốt phạm vi" / verify checks only the
 doc's shape + `npm test` staying green). No files touched other than the

@@ -43,7 +43,7 @@ import {
 test('fgos setup (no flags) produces valid wrapEnvelope-shaped JSON on stdout', () => {
   const cwd = mkTemp('setup-cli-json-');
   const homeDir = mkTemp('setup-cli-json-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const envelope = JSON.parse(result.stdout);
   assert.equal(typeof envelope.contract, 'string');
@@ -61,7 +61,7 @@ test('fgos setup fills a missing default key into an existing ~/.fgos/config.jso
   const customized = { runner: { ...DEFAULT_RUNNER_CONFIG, executor: { command: 'my-custom-cli', args: ['{prompt}'] } } };
   fs.writeFileSync(globalPath, `${JSON.stringify(customized, null, 2)}\n`);
 
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const written = JSON.parse(fs.readFileSync(globalPath, 'utf8'));
   assert.equal(written.runner.executor.command, 'my-custom-cli', 'a value the user already customized must never be overwritten');

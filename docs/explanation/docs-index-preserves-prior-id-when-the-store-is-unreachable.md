@@ -26,7 +26,7 @@ because the diff was inspected before staging."
 > capture for that doc — is allowed to write `null` over a prior value.
 
 The "unreachable" signal itself was corrected mid-flight, caught live at
-`fgos-validating`:
+`fgos-coding-validating`:
 
 > Precise signal: the resolved `.fgos/` directory can exist while carrying
 > no `events.jsonl` (observed live: a worktree's `.fgos/` holding only
@@ -55,7 +55,7 @@ a test happens to be watching.
 
 ## Why `--dir`-redirecting the test (D2) was tried, then dropped
 
-> `fgos-validating` proved live that `--dir` redirects `docs-index`'s own
+> `fgos-coding-validating` proved live that `--dir` redirects `docs-index`'s own
 > `repoRoot` (`case 'docs-index'`: `const repoRoot =
 > path.dirname(dir)`), not just which store informs `sourceCaptureId` —
 > pointing it at main checkout broke a real, unrelated test (`fgos

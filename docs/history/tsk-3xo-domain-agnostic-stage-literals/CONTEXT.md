@@ -4,7 +4,7 @@
 
 A second (non-`coding`) fgOS domain whose registry maps a stage to
 `Clarify`/`Divide` cannot cross those stages: `bin/fgos.mjs`'s sync CLI
-gates and `src/intake/discovery.mjs`/`src/intake/decompose.mjs`'s internal
+gates and `src/intake/discovery.mjs`/`src/intake/plan.mjs`'s internal
 `moveStage` calls hardcode the literal stage names `'clarify'`/
 `'decompose'`/`'executing'` instead of resolving them via
 `stageForStep(getDomain(work.domain), step)`
@@ -47,7 +47,7 @@ comment that mis-describes the failure mode.
   CLI gates read exactly as described; `work.domain` is available at both
   call sites via `listWork(dir).work[id]`.
 - `src/intake/discovery.mjs:593-599,663-669` and
-  `src/intake/decompose.mjs:542,604,685,759` — confirmed all 6
+  `src/intake/plan.mjs:542,604,685,759` — confirmed all 6
   `moveStage(...)` literal call sites.
 - `src/state/workflow-stage-graphs.mjs:32-40` — confirmed the stale
   doc-comment text targeted by D1's doc correction.
@@ -73,6 +73,6 @@ comment that mis-describes the failure mode.
 
 None — the fix shape, exact call sites, and new-test spec are already
 fully specified by the source report and the item's own description;
-`fgos-planning` should confirm whether this is simple enough to skip
+`fgos-coding-planning` should confirm whether this is simple enough to skip
 straight to `executing` or still needs a written plan, not re-derive any
 of the above.

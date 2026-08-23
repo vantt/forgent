@@ -22,9 +22,9 @@ item used to own is now already shipped elsewhere):
 | external systems | no | no new external call |
 | public contracts | no | CLI `decision` verb already carries `--id`/`--rationale`/`--alternatives`/`--source` (`bin/fgos.mjs:1034-1042`, shipped) — this item does not touch the CLI |
 | cross-platform | no | |
-| existing covered behavior | **yes** | `test/intake/decompose.test.mjs` has 38 passing tests, 13 fixtures constructing `verdict: 'decompose'` — see the recount below |
+| existing covered behavior | **yes** | `test/intake/plan.test.mjs` has 38 passing tests, 13 fixtures constructing `verdict: 'decompose'` — see the recount below |
 | weak proof around the area | **yes** | item's own `verify` field reads "chưa xác định — P15 bổ sung" (not yet determined) |
-| multi-domain | no | single domain (coding), `src/intake/decompose.mjs` only |
+| multi-domain | no | single domain (coding), `src/intake/plan.mjs` only |
 
 **3 flags → standard mode** (down from the original 5-flag/high-risk
 count). The scope shrunk for real reasons, not by relaxing rigor: the
@@ -46,14 +46,14 @@ than CONTEXT.md D1 originally locked:
 - CLI flags (`--id`/`--rationale`/`--alternatives`/`--source`) already
   exist.
 
-This item's remaining scope is therefore **only `src/intake/decompose.mjs`**
+This item's remaining scope is therefore **only `src/intake/plan.mjs`**
 — consuming the shipped `addDecision`, plus the model-prompt change
 (D2/D3) that was always this item's own to build regardless of who owns
 the schema.
 
 ### Files touched, in dependency order
 
-1. **`src/intake/decompose.mjs`** —
+1. **`src/intake/plan.mjs`** —
    a. `buildDecomposePrompt`: extend the JSON schema description (currently
       line 120) so `pass-through` gains an optional top-level `"reason"`
       and `decompose` gains a **required** top-level `"reason"` (separate
@@ -82,9 +82,9 @@ one file, one internal dependency chain (prompt/parsing before wiring).
 
 ## Risk map
 
-| Component | Risk | Proof point (→ fgos-validating) |
+| Component | Risk | Proof point (→ fgos-coding-validating) |
 |---|---|---|
-| `decompose.mjs` reason parsing (D2/D3) | medium — a required top-level `reason` on the `decompose` branch changes what a previously-valid model response now normalizes to | Confirm `test/intake/decompose.test.mjs`'s 13 `verdict: 'decompose'` fixtures (2 unaffected — 0-children and missing-verify negative paths); the other ~11 need a `reason` field added or they flip to `kind: 'invalid'`; add one new case for "decompose verdict missing top-level reason → invalid" |
+| `decompose.mjs` reason parsing (D2/D3) | medium — a required top-level `reason` on the `decompose` branch changes what a previously-valid model response now normalizes to | Confirm `test/intake/plan.test.mjs`'s 13 `verdict: 'decompose'` fixtures (2 unaffected — 0-children and missing-verify negative paths); the other ~11 need a `reason` field added or they flip to `kind: 'invalid'`; add one new case for "decompose verdict missing top-level reason → invalid" |
 | `resolveDecompose` calling the shipped `addDecision` on every branch | low — additive call, no existing return-shape change (per `resolveDecompose`'s own doc comment, `outcome` values are unchanged); `text`/`rationale`/`id`/`source` are all fields the shipped `addDecision` already accepts | Confirm `view.decisionsById['<item-id>']` gains one entry per `discover` call, for all 4 branches (invalid/need-human/pass-through/decompose) — this is the item's own stated verify criterion |
 
 ## Concrete cases to prove against
@@ -103,7 +103,7 @@ one file, one internal dependency chain (prompt/parsing before wiring).
 - Re-entrant `already-decomposed` path (`decompose.mjs:287-292`) — leaning
   toward: no new record here, since children already carry their own trace
   and this path is purely a crash-recovery no-op, not a fresh judgment —
-  flagged for `fgos-code-implement` to confirm against the item's own verify
+  flagged for `fgos-coding-implement` to confirm against the item's own verify
   wording ("cả 4 nhánh").
 
 ## No split

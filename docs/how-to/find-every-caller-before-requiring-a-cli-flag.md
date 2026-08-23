@@ -15,7 +15,7 @@ which existing callers will start failing once it lands.
 
 - You need the exact command name whose flag is becoming required (e.g.
   `fgos decision`), and the flag's exact spelling (e.g. `--rationale`).
-- This is a `fgos-validating`-stage check, not a `fgos-planning` one: the
+- This is a `fgos-coding-validating`-stage check, not a `fgos-coding-planning` one: the
   plan proposes the change, validating proves the plan's own claim about
   blast radius against the real repo.
 
@@ -88,7 +88,7 @@ test break the narrower grep never surfaced.
    > "`test/e2e/rebuild-determinism.test.mjs` | Update the
    > `run(cwd, ['decision', '--text', 'locked D3: ...'])` call (line 94)
    > to also pass `--rationale` — found by a full-repo grep at
-   > `fgos-validating` time, missed by the original single-caller check
+   > `fgos-coding-validating` time, missed by the original single-caller check
    > (that check only covered `addDecision`'s direct code caller, not
    > every test invoking the CLI command)."
    > — real `plan.md` files-touched row, post-fix,
@@ -96,7 +96,7 @@ test break the narrower grep never surfaced.
 
 ## Why this matters at the validating stage specifically
 
-`fgos-validating`'s own hard rule is that a matrix row needs "a file
+`fgos-coding-validating`'s own hard rule is that a matrix row needs "a file
 actually read, a command actually run with its real output" — never
 plausibility language. The first grep (function callers) is exactly this
 kind of concrete evidence, and it is still wrong to stop there: it proves
@@ -107,9 +107,9 @@ is what turns a plausible-sounding risk row into a genuinely checked one.
 
 ## Related
 
-- `fgos-validating`'s reality gate (`.claude/skills/fgos-validating/SKILL.md`)
+- `fgos-coding-validating`'s reality gate (`.claude/skills/fgos-coding-validating/SKILL.md`)
   — the stage this check belongs to; a `FAIL` here returns the item to
-  `fgos-planning` with the missing caller named, never softened into a
+  `fgos-coding-planning` with the missing caller named, never softened into a
   pass.
 - `docs/history/decision-schema-rationale-alternatives-source/{CONTEXT.md,plan.md}`
   — the full decision record and plan this example is drawn from.

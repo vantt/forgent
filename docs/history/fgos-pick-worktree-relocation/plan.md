@@ -38,7 +38,7 @@ ephemeral worktrees too.
 |---|---|---|
 | `bin/fgos.mjs` pick call site (add one opt) | low | existing pick suite (`test/cli/fgos.test.mjs:2661` onward) plus a new assertion that `data.worktree.path` sits under `.claude/worktrees/` |
 | Case B / merge-ephemeral call sites (untouched) | low | existing `test/runner/loop.test.mjs`, `test/e2e/runner-loop.test.mjs`, `test/runner/merge.test.mjs` pass unchanged — no code path there is touched |
-| Real `EnterWorktree` second-switch behavior against the new location | **medium** | not unit-testable (needs the live harness tool, not mockable in `node --test`) — this is the actual tsk-1wd repro (root claim → `EnterWorktree` in → pick a child → `EnterWorktree` into the child) and is this item's `fgos-validating` reality check, not a guess here |
+| Real `EnterWorktree` second-switch behavior against the new location | **medium** | not unit-testable (needs the live harness tool, not mockable in `node --test`) — this is the actual tsk-1wd repro (root claim → `EnterWorktree` in → pick a child → `EnterWorktree` into the child) and is this item's `fgos-coding-validating` reality check, not a guess here |
 
 **Files touched, in order:**
 
@@ -79,7 +79,7 @@ One direct code change (file 1), one test extension proving it (file
 - The actual tsk-1wd repro now succeeds: claim a root, `EnterWorktree`
   into it, pick a child of that root, `EnterWorktree` into the child —
   second switch succeeds instead of being refused. This is the medium-risk
-  proof point that only `fgos-validating`'s live reality check can carry,
+  proof point that only `fgos-coding-validating`'s live reality check can carry,
   not a unit test.
 
 ## Split decision

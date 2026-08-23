@@ -46,7 +46,7 @@ uses 0026's sense, needs the rename; — = allowlisted/unrelated, skip):
 | `docs/distillery/**` | — allowlisted (verbatim upstream extraction) |
 | `plans/reports/**` | — allowlisted (historical records) |
 | `docs/history/herdr-*` | — allowlisted when about `PaneOrchestrator`; still spot-check each, not blanket-skip |
-| `.claude/skills/{fgos-clarifying,fgos-exploring,_shared/capacity-dispatch-fallback,fgos-planning,fgos-code-implement,fgos-validating}` + `.agents/skills/` mirrors (12 files) | — **no edit**: these cite 0026's own filename, which D2 keeps unchanged; the word "orchestrator" here is a correct path citation, not a term-misuse instance |
+| `.claude/skills/{fgos-clarifying,fgos-coding-exploring,_shared/capacity-dispatch-fallback,fgos-coding-planning,fgos-coding-implement,fgos-coding-validating}` + `.agents/skills/` mirrors (12 files) | — **no edit**: these cite 0026's own filename, which D2 keeps unchanged; the word "orchestrator" here is a correct path citation, not a term-misuse instance |
 | `docs/architecture-map.md`, `docs/backlog.md`, `docs/decisions/0013-...md`, `docs/enduser-docs-index.json`, `docs/explanation/*.md` (4 files), remaining `docs/history/*/{CONTEXT,plan,session-source,repro-notes}.md` (~20 files) | **unclassified — triage each individually during execution** against 0026's sense vs. an unrelated/generic use of the word "orchestrator"; not pre-classified here since CONTEXT.md deferred this per-spot check to execution rather than guessing in bulk |
 
 Risk map:
@@ -79,7 +79,7 @@ are all in place together — splitting into siblings would mean each piece
 either can't verify independently or duplicates the same guard test, with
 no independent-workability gain. Proceeds as `tsk-2cw` itself.
 
-## Assumptions (unproven, flagged for fgos-validating)
+## Assumptions (unproven, flagged for fgos-coding-validating)
 
 - The ~25 "unclassified" files in the Approach table each get a real,
   individual read during execution rather than a keyword-only judgment —

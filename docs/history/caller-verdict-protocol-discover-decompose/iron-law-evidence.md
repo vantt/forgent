@@ -22,7 +22,7 @@ judge coincidentally produced the same answer.
 ## RED — new caller-supplied-verdict tests against pre-fix code
 
 Pre-fix `bin/fgos.mjs`, `src/intake/discovery.mjs`,
-`src/intake/decompose.mjs`, `src/cli/command-registry.mjs` restored from
+`src/intake/plan.mjs`, `src/cli/command-registry.mjs` restored from
 `git show 63982e0^:<path>` (the parent of this item's own single
 implementation commit), with the new tests from post-fix
 `test/cli/fgos.test.mjs` layered on top (test file is additive-only, no
@@ -51,7 +51,7 @@ confirming the pre-fix swap didn't break unrelated CLI behavior.
 ## GREEN — same tests against post-fix code
 
 Post-fix files restored via `git checkout HEAD -- bin/fgos.mjs
-src/intake/discovery.mjs src/intake/decompose.mjs
+src/intake/discovery.mjs src/intake/plan.mjs
 src/cli/command-registry.mjs` (identical command, no code changed beyond
 that restore):
 
@@ -65,7 +65,7 @@ $ node --test --test-name-pattern="verdict" test/cli/fgos.test.mjs
 ## Item-scoped verify
 
 ```
-$ node --test test/cli/fgos.test.mjs test/intake/decompose.test.mjs test/intake/discovery.test.mjs
+$ node --test test/cli/fgos.test.mjs test/intake/plan.test.mjs test/intake/discovery.test.mjs
 ℹ tests 668
 ℹ pass 668
 ℹ fail 0

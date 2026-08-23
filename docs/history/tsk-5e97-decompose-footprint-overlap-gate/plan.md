@@ -2,11 +2,11 @@
 
 ## Mode
 
-**small** — a few files, no gray areas left after `fgos-exploring`.
+**small** — a few files, no gray areas left after `fgos-coding-exploring`.
 
 Flag count: 1 of 10 (`existing covered behavior` — `resolveDecompose` is the
 core decompose engine path, covered by 1210 lines of tests in
-`test/intake/decompose.test.mjs`, including two existing gates
+`test/intake/plan.test.mjs`, including two existing gates
 (`keywordRiskGate`/`blastRadiusGate`) this change must not disturb). No auth,
 authorization, data-model, audit/security, external-system, public-contract,
 cross-platform, weak-proof, or multi-domain flag applies. 1 flag stays under
@@ -34,7 +34,7 @@ gate to `awaiting-human` on footprint overlap among tentative children,
 mirroring `keywordRiskGate`/`blastRadiusGate`, never auto-adjusting.
 
 **Insertion point**: inside `resolveDecompose`'s `verdict.kind === 'decompose'`
-branch (`src/intake/decompose.mjs:477-504`), right after `childIds` is
+branch (`src/intake/plan.mjs:477-504`), right after `childIds` is
 computed (`:482`) and before the `verdict.children.forEach` / `addWork` loop
 (`:484`). This is the earliest point where tentative children have real ids
 (`childIds[index]`) to pass as `footprintOverlapAmong`'s candidate `.id`, and
@@ -87,10 +87,10 @@ check from ever running that pass.
 
 ## Files touched
 
-- `src/intake/decompose.mjs` — import `footprintOverlapAmong` from
+- `src/intake/plan.mjs` — import `footprintOverlapAmong` from
   `../state/graph-metrics.mjs`; add the check + gate branch described above,
   inside the existing `decompose` branch.
-- `test/intake/decompose.test.mjs` — new tests mirroring the existing
+- `test/intake/plan.test.mjs` — new tests mirroring the existing
   `risksGate` test shape (`:747-955`):
   1. Two tentative children with overlapping `footprint` → `resolveDecompose`
      returns `outcome: 'need-human'`, writes zero children (assert no
@@ -113,14 +113,14 @@ check from ever running that pass.
 
 ## Proof surface
 
-Item `verify` (set at `fgos-validating`, was a placeholder before this):
-`node --test test/intake/decompose.test.mjs`. Confirmed real and runnable
+Item `verify` (set at `fgos-coding-validating`, was a placeholder before this):
+`node --test test/intake/plan.test.mjs`. Confirmed real and runnable
 today — pre-implementation baseline: 59/59 passing. Post-implementation this
 same command must still pass, now including the 5 new tests listed above.
 
-**Post-implementation verify drift (fgos-code-implement)**: the `fgos discover`
+**Post-implementation verify drift (fgos-coding-implement)**: the `fgos discover`
 call that moved this item from `clarify` to `decompose` (run at the top of
-`fgos-code-implement`, since the earlier `fgos-exploring` pass had locked
+`fgos-coding-implement`, since the earlier `fgos-coding-exploring` pass had locked
 `CONTEXT.md`/`plan.md` but never actually fired the stage-move verb)
 recorded its own model-guessed `verify: "npm test"` on the item, silently
 overwriting the narrower command set above. The first `fgos return` re-ran
@@ -128,7 +128,7 @@ that broad command and failed on 2 pre-existing, unrelated tests (a manifest
 completeness check and a `.claude/skills`↔`.agents/skills` mirror-drift
 check — both fail identically on the unmodified branch tip, confirmed via
 `git stash`), moving the item to `blocked`. `node --test
-test/intake/decompose.test.mjs` (64/64, including the 5 new tests) was
+test/intake/plan.test.mjs` (64/64, including the 5 new tests) was
 restored via `fgos edit --verify`, matching what this section had already
 locked — the drift was an unrelated engine overwrite, not a scope change.
 

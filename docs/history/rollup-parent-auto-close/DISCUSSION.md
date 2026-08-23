@@ -114,7 +114,7 @@ item id (xem đề xuất cuối §5).
   nhu cầu thật). Thiết kế §6 giờ đủ cụ thể để viết task breakdown ở §7.
   Đề xuất còn lại: discussion này chưa gắn với fgOS work item nào (bắt đầu
   brainstorm thẳng, không qua submit trước) — cần `fgOS:submit` để có item
-  id thật trước khi terminal handoff sang `fgos-exploring`/`fgos-planning`
+  id thật trước khi terminal handoff sang `fgos-coding-exploring`/`fgos-coding-planning`
   (2 skill đó cần item để gắn `refs`/chạy Socratic lock), và để 3 D-ID trên
   ghi được bằng lệnh `fgos decision --id` thật, không chỉ nằm trong file.
 

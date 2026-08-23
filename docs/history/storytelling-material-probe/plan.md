@@ -47,7 +47,7 @@ One piece, no split. `scripts/probe-storytelling-material.mjs`:
    — does the material show a real arc/turning point/disagreement, or is
    it just unusable notes — with verbatim quotes (D3, item's own
    acceptance criterion). This step is NOT inside the script; it is the
-   actual deliverable `fgos-code-implement` reports back.
+   actual deliverable `fgos-coding-implement` reports back.
 
 Alternatives rejected: none carried into `CONTEXT.md` as a real
 alternative — D1's two real reasons (probe-not-permanent, `bin/fgos.mjs`
@@ -62,7 +62,7 @@ architectural shape was on the table for a read-only probe.
 | Boilerplate filter correctness | light — five patterns are literal strings from the item's own pre-measured data (D4), not inferred | test asserts filtered/kept counts against a synthetic fixture (D8) that includes at least one instance of each of the five patterns plus at least one genuine single-occurrence rationale |
 | Probe verdict quality (the real deliverable, step 5 above) | not a code risk — a judgment call this session makes after running the script, using real quotes | verified by presence of verbatim quotes in the final report to the user, not by `verify` |
 
-No medium/high risk identified — nothing here carries to `fgos-validating`
+No medium/high risk identified — nothing here carries to `fgos-coding-validating`
 beyond confirming the plan and fixture design are real.
 
 ## Files touched

@@ -144,7 +144,7 @@ The first `fgos discover` call on this item was genuinely rejected: the
 first pass came back clear, but `judgeVerifySemanticCorrectness`
 disagreed — the item had been submitted with a placeholder `verify`
 string ("chưa xác định — P15 bổ sung"), not a real shell command, and
-`fgos-exploring`'s own rule only ever *captures* whatever verify an item
+`fgos-coding-exploring`'s own rule only ever *captures* whatever verify an item
 already carries rather than designing a new one itself. The judge was
 right to catch this: an item submitted with a placeholder verify will
 always be blocked at this door until a real person supplies a real
@@ -153,7 +153,7 @@ person supplied the real `verify` (the D10 command above) via `fgos
 answer` + `fgos edit --verify`, and the second `discover` call cleared
 cleanly.
 
-## What stayed deliberately unresolved for `fgos-planning` to decide
+## What stayed deliberately unresolved for `fgos-coding-planning` to decide
 
 Two implementer-level questions were named and left open rather than
 guessed at during design: whether waves run strictly "wait for the whole
@@ -214,7 +214,7 @@ execution). The item required listing all five explicitly and stating,
 for each one, whether its behavior changed or not — not just fixing
 `/fgOS:cook` and assuming the rest were fine by omission. Four of the
 five inherit the contract but were deliberately **not** modified in this
-item; if `fgos-validating`'s own reality check judged that an oversight
+item; if `fgos-coding-validating`'s own reality check judged that an oversight
 rather than a real scope boundary, the item's own scope would have had
 to widen — flagged explicitly as an open question in its plan rather
 than silently decided either way.

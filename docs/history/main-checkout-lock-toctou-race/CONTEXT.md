@@ -31,7 +31,7 @@ window that produces a *false* AMBIGUOUS on a torn read closes.
 |----|----------|
 | D1 | Fix scoped to `src/runner/main-checkout-lock.mjs` only. The header comment (lines 7-14) names three sibling locks sharing the same wx-atomic-create lineage (`loop.mjs`'s `acquireRunnerLock`, `session.mjs`'s `acquireSessionsLock`, `events.mjs`'s `acquireEventsLock`) but the item's own title/description name only this file. Sibling locks are explicitly out of scope for tsk-2tm — if the same torn-read race exists there, it is a separate future item, not silently bundled into this one. |
 | D2 | The fix must eliminate the torn-read window for BOTH the fresh-create path and the self-recognition refresh path (both cited in the bug description) — fixing only one leaves the other producing the same false-AMBIGUOUS failure mode. |
-| D3 | The fix must NOT weaken the existing mutual-exclusion guarantee: two processes racing to create a genuinely NEW lock must still result in exactly one ACQUIRED and one EEXIST/retry outcome (today's `wx`-create semantics). This is a correctness constraint on the fix, not a prescribed technique — the concrete mechanism (e.g. write-to-temp-then-publish vs. a single pre-serialized `wx` write) is `fgos-planning`'s call. |
+| D3 | The fix must NOT weaken the existing mutual-exclusion guarantee: two processes racing to create a genuinely NEW lock must still result in exactly one ACQUIRED and one EEXIST/retry outcome (today's `wx`-create semantics). This is a correctness constraint on the fix, not a prescribed technique — the concrete mechanism (e.g. write-to-temp-then-publish vs. a single pre-serialized `wx` write) is `fgos-coding-planning`'s call. |
 | D4 | Acceptance requires a regression test in `test/runner/main-checkout-lock.test.mjs` that proves the eliminated window (e.g. a reader observing the lock file mid-acquire never sees unparseable/partial content), run via `node --test test/runner/main-checkout-lock.test.mjs`, plus the full suite (`npm test`) green. No existing test in that file currently covers this race (scouted: existing tests cover ACQUIRED/HELD/AMBIGUOUS/reclaim/release outcomes on already-settled lock files, never a read concurrent with an in-progress write). |
 
 ## Scout evidence cited
@@ -51,13 +51,13 @@ window that produces a *false* AMBIGUOUS on a torn read closes.
 - `.fgos/gate-bypass.json` — `{"level":"standard"}`; item `tier: light` is
   covered by `standard` (D5, `docs/history/gate-bypass/CONTEXT.md`).
 - `fgos tool query --capability impact-analysis --status present` — GitNexus
-  registered and `present`: impact-analysis posture is **full**. `fgos-planning`/
-  `fgos-validating`/`fgos-code-implement` must run `impact()` on
+  registered and `present`: impact-analysis posture is **full**. `fgos-coding-planning`/
+  `fgos-coding-validating`/`fgos-coding-implement` must run `impact()` on
   `tryAcquireOnce`/`acquireMainCheckoutLock` before editing, per `CLAUDE.md`'s
   gate.
 
 ## Outstanding questions
 
 None — no unstated product decision remains open. Implementation technique
-(D3's "how", test shape beyond D4's proof requirement) is `fgos-planning`'s
+(D3's "how", test shape beyond D4's proof requirement) is `fgos-coding-planning`'s
 job.

@@ -8,17 +8,17 @@ correctly. No design question, no split.
 
 1. `plugins/fgOS/skills/cook/SKILL.md` frontmatter `description` (:6-11):
    replace "Pauses for real human approval at every dev-skill gate
-   (fgos-exploring/fgos-planning/fgos-validating) ... never
+   (fgos-coding-exploring/fgos-coding-planning/fgos-coding-validating) ... never
    auto-approved" with accurate language: each dev-skill gate
    auto-approves when the repo's configured gate-bypass level covers it
-   (`fgos-exploring`/`fgos-planning`/`fgos-validating`'s own
+   (`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`'s own
    `canAutoApprove`/`canAutoApproveValidate` checks), otherwise pauses for
    real human approval — final merge review (`fgos approve`) always stays
    a human decision regardless, unchanged.
 2. Hard rules (:27-31): replace "Never auto-approve a gate" with the
    actually-intended invariant: never bypass a gate BEYOND what each
    dev-skill's own gate-bypass check already permits — cook's driver
-   invokes `fgos-exploring`/`fgos-planning`/`fgos-validating` unchanged
+   invokes `fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating` unchanged
    either way (already correctly stated at :118-121) and never
    second-guesses, forces, or fakes an auto-approve/human-approve record
    on its own authority.

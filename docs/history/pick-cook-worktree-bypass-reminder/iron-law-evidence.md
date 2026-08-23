@@ -27,7 +27,7 @@ $ git diff main --cached --stat -- docs/ plugins/
 
 (`CONTEXT.md`/`plan.md` under the same feature dir landed in two earlier
 commits on this branch, `ec60a0a`/`2f23e6c` — already accounted for in
-`fgos-planning`'s own gate approval, not new in this step's diff.)
+`fgos-coding-planning`'s own gate approval, not new in this step's diff.)
 
 Zero `.mjs`/`.js` source files changed — no code, self-modifying-capable or
 otherwise; every touched path is Markdown. `matchedFlags: ["sự cố"]` came

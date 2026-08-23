@@ -24,11 +24,11 @@ code with no item tracking it.
 
 **Impact-analysis capability gate:** `impact-analysis: full` (GitNexus
 present, checked via `fgos tool query --capability impact-analysis
---status present` during `fgos-exploring`). Applied below.
+--status present` during `fgos-coding-exploring`). Applied below.
 
 ## Risk map
 
-| Component | Risk | Proof point (for fgos-validating) |
+| Component | Risk | Proof point (for fgos-coding-validating) |
 |---|---|---|
 | `mainCheckoutHookWired` (read check, feeds `fgos doctor`) | Low — pure function, already covered by 4 existing unit tests (`checks.test.mjs:429-454`) that must keep passing unchanged | Existing tests still pass + new absolute-path case added |
 | `installGitHooks` fill-only detector | Medium — its "already wired" branch and its "found a foreign custom hook" branch both currently keyed off the same exact-string compare; changing the compare changes which branch an absolute-but-correct value takes | GitNexus `impact({target: "installGitHooks", direction: "upstream"})` before editing (impact-analysis: full, MUST run per CLAUDE.md gate) + existing `checks.test.mjs:485-522` wiring/fill-only e2e tests still pass + new absolute-path case |
@@ -50,7 +50,7 @@ the fix only widens what counts as "wired," it never narrows it.
   absolute-path case (existing coverage: `installGitHooks sets
   core.hooksPath...`, `...is idempotent...`, etc.).
 - `test/setup/uninstall-wiring.test.mjs` — new `uninstallGitHooks`
-  absolute-path case (existing coverage confirmed by `fgos-validating`'s
+  absolute-path case (existing coverage confirmed by `fgos-coding-validating`'s
   reality gate — 4 tests: unwire+delete, custom-path-untouched,
   no-op-when-unset, refuse-when-not-exactly-`.githooks` — plan's original
   claim that this coverage lived in `install-git-hooks.test.mjs` was
@@ -81,7 +81,7 @@ does not proceed as a decomposed set of children.
 - an absolute-path-equivalence case for `installGitHooks`
   (`install-git-hooks.test.mjs`)
 - an absolute-path-equivalence case for `uninstallGitHooks`
-  (`uninstall-wiring.test.mjs` — corrected by `fgos-validating`'s reality
+  (`uninstall-wiring.test.mjs` — corrected by `fgos-coding-validating`'s reality
   gate; the plan originally cited `install-git-hooks.test.mjs` for this
   case, which has no `uninstallGitHooks` coverage at all)
 

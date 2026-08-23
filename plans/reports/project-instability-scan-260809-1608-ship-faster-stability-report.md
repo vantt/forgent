@@ -266,11 +266,11 @@ have **0** occurrences. Not "empty now" — never reached once.
 
 Compounding it, `.claude/skills/fgos-routing/SKILL.md:137-143` — the table a
 session reads first — insists on registry lookup and then hardcodes it
-wrong: it names `fgos-exploring` for `clarify`, where the registry says
+wrong: it names `fgos-coding-exploring` for `clarify`, where the registry says
 `fgos-clarifying`.
 
 *Cost, demonstrated by this very item:* `tsk-36i` went `clarify` →
-`decompose` and arrived at `fgos-planning`, whose Bootstrap step opens
+`decompose` and arrived at `fgos-coding-planning`, whose Bootstrap step opens
 *"read that feature's `CONTEXT.md` — the locked decisions are the only
 source of truth."* No `CONTEXT.md` existed, because the only skill that
 writes one sits on an unreachable stage. A paragraph was written into
@@ -394,7 +394,7 @@ both other consumers already migrated (`src/intake/classify.mjs:63`,
 Real matches on the live backlog:
 
 ```
-tsk-12t [auth]   -> "...verify authoring during fgos-exploring..."
+tsk-12t [auth]   -> "...verify authoring during fgos-coding-exploring..."
 tsk-5ma [audit]  -> "...already done -- audited every other remaining caller..."
 tsk-1tm [delete] -> "...shows these 6 as \" D\" (deleted) in git status."
 ```
@@ -419,9 +419,9 @@ instructions**
 Severity: **high** · Dedupe: **NEW** (one bug, three sites)
 
 `plugins/fgOS/skills/cook/SKILL.md:27-31` — *"**Never auto-approve a gate.**"*
-`.claude/skills/fgos-planning/SKILL.md:282-284, 313-314` — check
+`.claude/skills/fgos-coding-planning/SKILL.md:282-284, 313-314` — check
 `canAutoApprove`, and on `true` *"skip the question."* Identical conflict in
-`fgos-exploring` (`:269-271`, `:313-321`) and `fgos-validating` (`:177`,
+`fgos-coding-exploring` (`:269-271`, `:313-321`) and `fgos-coding-validating` (`:177`,
 `:210-213`).
 
 Live on this repo: bypass level `standard`, and the check returned `true`
@@ -456,7 +456,7 @@ The two automated writers disagree on their inputs:
 
 - `src/intake/discovery.mjs:218-221` (rough, at `clarify`) passes **both**
   axes: `blocks` *and* `semanticRelatedness`.
-- `src/intake/decompose.mjs:609` (documented at `:600-606` as *"the REFINED
+- `src/intake/plan.mjs:609` (documented at `:600-606` as *"the REFINED
   pass"*) passes `blocks` and `blastRadius` — **no `semanticRelatedness`**.
 
 So the pass that runs second silently discards a component the first one
@@ -508,7 +508,7 @@ with a bare `catch {}`**
 
 Severity: medium · Dedupe: **NEW**
 
-`src/intake/discovery.mjs:227-229` and `src/intake/decompose.mjs:616-619`.
+`src/intake/discovery.mjs:227-229` and `src/intake/plan.mjs:616-619`.
 A `lock-timeout` (finding 1) or any write-door rejection drops the priority
 write with zero signal. A run where every priority write failed looks
 identical to one where they all succeeded — which is why 12b and 12c were
@@ -642,7 +642,7 @@ error messages state a remedy — use it as the template for the fix.)*
 | 26 | **`--help --json` has no globals section** — `--dir`, `--json`, `--pretty` accepted by every verb, documented nowhere machine-readable. This is exactly how finding 3 stays invisible. | `--help --json` top keys = `[schema_version, commands]` | NEW |
 | 27 | **`discover`/`decompose --help` tell callers to omit `--verdict` to get a judge that was deleted** — the real path now throws. | `src/cli/command-registry.mjs:147, 165-173` vs `src/intake/discovery.mjs:191-201` | NEW |
 | 28 | **`cook` forbids `fgos approve`, then routes into `fgos-fanout`, which calls it.** Fanout's reason is sound (leaf merges into `fgw/<root>`, never main) but neither `cook` nor `coding-driving` records the leaf-vs-root distinction; both say "always". | `cook:32-35` vs `fgos-fanout:90-95, 152` | NEW |
-| 29 | **`fgos-routing` and `fgos-coding-driving` give opposite claim-timing rules.** On the cook path the item is unclaimed through `decompose`, so `fgos-planning`'s "commit `plan.md` to `fgw/<id>` before calling `fgos discover`" is unexecutable as written — no such branch exists yet. | `fgos-routing:88-101` vs `fgos-coding-driving:113-115`; `fgos-planning:86-89` | adjacent to `tsk-2gw`; contradiction is NEW |
+| 29 | **`fgos-routing` and `fgos-coding-driving` give opposite claim-timing rules.** On the cook path the item is unclaimed through `decompose`, so `fgos-coding-planning`'s "commit `plan.md` to `fgw/<id>` before calling `fgos discover`" is unexecutable as written — no such branch exists yet. | `fgos-routing:88-101` vs `fgos-coding-driving:113-115`; `fgos-coding-planning:86-89` | adjacent to `tsk-2gw`; contradiction is NEW |
 
 ## Unproven suspicions
 
@@ -660,7 +660,7 @@ Not findings. Each names what would settle it.
   mis-tested (zero textual references proven; runtime path not traced).
 - **Why `test/setup/checks.test.mjs` costs 10-14s per test is unexplained.**
   The obvious hypothesis is refuted — `claude --version` is 75ms.
-- **`fgos-exploring`'s gate has no rejection path** — the `false` branch only
+- **`fgos-coding-exploring`'s gate has no rejection path** — the `false` branch only
   covers "once the person approves". *Settle it:* decline at that gate and
   check whether `stage` advanced.
 - **`distillery.md` may describe an area with no implementation here.**

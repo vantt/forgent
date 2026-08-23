@@ -47,10 +47,10 @@ this skill's flow doesn't apply).
 
 Impact-analysis posture: **full** (`fgos tool query --capability
 impact-analysis --status present` → `gitnexus` present, confirmed during
-`fgos-exploring`). GitNexus `impact()` MUST run before editing
+`fgos-coding-exploring`). GitNexus `impact()` MUST run before editing
 `reclaimOrphanedCheckout`/`createWorktree`/the `pick`/`take` handlers
 (CLAUDE.md's Always-Do rules) — this is the blast-radius proof point for
-the risk-map row below, carried to `fgos-validating`.
+the risk-map row below, carried to `fgos-coding-validating`.
 
 ### Changes
 
@@ -66,7 +66,7 @@ the risk-map row below, carried to `fgos-validating`.
 
 2. **`bin/fgos.mjs` — `take` handler.** Replace `repoRoot: process.cwd()`
    (currently line ~1722) with the `repoRoot = path.dirname(dir)` pattern
-   already used at line ~1537 (`wiki` verb) and `src/intake/decompose.mjs:438`.
+   already used at line ~1537 (`wiki` verb) and `src/intake/plan.mjs:438`.
 
 3. **`bin/fgos.mjs` — `pick` handler (D2).** Same `repoRoot` fix as `take`
    (currently line ~1785), AND replace `worktreeDir: path.join(process.cwd(),
@@ -76,7 +76,7 @@ the risk-map row below, carried to `fgos-validating`.
 
 ### Risk map
 
-| Component | Risk | Proof point (carried to `fgos-validating`) |
+| Component | Risk | Proof point (carried to `fgos-coding-validating`) |
 |---|---|---|
 | `reclaimOrphanedCheckout` new refuse branch (D1) | Medium — shared with runner's own autonomous dispatch (`loop.mjs` leaf/root `createWorktree` calls); a wrong guard could make normal reclaim (orphan != repoRoot, the common case) refuse when it shouldn't | `impact({target: "reclaimOrphanedCheckout", direction: "upstream"})` before editing; full `test/runner/worktree.test.mjs` + `test/e2e/pr-gate.test.mjs` + runner-loop e2e green after the change, unmodified pass/fail set except the new case added |
 | `pick`/`take` `repoRoot`/`worktreeDir` derivation | Low-medium — mechanical substitution, but on the most heavily used pull-door path | `impact({target: "claimWork", direction: "upstream"})` before editing; full `test/cli/fgos.test.mjs` + `test/runner/claim-port.test.mjs` green; no-`--dir` behavior byte-identical (see CONTEXT.md scout evidence) |
@@ -103,7 +103,7 @@ the risk-map row below, carried to `fgos-validating`.
 - The exact `WorktreeError` message wording for D1's refuse path and the
   exact shape of the new CLI-level regression test are implementation
   detail, not product decisions — left to whoever implements (per
-  CONTEXT.md's own deferred-questions section); `fgos-validating`'s
+  CONTEXT.md's own deferred-questions section); `fgos-coding-validating`'s
   reality gate checks this assumption is proven, not asked about here.
 
 ## Proof surface

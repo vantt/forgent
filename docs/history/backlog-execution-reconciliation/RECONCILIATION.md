@@ -271,7 +271,7 @@ decisions (`scripts/check-decision-citation-drift.mjs`), none for this.
 
 ### p-4b7dd2ed — verdict: resolved
 
-`.gitignore` excluded `/docs/history/` while `fgos-exploring` required
+`.gitignore` excluded `/docs/history/` while `fgos-coding-exploring` required
 committing `CONTEXT.md` there.
 
 `.gitignore` carries no `docs/history` entry at all, and **541 files under
@@ -307,7 +307,7 @@ different mechanism, not this row.
 `buildDecomposePrompt` never reads `work.description` or `docsRef`.
 
 Same retirement. `buildDecomposePrompt` exists nowhere in `src/`, `bin/` or
-`test/`; `src/intake/decompose.mjs:4` records "RETIRED (tsk-1x3 D1/D9/D16)
+`test/`; `src/intake/plan.mjs:4` records "RETIRED (tsk-1x3 D1/D9/D16)
 … this module used to spawn a nested `claude -p` judge (judgeDecompose)".
 The `docsRef`-reading trust signal survived the retirement as
 `readLockedContext` (`src/intake/discovery.mjs:24` imports it, and
@@ -330,7 +330,7 @@ session/skill/original-command provenance the row asked for — resolved via
 `src/cli/invocation-fault-log.mjs:37`'s `resolveWriterIdentity`. Wired into
 the single CLI door at `bin/fgos.mjs:66`.
 
-The row also demanded a real `fgos-exploring` pass before construction
+The row also demanded a real `fgos-coding-exploring` pass before construction
 rather than deciding architecture in the backlog; that happened —
 `docs/history/cli-invocation-fault-provenance/CONTEXT.md:3` names item
 `tsk-5z0`, with a `plan.md` alongside it.

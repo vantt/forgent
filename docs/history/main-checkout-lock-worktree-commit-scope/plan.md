@@ -80,12 +80,12 @@ function main() {
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |-----------|------|--------------------------------------|
 | Guard 1 (lock-acquire skip for worktree) | medium-high | `test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs` (already written, currently RED) must go green |
 | Guard 2 (`currentFgwBranchIfMainCheckout`, refactored to take `isMainCheckout` param) | medium | `test/e2e/main-checkout-lock-hook.test.mjs` (existing, currently green) must stay green — no regression on the fgw-branch-on-main refusal or the legitimate-worktree-on-fgw-branch pass-through |
 | `main-checkout-lock.mjs` primitive | none | unchanged (D4/D5) — no proof point needed, confirmed by D5's call-site scout |
-| Real dogfood on this checkout | medium | `fgos doctor`'s hook-wired check is currently a false negative here (`tsk-1gn`, out of scope) — `fgos-validating` should not rely on `fgos doctor` green/red as evidence for this item; use the e2e tests + a real `git commit` from this session's own worktree instead, same as this session already did live twice |
+| Real dogfood on this checkout | medium | `fgos doctor`'s hook-wired check is currently a false negative here (`tsk-1gn`, out of scope) — `fgos-coding-validating` should not rely on `fgos doctor` green/red as evidence for this item; use the e2e tests + a real `git commit` from this session's own worktree instead, same as this session already did live twice |
 
 `impact-analysis: degraded` (GitNexus present, index stale) — the e2e
 tests above are this item's actual blast-radius evidence, not a

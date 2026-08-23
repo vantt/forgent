@@ -1,7 +1,7 @@
 # Why `fgos discover` could overwrite an already-locked `verify` command
 
 `resolveDiscovery` (`src/intake/discovery.mjs`) and `resolveDecompose`
-(`src/intake/decompose.mjs`) both have a trust-signal shortcut: if the
+(`src/intake/plan.mjs`) both have a trust-signal shortcut: if the
 item's `docsRef` already points at a committed, locked `CONTEXT.md`/
 `plan.md`, skip the model judge entirely and advance the stage directly
 (`readLockedContext`, `tsk-ozl` D1-D3). In the standard interactive
@@ -18,14 +18,14 @@ const repoRoot = path.dirname(dir); // dir is always the main checkout's .fgos, 
 
 then call `readLockedContext(repoRoot, work.docsRef)` — a plain
 `fs.readFileSync` against `path.join(repoRoot, docsRef)`. But
-`fgos-exploring`/`fgos-planning` commit `CONTEXT.md`/`plan.md` to the
+`fgos-coding-exploring`/`fgos-coding-planning` commit `CONTEXT.md`/`plan.md` to the
 item's own `fgw/<id>` branch/worktree — never to main, which has no idea
 those files exist until later merge. So `readLockedContext` always reads
 from the wrong physical directory and always finds nothing, in exactly
 the scenario (an interactive session already did the real reasoning) the
 shortcut exists to serve.
 
-> Confirmed live for `tsk-3sw`: after `fgos-exploring` committed
+> Confirmed live for `tsk-3sw`: after `fgos-coding-exploring` committed
 > `CONTEXT.md` and got `contextApprove` approved, `fgos discover tsk-3sw`
 > still spawned a full nested `judgeDiscovery` call instead of skipping,
 > producing a wrong verify guess (a docs-grep check for what was really a
@@ -56,18 +56,18 @@ production.
 `resolveDiscovery` additionally writes `verdict.verify` — `judgeDiscovery`'s
 own model guess — straight onto `work.verify` on every clear verdict, with
 no check for whether the item already carries a real, locked `verify`
-from a later stage (e.g. `fgos-validating`'s `planApprove.verify` gate
+from a later stage (e.g. `fgos-coding-validating`'s `planApprove.verify` gate
 record):
 
 ```js
 moveStage(..., { verify: verdict.verify ?? FALLBACK_VERIFY, ... })
 ```
 
-Concrete incident (`tsk-5e97`): `fgos-validating` explicitly set
+Concrete incident (`tsk-5e97`): `fgos-coding-validating` explicitly set
 `item.verify` to a real, narrow, already-passing command (`node --test
-test/intake/decompose.test.mjs`) and locked it in `plan.md`'s
+test/intake/plan.test.mjs`) and locked it in `plan.md`'s
 Proof-surface section. Only afterward did the session realize
-`fgos-exploring`'s own `CONTEXT.md` lock had never actually been released
+`fgos-coding-exploring`'s own `CONTEXT.md` lock had never actually been released
 through the `discover` verb (because of the repoRoot bug above), so it ran
 `fgos discover tsk-5e97` — and that call's own `judgeDiscovery` verdict
 carried a different, broader verify guess (`npm test`, the whole suite)
@@ -97,7 +97,7 @@ D1's `decompose.mjs` half is implemented (`tsk-1ni-1`): a new
 `resolveContentRoot` helper tries `process.cwd()`, then `git worktree list`
 for `fgw/<id>`, then falls back to the state root — resolving the real
 content root instead of the buggy `path.dirname(dir)` derivation above.
-Real commit (`5d9b50c`, `src/intake/decompose.mjs`, +55/-1 lines):
+Real commit (`5d9b50c`, `src/intake/plan.mjs`, +55/-1 lines):
 
 > resolveContentRoot tries process.cwd(), then git worktree list for
 > fgw/<id>, then falls back to stateRoot. Fixes readLockedContext's
@@ -169,7 +169,7 @@ merged, not just planned.
   checkout per ADR0020), when the actual committed `CONTEXT.md`/`plan.md`
   live in the item's own separate `fgw/<id>` worktree.
 - **content root** — the caller's live working directory (the worktree an
-  interactive `fgos-exploring`/`fgos-planning` session is standing in),
+  interactive `fgos-coding-exploring`/`fgos-coding-planning` session is standing in),
   distinct from the state root (`dir`, always main).
 - **verify-overwrite guard** (D2) — the check in `resolveDiscovery` that
   skips writing `verdict.verify` over an existing non-empty,

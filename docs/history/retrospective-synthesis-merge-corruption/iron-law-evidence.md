@@ -6,8 +6,8 @@
 ```json
 {
   "filesChanged": [
-    ".agents/skills/fgos-compounding/SKILL.md",
-    ".claude/skills/fgos-compounding/SKILL.md",
+    ".agents/skills/fgos-coding-compounding/SKILL.md",
+    ".claude/skills/fgos-coding-compounding/SKILL.md",
     "docs/history/retrospective-synthesis-merge-corruption/CONTEXT.md",
     "docs/history/retrospective-synthesis-merge-corruption/RESEARCH.md",
     "docs/history/retrospective-synthesis-merge-corruption/plan.md"
@@ -23,7 +23,7 @@
 ## Where the flag actually came from
 
 `audit` matches this item's own description text — tsk-2oy repairs a hole
-in the main-checkout write path (`fgos-compounding` step 3's retrospective-
+in the main-checkout write path (`fgos-coding-compounding` step 3's retrospective-
 synthesis commit) that silently corrupted the git-history audit trail
 (confirmed 5 real instances in `RESEARCH.md`). This is the expected match,
 not a false positive: the whole point of this item is an audit-trail
@@ -35,12 +35,12 @@ Per `plan.md`'s Proof surface (skill-prose verify shape,
 `docs/how-to/write-verify-for-a-skill-prose-change.md`):
 
 ```
-npm test && grep -qF "refusing to commit — MERGE_HEAD is set" .claude/skills/fgos-compounding/SKILL.md && grep -qF 'git -C "$root" commit -m "docs(<id>): retrospective synthesis"' .claude/skills/fgos-compounding/SKILL.md && grep -qF "refusing to commit — MERGE_HEAD is set" .agents/skills/fgos-compounding/SKILL.md && grep -qF 'git -C "$root" commit -m "docs(<id>): retrospective synthesis"' .agents/skills/fgos-compounding/SKILL.md
+npm test && grep -qF "refusing to commit — MERGE_HEAD is set" .claude/skills/fgos-coding-compounding/SKILL.md && grep -qF 'git -C "$root" commit -m "docs(<id>): retrospective synthesis"' .claude/skills/fgos-coding-compounding/SKILL.md && grep -qF "refusing to commit — MERGE_HEAD is set" .agents/skills/fgos-coding-compounding/SKILL.md && grep -qF 'git -C "$root" commit -m "docs(<id>): retrospective synthesis"' .agents/skills/fgos-coding-compounding/SKILL.md
 ```
 
 ## Failing-before / passing-after transcript (real, not paraphrased)
 
-**Before** (`git show HEAD~1:.claude/skills/fgos-compounding/SKILL.md`,
+**Before** (`git show HEAD~1:.claude/skills/fgos-coding-compounding/SKILL.md`,
 the commit immediately prior to the guard landing):
 
 ```
@@ -51,7 +51,7 @@ POSITIVE claude: NO MATCH (expected -- guard not written yet)
 **After** (working tree, same file, this item's own commit `cc887310`):
 
 ```
-$ grep -qF "refusing to commit — MERGE_HEAD is set" .claude/skills/fgos-compounding/SKILL.md && echo "POSITIVE claude: MATCH (expected)" || echo "POSITIVE claude: NO MATCH (unexpected)"
+$ grep -qF "refusing to commit — MERGE_HEAD is set" .claude/skills/fgos-coding-compounding/SKILL.md && echo "POSITIVE claude: MATCH (expected)" || echo "POSITIVE claude: NO MATCH (unexpected)"
 POSITIVE claude: MATCH (expected)
 ```
 

@@ -45,9 +45,70 @@ cleanly express or reuse.
 
 `discover-next` only considers `status:todo` items in either sub-pool.
 `status:doing` items are excluded — those are actively claimed by another
-live session (an open `fgos-exploring`/`fgos-planning` session on that
+live session (an open `fgos-coding-exploring`/`fgos-coding-planning` session on that
 item), and the loop must not touch a session someone else already has
 open.
+
+## Eligibility also requires deps-readiness, or the picker hands back an id nobody can claim
+
+Status and stage were not enough on their own. `isCandidate()` originally
+read:
+
+```js
+function isCandidate(item) {
+  return item.status === 'todo' && CANDIDATE_STAGES.has(item.stage);
+}
+```
+
+Nothing there asks whether the item's dependencies are resolved — so the
+picker could hand a caller an id that the very next step refuses. The
+claim path checks what the pool did not: `take`'s handler calls
+`isDepsAndLineageReady(dir, id)` directly, and refuses with `"<id>" is
+todo but has an unmet dependency or an open decomposed child`.
+
+Confirmed live (2026-08-11) on `tsk-28x` — `status:todo`, `stage:clarify`,
+so an exact match for the old two-clause filter — whose `take` was refused
+because its deps `tsk-12m` (`awaiting-human`) and `tsk-1hy` (`cleanup`,
+not yet `done`) were unresolved. Every such pick costs a whole
+discover/session round that can only end in a refusal.
+
+The fix reuses the helper that was already exported and already the claim
+path's own check (`src/state/frontier.mjs`), rather than writing a second
+readiness rule that could drift from it:
+
+```js
+function isCandidate(item, view) {
+  return (
+    CANDIDATE_STATUSES.has(item.status) &&
+    isCandidateStage(item) &&
+    isDepsAndLineageReady(view, item.id)
+  );
+}
+```
+
+Two properties of that reuse are deliberate:
+
+- **The whole helper, not just its deps clause.** `isDepsAndLineageReady`
+  also refuses on `hasOpenDescendant` (an open decomposed child). Bundling
+  both is right here for the same reason `take`'s explicit-`--id` branch
+  already bundles both: an item anchored by an open child is equally not
+  dispatchable, and why it is undispatchable does not change the answer.
+- **Silent exclusion, not a new "found but blocked" report.** This matches
+  the only existing convention in the codebase for the same kind of
+  filter — `frontier()`, in the same directory, already drops an
+  executing-stage item with `depsReady === false` without announcing it.
+  No new return shape was introduced.
+
+Only the picker's filter changed. `/fgOS:discover`'s own claim step was
+never buggy: it calls `take`, inherits `take`'s real check transitively,
+and correctly relays the refusal and stops.
+
+One real asymmetry stayed open rather than being folded in: `pick --id
+<id>` does **not** call `isDepsAndLineageReady` at all, going straight to
+`claimWork` with only a CAS on `expectedStatus`. That path is not
+exercised by this failure mode — `/fgOS:discover` falls back to `pick`
+only when `take` fails for a branch-exists reason, never for unmet deps —
+so it is a known sibling gap, not something this change silently covered.
 
 ## Stop rules — deliberately not "same item blocked twice"
 
@@ -80,10 +141,10 @@ re-selected on the next pass.
 ## The lock-timeout signal broke silently when discover-next stopped being a CLI subprocess, then was restored end-to-end
 
 The stop rule above (`lock-timeout` — exit code `7` — stops the whole
-loop) assumed `discover-next` calls `fgos discover`/`fgos decompose` as a
+loop) assumed `discover-next` calls `fgos discover`/`fgos plan` as a
 raw CLI subprocess, whose real exit code it can read directly. `tsk-31l`
 later switched `discover-next` to dispatch through the `fgos-coding-driving`
-skill instead (which invokes `fgos-exploring`/`fgos-planning` in-session,
+skill instead (which invokes `fgos-coding-exploring`/`fgos-coding-planning` in-session,
 never as a subprocess) — and that switch silently broke the signal this
 doc's own stop-rule section depends on. A `lock-timeout` several skill
 layers down now looked identical to any other one-off `blocked` outcome:
@@ -95,7 +156,7 @@ continue."
 explicit out-of-scope gap rather than silently patched inline) restored
 the signal by threading a literal, locked token —
 **`stop-reason: lock-timeout`** — through every layer between where a
-`fgos discover`/`fgos decompose` call can actually fail and where
+`fgos discover`/`fgos plan` call can actually fail and where
 `discover-next`/`discover-loop` classify the result:
 
 > "D2: Fix lives at the root: `fgos-coding-driving`'s own stop-report
@@ -107,14 +168,14 @@ the signal by threading a literal, locked token —
 > "D4: The stop-report's lock-timeout signal is identified by the literal
 > token `stop-reason: lock-timeout`. This is a locked contract string, not
 > an implementation detail: whoever implements D2 must emit exactly this
-> token, and `fgos-exploring`/`fgos-planning` must relay exactly this
+> token, and `fgos-coding-exploring`/`fgos-coding-planning` must relay exactly this
 > token when their own engine-verb call fails that way."
 
 Ten `SKILL.md` files ended up needing the token (both `.claude/skills/`
-and `.agents/skills/` mirrors of `fgos-coding-driving`/`fgos-exploring`/
-`fgos-planning`/`fgos-validating`, plus `discover-next`/`discover-loop`
-themselves) — `fgos-validating` was added mid-implementation once
-`fgos-planning`'s reality gate noticed it also fires `fgos decompose`
+and `.agents/skills/` mirrors of `fgos-coding-driving`/`fgos-coding-exploring`/
+`fgos-coding-planning`/`fgos-coding-validating`, plus `discover-next`/`discover-loop`
+themselves) — `fgos-coding-validating` was added mid-implementation once
+`fgos-coding-planning`'s reality gate noticed it also fires `fgos plan`
 internally (its own Gate section), which the original eight-file count had
 missed.
 
@@ -125,7 +186,7 @@ can assert the literal token is *present* in the prose (and that a
 superseded "Known gap" paragraph is *gone*), but cannot prove an LLM
 actually relays that token across a live skill-invocation hop at runtime —
 that proof is explicitly left to `docs/how-to/
-smoke-test-fgos-code-implement-with-a-trivial-item.md` plus real
+smoke-test-fgos-coding-implement-with-a-trivial-item.md` plus real
 event-log observation, not to this field. `tsk-1c6`'s own verify went
 through three locked-then-reversed forms before landing there (a
 mechanical grep, disputed five times as unable to prove a runtime claim;

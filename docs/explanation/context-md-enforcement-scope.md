@@ -14,9 +14,9 @@ writing the enforcement code itself.
 > a `CONTEXT.md` at all... Re-measured 2026-08-02 against the current
 > log: 280 items created, 102 (36.4%) with a real `CONTEXT.md` — organic
 > improvement (from two unrelated upgrades, `tsk-ozl` and
-> `fgos-planning-context-gap-handback`), still with zero engine-level
+> `fgos-coding-planning-context-gap-handback`), still with zero engine-level
 > enforcement. Nothing in `src/intake/discovery.mjs` or
-> `src/intake/decompose.mjs` checks CONTEXT.md's existence before an item
+> `src/intake/plan.mjs` checks CONTEXT.md's existence before an item
 > leaves `clarify`/`decompose` — both edges to `executing` exist
 > unconditioned (`src/state/workflow-stage-graphs.mjs:65,67`).
 
@@ -30,10 +30,10 @@ The item's own scope was deliberately narrow:
 
 | ID | Decision |
 |----|----------|
-| D1 | Enforcement scope is **(b) OR (c)**: an item must carry a non-empty `CONTEXT.md` under its `docsRef` before leaving `clarify`/`decompose` **if** it is `risk: heavy` or `risk: standard` with `acceptance` criteria set (b), **or** it has been through at least one `fgos ask`/`fgos answer` round trip (c) — either condition alone is sufficient to trigger the requirement. An item that is neither (`risk: light` with no acceptance, never parked on a person) is exempt — preserves `fgos-exploring`'s own "item đơn giản không cần ceremony" principle. |
+| D1 | Enforcement scope is **(b) OR (c)**: an item must carry a non-empty `CONTEXT.md` under its `docsRef` before leaving `clarify`/`decompose` **if** it is `risk: heavy` or `risk: standard` with `acceptance` criteria set (b), **or** it has been through at least one `fgos ask`/`fgos answer` round trip (c) — either condition alone is sufficient to trigger the requirement. An item that is neither (`risk: light` with no acceptance, never parked on a person) is exempt — preserves `fgos-coding-exploring`'s own "item đơn giản không cần ceremony" principle. |
 | D2 | Enforcement is **hard**: both `clarify -> executing` and `decompose -> executing` (`workflow-stage-graphs.mjs:65,67`) are blocked — not warn-and-continue — when D1's trigger applies and no non-empty `CONTEXT.md` exists at the item's `docsRef`. Mirrors the existing `RUL50`/compound-learn precondition precedent (a precondition gate blocking a stage/status edge on a content check) already proven safe in this codebase, rather than a softer warn-only path that a 27%-73% non-compliance rate (pre-upgrade baseline) shows does not self-correct. |
 | D3 | The trigger check (D1) is evaluated at attempt-time, reading the item's *current* `risk`/`acceptance`/gate history, not a value frozen at creation — an item that starts `risk: light` and gets upgraded, or that gets parked on a person later, becomes subject to enforcement from that point forward, same as any other content-based gate in this codebase. |
-| D4 | This item's own scope stops at the decision lock. The actual precondition check (reading `docsRef` + file-on-disk, keyed off D1's trigger, applied to both edges per D2) is separate follow-up work — writing it here would violate `fgos-exploring`'s "do not write code, other than the decision doc itself" rule. |
+| D4 | This item's own scope stops at the decision lock. The actual precondition check (reading `docsRef` + file-on-disk, keyed off D1's trigger, applied to both edges per D2) is separate follow-up work — writing it here would violate `fgos-coding-exploring`'s "do not write code, other than the decision doc itself" rule. |
 
 ## Why hard, not soft — the bee precedent
 
@@ -49,7 +49,7 @@ The item's own scope was deliberately narrow:
 
 The organic 23%→36.4% improvement between the two measurement dates came
 from two unrelated upgrades (`tsk-ozl`,
-`fgos-planning-context-gap-handback`) — not from any gate — which is why
+`fgos-coding-planning-context-gap-handback`) — not from any gate — which is why
 D2 treats a soft/warn path as insufficient: passive improvement plateaus
 well short of full coverage without a hard block.
 
@@ -61,7 +61,7 @@ The decision lock does not include the gate implementation itself:
 >   `discovery.mjs`/`decompose.mjs` it hooks in, what error/park behavior
 >   fires on a trigger-true-but-missing-CONTEXT.md item, and its own
 >   verify/test coverage. Not locked here; a new item's own
->   `fgos-planning` pass shapes it, citing D1-D4 above.
+>   `fgos-coding-planning` pass shapes it, citing D1-D4 above.
 > - Exact wording of the parked reason / error surfaced to a blocked item
 >   (implementer's call, per D4).
 

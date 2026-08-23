@@ -28,38 +28,18 @@ read never appends an event).
 
 2. **Read the ranking.** Run:
 
+   Both branches use `../_shared/fgos-cli-fallback.md`, substituting
+   `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" triage --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos triage --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   triage --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
    — or, when step 1 found `--all`, add that flag to the same call:
 
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" triage --all --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos triage --all --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   triage --all --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
-
-   Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
-   never a relative path — an installed plugin's files run from a copied
-   cache location, not from this repo checkout, so a relative path would
-   resolve to the wrong place or fail outright.
 
    `--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),
    so a bare call from inside one silently reads an empty store — exit 0,
@@ -85,7 +65,8 @@ read never appends an event).
    **blocks**, **tier**, **priority**, **title**.
    - `status` is the item's raw status (`todo` | `doing` | `blocked` |
      `awaiting-human` | `awaiting-approval` | `done`), rendered as-is.
-   - `stage` (`clarify` | `decompose` | `executing` | `compound-learn`) is
+   - `stage` (`discovery` | `exploring` | `planning` | `executing`, plus
+     the drain-only legacy `decompose`) is
      always present (defaults to `executing` when the raw record has none).
    - `blocked-by` renders `blockedBy` — the ids of OTHER still-open items
      THIS row directly waits on (its own unmet `deps`, plus — when this row

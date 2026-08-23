@@ -67,7 +67,7 @@ Impact-analysis gate: `fgos tool query --capability impact-analysis
 --status present` → GitNexus registered and `present` (`full` posture, per
 `CONTEXT.md`'s scout evidence). Per the project's impact-analysis gate,
 `impact()` runs on `main()` (the function being edited) before the edit,
-and `detect_changes()` runs before commit — both at `fgos-code-implement`
+and `detect_changes()` runs before commit — both at `fgos-coding-implement`
 time, not here.
 
 **Files touched**: `.githooks/pre-commit` (the guard),

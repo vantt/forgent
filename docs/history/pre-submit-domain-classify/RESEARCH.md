@@ -4,7 +4,7 @@
 
 **Asked:** Is there anything blocking the item from moving forward past
 `discovery`, given CONTEXT.md already locked D1/D2 and named two
-implementation-mechanism questions as deferred to `fgos-planning`? In
+implementation-mechanism questions as deferred to `fgos-coding-planning`? In
 particular: does a headless-capable classification mechanism already exist
 that D1 (Bước A must also work on headless submit paths) could point at?
 
@@ -50,7 +50,7 @@ that D1 (Bước A must also work on headless submit paths) could point at?
   "có sẵn qua `.fgos/config.json` `runner.capacities`" is not accurate as
   of this session: that name now resolves only to a `tools` registry entry
   (a different registration door), not a `runner.capacities` entry. Whoever
-  picks the headless mechanism for Bước A in `fgos-planning` should not
+  picks the headless mechanism for Bước A in `fgos-coding-planning` should not
   assume `capacities.submit-assist-classify` exists to dispatch through —
   it does not, today.
 - A separate, already-tracked effort (`plans/260808-2210-dispatch-
@@ -61,7 +61,7 @@ that D1 (Bước A must also work on headless submit paths) could point at?
   itself — this item's own footprint should stay `domain`-classification
   only.
 
-**Still open (for `fgos-planning`, unchanged from CONTEXT.md):** which
+**Still open (for `fgos-coding-planning`, unchanged from CONTEXT.md):** which
 concrete mechanism Bước A uses to satisfy D1's headless requirement. This
 round found no existing ready-to-use classify-purpose capacity to point
 at — planning starts from "register something new" or "reuse the `tools`

@@ -59,7 +59,7 @@ ambiguity to resolve here):
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | Readiness/ordering function (new composition of dep-wait + an extracted candidate-list overlap comparison + rankImpact) | Medium — new combination + extracting shared logic out of `footprintOverlap` | Unit tests: an item with an unmerged dep is excluded; a conflicting pair has the lower-impact one deprioritized/excluded; goalTier tie-break matches `rankImpact`'s existing behavior byte-for-byte; all 4 existing `test/state/graph-metrics.test.mjs` footprint-overlap tests (lines 433-478) and `fgos conflicts` output stay byte-for-byte unchanged after the extraction |
 | Merge-next calling `approve` unattended, agent-driven | High — touches CTR005, the worktree/main-checkout structural guards, the Iron Law gate (runner-sourced items), and local-vs-github transport branching | Confirm merge-next refuses identically to `approve` when run from a worktree; confirm a real conflict still ends in `blocked`/`merge-conflict` with main byte-for-byte untouched (existing `merge-abort-probe` guarantee); confirm `role: 'human'` attribution is unchanged |

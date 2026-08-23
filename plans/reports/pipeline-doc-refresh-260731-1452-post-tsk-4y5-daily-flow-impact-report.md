@@ -13,21 +13,21 @@ flowchart TD
     A["submit / add<br/>(mechanical, classify.mjs, no LLM)<br/>--urgent optional now"] -->|"stage: clarify<br/>status: todo"| B["pull door<br/>take / pick"]
     B -->|"status: doing"| C{"discover<br/>(judgeDiscovery)<br/>writes ROUGH priority<br/>(was: intentScore->intent)"}
     C -->|"clear"| E1["decompose or executing"]
-    C -->|"unclear"| D["awaiting-human<br/>fgos-exploring: scout (rg, 1 keyword)<br/>+ capability-gate query (impact-analysis)<br/>+ 3-test filter, ask/answer"]
+    C -->|"unclear"| D["awaiting-human<br/>fgos-coding-exploring: scout (rg, 1 keyword)<br/>+ capability-gate query (impact-analysis)<br/>+ 3-test filter, ask/answer"]
     D -->|"answered"| C
     E1 -->|"stage: decompose"| F{"decompose<br/>(judgeDecompose, separate verb now --<br/>tsk-2b0 hard split, no fallback)<br/>writes REFINED priority<br/>reads mode+blastRadius from plan.md"}
     F -->|"pass-through"| H["executing"]
     F -->|"decompose"| G["children created<br/>(deps-linked OR parent-linked,<br/>--parent now real, tsk-1xx)"]
-    F -->|"need-human / risk:heavy / blast-radius-over-threshold"| D2["awaiting-human<br/>fgos-planning + fgos-validating"]
+    F -->|"need-human / risk:heavy / blast-radius-over-threshold"| D2["awaiting-human<br/>fgos-coding-planning + fgos-coding-validating"]
     D2 -->|"answered / plan approved"| F
-    H --> I["fgos-code-implement<br/>implement -> verify -> return"]
+    H --> I["fgos-coding-implement<br/>implement -> verify -> return"]
     G --> I
     I -->|"verify green"| J["awaiting-approval"]
     I -->|"verify red"| K["blocked"]
     K -->|"fix, return again"| I
     J --> L["review / approve<br/>Iron Law gate if self-modifying<br/>(--acknowledge-iron-law, human-only)"]
     L -->|"reject"| I
-    L -->|"approve, merge OK"| M["compound-learn<br/>fgos-compounding: tag + doc<br/>(compound verb fires this edge)"]
+    L -->|"approve, merge OK"| M["compound-learn<br/>fgos-coding-compounding: tag + doc<br/>(compound verb fires this edge)"]
     M --> N["approve again -> done"]
 ```
 
@@ -47,21 +47,21 @@ had this exact detail confirmed by a live run before now.
 | `intent` | Auto-written at clarify | Retired in place — stops being written for new items; old data/flag untouched | None for old items; new items simply never populate it |
 | `list`/`ready`/`triage` order | Most items had no `priority` (tie-broken by `intent`/FIFO) | Most NEW items now carry a real computed `priority` number, actively sorting ASC | **Expect visible reordering** for anything processed after this merge — not a bug, but a surprise if unannounced |
 | `decompose`'s human gate | Only `risk: heavy` (keyword) forced `awaiting-human` | + blast-radius over threshold (20) also forces it, independently | **More items may pause for confirmation** than before, even when `risk` looks light |
-| `fgos-exploring` | No capability query | Now also runs `fgos tool query --capability impact-analysis` (`tsk-17w`) | Low — one more read-only line in the scout step |
+| `fgos-coding-exploring` | No capability query | Now also runs `fgos tool query --capability impact-analysis` (`tsk-17w`) | Low — one more read-only line in the scout step |
 
 ## Known gaps — status after merge
 
 1. ~~**`parent` field has no CLI writer.**~~ **RESOLVED (`tsk-1xx`, merged).**
    `add --parent`/`edit --parent` are real now (`src/cli/command-registry.mjs:82,227`,
-   `bin/fgos.mjs:783,1046-1050`). `fgos-planning`'s SKILL.md step 5 can
+   `bin/fgos.mjs:783,1046-1050`). `fgos-coding-planning`'s SKILL.md step 5 can
    actually be executed as written today.
 2. ~~**`clarify` has no capability-gate for `impact-analysis`.**~~ **RESOLVED
-   (`tsk-17w`, merged).** `fgos-exploring/SKILL.md` now queries it too,
-   matching `fgos-planning`/`fgos-validating`/`fgos-code-implement`.
+   (`tsk-17w`, merged).** `fgos-coding-exploring/SKILL.md` now queries it too,
+   matching `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`.
 3. **NEW — `priority` has no "don't clobber an explicit human value"
    guard.** Verified by direct read: `resolveDiscovery`
    (`src/intake/discovery.mjs:309-310`) and `resolveDecompose`
-   (`src/intake/decompose.mjs:394-401`) both call
+   (`src/intake/plan.mjs:394-401`) both call
    `editWork(dir, { id, patch: { priority }, role })` unconditionally —
    neither checks whether the item already carries a `priority` a human
    set via `edit --priority` before this pass ran. `docs/history/
@@ -82,9 +82,9 @@ had this exact detail confirmed by a live run before now.
 
 ## Sources (verified 2026-07-31, post-merge)
 
-`src/intake/discovery.mjs`, `src/intake/decompose.mjs`,
+`src/intake/discovery.mjs`, `src/intake/plan.mjs`,
 `src/cli/command-registry.mjs`, `bin/fgos.mjs`,
-`.claude/skills/fgos-exploring/SKILL.md`,
+`.claude/skills/fgos-coding-exploring/SKILL.md`,
 `docs/history/work-item-priority-matrix/CONTEXT.md`/`plan.md`,
 `docs/reference/priority-formula-and-intent-retirement.md`, live
 `fgos show tsk-1xx`/`tsk-17w`/`tsk-4y5` output, and this session's own

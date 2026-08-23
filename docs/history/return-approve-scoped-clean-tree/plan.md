@@ -13,7 +13,7 @@ CONTEXT.md: `docs/history/return-approve-scoped-clean-tree/CONTEXT.md` (D1-D3).
 
 **standard.**
 
-Flags counted (per fgos-planning's mechanical gate):
+Flags counted (per fgos-coding-planning's mechanical gate):
 - public contracts — yes: `return`/`approve` are the fgOS CLI's own verbs;
   this changes when they refuse (their observable contract).
 - existing covered behavior — yes: `test/runner/merge.test.mjs`
@@ -96,7 +96,7 @@ gets the OLD strict behavior, never a silent free pass.
 | default (`ownFileSet = null`) staying fail-safe (strict) for any caller that omits it | low | unit test: calling `isWorkingTreeClean`/`isFgosOnlyStatusLine` with no `ownFileSet` reproduces today's exact whole-tree-blocks-on-anything behavior |
 | footprint-declared item: uncommitted-but-in-footprint path still blocks (D2/D3) | standard | integration test: item with `footprint` set, a footprint path dirty/untracked but not yet committed → return/approve still blocks |
 
-## Proof to carry into `fgos-validating`
+## Proof to carry into `fgos-coding-validating`
 
 Concrete cases the plan commits to proving (validating's reality check
 runs these, or confirms equivalents already exist):

@@ -47,7 +47,7 @@ Order (each step feeds the next, no parallel-worthy pieces to compare via
    search adds or confirms nothing new.
 2. **Column B — what synthesis needs.** Cite `gate-dialogue-continuity`
    D3 (why / exchange-points / tradeoffs — three-part settle record) and
-   `fgos-compounding` SKILL.md's real input contract (`fgos check <id>` +
+   `fgos-coding-compounding` SKILL.md's real input contract (`fgos check <id>` +
    `docs/history/<feature>/`, §1 of that skill). Per D2, also read the bee
    doc-types-lifecycle report and pull its concrete precedent (which of
    bee's 11 doc types are generated mid-lifecycle vs. at close, and what
@@ -67,7 +67,7 @@ Order (each step feeds the next, no parallel-worthy pieces to compare via
 
 Risk map: the only real risk is the report drifting into speculation
 instead of citing real evidence (the item's own named failure mode) — no
-proof point needed at `fgos-validating` beyond confirming every claim in
+proof point needed at `fgos-coding-validating` beyond confirming every claim in
 the report traces to a file:line or a real count, per D1/D2.
 
 ## 3. Shape

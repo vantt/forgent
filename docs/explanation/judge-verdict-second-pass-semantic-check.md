@@ -276,7 +276,7 @@ properly incorporated: round 3 added grep assertions targeting each
 fix's expected code shape. But rounds 3 and 4 kept disputing anyway, now
 demanding "git diff showing actual code changes" — evidence that cannot
 exist yet at the `clarify` stage, since the `verify` command being
-evaluated is a *specification* for what `fgos-code-implement`/`fgos
+evaluated is a *specification* for what `fgos-coding-implement`/`fgos
 return` will run *later*, not something run now. Every round's counter-
 demand was answerable only by writing the implementation first, which
 defeats the entire purpose of proposing `verify` during shaping.

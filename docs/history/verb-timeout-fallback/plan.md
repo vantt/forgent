@@ -2,7 +2,7 @@
 
 ## Status
 
-Mode: **standard**. Ready for `fgos-validating`.
+Mode: **standard**. Ready for `fgos-coding-validating`.
 
 ## Mode gate
 
@@ -81,7 +81,7 @@ default from the one the runner loop already uses for the identical
 | Error text (D4) | low — string change only | grep for the old string after the change; should return nothing outside a changelog/history reference |
 
 Medium-risk items (flag resolution, existing test coverage) carry their
-proof points into `fgos-validating`.
+proof points into `fgos-coding-validating`.
 
 **Files likely touched:**
 

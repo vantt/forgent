@@ -17,7 +17,7 @@ console.log(JSON.stringify(classifyIronLaw({ filesChanged, description: item.des
 }
 ```
 
-This is a self-referential proof: tsk-1ne fixes `fgos-code-implement`'s
+This is a self-referential proof: tsk-1ne fixes `fgos-coding-implement`'s
 Iron Law check step (step 4) never explicitly saying it must run against
 the real committed diff, not a pre-commit one — which is exactly the
 mistake this session made while implementing tsk-1ne itself. The first

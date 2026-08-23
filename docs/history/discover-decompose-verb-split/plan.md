@@ -2,7 +2,7 @@
 
 CONTEXT.md: `docs/history/discover-decompose-verb-split/CONTEXT.md` (D1-D3).
 
-**Post-execution note:** `fgos-code-implement` found one live caller this
+**Post-execution note:** `fgos-coding-implement` found one live caller this
 plan's scout missed — `test/e2e/runner-loop.test.mjs` (a second `discover`
 call assuming decompose-stage dynamic dispatch, same pattern as the
 CLI-level test). Fixed in the same commit as the implementation, per D2.
@@ -52,16 +52,16 @@ sweep's pre-filtered calls and the CLI's now-guarded calls for no benefit.
 
 **Risk map**:
 
-| Component | Risk | Proof point (for fgos-validating) |
+| Component | Risk | Proof point (for fgos-coding-validating) |
 |---|---|---|
-| `bin/fgos.mjs` new `discover`/`decompose` cases | Low — mechanical split of one existing case into two, each with a one-line stage guard | `test/cli/fgos.test.mjs` reshaped cases pass; a manual `fgos decompose <id>` on a `clarify`-stage item errors instead of silently running the wrong judge |
+| `bin/fgos.mjs` new `discover`/`decompose` cases | Low — mechanical split of one existing case into two, each with a one-line stage guard | `test/cli/fgos.test.mjs` reshaped cases pass; a manual `fgos plan <id>` on a `clarify`-stage item errors instead of silently running the wrong judge |
 | `src/cli/command-registry.mjs` | Low — one entry becomes two, same parameter shape reused | `fgos --help`/registry consumers show both verbs distinctly (no automated test currently asserts on this file's shape beyond existence — confirm via `rg "name: 'discover'" src/cli/command-registry.mjs` returns exactly one match, and a new `name: 'decompose'` match exists) |
-| `plugins/fgOS/skills/discover/SKILL.md` + new `plugins/fgOS/skills/decompose/SKILL.md` | Medium — the existing skill's whole step 2/3 contract (one call, branch on `data.outcome` shape) is built on dynamic dispatch; splitting it wrong could leave a stage with no slash-command path | Manually walk both skills' steps against a real `clarify`-stage and a real `decompose`-stage item id; confirm each skill's own step 2 command succeeds and step 3's outcome-branch table still matches what the CLI actually returns |
-| `.claude/skills/fgos-exploring/SKILL.md`, `.claude/skills/fgos-validating/SKILL.md` (+ `.agents/skills/` mirrors) | Low — prose-only hand-off references, no executable contract | Grep confirms no remaining bare `fgos discover` reference where a `decompose`-stage hand-off is meant (`fgos-validating`'s hand-off should now say `fgos decompose`) |
+| `plugins/fgOS/skills/discover/SKILL.md` + new `plugins/fgOS/skills/plan/SKILL.md` | Medium — the existing skill's whole step 2/3 contract (one call, branch on `data.outcome` shape) is built on dynamic dispatch; splitting it wrong could leave a stage with no slash-command path | Manually walk both skills' steps against a real `clarify`-stage and a real `decompose`-stage item id; confirm each skill's own step 2 command succeeds and step 3's outcome-branch table still matches what the CLI actually returns |
+| `.claude/skills/fgos-coding-exploring/SKILL.md`, `.claude/skills/fgos-coding-validating/SKILL.md` (+ `.agents/skills/` mirrors) | Low — prose-only hand-off references, no executable contract | Grep confirms no remaining bare `fgos discover` reference where a `decompose`-stage hand-off is meant (`fgos-coding-validating`'s hand-off should now say `fgos plan`) |
 | `test/cli/fgos.test.mjs` | Medium — 9 existing call sites assume one verb name; some test the decompose branch by calling `discover` a second time after the item already advanced to `decompose` | Full `npm test` green; specifically the reshaped `discover`/`decompose` test block covers: clear verdict, unclear verdict (parks `awaiting-human`), missing id, wrong-stage call to each verb (new case), invalid judge response, pass-through, already-decomposed |
 (`docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md`, cited in
 `tsk-4y5`'s CONTEXT.md as a follow-up target, was checked at
-`fgos-validating` time and found untracked/uncommitted — not reachable from
+`fgos-coding-validating` time and found untracked/uncommitted — not reachable from
 any commit on this or any branch, only a WIP file in another session's
 working directory. Dropped from this item's scope below; a genuinely
 committed version is a later item's concern, not this one's.)
@@ -82,24 +82,24 @@ split.
    example.
 3. `plugins/fgOS/skills/discover/SKILL.md` — narrow to clarify-stage only
    (drop the decompose/split-work branch from step 3's outcome table).
-4. `plugins/fgOS/skills/decompose/SKILL.md` — new file, mirrors
+4. `plugins/fgOS/skills/plan/SKILL.md` — new file, mirrors
    `discover/SKILL.md`'s shape for the decompose-stage outcomes
    (`noop`, `already-decomposed`, `invalid`, `need-human`, `pass-through`,
    `decompose`) that step 3 of the old skill documented.
 5. `plugins/fgOS/skills/cook/SKILL.md:90` — update the "same engine
    command" reference to name whichever of `discover`/`decompose` applies
    at that call site.
-6. `.claude/skills/fgos-exploring/SKILL.md`, `.claude/skills/
-   fgos-validating/SKILL.md`, and their `.agents/skills/` mirrors —
-   update hand-off prose: `fgos-exploring`'s note stays `fgos discover`
-   (it hands off at `clarify`); `fgos-validating`'s note becomes `fgos
+6. `.claude/skills/fgos-coding-exploring/SKILL.md`, `.claude/skills/
+   fgos-coding-validating/SKILL.md`, and their `.agents/skills/` mirrors —
+   update hand-off prose: `fgos-coding-exploring`'s note stays `fgos discover`
+   (it hands off at `clarify`); `fgos-coding-validating`'s note becomes `fgos
    decompose` (it hands off at `decompose`).
 7. `test/cli/fgos.test.mjs:2738-2884` — reshape the 9 call sites per the
    risk-map proof point above.
 
 `docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md` is
 **out of scope** (see risk-map note above) — untracked/uncommitted, not
-reachable on this branch as of `fgos-validating`'s check. D2's "every live
+reachable on this branch as of `fgos-coding-validating`'s check. D2's "every live
 caller in scope" only covers files this item can actually see and commit
 against; a file that doesn't exist yet in git history isn't a live caller
 this item can update.
@@ -121,10 +121,10 @@ further split to compare candidates for):
 2. `test/cli/fgos.test.mjs` reshaped alongside step 1 (same commit) —
    proves step 1 immediately, per this repo's real-test-first discipline.
 3. `plugins/fgOS/skills/discover/SKILL.md` +
-   `plugins/fgOS/skills/decompose/SKILL.md` — depend on step 1's final
+   `plugins/fgOS/skills/plan/SKILL.md` — depend on step 1's final
    verb names/output shapes.
-4. `plugins/fgOS/skills/cook/SKILL.md`, `.claude/skills/fgos-exploring/
-   SKILL.md`, `.claude/skills/fgos-validating/SKILL.md` (+ `.agents/
+4. `plugins/fgOS/skills/cook/SKILL.md`, `.claude/skills/fgos-coding-exploring/
+   SKILL.md`, `.claude/skills/fgos-coding-validating/SKILL.md` (+ `.agents/
    skills/` mirrors) — prose-only updates, last since nothing else depends
    on them.
 
@@ -134,7 +134,7 @@ further split to compare candidates for):
 fgos tool query --capability impact-analysis --status present
 ```
 
-To be run at `fgos-validating` time (this skill does not run the reality
+To be run at `fgos-coding-validating` time (this skill does not run the reality
 check itself). If `present`: run `impact` on `bin/fgos.mjs`'s discover
 case and `resolveDiscovery`/`resolveDecompose` before editing, per
 `CLAUDE.md`'s MUST-run rule, and attach the blast-radius result to the
@@ -144,7 +144,7 @@ case and `resolveDiscovery`/`resolveDecompose` before editing, per
 rely on the `test/cli/fgos.test.mjs` full-suite proof instead — not a
 gap, per the capability gate's own inactive/degraded posture.
 
-**Run at `fgos-validating` time (2026-07-31):** `present` (GitNexus
+**Run at `fgos-coding-validating` time (2026-07-31):** `present` (GitNexus
 registered). `impact(resolveDiscovery, upstream)` and
 `impact(resolveDecompose, upstream)` both returned `impactedCount: 0,
 risk: LOW` — but GitNexus's index is 205 commits behind HEAD

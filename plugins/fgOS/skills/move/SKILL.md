@@ -32,26 +32,15 @@ CTR001).
 
 2. **Move the item.** Run:
 
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" move <id> --to <status> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos move <id> --to <status> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   move <id> --to <status> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
-   substituting the id and status parsed in step 1. Always use the literal
-   `${CLAUDE_PROJECT_DIR}` substitution shown above, never a relative path —
-   an installed plugin's files run from a copied cache location, not from
-   this repo checkout, so a relative path would resolve to the wrong place
-   or fail outright.
+   substituting the id and status parsed in step 1.
 
-   `--dir` (tsk-56t): the session may already be inside the claimed item's
+   `--dir`: the session may already be inside the claimed item's
    worktree (`/fgOS:pick` switches into it), which never carries its own
    `.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves
    to the main checkout even from inside that worktree (it survives an

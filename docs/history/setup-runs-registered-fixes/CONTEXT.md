@@ -1,6 +1,6 @@
 # tsk-5hi — `fgos setup` runs registered doctor fixes
 
-**Stage:** clarify (fgos-exploring). **Date:** 2026-08-05.
+**Stage:** clarify (fgos-coding-exploring). **Date:** 2026-08-05.
 
 ## Feature boundary
 
@@ -20,7 +20,7 @@ second command exists.
 | ID | Decision |
 |----|----------|
 | D1 | `fgos setup` runs every registered fix unconditionally via the existing `runFixes(repoRoot)` (`src/setup/registrations.mjs:130`) — the identical call `doctor --fix` already makes, no new mechanism. No confirmation prompt, no subset carve-out. Grounded in RUL10 (`docs/specs/distribution.md:210`): "`fgos setup` never asks for confirmation before writing... it acts and then reports exactly what it changed" — `setup` has never gated any of its other writes (rc lines, config defaults, git hooks) behind a prompt, so gating fixes behind one would be a new, unprecedented behavior for this verb, not a continuation of its existing contract. Safe to run unconditionally because every registered `fix` is already required to be idempotent and fail-soft per entry (`docs/history/doctor-fix-gate-bypass/CONTEXT.md` D3) — confirmed live in both current fixes: `fixGateBypassConfigured` (`src/setup/registrations.mjs:519-532`) is a no-op once the level is already valid, and `fixClaudePluginMarketplace` (`:658-692`) cleanly reports "claude CLI not found on PATH — nothing to fix" rather than erroring when the `claude` binary is absent. |
-| D2 | The item's own framing that `gate-bypass-configured` is "also never auto-applied by setup" is true of the `fix` *function* only — `setup` already reaches the same end state today through the independent `ensureSharedConfigDefaults()` path: `registerConfigDefault({id:'gateBypass', key:'gateBypass', shape:{level: DEFAULT_LEVEL}})` (`src/setup/registrations.mjs:534-538`) is already folded into `assembleRegistryDefaults()` and merged by `ensureSharedConfigDefaults(repoRoot)`, which `setup`'s case already calls (`bin/fgos.mjs:3516`) — both paths write `gateBypass.level = "off"` when missing, so `gate-bypass-configured`'s doctor check already passes after a plain `fgos setup` today. `claude-plugin-marketplace` (tsk-4xg) is the only registered fix with no `configDefault` counterpart, and is therefore the one fix this item's D1 closes a real, practical gap for in today's registry — pinned so `fgos-planning` scopes verify/test evidence at the real gap rather than re-proving something `setup` already covers structurally. This does not change D1: D1 still runs *every* registered fix (future fixes may have no config-default counterpart either), it only corrects which of today's two fixes is the actual motivating gap. |
+| D2 | The item's own framing that `gate-bypass-configured` is "also never auto-applied by setup" is true of the `fix` *function* only — `setup` already reaches the same end state today through the independent `ensureSharedConfigDefaults()` path: `registerConfigDefault({id:'gateBypass', key:'gateBypass', shape:{level: DEFAULT_LEVEL}})` (`src/setup/registrations.mjs:534-538`) is already folded into `assembleRegistryDefaults()` and merged by `ensureSharedConfigDefaults(repoRoot)`, which `setup`'s case already calls (`bin/fgos.mjs:3516`) — both paths write `gateBypass.level = "off"` when missing, so `gate-bypass-configured`'s doctor check already passes after a plain `fgos setup` today. `claude-plugin-marketplace` (tsk-4xg) is the only registered fix with no `configDefault` counterpart, and is therefore the one fix this item's D1 closes a real, practical gap for in today's registry — pinned so `fgos-coding-planning` scopes verify/test evidence at the real gap rather than re-proving something `setup` already covers structurally. This does not change D1: D1 still runs *every* registered fix (future fixes may have no config-default counterpart either), it only corrects which of today's two fixes is the actual motivating gap. |
 
 ## Pinned terms
 
@@ -66,7 +66,7 @@ second command exists.
 - Exact call-site placement of `runFixes(repoRoot)` inside the `setup`
   case (ordering relative to the rc/config/hooks writes already there) and
   the exact shape of the `fixed` key added to `setup`'s return object —
-  implementation detail, `fgos-planning`'s job, not a product decision.
+  implementation detail, `fgos-coding-planning`'s job, not a product decision.
 
 ## Canonical references
 

@@ -8,7 +8,7 @@ by reading the real `discover`/`decompose` implementation). Verified
 
 **Per-item stopping point (by design, matches `tsk-3go`'s own scope):**
 the loop only ever calls the MECHANICAL `discover`/`decompose` verbs — it
-never continues into `fgos-code-implement`. So for any one item, this loop's
+never continues into `fgos-coding-implement`. So for any one item, this loop's
 involvement ends the moment that item reaches ONE of:
 - `stage: executing` (verdict was `clear`/`pass-through`/`decompose` —
   success, move to the next item in frontier, never chase it into
@@ -44,7 +44,7 @@ all.** This isn't a simplification choice, it's a fact about what these
 verbs actually touch, verified directly:
 
 - `grep -n "writeFileSync\|fs\.write\|fs\.append" src/intake/discovery.mjs
-  src/intake/decompose.mjs` → **zero matches**. Neither file ever writes
+  src/intake/plan.mjs` → **zero matches**. Neither file ever writes
   to the git tree. `readLockedContext` (`decompose.mjs`) only READS
   `CONTEXT.md`/`plan.md` if present, never writes.
 - Every state change from `discover`/`decompose` (`editWork`, `addWork`,
@@ -71,7 +71,7 @@ execute phase.
 **Where a worktree DOES become necessary** — but is explicitly OUT of
 `tsk-3go`'s scope — is the moment a human/session actually picks an
 item that reached `executing` (or one parked `awaiting-human` that a
-person answered and wants to shape via `fgos-exploring`/`fgos-planning`,
+person answered and wants to shape via `fgos-coding-exploring`/`fgos-coding-planning`,
 which DO write real files: `CONTEXT.md`/`plan.md`). That's `/fgOS:pick`'s
 job, a later, separate step this loop should never trigger itself.
 
@@ -79,7 +79,7 @@ job, a later, separate step this loop should never trigger itself.
 
 - `/fgOS:discover-next`: pick next frontier item at `stage: clarify` (or
   `decompose`), call `fgos discover <id> --dir <main>` /
-  `fgos decompose <id> --dir <main>` directly against the main checkout —
+  `fgos plan <id> --dir <main>` directly against the main checkout —
   **no worktree, no branch, no merge, no cleanup step at all.**
 - `/fgOS:discover-loop`: `/loop` wrapped around the above. Stop rules:
   frontier empty, same item parked twice, iteration cap (default ~10-15).
@@ -89,7 +89,7 @@ job, a later, separate step this loop should never trigger itself.
 ## Unresolved questions
 
 - Exact default iteration cap number — not decided, implementer's call
-  at `fgos-planning` time.
+  at `fgos-coding-planning` time.
 - Whether `discover-loop` should also surface a summary at the end (N
   cleared, N parked, N skipped) for the human to review in one glance —
   not decided, reasonable addition, left to planning.

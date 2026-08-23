@@ -69,14 +69,14 @@ narrower fact, and would be slower and less direct. `frontier.mjs`'s own
 guarantee — see `CONTEXT.md` scout evidence) is already implicitly
 covered by any existing frontier test that seeds a `doing` item and
 confirms it's excluded; this plan does not add a redundant one unless
-`fgos-validating` finds no such coverage exists.
+`fgos-coding-validating` finds no such coverage exists.
 
 **Risk map**:
 
 | Component | Risk | Proof point |
 |---|---|---|
 | `claim-port.mjs`'s `moveWork` CAS (the mechanism under test) | Low — additive test only, no production code change, same fixture pattern as 4 existing tests in the same file | The new test passing under `node --test test/runner/claim-port.test.mjs` |
-| Whether the guarantee (per `CONTEXT.md` D1) actually holds once mechanically exercised (as opposed to inferred from reading the code) | Medium — this item exists specifically because a prior belief about this area turned out wrong once checked against the real event log; the code-reading-based confidence from `fgos-exploring` is not itself proof | Running the new test for real. A FAIL here is not a bug to silently patch under this plan's scope — it reopens exactly the question `CONTEXT.md` D1 currently answers "no" to, and should route back through `fgos-exploring`/re-scoping rather than being fixed as an unplanned side quest |
+| Whether the guarantee (per `CONTEXT.md` D1) actually holds once mechanically exercised (as opposed to inferred from reading the code) | Medium — this item exists specifically because a prior belief about this area turned out wrong once checked against the real event log; the code-reading-based confidence from `fgos-coding-exploring` is not itself proof | Running the new test for real. A FAIL here is not a bug to silently patch under this plan's scope — it reopens exactly the question `CONTEXT.md` D1 currently answers "no" to, and should route back through `fgos-coding-exploring`/re-scoping rather than being fixed as an unplanned side quest |
 
 **Files touched**: `test/runner/claim-port.test.mjs` only. No production
 code file is expected to change — per `CONTEXT.md` D1, the guarantee
@@ -115,12 +115,12 @@ already used by sibling items in this backlog). For fast iteration while
 writing the test, `node --test test/runner/claim-port.test.mjs` runs just
 this file.
 
-## Outstanding questions carried to fgos-validating
+## Outstanding questions carried to fgos-coding-validating
 
 - Confirm whether `frontier.mjs`'s own `status !== 'todo'` filter (the
   second, independent layer of this guarantee) already has ANY existing
   test coverage anywhere in `test/state/` — if genuinely uncovered,
-  `fgos-validating` should decide whether closing that gap belongs inside
+  `fgos-coding-validating` should decide whether closing that gap belongs inside
   this same item or is truly out of scope per D2.
 - Confirm the exact `FsmError`/`categoryOf` error shape the second
   `claimWork` call actually throws today (this plan asserts `category:

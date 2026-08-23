@@ -90,7 +90,7 @@ them only to explain *why* this seam-cutting is being prioritized first
 
 - Whether `tsk-4zo`/`tsk-1q3`/`tsk-67u`/`tsk-1eu` get their `deps` updated
   to require `tsk-3t9` (so they're forced to build on the new ports) —
-  a dependency-graph/shaping call, `fgos-planning`'s job, not decided here.
+  a dependency-graph/shaping call, `fgos-coding-planning`'s job, not decided here.
   Today only `tsk-4vo` formally depends on `tsk-3t9`.
 - Exact module/file layout for the new ports (e.g. a new `ports.rs` vs.
   trait definitions colocated with the domain in `app.rs`, an `adapters/`

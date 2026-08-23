@@ -10,7 +10,7 @@ Per D1: change `catch {}` to `catch (err) {}` in both
 control flow unchanged — nothing re-thrown, nothing else added to the catch
 body.
 
-Files touched: `src/intake/discovery.mjs`, `src/intake/decompose.mjs`
+Files touched: `src/intake/discovery.mjs`, `src/intake/plan.mjs`
 (the priority-write catch only — the separate "decompose completeness
 advisory" catch later in the same file is a different concern, not named
 by this item's own citation, left untouched).

@@ -93,7 +93,7 @@ Two real candidate causes turned up instead:
 
 ## What actually got fixed, and what stayed deferred
 
-`fgos-validating`'s own scope decision, confirmed by a human at the
+`fgos-coding-validating`'s own scope decision, confirmed by a human at the
 `decompose` gate: fix root cause A only as this item's one honest piece —
 "widen `withEventsLock` scope in `store.mjs`/`porting-store.mjs` to
 include `refreshView`, closing the lost-update race on `state.json`" —

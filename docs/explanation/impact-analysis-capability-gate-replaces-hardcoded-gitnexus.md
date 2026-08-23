@@ -1,7 +1,7 @@
 # Why workflow prose gates on a capability query, not a hardcoded tool name
 
-`tsk-1e4` rewrote `CLAUDE.md` and the `fgos-planning`/`fgos-validating`/
-`fgos-code-implement` skill prose so that "should I demand GitNexus impact
+`tsk-1e4` rewrote `CLAUDE.md` and the `fgos-coding-planning`/`fgos-coding-validating`/
+`fgos-coding-implement` skill prose so that "should I demand GitNexus impact
 analysis here?" is answered by querying the `impact-analysis` capability
 (`tsk-1dj`'s tool registry) instead of assuming GitNexus is on this
 machine. Sibling item `tsk-1e4` was explicitly carved out of `tsk-1dj`'s
@@ -37,7 +37,7 @@ Each skill consults the gate at a different moment in the item lifecycle,
 so each needed the degrade-ladder wired into what that moment already
 does:
 
-**`fgos-code-implement`** — at the point it already reads a symbol's file
+**`fgos-coding-implement`** — at the point it already reads a symbol's file
 before editing it:
 
 > Before editing a symbol, apply `CLAUDE.md`'s impact-analysis capability
@@ -47,7 +47,7 @@ before editing it:
 > (registered but not present — proceed, but say the blast radius is
 > unconfirmed), or Inactive (nothing registered — proceed without it).
 
-**`fgos-planning`** — at the point a proof point would lean on blast-radius
+**`fgos-coding-planning`** — at the point a proof point would lean on blast-radius
 evidence:
 
 > Before writing a proof point that would lean on blast-radius evidence,
@@ -58,12 +58,12 @@ evidence:
 > proof point — inactive drops the requirement, degraded keeps it but
 > marks the evidence weak, full keeps it exactly as before.
 
-**`fgos-validating`** — checking the posture `fgos-planning` recorded is
+**`fgos-coding-validating`** — checking the posture `fgos-coding-planning` recorded is
 still true, and treating a stale posture as a real failure, not a skip:
 
 > **Impact-analysis posture** — where the plan leans on blast-radius
 > evidence, does its recorded `impact-analysis: inactive|degraded|full`
-> posture (`fgos-planning`'s step 3) match what `CLAUDE.md`'s
+> posture (`fgos-coding-planning`'s step 3) match what `CLAUDE.md`'s
 > impact-analysis capability gate actually reports right now (`fgos tool
 > query --capability impact-analysis --status present`)? A stale or
 > missing posture is a FAIL here, not a skip — never assume GitNexus is
@@ -86,34 +86,34 @@ prose contract, never automatic." `tsk-1e4` is the item that actually
 performs that injection into the three lifecycle skills plus `CLAUDE.md`;
 without it, the registry existing was inert.
 
-## The fourth skill: `fgos-exploring` (`tsk-17w`)
+## The fourth skill: `fgos-coding-exploring` (`tsk-17w`)
 
-`tsk-1e4` covered `fgos-planning`/`fgos-validating`/`fgos-code-implement`, but
-left the earliest lifecycle stage — `fgos-exploring`, stage `clarify` —
+`tsk-1e4` covered `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`, but
+left the earliest lifecycle stage — `fgos-coding-exploring`, stage `clarify` —
 without the same gate. `tsk-17w` closed that gap, adding the query to
-`fgos-exploring`'s own scout step:
+`fgos-coding-exploring`'s own scout step:
 
 > Also query `CLAUDE.md`'s impact-analysis capability gate — the same
-> check `fgos-planning`/`fgos-validating`/`fgos-code-implement` already run
+> check `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement` already run
 > (`fgos tool query --capability impact-analysis --status present`) —
 > rather than assuming GitNexus is on this machine, since this is the only
 > clarify-stage session with real tool access (`judgeDiscovery` itself has
 > none: `src/runner/dispatch.mjs:207-220`'s `--allowedTools` permits only
 > `git add`/`git commit`).
 
-Why `fgos-exploring` records the posture but never gates on it, unlike the
+Why `fgos-coding-exploring` records the posture but never gates on it, unlike the
 other three skills:
 
 > Fold the result into `CLAUDE.md`'s three-way framing
 > (`impact-analysis: inactive|degraded|full`) and record that line in
 > `CONTEXT.md` in step 3, next to the other scout evidence. This is
-> informational only — `fgos-exploring` edits no code and produces no
+> informational only — `fgos-coding-exploring` edits no code and produces no
 > proof points, so the posture never gates or reshapes which candidate
 > decisions get asked here; it exists so a later reader of this item's
 > `CONTEXT.md` sees the posture without re-deriving it.
 
-With this item, all four lifecycle skills (`fgos-exploring`,
-`fgos-planning`, `fgos-validating`, `fgos-code-implement`) plus `CLAUDE.md`
+With this item, all four lifecycle skills (`fgos-coding-exploring`,
+`fgos-coding-planning`, `fgos-coding-validating`, `fgos-coding-implement`) plus `CLAUDE.md`
 consult the same capability query — the injection `tsk-1dj`'s own D3 first
 flagged as still-needed is now complete across the full item lifecycle.
 
@@ -171,3 +171,47 @@ own error already names its fix (drop/recreate `file_fts`) when it does
 surface. Staleness (index behind HEAD) and corruption (index broken
 regardless of freshness) are deliberately distinct terms — the fix here
 only covers the former.
+
+## `full` doesn't mean complete per-file coverage either (`tsk-38h`)
+
+`tsk-j7y` closed the staleness gap — a `present` status now means the
+index reflects the repo's current commit. But a fresh, non-stale index
+can still have zero symbol-level coverage for one specific file, which is
+a *third*, distinct mechanism from both "not present" and "stale."
+
+`tsk-38h` first reproduced this on `bin/fgos.mjs`: `impact()` reported no
+upstream callers for `resolveDiscovery`/`resolveDecompose` and could not
+find `runVerb` at all — even right after a fresh `gitnexus analyze` (8241
+symbols, 17s). Grep confirmed real call sites existed
+(`bin/fgos.mjs:965`/`986`, `loop.mjs:977`/`997`). A second, independent
+reproduction landed later, during `tsk-5zg`'s own required impact-analysis
+step: `impact({target:'runVerb', direction:'upstream',
+file_path:'bin/fgos.mjs'})` still returned "not found" on a freshly
+rebuilt index (15935 nodes, 0 stale). A direct cypher query — `MATCH
+(f:Function) WHERE f.filePath = 'bin/fgos.mjs' RETURN f.name` — confirmed
+`bin/fgos.mjs` carries **zero indexed `Function` symbols at all**. Not a
+stale-index or wrong-name issue: the whole file sits outside the parser's
+symbol-level coverage, likely a size/complexity ceiling (the file is
+5000+ lines).
+
+**Why this didn't need a fourth status word.** The existing "degraded"
+bucket's own unconditional cross-check line — "a suspicious zero-result
+or 'not found' answer from an impact-analysis tool is worth a quick
+grep/rg cross-check before being trusted, regardless of what `fgos tool
+query` reports" — already operationally covers this case: a session that
+follows that line catches a large-file zero-coverage miss the same way it
+would catch staleness. What was missing was making the *mechanism*
+explicit under the "full" bucket itself, so a reader doesn't read `full`
+as "guaranteed complete." `CLAUDE.md`'s gate prose now reads:
+
+> `present`, freshly checked — Full: the MUST rules below apply exactly
+> as written. A `full` posture still is not a guarantee of complete
+> per-file coverage: a genuinely fresh, non-stale index can still carry
+> zero indexed symbols for one large/complex file (tsk-38h — confirmed on
+> `bin/fgos.mjs`, 5000+ lines, zero indexed `Function` symbols even
+> immediately after a fresh reindex), a distinct mechanism from staleness
+> that the cross-check line above already covers unconditionally.
+
+So the three-way framing (inactive/degraded/full) stays a three-way
+framing — this item only sharpens what "full" honestly promises, it
+never adds a fourth bucket.

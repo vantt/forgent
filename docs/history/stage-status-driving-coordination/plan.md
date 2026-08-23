@@ -41,13 +41,13 @@ coordination; this is purely an observability addition to the existing
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `graphMetrics()` return-shape change | GitNexus `impact(graphMetrics, upstream)` returned **HIGH** (4 impacted symbols; feeds `judgeDiscovery`/`buildDiscoveryPrompt` via `store.mjs`'s `graphMetrics` wrapper, `src/intake/discovery.mjs:92-94`). Confirmed additive-safe by reading the actual consumer: `buildDiscoveryPrompt` only destructures `metrics.staleBlocked` by name (`discovery.mjs:94`) — a new field is invisible to it. | `fgos-validating` must confirm the new field is added, never renamed/removed from the existing `{ order_version, frame, componentCount, components, criticalPath, staleBlocked, topUnblock }` shape, and that `discovery.test.mjs`/`graph-metrics.test.mjs` both stay green after the change (impact-analysis posture: **full** — GitNexus present, checked fresh this session). |
+| `graphMetrics()` return-shape change | GitNexus `impact(graphMetrics, upstream)` returned **HIGH** (4 impacted symbols; feeds `judgeDiscovery`/`buildDiscoveryPrompt` via `store.mjs`'s `graphMetrics` wrapper, `src/intake/discovery.mjs:92-94`). Confirmed additive-safe by reading the actual consumer: `buildDiscoveryPrompt` only destructures `metrics.staleBlocked` by name (`discovery.mjs:94`) — a new field is invisible to it. | `fgos-coding-validating` must confirm the new field is added, never renamed/removed from the existing `{ order_version, frame, componentCount, components, criticalPath, staleBlocked, topUnblock }` shape, and that `discovery.test.mjs`/`graph-metrics.test.mjs` both stay green after the change (impact-analysis posture: **full** — GitNexus present, checked fresh this session). |
 | Age-anchoring correctness | Medium — mirrors a documented past bug class (`checkCleanupTTLElapsed`'s own header: "never latest event of any kind"). | New tests must assert the age is computed from the *specific* `delivered`/`retrospective`/`cleanup`-entry `work.move` event (`payload.to === '<status>'`), not just the newest event of any type — same shape `checkCleanupTTLElapsed` (`cleanup-harness.mjs:131-138`) and `latestRetrospectiveEntry` (`retro-pool.mjs:19-24`) already use. |
 | Threshold arithmetic (delivered/retrospective 3d flat vs cleanup `ttlDays+3d` grace) | Low — three independent, already-locked constants (CONTEXT.md D4/D7). | Boundary tests: exactly-at-threshold stays fresh, one unit past goes stale, for all three statuses. |
 
 Impact-analysis posture: **full** (GitNexus present, `fgos tool query
 --capability impact-analysis --status present` checked fresh in
-`fgos-exploring`'s pass this session).
+`fgos-coding-exploring`'s pass this session).
 
 ## Shape (small mode — direct plan, no phases)
 
@@ -202,10 +202,10 @@ to lean on; the ordering above did not need it.
 |---|---|---|
 | Settings source (new `.fgos/config.json` section, read from Rust) | Medium — new cross-language contract; must fail closed (missing section/malformed JSON → all 4 toggles OFF), mirroring `gate-bypass.mjs`'s own fail-closed convention. | Tests: absent section defaults every toggle OFF; malformed JSON does not crash herdr-plugin and defaults OFF; `fgos doctor` surfaces the section. |
 | Guard-by-title double-launch check | Medium-high — `pane_scan.rs`'s current label extraction (`extract_task_id`) assumes an id-shaped title; the fixed non-id titles this item needs (`"fgos-auto-merge"` etc.) do not match that shape today (found this session, `pane_scan.rs:68-71`). | Unit test: guard-check function correctly detects a live pane by its fixed, non-id-shaped title, not just id-shaped ones. |
-| `fg:operation` placement (`tsk-5lr` not yet delivered) | High — external, in-flight dependency; this item's own `layout.rs` change must target `tsk-5lr`'s actual merged shape, not a guess made now. | Blocked structurally by `deps: [tsk-5lr, tsk-3v2]` (frontier `depsReady`) — no proof point needed before merge, per `depsReady`'s own zero-latency-unblock guarantee (CONTEXT.md D3); re-verify the placement call signature against `tsk-5lr`'s actual landed code at `fgos-validating` time for whichever child builds it. |
+| `fg:operation` placement (`tsk-5lr` not yet delivered) | High — external, in-flight dependency; this item's own `layout.rs` change must target `tsk-5lr`'s actual merged shape, not a guess made now. | Blocked structurally by `deps: [tsk-5lr, tsk-3v2]` (frontier `depsReady`) — no proof point needed before merge, per `depsReady`'s own zero-latency-unblock guarantee (CONTEXT.md D3); re-verify the placement call signature against `tsk-5lr`'s actual landed code at `fgos-coding-validating` time for whichever child builds it. |
 | autoClose (`tsk-3v2` not yet delivered) | High — same external in-flight dependency shape as above. | Same: `deps` field already blocks; re-verify the actual autoClose hook signature once `tsk-3v2` lands. |
-| Auto-merge automation (audit/security hard-gate) | Confirmed non-conflicting with the human-gate policy wall (CONTEXT.md D9) — residual risk is scope creep into `approve`/merge internals. | This item's own footprint must never touch `bin/fgos.mjs`'s `approve`/`merge` cases or `src/state/store.mjs`'s `moveWork` — it only ever shells out to the existing `/fgOS:merge-loop` command, same as a person would; `fgos-validating`/`detect_changes()` should confirm no such file is touched. |
-| Poll-tick race (two ticks firing before a guard title registers) | Medium — new unattended-launch surface, no existing precedent to lean on (weak-proof flag). | Guard check and pane spawn must happen synchronously within the same tick, same shape `skip_permissions_enabled()`'s own read-then-act already uses; flag as an explicit `fgos-validating` proof point for whichever child implements the spawn call. |
+| Auto-merge automation (audit/security hard-gate) | Confirmed non-conflicting with the human-gate policy wall (CONTEXT.md D9) — residual risk is scope creep into `approve`/merge internals. | This item's own footprint must never touch `bin/fgos.mjs`'s `approve`/`merge` cases or `src/state/store.mjs`'s `moveWork` — it only ever shells out to the existing `/fgOS:merge-loop` command, same as a person would; `fgos-coding-validating`/`detect_changes()` should confirm no such file is touched. |
+| Poll-tick race (two ticks firing before a guard title registers) | Medium — new unattended-launch surface, no existing precedent to lean on (weak-proof flag). | Guard check and pane spawn must happen synchronously within the same tick, same shape `skip_permissions_enabled()`'s own read-then-act already uses; flag as an explicit `fgos-coding-validating` proof point for whichever child implements the spawn call. |
 
 Impact-analysis posture: **full** (GitNexus present, checked fresh this
 session — see CONTEXT.md's Evidence trail).
@@ -515,7 +515,7 @@ staleness check cannot catch: a *present* but malformed value (e.g.
 `checkGateBypassConfigured` already documents for `gateBypass.level`'s enum
 check.
 
-**Found at `fgos-validating`, correcting an omission from the Approach
+**Found at `fgos-coding-validating`, correcting an omission from the Approach
 above:** `test/setup/registrations.test.mjs`'s "Data Dictionary #7 names
 exactly the registered doctor checks" test asserts the registered-check-id
 list against `docs/specs/distribution.md`'s Data Dictionary row #7 verbatim
@@ -575,7 +575,7 @@ section (e.g. only `autoDiscover` set) leave the other three at `false`
 rather than erroring — `Deserialize`'s own missing-field behavior, not
 custom code.
 
-**Corrected at `fgos-validating`:** the Approach section above claimed
+**Corrected at `fgos-coding-validating`:** the Approach section above claimed
 `serde` (derive) was not yet a `herdr-plugin` dependency — false.
 `herdr-plugin/Cargo.toml:17` already carries
 `serde = { version = "1.0", features = ["derive"] }`, alongside
@@ -613,7 +613,7 @@ external process to seam around.
   pre-declared footprint guess of `src/config/shared-config-file.mjs`,
   see Approach above)
 - `docs/specs/distribution.md` (Data Dictionary row #7's enumerated
-  check-id list — found at `fgos-validating`, see above)
+  check-id list — found at `fgos-coding-validating`, see above)
 - `CHANGELOG.md` (`## [Unreleased]` line)
 
 ### Risk map
@@ -622,7 +622,7 @@ external process to seam around.
 |---|---|---|
 | Rust settings read (new cross-language contract) | Medium (parent plan's own risk-map row) — must fail closed on missing file/section/malformed JSON. | `cargo test settings_`: absent `.fgos/config.json` → all-OFF; file present, section absent → all-OFF; malformed JSON → all-OFF, no panic; one toggle `true`, rest omitted → only that one `true`. |
 | Node config registration | Low — additive `registerConfigDefault`/`registerCheck` calls, same shape `gateBypass`/`cleanup` already use; GitNexus `impact(registerConfigDefault, upstream)` returned **LOW** (2 impacted symbols, checked fresh this session — impact-analysis posture: full). | `npm test`: `checkConfigNotStale` reports a missing `herdrOrchestrator` key before this lands and stops after; `checkHerdrOrchestratorConfigured` fails on a non-boolean value, passes once all 4 keys are booleans. |
-| Scope boundary (must not touch merge/pane-launch code) | Low — this piece stores a value, nothing reads it to act yet. | `detect_changes()`/`git diff --name-only` at `fgos-validating`/return time confirms no file outside the list above is touched. |
+| Scope boundary (must not touch merge/pane-launch code) | Low — this piece stores a value, nothing reads it to act yet. | `detect_changes()`/`git diff --name-only` at `fgos-coding-validating`/return time confirms no file outside the list above is touched. |
 
 Impact-analysis posture: **full** (GitNexus present, `fgos tool query
 --capability impact-analysis --status present` checked fresh this session).
@@ -630,7 +630,7 @@ Impact-analysis posture: **full** (GitNexus present, `fgos tool query
 ## Shape (standard mode — two-part plan, one item)
 
 1. **Rust side.** `serde` derive is already a dependency (`Cargo.toml:17`,
-   confirmed at `fgos-validating`) — no `Cargo.toml` edit. Write
+   confirmed at `fgos-coding-validating`) — no `Cargo.toml` edit. Write
    `settings.rs` (`OrchestratorSettings`, `read_settings`) per the Approach
    section above. Wire `pub mod settings;` into `lib.rs`. Add
    `orchestrator_settings: OrchestratorSettings` to `App` (default all-OFF
@@ -645,7 +645,7 @@ Impact-analysis posture: **full** (GitNexus present, `fgos tool query
    `registerCheck` to `src/setup/registrations.mjs`, next to the
    `gateBypass` block they mirror. Add `herdr-launcher-configured` to
    `docs/specs/distribution.md`'s Data Dictionary row #7 enumerated list
-   (found at `fgos-validating` — `registrations.test.mjs`'s "Data
+   (found at `fgos-coding-validating` — `registrations.test.mjs`'s "Data
    Dictionary #7" test asserts this list verbatim against the spec, will
    fail otherwise). Tests in `test/setup/registrations.test.mjs` (existing
    file; `plugin-skill-cli-reachable`'s tests at lines 216-242 are the
@@ -716,7 +716,7 @@ this one child lowers it, since the hard-gate flag is this child's alone
 
 **Grounding note:** `tsk-5lr` and `tsk-3v2` were confirmed `delivered` in
 state but their code was verifiably absent from this worktree at the time
-`fgos-planning` was first invoked for this item (neither feature commit
+`fgos-coding-planning` was first invoked for this item (neither feature commit
 was an ancestor of `fgw/tsk-57q`'s original fork point, and `tsk-3v2`'s
 own merge into `main` had silently failed — an orphaned, uncommitted merge
 attempt). Both gaps were closed before writing this section: `tsk-3v2`'s
@@ -776,7 +776,7 @@ testable now: it activates for real the moment `tsk-2m5` lands its actual
 write-side, with no further change needed here. This is a labeled
 assumption (not a material product decision — it changes no scope or
 acceptance criteria of this item), pinned rather than asked, per
-`fgos-exploring`'s material/grounded/answerable filter.
+`fgos-coding-exploring`'s material/grounded/answerable filter.
 
 **Rejected alternative:** routing merge/retro/cleanup launches through
 `layout::place_new_agent_pane`/the `fg:agents-N` pool — rejected because
@@ -808,7 +808,7 @@ reusing the pool function would silently violate that pinned placement.
 | Fixed-title guard | Medium-high — same gap the parent plan already flagged, reconfirmed still present in current `pane_scan.rs`. | Unit test: the new check recognizes exactly the three fixed titles, still rejects arbitrary non-id strings the existing path already rejects. |
 | Left/right pane role reuse | Low — `ensure_operation_tab`/`left_right_panes` already delivered and unit-tested by `tsk-5lr`. | No new geometry test needed here; this item only asserts it reads `App.operation_left_pane_id`/`operation_right_pane_id` correctly. |
 | Poll-tick race | Medium — new unattended-launch surface, no existing precedent (weak-proof flag). | Guard check and launch happen synchronously within one tick, mirroring `skip_permissions_enabled`'s own read-then-act shape. |
-| Audit/security (merge-loop launch) | Confirmed non-conflicting with the human-gate policy wall (CONTEXT.md D9); residual risk is scope creep into `approve`/merge internals. | `detect_changes()` at `fgos-validating`/before commit must confirm `bin/fgos.mjs`'s `approve`/`merge` cases and `store.mjs`'s `moveWork` are untouched — this item's footprint stays scoped to the 4 `herdr-plugin/src/*.rs` files above. |
+| Audit/security (merge-loop launch) | Confirmed non-conflicting with the human-gate policy wall (CONTEXT.md D9); residual risk is scope creep into `approve`/merge internals. | `detect_changes()` at `fgos-coding-validating`/before commit must confirm `bin/fgos.mjs`'s `approve`/`merge` cases and `store.mjs`'s `moveWork` are untouched — this item's footprint stays scoped to the 4 `herdr-plugin/src/*.rs` files above. |
 
 Impact-analysis posture: **degraded** — GitNexus reports `present`
 (`fgos tool query --capability impact-analysis --status present`), but its

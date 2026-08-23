@@ -2,7 +2,7 @@
 
 `pickNextDiscoverItem` (`src/state/discover-pool.mjs`, tsk-3go-1) picks
 the single next item for an interactive discover-loop iteration to run
-`fgos discover`/`fgos decompose` on. Pure — no `fs`, no `.fgos/` read,
+`fgos discover`/`fgos plan` on. Pure — no `fs`, no `.fgos/` read,
 same discipline as `frontier.mjs`/`impact.mjs`. It covers the
 `stage:clarify`/`stage:decompose` pool that `frontier()` itself
 deliberately excludes (`frontier()` only ever surfaces `stage:executing`

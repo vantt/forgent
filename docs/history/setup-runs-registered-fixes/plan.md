@@ -1,6 +1,6 @@
 # tsk-5hi — plan: `fgos setup` runs registered doctor fixes
 
-**Stage:** decompose (fgos-planning). **Date:** 2026-08-05.
+**Stage:** decompose (fgos-coding-planning). **Date:** 2026-08-05.
 **Decisions:** `docs/history/setup-runs-registered-fixes/CONTEXT.md` (D1, D2).
 
 ## Mode gate
@@ -58,7 +58,7 @@ already generic over `FIX_REGISTRATIONS` (D1, CONTEXT.md).
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `runFixes()` call added to `setup` | Unconditional shell-out to `claude` plugin CLI on every setup run, including environments with no `claude` binary or where marketplace mutation is unwanted | Run `fgos setup` in a scratch dir with `FGOS_CLAUDE_COMMAND` unset/pointed at a missing binary (existing test seam, `src/setup/registrations.mjs:594-596`) — confirm `setup` still exits 0 and `fixed` reports `claude-plugin-marketplace` as `changed:false, message: "claude CLI not found on PATH — nothing to fix"`, no crash, no partial-write |
 | `gate-bypass-configured` fix now double-covered (D2) | Running both `ensureSharedConfigDefaults` (already in `setup`) and `runFixes()` against the same `gateBypass.level` key on one `setup` call — check for a conflicting/duplicate write | Trace `mergeConfigDefaults` + `fixGateBypassConfigured`: the config-default fill already writes a valid `level` before `runFixes` runs (order in the `setup` case), so the fix sees an already-valid level and reports `changed:false` — proof point is a real `setup` run against an empty config confirming exactly one effective write and no error |
@@ -67,7 +67,7 @@ already generic over `FIX_REGISTRATIONS` (D1, CONTEXT.md).
 
 Impact-analysis posture: **full** (`gitnexus` present, confirmed via
 `fgos tool query --capability impact-analysis --status present` at
-`fgos-exploring` time — CONTEXT.md scout evidence). `fgos-code-implement`
+`fgos-coding-exploring` time — CONTEXT.md scout evidence). `fgos-coding-implement`
 runs `impact({target: "setup", direction: "upstream"})` (or the actual
 symbol name the switch-case resolves to) before editing, per
 `AGENTS.md`'s Always-Do rule — this plan does not substitute for that.
@@ -123,7 +123,7 @@ Concrete cases to prove:
   remain safe to call repeatedly (idempotent) — already an existing
   assumption `doctor --fix` relies on today (`docs/history/
   tsk-4xg-plugin-marketplace-doctor-check/`), not a new one introduced by
-  this item. Not re-proven here; flagged so `fgos-validating` can decide
+  this item. Not re-proven here; flagged so `fgos-coding-validating` can decide
   whether it needs fresh evidence.
 
 ## Verify (for the item as a whole)

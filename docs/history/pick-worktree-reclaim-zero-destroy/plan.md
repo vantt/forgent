@@ -60,7 +60,7 @@ a real, live checkout exists to protect.
 
 **Risk map:**
 
-| Component | Risk | Proof point (→ `fgos-validating`) |
+| Component | Risk | Proof point (→ `fgos-coding-validating`) |
 |---|---|---|
 | `reclaimOrphanedCheckout`/`createWorktree` reclaim-path switched to `git worktree move` | Medium — the exact fragile, previously-bitten function; changes a path 3 prior incidents already touched | New test: inject a failure in the move/create step (mirrors `tsk-4m0`'s own failure-injection testing style) and assert the ORIGINAL `orphanPath` checkout still exists, is still valid, and `git log` on `branch` still shows every prior commit — this is the direct proof of D2 |
 | Normal (non-failure) reclaim-and-relocate | Medium — must still produce a working checkout with the branch's commits at the new mkdtemp-style path | Update the existing "reclaims a branch already checked out at an orphaned path" / "...at a path that's already gone" tests (`test/runner/worktree.test.mjs` ~114-155) to assert the new end-state via `git worktree move` semantics; same observable outcome (reused branch checked out only at the new path) |
@@ -100,7 +100,7 @@ same as `tsk-4m0`'s own plan noted for its own single-piece shape.
 ## Shape
 
 One phase, no split — see below. Concrete cases to prove at
-`fgos-validating`/execution time, matching the risk map:
+`fgos-coding-validating`/execution time, matching the risk map:
 
 - **Empty/boundary**: branch does not exist yet at all (first-ever pick,
   no reclaim call happens) — must stay byte-identical to today's
@@ -123,7 +123,7 @@ One phase, no split — see below. Concrete cases to prove at
   destroyed — existing `isCheckoutDirty` guard/test stays as the proof,
   unmodified.
 
-## Validated at fgos-validating
+## Validated at fgos-coding-validating
 
 Empirically confirmed against this repo's real `git` (2.34.1, `git worktree
 move <worktree> <new-path>` is a real, documented subcommand):
@@ -173,8 +173,8 @@ describes actually exists.
 node --test test/runner/worktree.test.mjs test/runner/worktree-callsite-wrapper.test.mjs test/runner/claim-port.test.mjs test/runner/merge.test.mjs test/runner/loop.test.mjs test/runner/promote-engine.test.mjs test/cli/fgos.test.mjs
 ```
 
-`test/runner/promote-engine.test.mjs` added post-`fgos-validating`
-(`fgos-code-implement` impact-analysis pass, GitNexus full posture):
+`test/runner/promote-engine.test.mjs` added post-`fgos-coding-validating`
+(`fgos-coding-implement` impact-analysis pass, GitNexus full posture):
 `reclaimOrphanedCheckout` impact query (upstream, CRITICAL risk, 9
 symbols) surfaced a THIRD real call site beyond `CONTEXT.md`'s D3 —
 `cleanupMergedBranch` (`src/runner/merge.mjs:931`) calls it directly, not

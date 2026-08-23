@@ -13,7 +13,7 @@ a nested package (e.g. `dogfood-fixture/`, with its own `test/` and
 
 ## The dogfood-proven bug
 
-Decision 0018 (`tsk-1wd`, 2026-07-28, `fgos-validating`) caught this for
+Decision 0018 (`tsk-1wd`, 2026-07-28, `fgos-coding-validating`) caught this for
 real: a discover verdict came back `clear: true` with
 `verify: "node --test test/expr/*.test.mjs"`. Running that from the real
 cwd produced `no matches found` (exit 1) — the tests actually lived under

@@ -23,7 +23,7 @@ later phases touch `src/setup/*`.
 | D2 | Package-manager scope is **npm only** — no pnpm/yarn matrix axis. |
 | D3 | OS matrix is **ubuntu + macos + windows** (all three). |
 | D4 | Workflow also adds a **fresh-runner `fgos doctor` clean-run check**, settling `docs/distribution-vision.md` §5 open question 4 in this item rather than deferring it. |
-| D5 | `install-packaging.test.mjs` gets real **OS-conditional (`process.platform`) path-resolution branching**, so the windows-latest matrix leg (D3) actually passes instead of failing on wrong path assumptions. Locked mid-planning (`fgos-planning`), see rationale below. |
+| D5 | `install-packaging.test.mjs` gets real **OS-conditional (`process.platform`) path-resolution branching**, so the windows-latest matrix leg (D3) actually passes instead of failing on wrong path assumptions. Locked mid-planning (`fgos-coding-planning`), see rationale below. |
 
 ## Rationale / scout evidence
 
@@ -73,7 +73,7 @@ later phases touch `src/setup/*`.
 - **No prior `judgeDiscovery` verdicts** existed for this item
   (`view.discovery["tsk-49r"]` was empty) — nothing to reconcile against.
 
-## D5 rationale (mid-planning gap, locked during fgos-planning)
+## D5 rationale (mid-planning gap, locked during fgos-coding-planning)
 
 - **Confirmed via research** (not assumption): Windows `npm install -g
   --prefix <dir>` places the installed package directly under
@@ -86,8 +86,8 @@ later phases touch `src/setup/*`.
   `path.join(installPrefix, 'bin', 'fgos')`) are Unix-only and will fail
   immediately on a windows-latest runner without this branching — not a
   hypothetical, a structural mismatch.
-- This surfaced only after `fgos-exploring`'s D3 (OS matrix) was already
-  locked — a genuine mid-planning gap under `fgos-planning`'s own
+- This surfaced only after `fgos-coding-exploring`'s D3 (OS matrix) was already
+  locked — a genuine mid-planning gap under `fgos-coding-planning`'s own
   material/grounded/answerable filter, not a re-litigation of D3 itself.
   User chose to add the real branching rather than drop windows from the
   matrix or skip the packaging/doctor tests on windows.
@@ -121,9 +121,9 @@ later phases touch `src/setup/*`.
 ## Outstanding questions deferred to planning
 
 - Exact GitHub Actions workflow file name/trigger (push/PR/both) —
-  implementation detail, belongs to `fgos-planning`.
+  implementation detail, belongs to `fgos-coding-planning`.
 - Whether the D4 doctor check runs as a separate job/step from the main
   test matrix, or as an additional step within each matrix cell —
-  implementation detail, belongs to `fgos-planning`.
+  implementation detail, belongs to `fgos-coding-planning`.
 - Caching strategy (`actions/setup-node`'s `cache: npm`) — implementation
-  detail, belongs to `fgos-planning`.
+  detail, belongs to `fgos-coding-planning`.
