@@ -58,6 +58,7 @@ import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
 import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_EVENT_THRESHOLD } from '../state/events-jsonl-truncation-guard.mjs';
+import { verifyCompactionCandidate } from '../state/events-compaction.mjs';
 import { readMainCheckoutGuardWarnings } from '../state/main-checkout-guard-warnings.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
@@ -1286,6 +1287,96 @@ registerCheck({
   id: 'events-jsonl-not-truncated',
   description: 'shared .fgos/events.jsonl has not been silently reverted by a git stash/checkout/reset/clean (tsk-cgg)',
   check: (cwd) => checkEventsJsonlNotTruncated(cwd),
+});
+
+// events-compaction-verified (Tầng A/T6, TA-D6): retroactively re-proves
+// every past compaction recorded in .fgos/events/archive/*.manifest.json
+// still holds -- re-reads the manifest's own `baseline` (still a live file
+// under .fgos/events/) and its `originals` (now under archive/) and re-runs
+// the SAME verify gate compactColdWriterFiles ran before archiving anything
+// (deep-equal view + count + hash-set, src/state/events-compaction.mjs).
+// No matching registerFix, same posture as events-jsonl-not-truncated above:
+// a break here means the compacted baseline and its own archived originals
+// have drifted apart after the fact (tampering, partial restore, a bug) --
+// real data may be at stake, so this only ever surfaces the finding for a
+// human to investigate (docs/how-to/... none yet; the manifest + both file
+// sets are still on disk for manual inspection), never auto-repairs.
+function checkEventsCompactionVerified(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const eventsDirPath = path.join(mainCheckout, '.fgos', 'events');
+  const archiveDirPath = path.join(eventsDirPath, 'archive');
+  let manifestNames = [];
+  try {
+    manifestNames = fs
+      .readdirSync(archiveDirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.manifest.json'))
+      .map((entry) => entry.name);
+  } catch {
+    return { passed: true, message: 'no compactions recorded yet — nothing to verify' };
+  }
+  if (manifestNames.length === 0) {
+    return { passed: true, message: 'no compactions recorded yet — nothing to verify' };
+  }
+
+  const broken = [];
+  for (const manifestName of manifestNames) {
+    let manifest;
+    try {
+      manifest = JSON.parse(fs.readFileSync(path.join(archiveDirPath, manifestName), 'utf8'));
+    } catch (err) {
+      broken.push({ manifest: manifestName, reason: `manifest does not parse: ${err.message}` });
+      continue;
+    }
+    const baselinePath = path.join(eventsDirPath, manifest.baseline);
+    if (!fs.existsSync(baselinePath)) {
+      broken.push({ manifest: manifestName, reason: `baseline "${manifest.baseline}" is missing` });
+      continue;
+    }
+    const originalEntries = [];
+    let missingOriginal = null;
+    for (const name of manifest.originals ?? []) {
+      const originalPath = path.join(archiveDirPath, name);
+      if (!fs.existsSync(originalPath)) {
+        missingOriginal = name;
+        break;
+      }
+      originalEntries.push({ name, events: readEventsJsonLines(originalPath) });
+    }
+    if (missingOriginal) {
+      broken.push({ manifest: manifestName, reason: `archived original "${missingOriginal}" is missing` });
+      continue;
+    }
+    const candidateEvents = readEventsJsonLines(baselinePath);
+    const verify = verifyCompactionCandidate(originalEntries, candidateEvents);
+    if (!verify.ok) {
+      broken.push({ manifest: manifestName, reason: verify.reason });
+    }
+  }
+
+  if (broken.length === 0) {
+    return { passed: true, message: `${manifestNames.length} past compaction(s) verified — baseline still matches its archived originals` };
+  }
+  return {
+    passed: false,
+    message: `compaction verify gate no longer holds for ${broken.map((b) => `${b.manifest} (${b.reason})`).join(', ')}`,
+  };
+}
+
+function readEventsJsonLines(filePath) {
+  return fs
+    .readFileSync(filePath, 'utf8')
+    .split('\n')
+    .filter((line) => line !== '')
+    .map((line) => JSON.parse(line));
+}
+
+registerCheck({
+  id: 'events-compaction-verified',
+  description: 'every past .fgos/events/ compaction (archive/*.manifest.json) still deep-equal/count/hash-set matches its archived originals (Tầng A/T6)',
+  check: (cwd) => checkEventsCompactionVerified(cwd),
 });
 
 // main-checkout-guard-warnings (tsk-1vc-3 D6, docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md):
