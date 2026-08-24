@@ -241,7 +241,10 @@ function excludeIronLawEvidence(files, id) {
 // log it appends to (`main-checkout-guard-warnings.jsonl`) are the same
 // kind of append-only, no-item-owns-it output -- a fallback checkpoint (or
 // the merge-time sweep) can legitimately touch either one, never an item's
-// own declared footprint.
+// own declared footprint. The wildcard extension on
+// `events-jsonl.truncation-guard\..*` also subsumes tsk-vim's own narrower
+// exact-`.json` fix (independently landed on main) -- one regex alternative
+// covers both.
 const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|entropy-history\.jsonl|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));

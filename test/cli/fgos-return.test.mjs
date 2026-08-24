@@ -274,8 +274,11 @@ test('return: a .fgos/* change bundled into the item\'s own commit (git add -A s
 // (main-checkout-guard-warnings.jsonl) are the same kind of no-item-owns-it
 // noise as events.jsonl itself -- an item bundling either one alongside its
 // own real work (a concurrent fallback firing mid-session, same as
-// events.jsonl above) must never be flagged either.
-test('return: .fgos/events-jsonl.truncation-guard.json and .fgos/main-checkout-guard-warnings.jsonl changes bundled into the item\'s own commit are exempt from footprintDiffHits, same as events.jsonl (tsk-3tp-1)', () => {
+// events.jsonl above) must never be flagged either. Also covers tsk-vim's
+// own narrower regression (a .gitignore predating that project's own
+// exclusion could still commit this file alongside real work) via the same
+// force-add.
+test('return: .fgos/events-jsonl.truncation-guard.json and .fgos/main-checkout-guard-warnings.jsonl changes bundled into the item\'s own commit are exempt from footprintDiffHits, same as events.jsonl (tsk-3tp-1, tsk-vim)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   execFileSync('git', ['add', '-A'], { cwd });
@@ -285,6 +288,17 @@ test('return: .fgos/events-jsonl.truncation-guard.json and .fgos/main-checkout-g
   assert.equal(run(cwd, ['take', '--id', id]).status, 0);
   fs.writeFileSync(path.join(cwd, '.fgos', 'events-jsonl.truncation-guard.json'), JSON.stringify({ seq: 1, hash: 'abc' }));
   fs.writeFileSync(path.join(cwd, '.fgos', 'main-checkout-guard-warnings.jsonl'), '{"kind":"truncation-break"}\n');
+  // -f: this fixture's own .gitignore (initGitCwd) now excludes
+  // events-jsonl.truncation-guard.json, matching this real repo's own root
+  // .gitignore (tsk-cgg) -- so a plain `git add -A` would never even stage
+  // it, which would make this test pass trivially without ever exercising
+  // FGOS_NOISE_ONLY_PATHS at all for that file. Force-adding it here
+  // reproduces the one real scenario where the regex still matters: a
+  // branch/checkout whose .gitignore predates this exclusion (or another
+  // fgOS-adopting project that never added it) can still end up with this
+  // file committed alongside real work. main-checkout-guard-warnings.jsonl
+  // is not gitignored, so it needs no equivalent force-add.
+  execFileSync('git', ['add', '-f', '.fgos/events-jsonl.truncation-guard.json'], { cwd });
   commitFile(cwd, 'proof.txt');
 
   const result = run(cwd, ['return', id]);
@@ -436,15 +450,26 @@ test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own
   execFileSync('git', ['add', 'proof.txt'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd });
 
-  // `.fgos/` has never had a tracked file inside it in this fixture, so git
-  // reports it collapsed as a single untracked directory ("?? .fgos/")
-  // rather than listing events.jsonl individually — either shape must still
-  // count as "only .fgos/ dirty" for the exclusion below.
+  // `.fgos/` may collapse into a single untracked-directory line
+  // ("?? .fgos/") when nothing inside it is tracked yet, OR — since
+  // tsk-3ve's periodic-checkpoint-commit (T5) now bootstrap-commits the
+  // initial per-writer events shard on its own schedule — show one line
+  // per still-dirty path inside `.fgos/` once that shard exists (an "M"
+  // for the shard itself alongside "??" for anything not yet committed,
+  // e.g. coexistence.json). Either shape must still count as "only
+  // .fgos/ dirty" for the exclusion below: assert every line is under
+  // `.fgos/`, never a fixed line count.
   const statusLines = execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' })
     .split('\n')
     .filter(Boolean);
-  assert.equal(statusLines.length, 1, 'sanity: .fgos/ must be the ONLY dirty path at this point');
-  assert.match(statusLines[0], /\.fgos\/?$/);
+  assert.ok(statusLines.length >= 1, 'sanity: .fgos/ must be dirty at this point');
+  for (const line of statusLines) {
+    const changedPath = line.slice(3);
+    assert.ok(
+      changedPath === '.fgos' || changedPath.startsWith('.fgos/'),
+      `sanity: every dirty path must be under .fgos/, got: ${line}`,
+    );
+  }
 
   const result = run(cwd, ['return', 'pull-return-fgos-only-dirty']);
   assert.equal(result.status, 0, `return should succeed with only .fgos/ dirty: ${result.stderr}`);
