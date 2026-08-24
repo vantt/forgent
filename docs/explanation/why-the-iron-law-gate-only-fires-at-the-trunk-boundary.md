@@ -2,7 +2,7 @@
 type: explanation
 title: Why the Iron Law gate only fires at the trunk boundary
 tags: [iron-law, merge, gate, human-ux, approve]
-source_capture_ids: [tsk-1y6-1, tsk-1y6-2]
+source_capture_ids: [tsk-1y6-1, tsk-1y6-2, tsk-1y6-3]
 authoritative_for: why the Iron Law gate only runs at the trunk merge boundary, why it's ask/warn (not a bypass field), and why one /fgOS:approve skill wraps both approve and sync-root
 ---
 # Why the Iron Law gate only fires at the trunk boundary
@@ -67,6 +67,17 @@ record tagged `kind: 'engine'` — the same tagging discipline
 whole family of fixes exists to enforce, applied correctly here from the
 start rather than needing a later fix. No new event type was introduced
 for this — the existing decision-record mechanism already covers it.
+
+## D5 landed (`tsk-1y6-3`): `merge-loop`/`merge-next` skip and continue, then batch-report
+
+The mechanical half of D5's "a blocked item never blocks anything else":
+`merge-loop`/`merge-next` now read a `skipped` result and continue to
+the next candidate instead of stopping the whole run. Every Iron-Law-held
+item accumulates across the run and gets presented together, once, at
+the end — the same "gathered call-back" shape `merge-loop`'s own Step 6
+already documents (present the whole list, ask one combined question),
+rather than a person being interrupted once per held item as the loop
+walks past each one individually.
 
 ## D9: one `/fgOS:approve` skill, not two
 
