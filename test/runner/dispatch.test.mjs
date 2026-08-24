@@ -4890,6 +4890,15 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
     import fs from 'node:fs';
 
     const start = Date.now();
+    // 800ms (widened from 200ms, tsk-5v3 flake): a CPU busy-wait, not a
+    // sleep, so under real contention from this repo's own full test
+    // suite running many other subprocess-heavy tests concurrently, the
+    // OS scheduler can delay or preempt one candidate's spin loop enough
+    // that a short window fails to overlap the other's even though both
+    // were genuinely dispatched concurrently -- observed flaking under
+    // full-suite load, passing reliably in isolation. A longer window
+    // gives real scheduling jitter more margin to still produce a
+    // provable overlap.
     const until = Date.now() + 800;
     while (Date.now() < until) { /* artificial delay */ }
     execFileSync('git', ['commit', '--allow-empty', '-m', 'fake work'], { stdio: 'ignore' });

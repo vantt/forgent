@@ -21,6 +21,35 @@ import path from 'node:path';
 
 const FRONTMATTER_PATTERN = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
 
+// `fs.copyFileSync` truncates the destination in place before writing it,
+// so a concurrent reader of that same destination (e.g. a sibling `fgos
+// setup` process assembling/reading the same shared `packageRoot/.agents/
+// skills/*`, tsk-25b) can observe a momentarily-empty or partially-written
+// file. `rename` within the same directory is atomic on POSIX filesystems,
+// so a reader always sees either the old file or the fully-written new
+// one, never a partial state. Same tmp-then-rename shape every other
+// atomic write in this repo already uses.
+const ATOMIC_TMP_SUFFIX_PATTERN = /\.tmp-\d+-\d+-[a-z0-9]+$/;
+
+function atomicCopyFileSync(sourcePath, targetPath) {
+  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  fs.copyFileSync(sourcePath, tmpPath);
+  fs.renameSync(tmpPath, targetPath);
+}
+
+// `readdirSync` on a directory another process is concurrently writing into
+// via `atomicCopyFileSync` can catch that process's own in-flight
+// `*.tmp-<pid>-<ts>-<rand>` file before it renames it away — copying or
+// pruning that transient name races the writer's own rename and throws
+// ENOENT (tsk-25b). Every loop below that walks a directory
+// `atomicCopyFileSync`/`assembleSkills` can be concurrently writing into
+// (a shared `packageRoot/.agents/skills`, in this repo's own test suite)
+// filters entries through this so an in-flight tmp file is invisible to
+// them, same as it is to the writer's own eventual rename target.
+function isOwnTmpFile(name) {
+  return ATOMIC_TMP_SUFFIX_PATTERN.test(name);
+}
+
 // Marker line unique to a wrapper this module itself generated. `.claude/
 // skills/*` is not an exclusively-generated tree (a hand-authored or
 // plugin-installed skill can live there directly, never routed through
@@ -90,6 +119,7 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
   const validWrapperNames = new Set();
   if (fs.existsSync(agentsSkillsRoot)) {
     for (const entry of fs.readdirSync(agentsSkillsRoot, { withFileTypes: true })) {
+      if (isOwnTmpFile(entry.name)) continue;
       if (!entry.isDirectory() || entry.name === '_shared') continue;
       const sourcePath = path.join(agentsSkillsRoot, entry.name, 'SKILL.md');
       if (!fs.existsSync(sourcePath)) continue;
@@ -106,13 +136,14 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
 
       const skillDir = path.join(agentsSkillsRoot, entry.name);
       for (const subEntry of fs.readdirSync(skillDir, { withFileTypes: true })) {
+        if (isOwnTmpFile(subEntry.name)) continue;
         if (subEntry.name === 'SKILL.md') continue;
         const subSource = path.join(skillDir, subEntry.name);
         const subTarget = path.join(wrapperDir, subEntry.name);
         if (subEntry.isDirectory()) {
           copyDirRecursive(subSource, subTarget);
         } else {
-          fs.copyFileSync(subSource, subTarget);
+          atomicCopyFileSync(subSource, subTarget);
         }
       }
     }
@@ -137,12 +168,13 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
 function copyDirRecursive(sourceDir, targetDir) {
   fs.mkdirSync(targetDir, { recursive: true });
   for (const entry of fs.readdirSync(sourceDir, { withFileTypes: true })) {
+    if (isOwnTmpFile(entry.name)) continue;
     const sourcePath = path.join(sourceDir, entry.name);
     const targetPath = path.join(targetDir, entry.name);
     if (entry.isDirectory()) {
       copyDirRecursive(sourcePath, targetPath);
     } else {
-      fs.copyFileSync(sourcePath, targetPath);
+      atomicCopyFileSync(sourcePath, targetPath);
     }
   }
 }
@@ -256,7 +288,7 @@ export function assembleSkills(projectRoot, targetAgentsSkills, { prune = true }
       copyDirRecursive(sourcePath, targetPath);
     } else {
       fs.mkdirSync(agentsSkillsRoot, { recursive: true });
-      fs.copyFileSync(sourcePath, targetPath);
+      atomicCopyFileSync(sourcePath, targetPath);
     }
     assembled.push(targetPath);
   }
@@ -275,6 +307,7 @@ export function assembleSkills(projectRoot, targetAgentsSkills, { prune = true }
   // skill names are absent from this call's own validSkillNames.
   if (prune && fs.existsSync(agentsSkillsRoot)) {
     for (const entry of fs.readdirSync(agentsSkillsRoot, { withFileTypes: true })) {
+      if (isOwnTmpFile(entry.name)) continue;
       if (!validSkillNames.has(entry.name)) {
         const orphanPath = path.join(agentsSkillsRoot, entry.name);
         fs.rmSync(orphanPath, { recursive: true, force: true });

@@ -1557,6 +1557,7 @@ async function runVerb(verb, flags, positional, dir) {
       if (assessment.failed.length > 0) {
         const reason = [...assessment.notReadyYet, ...assessment.failed].join('; ');
         const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'cleanup', reason, role: 'system' });
+        releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
         return { id, to: 'blocked', reason, seq: event.seq };
       }
 
@@ -1573,6 +1574,7 @@ async function runVerb(verb, flags, positional, dir) {
         }
       }
       const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'cleanup', role: 'human' });
+      releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
       return { id, to: 'done', seq: event.seq, cleanupWarnings };
     }
 
@@ -1636,6 +1638,7 @@ async function runVerb(verb, flags, positional, dir) {
         }
       }
       const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
+      releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
       return { id, docType, docPath: docPath ?? null, status: item.status, seq: event.seq };
     }
 
