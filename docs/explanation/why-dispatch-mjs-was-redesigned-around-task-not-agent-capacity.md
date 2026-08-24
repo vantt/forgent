@@ -2,7 +2,7 @@
 type: explanation
 title: Why dispatch.mjs was redesigned around task, not agent capacity
 tags: [dispatch, executor, capacity, task-dispatch-unification]
-source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5]
+source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5, tsk-5tm-6]
 authoritative_for: why src/runner/dispatch.mjs's capacity/executor layer was redesigned around "task" as the unifying concept, and the 12 locked decisions behind that redesign
 ---
 # Why `dispatch.mjs` was redesigned around "task," not agent capacity
@@ -34,7 +34,12 @@ from both `capacities.<id>` config shape and the dispatch gate itself.
 - **D4 — generalize dispatch around "task,"** widening `tsk-3ik` D3's
   already-locked scope. Flow B (`capacityIdForWork`) had already done
   half of this; `fgos-fanout` still hardcoded the `Agent` tool directly
-  instead of consulting the shared decision protocol.
+  instead of consulting the shared decision protocol. Landed
+  (`tsk-5tm-6`): `fgos-fanout` now calls `decide --work <id>` before
+  firing an Agent for each candidate — the `decideExecutorCli`'s `--work`
+  door (resolving a work item's own dispatch executor via
+  `executorIdForWork`, the exact lookup `spawnWorker` already uses
+  internally) built specifically for this consumer.
 - **D5 — `dispatch.mjs` must self-execute for the adapter-resolvable
   case,** matching marketing-cockpit's own `run_task()` contract. Before
   this, Flow A (`resolveCapacityCli`) always handed back a bare
