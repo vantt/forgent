@@ -1157,6 +1157,64 @@ test('sync-root never reports outcome "synced" when mergeRunnerItem returns an o
   assert.equal(mergedDecisions.length, 0, 'must never record a "merged" decision for a merge that never actually completed');
 });
 
+test('sync-root outcome guard catches merge-failed-unclassified and records unhandled-outcome friction (tsk-12o)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-merge-failed', { verify: 'true' });
+
+  // tsk-18a D1: `git merge --no-commit --no-ff` can fail WITHOUT ever
+  // creating MERGE_HEAD when an untracked file at the target checkout
+  // collides with a DIRECTORY path the incoming branch needs to create.
+  // The collision path must be the DIRECTORY itself
+  // ('sync-root-merge-failed-dir'), never the leaf file the branch's own
+  // diff introduces ('sync-root-merge-failed-dir/leaf.txt') -- an
+  // untracked file at that leaf path would instead trip the EARLIER
+  // dirty-tree refusal the 'sync-root-dirty' test above already covers
+  // (isMainTreeClean's ownFileSet only ever contains leaf paths from
+  // `git diff --name-only trunk...branch`, never their parent
+  // directories), so this reaches mergeRunnerItem itself rather than
+  // being refused before it.
+  gitAtCwd(cwd, ['checkout', 'fgw/sync-root-merge-failed']);
+  fs.mkdirSync(path.join(cwd, 'sync-root-merge-failed-dir'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'sync-root-merge-failed-dir', 'leaf.txt'), 'from-branch\n');
+  gitAtCwd(cwd, ['add', 'sync-root-merge-failed-dir/leaf.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'branch adds a nested leaf file']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  // A stray untracked file already sitting at the exact directory path the
+  // branch needs to create -- the real-world shape test/runner/merge.test.mjs
+  // (mergeRunnerItem unit level) already proves reports 'merge-failed-unclassified',
+  // never 'conflict', for exactly this git failure mode.
+  fs.writeFileSync(path.join(cwd, 'sync-root-merge-failed-dir'), 'stray-untracked\n');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['sync-root', 'sync-root-merge-failed']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.notEqual(data.outcome, 'synced', 'must never report success for an outcome it does not recognize');
+  assert.equal(data.outcome, 'blocked');
+  assert.equal(data.reason, 'merge-failed-unclassified');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be unchanged');
+  assert.throws(
+    () => gitAtCwd(cwd, ['rev-parse', '--verify', 'MERGE_HEAD']),
+    'MERGE_HEAD must never have existed -- this was never a real conflict, git refused before staging anything',
+  );
+  assert.equal(fs.existsSync(path.join(cwd, 'sync-root-merge-failed-produced.txt')), false, 'the drifted root\'s own top-level content must NOT have landed on main');
+  assert.equal(fs.readFileSync(path.join(cwd, 'sync-root-merge-failed-dir'), 'utf8'), 'stray-untracked\n', 'the stray untracked file must survive untouched');
+  assert.equal(stateView(cwd).work['sync-root-merge-failed'].status, 'doing', 'a blocked sync-root must never touch the root item\'s status');
+
+  const frictions = stateView(cwd).frictions?.['sync-root-merge-failed'] ?? [];
+  assert.ok(
+    frictions.some((f) => f.errorClass === 'sync-root-unhandled-outcome'),
+    'frictions must contain an entry with errorClass === "sync-root-unhandled-outcome"',
+  );
+
+  const lines = eventLines(cwd);
+  const mergedDecisions = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-merge-failed' && /merged/.test(e.payload?.text ?? ''));
+  assert.equal(mergedDecisions.length, 0, 'must never record a "merged" decision for a merge that never actually completed');
+});
+
 test('sync-root outcome guard catches lock-lost-mid-merge and records unhandled-outcome friction (tsk-3df)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);

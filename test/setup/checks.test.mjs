@@ -92,6 +92,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'decision-index-stale',
       'agy-permissions-configured',
       'main-checkout-guard-warnings',
+      'events-compaction-verified',
       'no-stuck-merge-abort',
     ].sort(),
   );

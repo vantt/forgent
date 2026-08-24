@@ -19,6 +19,7 @@ import {
   resyncWorktree,
   refreshUnstartedBranch,
   withMergeEphemeralWorktree,
+  checkoutDirtyPaths,
   WorktreeError,
 } from '../../src/runner/worktree.mjs';
 
@@ -1413,3 +1414,24 @@ test('refreshUnstartedBranch with a live checkout: refreshes in place via a real
   const resync = resyncClaimWorktree(repoRoot, first.path, 'fgw/leaf');
   assert.equal(resync.resynced, false);
 });
+
+test('checkoutDirtyPaths returns relative dirty paths excluding .fgos artifacts', () => {
+  const repoRoot = initTempRepo();
+  assert.deepEqual(checkoutDirtyPaths(repoRoot, repoRoot), []);
+
+  // Write a dirty uncommitted file and an untracked file
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'modified seed\n');
+  fs.writeFileSync(path.join(repoRoot, 'newfile.txt'), 'new\n');
+  // Write a .fgos file which should be excluded by :!.fgos
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'test.json'), '{}');
+
+  const dirty = checkoutDirtyPaths(repoRoot, repoRoot);
+  assert.deepEqual(dirty.sort(), ['newfile.txt', 'seed.txt']);
+});
+
+test('checkoutDirtyPaths returns empty array on invalid directory or git error', () => {
+  const tmpDir = mkWorktreeDir();
+  assert.deepEqual(checkoutDirtyPaths(tmpDir, tmpDir), []);
+});
+

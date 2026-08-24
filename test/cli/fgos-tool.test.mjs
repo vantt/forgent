@@ -34,10 +34,30 @@ function envelopeData(stdout) {
   return envelope.data;
 }
 
+// Tầng A/T2: new events land under `.fgos/events/<writer>-<ts>.jsonl`, not
+// the frozen baseline `.fgos/events.jsonl` (TA-D12) -- counts/exposes raw
+// lines across both, mirroring test/cli/helpers/fgos-cli-harness.mjs's own
+// eventLines (this file keeps its own local copy rather than importing it).
 function eventLines(cwd) {
+  const lines = [];
   const logPath = path.join(cwd, '.fgos', 'events.jsonl');
-  if (!fs.existsSync(logPath)) return [];
-  return fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+  if (fs.existsSync(logPath)) {
+    lines.push(...fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean));
+  }
+  const eventsDir = path.join(cwd, '.fgos', 'events');
+  let names = [];
+  try {
+    names = fs
+      .readdirSync(eventsDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch {
+    names = [];
+  }
+  for (const name of names) {
+    lines.push(...fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean));
+  }
+  return lines;
 }
 
 // Declares a executor directly in `.fgos/config.json`'s `runner.executors`
