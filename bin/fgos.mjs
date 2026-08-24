@@ -235,7 +235,17 @@ function excludeIronLawEvidence(files, id) {
 // (`baseline-<ts>.jsonl`, T6) and its own manifest sidecar under
 // `.fgos/events/archive/` are equally append-only lifecycle output, never
 // an item's own declared footprint.
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|entropy-history\.jsonl|events-jsonl\.truncation-guard\.json)$/;
+//
+// tsk-3tp-1 (D2, sweep-into-merge-commit redesign): the truncation guard's
+// own mark sidecar (`events-jsonl.truncation-guard.json`) and the warnings
+// log it appends to (`main-checkout-guard-warnings.jsonl`) are the same
+// kind of append-only, no-item-owns-it output -- a fallback checkpoint (or
+// the merge-time sweep) can legitimately touch either one, never an item's
+// own declared footprint. The wildcard extension on
+// `events-jsonl.truncation-guard\..*` also subsumes tsk-vim's own narrower
+// exact-`.json` fix (independently landed on main) -- one regex alternative
+// covers both.
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|entropy-history\.jsonl|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }

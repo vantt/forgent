@@ -435,6 +435,90 @@ test('mergeRunnerItem merges cleanly, verify passes, and commits — outcome "me
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
+// tsk-3tp-1 (D2): the merge commit ITSELF sweeps up whatever is dirty under
+// `.fgos/events/` at merge time — no dedicated checkpoint commit needed for
+// the common case where a merge happens often enough to carry it along.
+test('mergeRunnerItem sweeps a dirty untracked .fgos/events/ shard file into its own merge commit', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const eventsDir = path.join(repoRoot, '.fgos', 'events');
+  fs.mkdirSync(eventsDir, { recursive: true });
+  const shardPath = path.join(eventsDir, 'writer-a-20260101T000000Z.jsonl');
+  fs.writeFileSync(shardPath, '{"id":"e1"}\n');
+
+  const headBefore = headOf(repoRoot);
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'merged');
+
+  // A merge commit has two parents — plain `diff-tree`/`diff-tree -r` prints
+  // nothing for one unless told which parent(s) to diff against; `-m` diffs
+  // against each parent in turn, same as `git show`'s own default for a
+  // merge commit.
+  const mergeCommitFiles = git(repoRoot, ['diff-tree', '--no-commit-id', '--name-only', '-r', '-m', headOf(repoRoot)]);
+  assert.match(
+    mergeCommitFiles,
+    /\.fgos\/events\/writer-a-20260101T000000Z\.jsonl/,
+    'the shard file must ride along inside the merge commit itself, not be left uncommitted',
+  );
+  assert.equal(isWorkingTreeClean(repoRoot), true, 'nothing should be left dirty after the sweep');
+  assert.notEqual(headOf(repoRoot), headBefore);
+
+  // Exactly one new commit landed — the merge commit itself — never a
+  // separate dedicated checkpoint commit riding alongside it.
+  // `--first-parent` walks only main's OWN lineage (never descending into
+  // the just-merged branch's pre-existing commit, which `headBefore..HEAD`
+  // alone would also include — that commit already existed before this
+  // call ran, so it is not "new" in the sense this assertion cares about):
+  // exactly one first-parent commit landing on main means the sweep really
+  // did ride the merge commit itself, never a separate commit alongside it.
+  const newCommitSubjects = git(repoRoot, ['log', '--first-parent', '--format=%s', `${headBefore}..HEAD`])
+    .trim()
+    .split('\n');
+  assert.equal(newCommitSubjects.length, 1, 'the sweep must ride the merge commit, never add a commit of its own');
+  assert.doesNotMatch(newCommitSubjects[0], /periodic events\.jsonl checkpoint|fallback events checkpoint/);
+});
+
+// tsk-3tp (fix, review r1): `.fgos` only ever exists under `lockRoot` — it is
+// stripped from every ephemeral worktree per ADR0020 (see
+// `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),
+// exactly the shape a leaf->parent approve or promote-engine merge passes in
+// (`lockRoot` set explicitly, distinct from the ephemeral `repoRoot` used as
+// the git-op cwd). Before this fix the sweep computed its pathspecs relative
+// to `repoRoot` and ran `git status`/`git add` with `cwd: repoRoot` — a
+// pathspec pointing at a sibling directory (`lockRoot`) that git refuses as
+// "outside repository", silently swallowed by the surrounding catch, so the
+// shard was never swept for this whole class of merges. Two separate real
+// repos stand in for the ephemeral worktree (`repoRoot`) and the real main
+// checkout (`lockRoot`), same shape as the "resolves the main-checkout lock
+// against lockRoot" test below.
+test('mergeRunnerItem sweeps a dirty .fgos/events/ shard under lockRoot (not repoRoot) into lockRoot\'s own index when lockRoot !== repoRoot', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const lockRoot = initRepo();
+  const eventsDir = path.join(lockRoot, '.fgos', 'events');
+  fs.mkdirSync(eventsDir, { recursive: true });
+  const shardPath = path.join(eventsDir, 'writer-a-20260101T000000Z.jsonl');
+  fs.writeFileSync(shardPath, '{"id":"e1"}\n');
+
+  const lockRootHeadBefore = headOf(lockRoot);
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }), { lockRoot });
+  assert.equal(result.outcome, 'merged');
+
+  const lockRootStatus = git(lockRoot, ['status', '--porcelain']);
+  assert.match(
+    lockRootStatus,
+    /^A\s+\.fgos\/events\/writer-a-20260101T000000Z\.jsonl$/m,
+    'the dirty shard living under lockRoot must be staged (git add) even though the merge commit itself lands in repoRoot',
+  );
+  assert.equal(
+    headOf(lockRoot),
+    lockRootHeadBefore,
+    'lockRoot itself must not gain a new commit from the sweep — only staged, ready to ride lockRoot\'s own next commit (e.g. the 1h fallback or a later root->main approve)',
+  );
+});
+
 test('mergeRunnerItem aborts cleanly on a real conflict — main left byte-for-byte unchanged, outcome "conflict"', async () => {
   const repoRoot = initRepo();
   fs.writeFileSync(path.join(repoRoot, 'shared.txt'), 'base\n');
@@ -1507,30 +1591,35 @@ test('mergeRunnerItem merges cleanly when a merge=union .fgos/ file genuinely di
   const repoGitattributes = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.gitattributes'));
   fs.writeFileSync(path.join(repoRoot, '.gitattributes'), repoGitattributes);
 
-  const logRelPath = path.join('.fgos', 'events.jsonl');
+  // tsk-3tp-2 retired merge=union for the legacy single-file
+  // .fgos/events.jsonl (now a frozen post-sharding baseline, never
+  // actively grown) — use a diagnostic log that still genuinely carries
+  // merge=union instead, per the same rule tsk-2xg's own regression test
+  // above exercises.
+  const logRelPath = path.join('.fgos', 'approve-post-success-faults.jsonl');
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  const baseContent = '{"seq":1,"id":"base"}\n';
+  const baseContent = '{"ts":"2026-08-24T00:00:00.000Z","id":"base"}\n';
   fs.writeFileSync(path.join(repoRoot, logRelPath), baseContent);
   git(repoRoot, ['add', '.gitattributes', logRelPath]);
-  git(repoRoot, ['commit', '-q', '-m', 'seed .gitattributes and events log']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .gitattributes and diagnostic log']);
 
   // Worker branch grows its own frozen copy with a line main never sees.
   git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
   fs.writeFileSync(path.join(repoRoot, 'produced.txt'), 'ok\n');
   git(repoRoot, ['add', 'produced.txt']);
   git(repoRoot, ['commit', '-q', '-m', 'worker produces its own file']);
-  const workerLine = '{"seq":2,"id":"worker-only"}\n';
+  const workerLine = '{"ts":"2026-08-24T00:00:02.000Z","id":"worker-only"}\n';
   fs.appendFileSync(path.join(repoRoot, logRelPath), workerLine);
   git(repoRoot, ['add', logRelPath]);
-  git(repoRoot, ['commit', '-q', '-m', 'worker grows its own frozen events log']);
+  git(repoRoot, ['commit', '-q', '-m', 'worker grows its own frozen diagnostic log']);
   git(repoRoot, ['checkout', 'main']);
 
   // Main grows the same file independently under concurrent write load,
   // BEFORE approve ever runs against the worker branch above.
-  const mainLine = '{"seq":3,"id":"main-only"}\n';
+  const mainLine = '{"ts":"2026-08-24T00:00:03.000Z","id":"main-only"}\n';
   fs.appendFileSync(path.join(repoRoot, logRelPath), mainLine);
   git(repoRoot, ['add', logRelPath]);
-  git(repoRoot, ['commit', '-q', '-m', 'main grows events log independently']);
+  git(repoRoot, ['commit', '-q', '-m', 'main grows diagnostic log independently']);
   const mainOwnContent = fs.readFileSync(path.join(repoRoot, logRelPath), 'utf8');
 
   const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));

@@ -56,8 +56,7 @@ import {
 } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
-import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
-import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_EVENT_THRESHOLD } from '../state/events-jsonl-truncation-guard.mjs';
+import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../state/events-jsonl-truncation-guard.mjs';
 import { verifyCompactionCandidate } from '../state/events-compaction.mjs';
 import { readMainCheckoutGuardWarnings } from '../state/main-checkout-guard-warnings.mjs';
 
@@ -1128,107 +1127,16 @@ registerCheck({
   check: (cwd) => checkDeliveredNotOnTrunk(cwd),
 });
 
-// tsk-3wq (docs/history/events-jsonl-merge-driver-recurring-write-loss/
-// CONTEXT.md D3): the shared .fgos/events.jsonl is git-tracked, and an
-// ordinary git merge on it — through `.gitattributes`'s `merge=union`
-// entry or otherwise — can leave the log with duplicate/non-contiguous
-// `seq` values even when it merges without a conflict (git's own docs:
-// `union` "tends to leave the added lines... in random order"). This
-// check surfaces that drift the same way root-drift above surfaces a
-// stale branch, instead of only being discovered when a migrate script's
-// own contiguity guard trips over it (tsk-n4i's original origin story).
-function checkEventsJsonlContiguous(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { passed: true, message: 'not inside a git checkout — nothing to check' };
-  }
-  const fgosDir = path.join(mainCheckout, '.fgos');
-  const logPath = path.join(fgosDir, 'events.jsonl');
-  const eventsDirPath = path.join(fgosDir, 'events');
-  let writerFileNames = [];
-  try {
-    writerFileNames = fs
-      .readdirSync(eventsDirPath, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
-      .map((entry) => entry.name);
-  } catch {
-    writerFileNames = [];
-  }
-  if (!fs.existsSync(logPath) && writerFileNames.length === 0) {
-    return { passed: true, message: 'no .fgos/events.jsonl yet — nothing to check' };
-  }
-
-  // Legacy baseline-0 keeps the ORIGINAL check unchanged (the merge=union
-  // failure class this whole check exists for, tsk-3wq). Tầng A/T5
-  // (TA-D10): each per-writer file under .fgos/events/ is checked too, but
-  // as its OWN single-writer sequence -- seq is only ever meaningful
-  // within one file post-cutover (TA-D1/TA-D2), never combined across
-  // files, and there is no matching auto-fix for a per-writer break (see
-  // `fixEventsJsonlContiguous` below): TA-D2 already eliminated the
-  // merge-driver failure class the baseline fix exists to repair, so a
-  // break here is a different, rarer bug worth surfacing loudly instead.
-  const broken = [];
-  if (fs.existsSync(logPath)) {
-    const report = checkEventsJsonlContiguity(logPath);
-    if (!report.ok) broken.push({ file: 'events.jsonl', duplicates: report.duplicates.length, gaps: report.gaps.length });
-  }
-  for (const name of writerFileNames) {
-    const report = checkEventsJsonlContiguity(path.join(eventsDirPath, name));
-    if (!report.ok) broken.push({ file: `events/${name}`, duplicates: report.duplicates.length, gaps: report.gaps.length });
-  }
-
-  if (broken.length === 0) {
-    return {
-      passed: true,
-      message: `events.jsonl${writerFileNames.length > 0 ? ` + ${writerFileNames.length} per-writer file(s)` : ''} contiguous (no seq breaks/duplicates)`,
-    };
-  }
-  return {
-    passed: false,
-    message: `duplicate seq / seq break(s) found in ${broken.map((b) => `${b.file} (${b.duplicates} dup, ${b.gaps} gap)`).join(', ')} — for events.jsonl this is likely left behind by a git merge (tsk-3wq), run fgos doctor --fix; a per-writer file has no auto-fix (TA-D2 already prevents the merge-driver class it would repair)`,
-  };
-}
-
-function fixEventsJsonlContiguous(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { changed: false, message: 'not inside a git checkout — nothing to fix' };
-  }
-  const logPath = path.join(mainCheckout, '.fgos', 'events.jsonl');
-  if (!fs.existsSync(logPath)) {
-    return { changed: false, message: 'no .fgos/events.jsonl yet — nothing to fix' };
-  }
-  const result = fixEventsJsonlContiguity(logPath);
-  if (!result.fixed) {
-    return { changed: false, message: 'events.jsonl already contiguous — nothing to fix' };
-  }
-  return {
-    changed: true,
-    message: `deduped ${result.dedupedCount} exact-duplicate line(s), resequenced ${result.resequencedCount} event(s), backup at ${result.backupPath}`,
-  };
-}
-
-registerCheck({
-  id: 'events-jsonl-contiguous',
-  description: 'shared .fgos/events.jsonl has no seq breaks or duplicates left behind by a git merge (tsk-3wq)',
-  check: (cwd) => checkEventsJsonlContiguous(cwd),
-});
-
-registerFix({
-  id: 'events-jsonl-contiguous',
-  fix: (cwd) => fixEventsJsonlContiguous(cwd),
-});
-
 // events-jsonl-not-truncated (tsk-cgg, docs/history/events-jsonl-git-
 // tracked-truncation/CONTEXT.md D1): catches a stash/checkout/reset/clean-
 // style silent truncation of the shared, git-tracked .fgos/events.jsonl --
-// the failure class events-jsonl-contiguous above is structurally blind
-// to, since a truncate-then-reappend renumbers forward and stays
-// perfectly contiguous. See src/state/events-jsonl-truncation-guard.mjs's
-// own header for the full detection mechanism. No matching registerFix
-// (unlike events-jsonl-contiguous): a break here means real data is
-// already gone -- auto-repairing would erase the loud signal before a
-// human ever saw it, defeating the reason this check exists. The
+// a failure class a seq-contiguity check is structurally blind to, since
+// a truncate-then-reappend renumbers forward and stays perfectly
+// contiguous. See src/state/events-jsonl-truncation-guard.mjs's own
+// header for the full detection mechanism. No matching registerFix: a
+// break here means real data is already gone -- auto-repairing would
+// erase the loud signal before a human ever saw it, defeating the
+// reason this check exists. The
 // re-baseline-after-acknowledgment step is a deliberate, documented
 // manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not
 // a blanket `doctor --fix` sweep.
@@ -1321,8 +1229,8 @@ function checkEventsCompactionVerified(cwd) {
     return { passed: true, message: 'no compactions recorded yet — nothing to verify' };
   }
 
-  // Never throws (same contract events-jsonl-contiguous/events-jsonl-not-
-  // truncated above already keep): a corrupt line in an archived original
+  // Never throws (same contract events-jsonl-not-truncated above already
+  // keeps): a corrupt line in an archived original
   // or the baseline itself is exactly the "tampering, partial restore, a
   // bug" shape this check exists to catch, per its own doc comment above --
   // it must surface as a normal `broken` finding, never crash the rest of
@@ -1766,7 +1674,7 @@ registerConfigDefault({
 registerConfigDefault({
   id: 'checkpoint',
   key: 'checkpoint',
-  shape: { eventThreshold: DEFAULT_CHECKPOINT_EVENT_THRESHOLD },
+  shape: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
 });
 
 // Deliberately does NOT execute the configured commands. `doctor` is a

@@ -849,7 +849,7 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
   // run on the shared checkout, so main-checkout.lock IS that target's
   // slot — behavior below is then exactly what it was before this item.
   if (targetSlot) {
-    return withPostLand(await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }));
+    return withPostLand(await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot }));
   }
 
   // The pre-commit hook only locks the final `git commit` — everything
@@ -941,7 +941,7 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
 
   let result;
   try {
-    result = await heartbeatStorage.run(heartbeatStatus, () => mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }));
+    result = await heartbeatStorage.run(heartbeatStatus, () => mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot }));
   } finally {
     clearInterval(heartbeat);
     lock.release();
@@ -1229,7 +1229,7 @@ function resolveFgosOnlyConflict(repoRoot, keepRef) {
   return stillUnmerged.length === 0;
 }
 
-async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
+async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot = repoRoot } = {}) {
   // tsk-3yl D1: still run the real goal-check here, even though nothing
   // will be staged/committed — every 'merged' outcome must carry a real,
   // freshly-executed verify result (both callers in bin/fgos.mjs read
@@ -1485,6 +1485,41 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   }
 
   try {
+    // tsk-3tp (D2): sweep dirty/untracked files under .fgos/events/ and .fgos/events.jsonl into the staged merge commit
+    //
+    // tsk-3tp (fix, review r1): `.fgos` only ever exists under `lockRoot`
+    // (ADR0020 strips it from every ephemeral worktree — see
+    // `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),
+    // so both the pathspec base AND the git-command cwd below must be
+    // `lockRoot`, not `repoRoot` — mirroring `fgosDir`/
+    // `runOpportunisticMainCheckoutChecks` above, which already got this
+    // right. Resolving/running against `repoRoot` instead made this block
+    // a silent no-op (git refuses an out-of-repository pathspec, swallowed
+    // by the catch below) for every leaf->parent approve and promote-engine
+    // merge — i.e. every merge where `lockRoot !== repoRoot`. `lockRoot`
+    // defaults to `repoRoot`, so the root->main approve path (where the two
+    // are already the same) is unaffected by this change.
+    const sweepFgosDir = path.join(lockRoot, '.fgos');
+    const sweepLogPath = path.join(sweepFgosDir, 'events.jsonl');
+    const sweepEventsDirPath = path.join(sweepFgosDir, 'events');
+    const sweepPathspecs = [];
+    if (fs.existsSync(sweepLogPath)) {
+      sweepPathspecs.push(path.relative(lockRoot, sweepLogPath) || '.fgos/events.jsonl');
+    }
+    if (fs.existsSync(sweepEventsDirPath)) {
+      sweepPathspecs.push(path.relative(lockRoot, sweepEventsDirPath));
+    }
+    if (sweepPathspecs.length > 0) {
+      try {
+        const statusOut = git(lockRoot, ['status', '--porcelain', '--', ...sweepPathspecs]).trim();
+        if (statusOut.length > 0) {
+          git(lockRoot, ['add', ...sweepPathspecs]);
+        }
+      } catch {
+        // non-blocking
+      }
+    }
+
     // HOLDER_PID_ENV_VAR (tsk-70l): scoped to this one call, not a
     // `process.env` assignment — see `git()`'s own env passthrough
     // above. Lets `.githooks/pre-commit`, spawned as this call's own
