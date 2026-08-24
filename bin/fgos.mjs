@@ -235,7 +235,7 @@ function excludeIronLawEvidence(files, id) {
 // (`baseline-<ts>.jsonl`, T6) and its own manifest sidecar under
 // `.fgos/events/archive/` are equally append-only lifecycle output, never
 // an item's own declared footprint.
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|entropy-history\.jsonl)$/;
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|entropy-history\.jsonl|events-jsonl\.truncation-guard\.json)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }

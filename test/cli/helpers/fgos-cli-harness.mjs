@@ -150,7 +150,7 @@ function initGitCwd() {
   execFileSync('git', ['init', '-q'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/state.json\n.fgos/events-jsonl.truncation-guard.json\n');
   fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
@@ -182,7 +182,7 @@ function initGitCwdInSubdir(subdirName = 'workspace') {
   execFileSync('git', ['init', '-q'], { cwd: topLevel });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: topLevel });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: topLevel });
-  fs.writeFileSync(path.join(topLevel, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(topLevel, '.gitignore'), '.fgos/state.json\n.fgos/events-jsonl.truncation-guard.json\n');
   fs.writeFileSync(path.join(topLevel, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd: topLevel });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: topLevel });
@@ -447,7 +447,7 @@ function initGitCwdMain() {
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/state.json\n.fgos/events-jsonl.truncation-guard.json\n');
   fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
