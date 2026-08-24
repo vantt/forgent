@@ -2,7 +2,7 @@
 type: explanation
 title: Why fgos-coding-compounding refuses to commit when MERGE_HEAD is set
 tags: [fgos-coding-compounding, merge-head, retrospective-synthesis, audit]
-source_capture_ids: [tsk-2oy, tsk-67t, tsk-4dy]
+source_capture_ids: [tsk-2oy, tsk-67t, tsk-4dy, tsk-3u8]
 authoritative_for: why fgos-coding-compounding's retrospective-synthesis commit step refuses when MERGE_HEAD is already set, the 5 real historical instances that motivated it, and each instance's own per-item audit outcome
 ---
 # Why `fgos-coding-compounding` refuses to commit when `MERGE_HEAD` is set
@@ -124,3 +124,10 @@ outcome-field check — **no content was lost**. Closed the same way as
 `tsk-67t`'s own sibling audit: `done` with a decision note, since this
 repo's status vocabulary has no distinct status for "investigated, found
 nothing wrong."
+
+## Per-instance audit outcome: `tsk-1vi` (`tsk-3u8`) — content verified intact
+
+Same shape again: `tsk-66t`'s own evidence and the `tsk-1vi` doc it
+produced were confirmed to survive intact on `main`, despite the same
+stray-`MERGE_HEAD` absorption. No content lost; closed the same way as
+the other instances above.
