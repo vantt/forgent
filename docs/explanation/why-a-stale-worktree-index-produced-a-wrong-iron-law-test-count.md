@@ -2,8 +2,8 @@
 type: explanation
 title: Why a stale worktree index produced a wrong Iron Law test count
 tags: [iron-law, evidence, worktree, addendum]
-source_capture_ids: [tsk-5x4]
-authoritative_for: why the tsk-51m root Iron Law evidence file recorded a test count lower than any of its own children, and why the fix is an addendum rather than an edit
+source_capture_ids: [tsk-5x4, tsk-2u5]
+authoritative_for: why the tsk-51m root Iron Law evidence file recorded a test count lower than any of its own children, why the fix is an addendum rather than an edit, and the general stale-worktree-index guard this incident led to
 ---
 # Why a stale worktree index produced a wrong Iron Law test count
 
@@ -61,6 +61,62 @@ Instead, a note is added to `docs/history/tsk-60h-merge-conflict-catchup-playboo
 recording the drift with concrete evidence (the line, the commit), so a
 future reader does not mistake the stored string for something still
 verbatim-reproducible today.
+
+## The general mechanism, and the guard it led to (`tsk-2u5`)
+
+The stale-index revert (`254f61e9`'s own fix, Finding 1 above) turned
+out to be one instance of a general, previously-unguarded hazard. A
+linked worktree checked out on branch X can desync from its own
+index/working-tree whenever a *different* process — an ephemeral merge
+worktree from `sync-root`/`approve`, for example — force-moves X's ref
+via `git branch -f` without ever touching the first worktree's own
+working tree or index. `HEAD`/`git log` inside the desynced worktree
+still read the *new* commit correctly, because `HEAD` is a symbolic ref
+pointing at the branch ref that just moved — but the files on disk and
+the index are still the *old* snapshot. A "narrowly-staged" commit from
+that worktree (`git add` exactly one new file) then silently drags the
+old version of every *other* tracked file along with it, reverting them.
+
+The `tsk-51m` incident above was caught only by luck — a ground-truth
+grep noticed `performCatchUp`/`withMergeTargetSlot` had vanished from
+`bin/fgos.mjs` right after the bad commit. No system guard existed to
+catch this automatically.
+
+**Locked design** (`docs/history/stale-worktree-index-guard/CONTEXT.md`):
+
+- **D1** — the guard lives in the existing `.githooks/pre-commit` file
+  (no per-worktree `core.hooksPath` override, which would also silently
+  disable the pre-existing `.fgos`-deletion guard), scoped to `fgw/*`
+  branch commits, and must run *before* the existing `.fgos`
+  staged-deletion guard so that guard reads an already-correct index.
+- **D2** — detection is read-only, never mutates: compare a
+  reflog-based `lastSynced` marker against the branch's current tip.
+  Equal → no-op. Not an ancestor, or the reflog is unreadable → refuse,
+  fail closed. Ancestor but behind → refuse with the exact repair
+  command; the hook itself never attempts an in-hook auto-fix, because a
+  reset+reapply that fails partway would strand the agent's only copy of
+  its real change in a temp patch — the exact class of work-loss this
+  guard exists to prevent.
+- **D3** — repair is a separate verb, `fgos resync-worktree` (never
+  embedded in the hook): extract the staged diff, save it under
+  `--git-common-dir` (never the worktree's own `--git-dir`, which fgOS
+  can force-remove later), `git reset --hard` to the real tip, re-strip
+  `.fgos/` after the reset (bundled fix for a related pre-existing bug
+  where the reset would otherwise resurrect a stale `.fgos/` snapshot,
+  violating ADR0020), then `git apply --index` the saved patch (never
+  `--3way`) — a real content conflict refuses outright and keeps the
+  patch on disk rather than guessing a merge.
+- **D4** — a bundled fix: `installGitHooks` now writes an *absolute*
+  path to the main checkout's `.githooks/` instead of the relative
+  string it wrote before, so every worktree resolves to the same,
+  current hook file regardless of which commit its own branch happens to
+  have checked out.
+- **D5** — deliberately out of scope: no proactive resync pushed into
+  sibling worktrees the moment a ref force-moves (would race a still-live
+  session, and conflicts with a separate documented decision governing
+  ephemeral merge worktrees). Detection-at-commit plus an on-demand
+  repair verb was judged sufficient to stop the silent-revert failure
+  mode without that added complexity.
 
 ## The shared lesson
 
