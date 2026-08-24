@@ -2,7 +2,7 @@
 type: explanation
 title: Why fgOS bin and skill distribution needed a 3-tier self-healing resolution
 tags: [distribution, install, setup, doctor, skill-materialization, external-project]
-source_capture_ids: [tsk-2qc, tsk-2qc-1]
+source_capture_ids: [tsk-2qc, tsk-2qc-1, tsk-1qi]
 authoritative_for: why fgOS install/setup resolves the fgos binary through a 3-tier cached scheme, and why skill materialization no longer depends on the claude CLI or plugin marketplace
 ---
 # Why fgOS bin and skill distribution needed a 3-tier self-healing resolution
@@ -100,6 +100,35 @@ materializes both directly — no `claude` CLI presence and no plugin
 marketplace registration required for core skill availability. The
 plugin marketplace becomes optional, needed only for the `/fgOS:xxx`
 typed-command UX, not for the underlying skills to exist and work.
+
+## D5/D7 landed (`tsk-1qi`): `.claude/skills` becomes generated, `.agents/skills` becomes canonical
+
+The concrete mechanism behind D5/D7 above: `.agents/` was added to
+`package.json`'s `files` allowlist (so it actually ships in the npm
+package), and one shared generator function now produces
+`.claude/skills/<name>/SKILL.md` as a thin-wrapper stub from
+`.agents/skills/<name>/SKILL.md` — copying frontmatter mechanically, with
+no hardcoded per-skill-name special-casing. (This is the exact "generated
+thin wrapper — do not edit directly, edit the source instead" pattern
+visible at the top of every `.claude/skills/*/SKILL.md` file in this repo
+today.) The generator is wired into a new `npm run build:skills` script
+(forgentX's own self-dogfood path) and into `fgos setup`'s
+external-project materialize path — which copies both `.agents/skills`
+and the freshly generated `.claude/skills` into the target project, using
+sibling-relative paths, never pointing back at the global install
+location.
+
+`test/skills/fgos-mirror.test.mjs`'s old byte-identical assertion (which
+only made sense when both trees were independently hand-edited) was
+replaced with a wrapper-*correctness* assertion — checking that each
+generated wrapper faithfully derives from its `.agents/skills` source,
+not that the two trees are literally identical text.
+
+The same `.fgos/`-presence verify-shape pitfall from `tsk-2qc-1` recurred
+here too — this item's first re-verify also failed inside a detached
+ephemeral merge worktree checking for `.fgos/` presence, and was fixed
+the same way: redesign the verify to check real code/behavior, never
+`.fgos/`'s presence in a context ADR0020 already guarantees lacks it.
 
 ## D6/D7: which skills get typed, and how wrappers are generated
 
