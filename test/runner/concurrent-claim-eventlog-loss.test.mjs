@@ -9,8 +9,31 @@ import { fileURLToPath } from 'node:url';
 import { claimWork } from '../../src/runner/claim-port.mjs';
 import { initStore, addWork, moveWork, readRawEvents } from '../../src/state/store.mjs';
 import { readEvents } from '../../src/state/events.mjs';
-import { checkEventsJsonlContiguity } from '../../src/state/events-jsonl-contiguity.mjs';
 import { checkTruncationGuard, readGuardMark, writeGuardMark, runOpportunisticMainCheckoutChecks } from '../../src/state/events-jsonl-truncation-guard.mjs';
+
+// Local seq-contiguity assertion helper -- this test only needs it to prove
+// a real event log has no gaps/duplicate `seq` values; it does not exercise
+// the retired `events-jsonl-contiguous` doctor check or its band-aid module
+// (both retired: seq stopped being cross-writer identity once Tầng A T1
+// gave every writer its own per-writer file).
+function checkSeqContiguity(logPath) {
+  const raw = fs.readFileSync(logPath, 'utf8');
+  const lines = raw.split('\n').filter((l) => l !== '');
+  const seenSeq = new Map();
+  const duplicates = [];
+  const gaps = [];
+  let prevSeq = null;
+  for (const line of lines) {
+    const parsed = JSON.parse(line);
+    const seq = parsed.seq;
+    if (typeof seq !== 'number') continue;
+    if (seenSeq.has(seq)) duplicates.push(seq);
+    else seenSeq.set(seq, true);
+    if (prevSeq !== null && seq !== prevSeq + 1 && seq !== prevSeq) gaps.push(seq);
+    prevSeq = seq;
+  }
+  return { ok: duplicates.length === 0 && gaps.length === 0, duplicates, gaps };
+}
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const CLAIM_PORT_MJS = path.join(REPO_ROOT, 'src/runner/claim-port.mjs');
@@ -44,7 +67,7 @@ test('explicitly rules out Root Cause A (refreshView outside lock) and Root Caus
     addWork(fgosDir, { id: 'item-rc', title: 'Root Cause Check', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
     moveWork(fgosDir, { id: 'item-rc', to: 'doing', expectedStatus: 'todo', role: 'session' });
 
-    const contiguity = checkEventsJsonlContiguity(logPath);
+    const contiguity = checkSeqContiguity(logPath);
     assert.equal(contiguity.ok, true, 'Root Cause A & B ruled out: event log must have no gaps or duplicates');
     assert.deepEqual(contiguity.gaps, []);
     assert.deepEqual(contiguity.duplicates, []);
@@ -115,11 +138,11 @@ process.exit(0);
     // mode -- so each landed its own work.move in its own per-writer file
     // under `.fgos/events/`, never baseline-0 (`logPath`, frozen/empty here).
     // readRawEvents(fgosDir) is the one door that reads all of them (TA-D7
-    // total order, deduped); contiguity is checked per-file, same precedent
-    // src/setup/registrations.mjs's checkEventsJsonlContiguous already uses
-    // (seq is only ever meaningful within one writer's own file post-cutover).
+    // total order, deduped); contiguity is checked per-file -- seq is only
+    // ever meaningful within one writer's own file post-cutover, never
+    // combined across files.
     const events = readRawEvents(fgosDir);
-    const contiguity = checkEventsJsonlContiguity(logPath);
+    const contiguity = checkSeqContiguity(logPath);
     assert.equal(contiguity.ok, true, 'baseline-0 contiguity check must pass with 0 gaps and 0 duplicates');
     assert.deepEqual(contiguity.gaps, []);
     assert.deepEqual(contiguity.duplicates, []);
@@ -127,7 +150,7 @@ process.exit(0);
     const eventsDirPath = path.join(fgosDir, 'events');
     const writerFileNames = fs.readdirSync(eventsDirPath).filter((f) => f.endsWith('.jsonl'));
     for (const name of writerFileNames) {
-      const writerContiguity = checkEventsJsonlContiguity(path.join(eventsDirPath, name));
+      const writerContiguity = checkSeqContiguity(path.join(eventsDirPath, name));
       assert.equal(writerContiguity.ok, true, `per-writer file ${name} contiguity check must pass with 0 gaps and 0 duplicates`);
     }
 

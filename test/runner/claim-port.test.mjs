@@ -137,23 +137,72 @@ test('claimWork throws a categorized ClaimError (not an uncategorized crash) whe
   );
 });
 
-test('claimWork throws a categorized ClaimError (unreadable/corrupt lock content, not a hook-shaped string-identity record) — genuinely ambiguous, fails closed', () => {
+// tsk-2l8: a lock file with unreadable/corrupt content (not a hook-shaped
+// string-identity record) used to fail closed immediately, forcing a
+// person to run `/fgOS:unlock` before retrying. claimWork now mirrors that
+// verb's own `forceReclaimAmbiguousLock` self-heal (main-checkout-lock.mjs:
+// 655-676, its own re-read-before-unlink TOCTOU guard) inline: a ONE-OFF
+// unparseable write like this never gets rewritten, so the reclaim-and-retry
+// clears it and the claim proceeds normally in the same call.
+test('claimWork self-heals a transiently-corrupt lock (unreadable content, not a hook-shaped string-identity record) instead of failing lock-ambiguous', () => {
   const { repoRoot, dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, LOCK_FILE), 'not valid json');
 
-  assert.throws(
-    () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot }),
-    (err) => {
-      assert.ok(err instanceof ClaimError);
-      assert.equal(err.code, 'lock-ambiguous');
-      assert.equal(err.category, 'lock-timeout');
-      // tsk-6c2: a retry wrapper checking `err.code === 'lock-held'` must
-      // never mistake this for a retryable state.
-      assert.equal(err.remainingTtlMs, undefined);
-      return true;
-    },
-  );
+  const claim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
+
+  assert.equal(claim.id, 'item-a');
+  assert.equal(claim.to, 'doing');
+});
+
+// The reclaim-and-retry above only ever gets ONE retry (mirroring `unlock`'s
+// own single forceReclaimAmbiguousLock call, never a loop) — content that is
+// STILL unparseable on that second attempt (persistently corrupt, e.g. some
+// other process keeps rewriting garbage into the lock file, not a transient
+// race with a legitimate writer) must still fail closed exactly like before
+// this item. Simulated by patching fs.linkSync so tryAcquireOnce's own
+// create-path (writeAtomicCreate) always sees the lock path as already
+// occupied — forcing it down the read-and-parse fallback on BOTH attempts —
+// and fs.readFileSync so that fallback always reads back corrupt content,
+// even after forceReclaimAmbiguousLock unlinks the real file in between.
+test('claimWork throws a categorized ClaimError when the lock content is still ambiguous after one reclaim-and-retry — genuinely ambiguous, fails closed', () => {
+  const { repoRoot, dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const lockPath = path.join(dir, LOCK_FILE);
+  fs.writeFileSync(lockPath, 'not valid json');
+
+  const originalReadFileSync = fs.readFileSync;
+  const originalLinkSync = fs.linkSync;
+  fs.readFileSync = function patchedRead(target, ...rest) {
+    if (target === lockPath) return 'still not valid json';
+    return originalReadFileSync.call(fs, target, ...rest);
+  };
+  fs.linkSync = function patchedLink(existingPath, newPath, ...rest) {
+    if (newPath === lockPath) {
+      const err = new Error('EEXIST: file already exists, link');
+      err.code = 'EEXIST';
+      throw err;
+    }
+    return originalLinkSync.call(fs, existingPath, newPath, ...rest);
+  };
+
+  try {
+    assert.throws(
+      () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot }),
+      (err) => {
+        assert.ok(err instanceof ClaimError);
+        assert.equal(err.code, 'lock-ambiguous');
+        assert.equal(err.category, 'lock-timeout');
+        // tsk-6c2: a retry wrapper checking `err.code === 'lock-held'` must
+        // never mistake this for a retryable state.
+        assert.equal(err.remainingTtlMs, undefined);
+        return true;
+      },
+    );
+  } finally {
+    fs.readFileSync = originalReadFileSync;
+    fs.linkSync = originalLinkSync;
+  }
 });
 
 // tsk-2zv: a claim-lock §3b release (decompose.mjs's releaseClaimOnExecuting)

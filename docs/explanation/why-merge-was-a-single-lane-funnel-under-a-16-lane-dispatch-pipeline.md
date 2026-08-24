@@ -2,7 +2,7 @@
 type: explanation
 title: Why merge was a single-lane funnel under a 16-lane dispatch pipeline
 tags: [merge, throughput, iron-law, main-checkout-lock, clean-tree]
-source_capture_ids: [tsk-51m]
+source_capture_ids: [tsk-51m, tsk-xyr]
 authoritative_for: why fgOS merge throughput bottlenecked despite parallel dispatch, and the merge target-ref queue design that replaced a hard concurrency cap
 ---
 # Why merge was a single-lane funnel under a 16-lane dispatch pipeline
@@ -91,6 +91,21 @@ still serialize, because that's the only pair that can actually collide.
 This is the direct answer to cause 1 above: the lock stopped being
 "one lock, one repo" and became "one lock per thing that can actually
 conflict."
+
+`tsk-xyr` is the item that carried D7 to landed code. Its own scout
+evidence pinpointed where the old repo-wide lock actually cost the most:
+leaf-to-root merges were already isolated onto a **detached** worktree at
+the tip of `fgw/<rootId>` (`bin/fgos.mjs:3145`, via
+`withMergeEphemeralWorktree`, landing with `git branch -f` — a comment at
+`:3110-3117` even says "never the human's own main checkout"), yet the
+very next line, `:3150`, still passed `lockRoot: repoRoot` — claiming the
+one shared main-checkout lock for a merge that never touched that
+checkout at all. Two leaves under different roots contended for nothing
+real. `src/runner/write-queue.mjs`'s own docstring ("a sequential async
+write-queue primitive") confirmed it was never a per-root mutex either,
+despite an older comment nearby claiming otherwise — overlap was only
+ever *detected* after the fact (the CAS guard from `tsk-46a`), never
+*prevented*, until this item's target-ref lock closed that gap directly.
 
 A companion decision (D5/D6) sequenced the work itself: the target-ref
 queue (§E) goes first, with three small fixes running in parallel

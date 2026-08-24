@@ -1,6 +1,6 @@
 ---
 type: explanation
-source_capture_ids: [tsk-6bx, tsk-1ds, tsk-1vi]
+source_capture_ids: [tsk-6bx, tsk-1ds, tsk-1vi, tsk-3i8]
 ---
 
 # Why gate-bypass is shaped the way it is
@@ -312,3 +312,36 @@ verb from a scratch tmp directory that has no local state modules,
 simulating a real global-install consumer's repo, and asserts it returns
 the same answer `canAutoApprove` would give directly — proof against the
 actual failure condition, not just proof the verb exists.
+
+## A bare-word marker scan created a perverse incentive to obfuscate (`tsk-3i8`)
+
+`hasOpenItems`'s TODO/FIXME check ran over the *whole* artifact text
+before it ever read the artifact's own "Outstanding questions" section —
+so any artifact whose prose merely contains the literal token `todo`
+failed the check, regardless of what the section actually said.
+
+This is unavoidable for exactly the class of item most likely to write
+about the work FSM itself: the status vocabulary includes `todo` as a
+real status name. Reproduced directly on `tsk-3dt` (during the
+worker-slot batch, `docs/explanation/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md`):
+a plan explaining that a refused claim correctly leaves an item at
+`todo` rather than orphaning it at `doing` could not auto-approve, purely
+because the word appeared in the explanation, forcing an unnecessary
+human round trip. Confirmed minimal: the identical plan text with
+`None` under Outstanding questions returns `true`; the same text with
+that one word spelled differently returns `false`.
+
+**Why a false positive here is worse than the usual "gate is too
+strict."** The gate's entire purpose is to force honest disclosure of
+open items. A marker scan matching a bare word anywhere in prose makes
+the *cheapest* way to pass the check "reword the document to dodge the
+scanner" — exactly the behavior the gate exists to prevent, and a real
+incentive the next agent (or the same one, next time) is likely to take
+once it notices the check is beatable by wording alone.
+
+**The landed fix**: the marker regex now requires `TODO`/`FIXME` to be
+immediately followed by a colon or an open parenthesis — the shape a
+genuine code marker actually reads (`TODO:`, `FIXME(name):`) — instead of
+matching the bare word anywhere in ordinary prose. A plan that merely
+*discusses* the `todo` status by name, with no real open-item marker,
+now reads correctly.

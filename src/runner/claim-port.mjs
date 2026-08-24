@@ -11,7 +11,7 @@ import { moveWork, addOutcome, addDecision, readRawEvents, FsmError } from '../s
 import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { visitCount } from './anti-loop.mjs';
-import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs, HOLDER_PID_ENV_VAR } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, forceReclaimAmbiguousLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs, HOLDER_PID_ENV_VAR } from './main-checkout-lock.mjs';
 import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
@@ -102,7 +102,22 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
   // staleness. Omitting ttlMs here (the original tsk-53f wiring did) makes
   // that record read as AMBIGUOUS forever once the hook is active,
   // permanently deadlocking every take/pick after the very first commit.
-  const lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
+  let lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
+  if (lockResult.status === AMBIGUOUS) {
+    // tsk-2l8: AMBIGUOUS means the lock file's content is unparseable, not
+    // that a live holder disagrees -- the same shape verb `unlock` already
+    // self-heals via forceReclaimAmbiguousLock (its own re-read-before-unlink
+    // TOCTOU guard, main-checkout-lock.mjs:655-676), just as a separate
+    // manual command. Mirror that single reclaim-and-retry here so pick/take
+    // recovers in the same call instead of requiring a person to run
+    // `/fgOS:unlock` before retrying. A transient race (a live holder wrote a
+    // valid record between the first read and this call) surfaces below as
+    // whatever that fresh content actually is (HELD/ACQUIRED); only a
+    // SECOND consecutive AMBIGUOUS (content persistently unparseable) still
+    // fails closed.
+    forceReclaimAmbiguousLock(dir);
+    lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
+  }
   if (lockResult.status === HELD) {
     const ttlPart = lockResult.remainingTtlMs != null
       ? `, expires in ${formatLockDurationMs(lockResult.remainingTtlMs)}`

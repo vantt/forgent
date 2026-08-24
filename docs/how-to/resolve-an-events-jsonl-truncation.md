@@ -48,10 +48,19 @@ recovery — there is nothing to recover.
 
 3. **Re-baseline the guard's own mark**, once you have looked at and
    understood the break — this is a deliberate, human-run step, never an
-   automatic `doctor --fix` (unlike the sibling `events-jsonl-contiguous`
-   check, this one has no registered fix: silently auto-repairing would
-   erase the loud signal before anyone saw it, defeating the reason this
-   check exists):
+   automatic `doctor --fix` (this check has no registered fix: silently
+   auto-repairing would erase the loud signal before anyone saw it,
+   defeating the reason this check exists). There used to be a sibling
+   `events-jsonl-contiguous` doctor check/fix pair that did auto-fix its
+   own class of residue (duplicate/gapped `seq` after a union-merge); that
+   check was retired by `tsk-3tp` along with the `.gitattributes`
+   `merge=union` entry it protected and the underlying script
+   (`scripts/events-jsonl-contiguity.mjs`), once `.fgos/events.jsonl`
+   became a frozen baseline and `seq` stopped being cross-writer identity
+   (see `docs/explanation/events-jsonl-lost-update-race-under-concurrent-
+   session-writes.md`). It is no longer part of `fgos doctor`'s registry —
+   this truncation-guard check remains the only one in this area, and it
+   still has no fix:
 
    ```bash
    node scripts/events-jsonl-truncation-guard.mjs --advance .fgos/events.jsonl .fgos/events-jsonl.truncation-guard.json
