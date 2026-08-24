@@ -13,3 +13,12 @@
 # problem tsk-3wq/tsk-2xg already solved for the old layout.
 .fgos/events/*.jsonl merge=union
 
+# tsk-3tp (safety net): .fgos/events.jsonl is meant to be a frozen
+# post-sharding baseline (tsk-3ve/tsk-3tp-2), but some write paths still
+# append to it directly instead of a per-writer shard (a real, separately
+# tracked gap) -- keep merge=union here too so any further growth still
+# merges cleanly across branches instead of tripping fgos-write-rejected
+# on a real content-changing diff, same reasoning as tsk-3wq's original
+# rule for this exact file.
+.fgos/events.jsonl merge=union
+
