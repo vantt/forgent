@@ -48,6 +48,7 @@
     "src/install/coexist.mjs": "infra",
     "src/runner/recovery.mjs": "domain",
     "src/runner/anti-loop.mjs": "domain",
+    "src/runner/attestation-guard.mjs": "domain",
     "src/runner/claim-port.mjs": "infra",
     "src/runner/claim-liveness.mjs": "infra",
     "src/runner/lock-wait.mjs": "infra",

@@ -2,6 +2,7 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+import { appendEvent } from '../../src/state/events.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -1218,4 +1219,32 @@ test('return --worker-verified-sha falls through to real verify when sha is stal
   // Should fall through to real verify (which is `exit 1`), so return moves item to blocked
   const view = stateView(cwd);
   assert.equal(view.work['worker-stale-item'].status, 'blocked');
+});
+
+test('tsk-34o5: return halts and parks item blocked when attestation diverges', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'return-attest-diverged', { verify: 'exit 0' });
+
+  const pickResult = run(cwd, ['pick', '--id', 'return-attest-diverged']);
+  assert.equal(pickResult.status, 0);
+  const pickData = envelopeData(pickResult.stdout);
+
+  fs.writeFileSync(path.join(pickData.worktree.path, 'proof.txt'), 'work\n');
+  execFileSync('git', ['add', '-A'], { cwd: pickData.worktree.path });
+  execFileSync('git', ['commit', '-q', '-m', 'work commit'], { cwd: pickData.worktree.path });
+
+  const baseCommit = gitAtCwd(cwd, ['rev-parse', 'HEAD']).trim();
+  appendEvent(path.join(cwd, '.fgos', 'events.jsonl'), {
+    type: 'executor.dispatch',
+    payload: { id: 'return-attest-diverged', executorId: 'cli', baseCommit, headRef: 'main' },
+  });
+
+  const result = run(cwd, ['return', 'return-attest-diverged']);
+  assert.notEqual(result.status, 0, 'return should exit non-zero');
+  assert.match(result.stderr, /attestation mismatch/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['return-attest-diverged'].status, 'blocked');
+  assert.equal(view.frictions['return-attest-diverged'][0].errorClass, 'attestation-mismatch');
 });

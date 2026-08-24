@@ -2,6 +2,7 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+import { appendEvent } from '../../src/state/events.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -1581,5 +1582,28 @@ test('approve --github --pr --trust-dir WITHOUT --dir is a no-op -- still refuse
   } finally {
     removeAdHocWorktree(cwd, worktreePath);
   }
+});
+
+test('approve of a runner item halts with attestation-mismatch when baseCommit/headRef diverges', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-attest-diverged', { verify: 'true' });
+
+  const baseCommit = gitAtCwd(cwd, ['rev-parse', 'HEAD']).trim();
+  appendEvent(path.join(cwd, '.fgos', 'events.jsonl'), {
+    type: 'executor.dispatch',
+    payload: { id: 'approve-attest-diverged', executorId: 'cli', baseCommit, headRef: 'main' },
+  });
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'approve-attest-diverged']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
+  assert.equal(envelopeData(result.stdout).reason, 'attestation-mismatch');
+
+  assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged');
+  const view = stateView(cwd);
+  assert.equal(view.work['approve-attest-diverged'].status, 'blocked');
+  assert.equal(view.frictions['approve-attest-diverged'][0].errorClass, 'attestation-mismatch');
 });
 

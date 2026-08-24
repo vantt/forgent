@@ -93,6 +93,7 @@ import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
 import { resolvePlan } from '../intake/plan.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
+import { checkDispatchAttestation } from './attestation-guard.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 
 // errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
@@ -394,6 +395,18 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
     const branch = branchNameFor(id);
     const facts = branchFacts(repoRoot, branch);
     const hasCommit = facts.exists && facts.aheadCount > 0;
+
+    const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
+    if (!attestation.ok) {
+      if (dryRun) {
+        resolutions.push({ id, planned: 'blocked' });
+      } else {
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: attestation.reason, role: 'runner' });
+        log(`fgos-runner: reaped stale doing "${id}" -> blocked (${attestation.reason}: ${attestation.detail})`);
+        resolutions.push({ id, to: 'blocked', reason: attestation.reason });
+      }
+      continue;
+    }
 
     if (dryRun) {
       resolutions.push({ id, planned: hasCommit ? 'verify-then-resolve' : 'blocked' });
