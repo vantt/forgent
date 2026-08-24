@@ -2,7 +2,7 @@
 type: explanation
 title: Why a stale worktree index produced a wrong Iron Law test count
 tags: [iron-law, evidence, worktree, addendum]
-source_capture_ids: [tsk-5x4, tsk-2u5, tsk-2u5-1, tsk-1d7, tsk-jgs, tsk-jg4]
+source_capture_ids: [tsk-5x4, tsk-2u5, tsk-2u5-1, tsk-1d7, tsk-jgs, tsk-jg4, tsk-2cl]
 authoritative_for: why the tsk-51m root Iron Law evidence file recorded a test count lower than any of its own children, why the fix is an addendum rather than an edit, and the general stale-worktree-index guard this incident led to
 ---
 # Why a stale worktree index produced a wrong Iron Law test count
@@ -189,6 +189,32 @@ of silently discarding the signal. A fuller fix (write a marker before
 the reset so a resumed run can tell "reset done, reapply pending" apart
 from a genuinely clean state) was named as a further option but not what
 this item locked in.
+
+## Follow-up: the one fail-open path in an otherwise fail-closed guard (`tsk-2cl`)
+
+A third finding from the same post-merge review (`c9c71534`):
+`.githooks/pre-commit`'s `staleWorktreeIndexRefusal` silently returned
+`null` — no refusal, commit proceeds unguarded — if `git rev-parse
+<branch>` failed to read the current branch tip, unlike every other
+unreadable/ambiguous state the same function handles (an unreadable
+reflog refuses; "not an ancestor" refuses). The code comment at that
+branch explicitly accepted this as "branch ref unreadable — not this
+guard's failure mode," but it was the one fail-*open* path in an
+otherwise deliberately fail-*closed* design (D2: "not an ancestor, or
+reflog unreadable → refuse, fail closed").
+
+The precondition is narrow: the same branch name had already been read
+successfully via `git symbolic-ref` moments earlier in the same
+function call, so `git rev-parse <branch>` failing right after implies a
+transient ref-read race or on-disk ref corruption. But if it happens,
+the exact silent-revert hazard this whole guard exists to prevent
+(the original `2cb6519e` incident) could recur undetected in that narrow
+window.
+
+**Fix**: treat an unreadable branch tip the same as an unreadable
+reflog — refuse with a fail-closed message — closing the one asymmetric
+branch in the guard's own logic rather than leaving it as a documented,
+accepted exception.
 
 ## The shared lesson
 
