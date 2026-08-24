@@ -1223,6 +1223,7 @@ test('sync-root outcome guard catches merge-failed-unclassified and records unha
   assert.notEqual(data.outcome, 'synced', 'must never report success for an outcome it does not recognize');
   assert.equal(data.outcome, 'blocked');
   assert.equal(data.reason, 'merge-failed-unclassified');
+  assert.ok(data.error?.stderr || data.error?.message, 'CLI response must carry real git error details (tsk-3tv)');
 
   assert.equal(gitHead(cwd), headBefore, 'main must be unchanged');
   assert.throws(
@@ -1237,6 +1238,11 @@ test('sync-root outcome guard catches merge-failed-unclassified and records unha
   assert.ok(
     frictions.some((f) => f.errorClass === 'sync-root-unhandled-outcome'),
     'frictions must contain an entry with errorClass === "sync-root-unhandled-outcome"',
+  );
+  const unhandledFriction = frictions.find((f) => f.errorClass === 'sync-root-unhandled-outcome');
+  assert.ok(
+    unhandledFriction.detail.includes(data.error.stderr || data.error.message),
+    'friction detail must carry real git error text/stderr (tsk-3tv)',
   );
 
   const lines = eventLines(cwd);

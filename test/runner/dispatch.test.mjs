@@ -4877,6 +4877,89 @@ test('fanoutBatchExecutorCli: real end-to-end out-of-process fire -- pick/execut
   assert.equal(view.work.cand1.status, 'awaiting-approval');
 });
 
+test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlapping execution windows', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const logFile = path.join(dir, 'timestamps.jsonl');
+  const scriptPath = path.join(dir, 'timed-committing-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import { execFileSync } from 'node:child_process';
+    import fs from 'node:fs';
+
+    const start = Date.now();
+    // 800ms (widened from 200ms, tsk-5v3 flake): a CPU busy-wait, not a
+    // sleep, so under real contention from this repo's own full test
+    // suite running many other subprocess-heavy tests concurrently, the
+    // OS scheduler can delay or preempt one candidate's spin loop enough
+    // that a short window fails to overlap the other's even though both
+    // were genuinely dispatched concurrently -- observed flaking under
+    // full-suite load, passing reliably in isolation. A longer window
+    // gives real scheduling jitter more margin to still produce a
+    // provable overlap.
+    const until = Date.now() + 800;
+    while (Date.now() < until) { /* artificial delay */ }
+    execFileSync('git', ['commit', '--allow-empty', '-m', 'fake work'], { stdio: 'ignore' });
+    const end = Date.now();
+
+    fs.appendFileSync(${JSON.stringify(logFile)}, JSON.stringify({ start, end, pid: process.pid }) + '\\n');
+    process.stdout.write(JSON.stringify({ ok: true }));
+    process.exit(0);
+    `,
+  );
+
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  addWork(fgosDir, {
+    id: 'cand1',
+    title: 'Candidate 1',
+    kind: 'task',
+    status: 'todo',
+    domain: 'coding',
+    stage: 'executing',
+    deps: [],
+    refs: [],
+    risk: 'light',
+    verify: 'true',
+  });
+  addWork(fgosDir, {
+    id: 'cand2',
+    title: 'Candidate 2',
+    kind: 'task',
+    status: 'todo',
+    domain: 'coding',
+    stage: 'executing',
+    deps: [],
+    refs: [],
+    risk: 'light',
+    verify: 'true',
+  });
+
+  const result = await fanoutBatchExecutorCli(['cand1', 'cand2'], { repoRoot, hasLiveTaskAccess: false });
+
+  assert.equal(result.fired.length, 2);
+  assert.equal(result.fired[0].status, 0);
+  assert.equal(result.fired[1].status, 0);
+
+  const lines = fs.readFileSync(logFile, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  assert.equal(lines.length, 2);
+
+  // Assert execution windows overlap: max(start1, start2) < min(end1, end2)
+  const [t1, t2] = lines;
+  const overlapStart = Math.max(t1.start, t2.start);
+  const overlapEnd = Math.min(t1.end, t2.end);
+  assert.ok(
+    overlapStart < overlapEnd,
+    `Expected execution windows to overlap, but candidate 1: [${t1.start}, ${t1.end}] and candidate 2: [${t2.start}, ${t2.end}]`,
+  );
+});
+
 // --- resolveAgentTypeForWork (D20/D22 wiring, review finding H1, tsk-397) ---
 // DOMAINS.coding is a fixed, module-load-time registry (not injectable per
 // call), so these fixtures write a real domains/coding/task-specs/
