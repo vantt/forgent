@@ -19,6 +19,7 @@ import {
   abortMergeIfPossible,
   formatFgosWriteRejectedDetail,
   detectPostLandDrift,
+  performCatchUp,
   MergeError,
 } from '../../src/runner/merge.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
@@ -1671,6 +1672,85 @@ test('mergeRunnerItem still refuses a non-union .fgos/ path that auto-merges cle
   assert.deepEqual(result.paths, [configRelPath.split(path.sep).join('/')]);
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort');
+});
+
+// tsk-tr9: a worker branch (`fgw/<id>`) that at some point in its history
+// recorded a DELETION of a merge=union-covered `.fgos/` shard (e.g. a
+// prior manual `git rm --cached` recovery after some earlier, unrelated
+// conflict) raises a REAL git conflict — modify/delete, never auto-
+// resolved by the `merge=union` driver, which only ever resolves
+// modify/modify text conflicts — the moment the SAME session's own
+// subsequent event-append (an ordinary return/approve/catchup elsewhere)
+// grows that exact shard on the other side. Confirmed empirically before
+// this fix: `performCatchUp` returned `outcome: 'conflict'` and
+// `mergeRunnerItem` returned `outcome: 'conflict'` for byte-identical
+// repo states — a false conflict manufactured entirely by the calling
+// session's own writes to its own shard, not a real content dispute
+// (neither side has any legitimate claim over the OTHER's `.fgos/`
+// state — ADR0020). `resolveFgosOnlyConflict` (merge.mjs) now resolves it
+// automatically for both merge directions, so a stale branch like this
+// self-heals on its very next catch-up/approve instead of staying stuck
+// in the same manual-recovery loop every cycle.
+function seedStaleDeletedFgosBranch(repoRoot, shardRelPath) {
+  fs.mkdirSync(path.join(repoRoot, '.fgos', 'events'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, shardRelPath), '{"seq":1}\n');
+  const repoGitattributes = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.gitattributes'));
+  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), repoGitattributes);
+  git(repoRoot, ['add', '.gitattributes', shardRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .gitattributes and event shard']);
+
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  git(repoRoot, ['checkout', 'fgw/demo-item']);
+
+  // An earlier merge/catch-up already pulled main's `.fgos/` state onto
+  // this branch (mirrored directly here as the end-state a prior cycle
+  // would have produced, rather than re-driving that whole cycle).
+  fs.appendFileSync(path.join(repoRoot, shardRelPath), '{"seq":2}\n');
+  git(repoRoot, ['add', shardRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'earlier merge landed main state onto the branch']);
+
+  // The established manual workaround: a session hits some unrelated
+  // fgos-write-rejected/conflict and "fixes" it by stripping `.fgos` back
+  // out of the branch, then commits that deletion.
+  git(repoRoot, ['rm', '-r', '--cached', '--ignore-unmatch', '--', '.fgos']);
+  fs.rmSync(path.join(repoRoot, '.fgos'), { recursive: true, force: true });
+  git(repoRoot, ['commit', '-q', '-m', 'manual workaround: strip stray .fgos from worker branch']);
+
+  git(repoRoot, ['checkout', 'main']);
+
+  // The calling session's own subsequent event-append grows the SAME
+  // shard on main — the write that reopens the divergence.
+  fs.appendFileSync(path.join(repoRoot, shardRelPath), '{"seq":3}\n');
+  git(repoRoot, ['add', shardRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main grows its own shard further']);
+}
+
+test('performCatchUp resolves a stale deleted-.fgos-shard branch cleanly instead of a false modify/delete conflict (tsk-tr9 regression)', async () => {
+  const repoRoot = initRepo();
+  const shardRelPath = path.join('.fgos', 'events', 'writer-a-1000.jsonl');
+  seedStaleDeletedFgosBranch(repoRoot, shardRelPath);
+  const item = makeItem({ id: 'demo-item', verify: 'test -f produced.txt' });
+
+  const result = await performCatchUp(repoRoot, 'demo-item', item, 'main', null);
+  assert.equal(result.outcome, 'merged', 'catch-up must resolve the false .fgos conflict, not report a real one');
+});
+
+test('mergeRunnerItem resolves a stale deleted-.fgos-shard branch cleanly instead of a false modify/delete conflict (tsk-tr9 regression)', async () => {
+  const repoRoot = initRepo();
+  const shardRelPath = path.join('.fgos', 'events', 'writer-a-1000.jsonl');
+  seedStaleDeletedFgosBranch(repoRoot, shardRelPath);
+  const item = makeItem({ id: 'demo-item', verify: 'test -f produced.txt' });
+  const mainShardBefore = fs.readFileSync(path.join(repoRoot, shardRelPath), 'utf8');
+
+  const result = await mergeRunnerItem(repoRoot, item);
+  assert.equal(result.outcome, 'merged', 'approve must resolve the false .fgos conflict, not report a real one');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
+  assert.equal(
+    fs.readFileSync(path.join(repoRoot, shardRelPath), 'utf8'),
+    mainShardBefore,
+    'main\'s own .fgos state must land completely unaffected by the stale branch',
+  );
+  assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
 // --- withMergeEphemeralWorktree's CAS guard (tsk-46a) ---------------------

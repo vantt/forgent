@@ -1173,6 +1173,62 @@ function isMergeUnionPath(repoRoot, relPath) {
   return output.trim().endsWith(': union');
 }
 
+// tsk-tr9: extends tsk-4gi's own restore-then-recheck protection (just
+// above, only ever reached when `git merge` stages the conflicting
+// `.fgos/` path CLEANLY via its `merge=union` driver) to the case `git
+// merge` itself THROWS a genuine conflict on that same kind of path. A
+// `merge=union` driver never resolves a MODIFY/DELETE — deletion is never
+// handled by a content-merge driver, union or otherwise, regardless of
+// attribute — so a `.fgos/` shard one side's own history happens to
+// record as deleted (a stale worker branch carrying an old manual
+// `git rm --cached` recovery from a PRIOR conflict, or any other cause)
+// raises a REAL git conflict against the other side's still-growing copy
+// of that same path — not a genuine content dispute, since a worker
+// branch has no legitimate claim over `.fgos/` state at all (ADR0020) and
+// `target`'s own copy is always the one to trust either merge direction
+// runs this against (`mergeRunnerItemLocked`'s branch-into-main, or
+// `performCatchUp`'s target-into-branch).
+//
+// Resolves every conflicted path by restoring it to `keepRef`'s own
+// committed version (or removing it if `keepRef` never had it at all,
+// e.g. a path only `target` ever introduced) — but ONLY when EVERY
+// conflicted path in this merge is under `.fgos/` AND actually declared
+// `merge=union` in `.gitattributes`; a single non-`.fgos/` conflicted
+// path, or a `.fgos/` path without that attribute, leaves the conflict
+// completely untouched and returns `false` — the caller must still treat
+// it as a genuine, unresolved conflict (identical restriction to
+// `isMergeUnionPath`'s own gate above, for the identical reason: never
+// silently discard a real, non-append-only `.fgos/` write).
+function resolveFgosOnlyConflict(repoRoot, keepRef) {
+  const conflictedPaths = git(repoRoot, ['diff', '--name-only', '--diff-filter=U'])
+    .split('\n')
+    .filter((p) => p !== '');
+  if (conflictedPaths.length === 0) {
+    return false;
+  }
+  const allFgosUnion = conflictedPaths.every((p) => (p === '.fgos' || p.startsWith('.fgos/')) && isMergeUnionPath(repoRoot, p));
+  if (!allFgosUnion) {
+    return false;
+  }
+  for (const conflictedPath of conflictedPaths) {
+    try {
+      git(repoRoot, ['checkout', keepRef, '--', conflictedPath]);
+    } catch {
+      // `keepRef` never had this path — the resolved state is "absent".
+      try {
+        git(repoRoot, ['rm', '-f', '--', conflictedPath]);
+      } catch {
+        // Already gone from the index on this side of the conflict too
+        // (a DELETE/DELETE shape) — nothing left to do for this path.
+      }
+    }
+  }
+  const stillUnmerged = git(repoRoot, ['diff', '--name-only', '--diff-filter=U'])
+    .split('\n')
+    .filter((p) => p !== '');
+  return stillUnmerged.length === 0;
+}
+
 async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot = repoRoot } = {}) {
   // tsk-3yl D1: still run the real goal-check here, even though nothing
   // will be staged/committed — every 'merged' outcome must carry a real,
@@ -1259,6 +1315,14 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
     }
     if (resolved) {
       selfResolved = true;
+    } else if (!resolveErr && mergeHeadExists(repoRoot) && resolveFgosOnlyConflict(repoRoot, 'HEAD')) {
+      // tsk-tr9: every conflicted path was confined to a `.fgos/` shard
+      // this repo declares `merge=union` for, and has now been restored to
+      // HEAD's (target's) own committed version — fall through to the
+      // commit path below exactly like a clean merge=union auto-resolution
+      // already does; the staged-`.fgos/`-path recheck further down never
+      // finds anything left to reject, since every such path here was just
+      // restored to HEAD's own content (no diff from HEAD at all).
     } else {
       // tsk-18a D1: MERGE_HEAD only exists when git actually staged a real
       // conflict -- captured BEFORE the abort below, which deletes it as a
@@ -1583,7 +1647,14 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
     try {
       execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
     } catch {
-      conflicted = true;
+      // tsk-tr9: `target` (main) is always the side to trust for any
+      // `.fgos/` path — a worker branch has no legitimate claim over it at
+      // all (ADR0020). A conflict confined entirely to `.fgos/` paths
+      // `.gitattributes` declares `merge=union` for is resolved by taking
+      // `target`'s own committed version outright (see
+      // `resolveFgosOnlyConflict`'s own doc, just above `mergeRunnerItemLocked`) —
+      // never a genuine content dispute this call should abort and report.
+      conflicted = !resolveFgosOnlyConflict(ephemeral.path, target);
     }
 
     if (conflicted) {
