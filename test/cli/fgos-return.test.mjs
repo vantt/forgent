@@ -115,6 +115,7 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   assert.equal('settlements' in view, false, 'doing -> awaiting-approval never settles (D4: settlement belongs to the -> done edge)');
 });
 
+
 test('return (verify passes, main-source): a live main-checkout.lock recorded under THIS session\'s own identity is released early, instead of waiting out the TTL (tsk-45z D1/D2)', () => {
   const cwd = initGitCwd();
   const sessionId = 'tsk-45z-test-session-ok';
@@ -131,6 +132,7 @@ test('return (verify passes, main-source): a live main-checkout.lock recorded un
   assert.equal(envelopeData(result.stdout).to, 'awaiting-approval');
   assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock once verify passes and the item settles to proposed');
 });
+
 
 test('return (verify FAILS, main-source): a live own-identity lock is released too — settling to blocked is just as much "done with the checkout" as proposed (tsk-45z D1/D2)', () => {
   const cwd = initGitCwd();
@@ -149,6 +151,7 @@ test('return (verify FAILS, main-source): a live own-identity lock is released t
   assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock even when verify fails and the item settles to blocked');
 });
 
+
 test('return (main-source) never touches a DIFFERENT session\'s live lock — never a blind unlink (tsk-45z D2)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -166,6 +169,7 @@ test('return (main-source) never touches a DIFFERENT session\'s live lock — ne
   assert.equal(JSON.parse(fs.readFileSync(lockPath, 'utf8')).pid, 'tsk-45z-a-different-live-session');
 });
 
+
 test('return: a changed sensitive file outside the item\'s footprint surfaces a frozenJudgeHits advisory, and never blocks the return', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -182,6 +186,7 @@ test('return: a changed sensitive file outside the item\'s footprint surfaces a 
   assert.deepEqual(data.frozenJudgeHits, [{ file: 'package.json', rule: 'package manifest' }]);
 });
 
+
 test('return: a changed sensitive file DECLARED in the item\'s footprint is not a hit', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -196,6 +201,7 @@ test('return: a changed sensitive file DECLARED in the item\'s footprint is not 
   assert.equal(data.passed, true);
   assert.deepEqual(data.frozenJudgeHits, []);
 });
+
 
 // --- tsk-4hl (post-tsk-2ig independent review): footprintDiffHits wired
 // into `return` next to frozenJudgeHits -- broader (any changed file
@@ -223,6 +229,7 @@ test('return: a changed file outside the item\'s footprint surfaces a footprintD
   assert.ok(data.footprintDiffHits.some((hit) => hit.file === 'random-outside.txt'));
 });
 
+
 test('return: footprintDiffHits is empty when the item declares NO footprint at all (D5 absent-footprint exemption, same as footprintDiffHits\' own unit tests)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -235,6 +242,7 @@ test('return: footprintDiffHits is empty when the item declares NO footprint at 
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.deepEqual(envelopeData(result.stdout).footprintDiffHits, []);
 });
+
 
 test('return: a .fgos/* change bundled into the item\'s own commit (git add -A sweeping in take\'s own event-log write) is exempt from footprintDiffHits (tsk-x5r self-exempt)', () => {
   const cwd = initGitCwd();
@@ -344,6 +352,7 @@ test('return: a .fgos/gate-bypass.json change bundled into the item\'s own commi
   );
 });
 
+
 test('return: the item\'s own docs/history/<id>/iron-law-evidence.md is exempt from footprintDiffHits (tsk-4hl self-exempt, avoids self-flagging every Iron-Law-gated item)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -419,6 +428,7 @@ test('return refuses a dirty working tree (uncommitted changes) as validation, e
   assert.equal(stateView(cwd).work['pull-return-dirty'].status, 'doing');
 });
 
+
 test('return succeeds when a dirty file on cwd is UNRELATED to the item\'s own committed progress (tsk-598 D1/D2) — own-file-set scoping, not a whole-tree gate', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -436,6 +446,7 @@ test('return succeeds when a dirty file on cwd is UNRELATED to the item\'s own c
   assert.equal(stateView(cwd).work['pull-return-unrelated-dirty'].status, 'awaiting-approval');
   assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated uncommitted work\n', 'the unrelated dirty file must be left untouched, still uncommitted');
 });
+
 
 test('return still refuses when the SAME path the item committed is dirty again — a real conflict, tsk-598 D2, exit 4, item stays doing', () => {
   const cwd = initGitCwd();

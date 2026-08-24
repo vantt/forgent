@@ -178,6 +178,29 @@ core.
 file nào > ~30s. Ghi cả số trước lẫn số sau vào `docs/history/
 tsk-25b-test-wallclock-split/`.
 
+### Phase 5 — Chẻ lại lần hai (2026-08-24, D5)
+
+Sau khi merge main (item này đứng yên 50 commit từ 2026-08-11, main tăng
+2827→3818 test), cả `checks.test.mjs` (75→115 test) lẫn 9 file
+`test/cli/*.test.mjs` đã chẻ ở Phase 1–3 mọc lại quá ~30s vì main thêm test
+mới vào đúng những file đó. Chẻ lại lần hai bằng script cơ học
+(`/tmp/split-cli-file.mjs`, không commit vào repo — thuần thao tác một lần):
+tìm ranh giới mỗi `test(...)` bằng bộ quét ký tự thật (tôn trọng string/
+template literal/comment, không phải regex dòng), gom top-level
+`function`/`const` cần dùng chung (`moveRootToResolved`, `VALID_ASK_TEXT`)
+vào MỌI mảnh thay vì chỉ mảnh đầu, chia đều theo số test — không theo chủ đề
+(khác quy ước `fgos-help.test.mjs` gốc, đặt tên `fgos-<n>.test.mjs`
+với hậu tố số thứ tự để tiết kiệm thời gian).
+
+Trong lúc đo lại, phát hiện một race có thật ở `src/setup/skill-wrappers.mjs`
+(`assembleSkills` ghi không nguyên tử vào `PACKAGE_ROOT/.agents/skills` dùng
+chung giữa mọi process `fgos setup` test song song) — bị lộ ra thường xuyên
+hơn hẳn vì chẻ thêm file làm tăng số process `node --test` chạy song song.
+Sửa bằng copy-qua-tmp-rồi-rename (atomic) cộng lọc tmp file khỏi mọi
+`readdirSync` đọc chung thư mục đó — xem commit message cho chi tiết đầy đủ.
+Đây không phải hồi quy của item này nhưng được sửa luôn trong tsk-25b theo
+quyết định của người dùng, vì bị chính việc chẻ lại của item này làm lộ rõ.
+
 ### Các trường hợp đáng chứng minh
 
 - **Không mất test**: tổng số test sau = trước. Bắt bởi verify.
