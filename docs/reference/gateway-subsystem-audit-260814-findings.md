@@ -2,7 +2,7 @@
 type: reference
 title: Gateway subsystem audit findings (2026-08-14)
 tags: [audit, gateway, mcp, interface-daemon, code-review]
-source_capture_ids: [tsk-1zg, tsk-4uh, tsk-og6, tsk-4lf, tsk-1qe, tsk-1ah, tsk-5m1]
+source_capture_ids: [tsk-1zg, tsk-4uh, tsk-og6, tsk-4lf, tsk-1qe, tsk-1ah, tsk-5m1, tsk-4qf]
 authoritative_for: the 9 findings from the 2026-08-14 haiku-scan + fable code-review audit of fgOS's gateway subsystem (REST/RPC + MCP surface), and which work item tracks each
 ---
 # Gateway subsystem audit findings (2026-08-14)
@@ -23,7 +23,7 @@ audit reviewed. Each finding below was filed as its own work item.
 | `tsk-1qe` | medium | **Fixed.** MCP `execute`'s Rhai scripting engine had no operation/time limit and an unbounded print buffer — one `loop {}` script wedged a blocking thread forever. Fixed: the Rhai engine now bounds both operations and output. |
 | `tsk-1ah` | medium-low | **Fixed.** Argv flag injection: a user-supplied string beginning with `--` was reinterpreted by the CLI's own parser as a flag, since `parseArgs` had no `--` separator boundary. Fixed: the gateway now rejects dash-prefixed, argv-injection-shaped input outright rather than forwarding it into the CLI parser. |
 | `tsk-5m1` | medium-low | **Fixed.** The contract's `X-Fgos-Writer-Id`/`X-Fgos-Writer-Role` attribution headers were dead — the gateway never read them, and the CLI had no flag to forward them into. Fixed by removing the dead headers from the contract entirely, rather than building the unused forwarding path — no real consumer needed them. |
-| `tsk-4qf` | medium-low | Non-2xx responses aren't always the contract's `ErrorEnvelope` shape; auth failures are indistinguishable from validation errors; the yaml declares no consistent error schema. |
+| `tsk-4qf` | medium-low | **Fixed.** Non-2xx responses weren't always the contract's `ErrorEnvelope` shape; auth failures were indistinguishable from validation errors; the yaml declared no consistent error schema. Fixed together: the gateway's error envelope and auth-signal drift were corrected in one pass. |
 | `tsk-67gr` | low | The contract's `takeWork` role enum promises `runner` as a valid role; the CLI actually refuses it. |
 | `tsk-4r1` | low | `gateway.token`/`gateway.port` are registered nowhere in `fgos setup`'s config-merge or `fgos doctor`'s checks — the gateway's own error message points at config a doctor pass can't verify exists. |
 
