@@ -45,6 +45,8 @@ import {
   AMBIGUOUS,
   formatLockDurationMs,
 } from '../main-checkout-lock.mjs';
+import { checkoutDirtyPaths } from '../worktree.mjs';
+
 
 /**
  * Executor identifier for a work item's executing-stage dispatch (D3,
@@ -519,8 +521,21 @@ export async function executeExecutorCli(
       `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
     );
     const headBefore = captureHeadSha(cwd);
+    const dirtyBefore = checkoutDirtyPaths(root, cwd);
     const result = await adapterFn({ command, args }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
     const headAfter = captureHeadSha(cwd);
+    const dirtyAfter = checkoutDirtyPaths(root, cwd);
+    let lostUncommittedPaths;
+    if (headBefore === headAfter && dirtyBefore.length > 0) {
+      const dirtyAfterSet = new Set(dirtyAfter);
+      const lost = dirtyBefore.filter((p) => !dirtyAfterSet.has(p));
+      if (lost.length > 0) {
+        lostUncommittedPaths = lost;
+        process.stderr.write(
+          `fgos: warning: uncommitted path(s) lost across out-of-process dispatch: ${lost.join(', ')}\n`,
+        );
+      }
+    }
     const stdoutStr = result && typeof result.stdout === 'string' ? result.stdout : '';
     const cleanStdout = stdoutStr.replace(/`+[\s\S]*?`+/g, '');
     const hasSignal = cleanStdout.includes('[DONE]') || cleanStdout.includes('[BLOCKED]');
@@ -530,6 +545,7 @@ export async function executeExecutorCli(
       ...result,
       ...(hasSignal ? {} : { outcome: 'unsignaled', headBefore, headAfter }),
       ...(isDone && headAfter ? { verifiedSha: headAfter } : {}),
+      ...(lostUncommittedPaths ? { lostUncommittedPaths } : {}),
       provider,
       command,
     };
