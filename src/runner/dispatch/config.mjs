@@ -297,6 +297,20 @@ export function ensureRunnerConfigForDir(dir) {
  * was retired at tsk-in1-2 D6: 0 live entries, had already caused a real
  * bug, per tsk-5tm D10.)
  */
+function validateExecutorEnvShape(env, label) {
+  if (!env || typeof env !== 'object' || Array.isArray(env)) {
+    throw new RunnerConfigError(`runner config (${label}) "env" must be an object mapping ENV_NAME to string when present.`);
+  }
+  for (const [k, v] of Object.entries(env)) {
+    if (typeof k !== 'string' || !k.trim()) {
+      throw new RunnerConfigError(`runner config (${label}) "env" key must be a non-empty string.`);
+    }
+    if (typeof v !== 'string') {
+      throw new RunnerConfigError(`runner config (${label}) "env.${k}" must be a string.`);
+    }
+  }
+}
+
 function validateExecutorShape(executor, label) {
   if (
     !executor ||
@@ -315,6 +329,9 @@ function validateExecutorShape(executor, label) {
     throw new RunnerConfigError(
       `runner config (${label}) "adapter" must be one of: ${Object.keys(EXECUTOR_ADAPTERS).join(', ')}.`,
     );
+  }
+  if (executor.env !== undefined) {
+    validateExecutorEnvShape(executor.env, label);
   }
 }
 
@@ -555,6 +572,9 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
   }
   if (executor.command !== undefined || executor.args !== undefined) {
     validateExecutorShape(executor, label);
+  }
+  if (executor.env !== undefined) {
+    validateExecutorEnvShape(executor.env, label);
   }
   if (executor.model !== undefined && (typeof executor.model !== 'string' || executor.model.length === 0)) {
     throw new RunnerConfigError(`runner config (${label}) "model" must be a non-empty string when present.`);

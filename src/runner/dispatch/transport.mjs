@@ -126,6 +126,17 @@ function captureDispatchAttestation(fgosDir, attestRoot) {
   };
 }
 
+export function resolveExecutorEnv(rawEnv, baseEnv = process.env) {
+  if (!rawEnv || typeof rawEnv !== 'object') return {};
+  const resolved = {};
+  for (const [k, v] of Object.entries(rawEnv)) {
+    if (typeof v === 'string') {
+      resolved[k] = v.replace(/\$\{([^}]+)\}/g, (_, varName) => baseEnv[varName] ?? '');
+    }
+  }
+  return resolved;
+}
+
 export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries, resolvedAgentType } = {}) {
   // Captured BEFORE resolveExecutorConfig, not after (D3) — cheap and
   // unconditional so the same call site works regardless of whether the
@@ -149,6 +160,7 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
   return {
     command: executor.command,
     args,
+    env: executor.env,
     adapter,
     provider: executor.provider ?? executor.command,
     baseCommit: attestation.baseCommit,
@@ -239,7 +251,7 @@ function killChildTree(child, signal) {
 }
 
 function cliSpawnAdapter(invocation, opts) {
-  const { command, args } = invocation;
+  const { command, args, env: rawEnv } = invocation;
   const { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
 
   const depth = currentDispatchDepth();
@@ -250,6 +262,8 @@ function cliSpawnAdapter(invocation, opts) {
       { workId, tier, model, depth },
     ));
   }
+
+  const resolvedEnv = resolveExecutorEnv(rawEnv);
 
   return new Promise((resolve, reject) => {
     // `stdin: 'ignore'` (never the 'pipe' default): an executor that checks
@@ -263,7 +277,7 @@ function cliSpawnAdapter(invocation, opts) {
       shell: false,
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: true,
-      env: { ...process.env, [DISPATCH_DEPTH_ENV]: String(depth + 1) },
+      env: { ...process.env, ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) },
     });
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
