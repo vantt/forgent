@@ -2,7 +2,7 @@
 type: explanation
 title: Why the herdr web dashboard became a static client of the gateway, not its own server
 tags: [herdr, web-dashboard, gateway, realignment, auth]
-source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w, tsk-5jr, tsk-4id, tsk-6d2, tsk-yo0]
+source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w, tsk-5jr, tsk-4id, tsk-6d2, tsk-yo0, tsk-54y]
 authoritative_for: why the herdr web dashboard's architecture moved from a standalone embedded webserver to a static bundle served by the existing gateway, and the security/lifecycle decisions that survived the realignment
 ---
 # Why the herdr web dashboard became a static client of the gateway, not its own server
@@ -49,7 +49,20 @@ cleanly from that one change:
   consequence and decided anyway) was never actually implemented before
   the realignment; the gateway had already merged with a hardcoded
   loopback-only bind. That decision stays correct as written; making the
-  real bind match it became its own separate item.
+  real bind match it became its own separate item, `tsk-54y`.
+
+**Landed** (`tsk-54y`): two ownerless gaps closed together, both on
+`gateway.rs`, after `tsk-k4v` (their prior would-be owner) closed without
+picking them up. **(a) CORS layer** — confirmed absent (`rg 'Cors|CorsLayer'`
+against `gateway.rs` returned zero hits) — needed because the web client
+is an independent static bundle, so cross-origin requests to the gateway
+are the normal case, not an edge case. **(b) Configurable bind address** —
+`gateway.rs` hardcoded `[127, 0, 0, 1]`, contradicting D7's own already-locked
+"default `0.0.0.0`, configurable, warn when non-loopback" — with the real
+motivating context being multiple machines on the same LAN/Tailscale
+network (the realignment's own D7) needing to reach the gateway from
+somewhere other than the host machine itself; loopback-only made that
+structurally impossible regardless of any other config.
 - **The frontend toolchain survived unchanged in shape, moved in
   destination.** Still vite + TypeScript under `herdr-plugin/web/`,
   bundled via `rust-embed` — but embedded into the *gateway* now, not a
