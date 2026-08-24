@@ -2,7 +2,7 @@
 type: explanation
 title: Why state/runner import edges were cut and CLI logic moved to a use-case layer
 tags: [architecture, module-boundary, state, runner, iron-law, cli]
-source_capture_ids: [tsk-49i-1, tsk-49i]
+source_capture_ids: [tsk-49i-1, tsk-49i, tsk-49i-2]
 authoritative_for: why fgOS cut specific state<->runner import edges, consolidated the Iron Law check, and started extracting bin/fgos.mjs's inline verb logic into a src/verbs/<domain>/<verb>.mjs use-case layer
 ---
 # Why state/runner import edges were cut and CLI logic moved to a use-case layer
@@ -59,7 +59,9 @@ call one use-case function → format the `fgos.v1` JSON envelope.
 
 That use-case layer lives at `src/verbs/<domain>/<verb>.mjs`, nested by
 domain from the start — this cluster lands its first slice at
-`src/verbs/merge/`. This does **not** imply migrating the 7 existing
+`src/verbs/merge/`. Landed (`tsk-49i-2`): the merge verb cluster's own
+use-case logic actually extracted into `src/verbs/merge/` — the first
+real slice built on this convention. This does **not** imply migrating the 7 existing
 files that already sit at roughly use-case rank
 (`runner/loop.mjs`, `intake/{discovery,plan,classify}.mjs`,
 `setup/{checks,registrations}.mjs`, `state/cursor.mjs`) — those stay
