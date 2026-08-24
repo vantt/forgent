@@ -323,6 +323,40 @@ test('return: the item\'s own docs/history/<id>/iron-law-evidence.md is exempt f
   assert.ok(data.footprintDiffHits.some((hit) => hit.file === 'random-outside.txt'), 'random-outside.txt must still be flagged');
 });
 
+test('return: the item\'s own docs/history/<feature>/RESEARCH.md (via docsRef) is exempt from footprintDiffHits (tsk-67o)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  const id = 'pull-return-research-exempt';
+  const docsRef = 'docs/history/some-feature-slug';
+  assert.equal(
+    run(cwd, [
+      'add', id,
+      '--title', 'X',
+      '--kind', 'task',
+      '--risk', 'light',
+      '--verify', 'test -f proof.txt',
+      '--footprint', 'proof.txt',
+      '--docs-ref', docsRef,
+      '--description', 'tsk-67o fixture description.',
+    ]).status,
+    0,
+  );
+  assert.equal(run(cwd, ['take', '--id', id]).status, 0);
+  commitFile(cwd, 'proof.txt');
+  fs.mkdirSync(path.join(cwd, docsRef), { recursive: true });
+  commitFile(cwd, `${docsRef}/RESEARCH.md`, '# research findings\n');
+  commitFile(cwd, 'random-outside.txt', 'not sensitive\n');
+
+  const result = run(cwd, ['return', id]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.ok(
+    !data.footprintDiffHits.some((hit) => hit.file === `${docsRef}/RESEARCH.md`),
+    'the research doc under docsRef must never appear in footprintDiffHits',
+  );
+  assert.ok(data.footprintDiffHits.some((hit) => hit.file === 'random-outside.txt'), 'random-outside.txt must still be flagged');
+});
+
 test('return refuses a dirty working tree (uncommitted changes) as validation, exit 4, item stays doing', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);

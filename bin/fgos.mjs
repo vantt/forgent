@@ -240,6 +240,18 @@ function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
 
+// tsk-67o: research findings doc written by fgos-researching during
+// discovery/planning/validating to docs/history/<feature>/RESEARCH.md -- an
+// item's footprint-sync convention (verify-sync-and-gap.md) requires syncing
+// plan.md into footprint, but never lists RESEARCH.md. footprintDiffHits would
+// otherwise flag it on nearly every item that runs fgos-researching. Narrowed to
+// this item's own item.docsRef directory when docsRef is set.
+function excludeDocsRefResearch(files, item) {
+  if (typeof item?.docsRef !== 'string' || !item.docsRef.trim()) return files;
+  const researchPath = normalizePath(path.posix.join(item.docsRef.replace(/\/+$/, ''), 'RESEARCH.md'));
+  return files.filter((f) => normalizePath(f) !== researchPath);
+}
+
 // `realpathOr` is worktree.mjs's `realpathOrSelf` (imported above, tsk-49i
 // D3): a bare fs.realpathSync would throw the moment any ONE registered
 // session's worktree directory is gone from disk (a crashed session
@@ -3186,7 +3198,7 @@ async function runVerb(verb, flags, positional, dir) {
           // absent-footprint exemption still applies inside footprintDiffHits
           // itself) — excludeIronLawEvidence strips this item's own mandatory
           // evidence doc before checking, see that helper's own comment.
-          const footprintDiff = footprintDiffHits(excludeFgosPaths(excludeIronLawEvidence(changed, id)), item.footprint);
+          const footprintDiff = footprintDiffHits(excludeDocsRefResearch(excludeFgosPaths(excludeIronLawEvidence(changed, id)), item), item.footprint);
           const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', branchHeadAtReturn: branchHead });
           addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
           return { id, from: 'doing', to: 'awaiting-approval', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
@@ -3317,7 +3329,7 @@ async function runVerb(verb, flags, positional, dir) {
         // STR63: advisory only (per cos) — a hit never blocks this return.
         const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
         // tsk-4hl: see excludeIronLawEvidence's own comment above.
-        const footprintDiff = footprintDiffHits(excludeFgosPaths(excludeIronLawEvidence(ownDiff, id)), item.footprint);
+        const footprintDiff = footprintDiffHits(excludeDocsRefResearch(excludeFgosPaths(excludeIronLawEvidence(ownDiff, id)), item), item.footprint);
         const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount } });
         // tsk-45z D1/D2: this session's own commits (landed straight on the
