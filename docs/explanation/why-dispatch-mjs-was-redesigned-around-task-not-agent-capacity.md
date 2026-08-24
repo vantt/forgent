@@ -2,7 +2,7 @@
 type: explanation
 title: Why dispatch.mjs was redesigned around task, not agent capacity
 tags: [dispatch, executor, capacity, task-dispatch-unification]
-source_capture_ids: [tsk-5tm-1, tsk-5tm-2]
+source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3]
 authoritative_for: why src/runner/dispatch.mjs's capacity/executor layer was redesigned around "task" as the unifying concept, and the 12 locked decisions behind that redesign
 ---
 # Why `dispatch.mjs` was redesigned around "task," not agent capacity
@@ -41,7 +41,13 @@ from both `capacities.<id>` config shape and the dispatch gate itself.
   `{command, args}` for the caller to run itself via Bash — even for
   cases the dispatch layer could perfectly well execute directly. This
   is the `execute` CLI subcommand's own origin
-  (`src/runner/dispatch/cli.mjs`'s `executeExecutorCli`).
+  (`src/runner/dispatch/cli.mjs`'s `executeExecutorCli`). Landed
+  (`tsk-5tm-3`): `node src/runner/dispatch.mjs execute <executorId>` —
+  the exact subcommand `_shared/executor-dispatch-fallback.md`'s Step B
+  and this repo's own coding-domain skills now call for the
+  `out-of-process` branch of `decide`, self-executing via
+  `EXECUTOR_ADAPTERS` instead of handing `{command, args}` back to the
+  caller.
 - **D6 — delete the `gather` capacity from `.fgos/config.json`.** It was
   the only cross-provider (agy/Gemini) dispatch path with no remaining
   architectural reason to exist — its own originating item's plan.md had
