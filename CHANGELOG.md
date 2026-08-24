@@ -47,6 +47,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `mergeRunnerItemLocked` (`src/runner/merge.mjs`) no longer refuses a
+  successful merge just because it left a `merge=union`-attributed
+  `.fgos/*.jsonl` path staged (e.g. `.fgos/events.jsonl`, its sharded
+  `.fgos/events/*.jsonl` files, or the diagnostic logs) — it now restores
+  that specific path to the target's own pre-merge committed content and
+  re-checks before deciding, instead of rejecting the merge outright. Any
+  other `.fgos/` path (not `merge=union`-attributed, or newly introduced
+  with no target-side version to restore to) still trips
+  `fgos-write-rejected` exactly as before; this closes the gap tsk-2xg
+  left open (its own `.gitattributes` `merge=union` half already
+  shipped, but the "restore-then-recheck after a clean auto-merge" half
+  never landed), which had been tripping `approve` on nearly every
+  long-lived branch under concurrent write load on `.fgos/*.jsonl`.
 - The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)
   now spawns every executor `detached: true` and kills its whole process
   GROUP on timeout/maxBuffer (`process.kill(-pid, ...)`), not just the
