@@ -2,7 +2,7 @@
 type: reference
 title: fgOS Gateway API (CTR010)
 tags: [gateway, openapi, contract, interface-daemon]
-source_capture_ids: [tsk-7l9-1, tsk-7l9-2]
+source_capture_ids: [tsk-7l9-1, tsk-7l9-2, tsk-7l9-3]
 authoritative_for: the fgOS gateway HTTP+JSON API contract — CTR010, its scope, and where the spec lives
 ---
 # fgOS Gateway API (CTR010)
@@ -53,3 +53,27 @@ against, since this is a brand-new file, so the Iron Law's
 failing-before proof neutered the real check in place instead, showed
 the auth test then fails, then restored the check and showed it passes
 again).
+
+## MCP surface: `search`/`execute`, Rust-native, not an embedded JS engine
+
+Following D9's Code Mode pattern (see
+`docs/explanation/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md`),
+the MCP surface exposes exactly two tools — `search` (queries this
+contract's own OpenAPI spec) and `execute` (runs generated code that
+calls the gateway's own routes/functions, still funneled through D7's
+one chokepoint, never fgOS core directly).
+
+**Locked** (`docs/history/fgos-gateway-mcp-surface/CONTEXT.md` D1):
+`execute`'s generated code is **Rust-native scripting, not an embedded JS
+engine** — a Rust-embeddable scripting language (e.g. `rhai` or `mlua`,
+the specific crate left to `fgos-coding-planning`) bound directly to the
+gateway's own Rust functions. Cloudflare's original Code Mode generates
+TypeScript run inside a V8 isolate, but that choice was driven by
+Cloudflare's own multi-tenant sandboxing need on Workers — the parent
+item's D9 had already ruled out sandboxing as a v1 requirement here (no
+untrusted third party; the same trust model direct CLI/Bash agent access
+already has). With no sandbox requirement, Code Mode's actual point — two
+MCP tools cutting tool-call round-trips via code generation — is
+language-agnostic, so staying Rust-native avoids embedding and
+maintaining an extra JS runtime layer (`rquickjs`/`boa`/`deno_core`) for
+no real benefit.
