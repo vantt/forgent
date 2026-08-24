@@ -58,6 +58,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   shipped, but the "restore-then-recheck after a clean auto-merge" half
   never landed), which had been tripping `approve` on nearly every
   long-lived branch under concurrent write load on `.fgos/*.jsonl`.
+- `performCatchUp` and `mergeRunnerItemLocked` (`src/runner/merge.mjs`)
+  no longer report a real `conflict` outcome for a git-merge conflict
+  confined entirely to `.fgos/` paths declared `merge=union` — a worker
+  branch that at some point recorded a DELETION of a shard (e.g. an
+  earlier manual `git rm --cached` recovery from an unrelated conflict)
+  raised a real modify/delete conflict the moment the calling session's
+  own subsequent event-append grew that same shard elsewhere, which the
+  `merge=union` driver never auto-resolves (deletion is never handled
+  by a content-merge driver, regardless of attribute). New helper
+  `resolveFgosOnlyConflict` restores every such conflicted path to the
+  trusted side's own committed version (`HEAD`/main for `approve`,
+  `target` for `catchup`) instead of aborting — neither merge direction
+  has any legitimate claim over the other's `.fgos/` state (ADR0020),
+  so this was always a false conflict, not a real content dispute.
 - The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)
   now spawns every executor `detached: true` and kills its whole process
   GROUP on timeout/maxBuffer (`process.kill(-pid, ...)`), not just the
