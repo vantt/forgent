@@ -47,6 +47,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `fgos pick`/`fgos take` (`claimWork`, `src/runner/claim-port.mjs`) now
+  self-heal an `AMBIGUOUS` `.fgos/main-checkout.lock` (unparseable content)
+  inline: it calls the same `forceReclaimAmbiguousLock` the `unlock` verb
+  already used and retries the claim once before falling back to the same
+  `lock-ambiguous` error — a transiently-corrupt lock no longer requires a
+  separate manual `fgos unlock`/`/fgOS:unlock` call to clear it.
 - `mergeRunnerItemLocked` (`src/runner/merge.mjs`) no longer refuses a
   successful merge just because it left a `merge=union`-attributed
   `.fgos/*.jsonl` path staged (e.g. `.fgos/events.jsonl`, its sharded
