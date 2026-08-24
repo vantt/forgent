@@ -2,7 +2,7 @@
 type: explanation
 title: Why dispatch.mjs was redesigned around task, not agent capacity
 tags: [dispatch, executor, capacity, task-dispatch-unification]
-source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5, tsk-5tm-6, tsk-2y4, tsk-5tm]
+source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5, tsk-5tm-6, tsk-2y4, tsk-5tm, tsk-5er]
 authoritative_for: why src/runner/dispatch.mjs's capacity/executor layer was redesigned around "task" as the unifying concept, and the 12 locked decisions behind that redesign
 ---
 # Why `dispatch.mjs` was redesigned around "task," not agent capacity
@@ -79,7 +79,11 @@ from both `capacities.<id>` config shape and the dispatch gate itself.
   unchanged — see
   `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md`
   and the `_shared/executor-dispatch-fallback.md` fragment every skill's
-  own dispatch step points to.
+  own dispatch step points to. Found unimplemented in 3 files (plus 2
+  plugin mirrors) by `tsk-5tm`'s own post-merge review pass — unlike D7
+  (deliberately deferred), D8 had no documented deferral, so this was a
+  genuine miss. **Fix** (`tsk-5er`): the rename applied across all 5
+  files — pure vocabulary/doc change, zero runtime impact.
 - **D9 — model/tier resolution moves from one flat map to N-maps per
   provider,** widening the tier vocabulary from 3 to 5 and adding
   `rigorOverrides`. `modelForTier` previously only ever read Claude model
