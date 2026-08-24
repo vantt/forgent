@@ -2,7 +2,7 @@
 type: explanation
 title: Why dispatch.mjs was redesigned around task, not agent capacity
 tags: [dispatch, executor, capacity, task-dispatch-unification]
-source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5, tsk-5tm-6, tsk-2y4, tsk-5tm, tsk-5er]
+source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5, tsk-5tm-6, tsk-2y4, tsk-5tm, tsk-5er, tsk-1qn]
 authoritative_for: why src/runner/dispatch.mjs's capacity/executor layer was redesigned around "task" as the unifying concept, and the 12 locked decisions behind that redesign
 ---
 # Why `dispatch.mjs` was redesigned around "task," not agent capacity
@@ -118,6 +118,23 @@ from both `capacities.<id>` config shape and the dispatch gate itself.
   `--work <id>` direction (exporting `capacityIdForWork` plus a new CLI
   flag) had already survived three-plus rounds of review with no
   reversal.
+
+## Independent post-merge verification (`tsk-1qn`): no bug found
+
+A dedicated review pass re-checked every one of D1-D12 against the code
+that actually shipped (`mergedSha e774207b`) — line-by-line, not
+assumed: D1's `needs` retirement confirmed via a live config carrying no
+`needs` key; D9's `modelPolicies` resolution traced through
+`modelForTier`'s real code path; D6's `gather` removal confirmed via a
+zero-match grep across both `dispatch.mjs` and the committed config; D7's
+deferral of the dispatch contract out of `AGENTS.md` confirmed still
+honored. **Result: no bug found** — every decision matched the shipped
+code exactly, and `npm test` (3338 tests, 3333 pass, 5 skipped) was
+confirmed green twice, once before and once after the review pass with
+no code changes between them. `tsk-5tm`'s own pre-merge friction (two
+blocked merge attempts) had already been resolved by fix-up commits that
+were already part of the merged sha by the time this review ran — this
+item's own diff is documentation-only.
 
 ## Why this matters beyond forgentX's own dispatch code
 
