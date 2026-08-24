@@ -2,7 +2,7 @@
 type: reference
 title: Worktree/merge lifecycle audit findings (2026-08-14)
 tags: [audit, worktree, merge, lifecycle, code-review]
-source_capture_ids: [tsk-25r, tsk-18k, tsk-1mn, tsk-2iz, tsk-ikd, tsk-4bh, tsk-2jn, tsk-4yv]
+source_capture_ids: [tsk-25r, tsk-18k, tsk-1mn, tsk-2iz, tsk-ikd, tsk-4bh, tsk-2jn, tsk-4yv, tsk-386]
 authoritative_for: the 9 findings from the 2026-08-14 fable code-review audit of fgOS's worktree claim/merge/cleanup lifecycle, and which work item tracks each
 ---
 # Worktree/merge lifecycle audit findings (2026-08-14)
@@ -22,7 +22,7 @@ as of this audit's own capture.
 | `tsk-4bh` | medium | **Fixed.** `checkMergeStillResolves` never skipped `wontfix`/canceled children, causing a permanent cleanup block on a decomposed root that had one. Fixed: the check now skips canceled/`wontfix` children. See `docs/explanation/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md` for the full family of fixes to this same function. |
 | `tsk-2jn` | medium-low | **Fixed.** `footprintOverlapAmong` compared raw declared paths without `normalizePath`, so differently-spelled but identical footprints (e.g. `./src/x.mjs` vs `src/x.mjs`) could dodge parallel-dispatch conflict detection. Fixed: both sides now normalize through `normalizePath` before comparison. See `docs/explanation/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md` for `tsk-11v`'s earlier, separate fix to the same function (deps-edge "sequence" resolution). |
 | `tsk-4yv` | low | **Partially fixed.** A `finishWorktreeSetup` failure leaked a registered worktree. Fixed: on failure, `finishWorktreeSetup` now force-removes the worktree it had just registered. The detached-merge-worktree half of this finding (never reclaimed by anything) was not addressed by this same fix. |
-| `tsk-386` | low | `baseRef: 'main'` hardcodes survive in `worktree.mjs` and `approve`'s root-branch fallback despite the earlier trunk-detection work. |
+| `tsk-386` | low | **Fixed.** `baseRef: 'main'` hardcodes survived in `worktree.mjs` and `approve`'s root-branch fallback despite earlier trunk-detection work elsewhere. Fixed: these defaults now route through `detectTrunk` instead of the literal string. |
 | `tsk-f8f` | low | `lastActivityAt` mis-parses git-quoted paths — activity on filenames with spaces/special characters is invisible to the stale-claim reclaim check. |
 
 ## Unresolved questions the audit itself named
