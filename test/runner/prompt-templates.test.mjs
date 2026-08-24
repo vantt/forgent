@@ -187,41 +187,6 @@ You are running on an isolated git worktree, checked out on its own branch for
 this work item only. Stay inside this checkout — never touch the main
 working tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.
 
-# Iron Law evidence
-This repo is self-modifying: fix any of its own runner/evolve/state modules
-(\`src/evolve/iron-law.mjs\`'s \`MODULE_RULES\`) and one extra guardrail applies
-— proof a fix was validated against a real failing test before it existed.
-AFTER your implementation is committed on this branch (running this BEFORE
-committing reads an empty diff and gives a false "not required" — see
-\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\`'s
-"Watch out for" section), classify your own diff:
-
-\`\`\`bash
-node --input-type=module -e "
-import { changedFiles } from './src/runner/merge.mjs';
-import { classifyIronLaw } from './src/evolve/iron-law.mjs';
-const id = process.argv[1];
-const description = process.argv[2];
-console.log(JSON.stringify(classifyIronLaw({ filesChanged: changedFiles('.', { id }), description })));
-" "<your item id — your current branch name, \`git branch --show-current\`, with the fgw/ prefix stripped>" "<your item's own Description text, verbatim, from the Description section above>"
-\`\`\`
-
-If the result's \`required\` is \`false\`, do nothing further. If
-\`required\` is \`true\`, you must produce real failing-test-first proof
-before reporting \`[DONE]\` — see
-\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\`
-for the full recipe: identify the test file(s) covering your change, \`git
-stash push --\` the IMPLEMENTATION files only (never the test files), run
-the same test command and capture the real failing output (red — paste the
-actual stderr/assertion text, never a paraphrase), \`git stash apply\`
-(never \`pop\`, until green is reconfirmed) to restore your fix, rerun the
-same command and confirm it passes (green), then write
-\`docs/history/<your item id>/iron-law-evidence.md\` with the matched
-flags/modules from the classification above and the real red/green
-transcript excerpts, and commit it as a follow-up commit on this branch —
-before reporting \`[DONE]\`. Skipping or fabricating this evidence when
-\`required\` is \`true\` is not a valid way to finish.
-
 # How to finish
 Report your completion status through a fixed token in your output — your
 caller reads this token mechanically, not free prose:
