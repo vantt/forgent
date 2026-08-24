@@ -13,7 +13,7 @@ Item này repurposed từ "Tầng B — worker ghi `.fgos/` trong worktree" (đ�
 vĩnh viễn theo D3). Toàn bộ lịch sử thảo luận, bằng chứng đo đạc, và scout
 upstream: `DISCUSSION.md` cùng thư mục (7 mục, §5 có Q&A log 7 vòng).
 
-## Quyết định đã chốt (từ decision log, `fgos show tsk-3tp`)
+## Locked decisions
 
 | D-ID | Quyết định | Seq |
 |---|---|---|

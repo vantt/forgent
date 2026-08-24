@@ -434,6 +434,50 @@ test('mergeRunnerItem merges cleanly, verify passes, and commits — outcome "me
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
+// tsk-3tp-1 (D2): the merge commit ITSELF sweeps up whatever is dirty under
+// `.fgos/events/` at merge time — no dedicated checkpoint commit needed for
+// the common case where a merge happens often enough to carry it along.
+test('mergeRunnerItem sweeps a dirty untracked .fgos/events/ shard file into its own merge commit', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const eventsDir = path.join(repoRoot, '.fgos', 'events');
+  fs.mkdirSync(eventsDir, { recursive: true });
+  const shardPath = path.join(eventsDir, 'writer-a-20260101T000000Z.jsonl');
+  fs.writeFileSync(shardPath, '{"id":"e1"}\n');
+
+  const headBefore = headOf(repoRoot);
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'merged');
+
+  // A merge commit has two parents — plain `diff-tree`/`diff-tree -r` prints
+  // nothing for one unless told which parent(s) to diff against; `-m` diffs
+  // against each parent in turn, same as `git show`'s own default for a
+  // merge commit.
+  const mergeCommitFiles = git(repoRoot, ['diff-tree', '--no-commit-id', '--name-only', '-r', '-m', headOf(repoRoot)]);
+  assert.match(
+    mergeCommitFiles,
+    /\.fgos\/events\/writer-a-20260101T000000Z\.jsonl/,
+    'the shard file must ride along inside the merge commit itself, not be left uncommitted',
+  );
+  assert.equal(isWorkingTreeClean(repoRoot), true, 'nothing should be left dirty after the sweep');
+  assert.notEqual(headOf(repoRoot), headBefore);
+
+  // Exactly one new commit landed — the merge commit itself — never a
+  // separate dedicated checkpoint commit riding alongside it.
+  // `--first-parent` walks only main's OWN lineage (never descending into
+  // the just-merged branch's pre-existing commit, which `headBefore..HEAD`
+  // alone would also include — that commit already existed before this
+  // call ran, so it is not "new" in the sense this assertion cares about):
+  // exactly one first-parent commit landing on main means the sweep really
+  // did ride the merge commit itself, never a separate commit alongside it.
+  const newCommitSubjects = git(repoRoot, ['log', '--first-parent', '--format=%s', `${headBefore}..HEAD`])
+    .trim()
+    .split('\n');
+  assert.equal(newCommitSubjects.length, 1, 'the sweep must ride the merge commit, never add a commit of its own');
+  assert.doesNotMatch(newCommitSubjects[0], /periodic events\.jsonl checkpoint|fallback events checkpoint/);
+});
+
 test('mergeRunnerItem aborts cleanly on a real conflict — main left byte-for-byte unchanged, outcome "conflict"', async () => {
   const repoRoot = initRepo();
   fs.writeFileSync(path.join(repoRoot, 'shared.txt'), 'base\n');

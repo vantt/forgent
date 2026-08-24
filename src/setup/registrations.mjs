@@ -57,7 +57,7 @@ import {
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
-import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_EVENT_THRESHOLD } from '../state/events-jsonl-truncation-guard.mjs';
+import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../state/events-jsonl-truncation-guard.mjs';
 import { verifyCompactionCandidate } from '../state/events-compaction.mjs';
 import { readMainCheckoutGuardWarnings } from '../state/main-checkout-guard-warnings.mjs';
 
@@ -1766,7 +1766,7 @@ registerConfigDefault({
 registerConfigDefault({
   id: 'checkpoint',
   key: 'checkpoint',
-  shape: { eventThreshold: DEFAULT_CHECKPOINT_EVENT_THRESHOLD },
+  shape: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
 });
 
 // Deliberately does NOT execute the configured commands. `doctor` is a
