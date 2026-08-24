@@ -2120,3 +2120,67 @@ test('tsk-2yo: a headless clear verdict carrying tier/kind/risk actually applies
   assert.equal(item.kind, 'bug');
   assert.equal(item.risk, 'heavy');
 });
+
+test('tsk-34o5: startupReap parks a stale doing item with attestation-mismatch when baseCommit/headRef diverges', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const id = 'stale-attest-item';
+  seedItem(dir, { id });
+  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', role: 'runner' });
+
+  const branch = branchNameFor(id);
+  const baseCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  execFileSync('git', ['checkout', '-b', branch], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'stale.txt'), 'stale content');
+  execFileSync('git', ['add', 'stale.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-m', 'stale commit'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
+
+  appendEvent(path.join(dir, 'events.jsonl'), {
+    type: 'executor.dispatch',
+    payload: { id, executorId: 'cli', baseCommit, headRef: 'main' },
+  });
+
+  const { startupReap } = await import('../../src/runner/loop.mjs');
+  const result = await startupReap({ repoRoot, dir, worktreeDir, log: noLog });
+
+  assert.equal(result.resolutions[0].to, 'blocked');
+  assert.equal(result.resolutions[0].reason, 'attestation-mismatch');
+
+  const view = listWork(dir);
+  assert.equal(view.work[id].status, 'blocked');
+});
+
+test('tsk-34o5: startupReap does NOT halt a legitimate retry on a branch with previous commits if latest attestation baseCommit is ancestor', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const id = 'retry-attest-item';
+  seedItem(dir, { id, verify: 'exit 0' });
+  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', role: 'runner' });
+
+  const branch = branchNameFor(id);
+  const baseCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  execFileSync('git', ['checkout', '-b', branch], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'attempt1.txt'), 'failed attempt');
+  execFileSync('git', ['add', 'attempt1.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-m', 'attempt 1'], { cwd: repoRoot });
+
+  appendEvent(path.join(dir, 'events.jsonl'), {
+    type: 'executor.dispatch',
+    payload: { id, executorId: 'cli', baseCommit, headRef: branch },
+  });
+
+  fs.writeFileSync(path.join(repoRoot, 'attempt2.txt'), 'successful attempt');
+  execFileSync('git', ['add', 'attempt2.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-m', 'attempt 2'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
+
+  appendEvent(path.join(dir, 'events.jsonl'), {
+    type: 'executor.dispatch',
+    payload: { id, executorId: 'cli', baseCommit, headRef: branch },
+  });
+
+  const { startupReap } = await import('../../src/runner/loop.mjs');
+  await startupReap({ repoRoot, dir, worktreeDir, log: noLog });
+
+  const view = listWork(dir);
+  assert.equal(view.work[id].status, 'awaiting-approval');
+});

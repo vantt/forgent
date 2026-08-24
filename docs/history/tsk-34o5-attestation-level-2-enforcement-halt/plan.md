@@ -25,9 +25,19 @@ Orient step). Flags counted against the item:
 4 flags plus one hard-gate flag on its own → **high-risk**, independently
 confirmed two ways.
 
-impact-analysis posture: **full** — `fgos tool query --capability
-impact-analysis --status present` returned `gitnexus`/`present`, checked
-fresh this session (2026-08-23).
+impact-analysis posture: **degraded** — `fgos tool query --capability
+impact-analysis --status present` still returns `gitnexus`/`present`, but
+a live hook notice right after this session's own plan.md/RESEARCH.md
+commit read "GitNexus index is stale (last indexed: 7bb3231)" — HEAD had
+moved past that commit. Named plainly per the reality gate's own
+requirement, but this does not weaken any row below: every citation this
+plan and RESEARCH.md rely on is a direct file read, `rg`/`grep`, or a real
+`node --test` run — none lean on GitNexus's own blast-radius output. (The
+one GitNexus answer actually queried during discovery — a symbol location
+for `captureDispatchAttestation` — was independently cross-checked against
+a direct read and found wrong even before this staleness, per
+RESEARCH.md Round 1's own citations; this is consistent with, not
+contradicted by, treating GitNexus output here as advisory-only.)
 
 ## Approach
 

@@ -155,15 +155,19 @@ original reason the exemption existed at all); a deliberate edit to a
 policy file is exactly the kind of out-of-footprint change this check
 should still catch.
 
-## Why level 1, and why advisory rather than a gate
+## Fourth follow-up (`tsk-34o5`): Attestation level 2 — enforcement halt at reap/return/approve
+
+`tsk-34o5` elevates identity attestation from advisory-only (level 1) to mechanical enforcement (level 2). While `footprintDiffHits` remains advisory-only (diffs outside declared footprint flag scope creep without blocking), identity divergence (`baseCommit` ancestry mismatch or `headRef` mismatch) now triggers an immediate halt at all three chokepoints (`startupReap`, `fgos return`, `fgos approve`):
+
+- **Shared Guard (`src/runner/attestation-guard.mjs`):** Reads the latest `executor.dispatch` event for an item ID from `.fgos/events.jsonl`.
+- **Enforcement Rules:** Halts if `headRef` recorded at dispatch time does not match `fgw/<id>`, or if the branch's actual tip is not a git descendant of the recorded `baseCommit` (`git merge-base --is-ancestor`).
+- **Typed Halt:** Divergent items are parked at `blocked` with the typed reason `attestation-mismatch`. No merge is attempted, main remains untouched, and friction evidence is logged.
+- **Zero Friction on Green & In-Session:** Absent attestation events or `baseCommit: null` / `headRef: null` (in-session dispatches) return `{ ok: true, skipped: true }` without blocking. Legitimate retries on a branch reset to baseline remain green.
+
+## Why level 1 vs level 2
 
 Real breakage is already caught by `merge.mjs`'s existing staged
-verify-gate — that's not this feature's job to duplicate. What this
-targets is narrower: scope creep that still *passes* verify — a change
-that works, but touched files nobody declared it would. STR63 already
-established advisory (flag, never block) as the right posture for exactly
-this class of risk, and this item follows that precedent rather than
-inventing a new enforcement mode. Both halves — the attestation capture
-and the broadened diff check — never throw and never change a
-merge/dispatch outcome on their own; they exist to be looked at, not to
-stop anything.
+verify-gate — that's not level 1's job to duplicate. What level 1
+targets is scope creep that still *passes* verify (advisory-only `footprintDiffHits`).
+Level 2 targets identity divergence (e.g. `tsk-43z` worker committing straight to main or off-baseline ref rewrites) by enforcing a hard mechanical halt before any code is trusted or merged.
+

@@ -30,6 +30,7 @@ import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
+import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
 // `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
@@ -3115,6 +3116,19 @@ async function runVerb(verb, flags, positional, dir) {
           branchHead = gitAt(repoRoot, ['rev-parse', branch]).trim();
         } catch (err) {
           throw new StoreError('validation', `return: branch "${branch}" for "${id}" not found or unreadable: ${err.message}`);
+        }
+        const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
+        if (!attestation.ok) {
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: attestation.reason, role: item.claimRole ?? 'session' });
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: attestation.reason,
+            layer: 'attestation',
+            attempts: 1,
+            detail: attestation.detail,
+          });
+          throw new StoreError('validation', `return: work "${id}" halted due to attestation mismatch: ${attestation.detail}`);
         }
         const branchAheadCount = commitsSince(repoRoot, item.branchHeadAtTake, branchHead);
         if (branchAheadCount <= 0) {
