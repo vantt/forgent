@@ -7,7 +7,6 @@ import { fileURLToPath } from 'node:url';
 import { appendEvent } from '../../src/state/events.mjs';
 import { foldEvents, rebuildView, viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir } from '../../src/state/replay.mjs';
 import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
-import { fixEventsJsonlContiguity } from '../../src/state/events-jsonl-contiguity.mjs';
 import { repairTruncatedLastLine } from '../../src/state/events.mjs';
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
@@ -1017,23 +1016,30 @@ test('rebuildView is safe against repairTruncatedLastLine (tail-only rewrite -- 
   assert.ok(view.work.a, 'the item added before the corruption must still be present');
 });
 
-test('rebuildView falls back to a full read after fixEventsJsonlContiguity rewrites the log (resort+reseq changes the fingerprint)', () => {
+test('rebuildView falls back to a full read after a resort+reseq rewrite changes the fingerprint (a duplicate-seq line sorted by ts and renumbered)', () => {
   const dir = tmpFgosDir();
   addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   const logPath = logPathOf(dir);
-  // Craft a real seq duplicate/gap directly on the log -- the shape
-  // fixEventsJsonlContiguity's own module exists to repair.
+  // Craft a real seq duplicate directly on the log (a different `ts`, same
+  // `seq` as an existing line), then manually apply the same resort-by-ts
+  // + renumber-seq-1..N rewrite the retired contiguity fix used to perform
+  // -- this test cares about rebuildView's fingerprint behavior on that
+  // REWRITE SHAPE, not about any particular repair mechanism.
   const raw = fs.readFileSync(logPath, 'utf8');
   const lastEvent = JSON.parse(raw.trim().split('\n').pop());
   const duplicateLine = `${JSON.stringify({ ...lastEvent, ts: '2026-08-11T00:00:00.000Z' })}\n`;
   fs.appendFileSync(logPath, duplicateLine, 'utf8');
 
-  const result = fixEventsJsonlContiguity(logPath);
-  assert.equal(result.fixed, true, 'sanity: the crafted duplicate seq was actually detected and fixed');
+  const linesBefore = fs.readFileSync(logPath, 'utf8').trim().split('\n');
+  const parsed = linesBefore.map((l) => JSON.parse(l));
+  parsed.sort((a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0));
+  const resequenced = parsed.map((e, i) => JSON.stringify({ ...e, seq: i + 1 }));
+  assert.notDeepEqual(resequenced, linesBefore, 'sanity: the crafted duplicate seq actually changed line content on resort+reseq');
+  fs.writeFileSync(logPath, `${resequenced.join('\n')}\n`, 'utf8');
 
   const view = rebuildView(logPath);
   const freshFold = foldEvents(readEventsWhole(logPath));
-  assert.deepEqual(view, freshFold, 'must still produce a view identical to a fresh full read of the fixed log');
+  assert.deepEqual(view, freshFold, 'must still produce a view identical to a fresh full read of the resorted+resequenced log');
 });
 
 test('rebuildView falls back to a full read after a wholesale reordering rewrite (git merge=union stand-in)', () => {

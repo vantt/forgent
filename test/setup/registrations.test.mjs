@@ -477,9 +477,8 @@ test('guard-warnings-surface: main-checkout-guard-warnings doctor check passes w
 
 
 
-// --- Tầng A/T5: events-jsonl-contiguous / events-jsonl-not-truncated ------
-// rescoped to check baseline-0 AND every per-writer file under
-// .fgos/events/ (TA-D10) -----------------------------------------------
+// --- Tầng A/T5: events-jsonl-not-truncated rescoped to check baseline-0
+// AND every per-writer file under .fgos/events/ (TA-D10) ----------------
 
 function ev(seq, ts, type) {
   return JSON.stringify({ seq, ts, type, payload: null });
@@ -487,39 +486,6 @@ function ev(seq, ts, type) {
 function raw(lines) {
   return `${lines.join('\n')}\n`;
 }
-
-test('events-jsonl-contiguous: passes on a healthy baseline-0 with no .fgos/events/ dir at all (byte-identical to pre-T5)', () => {
-  const gitDir = mkTempDir();
-  execFileSync('git', ['init', '-q'], { cwd: gitDir });
-  const fgosDir = path.join(gitDir, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'events.jsonl'), raw([ev(1, '2026-01-01T00:00:00.000Z', 'a'), ev(2, '2026-01-01T00:00:01.000Z', 'b')]), 'utf8');
-
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-jsonl-contiguous');
-  const result = entry.check(gitDir);
-  assert.equal(result.passed, true);
-  assert.doesNotMatch(result.message, /per-writer/);
-});
-
-test('events-jsonl-contiguous: a broken per-writer file under .fgos/events/ fails the check even when baseline-0 is clean', () => {
-  const gitDir = mkTempDir();
-  execFileSync('git', ['init', '-q'], { cwd: gitDir });
-  const fgosDir = path.join(gitDir, '.fgos');
-  const eventsDir = path.join(fgosDir, 'events');
-  fs.mkdirSync(eventsDir, { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'events.jsonl'), raw([ev(1, '2026-01-01T00:00:00.000Z', 'a')]), 'utf8');
-  // Duplicate seq within the SAME writer file -- the failure shape this check exists to catch.
-  fs.writeFileSync(
-    path.join(eventsDir, 'writer-a-1.jsonl'),
-    raw([ev(1, '2026-08-23T00:00:00.000Z', 'x'), ev(1, '2026-08-23T00:00:01.000Z', 'y')]),
-    'utf8',
-  );
-
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-jsonl-contiguous');
-  const result = entry.check(gitDir);
-  assert.equal(result.passed, false);
-  assert.match(result.message, /events\/writer-a-1\.jsonl/);
-});
 
 test('events-jsonl-not-truncated: a truncation in a per-writer file under .fgos/events/ fails the check even when baseline-0 holds clean', () => {
   const gitDir = mkTempDir();

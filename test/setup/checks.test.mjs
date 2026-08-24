@@ -51,7 +51,7 @@ import { createSession } from '../../src/runner/session.mjs';
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, leaf-notify-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, advise-execute-capabilities-configured, decision-index-stale, and agy-permissions-configured', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, leaf-notify-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, advise-execute-capabilities-configured, decision-index-stale, and agy-permissions-configured', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -76,7 +76,6 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'domain-workflow-skillmap-coverage',
       'delivered-not-on-trunk',
       'enduser-docs-index-stale',
-      'events-jsonl-contiguous',
       'invariant-checks-configured',
       'events-jsonl-not-truncated',
       'cli-version-visible',
@@ -220,67 +219,6 @@ test('leaf-notify-drift fails and names the leaf when a live session branch over
   assert.equal(passed, false);
   assert.match(message, /leaf/);
   assert.match(message, /file\.txt/);
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-// ─── events-jsonl-contiguous (tsk-3wq) ─────────────────────────────────────
-
-test('events-jsonl-contiguous passes on a freshly-initialized, untouched log', () => {
-  const dir = initRepo('checks-events-contig-clean-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
-
-  const { passed, message } = checkById('events-jsonl-contiguous').check(dir);
-  assert.equal(passed, true);
-  assert.match(message, /contiguous/);
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('events-jsonl-contiguous fails when the log has a duplicate seq (the union-merge residue shape)', () => {
-  const dir = initRepo('checks-events-contig-dup-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  const logPath = path.join(fgosDir, 'events.jsonl');
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 100, ts: '2026-01-01T00:00:00.000Z', type: 'race-a', payload: null })}\n`);
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 100, ts: '2026-01-01T00:00:01.000Z', type: 'race-b', payload: null })}\n`);
-
-  const { passed, message } = checkById('events-jsonl-contiguous').check(dir);
-  assert.equal(passed, false);
-  assert.match(message, /duplicate seq/);
-  assert.match(message, /fgos doctor --fix/);
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('events-jsonl-contiguous fix resolves the duplicate-seq shape without losing either event', () => {
-  const dir = initRepo('checks-events-contig-fix-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  const logPath = path.join(fgosDir, 'events.jsonl');
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 100, ts: '2026-01-01T00:00:00.000Z', type: 'race-a', payload: null })}\n`);
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 100, ts: '2026-01-01T00:00:01.000Z', type: 'race-b', payload: null })}\n`);
-
-  const { changed, message } = fixById('events-jsonl-contiguous').fix(dir);
-  assert.equal(changed, true);
-  assert.match(message, /resequenced/);
-
-  const { passed } = checkById('events-jsonl-contiguous').check(dir);
-  assert.equal(passed, true, 'the check must pass after the fix runs');
-
-  const lines = fs.readFileSync(logPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
-  assert.deepEqual(lines.map((l) => l.type).sort(), ['race-a', 'race-b'], 'both events must survive the fix, never one dropped');
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('events-jsonl-contiguous fix is a no-op when the log is already contiguous', () => {
-  const dir = initRepo('checks-events-contig-noop-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
-
-  const { changed, message } = fixById('events-jsonl-contiguous').fix(dir);
-  assert.equal(changed, false);
-  assert.match(message, /already contiguous/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
