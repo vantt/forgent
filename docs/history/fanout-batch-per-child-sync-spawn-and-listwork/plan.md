@@ -1,14 +1,18 @@
-# Plan — fanout-batch per-child sync spawn, listWork reread, and blocking attestation (tsk-2ewi)
+# Plan — fanout-batch per-child sync spawn and listWork reread (tsk-2ewi)
+
+**Revised after a validating-stage reality-gate FAIL** (`fgos decision`
+seq 11) — the original round's sub-fix 2 (non-blocking git attestation)
+is dropped from this item's approach; see "2. Non-blocking git
+attestation — considered and rejected" below for why.
 
 Mode: standard (2 flags: existing covered behavior —
 `fanoutBatchExecutorCli` is already exercised by
 `test/runner/dispatch.test.mjs`, e.g. the `slotsFull`/trimming tests
 around line 4774; weak proof around the area — no existing test proves
-per-child dispatch stays correct once the `listWork` read is collapsed or
-`resolveExecutorCommand`'s attestation capture goes async, RESEARCH.md
-round 1's "Still open" section). No hard-gate flag applies (no
-auth/data-loss/audit/external-provider/validation-removal). Applied via
-`fgos-routing`'s own Mode-gate subsection directly, per this skill's
+per-child dispatch stays correct once the `listWork` read is collapsed,
+RESEARCH.md round 1's "Still open" section). No hard-gate flag applies
+(no auth/data-loss/audit/external-provider/validation-removal). Applied
+via `fgos-routing`'s own Mode-gate subsection directly, per this skill's
 direct-entry fallback — this session entered through `/fgOS:pick` →
 `fgos-coding-driving`, never through `fgos-routing` itself.
 
@@ -34,9 +38,10 @@ citation to satisfy the split shape.
 
 ## Approach
 
-**Chosen path:** three ordered, independently-revertible changes inside
-`src/runner/dispatch/cli.mjs` and `src/runner/dispatch/transport.mjs`,
-landed low-risk-first:
+**Chosen path:** one low-risk mechanical change inside
+`src/runner/dispatch/cli.mjs` (sub-fix 1), plus one still-open
+follow-up proof point (sub-fix 3). Sub-fix 2 was investigated and
+rejected this round — see below.
 
 ### 1. Collapse the per-child `listWork` reread (low risk)
 
@@ -74,60 +79,46 @@ item's own synced `verify`) — the existing `fanoutBatchExecutorCli` tests
 already assert on `workItem`-derived fields (`executorId`, dispatch
 outcome), so a wrong collapse fails loud there.
 
-### 2. Non-blocking git attestation capture (medium risk — bounded blast radius, not "isolated" as the item's own text implied)
+### 2. Non-blocking git attestation — considered and rejected
 
 `captureDispatchAttestation` (`transport.mjs:113`) runs two
 `execFileSync('git', ...)` calls (`rev-parse HEAD`,
 `symbolic-ref --short -q HEAD`), synchronous and blocking, inside
-`resolveExecutorCommand` (`transport.mjs:135`), itself synchronous.
+`resolveExecutorCommand` (`transport.mjs:135`), itself synchronous. The
+original round of this plan proposed making `resolveExecutorCommand`
+`async` (via `execFile`) to unblock these two calls, contingent on
+picking a caller-conversion path for `resolveExecutorCommand`'s other
+real caller, `spawnWorker` (`cli.mjs:194`).
 
-Traced this round (impact-analysis posture: **full** — GitNexus present,
-freshly queried this session via `fgos tool query --capability
-impact-analysis --status present`): `resolveExecutorCommand` has exactly
-two real production callers, not the "one blocking step inside execute()"
-the item's own description implies:
+**Rejected at validating, with direct evidence (`fgos decision` seq
+11):** `resolveExecutorCommand` is also where `RunnerConfigError` gets
+thrown for a malformed tier/config — `cli.mjs:195-200`'s own comment
+states this is deliberate: "Setup stays synchronous and OUTSIDE the
+adapter call on purpose... a malformed tier/config... must still throw
+synchronously, before any process is spawned." `test/runner/
+dispatch.test.mjs:2867-2871` pins exactly this:
+`spawnWorker throws a RunnerConfigError (not DispatchError) for an
+unconfigured tier, before any spawn`, asserted with `assert.throws(() =>
+spawnWorker(...), RunnerConfigError)` — a synchronous-throw assertion
+that a rejected Promise does not satisfy. Making `resolveExecutorCommand`
+`async` converts EVERY error thrown inside it, not just the two git
+calls, into a rejected Promise — this breaks the pinned contract
+regardless of which of the original (a)/(b)/(c) caller-conversion paths
+is chosen; the choice of caller was never the actual constraint.
 
-- `spawnWorker` (`cli.mjs:194`, **synchronous function**, called at
-  `cli.mjs:217`) — the runner-loop's own out-of-process dispatch path
-  (`loop.mjs`), unrelated to `fanoutBatchExecutorCli` directly but a real
-  shared caller.
-- `executeExecutorCli` (`cli.mjs:353`, **already `async`**, called at
-  `cli.mjs:468`) — the path `fanoutBatchExecutorCli` itself uses
-  (`:797`, already `await`ed).
+Separately, proportionality: the item's own description cites the real
+bottleneck as cold Node process starts for `pick`/`return`
+(~100-300ms+ each, sub-fix 3's own subject); two `git` subprocess calls
+are typically single-digit-to-low-double-digit ms on a warm filesystem
+cache — a fraction of that cost. Restructuring a synchronous-throw
+contract two production call sites depend on, to shave a small fraction
+of the item's own cited bottleneck, fails the Reality Gate's "smaller
+path" dimension on its own even setting the broken-contract finding
+aside.
 
-Making `captureDispatchAttestation` genuinely non-blocking (`execFile`
-instead of `execFileSync`, or deferred/parallelized with the rest of
-dispatch setup) means `resolveExecutorCommand` becomes `async` — which
-`executeExecutorCli`'s call site already tolerates (already `await`s the
-whole chain around it), but `spawnWorker`'s call site does not: it is a
-plain synchronous function today, and its own caller(s) in `loop.mjs`
-would need tracing before this specific sub-fix can land without breaking
-`spawnWorker`'s own contract.
-
-**Change (scoped to what THIS item's own footprint touches):** convert
-`captureDispatchAttestation` to use `execFile` (promisified) and make
-`resolveExecutorCommand` `async`; update `executeExecutorCli`'s own call
-site (`cli.mjs:468`) to `await` it (trivial, already in an async
-function). **`spawnWorker`'s own call site (`cli.mjs:217`) is explicitly
-OUT of this item's scope** — converting it is a separate, `loop.mjs`-side
-change with its own blast radius, not something this item's own
-`fanoutBatchExecutorCli`/`executeExecutorCli` footprint should absorb.
-Until `spawnWorker` is converted separately, it keeps calling the
-now-async `resolveExecutorCommand` — this is a REAL constraint this
-sub-fix must resolve before landing: either (a) `resolveExecutorCommand`
-grows a sync/async dual-path (a real complexity cost against a "just
-make attestation non-blocking" framing), or (b) `spawnWorker` is
-converted in the same change despite being out of `fanoutBatchExecutorCli`'s
-own footprint, or (c) this sub-fix is deferred to a separate item scoped
-around `spawnWorker` too. **Validating decides which of (a)/(b)/(c)** —
-recorded here as the plan's own risk-map entry, not resolved by this
-skill.
-
-**Proof point:** `node --test test/runner/dispatch.test.mjs` — the file
-already has direct `resolveExecutorCommand` unit tests (lines 795-919,
-1608-1667+) that would need updating to `await` the now-async calls;
-their current shape (synchronous assertions on a synchronous return
-value) is itself evidence of how many call sites assume sync today.
+**No change made for this sub-fix.** Left as a rejected alternative here
+for the record, not carried into `## Files likely touched` or this
+item's own `footprint`/`action`.
 
 ### 3. In-process `pick`/`return` (highest risk — NOT decided this round, named as an open proof point)
 
@@ -164,24 +155,18 @@ learning`/friction note, not a fix forced through anyway).
 
 ## Files likely touched
 
-- `src/runner/dispatch/cli.mjs` — sub-fix 1 (`:761`), sub-fix 2's
-  `executeExecutorCli` call site (`:468` area).
-- `src/runner/dispatch/transport.mjs` — sub-fix 2's
-  `captureDispatchAttestation`/`resolveExecutorCommand` (`:113-157`).
-- `test/runner/dispatch.test.mjs` — updated assertions for both
-  sub-fixes (existing `fanoutBatchExecutorCli` tests for sub-fix 1;
-  existing `resolveExecutorCommand` sync-assertion tests, lines
-  795-919/1608-1667+, need `await`ing for sub-fix 2).
+- `src/runner/dispatch/cli.mjs` — sub-fix 1 (`:761`) only.
+- `test/runner/dispatch.test.mjs` — existing `fanoutBatchExecutorCli`
+  tests already assert on `workItem`-derived fields, exercised as
+  regression for sub-fix 1; no new test file needed.
 - `docs/history/fanout-batch-per-child-sync-spawn-and-listwork/plan.md`
-  (this file).
+  (this file) and `RESEARCH.md`.
 
 `fgos graph --json` was read this round (`componentCount: 588`,
 `topUnblock` skipped by the engine for this graph size) — this item sits
 in a small, low-fan-out component of the work graph (only tsk-5v3 as a
 dependency, no items declare tsk-2ewi as their own dependency yet), so
-ordering sub-fixes 1→2→3 by risk (not by unblock-impact) is the honest
-call here; nothing else in the graph is waiting on this item's completion
-order.
+nothing else in the graph is waiting on this item's completion order.
 
 ## Outstanding questions
 
