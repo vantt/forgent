@@ -2,7 +2,7 @@
 type: explanation
 title: Why a stale worktree index produced a wrong Iron Law test count
 tags: [iron-law, evidence, worktree, addendum]
-source_capture_ids: [tsk-5x4, tsk-2u5, tsk-2u5-1]
+source_capture_ids: [tsk-5x4, tsk-2u5, tsk-2u5-1, tsk-1d7]
 authoritative_for: why the tsk-51m root Iron Law evidence file recorded a test count lower than any of its own children, why the fix is an addendum rather than an edit, and the general stale-worktree-index guard this incident led to
 ---
 # Why a stale worktree index produced a wrong Iron Law test count
