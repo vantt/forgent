@@ -2,7 +2,7 @@
 type: explanation
 title: Why dispatch.mjs was redesigned around task, not agent capacity
 tags: [dispatch, executor, capacity, task-dispatch-unification]
-source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4]
+source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5]
 authoritative_for: why src/runner/dispatch.mjs's capacity/executor layer was redesigned around "task" as the unifying concept, and the 12 locked decisions behind that redesign
 ---
 # Why `dispatch.mjs` was redesigned around "task," not agent capacity
@@ -72,7 +72,13 @@ from both `capacities.<id>` config shape and the dispatch gate itself.
   provider,** widening the tier vocabulary from 3 to 5 and adding
   `rigorOverrides`. `modelForTier` previously only ever read Claude model
   names — a non-Claude executor (agy/Gemini) silently received the wrong
-  model name instead of throwing.
+  model name instead of throwing. Landed (`tsk-5tm-5`): model/tier
+  resolution moved to provider-keyed `modelPolicies` (visible in this
+  repo's own `.fgos/config.json`, e.g. `modelPolicies.gemini.lightweight`),
+  widened to the 5-tier vocabulary, with `rigorOverrides` — the exact
+  mechanism the `fgos-coding-implement` capability's own config entry
+  uses to pin `agy` to a specific Gemini model regardless of
+  `executors.agy`'s own defaults.
 - **D10 — the `judge-discovery`/`judge-decompose` `for: "judge"`
   collision is harmless and needed no fix** to
   `resolveCapacityIdForPurpose`. Investigation found the real bug behind
