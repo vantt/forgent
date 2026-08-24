@@ -78,4 +78,4 @@ Ba bất biến, tách bạch rõ để không ai đọc nhầm đây là sandbo
 
 `src/runner/dispatch.mjs` (prompt + trust invariant) · `src/runner/worktree.mjs`
 (same-user trust invariant) · `docs/platform-foundations.md` L4 (`14ebeea9`)
-· `docs/history/phase-2-routing/CONTEXT.md` D3/D4.
+· `docs/specs/runner.md` (ADR-0005 Runner & cô lập worker, D3/D4).
