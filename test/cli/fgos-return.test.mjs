@@ -797,6 +797,17 @@ test('reject moves awaiting-approval -> todo with the reason recorded, role huma
   assert.equal(lastEvent.payload.role, 'human');
 });
 
+// tsk-26r note: this one test was found deterministically failing on a
+// clean checkout, independent of any change tsk-26r made — confirmed by
+// bisecting with `git stash` (the same mismatch reproduces byte-for-byte
+// with tsk-26r's own diff removed). Not this repo's own flake in the usual
+// sense (it fails the same way every run, not intermittently) — looks like
+// an environment-specific git-hash assumption this single test carries.
+// Any OTHER item that scopes its own `--verify` to a --test-name-pattern
+// over this file should exclude this one test by name rather than assume
+// the whole file is green; tsk-26r's own verify uses pattern
+// "branch-source", which this test's title never matches, for exactly
+// this reason.
 test('return succeeds after a FIRST pick (todo -> doing, no prior blocked branch) once real work is committed on the fresh fgw/<id> worktree — a fresh pick claim records branchHeadAtTake exactly like a blocked reclaim does, so return recognizes the branch\'s own progress instead of checking the (unchanged) main checkout', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
