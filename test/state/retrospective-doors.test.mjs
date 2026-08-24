@@ -19,6 +19,7 @@ import {
   checkDocDeferralDoor,
   runFourDoorChecks,
 } from '../../src/state/retrospective-doors.mjs';
+import { readRawEvents } from '../../src/state/store.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -243,13 +244,13 @@ test('CLI: retrospective logs advisory friction for a freshness-door gap but sti
   const view = JSON.parse(show.stdout).data;
   assert.equal(view.work['host-item'].status, 'retrospective');
 
-  // The friction is real and queryable.
-  const frictionLines = fs
-    .readFileSync(path.join(cwd, '.fgos', 'events.jsonl'), 'utf8')
-    .trim()
-    .split('\n')
-    .map((l) => JSON.parse(l))
-    .filter((e) => e.type === 'work.friction' && e.payload.id === 'host-item');
+  // The friction is real and queryable. Tầng A/T2 (TA-D2/TA-D12):
+  // readRawEvents(dir) is the one door that reads baseline-0 PLUS every
+  // per-writer file under `.fgos/events/`, where this CLI subprocess's own
+  // writes actually land.
+  const frictionLines = readRawEvents(path.join(cwd, '.fgos')).filter(
+    (e) => e.type === 'work.friction' && e.payload.id === 'host-item',
+  );
   assert.equal(frictionLines.length, 1);
   assert.equal(frictionLines[0].payload.errorClass, 'retrospective-door-freshness');
   assert.equal(frictionLines[0].payload.disposition, 'advisory');
@@ -271,11 +272,8 @@ test('CLI: retrospective logs no friction and no doorFindings key for a clean it
   assert.equal(data.swept[0].id, 'clean-item');
   assert.equal('doorFindings' in data.swept[0], false);
 
-  const frictionLines = fs
-    .readFileSync(path.join(cwd, '.fgos', 'events.jsonl'), 'utf8')
-    .trim()
-    .split('\n')
-    .map((l) => JSON.parse(l))
-    .filter((e) => e.type === 'work.friction' && e.payload.id === 'clean-item');
+  const frictionLines = readRawEvents(path.join(cwd, '.fgos')).filter(
+    (e) => e.type === 'work.friction' && e.payload.id === 'clean-item',
+  );
   assert.equal(frictionLines.length, 0);
 });

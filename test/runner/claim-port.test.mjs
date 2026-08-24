@@ -62,15 +62,26 @@ function writeHookStyleLock(dir, ageMs) {
 // ever ran their own separate reads (CAS reread + appendEventCore's own
 // seq-computation read, both load-bearing and untouched by this item — see
 // docs/history/tsk-3jh-dedupe-redundant-state-reads/RESEARCH.md). Counts
-// real fs.readFileSync calls against the log path to prove the dedupe, not
-// just the resulting shape.
-test('claimWork reads the event log fully 3 times per call, not 6 or 7 (tsk-3jh dedupe + tsk-49e incremental snapshot)', () => {
+// real fs.readFileSync calls against the log surface to prove the dedupe,
+// not just the resulting shape.
+//
+// Tầng A/T2/T3 (eventlog-tier-a-multifile-content-hash): a writer's own
+// events now land in a per-writer file under `.fgos/events/`, not baseline-0
+// `.fgos/events.jsonl` — so the single `target === logPath` check this test
+// used to make no longer sees most of the activity (it silently degenerated
+// to counting only the near-empty baseline file). Widened to count a full
+// read of EITHER the baseline file OR any file under `.fgos/events/`,
+// preserving the original intent (prove the full-log-read count stays
+// bounded) across the new multi-file shape.
+test('claimWork reads the event log fully 4 times per call, not 6 or 7 (tsk-3jh dedupe + tsk-49e incremental snapshot + Tầng A multi-file)', () => {
   const { repoRoot, dir } = setup();
-  const logPath = path.join(dir, 'events.jsonl');
+  const eventsDir = path.join(dir, 'events');
+  const baselinePath = path.join(dir, 'events.jsonl');
   const originalReadFileSync = fs.readFileSync;
   let logReadCount = 0;
   fs.readFileSync = function patched(target, ...rest) {
-    if (target === logPath) logReadCount++;
+    const t = String(target);
+    if (t === baselinePath || t.startsWith(eventsDir + path.sep)) logReadCount++;
     return originalReadFileSync.call(fs, target, ...rest);
   };
   try {
@@ -79,20 +90,22 @@ test('claimWork reads the event log fully 3 times per call, not 6 or 7 (tsk-3jh 
     fs.readFileSync = originalReadFileSync;
   }
 
-  // 3 FULL fs.readFileSync reads remain: claimWork's own single combined
-  // read, moveWork's appendEventCore seq-read, addOutcome's
-  // appendEventCore seq-read (none of these three go through rebuildView,
-  // so tsk-49e's snapshot fast path never applies to them). tsk-3jh's own
-  // dedupe (7->6, listWork+readRawEvents collapsed to one read) is still
-  // intact here. The further 6->3 drop is tsk-49e's own snapshot fast
-  // path: moveWork's CAS pre-read and both post-append refreshView reads
-  // all go through rebuildView, which by this point in the call always
-  // finds the log has grown past state.json's own last snapshot -- so
-  // each now takes the INCREMENTAL path (a bounded fs.readSync of only the
-  // new bytes, never fs.readFileSync on the whole file), correctly
-  // dropping out of this full-read counter without this test needing to
-  // assert on fs.readSync's own call count too.
-  assert.equal(logReadCount, 3);
+  // 4 FULL fs.readFileSync reads remain, one per file this call actually
+  // touches: (1) discovery's baseline-0 read (empty/absent, per
+  // discoverEventFilePaths always listing it), (2) discovery's single read
+  // of the one existing writer file (replay.mjs's readFileWithRawLines —
+  // fixed by this same cell to read+parse from ONE buffer instead of
+  // reading the file twice, matching tsk-3jh's own "never re-read data
+  // already in hand" discipline), (3) moveWork's appendEventCore seq-read
+  // of the writer file, (4) addOutcome's appendEventCore seq-read of the
+  // writer file. None of these four go through rebuildView, so tsk-49e's
+  // snapshot fast path never applies to them — moveWork's CAS pre-read and
+  // both post-append refreshView reads all go through rebuildViewFromDir,
+  // which by this point always finds the log has grown past state.json's
+  // own last snapshot, so each takes T4's INCREMENTAL path (a bounded
+  // fs.readSync of only the new bytes, never fs.readFileSync on the whole
+  // file) and correctly drops out of this full-read counter.
+  assert.equal(logReadCount, 4);
 });
 
 test('claimWork reclaims a stale hook-written (string-identity) lock past DEFAULT_TTL_MS, instead of failing lock-ambiguous forever', () => {
@@ -484,10 +497,16 @@ test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and su
   const { repoRoot, dir } = setup();
   const guardPath = path.join(dir, 'events-jsonl.truncation-guard.json');
   const warnPath = path.join(dir, 'main-checkout-guard-warnings.jsonl');
-  const logPath = path.join(dir, 'events.jsonl');
+  const eventsDir = path.join(dir, 'events');
 
-  // Seed a guard mark
-  fs.writeFileSync(guardPath, JSON.stringify({ seq: 9999, hash: 'badhash' }));
+  // Tầng A/T5: the guard sidecar is now a map keyed by fileKey ("events.jsonl"
+  // for baseline-0, "events/<name>" for a per-writer file); setup()'s addWork
+  // wrote into a real per-writer file, so seed a deliberately-regressed mark
+  // for THAT file -- a real structural break the guard must still catch now
+  // that claimWork does its own real multi-file discovery (no more synthetic
+  // single-file `rawLog` injection).
+  const writerFileName = fs.readdirSync(eventsDir).find((f) => f.endsWith('.jsonl'));
+  fs.writeFileSync(guardPath, JSON.stringify({ [`events/${writerFileName}`]: { seq: 9999, hash: 'badhash' } }));
 
   // claimWork should succeed normally despite truncation break, and write warning
   const res = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });

@@ -137,33 +137,57 @@ export function checkTruncationGuard(raw, storedMark) {
   return { ok: true, reason: "clean", message: `mark still holds at seq ${storedMark.seq}, tip now at seq ${currentMark.seq}`, mark: currentMark };
 }
 
-/** Read the persisted mark from `guardPath`. Missing, unreadable, or
- * malformed sidecar is treated as bootstrap (`null`), never a hard
- * failure -- matches `checkContiguity`'s "never throws on the expected
- * finding" posture; a lost/corrupt sidecar is itself a legitimate reason
- * to re-bootstrap from the current tip rather than crash `fgos doctor`. */
-export function readGuardMark(guardPath) {
+/**
+ * Tầng A/T5 (TA-D10): the sidecar now holds a MAP `{fileName -> {seq,
+ * hash}}` instead of a single `{seq, hash}` object -- one entry per
+ * tracked file (baseline-0's own basename `"events.jsonl"`, or
+ * `"events/<writer file name>"` for a per-writer file), since a
+ * truncation on one writer's file must never be confused with, or hide
+ * behind, another writer's own mark. Still one gitignored sidecar per
+ * `.fgos/` dir (unchanged path/name) -- only its on-disk SHAPE changed.
+ * `readGuardMarks`/`writeGuardMarks` own that shape; every other function
+ * below narrows to one entry by `fileKey`.
+ */
+export function readGuardMarks(guardPath) {
   let raw;
   try {
     raw = fs.readFileSync(guardPath, "utf8");
   } catch {
-    return null;
+    return {};
   }
   try {
     const parsed = JSON.parse(raw);
-    if (typeof parsed.seq === "number" && typeof parsed.hash === "string") return parsed;
-    return null;
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
   } catch {
-    return null;
+    return {};
   }
 }
 
-/** Persist `mark` to `guardPath`. `mark === null` (an empty/legacy log)
- * writes nothing -- there is no mark yet to advance to. */
-export function writeGuardMark(guardPath, mark) {
-  if (mark === null) return;
+/** Persist the WHOLE marks map to `guardPath`. */
+export function writeGuardMarks(guardPath, marks) {
   fs.mkdirSync(path.dirname(guardPath), { recursive: true });
-  fs.writeFileSync(guardPath, `${JSON.stringify(mark)}\n`, "utf8");
+  fs.writeFileSync(guardPath, `${JSON.stringify(marks)}\n`, "utf8");
+}
+
+/** Read one file's persisted mark from the shared sidecar map. Missing
+ * sidecar, missing entry, unreadable, or malformed content is treated as
+ * bootstrap (`null`), never a hard failure -- matches `checkContiguity`'s
+ * "never throws on the expected finding" posture; a lost/corrupt sidecar
+ * is itself a legitimate reason to re-bootstrap from the current tip
+ * rather than crash `fgos doctor`. */
+export function readGuardMark(guardPath, fileKey) {
+  const mark = readGuardMarks(guardPath)[fileKey];
+  return mark && typeof mark.seq === "number" && typeof mark.hash === "string" ? mark : null;
+}
+
+/** Persist `mark` under `fileKey` in the shared sidecar map, leaving every
+ * other file's own entry untouched. `mark === null` (an empty/legacy log)
+ * writes nothing -- there is no mark yet to advance to. */
+export function writeGuardMark(guardPath, fileKey, mark) {
+  if (mark === null) return;
+  const marks = readGuardMarks(guardPath);
+  marks[fileKey] = mark;
+  writeGuardMarks(guardPath, marks);
 }
 
 /** Read-only: run `checkTruncationGuard` against real files on disk,
@@ -171,10 +195,13 @@ export function writeGuardMark(guardPath, mark) {
  * `checkEventsJsonlContiguity`'s own precedent (a report that races a
  * concurrent append at worst reads a slightly stale snapshot, never a
  * torn/corrupt one; `appendEvent`'s own lock still protects the file
- * itself from a torn write). */
-export function checkEventsJsonlTruncationGuard(logPath, guardPath) {
+ * itself from a torn write). `fileKey` defaults to `logPath`'s own
+ * basename -- byte-identical to the pre-T5 single-file behavior for any
+ * caller that never passes it (e.g. the CLI wrapper, always called
+ * against baseline-0). */
+export function checkEventsJsonlTruncationGuard(logPath, guardPath, fileKey = path.basename(logPath)) {
   const raw = fs.existsSync(logPath) ? fs.readFileSync(logPath, "utf8") : "";
-  const storedMark = readGuardMark(guardPath);
+  const storedMark = readGuardMark(guardPath, fileKey);
   return checkTruncationGuard(raw, storedMark);
 }
 
@@ -183,13 +210,41 @@ export function checkEventsJsonlTruncationGuard(logPath, guardPath) {
  * tip -- this IS the mechanism (an external mark that only a clean check
  * ever gets to move). Never advances the mark on a break, so the failing
  * mark stays pointed at the last known-good position for whoever
- * investigates. */
-export function advanceEventsJsonlTruncationGuard(logPath, guardPath) {
-  const report = checkEventsJsonlTruncationGuard(logPath, guardPath);
+ * investigates. Same `fileKey` default as `checkEventsJsonlTruncationGuard`. */
+export function advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey = path.basename(logPath)) {
+  const report = checkEventsJsonlTruncationGuard(logPath, guardPath, fileKey);
   if (report.ok && report.mark !== null) {
-    writeGuardMark(guardPath, report.mark);
+    writeGuardMark(guardPath, fileKey, report.mark);
   }
   return report;
+}
+
+/**
+ * Tầng A/T5 (TA-D10): every file the guard/checkpoint machinery tracks --
+ * baseline-0 (`${fgosDir}/events.jsonl`, always listed, tagged with the
+ * `fileKey` `"events.jsonl"` even if it does not physically exist yet) plus
+ * every `*.jsonl` file directly under `${fgosDir}/events/` (non-recursive,
+ * so a future `archive/` there is structurally never included), tagged
+ * `"events/<name>"`. Mirrors `discoverEventFilePaths` in replay.mjs (T3/T4)
+ * -- a separate copy here on purpose: this module is `kernel` tier and may
+ * not import from `src/state/replay.mjs` (one-way-down layering).
+ */
+function discoverGuardedFiles(fgosDir) {
+  const result = [{ fileKey: "events.jsonl", logPath: path.join(fgosDir, "events.jsonl") }];
+  const eventsDirPath = path.join(fgosDir, "events");
+  let names = [];
+  try {
+    names = fs
+      .readdirSync(eventsDirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".jsonl"))
+      .map((entry) => entry.name);
+  } catch (err) {
+    if (err.code !== "ENOENT") throw err;
+  }
+  for (const name of names) {
+    result.push({ fileKey: `events/${name}`, logPath: path.join(eventsDirPath, name) });
+  }
+  return result;
 }
 
 export const PERIODIC_CHECKPOINT_INTERVAL_SEC = 900; // 15 minutes
@@ -208,11 +263,9 @@ export const PERIODIC_CHECKPOINT_INTERVAL_SEC = 900; // 15 minutes
 // override once more of it exists.
 export const DEFAULT_CHECKPOINT_EVENT_THRESHOLD = 50;
 
-/**
- * Calculates the number of uncommitted appended events in logPath relative to git HEAD.
- * Returns 0 if logPath does not exist.
- */
-export function getUncommittedEventCount(logPath, repoRoot) {
+/** The single-file core `getUncommittedEventCount` (below) sums over every
+ * discovered file. Returns 0 if `logPath` does not exist. */
+function getUncommittedEventCountForFile(logPath, repoRoot) {
   if (!fs.existsSync(logPath)) return 0;
   const relPath = path.relative(repoRoot, logPath) || ".fgos/events.jsonl";
   let diskLines = 0;
@@ -236,6 +289,22 @@ export function getUncommittedEventCount(logPath, repoRoot) {
   }
 
   return Math.max(0, diskLines - committedLines);
+}
+
+/**
+ * Calculates the number of uncommitted appended events across baseline-0
+ * AND every per-writer file under `.fgos/events/` (TA-D10) relative to git
+ * HEAD, summed. `fgosDir` is the `.fgos` directory (not a single log path
+ * -- pre-T5 this function took `logPath` directly; there were no callers
+ * outside this module to preserve compat for). Returns 0 for a dir with no
+ * baseline and no `events/` files at all.
+ */
+export function getUncommittedEventCount(fgosDir, repoRoot) {
+  let total = 0;
+  for (const { logPath } of discoverGuardedFiles(fgosDir)) {
+    total += getUncommittedEventCountForFile(logPath, repoRoot);
+  }
+  return total;
 }
 
 /**
@@ -278,24 +347,34 @@ export function runOpportunisticMainCheckoutChecks(
 
   let breakFlagged = false;
 
-  // D1: Detect and warn. Refuse mark advancement / periodic commit on break.
+  // D1: Detect and warn, per tracked file (TA-D10: baseline-0 AND every
+  // per-writer file under .fgos/events/). Refuse mark advancement /
+  // periodic commit on ANY file's break -- a break on one writer's file is
+  // just as real a truncation as one on baseline-0.
   try {
-    const logPath = path.join(fgosDir, "events.jsonl");
     const guardPath = path.join(fgosDir, "events-jsonl.truncation-guard.json");
     if (rawLog !== null) {
-      const storedMark = readGuardMark(guardPath);
+      // Test-injection path (existing `rawLog` override): scoped to
+      // baseline-0 only, byte-identical to before T5 -- callers using this
+      // override are simulating a single log's raw text directly, not a
+      // whole directory.
+      const fileKey = "events.jsonl";
+      const storedMark = readGuardMark(guardPath, fileKey);
       const report = checkTruncationGuard(rawLog, storedMark);
       if (report.ok && report.mark !== null) {
-        writeGuardMark(guardPath, report.mark);
+        writeGuardMark(guardPath, fileKey, report.mark);
       } else if (!report.ok) {
-        recordMainCheckoutGuardWarning(fgosDir, report);
+        recordMainCheckoutGuardWarning(fgosDir, { ...report, file: fileKey });
         breakFlagged = true;
       }
-    } else if (fs.existsSync(logPath)) {
-      const report = advanceEventsJsonlTruncationGuard(logPath, guardPath);
-      if (report && report.ok === false) {
-        recordMainCheckoutGuardWarning(fgosDir, report);
-        breakFlagged = true;
+    } else {
+      for (const { fileKey, logPath } of discoverGuardedFiles(fgosDir)) {
+        if (!fs.existsSync(logPath)) continue;
+        const report = advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey);
+        if (report && report.ok === false) {
+          recordMainCheckoutGuardWarning(fgosDir, { ...report, file: fileKey });
+          breakFlagged = true;
+        }
       }
     }
   } catch {
@@ -305,12 +384,28 @@ export function runOpportunisticMainCheckoutChecks(
   // D1 Fail-closed: refuse periodic auto-commit when an unacknowledged break is flagged
   if (breakFlagged) return;
 
-  // D2: Event-count-based (or time-based) periodic auto-commit
+  // D2: Event-count-based (or time-based) periodic auto-commit. Pathspecs
+  // cover baseline-0 AND `.fgos/events/` (TA-D10) -- each ONLY when it
+  // actually exists on disk: `git add`/`git status` on a pathspec that
+  // matches nothing at all is a hard error (unlike a directory that exists
+  // but happens to be empty). Baseline-0 not existing is a real, if rare,
+  // case too (deleted post-migration, or any other reason) -- treating it
+  // as always-present here would silently skip the periodic commit the
+  // moment that happened, via the outer catch below swallowing git add's
+  // fatal error -- exactly the "silent event log loss" class this module
+  // exists to prevent.
   try {
     const logPath = path.join(fgosDir, "events.jsonl");
+    const eventsDirPath = path.join(fgosDir, "events");
+    const pathspecs = [];
     if (fs.existsSync(logPath)) {
-      const relPath = path.relative(realRepoRoot, logPath) || ".fgos/events.jsonl";
-      const statusOut = execFileSync("git", ["status", "--porcelain", "--", relPath], {
+      pathspecs.push(path.relative(realRepoRoot, logPath) || ".fgos/events.jsonl");
+    }
+    if (fs.existsSync(eventsDirPath)) {
+      pathspecs.push(path.relative(realRepoRoot, eventsDirPath));
+    }
+    if (pathspecs.length > 0) {
+      const statusOut = execFileSync("git", ["status", "--porcelain", "--", ...pathspecs], {
         cwd: realRepoRoot,
         encoding: "utf8",
         stdio: ["ignore", "pipe", "ignore"],
@@ -319,7 +414,7 @@ export function runOpportunisticMainCheckoutChecks(
       if (statusOut.length > 0) {
         let lastCommitSec = null;
         try {
-          const logOut = execFileSync("git", ["log", "-1", "--format=%ct", "--", relPath], {
+          const logOut = execFileSync("git", ["log", "-1", "--format=%ct", "--", ...pathspecs], {
             cwd: realRepoRoot,
             encoding: "utf8",
             stdio: ["ignore", "pipe", "ignore"],
@@ -358,7 +453,7 @@ export function runOpportunisticMainCheckoutChecks(
             ? configThreshold
             : DEFAULT_CHECKPOINT_EVENT_THRESHOLD;
 
-        const uncommittedEvents = getUncommittedEventCount(logPath, realRepoRoot);
+        const uncommittedEvents = getUncommittedEventCount(fgosDir, realRepoRoot);
         const currentTimeSec = nowSec !== null ? nowSec : Math.floor(Date.now() / 1000);
 
         const eventThresholdMet = effectiveEventThreshold !== null && uncommittedEvents >= effectiveEventThreshold;
@@ -366,7 +461,7 @@ export function runOpportunisticMainCheckoutChecks(
         const initialCommitMet = lastCommitSec === null;
 
         if (eventThresholdMet || timeIntervalMet || initialCommitMet) {
-          execFileSync("git", ["add", relPath], {
+          execFileSync("git", ["add", ...pathspecs], {
             cwd: realRepoRoot,
             stdio: ["ignore", "pipe", "ignore"],
           });
@@ -375,7 +470,7 @@ export function runOpportunisticMainCheckoutChecks(
             // the caller passes HOLDER_PID_ENV_VAR down as plain data so
             // .githooks/pre-commit's own lock re-check recognizes this
             // commit as the same identity already holding the lock.
-            execFileSync("git", ["commit", "-m", "chore(.fgos): periodic events.jsonl checkpoint", "--", relPath], {
+            execFileSync("git", ["commit", "-m", "chore(.fgos): periodic events.jsonl checkpoint", "--", ...pathspecs], {
               cwd: realRepoRoot,
               stdio: ["ignore", "pipe", "ignore"],
               ...(commitEnv ? { env: { ...process.env, ...commitEnv } } : {}),
@@ -388,7 +483,7 @@ export function runOpportunisticMainCheckoutChecks(
             // operation runs next. Best-effort: the outer catch below still
             // swallows non-blocking either way.
             try {
-              execFileSync("git", ["reset", "--", relPath], { cwd: realRepoRoot, stdio: ["ignore", "pipe", "ignore"] });
+              execFileSync("git", ["reset", "--", ...pathspecs], { cwd: realRepoRoot, stdio: ["ignore", "pipe", "ignore"] });
             } catch {
               // best-effort
             }
