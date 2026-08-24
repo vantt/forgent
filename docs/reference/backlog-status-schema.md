@@ -2,7 +2,7 @@
 type: reference
 title: backlog status schema
 tags: [status-fsm, backlog, work-item, schema]
-source_capture_ids: [tsk-5vs, tsk-4rdi]
+source_capture_ids: [tsk-5vs, tsk-4rdi, tsk-1av]
 authoritative_for: the schema shape of the backlog work-item status — STATUSES, TRANSITIONS, and statusLabels wiring
 ---
 # `backlog` status schema
@@ -50,3 +50,13 @@ existing `opts.async`). When set, the created item's `status` is
 `'backlog'` instead of the hardcoded `'todo'` literal
 (`bin/fgos.mjs:921`) — the one and only place a work item can be created
 directly into `backlog` rather than reaching it later some other way.
+
+## `fgos-clarifying` can run directly on a `backlog` item
+
+`src/state/discover-pool.mjs`'s `isCandidate` status check is split by
+stage shape: a `discoverableStages` candidate (`discovery`/`exploring`
+for the `coding` domain) now accepts status `todo` **or** `backlog`; a
+decompose-stage candidate (the drain-only legacy path) stays strict
+`todo`-only, unchanged. This lets `fgos-clarifying` clarify a backlog
+item's description while it still sits at `backlog` — clarification does
+not require promoting the item to `todo` first.
