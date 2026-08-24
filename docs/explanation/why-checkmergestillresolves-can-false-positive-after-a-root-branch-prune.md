@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: Why `checkMergeStillResolves` can false-positive after a root branch prune
-source_capture_ids: [tsk-psb, tsk-2q8, tsk-597z]
+source_capture_ids: [tsk-psb, tsk-2q8, tsk-597z, tsk-4bh]
 ---
 # Why `checkMergeStillResolves` can false-positive after a root branch prune
 
@@ -301,3 +301,15 @@ reruns. This sweep only helps the `tsk-4n7` shape, where the underlying
 check later became true again for an unrelated reason (a `sync-root`
 elsewhere re-establishing real ancestry) — a genuinely different failure
 mode from a rebase that permanently orphans the original sha.
+
+## A fourth gap: canceled/`wontfix` children were never skipped (`tsk-4bh`)
+
+Found in the same 2026-08-14 fable audit
+(`docs/reference/worktree-merge-lifecycle-audit-260814-findings.md`):
+`checkMergeStillResolves` never skipped `wontfix`/canceled children when
+walking a decomposed root's own children-recursion check — a root with
+one abandoned (`wontfix`) child could never clear cleanup, since the
+check kept demanding ancestry proof for a child that was never going to
+merge in the first place. **Fix**: the check now skips canceled/`wontfix`
+children when recursing, the same way it should already skip anything
+that was never going to land.

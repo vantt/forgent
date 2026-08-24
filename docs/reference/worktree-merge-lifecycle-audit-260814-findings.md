@@ -2,7 +2,7 @@
 type: reference
 title: Worktree/merge lifecycle audit findings (2026-08-14)
 tags: [audit, worktree, merge, lifecycle, code-review]
-source_capture_ids: [tsk-25r, tsk-18k, tsk-1mn, tsk-2iz, tsk-ikd]
+source_capture_ids: [tsk-25r, tsk-18k, tsk-1mn, tsk-2iz, tsk-ikd, tsk-4bh]
 authoritative_for: the 9 findings from the 2026-08-14 fable code-review audit of fgOS's worktree claim/merge/cleanup lifecycle, and which work item tracks each
 ---
 # Worktree/merge lifecycle audit findings (2026-08-14)
@@ -19,7 +19,7 @@ as of this audit's own capture.
 | `tsk-1mn` | medium | **Fixed.** `claimWork` held the main-checkout lock across synchronous `npm ci` with no heartbeat, letting the TTL expire mid-claim and reopen the concurrent-writer race `tsk-18k` also addresses. Fixed by releasing `main-checkout.lock` *before* `claimWork`'s synchronous `npm ci` runs, rather than adding a heartbeat — the two findings are companions: `tsk-18k` fixes what happens *after* a TTL-driven reclaim, this fixes how *often* one happens in the first place. |
 | `tsk-2iz` | medium | **Fixed.** Decision-index auto-resolve could mint duplicate decision IDs (reading only one of two relevant trees) and a throw mid-resolve could skip the merge abort. Fixed by having auto-resolve consider both trees and never skip the abort path on a throw. |
 | `tsk-ikd` | medium | **Fixed.** `return`'s main-source path had no main-worktree guard, unlike `approve`/`sync-root`/`promote-to-component`, which all already refuse when run outside the main checkout. Fixed: `return`'s main-source path now refuses against an unregistered worktree the same way. |
-| `tsk-4bh` | medium | `checkMergeStillResolves` never skips `wontfix`/canceled children, causing a permanent cleanup block on a decomposed root. |
+| `tsk-4bh` | medium | **Fixed.** `checkMergeStillResolves` never skipped `wontfix`/canceled children, causing a permanent cleanup block on a decomposed root that had one. Fixed: the check now skips canceled/`wontfix` children. See `docs/explanation/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md` for the full family of fixes to this same function. |
 | `tsk-2jn` | medium-low | `footprintOverlapAmong` compares raw declared paths without `normalizePath` — differently-spelled but identical footprints dodge parallel-dispatch conflict detection. |
 | `tsk-4yv` | low | A `finishWorktreeSetup` failure leaks a registered worktree; detached merge worktrees are never reclaimed by anything. |
 | `tsk-386` | low | `baseRef: 'main'` hardcodes survive in `worktree.mjs` and `approve`'s root-branch fallback despite the earlier trunk-detection work. |
