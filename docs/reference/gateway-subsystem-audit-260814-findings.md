@@ -2,7 +2,7 @@
 type: reference
 title: Gateway subsystem audit findings (2026-08-14)
 tags: [audit, gateway, mcp, interface-daemon, code-review]
-source_capture_ids: [tsk-1zg, tsk-4uh, tsk-og6, tsk-4lf, tsk-1qe, tsk-1ah, tsk-5m1, tsk-4qf, tsk-67gr]
+source_capture_ids: [tsk-1zg, tsk-4uh, tsk-og6, tsk-4lf, tsk-1qe, tsk-1ah, tsk-5m1, tsk-4qf, tsk-67gr, tsk-4r1]
 authoritative_for: the 9 findings from the 2026-08-14 haiku-scan + fable code-review audit of fgOS's gateway subsystem (REST/RPC + MCP surface), and which work item tracks each
 ---
 # Gateway subsystem audit findings (2026-08-14)
@@ -25,7 +25,7 @@ audit reviewed. Each finding below was filed as its own work item.
 | `tsk-5m1` | medium-low | **Fixed.** The contract's `X-Fgos-Writer-Id`/`X-Fgos-Writer-Role` attribution headers were dead — the gateway never read them, and the CLI had no flag to forward them into. Fixed by removing the dead headers from the contract entirely, rather than building the unused forwarding path — no real consumer needed them. |
 | `tsk-4qf` | medium-low | **Fixed.** Non-2xx responses weren't always the contract's `ErrorEnvelope` shape; auth failures were indistinguishable from validation errors; the yaml declared no consistent error schema. Fixed together: the gateway's error envelope and auth-signal drift were corrected in one pass. |
 | `tsk-67gr` | low | **Fixed.** The contract's `takeWork` role enum promised `runner` as a valid role; the CLI actually refused it. Fixed by narrowing the contract's enum to match `take`'s real scope, rather than widening the CLI to accept a role it was never designed to support. |
-| `tsk-4r1` | low | `gateway.token`/`gateway.port` are registered nowhere in `fgos setup`'s config-merge or `fgos doctor`'s checks — the gateway's own error message points at config a doctor pass can't verify exists. |
+| `tsk-4r1` | low | **Fixed.** `gateway.token`/`gateway.port` were registered nowhere in `fgos setup`'s config-merge or `fgos doctor`'s checks — the exact gap `AGENTS.md`'s own install/setup/doctor gate exists to prevent (a new config default landing without a matching setup/doctor registration). Fixed: both are now registered in the setup/doctor gate. |
 
 Findings 1-2 were spot-verified directly by the auditing session; findings
 3-9 were not independently re-verified at capture time (fable's own raw
