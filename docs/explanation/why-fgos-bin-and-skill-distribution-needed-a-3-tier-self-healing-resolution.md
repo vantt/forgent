@@ -2,7 +2,7 @@
 type: explanation
 title: Why fgOS bin and skill distribution needed a 3-tier self-healing resolution
 tags: [distribution, install, setup, doctor, skill-materialization, external-project]
-source_capture_ids: [tsk-2qc]
+source_capture_ids: [tsk-2qc, tsk-2qc-1]
 authoritative_for: why fgOS install/setup resolves the fgos binary through a 3-tier cached scheme, and why skill materialization no longer depends on the claude CLI or plugin marketplace
 ---
 # Why fgOS bin and skill distribution needed a 3-tier self-healing resolution
@@ -54,6 +54,25 @@ itself splits into three deterministic tiers: dev-checkout self-hosting
 a real supported mode for cross-project version pinning, not just an
 implementation detail), and global install — the only tier that actually
 needs `PATH`/cache resolution at all.
+
+## D2/D4 landed (`tsk-2qc-1`): the 3-tier resolution with a global-tier config-cache
+
+The bin-discovery rework itself: `fgos` resolution now walks the three
+D2 tiers in order (dev-checkout self-hosting, project-local
+`node_modules/.bin/fgos`, global install), with the global tier backed by
+the `~/.fgos/config.json` cache per D4 — populate/repair happens once,
+inside `fgos setup`/`doctor --fix`, not on every invocation.
+
+A real verify-shape lesson surfaced landing this piece: its first
+`return` re-verify failed with a `.fgos/`-presence-related signal — the
+verify command was checking for `.fgos/` existing, but a detached
+ephemeral merge worktree (which `bin/fgos.mjs`'s own `return` re-verify
+runs inside) never carries `.fgos/` at all, per ADR0020. The fix redesigned
+the item's own verify to check real code/behavior directly instead of
+`.fgos/` presence — the same class of verify-shape mistake other items in
+this repo's own history have hit when a check accidentally depends on a
+directory ADR0020 guarantees is absent in exactly the context the check
+runs in.
 
 ## D3/D4: cache-then-verify, not probe-every-call
 
