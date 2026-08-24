@@ -174,7 +174,13 @@
               "ANTHROPIC_API_KEY": ""
             }
           }
-        ]
+        ],
+        "providerModel": "z-ai",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
       },
       "gitnexus": {
         "kind": "tool",
@@ -228,6 +234,9 @@
       },
       "openai-codex": {
         "lightweight": "gpt-5.5"
+      },
+      "z-ai": {
+        "lightweight": "z-ai/glm-5.2"
       }
     },
     "models": {
