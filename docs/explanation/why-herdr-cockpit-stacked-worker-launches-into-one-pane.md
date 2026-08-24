@@ -2,7 +2,7 @@
 type: explanation
 title: Why herdr cockpit stacked worker launches into one pane
 tags: [herdr, pane, launch-guard, boot-window]
-source_capture_ids: [tsk-40g, tsk-4ry]
+source_capture_ids: [tsk-40g, tsk-4ry, tsk-3q8z]
 authoritative_for: why herdr cockpit stacked worker launches into a single reused pane and relaunched its discovery worker during boot
 ---
 # Why herdr cockpit stacked worker launches into one pane
