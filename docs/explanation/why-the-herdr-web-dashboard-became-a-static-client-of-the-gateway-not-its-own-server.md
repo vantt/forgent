@@ -2,7 +2,7 @@
 type: explanation
 title: Why the herdr web dashboard became a static client of the gateway, not its own server
 tags: [herdr, web-dashboard, gateway, realignment, auth]
-source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w, tsk-5jr]
+source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w, tsk-5jr, tsk-4id]
 authoritative_for: why the herdr web dashboard's architecture moved from a standalone embedded webserver to a static bundle served by the existing gateway, and the security/lifecycle decisions that survived the realignment
 ---
 # Why the herdr web dashboard became a static client of the gateway, not its own server
@@ -121,6 +121,20 @@ itself) — the item is explicit that no endpoint gets re-described
 independently in either the item text or the code; every reference cites
 the contract directly, avoiding the exact class of stale-reference drift
 several other items in this sweep found elsewhere in this repo.
+
+## P4 (`tsk-4id`): the task-detail view, the cluster's actual main goal
+
+Task detail — agent history, question history, questions needing an
+answer — was the primary target of the whole cluster, not just another
+screen. Same web-client-independent framing and same
+contract-as-single-source rule as P3 (`GET /v1/work/{id}` for item
+detail, `GET /v1/rollup/{id}` for child progress). This is the item
+whose own live run — actually executing the full 7-item cluster in one
+session — produced the real evidence behind D15's own finding: every
+gate question in that live run got asked and answered synchronously
+within the session, never durably recorded, confirming the pending-gate-
+visibility gap named earlier as a real limit rather than a theoretical
+one.
 
 ## What didn't change: why the webserver outlives the cockpit pane (D12)
 
