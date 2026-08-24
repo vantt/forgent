@@ -1,0 +1,39 @@
+---
+type: reference
+title: Worktree/merge lifecycle audit findings (2026-08-14)
+tags: [audit, worktree, merge, lifecycle, code-review]
+source_capture_ids: [tsk-25r]
+authoritative_for: the 9 findings from the 2026-08-14 fable code-review audit of fgOS's worktree claim/merge/cleanup lifecycle, and which work item tracks each
+---
+# Worktree/merge lifecycle audit findings (2026-08-14)
+
+`tsk-25r` (parent/coordinator item). Full report:
+`plans/reports/worktree-merge-audit-260814-1809-fable-hidden-bugs-report.md`.
+Each finding below was filed as its own separate work item, ready to be
+picked up individually or driven as a batch — none had landed a code fix
+as of this audit's own capture.
+
+| id | severity | finding |
+|---|---|---|
+| `tsk-18k` | high | Merge-target-slot lock's string-identity release/renew can delete a sibling session's live lock after a TTL reclaim (see `docs/explanation/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md` for full detail — a third round on the same call site `tsk-1wr`/`tsk-70l` already worked on). |
+| `tsk-1mn` | medium | `claimWork` holds the main-checkout lock across `npm ci` with no heartbeat. |
+| `tsk-2iz` | medium | Decision-index auto-resolve can mint duplicate decision IDs, and a throw mid-resolve skips the merge abort. |
+| `tsk-ikd` | medium | `return`'s main-source path has no main-worktree guard — `approve`/`sync-root`/`promote-to-component` all refuse outside the main checkout, `return` doesn't. |
+| `tsk-4bh` | medium | `checkMergeStillResolves` never skips `wontfix`/canceled children, causing a permanent cleanup block on a decomposed root. |
+| `tsk-2jn` | medium-low | `footprintOverlapAmong` compares raw declared paths without `normalizePath` — differently-spelled but identical footprints dodge parallel-dispatch conflict detection. |
+| `tsk-4yv` | low | A `finishWorktreeSetup` failure leaks a registered worktree; detached merge worktrees are never reclaimed by anything. |
+| `tsk-386` | low | `baseRef: 'main'` hardcodes survive in `worktree.mjs` and `approve`'s root-branch fallback despite the earlier trunk-detection work. |
+| `tsk-f8f` | low | `lastActivityAt` mis-parses git-quoted paths — activity on filenames with spaces/special characters is invisible to the stale-claim reclaim check. |
+
+## Unresolved questions the audit itself named
+
+- Findings 3 (`tsk-2iz`) and 5 (`tsk-4bh`) both touch the
+  decomposed-parent merge/cleanup path — worth confirming whether fixing
+  one changes the reproduction shape of the other before implementing
+  either.
+- Finding 8 (`tsk-386`)'s overlap with an already-`done` trunk-hardcode
+  item wasn't fully resolved at capture time.
+
+Each finding is tracked and, where later implemented, synthesized under
+its own work item id — this reference is the audit's own index, not a
+substitute for each fix's own record.

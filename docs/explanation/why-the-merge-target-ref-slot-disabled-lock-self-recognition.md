@@ -2,7 +2,7 @@
 type: explanation
 title: Why the merge target-ref slot disabled lock self-recognition
 tags: [merge, lock, self-recognition, concurrency, session-identity]
-source_capture_ids: [tsk-1wr, tsk-70l]
+source_capture_ids: [tsk-1wr, tsk-70l, tsk-25r]
 authoritative_for: why withMergeTargetSlot passes allowSelfRecognition false while main-checkout.lock keeps self-recognition enabled
 ---
 # Why the merge target-ref slot disabled lock self-recognition
@@ -138,6 +138,51 @@ worse failure mode than the bug being fixed); and widening
 `tryAcquireOnce`'s own self-recognition equality branch to parse a
 composite identity (touches exclusion-critical logic this fix can avoid
 touching entirely, for no benefit over the explicit env-channel design).
+
+## A third round reopens the target-slot's release/renew path (fable audit, `tsk-18k`)
+
+A code-review audit (`tsk-25r`, `plans/reports/worktree-merge-audit-260814-1809-fable-hidden-bugs-report.md`)
+found a real gap neither `tsk-1wr` nor `tsk-70l` had covered: `allowSelfRecognition:
+false` (`tsk-1wr`'s own fix) only affects the *acquire* path on
+`withMergeTargetSlot` — `release()` and the heartbeat's renew both still
+match on plain string-identity equality (`record.pid === identity`),
+with no way to tell which of two fanout siblings sharing the same
+session-id string actually wrote a given record.
+
+**Failure scenario**: sibling A holds the slot; its heartbeat starves
+past TTL because the hold spans a synchronous `npm ci`
+(`provisionDependencies`, run twice per leaf approve) that can exceed
+the 180s TTL on a cold cache. Sibling B sees the record as stale,
+reclaims, writes its own record under the *same* string identity. A
+finishes and releases — matching B's live record and deleting it. A
+third session C can now acquire while B is still mid-merge: the slot no
+longer provides mutual exclusion, and every resulting collision shows up
+only as a confusing "tip changed since this merge started" retry, never
+the real cause.
+
+**Why this doesn't reopen `tsk-1wr`'s or `tsk-70l`'s own decisions.**
+`tsk-1wr` locked "targeted fix, not a wider identity-model change" for
+this exact call site and explicitly rejected per-process identity — that
+reasoning has nothing to do with this failure mode. `tsk-70l` separately
+reviewed this same call site and marked it out of scope, reasoning the
+slot is "always released within the same call that acquired it" — this
+audit's TTL-starvation-during-`npm ci` scenario is the new, concrete
+evidence that assumption fails in a reachable real case, which is
+specifically what justifies reopening scope here without touching either
+prior decision.
+
+**Decided direction**: a per-acquisition **nonce** stamped into the lock
+record, with release/renew matching on the nonce instead of identity —
+not a switch to `process.pid` (a second-round "should we just use pid
+now?" hypothesis was raised and considered, but the nonce direction
+better isolates the fix to exactly the correctness gap found, without
+reopening the wider identity-model question `tsk-1wr` already settled).
+Scoped to land together with a related finding shrinking the lock's hold
+time across `npm ci` — the two are complementary, neither substitutes
+for the other: the nonce closes the correctness gap outright; shrinking
+the hold time reduces how often the TTL-starvation window is even
+reachable. Not yet implemented as of this capture — filed as its own
+work item (`tsk-18k`).
 
 ## Verification shape
 
