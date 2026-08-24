@@ -520,6 +520,18 @@ export async function approveUseCase(
             });
             return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch, conflictedFiles: catchupResult.conflictedFiles };
           }
+          if (catchupResult.outcome === 'merge-refused') {
+            moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-failed-unclassified', role: 'system' });
+            addFriction(dir, {
+              id,
+              disposition: 'blocked',
+              errorClass: 'merge-fail',
+              layer: 'state',
+              attempts: 1,
+              detail: `catchup (inbound gate): git merge --no-commit --no-ff ${rootBranch} into ${branchNameFor(id)} refused: ${catchupResult.reason}`,
+            });
+            return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: rootBranch, detail: catchupResult.reason };
+          }
           if (catchupResult.outcome === 'verify-fail') {
             const mergeReason = catchupResult.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
             moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: mergeReason, role: 'system' });

@@ -2385,3 +2385,87 @@ test('mergeRunnerItem attaches no postLand report when the merge did not land', 
   assert.equal(result.outcome, 'verify-fail');
   assert.equal(result.postLand, undefined);
 });
+
+test('performCatchUp pre-merge-refusal fixture returns merge-refused outcome without conflictedFiles', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/tsk-5et', 'f.txt', 'branch\n');
+  git(repoRoot, ['checkout', 'main']);
+  fs.writeFileSync(path.join(repoRoot, 'f.txt'), 'main\n');
+  git(repoRoot, ['add', 'f.txt']);
+  git(repoRoot, ['commit', '-m', 'main edit']);
+
+  const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bin-shim-'));
+  const realGit = execFileSync('which', ['git'], { encoding: 'utf8' }).trim();
+  const shimScript = `#!/bin/sh
+if [ "$1" = "merge" ] && [ "$2" = "--no-commit" ]; then
+  echo "error: Entry 'f.txt' not uptodate. Cannot merge." >&2
+  exit 1
+fi
+exec ${realGit} "$@"
+`;
+  fs.writeFileSync(path.join(binDir, 'git'), shimScript, { mode: 0o755 });
+
+  const origPath = process.env.PATH;
+  process.env.PATH = `${binDir}:${origPath}`;
+
+  try {
+    const result = await performCatchUp(repoRoot, 'tsk-5et', makeItem(), 'main', 5000);
+    assert.equal(result.outcome, 'merge-refused');
+    assert.equal(result.reason, "error: Entry 'f.txt' not uptodate. Cannot merge.");
+    assert.equal('conflictedFiles' in result, false);
+  } finally {
+    process.env.PATH = origPath;
+    fs.rmSync(binDir, { recursive: true, force: true });
+  }
+});
+
+test('performCatchUp genuine conflict returns conflict outcome with non-empty conflictedFiles', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/tsk-5et', 'conflict.txt', 'branch content\n');
+  git(repoRoot, ['checkout', 'main']);
+  fs.writeFileSync(path.join(repoRoot, 'conflict.txt'), 'main content\n');
+  git(repoRoot, ['add', 'conflict.txt']);
+  git(repoRoot, ['commit', '-m', 'main edit']);
+
+  const result = await performCatchUp(repoRoot, 'tsk-5et', makeItem(), 'main', 5000);
+  assert.equal(result.outcome, 'conflict');
+  assert.deepEqual(result.conflictedFiles, ['conflict.txt']);
+});
+
+test('abortMergeIfPossible throws MergeError with category merge-fail when merge abort fails on dirty staged merge', () => {
+  const repoRoot = initRepo();
+  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), '.fgos/events.jsonl merge=union\n');
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, '.fgos/events.jsonl'), 'line1\n');
+  fs.writeFileSync(path.join(repoRoot, 'conflict.txt'), 'base\n');
+  git(repoRoot, ['add', '.gitattributes', '.fgos/events.jsonl', 'conflict.txt']);
+  git(repoRoot, ['commit', '-m', 'initial']);
+
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'conflict.txt', 'branch\n');
+  git(repoRoot, ['checkout', 'fgw/demo-item']);
+  fs.writeFileSync(path.join(repoRoot, '.fgos/events.jsonl'), 'line1\nline2-branch\n');
+  git(repoRoot, ['commit', '-am', 'branch events update']);
+
+  git(repoRoot, ['checkout', 'main']);
+  fs.writeFileSync(path.join(repoRoot, '.fgos/events.jsonl'), 'line1\nline3-main\n');
+  fs.writeFileSync(path.join(repoRoot, 'conflict.txt'), 'main\n');
+  git(repoRoot, ['commit', '-am', 'main events & conflict update']);
+
+  try {
+    git(repoRoot, ['merge', '--no-commit', '--no-ff', 'fgw/demo-item']);
+  } catch {
+    // staged merge=union events.jsonl and hit conflict on conflict.txt
+  }
+  fs.appendFileSync(path.join(repoRoot, '.fgos/events.jsonl'), 'concurrent append\n');
+
+  assert.throws(
+    () => {
+      try {
+        abortMergeIfPossible(repoRoot);
+      } catch (abortErr) {
+        throw new MergeError(`merge of "fgw/demo-item" failed and "git merge --abort" itself failed: ${abortErr.message}`, { branch: 'fgw/demo-item' });
+      }
+    },
+    (err) => err instanceof MergeError && err.category === 'merge-fail',
+  );
+});

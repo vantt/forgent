@@ -118,6 +118,9 @@ export async function catchupUseCase({ dir, repoRoot }, { id, timeoutMs }) {
   if (result.outcome === 'verify-fail') {
     return { id, outcome: 'verify-fail', timedOut: result.timedOut, target, branch: ownBranch, exitStatus: result.exitStatus, output: result.output };
   }
+  if (result.outcome === 'merge-refused') {
+    return { id, outcome: 'merge-refused', target, branch: ownBranch, reason: result.reason };
+  }
   // 'conflict'
   return { id, outcome: 'conflict', target, branch: ownBranch, conflictedFiles: result.conflictedFiles };
 }
