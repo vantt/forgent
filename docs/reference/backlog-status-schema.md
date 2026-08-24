@@ -2,7 +2,7 @@
 type: reference
 title: backlog status schema
 tags: [status-fsm, backlog, work-item, schema]
-source_capture_ids: [tsk-5vs]
+source_capture_ids: [tsk-5vs, tsk-4rdi]
 authoritative_for: the schema shape of the backlog work-item status — STATUSES, TRANSITIONS, and statusLabels wiring
 ---
 # `backlog` status schema
@@ -40,3 +40,13 @@ kept out of the pick frontier once the category exists.
 - **D4** — `herdr-plugin`'s `WorkTab::matches`/`next_auto_discover_candidate`
   needed a matching fix so a `backlog` item is correctly excluded from
   auto-discover, scoped into this same item rather than deferred.
+
+## Entry point: `fgos submit --backlog`
+
+Per D2 above, `fgos add` stays untouched — it always creates at `todo`.
+`fgos submit` gained the dedicated entry point instead: `submitWork`
+takes a new optional `opts.backlog` flag (the same optional shape as the
+existing `opts.async`). When set, the created item's `status` is
+`'backlog'` instead of the hardcoded `'todo'` literal
+(`bin/fgos.mjs:921`) — the one and only place a work item can be created
+directly into `backlog` rather than reaching it later some other way.
