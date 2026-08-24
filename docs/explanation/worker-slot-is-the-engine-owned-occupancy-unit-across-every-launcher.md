@@ -2,7 +2,7 @@
 type: explanation
 title: Worker slot is the engine-owned occupancy unit across every launcher
 tags: [worker-slot, occupancy, herdr-plugin, fgos-runner, fgos-fanout, ceiling]
-source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk, tsk-1oz]
+source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk, tsk-1oz, tsk-qrs]
 authoritative_for: worker slot concept and engine-wide worker occupancy ceiling shared by herdr-plugin, fgos-runner, fgos-fanout
 ---
 # Worker slot is the engine-owned occupancy unit across every launcher
@@ -336,6 +336,58 @@ standing-up design above — every fix sits at the seam between that
 design and setup/doctor/skill-prose, the class of gap a design's own
 unit tests structurally cannot see because it is about what surrounds
 the design, not what it computes.
+
+## A second review round: the runner/fanout half of the same ceiling (`tsk-qrs`)
+
+A separate review pass over the runner and `fgos-fanout` side (also
+post-`tsk-2sj`) found five more real defects — this time about whether
+the shared ceiling actually *covers* every launcher, not about setup/
+doctor surfacing:
+
+- **F1 — D8's whole-batch rule was documented but never actually built
+  into the enforcing gate.** `hasWorkerSlotRoom` returns `granted` equal
+  to the full requested `batchSize`, but `claimWork` calls it with no
+  `batchSize` at all — so every claim in a batch is checked alone against
+  `free`, and a batch of five against one free slot lands one and refuses
+  the other four, not the documented "whole batch waits its turn"
+  behavior. **Decision: retire D8 rather than rescue it.** The engine
+  keeps its hard per-item ceiling (which never overshoots); a launcher
+  trims its own batch down to `execution.free` before firing, instead of
+  firing the whole batch and letting the engine sort it out. Per
+  `AGENTS.md`'s own rule on changing a locked decision, this is recorded
+  as a written supersede rather than an edit to the original — all three
+  sites that had documented the never-built behavior (`worker-slots.mjs`,
+  `loop.mjs`, and `fgos-fanout`'s own `SKILL.md` — including a red flag
+  that had been forbidding the exact trim this decision now requires)
+  were corrected to match.
+- **F2 — the runner's discovery sweep bypassed the ceiling entirely.**
+  It stands real worker processes up without ever requesting a slot and
+  without occupying one, because it never claims (the item stays `todo`,
+  and occupancy only counts `doing`). Net effect: a full execution lane
+  correctly refuses its own wave, then spawns research workers anyway,
+  while `fgos slots` under-reports what the machine is actually running.
+- **F3 — a full lane's own log contradicted its own refusal message.**
+  It printed "frontier empty, nothing to do" moments after refusing on a
+  full lane, and reported outcome `idle` — giving a caller no way to
+  distinguish "genuinely no work" from "work is waiting behind a full
+  lane."
+- **F4 — an abandoned session claim could wedge every launcher
+  permanently, once a real ceiling was armed.** `startupReap`
+  deliberately skips `human`/`session` claims (by design, for a different
+  reason), and nothing surfaced which items were holding the occupied
+  slots — even though the wave gate already had those ids in hand and was
+  simply discarding them.
+- **F5 — `fgos-fanout`'s own refusal branch had no loop, no wait, no
+  bound, and no give-up rule.** A literal reading of the skill prose fell
+  straight through the refusal into the exact dispatch line the refusal
+  was supposed to prevent.
+
+Taken together with `tsk-1oz`'s six gaps, all eleven trace to the same
+root shape: the ceiling/ask-before-standing-up computation itself was
+correct and well-tested, but each of the three launchers' own *use* of
+it — batching, sweep-vs-execution occupancy, refusal reporting, reap, and
+loop control — had its own independent gap a unit test scoped to the
+shared engine code could never see.
 
 ## Related
 
