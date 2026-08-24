@@ -2,7 +2,7 @@
 type: explanation
 title: Why the herdr web dashboard became a static client of the gateway, not its own server
 tags: [herdr, web-dashboard, gateway, realignment, auth]
-source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w, tsk-5jr, tsk-4id, tsk-6d2]
+source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w, tsk-5jr, tsk-4id, tsk-6d2, tsk-yo0]
 authoritative_for: why the herdr web dashboard's architecture moved from a standalone embedded webserver to a static bundle served by the existing gateway, and the security/lifecycle decisions that survived the realignment
 ---
 # Why the herdr web dashboard became a static client of the gateway, not its own server
@@ -135,6 +135,19 @@ gate question in that live run got asked and answered synchronously
 within the session, never durably recorded, confirming the pending-gate-
 visibility gap named earlier as a real limit rather than a theoretical
 one.
+
+## The frontend scaffold split out as its own item (`tsk-yo0`)
+
+The realignment's own D6 split the frontend project scaffold
+(`herdr-plugin/web/`: vite + TypeScript + Tailwind, plus the API-client
+layer reading `fgos-gateway-api-v1.yaml`) into its own item, superseding
+D14's original plan (which had handed `package.json`/`vite.config.ts` to
+P3/`tsk-5jr` directly). **Why split out**: the scaffold stopped being a
+bare `npm create vite` once it also had to include the API-client layer
+and auth handling — substantial enough to stand on its own — and
+splitting it let P3 (`tsk-5jr`) and P4 (`tsk-4id`) run in parallel
+against a shared, already-built foundation instead of each building their
+own.
 
 ## This item is the realignment itself (`tsk-6d2`)
 
