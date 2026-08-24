@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: Why `checkMergeStillResolves` can false-positive after a root branch prune
-source_capture_ids: [tsk-psb]
+source_capture_ids: [tsk-psb, tsk-2q8]
 ---
 # Why `checkMergeStillResolves` can false-positive after a root branch prune
 
@@ -222,3 +222,53 @@ item resolves to itself as the root, also check that root's own branch
 against `main` — combined with AND. Same diagnostic-only stance every
 fix on this page already takes: report, never auto-recover. See
 `src/state/cleanup-harness.mjs`'s `checkRootBranchResolves`.
+
+## The rebased-not-pruned case (`tsk-2q8`) — content landed, ancestry sha didn't
+
+A different scenario from a pruned ref: a root/parent branch (`fgw/<rootId>`)
+that still *exists* but was **rebased**, not pruned. Confirmed live: a
+leaf item's own `branchHeadAtReturn` sha becomes permanently stale
+ancestry-wise even though the content genuinely landed on `main` —
+`git reflog` showed the parent branch rebased, replaying the leaf's
+return commit as a byte-identical new sha (verified: diff of
+added/removed lines matches exactly, and the deliverable text was
+directly confirmed present on `main`). The new sha is reachable from
+both the parent branch and `main`; the *recorded* sha is reachable from
+neither, so `checkMergeStillResolves` blocked the item with
+`parkReason: system-error` on every TTL cleanup attempt — permanently,
+since `fgos catchup`'s own `CATCHUP_REASONS` set only covers
+merge-related parks, never `system-error`.
+
+**Chosen fix**: rather than adding a third ancestry-fallback check (the
+originally proposed direction) or a sha-resync step, `fgos catchup`
+itself was made eligible for exactly this park shape. The eligibility
+gate reads the item's most recent `work.move` event and checks whether
+it transitioned `cleanup -> blocked` (via `readRawEvents`, already in
+scope at the same call site) — not a new field, marker convention, or
+`reason`-text parsing. Once eligible, `catchup`'s own existing
+merge-and-reverify mechanism (already tested, unchanged) naturally
+re-establishes fresh ancestry by merging the target into the item's
+branch and re-verifying — the exact recovery a rebased-but-still-live
+branch needs, reusing machinery that already existed for a different
+purpose rather than building a parallel fallback path.
+
+A negative test locks the boundary: a `blocked` item with an unrelated
+`system-error` reason (e.g. a runner-crash reclaim) must still be
+*rejected* by `fgos catchup` — admitting the wrong class of `system-error`
+park into the merge-retry path is exactly the failure this eligibility
+gate must not create.
+
+## A found-but-separate gap: old victims of an already-fixed false positive stay stuck
+
+A second, real occurrence of the *original* pruned-parent false positive
+(the `tsk-psb` shape this doc's own main body already covers) was found
+stuck in `status: blocked` for 5 days — the fix that resolved
+`checkMergeStillResolves` for new occurrences never retroactively
+re-checked items already parked *before* the fix landed. Fresh
+verification confirmed no data loss (the recorded sha had since become a
+real ancestor via an unrelated `sync-root`), and the item was manually
+unblocked the same way. This surfaced a genuine gap this item's own scope
+named but did not close: no sweep or audit revisits `status: blocked`
+items with a merge-related `system-error` park to see whether a since-landed
+fix now clears them — a fixed false-positive shape can still leave old
+victims stranded indefinitely, discoverable only by manual investigation.
