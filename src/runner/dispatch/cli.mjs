@@ -642,6 +642,8 @@ export async function decideExecutorCli(
   // `executeExecutorCli` above already uses, generalized past purpose-only.
   const resolvedIndirectly = !executorIdArg;
   let executorId = executorIdArg;
+  let workResolved;
+  let workResolvedInputId;
   if (!executorId && workIdArg) {
     const fgosDir = fgosDirFromRoot(root);
     const workItem = listWork(fgosDir).work[workIdArg];
@@ -649,6 +651,8 @@ export async function decideExecutorCli(
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
     executorId = executorIdForWork(workItem, stageArg);
+    workResolvedInputId = executorId;
+    workResolved = resolveExecutorAndOverrides(cfg, executorId);
     // tsk-5tm-6 D4: a work-item-resolved executorId with NO explicit
     // cfg.executors entry means "no override configured" -- per
     // Native-First Dispatch Doctrine (docs/decisions/0026) rule 2, every
@@ -665,7 +669,7 @@ export async function decideExecutorCli(
     // their pre-D4 "no executor -> out-of-process" behavior byte-identical,
     // since naming a specific executorId/purpose asks about that
     // registered target specifically, not a work item's default dispatch.
-    const hasExplicitExecutor = resolveExecutorAndOverrides(cfg, executorId).configured;
+    const hasExplicitExecutor = workResolved.configured;
     if (!hasExplicitExecutor) {
       const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
       return { mechanism, executorId, configured: false };
@@ -692,7 +696,9 @@ export async function decideExecutorCli(
     return { mechanism: 'unavailable', configured: false };
   }
   const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
-  const { executor, configured } = resolveExecutorAndOverrides(cfg, executorId);
+  const { executor, configured } = workResolved && workResolvedInputId === executorId
+    ? workResolved
+    : resolveExecutorAndOverrides(cfg, executorId);
   const agentType = executor?.agentType;
 
   // tsk-45f D10: MCP hand-back -- a tool-kind executor with an mcp
