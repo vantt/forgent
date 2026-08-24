@@ -55,6 +55,32 @@ This is exactly why the item's own scope was "confirm it actually takes
 effect... not just that config validation passes" — config validation
 alone would never have caught this; only a live round trip did.
 
+## Second real finding (user-directed, during executing)
+
+User asked to also add `ANTHROPIC_DEFAULT_HAIKU_MODEL`/
+`ANTHROPIC_DEFAULT_SONNET_MODEL`/`ANTHROPIC_DEFAULT_OPUS_MODEL` (all set
+to `z-ai/glm-5.2`) to `glm`'s env block — Claude Code's own hinted
+"modelOverrides" mechanism for its "unrecognized model" warning. Added
+directly to `.fgos/config.json` on main (commit `2d2dd4d5`, same
+structural reason as before). Real test after adding: the warning
+persists — it fires off the literal `--model z-ai/glm-5.2` flag this
+executor's own `args` template always passes, never the bare
+`sonnet`/`haiku`/`opus` alias these three vars actually govern, so they
+are correctness-neutral no-ops for this executor's own invocation shape.
+Correctness reconfirmed unaffected either way (self-identification still
+returns `z-ai/glm-5.2`). Kept in config anyway (harmless, matches what
+was asked, and would matter if a future invocation shape ever passes a
+bare alias instead of a literal model string).
+
+Also discovered during this same round: `fgos discover`/`fgos edit` (x3)
+returned valid-looking successful responses that did NOT durably persist
+on the first attempt (a fresh `fgos list` read showed `stage: discovery`
+again with an empty discovery record, well after the calls "succeeded")
+— re-running the exact same calls a second time persisted correctly
+(verified via an immediate fresh read after each). Not chased further
+here (task item, no code footprint) but worth a dedicated bug report —
+see the session's own end-of-turn summary.
+
 ## Outstanding questions
 
 None
