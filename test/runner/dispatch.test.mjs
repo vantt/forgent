@@ -14,6 +14,7 @@ import {
   detectAssistantCli,
   modelForTier,
   resolveExecutorCommand,
+  resolveExecutorEnv,
   executeExecutorCli,
   resolveExecutorIdForPurpose,
   resolveExecutorAndOverrides,
@@ -4911,6 +4912,7 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
 
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
+    capabilities: { 'fgos-coding-implement': { prefer: 'fgos-coding-implement' } },
     executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
@@ -5012,4 +5014,243 @@ test('resolveAgentTypeForWork returns null for a stage with no registered taskSp
   const cwd = mkTempDir();
   const resolved = resolveAgentTypeForWork({ domain: 'coding', stage: 'nonexistent-stage' }, cwd);
   assert.equal(resolved, null);
+});
+
+// --- tsk-gb3: per-executor env overrides and GLM OpenRouter executor ---
+
+test('resolveExecutorEnv substitutes ${VAR} against baseEnv and passes literals unchanged', () => {
+  const baseEnv = {
+    FOO: 'bar',
+    EMPTY_VAR: '',
+  };
+
+  const rawEnv = {
+    LITERAL: 'https://openrouter.ai/api',
+    SUBSTITUTED: '${FOO}',
+    SUBSTITUTED_EMPTY: '${EMPTY_VAR}',
+    UNSET: '${UNSET_VAR}',
+    EMPTY_LITERAL: '',
+    MULTI: '${FOO}_baz_${FOO}',
+  };
+
+  const resolved = resolveExecutorEnv(rawEnv, baseEnv);
+
+  assert.equal(resolved.LITERAL, 'https://openrouter.ai/api');
+  assert.equal(resolved.SUBSTITUTED, 'bar');
+  assert.equal(resolved.SUBSTITUTED_EMPTY, '');
+  assert.equal(resolved.UNSET, '');
+  assert.equal(resolved.EMPTY_LITERAL, '');
+  assert.equal(resolved.MULTI, 'bar_baz_bar');
+});
+
+test('resolveExecutorEnv returns empty object when rawEnv is absent or invalid', () => {
+  assert.deepEqual(resolveExecutorEnv(undefined), {});
+  assert.deepEqual(resolveExecutorEnv(null), {});
+  assert.deepEqual(resolveExecutorEnv('not-an-object'), {});
+});
+
+test('loadRunnerConfig accepts well-formed "env" block in executors entry', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'env-ok.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: {
+        glm: {
+          kind: 'agent',
+          command: 'claude',
+          args: ['{prompt}'],
+          env: {
+            ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
+            ANTHROPIC_AUTH_TOKEN: '${GLM_KEY}',
+            ANTHROPIC_API_KEY: '',
+          },
+        },
+      },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.executors.glm.env.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
+  assert.equal(cfg.executors.glm.env.ANTHROPIC_AUTH_TOKEN, '${GLM_KEY}');
+  assert.equal(cfg.executors.glm.env.ANTHROPIC_API_KEY, '');
+});
+
+test('loadRunnerConfig rejects malformed "env" in executors entry', () => {
+  const dir = mkTempDir();
+
+  // non-object env
+  const path1 = path.join(dir, 'bad-env-1.json');
+  fs.writeFileSync(
+    path1,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: 'not-an-object' } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(path1), RunnerConfigError);
+
+  // array env
+  const path2 = path.join(dir, 'bad-env-2.json');
+  fs.writeFileSync(
+    path2,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: ['KEY=VAL'] } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(path2), RunnerConfigError);
+
+  // non-string value in env
+  const path3 = path.join(dir, 'bad-env-3.json');
+  fs.writeFileSync(
+    path3,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: { KEY: 123 } } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(path3), RunnerConfigError);
+
+  // empty-string key in env
+  const path4 = path.join(dir, 'bad-env-4.json');
+  fs.writeFileSync(
+    path4,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: { '': 'value' } } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(path4), RunnerConfigError);
+});
+
+test('resolveExecutorCommand returns env block from resolved executor', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      glm: {
+        kind: 'agent',
+        command: 'claude',
+        args: ['-p', '{prompt}'],
+        env: {
+          ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
+          ANTHROPIC_AUTH_TOKEN: '${TEST_OPENROUTER_KEY}',
+        },
+      },
+    },
+    models: { standard: 'sonnet' },
+  };
+
+  const res = resolveExecutorCommand(cfg, { prompt: 'hi', model: 'sonnet', tier: 'standard', executorId: 'glm' });
+  assert.equal(res.command, 'claude');
+  assert.deepEqual(res.env, {
+    ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
+    ANTHROPIC_AUTH_TOKEN: '${TEST_OPENROUTER_KEY}',
+  });
+});
+
+test('spawnWorker / cliSpawnAdapter passes per-executor resolved env to child process', async () => {
+  const dir = mkTempDir();
+  const scriptPath = path.join(dir, 'env-echo-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    process.stdout.write(JSON.stringify({
+      BASE_URL: process.env.ANTHROPIC_BASE_URL,
+      AUTH_TOKEN: process.env.ANTHROPIC_AUTH_TOKEN,
+      API_KEY: process.env.ANTHROPIC_API_KEY,
+    }));
+    process.exit(0);
+    `,
+  );
+
+  const originalKey = process.env.GLM_OPENROUTER_API_KEY;
+  process.env.GLM_OPENROUTER_API_KEY = 'secret-test-key-12345';
+
+  try {
+    const cfg = {
+      executor: { command: process.execPath, args: [scriptPath] },
+      capabilities: {
+        'fgos-coding-implement': { prefer: 'glm' },
+      },
+      executors: {
+        glm: {
+          kind: 'agent',
+          command: process.execPath,
+          args: [scriptPath],
+          allowCrossProvider: true,
+          env: {
+            ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
+            ANTHROPIC_AUTH_TOKEN: '${GLM_OPENROUTER_API_KEY}',
+            ANTHROPIC_API_KEY: '',
+          },
+        },
+      },
+      models: { standard: 'sonnet' },
+      timeoutMs: 5000,
+    };
+
+    const res = await spawnWorker(sampleWork(), cfg, dir, { stage: 'executing' });
+    const output = JSON.parse(res.stdout);
+    assert.equal(output.BASE_URL, 'https://openrouter.ai/api');
+    assert.equal(output.AUTH_TOKEN, 'secret-test-key-12345');
+    assert.equal(output.API_KEY, '');
+
+    // process.env of host remains unchanged
+    assert.equal(process.env.ANTHROPIC_BASE_URL, undefined);
+  } finally {
+    if (originalKey !== undefined) {
+      process.env.GLM_OPENROUTER_API_KEY = originalKey;
+    } else {
+      delete process.env.GLM_OPENROUTER_API_KEY;
+    }
+  }
+});
+
+test('registered executors.glm entry resolves command "claude" and env block', () => {
+  const { repoRoot } = mkTempGitRepo();
+  const glmConfig = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      glm: {
+        kind: 'agent',
+        description: 'Claude Code CLI routing to OpenRouter GLM 5.2 model',
+        command: 'claude',
+        args: ['-p', '{prompt}', '--model', '{model}'],
+        env: {
+          ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
+          ANTHROPIC_AUTH_TOKEN: '${GLM_OPENROUTER_API_KEY}',
+          ANTHROPIC_MODEL: 'z-ai/glm-5.2',
+          ANTHROPIC_API_KEY: '',
+        },
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 1000,
+  };
+  const fgosDir = path.join(repoRoot, '.fgos');
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: glmConfig }, null, 2));
+
+  const cfg = loadRunnerConfigFromDir(repoRoot);
+  assert.ok(cfg.executors.glm, 'executors.glm is registered');
+  assert.equal(cfg.executors.glm.kind, 'agent');
+  assert.equal(cfg.executors.glm.command, 'claude');
+  assert.equal(cfg.executors.glm.env.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
+  assert.equal(cfg.executors.glm.env.ANTHROPIC_AUTH_TOKEN, '${GLM_OPENROUTER_API_KEY}');
+  assert.equal(cfg.executors.glm.env.ANTHROPIC_MODEL, 'z-ai/glm-5.2');
+  assert.equal(cfg.executors.glm.env.ANTHROPIC_API_KEY, '');
+
+  const res = resolveExecutorCommand(cfg, { prompt: 'test', model: 'sonnet', tier: 'standard', executorId: 'glm' });
+  assert.equal(res.command, 'claude');
+  assert.equal(res.provider, 'claude');
 });

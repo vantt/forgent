@@ -214,7 +214,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // a command-less/adapter-less/invocation-less executor with no static
   // agentType of its own -- see resolveAgentTypeForWork's own doc comment.
   const resolvedAgentType = resolveAgentTypeForWork(work, cwd, opts.stage);
-  const { command, args, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
+  const { command, args, env, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -253,7 +253,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
 
-  return adapterFn({ command, args }, {
+  return adapterFn({ command, args, env }, {
     cwd,
     timeoutMs,
     idleTimeoutMs,
@@ -465,7 +465,7 @@ export async function executeExecutorCli(
     rigorOverrides: capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides,
   });
   const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
-  const { command, args, adapter, provider } = resolveExecutorCommand(cfg, {
+  const { command, args, env, adapter, provider } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -522,7 +522,7 @@ export async function executeExecutorCli(
     );
     const headBefore = captureHeadSha(cwd);
     const dirtyBefore = checkoutDirtyPaths(root, cwd);
-    const result = await adapterFn({ command, args }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
+    const result = await adapterFn({ command, args, env }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
     const headAfter = captureHeadSha(cwd);
     const dirtyAfter = checkoutDirtyPaths(root, cwd);
     let lostUncommittedPaths;
