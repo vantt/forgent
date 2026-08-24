@@ -53,14 +53,15 @@ the same way (`classifyIronLaw`, `src/evolve/iron-law.mjs`), against that
 now-real committed diff:
 
 ```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 node --input-type=module -e "
 import { changedFiles } from './src/runner/merge.mjs';
 import { classifyIronLaw } from './src/evolve/iron-law.mjs';
 import { listWork } from './src/state/store.mjs';
-const item = listWork('.fgos').work[process.argv[1]];
-const filesChanged = changedFiles('.', item);
+const item = listWork(process.argv[2]).work[process.argv[1]];
+const filesChanged = changedFiles(process.argv[3], item);
 console.log(JSON.stringify(classifyIronLaw({ filesChanged, description: item.description })));
-" "<id>"
+" "<id>" "$root/.fgos" "$root"
 ```
 
 When the result's `required` is `true`, write

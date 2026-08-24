@@ -24,8 +24,7 @@ its answer:
   worker already ran the item's own verify and committed its own change
   before returning — you do NOT run Verify/Commit yourself for this
   mechanism. Confirm the worker's own commit is real (`git log -1` shows
-  a new commit citing this item, `git status` is clean) and read `verifiedSha`
-  from the `execute` call's JSON stdout if present, then skip
+  a new commit citing this item, `git status` is clean) then skip
   straight to Step 4's Iron Law classification against that commit. If
   the worker returned `[BLOCKED]` or the tree is not clean, that is a
   driver-side problem to handle (park the item / retry dispatch) — never
