@@ -2,7 +2,7 @@
 type: explanation
 title: Why the merge target-ref slot disabled lock self-recognition
 tags: [merge, lock, self-recognition, concurrency, session-identity]
-source_capture_ids: [tsk-1wr, tsk-70l, tsk-25r]
+source_capture_ids: [tsk-1wr, tsk-70l, tsk-25r, tsk-18k]
 authoritative_for: why withMergeTargetSlot passes allowSelfRecognition false while main-checkout.lock keeps self-recognition enabled
 ---
 # Why the merge target-ref slot disabled lock self-recognition
@@ -171,18 +171,41 @@ evidence that assumption fails in a reachable real case, which is
 specifically what justifies reopening scope here without touching either
 prior decision.
 
-**Decided direction**: a per-acquisition **nonce** stamped into the lock
-record, with release/renew matching on the nonce instead of identity —
-not a switch to `process.pid` (a second-round "should we just use pid
-now?" hypothesis was raised and considered, but the nonce direction
-better isolates the fix to exactly the correctness gap found, without
-reopening the wider identity-model question `tsk-1wr` already settled).
-Scoped to land together with a related finding shrinking the lock's hold
-time across `npm ci` — the two are complementary, neither substitutes
-for the other: the nonce closes the correctness gap outright; shrinking
-the hold time reduces how often the TTL-starvation window is even
-reachable. Not yet implemented as of this capture — filed as its own
-work item (`tsk-18k`).
+**What actually landed (`tsk-18k`), correcting the audit's own first-pass
+direction**: a second discussion round revisited `tsk-1wr`'s original
+"per-process identity has a wider blast radius" rationale and found it
+stale — the dual numeric/string identity branch in
+`main-checkout-lock.mjs` (`:268-283`) predates `tsk-1wr`'s 2026-08-12
+decision by three weeks, and `fgos unlock` already branches on both
+identity types cleanly. With that blast-radius concern gone, **pid
+identity, not a nonce**, is what actually shipped for this call site —
+`withMergeTargetSlot` now keys on `process.pid` (mirroring the pattern
+`tsk-70l` had already used for the sibling root→main call site), which
+also let `allowSelfRecognition: false` be dropped here entirely, since
+distinct OS pids are never misread as the same writer to begin with —
+a genuine simplification over carrying both a nonce *and* the flag.
+
+Critically, neither a nonce nor pid identity is a root-cause fix on its
+own: TTL-starvation-driven reclaim still happens under either, since
+`main-checkout-lock.mjs`'s own `held = pidLive && withinTtl` reclaims a
+live-but-TTL-expired holder the same way regardless of identity shape.
+Shrinking the lock's hold time across `npm ci` (a companion finding from
+the same audit) is what actually reduces how *often* reclaim fires;
+`tsk-18k`'s own fix only stops the reclaim's aftermath from deleting a
+live sibling's lock once it does.
+
+**A second, deeper gap the same discussion surfaced and closed in the
+same item**: the merge's own CAS guard (`worktree.mjs`, the `git branch
+-f` force-move) was read-then-force-move — `tsk-46a`'s own earlier
+hardening had assumed the lock already serializes holders, but
+`tsk-18k`'s own bug is precisely the case that can put two holders "live"
+at once, which could let both pass a tip re-read before either
+force-moves, silently discarding the first holder's merge (breaking the
+"fails loudly, no silent data loss" invariant the whole slot design
+depends on). This was hardened alongside the identity fix via an atomic
+`git update-ref <ref> <new> <old>` instead of the prior read-then-force
+sequence — the item was explicitly not allowed to close without
+confirming this held.
 
 ## Verification shape
 

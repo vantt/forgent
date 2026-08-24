@@ -2,7 +2,7 @@
 type: reference
 title: Worktree/merge lifecycle audit findings (2026-08-14)
 tags: [audit, worktree, merge, lifecycle, code-review]
-source_capture_ids: [tsk-25r]
+source_capture_ids: [tsk-25r, tsk-18k]
 authoritative_for: the 9 findings from the 2026-08-14 fable code-review audit of fgOS's worktree claim/merge/cleanup lifecycle, and which work item tracks each
 ---
 # Worktree/merge lifecycle audit findings (2026-08-14)
@@ -15,7 +15,7 @@ as of this audit's own capture.
 
 | id | severity | finding |
 |---|---|---|
-| `tsk-18k` | high | Merge-target-slot lock's string-identity release/renew can delete a sibling session's live lock after a TTL reclaim (see `docs/explanation/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md` for full detail — a third round on the same call site `tsk-1wr`/`tsk-70l` already worked on). |
+| `tsk-18k` | high | **Fixed.** Merge-target-slot lock's string-identity release/renew could delete a sibling session's live lock after a TTL reclaim — fixed via pid identity (not the nonce first proposed) plus an atomic `git update-ref` hardening a related CAS gap the same discussion surfaced. Full detail: `docs/explanation/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md` (a third round on the same call site `tsk-1wr`/`tsk-70l` already worked on). |
 | `tsk-1mn` | medium | `claimWork` holds the main-checkout lock across `npm ci` with no heartbeat. |
 | `tsk-2iz` | medium | Decision-index auto-resolve can mint duplicate decision IDs, and a throw mid-resolve skips the merge abort. |
 | `tsk-ikd` | medium | `return`'s main-source path has no main-worktree guard — `approve`/`sync-root`/`promote-to-component` all refuse outside the main checkout, `return` doesn't. |
