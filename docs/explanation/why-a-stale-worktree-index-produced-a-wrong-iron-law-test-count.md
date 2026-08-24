@@ -2,7 +2,7 @@
 type: explanation
 title: Why a stale worktree index produced a wrong Iron Law test count
 tags: [iron-law, evidence, worktree, addendum]
-source_capture_ids: [tsk-5x4, tsk-2u5, tsk-2u5-1, tsk-1d7, tsk-jgs]
+source_capture_ids: [tsk-5x4, tsk-2u5, tsk-2u5-1, tsk-1d7, tsk-jgs, tsk-jg4]
 authoritative_for: why the tsk-51m root Iron Law evidence file recorded a test count lower than any of its own children, why the fix is an addendum rather than an edit, and the general stale-worktree-index guard this incident led to
 ---
 # Why a stale worktree index produced a wrong Iron Law test count
@@ -152,6 +152,43 @@ worktree) was added alongside the fix — the prior test coverage only
 exercised the underlying `resyncWorktree()` function and the hook's own
 refusal message directly, never the real CLI path, which is exactly what
 let this ship in the first place.
+
+## Follow-up: the repair verb re-introduced a narrower version of the same stranded-work risk (`tsk-jg4`)
+
+Also found in the same post-merge `/ck-code-review` of `tsk-2u5`/`tsk-1d7`
+(commit `c9c71534`): `resyncWorktree` itself
+(`src/runner/worktree.mjs:711-789`) has an unhandled crash window
+between `git reset --hard <branchTip>` and the patch reapply completing.
+If the process is killed in that window (OOM, SIGKILL, a host crash),
+the worktree's tracked files/index are already reset to the branch tip —
+`reset --hard` itself writes a new `HEAD` reflog entry equal to the
+branch tip — but the user's staged patch was never reapplied, left
+orphaned on disk under `--git-common-dir/fgos-resync-patches/<branch>-<timestamp>.patch`.
+On the *next* `resync-worktree` run (or the pre-commit hook's own
+stale-index check), `lastSyncedCommit` reads that post-reset reflog
+entry, sees it equal to the branch tip, and reports "already-in-sync" —
+letting a subsequent commit through with zero signal that an orphaned
+patch containing the user's real staged work still sits on disk.
+
+The self-aware irony: the original design's own D2
+(`docs/history/stale-worktree-index-guard/CONTEXT.md`) explicitly
+reasoned about this exact class of stranded-work risk to justify keeping
+the repair *out* of the pre-commit hook itself ("an in-hook reset+reapply
+that fails partway leaves the working tree reset with the agent's only
+copy of its change stranded in a temp patch"). The standalone
+`resync-worktree` verb that decision produced re-introduces an
+equivalent — narrower, since it now needs an actual process kill mid-repair
+rather than any ordinary hook failure — version of that same risk
+internally. Neither the locked decisions (D1-D5) nor the existing tests
+covered a mid-repair crash.
+
+**What actually landed**: the minimum fix suggested at capture time —
+detect an orphaned patch file left behind from a prior interrupted run
+and surface it loudly (refuse to silently proceed as "in-sync") instead
+of silently discarding the signal. A fuller fix (write a marker before
+the reset so a resumed run can tell "reset done, reapply pending" apart
+from a genuinely clean state) was named as a further option but not what
+this item locked in.
 
 ## The shared lesson
 
