@@ -2,7 +2,7 @@
 type: explanation
 title: Why the herdr web dashboard became a static client of the gateway, not its own server
 tags: [herdr, web-dashboard, gateway, realignment, auth]
-source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w, tsk-5jr, tsk-4id]
+source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w, tsk-5jr, tsk-4id, tsk-6d2]
 authoritative_for: why the herdr web dashboard's architecture moved from a standalone embedded webserver to a static bundle served by the existing gateway, and the security/lifecycle decisions that survived the realignment
 ---
 # Why the herdr web dashboard became a static client of the gateway, not its own server
@@ -135,6 +135,32 @@ gate question in that live run got asked and answered synchronously
 within the session, never durably recorded, confirming the pending-gate-
 visibility gap named earlier as a real limit rather than a theoretical
 one.
+
+## This item is the realignment itself (`tsk-6d2`)
+
+`tsk-6d2` is the actual realignment pass this whole doc's own "the
+realignment" sections describe — triggered because `fgw/tsk-ldb` had
+forked over 550 commits behind `main` by the time it was revisited, and
+`main` had since gained a *complete*, already-merged `tsk-7l9` interface
+daemon: a real gateway REST server (`gateway.rs`, 17 routes under `/v1`
+covering work CRUD/move/ask/answer/take/return/approve/reject/ready/
+rollup/graph/state-digest/sessions/runner-tick/contract), one-token-
+per-machine auth reading `~/.fgos/config.json`'s `gateway.token` (a
+missing token refuses startup), a real OpenAPI contract, and doctor/setup
+registration already landed (`tsk-4r1`). No SSE/WebSocket — only
+`/state/digest` as a cheap-poll endpoint returning `data_hash`. Given all
+of that already existed and worked, re-designing a second, standalone
+web server for the dashboard would have duplicated a working mechanism
+rather than reusing it — the actual trigger for every D-numbered revision
+documented throughout this file.
+
+A real process gap surfaced by this item's own friction log, worth
+naming honestly: all 15 of this realignment's own locked decisions
+(D1-D15) are recorded in `CONTEXT.md`'s table, but none of them were
+ever routed into `state.decisions` — the machine-readable log stayed
+silent about a decision set this significant. The narrative record is
+real and complete; the structured one simply never got written for this
+item.
 
 ## What didn't change: why the webserver outlives the cockpit pane (D12)
 
