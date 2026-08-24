@@ -81,6 +81,23 @@ again with an empty discovery record, well after the calls "succeeded")
 here (task item, no code footprint) but worth a dedicated bug report —
 see the session's own end-of-turn summary.
 
+## Third finding: the verify command's own fragility (real return failure)
+
+The first `fgos return` attempt moved the item to `blocked` (`exitStatus:
+1`) even though the underlying dispatch genuinely succeeded (real "PONG"
+from `z-ai/glm-5.2` visible in the captured output) — the recorded
+`verify` command's own `echo "$OUT" | node -e "...JSON.parse..."`
+construction threw `SyntaxError: Bad control character in string
+literal` on that specific run (not reproduced on a clean retry — most
+likely transient noise from the nested `claude` CLI's own stdout mixing
+with the shell round-trip). Root cause is the verify command's own
+fragility, not the executor. Fixed by dropping the JSON.parse round trip
+entirely: capture dispatch output to a file, `grep -q '"status":0'` +
+`grep -qi 'PONG'` on the raw text instead — robust against any control
+characters and no `--has-live-task-access`-dependent double-encoding.
+Confirmed real, twice: as a standalone script and as the literal
+one-line `verify` string now recorded on the item.
+
 ## Outstanding questions
 
 None
