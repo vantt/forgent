@@ -105,6 +105,39 @@ test('edit changes only the targeted field, every other field unchanged, exit 0'
   assert.equal(item.status, 'todo');
 });
 
+// tsk-1t2: real events for tsk-26r (work.move/work.outcome/work.edit) were
+// once found sitting in the shared repo's frozen `.fgos/events.jsonl`
+// baseline (seq 24089-24092) instead of a per-writer shard under
+// `.fgos/events/` -- exactly the "fgos edit <id> --verify ..." + a
+// pick/return lifecycle this test drives end to end through the REAL
+// spawned CLI process (not a bare store.mjs function call, which
+// test/state/store.test.mjs's own "learning record rides the SAME
+// work.move event" test already covers at the in-process level -- this is
+// the CLI-process-boundary layer the incident's own command actually ran
+// through). `logPath(cwd)` (TA-D12's baseline-0) must never gain a single
+// byte across add/edit/move/edit again: every event this whole sequence
+// produces belongs under `.fgos/events/` instead.
+test('a full add -> edit -> move -> edit CLI lifecycle never appends to the frozen events.jsonl baseline -- every event lands under .fgos/events/', () => {
+  const cwd = tmpCwd();
+  const baselineBefore = fs.readFileSync(logPath(cwd), 'utf8');
+  assert.equal(baselineBefore, '', 'tmpCwd(): baseline should start empty (init writes no events, just an empty file)');
+
+  assert.equal(addOk(cwd, 'tsk-write-path-guard').status, 0);
+  assert.equal(run(cwd, ['edit', 'tsk-write-path-guard', '--verify', 'echo first']).status, 0);
+  assert.equal(run(cwd, ['move', 'tsk-write-path-guard', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['edit', 'tsk-write-path-guard', '--verify', 'echo second']).status, 0);
+
+  const baselineAfter = fs.readFileSync(logPath(cwd), 'utf8');
+  assert.equal(baselineAfter, '', 'the frozen events.jsonl baseline must stay byte-identical (empty) -- every event above belongs in a per-writer shard, never here');
+
+  const eventsDir = path.join(cwd, '.fgos', 'events');
+  const shardFiles = fs.readdirSync(eventsDir).filter((name) => name.endsWith('.jsonl'));
+  assert.equal(shardFiles.length, 1, 'exactly one writer, one open shard file');
+  const shardLines = fs.readFileSync(path.join(eventsDir, shardFiles[0]), 'utf8').split('\n').filter(Boolean);
+  const shardTypes = shardLines.map((line) => JSON.parse(line).type);
+  assert.deepEqual(shardTypes, ['work.add', 'work.edit', 'work.move', 'work.edit'], 'the whole lifecycle landed in the shard, in order, none of it in the baseline');
+});
+
 test('edit on an unknown id is rejected as validation, exit 4, no event written', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['edit', 'never-added', '--risk', 'heavy']);
