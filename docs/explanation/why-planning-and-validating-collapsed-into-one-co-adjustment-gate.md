@@ -2,7 +2,7 @@
 type: explanation
 title: Why planning and validating collapsed into one co-adjustment gate
 tags: [fgos-coding-planning, fgos-coding-validating, gate, gate-bypass, human-release]
-source_capture_ids: [tsk-224]
+source_capture_ids: [tsk-224, tsk-2tk]
 authoritative_for: why fgos-coding-planning and fgos-coding-validating merged their two approval gates into one, and how that one gate decides when to ask a person versus proceed
 ---
 # Why planning and validating collapsed into one co-adjustment gate
@@ -170,6 +170,39 @@ resolve as much as possible at once); and when nothing is genuinely
 stuck, ask nothing at all — post a single non-blocking notice line
 instead, reusing the existing `auto-approved:` pattern from `gate-bypass
 D3`.
+
+## Post-merge prose sync (`tsk-2tk`)
+
+Deleting `planApprove` and `canAutoApproveValidate` left five real
+stale-prose spots, each verified by direct grep/read (none touching
+runtime logic, schema, or test assertions):
+
+1. `plugins/fgOS/skills/cook/SKILL.md`'s frontmatter and hard rule still
+   said "3 gates" and called the now-deleted `canAutoApproveValidate` —
+   live prose read on every `/fgOS:cook` run, synced across all three
+   mirror roots (`.claude/skills`, `.agents/skills`, `plugins/fgOS/skills`,
+   enforced byte-identical by `fgos-mirror.test.mjs`).
+2. `src/cli/command-registry.mjs`'s `gate-approve` verb description still
+   said "3 skill-embedded Gates" and attributed `planApprove` to
+   `fgos-coding-planning`, which no longer writes any gate.
+3. `fgos-coding-planning/SKILL.md` self-contradicted across two lines —
+   one saying "see this skill's own Gate section below," another saying
+   "this skill has no gate" — synced across all three mirror roots.
+4. `docs/reference/gate-bypass-config.md` still described the old
+   two-gate architecture (exploring + planning, each with its own gate)
+   as current.
+5. `src/intake/plan.mjs`'s own comment claimed `fgos-coding-planning`
+   still writes verify into `gates[id].planApprove` — confirmed dead by
+   grepping `.fgos/events.jsonl` for zero new `planApprove` records since
+   the merge commit (`c0cedaa`) that removed it.
+
+Three further docs referenced `canAutoApproveValidate` in present tense
+and were updated to past tense / marked removed, per the person's own
+decision: `docs/explanation/gate-bypass-design.md`,
+`docs/explanation/why-cooks-never-auto-approve-prose-lost-to-gate-bypass.md`,
+`docs/explanation/why-heavy-keywords-matching-moved-to-word-boundaries.md`.
+Scope stayed strictly prose/comment/doc — no logic, schema, or test
+assertion changed by this cleanup pass.
 
 ## D14: a hand-back from planning to exploring must leave a real trail
 
