@@ -2,7 +2,7 @@
 type: explanation
 title: Why planning and validating collapsed into one co-adjustment gate
 tags: [fgos-coding-planning, fgos-coding-validating, gate, gate-bypass, human-release]
-source_capture_ids: [tsk-224, tsk-2tk, tsk-blk]
+source_capture_ids: [tsk-224, tsk-2tk, tsk-blk, tsk-4vz]
 authoritative_for: why fgos-coding-planning and fgos-coding-validating merged their two approval gates into one, and how that one gate decides when to ask a person versus proceed
 ---
 # Why planning and validating collapsed into one co-adjustment gate
@@ -234,6 +234,29 @@ Test-only additions, no production-behavior change intended:
    change needed to make the `false` output explicit (rather than relying
    on an implicit crash) was required to stay small and preserve the
    exact same fail-closed behavior.
+
+## Closing the door on new `planApprove` records (`tsk-4vz`)
+
+`GATE_APPROVE_GATES` (`src/state/store.mjs:818`) still accepted
+`'planApprove'` as a valid value when *writing* a new gate-approve
+record through `recordGateApprove`/`fgos gate-approve`, even though
+`fgos-coding-planning` writes no gate at all since `tsk-224`. Verified by
+reading the code directly: `replay.mjs`'s own `work.gate-approve` case
+never validates the gate name against `GATE_APPROVE_GATES` at all — it
+reads whatever key an event happens to carry. That set is used
+exclusively by the *write* path's own input validation
+(`store.mjs:837-838`), never by replay.
+
+This made removing `'planApprove'` from the set safe: it does not affect
+replaying any of the 277 historical records, or the 6 in-flight items
+still carrying a `gates[id].planApprove` field (already audited in
+`tsk-2tk`) — it only blocks *creating a new* `planApprove` record going
+forward, which is exactly the intended state after `tsk-224` (only
+`contextApprove`/`validateApprove` remain live gates). Left unfixed, the
+real risk was a confused session — stale local cache, or a hand-typed
+command — still successfully calling `fgos gate-approve` with
+`planApprove`, silently recording a gate approval for a gate that no
+longer governs anything.
 
 ## D14: a hand-back from planning to exploring must leave a real trail
 
