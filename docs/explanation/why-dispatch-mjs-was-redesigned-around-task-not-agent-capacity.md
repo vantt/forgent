@@ -2,7 +2,7 @@
 type: explanation
 title: Why dispatch.mjs was redesigned around task, not agent capacity
 tags: [dispatch, executor, capacity, task-dispatch-unification]
-source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3]
+source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4]
 authoritative_for: why src/runner/dispatch.mjs's capacity/executor layer was redesigned around "task" as the unifying concept, and the 12 locked decisions behind that redesign
 ---
 # Why `dispatch.mjs` was redesigned around "task," not agent capacity
@@ -83,7 +83,12 @@ from both `capacities.<id>` config shape and the dispatch gate itself.
   name, never renames it to `executors`.** `dispatch.mjs`'s own
   validation only allows *tier* names as keys under `cfg.executors` — a
   key named after an executor there would be rejected outright by a
-  `RunnerConfigError`.
+  `RunnerConfigError`. Landed (`tsk-5tm-4`): each `runner.executors.<id>`
+  entry restructured to carry an `invocations: [{via, adapter, command,
+  args}]` array (visible in this repo's own `.fgos/config.json` today,
+  e.g. the `claude`/`agy` executors' `via: "cli"` entries) — the concrete
+  shape D2's "executor, not backend" naming and D9's per-executor
+  model/tier resolution both build on.
 - **D12 — the shared dispatch-fallback prose helper stays one document,
   not split into separate D-IDs per sub-part**: (i) a fragment
   extracting D5's own three-step consequence; (ii) purpose-lookup via
