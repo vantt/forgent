@@ -91,6 +91,19 @@ You are running on an isolated git worktree, checked out on its own branch for
 this work item only. Stay inside this checkout — never touch the main
 working tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.
 
+# How to finish
+Report your completion status through a fixed token in your output — your
+caller reads this token mechanically, not free prose:
+
+- \`[DONE]\` — the work described in your boundary is complete and committed on
+  this branch.
+- \`[BLOCKED] <exactly what's missing or what stopped you>\` — you cannot proceed
+  because required context is missing, a file is outside your boundary, or a
+  real mid-work blocker stopped you. Never leave this bare.
+
+Exiting without printing either token is not a valid end state — your caller
+has nothing mechanical to read and will treat your outcome as unsignaled.
+
 # Expected proof
 Your work is judged only by this verify command, which the runner runs
 itself after you finish (your own report is never trusted on its own):
@@ -173,6 +186,19 @@ governs how this work item must be done.
 You are running on an isolated git worktree, checked out on its own branch for
 this work item only. Stay inside this checkout — never touch the main
 working tree, another branch, or another worktree. Relevant refs: src/widget.mjs, docs/specs/widget.md.
+
+# How to finish
+Report your completion status through a fixed token in your output — your
+caller reads this token mechanically, not free prose:
+
+- \`[DONE]\` — the work described in your boundary is complete and committed on
+  this branch.
+- \`[BLOCKED] <exactly what's missing or what stopped you>\` — you cannot proceed
+  because required context is missing, a file is outside your boundary, or a
+  real mid-work blocker stopped you. Never leave this bare.
+
+Exiting without printing either token is not a valid end state — your caller
+has nothing mechanical to read and will treat your outcome as unsignaled.
 
 # Expected proof
 Your work is judged only by this verify command, which the runner runs
