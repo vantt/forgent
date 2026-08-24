@@ -2,7 +2,7 @@
 type: explanation
 title: Why the retrospective content gate checked the wrong fields
 tags: [retrospective, cleanup-gate, engine-decision, kind]
-source_capture_ids: [tsk-558, tsk-4kw]
+source_capture_ids: [tsk-558, tsk-4kw, tsk-5dn]
 authoritative_for: why checkRetrospectiveContent's cleanup-to-done gate reads outcome/decision fields the way it does, and which engine-written decisions it must exclude
 ---
 # Why the retrospective content gate checked the wrong fields
@@ -121,3 +121,27 @@ This is distinct from a sibling finding (`tsk-37t`), which covers a
 different pair of gaps in the same review pass: `excludeId` not applying
 past the loop's own iteration ceiling, and `fgos report` accepting an
 unknown id.
+
+## A third door into the same defect class: `fgos decision` had no `--kind` flag (`tsk-5dn`)
+
+Same defect class as `tsk-qrs`/`tsk-4kw` — an engine-written decision
+record counted as human reflection — reached through a third path.
+`fgos-coding-validating`'s single merged gate (the redesign in
+`docs/explanation/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md`)
+logs an audit line through the `fgos decision` CLI verb whenever it
+auto-approves — e.g. `"auto-approved validateApprove gate for <id> at
+level <level> ... --relation supersedes:tsk-224"`. Confirmed still live
+on the tree at capture time: `bin/fgos.mjs`'s `decision` case
+destructures `text`/`rationale`/`alternatives`/`source`/`id`/`scope`/
+`relation` but never `flags.kind` at all — so `addDecision` always
+defaulted `kind` to `"design"`, and `checkRetrospectiveContent` (which
+only excludes `kind === 'engine'`) read every one of these auto-approve
+audit lines as a human reflecting on the work. The retrospective gate
+went green with no retrospective document behind it — the third distinct
+code path producing the same false pass this doc's own earlier findings
+already covered for `resolveDiscovery`/`resolvePlan`, `sync-root`, and
+`promote-to-component`.
+
+**Fix**: `fgos decision` gains a `--kind` flag, so an audit line like the
+gate's own auto-approve log can actually be tagged `kind: 'engine'`
+instead of silently defaulting to `'design'`.
