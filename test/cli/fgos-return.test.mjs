@@ -860,6 +860,33 @@ test('return on a branch-source take: verify passes in a disposable detached wor
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
 });
 
+test('return on a branch-source take: the disposable detached verify worktree never carries a checked-out .fgos/ (ADR0020, tsk-26r — same strip createWorktree already does, applied to return\'s own ephemeral tmpWorktree)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // `.fgos/` is git-tracked in this repo (state.json excepted) — by the time
+  // makeBlockedBranchItem's own commitPending runs, .fgos/config.json,
+  // .fgos/coexistence.json, and .fgos/events.jsonl are all committed on
+  // main, so the branch this item takes from carries a real checked-out
+  // .fgos/ snapshot too. The item's own verify command is the probe: it can
+  // only pass if the ephemeral worktree return checks it out into has
+  // already had that snapshot stripped, exactly like createWorktree's own
+  // worker worktrees never carry one.
+  makeBlockedBranchItem(cwd, 'branch-return-no-fgos', { verify: 'test ! -e .fgos' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-no-fgos']).status, 0);
+  commitPending(cwd, 'state: take branch-return-no-fgos');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-no-fgos']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['return', 'branch-return-no-fgos']);
+  assert.equal(result.status, 0, `return failed — pre-fix, verify runs inside a tmpWorktree that still carries a checked-out .fgos/, so 'test ! -e .fgos' fails and this item is blocked instead of returned: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+  assert.equal(stateView(cwd).work['branch-return-no-fgos'].status, 'awaiting-approval');
+});
+
 test('return on a branch-source take whose branch declares a real npm dependency: verify passes because the disposable detached worktree gets its own node_modules provisioned first (tsk-2vd — reproduces the real failure that blocked tsk-32n\'s own return)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
