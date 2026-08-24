@@ -99,12 +99,43 @@ function envelopeData(stdout) {
   return JSON.parse(stdout).data;
 }
 
+// Tầng A/T2/T3 (TA-D2/TA-D7/TA-D12): new events land in a per-writer file
+// under `.fgos/events/<writer-id>-<openTs>.jsonl` (many, one per CLI
+// subprocess invocation here — a fresh process is a fresh writer identity,
+// TA-D11's degraded per-invocation mode), not baseline-0's
+// `.fgos/events.jsonl` alone (still read too — legacy content lives there,
+// zero rewrite). This file's own "never import src/state directly" rule
+// (top of file) means it re-derives the TA-D7 total order `(ts, file,
+// seq)` here rather than delegating to replay.mjs's readAllEventsFromDir —
+// same order production replay produces, read as an outside observer would.
 function events(cwd) {
-  return fs
-    .readFileSync(logPath(cwd), 'utf8')
-    .split('\n')
-    .filter(Boolean)
-    .map((line) => JSON.parse(line));
+  const tagged = [];
+  if (fs.existsSync(logPath(cwd))) {
+    for (const line of fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean)) {
+      tagged.push({ ev: JSON.parse(line), file: '' });
+    }
+  }
+  const eventsDir = path.join(cwd, '.fgos', 'events');
+  let names = [];
+  try {
+    names = fs
+      .readdirSync(eventsDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch {
+    names = [];
+  }
+  for (const name of names) {
+    for (const line of fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean)) {
+      tagged.push({ ev: JSON.parse(line), file: name });
+    }
+  }
+  tagged.sort((a, b) => {
+    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
+    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
+    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
+  });
+  return tagged.map(({ ev }) => ev);
 }
 
 function writeRunnerConfig(repoRoot, executorScript) {

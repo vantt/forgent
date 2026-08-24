@@ -18,7 +18,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { SCHEMA_VERSION } from './work.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
 
 // Cross-process append lock. `appendEvent` reads the log's last seq then
 // appends — a read-then-write window that, unguarded, lets two concurrent
@@ -411,17 +413,47 @@ export function withEventsLock(logPath, fn) {
  * lock acquisition. For a caller that already holds the `events.lock` via
  * `withEventsLock` and wants to append inside that same held lock, without
  * `appendEvent`'s own (non-reentrant) acquire/release around it.
+ *
+ * `fgosDir` (Tầng A/T2 follow-up): the real `.fgos`-shaped directory whose
+ * `sessions.json` registry `resolveWriterIdentity` consults to confirm an
+ * env-supplied writer id (see session-identity.mjs). Defaults to
+ * `path.dirname(logPath)` — correct for every caller that still appends
+ * straight to baseline-0 (`<fgosDir>/events.jsonl`, e.g. dispatch/cli.mjs
+ * and loop.mjs), but WRONG once `logPath` is a per-writer file under
+ * `<fgosDir>/events/` (TA-D2/TA-D11): `path.dirname` of THAT path is the
+ * `events/` subdirectory itself, not `.fgos/`, silently pointing the
+ * registry confirmation at `<fgosDir>/events/sessions.json` (never exists)
+ * instead of `<fgosDir>/sessions.json`. store.mjs's per-writer callers pass
+ * their own already-known `dir` explicitly to close that gap. This never
+ * changes the resolved `src` value itself (resolveWriterIdentity's `id` does
+ * not depend on `fgosDir` — only whether `source` reports REGISTRY or ENV,
+ * a value this function never reads) — it only fixes which file gets probed.
  */
-function appendEventCore(logPath, { type, payload = null } = {}) {
+function appendEventCore(logPath, { type, payload = null } = {}, fgosDir = path.dirname(logPath)) {
   if (typeof type !== 'string' || !type.trim()) {
     throw new EventLogError('validation', 'appendEvent: "type" is required and must be a non-empty string.');
   }
 
+  // seq is derived per-file (below), so once a writer's own file is one of
+  // several under .fgos/events/ (TA-D2), it is a within-file ordinal only —
+  // never a cross-file identity. `h` (next) is the content-hash identity;
+  // seq stays for display/ordering-within-file only.
   const existing = readEvents(logPath);
   const last = existing[existing.length - 1];
   const seq = last ? last.seq + 1 : 1;
 
-  const event = { seq, ts: new Date().toISOString(), type: type.trim(), payload, v: SCHEMA_VERSION };
+  // src: writer id (TA-D9), stamped before hashing so the hash covers it —
+  // two real events from different writers are never byte-identical.
+  // String(): resolveWriterIdentity's id is a number for a PID-fallback
+  // writer (no env/registry identity available) -- stringified here so
+  // `src` always matches the type store.mjs's resolveWriterLogPath uses to
+  // build the `<writer-id>-<openTs>.jsonl` filename for the SAME writer.
+  const src = String(resolveWriterIdentity(fgosDir).id);
+  const unhashed = { seq, ts: new Date().toISOString(), type: type.trim(), payload, v: SCHEMA_VERSION, src };
+  // h: 16-hex SHA-256 of the unhashed line content (TA-D1) — the event's
+  // content-addressed identity, order-independent, deterministic.
+  const h = crypto.createHash('sha256').update(JSON.stringify(unhashed)).digest('hex').slice(0, 16);
+  const event = { ...unhashed, h };
 
   fs.mkdirSync(path.dirname(logPath), { recursive: true });
   fs.appendFileSync(logPath, `${JSON.stringify(event)}\n`, 'utf8');
@@ -432,12 +464,18 @@ export { appendEventCore as appendEventLocked };
 
 /**
  * Append exactly one event to `logPath` as a single JSON line: `{ seq, ts,
- * type, payload, v }`. `seq` is derived from the current last event (1 if
- * the log is empty/absent) — never supplied by the caller, so events cannot
- * be reordered or double-numbered. `ts` is set here, always ISO-8601 UTC.
- * `v` is always the current `SCHEMA_VERSION` (per D7c) — every event this
- * module writes from now on carries it; there is no way to append an event
- * without one.
+ * type, payload, v, src, h }`. `seq` is derived from the current last event
+ * (1 if the log is empty/absent) — never supplied by the caller, so events
+ * cannot be reordered or double-numbered within one file (per-file only,
+ * TA-D1: cross-file identity is `h`, not `seq`). `ts` is set here, always
+ * ISO-8601 UTC. `v` is always the current `SCHEMA_VERSION` (per D7c) — every
+ * event this module writes from now on carries it; there is no way to append
+ * an event without one. `src` is the writer id from `resolveWriterIdentity`
+ * (TA-D9). `h` is a 16-hex SHA-256 of the line content up to and including
+ * `src` (TA-D1/TA-D9) — the event's content-addressed, order-independent
+ * identity, used downstream for cross-file dedupe. A log line written before
+ * this field existed has no `h`/`src` and still reads back exactly as
+ * written (D7a: never rewritten, never migrated in place).
  *
  * Reads the existing log first (via readEvents), so appending onto an
  * already-corrupt log fails loudly with the same 'corrupt-log' category
@@ -456,6 +494,6 @@ export { appendEventCore as appendEventLocked };
  * directly instead of this function, so their whole read-check-append
  * sequence is one critical section.
  */
-export function appendEvent(logPath, opts) {
-  return withEventsLock(logPath, () => appendEventCore(logPath, opts));
+export function appendEvent(logPath, opts, fgosDir) {
+  return withEventsLock(logPath, () => appendEventCore(logPath, opts, fgosDir));
 }

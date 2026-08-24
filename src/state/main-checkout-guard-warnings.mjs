@@ -25,6 +25,11 @@ export function recordMainCheckoutGuardWarning(dir, report) {
       reason: report?.reason ?? 'unknown',
       message: report?.message ?? '',
       mark: report?.mark ?? null,
+      // Tầng A/T5 (TA-D10): which tracked file broke -- `"events.jsonl"`
+      // (baseline-0) or `"events/<name>"` (a per-writer file). Additive,
+      // optional field; a caller that never passes `report.file` (every
+      // pre-T5 call site) writes a record byte-identical to before.
+      ...(report?.file !== undefined ? { file: report.file } : {}),
     };
     fs.mkdirSync(fgosDir, { recursive: true });
     fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`, 'utf8');

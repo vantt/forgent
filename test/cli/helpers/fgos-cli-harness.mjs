@@ -83,12 +83,30 @@ function envelopeData(stdout) {
   return envelope.data;
 }
 
+// Tầng A/T2: new events land under `.fgos/events/<writer>-<ts>.jsonl`, not
+// the frozen baseline `logPath(cwd)` (TA-D12) -- this counts/exposes every
+// raw line across BOTH, so every existing caller's "N more events since
+// before" or "find the event with type X" check keeps working unchanged
+// regardless of which physical file the CLI actually wrote to.
 function eventLines(cwd) {
-  if (!fs.existsSync(logPath(cwd))) return [];
-  return fs
-    .readFileSync(logPath(cwd), 'utf8')
-    .split('\n')
-    .filter(Boolean);
+  const lines = [];
+  if (fs.existsSync(logPath(cwd))) {
+    lines.push(...fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean));
+  }
+  const eventsDir = path.join(cwd, '.fgos', 'events');
+  let names = [];
+  try {
+    names = fs
+      .readdirSync(eventsDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch {
+    names = [];
+  }
+  for (const name of names) {
+    lines.push(...fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean));
+  }
+  return lines;
 }
 
 function stateView(cwd) {

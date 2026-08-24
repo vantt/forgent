@@ -7,7 +7,7 @@ import { fork, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { claimWork } from '../../src/runner/claim-port.mjs';
-import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
+import { initStore, addWork, moveWork, readRawEvents } from '../../src/state/store.mjs';
 import { readEvents } from '../../src/state/events.mjs';
 import { checkEventsJsonlContiguity } from '../../src/state/events-jsonl-contiguity.mjs';
 import { checkTruncationGuard, readGuardMark, writeGuardMark, runOpportunisticMainCheckoutChecks } from '../../src/state/events-jsonl-truncation-guard.mjs';
@@ -110,11 +110,26 @@ process.exit(0);
 
     assert.deepEqual(exitCodes, Array(N_PROC).fill(0), 'all concurrent claim processes must exit with code 0');
 
-    const events = readEvents(logPath);
+    // Tầng A/T2 (TA-D2/TA-D11): each concurrent claimWork call is its own OS
+    // process -- a fresh writer identity per TA-D11's degraded per-invocation
+    // mode -- so each landed its own work.move in its own per-writer file
+    // under `.fgos/events/`, never baseline-0 (`logPath`, frozen/empty here).
+    // readRawEvents(fgosDir) is the one door that reads all of them (TA-D7
+    // total order, deduped); contiguity is checked per-file, same precedent
+    // src/setup/registrations.mjs's checkEventsJsonlContiguous already uses
+    // (seq is only ever meaningful within one writer's own file post-cutover).
+    const events = readRawEvents(fgosDir);
     const contiguity = checkEventsJsonlContiguity(logPath);
-    assert.equal(contiguity.ok, true, 'contiguity check must pass with 0 gaps and 0 duplicates');
+    assert.equal(contiguity.ok, true, 'baseline-0 contiguity check must pass with 0 gaps and 0 duplicates');
     assert.deepEqual(contiguity.gaps, []);
     assert.deepEqual(contiguity.duplicates, []);
+
+    const eventsDirPath = path.join(fgosDir, 'events');
+    const writerFileNames = fs.readdirSync(eventsDirPath).filter((f) => f.endsWith('.jsonl'));
+    for (const name of writerFileNames) {
+      const writerContiguity = checkEventsJsonlContiguity(path.join(eventsDirPath, name));
+      assert.equal(writerContiguity.ok, true, `per-writer file ${name} contiguity check must pass with 0 gaps and 0 duplicates`);
+    }
 
     const claimedTasks = events.filter((e) => e.type === 'work.move' && e.payload?.to === 'doing').map((e) => e.payload.id);
     assert.equal(claimedTasks.length, N_PROC, 'every item must have a recorded work.move event');
@@ -124,6 +139,20 @@ process.exit(0);
     fs.rmSync(repoRoot, { recursive: true, force: true });
   }
 });
+
+// Tầng A/T2/T5 (TA-D2/TA-D10/TA-D11): addWork/moveWork now write into a
+// per-writer file under `.fgos/events/`, never baseline-0 (frozen,
+// TA-D12) -- and the guard sidecar is a MAP keyed by fileKey (`readGuardMark`/
+// `writeGuardMark(guardPath, fileKey, mark)` both take the key explicitly
+// now), not a single-file mark. Discovers whichever writer file actually
+// holds this process's own moveWork events, the same way
+// test/runner/claim-port.test.mjs's own guard-mark test does.
+function soleWriterFile(fgosDir) {
+  const eventsDir = path.join(fgosDir, 'events');
+  const names = fs.readdirSync(eventsDir).filter((f) => f.endsWith('.jsonl'));
+  assert.equal(names.length, 1, 'expected exactly one per-writer file for this single-process test');
+  return names[0];
+}
 
 test('reproduces unlocked guard mark write race across concurrent sessions against unfixed guard code', async () => {
   const origEnv = process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
@@ -142,11 +171,11 @@ test('reproduces unlocked guard mark write race across concurrent sessions again
     const childScriptContent = `
 import { runOpportunisticMainCheckoutChecks, writeGuardMark } from ${JSON.stringify(GUARD_MJS)};
 
-const [fgosDir, repoRoot, seqStr, hash] = process.argv.slice(2);
+const [fgosDir, repoRoot, fileKey, seqStr, hash] = process.argv.slice(2);
 const guardPath = fgosDir + '/events-jsonl.truncation-guard.json';
 
 if (seqStr && hash) {
-  writeGuardMark(guardPath, { seq: Number(seqStr), hash });
+  writeGuardMark(guardPath, fileKey, { seq: Number(seqStr), hash });
 } else {
   runOpportunisticMainCheckoutChecks(fgosDir, repoRoot);
 }
@@ -155,9 +184,14 @@ process.exit(0);
     fs.writeFileSync(childScriptPath, childScriptContent, 'utf8');
 
     moveWork(fgosDir, { id: 'task-guard-1', to: 'doing', expectedStatus: 'todo', role: 'session' });
-    const logText1 = fs.readFileSync(path.join(fgosDir, 'events.jsonl'), 'utf8');
-    runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { rawLog: logText1 });
-    const markAfterFirst = readGuardMark(guardPath);
+    const writerFileName = soleWriterFile(fgosDir);
+    const fileKey = `events/${writerFileName}`;
+    const writerFilePath = path.join(fgosDir, 'events', writerFileName);
+    // Real per-file disk discovery (no `rawLog` override — that path is
+    // scoped to baseline-0 only, byte-identical to before T5, and this
+    // writer's own events never land there post-cutover).
+    runOpportunisticMainCheckoutChecks(fgosDir, repoRoot);
+    const markAfterFirst = readGuardMark(guardPath, fileKey);
     assert.ok(markAfterFirst !== null, 'guard mark must be set after first check');
 
     moveWork(fgosDir, { id: 'task-guard-2', to: 'doing', expectedStatus: 'todo', role: 'session' });
@@ -165,13 +199,13 @@ process.exit(0);
     const childEnv = { ...process.env };
     delete childEnv.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
 
-    const child1 = fork(childScriptPath, [fgosDir, repoRoot, String(markAfterFirst.seq + 10), 'stale-future-hash'], { stdio: 'inherit', env: childEnv });
+    const child1 = fork(childScriptPath, [fgosDir, repoRoot, fileKey, String(markAfterFirst.seq + 10), 'stale-future-hash'], { stdio: 'inherit', env: childEnv });
     await new Promise((resolve) => child1.on('exit', resolve));
 
     runOpportunisticMainCheckoutChecks(fgosDir, repoRoot);
 
-    const markAfterRace = readGuardMark(guardPath);
-    const report = checkTruncationGuard(fs.readFileSync(path.join(fgosDir, 'events.jsonl'), 'utf8'), markAfterRace);
+    const markAfterRace = readGuardMark(guardPath, fileKey);
+    const report = checkTruncationGuard(fs.readFileSync(writerFilePath, 'utf8'), markAfterRace);
 
     assert.ok(markAfterRace !== null, 'mark exists');
     assert.equal(typeof report.ok, 'boolean');

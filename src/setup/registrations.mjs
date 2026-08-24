@@ -58,6 +58,7 @@ import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
 import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_EVENT_THRESHOLD } from '../state/events-jsonl-truncation-guard.mjs';
+import { verifyCompactionCandidate } from '../state/events-compaction.mjs';
 import { readMainCheckoutGuardWarnings } from '../state/main-checkout-guard-warnings.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
@@ -1141,17 +1142,50 @@ function checkEventsJsonlContiguous(cwd) {
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const logPath = path.join(mainCheckout, '.fgos', 'events.jsonl');
-  if (!fs.existsSync(logPath)) {
+  const fgosDir = path.join(mainCheckout, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  const eventsDirPath = path.join(fgosDir, 'events');
+  let writerFileNames = [];
+  try {
+    writerFileNames = fs
+      .readdirSync(eventsDirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch {
+    writerFileNames = [];
+  }
+  if (!fs.existsSync(logPath) && writerFileNames.length === 0) {
     return { passed: true, message: 'no .fgos/events.jsonl yet — nothing to check' };
   }
-  const report = checkEventsJsonlContiguity(logPath);
-  if (report.ok) {
-    return { passed: true, message: `events.jsonl is contiguous (${report.totalLines} lines, no seq breaks/duplicates)` };
+
+  // Legacy baseline-0 keeps the ORIGINAL check unchanged (the merge=union
+  // failure class this whole check exists for, tsk-3wq). Tầng A/T5
+  // (TA-D10): each per-writer file under .fgos/events/ is checked too, but
+  // as its OWN single-writer sequence -- seq is only ever meaningful
+  // within one file post-cutover (TA-D1/TA-D2), never combined across
+  // files, and there is no matching auto-fix for a per-writer break (see
+  // `fixEventsJsonlContiguous` below): TA-D2 already eliminated the
+  // merge-driver failure class the baseline fix exists to repair, so a
+  // break here is a different, rarer bug worth surfacing loudly instead.
+  const broken = [];
+  if (fs.existsSync(logPath)) {
+    const report = checkEventsJsonlContiguity(logPath);
+    if (!report.ok) broken.push({ file: 'events.jsonl', duplicates: report.duplicates.length, gaps: report.gaps.length });
+  }
+  for (const name of writerFileNames) {
+    const report = checkEventsJsonlContiguity(path.join(eventsDirPath, name));
+    if (!report.ok) broken.push({ file: `events/${name}`, duplicates: report.duplicates.length, gaps: report.gaps.length });
+  }
+
+  if (broken.length === 0) {
+    return {
+      passed: true,
+      message: `events.jsonl${writerFileNames.length > 0 ? ` + ${writerFileNames.length} per-writer file(s)` : ''} contiguous (no seq breaks/duplicates)`,
+    };
   }
   return {
     passed: false,
-    message: `events.jsonl has ${report.duplicates.length} duplicate seq and ${report.gaps.length} seq break(s) — likely left behind by a git merge (tsk-3wq); run fgos doctor --fix`,
+    message: `duplicate seq / seq break(s) found in ${broken.map((b) => `${b.file} (${b.duplicates} dup, ${b.gaps} gap)`).join(', ')} — for events.jsonl this is likely left behind by a git merge (tsk-3wq), run fgos doctor --fix; a per-writer file has no auto-fix (TA-D2 already prevents the merge-driver class it would repair)`,
   };
 }
 
@@ -1198,23 +1232,54 @@ registerFix({
 // re-baseline-after-acknowledgment step is a deliberate, documented
 // manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not
 // a blanket `doctor --fix` sweep.
+// Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under
+// .fgos/events/, each against its OWN entry in the shared guard sidecar
+// (the same `events/<name>` fileKey scheme `runOpportunisticMainCheckout
+// Checks` uses, so the two never disagree about which mark belongs to
+// which file). Per-session files stay git-tracked (TA-D2 only removes the
+// NEED for merge=union, not git tracking itself), so they carry the exact
+// same git reset/checkout/stash truncation risk baseline-0 always has
+// (tsk-cgg) — leaving this check baseline-only would be Tầng A quietly
+// opening a new observability gap.
 function checkEventsJsonlNotTruncated(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const logPath = path.join(mainCheckout, '.fgos', 'events.jsonl');
-  const guardPath = path.join(mainCheckout, '.fgos', 'events-jsonl.truncation-guard.json');
-  if (!fs.existsSync(logPath)) {
+  const fgosDir = path.join(mainCheckout, '.fgos');
+  const guardPath = path.join(fgosDir, 'events-jsonl.truncation-guard.json');
+  const filesToCheck = [{ fileKey: 'events.jsonl', logPath: path.join(fgosDir, 'events.jsonl') }];
+  const eventsDirPath = path.join(fgosDir, 'events');
+  try {
+    const names = fs
+      .readdirSync(eventsDirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+    for (const name of names) filesToCheck.push({ fileKey: `events/${name}`, logPath: path.join(eventsDirPath, name) });
+  } catch {
+    // .fgos/events/ doesn't exist yet -- baseline-0 alone is still checked below
+  }
+
+  const existingFiles = filesToCheck.filter(({ logPath }) => fs.existsSync(logPath));
+  if (existingFiles.length === 0) {
     return { passed: true, message: 'no .fgos/events.jsonl yet — nothing to check' };
   }
-  const report = advanceEventsJsonlTruncationGuard(logPath, guardPath);
-  if (report.ok) {
-    return { passed: true, message: `events.jsonl truncation guard holds (${report.message})` };
+
+  const broken = [];
+  for (const { fileKey, logPath } of existingFiles) {
+    const report = advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey);
+    if (!report.ok) broken.push({ fileKey, message: report.message });
+  }
+
+  if (broken.length === 0) {
+    return {
+      passed: true,
+      message: `truncation guard holds across events.jsonl${existingFiles.length > 1 ? ` + ${existingFiles.length - 1} per-writer file(s)` : ''}`,
+    };
   }
   return {
     passed: false,
-    message: `events.jsonl truncation detected: ${report.message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,
+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,
   };
 }
 
@@ -1222,6 +1287,101 @@ registerCheck({
   id: 'events-jsonl-not-truncated',
   description: 'shared .fgos/events.jsonl has not been silently reverted by a git stash/checkout/reset/clean (tsk-cgg)',
   check: (cwd) => checkEventsJsonlNotTruncated(cwd),
+});
+
+// events-compaction-verified (Tầng A/T6, TA-D6): retroactively re-proves
+// every past compaction recorded in .fgos/events/archive/*.manifest.json
+// still holds -- re-reads the manifest's own `baseline` (still a live file
+// under .fgos/events/) and its `originals` (now under archive/) and re-runs
+// the SAME verify gate compactColdWriterFiles ran before archiving anything
+// (deep-equal view + count + hash-set, src/state/events-compaction.mjs).
+// No matching registerFix, same posture as events-jsonl-not-truncated above:
+// a break here means the compacted baseline and its own archived originals
+// have drifted apart after the fact (tampering, partial restore, a bug) --
+// real data may be at stake, so this only ever surfaces the finding for a
+// human to investigate (docs/how-to/... none yet; the manifest + both file
+// sets are still on disk for manual inspection), never auto-repairs.
+function checkEventsCompactionVerified(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const eventsDirPath = path.join(mainCheckout, '.fgos', 'events');
+  const archiveDirPath = path.join(eventsDirPath, 'archive');
+  let manifestNames = [];
+  try {
+    manifestNames = fs
+      .readdirSync(archiveDirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.manifest.json'))
+      .map((entry) => entry.name);
+  } catch {
+    return { passed: true, message: 'no compactions recorded yet — nothing to verify' };
+  }
+  if (manifestNames.length === 0) {
+    return { passed: true, message: 'no compactions recorded yet — nothing to verify' };
+  }
+
+  // Never throws (same contract events-jsonl-contiguous/events-jsonl-not-
+  // truncated above already keep): a corrupt line in an archived original
+  // or the baseline itself is exactly the "tampering, partial restore, a
+  // bug" shape this check exists to catch, per its own doc comment above --
+  // it must surface as a normal `broken` finding, never crash the rest of
+  // `fgos doctor` (bin/fgos.mjs's doctor handler runs every check in one
+  // .map(), with no per-check try/catch of its own).
+  const broken = [];
+  for (const manifestName of manifestNames) {
+    try {
+      const manifest = JSON.parse(fs.readFileSync(path.join(archiveDirPath, manifestName), 'utf8'));
+      const baselinePath = path.join(eventsDirPath, manifest.baseline);
+      if (!fs.existsSync(baselinePath)) {
+        broken.push({ manifest: manifestName, reason: `baseline "${manifest.baseline}" is missing` });
+        continue;
+      }
+      const originalEntries = [];
+      let missingOriginal = null;
+      for (const name of manifest.originals ?? []) {
+        const originalPath = path.join(archiveDirPath, name);
+        if (!fs.existsSync(originalPath)) {
+          missingOriginal = name;
+          break;
+        }
+        originalEntries.push({ name, events: readEventsJsonLines(originalPath) });
+      }
+      if (missingOriginal) {
+        broken.push({ manifest: manifestName, reason: `archived original "${missingOriginal}" is missing` });
+        continue;
+      }
+      const candidateEvents = readEventsJsonLines(baselinePath);
+      const verify = verifyCompactionCandidate(originalEntries, candidateEvents);
+      if (!verify.ok) {
+        broken.push({ manifest: manifestName, reason: verify.reason });
+      }
+    } catch (err) {
+      broken.push({ manifest: manifestName, reason: `could not verify: ${err.message}` });
+    }
+  }
+
+  if (broken.length === 0) {
+    return { passed: true, message: `${manifestNames.length} past compaction(s) verified — baseline still matches its archived originals` };
+  }
+  return {
+    passed: false,
+    message: `compaction verify gate no longer holds for ${broken.map((b) => `${b.manifest} (${b.reason})`).join(', ')}`,
+  };
+}
+
+function readEventsJsonLines(filePath) {
+  return fs
+    .readFileSync(filePath, 'utf8')
+    .split('\n')
+    .filter((line) => line !== '')
+    .map((line) => JSON.parse(line));
+}
+
+registerCheck({
+  id: 'events-compaction-verified',
+  description: 'every past .fgos/events/ compaction (archive/*.manifest.json) still deep-equal/count/hash-set matches its archived originals (Tầng A/T6)',
+  check: (cwd) => checkEventsCompactionVerified(cwd),
 });
 
 // main-checkout-guard-warnings (tsk-1vc-3 D6, docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md):
