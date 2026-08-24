@@ -1721,6 +1721,63 @@ test('mergeRunnerItem merges cleanly when a non-union .fgos/ path auto-merges to
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
+// tsk-198: proves a .fgos/ path absent at branchHeadAtTake and absent on the
+// branch's current tip is safely preserved when main keeps drifting it.
+//
+// Two shapes were tried and rejected before this one:
+//   1. A path main creates for the FIRST time after the branch's own fork
+//      (never existing at the merge-base at all) -- passed identically with
+//      or without this fix; git's merge never even stages a diff for a path
+//      only one side ever knew about, so it proved nothing (same lesson
+//      tsk-4s6's own first rejected shape already recorded).
+//   2. The path exists at the merge-base, the branch deletes it, AND main
+//      also modifies its content after the fork -- a genuine
+//      modify(main)/delete(branch) CONFLICT (git always throws for this,
+//      confirmed empirically), which this fix's restore loop never reaches
+//      at all (it only runs after a clean merge) -- failed even with the
+//      fix, for the wrong reason.
+// This shape mirrors the REAL bug (fgw/tsk-25b's own dead
+// events.jsonl.backup-tsk-1lv-4-dedup-fix-20260817 file, docs/history/
+// tsk-198-write-rejected-no-diff-check/plan.md, confirmed by directly
+// reproducing the real merge against the live repo): the path exists at the
+// merge-base, the branch deletes it before branchHeadAtTake is ever
+// recorded, and main leaves its OWN copy completely untouched afterward
+// (never modifies it further) -- a one-sided deletion (only the branch
+// changed anything relative to the merge-base) that git auto-resolves
+// cleanly to "deleted" with no conflict thrown, but which still stages a
+// real diff against HEAD (which still has the file).
+test('mergeRunnerItem merges cleanly when a .fgos/ path is absent at branchHeadAtTake, absent on branch, and present on main (tsk-198)', async () => {
+  const repoRoot = initRepo();
+  const configRelPath = path.join('.fgos', 'config.json');
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  const seedContent = '{\n  "version": 1\n}\n';
+  fs.writeFileSync(path.join(repoRoot, configRelPath), seedContent);
+  git(repoRoot, ['add', configRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .fgos/config.json on main']);
+
+  // Branch forks, then deletes the path BEFORE branchHeadAtTake is
+  // recorded -- from the item's own perspective, it never had this path.
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  git(repoRoot, ['rm', '-q', configRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'branch removes .fgos/config.json before this item was ever taken']);
+  fs.writeFileSync(path.join(repoRoot, 'produced.txt'), 'ok\n');
+  git(repoRoot, ['add', 'produced.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'worker produces its own file']);
+  const forkCommit = headOf(repoRoot);
+  git(repoRoot, ['checkout', 'main']);
+  // Main leaves the path completely untouched after the branch's fork --
+  // only the branch changed anything relative to the merge-base, the exact
+  // one-sided-deletion shape that auto-resolves without a conflict.
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt', branchHeadAtTake: forkCommit }));
+  assert.equal(result.outcome, 'merged');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
+
+  const finalContent = fs.readFileSync(path.join(repoRoot, configRelPath), 'utf8');
+  assert.equal(finalContent, seedContent, 'main\'s own content must survive unaffected');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
 // tsk-4gi: a NON-union `.fgos/` path (e.g. `.fgos/config.json`, no
 // `merge=union` entry) that already exists on target's HEAD and gets edited
 // on non-overlapping lines by both the worker branch and target auto-merges

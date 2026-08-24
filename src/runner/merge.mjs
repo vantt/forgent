@@ -1176,10 +1176,9 @@ function isMergeUnionPath(repoRoot, relPath) {
 function isUnchangedSinceBranchHeadAtTake(repoRoot, branch, relPath, branchHeadAtTake) {
   if (!branchHeadAtTake) return false;
   try {
-    const atTake = git(repoRoot, ['rev-parse', `${branchHeadAtTake}:${relPath}`]).trim();
-    const atBranchHead = git(repoRoot, ['rev-parse', `${branch}:${relPath}`]).trim();
-    return atTake === atBranchHead;
-  } catch {
+    git(repoRoot, ['diff', '--quiet', branchHeadAtTake, branch, '--', relPath]);
+    return true;
+  } catch (err) {
     return false;
   }
 }
