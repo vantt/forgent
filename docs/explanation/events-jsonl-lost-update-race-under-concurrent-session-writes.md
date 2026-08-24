@@ -12,6 +12,31 @@ lost-update bug: raw log lines can go missing entirely, not just a
 derived cache going stale, when multiple sessions write against the same
 shared main checkout at once.
 
+**Superseded mechanism, current state (`tsk-3tp`, on top of `tsk-3ve`):**
+the union-merge-driver + `scripts/events-jsonl-contiguity.mjs` fix
+described below in "How root cause B was actually closed" is no longer
+how this is handled. `.fgos/events.jsonl` is now a frozen baseline
+(`tsk-3ve`); new events land in per-writer shard files under
+`.fgos/events/<writer-id>-<openTs>.jsonl`, each carrying a content-hash
+`h` identity instead of a cross-writer `seq`, periodically compacted into
+a verified `baseline-<ts>.jsonl` (originals archived, never deleted).
+Because writers no longer share one file, there is nothing left for a
+`.fgos/events.jsonl merge=union` entry to protect — that `.gitattributes`
+line was removed, and the `scripts/events-jsonl-contiguity.mjs` script
+plus its `fgos doctor` `events-jsonl-contiguous` check/fix pair were
+deleted outright (seq stopped being identity). Commit timing for the
+shard files also changed: instead of a dedicated timer/event-count
+checkpoint commit, dirty shard files ride along (are swept into) the next
+merge/approve commit that main creates anyway, with a sparse
+(`checkpoint.fallbackIntervalSec`, default 3600s) fallback commit for
+quiet stretches. This does **not** affect the other `.fgos/*.jsonl` files
+(`approve-post-success-faults.jsonl`, `invocation-faults.jsonl`,
+`main-checkout-guard-warnings.jsonl`) — those still legitimately use
+`merge=union` per `tsk-2xg`, unchanged. Full decision record:
+`docs/history/tsk-3tp-worker-write-events-tang-b/`. The sections below
+remain accurate as history of the investigation and the fix that was
+current through `tsk-3wq`; they no longer describe the live mechanism.
+
 ## A real, observed instance (`tsk-2xt`)
 
 While redoing bookkeeping for `tsk-2xt` (the herdr-orchestrator root
@@ -143,14 +168,16 @@ the exact shape `docs/history/live-events-seq-corruption/CONTEXT.md`
 recurred three more times (`tsk-4vo`'s children, `tsk-5td`, `tsk-2x9k`)
 before `tsk-3wq` closed it.
 
-The fix (`tsk-3wq` D1): a `.gitattributes` entry —
+The fix as it stood through `tsk-3wq` (D1, retired by `tsk-3tp` — see the
+superseded note above): a `.gitattributes` entry —
 `.fgos/events.jsonl merge=union` — routing every `git merge` touching
 that path (including ad hoc ones run directly by a session, not only
 `fgos merge`) through git's own built-in `union` merge driver, which
 takes lines from both sides instead of leaving conflict markers. Because
 `.gitattributes` is itself a versioned file, every checkout picks it up
 automatically; no per-machine git config or `fgos setup` wiring is
-needed. The same divergent-branch scenario, with the fix in place:
+needed. The same divergent-branch scenario, with that (now-retired) fix
+in place:
 
 ```
 $ git merge --no-ff branch-b -m "merge branch-b into main"
@@ -164,12 +191,15 @@ Exit `0`, no conflict, no hand-resolution — all 6 real events from both
 sides survive. The one documented residue of `union` ("tends to leave the
 added lines... in random order," and here, duplicate `seq` values since
 each side numbered its own new lines independently) is exactly what a
-second, new `scripts/events-jsonl-contiguity.mjs` script closes:
+second script closed at the time — `scripts/events-jsonl-contiguity.mjs`
+(deleted by `tsk-3tp`; see the superseded note above — `seq` stopped
+being cross-writer identity once `tsk-3ve` gave every writer its own
+shard file):
 `--check` reports any `seq` gap or duplicate; `--fix` dedupes exact
 duplicates and renumbers `seq` 1..N contiguously in original relative
 (`ts`) order, reusing `src/state/events.mjs`'s own line parsing rather
 than reimplementing it. Run against the merged, duplicate-`seq` result
-above:
+above (historical example — this script no longer exists):
 
 ```
 $ node scripts/events-jsonl-contiguity.mjs --check .fgos/events.jsonl
@@ -179,11 +209,14 @@ $ node scripts/events-jsonl-contiguity.mjs --fix .fgos/events.jsonl
 {"fixed": true, "totalLines": 6, "dedupedCount": 0, "resequencedCount": 2, "backupPath": "..."}
 ```
 
-— fully contiguous afterward, all 6 real events intact. That script is
-registered into `fgos doctor`'s existing check registry (mirroring the
-already-tested `checkRootDrift` pattern) so this class of residue is
-caught proactively going forward, on any git operation, not only when
-some later script happens to trip over it.
+— fully contiguous afterward, all 6 real events intact. At the time, that
+script was registered into `fgos doctor`'s existing check registry
+(mirroring the already-tested `checkRootDrift` pattern, as the
+`events-jsonl-contiguous` check/fix pair) so this class of residue was
+caught proactively on any git operation. `tsk-3tp` retired that check
+along with the script — it is no longer part of `fgos doctor`'s registry
+(seq is no longer cross-writer identity, so there is nothing left for it
+to check).
 
 `tsk-3wq` closed one more, independently-real gap in the same pass
 (D2): `repairTruncatedLastLine` (`src/state/events.mjs:141-184`) did its
@@ -232,4 +265,9 @@ test/scripts/events-jsonl-contiguity.test.mjs` — 166 tests, 0 fail.
   main checkout can discard another session's uncommitted work.
 - `docs/history/events-jsonl-merge-driver-recurring-write-loss/` —
   `tsk-3wq`'s own CONTEXT.md/plan.md/repro-notes.md/iron-law-evidence.md,
-  the full decision record and evidence trail behind root cause B's fix.
+  the full decision record and evidence trail behind root cause B's fix as
+  it stood at the time (since superseded — see below).
+- `docs/history/tsk-3tp-worker-write-events-tang-b/` — the current
+  mechanism: sharded `.fgos/events/` layout (building on `tsk-3ve`) plus
+  merge-time sweep + sparse fallback commit, which retired the
+  union-merge-driver + contiguity-script fix this doc describes above.

@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Retired eager periodic event log checkpointing (interval 900s / threshold 50 events) in favor of sweeping dirty `.fgos/events/` shards into staged merge commits, with a 3600s fallback interval (`checkpoint.fallbackIntervalSec`).
+- Retired the `.fgos/events.jsonl` seq-contiguity band-aid: removed `.gitattributes`'s `merge=union` entry for it, `src/state/events-jsonl-contiguity.mjs`, `scripts/events-jsonl-contiguity.mjs`, `scripts/check-events-seq-contiguity.mjs` (and its `npm run check:events-seq` script), and the `fgos doctor` `events-jsonl-contiguous` check/fix pair. `seq` stopped being cross-writer identity once every writer got its own per-writer file under `.fgos/events/` (content-hash `h` is the real identity now), and baseline-0 no longer receives new appends, so the union-merge failure shape this surface existed to repair can no longer happen.
+- `.gitattributes` now applies `merge=union` to `.fgos/events/*.jsonl` (the per-writer sharded event-log files introduced by the event-log sharding migration), matching the existing rule for the old single-file `.fgos/events.jsonl` and the diagnostic logs — every session's own live shard was hitting the same git append-conflict problem those earlier rules already solved.
 - `scripts/fgos-shell-integration.sh`'s `fgos()` shell function now automatically appends `--dir "$root"` to `bin/fgos.mjs` invocations when the caller omits `--dir`, preserving any explicit `--dir` passed by the caller. Rewrote all CLI examples across skill documents (`core/skills/` and `domains/coding/skills/`) into flat, single-line `fgos <verb>` subcommands, eliminating multi-statement `root=$(git rev-parse...)` compounds that trip worktree-isolation guards.
 - Updated `resolveAgentTypeForTaskSpec` (`src/runner/dispatch/cli.mjs`) to fail closed (returning `null`) across all four unvalidated/mismatched eligibility fallback points (missing taskSpec header, pinned agent missing from roster, empty `requires-skill`, and no roster agent matching required skills) instead of falling open to an unvalidated agent name.
 - `fgos return` now accepts `--worker-verified-sha <sha>` to skip re-running verify when an out-of-process worker already verified the exact same branch tip commit; `executeExecutorCli` now returns `verifiedSha` on `[DONE]` results and `fanoutBatchExecutorCli` threads it into return.
@@ -50,6 +53,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   already used and retries the claim once before falling back to the same
   `lock-ambiguous` error — a transiently-corrupt lock no longer requires a
   separate manual `fgos unlock`/`/fgOS:unlock` call to clear it.
+- `mergeRunnerItemLocked` (`src/runner/merge.mjs`) no longer refuses a
+  successful merge just because it left a `merge=union`-attributed
+  `.fgos/*.jsonl` path staged (e.g. `.fgos/events.jsonl`, its sharded
+  `.fgos/events/*.jsonl` files, or the diagnostic logs) — it now restores
+  that specific path to the target's own pre-merge committed content and
+  re-checks before deciding, instead of rejecting the merge outright. Any
+  other `.fgos/` path (not `merge=union`-attributed, or newly introduced
+  with no target-side version to restore to) still trips
+  `fgos-write-rejected` exactly as before; this closes the gap tsk-2xg
+  left open (its own `.gitattributes` `merge=union` half already
+  shipped, but the "restore-then-recheck after a clean auto-merge" half
+  never landed), which had been tripping `approve` on nearly every
+  long-lived branch under concurrent write load on `.fgos/*.jsonl`.
+- `performCatchUp` and `mergeRunnerItemLocked` (`src/runner/merge.mjs`)
+  no longer report a real `conflict` outcome for a git-merge conflict
+  confined entirely to `.fgos/` paths declared `merge=union` — a worker
+  branch that at some point recorded a DELETION of a shard (e.g. an
+  earlier manual `git rm --cached` recovery from an unrelated conflict)
+  raised a real modify/delete conflict the moment the calling session's
+  own subsequent event-append grew that same shard elsewhere, which the
+  `merge=union` driver never auto-resolves (deletion is never handled
+  by a content-merge driver, regardless of attribute). New helper
+  `resolveFgosOnlyConflict` restores every such conflicted path to the
+  trusted side's own committed version (`HEAD`/main for `approve`,
+  `target` for `catchup`) instead of aborting — neither merge direction
+  has any legitimate claim over the other's `.fgos/` state (ADR0020),
+  so this was always a false conflict, not a real content dispute.
 - The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)
   now spawns every executor `detached: true` and kills its whole process
   GROUP on timeout/maxBuffer (`process.kill(-pid, ...)`), not just the

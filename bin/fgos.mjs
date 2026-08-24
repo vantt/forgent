@@ -235,7 +235,17 @@ function excludeIronLawEvidence(files, id) {
 // (`baseline-<ts>.jsonl`, T6) and its own manifest sidecar under
 // `.fgos/events/archive/` are equally append-only lifecycle output, never
 // an item's own declared footprint.
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|entropy-history\.jsonl|events-jsonl\.truncation-guard\.json)$/;
+//
+// tsk-3tp-1 (D2, sweep-into-merge-commit redesign): the truncation guard's
+// own mark sidecar (`events-jsonl.truncation-guard.json`) and the warnings
+// log it appends to (`main-checkout-guard-warnings.jsonl`) are the same
+// kind of append-only, no-item-owns-it output -- a fallback checkpoint (or
+// the merge-time sweep) can legitimately touch either one, never an item's
+// own declared footprint. The wildcard extension on
+// `events-jsonl.truncation-guard\..*` also subsumes tsk-vim's own narrower
+// exact-`.json` fix (independently landed on main) -- one regex alternative
+// covers both.
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|entropy-history\.jsonl|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
@@ -3142,6 +3152,23 @@ async function runVerb(verb, flags, positional, dir) {
           const tmpWorktree = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-return-'));
           try {
             gitAt(repoRoot, ['worktree', 'add', '--detach', tmpWorktree, branchHead]);
+            // `.fgos/` strip (ADR0020, tsk-26r): since `.fgos/` is
+            // git-tracked in this repo, the `worktree add` above just
+            // checked out a snapshot of it frozen at branchHead — stale the
+            // moment main gets another event, and (per createWorktree's own
+            // finishWorktreeSetup, src/runner/worktree.mjs) something this
+            // disposable verify worktree has no legitimate reason to read or
+            // write anyway. Strip it the same way createWorktree does, right
+            // after checkout and before verify runs, so this ephemeral
+            // worktree's tree looks like every other worker worktree instead
+            // of tripping fgos-return.test.mjs's main-checkout-cleanliness /
+            // `.fgos`-dirty-tree exemption checks on a checked-out copy
+            // nothing here ever needed.
+            try {
+              fs.rmSync(path.join(tmpWorktree, '.fgos'), { recursive: true, force: true });
+            } catch (err) {
+              throw new StoreError('validation', `return: removing checked-out .fgos in ephemeral verify worktree "${tmpWorktree}" failed: ${err.message}`);
+            }
             // tsk-5l2-1 finding (real, kept as evidence): tmpWorktree lives
             // under os.tmpdir(), outside the repo tree — Node's ESM loader
             // never consults NODE_PATH, so a bare-specifier import (e.g.

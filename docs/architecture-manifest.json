@@ -90,7 +90,6 @@
     "src/evolve/candidates.mjs": "domain",
     "src/evolve/iron-law.mjs": "domain",
     "src/state/events.mjs": "kernel",
-    "src/state/events-jsonl-contiguity.mjs": "kernel",
     "src/state/events-jsonl-truncation-guard.mjs": "kernel",
     "src/state/main-checkout-guard-warnings.mjs": "kernel",
     "src/state/work.mjs": "kernel",
