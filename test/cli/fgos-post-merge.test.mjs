@@ -2,6 +2,7 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+import { resolveWriterIdentity } from '../../src/util/session-identity.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -1106,4 +1107,77 @@ test('catchup succeeds when invoked with cwd inside the item\'s own linked workt
 
   gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
 });
+
+test('cleanup (to blocked branch) releases main-checkout lock held by caller session (tsk-5zv)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'cleanup-lock-blocked');
+  run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'doing']);
+  run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'delivered']);
+  run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'retrospective']);
+  run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'cleanup']);
+
+  const dir = path.join(cwd, '.fgos');
+  const lockPath = mainCheckoutLockPath(cwd);
+  const writerId = resolveWriterIdentity(dir).id;
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: writerId, ts: Date.now() }));
+  assert.equal(fs.existsSync(lockPath), true);
+
+  const result = run(cwd, ['cleanup', 'cleanup-lock-blocked']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
+  assert.equal(fs.existsSync(lockPath), false, 'cleanup -> blocked must release the session lock early');
+});
+
+test('cleanup (to done branch) releases main-checkout lock held by caller session (tsk-5zv)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  writeCleanupTtlConfig(cwd, 0);
+  makeRunnerProposedItem(cwd, 'cleanup-lock-done', { verify: 'test -f cleanup-lock-done-produced.txt' });
+  commitPendingBeforeApprove(cwd, 'cleanup-lock-done');
+
+  const approve = run(cwd, ['approve', 'cleanup-lock-done']);
+  assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
+
+  run(cwd, ['move', 'cleanup-lock-done', '--to', 'retrospective']);
+  const dir = path.join(cwd, '.fgos');
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'cleanup-lock-done.md'), '# doc\n');
+  addOutcome(dir, { id: 'cleanup-lock-done', docType: 'how-to', docPath: 'docs/how-to/cleanup-lock-done.md' });
+  run(cwd, ['move', 'cleanup-lock-done', '--to', 'cleanup']);
+
+  const lockPath = mainCheckoutLockPath(cwd);
+  const writerId = resolveWriterIdentity(dir).id;
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: writerId, ts: Date.now() }));
+  assert.equal(fs.existsSync(lockPath), true);
+
+  const result = run(cwd, ['cleanup', 'cleanup-lock-done']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(envelopeData(result.stdout).to, 'done');
+  assert.equal(fs.existsSync(lockPath), false, 'cleanup -> done must release the session lock early');
+});
+
+test('compound releases main-checkout lock held by caller session (tsk-5zv)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'compound-lock-item');
+  run(cwd, ['move', 'compound-lock-item', '--to', 'doing']);
+  run(cwd, ['move', 'compound-lock-item', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-lock-item', '--to', 'retrospective']);
+
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'compound-lock-item.md'), '# doc\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'add doc']);
+
+  const dir = path.join(cwd, '.fgos');
+  const lockPath = mainCheckoutLockPath(cwd);
+  const writerId = resolveWriterIdentity(dir).id;
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: writerId, ts: Date.now() }));
+  assert.equal(fs.existsSync(lockPath), true);
+
+  const result = run(cwd, ['compound', 'compound-lock-item', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/compound-lock-item.md']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(fs.existsSync(lockPath), false, 'compound must release the session lock early after addOutcome');
+});
+
 
