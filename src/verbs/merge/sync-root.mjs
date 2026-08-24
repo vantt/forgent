@@ -234,6 +234,17 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
           });
           return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch, conflictedFiles: catchupResult.conflictedFiles };
         }
+        if (catchupResult.outcome === 'merge-refused') {
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'merge-fail',
+            layer: 'state',
+            attempts: 1,
+            detail: `sync-root catchup (inbound gate): git merge --no-commit --no-ff ${targetBranch} into ${branch} refused: ${catchupResult.reason}`,
+          });
+          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-failed-unclassified', target: targetBranch, branch, detail: catchupResult.reason };
+        }
         if (catchupResult.outcome === 'verify-fail') {
           addFriction(dir, {
             id,

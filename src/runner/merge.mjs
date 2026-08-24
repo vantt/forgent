@@ -1626,6 +1626,9 @@ export function cleanupMergedBranch(repoRoot, branch) {
  *     branch is left exactly as it was.
  *   - `{ outcome: 'conflict', conflictedFiles }` — a real textual conflict;
  *     aborted cleanly, branch untouched.
+ *   - `{ outcome: 'merge-refused', reason }` — git refused the merge attempt
+ *     up front before staging anything (no MERGE_HEAD); aborted cleanly (nothing
+ *     staged to abort), branch untouched.
  *
  * Never mutates `.fgos/` state and never throws for any of these defined
  * outcomes — only for a genuinely unexpected git failure (e.g. `git merge
@@ -1656,7 +1659,11 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
     let conflicted = false;
     try {
       execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-    } catch {
+    } catch (err) {
+      if (!mergeHeadExists(ephemeral.path)) {
+        const reason = (err.stderr || err.message || '').trim();
+        return { outcome: 'merge-refused', reason };
+      }
       // tsk-tr9: `target` (main) is always the side to trust for any
       // `.fgos/` path — a worker branch has no legitimate claim over it at
       // all (ADR0020). A conflict confined entirely to `.fgos/` paths
@@ -1675,21 +1682,13 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
         // best-effort — the outcome below still reports the conflict even
         // if listing the conflicted files itself fails.
       }
-      try {
-        execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-      } catch (abortErr) {
-        throw abortErr;
-      }
+      abortMergeIfPossible(ephemeral.path);
       return { outcome: 'conflict', conflictedFiles: conflictedFiles ? conflictedFiles.split('\n').filter(Boolean) : [] };
     }
 
     const check = await runGoalCheck(item, ephemeral.path, timeoutMs);
     if (!check.passed) {
-      try {
-        execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-      } catch (abortErr) {
-        throw abortErr;
-      }
+      abortMergeIfPossible(ephemeral.path);
       return { outcome: 'verify-fail', timedOut: check.timedOut, exitStatus: check.status, output: check.output };
     }
 
