@@ -2,7 +2,7 @@
 type: reference
 title: Worktree/merge lifecycle audit findings (2026-08-14)
 tags: [audit, worktree, merge, lifecycle, code-review]
-source_capture_ids: [tsk-25r, tsk-18k, tsk-1mn]
+source_capture_ids: [tsk-25r, tsk-18k, tsk-1mn, tsk-2iz]
 authoritative_for: the 9 findings from the 2026-08-14 fable code-review audit of fgOS's worktree claim/merge/cleanup lifecycle, and which work item tracks each
 ---
 # Worktree/merge lifecycle audit findings (2026-08-14)
@@ -17,7 +17,7 @@ as of this audit's own capture.
 |---|---|---|
 | `tsk-18k` | high | **Fixed.** Merge-target-slot lock's string-identity release/renew could delete a sibling session's live lock after a TTL reclaim — fixed via pid identity (not the nonce first proposed) plus an atomic `git update-ref` hardening a related CAS gap the same discussion surfaced. Full detail: `docs/explanation/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md` (a third round on the same call site `tsk-1wr`/`tsk-70l` already worked on). |
 | `tsk-1mn` | medium | **Fixed.** `claimWork` held the main-checkout lock across synchronous `npm ci` with no heartbeat, letting the TTL expire mid-claim and reopen the concurrent-writer race `tsk-18k` also addresses. Fixed by releasing `main-checkout.lock` *before* `claimWork`'s synchronous `npm ci` runs, rather than adding a heartbeat — the two findings are companions: `tsk-18k` fixes what happens *after* a TTL-driven reclaim, this fixes how *often* one happens in the first place. |
-| `tsk-2iz` | medium | Decision-index auto-resolve can mint duplicate decision IDs, and a throw mid-resolve skips the merge abort. |
+| `tsk-2iz` | medium | **Fixed.** Decision-index auto-resolve could mint duplicate decision IDs (reading only one of two relevant trees) and a throw mid-resolve could skip the merge abort. Fixed by having auto-resolve consider both trees and never skip the abort path on a throw. |
 | `tsk-ikd` | medium | `return`'s main-source path has no main-worktree guard — `approve`/`sync-root`/`promote-to-component` all refuse outside the main checkout, `return` doesn't. |
 | `tsk-4bh` | medium | `checkMergeStillResolves` never skips `wontfix`/canceled children, causing a permanent cleanup block on a decomposed root. |
 | `tsk-2jn` | medium-low | `footprintOverlapAmong` compares raw declared paths without `normalizePath` — differently-spelled but identical footprints dodge parallel-dispatch conflict detection. |
