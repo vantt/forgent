@@ -10,3 +10,12 @@
 # scripts/events-jsonl-contiguity.mjs and the `events-jsonl-contiguous`
 # fgos doctor check for that half.
 .fgos/events.jsonl merge=union
+
+# tsk-2xg: append-only diagnostic logs written by fgos tools. Git's default
+# line-based 3-way merge causes fgos-write-rejected deadlocks when worker
+# branches catch up with main and revert .fgos/* per pre-commit hook rules.
+# `union` keeps lines from both sides and prevents false staged diffs.
+.fgos/approve-post-success-faults.jsonl merge=union
+.fgos/invocation-faults.jsonl merge=union
+.fgos/main-checkout-guard-warnings.jsonl merge=union
+

@@ -156,6 +156,8 @@ A `NOT READY` verdict skips this Gate entirely; it returns to
 `fgos-coding-planning` instead of asking anything or checking bypass.
 
 ### Gate Step 1: decide whether this gate has anything to ask
+**Skip-load check, before reading further.** If `plan.md`'s `Mode:` line reads `tiny` or `small`, skip opening references/gate-tier-a-b-triggers.md — instead, run this condensed inline reality check: is there still an untried action that would close whatever the Reality gate above left uncertain? If yes, do it. If no, and the plan touches none of the three named triggers below (T1 two options still standing, T2 a locked CONTEXT.md conflict, T3 an unwritable child spec), record cost verdict `REVERSIBLE` and continue straight to Gate Step 2. If it does touch one, ask, following the "Ask to adjust the plan together" shape the `false` branch below already describes. For every other lane, continue reading this Step as written, including opening its own reference file.
+
 Tier A first, always: is there a valid action in reach that closes the
 gap (run the command, read the file, invoke `fgos-researching`, run
 `fgos graph --what-if`)? If yes, do it, then re-ask from the top — never

@@ -163,6 +163,25 @@ test('rebuild-determinism: CAS conflict — a stale --expect on the second of tw
   assert.equal(stateView(cwd).work['cas-e2e'].status, 'doing');
 });
 
+// Tầng A/T2 (TA-D2/TA-D11/TA-D12): a fresh store's writes never land in
+// baseline-0 (`.fgos/events.jsonl` stays exactly whatever `init` left it —
+// empty, for a repo with no pre-migration history) — `add` opens a
+// per-writer file under `.fgos/events/` instead. Finds the one file that
+// actually holds content (checked first since `events.jsonl` is created
+// by `init` even when never appended to), so the corrupt-mid-append
+// simulation below truncates a real, non-empty log — same real behavior
+// this test proves regardless of which physical file the event landed in.
+function activeLogPath(cwd) {
+  if (fs.readFileSync(logPath(cwd), 'utf8').length > 0) return logPath(cwd);
+  const eventsDir = path.join(cwd, '.fgos', 'events');
+  const names = fs
+    .readdirSync(eventsDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+    .map((entry) => entry.name);
+  assert.ok(names.length > 0, 'expected at least one non-empty event log file');
+  return path.join(eventsDir, names[0]);
+}
+
 test('rebuild-determinism: a truncated final event-log line is reported as corrupt-log, exit 5, message names the error', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
@@ -170,12 +189,13 @@ test('rebuild-determinism: a truncated final event-log line is reported as corru
 
   // Simulate a crash mid-append: cut the last line off partway through
   // rather than replacing it with different-but-valid or garbage content.
-  const raw = fs.readFileSync(logPath(cwd), 'utf8');
+  const targetPath = activeLogPath(cwd);
+  const raw = fs.readFileSync(targetPath, 'utf8');
   const lines = raw.split('\n').filter(Boolean);
   const lastLine = lines[lines.length - 1];
   const truncatedLast = lastLine.slice(0, Math.floor(lastLine.length / 2));
   const truncated = [...lines.slice(0, -1), truncatedLast].join('\n');
-  fs.writeFileSync(logPath(cwd), `${truncated}\n`, 'utf8');
+  fs.writeFileSync(targetPath, `${truncated}\n`, 'utf8');
 
   const result = run(cwd, ['list']);
   assert.equal(result.status, 5);
