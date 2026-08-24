@@ -2,7 +2,7 @@
 type: explanation
 title: Why planning and validating collapsed into one co-adjustment gate
 tags: [fgos-coding-planning, fgos-coding-validating, gate, gate-bypass, human-release]
-source_capture_ids: [tsk-224, tsk-2tk]
+source_capture_ids: [tsk-224, tsk-2tk, tsk-blk]
 authoritative_for: why fgos-coding-planning and fgos-coding-validating merged their two approval gates into one, and how that one gate decides when to ask a person versus proceed
 ---
 # Why planning and validating collapsed into one co-adjustment gate
@@ -203,6 +203,37 @@ decision: `docs/explanation/gate-bypass-design.md`,
 `docs/explanation/why-heavy-keywords-matching-moved-to-word-boundaries.md`.
 Scope stayed strictly prose/comment/doc — no logic, schema, or test
 assertion changed by this cleanup pass.
+
+## Two coverage gaps closed after the redesign (`tsk-blk`)
+
+Test-only additions, no production-behavior change intended:
+
+1. **A gate-name drift guard.** `test/cli/command-registry.test.mjs` had
+   two guards already (no retired `judge*` function referenced, no
+   retired stage referenced) but none for a retired *gate name* appearing
+   in free-text prose. A new test derives the live gate names
+   (`contextApprove`/`validateApprove` — the real set in
+   `src/state/store.mjs`'s `GATE_APPROVE_GATES`, or read from the
+   SKILL.md files that actually call `gate-approve`) and asserts no
+   prose anywhere still names a retired gate/function as free text (e.g.
+   `"planApprove (fgos-coding-planning)"`, `"canAutoApproveValidate"`) —
+   the same class of drift `tsk-2tk` had just manually swept, now caught
+   mechanically going forward.
+2. **`childSpecs` JSON.parse safety, proven rather than assumed.**
+   `fgos-coding-validating/SKILL.md:264` calls
+   `JSON.parse(process.argv[4])` in its own prose with no try/catch.
+   Reproduced directly: malformed JSON input produces a `SyntaxError`,
+   empty stdout, exit 1 — never routed through
+   `src/cli/command-registry.mjs`, so nothing catches it there. The
+   skill's own rule (`SKILL.md:292-294`, "anything other than a literal
+   `true`, including a throw, counts as `false` — fail closed") already
+   makes this the *correct* behavior — it just had no test asserting it.
+   A new test locks in that a malformed `childSpecs` argv produces empty
+   stdout/non-`true`, never an uncaught crash surfacing a raw stack trace
+   to a person with no guidance. Scope stayed test-only; any production
+   change needed to make the `false` output explicit (rather than relying
+   on an implicit crash) was required to stay small and preserve the
+   exact same fail-closed behavior.
 
 ## D14: a hand-back from planning to exploring must leave a real trail
 
