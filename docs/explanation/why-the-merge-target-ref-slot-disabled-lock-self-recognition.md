@@ -2,7 +2,7 @@
 type: explanation
 title: Why the merge target-ref slot disabled lock self-recognition
 tags: [merge, lock, self-recognition, concurrency, session-identity]
-source_capture_ids: [tsk-1wr]
+source_capture_ids: [tsk-1wr, tsk-70l]
 authoritative_for: why withMergeTargetSlot passes allowSelfRecognition false while main-checkout.lock keeps self-recognition enabled
 ---
 # Why the merge target-ref slot disabled lock self-recognition
@@ -78,6 +78,66 @@ instead of per-session. Rejected because `isPidAlive`/the existing
 stale-reclaim logic already assume a numeric pid-shaped identity — a
 wider blast radius across the whole lock module for a narrower actual
 gain than the one-flag, one-call-site fix above.
+
+## The sibling gap on the root→main path (`tsk-70l`), and why a bare flag flip was rejected
+
+`tsk-1wr`'s own fix only touched `withMergeTargetSlot` (`merge.mjs:778`).
+A sibling call site, `merge.mjs:886`'s `acquireMainCheckoutLock` — the
+branch `mergeRunnerItem` uses when `item.parent` is `null` (a root
+merging directly into `main` via `sync-root`/`approve`, no ephemeral
+worktree, e.g. `tsk-51m`/`tsk-kv3`/`tsk-60h`) — never got
+`allowSelfRecognition: false`. `tsk-1wr`'s own plan addendum had
+deliberately left this path's self-recognition on, reasoning that this
+particular lock is used for one session refreshing across several
+back-to-back operations (a pre-commit hook's child `git commit` process
+recognizing its own parent as a legitimate same-session re-acquire).
+
+But every root item in the very same `tsk-51m` batch — `tsk-51m`,
+`tsk-kv3`, `tsk-60h` — is exactly `parent: null`, routing through this
+exact unguarded path. Two independent root→main `approve`/`sync-root`
+calls (real, separate OS processes, not one session refreshing itself)
+sharing one inherited session id — the same fanout-inheritance shape
+`tsk-1wr`'s own addendum had already called "not just theoretical" —
+would self-recognize as the same writer and fail to exclude each other,
+risking two processes writing to the shared main checkout at once. This
+is suspected as the previously-unexplained root cause behind `tsk-22c`
+(a `git commit --no-edit` failure, exit 9, verify already passed,
+suspected `index.lock` held by another process) — a decision link was
+attached at post-batch audit time, though only `tsk-22c`'s own
+blind-release half (`releaseMainCheckoutLockIfOwn`) had been fixed there;
+this self-recognition half needed its own design, not a one-line patch.
+
+**Why simply mirroring `tsk-1wr`'s flag was rejected.** A bare
+`allowSelfRecognition: false` at line 886 would regress the legitimate
+same-session case `tsk-1wr` had preserved on purpose: that flag skips
+the equality check entirely rather than substituting anything smarter,
+so a genuine same-session crash-retry (the pre-commit hook re-entering
+its own held lock) would wait out the full TTL instead of resuming
+immediately — trading one bug for a different, worse one on the hot
+path every root→main merge takes.
+
+**Locked fix**: replace the plain session-id-string identity on this
+lock with a **pid-liveness-checkable** identity, mirroring the pattern
+`claim-port.mjs`'s own `identity: process.pid` already uses on this same
+lock file. `isPidAlive` can then tell a live fanout sibling (a different,
+live pid — real exclusion) apart from a crashed same-session holder (a
+different, dead pid — immediate reclaim is still safe) — a distinction a
+bare string-identity equality check structurally cannot make. The nested
+pre-commit hook recognizes its own parent specifically through an
+explicit env var set *only* on the one `execFileSync` call that spawns
+`git commit` (`shell: false`, no intermediate shell hop) — never a
+global `process.env` mutation that could leak the recognition signal
+somewhere it shouldn't apply.
+
+**Rejected alternatives**: a `ps`-based ancestor-pid walk (would put
+`ps` availability on the hot path for every root→main merge, specifically
+for the agent/subagent population that already always carries a
+`BEE_SESSION_ID`/`CLAUDE_CODE_SESSION_ID` and today never needs that
+fallback at all — a missing/restricted `ps` would break every merge, a
+worse failure mode than the bug being fixed); and widening
+`tryAcquireOnce`'s own self-recognition equality branch to parse a
+composite identity (touches exclusion-critical logic this fix can avoid
+touching entirely, for no benefit over the explicit env-channel design).
 
 ## Verification shape
 
