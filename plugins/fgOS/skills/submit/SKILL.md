@@ -70,25 +70,41 @@ later by `discovery`'s own judgment, not by this skill.
    list --json
    ```
 
-   Read the returned items' titles/text and look for a CLEAR,
-   textually-grounded match to the new submission — e.g. the new text
-   names the same subsystem, file, feature, or bug that an existing open
-   item's title already names. Do not infer a dependency from a vague
-   thematic similarity, a shared single common word, or a guess about
-   intent. If nothing in the list is a clear match, there is no
-   candidate — skip straight to step 4 with no deps.
+   Read the returned items' titles/text and look for candidate matches against
+   the new submission using two parallel heuristics:
+
+   - **Dependency heuristic**: look for a CLEAR, textually-grounded match —
+     e.g. the new text names the same subsystem, file, feature, or bug that an
+     existing open item's title already names. (Do not infer a match from a
+     vague thematic similarity, a shared single common word, or a guess about intent).
+   - **Consolidation heuristic**: check for consolidation keywords in the
+     new submission's own text (`redesign`, `consolidate`, `gop`, `gom`, `thay-the`)
+     against the candidate item.
+
+   Determine a **direction hint** based on which heuristic matched:
+   - `blocked-by` hint: when the dependency heuristic alone matched (the new item is likely blocked by the candidate).
+   - `superseded-by` hint: when the consolidation heuristic also or only matched (the new item likely consolidates or replaces the candidate).
+   - **No hint**: when neither heuristic gives a confident read.
+
+   If nothing in the list matches either heuristic, there is no candidate —
+   skip straight to step 4 with no candidate.
 
 3. **If a candidate was found, present it and require an explicit
    confirm/edit/reject response before proceeding.** Show the user the
    candidate item's id and title, and the specific text that grounds the
    match (quote the overlapping phrase/subject). Ask whether to:
-   - **confirm** — attach this item's id as a dependency,
-   - **edit** — attach a different id (or set of ids) the user provides,
-   - **reject** — submit with no dependency at all.
+   - **confirm-as-blocked-by** — attach this candidate item's id as a dependency (`deps`) on the new item (the new item cannot finish until the candidate finishes first),
+   - **mark-as-superseded-by** — mark the existing candidate item with `supersededBy` pointing to the new item once created (the new item consolidates or replaces the candidate; does not block the new item),
+   - **edit** — attach or mark different ids provided by the user with their explicitly chosen direction,
+   - **reject** — submit with no relationship attached.
+
+   If a direction hint was produced in step 2 (`blocked-by` or `superseded-by`),
+   pre-select it as the shown default option. If no hint was produced, ask
+   directly with no default.
 
    Do not proceed to step 4 until the user has answered in this turn.
-   Never auto-attach a suggested dependency without this explicit
-   response — this is a hard requirement (D4), not a convenience default.
+   Never auto-attach a suggested dependency or auto-mark a superseded item
+   without this explicit response — this is a hard requirement, not a convenience default.
 
 4. **If — and only if — a live interactive session is running this,
    clarify BEFORE the item exists (tsk-qod D2).**
@@ -125,8 +141,8 @@ later by `discovery`'s own judgment, not by this skill.
      place of the step 1 original for step 5; otherwise use step 1's text
      unchanged.
 
-5. **Call `submit`.**
-   - If the user confirmed (or edited to) one or more dependency ids, run:
+5. **Call `submit` (and apply any `supersededBy` edits).**
+   - If the user confirmed (or edited to) one or more dependency ids as `blocked-by` (confirm-as-blocked-by), run:
 
      Both branches use `../_shared/fgos-cli-fallback.md`, substituting
      `<verb-cmd>` with:
@@ -136,9 +152,8 @@ later by `discovery`'s own judgment, not by this skill.
      ```
 
      where `<confirmed-ids>` is a comma-separated list of the confirmed
-     dependency ids.
-   - If the user rejected the suggestion, or no candidate was found in
-     step 2, run the same fallback with **no `--deps` flag at all**:
+     `blocked-by` dependency ids.
+   - If no candidates were confirmed as `blocked-by` (or if all were confirmed as `mark-as-superseded-by` or rejected), or no candidate was found in step 2, run the same fallback with **no `--deps` flag at all**:
 
      ```
      submit "<text>" --domain <domain> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
@@ -158,11 +173,25 @@ later by `discovery`'s own judgment, not by this skill.
    `EnterWorktree` switch), so passing it as `--dir` here points this
    write at the one real store explicitly.
 
-6. **Report the result.** Relay `submit`'s own output (the new item's id
-   and derived fields) back to the user. If the command fails (e.g. an
-   unknown dependency id), show the real error — do not retry with a
-   modified/guessed id and do not silently drop the failure. `tier`/
-   `kind`/`risk` on this new item are still the mechanical placeholder
+   - If one or more candidates were confirmed (or edited) as `mark-as-superseded-by`,
+     once `submit` returns the new item's real id (`<new-id>`), loop `fgos edit` for
+     each candidate confirmed for this branch using `../_shared/fgos-cli-fallback.md` to
+     set its `supersededBy` pointer:
+
+     ```
+     edit <candidate-id> --superseded-by <new-id> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+     ```
+
+     Note: both `blocked-by` and `mark-as-superseded-by` can occur in the same submit call
+     when multiple candidates were found and confirmed differently.
+
+6. **Report the result.** Merge all results into a single report back to the user.
+   Relay `submit`'s own output (the new item's id and derived fields), stating
+   which candidates were attached as `deps` (`blocked-by`) and which candidates received
+   a `superseded-by <new-id>` edit. If any `submit` or `edit` command fails, show
+   the real error — do not retry with a modified/guessed id and do not silently
+   drop the failure. `tier`/`kind`/`risk` on this new item are still the
+   mechanical placeholder
    (D12, tsk-2yo) — `discovery`'s own skill chủ judges the real values
    later, not this skill; there is no further step here that touches
    them.
