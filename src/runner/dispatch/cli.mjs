@@ -758,7 +758,7 @@ export async function fanoutBatchExecutorCli(
 
   const results = await Promise.allSettled(
     batchToRun.map(async (candidateId) => {
-      const workItem = listWork(fgosDir).work[candidateId];
+      const workItem = slotsView.work[candidateId];
       if (!workItem) {
         return { kind: 'unavailable', entry: { id: candidateId, reason: 'not-found' } };
       }

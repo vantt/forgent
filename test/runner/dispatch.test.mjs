@@ -4889,7 +4889,7 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
     import fs from 'node:fs';
 
     const start = Date.now();
-    const until = Date.now() + 200;
+    const until = Date.now() + 2500;
     while (Date.now() < until) { /* artificial delay */ }
     execFileSync('git', ['commit', '--allow-empty', '-m', 'fake work'], { stdio: 'ignore' });
     const end = Date.now();
