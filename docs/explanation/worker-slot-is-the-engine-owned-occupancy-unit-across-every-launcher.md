@@ -2,7 +2,7 @@
 type: explanation
 title: Worker slot is the engine-owned occupancy unit across every launcher
 tags: [worker-slot, occupancy, herdr-plugin, fgos-runner, fgos-fanout, ceiling]
-source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk]
+source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk, tsk-1oz]
 authoritative_for: worker slot concept and engine-wide worker occupancy ceiling shared by herdr-plugin, fgos-runner, fgos-fanout
 ---
 # Worker slot is the engine-owned occupancy unit across every launcher
@@ -283,6 +283,59 @@ The merge was aborted cleanly (main left unchanged) rather than landed
 through a conflicted state — consistent with the design's own D2/D9
 stance that the engine's event log, not an in-progress merge attempt, is
 the single source of truth for what is actually running or landed.
+
+## Post-merge gaps a review found after the four-way split landed (`tsk-1oz`)
+
+A review pass after `tsk-2sj` merged to `main` found six real, verified
+defects the split had left behind — none caught by the split's own
+tests because each is about the boundary between the design and its
+surrounding setup/doctor/skill-prose surface, not the ceiling logic
+itself:
+
+- **F0 — `fgos setup` armed a ceiling that instantly locked the
+  backlog.** `registrations.mjs` registered `workerSlots` with a live
+  `ceiling: 8`, and `doctor` actively nagged until a stale config ran
+  `fgos setup` to pick it up. Any repo already running more than 8 items
+  at `doing` — this one included, with 12 — got `ceiling-reached`
+  refused on its very next `take`/`pick`/runner claim, from a setup step
+  that never asked a person to choose a real number. The design had
+  deliberately avoided a live in-code default for exactly this reason
+  (a silent gate nobody chose) but left the identical landmine one
+  `fgos setup` run away. **Fix**: the registered shape now writes
+  `ceiling: null` — the config section exists (so doctor stops nagging
+  about a missing key) while the gate itself stays off until a person
+  sets a real number.
+- **F1 — D10 shipped only half-built.** The `fgos report` verb existed,
+  but zero skills actually called it, even though `plan.md`'s own A8
+  assigned that prose half to the skill owning `fgos-coding-driving`.
+  This call is the safety precondition for the pane-reuse behavior
+  (`tsk-2sj`'s own T2) already shipped — without it, a driver's closing
+  report only ever lived in a pane that pane-reuse could overwrite
+  before anyone read it. **Fix**: wired the call into
+  `fgos-coding-driving`'s own `SKILL.md`, in both the `.claude` and
+  `.agents` copies, which this repo requires to stay byte-identical.
+- **F2 — `workerSlots.adminReservation` was written and displayed, but
+  never read.** `fgos setup` wrote it, `doctor` surfaced it, and
+  `countWorkerSlots` ignored it entirely, returning a hardcoded constant
+  instead.
+- **F3 — a malformed `ceiling` silently disabled the gate while looking
+  configured.** A string `"8"`, a float `8.5`, `0`, or `-1` all passed
+  through with no doctor check flagging them, unlike the existing
+  `checkInvariantChecksConfigured` precedent already covering this exact
+  failure class for a different config section.
+- **F4 — stale skill prose.** `discover`'s `SKILL.md` still claimed herdr
+  always passes `--autoClose`, which `pick.rs` had already stopped doing.
+- **F5 — a verb description contradicted its own output shape.** The
+  `fgos slots` verb's description claimed its result was not a growing
+  row set, while `execution.items` in fact grows one row per running
+  item (see `docs/reference/fgos-slots-verb-output-fields.md`, the doc
+  this description itself should have matched).
+
+None of the six required reopening any of the ceiling/ask-before-
+standing-up design above — every fix sits at the seam between that
+design and setup/doctor/skill-prose, the class of gap a design's own
+unit tests structurally cannot see because it is about what surrounds
+the design, not what it computes.
 
 ## Related
 
