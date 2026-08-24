@@ -92,6 +92,8 @@ handed off, derive) the lane and record it into `plan.md` as `Mode:
 skip-and-advance short-circuit parses. Full mechanics:
 `references/bootstrap-and-lane.md`.
 
+**Skip-load check.** Once the lane is known, decide now, before Step 2: if it reads `tiny` or `small`, skip opening references/approach-and-shape.md and references/split-and-child-specs.md entirely — instead, write plan.md's Approach as one paragraph naming the chosen file(s), the one risk worth naming (or `none`), and the one command that proves it done, write Step 3's `## Outstanding questions` section as normal, then go straight to Step 4 (`references/verify-sync-and-gap.md` still applies for verify-sync at every lane — never skipped). For every other lane, continue to Step 2 below exactly as written, including opening its own reference file.
+
 ### Step 2: Approach
 Write the chosen path, alternatives rejected, a risk map, the files
 likely touched, and their order — informed by `fgos graph --json`'s
@@ -111,15 +113,19 @@ Some items are one honest piece; others need to become several
 independently workable ones. If a split is right, write each piece's spec
 into `plan.md` as a validated JSON array and **create nothing** — no work
 item exists until `fgos-coding-validating` materializes them at the
-single gate. Full field-by-field spec shape and the "why nothing is
-created here" rationale: `references/split-and-child-specs.md`.
+single gate. For a split root item, sync a still-placeholder `verify`
+field onto the root item once the split is decided. Full field-by-field
+spec shape and the "why nothing is created here" rationale:
+`references/split-and-child-specs.md` (and full root-verify mechanics:
+`references/verify-sync-and-gap.md`).
 
 ### Step 5: Leave execution alone
 This skill only names, for each piece it describes, the one command that
 proves it done — it never designs or re-plans Execute's own mechanical
 path. For a pass-through (non-split) item, sync a still-placeholder
-`verify` field onto the item once the real command is named. Full
-mechanics: `references/verify-sync-and-gap.md`.
+`verify` field onto the item once the real command is named, and sync its
+`action` and `footprint` fields (pointing to `plan.md` and touched files)
+if unpopulated. Full mechanics: `references/verify-sync-and-gap.md`.
 
 ### Step 6: Mid-planning CONTEXT.md gap
 If CONTEXT.md turns out silent on something this plan actually needs,
@@ -218,8 +224,9 @@ Violating the letter of the rules is violating the spirit of the rules.
   hatch
 - `references/split-and-child-specs.md` — the child-spec JSON shape,
   field-by-field requirements, and why nothing is created at this stage
-- `references/verify-sync-and-gap.md` — the pass-through verify-sync
-  mechanics and the mid-planning CONTEXT.md gap hand-back
+- `references/verify-sync-and-gap.md` — the pass-through action/footprint/verify
+  sync mechanics, split-root verify-sync mechanics, and the mid-planning CONTEXT.md
+  gap hand-back
 
 ## Workflow Position
 

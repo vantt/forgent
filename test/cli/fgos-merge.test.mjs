@@ -1157,6 +1157,49 @@ test('sync-root never reports outcome "synced" when mergeRunnerItem returns an o
   assert.equal(mergedDecisions.length, 0, 'must never record a "merged" decision for a merge that never actually completed');
 });
 
+test('sync-root outcome guard catches lock-lost-mid-merge and records unhandled-outcome friction (tsk-3df)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  const lockOverwriter = `node -e "require('fs').writeFileSync('${lockPath}', JSON.stringify({pid: 999999, ts: Date.now()})); const end = Date.now() + 50; while (Date.now() < end) {}"`;
+
+  makeDriftedRoot(cwd, 'sync-root-lock-lost', { verify: lockOverwriter });
+
+  const headBefore = gitHead(cwd);
+  process.env.FGOS_HEARTBEAT_INTERVAL_MS = '10';
+  let result;
+  try {
+    result = run(cwd, ['sync-root', 'sync-root-lock-lost']);
+  } finally {
+    delete process.env.FGOS_HEARTBEAT_INTERVAL_MS;
+  }
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.notEqual(data.outcome, 'synced', 'must never report success for lock-lost-mid-merge');
+  assert.equal(data.outcome, 'blocked');
+  assert.equal(data.reason, 'lock-lost-mid-merge');
+
+  const frictions = stateView(cwd).frictions?.['sync-root-lock-lost'] ?? [];
+  assert.ok(
+    frictions.some((f) => f.errorClass === 'sync-root-unhandled-outcome'),
+    'frictions must contain an entry with errorClass === "sync-root-unhandled-outcome"',
+  );
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be unchanged');
+  assert.doesNotThrow(
+    () => gitAtCwd(cwd, ['rev-parse', '--verify', 'MERGE_HEAD']),
+    'MERGE_HEAD must survive untouched because abortMergeIfPossible was not called',
+  );
+  assert.equal(fs.existsSync(path.join(cwd, 'sync-root-lock-lost-produced.txt')), true, 'staged merge file must survive untouched on disk');
+  assert.equal(stateView(cwd).work['sync-root-lock-lost'].status, 'doing', 'a blocked sync-root must never touch the root item\'s status');
+
+  const lines = eventLines(cwd);
+  const mergedDecisions = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-lock-lost' && /merged/.test(e.payload?.text ?? ''));
+  assert.equal(mergedDecisions.length, 0, 'must never record a "merged" decision for a merge that never actually completed');
+});
+
 test('sync-root --trust-dir with --dir succeeds from inside a linked worktree (tsk-4uj)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);

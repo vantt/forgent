@@ -67,7 +67,7 @@ import {
   resolveWriterLogPath,
 } from '../state/store.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
-import { DEFAULT_DOMAIN, getDomain, resolveWorkflow, stageForStep } from '../state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, resolveWorkflow, stageForStep, classificationVocabulary } from '../state/workflow-stage-graphs.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
   visitCount,
@@ -341,7 +341,8 @@ function tailLines(text, n = 10) {
  * dispatch-anchor definition here would NOT catch the scenario that caused
  * the real 14-item false-positive block this guards against. Do not
  * consolidate this with `hasOpenDescendant` — the two intentionally answer
- * different questions.
+ * different questions. See `frontier.mjs`'s `hasOpenDescendant` for the
+ * narrower, resolved-status check this deliberately diverges from.
  */
 function hasStillNeededDescendant(id, work) {
   for (const [childId, child] of Object.entries(work)) {
@@ -720,6 +721,11 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
         }
         const id = generateId(block.title, Object.keys(view));
         const derived = classify(block.title);
+        const domainObj = getDomain(item.domain);
+        const validKinds = classificationVocabulary(domainObj, 'kind');
+        const validRisks = classificationVocabulary(domainObj, 'risk');
+        const kindValid = validKinds ? validKinds.includes(block.kind) : typeof block.kind === 'string' && block.kind.length > 0;
+        const riskValid = validRisks ? validRisks.includes(block.risk) : typeof block.risk === 'string' && block.risk.length > 0;
         addWork(dir, {
           id,
           title: block.title,
@@ -730,10 +736,10 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           // the third write path this item's own scout found mid-planning.
           description:
             typeof block.description === 'string' && block.description.trim() ? block.description : block.title,
-          kind: block.kind ?? derived.kind,
+          kind: kindValid ? block.kind : derived.kind,
           status: 'todo',
           deps: [],
-          risk: block.risk ?? derived.risk,
+          risk: riskValid ? block.risk : derived.risk,
           refs: [],
           verify: FALLBACK_VERIFY,
           tier: derived.tier,
@@ -749,7 +755,7 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           // (`scripts/migrate-clarify-split.mjs`'s own "untouched" target).
           // A domain that still has a real Clarify-mapped stage (e.g.
           // `triage`) is unaffected -- the `??` never fires for it.
-          stage: stageForStep(getDomain(item.domain), 'Clarify') ?? getDomain(item.domain).stages?.[0],
+          stage: stageForStep(domainObj, 'Clarify') ?? domainObj.stages?.[0],
           domain: item.domain,
           discoveredFrom: item.id,
         });

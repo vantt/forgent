@@ -43,6 +43,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, withMergeEphemeralWorktree } from './worktree.mjs';
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
@@ -52,6 +53,8 @@ import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
 import { runOpportunisticMainCheckoutChecks } from '../state/events-jsonl-truncation-guard.mjs';
+
+const heartbeatStorage = new AsyncLocalStorage();
 
 /** Raised only for a genuinely unexpected git failure (e.g. `git merge
  * --abort` itself failing) — never for a conflict or a red verify, which are
@@ -722,7 +725,9 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
 // fixed constant) so the two stay proportional if the TTL is ever retuned
 // again; a third of the TTL leaves a comfortable margin (renews at ~60s
 // against a 180s window) even if one renew tick is delayed.
-const HEARTBEAT_INTERVAL_MS = Math.floor(DEFAULT_TTL_MS / 3);
+function heartbeatIntervalMs() {
+  return Number(process.env.FGOS_HEARTBEAT_INTERVAL_MS) || Math.floor(DEFAULT_TTL_MS / 3);
+}
 
 /**
  * Holds a per-TARGET-REF slot (tsk-xyr, §E of the Merge Conductor design)
@@ -787,13 +792,17 @@ export async function withMergeTargetSlot(lockRoot, targetRef, fn) {
 
   runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { commitEnv: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
 
+  const heartbeatStatus = { status: 'renewed' };
   const heartbeat = setInterval(() => {
-    renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
-  }, HEARTBEAT_INTERVAL_MS);
+    const res = renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
+    if (res.status !== 'renewed') {
+      heartbeatStatus.status = res.status;
+    }
+  }, heartbeatIntervalMs());
   heartbeat.unref();
 
   try {
-    return await fn();
+    return await heartbeatStorage.run(heartbeatStatus, () => fn());
   } finally {
     clearInterval(heartbeat);
     lock.release();
@@ -921,14 +930,18 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
   // tick. Cleared in the same `finally` that already releases the lock —
   // covers every exit path (success, verify-fail, a thrown exception)
   // exactly like `lock.release()` already does.
+  const heartbeatStatus = { status: 'renewed' };
   const heartbeat = setInterval(() => {
-    renewMainCheckoutLockIfOwn(fgosDir, identity);
-  }, HEARTBEAT_INTERVAL_MS);
+    const res = renewMainCheckoutLockIfOwn(fgosDir, identity);
+    if (res.status !== 'renewed') {
+      heartbeatStatus.status = res.status;
+    }
+  }, heartbeatIntervalMs());
   heartbeat.unref();
 
   let result;
   try {
-    result = await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs });
+    result = await heartbeatStorage.run(heartbeatStatus, () => mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }));
   } finally {
     clearInterval(heartbeat);
     lock.release();
@@ -1327,6 +1340,16 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
       }
       return { outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant), ...(selfResolved && { selfResolved }) };
     }
+  }
+
+  // tsk-2qp: if the lock heartbeat lapsed mid-merge (e.g. renewal returned
+  // not-owner, ambiguous, or no-lock because another session reclaimed), do
+  // NOT execute `git commit`. Return `lock-lost-mid-merge` without calling
+  // `abortMergeIfPossible` — the tree state legitimately belongs to the new
+  // lock holder, so tearing it up would cause data loss.
+  const heartbeatStatus = heartbeatStorage.getStore();
+  if (heartbeatStatus && heartbeatStatus.status !== 'renewed') {
+    return { outcome: 'lock-lost-mid-merge', branch };
   }
 
   try {

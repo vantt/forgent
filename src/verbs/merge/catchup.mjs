@@ -41,7 +41,10 @@ import { performCatchUp } from '../../runner/merge.mjs';
 // still-in-progress merge, not this item's own conflict, so a retry
 // once that other merge finishes or gets aborted is the natural
 // recovery, not a manual rework.
-const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'verify-timeout-post-merge', 'integration-drift', 'merge-failed-unclassified', 'merge-blocked-other-item']);
+// tsk-2qp: 'lock-lost-mid-merge' joins this set — the lock was lost mid-merge
+// due to a lapsed heartbeat or a reclaimed lock, so a retry via catchup
+// once the target/lock is free is the natural recovery.
+const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'verify-timeout-post-merge', 'integration-drift', 'merge-failed-unclassified', 'merge-blocked-other-item', 'lock-lost-mid-merge']);
 
 /**
  * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` is always

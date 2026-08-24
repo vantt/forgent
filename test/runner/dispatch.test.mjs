@@ -354,6 +354,28 @@ test('buildPrompt degrades readFirst to "(không có)" when the work item has no
   assert.match(prompt, /# Files to read first\n\(không có\)/);
 });
 
+test('buildPrompt renders docsRefPointer under "Files to read first" when docsRef is set on work item', () => {
+  const prompt = buildPrompt(sampleWork({ docsRef: 'docs/history/my-feature' }));
+  assert.match(prompt, /# Files to read first\n\(không có\)\ndocs\/history\/my-feature\/plan\.md and \.\.\.\/CONTEXT\.md \(if present\) — the locked decisions and chosen approach for this item/);
+});
+
+test('buildPrompt normalizes trailing slash in docsRef when rendering docsRefPointer', () => {
+  const prompt1 = buildPrompt(sampleWork({ docsRef: 'docs/history/my-feature/' }));
+  const prompt2 = buildPrompt(sampleWork({ docsRef: 'docs/history/my-feature' }));
+  assert.equal(prompt1, prompt2);
+  assert.ok(prompt1.includes('docs/history/my-feature/plan.md'));
+});
+
+test('buildPrompt renders "(none)" for docsRefPointer when work.docsRef is absent or empty', () => {
+  const prompt = buildPrompt(sampleWork());
+  assert.match(prompt, /# Files to read first\n\(không có\)\n\(none\)/);
+});
+
+test('buildPrompt for non-executing stage (e.g. discovery) does not leak literal {docsRefPointer} template variable', () => {
+  const prompt = buildPrompt(sampleWork({ docsRef: 'docs/history/my-feature' }), undefined, 'discovery');
+  assert.doesNotMatch(prompt, /\{docsRefPointer\}/);
+});
+
 test('buildPrompt with no feedback stays byte-identical to the pre-feedback shape (no Human feedback section)', () => {
   assert.equal(buildPrompt(sampleWork()), buildPrompt(sampleWork(), undefined));
   assert.doesNotMatch(buildPrompt(sampleWork(), {}), /# Human feedback/);
@@ -2776,10 +2798,10 @@ test('spawnWorker: idleTimeoutMs resets on every chunk -- a worker producing per
   const scriptPath = writePeriodicWriterExecutor(dir, { intervalMs: 150, count: 5 });
   const cfg = baseConfig([scriptPath]);
 
-  // idleTimeoutMs (400ms) is smaller than the total runtime (~750ms) but
+  // idleTimeoutMs (700ms) is smaller than the total runtime (~750ms) but
   // larger than the gap between any two ticks (150ms) -- only passes if the
   // idle timer truly resets per chunk instead of firing on total elapsed time.
-  const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs: 400 });
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs: 700 });
   assert.equal(result.status, 0);
   assert.match(result.stdout, /tick-4/);
 });

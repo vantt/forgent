@@ -530,6 +530,37 @@ test('mergeRunnerItem reports "merge-blocked-other-item" (not "conflict") and ne
   assert.equal(fs.existsSync(path.join(repoRoot, 'newfile.txt')), false, 'demo-item\'s own merge must never have been attempted');
 });
 
+test('mergeRunnerItem reports "lock-lost-mid-merge" when heartbeat renewal fails before commit and never calls abortMergeIfPossible', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'newfile.txt', 'clean-content\n');
+
+  // Override heartbeat interval so ticks run rapidly during the test goalCheck
+  process.env.FGOS_HEARTBEAT_INTERVAL_MS = '10';
+
+  try {
+    const headBefore = headOf(repoRoot);
+
+    // Goal check script that simulates another session reclaiming the lock mid-hold,
+    // then pauses briefly to guarantee a heartbeat tick executes and sees the change.
+    const lockPath = path.join(repoRoot, '.fgos', 'main-checkout.lock');
+    const lockOverwriter = `node -e "require('fs').writeFileSync('${lockPath}', JSON.stringify({pid: 999999, ts: Date.now()})); const end = Date.now() + 50; while (Date.now() < end) {}"`;
+
+    const result = await mergeRunnerItem(repoRoot, makeItem({ verify: lockOverwriter }));
+
+    assert.equal(result.outcome, 'lock-lost-mid-merge');
+    assert.equal(result.branch, 'fgw/demo-item');
+    assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged (no commit landed)');
+
+    // Verify abortMergeIfPossible was NOT called: staged merge changes still remain on disk
+    assert.doesNotThrow(
+      () => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']),
+      'MERGE_HEAD must survive untouched because abortMergeIfPossible was not called',
+    );
+  } finally {
+    delete process.env.FGOS_HEARTBEAT_INTERVAL_MS;
+  }
+});
+
 // --- mergeRunnerItem: decision-ID collision auto-resolve (tsk-3mv-1 D1a) ---
 // Mirrors the real occurrence (tsk-66l,
 // docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md):
@@ -1412,6 +1443,53 @@ test('mergeRunnerItem merges normally when the branch touches ordinary files alo
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')));
 });
+
+// tsk-2xg: two-sided-drift-after-forced-restore shape deadlock regression test.
+// When a worker branch merges main then restores .fgos/* back to its own pre-merge
+// value to pass pre-commit hook checks, and main grows the log further before approve,
+// the merge=union attribute prevents fgos-write-rejected and preserves all lines.
+test('mergeRunnerItem resolves two-sided-drift-after-forced-restore cleanly via merge=union for diagnostic logs (tsk-2xg regression)', async () => {
+  const repoRoot = initRepo();
+  const repoGitattributes = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.gitattributes'));
+  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), repoGitattributes);
+
+  const logRelPath = path.join('.fgos', 'approve-post-success-faults.jsonl');
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  const baseContent = '{"ts":"2026-08-24T00:00:00.000Z","id":"base1"}\n{"ts":"2026-08-24T00:00:01.000Z","id":"base2"}\n';
+  fs.writeFileSync(path.join(repoRoot, logRelPath), baseContent);
+  git(repoRoot, ['add', '.gitattributes', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .gitattributes and fault log']);
+
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'worker code\n');
+
+  const mainGrowth1 = '{"ts":"2026-08-24T00:01:00.000Z","id":"main1"}\n';
+  fs.appendFileSync(path.join(repoRoot, logRelPath), mainGrowth1);
+  git(repoRoot, ['add', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main grows fault log 1']);
+
+  git(repoRoot, ['checkout', 'fgw/demo-item']);
+  git(repoRoot, ['merge', '-q', '--no-ff', 'main']);
+  fs.writeFileSync(path.join(repoRoot, logRelPath), baseContent);
+  git(repoRoot, ['add', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'worker restores .fgos per pre-commit hook rule']);
+  git(repoRoot, ['checkout', 'main']);
+
+  const mainGrowth2 = '{"ts":"2026-08-24T00:02:00.000Z","id":"main2"}\n';
+  fs.appendFileSync(path.join(repoRoot, logRelPath), mainGrowth2);
+  git(repoRoot, ['add', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main grows fault log 2']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'merged');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+
+  const finalContent = fs.readFileSync(path.join(repoRoot, logRelPath), 'utf8');
+  assert.ok(finalContent.includes('"id":"base1"'), 'base1 line must be preserved');
+  assert.ok(finalContent.includes('"id":"base2"'), 'base2 line must be preserved');
+  assert.ok(finalContent.includes('"id":"main1"'), 'main1 line must be preserved');
+  assert.ok(finalContent.includes('"id":"main2"'), 'main2 line must be preserved');
+});
+
 
 // --- withMergeEphemeralWorktree's CAS guard (tsk-46a) ---------------------
 // Reproduces the race deterministically, without real concurrency: git only

@@ -583,6 +583,22 @@ export async function approveUseCase(
           return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: rootBranch };
         }
 
+        if (result.outcome === 'lock-lost-mid-merge') {
+          // tsk-2qp: main checkout lock was lost mid-merge (heartbeat renewal failed).
+          // Merge commit was not performed and git merge --abort was never called,
+          // preserving the new lock holder's tree state intact.
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'lock-lost-mid-merge', role: 'system' });
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'lock-lost-mid-merge',
+            layer: 'state',
+            attempts: 1,
+            detail: `main checkout lock was lost mid-merge; ${rootBranch}'s own merge of ${result.branch} was stopped before commit`,
+          });
+          return { id, mode: 'merge', to: 'blocked', reason: 'lock-lost-mid-merge', target: rootBranch };
+        }
+
         if (result.outcome === 'fgos-write-rejected') {
           moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
           addFriction(dir, {
@@ -747,6 +763,24 @@ export async function approveUseCase(
         detail,
       });
       return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: 'main' };
+    }
+
+    if (result.outcome === 'lock-lost-mid-merge') {
+      // tsk-2qp: main checkout lock was lost mid-merge (heartbeat renewal failed).
+      // Merge commit was not performed and git merge --abort was never called.
+      const detail = hadChildren
+        ? `cross-root integration attempt at main@${currentHead(repoRoot)}; main checkout lock was lost mid-merge; merge of ${result.branch} was stopped before commit`
+        : `main checkout lock was lost mid-merge; merge of ${result.branch} was stopped before commit`;
+      moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'lock-lost-mid-merge', role: 'system' });
+      addFriction(dir, {
+        id,
+        disposition: 'blocked',
+        errorClass: 'lock-lost-mid-merge',
+        layer: 'state',
+        attempts: 1,
+        detail,
+      });
+      return { id, mode: 'merge', to: 'blocked', reason: 'lock-lost-mid-merge', target: 'main' };
     }
 
     if (result.outcome === 'fgos-write-rejected') {
