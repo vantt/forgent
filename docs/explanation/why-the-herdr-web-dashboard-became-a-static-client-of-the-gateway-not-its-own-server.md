@@ -2,7 +2,7 @@
 type: explanation
 title: Why the herdr web dashboard became a static client of the gateway, not its own server
 tags: [herdr, web-dashboard, gateway, realignment, auth]
-source_capture_ids: [tsk-54j]
+source_capture_ids: [tsk-54j, tsk-3x6]
 authoritative_for: why the herdr web dashboard's architecture moved from a standalone embedded webserver to a static bundle served by the existing gateway, and the security/lifecycle decisions that survived the realignment
 ---
 # Why the herdr web dashboard became a static client of the gateway, not its own server
@@ -60,6 +60,37 @@ cleanly from that one change:
   fragility concern false — `herdr-gateway`'s own `build.rs` already
   guarantees `static/` exists before `RustEmbed` scans it) held
   regardless of where the bundle ends up living.
+
+## Why the UI spec gates the mechanical build steps, not the reverse (`tsk-3x6`)
+
+`tsk-3x6` (P0b) tracks the concrete UI spec/userflow
+(`docs/reference/herdr-web-dashboard-layout.md`) as its own gated,
+cited artifact — even though the product owner drives its actual
+authoring with their own design tooling, the same shape a prior TUI
+redesign already established (`docs/reference/herdr-dashboard-layout-and-action-queues.md`,
+`tsk-1d5`, itself tracked via `tsk-jo1` with a doc-existence verify).
+
+**Why this had to gate the later build steps (P3/P4) rather than trail
+them**: the acceptance criterion the product owner actually stated for
+the whole cluster is *subjective readability* — questions framed so a
+person with zero context can answer quickly. A later step's own verify
+can only prove mechanical correctness (askHistory pairs with settlement
+answers by `seq`, a `docsRef` path-traversal attempt is rejected,
+gate-approve entries appear alongside `ask` entries) — none of which
+touches readability at all. A build could pass every one of those checks
+and still completely miss the actual point. The UI spec is the only
+artifact where that subjective criterion can be pinned into something
+checkable *before* any pixels exist, which is exactly why it has to come
+first and gate what follows, not just document it after the fact.
+
+The spec had to cover the full userflow (login, taskboard, opening a
+task, answering a parked question, approving a gate), the task-detail
+layout specifically (the three-region arrangement of question / why it's
+being asked / item context, and how a multi-round question/answer
+timeline renders), empty/error states, and color/typography — authored
+through the `ui-spec` skill's own tooling (added mid-item, once that
+skill existed) rather than hand-authored, pulling product/actor/flow
+facts from `tsk-54j`'s own area spec rather than re-deriving them.
 
 ## What didn't change: why the webserver outlives the cockpit pane (D12)
 
