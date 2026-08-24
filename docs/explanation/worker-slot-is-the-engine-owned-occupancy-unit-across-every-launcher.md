@@ -2,7 +2,7 @@
 type: explanation
 title: Worker slot is the engine-owned occupancy unit across every launcher
 tags: [worker-slot, occupancy, herdr-plugin, fgos-runner, fgos-fanout, ceiling]
-source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk, tsk-1oz, tsk-qrs]
+source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk, tsk-1oz, tsk-qrs, tsk-nwz]
 authoritative_for: worker slot concept and engine-wide worker occupancy ceiling shared by herdr-plugin, fgos-runner, fgos-fanout
 ---
 # Worker slot is the engine-owned occupancy unit across every launcher
@@ -388,6 +388,37 @@ correct and well-tested, but each of the three launchers' own *use* of
 it — batching, sweep-vs-execution occupancy, refusal reporting, reap, and
 loop control — had its own independent gap a unit test scoped to the
 shared engine code could never see.
+
+## An unarmed ceiling (F0's own fix) silently zeroed fgos-fanout's batch (`tsk-nwz`)
+
+`tsk-1oz`'s own F0 fix made `fgos setup` write `workerSlots.ceiling: null`
+on purpose — present but unarmed, so `doctor` stops nagging while the
+gate stays off until a person sets a real number. That is exactly the
+state a fresh `fgos setup` ships. In that state, `fgos slots --json`
+reports `execution.hasRoom: true`, `execution.free: null`, reason
+`no-ceiling-configured` — correct at the engine level.
+
+`fgos-fanout`'s own skill prose, however, computed its batch as
+`min(5, execution.free)` and forbade firing more Agents than
+`execution.free` — with `free` literally `null`, there is no number the
+skill's own prose permits it to fire, so a launcher following it
+dispatched **nothing**, on a fresh install, with the engine wide open the
+entire time. No branch in the skill prose covered the unarmed case at
+all.
+
+The engine's own API never had this hole: `hasWorkerSlotRoom` already
+returns `granted` equal to the full batch size when no ceiling is
+configured — the correct "wide open" answer. The bug was narrower than
+it looked: `fgos slots` never exposed `granted` at all, so the skill's
+prose had nothing to point at except `free`, the one field that goes
+`null` in exactly this state.
+
+**Fix**: prose-only, in both `.claude/skills/fgos-fanout/SKILL.md` and
+its `.agents` mirror (kept byte-identical by `test/skills/fgos-mirror.test.mjs`)
+— teach the skill that `execution.free: null` means no ceiling is armed,
+and the batch in that case is `min(5, batch.length)`, matching
+`hasWorkerSlotRoom`'s own `granted` contract instead of a field that was
+never meant to answer this question in the unarmed state.
 
 ## Related
 
