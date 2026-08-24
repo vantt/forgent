@@ -1173,6 +1173,17 @@ function isMergeUnionPath(repoRoot, relPath) {
   return output.trim().endsWith(': union');
 }
 
+function isUnchangedSinceBranchHeadAtTake(repoRoot, branch, relPath, branchHeadAtTake) {
+  if (!branchHeadAtTake) return false;
+  try {
+    const atTake = git(repoRoot, ['rev-parse', `${branchHeadAtTake}:${relPath}`]).trim();
+    const atBranchHead = git(repoRoot, ['rev-parse', `${branch}:${relPath}`]).trim();
+    return atTake === atBranchHead;
+  } catch {
+    return false;
+  }
+}
+
 // tsk-tr9: extends tsk-4gi's own restore-then-recheck protection (just
 // above, only ever reached when `git merge` stages the conflicting
 // `.fgos/` path CLEANLY via its `merge=union` driver) to the case `git
@@ -1395,7 +1406,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
   let fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
   if (fgosPaths.length > 0) {
     for (const fgosPath of fgosPaths) {
-      if (!isMergeUnionPath(repoRoot, fgosPath)) {
+      if (!isMergeUnionPath(repoRoot, fgosPath) && !isUnchangedSinceBranchHeadAtTake(repoRoot, branch, fgosPath, item.branchHeadAtTake)) {
         continue;
       }
       try {
