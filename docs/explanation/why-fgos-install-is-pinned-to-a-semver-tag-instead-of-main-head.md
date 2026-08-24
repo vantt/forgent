@@ -2,7 +2,7 @@
 type: explanation
 title: Why fgOS install is pinned to a semver tag instead of main HEAD
 tags: [distribution, semver, release, install]
-source_capture_ids: [tsk-jtb]
+source_capture_ids: [tsk-jtb, tsk-2t8]
 authoritative_for: why fgOS install moved from always pulling main HEAD to a tag-pinned semver release, and how tags get cut
 ---
 # Why fgOS install is pinned to a semver tag instead of `main` HEAD
@@ -39,3 +39,23 @@ projects installing fgOS were seeing unstable behavior.
   expected to only tag a commit they've already seen pass CI —  a second
   automated check would duplicate that proof rather than add real new
   coverage.
+
+## The gap this created, and why the fix stayed a doctor check (`tsk-2t8`)
+
+`README.md`'s recommended install command
+(`npm install -g github:vantt/forgent#v0.1.0`) pointed at a git tag that
+did not exist — `git tag -l` had no semver tags at all at the time this
+was found, only pre-migration markers. Every new external user following
+the documented install path got a bare npm resolution failure on their
+very first command. `tsk-jtb` had added this recommendation plus a
+`docs/how-to/cut-a-fgos-release-tag.md` runbook, but left tag-cutting
+manual (D1) — and no item ever actually tracked *doing* the first cut, so
+the recommendation shipped ahead of the thing it pointed at.
+
+**Cutting the tag was explicitly rejected as part of this item's own
+scope** — consistent with `tsk-jtb`'s own D1, "cutting a tag is always a
+deliberate, manual act." What this item *did* fix: a `doctor` check that
+verifies the README's pinned tag actually exists, so this exact gap — a
+recommended install command silently pointing at nothing — surfaces
+mechanically instead of being discovered by an external user's first
+failed install.
