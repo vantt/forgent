@@ -1,3 +1,10 @@
+---
+type: explanation
+title: Why fgos-coding-compounding refuses to commit when MERGE_HEAD is set
+tags: [fgos-coding-compounding, merge-head, retrospective-synthesis, audit]
+source_capture_ids: [tsk-2oy, tsk-67t]
+authoritative_for: why fgos-coding-compounding's retrospective-synthesis commit step refuses when MERGE_HEAD is already set, the 5 real historical instances that motivated it, and each instance's own per-item audit outcome
+---
 # Why `fgos-coding-compounding` refuses to commit when `MERGE_HEAD` is set
 
 `fgos-coding-compounding`'s retrospective-synthesis step writes an end-user
@@ -85,3 +92,24 @@ since it buried a real code fix, same severity as the triggering case).
 A related harness gap found mid-investigation — `checkMergeStillResolves`
 never validates a decomposed root's own branch against `main`, only
 children onto their parent — was filed separately as `tsk-5j0`.
+
+## Per-instance audit outcome: `tsk-648` (`tsk-67t`) — content verified intact
+
+`tsk-67t` audited the `tsk-648` instance specifically: commit `7bf76aaa`
+("docs(tsk-648): retrospective synthesis") was a 2-parent merge commit —
+one parent was `tsk-3wn`'s own expected prior synthesis, the other was
+an entirely unrelated commit, `tsk-5nj`'s own `plan.md` (a plan-split
+into `tsk-4mx`/`tsk-49e`), absorbed via the same stray-`MERGE_HEAD`
+mechanism this doc's own fix closes.
+
+**Conclusion: no content was actually lost.** Verified at the byte level —
+empty `git diff` across all three affected files, plus a live status
+check confirming both split children (`tsk-4mx`, `tsk-49e`) existed
+correctly. The commit's *label* was misleading (an unrelated item's plan
+buried under `tsk-648`'s own commit message), but the actual content
+survived intact in both places. This item closed as a verified
+non-issue, not a repair — this repo's status vocabulary has no distinct
+`wontfix`-shaped status for "investigated, found nothing wrong,"
+so a verified non-issue closes via `done` with the decision note as the
+record, the same way the other 3 sibling audits (`tsk-4dy`, `tsk-3u8`,
+`tsk-5z9`) are expected to close unless one of them finds a real loss.
