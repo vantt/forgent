@@ -2,7 +2,7 @@
 type: explanation
 title: Why dispatch.mjs was redesigned around task, not agent capacity
 tags: [dispatch, executor, capacity, task-dispatch-unification]
-source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5, tsk-5tm-6]
+source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5, tsk-5tm-6, tsk-2y4]
 authoritative_for: why src/runner/dispatch.mjs's capacity/executor layer was redesigned around "task" as the unifying concept, and the 12 locked decisions behind that redesign
 ---
 # Why `dispatch.mjs` was redesigned around "task," not agent capacity
@@ -59,7 +59,14 @@ from both `capacities.<id>` config shape and the dispatch gate itself.
   literally recorded "not decided" for why it needed to stay, and the
   parallelization reason it once served is now met natively. Landed
   (`tsk-5tm-2`): the capacity entry, its tool-registry entry, and every
-  dead reference to it were removed together.
+  dead reference to it were removed together. A stale test
+  (`test/runner/dispatch.test.mjs`) that still asserted `capacities.gather`
+  must exist was missed in that same pass — confirmed pre-existing and
+  unrelated to any other work via a `git stash` reproduction against the
+  base commit. **Fix** (`tsk-2y4`): the test was updated to assert
+  `gather`'s removal instead of restored — this repo's own in-flight
+  redesign (this same `tsk-5tm` family) was never expected to bring back
+  an equivalent capacity, so waiting for one was never the right call.
 - **D7 — defer writing the dispatch contract into `AGENTS.md`** until D5
   (`execute`) and its `--work` CLI flag actually ship. `AGENTS.md` is
   always-loaded context; documenting a command before it exists would
