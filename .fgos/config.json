@@ -149,6 +149,33 @@
           "heavy": "lightweight"
         }
       },
+      "glm": {
+        "kind": "agent",
+        "description": "Claude Code CLI routed to OpenRouter's GLM 5.2 model (z-ai/glm-5.2), not real Anthropic -- ANTHROPIC_BASE_URL/AUTH_TOKEN/MODEL overridden via this invocation's own env block (dispatch/transport.mjs's ${VAR} substitution against process.env, never a shell). Real key lives in .fgos/secrets.local.env (untracked, gitignored) as GLM_OPENROUTER_API_KEY -- never committed here. See docs/history/glm-openrouter-executor/plan.md (tsk-gb3).",
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "claude",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}",
+              "--permission-mode",
+              "acceptEdits",
+              "--allowedTools",
+              "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+            ],
+            "env": {
+              "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
+              "ANTHROPIC_AUTH_TOKEN": "${GLM_OPENROUTER_API_KEY}",
+              "ANTHROPIC_MODEL": "z-ai/glm-5.2",
+              "ANTHROPIC_API_KEY": ""
+            }
+          }
+        ]
+      },
       "gitnexus": {
         "kind": "tool",
         "description": "Code-graph blast radius",
