@@ -9,16 +9,16 @@ The full detail behind SKILL.md's Step 5.
 > Wait for the harness's own background-completion notification before proceeding to gather results (end the turn with no further tool call once background execution is started; the harness delivers a task-notification automatically and resumes the session with the output in context). Do NOT use `ScheduleWakeup` or polling — `ScheduleWakeup` is for `/loop` dynamic pacing only (requires `prompt` unless `stop:true`) and fails immediately in this context.
 
 ```
-fgos return <id> [--worker-verified-sha <sha>]
+fgos return <id>
 ```
 
 This is the fgOS equivalent of a bee cell's cap: `return` re-runs the
-item's `verify` itself (unless `--worker-verified-sha <sha>` is passed matching the current branch tip, indicating an out-of-process worker already verified this commit), checks for a clean working tree and an advanced
+item's `verify` itself, checks for a clean working tree and an advanced
 commit history, and only then moves the item to `awaiting-approval`
 (verify red moves it to `blocked` instead) — it never takes the caller's
 word for it, the same "proof, not assertion" discipline bee's
 cap-with-evidence rule enforces, just applied by the engine instead of a
-recorded trace field. When a `verifiedSha` was captured from an out-of-process Implement step in the SAME drive, pass `--worker-verified-sha <sha>`; when Implement was `unavailable`/`in-process` (no worker, this session verified for real itself, or `dispatch.mjs execute` was never called this drive), call `fgos return <id>` bare with no flag.
+recorded trace field.
 
 ## The engine-fired review handoff
 
