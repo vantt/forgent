@@ -2,7 +2,7 @@
 type: explanation
 title: Why a partially materialized decompose no longer locks out the remaining children
 tags: [resolvePlan, decompose, footprint-overlap, atomicity]
-source_capture_ids: [tsk-4n8]
+source_capture_ids: [tsk-4n8, tsk-11v]
 authoritative_for: why resolvePlan's decompose verdict no longer treats the presence of any one child as proof the whole split already completed
 ---
 # Why a partially materialized decompose no longer locks out the remaining children
@@ -52,3 +52,27 @@ finished split from one that was interrupted partway (e.g. by a
 footprint-overlap ask), so resubmitting the full children array after
 resolving the conflict actually creates the remaining, still-missing
 children instead of refusing outright.
+
+## Follow-up: the documented "sequence" resolution was never implemented (`tsk-11v`)
+
+`tsk-4n8`'s own discovery pass noticed but deliberately deferred a
+second, related gap: `footprintOverlapAmong`
+(`src/state/graph-metrics.mjs`) never considered a candidate pair's
+`deps` edge at all, so decompose's own footprint-overlap gate flagged two
+children as conflicting even when one already depended on the other (and
+therefore could never run in parallel to begin with). The documented
+resolution options were `FOOTPRINT_CONFLICT_SUGGESTIONS = ['sequence',
+'hoist', 're-slice']`, but "sequence" — adding a `deps` edge between the
+two conflicting children — was unimplemented for this call site: adding
+the edge never satisfied the check, forcing every real resolution through
+re-slicing instead, regardless of which fix actually fit the situation.
+
+This was deferred from `tsk-4n8` itself specifically because it wasn't
+what blocked that item's real incident (re-slicing already worked there),
+and because `footprintOverlapAmong` has two other callers —
+`footprintOverlap`'s frontier-only parallel-dispatch advisory, and
+`graph-harness.mjs`'s merge-readiness ranking — that a change to shared
+logic could affect. **Fix** (`tsk-11v`): the footprint-overlap gate now
+honors a declared `deps` edge between two candidates, so "sequence" is a
+real, working resolution option alongside "hoist" and "re-slice," not
+just documented text.
