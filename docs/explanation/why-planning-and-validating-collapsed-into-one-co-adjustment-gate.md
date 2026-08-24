@@ -2,7 +2,7 @@
 type: explanation
 title: Why planning and validating collapsed into one co-adjustment gate
 tags: [fgos-coding-planning, fgos-coding-validating, gate, gate-bypass, human-release]
-source_capture_ids: [tsk-224, tsk-2tk, tsk-blk, tsk-4vz]
+source_capture_ids: [tsk-224, tsk-2tk, tsk-blk, tsk-4vz, tsk-13s]
 authoritative_for: why fgos-coding-planning and fgos-coding-validating merged their two approval gates into one, and how that one gate decides when to ask a person versus proceed
 ---
 # Why planning and validating collapsed into one co-adjustment gate
@@ -257,6 +257,28 @@ real risk was a confused session — stale local cache, or a hand-typed
 command — still successfully calling `fgos gate-approve` with
 `planApprove`, silently recording a gate approval for a gate that no
 longer governs anything.
+
+## The fail-closed catch swallowed too much (`tsk-13s`)
+
+`tsk-blk`'s own fix added `.catch(() => console.log("false"))` to
+`canAutoApproveMergedGate`'s gate-check snippet (in all three mirror
+copies) specifically to avoid a raw crash on malformed `childSpecs` JSON.
+The catch was too broad: it swallows *every* error in the promise
+chain, not just a JSON parse failure — a nonexistent item id
+(`listWork(...).work[id]` undefined), a wrong `plan.md` path
+(`fs.readFileSync` `ENOENT`), a broken `gate-bypass.mjs` import, all of
+it. Before `tsk-blk`, these at least printed a raw stack trace to
+stderr — ugly, but debuggable. After, every one of them silently became
+`"false"` on stdout with no way to tell "the gate genuinely refused"
+apart from "the command itself was typed wrong" (a bad item id, a bad
+path).
+
+**Fix**: log the caught error to **stderr** before printing `"false"` to
+stdout — `.catch((err) => { console.error(err); console.log("false");
+})` — keeping the exact same fail-closed contract on stdout (anything
+other than a literal `true` still reads as `false`, as documented) while
+restoring the ability to actually debug which failure produced that
+`false`.
 
 ## D14: a hand-back from planning to exploring must leave a real trail
 
