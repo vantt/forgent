@@ -1249,6 +1249,27 @@ function createDetachedMergeWorktree(repoRoot, id) {
     throw err;
   }
 
+  // Racy-git stat-cache guard: immediately after this fresh checkout, git's
+  // index can still carry a stale mtime for a path whose on-disk content
+  // already matches HEAD (mtime granularity can't distinguish "just checked
+  // out" from "modified microseconds later" under heavy concurrent I/O from
+  // sibling worktrees). A `git merge` attempted this soon can then refuse an
+  // untouched path outright with "not uptodate. Cannot merge." even though
+  // the path is genuinely clean — reproduced directly on a real merge
+  // branch: a path the branch never touched since its merge-base failed
+  // this way 3/3 times, with the working tree confirmed byte-equal to HEAD
+  // immediately beforehand via debug instrumentation. `git update-index
+  // --refresh` forces a real content re-check and clears the stale cache
+  // entries. Its own exit code is ignored: `.fgos/`'s deliberate unstaged
+  // deletion above always makes it report "needs update" for those paths,
+  // which is expected, not a real failure — this call is best-effort
+  // stat-cache hygiene, never a gate.
+  try {
+    execFileSync('git', ['update-index', '-q', '--refresh'], { cwd: worktreePath, encoding: 'utf8', shell: false, stdio: 'ignore' });
+  } catch {
+    // best-effort — see comment above.
+  }
+
   return { path: worktreePath, branch, startCommit };
 }
 
