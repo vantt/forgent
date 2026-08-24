@@ -8,7 +8,7 @@ reclaim `.fgos/main-checkout.lock` khi holder mang identity CHUỖI (session
 id), thay `/fgOS:unlock` thủ công.
 
 Research vòng `discovery` (`docs/history/tsk-2l8/RESEARCH.md`)
-xác nhận tiền đề đó không khớp code thật hôm nay — xem `## Locked decisions`
+xác nhận tiền đề đó không khớp code thật hôm nay — xem mục "Locked decisions"
 bên dưới. Sau khi loại bỏ phần sai, phạm vi thật của item co lại thành một
 việc nhỏ, cụ thể:
 
