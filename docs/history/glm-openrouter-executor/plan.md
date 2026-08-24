@@ -60,10 +60,20 @@ current byte-identical spawn behavior:
    only, no `registrations.mjs` default-template entry) — `glm` is a
    single-project executor addition, not a fresh-install default (see
    RESEARCH.md Round 1, finding 4).
-4. The real secret value never enters this repo. `GLM_OPENROUTER_API_KEY`
-   is exported in the operator's own shell profile (or an untracked,
-   gitignored env file this session already avoids reading into any
-   committed output) — outside every git-tracked path. Only the env-var
+4. The real secret value never enters this repo. **Decided at the
+   validating Gate (human answer):** `GLM_OPENROUTER_API_KEY` lives in a
+   new untracked file, `.fgos/secrets.local.env` (`KEY=value` lines,
+   following the existing `.fgos/*.local.*` gitignore-pattern precedent —
+   `.fgos/tool-status.local.json` is already gitignored the same way).
+   Added to `.gitignore` explicitly as part of this item (mirroring the
+   existing per-file `.fgos/...` entries — `.fgos/` itself is NOT
+   wholesale ignored). This session does not create or populate that
+   file with a real value — the operator does, after this item lands.
+   Sourced into the environment before `fgos`/Claude Code dispatches
+   (documented in the new executor entry's own `description`, e.g. `set
+   -a; source .fgos/secrets.local.env; set +a` before invoking anything
+   that spawns the `glm` executor) so `process.env.GLM_OPENROUTER_API_KEY`
+   is present for the `${...}` substitution to resolve. Only the env-var
    NAME is committed, in `.fgos/config.json`.
 
 **Alternatives rejected:**
@@ -120,11 +130,13 @@ the GitNexus proof point itself is weak.
    + `cliSpawnAdapter`'s spawn `env` merge
 3. `test/runner/dispatch.test.mjs` — new cases for both of the above
 4. `.fgos/config.json` — register `executors.glm`
-5. `CHANGELOG.md` — one line under `## [Unreleased]` (AGENTS.md's
+5. `.gitignore` — add `.fgos/secrets.local.env`
+6. `CHANGELOG.md` — one line under `## [Unreleased]` (AGENTS.md's
    install/setup/doctor gate: this is a new, user-visible executor
    capability)
-6. Outside the repo: export `GLM_OPENROUTER_API_KEY` in the operator's own
-   shell profile — not a tracked file, not part of this branch's diff
+7. NOT part of this branch's diff: the operator populates
+   `.fgos/secrets.local.env` with the real key after this item lands
+   (untracked, per the gate's own answer above)
 
 ## Shape
 
