@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: Why `checkMergeStillResolves` can false-positive after a root branch prune
-source_capture_ids: [tsk-psb]
+source_capture_ids: [tsk-psb, tsk-2q8, tsk-597z, tsk-4bh]
 ---
 # Why `checkMergeStillResolves` can false-positive after a root branch prune
 
@@ -222,3 +222,94 @@ item resolves to itself as the root, also check that root's own branch
 against `main` — combined with AND. Same diagnostic-only stance every
 fix on this page already takes: report, never auto-recover. See
 `src/state/cleanup-harness.mjs`'s `checkRootBranchResolves`.
+
+## The rebased-not-pruned case (`tsk-2q8`) — content landed, ancestry sha didn't
+
+A different scenario from a pruned ref: a root/parent branch (`fgw/<rootId>`)
+that still *exists* but was **rebased**, not pruned. Confirmed live: a
+leaf item's own `branchHeadAtReturn` sha becomes permanently stale
+ancestry-wise even though the content genuinely landed on `main` —
+`git reflog` showed the parent branch rebased, replaying the leaf's
+return commit as a byte-identical new sha (verified: diff of
+added/removed lines matches exactly, and the deliverable text was
+directly confirmed present on `main`). The new sha is reachable from
+both the parent branch and `main`; the *recorded* sha is reachable from
+neither, so `checkMergeStillResolves` blocked the item with
+`parkReason: system-error` on every TTL cleanup attempt — permanently,
+since `fgos catchup`'s own `CATCHUP_REASONS` set only covers
+merge-related parks, never `system-error`.
+
+**Chosen fix**: rather than adding a third ancestry-fallback check (the
+originally proposed direction) or a sha-resync step, `fgos catchup`
+itself was made eligible for exactly this park shape. The eligibility
+gate reads the item's most recent `work.move` event and checks whether
+it transitioned `cleanup -> blocked` (via `readRawEvents`, already in
+scope at the same call site) — not a new field, marker convention, or
+`reason`-text parsing. Once eligible, `catchup`'s own existing
+merge-and-reverify mechanism (already tested, unchanged) naturally
+re-establishes fresh ancestry by merging the target into the item's
+branch and re-verifying — the exact recovery a rebased-but-still-live
+branch needs, reusing machinery that already existed for a different
+purpose rather than building a parallel fallback path.
+
+A negative test locks the boundary: a `blocked` item with an unrelated
+`system-error` reason (e.g. a runner-crash reclaim) must still be
+*rejected* by `fgos catchup` — admitting the wrong class of `system-error`
+park into the merge-retry path is exactly the failure this eligibility
+gate must not create.
+
+## A found-but-separate gap: old victims of an already-fixed false positive stay stuck
+
+A second, real occurrence of the *original* pruned-parent false positive
+(the `tsk-psb` shape this doc's own main body already covers) was found
+stuck in `status: blocked` for 5 days — the fix that resolved
+`checkMergeStillResolves` for new occurrences never retroactively
+re-checked items already parked *before* the fix landed. Fresh
+verification confirmed no data loss (the recorded sha had since become a
+real ancestor via an unrelated `sync-root`), and the item was manually
+unblocked the same way. This surfaced a genuine gap this item's own scope
+named but did not close: no sweep or audit revisits `status: blocked`
+items with a merge-related `system-error` park to see whether a since-landed
+fix now clears them — a fixed false-positive shape can still leave old
+victims stranded indefinitely, discoverable only by manual investigation.
+
+## The recheck sweep, split off as its own item (`tsk-597z`)
+
+Split off from `tsk-2q8` (per its own exploring D2). **Report-only,
+never auto-transitioning**, on purpose — four named risks ruled out
+auto-transition for now: (1) keying the trigger on the free-text
+`detail` string would be fragile, since that string has already been
+independently rewritten by several other fixes in turn; a structured
+marker would be needed, not string-matching; (2) wiring auto-transition
+into the runner's ~5s poll cycle against a transiently-resolvable git ref
+risks a flap loop; (3) a check-then-transition window races concurrent
+rebases/prunes on the shared main checkout (TOCTOU); (4) no persistent
+`--watch` daemon runs in this repo's normal day-to-day usage today
+(sessions call `fgos` per-command), so an auto-transition wired only into
+a single poll cycle wouldn't even fire reliably in practice yet.
+
+**Delivered**: `fgos recheck-blocked`, a report-only sweep listing which
+currently-`blocked` items would now pass their own park-causing check if
+it were re-run today — surfacing exactly the `tsk-4n7` shape (a
+now-resolved false positive) for a person to act on, without the engine
+ever transitioning anything on its own.
+
+**Explicitly does not fix `tsk-2q8`'s own repro.** The rebased-root-branch
+case (`tsk-2sr`) has a *permanently* unreachable recorded sha — re-running
+the same ancestry check on it fails forever, no matter how many times it
+reruns. This sweep only helps the `tsk-4n7` shape, where the underlying
+check later became true again for an unrelated reason (a `sync-root`
+elsewhere re-establishing real ancestry) — a genuinely different failure
+mode from a rebase that permanently orphans the original sha.
+
+## A fourth gap: canceled/`wontfix` children were never skipped (`tsk-4bh`)
+
+Found in the same 2026-08-14 fable audit
+(`docs/reference/worktree-merge-lifecycle-audit-260814-findings.md`):
+`checkMergeStillResolves` never skipped `wontfix`/canceled children when
+walking a decomposed root's own children-recursion check — a root with
+one abandoned (`wontfix`) child could never clear cleanup, since the
+check kept demanding ancestry proof for a child that was never going to
+merge in the first place. **Fix**: the check now skips canceled/`wontfix`
+children when recursing, the same way it should already skip anything
+that was never going to land.

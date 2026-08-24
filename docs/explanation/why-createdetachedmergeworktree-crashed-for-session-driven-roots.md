@@ -1,8 +1,9 @@
 ---
 type: explanation
 title: Why createDetachedMergeWorktree crashed for roots a live session dispatched
-tags: []
-source_capture_ids: [tsk-6ch]
+tags: [merge, worktree, branch-creation, session-driven-dispatch]
+source_capture_ids: [tsk-6ch, tsk-5zg]
+authoritative_for: why a session-driven root's fgw/<rootId> branch may not exist yet at merge time, and every call site that needed its own fallback for it
 ---
 # Why `createDetachedMergeWorktree` crashed for roots a live session dispatched
 
@@ -64,6 +65,36 @@ fallback should match it. Reaching for `detectTrunk` inside
 `worktree.mjs` would also have created a fresh circular import
 (`merge.mjs` already imports from `worktree.mjs`), a second real reason
 the fallback keeps the literal `'main'` baseRef `loop.mjs` already uses.
+
+## The same root cause, one call site earlier (`tsk-5zg`)
+
+`tsk-6ch`'s fallback only covers `createDetachedMergeWorktree` — but
+`approve`'s leaf-into-root merge runs an **earlier** check first, in the
+same function, before `createDetachedMergeWorktree` is ever reached: an
+ancestor check at `bin/fgos.mjs` (~line 3483),
+`execFileSync('git', ['merge-base', '--is-ancestor', rootBranch,
+branchNameFor(id)], ...)`, with no branch-existence guard of its own.
+
+Reproduced live (2026-08-13): approving `tsk-5vs` (a leaf of `tsk-5wr`)
+before `tsk-5wr` itself had ever been claimed crashed with a raw `fatal:
+Not a valid object name fgw/tsk-5wr` instead of falling back gracefully.
+The mechanism is subtly different from a missing-branch check: `git
+merge-base --is-ancestor` on a genuinely nonexistent ref exits with git's
+own fatal code **128**, not the ordinary "not an ancestor" exit code
+**1** — so the surrounding `catch` block's own `if (ancestorErr.status
+!== 1) throw ancestorErr` re-threw the crash instead of treating it as
+"not yet caught up," the same soft-fail path a real "not an ancestor"
+result already takes.
+
+This is the identical underlying gap `tsk-6ch` diagnosed (a session-driven
+root's branch not existing yet at merge time) surfacing at a call site
+`tsk-6ch`'s own fix never reached. **Fix**: apply the same
+`createBranchRef` fallback (or an explicit branch-existence guard) at
+this earlier ancestor-check site too, consistent with how the later
+`createDetachedMergeWorktree` call already handles it. Until this
+landed, the only workaround was manually claiming the root item first (which
+creates its branch via `createWorktree`'s branch-reuse path) before
+retrying `approve` on the leaf.
 
 ## Related
 

@@ -2,7 +2,7 @@
 type: explanation
 title: Worker slot is the engine-owned occupancy unit across every launcher
 tags: [worker-slot, occupancy, herdr-plugin, fgos-runner, fgos-fanout, ceiling]
-source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk]
+source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk, tsk-1oz, tsk-qrs, tsk-nwz, tsk-37t]
 authoritative_for: worker slot concept and engine-wide worker occupancy ceiling shared by herdr-plugin, fgos-runner, fgos-fanout
 ---
 # Worker slot is the engine-owned occupancy unit across every launcher
@@ -283,6 +283,175 @@ The merge was aborted cleanly (main left unchanged) rather than landed
 through a conflicted state — consistent with the design's own D2/D9
 stance that the engine's event log, not an in-progress merge attempt, is
 the single source of truth for what is actually running or landed.
+
+## Post-merge gaps a review found after the four-way split landed (`tsk-1oz`)
+
+A review pass after `tsk-2sj` merged to `main` found six real, verified
+defects the split had left behind — none caught by the split's own
+tests because each is about the boundary between the design and its
+surrounding setup/doctor/skill-prose surface, not the ceiling logic
+itself:
+
+- **F0 — `fgos setup` armed a ceiling that instantly locked the
+  backlog.** `registrations.mjs` registered `workerSlots` with a live
+  `ceiling: 8`, and `doctor` actively nagged until a stale config ran
+  `fgos setup` to pick it up. Any repo already running more than 8 items
+  at `doing` — this one included, with 12 — got `ceiling-reached`
+  refused on its very next `take`/`pick`/runner claim, from a setup step
+  that never asked a person to choose a real number. The design had
+  deliberately avoided a live in-code default for exactly this reason
+  (a silent gate nobody chose) but left the identical landmine one
+  `fgos setup` run away. **Fix**: the registered shape now writes
+  `ceiling: null` — the config section exists (so doctor stops nagging
+  about a missing key) while the gate itself stays off until a person
+  sets a real number.
+- **F1 — D10 shipped only half-built.** The `fgos report` verb existed,
+  but zero skills actually called it, even though `plan.md`'s own A8
+  assigned that prose half to the skill owning `fgos-coding-driving`.
+  This call is the safety precondition for the pane-reuse behavior
+  (`tsk-2sj`'s own T2) already shipped — without it, a driver's closing
+  report only ever lived in a pane that pane-reuse could overwrite
+  before anyone read it. **Fix**: wired the call into
+  `fgos-coding-driving`'s own `SKILL.md`, in both the `.claude` and
+  `.agents` copies, which this repo requires to stay byte-identical.
+- **F2 — `workerSlots.adminReservation` was written and displayed, but
+  never read.** `fgos setup` wrote it, `doctor` surfaced it, and
+  `countWorkerSlots` ignored it entirely, returning a hardcoded constant
+  instead.
+- **F3 — a malformed `ceiling` silently disabled the gate while looking
+  configured.** A string `"8"`, a float `8.5`, `0`, or `-1` all passed
+  through with no doctor check flagging them, unlike the existing
+  `checkInvariantChecksConfigured` precedent already covering this exact
+  failure class for a different config section.
+- **F4 — stale skill prose.** `discover`'s `SKILL.md` still claimed herdr
+  always passes `--autoClose`, which `pick.rs` had already stopped doing.
+- **F5 — a verb description contradicted its own output shape.** The
+  `fgos slots` verb's description claimed its result was not a growing
+  row set, while `execution.items` in fact grows one row per running
+  item (see `docs/reference/fgos-slots-verb-output-fields.md`, the doc
+  this description itself should have matched).
+
+None of the six required reopening any of the ceiling/ask-before-
+standing-up design above — every fix sits at the seam between that
+design and setup/doctor/skill-prose, the class of gap a design's own
+unit tests structurally cannot see because it is about what surrounds
+the design, not what it computes.
+
+## A second review round: the runner/fanout half of the same ceiling (`tsk-qrs`)
+
+A separate review pass over the runner and `fgos-fanout` side (also
+post-`tsk-2sj`) found five more real defects — this time about whether
+the shared ceiling actually *covers* every launcher, not about setup/
+doctor surfacing:
+
+- **F1 — D8's whole-batch rule was documented but never actually built
+  into the enforcing gate.** `hasWorkerSlotRoom` returns `granted` equal
+  to the full requested `batchSize`, but `claimWork` calls it with no
+  `batchSize` at all — so every claim in a batch is checked alone against
+  `free`, and a batch of five against one free slot lands one and refuses
+  the other four, not the documented "whole batch waits its turn"
+  behavior. **Decision: retire D8 rather than rescue it.** The engine
+  keeps its hard per-item ceiling (which never overshoots); a launcher
+  trims its own batch down to `execution.free` before firing, instead of
+  firing the whole batch and letting the engine sort it out. Per
+  `AGENTS.md`'s own rule on changing a locked decision, this is recorded
+  as a written supersede rather than an edit to the original — all three
+  sites that had documented the never-built behavior (`worker-slots.mjs`,
+  `loop.mjs`, and `fgos-fanout`'s own `SKILL.md` — including a red flag
+  that had been forbidding the exact trim this decision now requires)
+  were corrected to match.
+- **F2 — the runner's discovery sweep bypassed the ceiling entirely.**
+  It stands real worker processes up without ever requesting a slot and
+  without occupying one, because it never claims (the item stays `todo`,
+  and occupancy only counts `doing`). Net effect: a full execution lane
+  correctly refuses its own wave, then spawns research workers anyway,
+  while `fgos slots` under-reports what the machine is actually running.
+- **F3 — a full lane's own log contradicted its own refusal message.**
+  It printed "frontier empty, nothing to do" moments after refusing on a
+  full lane, and reported outcome `idle` — giving a caller no way to
+  distinguish "genuinely no work" from "work is waiting behind a full
+  lane."
+- **F4 — an abandoned session claim could wedge every launcher
+  permanently, once a real ceiling was armed.** `startupReap`
+  deliberately skips `human`/`session` claims (by design, for a different
+  reason), and nothing surfaced which items were holding the occupied
+  slots — even though the wave gate already had those ids in hand and was
+  simply discarding them.
+- **F5 — `fgos-fanout`'s own refusal branch had no loop, no wait, no
+  bound, and no give-up rule.** A literal reading of the skill prose fell
+  straight through the refusal into the exact dispatch line the refusal
+  was supposed to prevent.
+
+Taken together with `tsk-1oz`'s six gaps, all eleven trace to the same
+root shape: the ceiling/ask-before-standing-up computation itself was
+correct and well-tested, but each of the three launchers' own *use* of
+it — batching, sweep-vs-execution occupancy, refusal reporting, reap, and
+loop control — had its own independent gap a unit test scoped to the
+shared engine code could never see.
+
+## An unarmed ceiling (F0's own fix) silently zeroed fgos-fanout's batch (`tsk-nwz`)
+
+`tsk-1oz`'s own F0 fix made `fgos setup` write `workerSlots.ceiling: null`
+on purpose — present but unarmed, so `doctor` stops nagging while the
+gate stays off until a person sets a real number. That is exactly the
+state a fresh `fgos setup` ships. In that state, `fgos slots --json`
+reports `execution.hasRoom: true`, `execution.free: null`, reason
+`no-ceiling-configured` — correct at the engine level.
+
+`fgos-fanout`'s own skill prose, however, computed its batch as
+`min(5, execution.free)` and forbade firing more Agents than
+`execution.free` — with `free` literally `null`, there is no number the
+skill's own prose permits it to fire, so a launcher following it
+dispatched **nothing**, on a fresh install, with the engine wide open the
+entire time. No branch in the skill prose covered the unarmed case at
+all.
+
+The engine's own API never had this hole: `hasWorkerSlotRoom` already
+returns `granted` equal to the full batch size when no ceiling is
+configured — the correct "wide open" answer. The bug was narrower than
+it looked: `fgos slots` never exposed `granted` at all, so the skill's
+prose had nothing to point at except `free`, the one field that goes
+`null` in exactly this state.
+
+**Fix**: prose-only, in both `.claude/skills/fgos-fanout/SKILL.md` and
+its `.agents` mirror (kept byte-identical by `test/skills/fgos-mirror.test.mjs`)
+— teach the skill that `execution.free: null` means no ceiling is armed,
+and the batch in that case is `min(5, batch.length)`, matching
+`hasWorkerSlotRoom`'s own `granted` contract instead of a field that was
+never meant to answer this question in the unarmed state.
+
+## Two more engine gaps: stuck-past-ceiling reclaim, and a phantom report id (`tsk-37t`)
+
+Found by a review pass after `tsk-2sj`, distinct from — and uncovered
+by — the `tsk-1oz`/`tsk-qrs` fixes above:
+
+- **The `excludeId` escape hatch stops working exactly when it is
+  needed.** `worker-slots.mjs` documents `excludeId` as the reason a
+  stale item sitting at the ceiling isn't permanently unreclaimable —
+  true at `occupied == ceiling`, but not past it: with a ceiling of 8 and
+  12 items at `doing`, excluding the target still leaves 11, `free`
+  clamps to zero, and the claim is refused. `claim-port.mjs`'s ceiling
+  gate runs *before* the stale-reclaim block, so the reclaim path is
+  unreachable precisely when a person is trying to clear the stale
+  claims that wedged the lane in the first place — the only way out was
+  hand-editing config. `tsk-1oz`'s own `ceiling: null` fix means this
+  can't bite a *fresh* repo, but it still bites any repo that armed a
+  real ceiling and later drifted past it, whether by lowering the number
+  or by accumulating abandoned claims. **Fix**: the ceiling gate now
+  exempts stale-claim reclaims specifically, rather than applying
+  uniformly regardless of whether occupancy is at, below, or already
+  past the ceiling.
+- **`fgos report` accepted an id that doesn't exist.** It exited zero
+  with a success envelope and wrote a decision record that `fgos show`
+  can then never retrieve, since `show` itself refuses an unknown id.
+  `addDecision` validated `text`/`rationale` but never that the work item
+  actually existed — every neighboring id-taking verb validates first.
+  This mattered little while `report` was typed by hand; it matters now
+  that `fgos-coding-driving` calls it automatically at every stop (the
+  closing-report convention this same driving loop follows on every
+  stop, including this one) — a wrong id in prose now silently loses the
+  closing report with no error. **Fix**: `addDecision` now validates the
+  work item exists before writing, matching its neighboring verbs.
 
 ## Related
 

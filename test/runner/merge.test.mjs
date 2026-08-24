@@ -1635,6 +1635,92 @@ test('mergeRunnerItem merges cleanly when a merge=union .fgos/ file genuinely di
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
+// tsk-4s6: mirrors the tsk-4gi union regression test's shape (a worker
+// branch that merges main in, then re-commits its OWN pre-merge .fgos/
+// content back per the ADR0020 pre-commit hook's own rule -- the real
+// mechanism that leaves a branch's committed blob for a NON-union path
+// genuinely pinned to an old value even though wall-clock time and
+// further main drift have passed) -- but for a NON-union path
+// (`.fgos/config.json`), which `isMergeUnionPath` alone can never rescue.
+// Two shapes were tried and rejected before this one:
+//   1. branch simply never touches the path at all -- produces no staged
+//      diff for git to even flag (a fast-moving auto-merge just keeps
+//      HEAD's own content when theirs == base), so it passed identically
+//      with or without this fix, proving it exercised nothing.
+//   2. a single-line file where both sides edit that same one line --
+//      a genuine content CONFLICT (git throws, never auto-merges), which
+//      this fix's restore loop never even reaches (it only runs after a
+//      CLEAN merge that still leaves a staged diff) -- failed even with
+//      the fix applied, for the right reason (wrong bug entirely).
+// This shape uses a two-field file so main's round-2 edit (field `b`) and
+// the branch's revert (field `a`, back to its branchHeadAtTake value) land
+// on different lines -- git auto-merges them into a THIRD combined value
+// with no conflict, which is exactly the staged-diff-after-clean-merge
+// shape this fix's restore loop inspects. Reproduces the real bug this
+// item was filed against (`fgw/tsk-25b`, `docs/history/
+// tsk-4s6-write-rejected-trust-branchheadattake/RESEARCH.md`).
+test('mergeRunnerItem merges cleanly when a non-union .fgos/ path auto-merges to a value differing from HEAD, but the branch\'s own field is unchanged since branchHeadAtTake (tsk-4s6)', async () => {
+  const repoRoot = initRepo();
+  const configRelPath = path.join('.fgos', 'config.json');
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  // pad1-pad5 give git's line-based merge enough unchanged context between
+  // the `a` and `b` edits to treat them as independent, non-overlapping
+  // hunks -- with the two fields on adjacent lines, git's default merge
+  // treats the edits as one ambiguous region and throws a real conflict
+  // instead of auto-merging (confirmed empirically), which would exercise
+  // the wrong code path entirely (this fix only runs after a CLEAN merge).
+  const forkContent = '{\n  "a": 1,\n  "pad1": "x",\n  "pad2": "x",\n  "pad3": "x",\n  "pad4": "x",\n  "pad5": "x",\n  "b": 1\n}\n';
+  fs.writeFileSync(path.join(repoRoot, configRelPath), forkContent);
+  git(repoRoot, ['add', configRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .fgos/config.json on main']);
+
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  fs.writeFileSync(path.join(repoRoot, 'produced.txt'), 'ok\n');
+  git(repoRoot, ['add', 'produced.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'worker produces its own file']);
+  const forkCommit = headOf(repoRoot);
+  git(repoRoot, ['checkout', 'main']);
+
+  // Main advances field `a` once before the branch's own catch-up.
+  const mainRound1 = '{\n  "a": 2,\n  "pad1": "x",\n  "pad2": "x",\n  "pad3": "x",\n  "pad4": "x",\n  "pad5": "x",\n  "b": 1\n}\n';
+  fs.writeFileSync(path.join(repoRoot, configRelPath), mainRound1);
+  git(repoRoot, ['add', configRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main updates config.json field a (round 1)']);
+
+  // The branch catches up (merges main in, adopting a:2), then reverts
+  // JUST field `a` back to its own pre-merge (branchHeadAtTake) value and
+  // commits that -- the real ADR0020 pre-commit-hook-driven pattern
+  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field
+  // `b` is left as main's round-1 merge brought it in, untouched by this
+  // revert -- the branch's own net content is now byte-identical to its
+  // branchHeadAtTake commit (both `{a:1, b:1}`), even though its commit
+  // history shows an intermediate touch.
+  git(repoRoot, ['checkout', 'fgw/demo-item']);
+  git(repoRoot, ['merge', '-q', '--no-ff', 'main']);
+  fs.writeFileSync(path.join(repoRoot, configRelPath), forkContent);
+  git(repoRoot, ['add', configRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'worker reverts .fgos/config.json field a per pre-commit hook rule']);
+  git(repoRoot, ['checkout', 'main']);
+
+  // Main drifts field `b` next, independently, after the branch's own
+  // catch-up/revert -- a DIFFERENT line than the branch's own revert
+  // touched, so the eventual merge auto-resolves cleanly (no conflict)
+  // but the result still differs from HEAD.
+  const mainRound2 = '{\n  "a": 2,\n  "pad1": "x",\n  "pad2": "x",\n  "pad3": "x",\n  "pad4": "x",\n  "pad5": "x",\n  "b": 2\n}\n';
+  fs.writeFileSync(path.join(repoRoot, configRelPath), mainRound2);
+  git(repoRoot, ['add', configRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main updates config.json field b (round 2)']);
+  const mainOwnContent = fs.readFileSync(path.join(repoRoot, configRelPath), 'utf8');
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt', branchHeadAtTake: forkCommit }));
+  assert.equal(result.outcome, 'merged');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
+
+  const finalContent = fs.readFileSync(path.join(repoRoot, configRelPath), 'utf8');
+  assert.equal(finalContent, mainOwnContent, 'target .fgos/ state must be exactly its own pre-merge version, unaffected by the branch\'s stale revert');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
 // tsk-4gi: a NON-union `.fgos/` path (e.g. `.fgos/config.json`, no
 // `merge=union` entry) that already exists on target's HEAD and gets edited
 // on non-overlapping lines by both the worker branch and target auto-merges

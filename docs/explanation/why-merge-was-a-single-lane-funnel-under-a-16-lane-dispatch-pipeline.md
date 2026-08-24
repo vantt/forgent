@@ -2,7 +2,7 @@
 type: explanation
 title: Why merge was a single-lane funnel under a 16-lane dispatch pipeline
 tags: [merge, throughput, iron-law, main-checkout-lock, clean-tree]
-source_capture_ids: [tsk-51m]
+source_capture_ids: [tsk-51m, tsk-xyr, tsk-5k4]
 authoritative_for: why fgOS merge throughput bottlenecked despite parallel dispatch, and the merge target-ref queue design that replaced a hard concurrency cap
 ---
 # Why merge was a single-lane funnel under a 16-lane dispatch pipeline
@@ -91,6 +91,57 @@ still serialize, because that's the only pair that can actually collide.
 This is the direct answer to cause 1 above: the lock stopped being
 "one lock, one repo" and became "one lock per thing that can actually
 conflict."
+
+`tsk-xyr` is the item that carried D7 to landed code. Its own scout
+evidence pinpointed where the old repo-wide lock actually cost the most:
+leaf-to-root merges were already isolated onto a **detached** worktree at
+the tip of `fgw/<rootId>` (`bin/fgos.mjs:3145`, via
+`withMergeEphemeralWorktree`, landing with `git branch -f` — a comment at
+`:3110-3117` even says "never the human's own main checkout"), yet the
+very next line, `:3150`, still passed `lockRoot: repoRoot` — claiming the
+one shared main-checkout lock for a merge that never touched that
+checkout at all. Two leaves under different roots contended for nothing
+real. `src/runner/write-queue.mjs`'s own docstring ("a sequential async
+write-queue primitive") confirmed it was never a per-root mutex either,
+despite an older comment nearby claiming otherwise — overlap was only
+ever *detected* after the fact (the CAS guard from `tsk-46a`), never
+*prevented*, until this item's target-ref lock closed that gap directly.
+
+## `withLockRetry` never actually wrapped the target-slot lock (`tsk-5k4`)
+
+Found in a post-batch audit (2026-08-13), verified by reading both call
+sites directly rather than assumed: `sync-root`'s root-with-parent case
+and `approve`'s leaf-to-root path both call
+`withMergeTargetSlot(repoRoot, targetBranch, async () => { ...
+withMergeEphemeralWorktree(..., runAndReport) })` — but `withMergeTargetSlot`
+(the call that can actually throw `MergeError{code:'lock-held'}` on
+contention) sits **outside** `withLockRetry` (`runMerge`'s own
+bounded-wait-retry wrapper) at both sites. `withLockRetry` only wraps the
+inner `runAndReport` call, and `runAndReport` invokes `mergeRunnerItem`
+with `{targetSlot: true}` — a mode that, per `merge.mjs:844`, deliberately
+does **not** acquire any lock of its own (an early return through
+`mergeRunnerItemLocked`). The retry wrapper was therefore watching a code
+path that could never throw `lock-held`, while the actual
+contention-throwing call sat unprotected outside it.
+
+This directly contradicted `withMergeTargetSlot`'s own docstring, which
+claimed it "mirrors `mergeRunnerItem`'s own main-checkout-lock heartbeat/
+release shape... so `withLockRetry`... transparently covers this too."
+The existing tests never caught the gap because they only exercised
+`--no-wait` against the main-checkout lock, never against the target-slot
+lock specifically.
+
+**Real consequence**: when two sessions both tried to `approve`/
+`sync-root` into the same target (leaf→root, or a nested root→parent),
+the session that lost the slot contention got a hard, immediate error
+instead of the bounded-wait-with-backoff retry D7's own acceptance
+criterion 1 ("two sessions racing one slot: the second waits, bounded,
+never crashes") had promised. **Fix**: move `withMergeTargetSlot` inside
+`withLockRetry` at both call sites (or equivalently, have
+`withLockRetry` wrap the outermost call so it actually observes
+`withMergeTargetSlot`'s own `lock-held` throw) — the acceptance
+criterion the original design promised, now actually enforced by the
+code that claimed to already provide it.
 
 A companion decision (D5/D6) sequenced the work itself: the target-ref
 queue (§E) goes first, with three small fixes running in parallel
