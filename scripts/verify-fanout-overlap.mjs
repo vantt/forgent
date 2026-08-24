@@ -17,8 +17,7 @@
 
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { readEvents } from '../src/state/events.mjs';
-import { listWork } from '../src/state/store.mjs';
+import { listWork, readRawEvents } from '../src/state/store.mjs';
 import { footprintOverlapAmong } from '../src/state/graph-metrics.mjs';
 
 // This item's own `verify` (CONTEXT.md D10) runs this script with no
@@ -42,7 +41,12 @@ const repoRoot = process.argv[2] ?? resolveMainCheckoutRoot();
 const dotFgosDir = path.join(repoRoot, '.fgos');
 
 const view = listWork(dotFgosDir);
-const rawEvents = readEvents(path.join(dotFgosDir, 'events.jsonl'));
+// Tầng A (TA-D2/TA-D12): new work.move events land under `.fgos/events/`,
+// not the frozen baseline `events.jsonl` alone — readRawEvents(dir) is the
+// one door that reads both, merged/deduped, matching what `view` above
+// already sees (a raw single-file read here would silently miss every
+// move recorded after the cutover).
+const rawEvents = readRawEvents(dotFgosDir);
 
 // id -> ordered list of its own work.move events ({ from, to, ts })
 const movesById = new Map();

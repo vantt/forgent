@@ -31,6 +31,16 @@ function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-learning-'));
 }
 
+// Blocking sleep (mirrors events.mjs's own internal sleepSync) — used only to
+// force a real millisecond gap between events from different simulated
+// writers below, since TA-D7's (ts, file, seq) total order intentionally
+// tie-breaks a same-millisecond cross-writer collision by filename, not true
+// causal order (documented, not a bug) — this test asserts the ordinary
+// (non-colliding) case, not that specific accepted edge.
+function sleepMs(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
 // Spawns N real child OS processes that all call `storeCall` (a snippet of
 // source referencing `dir`/`id`, run inside the child) at a synchronized
 // start instant, so their read-check-append windows genuinely overlap —
@@ -264,14 +274,18 @@ test('the learning record rides the SAME work.move event that closes the item �
   moveWork(dir, { id: 'learn-rebuild', to: 'retrospective', expectedStatus: 'delivered' });
   moveWork(dir, { id: 'learn-rebuild', to: 'cleanup', expectedStatus: 'retrospective' });
 
-  const logPath = path.join(dir, 'events.jsonl');
-  const filesBefore = fs.readdirSync(dir).sort();
+  // Tầng A/T2: writes now land in the ONE open per-writer file under
+  // .fgos/events/ (TA-D2/TA-D11), not the frozen events.jsonl baseline.
+  const eventsDir = path.join(dir, 'events');
+  const filesBefore = fs.readdirSync(eventsDir).sort();
+  assert.equal(filesBefore.length, 1, 'exactly one writer, one open file');
+  const logPath = path.join(eventsDir, filesBefore[0]);
   const eventsBefore = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean).length;
 
   const { event } = moveWork(dir, { id: 'learn-rebuild', to: 'done', expectedStatus: 'cleanup', role: 'human' });
 
-  const filesAfter = fs.readdirSync(dir).sort();
-  assert.deepEqual(filesAfter, filesBefore, 'no new file appears — the learning record rides the events.jsonl append that already happens');
+  const filesAfter = fs.readdirSync(eventsDir).sort();
+  assert.deepEqual(filesAfter, filesBefore, 'no new file appears — the learning record rides the same writer-file append that already happens');
 
   const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
   assert.equal(lines.length, eventsBefore + 1, 'exactly ONE event appended for the close — not two');
@@ -283,6 +297,60 @@ test('the learning record rides the SAME work.move event that closes the item �
   const rebuiltOnce = listWork(dir);
   const rebuiltTwice = listWork(dir);
   assert.deepEqual(rebuiltTwice, rebuiltOnce, 'rebuilding the same log twice must be deep-equal (determinism)');
+});
+
+// --- Tầng A/T2: multi-file write path (TA-D2/TA-D11/TA-D14) --------------
+//
+// Two distinct writer identities interleaving their writes must each get
+// their OWN file under .fgos/events/ (never share one, never collide), and
+// a CAS precondition (moveWork's expectedStatus) must still see the OTHER
+// writer's prior event when it reads "current state" — proving the merged
+// multi-file view, not just the append side, is correct.
+test('two interleaved writer identities each write to their own file under .fgos/events/, and CAS still sees across both', () => {
+  const dir = tmpDir();
+  const savedSessionId = process.env.FGOS_SESSION_ID;
+  try {
+    process.env.FGOS_SESSION_ID = 'writer-a';
+    addWork(dir, {
+      id: 'interleave-1',
+      title: 'Title interleave-1',
+      kind: 'task',
+      status: 'todo',
+      deps: [],
+      risk: 'light',
+      refs: [],
+      verify: 'npm test',
+    });
+
+    sleepMs(5);
+    process.env.FGOS_SESSION_ID = 'writer-b';
+    moveWork(dir, { id: 'interleave-1', to: 'doing', expectedStatus: 'todo' });
+
+    sleepMs(5);
+    process.env.FGOS_SESSION_ID = 'writer-a';
+    // CAS precondition here only succeeds if writer-a's read of "current
+    // state" sees writer-b's move, which lives in a DIFFERENT file.
+    moveWork(dir, { id: 'interleave-1', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+
+    const eventsDir = path.join(dir, 'events');
+    const files = fs.readdirSync(eventsDir).filter((f) => f.endsWith('.jsonl'));
+    assert.equal(files.length, 2, 'two distinct writer identities produce two distinct files');
+    assert.ok(files.some((f) => f.startsWith('writer-a-')));
+    assert.ok(files.some((f) => f.startsWith('writer-b-')));
+
+    const view = listWork(dir);
+    assert.equal(view.work['interleave-1'].status, 'delivered');
+
+    const rawEvents = readRawEvents(dir);
+    assert.deepEqual(
+      rawEvents.map((e) => e.type),
+      ['work.add', 'work.move', 'work.move'],
+      'readRawEvents merges both writer files in total order',
+    );
+  } finally {
+    if (savedSessionId === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = savedSessionId;
+  }
 });
 
 // --- branch-source take/return write-side stamp (human-rounds D2) ---------
@@ -930,8 +998,12 @@ test('moveWork re-reads fresh state on retry: editing in the missing evidence af
   );
   assert.equal(listWork(dir).work['cos-retry'].status, 'doing');
 
-  // tsk-5q5-2: evidence must resolve to a real path under repoRoot.
-  editWork(dir, { id: 'cos-retry', patch: { acceptance: [{ text: 'field round-trips', evidence: `${path.basename(dir)}/events.jsonl:1` }] } });
+  // tsk-5q5-2: evidence must resolve to a real path under repoRoot. Cites
+  // state.json (not events.jsonl) since Tầng A/T2 moves new writes under
+  // .fgos/events/ — state.json is the one file every mutation still
+  // guarantees exists at this root, unlike the now-frozen events.jsonl
+  // baseline, which this test's tmpDir() never touches directly (TA-D12).
+  editWork(dir, { id: 'cos-retry', patch: { acceptance: [{ text: 'field round-trips', evidence: `${path.basename(dir)}/state.json:1` }] } });
 
   const { view } = moveWork(dir, { id: 'cos-retry', to: 'delivered', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['cos-retry'].status, 'delivered', 'the retry must re-read the just-edited evidence, not a cached refusal');

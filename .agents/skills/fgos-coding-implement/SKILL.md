@@ -104,9 +104,7 @@ on how you got here:
 Read the claimed item's title, `refs`, `deps`, and docsRef when present.
 Re-check live claim status if this session did not arrive via
 `fgos-coding-driving`. Reclaim the role/holder ball if it isn't already
-`implementer`.
-
-**Skip-load check.** For a `tiny`/`small` lane where `plan.md`'s recorded file list is small, skip opening references/worker-contract-and-orient.md's full text — instead do its two mechanical checks directly, inline: if this session did not arrive via `fgos-coding-driving` (which already re-checks claim status), re-read the item's live `status` and re-claim (`fgos pick <id>`) when it reads `todo`; and if `holder` (from the same read) is set to anything other than `implementer`, call `fgos handoff-return "<id>" --note "reclaiming at Orient — holder was <role>"`, repeating until `holder` reads `implementer` or the call refuses with "no open call". Never skip `references/verify-commit-and-iron-law.md` or `references/return-mechanics.md` — those apply at every lane. For every other lane, continue as written below, including opening its own reference file. Full mechanics: `references/worker-contract-and-orient.md`.
+`implementer`. Full mechanics: `references/worker-contract-and-orient.md`.
 
 ### Step 2: Implement
 Run `dispatch.mjs decide` first (per the Hard rule above) and branch on

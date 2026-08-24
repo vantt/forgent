@@ -19,6 +19,7 @@ import {
   abortMergeIfPossible,
   formatFgosWriteRejectedDetail,
   detectPostLandDrift,
+  performCatchUp,
   MergeError,
 } from '../../src/runner/merge.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
@@ -432,6 +433,90 @@ test('mergeRunnerItem merges cleanly, verify passes, and commits — outcome "me
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')));
   assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
+// tsk-3tp-1 (D2): the merge commit ITSELF sweeps up whatever is dirty under
+// `.fgos/events/` at merge time — no dedicated checkpoint commit needed for
+// the common case where a merge happens often enough to carry it along.
+test('mergeRunnerItem sweeps a dirty untracked .fgos/events/ shard file into its own merge commit', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const eventsDir = path.join(repoRoot, '.fgos', 'events');
+  fs.mkdirSync(eventsDir, { recursive: true });
+  const shardPath = path.join(eventsDir, 'writer-a-20260101T000000Z.jsonl');
+  fs.writeFileSync(shardPath, '{"id":"e1"}\n');
+
+  const headBefore = headOf(repoRoot);
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'merged');
+
+  // A merge commit has two parents — plain `diff-tree`/`diff-tree -r` prints
+  // nothing for one unless told which parent(s) to diff against; `-m` diffs
+  // against each parent in turn, same as `git show`'s own default for a
+  // merge commit.
+  const mergeCommitFiles = git(repoRoot, ['diff-tree', '--no-commit-id', '--name-only', '-r', '-m', headOf(repoRoot)]);
+  assert.match(
+    mergeCommitFiles,
+    /\.fgos\/events\/writer-a-20260101T000000Z\.jsonl/,
+    'the shard file must ride along inside the merge commit itself, not be left uncommitted',
+  );
+  assert.equal(isWorkingTreeClean(repoRoot), true, 'nothing should be left dirty after the sweep');
+  assert.notEqual(headOf(repoRoot), headBefore);
+
+  // Exactly one new commit landed — the merge commit itself — never a
+  // separate dedicated checkpoint commit riding alongside it.
+  // `--first-parent` walks only main's OWN lineage (never descending into
+  // the just-merged branch's pre-existing commit, which `headBefore..HEAD`
+  // alone would also include — that commit already existed before this
+  // call ran, so it is not "new" in the sense this assertion cares about):
+  // exactly one first-parent commit landing on main means the sweep really
+  // did ride the merge commit itself, never a separate commit alongside it.
+  const newCommitSubjects = git(repoRoot, ['log', '--first-parent', '--format=%s', `${headBefore}..HEAD`])
+    .trim()
+    .split('\n');
+  assert.equal(newCommitSubjects.length, 1, 'the sweep must ride the merge commit, never add a commit of its own');
+  assert.doesNotMatch(newCommitSubjects[0], /periodic events\.jsonl checkpoint|fallback events checkpoint/);
+});
+
+// tsk-3tp (fix, review r1): `.fgos` only ever exists under `lockRoot` — it is
+// stripped from every ephemeral worktree per ADR0020 (see
+// `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),
+// exactly the shape a leaf->parent approve or promote-engine merge passes in
+// (`lockRoot` set explicitly, distinct from the ephemeral `repoRoot` used as
+// the git-op cwd). Before this fix the sweep computed its pathspecs relative
+// to `repoRoot` and ran `git status`/`git add` with `cwd: repoRoot` — a
+// pathspec pointing at a sibling directory (`lockRoot`) that git refuses as
+// "outside repository", silently swallowed by the surrounding catch, so the
+// shard was never swept for this whole class of merges. Two separate real
+// repos stand in for the ephemeral worktree (`repoRoot`) and the real main
+// checkout (`lockRoot`), same shape as the "resolves the main-checkout lock
+// against lockRoot" test below.
+test('mergeRunnerItem sweeps a dirty .fgos/events/ shard under lockRoot (not repoRoot) into lockRoot\'s own index when lockRoot !== repoRoot', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const lockRoot = initRepo();
+  const eventsDir = path.join(lockRoot, '.fgos', 'events');
+  fs.mkdirSync(eventsDir, { recursive: true });
+  const shardPath = path.join(eventsDir, 'writer-a-20260101T000000Z.jsonl');
+  fs.writeFileSync(shardPath, '{"id":"e1"}\n');
+
+  const lockRootHeadBefore = headOf(lockRoot);
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }), { lockRoot });
+  assert.equal(result.outcome, 'merged');
+
+  const lockRootStatus = git(lockRoot, ['status', '--porcelain']);
+  assert.match(
+    lockRootStatus,
+    /^A\s+\.fgos\/events\/writer-a-20260101T000000Z\.jsonl$/m,
+    'the dirty shard living under lockRoot must be staged (git add) even though the merge commit itself lands in repoRoot',
+  );
+  assert.equal(
+    headOf(lockRoot),
+    lockRootHeadBefore,
+    'lockRoot itself must not gain a new commit from the sweep — only staged, ready to ride lockRoot\'s own next commit (e.g. the 1h fallback or a later root->main approve)',
+  );
 });
 
 test('mergeRunnerItem aborts cleanly on a real conflict — main left byte-for-byte unchanged, outcome "conflict"', async () => {
@@ -1442,6 +1527,230 @@ test('mergeRunnerItem merges normally when the branch touches ordinary files alo
   const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')));
+});
+
+// tsk-2xg: two-sided-drift-after-forced-restore shape deadlock regression test.
+// When a worker branch merges main then restores .fgos/* back to its own pre-merge
+// value to pass pre-commit hook checks, and main grows the log further before approve,
+// the merge=union attribute prevents fgos-write-rejected and preserves all lines.
+test('mergeRunnerItem resolves two-sided-drift-after-forced-restore cleanly via merge=union for diagnostic logs (tsk-2xg regression)', async () => {
+  const repoRoot = initRepo();
+  const repoGitattributes = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.gitattributes'));
+  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), repoGitattributes);
+
+  const logRelPath = path.join('.fgos', 'approve-post-success-faults.jsonl');
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  const baseContent = '{"ts":"2026-08-24T00:00:00.000Z","id":"base1"}\n{"ts":"2026-08-24T00:00:01.000Z","id":"base2"}\n';
+  fs.writeFileSync(path.join(repoRoot, logRelPath), baseContent);
+  git(repoRoot, ['add', '.gitattributes', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .gitattributes and fault log']);
+
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'worker code\n');
+
+  const mainGrowth1 = '{"ts":"2026-08-24T00:01:00.000Z","id":"main1"}\n';
+  fs.appendFileSync(path.join(repoRoot, logRelPath), mainGrowth1);
+  git(repoRoot, ['add', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main grows fault log 1']);
+
+  git(repoRoot, ['checkout', 'fgw/demo-item']);
+  git(repoRoot, ['merge', '-q', '--no-ff', 'main']);
+  fs.writeFileSync(path.join(repoRoot, logRelPath), baseContent);
+  git(repoRoot, ['add', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'worker restores .fgos per pre-commit hook rule']);
+  git(repoRoot, ['checkout', 'main']);
+
+  const mainGrowth2 = '{"ts":"2026-08-24T00:02:00.000Z","id":"main2"}\n';
+  fs.appendFileSync(path.join(repoRoot, logRelPath), mainGrowth2);
+  git(repoRoot, ['add', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main grows fault log 2']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'merged');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+
+  const finalContent = fs.readFileSync(path.join(repoRoot, logRelPath), 'utf8');
+  assert.ok(finalContent.includes('"id":"base1"'), 'base1 line must be preserved');
+  assert.ok(finalContent.includes('"id":"base2"'), 'base2 line must be preserved');
+  assert.ok(finalContent.includes('"id":"main1"'), 'main1 line must be preserved');
+  assert.ok(finalContent.includes('"id":"main2"'), 'main2 line must be preserved');
+});
+
+// tsk-4gi: a merge=union-covered `.fgos/*.jsonl` file where the worker
+// branch's OWN frozen copy genuinely diverges from main's (the worker wrote
+// its own event line that main never saw, while main independently grew the
+// same file with its own line) previously tripped fgos-write-rejected even
+// though `git merge` itself succeeded cleanly via the union driver — the
+// union result differs from main's own committed content, so the old
+// unconditional "any staged .fgos/ path is rejected" check fired on a
+// perfectly good, non-conflicting merge. Restoring the .fgos/ path to
+// target's own pre-merge (HEAD) content right after a successful merge, and
+// re-checking before rejecting, fixes this: main's own state must land
+// completely unaffected by the worker's stale/independent copy.
+test('mergeRunnerItem merges cleanly when a merge=union .fgos/ file genuinely diverges between branch and main (tsk-4gi regression)', async () => {
+  const repoRoot = initRepo();
+  const repoGitattributes = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.gitattributes'));
+  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), repoGitattributes);
+
+  // tsk-3tp-2 retired merge=union for the legacy single-file
+  // .fgos/events.jsonl (now a frozen post-sharding baseline, never
+  // actively grown) — use a diagnostic log that still genuinely carries
+  // merge=union instead, per the same rule tsk-2xg's own regression test
+  // above exercises.
+  const logRelPath = path.join('.fgos', 'approve-post-success-faults.jsonl');
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  const baseContent = '{"ts":"2026-08-24T00:00:00.000Z","id":"base"}\n';
+  fs.writeFileSync(path.join(repoRoot, logRelPath), baseContent);
+  git(repoRoot, ['add', '.gitattributes', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .gitattributes and diagnostic log']);
+
+  // Worker branch grows its own frozen copy with a line main never sees.
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  fs.writeFileSync(path.join(repoRoot, 'produced.txt'), 'ok\n');
+  git(repoRoot, ['add', 'produced.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'worker produces its own file']);
+  const workerLine = '{"ts":"2026-08-24T00:00:02.000Z","id":"worker-only"}\n';
+  fs.appendFileSync(path.join(repoRoot, logRelPath), workerLine);
+  git(repoRoot, ['add', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'worker grows its own frozen diagnostic log']);
+  git(repoRoot, ['checkout', 'main']);
+
+  // Main grows the same file independently under concurrent write load,
+  // BEFORE approve ever runs against the worker branch above.
+  const mainLine = '{"ts":"2026-08-24T00:00:03.000Z","id":"main-only"}\n';
+  fs.appendFileSync(path.join(repoRoot, logRelPath), mainLine);
+  git(repoRoot, ['add', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main grows diagnostic log independently']);
+  const mainOwnContent = fs.readFileSync(path.join(repoRoot, logRelPath), 'utf8');
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'merged');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
+
+  // The final .fgos/events.jsonl state must match main's own pre-merge
+  // content EXACTLY — not a union of both sides, and not the worker's
+  // stale copy either.
+  const finalContent = fs.readFileSync(path.join(repoRoot, logRelPath), 'utf8');
+  assert.equal(finalContent, mainOwnContent, 'target .fgos/ state must be exactly its own pre-merge version, unaffected by the worker branch');
+  assert.ok(!finalContent.includes('worker-only'), 'the worker branch\'s stale .fgos/ line must never land on main');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
+// tsk-4gi: a NON-union `.fgos/` path (e.g. `.fgos/config.json`, no
+// `merge=union` entry) that already exists on target's HEAD and gets edited
+// on non-overlapping lines by both the worker branch and target auto-merges
+// cleanly too (`git merge` never throws) -- the exact shape that would let
+// `git checkout HEAD -- <path>` silently discard a REAL, non-append-only
+// `.fgos/` write if the restore ran unconditionally for every staged
+// `.fgos/` path. This must still be refused: the restore-then-recheck this
+// fix adds only ever applies to a path `.gitattributes` actually declares
+// `merge=union` for (isMergeUnionPath) -- protection for everything else
+// must stay exactly as strong as before this fix.
+test('mergeRunnerItem still refuses a non-union .fgos/ path that auto-merges cleanly on non-overlapping lines (tsk-4gi: fix must not weaken this)', async () => {
+  const repoRoot = initRepo();
+  const configRelPath = path.join('.fgos', 'config.json');
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, configRelPath), 'line1\nline2\nline3\n');
+  git(repoRoot, ['add', configRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .fgos/config.json on main (no merge=union for this path)']);
+
+  // Worker branch edits the FIRST line only.
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  fs.writeFileSync(path.join(repoRoot, configRelPath), 'worker-line1\nline2\nline3\n');
+  git(repoRoot, ['add', configRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'worker edits .fgos/config.json line 1']);
+  git(repoRoot, ['checkout', 'main']);
+
+  // Main independently edits the LAST line -- a non-overlapping change, so
+  // git's default 3-way merge auto-resolves this without throwing.
+  fs.writeFileSync(path.join(repoRoot, configRelPath), 'line1\nline2\nmain-line3\n');
+  git(repoRoot, ['add', configRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main edits .fgos/config.json line 3']);
+  const headBefore = headOf(repoRoot);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem());
+  assert.equal(result.outcome, 'fgos-write-rejected');
+  assert.deepEqual(result.paths, [configRelPath.split(path.sep).join('/')]);
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
+  assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort');
+});
+
+// tsk-tr9: a worker branch (`fgw/<id>`) that at some point in its history
+// recorded a DELETION of a merge=union-covered `.fgos/` shard (e.g. a
+// prior manual `git rm --cached` recovery after some earlier, unrelated
+// conflict) raises a REAL git conflict — modify/delete, never auto-
+// resolved by the `merge=union` driver, which only ever resolves
+// modify/modify text conflicts — the moment the SAME session's own
+// subsequent event-append (an ordinary return/approve/catchup elsewhere)
+// grows that exact shard on the other side. Confirmed empirically before
+// this fix: `performCatchUp` returned `outcome: 'conflict'` and
+// `mergeRunnerItem` returned `outcome: 'conflict'` for byte-identical
+// repo states — a false conflict manufactured entirely by the calling
+// session's own writes to its own shard, not a real content dispute
+// (neither side has any legitimate claim over the OTHER's `.fgos/`
+// state — ADR0020). `resolveFgosOnlyConflict` (merge.mjs) now resolves it
+// automatically for both merge directions, so a stale branch like this
+// self-heals on its very next catch-up/approve instead of staying stuck
+// in the same manual-recovery loop every cycle.
+function seedStaleDeletedFgosBranch(repoRoot, shardRelPath) {
+  fs.mkdirSync(path.join(repoRoot, '.fgos', 'events'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, shardRelPath), '{"seq":1}\n');
+  const repoGitattributes = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.gitattributes'));
+  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), repoGitattributes);
+  git(repoRoot, ['add', '.gitattributes', shardRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .gitattributes and event shard']);
+
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  git(repoRoot, ['checkout', 'fgw/demo-item']);
+
+  // An earlier merge/catch-up already pulled main's `.fgos/` state onto
+  // this branch (mirrored directly here as the end-state a prior cycle
+  // would have produced, rather than re-driving that whole cycle).
+  fs.appendFileSync(path.join(repoRoot, shardRelPath), '{"seq":2}\n');
+  git(repoRoot, ['add', shardRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'earlier merge landed main state onto the branch']);
+
+  // The established manual workaround: a session hits some unrelated
+  // fgos-write-rejected/conflict and "fixes" it by stripping `.fgos` back
+  // out of the branch, then commits that deletion.
+  git(repoRoot, ['rm', '-r', '--cached', '--ignore-unmatch', '--', '.fgos']);
+  fs.rmSync(path.join(repoRoot, '.fgos'), { recursive: true, force: true });
+  git(repoRoot, ['commit', '-q', '-m', 'manual workaround: strip stray .fgos from worker branch']);
+
+  git(repoRoot, ['checkout', 'main']);
+
+  // The calling session's own subsequent event-append grows the SAME
+  // shard on main — the write that reopens the divergence.
+  fs.appendFileSync(path.join(repoRoot, shardRelPath), '{"seq":3}\n');
+  git(repoRoot, ['add', shardRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main grows its own shard further']);
+}
+
+test('performCatchUp resolves a stale deleted-.fgos-shard branch cleanly instead of a false modify/delete conflict (tsk-tr9 regression)', async () => {
+  const repoRoot = initRepo();
+  const shardRelPath = path.join('.fgos', 'events', 'writer-a-1000.jsonl');
+  seedStaleDeletedFgosBranch(repoRoot, shardRelPath);
+  const item = makeItem({ id: 'demo-item', verify: 'test -f produced.txt' });
+
+  const result = await performCatchUp(repoRoot, 'demo-item', item, 'main', null);
+  assert.equal(result.outcome, 'merged', 'catch-up must resolve the false .fgos conflict, not report a real one');
+});
+
+test('mergeRunnerItem resolves a stale deleted-.fgos-shard branch cleanly instead of a false modify/delete conflict (tsk-tr9 regression)', async () => {
+  const repoRoot = initRepo();
+  const shardRelPath = path.join('.fgos', 'events', 'writer-a-1000.jsonl');
+  seedStaleDeletedFgosBranch(repoRoot, shardRelPath);
+  const item = makeItem({ id: 'demo-item', verify: 'test -f produced.txt' });
+  const mainShardBefore = fs.readFileSync(path.join(repoRoot, shardRelPath), 'utf8');
+
+  const result = await mergeRunnerItem(repoRoot, item);
+  assert.equal(result.outcome, 'merged', 'approve must resolve the false .fgos conflict, not report a real one');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
+  assert.equal(
+    fs.readFileSync(path.join(repoRoot, shardRelPath), 'utf8'),
+    mainShardBefore,
+    'main\'s own .fgos state must land completely unaffected by the stale branch',
+  );
+  assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
 // --- withMergeEphemeralWorktree's CAS guard (tsk-46a) ---------------------

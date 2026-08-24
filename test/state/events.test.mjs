@@ -129,6 +129,26 @@ test('appendEvent stamps every new event with v: SCHEMA_VERSION, from the single
   assert.equal(JSON.parse(line).v, SCHEMA_VERSION);
 });
 
+test('appendEvent stamps every new event with a 16-hex h (content hash) and a src (writer id)', () => {
+  const logPath = tmpLogPath();
+  const event = appendEvent(logPath, { type: 'work.add', payload: { id: 'a' } });
+
+  assert.match(event.h, /^[0-9a-f]{16}$/);
+  assert.ok(event.src !== undefined && event.src !== null);
+
+  const [line] = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+  const onDisk = JSON.parse(line);
+  assert.equal(onDisk.h, event.h);
+  assert.equal(onDisk.src, event.src);
+});
+
+test('appendEvent produces a different h for two events with different content, and never reuses a prior h', () => {
+  const logPath = tmpLogPath();
+  const first = appendEvent(logPath, { type: 'work.add', payload: { id: 'a' } });
+  const second = appendEvent(logPath, { type: 'work.add', payload: { id: 'b' } });
+  assert.notEqual(first.h, second.h);
+});
+
 test('repairTruncatedLastLine repairs a log with only a truncated final line, and the log becomes readable again', () => {
   const logPath = tmpLogPath();
   appendEvent(logPath, { type: 'work.add', payload: { id: 'a' } });

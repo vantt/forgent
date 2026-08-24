@@ -153,17 +153,20 @@ test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is
   makeRunnerProposedItem(cwd, 'approve-fgos-only-dirty', { verify: 'test -f approve-fgos-only-dirty-produced.txt' });
   commitPendingBeforeApprove(cwd, 'approve-fgos-only-dirty');
 
-  // Dirty ONLY `.fgos/events.jsonl` on main after the item is proposed —
-  // an unrelated `add` appends an event and never touches any other file —
+  // Dirty ONLY the live event log on main after the item is proposed — an
+  // unrelated `add` appends an event and never touches any other file —
   // deliberately left uncommitted (unlike makeRunnerProposedItem's own
-  // commitPending calls, which fold everything together).
+  // commitPending calls, which fold everything together). Tầng A/T2
+  // (TA-D2/TA-D11): the new event lands in a per-writer file under
+  // `.fgos/events/<writer-id>-<openTs>.jsonl`, not baseline-0's
+  // `.fgos/events.jsonl` — same live-log noise, different physical path.
   assert.equal(addOk(cwd, 'approve-fgos-only-dirty-noise').status, 0);
 
   const statusLines = execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' })
     .split('\n')
     .filter(Boolean);
-  assert.equal(statusLines.length, 1, 'sanity: .fgos/events.jsonl must be the ONLY dirty path at this point');
-  assert.match(statusLines[0], /\.fgos\/events\.jsonl$/);
+  assert.equal(statusLines.length, 1, 'sanity: the live event log must be the ONLY dirty path at this point');
+  assert.match(statusLines[0], /\.fgos\/events(\.jsonl|\/.*\.jsonl)$/);
 
   const result = run(cwd, ['approve', 'approve-fgos-only-dirty']);
   assert.equal(result.status, 0, `approve should succeed with only .fgos/ dirty: ${result.stderr}`);

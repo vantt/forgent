@@ -1,12 +1,15 @@
-# tsk-3wq: .fgos/events.jsonl is a shared, append-only log that multiple
-# concurrent sessions/branches write to. Git's default line-based 3-way
-# merge treats two-sided end-of-file appends as a conflict; a hand-resolved
-# conflict on this file has already silently dropped real events at least
-# once (docs/history/live-events-seq-corruption/CONTEXT.md, tsk-n4i D1).
-# `union` is git's own built-in merge driver (no local config needed): it
-# keeps lines from both sides instead of leaving conflict markers, which is
-# exactly the right primitive for a provably append-only log. It does not
-# guarantee order or dedupe/reseq the result — see
-# scripts/events-jsonl-contiguity.mjs and the `events-jsonl-contiguous`
-# fgos doctor check for that half.
-.fgos/events.jsonl merge=union
+# tsk-2xg: append-only diagnostic logs written by fgos tools. Git's default
+# line-based 3-way merge causes fgos-write-rejected deadlocks when worker
+# branches catch up with main and revert .fgos/* per pre-commit hook rules.
+# `union` keeps lines from both sides and prevents false staged diffs.
+.fgos/approve-post-success-faults.jsonl merge=union
+.fgos/invocation-faults.jsonl merge=union
+.fgos/main-checkout-guard-warnings.jsonl merge=union
+
+# tsk-1wk: tsk-3ve's per-writer sharded event log (.fgos/events/<writer-id>-
+# <openTs>.jsonl) is append-only exactly like the old single-file
+# .fgos/events.jsonl above, but wasn't covered by that same union-merge
+# rule — every session's own live shard hit the identical append-conflict
+# problem tsk-3wq/tsk-2xg already solved for the old layout.
+.fgos/events/*.jsonl merge=union
+

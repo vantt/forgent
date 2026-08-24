@@ -12,6 +12,7 @@ import {
   checkEventsJsonlTruncationGuard,
   advanceEventsJsonlTruncationGuard,
   runOpportunisticMainCheckoutChecks,
+  getUncommittedEventCount,
 } from "../../src/state/events-jsonl-truncation-guard.mjs";
 import { recordMainCheckoutGuardWarning, MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME } from "../../src/state/main-checkout-guard-warnings.mjs";
 
@@ -129,7 +130,7 @@ test("checkTruncationGuard flags mark-seq-missing when the mark's own seq no lon
 test("readGuardMark returns null when the sidecar does not exist yet (bootstrap, not a crash)", () => {
   const dir = mkTempDir("truncguard-read-missing-");
   const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
-  assert.equal(readGuardMark(guardPath), null);
+  assert.equal(readGuardMark(guardPath, "events.jsonl"), null);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -137,15 +138,15 @@ test("readGuardMark returns null on a corrupt sidecar (never throws)", () => {
   const dir = mkTempDir("truncguard-read-corrupt-");
   const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
   fs.writeFileSync(guardPath, "not json at all", "utf8");
-  assert.equal(readGuardMark(guardPath), null);
+  assert.equal(readGuardMark(guardPath, "events.jsonl"), null);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
 test("writeGuardMark then readGuardMark round-trips the mark", () => {
   const dir = mkTempDir("truncguard-roundtrip-");
   const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
-  writeGuardMark(guardPath, { seq: 42, hash: "abc123" });
-  const read = readGuardMark(guardPath);
+  writeGuardMark(guardPath, "events.jsonl", { seq: 42, hash: "abc123" });
+  const read = readGuardMark(guardPath, "events.jsonl");
   assert.deepEqual(read, { seq: 42, hash: "abc123" });
   fs.rmSync(dir, { recursive: true, force: true });
 });
@@ -172,12 +173,12 @@ test("advanceEventsJsonlTruncationGuard writes the mark forward on a clean pass"
 
   const first = advanceEventsJsonlTruncationGuard(logPath, guardPath);
   assert.equal(first.ok, true);
-  assert.equal(readGuardMark(guardPath).seq, 1);
+  assert.equal(readGuardMark(guardPath, "events.jsonl").seq, 1);
 
   fs.appendFileSync(logPath, `${ev(2, "2026-01-01T00:00:01.000Z", "b")}\n`);
   const second = advanceEventsJsonlTruncationGuard(logPath, guardPath);
   assert.equal(second.ok, true);
-  assert.equal(readGuardMark(guardPath).seq, 2, "mark advances forward on every clean check");
+  assert.equal(readGuardMark(guardPath, "events.jsonl").seq, 2, "mark advances forward on every clean check");
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -187,13 +188,13 @@ test("advanceEventsJsonlTruncationGuard never advances the mark on a break — t
   const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
   fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
   advanceEventsJsonlTruncationGuard(logPath, guardPath);
-  assert.equal(readGuardMark(guardPath).seq, 2);
+  assert.equal(readGuardMark(guardPath, "events.jsonl").seq, 2);
 
   // Simulate a truncation: rewrite the file back to just line 1.
   fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a")]), "utf8");
   const result = advanceEventsJsonlTruncationGuard(logPath, guardPath);
   assert.equal(result.ok, false);
-  assert.equal(readGuardMark(guardPath).seq, 2, "mark must not move on a break");
+  assert.equal(readGuardMark(guardPath, "events.jsonl").seq, 2, "mark must not move on a break");
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -255,20 +256,20 @@ test("runOpportunisticMainCheckoutChecks D2: commits stale-and-dirty events.json
   // Append new uncommitted event
   fs.appendFileSync(logPath, `${ev(2, "2026-01-01T00:01:00.000Z", "append")}\n`);
 
-  // Run check with gap < 900s (e.g. at commitTime + 100s) -> should NOT commit
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 100, intervalSec: 900, eventThreshold: 50 });
+  // Run check with gap < 3600s (e.g. at commitTime + 100s) -> should NOT commit
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 100, fallbackIntervalSec: 3600 });
   let logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
   assert.equal(logOut, "init events", "must not commit when gap is under threshold");
 
-  // Run check with gap >= 900s (e.g. at commitTime + 1000s) -> SHOULD commit
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 1000, intervalSec: 900, eventThreshold: 50 });
+  // Run check with gap >= 3600s (e.g. at commitTime + 4000s) -> SHOULD commit
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 4000, fallbackIntervalSec: 3600 });
   logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
-  assert.equal(logOut, "chore(.fgos): periodic events.jsonl checkpoint", "must commit periodic checkpoint when stale and dirty");
+  assert.equal(logOut, "chore(.fgos): fallback events checkpoint", "must commit fallback checkpoint when stale and dirty");
 
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
-test("runOpportunisticMainCheckoutChecks D1: refuses periodic auto-commit when an unacknowledged truncation break is flagged", () => {
+test("runOpportunisticMainCheckoutChecks D1: refuses fallback auto-commit when an unacknowledged truncation break is flagged", () => {
   const repoRoot = mkTempDir("truncguard-d1-refuse-test-");
   execFileSync("git", ["init", "-q"], { cwd: repoRoot });
   execFileSync("git", ["config", "user.email", "test@example.com"], { cwd: repoRoot });
@@ -290,60 +291,24 @@ test("runOpportunisticMainCheckoutChecks D1: refuses periodic auto-commit when a
   // Set initial mark at seq 2
   advanceEventsJsonlTruncationGuard(logPath, guardPath);
 
-  // Truncate file back to seq 1 and add uncommitted events so time & event count thresholds are exceeded
+  // Truncate file back to seq 1 and add uncommitted events
   const regressedLines = [ev(1, "2026-01-01T00:00:00.000Z", "a")];
   for (let i = 2; i <= 20; i++) {
     regressedLines.push(ev(i, "2026-01-01T00:00:02.000Z", `new-${i}`));
   }
   fs.writeFileSync(logPath, raw(regressedLines), "utf8");
 
-  // Run opportunistic checks with event threshold 5 and interval 100s
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 1000, intervalSec: 100, eventThreshold: 5 });
+  // Run opportunistic checks with fallbackIntervalSec 100s
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 1000, fallbackIntervalSec: 100 });
 
-  // Verify: auto-commit MUST be refused despite thresholds met, because break was flagged
+  // Verify: auto-commit MUST be refused despite time threshold met, because break was flagged
   const logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
-  assert.equal(logOut, "init events", "must refuse periodic auto-commit when truncation break is flagged");
+  assert.equal(logOut, "init events", "must refuse fallback auto-commit when truncation break is flagged");
 
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
-test("runOpportunisticMainCheckoutChecks D2: commits events.jsonl when event-count threshold is reached", () => {
-  const repoRoot = mkTempDir("truncguard-d2-eventcount-test-");
-  execFileSync("git", ["init", "-q"], { cwd: repoRoot });
-  execFileSync("git", ["config", "user.email", "test@example.com"], { cwd: repoRoot });
-  execFileSync("git", ["config", "user.name", "Test"], { cwd: repoRoot });
-
-  const fgosDir = path.join(repoRoot, ".fgos");
-  fs.mkdirSync(fgosDir, { recursive: true });
-  const logPath = path.join(fgosDir, "events.jsonl");
-
-  const commitTime = 1000000;
-  fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "init")]), "utf8");
-  execFileSync("git", ["add", ".fgos/events.jsonl"], { cwd: repoRoot });
-  execFileSync("git", ["commit", "-q", "-m", "init events"], {
-    cwd: repoRoot,
-    env: { ...process.env, GIT_AUTHOR_DATE: `@${commitTime} +0000`, GIT_COMMITTER_DATE: `@${commitTime} +0000` },
-  });
-
-  // Append 2 events (under threshold 5) -> should not commit
-  fs.appendFileSync(logPath, `${ev(2, "2026-01-01T00:01:00.000Z", "e2")}\n${ev(3, "2026-01-01T00:01:01.000Z", "e3")}\n`);
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 10, intervalSec: 900, eventThreshold: 5 });
-  let logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
-  assert.equal(logOut, "init events", "must not commit when uncommitted event count is under threshold");
-
-  // Append 3 more events (total 5 uncommitted events) -> SHOULD commit
-  fs.appendFileSync(
-    logPath,
-    `${ev(4, "2026-01-01T00:01:02.000Z", "e4")}\n${ev(5, "2026-01-01T00:01:03.000Z", "e5")}\n${ev(6, "2026-01-01T00:01:04.000Z", "e6")}\n`
-  );
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 20, intervalSec: 900, eventThreshold: 5 });
-  logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
-  assert.equal(logOut, "chore(.fgos): periodic events.jsonl checkpoint", "must commit when uncommitted event count meets threshold");
-
-  fs.rmSync(repoRoot, { recursive: true, force: true });
-});
-
-test("runOpportunisticMainCheckoutChecks D2: reads eventThreshold from .fgos/config.json", () => {
+test("runOpportunisticMainCheckoutChecks D2: reads fallbackIntervalSec from .fgos/config.json", () => {
   const repoRoot = mkTempDir("truncguard-d2-config-test-");
   execFileSync("git", ["init", "-q"], { cwd: repoRoot });
   execFileSync("git", ["config", "user.email", "test@example.com"], { cwd: repoRoot });
@@ -354,8 +319,8 @@ test("runOpportunisticMainCheckoutChecks D2: reads eventThreshold from .fgos/con
   const logPath = path.join(fgosDir, "events.jsonl");
   const configPath = path.join(fgosDir, "config.json");
 
-  // Write .fgos/config.json with checkpoint eventThreshold: 3
-  fs.writeFileSync(configPath, JSON.stringify({ checkpoint: { eventThreshold: 3 } }), "utf8");
+  // Write .fgos/config.json with checkpoint fallbackIntervalSec: 500
+  fs.writeFileSync(configPath, JSON.stringify({ checkpoint: { fallbackIntervalSec: 500 } }), "utf8");
 
   const commitTime = 1000000;
   fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "init")]), "utf8");
@@ -365,17 +330,157 @@ test("runOpportunisticMainCheckoutChecks D2: reads eventThreshold from .fgos/con
     env: { ...process.env, GIT_AUTHOR_DATE: `@${commitTime} +0000`, GIT_COMMITTER_DATE: `@${commitTime} +0000` },
   });
 
-  // Append 3 uncommitted events
-  fs.appendFileSync(
-    logPath,
-    `${ev(2, "2026-01-01T00:01:00.000Z", "e2")}\n${ev(3, "2026-01-01T00:01:01.000Z", "e3")}\n${ev(4, "2026-01-01T00:01:02.000Z", "e4")}\n`
-  );
+  // Append 1 uncommitted event
+  fs.appendFileSync(logPath, `${ev(2, "2026-01-01T00:01:00.000Z", "e2")}\n`);
 
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 10, intervalSec: 900 });
-  const logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
-  assert.equal(logOut, "chore(.fgos): periodic events.jsonl checkpoint", "must commit based on eventThreshold configured in .fgos/config.json");
+  // Time gap 100s < 500s -> should NOT commit
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 100 });
+  let logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
+  assert.equal(logOut, "init events");
+
+  // Time gap 600s >= 500s -> SHOULD commit
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 600 });
+  logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
+  assert.equal(logOut, "chore(.fgos): fallback events checkpoint", "must commit based on fallbackIntervalSec configured in .fgos/config.json");
 
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
 
+
+// --- Tầng A/T5: multi-file guard mark map + directory scanning (TA-D10) ----
+
+test("the sidecar map holds independent marks per file — advancing one file's mark never touches another's", () => {
+  const dir = mkTempDir("truncguard-multi-mark-");
+  const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
+  writeGuardMark(guardPath, "events.jsonl", { seq: 1, hash: "aaa" });
+  writeGuardMark(guardPath, "events/writer-a-1.jsonl", { seq: 7, hash: "bbb" });
+
+  assert.deepEqual(readGuardMark(guardPath, "events.jsonl"), { seq: 1, hash: "aaa" });
+  assert.deepEqual(readGuardMark(guardPath, "events/writer-a-1.jsonl"), { seq: 7, hash: "bbb" });
+
+  writeGuardMark(guardPath, "events.jsonl", { seq: 2, hash: "ccc" });
+  assert.deepEqual(readGuardMark(guardPath, "events.jsonl"), { seq: 2, hash: "ccc" }, "events.jsonl's own mark advanced");
+  assert.deepEqual(readGuardMark(guardPath, "events/writer-a-1.jsonl"), { seq: 7, hash: "bbb" }, "writer-a's own mark is untouched");
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("runOpportunisticMainCheckoutChecks D1 detects and warns on a truncation break in a PER-WRITER file under .fgos/events/, not just baseline-0", () => {
+  const repoRoot = mkTempDir("truncguard-multi-d1-");
+  const fgosDir = path.join(repoRoot, ".fgos");
+  const eventsDir = path.join(fgosDir, "events");
+  fs.mkdirSync(eventsDir, { recursive: true });
+  const writerLogPath = path.join(eventsDir, "writer-a-1.jsonl");
+  const guardPath = path.join(fgosDir, "events-jsonl.truncation-guard.json");
+  const warnPath = path.join(fgosDir, MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
+
+  fs.writeFileSync(writerLogPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot); // bootstraps the mark for writer-a-1.jsonl
+
+  // Truncate the WRITER file (not baseline) back to seq 1.
+  fs.writeFileSync(writerLogPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a")]), "utf8");
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot);
+
+  assert.equal(fs.existsSync(warnPath), true, "warning log must be written for a per-writer-file break");
+  const warnContent = fs.readFileSync(warnPath, "utf8");
+  assert.match(warnContent, /regressed/);
+  assert.match(warnContent, /events\/writer-a-1\.jsonl/, "the warning must identify WHICH file broke");
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test("getUncommittedEventCount sums uncommitted lines across baseline-0 AND every per-writer file under .fgos/events/", () => {
+  const repoRoot = mkTempDir("truncguard-uncommitted-multi-");
+  execFileSync("git", ["init", "-q"], { cwd: repoRoot });
+  execFileSync("git", ["config", "user.email", "test@example.com"], { cwd: repoRoot });
+  execFileSync("git", ["config", "user.name", "Test"], { cwd: repoRoot });
+
+  const fgosDir = path.join(repoRoot, ".fgos");
+  const eventsDir = path.join(fgosDir, "events");
+  fs.mkdirSync(eventsDir, { recursive: true });
+  const baselinePath = path.join(fgosDir, "events.jsonl");
+  const writerPath = path.join(eventsDir, "writer-a-1.jsonl");
+
+  fs.writeFileSync(baselinePath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a")]), "utf8");
+  fs.writeFileSync(writerPath, raw([ev(1, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
+  execFileSync("git", ["add", ".fgos"], { cwd: repoRoot });
+  execFileSync("git", ["commit", "-q", "-m", "init"], { cwd: repoRoot });
+
+  // 2 more uncommitted lines in baseline, 1 more in the writer file -> 3 total.
+  fs.appendFileSync(baselinePath, `${ev(2, "2026-01-01T00:00:02.000Z", "c")}\n${ev(3, "2026-01-01T00:00:03.000Z", "d")}\n`);
+  fs.appendFileSync(writerPath, `${ev(2, "2026-01-01T00:00:04.000Z", "e")}\n`);
+
+  assert.equal(getUncommittedEventCount(fgosDir, repoRoot), 3);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test("runOpportunisticMainCheckoutChecks D2 checkpoints BOTH baseline-0 and .fgos/events/ together when the fallback interval is met", () => {
+  const repoRoot = mkTempDir("truncguard-multi-d2-");
+  execFileSync("git", ["init", "-q"], { cwd: repoRoot });
+  execFileSync("git", ["config", "user.email", "test@example.com"], { cwd: repoRoot });
+  execFileSync("git", ["config", "user.name", "Test"], { cwd: repoRoot });
+
+  const fgosDir = path.join(repoRoot, ".fgos");
+  const eventsDir = path.join(fgosDir, "events");
+  fs.mkdirSync(eventsDir, { recursive: true });
+  const baselinePath = path.join(fgosDir, "events.jsonl");
+  const writerPath = path.join(eventsDir, "writer-a-1.jsonl");
+
+  const commitTime = 1000000;
+  fs.writeFileSync(baselinePath, raw([ev(1, "2026-01-01T00:00:00.000Z", "init")]), "utf8");
+  fs.writeFileSync(writerPath, raw([ev(1, "2026-01-01T00:00:01.000Z", "init-writer")]), "utf8");
+  execFileSync("git", ["add", ".fgos"], { cwd: repoRoot });
+  execFileSync("git", ["commit", "-q", "-m", "init events"], {
+    cwd: repoRoot,
+    env: { ...process.env, GIT_AUTHOR_DATE: `@${commitTime} +0000`, GIT_COMMITTER_DATE: `@${commitTime} +0000` },
+  });
+
+  // 3 uncommitted new lines in the writer file only
+  fs.appendFileSync(
+    writerPath,
+    `${ev(2, "2026-01-01T00:01:00.000Z", "e2")}\n${ev(3, "2026-01-01T00:01:01.000Z", "e3")}\n${ev(4, "2026-01-01T00:01:02.000Z", "e4")}\n`,
+  );
+
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 4000, fallbackIntervalSec: 3600 });
+  const logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
+  assert.equal(logOut, "chore(.fgos): fallback events checkpoint", "must commit when fallback interval is met");
+
+  const statusOut = execFileSync("git", ["status", "--porcelain", "--", ".fgos/events.jsonl", ".fgos/events"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  }).trim();
+  assert.equal(statusOut, "", "the writer file's new lines must actually be committed, not left dirty");
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test("FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 opts out of opportunistic checks completely", () => {
+  const repoRoot = mkTempDir("truncguard-optout-");
+  execFileSync("git", ["init", "-q"], { cwd: repoRoot });
+  execFileSync("git", ["config", "user.email", "test@example.com"], { cwd: repoRoot });
+  execFileSync("git", ["config", "user.name", "Test"], { cwd: repoRoot });
+
+  const fgosDir = path.join(repoRoot, ".fgos");
+  fs.mkdirSync(fgosDir, { recursive: true });
+  const logPath = path.join(fgosDir, "events.jsonl");
+
+  const commitTime = 1000000;
+  fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "init")]), "utf8");
+  execFileSync("git", ["add", ".fgos/events.jsonl"], { cwd: repoRoot });
+  execFileSync("git", ["commit", "-q", "-m", "init events"], {
+    cwd: repoRoot,
+    env: { ...process.env, GIT_AUTHOR_DATE: `@${commitTime} +0000`, GIT_COMMITTER_DATE: `@${commitTime} +0000` },
+  });
+
+  fs.appendFileSync(logPath, `${ev(2, "2026-01-01T00:01:00.000Z", "e2")}\n`);
+
+  const prevEnv = process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
+  try {
+    process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS = "1";
+    runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 4000, fallbackIntervalSec: 3600 });
+    const logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
+    assert.equal(logOut, "init events", "must not commit when FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 is set");
+  } finally {
+    if (prevEnv === undefined) delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
+    else process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS = prevEnv;
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
