@@ -2,7 +2,7 @@
 type: explanation
 title: Why concurrency tests batch processes instead of relying on a fixed lock timeout
 tags: [testing, concurrency, flake, events-lock, contention]
-source_capture_ids: [tsk-4fx]
+source_capture_ids: [tsk-4fx, tsk-2va]
 authoritative_for: why fgOS's concurrency tests batch spawned processes to reduce peak events.lock contention instead of scaling the lock-timeout budget
 ---
 # Why concurrency tests batch processes instead of relying on a fixed lock timeout
@@ -54,3 +54,19 @@ still genuinely races multiple processes against the same lock) while
 keeping the race itself inside the timeout the lock is supposed to work
 under in normal operation — the same target the fix intends production
 code to actually meet.
+
+## Follow-up: the task id itself didn't belong in the comments (`tsk-2va`)
+
+`tsk-4fx`'s own merged commit left the literal string `"tsk-4fx"` inline
+in four code-comment lines across the two affected test files (two
+doc-comments describing the new `batchSize` param, two call-site
+comments explaining why the flaky sites use `4`). That violates this
+repo's own stable-code-artifacts rule: a plan/finding id in a code
+comment rots as the codebase evolves, and the invariant should be
+explained directly rather than pointed at by label — the item itself
+already carries the full rationale. **Fix**: reword all four comments to
+explain the invariant directly (why `batchSize` exists, why these
+specific call sites use `4`) without citing the task id. The
+`docs/history/tsk-4fx-.../RESEARCH.md` path references in the same
+comments were kept — a real, permanent doc path is not the same class of
+artifact as a bare task-id label.
