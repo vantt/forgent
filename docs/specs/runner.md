@@ -1127,6 +1127,12 @@ Lớp state cần một "máy" thật để vòng recovery và anti-loop đượ
 thật**, không phải bảng chính sách treo. Đây cũng là bước đầu của hướng nhiều-agent
 chạy song song. Đồ bảo hộ phải có máy để bảo vệ.
 
+Mối đe dọa thực tế đối với worker trong fgOS không phải là worker cố ý gian lận (adversarial swarm worker), mà là worker drift không cố ý. Hai bằng chứng thực tế đã ghi nhận trong repo:
+1. Lỗi `agy` cwd (`docs/history/agy-cwd-fidelity/RESEARCH.md`): tiến trình executor chạy với `cwd` đúng nhưng agent tự nhảy sang worktree của item khác (`fgw/tsk-1lv`), thoát thành công và báo xanh dù kết quả hoàn toàn sai.
+2. Fanout worktree race (`.agents/skills/fgos-fanout/SKILL.md` dòng 159-166): trạng thái cô lập worktree ở session level bị clobber bởi sibling dispatched agents, khiến working directory của session điều phối trôi sang worktree sibling mid-run.
+
+Ngoài ra, giả định "luôn có con người review trước khi merge" không phản ánh đúng vận hành thực tế — fgOS ưu tiên #2 "Release con người" (`docs/specs/runner.md`) với các vòng tự-duyệt batch tự động (`/fgOS:merge-loop`, `/fgOS:cleanup-loop`). Do đó, `verify` của item do RUNNER tự re-verify độc lập là bắt buộc để phát hiện worker drift trước khi auto-merge.
+
 #### Quyết định
 
 - **Runner tối thiểu, vòng lặp thật:** đọc frontier → lấy một việc → dispatch →
@@ -1153,6 +1159,7 @@ chạy song song. Đồ bảo hộ phải có máy để bảo vệ.
 - **Recovery/anti-loop là hành vi được test,** không phải lời hứa trên giấy.
 - **Cost-tiered delegation** ngay từ vòng dispatch.
 - **Single-writer bảo toàn:** một cửa ghi trong lúc chạy tự động → không tranh ghi.
+- **Bảo vệ trước worker drift không cố ý:** độc lập re-verify `verify` ngăn chặn sai sót lọt qua các vòng batch unattended merge (`/fgOS:merge-loop`, `/fgOS:cleanup-loop`) mà không đòi hỏi con người ngồi canh từng item.
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
