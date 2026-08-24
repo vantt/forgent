@@ -155,15 +155,28 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
       // here (unlike the named branches above) -- this guard's whole
       // point is to catch whatever this call site doesn't already
       // handle by name, today and for any outcome added later.
+      // tsk-3tv: thread result.error (when present, e.g. merge-failed-unclassified)
+      // into both friction detail and the CLI response object.
+      const errText = result.error
+        ? ` (exit ${result.error.status}): ${result.error.stderr || result.error.message}`
+        : '';
       addFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: 'sync-root-unhandled-outcome',
         layer: 'state',
         attempts: 1,
-        detail: `sync-root: mergeRunnerItem returned unrecognized outcome "${result.outcome}" for ${branch} into ${targetBranch} — refusing to report success`,
+        detail: `sync-root: mergeRunnerItem returned unrecognized outcome "${result.outcome}" for ${branch} into ${targetBranch}${errText} — refusing to report success`,
       });
-      return { id, mode: 'sync-root', outcome: 'blocked', reason: result.outcome, target: targetBranch, branch };
+      return {
+        id,
+        mode: 'sync-root',
+        outcome: 'blocked',
+        reason: result.outcome,
+        target: targetBranch,
+        branch,
+        ...(result.error ? { error: result.error } : {}),
+      };
     }
 
     // Success — status/stage of `id` is deliberately UNTOUCHED (the

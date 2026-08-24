@@ -3,9 +3,15 @@
 // Harness spawnSync thật, không mock chính process CLI.
 //
 // tsk-67g: 10 test dựng môi trường thật cho `fgos setup` đã dọn sang các file
-// checks-setup-*.test.mjs bên cạnh -- chúng chiếm 117.6s trong 120s của file
-// này và một mình quyết định wall-clock của cả bộ test. Phần ở lại đây chạy
-// hết trong khoảng 2.5s.
+// checks-setup-*.test.mjs bên cạnh.
+//
+// tsk-25b: main đã thêm nhiều check mới (root-drift, leaf-notify-drift,
+// events-jsonl-*, work-*-vocabulary, domain-workflow-skillmap-coverage,
+// enduser-docs-index-stale, decision-index-stale, ...) từ sau lần chẻ đầu,
+// khiến file này lại vượt ngưỡng ~30s. Phần drift/vocabulary/index-staleness
+// của chính work-item store ở lại đây; phần config/CLI-wiring/doctor runtime
+// tách sang checks-doctor-config.test.mjs cạnh đó -- cùng D2 (chẻ cơ học,
+// mỗi file dưới ~30s) tsk-3um/tsk-67g đã áp dụng.
 import { test } from 'node:test';
 import {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,
@@ -19,13 +25,11 @@ import {
   FGOS,
   FIX_REGISTRATIONS,
   NO_CLAUDE_ENV,
-  __dirname,
   addWork,
   appendEvent,
   assert,
   checkById,
   execFileSync,
-  fileURLToPath,
   fixById,
   fs,
   initRepo,
@@ -33,7 +37,6 @@ import {
   integrationScriptPath,
   mainCheckoutHookWired,
   mkTemp,
-  os,
   path,
   resolveMainCheckout,
   spawnSync,
@@ -45,8 +48,6 @@ import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
 import { addDecision } from '../../src/state/store.mjs';
-
-
 import { createSession } from '../../src/runner/session.mjs';
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
