@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: Why `checkMergeStillResolves` can false-positive after a root branch prune
-source_capture_ids: [tsk-psb, tsk-2q8]
+source_capture_ids: [tsk-psb, tsk-2q8, tsk-597z]
 ---
 # Why `checkMergeStillResolves` can false-positive after a root branch prune
 
@@ -272,3 +272,32 @@ named but did not close: no sweep or audit revisits `status: blocked`
 items with a merge-related `system-error` park to see whether a since-landed
 fix now clears them — a fixed false-positive shape can still leave old
 victims stranded indefinitely, discoverable only by manual investigation.
+
+## The recheck sweep, split off as its own item (`tsk-597z`)
+
+Split off from `tsk-2q8` (per its own exploring D2). **Report-only,
+never auto-transitioning**, on purpose — four named risks ruled out
+auto-transition for now: (1) keying the trigger on the free-text
+`detail` string would be fragile, since that string has already been
+independently rewritten by several other fixes in turn; a structured
+marker would be needed, not string-matching; (2) wiring auto-transition
+into the runner's ~5s poll cycle against a transiently-resolvable git ref
+risks a flap loop; (3) a check-then-transition window races concurrent
+rebases/prunes on the shared main checkout (TOCTOU); (4) no persistent
+`--watch` daemon runs in this repo's normal day-to-day usage today
+(sessions call `fgos` per-command), so an auto-transition wired only into
+a single poll cycle wouldn't even fire reliably in practice yet.
+
+**Delivered**: `fgos recheck-blocked`, a report-only sweep listing which
+currently-`blocked` items would now pass their own park-causing check if
+it were re-run today — surfacing exactly the `tsk-4n7` shape (a
+now-resolved false positive) for a person to act on, without the engine
+ever transitioning anything on its own.
+
+**Explicitly does not fix `tsk-2q8`'s own repro.** The rebased-root-branch
+case (`tsk-2sr`) has a *permanently* unreachable recorded sha — re-running
+the same ancestry check on it fails forever, no matter how many times it
+reruns. This sweep only helps the `tsk-4n7` shape, where the underlying
+check later became true again for an unrelated reason (a `sync-root`
+elsewhere re-establishing real ancestry) — a genuinely different failure
+mode from a rebase that permanently orphans the original sha.
