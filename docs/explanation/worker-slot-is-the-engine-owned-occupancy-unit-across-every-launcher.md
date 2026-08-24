@@ -2,7 +2,7 @@
 type: explanation
 title: Worker slot is the engine-owned occupancy unit across every launcher
 tags: [worker-slot, occupancy, herdr-plugin, fgos-runner, fgos-fanout, ceiling]
-source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk, tsk-1oz, tsk-qrs, tsk-nwz]
+source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk, tsk-1oz, tsk-qrs, tsk-nwz, tsk-37t]
 authoritative_for: worker slot concept and engine-wide worker occupancy ceiling shared by herdr-plugin, fgos-runner, fgos-fanout
 ---
 # Worker slot is the engine-owned occupancy unit across every launcher
@@ -419,6 +419,39 @@ its `.agents` mirror (kept byte-identical by `test/skills/fgos-mirror.test.mjs`)
 and the batch in that case is `min(5, batch.length)`, matching
 `hasWorkerSlotRoom`'s own `granted` contract instead of a field that was
 never meant to answer this question in the unarmed state.
+
+## Two more engine gaps: stuck-past-ceiling reclaim, and a phantom report id (`tsk-37t`)
+
+Found by a review pass after `tsk-2sj`, distinct from — and uncovered
+by — the `tsk-1oz`/`tsk-qrs` fixes above:
+
+- **The `excludeId` escape hatch stops working exactly when it is
+  needed.** `worker-slots.mjs` documents `excludeId` as the reason a
+  stale item sitting at the ceiling isn't permanently unreclaimable —
+  true at `occupied == ceiling`, but not past it: with a ceiling of 8 and
+  12 items at `doing`, excluding the target still leaves 11, `free`
+  clamps to zero, and the claim is refused. `claim-port.mjs`'s ceiling
+  gate runs *before* the stale-reclaim block, so the reclaim path is
+  unreachable precisely when a person is trying to clear the stale
+  claims that wedged the lane in the first place — the only way out was
+  hand-editing config. `tsk-1oz`'s own `ceiling: null` fix means this
+  can't bite a *fresh* repo, but it still bites any repo that armed a
+  real ceiling and later drifted past it, whether by lowering the number
+  or by accumulating abandoned claims. **Fix**: the ceiling gate now
+  exempts stale-claim reclaims specifically, rather than applying
+  uniformly regardless of whether occupancy is at, below, or already
+  past the ceiling.
+- **`fgos report` accepted an id that doesn't exist.** It exited zero
+  with a success envelope and wrote a decision record that `fgos show`
+  can then never retrieve, since `show` itself refuses an unknown id.
+  `addDecision` validated `text`/`rationale` but never that the work item
+  actually existed — every neighboring id-taking verb validates first.
+  This mattered little while `report` was typed by hand; it matters now
+  that `fgos-coding-driving` calls it automatically at every stop (the
+  closing-report convention this same driving loop follows on every
+  stop, including this one) — a wrong id in prose now silently loses the
+  closing report with no error. **Fix**: `addDecision` now validates the
+  work item exists before writing, matching its neighboring verbs.
 
 ## Related
 
