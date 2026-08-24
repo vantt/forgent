@@ -2,7 +2,7 @@
 type: explanation
 title: Why dispatch.mjs was redesigned around task, not agent capacity
 tags: [dispatch, executor, capacity, task-dispatch-unification]
-source_capture_ids: [tsk-5tm-1]
+source_capture_ids: [tsk-5tm-1, tsk-5tm-2]
 authoritative_for: why src/runner/dispatch.mjs's capacity/executor layer was redesigned around "task" as the unifying concept, and the 12 locked decisions behind that redesign
 ---
 # Why `dispatch.mjs` was redesigned around "task," not agent capacity
@@ -46,7 +46,9 @@ from both `capacities.<id>` config shape and the dispatch gate itself.
   the only cross-provider (agy/Gemini) dispatch path with no remaining
   architectural reason to exist — its own originating item's plan.md had
   literally recorded "not decided" for why it needed to stay, and the
-  parallelization reason it once served is now met natively.
+  parallelization reason it once served is now met natively. Landed
+  (`tsk-5tm-2`): the capacity entry, its tool-registry entry, and every
+  dead reference to it were removed together.
 - **D7 — defer writing the dispatch contract into `AGENTS.md`** until D5
   (`execute`) and its `--work` CLI flag actually ship. `AGENTS.md` is
   always-loaded context; documenting a command before it exists would
