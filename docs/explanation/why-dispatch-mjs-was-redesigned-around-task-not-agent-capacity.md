@@ -2,7 +2,7 @@
 type: explanation
 title: Why dispatch.mjs was redesigned around task, not agent capacity
 tags: [dispatch, executor, capacity, task-dispatch-unification]
-source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5, tsk-5tm-6, tsk-2y4, tsk-5tm, tsk-5er, tsk-1qn]
+source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5, tsk-5tm-6, tsk-2y4, tsk-5tm, tsk-5er, tsk-1qn, tsk-2te]
 authoritative_for: why src/runner/dispatch.mjs's capacity/executor layer was redesigned around "task" as the unifying concept, and the 12 locked decisions behind that redesign
 ---
 # Why `dispatch.mjs` was redesigned around "task," not agent capacity
@@ -70,7 +70,11 @@ from both `capacities.<id>` config shape and the dispatch gate itself.
 - **D7 — defer writing the dispatch contract into `AGENTS.md`** until D5
   (`execute`) and its `--work` CLI flag actually ship. `AGENTS.md` is
   always-loaded context; documenting a command before it exists would
-  point every reader at something that doesn't work yet.
+  point every reader at something that doesn't work yet. Landed
+  (`tsk-2te`), once the deferral condition was satisfied: `AGENTS.md`'s
+  own "Dispatch — routing work to a executor" section — the same section
+  that gates every Agent/Task-tool call in this repo via a `PreToolUse`
+  hook — is this item's own deliverable.
 - **D8 — rename "ad-hoc packet" to "ad-hoc task"** in the shared
   vocabulary. Matches what it actually is (an agent composing its own
   prompt that needs dispatching); "work" collides with the lifecycle
