@@ -2,6 +2,18 @@
 
 Mode: tiny
 
+Lane derived directly from `fgos-routing`'s own Mode-gate table (no prior
+session had decided one — this item's discovery verdict was `clear`, which
+skips `exploring` entirely, and `fgos-coding-driving` claimed it straight
+into `planning` with no lane in context). Flag count: 1 — only "existing
+covered behavior" applies (the golden byte-for-byte test in
+`test/runner/prompt-templates.test.mjs` pins this template's current
+content). None of the other nine flags apply: no auth, authorization, data
+model, audit/security, external systems, public contracts, cross-platform,
+weak proof, or multi-domain concern. 0-1 flags → tiny/small; "tiny" fits —
+a couple of files, one direct task (the template addition plus its own
+pinned test), no gray areas.
+
 No `exploring` round happened for this item (discovery verdict was
 `clear` — RESEARCH.md's Round 1 resolved every open point directly from
 the repo), so there is no `CONTEXT.md`; this plan cites RESEARCH.md's Round
