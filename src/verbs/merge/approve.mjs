@@ -56,6 +56,7 @@ import { listSessions } from '../../runner/session.mjs';
 import { runGoalCheck } from '../../runner/goal-check.mjs';
 import { mergeGitHubPR } from '../../runner/github-adapter.mjs';
 import { recordApprovePostSuccessFault } from '../../cli/approve-fault-log.mjs';
+import { checkDispatchAttestation } from '../../runner/attestation-guard.mjs';
 
 // tsk-480: approve's own success paths (merge landed, or verify-only
 // passed) call `moveWork(...to:'delivered'...)` as their very last
@@ -408,6 +409,24 @@ export async function approveUseCase(
     // (resolveRoot walks item.parent up to the top); a root's resolved
     // root is itself.
     const rootId = resolveRoot(view, id);
+
+    if (source === 'runner') {
+      const branch = branchNameFor(id);
+      const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
+      if (!attestation.ok) {
+        const targetBranch = rootId !== id ? branchNameFor(rootId) : detectTrunk(repoRoot);
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: attestation.reason, role: 'system' });
+        addFriction(dir, {
+          id,
+          disposition: 'blocked',
+          errorClass: attestation.reason,
+          layer: 'attestation',
+          attempts: 1,
+          detail: attestation.detail,
+        });
+        return { id, mode: 'merge', to: 'blocked', reason: attestation.reason, target: targetBranch };
+      }
+    }
 
     if (rootId !== id) {
       const rootBranch = branchNameFor(rootId);

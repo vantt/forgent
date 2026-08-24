@@ -5,6 +5,8 @@
 .fgos/approve-post-success-faults.jsonl merge=union
 .fgos/invocation-faults.jsonl merge=union
 .fgos/main-checkout-guard-warnings.jsonl merge=union
+.fgos/changelog-nag-history.jsonl merge=union
+.fgos/entropy-history.jsonl merge=union
 
 # tsk-1wk: tsk-3ve's per-writer sharded event log (.fgos/events/<writer-id>-
 # <openTs>.jsonl) is append-only exactly like the old single-file
