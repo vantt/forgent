@@ -2,7 +2,7 @@
 type: explanation
 title: Why a stale worktree index produced a wrong Iron Law test count
 tags: [iron-law, evidence, worktree, addendum]
-source_capture_ids: [tsk-5x4, tsk-2u5, tsk-2u5-1, tsk-1d7]
+source_capture_ids: [tsk-5x4, tsk-2u5, tsk-2u5-1, tsk-1d7, tsk-jgs]
 authoritative_for: why the tsk-51m root Iron Law evidence file recorded a test count lower than any of its own children, why the fix is an addendum rather than an edit, and the general stale-worktree-index guard this incident led to
 ---
 # Why a stale worktree index produced a wrong Iron Law test count
@@ -117,6 +117,41 @@ catch this automatically.
   ephemeral merge worktrees). Detection-at-commit plus an on-demand
   repair verb was judged sufficient to stop the silent-revert failure
   mode without that added complexity.
+
+## Follow-up: the repair verb's own bare invocation was broken (`tsk-jgs`)
+
+Found during a post-merge `/ck-code-review` of `tsk-2u5`/`tsk-1d7`
+(commit `c9c71534`): `fgos resync-worktree` run **bare** (no `--dir`) from
+inside a stale worktree — exactly what `.githooks/pre-commit`'s own
+refusal message instructs a user to do — failed to resolve the main
+checkout and errored with a misleading `"could not read HEAD reflog"`
+instead of performing the repair.
+
+**Root cause**: `bin/fgos.mjs`'s `resync-worktree` case passed `dir`
+(`dataDir(flags.dir)`, which resolves `.fgos` relative to cwd) straight
+through as `resyncWorktree`'s `repoRoot`, instead of resolving/defaulting
+to the main checkout the way every other git-operating verb in the same
+file does (via `path.dirname(dir)`). Since a linked worktree's own
+`.fgos/` never exists at all (ADR0020), this path is broken by
+construction whenever `--dir` is omitted. Reproduced live: a real
+worktree with a force-moved branch, `node bin/fgos.mjs resync-worktree`
+run bare from inside it failed with the misleading reflog error; the
+identical call with `--dir <mainRoot>` succeeded (`resynced: true`).
+Compounding: `command-registry.mjs`'s own `resync-worktree` entry listed
+the bare invocation as a valid example and never marked `--dir` required
+— nothing in the interface warned that the documented, hook-instructed
+usage was actually broken.
+
+**Fix**: make the bare/default invocation genuinely work — auto-resolve
+the main checkout the same way other worktree-aware verbs already do
+(via `git --git-common-dir` resolution) — rather than just documenting
+`--dir` as mandatory, since the hook's own refusal message specifically
+tells a user to run the command bare. A real subprocess-level test
+(invoking the actual `fgos resync-worktree` CLI end-to-end from inside a
+worktree) was added alongside the fix — the prior test coverage only
+exercised the underlying `resyncWorktree()` function and the hook's own
+refusal message directly, never the real CLI path, which is exactly what
+let this ship in the first place.
 
 ## The shared lesson
 
