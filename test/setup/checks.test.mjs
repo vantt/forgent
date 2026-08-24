@@ -42,7 +42,7 @@ import {
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
-import { DEFAULT_CHECKPOINT_EVENT_THRESHOLD } from '../../src/state/events-jsonl-truncation-guard.mjs';
+import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
 import { addDecision } from '../../src/state/store.mjs';
 
@@ -1091,7 +1091,7 @@ test('config-not-stale passes when the existing config already has every default
       workerSlots: { ceiling: null },
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
-      checkpoint: { eventThreshold: DEFAULT_CHECKPOINT_EVENT_THRESHOLD },
+      checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);

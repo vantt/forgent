@@ -849,7 +849,7 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
   // run on the shared checkout, so main-checkout.lock IS that target's
   // slot — behavior below is then exactly what it was before this item.
   if (targetSlot) {
-    return withPostLand(await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }));
+    return withPostLand(await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot }));
   }
 
   // The pre-commit hook only locks the final `git commit` — everything
@@ -941,7 +941,7 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
 
   let result;
   try {
-    result = await heartbeatStorage.run(heartbeatStatus, () => mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }));
+    result = await heartbeatStorage.run(heartbeatStatus, () => mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot }));
   } finally {
     clearInterval(heartbeat);
     lock.release();
@@ -1156,7 +1156,7 @@ export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {
   return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;
 }
 
-async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
+async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot = repoRoot } = {}) {
   // tsk-3yl D1: still run the real goal-check here, even though nothing
   // will be staged/committed — every 'merged' outcome must carry a real,
   // freshly-executed verify result (both callers in bin/fgos.mjs read
@@ -1353,6 +1353,28 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   }
 
   try {
+    // tsk-3tp (D2): sweep dirty/untracked files under .fgos/events/ and .fgos/events.jsonl into the staged merge commit
+    const sweepFgosDir = path.join(lockRoot, '.fgos');
+    const sweepLogPath = path.join(sweepFgosDir, 'events.jsonl');
+    const sweepEventsDirPath = path.join(sweepFgosDir, 'events');
+    const sweepPathspecs = [];
+    if (fs.existsSync(sweepLogPath)) {
+      sweepPathspecs.push(path.relative(repoRoot, sweepLogPath) || '.fgos/events.jsonl');
+    }
+    if (fs.existsSync(sweepEventsDirPath)) {
+      sweepPathspecs.push(path.relative(repoRoot, sweepEventsDirPath));
+    }
+    if (sweepPathspecs.length > 0) {
+      try {
+        const statusOut = git(repoRoot, ['status', '--porcelain', '--', ...sweepPathspecs]).trim();
+        if (statusOut.length > 0) {
+          git(repoRoot, ['add', ...sweepPathspecs]);
+        }
+      } catch {
+        // non-blocking
+      }
+    }
+
     // HOLDER_PID_ENV_VAR (tsk-70l): scoped to this one call, not a
     // `process.env` assignment — see `git()`'s own env passthrough
     // above. Lets `.githooks/pre-commit`, spawned as this call's own
