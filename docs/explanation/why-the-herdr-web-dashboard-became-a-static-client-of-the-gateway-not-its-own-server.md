@@ -2,7 +2,7 @@
 type: explanation
 title: Why the herdr web dashboard became a static client of the gateway, not its own server
 tags: [herdr, web-dashboard, gateway, realignment, auth]
-source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb]
+source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w]
 authoritative_for: why the herdr web dashboard's architecture moved from a standalone embedded webserver to a static bundle served by the existing gateway, and the security/lifecycle decisions that survived the realignment
 ---
 # Why the herdr web dashboard became a static client of the gateway, not its own server
@@ -91,6 +91,22 @@ timeline renders), empty/error states, and color/typography — authored
 through the `ui-spec` skill's own tooling (added mid-item, once that
 skill existed) rather than hand-authored, pulling product/actor/flow
 facts from `tsk-54j`'s own area spec rather than re-deriving them.
+
+## P1 landed (`tsk-48w`): survived realignment as a config flag, not a closed item
+
+D10's original static-serving toggle was initially marked for closure by
+the realignment's own D4 (since the standalone webserver it was meant to
+gate no longer existed) — but D14 later **superseded that closure**: the
+item actually installed *two* decisions from the cluster, and only one
+of them (D9, the separate `FGOS_HERDR_WEB_SECRET` token) actually died.
+D10 itself — the toggle for whether the gateway serves the static bundle
+at all — survived, just transformed: it's now a config flag on the
+gateway's own static-serving behavior, still requiring registration in
+`fgos setup`'s config-merge and `fgos doctor`'s check registry per
+`AGENTS.md`'s own install/setup/doctor gate. Reading this item's own
+stale verify/description closely enough to notice it bundled two
+separable decisions — one dead, one alive — is what caught the
+realignment's own over-broad closure before it happened.
 
 ## What didn't change: why the webserver outlives the cockpit pane (D12)
 
