@@ -2,7 +2,7 @@
 type: reference
 title: Gateway subsystem audit findings (2026-08-14)
 tags: [audit, gateway, mcp, interface-daemon, code-review]
-source_capture_ids: [tsk-1zg]
+source_capture_ids: [tsk-1zg, tsk-4uh]
 authoritative_for: the 9 findings from the 2026-08-14 haiku-scan + fable code-review audit of fgOS's gateway subsystem (REST/RPC + MCP surface), and which work item tracks each
 ---
 # Gateway subsystem audit findings (2026-08-14)
@@ -17,7 +17,7 @@ audit reviewed. Each finding below was filed as its own work item.
 
 | id | severity | finding |
 |---|---|---|
-| `tsk-4uh` | high (spot-verified) | Every gateway route is served without the `/v1` prefix the contract's server URL and the gateway's own startup log both advertise — a contract-compliant client 404s on every real call. |
+| `tsk-4uh` | high (spot-verified) | **Fixed.** Every gateway route was served without the `/v1` prefix the contract's server URL and the gateway's own startup log both advertise — a contract-compliant client 404'd on every real call. Fixed: routes now serve under `/v1`; a follow-up commit also `/v1`-prefixed three test URIs that had arrived via later-merged branches after the main fix landed. |
 | `tsk-og6` | high (spot-verified) | `spawn_fgos_verb` passes `--dir <root>` but never sets `current_dir(root)` on the child process — some `fgos` verbs resolve their repo root from `process.cwd()` instead of the passed `--dir`, silently operating on the wrong repo. |
 | `tsk-4lf` | medium | No timeout, cancellation, or concurrency bound anywhere on the verb chokepoint — one wedged `fgos` subprocess pins a blocking-pool thread indefinitely. |
 | `tsk-1qe` | medium | MCP `execute`'s Rhai scripting engine has no operation/time limit and an unbounded print buffer — one `loop {}` script wedges a blocking thread forever. |
