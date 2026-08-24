@@ -2,7 +2,7 @@
 type: explanation
 title: Why the Iron Law gate only fires at the trunk boundary
 tags: [iron-law, merge, gate, human-ux, approve]
-source_capture_ids: [tsk-1y6-1]
+source_capture_ids: [tsk-1y6-1, tsk-1y6-2]
 authoritative_for: why the Iron Law gate only runs at the trunk merge boundary, why it's ask/warn (not a bypass field), and why one /fgOS:approve skill wraps both approve and sync-root
 ---
 # Why the Iron Law gate only fires at the trunk boundary
@@ -76,4 +76,7 @@ caller pick. Before asking a person anything, it's required to present
 the real blast radius first — which verb, which root, how many children
 ride along — so a person's yes/no answer is informed rather than blind.
 (This is the exact skill this session used throughout its own drive,
-including for its own eventual `/fgOS:approve tsk-4dk-1` call.)
+including for its own eventual `/fgOS:approve tsk-4dk-1` call.) Landed
+(`tsk-1y6-2`): the skill itself, inferring `approve` vs `sync-root` from
+the target id and always presenting the blast radius before ever asking
+a person anything.
