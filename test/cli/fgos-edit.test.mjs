@@ -586,6 +586,23 @@ test('edit --footprint sets footprint on an item that had none, exit 0', () => {
   assert.deepEqual(stateView(cwd).work['edit-footprint-new'].footprint, ['src/a.mjs', 'src/b.mjs']);
 });
 
+test('edit --action sets action directive prose on an item, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-action-new');
+  assert.equal(stateView(cwd).work['edit-action-new'].action, undefined);
+  const result = run(cwd, ['edit', 'edit-action-new', '--action', 'Implement feature X per plan.md']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['edit-action-new'].action, 'Implement feature X per plan.md');
+});
+
+test('edit --action with empty string is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-action-empty');
+  const result = run(cwd, ['edit', 'edit-action-empty', '--action', '']);
+  assert.equal(result.status, 4);
+  assert.equal(stateView(cwd).work['edit-action-empty'].action, undefined);
+});
+
 test('edit --acceptance is refused when a clause supplies text+evidence together but evidence cites no real path', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'edit-untraceable');

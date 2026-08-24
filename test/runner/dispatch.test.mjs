@@ -36,7 +36,7 @@ import {
   resolveAgentTypeForTaskSpec,
   resolveAgentTypeForWork,
 } from '../../src/runner/dispatch.mjs';
-import { initStore, addWork, listWork } from '../../src/state/store.mjs';
+import { initStore, addWork, listWork, readRawEvents } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
 
@@ -352,6 +352,28 @@ test('buildPrompt renders readFirst from the item\'s own footprint, joined, unde
 test('buildPrompt degrades readFirst to "(không có)" when the work item has no footprint', () => {
   const prompt = buildPrompt(sampleWork());
   assert.match(prompt, /# Files to read first\n\(không có\)/);
+});
+
+test('buildPrompt renders docsRefPointer under "Files to read first" when docsRef is set on work item', () => {
+  const prompt = buildPrompt(sampleWork({ docsRef: 'docs/history/my-feature' }));
+  assert.match(prompt, /# Files to read first\n\(không có\)\ndocs\/history\/my-feature\/plan\.md and \.\.\.\/CONTEXT\.md \(if present\) — the locked decisions and chosen approach for this item/);
+});
+
+test('buildPrompt normalizes trailing slash in docsRef when rendering docsRefPointer', () => {
+  const prompt1 = buildPrompt(sampleWork({ docsRef: 'docs/history/my-feature/' }));
+  const prompt2 = buildPrompt(sampleWork({ docsRef: 'docs/history/my-feature' }));
+  assert.equal(prompt1, prompt2);
+  assert.ok(prompt1.includes('docs/history/my-feature/plan.md'));
+});
+
+test('buildPrompt renders "(none)" for docsRefPointer when work.docsRef is absent or empty', () => {
+  const prompt = buildPrompt(sampleWork());
+  assert.match(prompt, /# Files to read first\n\(không có\)\n\(none\)/);
+});
+
+test('buildPrompt for non-executing stage (e.g. discovery) does not leak literal {docsRefPointer} template variable', () => {
+  const prompt = buildPrompt(sampleWork({ docsRef: 'docs/history/my-feature' }), undefined, 'discovery');
+  assert.doesNotMatch(prompt, /\{docsRefPointer\}/);
 });
 
 test('buildPrompt with no feedback stays byte-identical to the pre-feedback shape (no Human feedback section)', () => {
@@ -3496,6 +3518,77 @@ test('executeExecutorCli refuses a concurrent dispatch for the same cwd with Dis
   assert.equal(thirdResult.status, 0);
 });
 
+test('executeExecutorCli attaches lostUncommittedPaths and prints stderr warning when out-of-process dispatch reverts uncommitted changes', async () => {
+  const dir = mkTempDir();
+  const scriptWipePath = path.join(dir, 'wipe-executor.mjs');
+  fs.writeFileSync(
+    scriptWipePath,
+    'import fs from "node:fs";\n' +
+    'if (fs.existsSync("plan.md")) fs.unlinkSync("plan.md");\n' +
+    'process.stdout.write("[DONE]\\n");\n' +
+    'process.exit(0);\n',
+  );
+
+  const { repoRoot: gitRepo } = mkTempGitRepo();
+  writeRunnerConfigFixture(gitRepo, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: {
+      'wipe-executor': { kind: 'agent', command: process.execPath, args: [scriptWipePath, '{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  fs.writeFileSync(path.join(gitRepo, 'plan.md'), 'uncommitted plan edit\n');
+
+  let stderrOutput = '';
+  const origWrite = process.stderr.write;
+  process.stderr.write = (chunk, ...args) => {
+    stderrOutput += chunk.toString();
+    return origWrite.call(process.stderr, chunk, ...args);
+  };
+
+  try {
+    const res = await executeExecutorCli('wipe-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+    assert.deepEqual(res.lostUncommittedPaths, ['plan.md']);
+    assert.ok(stderrOutput.includes('uncommitted path(s) lost across out-of-process dispatch: plan.md'));
+  } finally {
+    process.stderr.write = origWrite;
+  }
+});
+
+test('executeExecutorCli omits lostUncommittedPaths when dispatch is clean or adapter commits changes', async () => {
+  const dir = mkTempDir();
+  const scriptCommitPath = path.join(dir, 'commit-executor.mjs');
+  fs.writeFileSync(
+    scriptCommitPath,
+    'import { execFileSync } from "node:child_process";\n' +
+    'execFileSync("git", ["add", "plan.md"]);\n' +
+    'execFileSync("git", ["commit", "-q", "-m", "worker commit"]);\n' +
+    'process.stdout.write("[DONE]\\n");\n' +
+    'process.exit(0);\n',
+  );
+
+  const { repoRoot: gitRepo } = mkTempGitRepo();
+  writeRunnerConfigFixture(gitRepo, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: {
+      'commit-executor': { kind: 'agent', command: process.execPath, args: [scriptCommitPath, '{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  // Clean cwd case
+  const resClean = await executeExecutorCli('commit-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  assert.equal(resClean.lostUncommittedPaths, undefined);
+
+  // Dirty file that is committed by the executor case
+  fs.writeFileSync(path.join(gitRepo, 'plan.md'), 'uncommitted plan edit\n');
+  const resCommit = await executeExecutorCli('commit-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  assert.equal(resCommit.lostUncommittedPaths, undefined);
+});
+
 test('executeExecutorCli refuses with DispatchError(dispatch-in-flight) when lock file content is corrupt/ambiguous (tsk-64hk)', async () => {
   const { repoRoot, fgosDir } = mkTempGitRepo();
   const dir = mkTempDir();
@@ -4587,9 +4680,8 @@ test('the "log" CLI entry point appends a executor.dispatch event and prints it 
   assert.equal(printed.payload.provider, 'agy');
   assert.equal(printed.payload.command, 'agy');
   assert.equal(printed.payload.model, 'gemini-flash');
-  const raw = fs.readFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), 'utf8');
-  const lines = raw.trim().split('\n');
-  const logged = JSON.parse(lines[lines.length - 1]);
+  const dispatchEvents = readRawEvents(path.join(repoRoot, '.fgos')).filter((e) => e.type === 'executor.dispatch');
+  const logged = dispatchEvents[dispatchEvents.length - 1];
   assert.equal(logged.type, 'executor.dispatch');
   assert.equal(logged.payload.id, 'tsk-2c1');
 });
@@ -4617,9 +4709,11 @@ test('logExecutorDispatch appends a executor.dispatch event with baseCommit/head
   assert.equal(event.type, 'executor.dispatch');
   assert.equal(event.payload.baseCommit, null);
   assert.equal(event.payload.headRef, null);
-  const raw = fs.readFileSync(path.join(fgosDir, 'events.jsonl'), 'utf8');
-  const lines = raw.trim().split('\n');
-  assert.equal(lines.length, 1);
+  // Tầng A (TA-D2/TA-D12): logExecutorDispatch now writes into this
+  // writer's own open file under `.fgos/events/`, not the frozen baseline
+  // `events.jsonl` -- readRawEvents(dir) is the one door that reads both.
+  const dispatchEvents = readRawEvents(fgosDir).filter((e) => e.type === 'executor.dispatch');
+  assert.equal(dispatchEvents.length, 1);
 });
 
 test('logExecutorDispatch appends multiple sequential calls without corrupting the log — sequential seq, no duplicate/dropped lines (parallel gather branches must never race the write)', () => {
@@ -4629,8 +4723,8 @@ test('logExecutorDispatch appends multiple sequential calls without corrupting t
   );
   const seqs = events.map((e) => e.seq);
   assert.deepEqual(seqs, [...new Set(seqs)].sort((a, b) => a - b), 'no duplicate seq');
-  const raw = fs.readFileSync(path.join(fgosDir, 'events.jsonl'), 'utf8');
-  assert.equal(raw.trim().split('\n').length, 4);
+  const dispatchEvents = readRawEvents(fgosDir).filter((e) => e.type === 'executor.dispatch');
+  assert.equal(dispatchEvents.length, 4);
 });
 
 // --- CLI subcommand --cwd flag coverage ---------------------------------

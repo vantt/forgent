@@ -48,9 +48,7 @@ silently fixed). What it DOES buy: the lane is
 known before `fgos-coding-planning` is even opened, so a stranger picking this
 item up cold — or this session itself, mid-Orient — already knows how
 much ceremony to expect, instead of learning it only after reading
-through that skill's own flow. A genuine skip-load optimization (e.g.
-routing a `tiny`/`small` item straight to a lighter path) would need an
-actual routing-table change, which this decision does not make. Count how
+through that skill's own flow. Skip-load optimization for `tiny`/`small` items is handled inside stage skills (`fgos-coding-planning`, `fgos-coding-validating`, `fgos-coding-implement`), where Bootstrap/Orient checks the lane and skips loading full reference chains. Count how
 many of these actually apply to the item: auth, authorization, data
 model, audit/security, external systems, public contracts, cross-platform,
 existing covered behavior, weak proof around the area, multi-domain.

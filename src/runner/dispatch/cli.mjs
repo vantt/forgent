@@ -12,14 +12,13 @@
 // handoff-redesign/CONTEXT.md` D7 for the split rationale.
 
 import fs from 'node:fs';
-import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { DEFAULTS } from '../../state/work.mjs';
 import { DOMAINS, resolveDomainName, skillForStage, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
 import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
-import { listWork } from '../../state/store.mjs';
+import { listWork, resolveWriterLogPath } from '../../state/store.mjs';
 import { appendEvent } from '../../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
@@ -46,6 +45,8 @@ import {
   AMBIGUOUS,
   formatLockDurationMs,
 } from '../main-checkout-lock.mjs';
+import { checkoutDirtyPaths } from '../worktree.mjs';
+
 
 /**
  * Executor identifier for a work item's executing-stage dispatch (D3,
@@ -286,12 +287,16 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
  * downstream reader never needs a second vocabulary — `baseCommit`/
  * `headRef` are always `null`: no worktree-dispatch attestation applies to
  * an in-session call (`captureDispatchAttestation` is never invoked here).
- * `appendEvent` already acquires `events.jsonl`'s own cross-process lock
- * internally (`withEventsLock`, `src/state/events.mjs`) — no extra
- * locking needed here even when multiple gather branches log concurrently.
+ * Writes into THIS writer's own open file under `.fgos/events/`
+ * (`resolveWriterLogPath`, TA-D2/TA-D12) — never straight to the frozen
+ * baseline `events.jsonl` — so a concurrent in-session gather branch from
+ * another writer never contends for the same physical file. `appendEvent`
+ * still acquires the shared `events.lock` internally (`withEventsLock`,
+ * `src/state/events.mjs`) — no extra locking needed here even when
+ * multiple gather branches log concurrently.
  */
 export function logExecutorDispatch(fgosDir, { id, executorId, provider, command, model }) {
-  return appendEvent(path.join(fgosDir, 'events.jsonl'), {
+  return appendEvent(resolveWriterLogPath(fgosDir), {
     type: 'executor.dispatch',
     payload: { id, executorId, provider, command, model, baseCommit: null, headRef: null },
   });
@@ -516,8 +521,21 @@ export async function executeExecutorCli(
       `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
     );
     const headBefore = captureHeadSha(cwd);
+    const dirtyBefore = checkoutDirtyPaths(root, cwd);
     const result = await adapterFn({ command, args }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
     const headAfter = captureHeadSha(cwd);
+    const dirtyAfter = checkoutDirtyPaths(root, cwd);
+    let lostUncommittedPaths;
+    if (headBefore === headAfter && dirtyBefore.length > 0) {
+      const dirtyAfterSet = new Set(dirtyAfter);
+      const lost = dirtyBefore.filter((p) => !dirtyAfterSet.has(p));
+      if (lost.length > 0) {
+        lostUncommittedPaths = lost;
+        process.stderr.write(
+          `fgos: warning: uncommitted path(s) lost across out-of-process dispatch: ${lost.join(', ')}\n`,
+        );
+      }
+    }
     const stdoutStr = result && typeof result.stdout === 'string' ? result.stdout : '';
     const cleanStdout = stdoutStr.replace(/`+[\s\S]*?`+/g, '');
     const hasSignal = cleanStdout.includes('[DONE]') || cleanStdout.includes('[BLOCKED]');
@@ -527,6 +545,7 @@ export async function executeExecutorCli(
       ...result,
       ...(hasSignal ? {} : { outcome: 'unsignaled', headBefore, headAfter }),
       ...(isDone && headAfter ? { verifiedSha: headAfter } : {}),
+      ...(lostUncommittedPaths ? { lostUncommittedPaths } : {}),
       provider,
       command,
     };

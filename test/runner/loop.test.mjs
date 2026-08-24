@@ -1571,6 +1571,64 @@ test('tsk-535 D4: a fgos-discovered block with no description falls back to the 
   assert.equal(discovered[0].description, 'Wire retry metrics into the dashboard');
 });
 
+test('tsk-2ck: a fgos-discovered block with an out-of-vocabulary risk (e.g. "medium") is coerced to derived.risk, creating the item instead of dropping it', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const body = JSON.stringify({
+    title: 'Fix crash in parser',
+    kind: 'bug',
+    risk: 'medium',
+  });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  const view = listWork(dir);
+  const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
+  assert.equal(discovered.length, 1, 'item was created instead of being silently dropped');
+  assert.equal(discovered[0].kind, 'bug');
+  assert.equal(discovered[0].risk, 'standard', 'out-of-vocabulary risk "medium" was coerced to derived.risk');
+});
+
+test('tsk-2ck: a fgos-discovered block with an out-of-vocabulary kind is coerced to derived.kind, creating the item instead of dropping it', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const body = JSON.stringify({
+    title: 'Fix crash in parser',
+    kind: 'superbug',
+    risk: 'light',
+  });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  const view = listWork(dir);
+  const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
+  assert.equal(discovered.length, 1, 'item was created instead of being silently dropped');
+  assert.equal(discovered[0].risk, 'light');
+  assert.equal(discovered[0].kind, 'bug', 'out-of-vocabulary kind "superbug" was coerced to derived.kind');
+});
+
+test('tsk-2ck: a fgos-discovered block with absent kind and risk falls back to derived.kind and derived.risk', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const body = JSON.stringify({
+    title: 'Fix crash in parser',
+  });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  const view = listWork(dir);
+  const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
+  assert.equal(discovered.length, 1);
+  assert.equal(discovered[0].kind, 'bug');
+  assert.equal(discovered[0].risk, 'standard');
+});
+
 test('wgi-8: a malformed fgos-discovered block is skipped (fail-safe) — the dispatch still proposes and no item is created', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-happy' });

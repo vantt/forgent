@@ -283,7 +283,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'edit',
     invoke: 'fgos edit',
-    description: 'Patch fields on an existing item (title/description/kind/risk/verify/tier/refs/deps/footprint/acceptance/priority/intent/docs-ref/parent/urgent/impact/effort/merge-after). At least one field must be given.',
+    description: 'Patch fields on an existing item (title/description/kind/risk/verify/tier/refs/deps/footprint/action/acceptance/priority/intent/docs-ref/parent/urgent/impact/effort/merge-after). At least one field must be given.',
     parameters: {
       type: 'object',
       properties: {
@@ -297,6 +297,7 @@ export const COMMAND_REGISTRY = [
         refs: { type: 'string', description: 'Comma-separated list of reference ids/links (empty string clears the field).', multiValueFormat: 'csv' },
         deps: { type: 'string', description: 'Comma-separated list of dependency ids (empty string clears the field).', multiValueFormat: 'csv' },
         footprint: { type: 'string', description: 'Comma-separated list of file paths this item is expected to touch (advisory only); empty string clears the field.', multiValueFormat: 'csv' },
+        action: { type: 'string', description: 'New action directive sentence (e.g. for worker prompt). Must be a non-empty string when present -- unlike refs/deps/footprint, an empty value is rejected as validation rather than clearing the field.' },
         parent: { type: 'string', description: 'New lineage parent id (empty string "" clears the field, un-parenting the item).' },
         acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses — replaces the whole array (empty array "[]" clears the field). NOT comma-separated — clause text may contain commas.', multiValueFormat: 'json-array' },
         priority: { type: 'integer', description: 'New priority: a non-negative integer, ascending sort (lower = higher priority). Absent stays absent — items without a priority sort after every item that has one.' },
