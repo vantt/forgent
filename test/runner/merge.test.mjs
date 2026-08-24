@@ -478,6 +478,46 @@ test('mergeRunnerItem sweeps a dirty untracked .fgos/events/ shard file into its
   assert.doesNotMatch(newCommitSubjects[0], /periodic events\.jsonl checkpoint|fallback events checkpoint/);
 });
 
+// tsk-3tp (fix, review r1): `.fgos` only ever exists under `lockRoot` — it is
+// stripped from every ephemeral worktree per ADR0020 (see
+// `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),
+// exactly the shape a leaf->parent approve or promote-engine merge passes in
+// (`lockRoot` set explicitly, distinct from the ephemeral `repoRoot` used as
+// the git-op cwd). Before this fix the sweep computed its pathspecs relative
+// to `repoRoot` and ran `git status`/`git add` with `cwd: repoRoot` — a
+// pathspec pointing at a sibling directory (`lockRoot`) that git refuses as
+// "outside repository", silently swallowed by the surrounding catch, so the
+// shard was never swept for this whole class of merges. Two separate real
+// repos stand in for the ephemeral worktree (`repoRoot`) and the real main
+// checkout (`lockRoot`), same shape as the "resolves the main-checkout lock
+// against lockRoot" test below.
+test('mergeRunnerItem sweeps a dirty .fgos/events/ shard under lockRoot (not repoRoot) into lockRoot\'s own index when lockRoot !== repoRoot', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const lockRoot = initRepo();
+  const eventsDir = path.join(lockRoot, '.fgos', 'events');
+  fs.mkdirSync(eventsDir, { recursive: true });
+  const shardPath = path.join(eventsDir, 'writer-a-20260101T000000Z.jsonl');
+  fs.writeFileSync(shardPath, '{"id":"e1"}\n');
+
+  const lockRootHeadBefore = headOf(lockRoot);
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }), { lockRoot });
+  assert.equal(result.outcome, 'merged');
+
+  const lockRootStatus = git(lockRoot, ['status', '--porcelain']);
+  assert.match(
+    lockRootStatus,
+    /^A\s+\.fgos\/events\/writer-a-20260101T000000Z\.jsonl$/m,
+    'the dirty shard living under lockRoot must be staged (git add) even though the merge commit itself lands in repoRoot',
+  );
+  assert.equal(
+    headOf(lockRoot),
+    lockRootHeadBefore,
+    'lockRoot itself must not gain a new commit from the sweep — only staged, ready to ride lockRoot\'s own next commit (e.g. the 1h fallback or a later root->main approve)',
+  );
+});
+
 test('mergeRunnerItem aborts cleanly on a real conflict — main left byte-for-byte unchanged, outcome "conflict"', async () => {
   const repoRoot = initRepo();
   fs.writeFileSync(path.join(repoRoot, 'shared.txt'), 'base\n');
