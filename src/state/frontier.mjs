@@ -310,6 +310,9 @@ export function resolveRoot(view, id) {
 // RESOLVED. `seen` guards against a malformed/cyclic parent chain turning
 // this into an infinite walk — it never occurs on data produced by the
 // decompose engine, only a defensive backstop.
+// See `loop.mjs`'s `hasStillNeededDescendant` for a deliberately BROADER
+// 'still needed' variant used by `startupReap`'s orphan-branch pruning — the
+// two intentionally answer different questions, do not consolidate.
 
 export function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {
   const children = childrenByParent[id];
