@@ -50,61 +50,79 @@ not root-cause confirmation).
      conflict report that is actively misleading.
 
 2. **`mergeRunnerItemLocked`/`abortMergeIfPossible`**
-   (`src/runner/merge.mjs:1074-1098` corrected line range —  actually
-   `:1129-1153`, see correction below — and `:1242-1341`, approve
-   direction). **Correction to CONTEXT.md's own scout evidence**, found
-   while reading the code directly during this Approach step (not a
-   reopening of D1's decision — the scope decision itself stands;
-   this only corrects the described mechanism):
-   `abortMergeIfPossible` already guards the exact "no `MERGE_HEAD`"
-   pre-merge-refusal case CONTEXT.md flagged (`mergeHeadExists` early
-   return at `:1130-1132`) — it does NOT share `performCatchUp`'s
-   unguarded-inline-abort defect. The real remaining gap here, per
-   `docs/history/events-jsonl-merge-abort-truncation-gap/RESEARCH.md`
-   Round 5 (tsk-1ji, fixture 2): when a merge DID stage something (real
-   `MERGE_HEAD` exists) and the abort ITSELF then fails (a broken index —
-   `fatal: Could not reset index file to revision 'HEAD'`), the catch
-   block's own `if (!mergeHeadExists(repoRoot)) return; throw err;`
-   correctly re-throws (`MERGE_HEAD` is still present, since the abort
-   never completed) — but that throw currently propagates as a raw,
-   untyped `MergeError` out of `mergeRunnerItemLocked` to its caller
-   (`approve`), instead of surfacing as one of the function's own defined
-   outcomes (`'merged'`/`'conflict'`/`'verify-fail'`/
-   `'merge-blocked-other-item'`). Fix: catch that specific re-thrown case
-   at `mergeRunnerItemLocked`'s own call sites and return a new typed
-   outcome (e.g. `'main-checkout-broken'`) carrying the raw error —
-   **never swallow it or attempt a second automatic recovery**; the
-   broken index still needs the exact same manual recovery it needs
-   today (tsk-1ji: "a main-checkout availability problem, not a
-   silent-data-loss problem" — this fix must not turn it into one).
+   (`src/runner/merge.mjs:1129-1153` for `abortMergeIfPossible`,
+   `:1242-1581` for `mergeRunnerItemLocked`, approve direction). **No
+   production-code change** — corrected during `fgos-coding-validating`'s
+   own reality gate (NOT READY round 1), which found this section's
+   original premise false. Not a reopening of D1's decision (both
+   functions stay "in scope" — see below for what that means here); this
+   corrects the described mechanism only. Verified directly (all 5 call
+   sites read: `merge.mjs:1346,1425,1463,1479,1545`):
+   - `abortMergeIfPossible` already guards the "no `MERGE_HEAD`"
+     pre-merge-refusal case (`mergeHeadExists` early return,
+     `:1130-1132`) exactly like the fix `performCatchUp` needs above.
+   - Every one of `mergeRunnerItemLocked`'s 5 call sites already wraps
+     `abortMergeIfPossible` in its own `try { ... } catch (abortErr) {
+     throw new MergeError(...) }` (e.g. `:1345-1349`, `:1424-1431`,
+     `:1462-1466`, `:1478-1482`) for the case Round 5's own fixture 2
+     reproduces (`MERGE_HEAD` existed, the abort itself then failed on a
+     broken index). `MergeError` (`merge.mjs:62-70`) is not a raw/untyped
+     throw — its own docstring already states "Raised only for a
+     genuinely unexpected git failure (e.g. `git merge --abort` itself
+     failing)", it sets `.category = 'merge-fail'`, and
+     `store.mjs:85-87`'s `categoryOf` plus the CLI's own top-level catch
+     (`bin/fgos.mjs:4369-4387`) already turn it into a clean one-line
+     `fgos: <message>` report, a distinct exit code, and a recorded
+     invocation fault — never a raw stack trace, never a silent success.
+     This IS D2's "graceful typed outcome" bar, already met, for this
+     function.
+   - **What "in scope" means here, corrected**: no code change to
+     `mergeRunnerItemLocked`/`abortMergeIfPossible` themselves. The
+     concrete task is a **regression test** — port tsk-1ji's own Round 5
+     fixture 2 (`docs/history/events-jsonl-merge-abort-truncation-gap/
+     RESEARCH.md`) into `test/runner/merge.test.mjs` to lock in this
+     already-correct behavior (asserts a `MergeError` with
+     `.category === 'merge-fail'` is thrown, never swallowed, never an
+     uncaught non-`MergeError` crash) — closing the gap that nothing
+     today explicitly exercises this exact interleaving as an assertion,
+     only as tsk-1ji's own one-off manual repro.
 
 **Alternatives rejected:**
 - A single generic `try { ... } catch { return { outcome: 'error' } }`
-  wrapper around either function — rejected: collapses conflict /
-  pre-merge-refusal / broken-index into one bucket, losing exactly the
-  diagnostic signal callers need and risking a silent-success mask over a
-  genuinely broken checkout (the failure mode D2/tsk-1ji both explicitly
-  rule out).
-- Fixing only `performCatchUp` — rejected, D1 is locked.
+  wrapper around `performCatchUp` — rejected: collapses conflict /
+  pre-merge-refusal into one bucket, losing exactly the diagnostic signal
+  callers need.
+- Also adding a new typed outcome to `mergeRunnerItemLocked`/
+  `abortMergeIfPossible` — rejected after the reality-gate correction
+  above: it already has one (`MergeError`, `.category = 'merge-fail'`);
+  adding a second, differently-shaped mechanism for the same case would
+  be the actual regression here, not a fix.
+- Fixing only `performCatchUp`'s file, with no test-side coverage of the
+  approve direction at all — rejected, D1 still calls for both functions
+  to be addressed; the regression test IS that coverage now that no
+  production fix is needed there.
 - Gating this fix on first reproducing tsk-5et's own original "not
   uptodate" trigger — rejected, D2 is locked.
 
 **Files touched, in order:**
-1. `src/runner/merge.mjs` — the two fixes above.
-2. `bin/fgos.mjs` — grep every read of `result.outcome` from `catchup`/
-   `approve`'s own CLI cases before assuming they need a new branch; add
-   reporting for the new outcome value(s) only where a switch/if-chain
-   would otherwise silently fall through.
+1. `src/runner/merge.mjs` — `performCatchUp`'s fix only (item 1 above);
+   no change to `mergeRunnerItemLocked`/`abortMergeIfPossible`.
+2. `bin/fgos.mjs` — grep every read of `result.outcome` from the
+   `catchup` CLI case before assuming it needs a new branch; add
+   reporting for the new `'merge-refused'` outcome only where a
+   switch/if-chain would otherwise silently fall through. The `approve`
+   case needs no change — its `MergeError` handling already works.
 3. `test/runner/merge.test.mjs` — extend with: (a) a `performCatchUp`
    pre-merge-refusal fixture, reusing this item's own `initRepo`/`git`/
    `headOf`/`makeBranchWithCommit` helpers (`RESEARCH.md` Round 1, Q2);
    (b) a real-conflict regression case proving classification did not
    flip to `'merge-refused'`; (c) tsk-1ji's own Round 5 fixture 2, ported
-   in as a regression test for `mergeRunnerItemLocked`'s new
-   `'main-checkout-broken'` outcome.
-4. Any doc enumerating the existing outcome vocabulary (grep for
-   `'already-caught-up'`/`'merge-blocked-other-item'` under `docs/`
-   before assuming one exists).
+   in as a regression test proving `mergeRunnerItemLocked` still throws a
+   `MergeError` (`.category === 'merge-fail'`) for a broken abort, never
+   silently swallowed.
+4. Any doc enumerating `performCatchUp`'s existing outcome vocabulary
+   (grep for `'already-caught-up'`/`'merge-blocked-other-item'` under
+   `docs/` before assuming one exists).
 
 `fgos graph --json`: tsk-5et is not on `criticalPath` and `topUnblock` is
 empty for it — no other item's ordering depends on this one, so file
@@ -118,11 +136,20 @@ Blast radius for `src/runner/merge.mjs`/`bin/fgos.mjs` callers of
 pass at `executing` before landing, since a stale index could still be
 hiding a caller this planning pass's own `rg` sweep missed.
 
+## Risk map
+
+| Component | Risk | Proof point |
+|---|---|---|
+| `performCatchUp`'s new pre-merge-refusal classification | medium | regression test: a genuine conflict still returns `'conflict'`; a `not uptodate`-shaped refusal returns `'merge-refused'`, never `'conflict'` |
+| `performCatchUp`'s dedup onto `abortMergeIfPossible` | low | existing `merge.test.mjs` coverage of `abortMergeIfPossible` carries over; one new case exercises `performCatchUp`'s real-conflict-then-abort path unchanged |
+| `mergeRunnerItemLocked`/`abortMergeIfPossible` broken-abort handling | none (no code change) | tsk-1ji's Round 5 fixture 2, ported as a regression test, proves the existing `MergeError` behavior — a locking test, not a fix |
+| root trigger of tsk-5et's own reproduction (never-touched, non-union path) | unconfirmed / open by design | deferred per D2 — best-effort diagnostic repro, not a gating proof |
+
 ## Shape
 
-Single cohesive change across one file's two call sites (plus their
-shared test file) — see "Decide the split" below for why this stays one
-piece rather than fragmenting into two.
+One file's real change (`performCatchUp`) plus a locking regression test
+for the already-correct sibling (`mergeRunnerItemLocked`) — see "Decide
+the split" below for why this stays one piece rather than fragmenting.
 
 **Concrete cases to prove** (high-risk depth):
 - **Empty/boundary**: an already-caught-up merge (nothing to do) — must
@@ -133,7 +160,8 @@ piece rather than fragmenting into two.
   `'conflict'` with real, non-empty `conflictedFiles`.
 - **Concurrent access**: tsk-1ji's Round 5 fixture 2 (concurrent append
   landing on merge=union-staged content, then abort) — ported in as this
-  item's own regression test for `'main-checkout-broken'`.
+  item's own regression test proving `mergeRunnerItemLocked` still
+  throws a typed `MergeError` for it, unchanged.
 - **Partial failure**: a pre-merge refusal with `MERGE_HEAD` never
   created — must return the new `'merge-refused'` outcome, never attempt
   an abort, never throw uncaught.

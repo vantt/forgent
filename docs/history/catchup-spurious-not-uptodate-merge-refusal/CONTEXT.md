@@ -4,16 +4,25 @@
 
 `fgos catchup`'s `performCatchUp` (`src/runner/merge.mjs:1634-1699`,
 catchup direction: `main` merged into a worker branch inside an ephemeral
-worktree) and `fgos approve`'s `mergeRunnerItemLocked` /
-`abortMergeIfPossible` (`src/runner/merge.mjs:1074-1098`, `:1242-1330`,
-approve direction: worker branch merged into `main`) both attempt a `git
-merge --abort` after ANY non-conflict merge failure, including a
-pre-merge `not uptodate` refusal that never started a merge and therefore
-has no `MERGE_HEAD` to abort. This item makes both functions handle that
-failure shape as a graceful, typed outcome instead of an opaque/secondary
-thrown error. It does not require pinning down the underlying
-git-internals reason `git merge` itself refuses in the first place — see
-D2.
+worktree) attempts a `git merge --abort` after ANY non-conflict merge
+failure, including a pre-merge `not uptodate` refusal that never started
+a merge and therefore has no `MERGE_HEAD` to abort. This item makes it
+handle that failure shape as a graceful, typed outcome instead of an
+opaque/secondary thrown error. It does not require pinning down the
+underlying git-internals reason `git merge` itself refuses in the first
+place — see D2.
+
+**Correction (found during `fgos-coding-validating`'s reality gate, NOT
+READY round 1):** the sibling function this section originally described
+as sharing the same defect, `fgos approve`'s `mergeRunnerItemLocked`/
+`abortMergeIfPossible` (`src/runner/merge.mjs:1129-1153`, `:1242-1581`),
+does NOT — it already guards the no-`MERGE_HEAD` case and already
+converts a broken-abort failure into a typed `MergeError`
+(`.category = 'merge-fail'`, cleanly surfaced by the CLI's own top-level
+catch). D1's scope decision itself is unchanged (both functions still get
+attention this item); see `plan.md`'s own Approach section 2 for what
+that now concretely means for the approve direction (a regression test,
+not a code fix).
 
 ## Locked decisions
 
@@ -66,24 +75,28 @@ D2.
   `resolveFgosOnlyConflict` returns `false`, `conflicted` is set `true`,
   and the code falls into `git merge --abort` (`merge.mjs:1679`) with no
   merge in progress.
-- **Sibling defect in the approve direction**: `docs/history/
-  events-jsonl-merge-abort-truncation-gap/RESEARCH.md` (tsk-1ji, status
-  `retrospective`) already empirically reproduced the *identical* error
-  text — `error: Entry 'events.jsonl' not uptodate. Cannot merge. /
-  fatal: Could not reset index file to revision 'HEAD'.`, exit `128` — for
-  `mergeRunnerItemLocked`'s `abortMergeIfPossible`
-  (`merge.mjs:1074-1098`), triggered when a `.fgos/` path staged by the
+- **Sibling investigation in the approve direction (corrected)**:
+  `docs/history/events-jsonl-merge-abort-truncation-gap/RESEARCH.md`
+  (tsk-1ji, status `retrospective`) already empirically reproduced the
+  *identical* error text — `error: Entry 'events.jsonl' not uptodate.
+  Cannot merge. / fatal: Could not reset index file to revision 'HEAD'.`,
+  exit `128` — for `mergeRunnerItemLocked`'s `abortMergeIfPossible`
+  (`merge.mjs:1129-1153`), triggered when a `.fgos/` path staged by the
   merge's own `merge=union` driver is then concurrently appended to
   before the abort runs (its Round 5, fixture 2). tsk-1ji's own
   conclusion for ITS original symptom (silent data loss) was that this
   interleaving does NOT lose data but DOES leave the main checkout in a
-  broken, half-aborted state requiring manual recovery — tsk-1ji left
-  "the real mechanism behind the data-loss incidents" open, but the
-  broken-abort-state shape itself is exactly what tsk-5et also hit
-  (recovery cost ~3 hours, manual git-mechanics workaround). tsk-1ji does
-  NOT cover `performCatchUp` at all (different function, different merge
-  direction) — this item's own D1 extends the same fix shape to that
-  sibling site rather than assuming tsk-1ji already closes it.
+  broken, half-aborted state requiring manual recovery. **This is NOT a
+  live defect** — direct reads of `mergeRunnerItemLocked`'s own 5 call
+  sites (`merge.mjs:1346,1425,1463,1479,1545`) confirm it already
+  converts exactly this failure into a typed `MergeError`
+  (`.category='merge-fail'`), cleanly surfaced by the CLI's own top-level
+  catch (`bin/fgos.mjs:4369-4387`) — already the graceful behavior D2
+  asks for. tsk-1ji left "the real mechanism behind the data-loss
+  incidents" open (a separate, still-unaddressed question on tsk-1ji
+  itself, out of scope here); the broken-abort-state SHAPE it reproduced
+  is exactly what tsk-5et also hit, but the code already handles it —
+  see `plan.md`'s Approach section 2.
 - **Impact-analysis capability posture**: `degraded` — GitNexus is
   registered and `present`, but its own index is flagged stale (last
   indexed `7bb3231`, per this session's own tool-hook notice). Blast
