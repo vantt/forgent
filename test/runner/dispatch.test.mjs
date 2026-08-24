@@ -3518,6 +3518,77 @@ test('executeExecutorCli refuses a concurrent dispatch for the same cwd with Dis
   assert.equal(thirdResult.status, 0);
 });
 
+test('executeExecutorCli attaches lostUncommittedPaths and prints stderr warning when out-of-process dispatch reverts uncommitted changes', async () => {
+  const dir = mkTempDir();
+  const scriptWipePath = path.join(dir, 'wipe-executor.mjs');
+  fs.writeFileSync(
+    scriptWipePath,
+    'import fs from "node:fs";\n' +
+    'if (fs.existsSync("plan.md")) fs.unlinkSync("plan.md");\n' +
+    'process.stdout.write("[DONE]\\n");\n' +
+    'process.exit(0);\n',
+  );
+
+  const { repoRoot: gitRepo } = mkTempGitRepo();
+  writeRunnerConfigFixture(gitRepo, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: {
+      'wipe-executor': { kind: 'agent', command: process.execPath, args: [scriptWipePath, '{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  fs.writeFileSync(path.join(gitRepo, 'plan.md'), 'uncommitted plan edit\n');
+
+  let stderrOutput = '';
+  const origWrite = process.stderr.write;
+  process.stderr.write = (chunk, ...args) => {
+    stderrOutput += chunk.toString();
+    return origWrite.call(process.stderr, chunk, ...args);
+  };
+
+  try {
+    const res = await executeExecutorCli('wipe-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+    assert.deepEqual(res.lostUncommittedPaths, ['plan.md']);
+    assert.ok(stderrOutput.includes('uncommitted path(s) lost across out-of-process dispatch: plan.md'));
+  } finally {
+    process.stderr.write = origWrite;
+  }
+});
+
+test('executeExecutorCli omits lostUncommittedPaths when dispatch is clean or adapter commits changes', async () => {
+  const dir = mkTempDir();
+  const scriptCommitPath = path.join(dir, 'commit-executor.mjs');
+  fs.writeFileSync(
+    scriptCommitPath,
+    'import { execFileSync } from "node:child_process";\n' +
+    'execFileSync("git", ["add", "plan.md"]);\n' +
+    'execFileSync("git", ["commit", "-q", "-m", "worker commit"]);\n' +
+    'process.stdout.write("[DONE]\\n");\n' +
+    'process.exit(0);\n',
+  );
+
+  const { repoRoot: gitRepo } = mkTempGitRepo();
+  writeRunnerConfigFixture(gitRepo, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: {
+      'commit-executor': { kind: 'agent', command: process.execPath, args: [scriptCommitPath, '{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  // Clean cwd case
+  const resClean = await executeExecutorCli('commit-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  assert.equal(resClean.lostUncommittedPaths, undefined);
+
+  // Dirty file that is committed by the executor case
+  fs.writeFileSync(path.join(gitRepo, 'plan.md'), 'uncommitted plan edit\n');
+  const resCommit = await executeExecutorCli('commit-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  assert.equal(resCommit.lostUncommittedPaths, undefined);
+});
+
 test('executeExecutorCli refuses with DispatchError(dispatch-in-flight) when lock file content is corrupt/ambiguous (tsk-64hk)', async () => {
   const { repoRoot, fgosDir } = mkTempGitRepo();
   const dir = mkTempDir();
