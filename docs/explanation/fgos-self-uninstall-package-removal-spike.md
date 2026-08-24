@@ -1,3 +1,10 @@
+---
+type: explanation
+title: Can fgOS reliably remove its own installed package?
+tags: [uninstall, npm, package-manager, self-removal]
+source_capture_ids: [tsk-4iv-2, tsk-652]
+authoritative_for: whether fgos uninstall --remove-package can reliably remove its own package, which package managers/platforms it covers, and how it handles an unconfirmed install method
+---
 # Can fgOS reliably remove its own installed package?
 
 `tsk-4iv-2`'s spike question: can a running process reliably delete its own
@@ -50,3 +57,19 @@ A follow-up item extending `--remove-package` to pnpm/yarn (and, once
 `tsk-3nx` lands CI coverage, Windows) is deliberately not created yet —
 YAGNI: there was no point shaping that build plan before this one
 package-manager question was even answered.
+
+## The false-success gap this scoping left open (`tsk-652`)
+
+The spike's own npm-only scoping had a real, live consequence: `fgos
+uninstall --remove-package` ran `execFileSync('npm', ['uninstall', '-g',
+'forgent'])` **unconditionally**, with no detection of which package
+manager the running copy was actually installed through. For a
+pnpm- or yarn-installed copy, `npm uninstall` removes nothing, exits `0`,
+and the CLI reported successful removal — a false-success report leaving
+the package still installed. No follow-up item had ever tracked closing
+this gap until `tsk-652` filed and fixed it directly.
+
+**Fix**: `--remove-package` no longer reports success on a non-npm
+install. It now refuses with a clear message when the actual install
+method cannot be confirmed to be npm, rather than silently reporting a
+removal that never happened.
