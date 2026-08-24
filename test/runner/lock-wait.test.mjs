@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { withLockRetry } from '../../src/runner/lock-wait.mjs';
 
-function lockHeldError(remainingTtlMs, holderPid) {
-  return Object.assign(new Error('main checkout locked'), { code: 'lock-held', remainingTtlMs, holderPid });
+function lockHeldError(remainingTtlMs, holderPid, lockAgeMs) {
+  return Object.assign(new Error('main checkout locked'), { code: 'lock-held', remainingTtlMs, holderPid, lockAgeMs });
 }
 
 test('withLockRetry: succeeds immediately when the thunk succeeds on the first attempt (no retry needed)', async () => {
@@ -230,5 +230,72 @@ test('withLockRetry: renders self qualifier when string holderPid equals env ses
     stderrChunks.some((line) => /still waiting on main-checkout lock.*likely your own session's other in-flight call/.test(line)),
     'string holderPid matching env session id must render the self qualifier',
   );
+});
+
+test('withLockRetry: renders remaining-TTL phrase and holder qualifier when remainingTtlMs > 0 (tsk-6ci)', async () => {
+  const stderrChunks = [];
+  const originalWrite = process.stderr.write;
+  process.stderr.write = (chunk) => {
+    stderrChunks.push(String(chunk));
+    return true;
+  };
+  try {
+    await assert.rejects(
+      () => withLockRetry(() => {
+        throw lockHeldError(45000, process.pid + 99999, 15000);
+      }, { waitMs: 500 }),
+    );
+  } finally {
+    process.stderr.write = originalWrite;
+  }
+  assert.ok(
+    stderrChunks.some((line) => /still waiting on main-checkout lock.*remaining TTL 45s.*a different pid\/session/.test(line)),
+    'printed line must include both holder qualifier and remaining TTL phrase when remainingTtlMs > 0',
+  );
+});
+
+test('withLockRetry: renders stale/fgos-unlock hint when remainingTtlMs === 0 (tsk-6ci)', async () => {
+  const stderrChunks = [];
+  const originalWrite = process.stderr.write;
+  process.stderr.write = (chunk) => {
+    stderrChunks.push(String(chunk));
+    return true;
+  };
+  try {
+    await assert.rejects(
+      () => withLockRetry(() => {
+        throw lockHeldError(0, process.pid, 60000);
+      }, { waitMs: 500 }),
+    );
+  } finally {
+    process.stderr.write = originalWrite;
+  }
+  assert.ok(
+    stderrChunks.some((line) => /still waiting on main-checkout lock.*-- TTL EXPIRED, may be stale: consider fgos-unlock/.test(line)),
+    'printed line must include stale hint when remainingTtlMs === 0',
+  );
+});
+
+test('withLockRetry: renders sanely with no fabricated duration claim when remainingTtlMs is undefined (tsk-6ci)', async () => {
+  const stderrChunks = [];
+  const originalWrite = process.stderr.write;
+  process.stderr.write = (chunk) => {
+    stderrChunks.push(String(chunk));
+    return true;
+  };
+  try {
+    await assert.rejects(
+      () => withLockRetry(() => {
+        throw lockHeldError(undefined, process.pid + 123);
+      }, { waitMs: 500 }),
+    );
+  } finally {
+    process.stderr.write = originalWrite;
+  }
+  const matchedLine = stderrChunks.find((line) => /still waiting on main-checkout lock/.test(line));
+  assert.ok(matchedLine, 'must print a progress line');
+  assert.ok(!matchedLine.includes('remaining TTL'), 'must not fabricate remaining TTL when undefined');
+  assert.ok(!matchedLine.includes('undefined'), 'must not contain literal undefined for duration');
+  assert.ok(!matchedLine.includes('TTL EXPIRED'), 'must not show TTL EXPIRED when undefined');
 });
 

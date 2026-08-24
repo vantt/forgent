@@ -642,6 +642,8 @@ export async function decideExecutorCli(
   // `executeExecutorCli` above already uses, generalized past purpose-only.
   const resolvedIndirectly = !executorIdArg;
   let executorId = executorIdArg;
+  let workResolved;
+  let workResolvedInputId;
   if (!executorId && workIdArg) {
     const fgosDir = fgosDirFromRoot(root);
     const workItem = listWork(fgosDir).work[workIdArg];
@@ -649,6 +651,8 @@ export async function decideExecutorCli(
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
     executorId = executorIdForWork(workItem, stageArg);
+    workResolvedInputId = executorId;
+    workResolved = resolveExecutorAndOverrides(cfg, executorId);
     // tsk-5tm-6 D4: a work-item-resolved executorId with NO explicit
     // cfg.executors entry means "no override configured" -- per
     // Native-First Dispatch Doctrine (docs/decisions/0026) rule 2, every
@@ -665,7 +669,7 @@ export async function decideExecutorCli(
     // their pre-D4 "no executor -> out-of-process" behavior byte-identical,
     // since naming a specific executorId/purpose asks about that
     // registered target specifically, not a work item's default dispatch.
-    const hasExplicitExecutor = resolveExecutorAndOverrides(cfg, executorId).configured;
+    const hasExplicitExecutor = workResolved.configured;
     if (!hasExplicitExecutor) {
       const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
       return { mechanism, executorId, configured: false };
@@ -692,7 +696,9 @@ export async function decideExecutorCli(
     return { mechanism: 'unavailable', configured: false };
   }
   const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
-  const { executor, configured } = resolveExecutorAndOverrides(cfg, executorId);
+  const { executor, configured } = workResolved && workResolvedInputId === executorId
+    ? workResolved
+    : resolveExecutorAndOverrides(cfg, executorId);
   const agentType = executor?.agentType;
 
   // tsk-45f D10: MCP hand-back -- a tool-kind executor with an mcp
@@ -756,89 +762,113 @@ export async function fanoutBatchExecutorCli(
   const mechanismChanged = [];
   const unavailable = [];
 
-  for (const candidateId of batchToRun) {
-    const workItem = listWork(fgosDir).work[candidateId];
-    if (!workItem) {
-      unavailable.push({ id: candidateId, reason: 'not-found' });
-      continue;
-    }
-
-    const executorId = executorIdForWork(workItem);
-    const hasExplicitExecutor = resolveExecutorAndOverrides(cfg, executorId).configured;
-    let mechanism;
-    if (!hasExplicitExecutor) {
-      mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
-    } else {
-      mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
-    }
-
-    if (mechanism === 'in-process') {
-      mechanismChanged.push({ id: candidateId, mechanism, executorId });
-      continue;
-    }
-    if (mechanism === 'unavailable') {
-      unavailable.push({ id: candidateId, executorId });
-      continue;
-    }
-
-    try {
-      // `--dir` must be the repo ROOT here, never `fgosDir` -- `dataDir()`
-      // (bin/fgos.mjs) always derives `.fgos` from `--dir` itself
-      // (`fgosDirFromRoot`), so passing an already-`.fgos` path doubles the
-      // suffix into a nonexistent `<root>/.fgos/.fgos`.
-      const pickStdout = execFileSync(process.execPath, [BIN_FGOS_PATH, 'pick', candidateId, '--dir', root], {
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'pipe'],
-      });
-      // Every fgos.mjs verb response is wrapped in the fgos.v1 envelope
-      // (`wrapEnvelope`, unconditional) -- the real path lives at
-      // `data.worktree.path`, never a bare `.worktreePath`/`.path`.
-      const picked = JSON.parse(pickStdout);
-      const wtPath = picked.data?.worktree?.path || cwd;
-
-      const execRes = await executeExecutorCli(executorId, {
-        // Bug found running tsk-397's own fanout batches (2026-08-20): this
-        // call omitted `prompt` entirely, so `executeExecutorCli` fell back
-        // to its own default `prompt = ''` and every out-of-process executor
-        // (agy) received a literal empty prompt — no edits, no commit, then
-        // `return` below failed with "branch has not advanced". `spawnWorker`
-        // (this same file, above) already builds the work item's own prompt
-        // via `buildPrompt` before dispatching; this out-of-process path
-        // needs the identical prompt, built the identical way (no feedback,
-        // default 'executing' stage — the same defaults `spawnWorker` uses
-        // when its own `opts.feedback`/`opts.stage` are omitted).
-        prompt: buildPrompt(workItem),
-        cwd: wtPath,
-        repoRoot: root,
-        hasLiveTaskAccess,
-        // D20/D22 (review finding H1, tsk-397): lets executeExecutorCli
-        // resolve a real agentType via resolveAgentTypeForWork, same as
-        // spawnWorker already does.
-        work: workItem,
-      });
-
-      const returnArgs = ['return', candidateId, '--dir', root];
-      if (execRes && execRes.verifiedSha) {
-        returnArgs.push('--worker-verified-sha', execRes.verifiedSha);
+  const results = await Promise.allSettled(
+    batchToRun.map(async (candidateId) => {
+      const workItem = listWork(fgosDir).work[candidateId];
+      if (!workItem) {
+        return { kind: 'unavailable', entry: { id: candidateId, reason: 'not-found' } };
       }
-      execFileSync(process.execPath, [BIN_FGOS_PATH, ...returnArgs], {
-        cwd: wtPath,
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'pipe'],
-      });
 
-      fired.push({
-        id: candidateId,
-        status: execRes.status ?? 0,
-        signal: execRes.signal ?? null,
-        errorClass: execRes.errorClass ?? null,
-      });
-    } catch (err) {
+      const executorId = executorIdForWork(workItem);
+      const hasExplicitExecutor = resolveExecutorAndOverrides(cfg, executorId).configured;
+      let mechanism;
+      if (!hasExplicitExecutor) {
+        mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
+      } else {
+        mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
+      }
+
+      if (mechanism === 'in-process') {
+        return { kind: 'mechanismChanged', entry: { id: candidateId, mechanism, executorId } };
+      }
+      if (mechanism === 'unavailable') {
+        return { kind: 'unavailable', entry: { id: candidateId, executorId } };
+      }
+
+      try {
+        // `--dir` must be the repo ROOT here, never `fgosDir` -- `dataDir()`
+        // (bin/fgos.mjs) always derives `.fgos` from `--dir` itself
+        // (`fgosDirFromRoot`), so passing an already-`.fgos` path doubles the
+        // suffix into a nonexistent `<root>/.fgos/.fgos`.
+        const pickStdout = execFileSync(process.execPath, [BIN_FGOS_PATH, 'pick', candidateId, '--dir', root], {
+          encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'pipe'],
+        });
+        // Every fgos.mjs verb response is wrapped in the fgos.v1 envelope
+        // (`wrapEnvelope`, unconditional) -- the real path lives at
+        // `data.worktree.path`, never a bare `.worktreePath`/`.path`.
+        const picked = JSON.parse(pickStdout);
+        const wtPath = picked.data?.worktree?.path || cwd;
+
+        const execRes = await executeExecutorCli(executorId, {
+          // Bug found running tsk-397's own fanout batches (2026-08-20): this
+          // call omitted `prompt` entirely, so `executeExecutorCli` fell back
+          // to its own default `prompt = ''` and every out-of-process executor
+          // (agy) received a literal empty prompt — no edits, no commit, then
+          // `return` below failed with "branch has not advanced". `spawnWorker`
+          // (this same file, above) already builds the work item's own prompt
+          // via `buildPrompt` before dispatching; this out-of-process path
+          // needs the identical prompt, built the identical way (no feedback,
+          // default 'executing' stage — the same defaults `spawnWorker` uses
+          // when its own `opts.feedback`/`opts.stage` are omitted).
+          prompt: buildPrompt(workItem),
+          cwd: wtPath,
+          repoRoot: root,
+          hasLiveTaskAccess,
+          // D20/D22 (review finding H1, tsk-397): lets executeExecutorCli
+          // resolve a real agentType via resolveAgentTypeForWork, same as
+          // spawnWorker already does.
+          work: workItem,
+        });
+
+        const returnArgs = ['return', candidateId, '--dir', root];
+        if (execRes && execRes.verifiedSha) {
+          returnArgs.push('--worker-verified-sha', execRes.verifiedSha);
+        }
+        execFileSync(process.execPath, [BIN_FGOS_PATH, ...returnArgs], {
+          cwd: wtPath,
+          encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'pipe'],
+        });
+
+        return {
+          kind: 'fired',
+          entry: {
+            id: candidateId,
+            status: execRes.status ?? 0,
+            signal: execRes.signal ?? null,
+            errorClass: execRes.errorClass ?? null,
+          },
+        };
+      } catch (err) {
+        return {
+          kind: 'fired',
+          entry: {
+            id: candidateId,
+            status: 1,
+            errorClass: err.errorClass || 'error',
+            error: err.message,
+          },
+        };
+      }
+    }),
+  );
+
+  for (let i = 0; i < results.length; i++) {
+    const res = results[i];
+    if (res.status === 'fulfilled') {
+      const { kind, entry } = res.value;
+      if (kind === 'fired') fired.push(entry);
+      else if (kind === 'mechanismChanged') mechanismChanged.push(entry);
+      else if (kind === 'unavailable') unavailable.push(entry);
+    } else {
+      const candidateId = batchToRun[i];
+      const err = res.reason;
       fired.push({
         id: candidateId,
         status: 1,
-        errorClass: err.errorClass || 'error',
-        error: err.message,
+        errorClass: err?.errorClass || 'error',
+        error: err?.message || String(err),
       });
     }
   }

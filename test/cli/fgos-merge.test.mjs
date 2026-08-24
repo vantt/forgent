@@ -102,12 +102,14 @@ test('review on a nonexistent id is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
+
 test('review on a non-proposed item is rejected as precondition, exit 2', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'not-proposed-review');
   const result = run(cwd, ['review', 'not-proposed-review']);
   assert.equal(result.status, 2);
 });
+
 
 test('review of a runner-source proposed item prints the branch diff and no warnings, exit 0', () => {
   const cwd = initGitCwdMain();
@@ -122,6 +124,7 @@ test('review of a runner-source proposed item prints the branch diff and no warn
   assert.match(data.diff, /review-runner-item-produced\.txt/);
   assert.deepEqual(data.warnings, []);
 });
+
 
 test('review of a pull-door proposed item prints the headAtTake..headAtReturn diff, exit 0', () => {
   const cwd = initGitCwd();
@@ -139,6 +142,7 @@ test('review of a pull-door proposed item prints the headAtTake..headAtReturn di
   assert.deepEqual(data.warnings, []);
 });
 
+
 test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) degrades honestly — a warning, no throw, exit 0 (must_have: legacy degrade)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'review-legacy-item');
@@ -151,6 +155,7 @@ test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) d
   assert.equal(data.source, 'legacy');
   assert.match(data.warnings.join('\n'), /no live diff source/);
 });
+
 
 test('review of a leaf proposed item diffs against its resolved root branch (fgw/<root>), not main', () => {
   const cwd = initGitCwdMain();
@@ -165,6 +170,7 @@ test('review of a leaf proposed item diffs against its resolved root branch (fgw
   assert.doesNotMatch(data.diff, /root-only\.txt/, 'diff against fgw/<root> must not include the root branch\'s own divergence from main');
 });
 
+
 test('review of a root proposed item is unchanged — still diffs against main (regression)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -177,12 +183,14 @@ test('review of a root proposed item is unchanged — still diffs against main (
   assert.match(data.diff, /review-root-regression-item-produced\.txt/);
 });
 
+
 test('sync-root on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   const result = run(cwd, ['sync-root', 'sync-root-ghost']);
   assert.equal(result.status, 4);
 });
+
 
 test('sync-root on a root with no fgw/<id> branch is rejected as validation, exit 4', () => {
   const cwd = initGitCwdMain();
@@ -192,6 +200,7 @@ test('sync-root on a root with no fgw/<id> branch is rejected as validation, exi
   assert.equal(result.status, 4);
   assert.match(result.stderr, /does not exist/);
 });
+
 
 test('sync-root happy path: merges fgw/<root> into main, root item status/stage UNCHANGED, fgw/<root> survives (not deleted)', () => {
   const cwd = initGitCwdMain();
@@ -215,6 +224,7 @@ test('sync-root happy path: merges fgw/<root> into main, root item status/stage 
   assert.match(branches, /fgw\/sync-root-happy\b/, 'sync-root must NOT delete the root branch — it stays open for further leaf merges');
 });
 
+
 test('sync-root records a real decision on the root item', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -229,6 +239,7 @@ test('sync-root records a real decision on the root item', () => {
   assert.equal(decisionEvents.length, 1, 'sync-root must append exactly one real decision record');
   assert.match(decisionEvents[0].payload.text, /sync-root-decision|fgw\/sync-root-decision/);
 });
+
 
 // A branch sync is machinery, not reflection. The record above still exists
 // and still shows in `fgos show` (which filters decisions by id, never by
@@ -256,6 +267,7 @@ test('sync-root tags its decision as engine bookkeeping, so it cannot satisfy th
   const gate = checkRetrospectiveContent(stateView(cwd), 'sync-root-engine-kind', cwd);
   assert.equal(gate.ok, false, 'a synced root with no retrospective document must not pass the cleanup gate on its sync record alone');
 });
+
 
 test('sync-root nested: a root with a parent merges into fgw/<parentId>, not main; main stays untouched; the child root\'s status stays unchanged', () => {
   const cwd = initGitCwdMain();
@@ -296,6 +308,7 @@ test('sync-root nested: a root with a parent merges into fgw/<parentId>, not mai
   assert.equal(view.work['sync-root-nested-child'].status, 'doing');
 });
 
+
 test('sync-root aborts cleanly on a genuine conflict: main left byte-for-byte unchanged, root status untouched', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -317,6 +330,7 @@ test('sync-root aborts cleanly on a genuine conflict: main left byte-for-byte un
   assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged after an aborted sync-root');
   assert.equal(stateView(cwd).work['sync-root-conflict'].status, 'doing', 'a blocked sync-root must never touch the root item\'s status');
 });
+
 
 test('sync-root on a no-parent root refuses when the shared main checkout carries an uncommitted change on a path the root itself touches, exit 4, no merge lands (tsk-66t)', () => {
   const cwd = initGitCwdMain();
@@ -340,6 +354,7 @@ test('sync-root on a no-parent root refuses when the shared main checkout carrie
   assert.equal(stateView(cwd).work['sync-root-dirty'].status, 'doing', 'a refused sync-root must never touch the root item\'s status');
 });
 
+
 test('sync-root refuses from inside a linked worktree (must land on the real main checkout)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -356,6 +371,7 @@ test('sync-root refuses from inside a linked worktree (must land on the real mai
 
   gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
 });
+
 
 // --- sync-root Iron Law + verify-fail (tsk-n2x, docs/history/sync-root-
 // direct-outcome-tests/) -----------------------------------------------
@@ -399,6 +415,7 @@ test('sync-root of a root whose diff touches a self-modifying-capable module REF
   assert.match(survivingBranches, /fgw\/sync-root-iron-refuse/, 'the branch survives an Iron Law refusal -- nothing was merged or cleaned up');
 });
 
+
 test('sync-root of a root whose staged merge fails its own verify: outcome blocked reason verify-fail, root status untouched', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -419,6 +436,7 @@ test('sync-root of a root whose staged merge fails its own verify: outcome block
   assert.equal(view.work['sync-root-verify-fail'].status, 'doing', 'sync-root must never change the root item\'s own status, including on a verify-fail block');
 });
 
+
 test('promote-to-component requires at least 2 ids, exit 4', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -429,6 +447,7 @@ test('promote-to-component requires at least 2 ids, exit 4', () => {
   assert.match(result.stderr, /at least 2/);
 });
 
+
 test('promote-to-component on a nonexistent member id is rejected as validation, exit 4', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -438,6 +457,7 @@ test('promote-to-component on a nonexistent member id is rejected as validation,
   assert.equal(result.status, 4);
   assert.match(result.stderr, /ptc-ghost.*not found/);
 });
+
 
 test('promote-to-component refuses a member that already has a parent, exit 4', () => {
   const cwd = initGitCwdMain();
@@ -452,6 +472,7 @@ test('promote-to-component refuses a member that already has a parent, exit 4', 
   assert.match(result.stderr, /already has parent/);
 });
 
+
 test('promote-to-component refuses ids that are not connected via deps/mergeAfter, exit 4', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -462,6 +483,7 @@ test('promote-to-component refuses ids that are not connected via deps/mergeAfte
   assert.equal(result.status, 4);
   assert.match(result.stderr, /not all connected/);
 });
+
 
 test('promote-to-component happy path (D1 new-item): creates a fresh root, merges both members into it, sets parent only after real success, records one decision', () => {
   const cwd = initGitCwdMain();
@@ -501,6 +523,7 @@ test('promote-to-component happy path (D1 new-item): creates a fresh root, merge
   assert.equal(gate.ok, false, 'a promoted root with no retrospective document must not pass the cleanup gate on its promotion record alone');
 });
 
+
 test('promote-to-component happy path (D1 reuse-member): promotes an existing member to root, root itself is skipped not merged', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -535,6 +558,7 @@ test('promote-to-component happy path (D1 reuse-member): promotes an existing me
   assert.match(rootFiles, /ptc-reuse-other-produced\.txt/);
 });
 
+
 test('promote-to-component reports merged-parent-rejected (never crashes) when the real git merge succeeds but setting parent would close a deps+parent cycle', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -568,6 +592,7 @@ test('promote-to-component reports merged-parent-rejected (never crashes) when t
   assert.equal(decisionEvents.length, 1, 'a per-member rejection still gets exactly one real decision record');
   assert.match(decisionEvents[0].payload.text, /ptc-cycle-other/);
 });
+
 
 test('promote-to-component bails a conflicting member without setting its parent, still processes and merges the rest', () => {
   const cwd = initGitCwdMain();
@@ -615,6 +640,7 @@ test('promote-to-component bails a conflicting member without setting its parent
   assert.equal(view.work['ptc-conflict-b'].parent, data.rootId);
 });
 
+
 test('review --github on a legacy (non-runner) item is a validation error, no state change, and no gh call is attempted', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -628,6 +654,7 @@ test('review --github on a legacy (non-runner) item is a validation error, no st
   assert.equal(stateView(cwd).work['gh-review-legacy'].status, 'awaiting-approval');
   assert.ok(!fs.existsSync(marker), 'the source gate must reject before any gh CLI call');
 });
+
 
 test('review --github on a runner item pushes the branch and opens a PR via a real subprocess-injected fake gh, reports the PR number, and never mutates FSM state', () => {
   const cwd = initGitCwdMain();
@@ -653,6 +680,7 @@ test('review --github on a runner item pushes the branch and opens a PR via a re
   assert.equal(stateView(cwd).work['gh-review-ok'].status, 'awaiting-approval');
 });
 
+
 test('review --github reports a gh failure as plain output with no state mutation (read-only contract holds on the blocked path)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -668,6 +696,7 @@ test('review --github reports a gh failure as plain output with no state mutatio
   assert.equal(stateView(cwd).work['gh-review-blocked'].status, 'awaiting-approval', 'review never transitions state, even on a gh failure');
   assert.equal(stateView(cwd).frictions?.['gh-review-blocked'], undefined, 'review never records friction');
 });
+
 
 // --- `review --github --pr <n>` read-only status check (github-adapter D6/D4) ---
 //
@@ -1194,6 +1223,7 @@ test('sync-root outcome guard catches merge-failed-unclassified and records unha
   assert.notEqual(data.outcome, 'synced', 'must never report success for an outcome it does not recognize');
   assert.equal(data.outcome, 'blocked');
   assert.equal(data.reason, 'merge-failed-unclassified');
+  assert.ok(data.error?.stderr || data.error?.message, 'CLI response must carry real git error details (tsk-3tv)');
 
   assert.equal(gitHead(cwd), headBefore, 'main must be unchanged');
   assert.throws(
@@ -1208,6 +1238,11 @@ test('sync-root outcome guard catches merge-failed-unclassified and records unha
   assert.ok(
     frictions.some((f) => f.errorClass === 'sync-root-unhandled-outcome'),
     'frictions must contain an entry with errorClass === "sync-root-unhandled-outcome"',
+  );
+  const unhandledFriction = frictions.find((f) => f.errorClass === 'sync-root-unhandled-outcome');
+  assert.ok(
+    unhandledFriction.detail.includes(data.error.stderr || data.error.message),
+    'friction detail must carry real git error text/stderr (tsk-3tv)',
   );
 
   const lines = eventLines(cwd);
