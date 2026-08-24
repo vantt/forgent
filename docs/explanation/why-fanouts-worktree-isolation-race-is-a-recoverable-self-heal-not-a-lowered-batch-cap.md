@@ -2,7 +2,7 @@
 type: explanation
 title: Why fanout's worktree isolation race is a recoverable self-heal, not a lowered batch cap
 tags: [fgos-fanout, worktree, isolation, concurrency, harness]
-source_capture_ids: [tsk-2k0]
+source_capture_ids: [tsk-2k0, tsk-8v1]
 authoritative_for: why fgos-fanout treats a dispatched Agent's worktree-isolation refusal as a recoverable race instead of lowering its batch cap or serializing dispatch
 ---
 # Why fanout's worktree isolation race is a recoverable self-heal, not a lowered batch cap
@@ -63,6 +63,47 @@ instruction:
 3. Never respond to this hazard by lowering the batch cap — concurrency
    is preserved by relying on this self-recovery instruction, not by
    avoiding the race.
+
+## New evidence the self-recovery instruction actually holds (`tsk-8v1`)
+
+`tsk-2k0`'s own fix only documented the hazard in `fgos-fanout/SKILL.md`'s
+"Known hazard" section — it never touched the underlying mechanism. A
+related item, `tsk-1y0`, tried to reopen this and ended `wontfix` (a
+terminal state the status machine cannot reopen). `tsk-8v1` picked the
+thread back up with fresh, real evidence and a narrower, explicitly
+scoped fix.
+
+**New evidence, N=1** (2026-08-19): dispatching a *single* Agent via the
+Task tool (not even a full `fgos-fanout` batch — a smoke test for a
+different item) was enough to pull the coordinating session's own cwd
+into the dispatched agent's worktree. A coordinator bash call was refused
+`"isolated in the worktree <path>"` even though the coordinator itself
+had never called `EnterWorktree`. Recovery was clean: `ExitWorktree({action:
+"keep"})`, then continuing normally — no algorithm needed, just
+recognizing the right error signal and self-correcting (the exact
+recovery pattern this session used for itself earlier in this same
+drive, for an unrelated worktree-exit need).
+
+Combined with `tsk-1y0`'s own older evidence (a real 3-way fanout batch:
+one sibling fully starved after 6 consecutive refused writes and gave up,
+the other two survived via their own retries; the starved one recovered
+cleanly once redispatched down to 1-way contention), the pattern held
+across both a 3-way real incident and a fresh N=1 one: recognizing "refused
+for the wrong worktree" as a recoverable race and self-correcting via
+`EnterWorktree` back into one's own worktree was sufficient both times,
+with **no additional algorithm or Loop-level mechanism** needed on top.
+
+**Locked scope for `tsk-8v1` itself** (2026-08-19): mechanical only —
+rewrite `fgos-fanout/SKILL.md`'s "Known hazard" section (and its
+`.agents/` mirror) so every dispatched Agent *and* the coordinating
+session treat one refused Edit/Write/Bash call as a recoverable race:
+re-`EnterWorktree` into their own worktree, then retry the exact refused
+operation. Still never lower the batch cap as the fix — that removes
+fanout's own reason to exist. The live empirical proof (a real ≥3-candidate
+fanout batch, cap not lowered, observing whether every participant
+actually self-recovers) was explicitly filed as a separate follow-up
+item — this item's own worker (an out-of-process worker with no live
+Agent/Task-tool access) could not safely run that test itself.
 
 ## Scope boundary: this hazard sits entirely in the in-process dispatch path
 
