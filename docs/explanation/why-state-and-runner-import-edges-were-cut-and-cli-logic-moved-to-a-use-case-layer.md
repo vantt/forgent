@@ -2,7 +2,7 @@
 type: explanation
 title: Why state/runner import edges were cut and CLI logic moved to a use-case layer
 tags: [architecture, module-boundary, state, runner, iron-law, cli]
-source_capture_ids: [tsk-49i-1]
+source_capture_ids: [tsk-49i-1, tsk-49i]
 authoritative_for: why fgOS cut specific state<->runner import edges, consolidated the Iron Law check, and started extracting bin/fgos.mjs's inline verb logic into a src/verbs/<domain>/<verb>.mjs use-case layer
 ---
 # Why state/runner import edges were cut and CLI logic moved to a use-case layer
