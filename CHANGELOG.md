@@ -44,6 +44,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `fgos pick`/`fgos take` (`claimWork`, `src/runner/claim-port.mjs`) now
+  self-heal an `AMBIGUOUS` `.fgos/main-checkout.lock` (unparseable content)
+  inline: it calls the same `forceReclaimAmbiguousLock` the `unlock` verb
+  already used and retries the claim once before falling back to the same
+  `lock-ambiguous` error — a transiently-corrupt lock no longer requires a
+  separate manual `fgos unlock`/`/fgOS:unlock` call to clear it.
 - The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)
   now spawns every executor `detached: true` and kills its whole process
   GROUP on timeout/maxBuffer (`process.kill(-pid, ...)`), not just the
