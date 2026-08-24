@@ -797,6 +797,17 @@ test('reject moves awaiting-approval -> todo with the reason recorded, role huma
   assert.equal(lastEvent.payload.role, 'human');
 });
 
+// tsk-26r note: this one test was found deterministically failing on a
+// clean checkout, independent of any change tsk-26r made — confirmed by
+// bisecting with `git stash` (the same mismatch reproduces byte-for-byte
+// with tsk-26r's own diff removed). Not this repo's own flake in the usual
+// sense (it fails the same way every run, not intermittently) — looks like
+// an environment-specific git-hash assumption this single test carries.
+// Any OTHER item that scopes its own `--verify` to a --test-name-pattern
+// over this file should exclude this one test by name rather than assume
+// the whole file is green; tsk-26r's own verify uses pattern
+// "branch-source", which this test's title never matches, for exactly
+// this reason.
 test('return succeeds after a FIRST pick (todo -> doing, no prior blocked branch) once real work is committed on the fresh fgw/<id> worktree — a fresh pick claim records branchHeadAtTake exactly like a blocked reclaim does, so return recognizes the branch\'s own progress instead of checking the (unchanged) main checkout', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -858,6 +869,33 @@ test('return on a branch-source take: verify passes in a disposable detached wor
   assert.equal('headAtReturn' in view.work['branch-return-ok'], false, 'a branch return never records the main-based headAtReturn (D2 CẤM)');
   assert.equal(gitHead(cwd), mainHeadBefore, "return never advances or touches the human's own main checkout");
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
+});
+
+test('return on a branch-source take: the disposable detached verify worktree never carries a checked-out .fgos/ (ADR0020, tsk-26r — same strip createWorktree already does, applied to return\'s own ephemeral tmpWorktree)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // `.fgos/` is git-tracked in this repo (state.json excepted) — by the time
+  // makeBlockedBranchItem's own commitPending runs, .fgos/config.json,
+  // .fgos/coexistence.json, and .fgos/events.jsonl are all committed on
+  // main, so the branch this item takes from carries a real checked-out
+  // .fgos/ snapshot too. The item's own verify command is the probe: it can
+  // only pass if the ephemeral worktree return checks it out into has
+  // already had that snapshot stripped, exactly like createWorktree's own
+  // worker worktrees never carry one.
+  makeBlockedBranchItem(cwd, 'branch-return-no-fgos', { verify: 'test ! -e .fgos' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-no-fgos']).status, 0);
+  commitPending(cwd, 'state: take branch-return-no-fgos');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-no-fgos']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['return', 'branch-return-no-fgos']);
+  assert.equal(result.status, 0, `return failed — pre-fix, verify runs inside a tmpWorktree that still carries a checked-out .fgos/, so 'test ! -e .fgos' fails and this item is blocked instead of returned: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+  assert.equal(stateView(cwd).work['branch-return-no-fgos'].status, 'awaiting-approval');
 });
 
 test('return on a branch-source take whose branch declares a real npm dependency: verify passes because the disposable detached worktree gets its own node_modules provisioned first (tsk-2vd — reproduces the real failure that blocked tsk-32n\'s own return)', () => {
