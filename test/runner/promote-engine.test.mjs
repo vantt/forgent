@@ -140,3 +140,24 @@ test('retargetMember refuses to run from a linked worktree, mirroring sync-root\
     git(repoRoot, ['worktree', 'remove', '--force', linkedWorktree]);
   }
 });
+
+test('retargetMember retries on lock-held and succeeds once the lock clears (withLockRetry wrap)', async () => {
+  const repoRoot = initRepo();
+  const fgosDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  makeBranchWithCommit(repoRoot, 'fgw/member-a', 'member-a.txt', 'member a work\n');
+  resolveIntegrationBranch(repoRoot, 'root-x');
+
+  const lockPath = path.join(fgosDir, 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: 'other-session', ts: Date.now() }));
+
+  setTimeout(() => {
+    if (fs.existsSync(lockPath)) {
+      fs.unlinkSync(lockPath);
+    }
+  }, 200);
+
+  const result = await retargetMember(repoRoot, makeItem('member-a'), 'root-x');
+  assert.deepEqual(result, { id: 'member-a', outcome: 'merged' });
+});
+
