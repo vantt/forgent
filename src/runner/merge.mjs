@@ -1156,6 +1156,23 @@ export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {
   return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;
 }
 
+// tsk-4gi: `git checkout HEAD -- <path>` is oblivious to merge attributes --
+// it will happily discard ANY staged change for any path that already
+// exists on HEAD, not only ones a `merge=union` driver produced. Restoring
+// that broadly would silently drop a worker's real, non-append-only `.fgos/`
+// write (e.g. a hand-edited `.fgos/config.json` that happened to auto-merge
+// without a textual conflict because the two sides touched different
+// lines) instead of refusing it -- exactly the ADR0020 protection this
+// check exists to keep. Gate the restore-then-recheck path in
+// mergeRunnerItemLocked on this so only a path `.gitattributes` actually
+// declares `merge=union` for is ever silently discarded back to target's
+// own pre-merge content; every other staged `.fgos/` path is left alone and
+// still falls through to fgos-write-rejected.
+function isMergeUnionPath(repoRoot, relPath) {
+  const output = git(repoRoot, ['check-attr', 'merge', '--', relPath]);
+  return output.trim().endsWith(': union');
+}
+
 async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   // tsk-3yl D1: still run the real goal-check here, even though nothing
   // will be staged/committed — every 'merged' outcome must carry a real,
@@ -1274,10 +1291,61 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
     }
   }
 
-  const stagedPaths = git(repoRoot, ['diff', '--name-only', '--cached'])
+  // tsk-4gi D1: a successful merge (no exception above) can still leave
+  // `.fgos/` paths staged — most commonly a `.gitattributes` `merge=union`
+  // driver cleanly auto-resolving an append-only `.fgos/*.jsonl` file (e.g.
+  // events.jsonl, the sharded events/*.jsonl, or the tsk-2xg diagnostic
+  // logs) by combining both sides. That auto-resolution is not a conflict —
+  // git already succeeded — but the old staged-diff check below rejected it
+  // unconditionally anyway, tripping on nearly every approve for a
+  // long-lived branch since main's `.fgos/*.jsonl` copy keeps growing under
+  // concurrent write load. Fix (tsk-2xg option b, never implemented until
+  // now): for a path `.gitattributes` actually declares `merge=union` for,
+  // restore it to target's own pre-merge committed version first —
+  // discarding whatever the union driver staged for it — then re-check.
+  //
+  // Only `merge=union` paths get this treatment (isMergeUnionPath, above)
+  // because `git checkout HEAD -- <path>` is oblivious to WHY a path is
+  // staged: for a plain (non-union) `.fgos/` path that already exists on
+  // HEAD, two non-overlapping edits (one on `branch`, one on target since)
+  // auto-merge cleanly with no exception too, and blindly restoring THAT
+  // would silently discard a real, non-append-only `.fgos/` write instead
+  // of refusing it — exactly what ADR0020 exists to catch. Restricting the
+  // restore to genuinely `merge=union`-attributed paths keeps that
+  // protection intact for everything else.
+  //
+  // Each `merge=union` path is restored individually rather than in one
+  // batched `checkout HEAD -- <paths>` call: a path the branch introduced
+  // for the FIRST time (never committed on target's own HEAD at all) has
+  // no HEAD pathspec to check out, `git checkout` throws for it, AND aborts
+  // its ENTIRE batch on the first pathspec that fails to match — restoring
+  // nothing at all, not even the other paths that do exist in HEAD. Such a
+  // path is also never a `merge=union` auto-resolution to begin with (that
+  // driver only ever resolves a MODIFY/MODIFY conflict on a path both sides
+  // already know about) — left staged as-is on a failed checkout, it still
+  // falls through to the reject/abort path below exactly as before this
+  // fix.
+  let stagedPaths = git(repoRoot, ['diff', '--name-only', '--cached'])
     .split('\n')
     .filter((p) => p !== '');
-  const fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
+  let fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
+  if (fgosPaths.length > 0) {
+    for (const fgosPath of fgosPaths) {
+      if (!isMergeUnionPath(repoRoot, fgosPath)) {
+        continue;
+      }
+      try {
+        git(repoRoot, ['checkout', 'HEAD', '--', fgosPath]);
+      } catch {
+        // No HEAD version to restore to -- leave it staged; the recheck
+        // below will still find it and this call will still refuse it.
+      }
+    }
+    stagedPaths = git(repoRoot, ['diff', '--name-only', '--cached'])
+      .split('\n')
+      .filter((p) => p !== '');
+    fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
+  }
   if (fgosPaths.length > 0) {
     try {
       abortMergeIfPossible(repoRoot);
