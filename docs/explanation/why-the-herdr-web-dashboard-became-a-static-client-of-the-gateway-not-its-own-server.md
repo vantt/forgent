@@ -2,7 +2,7 @@
 type: explanation
 title: Why the herdr web dashboard became a static client of the gateway, not its own server
 tags: [herdr, web-dashboard, gateway, realignment, auth]
-source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w]
+source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w, tsk-5jr]
 authoritative_for: why the herdr web dashboard's architecture moved from a standalone embedded webserver to a static bundle served by the existing gateway, and the security/lifecycle decisions that survived the realignment
 ---
 # Why the herdr web dashboard became a static client of the gateway, not its own server
@@ -107,6 +107,20 @@ gateway's own static-serving behavior, still requiring registration in
 stale verify/description closely enough to notice it bundled two
 separable decisions — one dead, one alive — is what caught the
 realignment's own over-broad closure before it happened.
+
+## P3 (`tsk-5jr`): the taskboard list view, and the contract-as-single-source rule
+
+The taskboard list screen — the work-item listing view — was re-framed
+the same way the whole cluster was: not a screen written inside the
+`herdr-fgos` binary (that door was closed by `tsk-7l9` D8), but a screen
+in an **independent web client** calling the gateway's HTTP API. Every
+endpoint the screen uses is sourced from exactly one place —
+`docs/contracts/fgos-gateway-api-v1.yaml` (18 paths, matching 1:1 against
+the 17 routes actually registered in `gateway.rs` plus `/contract`
+itself) — the item is explicit that no endpoint gets re-described
+independently in either the item text or the code; every reference cites
+the contract directly, avoiding the exact class of stale-reference drift
+several other items in this sweep found elsewhere in this repo.
 
 ## What didn't change: why the webserver outlives the cockpit pane (D12)
 
