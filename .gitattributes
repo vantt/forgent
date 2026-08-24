@@ -6,3 +6,10 @@
 .fgos/invocation-faults.jsonl merge=union
 .fgos/main-checkout-guard-warnings.jsonl merge=union
 
+# tsk-1wk: tsk-3ve's per-writer sharded event log (.fgos/events/<writer-id>-
+# <openTs>.jsonl) is append-only exactly like the old single-file
+# .fgos/events.jsonl above, but wasn't covered by that same union-merge
+# rule — every session's own live shard hit the identical append-conflict
+# problem tsk-3wq/tsk-2xg already solved for the old layout.
+.fgos/events/*.jsonl merge=union
+
