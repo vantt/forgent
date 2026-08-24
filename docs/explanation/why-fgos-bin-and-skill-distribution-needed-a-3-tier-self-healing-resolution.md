@@ -2,7 +2,7 @@
 type: explanation
 title: Why fgOS bin and skill distribution needed a 3-tier self-healing resolution
 tags: [distribution, install, setup, doctor, skill-materialization, external-project]
-source_capture_ids: [tsk-2qc, tsk-2qc-1, tsk-1qi]
+source_capture_ids: [tsk-2qc, tsk-2qc-1, tsk-1qi, tsk-424n]
 authoritative_for: why fgOS install/setup resolves the fgos binary through a 3-tier cached scheme, and why skill materialization no longer depends on the claude CLI or plugin marketplace
 ---
 # Why fgOS bin and skill distribution needed a 3-tier self-healing resolution
@@ -143,3 +143,15 @@ setup`'s external-project path — generated wrappers are always
 self-contained inside the target project (copying `.agents/skills/*` +
 `.claude/skills/*` together, sibling-relative paths), never pointing back
 at a global npm install location.
+
+## D6 rollout (`tsk-424n`): verified empirically on one skill before the other 13
+
+Rather than authoring `user-invocable: false` into all 14 dev-skills'
+`.agents/skills/fgos-*/SKILL.md` source files at once, the rollout
+verified the flag empirically on `fgos-unlock` first — confirming both
+halves actually hold (the skill disappears from the human-typed menu,
+and explicit `Skill`-tool dispatch into it still works) before trusting
+the same flag for the other 13. Once confirmed, the frontmatter was
+authored directly into all 14 source files; the generator itself
+(`src/setup/skill-wrappers.mjs`) was never touched, since it already just
+copies frontmatter as-authored.
