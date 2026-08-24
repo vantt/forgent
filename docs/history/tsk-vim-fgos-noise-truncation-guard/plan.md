@@ -89,6 +89,21 @@ does not touch the narrowing logic itself):
 - `.fgos/events.jsonl`/`.fgos/entropy-history.jsonl` stay exempt
   (unchanged existing alternatives).
 
+## Gate resolution (validating stage)
+
+`fgos gate-check` returned `canAutoApprove: false` — the hard-gate keyword
+floor matched `migration` inside the item's own `description` text. That
+word appears only in background/root-cause prose ("a new noise file
+introduced by tsk-3ve's event-log sharding migration") citing a prior,
+already-merged item; this item performs no migration/schema/security/
+auth/data-loss/external-system work of its own — the actual change is a
+single regex-alternative addition plus one mirrored test, confirmed by
+the reality gate above. Resolved live, in-session, via the Gate's own
+"ask a person" branch (never lowering the mechanical floor — the floor's
+`false` stands as computed): the keyword hit is a benign false positive
+on descriptive background text, not a live migration/security concern.
+Approved `--actor human`, recorded via `fgos gate-approve`.
+
 ## Outstanding questions
 
 None
