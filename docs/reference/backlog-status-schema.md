@@ -2,7 +2,7 @@
 type: reference
 title: backlog status schema
 tags: [status-fsm, backlog, work-item, schema]
-source_capture_ids: [tsk-5vs, tsk-4rdi, tsk-1av]
+source_capture_ids: [tsk-5vs, tsk-4rdi, tsk-1av, tsk-584]
 authoritative_for: the schema shape of the backlog work-item status — STATUSES, TRANSITIONS, and statusLabels wiring
 ---
 # `backlog` status schema
@@ -60,3 +60,16 @@ decompose-stage candidate (the drain-only legacy path) stays strict
 `todo`-only, unchanged. This lets `fgos-clarifying` clarify a backlog
 item's description while it still sits at `backlog` — clarification does
 not require promoting the item to `todo` first.
+
+## Visible in the herdr TUI, not just non-erroring (D4)
+
+`herdr-plugin/src/app.rs`'s `WorkTab::matches` gained a `backlog` arm so
+a `backlog` item is findable through normal TUI browsing. The exact UI
+treatment (a dedicated Backlog tab vs. folding into Todo with a marker)
+was left as an implementation call, but constrained by a sharpened bar:
+the item must be genuinely **visible and actionable**, not merely
+non-erroring — since D1 makes `backlog -> todo` a human-only edge, an
+item a person can never actually see would never get promoted.
+`next_auto_discover_candidate` (`main.rs:138-140`) needed no logic
+change — it already correctly excluded any non-`todo` item — but gained
+a regression test locking that exclusion in for `backlog` specifically.
