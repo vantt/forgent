@@ -113,9 +113,41 @@ check to `fgos doctor` (this is documentation lint, not setup health — a
 test is the more honest home, and doesn't require registering a new
 `doctor` check for something that isn't a setup/config concern).
 
+## A gap found in the fix's own guard heuristic
+
+A post-merge audit of the landed fix (`tsk-zl5`) confirmed the fix itself
+works — running the new guard script against the live repo reports "no
+findings," and the 30-file retrofix diff touches exactly the heading line
+in each file, nothing else. But the audit also found a real, demonstrated
+gap in the guard's own detection heuristic:
+`DECISION_LIKE_HEADING = /decision|quy.t.*.nh/i`
+(`scripts/check-locked-decisions-heading-drift.mjs:22`) only matches a
+heading containing "decision" or (loosely) the Vietnamese substring "quyết
+định". A heading using "chốt" ("locked/settled") *without* either of
+those words never enters the guard's candidate list at all, so it can
+never be flagged — regardless of what its body contains.
+
+This is not hypothetical: `docs/history/
+gate-approve-vs-movenext-semantics/CONTEXT.md:164` carries a real heading,
+`## 7. Thuật ngữ chốt`, that fails `DECISION_LIKE_HEADING` and whose body
+cites D1/D9/D12/D13 inline. It causes no miss today only because that same
+file's real decisions table already sits under the canonical
+`## Locked decisions` heading elsewhere in the file, so the primary
+`CANONICAL_SECTION` check finds it and the file is skipped before the
+candidate search ever runs. A hypothetical file whose *only* D-ID table
+sat under a "chốt"-alone heading (or any decision-adjacent word never
+containing "decision"/"quyết định") would slip through the guard
+undetected — the exact class of silent failure this whole contract exists
+to make loud. Flagged as a follow-up backlog item rather than fixed in the
+audit itself, per the audit's own scope boundary (verify the landed code
+against the locked decisions, don't re-litigate or expand the original
+item's scope).
+
 ## Source
 
 `tsk-3xog`, found while validating `tsk-1y6` (which was not blocked by
 this — its own `CONTEXT.md` already used the correct heading, verified to
 recover 9/9 D-IDs). `docs/history/tsk-3xog/` carries the fuller shaping
-record.
+record. The guard-heuristic gap above was found by `tsk-zl5`'s post-merge
+audit of the landed fix (`docs/history/tsk-zl5-post-merge-audit/
+REVIEW.md`).
