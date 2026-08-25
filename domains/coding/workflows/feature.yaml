@@ -38,5 +38,5 @@ transitions:
 
 statusSkills:
   retrospective:
-    skill: fgos-coding-compounding
+    skill: fgos-coding-knowledge
     taskSpec: compound-learn

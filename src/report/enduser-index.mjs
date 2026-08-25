@@ -13,6 +13,8 @@
 // disk today (D12 validation constraint (a)) — the other three are valid,
 // simply-empty quadrants until docs land there; the entry layer must treat
 // a missing quadrant dir as "zero docs", never a crash.
+import { resolveDocPath } from './knowledge-resolver.mjs';
+
 export const QUADRANTS = ['tutorials', 'how-to', 'reference', 'explanation'];
 
 // Fixed quadrant -> {purpose, audience} mapping (D12/D14): the SINGLE
@@ -58,66 +60,55 @@ export const QUADRANT_META = Object.freeze({
 
 /**
  * Find the id of the compound-learn outcome record whose `docPath` matches
- * `docPath` exactly (D13's fidelity/back-link guarantee). `outcomesView` is
- * `view.outcomes` as folded by replay.mjs — `{ [id]: { ...predicted, ...actual,
- * docPath?, docType? } }`, merged-by-id per work.outcome's additive fold —
- * so a single matching id is enough; ties are not expected in practice (a
- * docPath is written once, at the doc's own compound-time), but if more than
- * one id ever carries the same docPath, the first found (stable object-key
- * order) is returned rather than throwing — a read-only index never refuses
- * to render over a data anomaly it did not cause.
- * Returns `null` when no outcome record carries this docPath (the legacy
- * how-to demo, which predates the `--doc-path` capture wiring).
+ * `docPath` (or resolves to the same doc via stateView).
  */
-export function findSourceCaptureId(outcomesView, docPath) {
-  for (const [id, outcome] of Object.entries(outcomesView ?? {})) {
-    if (outcome?.docPath === docPath) {
-      return id;
-    }
-  }
-  return null;
+export function findSourceCaptureId(outcomesView, docPath, stateView = null) {
+  const ids = findSourceCaptureIds(outcomesView, docPath, stateView);
+  return ids.length > 0 ? ids[0] : null;
 }
 
 /**
- * Find EVERY outcome id whose `docPath` matches `docPath` exactly — the
- * plural counterpart to `findSourceCaptureId` above, added for the Slice ①
- * gộp-sống merge (CONTEXT.md D13/D17): the export skill must gather ALL
- * captures linked to a docPath to reconstruct a living doc with no loss of
- * detail, not just the first — the singular helper's first-match behavior
- * above is unchanged and stays the index's own sourceCaptureId resolver.
- * Returns ids in the outcomesView's own stable insertion (object-key) order;
- * `[]` when no outcome carries this docPath — a docPath with zero linked
- * captures is a legitimate, common state, never an error.
+ * Find EVERY outcome id whose `docPath` matches `docPath` (or resolves to the
+ * same doc via stateView).
  */
-export function findSourceCaptureIds(outcomesView, docPath) {
+export function findSourceCaptureIds(outcomesView, docPath, stateView = null) {
   const ids = [];
-  for (const [id, outcome] of Object.entries(outcomesView ?? {})) {
-    if (outcome?.docPath === docPath) {
-      ids.push(id);
+  let targetDocIds = null;
+
+  if (stateView && stateView.docs) {
+    const res = resolveDocPath(stateView, docPath);
+    if (res) {
+      const docList = Array.isArray(res) ? res : [res];
+      targetDocIds = new Set(docList.map((d) => d.docId));
     }
   }
+
+  for (const [id, outcome] of Object.entries(outcomesView ?? {})) {
+    if (!outcome || !outcome.docPath) continue;
+    if (outcome.docPath === docPath) {
+      if (!ids.includes(id)) ids.push(id);
+      continue;
+    }
+    if (targetDocIds && stateView && stateView.docs) {
+      const outcomeRes = resolveDocPath(stateView, outcome.docPath);
+      if (outcomeRes) {
+        const outcomeDocList = Array.isArray(outcomeRes) ? outcomeRes : [outcomeRes];
+        const match = outcomeDocList.some((d) => targetDocIds.has(d.docId));
+        if (match && !ids.includes(id)) {
+          ids.push(id);
+        }
+      }
+    }
+  }
+
   return ids;
 }
 
 /**
  * Build the manifest array from enumerated doc entries + the rebuilt
- * outcomes view. `docEntries` is `[{ quadrant, docPath, title }]` — exactly
- * what the entry-layer enumeration step produces per doc file found under a
- * `docs/<quadrant>/` dir (readdir + first-H1 extraction), one entry per real
- * on-disk file. `outcomesView` is `view.outcomes` (or `{}`/`undefined` when
- * the log has no outcomes at all — the same lazy-key shape replay.mjs uses
- * everywhere else).
- *
- * Idempotent by construction (D12 validation constraint (d)): the caller
- * re-enumerates the doc tree fresh on every run and this function derives
- * the manifest purely from that snapshot plus the current outcomes view —
- * there is no accumulating state anywhere in the pipeline for a re-run to
- * duplicate. This function additionally dedupes defensively on `docPath`
- * (keeping the first occurrence) so a caller that ever passed the same doc
- * twice in one `docEntries` array still gets exactly one manifest row for
- * it, never two.
+ * outcomes view + optional stateView.
  */
-export function buildEnduserIndex(docEntries, outcomesView) {
+export function buildEnduserIndex(docEntries, outcomesView, stateView = null) {
   const seenPaths = new Set();
   const entries = [];
   for (const doc of docEntries ?? []) {
@@ -126,13 +117,23 @@ export function buildEnduserIndex(docEntries, outcomesView) {
     }
     seenPaths.add(doc.docPath);
     const meta = QUADRANT_META[doc.quadrant] ?? { purpose: null, audience: null };
+
+    let aliases = [];
+    if (stateView && stateView.docs) {
+      const res = resolveDocPath(stateView, doc.docPath);
+      if (res && !Array.isArray(res) && Array.isArray(res.aliases)) {
+        aliases = res.aliases;
+      }
+    }
+
     entries.push({
       quadrant: doc.quadrant,
       purpose: meta.purpose,
       audience: meta.audience,
       docPath: doc.docPath,
       title: doc.title ?? null,
-      sourceCaptureId: findSourceCaptureId(outcomesView, doc.docPath),
+      sourceCaptureId: findSourceCaptureId(outcomesView, doc.docPath, stateView),
+      ...(aliases.length > 0 ? { aliases } : {}),
     });
   }
   return entries;

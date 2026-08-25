@@ -60,6 +60,10 @@ import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../state/events-jsonl-truncation-guard.mjs';
 import { verifyCompactionCandidate } from '../state/events-compaction.mjs';
 import { readMainCheckoutGuardWarnings } from '../state/main-checkout-guard-warnings.mjs';
+import { computeKnowledgeProjection } from '../report/knowledge-projection.mjs';
+import { rebuild } from '../state/store.mjs';
+import { resolveDocPath } from '../report/knowledge-resolver.mjs';
+import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -2442,6 +2446,197 @@ registerFix({
   id: 'decision-index-stale',
   fix: (cwd) => fixDecisionIndexStale(cwd),
 });
+
+const DEFAULT_DOC_REGISTRY_SETTINGS = Object.freeze({
+  enforce: false,
+});
+
+function checkDocRegistryEnforce(cwd) {
+  const shared = readSharedConfig(cwd);
+  const settings = shared.docRegistry;
+  if (settings === undefined) {
+    return { passed: false, message: 'docRegistry section missing -- run fgos setup' };
+  }
+  if (typeof settings.enforce !== 'boolean') {
+    return { passed: false, message: 'docRegistry.enforce is not a boolean' };
+  }
+  return { passed: true, message: `docRegistry: enforce=${settings.enforce}` };
+}
+
+registerConfigDefault({
+  id: 'docRegistry',
+  key: 'docRegistry',
+  shape: DEFAULT_DOC_REGISTRY_SETTINGS,
+});
+
+registerCheck({
+  id: 'doc-registry-enforce',
+  description: 'docRegistry.enforce in the shared config file is present and boolean',
+  check: (cwd) => checkDocRegistryEnforce(cwd),
+});
+
+function checkDocRegistryStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {
+    return { passed: true, message: 'knowledge registry check skipped -- no events log' };
+  }
+  const view = rebuild(fgosDir);
+  const { jsonContent, mdContent } = computeKnowledgeProjection(view);
+  const mdPath = path.join(root, 'docs/doc-registry.md');
+  const jsonPath = path.join(root, 'docs/doc-registry.json');
+  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;
+  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;
+
+  if (mdOk && jsonOk) {
+    return { passed: true, message: 'doc-registry projections up to date' };
+  }
+  return { passed: false, message: 'docs/doc-registry.md or docs/doc-registry.json is stale -- run fgos doc-registry' };
+}
+
+function fixDocRegistryStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {
+    return { changed: false, message: 'skipped -- no events log' };
+  }
+  let view;
+  try {
+    view = rebuild(fgosDir);
+  } catch (err) {
+    if (err instanceof StoreError || err.code === 'ENOENT') {
+      return { changed: false, message: `skipped -- ${err.message}` };
+    }
+    throw err;
+  }
+  const { jsonContent, mdContent } = computeKnowledgeProjection(view);
+  const mdPath = path.join(root, 'docs/doc-registry.md');
+  const jsonPath = path.join(root, 'docs/doc-registry.json');
+
+  fs.mkdirSync(path.dirname(mdPath), { recursive: true });
+  fs.writeFileSync(mdPath, mdContent, 'utf8');
+  fs.writeFileSync(jsonPath, jsonContent, 'utf8');
+  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };
+}
+
+function checkDocAliasBroken(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  const view = rebuild(fgosDir);
+  const broken = [];
+  for (const doc of Object.values(view.docs || {})) {
+    for (const alias of doc.aliases || []) {
+      if (!fs.existsSync(path.join(root, alias))) {
+        broken.push(`${doc.docId}: ${alias}`);
+      }
+    }
+  }
+  if (broken.length === 0) return { passed: true, message: 'no broken doc aliases' };
+  return { passed: false, message: `found ${broken.length} broken doc aliases: ${broken.join(', ')}` };
+}
+
+function checkDocActiveDuplicate(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  const view = rebuild(fgosDir);
+  const counts = {};
+  for (const doc of Object.values(view.docs || {})) {
+    if (doc.docLifecycle === 'active') {
+      const key = `${doc.topicId}:${doc.role}`;
+      counts[key] = (counts[key] || 0) + 1;
+    }
+  }
+  const dupes = Object.entries(counts).filter(([, c]) => c > 1);
+  if (dupes.length === 0) return { passed: true, message: 'no duplicate active docs' };
+  return { passed: false, message: `active duplicate docs found for: ${dupes.map(([k]) => k).join(', ')}` };
+}
+
+function checkDocNearDuplicate(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const docsDir = path.join(root, 'docs/how-to');
+  if (!fs.existsSync(docsDir)) return { passed: true, message: 'skipped' };
+  const groups = findDuplicateAuthoritativeClaims(docsDir);
+  if (groups.length === 0) return { passed: true, message: 'no near-duplicate authoritative claims' };
+  return { passed: false, message: `found ${groups.length} near-duplicate claim groups` };
+}
+
+function checkDocProvisionalAged(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  const view = rebuild(fgosDir);
+  const now = Date.now();
+  const maxAgeMs = 7 * 24 * 60 * 60 * 1000;
+  const aged = [];
+  for (const doc of Object.values(view.docs || {})) {
+    if (doc.docLifecycle === 'provisional' && doc.updatedAt && (now - doc.updatedAt > maxAgeMs)) {
+      aged.push(doc.docId);
+    }
+  }
+  if (aged.length === 0) return { passed: true, message: 'no aged provisional docs' };
+  return { passed: false, message: `provisional docs aged >7 days: ${aged.join(', ')}` };
+}
+
+function checkDocTopicOversized(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  const view = rebuild(fgosDir);
+  const shared = readSharedConfig(cwd);
+  const maxDocs = shared.docRegistry?.topicMaxDocs ?? 10;
+  const oversized = [];
+  for (const topic of Object.values(view.topics || {})) {
+    const count = Object.values(view.docs || {}).filter((d) => d.topicId === topic.topicId).length;
+    if (count > maxDocs) oversized.push(`${topic.topicId} (${count} docs)`);
+  }
+  if (oversized.length === 0) return { passed: true, message: 'no oversized topics' };
+  return { passed: false, message: `oversized topics: ${oversized.join(', ')}` };
+}
+
+function checkDocRoleUnderused(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  const view = rebuild(fgosDir);
+  const roleCounts = {};
+  for (const doc of Object.values(view.docs || {})) {
+    roleCounts[doc.role] = (roleCounts[doc.role] || 0) + 1;
+  }
+  const underused = Object.entries(roleCounts).filter(([, c]) => c === 1);
+  if (underused.length === 0) return { passed: true, message: 'no underused roles' };
+  return { passed: true, message: `${underused.length} roles used by single doc: ${underused.map(([r]) => r).join(', ')}` };
+}
+
+function checkDocSourceConservation(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  const view = rebuild(fgosDir);
+  const outcomes = view.outcomes || {};
+  let missingCount = 0;
+  for (const outcome of Object.values(outcomes)) {
+    if (outcome.docPath) {
+      const resolved = resolveDocPath(view, outcome.docPath);
+      if (!resolved) missingCount++;
+    }
+  }
+  if (missingCount === 0) return { passed: true, message: 'all source captures reachable' };
+  return { passed: false, message: `${missingCount} source captures unresolvable` };
+}
+
+registerCheck({ id: 'doc-registry-stale', description: 'docs/doc-registry.md and doc-registry.json up to date', check: checkDocRegistryStale });
+registerFix({ id: 'doc-registry-stale', fix: fixDocRegistryStale });
+registerCheck({ id: 'doc-alias-broken', description: 'doc aliases point to valid paths', check: checkDocAliasBroken });
+registerCheck({ id: 'doc-active-duplicate', description: 'no duplicate active docs for same topic and role', check: checkDocActiveDuplicate });
+registerCheck({ id: 'doc-near-duplicate', description: 'near-duplicate authoritative claims check', check: checkDocNearDuplicate });
+registerCheck({ id: 'doc-provisional-aged', description: 'provisional docs age check', check: checkDocProvisionalAged });
+registerCheck({ id: 'doc-topic-oversized', description: 'topic size check against ceiling', check: checkDocTopicOversized });
+registerCheck({ id: 'doc-role-underused', description: 'role usage frequency check', check: checkDocRoleUnderused });
+registerCheck({ id: 'doc-source-conservation', description: 'source captures conservation check', check: checkDocSourceConservation });
 
 function getMergeHeadSha(mainCheckout) {
   try {

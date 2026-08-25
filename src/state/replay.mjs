@@ -14,6 +14,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { readEvents, readLastLineBefore, readEventsFromByte, parseEventLines } from './events.mjs';
 import { DEFAULTS } from './work.mjs';
+import { applyKnowledgeEvent } from './knowledge-registry.mjs';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
 // tsk-49e: every top-level key applyEvent ever writes to `view` is either an
@@ -621,6 +622,21 @@ function applyEvent(view, event) {
           { ...event.payload, ts: event.ts },
         ];
       }
+      break;
+    }
+    case 'topic.register':
+    case 'topic.rename':
+    case 'topic.split':
+    case 'topic.merge':
+    case 'topic.retire':
+    case 'doc.reserve':
+    case 'doc.register':
+    case 'doc.mark-rendered':
+    case 'doc.promote':
+    case 'doc.supersede':
+    case 'doc.retire':
+    case 'doc.path-move': {
+      applyKnowledgeEvent(view, event);
       break;
     }
     case 'work.resolve-park-reason': {

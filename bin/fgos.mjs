@@ -17,7 +17,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore } from '../src/state/store.mjs';
+import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
+import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
 import { collectWideSourceFiles, findWideCitationFindings, isDLocalId } from '../scripts/check-decision-citation-drift.mjs';
 import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
 import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
@@ -1610,7 +1612,252 @@ async function runVerb(verb, flags, positional, dir) {
     // source capture with no loss of detail. Only meaningful alongside
     // `--doc-type` — same optional-shape idiom, only a bare/empty value is
     // refused.
+    case 'topic': {
+      const sub = positional[0];
+      if (!sub) {
+        throw new StoreError('validation', 'topic requires a subcommand (register, split, merge, rename, retire).');
+      }
+      if (sub === 'register') {
+        const topicId = requireField(positional[1] ?? flags['topic-id'], 'topic register requires topicId positional or --topic-id');
+        const purposeSlug = requireField(flags['purpose-slug'], 'topic register requires --purpose-slug');
+        const purposeTitle = flags['purpose-title'] ?? purposeSlug;
+        const entities = parseListFlag(flags.entities);
+        return registerTopicStore(dir, { topicId, purposeSlug, purposeTitle, entities });
+      } else if (sub === 'rename') {
+        const topicId = requireField(positional[1] ?? flags['topic-id'], 'topic rename requires topicId positional or --topic-id');
+        const newPurposeSlug = flags['new-purpose-slug'];
+        const newPurposeTitle = flags['new-purpose-title'];
+        return renameTopicStore(dir, { topicId, newPurposeSlug, newPurposeTitle });
+      } else if (sub === 'split') {
+        const topicId = requireField(positional[1] ?? flags['topic-id'], 'topic split requires topicId positional or --topic-id');
+        const intoRaw = requireField(flags.into ?? flags['new-topics'], 'topic split requires --into or --new-topics JSON array');
+        let newTopics;
+        try {
+          newTopics = typeof intoRaw === 'string' ? JSON.parse(intoRaw) : intoRaw;
+        } catch {
+          throw new StoreError('validation', 'topic split --into must be a valid JSON array of new topics');
+        }
+        return splitTopicStore(dir, { topicId, newTopics });
+      } else if (sub === 'merge') {
+        const targetTopicId = requireField(positional[1] ?? flags['target-topic'], 'topic merge requires targetTopicId positional or --target-topic');
+        const sourceTopicIds = parseListFlag(flags.sources);
+        if (sourceTopicIds.length === 0) {
+          throw new StoreError('validation', 'topic merge requires --sources (comma-separated list of source topicIds)');
+        }
+        return mergeTopicStore(dir, { sourceTopicIds, targetTopicId });
+      } else if (sub === 'retire') {
+        const topicId = requireField(positional[1] ?? flags['topic-id'], 'topic retire requires topicId positional or --topic-id');
+        return retireTopicStore(dir, { topicId });
+      } else {
+        throw new StoreError('validation', `topic: unknown subcommand "${sub}" (supported: register, split, merge, rename, retire).`);
+      }
+    }
+
+    case 'doc': {
+      const sub = positional[0];
+      if (!sub) {
+        throw new StoreError('validation', 'doc requires a subcommand (reserve, register, mark-rendered, move-path, promote, supersede, retire).');
+      }
+      if (sub === 'reserve') {
+        const topicId = requireField(positional[1] ?? flags['topic-id'], 'doc reserve requires topicId');
+        const role = requireField(positional[2] ?? flags.role, 'doc reserve requires role');
+        const currentPath = requireField(positional[3] ?? flags['doc-path'], 'doc reserve requires currentPath');
+        return reserveDocStore(dir, {
+          topicId,
+          role,
+          currentPath,
+          framework: flags.framework ?? 'diataxis',
+          mode: flags.mode ?? 'explanation',
+          docId: flags['doc-id'],
+        });
+      } else if (sub === 'register') {
+        const topicId = requireField(positional[1] ?? flags['topic-id'], 'doc register requires topicId');
+        const role = requireField(positional[2] ?? flags.role, 'doc register requires role');
+        const currentPath = requireField(positional[3] ?? flags['doc-path'], 'doc register requires currentPath');
+        return registerDocStore(dir, {
+          topicId,
+          role,
+          currentPath,
+          framework: flags.framework ?? 'diataxis',
+          mode: flags.mode ?? 'explanation',
+          docLifecycle: flags.lifecycle ?? 'provisional',
+          aliases: parseListFlag(flags.aliases),
+          sourceCaptureIds: parseListFlag(flags['source-captures']),
+          docId: flags['doc-id'],
+        });
+      } else if (sub === 'mark-rendered') {
+        const docId = flags['doc-id'];
+        const topicId = positional[1] ?? flags['topic-id'];
+        const role = positional[2] ?? flags.role;
+        return markDocRenderedStore(dir, { docId, topicId, role });
+      } else if (sub === 'move-path') {
+        const topicId = positional[1] ?? flags['topic-id'];
+        const role = positional[2] ?? flags.role;
+        const newPath = requireField(flags['new-path'] ?? positional[3], 'doc move-path requires --new-path');
+        return moveDocPathStore(dir, { docId: flags['doc-id'], topicId, role, newPath });
+      } else if (sub === 'promote') {
+        const topicId = positional[1] ?? flags['topic-id'];
+        const role = positional[2] ?? flags.role;
+        const docPath = flags['doc-path'];
+
+        const view = rebuild(dir);
+
+        let targetDoc = null;
+        if (topicId && role) {
+          const docId = `${topicId}:${role}`;
+          targetDoc = view.docs?.[docId] ?? null;
+        } else if (docPath) {
+          const resolved = resolveDocPath(view, docPath);
+          if (resolved) {
+            targetDoc = Array.isArray(resolved) ? resolved[0] : resolved;
+          }
+        }
+
+        if (!targetDoc) {
+          throw new StoreError(
+            'validation',
+            `doc promote: no reserved or provisional doc found for given parameters. Remedy: use 'fgos doc reserve' or 'fgos doc register' to register doc slot first.`
+          );
+        }
+
+        if (targetDoc.docLifecycle === 'reserved') {
+          throw new StoreError(
+            'validation',
+            `doc promote: cannot promote doc '${targetDoc.docId}' from 'reserved' state. Remedy: render content and run 'fgos doc mark-rendered' or register as provisional first.`
+          );
+        }
+
+        if (targetDoc.docLifecycle !== 'provisional') {
+          throw new StoreError(
+            'validation',
+            `doc promote: doc '${targetDoc.docId}' is in '${targetDoc.docLifecycle}' state, must be 'provisional'. Remedy: check doc lifecycle state via 'fgos knowledge status'.`
+          );
+        }
+
+        if (docPath && targetDoc.currentPath !== docPath && Array.isArray(targetDoc.aliases) && targetDoc.aliases.includes(docPath)) {
+          throw new StoreError(
+            'validation',
+            `doc promote: path '${docPath}' is an alias for currentPath '${targetDoc.currentPath}'. Remedy: pass official currentPath '${targetDoc.currentPath}' to promote.`
+          );
+        }
+
+        const activeDocs = Object.values(view.docs || {}).filter(
+          (d) => d.topicId === targetDoc.topicId && d.role === targetDoc.role && d.docLifecycle === 'active' && d.docId !== targetDoc.docId
+        );
+        if (activeDocs.length > 0) {
+          throw new StoreError(
+            'validation',
+            `doc promote: activeDoc(${targetDoc.topicId}, ${targetDoc.role}) already exists: '${activeDocs[0].currentPath}'. Remedy: use 'fgos topic split' to create a new topic for extra doc or supersede existing active doc.`
+          );
+        }
+
+        const repoRoot = path.dirname(dir);
+        let existsAtHead = false;
+        try {
+          execFileSync('git', ['cat-file', '-e', `HEAD:${targetDoc.currentPath}`], { cwd: repoRoot, stdio: 'ignore' });
+          existsAtHead = true;
+        } catch {
+          existsAtHead = false;
+        }
+
+        if (!existsAtHead) {
+          throw new StoreError(
+            'validation',
+            `doc promote: file '${targetDoc.currentPath}' is not committed at git HEAD. Remedy: commit file '${targetDoc.currentPath}' to git HEAD before promoting.`
+          );
+        }
+
+        return promoteDocStore(dir, { docId: targetDoc.docId, topicId: targetDoc.topicId, role: targetDoc.role });
+      } else if (sub === 'supersede') {
+        const topicId = positional[1] ?? flags['topic-id'];
+        const role = positional[2] ?? flags.role;
+        return supersedeDocStore(dir, { docId: flags['doc-id'], topicId, role, supersededBy: flags['superseded-by'] });
+      } else if (sub === 'retire') {
+        const topicId = positional[1] ?? flags['topic-id'];
+        const role = positional[2] ?? flags.role;
+        return retireDocStore(dir, { docId: flags['doc-id'], topicId, role });
+      } else {
+        throw new StoreError('validation', `doc: unknown subcommand "${sub}".`);
+      }
+    }
+
+    case 'knowledge': {
+      const sub = positional[0];
+      if (!sub) {
+        throw new StoreError('validation', 'knowledge requires a subcommand (status, attest).');
+      }
+      if (sub === 'status') {
+        const view = rebuild(dir);
+        const topics = view.topics ?? {};
+        const docs = view.docs ?? {};
+        const activeTopics = Object.values(topics).filter((t) => t.status === 'active').length;
+        const retiredTopics = Object.values(topics).filter((t) => t.status === 'retired').length;
+
+        const docCounts = {
+          reserved: 0,
+          provisional: 0,
+          active: 0,
+          superseded: 0,
+          retired: 0,
+        };
+        for (const doc of Object.values(docs)) {
+          if (docCounts[doc.docLifecycle] !== undefined) {
+            docCounts[doc.docLifecycle]++;
+          }
+        }
+
+        return {
+          topics: { active: activeTopics, retired: retiredTopics, total: Object.keys(topics).length },
+          docs: docCounts,
+          totalDocs: Object.keys(docs).length,
+        };
+      } else if (sub === 'attest') {
+        const docPath = requireField(flags['doc-path'] ?? positional[1], 'knowledge attest requires --doc-path');
+        const view = rebuild(dir);
+        const resolved = resolveDocPath(view, docPath);
+
+        const repoRoot = path.dirname(dir);
+        let committedAtHead = false;
+        try {
+          execFileSync('git', ['cat-file', '-e', `HEAD:${docPath}`], { cwd: repoRoot, stdio: 'ignore' });
+          committedAtHead = true;
+        } catch {
+          committedAtHead = false;
+        }
+
+        if (!committedAtHead) {
+          throw new StoreError('validation', `knowledge attest: path '${docPath}' is not committed at git HEAD. Remedy: commit file '${docPath}' to git HEAD first.`);
+        }
+
+        const match = Array.isArray(resolved) ? resolved[0] : resolved;
+        if (!match) {
+          throw new StoreError('validation', `knowledge attest: path '${docPath}' is not registered in knowledge registry. Remedy: run 'fgos doc reserve' or 'fgos doc register' first.`);
+        }
+
+        if (match.currentPath !== docPath) {
+          throw new StoreError('validation', `knowledge attest: path '${docPath}' is an ALIAS, not currentPath '${match.currentPath}'. Remedy: use official currentPath '${match.currentPath}'.`);
+        }
+
+        return { attested: true, docId: match.docId, currentPath: match.currentPath };
+      } else {
+        throw new StoreError('validation', `knowledge: unknown subcommand "${sub}".`);
+      }
+    }
+
+    case 'doc-registry': {
+      const view = rebuild(dir);
+      const { jsonContent, mdContent } = computeKnowledgeProjection(view);
+      const root = path.dirname(dir);
+      const mdPath = path.join(root, 'docs/doc-registry.md');
+      const jsonPath = path.join(root, 'docs/doc-registry.json');
+      fs.mkdirSync(path.dirname(mdPath), { recursive: true });
+      fs.writeFileSync(mdPath, mdContent, 'utf8');
+      fs.writeFileSync(jsonPath, jsonContent, 'utf8');
+      return { mdPath, jsonPath, topics: Object.keys(view.topics || {}).length, docs: Object.keys(view.docs || {}).length };
+    }
+
     case 'compound': {
+      console.error('[DEPRECATION WARNING] fgos compound is deprecated. Use fgos doc reserve/register/promote instead.');
       const id = requireField(positional[0] ?? flags.id, 'compound requires an id: fgos compound <id>');
       const item = listWork(dir).work[id];
       if (!item) {
@@ -2830,7 +3077,7 @@ async function runVerb(verb, flags, positional, dir) {
       );
       const view = listWork(dir);
       const outcomes = view.outcomes ?? {};
-      const ids = findSourceCaptureIds(outcomes, docPath);
+      const ids = findSourceCaptureIds(outcomes, docPath, view);
       return {
         docPath,
         count: ids.length,

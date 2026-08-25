@@ -95,7 +95,7 @@ const fallbackCodingDomain = Object.freeze({
     decompose: 'fgos-coding-planning',
     planning: 'fgos-coding-planning',
     executing: 'fgos-coding-implement',
-    retrospective: 'fgos-coding-compounding',
+    retrospective: 'fgos-coding-knowledge',
   }),
   taskSpecMap: Object.freeze({
     discovery: 'judge-ambiguity',
@@ -170,7 +170,7 @@ const fallbackCodingDomain = Object.freeze({
         decompose: 'fgos-coding-planning',
         planning: 'fgos-coding-planning',
         executing: 'fgos-coding-implement',
-        retrospective: 'fgos-coding-compounding',
+        retrospective: 'fgos-coding-knowledge',
       }),
       taskSpecMap: Object.freeze({
         discovery: 'judge-ambiguity',

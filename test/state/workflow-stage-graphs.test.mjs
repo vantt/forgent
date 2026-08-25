@@ -108,17 +108,12 @@ test('DOMAINS.synthetic.skillMap.assembling is null (synthetic has never loaded 
 // use, resolving which skill fgOS's retrospective loop (/fgOS:retro-next)
 // should run for a domain's status:retrospective items. ---
 
-test("DOMAINS.coding.skillMap.retrospective is 'fgos-coding-compounding' (0027 D5 — zero regression, coding's synthesis skill does not change; renamed from fgos-compounding, tsk-403 D15)", () => {
-  assert.equal(DOMAINS.coding.skillMap.retrospective, 'fgos-coding-compounding');
+test("DOMAINS.coding.skillMap.retrospective is 'fgos-coding-knowledge' (tsk-28x)", () => {
+  assert.equal(DOMAINS.coding.skillMap.retrospective, 'fgos-coding-knowledge');
 });
 
-test('skillForStage(DOMAINS.coding, "retrospective") resolves fgos-coding-compounding — skillForStage is a generic skillMap[key] lookup, not scoped to `stage` names by implementation, only by its usual callers', () => {
-  // skillForStage's body (`(domain.skillMap && domain.skillMap[stage]) ??
-  // null`) never inspects whether `stage` is actually one of
-  // DOMAINS.coding.stages — it is safe and correct to reuse it here for
-  // the status key `retrospective` exactly as /fgOS:retro-next's own
-  // SKILL.md now does, rather than writing a second, redundant accessor.
-  assert.equal(skillForStage(DOMAINS.coding, 'retrospective'), 'fgos-coding-compounding');
+test('skillForStage(DOMAINS.coding, "retrospective") resolves fgos-coding-knowledge', () => {
+  assert.equal(skillForStage(DOMAINS.coding, 'retrospective'), 'fgos-coding-knowledge');
 });
 
 test('skillForStage falls back to null for "retrospective" on a domain that declares no skillMap.retrospective entry (synthetic, triage) — the caller-side ?? \'fgos-compounding\' fallback documented in retro-next/SKILL.md step 4 covers this case', () => {
@@ -429,7 +424,7 @@ test('bundleForStage resolves {skill, taskSpec} for domain and stage (D14/D29/D3
     taskSpec: 'shape-plan',
   });
   assert.deepEqual(bundleForStage('coding', 'retrospective'), {
-    skill: 'fgos-coding-compounding',
+    skill: 'fgos-coding-knowledge',
     taskSpec: 'compound-learn',
   });
   assert.deepEqual(bundleForStage(DOMAINS.coding, 'executing'), {
