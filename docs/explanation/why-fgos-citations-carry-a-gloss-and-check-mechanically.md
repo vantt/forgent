@@ -201,6 +201,27 @@ confirmed (by reading the real content of D5/D7) to lose no information a
 reader actually needed. All fifteen affected wrapper files were
 regenerated and the full suite re-verified green.
 
+## The two flagged-but-deferred findings finally closed (`tsk-1pf`)
+
+`tsk-6at`'s own review had flagged two real bugs as explicitly out of its
+own scope, left unpicked-up until this item: (1) `check-decision-codes.mjs`
+— a sibling script, not the citation-drift checker itself — had the
+architecturally identical membership-only `.includes()` bug `tsk-6at`
+already fixed in `check-decision-citation-drift.mjs`, dormant only because
+its own real baseline happened to contain zero duplicate-key entries at
+the time, not because the underlying logic differed; ported the same
+count-consumption fix, plus a mirrored regression test. (2) Both checker
+scripts' `baselineFromFindings` used a plain `{}` object keyed by file-path
+strings — a source path literally named `__proto__` would reassign the
+object's own prototype instead of creating a normal property, throwing on
+the following `.push()`. Confirmed pre-existing, predating even `tsk-3x8`.
+Not realistically exploitable (file paths only ever come from trusted
+local repo traversal, never external input) but cheap to close regardless.
+Deliberately left out of this item's own scope: the 1,645 orphaned
+baseline findings with no cleanup owner, and the `tsk-37i`/`tsk-1lv`
+handoff-gap communication mismatch — both ownership/triage decisions for a
+person, not bugs a code pass can resolve.
+
 ## Source
 
 `tsk-37i`. Verify: `npm test && test -f
