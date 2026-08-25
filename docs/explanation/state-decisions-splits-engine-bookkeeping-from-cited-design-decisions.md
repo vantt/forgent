@@ -315,3 +315,19 @@ opposite of what the field exists for. Fixed by scoping the match to the
 citing line's own home document (`isDLocalId` + a `homeFile` parameter),
 wired into both real callers (`fgos decision`'s own case in `bin/fgos.mjs`,
 and `retrospective-doors.mjs`'s impact door from `tsk-1lv-5`).
+
+**A caller-side misuse of the new `--relation` requirement (`tsk-1mo`).**
+`tsk-1lv-1`'s new `--relation` requirement was itself used incorrectly by
+`fgos-coding-validating`'s own Gate boilerplate: its literal
+`fgos decision` call for an auto-approved gate asserted `supersedes:tsk-224`
+— claiming the current decision *replaces* `tsk-224`'s established gate
+redesign, when every later auto-approval is really just *citing* that
+already-settled rule. The correct verb was `touches:tsk-224`. Left
+uncorrected, every future auto-approved gate call would have kept
+asserting a fresh, false "supersedes tsk-224" claim, compounding the
+dangling-citation list `tsk-679`'s own fix had just made trustworthy
+again. Confirmed live: only 156 identical decision events existed at the
+time, two sessions had already copied the wrong `supersedes:` verb
+verbatim, and a third had sidestepped the ambiguity entirely with
+`relation: "none"` — direct evidence the skill's own prose was unclear
+enough that sessions were already diverging on how to follow it.
