@@ -327,6 +327,7 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | D22 | **Invariant cardinality — không có cửa thoát lúc ghi** | **ĐÃ CHỐT — D-tsk28x-14 (vòng 10)** | Session phản biện chỗ advisor để `docId` được là *"id riêng nếu cần nhiều doc cùng role"* — đó là cửa thoát mở lại đúng sprawl đang chữa. Chủ sản phẩm đồng ý và **thắt chặt hơn**: `activeDoc(topicId, role) <= 1`, tuyệt đối không escape hatch lúc ghi. Muốn thêm một active document thì bắt buộc **split topic / merge topic / đổi role qua verb registry tường minh**, và mọi ngoại lệ để lại lineage (`topicA+roleX → retired/split-from`; `topicB+roleX → active`; `topicC+roleX → active`). Tức *nhiều doc cùng role* chỉ xuất hiện VÌ topic đã bị tách, không phải vì writer được quyền tạo thêm doc trong cùng topic. `docId` chỉ là **danh tính kỹ thuật** của registry row, không bao giờ là khoá cardinality ngữ nghĩa. Hệ quả kiến trúc: filesystem uniqueness là backstop vật lý, **uniqueness THẬT nằm ở registry invariant `topicId+role`** — khớp đúng hướng D-tsk28x-13 |
 | D23 | **Vocabulary lifecycle — hai tầng, hai bộ từ vựng rời nhau** | **ĐÃ CHỐT — D-tsk28x-15 (vòng 10)** | Session nêu xung đột: vòng 8 đã đặt nghĩa *"bản nháp" = chất liệu đã trích*, nên thêm `draft` cho tài liệu sẽ làm hai chữ nháp khác nghĩa cùng sống trong một hệ — vi phạm chính luật **Q4** session vừa đặt ra ở vòng 9. Chủ sản phẩm đồng ý: chữ `draft` dễ gây lỗi mô hình. **Tầng chất liệu:** `material:draft` / `extracted_material`. **Tầng tài liệu:** `provisional` (đã render nhưng chưa được công nhận authoritative) → `active` (chính thức) → `superseded` / `retired`. Chữ `draft` không xuất hiện ở tầng tài liệu |
 | D24 | **False-positive của guard `fgos decision`** | **RÕ — gặp thật vòng 10, chưa xử** | Ghi D-tsk28x-15 bị `fgos decision` từ chối (exit 4) vì `SUPERSESSION_PROSE_PATTERN` (`src/state/store.mjs:1291`) bắt chữ `superseded` — nhưng ở đây nó là **giá trị enum của lifecycle**, không phải câu tuyên bố supersession. Guard không phân biệt được enum value với narration. Vòng tránh bằng cách diễn đạt enum không dùng token đó. **Đã submit thành `tsk-o4f`** (2026-08-25): mọi quyết định tương lai định nghĩa một vocabulary chứa `superseded`/`replaces` sẽ vấp lại — đúng hình dạng quyết định repo này hay viết khi khoá một state machine hay status enum. Khai `--relation supersedes:<id>` KHÔNG phải workaround: không có quyết định nào bị supersede thật, khai vậy là ghi một lời sai vào log. Ý đồ guard đúng (tsk-1lv-1 D2/D8) nên không được làm yếu — hướng sửa là phân biệt NARRATION với token xuất hiện như một giá trị được định nghĩa |
+| D25 | **Backstop quét trùng có sẵn nhưng KHÔNG BAO GIỜ CHẠY** | **RÕ — chủ sản phẩm hỏi, kiểm chứng vòng 10** | Chủ sản phẩm hỏi *"phần harness bên dưới không làm gì à"*. Kiểm: `fgos authoritative-match --check-duplicates` tự mô tả là **"harness-backstop scan"**, nhưng grep toàn repo chỉ ra **đúng một caller: unit test của chính nó** (`test/report/authoritative-match.test.mjs`). `.agents/skills/fgos-coding-compounding/SKILL.md:115` chỉ gọi nhánh `--topic` (find-before-create); `src/setup/checks.mjs` không có check nào; `scripts/`, `package.json`, `.github/` đều không. ⇒ **Backstop tồn tại, có test, không bao giờ chạy trên corpus thật.** Chữ "harness" là tên gọi mong muốn, không có harness nào wire nó vào. **Ý nghĩa:** giải thích vì sao lỗ 80% sống lâu không ai thấy — **hai lớp hỏng chồng nhau**, thiếu dữ liệu (`authoritative_for` phủ 20%) VÀ thiếu người chạy (không lịch nào quét). Kể cả phủ 100% thì vẫn không ai quét. Bổ sung cho D18: đề bài không chỉ *nâng phủ + cưỡng chế khai báo* mà còn *wire backstop vào một harness thật* |
 | E | Ranh giới scope `tsk-28x` vs `tsk-12m` | **ĐÃ CHỐT — D-tsk28x-2 (vòng 7)** | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay, không cần chờ `tsk-28x`. **Vòng 7 (2026-08-11):** chủ sản phẩm xác nhận tách quan hệ — `tsk-28x` không còn `deps` trên `tsk-12m`; `tsk-12m` tự xây phần quan-sát/nhắc độc lập, phần ghi/registry của nó cắm vào bất cứ hình dạng `tsk-28x` chốt sau, không phải chờ ngược lại |
 | F | Hình dạng pha TRIAGE (pha 1, §6) | ĐỠ MỜ sau vòng 5 — xem J2 | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). **Vòng 5 có ứng viên đầu có căn cứ: round-count trên mỗi item (J2).** Còn mở: đo nó bằng bộ nhãn nào — fgOS vẫn chưa có tập nhãn tay như bee đã có, nên chưa chạy được phép đo AUC tương đương |
 | G | ~~Chất liệu `struggle` đã có sẵn trong `friction`~~ | **RÚT LẠI — SAI** (đo lại vòng 4) | Vòng 3 kết luận "RÕ" từ ĐÚNG MỘT bản ghi (`tsk-1gn`) rồi suy rộng ra cả hệ thống. Đo toàn log: 131 friction = 81 `verify-miss` + 39 `merge-conflict` (92% telemetry máy), `detail` điển hình `goal-check failed on branch "fgw/tsk-puz" (exit null)` — ghi RẰNG hỏng, không ghi ĐÃ THỬ GÌ / VÌ SAO / CHỖ NGOẶT. Không phải chất liệu kể chuyện. Thứ làm vòng 3 phấn khích thực ra là `gates.askHistory`, KHÁC `friction` — vòng 3 lẫn hai thứ |
@@ -1390,10 +1391,14 @@ match chắc thì grow doc hiện có; match yếu thì ghi `provisional`, **kh�
 topic chính thức mới**; không match thì tạo topic ứng viên trạng thái chờ,
 **không tự coi là sự thật đã công nhận**.
 
-**Bẫy đã gặp thật:** `--check-duplicates` hiện trả `duplicateGroups: []` trên
-`docs/explanation` trong khi có trùng rõ ràng — **kết quả sạch giả** vì 80% tài
-liệu không khai `authoritative_for`. Task này phải làm cho zero-result trở nên
-đáng tin, và test phải chứng minh điều đó (một ca trùng thật bị bắt).
+**Bẫy đã gặp thật — HAI lớp hỏng chồng nhau, phải sửa cả hai:** (1)
+`--check-duplicates` trả `duplicateGroups: []` trên `docs/explanation` trong khi
+có trùng rõ ràng — **kết quả sạch giả** vì 80% tài liệu không khai
+`authoritative_for`; (2) **và kể cả phủ 100% thì cũng không ai chạy nó** — caller
+duy nhất trong toàn repo là unit test của chính nó (§3 dòng D25). T3 sửa lớp (1)
+bằng nâng phủ + cưỡng chế khai báo lúc ghi; lớp (2) là `topic-duplicate-scan` ở
+T5. Test của T3 phải chứng minh một ca trùng thật BỊ BẮT, không chỉ chứng minh
+hàm chạy không lỗi.
 
 **Quan hệ anh em:** phụ thuộc T2. Chặn T6.
 
@@ -1430,8 +1435,11 @@ một file trước khi task này xong ⇒ gãy linkage cho **toàn bộ 268 cap
 ### T5 — Hai ảnh cuối cùng + doctor check {#task-projections-doctor}
 
 **Mục tiêu:** sinh **JSON cho máy** và **Markdown cho người** từ registry, cộng
-ba doctor check: `topic-index-stale`, `topic-doc-oversize` (tín hiệu TÁCH), và
-tràn `unmatched`/`misc` (guard chống dồn rác).
+**bốn** doctor check: `topic-index-stale`, `topic-doc-oversize` (tín hiệu TÁCH),
+tràn `unmatched`/`misc` (guard chống dồn rác), và **`topic-duplicate-scan` —
+chạy thật cái backstop quét trùng hiện đang nằm chết** (§3 dòng D25:
+`--check-duplicates` tự gọi là "harness-backstop" nhưng caller duy nhất trong
+toàn repo là unit test của chính nó; doctor/CI/scripts đều không gọi).
 
 **Trích §6.7 áp dụng:** phần "Cơ chế vận hành"; ảnh Markdown phải cho thấy thứ
 `ls` không thấy — lineage tách/gộp, topic đã đăng ký mà chưa có tài liệu, topic
