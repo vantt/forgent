@@ -424,7 +424,7 @@ test('bundleForStage resolves {skill, taskSpec} for domain and stage (D14/D29/D3
     taskSpec: 'shape-plan',
   });
   assert.deepEqual(bundleForStage('coding', 'retrospective'), {
-    skill: 'fgos-coding-compounding',
+    skill: 'fgos-coding-knowledge',
     taskSpec: 'compound-learn',
   });
   assert.deepEqual(bundleForStage(DOMAINS.coding, 'executing'), {
