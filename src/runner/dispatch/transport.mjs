@@ -499,6 +499,23 @@ function herdrSpawnAdapter(invocation, opts) {
     if (cwd) {
       splitArgs.push('--cwd', cwd);
     }
+    // Resolved env into the pane itself (self-review finding, 2026-08-25):
+    // `fullEnv` above only ever governed the *local* execFileSync/spawn
+    // calls this adapter makes to the `herdr` CLI -- it never reached the
+    // worker actually running inside the pane at all, which instead ran
+    // under whatever ambient/default env that shell already had. An
+    // executor declaring `ANTHROPIC_BASE_URL`/an API key/a model env would
+    // dispatch to one backend while the audit event (built from the
+    // RESOLVED config, per the governance-propagation fix) recorded a
+    // different one -- the exact kind of gap the governance work exists to
+    // close. `herdr pane split --env KEY=VALUE` (repeatable; confirmed
+    // real, `docs/history/herdr-cockpit-project-root/CONTEXT.md:71`, and
+    // already part of this piece's own accepted design,
+    // `docs/history/dispatch-plan-protocol-redesign/plan.md:277`) sets it
+    // on the pane's own shell before anything runs there.
+    for (const [key, value] of Object.entries(resolvedEnv)) {
+      splitArgs.push('--env', `${key}=${value}`);
+    }
 
     let splitOutput;
     try {
@@ -510,10 +527,16 @@ function herdrSpawnAdapter(invocation, opts) {
         stdio: ['ignore', 'pipe', 'pipe'],
       });
     } catch (err) {
+      // Never interpolate err.message/err.cmd here: a non-ENOENT
+      // execFileSync failure embeds the full argv in its own message
+      // ("Command failed: herdr pane split --env KEY=<real-value> ..."),
+      // which would leak a resolved secret into this DispatchError's own
+      // message text -- and from there into whatever surface logs/reports
+      // it (self-review finding: "không log secret").
       return reject(new DispatchError(
         'worker-spawn-fail',
-        `executor failed to start for work "${workId}": herdr pane split failed: ${err.message}`,
-        { workId, tier, model, cause: err.message },
+        `executor failed to start for work "${workId}": herdr pane split failed (exit code ${err.status ?? 'unknown'}).`,
+        { workId, tier, model, cause: 'herdr pane split failed', exitCode: err.status ?? null },
       ));
     }
 

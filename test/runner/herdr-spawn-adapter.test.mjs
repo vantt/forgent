@@ -374,3 +374,58 @@ test('herdr-spawn adapter: the worker\'s own [DONE] token still resolves the fas
   assert.equal(res.status, 0);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
+
+test('herdr-spawn adapter passes the resolved executor env into the pane itself via "pane split --env KEY=VALUE" (self-review finding, P1)', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-env-propagation-test-'));
+  const { scriptPath, logPath } = createMockHerdrScript(tmpDir);
+  const wrapperPath = path.join(tmpDir, 'herdr-wrapper.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh\nexec node "${scriptPath}" "$@"\n`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  await herdrSpawn(
+    { command: 'echo', args: ['hi'], env: { ANTHROPIC_BASE_URL: 'https://openrouter.ai/api', SOME_API_KEY: 'sk-test-12345' } },
+    { cwd: tmpDir, workId: 'env-item', tier: 'standard', model: 'sonnet', herdrBin: wrapperPath },
+  );
+
+  const calls = fs.readFileSync(logPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  const splitCall = calls.find((c) => c.args[0] === 'pane' && c.args[1] === 'split');
+  assert.ok(splitCall, 'expected a "pane split" call to be logged');
+  // Before this fix: fullEnv only ever governed the LOCAL calls this
+  // adapter makes to the herdr CLI itself, never the worker inside the
+  // pane -- which would run under ambient/default env instead, diverging
+  // from what the audit event (built from the same resolved config)
+  // records as the real egress target.
+  assert.ok(splitCall.args.includes('--env'), 'pane split must receive --env flags carrying the resolved executor env');
+  assert.ok(splitCall.args.includes('ANTHROPIC_BASE_URL=https://openrouter.ai/api'));
+  assert.ok(splitCall.args.includes('SOME_API_KEY=sk-test-12345'));
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('herdr-spawn adapter never leaks a resolved env secret into its own DispatchError message when "pane split" fails (self-review finding: "không log secret")', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-env-secret-test-'));
+  // A wrapper that fails "pane split" with a NON-ENOENT, non-zero exit --
+  // the exact shape whose Node execFileSync error message embeds the full
+  // argv ("Command failed: <cmd> <args...>"), which would otherwise echo
+  // the secret value straight into this adapter's own DispatchError.
+  const wrapperPath = path.join(tmpDir, 'herdr-failing-split.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh\nif [ "$1" = "pane" ] && [ "$2" = "split" ]; then echo "boom" 1>&2; exit 3; fi\nexit 0\n`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  const secretValue = 'sk-super-secret-do-not-leak-98765';
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  try {
+    await herdrSpawn(
+      { command: 'echo', args: ['hi'], env: { SOME_API_KEY: secretValue } },
+      { cwd: tmpDir, workId: 'secret-item', tier: 'standard', model: 'sonnet', herdrBin: wrapperPath },
+    );
+    assert.fail('should have rejected on pane split failure');
+  } catch (err) {
+    assert.ok(err instanceof DispatchError);
+    assert.ok(!err.message.includes(secretValue), `DispatchError message must never contain the resolved secret value, got: ${err.message}`);
+    assert.ok(!JSON.stringify(err).includes(secretValue), 'no field on the DispatchError (including its own serialization) may carry the secret value');
+  }
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
