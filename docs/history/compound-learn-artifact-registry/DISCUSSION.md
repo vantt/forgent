@@ -826,14 +826,10 @@ của vòng 6 bị rút, phương án 3 (per-item + ngưỡng) lên thay. **§6.
 vòng 8** — định nghĩa "bản nháp". Viết cho người đọc không có lịch sử
 hội thoại.
 
-> **§6.7 (trục danh tính / topic-registry) CHƯA viết ở đây — cố ý.** Vòng
-> 9 đã trả lời sáu câu về hình dạng của nó (§3 dòng D2-D7: phẳng + field;
-> có biến hình, đóng-cấu-trúc/mở-danh-sách; tách kích hoạt bằng doctor
-> check đo được; `docPath` là sự thật lịch sử còn registry là bản chiếu;
-> lưu bằng event+verb; hai ảnh cuối cùng theo audience). Tất cả mới qua
-> MỘT vòng — luật D4 chưa cho mint, và §6 không được chắp vá từng mảnh
-> chưa chốt. Vòng 10 xác nhận xong thì §6 tái sinh trọn, có §6.7 đầy đủ
-> kèm sơ đồ.
+> **§6.7 viết ở dưới theo yêu cầu chủ sản phẩm (vòng 9), nhưng D2-D17 CHƯA
+> mint** — luật D4 đòi đứng vững qua hơn một vòng. Đọc §6.7 như *bức tranh
+> hiện hành đã thống nhất trong hội thoại*, chưa phải thiết kế đã khoá.
+> Vòng 10 xác nhận xong thì §6 tái sinh trọn và §6.7 lên trạng thái chốt.
 
 ### 6.1 Vấn đề gốc: một trục gánh ba việc
 
@@ -1076,6 +1072,96 @@ flowchart TD
     E -.->|"bất đồng bộ, lúc nào tuỳ người"| G["Người đọc chất liệu"]
     G -->|"gật"| H["Lúc này mới VIẾT"]
     G -->|"lắc"| I["Để đó — nằm im, không tốn gì"]
+```
+
+### 6.7 Bức tranh đủ — bốn nhãn, hai trục {#four-labels}
+
+*Trạng thái: thống nhất trong hội thoại vòng 9, D2-D17 chưa mint (luật D4).*
+
+Mọi tài liệu người-dùng-cuối mang **bốn nhãn**, thuộc **hai trục vuông góc**
+(D-tsk28x-1). Trục danh tính trả lời *"đây là cái gì, của ai, về vấn đề
+gì"*; trục cách viết trả lời *"viết ra sao"*. Diataxis **chỉ** nằm ở trục
+thứ hai — nó không bao giờ quyết tài liệu nào tồn tại hay nằm ở đâu (D17).
+
+| # | Nhãn | Trục | Đơn/đa trị | Đóng/mở | Hiện ra ở | Trả lời câu |
+|---|---|---|---|---|---|---|
+| 1 | **Mục đích** | danh tính | đơn | mở, tăng CHẬM | **thư mục** `docs/<mục-đích>/` | Giải quyết vấn đề gì, cho ai |
+| 2 | **Vai trò** | danh tính | đơn | **ĐÓNG** (có cửa) | **tên file** `<vai-trò>.md` | Tài liệu này đóng vai trò gì về vấn đề đó |
+| 3 | **Entity** | danh tính | **ĐA** | mở, tăng NHANH | tag trong frontmatter | Nó chạm tới những thực thể nào |
+| 4 | **Framework + mode** | cách viết | đơn mỗi framework | registry MỞ của framework, mỗi framework ĐÓNG | frontmatter | Hành văn/outline/trình tự theo khuôn nào |
+
+Ví dụ một tài liệu thật, trước và sau:
+
+```
+TRƯỚC  docs/explanation/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md
+
+SAU    docs/stale-index-vs-uncommitted-work/pitfall.md
+       ---
+       entities: [worktree-index, iron-law, test-count]
+       framework: diataxis
+       mode: explanation
+       ---
+```
+
+#### Quy định đi kèm
+
+**Q1 — Đường dẫn CHÍNH LÀ cặp danh tính đơn trị.** `docs/<mục-đích>/<vai-trò>.md`.
+Hệ quả: ràng buộc "một chủ đề một chủ sở hữu" được hệ tệp cưỡng chế miễn phí,
+không cần anti-fork gate (D12). Hai tài liệu cùng cặp không thể cùng tồn tại.
+
+**Q2 — Entity KHÔNG BAO GIỜ làm thư mục.** Thư mục phải đơn trị, mà đo được
+**28% tài liệu chạm ≥2 entity ngay trong tên** (93/330), thân bài còn nhiều
+hơn (D16). Entity chỉ là tag — và vì vậy entity sinh sôi mà đẻ **0 file mới**.
+
+**Q3 — Diataxis (và mọi framework viết) không được làm thư mục.** Trục cách
+viết là registry mở nhiều framework (D-tsk28x-3); khi có framework thứ hai
+thì không tồn tại thư mục tương ứng. Quadrant-làm-thư-mục vỡ ngay tại đó (D11).
+
+**Q4 — Vocabulary `vai trò` không được trùng tên bất kỳ quadrant/mode nào.**
+`reference` phải đổi tên (vd. `lookup-table`), nếu không hai nhãn khác trục
+mang cùng một chữ (D17).
+
+**Q5 — Vai trò GỢI Ý một framework/mode mặc định, không đồng nhất với nó.**
+`runbook` tự nhiên viết lối how-to, `decision` lối explanation — nhưng đè được.
+Bằng chứng hai chiều khác nhau: một `pitfall` viết được cả how-to lẫn
+explanation; còn `decision`/`pattern`/`incident` cùng là explanation nhưng
+vòng đời khác hẳn — decision **bị supersede**, pattern **được tinh chỉnh dần**
+(D13, D17).
+
+**Q6 — Nửa ĐÓNG phải bám đúng chỗ không phình.** `vai trò` nói về hình dạng
+TRI THỨC nên không lớn theo sản phẩm; `mục đích` và `entity` thì có. Nếu để
+`vai trò` = *mục đích sử dụng* thì cả hai nửa cùng mở và registry mất khả năng
+cưỡng chế lúc ghi (D16).
+
+**Q7 — Hai tầng, một bộ máy, hai registry tách rời.** Tầng người (end-user
+docs) tối ưu độ rõ, chấp nhận trùng lặp có chủ đích vì phục vụ nhiều đối
+tượng đọc; tầng máy (`docs/specs/`) tối ưu độ gọn, đủ là dừng. Chung verb +
+ảnh cuối cùng + doctor check, KHÔNG chung vocabulary, KHÔNG chung ngưỡng (D15).
+
+**Q8 — `docPath` cũ là sự thật lịch sử, không sửa.** Registry giữ bản chiếu
+hiện tại qua lineage `split`/`merge` (D-ADR0001). Với layout mới, bảng ánh xạ
+cũ→mới là việc NGÀY ĐẦU, không phải cải tiến sau (D5, D14).
+
+```mermaid
+flowchart TD
+    C["Capture thật của một work-item"] --> S["Skill viết tài liệu<br/>(contract đầu vào)"]
+
+    S --> ID["TRỤC DANH TÍNH<br/>ghi vào ĐÂU"]
+    S --> WR["TRỤC CÁCH VIẾT<br/>viết RA SAO"]
+
+    ID --> P["mục đích (đơn)<br/>⇒ thư mục"]
+    ID --> R["vai trò (đơn, ĐÓNG)<br/>⇒ tên file"]
+    ID --> E["entity (ĐA)<br/>⇒ tag, KHÔNG là thư mục"]
+
+    WR --> F["framework + mode<br/>Diataxis là framework đầu tiên<br/>⇒ frontmatter"]
+    F --> X["nạp expertise viết<br/>khuôn _shared/ đã có"]
+
+    P --> PATH["docs/&lt;mục-đích&gt;/&lt;vai-trò&gt;.md<br/>đường dẫn = cặp đơn trị<br/>⇒ chống trùng MIỄN PHÍ"]
+    R --> PATH
+    X --> PATH
+    E -.->|tra chéo xuyên mục đích| IDX["ảnh cuối cùng<br/>JSON cho máy + Markdown cho người"]
+    PATH --> IDX
+    IDX --> DOC["doctor: index-stale<br/>+ doc-oversize ⇒ tín hiệu TÁCH"]
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
