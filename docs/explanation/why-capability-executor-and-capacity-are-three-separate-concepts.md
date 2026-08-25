@@ -143,6 +143,17 @@ reads `method`/`url`/`headers`/`body`) — forcing `http` into the old
 CLI-shaped signature would have repeated the exact "invocation doesn't fit
 command/args" trap the `mcp` case (D9 below) already hit.
 
+Landing this piece (`tsk-in1-5`) also confirmed a real limitation of the
+project's own impact-analysis tooling: `fgos-coding-validating` found
+GitNexus's `impact()` query returned a false negative for
+`EXECUTOR_ADAPTERS`'s real call sites, so the validation checklist used
+direct `grep` against the four confirmed call sites
+(`dispatch.mjs:429/1040/1299/1530`) instead of trusting the tool's own
+blast-radius answer — the same caution `CLAUDE.md`'s impact-analysis gate
+names generally (a suspicious zero/empty result is worth a grep
+cross-check before being trusted), here with a concrete instance behind
+it.
+
 ## The three gates D5 needed to actually ship safely
 
 > D9: D5 cần 3 gate sửa kèm, không thể ship riêng D5 mà thiếu: (a)
