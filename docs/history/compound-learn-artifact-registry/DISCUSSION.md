@@ -1293,6 +1293,73 @@ khứ.
 **Hai item đã tách ra ngoài, KHÔNG thuộc danh mục dưới đây:** `tsk-422` (thu
 chất liệu kể chuyện, D-tsk28x-12) và `tsk-o4f` (bug guard supersession, §3 D24).
 
+
+### Vocabulary — `knowledge`, không phải `compound` (D-tsk28x-16)
+
+Chốt vòng 10, **gộp vào chính `tsk-28x`** (chủ sản phẩm chọn, không tách item).
+
+**Lý do mạnh nhất, đã kiểm chứng:** verb `fgos compound` **không viết knowledge**
+— nó chỉ ghi tag `docType` + linkage `docPath` vào event log; phần viết là của
+SKILL. Tức cái tên `compound` **mô tả sai việc verb làm** ngay từ đầu. `attest`
+("capture này đã được gắn với artifact này") mô tả đúng bản chất.
+
+| Lớp | Tên cũ | Tên mới |
+|---|---|---|
+| Boundary | compound / compound-learn | **`knowledge`** |
+| Skill | `fgos-coding-compounding` | **`fgos-coding-knowledge`** |
+| Area spec | `enduser-docs-authoring` | **`knowledge`** (`docs/specs/knowledge.md`) |
+| Verb ghi linkage | `fgos compound` | **`fgos knowledge attest`** (verb cũ → `deprecated`) |
+
+**Ba mặt CLI, hai cấp — không lồng ba cấp:**
+
+```
+fgos knowledge extract|route|author|attest|run <id>     # ĐƯỜNG ỐNG (process)
+fgos topic register|split|merge|rename|retire           # registry chủ đề (state)
+fgos doc reserve|register|mark-rendered|move-path|promote|supersede|retire
+```
+
+`knowledge` là **namespace**, hành động nằm ở subverb — không bao giờ có
+`fgos knowledge <id>` trần, vì không ai đoán được nó extract, route, author,
+attest hay promote. Bộ subverb khớp **1:1 với đường ống 5 pha** (§7 Track A):
+`extract` ↔ pha 0, `route` ↔ pha 2 resolver, `author` ↔ pha 3 writer,
+`attest` ↔ ghi linkage, `promote` ↔ chấp nhận chính thức.
+
+**Hai chỗ session tự quyết, nêu rõ để sửa được nếu sai:**
+
+1. **`topic`/`doc` là namespace ANH EM của `knowledge`, không lồng bên trong**
+   (`fgos topic register`, không phải `fgos knowledge topic register`). Lý do:
+   registry là **state**, đường ống là **process** — fgOS vốn đã tách hai loại
+   verb đó; và lồng ba cấp là nặng cho một CLI hôm nay gần như phẳng.
+2. **`promote` chỉ tồn tại MỘT chỗ: `fgos doc promote`.** Advisor liệt cả
+   `knowledge promote <doc>`; nhưng "chấp nhận chính thức" chính là
+   `provisional → active`, tức một chuyển trạng thái của **doc**. Có hai lối vào
+   cùng một hành động là mầm lệch về sau.
+
+**Tên lớp (dùng thống nhất trong mọi tài liệu và tên hàm):**
+
+| Khái niệm | Tên |
+|---|---|
+| capture thô | knowledge **material** |
+| giải topic + role | knowledge **routing** |
+| render tài liệu | knowledge **authoring** |
+| linkage capture↔doc | knowledge **attestation** |
+| chấp nhận chính thức | knowledge **promotion** |
+
+**Vì sao area là `knowledge` chứ KHÔNG phải `retrospective-knowledge`:** tên gắn
+với **stage** sẽ già cỗi. Repo đã có tiền lệ đúng cái bẫy đó — stage
+`compound-learn` **đã retire** (`tsk-1zi`) nhưng chữ `compound` vẫn dính khắp
+55 file. Và chính thảo luận này vừa tách `tsk-422` ra: nó chạy per-item tại
+compound stage nhưng bản ghi sống ở `.fgos/`, hoàn toàn có thể dời chỗ chạy.
+
+**Đo trước khi đồng ý (không phải cảm tính):** 55 file tham chiếu `compound`
+trong `src/bin/test/.agents/plugins`; field `deprecated` **có** trong schema
+`command-registry.mjs` nhưng **chưa verb nào dùng** (tất cả `null`) — nên
+exercise đường deprecation là **công việc thật, có test riêng**, không phải đi
+ké; không có xung đột tên `knowledge` trong fgOS (grep chỉ ra `acknowledge`); và
+nó khớp vocabulary của bee (`bee knowledge check`).
+
+---
+
 ### Hai track
 
 - **Track A — cơ chế:** identity / registry / resolver / writer.
@@ -1391,11 +1458,12 @@ linkage cho **toàn bộ 268 capture**. **Không task nào được dời file t
 ### A3 — Registry surfaces (verb) {#task-registry-verbs}
 
 ```
-fgos topic register|split|merge|rename|retire
-fgos doc   register|promote|move-path
+fgos knowledge extract|route|author|attest|run <id>
+fgos topic     register|split|merge|rename|retire
+fgos doc       reserve|register|mark-rendered|move-path|promote|supersede|retire
 ```
 
-**Không cho soạn JSON tay.**
+**Không cho soạn JSON tay.** Tên theo D-tsk28x-16 (xem mục Vocabulary ở đầu §7).
 
 **Điểm mấu chốt:** `topic split` là **cửa duy nhất** tạo ra nhiều active doc
 cùng role theo nghĩa thực tế — vì nó tạo nhiều topic mới. **Writer không có
@@ -1409,7 +1477,7 @@ option "new doc id".**
 ---
 
 
-### A3b — `fgos compound` registry gate {#task-compound-registry-gate}
+### A3b — `fgos knowledge attest` registry gate {#task-compound-registry-gate}
 
 **Đây là task chốt của cả kế hoạch.** Không được để *thứ tự triển khai* làm hàng
 rào — writer là **skill prose**, không gì cưỡng chế nó. Chặn ở **producer verb**,
@@ -1418,7 +1486,7 @@ rào — writer là **skill prose**, không gì cưỡng chế nó. Chặn ở *
 **Invariant mới:**
 
 ```
-fgos compound --doc-path <path>   phải thoả CẢ BỐN:
+fgos knowledge attest --doc-path <path>   phải thoả CẢ BỐN:
   1. <path> đã commit tại main HEAD              (đã có sẵn — D3)
   2. doc registry enforcement đang bật
   3. <path> là currentPath của một live doc slot trong registry
@@ -1460,7 +1528,7 @@ lần rồi thôi.
 1. resolve topic + role
 2. cần doc mới  ->  doc.reserve(topicId, role, currentPath)
 3. write + commit file tại currentPath
-4. fgos compound --doc-path currentPath
+4. fgos knowledge attest --doc-path currentPath
 5. doc.mark-rendered -> provisional | active, theo policy
 ```
 
@@ -1481,7 +1549,7 @@ mỗi phiên tự đoán một kiểu.
 
 ### A4 — Compound writer đổi sang registry-first {#task-writer-skill}
 
-**Mục tiêu:** `fgos-coding-compounding` đổi từ *"chọn quadrant + tự đặt path"*
+**Mục tiêu:** `fgos-coding-knowledge` (đổi tên từ `fgos-coding-compounding`, D-tsk28x-16) đổi từ *"chọn quadrant + tự đặt path"*
 sang:
 
 1. Đọc capture.
@@ -1529,6 +1597,36 @@ tiện nghi), D-tsk28x-8 (hai tầng dùng chung bộ máy, không chung vocabul
 
 **Footprint:** `src/report/`, `bin/fgos.mjs`.
 **Verify:** `node --test test/report/`
+
+---
+
+### A7 — Deprecate `fgos compound` → `fgos knowledge attest` {#task-compound-deprecation}
+
+**Mục tiêu:** verb cũ `fgos compound` đánh dấu `deprecated` trong
+`src/cli/command-registry.mjs`, trỏ sang `fgos knowledge attest`. Gộp vào
+`tsk-28x` theo quyết định chủ sản phẩm (D-tsk28x-16), không tách item.
+
+**Vì sao đây là công việc THẬT, không phải sửa một dòng:**
+
+- **55 file** tham chiếu `compound` trong `src/`, `bin/`, `test/`, `.agents/`,
+  `plugins/` — đo vòng 10.
+- Field `deprecated` **có** trong schema `command-registry.mjs` nhưng **chưa
+  verb nào từng dùng** (tất cả `null`). Đây là lần **đầu tiên** đường
+  deprecation được exercise ⇒ nó chưa có test, chưa có hành vi đã chứng minh.
+  Phải kiểm: verb deprecated còn chạy được không, `--help [--json]` render nó ra
+  sao, `test/cli/fgos-manifest.test.mjs` (test chống-lệch sổ verb) có bắt không.
+
+**Ràng buộc:** giữ `fgos compound` **chạy được** trong ít nhất một chu kỳ phát
+hành — đây là verb đã ship, AGENTS.md đòi giữ public contract trừ khi thay đổi
+là có chủ đích và đã được chấp nhận. Deprecate ≠ xoá.
+
+**Đây là thay đổi người dùng fgOS thấy được** ⇒ bắt buộc một dòng trong
+`CHANGELOG.md` `## [Unreleased]`.
+
+**Footprint:** `src/cli/command-registry.mjs`, `bin/fgos.mjs`, `test/cli/`,
+`CHANGELOG.md`, và 55 file tham chiếu (phần lớn là prose skill/test cần cập nhật
+tên, không phải logic).
+**Verify:** `node --test test/cli/fgos-manifest.test.mjs`
 
 ---
 
@@ -1671,7 +1769,11 @@ khắc nào "đã dời layout nhưng writer còn cũ".
  8. Chạy writer CANARY riêng                      (A6)  <-- cổng
  9. Migration dry-run                             (+ B4 conservation)
 10. Migration apply / fold
+11. A7 deprecate fgos compound -> fgos knowledge attest
 ```
+
+**A7 đứng cuối có chủ đích:** đánh dấu deprecated trước khi `knowledge attest`
+thật sự thay được việc của nó là hứa suông với người dùng.
 
 **Hai cổng cứng:** bước 5 phải xong trước bước 7 (không thì writer cũ vẫn ghi
 tự do); **bước 8 phải XANH trước bước 9** — migration chỉ chạy sau khi đã chứng
@@ -1703,10 +1805,10 @@ trước mỗi đợt. `docs/` tree bị dry-run + apply chạm — hai bước 
 
 ### Cập nhật spec và hard rule — đi kèm từng task, không gom cuối
 
-- `docs/specs/enduser-docs-authoring.md` — **R4** (grow-vs-create theo tồn-tại-tệp)
+- `docs/specs/enduser-docs-authoring.md` → **đổi tên `docs/specs/knowledge.md`** (D-tsk28x-16); **R4** (grow-vs-create theo tồn-tại-tệp)
   và **R5** (Diataxis là trục cấu trúc duy nhất) đều bị thay; § Open Gaps còn
   viết "mới ngăn how-to có tài liệu thật", sai từ lâu.
-- `.agents/skills/fgos-coding-compounding/SKILL.md` — hard rule "không viết ngoài
+- `.agents/skills/fgos-coding-knowledge/SKILL.md` (đổi tên từ `fgos-coding-compounding`) — hard rule "không viết ngoài
   `docs/<quadrant>/`" bị thay; bước 3 `fs.existsSync` thay bằng resolver.
 - `src/report/enduser-index.mjs` — `QUADRANT_DIR_ALIASES` đổi vai.
 - `docs/specs/reading-map.md` + `system-overview.md` § Area Map — thêm area mới.
