@@ -156,7 +156,7 @@ test('adding "fixture-marketing" leaves DOMAINS.coding completely unchanged (RUL
     'awaiting-approval': 'review',
     wontfix: 'canceled',
   });
-  assert.equal(DOMAINS.coding.skillMap.retrospective, 'fgos-coding-compounding');
+  assert.equal(DOMAINS.coding.skillMap.retrospective, 'fgos-coding-knowledge');
   assert.equal(DOMAINS.coding.fieldSchema, undefined);
   assert.equal(DOMAINS.coding.worktreeBacked, true);
 });

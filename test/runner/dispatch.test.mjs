@@ -991,12 +991,8 @@ test('loadRunnerConfig rejects a "executors.<id>.invocations[]" entry with "via"
  * independent proof (e.g. a real merge/catchup dry-run) that its content
  * agrees with what will actually land, since these tests cannot see it. */
 function committedRunnerConfig() {
-  // Main-checkout-resolved, not `import.meta.dirname`-relative: this test
-  // suite itself may be running from inside a worktree, whose `.fgos/` is
-  // unconditionally wiped (ADR0020) -- only the main checkout carries the
-  // real committed `.fgos/config.json`.
-  const repoRoot = resolveMainCheckoutRoot(path.resolve(import.meta.dirname, '..', '..'));
-  const raw = execFileSync('git', ['show', 'HEAD:.fgos/config.json'], { cwd: repoRoot, encoding: 'utf8' });
+  const worktreeRoot = path.resolve(import.meta.dirname, '..', '..');
+  const raw = execFileSync('git', ['show', 'HEAD:.fgos/config.json'], { cwd: worktreeRoot, encoding: 'utf8' });
   const parsed = JSON.parse(raw);
   return parsed.runner;
 }

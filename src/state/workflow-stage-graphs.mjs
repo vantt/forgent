@@ -241,7 +241,7 @@ const codingDomain = {
       decompose: 'fgos-coding-planning',
       planning: 'fgos-coding-planning',
       executing: 'fgos-coding-implement',
-      retrospective: 'fgos-coding-compounding',
+      retrospective: 'fgos-coding-knowledge',
     }),
     // taskSpecMap (tsk-2t9c D6/D9): stage -> task-spec id, the "skillMap
     // points stage -> (task-spec, skill)" half of A-lite. Purely additive

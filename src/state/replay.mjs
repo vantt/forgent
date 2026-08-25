@@ -14,6 +14,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { readEvents, readLastLineBefore, readEventsFromByte } from './events.mjs';
 import { DEFAULTS } from './work.mjs';
+import { applyKnowledgeEvent } from './knowledge-registry.mjs';
 
 // tsk-49e: every top-level key applyEvent ever writes to `view` is either an
 // array `.push`ed onto in place (only `decisions`) or reassigned via a
@@ -596,6 +597,21 @@ function applyEvent(view, event) {
           { ...event.payload, ts: event.ts },
         ];
       }
+      break;
+    }
+    case 'topic.register':
+    case 'topic.rename':
+    case 'topic.split':
+    case 'topic.merge':
+    case 'topic.retire':
+    case 'doc.reserve':
+    case 'doc.register':
+    case 'doc.mark-rendered':
+    case 'doc.promote':
+    case 'doc.supersede':
+    case 'doc.retire':
+    case 'doc.path-move': {
+      applyKnowledgeEvent(view, event);
       break;
     }
     // tsk-in1-1 D1: `tool.register`/`tool.remove` retired — a tool provider

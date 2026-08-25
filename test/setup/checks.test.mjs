@@ -84,6 +84,15 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'task-specs-resolve',
       'agent-claims-resolve',
       'decision-index-stale',
+      'doc-registry-enforce',
+      'doc-registry-stale',
+      'doc-alias-broken',
+      'doc-active-duplicate',
+      'doc-near-duplicate',
+      'doc-provisional-aged',
+      'doc-topic-oversized',
+      'doc-role-underused',
+      'doc-source-conservation',
     ].sort(),
   );
 });
@@ -1037,6 +1046,7 @@ test('config-not-stale passes when the existing config already has every default
       workerSlots: { ceiling: null },
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
+      docRegistry: { enforce: false },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);

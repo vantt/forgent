@@ -84,3 +84,55 @@ correctly depends on `tsk-12m` given the scope-boundary question raised in
 clarify-locking starts, or proceeding to `fgos-exploring` now on the
 understanding that its own decisions may need to reopen or narrow what
 `DISCUSSION.md` already drafted?
+
+## Round 2 (2026-08-25)
+
+**Asked:** stage `discovery` re-entry after an extensive `/fgOS:coding-shape
+tsk-28x` continuation (agreed in Round 1's own answered ask, "đồng ý tiếp
+tục thảo luận coding-shape") — are the two gaps Round 1 raised still open,
+is the item clear enough to move to `planning` now, and does real evidence
+support raising `tier`/`risk` off `light`?
+
+**Routed mechanically:**
+
+- Round 1's gap #1 (Lane-B storytelling-half conclusion) — resolved. Read
+  `docs/history/compound-learn-artifact-registry/DISCUSSION.md`: 18 locked
+  decisions `D-tsk28x-1` through `D-tsk28x-18` (`grep -oE
+  "D-tsk28x-[0-9]+" DISCUSSION.md | sort -Vu` → 1..18, none skipped), the
+  "## Thứ tự thi công" section carries a 10-step build order with named
+  hard gates, and the item now has a full agent-ready plan at
+  `plans/260825-1841-knowledge-registry/plan.md` plus 12 phase files
+  (`phase-01-registry-domain-model.md` … `phase-12-deprecate-compound.md`)
+  each self-contained (own context, deps, footprint, acceptance).
+- Round 1's gap #2 (tsk-12m dependency) — resolved by `D-tsk28x-2`
+  (DISCUSSION.md, round 7, 2026-08-11): dependency split, `tsk-12m` no
+  longer blocks `tsk-28x`. The item's live `deps` field (`fgos list --id
+  tsk-28x --json`) already reads `["tsk-1hy"]` only, and `tsk-1hy` is
+  `delivered` — deps fully satisfied.
+- Scope size for tier/risk — `plan.md`'s own footprint-conflict section
+  reports the real engine (`fgos plan`) found **5** file-overlap pairs
+  across the 12 phases, 2 of which manual footprint analysis missed
+  (`src/cli/command-registry.mjs`, `src/setup/checks.mjs`), on top of the
+  3 manually-caught `bin/fgos.mjs` overlaps (05↔06, 05↔07, 06↔07).
+  `bin/fgos.mjs` itself is 4215 lines (`wc -l`) — the core CLI entrypoint,
+  touched by phases 05/06/07/12. Phase 11 (migration) carries an explicit
+  conservation gate over ~268 existing docs (`docs -name '*.md' | wc -l`
+  → 1592 total repo-wide today, of which the plan's own "Vấn đề đang giải"
+  section cites 268 as the pre-migration end-user doc corpus this specific
+  registry governs) with a dry-run-before-apply hard gate, and phase 06
+  adds a producer-door enforcement gate that can reject writes repo-wide
+  once live. This is materially larger and more cross-cutting than
+  `light`/`light` — no single-file, low-blast-radius change.
+
+**Verdict:** **clear.**
+
+Both Round 1 gaps are resolved by real, cited decisions and artifacts, not
+by re-deciding them here. `tier`/`risk`: real evidence (footprint-conflict
+count, core-CLI file size, migration conservation gate, enforcement gate)
+supports `heavy`/`heavy`, up from the item's current `light`/`light` —
+recommending the item's classification be updated to match.
+
+**Verify (real, runnable):** `npm test && node bin/fgos.mjs doctor`
+(plan.md's own Acceptance section: `npm test` green including new
+harnesses, `fgos doctor` green including the 8 new knowledge checks phase
+08 registers).

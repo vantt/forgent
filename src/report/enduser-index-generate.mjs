@@ -85,7 +85,7 @@ export function computeEnduserDocsIndex(repoRoot, fgosDir) {
     for (const e of JSON.parse(previousContent)) previousById.set(e.docPath, e.sourceCaptureId);
   }
   const view = listWork(fgosDir);
-  const rawEntries = buildEnduserIndex(docEntries, view.outcomes ?? {});
+  const rawEntries = buildEnduserIndex(docEntries, view.outcomes ?? {}, view);
   const entries = rawEntries.map((e) => {
     if (!storeReachable && e.sourceCaptureId === null && previousById.get(e.docPath)) {
       return { ...e, sourceCaptureId: previousById.get(e.docPath) };

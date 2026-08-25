@@ -40,8 +40,9 @@ import { EventLogError } from './events.mjs';
 import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
+import { KnowledgeValidationError, applyKnowledgeEvent } from './knowledge-registry.mjs';
 
-export { FsmError, WorkValidationError, EventLogError };
+export { FsmError, WorkValidationError, EventLogError, KnowledgeValidationError };
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class StoreError extends Error {
@@ -1469,3 +1470,66 @@ export function readRawEvents(dir) {
 export function rebuild(dir) {
   return refreshView(dir);
 }
+
+/**
+ * Append a knowledge event after validating payload and invariants inside lock.
+ */
+export function appendKnowledgeEvent(dir, type, payload) {
+  const { logPath } = paths(dir);
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    const before = rebuildView(logPath);
+    const event = { type, payload, ts: Date.now() };
+    applyKnowledgeEvent(before, event);
+    appendEventLocked(logPath, { type, payload });
+    return event;
+  });
+}
+
+export function registerTopicStore(dir, { topicId, purposeSlug, purposeTitle, entities }) {
+  return appendKnowledgeEvent(dir, 'topic.register', { topicId, purposeSlug, purposeTitle, entities });
+}
+
+export function renameTopicStore(dir, { topicId, newPurposeSlug, newPurposeTitle }) {
+  return appendKnowledgeEvent(dir, 'topic.rename', { topicId, newPurposeSlug, newPurposeTitle });
+}
+
+export function splitTopicStore(dir, { topicId, newTopics }) {
+  return appendKnowledgeEvent(dir, 'topic.split', { topicId, newTopics });
+}
+
+export function mergeTopicStore(dir, { sourceTopicIds, targetTopicId }) {
+  return appendKnowledgeEvent(dir, 'topic.merge', { sourceTopicIds, targetTopicId });
+}
+
+export function retireTopicStore(dir, { topicId }) {
+  return appendKnowledgeEvent(dir, 'topic.retire', { topicId });
+}
+
+export function reserveDocStore(dir, { topicId, role, currentPath, framework, mode, docId }) {
+  return appendKnowledgeEvent(dir, 'doc.reserve', { topicId, role, currentPath, framework, mode, docId });
+}
+
+export function registerDocStore(dir, { topicId, role, currentPath, framework, mode, docLifecycle, aliases, sourceCaptureIds, docId }) {
+  return appendKnowledgeEvent(dir, 'doc.register', { topicId, role, currentPath, framework, mode, docLifecycle, aliases, sourceCaptureIds, docId });
+}
+
+export function markDocRenderedStore(dir, { docId, topicId, role }) {
+  return appendKnowledgeEvent(dir, 'doc.mark-rendered', { docId, topicId, role });
+}
+
+export function promoteDocStore(dir, { docId, topicId, role }) {
+  return appendKnowledgeEvent(dir, 'doc.promote', { docId, topicId, role });
+}
+
+export function supersedeDocStore(dir, { docId, topicId, role, supersededBy }) {
+  return appendKnowledgeEvent(dir, 'doc.supersede', { docId, topicId, role, supersededBy });
+}
+
+export function retireDocStore(dir, { topicId, role }) {
+  return appendKnowledgeEvent(dir, 'doc.retire', { docId, topicId, role });
+}
+
+export function moveDocPathStore(dir, { docId, topicId, role, newPath }) {
+  return appendKnowledgeEvent(dir, 'doc.path-move', { docId, topicId, role, newPath });
+}
+

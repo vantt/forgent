@@ -390,3 +390,31 @@ test("docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type an
   assert.ok(Array.isArray(meta.source_capture_ids));
   assert.ok(meta.source_capture_ids.includes('doc-fgos-rollup-howto'));
 });
+
+test('findSourceCaptureIds resolves oldPath and currentPath through resolver stateView', () => {
+  const outcomesView = {
+    'item-1': { docPath: 'docs/old/guide.md' },
+    'item-2': { docPath: 'docs/new/guide.md' },
+  };
+
+  const stateView = {
+    topics: { t1: { topicId: 't1', status: 'active' } },
+    docs: {
+      't1:guide': {
+        docId: 't1:guide',
+        topicId: 't1',
+        role: 'guide',
+        currentPath: 'docs/new/guide.md',
+        aliases: ['docs/old/guide.md'],
+        docLifecycle: 'active',
+      },
+    },
+  };
+
+  const capturesOld = findSourceCaptureIds(outcomesView, 'docs/old/guide.md', stateView);
+  const capturesNew = findSourceCaptureIds(outcomesView, 'docs/new/guide.md', stateView);
+
+  assert.deepEqual(capturesOld.sort(), ['item-1', 'item-2']);
+  assert.deepEqual(capturesNew.sort(), ['item-1', 'item-2']);
+});
+

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Extensible multi-audience artifact-producer registry for knowledge management (`fgos topic *`, `fgos doc *`, `fgos knowledge *`, `fgos doc-registry`) (tsk-28x).
 - Three new read-only verbs: `fgos decision-index [--check]` generates
   `docs/decisions/index.md`, a projection of every platform/repo-wide
   decision (`fgos decision --scope <area>`) from `state.decisions`;

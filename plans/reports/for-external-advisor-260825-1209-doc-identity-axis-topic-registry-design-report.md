@@ -176,3 +176,46 @@ chứng mới:
 - Vocabulary suy **bottom-up** từ tài liệu thật (không liệt kê tay).
 - Registry lưu bằng **event + verb** (không phải JSON soạn tay).
 - **Tách** phần thu-chất-liệu-kể-chuyện sang item riêng.
+
+## 8. Tự quyết sau bản nháp — advisor có thể sửa nếu sai
+
+Hai điểm dưới đây được tự chốt sau khi đổi tên boundary từ `compound` sang
+`knowledge`. Ghi rõ ở đây để người đọc sau không suy nhầm đây là điều đã được
+kiểm chứng bởi bản thiết kế ban đầu.
+
+1. **`topic` và `doc` là namespace anh em của `knowledge`, không lồng bên trong.**
+   CLI dự kiến là `fgos topic register`, `fgos topic split`, `fgos doc reserve`,
+   `fgos doc promote`, không phải `fgos knowledge topic register`. Lý do: registry
+   là state, đường ống knowledge là process; fgOS vốn tách các verb state/process
+   kiểu này. Lồng ba cấp cũng quá nặng cho một CLI hiện gần như phẳng.
+2. **`promote` chỉ tồn tại ở một chỗ: `fgos doc promote`.** Chấp nhận chính thức
+   chính là chuyển trạng thái tài liệu từ `provisional` sang `active`, nên đây là
+   một hành động của `doc`, không phải một entry point thứ hai kiểu
+   `fgos knowledge promote <doc>`. Hai lối vào cho cùng một hành động là mầm lệch
+   contract về sau.
+3. **Classifier/inventory phải đứng trước bootstrap registry, không đứng sau.**
+   Bootstrap registry cho 268 tài liệu cũ cần ghi mỗi file thành một dòng có
+   `currentPath`, `topicId`, `purposeSlug`, `role`, `entities`, `framework`, `mode`.
+   `currentPath` thì đọc được từ cây file, nhưng `topicId`/`purposeSlug`/`role`
+   chính là đầu ra của classifier. Vì vậy "bootstrap registry" và "classifier
+   chạy trên corpus cũ" không phải hai bước độc lập đặt xa nhau: classifier là
+   pass đọc-thuần sinh dữ liệu bootstrap. Bật enforcement trước khi có bảng chữ
+   cái `role`/`purpose` cũng sai, vì item retrospective mới không có gì để gán
+   "gần nhất". Thứ tự sửa: model+resolver có thể làm trước; classifier/inventory
+   chạy sớm và song song; bootstrap dùng output đó; chỉ sau đó mới bật
+   enforcement `fgos compound`/knowledge-attestation từ chối path không nằm trong
+   registry.
+
+Nguyên tắc tự kiểm thêm: trước khi tách hai việc vào hai chỗ khác nhau trong plan,
+hỏi thẳng "đầu ra của bước này có phải đầu vào bắt buộc của bước kia không?". Nếu
+có, chúng phải liền nhau hoặc nhập làm một. Đây là lần thứ ba trong thảo luận này
+hai việc tưởng rời hoá ra là một.
+
+Vẫn đang treo, chưa gấp vào thiết kế:
+
+- Policy sau khi writer render xong một tài liệu đã có topic do người đăng ký
+  tường minh: `doc.mark-rendered` nên đi thẳng `active`, hay vẫn phải vào
+  `provisional` rồi chờ `doc promote`?
+- Các phần lịch sử như §1 và §6.7 vẫn dùng chữ `compound`. Không sửa ngược quá
+  khứ: §5 là log append-only, và các vòng trước thật sự dùng tên đó. Tên mới
+  `knowledge` áp cho boundary đi tiếp, không rewrite lại transcript thiết kế.
