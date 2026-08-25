@@ -130,7 +130,7 @@ export function compileDispatchPlan(
       executorId: null,
       capability: purpose ?? null,
       invocation: null,
-      governance: { carries: [], egress: null },
+      governance: { providerFamily: null, egress: null },
       reasonCodes,
       configured: false,
     };

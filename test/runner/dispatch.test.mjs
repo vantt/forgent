@@ -5333,6 +5333,15 @@ test('compileDispatchPlan selector precedence matches actual resolution preceden
   assert.equal(plan.executorId, 'agy');
 });
 
+test('compileDispatchPlan governance shape is consistent across every branch, including "unavailable" for a genuinely unregistered purpose (self-review finding, second round)', () => {
+  const plan = compileDispatchPlan({}, { for: 'no-such-purpose' });
+  assert.equal(plan.mechanism, 'unavailable');
+  assert.equal(plan.configured, false);
+  // Every other branch reports governance as {providerFamily, egress} --
+  // this one used to be the sole holdout still shaped {carries: [], egress}.
+  assert.deepEqual(plan.governance, { providerFamily: null, egress: null });
+});
+
 test('compileDispatchPlan.invocation selects the real via:"cli" entry among an executor\'s invocations[], never blindly invocations[0] (self-review finding)', () => {
   const cfg = {
     executors: {
