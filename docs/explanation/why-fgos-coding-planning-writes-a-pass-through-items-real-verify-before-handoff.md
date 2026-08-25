@@ -2,7 +2,7 @@
 type: explanation
 title: Why fgos-coding-planning writes a pass-through item's real verify before handoff
 tags: [fgos-coding-planning, verify, plan-mjs, placeholder]
-source_capture_ids: [tsk-14a, tsk-13b]
+source_capture_ids: [tsk-14a, tsk-13b, tsk-1zo]
 authoritative_for: why a pass-through (non-split) item's designed proof-surface command is synced onto work.verify by fgos-coding-planning, and why the fix is skill prose rather than an engine change
 ---
 # Why `fgos-coding-planning` writes a pass-through item's real verify before handoff
@@ -103,3 +103,24 @@ future judgment would need to check — sequenced via `deps`, but not
 blocking in substance: this fix is purely additive (write a real value
 earlier) and never touches the judgment-placement question `tsk-4m4`
 owns.
+
+## `fgos return`'s own safety net, once a placeholder slips through anyway (`tsk-1zo`)
+
+Even with the upstream fixes above, a placeholder can still reach `fgos
+return` — an item can complete every one of its children without its own
+root item's `verify` ever getting upgraded from `SUBMIT_VERIFY_SENTINEL`.
+This happened live, directly during `tsk-1lv`'s own real approve: its root
+item still held the literal placeholder text ("chưa xác định — P15 bổ
+sung") when its six children finished, and `return`'s own verify execution
+path (`runGoalCheck` → `runCommand`, `src/runner/goal-check.mjs`) shelled
+out to that literal string with zero placeholder check — producing a raw,
+cryptic shell error (`/bin/sh: 1: chưa: not found`, exit 127) instead of a
+clear validation refusal. The guard already existed elsewhere:
+`hasRealVerify()` (`src/intake/discovery.mjs`) is used at discovery-stage
+transitions, but `return`'s own verify path never imported or reused it.
+The fix: `runGoalCheck` now checks `hasRealVerify(item.verify)` before
+calling `runCommand`, refusing with a clear `StoreError` naming the
+placeholder instead of executing it as a shell command. Complementary
+scope to the fix above, not competing: that fix stops a placeholder from
+ever reaching `planning`→`executing` in the normal case; this one is the
+safety net for when one reaches `return` anyway.
