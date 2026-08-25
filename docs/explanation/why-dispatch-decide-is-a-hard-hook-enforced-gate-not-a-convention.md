@@ -239,6 +239,69 @@ extension of `0026`, not a rewrite of it — `0026`'s own body stays intact
 with a pointer note, since its rule still governs the no-capacity-configured
 case correctly.
 
+## `capabilities.<name>` gains `prefer`/`overrides`, replacing per-purpose duplicate capacity entries
+
+`tsk-34n` closed the gap `tsk-1m8`/`tsk-pdg` left behind: `fgos-coding-implement`
+had its own dedicated `capacities.fgos-coding-implement` entry, duplicating
+`agy`'s real config just to give that one job a name to look up by. This
+item modeled the relationship correctly instead: a capability
+(`runner.capabilities.<name>`) declares `prefer: <capacityId>` pointing at
+the executor that serves it (the executor must itself declare
+`for: [<name>]` — this symmetry is enforced at load time, specifically to
+catch a `prefer` typo pointing at a capacity that never actually claimed to
+serve that purpose) and `overrides` — a shallow merge onto the resolved
+capacity, restricted to exactly four fields: `rigorOverrides`,
+`providerModel`, `tier`, `model`. `overrides` can never touch `command`,
+`args`, `adapter`, or `invocations` — keeping the one-backend-one-command
+principle `0026` established intact; a capability can retune *how* an
+executor runs a job, never swap in a different program to run it.
+
+> D1: literal-key capacity lookup (`cfg.capacities[capacityId]`) luôn
+> thắng trước, không đổi hành vi cũ -- for/prefer chỉ là fallback
+> ADDITIVE khi không có literal key
+
+Resolution order stays backward compatible: a literal capacity id always
+wins first (existing configs keep working byte-identical); `prefer`/`for`
+is purely an additive fallback for the case no literal key was given —
+this is exactly how `fgos-coding-implement` itself now resolves (`decide
+--work` still passes a literal capacity id when one exists, but a caller
+naming just the purpose now finds `agy` through `prefer` instead of
+needing its own duplicate entry).
+
+## The real gap self-review found: two independent lookups had to be unified
+
+> D4: một hàm dùng chung (resolveCapacityForId-style) áp toàn bộ thứ tự
+> resolve... CẢ spawnWorker's own model lookup LẪN resolveExecutorConfig's
+> internal lookup phải gọi hàm này
+
+A code sweep found `spawnWorker` had its *own*, separate lookup for model
+selection, independent of `resolveExecutorConfig`'s lookup for the command
+to run — fixing only one would have silently let model and command drift
+apart the moment the duplicate `fgos-coding-implement` entry was deleted. A
+single shared resolver (`resolveCapacityAndOverrides`) now backs every real
+call site instead: `resolveExecutorConfig`, `decideCapacityDispatchMechanism`,
+`spawnWorker`'s model lookup, both of `decideCapacityCli`'s derivation
+points, and three more sites inside `executeCapacityCli` found only once
+implementation was underway.
+
+A user-requested self-review (before approval, not after) then found three
+more real bugs the initial implementation had missed: `executeCapacityCli`'s
+`--for` door was silently dropping `overrides` on a second resolve call
+that always hit the literal-key branch instead of the purpose branch;
+`overrides.tier`/`overrides.model` validated as legal fields but were never
+actually consulted anywhere (dead config, no error); and an error message's
+remediation advice named the purpose instead of the real resolved capacity
+id once they differed. All three were fixed with real red/green regression
+tests before the item returned a second time — the same "self-review before
+declaring done" discipline `tsk-60f` D16 had already established for the
+role/holder wiring.
+
+One pre-existing, out-of-scope finding was documented rather than fixed: a
+prototype-pollution-adjacent bracket-access pattern
+(`cfg.capacities[key]`) exists across roughly ten sites in this file,
+predating this item, low real-world exploitability, left as a named gap
+rather than folded into this item's own scope.
+
 ## A real operational snag: approve cannot run from inside an isolated worktree
 
 This item's own driving hit a structural wall worth recording: once fully
