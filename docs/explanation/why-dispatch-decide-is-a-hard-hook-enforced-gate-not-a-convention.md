@@ -369,6 +369,33 @@ The fix landed was a one-paragraph clarification added to the shared
 dispatch fragment (both mirrors) making this boundary explicit for future
 readers — no code change, since nothing was actually broken.
 
+## `fgos-coding-implement`'s own prose had gone stale about its own mechanism
+
+Even after `tsk-pdg` (`0033`) made a configured cli-spawn capacity win
+unconditionally, `fgos-coding-implement`'s own `SKILL.md` still described
+Implement as "do your own Implement work directly... never delegate to
+Agent/Task tool as an ad hoc sub-dispatch," with `dispatch.mjs decide`
+mentioned only as a rare escape hatch "if a step genuinely needs a
+different backend." That prose was no longer accurate the moment
+`fgos-coding-implement` itself had a real registered `agy` capacity
+(`tsk-34n`): `decide` now *always* returns `out-of-process` for that job,
+regardless of the caller's own live Task access — config wins, not "I'll
+just do it myself."
+
+The mismatch produced a real, observed misreport: a session driving
+`tsk-52z` called `decide --work tsk-52z --has-live-task-access`, received
+`out-of-process`, and described this to the user as "an escape hatch I
+deliberately used" — when it was actually the mandatory default `0033`
+already established. `tsk-1ep` fixed the prose itself: Hard rules and Flow
+step 2 now say to *always* call `decide` before Implement (never assume a
+live Task tool means doing it inline by default), citing `0033` directly,
+then branch on whatever `mechanism` comes back. This exact corrected
+wording is what a reader sees in `fgos-coding-implement`'s Hard rules
+today. The other five coding-domain skills (planning/validating/exploring/
+researching/fanout) were deliberately left untouched — none of them had a
+cli-spawn capacity registered for their own reasoning step, so there was
+no real bug there yet to fix (YAGNI).
+
 ## A closing rename: "capacity" became "executor"
 
 Every decision quoted above uses "capacity"/`capacities` because that was
