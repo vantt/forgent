@@ -197,3 +197,16 @@ of live cross-branch collision the coordination decision (D9, splitting
 scope between `tsk-1lv` and `tsk-37i`) existed to prevent, caught here
 because the two branches' actual diffs were compared directly rather than
 assuming the earlier scope split still held once both had drifted.
+
+**Live confirmation of the fold-into-spec convention (`tsk-1fp-6`).** A
+later, unrelated item (superseding `docs/specs/distribution.md`'s install
+entry-point law) had been planned three hours and twenty minutes *before*
+D5's retirement actually merged, still assuming the old convention (write
+a new numbered `docs/decisions/00NN-*.md` file). Caught on a re-scan for
+drift before executing, its footprint and description were corrected to
+the real, current mechanism instead: fold the superseding decision into
+the target spec's own body — a `decisions:` frontmatter array entry at the
+top of the file, plus inline narrative near the specific rule being
+superseded — never a new standalone decision file. The item's intent
+stayed valid throughout; only the mechanism needed correcting once the
+timing gap was noticed.
