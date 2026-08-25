@@ -5275,7 +5275,7 @@ test('decideExecutorCli resolves --for via capabilities.<name>.prefer returning 
 
 test('compileDispatchPlan builds a canonical DispatchPlan for all four selector forms (0b)', () => {
   const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } },
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
   };
 
@@ -5286,7 +5286,13 @@ test('compileDispatchPlan builds a canonical DispatchPlan for all four selector 
   assert.equal(plan1.mechanism, 'out-of-process');
   assert.equal(plan1.executorId, 'agy');
   assert.deepEqual(plan1.invocation, { via: 'cli', adapter: 'cli-spawn', protocol: 'prompt-stdout-v1' });
-  assert.deepEqual(plan1.governance, { carries: [], egress: null });
+  // governance (self-review finding, 2026-08-25): must be the REAL
+  // resolveExecutorConfig output, not an approximation -- proves the plan
+  // reuses the same resolution execution actually goes through.
+  assert.deepEqual(plan1.governance, {
+    providerFamily: 'agy',
+    egress: { kind: 'cross-provider', target: 'agy', content: 'repo-content' },
+  });
   assert.ok(plan1.reasonCodes.includes('native-first.0033.cli-spawn-shaped'));
 
   // Form 2: purpose selector (--for)
@@ -5311,6 +5317,40 @@ test('compileDispatchPlan builds a canonical DispatchPlan for all four selector 
   assert.equal(plan4.selector.value, true);
   assert.equal(plan4.mechanism, 'out-of-process');
   assert.equal(plan4.configured, false);
+});
+
+test('compileDispatchPlan selector precedence matches actual resolution precedence: an explicit executorId always wins over work/purpose, even when both are passed (self-review finding)', () => {
+  const cfg = {
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+  };
+  const sample = sampleWork();
+  // Both executorId AND work are passed -- resolution's own `if (!executorId
+  // && workIdArg)` guard means the work item is never even touched, so
+  // selector must report 'executor', never 'work'.
+  const plan = compileDispatchPlan(cfg, { executorId: 'agy', work: sample.id, workItem: sample });
+  assert.equal(plan.selector.type, 'executor');
+  assert.equal(plan.selector.value, 'agy');
+  assert.equal(plan.executorId, 'agy');
+});
+
+test('compileDispatchPlan.invocation selects the real via:"cli" entry among an executor\'s invocations[], never blindly invocations[0] (self-review finding)', () => {
+  const cfg = {
+    executors: {
+      mixedInvocations: {
+        kind: 'tool',
+        allowCrossProvider: true,
+        invocations: [
+          { via: 'mcp', tools: {} },
+          { via: 'cli', command: 'real-cli-command', args: ['{prompt}'], adapter: 'cli-spawn' },
+        ],
+      },
+    },
+  };
+  const plan = compileDispatchPlan(cfg, { executorId: 'mixedInvocations' });
+  // The old `invocations[0]` approximation would have reported the mcp
+  // entry's own (nonexistent) `via`/adapter here instead of the cli one.
+  assert.equal(plan.invocation.via, 'cli');
+  assert.equal(plan.invocation.adapter, 'cli-spawn');
 });
 
 test('logExecutorDispatch writes governance payload into executor.dispatch event generically (0c)', () => {

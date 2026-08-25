@@ -7,7 +7,7 @@
 // and reasonCodes into a canonical DispatchPlan object.
 
 import { RunnerConfigError } from './config.mjs';
-import { resolveExecutorAndOverrides } from './resolve.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorConfig } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { executorIdForWork } from './cli.mjs';
 
@@ -46,13 +46,24 @@ export function compileDispatchPlan(
   }
 
   // 1. Derive selector
+  //
+  // Self-review finding (2026-08-25): this order must mirror the ACTUAL
+  // resolution precedence below, never a separate ranking of its own — the
+  // resolution logic only ever consults `workIdArg`/`purpose` inside an
+  // `if (!executorId && ...)` guard, so an explicit `executorIdArg` always
+  // wins first regardless of what else the caller passed. The old order
+  // (work > purpose > executor) reported `selector.type: 'work'` for a
+  // caller that passed BOTH `executorId` and `work`, even though
+  // resolution never touched the work item at all — any audit/log
+  // consumer reading `plan.selector` to understand why this dispatch
+  // resolved the way it did was told the wrong reason.
   let selector;
-  if (workIdArg) {
+  if (executorIdArg) {
+    selector = { type: 'executor', value: executorIdArg };
+  } else if (workIdArg) {
     selector = { type: 'work', value: workIdArg };
   } else if (purpose) {
     selector = { type: 'purpose', value: purpose };
-  } else if (executorIdArg) {
-    selector = { type: 'executor', value: executorIdArg };
   } else {
     selector = { type: 'adHocAgent', value: true };
   }
@@ -82,7 +93,7 @@ export function compileDispatchPlan(
         executorId,
         capability: executorId,
         invocation: null,
-        governance: { carries: [], egress: null },
+        governance: { providerFamily: null, egress: null },
         reasonCodes,
         configured: false,
       };
@@ -106,7 +117,7 @@ export function compileDispatchPlan(
         executorId: null,
         capability: purpose ?? null,
         invocation: null,
-        governance: { carries: [], egress: null },
+        governance: { providerFamily: null, egress: null },
         reasonCodes,
         configured: false,
       };
@@ -155,17 +166,37 @@ export function compileDispatchPlan(
   const agentType = executor?.agentType;
   const capability = purpose ?? (Array.isArray(executor?.for) && executor.for.length > 0 ? executor.for[0] : (executorId ?? null));
 
-  const invEntry = Array.isArray(executor?.invocations) ? executor.invocations[0] : undefined;
+  // Self-review finding (2026-08-25): the invocation/governance below used
+  // to be APPROXIMATED here -- `executor.invocations[0]` instead of the
+  // `via:"cli"` entry `resolveExecutorConfig`'s own Gate B2 actually
+  // selects (an executor declaring `[{via:"mcp",...}, {via:"cli",...}]`
+  // would silently report the wrong one), and a hardcoded `egress: null`
+  // that never reflected the real per-executor governance resolve.mjs
+  // computes for every actual dispatch. A canonical DispatchPlan exists to
+  // describe what execution will ACTUALLY do, so it reuses the exact same
+  // resolution function `resolveExecutorCommand` calls, rather than
+  // re-deriving a second, drifting approximation of it. Caught and
+  // gracefully degraded (never lets `decide` itself start throwing for a
+  // call that previously succeeded): a governance-blocked executor or an
+  // mcp-only one (no `via:"cli"` invocation at all, e.g. gitnexus, exactly
+  // the case an mcp handback above may already be reporting) is a real
+  // resolution failure this preview reports as "unknown" rather than
+  // crashing on — the throw itself only ever matters at actual dispatch
+  // time, which resolveExecutorCommand still enforces unconditionally.
+  let resolvedForDispatch;
+  try {
+    resolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, agentType);
+  } catch {
+    resolvedForDispatch = undefined;
+  }
+
   const invocation = {
-    via: invEntry?.via ?? 'cli',
-    adapter: executor?.adapter ?? 'cli-spawn',
+    via: 'cli',
+    adapter: resolvedForDispatch?.adapter ?? executor?.adapter ?? 'cli-spawn',
     protocol: 'prompt-stdout-v1',
   };
 
-  const governance = {
-    carries: Array.isArray(executor?.carries) ? executor.carries : [],
-    egress: null,
-  };
+  const governance = resolvedForDispatch?.governance ?? { providerFamily: null, egress: null };
 
   return {
     selector,
