@@ -22,6 +22,7 @@ import {
   decideDispatchMechanism,
   decideExecutorDispatchMechanism,
   decideExecutorCli,
+  compileDispatchPlan,
   fanoutBatchExecutorCli,
   spawnWorker,
   RunnerConfigError,
@@ -5254,3 +5255,74 @@ test('registered executors.glm entry resolves command "claude" and env block', (
   assert.equal(res.command, 'claude');
   assert.equal(res.provider, 'claude');
 });
+
+// --- DispatchPlan / compileDispatchPlan & decide --for capabilities.prefer (tsk-5x7-1) ---
+
+test('decideExecutorCli resolves --for via capabilities.<name>.prefer returning executorId, out-of-process, configured:true (0a fix)', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'fgos-coding-implement', hasLiveTaskAccess: false });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', executorId: 'agy', configured: true });
+});
+
+test('compileDispatchPlan builds a canonical DispatchPlan for all four selector forms (0b)', () => {
+  const cfg = {
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+  };
+
+  // Form 1: executor selector
+  const plan1 = compileDispatchPlan(cfg, { executorId: 'agy' });
+  assert.equal(plan1.selector.type, 'executor');
+  assert.equal(plan1.selector.value, 'agy');
+  assert.equal(plan1.mechanism, 'out-of-process');
+  assert.equal(plan1.executorId, 'agy');
+  assert.deepEqual(plan1.invocation, { via: 'cli', adapter: 'cli-spawn', protocol: 'prompt-stdout-v1' });
+  assert.deepEqual(plan1.governance, { carries: [], egress: null });
+  assert.ok(plan1.reasonCodes.includes('native-first.0033.cli-spawn-shaped'));
+
+  // Form 2: purpose selector (--for)
+  const plan2 = compileDispatchPlan(cfg, { for: 'fgos-coding-implement' });
+  assert.equal(plan2.selector.type, 'purpose');
+  assert.equal(plan2.selector.value, 'fgos-coding-implement');
+  assert.equal(plan2.mechanism, 'out-of-process');
+  assert.equal(plan2.executorId, 'agy');
+  assert.equal(plan2.capability, 'fgos-coding-implement');
+
+  // Form 3: work selector (--work)
+  const sample = sampleWork();
+  const plan3 = compileDispatchPlan(cfg, { work: sample.id, workItem: sample });
+  assert.equal(plan3.selector.type, 'work');
+  assert.equal(plan3.selector.value, sample.id);
+  assert.equal(plan3.mechanism, 'out-of-process');
+  assert.equal(plan3.executorId, 'fgos-coding-implement');
+
+  // Form 4: adHocAgent selector (--needs-soul)
+  const plan4 = compileDispatchPlan(cfg, { needsSoul: true });
+  assert.equal(plan4.selector.type, 'adHocAgent');
+  assert.equal(plan4.selector.value, true);
+  assert.equal(plan4.mechanism, 'out-of-process');
+  assert.equal(plan4.configured, false);
+});
+
+test('logExecutorDispatch writes governance payload into executor.dispatch event generically (0c)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const gov = { carries: ['repo-content'], egress: null };
+  const event = logExecutorDispatch(fgosDir, {
+    id: 'tsk-5x7-1',
+    executorId: 'agy',
+    provider: 'agy',
+    command: 'agy',
+    model: 'gemini-flash',
+    governance: gov,
+  });
+  assert.equal(event.type, 'executor.dispatch');
+  assert.deepEqual(event.payload.governance, gov);
+});
+
