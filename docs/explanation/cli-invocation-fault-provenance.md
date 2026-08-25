@@ -100,6 +100,6 @@ reads it and the feature's own purpose — being able to "soi lại sau" (look
 back later) — never materializes. A machine-readable read surface (a
 `fgos faults` verb) was left as separate follow-on work, not part of this
 item — landed by `tsk-1wdf`: `fgos faults [--limit N]` reads the same
-`.fgos/invocation-faults.jsonl` back, resolving it the same worktree-safe
+`.fgos/logs/invocation-faults.jsonl` back, resolving it the same worktree-safe
 way it is written (D5), so a linked worktree with no `--dir` still sees the
 main checkout's real records instead of an empty view.

@@ -545,7 +545,7 @@ test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and su
   delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
   const { repoRoot, dir } = setup();
   const guardPath = path.join(dir, 'events-jsonl.truncation-guard.json');
-  const warnPath = path.join(dir, 'main-checkout-guard-warnings.jsonl');
+  const warnPath = path.join(dir, 'logs', 'main-checkout-guard-warnings.jsonl');
   const eventsDir = path.join(dir, 'events');
 
   // Tầng A/T5: the guard sidecar is now a map keyed by fileKey ("events.jsonl"

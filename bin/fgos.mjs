@@ -246,7 +246,12 @@ function excludeIronLawEvidence(files, id) {
 // `events-jsonl.truncation-guard\..*` also subsumes tsk-vim's own narrower
 // exact-`.json` fix (independently landed on main) -- one regex alternative
 // covers both.
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|entropy-history\.jsonl|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
+// `.fgos/logs/` (phase-01, plans/260825-0842-fgos-logs-dir-bucketing):
+// entropy/changelog-nag/approve-fault/invocation-fault/guard-warnings all
+// moved under this gitignored bucket -- kept here too since this regex is
+// evaluated against whatever path list a caller hands it, not only
+// `git diff --name-only` (which would never surface an ignored path).
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|entropy-history\.jsonl|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
@@ -693,7 +698,7 @@ function collectMissingOutcomeNag(view, id) {
 // the `changelog-unreleased-stale` doctor check uses, so both surfaces
 // agree on what "has an entry" means.
 function changelogNagHistoryPath(dir) {
-  return path.join(dir, 'changelog-nag-history.jsonl');
+  return path.join(dir, 'logs', 'changelog-nag-history.jsonl');
 }
 
 // Appends one snapshot per `check` run — same append-only, never-read-back
@@ -704,8 +709,9 @@ function changelogNagHistoryPath(dir) {
 // description says are currently guesses. This function only records the
 // data point — it never computes a rate itself ("đếm, đừng mắng").
 function appendChangelogNagHistoryEntry(dir, entry) {
-  fs.mkdirSync(dir, { recursive: true });
-  fs.appendFileSync(changelogNagHistoryPath(dir), `${JSON.stringify(entry)}\n`, 'utf8');
+  const logPath = changelogNagHistoryPath(dir);
+  fs.mkdirSync(path.dirname(logPath), { recursive: true });
+  fs.appendFileSync(logPath, `${JSON.stringify(entry)}\n`, 'utf8');
 }
 
 function collectChangelogNag(view, dir) {
@@ -727,7 +733,7 @@ function collectChangelogNag(view, dir) {
 // data dir (dataDir() below, or a test's own tmp dir), the exact same value
 // every other verb in this file already threads through to store.mjs.
 function entropyHistoryPath(dir) {
-  return path.join(dir, 'entropy-history.jsonl');
+  return path.join(dir, 'logs', 'entropy-history.jsonl');
 }
 
 // Reads only the LAST line of the trend history (the one prior checkpoint
@@ -765,8 +771,9 @@ function readLastHistoryEntry(dir) {
 // has already confirmed there is work-state data to report on (below) —
 // so a `check` against an uninitialized dir never creates it.
 function appendHistoryEntry(dir, entry) {
-  fs.mkdirSync(dir, { recursive: true });
-  fs.appendFileSync(entropyHistoryPath(dir), `${JSON.stringify(entry)}\n`, 'utf8');
+  const logPath = entropyHistoryPath(dir);
+  fs.mkdirSync(path.dirname(logPath), { recursive: true });
+  fs.appendFileSync(logPath, `${JSON.stringify(entry)}\n`, 'utf8');
 }
 
 // Entropy-trend + seal-digest data (per this cell's action (2)/(3)):

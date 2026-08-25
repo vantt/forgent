@@ -19,7 +19,8 @@ export const MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME = 'main-checkout-guard-warnin
 export function recordMainCheckoutGuardWarning(dir, report) {
   try {
     const fgosDir = path.basename(dir) === '.fgos' ? dir : path.join(dir, '.fgos');
-    const logPath = path.join(fgosDir, MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
+    const logDir = path.join(fgosDir, 'logs');
+    const logPath = path.join(logDir, MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
     const record = {
       ts: new Date().toISOString(),
       reason: report?.reason ?? 'unknown',
@@ -31,7 +32,7 @@ export function recordMainCheckoutGuardWarning(dir, report) {
       // pre-T5 call site) writes a record byte-identical to before.
       ...(report?.file !== undefined ? { file: report.file } : {}),
     };
-    fs.mkdirSync(fgosDir, { recursive: true });
+    fs.mkdirSync(logDir, { recursive: true });
     fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`, 'utf8');
     return logPath;
   } catch {
@@ -47,7 +48,7 @@ export function recordMainCheckoutGuardWarning(dir, report) {
 export function readMainCheckoutGuardWarnings(dir) {
   try {
     const fgosDir = path.basename(dir) === '.fgos' ? dir : path.join(dir, '.fgos');
-    const logPath = path.join(fgosDir, MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
+    const logPath = path.join(fgosDir, 'logs', MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
     if (!fs.existsSync(logPath)) {
       return [];
     }

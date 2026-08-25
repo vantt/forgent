@@ -1535,11 +1535,16 @@ test('mergeRunnerItem merges normally when the branch touches ordinary files alo
 // the merge=union attribute prevents fgos-write-rejected and preserves all lines.
 test('mergeRunnerItem resolves two-sided-drift-after-forced-restore cleanly via merge=union for diagnostic logs (tsk-2xg regression)', async () => {
   const repoRoot = initRepo();
-  const repoGitattributes = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.gitattributes'));
-  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), repoGitattributes);
-
-  const logRelPath = path.join('.fgos', 'approve-post-success-faults.jsonl');
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  // phase-01 (plans/260825-0842-fgos-logs-dir-bucketing) moved this file
+  // under the gitignored .fgos/logs/ bucket and retired its merge=union
+  // entry from the real repo's own .gitattributes -- this test declares its
+  // own, exercising the same isMergeUnionPath/restore-then-recheck
+  // machinery for the legitimate legacy case: a branch/checkout whose
+  // .gitattributes predates that retirement can still carry this file
+  // tracked and force-added.
+  const logRelPath = path.join('.fgos', 'logs', 'approve-post-success-faults.jsonl');
+  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), `${logRelPath.replace(/\\/g, '/')} merge=union\n`);
+  fs.mkdirSync(path.join(repoRoot, path.dirname(logRelPath)), { recursive: true });
   const baseContent = '{"ts":"2026-08-24T00:00:00.000Z","id":"base1"}\n{"ts":"2026-08-24T00:00:01.000Z","id":"base2"}\n';
   fs.writeFileSync(path.join(repoRoot, logRelPath), baseContent);
   git(repoRoot, ['add', '.gitattributes', logRelPath]);
@@ -1588,16 +1593,18 @@ test('mergeRunnerItem resolves two-sided-drift-after-forced-restore cleanly via 
 // completely unaffected by the worker's stale/independent copy.
 test('mergeRunnerItem merges cleanly when a merge=union .fgos/ file genuinely diverges between branch and main (tsk-4gi regression)', async () => {
   const repoRoot = initRepo();
-  const repoGitattributes = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.gitattributes'));
-  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), repoGitattributes);
 
   // tsk-3tp-2 retired merge=union for the legacy single-file
   // .fgos/events.jsonl (now a frozen post-sharding baseline, never
-  // actively grown) — use a diagnostic log that still genuinely carries
-  // merge=union instead, per the same rule tsk-2xg's own regression test
-  // above exercises.
-  const logRelPath = path.join('.fgos', 'approve-post-success-faults.jsonl');
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  // actively grown); phase-01 (plans/260825-0842-fgos-logs-dir-bucketing)
+  // later retired it for this diagnostic log too (moved under the
+  // gitignored .fgos/logs/ bucket). This test declares its own
+  // merge=union entry, exercising the same machinery for the legitimate
+  // legacy case a branch/checkout whose .gitattributes predates that
+  // retirement can still hit.
+  const logRelPath = path.join('.fgos', 'logs', 'approve-post-success-faults.jsonl');
+  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), `${logRelPath.replace(/\\/g, '/')} merge=union\n`);
+  fs.mkdirSync(path.join(repoRoot, path.dirname(logRelPath)), { recursive: true });
   const baseContent = '{"ts":"2026-08-24T00:00:00.000Z","id":"base"}\n';
   fs.writeFileSync(path.join(repoRoot, logRelPath), baseContent);
   git(repoRoot, ['add', '.gitattributes', logRelPath]);

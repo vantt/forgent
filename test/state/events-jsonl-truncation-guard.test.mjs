@@ -216,7 +216,7 @@ test("runOpportunisticMainCheckoutChecks D1: records warning on truncation break
   fs.mkdirSync(fgosDir, { recursive: true });
   const logPath = path.join(fgosDir, "events.jsonl");
   const guardPath = path.join(fgosDir, "events-jsonl.truncation-guard.json");
-  const warnPath = path.join(fgosDir, MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
+  const warnPath = path.join(fgosDir, 'logs', MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
 
   // Set initial mark at seq 2
   fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
@@ -372,7 +372,7 @@ test("runOpportunisticMainCheckoutChecks D1 detects and warns on a truncation br
   fs.mkdirSync(eventsDir, { recursive: true });
   const writerLogPath = path.join(eventsDir, "writer-a-1.jsonl");
   const guardPath = path.join(fgosDir, "events-jsonl.truncation-guard.json");
-  const warnPath = path.join(fgosDir, MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
+  const warnPath = path.join(fgosDir, 'logs', MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
 
   fs.writeFileSync(writerLogPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
   runOpportunisticMainCheckoutChecks(fgosDir, repoRoot); // bootstraps the mark for writer-a-1.jsonl

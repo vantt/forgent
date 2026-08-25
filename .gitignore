@@ -3,7 +3,11 @@
 
 # forgent state layer — events.jsonl is truth (committed); state.json is a derived view
 .fgos/state.json
-# worker dispatch logs — local observability, never committed (worker-dispatch-log D4)
+# diagnostic/telemetry logs — local observability, never committed
+# (worker-dispatch-log D4; also holds approve-post-success-faults.jsonl,
+# main-checkout-guard-warnings.jsonl, changelog-nag-history.jsonl,
+# entropy-history.jsonl, invocation-faults.jsonl since phase-01,
+# plans/260825-0842-fgos-logs-dir-bucketing)
 .fgos/logs/
 node_modules/
 
@@ -14,11 +18,6 @@ output.txt
 
 # main-checkout activity lock + sibling lock files (STR65) — process state, never committed
 .fgos/*.lock
-
-# malformed-invocation records — local forensics only. The records carry the
-# raw argv of the bad call, so committing them would push whatever flag values
-# it happened to contain.
-.fgos/invocation-faults.jsonl
 
 # tool registry local status overlay — a fact about THIS machine (what `tool
 # check` last observed), never a team decision, so it never goes through

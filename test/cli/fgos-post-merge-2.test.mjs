@@ -276,7 +276,7 @@ test('entropy-history.jsonl is written in the SAME data dir as events.jsonl, not
   run(cwd, ['check']);
   run(cwd, ['check']);
 
-  const historyPath = path.join(cwd, '.fgos', 'entropy-history.jsonl');
+  const historyPath = path.join(cwd, '.fgos', 'logs', 'entropy-history.jsonl');
   assert.ok(fs.existsSync(historyPath));
   const lines = fs.readFileSync(historyPath, 'utf8').split('\n').filter(Boolean);
   assert.equal(lines.length, 2);

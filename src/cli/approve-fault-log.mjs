@@ -29,11 +29,13 @@ export const APPROVE_FAULT_LOG_BASENAME = 'approve-post-success-faults.jsonl';
  */
 export function recordApprovePostSuccessFault(dir, { id, phase, detail, mergedSha, mergedInto }) {
   try {
-    const logPath = path.join(dir, APPROVE_FAULT_LOG_BASENAME);
+    const logDir = path.join(dir, 'logs');
+    const logPath = path.join(logDir, APPROVE_FAULT_LOG_BASENAME);
     const record = { ts: new Date().toISOString(), id, phase };
     if (detail !== undefined) record.detail = detail;
     if (mergedSha !== undefined) record.mergedSha = mergedSha;
     if (mergedInto !== undefined) record.mergedInto = mergedInto;
+    fs.mkdirSync(logDir, { recursive: true });
     fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`);
     return logPath;
   } catch {

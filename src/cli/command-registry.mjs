@@ -670,7 +670,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'faults',
     invoke: 'fgos faults',
-    description: 'Read-only: the machine-readable surface for .fgos/invocation-faults.jsonl, the side log recordInvocationFault writes when a fgos call is malformed (unknown verb, missing store, a bad --dir, an arg-parse fault) — never for a verb\'s own business refusal. Returns every record in append order (oldest first) plus the total count; --limit caps it to the N most recent (still oldest-of-those-first). Resolves the log the same worktree-safe way it is written: from a linked worktree with no --dir, this still reads the main checkout\'s real log rather than an empty view.',
+    description: 'Read-only: the machine-readable surface for .fgos/logs/invocation-faults.jsonl, the side log recordInvocationFault writes when a fgos call is malformed (unknown verb, missing store, a bad --dir, an arg-parse fault) — never for a verb\'s own business refusal. Returns every record in append order (oldest first) plus the total count; --limit caps it to the N most recent (still oldest-of-those-first). Resolves the log the same worktree-safe way it is written: from a linked worktree with no --dir, this still reads the main checkout\'s real log rather than an empty view.',
     parameters: {
       type: 'object',
       properties: {

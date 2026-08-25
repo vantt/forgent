@@ -41,9 +41,14 @@ for (const relPath of RETIRED_FILES) {
 test('.gitattributes no longer configures merge=union for .fgos/events.jsonl (file is frozen baseline-0, Tầng A)', () => {
   const raw = fs.readFileSync(path.join(REPO_ROOT, '.gitattributes'), 'utf8');
   assert.doesNotMatch(raw, /\.fgos\/events\.jsonl\s+merge=union/, 'the retired union-merge entry must be gone');
-  // Sibling union entries for OTHER shared diagnostic logs are unrelated to
-  // this retirement and must survive untouched.
-  assert.match(raw, /\.fgos\/approve-post-success-faults\.jsonl merge=union/);
+  // Sibling union entry for the still-tracked per-writer event shards is
+  // unrelated to this retirement and must survive untouched. The 5
+  // diagnostic-log union entries (approve-post-success-faults.jsonl etc.)
+  // were separately retired in phase-01
+  // (plans/260825-0842-fgos-logs-dir-bucketing): those files moved under
+  // the gitignored `.fgos/logs/` bucket, so git merge never sees them —
+  // see fgos-logs-bucket.test.mjs.
+  assert.match(raw, /\.fgos\/events\/\*\.jsonl merge=union/);
 });
 
 test('package.json no longer registers the check:events-seq npm script', () => {

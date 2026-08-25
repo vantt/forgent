@@ -413,7 +413,7 @@ test('check tolerates a torn final entropy-history line — folds trend against 
   assert.equal(envelopeData(first.stdout).entropy.trend.baseline, true);
 
   // Simulate a crash mid-append: a partial, unparseable JSON line at EOF.
-  const historyPath = path.join(cwd, '.fgos', 'entropy-history.jsonl');
+  const historyPath = path.join(cwd, '.fgos', 'logs', 'entropy-history.jsonl');
   fs.appendFileSync(historyPath, '{"ts":"2026-07-18T00:00:00.000Z","score":9,"cou', 'utf8');
 
   // The torn last line must NOT crash check: readLastHistoryEntry walks back to

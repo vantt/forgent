@@ -839,7 +839,7 @@ test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to chan
   assert.deepEqual(data.changelogNag, { fileExists: true, hasEntries: false, deliveredCount: 1 });
 
   const historyLines = fs
-    .readFileSync(path.join(fgosDir, 'changelog-nag-history.jsonl'), 'utf8')
+    .readFileSync(path.join(fgosDir, 'logs', 'changelog-nag-history.jsonl'), 'utf8')
     .split('\n')
     .filter(Boolean)
     .map((l) => JSON.parse(l));

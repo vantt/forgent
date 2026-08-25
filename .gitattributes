@@ -1,12 +1,11 @@
-# tsk-2xg: append-only diagnostic logs written by fgos tools. Git's default
-# line-based 3-way merge causes fgos-write-rejected deadlocks when worker
-# branches catch up with main and revert .fgos/* per pre-commit hook rules.
-# `union` keeps lines from both sides and prevents false staged diffs.
-.fgos/approve-post-success-faults.jsonl merge=union
-.fgos/invocation-faults.jsonl merge=union
-.fgos/main-checkout-guard-warnings.jsonl merge=union
-.fgos/changelog-nag-history.jsonl merge=union
-.fgos/entropy-history.jsonl merge=union
+# tsk-2xg originally added per-file `merge=union` rules here for 5
+# diagnostic logs (approve-post-success-faults.jsonl, invocation-faults.jsonl,
+# main-checkout-guard-warnings.jsonl, changelog-nag-history.jsonl,
+# entropy-history.jsonl) to stop fgos-write-rejected deadlocks on worker
+# branches. Removed (phase-01, plans/260825-0842-fgos-logs-dir-bucketing):
+# all 5 moved under the gitignored `.fgos/logs/` bucket, so git merge never
+# sees them at all now — no union rule needed, and no new one needed for
+# whatever else lands in that bucket later.
 
 # tsk-1wk: tsk-3ve's per-writer sharded event log (.fgos/events/<writer-id>-
 # <openTs>.jsonl) is append-only exactly like the old single-file

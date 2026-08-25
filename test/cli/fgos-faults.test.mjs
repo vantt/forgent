@@ -77,7 +77,7 @@ test('a recorded fault is read back with its full provenance', () => {
   assert.equal(record.cwd, fs.realpathSync(cwd));
   assert.ok(record.writer?.id, 'a record must name who wrote it');
   assert.match(record.message, /unknown verb/);
-  assert.equal(data.path, path.join(fs.realpathSync(cwd), '.fgos', 'invocation-faults.jsonl'));
+  assert.equal(data.path, path.join(fs.realpathSync(cwd), '.fgos', 'logs', 'invocation-faults.jsonl'));
 });
 
 test('a verb\'s own business refusal never shows up in the read surface', () => {

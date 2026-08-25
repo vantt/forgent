@@ -66,11 +66,11 @@ function mainCheckoutFgosDir(cwd) {
  */
 export function resolveFaultLogPath(fgosDir, cwd) {
   if (typeof fgosDir === 'string' && fgosDir && fs.existsSync(fgosDir)) {
-    return path.join(fgosDir, INVOCATION_FAULT_LOG_BASENAME);
+    return path.join(fgosDir, 'logs', INVOCATION_FAULT_LOG_BASENAME);
   }
   const fallback = mainCheckoutFgosDir(cwd);
   if (!fallback || !fs.existsSync(fallback)) return null;
-  return path.join(fallback, INVOCATION_FAULT_LOG_BASENAME);
+  return path.join(fallback, 'logs', INVOCATION_FAULT_LOG_BASENAME);
 }
 
 /**
@@ -95,8 +95,9 @@ export function recordInvocationFault({ fgosDir, cwd, verb, faultClass, message,
       message,
       cwd,
       argv,
-      writer: resolveWriterIdentity(path.dirname(logPath)),
+      writer: resolveWriterIdentity(path.dirname(path.dirname(logPath))),
     };
+    fs.mkdirSync(path.dirname(logPath), { recursive: true });
     fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`);
     return logPath;
   } catch {

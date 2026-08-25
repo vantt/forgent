@@ -296,18 +296,20 @@ test('return: .fgos/events-jsonl.truncation-guard.json and .fgos/main-checkout-g
   assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', id]).status, 0);
   fs.writeFileSync(path.join(cwd, '.fgos', 'events-jsonl.truncation-guard.json'), JSON.stringify({ seq: 1, hash: 'abc' }));
-  fs.writeFileSync(path.join(cwd, '.fgos', 'main-checkout-guard-warnings.jsonl'), '{"kind":"truncation-break"}\n');
-  // -f: this fixture's own .gitignore (initGitCwd) now excludes
-  // events-jsonl.truncation-guard.json, matching this real repo's own root
-  // .gitignore (tsk-cgg) -- so a plain `git add -A` would never even stage
-  // it, which would make this test pass trivially without ever exercising
-  // FGOS_NOISE_ONLY_PATHS at all for that file. Force-adding it here
+  fs.mkdirSync(path.join(cwd, '.fgos', 'logs'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'logs', 'main-checkout-guard-warnings.jsonl'), '{"kind":"truncation-break"}\n');
+  // -f: both files sit under paths this fixture's own .gitignore (initGitCwd)
+  // now excludes -- events-jsonl.truncation-guard.json individually, and
+  // main-checkout-guard-warnings.jsonl since phase-01
+  // (plans/260825-0842-fgos-logs-dir-bucketing) moved it under the
+  // gitignored .fgos/logs/ bucket -- so a plain `git add -A` would never
+  // even stage either, which would make this test pass trivially without
+  // ever exercising FGOS_NOISE_ONLY_PATHS at all. Force-adding both here
   // reproduces the one real scenario where the regex still matters: a
-  // branch/checkout whose .gitignore predates this exclusion (or another
-  // fgOS-adopting project that never added it) can still end up with this
-  // file committed alongside real work. main-checkout-guard-warnings.jsonl
-  // is not gitignored, so it needs no equivalent force-add.
-  execFileSync('git', ['add', '-f', '.fgos/events-jsonl.truncation-guard.json'], { cwd });
+  // branch/checkout whose .gitignore predates these exclusions (or another
+  // fgOS-adopting project that never added them) can still end up with
+  // these files committed alongside real work.
+  execFileSync('git', ['add', '-f', '.fgos/events-jsonl.truncation-guard.json', '.fgos/logs/main-checkout-guard-warnings.jsonl'], { cwd });
   commitFile(cwd, 'proof.txt');
 
   const result = run(cwd, ['return', id]);
