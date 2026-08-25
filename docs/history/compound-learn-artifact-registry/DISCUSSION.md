@@ -204,9 +204,10 @@ Changelog/marketing-storytelling (Làn A/B, "bản nháp") đóng băng theo yê
 cầu chủ sản phẩm — bàn tiếp sau khi row D (trục danh tính cho Diataxis)
 rõ ràng.
 
-**Năm kiểu sai thảo luận này đã thật sự mắc — đọc trước khi tin bất cứ
-kết luận nào ở đây.** Bảy lần vấp, năm cơ chế khác nhau. Không cái nào do
-session tự phát hiện: hoặc chủ sản phẩm bắt, hoặc lòi ra khi đo lại.
+**Sáu kiểu sai thảo luận này đã thật sự mắc — đọc trước khi tin bất cứ
+kết luận nào ở đây.** Tám lần vấp, sáu cơ chế khác nhau. **Không cái nào do
+session tự phát hiện**: hoặc chủ sản phẩm bắt, hoặc advisor ngoài bắt, hoặc
+lòi ra khi đo lại.
 
 | # | Kiểu sai | Đã xảy ra ở | Nguyên tắc rút ra |
 |---|---|---|---|
@@ -214,7 +215,22 @@ session tự phát hiện: hoặc chủ sản phẩm bắt, hoặc lòi ra khi �
 | 2 | **Đọc dữ kiện repo trong worktree đã claim từ nhiều ngày trước**, không phải `main` | Vòng 9(d): nhánh lùi 1438 commit ⇒ đếm thiếu 17% corpus, và suýt bỏ mất con số +50 tài liệu/7 ngày | Scout dữ-kiện-repo luôn đọc ở `main`; worktree cũ chỉ dùng để ghi, không dùng để đo |
 | 3 | **Chứng cứ ĐÚNG nằm im nhiều vòng vì không ai hỏi đúng câu** | Vòng 9(g): câu "vocabulary cấu trúc ĐÓNG + dữ liệu chủ đề MỞ" chép về từ OKF ở **vòng 2**, 7 vòng sau mới được nối vào bài toán trục danh tính | Khác kiểu 1 (chứng cứ sai): đây là chứng cứ đúng chưa dùng. Khi bí một câu thiết kế, đọc lại §5 trước khi đi scout mới |
 | 4 | **Kết luận mới mâu thuẫn chẩn đoán CŨ của chính tài liệu**, cả hai cùng nằm trong một file đang mở | Vòng 9(h): dòng D2 viết `docs/<quadrant>/<topic>.md` — đúng thứ §6.1 đã gọi là bệnh gốc từ vòng 3; session vừa viết lại §6.3 cùng vòng mà vẫn không đối chiếu | Sau khi trả lời một câu thiết kế, rà ngược xem nó có va vào §6 hiện hành không — §6 tồn tại đúng để làm việc đó, nhưng chỉ có tác dụng nếu ai đó thật sự đối chiếu |
+| 6 | **Khẳng định một cơ chế KHÔNG tồn tại mà không grep** | Vòng 10: nói fgOS không có khái niệm chủ-sở-hữu-chủ-đề, trong khi `fgos authoritative-match` + `authoritative-match.mjs` đã landed **2026-08-17**, một ngày TRƯỚC lúc scout | Khác kiểu #2 ở chỗ: session ĐÃ phát hiện worktree cũ và ĐÃ đo lại — nhưng chỉ đo lại những **con số** tình cờ nhắc tới, không rà lại các **khẳng định** rút ra từ cùng trạng thái cũ. Bổ sung cho #2: *khi phát hiện đã đọc trạng thái lỗi thời, rà lại MỌI khẳng định dẫn xuất, không chỉ con số mình nhớ ra*. Kèm: một zero-result từ công cụ (`--check-duplicates` báo 0 nhóm trùng) phải grep chéo trước khi tin |
 | 5 | **Ước lượng chi phí sai làm lệch một khuyến nghị** | Vòng 9(i): "chồng hai việc nặng — fold 268 file rồi lại dời 268 file", trong khi fold VÀ dời là cùng một thao tác; con số phóng đại đó suýt đẩy chủ sản phẩm khỏi đường (1) | Trước khi lấy chi phí làm lý do loại một phương án, kiểm xem hai việc đang cộng vào nhau có thật sự là hai việc rời không |
+
+**VÒNG 10 (2026-08-25, cùng ngày) — advisor ngoài phản biện, một khẳng định
+nền tảng của session bị bác.** Cơ chế anti-fork ngữ nghĩa **đã tồn tại** trong
+fgOS (`fgos authoritative-match`, `tsk-1lv-6`, landed 2026-08-17 — trước lúc
+session scout một ngày); vấn đề thật là **độ phủ 67/331 ≈ 20%** và không gì
+cưỡng chế khai `authoritative_for`, khiến detector trả kết quả **sạch giả**.
+Đề bài đổi từ *xây mới* sang *nâng phủ + cưỡng chế*. Q1 của §6.7 bị sửa
+(D-tsk28x-13 supersede mệnh đề chống-trùng của D-tsk28x-5). Thêm ba chốt mới:
+`mục đích` phải có cửa như `vai trò` (D20), invariant `activeDoc(topicId,role)
+<= 1` không escape hatch (D-tsk28x-14), lifecycle hai tầng bỏ chữ `draft` khỏi
+tầng tài liệu (D-tsk28x-15). Kiến trúc chuyển sang **`topicId` bền +
+`currentPath` là bản chiếu + `aliases`**, pipeline 5 pha có **resolver** riêng,
+migration dựng registry+alias TRƯỚC khi dời file. Chi tiết §3 dòng D18-D24,
+§5 vòng 10.
 
 **MINT vòng 9 (2026-08-25): D-tsk28x-4 → D-tsk28x-12, chín D-ID, đã ghi qua
 `fgos decision --id tsk-28x`.** Điều kiện D4 thoả theo hai đường: phần lớn là
@@ -303,6 +319,13 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | D15 | **Một bộ máy hay hai, cho tầng BA (`docs/specs/`) và tầng end-user** | **CHỦ SẢN PHẨM CHỐT V9** — MỘT bộ máy, HAI registry tách rời | Câu này vòng 9 session trả lời hụt: đã trả lời "tái dùng cơ chế, không tái dùng vocabulary" nhưng đó là trả lời cho *end-user docs có dùng GIÁ TRỊ của Area Map không*, chưa trả lời *có nên một bộ máy phục vụ CẢ HAI tầng không*. Chủ sản phẩm chốt: **nên có một bộ máy phục vụ 2 tầng, và nên TÁCH** — lý do nêu thẳng: *"viết cho người càng rõ ràng chi tiết càng tốt và có thể trùng tài liệu vì viết cho nhiều người. nhưng cho máy thì chỉ cần đủ và gọn"*. Tức hai tầng **tối ưu NGƯỢC CHIỀU nhau**: tầng người tối ưu độ rõ, chấp nhận trùng lặp có chủ đích (cùng một sự thật kể lại cho nhiều đối tượng đọc); tầng máy tối ưu độ gọn, đủ là dừng. Chung bộ máy (verb + ảnh cuối cùng + doctor check) nhưng KHÔNG chung vocabulary và KHÔNG chung ngưỡng — ép chung sẽ kéo một trong hai về sai hướng tối ưu của nó. Lợi ích phụ đã đo: Area Map đang trôi (`herdr-web-dashboard` là area sống mang 20 quyết định, thiếu trong danh sách) — cưỡi chung bộ máy thì hết trôi |
 | D16 | **Entity là ĐA TRỊ — mô hình hai-toạ-độ của session SAI, cần ba toạ độ** (lưu ý: nhãn hàng của bảng này, không liên quan D16 của `enduser-docs-authoring` trích ở hàng D) | **CHỦ SẢN PHẨM SỬA V9** — cách hiểu của chủ sản phẩm không bất ổn; nó sửa lỗi thật + bổ sung lớp thiếu | Chủ sản phẩm nêu: một audience cần tài liệu theo **mục đích sử dụng** (giải quyết vấn đề gì); trong MỘT tài liệu có thể chứa **nhiều đối tượng (entity liên quan)**; các entity đó **dùng lại, nói lại** ở nhiều loại tài liệu khác nhau. **Đo kiểm: 93/330 tài liệu (28%) nhắc >=2 entity ngay trong TÊN FILE** (sàn, không phải trần — thân bài chắc chắn nhiều hơn); ví dụ `why-decomposes-skip-and-advance-is-narrower-than-discoverys` (discover+decompose), `why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root` (approve+gate+root). **Lỗi của session:** dùng chữ "đối tượng" theo HAI nghĩa mà không tự nhận ra — lúc thì *vùng vấn đề* (`worktree-reclaim`), lúc thì *entity* ("tài liệu này nói VỀ CÁI GÌ"). Hệ quả: entity KHÔNG thể làm toạ độ lưu trữ vì thư mục phải đơn trị mà tài liệu chạm nhiều entity ⇒ layout `docs/<đối-tượng>/<loại>.md` ở D12 SAI nếu đọc "đối tượng" = entity. **Chỗ bất ổn trong cách chủ sản phẩm phát biểu:** nếu `loại` = *mục đích* thì nửa ĐÓNG biến mất (mục đích sinh sôi theo sản phẩm như entity), mà nửa đóng chính là thứ làm registry cưỡng chế được lúc ghi (D8/D9). Thứ tự nhiên đóng là **VAI TRÒ** tài liệu (`decision`/`runbook`/`pitfall`/`reference`) vì nó nói về hình dạng TRI THỨC, không nói về sản phẩm. **Tổng hợp — BA toạ độ:** (1) **Mục đích** (vấn đề gì, cho ai) — đơn trị, mở-nhưng-chậm ⇒ THƯ MỤC; (2) **Vai trò** — đơn trị, ĐÓNG ⇒ TÊN FILE; (3) **Entity** — ĐA TRỊ, mở ⇒ METADATA/TAG, không bao giờ là thư mục. Ví dụ: `why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md` ⇒ `docs/stale-index-vs-uncommitted-work/pitfall.md` + `entities: [worktree-index, iron-law, test-count]`. **Ba lợi ích mô hình cũ không có:** entity sinh sôi mà đẻ 0 file mới (cải thiện thật cho +7 tài liệu/ngày); trả lời được "có tài liệu nào nhắc `worktree`?" xuyên mọi mục đích; giúp fold 268 file vì entity giữ khả năng tìm lại dù nội dung đã dời. **Tiền lệ nằm sẵn ở §5 vòng 2 mà session lấy thiếu:** OKF tách `authoritative_for` (ĐƠN trị — LÀ chủ của chủ đề nào) khỏi `areas`/`tags` (ĐA trị — CHẠM tới vùng nào); session lần trước chỉ lấy nửa đầu, bỏ nửa sau — nên thiếu lớp entity. Lặp lại **kiểu sai #3** (chứng cứ đúng ngủ quên), lần thứ hai trong cùng vòng 9 |
 | D17 | **Diataxis có bị bỏ không sau khi thêm ba toạ độ danh tính** | **TRẢ LỜI V9** — KHÔNG bỏ; bảng "ba toạ độ" của session viết ẩu | Chủ sản phẩm hỏi thẳng "ủa vậy bỏ Diataxis à?" — vì bảng ba-toạ-độ ở D16 chỉ liệt kê toạ độ của TRỤC DANH TÍNH mà không nói rõ, đọc vào tưởng Diataxis biến mất. **Bức tranh đủ là BỐN nhãn trên HAI trục:** trục danh tính = mục đích (đơn ⇒ thư mục) + vai trò (đơn, ĐÓNG ⇒ tên file) + entity (ĐA ⇒ tag frontmatter); trục cách viết = framework + mode, Diataxis là framework đầu tiên (⇒ frontmatter). Diataxis vẫn quyết hành văn/outline/trình tự y như cũ; thứ nó THÔI LÀM chỉ là làm thư mục (D11/D12) vì đó là việc của trục danh tính. **Lỗi thật câu hỏi này lòi ra:** danh sách vai trò session đưa có `reference` — TRÙNG NGUYÊN VĂN một quadrant Diataxis; thêm `runbook`↔`how-to`, `decision`↔`explanation` đối ứng gần một-một. Kiểm bằng hai phép thử: (1) cùng vai trò viết được hai mode khác nhau không — `pitfall` viết dạng how-to ("các bước phân biệt") HOẶC explanation ("vì sao trông giống nhau"), được cả hai ⇒ không đồng nhất; (2) hai vai trò khác nhau có chung một mode không — `decision`/`pattern`/`incident` đều là explanation dưới mắt Diataxis, nhưng khác thật: **decision** ghi một lựa chọn tại một thời điểm, có phương án bị loại, và **bị supersede**; **pattern** ghi hình dạng lời giải lặp lại, được **tinh chỉnh dần**, không supersede. Vòng đời khác hẳn, Diataxis không nhìn thấy. Bằng chứng vòng đời có thật trong repo: `state.decisions` + ngữ nghĩa supersede tồn tại riêng cho decision, pattern không có gì tương đương. ⇒ **Vai trò là chiều thật, không phải Diataxis đội lốt. NHƯNG thêm một luật bắt buộc:** vocabulary vai trò KHÔNG được dùng lại tên của bất kỳ quadrant/mode nào — `reference` phải đổi tên (vd. `lookup-table`/`spec-sheet`), nếu không sáu tháng sau không ai phân biệt nổi hai nhãn. Luật này bổ sung cho D13 (vai trò GỢI Ý framework mặc định nhưng không đồng nhất) |
+| D18 | **Cơ chế anti-fork ngữ nghĩa ĐÃ TỒN TẠI — session khẳng định sai là không có** | **RÕ — advisor ngoài bắt, kiểm chứng vòng 10** | Advisor báo `main` có 331 Diataxis docs nhưng chỉ 67 mang `authoritative_for`. Kiểm thật: **67 file có**; code đọc nó là `src/report/authoritative-match.mjs` + verb `fgos authoritative-match` — skeleton-match chủ đề với `authoritative_for` từng doc, đúng **"find-before-create doctrine" của chính `fgos-coding-compounding`** (`tsk-1lv-6`), kèm `--check-duplicates` quét mọi nhóm ≥2 doc cùng khai một chủ đề ("mirrors bee's own `duplicate_authoritative_for`"). **Landed 2026-08-17 — MỘT NGÀY TRƯỚC khi session scout vòng 9** và khẳng định fgOS *"không có khái niệm chủ-sở-hữu-chủ-đề"*. Lý do session đưa ra để BỎ anti-fork ("nó chỉ bắt tên gần giống") đọc từ mô tả OKF chứ không từ bản cài thật của fgOS — bản này match trên văn xuôi `authoritative_for`, tức đúng là ngữ nghĩa. **Nhưng cơ chế đang cho kết quả SẠCH GIẢ:** chạy `--check-duplicates` trên `docs/explanation` ra `candidateCount: 213, duplicateGroups: []`, trong khi ba file worktree-reclaim trùng chủ đề rõ ràng và **không cái nào khai `authoritative_for`**. Độ phủ 67/331 ≈ 20% ⇒ 80% vô hình với detector. Đúng thứ CLAUDE.md cảnh báo: *zero-result đáng ngờ cần grep chéo trước khi tin* — session đã không làm. **Chẩn đoán sửa lại: không phải "thiếu cơ chế" mà là "cơ chế có, phủ 20%, không gì cưỡng chế khai báo"** ⇒ đề bài đổi từ XÂY MỚI sang NÂNG PHỦ + CƯỠNG CHẾ, rẻ hơn nhiều |
+| D19 | **Q1 sai — và là CÙNG MỘT lớp lỗi đã mắc một vòng trước** | **RÕ — nhận phản biện advisor** | Advisor phản biện mạnh nhất vào Q1 (§6.7): *"đường dẫn cưỡng chế miễn phí nên không cần anti-fork gate"*. Đúng — filesystem chỉ biết path, không biết hai `mục đích` khác tên đang nói cùng một vấn đề. Nhìn kỹ thì Q1 cùng lớp lỗi với chuyện chủ sản phẩm bắt ở D11: **lẫn DANH TÍNH với VỊ TRÍ** — lần 1 lấy trục cách-viết làm nơi lưu, lần 2 (Q1) lấy nơi lưu làm danh tính. Hai chiều của cùng một nhầm lẫn, cách nhau một vòng, trong cùng một thiết kế. Đề xuất advisor (`topicId` bền + `currentPath` là bản chiếu + `aliases`) chính là tách hẳn hai thứ, và nhất quán với D-ADR0001 hơn thiết kế cũ. Sửa Q1: **path uniqueness là BACKSTOP vật lý, không phải anti-fork ngữ nghĩa** (D-tsk28x-13 supersede mệnh đề này của D-tsk28x-5) |
+| D20 | **`mục đích` chưa có cửa — lỗ thật trong thiết kế session** | **RÕ — advisor bắt, session nhận** | D-tsk28x-7 đóng `vai trò` bằng cửa (không bịa inline, thêm qua verb) nhưng để `mục đích` **mở tự do**, chỉ mô tả là "tăng chậm" mà không có cơ chế nào ÉP nó tăng chậm. Advisor chỉ đúng: nếu phiên compound tự mở `mục đích` mới từ từng item thì chỉ đổi `docs/explanation/why-x.md` thành `docs/x/decision.md`, sprawl còn nguyên. Sửa: **không cho compound mở `mục đích` mới trong luồng thường** — chỉ qua `fgos topic register` hoặc batch migration/curation. `mục đích` phải là *reader job / problem domain*, KHÔNG phải semantic của title một item |
+| D21 | **Đề xuất kiến trúc của advisor — nhận, hai chỗ phản biện ĐÃ ĐƯỢC CHỐT CHẶT HƠN** | **ĐÃ CHỐT vòng 10 — D-tsk28x-14/15** | Advisor đề xuất: `topicId` (danh tính ổn định) / `role` / `docId` = cặp (topicId, role) / `currentPath` (bản chiếu) / `aliases` (resolve path cũ) / `entities` / `framework+mode` / `lifecycle: draft\|active\|retired\|superseded`; pipeline 5 pha (0 capture thô ghi thẳng → 1 classifier gán có confidence+evidence → 2 **resolver** quyết create/grow/split/merge, chỗ anti-fork sống → 3 writer → 4 index/projection); migration an toàn: inventory → conservation gate → **tạo registry + alias map TRƯỚC, chưa move file** → đổi `doc-sources`/`docs-index` đọc qua resolver → dry-run duplicate detector → mới move theo từng target. **Session nhận toàn bộ** (pha *resolver* là chỗ thiếu hẳn; migration an toàn hơn hai-pha cũ). **Hai chỗ giữ phản biện:** (1) `docId` "hoặc id riêng nếu cần nhiều doc cùng role" là cửa thoát mở lại đúng sprawl đang chữa — chỉ nên cho phép qua `split` tường minh có lineage, không phải lựa chọn lúc ghi; (2) `lifecycle: draft` **đụng chữ "bản nháp" đã chốt vòng 8** (ở đó "nháp" = *chất liệu đã trích*, không phải bài viết) — hai chữ nháp khác nghĩa cùng sống trong một hệ, vi phạm chính luật Q4; cần đổi tên một bên (vd. `provisional`) |
+| D22 | **Invariant cardinality — không có cửa thoát lúc ghi** | **ĐÃ CHỐT — D-tsk28x-14 (vòng 10)** | Session phản biện chỗ advisor để `docId` được là *"id riêng nếu cần nhiều doc cùng role"* — đó là cửa thoát mở lại đúng sprawl đang chữa. Chủ sản phẩm đồng ý và **thắt chặt hơn**: `activeDoc(topicId, role) <= 1`, tuyệt đối không escape hatch lúc ghi. Muốn thêm một active document thì bắt buộc **split topic / merge topic / đổi role qua verb registry tường minh**, và mọi ngoại lệ để lại lineage (`topicA+roleX → retired/split-from`; `topicB+roleX → active`; `topicC+roleX → active`). Tức *nhiều doc cùng role* chỉ xuất hiện VÌ topic đã bị tách, không phải vì writer được quyền tạo thêm doc trong cùng topic. `docId` chỉ là **danh tính kỹ thuật** của registry row, không bao giờ là khoá cardinality ngữ nghĩa. Hệ quả kiến trúc: filesystem uniqueness là backstop vật lý, **uniqueness THẬT nằm ở registry invariant `topicId+role`** — khớp đúng hướng D-tsk28x-13 |
+| D23 | **Vocabulary lifecycle — hai tầng, hai bộ từ vựng rời nhau** | **ĐÃ CHỐT — D-tsk28x-15 (vòng 10)** | Session nêu xung đột: vòng 8 đã đặt nghĩa *"bản nháp" = chất liệu đã trích*, nên thêm `draft` cho tài liệu sẽ làm hai chữ nháp khác nghĩa cùng sống trong một hệ — vi phạm chính luật **Q4** session vừa đặt ra ở vòng 9. Chủ sản phẩm đồng ý: chữ `draft` dễ gây lỗi mô hình. **Tầng chất liệu:** `material:draft` / `extracted_material`. **Tầng tài liệu:** `provisional` (đã render nhưng chưa được công nhận authoritative) → `active` (chính thức) → `superseded` / `retired`. Chữ `draft` không xuất hiện ở tầng tài liệu |
+| D24 | **False-positive của guard `fgos decision`** | **RÕ — gặp thật vòng 10, chưa xử** | Ghi D-tsk28x-15 bị `fgos decision` từ chối (exit 4) vì `SUPERSESSION_PROSE_PATTERN` (`src/state/store.mjs:1291`) bắt chữ `superseded` — nhưng ở đây nó là **giá trị enum của lifecycle**, không phải câu tuyên bố supersession. Guard không phân biệt được enum value với narration. Vòng tránh bằng cách diễn đạt enum không dùng token đó, nhưng đây là bug thật đáng submit riêng: mọi quyết định tương lai định nghĩa một vocabulary có chứa `superseded`/`replaces` sẽ vấp lại |
 | E | Ranh giới scope `tsk-28x` vs `tsk-12m` | **ĐÃ CHỐT — D-tsk28x-2 (vòng 7)** | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay, không cần chờ `tsk-28x`. **Vòng 7 (2026-08-11):** chủ sản phẩm xác nhận tách quan hệ — `tsk-28x` không còn `deps` trên `tsk-12m`; `tsk-12m` tự xây phần quan-sát/nhắc độc lập, phần ghi/registry của nó cắm vào bất cứ hình dạng `tsk-28x` chốt sau, không phải chờ ngược lại |
 | F | Hình dạng pha TRIAGE (pha 1, §6) | ĐỠ MỜ sau vòng 5 — xem J2 | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). **Vòng 5 có ứng viên đầu có căn cứ: round-count trên mỗi item (J2).** Còn mở: đo nó bằng bộ nhãn nào — fgOS vẫn chưa có tập nhãn tay như bee đã có, nên chưa chạy được phép đo AUC tương đương |
 | G | ~~Chất liệu `struggle` đã có sẵn trong `friction`~~ | **RÚT LẠI — SAI** (đo lại vòng 4) | Vòng 3 kết luận "RÕ" từ ĐÚNG MỘT bản ghi (`tsk-1gn`) rồi suy rộng ra cả hệ thống. Đo toàn log: 131 friction = 81 `verify-miss` + 39 `merge-conflict` (92% telemetry máy), `detail` điển hình `goal-check failed on branch "fgw/tsk-puz" (exit null)` — ghi RẰNG hỏng, không ghi ĐÃ THỬ GÌ / VÌ SAO / CHỖ NGOẶT. Không phải chất liệu kể chuyện. Thứ làm vòng 3 phấn khích thực ra là `gates.askHistory`, KHÁC `friction` — vòng 3 lẫn hai thứ |
@@ -338,6 +361,9 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | D-tsk28x-10 | Hai trục triển khai CÙNG LÚC — bị ép bởi contract của skill viết, không phải lựa chọn phạm vi | Chủ sản phẩm chốt vòng 9; session rút lại nghiêng-về-tuần-tự. Đóng câu vòng 4(d) treo từ 2026-08-07. §3 dòng D10 |
 | D-tsk28x-11 | Fold 268 file chia hai pha; pha 1 (phân loại) CHÍNH LÀ pass bottom-up sinh vocabulary; guard `conservation` bắt buộc | Lần thứ hai hai việc tưởng rời hoá ra là một. §3 dòng D12, §6.5 |
 | D-tsk28x-12 | TÁCH nửa thu-chất-liệu-kể-chuyện thành item riêng; `tsk-28x` giữ trục danh tính + registry + skill viết | Chủ sản phẩm chốt vòng 9. Mô hình bốn nhãn đã giải phần lớn nửa đóng băng: Keep a Changelog là framework viết thứ hai, không cần producer registry riêng |
+| D-tsk28x-13 | **Supersede** mệnh đề chống-trùng của D-tsk28x-5: đường dẫn duy nhất chỉ là backstop VẬT LÝ; anti-fork ngữ nghĩa vẫn bắt buộc — và **đã tồn tại** (`fgos authoritative-match`, tsk-1lv-6). Đề bài là nâng phủ (20%) + cưỡng chế khai báo, không phải xây mới | Advisor ngoài phản biện Q1; kiểm chứng vòng 10. §3 dòng D18/D19 |
+| D-tsk28x-14 | Invariant `activeDoc(topicId, role) <= 1`, không escape hatch lúc ghi; thêm active doc chỉ qua split/merge/đổi-role tường minh có lineage; `docId` là danh tính kỹ thuật, không phải khoá cardinality | Session phản biện cửa thoát của advisor, chủ sản phẩm đồng ý + thắt chặt hơn. §3 dòng D22 |
+| D-tsk28x-15 | Lifecycle hai tầng: chất liệu dùng `material:draft`/`extracted_material`; tài liệu dùng `provisional`/`active`/`superseded`/`retired`. Chữ `draft` không xuất hiện ở tầng tài liệu | Giữ luật Q4 (cấm một nhãn cùng chữ ở hai trục khác nghĩa). §3 dòng D23 |
 
 ## 5. Q&A log
 
@@ -833,6 +859,69 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
   Bốn phép đo + hai câu trả lời có bằng chứng: xem §1 vòng 9. Hai câu mới
   (vocabulary bottom-up/top-down; xử lý 223 file cũ) chờ chủ sản phẩm.
 
+- **2026-08-25 (vòng 10 — advisor ngoài phản biện, session sai một khẳng định
+  nền tảng)** — Chủ sản phẩm nhờ một advisor agent độc lập đọc bản tóm tắt tự
+  chứa (`plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md`)
+  và góp ý.
+
+  **(a) Advisor đưa một dữ kiện session chưa từng kiểm: `main` có 331 Diataxis
+  docs nhưng chỉ 67 mang `authoritative_for`.** Session kiểm ngay và kết quả nặng
+  hơn nhận định của advisor: không chỉ nhãn tồn tại, mà **cả một cơ chế hoàn
+  chỉnh đã chạy** — `src/report/authoritative-match.mjs` + verb
+  `fgos authoritative-match` (skeleton-match + `--check-duplicates`), landed
+  **2026-08-17, đúng một ngày TRƯỚC** khi session scout vòng 9 rồi khẳng định
+  fgOS "không có khái niệm chủ-sở-hữu-chủ-đề". Chi tiết §3 dòng D18.
+
+  **Kiểu sai MỚI, thứ sáu:** khẳng định một cơ chế KHÔNG tồn tại mà không grep.
+  Khác kiểu #2 (đọc worktree cũ) ở chỗ: session ĐÃ phát hiện worktree cũ và ĐÃ
+  đo lại — nhưng chỉ đo lại **những con số tình cờ nhắc tới**, không rà lại các
+  **khẳng định** rút ra từ cùng trạng thái cũ đó. Nguyên tắc bổ sung cho kiểu #2:
+  *khi phát hiện đã đọc trạng thái lỗi thời, phải rà lại MỌI khẳng định dẫn xuất,
+  không chỉ những con số mình nhớ ra.*
+
+  **(b) Cơ chế có sẵn đang cho kết quả SẠCH GIẢ.** `--check-duplicates` trên
+  `docs/explanation` trả `candidateCount: 213, duplicateGroups: []` — trong khi
+  ba file worktree-reclaim trùng chủ đề rõ ràng và không cái nào khai
+  `authoritative_for`. Đúng thứ CLAUDE.md cảnh báo về zero-result đáng ngờ.
+  ⇒ Đề bài đổi từ **xây mới** sang **nâng độ phủ + cưỡng chế khai báo**.
+
+  **(c) Q1 sai — và cùng lớp lỗi với chuyện chủ sản phẩm bắt một vòng trước.**
+  Advisor phản biện đúng: path uniqueness là backstop vật lý, không thay được
+  anti-fork ngữ nghĩa. Nhìn kỹ thì D11 (lấy trục cách-viết làm nơi lưu) và Q1
+  (lấy nơi lưu làm danh tính) là **hai chiều của cùng một nhầm lẫn danh-tính-vs-
+  vị-trí**, trong cùng một thiết kế, cách nhau một vòng. §3 dòng D19.
+
+  **(d) Advisor bắt thêm một lỗ session tự tạo: `mục đích` chưa có cửa.**
+  D-tsk28x-7 đóng `vai trò` nhưng để `mục đích` mở tự do, chỉ mô tả "tăng chậm"
+  mà không cơ chế nào ép. §3 dòng D20.
+
+  **(e) Đề xuất kiến trúc của advisor** (`topicId` bền + `currentPath` + `aliases`
+  + `lifecycle`; pipeline 5 pha có **resolver** riêng; migration tạo registry và
+  alias TRƯỚC khi dời file) — session nhận toàn bộ, giữ hai chỗ phản biện
+  (`docId` có cửa thoát "id riêng cùng role"; `lifecycle: draft` đụng chữ "bản
+  nháp" của vòng 8, vi phạm chính luật Q4). §3 dòng D21.
+
+  **(f) Chủ sản phẩm chốt CẢ HAI chỗ phản biện, và chốt chặt hơn đề xuất của
+  session.** (1) Bỏ hẳn cửa thoát: invariant `activeDoc(topicId, role) <= 1`,
+  không escape hatch lúc ghi; nhiều doc cùng role chỉ xuất hiện VÌ topic đã tách,
+  có lineage; `docId` là danh tính kỹ thuật, không mang quyền phá cardinality.
+  Câu chốt đáng giữ nguyên văn: *"filesystem uniqueness vẫn là backstop, nhưng
+  uniqueness thật nằm ở registry invariant topicId + role, và mọi ngoại lệ đều
+  phải để lại lineage"*. (2) Tách hai bộ từ vựng lifecycle, chữ `draft` không
+  xuất hiện ở tầng tài liệu. Ghi thành D-tsk28x-14 và D-tsk28x-15; §3 dòng
+  D22/D23.
+
+  **(g) Gặp một bug thật của chính fgOS khi ghi quyết định trên.** `fgos decision`
+  từ chối D-tsk28x-15 (exit 4) vì `SUPERSESSION_PROSE_PATTERN`
+  (`src/state/store.mjs:1291`) bắt chữ `superseded` — nhưng ở đây nó là **giá trị
+  enum của lifecycle**, không phải câu tuyên bố supersession. Guard không phân
+  biệt được enum value với narration. Đã vòng tránh bằng cách diễn đạt khác, và
+  ghi lại ở §3 dòng D24 — đáng submit thành item riêng vì mọi quyết định tương
+  lai định nghĩa vocabulary chứa `superseded`/`replaces` sẽ vấp lại.
+
+  **Ghi qua `fgos decision`:** D-tsk28x-13, `--relation supersedes:D-tsk28x-5`
+  (mệnh đề chống-trùng của D-tsk28x-5 bị rút, phần còn lại của nó giữ nguyên).
+
 ## 6. Thiết kế đã chốt {#design}
 
 **Tái sinh vòng 9.** Đã chốt thật: D-tsk28x-1 (hai trục), D-tsk28x-2
@@ -1122,9 +1211,16 @@ SAU    docs/stale-index-vs-uncommitted-work/pitfall.md
 
 #### Quy định đi kèm
 
-**Q1 — Đường dẫn CHÍNH LÀ cặp danh tính đơn trị.** `docs/<mục-đích>/<vai-trò>.md`.
-Hệ quả: ràng buộc "một chủ đề một chủ sở hữu" được hệ tệp cưỡng chế miễn phí,
-không cần anti-fork gate (D12). Hai tài liệu cùng cặp không thể cùng tồn tại.
+**Q1 — ~~Đường dẫn CHÍNH LÀ cặp danh tính đơn trị, nên không cần anti-fork gate.~~**
+**SỬA vòng 10 (D-tsk28x-13 supersede, advisor ngoài phản biện):** đường dẫn duy
+nhất chỉ là **backstop VẬT LÝ** — hệ tệp biết path, không biết hai `mục đích`
+khác tên đang nói cùng một vấn đề. **Anti-fork NGỮ NGHĨA vẫn bắt buộc, và nó ĐÃ
+TỒN TẠI trong fgOS**: verb `fgos authoritative-match` + `src/report/authoritative-match.mjs`
+(find-before-create doctrine của chính `fgos-coding-compounding`, tsk-1lv-6),
+kèm `--check-duplicates`. Vấn đề thật là **độ phủ 67/331 ≈ 20%** và không gì
+cưỡng chế khai `authoritative_for` — detector đang trả kết quả sạch giả. Xem
+§3 dòng D18/D19. Ghi chú: Q1 bản cũ lẫn DANH TÍNH với VỊ TRÍ — cùng lớp lỗi
+với quadrant-làm-thư-mục ở D11, chỉ ngược chiều.
 
 **Q2 — Entity KHÔNG BAO GIỜ làm thư mục.** Thư mục phải đơn trị, mà đo được
 **28% tài liệu chạm ≥2 entity ngay trong tên** (93/330), thân bài còn nhiều
