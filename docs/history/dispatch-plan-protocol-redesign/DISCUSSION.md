@@ -17,7 +17,30 @@ children, **retrospective**, driver/worker split + `prepareDispatch`).
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2 (2026-08-25). Vòng 1 scout xong hai finding sống + quét backlog/
+Vòng 4 (2026-08-25). **Ba D-ID đầu tiên đã mint** (D1/D2/D3, §4) — đều là
+những điểm đã giữ nguyên qua vòng 2→3→4 không bị lật, kèm ba lời gọi
+`fgos decision --id tsk-5x7` thật (seq 4/5/6). §6 đã regenerate lần đầu.
+
+Vòng 4 người dùng chọn **phá tương thích, thiết kế lại đúng từ đầu**: đổi
+`exec packet`→`DispatchAssignment`, `TASK`→`ASSIGN`, bỏ id `<scope>#p<n>`
+thay bằng typed prefix (`asgn_`/`msg_`/`run_`), bỏ hẳn parse
+`[DONE]`/`[BLOCKED]` từ stdout, bắt buộc `ArtifactRef` cho mọi dữ liệu nặng.
+Phiên đã **đo giá phá tương thích thật trước khi bàn** (không suy đoán): cả
+`exec packet` lẫn id `<scope>#p<n>` có **0 dòng code** — chúng là quyết định
+đã khoá nhưng CHƯA BAO GIỜ được xây (`tsk-2t6` D4 tự gác lại B2), nên đổi
+tên gần như miễn phí; `[DONE]`/`[BLOCKED]` chỉ có **2 điểm code thật**
+(`cli.mjs:541-542`) + 3 file prose canonical (mirror thành 7); `carries`
+thì NGƯỢC LẠI — đã xây thật và đang gác trong `resolve.mjs:243-258` với
+enum sống `EXECUTOR_CARRIES = ['user-text','repo-content']`, khớp 1:1 với
+`governance.carries` người dùng đề xuất nên tái dùng được ngay, miễn phí.
+
+Bốn đổi tên của vòng 4 **chưa mint** (mới đứng đúng một vòng, hard rule cấm
+mint từ một câu trả lời) — nằm ở §3 hàng 15-18. Một điểm phiên **không đồng
+ý hoàn toàn** và đã nêu bằng chứng ngược: bỏ SẠCH fallback stdout (§3 hàng
+18) — không phải phản đối structured RESULT, mà phản đối việc bỏ đường lùi
+khi worker là CLI agent bên thứ ba mà fgOS không ép được nó tuân schema.
+
+Vòng 2-3 (giữ lại để đọc mạch): vòng 1 scout xong hai finding sống + quét backlog/
 doctrine, đặt hai câu hỏi mở đầu (vocabulary reconciliation + phạm vi thảo
 luận). Người dùng trả lời cả hai trong vòng 2, đầy đủ và có lý lẽ riêng:
 `mechanism` phải là canonical output của 0026/0033 (không phải quyết định
@@ -74,13 +97,24 @@ handoff → mailbox/Herdr optional → tối ưu tốc độ).
 | 9 | Phase 3/6/7 (AgentMessage schema, artifact-based handoff, mailbox/Herdr) có consumer thật nào hôm nay không, hay cùng dạng YAGNI-chờ-consumer như `tsk-6db` (Native-First Phase 5, "deferred, no concrete consumer yet") và `tsk-2ld` (RPC/app-server adapter, "research/discovery scope only")? | **CHƯA RÕ — cần người quyết** | Chưa thấy bằng chứng có provider nào hôm nay THẬT SỰ cần JSON-mode/event-stream thay vì prompt/stdout — `coding-worker-contract.md`'s `[DONE]`/`[BLOCKED]` token vẫn là hợp đồng sống duy nhất. Repo có xu hướng khoá rõ "deferred, YAGNI, chưa có consumer cụ thể" cho đúng dạng việc này (`tsk-6db`) thay vì xây trước. |
 | 10 | Phạm vi thảo luận vòng này: đi hết 8 pha của note, hay khoanh trước vào phần đã xác minh sống + rẻ (Finding #1, #3 — hàng 1-2 ở trên), để phần đầu cơ (AgentMessage/mailbox/Herdr) chờ một vòng riêng có consumer thật? | **Người dùng chọn: đi hết, dưới tên "Dispatch semantic control plane + Herdr-ready orchestration"** | Người dùng mở rộng scope thành 8 pha thật (DispatchPlan canonical → AgentMessage schema → protocol abstraction → structured result → artifact store → Herdr orchestration → mailbox/broker → governance egress), thứ tự triển khai rõ. Herdr được đưa vào SỚM hơn đề xuất gốc của note (pha 6/9 thay vì "optional, chưa quyết"), với ràng buộc rõ: Herdr là runtime adapter, KHÔNG BAO GIỜ quyết định task/review/blocker/artifact state — AgentMessage + fgOS state transition mới có quyền đó. Chưa trả lời trực tiếp câu hỏi "có consumer thật không" — xem hàng 11 mới. |
 | 11 | Herdr-as-transport (pha 6/7 mới) có consumer thật đang chờ không, hay vẫn là tầm nhìn chưa ai cần (cùng dạng YAGNI `tsk-6db` đã tự khoá)? | **Rõ — consumer thật, cùng xây trong scope này** | Người dùng xác nhận: consumer là chính người dùng khi đang làm việc, muốn TEST/theo dõi/trace agent đang làm gì lúc dispatch — thay vì bật agent mới qua stdin/stdout mù, bật qua Herdr để thấy nó chạy trên pane thật. Hệ quả kiến trúc quan trọng: khi Herdr đứng pane lên, A (caller) KHÔNG CÒN LÀ tiến trình cha trực tiếp của B (worker) — A không spawn B, không đọc stdout của B đồng bộ — nên cần một **protocol ổn định để A/B trao đổi khi A không sở hữu tiến trình B**. Đây chính là động lực thật, cụ thể, đứng sau việc tách AgentMessage khỏi giả định "A spawn B, đọc stdout" — không phải đầu cơ. |
-| 12 | `AgentMessage.payload`/`message_id` có phải phát minh từ đầu, hay đã có hình dạng tương đương bị khoá ở nơi khác? | **CHƯA RÕ — phát hiện chồng lấn nặng, cần người quyết trước khi viết schema** | `two-layer-dispatch` (`tsk-2t6`) đã khoá **D18**: gói dispatch ad-hoc tên chính thức là **"exec packet"** (không phải cell/job/errand), với **SÁU field bắt buộc**: id gói · mục tiêu một câu · đầu vào phải đọc · ranh giới (không được chạm/ghi gì) · hình dạng kết quả mong đợi · hợp đồng trả về — và id shape khoá cứng `<scope>#p<n>` (D6b, `#` cố ý phá `ID_PATTERN` để không bao giờ bị nhầm work item). `AgentMessage.payload` (`action/scope/verify`) và `message_id` (`msg_...`) của note trùng lặp Ý ĐỊNH gần như 1:1 với "exec packet" đã khoá — nhưng KHÔNG cùng field name/id format. Cần chốt: `AgentMessage` là envelope RỘNG HƠN (routing/correlation/lifecycle/observability) BỌC quanh một "exec packet" làm `payload` của nó (không phát minh field payload mới, tái dùng sáu ô đã khoá), hay là hai khái niệm cố tình khác nhau? |
-| 13 | `governance.egress`/`egressTarget` của note có trùng field nào đã khoá không? | **CHƯA RÕ — hai chỗ chồng lấn tiềm năng** | (a) `dispatch-concept-boundary` (`tsk-5td`) đã khoá **D9**: event `capacity.dispatch` phải ghi CẢ HAI `provider` (nhãn tự khai) VÀ `command` (lệnh thật spawn) — đúng gap glm-style mà note gọi là "egress ẩn", chỉ khác tên field và khác chỗ áp (audit log vs. một field mới trên DispatchPlan). (b) Cùng discussion khoá **D15**: `capacity` đã khai `carries` — tập ĐÓNG các loại nội dung nó ĐƯỢC PHÉP nhận (`user-text`, `repo-content`; `secrets` không bao giờ hợp lệ) — là trục "được phép mang gì", còn note's `egress.content` là trục "lần dispatch NÀY đang mang gì". Có thể bổ sung nhau (khai declare vs khai per-call) chứ không nhất thiết trùng — cần người quyết có tái dùng `carries` làm tập giá trị hợp lệ cho `egress.content` không. |
+| 12 | `AgentMessage.payload`/`message_id` có phải phát minh từ đầu, hay đã có hình dạng tương đương bị khoá ở nơi khác? | **Rõ — chồng lấn có thật, và giá đổi tên gần bằng 0** | `two-layer-dispatch` (`tsk-2t6`) đã khoá **D18**: gói dispatch ad-hoc tên chính thức "exec packet", **SÁU field bắt buộc** (id · mục tiêu một câu · đầu vào phải đọc · ranh giới · hình dạng kết quả mong đợi · hợp đồng trả về), id shape `<scope>#p<n>` (D6b). Vòng 4 người dùng chọn đổi tên thành `DispatchAssignment` + typed id `asgn_`. **Đo giá thật:** `grep -rn "exec packet\|execPacket" src/ bin/` → **0 hit**; `<scope>#p<n>` → **0 hit**. Cả hai là quyết định đã khoá mà CHƯA BAO GIỜ xây — chính `tsk-2t6` D4 tự gác B2 lại, D9 đặt điều kiện AND để mở lại và điều kiện (b) chưa bao giờ thoả. Nên đây không phải "phá tương thích" mà là **đổi tên một thứ chưa tồn tại**; sáu ô nội dung của D18 vẫn được giữ nguyên ý nghĩa, chỉ đổi nhãn (`goal`→`objective`, `boundary`→`scope`, v.v.). |
+| 13 | `governance.egress`/`carries` của note có trùng field nào đã khoá không? | **Rõ — `carries` đã XÂY THẬT và khớp 1:1, tái dùng được ngay** | (a) **D15** (`tsk-5td`) không chỉ khoá trên giấy: `EXECUTOR_CARRIES = Object.freeze(['user-text','repo-content'])` (`config.mjs:364`) và gate thật ở `resolve.mjs:243-258` — một executor khai `carries:"user-text"` sẽ TỪ CHỐI một dispatch mang `repo-content` **trước khi spawn**. `execute --carries <class>` đã là flag CLI sống (`cli.mjs:929`). Người dùng đề xuất `governance.carries:["repo-content"]` — trùng khớp enum sống, tái dùng miễn phí, không phát minh vocabulary mới. Hôm nay chưa executor nào trong `.fgos/config.json` khai `carries` nên gate đang ngủ, nhưng cơ chế thì đã có. (b) **D9** (`tsk-5td`) đã thiết kế đúng fix cho gap glm: audit ghi CẢ `provider` (nhãn tự khai) LẪN `command` (lệnh thật) — khớp `egress.declared_provider` vs `effective_target` người dùng đề xuất, chỉ khác chỗ áp (audit event vs field trên message). |
+| 15 | Đổi `exec packet`→`DispatchAssignment`, `TASK`→`ASSIGN` | **Hội tụ vòng 4, CHƯA MINT (mới một vòng)** | Lý do người dùng đưa ra đứng vững: "exec packet" thiên về transport/process, còn thứ nó mô tả là *một phần việc được giao*; `TASK` dễ lẫn với `work item`/`tsk-` (và 0029 đã bỏ `rootTask`/`subTask` chính vì lẫn lộn tương tự). Giá đổi = 0 dòng code (hàng 12). |
+| 16 | Bỏ id `<scope>#p<n>`, thay bằng typed prefix `asgn_`/`msg_`/`run_` | **Hội tụ vòng 4, CHƯA MINT** | D6b chọn `#` **cố ý** để id gói không bao giờ hợp lệ với `ID_PATTERN` (`work.mjs:24`) — bảo đảm bằng CẤU TRÚC. Typed prefix cũng đạt cùng mục tiêu (`asgn_01K...` không khớp `/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/` vì có `_` và chữ hoa) nhưng đọc được và grep được hơn. Scout: `runId`/`run_id` = **0 hit** trong `src/` → không va chạm khái niệm nào đang sống. |
+| 17 | `ArtifactRef` bắt buộc cho dữ liệu nặng, artifact store `.fgos/artifacts/` | **Hội tụ vòng 4, CHƯA MINT** | Greenfield hoàn toàn: `artifactRef\|ArtifactRef\|artifact://` = **0 hit** trong `src/`; `.fgos/` chưa có thư mục `artifacts/`. Không đụng gì đang sống. Ăn khớp với ưu tiên #2 "Release con người" (driver không phải nuốt diff/log dài vào conversation mới biết kết quả). |
+| 18 | Bỏ HẲN parse `[DONE]`/`[BLOCKED]`, không giữ fallback | **CHƯA RÕ — phiên KHÔNG đồng ý hoàn toàn, có bằng chứng ngược** | Đồng ý phần structured RESULT là đích đến. Không đồng ý phần **bỏ sạch đường lùi**, vì worker là CLI agent BÊN THỨ BA (agy/gemini, codex, claude) — fgOS *nhờ* nó tuân schema qua prompt, không *ép* được. Bằng chứng repo đã tự thừa nhận điều này: `cli.mjs:546` đã có sẵn trạng thái thứ ba `outcome:'unsignaled'` kèm `headBefore`/`headAfter` — tức fgOS ĐÃ phải thiết kế đường "worker không nói gì dùng được, đọc git state làm sự thật" vì ca đó có thật. Bỏ fallback mà không thay bằng gì thì một worker không tuân sẽ cho **zero** kết quả thay vì một kết quả suy giảm nhưng dùng được. Đề nghị: giữ thang ba nấc `structured RESULT` → `stdout token` → `git-state/unsignaled`, và nấc dưới ghi rõ `confidence`/`source` để đo được bao nhiêu % worker thật sự tuân — đo trước, gỡ sau khi số liệu cho phép. |
 | 14 | Trục `mechanism`/`kind` của note có đụng khung bảy tầng đã khoá (D10, `tsk-5td`) không? | **Rõ — không đụng, chỉ cần đối chiếu tên khi viết code** | D10 khoá khung bảy tầng T0-T4+TG+TD (`orchestrator`/`launcher`|`driver`/`work`|`errand`→`exec packet`/`capacity`→`executor`/`capability`|`tool`|`kind`|`executor`/gate/`mechanism`). D16 đã đổi giá trị mechanism từ `native`/`cli-spawn` sang đúng `in-process`/`out-of-process` — khớp 100% với code thật hôm nay (`mechanism.mjs`). D17 khoá T1 chỉ có `launcher`/`driver` — khớp đề xuất `plan.caller`/`plan.launcher` của người dùng. Không có xung đột giá trị, chỉ cần khi viết `DispatchPlan` module thật thì đặt tên field đúng theo khung này (vd không tự bịa từ `orchestrator` cho một nghĩa khác). |
 
 ## 4. Quyết định đã chốt
 
-(chưa có D-ID nào — vòng 1)
+_Append-only. Mỗi D-ID chỉ mint sau khi đã đứng qua **hơn một vòng** không
+bị lật, kèm một lời gọi `fgos decision --id tsk-5x7` thật._
+
+| D-ID | Quyết định | Lý do | Vòng nêu → chốt |
+|---|---|---|---|
+| **D1** | **`DispatchPlan.mechanism` là output canonical của Native-First Dispatch Doctrine (0026 rules 1-4, thu hẹp bởi 0033), không phải một quyết định mới đứng cạnh nó.** `launcher`/`driver` đi vào `plan.caller` (vai trò T1, D17 `tsk-5td`), không vào `mechanism`. `selector.type` dùng `work` (0029 đã thay `rootTask`/`subTask` bằng `work`/`child work`), không resurrect từ vựng cũ. `capacity` không dùng làm primary field — `D-ADR0034`/`tsk-225` đã rename `capacity`→`executor` toàn bộ code+config, `runner.executors` hôm nay CHÍNH LÀ khái niệm đó. `reasonCodes` giữ trace rule nào thắng. | Xác minh sống: `mechanism.mjs`'s `decideDispatchMechanism`/`decideExecutorDispatchMechanism` đã là triển khai thuần của đúng 4 quy tắc 0026/0033, không có drift phải dọn ⇒ Phase 1 thật sự *thin*: chỉ bọc kết quả có sẵn, không viết lại logic. Tạo tầng mechanism thứ hai = hai nguồn sự thật (doctrine trong `docs/specs` vs planner trong code). | 1 → 4 (`fgos decision` seq 4) |
+| **D2** | **Scope là "Dispatch semantic control plane + Herdr-ready orchestration" — 8 pha, không khoanh hẹp vào 2 bug đã xác minh sống.** Thứ tự: (1) DispatchPlan canonical + fix `decide --for`, (2) AgentMessage schema V1, (3) protocol abstraction, (4) structured RESULT/BLOCKER/ERROR, (5) artifact store V1, (6) Herdr orchestration làm runtime adapter, (7) mailbox/broker, (8) governance egress metadata. | Người dùng chọn mở rộng thay vì khoanh hẹp, có lý do thật đứng sau (D3) chứ không phải đầu cơ. Ràng buộc cứng đi kèm: **Herdr KHÔNG BAO GIỜ quyết định** task/review/blocker/artifact state — chỉ AgentMessage + fgOS state transition có quyền đó. | 2 → 4 (`fgos decision` seq 5) |
+| **D3** | **Consumer thật của Herdr-as-transport là chính người dùng khi đang làm việc** — muốn test/theo dõi/trace agent đang chạy trên pane thật thay vì stdin/stdout mù. Hệ quả kiến trúc: khi Herdr đứng pane lên, **A (caller) không còn là tiến trình cha trực tiếp của B (worker)** — A không spawn B, không đọc stdout của B đồng bộ. | Đó là lý do thật, cụ thể, đứng sau việc tách AgentMessage khỏi giả định "A spawn B rồi đọc stdout" — không phải YAGNI kiểu `tsk-6db`. Scout xác nhận đây là bề mặt MỚI: Herdr đã có tích hợp thật (`fgos gateway` `tsk-31v`, `herdrOrchestrator`, MCP surface) nhưng tất cả là REST/dashboard/automation-trigger, khác hẳn "giao AgentMessage qua Herdr-managed runtime/session". | 3 → 4 (`fgos decision` seq 6) |
 
 ## 5. Q&A log
 
@@ -134,11 +168,132 @@ handoff → mailbox/Herdr optional → tối ưu tốc độ).
   `tsk-5td`) xác nhận KHÔNG đụng đề xuất của người dùng (`in-process`/
   `out-of-process`, `launcher`/`driver` hai giá trị đều khớp).
 
+- **2026-08-25, vòng 4** — Người dùng chọn **phá tương thích, thiết kế lại
+  đúng từ đầu**, không bị ràng buộc bởi tên/shape cũ: `exec packet` →
+  `DispatchAssignment` (tên cũ thiên transport/process-oriented); `TASK` →
+  `ASSIGN` (tránh lẫn với `work item`); id `<scope>#p<n>` → typed prefix
+  (`tsk_`/`asgn_`/`msg_`/`run_`); bỏ parse `[DONE]`/`[BLOCKED]`, bắt buộc
+  structured RESULT; artifact handoff bắt buộc qua `ArtifactRef`; prompt
+  contract trở thành thứ *sinh ra từ* `DispatchAssignment` chứ không phải
+  protocol gốc; Herdr = transport/orchestration, không là state authority.
+  Nghiêng về Option B cho stdout (agent ghi `.fgos/outbox/<message_id>.json`,
+  stdout chỉ còn human log) để không phải scrape terminal đoán task done.
+  Phiên **đo giá phá tương thích trước khi bàn**: `exec packet` = 0 hit
+  code, `<scope>#p<n>` = 0 hit, `runId`/`ArtifactRef`/`artifact://` = 0 hit
+  → gần như miễn phí, vì `tsk-2t6` D4 đã tự gác B2 và chưa bao giờ xây;
+  `[DONE]`/`[BLOCKED]` = 2 điểm code + 3 file prose canonical; NGƯỢC LẠI
+  `carries` đã xây thật (`EXECUTOR_CARRIES`, gate `resolve.mjs:243-258`,
+  flag `execute --carries`) và khớp 1:1 đề xuất `governance.carries`.
+  Phiên **không đồng ý một điểm** và nêu bằng chứng ngược: bỏ SẠCH fallback
+  stdout (§3 hàng 18) — `cli.mjs:546` đã có sẵn `outcome:'unsignaled'` +
+  `headBefore`/`headAfter`, tức repo đã phải thiết kế đường lùi vì ca
+  worker-không-tuân là có thật; đề nghị thang ba nấc có đo `confidence`
+  thay vì bỏ hẳn. Mint D1/D2/D3 (những điểm đã giữ qua 2→3→4).
+
 ## 6. Thiết kế đã chốt {#design}
 
-(chưa có gì để tổng hợp — chưa D-ID nào ổn định qua hơn một vòng. Sẽ viết
-lại toàn phần một khi §4 có D-ID đầu tiên.)
+_Viết lại toàn phần mỗi khi một D-ID làm đổi hình dạng thiết kế. Bản này:
+sau D1/D2/D3 (vòng 4). Độ chín ghi rõ từng mục — phần lớn nội dung dưới đây
+**chưa mint**._
+
+### 6.1 Năm lớp, và ranh giới giữa chúng [KHOÁ — D1/D2/D3]
+
+Thiết kế đứng trên một mệnh đề: **mỗi lớp chỉ được là sự thật của đúng một
+thứ**, và không lớp nào được suy ra sự thật của lớp khác.
+
+| Lớp | Là sự thật của | Không bao giờ được quyết |
+|---|---|---|
+| **DispatchPlan** | route: ai làm, cơ chế nào, provider/model nào, policy nào | nội dung việc, kết quả việc |
+| **AgentMessage** | control-plane: giao việc, hỏi, chặn, trả kết quả, review | trạng thái lifecycle của work item |
+| **ArtifactRef / artifact store** | dữ liệu nặng: commit, diff, test report, log | ý nghĩa của dữ liệu đó |
+| **State store (`.fgos/`)** | **sự thật duy nhất** về work status | cách một dispatch được route |
+| **Transport** | cách message đi tới nơi (stdio/mailbox/HTTP/MCP/Herdr) | bất cứ thứ gì mang nghĩa |
+
+Ràng buộc sắc nhất, từ D2/D3: **Herdr nằm ở hàng Transport, không hàng State
+store.** Herdr biết pane nào sống, tiến trình nào chết, terminal nào đang
+chạy gì — nhưng "task xong chưa", "review qua chưa", "blocker gỡ chưa" chỉ
+đến từ AgentMessage cộng với fgOS state transition. Không map trạng thái
+Herdr 1:1 sang trạng thái task.
+
+### 6.2 Vì sao AgentMessage phải tồn tại [KHOÁ — D3]
+
+Không phải vì JSON đẹp hơn prose. Vì một sự kiện cụ thể: **khi Herdr đứng
+pane lên, A không còn là cha của B.** Mô hình dispatch hôm nay giả định
+ngầm rằng caller spawn worker rồi đọc stdout của chính tiến trình con đó —
+toàn bộ `[DONE]`/`[BLOCKED]`, toàn bộ `outcome:'unsignaled'` đều dựa trên
+giả định ấy. Bỏ giả định đó đi thì cần một kênh trao đổi không phụ thuộc
+quan hệ cha-con tiến trình. Đó là AgentMessage.
+
+```mermaid
+flowchart LR
+  subgraph HT["hôm nay — A là cha của B"]
+    A1[caller A] -->|spawn| B1[worker B]
+    B1 -->|stdout token| A1
+  end
+  subgraph HD["với Herdr — A không spawn B"]
+    A2[caller A] -->|ASSIGN| MB[(kênh message)]
+    MB --> H[Herdr: dựng/đánh thức pane]
+    H --> B2[worker B trên pane thật]
+    B2 -->|RESULT / BLOCKER| MB
+    MB --> A2
+    B2 -.->|người dùng nhìn thấy| EYE([anh theo dõi trực tiếp])
+  end
+```
+
+### 6.3 DispatchPlan — thin, không phải tầng quyết định thứ hai [KHOÁ — D1]
+
+`compileDispatchPlan()` **không tự phán** cơ chế. Nó gọi đúng thứ đã có
+(`decideDispatchMechanism`/`decideExecutorDispatchMechanism`, triển khai
+thuần của 0026 rules 1-4 thu hẹp bởi 0033) rồi đóng gói kết quả lại kèm
+ngữ cảnh. Hình dạng (field name chưa mint):
+
+```
+selector   { type: work|purpose|executor|adHocAgent, value }
+caller     { role: launcher|driver }        ← T1, D17 tsk-5td
+mechanism  in-process | out-of-process | unavailable   ← D16 tsk-5td
+executorId capability  invocation{via,adapter,protocol}  model
+governance { carries, egress }
+reasonCodes [ "native-first.rule-2...", "native-first.0033.cli-spawn-shaped" ]
+```
+
+`reasonCodes` là chỗ trả lời "vì sao ra kết quả này" mà hôm nay không có —
+quan trọng vì mechanism là *dẫn xuất*, và một dẫn xuất không giải thích
+được thì không debug được.
+
+### 6.4 Bốn đổi tên của vòng 4 [HỘI TỤ — chưa mint]
+
+`DispatchAssignment` (thay `exec packet`), `ASSIGN` (thay `TASK`), typed id
+`asgn_`/`msg_`/`run_` (thay `<scope>#p<n>`), `ArtifactRef` bắt buộc. Sáu ô
+nội dung của D18 (`tsk-2t6`) **giữ nguyên ý nghĩa**, chỉ đổi nhãn:
+`id`→`assignment_id`, `goal`→`objective`, `boundary`→`scope`,
+`expected shape`→`deliverable`, `return contract`→`return_contract`.
+Giá đo được: 0 dòng code phải sửa (cả hai khái niệm chưa từng được xây).
+
+### 6.5 Thang kết quả — điểm còn tranh luận [HỞ]
+
+Đích đến (structured RESULT/BLOCKER/ERROR) đã đồng thuận. Chỗ chưa thống
+nhất là có giữ đường lùi không. Lập luận của phiên: worker là CLI agent bên
+thứ ba, fgOS *nhờ* nó tuân schema chứ không *ép* được; `cli.mjs:546` đã có
+sẵn `outcome:'unsignaled'` chính vì ca không-tuân là có thật. Đề nghị thang
+ba nấc, nấc dưới ghi rõ nguồn/độ tin, đo tỉ lệ tuân trước khi gỡ:
+
+```
+structured RESULT (mailbox/NDJSON)   → confidence: reported
+stdout token [DONE]/[BLOCKED]        → confidence: legacy-signal
+git state (headBefore/headAfter)     → confidence: inferred
+```
+
+### 6.6 Cái gì tái dùng được ngay, miễn phí [KHOÁ — bằng chứng code]
+
+- `carries` — `EXECUTOR_CARRIES = ['user-text','repo-content']` đã sống,
+  gate đã chạy (`resolve.mjs:243-258`), flag `execute --carries` đã có.
+  `governance.carries` của thiết kế mới dùng thẳng, không phát minh enum.
+- `provider` + `command` dual-audit (D9 `tsk-5td`) — đúng fix cho gap
+  glm-style, khớp `egress.declared_provider` vs `effective_target`.
+- `mechanism` values `in-process`/`out-of-process` (D16) — khớp code thật.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-(chưa chia — chờ §6 có hình dạng cụ thể)
+(chưa chia — §6 vừa có hình dạng đầu tiên, nhưng §6.4/§6.5 còn chưa mint và
+§6.5 còn đang tranh luận. Chia việc sau khi hai mục đó đứng qua một vòng
+nữa.)
