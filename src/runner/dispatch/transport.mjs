@@ -495,7 +495,18 @@ function herdrSpawnAdapter(invocation, opts) {
 
   return new Promise((resolve, reject) => {
     // 1. HARD CONSTRAINT (tsk-1nih): ALWAYS create a fresh pane via `herdr pane split`
-    const splitArgs = ['pane', 'split', '--no-focus'];
+    //
+    // `--direction right|down` is REQUIRED, not optional (self-review
+    // finding, 2026-08-25, confirmed live against the real installed
+    // binary: `herdr pane split --no-focus --cwd /tmp` refuses with exit 2
+    // -- "usage: herdr pane split [<pane_id>|--pane ID|--current]
+    // --direction right|down ..."). Every prior version of this adapter
+    // omitted it entirely, so it could never have actually split a pane
+    // against a real herdr install. `right` is an arbitrary but reasonable
+    // default (matches this repo's own documented example,
+    // docs/distillery/deep-dives/how-to-use-herdr.md) -- no config knob
+    // for it exists yet because nothing has needed one.
+    const splitArgs = ['pane', 'split', '--direction', 'right', '--no-focus'];
     if (cwd) {
       splitArgs.push('--cwd', cwd);
     }
@@ -618,10 +629,47 @@ function herdrSpawnAdapter(invocation, opts) {
     // worker's own [DONE]/[BLOCKED] token (fast path, unchanged) OR the
     // sentinel above (the shell command itself has exited, whether or not
     // the worker ever signaled).
-    const waitArgs = ['pane', 'wait-output', paneId, '--regex', `\\[(DONE|BLOCKED)\\]|${sentinel}:`];
-    if (timeoutMs) {
-      waitArgs.push('--timeout', String(timeoutMs));
-    }
+    //
+    // Deliberately NO `--timeout` flag (self-review finding, 2026-08-25,
+    // confirmed live): passing BOTH herdr's own `--timeout` and this
+    // adapter's own JS setTimeout at the identical duration is a genuine
+    // race -- confirmed empirically against the real binary that when
+    // herdr's own timeout wins, `wait-output` exits 1 with an
+    // `{"error":{"code":"timeout",...}}` body and NO `result.read` at all,
+    // which this adapter's own `timedOut` flag (set only by ITS OWN
+    // setTimeout) never sees, so it fell through to the "success" branch
+    // and silently resolved `{status:1, stdout:''}` instead of rejecting
+    // `worker-timeout` -- a real timeout invisible to every caller that
+    // branches on that error class. Per `--help`, wait-output with no
+    // `--timeout` "waits indefinitely" -- the JS timer below is the SOLE
+    // timeout authority, the same single-source-of-truth shape
+    // `cliSpawnAdapter` already uses for its own child process.
+    //
+    // `(?m)^` anchoring on BOTH alternatives (self-review finding,
+    // 2026-08-25, confirmed live -- a genuinely serious one): `wait-output`
+    // "searches immediately, including existing output" per its own
+    // --help, and the FIRST thing to appear in a fresh pane's scrollback is
+    // the shell's own echo of the typed command line itself -- which
+    // contains the sentinel's literal text verbatim (`echo "sentinel:$?"`,
+    // unevaluated) and, in real production use, near-certainly contains
+    // the literal substrings "[DONE]"/"[BLOCKED]" too, since the worker's
+    // own dispatched prompt (built by buildPrompt, typed as part of this
+    // same command) instructs it to print exactly those tokens. An
+    // unanchored regex matches that echoed instruction/typed-text
+    // immediately -- confirmed live: an unanchored sentinel regex matched
+    // within milliseconds against only the echoed input, before a 2-second
+    // real sleep even started, with `sentinelMatch` failing to parse a real
+    // exit code from the literal unevaluated `$?` and silently falling back
+    // to a wrong status. `(?m)^` requires the match to START its own real
+    // output line -- confirmed live against a prompt literally containing
+    // "Report [DONE] when finished..." as instructional prose: the
+    // anchored pattern correctly skipped that line (mid-line, not
+    // line-initial) and matched only the worker's real standalone `[DONE]`
+    // line once it actually appeared. This also matches the coding-worker-
+    // contract's own established rule (tsk-5gd) that a valid completion
+    // token must be a standalone, unquoted status line -- never text
+    // embedded elsewhere.
+    const waitArgs = ['pane', 'wait-output', paneId, '--regex', `(?m)^\\[(DONE|BLOCKED)\\]|(?m)^${sentinel}:\\d+`, '--source', 'recent-unwrapped', '--lines', '500'];
 
     const waitChild = spawn(herdrBin, waitArgs, {
       cwd,
@@ -632,12 +680,36 @@ function herdrSpawnAdapter(invocation, opts) {
 
     let timedOut = false;
     let timer = null;
+    let waitStdout = '';
+    waitChild.stdout.setEncoding('utf8');
+    waitChild.stdout.on('data', (chunk) => { waitStdout += chunk; });
 
+    // TIMEOUT MUST STOP THE WORKER, NOT JUST THE WATCHER (self-review
+    // finding, 2026-08-25, confirmed live): `pane run` types text into the
+    // pane's own shell -- it is not this adapter's child process, so
+    // killing `waitChild` (a separate `wait-output` polling process) never
+    // touches whatever the worker is still doing inside the pane. Verified
+    // empirically: a real `sleep 45` launched via `pane run`, still
+    // visible in `ps` under its own pty, was gone within one second of
+    // `herdr pane close <paneId>` -- the same real mechanism used here.
+    // Best-effort and never allowed to block or fail the reject: losing
+    // the ability to positively confirm the close is strictly better than
+    // losing the timeout report itself.
     if (timeoutMs) {
       timer = setTimeout(() => {
         timedOut = true;
         try {
           killChildTree(waitChild, 'SIGTERM');
+        } catch {}
+        try {
+          execFileSync(herdrBin, ['pane', 'close', paneId], {
+            cwd,
+            env: fullEnv,
+            encoding: 'utf8',
+            shell: false,
+            stdio: ['ignore', 'pipe', 'pipe'],
+            timeout: 5000,
+          });
         } catch {}
       }, timeoutMs);
     }
@@ -662,25 +734,24 @@ function herdrSpawnAdapter(invocation, opts) {
         return;
       }
 
-      // 4. Read scrollback output via `herdr pane read <paneId>`
+      // 4. Extract the scrollback text directly from wait-output's OWN
+      // embedded read result (self-review finding, 2026-08-25, confirmed
+      // live) -- NOT a separate `herdr pane read <paneId>` call, which was
+      // this adapter's prior design. Confirmed empirically against the
+      // real binary: a standalone `pane read --source recent-unwrapped`
+      // call returns EMPTY whenever the pane's total output still fits
+      // within the visible viewport (nothing has scrolled off-screen yet
+      // for "recent"/"recent-unwrapped" to find) -- the common case for a
+      // short [DONE]/[BLOCKED] confirmation or a brief error. wait-output's
+      // own embedded read (same --source/--lines flags, requested above)
+      // reliably captured both a short (4-line) and a long (200+ line)
+      // transcript in live testing; a second, separately-behaving call
+      // never needed to exist at all.
       let stdout = '';
-      try {
-        stdout = execFileSync(herdrBin, ['pane', 'read', paneId, '--source', 'recent-unwrapped', '--lines', '500'], {
-          cwd,
-          env: fullEnv,
-          encoding: 'utf8',
-          shell: false,
-          stdio: ['ignore', 'pipe', 'pipe'],
-        });
-      } catch {
+      if (code === 0) {
         try {
-          stdout = execFileSync(herdrBin, ['pane', 'read', paneId], {
-            cwd,
-            env: fullEnv,
-            encoding: 'utf8',
-            shell: false,
-            stdio: ['ignore', 'pipe', 'pipe'],
-          });
+          const parsed = JSON.parse(waitStdout);
+          stdout = typeof parsed?.result?.read?.text === 'string' ? parsed.result.read.text : '';
         } catch {
           stdout = '';
         }
@@ -698,7 +769,15 @@ function herdrSpawnAdapter(invocation, opts) {
       // pre-existing behavior for that edge case.
       const sentinelMatch = stdout.match(new RegExp(`${sentinel}:(\\d+)`));
       const realStatus = sentinelMatch ? Number(sentinelMatch[1]) : (code === 0 ? 0 : code);
-      const cleanedStdout = stdout.replace(new RegExp(`${sentinel}:\\d+\\n?`), '');
+      // Strip EVERY occurrence, not just the first (self-review finding,
+      // 2026-08-25, confirmed live): the pane's shell echoes the typed
+      // command line back verbatim BEFORE evaluating it, so the sentinel's
+      // own literal, unevaluated text (`sentinel:$?`) appears at least once
+      // in scrollback in addition to the real evaluated line
+      // (`sentinel:7`) -- a non-global, digit-only replace left the echoed
+      // literal form sitting in the returned stdout. Matches either form
+      // (`$?` unevaluated or real digits), every time it appears.
+      const cleanedStdout = stdout.replace(new RegExp(`${sentinel}:(?:\\$\\?|\\d+)\\n?`, 'g'), '');
 
       if (onChunk && cleanedStdout) {
         teeChunk(onChunk, 'stdout', cleanedStdout);

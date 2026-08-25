@@ -6,6 +6,24 @@ import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { EXECUTOR_ADAPTERS, DispatchError, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from '../../src/runner/dispatch/transport.mjs';
 import { loadRunnerConfig } from '../../src/runner/dispatch/config.mjs';
+import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
+
+// Live-binary regression guard (self-review finding, 2026-08-25, fourth
+// round): every mock in this file simulates herdr's CLI contract by hand,
+// and that simulation was itself wrong in ways that only surfaced against
+// the REAL binary -- `pane split` requires `--direction` (the mocks below
+// accepted anything), and an unanchored completion regex matches the
+// pane's own echo of the typed command line before the real command even
+// runs (the mocks below never modeled that echo-then-output timing at
+// all). Skips honestly when herdr isn't installed, same pattern
+// test/e2e/coexistence-canary.test.mjs already uses for its own
+// real-binary dependency.
+const HERDR_BIN = findExecutableOnPath(['herdr']);
+const HERDR_SKIP = HERDR_BIN ? false : 'herdr binary not found on PATH -- live-binary regression tests skip honestly';
+
+function herdrPane(args) {
+  return execFileSync(HERDR_BIN, args, { encoding: 'utf8' });
+}
 
 // A realistic mock: unlike createMockHerdrScript below (which never
 // actually runs the "pane run" command text, so it can't exercise the
@@ -27,6 +45,13 @@ const subcommand = args[0];
 const action = args[1];
 
 if (subcommand === 'pane' && action === 'split') {
+  // Real herdr refuses without --direction (self-review finding,
+  // 2026-08-25, confirmed live: exit 2). Mirrored here for the same reason
+  // as createMockHerdrScript's own copy of this check.
+  if (!args.includes('--direction')) {
+    process.stderr.write('usage: herdr pane split ... --direction right|down ...\\n');
+    process.exit(2);
+  }
   const paneId = 'pane-real-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
   fs.writeFileSync(path.join(outputsDir, paneId + '.txt'), '');
   console.log(JSON.stringify({ result: { pane: { pane_id: paneId } } }));
@@ -36,6 +61,13 @@ if (subcommand === 'pane' && action === 'split') {
 if (subcommand === 'pane' && action === 'run') {
   const paneId = args[2];
   const cmd = args[3];
+  // Real herdr's pane FIRST echoes the typed command line back (terminal
+  // convention -- confirmed live), THEN the command actually runs and
+  // produces its own real output. Written here in that same order so a
+  // regex without the (?m)^ anchoring fix (self-review finding,
+  // 2026-08-25) would match the echoed line's own literal token/sentinel
+  // text -- exactly the false-positive this mock exists to catch.
+  fs.appendFileSync(path.join(outputsDir, paneId + '.txt'), cmd + '\\n');
   let out = '';
   try {
     out = execSync(cmd, { shell: '/bin/sh', encoding: 'utf8' });
@@ -49,23 +81,30 @@ if (subcommand === 'pane' && action === 'run') {
 if (subcommand === 'pane' && action === 'wait-output') {
   const paneId = args[2];
   const regexIdx = args.indexOf('--regex');
-  const re = new RegExp(args[regexIdx + 1]);
-  const timeoutIdx = args.indexOf('--timeout');
-  const timeoutMs = timeoutIdx !== -1 ? Number(args[timeoutIdx + 1]) : 5000;
+  // Real herdr's --regex is a Rust regex; this adapter's own pattern uses
+  // Rust's inline (?m) flag syntax, which JS's RegExp constructor does NOT
+  // support (throws "Invalid group") -- confirmed live. Strip it and apply
+  // JS's own 'm' flag instead, same semantics.
+  const rawPattern = args[regexIdx + 1];
+  const re = new RegExp(rawPattern.replace(/\\(\\?m\\)/g, ''), 'm');
   const outFile = path.join(outputsDir, paneId + '.txt');
-  const deadline = Date.now() + timeoutMs;
+  // No --timeout is ever passed by this adapter anymore (self-review
+  // finding, 2026-08-25: dropped in favor of the adapter's own JS timer as
+  // sole authority) -- this mock waits until SIGTERM'd, same as the real
+  // binary's own "without --timeout, waits indefinitely", capped at a
+  // generous safety ceiling so a forgotten test-side timeout can't hang
+  // the suite forever.
+  const deadline = Date.now() + 30000;
   while (Date.now() < deadline) {
     const content = fs.existsSync(outFile) ? fs.readFileSync(outFile, 'utf8') : '';
-    if (re.test(content)) process.exit(0);
+    const match = re.exec(content);
+    if (match) {
+      console.log(JSON.stringify({ result: { matched_line: match[0], read: { text: content } } }));
+      process.exit(0);
+    }
   }
+  console.log(JSON.stringify({ error: { code: 'timeout', message: 'timed out waiting for output match' } }));
   process.exit(1);
-}
-
-if (subcommand === 'pane' && action === 'read') {
-  const paneId = args[2];
-  const outFile = path.join(outputsDir, paneId + '.txt');
-  process.stdout.write(fs.existsSync(outFile) ? fs.readFileSync(outFile, 'utf8') : '');
-  process.exit(0);
 }
 
 process.exit(0);
@@ -94,6 +133,14 @@ const subcommand = args[0];
 const action = args[1];
 
 if (subcommand === 'pane' && action === 'split') {
+  // Real herdr refuses without --direction (self-review finding,
+  // 2026-08-25, confirmed live: exit 2, "usage: herdr pane split ...
+  // --direction right|down ..."). Mirrored here so a regression (the flag
+  // silently dropped again) fails this mock too, not just the live suite.
+  if (!args.includes('--direction')) {
+    process.stderr.write('usage: herdr pane split [<pane_id>|--pane ID|--current] --direction right|down ...\\n');
+    process.exit(2);
+  }
   const paneId = 'pane-' + counter + '-' + Math.random().toString(36).slice(2, 7);
   console.log(JSON.stringify({ result: { pane: { pane_id: paneId } } }));
   process.exit(0);
@@ -104,22 +151,18 @@ if (subcommand === 'pane' && action === 'run') {
 }
 
 if (subcommand === 'pane' && action === 'wait-output') {
-  // Simulate waiting for output
-  const timeoutIdx = args.indexOf('--timeout');
-  if (timeoutIdx !== -1 && args[timeoutIdx + 1] === '50') {
-    // Simulate timeout test if requested
-    setTimeout(() => {
-      process.exit(1);
-    }, 500);
-    // keep running until timeout
-  } else {
-    console.log('matched output');
-    process.exit(0);
-  }
-}
-
-if (subcommand === 'pane' && action === 'read') {
-  console.log('[DONE] Work completed successfully inside herdr pane');
+  // Real herdr embeds the matched snapshot directly in its own JSON
+  // response (self-review finding, 2026-08-25, confirmed live) -- this
+  // adapter reads result.read.text from THIS response, never a separate
+  // "pane read" call (which the real binary can return EMPTY for on a
+  // "recent"/"recent-unwrapped" source when nothing has scrolled
+  // off-screen yet).
+  console.log(JSON.stringify({
+    result: {
+      matched_line: '[DONE]',
+      read: { text: '[DONE] Work completed successfully inside herdr pane' },
+    },
+  }));
   process.exit(0);
 }
 
@@ -349,9 +392,12 @@ test('herdr-spawn adapter: a worker that finishes WITHOUT ever printing [DONE]/[
   // wait-output succeeded at finding the sentinel, that is not the same
   // fact as "the worker exited 0").
   assert.equal(res.status, 7, 'status must be the real worker exit code, not wait-output\'s own exit code');
-  // The internal sentinel line must never leak into what looks like real
-  // worker output.
-  assert.equal(res.stdout.trim(), 'hello-no-token', 'stdout must be cleaned of the internal sentinel marker');
+  // The internal sentinel line itself must never leak into what looks like
+  // real worker output -- the surrounding shell prompt/typed-command echo
+  // noise (the pane's own terminal behavior, confirmed live) is a
+  // pre-existing, accepted characteristic shared with the [DONE]/[BLOCKED]
+  // fast path, not something this fix changes.
+  assert.ok(res.stdout.includes('hello-no-token'));
   assert.ok(!res.stdout.includes('__fgos_herdr_exit_'), 'the sentinel marker itself must never appear in the returned stdout');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
@@ -428,4 +474,91 @@ test('herdr-spawn adapter never leaks a resolved env secret into its own Dispatc
   }
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+// --- Live-binary regression guard (fourth-round self-review findings) ---
+//
+// Everything below dispatches against the REAL installed `herdr` binary --
+// no mock. Each test tracks its own pane_id and closes it in a `finally`,
+// same courtesy `herdr pane close` itself proved reliable for in live
+// probing (a real `sleep 45` launched via `pane run`, confirmed via `ps`,
+// was gone within one second of the close call).
+
+test('herdr-spawn adapter (LIVE): a worker that finishes without ever printing [DONE]/[BLOCKED] is detected via the sentinel against the real binary, with the real exit code and no sentinel leak', { skip: HERDR_SKIP }, async () => {
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  const res = await herdrSpawn(
+    { command: 'sh', args: ['-c', 'echo real-live-hello; exit 7'], env: {} },
+    { cwd: '/tmp', timeoutMs: 10000, workId: 'live-sentinel-item', tier: 'standard', model: 'sonnet', herdrBin: HERDR_BIN },
+  );
+  try {
+    assert.equal(res.status, 7, 'status must be the real worker exit code');
+    assert.ok(res.stdout.includes('real-live-hello'));
+    assert.ok(!res.stdout.includes('__fgos_herdr_exit_'), 'the sentinel marker must never leak into stdout, including its echoed/unevaluated form');
+  } finally {
+    try { herdrPane(['pane', 'close', res.paneId]); } catch {}
+  }
+});
+
+test('herdr-spawn adapter (LIVE): timeout actually stops the real worker process, not just the watcher', { skip: HERDR_SKIP }, async () => {
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  let caught;
+  try {
+    await herdrSpawn(
+      { command: 'sh', args: ['-c', 'sleep 20'], env: {} },
+      { cwd: '/tmp', timeoutMs: 2000, workId: 'live-timeout-item', tier: 'standard', model: 'sonnet', herdrBin: HERDR_BIN },
+    );
+  } catch (err) {
+    caught = err;
+  }
+  assert.ok(caught instanceof DispatchError);
+  assert.equal(caught.errorClass, 'worker-timeout');
+  // Give the (best-effort) pane close a moment to actually land, then
+  // confirm no `sleep 20` launched by this test is still alive anywhere.
+  await new Promise((r) => setTimeout(r, 1500));
+  const survivors = execFileSync('sh', ['-c', 'ps -eo args | grep "^sleep 20$" || true'], { encoding: 'utf8' }).trim();
+  assert.equal(survivors, '', `expected no surviving "sleep 20" process, found: ${survivors}`);
+});
+
+test('herdr-spawn adapter (LIVE): a dispatched prompt that itself mentions "[DONE]" as instructional prose never triggers a false-positive match on its own echoed command line', { skip: HERDR_SKIP }, async () => {
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  // The typed command's own text contains "[DONE]" as prose (mirroring a
+  // real worker-contract prompt instructing the agent to report it) --
+  // BEFORE the real, standalone `[DONE]` line the "worker" prints after a
+  // real 2s delay. An unanchored regex matches the echoed prose instantly;
+  // this must wait for and match only the real standalone token line.
+  const start = Date.now();
+  const res = await herdrSpawn(
+    {
+      command: 'sh',
+      args: ['-c', "echo 'Report [DONE] when finished with your task.'; sleep 2; echo '[DONE]'"],
+      env: {},
+    },
+    { cwd: '/tmp', timeoutMs: 10000, workId: 'live-anchor-item', tier: 'standard', model: 'sonnet', herdrBin: HERDR_BIN },
+  );
+  const elapsedMs = Date.now() - start;
+  try {
+    assert.ok(elapsedMs >= 1500, `expected to genuinely wait past the 2s sleep for the real token (only waited ${elapsedMs}ms) -- an unanchored regex would match the echoed prose instantly`);
+    assert.ok(res.stdout.includes('[DONE]'));
+  } finally {
+    try { herdrPane(['pane', 'close', res.paneId]); } catch {}
+  }
+});
+
+test('herdr-spawn adapter (LIVE): "pane split" is called with the required --direction flag -- confirmed by the real binary accepting the call instead of refusing with exit 2', { skip: HERDR_SKIP }, async () => {
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  // If --direction were ever dropped again, `herdr pane split` itself
+  // refuses (confirmed live, 2026-08-25: exit 2, "usage: herdr pane split
+  // ... --direction right|down ...") before a pane is ever created --
+  // this adapter would reject worker-spawn-fail immediately. A clean
+  // resolve here is the real proof the flag is present and accepted.
+  const res = await herdrSpawn(
+    { command: 'echo', args: ['direction-flag-ok'], env: {} },
+    { cwd: '/tmp', timeoutMs: 10000, workId: 'live-direction-item', tier: 'standard', model: 'sonnet', herdrBin: HERDR_BIN },
+  );
+  try {
+    assert.ok(res.paneId);
+    assert.ok(res.stdout.includes('direction-flag-ok'));
+  } finally {
+    try { herdrPane(['pane', 'close', res.paneId]); } catch {}
+  }
 });
