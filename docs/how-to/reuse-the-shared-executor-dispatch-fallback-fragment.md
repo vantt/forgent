@@ -15,11 +15,11 @@ that branch logic into the new skill's own `SKILL.md`.
 
 `fgos-submit-assist`'s classify step (`tsk-5l2`) was, until this pattern
 was extracted, the only skill in this repo wired through the
-executor-dispatch mechanism (`resolveExecutorCli`/`resolveExecutorConfig`,
-`src/runner/dispatch.mjs`). A second skill wanting the same
-dispatch-with-fallback shape would have had to copy that branch prose by
-hand — and the two copies would drift the next time the branching logic
-changed. That's why the branch logic now lives in one shared file instead.
+executor-dispatch mechanism (`decide`/`execute` over
+`resolveExecutorConfig`, `src/runner/dispatch.mjs`). A second skill wanting
+the same dispatch-with-fallback shape would have had to copy that branch
+prose by hand, and the copies would drift the next time the branching
+logic changed. That's why the branch logic now lives in one shared file.
 
 ## Steps
 
@@ -28,8 +28,9 @@ changed. That's why the branch logic now lives in one shared file instead.
    steps 1–3 (unchanged, still skill-agnostic): add a `.fgos/config.json`
    `runner.executors.<id>` entry, declare it as a tool-registry entry too
    (a `capability` field on that same entry, tsk-in1-1 D1 — no longer a
-   `fgos tool register` verb call), and confirm it resolves via
-   `dispatch.mjs`'s `resolve` CLI subcommand.
+   `fgos tool register` verb call), and confirm it with
+   `dispatch.mjs decide` followed by `dispatch.mjs execute` when the
+   mechanism is `out-of-process`.
 
 2. **Point your `SKILL.md`'s reasoning step at the shared fragment**
    instead of inlining the branch logic:
@@ -41,43 +42,22 @@ changed. That's why the branch logic now lives in one shared file instead.
    - `<INLINE_FALLBACK_HEADING>` = the heading of your own "reason about it yourself" step
    ```
 
-   Mirror the same edit into `.agents/skills/<your-skill>/SKILL.md` — every
-   `fgos-*` skill keeps its two trees byte-identical
-   (`test/skills/fgos-mirror.test.mjs`), and the shared fragment itself
-   lives at both `.claude/skills/_shared/executor-dispatch-fallback.md`
-   and its `.agents/skills/_shared/` mirror.
+   Edit the canonical source under `core/skills/` or `domains/*/skills/`,
+   then run `npm run build:skills`. The build assembles `.agents/skills/`,
+   generates `.claude/skills/` wrappers, and mirrors dev skills plus
+   `_shared/` into `plugins/fgOS/skills/`.
 
 3. **Know what the fragment does on your behalf**, so you can read its
-   output correctly (tsk-5tm-3 D5 reduced this to 3 steps — `execute` now
-   self-executes or hands back in one call, folding what used to be a
-   separate presence check and native-vs-cli/spawn decision into it):
-   - **Step A (config check)** — `not-configured` skips straight to your
-     inline-fallback heading, byte-identical to before this executor
-     existed. `configured` moves to Step B. No separate presence check any
-     more (tsk-5tm-1 D1 retired the `needs` field and the gate that
-     consulted it) — a missing backend now surfaces as `execute`'s own
-     spawn failure, caught by Step C.
-   - **Step B (`execute`, self-execute or hand back)** — decide for
-     yourself whether you (the assistant reading the fragment) already
-     have live Agent/Task tool access right now (never inferred from
-     environment or config), then run `node dispatch.mjs execute
-     <EXECUTOR_ID> --prompt "..." [--has-live-task-access]`. Prints one of
-     two shapes: `{"mechanism":"in-process","agentType":...,"prompt":...}`
-     — dispatch has no Task tool of its own, so this is the one case it
-     hands back; print `<EXECUTOR_ID> - in-process - <agentType> -
-     <model>`, then call your own Agent/Task tool with `subagent_type` =
-     `agentType` and the same `<PROMPT_TEMPLATE>` prompt. Or
-     `{"mechanism":"out-of-process", ...real result fields}` — dispatch
-     already ran it via `EXECUTOR_ADAPTERS`, reusing
-     `resolveExecutorConfig`/`resolveExecutorCommand` internally (never a
-     second argv-building implementation); print `<EXECUTOR_ID> -
-     out-of-process - <provider> - <model>` and read `stdout` — this IS
-     the real answer, nothing left to run.
-   - **Step C (malformed-response fallback)** — a missing/unparseable/
-     unusable response, or an error from Step B's own call, falls back to
-     your inline-fallback heading exactly as if the executor were absent;
-     never treat a dispatched answer as more trustworthy than your own
-     reasoning would have been.
+   output correctly:
+   - **Step A (`decide`)** — asks the runner for the mechanism and branches
+     only on `unavailable`, `in-process`, or `out-of-process`.
+   - **Step B (`execute`)** — runs only for `out-of-process`; `execute`
+     invokes the adapter and returns the real JSON result. The caller never
+     runs a resolved command through Bash.
+   - **Step C (fallback)** — a missing, unparseable, unusable, or failed
+     response falls back to your inline heading exactly as if the executor
+     were absent. A dispatched answer is never more authoritative than the
+     skill's own reasoning would have been.
 
 4. **Verify the mirror still holds**:
 
@@ -98,11 +78,10 @@ changed. That's why the branch logic now lives in one shared file instead.
 > independent copies drift out of sync the next time this pattern's logic
 > changes (DRY) — a single referenced source doesn't.
 
-The fragment lives under `.claude/skills/_shared/` — the skill tree the
-mirror test already governs — rather than under `docs/how-to/`, since a
-skill-facing fragment other `SKILL.md` files point to by relative path
-belongs where the mirror machinery scans, not in a location the mirror
-test does not check at all.
+The fragment lives under `.agents/skills/_shared/` after assembly, mirrored
+from `core/skills/_shared/` and into `plugins/fgOS/skills/_shared/`. It
+stays out of `docs/how-to/` because consuming `SKILL.md` files include it
+by relative path and the mirror checks govern the skill trees.
 
 ## Why cli-dispatch and task-dispatch aren't two separate architectures
 
@@ -127,8 +106,8 @@ selects the agent at all; persona dispatch happens via prompt text
 naming an agent defined in `.codex/agents/<name>.toml`. Any
 executor-dispatch design resolving an `agentType` into real invocation
 args cannot assume any common flag shape across providers — this is why
-Step B's native-vs-cli/spawn decision (applied internally by `execute`,
-tsk-5tm-3 D5) is a real branch, not a detail to paper over.
+Step B's `in-process`/`out-of-process` decision is a real branch, not a
+detail to paper over.
 
 ## Related
 
@@ -141,5 +120,5 @@ tsk-5tm-3 D5) is a real branch, not a detail to paper over.
   — Step B's own dispatch-decision mechanism in more depth.
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
   — Native-First Dispatch Doctrine, the governing rules behind Step B.
-- `.claude/skills/_shared/executor-dispatch-fallback.md` — the fragment
-  itself.
+- `.agents/skills/_shared/executor-dispatch-fallback.md` — the assembled
+  fragment loaded by local wrappers.

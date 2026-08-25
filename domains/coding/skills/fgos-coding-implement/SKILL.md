@@ -57,7 +57,7 @@ on how you got here:
   ```
 - **Always call `dispatch.mjs decide` first for the Implement step —
   never assume "I have a live Task tool, so I do it myself" as the
-  default.** A `cli-spawn`-shaped capacity already registered in
+  default.** A `cli-spawn`-shaped executor already registered in
   `.fgos/config.json` resolves `out-of-process` *unconditionally* once
   configured — having live Task access does not change that; config
   wins, not "I already have full context so I'll do it myself". Run

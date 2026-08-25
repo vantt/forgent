@@ -98,10 +98,9 @@ nothing is configured.
    resolved command themselves through Bash.
 
 4. **In the skill's own `SKILL.md`, point at the shared fragment instead
-   of inlining the branch logic.** `.claude/skills/_shared/executor-
-   dispatch-fallback.md` (tsk-53h) already carries the four-way branch —
-   config check, presence check, configured-and-present dispatch, and the
-   malformed-response fallback — generalized from this exact wiring
+   of inlining the branch logic.** `.agents/skills/_shared/executor-
+   dispatch-fallback.md` (tsk-53h) carries the current `decide`/`execute`
+   branch and malformed-response fallback, generalized from this exact wiring
    (`submit-assist-classify`, the fragment's own real precedent). Reference
    it by relative path from the consuming `SKILL.md`
    (`../_shared/executor-dispatch-fallback.md`) and fill in its three
@@ -111,12 +110,10 @@ nothing is configured.
    branch prose into the new skill's own file — that is exactly the drift
    risk the shared fragment exists to remove.
 
-   Update **every** mirrored copy together
-   (`.claude/skills/<name>/SKILL.md` and `.agents/skills/<name>/SKILL.md`,
-   and `.claude/skills/_shared/`/`.agents/skills/_shared/` if the fragment
-   itself changes — `test/skills/fgos-mirror.test.mjs` enforces
-   byte-identical content across both trees for `fgos-*` skills and for
-   `_shared/`, and fails loudly if only one side is edited).
+   Edit the canonical source under `core/skills/` or `domains/*/skills/`,
+   then run `npm run build:skills`. The build assembles `.agents/skills/`,
+   generates `.claude/skills/` wrappers, and mirrors dev skills plus
+   `_shared/` into `plugins/fgOS/skills/`.
 
 5. **Verify the dispatch actually works, live, once.** Since a prose
    skill's own branching can never be executed by the test suite (no
@@ -137,7 +134,7 @@ nothing is configured.
 
 ## Why this exists
 
-A executor's config and presence-check machinery (steps 1-3) already has
+An executor's config and presence-check machinery (steps 1-3) already has
 real unit-test coverage from whichever item built the mechanism itself
 (`tsk-62v`/`tsk-5l2-1`/`tsk-5l2-2`) — but wiring a *specific skill's prose*
 through it (step 4) sits in a genuine, structural test-coverage gap: no
@@ -152,7 +149,7 @@ acceptance proof instead of a weaker placeholder.
   `plan.md` — the locked decisions (D1-D8) this exact wiring followed,
   including the governance (D7) and malformed-output (D8) calls named in
   steps 1 and 4 above.
-- `.claude/skills/_shared/executor-dispatch-fallback.md` — the shared
+- `.agents/skills/_shared/executor-dispatch-fallback.md` — the shared
   fragment step 4 now points at, generalized from this exact wiring
   (`tsk-53h`).
 - `docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` /
