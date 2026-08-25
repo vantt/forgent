@@ -639,7 +639,10 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.attempt': {
-      const { id, phase, result, endedAt, claimId, actor } = event.payload ?? {};
+      const {
+        id, phase, result, endedAt, claimId, actor,
+        from, to, startedAt, branch, headAtTake, branchHeadAtTake, branchHeadAtReturn, headAtReturn, reason, releaseTrigger,
+      } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.attemptCount = (item.attemptCount ?? 0) + 1;
@@ -649,6 +652,22 @@ function applyEvent(view, event) {
           endedAt: endedAt || event.ts,
           ...(claimId !== undefined ? { claimId } : {}),
           ...(actor !== undefined ? { actor } : {}),
+          // tsk-40m (docs/architect/doing-coordination-redesign.md §7.2):
+          // work.attempt is now the complete durable record of an attempt
+          // (no durable intermediate work.move(->doing) to infer from/to
+          // from) — fold its own richer fields the same additive way as
+          // claimId/actor above, never overwriting an older attempt's
+          // fields with `undefined` on a leaner legacy record.
+          ...(from !== undefined ? { from } : {}),
+          ...(to !== undefined ? { to } : {}),
+          ...(startedAt !== undefined ? { startedAt } : {}),
+          ...(branch !== undefined ? { branch } : {}),
+          ...(headAtTake !== undefined ? { headAtTake } : {}),
+          ...(branchHeadAtTake !== undefined ? { branchHeadAtTake } : {}),
+          ...(branchHeadAtReturn !== undefined ? { branchHeadAtReturn } : {}),
+          ...(headAtReturn !== undefined ? { headAtReturn } : {}),
+          ...(reason !== undefined ? { reason } : {}),
+          ...(releaseTrigger !== undefined ? { releaseTrigger } : {}),
         };
       }
       break;

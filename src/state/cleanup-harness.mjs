@@ -166,7 +166,15 @@ export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
         : childrenResult;
     }
   }
-  const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake;
+  // tsk-40m (docs/architect/doing-coordination-redesign.md): these top-level
+  // sticky fields are only ever set by a durable work.move payload, which
+  // claim time no longer writes -- the real values now live on the settle's
+  // own work.attempt, folded into work.lastAttempt. Checked as a fallback,
+  // never instead of, so a genuinely legacy pre-migration record (top-level
+  // field set, no lastAttempt) still resolves exactly as before.
+  const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake
+    ?? work?.lastAttempt?.branchHeadAtReturn ?? work?.lastAttempt?.headAtReturn
+    ?? work?.lastAttempt?.branchHeadAtTake ?? work?.lastAttempt?.headAtTake;
   if (!sha) {
     return { ok: true, detail: NOTHING_TO_CHECK_DETAIL };
   }

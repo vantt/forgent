@@ -9,6 +9,7 @@ import { computeImpact, computePriority } from '../../src/state/priority-formula
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove, readRawEvents } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
 import { createWorktree } from '../../src/runner/worktree.mjs';
+import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 
 // tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
 // `judgeDiscovery` (a nested `claude -p` subprocess) is retired. This file
@@ -465,7 +466,7 @@ test('resolveDiscovery on a caller-supplied unclear verdict stamps statusAtAsk f
 test('resolveDiscovery on a caller-supplied unclear verdict stamps statusAtAsk "doing" when a pick claim is held through clarify (claim-lock §1/§5.1)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
+  acquireClaim(storeDir, { id: 'item-x', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
 
   resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe client needs a concrete endpoint to call.\n\n## Why this matters\n\nThis directly affects the outcome: Which endpoint?' });
   const view = listWork(storeDir);

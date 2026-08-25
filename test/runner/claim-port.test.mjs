@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { LOCK_FILE, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 import { initStore, addWork, moveWork, settleClaim, listWork, FsmError, readRawEvents } from '../../src/state/store.mjs';
+import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 
@@ -487,7 +488,7 @@ test('tsk-37t: a stale-claim reclaim succeeds even when the repo is already drif
   // A second, unrelated item is also `doing` -- with ceiling 1, occupied
   // (excluding item-a) is already 1, at/over ceiling before the reclaim.
   addWork(dir, { id: 'item-b', title: 'Item B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  moveWork(dir, { id: 'item-b', to: 'doing', expectedStatus: 'todo' });
+  acquireClaim(dir, { id: 'item-b', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
 
   // Reclaiming item-a must succeed: it was already `doing` (occupying its
   // slot) before this call, and stays `doing` after -- no net new
@@ -502,7 +503,7 @@ test('tsk-37t: a genuinely NEW claim still refuses when the repo is at ceiling, 
   writeSharedConfig(repoRoot, { workerSlots: { ceiling: 1 } });
 
   addWork(dir, { id: 'item-b', title: 'Item B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  moveWork(dir, { id: 'item-b', to: 'doing', expectedStatus: 'todo' });
+  acquireClaim(dir, { id: 'item-b', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
 
   // item-a (todo, never claimed) is a genuinely NEW claim -- not a reclaim
   // of an already-doing item -- so it must still be refused at ceiling 1.

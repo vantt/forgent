@@ -256,7 +256,8 @@ test("e2e synthetic domain: the real 'fgos cleanup' verb closes a synthetic item
   );
 
   add(repoRoot, 'synth-cleanup-item', { domain: 'synthetic', verify: 'true' });
-  assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'doing']).status, 0);
+  // tsk-40m: blocked stands in for the retired todo->doing edge.
+  assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'blocked']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'delivered']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'retrospective']).status, 0);
   assert.equal(

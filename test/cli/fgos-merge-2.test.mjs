@@ -223,8 +223,7 @@ test('merge next on a directory with no .fgos/ at all is refused, exit 4, no mer
 test('merge next run from inside a linked worktree without --dir is refused, exit 4 -- never the old silent "nothing ready" false negative even though the real store has a ready item', () => {
   const { main, wt } = tmpLinkedWorktree();
   assert.equal(run(main, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
-  assert.equal(run(main, ['move', 'solo', '--to', 'doing']).status, 0);
-  assert.equal(run(main, ['move', 'solo', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
+  assert.equal(run(main, ['move', 'solo', '--to', 'awaiting-approval']).status, 0); // tsk-40m: no real claim needed (no branch)
   // Confirm the real store genuinely has a ready item, so a refusal below
   // cannot be mistaken for a true "nothing ready" negative.
   assert.deepEqual(envelopeData(run(main, ['merge', 'list']).stdout).ready, ['solo']);
@@ -255,8 +254,8 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   // package.json to run against in this bare sandbox, so approve would
   // park it 'blocked' instead of 'done' — a false negative for this test.
   assert.equal(run(cwd, ['add', 'dep', '--title', 'Dep', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
-  assert.equal(run(cwd, ['move', 'dep', '--to', 'doing']).status, 0);
-  assert.equal(run(cwd, ['move', 'dep', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
+  // tsk-40m: no real claim needed (no branch) -- straight todo -> awaiting-approval.
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'awaiting-approval']).status, 0);
   const approveResult = envelopeData(run(cwd, ['approve', 'dep']).stdout);
   assert.equal(approveResult.to, 'delivered', `expected dep to reach delivered, got: ${JSON.stringify(approveResult)}`);
   // merge list still reads RESOLVED_STATUSES = {done, wontfix} at this point
@@ -327,8 +326,8 @@ test('merge next merges the single ready item by recursing into approve, item re
   // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-
   // and-plugin-skill.md.
   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
-  assert.equal(run(cwd, ['move', 'solo', '--to', 'doing']).status, 0);
-  assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
+  // tsk-40m: no real claim needed (no branch) -- straight todo -> awaiting-approval.
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
 
   const result = run(cwd, ['merge', 'next']);
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
@@ -344,8 +343,8 @@ test('merge next picks the higher-ranked (mvp goalTier) item first when two are 
   assert.equal(run(cwd, ['init']).status, 0);
   for (const id of ['plain', 'important']) {
     assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
-    assert.equal(run(cwd, ['move', id, '--to', 'doing']).status, 0);
-    assert.equal(run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
+    // tsk-40m: no real claim needed (no branch) -- straight todo -> awaiting-approval.
+    assert.equal(run(cwd, ['move', id, '--to', 'awaiting-approval']).status, 0);
   }
   const data = envelopeData(run(cwd, ['merge', 'next']).stdout);
   assert.equal(data.picked, 'important', 'the mvp-goalTier item outranks the plain one per rankImpact');
@@ -591,18 +590,12 @@ test('sync-root outcome guard catches lock-lost-mid-merge and records unhandled-
   run(cwd, ['init']);
 
   const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
-  const lockOverwriter = `node -e "require('fs').writeFileSync('${lockPath}', JSON.stringify({pid: 999999, ts: Date.now()})); const end = Date.now() + 50; while (Date.now() < end) {}"`;
+  const lockOverwriter = `node -e "require('fs').writeFileSync('${lockPath}', JSON.stringify({pid: 999999, ts: Date.now()}))"`;
 
   makeDriftedRoot(cwd, 'sync-root-lock-lost', { verify: lockOverwriter });
 
   const headBefore = gitHead(cwd);
-  process.env.FGOS_HEARTBEAT_INTERVAL_MS = '10';
-  let result;
-  try {
-    result = run(cwd, ['sync-root', 'sync-root-lock-lost']);
-  } finally {
-    delete process.env.FGOS_HEARTBEAT_INTERVAL_MS;
-  }
+  const result = run(cwd, ['sync-root', 'sync-root-lock-lost']);
 
   assert.equal(result.status, 0, result.stderr);
   const data = envelopeData(result.stdout);

@@ -110,10 +110,10 @@ test('retrospective sweeps every delivered item to retrospective, in one pass, l
   const cwd = tmpCwd();
   addOk(cwd, 'retro-todo-item'); // stays todo
   addOk(cwd, 'retro-delivered-a');
-  run(cwd, ['move', 'retro-delivered-a', '--to', 'doing']);
+  run(cwd, ['move', 'retro-delivered-a', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'retro-delivered-a', '--to', 'delivered']);
   addOk(cwd, 'retro-delivered-b');
-  run(cwd, ['move', 'retro-delivered-b', '--to', 'doing']);
+  run(cwd, ['move', 'retro-delivered-b', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'retro-delivered-b', '--to', 'delivered']);
 
   const result = run(cwd, ['retrospective']);
@@ -156,7 +156,7 @@ test('cleanup on an item not at status cleanup is rejected as precondition, exit
 test('cleanup parks cleanup -> blocked, with every failing reason joined, when the TTL has not elapsed and no retrospective content exists', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'cleanup-not-ready');
-  run(cwd, ['move', 'cleanup-not-ready', '--to', 'doing']);
+  run(cwd, ['move', 'cleanup-not-ready', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'cleanup-not-ready', '--to', 'delivered']);
   run(cwd, ['move', 'cleanup-not-ready', '--to', 'retrospective']);
   run(cwd, ['move', 'cleanup-not-ready', '--to', 'cleanup']);
@@ -176,7 +176,7 @@ test('cleanup parks cleanup -> blocked, with every failing reason joined, when t
 test('cleanup is a no-op — writes zero work.move events and stays at cleanup — when only TTL has not elapsed and the D8 checks pass', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'cleanup-ttl-only');
-  run(cwd, ['move', 'cleanup-ttl-only', '--to', 'doing']);
+  run(cwd, ['move', 'cleanup-ttl-only', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'cleanup-ttl-only', '--to', 'delivered']);
   run(cwd, ['move', 'cleanup-ttl-only', '--to', 'retrospective']);
   const dir = path.join(cwd, '.fgos');
@@ -421,7 +421,7 @@ test('catchup accepts a blocked reason of merge-blocked-other-item as a valid pr
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   addOk(cwd, 'catchup-blocked-other-item');
-  run(cwd, ['move', 'catchup-blocked-other-item', '--to', 'doing']);
+  run(cwd, ['move', 'catchup-blocked-other-item', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   commitPending(cwd, 'state: claim catchup-blocked-other-item');
 
   gitAtCwd(cwd, ['checkout', '-b', 'fgw/catchup-blocked-other-item']);

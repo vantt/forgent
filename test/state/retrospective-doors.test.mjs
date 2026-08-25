@@ -224,11 +224,10 @@ test('CLI: retrospective logs advisory friction for a freshness-door gap but sti
   // way other CLI-level tests in this suite reach a status without
   // re-running the whole real lifecycle (a plain move chain is sufficient
   // here -- this test is about the door/friction wiring, not FSM legality
-  // elsewhere already covered). `doing -> awaiting-approval` refuses
-  // without real proof (return's own job) unless forced with
-  // --skip-return-guard, exactly the escape hatch it exists for.
-  assert.equal(run(cwd, ['move', 'host-item', '--to', 'doing', '--expect', 'todo']).status, 0);
-  assert.equal(run(cwd, ['move', 'host-item', '--to', 'awaiting-approval', '--expect', 'doing', '--skip-return-guard', 'test fixture']).status, 0);
+  // elsewhere already covered). tsk-40m: todo -> doing is retired -- no
+  // real claim needed here (no branch), straight todo -> awaiting-approval
+  // via the redesign's own new direct edge.
+  assert.equal(run(cwd, ['move', 'host-item', '--to', 'awaiting-approval', '--expect', 'todo']).status, 0);
   assert.equal(run(cwd, ['move', 'host-item', '--to', 'delivered', '--expect', 'awaiting-approval']).status, 0);
 
   const result = run(cwd, ['retrospective']);
@@ -262,8 +261,8 @@ test('CLI: retrospective logs no friction and no doorFindings key for a clean it
     run(cwd, ['add', '--id', 'clean-item', '--title', 'Clean', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--description', 'fixture']).status,
     0,
   );
-  assert.equal(run(cwd, ['move', 'clean-item', '--to', 'doing', '--expect', 'todo']).status, 0);
-  assert.equal(run(cwd, ['move', 'clean-item', '--to', 'awaiting-approval', '--expect', 'doing', '--skip-return-guard', 'test fixture']).status, 0);
+  // tsk-40m: no real claim needed (no branch) -- straight todo -> awaiting-approval.
+  assert.equal(run(cwd, ['move', 'clean-item', '--to', 'awaiting-approval', '--expect', 'todo']).status, 0);
   assert.equal(run(cwd, ['move', 'clean-item', '--to', 'delivered', '--expect', 'awaiting-approval']).status, 0);
 
   const result = run(cwd, ['retrospective']);

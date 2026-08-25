@@ -210,11 +210,20 @@ test('e2e: moving a fixture-marketing item into "blocked" stamps statusCategory 
   assert.equal(view.work['fx-cat'].statusCategory, 'todo');
   assert.equal(view.work['coding-cat'].statusCategory, 'todo');
 
-  move(repoRoot, 'fx-cat', 'doing');
-  move(repoRoot, 'coding-cat', 'doing');
+  // tsk-40m: todo -> doing is retired -- awaiting-human stands in as the
+  // shared "in-progress" example both domains keep grouped the same way
+  // (workflow-stage-graphs.mjs's own fixture-marketing comment: "doing/
+  // awaiting-human keep coding's own in-progress grouping"). Entered via
+  // the dedicated `ask` verb (the generic `move` verb has no --ask flag).
+  const ASK = '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome.';
+  assert.equal(fgos(repoRoot, ['ask', 'fx-cat', '--text', ASK]).status, 0);
+  assert.equal(fgos(repoRoot, ['ask', 'coding-cat', '--text', ASK]).status, 0);
   view = stateView(repoRoot);
   assert.equal(view.work['fx-cat'].statusCategory, 'in-progress');
   assert.equal(view.work['coding-cat'].statusCategory, 'in-progress');
+
+  assert.equal(fgos(repoRoot, ['answer', 'fx-cat', '--text', 'resolved']).status, 0);
+  assert.equal(fgos(repoRoot, ['answer', 'coding-cat', '--text', 'resolved']).status, 0);
 
   // The divergence: same literal edge (doing -> blocked), same shared FSM
   // table (status-fsm.mjs, untouched by this item) — different category,
@@ -370,11 +379,14 @@ test('e2e: a fixture-marketing item runs the real take -> return -> delivered ->
     assert.equal('statusCategory' in event.payload, false, `tail move to "${event.payload.to}" must carry no statusCategory key, got: ${JSON.stringify(event.payload)}`);
   }
 
-  // Contrast: the two front-segment moves earlier in this SAME lifecycle
-  // (doing, awaiting-approval) DID carry one — the split is real, not an
-  // artifact of a domain that never stamps anything.
+  // Contrast: the one front-segment move earlier in this SAME lifecycle
+  // (awaiting-approval) DID carry one — the split is real, not an artifact
+  // of a domain that never stamps anything. tsk-40m: `take`'s own claim
+  // writes no durable work.move at all (doing is purely derived from the
+  // active-claim overlay now), so there is no raw 'doing' move to check
+  // here — this is the ONE front-segment move left in the raw log.
   const frontMoves = events.filter((e) => ['doing', 'awaiting-approval'].includes(e.payload.to));
-  assert.equal(frontMoves.length, 2);
+  assert.equal(frontMoves.length, 1);
   for (const event of frontMoves) {
     assert.equal('statusCategory' in event.payload, true, `front-segment move to "${event.payload.to}" must carry statusCategory`);
   }

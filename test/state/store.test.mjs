@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fork, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
+import { initStore, addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, rebuild, resolveWriterLogPath, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/util/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
@@ -30,6 +30,32 @@ const STORE_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/sta
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-learning-'));
+}
+
+// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`/
+// `blocked -> doing` are RETIRED from status-fsm.mjs's TRANSITIONS table —
+// nothing durably writes INTO `doing` anymore, not even settleClaim's own
+// settle segment. This file's own tests need a durably-'doing' item purely
+// as a PRECONDITION for exercising a later `moveWork(..., to: X,
+// expectedStatus: 'doing')` call (the actual subject under test) — a raw
+// event write, bypassing transitionWork's own edge validation, is the
+// direct, honest way to get there, the same technique `addLegacyWork`
+// above already uses for a different since-tightened rule.
+function moveToDurableDoingForTest(dir, id, from = 'todo') {
+  // Must land in the CURRENT writer identity's own open file under
+  // .fgos/events/ (TA-D2/TA-D11) via resolveWriterLogPath — never the
+  // frozen baseline events.jsonl (TA-D12), and never a hardcoded path that
+  // could collide with a DIFFERENT writer's file, which would both violate
+  // "each writer identity gets its own file" and, if the earlier write
+  // lands in the same millisecond, tie-break to the wrong file-sort order
+  // (TA-D7) and sort this work.move BEFORE the work.add it must follow.
+  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
+  // Force a fresh rebuild right away — closes a real timestamp-granularity
+  // race where a subsequent moveWork's own CAS read (currentView's T4
+  // incremental fast path, mtime-based staleness detection) could still
+  // see the pre-append state.json snapshot when this append and the
+  // preceding addWork/addSampleWork land within the same mtime bucket.
+  rebuild(dir);
 }
 
 // Blocking sleep (mirrors events.mjs's own internal sleepSync) — used only to
@@ -189,7 +215,7 @@ test('tsk-37t: addDecision with no id at all is still legitimate (a global decis
 test('moveWork doing->done composes a learning record reflecting the item\'s actual outcome, friction (by layer), and settlement (by kind/role)', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'learn-doing');
-  moveWork(dir, { id: 'learn-doing', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'learn-doing');
 
   addOutcome(dir, { id: 'learn-doing', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
   addOutcome(dir, {
@@ -233,7 +259,7 @@ test('moveWork doing->done composes a learning record reflecting the item\'s act
 test('moveWork via the awaiting-approval path (not just the doing hand-move path) also composes a learning record at the shared cleanup->done close', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'learn-proposed');
-  moveWork(dir, { id: 'learn-proposed', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'learn-proposed');
   moveWork(dir, { id: 'learn-proposed', to: 'awaiting-approval', expectedStatus: 'doing' });
   moveWork(dir, { id: 'learn-proposed', to: 'delivered', expectedStatus: 'awaiting-approval' });
   moveWork(dir, { id: 'learn-proposed', to: 'retrospective', expectedStatus: 'delivered' });
@@ -248,7 +274,7 @@ test('moveWork via the awaiting-approval path (not just the doing hand-move path
 test('moveWork to done for an item with no outcome and no friction still produces a minimal (not skipped) learning record', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'learn-empty');
-  moveWork(dir, { id: 'learn-empty', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'learn-empty');
   moveWork(dir, { id: 'learn-empty', to: 'delivered', expectedStatus: 'doing' });
   moveWork(dir, { id: 'learn-empty', to: 'retrospective', expectedStatus: 'delivered' });
   moveWork(dir, { id: 'learn-empty', to: 'cleanup', expectedStatus: 'retrospective' });
@@ -266,7 +292,7 @@ test('moveWork to done for an item with no outcome and no friction still produce
 test('the learning record rides the SAME work.move event that closes the item — single write door, no extra event, no extra file, and rebuild is deterministic', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'learn-rebuild');
-  moveWork(dir, { id: 'learn-rebuild', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'learn-rebuild');
   // Walk the sequential chain up to (but not through) the final close;
   // snapshot the log AFTER this so the assertion below still proves the
   // CLOSE itself (cleanup->done) appends exactly one event, not the chain
@@ -325,7 +351,7 @@ test('two interleaved writer identities each write to their own file under .fgos
 
     sleepMs(5);
     process.env.FGOS_SESSION_ID = 'writer-b';
-    moveWork(dir, { id: 'interleave-1', to: 'doing', expectedStatus: 'todo' });
+    moveToDurableDoingForTest(dir, 'interleave-1');
 
     sleepMs(5);
     process.env.FGOS_SESSION_ID = 'writer-a';
@@ -356,44 +382,19 @@ test('two interleaved writer identities each write to their own file under .fgos
 
 // --- branch-source take/return write-side stamp (human-rounds D2) ---------
 //
-// moveWork's destructure is a FIXED field list (never a `...rest` spread,
-// per the fold-allowlist critical pattern) — a caller passing a new field
-// that this facade does not also destructure gets it silently dropped
-// before the event is ever appended. This asserts the write side directly
-// (the exact gap a reviewer caught during validating): branchHeadAtTake/
-// branchHeadAtReturn must land on the appended event's own payload, not
-// only on replay.mjs's later fold.
-
-test('moveWork stamps branchHeadAtTake onto the appended event payload for a blocked -> doing move that carries it', () => {
-  const dir = tmpDir();
-  addSampleWork(dir, 'branch-take', { status: 'blocked' });
-
-  const { event } = moveWork(dir, { id: 'branch-take', to: 'doing', expectedStatus: 'blocked', role: 'human', branchHeadAtTake: 'branch-deadbeef' });
-
-  assert.equal(event.payload.branchHeadAtTake, 'branch-deadbeef');
-  assert.equal('headAtTake' in event.payload, false, 'a branch take never also stamps the main-based headAtTake');
-});
-
-test('moveWork stamps branchHeadAtReturn onto the appended event payload for a doing -> awaiting-approval move that carries it, never headAtReturn', () => {
-  const dir = tmpDir();
-  addSampleWork(dir, 'branch-return', { status: 'blocked' });
-  moveWork(dir, { id: 'branch-return', to: 'doing', expectedStatus: 'blocked', role: 'human', branchHeadAtTake: 'branch-deadbeef' });
-
-  const { event } = moveWork(dir, { id: 'branch-return', to: 'awaiting-approval', expectedStatus: 'doing', branchHeadAtReturn: 'branch-c0ffee' });
-
-  assert.equal(event.payload.branchHeadAtReturn, 'branch-c0ffee');
-  assert.equal('headAtReturn' in event.payload, false, 'a branch return never also stamps the main-based headAtReturn (D2 CẤM)');
-});
-
-test('moveWork omits branchHeadAtTake/branchHeadAtReturn entirely from the event payload when the caller never supplies them (byte-identical to the prior shape)', () => {
-  const dir = tmpDir();
-  addSampleWork(dir, 'branch-absent');
-
-  const { event } = moveWork(dir, { id: 'branch-absent', to: 'doing', expectedStatus: 'todo', role: 'human', headAtTake: 'main-deadbeef' });
-
-  assert.equal('branchHeadAtTake' in event.payload, false);
-  assert.equal('branchHeadAtReturn' in event.payload, false);
-});
+// RETIRED (tsk-40m, docs/architect/doing-coordination-redesign.md): the
+// three tests this section used to hold all exercised `moveWork(..., to:
+// 'doing', expectedStatus: 'blocked'/'todo', ...)` specifically —
+// `blocked -> doing`/`todo -> doing` are retired edges (see
+// status-fsm.mjs's TRANSITIONS table), so that scenario no longer exists
+// to test. branchHeadAtTake/branchHeadAtReturn stamping for a real claim/
+// settle now lives on settleClaim's own enriched work.attempt payload
+// (store.mjs, folded by replay.mjs's work.attempt case), exercised
+// end-to-end by test/cli/fgos-return*.test.mjs and
+// test/runner/claim-port.test.mjs's real take/return flows — this file no
+// longer has a low-level moveWork-only unit test for these two fields in
+// isolation; the field-stamping code path itself is untouched, only the
+// edge these tests drove it through was retired.
 
 // --- delivered-event merge provenance (tsk-5dk) ---------------------------
 //
@@ -604,7 +605,7 @@ test('editWork accepts a kind patch while status is still todo', () => {
 test('editWork refuses a kind patch once status has left todo (doing)', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'kind-doing', { kind: 'task' });
-  moveWork(dir, { id: 'kind-doing', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'kind-doing');
   assert.throws(
     () => editWork(dir, { id: 'kind-doing', patch: { kind: 'bug' } }),
     /kind.*status is "doing", not "todo"/s,
@@ -616,7 +617,7 @@ test('editWork refuses a kind patch once status has left todo (doing)', () => {
 test('editWork refuses a kind patch on a delivered item too (not just doing)', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'kind-delivered', { kind: 'task' });
-  moveWork(dir, { id: 'kind-delivered', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'kind-delivered');
   moveWork(dir, { id: 'kind-delivered', to: 'delivered', expectedStatus: 'doing' });
   assert.throws(
     () => editWork(dir, { id: 'kind-delivered', patch: { kind: 'bug' } }),
@@ -627,7 +628,7 @@ test('editWork refuses a kind patch on a delivered item too (not just doing)', (
 test('editWork still accepts an unrelated-field patch once status has left todo — the kind lock is scoped to kind alone', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'kind-lock-scoped', { kind: 'task' });
-  moveWork(dir, { id: 'kind-lock-scoped', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'kind-lock-scoped');
   editWork(dir, { id: 'kind-lock-scoped', patch: { priority: 5 } });
   assert.equal(listWork(dir).work['kind-lock-scoped'].priority, 5);
 });
@@ -803,7 +804,7 @@ test('addWork under concurrent OS processes racing the SAME id: exactly one succ
 test('moveWork under concurrent OS processes racing the SAME expectedStatus CAS on the SAME id: exactly one succeeds, the rest conflict, and the log has exactly one matching work.move', async () => {
   const dir = tmpDir();
   addSampleWork(dir, 'race-move');
-  moveWork(dir, { id: 'race-move', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'race-move');
   const N = 6;
 
   const results = await raceAcrossProcesses(
@@ -944,7 +945,7 @@ test('writeView serializes view content only once per mutation (tsk-37d)', () =>
 test('moveWork refuses a doing->delivered close when a populated acceptance clause has no evidence: precondition, item stays "doing", no event written', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'cos-missing-evidence', { acceptance: [{ text: 'field round-trips' }] });
-  moveWork(dir, { id: 'cos-missing-evidence', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'cos-missing-evidence');
 
   const before = readRawEvents(dir).length;
   assert.throws(
@@ -968,7 +969,7 @@ test('moveWork allows a doing->delivered close when every acceptance clause has 
       { text: 'CLI exits 0', evidence: realEvidence },
     ],
   });
-  moveWork(dir, { id: 'cos-all-evidenced', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'cos-all-evidenced');
 
   const { view } = moveWork(dir, { id: 'cos-all-evidenced', to: 'delivered', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['cos-all-evidenced'].status, 'delivered');
@@ -978,8 +979,8 @@ test('moveWork leaves a doing->delivered close completely unaffected when accept
   const dir = tmpDir();
   addSampleWork(dir, 'cos-absent'); // no `acceptance` field at all
   addSampleWork(dir, 'cos-empty', { acceptance: [] });
-  moveWork(dir, { id: 'cos-absent', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'cos-empty', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'cos-absent');
+  moveToDurableDoingForTest(dir, 'cos-empty');
 
   const { view: viewAbsent } = moveWork(dir, { id: 'cos-absent', to: 'delivered', expectedStatus: 'doing', role: 'human' });
   assert.equal(viewAbsent.work['cos-absent'].status, 'delivered');
@@ -991,7 +992,7 @@ test('moveWork leaves a doing->delivered close completely unaffected when accept
 test('moveWork re-reads fresh state on retry: editing in the missing evidence after a refusal, then retrying, succeeds — no cached verdict', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'cos-retry', { acceptance: [{ text: 'field round-trips' }] });
-  moveWork(dir, { id: 'cos-retry', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'cos-retry');
 
   assert.throws(
     () => moveWork(dir, { id: 'cos-retry', to: 'delivered', expectedStatus: 'doing' }),
@@ -1033,7 +1034,7 @@ test('tsk-2p6: moveWork refuses a doing->delivered close for a risk:heavy item w
   const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-missing-');
   execFileSync('git', ['branch', 'fgw/heavy-no-plan'], { cwd: repoRoot });
   addSampleWork(dir, 'heavy-no-plan', { risk: 'heavy' });
-  moveWork(dir, { id: 'heavy-no-plan', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'heavy-no-plan');
 
   const before = readRawEvents(dir).length;
   assert.throws(
@@ -1054,7 +1055,7 @@ test('tsk-2p6: moveWork allows a doing->delivered close for a risk:heavy item th
   execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
 
   addSampleWork(dir, 'heavy-with-plan', { risk: 'heavy' });
-  moveWork(dir, { id: 'heavy-with-plan', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'heavy-with-plan');
   const { view } = moveWork(dir, { id: 'heavy-with-plan', to: 'delivered', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['heavy-with-plan'].status, 'delivered');
 });
@@ -1069,7 +1070,7 @@ test('tsk-2p6: moveWork allows a doing->delivered close for a risk:heavy item wh
   execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
 
   addSampleWork(dir, 'heavy-docsref', { risk: 'heavy', docsRef: 'docs/history/custom-feature-name/' });
-  moveWork(dir, { id: 'heavy-docsref', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'heavy-docsref');
   const { view } = moveWork(dir, { id: 'heavy-docsref', to: 'delivered', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['heavy-docsref'].status, 'delivered');
 });
@@ -1078,7 +1079,7 @@ test('tsk-2p6: moveWork never gates a light/standard-risk item on plan.md — by
   const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-light-');
   execFileSync('git', ['branch', 'fgw/light-item'], { cwd: repoRoot });
   addSampleWork(dir, 'light-item', { risk: 'light' });
-  moveWork(dir, { id: 'light-item', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'light-item');
   const { view } = moveWork(dir, { id: 'light-item', to: 'delivered', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['light-item'].status, 'delivered');
 });
@@ -1154,10 +1155,11 @@ test('setFocus throws StoreError("validation") when the item exists but has no g
 test("editWork, moveWork and moveStage each stamp the event payload with writer id/source, never a joined string, never routed through a validator", () => {
   const dir = tmpDir();
   addSampleWork(dir, "writer-a", { stage: "exploring" });
+  moveToDurableDoingForTest(dir, "writer-a");
 
   const doors = [
     { name: "editWork", call: () => editWork(dir, { id: "writer-a", patch: { title: "Writer A edited" } }) },
-    { name: "moveWork", call: () => moveWork(dir, { id: "writer-a", to: "doing", expectedStatus: "todo" }) },
+    { name: "moveWork", call: () => moveWork(dir, { id: "writer-a", to: "blocked", expectedStatus: "doing" }) },
     { name: "moveStage", call: () => moveStage(dir, { id: "writer-a", to: "decompose" }) },
   ];
 

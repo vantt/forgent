@@ -62,6 +62,7 @@ import {
   makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStage,
+  moveToDurableDoingForTest,
   moveWork,
   os,
   path,
@@ -124,7 +125,10 @@ test('a full add -> edit -> move -> edit CLI lifecycle never appends to the froz
 
   assert.equal(addOk(cwd, 'tsk-write-path-guard').status, 0);
   assert.equal(run(cwd, ['edit', 'tsk-write-path-guard', '--verify', 'echo first']).status, 0);
-  assert.equal(run(cwd, ['move', 'tsk-write-path-guard', '--to', 'doing']).status, 0);
+  // tsk-40m: blocked stands in for the retired todo->doing edge -- this
+  // test only cares that a work.move event lands in the shard, not which
+  // status it targets.
+  assert.equal(run(cwd, ['move', 'tsk-write-path-guard', '--to', 'blocked']).status, 0);
   assert.equal(run(cwd, ['edit', 'tsk-write-path-guard', '--verify', 'echo second']).status, 0);
 
   const baselineAfter = fs.readFileSync(logPath(cwd), 'utf8');
@@ -182,7 +186,10 @@ test('edit rejects a patch targeting id/status/stage/domain, exit 4, no event wr
 test('edit succeeds identically regardless of the item current status', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'edit-any-status');
-  run(cwd, ['move', 'edit-any-status', '--to', 'doing']);
+  // tsk-40m: tmpCwd() has no real git repo, so `take` (which computes a
+  // real HEAD) can't be used here -- raw-inject the durable 'doing' status
+  // this test actually asserts against instead.
+  moveToDurableDoingForTest(cwd, 'edit-any-status');
   const result = run(cwd, ['edit', 'edit-any-status', '--risk', 'heavy']);
   assert.equal(result.status, 0);
   const item = stateView(cwd).work['edit-any-status'];
@@ -345,7 +352,7 @@ test('edit --verify-from-children generates a jq command listing all direct chil
   assert.equal(run(cwd, ['add', 'child-2', '--title', 'Child 2', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--parent', 'parent-x', '--description', 'tsk-535 fixture description.']).status, 0);
   // child-1 already resolved (delivered, not yet cleanup/done) -- the
   // resolved-set default (D3) must still count it, unlike a strict-done check.
-  assert.equal(run(cwd, ['move', 'child-1', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-1', '--to', 'blocked']).status, 0); // tsk-40m: blocked stands in for the retired todo->doing edge
   assert.equal(run(cwd, ['move', 'child-1', '--to', 'delivered']).status, 0);
 
   // Run the edit itself with process cwd INSIDE the linked worktree, while
@@ -394,9 +401,9 @@ test("edit --verify-from-children's generated jq expression correctly returns tr
   assert.equal(run(cwd, ['add', 'child-r1', '--title', 'Child 1', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--parent', 'parent-all-resolved', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['add', 'child-r2', '--title', 'Child 2', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--parent', 'parent-all-resolved', '--description', 'tsk-535 fixture description.']).status, 0);
   // child-r1 delivered, child-r2 cleanup -- both resolved-set, neither strict-done.
-  assert.equal(run(cwd, ['move', 'child-r1', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r1', '--to', 'blocked']).status, 0); // tsk-40m: blocked stands in for the retired todo->doing edge
   assert.equal(run(cwd, ['move', 'child-r1', '--to', 'delivered']).status, 0);
-  assert.equal(run(cwd, ['move', 'child-r2', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r2', '--to', 'blocked']).status, 0); // tsk-40m: blocked stands in for the retired todo->doing edge
   assert.equal(run(cwd, ['move', 'child-r2', '--to', 'delivered']).status, 0);
   assert.equal(run(cwd, ['move', 'child-r2', '--to', 'retrospective']).status, 0);
   assert.equal(run(cwd, ['move', 'child-r2', '--to', 'cleanup']).status, 0);
@@ -415,7 +422,7 @@ test("edit --verify-from-children's generated jq expression correctly returns fa
   assert.equal(run(cwd, ['add', 'child-p1', '--title', 'Child 1', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--parent', 'parent-partial', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['add', 'child-p2', '--title', 'Child 2', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--parent', 'parent-partial', '--description', 'tsk-535 fixture description.']).status, 0);
   // child-p1 resolved (delivered); child-p2 stays at todo -- NOT resolved.
-  assert.equal(run(cwd, ['move', 'child-p1', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-p1', '--to', 'blocked']).status, 0); // tsk-40m: blocked stands in for the retired todo->doing edge
   assert.equal(run(cwd, ['move', 'child-p1', '--to', 'delivered']).status, 0);
   linkFgosBinInto(cwd);
 

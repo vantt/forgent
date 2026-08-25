@@ -62,6 +62,7 @@ import {
   makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStage,
+  moveToDurableDoingForTest,
   moveWork,
   os,
   path,
@@ -188,7 +189,9 @@ test('move awaiting-approval -> done rejects a CAS expected-status mismatch as c
 test('move --reason on a non-rejection edge is accepted but ignored, not embedded in the payload', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'reason-ignored-item');
-  const result = run(cwd, ['move', 'reason-ignored-item', '--to', 'doing', '--reason', 'not a rejection']);
+  // tsk-40m: todo -> doing is retired -- blocked stands in as the generic
+  // "some non-rejection edge" example this test actually needs.
+  const result = run(cwd, ['move', 'reason-ignored-item', '--to', 'blocked', '--reason', 'not a rejection']);
   assert.equal(result.status, 0);
 
   const lines = eventLines(cwd);
@@ -276,7 +279,7 @@ test('ask --rationale and answer --rationale both persist on gates[id], neither 
 test('ask/answer round-trip on a doing item: answer resumes to doing, preserving the held claim (claim-lock §5.1)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'gated-doing-item');
-  assert.equal(run(cwd, ['move', 'gated-doing-item', '--to', 'doing']).status, 0);
+  moveToDurableDoingForTest(cwd, 'gated-doing-item');
 
   const askResult = run(cwd, ['ask', 'gated-doing-item', '--text', VALID_ASK_TEXT]);
   assert.equal(askResult.status, 0);
@@ -300,7 +303,7 @@ test('ask/answer round-trip on a doing item: answer resumes to doing, preserving
 test('ask without --text is rejected as validation, exit 4, no event written, item stays in its prior status', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'no-text-ask');
-  run(cwd, ['move', 'no-text-ask', '--to', 'doing']);
+  moveToDurableDoingForTest(cwd, 'no-text-ask');
   const before = eventLines(cwd).length;
 
   const result = run(cwd, ['ask', 'no-text-ask']);
@@ -325,7 +328,7 @@ test('answer on an item that is not awaiting-human is rejected as precondition, 
 test('ask rejects a CAS expected-status mismatch as conflict, exit 3, no event written', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'cas-ask-item');
-  run(cwd, ['move', 'cas-ask-item', '--to', 'doing']);
+  moveToDurableDoingForTest(cwd, 'cas-ask-item');
   const before = eventLines(cwd).length;
 
   const result = run(cwd, ['ask', 'cas-ask-item', '--text', VALID_ASK_TEXT, '--expect', 'todo']);

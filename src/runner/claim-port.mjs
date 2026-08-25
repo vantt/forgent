@@ -37,19 +37,22 @@ function gitAt(repoRoot, args) {
 import { DEFAULTS } from '../state/work.mjs';
 
 /**
- * Read `releaseTrigger` off the MOST RECENT `work.move` event that landed
- * `id` on `to: 'todo'` — never off a durable item field, so a later
+ * Read `releaseTrigger` off the MOST RECENT settle-to-'todo' event for
+ * `id` — a `work.move(to: 'todo')`, or (tsk-40m: a same-state settle whose
+ * preClaimStatus was already 'todo' writes no work.move at all) a
+ * `work.attempt(to: 'todo')` — never off a durable item field, so a later
  * reject/verify-fail-park (which never carries this marker) always wins
  * over an earlier claim-lock §3b release's marker instead of the stale
  * value silently surviving (tsk-2zv). Returns `undefined` when the item
- * has never moved to `todo`, or when its latest such move didn't carry
+ * has never settled to `todo`, or when its latest such settle didn't carry
  * the marker (reject, verify-fail park, or a genuinely fresh take).
  */
 function latestTodoReleaseTrigger(events, id) {
   let marker;
   for (const event of events) {
     if (!event || !event.payload) continue;
-    if (event.type === 'work.move' && event.payload.id === id && event.payload.to === 'todo') {
+    if (event.payload.id !== id || event.payload.to !== 'todo') continue;
+    if (event.type === 'work.move' || event.type === 'work.attempt') {
       marker = event.payload.releaseTrigger;
     }
   }
@@ -211,14 +214,20 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       );
     }
 
+    // tsk-40m (docs/architect/doing-coordination-redesign.md): claim time no
+    // longer writes a durable work.move(->doing), so the ORIGINAL claim's
+    // branchHeadAtTake no longer lands on the item's own sticky top-level
+    // field (that field is only ever set by a work.move payload) — it now
+    // lives on the settle's own work.attempt, folded into item.lastAttempt.
+    const priorBranchHeadAtTake = item.lastAttempt?.branchHeadAtTake;
     const isClaimLockReclaim = branchAlreadyExists
-      && typeof item.branchHeadAtTake === 'string'
-      && item.branchHeadAtTake
+      && typeof priorBranchHeadAtTake === 'string'
+      && priorBranchHeadAtTake
       && latestTodoReleaseTrigger(rawEvents, id) === 'claim-lock-3b';
 
     let branchHeadAtTake;
     if (isClaimLockReclaim) {
-      branchHeadAtTake = item.branchHeadAtTake;
+      branchHeadAtTake = priorBranchHeadAtTake;
     } else if (branchAlreadyExists) {
       branchHeadAtTake = gitAt(repoRoot, ['rev-parse', branch]).trim();
     } else if (rootBranchExists) {

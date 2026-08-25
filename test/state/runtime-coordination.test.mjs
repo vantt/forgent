@@ -58,7 +58,7 @@ test('acquireClaim and releaseClaim lifecycle', () => {
   assert.equal(viewAfter.work['tsk-1'].activeClaim, undefined);
 });
 
-test('settleClaim appends 3-event segment and releases claim', () => {
+test('settleClaim settles directly (no durable intermediate doing) and releases claim', () => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 2', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
 
@@ -93,11 +93,23 @@ test('settleClaim appends 3-event segment and releases claim', () => {
   assert.equal(res.event.type, 'work.move');
   assert.equal(res.event.payload.to, 'awaiting-approval');
 
-  // Check event log has work.move(->doing), work.attempt, work.move(doing->awaiting-approval)
   const events = listWork(dir);
   assert.equal(events.work['tsk-1'].status, 'awaiting-approval');
   assert.ok(events.work['tsk-1'].lastAttempt);
   assert.equal(events.work['tsk-1'].lastAttempt.result, 'success');
+  assert.equal(events.work['tsk-1'].lastAttempt.from, 'todo');
+  assert.equal(events.work['tsk-1'].lastAttempt.to, 'awaiting-approval');
+
+  // tsk-40m (docs/architect/doing-coordination-redesign.md §7.3/§9.2):
+  // the durable log carries exactly work.attempt + ONE work.move, straight
+  // from preClaimStatus to finalStatus -- no durable work.move(->doing)
+  // leg at all.
+  const raw = readRawEvents(dir).filter((e) => e.payload?.id === 'tsk-1');
+  const moves = raw.filter((e) => e.type === 'work.move');
+  assert.equal(moves.length, 1, 'exactly one work.move -- no durable intermediate doing leg');
+  assert.equal(moves[0].payload.from, 'todo');
+  assert.equal(moves[0].payload.to, 'awaiting-approval');
+  assert.equal(raw.filter((e) => e.type === 'work.attempt').length, 1);
 });
 
 test('settleClaim CAS validation failure', () => {
@@ -531,4 +543,33 @@ test('settleClaim to finalStatus:"awaiting-human" with no ask writes NOTHING dur
   assert.equal(events.filter((e) => e.type === 'work.attempt').length, 0, 'no orphaned work.attempt must land durably');
   assert.ok(readClaim(dir, 'tsk-1'), 'the claim must survive a missing-ask attempt, not be silently dropped');
   assert.equal(readClaim(dir, 'tsk-1').claimId, claim.claimId);
+});
+
+// tsk-40m (docs/architect/doing-coordination-redesign.md §7.3): a
+// same-state settle (finalStatus === preClaimStatus -- e.g. a branch-take
+// item failing verify again while already 'blocked') has nothing to
+// durably move: status-fsm.mjs has no self-loop edges by design. The
+// work.attempt is the complete durable record; there is no work.move at
+// all, and the returned event is the attempt itself (still real, still
+// seq-bearing).
+test('settleClaim with finalStatus === preClaimStatus writes only work.attempt, no work.move at all', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 18', kind: 'feature', status: 'blocked', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'runner', preClaimStatus: 'blocked' });
+
+  const res = settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'blocked', reason: 'verify-fail', role: 'runner' });
+
+  assert.equal(typeof res.event.seq, 'number');
+  assert.equal(res.event.type, 'work.attempt', 'with nothing to durably move, the attempt itself is the returned final event');
+
+  const raw = readRawEvents(dir).filter((e) => e.payload?.id === 'tsk-1');
+  assert.equal(raw.filter((e) => e.type === 'work.move').length, 0, 'a same-state settle writes no work.move at all');
+  assert.equal(raw.filter((e) => e.type === 'work.attempt').length, 1);
+  assert.equal(raw[raw.length - 1].payload.from, 'blocked');
+  assert.equal(raw[raw.length - 1].payload.to, 'blocked');
+  assert.equal(raw[raw.length - 1].payload.reason, 'verify-fail');
+
+  assert.equal(listWork(dir).work['tsk-1'].status, 'blocked');
+  assert.equal(listWork(dir).work['tsk-1'].lastAttempt.reason, 'verify-fail');
+  assert.equal(readClaim(dir, 'tsk-1'), null, 'the claim must still be released on a successful same-state settle');
 });

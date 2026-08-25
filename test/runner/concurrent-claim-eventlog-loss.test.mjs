@@ -68,7 +68,9 @@ test('explicitly rules out Root Cause A (refreshView outside lock) and Root Caus
 
     const logPath = path.join(fgosDir, 'events.jsonl');
     addWork(fgosDir, { id: 'item-rc', title: 'Root Cause Check', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-    moveWork(fgosDir, { id: 'item-rc', to: 'doing', expectedStatus: 'todo', role: 'session' });
+    // tsk-40m: blocked stands in for the retired todo->doing edge -- this
+    // test only needs SOME move event to check seq contiguity.
+    moveWork(fgosDir, { id: 'item-rc', to: 'blocked', expectedStatus: 'todo', role: 'session' });
 
     const contiguity = checkSeqContiguity(logPath);
     assert.equal(contiguity.ok, true, 'Root Cause A & B ruled out: event log must have no gaps or duplicates');
@@ -210,7 +212,8 @@ process.exit(0);
 `;
     fs.writeFileSync(childScriptPath, childScriptContent, 'utf8');
 
-    moveWork(fgosDir, { id: 'task-guard-1', to: 'doing', expectedStatus: 'todo', role: 'session' });
+    // tsk-40m: blocked stands in for the retired todo->doing edge.
+    moveWork(fgosDir, { id: 'task-guard-1', to: 'blocked', expectedStatus: 'todo', role: 'session' });
     const writerFileName = soleWriterFile(fgosDir);
     const fileKey = `events/${writerFileName}`;
     const writerFilePath = path.join(fgosDir, 'events', writerFileName);
@@ -221,7 +224,7 @@ process.exit(0);
     const markAfterFirst = readGuardMark(guardPath, fileKey);
     assert.ok(markAfterFirst !== null, 'guard mark must be set after first check');
 
-    moveWork(fgosDir, { id: 'task-guard-2', to: 'doing', expectedStatus: 'todo', role: 'session' });
+    moveWork(fgosDir, { id: 'task-guard-2', to: 'blocked', expectedStatus: 'todo', role: 'session' });
 
     const childEnv = { ...process.env };
     delete childEnv.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;

@@ -62,6 +62,7 @@ import {
   makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStage,
+  moveToDurableDoingForTest,
   moveWork,
   os,
   path,
@@ -172,7 +173,7 @@ test('stale verb: a freshly-claimed doing item is NOT stale; a valid envelope + 
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(addOk(cwd, 'a').status, 0);
-  assert.equal(run(cwd, ['move', 'a', '--to', 'doing', '--expect', 'todo']).status, 0);
+  moveToDurableDoingForTest(cwd, 'a');
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['stale']);
@@ -202,7 +203,7 @@ test('stale verb: postDelivery is additive — existing stale/thresholds shape i
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(addOk(cwd, 'a').status, 0);
-  assert.equal(run(cwd, ['move', 'a', '--to', 'doing', '--expect', 'todo']).status, 0);
+  moveToDurableDoingForTest(cwd, 'a');
 
   const data = envelopeData(run(cwd, ['stale']).stdout);
   assert.deepEqual(data.stale, [], 'existing doing-advisory shape untouched');
@@ -216,7 +217,7 @@ test('stale verb: a just-delivered item is NOT flagged in postDelivery (well wit
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
   addOk(cwd, 'just-delivered');
-  run(cwd, ['move', 'just-delivered', '--to', 'doing']);
+  moveToDurableDoingForTest(cwd, 'just-delivered');
   run(cwd, ['move', 'just-delivered', '--to', 'delivered']);
 
   const before = eventLines(cwd).length;
@@ -455,11 +456,12 @@ test('list --all --json with NO pagination flags stays byte-identical -- herdr-p
   // never gain tsk-483's new scoping, matching herdr-plugin's own real,
   // vendored call sites (herdr-plugin/src/fgos.rs, confirmed directly:
   // every one of its 3 call sites is exactly ["list", "--all", "--json"]).
-  // 'list-protected-done' carries TWO: its own explicit decision above,
-  // plus the tsk-280 --skip-return-guard override toProposed's own
-  // doing -> awaiting-approval move now logs.
+  // 'list-protected-done' carries its own explicit decision above --
+  // tsk-40m: toProposed no longer claims through 'doing' at all (a direct
+  // todo -> awaiting-approval move, the redesign's own new edge), so there
+  // is no --skip-return-guard override left to log a second decision for.
   assert.deepEqual(
     data.decisions.map((d) => d.id).sort(),
-    ['list-protected-done', 'list-protected-done', 'list-protected-open'],
+    ['list-protected-done', 'list-protected-open'],
   );
 });

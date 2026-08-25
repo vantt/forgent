@@ -270,7 +270,8 @@ test('done is terminal via the real CLI: moving out of done is refused as precon
 test('cleanup (to blocked branch) releases main-checkout lock held by caller session (tsk-5zv)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'cleanup-lock-blocked');
-  run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'doing']);
+  // tsk-40m: blocked stands in for the retired todo->doing edge.
+  run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'blocked']);
   run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'delivered']);
   run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'retrospective']);
   run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'cleanup']);
@@ -319,7 +320,8 @@ test('compound releases main-checkout lock held by caller session (tsk-5zv)', ()
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   addOk(cwd, 'compound-lock-item');
-  run(cwd, ['move', 'compound-lock-item', '--to', 'doing']);
+  // tsk-40m: blocked stands in for the retired todo->doing edge.
+  run(cwd, ['move', 'compound-lock-item', '--to', 'blocked']);
   run(cwd, ['move', 'compound-lock-item', '--to', 'delivered']);
   run(cwd, ['move', 'compound-lock-item', '--to', 'retrospective']);
 

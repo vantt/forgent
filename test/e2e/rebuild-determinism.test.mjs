@@ -83,19 +83,22 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
 
   // Move each item through a distinct path, always with --expect (CAS),
   // so the whole journey proves precondition + CAS on real transitions.
-  assert.equal(move(cwd, 'a', 'doing', 'todo').status, 0);
+  // tsk-40m (docs/architect/doing-coordination-redesign.md): todo -> doing
+  // is retired -- no real claim needed here (no branch), straight
+  // todo -> awaiting-approval via the redesign's own new direct edge.
+  assert.equal(move(cwd, 'a', 'awaiting-approval', 'todo').status, 0);
   // done's one remaining door in is the sequential delivered->retrospective
   // ->cleanup->done chain (work-item-status-delivered-retrospective-cleanup
   // D1/D2/D10) — walk it with --expect at each step.
-  assert.equal(move(cwd, 'a', 'awaiting-approval', 'doing').status, 0);
   assert.equal(move(cwd, 'a', 'delivered', 'awaiting-approval').status, 0);
   assert.equal(move(cwd, 'a', 'retrospective', 'delivered').status, 0);
   assert.equal(move(cwd, 'a', 'cleanup', 'retrospective').status, 0);
   assert.equal(move(cwd, 'a', 'done', 'cleanup').status, 0);
 
-  assert.equal(move(cwd, 'b', 'doing', 'todo').status, 0);
-  assert.equal(move(cwd, 'b', 'blocked', 'doing').status, 0);
-  assert.equal(move(cwd, 'b', 'doing', 'blocked').status, 0);
+  // tsk-40m: blocked stands in for the retired doing round-trip.
+  assert.equal(move(cwd, 'b', 'blocked', 'todo').status, 0);
+  assert.equal(move(cwd, 'b', 'todo', 'blocked').status, 0);
+  assert.equal(move(cwd, 'b', 'blocked', 'todo').status, 0);
 
   assert.equal(move(cwd, 'c', 'blocked', 'todo').status, 0);
   assert.equal(move(cwd, 'c', 'todo', 'blocked').status, 0);
@@ -104,27 +107,29 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
 
   // `ready` (per phase-2-routing-5): a pure read, exercised mid-journey —
   // it must reflect the frontier at this exact point (only `a` is `done`;
-  // `b` is `doing`, `c` is `blocked`, neither is ready) and must never
+  // `b` and `c` are both `blocked`, neither is ready) and must never
   // perturb the log the determinism check below depends on.
   const logBeforeReady = fs.readFileSync(logPath(cwd), 'utf8');
   const readyResult = run(cwd, ['ready']);
   assert.equal(readyResult.status, 0);
   const ready = envelopeData(readyResult.stdout);
   assert.ok(!ready.some((item) => item.id === 'a'), 'a is done, not todo — never in the frontier');
-  assert.ok(!ready.some((item) => item.id === 'b'), 'b is doing, not ready');
+  assert.ok(!ready.some((item) => item.id === 'b'), 'b is blocked, not ready');
   assert.ok(!ready.some((item) => item.id === 'c'), 'c is blocked, not ready');
   assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBeforeReady, 'ready must not append any event');
 
   const before = stateView(cwd);
   assert.equal(before.work.a.status, 'done');
-  assert.equal(before.work.b.status, 'doing');
+  assert.equal(before.work.b.status, 'blocked');
   assert.equal(before.work.c.status, 'todo');
   assert.equal(before.work.b.title, 'Tiêu đề tiếng Việt — 日本語タイトル 🎉');
   assert.deepEqual(before.work.c.deps, ['a', 'b']);
-  // 2, not 1: the explicit decision above, plus the tsk-280
-  // --skip-return-guard override the move() helper logs for item 'a's own
-  // doing -> awaiting-approval step (line 85).
-  assert.equal(before.decisions.length, 2);
+  // tsk-40m: just the explicit decision above -- item 'a's own
+  // todo -> awaiting-approval step no longer passes through 'doing' at
+  // all, so the --skip-return-guard flag the move() helper still sends is
+  // a no-op (the guard it bypasses only ever fires when status IS 'doing'),
+  // logging no second decision.
+  assert.equal(before.decisions.length, 1);
 
   fs.rmSync(viewPath(cwd));
   assert.ok(!fs.existsSync(viewPath(cwd)));
@@ -149,19 +154,20 @@ test('rebuild-determinism: CAS conflict — a stale --expect on the second of tw
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(add(cwd, 'cas-e2e').status, 0);
 
-  const first = move(cwd, 'cas-e2e', 'doing', 'todo');
+  // tsk-40m: blocked stands in for the retired todo->doing edge.
+  const first = move(cwd, 'cas-e2e', 'blocked', 'todo');
   assert.equal(first.status, 0);
 
   const eventsBefore = fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean).length;
 
   // Same stale --expect ("todo") reused after the item already moved to
-  // "doing" — the CLI must refuse as a CAS conflict, not overwrite blindly.
+  // "blocked" — the CLI must refuse as a CAS conflict, not overwrite blindly.
   const second = move(cwd, 'cas-e2e', 'done', 'todo');
   assert.equal(second.status, 3);
 
   const eventsAfter = fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean).length;
   assert.equal(eventsAfter, eventsBefore);
-  assert.equal(stateView(cwd).work['cas-e2e'].status, 'doing');
+  assert.equal(stateView(cwd).work['cas-e2e'].status, 'blocked');
 });
 
 // Tầng A/T2 (TA-D2/TA-D11/TA-D12): a fresh store's writes never land in

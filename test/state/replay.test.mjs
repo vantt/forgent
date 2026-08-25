@@ -932,7 +932,7 @@ test('rebuildView via the zero-read fast path still returns a view deep-equal to
   const dir = tmpFgosDir();
   addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   const logPath = logPathOf(dir);
-  moveWork(dir, { id: 'a', to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id: 'a', to: 'blocked', expectedStatus: 'todo' });
 
   const viaFastPath = rebuildView(logPath);
   const freshFold = foldEvents(readEventsWhole(logPath));
@@ -1112,7 +1112,7 @@ test('determinism: the zero-read fast path\'s round-tripped view is deep-equal t
     verify: 'npm test', tier: 'standard', description: 'a full description', footprint: ['src/a.mjs'],
   });
   const logPath = logPathOf(dir);
-  moveWork(dir, { id: 'a', to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id: 'a', to: 'blocked', expectedStatus: 'todo' });
 
   const viaFastPath = rebuildView(logPath); // exact-match zero-read shortcut
   const freshFold = foldEvents(readEventsWhole(logPath));
@@ -1304,7 +1304,7 @@ test('rebuildViewFromDir falls back to a full read when a new writer file appear
 test('rebuildViewFromDir falls back to a full read when a per-writer file shrank since the snapshot', () => {
   const dir = tmpFgosDir();
   addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  moveWork(dir, { id: 'a', to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id: 'a', to: 'blocked', expectedStatus: 'todo' });
   const logPath = logPathOf(dir);
   const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
   fs.writeFileSync(logPath, `${lines[0]}\n`, 'utf8'); // truncate back to just the add -- shrank relative to the last snapshot

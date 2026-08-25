@@ -217,12 +217,28 @@ export function isWorkingTreeClean(repoRoot, ownFileSet = null, { scope = 'whole
     .every((line) => isFgosOnlyStatusLine(line, prefix, ownFileSet));
 }
 
+/**
+ * Resolve the pull-door take/return head pair for `item` — tsk-40m (docs/
+ * architect/doing-coordination-redesign.md): `headAtTake`/`headAtReturn` are
+ * top-level sticky fields only ever set by a durable work.move payload,
+ * which claim time no longer writes; the settle's own work.attempt now
+ * carries them instead, folded into `item.lastAttempt`. Checked as a
+ * fallback, never instead of, so a genuinely legacy pre-migration record
+ * (top-level field set, no lastAttempt) still resolves exactly as before.
+ */
+function resolvePullDoorHeads(item) {
+  const headAtTake = item.headAtTake ?? item.lastAttempt?.headAtTake;
+  const headAtReturn = item.headAtReturn ?? item.lastAttempt?.headAtReturn;
+  return { headAtTake, headAtReturn };
+}
+
 /** Classify a proposed `item` into its diff/merge source (see module doc). */
 export function classifySource(repoRoot, item) {
   if (branchExists(repoRoot, branchNameFor(item.id))) {
     return 'runner';
   }
-  if (typeof item.headAtTake === 'string' && item.headAtTake && typeof item.headAtReturn === 'string' && item.headAtReturn) {
+  const { headAtTake, headAtReturn } = resolvePullDoorHeads(item);
+  if (typeof headAtTake === 'string' && headAtTake && typeof headAtReturn === 'string' && headAtReturn) {
     return 'pull';
   }
   return 'legacy';
@@ -266,7 +282,8 @@ export function reviewDiff(repoRoot, item, opts = {}) {
   }
 
   if (source === 'pull') {
-    const range = `${item.headAtTake}..${item.headAtReturn}`;
+    const { headAtTake, headAtReturn } = resolvePullDoorHeads(item);
+    const range = `${headAtTake}..${headAtReturn}`;
     let diff;
     let commitCount;
     try {

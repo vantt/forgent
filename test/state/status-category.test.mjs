@@ -60,12 +60,15 @@ The deployment configuration impacts system availability and resource allocation
 // D2/D3's exact map for the six front-segment statuses. Each case walks the
 // item through a real, legal status-fsm.mjs edge to reach `to`, so this also
 // pins that the schema task made zero changes to which edges are legal.
+// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+// is retired from status-fsm.mjs's TRANSITIONS table — nothing durably
+// writes INTO `doing` anymore (it is derived purely from the active-claim
+// overlay). There is therefore no durable `work.move` event landing on
+// `doing` left to stamp statusCategory onto for a fresh claim, so that case
+// is dropped from this table entirely rather than simulated — the other
+// cases below use `blocked` (also mapped to `in-progress`, D2/D3's own map)
+// wherever a "some in-progress status" precondition/target was needed.
 const FRONT_SEGMENT_CASES = [
-  {
-    to: 'doing',
-    category: 'in-progress',
-    move: (dir, id) => moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' }),
-  },
   {
     to: 'blocked',
     category: 'in-progress',
@@ -77,12 +80,12 @@ const FRONT_SEGMENT_CASES = [
     move: (dir, id) => moveWork(dir, { id, to: 'awaiting-human', expectedStatus: 'todo', ask: VALID_ASK }),
   },
   {
+    // tsk-40m: reached directly from todo now (the redesign's own new
+    // direct edge, added for exactly settleClaim's fresh-claim settle) —
+    // no intermediate doing leg needed or possible.
     to: 'awaiting-approval',
     category: 'review',
-    move: (dir, id) => {
-      moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
-      return moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing' });
-    },
+    move: (dir, id) => moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'todo' }),
   },
   {
     to: 'wontfix',
@@ -90,13 +93,15 @@ const FRONT_SEGMENT_CASES = [
     move: (dir, id) => moveWork(dir, { id, to: 'wontfix', expectedStatus: 'todo' }),
   },
   {
-    // `todo` itself is reached by moving BACK to it — the claim-release edge
-    // (`doing -> todo`) needs no reason/ask, the cheapest legal round trip.
+    // `todo` itself is reached by moving BACK to it — `blocked -> todo`
+    // needs no reason/ask, the cheapest legal round trip (tsk-40m: `doing ->
+    // todo` is still legal but only for settleClaim's legacy fallback on a
+    // genuinely pre-migration durable-doing item, never a fresh test claim).
     to: 'todo',
     category: 'todo',
     move: (dir, id) => {
-      moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
-      return moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });
+      moveWork(dir, { id, to: 'blocked', expectedStatus: 'todo' });
+      return moveWork(dir, { id, to: 'todo', expectedStatus: 'blocked' });
     },
   },
 ];
@@ -120,9 +125,12 @@ test('moveWork into the four tail-segment statuses never writes statusCategory o
   const dir = tmpDir();
   const id = 'tail-chain';
   addSampleWork(dir, id);
-  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
+  // tsk-40m: `blocked` stands in for `doing` as the "some in-progress
+  // status" precondition — `todo -> doing` is retired, `blocked -> delivered`
+  // is an equally legal in-progress-segment entry into the tail chain.
+  moveWork(dir, { id, to: 'blocked', expectedStatus: 'todo' });
 
-  const delivered = moveWork(dir, { id, to: 'delivered', expectedStatus: 'doing' });
+  const delivered = moveWork(dir, { id, to: 'delivered', expectedStatus: 'blocked' });
   assert.equal(delivered.event.payload.statusCategory, undefined);
   assert.ok(!('statusCategory' in delivered.event.payload));
 
@@ -151,9 +159,11 @@ test('a stale statusCategory from the last front-segment move survives (uncleare
   const dir = tmpDir();
   const id = 'stale-category';
   addSampleWork(dir, id);
-  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
-  const { view: afterDelivered } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'doing' });
-  // 'doing' mapped to 'in-progress' on the earlier move; delivered's own
+  // tsk-40m: `blocked` stands in for `doing` (see the tail-segment test
+  // above) — same 'in-progress' category, same stale-survival behavior.
+  moveWork(dir, { id, to: 'blocked', expectedStatus: 'todo' });
+  const { view: afterDelivered } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'blocked' });
+  // 'blocked' mapped to 'in-progress' on the earlier move; delivered's own
   // move carried no statusCategory at all, so the fold left it untouched.
   assert.equal(afterDelivered.work[id].statusCategory, 'in-progress');
 });

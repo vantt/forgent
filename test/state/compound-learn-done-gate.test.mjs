@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { addWork, moveWork, FsmError } from '../../src/state/store.mjs';
+import { addWork, moveWork, FsmError, resolveWriterLogPath, rebuild } from '../../src/state/store.mjs';
+import { appendEvent } from '../../src/state/events.mjs';
 
 // The OLD stage-based "compound-learn done-gate" (RUL50) is RETIRED by
 // work-item-status-delivered-retrospective-cleanup D1/D4/D11 — done is no
@@ -50,11 +51,25 @@ function addSynthetic(dir, id) {
   });
 }
 
+// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+// is retired -- nothing durably writes INTO `doing` anymore. This file's
+// own tests need a durably-'doing' item purely as a PRECONDITION for
+// exercising a later moveWork(..., expectedStatus: 'doing') call — a raw
+// event write, bypassing transitionWork's own edge validation, is the
+// direct, honest way to get there (same technique test/state/store.test.mjs
+// uses).
+function moveToDurableDoingForTest(dir, id, from = 'todo') {
+  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
+  rebuild(dir);
+}
+
 // Walk doing -> delivered -> retrospective -> cleanup -> done for `id`,
-// returning the final { event, view }.
+// returning the final { event, view }. `blocked` stands in for `doing` as
+// the in-progress precondition (`blocked -> delivered` is an equally legal
+// edge) — this helper's own tests never assert the intermediate status.
 function walkToDone(dir, id) {
-  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id, to: 'delivered', expectedStatus: 'doing' });
+  moveWork(dir, { id, to: 'blocked', expectedStatus: 'todo' });
+  moveWork(dir, { id, to: 'delivered', expectedStatus: 'blocked' });
   moveWork(dir, { id, to: 'retrospective', expectedStatus: 'delivered' });
   moveWork(dir, { id, to: 'cleanup', expectedStatus: 'retrospective' });
   return moveWork(dir, { id, to: 'done', expectedStatus: 'cleanup', role: 'human' });
@@ -78,7 +93,7 @@ test("composeLearning (RUL21) still fires on done's one remaining door in (clean
 test('done is unreachable by skipping any step of the chain (doing->done, delivered->done are all gone)', () => {
   const dir = tmpDir();
   addCoding(dir, 'gate-no-skip');
-  moveWork(dir, { id: 'gate-no-skip', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'gate-no-skip');
   assert.throws(
     () => moveWork(dir, { id: 'gate-no-skip', to: 'done', expectedStatus: 'doing' }),
     (err) => err instanceof FsmError && err.category === 'precondition',
@@ -100,7 +115,7 @@ test('a synthetic-domain item (no compound-learn stage, no worktree) walks the S
 test('a stale expectedStatus mid-chain still yields conflict, not precondition — CAS ordering is preserved', () => {
   const dir = tmpDir();
   addCoding(dir, 'cas-order');
-  moveWork(dir, { id: 'cas-order', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'cas-order');
   moveWork(dir, { id: 'cas-order', to: 'delivered', expectedStatus: 'doing' });
 
   // The item is already at delivered — a stale --expect targeting doing

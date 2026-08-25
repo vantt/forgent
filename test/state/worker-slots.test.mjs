@@ -12,7 +12,8 @@ import {
   DEFAULT_WORKER_SLOT_CEILING,
 } from '../../src/state/worker-slots.mjs';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
-import { initStore, addWork, moveWork, listWork } from '../../src/state/store.mjs';
+import { initStore, addWork, listWork } from '../../src/state/store.mjs';
+import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 
 const FGOS_BIN = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
 
@@ -195,7 +196,11 @@ function captureThrow(fn) {
   assert.fail('expected a throw, got none');
 }
 
-/** `occupants` items are created and moved to `doing` so they hold slots. */
+/** `occupants` items are created and given an active runtime claim so they
+ * hold slots via the effective view (tsk-40m: `todo -> doing` is retired
+ * from status-fsm.mjs's TRANSITIONS -- nothing durably writes into `doing`
+ * anymore, not even a test's own direct moveWork shortcut; a real
+ * acquireClaim is the only way an item now reads as effective 'doing'). */
 function setup({ ceiling, occupants = 0 } = {}) {
   const repoRoot = initTempRepo();
   const dir = path.join(repoRoot, '.fgos');
@@ -204,7 +209,7 @@ function setup({ ceiling, occupants = 0 } = {}) {
   for (let n = 0; n < occupants; n++) {
     const id = `busy-${n}`;
     addWork(dir, { id, title: `Busy ${n}`, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-    moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', role: 'session' });
+    acquireClaim(dir, { id, actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
   }
   if (ceiling !== undefined) {
     fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ workerSlots: { ceiling } }));

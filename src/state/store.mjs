@@ -959,18 +959,22 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
 }
 
 /**
- * Settle an active runtime claim on item `id`, transitioning it to `finalStatus` (D2).
- * Validates active runtime claim ownership (claimId, writerId) and durable
- * revision (preClaimRevision) FRESH, inside the same held events.lock +
- * claims.lock critical section the write itself runs in — both legs of the
- * segment (the FSM-validating `transitionWork` calls for move1 and move3)
- * are built and proven valid BEFORE either is appended, so a bad
- * finalStatus/missing ask never leaves a partial segment on disk. Writes
- * the full segment [work.move(preClaimStatus->doing), work.attempt,
- * work.move(doing->finalStatus)] and releases the runtime claim in that
- * SAME critical section, immediately after the write succeeds — never on
- * a failed settle (a caught CAS/revision conflict leaves the claim
- * untouched for its owner to retry or reconcile).
+ * Settle an active runtime claim on item `id`, transitioning it DIRECTLY
+ * from its preClaimStatus to `finalStatus` (D2; docs/architect/
+ * doing-coordination-redesign.md §7.3/§9.2) — no durable intermediate
+ * work.move(->doing) leg. Validates active runtime claim ownership
+ * (claimId, writerId) and durable revision (preClaimRevision) FRESH,
+ * inside the same held events.lock + claims.lock critical section the
+ * write itself runs in — the FSM-validating `transitionWork` call is
+ * built and proven valid BEFORE anything is appended, so a bad
+ * finalStatus/missing ask never leaves a partial write on disk. Writes
+ * work.attempt (the complete durable record of the attempt: from/to/
+ * branch/head/timing) and, unless finalStatus === preClaimStatus (nothing
+ * to durably move), a single work.move(preClaimStatus->finalStatus) —
+ * then releases the runtime claim in that SAME critical section,
+ * immediately after the write succeeds — never on a failed settle (a
+ * caught CAS/revision conflict leaves the claim untouched for its owner
+ * to retry or reconcile).
  */
 export function settleClaim(dir, {
   id,
@@ -1079,83 +1083,88 @@ export function settleClaim(dir, {
         }
       }
 
-      // tsk-40m code-review finding (blocker, partial-segment write): BOTH
-      // legs of the segment must be built and pass transitionWork's own
-      // FSM-edge validation (throws on an invalid finalStatus, a missing
-      // `ask` for an awaiting-human edge, etc.) BEFORE either is appended.
-      // The old order built+appended move1 and the attempt, THEN built
-      // (and could throw validating) move3 — a bad finalStatus left move1
-      // and the attempt durably on disk with no matching terminal
-      // transition: a durable 'doing' with no active claim to explain it,
-      // and an attempt record with no settlement.
-      const move1Raw = transitionWork({ work, to: 'doing', expectedStatus: preClaimStatus });
-      move1Raw.payload.writer = writer;
-      if (freshClaim.claimRole || role) move1Raw.payload.role = freshClaim.claimRole || role;
-      if (freshClaim.headAtTake) move1Raw.payload.headAtTake = freshClaim.headAtTake;
-      if (freshClaim.branchHeadAtTake) move1Raw.payload.branchHeadAtTake = freshClaim.branchHeadAtTake;
-      if (freshClaim.claimTrigger) move1Raw.payload.claimTrigger = freshClaim.claimTrigger;
-      const cat1 = statusCategoryFor(getDomain(work.domain), 'doing');
-      if (cat1 !== undefined) move1Raw.payload.statusCategory = cat1;
-      const pr1 = parkReasonForStatus(getDomain(work.domain), 'doing');
-      if (pr1 !== undefined) move1Raw.payload.parkReason = pr1;
-
-      const intermediateWork = { ...work, status: 'doing' };
-      const move3Raw = transitionWork({
-        work: intermediateWork,
-        to: finalStatus,
-        expectedStatus: 'doing',
-        reason,
-        ask,
-        answer,
-      });
-      move3Raw.payload.writer = writer;
-      if (role !== undefined) move3Raw.payload.role = role;
-      const cat3 = statusCategoryFor(getDomain(work.domain), finalStatus);
-      if (cat3 !== undefined) move3Raw.payload.statusCategory = cat3;
-      const pr3 = parkReasonForStatus(getDomain(work.domain), finalStatus);
-      if (pr3 !== undefined) move3Raw.payload.parkReason = pr3;
-      if (headAtReturn !== undefined) move3Raw.payload.headAtReturn = headAtReturn;
-      if (releaseTrigger !== undefined) move3Raw.payload.releaseTrigger = releaseTrigger;
-      if (branchHeadAtReturn !== undefined) move3Raw.payload.branchHeadAtReturn = branchHeadAtReturn;
-      if (mergedSha !== undefined) move3Raw.payload.mergedSha = mergedSha;
-      if (mergedInto !== undefined) move3Raw.payload.mergedInto = mergedInto;
-      if (reason !== undefined) move3Raw.payload.reason = reason;
+      // tsk-40m (docs/architect/doing-coordination-redesign.md §7.3/§9.2,
+      // design target confirmed 2026-08-25): settle DIRECTLY from
+      // preClaimStatus to finalStatus — no durable intermediate
+      // work.move(->doing) leg at all. transitionWork validates the real
+      // edge (throws on an invalid finalStatus, a missing `ask` for an
+      // awaiting-human edge, etc.) BEFORE anything is appended, so a bad
+      // finalStatus never leaves a partial write on disk. A same-state
+      // settle (finalStatus === preClaimStatus — e.g. a branch-take item
+      // failing verify again while already 'blocked') has nothing to
+      // durably move: transitionWork has no self-loop edges by design, and
+      // status-fsm.mjs's TRANSITIONS table stays that way on purpose — the
+      // work.attempt below is the complete durable record of that attempt,
+      // with no accompanying work.move.
+      const isSameState = finalStatus === preClaimStatus;
+      let move3Raw = null;
+      if (!isSameState) {
+        move3Raw = transitionWork({
+          work,
+          to: finalStatus,
+          expectedStatus: preClaimStatus,
+          reason,
+          ask,
+          answer,
+        });
+        move3Raw.payload.writer = writer;
+        if (role !== undefined) move3Raw.payload.role = role;
+        const cat3 = statusCategoryFor(getDomain(work.domain), finalStatus);
+        if (cat3 !== undefined) move3Raw.payload.statusCategory = cat3;
+        const pr3 = parkReasonForStatus(getDomain(work.domain), finalStatus);
+        if (pr3 !== undefined) move3Raw.payload.parkReason = pr3;
+        if (headAtReturn !== undefined) move3Raw.payload.headAtReturn = headAtReturn;
+        if (releaseTrigger !== undefined) move3Raw.payload.releaseTrigger = releaseTrigger;
+        if (branchHeadAtReturn !== undefined) move3Raw.payload.branchHeadAtReturn = branchHeadAtReturn;
+        if (mergedSha !== undefined) move3Raw.payload.mergedSha = mergedSha;
+        if (mergedInto !== undefined) move3Raw.payload.mergedInto = mergedInto;
+        if (reason !== undefined) move3Raw.payload.reason = reason;
+      }
 
       const writerLogPath = resolveWriterLogPath(dir);
 
-      // Event 1: work.move (preClaimStatus -> 'doing')
-      appendEventLocked(writerLogPath, move1Raw, dir);
-
-      // Event 2: work.attempt
+      // work.attempt: the complete durable record of this attempt —
+      // enriched with from/to/branch/head/timing metadata (design doc
+      // §7.2) so "what happened during this attempt" never needs to be
+      // inferred from an adjacent work.move.
       const attemptResult = result || (finalStatus === 'awaiting-approval' || finalStatus === 'delivered' || finalStatus === 'done' ? 'success' : 'failed');
       const attemptPayload = {
         id,
         phase,
         result: attemptResult,
+        from: preClaimStatus,
+        to: finalStatus,
         claimId: targetClaimId,
         actor: freshClaim.actor || role || 'unknown',
         endedAt: new Date().toISOString(),
       };
-      appendEventLocked(writerLogPath, { type: 'work.attempt', payload: attemptPayload }, dir);
+      if (freshClaim.acquiredAt != null) attemptPayload.startedAt = freshClaim.acquiredAt;
+      if (freshClaim.branch != null) attemptPayload.branch = freshClaim.branch;
+      if (freshClaim.headAtTake != null) attemptPayload.headAtTake = freshClaim.headAtTake;
+      if (freshClaim.branchHeadAtTake != null) attemptPayload.branchHeadAtTake = freshClaim.branchHeadAtTake;
+      if (branchHeadAtReturn !== undefined) attemptPayload.branchHeadAtReturn = branchHeadAtReturn;
+      if (headAtReturn !== undefined) attemptPayload.headAtReturn = headAtReturn;
+      if (reason !== undefined) attemptPayload.reason = reason;
+      // Stamped here too, not just on move3Raw: a same-state settle (e.g.
+      // claim-lock §3b releasing a claim whose preClaimStatus was already
+      // 'todo' — 'doing' never having been durable — back to 'todo') writes
+      // NO work.move at all, and this marker must still survive somewhere
+      // durable for claim-port.mjs's reclaim check to read (tsk-40m).
+      if (releaseTrigger !== undefined) attemptPayload.releaseTrigger = releaseTrigger;
+      const attemptEvent = appendEventLocked(writerLogPath, { type: 'work.attempt', payload: attemptPayload }, dir);
 
-      // Event 3: work.move ('doing' -> finalStatus)
-      const event3 = appendEventLocked(writerLogPath, move3Raw, dir);
-
-      // tsk-40m code-review finding (blocker): return the raw event
-      // directly here — matching moveWork's own `return
-      // appendEventLocked(...)` pattern immediately above in this file —
-      // so withEventsLockAndRefresh's own `{ event, view }` wrapper (below,
-      // after this whole closure returns) produces `res.event` as the
-      // real final work.move event (with its own `.seq`), not this
-      // closure's own separate `{event, view}` object nested one level too
-      // deep. bin/fgos.mjs's `return` command reads `event.seq` straight
-      // off this for its own CLI output — nested, that was always
-      // `undefined`, silently dropping the audit seq from every `fgos
-      // return` a claim-tracked item went through. The old manual
-      // rebuildViewFromDir call this replaced was also redundant:
-      // withEventsLockAndRefresh's own refreshView call (run right after
-      // this closure returns) already rebuilds and persists the view.
-      return event3;
+      // tsk-40m code-review finding (blocker, fixed): return the raw event
+      // directly — matching moveWork's own `return appendEventLocked(...)`
+      // pattern immediately above in this file — so
+      // withEventsLockAndRefresh's own `{ event, view }` wrapper (below,
+      // after this whole closure returns) produces `res.event` as a real
+      // final event (with its own `.seq`), never nested one level too
+      // deep. When a durable move actually happened, that move IS the
+      // "final" event bin/fgos.mjs's `return` command reads `.seq` off
+      // for its own CLI output; a same-state settle has no move, so the
+      // work.attempt (still a real, seq-bearing event) is the final event
+      // instead.
+      return move3Raw ? appendEventLocked(writerLogPath, move3Raw, dir) : attemptEvent;
       });
 
       // tsk-40m code-review finding (blocker): release the claim HERE,

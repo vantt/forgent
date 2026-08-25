@@ -62,6 +62,7 @@ import {
   makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStage,
+  moveToDurableDoingForTest,
   moveWork,
   os,
   path,
@@ -197,10 +198,12 @@ test('move applies a legal transition, appends one event, and updates the view, 
   const cwd = tmpCwd();
   addOk(cwd, 'movable');
   const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'movable', '--to', 'doing']);
+  // tsk-40m: todo -> doing is retired -- todo -> blocked stands in as the
+  // generic "some legal transition" example this test actually needs.
+  const result = run(cwd, ['move', 'movable', '--to', 'blocked']);
   assert.equal(result.status, 0);
   assert.equal(eventLines(cwd).length, before + 1);
-  assert.equal(stateView(cwd).work.movable.status, 'doing');
+  assert.equal(stateView(cwd).work.movable.status, 'blocked');
 });
 
 
@@ -211,7 +214,11 @@ for (const from of ['blocked', 'todo', 'doing']) {
   test(`move applies ${from} -> wontfix through the generic verb, exit 0`, () => {
     const cwd = tmpCwd();
     addOk(cwd, `wontfix-from-${from}`);
-    if (from !== 'todo') run(cwd, ['move', `wontfix-from-${from}`, '--to', from]);
+    // tsk-40m: todo -> doing is retired -- a durably-'doing' entry status
+    // still needs a raw injection (doing -> wontfix itself stays a real,
+    // legal edge, kept for settleClaim's legacy fallback).
+    if (from === 'doing') moveToDurableDoingForTest(cwd, `wontfix-from-${from}`);
+    else if (from !== 'todo') run(cwd, ['move', `wontfix-from-${from}`, '--to', from]);
     const result = run(cwd, ['move', `wontfix-from-${from}`, '--to', 'wontfix', '--reason', 'superseded']);
     assert.equal(result.status, 0);
     assert.equal(stateView(cwd).work[`wontfix-from-${from}`].status, 'wontfix');
@@ -231,7 +238,7 @@ test('move rejects an illegal transition as precondition, exit 2, no event writt
 test('move rejects a CAS expected-status mismatch as conflict, exit 3, no event written', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'cas-item');
-  run(cwd, ['move', 'cas-item', '--to', 'doing']);
+  moveToDurableDoingForTest(cwd, 'cas-item');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['move', 'cas-item', '--to', 'done', '--expect', 'todo']);
   assert.equal(result.status, 3);
@@ -261,13 +268,15 @@ for (const [label, badFlagArgs] of MOVE_BAD_FLAG_CASES) {
 test('move reports the real event seq in its envelope data, not undefined', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'seq-check'); // event #1
-  const result = run(cwd, ['move', 'seq-check', '--to', 'doing']);
+  // tsk-40m: todo -> doing is retired -- blocked stands in as the generic
+  // "some legal move" example this test actually needs.
+  const result = run(cwd, ['move', 'seq-check', '--to', 'blocked']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
   assert.equal(data.seq, 2);
   assert.equal(data.id, 'seq-check');
   assert.equal(data.from, 'todo');
-  assert.equal(data.to, 'doing');
+  assert.equal(data.to, 'blocked');
 });
 
 

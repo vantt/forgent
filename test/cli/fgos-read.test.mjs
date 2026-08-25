@@ -332,9 +332,9 @@ test('list --id scopes every id-keyed view section to just the requested item, e
   assert.equal(run(cwd, ['answer', 'item-b', '--text', 'answer about B']).status, 0);
 
   // Populate callThreads for BOTH items (consult handoff round trip).
-  assert.equal(run(cwd, ['move', 'item-a', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'item-a', '--to', 'blocked']).status, 0); // tsk-40m: blocked stands in for the retired todo->doing edge
   assert.equal(run(cwd, ['handoff', 'item-a', '--to', 'researcher', '--reason', 'consult', '--outcome', 'consult about A']).status, 0);
-  assert.equal(run(cwd, ['move', 'item-b', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'item-b', '--to', 'blocked']).status, 0); // tsk-40m: blocked stands in for the retired todo->doing edge
   assert.equal(run(cwd, ['handoff', 'item-b', '--to', 'researcher', '--reason', 'consult', '--outcome', 'consult about B']).status, 0);
 
   const data = envelopeData(run(cwd, ['list', '--id', 'item-a', '--json']).stdout);

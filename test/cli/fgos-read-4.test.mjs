@@ -62,6 +62,7 @@ import {
   makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStage,
+  moveToDurableDoingForTest,
   moveWork,
   os,
   path,
@@ -341,7 +342,7 @@ test('check output on a log with no settling transitions is unchanged — no set
 test('check reports a nonzero baseline entropy score with an explainable part for a real event-backed store with a stale-doing item', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'entropy-item');
-  assert.equal(run(cwd, ['move', 'entropy-item', '--to', 'doing']).status, 0);
+  moveToDurableDoingForTest(cwd, 'entropy-item');
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
@@ -383,7 +384,7 @@ test('check reports a seal-digest delta only meaningfully for channels with real
 test('check on a second consecutive run over the same store prints a real trend delta against the first run (not baseline again)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'entropy-trend-item');
-  assert.equal(run(cwd, ['move', 'entropy-trend-item', '--to', 'doing']).status, 0);
+  moveToDurableDoingForTest(cwd, 'entropy-trend-item');
 
   const first = run(cwd, ['check']);
   assert.equal(first.status, 0);
@@ -405,7 +406,7 @@ test('check on a second consecutive run over the same store prints a real trend 
 test('check tolerates a torn final entropy-history line — folds trend against the last COMPLETE checkpoint instead of throwing', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'torn-history-item');
-  run(cwd, ['move', 'torn-history-item', '--to', 'doing']);
+  moveToDurableDoingForTest(cwd, 'torn-history-item');
 
   // First check writes one complete checkpoint line — the baseline.
   const first = run(cwd, ['check']);
@@ -446,7 +447,7 @@ test('check returns the learning data — outcome/friction/settlement summary �
   const cwd = tmpCwd();
   addOk(cwd, 'learning-item');
   const dir = path.join(cwd, '.fgos');
-  run(cwd, ['move', 'learning-item', '--to', 'doing']);
+  moveToDurableDoingForTest(cwd, 'learning-item');
   addOutcome(dir, {
     id: 'learning-item',
     actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 },
@@ -485,7 +486,7 @@ test('check returns the learning data — outcome/friction/settlement summary �
 test('check on a log with no item ever reaching done is unchanged — no learning data', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'no-learning-item');
-  run(cwd, ['move', 'no-learning-item', '--to', 'doing']);
+  moveToDurableDoingForTest(cwd, 'no-learning-item');
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);

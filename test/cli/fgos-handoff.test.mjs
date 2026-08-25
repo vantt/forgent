@@ -8,10 +8,24 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { addWork, moveWork, StoreError, recordCall, recordCallReturn, listWork } from '../../src/state/store.mjs';
+import { addWork, moveWork, StoreError, recordCall, recordCallReturn, listWork, resolveWriterLogPath, rebuild } from '../../src/state/store.mjs';
+import { appendEvent } from '../../src/state/events.mjs';
 
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-handoff-cli-'));
+}
+
+// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+// is retired from status-fsm.mjs's TRANSITIONS table — nothing durably
+// writes INTO `doing` anymore. This file's own tests need a durably-'doing'
+// item purely as a PRECONDITION for exercising moveWork's OWN D16/D18
+// side-effect logic on a later `to: X, expectedStatus: 'doing'` call (the
+// actual subject under test) — a raw event write, bypassing transitionWork's
+// own edge validation, is the direct, honest way to get there (same
+// technique test/state/store.test.mjs's own moveToDurableDoingForTest uses).
+function moveToDurableDoingForTest(dir, id, from = 'todo') {
+  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
+  rebuild(dir);
 }
 
 // Born directly at stage 'executing' (same shape a split child gets from
@@ -29,7 +43,7 @@ function seedExecutingItem(dir, id = 'implement-thing') {
     refs: [],
     verify: 'npm test',
   });
-  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, id);
   return id;
 }
 
@@ -53,7 +67,7 @@ test('regression: a handoff succeeds on an item with no explicit stage field (D8
     refs: [],
     verify: 'true',
   });
-  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, id);
   recordCall(dir, { id, toRole: 'reviewer', reason: 'review' });
   assert.equal(listWork(dir).work[id].holder, 'reviewer');
 });
@@ -170,7 +184,7 @@ test('a domain with no roleGraph refuses cleanly, never crashes', () => {
     verify: 'true',
     domain: 'synthetic',
   });
-  moveWork(dir, { id: 'synthetic-item', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'synthetic-item');
   assert.throws(
     () => recordCall(dir, { id: 'synthetic-item', toRole: 'reviewer', reason: 'review' }),
     StoreError,
@@ -210,7 +224,7 @@ test('D18: a domain with no roleGraph reaching awaiting-approval is unaffected (
     verify: 'true',
     domain: 'synthetic',
   });
-  moveWork(dir, { id: 'synthetic-awaiting', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'synthetic-awaiting');
   moveWork(dir, { id: 'synthetic-awaiting', to: 'awaiting-approval', expectedStatus: 'doing' });
   const view = listWork(dir);
   assert.equal(view.work['synthetic-awaiting'].status, 'awaiting-approval');
@@ -283,7 +297,7 @@ test('D16: a domain with no roleGraph reaching delivered is unaffected (no crash
     verify: 'true',
     domain: 'synthetic',
   });
-  moveWork(dir, { id: 'synthetic-delivered', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'synthetic-delivered');
   moveWork(dir, { id: 'synthetic-delivered', to: 'delivered', expectedStatus: 'doing' });
   const view = listWork(dir);
   assert.equal(view.work['synthetic-delivered'].status, 'delivered');

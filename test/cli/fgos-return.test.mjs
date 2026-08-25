@@ -63,6 +63,7 @@ import {
   makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStage,
+  moveToDurableDoingForTest,
   moveWork,
   os,
   path,
@@ -729,8 +730,7 @@ test('return on an item claimed by the runner (claimRole "runner", no headAtTake
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-runner-claim');
-  const dir = path.join(cwd, '.fgos');
-  moveWork(dir, { id: 'pull-return-runner-claim', to: 'doing', expectedStatus: 'todo', role: 'runner' });
+  moveToDurableDoingForTest(cwd, 'pull-return-runner-claim', 'todo', { role: 'runner' });
 
   const result = run(cwd, ['return', 'pull-return-runner-claim']);
   assert.equal(result.status, 4);

@@ -8,7 +8,21 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { addWork, moveWork, putInAwaiting, answerAwaiting, listWork, categoryOf } from '../../src/state/store.mjs';
+import { addWork, moveWork, putInAwaiting, answerAwaiting, listWork, categoryOf, resolveWriterLogPath, rebuild } from '../../src/state/store.mjs';
+import { appendEvent } from '../../src/state/events.mjs';
+
+// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+// is retired from status-fsm.mjs's TRANSITIONS table — nothing durably
+// writes INTO `doing` anymore. This file's own tests need a durably-'doing'
+// item purely as a PRECONDITION for exercising putInAwaiting/answerAwaiting's
+// own 'doing'-resume behavior (the actual subject under test) — a raw event
+// write, bypassing transitionWork's own edge validation, is the direct,
+// honest way to get there (same technique test/state/store.test.mjs's own
+// moveToDurableDoingForTest uses).
+function moveToDurableDoingForTest(dir, id, from = 'todo', extra = {}) {
+  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing', ...extra } }, dir);
+  rebuild(dir);
+}
 
 // tsk-539 D11: `ask` must contain two Markdown headings ("## Context",
 // "## Why this matters") each with >=20 characters of content — every
@@ -69,7 +83,7 @@ test('answerAwaiting then rebuild -> status todo + gates[id]={ask,answer}', () =
 test('putInAwaiting with a stale expectedStatus -> conflict, no event appended', () => {
   const dir = tmpDir();
   addSampleWork(dir);
-  moveWork(dir, { id: 'item-x', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'item-x');
 
   const before = listWork(dir);
   assert.throws(
@@ -167,7 +181,7 @@ test('a second ask after an answer overwrites the prior parentSnapshotAtAsk, nev
 test('putInAwaiting with a statusAtAsk -> gates[id].statusAtAsk on rebuild', () => {
   const dir = tmpDir();
   addSampleWork(dir);
-  moveWork(dir, { id: 'item-x', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'item-x');
 
   const { view } = putInAwaiting(dir, {
     id: 'item-x',
@@ -195,7 +209,7 @@ test('putInAwaiting with no statusAtAsk -> no such key on gates[id] at all', () 
 test('answerAwaiting resumes to statusAtAsk ("doing") instead of hardcoded "todo" — a claim held through the ask survives the answer', () => {
   const dir = tmpDir();
   addSampleWork(dir);
-  moveWork(dir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session', headAtTake: 'deadbeef' });
+  moveToDurableDoingForTest(dir, 'item-x', 'todo', { role: 'session', headAtTake: 'deadbeef' });
   putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'doing', statusAtAsk: 'doing' });
 
   const { view } = answerAwaiting(dir, { id: 'item-x', answer: 'OAuth', expectedStatus: 'awaiting-human', role: 'human' });
@@ -221,7 +235,7 @@ test('answerAwaiting with no statusAtAsk on the gate falls back to "todo" (backw
 test('a second ask after an answer overwrites the prior statusAtAsk, never merges', () => {
   const dir = tmpDir();
   addSampleWork(dir);
-  moveWork(dir, { id: 'item-x', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'item-x');
   putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK_FIRST, expectedStatus: 'doing', statusAtAsk: 'doing' });
   answerAwaiting(dir, { id: 'item-x', answer: 'first answer', expectedStatus: 'awaiting-human' });
 

@@ -757,10 +757,12 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
   // carries the marker only `test -f output.txt && echo VERIFY_OK` prints.
   assert.match(first.stdout, /VERIFY_OK/);
 
-  // events.jsonl carries the real chain: two adds, then doing, then a
-  // predicted work.outcome (written at claim), then proposed for item1
-  // only, then an actual work.outcome (written on the pass terminal) —
-  // every event from Phase 2 on carries `v`.
+  // events.jsonl carries the real chain: two adds, then a predicted
+  // work.outcome (written at claim), then settle for item1 only (tsk-40m:
+  // settleClaim writes an enriched work.attempt then transitions DIRECTLY
+  // from its preClaimStatus to finalStatus -- no durable intermediate
+  // work.move(->doing) leg), then an actual work.outcome (written on the
+  // pass terminal) — every event from Phase 2 on carries `v`.
   const afterFirstEvents = events(repoRoot);
   assert.deepEqual(
     afterFirstEvents.map((e) => (e.type === 'work.outcome'
@@ -771,18 +773,14 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
       'work.add:item2:add',
       'work.outcome:item1:predicted',
       'executor.dispatch:item1:add',
-      'work.move:item1:doing',
-      'work.attempt:item1:add',
+      'work.attempt:item1:awaiting-approval',
       'work.move:item1:awaiting-approval',
       'work.handoff:item1:reviewer',
       'work.outcome:item1:actual',
     ],
   );
-  const doingEvent = afterFirstEvents.find((e) => e.type === 'work.move' && e.payload.to === 'doing');
   const proposedEvent = afterFirstEvents.find((e) => e.type === 'work.move' && e.payload.to === 'awaiting-approval');
-  assert.equal(doingEvent.payload.id, 'item1');
   assert.equal(proposedEvent.payload.id, 'item1');
-  assert.equal(typeof doingEvent.v, 'number', 'doing event carries a schema version');
   assert.equal(typeof proposedEvent.v, 'number', 'proposed event carries a schema version');
   // actual is real dispatch evidence (real subprocess, real goal-check),
   // sourced from the runner's own branchFacts — never the worker's report.
@@ -863,13 +861,16 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
   const seq = redEvents.map((e) => (e.type === 'work.outcome'
     ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}`
     : `${e.type}:${e.payload.to ?? e.payload.id ?? ''}`));
+  // tsk-40m: settleClaim writes an enriched work.attempt (carrying its own
+  // `to`, hence this mapper prints it as "work.attempt:blocked" rather than
+  // falling back to payload.id) then transitions DIRECTLY from preClaimStatus
+  // to finalStatus -- no durable intermediate work.move(->doing) leg.
   assert.deepEqual(seq, [
     'work.add:item-red',
     'work.outcome:predicted',
     'executor.dispatch:item-red',
     'executor.dispatch:item-red',
-    'work.move:doing',
-    'work.attempt:item-red',
+    'work.attempt:blocked',
     'work.move:blocked',
     'work.outcome:actual',
     'work.friction:item-red',

@@ -231,7 +231,7 @@ test('compound on an item not at status retrospective is rejected as validation,
 test('compound with an invalid --doc-type is rejected as validation, exit 4, before any write', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'compound-bad-doctype');
-  run(cwd, ['move', 'compound-bad-doctype', '--to', 'doing']);
+  run(cwd, ['move', 'compound-bad-doctype', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'compound-bad-doctype', '--to', 'delivered']);
   run(cwd, ['move', 'compound-bad-doctype', '--to', 'retrospective']);
   const before = eventLines(cwd).length;
@@ -245,7 +245,7 @@ test('compound with an invalid --doc-type is rejected as validation, exit 4, bef
 test('compound with no --doc-type is a no-op: exit 0, docType null, no events written', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'compound-noop');
-  run(cwd, ['move', 'compound-noop', '--to', 'doing']);
+  run(cwd, ['move', 'compound-noop', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'compound-noop', '--to', 'delivered']);
   run(cwd, ['move', 'compound-noop', '--to', 'retrospective']);
   const before = eventLines(cwd).length;
@@ -261,7 +261,7 @@ test('compound with no --doc-type is a no-op: exit 0, docType null, no events wr
 test('compound with --doc-type tags the outcome, surfaced by `show`; item stays at status retrospective (no stage/status move)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'compound-tag-only');
-  run(cwd, ['move', 'compound-tag-only', '--to', 'doing']);
+  run(cwd, ['move', 'compound-tag-only', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'compound-tag-only', '--to', 'delivered']);
   run(cwd, ['move', 'compound-tag-only', '--to', 'retrospective']);
 
@@ -290,7 +290,7 @@ test('compound with --doc-type tags the outcome, surfaced by `show`; item stays 
 test('compound with --doc-type and --doc-path tags both when the file is committed at HEAD, surfaced by `show`', () => {
   const cwd = initGitCwdMain();
   addOk(cwd, 'compound-tag-path');
-  run(cwd, ['move', 'compound-tag-path', '--to', 'doing']);
+  run(cwd, ['move', 'compound-tag-path', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'compound-tag-path', '--to', 'delivered']);
   run(cwd, ['move', 'compound-tag-path', '--to', 'retrospective']);
   fs.mkdirSync(path.join(cwd, 'docs', 'explanation'), { recursive: true });
@@ -312,7 +312,7 @@ test('compound with --doc-type and --doc-path tags both when the file is committ
 test('compound --doc-path is rejected as validation, exit 4, when the file does not exist at all', () => {
   const cwd = initGitCwdMain();
   addOk(cwd, 'compound-doc-absent');
-  run(cwd, ['move', 'compound-doc-absent', '--to', 'doing']);
+  run(cwd, ['move', 'compound-doc-absent', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'compound-doc-absent', '--to', 'delivered']);
   run(cwd, ['move', 'compound-doc-absent', '--to', 'retrospective']);
   const before = eventLines(cwd).length;
@@ -327,7 +327,7 @@ test('compound --doc-path is rejected as validation, exit 4, when the file does 
 test('compound --doc-path is rejected as validation, exit 4, when the file exists but is untracked', () => {
   const cwd = initGitCwdMain();
   addOk(cwd, 'compound-doc-untracked');
-  run(cwd, ['move', 'compound-doc-untracked', '--to', 'doing']);
+  run(cwd, ['move', 'compound-doc-untracked', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'compound-doc-untracked', '--to', 'delivered']);
   run(cwd, ['move', 'compound-doc-untracked', '--to', 'retrospective']);
   fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
@@ -344,7 +344,7 @@ test('compound --doc-path is rejected as validation, exit 4, when the file exist
 test('compound --doc-path is rejected as validation, exit 4, when the file exists and is staged but not committed', () => {
   const cwd = initGitCwdMain();
   addOk(cwd, 'compound-doc-staged');
-  run(cwd, ['move', 'compound-doc-staged', '--to', 'doing']);
+  run(cwd, ['move', 'compound-doc-staged', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'compound-doc-staged', '--to', 'delivered']);
   run(cwd, ['move', 'compound-doc-staged', '--to', 'retrospective']);
   fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
