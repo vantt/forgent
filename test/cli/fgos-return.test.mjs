@@ -995,8 +995,14 @@ test('return on a branch-source take whose branch declares a real npm dependency
 test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
+  // tsk-40m: settleClaim now verifies the settling caller is the SAME
+  // session that acquired the claim (writer-identity check) — take and
+  // return must share the SAME FGOS_SESSION_ID for this test's own actor
+  // to legitimately be the one returning it. Orthogonal to what this test
+  // actually asserts (the pre-existing main-checkout.lock below, recorded
+  // under the SAME identity for a different reason, must survive untouched).
   makeBlockedBranchItem(cwd, 'branch-return-lock-untouched', { verify: 'test -f proof.txt' });
-  assert.equal(run(cwd, ['take', '--id', 'branch-return-lock-untouched']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-lock-untouched'], { FGOS_SESSION_ID: 'tsk-45z-branch-session' }).status, 0);
   commitPending(cwd, 'state: take branch-return-lock-untouched');
 
   gitAtCwd(cwd, ['checkout', 'fgw/branch-return-lock-untouched']);

@@ -239,3 +239,62 @@ test('acquireClaim never silently overwrites a claim file that exists but is cor
   // the corrupt file must survive untouched -- never silently overwritten
   assert.equal(fs.readFileSync(path.join(claimsDir, 'tsk-1.json'), 'utf8'), '{not valid json');
 });
+
+// tsk-40m code-review finding (blocker, confirmed needed): a caller with no
+// in-process capability token (a fresh CLI invocation, e.g. `fgos return`,
+// separate from the take/pick that acquired the claim) can only ever
+// discover a claimId by reading "whichever claim is active right now" --
+// which trivially "matches" itself even for a DIFFERENT actor's session.
+// writerId (recorded at acquireClaim time from session-identity.mjs, the
+// same mechanism fgOS already uses to stamp every event's `writer` field)
+// closes this independently of claimId, by comparing the CURRENT caller's
+// own resolved session identity against the claim's recorded owner.
+test('settleClaim rejects a different session presenting the correct claimId (writer-identity check)', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 9', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+
+  const originalSessionId = process.env.FGOS_SESSION_ID;
+  try {
+    process.env.FGOS_SESSION_ID = 'session-A';
+    const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo' });
+    assert.equal(claim.writerId, 'session-A');
+
+    process.env.FGOS_SESSION_ID = 'session-B';
+    assert.throws(
+      () => settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' }),
+      (err) => err instanceof StoreError && err.category === 'conflict',
+    );
+    // the claim must survive the rejected cross-session settle attempt
+    assert.ok(readClaim(dir, 'tsk-1'));
+
+    // the SAME session (A) presenting the same claimId still settles cleanly
+    process.env.FGOS_SESSION_ID = 'session-A';
+    const res = settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' });
+    assert.equal(res.view.work['tsk-1'].status, 'awaiting-approval');
+  } finally {
+    if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = originalSessionId;
+  }
+});
+
+test('settleClaim skips the writer-identity check for a claim written before the field existed (backward compat, never a false positive on old data)', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 10', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+
+  const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo' });
+  const claimsDir = resolveFgosFile(dir, FGOS_FILE.CLAIMS_DIR);
+  const claimFilePath = path.join(claimsDir, 'tsk-1.json');
+  const legacyClaim = JSON.parse(fs.readFileSync(claimFilePath, 'utf8'));
+  delete legacyClaim.writerId;
+  fs.writeFileSync(claimFilePath, JSON.stringify(legacyClaim, null, 2), 'utf8');
+
+  const originalSessionId = process.env.FGOS_SESSION_ID;
+  try {
+    process.env.FGOS_SESSION_ID = 'a-totally-different-session';
+    const res = settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' });
+    assert.equal(res.view.work['tsk-1'].status, 'awaiting-approval');
+  } finally {
+    if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = originalSessionId;
+  }
+});

@@ -1009,6 +1009,27 @@ export function settleClaim(dir, {
       throw new StoreError('conflict', `settleClaim: claimId mismatch for "${id}": active claim is "${claim.claimId}", got "${claimId}".`);
     }
     const targetClaimId = claim.claimId;
+    // tsk-40m code-review finding (blocker, confirmed needed by product
+    // decision): claimId alone is only as strong as the caller's own
+    // discipline about where it got that value from — a caller with no
+    // in-process capability token (bin/fgos.mjs's `return`, a fresh CLI
+    // invocation separate from the original take/pick) can only ever
+    // discover a claimId by reading "whichever claim is active right now",
+    // which trivially "matches" whatever it just read. `writerId` (the
+    // session/shell identity `acquireClaim` recorded at claim time) closes
+    // that gap independently of claimId: resolved FRESH here from THIS
+    // caller's own real process/session, and compared against the claim's
+    // recorded owner. A claim written before this field existed reads
+    // `writerId: undefined` and skips the check (never a false positive on
+    // old data). Taking over a genuinely different session's live claim
+    // goes through the sanctioned stale-claim-reclaim path (claim-port.mjs,
+    // gated on real liveness) — never a direct settle under a different
+    // identity, however it obtained the claimId.
+    const writer = resolveWriterIdentity(dir);
+    const currentWriterId = String(writer.id);
+    if (claim.writerId !== undefined && claim.writerId !== currentWriterId) {
+      throw new StoreError('conflict', `settleClaim: writer identity mismatch for "${id}" — claim acquired by writer "${claim.writerId}", settling as writer "${currentWriterId}".`);
+    }
 
     try {
       const res = withEventsLockAndRefresh(dir, logPath, () => {
@@ -1030,7 +1051,6 @@ export function settleClaim(dir, {
           }
         }
 
-        const writer = resolveWriterIdentity(dir);
         const writerLogPath = resolveWriterLogPath(dir);
 
         // Event 1: work.move (preClaimStatus -> 'doing')

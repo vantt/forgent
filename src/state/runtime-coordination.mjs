@@ -9,6 +9,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
 
 export function getMainFgosDir(dir) {
   if (!dir) return dir;
@@ -211,10 +212,25 @@ export function acquireClaim(fgosDirInput, {
     }
 
     const now = new Date().toISOString();
+    // tsk-40m code-review finding (blocker, confirmed needed by product
+    // decision): the session/shell identity fgOS already resolves for
+    // every mutation (session-identity.mjs — stable across separate CLI
+    // invocations from the SAME terminal, via its own env-session-var/
+    // pid-ancestor-walk). Recorded here so settleClaim can verify, at
+    // settle time, that the caller is really the same actor/session that
+    // acquired this claim — independent of claimId, which a caller with no
+    // in-process token (a fresh CLI invocation, e.g. `fgos return`,
+    // separate from the take/pick that claimed it) can only ever discover
+    // by reading "whichever claim is active right now". Taking over a
+    // DIFFERENT session's still-live claim goes through the sanctioned
+    // stale-claim-reclaim path (claim-port.mjs, gated on real liveness),
+    // never a direct `return` under a different identity.
+    const writerId = String(resolveWriterIdentity(fgosDir).id);
     const claimRecord = {
       claimId: `clm-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
       id,
       actor: actor ?? null,
+      writerId,
       source: source ?? null,
       branch: branch ?? null,
       branchHeadAtTake: branchHeadAtTake ?? null,
