@@ -1428,14 +1428,38 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
   let fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
   if (fgosPaths.length > 0) {
     for (const fgosPath of fgosPaths) {
-      if (!isMergeUnionPath(repoRoot, fgosPath) && !isUnchangedSinceBranchHeadAtTake(repoRoot, branch, fgosPath, item.branchHeadAtTake)) {
+      const unchangedOnBranch = isUnchangedSinceBranchHeadAtTake(repoRoot, branch, fgosPath, item.branchHeadAtTake);
+      if (!isMergeUnionPath(repoRoot, fgosPath) && !unchangedOnBranch) {
         continue;
       }
       try {
         git(repoRoot, ['checkout', 'HEAD', '--', fgosPath]);
       } catch {
-        // No HEAD version to restore to -- leave it staged; the recheck
-        // below will still find it and this call will still refuse it.
+        // `git checkout HEAD -- <path>` throws whenever HEAD has no such
+        // pathspec RIGHT NOW -- true both for a path the WORKER branch
+        // introduces for the first time (never on target's own history --
+        // a real new .fgos/ write, correctly left staged so the reject
+        // below catches it, per this block's own comment above) and for a
+        // path TARGET itself has since fully untracked/deleted (e.g. the
+        // fgos-logs-bucket migration moving 5 diagnostic logs out of
+        // .fgos/ root, tsk-p2q). `unchangedOnBranch` already proved the
+        // WORKER never touched this path since its own claim -- whatever
+        // it carries is inherited staleness from before the item even
+        // started, never new content the worker is trying to introduce --
+        // so `git rm --cached` (drop it from the staged merge tree,
+        // matching target's own "no longer tracked" state) is the correct
+        // trusted-side resolution here, same spirit as the checkout branch
+        // just above. Never attempted for the isMergeUnionPath-only case
+        // (a brand-new shard the WORKER itself just wrote) -- that stays
+        // exactly as before, falling through to reject.
+        if (unchangedOnBranch) {
+          try {
+            git(repoRoot, ['rm', '-f', '--', fgosPath]);
+          } catch {
+            // Still no way to resolve it -- leave staged; the recheck
+            // below will find it and this call will still refuse it.
+          }
+        }
       }
     }
     stagedPaths = git(repoRoot, ['diff', '--name-only', '--cached'])

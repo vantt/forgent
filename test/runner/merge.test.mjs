@@ -1781,6 +1781,53 @@ test('mergeRunnerItem merges cleanly when a .fgos/ path is absent at branchHeadA
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
+// tsk-28x: the mirror-image shape of tsk-198 above -- the path exists at
+// the merge-base, the WORKER branch leaves it completely untouched (still
+// present, unchanged since branchHeadAtTake), and MAIN is the side that
+// deletes/untracks it after the fork (e.g. the fgos-logs-bucket migration
+// moving a diagnostic log out of `.fgos/` root entirely). `git merge`
+// auto-resolves this one-sided deletion cleanly (no conflict thrown), but
+// still stages the file as deleted -- a real diff `mergeRunnerItemLocked`'s
+// restore loop must resolve. Before this fix, `git checkout HEAD --
+// <path>` always threw here (HEAD has no such pathspec once main deletes
+// it), and the loop had no fallback: `unchangedOnBranch` was true (the
+// worker never touched it) but the path stayed staged, permanently
+// tripping `fgos-write-rejected` for a branch that never actually wrote
+// anything to `.fgos/` -- only inherited a path main has since retired.
+// Reproduces the real live failure (tsk-28x's own `.fgos/
+// changelog-nag-history.jsonl`/`.fgos/entropy-history.jsonl`, forked long
+// before phase-01's `.fgos/logs/` bucket migration untracked them on
+// main).
+test('mergeRunnerItem merges cleanly when a .fgos/ path is unchanged on the branch since branchHeadAtTake but main has since fully untracked it (tsk-28x)', async () => {
+  const repoRoot = initRepo();
+  const logRelPath = path.join('.fgos', 'changelog-nag-history.jsonl');
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  const seedContent = '{"ts":"2026-08-01T00:00:00.000Z"}\n';
+  fs.writeFileSync(path.join(repoRoot, logRelPath), seedContent);
+  git(repoRoot, ['add', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .fgos/changelog-nag-history.jsonl on main']);
+
+  // Branch forks, never touches the path, records branchHeadAtTake here.
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  fs.writeFileSync(path.join(repoRoot, 'produced.txt'), 'ok\n');
+  git(repoRoot, ['add', 'produced.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'worker produces its own file']);
+  const forkCommit = headOf(repoRoot);
+  git(repoRoot, ['checkout', 'main']);
+
+  // Main untracks the path entirely after the branch's fork -- the branch
+  // still carries it (unmodified), so this is a one-sided deletion on
+  // main's side, the exact shape git auto-resolves without a conflict.
+  git(repoRoot, ['rm', '-q', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main migrates diagnostic log out of .fgos/ root']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt', branchHeadAtTake: forkCommit }));
+  assert.equal(result.outcome, 'merged');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
+  assert.equal(fs.existsSync(path.join(repoRoot, logRelPath)), false, 'main\'s own deletion must survive unaffected -- the branch\'s stale copy must never resurrect it');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
 // tsk-4gi: a NON-union `.fgos/` path (e.g. `.fgos/config.json`, no
 // `merge=union` entry) that already exists on target's HEAD and gets edited
 // on non-overlapping lines by both the worker branch and target auto-merges
