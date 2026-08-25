@@ -210,3 +210,10 @@ top of the file, plus inline narrative near the specific rule being
 superseded — never a new standalone decision file. The item's intent
 stayed valid throughout; only the mechanism needed correcting once the
 timing gap was noticed.
+
+**D2/D3 shipped as real code (`tsk-1lv-1`).** `fgos decision` now requires
+a `--relation` argument, and the write-time consistency sweep (D2: derive
+consistency at write time, never a stored parallel graph) widened its own
+scan scope from just `docs/backlog.md` + `docs/specs/*.md` to the full
+`docs/**` + `src/**` + `plugins/**` tree, on the existing store (D3: no new
+decision-store, upgrade the one that already exists).
