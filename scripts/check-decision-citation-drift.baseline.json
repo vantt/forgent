@@ -3,9 +3,9 @@
     "d-local-outside-home:D2:`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).",
     "d-local-outside-home:D2:Four, no more (`docs/history/two-layer-dispatch/DISCUSSION.md` D2, single",
     "d-local-outside-home:D5:(tsk-5tm-3 D5, matching marketing-cockpit's `run_task()` contract).",
-    "d-local-outside-home:D3:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
-    "d-local-outside-home:D6:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
-    "d-local-outside-home:D10:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
+    "d-local-outside-home:D3:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
+    "d-local-outside-home:D6:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
+    "d-local-outside-home:D10:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
     "d-local-outside-home:D8:| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |",
     "d-local-outside-home:D4:| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |",
     "d-local-outside-home:D10:Plus two fields that may be left blank (D10): `provider` and `tier`. No",
@@ -41,8 +41,6 @@
     "d-local-outside-home:D3:the main checkout, committed.** (retrospective-doc-write-path D1/D3:",
     "d-local-outside-home:D1:before D1/D3 locked the inversion.)",
     "d-local-outside-home:D3:before D1/D3 locked the inversion.)",
-    "bare-citation:ADR0020:own `.fgos/` by design (ADR0020). Resolve the main checkout root once",
-    "d-local-outside-home:D1:and reuse it for every command below (tsk-56t D1):",
     "d-local-outside-home:D3:`compound` also now refuses (retrospective-doc-write-path D3) when",
     "d-local-outside-home:D3:document from step 3 exists on disk at `$root`. Step 4's own D3 check"
   ],
@@ -99,9 +97,9 @@
     "d-local-outside-home:D2:`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).",
     "d-local-outside-home:D2:Four, no more (`docs/history/two-layer-dispatch/DISCUSSION.md` D2, single",
     "d-local-outside-home:D5:(tsk-5tm-3 D5, matching marketing-cockpit's `run_task()` contract).",
-    "d-local-outside-home:D3:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
-    "d-local-outside-home:D6:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
-    "d-local-outside-home:D10:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor",
+    "d-local-outside-home:D3:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
+    "d-local-outside-home:D6:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
+    "d-local-outside-home:D10:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
     "d-local-outside-home:D8:| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |",
     "d-local-outside-home:D4:| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |",
     "d-local-outside-home:D10:Plus two fields that may be left blank (D10): `provider` and `tier`. No",
@@ -195,8 +193,6 @@
     "d-local-outside-home:D3:the main checkout, committed.** (retrospective-doc-write-path D1/D3:",
     "d-local-outside-home:D1:before D1/D3 locked the inversion.)",
     "d-local-outside-home:D3:before D1/D3 locked the inversion.)",
-    "bare-citation:ADR0020:own `.fgos/` by design (ADR0020). Resolve the main checkout root once",
-    "d-local-outside-home:D1:and reuse it for every command below (tsk-56t D1):",
     "d-local-outside-home:D3:`compound` also now refuses (retrospective-doc-write-path D3) when",
     "d-local-outside-home:D3:document from step 3 exists on disk at `$root`. Step 4's own D3 check"
   ],
@@ -263,8 +259,7 @@
   ],
   "plugins/fgOS/skills/merge-next/SKILL.md": [
     "d-local-outside-home:D6:CONTEXT.md` D6).",
-    "d-local-outside-home:D6:This runs unattended by design (D6) — do not add a confirmation prompt",
-    "d-local-outside-home:D2:the user a command to type (D2, `docs/history/iron-law-gate-human-ux/"
+    "d-local-outside-home:D6:This runs unattended by design (D6) — do not add a confirmation prompt"
   ],
   "plugins/fgOS/skills/move/SKILL.md": [
     "bare-citation:ADR0020:`.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves"
@@ -324,7 +319,6 @@
     "d-local-outside-home:D1:it (tsk-qod D1/D2, `clarify` retired as a stage entirely): it is now a",
     "d-local-outside-home:D2:it (tsk-qod D1/D2, `clarify` retired as a stage entirely): it is now a",
     "d-local-outside-home:D12:all (D12, tsk-2yo) — `discovery`'s own skill chủ (`fgos-coding-discovering`)",
-    "d-local-outside-home:D4:response — this is a hard requirement (D4), not a convenience default.",
     "d-local-outside-home:D2:clarify BEFORE the item exists (tsk-qod D2).**",
     "d-local-outside-home:D1:only — it writes no state itself, tsk-qod D1/D2):",
     "d-local-outside-home:D2:only — it writes no state itself, tsk-qod D1/D2):",
