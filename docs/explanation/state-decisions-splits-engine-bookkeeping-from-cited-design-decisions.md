@@ -2,7 +2,8 @@
 type: explanation
 title: state.decisions splits engine bookkeeping from cited design decisions
 tags: []
-source_capture_ids: [tsk-1ud]
+source_capture_ids: [tsk-1ud, tsk-1lv]
+authoritative_for: why state.decisions splits engine bookkeeping from design decisions, and how the canonical decision projection (docs/decisions/index.md, docs/specs/<area>.md narrative) is wired onto that same clean zone with no second store
 ---
 # state.decisions splits engine bookkeeping from cited design decisions
 
@@ -113,3 +114,86 @@ possible) is a separate, hard-dependent follow-up item — this item only
 makes that future read safe, it doesn't perform it. Rewriting
 `CONTEXT.md`'s own authoring convention is D7's own step 6, also
 separate.
+
+## The follow-up that used this clean zone (`tsk-1lv`)
+
+`tsk-1ud` predicted its own scope shrinkage would leave a wiring follow-up
+for later — `tsk-1lv` (canonical decision projection) is that follow-up,
+answering a broader complaint: too many rules/decisions/docs go stale and
+contradict each other, with agents scanning up outdated decisions even
+after a newer one supersedes them.
+
+**No second source of truth.** `tsk-1lv` explicitly rejected building a
+stored graph or a daemon to track document/decision staleness:
+
+> D2: Không xây stored graph/daemon riêng cho bài toán doc/decision
+> staleness -- consistency derive tại thời điểm ghi (write-time sweep)
+> và tại thời điểm đóng việc (close-time door), không phải một graph lưu
+> trữ song song
+
+A second source of truth is exactly the failure mode this whole area
+exists to eliminate — consistency is derived live, at write time and at
+close time, never cached into a competing store.
+
+**Wire the existing zone, don't add a third one.**
+
+> D3: KHÔNG xây decision-store mới -- fgOS đã có sẵn store hợp nhất
+> state.decisions... Việc cần làm là WIRE các bề mặt doc (CONTEXT.md
+> Locked-Decisions table, docs/specs) vào đây
+
+This is the direct continuation of the gate above: `state.decisions` was
+cleaned specifically so something could finally depend on it; `tsk-1lv`
+is that something, classifying three kinds of decision that map onto it
+(machine bookkeeping — already `kind: engine`, unchanged; item-level
+design decisions — already written via `fgos decision --id`, only the
+*rendering* of `CONTEXT.md` from that store was missing; and a genuinely
+new case, platform/repo-wide decisions, needing a new `scope`/`area`
+field written via `fgos decision` with no `--id`).
+
+**Retiring the one-file-per-decision ADR corpus.**
+
+> D5: Retire docs/decisions/*.md corpus (1 file/quyết định kiểu Nygard,
+> 35 file) -- narrative dài dồn vào docs/specs/<area>.md... state.decisions
+> giữ record ngắn... file ADR riêng không còn là nguồn quyền uy
+
+The long-form ADR-style files stop being the authoritative narrative;
+`docs/specs/<area>.md` (which already existed, serving the same role as
+an upstream reference project's `docs/knowledge/areas/`) absorbs the long
+narrative, while `state.decisions` keeps the short evidence-bearing
+record as the real source. `docs/decisions/index.md`, mentioned at the top
+of this repo's own `AGENTS.md`, is the generated projection this decision
+made possible.
+
+**Find-before-create extended to the whole Diataxis doc layer, then
+narrowed again.** `tsk-1lv` initially widened its own design (D6/D8) to
+also govern how `fgos-coding-compounding` decides whether to grow an
+existing end-user doc or create a new one — but a later self-correction
+(D14) pulled that claim back to its actually-proven scope:
+
+> D14: D8's authoritative_for CHỈ giải đúng 'trùng chủ đề TRONG một
+> subject-space đã định nghĩa rõ' -- KHÔNG mở rộng claim sang audience/area
+> như một trục độc lập, vì trục đó CHƯA TỒN TẠI trong schema hiện tại
+
+Diataxis (tutorial/how-to/reference/explanation) only resolves the
+*perception* axis of a document, never its *audience/scope* axis — a
+different, still-unsolved problem tracked separately (`tsk-28x`). Claiming
+D8 had solved audience-scoping too, before that axis even existed in the
+schema, would have overclaimed; the correction keeps D8 honestly limited
+to what it actually proves: deduplicating within an already-defined
+subject-space.
+
+**A real coordination finding caught before merge, not after.** While
+reviewing a sibling item before its own merge, the driving session found
+`tsk-1lv`'s branch had independently rewritten
+`scripts/check-decision-citation-drift.mjs` in a way that silently dropped
+the entire bare-citation-gloss/baseline-ratchet mechanism `tsk-37i`
+(this doc's own sibling, see `docs/explanation/
+why-fgos-citations-carry-a-gloss-and-check-mechanically.md`) had just
+built and gotten merged to main — with zero mention of that mechanism
+anywhere in `tsk-1lv`'s own planning docs, meaning it looked like an
+unconsidered side effect of a full-file rewrite rather than a deliberate
+retirement. This was flagged explicitly before merging, exactly the kind
+of live cross-branch collision the coordination decision (D9, splitting
+scope between `tsk-1lv` and `tsk-37i`) existed to prevent, caught here
+because the two branches' actual diffs were compared directly rather than
+assuming the earlier scope split still held once both had drifted.
