@@ -122,6 +122,44 @@ follow-up cleanup lands. A baseline regenerated fresh as part of this
 item's own final commit — showing real, git-diffable shrinkage from the
 item's starting state — is not the earlier staleness failure mode.
 
+## A real follow-up bug: the baseline was keyed by line number, not content
+
+A hand-verified audit (`tsk-3x8`) found the checker's baseline
+(`check-decision-citation-drift.baseline.json`) keyed each finding as
+`kind:line:id` rather than by content, unlike its sibling
+`check-decision-codes.mjs` it was supposed to follow. Inserting or
+deleting a single line anywhere earlier in a baselined file shifts every
+finding below it — each one then reads as "new," turning `npm test` red.
+Proven directly: one inserted comment line in `docs/backlog.md` flipped
+"0 new findings" to 64. `docs/backlog.md` alone is touched in 152 of 200
+recent commits — this was near-certain to trigger soon, not a remote edge
+case.
+
+The dangerous part is the obvious fix for a red `npm test`: rerunning
+`--write-baseline`. That snapshots *every* current finding, including real
+newly-introduced violations, silently wiping them from tracking — with
+1,645 findings, nobody reads the full JSON diff to notice. This meant D4's
+"blocks new violations" guarantee from `tsk-37i` was not actually true of
+what had shipped.
+
+The fix re-keyed the baseline from `kind:line:id` to
+`kind:id:<line-text>`, preserving the same 1645/73 finding count on
+regeneration, and added regression coverage for line-*insertion* (the
+existing suite had only ever tested appending new findings after existing
+ones, never inserting before them).
+
+Several other real findings from the same audit were explicitly scoped
+out of this item and left as open follow-up, not silently dropped: the
+`--write-baseline` no-diff-protection gap itself (rerunning it still masks
+new violations the same way, just less easily triggered); the shared
+citation-format convention doc (`_shared/citation-format.md`) being cited
+by zero files including its own intended flagship consumer
+(`fgos-coding-shaping/SKILL.md`); the 1,645 pre-existing findings having no
+tracked cleanup item, with `tsk-1lv` and `tsk-37i` separately believing
+different things about what had already been cleaned; and the fact that if
+`tsk-1lv` D5 (retiring `docs/decisions/*.md`) ships, this check quietly
+stops catching anything at all, with no error.
+
 ## Source
 
 `tsk-37i`. Verify: `npm test && test -f
