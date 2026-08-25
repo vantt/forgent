@@ -524,6 +524,18 @@ function herdrSpawnAdapter(invocation, opts) {
     // already part of this piece's own accepted design,
     // `docs/history/dispatch-plan-protocol-redesign/plan.md:277`) sets it
     // on the pane's own shell before anything runs there.
+    //
+    // ACCEPTED RISK, decided by the person (2026-08-25, fourth-round
+    // advisor review): `--env KEY=VALUE` puts secret values in the
+    // `herdr` CLI process's own argv, visible via `ps`/process listings
+    // and possibly herdr's own internal logs, for the duration of this
+    // one `pane split` call -- inherent to any CLI tool taking secrets as
+    // command-line arguments, not something avoidable from this side
+    // given herdr's current interface (no env-file/stdin/daemon
+    // alternative is documented). Ship as-is; revisit only if herdr ever
+    // adds a non-argv env-setting mechanism. The DispatchError path right
+    // below is still sanitized so a *failure* here never additionally
+    // echoes the secret into fgOS's own logs.
     for (const [key, value] of Object.entries(resolvedEnv)) {
       splitArgs.push('--env', `${key}=${value}`);
     }
