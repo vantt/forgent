@@ -235,3 +235,11 @@ renders from `state.decisions` itself, applied to all three skills that
 write a `CONTEXT.md` (`fgos-coding-exploring`, `fgos-coding-planning`,
 `fgos-coding-shaping`), not just the one `tsk-1ud` had originally scoped
 for.
+
+**D5's retirement itself shipped as `tsk-1lv-4`.** All 35 files of the
+`docs/decisions/*.md` corpus were retired: their narrative folded into
+the relevant `docs/specs/<area>.md`, `state.decisions` kept as the short
+real record, and `docs/decisions/` itself persists as a directory holding
+only the generated `index.md` (this is a separate retirement from
+`docs/history/<feature>/` shaping records, which are cleaned up on their
+own, unrelated schedule by `/fgOS:cleanup-next`).
