@@ -93,6 +93,13 @@ source for `buildAgentTypeExecutor`, with no optional guard the way
 special `'default'` key would recreate exactly the meaningful-key-name trap
 that caused the D6 bug in the first place.
 
+D6/D7 landed as their own piece (`tsk-in1-2`): both `cfg.executors`
+touch-points `dispatch.mjs` had (the validate check and the resolve
+fallback) were removed together with their dedicated tests, confirmed by
+the item's own verify command asserting `cfg.executors` no longer appears
+in `dispatch.mjs` at all — while `cfg.executor` (singular) was left
+untouched, exactly as D7 requires.
+
 ## `kind` splits into what vs. how
 
 > D5: kind tách thành 2 giá trị agent|tool (trục BẢN CHẤT), chuyển vocab
