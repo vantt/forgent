@@ -5143,6 +5143,7 @@ test('resolveExecutorCommand returns env block from resolved executor', () => {
         kind: 'agent',
         command: 'claude',
         args: ['-p', '{prompt}'],
+        allowCrossProvider: true,
         env: {
           ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
           ANTHROPIC_AUTH_TOKEN: '${TEST_OPENROUTER_KEY}',
@@ -5228,6 +5229,7 @@ test('registered executors.glm entry resolves command "claude" and env block', (
         description: 'Claude Code CLI routing to OpenRouter GLM 5.2 model',
         command: 'claude',
         args: ['-p', '{prompt}', '--model', '{model}'],
+        allowCrossProvider: true,
         env: {
           ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
           ANTHROPIC_AUTH_TOKEN: '${GLM_OPENROUTER_API_KEY}',
