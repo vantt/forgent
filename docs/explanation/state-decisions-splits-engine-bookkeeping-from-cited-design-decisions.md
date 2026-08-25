@@ -295,3 +295,23 @@ half of this same piece: `fgos-coding-compounding`'s previously-absolute
 prose a newly gathered capture genuinely contradicts — a targeted
 correction, never a license to prune content the new capture doesn't
 actually contradict.
+
+**A false-positive-flood bug in the write-time sweep, live-reproduced
+(`tsk-679`).** Running `fgos decision --relation supersedes:D8` on an
+item superseding its *own* locally-scoped `D8` decision returned a
+`danglingCitations` flood against many unrelated files across the repo —
+`docs/backlog.md`, several `docs/specs/*.md` files, some with multiple
+hits each. None of those lines actually cited the item's own `D8`; each
+cited some *other* document's own, differently-scoped `D8` label — a
+`D`-local id is short and common enough to collide constantly across
+unrelated `CONTEXT.md` files, by design (the whole point of the citation
+contract's own local-scoping rule). Root cause: `findWideCitationFindings`
+matched the target id as a bare substring across every file in
+`WIDE_SWEEP_ROOTS`, with no awareness that a `D`-local id is scoped to its
+own home document. Non-blocking in practice (the sweep only ever surfaces
+findings, never refuses the write), but noisy enough to risk training
+whoever reviews `danglingCitations` output to ignore it entirely — the
+opposite of what the field exists for. Fixed by scoping the match to the
+citing line's own home document (`isDLocalId` + a `homeFile` parameter),
+wired into both real callers (`fgos decision`'s own case in `bin/fgos.mjs`,
+and `retrospective-doors.mjs`'s impact door from `tsk-1lv-5`).
