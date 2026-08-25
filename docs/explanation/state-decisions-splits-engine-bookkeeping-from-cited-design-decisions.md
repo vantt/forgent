@@ -243,3 +243,13 @@ real record, and `docs/decisions/` itself persists as a directory holding
 only the generated `index.md` (this is a separate retirement from
 `docs/history/<feature>/` shaping records, which are cleaned up on their
 own, unrelated schedule by `/fgOS:cleanup-next`).
+
+**The 4-door check landed too (`tsk-1lv-5`)** — the source of every
+`retrospective-door-freshness`/`retrospective-door-routing`/
+`retrospective-door-docDeferral` advisory friction entry a retrospective
+sweep produces. It runs harness-only, inside the existing `bin/fgos.mjs`
+`case 'retrospective'` call (the same sweep every `/fgOS:retro-next`
+iteration already runs), never gating `fgos approve` and never touching
+any skill's own prose — applied to every item in the batch uniformly,
+with no risk-tier exemption (D11: doc-rot doesn't distinguish tier, so
+neither does the check).
