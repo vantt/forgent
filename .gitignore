@@ -27,6 +27,9 @@ node_modules/
 output.txt
 *-output.txt
 .fgos/sessions.json
+# gateway process registry (pid/port/startedAt) — process state, never
+# committed, same class as sessions.json (tsk-31v)
+.fgos/gateway.json
 
 # main-checkout activity lock + sibling lock files (STR65) — process state, never committed
 .fgos/*.lock
