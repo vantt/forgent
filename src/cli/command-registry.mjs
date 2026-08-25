@@ -1143,6 +1143,25 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'gateway',
+    invoke: 'fgos gateway',
+    description: 'One-door lifecycle for the herdr-fgos gateway (REST API + web dashboard, herdr-plugin/src/gateway.rs) as a detached background process (tsk-31v): "start" builds the release binary then spawns it detached, refusing if already running; "stop" sends SIGTERM to the recorded pid; "status" (read-only) reports pid/port/liveness plus a real reachability check against /v1/contract. Use this instead of a hand-rolled nohup/tmux/systemd invocation — AGENTS.md names it the mandatory entry point.',
+    parameters: {
+      type: 'object',
+      properties: {
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['start', 'stop', 'status'] },
+      },
+      positional: ['sub'],
+      required: ['sub'],
+    },
+    examples: ['fgos gateway start', 'fgos gateway status', 'fgos gateway stop'],
+    touchesState: true,
+    requiresExistingStore: false,
+    externalEffect: true,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'goal',
     invoke: 'fgos goal',
     description: 'Persisted-focus pointer (str67-goal-directed-planning D3/D4/D6/D7): "set" points focus at an existing goalTier item (rejects a non-goal id, required for "set"); "show" (read-only) returns the current focus plus its goal-scoped ranking, or {focus: null} when nothing is set.',

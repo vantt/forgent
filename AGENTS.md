@@ -115,6 +115,10 @@ Every result also carries `configured: true|false` — `false` means nothing is 
 
 A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.claude/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `.agents/skills/_shared/`).
 
+## Starting the herdr gateway — one door, never a raw process
+
+**If a task needs the herdr-fgos gateway (REST API + web dashboard) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** (tsk-31v) This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `herdr-plugin/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.
+
 <!-- mdview:START -->
 ## Documentation Viewing (MDView)
 

@@ -82,6 +82,7 @@ import {
 } from '../src/runner/main-checkout-lock.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
+import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
@@ -3677,6 +3678,33 @@ async function runVerb(verb, flags, positional, dir) {
       }
     }
 
+    // Gateway process lifecycle (tsk-31v): the one-door way any agent
+    // starts/stops/checks the herdr-fgos gateway (REST API + web
+    // dashboard) as a detached background process instead of hand-rolling
+    // nohup/tmux/systemd. AGENTS.md's own dispatch doctrine names this as
+    // the mandatory entry point.
+    case 'gateway': {
+      const sub = requireField(positional[0], 'gateway requires a sub-verb: fgos gateway <start|stop|status>');
+      const repoRoot = path.dirname(dir);
+      try {
+        if (sub === 'start') {
+          return startGateway(repoRoot, dir);
+        }
+        if (sub === 'stop') {
+          return stopGateway(dir);
+        }
+        if (sub === 'status') {
+          return await gatewayStatus(dir);
+        }
+        throw new StoreError('validation', `unknown gateway sub-verb "${sub}". Usage: fgos gateway <start|stop|status>`);
+      } catch (err) {
+        if (err instanceof GatewayControlError) {
+          throw new StoreError('validation', err.message);
+        }
+        throw err;
+      }
+    }
+
     // Persisted-focus CLI surface (str67-goal-directed-planning D3/D4/D6/D7):
     // reads/writes go through the setFocus/goalFocusShow facades only, never
     // graph-metrics.mjs directly. Only `set`/`show` exist here — `clear`/
@@ -4088,7 +4116,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
   }
 }
 
