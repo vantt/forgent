@@ -21,9 +21,8 @@ state or touches git worktrees directly — every write goes through the
 
 1. **Read the optional id argument, and the optional `--autoClose` flag.**
    `$ARGUMENTS` is the work item id to claim, or empty to claim the current
-   frontier head, plus an optional trailing `--autoClose` token
-   (`docs/history/fgos-terminal-close-autoclose/CONTEXT.md` D1: opt-in
-   only, never a new default). Strip a trailing `--autoClose` token from
+   frontier head, plus an optional trailing `--autoClose` token — opt-in
+   only, never a new default. Strip a trailing `--autoClose` token from
    `$ARGUMENTS` before passing the rest through to the verb in step 2 —
    when absent, `$ARGUMENTS` is unchanged and this skill's behavior is
    byte-identical to before this option existed. Do not validate or guess
@@ -33,29 +32,17 @@ state or touches git worktrees directly — every write goes through the
 
 2. **Claim the item and stand up its worktree.** Run:
 
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" pick $ARGUMENTS --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos pick $ARGUMENTS --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   pick $ARGUMENTS --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
-   Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
-   never a relative path — an installed plugin's files run from a copied
-   cache location, not from this repo checkout, so a relative path would
-   resolve to the wrong place or fail outright.
-
-   `--dir` (tsk-56t): most picks run from the main checkout, where this is
-   a no-op — but tsk-424's chaining case (a session already inside a root
+   `--dir`: most picks run from the main checkout, where this is
+   a no-op — but the chaining case (a session already inside a root
    item's worktree calling `/fgOS:pick` again on a child item, via a
    second in-session `EnterWorktree`) means this cwd can already BE a
-   linked worktree, which never carries its own `.fgos/` (ADR0020).
+   linked worktree, which never carries its own `.fgos/` by design.
    `${CLAUDE_PROJECT_DIR}` still resolves to the main checkout even from
    inside that worktree (it survives an `EnterWorktree` switch), so
    passing it as `--dir` here keeps the chained claim writing to the one
@@ -88,7 +75,7 @@ state or touches git worktrees directly — every write goes through the
    herdr-managed pane. Never stop or retry pick's own flow based on its
    result.
 
-   (tsk-23z: showing the claimed item's title/description to the user no
+   (Showing the claimed item's title/description to the user no
    longer happens here — it moved to `fgos-coding-driving`'s own Loop,
    which step 5 below already invokes and which now prints it once, right
    before the worktree/claim branch, the same position this step used to
@@ -107,15 +94,14 @@ state or touches git worktrees directly — every write goes through the
    tell the user to open a new session there. This is the same fallback
    pattern `bee worktree new` already uses for the analogous case.
 
-   tsk-424: pick's own worktree lives under `.claude/worktrees/` precisely
+   Pick's own worktree lives under `.claude/worktrees/` precisely
    so a session already switched into a root item's worktree CAN chain a
    second, in-session `EnterWorktree` call into a child item's worktree
    (e.g. the root decomposing into children mid-session) — that specific
    case no longer needs this fallback at all.
 
    **Never bypass this step with a raw `git checkout <fgw/branch>` on the
-   main checkout** (tsk-4hk: `docs/journals/260803-1612-main-checkout-
-   direct-branch-checkout-tsk-4hk.md`) — the main checkout is the one
+   main checkout** — the main checkout is the one
    shared working tree every session's `fgos <verb>` call resolves against;
    checking a work branch out there instead of into its own worktree mixes
    that branch's tree with whatever else is in flight elsewhere in the
@@ -124,8 +110,7 @@ state or touches git worktrees directly — every write goes through the
    one.
 
    **Never run a raw `git reset --hard` on the main checkout without a
-   full `git status` first** (tsk-3au:
-   `docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md`) — a
+   full `git status` first** — a
    session that checks only the files it meant to touch, not the whole
    tree, can silently discard another in-flight session's uncommitted work
    with no stash/reflog/blob to recover it (the main checkout is shared
@@ -134,7 +119,7 @@ state or touches git worktrees directly — every write goes through the
    instead — it shows the full whole-repo status and refuses without
    `--confirm` when the tree is dirty.
 
-5. **Drive the claimed item via `fgos-coding-driving` (tsk-19j-4) — do not
+5. **Drive the claimed item via `fgos-coding-driving` — do not
    stop after the switch.** If step 4 actually switched the session into
    the worktree, immediately invoke the `fgos-coding-driving` skill for
    this id, no `ceiling` (omit it — the driver's own implicit stops
@@ -161,7 +146,7 @@ state or touches git worktrees directly — every write goes through the
 6. **Report and stop.** In the fallback case, report right after step 4:
    tell the user which item id was claimed and the worktree path they
    need to open. In the switched case, report whatever `fgos-coding-
-   driving` itself reported (tsk-19j-4):
+   driving` itself reported:
    - **`awaiting-approval` reached** — the item is built, verified, and
      returned; tell the user and mention the review gate
      (`fgos review`/`fgos approve`/`fgos reject`) is theirs to run next,
@@ -170,8 +155,7 @@ state or touches git worktrees directly — every write goes through the
      working tree") — this session is sitting in exactly that worktree
      (step 4 switched into it), so tell the user (or do it yourself if
      driving on their behalf) to leave it first: `ExitWorktree` with
-     `action: "keep"`, then run `fgos approve` from the main checkout
-     (tsk-3rg).
+     `action: "keep"`, then run `fgos approve` from the main checkout.
    - **anchored by open children** — the driver's own planning pass split
      this item; tell the user which child ids are still open and that
      `/fgOS:pick <child-id>` is the way to continue on any of them.
@@ -187,8 +171,7 @@ state or touches git worktrees directly — every write goes through the
 
    **If `--autoClose` was passed (step 1) and the driver's stop is one of
    `awaiting-approval` reached, anchored by open children, or
-   `awaiting-human`** — an advance or a legitimate park, per
-   `docs/history/fgos-terminal-close-autoclose/CONTEXT.md` D2 — call
+   `awaiting-human`** — an advance or a legitimate park — call
    `/fgOS:terminal-close` as the literal last action of this skill's own
    flow, invoked directly here the same way step 3 already calls
    `terminal/rename.sh` rather than through a second slash-command round
@@ -199,6 +182,6 @@ state or touches git worktrees directly — every write goes through the
    ```
 
    Never call this on `blocked` or no-progress — the pane must stay open
-   for a person to debug (D2). Never call it if `--autoClose` was not
+   for a person to debug. Never call it if `--autoClose` was not
    passed. Nothing runs after this call — it is unconditionally the final
    statement of this skill's flow when it fires, with no delay before it.

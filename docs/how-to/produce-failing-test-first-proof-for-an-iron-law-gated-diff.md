@@ -143,6 +143,37 @@ the very term it's checking for. Run the guard test *after* `git add`/
 lesson above already establishes, and treat a fully-green first local run
 as suspect (not proof) if the diff added any new tracked-prose files.
 
+## Watch out for: a comment-only, behavior-neutral diff has no red state to honestly produce
+
+`tsk-bc7` (a post-hoc audit of the `tsk-1y6-1` → `tsk-49i` Iron Law port)
+tripped the gate on `matchedFlags: ["audit"]` — a description-keyword match
+(`src/intake/risk-keywords.mjs`'s `HEAVY_KEYWORDS` includes the literal
+word "audit"), with `matchedModules` empty: nothing the item touched was
+actually on `src/evolve/iron-law.mjs`'s `MODULE_RULES` list. The gate
+fired because of the item's *subject matter* (auditing the Iron Law gate
+itself), not because the diff was self-modifying capability code.
+
+The item's real committed code change was a 3-line comment-only edit in
+`src/setup/registrations.mjs`, updating a stale reference from
+`bin/fgos.mjs's readIronLawLevel` to the function's real post-port
+location (`src/verbs/merge/iron-law-level.mjs`) — zero identifier, control
+flow, or runtime string changed.
+
+The stash-and-restore recipe above assumes the diff changes *behavior* a
+test can observe differently before and after. A comment-only edit has no
+such behavior — there is no red state to honestly get to, and inventing
+one (temporarily breaking something unrelated just to have a "before"
+failure) would be exactly the fabrication this whole proof requirement
+exists to prevent.
+
+**The correct proof for a behavior-neutral diff is identical test results
+before and after**, confirming the change didn't regress anything: `npm
+test` run once on the pre-edit tree, once on the post-edit tree, both
+showing the same pass/fail/skip counts (3364/0/5 out of 3369, both times,
+for `tsk-bc7`). Reach for this shape only when the diff genuinely has no
+observable behavior to flip red — a real logic change still owes the
+stash-and-restore recipe above, not this shortcut.
+
 ## Why this survives review even without re-running it
 
 A reviewer (human or a later session) reading `iron-law-evidence.md` gets

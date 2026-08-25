@@ -83,3 +83,77 @@ on disk), or (c) explicitly document today's dev-skill dispatch as
 forgentX-checkout-only and add a doctor check that fails loudly instead of
 erroring mid-run. This is a product/scope decision, not something further
 research resolves.
+
+## Round 2 — 2026-08-20 (tsk-5zi, discovery stage)
+
+**Asked:** Round 1's D3 (CONTEXT.md) locked test-based enforcement
+(extend `test/skills/fgos-mirror.test.mjs`'s byte-identical assertion to
+`plugins/fgOS/skills/`) but explicitly left open "whether to ALSO add an
+active copy/generation script ... vs relying on a failing test to force a
+manual re-sync" as an implementation-approach choice. tsk-5zi proposes
+closing that open choice: extend `npm run build:skills`
+(`src/setup/skill-wrappers.mjs`) to auto-copy `.agents/skills/<name>` →
+`plugins/fgOS/skills/<name>` for the 14 dev-skills, reusing the existing
+`copyDirRecursive` helper. Is this concretely buildable against the real
+current code, and does the byte-identical claim in tsk-5zi's own
+description still hold?
+
+**Checked — repo first:**
+- `src/setup/skill-wrappers.mjs:96` — `copyDirRecursive(sourceDir,
+  targetDir)` already exists, module-local (not exported), recursively
+  copies and overwrites every file — already reused by
+  `generateAllSkillWrappers` (`:62`), `assembleSkills` (`:122`), and
+  `materializeSkillsIntoProject` (`:197`) for the analogous
+  `.agents/skills` → `.claude/skills`(wrappers)/`targetRoot` copies. A new
+  function in the same module can call it directly for the third leg
+  without exporting it.
+- `scripts/build-skill-wrappers.mjs` (read directly, 29 lines) — the
+  `npm run build:skills` entrypoint (`package.json:31`). Currently calls
+  only `assembleSkills` then `generateAllSkillWrappers`; never touches
+  `plugins/fgOS/skills/` at all today.
+- `plugins/fgOS/skills/` (`ls`, 49 entries) vs `.agents/skills/` (`ls`, 16
+  entries: `_shared`, `distill`, and the 14 `fgos-*` dev-skills) — the 14
+  `fgos-*` dev-skill names in `.agents/skills` are exactly the 14 present
+  in `plugins/fgOS/skills` (`distill` is NOT mirrored into
+  `plugins/fgOS/skills` — matches `test/skills/fgos-mirror.test.mjs:231-
+  234`'s explicit "only the 14 dev-skills are in scope for D6" assertion).
+- `diff -rq` run live, fresh, against every one of the 14
+  `.agents/skills/fgos-*` dirs and `plugins/fgOS/skills/fgos-*`
+  counterparts, plus `_shared`: **all empty** — confirms tsk-5zi's own
+  description claim ("2 bên đang byte-identical") still holds today,
+  2026-08-20, not just at the description's original write time.
+- `test/skills/fgos-mirror.test.mjs:30-39` (comment) — explicitly states
+  the plugin leg "stays hand-maintained ... a full byte-identical copy
+  against the real canonical source, `.agents/skills`" — confirms no
+  active sync exists yet, matching Round 1's D3 framing. Lines `115-150`
+  already assert the exact target shape any new sync function must
+  satisfy: same `fgos-*` name set, same relative file paths, byte-
+  identical content, for every dev-skill. Lines `171-189` assert the same
+  for `_shared/` (tsk-53h/tsk-32b: 6 of the 14 dev-skills reference
+  `../_shared/executor-dispatch-fallback.md`, so `_shared` must mirror
+  too). These tests already pass today (manual copy); a build:skills
+  extension does not need to change the tests, only make the state they
+  assert self-maintaining.
+- `src/setup/registrations.mjs:1921-1946` — doctor check
+  `plugin-dev-skills-packaged` only checks *presence* (`SKILL.md` exists
+  at the target path), not content — unaffected either way by whether the
+  copy is manual or automated.
+- `grep -rn "plugins/fgOS/skills"` across `scripts/`, `src/`,
+  `package.json`: no other script or module writes into
+  `plugins/fgOS/skills/` — the new function has no other caller/path to
+  coordinate with besides `scripts/build-skill-wrappers.mjs`.
+
+**Finding:** Fully buildable with existing pieces, no new external
+research needed. Concrete shape: add one new exported function in
+`src/setup/skill-wrappers.mjs` (e.g. `mirrorDevSkillsIntoPlugin`) that
+lists `.agents/skills/<name>` for `_shared` and every `fgos-*`-prefixed
+directory and calls the existing `copyDirRecursive` for each into
+`plugins/fgOS/skills/<name>`; call it from
+`scripts/build-skill-wrappers.mjs` after the existing
+`generateAllSkillWrappers` call. `materializeSkillsIntoProject`
+(external-project setup path) does NOT need this call —
+`plugins/fgOS/skills/` is this repo's own package-relative plugin
+directory, not something materialized per external `targetRoot`.
+
+**Still open:** none — this closes Round 1's D3 open choice. No
+`awaiting-human` question remains; ready for a `clear` discovery verdict.

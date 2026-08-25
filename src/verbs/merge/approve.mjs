@@ -36,6 +36,7 @@ import {
   performCatchUp,
   buildOwnFileSet,
   isWorkingTreeClean as isMainTreeClean,
+  formatFgosWriteRejectedDetail,
 } from '../../runner/merge.mjs';
 import {
   branchNameFor,
@@ -55,6 +56,7 @@ import { listSessions } from '../../runner/session.mjs';
 import { runGoalCheck } from '../../runner/goal-check.mjs';
 import { mergeGitHubPR } from '../../runner/github-adapter.mjs';
 import { recordApprovePostSuccessFault } from '../../cli/approve-fault-log.mjs';
+import { checkDispatchAttestation } from '../../runner/attestation-guard.mjs';
 
 // tsk-480: approve's own success paths (merge landed, or verify-only
 // passed) call `moveWork(...to:'delivered'...)` as their very last
@@ -73,6 +75,7 @@ import { recordApprovePostSuccessFault } from '../../cli/approve-fault-log.mjs';
 // truthful envelope.
 function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { mergedSha, mergedInto } = {}) {
   try {
+    recordApprovePostSuccessFault(dir, { id, phase, mergedSha, mergedInto });
     // Test-only failure seam (tsk-480 D3), same shape as
     // FGOS_GH_COMMAND: the env var itself is read by the CLI adapter and
     // arrives here as `testForceLockTimeoutId` (a use case never reads
@@ -95,7 +98,7 @@ function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { me
     if (!(err instanceof EventLogError)) {
       throw err;
     }
-    const diagnosticLog = recordApprovePostSuccessFault(dir, { id, phase, detail: err.message });
+    const diagnosticLog = recordApprovePostSuccessFault(dir, { id, phase, detail: err.message, mergedSha, mergedInto });
     process.stderr.write(
       `fgos: warning: "${id}" ${phase} succeeded but its status write failed (${err.message}); `
         + `item status remains "awaiting-approval" pending manual reconciliation; `
@@ -355,7 +358,9 @@ export async function approveUseCase(
       // eventual consistency hasn't attached it yet (accepted rough
       // edge, same as the module's own doc comment); mergedInto matches
       // the literal 'main' the local root-into-main path already uses.
-      const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha: result.mergeCommit?.oid, mergedInto: 'main' });
+      const mergedSha = result.mergeCommit?.oid;
+      recordApprovePostSuccessFault(dir, { id, phase: 'github merge', mergedSha, mergedInto: 'main' });
+      const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha, mergedInto: 'main' });
       return { id, mode: 'github', to: 'delivered', prNumber, seq: event.seq };
     }
     // blocked — mirrors the local merge-conflict/verify-fail-post-merge
@@ -404,6 +409,24 @@ export async function approveUseCase(
     // (resolveRoot walks item.parent up to the top); a root's resolved
     // root is itself.
     const rootId = resolveRoot(view, id);
+
+    if (source === 'runner') {
+      const branch = branchNameFor(id);
+      const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
+      if (!attestation.ok) {
+        const targetBranch = rootId !== id ? branchNameFor(rootId) : detectTrunk(repoRoot);
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: attestation.reason, role: 'system' });
+        addFriction(dir, {
+          id,
+          disposition: 'blocked',
+          errorClass: attestation.reason,
+          layer: 'attestation',
+          attempts: 1,
+          detail: attestation.detail,
+        });
+        return { id, mode: 'merge', to: 'blocked', reason: attestation.reason, target: targetBranch };
+      }
+    }
 
     if (rootId !== id) {
       const rootBranch = branchNameFor(rootId);
@@ -497,6 +520,18 @@ export async function approveUseCase(
             });
             return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch, conflictedFiles: catchupResult.conflictedFiles };
           }
+          if (catchupResult.outcome === 'merge-refused') {
+            moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-failed-unclassified', role: 'system' });
+            addFriction(dir, {
+              id,
+              disposition: 'blocked',
+              errorClass: 'merge-fail',
+              layer: 'state',
+              attempts: 1,
+              detail: `catchup (inbound gate): git merge --no-commit --no-ff ${rootBranch} into ${branchNameFor(id)} refused: ${catchupResult.reason}`,
+            });
+            return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: rootBranch, detail: catchupResult.reason };
+          }
           if (catchupResult.outcome === 'verify-fail') {
             const mergeReason = catchupResult.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
             moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: mergeReason, role: 'system' });
@@ -579,6 +614,22 @@ export async function approveUseCase(
           return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: rootBranch };
         }
 
+        if (result.outcome === 'lock-lost-mid-merge') {
+          // tsk-2qp: main checkout lock was lost mid-merge (heartbeat renewal failed).
+          // Merge commit was not performed and git merge --abort was never called,
+          // preserving the new lock holder's tree state intact.
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'lock-lost-mid-merge', role: 'system' });
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'lock-lost-mid-merge',
+            layer: 'state',
+            attempts: 1,
+            detail: `main checkout lock was lost mid-merge; ${rootBranch}'s own merge of ${result.branch} was stopped before commit`,
+          });
+          return { id, mode: 'merge', to: 'blocked', reason: 'lock-lost-mid-merge', target: rootBranch };
+        }
+
         if (result.outcome === 'fgos-write-rejected') {
           moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
           addFriction(dir, {
@@ -587,7 +638,7 @@ export async function approveUseCase(
             errorClass: 'fgos-write-blocked',
             layer: 'state',
             attempts: 1,
-            detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${rootBranch} unchanged — ADR0020`,
+            detail: formatFgosWriteRejectedDetail(result.branch, result.paths, rootBranch),
           });
           return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: rootBranch, paths: result.paths };
         }
@@ -745,6 +796,24 @@ export async function approveUseCase(
       return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: 'main' };
     }
 
+    if (result.outcome === 'lock-lost-mid-merge') {
+      // tsk-2qp: main checkout lock was lost mid-merge (heartbeat renewal failed).
+      // Merge commit was not performed and git merge --abort was never called.
+      const detail = hadChildren
+        ? `cross-root integration attempt at main@${currentHead(repoRoot)}; main checkout lock was lost mid-merge; merge of ${result.branch} was stopped before commit`
+        : `main checkout lock was lost mid-merge; merge of ${result.branch} was stopped before commit`;
+      moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'lock-lost-mid-merge', role: 'system' });
+      addFriction(dir, {
+        id,
+        disposition: 'blocked',
+        errorClass: 'lock-lost-mid-merge',
+        layer: 'state',
+        attempts: 1,
+        detail,
+      });
+      return { id, mode: 'merge', to: 'blocked', reason: 'lock-lost-mid-merge', target: 'main' };
+    }
+
     if (result.outcome === 'fgos-write-rejected') {
       moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
       addFriction(dir, {
@@ -753,7 +822,7 @@ export async function approveUseCase(
         errorClass: 'fgos-write-blocked',
         layer: 'state',
         attempts: 1,
-        detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, main unchanged — ADR0020`,
+        detail: formatFgosWriteRejectedDetail(result.branch, result.paths, 'main'),
       });
       return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: 'main', paths: result.paths };
     }

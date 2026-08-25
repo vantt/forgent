@@ -3,13 +3,13 @@ name: beehive
 type: git-repo
 url: https://github.com/vantt/beegog (fork tracked as primary clone here); upstream origin https://github.com/thanhsmind/beegog (project was originally named bee, renamed to beegog, Rust core added)
 local: upstreams/beehive
-last_analyzed_commit: 05a131f (beegog snapshot pass)
-last_analyzed_version: v2.7.0 (bee living-doc scoped delta pass)
+last_analyzed_commit: 05a131f
+last_analyzed_version: v2.7.0
 last_analyzed_date: 2026-08-17
 domains_covered: [harness, skills, hooks, workflow, orchestration, routing, integration-contract, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals]
 ---
 
-# Beehive (bee / beegog) — Feature Index
+# Beehive — Feature Index
 
 > **Merged 2026-08-17** from two independent distillation passes over the same project (bee → renamed → beegog, now tracked here as `beehive`): the **beegog git-repo snapshot pass** (commit-hash versioned, `Seen: <sha>`) and the **bee living-doc pass** (semver-tag versioned, `Seen: <version>`). The two passes used the same 18-domain taxonomy in the same order and, on inspection, produced zero overlapping entry slugs — every `###` entry below is unique, so domain sections concatenate both passes' entries (beegog-pass entries first, then bee-pass entries) with nothing dropped or deduplicated.
 
@@ -643,7 +643,7 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 
 ### proof-tier-matrix
 - **What:** Replaces the old blanket "red-first for any behavior_change cell" rule (test-economy D1/D2, amending not reversing the prior decisions). Proof required at cap is now derived from `change_class × lane`: `refactor`/`formatting` at every lane including high-risk → existing suite passing is proof enough, a NEW test file is refused outright; `bugfix`/`behavior`/`api` at `tiny`/`small`/`standard` → one targeted-green test, no red-first needed; the same at `high-risk` → full scoped red-first; `security`/`migration` at every lane → always red-first, "no lane ever softens this row." An unclassified cell falls back to old behavior (no discount without explicitly declaring `change_class`).
-- **Where:** `bee-executing/SKILL.md` (Proof-tier matrix, `packages/bee/lib/cells.mjs` `requiredProofTier`).
+- **Where:** `bee-executing/SKILL.md` (Proof-tier matrix, `packages/bee-rs/crates/bee/src/verbs/cells/finish_support.rs` — ported from JS `lib/cells.mjs` `requiredProofTier`; Rust path is upstream/main only, not yet in the tracked fork branch).
 - **Notable:** Paired with test-shape rules (≥3 similar cases must be table-driven not copy-pasted; a genuinely new test file needs a declared `new_suite_reason` ≥20 chars; a test-to-source line ratio ceiling that warns at tiny/small and refuses above 4× at standard/high-risk) — an explicit anti-test-bloat design, not just a proof-strength rule.
 - **Keywords:** test-economy, proof tier, change_class, scoped red-first
 - **Seen:** 1.18.3
@@ -732,7 +732,7 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 
 ### decision-citation-and-reversal-sweep
 - **What:** New system since v1.18.3, `docs/knowledge/areas/decision-memory/overview.md` (9 business rules). Decisions carry a global content-hash `short8` id (never a small integer alone); **R8 — Citation discipline (D3):** any artifact encoding a decision cites that short8 id, which is what makes reversal reachable. **R2 — a supersede is not finished until every citing artifact is reconciled:** before its single log append, `decisions supersede` computes a citation sweep over `docs/**` (full id + word-boundary short8 match); every hit is fixed same-turn or explicitly waived with a recorded reason, and an unreconciled hit resurfaces at every flush. `decisions log --relation touches:<id>` runs the same sweep for a non-superseding reference. Free text that reads as an inline supersession claim ("supersedes", "replaces", "no longer applies"...) is refused unless a real `--relation supersedes:<id>` resolves it — a guard added after a store audit found 70 decide events hiding a supersession in prose against 29 proper supersede events. **R5 — the recall surface is a machine-regenerated index** (`docs/decisions/index.md`, never hand-edited, grouped scope→tag, superseded entries excluded, byte-stable, "complete by construction"), with structured search (`--tag`, `--scope`, `--since`, `--untagged`) — "bare substring grep is the fallback, never the recall path."
-- **Where:** `docs/knowledge/areas/decision-memory/overview.md`, `packages/bee-rs/crates/bee/src/verbs/decisions/`.
+- **Where:** `docs/knowledge/areas/decision-memory/overview.md`, `packages/bee-rs/crates/bee/src/verbs/decisions/` (upstream/main only — not yet in the tracked fork branch).
 - **Notable:** Directly answers "how does a bare decision-id citation stay meaningful over time" — bee's answer is not a prose convention alone (R8 still requires an author to remember to cite the short8) but a **mechanical backstop**: a decision cannot be superseded/reversed without the system itself finding and forcing reconciliation of every place that cited the old truth, closing the exact failure mode ("a reversed decision lived only in the log; every artifact that stated the old conclusion kept restating it") this project's own hand-maintained `docs/decisions/0000-index.md` has no mechanism against.
 - **Keywords:** short8 citation, reversal-propagation sweep, machine-regenerated index, relation-required guard
 - **Seen:** v2.7.0 (scoped delta pass, tsk-37i, 2026-08-17 — not present at v1.18.3)
@@ -985,7 +985,7 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 
 ### one-line-cite-plus-local-delta
 - **What:** New since v1.18.3, `docs/knowledge/areas/doctrine-layer/prompt-writing-standard.md` — the standard every edit to bee's own instruction text is judged by. **R3 — "One rule, one home":** a boundary rule is stated in full exactly once (its canonical home document); everywhere else it appears **only as a one-line cite plus the local delta that document actually adds** — never a near-verbatim restatement, and never a bare id with no gloss. Paired with a mechanical **pointer-integrity check** (`docs/knowledge/areas/verify-pipeline/skill-reference-pointer-integrity.md`, Rust test `pointer_integrity.rs`): every citation from an instruction document to a reference document must resolve to a real file AND a real heading inside it, checked on every verify run with negative-control fixtures proving the check can still detect a broken pointer — three real broken pointers were found the first time the check ran, in documents that had "passed" every prior check for their whole existence. Separately, **R5 (deterministic-backstop preference):** an absolute rule that is structurally reachable belongs in a hook/permission, not prose — "markdown carries only what enforcement cannot reach."
-- **Where:** `docs/knowledge/areas/doctrine-layer/prompt-writing-standard.md`, `docs/knowledge/areas/verify-pipeline/skill-reference-pointer-integrity.md`, `packages/bee-rs/crates/bee/tests/pointer_integrity.rs`.
+- **Where:** `docs/knowledge/areas/doctrine-layer/prompt-writing-standard.md`, `docs/knowledge/areas/verify-pipeline/skill-reference-pointer-integrity.md`, `packages/bee-rs/crates/bee/tests/pointer_integrity.rs` (upstream/main only — not yet in the tracked fork branch).
 - **Notable:** This is bee's most direct answer to "a citation should never be a bare id" — but it splits the fix into two different-strength mechanisms on purpose: the *structural* half (does the pointer even resolve to a real file/heading) is machine-enforced and fails the build; the *content* half (is the one-line gloss actually accurate/complete) stays prose discipline enforced by review, because — per this same standard's four-question line filter — whether a gloss is *faithful* is a judgment call no grep can make, only whether it *exists and resolves* can be checked mechanically.
 - **Where else relevant:** `docs/knowledge/areas/doctrine-layer/placement-and-anchoring.md` (B4 — every rule that must never disappear carries a suite-enforced anchor; a rule without one may vanish with no signal) is the same "verify reachability mechanically, verify content by discipline" split applied to whole rules instead of individual citations.
 - **Keywords:** one-rule-one-home, cite-plus-delta, pointer integrity, four-question line filter

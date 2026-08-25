@@ -109,15 +109,15 @@ function git(repoRoot, args) {
  * failing closed -- `HEAD` itself is never pruned, so this fallback only
  * ever applies to the leaf case (targetRef !== 'HEAD').
  *
- * DIAGNOSTIC HINT (tsk-3ft): when `targetRef` DOES exist but the sha still
- * isn't its ancestor, ancestry alone cannot tell a genuine force-push loss
- * apart from a branch manually reset to unrelated divergent history --
- * `git merge-base --is-ancestor` fails identically either way (this stays
- * an intentional limitation, matching the revert-detection gap documented
- * above; tsk-3ft's own investigation deliberately rejected building
- * detection or auto-recovery for this). The `ok:false` detail just points
- * at `git reflog show <targetRef>` as the next diagnostic step -- the
- * exact tool that resolved tsk-47e's case in that investigation.
+ * DIAGNOSTIC HINT (tsk-3ft, tsk-2jz): when `targetRef` DOES exist but direct
+ * ancestry fails, checkAncestry tries two fallbacks before reporting failure:
+ * (1) checking if the commit reached HEAD directly (blind spot 2: rescue merge
+ * bypassing targetRef), and (2) checking if content is equivalent via git
+ * cherry-pick patch-ids (blind spot 1: clean rebase-rehash). If both fallbacks
+ * fail, ancestry/content checks cannot prove the commit's work reached targetRef
+ * (e.g. a rebase that also changed content via conflict resolution, or a genuine
+ * force-push loss) -- this stays an intentional limitation. The `ok:false` detail
+ * points at `git reflog show <targetRef>` as the next diagnostic step.
  *
  * DECOMPOSED-PARENT FALLBACK (tsk-psb): an item that went through
  * decompose-into-children never itself merges `fgw/<id>` into anything --
@@ -166,7 +166,15 @@ export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
         : childrenResult;
     }
   }
-  const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake;
+  // tsk-40m (docs/architect/doing-coordination-redesign.md): these top-level
+  // sticky fields are only ever set by a durable work.move payload, which
+  // claim time no longer writes -- the real values now live on the settle's
+  // own work.attempt, folded into work.lastAttempt. Checked as a fallback,
+  // never instead of, so a genuinely legacy pre-migration record (top-level
+  // field set, no lastAttempt) still resolves exactly as before.
+  const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake
+    ?? work?.lastAttempt?.branchHeadAtReturn ?? work?.lastAttempt?.headAtReturn
+    ?? work?.lastAttempt?.branchHeadAtTake ?? work?.lastAttempt?.headAtTake;
   if (!sha) {
     return { ok: true, detail: NOTHING_TO_CHECK_DETAIL };
   }
@@ -245,14 +253,59 @@ function checkAncestry(repoRoot, sha, targetRef, fallbackNote) {
         : `commit ${sha} is still an ancestor of ${targetRef}`,
     };
   } catch {
-    return {
-      ok: false,
-      detail: fallbackNote
-        ? `${fallbackNote} — fell back to HEAD, but commit ${sha} is not an ancestor of HEAD either — the merge may have been force-pushed away or history rewritten`
-        : `commit ${sha} is no longer reachable from ${targetRef} — the merge may have been force-pushed away or history rewritten. ` +
-          `${targetRef} still exists — if this is unexpected, run "git reflog show ${targetRef}" to check for a manual reset that discarded this commit (tsk-3ft)`,
-    };
+    // Direct check failed; fall through to fallbacks.
   }
+
+  // Fallback 1: Main-ancestry fallback (resolves blind spot 2)
+  if (targetRef !== 'HEAD') {
+    try {
+      git(repoRoot, ['merge-base', '--is-ancestor', sha, 'HEAD']);
+      return {
+        ok: true,
+        detail: fallbackNote
+          ? `${fallbackNote} — fell back to HEAD, commit ${sha} resolved as an ancestor of HEAD (main-ancestry fallback)`
+          : `commit ${sha} is not an ancestor of ${targetRef}, but resolved as an ancestor of HEAD (main-ancestry fallback)`,
+      };
+    } catch {
+      // Main-ancestry fallback failed
+    }
+  }
+
+  // Fallback 2: Content-equivalence fallback (resolves a CLEAN rebase-rehash)
+  const refsToTry = [targetRef];
+  if (targetRef !== 'HEAD') {
+    refsToTry.push('HEAD');
+  }
+
+  for (const ref of refsToTry) {
+    try {
+      const out = git(repoRoot, [
+        'rev-list',
+        '--count',
+        '--cherry-pick',
+        '--right-only',
+        '--no-merges',
+        `${ref}...${sha}`,
+      ]).trim();
+      const count = Number.parseInt(out, 10);
+      if (count === 0) {
+        return {
+          ok: true,
+          detail: `commit ${sha} is not an ancestor of ${targetRef}, but its content is present on ${ref} under a different commit (content-equivalence fallback)`,
+        };
+      }
+    } catch {
+      // Ignore git errors in rev-list and try next ref or fall through
+    }
+  }
+
+  return {
+    ok: false,
+    detail: fallbackNote
+      ? `${fallbackNote} — fell back to HEAD, but commit ${sha} is not an ancestor of HEAD either — the merge may have been force-pushed away or history rewritten`
+      : `commit ${sha} is no longer reachable from ${targetRef} — the merge may have been force-pushed away or history rewritten. ` +
+        `${targetRef} still exists — if this is unexpected, run "git reflog show ${targetRef}" to check for a manual reset that discarded this commit (tsk-3ft)`,
+  };
 }
 
 /**

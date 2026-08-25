@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
 import { collectWideSourceFiles, findWideCitationFindings, isDLocalId } from '../scripts/check-decision-citation-drift.mjs';
@@ -32,6 +32,7 @@ import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
+import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
 // `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
@@ -42,6 +43,7 @@ import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '.
 // uses in src/setup/registrations.mjs.
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 import { resolveFgosDir, fgosDirFromRoot, resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../src/state/fgos-file-registry.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification, hasRealVerify } from '../src/intake/discovery.mjs';
 import { resolvePlan, replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
@@ -51,6 +53,7 @@ import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.m
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
+import { readClaim } from '../src/state/runtime-coordination.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
@@ -82,12 +85,13 @@ import {
 } from '../src/runner/main-checkout-lock.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
+import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
-import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
+import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig, readSharedConfigOrEmpty, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
@@ -229,9 +233,44 @@ function excludeIronLawEvidence(files, id) {
 // streams the concurrent-session noise above actually comes from --
 // `events.jsonl` (plus its own timestamped backups) and
 // `entropy-history.jsonl` -- never a policy or generated file.
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|entropy-history\.jsonl)$/;
+//
+// Tầng A/T2 (TA-D2/TA-D11): the same append-only stream now also lands in
+// per-writer files under `.fgos/events/<writer-id>-<openTs>.jsonl` instead
+// of always landing in baseline-0 -- same noise, same reasoning, just a
+// different physical path; a compacted baseline under `.fgos/events/`
+// (`baseline-<ts>.jsonl`, T6) and its own manifest sidecar under
+// `.fgos/events/archive/` are equally append-only lifecycle output, never
+// an item's own declared footprint.
+//
+// tsk-3tp-1 (D2, sweep-into-merge-commit redesign): the truncation guard's
+// own mark sidecar (`events-jsonl.truncation-guard.json`) and the warnings
+// log it appends to (`main-checkout-guard-warnings.jsonl`) are the same
+// kind of append-only, no-item-owns-it output -- a fallback checkpoint (or
+// the merge-time sweep) can legitimately touch either one, never an item's
+// own declared footprint. The wildcard extension on
+// `events-jsonl.truncation-guard\..*` also subsumes tsk-vim's own narrower
+// exact-`.json` fix (independently landed on main) -- one regex alternative
+// covers both.
+// `.fgos/logs/` (phase-01, plans/260825-0842-fgos-logs-dir-bucketing):
+// entropy/changelog-nag/approve-fault/invocation-fault/guard-warnings all
+// moved under this gitignored bucket -- kept here too since this regex is
+// evaluated against whatever path list a caller hands it, not only
+// `git diff --name-only` (which would never surface an ignored path).
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|entropy-history\.jsonl|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
+}
+
+// tsk-67o: research findings doc written by fgos-researching during
+// discovery/planning/validating to docs/history/<feature>/RESEARCH.md -- an
+// item's footprint-sync convention (verify-sync-and-gap.md) requires syncing
+// plan.md into footprint, but never lists RESEARCH.md. footprintDiffHits would
+// otherwise flag it on nearly every item that runs fgos-researching. Narrowed to
+// this item's own item.docsRef directory when docsRef is set.
+function excludeDocsRefResearch(files, item) {
+  if (typeof item?.docsRef !== 'string' || !item.docsRef.trim()) return files;
+  const researchPath = normalizePath(path.posix.join(item.docsRef.replace(/\/+$/, ''), 'RESEARCH.md'));
+  return files.filter((f) => normalizePath(f) !== researchPath);
 }
 
 // `realpathOr` is worktree.mjs's `realpathOrSelf` (imported above, tsk-49i
@@ -664,7 +703,7 @@ function collectMissingOutcomeNag(view, id) {
 // the `changelog-unreleased-stale` doctor check uses, so both surfaces
 // agree on what "has an entry" means.
 function changelogNagHistoryPath(dir) {
-  return path.join(dir, 'changelog-nag-history.jsonl');
+  return resolveFgosFile(dir, FGOS_FILE.CHANGELOG_NAG_HISTORY);
 }
 
 // Appends one snapshot per `check` run — same append-only, never-read-back
@@ -675,8 +714,9 @@ function changelogNagHistoryPath(dir) {
 // description says are currently guesses. This function only records the
 // data point — it never computes a rate itself ("đếm, đừng mắng").
 function appendChangelogNagHistoryEntry(dir, entry) {
-  fs.mkdirSync(dir, { recursive: true });
-  fs.appendFileSync(changelogNagHistoryPath(dir), `${JSON.stringify(entry)}\n`, 'utf8');
+  const logPath = changelogNagHistoryPath(dir);
+  fs.mkdirSync(path.dirname(logPath), { recursive: true });
+  fs.appendFileSync(logPath, `${JSON.stringify(entry)}\n`, 'utf8');
 }
 
 function collectChangelogNag(view, dir) {
@@ -698,7 +738,7 @@ function collectChangelogNag(view, dir) {
 // data dir (dataDir() below, or a test's own tmp dir), the exact same value
 // every other verb in this file already threads through to store.mjs.
 function entropyHistoryPath(dir) {
-  return path.join(dir, 'entropy-history.jsonl');
+  return resolveFgosFile(dir, FGOS_FILE.ENTROPY_HISTORY);
 }
 
 // Reads only the LAST line of the trend history (the one prior checkpoint
@@ -736,8 +776,9 @@ function readLastHistoryEntry(dir) {
 // has already confirmed there is work-state data to report on (below) —
 // so a `check` against an uninitialized dir never creates it.
 function appendHistoryEntry(dir, entry) {
-  fs.mkdirSync(dir, { recursive: true });
-  fs.appendFileSync(entropyHistoryPath(dir), `${JSON.stringify(entry)}\n`, 'utf8');
+  const logPath = entropyHistoryPath(dir);
+  fs.mkdirSync(path.dirname(logPath), { recursive: true });
+  fs.appendFileSync(logPath, `${JSON.stringify(entry)}\n`, 'utf8');
 }
 
 // Entropy-trend + seal-digest data (per this cell's action (2)/(3)):
@@ -1528,6 +1569,7 @@ async function runVerb(verb, flags, positional, dir) {
       if (assessment.failed.length > 0) {
         const reason = [...assessment.notReadyYet, ...assessment.failed].join('; ');
         const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'cleanup', reason, role: 'system' });
+        releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
         return { id, to: 'blocked', reason, seq: event.seq };
       }
 
@@ -1544,6 +1586,7 @@ async function runVerb(verb, flags, positional, dir) {
         }
       }
       const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'cleanup', role: 'human' });
+      releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
       return { id, to: 'done', seq: event.seq, cleanupWarnings };
     }
 
@@ -1852,6 +1895,7 @@ async function runVerb(verb, flags, positional, dir) {
         }
       }
       const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
+      releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
       return { id, docType, docPath: docPath ?? null, status: item.status, seq: event.seq };
     }
 
@@ -1865,7 +1909,7 @@ async function runVerb(verb, flags, positional, dir) {
     case 'edit': {
       const id = requireField(positional[0] ?? flags.id, 'edit requires an id: fgos edit <id> --<field> <value> [...]');
       const patch = {};
-      for (const field of ['title', 'description', 'kind', 'risk', 'verify', 'tier', 'urgent']) {
+      for (const field of ['title', 'description', 'kind', 'risk', 'verify', 'tier', 'urgent', 'action']) {
         if (flags[field] !== undefined) {
           patch[field] = flags[field];
         }
@@ -2077,7 +2121,16 @@ async function runVerb(verb, flags, positional, dir) {
           'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after/--superseded-by/--duplicates/--domain-fields/--verify-from-children/--verify-from-targets.',
         );
       }
-      const { event } = editWork(dir, { id, patch, role: 'human' });
+      // tsk-34o: mirrors `take --role`'s own pattern (see the `case 'take'`
+      // block below) -- optional, defaults to 'human' so every existing
+      // caller is unaffected, lets a caller that knows it is not a human
+      // (a session/sub-agent write) say so honestly instead of every write
+      // through this verb being indistinguishable provenance.
+      const role = optionalField(flags.role, 'edit --role requires "human" or "session" (omit --role entirely to default to human)') ?? 'human';
+      if (role !== 'human' && role !== 'session') {
+        throw new StoreError('validation', `edit --role must be "human" or "session" (got "${role}").`);
+      }
+      const { event } = editWork(dir, { id, patch, role });
       if (patch.priority !== undefined) {
         // tsk-sq9: mark this priority as human-set so plan.mjs's resolvePlan
         // refined pass (~line 639) knows to skip its own auto-recompute
@@ -2091,6 +2144,14 @@ async function runVerb(verb, flags, positional, dir) {
         });
       }
       return { id, fields: Object.keys(patch), seq: event.seq };
+    }
+
+    case 'resolve-park-reason': {
+      const id = requireField(positional[0] ?? flags.id, 'resolve-park-reason requires an id: fgos resolve-park-reason <id> --note "..."');
+      const note = requireField(flags.note, 'resolve-park-reason requires --note "..."');
+      const role = optionalField(flags.role, 'resolve-park-reason --role requires "human" or "session" (omit --role entirely to default to human)') ?? 'human';
+      const event = resolveParkReason(dir, { id, note, role });
+      return { id, type: event.type, seq: event.seq };
     }
 
     // Parks the item into `awaiting-human`, carrying the question it is
@@ -2112,10 +2173,12 @@ async function runVerb(verb, flags, positional, dir) {
       const parentId = askView.work[id]?.parent;
       const parent = parentId ? askView.work[parentId] : undefined;
       const parentSnapshotAtAsk = parent ? { id: parent.id, title: parent.title, status: parent.status } : undefined;
-      // statusAtAsk (claim-lock §5.1): the item's OWN status right now, before
-      // the park below — `doing` when a pick claim is held, `todo` otherwise.
-      // answerAwaiting reads this back later to resume to the same status
-      // instead of always falling to `todo`.
+      // statusAtAsk (claim-lock §5.1, tsk-40m P1 fix): informational/audit
+      // ONLY — `askView` above is the EFFECTIVE view (claim overlay), so a
+      // claimed item legitimately reads 'doing' here, a true fact worth
+      // recording. NEVER trusted as a resume target: putInAwaiting/moveWork
+      // compute the resume-safe `durableStatusAtAsk` themselves, from a
+      // fresh durable read, ignoring this value entirely.
       const statusAtAsk = askView.work[id]?.status;
       // rationale/alternatives/source (tsk-63c D1/D3): optional, same
       // guarded-passthrough shape as the rest of ask's fields — fold into
@@ -2155,12 +2218,21 @@ async function runVerb(verb, flags, positional, dir) {
     // both the refusal reason and the legal edges named in the message
     // (chặn và dạy tại chỗ).
     case 'handoff': {
-      const id = requireField(positional[0] ?? flags.id, 'handoff requires an id: fgos handoff <id> --to <role> --reason <advise|assist|review|consult> [--note ...] [--outcome ...]');
+      const id = requireField(positional[0] ?? flags.id, 'handoff requires an id: fgos handoff <id> --to <role> --reason <advise|assist|review|consult> [--note ...] [--outcome ...] [--open-sync-depth <n>]');
       const toRole = requireField(flags.to, 'handoff requires --to <role>');
       const reason = requireField(flags.reason, 'handoff requires --reason <advise|assist|review|consult>');
       const note = optionalField(flags.note, 'handoff --note requires a non-empty value (omit --note entirely to skip it)');
       const outcome = optionalField(flags.outcome, 'handoff --outcome requires a non-empty value (omit --outcome entirely to skip it)');
-      const { event } = recordCall(dir, { id, toRole, reason, note, outcome });
+      // D28: only a caller already inside its own nested sync-consult work
+      // knows this depth -- recordCall's own doc comment explains why it can
+      // never be derived from replay. Omitted (every existing caller) means
+      // 0, byte-identical to before this flag existed.
+      const openSyncDepthRaw = optionalField(flags['open-sync-depth'], 'handoff --open-sync-depth requires a non-negative integer');
+      if (openSyncDepthRaw !== undefined && (!/^\d+$/.test(openSyncDepthRaw))) {
+        throw new StoreError('validation', `handoff --open-sync-depth must be a non-negative integer, got "${openSyncDepthRaw}".`);
+      }
+      const openSyncDepth = openSyncDepthRaw === undefined ? undefined : Number(openSyncDepthRaw);
+      const { event } = recordCall(dir, { id, toRole, reason, note, outcome, ...(openSyncDepth === undefined ? {} : { openSyncDepth }) });
       return { id, type: event.type, seq: event.seq };
     }
 
@@ -2177,7 +2249,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'decision': {
-      const text = requireField(flags.text ?? (positional.length ? positional.join(' ') : undefined), 'decision requires --text "..."');
+      const text = requireField(flags.text, 'decision requires --text "..."');
       const rationale = requireField(flags.rationale, 'decision requires --rationale "..."');
       const alternatives = optionalField(flags.alternatives, 'decision --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
       const source = optionalField(flags.source, 'decision --source requires a non-empty value (omit --source entirely to skip it)');
@@ -2461,6 +2533,42 @@ async function runVerb(verb, flags, positional, dir) {
         if (!item) {
           throw new StoreError('validation', `list: work "${id}" not found.`);
         }
+        if (flags.fields !== undefined) {
+          const ALLOWED_ID_FIELDS = new Set([
+            'stage', 'status', 'holder', 'title', 'docsRef',
+            'verify', 'parent', 'id', 'domain', 'kind', 'risk', 'tier',
+          ]);
+          const fieldList = parseListFlag(flags.fields);
+          if (fieldList.length === 0) {
+            throw new StoreError('validation', 'list --fields requires a non-empty comma-separated list of field names.');
+          }
+          for (const f of fieldList) {
+            if (!ALLOWED_ID_FIELDS.has(f)) {
+              throw new StoreError('validation', `list --fields: unknown field "${f}". Allowed fields: ${Array.from(ALLOWED_ID_FIELDS).join(', ')}.`);
+            }
+          }
+          const fullItem = withStageEffective(item);
+          const filteredItem = {};
+          for (const f of fieldList) {
+            if (fullItem[f] !== undefined) {
+              filteredItem[f] = fullItem[f];
+            }
+          }
+          const {
+            decisions, discovery, gates, settlements, outcomes,
+            frictions, learnings, decisionsById, callThreads,
+            ...restView
+          } = rawView;
+          const singleView = {
+            ...restView,
+            work: { [id]: filteredItem },
+          };
+          if (item.status === 'awaiting-human') {
+            const ctx = computeAwaitingContext(singleView, id);
+            if (ctx) return { ...singleView, awaitingContext: { [id]: ctx } };
+          }
+          return singleView;
+        }
         // tsk-2u9 D1/D2: scope every OTHER id-keyed view section to this
         // item too, not just `work` -- `rawView` otherwise leaks the
         // entire backlog's decisions/discovery/gates/settlements/outcomes/
@@ -2483,6 +2591,7 @@ async function runVerb(verb, flags, positional, dir) {
           frictions: scopedById(rawView.frictions),
           learnings: scopedById(rawView.learnings),
           decisionsById: scopedById(rawView.decisionsById),
+          callThreads: scopedById(rawView.callThreads),
         };
         if (item.status === 'awaiting-human') {
           const ctx = computeAwaitingContext(singleView, id);
@@ -2767,6 +2876,40 @@ async function runVerb(verb, flags, positional, dir) {
       return { conflicts, stageByItem };
     }
 
+    // tsk-1wdf: the machine-readable read surface D6 (tsk-5z0) left as
+    // follow-on work -- `recordInvocationFault` writes .fgos/invocation-
+    // faults.jsonl, this reads it back. `resolveFaultLogPath` already
+    // falls back to the main checkout's own store when `dir` doesn't exist
+    // (D5 -- the exact worktree-safety fallback this verb needs too), so
+    // this is deliberately absent from STORE_MISSING_WARNING_VERBS below:
+    // unlike `list`/`stale`, a worktree session with no --dir still reads
+    // the real log correctly here, so warning about "may be empty" would
+    // be actively misleading (same reasoning as docs-index's exclusion).
+    case 'faults': {
+      // Validated before the (possibly early, no-log) return below, so a
+      // malformed --limit is refused the same way regardless of whether
+      // any fault has ever been recorded yet.
+      const rawLimit = optionalField(flags.limit, 'faults --limit requires a positive integer value');
+      let limit;
+      if (rawLimit !== undefined) {
+        limit = Number(rawLimit);
+        if (!Number.isInteger(limit) || limit <= 0) {
+          throw new StoreError('validation', 'faults --limit requires a positive integer value');
+        }
+      }
+      const logPath = resolveFaultLogPath(dir, process.cwd());
+      if (!logPath || !fs.existsSync(logPath)) {
+        return { path: logPath, count: 0, records: [] };
+      }
+      const records = fs
+        .readFileSync(logPath, 'utf8')
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => JSON.parse(line));
+      const mostRecent = limit === undefined ? records : records.slice(-limit);
+      return { path: logPath, count: records.length, records: mostRecent };
+    }
+
     // Read-only, report-only (tsk-597z): re-runs checkMergeStillResolves
     // LIVE against every current status:blocked item -- the same live
     // re-check `catchup`'s own eligibility gate already trusts over the
@@ -2786,7 +2929,9 @@ async function runVerb(verb, flags, positional, dir) {
     // (src/state/store.mjs) — never reimplements the layering/cycle logic
     // here.
     case 'schedule': {
-      return computedSchedule(dir);
+      // Optional --candidates <id1,id2,...> flag scopes schedule to specified items
+      const candidateIds = flags.candidates ? String(flags.candidates).split(',').map((s) => s.trim()).filter(Boolean) : undefined;
+      return computedSchedule(dir, candidateIds);
     }
 
     // Request-class per D1 (same contract as `ready`/`triage`/`conflicts`): a
@@ -3215,6 +3360,13 @@ async function runVerb(verb, flags, positional, dir) {
           `return: work "${id}" was not taken through the pull door (claimed by "${item.claimRole ?? 'runner'}") — return only completes a take.`,
         );
       }
+      // tsk-40m code-review finding (blocker): settleClaim requires claimId
+      // when an active claim exists — read it once here, reused by every
+      // settleClaim call below (branch-source/main-source, success/failure).
+      // A legacy pre-migration item (durable 'doing', no active runtime
+      // claim) reads null here — settleClaim's own legacy fallback handles
+      // that case without a claimId.
+      const activeClaim = readClaim(dir, id);
       // tsk-1zo: a verify never upgraded from its discovery/submit-stage
       // placeholder sentinel shells out as literal text (runGoalCheck ->
       // runCommand) and fails with a cryptic raw shell error ("<first
@@ -3246,6 +3398,19 @@ async function runVerb(verb, flags, positional, dir) {
         } catch (err) {
           throw new StoreError('validation', `return: branch "${branch}" for "${id}" not found or unreadable: ${err.message}`);
         }
+        const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
+        if (!attestation.ok) {
+          settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'blocked', reason: attestation.reason, role: item.claimRole ?? 'session' });
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: attestation.reason,
+            layer: 'attestation',
+            attempts: 1,
+            detail: attestation.detail,
+          });
+          throw new StoreError('validation', `return: work "${id}" halted due to attestation mismatch: ${attestation.detail}`);
+        }
         const branchAheadCount = commitsSince(repoRoot, item.branchHeadAtTake, branchHead);
         if (branchAheadCount <= 0) {
           if (!noNewCommitsOk) {
@@ -3257,51 +3422,81 @@ async function runVerb(verb, flags, positional, dir) {
           assertNoPriorBlockedOutcome(view, id);
         }
 
-        // No cwd-clean requirement here (D2: "tree người là việc của
-        // người") — the human's own working tree is never inspected or
-        // touched. Verify runs in a DISPOSABLE, DETACHED worktree checked out
-        // at the branch's own commit SHA — never `git worktree add <path>
-        // <branch>` (that fails outright, and would collide, if the human
-        // happens to be standing on `fgw/<id>` in their own tree right now)
-        // and never `reclaimOrphanedCheckout` (that would force-remove a
-        // checkout the human is actively using — the exact BLOCKER the
-        // validating gate caught).
-        const tmpWorktree = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-return-'));
+        const workerVerifiedSha = flags['worker-verified-sha'];
+        const isWorkerVerified = typeof workerVerifiedSha === 'string' && workerVerifiedSha && workerVerifiedSha === branchHead;
+
         let check;
-        try {
-          gitAt(repoRoot, ['worktree', 'add', '--detach', tmpWorktree, branchHead]);
-          // tsk-5l2-1 finding (real, kept as evidence): tmpWorktree lives
-          // under os.tmpdir(), outside the repo tree — Node's ESM loader
-          // never consults NODE_PATH, so a bare-specifier import (e.g.
-          // "yaml") can only resolve via a real node_modules directory
-          // reachable by walking up from tmpWorktree itself. A symlink
-          // pointed at the nearest real install was considered here too
-          // (tsk-5l2-1) and rejected for the same reason tsk-2vd D2
-          // already rejected it for createWorktree: it only reflects
-          // whatever the symlink source already has installed, never the
-          // checked-out branch's own declared dependencies — exactly the
-          // scenario (a branch merging in a new dependency before that
-          // merge lands on the source's own default branch) that exposed
-          // this whole gap. provisionDependencies installs for THIS
-          // worktree's own package.json instead.
-          provisionDependencies(tmpWorktree);
-          check = await runGoalCheck(item, tmpWorktree, timeoutMs);
-          // tsk-516 (CONTEXT.md D3/D4): the repo-invariant checks run in the
-          // SAME disposable worktree, while it still exists — the `finally`
-          // below removes it. Only after the item's own verify is green:
-          // a red verify already blocks, and reporting the invariant result
-          // on top of it would just be noise about a tree already refused.
-          if (check.passed) {
-            const invariant = await runInvariantChecks(invariantCheckCommands, tmpWorktree, timeoutMs);
-            if (!invariant.passed) check = invariantFailureAsCheck(invariant);
-          }
-        } finally {
+        if (isWorkerVerified) {
+          check = {
+            passed: true,
+            status: 0,
+            timedOut: false,
+            skipped: true,
+            output: `verify skipped: branch tip ${branchHead} was already verified green by worker`,
+          };
+        } else {
+          // No cwd-clean requirement here (D2: "tree người là việc của
+          // người") — the human's own working tree is never inspected or
+          // touched. Verify runs in a DISPOSABLE, DETACHED worktree checked out
+          // at the branch's own commit SHA — never `git worktree add <path>
+          // <branch>` (that fails outright, and would collide, if the human
+          // happens to be standing on `fgw/<id>` in their own tree right now)
+          // and never `reclaimOrphanedCheckout` (that would force-remove a
+          // checkout the human is actively using — the exact BLOCKER the
+          // validating gate caught).
+          const tmpWorktree = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-return-'));
           try {
-            execFileSync('git', ['worktree', 'remove', tmpWorktree, '--force'], { cwd: repoRoot, encoding: 'utf8', shell: false });
-          } catch {
-            // best-effort — mirrors worktree.mjs's own removeWorktree/prune
-            // discipline; a cleanup failure must never mask the verify
-            // result already computed above.
+            gitAt(repoRoot, ['worktree', 'add', '--detach', tmpWorktree, branchHead]);
+            // `.fgos/` strip (ADR0020, tsk-26r): since `.fgos/` is
+            // git-tracked in this repo, the `worktree add` above just
+            // checked out a snapshot of it frozen at branchHead — stale the
+            // moment main gets another event, and (per createWorktree's own
+            // finishWorktreeSetup, src/runner/worktree.mjs) something this
+            // disposable verify worktree has no legitimate reason to read or
+            // write anyway. Strip it the same way createWorktree does, right
+            // after checkout and before verify runs, so this ephemeral
+            // worktree's tree looks like every other worker worktree instead
+            // of tripping fgos-return.test.mjs's main-checkout-cleanliness /
+            // `.fgos`-dirty-tree exemption checks on a checked-out copy
+            // nothing here ever needed.
+            try {
+              fs.rmSync(path.join(tmpWorktree, '.fgos'), { recursive: true, force: true });
+            } catch (err) {
+              throw new StoreError('validation', `return: removing checked-out .fgos in ephemeral verify worktree "${tmpWorktree}" failed: ${err.message}`);
+            }
+            // tsk-5l2-1 finding (real, kept as evidence): tmpWorktree lives
+            // under os.tmpdir(), outside the repo tree — Node's ESM loader
+            // never consults NODE_PATH, so a bare-specifier import (e.g.
+            // "yaml") can only resolve via a real node_modules directory
+            // reachable by walking up from tmpWorktree itself. A symlink
+            // pointed at the nearest real install was considered here too
+            // (tsk-5l2-1) and rejected for the same reason tsk-2vd D2
+            // already rejected it for createWorktree: it only reflects
+            // whatever the symlink source already has installed, never the
+            // checked-out branch's own declared dependencies — exactly the
+            // scenario (a branch merging in a new dependency before that
+            // merge lands on the source's own default branch) that exposed
+            // this whole gap. provisionDependencies installs for THIS
+            // worktree's own package.json instead.
+            provisionDependencies(tmpWorktree);
+            check = await runGoalCheck(item, tmpWorktree, timeoutMs);
+            // tsk-516 (CONTEXT.md D3/D4): the repo-invariant checks run in the
+            // SAME disposable worktree, while it still exists — the `finally`
+            // below removes it. Only after the item's own verify is green:
+            // a red verify already blocks, and reporting the invariant result
+            // on top of it would just be noise about a tree already refused.
+            if (check.passed) {
+              const invariant = await runInvariantChecks(invariantCheckCommands, tmpWorktree, timeoutMs);
+              if (!invariant.passed) check = invariantFailureAsCheck(invariant);
+            }
+          } finally {
+            try {
+              execFileSync('git', ['worktree', 'remove', tmpWorktree, '--force'], { cwd: repoRoot, encoding: 'utf8', shell: false });
+            } catch {
+              // best-effort — mirrors worktree.mjs's own removeWorktree/prune
+              // discipline; a cleanup failure must never mask the verify
+              // result already computed above.
+            }
           }
         }
 
@@ -3313,8 +3508,8 @@ async function runVerb(verb, flags, positional, dir) {
           // absent-footprint exemption still applies inside footprintDiffHits
           // itself) — excludeIronLawEvidence strips this item's own mandatory
           // evidence doc before checking, see that helper's own comment.
-          const footprintDiff = footprintDiffHits(excludeFgosPaths(excludeIronLawEvidence(changed, id)), item.footprint);
-          const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', branchHeadAtReturn: branchHead });
+          const footprintDiff = footprintDiffHits(excludeDocsRefResearch(excludeFgosPaths(excludeIronLawEvidence(changed, id)), item), item.footprint);
+          const { event } = settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'awaiting-approval', branchHeadAtReturn: branchHead });
           addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
           return { id, from: 'doing', to: 'awaiting-approval', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
         }
@@ -3323,7 +3518,7 @@ async function runVerb(verb, flags, positional, dir) {
         // machine may simply have been under load) — never let it park as
         // an indistinguishable 'verify-fail'/'verify-miss', and never state
         // "(exit null)" as if that were a real exit code.
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+        settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
         addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount: branchAheadCount } });
         {
           const detail = check.timedOut
@@ -3444,8 +3639,8 @@ async function runVerb(verb, flags, positional, dir) {
         // STR63: advisory only (per cos) — a hit never blocks this return.
         const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
         // tsk-4hl: see excludeIronLawEvidence's own comment above.
-        const footprintDiff = footprintDiffHits(excludeFgosPaths(excludeIronLawEvidence(ownDiff, id)), item.footprint);
-        const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', headAtReturn: head });
+        const footprintDiff = footprintDiffHits(excludeDocsRefResearch(excludeFgosPaths(excludeIronLawEvidence(ownDiff, id)), item), item.footprint);
+        const { event } = settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'awaiting-approval', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount } });
         // tsk-45z D1/D2: this session's own commits (landed straight on the
         // main checkout, not a branch/worktree) may still hold
@@ -3462,7 +3657,7 @@ async function runVerb(verb, flags, positional, dir) {
 
       // tsk-53o: same timeout/fail distinction as the branch-source path
       // above — a timeout is not proof the item's verify failed.
-      moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+      settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
       addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount } });
       {
         const detail = check.timedOut
@@ -3734,6 +3929,33 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError('validation', `unknown session sub-verb "${sub}". Usage: fgos session <start|end|list|gc> ...`);
       } catch (err) {
         if (err instanceof SessionError) {
+          throw new StoreError('validation', err.message);
+        }
+        throw err;
+      }
+    }
+
+    // Gateway process lifecycle (tsk-31v): the one-door way any agent
+    // starts/stops/checks the herdr-fgos gateway (REST API + web
+    // dashboard) as a detached background process instead of hand-rolling
+    // nohup/tmux/systemd. AGENTS.md's own dispatch doctrine names this as
+    // the mandatory entry point.
+    case 'gateway': {
+      const sub = requireField(positional[0], 'gateway requires a sub-verb: fgos gateway <start|stop|status>');
+      const repoRoot = path.dirname(dir);
+      try {
+        if (sub === 'start') {
+          return startGateway(repoRoot, dir);
+        }
+        if (sub === 'stop') {
+          return stopGateway(dir);
+        }
+        if (sub === 'status') {
+          return await gatewayStatus(dir);
+        }
+        throw new StoreError('validation', `unknown gateway sub-verb "${sub}". Usage: fgos gateway <start|stop|status>`);
+      } catch (err) {
+        if (err instanceof GatewayControlError) {
           throw new StoreError('validation', err.message);
         }
         throw err;
@@ -4151,7 +4373,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
   }
 }
 

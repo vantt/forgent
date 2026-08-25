@@ -7,6 +7,7 @@
 // compounding/SKILL.md had zero real callers without it.
 
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -262,7 +263,7 @@ test('CLI: authoritative-match never mutates state: events.jsonl and state.json 
   const cwd = initCwd();
   writeDoc(cwd, 'docs/how-to', 'pick.md', 'claiming a work item');
   const logPath = path.join(cwd, '.fgos', 'events.jsonl');
-  const viewPath = path.join(cwd, '.fgos', 'state.json');
+  const viewPath = resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE);
   const logBefore = fs.readFileSync(logPath, 'utf8');
   const viewBefore = fs.readFileSync(viewPath, 'utf8');
 

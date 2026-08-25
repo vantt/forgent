@@ -28,8 +28,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { readEvents, withEventsLock, appendEventLocked, readLastLineBefore } from './events.mjs';
-import { rebuildView, viewRevision } from './replay.mjs';
+import { withEventsLock, appendEventLocked } from './events.mjs';
+import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
@@ -41,6 +41,8 @@ import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageR
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { KnowledgeValidationError, applyKnowledgeEvent } from './knowledge-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
+import { readClaim, readClaims, releaseClaim, withClaimsLock, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
 
 export { FsmError, WorkValidationError, EventLogError, KnowledgeValidationError };
 
@@ -88,7 +90,67 @@ export function categoryOf(err) {
 }
 
 function paths(dir) {
-  return { logPath: path.join(dir, 'events.jsonl'), viewPath: path.join(dir, 'state.json') };
+  return { logPath: path.join(dir, 'events.jsonl'), viewPath: resolveFgosFile(dir, FGOS_FILE.STATE) };
+}
+
+// Tầng A / T2 (TA-D2, TA-D11, TA-D14): new writes go under `.fgos/events/`,
+// one open file per writer, instead of the single top-level `events.jsonl`.
+// `paths(dir).logPath` (above) is untouched and stays load-bearing for two
+// unrelated things: it is baseline-0, the pre-cutover log frozen in place
+// (TA-D12, read but never appended to below), and its OWN dirname is what
+// `withEventsLockAndRefresh` derives the cross-process lock from — passing
+// it there keeps `events.lock` scoped to the whole `.fgos/` dir exactly as
+// before (TA-D14: a per-file lock would no longer serialize the CAS
+// preconditions every mutation here depends on).
+const EVENTS_SUBDIR = 'events';
+
+function eventsDirOf(dir) {
+  return path.join(dir, EVENTS_SUBDIR);
+}
+
+// TA-D11 naming: `<writer-id>-<openTs>.jsonl`, openTs compact
+// `YYYYMMDDTHHMMSSmmmZ` (no separators) so a writer's second file after a
+// future compaction never collides with its first.
+function formatCompactTs(date) {
+  return date.toISOString().replace(/[-:]/g, '').replace('.', '');
+}
+
+// Resolves the ONE currently-open file for this writer under
+// `.fgos/events/` (TA-D2/TA-D11): reuse it if a prior write in this same
+// writer identity already opened one, otherwise open a new one now. Never
+// writes to `paths(dir).logPath` (baseline-0 is frozen, TA-D12).
+export function resolveWriterLogPath(dir) {
+  const dirPath = eventsDirOf(dir);
+  fs.mkdirSync(dirPath, { recursive: true });
+  const writerId = String(resolveWriterIdentity(dir).id);
+  const prefix = `${writerId}-`;
+  let existing = [];
+  try {
+    existing = fs
+      .readdirSync(dirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.startsWith(prefix) && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name)
+      .sort(); // the compact ts suffix sorts lexicographically -> last = newest = the open one
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+  if (existing.length > 0) {
+    return path.join(dirPath, existing[existing.length - 1]);
+  }
+  return path.join(dirPath, `${prefix}${formatCompactTs(new Date())}.jsonl`);
+}
+
+// Tầng A/T3: the multi-file discovery + total-order + dedupe step now
+// lives in replay.mjs (`readAllEventsFromDir`/`rebuildViewFromDir`) — this
+// module only ever passes `dir` through. `readAllEvents`/`currentView` are
+// the ONE pair of names every reader below still calls, unchanged from T2,
+// so this handoff touched no call site.
+function readAllEvents(dir) {
+  return readAllEventsFromDir(dir);
+}
+
+function currentView(dir) {
+  return rebuildViewFromDir(dir);
 }
 
 function writeView(viewPath, view, snapshot) {
@@ -103,13 +165,18 @@ function writeView(viewPath, view, snapshot) {
   // this write) is the same kind of additive sibling field — read back only
   // by replay.mjs's own incremental-rebuild fast path, never folded into the
   // view a rebuild returns.
-  const persisted = { ...view, revision: viewRevision(view), snapshot };
+  // tsk-37d: reuse the once-serialized view string to derive the revision hash
+  // and construct the persisted JSON without a second JSON.stringify pass over
+  // view.
+  const { viewStr, revision } = serializeView(view);
+  const snapshotPart = snapshot !== undefined ? `,"snapshot":${JSON.stringify(snapshot)}` : '';
+  const persistedContent = `${viewStr.slice(0, -1)},"revision":${JSON.stringify(revision)}${snapshotPart}}\n`;
   // tsk-4mx: write to a uniquely-named temp file, then rename(2) it onto
   // viewPath -- an atomic replace on POSIX, so a reader can never observe a
   // truncated/partial state.json, same pattern as main-checkout-lock.mjs's
   // own writeAtomicReplace.
   const tmpPath = `${viewPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  fs.writeFileSync(tmpPath, `${JSON.stringify(persisted, null, 2)}\n`, 'utf8');
+  fs.writeFileSync(tmpPath, persistedContent, 'utf8');
   fs.renameSync(tmpPath, viewPath);
 }
 
@@ -117,16 +184,15 @@ function writeView(viewPath, view, snapshot) {
 // updated) log and overwrite state.json. Always called AFTER the event that
 // caused the change has already been appended — never before.
 function refreshView(dir) {
-  const { logPath, viewPath } = paths(dir);
-  const view = rebuildView(logPath); // may itself take replay.mjs's own snapshot fast path -- still correct either way
-  // tsk-49e: captures the exact {size, mtimeMs} events.jsonl has RIGHT NOW,
-  // plus the raw text of its own last line -- safe to stat/read here
-  // uncontended: refreshView always runs inside withEventsLockAndRefresh's
-  // held lock (tsk-1q5), so no concurrent append can land between
-  // rebuildView's own read above and this stat/tail-read.
-  const stat = fs.statSync(logPath);
-  const lastLine = readLastLineBefore(logPath, stat.size);
-  writeView(viewPath, view, { size: stat.size, mtimeMs: stat.mtimeMs, lastLine });
+  const { viewPath } = paths(dir);
+  const view = currentView(dir); // tries T4's incremental fast path first, falls back to a full multi-file fold
+  // T4's per-file anchor ({files: {name: {size, lastLine}}, maxTs}) --
+  // cheap stat + tail-read per file, never a full-content read. Safe to
+  // build here uncontended: refreshView always runs inside
+  // withEventsLockAndRefresh's held lock (tsk-1q5), so no concurrent append
+  // can land between currentView's own read above and this snapshot build.
+  const snapshot = buildSnapshotFromDir(dir);
+  writeView(viewPath, view, snapshot);
   return view;
 }
 
@@ -180,7 +246,7 @@ export function initStore(dir) {
 export function addWork(dir, work) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
 
     if (before.work[work?.id]) {
       throw new StoreError('validation', `work "${work.id}" already exists.`);
@@ -264,7 +330,7 @@ export function addWork(dir, work) {
     assertNoCycle(item, before.work);
     assertNoUnifiedCycle(item, before.work);
 
-    return appendEventLocked(logPath, { type: 'work.add', payload: item });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.add', payload: item }, dir);
   });
 }
 
@@ -273,7 +339,7 @@ export function addWork(dir, work) {
 // write path (identity is immutable; `status` is `move`'s; `stage` is
 // `moveStage`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier']);
+const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'action', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door
@@ -296,7 +362,7 @@ const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify
 export function editWork(dir, { id, patch, role } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -400,7 +466,41 @@ export function editWork(dir, { id, patch, role } = {}) {
     // never throws and never blocks the mutation (D18); no validator sits on
     // this path.
     payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(logPath, { type: 'work.edit', payload });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.edit', payload }, dir);
+  });
+}
+
+/**
+ * Clear/annotate a stale reason/parkReason on a done or wontfix work item.
+ * Appends a 'work.resolve-park-reason' event carrying { id, note, role, writer }.
+ */
+export function resolveParkReason(dir, { id, note, role } = {}) {
+  const { logPath } = paths(dir);
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    const before = currentView(dir);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
+    }
+    if (!note || typeof note !== 'string' || note.trim() === '') {
+      throw new StoreError('validation', 'resolve-park-reason requires a non-empty --note.');
+    }
+    if (work.status !== 'done' && work.status !== 'wontfix') {
+      throw new StoreError(
+        'validation',
+        `resolve-park-reason can only clear reason/parkReason on terminal items (status "done" or "wontfix"); work "${id}" has status "${work.status}".`,
+      );
+    }
+    if (role !== undefined && role !== 'human' && role !== 'session') {
+      throw new StoreError('validation', `resolve-park-reason role must be "human" or "session" (got "${role}").`);
+    }
+
+    const payload = { id, note: note.trim() };
+    if (role !== undefined) {
+      payload.role = role;
+    }
+    payload.writer = resolveWriterIdentity(dir);
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.resolve-park-reason', payload }, dir);
   });
 }
 
@@ -450,7 +550,7 @@ function composeLearning(view, id, closingSettlement) {
 export function setFocus(dir, { id, role } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -462,7 +562,7 @@ export function setFocus(dir, { id, role } = {}) {
       );
     }
     const payload = role !== undefined ? { id, role } : { id };
-    return appendEventLocked(logPath, { type: 'goal.focus', payload });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'goal.focus', payload }, dir);
   });
 }
 
@@ -558,7 +658,7 @@ export function assertPlanEvidence(id, work, repoRoot) {
 export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askRationale, askAlternatives, askSource, mergedSha, mergedInto } = {}) {
   const { logPath } = paths(dir);
   const result = withEventsLockAndRefresh(dir, logPath, () => {
-  const before = rebuildView(logPath);
+  const before = currentView(dir);
   const work = before.work[id];
   if (!work) {
     throw new StoreError('validation', `work "${id}" not found.`);
@@ -675,15 +775,36 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   if (parentSnapshotAtAsk !== undefined) {
     rawEvent.payload.parentSnapshotAtAsk = parentSnapshotAtAsk;
   }
-  // Status-at-ask snapshot (claim-lock §5.1): the item's OWN status right
-  // before this same `to === 'awaiting-human'` move parks it — `doing` when a
-  // pick claim is held mid-clarify/decompose, `todo` otherwise. answerAwaiting
-  // reads this back (via view.gates) to resume to the SAME status instead of
-  // hardcoding `todo`, so answering a gate never silently drops a live claim.
-  // Same additive, fsm-ignored stamp pattern as parentSnapshotAtAsk — never
-  // set on any edge but the awaiting-human entry.
-  if (statusAtAsk !== undefined) {
-    rawEvent.payload.statusAtAsk = statusAtAsk;
+  // Status-at-ask split (claim-lock §5.1, tsk-40m P1 fix — docs/architect/
+  // doing-coordination-redesign.md): two SEPARATE fields, never conflated.
+  //
+  // `statusAtAsk` — informational/audit only, whatever the CALLER supplies
+  // (typically the EFFECTIVE view, so a claimed item legitimately reads
+  // 'doing' here — that's a true fact worth recording: "this question was
+  // asked while someone was actively working it"). NEVER read back for a
+  // resume decision.
+  //
+  // `durableStatusAtAsk` — the item's OWN DURABLE status right before this
+  // move parks it, computed HERE from `work.status` (the fresh durable read
+  // above), never from caller input. This is the ONLY field answerAwaiting
+  // trusts to pick a resume target. Trusting a caller-supplied value here
+  // was the exact bug this fix closes: a caller's view is typically
+  // EFFECTIVE (claim overlay), and forwarding its 'doing' into a value that
+  // gets resumed durably let `take` (todo) -> `ask` -> `answer` durably
+  // write awaiting-human -> doing with no backing claim at all. Resuming to
+  // `durableStatusAtAsk` instead restores the item's pre-park durable
+  // status with zero durable writes of 'doing' — for the normal claimed
+  // case, `putInAwaiting` (below) already settled and released the claim
+  // before this event was ever written, so there is nothing left to
+  // "un-stale"; a later `fgos take` acquires a fresh claim. For a
+  // genuinely legacy durable-doing item (no active claim), it durably
+  // resumes to `doing` — a value only ever a fresh, trusted read can
+  // produce here, never client input.
+  if (to === 'awaiting-human') {
+    if (statusAtAsk !== undefined) {
+      rawEvent.payload.statusAtAsk = statusAtAsk;
+    }
+    rawEvent.payload.durableStatusAtAsk = work.status;
   }
   // rationale/alternatives/source (tsk-63c D1, decision-schema-rationale-
   // alternatives-source): the same additive, fsm-ignored post-transition
@@ -718,12 +839,16 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   // Release-trigger marker (claim-lock §3b, tsk-2zv): what released this
   // specific `doing -> todo` move — additive, fsm-ignored, same
-  // post-transition stamp pattern as claimTrigger above. Only
-  // `releaseClaimOnExecuting` (decompose.mjs) ever passes this, so a
-  // reader can positively identify "this todo-entry came from a claim-lock
+  // post-transition stamp pattern as claimTrigger above. Historically only
+  // `releaseClaimOnExecuting` (src/intake/plan.mjs) ever passed this, so a
+  // reader could positively identify "this todo-entry came from a claim-lock
   // §3b release" instead of inferring it from status/branch-existence
   // alone, which reject (`awaiting-approval -> todo`) and a verify-fail park also
-  // produce without deleting the branch.
+  // produce without deleting the branch. tsk-40m D5: `releaseClaimOnExecuting`
+  // is now retired to a no-op (planning->executing no longer holds a
+  // durable `doing` to release) — no NEW event carries this marker.
+  // `latestTodoReleaseTrigger` (claim-port.mjs) still reads it purely for
+  // pre-migration event history.
   if (releaseTrigger !== undefined) {
     rawEvent.payload.releaseTrigger = releaseTrigger;
   }
@@ -785,7 +910,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
       // best-effort — see comment above.
     }
   }
-  return appendEventLocked(logPath, rawEvent); // captures the real seq; rawEvent itself has none
+  return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir); // captures the real seq; rawEvent itself has none
   });
   // tsk-2t9c D16: `delivered` is a terminal state for the role/holder axis
   // -- no stage skill ever re-enters an item past this point (every wired
@@ -856,10 +981,302 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
 }
 
 /**
+ * Settle an active runtime claim on item `id`, transitioning it DIRECTLY
+ * from its preClaimStatus to `finalStatus` (D2; docs/architect/
+ * doing-coordination-redesign.md §7.3/§9.2) — no durable intermediate
+ * work.move(->doing) leg. Validates active runtime claim ownership
+ * (claimId, writerId) and durable revision (preClaimRevision) FRESH,
+ * inside the same held events.lock + claims.lock critical section the
+ * write itself runs in — the FSM-validating `transitionWork` call is
+ * built and proven valid BEFORE anything is appended, so a bad
+ * finalStatus/missing ask never leaves a partial write on disk. Writes
+ * work.attempt (the complete durable record of the attempt: from/to/
+ * branch/head/timing) and, unless finalStatus === preClaimStatus (nothing
+ * to durably move), a single work.move(preClaimStatus->finalStatus) —
+ * then releases the runtime claim in that SAME critical section,
+ * immediately after the write succeeds — never on a failed settle (a
+ * caught CAS/revision conflict leaves the claim untouched for its owner
+ * to retry or reconcile).
+ */
+export function settleClaim(dir, {
+  id,
+  claimId,
+  finalStatus,
+  reason,
+  ask,
+  answer,
+  role,
+  headAtReturn,
+  branchHeadAtReturn,
+  parentSnapshotAtAsk,
+  statusAtAsk,
+  claimTrigger,
+  releaseTrigger,
+  rationale,
+  alternatives,
+  source,
+  askRationale,
+  askAlternatives,
+  askSource,
+  mergedSha,
+  mergedInto,
+  phase = 'execute',
+  result,
+} = {}) {
+  if (!id || typeof id !== 'string') {
+    throw new StoreError('validation', 'settleClaim: "id" is required.');
+  }
+
+  const { logPath } = paths(dir);
+  const claim = readClaim(dir, id);
+
+  if (claim) {
+    // tsk-40m code-review finding (blocker): an active claim exists for
+    // `id` — the caller MUST name it. Silently settling "whatever claim is
+    // active right now" when the caller omits claimId let a stale actor
+    // (its own claim already released/reclaimed) settle a DIFFERENT actor's
+    // live claim (D2's ownership check has nothing to check against).
+    if (!claimId) {
+      throw new StoreError('validation', `settleClaim: "claimId" is required for "${id}" — an active claim exists ("${claim.claimId}") and the caller must name it.`);
+    }
+    if (claim.claimId !== claimId) {
+      throw new StoreError('conflict', `settleClaim: claimId mismatch for "${id}": active claim is "${claim.claimId}", got "${claimId}".`);
+    }
+    const targetClaimId = claim.claimId;
+    // tsk-40m code-review finding (blocker, confirmed needed by product
+    // decision): claimId alone is only as strong as the caller's own
+    // discipline about where it got that value from — a caller with no
+    // in-process capability token (bin/fgos.mjs's `return`, a fresh CLI
+    // invocation separate from the original take/pick) can only ever
+    // discover a claimId by reading "whichever claim is active right now",
+    // which trivially "matches" whatever it just read. `writerId` (the
+    // session/shell identity `acquireClaim` recorded at claim time) closes
+    // that gap independently of claimId: resolved FRESH here from THIS
+    // caller's own real process/session, and compared against the claim's
+    // recorded owner. A claim written before this field existed reads
+    // `writerId: undefined` and skips the check (never a false positive on
+    // old data). Taking over a genuinely different session's live claim
+    // goes through the sanctioned stale-claim-reclaim path (claim-port.mjs,
+    // gated on real liveness) — never a direct settle under a different
+    // identity, however it obtained the claimId.
+    const writer = resolveWriterIdentity(dir);
+    const currentWriterId = String(writer.id);
+    if (claim.writerId !== undefined && claim.writerId !== currentWriterId) {
+      throw new StoreError('conflict', `settleClaim: writer identity mismatch for "${id}" — claim acquired by writer "${claim.writerId}", settling as writer "${currentWriterId}".`);
+    }
+
+    const res = withEventsLockAndRefresh(dir, logPath, () => {
+      const writeResult = withClaimsLock(dir, () => {
+      // tsk-40m code-review finding (blocker, TOCTOU race): every check
+      // above (claimId, writerId) ran against a snapshot read BEFORE
+      // acquiring events.lock. Waiting for that lock (held by any other
+      // writer) is unbounded — long enough for claim-port.mjs's own
+      // stale-claim-reclaim to release THIS claim and hand it to a
+      // different actor in the meantime. Re-reading it here, now holding
+      // BOTH events.lock and claims.lock, closes the window: no release/
+      // reacquire (claims.lock) and no durable write (events.lock) can
+      // land between this read and our own append below.
+      const freshClaim = readClaim(dir, id);
+      if (!freshClaim || freshClaim.claimId !== targetClaimId) {
+        throw new StoreError(
+          'conflict',
+          `settleClaim: claim for "${id}" changed while waiting for the write lock — had "${targetClaimId}", now ${freshClaim ? `"${freshClaim.claimId}"` : 'none'}.`,
+        );
+      }
+      if (freshClaim.writerId !== undefined && freshClaim.writerId !== currentWriterId) {
+        throw new StoreError('conflict', `settleClaim: writer identity for "${id}" changed while waiting for the write lock.`);
+      }
+
+      const before = currentView(dir);
+      const work = before.work[id];
+      if (!work) {
+        throw new StoreError('validation', `settleClaim: work "${id}" not found.`);
+      }
+
+      const preClaimStatus = freshClaim.preClaimStatus || work.status;
+      if (freshClaim.preClaimStatus && work.status !== freshClaim.preClaimStatus) {
+        throw new StoreError('conflict', `settleClaim: item "${id}" status changed from preClaimStatus "${freshClaim.preClaimStatus}" to "${work.status}".`);
+      }
+
+      if (freshClaim.preClaimRevision) {
+        const curRev = getItemDurableRevision(before, id);
+        if (curRev !== freshClaim.preClaimRevision) {
+          throw new StoreError('conflict', `settleClaim: item "${id}" durable revision changed from "${freshClaim.preClaimRevision}" to "${curRev}".`);
+        }
+      }
+
+      // tsk-40m (docs/architect/doing-coordination-redesign.md §7.3/§9.2,
+      // design target confirmed 2026-08-25): settle DIRECTLY from
+      // preClaimStatus to finalStatus — no durable intermediate
+      // work.move(->doing) leg at all. transitionWork validates the real
+      // edge (throws on an invalid finalStatus, a missing `ask` for an
+      // awaiting-human edge, etc.) BEFORE anything is appended, so a bad
+      // finalStatus never leaves a partial write on disk. A same-state
+      // settle (finalStatus === preClaimStatus — e.g. a branch-take item
+      // failing verify again while already 'blocked') has nothing to
+      // durably move: transitionWork has no self-loop edges by design, and
+      // status-fsm.mjs's TRANSITIONS table stays that way on purpose — the
+      // work.attempt below is the complete durable record of that attempt,
+      // with no accompanying work.move.
+      const isSameState = finalStatus === preClaimStatus;
+      let move3Raw = null;
+      if (!isSameState) {
+        move3Raw = transitionWork({
+          work,
+          to: finalStatus,
+          expectedStatus: preClaimStatus,
+          reason,
+          ask,
+          answer,
+        });
+        move3Raw.payload.writer = writer;
+        if (role !== undefined) move3Raw.payload.role = role;
+        const cat3 = statusCategoryFor(getDomain(work.domain), finalStatus);
+        if (cat3 !== undefined) move3Raw.payload.statusCategory = cat3;
+        const pr3 = parkReasonForStatus(getDomain(work.domain), finalStatus);
+        if (pr3 !== undefined) move3Raw.payload.parkReason = pr3;
+        if (headAtReturn !== undefined) move3Raw.payload.headAtReturn = headAtReturn;
+        if (releaseTrigger !== undefined) move3Raw.payload.releaseTrigger = releaseTrigger;
+        if (branchHeadAtReturn !== undefined) move3Raw.payload.branchHeadAtReturn = branchHeadAtReturn;
+        if (mergedSha !== undefined) move3Raw.payload.mergedSha = mergedSha;
+        if (mergedInto !== undefined) move3Raw.payload.mergedInto = mergedInto;
+        if (reason !== undefined) move3Raw.payload.reason = reason;
+        if (parentSnapshotAtAsk !== undefined) move3Raw.payload.parentSnapshotAtAsk = parentSnapshotAtAsk;
+        if (askRationale !== undefined) move3Raw.payload.askRationale = askRationale;
+        if (askAlternatives !== undefined) move3Raw.payload.askAlternatives = askAlternatives;
+        if (askSource !== undefined) move3Raw.payload.askSource = askSource;
+        // Status-at-ask split (tsk-40m P1 fix, same two-field discipline as
+        // moveWork's own — see its comment): `statusAtAsk` is caller-
+        // supplied/informational only; `durableStatusAtAsk` is ALWAYS the
+        // trusted value here — `preClaimStatus` IS the item's real durable
+        // status at this exact moment (already validated above: `work.status
+        // !== freshClaim.preClaimStatus` would have thrown conflict first),
+        // never a caller input, so a claimed item settling into
+        // awaiting-human can never durably record anything but its own true
+        // pre-claim status as the safe resume target.
+        if (finalStatus === 'awaiting-human') {
+          if (statusAtAsk !== undefined) move3Raw.payload.statusAtAsk = statusAtAsk;
+          move3Raw.payload.durableStatusAtAsk = preClaimStatus;
+        }
+      }
+
+      const writerLogPath = resolveWriterLogPath(dir);
+
+      // work.attempt: the complete durable record of this attempt —
+      // enriched with from/to/branch/head/timing metadata (design doc
+      // §7.2) so "what happened during this attempt" never needs to be
+      // inferred from an adjacent work.move.
+      const attemptResult = result || (finalStatus === 'awaiting-approval' || finalStatus === 'delivered' || finalStatus === 'done' ? 'success' : 'failed');
+      const attemptPayload = {
+        id,
+        phase,
+        result: attemptResult,
+        from: preClaimStatus,
+        to: finalStatus,
+        claimId: targetClaimId,
+        actor: freshClaim.actor || role || 'unknown',
+        endedAt: new Date().toISOString(),
+      };
+      if (freshClaim.acquiredAt != null) attemptPayload.startedAt = freshClaim.acquiredAt;
+      if (freshClaim.branch != null) attemptPayload.branch = freshClaim.branch;
+      if (freshClaim.headAtTake != null) attemptPayload.headAtTake = freshClaim.headAtTake;
+      if (freshClaim.branchHeadAtTake != null) attemptPayload.branchHeadAtTake = freshClaim.branchHeadAtTake;
+      if (branchHeadAtReturn !== undefined) attemptPayload.branchHeadAtReturn = branchHeadAtReturn;
+      if (headAtReturn !== undefined) attemptPayload.headAtReturn = headAtReturn;
+      if (reason !== undefined) attemptPayload.reason = reason;
+      // Stamped here too, not just on move3Raw: a same-state settle (e.g.
+      // claim-lock §3b releasing a claim whose preClaimStatus was already
+      // 'todo' — 'doing' never having been durable — back to 'todo') writes
+      // NO work.move at all, and this marker must still survive somewhere
+      // durable for claim-port.mjs's reclaim check to read (tsk-40m).
+      if (releaseTrigger !== undefined) attemptPayload.releaseTrigger = releaseTrigger;
+      const attemptEvent = appendEventLocked(writerLogPath, { type: 'work.attempt', payload: attemptPayload }, dir);
+
+      // tsk-40m code-review finding (blocker, fixed): return the raw event
+      // directly — matching moveWork's own `return appendEventLocked(...)`
+      // pattern immediately above in this file — so
+      // withEventsLockAndRefresh's own `{ event, view }` wrapper (below,
+      // after this whole closure returns) produces `res.event` as a real
+      // final event (with its own `.seq`), never nested one level too
+      // deep. When a durable move actually happened, that move IS the
+      // "final" event bin/fgos.mjs's `return` command reads `.seq` off
+      // for its own CLI output; a same-state settle has no move, so the
+      // work.attempt (still a real, seq-bearing event) is the final event
+      // instead.
+      return move3Raw ? appendEventLocked(writerLogPath, move3Raw, dir) : attemptEvent;
+      });
+
+      // tsk-40m code-review finding (blocker): release the claim HERE,
+      // right after the durable write actually succeeds (claims.lock,
+      // above, is not reentrant — releaseClaim needs its own separate,
+      // immediately-following acquisition, still inside the SAME held
+      // events.lock) — never in an outer `finally` that also ran on a
+      // FAILED settle (a CAS/revision conflict caught above, with nothing
+      // yet written, used to destroy a still-legitimately-held claim
+      // anyway, silently dropping the coordination state for real
+      // in-progress work), and never after the best-effort recordCall*/
+      // recordCallReturn side effects below (which shrinks, not
+      // eliminates, the crash window between "durably settled" and "claim
+      // file actually gone" — buildEffectiveView's own staleness check
+      // below is the defense-in-depth for what this ordering can't fully
+      // close).
+      releaseClaim(dir, { id, claimId: targetClaimId });
+
+      return writeResult;
+    });
+
+    if (finalStatus === 'delivered') {
+      try {
+        const closeResult = recordCallReturn(dir, { id, note: 'auto-closed at delivered (tsk-2t9c D16)' });
+        if (closeResult) res.view = closeResult.view;
+      } catch {
+        // Best-effort
+      }
+    }
+
+    if (finalStatus === 'awaiting-approval') {
+      try {
+        const domain = getDomain(res.view.work[id]?.domain);
+        if (roleGraphFor(domain)) {
+          recordCall(dir, { id, toRole: 'reviewer', reason: 'review', note: 'auto-fired on reaching awaiting-approval (tsk-2t9c D18)' });
+        }
+      } catch {
+        // Best-effort
+      }
+    }
+
+    return res;
+  }
+
+  // Fallback for legacy items (durable status was 'doing' before migration, with no active runtime claim record)
+  return moveWork(dir, {
+    id,
+    to: finalStatus,
+    expectedStatus: 'doing',
+    reason,
+    ask,
+    answer,
+    role,
+    headAtReturn,
+    branchHeadAtReturn,
+    parentSnapshotAtAsk,
+    statusAtAsk,
+    claimTrigger,
+    releaseTrigger,
+    rationale,
+    alternatives,
+    source,
+    askRationale,
+    askAlternatives,
+    askSource,
+    mergedSha,
+    mergedInto,
+  });
+}
+
+/**
  * Park a work item into `awaiting-human`, carrying the question it is
- * waiting on (per D2/D5). Thin wrapper over `moveWork` — same
- * append-then-refresh tail, same CAS/validation errors — status-fsm.mjs requires a
- * non-empty `ask` on this edge.
+ * waiting on (per D2/D5).
  *
  * tsk-19zm D2: `rationale`/`alternatives`/`source` here are the AGENT's
  * checkpoint distillate as of this `ask` — kept a caller-facing param name
@@ -867,8 +1284,41 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
  * written into the payload as `askRationale`/`askAlternatives`/`askSource`
  * so a later `answer` on the same item never overwrites this checkpoint —
  * the two snapshots live side by side in `gates[id]` (replay.mjs's fold).
+ *
+ * tsk-40m P1 fix (docs/architect/doing-coordination-redesign.md): `ask`ing
+ * an item under an ACTIVE runtime claim must not leave that claim orphaned
+ * — a plain `moveWork` durably moves the item away from the claim's own
+ * `preClaimStatus` (to `awaiting-human`) without ever touching the claim
+ * file, which buildEffectiveView then reads as stale (a real bug on its
+ * own: the item silently drops out of every claim-aware view — worker-slot
+ * occupancy, stale-doing advisory — while the orphaned claim file lingers
+ * forever with nothing to release it). So this delegates to `settleClaim`
+ * whenever a claim is active: it validates ownership/CAS fresh, settles
+ * the claim DIRECTLY from its preClaimStatus to `awaiting-human` (the same
+ * one-move discipline every other settle path uses, `result: 'paused'`
+ * marking this as a park rather than a completion), and releases the claim
+ * in the same critical section — never a silent leak. `statusAtAsk` here
+ * is purely informational (whatever the caller's own, typically EFFECTIVE,
+ * view reports) — moveWork/settleClaim compute the resume-trusted
+ * `durableStatusAtAsk` themselves, from a fresh durable read, regardless of
+ * what (if anything) the caller passes.
  */
 export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAsk, statusAtAsk, rationale, alternatives, source } = {}) {
+  const claim = readClaim(dir, id);
+  if (claim) {
+    return settleClaim(dir, {
+      id,
+      claimId: claim.claimId,
+      finalStatus: 'awaiting-human',
+      ask,
+      parentSnapshotAtAsk,
+      statusAtAsk,
+      askRationale: rationale,
+      askAlternatives: alternatives,
+      askSource: source,
+      result: 'paused',
+    });
+  }
   return moveWork(dir, {
     id,
     to: 'awaiting-human',
@@ -888,15 +1338,34 @@ export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAs
  * append-then-refresh tail, same CAS/validation errors — status-fsm.mjs requires a
  * non-empty `answer` on this edge.
  *
- * Resume target (claim-lock §5.1): reads the gate's own `statusAtAsk`
- * snapshot (stamped by the `ask` that parked this item) and resumes there —
- * `doing` when a pick claim was held at ask-time, `todo` otherwise (also the
- * default for pre-existing logs/gates with no `statusAtAsk`, preserving the
- * historical hardcoded-`todo` behavior byte for byte).
+ * Resume target (claim-lock §5.1, tsk-40m P1 fix + hard-cut): reads the
+ * gate's own `durableStatusAtAsk` (the item's trusted DURABLE status at
+ * ask-time, stamped by moveWork/settleClaim themselves — never a caller-
+ * supplied value) and resumes there. For an item claimed at ask-time, the
+ * durable status was still `todo`, so this resumes to `todo`. `putInAwaiting`
+ * already settled and released any active claim at park time (see below) —
+ * there is no claim left here to "un-stale". Resuming just restores durable
+ * status to what it was before the claim existed, so a later `fgos take`
+ * can acquire a brand-new claim on it, with no durable write of `doing`
+ * anywhere in this path.
+ *
+ * `awaiting-human -> doing` is retired from status-fsm.mjs's TRANSITIONS
+ * table entirely (hard-cut, per the redesign) — a `durableStatusAtAsk` of
+ * `doing` can therefore only ever be a truthful historical record of a
+ * genuinely legacy pre-migration item's durable status, never a valid
+ * resume target anymore, so it clamps to `todo` here instead of attempting
+ * an edge that no longer exists. Data predating the `durableStatusAtAsk`
+ * split falls back to the OLD `statusAtAsk` field (which used to double as
+ * the resume target directly) under the SAME clamp — a legacy `'doing'`
+ * there is exactly the value this hard-cut retires. `todo` is also the
+ * final default for pre-existing logs/gates with neither field,
+ * preserving the historical hardcoded-`todo` behavior byte for byte.
  */
 export function answerAwaiting(dir, { id, answer, expectedStatus, role, rationale, alternatives, source } = {}) {
   const view = listWork(dir);
-  const to = view.gates?.[id]?.statusAtAsk ?? 'todo';
+  const gate = view.gates?.[id];
+  const recorded = gate?.durableStatusAtAsk ?? gate?.statusAtAsk;
+  const to = recorded === 'doing' ? 'todo' : (recorded ?? 'todo');
   return moveWork(dir, { id, to, expectedStatus, answer, role, rationale, alternatives, source });
 }
 
@@ -913,7 +1382,7 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, role, rational
 export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -930,7 +1399,7 @@ export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
     // moveStage call records who wrote it, never blocking on a malformed
     // identity (D18).
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(logPath, rawEvent);
+    return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
   });
 }
 
@@ -974,11 +1443,27 @@ function openCallStack(callThreadEntries) {
  * refusal reason AND the legal edges as JSON — "chặn và dạy tại chỗ"
  * (D1): the caller can read the legal edges straight out of the error
  * message without a second round trip.
+ *
+ * `openSyncDepth` (D28, wired review finding H2/tsk-397): unlike
+ * `openCallDepth`, this is NEVER derived from `callThreads` here — a
+ * `work.call-summary` event commits atomically at the exact instant this
+ * function's own door opens (see the `appendEventLocked` call below), so
+ * by the time a genuinely NESTED sync call (the callee's own work needing
+ * a further sync consult before it finishes) would call `recordCall`
+ * again, the outer call's event is already fully committed to the log —
+ * indistinguishable, from replay alone, from two purely sequential sync
+ * calls. Only the CALLER (a skill already inside its own sync-consult
+ * work, about to make a further nested one) knows its real current
+ * depth; it must track and pass that depth itself. Every existing
+ * caller passes none, defaulting to `0` — identical behavior to before
+ * this parameter existed — this only makes the cap genuinely reachable
+ * for a future caller that does track its own nesting, instead of being
+ * permanently unreachable dead code.
  */
-export function recordCall(dir, { id, toRole, reason, note, outcome } = {}) {
+export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDepth = 0 } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -997,7 +1482,7 @@ export function recordCall(dir, { id, toRole, reason, note, outcome } = {}) {
     const stage = effectiveStage(work, domain);
     const openCallDepth = openCallStack(before.callThreads?.[id]).length;
 
-    const result = evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth });
+    const result = evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth, openSyncDepth });
     if (!result.ok) {
       throw new StoreError(
         'validation',
@@ -1009,7 +1494,7 @@ export function recordCall(dir, { id, toRole, reason, note, outcome } = {}) {
       ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }
       : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(logPath, rawEvent);
+    return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
   });
 }
 
@@ -1031,7 +1516,7 @@ export function recordCall(dir, { id, toRole, reason, note, outcome } = {}) {
 export function recordCallReturn(dir, { id, note } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -1046,7 +1531,7 @@ export function recordCallReturn(dir, { id, note } = {}) {
       payload: { id, from: work.holder, to: openCall.from, reason: openCall.reason, mode: 'async', returning: true, note },
     };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(logPath, rawEvent);
+    return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
   });
 }
 
@@ -1062,7 +1547,7 @@ export function addDiscovery(dir, payload) {
   if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
     throw new StoreError('validation', 'discovery requires a non-empty "id".');
   }
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'work.discovery', payload }));
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.discovery', payload }, dir));
 }
 
 // Gate approve record shape (tsk-19j D1/D11): the 3 skill-embedded Gates
@@ -1098,7 +1583,7 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
     throw new StoreError('validation', 'gate-approve requires a non-empty "verify".');
   }
   return withEventsLockAndRefresh(dir, logPath, () =>
-    appendEventLocked(logPath, { type: 'work.gate-approve', payload: { id, gate, actor, verify } }));
+    appendEventLocked(resolveWriterLogPath(dir), { type: 'work.gate-approve', payload: { id, gate, actor, verify } }, dir));
 }
 
 /**
@@ -1151,12 +1636,12 @@ export function addDecision(dir, payload) {
     // legitimate, e.g. `fgos decision` with no --id) — only validated when
     // present.
     if (payload.id !== undefined && payload.id !== null) {
-      const before = rebuildView(logPath);
+      const before = currentView(dir);
       if (!before.work[payload.id]) {
         throw new StoreError('validation', `work "${payload.id}" not found.`);
       }
     }
-    return appendEventLocked(logPath, { type: 'decision', payload: eventPayload });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'decision', payload: eventPayload }, dir);
   });
 }
 
@@ -1263,7 +1748,7 @@ export function addOutcome(dir, payload) {
     throw new StoreError('validation', 'outcome requires a non-empty "id".');
   }
   assertValidDocType(payload);
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'work.outcome', payload }));
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.outcome', payload }, dir));
 }
 
 /**
@@ -1282,13 +1767,46 @@ export function addFriction(dir, payload) {
     throw new StoreError('validation', 'friction requires a non-empty "id".');
   }
   assertValidDocType(payload);
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'work.friction', payload }));
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.friction', payload }, dir));
 }
 
-/** Read-only: the current view, rebuilt fresh from the log (never off a stale file). */
-export function listWork(dir) {
+/**
+ * Append a standalone durable `work.attempt` record for a claim that ends
+ * WITHOUT a status transition — a stale runtime claim reclaimed by a new
+ * claimant (claim-port.mjs's stale-claim-reclaim path). `settleClaim`
+ * already folds a `work.attempt` into its own full segment when a claim
+ * settles through a real status transition; this is the sibling for the
+ * other way a claim ends (tsk-40m code-review finding, high, D4/D8) — kept
+ * separate from `settleClaim` since a reclaim never transitions the item's
+ * own status.
+ *
+ * `attemptCount`/`lastAttempt` (replay.mjs) rely on `work.attempt`
+ * existing at all to tell "started then reclaimed" apart from "never
+ * started" — without this, releasing/reclaiming a runtime claim (which
+ * only ever deletes the `.fgos/runtime/claims/<id>.json` file, never a
+ * durable event) left no trace an attempt ever happened.
+ */
+export function recordClaimAttempt(dir, { id, phase, result, claimId, actor, endedAt } = {}) {
   const { logPath } = paths(dir);
-  return rebuildView(logPath);
+  if (!id || typeof id !== 'string') {
+    throw new StoreError('validation', 'recordClaimAttempt: "id" is required.');
+  }
+  if (!phase || typeof phase !== 'string') {
+    throw new StoreError('validation', 'recordClaimAttempt: "phase" is required.');
+  }
+  const payload = { id, phase, result, claimId, actor: actor || 'unknown', endedAt: endedAt || new Date().toISOString() };
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.attempt', payload }, dir));
+}
+
+export function currentEffectiveView(dir) {
+  const durableView = currentView(dir);
+  const claims = readClaims(dir);
+  return buildEffectiveView(durableView, claims);
+}
+
+/** Read-only: the current effective view (durable view + active runtime claims). */
+export function listWork(dir) {
+  return currentEffectiveView(dir);
 }
 
 /**
@@ -1306,8 +1824,7 @@ export function listWork(dir) {
  * (`'Execute'`) applies, byte-identical to every pre-existing caller.
  */
 export function readyWork(dir, { step } = {}) {
-  const { logPath } = paths(dir);
-  return frontier(rebuildView(logPath), step ? { step } : undefined);
+  return frontier(currentEffectiveView(dir), step ? { step } : undefined);
 }
 
 /**
@@ -1319,8 +1836,7 @@ export function readyWork(dir, { step } = {}) {
  * item without losing the deps/lineage guard.
  */
 export function isDepsAndLineageReady(dir, id) {
-  const { logPath } = paths(dir);
-  return depsAndLineageReadyView(rebuildView(logPath), id);
+  return depsAndLineageReadyView(currentEffectiveView(dir), id);
 }
 
 /**
@@ -1332,8 +1848,7 @@ export function isDepsAndLineageReady(dir, id) {
  * reaches `frontier` only through `readyWork`.
  */
 export function graphMetrics(dir) {
-  const { logPath } = paths(dir);
-  return computeGraphMetrics(rebuildView(logPath));
+  return computeGraphMetrics(currentEffectiveView(dir));
 }
 
 /**
@@ -1342,8 +1857,10 @@ export function graphMetrics(dir) {
  * shape as graphMetrics; the Domain compute core decides the answer.
  */
 export function graphWhatIf(dir, id) {
-  const { logPath } = paths(dir);
-  return computeWhatIf(rebuildView(logPath), id);
+  // tsk-40m code-review finding (high, D4): effective view, not durable-only
+  // -- an actively-claimed dependent (durable status still 'todo' post-
+  // migration) must not read as newly-ready idle work.
+  return computeWhatIf(currentEffectiveView(dir), id);
 }
 
 /**
@@ -1356,8 +1873,12 @@ export function graphWhatIf(dir, id) {
  * functions already degrade gracefully (empty scope) on an unknown/stale id.
  */
 export function goalFocusShow(dir) {
-  const { logPath } = paths(dir);
-  const view = rebuildView(logPath);
+  // tsk-40m code-review finding (non-blocking, round 3): effective view,
+  // not durable-only -- consistent with graphWhatIf/staleDoingAdvisory/
+  // footprintConflicts/computedSchedule above (D4). An actively-claimed
+  // item feeding criticalPath/topUnblock must read as 'doing', not a
+  // durable-only 'todo' left over from claim-time no longer writing it.
+  const view = currentEffectiveView(dir);
   if (view.focus === undefined) {
     return { focus: null };
   }
@@ -1376,10 +1897,19 @@ export function goalFocusShow(dir) {
  * suggests; it never moves or reclaims anything.
  */
 export function staleDoingAdvisory(dir, opts = {}) {
-  const { logPath } = paths(dir);
-  const view = rebuildView(logPath);
+  // tsk-40m code-review finding (high, D4): claim-time no longer writes a
+  // durable work.move(->doing) event for an active runtime claim (only
+  // settle-time does, retroactively) -- an item still under an active claim
+  // has NO such event yet, so the raw-event-derived `claimedAt` this used to
+  // rely on is blind to every post-migration claim (this advisory would
+  // always report zero of them, no matter how stale). An active claim's own
+  // `acquiredAt` is the real "claimed at" timestamp; the raw-event scan
+  // stays as the fallback for a legacy pre-migration item (durable status
+  // still 'doing', no active runtime claim record at all).
+  const claims = readClaims(dir);
+  const view = buildEffectiveView(currentView(dir), claims);
   const claimedAt = new Map();
-  for (const event of readEvents(logPath)) {
+  for (const event of readAllEvents(dir)) {
     if (event.type === 'work.move' && event.payload?.to === 'doing' && typeof event.payload?.id === 'string') {
       const ts = Date.parse(event.ts);
       if (!Number.isNaN(ts)) claimedAt.set(event.payload.id, ts); // in-order iteration -> latest claim wins
@@ -1388,7 +1918,13 @@ export function staleDoingAdvisory(dir, opts = {}) {
   const entries = [];
   for (const id of Object.keys(view.work)) {
     if (view.work[id].status !== 'doing') continue;
-    entries.push({ id, claimRole: view.work[id].claimRole, claimedAt: claimedAt.get(id) });
+    const claim = claims[id];
+    const claimTs = claim ? Date.parse(claim.acquiredAt) : claimedAt.get(id);
+    entries.push({
+      id,
+      claimRole: claim ? (claim.claimRole || claim.actor) : view.work[id].claimRole,
+      claimedAt: Number.isNaN(claimTs) ? undefined : claimTs,
+    });
   }
   return classifyStaleDoing(entries, opts);
 }
@@ -1407,9 +1943,8 @@ export function staleDoingAdvisory(dir, opts = {}) {
  * shared-config value this read-only facade never guesses.
  */
 export function stalePostDeliveryAdvisory(dir, opts = {}) {
-  const { logPath } = paths(dir);
-  const view = rebuildView(logPath);
-  const rawEvents = readEvents(logPath);
+  const view = currentView(dir);
+  const rawEvents = readAllEvents(dir);
   return classifyStalePostDelivery(view, rawEvents, opts);
 }
 
@@ -1429,8 +1964,10 @@ export function stalePostDeliveryAdvisory(dir, opts = {}) {
  * instead.
  */
 export function footprintConflicts(dir) {
-  const { logPath } = paths(dir);
-  return footprintOverlapAmong(frontierAcrossSteps(rebuildView(logPath)));
+  // tsk-40m code-review finding (high, D4): effective view -- an actively-
+  // claimed item is not an idle-and-ready candidate for a parallel-dispatch
+  // collision.
+  return footprintOverlapAmong(frontierAcrossSteps(currentEffectiveView(dir)));
 }
 
 /**
@@ -1442,10 +1979,11 @@ export function footprintConflicts(dir) {
  * Same read-facade shape as `footprintConflicts`; the Domain core
  * (`graph-metrics.mjs`) computes both, this just rebuilds the view.
  */
-export function computedSchedule(dir) {
-  const { logPath } = paths(dir);
-  const view = rebuildView(logPath);
-  return { ...computeSchedule(view), cycles: detectCycles(view) };
+export function computedSchedule(dir, candidateIds) {
+  // tsk-40m code-review finding (high, D4): effective view -- an actively-
+  // claimed item must not be scheduled into a new dispatch wave.
+  const view = currentEffectiveView(dir);
+  return { ...computeSchedule(view, candidateIds), cycles: detectCycles(view) };
 }
 
 /**
@@ -1458,8 +1996,7 @@ export function computedSchedule(dir) {
  * corrupt log throws EventLogError('corrupt-log').
  */
 export function readRawEvents(dir) {
-  const { logPath } = paths(dir);
-  return readEvents(logPath);
+  return readAllEvents(dir);
 }
 
 /**

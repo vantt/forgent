@@ -32,15 +32,18 @@ import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInv
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
+import { checkAgyPermissionsConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
+import { postLandDrift } from '../state/postland-drift.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { computeDecisionIndex, generateDecisionIndex, indexPathFor } from '../report/decision-index.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
-import { DOMAINS, getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
+import { DOMAINS, getDomain, resolveDomainName, effectiveStage, resolveTaskSpecPath } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
@@ -54,8 +57,9 @@ import {
 } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
-import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
-import { advanceEventsJsonlTruncationGuard } from '../state/events-jsonl-truncation-guard.mjs';
+import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../state/events-jsonl-truncation-guard.mjs';
+import { verifyCompactionCandidate } from '../state/events-compaction.mjs';
+import { readMainCheckoutGuardWarnings } from '../state/main-checkout-guard-warnings.mjs';
 import { computeKnowledgeProjection } from '../report/knowledge-projection.mjs';
 import { rebuild } from '../state/store.mjs';
 import { resolveDocPath } from '../report/knowledge-resolver.mjs';
@@ -409,36 +413,68 @@ function checkTaskSpecsResolve(cwd) {
     const taskSpecMap = domain.taskSpecMap;
     if (!taskSpecMap) continue;
     for (const [stage, specId] of Object.entries(taskSpecMap)) {
-      const specPath = path.join(cwd, 'docs', 'task-specs', domainName, `${specId}.md`);
+      const specPath = resolveTaskSpecPath(domainName, specId, cwd);
       if (!fs.existsSync(specPath)) {
         missing.push(`${domainName}.taskSpecMap.${stage} -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
       }
     }
   }
+  const CORE_TASK_SPECS = [
+    'fgos-routing',
+    'fgos-clarifying',
+    'fgos-researching',
+    'fgos-unlock',
+    'fgos-fanout',
+    'fgos-indexing',
+    'distill',
+  ];
+  for (const specId of CORE_TASK_SPECS) {
+    const specPath = resolveTaskSpecPath('core', specId, cwd);
+    if (!fs.existsSync(specPath)) {
+      missing.push(`core.taskSpec -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
+    }
+  }
   if (missing.length > 0) {
     return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };
   }
-  return { passed: true, message: 'every domain\'s taskSpecMap entry resolves to a real docs/task-specs/ file' };
+  return { passed: true, message: 'every domain\'s taskSpecMap entry resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };
 }
 
-// Every real task-spec id across every docs/task-specs/<domain>/ directory
-// -- the resolution set checkAgentClaimsResolve validates each agent-type's
-// `claims` list against. Absent docs/task-specs/ entirely is not an error
-// (a project that has not yet adopted the convention at all).
-function allTaskSpecIds(cwd) {
-  const root = path.join(cwd, 'docs', 'task-specs');
-  const ids = new Set();
-  if (!fs.existsSync(root)) return ids;
-  for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {
-    if (!domainEntry.isDirectory()) continue;
-    for (const file of fs.readdirSync(path.join(root, domainEntry.name))) {
-      if (file.endsWith('.md')) ids.add(file.slice(0, -'.md'.length));
+function allTaskSpecs(cwd) {
+  const specs = [];
+  const root = path.join(cwd, 'domains');
+  if (fs.existsSync(root)) {
+    for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {
+      if (!domainEntry.isDirectory()) continue;
+      const taskSpecsDir = path.join(root, domainEntry.name, 'task-specs');
+      if (!fs.existsSync(taskSpecsDir)) continue;
+      for (const file of fs.readdirSync(taskSpecsDir)) {
+        if (file.endsWith('.md')) {
+          specs.push({
+            domain: domainEntry.name,
+            specId: file.slice(0, -'.md'.length),
+            filePath: path.join(taskSpecsDir, file),
+          });
+        }
+      }
     }
   }
-  return ids;
+  const coreRoot = path.join(cwd, 'core', 'task-specs');
+  if (fs.existsSync(coreRoot)) {
+    for (const file of fs.readdirSync(coreRoot)) {
+      if (file.endsWith('.md')) {
+        specs.push({
+          domain: 'core',
+          specId: file.slice(0, -'.md'.length),
+          filePath: path.join(coreRoot, file),
+        });
+      }
+    }
+  }
+  return specs;
 }
 
-// Extracts a `claims:` list's own item strings from raw yaml SOURCE TEXT,
+// Extracts a `skills:` list's own item strings from raw yaml SOURCE TEXT,
 // without a yaml parser dependency. Doctor (`src/setup/registrations.mjs`)
 // must keep loading in a plain unpacked copy with no `node_modules/` yet
 // (test/setup/checks-setup-rc-line.test.mjs's own "setup from a copy of
@@ -447,64 +483,204 @@ function allTaskSpecIds(cwd) {
 // would break module load there even though 'yaml' is a real dependency
 // used elsewhere (scripts/project-agents.mjs, run only after `npm
 // install`, well after this constraint applies). Supports both block-list
-// (`claims:\n  - a\n  - b`) and inline flow (`claims: [a, b]`) styles,
+// (`skills:\n  - a\n  - b`) and inline flow (`skills: [a, b]`) styles,
 // enough for a diagnostic -- the real authority on whether a source yaml
 // is well-formed is project-agents.mjs's own full parse at projection
 // time, never this heuristic.
-function extractClaimsFromYamlText(text) {
-  const inlineMatch = text.match(/^claims:\s*\[([^\]]*)\]\s*$/m);
+function extractSkillsFromYamlText(text) {
+  const inlineMatch = text.match(/^skills:\s*\[([^\]]*)\]\s*$/m);
   if (inlineMatch) {
     return inlineMatch[1].split(',').map((s) => s.trim()).filter(Boolean);
   }
   const lines = text.split('\n');
-  const claims = [];
+  const skills = [];
   let inBlock = false;
   for (const line of lines) {
-    if (/^claims:\s*$/.test(line)) {
+    if (/^skills:\s*$/.test(line)) {
       inBlock = true;
       continue;
     }
     if (!inBlock) continue;
     const item = line.match(/^\s+-\s*(\S+)\s*$/);
     if (item) {
-      claims.push(item[1]);
+      skills.push(item[1]);
       continue;
     }
-    if (line.trim() === '') continue; // blank line inside the block -- keep scanning
-    break; // any other non-list-item line ends the block
+    if (line.trim() === '') continue;
+    break;
   }
-  return claims;
+  return skills;
 }
 
-// tsk-2t9c D12: eligibility for the multi-role team harness is declared by
-// an OPTIONAL `claims` list on an agent-type's own source yaml
-// (agents/*.yaml, projected by scripts/project-agents.mjs) -- a typo'd
-// claim would otherwise make that agent-type permanently ineligible for
-// any role/holder call with no error anywhere.
-function checkAgentClaimsResolve(cwd) {
-  const agentsDir = path.join(cwd, 'agents');
-  if (!fs.existsSync(agentsDir)) {
-    return { passed: true, message: 'no agents/ directory -- nothing to check' };
-  }
-  const knownSpecIds = allTaskSpecIds(cwd);
-  const problems = [];
-  for (const file of fs.readdirSync(agentsDir).filter((f) => f.endsWith('.yaml'))) {
-    let text;
-    try {
-      text = fs.readFileSync(path.join(agentsDir, file), 'utf8');
-    } catch {
-      continue;
+function parseTaskSpecHeaderFields(headerLine) {
+  if (!headerLine) return {};
+  const parts = headerLine.split('|').map((p) => p.trim());
+  const res = {};
+  for (const part of parts) {
+    const colonIdx = part.indexOf(':');
+    if (colonIdx === -1) continue;
+    const key = part.slice(0, colonIdx).trim();
+    const valStr = part.slice(colonIdx + 1).trim();
+    if (key === 'requires-skill' || key === 'agent') {
+      if (valStr.startsWith('[') && valStr.endsWith(']')) {
+        res[key] = valStr.slice(1, -1).split(',').map((s) => s.trim()).filter(Boolean);
+      } else if (valStr.includes(',')) {
+        res[key] = valStr.split(',').map((s) => s.trim()).filter(Boolean);
+      } else if (valStr) {
+        res[key] = [valStr];
+      } else {
+        res[key] = [];
+      }
+    } else {
+      res[key] = valStr;
     }
-    for (const claim of extractClaimsFromYamlText(text)) {
-      if (!knownSpecIds.has(claim)) {
-        problems.push(`agents/${file} claims unknown task-spec "${claim}"`);
+  }
+  return res;
+}
+
+// D32 "deterministic, never random": readdirSync's own order is
+// filesystem-dependent, not a stable ordering guarantee -- sorted so
+// D33's own duplicate-name scan (the caller) reports the same "first
+// occurrence wins" file on every machine/run (review finding M2).
+function sortedReaddir(dir) {
+  return fs.readdirSync(dir).sort((a, b) => a.localeCompare(b));
+}
+
+function allAgentYamlFiles(cwd) {
+  const files = [];
+  const coreDir = path.join(cwd, 'core', 'agents');
+  if (fs.existsSync(coreDir)) {
+    for (const f of sortedReaddir(coreDir)) {
+      if (f.endsWith('.yaml') || f.endsWith('.yml')) {
+        files.push({ source: 'core/agents', filePath: path.join(coreDir, f), fileName: f });
       }
     }
   }
+  const domainsDir = path.join(cwd, 'domains');
+  if (fs.existsSync(domainsDir)) {
+    const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
+    for (const domainEntry of domainEntries) {
+      if (domainEntry.isDirectory()) {
+        const domainAgentsDir = path.join(domainsDir, domainEntry.name, 'agents');
+        if (fs.existsSync(domainAgentsDir)) {
+          for (const f of sortedReaddir(domainAgentsDir)) {
+            if (f.endsWith('.yaml') || f.endsWith('.yml')) {
+              files.push({ source: `domains/${domainEntry.name}/agents`, filePath: path.join(domainAgentsDir, f), fileName: f });
+            }
+          }
+        }
+      }
+    }
+  }
+  const legacyDir = path.join(cwd, 'agents');
+  if (fs.existsSync(legacyDir)) {
+    for (const f of sortedReaddir(legacyDir)) {
+      if (f.endsWith('.yaml') || f.endsWith('.yml')) {
+        const fp = path.join(legacyDir, f);
+        if (!files.some((item) => item.filePath === fp)) {
+          files.push({ source: 'agents', filePath: fp, fileName: f });
+        }
+      }
+    }
+  }
+  return files;
+}
+
+// tsk-397 D20: eligibility direction inverted -- task-spec declares agent/requires-skill,
+// agent-type declares skills. Check validates every requires-skill is provided by at least
+// one agent-type, and every pinned agent exists.
+function checkAgentClaimsResolve(cwd) {
+  const agentFiles = allAgentYamlFiles(cwd);
+  const agentSkillsMap = new Map();
+  for (const file of agentFiles) {
+    try {
+      const text = fs.readFileSync(file.filePath, 'utf8');
+      const nameMatch = text.match(/^name:\s*(\S+)/m);
+      const name = nameMatch ? nameMatch[1] : file.fileName.replace(/\.yaml$|\.yml$/, '');
+      const skills = extractSkillsFromYamlText(text);
+      agentSkillsMap.set(name, new Set(skills));
+    } catch {
+      continue;
+    }
+  }
+
+  const allProvidedSkills = new Set();
+  for (const skillsSet of agentSkillsMap.values()) {
+    for (const s of skillsSet) allProvidedSkills.add(s);
+  }
+
+  const taskSpecs = allTaskSpecs(cwd);
+  const problems = [];
+
+  for (const spec of taskSpecs) {
+    let text;
+    try {
+      text = fs.readFileSync(spec.filePath, 'utf8');
+    } catch {
+      continue;
+    }
+    const lines = text.split('\n');
+    const headerLine = lines.find((l) => l.startsWith('domain:'));
+    const parsed = parseTaskSpecHeaderFields(headerLine);
+
+    if (Array.isArray(parsed.agent)) {
+      for (const agentName of parsed.agent) {
+        if (agentSkillsMap.size > 0 && !agentSkillsMap.has(agentName)) {
+          problems.push(`task-spec "${spec.specId}" names unknown agent "${agentName}"`);
+        }
+      }
+    }
+
+    if (Array.isArray(parsed['requires-skill'])) {
+      for (const reqSkill of parsed['requires-skill']) {
+        if (agentSkillsMap.size > 0 && !allProvidedSkills.has(reqSkill)) {
+          problems.push(`task-spec "${spec.specId}" requires skill "${reqSkill}" but no agent-type provides it`);
+        }
+      }
+    }
+  }
+
   if (problems.length > 0) {
     return { passed: false, message: problems.join('; ') };
   }
-  return { passed: true, message: 'every agent-type\'s claims resolve to a real task-spec' };
+  return { passed: true, message: 'every task-spec\'s requires-skill/agent eligibility declaration resolves to real agent skills' };
+}
+
+function checkAgentTypeNamesUnique(cwd) {
+  const agentFiles = allAgentYamlFiles(cwd);
+  const nameToFiles = new Map();
+  for (const file of agentFiles) {
+    try {
+      const text = fs.readFileSync(file.filePath, 'utf8');
+      const nameMatch = text.match(/^name:\s*(\S+)/m);
+      const name = nameMatch ? nameMatch[1] : file.fileName.replace(/\.yaml$|\.yml$/, '');
+      if (!nameToFiles.has(name)) {
+        nameToFiles.set(name, []);
+      }
+      const relPath = path.relative(cwd, file.filePath);
+      nameToFiles.get(name).push(relPath);
+    } catch {
+      continue;
+    }
+  }
+
+  const duplicates = [];
+  for (const [name, paths] of nameToFiles.entries()) {
+    if (paths.length > 1) {
+      duplicates.push(`"${name}" (${paths.join(', ')})`);
+    }
+  }
+
+  if (duplicates.length > 0) {
+    return {
+      passed: false,
+      message: `duplicate agent-type name(s) found across core/agents/ and domains/*/agents/: ${duplicates.join('; ')} (D33)`,
+    };
+  }
+  return {
+    passed: true,
+    message: 'every agent-type name across core/agents/ and domains/*/agents/ is globally unique (D33)',
+  };
 }
 
 function checkMainCheckoutHookWired(cwd) {
@@ -587,7 +763,7 @@ registerCheck({
 
 registerCheck({
   id: 'task-specs-resolve',
-  description: 'every domain\'s taskSpecMap entry resolves to a real docs/task-specs/ file (tsk-2t9c D6/D9)',
+  description: 'every domain\'s taskSpecMap entry resolves to a real domains/<domain>/task-specs/ file (tsk-2t9c D6/D9)',
   check: (cwd) => checkTaskSpecsResolve(cwd),
 });
 
@@ -595,6 +771,12 @@ registerCheck({
   id: 'agent-claims-resolve',
   description: 'every agent-type\'s claims list (agents/*.yaml) names real task-specs (tsk-2t9c D12)',
   check: (cwd) => checkAgentClaimsResolve(cwd),
+});
+
+registerCheck({
+  id: 'agent-type-names-unique',
+  description: 'every agent-type name across core/agents/ and domains/*/agents/ is globally unique (D33)',
+  check: (cwd) => checkAgentTypeNamesUnique(cwd),
 });
 
 registerCheck({
@@ -613,6 +795,17 @@ registerCheck({
   id: 'tool-registry-configured',
   description: 'tool registry posture — inactive/degraded/full (tsk-1dj)',
   check: (cwd) => checkToolRegistryConfigured(cwd),
+});
+
+registerCheck({
+  id: 'agy-permissions-configured',
+  description: 'agy settings.json has a working command denylist instead of relying only on --dangerously-skip-permissions (tsk-1xm)',
+  check: () => checkAgyPermissionsConfigured(),
+});
+
+registerFix({
+  id: 'agy-permissions-configured',
+  fix: () => fixAgyPermissionsConfigured(),
 });
 
 // tsk-5m7 (docs/history/tsk-3bn-merge-conductor-harness-v2/): a real
@@ -697,6 +890,27 @@ function checkRootDrift(cwd) {
   return {
     passed: false,
     message: `${parts.join('; ')} — run fgos sync-root <root-id>`,
+  };
+}
+
+function checkLeafNotifyDrift(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const drift = postLandDrift(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
+  const entries = Object.entries(drift);
+  if (entries.length === 0) {
+    return { passed: true, message: 'no live session branch has post-land drift against its target' };
+  }
+
+  const describe = ([id, info]) =>
+    `${id} (${info.branch} overlaps ${info.shared.join(', ')} with ${info.target})`;
+
+  return {
+    passed: false,
+    message: `live session branch(es) have post-land drift against their target: ${entries.map(describe).join(', ')}`,
   };
 }
 
@@ -854,6 +1068,12 @@ registerCheck({
   check: (cwd) => checkRootDrift(cwd),
 });
 
+registerCheck({
+  id: 'leaf-notify-drift',
+  description: 'every live session branch has no post-land drift against its target (tsk-1el)',
+  check: (cwd) => checkLeafNotifyDrift(cwd),
+});
+
 // tsk-1l9: the LEAF-inclusive sibling of root-drift above. `root-drift` only
 // walks items that some other item calls `parent`, so an ordinary leaf marked
 // handed-over with its branch still off trunk is invisible to it — and
@@ -912,94 +1132,67 @@ registerCheck({
   check: (cwd) => checkDeliveredNotOnTrunk(cwd),
 });
 
-// tsk-3wq (docs/history/events-jsonl-merge-driver-recurring-write-loss/
-// CONTEXT.md D3): the shared .fgos/events.jsonl is git-tracked, and an
-// ordinary git merge on it — through `.gitattributes`'s `merge=union`
-// entry or otherwise — can leave the log with duplicate/non-contiguous
-// `seq` values even when it merges without a conflict (git's own docs:
-// `union` "tends to leave the added lines... in random order"). This
-// check surfaces that drift the same way root-drift above surfaces a
-// stale branch, instead of only being discovered when a migrate script's
-// own contiguity guard trips over it (tsk-n4i's original origin story).
-function checkEventsJsonlContiguous(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { passed: true, message: 'not inside a git checkout — nothing to check' };
-  }
-  const logPath = path.join(mainCheckout, '.fgos', 'events.jsonl');
-  if (!fs.existsSync(logPath)) {
-    return { passed: true, message: 'no .fgos/events.jsonl yet — nothing to check' };
-  }
-  const report = checkEventsJsonlContiguity(logPath);
-  if (report.ok) {
-    return { passed: true, message: `events.jsonl is contiguous (${report.totalLines} lines, no seq breaks/duplicates)` };
-  }
-  return {
-    passed: false,
-    message: `events.jsonl has ${report.duplicates.length} duplicate seq and ${report.gaps.length} seq break(s) — likely left behind by a git merge (tsk-3wq); run fgos doctor --fix`,
-  };
-}
-
-function fixEventsJsonlContiguous(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { changed: false, message: 'not inside a git checkout — nothing to fix' };
-  }
-  const logPath = path.join(mainCheckout, '.fgos', 'events.jsonl');
-  if (!fs.existsSync(logPath)) {
-    return { changed: false, message: 'no .fgos/events.jsonl yet — nothing to fix' };
-  }
-  const result = fixEventsJsonlContiguity(logPath);
-  if (!result.fixed) {
-    return { changed: false, message: 'events.jsonl already contiguous — nothing to fix' };
-  }
-  return {
-    changed: true,
-    message: `deduped ${result.dedupedCount} exact-duplicate line(s), resequenced ${result.resequencedCount} event(s), backup at ${result.backupPath}`,
-  };
-}
-
-registerCheck({
-  id: 'events-jsonl-contiguous',
-  description: 'shared .fgos/events.jsonl has no seq breaks or duplicates left behind by a git merge (tsk-3wq)',
-  check: (cwd) => checkEventsJsonlContiguous(cwd),
-});
-
-registerFix({
-  id: 'events-jsonl-contiguous',
-  fix: (cwd) => fixEventsJsonlContiguous(cwd),
-});
-
 // events-jsonl-not-truncated (tsk-cgg, docs/history/events-jsonl-git-
 // tracked-truncation/CONTEXT.md D1): catches a stash/checkout/reset/clean-
 // style silent truncation of the shared, git-tracked .fgos/events.jsonl --
-// the failure class events-jsonl-contiguous above is structurally blind
-// to, since a truncate-then-reappend renumbers forward and stays
-// perfectly contiguous. See src/state/events-jsonl-truncation-guard.mjs's
-// own header for the full detection mechanism. No matching registerFix
-// (unlike events-jsonl-contiguous): a break here means real data is
-// already gone -- auto-repairing would erase the loud signal before a
-// human ever saw it, defeating the reason this check exists. The
+// a failure class a seq-contiguity check is structurally blind to, since
+// a truncate-then-reappend renumbers forward and stays perfectly
+// contiguous. See src/state/events-jsonl-truncation-guard.mjs's own
+// header for the full detection mechanism. No matching registerFix: a
+// break here means real data is already gone -- auto-repairing would
+// erase the loud signal before a human ever saw it, defeating the
+// reason this check exists. The
 // re-baseline-after-acknowledgment step is a deliberate, documented
 // manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not
 // a blanket `doctor --fix` sweep.
+// Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under
+// .fgos/events/, each against its OWN entry in the shared guard sidecar
+// (the same `events/<name>` fileKey scheme `runOpportunisticMainCheckout
+// Checks` uses, so the two never disagree about which mark belongs to
+// which file). Per-session files stay git-tracked (TA-D2 only removes the
+// NEED for merge=union, not git tracking itself), so they carry the exact
+// same git reset/checkout/stash truncation risk baseline-0 always has
+// (tsk-cgg) — leaving this check baseline-only would be Tầng A quietly
+// opening a new observability gap.
 function checkEventsJsonlNotTruncated(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const logPath = path.join(mainCheckout, '.fgos', 'events.jsonl');
-  const guardPath = path.join(mainCheckout, '.fgos', 'events-jsonl.truncation-guard.json');
-  if (!fs.existsSync(logPath)) {
+  const fgosDir = path.join(mainCheckout, '.fgos');
+  const guardPath = resolveFgosFile(fgosDir, FGOS_FILE.GUARD_MARK);
+  const filesToCheck = [{ fileKey: 'events.jsonl', logPath: path.join(fgosDir, 'events.jsonl') }];
+  const eventsDirPath = path.join(fgosDir, 'events');
+  try {
+    const names = fs
+      .readdirSync(eventsDirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+    for (const name of names) filesToCheck.push({ fileKey: `events/${name}`, logPath: path.join(eventsDirPath, name) });
+  } catch {
+    // .fgos/events/ doesn't exist yet -- baseline-0 alone is still checked below
+  }
+
+  const existingFiles = filesToCheck.filter(({ logPath }) => fs.existsSync(logPath));
+  if (existingFiles.length === 0) {
     return { passed: true, message: 'no .fgos/events.jsonl yet — nothing to check' };
   }
-  const report = advanceEventsJsonlTruncationGuard(logPath, guardPath);
-  if (report.ok) {
-    return { passed: true, message: `events.jsonl truncation guard holds (${report.message})` };
+
+  const broken = [];
+  for (const { fileKey, logPath } of existingFiles) {
+    const report = advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey);
+    if (!report.ok) broken.push({ fileKey, message: report.message });
+  }
+
+  if (broken.length === 0) {
+    return {
+      passed: true,
+      message: `truncation guard holds across events.jsonl${existingFiles.length > 1 ? ` + ${existingFiles.length - 1} per-writer file(s)` : ''}`,
+    };
   }
   return {
     passed: false,
-    message: `events.jsonl truncation detected: ${report.message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,
+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,
   };
 }
 
@@ -1008,6 +1201,127 @@ registerCheck({
   description: 'shared .fgos/events.jsonl has not been silently reverted by a git stash/checkout/reset/clean (tsk-cgg)',
   check: (cwd) => checkEventsJsonlNotTruncated(cwd),
 });
+
+// events-compaction-verified (Tầng A/T6, TA-D6): retroactively re-proves
+// every past compaction recorded in .fgos/events/archive/*.manifest.json
+// still holds -- re-reads the manifest's own `baseline` (still a live file
+// under .fgos/events/) and its `originals` (now under archive/) and re-runs
+// the SAME verify gate compactColdWriterFiles ran before archiving anything
+// (deep-equal view + count + hash-set, src/state/events-compaction.mjs).
+// No matching registerFix, same posture as events-jsonl-not-truncated above:
+// a break here means the compacted baseline and its own archived originals
+// have drifted apart after the fact (tampering, partial restore, a bug) --
+// real data may be at stake, so this only ever surfaces the finding for a
+// human to investigate (docs/how-to/... none yet; the manifest + both file
+// sets are still on disk for manual inspection), never auto-repairs.
+function checkEventsCompactionVerified(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const eventsDirPath = path.join(mainCheckout, '.fgos', 'events');
+  const archiveDirPath = path.join(eventsDirPath, 'archive');
+  let manifestNames = [];
+  try {
+    manifestNames = fs
+      .readdirSync(archiveDirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.manifest.json'))
+      .map((entry) => entry.name);
+  } catch {
+    return { passed: true, message: 'no compactions recorded yet — nothing to verify' };
+  }
+  if (manifestNames.length === 0) {
+    return { passed: true, message: 'no compactions recorded yet — nothing to verify' };
+  }
+
+  // Never throws (same contract events-jsonl-not-truncated above already
+  // keeps): a corrupt line in an archived original
+  // or the baseline itself is exactly the "tampering, partial restore, a
+  // bug" shape this check exists to catch, per its own doc comment above --
+  // it must surface as a normal `broken` finding, never crash the rest of
+  // `fgos doctor` (bin/fgos.mjs's doctor handler runs every check in one
+  // .map(), with no per-check try/catch of its own).
+  const broken = [];
+  for (const manifestName of manifestNames) {
+    try {
+      const manifest = JSON.parse(fs.readFileSync(path.join(archiveDirPath, manifestName), 'utf8'));
+      const baselinePath = path.join(eventsDirPath, manifest.baseline);
+      if (!fs.existsSync(baselinePath)) {
+        broken.push({ manifest: manifestName, reason: `baseline "${manifest.baseline}" is missing` });
+        continue;
+      }
+      const originalEntries = [];
+      let missingOriginal = null;
+      for (const name of manifest.originals ?? []) {
+        const originalPath = path.join(archiveDirPath, name);
+        if (!fs.existsSync(originalPath)) {
+          missingOriginal = name;
+          break;
+        }
+        originalEntries.push({ name, events: readEventsJsonLines(originalPath) });
+      }
+      if (missingOriginal) {
+        broken.push({ manifest: manifestName, reason: `archived original "${missingOriginal}" is missing` });
+        continue;
+      }
+      const candidateEvents = readEventsJsonLines(baselinePath);
+      const verify = verifyCompactionCandidate(originalEntries, candidateEvents);
+      if (!verify.ok) {
+        broken.push({ manifest: manifestName, reason: verify.reason });
+      }
+    } catch (err) {
+      broken.push({ manifest: manifestName, reason: `could not verify: ${err.message}` });
+    }
+  }
+
+  if (broken.length === 0) {
+    return { passed: true, message: `${manifestNames.length} past compaction(s) verified — baseline still matches its archived originals` };
+  }
+  return {
+    passed: false,
+    message: `compaction verify gate no longer holds for ${broken.map((b) => `${b.manifest} (${b.reason})`).join(', ')}`,
+  };
+}
+
+function readEventsJsonLines(filePath) {
+  return fs
+    .readFileSync(filePath, 'utf8')
+    .split('\n')
+    .filter((line) => line !== '')
+    .map((line) => JSON.parse(line));
+}
+
+registerCheck({
+  id: 'events-compaction-verified',
+  description: 'every past .fgos/events/ compaction (archive/*.manifest.json) still deep-equal/count/hash-set matches its archived originals (Tầng A/T6)',
+  check: (cwd) => checkEventsCompactionVerified(cwd),
+});
+
+// main-checkout-guard-warnings (tsk-1vc-3 D6, docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md):
+// surfaces recordMainCheckoutGuardWarning's write-only output (main-checkout-guard-warnings.jsonl)
+// to fgos doctor.
+function checkMainCheckoutGuardWarnings(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const warnings = readMainCheckoutGuardWarnings(mainCheckout);
+  if (warnings.length === 0) {
+    return { passed: true, message: 'no main checkout guard warnings recorded' };
+  }
+  const latest = warnings[warnings.length - 1];
+  return {
+    passed: false,
+    message: `${warnings.length} main checkout guard warning(s) recorded — latest: [${latest.ts}] ${latest.reason}: ${latest.message}`,
+  };
+}
+
+registerCheck({
+  id: 'main-checkout-guard-warnings',
+  description: 'main checkout eventlog guard warnings log has no recorded regression or truncation warnings (D6)',
+  check: (cwd) => checkMainCheckoutGuardWarnings(cwd),
+});
+
 
 // docs/history/global-project-config-awareness/CONTEXT.md D1: reports which
 // config level is currently active (project always wins when present) and
@@ -1038,14 +1352,132 @@ registerCheck({
   check: (cwd) => checkGlobalProjectAwareness(cwd),
 });
 
-// The runner's own config-default, registered under its key in the shared
-// file (tsk-2cs D6) — `checkConfigNotStale`/`ensureSharedConfigDefaults`
-// above are both driven by this registration generically (tsk-5vf D4), not
-// a hardcoded reference to `DEFAULT_RUNNER_CONFIG`'s shape.
+// tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/
+// CONTEXT.md D2): the two role-by-intelligence capability slots --
+// `advise` (value comes from disagreement, never changes state, one
+// question/one answer) and `execute` (value comes from compliance,
+// changes files, must pass verify). `decide --for <purpose>` already
+// validates a `--for` name against `runner.capabilities` (dispatch.mjs's
+// `validateCapabilitiesShape`/`resolveExecutorAndOverrides`), but the
+// shared config's `capabilities` map shipped with neither name declared,
+// so neither purpose could ever resolve. Layered onto the SAME `runner`
+// config-default below (never a second, colliding `key: 'runner'`
+// registration -- `assembleRegistryDefaults` combines registrations by
+// flat per-key assignment, not a deep merge across entries sharing a
+// key) so `DEFAULT_RUNNER_CONFIG` itself (src/runner/dispatch.mjs,
+// tsk-2uf-1's own footprint) stays untouched -- this only ADDS a
+// `capabilities` key that constant has never declared. Deliberately no
+// `prefer`/`aliases`/`overrides`: naming which executor serves a purpose
+// is a dispatch-mechanism decision, and tsk-5tm-3 D5 forbids `execute`
+// (or, by the same reasoning, this registration) re-deciding that.
+export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
+  advise: {
+    description:
+      'Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
+  },
+  execute: {
+    description:
+      'Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
+  },
+});
+
+// tsk-47r: `pi` as a second `agent`-kind executor, layered onto this SAME
+// `runner` config-default for the same reason `capabilities` above is (a
+// second `key: 'runner'` registration would silently overwrite this one,
+// never merge with it). `executors.pi` mirrors `executors.agy`'s live
+// shape exactly (`.fgos/config.json`, hand-authored, not itself sourced
+// from this registration) — `mergeConfigDefaults`'s fill-missing-only
+// recursion (`config-merge.mjs`) adds `runner.executors.pi` and
+// `runner.modelPolicies["openai-codex"]` on the next `fgos setup` run
+// without touching the live `executors.agy`/`modelPolicies.claude`/
+// `modelPolicies.gemini` entries. `--provider openai-codex --model
+// gpt-5.5` and the `read,write,edit,bash,grep,find,ls` allowlist are the
+// EXACT invocation a live D4 proof-test dispatch ran and confirmed GREEN
+// (worker contract followed: layered skill-pointer chain read natively,
+// footprint honored, correct `[BLOCKED]`/`[DONE]` two-token reporting) —
+// see docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4.
+// Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple
+// tests assert this exact shape instead of duplicating the literal.
+export const PI_EXECUTOR_DEFAULT = Object.freeze({
+  kind: 'agent',
+  description: 'pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)',
+  allowCrossProvider: true,
+  invocations: [
+    {
+      via: 'cli',
+      adapter: 'cli-spawn',
+      command: 'pi',
+      args: [
+        '--provider',
+        'openai-codex',
+        '--model',
+        '{model}',
+        '--tools',
+        'read,write,edit,bash,grep,find,ls',
+        '--mode',
+        'json',
+        '--approve',
+        '-p',
+        '{prompt}',
+      ],
+    },
+  ],
+  providerModel: 'openai-codex',
+  rigorOverrides: {
+    light: 'lightweight',
+    standard: 'lightweight',
+    heavy: 'lightweight',
+  },
+});
+
 registerConfigDefault({
   id: 'runner',
   key: 'runner',
-  shape: DEFAULT_RUNNER_CONFIG,
+  shape: {
+    ...DEFAULT_RUNNER_CONFIG,
+    capabilities: DEFAULT_CAPABILITY_SLOTS,
+    modelPolicies: {
+      ...DEFAULT_RUNNER_CONFIG.modelPolicies,
+      'openai-codex': { lightweight: 'gpt-5.5' },
+    },
+    executors: { pi: PI_EXECUTOR_DEFAULT },
+  },
+});
+
+// `checkConfigNotStale` above already catches `runner.capabilities` (or
+// either slot inside it) being wholly ABSENT, generically, via
+// `assembleRegistryDefaults`'s merge -- same "generic scan covers missing,
+// a dedicated check covers present-but-malformed" split every other
+// present-but-unusable check in this file already follows (gateway/
+// workerSlots/invariantChecks above). What slips past the generic scan is
+// a slot present as the wrong shape (a string, an array, `null`) -- never
+// "missing", so `mergeConfigDefaults` has nothing to add, and `decide
+// --for advise`/`--for execute` would still fail validateCapabilitiesShape
+// with no doctor signal pointing at why.
+function checkAdviseExecuteCapabilitiesConfigured(cwd) {
+  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
+  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
+    return {
+      passed: false,
+      message: 'runner.capabilities section missing -- run fgos setup (decide --for advise/execute cannot resolve until it exists)',
+    };
+  }
+  const missing = ['advise', 'execute'].filter(
+    (name) => !capabilities[name] || typeof capabilities[name] !== 'object' || Array.isArray(capabilities[name]),
+  );
+  if (missing.length > 0) {
+    return {
+      passed: false,
+      message: `runner.capabilities is missing or has a malformed slot for: ${missing.join(', ')} -- run fgos setup`,
+    };
+  }
+  return { passed: true, message: 'runner.capabilities declares both "advise" and "execute"' };
+}
+
+registerCheck({
+  id: 'advise-execute-capabilities-configured',
+  description: 'runner.capabilities declares the "advise" and "execute" purpose slots decide --for resolves against (tsk-2uf-3)',
+  check: (cwd) => checkAdviseExecuteCapabilitiesConfigured(cwd),
 });
 
 // tsk-slq D6 (AGENTS.md's install/setup/doctor gate — a new infra
@@ -1242,6 +1674,12 @@ registerConfigDefault({
   id: 'invariantChecks',
   key: 'invariantChecks',
   shape: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
+});
+
+registerConfigDefault({
+  id: 'checkpoint',
+  key: 'checkpoint',
+  shape: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
 });
 
 // Deliberately does NOT execute the configured commands. `doctor` is a
@@ -2200,4 +2638,61 @@ registerCheck({ id: 'doc-topic-oversized', description: 'topic size check agains
 registerCheck({ id: 'doc-role-underused', description: 'role usage frequency check', check: checkDocRoleUnderused });
 registerCheck({ id: 'doc-source-conservation', description: 'source captures conservation check', check: checkDocSourceConservation });
 
+function getMergeHeadSha(mainCheckout) {
+  try {
+    const stdout = execFileSync('git', ['rev-parse', '--verify', 'MERGE_HEAD'], {
+      cwd: mainCheckout,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    return stdout.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+function checkNoStuckMergeAbort(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const sha = getMergeHeadSha(mainCheckout);
+  if (sha !== null) {
+    return {
+      passed: false,
+      message: `merge in progress or stuck (MERGE_HEAD=${sha}) — run fgos main-checkout-reset --sha ${sha} --confirm`,
+    };
+  }
+  return { passed: true, message: 'no merge in progress or stuck MERGE_HEAD' };
+}
+
+// Unattended automation must never mutate the shared main checkout's git
+// plumbing without a human reviewing real `git status` first (plan.md).
+// Therefore, this fix always returns changed: false and names the manual
+// recovery command `fgos main-checkout-reset --sha <sha> --confirm`.
+function fixNoStuckMergeAbort(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { changed: false, message: 'not inside a git checkout — nothing to fix' };
+  }
+  const sha = getMergeHeadSha(mainCheckout);
+  if (sha === null) {
+    return { changed: false, message: 'no merge in progress — nothing to fix' };
+  }
+  return {
+    changed: false,
+    message: `merge in progress or stuck (MERGE_HEAD=${sha}) — run fgos main-checkout-reset --sha ${sha} --confirm`,
+  };
+}
+
+registerCheck({
+  id: 'no-stuck-merge-abort',
+  description: 'main checkout has no lingering MERGE_HEAD from an in-progress or stuck merge abort (tsk-40a)',
+  check: (cwd) => checkNoStuckMergeAbort(cwd),
+});
+
+registerFix({
+  id: 'no-stuck-merge-abort',
+  fix: (cwd) => fixNoStuckMergeAbort(cwd),
+});
 

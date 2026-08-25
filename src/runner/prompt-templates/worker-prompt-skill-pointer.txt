@@ -15,11 +15,60 @@ governs how this work item must be done.
 
 # Files to read first
 {readFirst}
+{docsRefPointer}
 
 # Worktree boundary
 You are running on an isolated git worktree, checked out on its own branch for
 this work item only. Stay inside this checkout — never touch the main
 working tree, another branch, or another worktree. Relevant refs: {refs}.
+
+# Iron Law evidence
+This repo is self-modifying: fix any of its own runner/evolve/state modules
+(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies
+— proof a fix was validated against a real failing test before it existed.
+AFTER your implementation is committed on this branch (running this BEFORE
+committing reads an empty diff and gives a false "not required" — see
+`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s
+"Watch out for" section), classify your own diff:
+
+```bash
+node --input-type=module -e "
+import { changedFiles } from './src/runner/merge.mjs';
+import { classifyIronLaw } from './src/evolve/iron-law.mjs';
+const id = process.argv[1];
+const description = process.argv[2];
+console.log(JSON.stringify(classifyIronLaw({ filesChanged: changedFiles('.', { id }), description })));
+" "<your item id — your current branch name, `git branch --show-current`, with the fgw/ prefix stripped>" "<your item's own Description text, verbatim, from the Description section above>"
+```
+
+If the result's `required` is `false`, do nothing further. If
+`required` is `true`, you must produce real failing-test-first proof
+before reporting `[DONE]` — see
+`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`
+for the full recipe: identify the test file(s) covering your change, `git
+stash push --` the IMPLEMENTATION files only (never the test files), run
+the same test command and capture the real failing output (red — paste the
+actual stderr/assertion text, never a paraphrase), `git stash apply`
+(never `pop`, until green is reconfirmed) to restore your fix, rerun the
+same command and confirm it passes (green), then write
+`docs/history/<your item id>/iron-law-evidence.md` with the matched
+flags/modules from the classification above and the real red/green
+transcript excerpts, and commit it as a follow-up commit on this branch —
+before reporting `[DONE]`. Skipping or fabricating this evidence when
+`required` is `true` is not a valid way to finish.
+
+# How to finish
+Report your completion status through a fixed token in your output — your
+caller reads this token mechanically, not free prose:
+
+- `[DONE]` — the work described in your boundary is complete and committed on
+  this branch.
+- `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed
+  because required context is missing, a file is outside your boundary, or a
+  real mid-work blocker stopped you. Never leave this bare.
+
+Exiting without printing either token is not a valid end state — your caller
+has nothing mechanical to read and will treat your outcome as unsignaled.
 
 # Expected proof
 Your work is judged only by this verify command, which the runner runs
@@ -42,7 +91,4 @@ your output:
 {"title": "<one-line title>", "kind": "<optional>", "risk": "<optional>", "description": "<optional>"}
 ```
 
-`title` is required; `kind`/`risk`/`description` are optional. This is a
-report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The
-runner reads these blocks after you finish and creates each item itself,
-stamping it as discovered-from this item.
+`title` is required; `kind`/`risk`/`description` are optional — pick `kind`/`risk` from the domain's own declared vocabulary (`classificationVocabulary(domain, field)`, `src/state/workflow-stage-graphs.mjs`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.

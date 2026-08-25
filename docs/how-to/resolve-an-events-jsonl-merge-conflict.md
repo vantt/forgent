@@ -7,10 +7,27 @@ source_capture_ids: [tsk-n4i-2]
 ---
 # How to resolve a git merge conflict on `.fgos/events.jsonl` without breaking seq contiguity
 
+**Superseded (`tsk-3tp`, on top of `tsk-3ve`):** `.fgos/events.jsonl` is
+now a frozen baseline — new events land in per-writer shard files under
+`.fgos/events/<writer-id>-<openTs>.jsonl` (content-hash `h` identity, not
+cross-writer `seq`), and dirty shards are swept into merge/approve commits
+rather than hand-merged. `scripts/check-events-seq-contiguity.mjs` (and
+the sibling `scripts/events-jsonl-contiguity.mjs`) referenced throughout
+this doc were deleted; neither is wired into `npm test` or `fgos doctor`
+any more. The scenario this doc describes — two branches independently
+appending to the *same* `.fgos/events.jsonl` and needing manual `seq`
+renumbering after a conflict — no longer arises for that file. See
+`docs/explanation/events-jsonl-lost-update-race-under-concurrent-session-
+writes.md` and `docs/history/tsk-3tp-worker-write-events-tang-b/` for the
+current mechanism. Everything below is kept as historical record of the
+procedure and the corruption it fixed at the time.
+
 Use this when `git merge`/`git rebase` reports a conflict inside
 `.fgos/events.jsonl`, or when `npm test` fails on
 `check-events-seq-contiguity`'s own test (`test/scripts/check-events-seq-contiguity.test.mjs`)
 or a `fgos merge`/migrate script refuses with `"seq gap at line N"`.
+(Historical — these entry points no longer exist; see the superseded
+note above.)
 
 ## Why hand-resolving this file is dangerous
 
@@ -114,9 +131,12 @@ applying:
 - `docs/how-to/fix-fgos-write-rejected-merge-block.md` — what to do if you
   already committed a `.fgos/` change onto a worker branch by mistake.
 - `scripts/check-events-seq-contiguity.mjs` — the fast-fail check this
-  procedure's step 4 runs, also wired into `npm test`.
+  procedure's step 4 ran, formerly also wired into `npm test`; deleted by
+  `tsk-3tp` (see the superseded note at the top of this doc).
 - `docs/history/live-events-seq-corruption/` — the full investigation and
-  plan behind both this doc and the check script.
+  plan behind both this doc and the (now-deleted) check script.
+- `docs/history/tsk-3tp-worker-write-events-tang-b/` — the current
+  mechanism that replaced the one this doc describes.
 
 ## Document history (compound-learn capture linkage)
 

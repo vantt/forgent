@@ -138,6 +138,15 @@ export function hasOpenItems(artifactText) {
   return !/^none\b/i.test(body);
 }
 
+function stripCitations(text) {
+  if (typeof text !== 'string') return '';
+  // Backtick-quoted spans (code spans, quoted paths/filenames).
+  let out = text.replace(/`[^`]*`/g, ' ');
+  // Bare filename-shaped tokens, e.g. AUDIT.md, gate-bypass.mjs.
+  out = out.replace(/\b[\w-]+\.(md|mjs|js|cjs|ts|json|yml|yaml|txt)\b/gi, ' ');
+  return out;
+}
+
 /**
  * Combine all three checks (D5's two axes plus D4's floor) into the single
  * yes/no a Gate step needs. `item` is the work item (title/description/tier
@@ -145,7 +154,17 @@ export function hasOpenItems(artifactText) {
  * `level` is the value `readGateBypassLevel` returned.
  */
 export function canAutoApprove(item, artifactText, level) {
-  const haystack = `${item?.title ?? ''}\n${item?.description ?? ''}`;
+  const haystack = stripCitations(`${item?.title ?? ''}\n${item?.description ?? ''}`);
+
+  // Known, permanent limitations of the mechanical floor:
+  // - A title/description that merely mentions a hard-gate word as a topic
+  //   (not describing an actual risky change) still hard-gates — accepted,
+  //   because the failure mode is asking a human unnecessarily (friction),
+  //   never silently skipping a real risk (the floor's own fail-safe direction).
+  // - Negated prose ("no auth/audit risk applies here") still hard-gates —
+  //   accepted, because teaching the floor to parse negation would turn it
+  //   from mechanical/lexical into an interpretive read, exactly what its own
+  //   design principle (docs/explanation/gate-bypass-design.md) exists to prevent.
   const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));
   if (hardGateHit) return false;
 
@@ -182,7 +201,10 @@ export const COST_REVERSIBLE = 'REVERSIBLE';
  * without inheriting that vocabulary problem.
  */
 function mergedGateHaystack(item, childSpecs) {
-  const parts = [item?.title ?? '', item?.description ?? ''];
+  const parts = [
+    stripCitations(item?.title ?? ''),
+    stripCitations(item?.description ?? ''),
+  ];
 
   for (const p of Array.isArray(item?.footprint) ? item.footprint : []) {
     if (typeof p === 'string') parts.push(p);

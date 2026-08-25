@@ -12,9 +12,29 @@
 
 /**
  * The full declared error-class domain (reliability-panel revision adds
- * `stale-doing` and `state-conflict` on top of the original six):
+ * `stale-doing` and `state-conflict` on top of the original six;
+ * `dispatch-in-flight`/`dispatch-depth-exceeded` are the dispatch-execute
+ * optimization pass's own additions, closing the gap `dispatch/cli.mjs`'s
+ * `DispatchError('dispatch-in-flight', ...)` had been throwing without a
+ * matching entry here since tsk-64hk — an undeclared class fails safe to
+ * `halt` the whole runner, which is the wrong response to "someone else is
+ * already dispatching this cwd, try again shortly"):
  *   - worker-spawn-fail  — the executor process could not be started.
  *   - worker-timeout     — the executor ran past its time budget.
+ *   - dispatch-in-flight — another `dispatch.mjs execute` call already
+ *                          holds the per-cwd lock for this dispatch (or the
+ *                          lock file itself is corrupt/ambiguous) — a
+ *                          transient condition, same shape as
+ *                          `worker-spawn-fail`: the caller should back off
+ *                          and try again shortly.
+ *   - dispatch-depth-exceeded — a dispatched executor tried to dispatch
+ *                          another executor past `transport.mjs`'s
+ *                          `MAX_DISPATCH_DEPTH` nested-dispatch cap.
+ *                          Scoped to this one item's own dispatch chain,
+ *                          not a runner-wide health signal — parks rather
+ *                          than halting, same reasoning as `stale-doing`
+ *                          below; retrying the same claim would only hit
+ *                          the same cap again until a human intervenes.
  *   - verify-miss        — the runner's own goal-check (item.verify) failed
  *                          after the worker returned; the worker's report is
  *                          never trusted on its own (per D3).
@@ -53,6 +73,8 @@ export const ERROR_CLASSES = Object.freeze([
   'reject-returned',
   'stale-doing',
   'state-conflict',
+  'dispatch-in-flight',
+  'dispatch-depth-exceeded',
 ]);
 
 /**
@@ -90,6 +112,8 @@ export const RECOVERY = Object.freeze({
   'reject-returned': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),
   'stale-doing': Object.freeze({ action: 'park' }),
   'state-conflict': Object.freeze({ action: 'halt' }),
+  'dispatch-in-flight': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),
+  'dispatch-depth-exceeded': Object.freeze({ action: 'park' }),
 });
 
 /**

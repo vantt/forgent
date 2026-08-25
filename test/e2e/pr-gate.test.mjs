@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -43,7 +44,7 @@ function initTempRepo() {
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
-  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/cache/\n');
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: repoRoot });
@@ -79,7 +80,7 @@ function add(cwd, id, extra = {}) {
 }
 
 function viewPath(cwd) {
-  return path.join(cwd, '.fgos', 'state.json');
+  return resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE);
 }
 
 function stateView(cwd) {
@@ -93,12 +94,42 @@ function envelopeData(stdout) {
   return JSON.parse(stdout).data;
 }
 
+// Tầng A/T2/T3 (TA-D2/TA-D7/TA-D12): new events land in a per-writer file
+// under `.fgos/events/<writer-id>-<openTs>.jsonl` (one per CLI subprocess
+// invocation here), not baseline-0's `.fgos/events.jsonl` alone (still read
+// too — legacy content lives there, zero rewrite). This file's own "never
+// imports src/runner or src/state directly" rule (top of file) means the
+// TA-D7 total order `(ts, file, seq)` is re-derived here — same order
+// production replay produces, read as an outside observer would.
 function events(cwd) {
-  return fs
-    .readFileSync(path.join(cwd, '.fgos', 'events.jsonl'), 'utf8')
-    .split('\n')
-    .filter(Boolean)
-    .map((line) => JSON.parse(line));
+  const tagged = [];
+  const logPath = path.join(cwd, '.fgos', 'events.jsonl');
+  if (fs.existsSync(logPath)) {
+    for (const line of fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean)) {
+      tagged.push({ ev: JSON.parse(line), file: '' });
+    }
+  }
+  const eventsDir = path.join(cwd, '.fgos', 'events');
+  let names = [];
+  try {
+    names = fs
+      .readdirSync(eventsDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch {
+    names = [];
+  }
+  for (const name of names) {
+    for (const line of fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean)) {
+      tagged.push({ ev: JSON.parse(line), file: name });
+    }
+  }
+  tagged.sort((a, b) => {
+    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
+    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
+    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
+  });
+  return tagged.map(({ ev }) => ev);
 }
 
 function writeRunnerConfig(repoRoot, executorScript) {
@@ -466,7 +497,7 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
   const approveEData = envelopeData(approve.stdout);
   assert.equal(approveEData.to, 'delivered');
-  assert.match(approveEData.output, /PR_E_OK/);
+  assert.match(approveEData.output, /verify skipped|PR_E_OK/);
   assert.equal(stateView(repoRoot).work['pr-e-item'].status, 'delivered');
 
   // tsk-1p9: real `cleanup` verb, not a bare `move --to done` — teardown

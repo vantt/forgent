@@ -136,6 +136,33 @@ function stagedFgosDeletions(committingToplevel) {
     .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
 }
 
+// tsk-5pb -- any staged path under .fgos/ (Added, Modified, Deleted) on a
+// worker's fgw/* branch is forbidden. Git manual merge materialization can stage
+// a .fgos/* blob as Modified; worker branches must never commit changes under .fgos/.
+function stagedFgosChangesOnWorkerBranch(committingToplevel) {
+  let branch;
+  try {
+    branch = execFileSync(
+      'git',
+      ['symbolic-ref', '--short', '-q', 'HEAD'],
+      { cwd: committingToplevel, encoding: 'utf8' },
+    ).trim();
+  } catch {
+    return [];
+  }
+  if (!/^fgw\//.test(branch)) return [];
+
+  const output = execFileSync(
+    'git',
+    ['diff', '--cached', '--name-only'],
+    { cwd: committingToplevel, encoding: 'utf8' },
+  );
+  return output
+    .split('\n')
+    .filter((p) => p !== '')
+    .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
+}
+
 // tsk-4hkd -- the main checkout must never sit on a fgw/<id> branch itself;
 // that branch belongs in the item's own linked worktree (fgos pick), never
 // checked out directly here. git-dir vs git-common-dir tells apart the main
@@ -156,6 +183,75 @@ function currentFgwBranchIfMainCheckout(repoRoot) {
     return null; // detached HEAD -- no branch to match, nothing to refuse
   }
   return /^fgw\//.test(branch) ? branch : null;
+}
+
+function countLines(str) {
+  let count = 0;
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === '\n') count++;
+  }
+  return count;
+}
+
+// tsk-1i3 -- staged .fgos/* content-precedence guard on main/default branch.
+// Refuses any commit staging a modification (--diff-filter=M) under .fgos/
+// whose staged line count is strictly lower than HEAD's own line count for that
+// same path (D1-D4).
+function stagedFgosModificationsRegressLineCount(committingToplevel) {
+  let branch;
+  try {
+    branch = execFileSync(
+      'git',
+      ['symbolic-ref', '--short', '-q', 'HEAD'],
+      { cwd: committingToplevel, encoding: 'utf8' },
+    ).trim();
+  } catch {
+    branch = '';
+  }
+  if (/^fgw\//.test(branch)) return { regressedPaths: [] };
+
+  let output;
+  try {
+    output = execFileSync(
+      'git',
+      ['diff', '--cached', '--name-only', '--diff-filter=M'],
+      { cwd: committingToplevel, encoding: 'utf8' },
+    );
+  } catch (err) {
+    return { error: `commit refused: could not run "git diff --cached" to check staged modifications under ".fgos/" (${err.message}) -- refusing to commit (fail-closed).` };
+  }
+
+  const modifiedFgosPaths = output
+    .split('\n')
+    .filter((p) => p !== '')
+    .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
+
+  if (modifiedFgosPaths.length === 0) return { regressedPaths: [] };
+
+  const regressedPaths = [];
+  for (const p of modifiedFgosPaths) {
+    let headContent, stagedContent;
+    try {
+      // maxBuffer (tsk-1i3 follow-up hotfix): execFileSync's default 1MB
+      // maxBuffer is smaller than .fgos/events.jsonl's real size (10MB+),
+      // throwing ENOBUFS on every commit that touches it and wrongly
+      // refusing the commit as "could not read blob" -- raised generously
+      // since this reads a whole git blob into memory once per commit.
+      const maxBuffer = 1024 * 1024 * 200;
+      headContent = execFileSync('git', ['show', `HEAD:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });
+      stagedContent = execFileSync('git', ['show', `:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });
+    } catch (err) {
+      return { error: `commit refused: could not read blob for "${p}" via "git show" -- refusing to commit against an unreadable ref/blob (fail-closed).` };
+    }
+
+    const headLines = countLines(headContent);
+    const stagedLines = countLines(stagedContent);
+    if (stagedLines < headLines) {
+      regressedPaths.push({ path: p, headLines, stagedLines });
+    }
+  }
+
+  return { regressedPaths };
 }
 
 // STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/
@@ -238,6 +334,12 @@ function main() {
     return;
   }
 
+  const fgosWorkerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);
+  if (fgosWorkerChanges.length > 0) {
+    refuse(`commit refused: this commit on a worker branch stages changes under ".fgos/" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
+    return;
+  }
+
   if (!hookRunsAtHome(repoRoot, committingToplevel)) {
     // A different, unrelated checkout (sharing this repo's core.hooksPath)
     // is committing -- nothing here concerns it, per the header comment.
@@ -263,6 +365,17 @@ function main() {
   const fgwBranch = currentFgwBranchIfMainCheckout(repoRoot);
   if (fgwBranch) {
     refuse(`commit refused: main checkout is on branch ${fgwBranch} -- checkout back to the default branch and use "fgos pick <id>" for item work.`);
+    return;
+  }
+
+  const fgosRegressed = stagedFgosModificationsRegressLineCount(committingToplevel);
+  if (fgosRegressed.error) {
+    refuse(fgosRegressed.error);
+    return;
+  }
+  if (fgosRegressed.regressedPaths.length > 0) {
+    const paths = fgosRegressed.regressedPaths.map((r) => r.path).join(', ');
+    refuse(`commit refused: this commit stages a modification under ".fgos/" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
     return;
   }
 

@@ -81,7 +81,7 @@ mechanism now exists so a forgotten entry doesn't go unnoticed forever:
 
 - **`fgos check`** surfaces the same read as a `changelogNag` field
   (`{fileExists, hasEntries, deliveredCount}`), and appends one data
-  point per check run to `.fgos/changelog-nag-history.jsonl` — a real,
+  point per check run to `.fgos/logs/changelog-nag-history.jsonl` — a real,
   accumulating counter, not a per-merge popup. At roughly 25 items
   reaching `delivered` per day (measured against `.fgos/events.jsonl`,
   2026-08-01 through 2026-08-08), a nag that fired per merge would be

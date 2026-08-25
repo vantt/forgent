@@ -1,0 +1,42 @@
+# domains/coding/workflows/feature.yaml - feature workflow declaration for coding domain (D19/D29)
+
+stages:
+  - name: discovery
+    skill: fgos-coding-discovering
+    taskSpec: judge-ambiguity
+  - name: exploring
+    skill: fgos-coding-exploring
+    taskSpec: lock-decisions
+  - name: decompose
+    skill: fgos-coding-planning
+  - name: planning
+    step: Divide
+    skill: fgos-coding-planning
+    taskSpec: shape-plan
+  - name: executing
+    step: Execute
+    skill: fgos-coding-implement
+    taskSpec: implement-item
+
+transitions:
+  - from: clarify
+    to: discovery
+  - from: clarify
+    to: exploring
+  - from: decompose
+    to: executing
+  - from: exploring
+    to: decompose
+  - from: discovery
+    to: exploring
+  - from: discovery
+    to: planning
+  - from: exploring
+    to: planning
+  - from: planning
+    to: executing
+
+statusSkills:
+  retrospective:
+    skill: fgos-coding-knowledge
+    taskSpec: compound-learn

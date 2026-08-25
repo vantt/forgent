@@ -22,6 +22,7 @@ import {
   path,
   addOk,
   addWork,
+  releaseClaimFor,
   run,
   stateView,
   eventLines,
@@ -62,7 +63,10 @@ function makeGatedLeaf(cwd, rootId, leafId) {
     id: leafId, title: `Title ${leafId}`, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [],
     verify: `test -f ${GATED_MODULE}`, parent: rootId,
   });
-  run(cwd, ['move', leafId, '--to', 'doing']);
+  // tsk-40m: `take` writes no durable move, but claimWork still durably
+  // appends a predicted work.outcome -- flush both that and the earlier
+  // work.add to main's own HEAD before branching.
+  run(cwd, ['take', '--id', leafId]);
   commitPending(cwd, `state: claim ${leafId}`);
 
   gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, `fgw/${rootId}`]);
@@ -73,7 +77,11 @@ function makeGatedLeaf(cwd, rootId, leafId) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
+  // The raw move below never goes through settleClaim -- release the
+  // runtime claim explicitly right after, same reasoning as the shared
+  // harness's makeRunnerProposedItem/makeRunnerProposedLeafItem.
   run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  releaseClaimFor(cwd, leafId);
   commitPendingBeforeApprove(cwd, leafId);
 }
 
@@ -92,7 +100,11 @@ function makeGatedSyncRoot(cwd, rootId, parent) {
     verify: 'true', ...(parent ? { parent } : {}),
   });
   commitPending(cwd, `state: add ${rootId}`);
-  run(cwd, ['move', rootId, '--to', 'doing']);
+  // tsk-40m: `take` writes no durable move, but claimWork still durably
+  // appends a predicted work.outcome -- flush both before branching. The
+  // item stays effectively 'doing' via the runtime claim for as long as
+  // sync-root tests never settle it.
+  run(cwd, ['take', '--id', rootId]);
   commitPending(cwd, `state: claim ${rootId}`);
 
   if (parent) {

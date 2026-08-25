@@ -14,6 +14,7 @@ import {
   inspectMainCheckoutLock,
   formatLockDurationMs,
   mergeSlotLockFile,
+  dispatchLockFile,
   LOCK_FILE,
   ACQUIRED,
   HELD,
@@ -924,6 +925,15 @@ test('mergeSlotLockFile output only ever contains filesystem-safe characters (no
     assert.ok(!name.includes('\0'), `"${name}" must not contain a null byte`);
   }
 });
+
+test('dispatchLockFile is injective and produces filesystem-safe lock filenames (tsk-64hk)', () => {
+  const a = dispatchLockFile('/path/to/worktree-a');
+  const b = dispatchLockFile('/path/to/worktree-b');
+  assert.notEqual(a, b);
+  assert.equal(a, `dispatch--${encodeURIComponent('/path/to/worktree-a')}.lock`);
+  assert.ok(!a.includes('/'), `"${a}" must not contain path separators`);
+});
+
 
 test('acquireMainCheckoutLock omitting lockFile still resolves to LOCK_FILE (byte-identical default)', () => {
   const { dir } = setup();

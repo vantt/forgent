@@ -4,6 +4,9 @@
 // state mutation, so retrying the entire call is equivalent to retrying
 // just the lock acquire. Never touches main-checkout-lock.mjs/tryAcquireOnce.
 
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
+import { formatLockDurationMs } from './main-checkout-lock.mjs';
+
 const BACKOFF_SCHEDULE_MS = [500, 1000, 2000]; // 500ms -> 1s -> 2s, then holds at the 2s cap
 
 // `remainingTtlMs` and this loop's own elapsed-time budget are both derived
@@ -88,8 +91,24 @@ export async function withLockRetry(fn, { waitMs } = {}) {
       // budgetMs. Never both true -- the progress line never printed at
       // all on the one path (no --wait) most likely to need it.
       if (delayMs > 0) {
+        let qualifier = '';
+        if (typeof err.holderPid === 'number') {
+          qualifier = err.holderPid === process.pid
+            ? ' -- likely your own session\'s other in-flight call'
+            : ' -- a different pid/session';
+        } else if (typeof err.holderPid === 'string') {
+          const selfId = resolveWriterIdentity().id;
+          qualifier = err.holderPid === selfId
+            ? ' -- likely your own session\'s other in-flight call'
+            : ' -- a different pid/session';
+        }
+        const agePart = typeof err.lockAgeMs === 'number' ? `, lock age ${formatLockDurationMs(err.lockAgeMs)}` : '';
+        const ttlPart = typeof err.remainingTtlMs === 'number' && err.remainingTtlMs > 0
+          ? `, remaining TTL ${formatLockDurationMs(err.remainingTtlMs)}`
+          : '';
+        const staleHint = err.remainingTtlMs === 0 ? ' -- TTL EXPIRED, may be stale: consider fgos-unlock' : '';
         process.stderr.write(
-          `still waiting on main-checkout lock (holder pid ${err.holderPid}, ${Math.round(elapsedMs / 1000)}s elapsed)\n`,
+          `still waiting on main-checkout lock (holder pid ${err.holderPid}, ${Math.round(elapsedMs / 1000)}s elapsed${agePart}${ttlPart})${qualifier}${staleHint}\n`,
         );
       }
       await sleep(delayMs);

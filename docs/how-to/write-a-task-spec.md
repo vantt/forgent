@@ -1,6 +1,8 @@
 # How to write a task-spec
 
-Task-specs live at `docs/task-specs/<domain>/<id>.md`. They are the
+Task-specs live at `domains/<domain>/task-specs/<id>.md` for a
+domain-specific spec, or `core/task-specs/<id>.md` for a domain-agnostic
+one (D7/D27). They are the
 **contract** half of D6's task/skill split (tsk-2t9c) — what a piece of
 work is, not how to do it. A-lite (D6): read-first material a soul reads
 via `refs`, not yet enforced by the engine.
@@ -43,7 +45,8 @@ some agent-types/roles may exercise it (e.g. `hard-gate` for
 
 ## Registering a new one
 
-1. Write the file at `docs/task-specs/<domain>/<id>.md`.
+1. Write the file at `domains/<domain>/task-specs/<id>.md` (or
+   `core/task-specs/<id>.md` for a domain-agnostic spec).
 2. If the task owns a stage directly, add it to that domain's
    `taskSpecMap` in `src/state/workflow-stage-graphs.mjs`.
 3. Run `fgos doctor` — the `task-specs-resolve` check confirms every

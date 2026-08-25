@@ -16,9 +16,12 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, addFriction, addDiscovery, moveWork, moveStage, addWork, editWork, StoreError } from '../../../src/state/store.mjs';
+import { addOutcome, addFriction, addDiscovery, moveWork, moveStage, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild } from '../../../src/state/store.mjs';
+import { appendEvent } from '../../../src/state/events.mjs';
+import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { DEFAULT_TTL_MS } from '../../../src/runner/main-checkout-lock.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -65,7 +68,7 @@ function logPath(cwd) {
 }
 
 function viewPath(cwd) {
-  return path.join(cwd, '.fgos', 'state.json');
+  return resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE);
 }
 
 // Every verb's success path now prints a single fgos.v1 envelope
@@ -83,15 +86,72 @@ function envelopeData(stdout) {
   return envelope.data;
 }
 
+// Tầng A/T2: new events land under `.fgos/events/<writer>-<ts>.jsonl`, not
+// the frozen baseline `logPath(cwd)` (TA-D12) -- this counts/exposes every
+// raw line across BOTH, so every existing caller's "N more events since
+// before" or "find the event with type X" check keeps working unchanged
+// regardless of which physical file the CLI actually wrote to.
 function eventLines(cwd) {
-  if (!fs.existsSync(logPath(cwd))) return [];
-  return fs
-    .readFileSync(logPath(cwd), 'utf8')
-    .split('\n')
-    .filter(Boolean);
+  const lines = [];
+  if (fs.existsSync(logPath(cwd))) {
+    lines.push(...fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean));
+  }
+  const eventsDir = path.join(cwd, '.fgos', 'events');
+  let names = [];
+  try {
+    names = fs
+      .readdirSync(eventsDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch {
+    names = [];
+  }
+  for (const name of names) {
+    lines.push(...fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean));
+  }
+  return lines;
 }
 
+// Effective view (durable status overlaid with any active runtime claim,
+// D4) -- the vast majority of callers want this: it reflects a claimed
+// item as 'doing' whether or not claim-time wrote that durably.
 function stateView(cwd) {
+  return listWork(path.join(cwd, '.fgos'));
+}
+
+// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+// is retired from status-fsm.mjs's TRANSITIONS table -- nothing durably
+// writes INTO `doing` anymore. Most fixtures needing an effective-'doing'
+// item should claim through `take`/`pick` instead (a real runtime claim) --
+// but those need a real git repo (they compute a real HEAD) and leak a
+// claim if the caller never settles it through settleClaim. This is for
+// the remaining case: a plain `tmpCwd()` (no git) test that just needs a
+// durably-'doing' item as a precondition for a later moveWork(...,
+// expectedStatus: 'doing') chain -- a raw event write, bypassing
+// transitionWork's own edge validation, same technique
+// test/state/store.test.mjs's own moveToDurableDoingForTest uses.
+function moveToDurableDoingForTest(cwd, id, from = 'todo', extra = {}) {
+  const dir = path.join(cwd, '.fgos');
+  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing', ...extra } }, dir);
+  rebuild(dir);
+}
+
+// Simulates the claim-lock §3b release (tsk-40m D5: durable doing retired
+// -- releasing a mid-work claim while the branch/worktree survive is now a
+// pure runtime-claim release, no durable move). Fixture-only helper: real
+// callers release through settleClaim (return/reject/verify-fail-park),
+// never a bare release with no durable transition.
+function releaseClaimFor(cwd, id) {
+  releaseClaim(path.join(cwd, '.fgos'), { id });
+}
+
+// Raw persisted cache file, byte-for-byte -- distinct from stateView()
+// above. Only a stale-cache/rebuild/revision test wants this: it never
+// reflects an active runtime claim (claims are never persisted to
+// state.json, D1/D4), and it carries the revision-hash `writeView`
+// stamps into the file at write time (never present on the pure
+// in-memory fold `stateView()` returns).
+function rawPersistedView(cwd) {
   return JSON.parse(fs.readFileSync(viewPath(cwd), 'utf8'));
 }
 
@@ -132,7 +192,7 @@ function initGitCwd() {
   execFileSync('git', ['init', '-q'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
   fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
@@ -164,7 +224,7 @@ function initGitCwdInSubdir(subdirName = 'workspace') {
   execFileSync('git', ['init', '-q'], { cwd: topLevel });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: topLevel });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: topLevel });
-  fs.writeFileSync(path.join(topLevel, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(topLevel, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
   fs.writeFileSync(path.join(topLevel, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd: topLevel });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: topLevel });
@@ -305,8 +365,12 @@ function addGoalItem(cwd, id, goalTier = 'mvp') {
 
 function toProposed(cwd, id) {
   addOk(cwd, id);
-  run(cwd, ['move', id, '--to', 'doing']);
-  return run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  // tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+  // is retired from status-fsm.mjs's TRANSITIONS table -- durable 'doing' is
+  // never written at all anymore. This fixture never wanted a real claim
+  // (no branch, no headAtTake) -- it goes straight `todo -> awaiting-
+  // approval` via the direct edge the redesign added for exactly this shape.
+  return run(cwd, ['move', id, '--to', 'awaiting-approval']);
 }
 
 // Walk awaiting-approval -> delivered -> retrospective -> cleanup -> done via
@@ -429,7 +493,7 @@ function initGitCwdMain() {
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
   fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
@@ -486,7 +550,12 @@ function commitPendingBeforeApprove(cwd, id) {
 // the real runner, only the git/state shape it produces.
 function makeRunnerProposedItem(cwd, id, extra = {}) {
   addOk(cwd, id, extra);
-  run(cwd, ['move', id, '--to', 'doing']);
+  // tsk-40m: `take` writes no durable move (claim time is a runtime-only
+  // claim), but claimWork still durably appends a predicted work.outcome --
+  // flush both that and the earlier work.add to main's own HEAD BEFORE
+  // branching, or they'd ride along onto fgw/<id>'s own worker commit below
+  // instead of staying on main.
+  run(cwd, ['take', '--id', id]);
   commitPending(cwd, `state: claim ${id}`);
 
   gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
@@ -495,7 +564,13 @@ function makeRunnerProposedItem(cwd, id, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
+  // The raw `move` below never goes through settleClaim, so the runtime
+  // claim `take` made above would otherwise leak and keep masking the
+  // item's real durable status behind an effective 'doing' overlay forever
+  // -- release it explicitly right after, same as every other fixture here
+  // that settles via a raw move instead of the real return/reject door.
   run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  releaseClaimFor(cwd, id);
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -546,7 +621,11 @@ function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
     verify: extra.verify ?? 'npm test',
     parent: rootId,
   });
-  run(cwd, ['move', leafId, '--to', 'doing']);
+  // tsk-40m: `take` writes no durable move, but claimWork still durably
+  // appends a predicted work.outcome -- flush both that and the leaf's own
+  // work.add to main's own HEAD before branching, same reasoning as the
+  // root's own work.add above.
+  run(cwd, ['take', '--id', leafId]);
   commitPending(cwd, `state: claim ${leafId}`);
 
   gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, `fgw/${rootId}`]);
@@ -555,7 +634,11 @@ function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
+  // The raw move below never goes through settleClaim -- release the
+  // runtime claim explicitly right after, or it leaks and keeps masking
+  // the item's real durable status behind an effective 'doing' overlay.
   run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  releaseClaimFor(cwd, leafId);
   commitPending(cwd, `state: propose ${leafId}`);
 }
 
@@ -574,7 +657,10 @@ function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
 // touch) a self-modifying-capable module path the Iron Law classifies.
 function makeRunnerProposedItemTouching(cwd, id, relPath, extra = {}) {
   addOk(cwd, id, extra);
-  run(cwd, ['move', id, '--to', 'doing']);
+  // tsk-40m: `take` writes no durable move, but claimWork still durably
+  // appends a predicted work.outcome -- flush both that and the earlier
+  // work.add to main's own HEAD before branching.
+  run(cwd, ['take', '--id', id]);
   commitPending(cwd, `state: claim ${id}`);
 
   gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
@@ -585,7 +671,11 @@ function makeRunnerProposedItemTouching(cwd, id, relPath, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
+  // The raw move below never goes through settleClaim -- release the
+  // runtime claim explicitly right after, same reasoning as
+  // makeRunnerProposedItem/makeRunnerProposedLeafItem above.
   run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  releaseClaimFor(cwd, id);
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -606,8 +696,10 @@ function makeDriftedRoot(cwd, rootId, opts = {}) {
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: opts.verify ?? 'true', ...(opts.parent ? { parent: opts.parent } : {}) });
   commitPending(cwd, `state: add ${rootId}`);
-  run(cwd, ['move', rootId, '--to', 'doing']);
-  commitPending(cwd, `state: claim ${rootId}`);
+  // tsk-40m: claim time writes no durable event anymore -- nothing to
+  // commit for the claim itself; the item stays effectively 'doing' via
+  // the runtime claim for as long as this fixture never settles it.
+  run(cwd, ['take', '--id', rootId]);
 
   gitAtCwd(cwd, ['checkout', '-b', `fgw/${rootId}`]);
   fs.writeFileSync(path.join(cwd, `${rootId}-produced.txt`), 'ok\n');
@@ -636,7 +728,9 @@ function makeDriftedRoot(cwd, rootId, opts = {}) {
 function registerFlatMember(cwd, id, opts = {}) {
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id, title: `Title ${id}`, kind: 'task', status: 'todo', deps: opts.deps ?? [], mergeAfter: opts.mergeAfter, risk: 'light', refs: [], verify: opts.verify ?? 'true' });
-  run(cwd, ['move', id, '--to', 'doing']);
+  // tsk-40m: claim time writes no durable event anymore -- the item stays
+  // effectively 'doing' via the runtime claim, nothing to commit for it.
+  run(cwd, ['take', '--id', id]);
 }
 
 // Cut `id`'s own `fgw/<id>` branch from whatever main currently is, with one
@@ -674,8 +768,9 @@ function makeFlatMember(cwd, id, opts = {}) {
 function makeMilestone(cwd, id, targets) {
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id, title: `Title ${id}`, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', targets });
-  run(cwd, ['move', id, '--to', 'doing']);
-  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  // tsk-40m: no real claim needed here (no branch) -- straight
+  // `todo -> awaiting-approval` via the direct edge, same as toProposed.
+  run(cwd, ['move', id, '--to', 'awaiting-approval']);
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -761,8 +856,9 @@ function addBareOrigin(cwd) {
 // source gate must reject.
 function makeLegacyProposedItem(cwd, id) {
   addOk(cwd, id);
-  run(cwd, ['move', id, '--to', 'doing']);
-  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  // tsk-40m: never claimed at all (no branch, no headAtTake) -- straight
+  // `todo -> awaiting-approval` via the direct edge, same as toProposed above.
+  run(cwd, ['move', id, '--to', 'awaiting-approval']);
 }
 
 // --- catchup (D6/D7/D11: unified catch-up-by-merge for a merge-related park) ---
@@ -909,13 +1005,17 @@ function initSessionSafeCwd() {
 // file, exactly what classifySource keys off.
 function makeSessionSafeRunnerItem(cwd, id, extra = {}) {
   addOk(cwd, id, extra);
-  run(cwd, ['move', id, '--to', 'doing']);
+  run(cwd, ['take', '--id', id]);
   gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
   fs.writeFileSync(path.join(cwd, `${id}-produced.txt`), 'ok\n');
   gitAtCwd(cwd, ['add', `${id}-produced.txt`]);
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
+  // The raw move below never goes through settleClaim -- release the
+  // runtime claim explicitly right after, same reasoning as
+  // makeRunnerProposedItem above.
   run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  releaseClaimFor(cwd, id);
 }
 
 // --- approve ad-hoc (unregistered) worktree guard (P44) --------------------
@@ -1030,6 +1130,7 @@ export {
   makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStage,
+  moveToDurableDoingForTest,
   moveWork,
   os,
   path,
@@ -1037,6 +1138,8 @@ export {
   registerFlatMember,
   removeAdHocWorktree,
   run,
+  rawPersistedView,
+  releaseClaimFor,
   spawnSync,
   startSession,
   stateView,

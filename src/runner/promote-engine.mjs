@@ -15,6 +15,7 @@
 import { createBranchRef, withMergeEphemeralWorktree, detectTrunk, isMainWorktree } from './worktree.mjs';
 import { mergeRunnerItem } from './merge.mjs';
 import { preflightRetarget } from './promote-preflight.mjs';
+import { withLockRetry } from './lock-wait.mjs';
 
 /**
  * D1: resolve the shared integration branch for `rootId`. Reuses
@@ -70,7 +71,10 @@ export async function retargetMember(repoRoot, memberItem, rootId, opts = {}) {
   }
 
   const result = await withMergeEphemeralWorktree(repoRoot, rootId, (ephemeral) =>
-    mergeRunnerItem(ephemeral.path, memberItem, opts.timeoutMs ? { timeoutMs: opts.timeoutMs, lockRoot: repoRoot } : { lockRoot: repoRoot }),
+    withLockRetry(
+      () => mergeRunnerItem(ephemeral.path, memberItem, opts.timeoutMs ? { timeoutMs: opts.timeoutMs, lockRoot: repoRoot } : { lockRoot: repoRoot }),
+      { waitMs: undefined },
+    ),
   );
 
   if (result.outcome !== 'merged') {

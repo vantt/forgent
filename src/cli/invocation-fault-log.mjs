@@ -30,33 +30,12 @@
 // `events.jsonl` is tracked on purpose, so without that entry every recorded
 // argv would be committed and pushed.
 
-import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
-
-export const INVOCATION_FAULT_LOG_BASENAME = 'invocation-faults.jsonl';
-
-/**
- * The main checkout's `.fgos/`, resolved the same way the fgOS skills' own
- * gate checks do (`git rev-parse --path-format=absolute --git-common-dir`,
- * then its parent). Returns null outside a git repo — there is no main
- * checkout to fall back to there, so the fault simply goes unrecorded.
- */
-function mainCheckoutFgosDir(cwd) {
-  try {
-    const gitCommonDir = execFileSync(
-      'git',
-      ['rev-parse', '--path-format=absolute', '--git-common-dir'],
-      { cwd, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'ignore'] },
-    ).trim();
-    if (!gitCommonDir) return null;
-    return path.join(path.dirname(gitCommonDir), '.fgos');
-  } catch {
-    return null;
-  }
-}
+import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 
 /**
  * Where a fault record would go, or null when there is nowhere to put it.
@@ -66,11 +45,12 @@ function mainCheckoutFgosDir(cwd) {
  */
 export function resolveFaultLogPath(fgosDir, cwd) {
   if (typeof fgosDir === 'string' && fgosDir && fs.existsSync(fgosDir)) {
-    return path.join(fgosDir, INVOCATION_FAULT_LOG_BASENAME);
+    return resolveFgosFile(fgosDir, FGOS_FILE.INVOCATION_FAULTS);
   }
-  const fallback = mainCheckoutFgosDir(cwd);
+  const mainRoot = resolveMainCheckoutRoot(cwd);
+  const fallback = mainRoot ? fgosDirFromRoot(mainRoot) : null;
   if (!fallback || !fs.existsSync(fallback)) return null;
-  return path.join(fallback, INVOCATION_FAULT_LOG_BASENAME);
+  return resolveFgosFile(fallback, FGOS_FILE.INVOCATION_FAULTS);
 }
 
 /**
@@ -95,8 +75,9 @@ export function recordInvocationFault({ fgosDir, cwd, verb, faultClass, message,
       message,
       cwd,
       argv,
-      writer: resolveWriterIdentity(path.dirname(logPath)),
+      writer: resolveWriterIdentity(path.dirname(path.dirname(logPath))),
     };
+    fs.mkdirSync(path.dirname(logPath), { recursive: true });
     fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`);
     return logPath;
   } catch {

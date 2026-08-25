@@ -40,22 +40,14 @@ CONTEXT.md` D6).
    `$ARGUMENTS` — this keeps today's default lock-wait behavior
    byte-identical for a caller who passes nothing:
 
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" merge next
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos merge next
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   merge next
    ```
 
-   (append the parsed flags after `merge next` on both the `node
-   "$FGOS_BIN" merge next` and `fgos merge next` lines above, e.g. `fgos
-   merge next --wait 300000`.)
+   (append the parsed flags after `merge next`, e.g. `merge next --wait
+   300000`.)
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown
    above, never a relative path — an installed plugin's files run from a
@@ -74,16 +66,20 @@ CONTEXT.md` D6).
    - `{picked: <id>, approve: {...}}` — the merge was attempted through
      `approve`; relay whether it reached `done` or was parked `blocked`
      (verify failure or merge conflict), same as `/fgOS:approve` would
-     report for that id. When the park is `reason: "merge-conflict"`, say
-     in the same breath that this is a **recoverable** park with a
-     recovery verb of its own — `fgos catchup <id>` merges the item's
-     target branch back into the item's branch, re-runs the item's own
-     verify there, and on green moves it to `awaiting-approval` — so a
-     session reading this result has a real next step to try before any
-     person is needed (tsk-60h). This single-shot skill does not run that
-     playbook itself: `/fgOS:merge-loop` owns it, because the "at most
-     once per id per run" bookkeeping the playbook depends on only exists
-     inside a loop. A `syncRoot: {id, outcome: 'synced'}` field
+     report for that id. When the park is eligible for self-recovery per
+     `../_shared/catchup-self-recovery.md` (`reason: "merge-conflict"`,
+     `verify-fail-post-merge`, `verify-timeout-post-merge`,
+     `integration-drift`, or `merge-failed-unclassified`), say in the same
+     breath that this is a **recoverable** park — but by the time this
+     result is visible here, the underlying `approve` execution has
+     already run the shared playbook itself (see
+     `../_shared/catchup-self-recovery.md`), inline, before ever returning
+     a final parked result (tsk-60h). A park reported here already
+     survived that one self-recovery attempt; there is nothing further for
+     this single-shot skill, `/fgOS:merge-loop`, or a person to run
+     automatically — a genuinely unrecoverable case, or one where the
+     evidence bar could not be met, is what reaches this report. A
+     `syncRoot: {id, outcome: 'synced'}` field
      alongside means this pick only became ready because an earlier
      blockedOnSync root was auto-synced first (tsk-173) — mention that in
      the report, it is not itself something to act on.
@@ -97,21 +93,19 @@ CONTEXT.md` D6).
      trips the Iron Law gate (a self-modifying diff needing human-verified
      failing-test-first proof). Nothing was merged, the item stays
      `awaiting-approval`. This never auto-resolves — tell the user which
-     item tripped it, and point them at `/fgOS:approve <id>` as the way to
-     take it further: that skill presents the item's blast radius, shows
-     its `iron-law-evidence.md` verbatim, asks once, and — only on a real
-     yes — runs the verb itself with `--acknowledge-iron-law`. Do not hand
-     the user a command to type (D2, `docs/history/iron-law-gate-human-ux/
-     CONTEXT.md`: the person decides, an agent operates), and never run
-     `--acknowledge-iron-law` yourself on this skill's own authority.
+     item tripped it, and invoke the `approve` skill directly (Skill tool)
+     for that `<id>` in the same turn: that skill presents the item's blast
+     radius, shows its `iron-law-evidence.md` verbatim, asks once, and —
+     only on a real yes — runs the verb itself with `--acknowledge-iron-law`.
+     Do not hand the user a command to type (`docs/history/iron-law-gate-human-ux/CONTEXT.md`: the person decides, an agent operates), and never run `--acknowledge-iron-law` yourself on this skill's own authority.
    - `{picked: null, reason: "every ready item is blocked", skipped:
      [{id, reason}]}` — the frontier is not empty, but every ready
      candidate provably trips the Iron Law, so nothing was merged and
      every one of them stays `awaiting-approval`. Report the whole
-     `skipped` list, not just its first entry, with the same
-     `/fgOS:approve <id>` handoff as above. This is deliberately a
-     different report from `nothing ready to merge`; do not collapse the
-     two.
+     `skipped` list, not just its first entry, then invoke the `approve`
+     skill directly (Skill tool) for `skipped[0].id` in the same turn. This
+     is deliberately a different report from `nothing ready to merge`; do
+     not collapse the two.
    - **A `skipped: [{id, reason}]` array alongside any of the shapes
      above** — candidates the engine's own pre-check walked past to reach
      the item it picked. Relay their ids as held, needing a person; they

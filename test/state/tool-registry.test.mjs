@@ -162,7 +162,8 @@ test('readLocalStatus on a missing file returns {} (never checked yet)', () => {
 
 test('readLocalStatus on a corrupt file returns {} (disposable local cache, never fatal)', () => {
   const dir = tmpDir();
-  fs.writeFileSync(path.join(dir, 'tool-status.local.json'), 'not json{{{');
+  fs.mkdirSync(path.join(dir, 'runtime'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'runtime', 'tool-status.local.json'), 'not json{{{');
   assert.deepEqual(readLocalStatus(dir), {});
 });
 

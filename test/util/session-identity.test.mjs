@@ -4,7 +4,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -253,7 +253,11 @@ test('3-hop walk reaches the real ancestor across a spawned process chain', { ti
     const [topPid, midPid, leafPid] = chain;
     assert.equal(typeof leafPid, 'number');
 
-    const result = resolveWriterIdentity(undefined, { env: {}, pid: leafPid });
+    const result = resolveWriterIdentity(undefined, {
+      env: {},
+      pid: leafPid,
+      execFile: (file, args, options) => execFileSync(file, args, { ...options, timeout: 2000 }),
+    });
     assert.deepEqual(result, { id: process.pid, source: PID });
 
     for (const pid of [topPid, midPid, leafPid]) {

@@ -1,3 +1,10 @@
+---
+type: explanation
+title: Why fgos-coding-compounding refuses to commit when MERGE_HEAD is set
+tags: [fgos-coding-compounding, merge-head, retrospective-synthesis, audit]
+source_capture_ids: [tsk-2oy, tsk-67t, tsk-4dy, tsk-3u8, tsk-5z9]
+authoritative_for: why fgos-coding-compounding's retrospective-synthesis commit step refuses when MERGE_HEAD is already set, the 5 real historical instances that motivated it, and each instance's own per-item audit outcome
+---
 # Why `fgos-coding-compounding` refuses to commit when `MERGE_HEAD` is set
 
 `fgos-coding-compounding`'s retrospective-synthesis step writes an end-user
@@ -85,3 +92,58 @@ since it buried a real code fix, same severity as the triggering case).
 A related harness gap found mid-investigation — `checkMergeStillResolves`
 never validates a decomposed root's own branch against `main`, only
 children onto their parent — was filed separately as `tsk-5j0`.
+
+## Per-instance audit outcome: `tsk-648` (`tsk-67t`) — content verified intact
+
+`tsk-67t` audited the `tsk-648` instance specifically: commit `7bf76aaa`
+("docs(tsk-648): retrospective synthesis") was a 2-parent merge commit —
+one parent was `tsk-3wn`'s own expected prior synthesis, the other was
+an entirely unrelated commit, `tsk-5nj`'s own `plan.md` (a plan-split
+into `tsk-4mx`/`tsk-49e`), absorbed via the same stray-`MERGE_HEAD`
+mechanism this doc's own fix closes.
+
+**Conclusion: no content was actually lost.** Verified at the byte level —
+empty `git diff` across all three affected files, plus a live status
+check confirming both split children (`tsk-4mx`, `tsk-49e`) existed
+correctly. The commit's *label* was misleading (an unrelated item's plan
+buried under `tsk-648`'s own commit message), but the actual content
+survived intact in both places. This item closed as a verified
+non-issue, not a repair — this repo's status vocabulary has no distinct
+`wontfix`-shaped status for "investigated, found nothing wrong,"
+so a verified non-issue closes via `done` with the decision note as the
+record, the same way the other 3 sibling audits (`tsk-4dy`, `tsk-3u8`,
+`tsk-5z9`) are expected to close unless one of them finds a real loss.
+
+## Per-instance audit outcome: `tsk-1q5` (`tsk-4dy`) — content verified intact
+
+Same shape, same conclusion: commit `a23ec8a1` ("docs(tsk-1q5):
+retrospective synthesis") absorbed an unrelated commit as its second
+merge parent. Verified via `git merge-base --is-ancestor` against
+current `main`, a single-commit file-history check, and a live
+outcome-field check — **no content was lost**. Closed the same way as
+`tsk-67t`'s own sibling audit: `done` with a decision note, since this
+repo's status vocabulary has no distinct status for "investigated, found
+nothing wrong."
+
+## Per-instance audit outcome: `tsk-1vi` (`tsk-3u8`) — content verified intact
+
+Same shape again: `tsk-66t`'s own evidence and the `tsk-1vi` doc it
+produced were confirmed to survive intact on `main`, despite the same
+stray-`MERGE_HEAD` absorption. No content lost; closed the same way as
+the other instances above.
+
+## Per-instance audit outcome: `tsk-2x9`/`tsk-1r3` (`tsk-5z9`) — the highest-severity instance, also confirmed intact
+
+This is the instance prioritized first because it buried a genuine code
+fix, not just a docs-vs-docs collision: `tsk-2x9`'s synthesis commit
+(`45aa107f`) had absorbed `fix(tsk-1r3)` as its second merge parent —
+meaning a real fix could have looked merged (state said
+`cleanup`/`done`) while the actual code never reached `main`. Audited
+and **confirmed intact**: both `tsk-1r3`'s own fix and `tsk-2x9`'s doc
+survived on `main`. All 4 per-instance audits (`tsk-67t`/`tsk-4dy`/
+`tsk-3u8`/`tsk-5z9`) reached the same conclusion — the stray-`MERGE_HEAD`
+mechanism mislabeled commits, but in every one of the 5 originally
+confirmed instances (the `tsk-4v6` case was already independently traced
+safe in the root-cause item above), the real content survived. The
+systemic fix in this doc's own root-cause section closes the mechanism
+going forward; this closes the historical audit trail.

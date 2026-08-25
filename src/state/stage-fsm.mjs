@@ -25,7 +25,7 @@
 // follow-up for whichever cell next touches this file's test scope.
 
 import { FsmError } from './status-fsm.mjs';
-import { DEFAULT_DOMAIN, getDomain, stageForStep } from './workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, resolveWorkflow, stageForStep } from './workflow-stage-graphs.mjs';
 
 // Re-exported for consumers that want the stage error type under this
 // module's own name, mirroring status-fsm.mjs's re-export of STATUSES from work.mjs.
@@ -91,7 +91,8 @@ export function transitionStage({ work, to, expectedStage, verify } = {}) {
     );
   }
 
-  const allowed = domain.transitions.some((edge) => edge.from === from && edge.to === to);
+  const workflow = resolveWorkflow(domain, work.kind);
+  const allowed = (workflow?.transitions ?? domain.transitions).some((edge) => edge.from === from && edge.to === to);
   if (!allowed) {
     throw new FsmError(
       'precondition',

@@ -3,9 +3,15 @@
 // Harness spawnSync thật, không mock chính process CLI.
 //
 // tsk-67g: 10 test dựng môi trường thật cho `fgos setup` đã dọn sang các file
-// checks-setup-*.test.mjs bên cạnh -- chúng chiếm 117.6s trong 120s của file
-// này và một mình quyết định wall-clock của cả bộ test. Phần ở lại đây chạy
-// hết trong khoảng 2.5s.
+// checks-setup-*.test.mjs bên cạnh.
+//
+// tsk-25b: main đã thêm nhiều check mới (root-drift, leaf-notify-drift,
+// events-jsonl-*, work-*-vocabulary, domain-workflow-skillmap-coverage,
+// enduser-docs-index-stale, decision-index-stale, ...) từ sau lần chẻ đầu,
+// khiến file này lại vượt ngưỡng ~30s. Phần drift/vocabulary/index-staleness
+// của chính work-item store ở lại đây; phần config/CLI-wiring/doctor runtime
+// tách sang checks-doctor-config.test.mjs cạnh đó -- cùng D2 (chẻ cơ học,
+// mỗi file dưới ~30s) tsk-3um/tsk-67g đã áp dụng.
 import { test } from 'node:test';
 import {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,
@@ -19,13 +25,11 @@ import {
   FGOS,
   FIX_REGISTRATIONS,
   NO_CLAUDE_ENV,
-  __dirname,
   addWork,
   appendEvent,
   assert,
   checkById,
   execFileSync,
-  fileURLToPath,
   fixById,
   fs,
   initRepo,
@@ -33,7 +37,6 @@ import {
   integrationScriptPath,
   mainCheckoutHookWired,
   mkTemp,
-  os,
   path,
   resolveMainCheckout,
   spawnSync,
@@ -42,13 +45,14 @@ import {
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
-import { DEFAULT_IRON_LAW_LEVEL, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
 import { addDecision } from '../../src/state/store.mjs';
-
+import { createSession } from '../../src/runner/session.mjs';
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, and decision-index-stale', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, leaf-notify-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, advise-execute-capabilities-configured, decision-index-stale, and agy-permissions-configured', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -61,6 +65,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'dependencies-installed',
       'gate-bypass-configured',
       'root-drift',
+      'leaf-notify-drift',
       'claude-plugin-marketplace',
       'plugin-skill-cli-reachable',
       'plugin-dev-skills-packaged',
@@ -72,7 +77,6 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'domain-workflow-skillmap-coverage',
       'delivered-not-on-trunk',
       'enduser-docs-index-stale',
-      'events-jsonl-contiguous',
       'invariant-checks-configured',
       'events-jsonl-not-truncated',
       'cli-version-visible',
@@ -83,6 +87,8 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'dispatch-decide-hook-wired',
       'task-specs-resolve',
       'agent-claims-resolve',
+      'agent-type-names-unique',
+      'advise-execute-capabilities-configured',
       'decision-index-stale',
       'doc-registry-enforce',
       'doc-registry-stale',
@@ -93,6 +99,10 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'doc-topic-oversized',
       'doc-role-underused',
       'doc-source-conservation',
+      'agy-permissions-configured',
+      'main-checkout-guard-warnings',
+      'events-compaction-verified',
+      'no-stuck-merge-abort',
     ].sort(),
   );
 });
@@ -183,64 +193,42 @@ test('root-drift stays silent for a wontfix root whose branch is ahead — aband
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-// ─── events-jsonl-contiguous (tsk-3wq) ─────────────────────────────────────
-
-test('events-jsonl-contiguous passes on a freshly-initialized, untouched log', () => {
-  const dir = initRepo('checks-events-contig-clean-');
+test('leaf-notify-drift passes when no live session branch has post-land drift against its target', () => {
+  const dir = initRepo('checks-leaf-drift-clean-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/leaf'], { cwd: dir });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
   const fgosDir = path.join(dir, '.fgos');
   initStore(fgosDir);
-  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'doing', deps: [], refs: [] });
 
-  const { passed, message } = checkById('events-jsonl-contiguous').check(dir);
+  const { passed, message } = checkById('leaf-notify-drift').check(dir);
   assert.equal(passed, true);
-  assert.match(message, /contiguous/);
+  assert.match(message, /no live session branch has post-land drift/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('events-jsonl-contiguous fails when the log has a duplicate seq (the union-merge residue shape)', () => {
-  const dir = initRepo('checks-events-contig-dup-');
+test('leaf-notify-drift fails and names the leaf when a live session branch overlaps files with target land', () => {
+  const dir = initRepo('checks-leaf-drift-dirty-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/leaf'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'file.txt'), 'leaf work\n');
+  execFileSync('git', ['add', 'file.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'leaf work'], { cwd: dir });
+
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'file.txt'), 'landed work\n');
+  execFileSync('git', ['add', 'file.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'landed work on main'], { cwd: dir });
+
   const fgosDir = path.join(dir, '.fgos');
   initStore(fgosDir);
-  const logPath = path.join(fgosDir, 'events.jsonl');
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 100, ts: '2026-01-01T00:00:00.000Z', type: 'race-a', payload: null })}\n`);
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 100, ts: '2026-01-01T00:00:01.000Z', type: 'race-b', payload: null })}\n`);
+  addWork(fgosDir, { id: 'landed', title: 'landed', kind: 'feature', risk: 'light', verify: 'true', status: 'done', deps: [], refs: [] });
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'doing', deps: [], refs: [] });
+  createSession(dir, { itemId: 'leaf' });
 
-  const { passed, message } = checkById('events-jsonl-contiguous').check(dir);
+  const { passed, message } = checkById('leaf-notify-drift').check(dir);
   assert.equal(passed, false);
-  assert.match(message, /duplicate seq/);
-  assert.match(message, /fgos doctor --fix/);
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('events-jsonl-contiguous fix resolves the duplicate-seq shape without losing either event', () => {
-  const dir = initRepo('checks-events-contig-fix-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  const logPath = path.join(fgosDir, 'events.jsonl');
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 100, ts: '2026-01-01T00:00:00.000Z', type: 'race-a', payload: null })}\n`);
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 100, ts: '2026-01-01T00:00:01.000Z', type: 'race-b', payload: null })}\n`);
-
-  const { changed, message } = fixById('events-jsonl-contiguous').fix(dir);
-  assert.equal(changed, true);
-  assert.match(message, /resequenced/);
-
-  const { passed } = checkById('events-jsonl-contiguous').check(dir);
-  assert.equal(passed, true, 'the check must pass after the fix runs');
-
-  const lines = fs.readFileSync(logPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
-  assert.deepEqual(lines.map((l) => l.type).sort(), ['race-a', 'race-b'], 'both events must survive the fix, never one dropped');
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('events-jsonl-contiguous fix is a no-op when the log is already contiguous', () => {
-  const dir = initRepo('checks-events-contig-noop-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
-
-  const { changed, message } = fixById('events-jsonl-contiguous').fix(dir);
-  assert.equal(changed, false);
-  assert.match(message, /already contiguous/);
+  assert.match(message, /leaf/);
+  assert.match(message, /file\.txt/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -262,7 +250,7 @@ test('events-jsonl-not-truncated passes and bootstraps a mark on first run again
   const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
   assert.equal(passed, true);
   assert.match(message, /truncation guard holds/);
-  assert.equal(fs.existsSync(path.join(fgosDir, 'events-jsonl.truncation-guard.json')), true, 'a passing check advances/bootstraps the mark');
+  assert.equal(fs.existsSync(path.join(fgosDir, 'runtime', 'events-jsonl.truncation-guard.json')), true, 'a passing check advances/bootstraps the mark');
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -860,7 +848,7 @@ test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to chan
   assert.deepEqual(data.changelogNag, { fileExists: true, hasEntries: false, deliveredCount: 1 });
 
   const historyLines = fs
-    .readFileSync(path.join(fgosDir, 'changelog-nag-history.jsonl'), 'utf8')
+    .readFileSync(path.join(fgosDir, 'logs', 'changelog-nag-history.jsonl'), 'utf8')
     .split('\n')
     .filter(Boolean)
     .map((l) => JSON.parse(l));
@@ -1037,7 +1025,12 @@ test('config-not-stale passes when the existing config already has every default
   fs.writeFileSync(
     path.join(cwd, '.fgos', 'config.json'),
     JSON.stringify({
-      runner: DEFAULT_RUNNER_CONFIG,
+      runner: {
+        ...DEFAULT_RUNNER_CONFIG,
+        capabilities: DEFAULT_CAPABILITY_SLOTS,
+        modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { lightweight: 'gpt-5.5' } },
+        executors: { pi: PI_EXECUTOR_DEFAULT },
+      },
       gateBypass: { level: 'off' },
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
       herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
@@ -1047,6 +1040,7 @@ test('config-not-stale passes when the existing config already has every default
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       docRegistry: { enforce: false },
+      checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
@@ -1169,6 +1163,52 @@ test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => 
   const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /workerSlots\.ceiling = 6/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── advise-execute-capabilities-configured (tsk-2uf-3, docs/history/
+// dispatch-activation-and-handoff-redesign/CONTEXT.md D2): same
+// generic-scan/dedicated-check split as gateway/workerSlots/invariantChecks
+// above -- config-not-stale already catches runner.capabilities (or either
+// slot) being wholly ABSENT; this check catches present-but-malformed.
+
+test('advise-execute-capabilities-configured fails when runner.capabilities is missing entirely', () => {
+  const cwd = mkTemp('doctor-capabilities-absent-');
+  const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /runner\.capabilities section missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('advise-execute-capabilities-configured fails when a slot is missing or malformed', () => {
+  for (const capabilities of [
+    { advise: {} }, // execute missing
+    { execute: {} }, // advise missing
+    { advise: 'not-an-object', execute: {} },
+    { advise: [], execute: {} },
+    { advise: null, execute: {} },
+    {},
+  ]) {
+    const cwd = mkTemp('doctor-capabilities-malformed-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities } }));
+    const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
+    assert.equal(passed, false, `capabilities: ${JSON.stringify(capabilities)}`);
+    assert.match(message, /missing or has a malformed slot for/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('advise-execute-capabilities-configured passes when both slots are declared', () => {
+  const cwd = mkTemp('doctor-capabilities-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }),
+  );
+  const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /declares both "advise" and "execute"/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
@@ -1665,3 +1705,39 @@ test('shell-integration-sourced samples dead paths instead of printing all of th
     fs.rmSync(homeDir, { recursive: true, force: true });
   }
 });
+
+test('no-stuck-merge-abort check passes and fix reports nothing to fix on a clean repo with no MERGE_HEAD', () => {
+  const dir = initRepo('checks-no-stuck-merge-clean-');
+  try {
+    const { passed, message } = checkById('no-stuck-merge-abort').check(dir);
+    assert.equal(passed, true);
+    assert.match(message, /no merge in progress/);
+
+    const { changed, message: fixMessage } = fixById('no-stuck-merge-abort').fix(dir);
+    assert.equal(changed, false);
+    assert.match(fixMessage, /nothing to fix/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('no-stuck-merge-abort check fails and fix reports manual command when MERGE_HEAD exists', () => {
+  const dir = initRepo('checks-no-stuck-merge-dirty-');
+  try {
+    const headSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
+    fs.writeFileSync(path.join(dir, '.git', 'MERGE_HEAD'), `${headSha}\n`);
+
+    const { passed, message } = checkById('no-stuck-merge-abort').check(dir);
+    assert.equal(passed, false);
+    assert.match(message, /merge in progress or stuck/);
+    assert.match(message, new RegExp(`fgos main-checkout-reset --sha ${headSha} --confirm`));
+
+    const { changed, message: fixMessage } = fixById('no-stuck-merge-abort').fix(dir);
+    assert.equal(changed, false);
+    assert.match(fixMessage, /merge in progress or stuck/);
+    assert.match(fixMessage, new RegExp(`fgos main-checkout-reset --sha ${headSha} --confirm`));
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+

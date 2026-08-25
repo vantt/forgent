@@ -9,8 +9,20 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
+import { execFileSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
+import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-guard-warnings.mjs';
+
+
+const EXPECTED_RUNNER_DEFAULT = {
+  ...DEFAULT_RUNNER_CONFIG,
+  capabilities: DEFAULT_CAPABILITY_SLOTS,
+  modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { lightweight: 'gpt-5.5' } },
+  executors: { pi: PI_EXECUTOR_DEFAULT },
+};
 
 // tsk-4xg: runFixes() below invokes every registered fix, including the
 // real `claude-plugin-marketplace` one, which shells out to a real,
@@ -163,10 +175,16 @@ test('runFixes invokes every registered fix against the given cwd and reports id
 test('ensureSharedConfigDefaults on a fresh dir writes every registered entry under its own key, including the built-in "runner" one', () => {
   const dir = mkTempDir();
   const { config, addedKeys } = ensureSharedConfigDefaults(dir);
-  assert.deepEqual(config.runner, DEFAULT_RUNNER_CONFIG);
+  // tsk-2uf-3: the registered "runner" config-default layers the
+  // advise/execute capability slots onto DEFAULT_RUNNER_CONFIG (that
+  // constant itself, src/runner/dispatch.mjs, stays untouched -- see
+  // registrations.mjs's own `DEFAULT_CAPABILITY_SLOTS` composition), so
+  // the assembled "runner" section is no longer byte-identical to
+  // DEFAULT_RUNNER_CONFIG alone.
+  assert.deepEqual(config.runner, EXPECTED_RUNNER_DEFAULT);
   assert.ok(addedKeys.some((k) => k.startsWith('runner.')) || addedKeys.includes('runner'));
   const written = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8'));
-  assert.deepEqual(written.runner, DEFAULT_RUNNER_CONFIG);
+  assert.deepEqual(written.runner, EXPECTED_RUNNER_DEFAULT);
 });
 
 test('ensureSharedConfigDefaults on an already-complete shared file does not rewrite it', () => {
@@ -389,4 +407,170 @@ test('the gateway config-default is registered under the "gateway" key with port
   assert.equal(entry.key, 'gateway');
   assert.equal(entry.shape.port, 4170);
   assert.equal(entry.shape.token, null);
+});
+
+test('task-specs-resolve doctor check passes when core/task-specs/ and domain task-specs exist', () => {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'task-specs-resolve');
+  assert.ok(entry, 'task-specs-resolve check must be registered');
+  const result = entry.check(process.cwd());
+  assert.equal(result.passed, true, `task-specs-resolve failed: ${result.message}`);
+});
+
+test('agent-type-names-unique doctor check passes when agent-type names are globally unique', () => {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
+  assert.ok(entry, 'agent-type-names-unique check must be registered');
+  const result = entry.check(process.cwd());
+  assert.equal(result.passed, true, `agent-type-names-unique failed: ${result.message}`);
+});
+
+test('agent-type-names-unique doctor check fails when duplicate agent-type names exist across sources (D33)', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-unique-test-'));
+  try {
+    const coreDir = path.join(tempDir, 'core', 'agents');
+    const domainDir = path.join(tempDir, 'domains', 'coding', 'agents');
+    fs.mkdirSync(coreDir, { recursive: true });
+    fs.mkdirSync(domainDir, { recursive: true });
+
+    fs.writeFileSync(path.join(coreDir, 'dup.yaml'), 'name: dup-agent\nversion: 0.1.0\n');
+    fs.writeFileSync(path.join(domainDir, 'dup.yaml'), 'name: dup-agent\nversion: 0.1.0\n');
+
+    const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
+    const result = entry.check(tempDir);
+    assert.equal(result.passed, false);
+    assert.match(result.message, /duplicate agent-type name/);
+    assert.match(result.message, /"dup-agent"/);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test('guard-warnings-surface: main-checkout-guard-warnings doctor check passes when no warnings exist and fails when warnings exist', () => {
+  const dir = mkTempDir();
+
+  // 1. Not in a git checkout
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'main-checkout-guard-warnings');
+  assert.ok(entry, 'main-checkout-guard-warnings check must be registered');
+  const nonGitResult = entry.check(dir);
+  assert.equal(nonGitResult.passed, true);
+  assert.match(nonGitResult.message, /not inside a git checkout/);
+
+  // 2. Fresh checkout (no warnings recorded)
+  const gitDir = mkTempDir();
+  execFileSync('git', ['init'], { cwd: gitDir });
+  const freshResult = entry.check(gitDir);
+  assert.equal(freshResult.passed, true);
+  assert.match(freshResult.message, /no main checkout guard warnings recorded/);
+
+  // 3. Warnings recorded
+  recordMainCheckoutGuardWarning(gitDir, {
+    reason: 'regressed',
+    message: 'current tip seq 22816 is lower than last recorded mark 22850',
+    mark: 22850,
+  });
+
+  const warnedResult = entry.check(gitDir);
+  assert.equal(warnedResult.passed, false);
+  assert.match(warnedResult.message, /1 main checkout guard warning\(s\) recorded/);
+  assert.match(warnedResult.message, /regressed: current tip seq 22816 is lower than last recorded mark 22850/);
+});
+
+
+
+
+// --- Tầng A/T5: events-jsonl-not-truncated rescoped to check baseline-0
+// AND every per-writer file under .fgos/events/ (TA-D10) ----------------
+
+function ev(seq, ts, type) {
+  return JSON.stringify({ seq, ts, type, payload: null });
+}
+function raw(lines) {
+  return `${lines.join('\n')}\n`;
+}
+
+test('events-jsonl-not-truncated: a truncation in a per-writer file under .fgos/events/ fails the check even when baseline-0 holds clean', () => {
+  const gitDir = mkTempDir();
+  execFileSync('git', ['init', '-q'], { cwd: gitDir });
+  const fgosDir = path.join(gitDir, '.fgos');
+  const eventsDir = path.join(fgosDir, 'events');
+  fs.mkdirSync(eventsDir, { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'events.jsonl'), raw([ev(1, '2026-01-01T00:00:00.000Z', 'a')]), 'utf8');
+  const writerPath = path.join(eventsDir, 'writer-a-1.jsonl');
+  fs.writeFileSync(writerPath, raw([ev(1, '2026-08-23T00:00:00.000Z', 'x'), ev(2, '2026-08-23T00:00:01.000Z', 'y')]), 'utf8');
+
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-jsonl-not-truncated');
+  const bootstrapResult = entry.check(gitDir); // bootstraps the mark for both files
+  assert.equal(bootstrapResult.passed, true);
+
+  // Truncate the writer file back to just its first line.
+  fs.writeFileSync(writerPath, raw([ev(1, '2026-08-23T00:00:00.000Z', 'x')]), 'utf8');
+  const result = entry.check(gitDir);
+  assert.equal(result.passed, false);
+  assert.match(result.message, /events\/writer-a-1\.jsonl/);
+});
+
+// --- Tầng A/T6: events-compaction-verified (TA-D6) -------------------------
+
+function hashOfObj(obj) {
+  return crypto.createHash('sha256').update(JSON.stringify(obj)).digest('hex').slice(0, 16);
+}
+function evWithHash(seq, ts, type, payload, src = 'writer-a') {
+  const unhashed = { seq, ts, type, payload, v: 1, src };
+  return { ...unhashed, h: hashOfObj(unhashed) };
+}
+function writeJsonlEvents(filePath, events) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, events.map((e) => `${JSON.stringify(e)}\n`).join(''), 'utf8');
+}
+
+test('events-compaction-verified passes trivially when no compaction has ever run', () => {
+  const gitDir = mkTempDir();
+  execFileSync('git', ['init', '-q'], { cwd: gitDir });
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-compaction-verified');
+  const result = entry.check(gitDir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /nothing to verify/);
+});
+
+test('events-compaction-verified passes when a real compaction\'s baseline still matches its archived originals', () => {
+  const gitDir = mkTempDir();
+  execFileSync('git', ['init', '-q'], { cwd: gitDir });
+  const fgosDir = path.join(gitDir, '.fgos');
+  const eventsDir = path.join(fgosDir, 'events');
+  const archiveDir = path.join(eventsDir, 'archive');
+
+  const e1 = evWithHash(1, '2026-01-01T00:00:00.000Z', 'work.add', { id: 'a', title: 'A', status: 'todo' });
+  writeJsonlEvents(path.join(archiveDir, 'writer-a-1.jsonl'), [e1]); // already archived
+  writeJsonlEvents(path.join(eventsDir, 'baseline-1.jsonl'), [e1]); // the live compacted baseline
+  fs.writeFileSync(
+    path.join(archiveDir, 'compact-1.manifest.json'),
+    JSON.stringify({ baseline: 'baseline-1.jsonl', originals: ['writer-a-1.jsonl'] }),
+    'utf8',
+  );
+
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-compaction-verified');
+  const result = entry.check(gitDir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /1 past compaction/);
+});
+
+test('events-compaction-verified fails and names the broken manifest when the baseline no longer matches its archived originals', () => {
+  const gitDir = mkTempDir();
+  execFileSync('git', ['init', '-q'], { cwd: gitDir });
+  const fgosDir = path.join(gitDir, '.fgos');
+  const eventsDir = path.join(fgosDir, 'events');
+  const archiveDir = path.join(eventsDir, 'archive');
+
+  const e1 = evWithHash(1, '2026-01-01T00:00:00.000Z', 'work.add', { id: 'a', title: 'A', status: 'todo' });
+  writeJsonlEvents(path.join(archiveDir, 'writer-a-1.jsonl'), [e1]);
+  writeJsonlEvents(path.join(eventsDir, 'baseline-1.jsonl'), []); // tampered/corrupted after the fact -- missing e1
+  fs.writeFileSync(
+    path.join(archiveDir, 'compact-1.manifest.json'),
+    JSON.stringify({ baseline: 'baseline-1.jsonl', originals: ['writer-a-1.jsonl'] }),
+    'utf8',
+  );
+
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-compaction-verified');
+  const result = entry.check(gitDir);
+  assert.equal(result.passed, false);
+  assert.match(result.message, /compact-1\.manifest\.json/);
 });

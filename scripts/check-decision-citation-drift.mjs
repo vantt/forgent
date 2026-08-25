@@ -317,7 +317,7 @@ function loadSourceFiles(
 // (never a missed detection, since the mirror's own byte-identity is
 // test-enforced) rather than added cross-root exclusion complexity for a
 // cosmetic double-count.
-const WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins', '.agents/skills'];
+const WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins', 'core/skills', 'domains', '.agents/skills'];
 const WIDE_SWEEP_EXTENSIONS = new Set(['.md', '.mjs', '.js']);
 const WIDE_SWEEP_SKIP_DIR_NAMES = new Set(['node_modules', '.git']);
 

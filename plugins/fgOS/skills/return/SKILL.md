@@ -25,26 +25,15 @@ CTR001).
 
 2. **Return the item.** Run:
 
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" return <id> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos return <id> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   return <id> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
-   substituting the id from step 1. Always use the literal
-   `${CLAUDE_PROJECT_DIR}` substitution shown above, never a relative path —
-   an installed plugin's files run from a copied cache location, not from
-   this repo checkout, so a relative path would resolve to the wrong place
-   or fail outright.
+   substituting the id from step 1.
 
-   `--dir` (tsk-56t): the session doing the returning is normally already
+   `--dir`: the session doing the returning is normally already
    inside the claimed item's worktree (that's the whole point of `return`
    — proving real progress on `fgw/<id>`), which never carries its own
    `.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves

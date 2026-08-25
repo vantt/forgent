@@ -35,11 +35,14 @@ for (const [from, to] of [
   // event carries no payload keys beyond id/from/to is what pins "no
   // reason/ask/answer required", the same shape blocked -> todo has.
   ['backlog', 'todo'],
-  ['todo', 'doing'],
+  // tsk-40m (docs/architect/doing-coordination-redesign.md): settleClaim
+  // settles a fresh (never-durably-doing) claim straight through to
+  // awaiting-approval — the direct edge this redesign needs, replacing
+  // `todo -> doing` (retired below, see the standalone refusal test).
+  ['todo', 'awaiting-approval'],
   ['todo', 'blocked'],
   ['doing', 'blocked'],
   ['blocked', 'todo'],
-  ['blocked', 'doing'],
   ['blocked', 'awaiting-approval'],
   ['doing', 'awaiting-approval'],
   ['doing', 'delivered'],
@@ -54,6 +57,22 @@ for (const [from, to] of [
   test(`transitionWork allows ${from} -> ${to} and returns a validated event with no extra payload keys`, () => {
     const event = transitionWork({ work: work(from), to });
     assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from, to } });
+  });
+}
+
+// tsk-40m (docs/architect/doing-coordination-redesign.md, design target
+// confirmed 2026-08-25): `todo -> doing` and `blocked -> doing` are
+// RETIRED, not merely unused — nothing durably writes INTO `doing` anymore,
+// not even settleClaim's own settle segment (`doing` is derived purely
+// from the active-claim overlay, or read from pre-migration history, never
+// newly written). Locked here as an explicit refusal so a future change
+// can never silently reintroduce either edge.
+for (const from of ['todo', 'blocked']) {
+  test(`transitionWork refuses ${from} -> doing as precondition (tsk-40m: doing is never a durable settle/claim target)`, () => {
+    assert.throws(
+      () => transitionWork({ work: work(from), to: 'doing' }),
+      (err) => err instanceof FsmError && err.category === 'precondition',
+    );
   });
 }
 
@@ -150,8 +169,8 @@ test('transitionWork rejects cleanup -> blocked without a reason as validation, 
 // blocked, cleanup -> blocked, per D2/D8), so the description and the edge
 // exercised below are updated to name all three.
 test('reason is ignored (never appears in payload) for every edge other than awaiting-approval -> todo/blocked and cleanup -> blocked', () => {
-  const event = transitionWork({ work: work('todo'), to: 'doing', reason: 'should be dropped' });
-  assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'todo', to: 'doing' } });
+  const event = transitionWork({ work: work('todo'), to: 'blocked', reason: 'should be dropped' });
+  assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'todo', to: 'blocked' } });
 });
 
 // Changed (work-item-status-delivered-retrospective-cleanup D1/D2, supersedes
@@ -160,17 +179,35 @@ test('reason is ignored (never appears in payload) for every edge other than awa
 // blocked->delivered, delivered->retrospective, retrospective->cleanup,
 // cleanup->done, cleanup->blocked. This sweep asserts the FULL table, so a
 // missed edge would silently pass as "still precondition" and hide it.
+//
+// tsk-40m (docs/architect/doing-coordination-redesign.md, design target
+// confirmed 2026-08-25): `todo->doing` and `blocked->doing` RETIRED —
+// settleClaim (store.mjs) settles a claim straight from preClaimStatus to
+// finalStatus with no durable intermediate `doing` leg at all; `doing` is
+// derived purely from the active-claim overlay or read from pre-migration
+// history, never newly written. `todo->awaiting-approval` ADDED — the
+// direct edge that redesign needs. `doing->*` edges (doing->todo,
+// doing->blocked, doing->awaiting-approval, doing->delivered,
+// doing->awaiting-human, doing->wontfix) all STAY: they remain the real
+// doors settleClaim's legacy fallback uses to settle a genuinely
+// pre-migration durable-`doing` item. `awaiting-human->doing` is RETIRED
+// (tsk-40m P1 fix + hard-cut): resuming a claimed item now durably targets
+// `todo` (putInAwaiting settles the claim straight from its preClaimStatus,
+// releasing it; answerAwaiting resumes to the item's trusted durable
+// status, never a caller-supplied effective one), and a genuinely legacy
+// durable-doing item's resume is clamped to `todo` by answerAwaiting itself
+// rather than attempting this edge — nothing durably writes INTO `doing`
+// ever, not even for old data.
 test('every legal edge is exactly the declared table; every other status pair is precondition', () => {
   const legalEdges = new Set([
     // work-item-backlog-status D1: one door out, zero doors in. The sweep
     // below is what proves the "zero doors in" half — every other X->backlog
     // pair must still come back precondition.
     'backlog->todo',
-    'todo->doing',
+    'todo->awaiting-approval',
     'todo->blocked',
     'doing->blocked',
     'blocked->todo',
-    'blocked->doing',
     'blocked->awaiting-approval',
     'blocked->delivered',
     'doing->awaiting-approval',
@@ -186,7 +223,6 @@ test('every legal edge is exactly the declared table; every other status pair is
     'todo->awaiting-human',
     'doing->awaiting-human',
     'awaiting-human->todo',
-    'awaiting-human->doing',
     'blocked->wontfix',
     'todo->wontfix',
     'doing->wontfix',
@@ -311,26 +347,18 @@ test('transitionWork rejects resuming from awaiting-human without a non-empty an
   );
 });
 
-// claim-lock §5.1: a claim held at ask-time (status 'doing') must be able to
-// resume to 'doing', not just 'todo' — otherwise answering a gate mid-claim
-// silently drops it. Mirrors the awaiting-human -> todo test above exactly,
-// one target over.
-test('transitionWork allows awaiting-human -> doing (resume held claim, per claim-lock §5.1) and carries the answer in the payload', () => {
-  const event = transitionWork({ work: work('awaiting-human'), to: 'doing', answer: 'use OAuth' });
-  assert.deepEqual(event, {
-    type: 'work.move',
-    payload: { id: 'w1', from: 'awaiting-human', to: 'doing', answer: 'use OAuth' },
-  });
-});
-
-test('transitionWork rejects resuming from awaiting-human to doing without a non-empty answer as validation, not precondition', () => {
+// claim-lock §5.1, tsk-40m P1 fix + hard-cut: awaiting-human -> doing is
+// RETIRED entirely — a claim held at ask-time now resumes to `todo`
+// (putInAwaiting settles the claim straight from its preClaimStatus into
+// awaiting-human, releasing it; answerAwaiting resumes to the item's
+// trusted durable status, un-staling the claim so buildEffectiveView's
+// overlay shows `doing` again on its own, with zero durable writes of
+// `doing`). See test/state/awaiting.test.mjs for the full store-level
+// coverage of this resume path and its legacy-data clamp.
+test('transitionWork refuses awaiting-human -> doing as precondition — the edge no longer exists', () => {
   assert.throws(
-    () => transitionWork({ work: work('awaiting-human'), to: 'doing' }),
-    (err) => err instanceof FsmError && err.category === 'validation',
-  );
-  assert.throws(
-    () => transitionWork({ work: work('awaiting-human'), to: 'doing', answer: '   ' }),
-    (err) => err instanceof FsmError && err.category === 'validation',
+    () => transitionWork({ work: work('awaiting-human'), to: 'doing', answer: 'use OAuth' }),
+    (err) => err instanceof FsmError && err.category === 'precondition',
   );
 });
 
@@ -343,11 +371,11 @@ test('transitionWork allows doing -> todo (claim release, per claim-lock §3b) w
 });
 
 test('ask/answer are ignored (never appear in payload) for every edge other than the awaiting-human entry/exit edges', () => {
-  const event = transitionWork({ work: work('todo'), to: 'doing', ask: 'dropped ask', answer: 'dropped answer' });
-  assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'todo', to: 'doing' } });
+  const event = transitionWork({ work: work('todo'), to: 'blocked', ask: 'dropped ask', answer: 'dropped answer' });
+  assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'todo', to: 'blocked' } });
 });
 
-test('awaiting-human is not reachable from blocked, proposed, or done, and does not accept blocked/awaiting-approval/done as a resume target (todo/doing are the only two, per claim-lock §5.1)', () => {
+test('awaiting-human is not reachable from blocked, proposed, or done, and does not accept blocked/awaiting-approval/done as a resume target (todo/wontfix are the only two, per claim-lock §5.1 + tsk-40m hard-cut)', () => {
   for (const from of ['blocked', 'awaiting-approval', 'done']) {
     assert.throws(
       () => transitionWork({ work: work(from), to: 'awaiting-human', ask: 'irrelevant' }),
@@ -436,9 +464,9 @@ test('transitionWork rejects an unknown target status as precondition', () => {
 });
 
 test('transitionWork CAS: matching expectedStatus proceeds normally', () => {
-  const event = transitionWork({ work: work('todo'), to: 'doing', expectedStatus: 'todo' });
+  const event = transitionWork({ work: work('todo'), to: 'blocked', expectedStatus: 'todo' });
   assert.equal(event.payload.from, 'todo');
-  assert.equal(event.payload.to, 'doing');
+  assert.equal(event.payload.to, 'blocked');
 });
 
 test('transitionWork CAS: mismatched expectedStatus is refused as conflict, not precondition', () => {

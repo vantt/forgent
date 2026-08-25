@@ -58,7 +58,7 @@ function tmpLinkedWorktree() {
 }
 
 function faultLogPath(root) {
-  return path.join(root, '.fgos', FAULT_LOG);
+  return path.join(root, '.fgos', 'logs', FAULT_LOG);
 }
 
 function faultRecords(root) {
@@ -179,13 +179,13 @@ test('concurrent faults append whole lines, never a torn one', () => {
 });
 
 test('the fault log is gitignored in this repo — recorded argv must never be committed', () => {
-  const checked = spawnSync('git', ['check-ignore', `.fgos/${FAULT_LOG}`], {
+  const checked = spawnSync('git', ['check-ignore', `.fgos/logs/${FAULT_LOG}`], {
     cwd: REPO_ROOT,
     encoding: 'utf8',
   });
   assert.equal(
     checked.status,
     0,
-    `.fgos/${FAULT_LOG} must be gitignored: the records carry the raw argv of the bad call`,
+    `.fgos/logs/${FAULT_LOG} must be gitignored: the records carry the raw argv of the bad call`,
   );
 });

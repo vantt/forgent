@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus, effectiveStage, classificationVocabulary } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus, effectiveStage, classificationVocabulary, resolveTaskSpecPath, bundleForStage } from '../../src/state/workflow-stage-graphs.mjs';
 import { rebuildView } from '../../src/state/replay.mjs';
 import { RISK_DISCOUNTS } from '../../src/state/priority-formula.mjs';
 
@@ -382,4 +382,83 @@ test('a domain that declares no classification vocabulary imposes none (undefine
   assert.equal(classificationVocabulary(DOMAINS.triage, 'risk'), undefined);
   assert.equal(classificationVocabulary(undefined, 'kind'), undefined);
   assert.equal(classificationVocabulary(DOMAINS.coding, 'nonesuch'), undefined);
+});
+
+test('DOMAINS.coding loaded from registry.yaml and workflows/feature.yaml matches expected golden shape', () => {
+  assert.equal(DOMAINS.coding.defaultWorkflow, 'feature');
+  assert.deepEqual(DOMAINS.coding.stages, ['discovery', 'exploring', 'decompose', 'planning', 'executing']);
+  assert.deepEqual(DOMAINS.coding.stepMap, { planning: 'Divide', executing: 'Execute' });
+  assert.equal(DOMAINS.coding.worktreeBacked, true);
+  assert.equal(DOMAINS.coding.workerContract, '.agents/skills/_shared/coding-worker-contract.md');
+  assert.deepEqual(DOMAINS.coding.workflows.feature.stages, DOMAINS.coding.stages);
+  assert.deepEqual(DOMAINS.coding.workflows.feature.stepMap, DOMAINS.coding.stepMap);
+  assert.deepEqual(DOMAINS.coding.workflows.feature.transitions, DOMAINS.coding.transitions);
+  assert.deepEqual(DOMAINS.coding.workflows.feature.skillMap, DOMAINS.coding.skillMap);
+  assert.deepEqual(DOMAINS.coding.workflows.feature.taskSpecMap, DOMAINS.coding.taskSpecMap);
+});
+
+test('resolveTaskSpecPath resolves task spec paths correctly for domains, domain objects, core, and custom cwd', () => {
+  assert.equal(resolveTaskSpecPath('coding', 'implement-item'), path.join('domains', 'coding', 'task-specs', 'implement-item.md'));
+  assert.equal(resolveTaskSpecPath('coding', 'implement-item', '/app'), path.join('/app', 'domains', 'coding', 'task-specs', 'implement-item.md'));
+  assert.equal(resolveTaskSpecPath('coding', 'implement-item', { cwd: '/app' }), path.join('/app', 'domains', 'coding', 'task-specs', 'implement-item.md'));
+  assert.equal(resolveTaskSpecPath('core', 'fgos-routing'), path.join('core', 'task-specs', 'fgos-routing.md'));
+  assert.equal(resolveTaskSpecPath('core', 'fgos-routing', '/app'), path.join('/app', 'core', 'task-specs', 'fgos-routing.md'));
+  assert.equal(resolveTaskSpecPath(DOMAINS.coding, 'implement-item', '/app'), path.join('/app', 'domains', 'coding', 'task-specs', 'implement-item.md'));
+});
+
+test('bundleForStage resolves {skill, taskSpec} for domain and stage (D14/D29/D30)', () => {
+  assert.deepEqual(bundleForStage('coding', 'executing'), {
+    skill: 'fgos-coding-implement',
+    taskSpec: 'implement-item',
+  });
+  assert.deepEqual(bundleForStage('coding', 'discovery'), {
+    skill: 'fgos-coding-discovering',
+    taskSpec: 'judge-ambiguity',
+  });
+  assert.deepEqual(bundleForStage('coding', 'exploring'), {
+    skill: 'fgos-coding-exploring',
+    taskSpec: 'lock-decisions',
+  });
+  assert.deepEqual(bundleForStage('coding', 'planning'), {
+    skill: 'fgos-coding-planning',
+    taskSpec: 'shape-plan',
+  });
+  assert.deepEqual(bundleForStage('coding', 'retrospective'), {
+    skill: 'fgos-coding-compounding',
+    taskSpec: 'compound-learn',
+  });
+  assert.deepEqual(bundleForStage(DOMAINS.coding, 'executing'), {
+    skill: 'fgos-coding-implement',
+    taskSpec: 'implement-item',
+  });
+  assert.deepEqual(bundleForStage('synthetic', 'assembling'), {
+    skill: null,
+    taskSpec: null,
+  });
+  assert.deepEqual(bundleForStage('coding', 'nonexistent'), {
+    skill: null,
+    taskSpec: null,
+  });
+  assert.deepEqual(bundleForStage(undefined, 'executing'), {
+    skill: 'fgos-coding-implement',
+    taskSpec: 'implement-item',
+  });
+  assert.deepEqual(bundleForStage('coding', 'executing', 'feature'), {
+    skill: 'fgos-coding-implement',
+    taskSpec: 'implement-item',
+  });
+  assert.deepEqual(bundleForStage('coding', 'executing', { kind: 'feature' }), {
+    skill: 'fgos-coding-implement',
+    taskSpec: 'implement-item',
+  });
+});
+
+test('workflow-derived fields take precedence over registryData top-level keys in domain objects (activeWorkflow overrides registryData)', () => {
+  const codingDomain = DOMAINS.coding;
+  const activeWf = codingDomain.workflows[codingDomain.defaultWorkflow];
+  assert.strictEqual(codingDomain.stages, activeWf.stages);
+  assert.strictEqual(codingDomain.stepMap, activeWf.stepMap);
+  assert.strictEqual(codingDomain.transitions, activeWf.transitions);
+  assert.strictEqual(codingDomain.skillMap, activeWf.skillMap);
+  assert.strictEqual(codingDomain.taskSpecMap, activeWf.taskSpecMap);
 });

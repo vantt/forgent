@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -85,11 +86,11 @@ function logPath(cwd) {
 }
 
 function viewPath(cwd) {
-  return path.join(cwd, '.fgos', 'state.json');
+  return resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE);
 }
 
 function stateView(cwd) {
-  return JSON.parse(fs.readFileSync(viewPath(cwd), 'utf8'));
+  return envelopeData(fgos(cwd, ['list', '--all', '--json']).stdout);
 }
 
 // Every verb's success path prints a single fgos.v1 envelope
@@ -99,12 +100,43 @@ function envelopeData(stdout) {
   return JSON.parse(stdout).data;
 }
 
+// Tầng A/T2/T3 (TA-D2/TA-D7/TA-D12): new events land in a per-writer file
+// under `.fgos/events/<writer-id>-<openTs>.jsonl` (many, one per CLI
+// subprocess invocation here — a fresh process is a fresh writer identity,
+// TA-D11's degraded per-invocation mode), not baseline-0's
+// `.fgos/events.jsonl` alone (still read too — legacy content lives there,
+// zero rewrite). This file's own "never import src/state directly" rule
+// (top of file) means it re-derives the TA-D7 total order `(ts, file,
+// seq)` here rather than delegating to replay.mjs's readAllEventsFromDir —
+// same order production replay produces, read as an outside observer would.
 function events(cwd) {
-  return fs
-    .readFileSync(logPath(cwd), 'utf8')
-    .split('\n')
-    .filter(Boolean)
-    .map((line) => JSON.parse(line));
+  const tagged = [];
+  if (fs.existsSync(logPath(cwd))) {
+    for (const line of fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean)) {
+      tagged.push({ ev: JSON.parse(line), file: '' });
+    }
+  }
+  const eventsDir = path.join(cwd, '.fgos', 'events');
+  let names = [];
+  try {
+    names = fs
+      .readdirSync(eventsDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch {
+    names = [];
+  }
+  for (const name of names) {
+    for (const line of fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean)) {
+      tagged.push({ ev: JSON.parse(line), file: name });
+    }
+  }
+  tagged.sort((a, b) => {
+    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
+    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
+    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
+  });
+  return tagged.map(({ ev }) => ev);
 }
 
 function writeRunnerConfig(repoRoot, executorScript) {
@@ -612,7 +644,7 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   // .gitignore already declares. "Commit your work" for `return` therefore
   // covers both the real file AND the log deltas `take`/`discover` already
   // appended.
-  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/cache/\n');
   execFileSync('git', ['add', '.gitignore'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'gitignore'], { cwd: repoRoot });
 
@@ -725,10 +757,12 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
   // carries the marker only `test -f output.txt && echo VERIFY_OK` prints.
   assert.match(first.stdout, /VERIFY_OK/);
 
-  // events.jsonl carries the real chain: two adds, then doing, then a
-  // predicted work.outcome (written at claim), then proposed for item1
-  // only, then an actual work.outcome (written on the pass terminal) —
-  // every event from Phase 2 on carries `v`.
+  // events.jsonl carries the real chain: two adds, then a predicted
+  // work.outcome (written at claim), then settle for item1 only (tsk-40m:
+  // settleClaim writes an enriched work.attempt then transitions DIRECTLY
+  // from its preClaimStatus to finalStatus -- no durable intermediate
+  // work.move(->doing) leg), then an actual work.outcome (written on the
+  // pass terminal) — every event from Phase 2 on carries `v`.
   const afterFirstEvents = events(repoRoot);
   assert.deepEqual(
     afterFirstEvents.map((e) => (e.type === 'work.outcome'
@@ -737,19 +771,16 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
     [
       'work.add:item1:add',
       'work.add:item2:add',
-      'work.move:item1:doing',
       'work.outcome:item1:predicted',
-      'executor.dispatch:item1:add', // D8, tsk-62v: dispatch announce/audit entry
+      'executor.dispatch:item1:add',
+      'work.attempt:item1:awaiting-approval',
       'work.move:item1:awaiting-approval',
-      'work.handoff:item1:reviewer', // D18: moveWork's own side effect on reaching awaiting-approval, not a second writer
+      'work.handoff:item1:reviewer',
       'work.outcome:item1:actual',
     ],
   );
-  const doingEvent = afterFirstEvents.find((e) => e.type === 'work.move' && e.payload.to === 'doing');
   const proposedEvent = afterFirstEvents.find((e) => e.type === 'work.move' && e.payload.to === 'awaiting-approval');
-  assert.equal(doingEvent.payload.id, 'item1');
   assert.equal(proposedEvent.payload.id, 'item1');
-  assert.equal(typeof doingEvent.v, 'number', 'doing event carries a schema version');
   assert.equal(typeof proposedEvent.v, 'number', 'proposed event carries a schema version');
   // actual is real dispatch evidence (real subprocess, real goal-check),
   // sourced from the runner's own branchFacts — never the worker's report.
@@ -830,14 +861,16 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
   const seq = redEvents.map((e) => (e.type === 'work.outcome'
     ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}`
     : `${e.type}:${e.payload.to ?? e.payload.id ?? ''}`));
+  // tsk-40m: settleClaim writes an enriched work.attempt (carrying its own
+  // `to`, hence this mapper prints it as "work.attempt:blocked" rather than
+  // falling back to payload.id) then transitions DIRECTLY from preClaimStatus
+  // to finalStatus -- no durable intermediate work.move(->doing) leg.
   assert.deepEqual(seq, [
     'work.add:item-red',
-    'work.move:doing',
     'work.outcome:predicted',
-    // D8, tsk-62v: one dispatch announce/audit entry per attempt — two
-    // retry attempts run before the item parks to blocked.
     'executor.dispatch:item-red',
     'executor.dispatch:item-red',
+    'work.attempt:blocked',
     'work.move:blocked',
     'work.outcome:actual',
     'work.friction:item-red',

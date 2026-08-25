@@ -5,8 +5,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork } from '../../src/state/store.mjs';
+import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork, recordClaimAttempt } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
+import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
 import { runOnce, runWatch, resolveRepoRoot } from '../../src/runner/loop.mjs';
@@ -133,7 +134,38 @@ fs.writeFileSync('output.txt', 'produced by worker\\n');
 execFileSync('git', ['add', 'output.txt']);
 execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);
 const { moveWork } = await import(${JSON.stringify(storeUrl)});
-moveWork(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, to: 'blocked', expectedStatus: 'doing' });
+moveWork(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, to: 'blocked', expectedStatus: 'todo' });
+`,
+  );
+  return scriptPath;
+}
+
+/** tsk-40m code-review finding (blocker): a rogue writer that races the
+ * runner's CLAIM (not its status move) — does the work, commits it, then
+ * releases the runner's own runtime claim and acquires a fresh one under a
+ * DIFFERENT actor, behind the runner's back. Simulates a stale-claim
+ * reclaim happening mid-dispatch (bypassing claim-port.mjs's own liveness
+ * gate directly, the same way writeRacingExecutor above bypasses moveWork's
+ * normal callers to force the race deterministically). The runner's own
+ * settleClaim call must still carry the EXACT claimId it acquired at claim
+ * time — never re-derive "whichever claim is active now" — so this must
+ * conflict instead of silently settling the different actor's claim. */
+function writeClaimReclaimingExecutor(scriptDir, counterFile, mainDir, id) {
+  const runtimeCoordUrl = pathToFileURL(path.resolve(import.meta.dirname, '../../src/state/runtime-coordination.mjs')).href;
+  const scriptPath = path.join(scriptDir, 'claim-reclaiming-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
+fs.writeFileSync('output.txt', 'produced by worker\\n');
+execFileSync('git', ['add', 'output.txt']);
+execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);
+const { readClaim, releaseClaim, acquireClaim } = await import(${JSON.stringify(runtimeCoordUrl)});
+const stale = readClaim(${JSON.stringify(mainDir)}, ${JSON.stringify(id)});
+releaseClaim(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, claimId: stale.claimId });
+acquireClaim(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, actor: 'a-different-actor', preClaimStatus: 'todo' });
 `,
   );
   return scriptPath;
@@ -286,17 +318,20 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   // worktree torn down, branch survives (D4 proposal artifact)
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
   // one door: the log carries exactly the runner's writes — the worker
-  // never touched .fgos/ (add + claim + predicted + executor-dispatch
-  // audit (D8, tsk-62v) + propose + actual, nothing else). The one
-  // addition since this test was first written, `work.handoff:reviewer`,
-  // is not a second writer — it is `moveWork`'s own D18 side effect,
-  // fired synchronously inside the SAME `to: 'awaiting-approval'` call
-  // the runner already made (`coding`'s default domain declares a
-  // `roleGraph`), never a write the worker or a second door performed.
+  // never touched .fgos/ (add + claim (no durable write) + predicted +
+  // executor-dispatch audit (D8, tsk-62v) + settle + actual, nothing
+  // else). tsk-40m (docs/architect/doing-coordination-redesign.md):
+  // settleClaim writes an enriched work.attempt then transitions the item
+  // DIRECTLY from its preClaimStatus to finalStatus — no durable
+  // intermediate work.move(->doing) leg. `work.handoff:reviewer` is not a
+  // second writer — it is `moveWork`'s own D18 side effect, fired
+  // synchronously inside the SAME settle call the runner already made
+  // (`coding`'s default domain declares a `roleGraph`), never a write the
+  // worker or a second door performed.
   const events = readRawEvents(dir);
   assert.deepEqual(
     events.map((e) => (e.type === 'work.outcome' ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}` : `${e.type}:${e.payload.to ?? 'add'}`)),
-    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'executor.dispatch:add', 'work.move:awaiting-approval', 'work.handoff:reviewer', 'work.outcome:actual'],
+    ['work.add:add', 'work.outcome:predicted', 'executor.dispatch:add', 'work.attempt:awaiting-approval', 'work.move:awaiting-approval', 'work.handoff:reviewer', 'work.outcome:actual'],
   );
   // predicted is written right at claim time, before dispatch ever runs
   const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);
@@ -401,12 +436,27 @@ test('runOnce stamps role "runner" on every claim/propose work.move it writes', 
 
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
+  // Claim time no longer durably writes a work.move — settleClaim writes
+  // exactly one work.move (the direct preClaimStatus -> finalStatus
+  // settle), so this asserts BOTH surviving carriers of the runner's
+  // identity: the settle's own work.move.role, and the settle's paired
+  // work.attempt.actor (the claim-time signal now rides this field).
   const moves = readRawEvents(dir).filter((e) => e.type === 'work.move');
-  assert.ok(moves.length >= 2, 'claim (todo->doing) and propose (doing->awaiting-approval) both wrote a move');
+  assert.ok(moves.length >= 1, 'the propose settle wrote a move');
   for (const move of moves) {
     assert.equal(move.payload.role, 'runner');
   }
+  const attempts = readRawEvents(dir).filter((e) => e.type === 'work.attempt');
+  assert.ok(attempts.length >= 1, 'the settle wrote an attempt');
+  for (const attempt of attempts) {
+    assert.equal(attempt.payload.actor, 'runner');
+  }
 });
+
+// (tsk-40m docs/architect/doing-coordination-redesign.md: settleClaim no
+// longer writes a durable work.move(->doing) at claim time — the claim
+// itself is a runtime-only claim file, and the "runner did this" signal at
+// claim time now rides the settle's own work.attempt.actor field instead.)
 
 // tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
 // the clarify/decompose sweeps' own judge subprocess is retired — a
@@ -668,16 +718,19 @@ test('two-tier cap: a root with three ready leaves dispatches maxLeavesPerRoot p
 
 // --- the shared worker-slot ceiling bounds the wave (D6/D7/D8) ------------
 
-/** Occupy `count` execution-lane slots with items parked at `doing`. `role:
- * 'session'` keeps startupReap's own stale-claim reclaim off them (it only
- * ever reaps a claim the runner itself made), so they stay occupied for the
- * whole run — the same shape test/state/worker-slots.test.mjs's own
- * occupants use. */
+/** Occupy `count` execution-lane slots with items parked at `doing`. A real
+ * runtime claim (`claimRole: 'session'`) keeps startupReap's own stale-claim
+ * reclaim off them (it only ever reaps a claim the runner itself made), so
+ * they stay occupied for the whole run — the same shape
+ * test/state/worker-slots.test.mjs's own occupants use. tsk-40m (docs/
+ * architect/doing-coordination-redesign.md): `todo -> doing` is retired from
+ * status-fsm.mjs's TRANSITIONS table, so `doing` is reached via a claim
+ * (listWork's effective view), never a durable moveWork. */
 function occupySlots(dir, count) {
   for (let n = 0; n < count; n++) {
     const id = `busy-${n}`;
     seedItem(dir, { id });
-    moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', role: 'session' });
+    acquireClaim(dir, { id, actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
   }
 }
 
@@ -1061,8 +1114,11 @@ test('live tee: .fgos/logs is never committed (live tee did not change the commi
   assert.ok(fs.existsSync(path.join(dir, 'logs', 'item-live-clean.log')));
   // main only ever gains the worker's own commit (produced by the committing
   // executor) — .fgos/logs never enters a git object at all, tracked or not.
+  // .fgos/events.jsonl itself IS expected to be committed here (tsk-1ji:
+  // claimWork's own opportunistic periodic checkpoint runs on every claim),
+  // so this only asserts the live-tee surface, not .fgos as a whole.
   const tracked = execFileSync('git', ['ls-files'], { cwd: repoRoot, encoding: 'utf8' });
-  assert.doesNotMatch(tracked, /\.fgos/, 'no .fgos path is ever committed');
+  assert.doesNotMatch(tracked, /\.fgos\/logs/, 'no .fgos/logs path is ever committed');
 });
 
 // --- anti-loop: max-visits parks the item OFF the frontier ----------------
@@ -1071,9 +1127,13 @@ test('anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leave
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-loopy' });
   seedItem(dir, { id: 'item-fresh' });
-  // one prior visit for item-loopy: todo -> doing -> blocked -> todo
-  moveWork(dir, { id: 'item-loopy', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'item-loopy', to: 'blocked', expectedStatus: 'doing' });
+  // one prior visit for item-loopy: a real settle-style work.attempt
+  // (tsk-40m D3: visitCount counts ONLY work.attempt(phase:'execute')
+  // events now, never a raw doing-move — hard migration, no dual-count
+  // legacy), then parked back to todo via blocked (todo -> doing is
+  // retired; blocked stands in for the same "parked mid-flight" shape).
+  recordClaimAttempt(dir, { id: 'item-loopy', phase: 'execute', result: 'failed' });
+  moveWork(dir, { id: 'item-loopy', to: 'blocked', expectedStatus: 'todo' });
   moveWork(dir, { id: 'item-loopy', to: 'todo', expectedStatus: 'blocked' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
@@ -1094,10 +1154,10 @@ test('anti-loop: a human reject (with reason) resets the runner gate — visits 
   seedItem(dir, { id: 'item-reprieved' });
   // one machine visit that would already be AT the cap (maxVisits: 1) on its
   // own — then a human rejects with a reason, which per D1 resets the item's
-  // own budget. Reaching `proposed` first (not just doing -> blocked -> todo)
+  // own budget. Reaching `proposed` first (not just blocked -> todo)
   // exercises the real reject edge (awaiting-approval -> todo, reason required).
-  moveWork(dir, { id: 'item-reprieved', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'item-reprieved', to: 'awaiting-approval', expectedStatus: 'doing' });
+  recordClaimAttempt(dir, { id: 'item-reprieved', phase: 'execute', result: 'success' });
+  moveWork(dir, { id: 'item-reprieved', to: 'awaiting-approval', expectedStatus: 'todo' });
   moveWork(dir, { id: 'item-reprieved', to: 'todo', expectedStatus: 'awaiting-approval', reason: 'not quite right', role: 'human' });
   // lifetime visitCount is already 1 here — the OLD (pre-D1) gate would have
   // parked this item immediately at maxVisits: 1, never dispatching it again.
@@ -1116,10 +1176,11 @@ test('anti-loop: a human reject (with reason) resets the runner gate — visits 
 test('anti-loop: a BARE resume (no reason, no human role) does NOT reset the gate — the machine-only loop still dies at the cap', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-loopy-bare' });
-  // todo -> doing -> blocked -> todo, no reason, no role: a bare resume,
-  // never a human trigger per D1c. The prior visit must still count.
-  moveWork(dir, { id: 'item-loopy-bare', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'item-loopy-bare', to: 'blocked', expectedStatus: 'doing' });
+  // a real prior visit (work.attempt), then blocked -> todo with no reason,
+  // no role: a bare resume, never a human trigger per D1c. The prior visit
+  // must still count.
+  recordClaimAttempt(dir, { id: 'item-loopy-bare', phase: 'execute', result: 'failed' });
+  moveWork(dir, { id: 'item-loopy-bare', to: 'blocked', expectedStatus: 'todo' });
   moveWork(dir, { id: 'item-loopy-bare', to: 'todo', expectedStatus: 'blocked' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
@@ -1181,7 +1242,7 @@ test('startup reap: a crashed run\'s doing item with a committed, verify-passing
   const item = seedItem(dir, { id: 'item-crashed' });
   // simulate the crashed run: claim, do the work on the branch, crash
   // before writing proposed (worktree torn down, branch left behind)
-  moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo' });
+  acquireClaim(dir, { id: item.id, actor: 'runner', preClaimStatus: 'todo' });
   const wt = createWorktree(repoRoot, item.id, { worktreeDir });
   fs.writeFileSync(path.join(wt.path, 'output.txt'), 'done before crash\n');
   execFileSync('git', ['add', 'output.txt'], { cwd: wt.path });
@@ -1209,7 +1270,7 @@ test('startup reap reclaims an orphaned checkout left behind by a genuine crash 
   // call removeWorktree -- the runner died before its own `finally` ran, so
   // fgw/item-orphaned-crash is still checked out at wt.path when reap starts
   // and its own throwaway goal-check worktree would otherwise collide with it.
-  moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo' });
+  acquireClaim(dir, { id: item.id, actor: 'runner', preClaimStatus: 'todo' });
   const wt = createWorktree(repoRoot, item.id, { worktreeDir });
   fs.writeFileSync(path.join(wt.path, 'output.txt'), 'done before crash\n');
   execFileSync('git', ['add', 'output.txt'], { cwd: wt.path });
@@ -1232,7 +1293,7 @@ test('startup reap reclaims an orphaned checkout left behind by a genuine crash 
 test('startup reap: a doing item with nothing on its branch is reclaimed to blocked (runner-crash-reclaim)', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir, { id: 'item-vanished' });
-  moveWork(dir, { id: 'item-vanished', to: 'doing', expectedStatus: 'todo' });
+  acquireClaim(dir, { id: 'item-vanished', actor: 'runner', preClaimStatus: 'todo' });
   const config = {
     executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
     models: { standard: 'sonnet' },
@@ -1255,7 +1316,7 @@ test('startup reap: a doing item with nothing on its branch is reclaimed to bloc
 test('startup reap SKIPS a doing item claimed by a human (claimRole) — never reclaimed, even with no branch/commit at all', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const item = seedItem(dir, { id: 'item-human-held' });
-  moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', role: 'human', headAtTake: 'deadbeef' });
+  acquireClaim(dir, { id: item.id, actor: 'human', preClaimStatus: 'todo', claimRole: 'human', headAtTake: 'deadbeef' });
   const config = {
     executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
     models: { standard: 'sonnet' },
@@ -1272,9 +1333,9 @@ test('startup reap SKIPS a doing item claimed by a human (claimRole) — never r
 test('startup reap SKIPS a doing item claimed by a session, but still reaps a plain runner claim in the SAME pass — selective, not a blanket disablement', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const held = seedItem(dir, { id: 'item-session-held' });
-  moveWork(dir, { id: held.id, to: 'doing', expectedStatus: 'todo', role: 'session', headAtTake: 'cafebabe' });
+  acquireClaim(dir, { id: held.id, actor: 'session', preClaimStatus: 'todo', claimRole: 'session', headAtTake: 'cafebabe' });
   const vanished = seedItem(dir, { id: 'item-runner-vanished' });
-  moveWork(dir, { id: vanished.id, to: 'doing', expectedStatus: 'todo', role: 'runner' });
+  acquireClaim(dir, { id: vanished.id, actor: 'runner', preClaimStatus: 'todo', claimRole: 'runner' });
   const config = {
     executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
     models: { standard: 'sonnet' },
@@ -1360,6 +1421,50 @@ test('startup reap: a zero-ahead root branch whose only descendant is already do
   assert.equal(branchExists(repoRoot, 'fgw/root-c'), false);
 });
 
+test('startup reap: a wontfix branch with real commits ahead and no open descendants is force-deleted', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const wt = createWorktree(repoRoot, 'wontfix-a', { worktreeDir });
+  fs.writeFileSync(path.join(wt.path, 'wontfix.txt'), 'abandoned work\n');
+  execFileSync('git', ['add', 'wontfix.txt'], { cwd: wt.path });
+  execFileSync('git', ['commit', '-q', '-m', 'wontfix work'], { cwd: wt.path });
+  removeWorktree(repoRoot, wt.path);
+  seedItem(dir, { id: 'wontfix-a', status: 'wontfix' });
+
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.pruned, ['fgw/wontfix-a']);
+  assert.equal(branchExists(repoRoot, 'fgw/wontfix-a'), false);
+});
+
+test('startup reap: a wontfix branch with an open descendant is kept, not pruned', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const wt = createWorktree(repoRoot, 'wontfix-root', { worktreeDir });
+  fs.writeFileSync(path.join(wt.path, 'wontfix.txt'), 'abandoned work\n');
+  execFileSync('git', ['add', 'wontfix.txt'], { cwd: wt.path });
+  execFileSync('git', ['commit', '-q', '-m', 'wontfix work'], { cwd: wt.path });
+  removeWorktree(repoRoot, wt.path);
+  seedItem(dir, { id: 'wontfix-root', status: 'wontfix' });
+  seedItem(dir, { id: 'child-open', parent: 'wontfix-root', status: 'doing' });
+
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.pruned, []);
+  assert.deepEqual(result.reap.kept, [{ branch: 'fgw/wontfix-root', aheadCount: 1 }]);
+  assert.equal(branchExists(repoRoot, 'fgw/wontfix-root'), true);
+});
+
 // --- CAS conflict on the runner's own write -> clean halt, exit 3 ---------
 
 test('state-conflict: a racing write under the runner\'s claim makes its own CAS fail -> cleanup, clean halt, exit 3', async () => {
@@ -1378,6 +1483,27 @@ test('state-conflict: a racing write under the runner\'s claim makes its own CAS
   // cleanup still ran on this halt path: worktree gone, branch kept
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
   assert.equal(branchExists(repoRoot, 'fgw/item-race'), true);
+});
+
+test('tsk-40m code-review finding (blocker): a claim reclaimed by a DIFFERENT actor mid-dispatch is never silently settled by the runner\'s own stale claimId -- CAS conflict, clean halt, exit 3', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-race-claim' });
+  const config = configFor(writeClaimReclaimingExecutor(scriptDir, counterFile, dir, 'item-race-claim'));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.exitCode, 3);
+  assert.equal(result.dispatched[0].outcome, 'halted');
+  assert.equal(result.dispatched[0].errorClass, 'state-conflict');
+  // the reclaiming actor's claim stands untouched — the runner never settled it
+  const { readClaim } = await import('../../src/state/runtime-coordination.mjs');
+  const currentClaim = readClaim(dir, 'item-race-claim');
+  assert.ok(currentClaim, 'the different actor\'s claim must still be active');
+  assert.equal(currentClaim.actor, 'a-different-actor');
+  // cleanup still ran on this halt path: worktree gone, branch kept
+  assert.deepEqual(fs.readdirSync(worktreeDir), []);
+  assert.equal(branchExists(repoRoot, 'fgw/item-race-claim'), true);
 });
 
 // --- dry-run: reads only, writes nothing ----------------------------------
@@ -1522,6 +1648,64 @@ test('tsk-535 D4: a fgos-discovered block with no description falls back to the 
   const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
   assert.equal(discovered.length, 1);
   assert.equal(discovered[0].description, 'Wire retry metrics into the dashboard');
+});
+
+test('tsk-2ck: a fgos-discovered block with an out-of-vocabulary risk (e.g. "medium") is coerced to derived.risk, creating the item instead of dropping it', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const body = JSON.stringify({
+    title: 'Fix crash in parser',
+    kind: 'bug',
+    risk: 'medium',
+  });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  const view = listWork(dir);
+  const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
+  assert.equal(discovered.length, 1, 'item was created instead of being silently dropped');
+  assert.equal(discovered[0].kind, 'bug');
+  assert.equal(discovered[0].risk, 'standard', 'out-of-vocabulary risk "medium" was coerced to derived.risk');
+});
+
+test('tsk-2ck: a fgos-discovered block with an out-of-vocabulary kind is coerced to derived.kind, creating the item instead of dropping it', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const body = JSON.stringify({
+    title: 'Fix crash in parser',
+    kind: 'superbug',
+    risk: 'light',
+  });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  const view = listWork(dir);
+  const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
+  assert.equal(discovered.length, 1, 'item was created instead of being silently dropped');
+  assert.equal(discovered[0].risk, 'light');
+  assert.equal(discovered[0].kind, 'bug', 'out-of-vocabulary kind "superbug" was coerced to derived.kind');
+});
+
+test('tsk-2ck: a fgos-discovered block with absent kind and risk falls back to derived.kind and derived.risk', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const body = JSON.stringify({
+    title: 'Fix crash in parser',
+  });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  const view = listWork(dir);
+  const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
+  assert.equal(discovered.length, 1);
+  assert.equal(discovered[0].kind, 'bug');
+  assert.equal(discovered[0].risk, 'standard');
 });
 
 test('wgi-8: a malformed fgos-discovered block is skipped (fail-safe) — the dispatch still proposes and no item is created', async () => {
@@ -2014,4 +2198,68 @@ test('tsk-2yo: a headless clear verdict carrying tier/kind/risk actually applies
   assert.equal(item.tier, 'heavy');
   assert.equal(item.kind, 'bug');
   assert.equal(item.risk, 'heavy');
+});
+
+test('tsk-34o5: startupReap parks a stale doing item with attestation-mismatch when baseCommit/headRef diverges', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const id = 'stale-attest-item';
+  seedItem(dir, { id });
+  acquireClaim(dir, { id, actor: 'runner', preClaimStatus: 'todo', claimRole: 'runner' });
+
+  const branch = branchNameFor(id);
+  const baseCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  execFileSync('git', ['checkout', '-b', branch], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'stale.txt'), 'stale content');
+  execFileSync('git', ['add', 'stale.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-m', 'stale commit'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
+
+  appendEvent(path.join(dir, 'events.jsonl'), {
+    type: 'executor.dispatch',
+    payload: { id, executorId: 'cli', baseCommit, headRef: 'main' },
+  });
+
+  const { startupReap } = await import('../../src/runner/loop.mjs');
+  const result = await startupReap({ repoRoot, dir, worktreeDir, log: noLog });
+
+  assert.equal(result.resolutions[0].to, 'blocked');
+  assert.equal(result.resolutions[0].reason, 'attestation-mismatch');
+
+  const view = listWork(dir);
+  assert.equal(view.work[id].status, 'blocked');
+});
+
+test('tsk-34o5: startupReap does NOT halt a legitimate retry on a branch with previous commits if latest attestation baseCommit is ancestor', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const id = 'retry-attest-item';
+  seedItem(dir, { id, verify: 'exit 0' });
+  acquireClaim(dir, { id, actor: 'runner', preClaimStatus: 'todo', claimRole: 'runner' });
+
+  const branch = branchNameFor(id);
+  const baseCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  execFileSync('git', ['checkout', '-b', branch], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'attempt1.txt'), 'failed attempt');
+  execFileSync('git', ['add', 'attempt1.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-m', 'attempt 1'], { cwd: repoRoot });
+
+  appendEvent(path.join(dir, 'events.jsonl'), {
+    type: 'executor.dispatch',
+    payload: { id, executorId: 'cli', baseCommit, headRef: branch },
+  });
+
+  fs.writeFileSync(path.join(repoRoot, 'attempt2.txt'), 'successful attempt');
+  execFileSync('git', ['add', 'attempt2.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-m', 'attempt 2'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
+
+  appendEvent(path.join(dir, 'events.jsonl'), {
+    type: 'executor.dispatch',
+    payload: { id, executorId: 'cli', baseCommit, headRef: branch },
+  });
+
+  const { startupReap } = await import('../../src/runner/loop.mjs');
+  await startupReap({ repoRoot, dir, worktreeDir, log: noLog });
+
+  const view = listWork(dir);
+  assert.equal(view.work[id].status, 'awaiting-approval');
 });

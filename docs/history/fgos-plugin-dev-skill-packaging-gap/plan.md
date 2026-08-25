@@ -101,6 +101,95 @@ map (temporarily desync a copy / remove a doctor-checked file) are one-time
 proof points run during implementation, never left as permanent suite
 state.
 
+## tsk-5zi — active copy/generation script (2026-08-20)
+
+Mode: tiny
+
+**Lane derivation (direct-entry fallback — no prior `Mode:` line for this
+item, no `fgos-routing` Orient step ran this session):** flags counted per
+`fgos-routing`'s own Mode-gate table — none of auth/authorization/data
+model/audit-security/external systems/public contracts/cross-platform/
+multi-domain apply; the one arguable flag is **existing covered
+behavior** (this extends `test/skills/fgos-mirror.test.mjs`'s existing
+byte-identical assertions, which already pass today against the manual
+copy). 0-1 flags, two files touched, one direct task → **tiny**.
+
+**Impact-analysis posture:** `full` (GitNexus registered and `present`,
+checked fresh this stage — same result as above, unchanged since 2026-08-12).
+
+This item closes the specific open choice this feature's own D3 (above)
+left unresolved: "whether to ALSO add an active copy/generation script
+... is left to fgos-coding-planning". This round answers: yes, add it,
+scoped to `npm run build:skills` only.
+
+### Approach
+
+Chosen path: add one new exported function to `src/setup/skill-
+wrappers.mjs` (reusing the existing, already-proven `copyDirRecursive`
+helper — no new copy mechanism) that mirrors `.agents/skills/{_shared,
+fgos-*}` into `plugins/fgOS/skills/`, called from `scripts/build-skill-
+wrappers.mjs` right after its existing `generateAllSkillWrappers` call.
+Rejected alternative: adding the mirror call inside
+`materializeSkillsIntoProject` instead/also — rejected because that
+function's `targetRoot` is an external project being set up, and
+`plugins/fgOS/skills/` is this repo's own package-relative plugin
+directory, never something materialized per external target (confirmed,
+RESEARCH.md Round 2).
+
+Cites: this feature's own D2 (plugins/fgOS's copies stay a
+generated/enforced mirror, never an independently-edited third copy —
+this item is exactly that generation step) and D3 (test-based enforcement
+already exists; this item adds the generation half D3 explicitly left
+open).
+
+### Risk map
+
+| Component | How risky | What proves it |
+|---|---|---|
+| New `mirrorDevSkillsIntoPlugin`-style function reusing `copyDirRecursive` | Light — same helper already proven correct by 3 existing callers | `npm run build:skills` run once, `git diff --stat` shows only the 14 dev-skill + `_shared` dirs under `plugins/fgOS/skills/` touched, no unrelated file changed |
+| Wiring the new call into `scripts/build-skill-wrappers.mjs` | Light — one new function call after an existing one, same script | `npm run build:skills` exits 0, prints the new copy summary alongside the existing wrapper-generation output |
+| No regression to the existing byte-identical enforcement | Light — `test/skills/fgos-mirror.test.mjs` already asserts the exact target shape (name set, file set, byte content, `_shared`) unchanged by this item | `node --test test/skills/fgos-mirror.test.mjs` green after running `npm run build:skills` |
+
+### Files likely touched
+
+- `src/setup/skill-wrappers.mjs` — new exported function
+- `scripts/build-skill-wrappers.mjs` — one new call, after
+  `generateAllSkillWrappers`
+- No test file changes needed — `test/skills/fgos-mirror.test.mjs`
+  already asserts the target state this item makes self-maintaining
+
+### Order
+
+1. Add the new function to `src/setup/skill-wrappers.mjs` (nothing to
+   call it from yet).
+2. Wire the call into `scripts/build-skill-wrappers.mjs`.
+3. Run `npm run build:skills`, confirm the diff is empty content-wise
+   (source and target already byte-identical today) and `npm test`
+   stays green.
+
+No `fgos graph --json` critical-path signal needed — single isolated
+item, two files, strictly sequential internal dependency (the function
+must exist before the script can call it).
+
+### Split decision
+
+No split — one honest piece of work.
+
+### Verify
+
+```bash
+npm run build:skills && node --test test/skills/fgos-mirror.test.mjs
+```
+
+Real, runnable command (synced onto the item's own `verify` field via
+`fgos edit --verify`, replacing the discovery-stage placeholder that had
+embedded prose, not valid shell). Runs the automation, then the existing
+test that already proves the target shape (name-set match, file-set
+match, byte-identical content, `_shared` mirror, `user-invocable: false`
+on every copy) — the same 6 assertions phases 1-2 of tsk-32b's own plan
+above established, now proven against a freshly-generated copy instead of
+a hand-maintained one.
+
 ## Outstanding questions
 
 None

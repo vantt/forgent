@@ -38,9 +38,10 @@
 // (resume makes the item actionable again; no `awaiting-human -> doing`
 // edge — YAGNI, add only if a real consumer needs it).
 //
-// fan-out-parallel D18: `blocked -> awaiting-approval` is a third door out of
-// `blocked`, alongside the existing `blocked -> todo`/`blocked -> doing`
-// pair. It exists for fan-out-parallel's drift reconcile (CONTEXT.md
+// fan-out-parallel D18: `blocked -> awaiting-approval` is a door out of
+// `blocked` alongside `blocked -> todo` (tsk-40m retired the third,
+// `blocked -> doing` — see that edge's own removal comment in the
+// TRANSITIONS table below). It exists for fan-out-parallel's drift reconcile (CONTEXT.md
 // D7/D8/D11): a root parked via `awaiting-approval -> blocked` (reason
 // `integration-drift`) after a clean catch-up + re-verify needs to return to
 // `awaiting-approval` directly, without re-entering `doing`. Re-entering `doing`
@@ -67,16 +68,19 @@ export class FsmError extends Error {
 export { STATUSES };
 
 // The transition table itself: every legal (from -> to) edge. `blocked` has
-// four doors out now — `todo` and `doing` per the plan, `awaiting-approval`
-// per fan-out-parallel D18 (see the doc comment above), and `delivered`
+// three doors out now — `todo` per the plan, `awaiting-approval` per
+// fan-out-parallel D18 (see the doc comment above), and `delivered`
 // (work-item-status-delivered-retrospective-cleanup D2: a mechanical retry
 // door, mirroring `blocked -> awaiting-approval`'s own shape exactly — no
 // `reason`, not a rejection) for an item parked via `cleanup -> blocked`
 // that just needs its retrospective/cleanup retried, not real rework
-// (rework instead goes out through the existing `blocked -> todo`/
-// `blocked -> doing` doors). `awaiting-approval` (per D5) is entered only
-// from `doing` (a worker's goal-check pass) or, per fan-out-parallel D18,
-// from `blocked` (a mechanical reconcile), and leaves to `delivered`
+// (rework instead goes out through the existing `blocked -> todo` door —
+// tsk-40m retired the `blocked -> doing` door this comment used to name
+// alongside it; see that edge's own removal comment in the table below).
+// `awaiting-approval` (per D5) is entered from `todo`/`doing` directly
+// (tsk-40m: settleClaim settles a claim straight through, no durable
+// intermediate `doing`) or, per fan-out-parallel D18, from `blocked` (a
+// mechanical reconcile), and leaves to `delivered`
 // (approved/merged — work-item-status-delivered-retrospective-cleanup D1,
 // superseding the old direct `-> done` edge), back to `todo` (rejected,
 // with a reason — see transitionWork below), or, per pr-lifecycle D3, to
@@ -84,7 +88,7 @@ export { STATUSES };
 // came back red on main after merge — the item parks with a reason rather
 // than being silently returned to the queue or auto-rebased; a human
 // resolves it, same as any other `blocked` item, via the existing
-// `blocked -> todo`/`blocked -> doing`/`blocked -> awaiting-approval`/
+// `blocked -> todo`/`blocked -> awaiting-approval`/
 // `blocked -> delivered` doors below). It is never a re-entry point for
 // `doing` directly.
 //
@@ -106,23 +110,44 @@ const TRANSITIONS = Object.freeze([
   // the way every other human-only edge in this codebase already is: the
   // CLI verb that exposes the edge stamps `role: 'human'`, not this table.
   Object.freeze({ from: 'backlog', to: 'todo' }),
-  Object.freeze({ from: 'todo', to: 'doing' }),
+  // tsk-40m (docs/architect/doing-coordination-redesign.md, design target
+  // confirmed 2026-08-25): the direct edge settleClaim (store.mjs) now
+  // needs to settle a fresh (`todo`-preClaim) claim straight through to
+  // `awaiting-approval` with NO durable intermediate `work.move(->doing)`
+  // — the whole point of this redesign. `todo -> doing` and
+  // `blocked -> doing` (both present in an earlier round of this same
+  // item) are RETIRED, not kept: nothing durably writes INTO `doing`
+  // anymore, not even settleClaim's own settle segment — `doing` is
+  // derived purely from the active-claim overlay (D1) or read from a
+  // durable value written before this migration (D6's own accepted
+  // backward-compat fallback), never newly written. `doing -> todo` (and
+  // every other `doing -> *` edge below) stays: it is still the real door
+  // settleClaim's legacy fallback (a pre-migration item durably 'doing',
+  // no active runtime claim) settles a GENUINELY OLD durable-doing item
+  // through — this new edge is for a FRESH claim that was never durably
+  // `doing` at all.
+  Object.freeze({ from: 'todo', to: 'awaiting-approval' }),
   Object.freeze({ from: 'todo', to: 'blocked' }),
   Object.freeze({ from: 'doing', to: 'blocked' }),
   Object.freeze({ from: 'blocked', to: 'todo' }),
-  Object.freeze({ from: 'blocked', to: 'doing' }),
   Object.freeze({ from: 'blocked', to: 'awaiting-approval' }),
   Object.freeze({ from: 'blocked', to: 'delivered' }),
   Object.freeze({ from: 'doing', to: 'awaiting-approval' }),
-  // Claim release (claim-lock §3b): the clarify/decompose -> executing
-  // boundary hands a held pick claim back to `todo` the moment the item is
-  // actually ready for its executing phase (resolvePlan, after its own
-  // moveStage(...,'executing',...)) — silent, no `reason` required, mirroring
-  // `blocked -> todo`'s own no-reason shape immediately above. This is the
-  // one new status edge the design needs beyond the awaiting-human ones: a
-  // held claim was previously only ever reclaimed via `blocked` (return's
-  // reject path) or resumed via `awaiting-human`; this is the third, direct
-  // door a claim can leave `doing` through without settling the item.
+  // Claim release (claim-lock §3b): originally fired by the clarify/
+  // decompose -> executing boundary handing a held pick claim back to
+  // `todo` the moment the item was ready for its executing phase
+  // (resolvePlan's `releaseClaimOnExecuting`) — silent, no `reason`
+  // required, mirroring `blocked -> todo`'s own no-reason shape immediately
+  // above. tsk-40m D5 retired that specific trigger (a runtime claim now
+  // stays active, unreleased, straight through clarify->executing).
+  // `latestTodoReleaseTrigger` (claim-port.mjs) still reads the historical
+  // `releaseTrigger: 'claim-lock-3b'` marker off pre-migration event log
+  // entries. This edge (and every other `doing -> *` edge here) stays live
+  // ONLY for settleClaim's legacy fallback settling a genuinely
+  // pre-migration durable-`doing` item — new code must never reach it any
+  // other way (see the `todo -> awaiting-approval` edge's own comment
+  // above for why `todo -> doing`/`blocked -> doing` are retired instead
+  // of kept alongside it).
   Object.freeze({ from: 'doing', to: 'todo' }),
   // work-item-status-delivered-retrospective-cleanup D1: `delivered`
   // replaces `done` as the direct target of both close doors — RUL58's
@@ -146,13 +171,22 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'todo', to: 'awaiting-human' }),
   Object.freeze({ from: 'doing', to: 'awaiting-human' }),
   Object.freeze({ from: 'awaiting-human', to: 'todo' }),
-  // Claim-lock resume (str-clarify-decompose-claim-lock §5.1): a claim held
-  // at ask-time (`doing`) must resume to `doing`, not fall to a claimless
-  // `todo` — otherwise answering a gate mid-clarify/decompose silently drops
-  // the pick claim. store.mjs's answerAwaiting picks the resume target from
-  // the ask-time snapshot (`statusAtAsk`); this edge is what makes `doing`
-  // a legal one, alongside the existing `todo` resume above.
-  Object.freeze({ from: 'awaiting-human', to: 'doing' }),
+  // Claim-lock resume (str-clarify-decompose-claim-lock §5.1), tsk-40m P1
+  // fix + hard-cut RETIRED this edge entirely (docs/architect/doing-
+  // coordination-redesign.md): a claim active at ask-time now resumes via
+  // the `todo` edge above instead (its own preClaimStatus matches durable
+  // status again, so buildEffectiveView's overlay shows 'doing' again on
+  // its own — no durable write of 'doing' anywhere), and `putInAwaiting`
+  // durably settles a claimed item DIRECTLY from its preClaimStatus into
+  // `awaiting-human` (via settleClaim), releasing the claim in that same
+  // write — never leaving one to silently resume through this edge later.
+  // A genuinely legacy pre-migration item whose durable status really was
+  // 'doing' at ask-time can still ENTER awaiting-human (the `doing ->
+  // awaiting-human` edge below stays) but never resumes back to 'doing' —
+  // answerAwaiting clamps that case to `todo` (store.mjs's own comment),
+  // matching the hard-cut discipline every other retired `-> doing` edge
+  // in this table follows: nothing durably writes INTO `doing`, ever,
+  // full stop, not even for old data.
   // fsm-wontfix-terminal-status D1/D3: three doors into the second
   // terminal state, zero doors out (see header comment above).
   Object.freeze({ from: 'blocked', to: 'wontfix' }),

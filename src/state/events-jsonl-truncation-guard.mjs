@@ -30,6 +30,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { execFileSync } from "node:child_process";
+import { recordMainCheckoutGuardWarning } from "./main-checkout-guard-warnings.mjs";
+import { resolveFgosFile, FGOS_FILE } from "./fgos-file-registry.mjs";
 
 function lastNonEmptyLine(raw) {
   const lines = raw.split("\n");
@@ -135,33 +138,57 @@ export function checkTruncationGuard(raw, storedMark) {
   return { ok: true, reason: "clean", message: `mark still holds at seq ${storedMark.seq}, tip now at seq ${currentMark.seq}`, mark: currentMark };
 }
 
-/** Read the persisted mark from `guardPath`. Missing, unreadable, or
- * malformed sidecar is treated as bootstrap (`null`), never a hard
- * failure -- matches `checkContiguity`'s "never throws on the expected
- * finding" posture; a lost/corrupt sidecar is itself a legitimate reason
- * to re-bootstrap from the current tip rather than crash `fgos doctor`. */
-export function readGuardMark(guardPath) {
+/**
+ * Tầng A/T5 (TA-D10): the sidecar now holds a MAP `{fileName -> {seq,
+ * hash}}` instead of a single `{seq, hash}` object -- one entry per
+ * tracked file (baseline-0's own basename `"events.jsonl"`, or
+ * `"events/<writer file name>"` for a per-writer file), since a
+ * truncation on one writer's file must never be confused with, or hide
+ * behind, another writer's own mark. Still one gitignored sidecar per
+ * `.fgos/` dir (unchanged path/name) -- only its on-disk SHAPE changed.
+ * `readGuardMarks`/`writeGuardMarks` own that shape; every other function
+ * below narrows to one entry by `fileKey`.
+ */
+export function readGuardMarks(guardPath) {
   let raw;
   try {
     raw = fs.readFileSync(guardPath, "utf8");
   } catch {
-    return null;
+    return {};
   }
   try {
     const parsed = JSON.parse(raw);
-    if (typeof parsed.seq === "number" && typeof parsed.hash === "string") return parsed;
-    return null;
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
   } catch {
-    return null;
+    return {};
   }
 }
 
-/** Persist `mark` to `guardPath`. `mark === null` (an empty/legacy log)
- * writes nothing -- there is no mark yet to advance to. */
-export function writeGuardMark(guardPath, mark) {
-  if (mark === null) return;
+/** Persist the WHOLE marks map to `guardPath`. */
+export function writeGuardMarks(guardPath, marks) {
   fs.mkdirSync(path.dirname(guardPath), { recursive: true });
-  fs.writeFileSync(guardPath, `${JSON.stringify(mark)}\n`, "utf8");
+  fs.writeFileSync(guardPath, `${JSON.stringify(marks)}\n`, "utf8");
+}
+
+/** Read one file's persisted mark from the shared sidecar map. Missing
+ * sidecar, missing entry, unreadable, or malformed content is treated as
+ * bootstrap (`null`), never a hard failure -- matches `checkContiguity`'s
+ * "never throws on the expected finding" posture; a lost/corrupt sidecar
+ * is itself a legitimate reason to re-bootstrap from the current tip
+ * rather than crash `fgos doctor`. */
+export function readGuardMark(guardPath, fileKey) {
+  const mark = readGuardMarks(guardPath)[fileKey];
+  return mark && typeof mark.seq === "number" && typeof mark.hash === "string" ? mark : null;
+}
+
+/** Persist `mark` under `fileKey` in the shared sidecar map, leaving every
+ * other file's own entry untouched. `mark === null` (an empty/legacy log)
+ * writes nothing -- there is no mark yet to advance to. */
+export function writeGuardMark(guardPath, fileKey, mark) {
+  if (mark === null) return;
+  const marks = readGuardMarks(guardPath);
+  marks[fileKey] = mark;
+  writeGuardMarks(guardPath, marks);
 }
 
 /** Read-only: run `checkTruncationGuard` against real files on disk,
@@ -169,10 +196,13 @@ export function writeGuardMark(guardPath, mark) {
  * `checkEventsJsonlContiguity`'s own precedent (a report that races a
  * concurrent append at worst reads a slightly stale snapshot, never a
  * torn/corrupt one; `appendEvent`'s own lock still protects the file
- * itself from a torn write). */
-export function checkEventsJsonlTruncationGuard(logPath, guardPath) {
+ * itself from a torn write). `fileKey` defaults to `logPath`'s own
+ * basename -- byte-identical to the pre-T5 single-file behavior for any
+ * caller that never passes it (e.g. the CLI wrapper, always called
+ * against baseline-0). */
+export function checkEventsJsonlTruncationGuard(logPath, guardPath, fileKey = path.basename(logPath)) {
   const raw = fs.existsSync(logPath) ? fs.readFileSync(logPath, "utf8") : "";
-  const storedMark = readGuardMark(guardPath);
+  const storedMark = readGuardMark(guardPath, fileKey);
   return checkTruncationGuard(raw, storedMark);
 }
 
@@ -181,11 +211,270 @@ export function checkEventsJsonlTruncationGuard(logPath, guardPath) {
  * tip -- this IS the mechanism (an external mark that only a clean check
  * ever gets to move). Never advances the mark on a break, so the failing
  * mark stays pointed at the last known-good position for whoever
- * investigates. */
-export function advanceEventsJsonlTruncationGuard(logPath, guardPath) {
-  const report = checkEventsJsonlTruncationGuard(logPath, guardPath);
+ * investigates. Same `fileKey` default as `checkEventsJsonlTruncationGuard`. */
+export function advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey = path.basename(logPath)) {
+  const report = checkEventsJsonlTruncationGuard(logPath, guardPath, fileKey);
   if (report.ok && report.mark !== null) {
-    writeGuardMark(guardPath, report.mark);
+    writeGuardMark(guardPath, fileKey, report.mark);
   }
   return report;
 }
+
+/**
+ * Tầng A/T5 (TA-D10): every file the guard/checkpoint machinery tracks --
+ * baseline-0 (`${fgosDir}/events.jsonl`, always listed, tagged with the
+ * `fileKey` `"events.jsonl"` even if it does not physically exist yet) plus
+ * every `*.jsonl` file directly under `${fgosDir}/events/` (non-recursive,
+ * so a future `archive/` there is structurally never included), tagged
+ * `"events/<name>"`. Mirrors `discoverEventFilePaths` in replay.mjs (T3/T4)
+ * -- a separate copy here on purpose: this module is `kernel` tier and may
+ * not import from `src/state/replay.mjs` (one-way-down layering).
+ */
+function discoverGuardedFiles(fgosDir) {
+  const result = [{ fileKey: "events.jsonl", logPath: path.join(fgosDir, "events.jsonl") }];
+  const eventsDirPath = path.join(fgosDir, "events");
+  let names = [];
+  try {
+    names = fs
+      .readdirSync(eventsDirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".jsonl"))
+      .map((entry) => entry.name);
+  } catch (err) {
+    if (err.code !== "ENOENT") throw err;
+  }
+  for (const name of names) {
+    result.push({ fileKey: `events/${name}`, logPath: path.join(eventsDirPath, name) });
+  }
+  return result;
+}
+
+export const DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC = 3600; // 3600 seconds (1 hour) fallback interval
+
+/** The single-file core `getUncommittedEventCount` (below) sums over every
+ * discovered file. Returns 0 if `logPath` does not exist. */
+function getUncommittedEventCountForFile(logPath, repoRoot) {
+  if (!fs.existsSync(logPath)) return 0;
+  const relPath = path.relative(repoRoot, logPath) || ".fgos/events.jsonl";
+  let diskLines = 0;
+  try {
+    const rawDisk = fs.readFileSync(logPath, "utf8");
+    diskLines = rawDisk.split("\n").filter((l) => l.trim() !== "").length;
+  } catch {
+    return 0;
+  }
+
+  let committedLines = 0;
+  try {
+    const rawCommitted = execFileSync("git", ["show", `HEAD:${relPath}`], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    committedLines = rawCommitted.split("\n").filter((l) => l.trim() !== "").length;
+  } catch {
+    committedLines = 0;
+  }
+
+  return Math.max(0, diskLines - committedLines);
+}
+
+/**
+ * Calculates the number of uncommitted appended events across baseline-0
+ * AND every per-writer file under `.fgos/events/` (TA-D10) relative to git
+ * HEAD, summed. `fgosDir` is the `.fgos` directory (not a single log path
+ * -- pre-T5 this function took `logPath` directly; there were no callers
+ * outside this module to preserve compat for). Returns 0 for a dir with no
+ * baseline and no `events/` files at all.
+ */
+export function getUncommittedEventCount(fgosDir, repoRoot) {
+  let total = 0;
+  for (const { logPath } of discoverGuardedFiles(fgosDir)) {
+    total += getUncommittedEventCountForFile(logPath, repoRoot);
+  }
+  return total;
+}
+
+/**
+ * Runs opportunistic checks immediately after main checkout lock acquisition:
+ * D1: Advance truncation guard and record warning on break; refuse mark advancement & fallback commit on break (never throws/blocks).
+ * D2: Fallback auto-commit of .fgos/events.jsonl and .fgos/events/ if dirty after fallbackIntervalSec (default 3600s, never throws/blocks).
+ *
+ * @param {string} dir - .fgos directory or repo root
+ * @param {string} [repoRoot] - optional repository root (defaults to parent of dir if dir is .fgos)
+ * @param {Object} [opts] - optional options for testing
+ * @param {number} [opts.nowSec] - mock current timestamp (unix seconds)
+ * @param {number} [opts.fallbackIntervalSec] - override fallback threshold seconds (default 3600)
+ * @param {string} [opts.rawLog] - mock raw log text for testing
+ * @param {Object} [opts.commitEnv] - extra env vars merged onto the fallback
+ *   checkpoint's own `git commit` call (tsk-32v).
+ */
+export function runOpportunisticMainCheckoutChecks(
+  dir,
+  repoRoot = null,
+  {
+    nowSec = null,
+    fallbackIntervalSec = null,
+    rawLog = null,
+    commitEnv = null,
+  } = {}
+) {
+  if (process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS === "1") return;
+  const fgosDir = path.basename(dir) === ".fgos" ? dir : path.join(dir, ".fgos");
+  const realRepoRoot = repoRoot || (path.basename(dir) === ".fgos" ? path.dirname(dir) : dir);
+
+  let breakFlagged = false;
+
+  // D1: Detect and warn, per tracked file (TA-D10: baseline-0 AND every
+  // per-writer file under .fgos/events/). Refuse mark advancement /
+  // fallback commit on ANY file's break -- a break on one writer's file is
+  // just as real a truncation as one on baseline-0.
+  try {
+    const guardPath = resolveFgosFile(fgosDir, FGOS_FILE.GUARD_MARK);
+    if (rawLog !== null) {
+      // Test-injection path (existing `rawLog` override): scoped to
+      // baseline-0 only, byte-identical to before T5 -- callers using this
+      // override are simulating a single log's raw text directly, not a
+      // whole directory.
+      const fileKey = "events.jsonl";
+      const storedMark = readGuardMark(guardPath, fileKey);
+      const report = checkTruncationGuard(rawLog, storedMark);
+      if (report.ok && report.mark !== null) {
+        writeGuardMark(guardPath, fileKey, report.mark);
+      } else if (!report.ok) {
+        recordMainCheckoutGuardWarning(fgosDir, { ...report, file: fileKey });
+        breakFlagged = true;
+      }
+    } else {
+      for (const { fileKey, logPath } of discoverGuardedFiles(fgosDir)) {
+        if (!fs.existsSync(logPath)) continue;
+        const report = advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey);
+        if (report && report.ok === false) {
+          recordMainCheckoutGuardWarning(fgosDir, { ...report, file: fileKey });
+          breakFlagged = true;
+        }
+      }
+    }
+  } catch {
+    // Non-blocking: swallow error
+  }
+
+  // D1 Fail-closed: refuse fallback auto-commit when an unacknowledged break is flagged
+  if (breakFlagged) return;
+
+  // D2: Fallback auto-commit for quiet periods without merges.
+  try {
+    const logPath = path.join(fgosDir, "events.jsonl");
+    const eventsDirPath = path.join(fgosDir, "events");
+    const pathspecs = [];
+    if (fs.existsSync(logPath)) {
+      pathspecs.push(path.relative(realRepoRoot, logPath) || ".fgos/events.jsonl");
+    }
+    if (fs.existsSync(eventsDirPath)) {
+      pathspecs.push(path.relative(realRepoRoot, eventsDirPath));
+    }
+    if (pathspecs.length > 0) {
+      const statusOut = execFileSync("git", ["status", "--porcelain", "--", ...pathspecs], {
+        cwd: realRepoRoot,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }).trim();
+
+      if (statusOut.length > 0) {
+        let lastCommitSec = null;
+        try {
+          const logOut = execFileSync("git", ["log", "-1", "--format=%ct", "--", ...pathspecs], {
+            cwd: realRepoRoot,
+            encoding: "utf8",
+            stdio: ["ignore", "pipe", "ignore"],
+          }).trim();
+          if (logOut) {
+            const parsed = parseInt(logOut, 10);
+            if (!Number.isNaN(parsed)) {
+              lastCommitSec = parsed;
+            }
+          }
+        } catch {
+          lastCommitSec = null;
+        }
+
+        let oldestDirtySec = null;
+        for (const spec of pathspecs) {
+          const fullPath = path.resolve(realRepoRoot, spec);
+          try {
+            const stat = fs.statSync(fullPath);
+            if (stat.isDirectory()) {
+              const entries = fs.readdirSync(fullPath, { withFileTypes: true });
+              for (const entry of entries) {
+                if (entry.isFile()) {
+                  const fileStat = fs.statSync(path.join(fullPath, entry.name));
+                  const mtimeSec = Math.floor(fileStat.mtimeMs / 1000);
+                  if (oldestDirtySec === null || mtimeSec < oldestDirtySec) {
+                    oldestDirtySec = mtimeSec;
+                  }
+                }
+              }
+            } else if (stat.isFile()) {
+              const mtimeSec = Math.floor(stat.mtimeMs / 1000);
+              if (oldestDirtySec === null || mtimeSec < oldestDirtySec) {
+                oldestDirtySec = mtimeSec;
+              }
+            }
+          } catch {
+            // ignore
+          }
+        }
+
+        let configFallbackIntervalSec = null;
+        try {
+          const sharedConfigPath = path.join(realRepoRoot, ".fgos", "config.json");
+          if (fs.existsSync(sharedConfigPath)) {
+            const cfg = JSON.parse(fs.readFileSync(sharedConfigPath, "utf8"));
+            configFallbackIntervalSec = cfg?.checkpoint?.fallbackIntervalSec;
+          }
+        } catch {
+          // ignore
+        }
+
+        const effectiveFallbackIntervalSec =
+          fallbackIntervalSec !== null
+            ? fallbackIntervalSec
+            : typeof configFallbackIntervalSec === "number"
+            ? configFallbackIntervalSec
+            : DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC;
+
+        const currentTimeSec = nowSec !== null ? nowSec : Math.floor(Date.now() / 1000);
+        const refSec = lastCommitSec !== null ? lastCommitSec : oldestDirtySec;
+
+        const fallbackIntervalMet =
+          effectiveFallbackIntervalSec !== null &&
+          refSec !== null &&
+          currentTimeSec - refSec >= effectiveFallbackIntervalSec;
+
+        if (fallbackIntervalMet) {
+          execFileSync("git", ["add", ...pathspecs], {
+            cwd: realRepoRoot,
+            stdio: ["ignore", "pipe", "ignore"],
+          });
+          try {
+            execFileSync("git", ["commit", "-m", "chore(.fgos): fallback events checkpoint", "--", ...pathspecs], {
+              cwd: realRepoRoot,
+              stdio: ["ignore", "pipe", "ignore"],
+              ...(commitEnv ? { env: { ...process.env, ...commitEnv } } : {}),
+            });
+          } catch (commitErr) {
+            try {
+              execFileSync("git", ["reset", "--", ...pathspecs], { cwd: realRepoRoot, stdio: ["ignore", "pipe", "ignore"] });
+            } catch {
+              // best-effort
+            }
+            throw commitErr;
+          }
+        }
+      }
+    }
+  } catch {
+    // Non-blocking: swallow error
+  }
+}
+
+

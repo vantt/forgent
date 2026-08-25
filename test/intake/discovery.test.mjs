@@ -6,9 +6,10 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { resolveDiscovery, RETIRED_P14_PLACEHOLDER, FALLBACK_VERIFY, classificationPatchFromVerdict, assertCallerClassification } from '../../src/intake/discovery.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
-import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove } from '../../src/state/store.mjs';
+import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove, readRawEvents } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
 import { createWorktree } from '../../src/runner/worktree.mjs';
+import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 
 // tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
 // `judgeDiscovery` (a nested `claude -p` subprocess) is retired. This file
@@ -465,7 +466,7 @@ test('resolveDiscovery on a caller-supplied unclear verdict stamps statusAtAsk f
 test('resolveDiscovery on a caller-supplied unclear verdict stamps statusAtAsk "doing" when a pick claim is held through clarify (claim-lock §1/§5.1)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
+  acquireClaim(storeDir, { id: 'item-x', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
 
   resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe client needs a concrete endpoint to call.\n\n## Why this matters\n\nThis directly affects the outcome: Which endpoint?' });
   const view = listWork(storeDir);
@@ -569,7 +570,11 @@ test('resolveDiscovery writes EXACTLY ONE work.edit event carrying priority per 
 
   resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true, verify: 'npm test -- discovered' });
 
-  const events = readEvents(path.join(storeDir, 'events.jsonl'));
+  // Tầng A/T2 (TA-D2/TA-D12): the priority-write pass's own `editWork` call
+  // lands in the new per-writer file under `<storeDir>/events/`, not
+  // baseline-0's `events.jsonl` -- readRawEvents(storeDir) is the one door
+  // that reads both (dedup'd, in TA-D7 total order).
+  const events = readRawEvents(storeDir);
   const priorityEdits = events.filter(
     (e) => e.type === 'work.edit' && e.payload?.id === 'item-x' && e.payload?.patch?.priority !== undefined,
   );

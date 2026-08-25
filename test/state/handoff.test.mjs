@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { evaluateHandoff } from '../../src/state/handoff.mjs';
-import { DOMAINS, roleGraphFor, legalCallEdges } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, roleGraphFor, legalCallEdges, workerContractFor } from '../../src/state/workflow-stage-graphs.mjs';
 
 const coding = DOMAINS.coding;
 const synthetic = DOMAINS.synthetic;
@@ -9,6 +9,15 @@ const synthetic = DOMAINS.synthetic;
 test('roleGraphFor: coding declares one, synthetic does not', () => {
   assert.ok(roleGraphFor(coding));
   assert.equal(roleGraphFor(synthetic), undefined);
+});
+
+test('workerContractFor: coding declares one, synthetic does not', () => {
+  assert.equal(workerContractFor(coding), '.agents/skills/_shared/coding-worker-contract.md');
+  assert.equal(workerContractFor(synthetic), undefined);
+});
+
+test('workerContractFor: undefined domain does not throw', () => {
+  assert.equal(workerContractFor(undefined), undefined);
 });
 
 test('legalCallEdges: empty for a domain with no roleGraph', () => {
@@ -35,7 +44,7 @@ test('discovery declares ONLY consult -- no advise, since discovery never asks a
     domain: coding,
     stage: 'discovery',
     fromRole: 'implementer',
-    toRole: 'human-advisor',
+    toRole: 'advisor',
     reason: 'advise',
   });
   assert.equal(result.ok, false);
@@ -108,7 +117,7 @@ test('nested async call under the cap succeeds, at the cap is refused', () => {
     domain: coding,
     stage: 'executing',
     fromRole: 'reviewer',
-    toRole: 'human-advisor',
+    toRole: 'advisor',
     reason: 'advise',
     openCallDepth: 2,
   });
@@ -118,7 +127,7 @@ test('nested async call under the cap succeeds, at the cap is refused', () => {
     domain: coding,
     stage: 'executing',
     fromRole: 'reviewer',
-    toRole: 'human-advisor',
+    toRole: 'advisor',
     reason: 'advise',
     openCallDepth: 3,
   });
@@ -126,7 +135,7 @@ test('nested async call under the cap succeeds, at the cap is refused', () => {
   assert.match(atCap.refusal, /callstack cap/);
 });
 
-test('sync call has no callstack cap applied', () => {
+test('sync call has no async callstack cap applied', () => {
   const result = evaluateHandoff({
     domain: coding,
     stage: 'executing',
@@ -134,6 +143,41 @@ test('sync call has no callstack cap applied', () => {
     toRole: 'researcher',
     reason: 'consult',
     openCallDepth: 999,
+  });
+  assert.equal(result.ok, true);
+});
+
+test('nested sync call under the cap succeeds, at the cap is refused (D25/D28)', () => {
+  const under = evaluateHandoff({
+    domain: coding,
+    stage: 'executing',
+    fromRole: 'implementer',
+    toRole: 'researcher',
+    reason: 'consult',
+    openSyncDepth: 2,
+  });
+  assert.equal(under.ok, true);
+
+  const atCap = evaluateHandoff({
+    domain: coding,
+    stage: 'executing',
+    fromRole: 'implementer',
+    toRole: 'researcher',
+    reason: 'consult',
+    openSyncDepth: 3,
+  });
+  assert.equal(atCap.ok, false);
+  assert.match(atCap.refusal, /callstack cap/);
+});
+
+test('async call has no sync callstack cap applied (openSyncDepth ignored)', () => {
+  const result = evaluateHandoff({
+    domain: coding,
+    stage: 'executing',
+    fromRole: 'implementer',
+    toRole: 'reviewer',
+    reason: 'review',
+    openSyncDepth: 999,
   });
   assert.equal(result.ok, true);
 });

@@ -2,6 +2,7 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+import { appendEvent } from '../../src/state/events.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -62,6 +63,7 @@ import {
   makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStage,
+  moveToDurableDoingForTest,
   moveWork,
   os,
   path,
@@ -104,6 +106,11 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   const data = envelopeData(result.stdout);
   assert.equal(data.to, 'awaiting-approval');
   assert.equal(data.passed, true);
+  // tsk-40m code-review finding (blocker): settleClaim's own return value
+  // used to nest {event, view} one level too deep -- event.seq read
+  // `undefined` here, silently dropping the audit seq from the CLI's own
+  // output for every claim-tracked return.
+  assert.equal(typeof data.seq, 'number', 'the CLI output must carry the real event seq, not undefined');
 
   const view = stateView(cwd);
   assert.equal(view.work['pull-return-ok'].status, 'awaiting-approval');
@@ -113,6 +120,7 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   assert.equal(view.work['pull-return-ok'].headAtReturn, headAtReturn, 'pr-lifecycle D3/D4: return records HEAD at green-return time, mirroring headAtTake at claim time');
   assert.equal('settlements' in view, false, 'doing -> awaiting-approval never settles (D4: settlement belongs to the -> done edge)');
 });
+
 
 test('return (verify passes, main-source): a live main-checkout.lock recorded under THIS session\'s own identity is released early, instead of waiting out the TTL (tsk-45z D1/D2)', () => {
   const cwd = initGitCwd();
@@ -131,6 +139,7 @@ test('return (verify passes, main-source): a live main-checkout.lock recorded un
   assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock once verify passes and the item settles to proposed');
 });
 
+
 test('return (verify FAILS, main-source): a live own-identity lock is released too — settling to blocked is just as much "done with the checkout" as proposed (tsk-45z D1/D2)', () => {
   const cwd = initGitCwd();
   const sessionId = 'tsk-45z-test-session-blocked';
@@ -147,6 +156,7 @@ test('return (verify FAILS, main-source): a live own-identity lock is released t
   assert.equal(envelopeData(result.stdout).to, 'blocked');
   assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock even when verify fails and the item settles to blocked');
 });
+
 
 test('return (main-source) never touches a DIFFERENT session\'s live lock — never a blind unlink (tsk-45z D2)', () => {
   const cwd = initGitCwd();
@@ -165,6 +175,7 @@ test('return (main-source) never touches a DIFFERENT session\'s live lock — ne
   assert.equal(JSON.parse(fs.readFileSync(lockPath, 'utf8')).pid, 'tsk-45z-a-different-live-session');
 });
 
+
 test('return: a changed sensitive file outside the item\'s footprint surfaces a frozenJudgeHits advisory, and never blocks the return', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -181,6 +192,7 @@ test('return: a changed sensitive file outside the item\'s footprint surfaces a 
   assert.deepEqual(data.frozenJudgeHits, [{ file: 'package.json', rule: 'package manifest' }]);
 });
 
+
 test('return: a changed sensitive file DECLARED in the item\'s footprint is not a hit', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -195,6 +207,7 @@ test('return: a changed sensitive file DECLARED in the item\'s footprint is not 
   assert.equal(data.passed, true);
   assert.deepEqual(data.frozenJudgeHits, []);
 });
+
 
 // --- tsk-4hl (post-tsk-2ig independent review): footprintDiffHits wired
 // into `return` next to frozenJudgeHits -- broader (any changed file
@@ -222,6 +235,7 @@ test('return: a changed file outside the item\'s footprint surfaces a footprintD
   assert.ok(data.footprintDiffHits.some((hit) => hit.file === 'random-outside.txt'));
 });
 
+
 test('return: footprintDiffHits is empty when the item declares NO footprint at all (D5 absent-footprint exemption, same as footprintDiffHits\' own unit tests)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -234,6 +248,7 @@ test('return: footprintDiffHits is empty when the item declares NO footprint at 
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.deepEqual(envelopeData(result.stdout).footprintDiffHits, []);
 });
+
 
 test('return: a .fgos/* change bundled into the item\'s own commit (git add -A sweeping in take\'s own event-log write) is exempt from footprintDiffHits (tsk-x5r self-exempt)', () => {
   const cwd = initGitCwd();
@@ -269,6 +284,51 @@ test('return: a .fgos/* change bundled into the item\'s own commit (git add -A s
   assert.deepEqual(data.footprintDiffHits, [], 'a .fgos/* change bundled into the item\'s own commit must never be flagged');
 });
 
+// tsk-3tp-1 (D2): the fallback checkpoint's own sidecar mark
+// (events-jsonl.truncation-guard.json) and warnings log
+// (main-checkout-guard-warnings.jsonl) are the same kind of no-item-owns-it
+// noise as events.jsonl itself -- an item bundling either one alongside its
+// own real work (a concurrent fallback firing mid-session, same as
+// events.jsonl above) must never be flagged either. Also covers tsk-vim's
+// own narrower regression (a .gitignore predating that project's own
+// exclusion could still commit this file alongside real work) via the same
+// force-add.
+test('return: .fgos/events-jsonl.truncation-guard.json and .fgos/main-checkout-guard-warnings.jsonl changes bundled into the item\'s own commit are exempt from footprintDiffHits, same as events.jsonl (tsk-3tp-1, tsk-vim)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  execFileSync('git', ['add', '-A'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'bootstrap .fgos/'], { cwd });
+  const id = 'pull-return-guard-files-exempt';
+  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', id]).status, 0);
+  fs.writeFileSync(path.join(cwd, '.fgos', 'events-jsonl.truncation-guard.json'), JSON.stringify({ seq: 1, hash: 'abc' }));
+  fs.mkdirSync(path.join(cwd, '.fgos', 'logs'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'logs', 'main-checkout-guard-warnings.jsonl'), '{"kind":"truncation-break"}\n');
+  // -f: both files sit under paths this fixture's own .gitignore (initGitCwd)
+  // now excludes -- events-jsonl.truncation-guard.json individually, and
+  // main-checkout-guard-warnings.jsonl since phase-01
+  // (plans/260825-0842-fgos-logs-dir-bucketing) moved it under the
+  // gitignored .fgos/logs/ bucket -- so a plain `git add -A` would never
+  // even stage either, which would make this test pass trivially without
+  // ever exercising FGOS_NOISE_ONLY_PATHS at all. Force-adding both here
+  // reproduces the one real scenario where the regex still matters: a
+  // branch/checkout whose .gitignore predates these exclusions (or another
+  // fgOS-adopting project that never added them) can still end up with
+  // these files committed alongside real work.
+  execFileSync('git', ['add', '-f', '.fgos/events-jsonl.truncation-guard.json', '.fgos/logs/main-checkout-guard-warnings.jsonl'], { cwd });
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', id]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.passed, true);
+  assert.deepEqual(
+    data.footprintDiffHits,
+    [],
+    'the truncation-guard sidecar and warnings-log files must never be flagged, same as events.jsonl',
+  );
+});
+
 // tsk-5iv D2 (round-3 review, MEDIUM): the original tsk-x5r exemption was a
 // blanket `.fgos/**` match, which also swallowed hand-edited policy files
 // (.fgos/config.json, .fgos/gate-bypass.json) that real items DO
@@ -300,6 +360,7 @@ test('return: a .fgos/gate-bypass.json change bundled into the item\'s own commi
   );
 });
 
+
 test('return: the item\'s own docs/history/<id>/iron-law-evidence.md is exempt from footprintDiffHits (tsk-4hl self-exempt, avoids self-flagging every Iron-Law-gated item)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -323,6 +384,40 @@ test('return: the item\'s own docs/history/<id>/iron-law-evidence.md is exempt f
   assert.ok(data.footprintDiffHits.some((hit) => hit.file === 'random-outside.txt'), 'random-outside.txt must still be flagged');
 });
 
+test('return: the item\'s own docs/history/<feature>/RESEARCH.md (via docsRef) is exempt from footprintDiffHits (tsk-67o)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  const id = 'pull-return-research-exempt';
+  const docsRef = 'docs/history/some-feature-slug';
+  assert.equal(
+    run(cwd, [
+      'add', id,
+      '--title', 'X',
+      '--kind', 'task',
+      '--risk', 'light',
+      '--verify', 'test -f proof.txt',
+      '--footprint', 'proof.txt',
+      '--docs-ref', docsRef,
+      '--description', 'tsk-67o fixture description.',
+    ]).status,
+    0,
+  );
+  assert.equal(run(cwd, ['take', '--id', id]).status, 0);
+  commitFile(cwd, 'proof.txt');
+  fs.mkdirSync(path.join(cwd, docsRef), { recursive: true });
+  commitFile(cwd, `${docsRef}/RESEARCH.md`, '# research findings\n');
+  commitFile(cwd, 'random-outside.txt', 'not sensitive\n');
+
+  const result = run(cwd, ['return', id]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.ok(
+    !data.footprintDiffHits.some((hit) => hit.file === `${docsRef}/RESEARCH.md`),
+    'the research doc under docsRef must never appear in footprintDiffHits',
+  );
+  assert.ok(data.footprintDiffHits.some((hit) => hit.file === 'random-outside.txt'), 'random-outside.txt must still be flagged');
+});
+
 test('return refuses a dirty working tree (uncommitted changes) as validation, exit 4, item stays doing', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -341,6 +436,7 @@ test('return refuses a dirty working tree (uncommitted changes) as validation, e
   assert.equal(stateView(cwd).work['pull-return-dirty'].status, 'doing');
 });
 
+
 test('return succeeds when a dirty file on cwd is UNRELATED to the item\'s own committed progress (tsk-598 D1/D2) — own-file-set scoping, not a whole-tree gate', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -358,6 +454,7 @@ test('return succeeds when a dirty file on cwd is UNRELATED to the item\'s own c
   assert.equal(stateView(cwd).work['pull-return-unrelated-dirty'].status, 'awaiting-approval');
   assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated uncommitted work\n', 'the unrelated dirty file must be left untouched, still uncommitted');
 });
+
 
 test('return still refuses when the SAME path the item committed is dirty again — a real conflict, tsk-598 D2, exit 4, item stays doing', () => {
   const cwd = initGitCwd();
@@ -407,15 +504,26 @@ test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own
   execFileSync('git', ['add', 'proof.txt'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd });
 
-  // `.fgos/` has never had a tracked file inside it in this fixture, so git
-  // reports it collapsed as a single untracked directory ("?? .fgos/")
-  // rather than listing events.jsonl individually — either shape must still
-  // count as "only .fgos/ dirty" for the exclusion below.
+  // `.fgos/` may collapse into a single untracked-directory line
+  // ("?? .fgos/") when nothing inside it is tracked yet, OR — since
+  // tsk-3ve's periodic-checkpoint-commit (T5) now bootstrap-commits the
+  // initial per-writer events shard on its own schedule — show one line
+  // per still-dirty path inside `.fgos/` once that shard exists (an "M"
+  // for the shard itself alongside "??" for anything not yet committed,
+  // e.g. coexistence.json). Either shape must still count as "only
+  // .fgos/ dirty" for the exclusion below: assert every line is under
+  // `.fgos/`, never a fixed line count.
   const statusLines = execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' })
     .split('\n')
     .filter(Boolean);
-  assert.equal(statusLines.length, 1, 'sanity: .fgos/ must be the ONLY dirty path at this point');
-  assert.match(statusLines[0], /\.fgos\/?$/);
+  assert.ok(statusLines.length >= 1, 'sanity: .fgos/ must be dirty at this point');
+  for (const line of statusLines) {
+    const changedPath = line.slice(3);
+    assert.ok(
+      changedPath === '.fgos' || changedPath.startsWith('.fgos/'),
+      `sanity: every dirty path must be under .fgos/, got: ${line}`,
+    );
+  }
 
   const result = run(cwd, ['return', 'pull-return-fgos-only-dirty']);
   assert.equal(result.status, 0, `return should succeed with only .fgos/ dirty: ${result.stderr}`);
@@ -622,8 +730,7 @@ test('return on an item claimed by the runner (claimRole "runner", no headAtTake
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-runner-claim');
-  const dir = path.join(cwd, '.fgos');
-  moveWork(dir, { id: 'pull-return-runner-claim', to: 'doing', expectedStatus: 'todo', role: 'runner' });
+  moveToDurableDoingForTest(cwd, 'pull-return-runner-claim', 'todo', { role: 'runner' });
 
   const result = run(cwd, ['return', 'pull-return-runner-claim']);
   assert.equal(result.status, 4);
@@ -759,6 +866,17 @@ test('reject moves awaiting-approval -> todo with the reason recorded, role huma
   assert.equal(lastEvent.payload.role, 'human');
 });
 
+// tsk-26r note: this one test was found deterministically failing on a
+// clean checkout, independent of any change tsk-26r made — confirmed by
+// bisecting with `git stash` (the same mismatch reproduces byte-for-byte
+// with tsk-26r's own diff removed). Not this repo's own flake in the usual
+// sense (it fails the same way every run, not intermittently) — looks like
+// an environment-specific git-hash assumption this single test carries.
+// Any OTHER item that scopes its own `--verify` to a --test-name-pattern
+// over this file should exclude this one test by name rather than assume
+// the whole file is green; tsk-26r's own verify uses pattern
+// "branch-source", which this test's title never matches, for exactly
+// this reason.
 test('return succeeds after a FIRST pick (todo -> doing, no prior blocked branch) once real work is committed on the fresh fgw/<id> worktree — a fresh pick claim records branchHeadAtTake exactly like a blocked reclaim does, so return recognizes the branch\'s own progress instead of checking the (unchanged) main checkout', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -822,6 +940,33 @@ test('return on a branch-source take: verify passes in a disposable detached wor
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
 });
 
+test('return on a branch-source take: the disposable detached verify worktree never carries a checked-out .fgos/ (ADR0020, tsk-26r — same strip createWorktree already does, applied to return\'s own ephemeral tmpWorktree)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // `.fgos/` is git-tracked in this repo (state.json excepted) — by the time
+  // makeBlockedBranchItem's own commitPending runs, .fgos/config.json,
+  // .fgos/coexistence.json, and .fgos/events.jsonl are all committed on
+  // main, so the branch this item takes from carries a real checked-out
+  // .fgos/ snapshot too. The item's own verify command is the probe: it can
+  // only pass if the ephemeral worktree return checks it out into has
+  // already had that snapshot stripped, exactly like createWorktree's own
+  // worker worktrees never carry one.
+  makeBlockedBranchItem(cwd, 'branch-return-no-fgos', { verify: 'test ! -e .fgos' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-no-fgos']).status, 0);
+  commitPending(cwd, 'state: take branch-return-no-fgos');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-no-fgos']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['return', 'branch-return-no-fgos']);
+  assert.equal(result.status, 0, `return failed — pre-fix, verify runs inside a tmpWorktree that still carries a checked-out .fgos/, so 'test ! -e .fgos' fails and this item is blocked instead of returned: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+  assert.equal(stateView(cwd).work['branch-return-no-fgos'].status, 'awaiting-approval');
+});
+
 test('return on a branch-source take whose branch declares a real npm dependency: verify passes because the disposable detached worktree gets its own node_modules provisioned first (tsk-2vd — reproduces the real failure that blocked tsk-32n\'s own return)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -855,8 +1000,14 @@ test('return on a branch-source take whose branch declares a real npm dependency
 test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
+  // tsk-40m: settleClaim now verifies the settling caller is the SAME
+  // session that acquired the claim (writer-identity check) — take and
+  // return must share the SAME FGOS_SESSION_ID for this test's own actor
+  // to legitimately be the one returning it. Orthogonal to what this test
+  // actually asserts (the pre-existing main-checkout.lock below, recorded
+  // under the SAME identity for a different reason, must survive untouched).
   makeBlockedBranchItem(cwd, 'branch-return-lock-untouched', { verify: 'test -f proof.txt' });
-  assert.equal(run(cwd, ['take', '--id', 'branch-return-lock-untouched']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-lock-untouched'], { FGOS_SESSION_ID: 'tsk-45z-branch-session' }).status, 0);
   commitPending(cwd, 'state: take branch-return-lock-untouched');
 
   gitAtCwd(cwd, ['checkout', 'fgw/branch-return-lock-untouched']);
@@ -1083,4 +1234,75 @@ test('tsk-ikd: return refuses from an ad-hoc worktree never created through "fgo
   } finally {
     removeAdHocWorktree(cwd, worktreePath);
   }
+});
+
+test('return --worker-verified-sha skips runGoalCheck when sha matches branchHead, moving item to awaiting-approval with verify skipped output', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'worker-verified-item', { verify: 'exit 1' });
+  const pickResult = run(cwd, ['pick', '--id', 'worker-verified-item']);
+  assert.equal(pickResult.status, 0);
+  const pickData = envelopeData(pickResult.stdout);
+
+  fs.writeFileSync(path.join(pickData.worktree.path, 'proof.txt'), 'built by worker\n');
+  execFileSync('git', ['add', '-A'], { cwd: pickData.worktree.path });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd: pickData.worktree.path });
+
+  const branchHead = gitAtCwd(cwd, ['rev-parse', 'fgw/worker-verified-item']).trim();
+
+  const result = run(cwd, ['return', 'worker-verified-item', '--worker-verified-sha', branchHead]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /verify skipped/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['worker-verified-item'].status, 'awaiting-approval');
+  assert.equal(view.work['worker-verified-item'].branchHeadAtReturn, branchHead);
+});
+
+test('return --worker-verified-sha falls through to real verify when sha is stale or mismatched', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'worker-stale-item', { verify: 'exit 1' });
+  const pickResult = run(cwd, ['pick', '--id', 'worker-stale-item']);
+  assert.equal(pickResult.status, 0);
+  const pickData = envelopeData(pickResult.stdout);
+
+  fs.writeFileSync(path.join(pickData.worktree.path, 'proof.txt'), 'built by worker\n');
+  execFileSync('git', ['add', '-A'], { cwd: pickData.worktree.path });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd: pickData.worktree.path });
+
+  const staleSha = '0000000000000000000000000000000000000000';
+
+  const result = run(cwd, ['return', 'worker-stale-item', '--worker-verified-sha', staleSha]);
+  // Should fall through to real verify (which is `exit 1`), so return moves item to blocked
+  const view = stateView(cwd);
+  assert.equal(view.work['worker-stale-item'].status, 'blocked');
+});
+
+test('tsk-34o5: return halts and parks item blocked when attestation diverges', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'return-attest-diverged', { verify: 'exit 0' });
+
+  const pickResult = run(cwd, ['pick', '--id', 'return-attest-diverged']);
+  assert.equal(pickResult.status, 0);
+  const pickData = envelopeData(pickResult.stdout);
+
+  fs.writeFileSync(path.join(pickData.worktree.path, 'proof.txt'), 'work\n');
+  execFileSync('git', ['add', '-A'], { cwd: pickData.worktree.path });
+  execFileSync('git', ['commit', '-q', '-m', 'work commit'], { cwd: pickData.worktree.path });
+
+  const baseCommit = gitAtCwd(cwd, ['rev-parse', 'HEAD']).trim();
+  appendEvent(path.join(cwd, '.fgos', 'events.jsonl'), {
+    type: 'executor.dispatch',
+    payload: { id: 'return-attest-diverged', executorId: 'cli', baseCommit, headRef: 'main' },
+  });
+
+  const result = run(cwd, ['return', 'return-attest-diverged']);
+  assert.notEqual(result.status, 0, 'return should exit non-zero');
+  assert.match(result.stderr, /attestation mismatch/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['return-attest-diverged'].status, 'blocked');
+  assert.equal(view.frictions['return-attest-diverged'][0].errorClass, 'attestation-mismatch');
 });

@@ -17,6 +17,7 @@ import {
   performCatchUp,
   buildOwnFileSet,
   isWorkingTreeClean as isMainTreeClean,
+  formatFgosWriteRejectedDetail,
 } from '../../runner/merge.mjs';
 import {
   branchNameFor,
@@ -124,7 +125,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
         errorClass: 'fgos-write-blocked',
         layer: 'state',
         attempts: 1,
-        detail: `sync-root: ${branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${targetBranch} unchanged — ADR0020`,
+        detail: `sync-root: ${formatFgosWriteRejectedDetail(branch, result.paths, targetBranch)}`,
       });
       return { id, mode: 'sync-root', outcome: 'blocked', reason: 'fgos-write-rejected', target: targetBranch, branch, paths: result.paths };
     }
@@ -154,15 +155,28 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
       // here (unlike the named branches above) -- this guard's whole
       // point is to catch whatever this call site doesn't already
       // handle by name, today and for any outcome added later.
+      // tsk-3tv: thread result.error (when present, e.g. merge-failed-unclassified)
+      // into both friction detail and the CLI response object.
+      const errText = result.error
+        ? ` (exit ${result.error.status}): ${result.error.stderr || result.error.message}`
+        : '';
       addFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: 'sync-root-unhandled-outcome',
         layer: 'state',
         attempts: 1,
-        detail: `sync-root: mergeRunnerItem returned unrecognized outcome "${result.outcome}" for ${branch} into ${targetBranch} — refusing to report success`,
+        detail: `sync-root: mergeRunnerItem returned unrecognized outcome "${result.outcome}" for ${branch} into ${targetBranch}${errText} — refusing to report success`,
       });
-      return { id, mode: 'sync-root', outcome: 'blocked', reason: result.outcome, target: targetBranch, branch };
+      return {
+        id,
+        mode: 'sync-root',
+        outcome: 'blocked',
+        reason: result.outcome,
+        target: targetBranch,
+        branch,
+        ...(result.error ? { error: result.error } : {}),
+      };
     }
 
     // Success — status/stage of `id` is deliberately UNTOUCHED (the
@@ -219,6 +233,17 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
             detail: `sync-root catchup (inbound gate): git merge --no-commit --no-ff ${targetBranch} into ${branch} conflicted; merge aborted, ${branch} unchanged`,
           });
           return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch, conflictedFiles: catchupResult.conflictedFiles };
+        }
+        if (catchupResult.outcome === 'merge-refused') {
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'merge-fail',
+            layer: 'state',
+            attempts: 1,
+            detail: `sync-root catchup (inbound gate): git merge --no-commit --no-ff ${targetBranch} into ${branch} refused: ${catchupResult.reason}`,
+          });
+          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-failed-unclassified', target: targetBranch, branch, detail: catchupResult.reason };
         }
         if (catchupResult.outcome === 'verify-fail') {
           addFriction(dir, {

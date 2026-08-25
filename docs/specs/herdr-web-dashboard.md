@@ -2,7 +2,7 @@
 area: herdr-web-dashboard
 updated: 2026-08-14
 sources: [herdr-web-dashboard, fgos-interface-daemon]
-decisions: [tsk-ldb-D1, tsk-ldb-D2, tsk-ldb-D3, tsk-ldb-D4, tsk-ldb-D5, tsk-ldb-D6, tsk-ldb-D7, tsk-ldb-D8, tsk-ldb-D9, tsk-ldb-D10, tsk-ldb-D11, tsk-ldb-D12, tsk-ldb-D13, tsk-ldb-D14, tsk-7l9-D1, tsk-7l9-D2, tsk-7l9-D4, tsk-7l9-D7, tsk-7l9-D8, tsk-7l9-D10]
+decisions: []
 coverage: partial
 ---
 
@@ -16,26 +16,26 @@ the questions it raises, from a device that is not the developer's machine.
 The need it exists for is concrete, and it is the reason the design looks the
 way it does: the product owner wants to **review and approve from a phone**,
 and at exactly that moment there is usually no cockpit terminal open
-(`docs/history/herdr-web-dashboard/CONTEXT.md` §"Vì sao D12"). A surface that
+(rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own rationale section for the child-process decision — the dashboard runs as a child process that outlives the cockpit pane, precisely so it does not vanish when the terminal closes). A surface that
 only lives as long as a terminal pane is absent precisely when it is needed.
 
 Three things bound this surface:
 
-- It runs **alongside** the herdr TUI, never replacing it (D1 boundary). A
+- It runs **alongside** the herdr TUI, never replacing it (boundary: web dashboard is a new subsystem inside the herdr-plugin Rust binary, runs alongside not instead of the TUI). A
   person at a terminal keeps the TUI; the dashboard serves the person who is
   not at one.
 - It is an **independent client project**, not code inside the `herdr-fgos`
-  binary (tsk-7l9 D8). It calls the gateway's REST/RPC API from the outside,
+  binary (per fgos-interface-daemon — gateway/orchestrator/TUI stay inside the herdr-fgos binary via hexagonal ports; the web client is a separate adapter calling in from outside). It calls the gateway's REST/RPC API from the outside,
   which is what decision `0014` requires of any non-terminal UI. An earlier
-  decision of this feature (tsk-ldb D1) proposed embedding an HTTP server
-  directly in `herdr-fgos`; that branch is closed — cite tsk-7l9 D8, not
-  tsk-ldb D1, for where the web client lives.
+  decision of this feature (tsk-ldb's own — web dashboard as a new subsystem inside herdr-plugin) proposed embedding an HTTP server
+  directly in `herdr-fgos`; that branch is closed — cite fgos-interface-daemon's hexagonal-ports decision, not
+  tsk-ldb's original one, for where the web client lives.
 - It never becomes a second write path. Every change it makes goes through
   an fgOS one-door-write verb executed by the gateway (R2 below).
 
 **Out of scope for this spec.** Question authoring quality at the source
-(`tsk-539`, deliberately decoupled — D5). Multi-project port/identity
-mechanics (`tsk-3b0` — D11). The concrete visual layout, colour and
+(`tsk-539`, deliberately decoupled — tsk-ldb and tsk-539 stay scope-separated). Multi-project port/identity
+mechanics (`tsk-3b0` — multi-project port/identity handling is deferred to tsk-3b0). The concrete visual layout, colour and
 typography (`tsk-3x6`, `docs/reference/herdr-web-dashboard-layout.md`) — this
 spec states what an actor expects to be able to do, never how it is drawn.
 
@@ -43,20 +43,20 @@ spec states what an actor expects to be able to do, never how it is drawn.
 
 - **Open the dashboard.** A person opens the dashboard's address in a browser
   on any device that can reach the machine. The first interaction is always
-  sign-in; there is no anonymous view (D6).
+  sign-in; there is no anonymous view (mandatory token auth from v1, not deferred to a later version).
 - **Open the taskboard.** The default landing surface once signed in: every
   work item on the connected project, grouped so the person can see state at a
   glance.
 - **Open one task's detail.** From the taskboard, or directly by address.
 - **Open "questions needing answer".** The list of everything currently
   waiting on a person — covering **both** channels, `ask` questions and
-  `gate-approve` questions (D4), not just the `ask` channel.
+  `gate-approve` questions (question-needing-answer covers both channels), not just the `ask` channel.
 - **Availability trigger (not a person's action).** The dashboard is reachable
   whenever its own process is running. That process is started and stopped
   from the cockpit but **outlives the cockpit pane** — closing the cockpit does
-  not stop the dashboard (D12). It is enabled by default (D10), listens on the
-  configured bind address (default reaches beyond loopback — D7) and on port
-  8788 (D13).
+  not stop the dashboard (it runs as a child process outliving the cockpit pane). It is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles), listens on the
+  configured bind address (default reaches beyond loopback — binds 0.0.0.0 by default, bind address configurable, warns when non-loopback) and on port
+  8788 (its config section carries a port field, defaulting to 8788).
 - **No outbound trigger exists.** Nothing notifies the person that a question
   is waiting; they have to come and look. A push/attention channel is a
   different, unbuilt capability (`docs/io-contract.md` §Ranh giới — STR48).
@@ -68,13 +68,13 @@ spec states what an actor expects to be able to do, never how it is drawn.
 | 1 | Work item | One unit of tracked work, as fgOS defines it | see `docs/specs/work-state.md` — this surface introduces no new item shape | — | — |
 | 2 | Status | Where the item sits in its lifecycle | fgOS's own status set (`todo`, `doing`, `awaiting-human`, `awaiting-approval`, `blocked`, `delivered`, `retrospective`, `cleanup`, `done`, `wontfix`) | yes | — |
 | 3 | Stage | Where the item sits within the front of its lifecycle | the item's own domain's stage list | no (frozen from `awaiting-approval` on) | — |
-| 4 | Question needing an answer | One thing waiting on a person; the union of the two channels (D4) | an `ask` question, or a `gate-approve` question (`contextApprove`/`planApprove`/`validateApprove`) | — | — |
+| 4 | Question needing an answer | One thing waiting on a person; the union of the two channels | an `ask` question, or a `gate-approve` question (`contextApprove`/`planApprove`/`validateApprove`) | — | — |
 | 5 | Answer | The person's reply that releases a waiting item | free text | yes, to answer | — |
-| 6 | Agent work history | What the agent actually did on this item | narrative from the item's own `CONTEXT.md`/`plan.md` is the primary source; the machine-side decision log is expandable detail, not shown by default (D3) | — | narrative shown, machine log collapsed |
-| 7 | Question/answer timeline | Questions paired with their answers across repeated park rounds | pairing is positional — the i-th recorded question pairs with the i-th recorded answer, ordered by sequence number (D2) | — | — |
-| 8 | Sign-in session | Proof that this browser may act | a session established by presenting the machine token once (D8) | yes | — |
-| 9 | Machine token | The single credential guarding the surface | resolved from the environment first, otherwise from a generated local secret file that is never committed (D9) | yes | generated on first run |
-| 10 | Gateway endpoint | The gateway instance this client is talking to | an address; the client is built to hold **more than one** (tsk-7l9 D2 — a future desktop client aggregates one gateway per machine) | yes | — |
+| 6 | Agent work history | What the agent actually did on this item | narrative from the item's own `CONTEXT.md`/`plan.md` is the primary source; the machine-side decision log is expandable detail, not shown by default | — | narrative shown, machine log collapsed |
+| 7 | Question/answer timeline | Questions paired with their answers across repeated park rounds | pairing is positional — the i-th recorded question pairs with the i-th recorded answer, ordered by sequence number | — | — |
+| 8 | Sign-in session | Proof that this browser may act | a session established by presenting the machine token once | yes | — |
+| 9 | Machine token | The single credential guarding the surface | resolved from the environment first, otherwise from a generated local secret file that is never committed | yes | generated on first run |
+| 10 | Gateway endpoint | The gateway instance this client is talking to | an address; the client is built to hold **more than one** (per fgos-interface-daemon — a future desktop client aggregates one gateway per machine) | yes | — |
 
 ## Behaviors & Operations
 
@@ -86,7 +86,7 @@ not decoration: the dashboard never writes fgOS state itself (R2).
 - **Blocked when:** the presented credential does not match. Every failure —
   wrong token, malformed request, unknown route — looks identical from
   outside: the surface gives back nothing that distinguishes "wrong token"
-  from "nothing here" (D8).
+  from "nothing here" (every auth failure returns an opaque 404, never 401).
 - **What changes:** a session is established for this browser.
 - **Side effects:** none on work state.
 - **Afterwards:** the person lands on the taskboard.
@@ -109,9 +109,9 @@ not decoration: the dashboard never writes fgOS state itself (R2).
 - **What changes:** nothing — this is a read.
 - **Side effects:** none.
 - **Afterwards:** the person sees, for that one item: what the agent did
-  (narrative first, machine decision log available but collapsed — D3), and
+  (narrative first, machine decision log available but collapsed), and
   the question/answer timeline across however many rounds the item has been
-  parked (D2). This screen is the core deliverable of the whole surface; the
+  parked. This screen is the core deliverable of the whole surface; the
   taskboard exists mainly to reach it.
 
 ### Answer a parked question
@@ -124,10 +124,10 @@ not decoration: the dashboard never writes fgOS state itself (R2).
 - **Side effects:** the item leaves the "questions needing answer" list.
 - **Afterwards:** the person sees the item's new state. Answering happens
   **in place, on this surface** — the person is not sent to a terminal. This
-  settles the question left open when D4 established only that the screen
+  settles the question left open when the question-needing-answer decision established only that the screen
   *surfaces* both channels: the gateway is already the component that runs
   fgOS write verbs on a client's behalf, and `answer` is named among them
-  (tsk-7l9 D7), so sending the person out to a CLI would contradict the
+  (fgos-interface-daemon's own chokepoint decision), so sending the person out to a CLI would contradict the
   contract this client is written against.
 
 ### Approve a merge
@@ -192,34 +192,33 @@ leaving a reader to discover them:
   authorization layer — "who may call which verb" is a separate, unbuilt
   capability (`docs/io-contract.md` §Ranh giới, STR38) — and the gateway's own
   credential is one token covering the whole machine, not per project and not
-  per person (tsk-7l9 D4). So read access and trunk-changing access are the
+  per person (one token per machine, per fgos-interface-daemon's auth decision). So read access and trunk-changing access are the
   same access. See Open Gaps.
 
 ## Business Rules
 
 - **R1.** The surface is a client of the gateway's API, never an embedded
-  server inside `herdr-fgos` (tsk-7l9 D8, decision `0014`). It is built to
+  server inside `herdr-fgos` (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to
   address more than one gateway, so no single fixed origin may be baked into
-  it (tsk-7l9 D2).
+  it (per fgos-interface-daemon's per-machine-scope decision).
 - **R2.** Every write goes through an fgOS one-door-write verb — `answer`,
   `approve`, the intake verb, `edit`, `move` — executed by the gateway, which
-  is the sole component that runs those verbs on a client's behalf (tsk-7l9
-  D7). The web surface never writes fgOS state directly. No second write path
+  is the sole component that runs those verbs on a client's behalf (per fgos-interface-daemon — gateway is the sole chokepoint that ever spawns fgos verbs). The web surface never writes fgOS state directly. No second write path
   is introduced by anything in this spec.
-- **R3.** A person may not read anything before signing in (D6). Sign-in is
+- **R3.** A person may not read anything before signing in (mandatory token auth from v1). Sign-in is
   token-based, and every failure is indistinguishable from "nothing here"
-  (D8). A second, alternative credential path exists in the design and, if
+  (an opaque 404, never 401). A second, alternative credential path exists in the design and, if
   used, must verify its assertion's signature properly rather than trusting a
-  header (D8).
+  header (the two-layer additive auth design — cookie session plus an optional cf-access JWT that must be cryptographically verified, never trusted on the header alone).
 - **R4.** The token is never stored anywhere that is committed. It comes from
   the environment when set; otherwise it is generated into a local file that
-  is excluded from version control and readable only by its owner (D9).
-- **R5.** The surface is enabled by default (D10) and its default bind reaches
-  beyond loopback (D7), with a warning raised when the bind is not loopback.
+  is excluded from version control and readable only by its owner.
+- **R5.** The surface is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles) and its default bind reaches
+  beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback.
   Its port is 8788, chosen to coexist with the neighbouring service on 8787
-  (D13).
+  (its config section carries a port field, defaulting to 8788).
 - **R6.** The dashboard's lifetime is independent of the cockpit's. Closing a
-  cockpit pane does not stop it (D12).
+  cockpit pane does not stop it (it runs as a child process outliving the cockpit pane).
 - **R7.** A merge approval can only be performed where fgOS allows it: the
   `approve` verb structurally refuses to run from a linked worktree and
   requires the repository's main working tree. This is a real mechanical
@@ -232,14 +231,14 @@ leaving a reader to discover them:
   The token (R3/R4) is therefore not a hardening layer that can be traded away
   for convenience — it is the only thing holding the surface closed. The
   product owner decided this default having been shown this exact consequence
-  (`docs/history/herdr-web-dashboard/CONTEXT.md` §"Hệ quả của D10"), and the
+  (rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own consequences section for the on-by-default decision), and the
   write operations added later raise its weight rather than changing the
   decision.
 - **R9.** Questions and answers are paired positionally, by order of
   recording, with no linking key added to the underlying records — the record
-  shape is deliberately unchanged (D2).
+  shape is deliberately unchanged.
 - **R10.** The narrative written for humans is the primary account of what an
-  agent did; the machine-side decision log is secondary detail (D3).
+  agent did; the machine-side decision log is secondary detail.
 - **R11.** Nothing on this surface pushes to a person. Being informed is a
   pull: the person opens the dashboard and looks.
 
@@ -254,7 +253,7 @@ leaving a reader to discover them:
   reported as missing.
 - **A narrative reference pointing outside the documentation tree.** Treated
   as invalid and refused, not followed.
-- **The cockpit is closed.** The dashboard keeps serving (R6/D12) — this is
+- **The cockpit is closed.** The dashboard keeps serving (R6) — this is
   the whole point of the design, not a leftover process.
 - **The gateway is unreachable.** The client says so plainly and offers to
   retry; it never presents stale data as current.
@@ -270,7 +269,7 @@ leaving a reader to discover them:
   `approve` above all, is available to whoever holds the machine's single
   token. There is no per-person, per-project, or per-verb distinction to
   spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;
-  tsk-7l9 D4). The exposure is stated rather than mitigated. Closing this
+  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this
   needs its own item and its own decision — the authorization layer's own
   scope, not this spec's, and not something to be improvised inside the web
   client.
@@ -287,9 +286,9 @@ leaving a reader to discover them:
   only a `GET /state/digest` cheap poll, which is why `15-system-events.md`
   describes client-derived events rather than server-pushed ones.
 - **Multi-project and multi-endpoint behaviour is only half-decided.** The
-  client must not assume one fixed gateway (tsk-7l9 D2, R1), but how a person
+  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person
   chooses between projects and instances, and how the surface shows which one
-  they are looking at, is deferred to `tsk-3b0` (D11).
+  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).
 - **No attention channel.** R11 records that nothing notifies a person. Whether
   it should is a separate, unbuilt capability (STR48).
 - **Coverage is `partial` on purpose.** The three read screens are locked by
@@ -309,7 +308,7 @@ grouped board with in-place quick actions and filtering, not a flat table.
 ## Pointers (implementation)
 
 - `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked
-  decisions (D1-D14) this spec cites throughout, plus the scout evidence
+  decisions this spec cites throughout, plus the scout evidence
   behind them.
 - `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion
   rounds those decisions came out of.
@@ -317,10 +316,10 @@ grouped board with in-place quick actions and filtering, not a flat table.
   (config/doctor, server core and sign-in, taskboard, task detail, alternative
   credential path), plus this spec's own planning section.
 - `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked
-  decisions, in particular D2 (per-machine scope, multi-endpoint clients), D4
-  (one token per machine), D7 (gateway is the sole runner of fgOS verbs), D8
-  (where gateway lives, and that web is an independent client), D10 (the API
-  contract still to be written).
+  decisions, in particular per-machine scope (multi-endpoint clients),
+  one token per machine, gateway is the sole runner of fgOS verbs,
+  where gateway lives (that web is an independent client), and the API
+  contract still to be written.
 - `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal
   UI is a client of a network gate rather than its own server.
 - `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary

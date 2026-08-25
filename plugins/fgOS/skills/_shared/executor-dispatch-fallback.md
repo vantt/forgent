@@ -56,11 +56,10 @@ a `Grep`.
 ## Step A — ask `decide` (never read the config yourself)
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/src/runner/dispatch.mjs" decide <EXECUTOR_ID> [--has-live-task-access]
+node src/runner/dispatch.mjs decide <EXECUTOR_ID> [--has-live-task-access]
 # when you have no executor id, use the door that matches what you know:
 #   decide --for <PURPOSE>  [--has-live-task-access]
-#   decide --work <WORK_ID> [--has-live-task-access]
+#   decide --work <WORK_ID> [--stage <STAGE>] [--has-live-task-access]
 #   decide --for <LABEL> --needs-soul [--has-live-task-access]
 ```
 
@@ -95,11 +94,26 @@ watching this session sees nothing while the executor is actually
 running. Monitor's own event stream is stdout-only, so fold the live
 stderr tee into it with `2>&1`; each line then becomes its own live
 notification while the process is still running — this is the real,
-intended relay channel for a live agent session, not a workaround:
+intended relay channel for a live agent session, not a workaround.
+
+**Filter the tee — never pipe it raw** (tsk-4bq's own dispatch of itself
+hit exactly the failure mode this line exists to prevent: an executor
+that iterates by re-running its own full verify command several times
+mid-run flooded the relay with repeated full-suite output, tripping
+Monitor's own rate-limit and needing a manual `TaskStop`). Monitor's own
+tool guidance already says this generally — "never pipe raw logs; filter
+to exactly the success and failure signals you care about" — apply it
+here specifically: keep the executor's real signal lines (`[DONE]`,
+`[BLOCKED]`, an error/failure marker) and the one line that matters
+structurally, the final JSON result (always starts a line with `{`, since
+it is `JSON.stringify` output) — drop everything else, including a
+verbose test runner's own line-by-line pass output:
 
 ```bash
-node "$root/src/runner/dispatch.mjs" execute <EXECUTOR_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access] 2>&1
+node "$root/src/runner/dispatch.mjs" execute <EXECUTOR_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access] 2>&1 | grep -E --line-buffered '\[DONE\]|\[BLOCKED\]|Error|FAIL|✗|^\{'
 ```
+
+When dispatching a worktree-backed item with explicit directory flags, pass `--cwd <worktree path>` (so the spawned executor runs in the worktree) and `--repo-root "$root"` (so config loads from main) as two separate flags — never pass `$root` as `--dir`/`--cwd` alone.
 
 **When this session is isolated in a worktree and `<PROMPT_TEMPLATE>` is
 built from a file via `$(cat ...)`, the worktree-isolation guard may
@@ -110,14 +124,18 @@ tsk-3rg's own finding that this guard is a harness-level built-in this
 repo cannot change). Unlike the `root=$(...)` + `node ... --dir "$root"`
 pattern tsk-3rg fixed by splitting into two tool calls, this line is one
 logical action (dispatch + live-tee, per the Monitor rule above) that
-cannot be split without losing the live-tee. When refused, write the
-exact command into a small wrapper script file inside the worktree and
-invoke that single file path through Monitor instead — a single-file
+cannot be split without losing the live-tee. When refused, run
+`node scripts/write-wrapper-script.mjs --command "<full shell command>" --dir "$root"`
+to produce the wrapper script file inside the worktree, and invoke that
+returned single file path through Monitor instead — a single-file
 invocation carries no compound shell syntax for the guard to flag.
 
 (pass the line above as Monitor's own `command`, with a `description`
 naming the executor/purpose; a reasonable `timeout_ms` for the tier at
 hand; `persistent: false`.)
+
+> **Waiting rule:**
+> Wait for the harness's own background-completion notification before proceeding to gather results (end the turn with no further tool call once Monitor/background dispatch is started; the harness delivers a task-notification automatically and resumes the session with the output in context). Do NOT use `ScheduleWakeup` or polling — `ScheduleWakeup` is for `/loop` dynamic pacing only (requires `prompt` unless `stop:true`) and fails immediately in this context.
 
 Once Monitor reports the command exited, read its final line: the real
 result as JSON — `{"mechanism":"out-of-process", ...real result fields
@@ -276,10 +294,9 @@ through the one existing writer of `.fgos/logs/`, `appendWorkerLog`
 (`src/runner/worker-log.mjs`); never a new log file or module for this:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 node --input-type=module -e "
-import { appendWorkerLog } from '$root/src/runner/worker-log.mjs';
-appendWorkerLog('$root', '<scope>', {
+import { appendWorkerLog } from './src/runner/worker-log.mjs';
+appendWorkerLog('.', '<scope>', {
   tier: '<judged-or-default-tier>',
   model: '<judged-or-default-model>',
   message: 'ad-hoc dispatch <task id>: <goal>',

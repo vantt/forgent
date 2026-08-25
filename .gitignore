@@ -1,35 +1,41 @@
 # Upstream source clones — cursors tracked in docs/distillery/, re-clone as needed
 /upstreams/
 
-# forgent state layer — events.jsonl is truth (committed); state.json is a derived view
-.fgos/state.json
-# worker dispatch logs — local observability, never committed (worker-dispatch-log D4)
+# forgent state layer — events.jsonl is truth (committed); everything under
+# .fgos/cache/ (state.json) is a derived, rebuildable view. First attempt
+# (phase-02, plans/260825-0842-fgos-logs-dir-bucketing) reverted because 21
+# test files hardcoded the old path independently; phase-03 introduced
+# resolveFgosFile/FGOS_FILE (src/runner/paths.mjs) as the one shared
+# resolver and routed every real call site (production and test) through
+# it before retrying this move.
+.fgos/cache/
+# diagnostic/telemetry logs — local observability, never committed
+# (worker-dispatch-log D4; also holds approve-post-success-faults.jsonl,
+# main-checkout-guard-warnings.jsonl, changelog-nag-history.jsonl,
+# entropy-history.jsonl, invocation-faults.jsonl since phase-01,
+# plans/260825-0842-fgos-logs-dir-bucketing)
 .fgos/logs/
+# per-machine runtime facts — tool-status.local.json and the events.jsonl
+# truncation-guard mark, moved here phase-02
+# (plans/260825-0842-fgos-logs-dir-bucketing). sessions.json/*.lock stay at
+# .fgos/ root for now (deferred, on the git hook's own live import path —
+# see plan.md phase-02 "held back" section).
+.fgos/runtime/
 node_modules/
 
 # test-leak artifacts — belt against auto-commit clobber (backlog STR74/STR65)
 output.txt
 *-output.txt
 .fgos/sessions.json
+# gateway process registry (pid/port/startedAt) — process state, never
+# committed, same class as sessions.json (tsk-31v)
+.fgos/gateway.json
 
 # main-checkout activity lock + sibling lock files (STR65) — process state, never committed
 .fgos/*.lock
 
-# malformed-invocation records — local forensics only. The records carry the
-# raw argv of the bad call, so committing them would push whatever flag values
-# it happened to contain.
-.fgos/invocation-faults.jsonl
-
-# tool registry local status overlay — a fact about THIS machine (what `tool
-# check` last observed), never a team decision, so it never goes through
-# events.jsonl (tsk-1dj, tool-registry-capability port)
-.fgos/tool-status.local.json
-
-# events.jsonl truncation-guard mark — a high-water-mark that must live
-# OUTSIDE git tracking to work at all: a git operation reverting the
-# tracked events.jsonl must never also revert this (tsk-cgg,
-# docs/history/events-jsonl-git-tracked-truncation/)
-.fgos/events-jsonl.truncation-guard.json
+# untracked local secret environment variables (tsk-gb3)
+.fgos/secrets.local.env
 
 # BEE:START
 .bee/state.json

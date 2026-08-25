@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -90,7 +91,7 @@ function submit(cwd, text, extra = {}) {
 }
 
 function viewPath(cwd) {
-  return path.join(cwd, '.fgos', 'state.json');
+  return resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE);
 }
 
 function stateView(cwd) {
@@ -255,7 +256,8 @@ test("e2e synthetic domain: the real 'fgos cleanup' verb closes a synthetic item
   );
 
   add(repoRoot, 'synth-cleanup-item', { domain: 'synthetic', verify: 'true' });
-  assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'doing']).status, 0);
+  // tsk-40m: blocked stands in for the retired todo->doing edge.
+  assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'blocked']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'delivered']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'retrospective']).status, 0);
   assert.equal(

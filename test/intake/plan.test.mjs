@@ -8,6 +8,7 @@ import { resolvePlan, resolveCallerPlanVerdict, resolveContentRoot, findUncovere
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove, addDecision } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
+import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 import { createWorktree } from '../../src/runner/worktree.mjs';
 
 // tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
@@ -197,10 +198,10 @@ test('resolvePlan completes an interrupted decompose (children exist, a decompos
   assert.equal(children.length, 1, 'no duplicate generated');
 });
 
-test('resolvePlan on the already-decomposed re-entrant path also releases a held claim (claim-lock §3b)', () => {
+test('resolvePlan on the already-decomposed re-entrant path leaves a held claim (doing) untouched (claim-lock §3b, tsk-40m D5: release-on-executing retired)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
+  acquireClaim(storeDir, { id: 'item-x', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
   addWork(storeDir, {
     id: 'orphan-child-def',
     title: 'Build parser',
@@ -223,7 +224,7 @@ test('resolvePlan on the already-decomposed re-entrant path also releases a held
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'session');
   assert.equal(result.outcome, 'already-decomposed');
-  assert.equal(listWork(storeDir).work['item-x'].status, 'todo');
+  assert.equal(listWork(storeDir).work['item-x'].status, 'doing');
 });
 
 // --- tsk-4n8: the bug this item exists to fix -- a stray child (no
@@ -469,27 +470,21 @@ test('resolvePlan still computes a priority (EFFORT_FLOOR default) on a caller-s
   assert.equal(view.work['item-x'].priority, expected);
 });
 
-// claim-lock §3b: a pick claim held through clarify/decompose (status
-// 'doing') is released back to 'todo' the moment the root actually reaches
-// stage executing, so `pick <id>` can re-claim it for the executing phase.
-test('resolvePlan on a caller-supplied pass-through verdict releases a held claim (doing -> todo) once the root reaches executing (claim-lock §3b)', () => {
+// claim-lock §3b / tsk-40m D5: a pick claim held through clarify/decompose
+// (effective status 'doing') is a runtime-only claim now, orthogonal to
+// stage — resolvePlan's release-on-executing behavior is retired, so the
+// claim (and its 'doing' overlay) survives the planning -> executing edge.
+test('resolvePlan on a caller-supplied pass-through verdict preserves claim (doing) once the root reaches executing (D5)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
+  acquireClaim(storeDir, { id: 'item-x', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'session', { verdict: 'pass-through' });
   assert.equal(result.outcome, 'pass-through');
 
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'executing');
-  assert.equal(view.work['item-x'].status, 'todo');
-
-  // tsk-2zv: the release carries a positive marker so claimWork can tell
-  // this todo-entry apart from a reject/verify-fail park.
-  const releaseEvent = readRawEvents(storeDir)
-    .filter((e) => e.type === 'work.move' && e.payload.id === 'item-x' && e.payload.to === 'todo')
-    .at(-1);
-  assert.equal(releaseEvent.payload.releaseTrigger, 'claim-lock-3b');
+  assert.equal(view.work['item-x'].status, 'doing');
 });
 
 // tsk-4hb: the refined priority-write pass (this file's own call site) logs
@@ -578,10 +573,10 @@ test('resolvePlan on a caller-supplied decompose verdict writes every child with
   assert.deepEqual(view.work['item-x'].deps, []);
 });
 
-test('resolvePlan on a caller-supplied decompose verdict releases a held claim (doing -> todo) once the root reaches executing (claim-lock §3b)', () => {
+test('resolvePlan on a caller-supplied decompose verdict leaves a held claim (doing) untouched once the root reaches executing (claim-lock §3b, tsk-40m D5: release-on-executing retired)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
+  acquireClaim(storeDir, { id: 'item-x', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'session', {
     verdict: 'decompose',
@@ -589,7 +584,7 @@ test('resolvePlan on a caller-supplied decompose verdict releases a held claim (
     children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'implement the described change for this test.' }],
   });
   assert.equal(result.outcome, 'decompose');
-  assert.equal(listWork(storeDir).work['item-x'].status, 'todo');
+  assert.equal(listWork(storeDir).work['item-x'].status, 'doing');
 });
 
 test('resolvePlan writes footprint on a child exactly when the verdict provided one, undefined otherwise', () => {
@@ -871,7 +866,7 @@ test('resolvePlan on a caller-supplied need-human verdict parks the item in awai
 test('resolvePlan on a caller-supplied need-human verdict stamps statusAtAsk "doing" when a pick claim is held (claim-lock §5.1)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
+  acquireClaim(storeDir, { id: 'item-x', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'session', { verdict: 'need-human', reason: 'Ambiguous scope' });
   assert.equal(result.outcome, 'need-human');

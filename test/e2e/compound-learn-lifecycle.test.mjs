@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -25,7 +26,7 @@ function initTempRepo() {
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
-  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/cache/\n');
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: repoRoot });
@@ -55,7 +56,7 @@ function add(cwd, id, extra = {}) {
 }
 
 function stateView(cwd) {
-  return JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'state.json'), 'utf8'));
+  return JSON.parse(fs.readFileSync(resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE), 'utf8'));
 }
 
 function envelopeData(stdout) {

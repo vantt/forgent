@@ -50,7 +50,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 ### instruction-level-enforcement
 - **What:** Trước E12, toàn bộ workflow (intake → story → trace) KHÔNG được enforce cơ học ở bất kỳ tầng nào — schema gần như không có FK bắt buộc, CLI không lệnh nào từ chối vì thiếu bước trước, không git hook, không CI gate. Mọi thứ chạy nhờ agent tự tuân thủ instruction; `audit`/`score-*` là observability chứ không phải gate. Repo tự nhận trong HARNESS_COMPONENTS.md: "Permissions are instruction-level only".
 - **Where:** deep-dive 11/07 (`plans/reports/deep-dive-qa-260711-*` §2, code-verified tại 14e6f10); E12 (@9cc306d) bắt đầu siết: SQL read-only, request authority, story-complete atomic
-- **Notable:** đối cực triết lý với bee (enforce bằng code); và quỹ đạo của harness đang tiến dần về phía enforce — xác nhận hướng bee chọn từ đầu là đúng.
+- **Notable:** đối cực triết lý với beehive (enforce bằng code); và quỹ đạo của harness đang tiến dần về phía enforce — xác nhận hướng beehive chọn từ đầu là đúng.
 - **Seen:** 9cc306d
 
 ## skills
@@ -98,7 +98,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 ### post-tool-design-hook
 - **What:** PostToolUse hook (Edit|Write|apply_patch) chạy design check của impeccable, timeout 5s, có statusMessage.
 - **Where:** `.codex/hooks.json`
-- **Notable:** hook làm quality feedback tức thời sau mỗi edit UI; mảng hooks mỏng hơn bee nhiều.
+- **Notable:** hook làm quality feedback tức thời sau mỗi edit UI; mảng hooks mỏng hơn beehive nhiều.
 - **Status:** removed @9cc306d (đi cùng impeccable; repo hiện không còn hook nào)
 - **Seen:** 14e6f10
 
@@ -107,7 +107,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 ### feature-intake-mandatory
 - **What:** Mọi prompt qua intake trước khi đổi code: 6 input types, 10 risk flags, hard gates (auth/data loss/audit/external provider/validation removal); output format cố định (Lane/Reason/Docs/Story/Validation); intake row ghi durable TRƯỚC khi implement, kể cả việc tiny.
 - **Where:** `docs/FEATURE_INTAKE.md`
-- **Notable:** "The human does not need to classify risk. The harness does." — bee thừa kế trực tiếp cơ chế này.
+- **Notable:** "The human does not need to classify risk. The harness does." — beehive thừa kế trực tiếp cơ chế này.
 - **Seen:** 14e6f10
 
 ### story-packets
@@ -182,7 +182,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 ### runnable-derived-dispatch
 - **What:** Tầng 2 (task-routing): "việc chạy được kế tiếp" là predicate SQL dẫn xuất — runnable = status planned AND verify_command non-empty AND mọi dependency blocker đã implemented; cycle bị chặn từ lúc insert dep/hierarchy (DFS); contract cấm consumer tự suy lại ("Consumers use this field and must not reproduce the SQL rules"); `query work-graph` trả stories + edges trong 1 transaction kèm revision hash.
 - **Where:** `crates/harness-cli/src/infrastructure.rs`, `docs/contracts/harness-orchestration-v1.md`
-- **Notable:** next-work do store tính và cam kết như contract — chống drift khi nhiều consumer; hội tụ độc lập với readyCells của bee (beegog:cell-status-lifecycle).
+- **Notable:** next-work do store tính và cam kết như contract — chống drift khi nhiều consumer; hội tụ độc lập với readyCells của beehive (beehive:cell-status-lifecycle).
 - **Keywords:** runnable, work-graph
 - **Seen:** 9cc306d
 
@@ -265,7 +265,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 ### story-complete-atomic
 - **What:** `story complete <id>` là **đường duy nhất** tới trạng thái `implemented`: đòi status in_progress/changed, chạy fresh proof, chỉ pass mới đánh dấu, atomic ghi proof + đóng các backlog occurrence đủ điều kiện; `story update --status implemented` bị reject (INVALID_ARGUMENT); `story verify` thường chỉ ghi proof, không đóng lifecycle.
 - **Where:** `docs/HARNESS.md`, `crates/harness-cli` (complete_story), contract v1
-- **Notable:** tách "có bằng chứng" khỏi "được đóng" — mạnh hơn cả cap của bee ở chỗ closure và proof là một transaction.
+- **Notable:** tách "có bằng chứng" khỏi "được đóng" — mạnh hơn cả cap của beehive ở chỗ closure và proof là một transaction.
 - **Seen:** 9cc306d
 
 ## docs-style
@@ -413,7 +413,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 ### growth-rule-friction
 - **What:** "The harness grows from friction" — gặp confusion/lặp tay/thiếu rule → sửa harness ngay HOẶC `backlog add` với predicted impact; đóng với actual outcome; `query backlog --closed` để đối chiếu.
 - **Where:** `docs/HARNESS.md` §Growth Rule
-- **Notable:** nguồn gốc của backlog-outcome-loop mà bee thừa kế.
+- **Notable:** nguồn gốc của backlog-outcome-loop mà beehive thừa kế.
 - **Seen:** 14e6f10
 
 ### audit-propose-pipeline

@@ -457,8 +457,11 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
             `vòng 1 đề xuất: ${verdict.verify}\n\n` +
             `## Why this matters\n\n` +
             `vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`;
-          // statusAtAsk (claim-lock §5.1): same rule as the unclear branch
-          // below — read at function entry, before this park.
+          // statusAtAsk (claim-lock §5.1, tsk-40m P1 fix): informational/
+          // audit only — `work` comes from the EFFECTIVE view (listWork),
+          // legitimately 'doing' for a claimed item. putInAwaiting/moveWork
+          // compute the resume-safe `durableStatusAtAsk` themselves, from a
+          // fresh durable read, never from this value.
           putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
           return { outcome: 'verify-disputed', id, verdict, secondPass };
         }
@@ -534,9 +537,9 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
   // succeeds (with the item staying parked, its discovery history gaining
   // the new entry) instead of throwing.
   //
-  // statusAtAsk (claim-lock §5.1): `work.status` read at function entry,
-  // before this park — `doing` when a pick claim is held through clarify,
-  // `todo` otherwise. answerAwaiting resumes to this same status later.
+  // statusAtAsk (claim-lock §5.1, tsk-40m P1 fix): informational/audit
+  // only — `work` comes from the EFFECTIVE view (listWork). putInAwaiting/
+  // moveWork compute the resume-safe `durableStatusAtAsk` themselves.
   if (work.status !== 'awaiting-human') {
     putInAwaiting(dir, { id, ask: verdict.question, statusAtAsk: work.status });
   }

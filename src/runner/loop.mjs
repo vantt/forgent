@@ -56,6 +56,7 @@ import { execFileSync } from 'node:child_process';
 import {
   listWork,
   moveWork,
+  settleClaim,
   addWork,
   editWork,
   readyWork,
@@ -64,9 +65,11 @@ import {
   addFriction,
   categoryOf,
   EXIT_CODES,
+  resolveWriterLogPath,
 } from '../state/store.mjs';
+import { readClaims } from '../state/runtime-coordination.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
-import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, resolveWorkflow, stageForStep, classificationVocabulary } from '../state/workflow-stage-graphs.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
   visitCount,
@@ -83,7 +86,8 @@ import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNa
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, claimRoot, steerFrontier } from './root-affinity.mjs';
-import { resolveRoot } from '../state/frontier.mjs';
+import { resolveRoot, hasOpenDescendant, indexChildrenByParent } from '../state/frontier.mjs';
+import { cleanupMergedBranch } from './merge.mjs';
 import { claimWork, ClaimError } from './claim-port.mjs';
 import { hasWorkerSlotRoom, countWorkerSlots } from '../state/worker-slots.mjs';
 import { readSharedConfig, readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
@@ -91,6 +95,7 @@ import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
 import { resolvePlan } from '../intake/plan.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
+import { checkDispatchAttestation } from './attestation-guard.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 
 // errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
@@ -339,7 +344,8 @@ function tailLines(text, n = 10) {
  * dispatch-anchor definition here would NOT catch the scenario that caused
  * the real 14-item false-positive block this guards against. Do not
  * consolidate this with `hasOpenDescendant` — the two intentionally answer
- * different questions.
+ * different questions. See `frontier.mjs`'s `hasOpenDescendant` for the
+ * narrower, resolved-status check this deliberately diverges from.
  */
 function hasStillNeededDescendant(id, work) {
   for (const [childId, child] of Object.entries(work)) {
@@ -373,24 +379,32 @@ function hasStillNeededDescendant(id, work) {
  */
 export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log = () => {}, dryRun = false } = {}) {
   const view = listWork(dir);
+  const activeClaims = readClaims(dir);
   const resolutions = [];
+  const processedIds = new Set();
 
-  for (const id of Object.keys(view.work)) {
+  for (const claim of Object.values(activeClaims)) {
+    const id = claim.id;
+    processedIds.add(id);
     const item = view.work[id];
-    if (item.status !== 'doing') continue;
-    // Pull-door claims never expire on their own (stage-decompose S2-pull
-    // D1/cell action (4)): a human/session claimant holds `doing`
-    // indefinitely — reap only reclaims a claim the RUNNER itself made and
-    // then crashed on. `claimRole` is folded onto the item by replay.mjs
-    // from the claiming `work.move`'s own `role` field; a legacy log with
-    // no role at all (or a runner claim, `role: 'runner'`) is untouched —
-    // this is a strict narrowing of what already gets reaped, never a
-    // widening.
-    if (item.claimRole === 'human' || item.claimRole === 'session') continue;
+    if (!item) continue;
+    if (claim.claimRole === 'human' || claim.claimRole === 'session' || claim.actor === 'human' || claim.actor === 'session') continue;
 
     const branch = branchNameFor(id);
     const facts = branchFacts(repoRoot, branch);
     const hasCommit = facts.exists && facts.aheadCount > 0;
+
+    const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
+    if (!attestation.ok) {
+      if (dryRun) {
+        resolutions.push({ id, planned: 'blocked' });
+      } else {
+        settleClaim(dir, { id, claimId: claim.claimId, finalStatus: 'blocked', reason: attestation.reason, role: 'runner' });
+        log(`fgos-runner: reaped stale doing "${id}" -> blocked (${attestation.reason}: ${attestation.detail})`);
+        resolutions.push({ id, to: 'blocked', reason: attestation.reason });
+      }
+      continue;
+    }
 
     if (dryRun) {
       resolutions.push({ id, planned: hasCommit ? 'verify-then-resolve' : 'blocked' });
@@ -404,19 +418,69 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
       let wt = null;
       try {
         wt = createDispatchWorktree(repoRoot, id, { worktreeDir });
-        // tsk-53o: read `timedOut` alongside `passed` — a timeout still
-        // reclaims to 'blocked' the same as any other non-pass (unchanged
-        // FSM behavior, resolveStaleDoing's own contract), but the log line
-        // below must say so rather than implying a real verify failure.
         const goalCheck = await runGoalCheck(item, wt.path, verifyTimeoutMs);
         verifyPassed = goalCheck.passed;
         verifyTimedOut = goalCheck.timedOut;
       } catch (err) {
-        // A worktree-fail here (e.g. this branch is irreconcilably checked
-        // out somewhere even after the reclaim in worktree.mjs) must never
-        // bubble past this loop and crash the whole reap raw: degrade this
-        // one item to a defined, reported state instead (per D5's blocked
-        // edge) and let the reap continue with the next stale item.
+        if (err?.errorClass === 'worktree-fail') {
+          worktreeFailed = true;
+          log(`fgos-runner: worktree-fail while reaping stale "doing" item "${id}": ${err.message}`);
+        } else {
+          throw err;
+        }
+      } finally {
+        if (wt) removeDispatchWorktree(repoRoot, wt.path, log);
+      }
+    }
+
+    const resolution = worktreeFailed
+      ? { to: 'blocked', reason: 'runner-crash-reclaim' }
+      : resolveStaleDoing({ hasCommit, verifyPassed });
+    settleClaim(dir, { id, claimId: claim.claimId, finalStatus: resolution.to, reason: resolution.reason, role: 'runner' });
+    const timeoutNote = verifyTimedOut ? ' (goal-check timed out, not a real verify failure)' : '';
+    log(`fgos-runner: reaped stale doing "${id}" -> ${resolution.to}${resolution.reason ? ` (${resolution.reason})` : ''}${timeoutNote}`);
+    resolutions.push({ id, to: resolution.to, reason: resolution.reason ?? null });
+  }
+
+  // Fallback scan for legacy durable 'doing' items with no active runtime claim
+  for (const id of Object.keys(view.work)) {
+    if (processedIds.has(id)) continue;
+    const item = view.work[id];
+    if (item.status !== 'doing') continue;
+    if (item.claimRole === 'human' || item.claimRole === 'session') continue;
+
+    const branch = branchNameFor(id);
+    const facts = branchFacts(repoRoot, branch);
+    const hasCommit = facts.exists && facts.aheadCount > 0;
+
+    const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
+    if (!attestation.ok) {
+      if (dryRun) {
+        resolutions.push({ id, planned: 'blocked' });
+      } else {
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: attestation.reason, role: 'runner' });
+        log(`fgos-runner: reaped stale doing "${id}" -> blocked (${attestation.reason}: ${attestation.detail})`);
+        resolutions.push({ id, to: 'blocked', reason: attestation.reason });
+      }
+      continue;
+    }
+
+    if (dryRun) {
+      resolutions.push({ id, planned: hasCommit ? 'verify-then-resolve' : 'blocked' });
+      continue;
+    }
+
+    let verifyPassed = false;
+    let verifyTimedOut = false;
+    let worktreeFailed = false;
+    if (hasCommit) {
+      let wt = null;
+      try {
+        wt = createDispatchWorktree(repoRoot, id, { worktreeDir });
+        const goalCheck = await runGoalCheck(item, wt.path, verifyTimeoutMs);
+        verifyPassed = goalCheck.passed;
+        verifyTimedOut = goalCheck.timedOut;
+      } catch (err) {
         if (err?.errorClass === 'worktree-fail') {
           worktreeFailed = true;
           log(`fgos-runner: worktree-fail while reaping stale "doing" item "${id}": ${err.message}`);
@@ -439,8 +503,20 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
 
   const pruned = [];
   const kept = [];
+  const childrenByParent = indexChildrenByParent(view.work);
   for (const { branch, aheadCount } of listLeftovers(repoRoot)) {
     const branchId = branch.startsWith('fgw/') ? branch.slice('fgw/'.length) : branch;
+    const itemStatus = view.work[branchId]?.status;
+
+    if (itemStatus === 'wontfix' && !hasOpenDescendant(branchId, view.work, childrenByParent)) {
+      if (!dryRun) {
+        cleanupMergedBranch(repoRoot, branch);
+        log(`fgos-runner: pruned orphan branch ${branch} (wontfix)`);
+      }
+      pruned.push(branch);
+      continue;
+    }
+
     if (aheadCount === 0 && hasStillNeededDescendant(branchId, view.work)) {
       log(
         `fgos-runner: keeping ${branch} (0 commits ahead, but a descendant still needs this ref — not yet done/wontfix)`,
@@ -505,14 +581,20 @@ async function claimItem({ dir, ownershipStore, queue, ownerIdentity, item, repo
     const freshView = listWork(dir);
     const decision = claimRoot(ownershipStore, freshView, item.id, ownerIdentity);
     if (decision.action === 'claim') ownershipStore.setOwner(decision.root, ownerIdentity);
+    let claimId;
     if (decision.accepted) {
       // Delegate to claim-port.mjs for main-checkout-lock + moveWork (tsk-53f D1).
       // Runner uses isolate:false here — worktree creation happens later in runItem.
       // skipOutcome:true because runner writes its own predicted outcome in runItem
       // with proper timing (after worktree creation, with branch head info).
-      claimWork(dir, { id: item.id, actor: 'runner', isolate: false, repoRoot, skipOutcome: true });
+      // tsk-40m code-review finding (blocker): capture the claimId THIS call
+      // actually acquired — dispatchClaimedItem must settle with this exact
+      // token, never re-read "whichever claim is active right now" at
+      // settle time (that would settle a DIFFERENT actor's claim if this
+      // one got reclaimed as stale in the meantime).
+      claimId = claimWork(dir, { id: item.id, actor: 'runner', isolate: false, repoRoot, skipOutcome: true }).claimId;
     }
-    return decision;
+    return { ...decision, claimId };
   });
 }
 
@@ -706,6 +788,11 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
         }
         const id = generateId(block.title, Object.keys(view));
         const derived = classify(block.title);
+        const domainObj = getDomain(item.domain);
+        const validKinds = classificationVocabulary(domainObj, 'kind');
+        const validRisks = classificationVocabulary(domainObj, 'risk');
+        const kindValid = validKinds ? validKinds.includes(block.kind) : typeof block.kind === 'string' && block.kind.length > 0;
+        const riskValid = validRisks ? validRisks.includes(block.risk) : typeof block.risk === 'string' && block.risk.length > 0;
         addWork(dir, {
           id,
           title: block.title,
@@ -716,10 +803,10 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           // the third write path this item's own scout found mid-planning.
           description:
             typeof block.description === 'string' && block.description.trim() ? block.description : block.title,
-          kind: block.kind ?? derived.kind,
+          kind: kindValid ? block.kind : derived.kind,
           status: 'todo',
           deps: [],
-          risk: block.risk ?? derived.risk,
+          risk: riskValid ? block.risk : derived.risk,
           refs: [],
           verify: FALLBACK_VERIFY,
           tier: derived.tier,
@@ -735,7 +822,7 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           // (`scripts/migrate-clarify-split.mjs`'s own "untouched" target).
           // A domain that still has a real Clarify-mapped stage (e.g.
           // `triage`) is unaffected -- the `??` never fires for it.
-          stage: stageForStep(getDomain(item.domain), 'Clarify') ?? getDomain(item.domain).stages?.[0],
+          stage: stageForStep(domainObj, 'Clarify') ?? domainObj.stages?.[0],
           domain: item.domain,
           discoveredFrom: item.id,
         });
@@ -747,7 +834,7 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
   }
 }
 
-async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, breaker, queue, log, priorVisits, rootId }) {
+async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, breaker, queue, log, priorVisits, rootId, claimId }) {
   log(`fgos-runner: claimed "${item.id}" (todo -> doing)`);
   await queue.enqueue(async () => {
     addOutcome(dir, {
@@ -821,17 +908,19 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       lastWorkerOutput = worker.stdout ?? ''; // wgi-8: terminal-outcome discovery source (success/verify-miss)
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
       // Executor-aware dispatch announce/audit (D8, tsk-62v): one line to
-      // stderr/logs, plus one event appended to the existing `.fgos/
-      // events.jsonl` one-door-write log — reused, not a new file.
-      // `replay.mjs` ignores unknown event types by design (see its own
-      // doc comment), so this audit-only entry never participates in the
-      // FSM view. Queued through the same `queue.enqueue()` every other
-      // write at this call site already uses, closing the synthesis
-      // report's concurrent-session write-race concern (§3) for this
-      // append too.
+      // stderr/logs, plus one event appended to this writer's own open
+      // file under `.fgos/events/` (`resolveWriterLogPath`, TA-D2/TA-D12)
+      // — never straight to the frozen baseline `events.jsonl`, so a
+      // concurrent dispatch from another writer never contends for the
+      // same physical file. `replay.mjs` ignores unknown event types by
+      // design (see its own doc comment), so this audit-only entry never
+      // participates in the FSM view. Queued through the same
+      // `queue.enqueue()` every other write at this call site already
+      // uses, closing the synthesis report's concurrent-session
+      // write-race concern (§3) for this append too.
       log(`fgos-runner: ${worker.executorId} — ${worker.provider} — ${worker.model}`);
       await queue.enqueue(async () => {
-        appendEvent(path.join(dir, 'events.jsonl'), {
+        appendEvent(resolveWriterLogPath(dir), {
           type: 'executor.dispatch',
           // baseCommit/headRef (tsk-4hl, D1/D3 of docs/history/parallel-
           // decomposition-footprint-avoidance/CONTEXT.md — mức 1): the
@@ -877,7 +966,13 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       if (check.passed && facts.aheadCount > 0) {
         breaker.recordHit(item.id);
         await queue.enqueue(async () => {
-          moveWork(dir, { id: item.id, to: 'awaiting-approval', expectedStatus: 'doing', role: 'runner' });
+          // tsk-40m code-review finding (blocker): settle with the EXACT
+          // claimId claimItem's own claimWork call acquired — never
+          // re-derive "whichever claim is active right now" via readClaim
+          // at settle time (that reads a DIFFERENT actor's claimId if this
+          // one was reclaimed as stale in the meantime, and would silently
+          // settle their claim instead of failing closed).
+          settleClaim(dir, { id: item.id, claimId, finalStatus: 'awaiting-approval', role: 'runner' });
         });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
         log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
@@ -957,10 +1052,10 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
     // records the edge itself; the reason lives in the runner's report (the
     // doing -> blocked edge carries no reason payload by design).
     await queue.enqueue(async () => {
-      moveWork(dir, {
+      settleClaim(dir, {
         id: item.id,
-        to: 'blocked',
-        expectedStatus: 'doing',
+        claimId,
+        finalStatus: 'blocked',
         reason: tripped ? 'breaker-tripped' : failure.errorClass,
         role: 'runner',
       });
@@ -1055,7 +1150,7 @@ async function claimAndDispatch(ctx) {
       log(`fgos-runner: claim for "${item.id}" rejected — root held by "${decision.currentOwner}"; left for a later poll`);
       return { outcome: 'claim-rejected', id: item.id, currentOwner: decision.currentOwner, exitCode: 0 };
     }
-    return await dispatchClaimedItem({ ...ctx, priorVisits, rootId: decision.root });
+    return await dispatchClaimedItem({ ...ctx, priorVisits, rootId: decision.root, claimId: decision.claimId });
   } catch (err) {
     // A worker-slot refusal is an ANSWER, not a failure (D6): the launcher
     // asked, the engine said no, and nothing was stood up. It reaches here
@@ -1069,9 +1164,9 @@ async function claimAndDispatch(ctx) {
     // `claim-rejected` is the outcome that already means "never dispatched,
     // left for a later poll" — the refused item keeps its place in the
     // frontier and the next poll picks it up once a slot frees.
-    if (err instanceof ClaimError && err.code === 'worker-slot-ceiling') {
+    if ((err.name === 'ClaimError' || err instanceof ClaimError) && (err.code === 'worker-slot-ceiling' || err.category === 'conflict' || err.code === 'conflict')) {
       log(`fgos-runner: claim for "${item.id}" refused — ${err.message}; left for a later poll`);
-      return { outcome: 'claim-rejected', id: item.id, reason: 'worker-slot-ceiling', exitCode: 0 };
+      return { outcome: 'claim-rejected', id: item.id, reason: err.code || 'conflict', exitCode: 0 };
     }
     const category = categoryOf(err);
     const exitCode = EXIT_CODES[category];
@@ -1285,7 +1380,7 @@ export async function runOnce(options = {}) {
       for (const item of Object.values(listWork(dir).work)) {
         const domain = getDomain(item.domain, {
           onUnrecognized: (bad) =>
-            log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "coding".`),
+            log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "${DEFAULT_DOMAIN}".`),
         });
         const planningStage = stageForStep(domain, 'Divide');
         // tsk-403 D18: also sweep the legacy `decompose` alias — an item
@@ -1294,11 +1389,12 @@ export async function runOnce(options = {}) {
         // it just because `stageForStep` no longer resolves NEW items
         // there. Only activates when a domain declares both names
         // distinctly (today: only `coding`).
-        const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+        const workflow = resolveWorkflow(domain, item.kind);
+        const legacyPlanStage = (workflow?.stages ?? domain.stages)?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
         if (
           planningStage !== undefined &&
           (item.stage === planningStage || item.stage === legacyPlanStage) &&
-          item.status === 'todo'
+          (item.status === 'todo' || item.status === 'doing')
         ) {
           resolvePlan(dir, item.id, config, 'runner');
           log(`fgos-runner: chia-việc swept plan item "${item.id}"`);

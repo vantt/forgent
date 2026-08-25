@@ -8,10 +8,24 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { addWork, moveWork, StoreError, recordCall, recordCallReturn, listWork } from '../../src/state/store.mjs';
+import { addWork, moveWork, StoreError, recordCall, recordCallReturn, listWork, resolveWriterLogPath, rebuild } from '../../src/state/store.mjs';
+import { appendEvent } from '../../src/state/events.mjs';
 
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-handoff-cli-'));
+}
+
+// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+// is retired from status-fsm.mjs's TRANSITIONS table — nothing durably
+// writes INTO `doing` anymore. This file's own tests need a durably-'doing'
+// item purely as a PRECONDITION for exercising moveWork's OWN D16/D18
+// side-effect logic on a later `to: X, expectedStatus: 'doing'` call (the
+// actual subject under test) — a raw event write, bypassing transitionWork's
+// own edge validation, is the direct, honest way to get there (same
+// technique test/state/store.test.mjs's own moveToDurableDoingForTest uses).
+function moveToDurableDoingForTest(dir, id, from = 'todo') {
+  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
+  rebuild(dir);
 }
 
 // Born directly at stage 'executing' (same shape a split child gets from
@@ -29,7 +43,7 @@ function seedExecutingItem(dir, id = 'implement-thing') {
     refs: [],
     verify: 'npm test',
   });
-  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, id);
   return id;
 }
 
@@ -53,7 +67,7 @@ test('regression: a handoff succeeds on an item with no explicit stage field (D8
     refs: [],
     verify: 'true',
   });
-  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, id);
   recordCall(dir, { id, toRole: 'reviewer', reason: 'review' });
   assert.equal(listWork(dir).work[id].holder, 'reviewer');
 });
@@ -77,6 +91,26 @@ test('sync call: consult does NOT change holder, appends a call-summary event', 
   assert.equal(view.callThreads[id].length, 1);
   assert.equal(view.callThreads[id][0].kind, 'call-summary');
   assert.equal(view.callThreads[id][0].outcome, 'finding: use lib X');
+});
+
+test('D28: recordCall threads a caller-supplied openSyncDepth into evaluateHandoff\'s cap -- refuses when the caller reports it is already at cap, even on the FIRST call (nesting can never be derived from replay for sync calls, see recordCall\'s own doc comment)', () => {
+  const dir = tmpDir();
+  const id = seedExecutingItem(dir);
+  assert.throws(
+    () => recordCall(dir, { id, toRole: 'researcher', reason: 'consult', openSyncDepth: 3 }),
+    (err) => {
+      assert.ok(err instanceof StoreError);
+      assert.match(err.message, /callstack cap/);
+      return true;
+    },
+  );
+});
+
+test('D28: omitting openSyncDepth defaults to 0 (byte-identical to every pre-D28-wiring caller) -- a sync call under cap still succeeds', () => {
+  const dir = tmpDir();
+  const id = seedExecutingItem(dir);
+  const { event } = recordCall(dir, { id, toRole: 'researcher', reason: 'consult' });
+  assert.equal(event.type, 'work.call-summary');
 });
 
 test('off-graph call is refused; the error names the legal edges', () => {
@@ -119,8 +153,8 @@ test('nested async calls (depth 2, the deepest this domain\'s roleGraph legally 
   const dir = tmpDir();
   const id = seedExecutingItem(dir);
   recordCall(dir, { id, toRole: 'reviewer', reason: 'review' }); // depth 0 -> 1
-  recordCall(dir, { id, toRole: 'human-advisor', reason: 'advise' }); // depth 1 -> 2
-  assert.equal(listWork(dir).work[id].holder, 'human-advisor');
+  recordCall(dir, { id, toRole: 'advisor', reason: 'advise' }); // depth 1 -> 2
+  assert.equal(listWork(dir).work[id].holder, 'advisor');
   recordCallReturn(dir, { id }); // depth 2 -> 1, back to reviewer (NOT reset to implementer)
   assert.equal(listWork(dir).work[id].holder, 'reviewer');
   recordCallReturn(dir, { id }); // depth 1 -> 0, back to implementer
@@ -132,7 +166,7 @@ test('nested async calls (depth 2, the deepest this domain\'s roleGraph legally 
 // The cap itself (openCallDepth reaching handoff.mjs's own callstackCap) is
 // proven directly at the pure-guard level in test/state/handoff.test.mjs,
 // where depth is injected rather than built through real edges — this
-// domain's roleGraph today has no legal edge past depth 2 (human-advisor
+// domain's roleGraph today has no legal edge past depth 2 (advisor
 // has no outgoing edges), so a depth-3 refusal cannot be exercised through
 // recordCall alone without inventing an edge nothing else uses.
 
@@ -150,7 +184,7 @@ test('a domain with no roleGraph refuses cleanly, never crashes', () => {
     verify: 'true',
     domain: 'synthetic',
   });
-  moveWork(dir, { id: 'synthetic-item', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'synthetic-item');
   assert.throws(
     () => recordCall(dir, { id: 'synthetic-item', toRole: 'reviewer', reason: 'review' }),
     StoreError,
@@ -190,7 +224,7 @@ test('D18: a domain with no roleGraph reaching awaiting-approval is unaffected (
     verify: 'true',
     domain: 'synthetic',
   });
-  moveWork(dir, { id: 'synthetic-awaiting', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'synthetic-awaiting');
   moveWork(dir, { id: 'synthetic-awaiting', to: 'awaiting-approval', expectedStatus: 'doing' });
   const view = listWork(dir);
   assert.equal(view.work['synthetic-awaiting'].status, 'awaiting-approval');
@@ -230,8 +264,8 @@ test('D16: moveWork to delivered auto-closes a depth-2 nested call, one frame at
   const dir = tmpDir();
   const id = seedExecutingItem(dir);
   recordCall(dir, { id, toRole: 'reviewer', reason: 'review' });
-  recordCall(dir, { id, toRole: 'human-advisor', reason: 'advise' });
-  assert.equal(listWork(dir).work[id].holder, 'human-advisor');
+  recordCall(dir, { id, toRole: 'advisor', reason: 'advise' });
+  assert.equal(listWork(dir).work[id].holder, 'advisor');
   moveWork(dir, { id, to: 'delivered', expectedStatus: 'doing' });
   const view = listWork(dir);
   assert.equal(view.work[id].holder, 'implementer');
@@ -263,7 +297,7 @@ test('D16: a domain with no roleGraph reaching delivered is unaffected (no crash
     verify: 'true',
     domain: 'synthetic',
   });
-  moveWork(dir, { id: 'synthetic-delivered', to: 'doing', expectedStatus: 'todo' });
+  moveToDurableDoingForTest(dir, 'synthetic-delivered');
   moveWork(dir, { id: 'synthetic-delivered', to: 'delivered', expectedStatus: 'doing' });
   const view = listWork(dir);
   assert.equal(view.work['synthetic-delivered'].status, 'delivered');

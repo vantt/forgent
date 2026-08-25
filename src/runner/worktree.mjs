@@ -320,6 +320,39 @@ export function isCheckoutDirty(repoRoot, worktreePath) {
 }
 
 /**
+ * Return an array of relative file paths that are currently dirty (uncommitted
+ * or untracked) in `worktreePath`, excluding `.fgos` artifacts (reusing the
+ * exact `:!.fgos` pathspec exclusion from `isCheckoutDirty`). Fails open
+ * (returns empty array) on git error.
+ *
+ * Exported (tsk-3bh): `executeExecutorCli` (src/runner/dispatch/cli.mjs)
+ * uses this to detect uncommitted paths lost across an out-of-process dispatch.
+ */
+export function checkoutDirtyPaths(repoRoot, worktreePath) {
+  let statusOutput;
+  try {
+    statusOutput = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '-z', '--', ':!.fgos']);
+  } catch {
+    return [];
+  }
+  const records = statusOutput.split('\0').filter((entry) => entry.length > 0);
+  const paths = [];
+  for (let i = 0; i < records.length; i += 1) {
+    const entry = records[i];
+    const statusCode = entry.slice(0, 2);
+    const filePath = entry.slice(3);
+    if (filePath) {
+      paths.push(filePath);
+    }
+    if (statusCode.includes('R') || statusCode.includes('C')) {
+      i += 1;
+    }
+  }
+  return paths;
+}
+
+
+/**
  * Reclaim `branch` from any existing checkout before it is reused (per
  * CRASH RECLAIM in the module doc). Idempotent: a branch not checked out
  * anywhere is a no-op. Returns `{ reclaimed, path }`.
@@ -1016,11 +1049,18 @@ export function resyncWorktree(repoRoot, worktreePath, branch) {
  * that's provably safe (tsk-2cd: `resyncClaimWorktree` above — the branch
  * may have advanced past this checkout via a child merge while this
  * worktree sat claimed-but-anchored; see that function's own doc for why
- * "untouched" was the bug, not the fix). The case is routine rather than
- * exotic — an item's claim is released back to `todo` the moment it reaches
- * stage `executing` (`decompose.mjs`'s `releaseClaimOnExecuting`), and the
- * session that held it then claims it again to do the work, from inside the
- * very worktree the claim stands up. Going through `createWorktree`'s reuse
+ * "untouched" was the bug, not the fix). The case was originally routine
+ * rather than exotic — an item's claim was released back to `todo` the
+ * moment it reached stage `executing` (`releaseClaimOnExecuting`,
+ * src/intake/plan.mjs), and the session that held it then claimed it again
+ * to do the work, from inside the very worktree the claim stands up.
+ * tsk-40m D5 retired that release (a runtime claim now stays active
+ * unbroken through clarify->executing, so this exact re-claim-at-executing
+ * trigger no longer fires for a new item) — this reattach path stays live
+ * for every OTHER reason the same worktree gets claimed again (a stale
+ * session reclaimed via claim-lock, a human re-`pick`ing after a crash,
+ * legacy pre-migration history), so it is not dead code, just no longer
+ * this ONE trigger's routine case. Going through `createWorktree`'s reuse
  * path there would reclaim that live checkout: force-removed when clean —
  * pulling the directory out from under the running session — or a hard
  * failure when dirty. Neither is what a re-claim means.

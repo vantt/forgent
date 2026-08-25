@@ -11,6 +11,7 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 - docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)
 - docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary
 - docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own "Lịch sử quyết định" sections (tsk-1lv-4)
+- domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing
 
 ## Product priority order (D-ADR0030, docs/specs/runner.md)
 
@@ -81,48 +82,15 @@ cài đặt/setup/doctor story. Before any change is done, ask:
 Laws in `docs/platform-foundations.md` are fixed until their named review
 threshold is hit. Changing one supersedes its decision ID — never edit it in place.
 
-## fgOS Workflow
+## RUL11 — tùm lum, không phải nặng (D-ADR0036, docs/specs/platform-foundations.md)
 
-A session opening in this repo to work an item through its lifecycle loads
-`fgos-routing` first (`.claude/skills/fgos-routing/SKILL.md`): it orients
-on open work, claims one item through the pull door, then points to
-`fgos-coding-discovering`, `fgos-coding-exploring`, `fgos-coding-planning`,
-or `fgos-coding-validating` based on where that item's `stage` puts it.
+Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của
+tình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum, gom lại — gom
+tới khi hết; quy mô không bao giờ là lý do miễn trừ. Đích của mọi lần gom
+là một hình dạng duy nhất: ranh giới rõ, contract tường minh, đổi và biến
+hình dễ, không chắp vá.
 
-**Never run a raw `git reset --hard` on the main checkout without a full
-`git status` first** (tsk-3au: `docs/history/main-checkout-destructive-
-git-safety-net/CONTEXT.md`) — the main checkout is the one shared working
-tree every session's `fgos <verb>` call resolves against; checking only the
-files you meant to touch instead of the whole tree can silently discard
-another in-flight session's uncommitted work, with no stash/reflog/blob to
-recover it. Use `fgos main-checkout-reset --sha <sha> [--confirm]` instead
-— it prints the full whole-repo status and refuses without `--confirm`
-when the tree is dirty.
-
-**Never `git add -A` inside a linked worktree (`fgos pick`'s `fgw/<id>`
-checkout) without checking `git status` first** (tsk-56u:
-`docs/history/commit-time-fgos-deletion-guard/`) — a worktree never keeps a
-working-tree copy of `.fgos/` (ADR0020 strips it right after `git worktree
-add`, without ever `git rm`-ing it from the index), so `-A` stages every
-`.fgos/` file as deleted. Committing that silently destroys the live event
-log once the branch merges back. `.githooks/pre-commit` now refuses this
-commit outright (a staged `.fgos/` deletion, checked unconditionally, not
-only "at home" in the main checkout) — if you hit that refusal, `git
-restore --staged .fgos` before committing again.
-
-**Never `git stash` in the main checkout to clear a dirty tree without
-checking what it swept up** (tsk-56u, same history folder) — the stash
-stack is shared across every session and worktree, and stashing
-`.fgos/events.jsonl` along with everything else doesn't just hide the
-file: it rolls the whole repository's `.fgos` state back to an older
-commit for as long as the stash is held. This has already caused a real
-incident: an `approve` run misread an item's status as `doing` when it was
-really `awaiting-approval`, because the live event log was sitting in a
-stash — recovered by applying the stash back by SHA rather than popping
-it, but the same move can silently strand another session's reads too.
-There is no mechanical guard against this (git has no hook that can
-refuse a stash) — stash selectively, or use `fgos main-checkout-reset`
-above instead of stash-and-reset as a shortcut.
+khong phai no nang ma no tum lum
 
 ## Dispatch — routing work to a executor
 
@@ -132,7 +100,7 @@ Four ways to call `decide`, for four different situations:
 
 - `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).
 - `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.
-- `decide --work <id>` — you have a real work item and want it dispatched.
+- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.
 - `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name.
 
 Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed.
@@ -141,56 +109,15 @@ Three possible `mechanism` results, each needing a different response:
 
 - **`"unavailable"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.
 - **"in-process"** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
-- **`"out-of-process"`** — run `node src/runner/dispatch.mjs execute`. Never run the resolved command yourself through Bash: `execute` invokes the adapter and hands back the real result.
+- **`"out-of-process"`** — run `node src/runner/dispatch.mjs execute`. Never run the resolved command yourself through Bash: `execute` invokes the adapter and hands back the real result. (For a worktree-backed item, if passing explicit directory flags, pass `--cwd <worktree path>` and `--repo-root <main checkout path>` as two separate flags — never pass the main checkout as `--dir` alone).
 
 Every result also carries `configured: true|false` — `false` means nothing is configured for that name or job, and the answer came from the default.
 
 A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.claude/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `.agents/skills/_shared/`).
 
-<!-- gitnexus:start -->
-# GitNexus — Code Intelligence
+## Starting the herdr gateway — one door, never a raw process
 
-This project is indexed by GitNexus as **forgent** (17220 symbols, 23895 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
-
-> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
-
-## Always Do
-
-- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the user.
-- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: "compare", base_ref: "main"})`.
-- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.
-- When exploring unfamiliar code, use `query({search_query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
-- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: "symbolName"})`.
-- For security review, `explain({target: "fileOrSymbol"})` lists taint findings (source→sink flows; needs `analyze --pdg`).
-
-## Never Do
-
-- NEVER edit a function, class, or method without first running `impact` on it.
-- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.
-- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.
-- NEVER commit changes without running `detect_changes()` to check affected scope.
-
-## Resources
-
-| Resource | Use for |
-|----------|---------|
-| `gitnexus://repo/forgent/context` | Codebase overview, check index freshness |
-| `gitnexus://repo/forgent/clusters` | All functional areas |
-| `gitnexus://repo/forgent/processes` | All execution flows |
-| `gitnexus://repo/forgent/process/{name}` | Step-by-step execution trace |
-
-## CLI
-
-| Task | Read this skill file |
-|------|---------------------|
-| Understand architecture / "How does X work?" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |
-| Blast radius / "What breaks if I change X?" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
-| Trace bugs / "Why is X failing?" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |
-| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
-| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |
-| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
-
-<!-- gitnexus:end -->
+**If a task needs the herdr-fgos gateway (REST API + web dashboard) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** (tsk-31v) This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `herdr-plugin/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.
 
 <!-- mdview:START -->
 ## Documentation Viewing (MDView)

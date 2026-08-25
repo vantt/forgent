@@ -283,7 +283,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'edit',
     invoke: 'fgos edit',
-    description: 'Patch fields on an existing item (title/description/kind/risk/verify/tier/refs/deps/footprint/acceptance/priority/intent/docs-ref/parent/urgent/impact/effort/merge-after). At least one field must be given.',
+    description: 'Patch fields on an existing item (title/description/kind/risk/verify/tier/refs/deps/footprint/action/acceptance/priority/intent/docs-ref/parent/urgent/impact/effort/merge-after). At least one field must be given.',
     parameters: {
       type: 'object',
       properties: {
@@ -297,6 +297,7 @@ export const COMMAND_REGISTRY = [
         refs: { type: 'string', description: 'Comma-separated list of reference ids/links (empty string clears the field).', multiValueFormat: 'csv' },
         deps: { type: 'string', description: 'Comma-separated list of dependency ids (empty string clears the field).', multiValueFormat: 'csv' },
         footprint: { type: 'string', description: 'Comma-separated list of file paths this item is expected to touch (advisory only); empty string clears the field.', multiValueFormat: 'csv' },
+        action: { type: 'string', description: 'New action directive sentence (e.g. for worker prompt). Must be a non-empty string when present -- unlike refs/deps/footprint, an empty value is rejected as validation rather than clearing the field.' },
         parent: { type: 'string', description: 'New lineage parent id (empty string "" clears the field, un-parenting the item).' },
         acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses — replaces the whole array (empty array "[]" clears the field). NOT comma-separated — clause text may contain commas.', multiValueFormat: 'json-array' },
         priority: { type: 'integer', description: 'New priority: a non-negative integer, ascending sort (lower = higher priority). Absent stays absent — items without a priority sort after every item that has one.' },
@@ -311,6 +312,26 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos edit build-cli --verify "npm test -- --grep cli"'],
+    touchesState: true,
+    requiresExistingStore: true,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'resolve-park-reason',
+    invoke: 'fgos resolve-park-reason',
+    description: 'Clear a stale reason/parkReason left over from a system-error park event on a closed item (status "done" or "wontfix"), requiring a non-empty --note justifying the resolution for the audit trail.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id (positional or --id).' },
+        note: { type: 'string', description: 'Human-confirmed rationale/note for clearing the stale reason (required).' },
+      },
+      positional: ['id'],
+      required: ['id', 'note'],
+    },
+    examples: ['fgos resolve-park-reason tsk-64h --note "Human confirmed present on main branch"'],
     touchesState: true,
     requiresExistingStore: true,
     externalEffect: false,
@@ -647,6 +668,24 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'faults',
+    invoke: 'fgos faults',
+    description: 'Read-only: the machine-readable surface for .fgos/logs/invocation-faults.jsonl, the side log recordInvocationFault writes when a fgos call is malformed (unknown verb, missing store, a bad --dir, an arg-parse fault) — never for a verb\'s own business refusal. Returns every record in append order (oldest first) plus the total count; --limit caps it to the N most recent (still oldest-of-those-first). Resolves the log the same worktree-safe way it is written: from a linked worktree with no --dir, this still reads the main checkout\'s real log rather than an empty view.',
+    parameters: {
+      type: 'object',
+      properties: {
+        limit: { type: 'integer', description: 'Return only the N most recently recorded faults instead of the full log.' },
+      },
+      required: [],
+    },
+    examples: ['fgos faults', 'fgos faults --limit 20'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'recheck-blocked',
     invoke: 'fgos recheck-blocked',
     description: 'Read-only, report-only advisory: re-runs the merge-still-resolves ancestry check LIVE against every current status:blocked item, instead of trusting its stored reason/detail text (the same live-recheck stance fgos catchup\'s own eligibility gate already takes). Reports which blocked items would now pass that check (resolvable), which are still genuinely blocked (stillBlocked), and which the check does not apply to at all — a non-worktree-backed domain, or an item with no recorded merge commit (notApplicable). Never transitions anything; run fgos catchup <id> to actually act on a resolvable item.',
@@ -780,7 +819,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'take',
     invoke: 'fgos take',
-    description: 'Claim one item through the pull door (defaults to the frontier head): moves it to doing and records the predicted outcome.',
+    description: 'Claim one item through the pull door (defaults to the frontier head): records a runtime claim (effective status becomes doing) and the predicted outcome.',
     parameters: {
       type: 'object',
       properties: {
@@ -1154,6 +1193,25 @@ export const COMMAND_REGISTRY = [
     touchesState: true,
     requiresExistingStore: false,
     externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'gateway',
+    invoke: 'fgos gateway',
+    description: 'One-door lifecycle for the herdr-fgos gateway (REST API + web dashboard, herdr-plugin/src/gateway.rs) as a detached background process (tsk-31v): "start" builds the release binary then spawns it detached, refusing if already running; "stop" sends SIGTERM to the recorded pid; "status" (read-only) reports pid/port/liveness plus a real reachability check against /v1/contract. Use this instead of a hand-rolled nohup/tmux/systemd invocation — AGENTS.md names it the mandatory entry point.',
+    parameters: {
+      type: 'object',
+      properties: {
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['start', 'stop', 'status'] },
+      },
+      positional: ['sub'],
+      required: ['sub'],
+    },
+    examples: ['fgos gateway start', 'fgos gateway status', 'fgos gateway stop'],
+    touchesState: true,
+    requiresExistingStore: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
   },

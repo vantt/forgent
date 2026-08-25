@@ -34,10 +34,30 @@ function envelopeData(stdout) {
   return envelope.data;
 }
 
+// Tầng A/T2: new events land under `.fgos/events/<writer>-<ts>.jsonl`, not
+// the frozen baseline `.fgos/events.jsonl` (TA-D12) -- counts/exposes raw
+// lines across both, mirroring test/cli/helpers/fgos-cli-harness.mjs's own
+// eventLines (this file keeps its own local copy rather than importing it).
 function eventLines(cwd) {
+  const lines = [];
   const logPath = path.join(cwd, '.fgos', 'events.jsonl');
-  if (!fs.existsSync(logPath)) return [];
-  return fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+  if (fs.existsSync(logPath)) {
+    lines.push(...fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean));
+  }
+  const eventsDir = path.join(cwd, '.fgos', 'events');
+  let names = [];
+  try {
+    names = fs
+      .readdirSync(eventsDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch {
+    names = [];
+  }
+  for (const name of names) {
+    lines.push(...fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean));
+  }
+  return lines;
 }
 
 // Declares a executor directly in `.fgos/config.json`'s `runner.executors`
@@ -105,7 +125,7 @@ test('tool check on a present mcp tool writes "present" to the local status over
   assert.equal(eventLines(cwd).length, before, 'tool check must never append an event — it writes the local overlay only');
   const data = envelopeData(result.stdout);
   assert.equal(data.checked.gitnexus.status, 'present');
-  const overlay = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'tool-status.local.json'), 'utf8'));
+  const overlay = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'runtime', 'tool-status.local.json'), 'utf8'));
   assert.equal(overlay.gitnexus.status, 'present');
 });
 
@@ -123,11 +143,11 @@ test('tool check --name only probes the named tool, leaving other declared tools
   declareGitnexus(cwd);
   declareExecutor(cwd, 'c3', { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
   run(cwd, ['tool', 'check']); // seeds both
-  const before = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'tool-status.local.json'), 'utf8'));
+  const before = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'runtime', 'tool-status.local.json'), 'utf8'));
   fs.mkdirSync(path.join(cwd, '.c3'), { recursive: true }); // now present, but we only re-check gitnexus below
   const result = run(cwd, ['tool', 'check', '--name', 'gitnexus']);
   assert.equal(result.status, 0);
-  const after = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'tool-status.local.json'), 'utf8'));
+  const after = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'runtime', 'tool-status.local.json'), 'utf8'));
   assert.equal(after.c3.checkedAt, before.c3.checkedAt, 'c3 must not have been re-probed');
 });
 

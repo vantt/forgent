@@ -45,8 +45,8 @@ of it).
 | 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |
 | 5b | Global config file | `~/.fgos/config.json` — same schema as the project-local shared config file, initialized/kept current by `fgos setup` (tsk-1ri) the same way it already handles the project-local file; project always wins any key present in both (`mergeWithGlobalConfig`, `src/config/global-config.mjs`) | one file, home-dir-relative | no (optional; a missing file is not an error, resolves to `{}`) | not created by anything except `fgos setup` |
 | 6 | Config staleness | Whether a config file (project-local or global — same computation, tsk-1ri) already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |
-| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); any module can add its own check independently of registering a config-default or a fix (tsk-2cs). Today's registered checks: `node-version-and-git`, `cli-version-visible` (tsk-2ej), `shell-integration-sourced`, `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `work-classification-vocabulary`, `work-stage-vocabulary` (tsk-64h), `domain-workflow-skillmap-coverage` (tsk-ogx), `root-drift`, `delivered-not-on-trunk` (tsk-1l9), `events-jsonl-contiguous` (tsk-3wq), `config-awareness`, `dependencies-installed`, `gate-bypass-configured`, `claude-plugin-marketplace`, `plugin-skill-cli-reachable`, `plugin-dev-skills-packaged` (tsk-32b), `changelog-unreleased-stale`, `herdr-launcher-configured`, `herdr-web-dashboard-configured` (tsk-48w), `enduser-docs-index-stale` (tsk-1m0), `invariant-checks-configured` (tsk-516), `events-jsonl-not-truncated` (tsk-cgg), `worker-slots-ceiling-usable` (tsk-1oz), `gateway-token-configured` (tsk-4r1), `readme-install-tag-exists` (tsk-2t8), `iron-law-configured` (tsk-1y6-1), `task-specs-resolve` (tsk-2t9c), `agent-claims-resolve` (tsk-2t9c), `dispatch-decide-hook-wired` (tsk-60f), `decision-index-stale` (tsk-1lv-2/tsk-1lv), `doc-registry-enforce` (tsk-28x), `doc-registry-stale` (tsk-28x), `doc-alias-broken` (tsk-28x), `doc-active-duplicate` (tsk-28x), `doc-near-duplicate` (tsk-28x), `doc-provisional-aged` (tsk-28x), `doc-topic-oversized` (tsk-28x), `doc-role-underused` (tsk-28x), `doc-source-conservation` (tsk-28x). The registry is open, but this list is not a snapshot — it names every registered check, and a module adding one updates this row in the same change | yes | — |
-| 7b | Doctor fix | One named repair `fgos doctor --fix` can run before re-reporting checks | not a fixed list — an extensible registry (`registerFix`), independent of `registerCheck`/`registerConfigDefault` (tsk-2cs). Today's registered fixes: `gate-bypass-configured` (tsk-2qz, the registry's first entry to register all three capabilities at once), `events-jsonl-contiguous` (tsk-3wq), `claude-plugin-marketplace` (tsk-4xg), `enduser-docs-index-stale` (tsk-1m0), `bin-discovery-cache` (tsk-2qc-1), `gateway-token-configured` (tsk-4r1), `iron-law-configured` (tsk-1y6-1), `decision-index-stale` (tsk-1lv-2/tsk-1lv), `doc-registry-stale` (tsk-28x). Same rule as #7: the registry is open, but this list names every registered fix and a module adding one updates this row in the same change | yes | — |
+| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); a check registration and a config-default registration are independent, never a forced pairing — a module may register only a check, only a config-default, or both. Today's registered checks: `node-version-and-git`, `cli-version-visible` (tsk-2ej), `shell-integration-sourced`, `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `work-classification-vocabulary`, `work-stage-vocabulary` (tsk-64h), `domain-workflow-skillmap-coverage` (tsk-ogx), `root-drift`, `delivered-not-on-trunk` (tsk-1l9), `config-awareness`, `dependencies-installed`, `gate-bypass-configured`, `claude-plugin-marketplace`, `plugin-skill-cli-reachable`, `plugin-dev-skills-packaged` (tsk-32b), `changelog-unreleased-stale`, `herdr-launcher-configured`, `herdr-web-dashboard-configured` (tsk-48w), `enduser-docs-index-stale` (tsk-1m0), `invariant-checks-configured` (tsk-516), `events-jsonl-not-truncated` (tsk-cgg), `worker-slots-ceiling-usable` (tsk-1oz), `gateway-token-configured` (tsk-4r1), `readme-install-tag-exists` (tsk-2t8), `iron-law-configured` (tsk-1y6-1), `leaf-notify-drift` (tsk-1el), `task-specs-resolve` (tsk-2t9c), `agent-claims-resolve` (tsk-2t9c), `agent-type-names-unique` (tsk-397-12), `dispatch-decide-hook-wired` (tsk-60f), `decision-index-stale` (tsk-1lv-2/tsk-1lv), `advise-execute-capabilities-configured` (tsk-2uf-3), `agy-permissions-configured` (tsk-1xm), `main-checkout-guard-warnings` (tsk-1vc-3), `events-compaction-verified` (tsk-3ve-6), `no-stuck-merge-abort` (tsk-40a), `doc-registry-enforce` (tsk-28x), `doc-registry-stale` (tsk-28x), `doc-alias-broken` (tsk-28x), `doc-active-duplicate` (tsk-28x), `doc-near-duplicate` (tsk-28x), `doc-provisional-aged` (tsk-28x), `doc-topic-oversized` (tsk-28x), `doc-role-underused` (tsk-28x), `doc-source-conservation` (tsk-28x). The registry is open, but this list is not a snapshot — it names every registered check, and a module adding one updates this row in the same change | yes | — |
+| 7b | Doctor fix | One named repair `fgos doctor --fix` can run before re-reporting checks | not a fixed list — an extensible registry (`registerFix`), independent of `registerCheck`/`registerConfigDefault` (per tsk-2cs). Today's registered fixes: `gate-bypass-configured` (tsk-2qz, the registry's first entry to register all three capabilities at once), `claude-plugin-marketplace` (tsk-4xg), `enduser-docs-index-stale` (tsk-1m0), `bin-discovery-cache` (tsk-2qc-1), `gateway-token-configured` (tsk-4r1), `iron-law-configured` (tsk-1y6-1), `decision-index-stale` (tsk-1lv-2/tsk-1lv), `agy-permissions-configured` (tsk-1xm), `no-stuck-merge-abort` (tsk-40a), `doc-registry-stale` (tsk-28x). Same rule as #7: the registry is open, but this list names every registered fix and a module adding one updates this row in the same change | yes | — |
 | 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |
 
 ## Behaviors & Operations
@@ -65,12 +65,12 @@ of it).
   (`README.md`'s recommended path, `docs/how-to/cut-a-fgos-release-tag.md`),
   or the source repository's default branch when it doesn't (the
   bleeding-edge path README also documents) — tag-cutting itself stays a
-  manual, repo-owner-judgment act (tsk-jtb D1/D2), never CI-automated. The
+  manual, repo-owner-judgment act (per tsk-jtb), never CI-automated. The
   install runs
   no lifecycle script of its own — there is nothing for a package manager's
   build-script policy (e.g. pnpm's `allowBuilds`) to approve or block, so the
   install succeeds the same way regardless of which of the three package
-  managers runs it (per D1/D2 str88-fgos-pnpm-lifecycle).
+  managers runs it (per str88-fgos-pnpm-lifecycle).
 - **Side effects:** none beyond the local install; no registry account is
   created or touched, and nothing is published to the public npm registry.
 - **Afterwards:** the installer has a working `fgos` command. The content
@@ -112,8 +112,8 @@ of it).
   themselves; it always runs when invoked.
 - **What changes:** running the setup command wires up this repository's
   pre-commit hook for the person who just cloned it. It is never triggered
-  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle
-  D1) — a contributor runs it once, by hand, after cloning.
+  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)
+  — a contributor runs it once, by hand, after cloning.
 - **Side effects:** none beyond the local git config change; nothing is
   installed and no network access happens.
 - **Afterwards:** the contributor's local clone has the pre-commit hook
@@ -181,69 +181,68 @@ of it).
 
 ## Business Rules
 
-- **RUL1.** The distributed package never includes the source repository's own
+- **RUL1 (distributed package never includes the source repo's own runtime data).** The distributed package never includes the source repository's own
   runtime data directory or its own dogfood runner configuration — install
-  content is always limited to the distribution file allowlist (per D2).
-- **RUL2.** Distribution happens by installing directly from the GitHub
+  content is always limited to the distribution file allowlist.
+- **RUL2 (distribution is a GitHub install, not an npm registry publish).** Distribution happens by installing directly from the GitHub
   repository, not by publishing to the public npm registry — no package
-  rename and no registry publish credentials are involved (per D1).
-- **RUL3.** Installing fgos does not change init/doctrine/marker-detection
+  rename and no registry publish credentials are involved.
+- **RUL3 (install never changes init/doctrine/marker-detection behavior).** Installing fgos does not change init/doctrine/marker-detection
   behavior in any way — that behavior belongs entirely to the coexistence
-  area and is unchanged by installation (per D3).
-- **RUL4.** Every link in the README's Documentation section resolves to a
+  area and is unchanged by installation.
+- **RUL4 (every README Documentation link resolves to a shipped file).** Every link in the README's Documentation section resolves to a
   file that is actually present in the distribution file allowlist — a link
   to content that isn't shipped is a defect, not an acceptable pointer to
-  "clone the repo for more" (per D1/D2 str77-79-doc-gap-fixes / ea8b9a8d).
+  "clone the repo for more" (per str77-79-doc-gap-fixes / ea8b9a8d).
   Contributor/maintainer-only documentation (decision records, area specs,
   the product backlog, platform foundations) is intentionally excluded from
   both the allowlist and that section — it is out of scope for an installed
   end user, not an oversight.
-- **RUL5.** The dev checkout shell helper file is never sourced automatically
+- **RUL5 (dev checkout shell helper is never sourced automatically).** The dev checkout shell helper file is never sourced automatically
   by any install step or other mechanism in this repository — a contributor
   adding it to their own shell profile is always their own explicit,
-  separate action (per D3/D4).
-- **RUL6.** Installing (from any of npm, pnpm, or yarn) never runs a lifecycle
+  separate action.
+- **RUL6 (install never runs a lifecycle script).** Installing (from any of npm, pnpm, or yarn) never runs a lifecycle
   script of its own — the contributor hooks setup is always a separate,
   manually-invoked command, never an automatic `prepare`/`postinstall` step
-  (per str88-fgos-pnpm-lifecycle D1). This is what lets every package
+  (per str88-fgos-pnpm-lifecycle). This is what lets every package
   manager's own build-script approval policy stay out of the way entirely,
   rather than needing to be satisfied.
-- **RUL7.** `fgos setup` and `fgos doctor` both cover bash and zsh — neither
-  shell is treated as a lesser case (per D4).
-- **RUL8.** `fgos setup`'s config update never overwrites a setting the
+- **RUL7 (setup/doctor cover both bash and zsh).** `fgos setup` and `fgos doctor` both cover bash and zsh — neither
+  shell is treated as a lesser case.
+- **RUL8 (setup's config update never overwrites a customized setting).** `fgos setup`'s config update never overwrites a setting the
   caller already customized, at any nesting depth; array-valued settings
-  are never partially merged, only added wholesale when entirely missing
-  (per D3).
-- **RUL9.** `fgos doctor`'s default (no `--fix`) path never writes
+  are never partially merged, only added wholesale when entirely missing.
+- **RUL9 (doctor's default path never writes anything).** `fgos doctor`'s default (no `--fix`) path never writes
   anything, under any circumstance, including when a check would
   otherwise need to create a file to check it — a missing config file is
-  reported as missing, never created as a side effect of checking (per
-  D2). `--fix` is the deliberate exception: it runs every registered fix
+  reported as missing, never created as a side effect of checking.
+  `--fix` is the deliberate exception: it runs every registered fix
   (Data Dictionary #7b) before re-reporting checks — reversed from the
-  original no-exceptions wording per `tsk-2qz` D2, which reverses this
-  rule and RUL11 together (`docs/history/doctor-fix-gate-bypass/
+  original no-exceptions wording per `tsk-2qz`, which reverses this
+  rule and RUL11 (doctor --fix exists and is real, runs every registered fix) together (`docs/history/doctor-fix-gate-bypass/
   CONTEXT.md`).
-- **RUL10.** `fgos setup` never asks for confirmation before writing to a
+- **RUL10 (setup never asks for confirmation, acts then reports).** `fgos setup` never asks for confirmation before writing to a
   shell profile or the config file — it acts and then reports exactly what
-  it changed (per D6). Every other verb, and both of these two without
+  it changed. Every other verb, and both of these two without
   `--pretty`, still produce the same enveloped-JSON result shape as before
   this feature — `--pretty` only changes how that same result is displayed,
-  never what it contains (per D7).
-- **RUL11.** `fgos doctor --fix` exists and is real: it runs every fix
+  never what it contains.
+- **RUL11 (doctor --fix exists and is real, runs every registered fix).** `fgos doctor --fix` exists and is real: it runs every fix
   registered via `registerFix` (Data Dictionary #7b) against the current
   cwd before re-reporting checks, then returns the same checks shape as
   the no-flag path plus a `fixed` array. The fix list is a registry, not
   a fixed set — a module can register a new one the same way a check or
-  config-default is registered, independent of either (tsk-2cs D2). This
+  config-default is registered, independent of either (per tsk-2cs). This
   supersedes the original v1 "does not exist yet, Deferred Idea" wording
-  (per D8) — `tsk-2qz` D2 reverses that decision deliberately, per
+  — `tsk-2qz` reverses that decision deliberately, per
   `docs/distribution-vision.md` §3's trụ cột 3.
-- **RUL12.** `fgos setup` also runs every registered fix (the same
-  `runFixes()` `doctor --fix` calls per RUL11), unconditionally and with no
-  confirmation — consistent with RUL10's own act-then-report contract for
+- **RUL12 (setup also runs every registered fix, unconditionally).** `fgos setup` also runs every registered fix (the same
+  `runFixes()` `doctor --fix` calls per RUL11 (doctor --fix exists and is real, runs every registered fix)), unconditionally and with no
+  confirmation — consistent with RUL10 (setup never asks for confirmation, acts then reports)'s own act-then-report contract for
   this verb, not an exception to it. `setup`'s result gains a `fixed` array,
-  the same per-entry `{id, changed, message}` shape RUL11 already describes
-  for `doctor --fix`'s own (per `tsk-5hi` D1,
+  the same per-entry `{id, changed, message}` shape RUL11 (doctor --fix exists and is real, runs every registered fix) already describes
+  for `doctor --fix`'s own (per `tsk-5hi`,
   `docs/history/setup-runs-registered-fixes/CONTEXT.md`).
 
 ## Edge Cases Settled
@@ -258,11 +257,11 @@ of it).
 - Calling `fgos`/`fgos-runner` (via the dev checkout shell helper) from
   inside a linked git worktree of this repository always runs the MAIN
   checkout's entry point, never that worktree's own local copy — accepted
-  as-is for this mechanism (per D1/D2), not treated as a defect.
+  as-is for this mechanism, not treated as a defect.
 - A package manager whose own policy blocks lifecycle scripts for
   git-hosted dependencies (e.g. pnpm 10+'s `allowBuilds`) never blocks
   installing this package, because this package's install never declares a
-  lifecycle script in the first place (per str88-fgos-pnpm-lifecycle D1) —
+  lifecycle script in the first place (per str88-fgos-pnpm-lifecycle) —
   there is nothing for that policy to approve or refuse.
 - `fgos setup` run a second time with nothing new to do reports that
   plainly rather than silently repeating (or silently no-oping without
@@ -274,7 +273,7 @@ of it).
 ## Open Gaps
 
 (none — coverage is full for the mechanisms this feature adds. `fgos doctor
---fix` now exists for real, per RUL11 above — its own further extension
+--fix` now exists for real, per RUL11 (doctor --fix exists and is real, runs every registered fix) above — its own further extension
 (which checks eventually get a registered fix) is ordinary registry growth,
 tracked per-module, not a gap in this spec.)
 

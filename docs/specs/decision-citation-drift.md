@@ -82,7 +82,7 @@ an agent doing grooming/scribing).
 - A bare digit sequence that does not match any known decision id is ignored,
   never counted as a citation.
 - Real dogfood run against this repo (2026-07-26) found exactly one finding:
-  `docs/backlog.md:88` (the STR53 row) cited `ADR0002` without mentioning
+  `docs/backlog.md:88` (the STR53 row) cited ADR0002 (flat work-item model, one item kind, one FSM, "epic" is a plain item) without mentioning
   `0012`, its superseder — confirming the check catches a real, not
   hypothetical, instance of dead framing.
 

@@ -29,7 +29,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
-import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
+import { getDomain, resolveWorkflow, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT, isRecognizedRisk } from '../state/priority-formula.mjs';
 import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
@@ -531,15 +531,10 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // valid across all three moveStage(...,'executing',...) call sites below. A
   // runner-sweep call (item never claimed, `status: 'todo'` already) is a
   // no-op here, matching R15 (sweep only touches todo items).
-  const releaseClaimOnExecuting = () => {
-    if (work.status === 'doing') {
-      // releaseTrigger (tsk-2zv): tags this specific todo-entry as a
-      // claim-lock §3b release so claimWork can tell it apart from a
-      // reject or verify-fail park, which land an item at the exact same
-      // status/branch-existence shape without deleting the branch.
-      moveWork(dir, { id, to: 'todo', expectedStatus: 'doing', releaseTrigger: 'claim-lock-3b' });
-    }
-  };
+  // tsk-40m D5: releaseClaimOnExecuting retired. Items at stage planning no
+  // longer hold durable status doing, so the planning->executing edge no longer
+  // needs to release a durable doing status back to todo.
+  const releaseClaimOnExecuting = () => {};
 
   // Idempotent no-op (must_haves truth 3): a re-entrant call once the root
   // is already past `decompose` does nothing — the CAS on the moveStage
@@ -557,7 +552,8 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // `coding`) — a domain whose OWN live Divide stage is still literally
   // named `decompose` (never renamed by this item) already has
   // `planningStage === 'decompose'`, so this stays a no-op for it.
-  const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+  const workflow = resolveWorkflow(domain, work.kind);
+  const legacyPlanStage = (workflow?.stages ?? domain.stages)?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
   if (currentStage !== planningStage && currentStage !== legacyPlanStage) {
     return { outcome: 'noop', id };
   }
@@ -626,7 +622,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
         `Verify: ${planApproveVerify}\n\n` +
         `## Why this matters\n\n` +
         `Cần xác nhận trước khi verify này được stamp thật vào item lúc sang executing.`;
-      putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
+      putInAwaiting(dir, { id, ask, statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
       return { outcome: 'verify-disputed', id, secondPass: planVerifyDispute };
     }
   }
@@ -815,7 +811,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
     // verdict.kind -- a risk-heavy root can force this parking out of a
     // pass-through/decompose verdict underneath it.
     logDecomposeVerdict(dir, id, 'need-human', reason);
-    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
+    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
     return { outcome: 'need-human', id, verdict };
   }
 
@@ -873,7 +869,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
       // fall through -- proceed to write children below, same as no dispute
     } else {
       logDecomposeVerdict(dir, id, 'need-human', reason);
-      putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
+      putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
       return { outcome: 'need-human', id, verdict };
     }
   }
@@ -954,7 +950,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   if (footprintConflicts.length > 0) {
     const reason = formatFootprintOverlapReason(footprintConflicts);
     logDecomposeVerdict(dir, id, 'need-human', reason, `${footprintConflicts.length} footprint conflicts`);
-    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
+    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
     return { outcome: 'need-human', id, verdict };
   }
 

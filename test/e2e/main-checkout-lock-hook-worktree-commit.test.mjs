@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -55,8 +56,10 @@ function initSharedAbsoluteHooksPathFixture() {
   // below checks it out into the worktree the same way it would for real,
   // before ADR0020's own fs.rmSync strip ever runs.
   fs.mkdirSync(path.join(mainRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(mainRoot, '.fgos', 'state.json'), '{}\n');
-  execFileSync('git', ['add', 'seed.txt', '.fgos/state.json'], { cwd: mainRoot });
+  const stateJsonPath = resolveFgosFile(path.join(mainRoot, '.fgos'), FGOS_FILE.STATE);
+  fs.mkdirSync(path.dirname(stateJsonPath), { recursive: true });
+  fs.writeFileSync(stateJsonPath, '{}\n');
+  execFileSync('git', ['add', 'seed.txt', '.fgos/cache/state.json'], { cwd: mainRoot });
   execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: mainRoot });
 
   const hooksDir = path.join(mainRoot, '.githooks');
@@ -295,8 +298,8 @@ test('tsk-2cl: a normal commit is unaffected when rev-parse succeeds (regression
 
 test('tsk-56u: a worktree commit staging a .fgos/ deletion (git add -A after the ADR0020 strip) is refused', () => {
   const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
-  const fgosFile = path.join(worktreeRoot, '.fgos', 'state.json');
-  assert.equal(fs.existsSync(fgosFile), true, 'setup: .fgos/state.json must be tracked and checked out into the worktree');
+  const fgosFile = resolveFgosFile(path.join(worktreeRoot, '.fgos'), FGOS_FILE.STATE);
+  assert.equal(fs.existsSync(fgosFile), true, 'setup: .fgos/cache/state.json must be tracked and checked out into the worktree');
 
   // ADR0020's own strip, reproduced by hand (createWorktree isn't invoked
   // by this fixture -- it uses a plain `git worktree add`).
@@ -335,11 +338,92 @@ test('tsk-56u: a legitimate .fgos/ addition/modification (never a deletion) is u
 
   // What fgOS's own state-writing verbs do: add/modify .fgos/ content
   // directly, never delete it. The guard must never fire here.
-  fs.writeFileSync(path.join(mainRoot, '.fgos', 'state.json'), '{"changed":true}\n');
+  fs.writeFileSync(resolveFgosFile(path.join(mainRoot, '.fgos'), FGOS_FILE.STATE), '{"changed":true}\n');
   fs.writeFileSync(path.join(mainRoot, '.fgos', 'new-file.json'), '{}\n');
-  execFileSync('git', ['add', '.fgos/state.json', '.fgos/new-file.json'], { cwd: mainRoot });
+  execFileSync('git', ['add', '.fgos/cache/state.json', '.fgos/new-file.json'], { cwd: mainRoot });
 
   const result = spawnSync('git', ['commit', '-q', '-m', 'fgos: legitimate .fgos/ write'], { cwd: mainRoot, encoding: 'utf8' });
 
   assert.equal(result.status, 0, result.stderr);
 });
+
+// --- tsk-5pb: staged .fgos/* change guard on worker branches --------------
+
+test('tsk-5pb: a worktree commit staging a .fgos/ modification on a worker branch is refused', () => {
+  const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
+  fs.writeFileSync(resolveFgosFile(path.join(worktreeRoot, '.fgos'), FGOS_FILE.STATE), '{"modified":true}\n');
+  execFileSync('git', ['add', '.fgos/cache/state.json'], { cwd: worktreeRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'oops: modified .fgos file on worker branch'], { cwd: worktreeRoot, encoding: 'utf8' });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /commit refused/);
+  assert.match(result.stderr, /\.fgos\//);
+});
+
+test('tsk-5pb: the same staged .fgos/ modification is allowed on main (not a fgw/* branch)', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+
+  fs.writeFileSync(resolveFgosFile(path.join(mainRoot, '.fgos'), FGOS_FILE.STATE), '{"modified":true}\n');
+  execFileSync('git', ['add', '.fgos/cache/state.json'], { cwd: mainRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'legitimate main checkout .fgos write'], { cwd: mainRoot, encoding: 'utf8' });
+
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test('tsk-5pb: a normal commit that never touches .fgos/ succeeds on a worker branch', () => {
+  const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
+
+  const result = commitAsSession(worktreeRoot, { FGOS_SESSION_ID: 'session-normal-worker-commit' });
+
+  assert.equal(result.status, 0, result.stderr);
+});
+
+// --- tsk-1i3: content-precedence line-count guard on main ------------------
+
+test('tsk-1i3: a commit on main branch staging a .fgos/*.jsonl modification with fewer lines than HEAD is refused', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  const jsonlPath = path.join(mainRoot, '.fgos', 'events.jsonl');
+  fs.writeFileSync(jsonlPath, 'line1\nline2\nline3\nline4\nline5\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'add multi-line events.jsonl'], { cwd: mainRoot });
+
+  fs.writeFileSync(jsonlPath, 'line1\nline2\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'regressed events.jsonl commit'], { cwd: mainRoot, encoding: 'utf8' });
+
+  assert.notEqual(result.status, 0, 'commit staging regressed line count on main must be refused');
+  assert.match(result.stderr, /commit refused/);
+  assert.match(result.stderr, /\.fgos\/events\.jsonl/);
+  assert.match(result.stderr, /main is left unchanged/i);
+  assert.match(result.stderr, /fix-fgos-write-rejected-merge-block\.md/);
+});
+
+test('tsk-1i3: a commit on main branch staging a .fgos/*.jsonl modification with equal-or-more lines succeeds', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  const jsonlPath = path.join(mainRoot, '.fgos', 'events.jsonl');
+  fs.writeFileSync(jsonlPath, 'line1\nline2\nline3\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'add multi-line events.jsonl'], { cwd: mainRoot });
+
+  fs.writeFileSync(jsonlPath, 'line1\nline2\nline3\nline4\nline5\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'appended events.jsonl commit'], { cwd: mainRoot, encoding: 'utf8' });
+
+  assert.equal(result.status, 0, `commit with more lines must succeed -- got: ${result.stderr}`);
+});
+
+test('tsk-1i3: a brand-new .fgos/* file addition is not refused', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  const newFilePath = path.join(mainRoot, '.fgos', 'brand-new-log.jsonl');
+  fs.writeFileSync(newFilePath, 'line1\nline2\n');
+  execFileSync('git', ['add', '.fgos/brand-new-log.jsonl'], { cwd: mainRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'add brand new log file'], { cwd: mainRoot, encoding: 'utf8' });
+
+  assert.equal(result.status, 0, `brand-new file addition must succeed -- got: ${result.stderr}`);
+});
+

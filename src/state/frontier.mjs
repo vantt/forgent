@@ -190,7 +190,7 @@ function compareReadyOrder(a, b) {
 // field never contribute an entry, so a view with no lineage at all yields
 // an empty index and `hasOpenDescendant` below short-circuits to `false` for
 // every id — the exact no-op this filter must be on a parent-less log.
-function indexChildrenByParent(work) {
+export function indexChildrenByParent(work) {
   const index = {};
   for (const id of Object.keys(work)) {
     const parent = work[id].parent;
@@ -310,8 +310,11 @@ export function resolveRoot(view, id) {
 // RESOLVED. `seen` guards against a malformed/cyclic parent chain turning
 // this into an infinite walk — it never occurs on data produced by the
 // decompose engine, only a defensive backstop.
+// See `loop.mjs`'s `hasStillNeededDescendant` for a deliberately BROADER
+// 'still needed' variant used by `startupReap`'s orphan-branch pruning — the
+// two intentionally answer different questions, do not consolidate.
 
-function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {
+export function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {
   const children = childrenByParent[id];
   if (!children) return false;
   for (const childId of children) {

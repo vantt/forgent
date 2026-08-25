@@ -48,7 +48,7 @@ fgOS đã có ở tầng cao hơn, sạch hơn.
 | Cửa người (submit/answer/review/approve) | ✓✓ pane gọi verb C1 trực tiếp | ~ phải qua `agent send` (send≠submit, xem §3) | **tmux** |
 | Dashboard poll rẻ (P37 data_hash) | ✓✓ poll `fgos rollup`, rẻ hoá bằng hash | ✓ hoặc `events.subscribe` (đẩy thay vì poll) | **Hòa** — herdr có *ý tưởng* subscribe hay hơn (mượn được) |
 | Chuông chờ-người | ✓ tmux `monitor-activity`/BEL | ✓✓ `notification.show` native + `wait agent-status` | **herdr** nhẹ nhàng hơn |
-| Đa phiên chung 1 checkout (P35) | ~ phải tự kỷ luật (bee claims/holds) | ✓✓ single-writer ownership + `--takeover`, observer read-only vô hạn | **herdr** (pattern đáng mượn) |
+| Đa phiên chung 1 checkout (P35) | ~ phải tự kỷ luật (beehive claims/holds) | ✓✓ single-writer ownership + `--takeover`, observer read-only vô hạn | **herdr** (pattern đáng mượn) |
 | Attach từ xa / điện thoại, sống qua restart | ~ `tmux attach` + ssh, tự lo | ✓✓✓ `--remote` thin-client, detach/reattach sống qua restart, SSH điện thoại | **herdr** rõ rệt |
 | Điều khiển **heterogeneous** third-party agent bạn KHÔNG kiểm soát | ✗ tmux không hiểu agent | ✓✓✓ 19 manifest + 14 integration + native resume | **herdr** — nhưng fgOS agent tự report state, nên ít cần |
 | AI tự lái multiplexer | ~ tmux CLI thô | ✓✓ 1 socket JSON-RPC tự mô tả, agent spawn/read/wait nhau | **herdr** — nhưng đây là coordination tầng *pane*, không phải tầng *work* mà fgOS đang xây |
@@ -105,12 +105,12 @@ của vài ý tưởng fgOS đang/sẽ cần; port *ý tưởng*, viết bằng 
    lần rồi `events.subscribe`"; hợp đồng cache client rõ, rẻ hơn poll khi fleet lớn.
 3. **single-writer-ownership + takeover** → cấp thẳng cho P35 (đa phiên chung
    checkout): 1 writer/tài nguyên, `--takeover` để evict, observer read-only vô hạn —
-   ngôn ngữ chính xác cho bee claims/holds hôm nay còn dựa kỷ luật.
+   ngôn ngữ chính xác cho beehive claims/holds hôm nay còn dựa kỷ luật.
 4. **wait-primitives split** → tách `wait output` (khớp màn hình) vs `wait
    agent-status` (state ngữ nghĩa); khớp-ngay-hoặc-block. Lõi cho reactive fan-out.
 5. **native-session-resume + self-describing schema** → relaunch bằng chính lệnh
    resume của agent (version-gated); sinh schema control-surface từ code (chống drift,
-   nối tiếp `bee --help --json`).
+   nối tiếp `beehive --help --json`).
 
 **herdr chỉ như lớp attach TÙY CHỌN, đứng TRÊN, nếu remote/điện thoại thành nhu cầu
 thật.** Đúng tư thế airemote đã dùng (consumer chạy TRÊN herdr) — và caveat §3 chính

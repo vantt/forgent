@@ -386,6 +386,29 @@ test('canAutoApproveMergedGate: D10 — word boundaries hold on footprint paths 
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), true);
 });
 
+// tsk-4gr: doc citations like `AUDIT.md` or bare AUDIT.md filename tokens must not trip keyword floor
+test('canAutoApprove: backtick-quoted doc citation `AUDIT.md` does not trip hard-gate keyword audit (tsk-4gr)', () => {
+  const item = { title: 'Fix false positive', description: 'Citing `AUDIT.md` in description', tier: 'light' };
+  assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), true);
+});
+
+test('canAutoApproveMergedGate: backtick-quoted doc citation `AUDIT.md` does not trip hard-gate keyword audit (tsk-4gr)', () => {
+  const item = { title: 'Fix false positive', description: 'Citing `AUDIT.md` in description', tier: 'light' };
+  assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), true);
+});
+
+test('canAutoApprove & canAutoApproveMergedGate: bare AUDIT.md filename token does not trip hard-gate keyword audit (tsk-4gr)', () => {
+  const item = { title: 'Fix false positive', description: 'Citing AUDIT.md in description', tier: 'light' };
+  assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), true);
+  assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), true);
+});
+
+test('canAutoApprove & canAutoApproveMergedGate: regression — genuine prose keyword mention "audit" still hard-gates (tsk-4gr)', () => {
+  const item = { title: 'Security review', description: 'run a security audit of the login flow', tier: 'light' };
+  assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), false);
+  assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), false);
+});
+
 // ─── the `gate-check` CLI verb (tsk-65q) — fgos-coding-exploring/
 // fgos-coding-validating's own "check whether the gate can auto-approve"
 // step now calls `fgos gate-check` instead of embedding its own

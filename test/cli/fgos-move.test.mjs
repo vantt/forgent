@@ -31,7 +31,7 @@ test('move --to delivered is allowed when no fgw/<id> branch exists at all (pull
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   addOk(cwd, 'move-no-branch');
-  run(cwd, ['move', 'move-no-branch', '--to', 'doing']);
+  run(cwd, ['take', '--id', 'move-no-branch']); // tsk-40m: real claim, no durable move anymore
   run(cwd, ['move', 'move-no-branch', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['move', 'move-no-branch', '--to', 'delivered']);
@@ -43,7 +43,7 @@ test('move --to delivered is allowed when fgw/<id> exists and IS reachable from 
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   addOk(cwd, 'move-reachable');
-  run(cwd, ['move', 'move-reachable', '--to', 'doing']);
+  run(cwd, ['take', '--id', 'move-reachable']); // tsk-40m: real claim, no durable move anymore
   gitAtCwd(cwd, ['branch', 'fgw/move-reachable', 'main']); // branched off main, never diverged: trivially an ancestor
   run(cwd, ['move', 'move-reachable', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
@@ -119,7 +119,7 @@ test('move --to awaiting-approval on a "doing" item is REFUSED without --skip-re
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   addOk(cwd, 'move-guard-doing');
-  run(cwd, ['move', 'move-guard-doing', '--to', 'doing']);
+  run(cwd, ['take', '--id', 'move-guard-doing']); // tsk-40m: real claim, no durable move anymore
 
   const before = stateView(cwd).work['move-guard-doing'];
   const result = run(cwd, ['move', 'move-guard-doing', '--to', 'awaiting-approval']);
@@ -135,7 +135,7 @@ test('move --to awaiting-approval with --skip-return-guard proceeds despite "doi
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   addOk(cwd, 'move-guard-override');
-  run(cwd, ['move', 'move-guard-override', '--to', 'doing']);
+  run(cwd, ['take', '--id', 'move-guard-override']); // tsk-40m: real claim, no durable move anymore
 
   const result = run(cwd, ['move', 'move-guard-override', '--to', 'awaiting-approval', '--skip-return-guard', 'manual recovery, evidence in incident-99']);
   assert.equal(result.status, 0, result.stderr);
@@ -152,7 +152,7 @@ test('move --to awaiting-approval on a "doing" item refuses even with an EMPTY -
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   addOk(cwd, 'move-guard-empty');
-  run(cwd, ['move', 'move-guard-empty', '--to', 'doing']);
+  run(cwd, ['take', '--id', 'move-guard-empty']); // tsk-40m: real claim, no durable move anymore
 
   const result = run(cwd, ['move', 'move-guard-empty', '--to', 'awaiting-approval', '--skip-return-guard', '']);
   assert.notEqual(result.status, 0);
@@ -164,7 +164,7 @@ test('move --to awaiting-approval on a NON-"doing" item is never gated by the re
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'move-guard-not-doing', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'move-guard-not-doing');
-  run(cwd, ['move', 'move-guard-not-doing', '--to', 'doing']);
+  run(cwd, ['take', '--id', 'move-guard-not-doing']); // tsk-40m: real claim, no durable move anymore
   run(cwd, ['move', 'move-guard-not-doing', '--to', 'blocked', '--reason', 'unrelated']);
 
   // blocked -> awaiting-approval (catchup's own edge) is a real FSM
@@ -185,7 +185,7 @@ test('move --to wontfix from awaiting-human succeeds when --answer is supplied, 
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   addOk(cwd, 'move-wontfix-from-ask');
-  run(cwd, ['move', 'move-wontfix-from-ask', '--to', 'doing']);
+  run(cwd, ['take', '--id', 'move-wontfix-from-ask']); // tsk-40m: real claim, no durable move anymore
   run(cwd, ['ask', 'move-wontfix-from-ask', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: still relevant?']);
   assert.equal(stateView(cwd).work['move-wontfix-from-ask'].status, 'awaiting-human');
 
@@ -198,7 +198,7 @@ test('move --to wontfix from awaiting-human still refuses with no --answer, same
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   addOk(cwd, 'move-wontfix-no-answer');
-  run(cwd, ['move', 'move-wontfix-no-answer', '--to', 'doing']);
+  run(cwd, ['take', '--id', 'move-wontfix-no-answer']); // tsk-40m: real claim, no durable move anymore
   run(cwd, ['ask', 'move-wontfix-no-answer', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: still relevant?']);
 
   const result = run(cwd, ['move', 'move-wontfix-no-answer', '--to', 'wontfix']);

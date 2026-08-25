@@ -1,3 +1,10 @@
+---
+type: explanation
+title: Why the retrospective content gate checked the wrong fields
+tags: [retrospective, cleanup-gate, engine-decision, kind]
+source_capture_ids: [tsk-558, tsk-4kw, tsk-5dn]
+authoritative_for: why checkRetrospectiveContent's cleanup-to-done gate reads outcome/decision fields the way it does, and which engine-written decisions it must exclude
+---
 # Why the retrospective content gate checked the wrong fields
 
 `checkRetrospectiveContent` (`src/state/cleanup-harness.mjs`) is the
@@ -77,3 +84,64 @@ is a remedy, not a repair — recovering the pre-existing false
 passes/fails this audit found (`tsk-3nx`, `tsk-4c05`, `tsk-3uj`,
 `tsk-3go-2`, `tsk-3go-3`) is separate manual follow-up, not something
 this fix does automatically.
+
+## Two more engine writers slipped through the `kind: engine` fix (`tsk-4kw`)
+
+A later fix (`tsk-qrs`'s own D10) taught `checkRetrospectiveContent` to
+reject decisions tagged `kind: 'engine'` — closing the hole where
+`fgos-coding-driving`'s automatic closing report made this gate
+permanently green with no real reflection behind it. That fix was
+incomplete: two other verbs write engine bookkeeping through
+`addDecision` with **no `kind` field at all** — `fgos sync-root`
+(`bin/fgos.mjs:3880`) and `fgos promote-to-component`
+(`bin/fgos.mjs:4084`). A decision with `kind: undefined` still passes
+`some(d => d.kind !== 'engine')`, so the gate reads it as real reflection.
+
+This was live, not hypothetical: `.fgos/events.jsonl` already carried 35
+`sync-root: merged` decision events at the time this was found — meaning
+any item whose root branch had ever been synced could reach `done`
+without retrospective having produced anything at all. Proven directly
+by calling the shipped function: a view whose only `decisionsById` entry
+is a sync-root record returned `ok: true`, `detail: "retrospective
+content found (a decision record exists)"` — while the driver-report
+shape (correctly tagged `kind: 'engine'`) returned `ok: false` as
+designed.
+
+Every *other* engine writer was already tagged correctly — both
+`resolveDiscovery` and `resolvePlan` set `kind: 'engine'` on all ten of
+their `addDecision` calls, and so does `claim-port`'s
+stale-claim-reclaim note — which is what made `sync-root` and
+`promote-to-component` genuine outliers rather than evidence the whole
+approach was wrong. **Fix**: add `kind: 'engine'` to those two
+`addDecision` calls too. The audit record stays fully visible in `fgos
+show` either way (`show` never filters on `kind`) — only the
+retrospective-content gate's own reflection test changes.
+
+This is distinct from a sibling finding (`tsk-37t`), which covers a
+different pair of gaps in the same review pass: `excludeId` not applying
+past the loop's own iteration ceiling, and `fgos report` accepting an
+unknown id.
+
+## A third door into the same defect class: `fgos decision` had no `--kind` flag (`tsk-5dn`)
+
+Same defect class as `tsk-qrs`/`tsk-4kw` — an engine-written decision
+record counted as human reflection — reached through a third path.
+`fgos-coding-validating`'s single merged gate (the redesign in
+`docs/explanation/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md`)
+logs an audit line through the `fgos decision` CLI verb whenever it
+auto-approves — e.g. `"auto-approved validateApprove gate for <id> at
+level <level> ... --relation supersedes:tsk-224"`. Confirmed still live
+on the tree at capture time: `bin/fgos.mjs`'s `decision` case
+destructures `text`/`rationale`/`alternatives`/`source`/`id`/`scope`/
+`relation` but never `flags.kind` at all — so `addDecision` always
+defaulted `kind` to `"design"`, and `checkRetrospectiveContent` (which
+only excludes `kind === 'engine'`) read every one of these auto-approve
+audit lines as a human reflecting on the work. The retrospective gate
+went green with no retrospective document behind it — the third distinct
+code path producing the same false pass this doc's own earlier findings
+already covered for `resolveDiscovery`/`resolvePlan`, `sync-root`, and
+`promote-to-component`.
+
+**Fix**: `fgos decision` gains a `--kind` flag, so an audit line like the
+gate's own auto-approve log can actually be tagged `kind: 'engine'`
+instead of silently defaulting to `'design'`.

@@ -32,21 +32,21 @@ Local orchestrator chạy Harness stories: discover runnable work qua public Har
 ### isolated-run-contract
 - **What:** Story → run cô lập: git worktree `symphony/{run_id}` + snapshot harness.db (qua protocol `db snapshot`, WAL-safe) + RUN_CONTRACT.json v1 + AGENTS.md shim → agent chạy → validate RESULT.json (version=1, run_id/story_id khớp, outcome hợp lệ, validation evidence bắt buộc) + SUMMARY.md → promote artifacts. Contract v1 mang required_outputs, result_json_schema, forbidden_paths, agent_instructions tường minh. Tiny lane được `--here` (in-place, vẫn snapshot DB riêng), normal/high-risk bắt buộc worktree.
 - **Where:** `crates/harness-symphony/src/run.rs`, `docs/SYMPHONY_SCOPE.md`
-- **Notable:** run contract là "prompt đủ để dispatch" cấp orchestrator — cùng gene cell/story self-contained (beegog:cell-task-unit, repository-harness:story-packets) nhưng ở tầng run isolation; tiến hóa từ repository-harness:symphony-isolated-runner với result validation + forbidden-paths chặt hơn.
+- **Notable:** run contract là "prompt đủ để dispatch" cấp orchestrator — cùng gene cell/story self-contained (beehive:cell-task-unit, repository-harness:story-packets) nhưng ở tầng run isolation; tiến hóa từ repository-harness:symphony-isolated-runner với result validation + forbidden-paths chặt hơn.
 - **Keywords:** RUN_CONTRACT.json, worktree, --here
 - **Seen:** 2f0b257
 
 ### agent-adapter-codex-jsonrpc
 - **What:** Agent dispatch qua adapter cắm được: `custom` (spawn command, chờ exit success) hoặc `codex` (full JSON-RPC app-server: handshake initialize→thread/start→turn/start, event loop 250ms, idle reconciliation sau 30s không event thì query turn-state, terminal khi turn/completed status="completed"). Env truyền vào: HARNESS_REPO_ROOT/DB_PATH/RUN_ID/RUN_MODE. Executable resolve qua absolute/relative/PATH.
 - **Where:** `crates/harness-symphony/src/agent.rs`
-- **Notable:** adapter abstraction cho phép nhiều agent runtime; codex adapter là một protocol client JSON-RPC hoàn chỉnh với idle-timeout reconciliation — cơ chế "agent im lặng ≠ agent chết" ở tầng transport, tinh vi hơn status-token của bee.
+- **Notable:** adapter abstraction cho phép nhiều agent runtime; codex adapter là một protocol client JSON-RPC hoàn chỉnh với idle-timeout reconciliation — cơ chế "agent im lặng ≠ agent chết" ở tầng transport, tinh vi hơn status-token của beehive.
 - **Keywords:** codex, app-server, adapter, idle reconcile
 - **Seen:** 2f0b257
 
 ### bounded-auto-polling
 - **What:** Unattended mode opt-in (enabled=false mặc định): validate → poll work-graph → enqueue candidate → chạy tuần tự với caps (once / max_runs / max_attempts=3 / poll_interval=30s / max_idle_cycles), single-active-run enforce. Chỉ source `harness-db` được chạy; external sources (github-issues/linear/jira/remote-harness) trả AdapterBoundary — ranh giới tường minh chưa build.
 - **Where:** `crates/harness-symphony/src/auto.rs`, `crates/harness-symphony/src/config.rs`
-- **Notable:** autonomy có ngân sách + mutex; tiến hóa từ repository-harness:auto-polling-bounded, thêm external-source boundary tường minh (declare "chưa support" thay vì im lặng). Cùng triết lý bound-autonomy với beegog:gate-bypass-safety-floor nhưng bằng caps thay vì floor.
+- **Notable:** autonomy có ngân sách + mutex; tiến hóa từ repository-harness:auto-polling-bounded, thêm external-source boundary tường minh (declare "chưa support" thay vì im lặng). Cùng triết lý bound-autonomy với beehive:gate-bypass-safety-floor nhưng bằng caps thay vì floor.
 - **Keywords:** auto mode, poll, caps, single-active-run
 - **Seen:** 2f0b257
 
@@ -55,7 +55,7 @@ Local orchestrator chạy Harness stories: discover runnable work qua public Har
 ### run-and-queue-state-machine
 - **What:** Tầng 1 (state-routing): run lifecycle `prepared/running → completed|blocked|needs_intake|partial|failed|cancelled` (terminal); single-active-run lock — `add_run()` từ chối nếu còn run active (ActiveRunExists), giải phóng khi vào terminal. Auto-queue riêng: `queued → running (attempts++) → completed | (retry) queued | failed (attempts≥max)`. Migration fence RAII guard (BEGIN IMMEDIATE, rollback nếu drop chưa commit) chặn ghi trong lúc migration. Tất cả trong `.symphony/state.db` do symphony sở hữu.
 - **Where:** `crates/harness-symphony/src/state.rs`
-- **Notable:** hai state machine song song (run + queue) + fence — mọi transition có precondition enforce trong SQLite transaction; hội tụ với repository-harness:story-status-single-door (CAS) và beegog:phase-machine-cli-owned về "transition là API có precondition".
+- **Notable:** hai state machine song song (run + queue) + fence — mọi transition có precondition enforce trong SQLite transaction; hội tụ với repository-harness:story-status-single-door (CAS) và beehive:phase-machine-cli-owned về "transition là API có precondition".
 - **Keywords:** single-active-run, migration fence, auto-queue
 - **Seen:** 2f0b257
 
@@ -85,7 +85,7 @@ Local orchestrator chạy Harness stories: discover runnable work qua public Har
 ### run-artifact-durability-split
 - **What:** Bảng tường minh phân loại độ bền từng artifact: product/code/docs → branch/PR; `.harness/changesets/*.jsonl` → commit + retain; SUMMARY.md/RESULT.json/logs → local, compactable; harness.db → local, rebuildable; `.symphony/state.db` → local only. Hệ quả phát biểu thẳng: "successful run ≠ merged change" — result valid trong khi branch còn chờ review; PR merge KHÔNG mutate DB clone khác, `sync` mới detect changeset committed và apply một lần.
 - **Where:** `docs/SYMPHONY_SCOPE.md`, `crates/harness-symphony/src/retention.rs`
-- **Notable:** tách "chạy xong" khỏi "đã merge" khỏi "đã durable" thành 5 mức bền rõ ràng — sắc hơn state-vs-log của bee ở chỗ phân biệt cả branch-pending vs committed; retention chỉ nén run artifacts, không đụng changeset (keep_last≥1).
+- **Notable:** tách "chạy xong" khỏi "đã merge" khỏi "đã durable" thành 5 mức bền rõ ràng — sắc hơn state-vs-log của beehive ở chỗ phân biệt cả branch-pending vs committed; retention chỉ nén run artifacts, không đụng changeset (keep_last≥1).
 - **Keywords:** durability split, successful run vs merged
 - **Seen:** 2f0b257
 

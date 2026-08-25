@@ -38,6 +38,7 @@
 // domain's own "declined" item never carries that literal at all.
 
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -101,8 +102,12 @@ function move(cwd, id, to, extraFlags = []) {
   return ok(fgos(cwd, ['move', id, '--to', to, ...extraFlags]), `move ${id} -> ${to}`);
 }
 
+function envelopeData(stdout) {
+  return JSON.parse(stdout).data;
+}
+
 function stateView(cwd) {
-  return JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'state.json'), 'utf8'));
+  return envelopeData(fgos(cwd, ['list', '--all', '--json']).stdout);
 }
 
 // Raw event log — used ONLY where the folded view cannot answer the
@@ -111,13 +116,42 @@ function stateView(cwd) {
 // PRIOR front-segment move stamped, even across tail-segment moves that
 // stamp nothing new — so proving a tail move itself carried no
 // statusCategory needs the raw per-event payload, not the folded item).
+// Tầng A/T2/T3 (TA-D2/TA-D7/TA-D12): new events land in a per-writer file
+// under `.fgos/events/<writer-id>-<openTs>.jsonl` (one per CLI subprocess
+// invocation here), not baseline-0's `.fgos/events.jsonl` alone (still read
+// too — legacy content lives there, zero rewrite). This file's own
+// "outside observer, never a mocked store call" discipline (top of file)
+// means the TA-D7 total order `(ts, file, seq)` is re-derived here rather
+// than delegating to replay.mjs.
 function rawWorkMoveEvents(cwd, id) {
-  const text = fs.readFileSync(path.join(cwd, '.fgos', 'events.jsonl'), 'utf8');
-  return text
-    .split('\n')
-    .filter(Boolean)
-    .map((line) => JSON.parse(line))
-    .filter((e) => e.type === 'work.move' && e.payload?.id === id);
+  const tagged = [];
+  const logPath = path.join(cwd, '.fgos', 'events.jsonl');
+  if (fs.existsSync(logPath)) {
+    for (const line of fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean)) {
+      tagged.push({ ev: JSON.parse(line), file: '' });
+    }
+  }
+  const eventsDir = path.join(cwd, '.fgos', 'events');
+  let names = [];
+  try {
+    names = fs
+      .readdirSync(eventsDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch {
+    names = [];
+  }
+  for (const name of names) {
+    for (const line of fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean)) {
+      tagged.push({ ev: JSON.parse(line), file: name });
+    }
+  }
+  tagged.sort((a, b) => {
+    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
+    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
+    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
+  });
+  return tagged.map(({ ev }) => ev).filter((e) => e.type === 'work.move' && e.payload?.id === id);
 }
 
 // --- Direct registry proof (no CLI needed): the DOMAINS entry itself ---
@@ -176,11 +210,20 @@ test('e2e: moving a fixture-marketing item into "blocked" stamps statusCategory 
   assert.equal(view.work['fx-cat'].statusCategory, 'todo');
   assert.equal(view.work['coding-cat'].statusCategory, 'todo');
 
-  move(repoRoot, 'fx-cat', 'doing');
-  move(repoRoot, 'coding-cat', 'doing');
+  // tsk-40m: todo -> doing is retired -- awaiting-human stands in as the
+  // shared "in-progress" example both domains keep grouped the same way
+  // (workflow-stage-graphs.mjs's own fixture-marketing comment: "doing/
+  // awaiting-human keep coding's own in-progress grouping"). Entered via
+  // the dedicated `ask` verb (the generic `move` verb has no --ask flag).
+  const ASK = '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome.';
+  assert.equal(fgos(repoRoot, ['ask', 'fx-cat', '--text', ASK]).status, 0);
+  assert.equal(fgos(repoRoot, ['ask', 'coding-cat', '--text', ASK]).status, 0);
   view = stateView(repoRoot);
   assert.equal(view.work['fx-cat'].statusCategory, 'in-progress');
   assert.equal(view.work['coding-cat'].statusCategory, 'in-progress');
+
+  assert.equal(fgos(repoRoot, ['answer', 'fx-cat', '--text', 'resolved']).status, 0);
+  assert.equal(fgos(repoRoot, ['answer', 'coding-cat', '--text', 'resolved']).status, 0);
 
   // The divergence: same literal edge (doing -> blocked), same shared FSM
   // table (status-fsm.mjs, untouched by this item) — different category,
@@ -336,11 +379,14 @@ test('e2e: a fixture-marketing item runs the real take -> return -> delivered ->
     assert.equal('statusCategory' in event.payload, false, `tail move to "${event.payload.to}" must carry no statusCategory key, got: ${JSON.stringify(event.payload)}`);
   }
 
-  // Contrast: the two front-segment moves earlier in this SAME lifecycle
-  // (doing, awaiting-approval) DID carry one — the split is real, not an
-  // artifact of a domain that never stamps anything.
+  // Contrast: the one front-segment move earlier in this SAME lifecycle
+  // (awaiting-approval) DID carry one — the split is real, not an artifact
+  // of a domain that never stamps anything. tsk-40m: `take`'s own claim
+  // writes no durable work.move at all (doing is purely derived from the
+  // active-claim overlay now), so there is no raw 'doing' move to check
+  // here — this is the ONE front-segment move left in the raw log.
   const frontMoves = events.filter((e) => ['doing', 'awaiting-approval'].includes(e.payload.to));
-  assert.equal(frontMoves.length, 2);
+  assert.equal(frontMoves.length, 1);
   for (const event of frontMoves) {
     assert.equal('statusCategory' in event.payload, true, `front-segment move to "${event.payload.to}" must carry statusCategory`);
   }

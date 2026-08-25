@@ -17,7 +17,7 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### agent-agnostic-adapter-spec
 - **What:** Một framework core (`.fgOS/`) chạy trên N nền tảng agent qua adapter contract: mỗi adapter BẮT BUỘC implement 4 capability (skill loading với override-merge, agent definition→platform config, knowledge injection có token budget, status protocol DONE/DONE_WITH_CONCERNS/BLOCKED/NEEDS_CONTEXT) + 6 optional có fallback tường minh (memory/scheduled/event triggers/state/observability/skill-composition — mỗi cái "không có thì mất gì" khai báo rõ). Adapter sống ở `.{platform}/` (agents/skills-overrides/hooks/config/scripts), base LUÔN từ `.fgOS/`, override chỉ khi cần.
 - **Where:** `.fgOS/adapters/ADAPTER-SPEC.md`, `.fgOS/adapters/README.md`, `.fgOS/FRAMEWORK.md`
-- **Notable:** kiểu thứ BA của integration-contract — không phải producer (harness) hay consumer (symphony) mà **một-framework-nhiều-runtime**: contract là "capability + fallback" thay vì "wire protocol"; adapter THỦ CÔNG (không generator), giữ core neutral bằng kỷ luật không bằng máy sinh. Cùng gene dual-runtime của bee (beegog:dual-runtime-contract) nhưng scale lên 4 nền tảng + optional-capability-với-degradation.
+- **Notable:** kiểu thứ BA của integration-contract — không phải producer (harness) hay consumer (symphony) mà **một-framework-nhiều-runtime**: contract là "capability + fallback" thay vì "wire protocol"; adapter THỦ CÔNG (không generator), giữ core neutral bằng kỷ luật không bằng máy sinh. Cùng gene dual-runtime của beehive (beehive:dual-runtime-contract) nhưng scale lên 4 nền tảng + optional-capability-với-degradation.
 - **Keywords:** adapter, agent-agnostic, capability, fallback
 - **Seen:** 588d800
 
@@ -26,7 +26,7 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### projection-governance-coverage
 - **What:** Framework nhiều-projection tự quản bằng 3 luật: **generate-don't-mirror** (catalog sinh ra, không chép tay), **validate-don't-trust** (invariant kiểm chứng), **block-don't-log** (`.fgOS/**` gated bởi pre-commit `fgos doctor` chặn cứng; `docs/**` chỉ advisory). `conventions-coverage.yaml` là manifest máy-đọc phân loại 28 rule theo mức enforce: enforced / enforceable / guidance / disputed — mỗi rule kèm cơ chế enforce cụ thể.
 - **Where:** `.fgOS/conventions-coverage.yaml`, `.fgOS/CONVENTIONS.md`
-- **Notable:** "convention có phân hạng enforce-ability" — không giả vờ mọi rule enforce được; disputed/guidance thừa nhận vùng xám. Cùng họ với beegog:skill-budgets-conventions nhưng thêm machine-readable coverage manifest + tri-level enforce.
+- **Notable:** "convention có phân hạng enforce-ability" — không giả vờ mọi rule enforce được; disputed/guidance thừa nhận vùng xám. Cùng họ với beehive:skill-budgets-conventions nhưng thêm machine-readable coverage manifest + tri-level enforce.
 - **Keywords:** conventions-coverage, generate-don't-mirror, fgos doctor
 - **Seen:** 588d800
 
@@ -35,7 +35,7 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### skill-tier-schema
 - **What:** 39 skill phân 3 tầng theo vai trò gọi: L1 orchestrator (2, gọi L2/L3), L2 specialist (26, domain), L3 utility (11, leaf). SKILL.md có schema (`skill.schema.yaml`): frontmatter + 9 section bắt buộc (Purpose → References) gồm anti-patterns / red-flags / **rationalization table** + verification checklist. L1/L2/L3 có luật gọi (tầng trên gọi tầng dưới, không ngược).
 - **Where:** `.fgOS/schemas/skill.schema.yaml`, `.fgOS/skills/README.md`
-- **Notable:** skill là artifact schema-validated với tầng gọi tường minh (skill-map) — rationalization table kế thừa superpowers/bee (beegog:tdd-for-skills-iron-law), nhưng thêm phân tầng L1/L2/L3 làm routing skill-to-skill tất định.
+- **Notable:** skill là artifact schema-validated với tầng gọi tường minh (skill-map) — rationalization table kế thừa superpowers/beehive (beehive:tdd-for-skills-iron-law), nhưng thêm phân tầng L1/L2/L3 làm routing skill-to-skill tất định.
 - **Keywords:** L1/L2/L3, skill hierarchy, rationalization
 - **Seen:** 588d800
 
@@ -44,7 +44,7 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### funnel-agent-roster
 - **What:** 20 agent định nghĩa theo `agent.schema.yaml` (frontmatter + 4 section: Role → Decision Boundary; persona + decision-boundary table + collaboration patterns), nhóm theo funnel stage (TOFU 4 / MOFU 4 / BOFU 2 / Core 6 / Support 4). Concurrency per-agent tường minh (`priority.yaml`): default 3, override theo bản chất việc (campaign-manager 5 vì orchestration nhẹ tải nhận thức, content-creator 2 vì sáng tạo cần focus, content-reviewer 4...).
 - **Where:** `.fgOS/agents/README.md`, `.fgOS/schemas/agent.schema.yaml`, `.fgOS/orchestration/priority.yaml`
-- **Notable:** agent có "decision boundary" khai báo (từ chối việc ngoài phạm vi, report BLOCKED khi vượt autonomy) + concurrency chỉnh theo tải nhận thức từng vai — mô hình đội agent chuyên biệt, khác swarm worker đồng nhất của bee.
+- **Notable:** agent có "decision boundary" khai báo (từ chối việc ngoài phạm vi, report BLOCKED khi vượt autonomy) + concurrency chỉnh theo tải nhận thức từng vai — mô hình đội agent chuyên biệt, khác swarm worker đồng nhất của beehive.
 - **Keywords:** decision boundary, funnel stage, concurrency
 - **Seen:** 588d800
 
@@ -53,7 +53,7 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### three-level-intent-routing
 - **What:** `routing.yaml` route intent 3 tầng: L1 intent — pattern-match cụm từ user, score = số token khớp (`specificity_first`), tie-break priority-then-order; L2 skill — map skill→candidate agents, tie-break `fewer_active_tasks`; L3 dynamic (reserved v2); fallback campaign-manager (orchestrator mặc định). Có test case ("plan social calendar for Q3" → social-batch-production score 2 vs editorial 0).
 - **Where:** `.fgOS/orchestration/routing.yaml`
-- **Notable:** routing tầng 2 (chọn agent) bằng token-scoring cơ học + load-balancing (fewer-active-tasks) — tất định, có test; khác skill-chain của bee (chain cố định) và request-class của harness (nhị phân) — đây là dispatch nhiều-agent theo intent scoring.
+- **Notable:** routing tầng 2 (chọn agent) bằng token-scoring cơ học + load-balancing (fewer-active-tasks) — tất định, có test; khác skill-chain của beehive (chain cố định) và request-class của harness (nhị phân) — đây là dispatch nhiều-agent theo intent scoring.
 - **Keywords:** intent routing, specificity-first, fewer-active-tasks
 - **Seen:** 588d800
 
@@ -67,7 +67,7 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### signal-driven-chaining
 - **What:** Tầng 3 (cross-workflow routing): workflow nối nhau qua signal (catalog 14+: content/review/brand/visual/strategy/persona/editorial; mỗi cái emitter/consumers/ttl/payload). Auto-dispatch (ADR 0032): signal có `auto_dispatch_to[]` + debounce 60s + max_retries 3; **dispatch loop detection** `dispatch_chain[]` max depth 5 (từ chối nếu workflow đã có trong chain). Rule cứng: consumer phải pending→consumed trước khi đọc payload, consumed→resolved trước khi run completed.
 - **Where:** `.fgOS/runtime/artifacts.yaml`, `.fgOS/runtime/triggers.yaml`
-- **Notable:** event-driven workflow chaining với loop-guard + ttl/starvation — routing qua pub-sub signal thay vì gọi trực tiếp; mô hình khác hẳn chain tuyến tính của bee, cho phép fan-out/reactive.
+- **Notable:** event-driven workflow chaining với loop-guard + ttl/starvation — routing qua pub-sub signal thay vì gọi trực tiếp; mô hình khác hẳn chain tuyến tính của beehive, cho phép fan-out/reactive.
 - **Keywords:** signal chaining, auto-dispatch, loop detection
 - **Seen:** 588d800
 
@@ -85,14 +85,14 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### rigor-scaled-evaluation
 - **What:** Eval 3 tầng theo cost/reliability: Tier 1 automated (schema/keyword/length/link — free, instant), Tier 2 LLM-judge (content_quality threshold 0.70, seo 0.65 — rubric có tiêu chí + trọng số), Tier 3 human (critical mandatory). Rigor→tier mapping bảng cứng (quick chỉ T1; critical đủ T1+T2+T3). **Default-FAIL protocol** (mượn Rune): reviewer giả định 3–5 lỗi tồn tại, chủ động truy factual/brand/missing/structural/legal trước khi pass; critical bật adversarial + default_fail=true.
 - **Where:** `.fgOS/observability/evaluation.yaml`, `.fgOS/eval/schemas/rubric.schema.yaml`
-- **Notable:** "reviewer mặc định FAIL đến khi chứng minh ngược" — cùng tinh thần evidence-before-claims của bee nhưng ở phía review; tier scale theo cost là mô hình eval kinh tế (free check trước, đắt sau).
+- **Notable:** "reviewer mặc định FAIL đến khi chứng minh ngược" — cùng tinh thần evidence-before-claims của beehive nhưng ở phía review; tier scale theo cost là mô hình eval kinh tế (free check trước, đắt sau).
 - **Keywords:** default-FAIL, 3-tier eval, rigor mapping
 - **Seen:** 588d800
 
 ### async-review-queue
 - **What:** Review là signal bất đồng bộ (ADR 0019): `review.pending` ttl 30d (starvation alert 21d) mang ai_precheck + brand_precheck; `review.approved/rejected/auto_approved/escalated/skipped`. `pause_reason` phân biệt loại pause (review_pending/revision_pending/brand_violation_critical/visual_production_pending/awaiting_external_data/manual). Auto-approve CHỈ khi rigor==quick AND precheck clean; revision cap 3 vòng, escalate vòng 4; brand cap 2.
 - **Where:** `.fgOS/runtime/artifacts.yaml`, `.fgOS/runtime/error-handling.yaml`
-- **Notable:** review không block workflow — pause + listen signal + resume, cho phép human duyệt lệch pha; auto-approve có floor an toàn (chỉ lane quick + precheck sạch) giống beegog:gate-bypass-safety-floor.
+- **Notable:** review không block workflow — pause + listen signal + resume, cho phép human duyệt lệch pha; auto-approve có floor an toàn (chỉ lane quick + precheck sạch) giống beehive:gate-bypass-safety-floor.
 - **Keywords:** async review, pause_reason, auto-approve floor
 - **Seen:** 588d800
 
@@ -117,7 +117,7 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### multiplatform-lifecycle-hooks
 - **What:** 7 lifecycle event + `hooks-manifest.yaml` (14 canonical hook wired vào event, per-executor matcher, mode_skip, guard clause); `hook-patterns.yaml` liệt kê event + use case + available data + implementation status. Hook capture telemetry (`post-tool-capture-event.py`: stdin/env contract, emit spawn/usage event; `post-tool-error-capture.py`: error detection regex + error.jsonl + circuit-breaker integration). Fail-soft exit 0. Hook là optional capability của adapter — nền thiếu thì degrade.
 - **Where:** `.fgOS/hooks/hooks-manifest.yaml`, `.fgOS/hooks/hook-patterns.yaml`, `.fgOS/hooks/post-tool-capture-event.py`
-- **Notable:** hook manifest declarative + per-executor matcher = cùng hook logic projected sang nhiều nền (giống beegog:hook-catalog-projection nhưng cross-platform); fail-soft + error-capture→circuit-breaker nối observability với reliability.
+- **Notable:** hook manifest declarative + per-executor matcher = cùng hook logic projected sang nhiều nền (giống beehive:hook-catalog-projection nhưng cross-platform); fail-soft + error-capture→circuit-breaker nối observability với reliability.
 - **Keywords:** hooks manifest, telemetry capture, per-executor matcher
 - **Seen:** 588d800
 
@@ -126,7 +126,7 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### four-memory-types
 - **What:** 4 loại memory scope/lifetime/TTL riêng: working (task, session-only, never-persist), episodic (project, 90d default / 365d nếu important: blocked/human-feedback/quality<0.4/new-pattern), semantic (global, versioned, chỉ đổi khi knowledge file đổi), procedural (project, never auto-delete, user preferences/patterns với confidence+evidence). **Consolidation** cuối task/session: extract lessons → ghi episodic → update procedural (newer-wins, confidence>0.7 + evidence≥2) → clear working. Context injection có cap (episodic 5, procedural 10, semantic on-demand 5).
 - **Where:** `.fgOS/memory/schema.yaml`, `.fgOS/memory/retention-policy.yaml`
-- **Notable:** phân loại memory theo khoa học nhận thức (working/episodic/semantic/procedural) với consolidation loop + importance-weighted forgetting — tinh vi hơn state-vs-log của bee; procedural memory (pattern học được, reinforcement +0.1/contradiction −0.2) là self-improvement ở tầng agent.
+- **Notable:** phân loại memory theo khoa học nhận thức (working/episodic/semantic/procedural) với consolidation loop + importance-weighted forgetting — tinh vi hơn state-vs-log của beehive; procedural memory (pattern học được, reinforcement +0.1/contradiction −0.2) là self-improvement ở tầng agent.
 - **Keywords:** episodic, procedural, consolidation, forgetting
 - **Seen:** 588d800
 
@@ -142,7 +142,7 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### executor-registry-cognitive-tier
 - **What:** Dispatch tách khỏi model: mỗi task/stage khai `cognitive_tier` (lightweight/standard/analytical/critical), `model-policy.yaml` map tier→model cụ thể theo nền (ADR 0025), `executor-registry.yaml` định nghĩa executor + invocation (ADR 0027/0042: `kind` agent|tool, invocation via task|cli|mcp|api + adapter bash/python/native/mcp). Orchestrator đọc `next_stage_model/executor/interface` từ run.yaml khi dispatch. Cognitive tier có **silent downgrade** (critical→analytical→standard→lightweight) khi cần.
 - **Where:** `.claude/config/model-policy.yaml`, `.fgOS/runtime/config/executor-registry.yaml`, `docs/02-design/executor-schema-v2.md`
-- **Notable:** model-tier là thuộc tính của task (cognitive_tier) tách khỏi ánh xạ tier→model (chỉnh một chỗ đổi model cả hệ) — sạch hơn model-tiers của bee (beegog:model-tiers-cost-discipline) ở chỗ tách policy khỏi task; executor-registry cho phép cùng task chạy qua nhiều interface (task/cli/mcp/api).
+- **Notable:** model-tier là thuộc tính của task (cognitive_tier) tách khỏi ánh xạ tier→model (chỉnh một chỗ đổi model cả hệ) — sạch hơn model-tiers của beehive (beehive:model-tiers-cost-discipline) ở chỗ tách policy khỏi task; executor-registry cho phép cùng task chạy qua nhiều interface (task/cli/mcp/api).
 - **Keywords:** cognitive tier, model-policy, executor-registry, silent downgrade
 - **Seen:** 588d800
 
@@ -160,7 +160,7 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### four-zone-storage-separation
 - **What:** 4 zone tách theo audience + tính bền: `.fgOS/` (framework core, read-only, agent-agnostic), `studio/` (user data, git-tracked, human-facing — với `config`/`shared` là reserved names, per-brand `{brand_id}/`), `.workspace/` (machine, gitignored, run state/checkpoint), `.{platform}/` (adapter per nền). Run layout `.workspace/runs/{YYMMDD-workflow-slug}/`; auto-promotion đẩy artifact từ workspace → studio theo rule. ADR 0040 chi phối intra-zone layout.
 - **Where:** `CLAUDE.md`, `.fgOS/runtime/artifacts.yaml`, `.gitignore`
-- **Notable:** mở rộng policy-vs-ops split (beegog/harness) thành 4 zone: thêm trục "framework vs user" (agent-agnostic core tách khỏi brand data) và "adapter per platform" — cần thiết cho multi-runtime + multi-tenant; reserved-names guard chống brand đè config/shared.
+- **Notable:** mở rộng policy-vs-ops split (beehive/harness) thành 4 zone: thêm trục "framework vs user" (agent-agnostic core tách khỏi brand data) và "adapter per platform" — cần thiết cho multi-runtime + multi-tenant; reserved-names guard chống brand đè config/shared.
 - **Keywords:** storage zones, framework-vs-user, workspace-vs-studio, reserved names
 - **Seen:** 588d800
 
@@ -169,7 +169,7 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### agent-facing-docs-contract
 - **What:** Docs có "hệ điều hành cho agent": `docs/_agents/` chứa QUICK-START (30s onboarding), AGENT-GUIDE ("where to start" theo task type), `change-protocols/` (protocol sửa theo loại), `doc-contract.md` (schema bắt buộc), `do-not-touch.md` (hard invariants). Kỷ luật ADR: never edit `status: ACCEPTED` (chỉ supersede bằng ADR mới), never rename per-flow file, never đổi stage-id production không có ADR. Backstop: post-commit `validate-doc.py` ghi vi phạm vào `docs/_violations.md` (no-friction), pre-commit opt-in.
 - **Where:** `docs/_agents/doc-contract.md`, `docs/_agents/QUICK-START.md`, `docs/_agents/AGENT-GUIDE.md`
-- **Notable:** docs được thiết kế NHƯ giao diện cho agent (không chỉ cho người) — có onboarding path, change-protocol theo task, contract schema, immutable-ADR; vượt spec-reading-map của bee ở chỗ có protocol sửa + backstop validate. Đối chiếu trực tiếp với hệ thống distill này của forgent.
+- **Notable:** docs được thiết kế NHƯ giao diện cho agent (không chỉ cho người) — có onboarding path, change-protocol theo task, contract schema, immutable-ADR; vượt spec-reading-map của beehive ở chỗ có protocol sửa + backstop validate. Đối chiếu trực tiếp với hệ thống distill này của forgent.
 - **Keywords:** docs-for-agents, change-protocols, immutable ADR, doc-contract
 - **Seen:** 588d800
 
@@ -178,6 +178,6 @@ Framework marketing-ops **agent-agnostic**: một core `.fgOS/` (39 skill, 20 ag
 ### procedural-memory-reinforcement
 - **What:** Procedural memory học pattern qua thời gian: user_preferences/successful_patterns/failed_approaches/skill_calibrations, cập nhật lúc consolidation với confidence có **reinforcement boost +0.1/episode xác nhận** và **contradiction penalty −0.2/episode mâu thuẫn**; xóa chỉ khi confidence<0.2 sau mâu thuẫn HOẶC human đánh dấu invalid HOẶC agent role bị gỡ. Newer-wins cần confidence>0.7 + evidence≥2. Staleness flag 365d (báo người, không tự xóa).
 - **Where:** `.fgOS/memory/schema.yaml`, `.fgOS/memory/retention-policy.yaml`
-- **Notable:** agent tự cải thiện bằng pattern học được có trọng số bằng chứng (reinforce/contradict) — self-improvement ở tầng runtime/agent, khác friction-backlog của bee (tầng harness/human). Cặp với four-memory-types (context-memory).
+- **Notable:** agent tự cải thiện bằng pattern học được có trọng số bằng chứng (reinforce/contradict) — self-improvement ở tầng runtime/agent, khác friction-backlog của beehive (tầng harness/human). Cặp với four-memory-types (context-memory).
 - **Keywords:** procedural memory, reinforcement, confidence, learned patterns
 - **Seen:** 588d800
