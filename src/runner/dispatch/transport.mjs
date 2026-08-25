@@ -552,7 +552,28 @@ function herdrSpawnAdapter(invocation, opts) {
     // token look dangerous" allowlist -- that heuristic is exactly what
     // let a metacharacter combination it didn't anticipate through before.
     const posixShellQuote = (value) => `'${String(value).replace(/'/g, `'\\''`)}'`;
-    const fullCmd = [command, ...(args || [])].map(posixShellQuote).join(' ');
+    const quotedCmd = [command, ...(args || [])].map(posixShellQuote).join(' ');
+
+    // SIGNAL FALLBACK (self-review finding, 2026-08-25): `herdr pane
+    // wait-output --regex` can ONLY detect completion by matching text the
+    // dispatched agent itself chooses to print -- unlike `cliSpawnAdapter`,
+    // which observes the real child process's own 'exit' event regardless
+    // of what it printed. An agent that does real work (commits, edits)
+    // but never emits `[DONE]`/`[BLOCKED]` -- the exact case the existing
+    // ladder's `headBefore`/`headAfter` git-inference fallback exists to
+    // handle -- would otherwise just sit until this adapter's own timeout
+    // elapses and hard-rejects, discarding that fallback entirely (this
+    // piece's own action text: "Results come back through the EXISTING
+    // ladder ... this piece introduces no new result protocol"). A
+    // runner-owned sentinel closes that gap without inventing a new
+    // protocol: it is not a signal the worker or `[DONE]`/`[BLOCKED]`
+    // ladder ever sees or needs to know about -- it only tells THIS
+    // adapter "the shell command has exited", the same fact `child.on
+    // ('exit')` already gives `cliSpawnAdapter` for free, plus the real
+    // exit code (closes the separate P2 finding: `status` below used to
+    // be `herdr pane wait-output`'s own exit code, never the worker's).
+    const sentinel = `__fgos_herdr_exit_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}__`;
+    const fullCmd = `${quotedCmd}; echo "${sentinel}:$?"`;
 
     try {
       execFileSync(herdrBin, ['pane', 'run', paneId, fullCmd], {
@@ -570,8 +591,11 @@ function herdrSpawnAdapter(invocation, opts) {
       ));
     }
 
-    // 3. Observe completion using `herdr pane wait-output`
-    const waitArgs = ['pane', 'wait-output', paneId, '--regex', '\\[(DONE|BLOCKED)\\]'];
+    // 3. Observe completion using `herdr pane wait-output` -- either the
+    // worker's own [DONE]/[BLOCKED] token (fast path, unchanged) OR the
+    // sentinel above (the shell command itself has exited, whether or not
+    // the worker ever signaled).
+    const waitArgs = ['pane', 'wait-output', paneId, '--regex', `\\[(DONE|BLOCKED)\\]|${sentinel}:`];
     if (timeoutMs) {
       waitArgs.push('--timeout', String(timeoutMs));
     }
@@ -639,14 +663,28 @@ function herdrSpawnAdapter(invocation, opts) {
         }
       }
 
-      if (onChunk && stdout) {
-        teeChunk(onChunk, 'stdout', stdout);
+      // P2 (self-review finding, 2026-08-25): `status` used to be `herdr
+      // pane wait-output`'s OWN exit code -- a completion-watcher process,
+      // never the dispatched worker's. The sentinel above always carries
+      // the real one (`echo "${sentinel}:$?"`, `$?` captured immediately
+      // after the real command exits) -- parsed out here and stripped from
+      // the returned stdout so it never leaks into what looks like worker
+      // output. Falls back to wait-output's own exit code only when the
+      // sentinel line genuinely never made it into scrollback (e.g. the
+      // `--lines 500` cap truncated it away) -- same as this adapter's
+      // pre-existing behavior for that edge case.
+      const sentinelMatch = stdout.match(new RegExp(`${sentinel}:(\\d+)`));
+      const realStatus = sentinelMatch ? Number(sentinelMatch[1]) : (code === 0 ? 0 : code);
+      const cleanedStdout = stdout.replace(new RegExp(`${sentinel}:\\d+\\n?`), '');
+
+      if (onChunk && cleanedStdout) {
+        teeChunk(onChunk, 'stdout', cleanedStdout);
       }
 
       resolve({
-        status: code === 0 ? 0 : code,
+        status: realStatus,
         signal,
-        stdout,
+        stdout: cleanedStdout,
         stderr: '',
         tier,
         model,

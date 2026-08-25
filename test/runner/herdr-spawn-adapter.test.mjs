@@ -7,6 +7,73 @@ import { execFileSync } from 'node:child_process';
 import { EXECUTOR_ADAPTERS, DispatchError, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from '../../src/runner/dispatch/transport.mjs';
 import { loadRunnerConfig } from '../../src/runner/dispatch/config.mjs';
 
+// A realistic mock: unlike createMockHerdrScript below (which never
+// actually runs the "pane run" command text, so it can't exercise the
+// self-review sentinel-fallback fix), this one really executes it via a
+// real shell and lets "pane wait-output"/"pane read" observe the real
+// resulting output -- close enough to real herdr semantics to prove the
+// sentinel actually gets matched and the real exit code actually surfaces.
+function createRealisticMockHerdrScript(tmpDir) {
+  const scriptPath = path.join(tmpDir, 'realistic-mock-herdr.mjs');
+  const outputsDir = path.join(tmpDir, 'pane-outputs');
+  const code = `
+import fs from 'node:fs';
+import path from 'node:path';
+import { execSync } from 'node:child_process';
+const outputsDir = ${JSON.stringify(outputsDir)};
+fs.mkdirSync(outputsDir, { recursive: true });
+const args = process.argv.slice(2);
+const subcommand = args[0];
+const action = args[1];
+
+if (subcommand === 'pane' && action === 'split') {
+  const paneId = 'pane-real-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+  fs.writeFileSync(path.join(outputsDir, paneId + '.txt'), '');
+  console.log(JSON.stringify({ result: { pane: { pane_id: paneId } } }));
+  process.exit(0);
+}
+
+if (subcommand === 'pane' && action === 'run') {
+  const paneId = args[2];
+  const cmd = args[3];
+  let out = '';
+  try {
+    out = execSync(cmd, { shell: '/bin/sh', encoding: 'utf8' });
+  } catch (err) {
+    out = (err.stdout || '') + (err.stderr || '');
+  }
+  fs.appendFileSync(path.join(outputsDir, paneId + '.txt'), out);
+  process.exit(0);
+}
+
+if (subcommand === 'pane' && action === 'wait-output') {
+  const paneId = args[2];
+  const regexIdx = args.indexOf('--regex');
+  const re = new RegExp(args[regexIdx + 1]);
+  const timeoutIdx = args.indexOf('--timeout');
+  const timeoutMs = timeoutIdx !== -1 ? Number(args[timeoutIdx + 1]) : 5000;
+  const outFile = path.join(outputsDir, paneId + '.txt');
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const content = fs.existsSync(outFile) ? fs.readFileSync(outFile, 'utf8') : '';
+    if (re.test(content)) process.exit(0);
+  }
+  process.exit(1);
+}
+
+if (subcommand === 'pane' && action === 'read') {
+  const paneId = args[2];
+  const outFile = path.join(outputsDir, paneId + '.txt');
+  process.stdout.write(fs.existsSync(outFile) ? fs.readFileSync(outFile, 'utf8') : '');
+  process.exit(0);
+}
+
+process.exit(0);
+`;
+  fs.writeFileSync(scriptPath, code);
+  return { scriptPath, outputsDir };
+}
+
 function createMockHerdrScript(tmpDir) {
   const scriptPath = path.join(tmpDir, 'mock-herdr.mjs');
   const logPath = path.join(tmpDir, 'herdr-calls.jsonl');
@@ -248,9 +315,62 @@ test('herdr-spawn adapter: shell metacharacters in a prompt/arg never execute wh
   // exactly like herdr's own pane would ("types the given text into
   // whatever shell is already running in that pane"). If quoting is
   // broken, `touch <markerFile>` fires and the file exists afterward.
+  // (The typed text also carries a trailing `; echo "<sentinel>:$?"` --
+  // the completion-detection sentinel, a separate self-review fix -- so
+  // only the FIRST line is the real echo output under test here.)
   const shellOutput = execFileSync('sh', ['-c', typedText], { encoding: 'utf8' });
   assert.ok(!fs.existsSync(markerFile), 'command substitution/backtick/semicolon/pipe in the prompt must NEVER execute when the pane types this text into its shell');
-  assert.equal(shellOutput.trim(), dangerousArg, 'echo must receive the dangerous string as ONE literal argument, unmangled');
+  assert.equal(shellOutput.split('\n')[0], dangerousArg, 'echo must receive the dangerous string as ONE literal argument, unmangled');
 
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('herdr-spawn adapter: a worker that finishes WITHOUT ever printing [DONE]/[BLOCKED] is still detected via the runner-owned sentinel, not lost to a hard timeout -- and the real worker exit code surfaces as status (self-review finding, P1/P2)', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-sentinel-fallback-test-'));
+  const { scriptPath } = createRealisticMockHerdrScript(tmpDir);
+  const wrapperPath = path.join(tmpDir, 'herdr-wrapper.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh\nexec node "${scriptPath}" "$@"\n`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  // A "worker" that does real work (prints something) and exits nonzero --
+  // but never once prints [DONE] or [BLOCKED]. Before this fix, this
+  // scenario just sat in `herdr pane wait-output`'s own dead regex wait
+  // until the adapter's timeout fired and hard-rejected, discarding the
+  // existing headBefore/headAfter git-inference fallback entirely.
+  const res = await herdrSpawn(
+    { command: 'sh', args: ['-c', 'echo hello-no-token; exit 7'], env: {} },
+    { cwd: tmpDir, timeoutMs: 5000, workId: 'sentinel-item', tier: 'standard', model: 'sonnet', herdrBin: wrapperPath },
+  );
+
+  assert.ok(res.paneId);
+  // P2: status must be the REAL worker exit code (7), never
+  // `herdr pane wait-output`'s own exit code (which would read 0 here --
+  // wait-output succeeded at finding the sentinel, that is not the same
+  // fact as "the worker exited 0").
+  assert.equal(res.status, 7, 'status must be the real worker exit code, not wait-output\'s own exit code');
+  // The internal sentinel line must never leak into what looks like real
+  // worker output.
+  assert.equal(res.stdout.trim(), 'hello-no-token', 'stdout must be cleaned of the internal sentinel marker');
+  assert.ok(!res.stdout.includes('__fgos_herdr_exit_'), 'the sentinel marker itself must never appear in the returned stdout');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('herdr-spawn adapter: the worker\'s own [DONE] token still resolves the fast path correctly against a realistic mock (regression guard for the sentinel regex alternation)', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-token-fastpath-test-'));
+  const { scriptPath } = createRealisticMockHerdrScript(tmpDir);
+  const wrapperPath = path.join(tmpDir, 'herdr-wrapper.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh\nexec node "${scriptPath}" "$@"\n`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  const res = await herdrSpawn(
+    { command: 'sh', args: ['-c', 'echo "[DONE] real work finished"'], env: {} },
+    { cwd: tmpDir, timeoutMs: 5000, workId: 'token-item', tier: 'standard', model: 'sonnet', herdrBin: wrapperPath },
+  );
+
+  assert.ok(res.stdout.includes('[DONE] real work finished'));
+  assert.equal(res.status, 0);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
