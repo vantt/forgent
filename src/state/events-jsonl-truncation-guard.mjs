@@ -328,7 +328,7 @@ export function runOpportunisticMainCheckoutChecks(
   // fallback commit on ANY file's break -- a break on one writer's file is
   // just as real a truncation as one on baseline-0.
   try {
-    const guardPath = path.join(fgosDir, "events-jsonl.truncation-guard.json");
+    const guardPath = path.join(fgosDir, "runtime", "events-jsonl.truncation-guard.json");
     if (rawLog !== null) {
       // Test-injection path (existing `rawLog` override): scoped to
       // baseline-0 only, byte-identical to before T5 -- callers using this

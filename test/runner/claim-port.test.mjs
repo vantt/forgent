@@ -544,7 +544,7 @@ test('claimWork pre-check never fires for take (isolate:false), even against a c
 test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and succeeds even when truncation guard detects a break', () => {
   delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
   const { repoRoot, dir } = setup();
-  const guardPath = path.join(dir, 'events-jsonl.truncation-guard.json');
+  const guardPath = path.join(dir, 'runtime', 'events-jsonl.truncation-guard.json');
   const warnPath = path.join(dir, 'logs', 'main-checkout-guard-warnings.jsonl');
   const eventsDir = path.join(dir, 'events');
 
@@ -555,6 +555,7 @@ test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and su
   // that claimWork does its own real multi-file discovery (no more synthetic
   // single-file `rawLog` injection).
   const writerFileName = fs.readdirSync(eventsDir).find((f) => f.endsWith('.jsonl'));
+  fs.mkdirSync(path.dirname(guardPath), { recursive: true });
   fs.writeFileSync(guardPath, JSON.stringify({ [`events/${writerFileName}`]: { seq: 9999, hash: 'badhash' } }));
 
   // claimWork should succeed normally despite truncation break, and write warning

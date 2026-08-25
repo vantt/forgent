@@ -26,14 +26,16 @@ concurrency-critical code (`session-identity.mjs`,
 `main-checkout-lock.mjs`). Deferred to Phase 2, not part of this pass.
 
 ## Phases
-- [phase-01-logs-bucket.md](phase-01-logs-bucket.md) — move the 4
-  tracked diagnostic files into `.fgos/logs/`, untrack them, update
-  every writer/reader path + test + living doc. **Doing now.**
-- Phase 2 (not written, backlog only): `cache/` for `state.json`,
-  `runtime/` for `sessions.json`/`tool-status.local.json`/`*.lock`/
-  `events-jsonl.truncation-guard.json`. Purely organizational (all
-  already gitignored) — revisit only when touching that code for
-  another reason, to avoid unrelated regression risk.
+- [phase-01-logs-bucket.md](phase-01-logs-bucket.md) — done, committed
+  (`dcaa6dee`).
+- [phase-02-cache-runtime-bucket.md](phase-02-cache-runtime-bucket.md) —
+  done (partial by design). `tool-status.local.json` and
+  `events-jsonl.truncation-guard.json` moved to `.fgos/runtime/`.
+  `state.json` → `.fgos/cache/` attempted and reverted (51 test
+  failures from 21 files hardcoding the old path, zero dirty-tree
+  benefit). `sessions.json`/lock files never attempted (on the git
+  hook's own live import path — too risky for zero benefit). `npm test`
+  green (4023 pass, 0 fail).
 
 ## Acceptance criteria
 - `git status` no longer shows the 4 files at `.fgos/` root after a

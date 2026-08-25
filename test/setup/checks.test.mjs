@@ -241,7 +241,7 @@ test('events-jsonl-not-truncated passes and bootstraps a mark on first run again
   const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
   assert.equal(passed, true);
   assert.match(message, /truncation guard holds/);
-  assert.equal(fs.existsSync(path.join(fgosDir, 'events-jsonl.truncation-guard.json')), true, 'a passing check advances/bootstraps the mark');
+  assert.equal(fs.existsSync(path.join(fgosDir, 'runtime', 'events-jsonl.truncation-guard.json')), true, 'a passing check advances/bootstraps the mark');
   fs.rmSync(dir, { recursive: true, force: true });
 });
 

@@ -207,7 +207,7 @@ export async function probeTool(tool, repoRoot) {
 export const TOOL_STATUS_FILENAME = 'tool-status.local.json';
 
 export function toolStatusPath(dir) {
-  return path.join(dir, TOOL_STATUS_FILENAME);
+  return path.join(dir, 'runtime', TOOL_STATUS_FILENAME);
 }
 
 /**
@@ -235,8 +235,9 @@ export function readLocalStatus(dir) {
 }
 
 export function writeLocalStatus(dir, statusMap) {
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(toolStatusPath(dir), `${JSON.stringify(statusMap, null, 2)}\n`, 'utf8');
+  const statusPath = toolStatusPath(dir);
+  fs.mkdirSync(path.dirname(statusPath), { recursive: true });
+  fs.writeFileSync(statusPath, `${JSON.stringify(statusMap, null, 2)}\n`, 'utf8');
 }
 
 /**

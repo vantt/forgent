@@ -1155,7 +1155,7 @@ function checkEventsJsonlNotTruncated(cwd) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
   const fgosDir = path.join(mainCheckout, '.fgos');
-  const guardPath = path.join(fgosDir, 'events-jsonl.truncation-guard.json');
+  const guardPath = path.join(fgosDir, 'runtime', 'events-jsonl.truncation-guard.json');
   const filesToCheck = [{ fileKey: 'events.jsonl', logPath: path.join(fgosDir, 'events.jsonl') }];
   const eventsDirPath = path.join(fgosDir, 'events');
   try {

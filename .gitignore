@@ -1,7 +1,12 @@
 # Upstream source clones — cursors tracked in docs/distillery/, re-clone as needed
 /upstreams/
 
-# forgent state layer — events.jsonl is truth (committed); state.json is a derived view
+# forgent state layer — events.jsonl is truth (committed); state.json is a
+# derived, rebuildable view. Tried bucketing it into .fgos/cache/ in
+# phase-02 (plans/260825-0842-fgos-logs-dir-bucketing) and reverted: 21 test
+# files independently hardcode this exact path, causing 51 failures for a
+# purely cosmetic move (state.json was already gitignored at its old
+# location too -- moving it fixes zero dirty-tree problem). Left at root.
 .fgos/state.json
 # diagnostic/telemetry logs — local observability, never committed
 # (worker-dispatch-log D4; also holds approve-post-success-faults.jsonl,
@@ -9,6 +14,12 @@
 # entropy-history.jsonl, invocation-faults.jsonl since phase-01,
 # plans/260825-0842-fgos-logs-dir-bucketing)
 .fgos/logs/
+# per-machine runtime facts — tool-status.local.json and the events.jsonl
+# truncation-guard mark, moved here phase-02
+# (plans/260825-0842-fgos-logs-dir-bucketing). sessions.json/*.lock stay at
+# .fgos/ root for now (deferred, on the git hook's own live import path —
+# see plan.md phase-02 "held back" section).
+.fgos/runtime/
 node_modules/
 
 # test-leak artifacts — belt against auto-commit clobber (backlog STR74/STR65)
@@ -19,19 +30,8 @@ output.txt
 # main-checkout activity lock + sibling lock files (STR65) — process state, never committed
 .fgos/*.lock
 
-# tool registry local status overlay — a fact about THIS machine (what `tool
-# check` last observed), never a team decision, so it never goes through
-# events.jsonl (tsk-1dj, tool-registry-capability port)
-.fgos/tool-status.local.json
-
 # untracked local secret environment variables (tsk-gb3)
 .fgos/secrets.local.env
-
-# events.jsonl truncation-guard mark — a high-water-mark that must live
-# OUTSIDE git tracking to work at all: a git operation reverting the
-# tracked events.jsonl must never also revert this (tsk-cgg,
-# docs/history/events-jsonl-git-tracked-truncation/)
-.fgos/events-jsonl.truncation-guard.json
 
 # BEE:START
 .bee/state.json

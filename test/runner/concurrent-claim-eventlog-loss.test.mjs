@@ -182,7 +182,7 @@ test('reproduces unlocked guard mark write race across concurrent sessions again
   delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
 
   const { repoRoot, fgosDir } = initTempRepo();
-  const guardPath = path.join(fgosDir, 'events-jsonl.truncation-guard.json');
+  const guardPath = path.join(fgosDir, 'runtime', 'events-jsonl.truncation-guard.json');
 
   try {
     addWork(fgosDir, { id: 'task-guard-1', title: 'Task Guard 1', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
@@ -195,7 +195,7 @@ test('reproduces unlocked guard mark write race across concurrent sessions again
 import { runOpportunisticMainCheckoutChecks, writeGuardMark } from ${JSON.stringify(GUARD_MJS)};
 
 const [fgosDir, repoRoot, fileKey, seqStr, hash] = process.argv.slice(2);
-const guardPath = fgosDir + '/events-jsonl.truncation-guard.json';
+const guardPath = fgosDir + '/runtime/events-jsonl.truncation-guard.json';
 
 if (seqStr && hash) {
   writeGuardMark(guardPath, fileKey, { seq: Number(seqStr), hash });

@@ -215,7 +215,7 @@ test("runOpportunisticMainCheckoutChecks D1: records warning on truncation break
   const fgosDir = path.join(repoRoot, ".fgos");
   fs.mkdirSync(fgosDir, { recursive: true });
   const logPath = path.join(fgosDir, "events.jsonl");
-  const guardPath = path.join(fgosDir, "events-jsonl.truncation-guard.json");
+  const guardPath = path.join(fgosDir, "runtime", "events-jsonl.truncation-guard.json");
   const warnPath = path.join(fgosDir, 'logs', MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
 
   // Set initial mark at seq 2
@@ -278,7 +278,7 @@ test("runOpportunisticMainCheckoutChecks D1: refuses fallback auto-commit when a
   const fgosDir = path.join(repoRoot, ".fgos");
   fs.mkdirSync(fgosDir, { recursive: true });
   const logPath = path.join(fgosDir, "events.jsonl");
-  const guardPath = path.join(fgosDir, "events-jsonl.truncation-guard.json");
+  const guardPath = path.join(fgosDir, "runtime", "events-jsonl.truncation-guard.json");
 
   const commitTime = 1000000;
   fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
