@@ -181,6 +181,17 @@ resolves). Both still touch `src/runner/dispatch.mjs`, so they had to
 sequence rather than run concurrently, the same footprint-overlap
 discipline `tsk-in1` had already established.
 
+## `execute` streams live output; `decide` never needed to
+
+`dispatch.mjs execute`'s CLI branch ran silently between its start line and
+its final JSON result — no intermediate signal at all, easy to mistake for
+a hang during a slow spawned executor. `tsk-129` wired the repo's existing
+`onChunk` live-tee mechanism (already used elsewhere, `P39`) into this one
+remaining caller that had never used it, so a slow executor's output now
+streams live to stderr instead of staying silent. `decide` was
+deliberately left unchanged — it is fully synchronous, with no in-flight
+period for a live tee to have anything to show.
+
 ## Live proof: `fgos-coding-implement` really does dispatch out-of-process to `agy`
 
 `tsk-1m8` live-proved the mechanism described above actually works for a
