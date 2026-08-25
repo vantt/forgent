@@ -160,6 +160,24 @@ different things about what had already been cleaned; and the fact that if
 `tsk-1lv` D5 (retiring `docs/decisions/*.md`) ships, this check quietly
 stops catching anything at all, with no error.
 
+## A second-order bug the re-keying fix itself introduced (`tsk-6at`)
+
+A dedicated review round over `tsk-3x8`'s own content-keyed baseline
+change found a real regression it had introduced: `findNewFindings`'
+membership check used a plain `.includes()` test, which under-detects new
+occurrences once a file has two or more findings that share the exact
+same key — a real, live shape (7 files/64 duplicate-key groups already
+existed in the actual baseline). Confirmed as a genuine regression against
+the old line-keyed formula, not a pre-existing gap. Fixed with
+count-based consumption instead of membership testing, no baseline format
+change needed. Two further review passes (requested explicitly, looking
+for anything still missed) confirmed multi-occurrence correctness (2
+baselined + 2 new correctly reports 2, not just the single-extra case the
+first regression test covered) and baseline-regeneration determinism, and
+surfaced one further out-of-scope edge case (a source path literally named
+`__proto__` would break the baseline object) — flagged, not fixed, since
+it was never in this item's own scope.
+
 ## Source
 
 `tsk-37i`. Verify: `npm test && test -f
