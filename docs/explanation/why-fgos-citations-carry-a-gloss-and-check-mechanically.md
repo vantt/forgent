@@ -178,6 +178,29 @@ surfaced one further out-of-scope edge case (a source path literally named
 `__proto__` would break the baseline object) — flagged, not fixed, since
 it was never in this item's own scope.
 
+## The wrapper generator's own boilerplate was violating the rule it lives next to (`tsk-352f`)
+
+Every generated skill wrapper (`.claude/skills/**/SKILL.md`,
+`plugins/fgOS/skills/**/SKILL.md`) carries a boilerplate line —
+`src/setup/skill-wrappers.mjs`'s `generateWrapperContent` — that used to
+self-embed the literal string "This is a generated thin wrapper (`tsk-1qi`
+D5/D7) -- do not edit directly, edit the source instead." `D5/D7` is a
+bare `D`-local citation cited outside its own home `CONTEXT.md` —
+precisely the pattern this whole citation contract exists to catch,
+except no checker had ever actually scanned `.claude/skills/` for it: the
+generator's own template string was never treated as a citation-format
+target in the first place, so the bug shipped invisibly into fifteen
+generated files at once, on every regeneration, unnoticed.
+
+The fix followed decision `0017`'s own rule directly: a `D`-local id is
+never cited outside its home — the correct move is inlining the content or
+dropping the id, never adding a gloss to a `D`-local citation living
+outside `CONTEXT.md`. Since the `tsk-1qi` item id alone already identifies
+the source sufficiently on its own, the `D5/D7` suffix was simply dropped,
+confirmed (by reading the real content of D5/D7) to lose no information a
+reader actually needed. All fifteen affected wrapper files were
+regenerated and the full suite re-verified green.
+
 ## Source
 
 `tsk-37i`. Verify: `npm test && test -f
