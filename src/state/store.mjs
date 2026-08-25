@@ -960,9 +960,17 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
 
 /**
  * Settle an active runtime claim on item `id`, transitioning it to `finalStatus` (D2).
- * Validates active runtime claim ownership (claimId) and durable revision (preClaimRevision),
- * writes the full segment [work.move(preClaimStatus->doing), work.attempt, work.move(doing->finalStatus)]
- * in ONE held events.lock critical section, then releases the runtime claim.
+ * Validates active runtime claim ownership (claimId, writerId) and durable
+ * revision (preClaimRevision) FRESH, inside the same held events.lock +
+ * claims.lock critical section the write itself runs in — both legs of the
+ * segment (the FSM-validating `transitionWork` calls for move1 and move3)
+ * are built and proven valid BEFORE either is appended, so a bad
+ * finalStatus/missing ask never leaves a partial segment on disk. Writes
+ * the full segment [work.move(preClaimStatus->doing), work.attempt,
+ * work.move(doing->finalStatus)] and releases the runtime claim in that
+ * SAME critical section, immediately after the write succeeds — never on
+ * a failed settle (a caught CAS/revision conflict leaves the claim
+ * untouched for its owner to retry or reconcile).
  */
 export function settleClaim(dir, {
   id,
@@ -1031,127 +1039,152 @@ export function settleClaim(dir, {
       throw new StoreError('conflict', `settleClaim: writer identity mismatch for "${id}" — claim acquired by writer "${claim.writerId}", settling as writer "${currentWriterId}".`);
     }
 
-    try {
-      const res = withEventsLockAndRefresh(dir, logPath, () => withClaimsLock(dir, () => {
-        // tsk-40m code-review finding (blocker, TOCTOU race): every check
-        // above (claimId, writerId) ran against a snapshot read BEFORE
-        // acquiring events.lock. Waiting for that lock (held by any other
-        // writer) is unbounded — long enough for claim-port.mjs's own
-        // stale-claim-reclaim to release THIS claim and hand it to a
-        // different actor in the meantime. Re-reading it here, now holding
-        // BOTH events.lock and claims.lock, closes the window: no release/
-        // reacquire (claims.lock) and no durable write (events.lock) can
-        // land between this read and our own append below.
-        const freshClaim = readClaim(dir, id);
-        if (!freshClaim || freshClaim.claimId !== targetClaimId) {
-          throw new StoreError(
-            'conflict',
-            `settleClaim: claim for "${id}" changed while waiting for the write lock — had "${targetClaimId}", now ${freshClaim ? `"${freshClaim.claimId}"` : 'none'}.`,
-          );
-        }
-        if (freshClaim.writerId !== undefined && freshClaim.writerId !== currentWriterId) {
-          throw new StoreError('conflict', `settleClaim: writer identity for "${id}" changed while waiting for the write lock.`);
-        }
+    const res = withEventsLockAndRefresh(dir, logPath, () => {
+      const writeResult = withClaimsLock(dir, () => {
+      // tsk-40m code-review finding (blocker, TOCTOU race): every check
+      // above (claimId, writerId) ran against a snapshot read BEFORE
+      // acquiring events.lock. Waiting for that lock (held by any other
+      // writer) is unbounded — long enough for claim-port.mjs's own
+      // stale-claim-reclaim to release THIS claim and hand it to a
+      // different actor in the meantime. Re-reading it here, now holding
+      // BOTH events.lock and claims.lock, closes the window: no release/
+      // reacquire (claims.lock) and no durable write (events.lock) can
+      // land between this read and our own append below.
+      const freshClaim = readClaim(dir, id);
+      if (!freshClaim || freshClaim.claimId !== targetClaimId) {
+        throw new StoreError(
+          'conflict',
+          `settleClaim: claim for "${id}" changed while waiting for the write lock — had "${targetClaimId}", now ${freshClaim ? `"${freshClaim.claimId}"` : 'none'}.`,
+        );
+      }
+      if (freshClaim.writerId !== undefined && freshClaim.writerId !== currentWriterId) {
+        throw new StoreError('conflict', `settleClaim: writer identity for "${id}" changed while waiting for the write lock.`);
+      }
 
-        const before = currentView(dir);
-        const work = before.work[id];
-        if (!work) {
-          throw new StoreError('validation', `settleClaim: work "${id}" not found.`);
-        }
+      const before = currentView(dir);
+      const work = before.work[id];
+      if (!work) {
+        throw new StoreError('validation', `settleClaim: work "${id}" not found.`);
+      }
 
-        const preClaimStatus = freshClaim.preClaimStatus || work.status;
-        if (freshClaim.preClaimStatus && work.status !== freshClaim.preClaimStatus) {
-          throw new StoreError('conflict', `settleClaim: item "${id}" status changed from preClaimStatus "${freshClaim.preClaimStatus}" to "${work.status}".`);
-        }
+      const preClaimStatus = freshClaim.preClaimStatus || work.status;
+      if (freshClaim.preClaimStatus && work.status !== freshClaim.preClaimStatus) {
+        throw new StoreError('conflict', `settleClaim: item "${id}" status changed from preClaimStatus "${freshClaim.preClaimStatus}" to "${work.status}".`);
+      }
 
-        if (freshClaim.preClaimRevision) {
-          const curRev = getItemDurableRevision(before, id);
-          if (curRev !== freshClaim.preClaimRevision) {
-            throw new StoreError('conflict', `settleClaim: item "${id}" durable revision changed from "${freshClaim.preClaimRevision}" to "${curRev}".`);
-          }
-        }
-
-        const writerLogPath = resolveWriterLogPath(dir);
-
-        // Event 1: work.move (preClaimStatus -> 'doing')
-        const move1Raw = transitionWork({ work, to: 'doing', expectedStatus: preClaimStatus });
-        move1Raw.payload.writer = writer;
-        if (freshClaim.claimRole || role) move1Raw.payload.role = freshClaim.claimRole || role;
-        if (freshClaim.headAtTake) move1Raw.payload.headAtTake = freshClaim.headAtTake;
-        if (freshClaim.branchHeadAtTake) move1Raw.payload.branchHeadAtTake = freshClaim.branchHeadAtTake;
-        if (freshClaim.claimTrigger) move1Raw.payload.claimTrigger = freshClaim.claimTrigger;
-        const cat1 = statusCategoryFor(getDomain(work.domain), 'doing');
-        if (cat1 !== undefined) move1Raw.payload.statusCategory = cat1;
-        const pr1 = parkReasonForStatus(getDomain(work.domain), 'doing');
-        if (pr1 !== undefined) move1Raw.payload.parkReason = pr1;
-
-        appendEventLocked(writerLogPath, move1Raw, dir);
-
-        // Event 2: work.attempt
-        const attemptResult = result || (finalStatus === 'awaiting-approval' || finalStatus === 'delivered' || finalStatus === 'done' ? 'success' : 'failed');
-        const attemptPayload = {
-          id,
-          phase,
-          result: attemptResult,
-          claimId: targetClaimId,
-          actor: freshClaim.actor || role || 'unknown',
-          endedAt: new Date().toISOString(),
-        };
-        appendEventLocked(writerLogPath, { type: 'work.attempt', payload: attemptPayload }, dir);
-
-        // Event 3: work.move ('doing' -> finalStatus)
-        const intermediateWork = { ...work, status: 'doing' };
-        const move3Raw = transitionWork({
-          work: intermediateWork,
-          to: finalStatus,
-          expectedStatus: 'doing',
-          reason,
-          ask,
-          answer,
-        });
-        move3Raw.payload.writer = writer;
-        if (role !== undefined) move3Raw.payload.role = role;
-        const cat3 = statusCategoryFor(getDomain(work.domain), finalStatus);
-        if (cat3 !== undefined) move3Raw.payload.statusCategory = cat3;
-        const pr3 = parkReasonForStatus(getDomain(work.domain), finalStatus);
-        if (pr3 !== undefined) move3Raw.payload.parkReason = pr3;
-        if (headAtReturn !== undefined) move3Raw.payload.headAtReturn = headAtReturn;
-        if (releaseTrigger !== undefined) move3Raw.payload.releaseTrigger = releaseTrigger;
-        if (branchHeadAtReturn !== undefined) move3Raw.payload.branchHeadAtReturn = branchHeadAtReturn;
-        if (mergedSha !== undefined) move3Raw.payload.mergedSha = mergedSha;
-        if (mergedInto !== undefined) move3Raw.payload.mergedInto = mergedInto;
-        if (reason !== undefined) move3Raw.payload.reason = reason;
-
-        const event3 = appendEventLocked(writerLogPath, move3Raw, dir);
-        const afterView = rebuildViewFromDir(dir);
-
-        return { event: event3, view: afterView };
-      }));
-
-      if (finalStatus === 'delivered') {
-        try {
-          const closeResult = recordCallReturn(dir, { id, note: 'auto-closed at delivered (tsk-2t9c D16)' });
-          if (closeResult) res.view = closeResult.view;
-        } catch {
-          // Best-effort
+      if (freshClaim.preClaimRevision) {
+        const curRev = getItemDurableRevision(before, id);
+        if (curRev !== freshClaim.preClaimRevision) {
+          throw new StoreError('conflict', `settleClaim: item "${id}" durable revision changed from "${freshClaim.preClaimRevision}" to "${curRev}".`);
         }
       }
 
-      if (finalStatus === 'awaiting-approval') {
-        try {
-          const domain = getDomain(res.view.work[id]?.domain);
-          if (roleGraphFor(domain)) {
-            recordCall(dir, { id, toRole: 'reviewer', reason: 'review', note: 'auto-fired on reaching awaiting-approval (tsk-2t9c D18)' });
-          }
-        } catch {
-          // Best-effort
-        }
-      }
+      // tsk-40m code-review finding (blocker, partial-segment write): BOTH
+      // legs of the segment must be built and pass transitionWork's own
+      // FSM-edge validation (throws on an invalid finalStatus, a missing
+      // `ask` for an awaiting-human edge, etc.) BEFORE either is appended.
+      // The old order built+appended move1 and the attempt, THEN built
+      // (and could throw validating) move3 — a bad finalStatus left move1
+      // and the attempt durably on disk with no matching terminal
+      // transition: a durable 'doing' with no active claim to explain it,
+      // and an attempt record with no settlement.
+      const move1Raw = transitionWork({ work, to: 'doing', expectedStatus: preClaimStatus });
+      move1Raw.payload.writer = writer;
+      if (freshClaim.claimRole || role) move1Raw.payload.role = freshClaim.claimRole || role;
+      if (freshClaim.headAtTake) move1Raw.payload.headAtTake = freshClaim.headAtTake;
+      if (freshClaim.branchHeadAtTake) move1Raw.payload.branchHeadAtTake = freshClaim.branchHeadAtTake;
+      if (freshClaim.claimTrigger) move1Raw.payload.claimTrigger = freshClaim.claimTrigger;
+      const cat1 = statusCategoryFor(getDomain(work.domain), 'doing');
+      if (cat1 !== undefined) move1Raw.payload.statusCategory = cat1;
+      const pr1 = parkReasonForStatus(getDomain(work.domain), 'doing');
+      if (pr1 !== undefined) move1Raw.payload.parkReason = pr1;
 
-      return res;
-    } finally {
+      const intermediateWork = { ...work, status: 'doing' };
+      const move3Raw = transitionWork({
+        work: intermediateWork,
+        to: finalStatus,
+        expectedStatus: 'doing',
+        reason,
+        ask,
+        answer,
+      });
+      move3Raw.payload.writer = writer;
+      if (role !== undefined) move3Raw.payload.role = role;
+      const cat3 = statusCategoryFor(getDomain(work.domain), finalStatus);
+      if (cat3 !== undefined) move3Raw.payload.statusCategory = cat3;
+      const pr3 = parkReasonForStatus(getDomain(work.domain), finalStatus);
+      if (pr3 !== undefined) move3Raw.payload.parkReason = pr3;
+      if (headAtReturn !== undefined) move3Raw.payload.headAtReturn = headAtReturn;
+      if (releaseTrigger !== undefined) move3Raw.payload.releaseTrigger = releaseTrigger;
+      if (branchHeadAtReturn !== undefined) move3Raw.payload.branchHeadAtReturn = branchHeadAtReturn;
+      if (mergedSha !== undefined) move3Raw.payload.mergedSha = mergedSha;
+      if (mergedInto !== undefined) move3Raw.payload.mergedInto = mergedInto;
+      if (reason !== undefined) move3Raw.payload.reason = reason;
+
+      const writerLogPath = resolveWriterLogPath(dir);
+
+      // Event 1: work.move (preClaimStatus -> 'doing')
+      appendEventLocked(writerLogPath, move1Raw, dir);
+
+      // Event 2: work.attempt
+      const attemptResult = result || (finalStatus === 'awaiting-approval' || finalStatus === 'delivered' || finalStatus === 'done' ? 'success' : 'failed');
+      const attemptPayload = {
+        id,
+        phase,
+        result: attemptResult,
+        claimId: targetClaimId,
+        actor: freshClaim.actor || role || 'unknown',
+        endedAt: new Date().toISOString(),
+      };
+      appendEventLocked(writerLogPath, { type: 'work.attempt', payload: attemptPayload }, dir);
+
+      // Event 3: work.move ('doing' -> finalStatus)
+      const event3 = appendEventLocked(writerLogPath, move3Raw, dir);
+      const afterView = rebuildViewFromDir(dir);
+
+      return { event: event3, view: afterView };
+      });
+
+      // tsk-40m code-review finding (blocker): release the claim HERE,
+      // right after the durable write actually succeeds (claims.lock,
+      // above, is not reentrant — releaseClaim needs its own separate,
+      // immediately-following acquisition, still inside the SAME held
+      // events.lock) — never in an outer `finally` that also ran on a
+      // FAILED settle (a CAS/revision conflict caught above, with nothing
+      // yet written, used to destroy a still-legitimately-held claim
+      // anyway, silently dropping the coordination state for real
+      // in-progress work), and never after the best-effort recordCall*/
+      // recordCallReturn side effects below (which shrinks, not
+      // eliminates, the crash window between "durably settled" and "claim
+      // file actually gone" — buildEffectiveView's own staleness check
+      // below is the defense-in-depth for what this ordering can't fully
+      // close).
       releaseClaim(dir, { id, claimId: targetClaimId });
+
+      return writeResult;
+    });
+
+    if (finalStatus === 'delivered') {
+      try {
+        const closeResult = recordCallReturn(dir, { id, note: 'auto-closed at delivered (tsk-2t9c D16)' });
+        if (closeResult) res.view = closeResult.view;
+      } catch {
+        // Best-effort
+      }
     }
+
+    if (finalStatus === 'awaiting-approval') {
+      try {
+        const domain = getDomain(res.view.work[id]?.domain);
+        if (roleGraphFor(domain)) {
+          recordCall(dir, { id, toRole: 'reviewer', reason: 'review', note: 'auto-fired on reaching awaiting-approval (tsk-2t9c D18)' });
+        }
+      } catch {
+        // Best-effort
+      }
+    }
+
+    return res;
   }
 
   // Fallback for legacy items (durable status was 'doing' before migration, with no active runtime claim record)

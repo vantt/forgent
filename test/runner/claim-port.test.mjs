@@ -3,12 +3,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, fork } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { LOCK_FILE, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 import { initStore, addWork, moveWork, settleClaim, listWork, FsmError, readRawEvents } from '../../src/state/store.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+
+const CLAIM_PORT_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/claim-port.mjs');
 
 // claim-port.mjs's claimWork shares main-checkout.lock with .githooks/
 // pre-commit (tsk-3w8) — the hook writes a STRING-identity record per commit
@@ -74,7 +77,7 @@ function writeHookStyleLock(dir, ageMs) {
 // read of EITHER the baseline file OR any file under `.fgos/events/`,
 // preserving the original intent (prove the full-log-read count stays
 // bounded) across the new multi-file shape.
-test('claimWork reads the event log fully at most 5 times per call, not 6+ (tsk-3jh dedupe + tsk-49e incremental snapshot + Tầng A multi-file + tsk-40m claim/doing split)', () => {
+test('claimWork reads the event log fully at most 7 times per call, not 8+ (tsk-3jh dedupe + tsk-49e incremental snapshot + Tầng A multi-file + tsk-40m claim/doing split + tsk-40m TOCTOU re-fold)', () => {
   const { repoRoot, dir } = setup();
   const eventsDir = path.join(dir, 'events');
   const baselinePath = path.join(dir, 'events.jsonl');
@@ -113,10 +116,17 @@ test('claimWork reads the event log fully at most 5 times per call, not 6+ (tsk-
   // baseline's real (previously unasserted) total of 6: moveWork's own
   // appendEventCore seq-read of the writer file is gone. None of these
   // reads go through rebuildView, so tsk-49e's snapshot fast path never
-  // applies to them. Asserted as an upper bound (never a lower one) because
-  // this call's own read count is bounded-above and deterministic, but the
-  // truncation guard's is not, in ways this test does not own.
-  assert.ok(logReadCount >= 2 && logReadCount <= 5, `expected 2-5 full log reads, got ${logReadCount}`);
+  // applies to them. (6)+(7) tsk-40m code-review finding (blocker, TOCTOU):
+  // claimWork now re-folds the durable log a SECOND time, fresh, right
+  // before acquireClaim — always, not conditionally — so a genuinely
+  // different process's durable write landing between the initial read at
+  // the top of this call and the actual claim write is never missed. That
+  // one `readRawEvents` call costs 2 full reads by this same counting
+  // (baseline-0 + the one writer file), the same shape as (1)+(2) above.
+  // Asserted as an upper bound (never a lower one) because this call's own
+  // read count is bounded-above and deterministic, but the truncation
+  // guard's is not, in ways this test does not own.
+  assert.ok(logReadCount >= 2 && logReadCount <= 7, `expected 2-7 full log reads, got ${logReadCount}`);
 });
 
 test('claimWork reclaims a stale hook-written (string-identity) lock past DEFAULT_TTL_MS, instead of failing lock-ambiguous forever', () => {
@@ -602,5 +612,86 @@ test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and su
   const res = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
   assert.ok(res);
   assert.equal(fs.existsSync(warnPath), true, 'warning file must be created on truncation break during claimWork');
+});
+
+// tsk-40m code-review finding (blocker, TOCTOU race): claimWork used to
+// validate preClaimStatus against a snapshot read at the very top of the
+// call, reused unchanged all the way to acquireClaim -- everything in
+// between (worker-slot check, branch/rev-parse git calls) took real
+// wall-clock time with no lock held, long enough for a genuinely DIFFERENT
+// process's moveWork to durably move the item without this call ever
+// noticing. Confirmed directly (a standalone repro script hit
+// `{ok:true, claimId:...}` against the pre-fix code -- a claim silently
+// written over a status this call never actually re-checked). Reproduced
+// here as a real cross-process race (in-process concurrency can never
+// expose this -- one event loop serializes calls for free): the child
+// does its OWN manual pre-check read (the exact same
+// foldEvents(readRawEvents(dir)) claimWork's own early read does) and acks
+// it BEFORE calling the real claimWork, immediately after (same
+// synchronous tick, no yield); this test process also holds the REAL
+// events.lock claimWork's own new re-validation block needs, released
+// only after the racing write below is already on disk. Both narrow the
+// window a lot, but IPC delivery timing is still real OS scheduling, not
+// something this test fully controls -- empirically this fails against
+// the pre-fix code most but not every run (observed ~1 in 3 in ad hoc
+// repeats); it is a real, valuable regression check, just not a
+// mathematically guaranteed repro on every single invocation.
+test('claimWork re-validates preClaimStatus against a FRESH durable read: a durable move landing mid-flight (a different process, while THIS call is still between its own early read and its final commit) must conflict, never claim over a status it never actually saw', async () => {
+  const { repoRoot, dir } = setup();
+
+  const lockPath = path.join(dir, 'events.lock');
+  fs.writeFileSync(lockPath, String(process.pid), 'utf8');
+
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claimwork-race-'));
+  const childScript = `
+import { readRawEvents } from ${JSON.stringify(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs'))};
+import { foldEvents } from ${JSON.stringify(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/replay.mjs'))};
+import { claimWork } from ${JSON.stringify(CLAIM_PORT_MJS)};
+const dir = ${JSON.stringify(dir)};
+const preCheck = foldEvents(readRawEvents(dir));
+process.send({ ack: true, status: preCheck.work['item-a']?.status });
+try {
+  const result = claimWork(dir, { id: 'item-a', actor: 'runner', isolate: false, repoRoot: ${JSON.stringify(repoRoot)} });
+  process.send({ ok: true, claimId: result.claimId });
+} catch (err) {
+  process.send({ ok: false, category: err.category, message: err.message });
+}
+`;
+  const childPath = path.join(workDir, 'claimwork-race-child.mjs');
+  fs.writeFileSync(childPath, childScript);
+
+  const child = fork(childPath, { stdio: 'inherit' });
+  const ack = await new Promise((resolve, reject) => {
+    child.once('message', resolve);
+    child.once('error', reject);
+  });
+  assert.equal(ack.status, 'todo', "the child's own pre-check must see 'todo' before this test's racing write lands");
+
+  // Directly append the durable move to a writer file -- this test already
+  // holds events.lock itself (above), so it cannot call the public
+  // moveWork (which would try to re-acquire the very same lock and
+  // deadlock against itself); this is the same event shape moveWork itself
+  // would append, simulating "a different process's moveWork already ran
+  // and released" without actually releasing this test's own hold early.
+  const eventsDir = path.join(dir, 'events');
+  fs.mkdirSync(eventsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(eventsDir, 'racer.jsonl'),
+    `${JSON.stringify({ seq: 1, ts: new Date().toISOString(), type: 'work.move', payload: { id: 'item-a', from: 'todo', to: 'blocked' }, v: 2 })}\n`,
+  );
+
+  fs.unlinkSync(lockPath);
+  const result = await new Promise((resolve, reject) => {
+    child.on('message', resolve);
+    child.on('error', reject);
+    child.on('exit', (code) => {
+      if (code !== 0) reject(new Error(`claimwork-race-child exited ${code} with no message`));
+    });
+  });
+
+  assert.equal(result.ok, false, 'a claim acquired on a status this call never actually observed must be refused, not silently written');
+  assert.equal(result.category, 'conflict');
+  assert.equal(listWork(dir).work['item-a'].status, 'blocked', 'the durable move must stand; no claim must overlay it back to doing');
+  assert.equal(listWork(dir).work['item-a'].activeClaim, undefined, 'no stale claim must be left behind for the rejected attempt');
 });
 

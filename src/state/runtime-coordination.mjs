@@ -297,6 +297,22 @@ export function buildEffectiveView(durableView, claims = {}) {
   const effectiveWork = {};
   for (const [id, item] of Object.entries(durableView.work)) {
     const claim = claims[id];
+    // tsk-40m code-review finding (blocker): a claim can legitimately
+    // outlive the durable settle it belonged to for a short window (a
+    // process crash or a releaseClaim failure between the durable write
+    // succeeding and the claim file actually being unlinked) -- if the
+    // item's CURRENT durable status has already moved off what the claim
+    // recorded at acquire time, the claim is stale/orphaned, not active
+    // current work. Overlaying it as 'doing' would hide a real durable
+    // awaiting-approval/blocked/etc. status behind a claim that no longer
+    // describes anything in progress. A claim with no recorded
+    // preClaimStatus (legacy data) can't be judged stale this way -- kept
+    // trusted as before, never a false positive on old data.
+    const claimIsStale = claim && claim.preClaimStatus != null && claim.preClaimStatus !== item.status;
+    if (claimIsStale) {
+      effectiveWork[id] = { ...item, staleClaim: claim };
+      continue;
+    }
     if (claim) {
       const overlaid = {
         ...item,

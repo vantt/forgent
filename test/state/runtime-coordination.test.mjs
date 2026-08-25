@@ -5,7 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, StoreError } from '../../src/state/store.mjs';
+import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, readRawEvents, StoreError } from '../../src/state/store.mjs';
 import { acquireClaim, releaseClaim, readClaim, readClaims, buildEffectiveView, getItemDurableRevision, ClaimError } from '../../src/state/runtime-coordination.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 
@@ -388,4 +388,86 @@ test('settleClaim skips the writer-identity check for a claim written before the
     if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
     else process.env.FGOS_SESSION_ID = originalSessionId;
   }
+});
+
+// tsk-40m code-review finding (blocker, partial-segment write): move3's own
+// FSM-edge validation (transitionWork) used to run AFTER move1 and the
+// attempt were already durably appended -- a bad finalStatus threw only at
+// that point, leaving a durable 'doing' with no active claim (settleClaim
+// had already released it in the old unconditional finally) and an
+// attempt record with no matching terminal transition to explain it.
+test('settleClaim with an invalid finalStatus writes NOTHING durably -- no partial segment, claim survives untouched', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 12', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo' });
+
+  assert.throws(
+    () => settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'not-a-status' }),
+    (err) => err.category === 'precondition' || err.category === 'validation',
+  );
+
+  const events = readRawEvents(dir);
+  assert.equal(events.filter((e) => e.type === 'work.move').length, 0, 'no partial work.move must land durably');
+  assert.equal(events.filter((e) => e.type === 'work.attempt').length, 0, 'no orphaned work.attempt must land durably');
+  assert.ok(readClaim(dir, 'tsk-1'), 'the claim must survive an invalid-finalStatus attempt, not be silently dropped');
+  assert.equal(readClaim(dir, 'tsk-1').claimId, claim.claimId);
+  assert.equal(listWork(dir).work['tsk-1'].status, 'doing', 'effective view must still show the still-active (untouched) claim as doing');
+});
+
+// tsk-40m code-review finding (blocker): a settle that fails BEFORE any
+// durable write (a CAS/revision conflict) used to still release the claim
+// in an unconditional `finally` -- destroying still-legitimate
+// coordination state for real in-progress work on a failure that wrote
+// nothing at all, silently dropping the item back to an unclaimed
+// "todo"-looking effective status with no attempt history.
+test('settleClaim on a CAS/revision conflict leaves the claim untouched -- a failed settle must never destroy still-legitimate coordination state', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 13', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision: 'a-revision-that-will-never-match' });
+
+  assert.throws(
+    () => settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' }),
+    (err) => err instanceof StoreError && err.category === 'conflict',
+  );
+
+  const events = readRawEvents(dir);
+  assert.equal(events.filter((e) => e.type === 'work.move').length, 0, 'no work.move must land durably on a CAS conflict');
+  assert.equal(events.filter((e) => e.type === 'work.attempt').length, 0, 'no work.attempt must land durably on a CAS conflict');
+  assert.ok(readClaim(dir, 'tsk-1'), 'the claim must survive a CAS conflict untouched, for its owner to retry or reconcile');
+  assert.equal(readClaim(dir, 'tsk-1').claimId, claim.claimId);
+  assert.equal(listWork(dir).work['tsk-1'].status, 'doing', 'effective view must still show the still-active claim as doing');
+});
+
+// tsk-40m code-review finding (blocker): a claim file can legitimately
+// outlive the durable settle it belonged to (a process crash, or a
+// releaseClaim failure, between the durable write succeeding and the
+// claim file actually being unlinked). buildEffectiveView used to
+// overlay ANY active claim as 'doing' unconditionally -- hiding a real
+// durable awaiting-approval/blocked status behind a claim that no longer
+// describes anything in progress, and potentially locking the item out of
+// query/list flows that read effective status.
+test('buildEffectiveView ignores a stale claim whose durable status has already moved past preClaimStatus, instead of overlaying it as doing', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 14', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo' });
+
+  // Simulate the crash scenario directly: the durable settle already
+  // succeeded (moved the item to awaiting-approval), but the claim file
+  // was never unlinked (a crash/timeout right after the durable write).
+  moveWork(dir, { id: 'tsk-1', to: 'blocked', expectedStatus: 'todo' });
+
+  const view = listWork(dir);
+  assert.equal(view.work['tsk-1'].status, 'blocked', 'the real durable status must win over a stale claim, never hidden behind doing');
+  assert.ok(view.work['tsk-1'].staleClaim, 'the stale claim must be surfaced, not silently dropped or silently trusted');
+  assert.equal(view.work['tsk-1'].staleClaim.claimId, claim.claimId);
+});
+
+test('buildEffectiveView still trusts a claim with no preClaimStatus recorded (legacy data) -- never a false positive on old data', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 15', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  acquireClaim(dir, { id: 'tsk-1', actor: 'session' }); // no preClaimStatus passed
+
+  const view = listWork(dir);
+  assert.equal(view.work['tsk-1'].status, 'doing', 'a claim with no recorded preClaimStatus cannot be judged stale -- stays trusted as before');
+  assert.equal(view.work['tsk-1'].staleClaim, undefined);
 });

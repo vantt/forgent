@@ -8,6 +8,7 @@
 // calls outside this module except for FSM-internal transitions.
 
 import { moveWork, addOutcome, addDecision, recordClaimAttempt, readRawEvents, FsmError } from '../state/store.mjs';
+import { withEventsLock } from '../state/events.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
@@ -230,7 +231,6 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     const expectedStatus = isBranchTake ? 'blocked' : 'todo';
     const useBranchSource = isolate || isBranchTake;
 
-    let durableStateMutatedByReclaim = false;
     if (
       isolate
       && !isBranchTake
@@ -253,18 +253,8 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
           const claimPhase = (item.stage ?? executeStage) === executeStage ? 'execute' : (item.stage || 'unknown');
           recordClaimAttempt(dir, { id, phase: claimPhase, result: 'reclaimed', claimId: activeClaim.claimId, actor: activeClaim.actor });
           releaseClaim(dir, { id, claimId: activeClaim.claimId });
-          // tsk-40m code-review finding (blocker): recordClaimAttempt is
-          // itself a durable write (work.attempt folds into the item's own
-          // attemptCount/lastAttempt, changing its durable revision) — the
-          // `durableView` snapshot read at the top of this call is now
-          // stale for THIS id. Without this flag, acquireClaim below would
-          // capture a preClaimRevision that no longer matches the item's
-          // real durable state, and every later settleClaim on the new
-          // claim would fail with a revision conflict.
-          durableStateMutatedByReclaim = true;
         } else if (item.status === 'doing') {
           moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });
-          durableStateMutatedByReclaim = true;
         }
         const activityAt = lastActivityAt(repoRoot, id);
         addDecision(dir, {
@@ -279,44 +269,43 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       }
     }
 
-    // Re-fold fresh ONLY when the reclaim block above actually wrote a
-    // durable event — the legacy moveWork-to-'todo' branch (an item whose
-    // durable status was still literally 'doing' pre-migration), OR
-    // recordClaimAttempt's work.attempt (tsk-40m: reclaiming an active
-    // runtime claim) — either mutates state out from under the
-    // `durableView` snapshot read at the top of this call. `releaseClaim`
-    // itself never touches durable events, so a pure runtime-claim release
-    // with NO paired durable write (impossible today — every activeClaim
-    // branch now also calls recordClaimAttempt — but kept explicit rather
-    // than assumed) still wouldn't need this. Skipping the re-fold on the
-    // common path (no reclaim at all) keeps this call's log-read count
-    // unchanged from before this CAS check existed.
-    let preClaimStatus = durableView.work[id].status;
-    let preClaimRevision = getItemDurableRevision(durableView, id);
-    if (durableStateMutatedByReclaim) {
+    // tsk-40m code-review finding (blocker, TOCTOU): re-read the durable
+    // view FRESH here, ALWAYS — not only when this call's own reclaim
+    // block wrote something. Everything between the `durableView` snapshot
+    // read at the top of this call and this point (worker-slot check,
+    // branch/rev-parse git calls, the stale-claim-reclaim block's own
+    // liveness check) takes real wall-clock time with no lock held — long
+    // enough for a genuinely DIFFERENT process's moveWork/settleClaim to
+    // durably move this item without this call ever seeing it. Wrapped in
+    // the SAME events.lock every durable writer serializes on (even though
+    // acquireClaim itself never appends an event) so no other durable
+    // write can land between this read and the runtime claim actually
+    // being written — the read-validate-write sequence is now atomic with
+    // respect to every other writer, not just this call's own prior
+    // reclaim.
+    const runtimeClaim = withEventsLock(path.join(dir, 'events.jsonl'), () => {
       const freshDurableView = foldEvents(readRawEvents(dir));
-      preClaimStatus = freshDurableView.work[id].status;
-      preClaimRevision = getItemDurableRevision(freshDurableView, id);
-    }
+      const freshStatus = freshDurableView.work[id]?.status;
+      if (freshStatus !== expectedStatus) {
+        throw new ClaimError(
+          'conflict',
+          `claimWork: expected "${id}" durable status "${expectedStatus}" but found "${freshStatus}" (durable state changed since read)`,
+        );
+      }
+      const freshRevision = getItemDurableRevision(freshDurableView, id);
 
-    if (preClaimStatus !== expectedStatus) {
-      throw new ClaimError(
-        'conflict',
-        `claimWork: expected "${id}" durable status "${expectedStatus}" but found "${preClaimStatus}" (durable state changed since read)`,
-      );
-    }
-
-    const runtimeClaim = acquireClaim(dir, {
-      id,
-      actor,
-      source: useBranchSource ? 'branch' : 'main',
-      branch: useBranchSource ? branch : undefined,
-      branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
-      headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
-      claimTrigger,
-      preClaimStatus,
-      preClaimRevision,
-      claimRole: actor,
+      return acquireClaim(dir, {
+        id,
+        actor,
+        source: useBranchSource ? 'branch' : 'main',
+        branch: useBranchSource ? branch : undefined,
+        branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
+        headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
+        claimTrigger,
+        preClaimStatus: freshStatus,
+        preClaimRevision: freshRevision,
+        claimRole: actor,
+      });
     });
 
     if (!skipOutcome) {
