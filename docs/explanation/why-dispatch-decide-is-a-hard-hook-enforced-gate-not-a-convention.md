@@ -315,6 +315,36 @@ work (e.g. `tsk-4dk-1`'s own retrospective/cleanup sweep) has to work
 around by explicitly exiting worktree isolation for operations that must
 run from the main checkout.
 
+## A closing rename: "capacity" became "executor"
+
+Every decision quoted above uses "capacity"/`capacities` because that was
+the real, live terminology at the time each of them was made. `tsk-225`
+later renamed the concept to "executor"/`executors` across both the
+`.fgos/config.json` field and every code identifier, no back-compat kept —
+this is why current `AGENTS.md`'s `## Dispatch` section reads "routing
+work to a executor" and `resolveExecutorConfig` was already named that
+(the rename picked "executor" specifically because it already matched that
+function's own return shape, not just for wording — plus the
+capability=promise/executor=fulfillment framing already in use). `backend`
+was considered and rejected: a static noun with no action sense, and no
+prior code ever used it as a field name.
+
+Frozen historical records (`docs/history/*capacity*/`) were deliberately
+**left untouched** — rewriting a history folder to use a later name would
+misrepresent what things were actually called when those decisions were
+made. Living docs (explanation/how-to/reference, including this one) and
+the shared skill fragment (`_shared/capacity-dispatch-fallback.md`,
+including its own filename) tracked the rename, since they describe
+current behavior rather than a frozen record. The seven existing locked
+decision records that used "capacity" as their own terminology (three with
+substantive content — `0026`, `0029`, `0033`) were handled by one new
+decision record (`0034`) annotated onto `0000-index.md`, the same
+non-reopening pattern `0028` had already established for its own earlier
+rename — `0034` also formally closed a gap `0029` D8 had left open (D8
+defined "capacity" as an undifferentiated promise+helper, a split
+`tsk-34n` had already made in practice without ever revisiting D8's own
+wording).
+
 ## Source
 
 `tsk-60f`. Full design: `docs/history/task-dispatch-unification/
