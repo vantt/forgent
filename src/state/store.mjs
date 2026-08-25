@@ -791,12 +791,14 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // EFFECTIVE (claim overlay), and forwarding its 'doing' into a value that
   // gets resumed durably let `take` (todo) -> `ask` -> `answer` durably
   // write awaiting-human -> doing with no backing claim at all. Resuming to
-  // `durableStatusAtAsk` instead — `todo` for a claimed item — un-stales
-  // the claim (its own preClaimStatus matches durable status again) and
-  // lets buildEffectiveView's overlay show 'doing' again on its own, with
-  // zero durable writes of 'doing'. For a genuinely legacy durable-doing
-  // item (no active claim), it durably resumes to `doing` — a value only
-  // ever a fresh, trusted read can produce here, never client input.
+  // `durableStatusAtAsk` instead restores the item's pre-park durable
+  // status with zero durable writes of 'doing' — for the normal claimed
+  // case, `putInAwaiting` (below) already settled and released the claim
+  // before this event was ever written, so there is nothing left to
+  // "un-stale"; a later `fgos take` acquires a fresh claim. For a
+  // genuinely legacy durable-doing item (no active claim), it durably
+  // resumes to `doing` — a value only ever a fresh, trusted read can
+  // produce here, never client input.
   if (to === 'awaiting-human') {
     if (statusAtAsk !== undefined) {
       rawEvent.payload.statusAtAsk = statusAtAsk;
@@ -1339,10 +1341,12 @@ export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAs
  * gate's own `durableStatusAtAsk` (the item's trusted DURABLE status at
  * ask-time, stamped by moveWork/settleClaim themselves — never a caller-
  * supplied value) and resumes there. For an item claimed at ask-time, the
- * durable status was still `todo`, so this resumes to `todo` — which
- * un-stales the claim (its preClaimStatus matches durable status again)
- * and lets buildEffectiveView's overlay show `doing` again on its own,
- * with no durable write of `doing` anywhere.
+ * durable status was still `todo`, so this resumes to `todo`. `putInAwaiting`
+ * already settled and released any active claim at park time (see below) —
+ * there is no claim left here to "un-stale". Resuming just restores durable
+ * status to what it was before the claim existed, so a later `fgos take`
+ * can acquire a brand-new claim on it, with no durable write of `doing`
+ * anywhere in this path.
  *
  * `awaiting-human -> doing` is retired from status-fsm.mjs's TRANSITIONS
  * table entirely (hard-cut, per the redesign) — a `durableStatusAtAsk` of
