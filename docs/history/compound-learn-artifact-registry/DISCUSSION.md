@@ -1351,6 +1351,29 @@ với **stage** sẽ già cỗi. Repo đã có tiền lệ đúng cái bẫy đ�
 55 file. Và chính thảo luận này vừa tách `tsk-422` ra: nó chạy per-item tại
 compound stage nhưng bản ghi sống ở `.fgos/`, hoàn toàn có thể dời chỗ chạy.
 
+**Khả năng khám phá — ba namespace anh em KHÔNG được trôi thành ba subsystem**
+(advisor phản biện điểm 1, session nhận). Rủi ro thật: người dùng thấy `topic`,
+`doc`, `knowledge` nằm ngang hàng mà không nhận ra chúng cùng một hệ. **Đo:** sổ
+verb `src/cli/command-registry.mjs` **hoàn toàn phẳng** — không có field
+`group`/`subsystem` nào, 60+ verb ngang hàng ⇒ rủi ro này **đang xảy ra cho cả
+CLI**, không riêng knowledge. Hai mức xử lý:
+
+- **Trong phạm vi `tsk-28x`:** thêm verb `fgos knowledge status` (read-only) làm
+  **neo khái niệm** — liệt kê trạng thái cả hệ (topic, doc, pending, drift) và
+  qua đó nói cho người dùng biết ba mặt kia thuộc về nhau. Cộng một mục
+  **"Knowledge surfaces"** trong `docs/specs/knowledge.md` liệt kê đủ ba.
+- **Ngoài phạm vi, ghi lại để không mất:** thêm field `subsystem` vào sổ verb là
+  cải tiến cho **toàn CLI** (kèm bump `MANIFEST_SCHEMA_VERSION`, hiện `2.0`).
+  Không gộp vào `tsk-28x` — nó giải một vấn đề rộng hơn và có blast radius riêng.
+
+**Glossary — chữ `compound` trong lịch sử** (advisor điểm 4). Không rewrite quá
+khứ: §5 là log append-only, các vòng 1-9 thật sự đã dùng tên đó. Nhưng phải có
+một dòng để người đọc mới không tưởng đang có hai khái niệm song song:
+
+> **`compound` (thuật ngữ cũ)** = tên cũ của đường *retrospective knowledge
+> synthesis* / *doc attestation*. Kể từ D-tsk28x-16 nó là `knowledge`. Mọi chỗ
+> viết `compound` trong §1-§6 và §5 là văn bản lịch sử, không phải một hệ thứ hai.
+
 **Đo trước khi đồng ý (không phải cảm tính):** 55 file tham chiếu `compound`
 trong `src/bin/test/.agents/plugins`; field `deprecated` **có** trong schema
 `command-registry.mjs` nhưng **chưa verb nào dùng** (tất cả `null`) — nên
@@ -1465,6 +1488,20 @@ fgos doc       reserve|register|mark-rendered|move-path|promote|supersede|retire
 
 **Không cho soạn JSON tay.** Tên theo D-tsk28x-16 (xem mục Vocabulary ở đầu §7).
 
+**`fgos doc promote` là cửa DUY NHẤT lên `active`, và phải khoá năm precondition
+ngay trong verb** (D-tsk28x-17) — nếu không nó thành cửa sau phá invariant
+`activeDoc(topicId, role) <= 1`:
+
+```
+1. chỉ provisional -> active
+2. từ chối nếu ĐÃ CÓ active doc cùng (topicId, role)
+3. từ chối nếu currentPath không tồn tại ở HEAD
+4. từ chối alias path
+5. topic + role phải valid
+```
+
+`promote` **chỉ đổi registry state, không viết prose**.
+
 **Điểm mấu chốt:** `topic split` là **cửa duy nhất** tạo ra nhiều active doc
 cùng role theo nghĩa thực tế — vì nó tạo nhiều topic mới. **Writer không có
 option "new doc id".**
@@ -1529,14 +1566,15 @@ lần rồi thôi.
 2. cần doc mới  ->  doc.reserve(topicId, role, currentPath)
 3. write + commit file tại currentPath
 4. fgos knowledge attest --doc-path currentPath
-5. doc.mark-rendered -> provisional | active, theo policy
+5. doc.mark-rendered -> provisional   (LUÔN, D-tsk28x-17)
+6. fgos doc promote -> active   (hành động RIÊNG, không tự động)
 ```
 
-**Lỗ nhỏ còn hở, phải chốt trước khi thi công (session nêu):** *policy* ở bước 5
-chưa được định nghĩa. Đã biết: match chắc ⇒ grow (active), match yếu ⇒
-provisional. Nhưng một topic **do người đăng ký tường minh** thì rendered xong
-nên là `active` hay `provisional`? Chưa ai trả lời — để mở tới lúc thi công là
-mỗi phiên tự đoán một kiểu.
+**Lỗ session nêu ở bước 5 — ĐÃ CHỐT (D-tsk28x-17):** render xong **luôn** vào
+`provisional`, không bao giờ tự vào `active`, kể cả khi topic do người đăng ký
+tường minh. Lý do (advisor): đăng ký topic chỉ chứng minh *slot này hợp lệ*, không
+chứng minh *prose này authoritative*. Lên `active` là việc riêng của
+`fgos doc promote`.
 
 **D-ID:** D-tsk28x-14, D-tsk28x-9, D-tsk28x-15.
 
@@ -1697,6 +1735,17 @@ compound rejects second active doc for same (topicId, role)
 doc.reserve is the ONLY way to hold a new path before the file exists
 ```
 
+**Bộ test cho `doc promote` (D-tsk28x-17, đủ cả năm precondition):**
+
+```
+promote rejects a doc that is not provisional
+promote rejects when an active doc already exists for same (topicId, role)
+promote rejects when currentPath is absent at HEAD
+promote rejects an alias path
+promote rejects an invalid topic/role
+promote changes ONLY registry state -- no prose written
+```
+
 **Regression đóng đúng cửa sổ session chỉ ra:**
 
 ```
@@ -1824,10 +1873,12 @@ trước mỗi đợt. `docs/` tree bị dry-run + apply chạm — hai bước 
   Số 800 dòng chỉ là config công cụ của phiên, không phải luật repo.
 - ~~Phép thử dogfood riêng cho writer~~ — **đã chia: A6 (writer canary)**, và là
   CỔNG cứng trước migration, không phải việc tuỳ chọn.
-- **Policy `doc.mark-rendered → provisional | active`** — chưa định nghĩa. Đã
-  biết: match chắc ⇒ grow/active, match yếu ⇒ provisional. Nhưng một topic **do
-  người đăng ký tường minh** thì rendered xong nên là `active` hay `provisional`?
-  Để mở tới lúc thi công là mỗi phiên tự đoán một kiểu (§A3b).
+- ~~Policy `doc.mark-rendered → provisional | active`~~ — **đã chốt:
+  D-tsk28x-17, LUÔN `provisional` trước.** Topic do người đăng ký tường minh chỉ
+  chứng minh *slot này hợp lệ*, không chứng minh *prose này authoritative* — hai
+  việc khác nhau. Muốn nhanh thì làm `fgos doc promote` rẻ, nhưng nó vẫn là
+  hành động riêng.
+- **Field `subsystem` cho sổ verb** — ngoài phạm vi `tsk-28x`, xem mục Vocabulary.
 
 ---
 
