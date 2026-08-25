@@ -455,5 +455,186 @@ async function httpAdapter(invocation, opts) {
   return { status: response.status, body: text, headers: Object.fromEntries(response.headers.entries()), tier, model };
 }
 
+/**
+ * D3/D6 (tsk-5x7-3): `herdr-spawn` executor adapter.
+ * Launches the worker inside a Herdr pane instead of a stdout-captured
+ * subprocess, allowing a person to watch the agent work live.
+ *
+ * HARD CONSTRAINT (tsk-1nih, live evidence): this adapter MUST ALWAYS create a
+ * fresh pane (`herdr pane split`) on every dispatch and MUST NEVER reuse an
+ * existing pane. Reusing a finished worker's pane delivers the next dispatch
+ * as a chat message into an idle interactive agent REPL.
+ *
+ * Results come back through the existing ladder (stdout captured via `herdr pane read`).
+ * Selected purely by `executor.adapter === 'herdr-spawn'`.
+ */
+function herdrSpawnAdapter(invocation, opts) {
+  const { command, args, env: rawEnv } = invocation;
+  const { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId, tier, model, herdrBin: optsHerdrBin } = opts;
+
+  const depth = currentDispatchDepth();
+  if (depth >= MAX_DISPATCH_DEPTH) {
+    return Promise.reject(new DispatchError(
+      'dispatch-depth-exceeded',
+      `executor for work "${workId}" refused: nested out-of-process dispatch depth ${depth} is already at the cap (${MAX_DISPATCH_DEPTH}) -- a dispatched executor tried to dispatch another executor too many levels deep.`,
+      { workId, tier, model, depth },
+    ));
+  }
+
+  const resolvedEnv = resolveExecutorEnv(rawEnv);
+  const herdrBin = optsHerdrBin ?? process.env.FGOS_HERDR_BIN ?? 'herdr';
+  const fullEnv = { ...process.env, ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) };
+
+  return new Promise((resolve, reject) => {
+    // 1. HARD CONSTRAINT (tsk-1nih): ALWAYS create a fresh pane via `herdr pane split`
+    const splitArgs = ['pane', 'split', '--no-focus'];
+    if (cwd) {
+      splitArgs.push('--cwd', cwd);
+    }
+
+    let splitOutput;
+    try {
+      splitOutput = execFileSync(herdrBin, splitArgs, {
+        cwd,
+        env: fullEnv,
+        encoding: 'utf8',
+        shell: false,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+    } catch (err) {
+      return reject(new DispatchError(
+        'worker-spawn-fail',
+        `executor failed to start for work "${workId}": herdr pane split failed: ${err.message}`,
+        { workId, tier, model, cause: err.message },
+      ));
+    }
+
+    let paneId;
+    try {
+      const parsed = JSON.parse(splitOutput);
+      paneId = parsed?.result?.pane?.pane_id ?? parsed?.result?.pane_id ?? parsed?.result?.root_pane?.pane_id ?? parsed?.pane_id;
+    } catch {
+      paneId = splitOutput ? splitOutput.trim() : null;
+    }
+
+    if (!paneId) {
+      return reject(new DispatchError(
+        'worker-spawn-fail',
+        `executor failed to start for work "${workId}": could not parse pane_id from herdr pane split output: "${splitOutput}"`,
+        { workId, tier, model, cause: 'invalid pane split output' },
+      ));
+    }
+
+    // 2. Launch worker inside the newly created pane via `herdr pane run <paneId> <cmd>`
+    const formattedArgs = (args || []).map((arg) => (/[ \t\n"'$`\\]/.test(arg) ? JSON.stringify(arg) : arg)).join(' ');
+    const fullCmd = formattedArgs ? `${command} ${formattedArgs}` : command;
+
+    try {
+      execFileSync(herdrBin, ['pane', 'run', paneId, fullCmd], {
+        cwd,
+        env: fullEnv,
+        encoding: 'utf8',
+        shell: false,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+    } catch (err) {
+      return reject(new DispatchError(
+        'worker-spawn-fail',
+        `executor failed to start for work "${workId}": herdr pane run failed: ${err.message}`,
+        { workId, tier, model, cause: err.message },
+      ));
+    }
+
+    // 3. Observe completion using `herdr pane wait-output`
+    const waitArgs = ['pane', 'wait-output', paneId, '--regex', '\\[(DONE|BLOCKED)\\]'];
+    if (timeoutMs) {
+      waitArgs.push('--timeout', String(timeoutMs));
+    }
+
+    const waitChild = spawn(herdrBin, waitArgs, {
+      cwd,
+      env: fullEnv,
+      shell: false,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    let timedOut = false;
+    let timer = null;
+
+    if (timeoutMs) {
+      timer = setTimeout(() => {
+        timedOut = true;
+        try {
+          killChildTree(waitChild, 'SIGTERM');
+        } catch {}
+      }, timeoutMs);
+    }
+
+    waitChild.on('error', (err) => {
+      if (timer) clearTimeout(timer);
+      reject(new DispatchError(
+        'worker-spawn-fail',
+        `executor failed to observe completion for work "${workId}": ${err.message}`,
+        { workId, tier, model, cause: err.message },
+      ));
+    });
+
+    waitChild.on('exit', (code, signal) => {
+      if (timer) clearTimeout(timer);
+      if (timedOut) {
+        reject(new DispatchError(
+          'worker-timeout',
+          `executor timed out after ${timeoutMs}ms for work "${workId}".`,
+          { workId, tier, model },
+        ));
+        return;
+      }
+
+      // 4. Read scrollback output via `herdr pane read <paneId>`
+      let stdout = '';
+      try {
+        stdout = execFileSync(herdrBin, ['pane', 'read', paneId, '--source', 'recent-unwrapped', '--lines', '500'], {
+          cwd,
+          env: fullEnv,
+          encoding: 'utf8',
+          shell: false,
+          stdio: ['ignore', 'pipe', 'pipe'],
+        });
+      } catch {
+        try {
+          stdout = execFileSync(herdrBin, ['pane', 'read', paneId], {
+            cwd,
+            env: fullEnv,
+            encoding: 'utf8',
+            shell: false,
+            stdio: ['ignore', 'pipe', 'pipe'],
+          });
+        } catch {
+          stdout = '';
+        }
+      }
+
+      if (onChunk && stdout) {
+        teeChunk(onChunk, 'stdout', stdout);
+      }
+
+      resolve({
+        status: code === 0 ? 0 : code,
+        signal,
+        stdout,
+        stderr: '',
+        tier,
+        model,
+        paneId,
+      });
+    });
+  });
+}
+
 /** C9 v2 executor-adapter registry — see `cliSpawnAdapter`'s doc comment. */
-export const EXECUTOR_ADAPTERS = { [DEFAULT_ADAPTER]: cliSpawnAdapter, http: httpAdapter };
+export const EXECUTOR_ADAPTERS = {
+  [DEFAULT_ADAPTER]: cliSpawnAdapter,
+  http: httpAdapter,
+  'herdr-spawn': herdrSpawnAdapter,
+};
+
