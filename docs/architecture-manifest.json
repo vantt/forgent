@@ -31,6 +31,7 @@
     "src/runner/promote-preflight.mjs": "infra",
     "src/runner/promote-engine.mjs": "infra",
     "src/runner/session.mjs": "infra",
+    "src/runner/gateway-control.mjs": "infra",
     "src/runner/goal-check.mjs": "infra",
     "src/runner/iron-law-gate.mjs": "infra",
     "src/runner/frozen-judge.mjs": "domain",
