@@ -62,6 +62,40 @@ verification step against the real branch/commit target after any `agy`
 success report is the honest mitigation until `agy` itself is proven more
 reliable, not just the one config fix this item made.
 
+## The second failure mode's root cause found (`tsk-1up`)
+
+A dedicated investigation traced `tsk-539`'s timeout to its real source:
+`agy`'s own print-mode carries its own `--print-timeout`, defaulting to
+5 minutes, **independent of** the outer 15-minute spawn timeout
+(`.fgos/config.json`'s `runner.timeoutMs`) — so a genuinely heavy coding
+task could exceed `agy`'s own internal wait long before the outer spawn
+timeout would ever fire. Confirmed by a live repro that reproduced the
+real `tsk-539` failure byte-for-byte. Fix: `--print-timeout 10m` added to
+`agy`'s invocation args in `.fgos/config.json` — same one-line-config-fix
+shape as the earlier `--new-project` fix. The real implementation was then
+successfully dispatched through `agy` itself on the first attempt after
+the fix.
+
+A second confirmed occurrence of the exact same error (`tsk-37d`,
+2026-08-20, a different item than `tsk-539`) landed *after* this fix
+shipped — same error string, same dispatch shape — but a retry with a
+fresh `agy` invocation succeeded cleanly on the second attempt. This
+closes part of the "only one observation" gap this investigation started
+with (now two confirmed live occurrences, both on `fgos-coding-implement`'s
+out-of-process dispatch via `agy`) without fully resolving whether the
+timeout is now rare-but-real or still needs a retry/circuit-breaker layer
+in front of the Step C inline fallback.
+
+Landing this fix also hit two real, unrelated operational snags worth
+naming: an `fgos-write-rejected` refusal on the first return attempt (the
+branch had picked up a `.fgos/config.json`-only commit — forbidden under
+ADR0020, a branch may never carry a `.fgos/` change — fixed by dropping
+that commit and deferring the real config change to a direct main-checkout
+commit); and a flaky `test/runner/session.test.mjs` lock-timeout under
+full-suite contention on the second return attempt, confirmed
+non-deterministic (not a regression) via two clean isolated re-runs before
+a third full-suite attempt passed clean.
+
 ## Source
 
 `tsk-it0`. `docs/history/agy-cwd-fidelity/` and `docs/history/
