@@ -106,6 +106,17 @@ const TRANSITIONS = Object.freeze([
   // the way every other human-only edge in this codebase already is: the
   // CLI verb that exposes the edge stamps `role: 'human'`, not this table.
   Object.freeze({ from: 'backlog', to: 'todo' }),
+  // tsk-40m D1/D2 (code-review non-blocking risk): this edge — and
+  // `doing -> todo` below — stay in the table because `settleClaim`
+  // (store.mjs) still legitimately writes them, as the first and possibly-
+  // last legs of its own atomic full-segment settle (preClaimStatus->doing,
+  // then doing->finalStatus, which CAN be `todo` for a plain release). They
+  // are NOT a general-purpose door: new code must never call `moveWork`
+  // directly with `to: 'doing'`, or `from: 'doing', to: 'todo'` outside
+  // `settleClaim`/its legacy fallback — doing so durably reintroduces the
+  // per-claim "doing" write tsk-40m's whole redesign moved OFF the
+  // claim-time write path (D1: doing-current is derived from the active
+  // runtime claim overlay, never written durably at claim time).
   Object.freeze({ from: 'todo', to: 'doing' }),
   Object.freeze({ from: 'todo', to: 'blocked' }),
   Object.freeze({ from: 'doing', to: 'blocked' }),
@@ -114,15 +125,21 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'blocked', to: 'awaiting-approval' }),
   Object.freeze({ from: 'blocked', to: 'delivered' }),
   Object.freeze({ from: 'doing', to: 'awaiting-approval' }),
-  // Claim release (claim-lock §3b): the clarify/decompose -> executing
-  // boundary hands a held pick claim back to `todo` the moment the item is
-  // actually ready for its executing phase (resolvePlan, after its own
-  // moveStage(...,'executing',...)) — silent, no `reason` required, mirroring
-  // `blocked -> todo`'s own no-reason shape immediately above. This is the
-  // one new status edge the design needs beyond the awaiting-human ones: a
-  // held claim was previously only ever reclaimed via `blocked` (return's
-  // reject path) or resumed via `awaiting-human`; this is the third, direct
-  // door a claim can leave `doing` through without settling the item.
+  // Claim release (claim-lock §3b): originally fired by the clarify/
+  // decompose -> executing boundary handing a held pick claim back to
+  // `todo` the moment the item was ready for its executing phase
+  // (resolvePlan's `releaseClaimOnExecuting`) — silent, no `reason`
+  // required, mirroring `blocked -> todo`'s own no-reason shape immediately
+  // above. tsk-40m D5 retired that specific trigger (a runtime claim now
+  // stays active, unreleased, straight through clarify->executing), but the
+  // edge itself stays live: `settleClaim` (store.mjs) still writes it as
+  // the LAST leg of its own atomic full-segment settle whenever a claim
+  // ends via a plain release (`finalStatus: 'todo'`), and
+  // `latestTodoReleaseTrigger` (claim-port.mjs) still reads the historical
+  // `releaseTrigger: 'claim-lock-3b'` marker off pre-migration event log
+  // entries. See the `todo -> doing` edge's own comment above — new code
+  // must reach this edge only through `settleClaim`, never a standalone
+  // `moveWork` call.
   Object.freeze({ from: 'doing', to: 'todo' }),
   // work-item-status-delivered-retrospective-cleanup D1: `delivered`
   // replaces `done` as the direct target of both close doors — RUL58's

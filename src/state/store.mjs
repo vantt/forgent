@@ -817,12 +817,16 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   // Release-trigger marker (claim-lock §3b, tsk-2zv): what released this
   // specific `doing -> todo` move — additive, fsm-ignored, same
-  // post-transition stamp pattern as claimTrigger above. Only
-  // `releaseClaimOnExecuting` (decompose.mjs) ever passes this, so a
-  // reader can positively identify "this todo-entry came from a claim-lock
+  // post-transition stamp pattern as claimTrigger above. Historically only
+  // `releaseClaimOnExecuting` (src/intake/plan.mjs) ever passed this, so a
+  // reader could positively identify "this todo-entry came from a claim-lock
   // §3b release" instead of inferring it from status/branch-existence
   // alone, which reject (`awaiting-approval -> todo`) and a verify-fail park also
-  // produce without deleting the branch.
+  // produce without deleting the branch. tsk-40m D5: `releaseClaimOnExecuting`
+  // is now retired to a no-op (planning->executing no longer holds a
+  // durable `doing` to release) — no NEW event carries this marker.
+  // `latestTodoReleaseTrigger` (claim-port.mjs) still reads it purely for
+  // pre-migration event history.
   if (releaseTrigger !== undefined) {
     rawEvent.payload.releaseTrigger = releaseTrigger;
   }

@@ -216,10 +216,14 @@ test('claimWork throws a categorized ClaimError when the lock content is still a
   }
 });
 
-// tsk-2zv: a claim-lock §3b release (decompose.mjs's releaseClaimOnExecuting)
-// is the SAME execution round split by a mechanical stage edge — commits
-// made before the release (CONTEXT.md, plan.md, or code) must still count
-// as real progress once the item is reclaimed for `executing`.
+// tsk-2zv: a claim-lock §3b release (originally src/intake/plan.mjs's
+// releaseClaimOnExecuting, retired to a no-op by tsk-40m D5 — simulated
+// below via a direct settleClaim call, since no live code path produces
+// this marker anymore) is the SAME execution round split by a mechanical
+// stage edge — commits made before the release (CONTEXT.md, plan.md, or
+// code) must still count as real progress once the item is reclaimed for
+// `executing`. Kept as a regression test for reading this LEGACY marker
+// out of pre-migration event history.
 test('claimWork on a claim-lock §3b-marked release preserves the ORIGINAL branchHeadAtTake on reclaim, instead of recomputing to the tip that already includes the pre-release commit (tsk-2zv)', () => {
   const { repoRoot, dir } = setup();
 

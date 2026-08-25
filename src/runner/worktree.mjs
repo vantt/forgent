@@ -1049,11 +1049,18 @@ export function resyncWorktree(repoRoot, worktreePath, branch) {
  * that's provably safe (tsk-2cd: `resyncClaimWorktree` above — the branch
  * may have advanced past this checkout via a child merge while this
  * worktree sat claimed-but-anchored; see that function's own doc for why
- * "untouched" was the bug, not the fix). The case is routine rather than
- * exotic — an item's claim is released back to `todo` the moment it reaches
- * stage `executing` (`decompose.mjs`'s `releaseClaimOnExecuting`), and the
- * session that held it then claims it again to do the work, from inside the
- * very worktree the claim stands up. Going through `createWorktree`'s reuse
+ * "untouched" was the bug, not the fix). The case was originally routine
+ * rather than exotic — an item's claim was released back to `todo` the
+ * moment it reached stage `executing` (`releaseClaimOnExecuting`,
+ * src/intake/plan.mjs), and the session that held it then claimed it again
+ * to do the work, from inside the very worktree the claim stands up.
+ * tsk-40m D5 retired that release (a runtime claim now stays active
+ * unbroken through clarify->executing, so this exact re-claim-at-executing
+ * trigger no longer fires for a new item) — this reattach path stays live
+ * for every OTHER reason the same worktree gets claimed again (a stale
+ * session reclaimed via claim-lock, a human re-`pick`ing after a crash,
+ * legacy pre-migration history), so it is not dead code, just no longer
+ * this ONE trigger's routine case. Going through `createWorktree`'s reuse
  * path there would reclaim that live checkout: force-removed when clean —
  * pulling the directory out from under the running session — or a hard
  * failure when dirty. Neither is what a re-claim means.
