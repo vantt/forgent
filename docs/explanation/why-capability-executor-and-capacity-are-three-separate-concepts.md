@@ -35,6 +35,29 @@ than `normalizeCapability`'s automatic kebab-case-only normalization —
 inheriting the description/responsibility spirit of the old tool-registry
 provider shape.
 
+## Piece 1: retiring tool-registry's own event-sourced registration
+
+> D1: Bỏ tool-registry event-sourced registration, gộp khai báo provider
+> (gitnexus, herdr) thẳng vào runner.capacities trong .fgos/config.json
+
+The first piece landed this D1 directly: `.fgos/tool-registry.json` and
+the `fgos tool register`/`remove` verbs were retired, with `gitnexus`/
+`herdr` declared straight in `runner.capacities` inside `.fgos/config.json`
+instead. `probeTool`/`findExecutableOnPath`/`isIndexStale` were kept as
+pure functions rather than deleted, since they still do real, useful work
+independent of *where* a provider is declared. A separate, local,
+gitignored file (`tool-status.local.json`) stayed split out from the
+config change.
+
+Landing this piece surfaced a live confirmation of ADR0020 (a worktree
+branch may never commit a `.fgos/` change): the item's own worker branch
+staged a change under `.fgos/config.json`, and the merge was correctly
+aborted rather than let through — `fgw/tsk-in1-1 staged a change under
+.fgos/ (.fgos/config.json); merge aborted, fgw/tsk-in1 unchanged`. This
+isn't a bug in the item; it's the guard working exactly as designed,
+forcing the actual config change to land through the proper `.fgos/`-write
+door instead of riding along inside a worker branch's own merge.
+
 ## Why `executors` (tier-keyed) and the new name-keyed registry couldn't share a field
 
 > D3: Giữ nguyên tên field capacities (không đổi thành executors) cho
