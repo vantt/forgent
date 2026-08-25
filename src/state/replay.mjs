@@ -73,7 +73,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, mergedSha, mergedInto, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
+      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, mergedSha, mergedInto, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, durableStatusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -227,11 +227,18 @@ function applyEvent(view, event) {
       // new one via this same spread-then-override merge, never accumulating
       // both.
       //
-      // `statusAtAsk` (claim-lock §5.1) rides the SAME fold, same guard: the
-      // item's own status at the moment this ask parked it, read back by
-      // answerAwaiting (store.mjs) to pick the resume target. Only the `ask`
-      // branch ever carries it; a fresh `ask` overwrites the prior value the
-      // same way parentSnapshotAtAsk does.
+      // `statusAtAsk` (claim-lock §5.1) rides the SAME fold, same guard:
+      // informational/audit only (tsk-40m P1 fix) — whatever the caller's
+      // own, typically EFFECTIVE, view reported at ask-time. Never read
+      // back for a resume decision. Only the `ask` branch ever carries it;
+      // a fresh `ask` overwrites the prior value the same way
+      // parentSnapshotAtAsk does.
+      //
+      // `durableStatusAtAsk` (tsk-40m P1 fix) rides the same fold, same
+      // guard: the item's TRUSTED durable status at the moment this ask
+      // parked it — stamped by moveWork/settleClaim themselves, never a
+      // caller-supplied value. This is the ONLY field answerAwaiting
+      // (store.mjs) trusts to pick a resume target.
       if (ask || answer) {
         if (!view.gates) {
           view.gates = {};
@@ -254,6 +261,7 @@ function applyEvent(view, event) {
           ...(answer ? { answer } : {}),
           ...(parentSnapshotAtAsk !== undefined ? { parentSnapshotAtAsk } : {}),
           ...(statusAtAsk !== undefined ? { statusAtAsk } : {}),
+          ...(durableStatusAtAsk !== undefined ? { durableStatusAtAsk } : {}),
           // rationale/alternatives/source (tsk-63c D1, decision-schema-
           // rationale-alternatives-source): same guarded fold as
           // parentSnapshotAtAsk/statusAtAsk above — only stamped when

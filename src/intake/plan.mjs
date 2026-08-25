@@ -622,7 +622,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
         `Verify: ${planApproveVerify}\n\n` +
         `## Why this matters\n\n` +
         `Cần xác nhận trước khi verify này được stamp thật vào item lúc sang executing.`;
-      putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
+      putInAwaiting(dir, { id, ask, statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
       return { outcome: 'verify-disputed', id, secondPass: planVerifyDispute };
     }
   }
@@ -811,7 +811,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
     // verdict.kind -- a risk-heavy root can force this parking out of a
     // pass-through/decompose verdict underneath it.
     logDecomposeVerdict(dir, id, 'need-human', reason);
-    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
+    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
     return { outcome: 'need-human', id, verdict };
   }
 
@@ -869,7 +869,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
       // fall through -- proceed to write children below, same as no dispute
     } else {
       logDecomposeVerdict(dir, id, 'need-human', reason);
-      putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
+      putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
       return { outcome: 'need-human', id, verdict };
     }
   }
@@ -950,7 +950,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   if (footprintConflicts.length > 0) {
     const reason = formatFootprintOverlapReason(footprintConflicts);
     logDecomposeVerdict(dir, id, 'need-human', reason, `${footprintConflicts.length} footprint conflicts`);
-    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
+    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
     return { outcome: 'need-human', id, verdict };
   }
 

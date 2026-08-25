@@ -774,15 +774,34 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   if (parentSnapshotAtAsk !== undefined) {
     rawEvent.payload.parentSnapshotAtAsk = parentSnapshotAtAsk;
   }
-  // Status-at-ask snapshot (claim-lock §5.1): the item's OWN status right
-  // before this same `to === 'awaiting-human'` move parks it — `doing` when a
-  // pick claim is held mid-clarify/decompose, `todo` otherwise. answerAwaiting
-  // reads this back (via view.gates) to resume to the SAME status instead of
-  // hardcoding `todo`, so answering a gate never silently drops a live claim.
-  // Same additive, fsm-ignored stamp pattern as parentSnapshotAtAsk — never
-  // set on any edge but the awaiting-human entry.
-  if (statusAtAsk !== undefined) {
-    rawEvent.payload.statusAtAsk = statusAtAsk;
+  // Status-at-ask split (claim-lock §5.1, tsk-40m P1 fix — docs/architect/
+  // doing-coordination-redesign.md): two SEPARATE fields, never conflated.
+  //
+  // `statusAtAsk` — informational/audit only, whatever the CALLER supplies
+  // (typically the EFFECTIVE view, so a claimed item legitimately reads
+  // 'doing' here — that's a true fact worth recording: "this question was
+  // asked while someone was actively working it"). NEVER read back for a
+  // resume decision.
+  //
+  // `durableStatusAtAsk` — the item's OWN DURABLE status right before this
+  // move parks it, computed HERE from `work.status` (the fresh durable read
+  // above), never from caller input. This is the ONLY field answerAwaiting
+  // trusts to pick a resume target. Trusting a caller-supplied value here
+  // was the exact bug this fix closes: a caller's view is typically
+  // EFFECTIVE (claim overlay), and forwarding its 'doing' into a value that
+  // gets resumed durably let `take` (todo) -> `ask` -> `answer` durably
+  // write awaiting-human -> doing with no backing claim at all. Resuming to
+  // `durableStatusAtAsk` instead — `todo` for a claimed item — un-stales
+  // the claim (its own preClaimStatus matches durable status again) and
+  // lets buildEffectiveView's overlay show 'doing' again on its own, with
+  // zero durable writes of 'doing'. For a genuinely legacy durable-doing
+  // item (no active claim), it durably resumes to `doing` — a value only
+  // ever a fresh, trusted read can produce here, never client input.
+  if (to === 'awaiting-human') {
+    if (statusAtAsk !== undefined) {
+      rawEvent.payload.statusAtAsk = statusAtAsk;
+    }
+    rawEvent.payload.durableStatusAtAsk = work.status;
   }
   // rationale/alternatives/source (tsk-63c D1, decision-schema-rationale-
   // alternatives-source): the same additive, fsm-ignored post-transition
@@ -987,8 +1006,8 @@ export function settleClaim(dir, {
   headAtReturn,
   branchHeadAtReturn,
   parentSnapshotAtAsk,
-  claimTrigger,
   statusAtAsk,
+  claimTrigger,
   releaseTrigger,
   rationale,
   alternatives,
@@ -1119,6 +1138,23 @@ export function settleClaim(dir, {
         if (mergedSha !== undefined) move3Raw.payload.mergedSha = mergedSha;
         if (mergedInto !== undefined) move3Raw.payload.mergedInto = mergedInto;
         if (reason !== undefined) move3Raw.payload.reason = reason;
+        if (parentSnapshotAtAsk !== undefined) move3Raw.payload.parentSnapshotAtAsk = parentSnapshotAtAsk;
+        if (askRationale !== undefined) move3Raw.payload.askRationale = askRationale;
+        if (askAlternatives !== undefined) move3Raw.payload.askAlternatives = askAlternatives;
+        if (askSource !== undefined) move3Raw.payload.askSource = askSource;
+        // Status-at-ask split (tsk-40m P1 fix, same two-field discipline as
+        // moveWork's own — see its comment): `statusAtAsk` is caller-
+        // supplied/informational only; `durableStatusAtAsk` is ALWAYS the
+        // trusted value here — `preClaimStatus` IS the item's real durable
+        // status at this exact moment (already validated above: `work.status
+        // !== freshClaim.preClaimStatus` would have thrown conflict first),
+        // never a caller input, so a claimed item settling into
+        // awaiting-human can never durably record anything but its own true
+        // pre-claim status as the safe resume target.
+        if (finalStatus === 'awaiting-human') {
+          if (statusAtAsk !== undefined) move3Raw.payload.statusAtAsk = statusAtAsk;
+          move3Raw.payload.durableStatusAtAsk = preClaimStatus;
+        }
       }
 
       const writerLogPath = resolveWriterLogPath(dir);
@@ -1221,8 +1257,8 @@ export function settleClaim(dir, {
     headAtReturn,
     branchHeadAtReturn,
     parentSnapshotAtAsk,
-    claimTrigger,
     statusAtAsk,
+    claimTrigger,
     releaseTrigger,
     rationale,
     alternatives,
@@ -1237,9 +1273,7 @@ export function settleClaim(dir, {
 
 /**
  * Park a work item into `awaiting-human`, carrying the question it is
- * waiting on (per D2/D5). Thin wrapper over `moveWork` — same
- * append-then-refresh tail, same CAS/validation errors — status-fsm.mjs requires a
- * non-empty `ask` on this edge.
+ * waiting on (per D2/D5).
  *
  * tsk-19zm D2: `rationale`/`alternatives`/`source` here are the AGENT's
  * checkpoint distillate as of this `ask` — kept a caller-facing param name
@@ -1247,8 +1281,41 @@ export function settleClaim(dir, {
  * written into the payload as `askRationale`/`askAlternatives`/`askSource`
  * so a later `answer` on the same item never overwrites this checkpoint —
  * the two snapshots live side by side in `gates[id]` (replay.mjs's fold).
+ *
+ * tsk-40m P1 fix (docs/architect/doing-coordination-redesign.md): `ask`ing
+ * an item under an ACTIVE runtime claim must not leave that claim orphaned
+ * — a plain `moveWork` durably moves the item away from the claim's own
+ * `preClaimStatus` (to `awaiting-human`) without ever touching the claim
+ * file, which buildEffectiveView then reads as stale (a real bug on its
+ * own: the item silently drops out of every claim-aware view — worker-slot
+ * occupancy, stale-doing advisory — while the orphaned claim file lingers
+ * forever with nothing to release it). So this delegates to `settleClaim`
+ * whenever a claim is active: it validates ownership/CAS fresh, settles
+ * the claim DIRECTLY from its preClaimStatus to `awaiting-human` (the same
+ * one-move discipline every other settle path uses, `result: 'paused'`
+ * marking this as a park rather than a completion), and releases the claim
+ * in the same critical section — never a silent leak. `statusAtAsk` here
+ * is purely informational (whatever the caller's own, typically EFFECTIVE,
+ * view reports) — moveWork/settleClaim compute the resume-trusted
+ * `durableStatusAtAsk` themselves, from a fresh durable read, regardless of
+ * what (if anything) the caller passes.
  */
 export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAsk, statusAtAsk, rationale, alternatives, source } = {}) {
+  const claim = readClaim(dir, id);
+  if (claim) {
+    return settleClaim(dir, {
+      id,
+      claimId: claim.claimId,
+      finalStatus: 'awaiting-human',
+      ask,
+      parentSnapshotAtAsk,
+      statusAtAsk,
+      askRationale: rationale,
+      askAlternatives: alternatives,
+      askSource: source,
+      result: 'paused',
+    });
+  }
   return moveWork(dir, {
     id,
     to: 'awaiting-human',
@@ -1268,15 +1335,32 @@ export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAs
  * append-then-refresh tail, same CAS/validation errors — status-fsm.mjs requires a
  * non-empty `answer` on this edge.
  *
- * Resume target (claim-lock §5.1): reads the gate's own `statusAtAsk`
- * snapshot (stamped by the `ask` that parked this item) and resumes there —
- * `doing` when a pick claim was held at ask-time, `todo` otherwise (also the
- * default for pre-existing logs/gates with no `statusAtAsk`, preserving the
- * historical hardcoded-`todo` behavior byte for byte).
+ * Resume target (claim-lock §5.1, tsk-40m P1 fix + hard-cut): reads the
+ * gate's own `durableStatusAtAsk` (the item's trusted DURABLE status at
+ * ask-time, stamped by moveWork/settleClaim themselves — never a caller-
+ * supplied value) and resumes there. For an item claimed at ask-time, the
+ * durable status was still `todo`, so this resumes to `todo` — which
+ * un-stales the claim (its preClaimStatus matches durable status again)
+ * and lets buildEffectiveView's overlay show `doing` again on its own,
+ * with no durable write of `doing` anywhere.
+ *
+ * `awaiting-human -> doing` is retired from status-fsm.mjs's TRANSITIONS
+ * table entirely (hard-cut, per the redesign) — a `durableStatusAtAsk` of
+ * `doing` can therefore only ever be a truthful historical record of a
+ * genuinely legacy pre-migration item's durable status, never a valid
+ * resume target anymore, so it clamps to `todo` here instead of attempting
+ * an edge that no longer exists. Data predating the `durableStatusAtAsk`
+ * split falls back to the OLD `statusAtAsk` field (which used to double as
+ * the resume target directly) under the SAME clamp — a legacy `'doing'`
+ * there is exactly the value this hard-cut retires. `todo` is also the
+ * final default for pre-existing logs/gates with neither field,
+ * preserving the historical hardcoded-`todo` behavior byte for byte.
  */
 export function answerAwaiting(dir, { id, answer, expectedStatus, role, rationale, alternatives, source } = {}) {
   const view = listWork(dir);
-  const to = view.gates?.[id]?.statusAtAsk ?? 'todo';
+  const gate = view.gates?.[id];
+  const recorded = gate?.durableStatusAtAsk ?? gate?.statusAtAsk;
+  const to = recorded === 'doing' ? 'todo' : (recorded ?? 'todo');
   return moveWork(dir, { id, to, expectedStatus, answer, role, rationale, alternatives, source });
 }
 

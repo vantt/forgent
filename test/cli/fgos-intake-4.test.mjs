@@ -271,32 +271,63 @@ test('ask --rationale and answer --rationale both persist on gates[id], neither 
 });
 
 
-// claim-lock §5.1 (intentional contract change from the test above): asking
-// a "doing" item now resumes it to "doing", not a claimless "todo" — the
-// exact bug the design fixes ("fgos ask/answer mid-claim silently dropped
-// the claim"). The item never re-enters the ready set (still `doing`, not
-// `todo`), unlike the todo-item round-trip above.
-test('ask/answer round-trip on a doing item: answer resumes to doing, preserving the held claim (claim-lock §5.1)', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'gated-doing-item');
-  moveToDurableDoingForTest(cwd, 'gated-doing-item');
+// claim-lock §5.1, tsk-40m P1 fix + hard-cut (docs/architect/doing-
+// coordination-redesign.md): superseded by the redesign — asking a
+// CLAIMED item (effective 'doing' via an active runtime claim, durable
+// status still 'todo') now settles the claim DIRECTLY into awaiting-human,
+// releasing it, and answering resumes to the durable base ('todo'), never
+// a durable 'doing'. This is the exact P1 bug an independent review found
+// after the redesign first landed ("take -> ask -> answer durably wrote
+// awaiting-human -> doing with no backing claim at all") — repro'd here
+// through the real CLI end to end.
+test('ask/answer round-trip on a CLAIMED item: ask releases the claim and settles directly to awaiting-human, answer resumes to the durable base — never a durable doing (claim-lock §5.1 + tsk-40m P1 fix)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'gated-claimed-item');
+  assert.equal(run(cwd, ['take', '--id', 'gated-claimed-item']).status, 0);
+  assert.equal(stateView(cwd).work['gated-claimed-item'].status, 'doing', 'effective doing via the claim overlay, before ask');
 
-  const askResult = run(cwd, ['ask', 'gated-doing-item', '--text', VALID_ASK_TEXT]);
+  const askResult = run(cwd, ['ask', 'gated-claimed-item', '--text', VALID_ASK_TEXT]);
   assert.equal(askResult.status, 0);
-  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-doing-item', from: 'doing', to: 'awaiting-human', seq: 3 });
-  assert.equal(stateView(cwd).work['gated-doing-item'].status, 'awaiting-human');
+  // Settles DIRECTLY from the claim's own preClaimStatus ('todo') — never
+  // through a durable 'doing' leg.
+  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-claimed-item', from: 'todo', to: 'awaiting-human', seq: 4 });
+  assert.equal(stateView(cwd).work['gated-claimed-item'].status, 'awaiting-human');
 
   const readyWhileAwaiting = envelopeData(run(cwd, ['ready']).stdout);
-  assert.ok(!readyWhileAwaiting.some((i) => i.id === 'gated-doing-item'));
+  assert.ok(!readyWhileAwaiting.some((i) => i.id === 'gated-claimed-item'));
 
-  const answerResult = run(cwd, ['answer', 'gated-doing-item', '--text', 'OAuth']);
+  const answerResult = run(cwd, ['answer', 'gated-claimed-item', '--text', 'OAuth']);
   assert.equal(answerResult.status, 0);
-  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-doing-item', from: 'awaiting-human', to: 'doing', seq: 4 });
-  assert.equal(stateView(cwd).work['gated-doing-item'].status, 'doing');
+  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-claimed-item', from: 'awaiting-human', to: 'todo', seq: 5 });
+  assert.equal(stateView(cwd).work['gated-claimed-item'].status, 'todo');
 
-  // Never resurfaces as ready — it resumed to "doing", not "todo".
+  // Resumes to the durable base ('todo') -- it re-enters the ready set,
+  // unlike the OLD (retired) resume-to-doing behavior this test used to
+  // pin. Reacquiring the claim (a separate, explicit `take`) is the only
+  // way back to an effective 'doing'.
   const readyAfterAnswer = envelopeData(run(cwd, ['ready']).stdout);
-  assert.ok(!readyAfterAnswer.some((i) => i.id === 'gated-doing-item'));
+  assert.ok(readyAfterAnswer.some((i) => i.id === 'gated-claimed-item'));
+});
+
+// Hard-cut companion (docs/architect/doing-coordination-redesign.md):
+// awaiting-human -> doing is retired from status-fsm.mjs's TRANSITIONS
+// table entirely — a genuinely legacy pre-migration item (no claim
+// involved, durable status really was 'doing') still resumes to `todo`,
+// never `doing`, since that edge no longer exists at all.
+test('ask/answer round-trip on a genuinely legacy durable-doing item (no claim): answer clamps to todo — awaiting-human -> doing no longer exists', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'gated-legacy-doing-item');
+  moveToDurableDoingForTest(cwd, 'gated-legacy-doing-item');
+
+  const askResult = run(cwd, ['ask', 'gated-legacy-doing-item', '--text', VALID_ASK_TEXT]);
+  assert.equal(askResult.status, 0);
+  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-legacy-doing-item', from: 'doing', to: 'awaiting-human', seq: 3 });
+
+  const answerResult = run(cwd, ['answer', 'gated-legacy-doing-item', '--text', 'OAuth']);
+  assert.equal(answerResult.status, 0);
+  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-legacy-doing-item', from: 'awaiting-human', to: 'todo', seq: 4 });
+  assert.equal(stateView(cwd).work['gated-legacy-doing-item'].status, 'todo');
 });
 
 

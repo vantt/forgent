@@ -1926,10 +1926,12 @@ async function runVerb(verb, flags, positional, dir) {
       const parentId = askView.work[id]?.parent;
       const parent = parentId ? askView.work[parentId] : undefined;
       const parentSnapshotAtAsk = parent ? { id: parent.id, title: parent.title, status: parent.status } : undefined;
-      // statusAtAsk (claim-lock §5.1): the item's OWN status right now, before
-      // the park below — `doing` when a pick claim is held, `todo` otherwise.
-      // answerAwaiting reads this back later to resume to the same status
-      // instead of always falling to `todo`.
+      // statusAtAsk (claim-lock §5.1, tsk-40m P1 fix): informational/audit
+      // ONLY — `askView` above is the EFFECTIVE view (claim overlay), so a
+      // claimed item legitimately reads 'doing' here, a true fact worth
+      // recording. NEVER trusted as a resume target: putInAwaiting/moveWork
+      // compute the resume-safe `durableStatusAtAsk` themselves, from a
+      // fresh durable read, ignoring this value entirely.
       const statusAtAsk = askView.work[id]?.status;
       // rationale/alternatives/source (tsk-63c D1/D3): optional, same
       // guarded-passthrough shape as the rest of ask's fields — fold into

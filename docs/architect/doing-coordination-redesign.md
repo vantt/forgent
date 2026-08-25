@@ -32,6 +32,7 @@ The redesign separates those meanings without deleting `doing` as a domain conce
 6. Reduce main-checkout churn by keeping live coordination out of committed event logs.
 7. Keep the implementation file-based and process-local friendly. No daemon is required.
 8. Make scheduling, listing, blocking, stale reclaim, and anti-loop read the correct state layer.
+9. Preserve the user-facing meaning of `todo -> doing` as a logical coordination transition without committing that transition as durable workflow state.
 
 ## 3. Non-Goals
 
@@ -63,6 +64,10 @@ The durable current status answers: "what stable workflow state is this item in?
 Runtime coordination answers: "who is actively holding this item right now?"
 
 The effective view answers: "what should a user or scheduler see right now?"
+
+The important distinction is not the word `doing`; it is which layer is allowed
+to make `doing` true. A claim may make the effective view move from `todo` to
+`doing`, but it must not make the durable event log move from `todo` to `doing`.
 
 ## 5. State Layers
 
@@ -123,7 +128,9 @@ The effective view overlays runtime claims onto durable state:
 
 ```txt
 effectiveStatus(item) =
-  activeClaim(item.id) exists and is valid
+  activeClaim(item.id) exists
+  and claim still matches the durable base it captured
+  and durableStatus(item) is not a parked/final state
     ? "doing"
     : durableStatus(item)
 ```
@@ -141,6 +148,10 @@ This is the view consumed by:
 - any user-facing status query.
 
 The effective view must preserve durable attempt metadata. A previously attempted but released item still shows as claimable, but carries `attemptCount > 0` or `hasStarted = true`.
+
+If the durable item has moved away from the claim's captured base status, the
+claim is stale, paused, or already settled. It must not be allowed to mask the
+durable status by continuing to render as effective `doing`.
 
 ## 6. Status Semantics
 
@@ -161,6 +172,11 @@ Allowed durable status categories should represent states such as:
 
 If the implementation keeps a `doing` enum value for effective statuses or historical run segments, it must be clearly separated from durable current-status transitions.
 
+Durable workflow edges that write into `doing` are not normal runtime edges after
+the hard cut. Any remaining durable `* -> doing` edge must be either migration
+code, a fixture for old data, or a reviewed compatibility path with an explicit
+retirement plan.
+
 ### 6.2 Effective Status
 
 Effective status is what the system presents at runtime.
@@ -180,6 +196,29 @@ An item may have:
 ```
 
 This means the durable workflow has not settled yet, but the item is actively owned.
+
+This is the valid form of the logical `todo -> doing` transition:
+
+```txt
+durable:
+  todo
+
+runtime coordination:
+  active claim exists
+
+effective:
+  doing
+```
+
+The invalid form is:
+
+```txt
+durable:
+  work.move todo -> doing
+```
+
+That invalid form reintroduces main-checkout churn, stale durable `doing`, and
+cleanup/reclaim paths that fight the committed event log.
 
 ### 6.3 Started Is Not A Durable Status
 
@@ -205,6 +244,43 @@ Use durable attempt metadata instead:
 ```
 
 This remains claimable while preserving that it is not fresh work.
+
+### 6.4 Human Park Is Not Active Doing
+
+`awaiting-human` is a stable parked workflow state. It means the item is waiting
+for a human answer, not that work is actively progressing.
+
+When an active item needs human input:
+
+- the durable item may move from its captured durable base, such as `todo`, to
+  `awaiting-human`;
+- the active runtime claim must be released, or moved to an explicitly paused
+  non-active representation that does not count as `doing`;
+- the effective view must show `awaiting-human`, not `doing`;
+- worker slots and reclaim must not treat the item as active work while it is
+  parked on the human.
+
+When the human answers:
+
+- the durable item resumes to the stable durable base or another stable policy
+  target, such as `todo`;
+- answer handling must not write durable `awaiting-human -> doing`;
+- if the same actor should continue immediately, that continuation must reacquire
+  or reactivate a runtime claim, which then makes the effective view `doing`.
+
+This preserves the user-facing sequence:
+
+```txt
+todo -> doing -> awaiting-human -> doing -> awaiting-approval
+```
+
+while the committed workflow history stays stable:
+
+```txt
+todo -> awaiting-human -> todo -> awaiting-approval
+```
+
+The two sequences are both true, but they belong to different layers.
 
 ## 7. Data Model
 
@@ -271,6 +347,7 @@ Recommended `result` values:
 
 - `submitted` - worker completed and submitted for approval;
 - `released` - owner intentionally gave the item back;
+- `paused` - owner stopped active work because the item is parked on human input;
 - `failed` - attempt ended unsuccessfully;
 - `verify-failed` - verification failed and item moved to a parked or retryable state;
 - `reclaimed` - system took ownership back from an inactive claim;
@@ -485,6 +562,48 @@ In the new model:
 - `releaseClaimOnExecuting` should be retired or made an internal no-op as part of the hard cut;
 - an actual pause/release must be represented as an intentional release flow, not as a hidden durable status bounce.
 
+### 9.7 Ask And Answer While Claimed
+
+```txt
+input:
+  active claim exists
+  durable status = todo or another claimable base
+  effective status = doing
+  the owner needs a human answer before continuing
+
+ask steps:
+  validate the active claim if the ask is claim-owned
+  record the durable base status, not the effective doing status
+  append durable attempt result=paused if this ask ends an active claim
+  append durable workflow move from durable base to awaiting-human
+  release the active claim, or mark it paused in a non-active coordination record
+
+ask result:
+  durable status = awaiting-human
+  effective status = awaiting-human
+  no active worker slot is consumed
+  reclaim does not treat the item as active doing
+
+answer steps:
+  append durable answer
+  move durable status from awaiting-human to the recorded durable base or another stable policy target
+  do not move durable status to doing
+  if work should continue immediately, acquire a fresh runtime claim after the durable answer
+
+answer result without immediate reclaim:
+  durable status = todo or other stable target
+  effective status = same stable target
+
+answer result with immediate runtime claim:
+  durable status = todo or other stable target
+  effective status = doing
+```
+
+The answer path must never use `statusAtAsk: "doing"` as a durable resume target.
+If the UI wants to remember that the item was visually `doing` when the question
+was asked, that field must be display/audit metadata only. The durable resume
+target must be the durable base captured by the claim or by the ask operation.
+
 ## 10. File Ownership And Git Policy
 
 ### 10.1 Committed Durable Files
@@ -563,6 +682,11 @@ Primary reclaim basis:
 - role-specific thresholds such as shorter agent threshold and longer human threshold.
 
 `hardExpiresAt` may force review or reclaim only as a safety backstop.
+
+Reclaim only applies to active runtime claims. A parked `awaiting-human` item is
+not active work and must not be reclaimed as stale doing. If a claim is paused
+for a human question, that paused state must be excluded from worker-slot counts
+and from normal stale-doing reclaim until it is reactivated.
 
 ## 12. Scheduling And Query Rules
 
@@ -659,6 +783,10 @@ The redesign is acceptable only if all conditions hold:
 10. Runtime coordination files and diagnostic logs are ignored by git.
 11. Durable event logs still capture meaningful attempt and workflow outcomes.
 12. No normal flow leaves an item durable-current `doing` after the hard cut.
+13. Asking a question while an item is effective `doing` does not persist
+    `statusAtAsk: "doing"` as the durable resume target.
+14. Answering a human question never writes durable `awaiting-human -> doing`;
+    continuation to `doing` happens only by runtime claim overlay.
 
 ## 16. Required Tests
 
@@ -711,6 +839,21 @@ The redesign is acceptable only if all conditions hold:
 - No migrated item loses final workflow status.
 - No runtime/derived/diagnostic file becomes tracked.
 
+### 16.8 Ask And Answer While Claimed
+
+- A claimed durable-`todo` item renders as effective `doing`.
+- Asking on that item parks it as durable/effective `awaiting-human` and removes
+  or pauses the active claim so it no longer renders as `doing`.
+- Asking on that item records durable attempt history if it ends an active claim,
+  so the item remains distinguishable from never-started work.
+- Answering resumes to the durable base, such as `todo`, and writes no durable
+  `awaiting-human -> doing` event.
+- If answer handling immediately reacquires work, durable status remains the
+  stable base while effective status becomes `doing` through the new runtime
+  claim.
+- Worker slots do not count the parked question as active work.
+- Reclaim does not treat parked human questions as stale doing.
+
 ## 17. Review Checklist
 
 Before merge, reviewers should search for:
@@ -720,6 +863,7 @@ to: "doing"
 to:'doing'
 expectedStatus: "doing"
 expectedStatus:'doing'
+awaiting-human -> doing
 status === "doing"
 statusCategory === "doing"
 releaseClaimOnExecuting
@@ -743,6 +887,7 @@ Do not implement:
 
 - `started` as a current workflow status;
 - durable `todo -> doing` at claim acquire;
+- durable `awaiting-human -> doing` at answer/resume;
 - durable `doing -> todo` at release;
 - settle CAS based on durable `doing`;
 - anti-loop based on runtime claim files;

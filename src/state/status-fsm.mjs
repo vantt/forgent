@@ -171,13 +171,22 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'todo', to: 'awaiting-human' }),
   Object.freeze({ from: 'doing', to: 'awaiting-human' }),
   Object.freeze({ from: 'awaiting-human', to: 'todo' }),
-  // Claim-lock resume (str-clarify-decompose-claim-lock §5.1): a claim held
-  // at ask-time (`doing`) must resume to `doing`, not fall to a claimless
-  // `todo` — otherwise answering a gate mid-clarify/decompose silently drops
-  // the pick claim. store.mjs's answerAwaiting picks the resume target from
-  // the ask-time snapshot (`statusAtAsk`); this edge is what makes `doing`
-  // a legal one, alongside the existing `todo` resume above.
-  Object.freeze({ from: 'awaiting-human', to: 'doing' }),
+  // Claim-lock resume (str-clarify-decompose-claim-lock §5.1), tsk-40m P1
+  // fix + hard-cut RETIRED this edge entirely (docs/architect/doing-
+  // coordination-redesign.md): a claim active at ask-time now resumes via
+  // the `todo` edge above instead (its own preClaimStatus matches durable
+  // status again, so buildEffectiveView's overlay shows 'doing' again on
+  // its own — no durable write of 'doing' anywhere), and `putInAwaiting`
+  // durably settles a claimed item DIRECTLY from its preClaimStatus into
+  // `awaiting-human` (via settleClaim), releasing the claim in that same
+  // write — never leaving one to silently resume through this edge later.
+  // A genuinely legacy pre-migration item whose durable status really was
+  // 'doing' at ask-time can still ENTER awaiting-human (the `doing ->
+  // awaiting-human` edge below stays) but never resumes back to 'doing' —
+  // answerAwaiting clamps that case to `todo` (store.mjs's own comment),
+  // matching the hard-cut discipline every other retired `-> doing` edge
+  // in this table follows: nothing durably writes INTO `doing`, ever,
+  // full stop, not even for old data.
   // fsm-wontfix-terminal-status D1/D3: three doors into the second
   // terminal state, zero doors out (see header comment above).
   Object.freeze({ from: 'blocked', to: 'wontfix' }),
