@@ -1,8 +1,8 @@
 ---
-authoritative_for: why fgos sync-root and fgos merge next resolve CLI flags (verify timeout, --wait) lazily, after their own refusal guards, instead of eagerly at CLI flag-parsing time
+authoritative_for: why fgos sync-root, fgos merge next, and fgos review resolve CLI flags (verify timeout, --wait, --pr) lazily, after their own use-case guards, instead of eagerly in the CLI adapter — the tsk-49i-2 flag-parsing-move regression family
 ---
 
-# Why merge-next and sync-root resolve their flags after their guards
+# Why merge-next, sync-root, and review resolve their flags after their guards
 
 `tsk-49i-2` moved flag parsing into the CLI adapter, so
 `parseMergeClusterOptions` started calling `resolveVerifyTimeoutMs`
@@ -70,13 +70,49 @@ Fix direction is the same treatment already applied to the timeout case:
 `sync-root` calls it after the Iron Law gate — so `merge next`'s early
 returns never parse `--wait` at all.
 
+## A third instance: `review --pr` outranks the item-not-found guard
+
+`tsk-49i-2` also moved `review`'s `--pr` parse into the CLI adapter
+(`bin/fgos.mjs case review`), where it now runs before `reviewUseCase`'s
+own found/status preconditions. On `main`, the equivalent
+`optionalField(flags.pr, ...)` call lived *inside* the `if (flags.github)`
+branch, after the work-not-found and awaiting-approval guards.
+
+Reproduced on two identical fresh repos: `main` answers `review: work
+"nosuch" not found.`; the branch answers `review --github --pr requires a
+PR number: --pr <n>`. The exit code is 4 either way, so nothing keying off
+exit codes changes — the cost is that a caller with both a bad id and a
+bare `--pr` is now told about the flag instead of the item that does not
+exist. `approve` already keeps its own `--pr` check inside the use case
+(the same `requireField`-equivalent shape); `review` should match it.
+
+Fix direction, same family as the two cases above: the adapter forwards
+`flags.pr` raw; `reviewUseCase` performs the `optionalField`-equivalent
+check at the same point the old case block did — after the item-found and
+status guards, not before them.
+
+## The pattern across all three
+
+`tsk-49i-2` moved CLI flag parsing (verify timeout, `--wait`, `--pr`) out
+of each verb's own case block and into the shared adapter, as a genuine
+DRY win — but doing that eagerly, at the point the adapter builds its
+`options` object, silently promoted every one of those flags' own
+validation to run *before* the use case's own preconditions instead of
+after them, for every verb whose old code happened to parse that flag
+partway through its own guard sequence rather than at the very top. The
+fix is not "don't share the parsing" — it's "share the parsing, but keep
+it lazy": pass a thunk, and call it at the exact point in the use case's
+own guard sequence the original inline code used to.
+
 ## Source
 
-`tsk-55f` and `tsk-2fx`, both children of `tsk-49i` (the CLI-adapter
-flag-parsing move) — `tsk-2fx` was found by a second branch review of
-`main...fgw/tsk-49i`, after `tsk-55f`'s own fix had already landed for the
-timeout half alone. Verify (`tsk-55f`): `npm test && test -f
-test/cli/fgos-merge-next-no-config-write.test.mjs && grep -qF
-resolveTimeoutMs src/verbs/merge/sync-root.mjs`. Verify (`tsk-2fx`): `npm
-test && test -f test/cli/fgos-merge-next-idle-turn.test.mjs && grep -qF
-resolveWaitFlags src/verbs/merge/approve.mjs`.
+`tsk-55f`, `tsk-2fx`, and `tsk-h6r`, all children of `tsk-49i` (the
+CLI-adapter flag-parsing move) — `tsk-2fx` and `tsk-h6r` were both found by
+a second branch review of `main...fgw/tsk-49i`, after `tsk-55f`'s own fix
+had already landed for the timeout half alone. Verify (`tsk-55f`): `npm
+test && test -f test/cli/fgos-merge-next-no-config-write.test.mjs && grep
+-qF resolveTimeoutMs src/verbs/merge/sync-root.mjs`. Verify (`tsk-2fx`):
+`npm test && test -f test/cli/fgos-merge-next-idle-turn.test.mjs && grep
+-qF resolveWaitFlags src/verbs/merge/approve.mjs`. Verify (`tsk-h6r`): `npm
+test && test -f test/cli/fgos-review-pr-precedence.test.mjs && ! grep -qF
+"optionalField(flags.pr" bin/fgos.mjs`.
