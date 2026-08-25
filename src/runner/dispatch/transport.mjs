@@ -165,6 +165,14 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     provider: executor.provider ?? executor.command,
     baseCommit: attestation.baseCommit,
     headRef: attestation.headRef,
+    // governance (self-review finding, 2026-08-25): resolveExecutorConfig
+    // already computes this (providerFamily + egress{kind,target,content})
+    // -- it was being discarded here, so the real production dispatch path
+    // (spawnWorker -> loop.mjs's `executor.dispatch` event) never recorded
+    // which dispatches were cross-provider, the entire stated purpose of
+    // the D1/D2/D6 governance work. Additive only: every existing caller
+    // that destructures a subset of this object is unaffected.
+    governance: executor.governance,
   };
 }
 

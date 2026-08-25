@@ -346,6 +346,15 @@ test('runOnce logs the "<executorId> — <provider> — <model>" announce line a
     // below.
     command: process.execPath,
     model: 'sonnet',
+    // governance (self-review finding, 2026-08-25): computed by
+    // resolveExecutorConfig for the global-executor fallback path this
+    // fixture takes -- process.execPath is neither a Claude CLI command
+    // nor a declared executors.* entry, so it resolves cross-provider with
+    // no declared providerModel/carries override (defaults apply).
+    governance: {
+      providerFamily: process.execPath,
+      egress: { kind: 'cross-provider', target: process.execPath, content: 'repo-content' },
+    },
   });
   assert.match(baseCommit, /^[0-9a-f]{40}$/, 'baseCommit must be a real commit sha, not null/undefined');
   assert.equal(headRef, 'fgw/item-announce', 'headRef must be this item\'s own dispatch branch, not the main checkout\'s');

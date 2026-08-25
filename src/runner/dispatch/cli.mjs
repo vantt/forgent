@@ -215,7 +215,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // a command-less/adapter-less/invocation-less executor with no static
   // agentType of its own -- see resolveAgentTypeForWork's own doc comment.
   const resolvedAgentType = resolveAgentTypeForWork(work, cwd, opts.stage);
-  const { command, args, env, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
+  const { command, args, env, adapter, provider, baseCommit, headRef, governance } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -265,9 +265,10 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     model,
   }).then(
     // executorId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl)/command
-    // (tsk-33w D9): additive only — every field this function already
-    // returned stays exactly where it was.
-    (result) => ({ ...result, templateName, templateHash, executorId, provider, command, baseCommit, headRef }),
+    // (tsk-33w D9)/governance (self-review finding, 2026-08-25): additive
+    // only — every field this function already returned stays exactly
+    // where it was.
+    (result) => ({ ...result, templateName, templateHash, executorId, provider, command, baseCommit, headRef, governance }),
     (err) => {
       if (err instanceof DispatchError) {
         err.templateName = templateName;
