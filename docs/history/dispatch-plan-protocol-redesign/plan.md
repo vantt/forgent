@@ -153,7 +153,7 @@ dependency order:
   {
     "title": "DispatchPlan canonical object + fix decide --for reading capabilities.prefer",
     "verify": "node src/runner/dispatch.mjs decide --for fgos-coding-implement --dir \"$PWD\" | grep -q '\"executorId\":\"agy\"' && node --test test/runner/dispatch.test.mjs",
-    "action": "Per D1, add src/runner/dispatch/plan.mjs exposing compileDispatchPlan() that CALLS the existing decideDispatchMechanism/decideExecutorDispatchMechanism (mechanism.mjs:42,82) rather than re-deriving any routing rule, and packages selector/caller/mechanism/executorId/capability/invocation/model/governance/reasonCodes into one object. Port decideExecutorCli, executeExecutorCli, spawnWorker, fanoutBatchExecutorCli and scripts/dispatch-decide-hook.mjs onto it. Same piece fixes the verified bug at cli.mjs:685, where decide --for calls resolveExecutorIdForPurpose and therefore never reads capabilities.<name>.prefer via resolveExecutorAndOverrides. Write characterization tests pinning today's output for all four selector forms BEFORE porting.",
+    "action": "Per D1, TWO ACCEPTANCE LAYERS, done in this order so a green proof lands early instead of riding on the whole refactor. (0a) Fix the live behaviour first: cli.mjs:685's decide --for calls resolveExecutorIdForPurpose and therefore never reads capabilities.<name>.prefer via resolveExecutorAndOverrides — route it through the latter so `decide --for fgos-coding-implement` returns executorId agy / out-of-process / configured:true. Land that with characterization tests pinning today's output for all four selector forms, written BEFORE the change. (0b) Only then add src/runner/dispatch/plan.mjs exposing compileDispatchPlan(), which CALLS the existing decideDispatchMechanism/decideExecutorDispatchMechanism (mechanism.mjs:42,82) rather than re-deriving any routing rule, and packages selector/caller/mechanism/executorId/capability/invocation/model/governance(placeholder, filled by piece 1's own work)/reasonCodes into one object; then port decideExecutorCli, executeExecutorCli, spawnWorker, fanoutBatchExecutorCli and scripts/dispatch-decide-hook.mjs onto it. 0a is a behaviour fix at low risk; 0b is the structural port at high risk — keeping them separable means a rollback of 0b never re-breaks 0a.",
     "footprint": ["src/runner/dispatch/plan.mjs", "src/runner/dispatch/cli.mjs", "src/runner/dispatch/mechanism.mjs", "scripts/dispatch-decide-hook.mjs", "test/runner/dispatch.test.mjs"],
     "kind": "feature",
     "risk": "heavy",
@@ -162,13 +162,13 @@ dependency order:
   },
   {
     "title": "Governance: replace command!=claude test with declared egress metadata",
-    "verify": "grep -q 'egress' src/runner/dispatch/resolve.mjs && node --test test/runner/dispatch.test.mjs",
-    "action": "Per D2 phase 8, replace the resolve.mjs:322 gate — which inspects only executor.command against CLAUDE_CLI_COMMANDS and is therefore blind to an env override — with a declared-egress check carrying providerFamily plus egress {kind, target, content}. Reuse the ALREADY-BUILT EXECUTOR_CARRIES enum (config.mjs:364, enforced at resolve.mjs:243-258) as the vocabulary for egress content instead of inventing a parallel enum, and record the real spawned command alongside the self-declared provider label. Cross-provider stays first-class and permitted; only undeclared or self-contradicting egress fails. Live specimen is executor glm, which keeps command:\"claude\" while routing to OpenRouter via env.",
-    "footprint": ["src/runner/dispatch/resolve.mjs", "src/runner/dispatch/config.mjs", "test/runner/dispatch.test.mjs"],
+    "verify": "grep -q 'egress' src/runner/dispatch/resolve.mjs && node --test test/runner/egress-governance.test.mjs && node --test test/runner/dispatch.test.mjs",
+    "action": "Per D2 phase 8, replace the resolve.mjs:322 gate — which inspects only executor.command against CLAUDE_CLI_COMMANDS and is therefore blind to an env override — with a declared-egress check carrying providerFamily plus egress {kind, target, content}. DELIBERATELY DEPENDENCY-FREE: this is a live policy hole, not a vocabulary refactor, so it must not sit behind the DispatchPlan port. It needs only fields that already exist today — executor.providerModel, invocations[].command, invocations[].env, allowCrossProvider, carries — and piece 0 folds its result into plan.governance afterwards rather than the other way round. Reuse the ALREADY-BUILT EXECUTOR_CARRIES enum (config.mjs:364, enforced at resolve.mjs:243-258) as the vocabulary for egress content instead of inventing a parallel enum, and record the real spawned command alongside the self-declared provider label. Cross-provider stays first-class and permitted; only undeclared or self-contradicting egress fails. Live specimen is executor glm, which keeps command:\"claude\" while routing to OpenRouter via env. Assertions land in their OWN test file, not in dispatch.test.mjs, so this piece shares no footprint with piece 0 and is genuinely parallel-safe.",
+    "footprint": ["src/runner/dispatch/resolve.mjs", "src/runner/dispatch/config.mjs", "test/runner/egress-governance.test.mjs"],
     "kind": "feature",
     "risk": "heavy",
     "refs": ["docs/history/dispatch-plan-protocol-redesign/DISCUSSION.md#task-governance-egress"],
-    "deps": [0]
+    "deps": []
   },
   {
     "title": "AgentMessage V1 envelope + DispatchAssignment payload, prompt becomes a renderer",
@@ -178,13 +178,13 @@ dependency order:
     "kind": "feature",
     "risk": "heavy",
     "refs": ["docs/history/dispatch-plan-protocol-redesign/DISCUSSION.md#task-agent-message"],
-    "deps": [0]
+    "deps": []
   },
   {
     "title": "Protocol abstraction: invocation.protocol field + handler registry, open resolve to non-cli invocations",
     "verify": "node --test test/runner/protocol-registry.test.mjs && node --test test/runner/dispatch.test.mjs",
-    "action": "Per D2's phase 3 and D4's demotion of the prompt to a renderer, add a `protocol` field to invocations[] plus a handler registry so prompt-stdout-v1 becomes ONE protocol rather than the only one (siblings: json-stdout-v1, agent-message-v1, http-json-v1, mcp-tool-v1, herdr-v1). Critically, this piece also opens resolveExecutorConfig, which today THROWS at resolve.mjs:280-286 whenever an executor declares invocations with no via:\"cli\" entry — that throw is what makes a via:\"herdr\" executor structurally undispatchable and therefore hard-blocks the Herdr piece. This closes Finding #2 of the source note (via:\"api\" and httpAdapter exist but production resolve only ever selects via:\"cli\"). Keep the existing cli path byte-identical; this is additive.",
-    "footprint": ["src/runner/dispatch/resolve.mjs", "src/runner/dispatch/transport.mjs", "src/runner/dispatch/config.mjs", "test/runner/protocol-registry.test.mjs"],
+    "action": "Per D2's phase 3 and D4's demotion of the prompt to a renderer, add a `protocol` field to invocations[] plus a handler registry in a new src/runner/dispatch/protocol.mjs, so prompt-stdout-v1 becomes ONE protocol rather than the only one. Critically, this piece also opens resolveExecutorConfig, which today THROWS at resolve.mjs:280-286 whenever an executor declares invocations with no via:\"cli\" entry — that throw is what makes a via:\"herdr\" executor structurally undispatchable and therefore hard-blocks the Herdr piece. This closes Finding #2 of the source note (via:\"api\" and httpAdapter exist but production resolve only ever selects via:\"cli\"). SCOPE IS DELIBERATELY THIN, and staying thin is part of the acceptance: ship exactly the protocol field, the registry, a prompt-stdout-v1 handler that keeps today's cli path byte-identical, and REGISTERED-BUT-EMPTY slots for the mailbox/herdr protocols. Do NOT build a transport ecosystem here — json-stdout-v1, http-json-v1 and mcp-tool-v1 handlers get real bodies only when a consumer actually needs them. Herdr needs a protocol floor, not a framework.",
+    "footprint": ["src/runner/dispatch/protocol.mjs", "src/runner/dispatch/resolve.mjs", "src/runner/dispatch/transport.mjs", "src/runner/dispatch/config.mjs", "test/runner/protocol-registry.test.mjs"],
     "kind": "feature",
     "risk": "heavy",
     "refs": ["docs/history/dispatch-plan-protocol-redesign/DISCUSSION.md#task-protocol-abstraction"],
@@ -198,7 +198,7 @@ dependency order:
     "kind": "feature",
     "risk": "heavy",
     "refs": ["docs/history/dispatch-plan-protocol-redesign/DISCUSSION.md#task-confidence-ladder"],
-    "deps": [2]
+    "deps": [0, 2]
   },
 
   {
@@ -224,6 +224,23 @@ dependency order:
 ]
 ```
 
+### Blast radius, counted rather than estimated
+
+Derived by walking every child footprint and testing each path against the
+working tree — an earlier hand-count in this plan's own review was wrong in
+both directions, so it is now produced by script, not by eye:
+
+| | Count | Paths |
+|---|---|---|
+| **New source** | **5** | `dispatch/plan.mjs` · `dispatch/agent-message.mjs` · `dispatch/protocol.mjs` · `dispatch/transport-herdr.mjs` · `runner/artifact-store.mjs` |
+| **New test** | **6** | `agent-message` · `protocol-registry` · `confidence-ladder` · `artifact-store` · `egress-governance` · `herdr-transport` |
+| **Edited existing** | **8** | `dispatch/{cli,config,mechanism,prepare,resolve,transport}.mjs` · `scripts/dispatch-decide-hook.mjs` · `test/runner/dispatch.test.mjs` |
+
+**11 new files, 8 touched, 19 distinct paths** — every one inside
+`src/runner/dispatch/`, `src/runner/`, `scripts/` or `test/runner/`, matching
+the grep-established boundary above. No file outside that boundary is
+touched by any piece.
+
 **Pre-flight, run against the real engine rather than assumed.** The block
 above was fed through the engine's own `resolveCallerPlanVerdict`/
 `normalizeChild` (`src/intake/plan.mjs`) before this plan was committed:
@@ -239,10 +256,26 @@ which is exactly the `sequence` resolution the gate itself suggests:
 
 | Pair | Shared path | Handled by |
 |---|---|---|
-| piece 0 ↔ piece 1 | `test/runner/dispatch.test.mjs` | piece 1 `deps: [0]` |
-| piece 0 ↔ piece 4 | `src/runner/dispatch/cli.mjs` | piece 4 `deps: [2]` → `[0]` |
-| piece 1 ↔ piece 3 | `src/runner/dispatch/resolve.mjs`, `config.mjs` | piece 3 `deps` widened to `[0,1,2]` — the probe caught this one unserialized on the first run |
+| piece 0 ↔ piece 4 | `src/runner/dispatch/cli.mjs` | piece 4 `deps: [0,2]` — `[0]` added specifically because making piece 2 dep-free removed the old transitive ordering |
+| piece 1 ↔ piece 3 | `src/runner/dispatch/resolve.mjs`, `config.mjs` | piece 3 `deps: [0,1,2]` — the probe caught this one unserialized on its first run |
 | piece 3 ↔ piece 6 | `src/runner/dispatch/transport.mjs` | piece 6 `deps: [2,3,4]` |
+
+The former `piece 0 ↔ piece 1` conflict on `test/runner/dispatch.test.mjs` is
+**gone**, not merely sequenced: piece 1's assertions moved into their own
+`test/runner/egress-governance.test.mjs`. That is what makes piece 1
+genuinely dependency-free rather than dependency-free on paper while still
+colliding at the gate.
+
+### Three dep-free foundation branches
+
+Pieces **0, 1 and 2 all carry `deps: []`** and can run in parallel. Piece 1
+is dep-free by deliberate policy choice, not convenience: the egress hole is
+a live security/policy defect (executor `glm` reaches OpenRouter through
+`env` while the gate inspects `command`), and parking a live defect behind a
+large structural refactor is the wrong trade. It needs only fields that
+already exist — `providerModel`, `invocations[].command`,
+`invocations[].env`, `allowCrossProvider`, `carries` — and piece 0 folds its
+outcome into `plan.governance` afterwards, not the reverse.
 
 **Existing sibling, not a child:** `tsk-fli` covers `execute --work <id>`
 (§7.2). It is not blocked by this split and can land independently; the only

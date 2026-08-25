@@ -502,8 +502,16 @@ render khác).
 
 **D-ID áp dụng.** D2 (pha 3 + pha 5 của note), D4 (prompt là renderer).
 
-**Quan hệ.** Cần §7.1 (chỗ đặt `invocation.protocol` trong plan) và §7.3
-(có `agent-message-v1` để mà khai). **Chặn §7.6.**
+**Quan hệ.** Cần §7.1 (chỗ đặt `invocation.protocol` trong plan), §7.7
+(cùng sửa `resolve.mjs`/`config.mjs`) và §7.3 (có `agent-message-v1` để mà
+khai). **Chặn §7.6.**
+
+**Ràng buộc phạm vi — MỎNG là một phần acceptance, không phải lời khuyên.**
+Ship đúng: field `protocol`, registry, handler `prompt-stdout-v1` giữ đường
+cli hôm nay byte-identical, và **slot đăng ký-nhưng-rỗng** cho
+mailbox/herdr. KHÔNG xây transport ecosystem ở đây — `json-stdout-v1`,
+`http-json-v1`, `mcp-tool-v1` chỉ có thân thật khi có consumer thật. Herdr
+cần một *nền* protocol, không cần cả framework.
 
 **Verify nháp.** Một executor khai `invocations:[{via:"herdr"}]` resolve
 được thay vì throw; `node --test test/runner/dispatch.test.mjs` xanh.
@@ -534,7 +542,14 @@ dual-audit `provider`+`command` (D9 `tsk-5td`) cho `effective_target`.
 
 **D-ID áp dụng.** D2 (pha 8).
 
-**Quan hệ.** Độc lập với 7.3-7.6, cần 7.1 (chỗ đặt `governance` trong plan).
+**Quan hệ.** **KHÔNG phụ thuộc 7.1** (quyết định 2026-08-25): đây là lỗ
+policy/security đang sống, không phải refactor từ vựng — để nó nằm sau một
+refactor lớn là sai trade-off. Nó chỉ cần field đã có sẵn hôm nay
+(`providerModel`, `invocations[].command`, `invocations[].env`,
+`allowCrossProvider`, `carries`); 7.1 gấp kết quả vào `plan.governance`
+*sau*, không phải ngược lại. Assertion nằm ở file test riêng
+(`test/runner/egress-governance.test.mjs`) để không đụng footprint 7.1 —
+đó mới là dep-free thật, thay vì dep-free trên giấy rồi kẹt ở overlap gate.
 **Item này là thứ `tsk-5x7` supersede `tsk-2y7` để làm** — gap glm đã xác
 minh sống.
 
