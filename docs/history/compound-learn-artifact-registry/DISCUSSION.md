@@ -1281,11 +1281,14 @@ flowchart TD
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-**Viết vòng 10 (2026-08-25), viết lại lần hai cùng vòng** sau khi advisor ngoài
-đưa kế hoạch đầy đủ. Bản đầu của §7 (chín task T1-T9) thiếu hẳn **một lớp
-harness** — chỉ có `verify` từng task, không có cách đo xem việc này có thành
-công không. Bản này gộp: giữ phần phụ thuộc/footprint của bản đầu, lấy nguyên
-cấu trúc hai-track + harness layer + metrics của advisor.
+**Viết vòng 10 (2026-08-25), qua BA bản trong cùng vòng.** Bản 1 (chín task
+T1-T9) thiếu hẳn **lớp harness** — chỉ có `verify` từng task, không có cách đo
+xem việc này có thành công không. Bản 2 gộp kế hoạch advisor: hai track, harness
+layer, metrics. **Bản 3 (hiện tại)** sau khi session chỉ ra **cửa sổ hở** giữa
+migration và writer, advisor nhận rồi bịt kín hơn: thêm **gate ở producer verb**
+(A3b), trạng thái **`reserved`** (A1), **bootstrap-trước-enforce-sau**, và
+**canary làm cổng** (A6). Ba bản này giữ trong lịch sử git, không viết lại quá
+khứ.
 
 **Hai item đã tách ra ngoài, KHÔNG thuộc danh mục dưới đây:** `tsk-422` (thu
 chất liệu kể chuyện, D-tsk28x-12) và `tsk-o4f` (bug guard supersession, §3 D24).
@@ -1324,7 +1327,8 @@ Hai họ sự kiện tách bạch:
 
 ```
 topic.register  topic.rename  topic.split  topic.merge  topic.retire
-doc.register    doc.promote   doc.supersede  doc.retire  doc.path-move
+doc.reserve     doc.register  doc.mark-rendered  doc.promote
+doc.supersede   doc.retire    doc.path-move
 ```
 
 Core record:
@@ -1333,9 +1337,15 @@ Core record:
 topicId, purposeSlug, purposeTitle, entities[]
 lineage: splitFrom | mergedFrom | renamedFrom
 role, framework, mode
-docLifecycle: provisional | active | superseded | retired
+docLifecycle: reserved | provisional | active | superseded | retired
 currentPath, aliases[], sourceCaptureIds[]
 ```
+
+**`reserved` là vòng đời KỸ THUẬT có trước khi file tồn tại** (advisor, vòng 10):
+`doc.reserve(topicId, role, currentPath)` giữ slot `(topicId, role)` khi chưa có
+bài viết. Nó **không phải** `draft`, **không phải** `provisional`. Thiếu trạng
+thái này thì gate ở A3b khoá chết writer: gate đòi path phải có trong registry,
+mà tài liệu mới thì chưa tồn tại để đăng ký.
 
 **D-ID:** D-tsk28x-6 (event+verb), D-tsk28x-4 (ba toạ độ danh tính),
 D-tsk28x-14, D-tsk28x-15.
@@ -1398,6 +1408,77 @@ option "new doc id".**
 
 ---
 
+
+### A3b — `fgos compound` registry gate {#task-compound-registry-gate}
+
+**Đây là task chốt của cả kế hoạch.** Không được để *thứ tự triển khai* làm hàng
+rào — writer là **skill prose**, không gì cưỡng chế nó. Chặn ở **producer verb**,
+đúng khuôn D3 của `retrospective-doc-write-path` đã làm với `HEAD:<docPath>`.
+
+**Invariant mới:**
+
+```
+fgos compound --doc-path <path>   phải thoả CẢ BỐN:
+  1. <path> đã commit tại main HEAD              (đã có sẵn — D3)
+  2. doc registry enforcement đang bật
+  3. <path> là currentPath của một live doc slot trong registry
+  4. <path> KHÔNG chỉ là alias
+```
+
+**Điều kiện (4) là chỗ bịt kín, và là lỗ session không thấy.** Session chỉ đề
+xuất "từ chối path không có trong registry" — nhưng sau migration, alias **có**
+trong registry, nên skill cũ tự đặt lại đúng old path sẽ được resolver tha và
+sprawl quay lại qua chính cửa vừa khoá. **Alias chỉ dùng cho đọc/resolution lịch
+sử, không bao giờ để tag capture mới.**
+
+**Bootstrap — phải rõ, nếu không gate bật lên là gãy hết:**
+
+1. Tạo registry entry cho **toàn bộ corpus hiện tại** với `currentPath = oldPath`.
+2. **Rồi mới** bật `doc-registry.enforce`.
+
+Từ thời điểm đó, skill cũ muốn ghi path tự nghĩ ra sẽ bị `compound` **từ chối
+thẳng**, dù file có thật và đã commit. Bước 1 phải **idempotent, chạy lại được**
+— nó là một cuộc di trú metadata cho 268 tài liệu, không phải một lệnh chạy một
+lần rồi thôi.
+
+**`compound` không tự tạo registry row.** Nó chỉ kiểm path đã
+`reserved`/`registered`/`rendered` và đã commit. Việc tạo row là của `doc.reserve`.
+
+**Hai ràng buộc riêng của fgOS phải mang theo (session bổ sung):**
+
+- **`doc-registry.enforce` là một config default mới** ⇒ theo AGENTS.md § Install/
+  setup/doctor gate, nó **bắt buộc** đăng ký vào config-merge của `fgos setup`
+  và vào check registry của `fgos doctor` (`src/setup/checks.mjs`) — không được
+  đứng một mình, `doctor` không thấy.
+- **Thông điệp từ chối phải NÊU CÁCH SỬA**, đúng khuôn đã có trong repo
+  (`docs/explanation/fsm-refusal-messages-name-a-remedy...`): lời từ chối phải
+  trỏ thẳng `fgos doc reserve`, không chỉ báo "path không hợp lệ".
+
+**Luồng writer mới (thay hẳn "chọn quadrant + tự đặt path"):**
+
+```
+1. resolve topic + role
+2. cần doc mới  ->  doc.reserve(topicId, role, currentPath)
+3. write + commit file tại currentPath
+4. fgos compound --doc-path currentPath
+5. doc.mark-rendered -> provisional | active, theo policy
+```
+
+**Lỗ nhỏ còn hở, phải chốt trước khi thi công (session nêu):** *policy* ở bước 5
+chưa được định nghĩa. Đã biết: match chắc ⇒ grow (active), match yếu ⇒
+provisional. Nhưng một topic **do người đăng ký tường minh** thì rendered xong
+nên là `active` hay `provisional`? Chưa ai trả lời — để mở tới lúc thi công là
+mỗi phiên tự đoán một kiểu.
+
+**D-ID:** D-tsk28x-14, D-tsk28x-9, D-tsk28x-15.
+
+**Footprint:** `bin/fgos.mjs`, `src/state/`, `src/setup/checks.mjs`,
+`test/cli/`, `test/state/`.
+**Verify:** `node --test test/cli/fgos.test.mjs` (bộ test gate ở B2)
+
+
+---
+
 ### A4 — Compound writer đổi sang registry-first {#task-writer-skill}
 
 **Mục tiêu:** `fgos-coding-compounding` đổi từ *"chọn quadrant + tự đặt path"*
@@ -1420,15 +1501,14 @@ frontmatter (`framework: diataxis`, `mode: explanation`).
 
 **Tiền lệ nạp expertise:** `.agents/skills/_shared/`.
 
-> **PHẢN BIỆN CỦA SESSION — cửa sổ hở, phải đóng bằng CODE không bằng thứ tự.**
-> Kế hoạch advisor đặt A4 **sau** migration apply. Giữa lúc 268 file đã dời sang
-> layout mới và lúc writer biết đến registry, **mọi item chạy retrospective vẫn
-> ghi bằng logic tự-đặt-tên cũ** — chủ động đẻ sprawl mới vào đúng cấu trúc vừa
-> dọn. Không vá được bằng cách đảo thứ tự, vì writer là **skill (prose)**, không
-> gì cưỡng chế nó. **Đóng bằng verb:** `fgos compound` đã từ chối `--doc-path`
-> không resolve trong HEAD (retrospective-doc-write-path D3) — thêm một tầng:
-> **từ chối path không có trong registry**. Lúc đó skill cũ hay mới đều bị chặn
-> ở cửa ghi. Tầng chặn này thuộc A3, phải landed TRƯỚC B-migration-apply.
+> **Cửa sổ hở — ĐÃ ĐÓNG ở A3b (advisor nhận phản biện của session rồi đi xa
+> hơn).** Session chỉ ra: đặt A4 sau migration apply tạo một cửa sổ trong đó
+> file đã dời sang layout mới nhưng writer còn logic tự-đặt-tên cũ, tức đẻ
+> sprawl mới vào cấu trúc vừa dọn; và không vá được bằng đảo thứ tự vì writer
+> là prose. Advisor nhận, và bịt kín hơn đề xuất của session: thêm **điều kiện
+> alias-không-được-tag** (§A3b) — thiếu nó thì skill cũ tự đặt lại old path vẫn
+> lọt, vì alias CÓ trong registry. Kèm **bootstrap trước, enforce sau**, nên
+> cửa sổ biến mất hoàn toàn chứ không chỉ thu hẹp.
 
 **Footprint:** `.agents/skills/` + `.claude/skills/` mirror.
 **Verify:** một ca chạy thật trên một item, cộng khuôn
@@ -1449,6 +1529,36 @@ tiện nghi), D-tsk28x-8 (hai tầng dùng chung bộ máy, không chung vocabul
 
 **Footprint:** `src/report/`, `bin/fgos.mjs`.
 **Verify:** `node --test test/report/`
+
+---
+
+### A6 — Writer canary (cổng trước migration) {#task-writer-canary}
+
+**Mục tiêu:** chứng minh **writer MỚI biết registry**, không phải chỉ migration
+tooling biết registry. Nhỏ, riêng, **không lẫn vào fold 268 file**.
+
+**Vì sao cần:** advisor tách migration tooling khỏi writer skill — an toàn hơn
+(conservation của migration không nên phụ thuộc hành vi prose của một skill), và
+session nhận. Nhưng tách thì **mất phép thử dogfood đầu tiên của writer**. Canary
+là chỗ lấy lại nó.
+
+**Hình dạng:** một retrospective item thật, hoặc một fixture e2e chuyên dụng, đi
+qua **toàn bộ** đường writer mới:
+
+```
+topic register / doc.reserve
+write một doc MỚI trong layout mới
+compound tag THÀNH CÔNG — và thành công CHỈ VÌ registry có currentPath
+doc chuyển provisional | active
+doc-sources <currentPath> trả về capture
+docs-index hiện doc có registry đỡ lưng
+```
+
+**Là CỔNG, không phải bước tuỳ chọn:** migration (bước 9-10) **chỉ được chạy sau
+khi canary xanh**.
+
+**Footprint:** `test/e2e/`, hoặc `dogfood-fixture/` nếu làm fixture chuyên dụng.
+**Verify:** `node --test test/e2e/<writer-canary>.test.mjs`
 
 ---
 
@@ -1477,6 +1587,25 @@ wire vào chỗ nào tự chạy.**
 - `doc move-path` thêm alias, đổi `currentPath`
 - `doc promote` đổi `provisional → active`
 - **không command nào** tạo extra doc cùng role nếu không split topic
+
+**Bộ test riêng cho gate A3b (bắt buộc, đủ cả sáu):**
+
+```
+compound rejects committed path not in registry
+compound accepts registered currentPath committed at HEAD
+compound rejects ALIAS path for a new tag
+compound rejects registered path if not committed at HEAD
+compound rejects second active doc for same (topicId, role)
+doc.reserve is the ONLY way to hold a new path before the file exists
+```
+
+**Regression đóng đúng cửa sổ session chỉ ra:**
+
+```
+legacy writer tự đặt tên docs/explanation/new-random.md
+file được commit thật
+compound TỪ CHỐI vì path không phải registry currentPath
+```
 
 ### B3 — Integration harness {#task-harness-integration}
 
@@ -1526,25 +1655,31 @@ thảo luận này đã bảy lần trả giá cho việc tin vào thứ chưa �
 
 ## Thứ tự thi công
 
-**Không bắt đầu bằng move/fold.**
+**Không bắt đầu bằng move/fold.** Thứ tự dưới đây là bản advisor sửa lại ở vòng
+10 sau khi session chỉ ra cửa sổ hở — điểm khác cốt lõi: **gate + bootstrap +
+enforce đứng TRƯỚC mọi thứ đụng tới writer hay tới file**, nên không còn khoảnh
+khắc nào "đã dời layout nhưng writer còn cũ".
 
 ```
-1. A1 registry model + B1 invariant tests
-2. A2 resolver + alias tests
-3. A2' đổi doc-sources / docs-index  (+ B3)
-4. A3 verb + tầng CHẶN path-ngoài-registry  (+ B2)
-5. B5 doctor checks
-6. Dry-run classifier / inventory  (+ B4 conservation)
-7. Migration apply
-8. A4 compound writer registry-first
+ 1. Registry reducer + invariant tests            (A1 + B1)
+ 2. Resolver + alias read tests                   (A2 + B1)
+ 3. fgos compound registry gate — CHƯA bật        (A3b + B2)
+ 4. Bootstrap registry cho corpus hiện tại: currentPath = oldPath
+ 5. BẬT doc-registry.enforce
+ 6. Update doc-sources / docs-index qua resolver  (A2' + B3)
+ 7. Update writer skill sang registry-first       (A4)
+ 8. Chạy writer CANARY riêng                      (A6)  <-- cổng
+ 9. Migration dry-run                             (+ B4 conservation)
+10. Migration apply / fold
 ```
 
-**Điểm mấu chốt (advisor):** *resolver và harness phải có TRƯỚC migration. Nếu
-không, ta đang dời corpus khi chưa có bằng chứng rằng old capture vẫn tìm được
-nhà mới.*
+**Hai cổng cứng:** bước 5 phải xong trước bước 7 (không thì writer cũ vẫn ghi
+tự do); **bước 8 phải XANH trước bước 9** — migration chỉ chạy sau khi đã chứng
+minh writer mới thật sự biết registry.
 
-**Sửa của session:** tầng CHẶN ở bước 4 phải landed trước bước 7, để cửa sổ hở
-giữa bước 7 và 8 không đẻ sprawl mới (xem hộp phản biện ở A4).
+**Nguyên tắc advisor giữ nguyên:** *resolver và harness phải có TRƯỚC migration.
+Nếu không, ta đang dời corpus khi chưa có bằng chứng rằng old capture vẫn tìm
+được nhà mới.*
 
 ### Dry-run và apply
 
@@ -1585,11 +1720,12 @@ trước mỗi đợt. `docs/` tree bị dry-run + apply chạm — hai bước 
   (`herdr-web-dashboard` là area sống mang 20 quyết định mà thiếu trong danh sách).
 - **Giá trị ngưỡng** cho `doc-topic-oversized` — chờ classifier cho phân bố thật.
   Số 800 dòng chỉ là config công cụ của phiên, không phải luật repo.
-- **Phép thử dogfood riêng cho writer (A4)** — bản đầu §7 gộp việc fold vào
-  writer để lấy dogfood; advisor tách migration tooling khỏi writer, **an toàn
-  hơn** (conservation của migration không nên phụ thuộc hành vi prose của một
-  skill) và session nhận. Nhưng tách thì **mất phép thử đầu tiên của writer** —
-  cần một ca chạy thật riêng, không lẫn vào migration.
+- ~~Phép thử dogfood riêng cho writer~~ — **đã chia: A6 (writer canary)**, và là
+  CỔNG cứng trước migration, không phải việc tuỳ chọn.
+- **Policy `doc.mark-rendered → provisional | active`** — chưa định nghĩa. Đã
+  biết: match chắc ⇒ grow/active, match yếu ⇒ provisional. Nhưng một topic **do
+  người đăng ký tường minh** thì rendered xong nên là `active` hay `provisional`?
+  Để mở tới lúc thi công là mỗi phiên tự đoán một kiểu (§A3b).
 
 ---
 
