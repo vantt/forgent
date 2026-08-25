@@ -2014,7 +2014,7 @@ export function rebuild(dir) {
 export function appendKnowledgeEvent(dir, type, payload) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const event = { type, payload, ts: Date.now() };
     applyKnowledgeEvent(before, event);
     appendEventLocked(logPath, { type, payload });
