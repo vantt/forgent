@@ -309,23 +309,52 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');
   }
 
-  // Cross-provider governance (D2/D3, tsk-32n): exempts ONLY the
-  // agentType-resolved path (`buildAgentTypeExecutor` always reuses the
-  // global `cfg.executor.command`, always Claude in practice, so the
-  // check below is already inert for it) — never a broad `kind` exemption.
-  // Pre-tsk-in1-4 this read `executor.kind !== 'task'`; `'task'` is no
-  // longer a legal `kind` value at all (D5: `kind` is `agent`/`tool` now,
-  // orthogonal to invocation `via`), and a `kind:"agent"` executor like
-  // `agy` dispatched via its own `via:"cli"` invocation MUST still clear
-  // this gate — that is exactly what `allowCrossProvider` already governs
-  // for it today.
-  if (executorEntry && !resolvedViaAgentType && !CLAUDE_CLI_COMMANDS.includes(executor.command) && executorEntry.allowCrossProvider !== true) {
+  // Declared egress & Cross-provider governance (D1/D2/D6):
+  // Inspect providerFamily and effective egress {kind, target, content}.
+  // An env override (e.g. ANTHROPIC_BASE_URL, OPENAI_BASE_URL, BASE_URL)
+  // or a non-Claude command/provider routes egress to a cross-provider backend.
+  const envBlock = executor.env ?? cliInvocation?.env ?? executorEntry?.env;
+  const envTarget = envBlock?.ANTHROPIC_BASE_URL || envBlock?.OPENAI_BASE_URL || envBlock?.BASE_URL;
+  const isEnvUrlOverride = typeof envTarget === 'string' && envTarget.trim().length > 0 && !envTarget.includes('api.anthropic.com');
+
+  const providerFamily =
+    typeof executorEntry?.providerModel === 'string' && executorEntry.providerModel.trim()
+      ? executorEntry.providerModel
+      : typeof executorEntry?.provider === 'string' && executorEntry.provider.trim()
+        ? executorEntry.provider
+        : CLAUDE_CLI_COMMANDS.includes(executor.command)
+          ? 'claude'
+          : executor.command;
+
+  const egressTarget = isEnvUrlOverride ? envTarget : executor.command;
+
+  const isCrossProvider =
+    isEnvUrlOverride ||
+    !CLAUDE_CLI_COMMANDS.includes(executor.command) ||
+    (executorEntry?.providerModel !== undefined && executorEntry.providerModel !== 'claude');
+
+  const egressKind = isCrossProvider ? 'cross-provider' : 'same-provider';
+  const egressContent = executorEntry?.carries ?? contentCarries ?? 'repo-content';
+
+  const governance = {
+    providerFamily,
+    egress: {
+      kind: egressKind,
+      target: egressTarget,
+      content: egressContent,
+    },
+  };
+
+  if (executorEntry && !resolvedViaAgentType && egressKind === 'cross-provider' && executorEntry.allowCrossProvider !== true) {
     const remediationId = realExecutorId && realExecutorId !== executorId ? realExecutorId : executorId;
     const resolvedNote = realExecutorId && realExecutorId !== executorId ? ` (resolved via capabilities."${executorId}".prefer to executor "${realExecutorId}")` : '';
     throw new RunnerConfigError(
-      `executor "${executorId}"${resolvedNote} resolves to non-Claude command "${executor.command}" — prompt content would leave the Claude ecosystem. Set executors.${remediationId}.allowCrossProvider: true to permit this.`,
+      `executor "${executorId}"${resolvedNote} resolves to cross-provider egress target "${egressTarget}" — prompt content would leave the Claude ecosystem. Set executors.${remediationId}.allowCrossProvider: true to permit this.`,
     );
   }
 
-  return executor;
+  return {
+    ...executor,
+    governance,
+  };
 }
