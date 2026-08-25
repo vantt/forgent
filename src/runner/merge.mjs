@@ -809,9 +809,12 @@ export async function withMergeTargetSlot(lockRoot, targetRef, fn) {
 
   runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { commitEnv: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
 
-  const heartbeatStatus = { status: 'renewed' };
+  const heartbeatStatus = {
+    status: 'renewed',
+    renew: () => renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile }),
+  };
   const heartbeat = setInterval(() => {
-    const res = renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
+    const res = heartbeatStatus.renew();
     if (res.status !== 'renewed') {
       heartbeatStatus.status = res.status;
     }
@@ -947,9 +950,12 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
   // tick. Cleared in the same `finally` that already releases the lock —
   // covers every exit path (success, verify-fail, a thrown exception)
   // exactly like `lock.release()` already does.
-  const heartbeatStatus = { status: 'renewed' };
+  const heartbeatStatus = {
+    status: 'renewed',
+    renew: () => renewMainCheckoutLockIfOwn(fgosDir, identity),
+  };
   const heartbeat = setInterval(() => {
-    const res = renewMainCheckoutLockIfOwn(fgosDir, identity);
+    const res = heartbeatStatus.renew();
     if (res.status !== 'renewed') {
       heartbeatStatus.status = res.status;
     }
@@ -1503,12 +1509,21 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
 
   // tsk-2qp: if the lock heartbeat lapsed mid-merge (e.g. renewal returned
   // not-owner, ambiguous, or no-lock because another session reclaimed), do
-  // NOT execute `git commit`. Return `lock-lost-mid-merge` without calling
-  // `abortMergeIfPossible` — the tree state legitimately belongs to the new
-  // lock holder, so tearing it up would cause data loss.
+  // NOT execute `git commit`. Also renew synchronously here: timer ticks are
+  // best-effort scheduling, and the final ownership check must not depend on
+  // a background interval firing between verify completion and commit.
+  // Return `lock-lost-mid-merge` without calling `abortMergeIfPossible` —
+  // the tree state legitimately belongs to the new lock holder, so tearing
+  // it up would cause data loss.
   const heartbeatStatus = heartbeatStorage.getStore();
-  if (heartbeatStatus && heartbeatStatus.status !== 'renewed') {
-    return { outcome: 'lock-lost-mid-merge', branch };
+  if (heartbeatStatus) {
+    const res = heartbeatStatus.renew();
+    if (res.status !== 'renewed') {
+      heartbeatStatus.status = res.status;
+    }
+    if (heartbeatStatus.status !== 'renewed') {
+      return { outcome: 'lock-lost-mid-merge', branch };
+    }
   }
 
   try {

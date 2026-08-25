@@ -52,6 +52,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `mergeRunnerItem` now performs an ownership-checked lock renewal synchronously
+  after verify/invariant checks and before `git commit`, so a lost merge lock
+  is caught deterministically as `lock-lost-mid-merge` instead of depending on
+  a background heartbeat timer firing in time.
 - `fgos pick`/`fgos take` (`claimWork`, `src/runner/claim-port.mjs`) now
   self-heal an `AMBIGUOUS` `.fgos/main-checkout.lock` (unparseable content)
   inline: it calls the same `forceReclaimAmbiguousLock` the `unlock` verb

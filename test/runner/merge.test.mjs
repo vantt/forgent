@@ -616,35 +616,30 @@ test('mergeRunnerItem reports "merge-blocked-other-item" (not "conflict") and ne
   assert.equal(fs.existsSync(path.join(repoRoot, 'newfile.txt')), false, 'demo-item\'s own merge must never have been attempted');
 });
 
-test('mergeRunnerItem reports "lock-lost-mid-merge" when heartbeat renewal fails before commit and never calls abortMergeIfPossible', async () => {
+test('mergeRunnerItem reports "lock-lost-mid-merge" when final lock renewal fails before commit and never calls abortMergeIfPossible', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'newfile.txt', 'clean-content\n');
 
-  // Override heartbeat interval so ticks run rapidly during the test goalCheck
-  process.env.FGOS_HEARTBEAT_INTERVAL_MS = '10';
+  const headBefore = headOf(repoRoot);
 
-  try {
-    const headBefore = headOf(repoRoot);
+  // Goal check script that simulates another session reclaiming the lock
+  // mid-hold. mergeRunnerItem's final synchronous renewal must notice this
+  // before commit; the assertion must not depend on a timer tick happening
+  // during a fixed wall-clock window.
+  const lockPath = path.join(repoRoot, '.fgos', 'main-checkout.lock');
+  const lockOverwriter = `node -e "require('fs').writeFileSync('${lockPath}', JSON.stringify({pid: 999999, ts: Date.now()}))"`;
 
-    // Goal check script that simulates another session reclaiming the lock mid-hold,
-    // then pauses briefly to guarantee a heartbeat tick executes and sees the change.
-    const lockPath = path.join(repoRoot, '.fgos', 'main-checkout.lock');
-    const lockOverwriter = `node -e "require('fs').writeFileSync('${lockPath}', JSON.stringify({pid: 999999, ts: Date.now()})); const end = Date.now() + 50; while (Date.now() < end) {}"`;
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: lockOverwriter }));
 
-    const result = await mergeRunnerItem(repoRoot, makeItem({ verify: lockOverwriter }));
+  assert.equal(result.outcome, 'lock-lost-mid-merge');
+  assert.equal(result.branch, 'fgw/demo-item');
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged (no commit landed)');
 
-    assert.equal(result.outcome, 'lock-lost-mid-merge');
-    assert.equal(result.branch, 'fgw/demo-item');
-    assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged (no commit landed)');
-
-    // Verify abortMergeIfPossible was NOT called: staged merge changes still remain on disk
-    assert.doesNotThrow(
-      () => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']),
-      'MERGE_HEAD must survive untouched because abortMergeIfPossible was not called',
-    );
-  } finally {
-    delete process.env.FGOS_HEARTBEAT_INTERVAL_MS;
-  }
+  // Verify abortMergeIfPossible was NOT called: staged merge changes still remain on disk
+  assert.doesNotThrow(
+    () => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']),
+    'MERGE_HEAD must survive untouched because abortMergeIfPossible was not called',
+  );
 });
 
 // --- mergeRunnerItem: decision-ID collision auto-resolve (tsk-3mv-1 D1a) ---

@@ -89,18 +89,20 @@ separate, already-tuned consumer and was deliberately left untouched.
 ## The heartbeat closes the read side; the release side had its own gap (tsk-22c)
 
 The heartbeat above stops a genuinely-still-working holder's lock from
-*looking* abandoned. It does not, by itself, stop what happens when the
-TTL lapses anyway — a real ~185s hold outrunning the ~180s TTL, the exact
+*looking* abandoned. It does not, by itself, stop what happens when the TTL
+lapses anyway — a real ~185s hold outrunning the ~180s TTL, the exact
 measurement this doc's own bug section cites — and a second session
-legitimately reclaims the lock mid-merge. The first session's own code
-keeps running (this doc's "Outstanding" gap, still open: the heartbeat's
-own return value is discarded at `merge.mjs:793`/`912`, so a renewal
-failure is never noticed or acted on). When that first session eventually
-finishes and calls `lock.release()`, the release closure
+legitimately reclaims the lock mid-merge. The first session's old release
+path could still run after that loss and call `lock.release()`, whose closure
 (`main-checkout-lock.mjs`'s own `release()`, what `lock.release()`
 everywhere actually calls) used to call the unconditional
 `releaseMainCheckoutLock` — a blind unlink of whatever lock file is
 present at that moment, with no check for who currently owns it.
+
+The remaining action-side gap is now closed separately: before committing,
+merge approval performs one synchronous ownership-checked renewal and reports
+`lock-lost-mid-merge` if that final check shows the caller no longer owns the
+lock.
 
 That is a second, independent bug from the read-side TOCTOU race this
 doc's sibling (`main-checkout-lock-toctou-race.md`) fixes: not a torn
@@ -146,15 +148,12 @@ work done in between, so no TTL-lapse window exists there; the
 unconditional unlink is that verb's actual, correct intent (force-clear),
 not an instance of this bug.
 
-**What stayed open.** Two things this fix does not close: (1) a sibling
-self-recognition gap (`acquireMainCheckoutLock` at `merge.mjs:886` leaves
-`allowSelfRecognition` at its default `true`, unlike `withMergeTargetSlot`
-which an earlier item set to `false` — two OS processes sharing one
-inherited session id can still read as "the same writer") needs an actual
-identity-model decision from a person, not a mechanical swap; and (2) the
-heartbeat's own renewal-failure return value is still discarded, so a
-session that silently loses the lock mid-hold keeps running its
-remaining git operations unprotected — this fix only stops that session
-from destroying the *new* legitimate holder's record on its own exit, it
-does not stop the underlying double-writer window once the TTL has
-already lapsed.
+**What stayed open, and what is now closed.** The sibling self-recognition
+gap is still separate: two operating-system processes sharing one inherited
+session id can read as "the same writer" unless the caller uses a numeric
+process identity for that lock family. The renewal-failure gap is closed:
+merge approval now checks the heartbeat result and also performs one
+ownership-checked renewal synchronously after verify/invariant checks and
+before commit. If that final renewal returns `not-owner`, `ambiguous`, or
+`no-lock`, approval reports `lock-lost-mid-merge` and leaves the staged merge
+state intact instead of committing or aborting someone else's tree state.
