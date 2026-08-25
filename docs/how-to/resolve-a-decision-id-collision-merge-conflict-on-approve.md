@@ -114,6 +114,42 @@ landed the merge cleanly on the next attempt.
 > `{"id":"tsk-66l","predicted":{"tier":"light","deps":0,"priorVisits":0,"role":"session","headAtTake":"d82a3336aaa9bfeb1365070e42c7b981ccba20d5"},"actual":{"outcome":"awaiting-approval","passed":true,"attempts":1,"errorClass":null,"aheadCount":5}}`
 > — real `work.outcome` capture, id `tsk-66l` (the eventual successful outcome)
 
+## Second real example: caught by a post-merge audit, not at approve time
+
+`tsk-60r4` (a scoped post-merge audit of the `tsk-2t9c`/`tsk-2t9c-1/2/3`/
+`tsk-3vk`/`tsk-ogx` cluster landed 2026-08-16) found the same class of
+collision, but in a shape this doc's step-2 recipe doesn't directly cover:
+`docs/decisions/0032-iron-law-...md` (the Iron Law trunk-boundary decision)
+and `docs/decisions/0032-multi-role-team-harness-...md` had both been
+created independently, on different branches, both claiming `0032`. This
+did NOT surface as a blocked `fgos approve` the way `tsk-66l`'s did —
+because the two branches' merges into `main` also had *other*, real
+file conflicts at the same time (`CHANGELOG.md`, `bin/fgos.mjs`,
+`docs/specs/distribution.md`, `src/setup/registrations.mjs`,
+`test/setup/checks.test.mjs`, from the concurrent `tsk-in1` `kind`/`via`
+vocabulary migration touching the same files). A multi-file conflict
+resolved entirely by hand is exactly the shape the auto-resolver in
+`docs/explanation/merge-auto-resolves-decision-id-collision.md` declines
+to touch (its own precondition requires the *only* conflicted path to be
+the index file) — so the collision landed silently, resolved by whichever
+side the person doing the manual multi-file resolve happened to keep, and
+was only caught later by a dedicated post-merge audit item.
+
+The fix followed the same rule as always — renumber the file with zero
+existing citations (`rg` across the repo confirmed `0032` was never cited
+pointing at the multi-role file; every existing `0032` reference meant Iron
+Law), renamed it to `0033`, added the missing index row. The same audit
+also caught a second, related error introduced by the same manual
+multi-file resolve: a duplicated CHANGELOG bullet under two different
+`## Added` headings, one contributed by each of the two merging branches.
+
+**The lesson this adds**: a decision-ID collision doesn't only show up as
+a blocked `approve` — when it rides along inside a larger multi-file merge
+conflict that a person has to resolve by hand, it can land silently, and a
+follow-up audit (not a mechanical check) is what catches it. Treat any
+large hand-resolved multi-file merge as worth a `docs/decisions/`
+grep-for-duplicate-number sweep afterward, not just a green `npm test`.
+
 ## Related
 
 - `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md` — the
