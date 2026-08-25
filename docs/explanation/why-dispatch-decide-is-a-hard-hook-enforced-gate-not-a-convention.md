@@ -315,6 +315,42 @@ work (e.g. `tsk-4dk-1`'s own retrospective/cleanup sweep) has to work
 around by explicitly exiting worktree isolation for operations that must
 run from the main checkout.
 
+## Scope boundary: a raw tool call mid-turn (e.g. `WebSearch`) is not a dispatch at all
+
+`tsk-3k4` investigated a real observed gap: `fgos-coding-shaping` ran
+`WebSearch` five times back-to-back with no `decide` call anywhere in that
+sequence, while `AGENTS.md`'s Dispatch section reads as if it covers "any
+task dispatched out of the current turn." Five converging pieces of
+evidence, all traced directly rather than assumed, confirmed this is
+working as intended, not a gap:
+
+1. The hook's matcher (`Agent|Task`, `test/setup/claude-code-hooks.test.mjs`)
+   is a literal regex over two tool names — mechanically incapable of
+   firing on `WebSearch` or anything else.
+2. The hook's own design (`tsk-60f`'s plan) was built specifically around
+   the Agent/Task tool's `subagent_type` field — there is no code path that
+   could generalize to a tool call with no such field.
+3. `dispatch.mjs`'s own scope (its file header) answers one question —
+   should a *spawn* run in-process or out-of-process — never "should this
+   tool call happen." A `WebSearch` call is not a spawn: no new process, no
+   capacity, architecturally the same category as `Read`/`Grep`/`Bash`,
+   none of which are gated through `decide` either.
+4. The shared dispatch-reasoning fragment every skill consults names
+   exactly four valid reasons to dispatch instead of working inline
+   (`docs/history/two-layer-dispatch/DISCUSSION.md` D2) — a single
+   `WebSearch` call inside a skill's own reasoning is "doing it inline,"
+   not a separate step being handed to anyone.
+5. The closest real precedent — organized multi-branch research fan-out in
+   `fgos-researching` — was already explicitly decided to bypass `decide`
+   on purpose (`tsk-5tm-2` D6): native Task-tool dispatch, no purpose
+   check, no round trip, because read-only/no-file-write "gather packet"
+   work is a named category that never needed dispatch coordination in the
+   first place.
+
+The fix landed was a one-paragraph clarification added to the shared
+dispatch fragment (both mirrors) making this boundary explicit for future
+readers — no code change, since nothing was actually broken.
+
 ## A closing rename: "capacity" became "executor"
 
 Every decision quoted above uses "capacity"/`capacities` because that was
