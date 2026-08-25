@@ -206,6 +206,13 @@ work, only the config entry. The proof ran entirely against a scratch
 every other coding item's real headless dispatch) was never touched or put
 at risk while proving this.
 
+A follow-up (`tsk-52z`) re-proved the same path against the now-real, live
+`fgos-coding-implement` capacity — this time also confirming `tsk-129`'s
+live-tee progress line actually prints to screen before `agy`'s final
+result, both pieces working together for a real `code-implement` step, no
+scratch fixture needed this time since the capacity was by then real
+config.
+
 ## A configured cli-spawn capacity beats a live soul — config wins, not "I can just do it myself"
 
 `tsk-1m8`'s live proof surfaced a real gap the moment it was tried against
