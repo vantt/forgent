@@ -225,3 +225,13 @@ readers at today (`fgos decision-index`) — is real: the `docs/decisions/`
 directory itself persists (mirroring the upstream project's own standing
 exemption for a directory that would otherwise be retired), but the only
 file inside it is that one generated index.
+
+**The actual read side closed the loop this doc opened (`tsk-1lv-3`).**
+This document's own earlier section ("What deliberately stays out of
+scope here") named wiring a skill to actually read `state.decisions`
+instead of hand-typed `CONTEXT.md` prose as `tsk-1ud`'s deferred payoff.
+This item is that wiring: `CONTEXT.md`'s Locked-Decisions table now
+renders from `state.decisions` itself, applied to all three skills that
+write a `CONTEXT.md` (`fgos-coding-exploring`, `fgos-coding-planning`,
+`fgos-coding-shaping`), not just the one `tsk-1ud` had originally scoped
+for.
