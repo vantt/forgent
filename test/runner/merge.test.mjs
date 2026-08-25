@@ -1828,6 +1828,59 @@ test('mergeRunnerItem merges cleanly when a .fgos/ path is unchanged on the bran
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
+// tsk-28x (second regression from the same live failure): the restore
+// loop must resolve its "unchanged since take" reference point from
+// `item.lastAttempt.branchHeadAtTake` when present, never the top-level
+// `item.branchHeadAtTake` alone. Post-tsk-40m, claim time no longer
+// writes a durable work.move(->doing) leg, so the top-level field goes
+// stale forever after an item's first-ever claim while `lastAttempt`
+// keeps refreshing on every real claim cycle. A top-level field frozen
+// at a commit from BEFORE the branch even started its real work makes
+// `isUnchangedSinceBranchHeadAtTake` see false drift on every .fgos/
+// path (real work landed between the stale sha and branchHeadAtTake),
+// permanently defeating the restore this whole mechanism exists to do --
+// confirmed live: tsk-28x's own top-level branchHeadAtTake was still
+// its original 2026-08-11 claim commit, weeks before any of its real
+// 12-phase implementation.
+test('mergeRunnerItem prefers item.lastAttempt.branchHeadAtTake over a stale top-level branchHeadAtTake when resolving whether a .fgos/ path is unchanged (tsk-28x)', async () => {
+  const repoRoot = initRepo();
+  const configRelPath = path.join('.fgos', 'config.json');
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  const seedContent = '{\n  "version": 1\n}\n';
+  fs.writeFileSync(path.join(repoRoot, configRelPath), seedContent);
+  git(repoRoot, ['add', configRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .fgos/config.json on main']);
+  const staleTakeCommit = headOf(repoRoot); // stands in for a weeks-old first claim
+
+  // Branch's REAL work starts later, well after staleTakeCommit -- this
+  // is the commit lastAttempt.branchHeadAtTake would actually carry after
+  // a real re-claim, unlike the frozen top-level field.
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  fs.writeFileSync(path.join(repoRoot, 'unrelated-earlier-work.txt'), 'ok\n');
+  git(repoRoot, ['add', 'unrelated-earlier-work.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'unrelated earlier commit on the branch, after the stale take point']);
+  const freshTakeCommit = headOf(repoRoot);
+  fs.writeFileSync(path.join(repoRoot, 'produced.txt'), 'ok\n');
+  git(repoRoot, ['add', 'produced.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'worker produces its own file']);
+  git(repoRoot, ['checkout', 'main']);
+
+  // Main untracks the path entirely, same one-sided-deletion shape as the
+  // first tsk-28x test above.
+  git(repoRoot, ['rm', '-q', configRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main migrates diagnostic file out of .fgos/ root']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({
+    verify: 'test -f produced.txt',
+    branchHeadAtTake: staleTakeCommit, // stale top-level field (real bug shape)
+    lastAttempt: { branchHeadAtTake: freshTakeCommit }, // the correct, fresh reference point
+  }));
+  assert.equal(result.outcome, 'merged', `expected a clean merge using lastAttempt's fresh take point, got: ${JSON.stringify(result)}`);
+  assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
+  assert.equal(fs.existsSync(path.join(repoRoot, configRelPath)), false, 'main\'s own deletion must survive unaffected');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
 // tsk-4gi: a NON-union `.fgos/` path (e.g. `.fgos/config.json`, no
 // `merge=union` entry) that already exists on target's HEAD and gets edited
 // on non-overlapping lines by both the worker branch and target auto-merges

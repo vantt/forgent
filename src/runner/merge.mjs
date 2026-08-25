@@ -1427,8 +1427,26 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
     .filter((p) => p !== '');
   let fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
   if (fgosPaths.length > 0) {
+    // tsk-28x: prefer `item.lastAttempt.branchHeadAtTake` over the
+    // top-level `item.branchHeadAtTake` -- tsk-40m's own claim redesign
+    // (docs/architect/doing-coordination-redesign.md §7.2/§9.2) stopped
+    // writing a durable work.move(->doing) leg at claim time, so the
+    // top-level field is now frozen at whatever it last was (often the
+    // item's very first-ever claim, potentially weeks stale for an item
+    // re-picked multiple times) while `lastAttempt` is the one field
+    // every claim genuinely refreshes. Using the stale top-level value
+    // here made `isUnchangedSinceBranchHeadAtTake` compare against an
+    // ancient commit, so it (wrongly) found real, unrelated drift for
+    // every .fgos/ path and never restored any of them -- confirmed live
+    // on tsk-28x itself. Same fallback shape `checkMergeStillResolves`
+    // (cleanup-harness.mjs) already established for this exact migration
+    // gap, just prioritized the other way: THIS check specifically wants
+    // the freshest known take point, so `lastAttempt` (when present)
+    // always wins over the top-level field, never merely a fallback for
+    // when it's absent.
+    const effectiveBranchHeadAtTake = item.lastAttempt?.branchHeadAtTake ?? item.branchHeadAtTake;
     for (const fgosPath of fgosPaths) {
-      const unchangedOnBranch = isUnchangedSinceBranchHeadAtTake(repoRoot, branch, fgosPath, item.branchHeadAtTake);
+      const unchangedOnBranch = isUnchangedSinceBranchHeadAtTake(repoRoot, branch, fgosPath, effectiveBranchHeadAtTake);
       if (!isMergeUnionPath(repoRoot, fgosPath) && !unchangedOnBranch) {
         continue;
       }
