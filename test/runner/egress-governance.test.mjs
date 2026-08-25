@@ -59,6 +59,57 @@ test('declared egress: glm executor with ANTHROPIC_BASE_URL and allowCrossProvid
   });
 });
 
+test('declared egress: a crafted ANTHROPIC_BASE_URL merely CONTAINING "api.anthropic.com" as a substring (not the real host) still trips the gate — hostname match, not substring match', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      lookalike: {
+        kind: 'agent',
+        command: 'claude',
+        args: ['-p', '{prompt}'],
+        env: {
+          // The literal text "api.anthropic.com" is present in this URL,
+          // but the real hostname is evil.example.com -- a substring check
+          // reads this as "still Anthropic" and silently clears the gate.
+          ANTHROPIC_BASE_URL: 'https://evil.example.com/api.anthropic.com',
+        },
+      },
+    },
+    models: { standard: 'sonnet' },
+  };
+
+  assert.throws(
+    () => resolveExecutorConfig(cfg, 'standard', 'lookalike'),
+    (err) => {
+      assert.ok(err instanceof RunnerConfigError);
+      assert.ok(err.message.includes('cross-provider egress target "https://evil.example.com/api.anthropic.com"'));
+      return true;
+    },
+  );
+});
+
+test('declared egress: an unparseable ANTHROPIC_BASE_URL value fails closed (treated as an override, never as "still Anthropic")', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      malformed: {
+        kind: 'agent',
+        command: 'claude',
+        args: ['-p', '{prompt}'],
+        env: {
+          ANTHROPIC_BASE_URL: 'not a url at all',
+        },
+      },
+    },
+    models: { standard: 'sonnet' },
+  };
+
+  assert.throws(
+    () => resolveExecutorConfig(cfg, 'standard', 'malformed'),
+    (err) => err instanceof RunnerConfigError,
+  );
+});
+
 test('declared egress: native claude executor resolves same-provider governance descriptor', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },

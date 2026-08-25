@@ -315,7 +315,24 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
   // or a non-Claude command/provider routes egress to a cross-provider backend.
   const envBlock = executor.env ?? cliInvocation?.env ?? executorEntry?.env;
   const envTarget = envBlock?.ANTHROPIC_BASE_URL || envBlock?.OPENAI_BASE_URL || envBlock?.BASE_URL;
-  const isEnvUrlOverride = typeof envTarget === 'string' && envTarget.trim().length > 0 && !envTarget.includes('api.anthropic.com');
+  // Security review finding (self-review, 2026-08-25): a substring check
+  // (`envTarget.includes('api.anthropic.com')`) is bypassable by any URL
+  // that merely CONTAINS that literal text anywhere — a path segment
+  // (`https://evil.example.com/api.anthropic.com`), a query param, or a
+  // subdomain-lookalike host all read as "same-provider" under a substring
+  // test, silently clearing the cross-provider gate this check exists to
+  // enforce. Real hostname comparison, fail-closed: an unparseable URL is
+  // never trusted as "still Anthropic" — it counts as an override, same as
+  // any other non-matching host.
+  const isAnthropicApiHost = (urlString) => {
+    try {
+      const { hostname } = new URL(urlString);
+      return hostname === 'api.anthropic.com' || hostname.endsWith('.api.anthropic.com');
+    } catch {
+      return false;
+    }
+  };
+  const isEnvUrlOverride = typeof envTarget === 'string' && envTarget.trim().length > 0 && !isAnthropicApiHost(envTarget);
 
   const providerFamily =
     typeof executorEntry?.providerModel === 'string' && executorEntry.providerModel.trim()
