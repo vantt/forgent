@@ -253,3 +253,29 @@ iteration already runs), never gating `fgos approve` and never touching
 any skill's own prose — applied to every item in the batch uniformly,
 with no risk-tier exemption (D11: doc-rot doesn't distinguish tier, so
 neither does the check).
+
+**Find-before-create shipped as `authoritative-match` (`tsk-1lv-6`)** —
+the `fgos authoritative-match --quadrant <quadrant> --topic <topic>`
+command a retrospective synthesis runs before deciding whether to grow an
+existing Diataxis document or create a new one, used throughout every
+doc-synthesis capture cited in this document (and its siblings). D8's own
+two-layer design is why this exists as a callable command rather than a
+gate: the doctrine half (`fgos-coding-compounding`'s own step 3 telling a
+session to check `authoritative_for` by topic before choosing a path) and
+the harness backstop half (the mechanical check this command performs)
+are separate, deliberately never fused into one live gate function called
+at write time — the repo's own precedent for that trap is named directly:
+an upstream project built exactly that (`scribingTarget()`) and later
+abandoned it as dead surface. D12 shapes the matching itself as
+skeleton-match (normalize/lowercase/accent-strip/confusable-fold/
+punctuation-collapse string comparison, not real semantic search — the
+upstream precedent's own admission that even their more advanced layer
+still groups by skeleton, never embeddings), implemented as a swappable
+port/adapter (mirroring the existing `CTR009 executor.v1` contract shape
+already in the repo) specifically so a future, smarter matching strategy
+could replace it without any caller needing to change. D6 is the other
+half of this same piece: `fgos-coding-compounding`'s previously-absolute
+"never delete, shorten, restructure" rule was loosened to allow reconciling
+prose a newly gathered capture genuinely contradicts — a targeted
+correction, never a license to prune content the new capture doesn't
+actually contradict.
