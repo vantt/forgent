@@ -175,26 +175,54 @@ export function compileDispatchPlan(
   // computes for every actual dispatch. A canonical DispatchPlan exists to
   // describe what execution will ACTUALLY do, so it reuses the exact same
   // resolution function `resolveExecutorCommand` calls, rather than
-  // re-deriving a second, drifting approximation of it. Caught and
-  // gracefully degraded (never lets `decide` itself start throwing for a
-  // call that previously succeeded): a governance-blocked executor or an
-  // mcp-only one (no `via:"cli"` invocation at all, e.g. gitnexus, exactly
-  // the case an mcp handback above may already be reporting) is a real
-  // resolution failure this preview reports as "unknown" rather than
-  // crashing on — the throw itself only ever matters at actual dispatch
-  // time, which resolveExecutorCommand still enforces unconditionally.
+  // re-deriving a second, drifting approximation of it.
+  //
+  // Second-round advisor finding (real, 2026-08-25): the first cut of this
+  // fix caught a `resolveExecutorConfig` throw and quietly degraded to
+  // `governance: null` while STILL returning `mechanism: "out-of-process",
+  // configured: true` -- a governance-blocked executor (cross-provider,
+  // no `allowCrossProvider`) would preview as dispatchable when the real
+  // `execute` call for the exact same executorId would refuse it outright.
+  // That is a preflight lying about the one gate it exists to describe.
+  //
+  // Only ATTEMPT real resolution when `finalMechanism === 'out-of-process'`
+  // -- an `in-process` result (native Task/Agent, or the mcp-handback
+  // branch just above) never runs through `resolveExecutorCommand`'s cli
+  // path at all, so an mcp-only executor (no `via:"cli"` invocation, e.g.
+  // gitnexus) throwing here is not a real blocker for THAT dispatch, only
+  // for a cli one this plan was never going to take. When the mechanism
+  // really is `out-of-process` and resolution still fails, that failure is
+  // real and this plan must say so -- never silently report a working
+  // mechanism while hiding why execution would actually refuse it.
   let resolvedForDispatch;
-  try {
-    resolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, agentType);
-  } catch {
-    resolvedForDispatch = undefined;
+  let resolveError;
+  if (finalMechanism === 'out-of-process') {
+    try {
+      resolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, agentType);
+    } catch (err) {
+      resolveError = err;
+    }
   }
 
-  const invocation = {
-    via: 'cli',
-    adapter: resolvedForDispatch?.adapter ?? executor?.adapter ?? 'cli-spawn',
-    protocol: 'prompt-stdout-v1',
-  };
+  if (finalMechanism === 'out-of-process' && !resolvedForDispatch) {
+    reasonCodes.push('governance.blocked');
+    return {
+      selector,
+      caller: callerObj,
+      mechanism: 'unavailable',
+      executorId,
+      capability,
+      invocation: null,
+      governance: { providerFamily: null, egress: null },
+      reasonCodes,
+      configured: false,
+      blockedReason: resolveError?.message ?? null,
+    };
+  }
+
+  const invocation = resolvedForDispatch
+    ? { via: 'cli', adapter: resolvedForDispatch.adapter ?? executor?.adapter ?? 'cli-spawn', protocol: 'prompt-stdout-v1' }
+    : null;
 
   const governance = resolvedForDispatch?.governance ?? { providerFamily: null, egress: null };
 
