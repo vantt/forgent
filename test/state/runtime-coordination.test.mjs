@@ -3,9 +3,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { fork } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, StoreError } from '../../src/state/store.mjs';
 import { acquireClaim, releaseClaim, readClaim, readClaims, buildEffectiveView, getItemDurableRevision, ClaimError } from '../../src/state/runtime-coordination.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+
+const STORE_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs');
 
 function makeTmpDir() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claim-test-'));
@@ -222,6 +226,93 @@ test('readClaim returns null only for a genuinely missing claim file, and fails 
     () => readClaim(dir, 'tsk-1'),
     (err) => err instanceof ClaimError && err.category === 'corrupt-log',
   );
+});
+
+// tsk-40m code-review finding (blocker, TOCTOU race): settleClaim validated
+// the active claim (claimId/writerId/preClaimStatus/preClaimRevision)
+// BEFORE acquiring events.lock. Waiting for that lock (held by any other
+// writer, real cross-process contention) is unbounded — long enough for a
+// stale-claim reclaim to release THIS claim and hand it to a different
+// actor in the meantime. This is a REAL cross-process race (in-process
+// concurrency can never expose it — one event loop serializes calls for
+// free): a genuine second OS process, spawned via fork, whose own
+// settleClaim call gets deterministically stuck behind an events.lock this
+// test itself holds (writes the lock file directly, the exact mechanism
+// events.mjs's own acquireEventsLock uses, keyed to this live process's own
+// pid so it reads as genuinely held, never stale) — never a delay/timing
+// guess, since nothing can pass the lock file's existence check while it's
+// there. While the child is provably stuck, THIS process (never blocked —
+// release/acquireClaim only ever need claims.lock, a different lock)
+// reclaims the item for a different actor, then removes the lock file to
+// let the child through.
+test('settleClaim re-validates the claim AFTER acquiring events.lock: a stale settle stuck behind the lock while the claim is reclaimed by a different actor must conflict, never overwrite the new claim\'s durable state', async () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 11', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  const claimA = acquireClaim(dir, { id: 'tsk-1', actor: 'session-a', preClaimStatus: 'todo' });
+
+  const lockPath = path.join(dir, 'events.lock');
+  fs.writeFileSync(lockPath, String(process.pid), 'utf8');
+
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-settle-race-'));
+  // The child does its OWN pre-check readClaim and acks it BEFORE calling
+  // the real settleClaim, immediately after (same synchronous tick, no
+  // await/yield in between) -- so by the time this test process receives
+  // that ack, settleClaim's own internal outer readClaim has, with the same
+  // certainty, already run too (and seen claim A, since nothing has touched
+  // the claim file yet at that point) and is now blocked spinning on
+  // acquireEventsLock (this test process holds it). Only AFTER receiving
+  // the ack does this test reclaim the item -- ordering the reclaim
+  // strictly after settleClaim's outer checks passed with STALE (claim A)
+  // data, and strictly before events.lock is released to let it through.
+  const childScript = `
+import { readClaim } from ${JSON.stringify(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/runtime-coordination.mjs'))};
+import { settleClaim } from ${JSON.stringify(STORE_MJS)};
+const dir = ${JSON.stringify(dir)};
+const id = ${JSON.stringify('tsk-1')};
+const preCheck = readClaim(dir, id);
+process.send({ ack: true, claimId: preCheck?.claimId });
+try {
+  settleClaim(dir, { id, claimId: ${JSON.stringify(claimA.claimId)}, finalStatus: 'blocked' });
+  process.send({ ok: true });
+} catch (err) {
+  process.send({ ok: false, category: err.category, message: err.message });
+}
+`;
+  const childPath = path.join(workDir, 'settle-race-child.mjs');
+  fs.writeFileSync(childPath, childScript);
+
+  const child = fork(childPath, { stdio: 'inherit' });
+  const ack = await new Promise((resolve, reject) => {
+    child.once('message', resolve);
+    child.once('error', reject);
+  });
+  assert.equal(ack.claimId, claimA.claimId, "the child's own pre-check must see claim A before this test reclaims it");
+
+  const childDone = new Promise((resolve, reject) => {
+    child.on('message', resolve);
+    child.on('error', reject);
+    child.on('exit', (code) => {
+      if (code !== 0) reject(new Error(`settle-race-child exited ${code} with no message`));
+    });
+  });
+
+  // The child cannot possibly pass acquireEventsLock while lockPath exists
+  // (a live pid it reads as genuinely held) -- reclaiming here is ordered
+  // BEFORE removing the lock, deterministically, not a timing guess.
+  releaseClaim(dir, { id: 'tsk-1', claimId: claimA.claimId });
+  const claimB = acquireClaim(dir, { id: 'tsk-1', actor: 'session-b', preClaimStatus: 'todo' });
+
+  fs.unlinkSync(lockPath);
+  const result = await childDone;
+
+  assert.equal(result.ok, false, 'the stale settle must conflict, never silently succeed against the reclaimed item');
+  assert.equal(result.category, 'conflict');
+
+  // durable state must be untouched by the stale settle -- never 'blocked'
+  assert.equal(listWork(dir).work['tsk-1'].status, 'doing', 'the reclaimed item stays effective doing under claim B, never overwritten by claim A\'s stale segment');
+  const currentClaim = readClaim(dir, 'tsk-1');
+  assert.ok(currentClaim, 'claim B must still be active');
+  assert.equal(currentClaim.claimId, claimB.claimId);
 });
 
 test('acquireClaim never silently overwrites a claim file that exists but is corrupt', () => {

@@ -41,7 +41,7 @@ import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageR
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
-import { readClaim, readClaims, releaseClaim, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
+import { readClaim, readClaims, releaseClaim, withClaimsLock, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
 
 export { FsmError, WorkValidationError, EventLogError };
 
@@ -1032,22 +1032,42 @@ export function settleClaim(dir, {
     }
 
     try {
-      const res = withEventsLockAndRefresh(dir, logPath, () => {
+      const res = withEventsLockAndRefresh(dir, logPath, () => withClaimsLock(dir, () => {
+        // tsk-40m code-review finding (blocker, TOCTOU race): every check
+        // above (claimId, writerId) ran against a snapshot read BEFORE
+        // acquiring events.lock. Waiting for that lock (held by any other
+        // writer) is unbounded — long enough for claim-port.mjs's own
+        // stale-claim-reclaim to release THIS claim and hand it to a
+        // different actor in the meantime. Re-reading it here, now holding
+        // BOTH events.lock and claims.lock, closes the window: no release/
+        // reacquire (claims.lock) and no durable write (events.lock) can
+        // land between this read and our own append below.
+        const freshClaim = readClaim(dir, id);
+        if (!freshClaim || freshClaim.claimId !== targetClaimId) {
+          throw new StoreError(
+            'conflict',
+            `settleClaim: claim for "${id}" changed while waiting for the write lock — had "${targetClaimId}", now ${freshClaim ? `"${freshClaim.claimId}"` : 'none'}.`,
+          );
+        }
+        if (freshClaim.writerId !== undefined && freshClaim.writerId !== currentWriterId) {
+          throw new StoreError('conflict', `settleClaim: writer identity for "${id}" changed while waiting for the write lock.`);
+        }
+
         const before = currentView(dir);
         const work = before.work[id];
         if (!work) {
           throw new StoreError('validation', `settleClaim: work "${id}" not found.`);
         }
 
-        const preClaimStatus = claim.preClaimStatus || work.status;
-        if (claim.preClaimStatus && work.status !== claim.preClaimStatus) {
-          throw new StoreError('conflict', `settleClaim: item "${id}" status changed from preClaimStatus "${claim.preClaimStatus}" to "${work.status}".`);
+        const preClaimStatus = freshClaim.preClaimStatus || work.status;
+        if (freshClaim.preClaimStatus && work.status !== freshClaim.preClaimStatus) {
+          throw new StoreError('conflict', `settleClaim: item "${id}" status changed from preClaimStatus "${freshClaim.preClaimStatus}" to "${work.status}".`);
         }
 
-        if (claim.preClaimRevision) {
+        if (freshClaim.preClaimRevision) {
           const curRev = getItemDurableRevision(before, id);
-          if (curRev !== claim.preClaimRevision) {
-            throw new StoreError('conflict', `settleClaim: item "${id}" durable revision changed from "${claim.preClaimRevision}" to "${curRev}".`);
+          if (curRev !== freshClaim.preClaimRevision) {
+            throw new StoreError('conflict', `settleClaim: item "${id}" durable revision changed from "${freshClaim.preClaimRevision}" to "${curRev}".`);
           }
         }
 
@@ -1056,10 +1076,10 @@ export function settleClaim(dir, {
         // Event 1: work.move (preClaimStatus -> 'doing')
         const move1Raw = transitionWork({ work, to: 'doing', expectedStatus: preClaimStatus });
         move1Raw.payload.writer = writer;
-        if (claim.claimRole || role) move1Raw.payload.role = claim.claimRole || role;
-        if (claim.headAtTake) move1Raw.payload.headAtTake = claim.headAtTake;
-        if (claim.branchHeadAtTake) move1Raw.payload.branchHeadAtTake = claim.branchHeadAtTake;
-        if (claim.claimTrigger) move1Raw.payload.claimTrigger = claim.claimTrigger;
+        if (freshClaim.claimRole || role) move1Raw.payload.role = freshClaim.claimRole || role;
+        if (freshClaim.headAtTake) move1Raw.payload.headAtTake = freshClaim.headAtTake;
+        if (freshClaim.branchHeadAtTake) move1Raw.payload.branchHeadAtTake = freshClaim.branchHeadAtTake;
+        if (freshClaim.claimTrigger) move1Raw.payload.claimTrigger = freshClaim.claimTrigger;
         const cat1 = statusCategoryFor(getDomain(work.domain), 'doing');
         if (cat1 !== undefined) move1Raw.payload.statusCategory = cat1;
         const pr1 = parkReasonForStatus(getDomain(work.domain), 'doing');
@@ -1074,7 +1094,7 @@ export function settleClaim(dir, {
           phase,
           result: attemptResult,
           claimId: targetClaimId,
-          actor: claim.actor || role || 'unknown',
+          actor: freshClaim.actor || role || 'unknown',
           endedAt: new Date().toISOString(),
         };
         appendEventLocked(writerLogPath, { type: 'work.attempt', payload: attemptPayload }, dir);
@@ -1106,7 +1126,7 @@ export function settleClaim(dir, {
         const afterView = rebuildViewFromDir(dir);
 
         return { event: event3, view: afterView };
-      });
+      }));
 
       if (finalStatus === 'delivered') {
         try {
@@ -1709,7 +1729,12 @@ export function graphWhatIf(dir, id) {
  * functions already degrade gracefully (empty scope) on an unknown/stale id.
  */
 export function goalFocusShow(dir) {
-  const view = currentView(dir);
+  // tsk-40m code-review finding (non-blocking, round 3): effective view,
+  // not durable-only -- consistent with graphWhatIf/staleDoingAdvisory/
+  // footprintConflicts/computedSchedule above (D4). An actively-claimed
+  // item feeding criticalPath/topUnblock must read as 'doing', not a
+  // durable-only 'todo' left over from claim-time no longer writing it.
+  const view = currentEffectiveView(dir);
   if (view.focus === undefined) {
     return { focus: null };
   }
