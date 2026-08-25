@@ -188,7 +188,7 @@ absent: `tsk-fli` is already that exact work (its `refs` points at
   {
     "title": "herdr-spawn adapter: run the worker in a real Herdr pane, protocol untouched",
     "verify": "node --test test/runner/herdr-spawn-adapter.test.mjs && node --test test/runner/dispatch.test.mjs",
-    "action": "Per D3 and D6, add a herdr-spawn entry to EXECUTOR_ADAPTERS (transport.mjs) that launches the worker inside a Herdr pane instead of a stdout-captured subprocess, so a person can watch the agent work. Selected purely by executor.adapter — the executor keeps invocations[].via:\"cli\", so resolve.mjs:280's cli gate passes unchanged and NO protocol work is required (transport.mjs:148 already reads executor.adapter ?? DEFAULT_ADAPTER; tsk-49o proposes sandboxed-cli-spawn by the same route). Results come back through the EXISTING ladder: structured if present, else the [DONE]/[BLOCKED] token, else headBefore/headAfter git inference — this piece introduces no new result protocol and no telemetry claim. Per D2's surviving hard constraint, assert in test that a Herdr runtime signal alone NEVER changes task status, review outcome, blocker resolution or artifact acceptance; only fgOS state transitions do. Keep cli-spawn byte-identical: this is additive and opt-in per executor.",
+    "action": "Per D3 and D6, add a herdr-spawn entry to EXECUTOR_ADAPTERS (transport.mjs) that launches the worker inside a Herdr pane instead of a stdout-captured subprocess, so a person can watch the agent work. HARD CONSTRAINT from validating (tsk-1nih, live evidence): this adapter must ALWAYS create a fresh pane (`herdr pane split`) and must NEVER reuse an existing one, or verify the target pane's foreground process before sending anything. `herdr pane run`/`send-text` types into whatever process currently holds the pane, and since tsk-1zq dropped --autoClose a finished worker's pane keeps an idle interactive agent REPL alive — so reusing a pane delivers the next dispatch as a CHAT MESSAGE into someone else's live session, with an item parked at awaiting-human as the sharpest case. Prefer `herdr pane wait-output --regex` plus `herdr pane read` to observe completion rather than assuming a captured stdout stream exists. Selected purely by executor.adapter — the executor keeps invocations[].via:\"cli\", so resolve.mjs:280's cli gate passes unchanged and NO protocol work is required (transport.mjs:148 already reads executor.adapter ?? DEFAULT_ADAPTER; tsk-49o proposes sandboxed-cli-spawn by the same route). Results come back through the EXISTING ladder: structured if present, else the [DONE]/[BLOCKED] token, else headBefore/headAfter git inference — this piece introduces no new result protocol and no telemetry claim. Per D2's surviving hard constraint, assert in test that a Herdr runtime signal alone NEVER changes task status, review outcome, blocker resolution or artifact acceptance; only fgOS state transitions do. Keep cli-spawn byte-identical: this is additive and opt-in per executor.",
     "footprint": ["src/runner/dispatch/transport.mjs", "test/runner/herdr-spawn-adapter.test.mjs"],
     "kind": "feature",
     "risk": "heavy",
@@ -240,6 +240,51 @@ hidden — both pieces are dependency-free by intent, so the gate should see
 the collision and let a person decide whether to sequence them. Hiding it by
 trimming a footprint would make the action promise work the footprint never
 declared, which is how an overlap gate goes blind.
+
+## Validating — reality gate, matrix, verdict
+
+Run 2026-08-25 by `fgos-coding-validating`. Every row cites a real artifact;
+no row is carried by plausibility language.
+
+### Reality gate
+
+| Dimension | Result | Evidence |
+|---|---|---|
+| Mode fit | **PASS** | `high-risk` is mechanically forced: two hard-gate flags (audit/security, external systems) still apply after D6's cut, and `fgos-routing`'s own rule is "any hard-gate flag → high-risk" |
+| Repo fit | **PASS** | every cited path read directly: `cli.mjs:685` (`resolveExecutorIdForPurpose`), `resolve.mjs:322` (gate) and `:280` (cli-only throw), `transport.mjs:148` (`executor.adapter ?? DEFAULT_ADAPTER`), `config.mjs:364` (`EXECUTOR_CARRIES`), `cli.mjs:298` (`logExecutorDispatch`) |
+| Assumptions | **PASS** | the one unproven assumption (that a Herdr pane can host a worker at all) was proven this pass — see matrix row 3 — rather than left standing |
+| Smaller path | **PASS** | a smaller path was already taken this session: D6 cut 7 pieces → 3 and deferred four. Piece 0's `0b` is explicitly scoped to `decideExecutorCli` only. Going smaller still would drop `DispatchPlan`, which D1 locks |
+| Proof surface | **PASS** | all three verifies are real runnable commands; piece 0's was executed as written against a worktree path and returned valid JSON (`{"mechanism":"unavailable","configured":false}` — today's bug, which is exactly what the fix must flip) |
+| Impact-analysis posture | **PASS** | plan records `degraded`; re-checked live at this gate — `fgos tool query --capability impact-analysis --status present` returns `gitnexus: present`, but the index is stale (`7bb3231`). Posture matches reality, and the gap is named rather than dropped |
+
+### Feasibility matrix
+
+| # | Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|---|
+| 1 | Routing `decide --for` through `resolveExecutorAndOverrides` changes only the intended outcome | high | run the current command; confirm the config it must read | `decide --for fgos-coding-implement` returns `{"mechanism":"unavailable","configured":false}` today, while `.fgos/config.json` carries `capabilities.fgos-coding-implement.prefer:"agy"` | **ACCEPTED** |
+| 2 | The egress gate can be tightened without breaking a working executor | high | confirm the blind spot is real and has a live specimen | `resolve.mjs:322` tests only `executor.command` against `CLAUDE_CLI_COMMANDS`; executor `glm` keeps `command:"claude"` and reaches OpenRouter through `env` — it passes the gate today | **ACCEPTED** |
+| 3 | A Herdr pane can actually host a dispatched worker, and results can be read back | medium | run the real CLI; confirm the primitives exist | `herdr` is on PATH; `herdr pane split --cwd <PATH> --env <K=V>` creates a pane, `send-text`/`send-keys` drive it, **`herdr pane wait-output --match/--regex`** waits for terminal output, `herdr pane read` reads it back. The `[DONE]`/`[BLOCKED]` tier maps directly onto `wait-output --regex` | **ACCEPTED — with constraint C1** |
+| 4 | A Herdr pane's lifecycle cannot be mistaken for task truth | medium | an explicit test asserting it | test is specified in piece 2's own verify + action (D2's surviving hard constraint) | **ACCEPTED (as a required test, not a claim)** |
+| 5 | Pieces 0 and 1 can both edit `cli.mjs` without colliding | low-med | measure the overlap mechanically | `footprintOverlapAmong` reports exactly one conflict, `p0 ↔ p1` on `cli.mjs`; the edits are function-level disjoint (`decideExecutorCli` ~:685 vs `logExecutorDispatch` ~:298) and the overlap is declared, not trimmed away | **ACCEPTED** |
+| 6 | Blast-radius evidence is trustworthy | med | posture check | `degraded` — GitNexus present but stale, so the radius was built by grep cross-check. **Gap named, not dropped**: per `CLAUDE.md`'s degraded branch this proof is weak, and the repo has a confirmed false-negative precedent for this exact query shape | **ACCEPTED (weak, named)** |
+
+### Constraints carried forward
+
+**C1 — `herdr-spawn` must never reuse a pane.** `tsk-1nih` (open) documents
+the live failure: `herdr pane run` is `send-text` + Enter, so it types into
+whatever process currently holds the pane; since `tsk-1zq` dropped
+`--autoClose`, a finished worker's pane keeps an idle interactive agent REPL
+alive. Reusing such a pane delivers the next dispatch as a **chat message
+into someone else's live session** — sharpest case being an item parked at
+`awaiting-human` while nobody is looking at that pane. Piece 2's `action`
+carries this constraint so the implementer cannot miss it. `tsk-1nih` stays
+its own item; piece 2 must not silently absorb it.
+
+### Verdict
+
+**READY WITH CONSTRAINTS** — constraint C1 above. No reality-gate dimension
+failed; every medium-or-higher assumption has accepted evidence; the one
+weak proof (blast radius) is named rather than hidden.
 
 ## Outstanding questions
 
