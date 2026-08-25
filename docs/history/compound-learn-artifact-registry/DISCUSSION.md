@@ -1284,11 +1284,13 @@ flowchart TD
 **Viết vòng 10 (2026-08-25), qua BA bản trong cùng vòng.** Bản 1 (chín task
 T1-T9) thiếu hẳn **lớp harness** — chỉ có `verify` từng task, không có cách đo
 xem việc này có thành công không. Bản 2 gộp kế hoạch advisor: hai track, harness
-layer, metrics. **Bản 3 (hiện tại)** sau khi session chỉ ra **cửa sổ hở** giữa
+layer, metrics. **Bản 3** sau khi session chỉ ra **cửa sổ hở** giữa
 migration và writer, advisor nhận rồi bịt kín hơn: thêm **gate ở producer verb**
 (A3b), trạng thái **`reserved`** (A1), **bootstrap-trước-enforce-sau**, và
-**canary làm cổng** (A6). Ba bản này giữ trong lịch sử git, không viết lại quá
-khứ.
+**canary làm cổng** (A6). **Bản 4** đổi vocabulary sang `knowledge` (D-tsk28x-16)
+và thêm A7. **Bản 5 (hiện tại)** sửa thứ tự sau khi session tìm ra lỗ
+classifier-sau-bootstrap, và khôi phục classifier thành task riêng A2b
+(D-tsk28x-18). Mọi bản giữ trong lịch sử git, không viết lại quá khứ.
 
 **Hai item đã tách ra ngoài, KHÔNG thuộc danh mục dưới đây:** `tsk-422` (thu
 chất liệu kể chuyện, D-tsk28x-12) và `tsk-o4f` (bug guard supersession, §3 D24).
@@ -1475,6 +1477,46 @@ linkage cho **toàn bộ 268 capture**. **Không task nào được dời file t
 
 **Footprint:** `src/report/enduser-index.mjs`, `bin/fgos.mjs`, `test/report/`.
 **Verify:** `node --test test/report/enduser-index.test.mjs`
+
+---
+
+### A2b — Classifier / inventory, đọc-thuần {#task-classifier-inventory}
+
+**Mục tiêu:** đọc toàn bộ 268 tài liệu end-user, sinh cho từng file:
+
+```
+topicId | purposeSlug | role | entities[] | framework | mode | targetPath
+```
+
+Đầu ra là **DỮ LIỆU**, không sửa một tài liệu nào, không ghi registry.
+
+**Task này gánh HAI việc mà trước đây tưởng là hai:**
+
+1. **Pass bottom-up sinh vocabulary** — Câu A chủ sản phẩm chọn ở vòng 9
+   (D-tsk28x-11): suy danh sách `vai trò` / `mục đích` từ tài liệu thật thay vì
+   liệt kê tay. Chốt giá trị trước khi đo là lặp lại kiểu sai #1.
+2. **Dữ liệu bootstrap cho bước 4** (D-tsk28x-18) — bootstrap phải gán
+   `(topicId, role)` cho 268 file, và việc gán đó *chính là* phân loại này.
+
+**Ràng buộc mang theo:** mỗi lần gán phải kèm **confidence + evidence**, để
+resolver ở A3b phân biệt được match chắc / match yếu / không match. Không được
+trả nhãn trần.
+
+**Vì sao đứng ở bước 3 chứ không muộn hơn:** đọc-thuần, độc lập, **không chạm
+`bin/fgos.mjs`** ⇒ chạy song song được với bước 1-2, không tốn thêm ngày nào
+trên đường găng. Nhưng bước 4 và 5 **không chạy được** nếu thiếu nó.
+
+**Lịch sử của chính task này, giữ lại để không lặp:** bản 1 của §7 xếp đúng
+(là T1, task đầu tiên); bản 2 viết lại theo cấu trúc advisor thì nó **bị hoà
+vào bước 9** và mất chỗ đứng riêng; bản 5 khôi phục. Đây là lần thứ ba hai việc
+tưởng rời hoá ra là một.
+
+**Quan hệ anh em:** không phụ thuộc ai; chặn bước 4 (bootstrap) và bước 9
+(migration dry-run).
+
+**Footprint:** `scripts/`, `test/scripts/`,
+`docs/history/compound-learn-artifact-registry/reports/`.
+**Verify:** `node --test test/scripts/<classifier>.test.mjs`
 
 ---
 
@@ -1802,51 +1844,42 @@ thảo luận này đã bảy lần trả giá cho việc tin vào thứ chưa �
 
 ## Thứ tự thi công
 
-**Không bắt đầu bằng move/fold.** Thứ tự dưới đây là bản advisor sửa lại ở vòng
-10 sau khi session chỉ ra cửa sổ hở — điểm khác cốt lõi: **gate + bootstrap +
-enforce đứng TRƯỚC mọi thứ đụng tới writer hay tới file**, nên không còn khoảnh
-khắc nào "đã dời layout nhưng writer còn cũ".
+**Không bắt đầu bằng move/fold.** Bản dưới đây là **thứ tự đã sửa** (D-tsk28x-18,
+vòng 10) sau khi session tìm ra lỗ ở bản trước: classifier bị xếp tận bước 9
+trong khi bootstrap ở bước 4 cần chính output của nó.
 
 ```
- 1. Registry reducer + invariant tests            (A1 + B1)
- 2. Resolver + alias read tests                   (A2 + B1)
- 3. fgos compound registry gate — CHƯA bật        (A3b + B2)
- 4. Bootstrap registry cho corpus hiện tại: currentPath = oldPath
- 5. BẬT doc-registry.enforce
- 6. Update doc-sources / docs-index qua resolver  (A2' + B3)
- 7. Update writer skill sang registry-first       (A4)
- 8. Chạy writer CANARY riêng                      (A6)  <-- cổng
- 9. Migration dry-run                             (+ B4 conservation)
-10. Migration apply / fold
-11. A7 deprecate fgos compound -> fgos knowledge attest
+ 1. Model registry + invariant tests                      (A1 + B1)
+ 2. Resolver / alias model                                (A2 + B1)
+ 3. Classifier / inventory ĐỌC-THUẦN trên 268 docs        (A2b)
+      -> sinh topicId / purposeSlug / role / entities / framework / mode / targetPath
+ 4. Bootstrap registry BẰNG CHÍNH OUTPUT CỦA BƯỚC 3
+ 5. BẬT enforcement ở producer door                       (A3b + B2)
+      -> attestation / legacy `fgos compound` từ chối path không nằm trong registry
+ 6. Update doc-sources / docs-index qua resolver          (A2' + B3)
+ 7. Update writer skill sang registry-first               (A4)
+ 8. Chạy writer CANARY riêng                              (A6)   <-- cổng cứng
+ 9. Migration dry-run -> fold -> apply                    (+ B4)
+10. Deprecate `fgos compound` -> `fgos knowledge attest`  (A7)
 ```
 
-> **LỖ THỨ TỰ — phát hiện vòng 10 khi soát lại, chưa sửa vào sơ đồ trên.**
-> Bước 5 bật enforcement ⇒ mọi ghi phải có `(topicId, role)` hợp lệ. Nhưng
-> vocabulary `vai trò` chỉ ra ở **bước 9** (classifier). Giữa 5 và 9, item
-> retrospective vẫn chảy mà **không có role nào tồn tại** — kể cả đường "gán
-> gần nhất + đề xuất" (D-tsk28x-7) cũng không chạy được vì không có gì để gần.
->
-> Sâu hơn: **bước 4 (bootstrap) và bước 9 (classifier) là CÙNG MỘT VIỆC.**
-> Bootstrap phải gán `(topicId, role)` cho 268 tài liệu — mà việc gán đó chính
-> là phân loại. Bootstrap "chỉ map path→entry" sẽ tạo 268 entry rỗng nghĩa.
->
-> **Sửa:** classifier chạy **trước bước 4**, output của nó *là* dữ liệu bootstrap.
-> Nó đọc-thuần, độc lập, chạy song song được với bước 1-2 — đúng như bản 1 của
-> §7 từng xếp nó làm task đầu tiên (T1) trước khi bản 2 hoà nó vào bước 9.
->
-> **Lần thứ BA trong thảo luận này hai việc tưởng rời hoá ra là một** (1: fold
-> và dời; 2: phân loại và pass bottom-up; 3: bootstrap và classifier). Đáng
-> thành nguyên tắc: *trước khi xếp hai bước liền nhau vào hai chỗ khác nhau
-> trong thứ tự, hỏi xem đầu ra của bước này có phải đầu vào bắt buộc của bước
-> kia không.*
+**Điểm cốt lõi đã ghi (D-tsk28x-18):** *bootstrap và classifier KHÔNG phải hai
+việc khác nhau ở hai pha xa nhau. Classifier chính là pass sinh dữ liệu
+bootstrap; bật enforcement trước pass đó thì hệ không có bảng chữ cái để
+retrospective item mới dùng.*
 
-**A7 đứng cuối có chủ đích:** đánh dấu deprecated trước khi `knowledge attest`
-thật sự thay được việc của nó là hứa suông với người dùng.
+**Ba cổng cứng:**
 
-**Hai cổng cứng:** bước 5 phải xong trước bước 7 (không thì writer cũ vẫn ghi
-tự do); **bước 8 phải XANH trước bước 9** — migration chỉ chạy sau khi đã chứng
-minh writer mới thật sự biết registry.
+1. Bước 3 phải xong trước bước 4 — bootstrap không có gì để ghi vào nếu thiếu.
+2. Bước 5 (enforcement) phải xong trước bước 7 — không thì writer cũ vẫn ghi tự do.
+3. **Bước 8 phải XANH** trước bước 9 — migration chỉ chạy sau khi đã chứng minh
+   writer mới thật sự biết registry.
+
+Bên trong bước 9 vẫn giữ cổng riêng: **dry-run sạch trước, apply sau**; không
+bao giờ apply khi conservation gate còn đỏ.
+
+**A7 (bước 10) đứng cuối có chủ đích:** đánh dấu deprecated trước khi
+`knowledge attest` thật sự thay được việc của nó là hứa suông với người dùng.
 
 **Nguyên tắc advisor giữ nguyên:** *resolver và harness phải có TRƯỚC migration.
 Nếu không, ta đang dời corpus khi chưa có bằng chứng rằng old capture vẫn tìm
