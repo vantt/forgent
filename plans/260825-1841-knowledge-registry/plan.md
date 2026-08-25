@@ -1,6 +1,6 @@
 # Knowledge registry — kế hoạch thi công (tsk-28x)
 
-**Trạng thái:** chờ chia con (`tsk-28x` đang `awaiting-human` ở stage `planning`).
+**Trạng thái:** đã chia — **`tsk-28x-1` … `tsk-28x-12`**, tất cả ở `todo` (2026-08-25).
 **Nguồn thiết kế:** `docs/history/compound-learn-artifact-registry/DISCUSSION.md`
 — §6.7 (bức tranh bốn nhãn + Q1-Q8), §7 (task + thứ tự), §3 (bảng vấn đề),
 §4 (18 D-ID đã chốt).
@@ -71,11 +71,35 @@ nó nằm trong frontmatter (`framework: diataxis`, `mode: explanation`).
 
 Trong phase 11 còn cổng riêng: **dry-run sạch trước, apply sau**.
 
-### Xung đột footprint
+### Xung đột footprint — 5 cặp, đã giải bằng `deps` thật
 
-`bin/fgos.mjs` bị **phase 05, 06, 07** cùng chạm ⇒ **không chạy song song**. Chạy
-`fgos conflicts` trước mỗi đợt dispatch. Phase **03 và 01/02 chạy song song
-được** (03 đọc-thuần, không chạm `src/`).
+Engine (`fgos plan`) tự phát hiện **5 cặp** khi chia, trong đó **2 cặp phân tích
+tay đã bỏ sót**:
+
+| Cặp | File trùng | Phân tích tay có bắt? |
+|---|---|---|
+| 05 ↔ 06, 05 ↔ 07, 06 ↔ 07 | `bin/fgos.mjs` | ✅ |
+| **05 ↔ 12** | `src/cli/command-registry.mjs` | ❌ **bỏ sót** |
+| **06 ↔ 08** | `src/setup/checks.mjs` | ❌ **bỏ sót** |
+
+**Cách giải: khai `deps` thật giữa các con, không phải trả lời cổng.** Cổng
+footprint của engine bỏ qua một cặp khi một con khai `deps` trên con kia — tức
+nó đang đòi đúng thứ kế hoạch này nói bằng lời (tuần tự hoá), nhưng ở dạng
+**máy cưỡng chế được**. Đồ thị phụ thuộc đã ghi vào 12 item con:
+
+```
+01 ──┬──────────────► 04 ──► 06 ──┬──► 07 ──────► 11 ──► 12
+     │                      ▲     ├──► 08
+02 ──┼──► 07                │     └──► 09 ──► 10 ──► 11
+     └──► 08                │
+03 ──┴──► 04, 11            05 ──┴──► 06, 07, 12
+```
+
+Chạy `fgos conflicts` trước mỗi đợt dispatch. Phase **03 chạy song song được với
+01/02** (đọc-thuần, không chạm `src/`).
+
+**Bài học ghi lại:** phân tích footprint bằng mắt bỏ sót 2/5 cặp. Đừng tin bảng
+footprint viết tay — để `fgos plan`/`fgos conflicts` chấm.
 
 ## Acceptance của cả kế hoạch
 
