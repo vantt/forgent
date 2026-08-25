@@ -1,8 +1,8 @@
 ---
-authoritative_for: why fgos sync-root and fgos merge next resolve the verify timeout lazily, after their own refusal guards, instead of at CLI flag-parsing time
+authoritative_for: why fgos sync-root and fgos merge next resolve CLI flags (verify timeout, --wait) lazily, after their own refusal guards, instead of eagerly at CLI flag-parsing time
 ---
 
-# Why merge-next and sync-root resolve the verify timeout after their guards
+# Why merge-next and sync-root resolve their flags after their guards
 
 `tsk-49i-2` moved flag parsing into the CLI adapter, so
 `parseMergeClusterOptions` started calling `resolveVerifyTimeoutMs`
@@ -41,8 +41,42 @@ called for its *return value* at a point earlier than the original code's
 call site is a real regression even when the returned value itself is
 correct — the write is the bug, not the value.
 
+## The sibling case: `--wait` flags flip the pool-empty exit shape
+
+The same eager-parsing regression had a second half that the timeout fix
+above missed: `parseMergeClusterOptions` also calls `parseWaitFlags`
+eagerly while building the options object, so `merge next` validates
+*both* `approve`'s and `sync-root`'s wait flags before `mergeReadiness`
+decides anything. On `main`, those flags were only ever parsed inside the
+recursive `runVerb('approve', ...)` call, which never ran on the
+`ready.length === 0` early return.
+
+Reproduced the same way as the timeout case — two identical fresh repos, an
+initialized store, nothing ready to merge: `main` returns
+`{picked: null, reason: 'nothing ready to merge'}` at exit 0; the eager
+version prints `approve --wait must be a positive number of milliseconds
+(got "0")` at exit 4. This is a bigger problem than a cosmetic message
+change — it flips the *shape* an unattended merge-loop driver parses.
+`/fgOS:merge-loop`'s own pool-empty stop rule keys on `{picked: null}`; a
+driver carrying a stale or malformed `--wait` value gets a hard refusal
+instead of the clean stop it expects. The same eager parse also moves
+`sync-root`'s `--wait` validation ahead of its item-not-found/
+`isMainWorktree`/branch/Iron-Law guards (message-only difference there,
+since `sync-root` already exits 4 on any of those guards too).
+
+Fix direction is the same treatment already applied to the timeout case:
+`parseMergeClusterOptions` hands over `resolveWaitFlags` as a thunk;
+`approve` calls it at the top (where its old case block parsed wait), and
+`sync-root` calls it after the Iron Law gate — so `merge next`'s early
+returns never parse `--wait` at all.
+
 ## Source
 
-`tsk-55f`, a child of `tsk-49i` (the CLI-adapter flag-parsing move). Verify:
-`npm test && test -f test/cli/fgos-merge-next-no-config-write.test.mjs &&
-grep -qF resolveTimeoutMs src/verbs/merge/sync-root.mjs`.
+`tsk-55f` and `tsk-2fx`, both children of `tsk-49i` (the CLI-adapter
+flag-parsing move) — `tsk-2fx` was found by a second branch review of
+`main...fgw/tsk-49i`, after `tsk-55f`'s own fix had already landed for the
+timeout half alone. Verify (`tsk-55f`): `npm test && test -f
+test/cli/fgos-merge-next-no-config-write.test.mjs && grep -qF
+resolveTimeoutMs src/verbs/merge/sync-root.mjs`. Verify (`tsk-2fx`): `npm
+test && test -f test/cli/fgos-merge-next-idle-turn.test.mjs && grep -qF
+resolveWaitFlags src/verbs/merge/approve.mjs`.
