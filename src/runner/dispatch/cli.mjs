@@ -15,14 +15,14 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { DEFAULTS } from '../../state/work.mjs';
-import { DOMAINS, resolveDomainName, skillForStage, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
+import { DOMAINS, resolveDomainName, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
 import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
 import { listWork, resolveWriterLogPath } from '../../state/store.mjs';
 import { appendEvent } from '../../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier } from './resolve.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, EXECUTOR_ADAPTERS, DispatchError } from './transport.mjs';
 import { buildPrompt } from './prepare.mjs';
@@ -48,37 +48,11 @@ import {
 } from '../main-checkout-lock.mjs';
 import { checkoutDirtyPaths } from '../worktree.mjs';
 
-
-/**
- * Executor identifier for a work item's executing-stage dispatch (D3,
- * tsk-62v): the skill name executing-stage resolves to for the item's
- * domain — the same `skillForStage`/`DOMAINS` formula `buildPrompt` already
- * applies internally to build its own `skillPath` (never recomputed a
- * different way, per D3). Kept as its own small function rather than
- * folded into `buildPrompt` itself so `buildPrompt`'s own pinned
- * "single console.warn on an unrecognized domain" behavior (str91 D6/D7)
- * stays untouched — this calls `resolveDomainName` its own time, same as
- * `selectTemplate` already being called a second time inside `spawnWorker`
- * below for template logging (P49's same "cheap, deterministic, no
- * duplicated LOGIC" precedent).
- *
- * Exported (tsk-5tm-6 D12(iii)): `decideExecutorCli`'s `--work <id>` path
- * below is the work-item-shaped lookup `fgos-fanout` needs to consult the
- * dispatch decision protocol before firing an Agent for a candidate,
- * instead of hardcoding native dispatch unconditionally.
- *
- * (tsk-in1-4 D12: re-confirmed at shaping time — a `executorIdForWork`
- * result MISSING from `cfg.executors` (keyed by executor name, not job
- * identity) is intentional, not a bug; `decideExecutorCli`'s own `--work`
- * branch below already documents the fallback this design implies.)
- *
- * `stage` defaults to `stage ?? work?.stage ?? 'executing'`.
- */
-export function executorIdForWork(work, stage) {
-  const domainObj = DOMAINS[resolveDomainName(work?.domain)];
-  const targetStage = stage ?? work?.stage ?? 'executing';
-  return skillForStage(domainObj, targetStage);
-}
+// executorIdForWork moved to resolve.mjs (self-review finding, 2026-08-25:
+// closes the plan.mjs<->cli.mjs import cycle) -- imported above alongside
+// this file's other resolve.mjs symbols; this module's own internal
+// callers below are unaffected, and dispatch.mjs's barrel now re-exports
+// it from resolve.mjs directly (no other file imports it from here).
 
 /**
  * Resolve persona/agentType for a given taskSpec header & list of registered agent-types (D20/D21/D22/D32).

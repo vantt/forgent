@@ -10,6 +10,37 @@
 // CONTEXT.md` D7 for the split rationale.
 
 import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, DEFAULT_TIER_TO_POLICY } from './config.mjs';
+import { DOMAINS, resolveDomainName, skillForStage } from '../../state/workflow-stage-graphs.mjs';
+
+/**
+ * Executor identifier for a work item's executing-stage dispatch (D3,
+ * tsk-62v): the skill name executing-stage resolves to for the item's
+ * domain — the same `skillForStage`/`DOMAINS` formula `buildPrompt` already
+ * applies internally to build its own `skillPath` (never recomputed a
+ * different way, per D3). Kept as its own small function rather than
+ * folded into `buildPrompt` itself so `buildPrompt`'s own pinned
+ * "single console.warn on an unrecognized domain" behavior (str91 D6/D7)
+ * stays untouched — this calls `resolveDomainName` its own time, same as
+ * `selectTemplate` already being called a second time inside `spawnWorker`
+ * for template logging (P49's same "cheap, deterministic, no duplicated
+ * LOGIC" precedent).
+ *
+ * Moved here from `dispatch/cli.mjs` (self-review finding, 2026-08-25):
+ * `plan.mjs` (a canonical, lower-level planner) importing this from
+ * `cli.mjs` (the CLI facade, which itself imports `compileDispatchPlan`
+ * from `plan.mjs`) was a real import cycle -- Node loaded it fine via ESM
+ * live bindings, but a planner depending on the facade built on top of it
+ * is backwards layering. This function has no dependency on anything
+ * `cli.mjs`-specific; `resolve.mjs` is the shared, lower-layer module both
+ * `plan.mjs` and `cli.mjs` already depend on either way.
+ *
+ * `stage` defaults to `stage ?? work?.stage ?? 'executing'`.
+ */
+export function executorIdForWork(work, stage) {
+  const domainObj = DOMAINS[resolveDomainName(work?.domain)];
+  const targetStage = stage ?? work?.stage ?? 'executing';
+  return skillForStage(domainObj, targetStage);
+}
 
 /**
  * Resolve `tier` (per D6; falls back to `work.mjs`'s declared default when a

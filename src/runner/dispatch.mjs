@@ -33,7 +33,7 @@ export {
   INVOCATION_VIA,
 } from './dispatch/config.mjs';
 
-export { modelForTier, resolveExecutorIdForPurpose, resolveExecutorAndOverrides } from './dispatch/resolve.mjs';
+export { modelForTier, resolveExecutorIdForPurpose, resolveExecutorAndOverrides, executorIdForWork } from './dispatch/resolve.mjs';
 
 export { decideDispatchMechanism, decideExecutorDispatchMechanism } from './dispatch/mechanism.mjs';
 
@@ -44,7 +44,6 @@ export { DispatchError, resolveExecutorCommand, resolveExecutorEnv, DEFAULT_ADAP
 export { buildPrompt } from './dispatch/prepare.mjs';
 
 export {
-  executorIdForWork,
   resolveAgentTypeForTaskSpec,
   resolveAgentTypeForWork,
   spawnWorker,

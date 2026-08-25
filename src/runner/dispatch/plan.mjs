@@ -7,9 +7,8 @@
 // and reasonCodes into a canonical DispatchPlan object.
 
 import { RunnerConfigError } from './config.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorConfig } from './resolve.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorConfig, executorIdForWork } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
-import { executorIdForWork } from './cli.mjs';
 
 /**
  * Compiles a canonical DispatchPlan object for a dispatch request.
