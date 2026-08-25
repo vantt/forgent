@@ -216,6 +216,14 @@ session tự phát hiện: hoặc chủ sản phẩm bắt, hoặc lòi ra khi �
 | 4 | **Kết luận mới mâu thuẫn chẩn đoán CŨ của chính tài liệu**, cả hai cùng nằm trong một file đang mở | Vòng 9(h): dòng D2 viết `docs/<quadrant>/<topic>.md` — đúng thứ §6.1 đã gọi là bệnh gốc từ vòng 3; session vừa viết lại §6.3 cùng vòng mà vẫn không đối chiếu | Sau khi trả lời một câu thiết kế, rà ngược xem nó có va vào §6 hiện hành không — §6 tồn tại đúng để làm việc đó, nhưng chỉ có tác dụng nếu ai đó thật sự đối chiếu |
 | 5 | **Ước lượng chi phí sai làm lệch một khuyến nghị** | Vòng 9(i): "chồng hai việc nặng — fold 268 file rồi lại dời 268 file", trong khi fold VÀ dời là cùng một thao tác; con số phóng đại đó suýt đẩy chủ sản phẩm khỏi đường (1) | Trước khi lấy chi phí làm lý do loại một phương án, kiểm xem hai việc đang cộng vào nhau có thật sự là hai việc rời không |
 
+**MINT vòng 9 (2026-08-25): D-tsk28x-4 → D-tsk28x-12, chín D-ID, đã ghi qua
+`fgos decision --id tsk-28x`.** Điều kiện D4 thoả theo hai đường: phần lớn là
+**quyết định trực tiếp của chủ sản phẩm** (tiền lệ D-tsk28x-2 vòng 7 cho phép
+mint ngay), phần còn lại đứng vững qua hai phiên cách nhau một tuần (08-18 →
+08-25) không ai sửa. Hai điểm ĐÃ bị sửa trong quá trình — layout thư mục
+(D2→D11/D12) và "đối tượng" đơn trị (D12→D16) — nên chỉ mint dạng đã sửa.
+Bức tranh đủ: **§6.7**.
+
 **Điểm đứng cuối vòng 9 — đọc dòng này trước nếu quay lại sau nhiều ngày.**
 Row D không còn là câu hỏi mở chung chung; nó đã vỡ thành sáu câu con và
 **cả sáu đều có câu trả lời**, chỉ chờ vòng 10 xác nhận để mint (§3 dòng
@@ -321,6 +329,15 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | D-tsk28x-1 | Phân loại tài liệu cần HAI trục vuông góc, không phải một danh sách dài hơn: trục trạng-thái-nhận-thức (Diataxis là một profile của nó) + trục danh tính (LÀ gì, của ai, về vấn đề gì) | Nêu vòng 2 (scout OKF), chủ sản phẩm xác nhận + làm sắc vòng 3, không bị sửa. Ghi qua `fgos decision --id tsk-28x` seq 9180 |
 | D-tsk28x-2 | Tách quan hệ `tsk-28x` → `tsk-12m`: bỏ `tsk-12m` khỏi `deps` của `tsk-28x`. Hai item độc lập — `tsk-12m` tự xây phần quan-sát/nhắc; phần ghi/registry của nó cắm vào hình dạng `tsk-28x` chốt sau, không chặn ngược | Câu hỏi treo từ §3 dòng E (vòng 1), một phiên `fgos-researching` độc lập vòng 7 tự nêu lại đúng câu này, chủ sản phẩm xác nhận trực tiếp cùng vòng. Căn cứ: `tsk-12m` vòng 4 đã tách quan-sát/nhắc khỏi quyết/viết/chặn, nửa quan-sát sống sót qua mọi phương án §6.4 |
 | D-tsk28x-3 | Trục "cách viết" (trạng thái nhận thức) là REGISTRY MỞ của nhiều FRAMEWORK viết, không chỉ nhiều profile trong một lưới. Diataxis là một framework cụ thể (đóng, 4 quadrant) — không phải bản thân trục. Framework khác (vd. narrative-arc cho marketing-storytelling) có thể cắm vào cùng trục, mỗi framework tự đóng vocabulary riêng | Nêu vòng 2 (scout OKF v0.1 lỏng + Bee Profile đóng), chủ sản phẩm xác nhận vòng 3 (dạng hẹp: "Diataxis là một profile"), đứng vững không ai bác qua vòng 8, chủ sản phẩm tự tổng quát hoá đúng thành "nhiều framework" ở vòng 9 — đủ D4 (đứng vững nhiều hơn một vòng). Trả lời §3 dòng B |
+| D-tsk28x-4 | Trục danh tính có BA toạ độ: mục đích (đơn ⇒ thư mục) + vai trò (đơn, ĐÓNG ⇒ tên file) + entity (ĐA TRỊ ⇒ tag). Entity không bao giờ làm thư mục | Chủ sản phẩm nêu vòng 9 (2026-08-25); đo 93/330 (28%) tài liệu chạm ≥2 entity ngay trong tên. Sửa lỗi session dùng chữ "đối tượng" hai nghĩa. §3 dòng D16 |
+| D-tsk28x-5 | Diataxis và mọi framework viết KHÔNG làm thư mục; layout `docs/<mục-đích>/<vai-trò>.md`, đường dẫn là cặp danh tính nên chống-trùng miễn phí | Chủ sản phẩm bắt lỗi vòng 9: §6.1 đã chẩn đoán từ vòng 3 mà session vẫn viết `docs/<quadrant>/`. §3 dòng D11/D12 |
+| D-tsk28x-6 | Registry lưu bằng event + verb `fgos topic *`, BẮT BUỘC kèm hai ảnh cuối cùng (JSON cho máy, Markdown cho người) + doctor check | Chủ sản phẩm chọn event+verb kèm điều kiện "luôn có ảnh cuối cùng". §3 dòng D6/D7 |
+| D-tsk28x-7 | Registry biến hình được: ĐÓNG cấu trúc/schema/luật-chọn-lúc-ghi, MỞ danh sách topic. Vai trò ĐÓNG-CÓ-CỬA; phiên đề xuất không chặn, người chốt theo lô; tách kích hoạt bằng doctor check | §3 dòng D3/D4; guard: vai trò chỉ có một tài liệu là đáng ngờ. Khớp ưu tiên #2 AGENTS.md |
+| D-tsk28x-8 | MỘT bộ máy phục vụ HAI tầng, HAI registry tách rời — tầng người tối ưu độ rõ (chấp nhận trùng lặp), tầng máy tối ưu độ gọn | Chủ sản phẩm chốt vòng 9. §3 dòng D15 |
+| D-tsk28x-9 | `docPath` cũ là sự thật lịch sử không sửa; registry giữ bản chiếu qua lineage. Bảng ánh xạ cũ→mới là việc NGÀY ĐẦU | Áp D-ADR0001. §3 dòng D5/D14 |
+| D-tsk28x-10 | Hai trục triển khai CÙNG LÚC — bị ép bởi contract của skill viết, không phải lựa chọn phạm vi | Chủ sản phẩm chốt vòng 9; session rút lại nghiêng-về-tuần-tự. Đóng câu vòng 4(d) treo từ 2026-08-07. §3 dòng D10 |
+| D-tsk28x-11 | Fold 268 file chia hai pha; pha 1 (phân loại) CHÍNH LÀ pass bottom-up sinh vocabulary; guard `conservation` bắt buộc | Lần thứ hai hai việc tưởng rời hoá ra là một. §3 dòng D12, §6.5 |
+| D-tsk28x-12 | TÁCH nửa thu-chất-liệu-kể-chuyện thành item riêng; `tsk-28x` giữ trục danh tính + registry + skill viết | Chủ sản phẩm chốt vòng 9. Mô hình bốn nhãn đã giải phần lớn nửa đóng băng: Keep a Changelog là framework viết thứ hai, không cần producer registry riêng |
 
 ## 5. Q&A log
 
