@@ -217,3 +217,11 @@ consistency at write time, never a stored parallel graph) widened its own
 scan scope from just `docs/backlog.md` + `docs/specs/*.md` to the full
 `docs/**` + `src/**` + `plugins/**` tree, on the existing store (D3: no new
 decision-store, upgrade the one that already exists).
+
+**D4's platform-level case shipped too (`tsk-1lv-2`).** `state.decisions`
+gained a `scope`/`area` field for the platform/repo-wide case D4 named,
+and `docs/decisions/index.md` — the generated projection AGENTS.md points
+readers at today (`fgos decision-index`) — is real: the `docs/decisions/`
+directory itself persists (mirroring the upstream project's own standing
+exemption for a directory that would otherwise be retired), but the only
+file inside it is that one generated index.
