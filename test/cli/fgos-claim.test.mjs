@@ -67,6 +67,7 @@ import {
   path,
   rawTmpCwd,
   registerFlatMember,
+  releaseClaimFor,
   removeAdHocWorktree,
   run,
   spawnSync,
@@ -375,7 +376,7 @@ test('pick --id reattaches to its own already-existing worktree/branch when invo
 
   // Simulate the claim-lock §3b release (item reached executing, claim
   // released back to todo) while the branch/worktree still stand.
-  assert.equal(run(main, ['move', 'reclaim-from-inside', '--to', 'todo', '--expect', 'doing']).status, 0);
+  releaseClaimFor(main, 'reclaim-from-inside');
 
   // Re-pick FROM INSIDE the item's own worktree, --dir pointed at main —
   // repoRoot/worktreeDir must resolve to main (stable), never ownWorktree
@@ -520,7 +521,7 @@ test('pick reclaims a released todo item onto its OWN existing branch tip, not a
 
   // Release (claim-lock §3b's own edge, doing -> todo) without settling the
   // item — the branch and its commit survive (worktree.mjs never deletes it).
-  assert.equal(run(cwd, ['move', 'reuse-branch-item', '--to', 'todo', '--expect', 'doing']).status, 0);
+  releaseClaimFor(cwd, 'reuse-branch-item');
   assert.equal(stateView(cwd).work['reuse-branch-item'].status, 'todo');
 
   const secondPick = envelopeData(run(cwd, ['pick', '--id', 'reuse-branch-item']).stdout);

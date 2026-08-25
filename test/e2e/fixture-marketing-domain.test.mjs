@@ -102,8 +102,12 @@ function move(cwd, id, to, extraFlags = []) {
   return ok(fgos(cwd, ['move', id, '--to', to, ...extraFlags]), `move ${id} -> ${to}`);
 }
 
+function envelopeData(stdout) {
+  return JSON.parse(stdout).data;
+}
+
 function stateView(cwd) {
-  return JSON.parse(fs.readFileSync(resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE), 'utf8'));
+  return envelopeData(fgos(cwd, ['list', '--all', '--json']).stdout);
 }
 
 // Raw event log — used ONLY where the folded view cannot answer the

@@ -67,6 +67,7 @@ import {
   path,
   rawTmpCwd,
   registerFlatMember,
+  releaseClaimFor,
   removeAdHocWorktree,
   run,
   spawnSync,
@@ -518,7 +519,7 @@ test('pick on an item whose fgw/<id> worktree is still live hands back that SAME
   execFileSync('git', ['commit', '-m', 'lock decisions'], { cwd: worktreePath });
   // A claim released at the clarify/decompose -> executing boundary, with the
   // session still sitting in its worktree.
-  assert.equal(run(cwd, ['move', 'repick-live-item', '--to', 'todo', '--expect', 'doing']).status, 0);
+  releaseClaimFor(cwd, 'repick-live-item');
 
   const secondPick = envelopeData(run(cwd, ['pick', '--id', 'repick-live-item']).stdout);
 
@@ -540,7 +541,7 @@ test('pick reattaches even when the live worktree has uncommitted work, leaving 
   execFileSync('git', ['add', 'CONTEXT.md'], { cwd: worktreePath });
   execFileSync('git', ['commit', '-m', 'lock decisions'], { cwd: worktreePath });
   fs.writeFileSync(path.join(worktreePath, 'draft.md'), 'half-written\n');
-  assert.equal(run(cwd, ['move', 'repick-dirty-item', '--to', 'todo', '--expect', 'doing']).status, 0);
+  releaseClaimFor(cwd, 'repick-dirty-item');
 
   const secondPick = envelopeData(run(cwd, ['pick', '--id', 'repick-dirty-item']).stdout);
 
@@ -557,7 +558,7 @@ test('take refuses a todo item whose own fgw/<id> branch already exists, naming 
   // the branch (and worktree) come into being via pick; the claim is then
   // released, leaving a todo item whose work lives on the branch
   envelopeData(run(cwd, ['pick', '--id', 'take-with-branch-item']).stdout);
-  assert.equal(run(cwd, ['move', 'take-with-branch-item', '--to', 'todo', '--expect', 'doing']).status, 0);
+  releaseClaimFor(cwd, 'take-with-branch-item');
 
   const taken = run(cwd, ['take', '--id', 'take-with-branch-item']);
 

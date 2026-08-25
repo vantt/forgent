@@ -638,6 +638,21 @@ function applyEvent(view, event) {
       }
       break;
     }
+    case 'work.attempt': {
+      const { id, phase, result, endedAt, claimId, actor } = event.payload ?? {};
+      const item = view.work[id];
+      if (item) {
+        item.attemptCount = (item.attemptCount ?? 0) + 1;
+        item.lastAttempt = {
+          phase,
+          result,
+          endedAt: endedAt || event.ts,
+          ...(claimId !== undefined ? { claimId } : {}),
+          ...(actor !== undefined ? { actor } : {}),
+        };
+      }
+      break;
+    }
     // tsk-in1-1 D1: `tool.register`/`tool.remove` retired — a tool provider
     // is now declared directly in `runner.executors.<id>` (config-edited,
     // never event-sourced). Historical events of either type already in

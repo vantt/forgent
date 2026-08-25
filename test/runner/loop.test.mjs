@@ -133,7 +133,7 @@ fs.writeFileSync('output.txt', 'produced by worker\\n');
 execFileSync('git', ['add', 'output.txt']);
 execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);
 const { moveWork } = await import(${JSON.stringify(storeUrl)});
-moveWork(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, to: 'blocked', expectedStatus: 'doing' });
+moveWork(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, to: 'blocked', expectedStatus: 'todo' });
 `,
   );
   return scriptPath;
@@ -296,7 +296,7 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   const events = readRawEvents(dir);
   assert.deepEqual(
     events.map((e) => (e.type === 'work.outcome' ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}` : `${e.type}:${e.payload.to ?? 'add'}`)),
-    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'executor.dispatch:add', 'work.move:awaiting-approval', 'work.handoff:reviewer', 'work.outcome:actual'],
+    ['work.add:add', 'work.outcome:predicted', 'executor.dispatch:add', 'work.move:doing', 'work.attempt:add', 'work.move:awaiting-approval', 'work.handoff:reviewer', 'work.outcome:actual'],
   );
   // predicted is written right at claim time, before dispatch ever runs
   const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);

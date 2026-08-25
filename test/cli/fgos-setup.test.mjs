@@ -71,6 +71,7 @@ import {
   run,
   spawnSync,
   startSession,
+  rawPersistedView,
   stateView,
   tmpCwd,
   tmpLinkedWorktree,
@@ -130,7 +131,7 @@ test('init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0',
   const result = run(cwd, ['init']);
   assert.equal(result.status, 0);
   assert.ok(fs.existsSync(logPath(cwd)));
-  const view = stateView(cwd);
+  const view = rawPersistedView(cwd);
   assert.deepEqual(view.work, {});
   assert.deepEqual(view.decisions, []);
   // work-graph-intelligence S3: the persisted (on-disk) view now carries a
@@ -212,14 +213,14 @@ test('rebuild reconstructs state.json from the log alone after the view file is 
   addOk(cwd, 'a');
   addOk(cwd, 'b');
   run(cwd, ['move', 'a', '--to', 'doing']);
-  const before = stateView(cwd);
+  const before = rawPersistedView(cwd);
 
   fs.rmSync(viewPath(cwd));
   assert.ok(!fs.existsSync(viewPath(cwd)));
 
   const result = run(cwd, ['rebuild']);
   assert.equal(result.status, 0);
-  assert.deepEqual(stateView(cwd), before);
+  assert.deepEqual(rawPersistedView(cwd), before);
 });
 
 test('rebuild reconstructs state.json from the log alone when the view file still exists but is stale (not deleted)', () => {
@@ -227,7 +228,7 @@ test('rebuild reconstructs state.json from the log alone when the view file stil
   addOk(cwd, 'a');
   addOk(cwd, 'b');
   run(cwd, ['move', 'a', '--to', 'doing']);
-  const freshFromLog = stateView(cwd);
+  const freshFromLog = rawPersistedView(cwd);
 
   // Corrupt the view IN PLACE (file still exists) rather than deleting it:
   // wrong status for "a" and a missing item "b" — the exact failure mode
@@ -240,11 +241,11 @@ test('rebuild reconstructs state.json from the log alone when the view file stil
   };
   fs.writeFileSync(viewPath(cwd), `${JSON.stringify(stale, null, 2)}\n`, 'utf8');
   assert.ok(fs.existsSync(viewPath(cwd)));
-  assert.notDeepEqual(stateView(cwd), freshFromLog);
+  assert.notDeepEqual(rawPersistedView(cwd), freshFromLog);
 
   const result = run(cwd, ['rebuild']);
   assert.equal(result.status, 0);
-  assert.deepEqual(stateView(cwd), freshFromLog);
+  assert.deepEqual(rawPersistedView(cwd), freshFromLog);
 });
 
 test('repair fixes a truncated final line via the real CLI, log becomes readable and usable again', () => {

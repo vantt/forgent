@@ -90,7 +90,7 @@ function viewPath(cwd) {
 }
 
 function stateView(cwd) {
-  return JSON.parse(fs.readFileSync(viewPath(cwd), 'utf8'));
+  return envelopeData(fgos(cwd, ['list', '--all', '--json']).stdout);
 }
 
 // Every verb's success path prints a single fgos.v1 envelope
@@ -769,11 +769,12 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
     [
       'work.add:item1:add',
       'work.add:item2:add',
-      'work.move:item1:doing',
       'work.outcome:item1:predicted',
-      'executor.dispatch:item1:add', // D8, tsk-62v: dispatch announce/audit entry
+      'executor.dispatch:item1:add',
+      'work.move:item1:doing',
+      'work.attempt:item1:add',
       'work.move:item1:awaiting-approval',
-      'work.handoff:item1:reviewer', // D18: moveWork's own side effect on reaching awaiting-approval, not a second writer
+      'work.handoff:item1:reviewer',
       'work.outcome:item1:actual',
     ],
   );
@@ -864,12 +865,11 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
     : `${e.type}:${e.payload.to ?? e.payload.id ?? ''}`));
   assert.deepEqual(seq, [
     'work.add:item-red',
-    'work.move:doing',
     'work.outcome:predicted',
-    // D8, tsk-62v: one dispatch announce/audit entry per attempt — two
-    // retry attempts run before the item parks to blocked.
     'executor.dispatch:item-red',
     'executor.dispatch:item-red',
+    'work.move:doing',
+    'work.attempt:item-red',
     'work.move:blocked',
     'work.outcome:actual',
     'work.friction:item-red',

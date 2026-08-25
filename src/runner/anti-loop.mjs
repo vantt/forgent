@@ -56,6 +56,8 @@ function countableDoingMoveIndexes(events, id) {
       stage = event.payload.stage;
     } else if (event.type === 'work.stage' && event.payload.id === id) {
       stage = event.payload.to;
+    } else if (event.type === 'work.attempt' && event.payload.id === id && event.payload.phase === 'execute') {
+      indexes.add(i);
     } else if (event.type === 'work.move' && event.payload.id === id && event.payload.to === 'doing') {
       const executeStage = stageForStep(getDomain(domain), 'Execute');
       if ((stage ?? executeStage) === executeStage) {

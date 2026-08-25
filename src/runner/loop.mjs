@@ -56,6 +56,7 @@ import { execFileSync } from 'node:child_process';
 import {
   listWork,
   moveWork,
+  settleClaim,
   addWork,
   editWork,
   readyWork,
@@ -66,6 +67,7 @@ import {
   EXIT_CODES,
   resolveWriterLogPath,
 } from '../state/store.mjs';
+import { readClaims, readClaim } from '../state/runtime-coordination.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, resolveWorkflow, stageForStep, classificationVocabulary } from '../state/workflow-stage-graphs.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
@@ -377,19 +379,74 @@ function hasStillNeededDescendant(id, work) {
  */
 export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log = () => {}, dryRun = false } = {}) {
   const view = listWork(dir);
+  const activeClaims = readClaims(dir);
   const resolutions = [];
+  const processedIds = new Set();
 
+  for (const claim of Object.values(activeClaims)) {
+    const id = claim.id;
+    processedIds.add(id);
+    const item = view.work[id];
+    if (!item) continue;
+    if (claim.claimRole === 'human' || claim.claimRole === 'session' || claim.actor === 'human' || claim.actor === 'session') continue;
+
+    const branch = branchNameFor(id);
+    const facts = branchFacts(repoRoot, branch);
+    const hasCommit = facts.exists && facts.aheadCount > 0;
+
+    const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
+    if (!attestation.ok) {
+      if (dryRun) {
+        resolutions.push({ id, planned: 'blocked' });
+      } else {
+        settleClaim(dir, { id, claimId: claim.claimId, finalStatus: 'blocked', reason: attestation.reason, role: 'runner' });
+        log(`fgos-runner: reaped stale doing "${id}" -> blocked (${attestation.reason}: ${attestation.detail})`);
+        resolutions.push({ id, to: 'blocked', reason: attestation.reason });
+      }
+      continue;
+    }
+
+    if (dryRun) {
+      resolutions.push({ id, planned: hasCommit ? 'verify-then-resolve' : 'blocked' });
+      continue;
+    }
+
+    let verifyPassed = false;
+    let verifyTimedOut = false;
+    let worktreeFailed = false;
+    if (hasCommit) {
+      let wt = null;
+      try {
+        wt = createDispatchWorktree(repoRoot, id, { worktreeDir });
+        const goalCheck = await runGoalCheck(item, wt.path, verifyTimeoutMs);
+        verifyPassed = goalCheck.passed;
+        verifyTimedOut = goalCheck.timedOut;
+      } catch (err) {
+        if (err?.errorClass === 'worktree-fail') {
+          worktreeFailed = true;
+          log(`fgos-runner: worktree-fail while reaping stale "doing" item "${id}": ${err.message}`);
+        } else {
+          throw err;
+        }
+      } finally {
+        if (wt) removeDispatchWorktree(repoRoot, wt.path, log);
+      }
+    }
+
+    const resolution = worktreeFailed
+      ? { to: 'blocked', reason: 'runner-crash-reclaim' }
+      : resolveStaleDoing({ hasCommit, verifyPassed });
+    settleClaim(dir, { id, claimId: claim.claimId, finalStatus: resolution.to, reason: resolution.reason, role: 'runner' });
+    const timeoutNote = verifyTimedOut ? ' (goal-check timed out, not a real verify failure)' : '';
+    log(`fgos-runner: reaped stale doing "${id}" -> ${resolution.to}${resolution.reason ? ` (${resolution.reason})` : ''}${timeoutNote}`);
+    resolutions.push({ id, to: resolution.to, reason: resolution.reason ?? null });
+  }
+
+  // Fallback scan for legacy durable 'doing' items with no active runtime claim
   for (const id of Object.keys(view.work)) {
+    if (processedIds.has(id)) continue;
     const item = view.work[id];
     if (item.status !== 'doing') continue;
-    // Pull-door claims never expire on their own (stage-decompose S2-pull
-    // D1/cell action (4)): a human/session claimant holds `doing`
-    // indefinitely — reap only reclaims a claim the RUNNER itself made and
-    // then crashed on. `claimRole` is folded onto the item by replay.mjs
-    // from the claiming `work.move`'s own `role` field; a legacy log with
-    // no role at all (or a runner claim, `role: 'runner'`) is untouched —
-    // this is a strict narrowing of what already gets reaped, never a
-    // widening.
     if (item.claimRole === 'human' || item.claimRole === 'session') continue;
 
     const branch = branchNameFor(id);
@@ -420,19 +477,10 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
       let wt = null;
       try {
         wt = createDispatchWorktree(repoRoot, id, { worktreeDir });
-        // tsk-53o: read `timedOut` alongside `passed` — a timeout still
-        // reclaims to 'blocked' the same as any other non-pass (unchanged
-        // FSM behavior, resolveStaleDoing's own contract), but the log line
-        // below must say so rather than implying a real verify failure.
         const goalCheck = await runGoalCheck(item, wt.path, verifyTimeoutMs);
         verifyPassed = goalCheck.passed;
         verifyTimedOut = goalCheck.timedOut;
       } catch (err) {
-        // A worktree-fail here (e.g. this branch is irreconcilably checked
-        // out somewhere even after the reclaim in worktree.mjs) must never
-        // bubble past this loop and crash the whole reap raw: degrade this
-        // one item to a defined, reported state instead (per D5's blocked
-        // edge) and let the reap continue with the next stale item.
         if (err?.errorClass === 'worktree-fail') {
           worktreeFailed = true;
           log(`fgos-runner: worktree-fail while reaping stale "doing" item "${id}": ${err.message}`);
@@ -912,7 +960,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       if (check.passed && facts.aheadCount > 0) {
         breaker.recordHit(item.id);
         await queue.enqueue(async () => {
-          moveWork(dir, { id: item.id, to: 'awaiting-approval', expectedStatus: 'doing', role: 'runner' });
+          settleClaim(dir, { id: item.id, finalStatus: 'awaiting-approval', role: 'runner' });
         });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
         log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
@@ -992,10 +1040,9 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
     // records the edge itself; the reason lives in the runner's report (the
     // doing -> blocked edge carries no reason payload by design).
     await queue.enqueue(async () => {
-      moveWork(dir, {
+      settleClaim(dir, {
         id: item.id,
-        to: 'blocked',
-        expectedStatus: 'doing',
+        finalStatus: 'blocked',
         reason: tripped ? 'breaker-tripped' : failure.errorClass,
         role: 'runner',
       });
@@ -1104,9 +1151,9 @@ async function claimAndDispatch(ctx) {
     // `claim-rejected` is the outcome that already means "never dispatched,
     // left for a later poll" — the refused item keeps its place in the
     // frontier and the next poll picks it up once a slot frees.
-    if (err instanceof ClaimError && err.code === 'worker-slot-ceiling') {
+    if ((err.name === 'ClaimError' || err instanceof ClaimError) && (err.code === 'worker-slot-ceiling' || err.category === 'conflict' || err.code === 'conflict')) {
       log(`fgos-runner: claim for "${item.id}" refused — ${err.message}; left for a later poll`);
-      return { outcome: 'claim-rejected', id: item.id, reason: 'worker-slot-ceiling', exitCode: 0 };
+      return { outcome: 'claim-rejected', id: item.id, reason: err.code || 'conflict', exitCode: 0 };
     }
     const category = categoryOf(err);
     const exitCode = EXIT_CODES[category];
@@ -1334,7 +1381,7 @@ export async function runOnce(options = {}) {
         if (
           planningStage !== undefined &&
           (item.stage === planningStage || item.stage === legacyPlanStage) &&
-          item.status === 'todo'
+          (item.status === 'todo' || item.status === 'doing')
         ) {
           resolvePlan(dir, item.id, config, 'runner');
           log(`fgos-runner: chia-việc swept plan item "${item.id}"`);
