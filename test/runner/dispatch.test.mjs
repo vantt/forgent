@@ -2335,9 +2335,12 @@ test('decideExecutorCli never hands back mcpTool when the requested purpose has 
   // "out-of-process, configured:true" here was itself a real instance of
   // the same class of bug the second-round self-review found: this
   // executorId would refuse at actual dispatch time. "unavailable" is the
-  // honest answer.
+  // honest answer. `configured` stays true (third-round advisor finding,
+  // real): gitnexus DOES have a real executors.gitnexus entry -- the
+  // refusal is that it cannot be dispatched via cli, not that it is
+  // unregistered; conflating the two under one field was itself a bug.
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'other', hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'unavailable', executorId: 'gitnexus', configured: false });
+  assert.deepEqual(decided, { mechanism: 'unavailable', executorId: 'gitnexus', configured: true });
 });
 
 test('decideExecutorCli never hands back mcpTool for a direct executorId call when the executor names more than one "for" entry -- ambiguous, no purpose to disambiguate', async () => {
@@ -2358,8 +2361,9 @@ test('decideExecutorCli never hands back mcpTool for a direct executorId call wh
   // Same underlying gap as the sibling test above: gitnexus has no
   // via:"cli" invocation at all, so a direct executorId call with no
   // purpose to match against its mcp tools map can dispatch neither way.
+  // configured stays true for the same reason as the sibling test.
   const decided = await decideExecutorCli('gitnexus', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'unavailable', configured: false });
+  assert.deepEqual(decided, { mechanism: 'unavailable', configured: true });
 });
 
 test('decideExecutorCli never hands back mcpTool for an agent-kind executor -- agentType always wins, mcpTool and agentType are mutually exclusive', async () => {
@@ -5393,13 +5397,18 @@ test('compileDispatchPlan never reports a governance-blocked executor as dispatc
     },
   };
   const plan = compileDispatchPlan(cfg, { executorId: 'blockedExec' });
-  // Before this fix: mechanism stayed "out-of-process", configured stayed
-  // true, and governance silently degraded to null -- a caller reading
-  // only mechanism/configured would wrongly conclude this executor is
-  // dispatchable, when the exact same executorId passed to `execute`
-  // throws. The plan must never claim success while hiding that.
+  // Before this fix: mechanism stayed "out-of-process" and governance
+  // silently degraded to null -- a caller reading only mechanism would
+  // wrongly conclude this executor is dispatchable, when the exact same
+  // executorId passed to `execute` throws. The plan must never claim
+  // success while hiding that.
   assert.equal(plan.mechanism, 'unavailable');
-  assert.equal(plan.configured, false);
+  // `configured` means "does this executorId resolve to a real config
+  // entry" (third-round advisor finding, real) -- blockedExec DOES have
+  // one (executors.blockedExec), so configured stays true; the refusal
+  // itself is carried by mechanism + blockedReason, never by overloading
+  // this field with a second meaning.
+  assert.equal(plan.configured, true);
   assert.ok(plan.reasonCodes.includes('governance.blocked'));
   assert.ok(plan.blockedReason && plan.blockedReason.includes('cross-provider'), `expected a cross-provider blockedReason, got: ${plan.blockedReason}`);
 });

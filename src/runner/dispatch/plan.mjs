@@ -205,6 +205,16 @@ export function compileDispatchPlan(
 
   if (finalMechanism === 'out-of-process' && !resolvedForDispatch) {
     reasonCodes.push('governance.blocked');
+    // Second-round advisor finding (real, 2026-08-25): `configured` means
+    // "does this executorId resolve to a real config entry" everywhere
+    // else in this function (and in decideExecutorCli's own docstring) --
+    // it is NOT "can this be dispatched right now". A governance-blocked
+    // executor still HAS a real `executors.<id>` entry (`configured`,
+    // already computed above from the same `resolved` this branch reads
+    // `executor` from) -- overriding it to `false` here conflated two
+    // different questions under one field. `mechanism: 'unavailable'` +
+    // `blockedReason` already carry the refusal; `configured` stays
+    // faithful to its one meaning.
     return {
       selector,
       caller: callerObj,
@@ -214,7 +224,7 @@ export function compileDispatchPlan(
       invocation: null,
       governance: { providerFamily: null, egress: null },
       reasonCodes,
-      configured: false,
+      configured,
       blockedReason: resolveError?.message ?? null,
     };
   }
