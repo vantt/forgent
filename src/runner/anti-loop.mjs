@@ -59,9 +59,19 @@ function countableDoingMoveIndexes(events, id) {
     } else if (event.type === 'work.attempt' && event.payload.id === id && event.payload.phase === 'execute') {
       indexes.add(i);
     } else if (event.type === 'work.move' && event.payload.id === id && event.payload.to === 'doing') {
-      const executeStage = stageForStep(getDomain(domain), 'Execute');
-      if ((stage ?? executeStage) === executeStage) {
-        indexes.add(i);
+      // tsk-40m D3 (hard migration, no dual-count): settleClaim (store.mjs)
+      // writes this exact move immediately followed by its own paired
+      // work.attempt(phase:'execute') as one atomic settle segment — counting
+      // both would double-count a single real attempt. A legacy standalone
+      // doing-move (pre-migration, no paired attempt right after it) still
+      // counts on its own, unchanged.
+      const next = events[i + 1];
+      const bundledWithAttempt = next?.type === 'work.attempt' && next.payload?.id === id && next.payload?.phase === 'execute';
+      if (!bundledWithAttempt) {
+        const executeStage = stageForStep(getDomain(domain), 'Execute');
+        if ((stage ?? executeStage) === executeStage) {
+          indexes.add(i);
+        }
       }
     }
   }

@@ -960,7 +960,11 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       if (check.passed && facts.aheadCount > 0) {
         breaker.recordHit(item.id);
         await queue.enqueue(async () => {
-          settleClaim(dir, { id: item.id, finalStatus: 'awaiting-approval', role: 'runner' });
+          // tsk-40m code-review finding (blocker): settleClaim now requires
+          // claimId when an active claim exists — read this item's own live
+          // claim (acquired by claimItem's claimWork call above) instead of
+          // settling whatever claim happens to be active.
+          settleClaim(dir, { id: item.id, claimId: readClaim(dir, item.id)?.claimId, finalStatus: 'awaiting-approval', role: 'runner' });
         });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
         log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
@@ -1042,6 +1046,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
     await queue.enqueue(async () => {
       settleClaim(dir, {
         id: item.id,
+        claimId: readClaim(dir, item.id)?.claimId,
         finalStatus: 'blocked',
         reason: tripped ? 'breaker-tripped' : failure.errorClass,
         role: 'runner',

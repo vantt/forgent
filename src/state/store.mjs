@@ -993,7 +993,15 @@ export function settleClaim(dir, {
   const claim = readClaim(dir, id);
 
   if (claim) {
-    if (claimId && claim.claimId !== claimId) {
+    // tsk-40m code-review finding (blocker): an active claim exists for
+    // `id` — the caller MUST name it. Silently settling "whatever claim is
+    // active right now" when the caller omits claimId let a stale actor
+    // (its own claim already released/reclaimed) settle a DIFFERENT actor's
+    // live claim (D2's ownership check has nothing to check against).
+    if (!claimId) {
+      throw new StoreError('validation', `settleClaim: "claimId" is required for "${id}" — an active claim exists ("${claim.claimId}") and the caller must name it.`);
+    }
+    if (claim.claimId !== claimId) {
       throw new StoreError('conflict', `settleClaim: claimId mismatch for "${id}": active claim is "${claim.claimId}", got "${claimId}".`);
     }
     const targetClaimId = claim.claimId;
@@ -1574,6 +1582,34 @@ export function addFriction(dir, payload) {
   return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.friction', payload }, dir));
 }
 
+/**
+ * Append a standalone durable `work.attempt` record for a claim that ends
+ * WITHOUT a status transition — a stale runtime claim reclaimed by a new
+ * claimant (claim-port.mjs's stale-claim-reclaim path). `settleClaim`
+ * already folds a `work.attempt` into its own full segment when a claim
+ * settles through a real status transition; this is the sibling for the
+ * other way a claim ends (tsk-40m code-review finding, high, D4/D8) — kept
+ * separate from `settleClaim` since a reclaim never transitions the item's
+ * own status.
+ *
+ * `attemptCount`/`lastAttempt` (replay.mjs) rely on `work.attempt`
+ * existing at all to tell "started then reclaimed" apart from "never
+ * started" — without this, releasing/reclaiming a runtime claim (which
+ * only ever deletes the `.fgos/runtime/claims/<id>.json` file, never a
+ * durable event) left no trace an attempt ever happened.
+ */
+export function recordClaimAttempt(dir, { id, phase, result, claimId, actor, endedAt } = {}) {
+  const { logPath } = paths(dir);
+  if (!id || typeof id !== 'string') {
+    throw new StoreError('validation', 'recordClaimAttempt: "id" is required.');
+  }
+  if (!phase || typeof phase !== 'string') {
+    throw new StoreError('validation', 'recordClaimAttempt: "phase" is required.');
+  }
+  const payload = { id, phase, result, claimId, actor: actor || 'unknown', endedAt: endedAt || new Date().toISOString() };
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.attempt', payload }, dir));
+}
+
 export function currentEffectiveView(dir) {
   const durableView = currentView(dir);
   const claims = readClaims(dir);
@@ -1633,7 +1669,10 @@ export function graphMetrics(dir) {
  * shape as graphMetrics; the Domain compute core decides the answer.
  */
 export function graphWhatIf(dir, id) {
-  return computeWhatIf(currentView(dir), id);
+  // tsk-40m code-review finding (high, D4): effective view, not durable-only
+  // -- an actively-claimed dependent (durable status still 'todo' post-
+  // migration) must not read as newly-ready idle work.
+  return computeWhatIf(currentEffectiveView(dir), id);
 }
 
 /**
@@ -1665,7 +1704,17 @@ export function goalFocusShow(dir) {
  * suggests; it never moves or reclaims anything.
  */
 export function staleDoingAdvisory(dir, opts = {}) {
-  const view = currentView(dir);
+  // tsk-40m code-review finding (high, D4): claim-time no longer writes a
+  // durable work.move(->doing) event for an active runtime claim (only
+  // settle-time does, retroactively) -- an item still under an active claim
+  // has NO such event yet, so the raw-event-derived `claimedAt` this used to
+  // rely on is blind to every post-migration claim (this advisory would
+  // always report zero of them, no matter how stale). An active claim's own
+  // `acquiredAt` is the real "claimed at" timestamp; the raw-event scan
+  // stays as the fallback for a legacy pre-migration item (durable status
+  // still 'doing', no active runtime claim record at all).
+  const claims = readClaims(dir);
+  const view = buildEffectiveView(currentView(dir), claims);
   const claimedAt = new Map();
   for (const event of readAllEvents(dir)) {
     if (event.type === 'work.move' && event.payload?.to === 'doing' && typeof event.payload?.id === 'string') {
@@ -1676,7 +1725,13 @@ export function staleDoingAdvisory(dir, opts = {}) {
   const entries = [];
   for (const id of Object.keys(view.work)) {
     if (view.work[id].status !== 'doing') continue;
-    entries.push({ id, claimRole: view.work[id].claimRole, claimedAt: claimedAt.get(id) });
+    const claim = claims[id];
+    const claimTs = claim ? Date.parse(claim.acquiredAt) : claimedAt.get(id);
+    entries.push({
+      id,
+      claimRole: claim ? (claim.claimRole || claim.actor) : view.work[id].claimRole,
+      claimedAt: Number.isNaN(claimTs) ? undefined : claimTs,
+    });
   }
   return classifyStaleDoing(entries, opts);
 }
@@ -1716,7 +1771,10 @@ export function stalePostDeliveryAdvisory(dir, opts = {}) {
  * instead.
  */
 export function footprintConflicts(dir) {
-  return footprintOverlapAmong(frontierAcrossSteps(currentView(dir)));
+  // tsk-40m code-review finding (high, D4): effective view -- an actively-
+  // claimed item is not an idle-and-ready candidate for a parallel-dispatch
+  // collision.
+  return footprintOverlapAmong(frontierAcrossSteps(currentEffectiveView(dir)));
 }
 
 /**
@@ -1729,7 +1787,9 @@ export function footprintConflicts(dir) {
  * (`graph-metrics.mjs`) computes both, this just rebuilds the view.
  */
 export function computedSchedule(dir, candidateIds) {
-  const view = currentView(dir);
+  // tsk-40m code-review finding (high, D4): effective view -- an actively-
+  // claimed item must not be scheduled into a new dispatch wave.
+  const view = currentEffectiveView(dir);
   return { ...computeSchedule(view, candidateIds), cycles: detectCycles(view) };
 }
 

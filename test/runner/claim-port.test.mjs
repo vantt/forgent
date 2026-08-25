@@ -237,7 +237,7 @@ test('claimWork on a claim-lock §3b-marked release preserves the ORIGINAL branc
   execFileSync('git', ['add', '-A'], { cwd: worktreePath });
   execFileSync('git', ['commit', '-q', '-m', 'docs: lock decisions'], { cwd: worktreePath });
 
-  settleClaim(dir, { id: 'item-a', finalStatus: 'todo', releaseTrigger: 'claim-lock-3b' });
+  settleClaim(dir, { id: 'item-a', claimId: firstClaim.claimId, finalStatus: 'todo', releaseTrigger: 'claim-lock-3b' });
 
   const reclaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
 
@@ -267,7 +267,7 @@ test('claimWork on an UNMARKED todo-with-branch reclaim (e.g. reject) still reco
   // No releaseTrigger here — an unmarked doing -> todo move, standing in
   // for reject's own awaiting-approval -> todo (same shape: status todo, branch
   // alive, no marker).
-  settleClaim(dir, { id: 'item-a', finalStatus: 'todo' });
+  settleClaim(dir, { id: 'item-a', claimId: firstClaim.claimId, finalStatus: 'todo' });
 
   const reclaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
 
@@ -377,7 +377,7 @@ test('claimWork reverts a branch-take blocked->doing claim back to blocked when 
   const firstClaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
   assert.equal(firstClaim.source, 'branch');
 
-  settleClaim(dir, { id: 'item-a', finalStatus: 'blocked' });
+  settleClaim(dir, { id: 'item-a', claimId: firstClaim.claimId, finalStatus: 'blocked' });
 
   assert.throws(
     () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot, worktreeDir: unusableWorktreeDir() }),
@@ -419,6 +419,31 @@ test('claimWork transparently reclaims a conclusively-quiet session doing claim 
     (e) => e.type === 'decision' && e.payload?.id === 'item-a' && e.payload?.source === 'claimWork' && e.payload?.text?.startsWith('stale-claim-reclaim:'),
   );
   assert.equal(evidenceDecisions.length, 1, 'the release must be logged with its evidence (D2c) — reason itself is not stamped for the doing->todo edge (status-fsm.mjs:216-232)');
+});
+
+// tsk-40m code-review finding (high, D4/D8): a stale-claim reclaim used to
+// only delete the runtime claim file (releaseClaim) with no durable trace —
+// the item read back to effective 'todo', indistinguishable from an item
+// that had never been claimed at all. It must now carry a durable
+// work.attempt(result:'reclaimed') so attemptCount/lastAttempt can tell
+// "started then reclaimed" apart from "never started".
+test('a stale-claim reclaim records a durable work.attempt(result:"reclaimed") before releasing, distinguishing "started then reclaimed" from "never started" (tsk-40m)', () => {
+  const { repoRoot, dir } = setup();
+
+  const first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
+  commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
+
+  claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+
+  const attempts = readRawEvents(dir).filter((e) => e.type === 'work.attempt' && e.payload?.id === 'item-a');
+  assert.equal(attempts.length, 1, 'exactly one work.attempt must be recorded for the reclaimed (first) claim');
+  assert.equal(attempts[0].payload.result, 'reclaimed');
+  assert.equal(attempts[0].payload.claimId, first.claimId);
+
+  const item = listWork(dir).work['item-a'];
+  assert.equal(item.attemptCount, 1, 'attemptCount must reflect the reclaimed attempt — never indistinguishable from a never-started item');
+  assert.equal(item.lastAttempt.result, 'reclaimed');
 });
 
 // tsk-37t: a repo drifted over its own worker-slot ceiling (occupied >

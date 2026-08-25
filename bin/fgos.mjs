@@ -51,6 +51,7 @@ import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.m
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
+import { readClaim } from '../src/state/runtime-coordination.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
@@ -3110,6 +3111,13 @@ async function runVerb(verb, flags, positional, dir) {
           `return: work "${id}" was not taken through the pull door (claimed by "${item.claimRole ?? 'runner'}") — return only completes a take.`,
         );
       }
+      // tsk-40m code-review finding (blocker): settleClaim requires claimId
+      // when an active claim exists — read it once here, reused by every
+      // settleClaim call below (branch-source/main-source, success/failure).
+      // A legacy pre-migration item (durable 'doing', no active runtime
+      // claim) reads null here — settleClaim's own legacy fallback handles
+      // that case without a claimId.
+      const activeClaim = readClaim(dir, id);
       // tsk-1zo: a verify never upgraded from its discovery/submit-stage
       // placeholder sentinel shells out as literal text (runGoalCheck ->
       // runCommand) and fails with a cryptic raw shell error ("<first
@@ -3143,7 +3151,7 @@ async function runVerb(verb, flags, positional, dir) {
         }
         const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
         if (!attestation.ok) {
-          settleClaim(dir, { id, finalStatus: 'blocked', reason: attestation.reason, role: item.claimRole ?? 'session' });
+          settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'blocked', reason: attestation.reason, role: item.claimRole ?? 'session' });
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -3252,7 +3260,7 @@ async function runVerb(verb, flags, positional, dir) {
           // itself) — excludeIronLawEvidence strips this item's own mandatory
           // evidence doc before checking, see that helper's own comment.
           const footprintDiff = footprintDiffHits(excludeDocsRefResearch(excludeFgosPaths(excludeIronLawEvidence(changed, id)), item), item.footprint);
-          const { event } = settleClaim(dir, { id, finalStatus: 'awaiting-approval', branchHeadAtReturn: branchHead });
+          const { event } = settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'awaiting-approval', branchHeadAtReturn: branchHead });
           addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
           return { id, from: 'doing', to: 'awaiting-approval', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
         }
@@ -3261,7 +3269,7 @@ async function runVerb(verb, flags, positional, dir) {
         // machine may simply have been under load) — never let it park as
         // an indistinguishable 'verify-fail'/'verify-miss', and never state
         // "(exit null)" as if that were a real exit code.
-        settleClaim(dir, { id, finalStatus: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+        settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
         addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount: branchAheadCount } });
         {
           const detail = check.timedOut
@@ -3383,7 +3391,7 @@ async function runVerb(verb, flags, positional, dir) {
         const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
         // tsk-4hl: see excludeIronLawEvidence's own comment above.
         const footprintDiff = footprintDiffHits(excludeDocsRefResearch(excludeFgosPaths(excludeIronLawEvidence(ownDiff, id)), item), item.footprint);
-        const { event } = settleClaim(dir, { id, finalStatus: 'awaiting-approval', headAtReturn: head });
+        const { event } = settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'awaiting-approval', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount } });
         // tsk-45z D1/D2: this session's own commits (landed straight on the
         // main checkout, not a branch/worktree) may still hold
@@ -3400,7 +3408,7 @@ async function runVerb(verb, flags, positional, dir) {
 
       // tsk-53o: same timeout/fail distinction as the branch-source path
       // above — a timeout is not proof the item's verify failed.
-      settleClaim(dir, { id, finalStatus: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+      settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
       addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount } });
       {
         const detail = check.timedOut

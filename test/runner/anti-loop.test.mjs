@@ -83,6 +83,10 @@ function stageMove(id, to, seq) {
   return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.stage', payload: { id, from: 'x', to }, v: 2 };
 }
 
+function attempt(id, seq, overrides = {}) {
+  return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.attempt', payload: { id, phase: 'execute', result: 'success', ...overrides }, v: 3 };
+}
+
 test('a log with no work.add for the id counts every doing-move exactly as before (backward-compat: no domain/stage info defaults to counting)', () => {
   const events = [move('a', 'doing', 1), move('a', 'blocked', 2), move('a', 'doing', 3)];
   assert.equal(visitCount(events, 'a'), 2);
@@ -132,6 +136,30 @@ test('visitsSinceLastHumanEvent also excludes clarify/decompose-phase claims fro
   ];
   assert.equal(visitCount(events, 'a'), 2);
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
+});
+
+// -- settleClaim's full-segment bundle (tsk-40m D3): one real settle writes
+// BOTH work.move(->doing) and work.attempt(phase:execute) together (store.mjs's
+// settleClaim), one right after the other. D3 is a hard migration -- no
+// dual-count: one settle must count as exactly one visit, not two.
+
+test('visitCount counts a settleClaim-style bundle (doing-move immediately followed by its own work.attempt) once, not twice', () => {
+  const events = [add('a', 1), move('a', 'doing', 2), attempt('a', 3), move('a', 'awaiting-approval', 4)];
+  assert.equal(visitCount(events, 'a'), 1);
+});
+
+test('visitCount still counts a legacy standalone doing-move (no paired work.attempt) exactly as before', () => {
+  const events = [add('a', 1), move('a', 'doing', 2), move('a', 'blocked', 3)];
+  assert.equal(visitCount(events, 'a'), 1);
+});
+
+test('visitCount counts two consecutive settleClaim bundles as two visits, not four', () => {
+  const events = [
+    add('a', 1),
+    move('a', 'doing', 2), attempt('a', 3), move('a', 'blocked', 4), // bundle 1
+    move('a', 'doing', 5), attempt('a', 6), move('a', 'awaiting-approval', 7), // bundle 2
+  ];
+  assert.equal(visitCount(events, 'a'), 2);
 });
 
 // -- visitsSinceLastHumanEvent: human-rounds D1 gate budget ----------------

@@ -7,9 +7,10 @@
 // This is the "one door" for claiming work — no direct moveWork(to:'doing')
 // calls outside this module except for FSM-internal transitions.
 
-import { moveWork, addOutcome, addDecision, readRawEvents, FsmError } from '../state/store.mjs';
+import { moveWork, addOutcome, addDecision, recordClaimAttempt, readRawEvents, FsmError } from '../state/store.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
+import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { visitCount } from './anti-loop.mjs';
 import { acquireMainCheckoutLock, forceReclaimAmbiguousLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs, HOLDER_PID_ENV_VAR } from './main-checkout-lock.mjs';
 import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
@@ -240,6 +241,17 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     ) {
       try {
         if (activeClaim) {
+          // tsk-40m code-review finding (high, D4/D8): releasing a claim
+          // used to just delete the runtime claim file, with no durable
+          // trace — a reclaimed item read identical to one that never
+          // started. Record the attempt first so attemptCount/lastAttempt
+          // (replay.mjs) can tell "started then reclaimed" apart from
+          // "never started". `phase` mirrors anti-loop.mjs's own
+          // executing-stage check (claim-lock) so a reclaim of a clarify/
+          // decompose-phase claim never inflates the execute-phase budget.
+          const executeStage = stageForStep(getDomain(item.domain), 'Execute');
+          const claimPhase = (item.stage ?? executeStage) === executeStage ? 'execute' : (item.stage || 'unknown');
+          recordClaimAttempt(dir, { id, phase: claimPhase, result: 'reclaimed', claimId: activeClaim.claimId, actor: activeClaim.actor });
           releaseClaim(dir, { id, claimId: activeClaim.claimId });
         } else if (item.status === 'doing') {
           moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });
