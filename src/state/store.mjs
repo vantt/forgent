@@ -1140,9 +1140,22 @@ export function settleClaim(dir, {
 
       // Event 3: work.move ('doing' -> finalStatus)
       const event3 = appendEventLocked(writerLogPath, move3Raw, dir);
-      const afterView = rebuildViewFromDir(dir);
 
-      return { event: event3, view: afterView };
+      // tsk-40m code-review finding (blocker): return the raw event
+      // directly here — matching moveWork's own `return
+      // appendEventLocked(...)` pattern immediately above in this file —
+      // so withEventsLockAndRefresh's own `{ event, view }` wrapper (below,
+      // after this whole closure returns) produces `res.event` as the
+      // real final work.move event (with its own `.seq`), not this
+      // closure's own separate `{event, view}` object nested one level too
+      // deep. bin/fgos.mjs's `return` command reads `event.seq` straight
+      // off this for its own CLI output — nested, that was always
+      // `undefined`, silently dropping the audit seq from every `fgos
+      // return` a claim-tracked item went through. The old manual
+      // rebuildViewFromDir call this replaced was also redundant:
+      // withEventsLockAndRefresh's own refreshView call (run right after
+      // this closure returns) already rebuilds and persists the view.
+      return event3;
       });
 
       // tsk-40m code-review finding (blocker): release the claim HERE,

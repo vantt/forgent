@@ -5,7 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, readRawEvents, StoreError } from '../../src/state/store.mjs';
+import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, editWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, readRawEvents, StoreError } from '../../src/state/store.mjs';
 import { acquireClaim, releaseClaim, readClaim, readClaims, buildEffectiveView, getItemDurableRevision, ClaimError } from '../../src/state/runtime-coordination.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 
@@ -83,6 +83,15 @@ test('settleClaim appends 3-event segment and releases claim', () => {
 
   assert.equal(res.view.work['tsk-1'].status, 'awaiting-approval');
   assert.equal(readClaim(dir, 'tsk-1'), null);
+
+  // tsk-40m code-review finding (blocker): res.event must be the real
+  // final work.move event itself (matching moveWork's own return shape),
+  // never a nested {event, view} object one level too deep -- bin/
+  // fgos.mjs's `return` command reads `event.seq` straight off this for
+  // its own CLI output.
+  assert.equal(typeof res.event.seq, 'number', 'res.event must be the raw final event, not a nested {event, view} wrapper');
+  assert.equal(res.event.type, 'work.move');
+  assert.equal(res.event.payload.to, 'awaiting-approval');
 
   // Check event log has work.move(->doing), work.attempt, work.move(doing->awaiting-approval)
   const events = listWork(dir);
@@ -470,4 +479,56 @@ test('buildEffectiveView still trusts a claim with no preClaimStatus recorded (l
   const view = listWork(dir);
   assert.equal(view.work['tsk-1'].status, 'doing', 'a claim with no recorded preClaimStatus cannot be judged stale -- stays trusted as before');
   assert.equal(view.work['tsk-1'].staleClaim, undefined);
+});
+
+// tsk-40m code-review finding (non-blocking): buildEffectiveView's
+// staleness check only compares status -- if durable CONTENT changes (an
+// unrelated editWork) while status stays the same, the claim still reads
+// as active (correct: it genuinely still IS the active claim for that
+// status). settleClaim's own preClaimRevision check is the actual guard
+// against this case, catching the content drift at settle time even
+// though the effective-view overlay itself can't see it.
+test('a durable content change with the SAME status is not flagged stale by buildEffectiveView, but settleClaim still catches it via preClaimRevision', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 16', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  const preClaimRevision = getItemDurableRevision(listWork(dir), 'tsk-1');
+  const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision });
+
+  // Durable content changes (title), status stays 'todo' -- a real edit by
+  // a different actor, not this claim's own doing.
+  editWork(dir, { id: 'tsk-1', patch: { title: 'Task 16 (retitled)' } });
+
+  const view = listWork(dir);
+  assert.equal(view.work['tsk-1'].status, 'doing', 'status-only staleness check cannot see a content-only drift -- still reads as the active claim');
+  assert.equal(view.work['tsk-1'].staleClaim, undefined);
+
+  assert.throws(
+    () => settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' }),
+    (err) => err instanceof StoreError && err.category === 'conflict',
+    'settleClaim\'s own preClaimRevision check must still catch the content drift, even though the effective-view overlay could not',
+  );
+  assert.ok(readClaim(dir, 'tsk-1'), 'the claim must survive this conflict untouched');
+});
+
+// tsk-40m code-review finding (test gap): status-fsm.mjs requires a
+// non-empty `ask` for the doing -> awaiting-human edge. This must go
+// through the SAME build-both-legs-before-appending-either guard as an
+// invalid finalStatus (they are both transitionWork failures on move3) --
+// locked here as its own regression rather than relying on the invalid-
+// finalStatus test to imply it.
+test('settleClaim to finalStatus:"awaiting-human" with no ask writes NOTHING durably, claim survives untouched', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 17', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo' });
+
+  assert.throws(
+    () => settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-human' }),
+    (err) => err.category === 'precondition' || err.category === 'validation',
+  );
+
+  const events = readRawEvents(dir);
+  assert.equal(events.filter((e) => e.type === 'work.move').length, 0, 'no partial work.move must land durably');
+  assert.equal(events.filter((e) => e.type === 'work.attempt').length, 0, 'no orphaned work.attempt must land durably');
+  assert.ok(readClaim(dir, 'tsk-1'), 'the claim must survive a missing-ask attempt, not be silently dropped');
+  assert.equal(readClaim(dir, 'tsk-1').claimId, claim.claimId);
 });

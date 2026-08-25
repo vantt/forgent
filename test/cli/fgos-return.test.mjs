@@ -105,6 +105,11 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   const data = envelopeData(result.stdout);
   assert.equal(data.to, 'awaiting-approval');
   assert.equal(data.passed, true);
+  // tsk-40m code-review finding (blocker): settleClaim's own return value
+  // used to nest {event, view} one level too deep -- event.seq read
+  // `undefined` here, silently dropping the audit seq from the CLI's own
+  // output for every claim-tracked return.
+  assert.equal(typeof data.seq, 'number', 'the CLI output must carry the real event seq, not undefined');
 
   const view = stateView(cwd);
   assert.equal(view.work['pull-return-ok'].status, 'awaiting-approval');
