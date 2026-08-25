@@ -96,6 +96,20 @@ constant only guarded the fallback branch, leaving the boundary branch
 (the one that actually produced the 230-character title) completely
 uncapped.
 
+## Follow-up polish: marking a truncation as a truncation
+
+The original cut left a reader unable to tell "this is the whole title"
+from "this was cut off" just by looking at it — both look like an ordinary
+title. A follow-up item (`tsk-16a`) closed that: `truncateTitle` now
+appends a single ellipsis character (`…`) whenever it actually truncates,
+reserving one character *inside* the existing `MAX_TITLE_LENGTH = 100`
+budget so the final length (word-boundary cut plus the ellipsis) never
+exceeds the ceiling — the word-boundary cut logic itself is unchanged,
+it just searches within a 99-character budget instead of 100 when a
+truncation is about to happen. This is cosmetic polish of the contract
+above, not a change to the ceiling value or to `fgos-clarifying`'s own
+rewrite trigger.
+
 ## What this item does not claim to fix
 
 The semantic half of the original request — a title should convey
