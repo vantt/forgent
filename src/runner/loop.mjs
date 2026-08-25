@@ -67,7 +67,7 @@ import {
   EXIT_CODES,
   resolveWriterLogPath,
 } from '../state/store.mjs';
-import { readClaims, readClaim } from '../state/runtime-coordination.mjs';
+import { readClaims } from '../state/runtime-coordination.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, resolveWorkflow, stageForStep, classificationVocabulary } from '../state/workflow-stage-graphs.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
@@ -581,14 +581,20 @@ async function claimItem({ dir, ownershipStore, queue, ownerIdentity, item, repo
     const freshView = listWork(dir);
     const decision = claimRoot(ownershipStore, freshView, item.id, ownerIdentity);
     if (decision.action === 'claim') ownershipStore.setOwner(decision.root, ownerIdentity);
+    let claimId;
     if (decision.accepted) {
       // Delegate to claim-port.mjs for main-checkout-lock + moveWork (tsk-53f D1).
       // Runner uses isolate:false here — worktree creation happens later in runItem.
       // skipOutcome:true because runner writes its own predicted outcome in runItem
       // with proper timing (after worktree creation, with branch head info).
-      claimWork(dir, { id: item.id, actor: 'runner', isolate: false, repoRoot, skipOutcome: true });
+      // tsk-40m code-review finding (blocker): capture the claimId THIS call
+      // actually acquired — dispatchClaimedItem must settle with this exact
+      // token, never re-read "whichever claim is active right now" at
+      // settle time (that would settle a DIFFERENT actor's claim if this
+      // one got reclaimed as stale in the meantime).
+      claimId = claimWork(dir, { id: item.id, actor: 'runner', isolate: false, repoRoot, skipOutcome: true }).claimId;
     }
-    return decision;
+    return { ...decision, claimId };
   });
 }
 
@@ -828,7 +834,7 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
   }
 }
 
-async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, breaker, queue, log, priorVisits, rootId }) {
+async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, breaker, queue, log, priorVisits, rootId, claimId }) {
   log(`fgos-runner: claimed "${item.id}" (todo -> doing)`);
   await queue.enqueue(async () => {
     addOutcome(dir, {
@@ -960,11 +966,13 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       if (check.passed && facts.aheadCount > 0) {
         breaker.recordHit(item.id);
         await queue.enqueue(async () => {
-          // tsk-40m code-review finding (blocker): settleClaim now requires
-          // claimId when an active claim exists — read this item's own live
-          // claim (acquired by claimItem's claimWork call above) instead of
-          // settling whatever claim happens to be active.
-          settleClaim(dir, { id: item.id, claimId: readClaim(dir, item.id)?.claimId, finalStatus: 'awaiting-approval', role: 'runner' });
+          // tsk-40m code-review finding (blocker): settle with the EXACT
+          // claimId claimItem's own claimWork call acquired — never
+          // re-derive "whichever claim is active right now" via readClaim
+          // at settle time (that reads a DIFFERENT actor's claimId if this
+          // one was reclaimed as stale in the meantime, and would silently
+          // settle their claim instead of failing closed).
+          settleClaim(dir, { id: item.id, claimId, finalStatus: 'awaiting-approval', role: 'runner' });
         });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
         log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
@@ -1046,7 +1054,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
     await queue.enqueue(async () => {
       settleClaim(dir, {
         id: item.id,
-        claimId: readClaim(dir, item.id)?.claimId,
+        claimId,
         finalStatus: 'blocked',
         reason: tripped ? 'breaker-tripped' : failure.errorClass,
         role: 'runner',
@@ -1142,7 +1150,7 @@ async function claimAndDispatch(ctx) {
       log(`fgos-runner: claim for "${item.id}" rejected — root held by "${decision.currentOwner}"; left for a later poll`);
       return { outcome: 'claim-rejected', id: item.id, currentOwner: decision.currentOwner, exitCode: 0 };
     }
-    return await dispatchClaimedItem({ ...ctx, priorVisits, rootId: decision.root });
+    return await dispatchClaimedItem({ ...ctx, priorVisits, rootId: decision.root, claimId: decision.claimId });
   } catch (err) {
     // A worker-slot refusal is an ANSWER, not a failure (D6): the launcher
     // asked, the engine said no, and nothing was stood up. It reaches here

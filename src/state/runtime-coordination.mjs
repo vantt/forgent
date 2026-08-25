@@ -111,17 +111,37 @@ export function withClaimsLock(fgosDirInput, fn, { timeoutMs = 2000, retryMs = 1
 
 /**
  * Read active runtime claim for a single item `id`.
+ *
+ * tsk-40m code-review finding (non-blocking, fail-open on corrupt data):
+ * ENOENT (no claim file at all) is the only case that legitimately means
+ * "no active claim" -> `null`. Any OTHER failure (a torn/corrupt write, a
+ * permission error) means "I don't actually know" — fails CLOSED with a
+ * typed `ClaimError`, never silently as "unclaimed". Read as `null` here,
+ * `acquireClaim`'s own existence check would have happily OVERWRITTEN a
+ * claim file that was merely unreadable, not actually absent, and every
+ * effective-view read would have shown the item as plain `todo` instead of
+ * surfacing that its claim state is unknown.
  */
 export function readClaim(fgosDirInput, id) {
   if (!id || typeof id !== 'string') return null;
   const fgosDir = getMainFgosDir(fgosDirInput);
   const claimsDir = resolveFgosFile(fgosDir, FGOS_FILE.CLAIMS_DIR);
   const claimFilePath = path.join(claimsDir, `${id}.json`);
+  let raw;
   try {
-    const raw = fs.readFileSync(claimFilePath, 'utf8');
+    raw = fs.readFileSync(claimFilePath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return null;
+    // 'corrupt-log' (store.mjs's EXIT_CODES, exit 5): the same
+    // operator-facing meaning as a corrupt eventlog file — local `.fgos`
+    // state needs manual repair — reused here rather than inventing a
+    // parallel category for the same class of problem.
+    throw new ClaimError('corrupt-log', `readClaim: claim file for "${id}" exists but could not be read: ${err.message}`);
+  }
+  try {
     return JSON.parse(raw);
-  } catch {
-    return null;
+  } catch (err) {
+    throw new ClaimError('corrupt-log', `readClaim: claim file for "${id}" is not valid JSON: ${err.message}`);
   }
 }
 

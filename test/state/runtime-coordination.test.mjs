@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, StoreError } from '../../src/state/store.mjs';
-import { acquireClaim, releaseClaim, readClaim, readClaims, buildEffectiveView, getItemDurableRevision } from '../../src/state/runtime-coordination.mjs';
+import { acquireClaim, releaseClaim, readClaim, readClaims, buildEffectiveView, getItemDurableRevision, ClaimError } from '../../src/state/runtime-coordination.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 
 function makeTmpDir() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claim-test-'));
@@ -198,4 +199,43 @@ test('staleDoingAdvisory flags a genuinely stale active claim using the claim re
     report.stale.some((entry) => entry.id === 'a'),
     'an active runtime claim with no durable work.move->doing event must still be classifiable as stale, via the claim record\'s own acquiredAt',
   );
+});
+
+// tsk-40m code-review finding (non-blocking, fail-open on corrupt data):
+// readClaim used to catch-all and return null on ANY read/parse error,
+// indistinguishable from "no claim file at all". A claim file that EXISTS
+// but is corrupt (a torn write, disk error) must fail closed instead --
+// silently reading it as "unclaimed" would let acquireClaim overwrite real
+// (if unreadable) claim data, and every effective-view read would show the
+// item as plain 'todo' with no signal anything is wrong.
+test('readClaim returns null only for a genuinely missing claim file, and fails closed (throws) on one that exists but is corrupt', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 7', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+
+  assert.equal(readClaim(dir, 'tsk-1'), null, 'a genuinely missing claim file still reads as no active claim');
+
+  const claimsDir = resolveFgosFile(dir, FGOS_FILE.CLAIMS_DIR);
+  fs.mkdirSync(claimsDir, { recursive: true });
+  fs.writeFileSync(path.join(claimsDir, 'tsk-1.json'), '{not valid json', 'utf8');
+
+  assert.throws(
+    () => readClaim(dir, 'tsk-1'),
+    (err) => err instanceof ClaimError && err.category === 'corrupt-log',
+  );
+});
+
+test('acquireClaim never silently overwrites a claim file that exists but is corrupt', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 8', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+
+  const claimsDir = resolveFgosFile(dir, FGOS_FILE.CLAIMS_DIR);
+  fs.mkdirSync(claimsDir, { recursive: true });
+  fs.writeFileSync(path.join(claimsDir, 'tsk-1.json'), '{not valid json', 'utf8');
+
+  assert.throws(
+    () => acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo' }),
+    (err) => err instanceof ClaimError && err.category === 'corrupt-log',
+  );
+  // the corrupt file must survive untouched -- never silently overwritten
+  assert.equal(fs.readFileSync(path.join(claimsDir, 'tsk-1.json'), 'utf8'), '{not valid json');
 });

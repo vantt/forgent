@@ -139,6 +139,37 @@ moveWork(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, to: 'blocked',
   return scriptPath;
 }
 
+/** tsk-40m code-review finding (blocker): a rogue writer that races the
+ * runner's CLAIM (not its status move) — does the work, commits it, then
+ * releases the runner's own runtime claim and acquires a fresh one under a
+ * DIFFERENT actor, behind the runner's back. Simulates a stale-claim
+ * reclaim happening mid-dispatch (bypassing claim-port.mjs's own liveness
+ * gate directly, the same way writeRacingExecutor above bypasses moveWork's
+ * normal callers to force the race deterministically). The runner's own
+ * settleClaim call must still carry the EXACT claimId it acquired at claim
+ * time — never re-derive "whichever claim is active now" — so this must
+ * conflict instead of silently settling the different actor's claim. */
+function writeClaimReclaimingExecutor(scriptDir, counterFile, mainDir, id) {
+  const runtimeCoordUrl = pathToFileURL(path.resolve(import.meta.dirname, '../../src/state/runtime-coordination.mjs')).href;
+  const scriptPath = path.join(scriptDir, 'claim-reclaiming-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
+fs.writeFileSync('output.txt', 'produced by worker\\n');
+execFileSync('git', ['add', 'output.txt']);
+execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);
+const { readClaim, releaseClaim, acquireClaim } = await import(${JSON.stringify(runtimeCoordUrl)});
+const stale = readClaim(${JSON.stringify(mainDir)}, ${JSON.stringify(id)});
+releaseClaim(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, claimId: stale.claimId });
+acquireClaim(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, actor: 'a-different-actor', preClaimStatus: 'todo' });
+`,
+  );
+  return scriptPath;
+}
+
 /** A worker that records a real execution INTERVAL: it writes a start marker,
  * waits long enough that two concurrent dispatches must overlap in wall time,
  * then writes+commits its proof file and an end marker. Each item writes to
@@ -1425,6 +1456,27 @@ test('state-conflict: a racing write under the runner\'s claim makes its own CAS
   // cleanup still ran on this halt path: worktree gone, branch kept
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
   assert.equal(branchExists(repoRoot, 'fgw/item-race'), true);
+});
+
+test('tsk-40m code-review finding (blocker): a claim reclaimed by a DIFFERENT actor mid-dispatch is never silently settled by the runner\'s own stale claimId -- CAS conflict, clean halt, exit 3', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-race-claim' });
+  const config = configFor(writeClaimReclaimingExecutor(scriptDir, counterFile, dir, 'item-race-claim'));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.exitCode, 3);
+  assert.equal(result.dispatched[0].outcome, 'halted');
+  assert.equal(result.dispatched[0].errorClass, 'state-conflict');
+  // the reclaiming actor's claim stands untouched — the runner never settled it
+  const { readClaim } = await import('../../src/state/runtime-coordination.mjs');
+  const currentClaim = readClaim(dir, 'item-race-claim');
+  assert.ok(currentClaim, 'the different actor\'s claim must still be active');
+  assert.equal(currentClaim.actor, 'a-different-actor');
+  // cleanup still ran on this halt path: worktree gone, branch kept
+  assert.deepEqual(fs.readdirSync(worktreeDir), []);
+  assert.equal(branchExists(repoRoot, 'fgw/item-race-claim'), true);
 });
 
 // --- dry-run: reads only, writes nothing ----------------------------------

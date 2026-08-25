@@ -438,7 +438,7 @@ test('a stale-claim reclaim records a durable work.attempt(result:"reclaimed") b
   const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
   commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
 
-  claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const second = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
 
   const attempts = readRawEvents(dir).filter((e) => e.type === 'work.attempt' && e.payload?.id === 'item-a');
   assert.equal(attempts.length, 1, 'exactly one work.attempt must be recorded for the reclaimed (first) claim');
@@ -448,6 +448,14 @@ test('a stale-claim reclaim records a durable work.attempt(result:"reclaimed") b
   const item = listWork(dir).work['item-a'];
   assert.equal(item.attemptCount, 1, 'attemptCount must reflect the reclaimed attempt — never indistinguishable from a never-started item');
   assert.equal(item.lastAttempt.result, 'reclaimed');
+
+  // tsk-40m code-review finding (blocker): recordClaimAttempt is itself a
+  // durable write -- it must count as "the reclaim mutated durable state"
+  // just like the legacy moveWork(->todo) branch does, or the NEW claim's
+  // preClaimRevision gets computed off the now-stale pre-attempt snapshot
+  // and every future settleClaim on it fails with a revision conflict.
+  const res = settleClaim(dir, { id: 'item-a', claimId: second.claimId, finalStatus: 'awaiting-approval', role: 'session' });
+  assert.equal(res.view.work['item-a'].status, 'awaiting-approval', 'the reclaimed claim must still be settle-able — preClaimRevision must reflect the post-attempt durable state, not a stale pre-attempt snapshot');
 });
 
 // tsk-37t: a repo drifted over its own worker-slot ceiling (occupied >
