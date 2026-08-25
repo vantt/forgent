@@ -723,4 +723,3 @@ export const EXECUTOR_ADAPTERS = {
   http: httpAdapter,
   'herdr-spawn': herdrSpawnAdapter,
 };
-

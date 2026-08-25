@@ -5437,4 +5437,3 @@ test('logExecutorDispatch writes governance payload into executor.dispatch event
   assert.equal(event.type, 'executor.dispatch');
   assert.deepEqual(event.payload.governance, gov);
 });
-

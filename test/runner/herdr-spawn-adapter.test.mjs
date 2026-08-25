@@ -77,7 +77,7 @@ process.exit(0);
 function createMockHerdrScript(tmpDir) {
   const scriptPath = path.join(tmpDir, 'mock-herdr.mjs');
   const logPath = path.join(tmpDir, 'herdr-calls.jsonl');
-  
+
   const code = `
 import fs from 'node:fs';
 const args = process.argv.slice(2);

@@ -15,9 +15,9 @@
 ```
 ✖ herdr-spawn adapter is registered in EXECUTOR_ADAPTERS and validated by loadRunnerConfig (5.341483ms)
   AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
-  
+
     assert.ok('herdr-spawn' in EXECUTOR_ADAPTERS)
-  
+
       at TestContext.<anonymous> (file:///home/vantt/projects/forgentX/.claude/worktrees/tsk-5x7-3-XrG9KL/test/runner/herdr-spawn-adapter.test.mjs:65:10)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1325:25)
