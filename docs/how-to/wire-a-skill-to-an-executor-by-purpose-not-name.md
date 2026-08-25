@@ -1,13 +1,13 @@
 ---
 type: how-to
-title: How to wire a skill to a executor by purpose, not by name
+title: How to wire a skill to an executor by purpose, not by name
 tags: []
 timestamp: 2026-08-09T00:00:00.000Z
 source_capture_ids: [tsk-2c1]
 ---
-# How to wire a skill to a executor by purpose, not by name
+# How to wire a skill to an executor by purpose, not by name
 
-Use this when the skill dispatching to a executor has no pre-registered
+Use this when the skill dispatching to an executor has no pre-registered
 `<EXECUTOR_ID>` to name ahead of time — its prompt is composed at runtime
 (e.g. a research fan-out branch, a generated packet), so it only knows
 *what it's calling for*, never *which config entry answers it*. Every
@@ -20,17 +20,15 @@ own prose. This is the recipe for the case those don't cover.
 
 ## Before you start
 
-This depends on US-027 (binding matches by capability promise, never by
-tool name) already being live in `src/runner/dispatch.mjs` — confirm
-`EXECUTOR_PURPOSES` and `resolveExecutorIdForPurpose` are exported before
-following this recipe.
+This depends on the runner capability catalog already being live in
+`src/runner/dispatch.mjs`. Purpose lookup reads `runner.capabilities` and
+executor declarations, not the old retired `EXECUTOR_PURPOSES` enum.
 
 ## The pattern
 
-A executor declares its purpose via `for` (a closed enum,
-`EXECUTOR_PURPOSES` — today just `judge`; `gather` was retired at
-tsk-5tm-2 D6, see the note below). A caller with no id to name resolves
-by that purpose instead:
+An executor declares the capabilities it serves with `for`, or a
+capability declares its preferred executor with `capabilities.<name>.prefer`.
+A caller with no executor id resolves by purpose instead:
 
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
@@ -38,11 +36,9 @@ node "$root/src/runner/dispatch.mjs" decide --for <purpose> --has-live-task-acce
 ```
 
 Prints `{"mechanism": "in-process"|"out-of-process"|"unavailable"[,
-"agentType": ..., "executorId": ...]}` — note the third mechanism value,
-`unavailable`, that a name-based `decide <executorId>` call never returns:
-a purpose with nothing registered against it is a legitimate, expected
-state (not every purpose has a executor yet), so this is a real enum value
-to branch on, never an error to catch.
+"agentType": ..., "mcpTool": ..., "executorId": ...]}`. A purpose with
+nothing registered against it is a legitimate state, so `unavailable` is
+a real value to branch on, not an exception to catch.
 
 - **`unavailable`** — no executor declares this purpose yet. Fall through
   to whatever native/inline path the caller used before this wiring
@@ -54,12 +50,11 @@ to branch on, never an error to catch.
   <executorId>` call keeps its pre-existing exact shape, byte-identical,
   since existing callers already assert on it).
 
-Actually dispatching works the same way, `--for` instead of a positional
-id — `execute` self-executes every adapter-resolvable case (never hands
-back a bare command for you to run yourself via Bash), except the
-`in-process` case above, which hands back `{mechanism:"in-process",
-agentType, prompt[, executorId]}` for you to call your own Agent/Task tool
-with:
+Actually dispatching works the same way, using `--for` instead of a
+positional id. `execute` self-executes every adapter-resolvable case and
+never hands back a bare command for you to run through Bash. The
+`in-process` case hands back `{mechanism:"in-process", agentType|mcpTool,
+prompt[, executorId]}` for the caller's own live tool.
 
 ```bash
 node "$root/src/runner/dispatch.mjs" execute --for <purpose> --prompt "<the prompt built at runtime>"
@@ -78,7 +73,7 @@ node "$root/src/runner/dispatch.mjs" execute --for <purpose> --carries repo-cont
 ```
 
 `repo-content` is the wider class (it covers `user-text` plus repo
-paths/content); a executor declaring `carries: "user-text"` refuses a
+paths/content); an executor declaring `carries: "user-text"` refuses a
 `repo-content` dispatch before spawn. Get this wrong and the refusal
 surfaces as a `RunnerConfigError` naming the executor and both content
 classes — treat it exactly like a malformed dispatch response: fall back
@@ -106,7 +101,7 @@ fan-out's independent branches each logging their own dispatch).
 
 `fgos-researching`'s gather fan-out (`tsk-2ie5`/`tsk-2c1`) was this
 recipe's original real example — wired to `decide --for gather` /
-`resolve --for gather --carries repo-content` before every research
+`execute --for gather --carries repo-content` before every research
 branch. `gather` was retired at `tsk-5tm-2` D6: it was the one real
 cross-provider path, with no architectural reason on record for needing
 cross-provider dispatch at all, and its one documented reason
@@ -122,7 +117,17 @@ fixed id directly, never `--for judge` (confirmed by grep, `tsk-5tm`
 now — the mechanism itself stays proven by direct unit test
 (`resolveExecutorIdForPurpose` and the `carries`/`decide`/`execute` CLI
 flags, `test/runner/dispatch.test.mjs`), ready for the next producer that
-genuinely needs to resolve a executor without a pre-registered id to name.
+genuinely needs to resolve an executor without a pre-registered id to name.
+
+## Current sharp edge
+
+The design target is that `decide --for` and `execute --for` use the same
+capability-aware resolver, including `capabilities.<name>.prefer`. Until
+`docs/architect/dispatch-control-plane-redesign.md` Item 0 lands,
+`execute --for` already follows that richer path, while `decide --for`
+still resolves only executors declaring `for`. For a capability that is
+served only through `prefer`, either use a literal executor id with
+`decide <executorId>` or keep this as a known redesign gap.
 
 ## Outcome capture
 

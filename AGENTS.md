@@ -113,7 +113,7 @@ Three possible `mechanism` results, each needing a different response:
 
 Every result also carries `configured: true|false` — `false` means nothing is configured for that name or job, and the answer came from the default.
 
-A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.claude/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `.agents/skills/_shared/`).
+A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.agents/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `plugins/fgOS/skills/_shared/`). `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own.
 
 ## Starting the herdr gateway — one door, never a raw process
 

@@ -68,9 +68,10 @@ Then branch on `mechanism`:
 - **`unavailable`** — go straight to `<INLINE_FALLBACK_HEADING>`, printing
   nothing at all. This is the default/common path, byte-identical to
   before this executor existed.
-- **`in-process`** — call your own Agent/Task tool with the returned
-  `agentType` (or your own default when absent). Print the announce line,
-  then read its answer through Step C.
+- **`in-process`** — call the returned hand-back yourself: use `agentType`
+  with your Agent/Task tool, or call `mcpTool` directly. If neither field
+  is returned, use your normal default for that live call. Print the
+  announce line, then read its answer through Step C.
 - **`out-of-process`** — continue to Step B.
 
 When `--for`/`--work` resolved a `executorId` (carried in this same JSON
@@ -172,7 +173,7 @@ it exactly like a malformed response, never retry blind.
 
 ## Ad-hoc executor: a runtime-composed task instead of `<PROMPT_TEMPLATE>`
 
-`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor
+`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor
 whose consuming skill has no single fixed question to ask — the parent
 composes a different command each time, depending on what it just decided
 to split off — cannot fill in a registered `<PROMPT_TEMPLATE>` at all.

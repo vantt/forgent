@@ -53,7 +53,7 @@ The runner config already distinguishes these axes:
 
 - executor kind: agent or tool;
 - content carried: `user-text` or `repo-content`;
-- invocation mechanism: `cli`, `mcp`, or `api`;
+- invocation mechanism: `cli`, `task`, `mcp`, or `api`;
 - adapter: default `cli-spawn`, with a registry hook already present;
 - provider/model policy and rigor override;
 - capability `prefer` mapping from an abstract purpose to a concrete executor.
@@ -180,6 +180,11 @@ Allowed selector types:
 - `adHocAgent` - dispatch decision for a runtime-composed agent assignment.
 
 Do not add `nativeTask` as a selector. Native/in-process is an output mechanism, not an input category.
+
+Current implementation note: `execute --for` already resolves through the
+capability-aware path that honors `capabilities.<name>.prefer`.
+`decide --for` still uses the older `for` scan. Item 0 below exists to
+remove that split.
 
 ### 6.3 Mechanism
 
