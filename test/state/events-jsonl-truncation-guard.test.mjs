@@ -14,7 +14,8 @@ import {
   runOpportunisticMainCheckoutChecks,
   getUncommittedEventCount,
 } from "../../src/state/events-jsonl-truncation-guard.mjs";
-import { recordMainCheckoutGuardWarning, MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME } from "../../src/state/main-checkout-guard-warnings.mjs";
+import { recordMainCheckoutGuardWarning } from "../../src/state/main-checkout-guard-warnings.mjs";
+import { resolveFgosFile, FGOS_FILE } from "../../src/state/fgos-file-registry.mjs";
 
 delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
 
@@ -129,14 +130,15 @@ test("checkTruncationGuard flags mark-seq-missing when the mark's own seq no lon
 
 test("readGuardMark returns null when the sidecar does not exist yet (bootstrap, not a crash)", () => {
   const dir = mkTempDir("truncguard-read-missing-");
-  const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
   assert.equal(readGuardMark(guardPath, "events.jsonl"), null);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
 test("readGuardMark returns null on a corrupt sidecar (never throws)", () => {
   const dir = mkTempDir("truncguard-read-corrupt-");
-  const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
+  fs.mkdirSync(path.dirname(guardPath), { recursive: true });
   fs.writeFileSync(guardPath, "not json at all", "utf8");
   assert.equal(readGuardMark(guardPath, "events.jsonl"), null);
   fs.rmSync(dir, { recursive: true, force: true });
@@ -144,7 +146,7 @@ test("readGuardMark returns null on a corrupt sidecar (never throws)", () => {
 
 test("writeGuardMark then readGuardMark round-trips the mark", () => {
   const dir = mkTempDir("truncguard-roundtrip-");
-  const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
   writeGuardMark(guardPath, "events.jsonl", { seq: 42, hash: "abc123" });
   const read = readGuardMark(guardPath, "events.jsonl");
   assert.deepEqual(read, { seq: 42, hash: "abc123" });
@@ -156,7 +158,7 @@ test("writeGuardMark then readGuardMark round-trips the mark", () => {
 test("checkEventsJsonlTruncationGuard is read-only — never writes the sidecar even on a clean bootstrap pass", () => {
   const dir = mkTempDir("truncguard-check-readonly-");
   const logPath = path.join(dir, "events.jsonl");
-  const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
   fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a")]), "utf8");
 
   const result = checkEventsJsonlTruncationGuard(logPath, guardPath);
@@ -168,7 +170,7 @@ test("checkEventsJsonlTruncationGuard is read-only — never writes the sidecar 
 test("advanceEventsJsonlTruncationGuard writes the mark forward on a clean pass", () => {
   const dir = mkTempDir("truncguard-advance-clean-");
   const logPath = path.join(dir, "events.jsonl");
-  const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
   fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a")]), "utf8");
 
   const first = advanceEventsJsonlTruncationGuard(logPath, guardPath);
@@ -185,7 +187,7 @@ test("advanceEventsJsonlTruncationGuard writes the mark forward on a clean pass"
 test("advanceEventsJsonlTruncationGuard never advances the mark on a break — the failing mark stays at the last known-good position", () => {
   const dir = mkTempDir("truncguard-advance-break-");
   const logPath = path.join(dir, "events.jsonl");
-  const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
   fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
   advanceEventsJsonlTruncationGuard(logPath, guardPath);
   assert.equal(readGuardMark(guardPath, "events.jsonl").seq, 2);
@@ -201,7 +203,7 @@ test("advanceEventsJsonlTruncationGuard never advances the mark on a break — t
 test("advanceEventsJsonlTruncationGuard treats a missing log as an empty one (bootstrap-clean), not a crash", () => {
   const dir = mkTempDir("truncguard-advance-nolog-");
   const logPath = path.join(dir, "events.jsonl");
-  const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
   const result = advanceEventsJsonlTruncationGuard(logPath, guardPath);
   assert.equal(result.ok, true);
   assert.equal(result.mark, null);
@@ -215,8 +217,8 @@ test("runOpportunisticMainCheckoutChecks D1: records warning on truncation break
   const fgosDir = path.join(repoRoot, ".fgos");
   fs.mkdirSync(fgosDir, { recursive: true });
   const logPath = path.join(fgosDir, "events.jsonl");
-  const guardPath = path.join(fgosDir, "runtime", "events-jsonl.truncation-guard.json");
-  const warnPath = path.join(fgosDir, 'logs', MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
+  const guardPath = resolveFgosFile(fgosDir, FGOS_FILE.GUARD_MARK);
+  const warnPath = resolveFgosFile(fgosDir, FGOS_FILE.MAIN_CHECKOUT_GUARD_WARNINGS);
 
   // Set initial mark at seq 2
   fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
@@ -278,7 +280,7 @@ test("runOpportunisticMainCheckoutChecks D1: refuses fallback auto-commit when a
   const fgosDir = path.join(repoRoot, ".fgos");
   fs.mkdirSync(fgosDir, { recursive: true });
   const logPath = path.join(fgosDir, "events.jsonl");
-  const guardPath = path.join(fgosDir, "runtime", "events-jsonl.truncation-guard.json");
+  const guardPath = resolveFgosFile(fgosDir, FGOS_FILE.GUARD_MARK);
 
   const commitTime = 1000000;
   fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
@@ -352,7 +354,7 @@ test("runOpportunisticMainCheckoutChecks D2: reads fallbackIntervalSec from .fgo
 
 test("the sidecar map holds independent marks per file — advancing one file's mark never touches another's", () => {
   const dir = mkTempDir("truncguard-multi-mark-");
-  const guardPath = path.join(dir, "events-jsonl.truncation-guard.json");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
   writeGuardMark(guardPath, "events.jsonl", { seq: 1, hash: "aaa" });
   writeGuardMark(guardPath, "events/writer-a-1.jsonl", { seq: 7, hash: "bbb" });
 
@@ -371,8 +373,7 @@ test("runOpportunisticMainCheckoutChecks D1 detects and warns on a truncation br
   const eventsDir = path.join(fgosDir, "events");
   fs.mkdirSync(eventsDir, { recursive: true });
   const writerLogPath = path.join(eventsDir, "writer-a-1.jsonl");
-  const guardPath = path.join(fgosDir, "events-jsonl.truncation-guard.json");
-  const warnPath = path.join(fgosDir, 'logs', MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
+  const warnPath = resolveFgosFile(fgosDir, FGOS_FILE.MAIN_CHECKOUT_GUARD_WARNINGS);
 
   fs.writeFileSync(writerLogPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
   runOpportunisticMainCheckoutChecks(fgosDir, repoRoot); // bootstraps the mark for writer-a-1.jsonl

@@ -7,6 +7,7 @@
 // `--scope` flag wiring.
 
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -65,7 +66,7 @@ test('CLI: decision --scope repo persists and is readable back via listWork', ()
   const cwd = initCwd();
   const result = run(cwd, ['decision', '--text', 'D1: repo-wide naming convention', '--rationale', 'because reasons', '--relation', 'none', '--scope', 'repo']);
   assert.equal(result.status, 0);
-  const view = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'state.json'), 'utf8'));
+  const view = JSON.parse(fs.readFileSync(resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE), 'utf8'));
   assert.equal(view.decisions.at(-1).scope, 'repo');
 });
 
@@ -73,7 +74,7 @@ test('CLI: decision without --scope succeeds exactly as before this field existe
   const cwd = initCwd();
   const result = run(cwd, ['decision', '--text', 'an ordinary decision', '--rationale', 'because reasons', '--relation', 'none']);
   assert.equal(result.status, 0);
-  const view = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'state.json'), 'utf8'));
+  const view = JSON.parse(fs.readFileSync(resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE), 'utf8'));
   assert.equal('scope' in view.decisions.at(-1), false);
 });
 
@@ -85,7 +86,7 @@ test('CLI: an --id-scoped decision may still carry --scope (not mutually exclusi
   );
   const result = run(cwd, ['decision', '--id', 'host-item', '--text', 'D1: item decision that also touches platform scope', '--rationale', 'because reasons', '--relation', 'none', '--scope', 'runner']);
   assert.equal(result.status, 0);
-  const view = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'state.json'), 'utf8'));
+  const view = JSON.parse(fs.readFileSync(resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE), 'utf8'));
   const last = view.decisions.at(-1);
   assert.equal(last.id, 'host-item');
   assert.equal(last.scope, 'runner');

@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -40,8 +41,10 @@ function initMainAndWorktree() {
   // shape, rather than accidentally testing "does .fgos/ exist at all"
   // instead of the actual bug (which repoRoot resyncWorktree receives).
   fs.mkdirSync(path.join(mainRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(mainRoot, '.fgos', 'state.json'), '{}\n');
-  execFileSync('git', ['add', 'seed.txt', '.fgos/state.json'], { cwd: mainRoot });
+  const stateJsonPath = resolveFgosFile(path.join(mainRoot, '.fgos'), FGOS_FILE.STATE);
+  fs.mkdirSync(path.dirname(stateJsonPath), { recursive: true });
+  fs.writeFileSync(stateJsonPath, '{}\n');
+  execFileSync('git', ['add', 'seed.txt', '.fgos/cache/state.json'], { cwd: mainRoot });
   execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: mainRoot });
 
   const worktreeParent = mkTempDir('fgos-tsk-jgs-worktree-parent-');

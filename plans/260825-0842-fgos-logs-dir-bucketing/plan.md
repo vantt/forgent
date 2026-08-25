@@ -34,8 +34,13 @@ concurrency-critical code (`session-identity.mjs`,
   `state.json` → `.fgos/cache/` attempted and reverted (51 test
   failures from 21 files hardcoding the old path, zero dirty-tree
   benefit). `sessions.json`/lock files never attempted (on the git
-  hook's own live import path — too risky for zero benefit). `npm test`
-  green (4023 pass, 0 fail).
+  hook's own live import path — too risky for zero benefit).
+- [phase-03-shared-path-registry.md](phase-03-shared-path-registry.md) —
+  done. Built `src/state/fgos-file-registry.mjs` (kernel layer, one
+  resolver + lookup table) so no module/test ever hardcodes a `.fgos/`
+  file path again; retried and landed the `state.json` → `.fgos/cache/`
+  move on top of it. `npm test` green (4023 pass, 0 fail).
+  `sessions.json`/lock files still not attempted (unchanged reasoning).
 
 ## Acceptance criteria
 - `git status` no longer shows the 4 files at `.fgos/` root after a

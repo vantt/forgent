@@ -19,6 +19,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { addOutcome, addFriction, addDiscovery, moveWork, moveStage, addWork, editWork, StoreError } from '../../../src/state/store.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { DEFAULT_TTL_MS } from '../../../src/runner/main-checkout-lock.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -65,7 +66,7 @@ function logPath(cwd) {
 }
 
 function viewPath(cwd) {
-  return path.join(cwd, '.fgos', 'state.json');
+  return resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE);
 }
 
 // Every verb's success path now prints a single fgos.v1 envelope
@@ -150,7 +151,7 @@ function initGitCwd() {
   execFileSync('git', ['init', '-q'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/state.json\n.fgos/runtime/\n');
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
   fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
@@ -182,7 +183,7 @@ function initGitCwdInSubdir(subdirName = 'workspace') {
   execFileSync('git', ['init', '-q'], { cwd: topLevel });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: topLevel });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: topLevel });
-  fs.writeFileSync(path.join(topLevel, '.gitignore'), '.fgos/state.json\n.fgos/runtime/\n');
+  fs.writeFileSync(path.join(topLevel, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
   fs.writeFileSync(path.join(topLevel, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd: topLevel });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: topLevel });
@@ -447,7 +448,7 @@ function initGitCwdMain() {
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/state.json\n.fgos/runtime/\n');
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
   fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });

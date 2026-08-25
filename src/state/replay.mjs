@@ -14,6 +14,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { readEvents, readLastLineBefore, readEventsFromByte, parseEventLines } from './events.mjs';
 import { DEFAULTS } from './work.mjs';
+import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
 // tsk-49e: every top-level key applyEvent ever writes to `view` is either an
 // array `.push`ed onto in place (only `decisions`) or reassigned via a
@@ -665,7 +666,7 @@ function applyEvent(view, event) {
 // paths (repairTruncatedLastLine, fixEventsJsonlContiguity --fix, git's own
 // merge=union driver).
 function tryIncrementalRebuild(logPath) {
-  const viewPath = path.join(path.dirname(logPath), 'state.json');
+  const viewPath = resolveFgosFile(path.dirname(logPath), FGOS_FILE.STATE);
   let persisted;
   try {
     persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
@@ -820,7 +821,7 @@ export function readAllEventsFromDir(dir) {
  * original single-file version gives).
  */
 function tryIncrementalRebuildFromDir(dir) {
-  const viewPath = path.join(dir, 'state.json');
+  const viewPath = resolveFgosFile(dir, FGOS_FILE.STATE);
   let persisted;
   try {
     persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));

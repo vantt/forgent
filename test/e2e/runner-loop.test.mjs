@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -85,7 +86,7 @@ function logPath(cwd) {
 }
 
 function viewPath(cwd) {
-  return path.join(cwd, '.fgos', 'state.json');
+  return resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE);
 }
 
 function stateView(cwd) {
@@ -643,7 +644,7 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   // .gitignore already declares. "Commit your work" for `return` therefore
   // covers both the real file AND the log deltas `take`/`discover` already
   // appended.
-  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/cache/\n');
   execFileSync('git', ['add', '.gitignore'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'gitignore'], { cwd: repoRoot });
 

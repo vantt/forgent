@@ -10,6 +10,7 @@ import { claimWork } from '../../src/runner/claim-port.mjs';
 import { initStore, addWork, moveWork, readRawEvents } from '../../src/state/store.mjs';
 import { readEvents } from '../../src/state/events.mjs';
 import { checkTruncationGuard, readGuardMark, writeGuardMark, runOpportunisticMainCheckoutChecks } from '../../src/state/events-jsonl-truncation-guard.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 
 // Local seq-contiguity assertion helper -- this test only needs it to prove
 // a real event log has no gaps/duplicate `seq` values; it does not exercise
@@ -38,6 +39,7 @@ function checkSeqContiguity(logPath) {
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const CLAIM_PORT_MJS = path.join(REPO_ROOT, 'src/runner/claim-port.mjs');
 const GUARD_MJS = path.join(REPO_ROOT, 'src/state/events-jsonl-truncation-guard.mjs');
+const FGOS_PATHS_MJS = path.join(REPO_ROOT, 'src/state/fgos-file-registry.mjs');
 
 function initTempRepo() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-concurrent-claim-repo-'));
@@ -182,7 +184,7 @@ test('reproduces unlocked guard mark write race across concurrent sessions again
   delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
 
   const { repoRoot, fgosDir } = initTempRepo();
-  const guardPath = path.join(fgosDir, 'runtime', 'events-jsonl.truncation-guard.json');
+  const guardPath = resolveFgosFile(fgosDir, FGOS_FILE.GUARD_MARK);
 
   try {
     addWork(fgosDir, { id: 'task-guard-1', title: 'Task Guard 1', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
@@ -193,9 +195,10 @@ test('reproduces unlocked guard mark write race across concurrent sessions again
 
     const childScriptContent = `
 import { runOpportunisticMainCheckoutChecks, writeGuardMark } from ${JSON.stringify(GUARD_MJS)};
+import { resolveFgosFile, FGOS_FILE } from ${JSON.stringify(FGOS_PATHS_MJS)};
 
 const [fgosDir, repoRoot, fileKey, seqStr, hash] = process.argv.slice(2);
-const guardPath = fgosDir + '/runtime/events-jsonl.truncation-guard.json';
+const guardPath = resolveFgosFile(fgosDir, FGOS_FILE.GUARD_MARK);
 
 if (seqStr && hash) {
   writeGuardMark(guardPath, fileKey, { seq: Number(seqStr), hash });

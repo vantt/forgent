@@ -35,6 +35,7 @@ import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { checkAgyPermissionsConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
@@ -1155,7 +1156,7 @@ function checkEventsJsonlNotTruncated(cwd) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
   const fgosDir = path.join(mainCheckout, '.fgos');
-  const guardPath = path.join(fgosDir, 'runtime', 'events-jsonl.truncation-guard.json');
+  const guardPath = resolveFgosFile(fgosDir, FGOS_FILE.GUARD_MARK);
   const filesToCheck = [{ fileKey: 'events.jsonl', logPath: path.join(fgosDir, 'events.jsonl') }];
   const eventsDirPath = path.join(fgosDir, 'events');
   try {

@@ -8,6 +8,7 @@ import { appendEvent } from '../../src/state/events.mjs';
 import { foldEvents, rebuildView, viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir } from '../../src/state/replay.mjs';
 import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
 import { repairTruncatedLastLine } from '../../src/state/events.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpLogPath() {
@@ -1064,7 +1065,7 @@ test('rebuildView falls back to a full read when state.json has no snapshot fiel
   const dir = tmpFgosDir();
   addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   const logPath = logPathOf(dir);
-  const viewPath = path.join(dir, 'state.json');
+  const viewPath = resolveFgosFile(dir, FGOS_FILE.STATE);
   const persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
   delete persisted.snapshot;
   fs.writeFileSync(viewPath, JSON.stringify(persisted), 'utf8');
@@ -1078,7 +1079,7 @@ test('rebuildView falls back to a full read when the snapshot sub-fields are mal
   const dir = tmpFgosDir();
   addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   const logPath = logPathOf(dir);
-  const viewPath = path.join(dir, 'state.json');
+  const viewPath = resolveFgosFile(dir, FGOS_FILE.STATE);
   const persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
   persisted.snapshot.size = 'not-a-number';
   fs.writeFileSync(viewPath, JSON.stringify(persisted), 'utf8');

@@ -40,6 +40,7 @@ import { EventLogError } from './events.mjs';
 import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
+import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
 export { FsmError, WorkValidationError, EventLogError };
 
@@ -87,7 +88,7 @@ export function categoryOf(err) {
 }
 
 function paths(dir) {
-  return { logPath: path.join(dir, 'events.jsonl'), viewPath: path.join(dir, 'state.json') };
+  return { logPath: path.join(dir, 'events.jsonl'), viewPath: resolveFgosFile(dir, FGOS_FILE.STATE) };
 }
 
 // Tầng A / T2 (TA-D2, TA-D11, TA-D14): new writes go under `.fgos/events/`,

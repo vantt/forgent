@@ -21,6 +21,7 @@ import { initStore, addWork, editWork, moveWork, moveStage, addOutcome, addFrict
 import { appendEvent } from '../../src/state/events.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/util/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 
 const WRITER_SOURCES = new Set([REGISTRY, ENV, PID, UNRESOLVED]);
 
@@ -861,7 +862,7 @@ for (let i = 0; i < ${N_EDITS}; i += 1) {
   // race would leave one or more ids' persisted `priority` behind its own
   // process's LAST edit (i.e. not N_EDITS - 1), even though the log itself has
   // every event.
-  const persisted = JSON.parse(fs.readFileSync(path.join(dir, 'state.json'), 'utf8'));
+  const persisted = JSON.parse(fs.readFileSync(resolveFgosFile(dir, FGOS_FILE.STATE), 'utf8'));
   const fresh = listWork(dir);
   for (let i = 0; i < N_PROC; i += 1) {
     assert.equal(persisted.work[`race-view-${i}`].priority, N_EDITS - 1, `race-view-${i} must show its own process's LAST edit (priority ${N_EDITS - 1}) in the persisted state.json, not silently lost to a losing refreshView race`);
@@ -876,7 +877,7 @@ for (let i = 0; i < ${N_EDITS}; i += 1) {
 // mutation makes, not just the resulting file content.
 test('writeView writes state.json via a temp-file-then-rename, never a direct writeFileSync onto it (tsk-4mx)', () => {
   const dir = tmpDir();
-  const viewPath = path.join(dir, 'state.json');
+  const viewPath = resolveFgosFile(dir, FGOS_FILE.STATE);
   const writeFileSyncCalls = [];
   const renameSyncCalls = [];
   const originalWriteFileSync = fs.writeFileSync;
@@ -1003,7 +1004,7 @@ test('moveWork re-reads fresh state on retry: editing in the missing evidence af
   // .fgos/events/ — state.json is the one file every mutation still
   // guarantees exists at this root, unlike the now-frozen events.jsonl
   // baseline, which this test's tmpDir() never touches directly (TA-D12).
-  editWork(dir, { id: 'cos-retry', patch: { acceptance: [{ text: 'field round-trips', evidence: `${path.basename(dir)}/state.json:1` }] } });
+  editWork(dir, { id: 'cos-retry', patch: { acceptance: [{ text: 'field round-trips', evidence: `${path.basename(dir)}/cache/state.json:1` }] } });
 
   const { view } = moveWork(dir, { id: 'cos-retry', to: 'delivered', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['cos-retry'].status, 'delivered', 'the retry must re-read the just-edited evidence, not a cached refusal');

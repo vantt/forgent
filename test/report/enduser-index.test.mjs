@@ -1,4 +1,5 @@
 import { test, before, after } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -32,7 +33,7 @@ function runDocsIndex() {
 // intact while making it worktree-safe.
 function hasRealCompoundHistory(outcomeId) {
   try {
-    const statePath = path.join(REPO_ROOT, '.fgos', 'state.json');
+    const statePath = resolveFgosFile(path.join(REPO_ROOT, '.fgos'), FGOS_FILE.STATE);
     const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
     return Boolean(state.outcomes?.[outcomeId]);
   } catch {

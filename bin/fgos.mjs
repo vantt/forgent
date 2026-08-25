@@ -41,6 +41,7 @@ import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 // uses in src/setup/registrations.mjs.
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 import { resolveFgosDir, fgosDirFromRoot, resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../src/state/fgos-file-registry.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification, hasRealVerify } from '../src/intake/discovery.mjs';
 import { resolvePlan, replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
@@ -698,7 +699,7 @@ function collectMissingOutcomeNag(view, id) {
 // the `changelog-unreleased-stale` doctor check uses, so both surfaces
 // agree on what "has an entry" means.
 function changelogNagHistoryPath(dir) {
-  return path.join(dir, 'logs', 'changelog-nag-history.jsonl');
+  return resolveFgosFile(dir, FGOS_FILE.CHANGELOG_NAG_HISTORY);
 }
 
 // Appends one snapshot per `check` run — same append-only, never-read-back
@@ -733,7 +734,7 @@ function collectChangelogNag(view, dir) {
 // data dir (dataDir() below, or a test's own tmp dir), the exact same value
 // every other verb in this file already threads through to store.mjs.
 function entropyHistoryPath(dir) {
-  return path.join(dir, 'logs', 'entropy-history.jsonl');
+  return resolveFgosFile(dir, FGOS_FILE.ENTROPY_HISTORY);
 }
 
 // Reads only the LAST line of the trend history (the one prior checkpoint

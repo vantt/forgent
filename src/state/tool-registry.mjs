@@ -23,6 +23,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
 /** The full kind domain (repository-harness's own set, minus 'http' — 0 real
  * usage confirmed at tsk-in1-1 time (DISCUSSION.md §3 #14): no executor ever
@@ -204,10 +205,8 @@ export async function probeTool(tool, repoRoot) {
   return 'unknown';
 }
 
-export const TOOL_STATUS_FILENAME = 'tool-status.local.json';
-
 export function toolStatusPath(dir) {
-  return path.join(dir, 'runtime', TOOL_STATUS_FILENAME);
+  return resolveFgosFile(dir, FGOS_FILE.TOOL_STATUS);
 }
 
 /**

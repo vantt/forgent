@@ -32,6 +32,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { recordMainCheckoutGuardWarning } from "./main-checkout-guard-warnings.mjs";
+import { resolveFgosFile, FGOS_FILE } from "./fgos-file-registry.mjs";
 
 function lastNonEmptyLine(raw) {
   const lines = raw.split("\n");
@@ -328,7 +329,7 @@ export function runOpportunisticMainCheckoutChecks(
   // fallback commit on ANY file's break -- a break on one writer's file is
   // just as real a truncation as one on baseline-0.
   try {
-    const guardPath = path.join(fgosDir, "runtime", "events-jsonl.truncation-guard.json");
+    const guardPath = resolveFgosFile(fgosDir, FGOS_FILE.GUARD_MARK);
     if (rawLog !== null) {
       // Test-injection path (existing `rawLog` override): scoped to
       // baseline-0 only, byte-identical to before T5 -- callers using this

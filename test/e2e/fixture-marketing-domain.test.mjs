@@ -38,6 +38,7 @@
 // domain's own "declined" item never carries that literal at all.
 
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -102,7 +103,7 @@ function move(cwd, id, to, extraFlags = []) {
 }
 
 function stateView(cwd) {
-  return JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'state.json'), 'utf8'));
+  return JSON.parse(fs.readFileSync(resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE), 'utf8'));
 }
 
 // Raw event log — used ONLY where the folded view cannot answer the

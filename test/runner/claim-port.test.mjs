@@ -8,6 +8,7 @@ import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { LOCK_FILE, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 import { initStore, addWork, moveWork, listWork, FsmError, readRawEvents } from '../../src/state/store.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 
 // claim-port.mjs's claimWork shares main-checkout.lock with .githooks/
 // pre-commit (tsk-3w8) — the hook writes a STRING-identity record per commit
@@ -544,8 +545,8 @@ test('claimWork pre-check never fires for take (isolate:false), even against a c
 test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and succeeds even when truncation guard detects a break', () => {
   delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
   const { repoRoot, dir } = setup();
-  const guardPath = path.join(dir, 'runtime', 'events-jsonl.truncation-guard.json');
-  const warnPath = path.join(dir, 'logs', 'main-checkout-guard-warnings.jsonl');
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
+  const warnPath = resolveFgosFile(dir, FGOS_FILE.MAIN_CHECKOUT_GUARD_WARNINGS);
   const eventsDir = path.join(dir, 'events');
 
   // Tầng A/T5: the guard sidecar is now a map keyed by fileKey ("events.jsonl"

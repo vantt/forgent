@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { APPROVE_FAULT_LOG_BASENAME } from '../../../src/cli/approve-fault-log.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 import {
   commitPendingBeforeApprove,
   envelopeData,
@@ -33,7 +33,7 @@ test('approve (leaf-into-root merge): produces a diagnostic log record carrying 
   const result = run(cwd, ['approve', 'diag-leaf-child']);
   assert.equal(result.status, 0, result.stderr);
 
-  const logPath = path.join(cwd, '.fgos', 'logs', APPROVE_FAULT_LOG_BASENAME);
+  const logPath = resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.APPROVE_FAULT_LOG);
   assert.ok(fs.existsSync(logPath), 'diagnostic log file must exist');
 
   const lines = fs.readFileSync(logPath, 'utf8').trim().split('\n');
@@ -54,7 +54,7 @@ test('approve (root-into-main merge): produces a diagnostic log record carrying 
   const result = run(cwd, ['approve', 'diag-root-item']);
   assert.equal(result.status, 0, result.stderr);
 
-  const logPath = path.join(cwd, '.fgos', 'logs', APPROVE_FAULT_LOG_BASENAME);
+  const logPath = resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.APPROVE_FAULT_LOG);
   assert.ok(fs.existsSync(logPath), 'diagnostic log file must exist');
 
   const lines = fs.readFileSync(logPath, 'utf8').trim().split('\n');
@@ -76,7 +76,7 @@ test('approve (--github): produces a diagnostic log record carrying mergedSha an
   const result = run(cwd, ['approve', 'diag-gh-item', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, result.stderr);
 
-  const logPath = path.join(cwd, '.fgos', 'logs', APPROVE_FAULT_LOG_BASENAME);
+  const logPath = resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.APPROVE_FAULT_LOG);
   assert.ok(fs.existsSync(logPath), 'diagnostic log file must exist');
 
   const lines = fs.readFileSync(logPath, 'utf8').trim().split('\n');

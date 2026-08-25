@@ -26,6 +26,7 @@ import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 // detectTrunk moved to runner/worktree.mjs (tsk-49i D1) — its cases stay in
 // this file, next to the merge behavior that resolves a target through it.
 import { branchNameFor, withMergeEphemeralWorktree, detectTrunk } from '../../src/runner/worktree.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import { acquireMainCheckoutLock, mergeSlotLockFile, ACQUIRED, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
@@ -1542,7 +1543,7 @@ test('mergeRunnerItem resolves two-sided-drift-after-forced-restore cleanly via 
   // machinery for the legitimate legacy case: a branch/checkout whose
   // .gitattributes predates that retirement can still carry this file
   // tracked and force-added.
-  const logRelPath = path.join('.fgos', 'logs', 'approve-post-success-faults.jsonl');
+  const logRelPath = resolveFgosFile('.fgos', FGOS_FILE.APPROVE_FAULT_LOG);
   fs.writeFileSync(path.join(repoRoot, '.gitattributes'), `${logRelPath.replace(/\\/g, '/')} merge=union\n`);
   fs.mkdirSync(path.join(repoRoot, path.dirname(logRelPath)), { recursive: true });
   const baseContent = '{"ts":"2026-08-24T00:00:00.000Z","id":"base1"}\n{"ts":"2026-08-24T00:00:01.000Z","id":"base2"}\n';
@@ -1602,7 +1603,7 @@ test('mergeRunnerItem merges cleanly when a merge=union .fgos/ file genuinely di
   // merge=union entry, exercising the same machinery for the legitimate
   // legacy case a branch/checkout whose .gitattributes predates that
   // retirement can still hit.
-  const logRelPath = path.join('.fgos', 'logs', 'approve-post-success-faults.jsonl');
+  const logRelPath = resolveFgosFile('.fgos', FGOS_FILE.APPROVE_FAULT_LOG);
   fs.writeFileSync(path.join(repoRoot, '.gitattributes'), `${logRelPath.replace(/\\/g, '/')} merge=union\n`);
   fs.mkdirSync(path.join(repoRoot, path.dirname(logRelPath)), { recursive: true });
   const baseContent = '{"ts":"2026-08-24T00:00:00.000Z","id":"base"}\n';

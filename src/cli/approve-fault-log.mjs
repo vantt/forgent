@@ -19,8 +19,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-
-export const APPROVE_FAULT_LOG_BASENAME = 'approve-post-success-faults.jsonl';
+import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 
 /**
  * Append one record. Returns the path written, or `null` when nothing was
@@ -29,13 +28,12 @@ export const APPROVE_FAULT_LOG_BASENAME = 'approve-post-success-faults.jsonl';
  */
 export function recordApprovePostSuccessFault(dir, { id, phase, detail, mergedSha, mergedInto }) {
   try {
-    const logDir = path.join(dir, 'logs');
-    const logPath = path.join(logDir, APPROVE_FAULT_LOG_BASENAME);
+    const logPath = resolveFgosFile(dir, FGOS_FILE.APPROVE_FAULT_LOG);
     const record = { ts: new Date().toISOString(), id, phase };
     if (detail !== undefined) record.detail = detail;
     if (mergedSha !== undefined) record.mergedSha = mergedSha;
     if (mergedInto !== undefined) record.mergedInto = mergedInto;
-    fs.mkdirSync(logDir, { recursive: true });
+    fs.mkdirSync(path.dirname(logPath), { recursive: true });
     fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`);
     return logPath;
   } catch {

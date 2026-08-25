@@ -1,13 +1,14 @@
 # Upstream source clones — cursors tracked in docs/distillery/, re-clone as needed
 /upstreams/
 
-# forgent state layer — events.jsonl is truth (committed); state.json is a
-# derived, rebuildable view. Tried bucketing it into .fgos/cache/ in
-# phase-02 (plans/260825-0842-fgos-logs-dir-bucketing) and reverted: 21 test
-# files independently hardcode this exact path, causing 51 failures for a
-# purely cosmetic move (state.json was already gitignored at its old
-# location too -- moving it fixes zero dirty-tree problem). Left at root.
-.fgos/state.json
+# forgent state layer — events.jsonl is truth (committed); everything under
+# .fgos/cache/ (state.json) is a derived, rebuildable view. First attempt
+# (phase-02, plans/260825-0842-fgos-logs-dir-bucketing) reverted because 21
+# test files hardcoded the old path independently; phase-03 introduced
+# resolveFgosFile/FGOS_FILE (src/runner/paths.mjs) as the one shared
+# resolver and routed every real call site (production and test) through
+# it before retrying this move.
+.fgos/cache/
 # diagnostic/telemetry logs — local observability, never committed
 # (worker-dispatch-log D4; also holds approve-post-success-faults.jsonl,
 # main-checkout-guard-warnings.jsonl, changelog-nag-history.jsonl,

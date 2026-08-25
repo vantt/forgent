@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -55,8 +56,10 @@ function initSharedAbsoluteHooksPathFixture() {
   // below checks it out into the worktree the same way it would for real,
   // before ADR0020's own fs.rmSync strip ever runs.
   fs.mkdirSync(path.join(mainRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(mainRoot, '.fgos', 'state.json'), '{}\n');
-  execFileSync('git', ['add', 'seed.txt', '.fgos/state.json'], { cwd: mainRoot });
+  const stateJsonPath = resolveFgosFile(path.join(mainRoot, '.fgos'), FGOS_FILE.STATE);
+  fs.mkdirSync(path.dirname(stateJsonPath), { recursive: true });
+  fs.writeFileSync(stateJsonPath, '{}\n');
+  execFileSync('git', ['add', 'seed.txt', '.fgos/cache/state.json'], { cwd: mainRoot });
   execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: mainRoot });
 
   const hooksDir = path.join(mainRoot, '.githooks');
@@ -295,8 +298,8 @@ test('tsk-2cl: a normal commit is unaffected when rev-parse succeeds (regression
 
 test('tsk-56u: a worktree commit staging a .fgos/ deletion (git add -A after the ADR0020 strip) is refused', () => {
   const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
-  const fgosFile = path.join(worktreeRoot, '.fgos', 'state.json');
-  assert.equal(fs.existsSync(fgosFile), true, 'setup: .fgos/state.json must be tracked and checked out into the worktree');
+  const fgosFile = resolveFgosFile(path.join(worktreeRoot, '.fgos'), FGOS_FILE.STATE);
+  assert.equal(fs.existsSync(fgosFile), true, 'setup: .fgos/cache/state.json must be tracked and checked out into the worktree');
 
   // ADR0020's own strip, reproduced by hand (createWorktree isn't invoked
   // by this fixture -- it uses a plain `git worktree add`).
@@ -335,9 +338,9 @@ test('tsk-56u: a legitimate .fgos/ addition/modification (never a deletion) is u
 
   // What fgOS's own state-writing verbs do: add/modify .fgos/ content
   // directly, never delete it. The guard must never fire here.
-  fs.writeFileSync(path.join(mainRoot, '.fgos', 'state.json'), '{"changed":true}\n');
+  fs.writeFileSync(resolveFgosFile(path.join(mainRoot, '.fgos'), FGOS_FILE.STATE), '{"changed":true}\n');
   fs.writeFileSync(path.join(mainRoot, '.fgos', 'new-file.json'), '{}\n');
-  execFileSync('git', ['add', '.fgos/state.json', '.fgos/new-file.json'], { cwd: mainRoot });
+  execFileSync('git', ['add', '.fgos/cache/state.json', '.fgos/new-file.json'], { cwd: mainRoot });
 
   const result = spawnSync('git', ['commit', '-q', '-m', 'fgos: legitimate .fgos/ write'], { cwd: mainRoot, encoding: 'utf8' });
 
@@ -348,8 +351,8 @@ test('tsk-56u: a legitimate .fgos/ addition/modification (never a deletion) is u
 
 test('tsk-5pb: a worktree commit staging a .fgos/ modification on a worker branch is refused', () => {
   const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
-  fs.writeFileSync(path.join(worktreeRoot, '.fgos', 'state.json'), '{"modified":true}\n');
-  execFileSync('git', ['add', '.fgos/state.json'], { cwd: worktreeRoot });
+  fs.writeFileSync(resolveFgosFile(path.join(worktreeRoot, '.fgos'), FGOS_FILE.STATE), '{"modified":true}\n');
+  execFileSync('git', ['add', '.fgos/cache/state.json'], { cwd: worktreeRoot });
 
   const result = spawnSync('git', ['commit', '-q', '-m', 'oops: modified .fgos file on worker branch'], { cwd: worktreeRoot, encoding: 'utf8' });
 
@@ -361,8 +364,8 @@ test('tsk-5pb: a worktree commit staging a .fgos/ modification on a worker branc
 test('tsk-5pb: the same staged .fgos/ modification is allowed on main (not a fgw/* branch)', () => {
   const { mainRoot } = initSharedAbsoluteHooksPathFixture();
 
-  fs.writeFileSync(path.join(mainRoot, '.fgos', 'state.json'), '{"modified":true}\n');
-  execFileSync('git', ['add', '.fgos/state.json'], { cwd: mainRoot });
+  fs.writeFileSync(resolveFgosFile(path.join(mainRoot, '.fgos'), FGOS_FILE.STATE), '{"modified":true}\n');
+  execFileSync('git', ['add', '.fgos/cache/state.json'], { cwd: mainRoot });
 
   const result = spawnSync('git', ['commit', '-q', '-m', 'legitimate main checkout .fgos write'], { cwd: mainRoot, encoding: 'utf8' });
 
