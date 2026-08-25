@@ -168,7 +168,7 @@ absent: `tsk-fli` is already that exact work (its `refs` points at
   {
     "title": "Fix decide --for reading capabilities.prefer, plus a minimal canonical DispatchPlan",
     "verify": "node src/runner/dispatch.mjs decide --for fgos-coding-implement --dir \"$PWD\" | grep -q '\"executorId\":\"agy\"' && node --test test/runner/dispatch.test.mjs",
-    "action": "Per D1 and D6, two layers in this order so a green proof lands first. (0a) Fix the live behaviour: cli.mjs:685's decide --for calls resolveExecutorIdForPurpose and therefore never reads capabilities.<name>.prefer via resolveExecutorAndOverrides — route it through the latter so `decide --for fgos-coding-implement` returns executorId agy / out-of-process / configured:true, with characterization tests for all four selector forms written BEFORE the change. (0b) Then add a MINIMAL src/runner/dispatch/plan.mjs exposing compileDispatchPlan(), which CALLS the existing decideDispatchMechanism/decideExecutorDispatchMechanism (mechanism.mjs:42,82) rather than re-deriving any routing rule, and packages selector/caller/mechanism/executorId/capability/invocation/reasonCodes. Minimal per D6 means: do NOT port every caller in this piece — decideExecutorCli is enough to prove the seam; spawnWorker/fanoutBatchExecutorCli/the hook follow only when something needs them.",
+    "action": "Per D1 and D6, two layers in this order so a green proof lands first. (0a) Fix the live behaviour: cli.mjs:685's decide --for calls resolveExecutorIdForPurpose and therefore never reads capabilities.<name>.prefer via resolveExecutorAndOverrides — route it through the latter so `decide --for fgos-coding-implement` returns executorId agy / out-of-process / configured:true, with characterization tests for all four selector forms written BEFORE the change. (0b) Then add a MINIMAL src/runner/dispatch/plan.mjs exposing compileDispatchPlan(), which CALLS the existing decideDispatchMechanism/decideExecutorDispatchMechanism (mechanism.mjs:42,82) rather than re-deriving any routing rule, and packages selector/caller/mechanism/executorId/capability/invocation/reasonCodes. Minimal per D6 means: do NOT port every caller in this piece — decideExecutorCli is enough to prove the seam; spawnWorker/fanoutBatchExecutorCli/the hook follow only when something needs them. (0c) HOISTED HERE from the governance piece at the footprint-overlap gate (person's call, 2026-08-25), because this piece already owns cli.mjs and already builds plan.governance: do the dispatch-audit-event work in logExecutorDispatch (cli.mjs:298) — record the real spawned command alongside the self-declared provider label per tsk-5td D9 (both fields exist today, no new schema), and write whatever plan.governance carries into the event GENERICALLY, so it stays empty-but-correct until the governance piece populates it. Writing it generically is what keeps the two pieces genuinely independent: no ordering dependency, because this piece never needs to know the egress descriptor's shape.",
     "footprint": ["src/runner/dispatch/plan.mjs", "src/runner/dispatch/cli.mjs", "test/runner/dispatch.test.mjs"],
     "kind": "feature",
     "risk": "heavy",
@@ -178,8 +178,8 @@ absent: `tsk-fli` is already that exact work (its `refs` points at
   {
     "title": "Governance: declared egress replaces the command!=claude test, dependency-free",
     "verify": "grep -q 'egress' src/runner/dispatch/resolve.mjs && node --test test/runner/egress-governance.test.mjs && node --test test/runner/dispatch.test.mjs",
-    "action": "Per D2's governance intent (carried forward by D6) and D1, replace the resolve.mjs:322 gate — which inspects only executor.command against CLAUDE_CLI_COMMANDS and is blind to an env override — with a declared-egress check carrying providerFamily plus egress {kind, target, content}. DELIBERATELY DEPENDENCY-FREE: this is a live policy hole, not a vocabulary refactor, and must not sit behind a structural refactor. It needs only fields that exist today — executor.providerModel, invocations[].command, invocations[].env, allowCrossProvider, carries. Reuse the ALREADY-BUILT EXECUTOR_CARRIES enum (config.mjs:364, enforced resolve.mjs:243-258) as the egress content vocabulary instead of inventing a parallel one. Also record the effective egress target alongside the self-declared provider label in the dispatch audit event, honoring tsk-5td D9's provider-AND-command rule. Cross-provider stays first-class; only undeclared or self-contradicting egress fails. Live specimen: executor glm keeps command:\"claude\" while routing to OpenRouter via env. GATE DECISION (person, 2026-08-25): ship glm's own egress declaration IN THIS SAME CHANGE, so the gate lands fail-closed with zero breakage. Measured blast radius is exactly one executor — agy/codex/pi already declare allowCrossProvider:true (their commands were never \"claude\", so the old gate already caught them) and no executor declares carries today; glm is the only entry carrying an env override. Do not tighten the gate without that declaration in the same commit.",
-    "footprint": ["src/runner/dispatch/resolve.mjs", "src/runner/dispatch/config.mjs", "src/runner/dispatch/cli.mjs", "test/runner/egress-governance.test.mjs"],
+    "action": "Per D2's governance intent (carried forward by D6) and D1, replace the resolve.mjs:322 gate — which inspects only executor.command against CLAUDE_CLI_COMMANDS and is blind to an env override — with a declared-egress check carrying providerFamily plus egress {kind, target, content}. DELIBERATELY DEPENDENCY-FREE: this is a live policy hole, not a vocabulary refactor, and must not sit behind a structural refactor. It needs only fields that exist today — executor.providerModel, invocations[].command, invocations[].env, allowCrossProvider, carries. Reuse the ALREADY-BUILT EXECUTOR_CARRIES enum (config.mjs:364, enforced resolve.mjs:243-258) as the egress content vocabulary instead of inventing a parallel one. Populate plan.governance with the resolved egress descriptor so it reaches the dispatch audit event — but do NOT edit cli.mjs here: the event-writing half was HOISTED into the DispatchPlan piece at the footprint-overlap gate (person's call, 2026-08-25), which writes plan.governance through generically. That keeps this piece dependency-free with zero footprint overlap, and keeps the audit-event concern in the one piece that already owns cli.mjs. Cross-provider stays first-class; only undeclared or self-contradicting egress fails. Live specimen: executor glm keeps command:\"claude\" while routing to OpenRouter via env. GATE DECISION (person, 2026-08-25): ship glm's own egress declaration IN THIS SAME CHANGE, so the gate lands fail-closed with zero breakage. Measured blast radius is exactly one executor — agy/codex/pi already declare allowCrossProvider:true (their commands were never \"claude\", so the old gate already caught them) and no executor declares carries today; glm is the only entry carrying an env override. Do not tighten the gate without that declaration in the same commit.",
+    "footprint": ["src/runner/dispatch/resolve.mjs", "src/runner/dispatch/config.mjs", "test/runner/egress-governance.test.mjs"],
     "kind": "feature",
     "risk": "heavy",
     "refs": ["docs/history/dispatch-plan-protocol-redesign/DISCUSSION.md#task-governance-egress"],
@@ -232,14 +232,25 @@ directions, so it is produced by script, not by eye:
 **3 new files, 5 touched, 8 distinct paths** — down from 11 new / 8 touched
 under the superseded seven-child scope.
 
-**One declared sibling overlap.** Pieces 0 and 1 both list
-`src/runner/dispatch/cli.mjs`: piece 0 changes `decideExecutorCli` (~:685),
-piece 1 adds the effective-egress fields to `logExecutorDispatch` (~:298).
-They are disjoint at function level, but the overlap is declared rather than
-hidden — both pieces are dependency-free by intent, so the gate should see
-the collision and let a person decide whether to sequence them. Hiding it by
-trimming a footprint would make the action promise work the footprint never
-declared, which is how an overlap gate goes blind.
+**Zero sibling overlap — after the gate caught one and it was hoisted.**
+
+The first `decompose` attempt declared an overlap on
+`src/runner/dispatch/cli.mjs` (piece 0's `decideExecutorCli` ~:685 vs piece
+1's audit-event work at `logExecutorDispatch` ~:298) rather than hiding it.
+The engine's own footprint-overlap gate caught it and parked the item at
+`awaiting-human` — working exactly as designed, and only because the
+footprint was honest. Trimming it for a clean table would have left the
+action promising work the footprint never declared, and the two pieces would
+have collided for real when run in parallel.
+
+**Resolved by hoist** (person's call): the audit-event half moved into piece
+0, which already owns `cli.mjs` and already builds `plan.governance`. Piece 0
+writes `plan.governance` into the event **generically**, so it needs no
+knowledge of the egress descriptor's shape; piece 1 populates that descriptor.
+No ordering dependency, all three pieces stay `deps: []`, and
+`footprintOverlapAmong` now reports **0 conflicts**. `sequence` was rejected
+because it would have put governance back behind the structural refactor —
+the exact arrangement D6 exists to prevent.
 
 ## Validating — reality gate, matrix, verdict
 
