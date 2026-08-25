@@ -204,8 +204,8 @@ Changelog/marketing-storytelling (Làn A/B, "bản nháp") đóng băng theo yê
 cầu chủ sản phẩm — bàn tiếp sau khi row D (trục danh tính cho Diataxis)
 rõ ràng.
 
-**Sáu kiểu sai thảo luận này đã thật sự mắc — đọc trước khi tin bất cứ
-kết luận nào ở đây.** Tám lần vấp, sáu cơ chế khác nhau. **Không cái nào do
+**Bảy kiểu sai thảo luận này đã thật sự mắc — đọc trước khi tin bất cứ
+kết luận nào ở đây.** Chín lần vấp, bảy cơ chế khác nhau. **Không cái nào do
 session tự phát hiện**: hoặc chủ sản phẩm bắt, hoặc advisor ngoài bắt, hoặc
 lòi ra khi đo lại.
 
@@ -215,6 +215,7 @@ lòi ra khi đo lại.
 | 2 | **Đọc dữ kiện repo trong worktree đã claim từ nhiều ngày trước**, không phải `main` | Vòng 9(d): nhánh lùi 1438 commit ⇒ đếm thiếu 17% corpus, và suýt bỏ mất con số +50 tài liệu/7 ngày | Scout dữ-kiện-repo luôn đọc ở `main`; worktree cũ chỉ dùng để ghi, không dùng để đo |
 | 3 | **Chứng cứ ĐÚNG nằm im nhiều vòng vì không ai hỏi đúng câu** | Vòng 9(g): câu "vocabulary cấu trúc ĐÓNG + dữ liệu chủ đề MỞ" chép về từ OKF ở **vòng 2**, 7 vòng sau mới được nối vào bài toán trục danh tính | Khác kiểu 1 (chứng cứ sai): đây là chứng cứ đúng chưa dùng. Khi bí một câu thiết kế, đọc lại §5 trước khi đi scout mới |
 | 4 | **Kết luận mới mâu thuẫn chẩn đoán CŨ của chính tài liệu**, cả hai cùng nằm trong một file đang mở | Vòng 9(h): dòng D2 viết `docs/<quadrant>/<topic>.md` — đúng thứ §6.1 đã gọi là bệnh gốc từ vòng 3; session vừa viết lại §6.3 cùng vòng mà vẫn không đối chiếu | Sau khi trả lời một câu thiết kế, rà ngược xem nó có va vào §6 hiện hành không — §6 tồn tại đúng để làm việc đó, nhưng chỉ có tác dụng nếu ai đó thật sự đối chiếu |
+| 7 | **Báo cáo trạng thái mở/đóng mà không đọc lại chính bản ghi mình vừa viết** | Vòng 10: liệt kê "đóng danh sách vai trò" và "ai có quyền thêm vai trò" là CÒN TREO, trong khi D-tsk28x-7 đã chốt cả hai — chủ sản phẩm đồng ý và session tự mint chỉ ít phút trước | Nguy hiểm riêng của kiểu này: nó bắt chủ sản phẩm phải tự nhớ thay session, tức phá đúng thứ hồ sơ này sinh ra để làm. Trước khi liệt kê bất cứ danh sách "còn mở" nào, đọc lại §4 và `fgos show <id>` — không liệt kê từ trí nhớ |
 | 6 | **Khẳng định một cơ chế KHÔNG tồn tại mà không grep** | Vòng 10: nói fgOS không có khái niệm chủ-sở-hữu-chủ-đề, trong khi `fgos authoritative-match` + `authoritative-match.mjs` đã landed **2026-08-17**, một ngày TRƯỚC lúc scout | Khác kiểu #2 ở chỗ: session ĐÃ phát hiện worktree cũ và ĐÃ đo lại — nhưng chỉ đo lại những **con số** tình cờ nhắc tới, không rà lại các **khẳng định** rút ra từ cùng trạng thái cũ. Bổ sung cho #2: *khi phát hiện đã đọc trạng thái lỗi thời, rà lại MỌI khẳng định dẫn xuất, không chỉ con số mình nhớ ra*. Kèm: một zero-result từ công cụ (`--check-duplicates` báo 0 nhóm trùng) phải grep chéo trước khi tin |
 | 5 | **Ước lượng chi phí sai làm lệch một khuyến nghị** | Vòng 9(i): "chồng hai việc nặng — fold 268 file rồi lại dời 268 file", trong khi fold VÀ dời là cùng một thao tác; con số phóng đại đó suýt đẩy chủ sản phẩm khỏi đường (1) | Trước khi lấy chi phí làm lý do loại một phương án, kiểm xem hai việc đang cộng vào nhau có thật sự là hai việc rời không |
 
