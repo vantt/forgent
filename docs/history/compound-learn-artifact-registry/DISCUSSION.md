@@ -1385,6 +1385,22 @@ nó khớp vocabulary của bee (`bee knowledge check`).
 
 ---
 
+### Kế hoạch thi công chi tiết {#impl-plan}
+
+§7 dưới đây là **thiết kế** (task, thứ tự, cổng). Bản **thi công chi tiết**, viết
+cho một agent tự code không có ngữ cảnh hội thoại, nằm ở:
+
+**`plans/260825-1841-knowledge-registry/`** — `plan.md` + 12 phase file. Mỗi phase
+file tự chứa: context + link, requirements, files tạo/sửa, implementation steps,
+tests, risks & rollback. Đọc phase file là đủ làm, không cần đọc lại 1700 dòng này.
+
+Bảng khuôn-có-sẵn-trong-repo (dùng lại, đừng phát minh) nằm cuối `plan.md`:
+`withEventsLock`/`appendEventLocked`, switch fold của `replay.mjs`,
+`registerCheck`/`registerConfigDefault`/`registerFix`, khuôn "generated,
+never hand-edit" của `docs/decisions/index.md`, `_shared/` fragment.
+
+---
+
 ### Hai track
 
 - **Track A — cơ chế:** identity / registry / resolver / writer.
