@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork, resolveWriterLogPath, rebuild } from '../../src/state/store.mjs';
+import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork, recordClaimAttempt } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
@@ -734,20 +734,6 @@ function occupySlots(dir, count) {
   }
 }
 
-// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`/
-// `blocked -> doing` are RETIRED from status-fsm.mjs's TRANSITIONS table —
-// nothing durably writes INTO `doing` anymore. A few tests below still need
-// a DURABLE 'doing' item (not a claim-overlay one) as a precondition for
-// exercising a chained moveWork(..., expectedStatus: 'doing') call, or to
-// simulate a legacy pre-migration durable-doing item for startupReap's
-// fallback scan — a raw event write, bypassing transitionWork's own edge
-// validation, is the direct, honest way to get there (same technique
-// test/state/store.test.mjs's own moveToDurableDoingForTest uses).
-function moveToDurableDoingForTest(dir, id, from = 'todo') {
-  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
-  rebuild(dir);
-}
-
 function writeCeiling(repoRoot, ceiling) {
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling } }));
 }
@@ -1141,9 +1127,13 @@ test('anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leave
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-loopy' });
   seedItem(dir, { id: 'item-fresh' });
-  // one prior visit for item-loopy: todo -> doing -> blocked -> todo
-  moveToDurableDoingForTest(dir, 'item-loopy');
-  moveWork(dir, { id: 'item-loopy', to: 'blocked', expectedStatus: 'doing' });
+  // one prior visit for item-loopy: a real settle-style work.attempt
+  // (tsk-40m D3: visitCount counts ONLY work.attempt(phase:'execute')
+  // events now, never a raw doing-move — hard migration, no dual-count
+  // legacy), then parked back to todo via blocked (todo -> doing is
+  // retired; blocked stands in for the same "parked mid-flight" shape).
+  recordClaimAttempt(dir, { id: 'item-loopy', phase: 'execute', result: 'failed' });
+  moveWork(dir, { id: 'item-loopy', to: 'blocked', expectedStatus: 'todo' });
   moveWork(dir, { id: 'item-loopy', to: 'todo', expectedStatus: 'blocked' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
@@ -1164,10 +1154,10 @@ test('anti-loop: a human reject (with reason) resets the runner gate — visits 
   seedItem(dir, { id: 'item-reprieved' });
   // one machine visit that would already be AT the cap (maxVisits: 1) on its
   // own — then a human rejects with a reason, which per D1 resets the item's
-  // own budget. Reaching `proposed` first (not just doing -> blocked -> todo)
+  // own budget. Reaching `proposed` first (not just blocked -> todo)
   // exercises the real reject edge (awaiting-approval -> todo, reason required).
-  moveToDurableDoingForTest(dir, 'item-reprieved');
-  moveWork(dir, { id: 'item-reprieved', to: 'awaiting-approval', expectedStatus: 'doing' });
+  recordClaimAttempt(dir, { id: 'item-reprieved', phase: 'execute', result: 'success' });
+  moveWork(dir, { id: 'item-reprieved', to: 'awaiting-approval', expectedStatus: 'todo' });
   moveWork(dir, { id: 'item-reprieved', to: 'todo', expectedStatus: 'awaiting-approval', reason: 'not quite right', role: 'human' });
   // lifetime visitCount is already 1 here — the OLD (pre-D1) gate would have
   // parked this item immediately at maxVisits: 1, never dispatching it again.
@@ -1186,10 +1176,11 @@ test('anti-loop: a human reject (with reason) resets the runner gate — visits 
 test('anti-loop: a BARE resume (no reason, no human role) does NOT reset the gate — the machine-only loop still dies at the cap', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-loopy-bare' });
-  // todo -> doing -> blocked -> todo, no reason, no role: a bare resume,
-  // never a human trigger per D1c. The prior visit must still count.
-  moveToDurableDoingForTest(dir, 'item-loopy-bare');
-  moveWork(dir, { id: 'item-loopy-bare', to: 'blocked', expectedStatus: 'doing' });
+  // a real prior visit (work.attempt), then blocked -> todo with no reason,
+  // no role: a bare resume, never a human trigger per D1c. The prior visit
+  // must still count.
+  recordClaimAttempt(dir, { id: 'item-loopy-bare', phase: 'execute', result: 'failed' });
+  moveWork(dir, { id: 'item-loopy-bare', to: 'blocked', expectedStatus: 'todo' });
   moveWork(dir, { id: 'item-loopy-bare', to: 'todo', expectedStatus: 'blocked' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 

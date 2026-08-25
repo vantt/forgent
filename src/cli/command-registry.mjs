@@ -819,7 +819,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'take',
     invoke: 'fgos take',
-    description: 'Claim one item through the pull door (defaults to the frontier head): moves it to doing and records the predicted outcome.',
+    description: 'Claim one item through the pull door (defaults to the frontier head): records a runtime claim (effective status becomes doing) and the predicted outcome.',
     parameters: {
       type: 'object',
       properties: {

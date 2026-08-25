@@ -9,20 +9,22 @@
 // lives only in the closure returned to the caller; nothing here touches
 // disk or a process.
 //
-// EXECUTING-PHASE ONLY (claim-lock, code review finding): before claim-lock,
-// an item could never reach `doing` before stage `executing` (pick/take were
-// frontier-only), so counting every `to: 'doing'` move was equivalent to
-// counting only real dispatch attempts. Claim-lock lets `pick` claim an item
-// at `clarify`/`decompose` too — a claim-then-release cycle there (pick ->
-// decompose.mjs's release `doing -> todo` -> re-pick at `executing`) is not a
-// dispatch attempt and must not silently eat into the SAME budget real
-// executing retries draw from. `countableDoingMoveIndexes` below replays just
-// enough of the log (domain + stage per id, mirroring frontier.mjs's own
-// `(item.stage ?? executeStage) !== executeStage` check) to count only a
-// `to: 'doing'` move that lands while the item's stage already IS its
-// domain's Execute-mapped stage.
-
-import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
+// EXECUTING-PHASE ONLY (claim-lock, code review finding, superseded by
+// tsk-40m D3): before claim-lock, an item could never reach `doing` before
+// stage `executing` (pick/take were frontier-only), so counting every
+// `to: 'doing'` move was equivalent to counting only real dispatch
+// attempts. Claim-lock let `pick` claim an item at `clarify`/`decompose`
+// too — a claim-then-release cycle there is not a dispatch attempt and
+// must not eat into the SAME budget real executing retries draw from. That
+// scoping used to be reconstructed here by replaying domain+stage per id
+// alongside each `to: 'doing'` move (mirroring frontier.mjs's own
+// executing check). tsk-40m D3 (docs/history/runtime-claim-doing-
+// separation/CONTEXT.md, locked decision — hard migration, no dual-count
+// legacy) retired that reconstruction entirely: `countableDoingMoveIndexes`
+// below now counts `work.attempt(phase:'execute')` events directly —
+// settleClaim (store.mjs) only ever stamps `phase:'execute'` for a real
+// dispatch attempt, so the same scoping is now a fact already recorded at
+// write time, never inferred at read time.
 
 /** Default max times a single item may be re-dispatched (re-enter `doing`)
  * before the runner refuses to pick it up again. Provisional — tuning is
@@ -46,33 +48,22 @@ export const MAX_VISITS = 3;
  */
 function countableDoingMoveIndexes(events, id) {
   const indexes = new Set();
-  let domain;
-  let stage;
   for (let i = 0; i < events.length; i += 1) {
     const event = events[i];
     if (!event || !event.payload) continue;
-    if (event.type === 'work.add' && event.payload.id === id) {
-      domain = event.payload.domain;
-      stage = event.payload.stage;
-    } else if (event.type === 'work.stage' && event.payload.id === id) {
-      stage = event.payload.to;
-    } else if (event.type === 'work.attempt' && event.payload.id === id && event.payload.phase === 'execute') {
+    // tsk-40m D3 (docs/history/runtime-claim-doing-separation/CONTEXT.md,
+    // locked decision — "anti-loop chuyen sang dem durable work.attempt
+    // event (phase:execute) THAY VI work.move->doing... Hard migration --
+    // khong giu dual-count legacy"): counts work.attempt(phase:'execute')
+    // ONLY, full replacement of the old work.move->doing count, no legacy
+    // fallback for a pre-migration item's OWN old doing-moves either — a
+    // hard cut, not an additive/dual-count transition. `domain`/`stage`
+    // tracking (needed only to scope the OLD work.move->doing fallback to
+    // the Execute stage) is retired along with it; work.attempt's own
+    // `phase:'execute'` field already carries that same scoping directly,
+    // set by settleClaim only for a real dispatch attempt.
+    if (event.type === 'work.attempt' && event.payload.id === id && event.payload.phase === 'execute') {
       indexes.add(i);
-    } else if (event.type === 'work.move' && event.payload.id === id && event.payload.to === 'doing') {
-      // tsk-40m D3 (hard migration, no dual-count): settleClaim (store.mjs)
-      // writes this exact move immediately followed by its own paired
-      // work.attempt(phase:'execute') as one atomic settle segment — counting
-      // both would double-count a single real attempt. A legacy standalone
-      // doing-move (pre-migration, no paired attempt right after it) still
-      // counts on its own, unchanged.
-      const next = events[i + 1];
-      const bundledWithAttempt = next?.type === 'work.attempt' && next.payload?.id === id && next.payload?.phase === 'execute';
-      if (!bundledWithAttempt) {
-        const executeStage = stageForStep(getDomain(domain), 'Execute');
-        if ((stage ?? executeStage) === executeStage) {
-          indexes.add(i);
-        }
-      }
     }
   }
   return indexes;

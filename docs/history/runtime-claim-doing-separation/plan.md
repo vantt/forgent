@@ -1,5 +1,17 @@
 # plan.md — tsk-40m: tách live claim/doing khỏi durable eventlog
 
+> **SUPERSEDED (2026-08-25)** — mục 3 dưới đây ("ghi ĐÚNG 1 lần dưới
+> events.lock full segment `work.move(preClaimStatus->doing)` +
+> `work.attempt` + `work.move(doing->finalStatus)`") đã bị thay bằng
+> **direct settle** (settleClaim ghi thẳng `work.move(preClaimStatus->
+> finalStatus)`, không còn leg `->doing` trung gian nào), sau khi review
+> phát hiện full-segment vẫn để lại một khoảng hở durable-doing thật giữa
+> hai lần append. Quyết định do user chọn trực tiếp (AskUserQuestion,
+> "Làm ngay") — xem docs/history/runtime-claim-doing-separation/
+> CONTEXT.md's ghi chú SUPERSEDED và docs/architect/doing-coordination-
+> redesign.md cho thiết kế hiện hành. Mọi mục khác trong plan này (1, 2,
+> 4-11) vẫn đúng nguyên trạng.
+
 Mode: high-risk
 
 **Vì sao không phải standard trở xuống**: đếm flag theo `fgos-routing`'s

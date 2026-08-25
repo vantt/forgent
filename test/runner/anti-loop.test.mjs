@@ -23,141 +23,124 @@ test('visitCount is 0 on an empty log', () => {
   assert.equal(visitCount([], 'a'), 0);
 });
 
-test('visitCount counts every entry into doing for the given id', () => {
+function attempt(id, seq, overrides = {}) {
+  return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.attempt', payload: { id, phase: 'execute', result: 'success', ...overrides }, v: 3 };
+}
+
+// tsk-40m D3 (docs/history/runtime-claim-doing-separation/CONTEXT.md,
+// locked decision — hard migration, no dual-count legacy): visitCount now
+// counts durable work.attempt(phase:'execute') events directly, INSTEAD OF
+// work.move(to:'doing') — a full replacement, not an additive/dual-count
+// transition. settleClaim (store.mjs) only ever stamps `phase:'execute'`
+// for a real dispatch attempt (a clarify/decompose-phase claim settles
+// with a different `phase`), so the executing-only scoping this file used
+// to reconstruct from domain+stage is now a fact already recorded at
+// write time.
+
+test('visitCount counts every execute-phase attempt for the given id', () => {
   const events = [
-    move('a', 'doing', 1),
+    attempt('a', 1),
     move('a', 'blocked', 2),
-    move('a', 'doing', 3),
+    attempt('a', 3),
     move('a', 'awaiting-approval', 4),
     move('a', 'todo', 5),
-    move('a', 'doing', 6),
+    attempt('a', 6),
   ];
   assert.equal(visitCount(events, 'a'), 3);
 });
 
-test('visitCount ignores moves for other ids', () => {
-  const events = [move('a', 'doing', 1), move('b', 'doing', 2), move('b', 'doing', 3)];
+test('visitCount ignores attempts for other ids', () => {
+  const events = [attempt('a', 1), attempt('b', 2), attempt('b', 3)];
   assert.equal(visitCount(events, 'a'), 1);
   assert.equal(visitCount(events, 'b'), 2);
 });
 
-test('visitCount ignores non-"doing" targets and non-work.move event types', () => {
+test('visitCount ignores non-execute-phase attempts and non-work.attempt event types', () => {
   const events = [
     move('a', 'blocked', 1),
     move('a', 'awaiting-approval', 2),
-    { seq: 3, ts: new Date().toISOString(), type: 'decision', payload: { text: 'unrelated' }, v: 2 },
+    attempt('a', 3, { phase: 'clarify' }),
+    attempt('a', 4, { phase: 'decompose' }),
+    { seq: 5, ts: new Date().toISOString(), type: 'decision', payload: { text: 'unrelated' }, v: 2 },
   ];
   assert.equal(visitCount(events, 'a'), 0);
 });
 
-test('visitCount counts a human-authored move exactly the same as any other (no privileged writer)', () => {
-  // The current event shape carries no "who wrote this" field, so a
-  // human's manual re-dispatch through the CLI produces the identical
-  // work.move{to:'doing'} shape a runner-driven one would — this test
-  // locks that no distinction is (or can be) made.
-  const events = [move('a', 'doing', 1)];
+test('visitCount counts a human-actor attempt exactly the same as any other (no privileged writer)', () => {
+  // A human's manual re-dispatch settles through the exact same
+  // settleClaim path (and the same work.attempt shape) a runner-driven
+  // one does — this test locks that no distinction is (or can be) made,
+  // regardless of `actor`.
+  const events = [attempt('a', 1, { actor: 'human' })];
   assert.equal(visitCount(events, 'a'), 1);
 });
 
 test('visitCount defensive guards: non-array events / missing id never throw', () => {
   assert.doesNotThrow(() => visitCount(undefined, 'a'));
   assert.equal(visitCount(undefined, 'a'), 0);
-  assert.equal(visitCount([move('a', 'doing', 1)], undefined), 0);
+  assert.equal(visitCount([attempt('a', 1)], undefined), 0);
 });
 
-// -- executing-phase scoping (claim-lock, code review finding) -------------
+// -- executing-phase scoping (claim-lock, code review finding, superseded
+// by tsk-40m D3) -------------------------------------------------------
 //
-// Before claim-lock, `doing` was unreachable before stage `executing` (pick/
-// take were frontier-only), so every `to: 'doing'` move already WAS an
-// executing-phase dispatch — the tests above (no work.add at all) exercise
-// exactly that historical shape and must keep passing unchanged (asserted
-// below). Claim-lock lets `pick` claim an item at clarify/decompose too; a
-// claim-then-release cycle there must not consume the SAME budget real
-// executing retries draw from.
+// Before claim-lock, `doing` was unreachable before stage `executing`
+// (pick/take were frontier-only), so every `to: 'doing'` move already WAS
+// an executing-phase dispatch. Claim-lock let `pick` claim an item at
+// clarify/decompose too; a claim-then-release cycle there must not
+// consume the SAME budget real executing retries draw from. That scoping
+// used to be reconstructed here from domain+stage replay. tsk-40m D3
+// retired that reconstruction: a clarify/decompose-phase claim now
+// settles with a `phase` OTHER than `'execute'` (resolveDiscovery/
+// resolvePlan's own responsibility when they call settleClaim), so
+// visitCount's own `phase === 'execute'` filter already excludes it by
+// construction — no domain/stage inference needed here at all.
 
 function add(id, seq, overrides = {}) {
   return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.add', payload: { id, title: id, status: 'todo', ...overrides }, v: 2 };
 }
 
-function stageMove(id, to, seq) {
-  return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.stage', payload: { id, from: 'x', to }, v: 2 };
-}
-
-function attempt(id, seq, overrides = {}) {
-  return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.attempt', payload: { id, phase: 'execute', result: 'success', ...overrides }, v: 3 };
-}
-
-test('a log with no work.add for the id counts every doing-move exactly as before (backward-compat: no domain/stage info defaults to counting)', () => {
-  const events = [move('a', 'doing', 1), move('a', 'blocked', 2), move('a', 'doing', 3)];
-  assert.equal(visitCount(events, 'a'), 2);
-});
-
-test('visitCount does not count a doing-move made while the item is still at stage clarify (claim-lock pick-at-clarify)', () => {
+test('visitCount does not count a clarify-phase claim settle (claim-lock pick-at-clarify)', () => {
   const events = [
     add('a', 1, { stage: 'clarify' }),
-    move('a', 'doing', 2), // pick --id a (clarify) — not a dispatch attempt
+    attempt('a', 2, { phase: 'clarify' }), // pick --id a (clarify), released — not a dispatch attempt
     move('a', 'todo', 3), // decompose.mjs's release, doing -> todo
   ];
   assert.equal(visitCount(events, 'a'), 0);
 });
 
-test('visitCount counts the doing-move once the item has actually reached stage executing, ignoring the earlier clarify-stage claim', () => {
+test('visitCount counts the execute-phase attempt once the item has actually reached executing, ignoring the earlier clarify-phase claim', () => {
   const events = [
     add('a', 1, { stage: 'clarify' }),
-    move('a', 'doing', 2), // pick at clarify — excluded
+    attempt('a', 2, { phase: 'clarify' }), // pick at clarify — excluded
     move('a', 'todo', 3), // release
-    stageMove('a', 'decompose', 4),
-    stageMove('a', 'executing', 5), // resolvePlan's own moveStage
-    move('a', 'doing', 6), // pick at executing — the real first dispatch
+    attempt('a', 4), // pick at executing — the real first dispatch
   ];
   assert.equal(visitCount(events, 'a'), 1);
 });
 
-test('visitCount counts every executing-stage doing-move for an item added with no explicit stage (lazy default reads as executing)', () => {
-  const events = [add('a', 1), move('a', 'doing', 2), move('a', 'blocked', 3), move('a', 'doing', 4)];
-  assert.equal(visitCount(events, 'a'), 2);
-});
+// -- settleClaim's own segment (tsk-40m redesign): one real settle writes
+// an enriched work.attempt(phase:'execute') then transitions DIRECTLY from
+// preClaimStatus to finalStatus — no durable intermediate
+// work.move(->doing) leg at all (store.mjs's settleClaim). There is
+// therefore no "bundle" left to dual-count: visitCount counts the one
+// work.attempt event and nothing else, full stop.
 
-test('visitCount is domain-aware: a synthetic-domain item (single stage "assembling", mapped to Execute) counts from its first doing-move, never excluded', () => {
-  const events = [add('a', 1, { domain: 'synthetic', stage: 'assembling' }), move('a', 'doing', 2)];
+test('visitCount counts one settleClaim segment (work.attempt, no accompanying doing-move) as exactly one visit', () => {
+  const events = [add('a', 1), attempt('a', 2), move('a', 'awaiting-approval', 3)];
   assert.equal(visitCount(events, 'a'), 1);
 });
 
-test('visitsSinceLastHumanEvent also excludes clarify/decompose-phase claims from the budget', () => {
-  const events = [
-    add('a', 1, { stage: 'clarify' }),
-    move('a', 'doing', 2), // clarify claim — excluded from both metrics
-    move('a', 'todo', 3),
-    stageMove('a', 'decompose', 4),
-    stageMove('a', 'executing', 5),
-    move('a', 'doing', 6), // first real dispatch
-    move('a', 'blocked', 7),
-    move('a', 'doing', 8), // retry 2
-  ];
-  assert.equal(visitCount(events, 'a'), 2);
-  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
-});
-
-// -- settleClaim's full-segment bundle (tsk-40m D3): one real settle writes
-// BOTH work.move(->doing) and work.attempt(phase:execute) together (store.mjs's
-// settleClaim), one right after the other. D3 is a hard migration -- no
-// dual-count: one settle must count as exactly one visit, not two.
-
-test('visitCount counts a settleClaim-style bundle (doing-move immediately followed by its own work.attempt) once, not twice', () => {
-  const events = [add('a', 1), move('a', 'doing', 2), attempt('a', 3), move('a', 'awaiting-approval', 4)];
-  assert.equal(visitCount(events, 'a'), 1);
-});
-
-test('visitCount still counts a legacy standalone doing-move (no paired work.attempt) exactly as before', () => {
+test('visitCount does NOT count a legacy standalone doing-move at all — hard migration, no dual-count legacy (tsk-40m D3)', () => {
   const events = [add('a', 1), move('a', 'doing', 2), move('a', 'blocked', 3)];
-  assert.equal(visitCount(events, 'a'), 1);
+  assert.equal(visitCount(events, 'a'), 0);
 });
 
-test('visitCount counts two consecutive settleClaim bundles as two visits, not four', () => {
+test('visitCount counts two consecutive settleClaim segments as two visits, not four', () => {
   const events = [
     add('a', 1),
-    move('a', 'doing', 2), attempt('a', 3), move('a', 'blocked', 4), // bundle 1
-    move('a', 'doing', 5), attempt('a', 6), move('a', 'awaiting-approval', 7), // bundle 2
+    attempt('a', 2), move('a', 'blocked', 3), // segment 1
+    attempt('a', 4), move('a', 'awaiting-approval', 5), // segment 2
   ];
   assert.equal(visitCount(events, 'a'), 2);
 });
@@ -180,76 +163,76 @@ test('visitsSinceLastHumanEvent is 0 on an empty log', () => {
 });
 
 test('with no human trigger event ever, visitsSinceLastHumanEvent equals visitCount (a pure machine loop still dies at the cap)', () => {
-  const events = [move('a', 'doing', 1), move('a', 'blocked', 2), move('a', 'doing', 3)];
+  const events = [attempt('a', 1), move('a', 'blocked', 2), attempt('a', 3)];
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), visitCount(events, 'a'));
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
 });
 
-test('a human answer (leaving awaiting-human) resets the budget — only doing-entries AFTER it count', () => {
+test('a human answer (leaving awaiting-human) resets the budget — only attempts AFTER it count', () => {
   const events = [
-    move('a', 'doing', 1),
+    attempt('a', 1),
     move('a', 'blocked', 2),
-    move('a', 'doing', 3),
+    attempt('a', 3),
     humanMove('a', 'todo', 4, { answer: 'go ahead' }),
-    move('a', 'doing', 5),
+    attempt('a', 5),
   ];
   assert.equal(visitCount(events, 'a'), 3); // lifetime metric unaffected
-  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 1); // only the doing at seq 5
+  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 1); // only the attempt at seq 5
 });
 
 test('a human reject/park with reason resets the budget the same way', () => {
   const events = [
-    move('a', 'doing', 1),
-    move('a', 'doing', 2),
+    attempt('a', 1),
+    attempt('a', 2),
     humanMove('a', 'todo', 3, { reason: 'not quite right' }),
-    move('a', 'doing', 4),
+    attempt('a', 4),
   ];
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 1);
 });
 
 test('a bare resume (blocked -> todo, no reason, no role) does NOT reset the budget', () => {
   const events = [
-    move('a', 'doing', 1),
+    attempt('a', 1),
     move('a', 'blocked', 2),
     move('a', 'todo', 3),
-    move('a', 'doing', 4),
+    attempt('a', 4),
   ];
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
 });
 
-test('a human take (blocked -> doing, role human, no answer/reason) does NOT reset the budget — it counts as a visit like any other', () => {
+test('a human-actor attempt does NOT reset the budget — it counts as a visit like any other (only a work.move reset trigger can reset)', () => {
   const events = [
-    move('a', 'doing', 1),
+    attempt('a', 1),
     move('a', 'blocked', 2),
-    humanMove('a', 'doing', 3),
+    attempt('a', 3, { actor: 'human' }),
   ];
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
 });
 
 test('a machine park with reason (role runner, e.g. anti-loop-max-visits) does NOT reset the budget — reason alone is not enough, role must be human', () => {
   const events = [
-    move('a', 'doing', 1),
+    attempt('a', 1),
     { seq: 2, ts: new Date(2026, 0, 2).toISOString(), type: 'work.move', payload: { id: 'a', from: 'doing', to: 'blocked', reason: 'anti-loop-max-visits', role: 'runner' }, v: 2 },
-    move('a', 'doing', 3),
+    attempt('a', 3),
   ];
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
 });
 
 test('a system park edge does not reset the anti-loop budget — role must be human, not just reason (return/approve internal park edges stamp role system)', () => {
   const events = [
-    move('a', 'doing', 1),
+    attempt('a', 1),
     { seq: 2, ts: new Date(2026, 0, 2).toISOString(), type: 'work.move', payload: { id: 'a', from: 'doing', to: 'blocked', reason: 'verify-fail', role: 'system' }, v: 2 },
-    move('a', 'doing', 3),
+    attempt('a', 3),
   ];
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
 });
 
 test('per-item: another id\'s human event never resets this id\'s budget', () => {
   const events = [
-    move('a', 'doing', 1),
-    move('a', 'doing', 2),
+    attempt('a', 1),
+    attempt('a', 2),
     humanMove('b', 'todo', 3, { answer: 'yes' }),
-    move('a', 'doing', 4),
+    attempt('a', 4),
   ];
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 3);
 });

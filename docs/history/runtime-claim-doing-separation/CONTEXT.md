@@ -1,5 +1,27 @@
 # CONTEXT — tsk-40m: tách live claim/doing khỏi durable eventlog
 
+> **SUPERSEDED (2026-08-25) — đọc docs/architect/doing-coordination-redesign.md
+> trước khi implement bất cứ gì dựa vào file này.** Sau khi round implement đầu
+> theo D1-D6 dưới đây bị review round phát hiện vấn đề (settle full-segment
+> `work.move(preClaimStatus->doing)` + `work.attempt` + `work.move(doing->
+> finalStatus)` vẫn để lại một khoảng hở đủ để race/đọc dở dang thấy durable
+> `doing`), user được hỏi trực tiếp qua AskUserQuestion và chọn "Làm ngay":
+> settleClaim đổi thành **direct settle** — CHỈ 1 work.move
+> (preClaimStatus->finalStatus), không còn leg trung gian `->doing` nào dưới
+> events.lock, cộng cạnh FSM mới `todo -> awaiting-approval`. D1 (durable
+> vs runtime split) và D2 (CAS mới)/D4 (effective view)/D5 (releaseClaimOnExecuting
+> retired)/D6 (reclaim liveness) trong bảng "Locked decisions" bên dưới VẪN
+> ĐÚNG; chỉ phần "settle ghi full 3-event segment" của D1's implementation
+> (plan.md mục 3) bị thay bằng direct-settle. D3 (anti-loop hard-cut,
+> đếm work.attempt(phase:execute), không dual-count legacy) giữ nguyên và đã
+> được xác nhận lại — implementation ban đầu lỡ thêm fallback đếm
+> work.move->doing chuẩn cũ, đã sửa lại đúng D3 (không còn fallback).
+> Nguồn xác nhận: session log tsk-40m, người dùng chọn "Làm ngay" khi được hỏi
+> giữa "giữ nguyên full-segment" và "direct settle"; docs/architect/doing-
+> coordination-redesign.md được chính user cập nhật cùng ngày với ngôn ngữ
+> hard-cut rõ hơn ("Durable workflow edges that write into doing are not
+> normal runtime edges after the hard cut").
+
 ## Feature boundary
 
 `fgos take`/`fgos pick` claim một item hôm nay ghi durable

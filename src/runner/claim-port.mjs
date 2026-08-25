@@ -1,11 +1,13 @@
 // claim-port.mjs — single choke-point for all claim flows (tsk-53f D1).
 //
 // Every claim (CLI take, CLI pick, runner claimItem) goes through this module.
-// Centralizes: main-checkout-lock acquire/release, moveWork to 'doing',
+// Centralizes: main-checkout-lock acquire/release, acquireClaim (runtime
+// claim only — tsk-40m retired the durable moveWork(to:'doing') claim-time
+// write entirely; doing is derived purely from the active-claim overlay),
 // optional worktree creation with correct baseRef for leaf items.
 //
-// This is the "one door" for claiming work — no direct moveWork(to:'doing')
-// calls outside this module except for FSM-internal transitions.
+// This is the "one door" for claiming work — no direct acquireClaim call
+// outside this module except for FSM-internal transitions.
 
 import { moveWork, addOutcome, addDecision, recordClaimAttempt, readRawEvents, FsmError } from '../state/store.mjs';
 import { withEventsLock } from '../state/events.mjs';
