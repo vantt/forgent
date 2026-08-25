@@ -195,6 +195,50 @@ work, only the config entry. The proof ran entirely against a scratch
 every other coding item's real headless dispatch) was never touched or put
 at risk while proving this.
 
+## A configured cli-spawn capacity beats a live soul — config wins, not "I can just do it myself"
+
+`tsk-1m8`'s live proof surfaced a real gap the moment it was tried against
+a genuine native session: registering a `fgos-coding-implement` capacity
+still resolved `in-process` for a session that happened to have live Task
+access, silently skipping the out-of-process dispatch the capacity entry
+was supposed to force. `tsk-pdg` fixed this by inverting a case decision
+`0026`'s own rule 2 (Native-First Dispatch Doctrine) — this only for the
+specific case a capacity has actually been configured for that job:
+
+Before this fix, `decideCapacityDispatchMechanism` let a caller's own
+`hasLiveTaskAccess: true` silently override a configured `kind: agent`
+capacity back to native/in-process dispatch — "I'm already a live soul, so
+I'll just do this myself" won by default even when the operator had
+explicitly configured a specific capacity for that job. After the fix, a
+**cli-spawn-shaped** capacity (its own `command`, or an `invocations[].via
+=== 'cli'` entry — e.g. `agy`) dispatches out-of-process *unconditionally*
+once configured, regardless of the caller's own live capability.
+`0026`'s rule 2 still holds exactly as before for the case it was written
+for — no capacity configured at all, where native remains the sane
+default. An **agentType-shaped** capacity (e.g. `judge-discovery`) is
+unaffected either way — that shape was already correctly resolving
+in-process, since dispatching it out-of-process would mean spawning a
+whole separate provider process just to do what the live session can
+already do natively.
+
+This is the concrete mechanism behind the wording `fgos-coding-implement`'s
+own Hard rules give today: *"A `cli-spawn`-shaped capacity already
+registered in `.fgos/config.json` resolves `out-of-process`
+*unconditionally* once configured — having live Task access does not
+change that; config wins, not 'I already have full context so I'll do it
+myself'."* The scope is every configured `kind: agent` capacity, not just
+`fgos-coding-implement`/`agy` specifically — the fix lives in the shared
+`decideCapacityDispatchMechanism` chokepoint, so it applies uniformly.
+
+A full scan of the existing test suite (28 sites asserting
+`hasLiveTaskAccess: true`) confirmed zero needed to change — the inversion
+only affects the specific combination of a *configured, cli-spawn-shaped*
+capacity with a live-task-access caller, a combination the existing tests
+hadn't happened to cover. `docs/decisions/0033` records this as an
+extension of `0026`, not a rewrite of it — `0026`'s own body stays intact
+with a pointer note, since its rule still governs the no-capacity-configured
+case correctly.
+
 ## A real operational snag: approve cannot run from inside an isolated worktree
 
 This item's own driving hit a structural wall worth recording: once fully
