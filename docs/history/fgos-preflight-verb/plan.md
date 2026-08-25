@@ -75,12 +75,21 @@ cwd-strict resolution for the identical reason). So `preflight` resolves
 `repoRoot` via `execFileSync('git', ['rev-parse', '--show-toplevel'],
 {cwd: process.cwd()})` — the CURRENT checkout's own toplevel, never
 `dataDir()`'s `.fgos`-resolved `dir`, and never `resolveMainCheckoutRoot`.
-This also confirms `requiresExistingStore: false` and `touchesState:
-false` in the registry entry (`touchesState` is specifically about ever
-appending an event or overwriting `.fgos/state.json`, per
-`src/cli/command-registry.mjs`'s own header comment — `preflight` never
-does either, even though check 1 does write real, non-`.fgos/` files to
-the working tree as an intentional side effect).
+This also confirms `requiresExistingStore: false` (no `.fgos/` dependency
+at all). **Correction after an initial reality-gate FAIL**: `touchesState`
+was first claimed `false` here on a literal reading of
+`src/cli/command-registry.mjs`'s header comment ("true for any verb that
+ever appends an event or overwrites `.fgos/state.json`") — wrong. The
+same file's `setup` entry (`src/cli/command-registry.mjs:1201-1204`,
+`touchesState: true`) is the closest real precedent: `setup` writes the
+shared config file/shell rc files/git hooks, never `.fgos/` at all, and
+is still `touchesState: true` — the header comment's own next sentence
+says so explicitly. The field tracks any persistent-state write, not only
+`.fgos/`. `preflight`'s check 1 writes real files
+(`.claude/skills/`/`plugins/fgOS/skills/`) as an intentional side effect,
+so its registry entry is `touchesState: true`, `externalEffect: false`
+(no external-system effect like `review --github`'s GitHub PR touch),
+matching `setup`'s own shape exactly.
 
 **Exit code.** Confirmed by reading `bin/fgos.mjs`'s `main()` dispatch
 (`bin/fgos.mjs:4341-4368`): a verb's success path always sets
@@ -128,7 +137,7 @@ not because a query was skipped for convenience.
 1. `bin/fgos.mjs` — add `case 'preflight': { ... }` (placed next to
    `doctor`, `bin/fgos.mjs:3943`, the closest sibling pattern).
 2. `src/cli/command-registry.mjs` — add the matching `preflight` manifest
-   entry (`touchesState: false`, `requiresExistingStore: false`,
+   entry (`touchesState: true`, `requiresExistingStore: false`,
    `externalEffect: false`, `paginated: false`).
 3. `test/cli/fgos-preflight.test.mjs` — new test file (naming convention
    confirmed via `ls test/cli/`: `fgos-<verb>.test.mjs`).
