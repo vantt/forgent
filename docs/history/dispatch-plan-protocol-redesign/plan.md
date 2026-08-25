@@ -178,7 +178,7 @@ absent: `tsk-fli` is already that exact work (its `refs` points at
   {
     "title": "Governance: declared egress replaces the command!=claude test, dependency-free",
     "verify": "grep -q 'egress' src/runner/dispatch/resolve.mjs && node --test test/runner/egress-governance.test.mjs && node --test test/runner/dispatch.test.mjs",
-    "action": "Per D2's governance intent (carried forward by D6) and D1, replace the resolve.mjs:322 gate — which inspects only executor.command against CLAUDE_CLI_COMMANDS and is blind to an env override — with a declared-egress check carrying providerFamily plus egress {kind, target, content}. DELIBERATELY DEPENDENCY-FREE: this is a live policy hole, not a vocabulary refactor, and must not sit behind a structural refactor. It needs only fields that exist today — executor.providerModel, invocations[].command, invocations[].env, allowCrossProvider, carries. Reuse the ALREADY-BUILT EXECUTOR_CARRIES enum (config.mjs:364, enforced resolve.mjs:243-258) as the egress content vocabulary instead of inventing a parallel one. Also record the effective egress target alongside the self-declared provider label in the dispatch audit event, honoring tsk-5td D9's provider-AND-command rule. Cross-provider stays first-class; only undeclared or self-contradicting egress fails. Live specimen: executor glm keeps command:\"claude\" while routing to OpenRouter via env.",
+    "action": "Per D2's governance intent (carried forward by D6) and D1, replace the resolve.mjs:322 gate — which inspects only executor.command against CLAUDE_CLI_COMMANDS and is blind to an env override — with a declared-egress check carrying providerFamily plus egress {kind, target, content}. DELIBERATELY DEPENDENCY-FREE: this is a live policy hole, not a vocabulary refactor, and must not sit behind a structural refactor. It needs only fields that exist today — executor.providerModel, invocations[].command, invocations[].env, allowCrossProvider, carries. Reuse the ALREADY-BUILT EXECUTOR_CARRIES enum (config.mjs:364, enforced resolve.mjs:243-258) as the egress content vocabulary instead of inventing a parallel one. Also record the effective egress target alongside the self-declared provider label in the dispatch audit event, honoring tsk-5td D9's provider-AND-command rule. Cross-provider stays first-class; only undeclared or self-contradicting egress fails. Live specimen: executor glm keeps command:\"claude\" while routing to OpenRouter via env. GATE DECISION (person, 2026-08-25): ship glm's own egress declaration IN THIS SAME CHANGE, so the gate lands fail-closed with zero breakage. Measured blast radius is exactly one executor — agy/codex/pi already declare allowCrossProvider:true (their commands were never \"claude\", so the old gate already caught them) and no executor declares carries today; glm is the only entry carrying an env override. Do not tighten the gate without that declaration in the same commit.",
     "footprint": ["src/runner/dispatch/resolve.mjs", "src/runner/dispatch/config.mjs", "src/runner/dispatch/cli.mjs", "test/runner/egress-governance.test.mjs"],
     "kind": "feature",
     "risk": "heavy",
@@ -280,9 +280,29 @@ into someone else's live session** — sharpest case being an item parked at
 carries this constraint so the implementer cannot miss it. `tsk-1nih` stays
 its own item; piece 2 must not silently absorb it.
 
+### Gate outcome
+
+`fgos gate-check --gate validateApprove --cost REVERSIBLE` returned
+`canAutoApprove: false`. The blocking axis was identified rather than
+guessed: the **hard-gate keyword floor**, hit by the word `audit` inside
+piece 1's `action` (the dispatch audit event). The open-items scan was clean
+(`None.`) and the cost verdict was this skill's own `REVERSIBLE` — so the
+floor, not the judgment, is what asked. Per this skill's own rule the floor
+may never be argued down, so a person was asked.
+
+**Asked, and answered (2026-08-25):** what happens to `glm` when the gate
+starts inspecting `env`. Evidence brought to the question: exactly **one**
+executor is affected — `agy`/`codex`/`pi` already declare
+`allowCrossProvider: true` (their commands were never `claude`, so the old
+gate caught them), `claude`/`gitnexus`/`herdr` carry no env override, and no
+executor declares `carries` at all today. **Decision: ship `glm`'s egress
+declaration in the same change**, so the gate lands fail-closed with zero
+breakage. Folded into piece 1's `action` above.
+
 ### Verdict
 
-**READY WITH CONSTRAINTS** — constraint C1 above. No reality-gate dimension
+**READY WITH CONSTRAINTS** — constraint C1 above, plus the gate decision on
+`glm` now recorded in piece 1's `action`. No reality-gate dimension
 failed; every medium-or-higher assumption has accepted evidence; the one
 weak proof (blast radius) is named rather than hidden.
 
