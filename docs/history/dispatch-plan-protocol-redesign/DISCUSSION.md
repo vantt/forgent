@@ -470,6 +470,58 @@ nhìn thấy tiến trình, kết quả về qua mailbox với `confidence:"repo
 và `fgos list` cho thấy status KHÔNG đổi cho tới khi fgOS state transition
 chạy, dù pane đã đóng.
 
+### 7.8 Protocol abstraction — mở cổng adapter/protocol {#task-protocol-abstraction}
+
+> ⚠ **Mục này bổ sung 2026-08-25, sau khi người dùng hỏi "các finding ảnh
+> hưởng gì, nó không còn relevant hay sao?".** Bảy mục §7.1-§7.7 ban đầu
+> nuốt im lặng **pha 3 của D2** (protocol abstraction) và **Finding #2** của
+> note gốc (adapter port chưa thật sự mở). Ghi lại lỗi ở đây thay vì sửa
+> lặng: §7 gốc map vào pha 1,1,2,4,5,6+7,8 — thiếu đúng pha 3.
+
+**Mục tiêu.** Thêm field `protocol` vào `invocations[]` và một registry
+handler, để `prompt-stdout-v1` trở thành MỘT protocol thay vì protocol duy
+nhất: `json-stdout-v1`, `agent-message-v1`, `http-json-v1`, `mcp-tool-v1`,
+`herdr-v1`. Đồng thời mở `resolveExecutorConfig` cho invocation không phải
+`cli`.
+
+**Vì sao đây là blocker cứng, không phải nice-to-have.**
+`resolve.mjs:280-286` hôm nay **throw** khi một executor khai `invocations`
+mà không có cái nào `via:"cli"`:
+
+> `executor "<id>" declares "invocations" but none is dispatchable via "cli"
+> (has: ...) — resolveExecutorConfig only ever spawns a cli invocation`
+
+Một executor khai `via:"herdr"` bị chặn ngay tại resolve ⇒ **§7.6 không thể
+chạy** cho tới khi mục này xong. Đây đúng Finding #2 của note gốc
+(`via:"api"` + `httpAdapter` có thật nhưng production resolve chỉ chọn
+`via:"cli"`) — không phải phát hiện mới.
+
+**Trích §6.** §6.1 (Transport là lớp riêng, "cách message đi tới nơi"),
+§6.4 (prompt tụt xuống thành một cách *render*, hàm ý phải có chỗ khai cách
+render khác).
+
+**D-ID áp dụng.** D2 (pha 3 + pha 5 của note), D4 (prompt là renderer).
+
+**Quan hệ.** Cần §7.1 (chỗ đặt `invocation.protocol` trong plan) và §7.3
+(có `agent-message-v1` để mà khai). **Chặn §7.6.**
+
+**Verify nháp.** Một executor khai `invocations:[{via:"herdr"}]` resolve
+được thay vì throw; `node --test test/runner/dispatch.test.mjs` xanh.
+
+### 7.9 Cố ý HOÃN, ghi rõ thay vì bỏ quên {#task-deferred}
+
+Hai finding của note gốc **không** vào lô này, có lý do, không phải bỏ sót:
+
+- **Finding #4 — MCP là handback, chưa là dispatch target đồng cấp.** Chính
+  note gốc tự phán *"Đây là hợp lý cho V1"*. Giữ nguyên handback
+  (`decide` trả `mcpTool`, caller tự gọi). Mở lại khi có consumer thật cần
+  dispatch layer tự gọi MCP — cùng dạng điều kiện `tsk-2t6` D9 đã dùng cho
+  B2, không phải "xem lại sau" mơ hồ.
+- **Finding #7 — tốc độ workflow.** Chính note gốc đo `decide` ≈ 0.09-0.13s
+  và chỉ ra bottleneck nằm ở **subprocess Node, git/worktree, pick/return,
+  Monitor/wrapper** — tức KHÔNG phải vấn đề của tầng dispatch protocol.
+  Nhét vào epic này sẽ trộn hai loại việc. Xứng đáng một item riêng.
+
 ### 7.7 Governance egress {#task-governance-egress}
 
 **Mục tiêu.** Thay phép thử `command !== "claude"` bằng egress khai báo:

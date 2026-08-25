@@ -113,11 +113,36 @@ ids, and by design no child exists yet at this stage.
 
 ## Shape
 
-Six pieces, materialized by `fgos-coding-validating` at its single gate — not
-seven, and none created here. §7.2 of `DISCUSSION.md` is deliberately absent
-from the specs below: `tsk-fli` is already that exact work (its `refs` was
-pointed at `#task-execute-work` this session), so it is honored as an
-existing sibling instead of duplicated as a child.
+Seven pieces, materialized by `fgos-coding-validating` at its single gate,
+none created here. §7.2 of `DISCUSSION.md` is deliberately absent from the
+specs below: `tsk-fli` is already that exact work (its `refs` was pointed at
+`#task-execute-work` this session), so it is honored as an existing sibling
+instead of duplicated as a child.
+
+### Coverage of the source note's seven Findings
+
+Written out explicitly because the first draft of this plan silently dropped
+three of them — the omission originated in `DISCUSSION.md` §7, which mapped
+onto D2's phases 1,1,2,4,5,6+7,8 and skipped **phase 3** without saying so.
+Corrected 2026-08-25; `§7.8`/`§7.9` were added there for the same reason.
+
+| Finding (source note) | Where it lands | Note |
+|---|---|---|
+| #1 `decide --for` misses `capabilities.*.prefer` | piece 0 | live-verified bug |
+| #2 adapter port not really open (`via:"api"` test-level only) | **piece 3** | was dropped in the first draft; it is a **hard blocker** for piece 6 |
+| #3 cross-provider governance inspects the wrong thing | piece 1 | live-verified gap (`glm`) |
+| #4 MCP is a hand-back, not a peer dispatch target | **deferred**, §7.9 | the source note itself calls this "hợp lý cho V1" |
+| #5 protocol pinned to prompt/stdout | pieces 2 + 3 | piece 2 makes the prompt a renderer; piece 3 opens the protocol layer |
+| #6 two orchestration paths not unified | piece 0 | all four callers port onto one plan object |
+| #7 workflow speed | **deferred**, §7.9 | the note's own measurements put the bottleneck in subprocess/git/worktree/pick-return, not in the dispatch protocol — mixing it in would blend two unrelated kinds of work |
+
+**Why #2 is a blocker and not a nicety.** `resolveExecutorConfig`
+(`resolve.mjs:280-286`) throws outright when an executor declares
+`invocations` with no `via:"cli"` entry: *"executor ... declares
+'invocations' but none is dispatchable via 'cli' ... resolveExecutorConfig
+only ever spawns a cli invocation"*. A `via:"herdr"` executor is therefore
+structurally undispatchable today, so the Herdr piece cannot function until
+piece 3 lands — which is why piece 6 now declares `deps: [2,3,4]`.
 
 `deps` are integer indices into this same array, pointing strictly backwards
 (`src/intake/plan.mjs:293` enforces `d < index`), so array order is the
@@ -156,6 +181,16 @@ dependency order:
     "deps": [0]
   },
   {
+    "title": "Protocol abstraction: invocation.protocol field + handler registry, open resolve to non-cli invocations",
+    "verify": "node --test test/runner/protocol-registry.test.mjs && node --test test/runner/dispatch.test.mjs",
+    "action": "Per D2's phase 3 and D4's demotion of the prompt to a renderer, add a `protocol` field to invocations[] plus a handler registry so prompt-stdout-v1 becomes ONE protocol rather than the only one (siblings: json-stdout-v1, agent-message-v1, http-json-v1, mcp-tool-v1, herdr-v1). Critically, this piece also opens resolveExecutorConfig, which today THROWS at resolve.mjs:280-286 whenever an executor declares invocations with no via:\"cli\" entry — that throw is what makes a via:\"herdr\" executor structurally undispatchable and therefore hard-blocks the Herdr piece. This closes Finding #2 of the source note (via:\"api\" and httpAdapter exist but production resolve only ever selects via:\"cli\"). Keep the existing cli path byte-identical; this is additive.",
+    "footprint": ["src/runner/dispatch/resolve.mjs", "src/runner/dispatch/transport.mjs", "src/runner/dispatch/config.mjs", "test/runner/protocol-registry.test.mjs"],
+    "kind": "feature",
+    "risk": "heavy",
+    "refs": ["docs/history/dispatch-plan-protocol-redesign/DISCUSSION.md#task-protocol-abstraction"],
+    "deps": [0, 1, 2]
+  },
+  {
     "title": "Three-tier confidence ladder on every dispatch result",
     "verify": "node --test test/runner/dispatch.test.mjs && node --test test/runner/confidence-ladder.test.mjs",
     "action": "Per D5, normalize every executor result into {status, confidence, evidence} across three tiers: a structured RESULT/BLOCKER gives confidence \"reported\"; the existing stdout token path (cli.mjs:541-542) gives \"legacy-signal\"; and git-state/exit-code inference gives \"inferred\" WITH status UNKNOWN rather than a pretended SUCCESS. Do not remove the legacy token in this piece — D5 gates removal on telemetry. Extend logExecutorDispatch's executor.dispatch payload (cli.mjs:298-301) additively with confidence, keeping attestation-guard.mjs — a real live consumer of that event — green. Follow the posture attestation-guard already proves correct: halt on contradiction, skip on absence.",
@@ -165,6 +200,7 @@ dependency order:
     "refs": ["docs/history/dispatch-plan-protocol-redesign/DISCUSSION.md#task-confidence-ladder"],
     "deps": [2]
   },
+
   {
     "title": "Artifact store V1 under .fgos/artifacts with ArtifactRef",
     "verify": "node --test test/runner/artifact-store.test.mjs && node --test test/runner/dispatch.test.mjs",
@@ -183,7 +219,7 @@ dependency order:
     "kind": "feature",
     "risk": "heavy",
     "refs": ["docs/history/dispatch-plan-protocol-redesign/DISCUSSION.md#task-herdr-transport"],
-    "deps": [2, 3]
+    "deps": [2, 3, 4]
   }
 ]
 ```
@@ -204,7 +240,9 @@ which is exactly the `sequence` resolution the gate itself suggests:
 | Pair | Shared path | Handled by |
 |---|---|---|
 | piece 0 ↔ piece 1 | `test/runner/dispatch.test.mjs` | piece 1 `deps: [0]` |
-| piece 0 ↔ piece 3 | `src/runner/dispatch/cli.mjs` | piece 3 `deps: [2]` → `[0]` |
+| piece 0 ↔ piece 4 | `src/runner/dispatch/cli.mjs` | piece 4 `deps: [2]` → `[0]` |
+| piece 1 ↔ piece 3 | `src/runner/dispatch/resolve.mjs`, `config.mjs` | piece 3 `deps` widened to `[0,1,2]` — the probe caught this one unserialized on the first run |
+| piece 3 ↔ piece 6 | `src/runner/dispatch/transport.mjs` | piece 6 `deps: [2,3,4]` |
 
 **Existing sibling, not a child:** `tsk-fli` covers `execute --work <id>`
 (§7.2). It is not blocked by this split and can land independently; the only
