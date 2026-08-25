@@ -192,6 +192,22 @@ streams live to stderr instead of staying silent. `decide` was
 deliberately left unchanged — it is fully synchronous, with no in-flight
 period for a live tee to have anything to show.
 
+**The live-tee is real but useless from inside a synchronous Bash call
+(`tsk-37ij`).** `tsk-129`'s live-tee genuinely writes to `dispatch.mjs`'s
+own stderr as `agy` runs — but real evidence from driving `tsk-52z` and
+`tsk-1ep` showed a native agent session invoking `execute` through its
+Bash tool *synchronously* (foreground) never sees any of that: the Bash
+tool waits for the whole command to finish and hands back all its output
+in one chunk at the end, regardless of what the child process wrote and
+when. The bug was in the *caller*, not in `dispatch.mjs` — the tee stream
+exists and fires in real time, nothing relays it live to a human watching
+the session. The fix, no hack required: the shared dispatch-fallback
+fragment's Step B now instructs a native agent session with Bash+Monitor
+tools to run `execute` with `run_in_background: true` and `Monitor` it —
+each stdout line then arrives as its own notification while the process is
+still running — instead of calling it synchronously and only seeing output
+once it's already done.
+
 ## Live proof: `fgos-coding-implement` really does dispatch out-of-process to `agy`
 
 `tsk-1m8` live-proved the mechanism described above actually works for a
