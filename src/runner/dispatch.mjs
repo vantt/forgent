@@ -37,6 +37,8 @@ export { modelForTier, resolveExecutorIdForPurpose, resolveExecutorAndOverrides 
 
 export { decideDispatchMechanism, decideExecutorDispatchMechanism } from './dispatch/mechanism.mjs';
 
+export { compileDispatchPlan } from './dispatch/plan.mjs';
+
 export { DispatchError, resolveExecutorCommand, resolveExecutorEnv, DEFAULT_ADAPTER, EXECUTOR_ADAPTERS, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from './dispatch/transport.mjs';
 
 export { buildPrompt } from './dispatch/prepare.mjs';
