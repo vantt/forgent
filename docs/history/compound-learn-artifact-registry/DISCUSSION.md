@@ -1821,6 +1821,26 @@ khắc nào "đã dời layout nhưng writer còn cũ".
 11. A7 deprecate fgos compound -> fgos knowledge attest
 ```
 
+> **LỖ THỨ TỰ — phát hiện vòng 10 khi soát lại, chưa sửa vào sơ đồ trên.**
+> Bước 5 bật enforcement ⇒ mọi ghi phải có `(topicId, role)` hợp lệ. Nhưng
+> vocabulary `vai trò` chỉ ra ở **bước 9** (classifier). Giữa 5 và 9, item
+> retrospective vẫn chảy mà **không có role nào tồn tại** — kể cả đường "gán
+> gần nhất + đề xuất" (D-tsk28x-7) cũng không chạy được vì không có gì để gần.
+>
+> Sâu hơn: **bước 4 (bootstrap) và bước 9 (classifier) là CÙNG MỘT VIỆC.**
+> Bootstrap phải gán `(topicId, role)` cho 268 tài liệu — mà việc gán đó chính
+> là phân loại. Bootstrap "chỉ map path→entry" sẽ tạo 268 entry rỗng nghĩa.
+>
+> **Sửa:** classifier chạy **trước bước 4**, output của nó *là* dữ liệu bootstrap.
+> Nó đọc-thuần, độc lập, chạy song song được với bước 1-2 — đúng như bản 1 của
+> §7 từng xếp nó làm task đầu tiên (T1) trước khi bản 2 hoà nó vào bước 9.
+>
+> **Lần thứ BA trong thảo luận này hai việc tưởng rời hoá ra là một** (1: fold
+> và dời; 2: phân loại và pass bottom-up; 3: bootstrap và classifier). Đáng
+> thành nguyên tắc: *trước khi xếp hai bước liền nhau vào hai chỗ khác nhau
+> trong thứ tự, hỏi xem đầu ra của bước này có phải đầu vào bắt buộc của bước
+> kia không.*
+
 **A7 đứng cuối có chủ đích:** đánh dấu deprecated trước khi `knowledge attest`
 thật sự thay được việc của nó là hứa suông với người dùng.
 
