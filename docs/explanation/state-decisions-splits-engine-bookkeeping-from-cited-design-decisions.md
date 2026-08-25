@@ -198,6 +198,22 @@ scope between `tsk-1lv` and `tsk-37i`) existed to prevent, caught here
 because the two branches' actual diffs were compared directly rather than
 assuming the earlier scope split still held once both had drifted.
 
+That flagged concern resolved cleanly (`tsk-12v`, follow-up once `tsk-1lv`
+actually landed): confirmed directly against the real merged code, `tsk-37i`'s
+own citation-format checking survived byte-identical, kept as the CLI's
+default check, and `tsk-1lv-1`'s wide-sweep mechanism was added *alongside*
+it rather than replacing it — the code's own comment says so explicitly,
+matching what shipped. The one real gap that remained: the wide-sweep's
+own scan roots (`docs`, `src`, `plugins`) never covered `.agents/skills`
+(the canonical skill source) or `.claude/skills` (its generated wrappers),
+leaving both the write-time supersede sweep and the 4-door check's own
+"impact" door blind to a stale citation living inside a skill file. Fixed
+by widening the scan roots to include `.agents/skills` — confirmed during
+discovery, rather than assumed, that `.claude/skills`'s generated wrappers
+carry no independent prose beyond what's byte-derived from that source, so
+scanning the source alone was sufficient without also adding the generated
+copy as a second root.
+
 **Live confirmation of the fold-into-spec convention (`tsk-1fp-6`).** A
 later, unrelated item (superseding `docs/specs/distribution.md`'s install
 entry-point law) had been planned three hours and twenty minutes *before*
