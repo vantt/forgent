@@ -1035,8 +1035,8 @@ test('loadRunnerConfig rejects a "executors.<id>" entry whose allowCrossProvider
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
-test('EXECUTOR_ADAPTERS registers exactly two adapters (D13, tsk-in1-5): cli-spawn (default) and http (the D13 pluggability precedent) — the RPC/app-server adapter stays deferred per D a4fe4c2b', () => {
-  assert.deepEqual(Object.keys(EXECUTOR_ADAPTERS), ['cli-spawn', 'http']);
+test('EXECUTOR_ADAPTERS registers adapters: cli-spawn (default), http, and herdr-spawn', () => {
+  assert.deepEqual(Object.keys(EXECUTOR_ADAPTERS), ['cli-spawn', 'http', 'herdr-spawn']);
   assert.equal(DEFAULT_ADAPTER, 'cli-spawn');
 });
 
