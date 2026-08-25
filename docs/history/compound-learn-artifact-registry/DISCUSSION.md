@@ -1280,9 +1280,301 @@ flowchart TD
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-§6.4 còn bốn phương án chưa chọn, nên **chưa chia được task thi công**.
-Nhưng một việc chia được ngay và không phụ thuộc lựa chọn đó: phép thử
-đọc vỉa chất liệu.
+**Viết vòng 10 (2026-08-25)**, sau khi §6.7 chốt bức tranh bốn nhãn và advisor
+ngoài sửa hai chỗ nền tảng (D-tsk28x-13 anti-fork đã tồn tại; D-tsk28x-14
+invariant cardinality). Trước vòng 10 mục này ghi "chưa chia được" — nay đủ.
+
+**Hai item đã tách ra ngoài, KHÔNG thuộc danh mục dưới đây:**
+
+- **`tsk-422`** — thu chất liệu kể chuyện (D-tsk28x-12). Không deps, bản ghi sống
+  ở `.fgos/`, không chờ registry.
+- **`tsk-o4f`** — bug guard supersession của `fgos decision` (§3 dòng D24). Độc lập.
+
+### Xung đột footprint phải biết trước khi chạy song song
+
+`bin/fgos.mjs` bị **T2 + T4 + T5** cùng chạm (thêm verb / đổi verb đọc). Ba task
+này **không được chạy song song** trừ khi tách trước phần verb-registration.
+Chạy `fgos conflicts` trước mỗi đợt dispatch. Ngoài ra `docs/` tree bị T7+T8
+chạm — nhưng hai task đó vốn tuần tự.
+
+### Thứ tự phụ thuộc
+
+```
+T1 (probe phân loại, đọc-thuần) ──┬─────────────► T7 ──► T8
+                                  │                ▲
+T2 (registry core) ──┬──► T3 ─────┴───► T6 ────────┘
+                     ├──► T4 ────────────────────► (chặn cứng T8)
+                     └──► T5
+T9 (spec + hard rule) ── đi kèm từng task, không đứng riêng
+```
+
+**T4 là chốt chặn cứng:** không được dời một file nào trước khi `docPath` cũ
+resolve được (D-tsk28x-9, §3 dòng D14).
+
+### T1 — Phép thử phân loại 268 tài liệu (đọc-thuần) {#task-classification-probe}
+
+**Mục tiêu:** đọc toàn bộ tài liệu end-user đang có, gán ứng viên
+`(mục đích, vai trò, entity[], framework+mode)` cho từng file, và **sinh ra
+vocabulary từ chính dữ liệu** thay vì liệt kê tay. Đầu ra là **DỮ LIỆU**
+(bảng gán + danh sách ứng viên + phân bố), không sửa một tài liệu nào.
+
+**Trích §6.7 áp dụng:** toàn bộ bảng bốn nhãn; đặc biệt Q6 (nửa ĐÓNG phải bám
+chỗ không phình — task này là chỗ kiểm giả thuyết đó bằng số thật).
+
+**D-ID áp dụng:** D-tsk28x-11 (pha 1 CHÍNH LÀ pass bottom-up, một việc không
+phải hai), D-tsk28x-4 (ba toạ độ), D-tsk28x-7 (vai trò ĐÓNG — task này sinh ra
+danh sách ứng viên để chủ sản phẩm chốt).
+
+**Vì sao làm trước mọi thứ:** hai câu (a)/(b) về `vai trò` đã có LUẬT
+(đóng-có-cửa, đề xuất-không-chặn) nhưng chưa có GIÁ TRỊ. Chốt giá trị trước khi
+đo là lặp lại kiểu sai #1. Task này rẻ, đọc-thuần, chạy lại được — đúng khuôn
+`tsk-1hy` đã chứng minh hiệu quả.
+
+**Ràng buộc mang theo:** đầu ra phải kèm **confidence + evidence** cho mỗi lần
+gán (advisor pha 1), để pha resolver sau này phân biệt được match chắc / match
+yếu / không match. Không được chỉ trả nhãn trần.
+
+**Quan hệ anh em:** độc lập hoàn toàn, không chạm `bin/fgos.mjs`. Chạy song song
+được với T2.
+
+**Footprint:** `scripts/`, `test/scripts/`,
+`docs/history/compound-learn-artifact-registry/reports/`.
+**Verify:** `node --test test/scripts/<probe>.test.mjs`
+
+---
+
+### T2 — Registry core: schema + verb + invariant {#task-registry-core}
+
+**Mục tiêu:** `fgos topic register/split/merge/rename/retire` ghi qua event log,
+với `topicId` bền, `role`, `currentPath`, `aliases[]`, `entities[]`,
+`framework+mode`, `lifecycle`. Chưa dời file nào, chưa đụng tài liệu nào.
+
+**Trích §6.7 áp dụng:** Q7 (một bộ máy hai registry), Q8 (`docPath` là sự thật
+lịch sử, registry giữ bản chiếu).
+
+**D-ID áp dụng:** D-tsk28x-6 (event + verb, không phải JSON soạn tay),
+D-tsk28x-7 (đóng cấu trúc/mở danh sách; năm thao tác), **D-tsk28x-14**
+(invariant `activeDoc(topicId, role) <= 1`, không escape hatch; `docId` là danh
+tính kỹ thuật), **D-tsk28x-15** (lifecycle `provisional|active|superseded|retired`,
+chữ `draft` không xuất hiện ở tầng tài liệu).
+
+**Điểm dễ làm sai:** invariant cardinality phải cưỡng chế **tại cửa ghi**, không
+phải kiểm sau. Mọi ngoại lệ (nhiều doc cùng role) chỉ được sinh ra qua `split`
+tường minh và **phải để lại lineage** — không có đường tắt nào khác.
+
+**Quan hệ anh em:** chặn T3/T4/T5/T6. Chạm `bin/fgos.mjs` +
+`src/cli/command-registry.mjs` ⇒ **xung đột với T4, T5**.
+
+**Footprint:** `src/state/<topic-registry>.mjs`, `bin/fgos.mjs`,
+`src/cli/command-registry.mjs`, `test/state/`.
+**Verify:** `node --test test/state/<topic-registry>.test.mjs`
+
+---
+
+### T3 — Resolver + nâng độ phủ anti-fork {#task-resolver-antifork}
+
+**Mục tiêu:** pha 2 của đường ống — nhận đầu ra phân loại, quyết
+**create / grow / split / merge**. Đây là chỗ anti-fork ngữ nghĩa sống. Đồng
+thời nâng độ phủ `authoritative_for` từ **20% (67/331)** và cưỡng chế khai báo
+lúc ghi.
+
+**Trích §6.7 áp dụng:** Q1 bản đã sửa — đường dẫn duy nhất là **backstop vật
+lý**, uniqueness THẬT nằm ở registry invariant `topicId + role`.
+
+**D-ID áp dụng:** **D-tsk28x-13** (anti-fork ngữ nghĩa bắt buộc và ĐÃ TỒN TẠI —
+`fgos authoritative-match` + `src/report/authoritative-match.mjs`, `tsk-1lv-6`;
+đề bài là nâng phủ + cưỡng chế, KHÔNG phải xây mới), D-tsk28x-14.
+
+**Ràng buộc mang theo:** ba nhánh xử lý theo độ chắc của match (advisor) —
+match chắc thì grow doc hiện có; match yếu thì ghi `provisional`, **không mở
+topic chính thức mới**; không match thì tạo topic ứng viên trạng thái chờ,
+**không tự coi là sự thật đã công nhận**.
+
+**Bẫy đã gặp thật:** `--check-duplicates` hiện trả `duplicateGroups: []` trên
+`docs/explanation` trong khi có trùng rõ ràng — **kết quả sạch giả** vì 80% tài
+liệu không khai `authoritative_for`. Task này phải làm cho zero-result trở nên
+đáng tin, và test phải chứng minh điều đó (một ca trùng thật bị bắt).
+
+**Quan hệ anh em:** phụ thuộc T2. Chặn T6.
+
+**Footprint:** `src/report/authoritative-match.mjs`, `src/report/<resolver>.mjs`,
+`test/report/`.
+**Verify:** `node --test test/report/<resolver>.test.mjs`
+
+---
+
+### T4 — Alias/lineage resolver cho `docPath` cũ {#task-docpath-alias-resolver}
+
+**Mục tiêu:** `findAllSourceCaptureIds`, `fgos doc-sources`, `fgos docs-index`
+đọc **qua registry** thay vì so khớp chuỗi thuần, để `docPath` lịch sử vẫn
+resolve ra tài liệu hiện tại qua `aliases`/lineage.
+
+**Trích §6.7 áp dụng:** Q8.
+
+**D-ID áp dụng:** **D-tsk28x-9** (bảng ánh xạ cũ→mới là việc NGÀY ĐẦU, không
+phải cải tiến sau).
+
+**Vì sao là chốt chặn cứng:** `findAllSourceCaptureIds`
+(`src/report/enduser-index.mjs`) khớp `docPath` **chính xác từng ký tự**. Dời
+một file trước khi task này xong ⇒ gãy linkage cho **toàn bộ 268 capture**.
+**Không task nào được dời file trước T4.**
+
+**Quan hệ anh em:** phụ thuộc T2; **chặn cứng T8**. Chạm `bin/fgos.mjs` ⇒ xung
+đột với T2, T5.
+
+**Footprint:** `src/report/enduser-index.mjs`, `bin/fgos.mjs`, `test/report/`.
+**Verify:** `node --test test/report/enduser-index.test.mjs`
+
+---
+
+### T5 — Hai ảnh cuối cùng + doctor check {#task-projections-doctor}
+
+**Mục tiêu:** sinh **JSON cho máy** và **Markdown cho người** từ registry, cộng
+ba doctor check: `topic-index-stale`, `topic-doc-oversize` (tín hiệu TÁCH), và
+tràn `unmatched`/`misc` (guard chống dồn rác).
+
+**Trích §6.7 áp dụng:** phần "Cơ chế vận hành"; ảnh Markdown phải cho thấy thứ
+`ls` không thấy — lineage tách/gộp, topic đã đăng ký mà chưa có tài liệu, topic
+quá ngưỡng chờ tách, topic nghỉ hưu và ai thay.
+
+**D-ID áp dụng:** D-tsk28x-6 (ảnh cuối cùng là ĐIỀU KIỆN của phương án event,
+không phải tiện nghi), D-tsk28x-7 (tách kích hoạt bằng doctor check, không phải
+người nhớ), **D-tsk28x-8** (hai tầng dùng chung bộ máy này nhưng KHÔNG chung
+vocabulary/ngưỡng).
+
+**Ràng buộc R6:** không được để bất kỳ bước nào phụ thuộc "có người nhớ chạy" —
+đó là hình dạng đã đo hỏng 32%. Khuôn có sẵn: `decision-index-stale`,
+`enduser-docs-index-stale`.
+
+**Guard đã chốt:** vai trò chỉ có **đúng một tài liệu** là vai trò đáng ngờ
+(D-tsk28x-7) — đếm được, đưa vào check.
+
+**Quan hệ anh em:** phụ thuộc T2. Chạm `bin/fgos.mjs` + `src/setup/checks.mjs`
+⇒ xung đột với T2, T4.
+
+**Footprint:** `src/report/`, `src/setup/checks.mjs`, `bin/fgos.mjs`,
+`test/setup/`, `test/report/`.
+**Verify:** `node --test test/setup/checks.test.mjs`
+
+---
+
+### T6 — Skill viết tài liệu có contract đầu vào {#task-writer-skill}
+
+**Mục tiêu:** skill nhận contract `{mục đích, vai trò, entity[]}` +
+`{framework + mode}` + `{capture thật}`, **tự nạp một hoặc nhiều expertise
+viết**, rồi viết/bồi tài liệu. Thay hẳn bước tự-đặt-tên-file hiện tại trong
+`fgos-coding-compounding`.
+
+**Trích §6.7 áp dụng:** nhãn 4 (framework+mode) và sơ đồ; Q3 (framework không
+làm thư mục), Q5 (vai trò gợi ý framework mặc định, đè được).
+
+**D-ID áp dụng:** **D-tsk28x-10** (contract không well-formed nếu thiếu một
+trong hai trục — đây là lý do hai trục phải cùng lúc), D-tsk28x-3 (trục cách
+viết là registry mở nhiều framework).
+
+**Tiền lệ dùng lại, không phát minh:** `.agents/skills/_shared/`
+(`executor-dispatch-fallback.md`, `citation-format.md`) — mảnh chuyên môn dùng
+chung, skill trỏ vào chứ không chép lại.
+
+**Quan hệ anh em:** phụ thuộc T2, T3. Chặn T8. Chạm `.agents/skills/` +
+`.claude/skills/` (mirror byte-identical) ⇒ không xung đột với T2/T4/T5.
+
+**Footprint:** `.agents/skills/<writer>/SKILL.md`, `.claude/skills/` mirror,
+`.agents/skills/_shared/`.
+**Verify:** kiểm prose skill theo khuôn `write-verify-for-a-skill-prose-change`
+(`docs/how-to/`), cộng một ca chạy thật trên một item.
+
+---
+
+### T7 — Di trú pha khô: inventory + conservation + dry-run {#task-migration-dryrun}
+
+**Mục tiêu:** từ đầu ra T1, dựng **bảng old-path → (mục đích, vai trò, entity,
+framework, mode)**, chạy **conservation gate**, dựng registry + alias map, và
+chạy **dry-run duplicate detector**. **Không dời một file nào.**
+
+**Trích §6.5 áp dụng:** kỷ luật conservation của bài học B6b — mọi mục phải
+được kể tên **đúng một lần**, thiếu một cái là ném lỗi.
+
+**D-ID áp dụng:** D-tsk28x-11 (conservation là guard bắt buộc), D-tsk28x-9
+(alias trước, dời sau).
+
+**Conservation gate cụ thể:** mỗi file trong 268 phải xuất hiện **đúng một lần**
+— hoặc trong danh sách nguồn của một đích, hoặc trong danh sách loại trừ **có lý
+do ghi rõ**. Đây là cách duy nhất đảm bảo R3 (*nuôi là bổ sung, không mất*)
+không bị vi phạm âm thầm khi gộp ~8 nguồn thành 1.
+
+**Quan hệ anh em:** phụ thuộc T1 và T4. Chặn T8.
+
+**Footprint:** `scripts/`, `test/scripts/`, registry state.
+**Verify:** `node --test test/scripts/<migration-dryrun>.test.mjs`
+
+---
+
+### T8 — Di trú pha ướt: fold + dời theo từng đích {#task-migration-execute}
+
+**Mục tiêu:** viết ~33 tài liệu đích theo layout `docs/<mục-đích>/<vai-trò>.md`,
+gộp nội dung 268 file cũ vào, xoá file cũ, cập nhật alias. Song song **theo
+đích**, mỗi đích độc lập.
+
+**D-ID áp dụng:** D-tsk28x-5 (layout mới), D-tsk28x-14 (một active doc mỗi
+`topicId+role`), D-tsk28x-11 (pha 2 đồng thời là **phép thử thật đầu tiên của
+skill viết** T6 — dogfood có sẵn).
+
+**Chặn cứng:** không chạy nếu T4 chưa xong. Không chạy nếu conservation gate của
+T7 chưa xanh.
+
+**Cảnh báo vận hành đã gặp thật:** fan-out từng đua worktree và phải lùi về tuần
+tự. Nếu song song hoá thì phải pin worktree tử tế; nếu nghi ngờ thì chạy tuần tự.
+
+**Quan hệ anh em:** phụ thuộc T4, T6, T7. Là task cuối của trục chính.
+
+**Footprint:** toàn bộ `docs/` tree, registry state.
+**Verify:** conservation gate xanh + `fgos docs-index` khớp + `node --test`
+toàn bộ `test/report/`.
+
+---
+
+### T9 — Cập nhật spec và hard rule {#task-spec-hardrule-update}
+
+**Mục tiêu:** sửa lớp văn bản đang mô tả sai hiện thực sau khi T2-T8 landed.
+
+**Danh sách cụ thể đã biết là sẽ sai:**
+
+- `docs/specs/enduser-docs-authoring.md` — **R4** (grow-vs-create theo tồn-tại-tệp)
+  và **R5** (Diataxis là trục cấu trúc DUY NHẤT) đều bị thay; § Open Gaps còn
+  viết "mới ngăn how-to có tài liệu thật" (sai từ lâu, thực tế 268 tài liệu).
+- `.agents/skills/fgos-coding-compounding/SKILL.md` — hard rule "không viết
+  ngoài `docs/<quadrant>/`" bị thay; bước 3 grow-vs-create bằng `fs.existsSync`
+  bị thay bằng resolver.
+- `src/report/enduser-index.mjs` — `QUADRANT_DIR_ALIASES` đổi vai.
+- `docs/specs/reading-map.md`, `docs/specs/system-overview.md` § Area Map — thêm
+  area mới cho topic registry.
+
+**Ràng buộc AGENTS.md:** đây là thay đổi người dùng fgOS thấy được ⇒ **bắt buộc
+thêm dòng vào `## [Unreleased]` của `CHANGELOG.md`**.
+
+**Quan hệ anh em:** không đứng riêng — nên đi kèm từng task tương ứng thay vì
+gom cuối, để không bao giờ có khoảng thời gian văn bản mô tả sai code đang chạy.
+
+**Footprint:** `docs/specs/`, `.agents/skills/`, `.claude/skills/`, `CHANGELOG.md`.
+**Verify:** `node --test test/scripts/check-decision-citation-drift.test.mjs`
++ doctor xanh.
+
+---
+
+### Chưa chia — cố ý để lại
+
+- **Tầng BA (`docs/specs/`) cưỡi chung bộ máy** (D-tsk28x-8). Đã chốt *một bộ
+  máy hai registry*, nhưng chưa chia task vì tầng người phải chạy thật trước rồi
+  mới biết chỗ nào tái dùng được. Động lực có sẵn: Area Map **đang trôi**
+  (`herdr-web-dashboard` là area sống mang 20 quyết định mà thiếu trong danh
+  sách `system-overview.md`).
+- **Giá trị ngưỡng cụ thể** cho `topic-doc-oversize` — chờ T1 cho phân bố thật.
+  Số 800 dòng hiện chỉ là config công cụ của phiên, không phải luật repo.
+
+---
+
+### Đã xong trước đó (giữ để đối chiếu)
 
 ### tsk-1hy — phép thử vỉa chất liệu kể chuyện {#task-storytelling-material-probe}
 
@@ -1332,23 +1624,3 @@ và `tsk-3ip` (hai task nửa changelog, ở
 `tsk-1hy` đã `delivered`, dep này giờ luôn thoả. Dep trên `tsk-12m` đã bị
 bỏ (đã tách quan hệ, xem §3 dòng E, §4) — `tsk-12m` không còn chặn
 `tsk-28x` tiến tiếp.
-
-### Chưa chia được — nhưng đã thấy hình (vòng 8)
-
-Chưa mint nên chưa chia task chính thức (luật D4: chờ vòng 9 xác nhận
-per-item + nghĩa B). Nhưng §6.4/§6.6 giờ đủ cụ thể để thấy các mảnh sẽ
-tách ra thế nào, ghi lại đây để vòng sau không phải nghĩ lại:
-
-- **Lọc tầng khuôn mẫu thứ hai của vỉa ask** (§3 dòng J3) — độc lập, cơ
-  học, làm được trước mọi thứ khác vì mọi thứ khác đo trên đầu ra của nó.
-- **Nối item ↔ commit** (§3 dòng N2/N3) — grep `type(id):` + đi xuống item
-  con qua field `parent`. Độc lập với phần event log. Lưu ý: KHÔNG dùng
-  branch (đã xoá sau merge) và KHÔNG dùng `branchHeadAtTake` (`tsk-2zv`).
-- **Đo hình dạng struggle → solution ở diện rộng** (§3 dòng N4) — có thể
-  cần một phép thử thứ hai kiểu `tsk-1hy`, vì hiện mới có 2 ví dụ và
-  thảo luận này đã hai lần trả giá cho cỡ mẫu đó.
-- **Bản ghi chất liệu + ngưỡng, cắm vào compound stage** — phụ thuộc ba
-  mảnh trên.
-- Chưa đụng tới: hình dạng registry/trục danh tính, port
-  `authoritative_for`. Vẫn chờ, và câu vòng 4(d) "hai trục có cần cùng
-  lúc không" vẫn chưa ai trả lời.
