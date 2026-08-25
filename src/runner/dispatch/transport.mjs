@@ -526,8 +526,25 @@ function herdrSpawnAdapter(invocation, opts) {
     }
 
     // 2. Launch worker inside the newly created pane via `herdr pane run <paneId> <cmd>`
-    const formattedArgs = (args || []).map((arg) => (/[ \t\n"'$`\\]/.test(arg) ? JSON.stringify(arg) : arg)).join(' ');
-    const fullCmd = formattedArgs ? `${command} ${formattedArgs}` : command;
+    //
+    // SECURITY (self-review finding, 2026-08-25): `herdr pane run` is not a
+    // spawn -- it types the given text into whatever shell is already
+    // running in the pane (docs/how-to/launch-claude-in-a-new-herdr-pane-
+    // from-a-plugin.md §2: "There is no shell-safe argv boundary"). The
+    // prior JSON.stringify-based double-quote wrapping still let `$()`/
+    // backticks inside a double-quoted shell string execute as command
+    // substitution -- and `command`/`args` here can carry untrusted prompt
+    // content (repo text, user text) substituted in by resolveExecutorCommand.
+    // POSIX single-quote wrapping (`'` -> close-quote, escaped literal
+    // quote, reopen-quote: `'\''`) is the standard way to embed an
+    // arbitrary string as one shell word with ZERO interpolation --
+    // nothing inside single quotes is special to a POSIX shell, not even a
+    // backslash. Every token (including `command` itself, previously never
+    // quoted at all) goes through this, never a regex-based "does this
+    // token look dangerous" allowlist -- that heuristic is exactly what
+    // let a metacharacter combination it didn't anticipate through before.
+    const posixShellQuote = (value) => `'${String(value).replace(/'/g, `'\\''`)}'`;
+    const fullCmd = [command, ...(args || [])].map(posixShellQuote).join(' ');
 
     try {
       execFileSync(herdrBin, ['pane', 'run', paneId, fullCmd], {

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { execFileSync } from 'node:child_process';
 import { EXECUTOR_ADAPTERS, DispatchError, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from '../../src/runner/dispatch/transport.mjs';
 import { loadRunnerConfig } from '../../src/runner/dispatch/config.mjs';
 
@@ -214,4 +215,42 @@ test('D2 hard constraint assertion: Herdr runtime signals alone NEVER mutate tas
     false,
     'Herdr scrollback text contains [DONE] token, but task status stays unchanged until fgos state transition runs',
   );
+});
+
+test('herdr-spawn adapter: shell metacharacters in a prompt/arg never execute when the typed pane command is later run by a real POSIX shell (self-review finding)', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-shell-injection-test-'));
+  const { scriptPath, logPath } = createMockHerdrScript(tmpDir);
+  const wrapperPath = path.join(tmpDir, 'herdr-wrapper.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh\nexec node "${scriptPath}" "$@"\n`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  const markerFile = path.join(tmpDir, 'pwned.txt');
+  // A prompt containing command substitution, a backtick, single/double
+  // quotes, a semicolon, and a pipe -- everything the old regex-based
+  // conditional-quoting missed or mishandled.
+  const dangerousArg = `before $(touch ${markerFile}) \`touch ${markerFile}\` "quoted" 'single' ; touch ${markerFile} | cat after`;
+
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  const res = await herdrSpawn(
+    { command: 'echo', args: [dangerousArg], env: {} },
+    { cwd: tmpDir, workId: 'injection-item', tier: 'standard', model: 'sonnet', herdrBin: wrapperPath },
+  );
+  assert.ok(res.paneId);
+
+  // Extract the exact text herdr-spawn typed into "pane run <paneId> <text>".
+  const calls = fs.readFileSync(logPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  const runCall = calls.find((c) => c.args[0] === 'pane' && c.args[1] === 'run');
+  assert.ok(runCall, 'expected a "pane run" call to be logged');
+  const typedText = runCall.args[3];
+  assert.ok(typedText, 'expected the typed command text as pane run\'s 4th argv element');
+
+  // The real proof: actually hand the captured text to a real POSIX shell,
+  // exactly like herdr's own pane would ("types the given text into
+  // whatever shell is already running in that pane"). If quoting is
+  // broken, `touch <markerFile>` fires and the file exists afterward.
+  const shellOutput = execFileSync('sh', ['-c', typedText], { encoding: 'utf8' });
+  assert.ok(!fs.existsSync(markerFile), 'command substitution/backtick/semicolon/pipe in the prompt must NEVER execute when the pane types this text into its shell');
+  assert.equal(shellOutput.trim(), dangerousArg, 'echo must receive the dangerous string as ONE literal argument, unmangled');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
 });
