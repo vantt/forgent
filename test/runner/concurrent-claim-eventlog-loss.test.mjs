@@ -11,6 +11,7 @@ import { initStore, addWork, moveWork, readRawEvents } from '../../src/state/sto
 import { readEvents } from '../../src/state/events.mjs';
 import { checkTruncationGuard, readGuardMark, writeGuardMark, runOpportunisticMainCheckoutChecks } from '../../src/state/events-jsonl-truncation-guard.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { readClaims } from '../../src/state/runtime-coordination.mjs';
 
 // Local seq-contiguity assertion helper -- this test only needs it to prove
 // a real event log has no gaps/duplicate `seq` values; it does not exercise
@@ -156,8 +157,8 @@ process.exit(0);
       assert.equal(writerContiguity.ok, true, `per-writer file ${name} contiguity check must pass with 0 gaps and 0 duplicates`);
     }
 
-    const claimedTasks = events.filter((e) => e.type === 'work.move' && e.payload?.to === 'doing').map((e) => e.payload.id);
-    assert.equal(claimedTasks.length, N_PROC, 'every item must have a recorded work.move event');
+    const claims = readClaims(fgosDir);
+    assert.equal(Object.keys(claims).length, N_PROC, 'every item must have a recorded active runtime claim');
 
     fs.rmSync(childScriptDir, { recursive: true, force: true });
   } finally {

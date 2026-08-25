@@ -16,7 +16,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, addFriction, addDiscovery, moveWork, moveStage, addWork, editWork, StoreError } from '../../../src/state/store.mjs';
+import { addOutcome, addFriction, addDiscovery, moveWork, moveStage, addWork, editWork, listWork, StoreError } from '../../../src/state/store.mjs';
+import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { DEFAULT_TTL_MS } from '../../../src/runner/main-checkout-lock.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
@@ -110,7 +111,29 @@ function eventLines(cwd) {
   return lines;
 }
 
+// Effective view (durable status overlaid with any active runtime claim,
+// D4) -- the vast majority of callers want this: it reflects a claimed
+// item as 'doing' whether or not claim-time wrote that durably.
 function stateView(cwd) {
+  return listWork(path.join(cwd, '.fgos'));
+}
+
+// Simulates the claim-lock §3b release (tsk-40m D5: durable doing retired
+// -- releasing a mid-work claim while the branch/worktree survive is now a
+// pure runtime-claim release, no durable move). Fixture-only helper: real
+// callers release through settleClaim (return/reject/verify-fail-park),
+// never a bare release with no durable transition.
+function releaseClaimFor(cwd, id) {
+  releaseClaim(path.join(cwd, '.fgos'), { id });
+}
+
+// Raw persisted cache file, byte-for-byte -- distinct from stateView()
+// above. Only a stale-cache/rebuild/revision test wants this: it never
+// reflects an active runtime claim (claims are never persisted to
+// state.json, D1/D4), and it carries the revision-hash `writeView`
+// stamps into the file at write time (never present on the pure
+// in-memory fold `stateView()` returns).
+function rawPersistedView(cwd) {
   return JSON.parse(fs.readFileSync(viewPath(cwd), 'utf8'));
 }
 
@@ -1056,6 +1079,8 @@ export {
   registerFlatMember,
   removeAdHocWorktree,
   run,
+  rawPersistedView,
+  releaseClaimFor,
   spawnSync,
   startSession,
   stateView,

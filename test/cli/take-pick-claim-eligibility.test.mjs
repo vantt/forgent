@@ -49,7 +49,7 @@ function initGitCwd() {
 }
 
 function stateView(cwd) {
-  return JSON.parse(fs.readFileSync(resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.STATE), 'utf8'));
+  return envelopeData(run(cwd, ['list', '--all', '--json']).stdout);
 }
 
 function envelopeData(stdout) {

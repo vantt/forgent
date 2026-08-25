@@ -41,6 +41,7 @@ import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageR
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
+import { readClaim, readClaims, releaseClaim, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
 
 export { FsmError, WorkValidationError, EventLogError };
 
@@ -954,6 +955,180 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
 }
 
 /**
+ * Settle an active runtime claim on item `id`, transitioning it to `finalStatus` (D2).
+ * Validates active runtime claim ownership (claimId) and durable revision (preClaimRevision),
+ * writes the full segment [work.move(preClaimStatus->doing), work.attempt, work.move(doing->finalStatus)]
+ * in ONE held events.lock critical section, then releases the runtime claim.
+ */
+export function settleClaim(dir, {
+  id,
+  claimId,
+  finalStatus,
+  reason,
+  ask,
+  answer,
+  role,
+  headAtReturn,
+  branchHeadAtReturn,
+  parentSnapshotAtAsk,
+  claimTrigger,
+  statusAtAsk,
+  releaseTrigger,
+  rationale,
+  alternatives,
+  source,
+  askRationale,
+  askAlternatives,
+  askSource,
+  mergedSha,
+  mergedInto,
+  phase = 'execute',
+  result,
+} = {}) {
+  if (!id || typeof id !== 'string') {
+    throw new StoreError('validation', 'settleClaim: "id" is required.');
+  }
+
+  const { logPath } = paths(dir);
+  const claim = readClaim(dir, id);
+
+  if (claim) {
+    if (claimId && claim.claimId !== claimId) {
+      throw new StoreError('conflict', `settleClaim: claimId mismatch for "${id}": active claim is "${claim.claimId}", got "${claimId}".`);
+    }
+    const targetClaimId = claim.claimId;
+
+    try {
+      const res = withEventsLockAndRefresh(dir, logPath, () => {
+        const before = currentView(dir);
+        const work = before.work[id];
+        if (!work) {
+          throw new StoreError('validation', `settleClaim: work "${id}" not found.`);
+        }
+
+        const preClaimStatus = claim.preClaimStatus || work.status;
+        if (claim.preClaimStatus && work.status !== claim.preClaimStatus) {
+          throw new StoreError('conflict', `settleClaim: item "${id}" status changed from preClaimStatus "${claim.preClaimStatus}" to "${work.status}".`);
+        }
+
+        if (claim.preClaimRevision) {
+          const curRev = getItemDurableRevision(before, id);
+          if (curRev !== claim.preClaimRevision) {
+            throw new StoreError('conflict', `settleClaim: item "${id}" durable revision changed from "${claim.preClaimRevision}" to "${curRev}".`);
+          }
+        }
+
+        const writer = resolveWriterIdentity(dir);
+        const writerLogPath = resolveWriterLogPath(dir);
+
+        // Event 1: work.move (preClaimStatus -> 'doing')
+        const move1Raw = transitionWork({ work, to: 'doing', expectedStatus: preClaimStatus });
+        move1Raw.payload.writer = writer;
+        if (claim.claimRole || role) move1Raw.payload.role = claim.claimRole || role;
+        if (claim.headAtTake) move1Raw.payload.headAtTake = claim.headAtTake;
+        if (claim.branchHeadAtTake) move1Raw.payload.branchHeadAtTake = claim.branchHeadAtTake;
+        if (claim.claimTrigger) move1Raw.payload.claimTrigger = claim.claimTrigger;
+        const cat1 = statusCategoryFor(getDomain(work.domain), 'doing');
+        if (cat1 !== undefined) move1Raw.payload.statusCategory = cat1;
+        const pr1 = parkReasonForStatus(getDomain(work.domain), 'doing');
+        if (pr1 !== undefined) move1Raw.payload.parkReason = pr1;
+
+        appendEventLocked(writerLogPath, move1Raw, dir);
+
+        // Event 2: work.attempt
+        const attemptResult = result || (finalStatus === 'awaiting-approval' || finalStatus === 'delivered' || finalStatus === 'done' ? 'success' : 'failed');
+        const attemptPayload = {
+          id,
+          phase,
+          result: attemptResult,
+          claimId: targetClaimId,
+          actor: claim.actor || role || 'unknown',
+          endedAt: new Date().toISOString(),
+        };
+        appendEventLocked(writerLogPath, { type: 'work.attempt', payload: attemptPayload }, dir);
+
+        // Event 3: work.move ('doing' -> finalStatus)
+        const intermediateWork = { ...work, status: 'doing' };
+        const move3Raw = transitionWork({
+          work: intermediateWork,
+          to: finalStatus,
+          expectedStatus: 'doing',
+          reason,
+          ask,
+          answer,
+        });
+        move3Raw.payload.writer = writer;
+        if (role !== undefined) move3Raw.payload.role = role;
+        const cat3 = statusCategoryFor(getDomain(work.domain), finalStatus);
+        if (cat3 !== undefined) move3Raw.payload.statusCategory = cat3;
+        const pr3 = parkReasonForStatus(getDomain(work.domain), finalStatus);
+        if (pr3 !== undefined) move3Raw.payload.parkReason = pr3;
+        if (headAtReturn !== undefined) move3Raw.payload.headAtReturn = headAtReturn;
+        if (releaseTrigger !== undefined) move3Raw.payload.releaseTrigger = releaseTrigger;
+        if (branchHeadAtReturn !== undefined) move3Raw.payload.branchHeadAtReturn = branchHeadAtReturn;
+        if (mergedSha !== undefined) move3Raw.payload.mergedSha = mergedSha;
+        if (mergedInto !== undefined) move3Raw.payload.mergedInto = mergedInto;
+        if (reason !== undefined) move3Raw.payload.reason = reason;
+
+        const event3 = appendEventLocked(writerLogPath, move3Raw, dir);
+        const afterView = rebuildViewFromDir(dir);
+
+        return { event: event3, view: afterView };
+      });
+
+      if (finalStatus === 'delivered') {
+        try {
+          const closeResult = recordCallReturn(dir, { id, note: 'auto-closed at delivered (tsk-2t9c D16)' });
+          if (closeResult) res.view = closeResult.view;
+        } catch {
+          // Best-effort
+        }
+      }
+
+      if (finalStatus === 'awaiting-approval') {
+        try {
+          const domain = getDomain(res.view.work[id]?.domain);
+          if (roleGraphFor(domain)) {
+            recordCall(dir, { id, toRole: 'reviewer', reason: 'review', note: 'auto-fired on reaching awaiting-approval (tsk-2t9c D18)' });
+          }
+        } catch {
+          // Best-effort
+        }
+      }
+
+      return res;
+    } finally {
+      releaseClaim(dir, { id, claimId: targetClaimId });
+    }
+  }
+
+  // Fallback for legacy items (durable status was 'doing' before migration, with no active runtime claim record)
+  return moveWork(dir, {
+    id,
+    to: finalStatus,
+    expectedStatus: 'doing',
+    reason,
+    ask,
+    answer,
+    role,
+    headAtReturn,
+    branchHeadAtReturn,
+    parentSnapshotAtAsk,
+    claimTrigger,
+    statusAtAsk,
+    releaseTrigger,
+    rationale,
+    alternatives,
+    source,
+    askRationale,
+    askAlternatives,
+    askSource,
+    mergedSha,
+    mergedInto,
+  });
+}
+
+/**
  * Park a work item into `awaiting-human`, carrying the question it is
  * waiting on (per D2/D5). Thin wrapper over `moveWork` — same
  * append-then-refresh tail, same CAS/validation errors — status-fsm.mjs requires a
@@ -1399,9 +1574,15 @@ export function addFriction(dir, payload) {
   return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.friction', payload }, dir));
 }
 
-/** Read-only: the current view, rebuilt fresh from the log (never off a stale file). */
+export function currentEffectiveView(dir) {
+  const durableView = currentView(dir);
+  const claims = readClaims(dir);
+  return buildEffectiveView(durableView, claims);
+}
+
+/** Read-only: the current effective view (durable view + active runtime claims). */
 export function listWork(dir) {
-  return currentView(dir);
+  return currentEffectiveView(dir);
 }
 
 /**
@@ -1419,7 +1600,7 @@ export function listWork(dir) {
  * (`'Execute'`) applies, byte-identical to every pre-existing caller.
  */
 export function readyWork(dir, { step } = {}) {
-  return frontier(currentView(dir), step ? { step } : undefined);
+  return frontier(currentEffectiveView(dir), step ? { step } : undefined);
 }
 
 /**
@@ -1431,7 +1612,7 @@ export function readyWork(dir, { step } = {}) {
  * item without losing the deps/lineage guard.
  */
 export function isDepsAndLineageReady(dir, id) {
-  return depsAndLineageReadyView(currentView(dir), id);
+  return depsAndLineageReadyView(currentEffectiveView(dir), id);
 }
 
 /**
@@ -1443,7 +1624,7 @@ export function isDepsAndLineageReady(dir, id) {
  * reaches `frontier` only through `readyWork`.
  */
 export function graphMetrics(dir) {
-  return computeGraphMetrics(currentView(dir));
+  return computeGraphMetrics(currentEffectiveView(dir));
 }
 
 /**

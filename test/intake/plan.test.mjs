@@ -223,7 +223,7 @@ test('resolvePlan on the already-decomposed re-entrant path also releases a held
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'session');
   assert.equal(result.outcome, 'already-decomposed');
-  assert.equal(listWork(storeDir).work['item-x'].status, 'todo');
+  assert.equal(listWork(storeDir).work['item-x'].status, 'doing');
 });
 
 // --- tsk-4n8: the bug this item exists to fix -- a stray child (no
@@ -472,7 +472,7 @@ test('resolvePlan still computes a priority (EFFORT_FLOOR default) on a caller-s
 // claim-lock §3b: a pick claim held through clarify/decompose (status
 // 'doing') is released back to 'todo' the moment the root actually reaches
 // stage executing, so `pick <id>` can re-claim it for the executing phase.
-test('resolvePlan on a caller-supplied pass-through verdict releases a held claim (doing -> todo) once the root reaches executing (claim-lock §3b)', () => {
+test('resolvePlan on a caller-supplied pass-through verdict preserves claim (doing) once the root reaches executing (D5)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
   moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
@@ -482,14 +482,7 @@ test('resolvePlan on a caller-supplied pass-through verdict releases a held clai
 
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'executing');
-  assert.equal(view.work['item-x'].status, 'todo');
-
-  // tsk-2zv: the release carries a positive marker so claimWork can tell
-  // this todo-entry apart from a reject/verify-fail park.
-  const releaseEvent = readRawEvents(storeDir)
-    .filter((e) => e.type === 'work.move' && e.payload.id === 'item-x' && e.payload.to === 'todo')
-    .at(-1);
-  assert.equal(releaseEvent.payload.releaseTrigger, 'claim-lock-3b');
+  assert.equal(view.work['item-x'].status, 'doing');
 });
 
 // tsk-4hb: the refined priority-write pass (this file's own call site) logs
@@ -589,7 +582,7 @@ test('resolvePlan on a caller-supplied decompose verdict releases a held claim (
     children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'implement the described change for this test.' }],
   });
   assert.equal(result.outcome, 'decompose');
-  assert.equal(listWork(storeDir).work['item-x'].status, 'todo');
+  assert.equal(listWork(storeDir).work['item-x'].status, 'doing');
 });
 
 test('resolvePlan writes footprint on a child exactly when the verdict provided one, undefined otherwise', () => {

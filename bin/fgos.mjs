@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession } from '../src/state/store.mjs';
 import { collectWideSourceFiles, findWideCitationFindings, isDLocalId } from '../scripts/check-decision-citation-drift.mjs';
 import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
 import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
@@ -3142,7 +3142,7 @@ async function runVerb(verb, flags, positional, dir) {
         }
         const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
         if (!attestation.ok) {
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: attestation.reason, role: item.claimRole ?? 'session' });
+          settleClaim(dir, { id, finalStatus: 'blocked', reason: attestation.reason, role: item.claimRole ?? 'session' });
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -3251,7 +3251,7 @@ async function runVerb(verb, flags, positional, dir) {
           // itself) — excludeIronLawEvidence strips this item's own mandatory
           // evidence doc before checking, see that helper's own comment.
           const footprintDiff = footprintDiffHits(excludeDocsRefResearch(excludeFgosPaths(excludeIronLawEvidence(changed, id)), item), item.footprint);
-          const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', branchHeadAtReturn: branchHead });
+          const { event } = settleClaim(dir, { id, finalStatus: 'awaiting-approval', branchHeadAtReturn: branchHead });
           addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
           return { id, from: 'doing', to: 'awaiting-approval', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
         }
@@ -3260,7 +3260,7 @@ async function runVerb(verb, flags, positional, dir) {
         // machine may simply have been under load) — never let it park as
         // an indistinguishable 'verify-fail'/'verify-miss', and never state
         // "(exit null)" as if that were a real exit code.
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+        settleClaim(dir, { id, finalStatus: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
         addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount: branchAheadCount } });
         {
           const detail = check.timedOut
@@ -3382,7 +3382,7 @@ async function runVerb(verb, flags, positional, dir) {
         const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
         // tsk-4hl: see excludeIronLawEvidence's own comment above.
         const footprintDiff = footprintDiffHits(excludeDocsRefResearch(excludeFgosPaths(excludeIronLawEvidence(ownDiff, id)), item), item.footprint);
-        const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', headAtReturn: head });
+        const { event } = settleClaim(dir, { id, finalStatus: 'awaiting-approval', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount } });
         // tsk-45z D1/D2: this session's own commits (landed straight on the
         // main checkout, not a branch/worktree) may still hold
@@ -3399,7 +3399,7 @@ async function runVerb(verb, flags, positional, dir) {
 
       // tsk-53o: same timeout/fail distinction as the branch-source path
       // above — a timeout is not proof the item's verify failed.
-      moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+      settleClaim(dir, { id, finalStatus: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
       addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount } });
       {
         const detail = check.timedOut

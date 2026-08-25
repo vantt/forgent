@@ -531,15 +531,10 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // valid across all three moveStage(...,'executing',...) call sites below. A
   // runner-sweep call (item never claimed, `status: 'todo'` already) is a
   // no-op here, matching R15 (sweep only touches todo items).
-  const releaseClaimOnExecuting = () => {
-    if (work.status === 'doing') {
-      // releaseTrigger (tsk-2zv): tags this specific todo-entry as a
-      // claim-lock §3b release so claimWork can tell it apart from a
-      // reject or verify-fail park, which land an item at the exact same
-      // status/branch-existence shape without deleting the branch.
-      moveWork(dir, { id, to: 'todo', expectedStatus: 'doing', releaseTrigger: 'claim-lock-3b' });
-    }
-  };
+  // tsk-40m D5: releaseClaimOnExecuting retired. Items at stage planning no
+  // longer hold durable status doing, so the planning->executing edge no longer
+  // needs to release a durable doing status back to todo.
+  const releaseClaimOnExecuting = () => {};
 
   // Idempotent no-op (must_haves truth 3): a re-entrant call once the root
   // is already past `decompose` does nothing — the CAS on the moveStage
