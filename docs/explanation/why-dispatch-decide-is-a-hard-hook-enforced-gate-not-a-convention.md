@@ -181,6 +181,20 @@ resolves). Both still touch `src/runner/dispatch.mjs`, so they had to
 sequence rather than run concurrently, the same footprint-overlap
 discipline `tsk-in1` had already established.
 
+## Live proof: `fgos-coding-implement` really does dispatch out-of-process to `agy`
+
+`tsk-1m8` live-proved the mechanism described above actually works for a
+real coding-domain capacity, not just in design: registering a
+`fgos-coding-implement` capacity entry pointed at the existing `agy` CLI
+(`kind: agent`, `allowCrossProvider: true`, `providerModel: gemini`) flips
+`decide`'s `configured` field from `false` to `true`, and a real `execute`
+call actually spawned `agy`, which returned the exact requested smoke-test
+reply (`AGY_DISPATCH_TEST_OK`) — no `src/` code change needed to make this
+work, only the config entry. The proof ran entirely against a scratch
+`.fgos/config.json` fixture outside the live repo, so the live config (and
+every other coding item's real headless dispatch) was never touched or put
+at risk while proving this.
+
 ## A real operational snag: approve cannot run from inside an isolated worktree
 
 This item's own driving hit a structural wall worth recording: once fully
