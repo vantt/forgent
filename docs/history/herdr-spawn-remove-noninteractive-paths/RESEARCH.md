@@ -119,3 +119,77 @@ tsk-2rr.
 `EXECUTOR_ADAPTERS` repoint) is an implementation-shape call, not a fact
 gap — evidence above is sufficient to proceed to `planning` without a human
 gate at `exploring`.
+
+## Round 2 — 2026-08-26 (validating stage, reality gate)
+
+**Asked:** does the real, live `.fgos/config.json` (main checkout —
+`/home/vantt/projects/forgentX/.fgos/config.json`, not searchable from a
+worktree or from tracked `src`/`test`/`docs`, since `.fgos/` is gitignored
+and ADR0020-stripped from every worker worktree) actually confirm Round 1's
+"unreferenced, dormant, safe to delete" findings for `live-renderers/*.mjs`
+and `claude-herdr`/`pi-herdr`/`codex-herdr`?
+
+**Checked:** read `.fgos/config.json`'s `runner.executors` block directly
+(`python3 -c "import json; ..."` against the real file) and
+`runner.capabilities.fgos-coding-implement`'s own description field.
+
+**Found — this corrects Round 1 findings 3 and 4, which were WRONG:**
+
+1. **`claude-herdr` and `pi-herdr` are real, fully-specified executor
+   configs that actively declare `adapter: "herdr-spawn"` with a real
+   `liveOutput.renderer` pointing at exactly the two files Round 1 called
+   dead code**: `claude-herdr` → `src/runner/dispatch/live-renderers/claude-stream-json.mjs`,
+   `pi-herdr` → `src/runner/dispatch/live-renderers/pi-agent-session.mjs`.
+   Both carry a real `command`/`args` invocation, not a stub. "DORMANT" in
+   their own description means "not yet wired to any capability's
+   `prefer`" — i.e., nothing dispatches through them BY DEFAULT today —
+   never "unreferenced" or "safe to delete". A person or a future
+   capability can still dispatch to either by name right now.
+2. **`codex-herdr` is a real config too**, using `herdr-spawn` with NO
+   `liveOutput` and NO `interactiveMode` — it depends entirely on the
+   PLAIN/non-interactive body (script-file + sentinel, no TUI) that this
+   item's plan proposes to delete outright.
+3. **`live-renderers/*.mjs` are therefore NOT dead code** — Round 1's grep
+   (`src`/`test`/`docs` only) missed the one real consumer because it lives
+   in gitignored `.fgos/config.json`, invisible to any tracked-file search.
+4. **`claude-herdr`/`pi-herdr`/`codex-herdr` are NOT "never wired into any
+   config"** — Round 1's "zero references anywhere" claim was based on the
+   same blind spot (searched `src`/`test`/`docs`/top-level config files,
+   never the real gitignored `.fgos/config.json`).
+5. **New, load-bearing finding Round 1 never looked for**:
+   `runner.capabilities.fgos-coding-implement`'s own description records a
+   real, twice-confirmed production bug in `executors.agy-herdr`'s
+   `interactiveMode` path — the exact mechanism this item's plan proposes
+   to keep as herdr-spawn's ONE supported mechanism: *"executors.agy-herdr's
+   -i interactiveMode invocation never actually delivers the prompt to
+   agy's chat the way -p does -- agy just opens its idle interactive REPL
+   banner and sits there, headBefore==headAfter, no real work done, while
+   agent_status genuinely (and honestly) reports 'idle' the whole time.
+   Confirmed twice independently... Do not flip prefer back to agy-herdr
+   until this is fixed and re-verified live."* The capability's own
+   `prefer` field currently reads `"agy-cli"` (the plain `cli-spawn`
+   executor), not `"agy-herdr"` — live routing already avoids
+   `interactiveMode` for real work today, for exactly this reason.
+
+**This invalidates the plan's core premise.** `plan.md`'s Approach section
+(and the item's own original description) assumed
+`herdrSpawnInteractiveAdapter`/`interactiveMode` is the clean, working
+mechanism worth keeping as herdr-spawn's sole path, and that the
+plain/liveOutput paths plus `live-renderers/*.mjs` are unused weight safe to
+cut. Real, current evidence says the opposite on both counts: the
+mechanism being kept is confirmed broken for real prompt delivery in
+production, and the mechanisms being deleted are the ONLY ones with any
+real, working config today (`agy-cli`, the plain `cli-spawn` adapter, is
+what actually runs — not through `herdr-spawn` at all — but `claude-herdr`/
+`pi-herdr`/`codex-herdr` remain real, dispatchable-by-name `herdr-spawn`
+configs that this plan would break).
+
+**Verdict for `fgos-coding-validating`'s reality gate: FAIL** (Repo
+fit / Assumptions dimensions) — returning to `fgos-coding-planning`, which
+should treat this as a material gap per its own Step 6 (the plan's
+foundational premise is now contradicted by evidence, not just an
+implementation detail) and hand off to `fgos-coding-exploring` for a human
+decision on how to reconcile: fix `agy-herdr`'s interactiveMode bug first,
+keep the plain/liveOutput paths alive for the three dormant executors,
+narrow this item's scope, or something else this session should not guess
+at alone.
