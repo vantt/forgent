@@ -164,3 +164,60 @@ test('concurrent registerDocStore enforces lock serialization', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('doc slot cardinality - a second non-retired/non-superseded doc for the same (topicId, role) is refused even below active', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'slot-test' });
+
+    reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/test/guide1.md', docId: 'd1' });
+
+    // Different docId, same (topicId, role), both still 'reserved'/'provisional' -- neither
+    // is 'active' so assertActiveDocCardinality alone would miss this.
+    assert.throws(() => {
+      registerDocStore(tmpDir, {
+        docId: 'd2',
+        topicId: 't1',
+        role: 'guide',
+        currentPath: 'docs/test/guide2.md',
+        docLifecycle: 'provisional',
+      });
+    }, /already occupied/);
+
+    assert.throws(() => {
+      reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/test/guide3.md', docId: 'd3' });
+    }, /already occupied/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.reserve is create-only - reserving an existing docId again is refused', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'reserve-test' });
+    reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docId: 'd1' });
+
+    assert.throws(() => {
+      reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docId: 'd1' });
+    }, /create-only/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('topic.register is create-only - re-registering an existing topicId is refused and does not wipe lineage', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-test' });
+
+    assert.throws(() => {
+      registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-test-overwritten' });
+    }, /create-only/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

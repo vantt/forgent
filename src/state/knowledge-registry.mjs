@@ -61,6 +61,34 @@ function assertCurrentPathUnique(view, id, currentPath) {
 }
 
 /**
+ * Refuses a NEW docId for (topicId, role) while a different doc already
+ * occupies that slot in a still-live state -- otherwise `doc.reserve`/
+ * `doc.register` with distinct `--doc-id` values is an escape hatch around
+ * `assertActiveDocCardinality` (which only ever looks at 'active' rows):
+ * two 'provisional' docs for the same role would sail through unnoticed.
+ * 'retired' and 'superseded' free the slot on purpose -- `doc.promote`'s own
+ * error message tells callers to supersede the existing active doc before
+ * registering its replacement, so a superseded row must not still block.
+ * A second doc for the same role is only legitimate after `topic.split`
+ * gives it a distinct topicId with real lineage.
+ */
+function assertDocSlotAvailable(view, id, topicId, role) {
+  for (const doc of Object.values(view.docs)) {
+    if (
+      doc.docId !== id &&
+      doc.topicId === topicId &&
+      doc.role === role &&
+      doc.docLifecycle !== 'retired' &&
+      doc.docLifecycle !== 'superseded'
+    ) {
+      throw new KnowledgeValidationError(
+        `doc slot (${topicId}, ${role}) is already occupied by doc '${doc.docId}' (${doc.docLifecycle}) — retire or supersede it first, or use "fgos topic split" to give the new doc its own topicId with lineage.`
+      );
+    }
+  }
+}
+
+/**
  * Apply a single knowledge event (topic.* or doc.*) onto view.
  * view = { topics: {...}, docs: {...}, ... }
  */
@@ -75,6 +103,11 @@ export function applyKnowledgeEvent(view, event) {
       const { topicId, purposeSlug, purposeTitle, entities } = payload;
       if (!topicId || !purposeSlug) {
         throw new KnowledgeValidationError('topic.register requires topicId and purposeSlug');
+      }
+      if (view.topics[topicId]) {
+        throw new KnowledgeValidationError(
+          `topic.register: topic '${topicId}' already exists (${view.topics[topicId].status}) — register is create-only; use "fgos topic rename"/"fgos topic split"/"fgos topic merge" to change an existing topic.`
+        );
       }
       view.topics[topicId] = {
         topicId,
@@ -201,6 +234,12 @@ export function applyKnowledgeEvent(view, event) {
         throw new KnowledgeValidationError(`doc.reserve: topicId "${topicId}" is not registered — run "fgos topic register" first`);
       }
       const id = docId ?? `${topicId}:${role}`;
+      if (view.docs[id]) {
+        throw new KnowledgeValidationError(
+          `doc.reserve: doc '${id}' already exists (${view.docs[id].docLifecycle}) — reserve is create-only; use "fgos doc register" for an explicit update.`
+        );
+      }
+      assertDocSlotAvailable(view, id, topicId, role);
       assertCurrentPathUnique(view, id, currentPath);
       view.docs[id] = {
         docId: id,
@@ -239,6 +278,7 @@ export function applyKnowledgeEvent(view, event) {
           );
         }
       }
+      assertDocSlotAvailable(view, id, topicId, role);
       assertCurrentPathUnique(view, id, currentPath);
       const existing = view.docs[id];
       view.docs[id] = {

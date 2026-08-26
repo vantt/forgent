@@ -109,21 +109,33 @@ test('knowledge-verbs - doc lifecycle and promote preconditions', async () => {
     view = rebuild(fgosDir);
     assert.equal(view.docs['t1:guide'].docLifecycle, 'active');
 
-    // 3. Register second provisional doc for same (t1, guide)
+    // 3. Register second provisional doc for same (t1, guide) WHILE first is still
+    // active -> MUST refuse immediately, at register time (not deferred to promote):
+    // a second non-retired/non-superseded doc for the same (topicId, role) is the
+    // sprawl escape hatch fgos-coding-knowledge's docId-per-role design forbids.
+    errOutput = '';
+    try {
+      execSync(`node "${fgosBin}" doc register t1 guide docs/worktree-reclaim/guide2.md --doc-id t1:guide2 --lifecycle provisional`, { cwd: tmpDir, stdio: 'pipe' });
+    } catch (err) {
+      errOutput = err.stderr.toString();
+    }
+    assert.ok(errOutput.includes('already occupied'), 'Error must refuse a second doc for the same (topicId, role) while the first is still active');
+
+    // Supersede the active doc to legitimately free the (t1, guide) slot
+    execSync(`node "${fgosBin}" doc supersede t1 guide`, { cwd: tmpDir });
+    view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide'].docLifecycle, 'superseded');
+
+    // Now registering the replacement doc succeeds
     execSync(`node "${fgosBin}" doc register t1 guide docs/worktree-reclaim/guide2.md --doc-id t1:guide2 --lifecycle provisional`, { cwd: tmpDir });
     const docFile2 = path.join(tmpDir, 'docs/worktree-reclaim/guide2.md');
     fs.writeFileSync(docFile2, '# Guide 2\n', 'utf8');
     execSync('git add docs/worktree-reclaim/guide2.md && git commit -m "add guide 2"', { cwd: tmpDir, stdio: 'ignore' });
 
-    // Promote second doc -> MUST refuse duplicate active
-    errOutput = '';
-    try {
-      execSync(`node "${fgosBin}" doc promote --doc-path docs/worktree-reclaim/guide2.md`, { cwd: tmpDir, stdio: 'pipe' });
-    } catch (err) {
-      errOutput = err.stderr.toString();
-    }
-    assert.ok(errOutput.includes('Remedy'), 'Error message must contain a remedy');
-    assert.ok(errOutput.includes('already exists'), 'Error must mention active duplicate');
+    // Promote the replacement doc -> SUCCESS since t1:guide is superseded, not active
+    execSync(`node "${fgosBin}" doc promote --doc-path docs/worktree-reclaim/guide2.md`, { cwd: tmpDir });
+    view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide2'].docLifecycle, 'active');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
