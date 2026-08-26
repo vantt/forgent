@@ -28,6 +28,12 @@ or a graph-walked blast radius. Used a direct grep/read cross-check instead
 `live-renderers/*.mjs` has no consumer outside the code/tests/docs already
 named below.
 
+**CONTEXT.md D1** (locked at a mid-planning `fgos-coding-exploring`
+re-entry, triggered by this validating round's own reality-gate FAIL):
+proceed with the original removal scope as written below, with
+`agy-herdr`'s `interactiveMode` bug and the fate of the three dormant
+`*-herdr` executor configs both explicitly out of this item's own scope.
+
 `fgos graph --json`'s `criticalPath`/`topUnblock` do not include tsk-by0 —
 it has no upstream/downstream dependency edges in the current graph, so
 there is no cross-item ordering constraint to honor; this item's own
@@ -63,21 +69,41 @@ backwards-compatibility shims when you can just change the code"). A caller
 that forgets `interactiveMode` gets a loud, named error instead of silently
 getting a behavior it never asked for.
 
-**executors.claude-herdr/pi-herdr/codex-herdr**: delete outright, not
-research 3 more CLIs' interactive flags. `RESEARCH.md` round 1 confirmed
-zero references anywhere in `src`/`test`/config — they were never actually
-wired into `.fgos/config.json` or any shared-config default. Reproducing
-`agy`'s own dedicated interactive-mode redesign (tsk-10j, real live-binary
-proof work) for three CLIs with zero current callers is exactly what YAGNI
-argues against. **Caveat**: since these ids were not found as real config
-entries in THIS checkout at all, there may be nothing to actually delete —
-Execute's first real step is confirming this (see Step 1 below); if
-confirmed absent, this sub-item is a no-op, not a blocker.
+**CORRECTED at validating (RESEARCH.md round 2), locked as CONTEXT.md D1**:
+Round 1's claim that `claude-herdr`/`pi-herdr`/`codex-herdr` and
+`live-renderers/*.mjs` are unreferenced was wrong — it only searched
+tracked `src`/`test`/`docs`, never the real, gitignored
+`.fgos/config.json`. That file shows `claude-herdr`/`pi-herdr` really do
+declare `liveOutput` pointing at the two `live-renderers/*.mjs` files, and
+`codex-herdr` really does depend on the plain path. D1 (person's call,
+live conversation at the exploring re-entry): proceed with the deletion
+anyway — these three are "DORMANT" (never wired to any capability's
+`prefer`) and functionally redundant with the plain `cli-spawn`-based
+`claude`/`codex`/`pi` executors, which already cover non-interactive
+dispatch for those same CLIs. Losing them is an accepted, explicit
+trade-off, not an oversight. `agy-herdr`'s own `interactiveMode`
+prompt-delivery bug (also found at validating — confirmed twice in
+`runner.capabilities.fgos-coding-implement`'s own description, currently
+worked around via `prefer: "agy-cli"`) is explicitly OUT of this item's
+scope per D1 — not a blocker, not something this item fixes.
+
+**executors.claude-herdr/pi-herdr/codex-herdr**: their code-side dependency
+(the plain path / `liveOutput`) goes away in this item's own branch. Their
+`.fgos/config.json` entries themselves are NOT touched by this branch
+(ADR0020 — a worker branch never carries a `.fgos/` change) — after this
+item merges, invoking any of the three BY NAME would throw the new
+missing-`interactiveMode` `DispatchError` instead of running. Recommended
+follow-up (same pattern as `executors.agy-herdr`'s own separate config-flip
+commit under tsk-2rr/tsk-10j, not this item's own footprint): a future
+direct main-checkout commit either deletes these three entries outright or
+updates their descriptions to note they're retired — flagged here so it
+isn't lost, not something this item's own branch or verify depends on.
 
 **live-renderers/*.mjs**: delete both files
 (`src/runner/dispatch/live-renderers/{claude-stream-json,pi-agent-session}.mjs`)
-— `RESEARCH.md` round 1 confirmed no consumer outside the code/tests being
-removed in this same change.
+— per D1, accepted as safe despite the real `claude-herdr`/`pi-herdr`
+config dependency found at validating, since those configs are themselves
+being abandoned as redundant.
 
 **Risk map:**
 
@@ -86,7 +112,7 @@ removed in this same change.
 | `herdrSpawnAdapter` non-interactive body removal | standard — well-scoped, single function, single registration site (confirmed) | full existing test suite green pre-change (confirmed this round: 29/29 pass, incl. LIVE tests against real `herdr`/`agy` binaries — both are installed here) and green post-change with the surviving interactiveMode-only subset |
 | `interactiveMode` now required, not optional | standard — a caller lacking it now gets a thrown `DispatchError` instead of the old plain-path behavior | a new/kept test asserting the reject path (see Step 4 below) |
 | live-renderers deletion | light — confirmed zero other consumers | `grep -rln "live-renderers\|claude-stream-json\|pi-agent-session" src test docs` returns only this change's own touched files afterward |
-| executors.claude-herdr/pi-herdr/codex-herdr deletion | light — likely a no-op (see caveat above) | same grep, zero hits before AND after |
+| executors.claude-herdr/pi-herdr/codex-herdr becoming non-functional | light — accepted per D1, config entries untouched by this branch (ADR0020) | confirmed real via `.fgos/config.json` read (RESEARCH.md round 2); no test in this branch depends on them working |
 | `docs/architecture-manifest.json` | light — hand-maintained layer manifest, not generated | its two `live-renderers/*.mjs` entries (lines 29-30) removed alongside the files |
 
 ## Files touched (footprint)
@@ -131,13 +157,22 @@ Concrete cases to prove against, at standard depth:
   interactiveMode test (lines 1077-1229 of the current test file) keeps
   passing unchanged — `herdrSpawnInteractiveAdapter` itself is not touched
   by this item.
-- **Coordination**: tsk-2rr (still `awaiting-approval` per `RESEARCH.md`
-  round 1) — if it merges before this item's own branch does, rebase onto
-  its result rather than duplicating its `interactiveMode` config-shape
-  work; if this item's branch is ready first, do not touch
-  `executors.agy-herdr`'s own config (that's tsk-2rr/tsk-10j's own
-  separate main-checkout commit, per ADR0020) — this item's own diff stays
-  entirely inside code/tests/docs, never `.fgos/config.json`.
+- **Coordination**: tsk-2rr (still `awaiting-approval`) is confirmed, by
+  reading its own full description, to be the FIX for exactly the
+  prompt-delivery bug `RESEARCH.md` round 2 found — `herdrSpawnInteractive
+  Adapter` types the initial `agy -i <prompt>` line but never follows up
+  with the prompt as a separate typed input the way it already does for
+  `exitCommand`, so `agy` sits idle at its own real REPL banner forever;
+  `agent_status` honestly reports idle because the prompt genuinely never
+  arrived. tsk-2rr's own fix touches `herdrSpawnInteractiveAdapter`
+  (`transport.mjs:538+`) and its own tests — a **different** function from
+  this item's own `herdrSpawnAdapter` non-interactive body
+  (`transport.mjs:907+`), so the two branches do not overlap in the file,
+  but both land in the same test file
+  (`test/runner/herdr-spawn-adapter.test.mjs`). Whichever of the two
+  branches merges second should rebase, not force-push over the other's
+  test-file edits. Per D1, this item's own branch does not wait on tsk-2rr
+  and does not touch `.fgos/config.json` either way.
 - **Partial failure**: none new — this item removes a code path, it does
   not add a new failure mode beyond the one named reject case above.
 
