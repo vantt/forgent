@@ -120,13 +120,14 @@ Therefore mailbox and AgentMessage are still design targets, not prerequisites f
 
 - `launcher` - starts a work item or dispatch target and may step away.
 - `driver` - stays attached and continues coordinating after activation.
+- `orchestrator` - T0 composition layer that manages N units of work and stays attached.
 - `work` - lifecycle-bearing fgOS unit with state, events, claim/return, and merge semantics.
 - `child work` - a normal work item related to a parent; not a separate dispatch category.
 - `capability` - an abstract behavior promise such as `fgos-coding-implement`.
 - `executor` - the concrete implementation of a capability, such as `agy`, `codex`, `gitnexus`, or `herdr`.
 - `ad-hoc task` / `exec packet` - an ephemeral runtime-composed unit outside the work ledger.
 
-The old `rootTask`/`subTask` vocabulary is not part of the current dispatch model. A "subtask" is either child work with lifecycle or an ephemeral ad-hoc dispatch target.
+The old `rootTask`/`subTask` vocabulary is not part of the current dispatch model. A "subtask" is either child work with lifecycle or an ephemeral ad-hoc dispatch target. Note that the runner spec's (`docs/specs/runner.md`) historical `capacity` concept maps to `capability` for abstract behavior promises and to `executor` for concrete execution units per ADR 0034.
 
 ### 5.2 Design-Target Rename
 
