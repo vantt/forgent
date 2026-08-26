@@ -38,12 +38,37 @@ missing`:
 **Data sources read** (RESEARCH.md round 1, all citations there):
 `executor.dispatch` events (`.fgos/events*` — id/executorId/provider/
 command/model/baseCommit/headRef/governance, no outcome) joined against
-`appendWorkerLog`'s per-attempt raw log (`.fgos/logs/<id>.log` via
-`src/runner/worker-log.mjs` — carries `stdout`/`status`/`signal`, the one
-source with enough raw material to re-run the ladder classification
-after the fact). The separate `addOutcome`/`fgos check` predicted-vs-
-actual mechanism (goal-check pass/fail) is a different signal with its
-own existing reader — out of scope here, not reused, not duplicated.
+`.fgos/logs/<id>.log` (written by `src/runner/worker-log.mjs`'s
+`appendWorkerLog`/`appendWorkerLogChunk`, the one source with enough raw
+material to re-run the ladder classification after the fact). The
+separate `addOutcome`/`fgos check` predicted-vs-actual mechanism
+(goal-check pass/fail) is a different signal with its own existing
+reader — out of scope here, not reused, not duplicated.
+
+**Reality-gate correction (round 2, repo-fit FAIL on round 1's own
+Approach — direct reads of `src/runner/worker-log.mjs:1-104` and
+`.gitignore:17`):** `worker-log.mjs` exports only write functions
+(`appendWorkerLog`, `appendWorkerLogChunk`) — no reader of its own to
+build on. `.fgos/logs/<id>.log` is not structured data; it is free-text,
+human-tail-oriented blocks (`=== <timestamp> | work <id> | attempt N |
+... === \nmessage: ...\n--- STDOUT ---\n<raw>\n--- STDERR ---\n<raw>`),
+so the new module must itself regex-split on the `=== ... ===` markers
+and extract the `--- STDOUT ---` section before it can hand text to
+tsk-2tr's token-scan helper. More materially: `.fgos/logs/` is listed in
+`.gitignore` — explicitly local-only, per-machine, git-ignored
+observability the module's own docstring calls "never load-bearing."
+This means classification is **best-effort and machine-scoped by
+construction**, not a durable cross-session record: `legacy-signal`/
+`inferred` are only reachable for a dispatch whose log file still exists
+on THIS machine (not rotated/cleaned, not run elsewhere) — `missing` is
+therefore the honest DEFAULT outcome for most historical dispatches, not
+a rare edge case. The reader's own `--description` (command-registry.mjs)
+and any docs must say this plainly — "best-effort, this-machine-only,
+degrades to `missing`" — rather than imply a durable production record
+that does not exist today. This does not change the chosen path (still
+worth building — it is real signal when the log survives, and a
+`missing` majority is itself useful information about how thin today's
+durable record is), only its honestly-stated scope.
 
 **Alternatives rejected.**
 - *Extend `fgos show`/`fgos list` instead of a new verb* (the item's own
@@ -67,6 +92,7 @@ own existing reader — out of scope here, not reused, not duplicated.
 |---|---|---|
 | Depending on tsk-2tr's not-yet-merged helper | medium — tsk-2tr is `doing`/`clarify` today, not `done` | `fgos-coding-validating`'s reality check must confirm tsk-2tr's status before this item enters `executing`; if still open, that is a real block to report, not a guess to route around (deps are declared but not yet engine-enforced as a hard claim gate — confirmed live during this item's own `fgos pick`, which succeeded despite the open dep) |
 | Reading two independent on-disk sources (events + worker-log) and joining by id | light — pure read, no state mutation | `node --test test/runner/dispatch.test.mjs` exercises the join against fixture event/log data |
+| Parsing the free-text `.fgos/logs/<id>.log` format (round 2 correction above) | light — a fixed, small format the writer itself controls (`formatEntry` in `worker-log.mjs`); a malformed/absent file must degrade to `missing`, never throw | test asserts a missing/corrupt log file classifies `missing` rather than erroring |
 
 Impact-analysis posture: **full** — `fgos tool query --capability
 impact-analysis --status present` returned GitNexus `present`
@@ -89,12 +115,16 @@ A `small`-lane item: one new module plus one new CLI registration, no
 phased rollout needed.
 
 Cases worth proving in the new tests: (a) a dispatch with a `legacy-signal`
-token present classifies correctly; (b) a dispatch with no token but a
-head delta classifies `inferred`; (c) a dispatch with a durable
-`executor.dispatch` event but no matching worker-log entry classifies
-`missing`, never silently dropped or mis-classified as `inferred`; (d) an
-id with zero dispatch history at all is reported plainly, not as an
-error.
+token present in its local `.fgos/logs/<id>.log` classifies correctly;
+(b) a dispatch with a local log but no token, only a head delta,
+classifies `inferred`; (c) a dispatch with a durable `executor.dispatch`
+event but no local log file at all (rotated away, run on another
+machine, or never captured) classifies `missing`, never silently dropped
+or mis-classified as `inferred` — this is expected to be the majority
+case in real usage, not an edge case; (d) a present-but-malformed local
+log file (round 2 correction) degrades to `missing` rather than throwing;
+(e) an id with zero dispatch history at all is reported plainly, not as
+an error.
 
 ## Outstanding questions
 
