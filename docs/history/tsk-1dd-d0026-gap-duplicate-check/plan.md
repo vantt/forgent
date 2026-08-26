@@ -55,6 +55,12 @@ Files touched: none beyond what discovery already committed
 
 Risk map: none — no production code or doc changes, no behavior change.
 
+Impact-analysis posture: `full` (`fgos tool query --capability
+impact-analysis --status present` returned `gitnexus`, status `present`,
+2026-08-26) — not load-bearing here: this plan touches zero code and zero
+doc content (the finding is "already done", not a new edit), so there is
+no blast radius to evidence.
+
 ## Shape
 
 Nothing further to implement. The one real action here is the human
