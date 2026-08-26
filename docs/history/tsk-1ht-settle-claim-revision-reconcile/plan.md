@@ -22,7 +22,15 @@ reconcile branch instead of an unconditional refuse: when
 `curRev !== freshClaim.preClaimRevision`, before throwing, scan
 `readRawEvents(dir)` (`src/state/store.mjs:1998`) for every event whose
 payload references this item's `id`, filtered to those appended strictly
-after the claim's own `acquiredAt` timestamp. If every one of those
+after the claim's own `acquiredAt` timestamp. **Implementation detail
+confirmed at Repo fit (validating Step 2):** raw events stamp `ts` as
+`Date.now()` (a numeric epoch-ms — `src/state/store.mjs:2018`'s
+`appendEventLocked`), while `claim.acquiredAt` is stored as
+`new Date().toISOString()` (`src/state/runtime-coordination.mjs:214,242`)
+— an ISO string, not a number. The reconcile branch must convert
+(`new Date(freshClaim.acquiredAt).getTime()`) before comparing to
+`event.ts`; comparing them directly (string vs number) would silently
+never filter anything. If every one of those
 events carries `payload.writer.id === freshClaim.writerId` (the SAME
 writer that holds this claim — `resolveWriterIdentity`'s stamp, already
 present on every mutating event per RESEARCH.md round 1 point 4), the
@@ -62,15 +70,21 @@ constructed a second writer.
 | Reading `events.jsonl` inside the already-locked settle critical section | Medium — must not introduce a second lock acquisition or reopen the TOCTOU window `tsk-40m`'s own comments (store.mjs:1070-1078) already closed | `readRawEvents` is a plain read, called from inside the same `withEventsLockAndRefresh`/`withClaimsLock` block already held at this point (store.mjs:1068-1069) — no new lock needed; confirm by re-reading that block before editing |
 | `getItemDurableRevision`/`claim-port.mjs` | Low — explicitly NOT touched by this fix (see Alternatives rejected) | No diff in `runtime-coordination.mjs`'s existing exports; `claim-port.mjs` needs no test changes |
 
-**Impact-analysis posture:** `full` — `fgos tool query --capability
+**Impact-analysis posture:** `degraded` — `fgos tool query --capability
 impact-analysis --status present` reports GitNexus registered and
-`present` on this machine. No direct GitNexus MCP query tool was available
-in this session's toolset to run a live symbol query, so the blast-radius
-claims above were cross-checked directly with `rg -n "settleClaim\("` /
-`rg -n "getItemDurableRevision\("` across `src/` and `bin/` instead (full
-results recorded in RESEARCH.md round 1) — per the CLAUDE.md gate, a
-`present` posture is not a guarantee of complete per-file coverage, so this
-substitution is noted here rather than silently assumed equivalent.
+`present` on this machine (re-confirmed at validating time,
+2026-08-26T08:40Z), but a live PostToolUse hook flagged the index itself
+as stale at commit `7bb3231`, and `git diff --stat 7bb3231 HEAD --
+src/state/store.mjs src/state/runtime-coordination.mjs` shows +1073/-117
+and +343 lines respectively since that index — both files this plan
+depends on have been rewritten well past what GitNexus last saw. Per the
+CLAUDE.md gate, `present` never implies fresh, so this is named plainly as
+`degraded`, not `full`. The evidence this plan actually relies on is the
+direct cross-check instead: `rg -n "settleClaim\("` / `rg -n
+"getItemDurableRevision\("` across `src/` and `bin/`, read against the
+CURRENT file contents (not GitNexus's stale graph) — full results recorded
+in RESEARCH.md round 1. This substitution is the honest gap, not a silent
+equivalence.
 
 **Files touched, in order:**
 1. `src/state/store.mjs` — add the reconcile branch inside `settleClaim`
@@ -132,6 +146,41 @@ sequence) is the human-facing confirmation `fgos-coding-implement` should
 still run once, per the item's own Verify text — but the single command
 recorded on `work.verify` (synced below) is the mechanical one `fgos
 return` re-checks.
+
+## Reality gate (fgos-coding-validating)
+
+| Dimension | Verdict | Citation |
+|---|---|---|
+| Mode fit | PASS | `high-risk` matches the hard-gate trigger this fix itself trips (loosening an existing validation) per `fgos-routing`'s Mode gate — not over/under-built |
+| Repo fit | PASS | Every claimed line re-read directly: `store.mjs:1101-1105` (settleClaim's refuse), `store.mjs:1998` (`readRawEvents`, confirmed a plain read — no lock of its own, per its own doc comment "never appends, never rebuilds the view"), `store.mjs:2018` (`ts: Date.now()`), `runtime-coordination.mjs:214,242` (`acquiredAt: new Date().toISOString()`) — the ts-format mismatch this surfaced is now folded into Approach above |
+| Assumptions | PASS | "No write-time guard blocks a different writer" — confirmed via `rg -n "writerId" src/state/store.mjs`, only settleClaim itself checks it (RESEARCH.md point 3). "Every mutating event stamps `payload.writer`" — confirmed by direct read of 6+ call sites (RESEARCH.md point 4) |
+| Smaller path | PASS | Considered stamping a `lastWriterId` onto the claim record on every edit instead of scanning events — rejected: that touches every mutating function in `store.mjs`, a strictly bigger footprint than a read-only scan of data (event `writer` stamps) that already exists |
+| Proof surface | PASS | `work.verify` synced to `node --test test/state/runtime-coordination.test.mjs` — real, runnable, already executed once as a baseline (see Feasibility matrix) |
+| Impact-analysis posture | DEGRADED (named, not blocking) | `fgos tool query --capability impact-analysis --status present` → present, but a live PostToolUse hook flagged the GitNexus index stale at `7bb3231`, and `git diff --stat 7bb3231 HEAD -- src/state/store.mjs src/state/runtime-coordination.mjs` shows +1073/-117 and +343 lines since — both files this plan touches were rewritten past what the index last saw. Direct `rg` cross-check substituted (RESEARCH.md point 3, this file's own Files-touched section) |
+
+## Feasibility matrix
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| Existing conflict/settle test suite is green before this change (regression net is real, not assumed) | High | Actual test run, real output | `node --test test/state/runtime-coordination.test.mjs` run directly: 21/21 pass, 0 fail (see command output, this session, 2026-08-26T08:4x) | PASS |
+| No write-time guard today lets a non-claim-holder writer edit a claimed item (so the reconcile MUST check real event provenance, never assume single-writer exclusivity) | High | Direct grep of every `writerId`-checking site in `store.mjs` | `rg -n "writerId" src/state/store.mjs` → only lines 1064-1066/1086-1088, both inside `settleClaim` itself, checking the SETTLER not the editor | PASS |
+| Every mutating event already carries `payload.writer` (the reconcile's core data source) | High | Direct read of the event-append call sites | `store.mjs` lines ~468 (`work.edit`), ~502, ~712, ~1401, ~1496, ~1533 all show `payload.writer = resolveWriterIdentity(dir)` before `appendEventLocked` | PASS |
+| `readRawEvents` is safe to call from inside settleClaim's already-held `events.lock`/`claims.lock` critical section (no re-entrant lock, no deadlock) | High | Read the function body and its own doc comment | `store.mjs:1998`, `readRawEvents(dir) { return readAllEvents(dir); }`, doc comment directly above: "this accessor never appends, never rebuilds the view" — a plain read, no lock acquisition | PASS |
+| Blast radius of touching `settleClaim`/`getItemDurableRevision` is fully known, despite the GitNexus index being stale for these exact files | Medium (impact-analysis posture: degraded, named per Reality gate row above) | GitNexus query (unavailable/stale) or a direct grep cross-check | `rg -n "settleClaim\("` across `src/`,`bin/`: `bin/fgos.mjs` ×5 (return path), `src/runner/loop.mjs` ×4 (the headless runner's own attestation/verify settle path), `store.mjs`'s own internal delegate ×1. `rg -n "getItemDurableRevision\("`: one external caller, `src/runner/claim-port.mjs:306` (claim-acquire time, untouched by this fix) | PASS WITH CONSTRAINT — gap named plainly per gate rule, not silently dropped |
+
+## Decide
+
+**READY WITH CONSTRAINTS.** Every reality-gate dimension passes; the one
+constraint (impact-analysis posture is `degraded`, not `full`) is named
+plainly above rather than silently assumed away, and the direct-grep
+substitute evidence is real and specific enough that the constraint does
+not block — it is carried forward as a note for whoever implements this,
+in case a symbol this plan did not find surfaces during the actual diff.
+No T1 (competing options), T2 (CONTEXT.md contradiction — none exists;
+this item skipped `exploring`), or T3 (unwritable child spec — no split)
+trigger fired. Cost verdict: **REVERSIBLE** (the ts-format fix and the
+degraded-posture note are both already folded into the plan itself, not
+left as open risk).
 
 ## Outstanding questions
 
