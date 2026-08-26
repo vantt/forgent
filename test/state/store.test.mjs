@@ -1088,8 +1088,30 @@ test('tsk-2p6: assertPlanEvidence fails gracefully (never throws an unrelated gi
   const { repoRoot } = gitBackedDir('fgos-plan-evidence-no-branch-');
   assert.throws(
     () => assertPlanEvidence('no-such-branch-item', { risk: 'heavy' }, repoRoot),
-    (err) => err instanceof StoreError && err.category === 'precondition' && /no plan\.md found on branch "fgw\/no-such-branch-item"/.test(err.message),
+    (err) => err instanceof StoreError && err.category === 'precondition' && /no plan\.md found in current tree/.test(err.message),
   );
+});
+
+test('tsk-2jg: assertPlanEvidence allows a risk:heavy item with NO fgw/<id> branch when plan.md exists on current tree (docs/history/<id>/plan.md shape)', () => {
+  const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-nobranch-history-');
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'history', 'nobranch-history'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'history', 'nobranch-history', 'plan.md'), '# plan\n');
+
+  addSampleWork(dir, 'nobranch-history', { risk: 'heavy' });
+  moveToDurableDoingForTest(dir, 'nobranch-history');
+  const { view } = moveWork(dir, { id: 'nobranch-history', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(view.work['nobranch-history'].status, 'delivered');
+});
+
+test('tsk-2jg: assertPlanEvidence allows a risk:heavy item with NO fgw/<id> branch when plan.md exists on current tree via docsRef', () => {
+  const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-nobranch-docsref-');
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'history', 'custom-parent-plan'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'history', 'custom-parent-plan', 'plan.md'), '# parent plan\n');
+
+  addSampleWork(dir, 'nobranch-docsref', { risk: 'heavy', docsRef: 'docs/history/custom-parent-plan/' });
+  moveToDurableDoingForTest(dir, 'nobranch-docsref');
+  const { view } = moveWork(dir, { id: 'nobranch-docsref', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(view.work['nobranch-docsref'].status, 'delivered');
 });
 
 // --- `priority`/`intent` in EDITABLE_FIELDS (per str7-str8-priority-intent

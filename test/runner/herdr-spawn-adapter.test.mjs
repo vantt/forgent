@@ -25,7 +25,9 @@ function writeRunnerConfigFixture(root, cfg) {
 // test/e2e/coexistence-canary.test.mjs already uses for its own
 // real-binary dependency.
 const HERDR_BIN = findExecutableOnPath(['herdr']);
+const AGY_BIN = findExecutableOnPath(['agy']);
 const HERDR_SKIP = HERDR_BIN ? false : 'herdr binary not found on PATH -- live-binary regression tests skip honestly';
+const AGY_HERDR_SKIP = HERDR_BIN && AGY_BIN ? false : 'herdr or agy binary not found on PATH -- live agy-herdr test skips honestly';
 
 function herdrPane(args) {
   return execFileSync(HERDR_BIN, args, { encoding: 'utf8' });
@@ -854,4 +856,143 @@ test('herdr-spawn adapter (LIVE): an observer failure (pane closed out from unde
     caught = err;
   }
   assert.ok(caught instanceof DispatchError, `expected a DispatchError rejection, got: ${caught}`);
+});
+
+test('herdr-spawn adapter closes the pane on success path (Requirement 1)', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-pane-close-test-'));
+  const { scriptPath, logPath } = createMockHerdrScript(tmpDir);
+  const wrapperPath = path.join(tmpDir, 'herdr-wrapper.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh\nexec node "${scriptPath}" "$@"\n`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  const res = await herdrSpawn(
+    { command: 'echo', args: ['hello'], env: {} },
+    { cwd: tmpDir, workId: 'close-test-item', tier: 'standard', model: 'sonnet', herdrBin: wrapperPath },
+  );
+
+  assert.ok(res.paneId);
+  const calls = fs.readFileSync(logPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  const closeCalls = calls.filter((c) => c.args[0] === 'pane' && c.args[1] === 'close' && c.args[2] === res.paneId);
+  assert.equal(closeCalls.length, 1, 'herdr pane close <paneId> must be called on success path');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('herdr-spawn adapter supports liveOutput config shape & bash PIPESTATUS pipeline (Requirement 2)', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-live-output-test-'));
+  const { scriptPath } = createRealisticMockHerdrScript(tmpDir);
+  const wrapperPath = path.join(tmpDir, 'herdr-wrapper.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh\nexec node "${scriptPath}" "$@"\n`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  const rendererScript = path.join(tmpDir, 'dummy-renderer.mjs');
+  fs.writeFileSync(rendererScript, `
+import readline from 'node:readline';
+const rl = readline.createInterface({ input: process.stdin });
+rl.on('line', (line) => {
+  try {
+    const obj = JSON.parse(line);
+    if (obj.text) process.stdout.write('RENDERED: ' + obj.text + '\\n');
+  } catch {}
+});
+`);
+
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  const invocation = {
+    command: 'bash',
+    args: ['-c', 'echo "{\\"text\\":\\"streamed-content\\"}"'],
+    env: {},
+    liveOutput: {
+      streamFlags: [],
+      renderer: rendererScript,
+    },
+  };
+
+  const res = await herdrSpawn(invocation, {
+    cwd: tmpDir,
+    timeoutMs: 5000,
+    workId: 'live-output-item',
+    tier: 'standard',
+    model: 'sonnet',
+    herdrBin: wrapperPath,
+  });
+
+  assert.equal(res.status, 0);
+  assert.ok(res.stdout.includes('RENDERED: streamed-content'), `stdout should contain output from renderer, got: ${JSON.stringify(res.stdout)}`);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('claude-stream-json.mjs live renderer formats JSONL correctly (Requirement 3)', () => {
+  const scriptPath = path.resolve('src/runner/dispatch/live-renderers/claude-stream-json.mjs');
+  const jsonl = [
+    JSON.stringify({ type: 'content_block_delta', delta: { type: 'text_delta', text: 'Hello ' } }),
+    JSON.stringify({ type: 'content_block_delta', delta: { type: 'text_delta', text: 'world' } }),
+    JSON.stringify({ type: 'content_block_start', content_block: { type: 'tool_use', name: 'Bash' } }),
+  ].join('\n') + '\n';
+
+  const output = execFileSync(process.execPath, [scriptPath], { input: jsonl, encoding: 'utf8' });
+  assert.ok(output.includes('Hello world'));
+  assert.ok(output.includes('→ Bash'));
+});
+
+test('pi-agent-session.mjs live renderer formats JSONL correctly (Requirement 3)', () => {
+  const scriptPath = path.resolve('src/runner/dispatch/live-renderers/pi-agent-session.mjs');
+  const jsonl = [
+    JSON.stringify({ type: 'message_update', assistantMessageEvent: { type: 'text_delta', delta: 'Pi output line' } }),
+    JSON.stringify({ type: 'tool_execution_start', toolName: 'read', args: { path: 'file.txt' } }),
+    JSON.stringify({ type: 'tool_execution_end', toolName: 'read', isError: false }),
+  ].join('\n') + '\n';
+
+  const output = execFileSync(process.execPath, [scriptPath], { input: jsonl, encoding: 'utf8' });
+  assert.ok(output.includes('Pi output line'));
+  assert.ok(output.includes('→ read'));
+  assert.ok(output.includes('← read [OK]'));
+});
+
+test('herdr-spawn adapter (LIVE): dispatch a real agy-shaped executor via herdr-spawn against real herdr and agy binaries (Requirement 5)', { skip: AGY_HERDR_SKIP }, async () => {
+  // Self-contained config fixture (same pattern as this file's very first
+  // test, `writeRunnerConfigFixture`), not a named executor read from the
+  // real, shared `.fgos/config.json` -- that live config change ships as
+  // its own separate main-checkout commit (ADR0020: a worker branch must
+  // never carry a `.fgos/` change, docs/how-to/fix-fgos-write-rejected-
+  // merge-block.md), so this test proves the MECHANISM (a real agy-shaped
+  // executor dispatched via herdr-spawn against the real binaries) without
+  // depending on that unrelated config change having actually landed.
+  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'live-agy-proof-'));
+  execFileSync('git', ['init'], { cwd: tmpRoot });
+  execFileSync('git', ['commit', '--allow-empty', '-m', 'initial'], { cwd: tmpRoot });
+  writeRunnerConfigFixture(tmpRoot, {
+    executor: { command: 'agy', args: ['-p', '{prompt}', '--model', '{model}'] },
+    models: { light: 'gemini-3.6-flash-medium' },
+    timeoutMs: 60000,
+    executors: {
+      'test-agy-herdr': {
+        kind: 'agent',
+        allowCrossProvider: true,
+        invocations: [{
+          via: 'cli',
+          adapter: 'herdr-spawn',
+          command: 'agy',
+          args: ['-p', '{prompt}', '--mode', 'accept-edits', '--new-project', '--print-timeout', '30m', '--model', '{model}'],
+        }],
+      },
+    },
+  });
+
+  const res = await executeExecutorCli('test-agy-herdr', {
+    prompt: 'Print Hello from agy-herdr live proof and exit. Write [DONE] when done.',
+    repoRoot: tmpRoot,
+    cwd: tmpRoot,
+    tier: 'light',
+  });
+
+  try {
+    assert.equal(res.status, 0);
+    assert.ok(res.stdout.includes('Hello from agy-herdr live proof'));
+    assert.ok(res.stdout.includes('[DONE]'));
+  } finally {
+    fs.rmSync(tmpRoot, { recursive: true, force: true });
+  }
 });

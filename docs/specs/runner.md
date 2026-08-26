@@ -1114,6 +1114,29 @@ Not applicable — không có màn hình.
 - `scripts/install-git-hooks.mjs` (STR65) — wire `core.hooksPath` về `.githooks` khi checkout có git thật (dev clone); vắng git (cài như dependency qua `npm install <github-url>`, không giữ lại git — xem `docs/specs/distribution.md`) thì thoát 0 im lặng, không throw; gọi qua `prepare` lifecycle script của `package.json` — chạy tự động sau `npm install` trên một clone mới, không cần bước cài tay riêng.
 - Test: `test/runner/*` (gồm `test/runner/merge.test.mjs` — unit `classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`; `test/runner/write-queue.test.mjs` — chứng minh serialize thật qua marker enter/exit không xen kẽ; `test/runner/root-affinity.test.mjs` — resolveRoot/claimRoot/steerFrontier, khuôn race 2-tác-nhân đã spike-proven; `test/runner/goal-check.test.mjs` — mới, real-fake-executor) + `test/e2e/runner-loop.test.mjs` (executor giả, repo git tạm, bao gồm 3 kịch bản stage-discovery — dispatch worker thật rồi phán quyết đủ rõ đẩy item sang `planning`, phán quyết chưa đủ rõ đẩy sang `exploring` + đậu chờ người, worker sập thì item đứng yên tại `discovery`/`todo` — cộng các kịch bản stage-clarify/stage-decompose còn lại, nay khẳng định `--once` KHÔNG tự phán ở hai tên stage đó: pass-through, chia-con-chặn-frontier, cần-người + 1 kịch bản S2-pull: `take` người + `fgos-runner --once` song song không giẫm + `return` xanh + kịch bản con fork từ tip nhánh gốc) + `test/e2e/pr-gate.test.mjs` (4 kịch bản thật qua binary + git: runner item full loop review→approve→merge→done, merge conflict thật với tree nguyên vẹn sau abort, pull-door item full loop, reject pull-door giữ commit làm lịch sử) + `test/cli/fgos.test.mjs` (unit CLI cho `take`/`return`/`review`/`approve`/`reject`/`catchup`: frontier-head claim, CAS conflict, dirty-tree/HEAD-chưa-tiến refusal, verify xanh/đỏ, main-never-holds-broken-merge cho cả conflict lẫn verify-fail, legacy degrade, leaf-vs-root branch targeting, integration-drift reason, catch-up sạch/xung-đột-thật/lý-do-không-áp-dụng-được) + `test/state/replay.test.mjs` (fold `claimRole`/`headAtTake`/`headAtReturn`) + `test/state/fsm.test.mjs` (cạnh `blocked→awaiting-approval`) + `test/report/entropy.test.mjs` (entropy thuần) + kịch bản chồng-lấn-thật hai việc song song trong `test/runner/loop.test.mjs` (peak-concurrency counter, không phải suy luận thời gian tường) + `test/runner/worker-log.test.mjs` (mới — create/append, nối-không-đè qua nhiều lần thử, degrade không throw khi field vắng) + `test/runner/frozen-judge.test.mjs` (STR63 — unit `frozenJudgeHits`, mọi rule + exact-path footprint match) + benchmark ngoài suite `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (F4, real binaries, expected-delta khai trước run); 1380 test toàn suite tính tới STR63 (`cd repo && npm test`, số cũ 637 đã trôi qua nhiều feature trước đó — không phải drift do cell này)
 
+## Từ vựng dispatch hiện hành
+
+Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control plane hợp nhất (chuỗi ADR 0026 / 0028 / 0029 / 0031 / 0034 — Native-First Dispatch Doctrine và lịch sử tiến hóa control plane). Các thuật ngữ cũ như `rootTask`, `subTask` đã được loại bỏ hoàn toàn (superseded bởi ADR 0029 — Sửa ba mệnh đề từ vựng dispatch, xem `docs/decisions/index.md`), và `capacity` cũ đã được phân tách thành `capability` và `executor` (superseded bởi ADR 0034 — Đổi tên capacity/capacities thành executor/executors, xem `docs/decisions/index.md`).
+
+### Bảng đối chiếu từ vựng dispatch
+
+| Thuật ngữ hiện hành | Thuật ngữ cũ / superseded | Ý nghĩa ngắn gọn | Con trỏ tham chiếu |
+|---|---|---|---|
+| `work` | `rootTask` | Đơn vị công việc gốc (T2, `tsk-*`) mang vai trò T1 khi được kích hoạt | `runner.md:1958` (ADR 0029) |
+| `child work` | `subTask` | Công việc con được phân rã từ một work cha | `runner.md:1959` (ADR 0029) |
+| `executor` | `capacity` (đơn vị thực thi) | Đối tượng thực thi cụ thể (agentType/cli/task/mcp) đảm nhận một job/capability | `runner.md:2434` (ADR 0034) |
+| `capability` | `capacity` (năng lực) | Năng lực / lời hứa hành vi có tên (abstract behavior promise) mà executor cung cấp | `runner.md:2434` (ADR 0034), `dispatch-control-plane-redesign.md:125` |
+| `launcher` | `orchestrator` (nghĩa cũ `0026`) | Tiến trình/cơ chế quyết định kích hoạt work, dựng work lên rồi rời đi (buông) | `runner.md:1871` (ADR 0028) |
+| `driver` | (không đổi) | Tiến trình/phiên đồng hành cùng work từ đầu đến cuối (ở lại) | `runner.md:1986` (ADR 0029), `runner.md:2172` (ADR 0031) |
+| `orchestrator` | (tái gán nghĩa `0029`) | Tầng hợp thành T0 quản lý N đơn vị work (ở lại) | `runner.md:1995` (ADR 0029), `runner.md:2172` (ADR 0031) |
+| `DispatchPlan` | (mới) | Kế hoạch dispatch được resolved gồm mechanism, target agent/tool, và metadata | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:175` |
+| `DispatchAssignment` | (mới) | Đơn vị phân công dispatch cụ thể gán executor cho work item | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:210` |
+
+*Ghi chú:*
+- Về vai trò bên gọi `launcher` / `driver` / `orchestrator`: xem lưới 2×2 tại `runner.md:2172-2180` (kỷ yếu `0031`) tóm tắt trục T1/T0.
+- Khái niệm `capacity` trong lịch sử từng đại diện cho cả năng lực lẫn đơn vị thực thi; từ ADR 0034 (`runner.md:2434`), các cấu hình `capacities.<id>` được chuyển thành `executors.<id>` và `capabilities.<id>`.
+- `rootTask` và `subTask` đã bị loại bỏ khỏi từ vựng dispatch per ADR 0029 (xem `docs/decisions/index.md`).
+
 ## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
 
 Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
@@ -1784,29 +1807,15 @@ implement gì).
    (headless-runner spawn `claude --agent <name>`) CHÍNH LÀ case này —
    hợp lệ, không sai, không bị tầm nhìn này phủ nhận.
 
-#### Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào
+#### Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào (Đã hoàn thành 4/5 pha; Pha 5 hoãn/YAGNI)
 
-Hôm nay CHƯA có lớp quyết định nào tự động áp quy tắc 1-4 ở trên. Bằng
-chứng sống, cụ thể (`tsk-1ni`, truy ra trong buổi thảo luận dẫn tới quyết
-định này): `judgeDiscovery`/`judgeDecompose` — 1 capacity cần soul (helper
-functional, không phải subTask) — LUÔN cli/spawn 1 `claude -p` con, dù caller
-(chính session đang gọi `fgos discover`) đã là 1 soul sống, CÙNG provider,
-đã có sẵn context tốt hơn (đã đọc CONTEXT.md, đã tự Socratic xong). Đúng
-lẽ ra phải rơi vào nhánh 2 (native — tự suy luận tiếp, không cần spawn gì
-cả) nhưng lại rơi vào nhánh 3/4 một cách âm thầm, sai — không phải vì
-thiếu khái niệm kiến trúc, mà vì thiếu cơ chế PHÁT HIỆN "tôi đang được
-gọi từ 1 soul sống cùng provider hay không" trước khi quyết định.
+Hiện nay 4 trong 5 pha triển khai doctrine (`tsk-1ni`, `tsk-27y`, `tsk-53h`, `tsk-3ik`) đã HOÀN THÀNH, và Pha 5 (`tsk-6db`, mở rộng native detection sang `agy`) được hoãn lại có chủ đích (deferred/YAGNI, chưa có consumer thật) — không phải gap chưa được giải quyết.
 
-Lớp thiếu này cần LÀ MỘT PHÁN ĐOÁN CỦA LLM (không thuần cơ học) vì tín
-hiệu quyết định không chỉ là 1 biến môi trường boolean (`CLAUDECODE` có
-mặt hay không) — còn phải cân nhắc: capacity này có thật sự cần soul
-không, có tồn tại cơ chế native tương ứng không, config có ép cli/spawn
-không, và (khi native khả dụng) có đáng dùng native hay vẫn nên cli/spawn
-vì lý do cô lập/tài nguyên. Đây chính là "lớp LLM vừa đủ thông minh" mà
-tầm nhìn này đòi hỏi — chưa xây, chỉ mới có mầm mống ý định
-(`tsk-3sw`'s "Revised design": *"the calling skill... MAY call Task tool
-natively instead of exec'ing... if it already has live Agent/Task tool
-access"*).
+Bối cảnh lịch sử và bằng chứng ban đầu (`tsk-1ni`): `judgeDiscovery`/`judgeDecompose` — 1 capacity cần soul (helper functional, không phải subTask) — trước đây LUÔN cli/spawn 1 `claude -p` con, dù caller (chính session đang gọi `fgos discover`) đã là 1 soul sống, CÙNG provider, đã có sẵn context tốt hơn (đã đọc CONTEXT.md, đã tự Socratic xong). Đúng lẽ ra phải rơi vào nhánh 2 (native — tự suy luận tiếp, không cần spawn gì cả) nhưng lại rơi vào nhánh 3/4 một cách âm thầm, sai — không phải vì thiếu khái niệm kiến trúc, mà vì thiếu cơ chế PHÁT HIỆN "tôi đang được gọi từ 1 soul sống cùng provider hay không" trước khi quyết định.
+
+Tầm nhìn ban đầu cho rằng lớp thiếu này cần LÀ MỘT PHÁN ĐOÁN CỦA LLM (không thuần cơ học) vì tín hiệu quyết định không chỉ là 1 biến môi trường boolean (`CLAUDECODE` có mặt hay không) — còn phải cân nhắc: capacity này có thật sự cần soul không, có tồn tại cơ chế native tương ứng không, config có ép cli/spawn không, và (khi native khả dụng) có đáng dùng native hay vẫn nên cli/spawn vì lý do cô lập/tài nguyên.
+
+**Bản thu hẹp có chủ đích trong thực tế:** Những gì đã được ship (`tsk-53h` / `tsk-3ik`) là một bản thu hẹp có chủ đích (deliberate narrowing) của tầm nhìn 4 yếu tố phán đoán LLM ban đầu: 3 yếu tố được giải quyết cơ học ở thời điểm cấu hình (config-time: shape/kind agent vs tool, config ép cli-spawn), và yếu tố runtime duy nhất còn lại ("liệu tôi có đang là 1 soul sống có quyền truy cập Task tool hay không") được thu gọn thành cờ tự khai báo `--has-live-task-access` do caller truyền trực tiếp (không bao giờ tự dò tìm hay đoán mò). Bằng chứng mã nguồn: `src/runner/dispatch/mechanism.mjs:42` (`decideDispatchMechanism`) và `src/runner/dispatch/mechanism.mjs:82` (`decideExecutorDispatchMechanism`).
 
 #### Quan hệ với việc đã khoá — không mâu thuẫn, chỉ hẹp hơn
 
@@ -1817,9 +1826,9 @@ access"*).
 - `tsk-53h`'s nesting rule + bằng chứng đa-provider (Claude/agy/Codex 3
   shape khác nhau) — ĐÚNG NỀN TẢNG quy tắc 2/3 ở trên dựa vào, không đổi.
 - Cả 2 item đó và gap `tsk-1ni` đều chỉ là MẢNH GHÉP hẹp (cơ chế
-  `capacities.<id>` config riêng của fgOS) của bức tranh rộng hơn tầm
+  `capabilities.<id>` config riêng của fgOS) của bức tranh rộng hơn tầm
   nhìn này vẽ ra (gộp cả việc tự gọi Task tool ngoài cơ chế
-  `capacities.<id>`, gộp cả khái niệm launcher tường minh).
+  `capabilities.<id>`, gộp cả khái niệm launcher tường minh).
 
 #### Ranh giới quan sát được (observability) — tránh ngộ nhận
 
@@ -1835,29 +1844,21 @@ scout-notes.md (đã trace thật trong buổi thảo luận này). Không đán
 "dùng native" với "quan sát được" — 2 lợi ích tách biệt, chỉ trùng nhau
 khi launcher vốn đã tương tác.
 
-#### Việc chưa quyết, để lại cho item build lớp quyết định thật
+#### Việc chưa quyết, để lại cho item build lớp quyết định thật (Đã hoàn tất qua `dispatch.mjs decide` & Pha 1-4; Pha 5 hoãn)
 
-- Tín hiệu phát hiện "launcher hiện tại có phải soul sống cùng
-  provider không" cho từng provider (Claude: `CLAUDECODE` env var đã xác
-  nhận tồn tại; agy/Codex: chưa verify tín hiệu tương đương).
-- Cơ chế tường minh nào áp CÙNG 1 quyết định dispatch (quy tắc 1-4) cho
-  cả subTask lẫn capacity trong code thật — hôm nay `capacities.<id>`
-  (fgOS config) và lời gọi Task tool trực tiếp của 1 session (kích hoạt
-  subTask) là 2 đường tách biệt hoàn toàn, chưa đi qua cùng 1 lớp quyết
-  định nào cả.
-- Địa điểm đặt lớp quyết định native-vs-cli/spawn: trong `resolveExecutorConfig`
-  bản thân nó (không thể — là hàm Node thuần, không tự gọi Task được),
-  hay ở tầng gọi nó (skill/engine-verb caller, nơi có soul thật)?
+- Tín hiệu phát hiện "launcher hiện tại có phải soul sống cùng provider không": Caller tự khai báo qua cờ `--has-live-task-access` khi gọi `dispatch.mjs decide` (Pha 3/4). Pha 5 mở rộng sang `agy` hoãn lại (YAGNI).
+- Cơ chế tường minh áp CÙNG 1 quyết định dispatch cho cả subTask lẫn capacity trong code thật: `dispatch.mjs decide` đã hợp nhất qua 1 entry point duy nhất (Pha 4, `tsk-3ik`).
+- Địa điểm đặt lớp quyết định native-vs-cli/spawn: Nằm ở helper `decideDispatchMechanism` / `decideExecutorDispatchMechanism` (`src/runner/dispatch/mechanism.mjs`), được gọi bởi `dispatch.mjs decide`.
 
 #### Kế hoạch triển khai (5 pha, đã file thành work item, deps thật)
 
-| Pha | Item | Phụ thuộc | Song song được với |
-|---|---|---|---|
-| 1 | `tsk-1ni` — fix `repoRoot` (state-root/content-root lẫn nhau) + verify-overwrite | không | Pha 3 (`tsk-53h`, khác file) |
-| 2 | `tsk-27y` — protocol caller tự khai verdict cho `fgos discover`/`fgos plan` | không (chỉ overlap footprint với Pha 1, không phải dep logic) | Pha 3 (`tsk-53h`, khác file) |
-| 3 | `tsk-53h` — shared helper phát hiện native-vs-cli/spawn cho skill-facing capacity | `tsk-3sw` (đã done) | Pha 1, Pha 2 (khác file, không overlap) |
-| 4 | `tsk-3ik` — hợp nhất `capacities.<id>` config dispatch với lời gọi Task tool trực tiếp | `tsk-27y` + `tsk-53h` | không (chờ cả 2 xong) |
-| 5 | `tsk-6db` — mở rộng native detection sang `agy` (deferred, YAGNI, chưa consumer thật) | `tsk-53h` | Pha 2, Pha 4 (concern khác nhau) |
+| Pha | Item | Phụ thuộc | Song song được với | Trạng thái |
+|---|---|---|---|---|
+| 1 | `tsk-1ni` — fix `repoRoot` (state-root/content-root lẫn nhau) + verify-overwrite | không | Pha 3 (`tsk-53h`, khác file) | Done |
+| 2 | `tsk-27y` — protocol caller tự khai verdict cho `fgos discover`/`fgos plan` | không (chỉ overlap footprint với Pha 1, không phải dep logic) | Pha 3 (`tsk-53h`, khác file) | Done |
+| 3 | `tsk-53h` — shared helper phát hiện native-vs-cli/spawn cho skill-facing capacity | `tsk-3sw` (đã done) | Pha 1, Pha 2 (khác file, không overlap) | Done |
+| 4 | `tsk-3ik` — hợp nhất `capabilities.<id>` config dispatch với lời gọi Task tool trực tiếp | `tsk-27y` + `tsk-53h` | không (chờ cả 2 xong) | Done |
+| 5 | `tsk-6db` — mở rộng native detection sang `agy` (deferred, YAGNI, chưa consumer thật) | `tsk-53h` | Pha 2, Pha 4 (concern khác nhau) | Hoãn / Deferred (YAGNI) |
 
 #### Tham chiếu
 

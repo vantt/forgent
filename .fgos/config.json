@@ -38,8 +38,8 @@
         "description": "Compliance-driven work -- value comes from following the plan, changes files, must pass verify (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for execute -> agy, never built: no caller invokes this purpose yet)"
       },
       "fgos-coding-implement": {
-        "description": "code-implement work for the coding domain's executing stage -- pinned to gemini-3.6-flash-medium via this capability's own providerModel/rigorOverrides (agy/gemini, lightweight policy tier; see modelPolicies.gemini.lightweight for the literal model string), not executors.agy's defaults",
-        "prefer": "agy",
+        "description": "code-implement work for the coding domain's executing stage -- pinned to gemini-3.6-flash-medium via this capability's own providerModel/rigorOverrides (agy/gemini, lightweight policy tier; see modelPolicies.gemini.lightweight for the literal model string), dispatched visibly inside a Herdr pane (adapter: herdr-spawn) via executors.agy-herdr instead of the invisible cli-spawn subprocess executors.agy-cli would give -- agy already streams its own headless output live (docs/history/herdr-spawn-generalize-live-visibility/RESEARCH.md), so no liveOutput renderer is needed here",
+        "prefer": "agy-herdr",
         "overrides": {
           "providerModel": "gemini",
           "rigorOverrides": {
@@ -72,14 +72,43 @@
           }
         ]
       },
-      "agy": {
+      "agy-cli": {
         "kind": "agent",
-        "description": "Antigravity Cli",
+        "description": "Antigravity Cli (headless, invisible cli-spawn subprocess -- renamed from executors.agy, tsk-5jl, so the name distinguishes it from executors.agy-herdr's real-pane dispatch)",
         "allowCrossProvider": true,
         "invocations": [
           {
             "via": "cli",
             "adapter": "cli-spawn",
+            "command": "agy",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--mode",
+              "accept-edits",
+              "--new-project",
+              "--print-timeout",
+              "30m",
+              "--model",
+              "{model}"
+            ]
+          }
+        ],
+        "providerModel": "gemini",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
+      },
+      "agy-herdr": {
+        "kind": "agent",
+        "description": "Antigravity CLI, same invocation as executors.agy-cli, dispatched via adapter:\"herdr-spawn\" (real Herdr pane) instead of cli-spawn -- ACTIVE (tsk-5jl): agy's own headless mode already streams live plain text natively (confirmed, docs/history/herdr-spawn-generalize-live-visibility/RESEARCH.md and docs/history/executor-dispatch-fallback-live-monitor/RESEARCH.md), so no liveOutput renderer is declared here.",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "herdr-spawn",
             "command": "agy",
             "args": [
               "-p",
@@ -184,6 +213,88 @@
           "standard": "lightweight",
           "heavy": "lightweight"
         }
+      },
+      "claude-herdr": {
+        "kind": "agent",
+        "description": "DORMANT (tsk-5jl): same Claude Code CLI invocation as executors.claude, dispatched via adapter:\"herdr-spawn\" with liveOutput -- Claude Code's plain -p text mode buffers until done (confirmed, official headless.md docs), so streamFlags adds --output-format stream-json --verbose --include-partial-messages and the renderer translates that JSONL into readable live text. Not wired to any capability yet -- to activate, point a capability's \"prefer\" at \"claude-herdr\" (or dispatch to it by name explicitly).",
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "claude",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}",
+              "--permission-mode",
+              "acceptEdits",
+              "--allowedTools",
+              "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+            ],
+            "liveOutput": {
+              "streamFlags": [
+                "--output-format",
+                "stream-json",
+                "--verbose",
+                "--include-partial-messages"
+              ],
+              "renderer": "src/runner/dispatch/live-renderers/claude-stream-json.mjs"
+            }
+          }
+        ]
+      },
+      "pi-herdr": {
+        "kind": "agent",
+        "description": "DORMANT (tsk-5jl): same pi CLI invocation as executors.pi, dispatched via adapter:\"herdr-spawn\" with liveOutput -- pi's own --mode json (already part of executors.pi's base args) emits a real, genuinely incremental AgentSessionEvent JSONL stream (confirmed against a real captured fixture, docs/history/pi-executor-runtime-capacity/evidence/round4-d4-attempt-gpt55-stdout.jsonl), so streamFlags stays empty here and the renderer alone translates that JSONL into readable live text. Not wired to any capability yet -- to activate, point a capability's \"prefer\" at \"pi-herdr\" (or dispatch to it by name explicitly).",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "pi",
+            "args": [
+              "--provider",
+              "openai-codex",
+              "--model",
+              "{model}",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "liveOutput": {
+              "streamFlags": [],
+              "renderer": "src/runner/dispatch/live-renderers/pi-agent-session.mjs"
+            }
+          }
+        ],
+        "providerModel": "openai-codex",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
+      },
+      "codex-herdr": {
+        "kind": "agent",
+        "description": "DORMANT (tsk-5jl): same Codex CLI invocation as executors.codex, dispatched via adapter:\"herdr-spawn\" -- NO liveOutput declared: whether `codex exec` streams live text by default or buffers is UNVERIFIED (deliberately deferred, not guessed -- docs/history/herdr-spawn-generalize-live-visibility/plan.md). A follow-up item should verify codex's real streaming behavior before adding a liveOutput renderer here. Not wired to any capability yet -- to activate, point a capability's \"prefer\" at \"codex-herdr\" (or dispatch to it by name explicitly).",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "codex",
+            "args": [
+              "exec",
+              "--dangerously-bypass-approvals-and-sandbox",
+              "{prompt}"
+            ]
+          }
+        ]
       },
       "gitnexus": {
         "kind": "tool",

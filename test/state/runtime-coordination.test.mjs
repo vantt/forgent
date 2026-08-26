@@ -5,7 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, editWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, readRawEvents, StoreError } from '../../src/state/store.mjs';
+import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, editWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, readRawEvents, addDecision, recordGateApprove, StoreError } from '../../src/state/store.mjs';
 import { acquireClaim, releaseClaim, readClaim, readClaims, buildEffectiveView, getItemDurableRevision, ClaimError } from '../../src/state/runtime-coordination.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 
@@ -503,23 +503,175 @@ test('buildEffectiveView still trusts a claim with no preClaimStatus recorded (l
 test('a durable content change with the SAME status is not flagged stale by buildEffectiveView, but settleClaim still catches it via preClaimRevision', () => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 16', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
-  const preClaimRevision = getItemDurableRevision(listWork(dir), 'tsk-1');
-  const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision });
 
-  // Durable content changes (title), status stays 'todo' -- a real edit by
-  // a different actor, not this claim's own doing.
-  editWork(dir, { id: 'tsk-1', patch: { title: 'Task 16 (retitled)' } });
+  // tsk-1ht: this test's own comment always claimed "a real edit by a
+  // different actor", but originally called editWork with no writer
+  // distinction at all -- same process, same default writer -- which
+  // settleClaim's new same-writer reconcile branch would otherwise
+  // legitimately let through. FGOS_SESSION_ID makes the different actor
+  // genuine, so this test still proves what it always claimed to prove.
+  const originalSessionId = process.env.FGOS_SESSION_ID;
+  try {
+    process.env.FGOS_SESSION_ID = 'session-A';
+    const preClaimRevision = getItemDurableRevision(listWork(dir), 'tsk-1');
+    const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision });
 
-  const view = listWork(dir);
-  assert.equal(view.work['tsk-1'].status, 'doing', 'status-only staleness check cannot see a content-only drift -- still reads as the active claim');
-  assert.equal(view.work['tsk-1'].staleClaim, undefined);
+    // Durable content changes (title), status stays 'todo' -- a real edit by
+    // a different actor, not this claim's own doing.
+    process.env.FGOS_SESSION_ID = 'session-B';
+    editWork(dir, { id: 'tsk-1', patch: { title: 'Task 16 (retitled)' } });
 
-  assert.throws(
-    () => settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' }),
-    (err) => err instanceof StoreError && err.category === 'conflict',
-    'settleClaim\'s own preClaimRevision check must still catch the content drift, even though the effective-view overlay could not',
-  );
-  assert.ok(readClaim(dir, 'tsk-1'), 'the claim must survive this conflict untouched');
+    const view = listWork(dir);
+    assert.equal(view.work['tsk-1'].status, 'doing', 'status-only staleness check cannot see a content-only drift -- still reads as the active claim');
+    assert.equal(view.work['tsk-1'].staleClaim, undefined);
+
+    process.env.FGOS_SESSION_ID = 'session-A';
+    assert.throws(
+      () => settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' }),
+      (err) => err instanceof StoreError && err.category === 'conflict',
+      'settleClaim\'s own preClaimRevision check must still catch the content drift, even though the effective-view overlay could not',
+    );
+    assert.ok(readClaim(dir, 'tsk-1'), 'the claim must survive this conflict untouched');
+  } finally {
+    if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = originalSessionId;
+  }
+});
+
+// tsk-1ht: settleClaim used to refuse ANY durable revision drift since claim
+// time unconditionally, even when every intervening write came from the
+// SAME writer that now holds the claim -- the routine mid-lifecycle `fgos
+// edit` calls fgos-coding-planning/fgos-coding-discovering make by design
+// (tier/kind/risk sync, docsRef registration, verify/action/footprint sync),
+// never a concurrent conflict. Live repro: tsk-1sl (2026-08-26) claimed,
+// edited several times by its own claiming session, then `fgos return`
+// refused with exactly this conflict.
+test('settleClaim reconciles a revision drift caused entirely by the SAME writer that holds the claim, instead of refusing', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 17', kind: 'bug', status: 'todo', deps: [], refs: [], risk: 'heavy', verify: 'npm test', domain: 'coding' });
+
+  const originalSessionId = process.env.FGOS_SESSION_ID;
+  try {
+    process.env.FGOS_SESSION_ID = 'session-A';
+    const preClaimRevision = getItemDurableRevision(listWork(dir), 'tsk-1');
+    const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision });
+
+    // Several routine same-writer edits, same shape fgos-coding-planning's
+    // own field-sync steps make mid-lifecycle -- all writer "session-A".
+    editWork(dir, { id: 'tsk-1', patch: { tier: 'standard' } });
+    editWork(dir, { id: 'tsk-1', patch: { docsRef: 'docs/history/tsk-1/' } });
+    editWork(dir, { id: 'tsk-1', patch: { verify: 'npm test -- test/foo.test.mjs', action: 'do the thing', footprint: ['src/foo.mjs'] } });
+
+    const curRev = getItemDurableRevision(listWork(dir), 'tsk-1');
+    assert.notEqual(curRev, preClaimRevision, 'the same-writer edits must actually have drifted the durable revision, or this test proves nothing');
+
+    const res = settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' });
+    assert.equal(res.view.work['tsk-1'].status, 'awaiting-approval', 'a same-writer drift must reconcile, not refuse');
+    assert.equal(readClaim(dir, 'tsk-1'), null, 'the claim must release normally on a successful (reconciled) settle');
+  } finally {
+    if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = originalSessionId;
+  }
+});
+
+// tsk-1ht: the live bug the first version of this fix actually shipped
+// with -- `fgos decision`/`fgos gate-approve` never stamp `payload.writer`
+// at all (confirmed: neither call site in store.mjs sets it), and
+// fgos-coding-planning/fgos-coding-validating call them routinely
+// mid-lifecycle. Treating them as drift-relevant made the reconcile fail
+// closed on every real coding-domain item. Neither event actually mutates
+// view.work[id] (decision -> view.decisions/decisionsById, gate-approve ->
+// view.gates -- both side logs replay.mjs folds separately), so they must
+// never block the same-writer reconcile regardless of writer stamp.
+test('settleClaim reconciles a same-writer drift even when unstamped side-log events (decision, gate-approve) also happened mid-claim', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 20', kind: 'bug', status: 'todo', deps: [], refs: [], risk: 'heavy', verify: 'npm test', domain: 'coding' });
+
+  const originalSessionId = process.env.FGOS_SESSION_ID;
+  try {
+    process.env.FGOS_SESSION_ID = 'session-A';
+    const preClaimRevision = getItemDurableRevision(listWork(dir), 'tsk-1');
+    const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision });
+
+    editWork(dir, { id: 'tsk-1', patch: { tier: 'standard' } });
+    addDecision(dir, { id: 'tsk-1', text: 'a routine mid-lifecycle decision', rationale: 'because', kind: 'engine' });
+    recordGateApprove(dir, { id: 'tsk-1', gate: 'validateApprove', actor: 'bypass', verify: 'npm test' });
+
+    const curRev = getItemDurableRevision(listWork(dir), 'tsk-1');
+    assert.notEqual(curRev, preClaimRevision, 'the same-writer edit must actually have drifted the durable revision, or this test proves nothing');
+
+    const res = settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' });
+    assert.equal(res.view.work['tsk-1'].status, 'awaiting-approval', 'unstamped decision/gate-approve events must never block a real same-writer reconcile');
+  } finally {
+    if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = originalSessionId;
+  }
+});
+
+// The distinguishing case the reconcile must never let through: a durable
+// edit stamped with a GENUINELY DIFFERENT writer's identity landing on a
+// claimed item must still refuse settle exactly as before this fix --
+// nothing here weakens the real conflict-refusal floor. Unlike the existing
+// "durable content change with the SAME status" test above (which calls
+// editWork with no writer distinction at all), this test controls
+// FGOS_SESSION_ID across the edit to construct a genuinely different writer.
+test('settleClaim still refuses a revision drift caused by a GENUINELY DIFFERENT writer, even under the same-writer reconcile', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 18', kind: 'bug', status: 'todo', deps: [], refs: [], risk: 'heavy', verify: 'npm test', domain: 'coding' });
+
+  const originalSessionId = process.env.FGOS_SESSION_ID;
+  try {
+    process.env.FGOS_SESSION_ID = 'session-A';
+    const preClaimRevision = getItemDurableRevision(listWork(dir), 'tsk-1');
+    const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision });
+
+    process.env.FGOS_SESSION_ID = 'session-B';
+    editWork(dir, { id: 'tsk-1', patch: { title: 'Task 18 (retitled by a different writer)' } });
+
+    process.env.FGOS_SESSION_ID = 'session-A';
+    assert.throws(
+      () => settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' }),
+      (err) => err instanceof StoreError && err.category === 'conflict',
+      'a genuinely different writer\'s edit must still refuse settle -- the reconcile only ever covers the SAME writer',
+    );
+    assert.ok(readClaim(dir, 'tsk-1'), 'the claim must survive this genuine conflict untouched');
+  } finally {
+    if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = originalSessionId;
+  }
+});
+
+// recordClaimAttempt's own reclaim record (src/runner/claim-port.mjs) never
+// stamps `payload.writer` at all -- the reconcile must fail CLOSED on a
+// missing writer stamp (never treat "no evidence" as "same writer"), or a
+// genuinely different actor's stale-claim-reclaim could slip through
+// unnoticed.
+test('settleClaim treats an event with no writer stamp at all as NOT self-caused (fails closed, keeps refusing)', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 19', kind: 'bug', status: 'todo', deps: [], refs: [], risk: 'heavy', verify: 'npm test', domain: 'coding' });
+
+  const originalSessionId = process.env.FGOS_SESSION_ID;
+  try {
+    process.env.FGOS_SESSION_ID = 'session-A';
+    const preClaimRevision = getItemDurableRevision(listWork(dir), 'tsk-1');
+    const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision });
+
+    editWork(dir, { id: 'tsk-1', patch: { tier: 'standard' } });
+
+    // Simulate an unstamped event touching this id landing in the log
+    // directly (the shape recordClaimAttempt writes -- no payload.writer).
+    const logPath = path.join(dir, 'events.jsonl');
+    fs.appendFileSync(logPath, `${JSON.stringify({ type: 'work.attempt', payload: { id: 'tsk-1', phase: 'claim', result: 'reclaimed' }, ts: Date.now() })}\n`, 'utf8');
+
+    assert.throws(
+      () => settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' }),
+      (err) => err instanceof StoreError && err.category === 'conflict',
+      'an unstamped event in the drift window must fail the reconcile closed',
+    );
+  } finally {
+    if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = originalSessionId;
+  }
 });
 
 // tsk-40m code-review finding (test gap): status-fsm.mjs requires a

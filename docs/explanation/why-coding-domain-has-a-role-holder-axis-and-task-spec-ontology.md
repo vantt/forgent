@@ -200,6 +200,8 @@ claim time) already existed. The only new surface needed was one `claims:`
 frontmatter field per agent-type plus one field on the claim event — no
 second source of truth.
 
+> **Note (D20 correction)**: The `claims:` field model from D12 was inverted by D20 (`docs/history/core-foundation-domain-boundary/DISCUSSION.md:461`) and `assignable-to` was renamed to `agent:` by D26 (`:467`). Today, eligibility is determined by matching what the task-spec requires (`requires-skill:` or explicit `agent:` pin) against what the agent-type has (`skills:`).
+
 ## Workflow hierarchy: domain → N workflows → item, mechanism first
 
 > D7: Hierarchy khai báo domain -> N workflow -> item. Mỗi domain có

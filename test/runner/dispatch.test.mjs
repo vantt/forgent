@@ -867,10 +867,10 @@ test('resolveExecutorCommand still enforces cross-provider governance for an inv
   );
 });
 
-test('the committed .fgos/config.json runner section declares the agy reference executor (tsk-5tm-4 D11): invocations[]-shaped, kind agent (migrated at tsk-in1-4 D5), allowCrossProvider true, resolves to the real installed agy binary', () => {
+test('the committed .fgos/config.json runner section declares the agy-cli reference executor (tsk-5tm-4 D11, renamed from executors.agy at tsk-5jl/tsk-2ii so it stands apart from executors.agy-herdr): invocations[]-shaped, kind agent (migrated at tsk-in1-4 D5), allowCrossProvider true, resolves to the real installed agy binary', () => {
   const cfg = committedRunnerConfig();
-  const executor = cfg.executors?.agy;
-  assert.ok(executor, 'executors.agy must exist');
+  const executor = cfg.executors?.['agy-cli'];
+  assert.ok(executor, 'executors.agy-cli must exist');
   assert.equal(executor.kind, 'agent');
   assert.equal(executor.allowCrossProvider, true);
   assert.ok(Array.isArray(executor.invocations) && executor.invocations.length === 1);
@@ -1208,9 +1208,9 @@ test('the committed .fgos/config.json runner section loads and is well-formed', 
   assert.deepEqual(Object.keys(cfg.modelPolicies.claude).sort(), ['analytical', 'creative', 'critical', 'lightweight', 'standard']);
 });
 
-test('the committed .fgos/config.json runner section wires the agy executor to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece fixes)', () => {
+test('the committed .fgos/config.json runner section wires the agy-cli executor to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece fixes; key renamed from executors.agy at tsk-5jl/tsk-2ii)', () => {
   const cfg = committedRunnerConfig();
-  assert.equal(cfg.executors?.agy?.providerModel, 'gemini');
+  assert.equal(cfg.executors?.['agy-cli']?.providerModel, 'gemini');
   assert.equal(typeof cfg.modelPolicies?.gemini?.lightweight, 'string');
   assert.ok(cfg.modelPolicies.gemini.lightweight.length > 0);
 });
