@@ -42,6 +42,7 @@ import { buildDispatchResult } from '../../src/runner/dispatch/result-ladder.mjs
 import { initStore, addWork, listWork, readRawEvents } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
+import { classifyDispatchConfidence, classifyDispatchResult } from '../../src/report/dispatch-confidence.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time. No real agent CLI is
@@ -5641,4 +5642,147 @@ test('logExecutorDispatch writes governance payload into executor.dispatch event
   });
   assert.equal(event.type, 'executor.dispatch');
   assert.deepEqual(event.payload.governance, gov);
+});
+
+test('classifyDispatchConfidence classifies legacy-signal token in local worker log (a)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-test-legacy';
+  logExecutorDispatch(fgosDir, {
+    id: workId,
+    executorId: 'claude',
+    provider: 'claude',
+    command: 'claude',
+    model: 'claude-3-5-sonnet',
+  });
+
+  const logsDir = path.join(fgosDir, 'logs');
+  fs.mkdirSync(logsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(logsDir, `${workId}.log`),
+    `=== 2026-08-26T00:00:00.000Z | work ${workId} | exit 0 ===\n--- STDOUT ---\nTask completed successfully. [DONE]\n--- STDERR ---\n`,
+  );
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.id, workId);
+  assert.equal(report.dispatches.length, 1);
+  assert.equal(report.dispatches[0].confidence, 'legacy-signal');
+  assert.equal(report.dispatches[0].outcome, 'done');
+  assert.equal(report.summary['legacy-signal'], 1);
+});
+
+test('classifyDispatchConfidence classifies inferred when log exists with no token (b)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-test-inferred';
+  logExecutorDispatch(fgosDir, {
+    id: workId,
+    executorId: 'claude',
+    provider: 'claude',
+    command: 'claude',
+    model: 'claude-3-5-sonnet',
+  });
+
+  const logsDir = path.join(fgosDir, 'logs');
+  fs.mkdirSync(logsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(logsDir, `${workId}.log`),
+    `=== 2026-08-26T00:00:00.000Z | work ${workId} | exit 0 ===\n--- STDOUT ---\nModified files headBefore: abc1234 headAfter: def5678\n--- STDERR ---\n`,
+  );
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.id, workId);
+  assert.equal(report.dispatches.length, 1);
+  assert.equal(report.dispatches[0].confidence, 'inferred');
+  assert.equal(report.dispatches[0].outcome, 'unsignaled');
+  assert.equal(report.summary.inferred, 1);
+});
+
+test('classifyDispatchConfidence classifies missing when executor.dispatch event exists but log file is missing (c)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-test-missing-log';
+  logExecutorDispatch(fgosDir, {
+    id: workId,
+    executorId: 'claude',
+    provider: 'claude',
+    command: 'claude',
+    model: 'claude-3-5-sonnet',
+  });
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.id, workId);
+  assert.equal(report.dispatches.length, 1);
+  assert.equal(report.dispatches[0].confidence, 'missing');
+  assert.equal(report.dispatches[0].outcome, null);
+  assert.equal(report.summary.missing, 1);
+});
+
+test('classifyDispatchConfidence degrades to missing when log file is malformed/empty (d)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-test-malformed';
+  logExecutorDispatch(fgosDir, {
+    id: workId,
+    executorId: 'claude',
+    provider: 'claude',
+    command: 'claude',
+    model: 'claude-3-5-sonnet',
+  });
+
+  const logsDir = path.join(fgosDir, 'logs');
+  fs.mkdirSync(logsDir, { recursive: true });
+  fs.writeFileSync(path.join(logsDir, `${workId}.log`), '');
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.id, workId);
+  assert.equal(report.dispatches.length, 1);
+  assert.equal(report.dispatches[0].confidence, 'missing');
+  assert.equal(report.summary.missing, 1);
+});
+
+test('classifyDispatchConfidence reports non-existent id plainly with zero dispatches (e)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-nonexistent';
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.id, workId);
+  assert.equal(report.dispatches.length, 0);
+  assert.equal(report.summary.total, 0);
+  assert.equal(report.summary.missing, 0);
+});
+
+test('classifyDispatchConfidence classifies reported when event payload carries explicit outcome', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-test-reported';
+  logExecutorDispatch(fgosDir, {
+    id: workId,
+    executorId: 'claude',
+    provider: 'claude',
+    command: 'claude',
+    model: 'claude-3-5-sonnet',
+  });
+
+  const eventsPath = path.join(fgosDir, 'events.jsonl');
+  fs.appendFileSync(
+    eventsPath,
+    JSON.stringify({
+      type: 'executor.dispatch',
+      payload: {
+        id: workId,
+        executorId: 'claude',
+        outcome: 'success',
+      },
+      ts: new Date(Date.now() + 1000).toISOString(),
+    }) + '\n',
+  );
+
+  const logsDir = path.join(fgosDir, 'logs');
+  fs.mkdirSync(logsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(logsDir, `${workId}.log`),
+    `=== 2026-08-26T00:00:00.000Z | work ${workId} | exit 0 ===\n--- STDOUT ---\nSome output without token\n--- STDERR ---\n`,
+  );
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.dispatches.length, 2);
+  const lastDispatch = report.dispatches[1];
+  assert.equal(lastDispatch.confidence, 'reported');
+  assert.equal(lastDispatch.outcome, 'success');
 });
