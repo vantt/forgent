@@ -1079,6 +1079,25 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'dispatch-report',
+    invoke: 'fgos dispatch-report [id]',
+    description: 'Read-only report on dispatch result confidence (reported | legacy-signal | inferred | missing) folded from executor.dispatch events and worker log evidence (best-effort, this-machine-only, degrades to missing when log is unavailable).',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id to report dispatch confidence for (positional or --id); omit to report across all dispatches.' },
+      },
+      positional: ['id'],
+      required: [],
+    },
+    examples: ['fgos dispatch-report', 'fgos dispatch-report tsk-1g6'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'doc-sources',
     invoke: 'fgos doc-sources',
     description: 'Read-only: gather every compound-learn capture linked to a docPath (ALL matches, not just the first) as check-content (id/predicted/actual/docType/docPath), so an export skill can reconstruct a doc from source with no loss (CONTEXT.md D13). A docPath with zero linked captures is success, reported as an empty list.',

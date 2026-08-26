@@ -34,6 +34,7 @@ import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
+import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
 // `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
@@ -2896,6 +2897,11 @@ async function runVerb(verb, flags, positional, dir) {
         : 'closing report recorded on the item so results are read via `fgos show`, not a guarded terminal pane';
       const { event } = addDecision(dir, { id, text, rationale, source: 'driver-report', kind: 'engine' });
       return { id, stopReason: stopReason ?? null, seq: event.seq };
+    }
+
+    case 'dispatch-report': {
+      const id = optionalField(positional[0] ?? flags.id, 'dispatch-report [id]');
+      return classifyDispatchConfidence(dir, { id });
     }
 
     case 'conflicts': {
