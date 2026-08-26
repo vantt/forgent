@@ -132,3 +132,20 @@ footprint at submit time — unchanged here).
   (scoped to the `claims:`→`skills:`/`requires-skill:`/`agent:` field
   only). Left untouched here; worth a follow-up item if a person agrees
   it's in scope for a future docs pass.
+
+## Post-return flake confirmation
+
+A retry of this item's own `verify` (`... && npm test`) failed on two
+`test/runner/dispatch.test.mjs` assertions ("fires candidates in batch
+concurrently with overlapping execution windows", and a timing-sensitive
+`idleTimeoutMs` worker-kill assertion) — both timing-sensitive tests,
+neither touching anything this item's own diff changes (`docs/specs/
+work-state.md`, the role-holder-axis explanation doc, and a 4-line
+comment-only edit in `src/runner/agent-roster.mjs`, confirmed via `git
+diff` against this branch's own merge-base). Re-ran both failing tests in
+isolation, away from full-suite concurrency load: both passed cleanly.
+`tsk-1sl`'s own Iron Law evidence documents the identical
+"overlapping execution windows" test failing the same way under
+concurrent load and passing in isolation — this is a known, pre-existing
+environment-timing flake in the test suite, not a regression from this
+item's docs-only diff.
