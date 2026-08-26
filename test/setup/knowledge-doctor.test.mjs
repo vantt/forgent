@@ -6,7 +6,7 @@ import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { computeKnowledgeProjection } from '../../src/report/knowledge-projection.mjs';
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
-import { initStore, registerTopicStore, registerDocStore } from '../../src/state/store.mjs';
+import { initStore, registerTopicStore, registerDocStore, supersedeDocStore } from '../../src/state/store.mjs';
 
 test('knowledge-doctor - computeKnowledgeProjection generates expected structure', () => {
   const view = {
@@ -181,6 +181,30 @@ test('knowledge-doctor - doc-source-conservation flags a duplicate migration-inv
     assert.equal(res.passed, false);
     assert.ok(res.message.includes("inventory source 'docs/dup.md' appears 2 times"));
     assert.ok(res.message.includes('docs/lost.md'));
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-doctor - doc-current-path-missing, doc-source-unreachable, and doc-source-conservation all treat a superseded doc as dead, not live', () => {
+  // src/report/knowledge-resolver.mjs's own isLive excludes 'superseded' as
+  // well as 'retired' -- a doc.supersede has already moved "current" to
+  // supersededBy, so the superseded doc's own currentPath/sourceCaptureIds
+  // are frozen history. None of these three checks should flag it just
+  // because its old file is gone or its old source path is unreachable.
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/guide-old.md', docLifecycle: 'active', sourceCaptureIds: ['docs/test/guide-old.md'] });
+    supersedeDocStore(fgosDir, { docId: 't1:guide' });
+    // Never commit docs/test/guide-old.md at HEAD, and never leave it
+    // reachable through any live doc's alias -- exactly the state a real
+    // supersede-then-content-merge leaves the old doc in.
+
+    for (const id of ['doc-current-path-missing', 'doc-source-unreachable', 'doc-source-conservation']) {
+      const res = DOCTOR_CHECKS.find(c => c.id === id).check(tmpDir);
+      assert.equal(res.passed, true, `${id} must not flag a superseded doc: ${res.message}`);
+    }
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

@@ -160,6 +160,105 @@ test('knowledge-migration - apply fails closed (throws, applies nothing) when a 
   }
 });
 
+test('knowledge-migration - apply refuses (no partial apply) when the planned doc is not registered in the registry', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    // Deliberately never register the t1:guide doc itself.
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Reclaim\n', 'utf8');
+    execSync('git add docs/how-to/reclaim.md && git commit -m "add reclaim"', { cwd: tmpDir, stdio: 'ignore' });
+
+    assert.throws(() => {
+      runKnowledgeMigration(tmpDir, { dryRun: false });
+    }, /doc 't1:guide' is not registered in the knowledge registry/);
+
+    // The real bug this reproduces: the file must NOT have been moved even
+    // though the registry write would have failed -- refusing up front
+    // means neither happens, not "file moved, registry write failed."
+    const newFile = path.join(tmpDir, 'docs/worktree-reclaim/guide.md');
+    assert.equal(fs.existsSync(oldFile), true, 'source file must still be at its old path');
+    assert.equal(fs.existsSync(newFile), false, 'target file must not have been created');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-migration - apply refuses when the target path already exists on disk (no overwrite)', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/how-to/reclaim.md', docLifecycle: 'active' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Reclaim\n', 'utf8');
+    execSync('git add docs/how-to/reclaim.md && git commit -m "add reclaim"', { cwd: tmpDir, stdio: 'ignore' });
+
+    // Something else already occupies the computed target path.
+    const collidingFile = path.join(tmpDir, 'docs/worktree-reclaim/guide.md');
+    fs.mkdirSync(path.dirname(collidingFile), { recursive: true });
+    fs.writeFileSync(collidingFile, '# Already here\n', 'utf8');
+
+    assert.throws(() => {
+      runKnowledgeMigration(tmpDir, { dryRun: false });
+    }, /target 'docs\/worktree-reclaim\/guide\.md' already exists on disk/);
+
+    assert.equal(fs.readFileSync(collidingFile, 'utf8'), '# Already here\n', 'the colliding file must not have been overwritten');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-migration - apply refuses when projection paths cannot depend on the caller cwd; writes docs/doc-registry.* under repoRoot', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/how-to/reclaim.md', docLifecycle: 'active' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Reclaim\n', 'utf8');
+    execSync('git add docs/how-to/reclaim.md && git commit -m "add reclaim"', { cwd: tmpDir, stdio: 'ignore' });
+
+    // Run from a DIFFERENT cwd than repoRoot -- projection output must
+    // still land under repoRoot, not under process.cwd().
+    const otherCwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-migration-othercwd-'));
+    const originalCwd = process.cwd();
+    process.chdir(otherCwd);
+    let res;
+    try {
+      res = runKnowledgeMigration(tmpDir, { dryRun: false });
+    } finally {
+      process.chdir(originalCwd);
+      fs.rmSync(otherCwd, { recursive: true, force: true });
+    }
+
+    assert.equal(res.appliedCount, 1);
+    assert.ok(fs.existsSync(path.join(tmpDir, 'docs/doc-registry.md')));
+    assert.ok(fs.existsSync(path.join(tmpDir, 'docs/doc-registry.json')));
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
 test('knowledge-migration - dry-run reports conservation errors for duplicate source and duplicate target, apply refuses them', () => {
   const { tmpDir, fgosDir } = setupGitRepoWithStore();
   try {

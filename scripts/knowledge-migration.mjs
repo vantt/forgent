@@ -6,6 +6,7 @@ import path from 'node:path';
 import { execSync } from 'node:child_process';
 import { rebuild, moveDocPathStore, demoteDocStore } from '../src/state/store.mjs';
 import { parseFrontmatter, renderFrontmatter } from '../src/report/frontmatter.mjs';
+import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
 
 // docs/architect/knowledge-registry-redesign.md §13.4 (Conservation): "every
 // old file must appear exactly once ... missing files, duplicate source
@@ -13,7 +14,16 @@ import { parseFrontmatter, renderFrontmatter } from '../src/report/frontmatter.m
 // from the planned-move list, before any file or store mutation happens --
 // dry-run surfaces these as `conservationErrors` in its report, apply throws
 // on them (nothing partially applied).
-function computeConservationErrors(repoRoot, plannedMoves) {
+//
+// Also preflights the registry event apply itself would need to write, not
+// just the filesystem move: a doc that isn't registered yet (or whose
+// registry identity no longer matches what was planned) would previously
+// only be discovered by actually running `git mv` first and having
+// moveDocPathStore throw AFTER the file already moved -- a real partial
+// apply (file relocated, registry never updated). Checking it here, before
+// any mutation, is what makes apply's "nothing partially applied" promise
+// true instead of aspirational.
+function computeConservationErrors(repoRoot, view, plannedMoves) {
   const errors = [];
 
   const sourceCounts = new Map();
@@ -36,6 +46,22 @@ function computeConservationErrors(repoRoot, plannedMoves) {
   for (const move of plannedMoves) {
     if (!fs.existsSync(path.join(repoRoot, move.oldPath))) {
       errors.push(`missing source file: '${move.oldPath}' (planned move to '${move.newPath}') does not exist on disk`);
+    }
+    if (fs.existsSync(path.join(repoRoot, move.newPath))) {
+      errors.push(`target '${move.newPath}' already exists on disk -- refusing to overwrite it`);
+    }
+
+    // The registry event apply will need to write (doc.path-move, and
+    // doc.demote when applicable) must be known-valid BEFORE any file
+    // touches disk -- a doc not yet registered, or one whose registry
+    // identity has drifted from what was planned, must fail here.
+    const doc = view.docs?.[move.docId];
+    if (!doc) {
+      errors.push(`doc '${move.docId}' is not registered in the knowledge registry -- run "fgos doc register" (or bootstrap) before migrating it`);
+    } else if (doc.topicId !== move.topicId || doc.role !== move.role || doc.currentPath !== move.oldPath) {
+      errors.push(
+        `doc '${move.docId}' registry identity (topicId='${doc.topicId}', role='${doc.role}', currentPath='${doc.currentPath}') no longer matches the planned move (topicId='${move.topicId}', role='${move.role}', oldPath='${move.oldPath}') -- the registry changed since planning; re-run migration to re-plan`
+      );
     }
   }
 
@@ -91,7 +117,7 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
     });
   }
 
-  const conservationErrors = computeConservationErrors(repoRoot, plannedMoves);
+  const conservationErrors = computeConservationErrors(repoRoot, view, plannedMoves);
 
   if (dryRun) {
     return {
@@ -109,7 +135,13 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
     );
   }
 
-  // Apply mode
+  // Apply mode. Every plannedMoves entry was already preflighted above
+  // (source exists, target is free, the doc is registered with an identity
+  // matching the plan) -- the only way a step below can still fail is a
+  // genuine race with another writer, in which case this loop stops with
+  // whatever it already applied recorded correctly (never a file moved
+  // with no matching registry event: moveDocPathStore is the very next
+  // call after the file operation, before any other file touches disk).
   let appliedCount = 0;
   for (const move of plannedMoves) {
     const srcAbs = path.join(repoRoot, move.oldPath);
@@ -152,11 +184,21 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
     appliedCount++;
   }
 
-  // Generate projections
-  const fgosBin = path.resolve('bin/fgos.mjs');
-  try {
-    execSync(`node "${fgosBin}" doc-registry`, { cwd: repoRoot });
-  } catch {}
+  // Rebuild and write projections (design §13.5 rule 4: "apply ...
+  // rebuilds machine and human projections"). Called directly against the
+  // real repoRoot (never a bare relative path.resolve, which silently
+  // depended on the CALLER's own process.cwd() instead of the repo this
+  // migration is actually running against) and never swallowed -- a
+  // projection failure here means docs/doc-registry.* is now stale right
+  // after a real apply, which the contract requires and callers need to
+  // know about, not a quietly-ignored best-effort step.
+  const finalView = rebuild(fgosDir);
+  const { jsonContent, mdContent } = computeKnowledgeProjection(finalView);
+  const mdPath = path.join(repoRoot, 'docs/doc-registry.md');
+  const jsonPath = path.join(repoRoot, 'docs/doc-registry.json');
+  fs.mkdirSync(path.dirname(mdPath), { recursive: true });
+  fs.writeFileSync(mdPath, mdContent, 'utf8');
+  fs.writeFileSync(jsonPath, jsonContent, 'utf8');
 
   return {
     dryRun: false,

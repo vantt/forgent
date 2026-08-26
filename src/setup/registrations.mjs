@@ -2652,6 +2652,17 @@ function checkDocRoleUnderused(cwd) {
   return { passed: true, message: `${underused.length} roles used by single doc: ${underused.map(([r]) => r).join(', ')}` };
 }
 
+// src/report/knowledge-resolver.mjs's own `isLive` (resolveDocPath) treats a
+// doc as live when it is neither 'retired' nor 'superseded' -- a superseded
+// doc's slot has already moved to supersededBy, so its own currentPath/
+// aliases/sourceCaptureIds are frozen history, not something these doctor
+// checks should still hold to today's HEAD/reachability bar. Shared here so
+// the three checks below can't drift from the resolver's own definition the
+// way skipping only 'retired' did before.
+function isLiveDocLifecycle(docLifecycle) {
+  return docLifecycle !== 'retired' && docLifecycle !== 'superseded';
+}
+
 // docs/architect/knowledge-registry-redesign.md §14.6: "current path absent
 // at HEAD" -- a doc's own currentPath is the thing every other check
 // (resolver, migration, doc-alias-broken) treats as ground truth; if the
@@ -2665,7 +2676,7 @@ function checkDocCurrentPathMissing(cwd) {
   const view = rebuild(fgosDir);
   const missing = [];
   for (const doc of Object.values(view.docs || {})) {
-    if (doc.docLifecycle === 'retired') continue;
+    if (!isLiveDocLifecycle(doc.docLifecycle)) continue;
     try {
       execFileSync('git', ['cat-file', '-e', `HEAD:${doc.currentPath}`], { cwd: root, stdio: 'ignore' });
     } catch {
@@ -2694,7 +2705,7 @@ function checkDocSourceUnreachable(cwd) {
   const view = rebuild(fgosDir);
   const unreachable = [];
   for (const doc of Object.values(view.docs || {})) {
-    if (doc.docLifecycle === 'retired') continue;
+    if (!isLiveDocLifecycle(doc.docLifecycle)) continue;
     for (const captureId of doc.sourceCaptureIds || []) {
       if (!looksLikeDocPath(captureId)) continue;
       const isOwnPath = captureId === doc.currentPath || (doc.aliases || []).includes(captureId);
@@ -2740,7 +2751,7 @@ function checkDocSourceConservation(cwd) {
   if (unreachableOutcomeCount > 0) problems.push(`${unreachableOutcomeCount} outcome source capture(s) unresolvable`);
 
   for (const doc of Object.values(view.docs || {})) {
-    if (doc.docLifecycle !== 'retired' && (doc.sourceCaptureIds || []).length === 0) {
+    if (isLiveDocLifecycle(doc.docLifecycle) && (doc.sourceCaptureIds || []).length === 0) {
       problems.push(`${doc.docId}: target document has no source (empty sourceCaptureIds)`);
     }
   }
