@@ -57,7 +57,13 @@ function computeConservationErrors(repoRoot, view, inventory, plannedMoves) {
     if (!fs.existsSync(path.join(repoRoot, move.oldPath))) {
       errors.push(`missing source file: '${move.oldPath}' (planned move to '${move.newPath}') does not exist on disk`);
     }
-    if (fs.existsSync(path.join(repoRoot, move.newPath))) {
+    // A move whose oldPath already equals newPath (the "coincidentally
+    // already at target, but not clean enough to take the shortcut below"
+    // shape -- dead doc, or the file itself missing) is checking the SAME
+    // path against itself here; that is never a real overwrite collision,
+    // just the missing-source check above (or the dead-doc check below)
+    // already explaining the actual problem.
+    if (move.oldPath !== move.newPath && fs.existsSync(path.join(repoRoot, move.newPath))) {
       errors.push(`target '${move.newPath}' already exists on disk -- refusing to overwrite it`);
     }
 
@@ -72,6 +78,13 @@ function computeConservationErrors(repoRoot, view, inventory, plannedMoves) {
       errors.push(
         `doc '${move.docId}' registry identity (topicId='${doc.topicId}', role='${doc.role}', currentPath='${doc.currentPath}') no longer matches the planned move (topicId='${move.topicId}', role='${move.role}', oldPath='${move.oldPath}') -- the registry changed since planning; re-run migration to re-plan`
       );
+    } else if (doc.docLifecycle === 'retired' || doc.docLifecycle === 'superseded') {
+      // Same reasoning knowledge-bootstrap.mjs's own drift check uses: a
+      // doc the registry already retired/superseded is not live, so
+      // migrating its file (or accepting it as "already migrated" without
+      // ever checking this) is never correct -- the inventory row still
+      // treating it as a live source is drift this run must surface.
+      errors.push(`doc '${move.docId}' is '${doc.docLifecycle}' (not live) -- refusing to migrate a dead doc's file`);
     }
   }
 
@@ -110,18 +123,23 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
     const existingDoc = view.docs?.[docId];
     const sourcePath = existingDoc ? existingDoc.currentPath : item.oldPath;
 
-    if (existingDoc && sourcePath === targetPath) {
-      // Genuinely already migrated: the doc IS registered AND its real
-      // (registry) currentPath already equals the computed target --
-      // nothing to plan, not a conservation gap. Requiring `existingDoc`
-      // here (not just the path comparison) matters: when the doc isn't
-      // registered at all, `sourcePath` falls back to `item.oldPath`, and
-      // an inventory row whose oldPath happens to already equal the
-      // computed targetPath would otherwise be silently counted as
-      // "already migrated" and skipped entirely -- never checked for
-      // registry membership at all, unlike every other unregistered row
-      // (which reaches computeConservationErrors's own membership check
-      // via plannedMoves below).
+    // Genuinely already migrated requires THREE things, not just the path
+    // comparison: the doc must actually be registered (requiring
+    // `existingDoc`, not just `sourcePath === targetPath`, matters because
+    // an unregistered row's `sourcePath` falls back to `item.oldPath`,
+    // which can coincidentally already equal targetPath); the doc must
+    // still be LIVE (a retired/superseded doc "already at its target" is
+    // drift, not success -- same reasoning knowledge-bootstrap.mjs's own
+    // drift check uses); and the file must actually be reachable on disk
+    // (design §13.5 rule 5, "verifies source reachability" -- a registry
+    // that claims a path with no real file behind it is corruption this
+    // run must surface, not silently accept). Any row that fails one of
+    // these falls through to plannedMoves below, where
+    // computeConservationErrors' own missing-source-file and dead-doc
+    // checks explain exactly which one.
+    const isLive = existingDoc && existingDoc.docLifecycle !== 'retired' && existingDoc.docLifecycle !== 'superseded';
+    const targetFileReachable = existingDoc && fs.existsSync(path.join(repoRoot, targetPath));
+    if (existingDoc && sourcePath === targetPath && isLive && targetFileReachable) {
       alreadyMigratedCount++;
       continue;
     }
