@@ -705,8 +705,10 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
       // real tool calls, live-confirmed to intermittently fool a one-shot
       // "sawWorking" gate into exiting mid-turn (~25% of live runs before
       // this debounce -- see docs/history/agy-herdr-false-idle-polling-race/
-      // RESEARCH.md Round 3). Require the SAME terminal reading (idle or
-      // done) on three consecutive 500ms polls before trusting it -- a
+      // RESEARCH.md Round 3). Require three consecutive 500ms polls that
+      // are each terminal (idle or done, not necessarily the same one of
+      // the two -- consecutiveTerminalPolls counts any idle/done reading,
+      // per the asymmetry below) before trusting it -- a
       // genuine finish stays idle/done for many poll cycles, while a
       // mid-turn gap flips back to "working" within one or two cycles
       // almost every time (two consecutive polls closed most of the gap
