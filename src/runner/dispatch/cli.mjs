@@ -11,6 +11,7 @@
 // below unchanged as a barrel. See `docs/history/dispatch-activation-and-
 // handoff-redesign/CONTEXT.md` D7 for the split rationale.
 
+import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -778,6 +779,25 @@ export async function fanoutBatchExecutorCli(
 }
 
 /**
+ * Guard against --repo-root being passed without --cwd when process.cwd() resolves
+ * to a different main-checkout root (or is not a main checkout at all, e.g. a worktree).
+ * (tsk-322 / D-ADR0030)
+ */
+export function guardCwdRepoRootDivergence(cwd, repoRoot) {
+  if (repoRoot && !cwd) {
+    const mainRoot = resolveMainCheckoutRoot(process.cwd());
+    const resolvedMain = mainRoot ? path.resolve(mainRoot) : null;
+    const resolvedRepo = path.resolve(repoRoot);
+    if (!resolvedMain || resolvedMain !== resolvedRepo) {
+      const displayMain = mainRoot ? `"${mainRoot}"` : 'not a main checkout';
+      throw new RunnerConfigError(
+        `--repo-root ("${repoRoot}") passed without --cwd, but process.cwd() main checkout root resolved to ${displayMain} — pass --cwd explicitly.`,
+      );
+    }
+  }
+}
+
+/**
  * CLI entry point body (D7 module split): was an inline `if
  * (import.meta.url === ...)` script guard directly in `dispatch.mjs`
  * before this split — now a named export so the barrel `dispatch.mjs`
@@ -823,6 +843,16 @@ export function runDispatchCli() {
           break;
         }
       }
+      try {
+        guardCwdRepoRootDivergence(flagValue('--cwd') ?? flagValue('--dir'), flagValue('--repo-root'));
+      } catch (err) {
+        process.stdout.write(
+          `${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`,
+        );
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+        break;
+      }
       executeExecutorCli(executorId, {
         prompt,
         model: flagValue('--model'),
@@ -854,8 +884,16 @@ export function runDispatchCli() {
       break;
     }
     case 'decide': {
+      try {
+        guardCwdRepoRootDivergence(flagValue('--cwd') ?? flagValue('--dir'), flagValue('--repo-root'));
+      } catch (err) {
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+        break;
+      }
       decideExecutorCli(executorId, {
         cwd: flagValue('--cwd') ?? flagValue('--dir'),
+        repoRoot: flagValue('--repo-root'),
         hasLiveTaskAccess: rest.includes('--has-live-task-access'),
         for: flagValue('--for'),
         work: flagValue('--work'),

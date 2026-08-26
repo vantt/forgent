@@ -2488,6 +2488,90 @@ test('the "execute" CLI entry point tees the spawned executor\'s own stdout/stde
   assert.equal(parsed.status, 0);
 });
 
+// --- tsk-322: guard helper for --repo-root without --cwd when process.cwd() diverges ---
+
+test('dispatch CLI: --repo-root alone with process.cwd() resolving to a DIFFERENT main checkout refuses with a clear error, no worker spawned', () => {
+  const repo1 = mkTempGitRepo();
+  const repo2 = mkTempGitRepo();
+  const scriptPath = writeEchoExecutor(repo2.repoRoot);
+  writeRunnerConfigFixture(repo2.repoRoot, {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'probe', '--repo-root', repo2.repoRoot],
+    { encoding: 'utf8', cwd: repo1.repoRoot },
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /--repo-root/);
+  assert.match(result.stderr, /pass --cwd explicitly/);
+});
+
+test('dispatch CLI: --repo-root alone with process.cwd() resolving to the SAME path unchanged, worker spawns normally', () => {
+  const { repoRoot } = mkTempGitRepo();
+  const scriptPath = writeEchoExecutor(repoRoot);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'probe', '--prompt', 'hello', '--repo-root', repoRoot],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout.trim());
+  assert.equal(parsed.status, 0);
+});
+
+test('dispatch CLI: both --cwd and --repo-root given unchanged, no guard fires', () => {
+  const repo1 = mkTempGitRepo();
+  const repo2 = mkTempGitRepo();
+  const scriptPath = writeEchoExecutor(repo2.repoRoot);
+  writeRunnerConfigFixture(repo2.repoRoot, {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'probe', '--prompt', 'hello', '--cwd', repo2.repoRoot, '--repo-root', repo2.repoRoot],
+    { encoding: 'utf8', cwd: repo1.repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout.trim());
+  assert.equal(parsed.status, 0);
+});
+
+test('dispatch CLI: neither given unchanged, existing default-process.cwd() behavior untouched', () => {
+  const { repoRoot } = mkTempGitRepo();
+  const scriptPath = writeEchoExecutor(repoRoot);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'probe', '--prompt', 'hello'],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout.trim());
+  assert.equal(parsed.status, 0);
+});
+
 // --- spawnWorker: fake executor, tier->model, cwd, timeout, spawn-fail --
 
 test('spawnWorker resolves tier -> model, runs in cwd, and passes the prompt via argv', async () => {
