@@ -633,6 +633,7 @@ function applyEvent(view, event) {
     case 'doc.register':
     case 'doc.mark-rendered':
     case 'doc.promote':
+    case 'doc.demote':
     case 'doc.supersede':
     case 'doc.retire':
     case 'doc.path-move':

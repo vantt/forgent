@@ -63,3 +63,59 @@ test('knowledge-bootstrap - idempotency and invariant check', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledge-bootstrap - refuses (does not silently skip) a topic whose purposeSlug drifted from the registry', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  try {
+    const dataPath = path.join(tmpDir, 'inventory.json');
+    const first = [
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1-original', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(first), 'utf8');
+    bootstrapRegistry(tmpDir, dataPath);
+
+    // A later classifier run renamed t1's purpose without a real
+    // "fgos topic rename" ever happening in the registry.
+    const drifted = [
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1-renamed', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(drifted), 'utf8');
+
+    assert.throws(() => {
+      bootstrapRegistry(tmpDir, dataPath);
+    }, /topic 't1' already exists with purposeSlug 't1-original', but the inventory row wants 't1-renamed'/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.topics.t1.purposeSlug, 't1-original', 'a refused bootstrap must not have mutated the topic');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-bootstrap - refuses (does not silently skip) a doc whose currentPath drifted from the registry', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  try {
+    const dataPath = path.join(tmpDir, 'inventory.json');
+    const first = [
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(first), 'utf8');
+    bootstrapRegistry(tmpDir, dataPath);
+
+    // The doc's real path moved (e.g. a manual "fgos doc move-path") but
+    // the classifier's inventory still names the old path.
+    const drifted = [
+      { oldPath: 'docs/how-to/moved.md', topicId: 't1', purposeSlug: 't1', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(drifted), 'utf8');
+
+    assert.throws(() => {
+      bootstrapRegistry(tmpDir, dataPath);
+    }, /doc 't1:guide' already exists with currentPath 'docs\/how-to\/one\.md', but the inventory row wants 'docs\/how-to\/moved\.md'/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs['t1:guide'].currentPath, 'docs/how-to/one.md', 'a refused bootstrap must not have mutated the doc');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

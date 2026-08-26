@@ -79,3 +79,122 @@ test('knowledge-migration - apply moves file and updates store currentPath and a
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledge-migration - apply demotes an active doc to provisional (design §13.5 rule 6)', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/how-to/reclaim.md', docLifecycle: 'active' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Reclaim\n', 'utf8');
+    execSync('git add docs/how-to/reclaim.md && git commit -m "add reclaim"', { cwd: tmpDir, stdio: 'ignore' });
+
+    runKnowledgeMigration(tmpDir, { dryRun: false });
+
+    const view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide'].docLifecycle, 'provisional');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-migration - apply is idempotent: a second run finds nothing left to plan, no throw', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/how-to/reclaim.md', docLifecycle: 'active' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Reclaim\n', 'utf8');
+    execSync('git add docs/how-to/reclaim.md && git commit -m "add reclaim"', { cwd: tmpDir, stdio: 'ignore' });
+
+    const first = runKnowledgeMigration(tmpDir, { dryRun: false });
+    assert.equal(first.appliedCount, 1);
+
+    // The inventory file on disk is UNCHANGED (still names the old oldPath)
+    // -- a second run must resolve the doc's REAL current path from the
+    // registry, see it already equals the target, and plan/apply nothing.
+    const second = runKnowledgeMigration(tmpDir, { dryRun: false });
+    assert.equal(second.appliedCount, 0);
+    assert.equal(second.totalPlanned, 0);
+    assert.equal(second.alreadyMigratedCount, 1);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-migration - apply fails closed (throws, applies nothing) when a planned source file is missing from disk', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/how-to/reclaim.md', docLifecycle: 'active' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    // Deliberately never create docs/how-to/reclaim.md on disk.
+
+    assert.throws(() => {
+      runKnowledgeMigration(tmpDir, { dryRun: false });
+    }, /missing source file: 'docs\/how-to\/reclaim\.md'/);
+
+    const view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide'].currentPath, 'docs/how-to/reclaim.md', 'a refused apply must not have moved anything');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-migration - dry-run reports conservation errors for duplicate source and duplicate target, apply refuses them', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'shared' });
+    registerTopicStore(fgosDir, { topicId: 't2', purposeSlug: 'shared' });
+    registerTopicStore(fgosDir, { topicId: 't3', purposeSlug: 'dup-source' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [
+      // t1:guide and t2:guide both share purposeSlug 'shared' + role 'guide'
+      // -- they compute the SAME target, an un-folded duplicate target.
+      { topicId: 't1', role: 'guide', oldPath: 'docs/a/guide.md', mode: 'how-to' },
+      { topicId: 't2', role: 'guide', oldPath: 'docs/b/guide.md', mode: 'how-to' },
+      // t3:guide and t3:pitfall both claim the SAME source file -- a
+      // duplicate source assignment.
+      { topicId: 't3', role: 'guide', oldPath: 'docs/c/shared-source.md', mode: 'how-to' },
+      { topicId: 't3', role: 'pitfall', oldPath: 'docs/c/shared-source.md', mode: 'reference' },
+    ];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    for (const p of ['docs/a/guide.md', 'docs/b/guide.md', 'docs/c/shared-source.md']) {
+      const abs = path.join(tmpDir, p);
+      fs.mkdirSync(path.dirname(abs), { recursive: true });
+      fs.writeFileSync(abs, `# ${p}\n`, 'utf8');
+    }
+
+    const dry = runKnowledgeMigration(tmpDir, { dryRun: true });
+    assert.equal(dry.conservationErrors.some((e) => e.includes('duplicate source assignment')), true);
+    assert.equal(dry.conservationErrors.some((e) => e.includes('has 2 sources')), true);
+
+    assert.throws(() => {
+      runKnowledgeMigration(tmpDir, { dryRun: false });
+    }, /conservation violation/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

@@ -28,12 +28,14 @@ test('knowledge-doctor - computeKnowledgeProjection generates expected structure
   assert.ok(mdContent.includes('docs/test/old-guide.md'));
 });
 
-test('knowledge-doctor - doctor registry includes 8 new checks', () => {
+test('knowledge-doctor - doctor registry includes all 10 design-required checks (§14.6)', () => {
   const checkIds = DOCTOR_CHECKS.map(c => c.id);
   const expectedNewChecks = [
     'doc-registry-stale',
     'doc-alias-broken',
     'doc-active-duplicate',
+    'doc-current-path-missing',
+    'doc-source-unreachable',
     'doc-near-duplicate',
     'doc-provisional-aged',
     'doc-topic-oversized',
@@ -68,6 +70,130 @@ test('knowledge-doctor - doc-registry-stale check passes when up to date', () =>
     // Check again -> passes
     const res2 = checkObj.check(tmpDir);
     assert.equal(res2.passed, true);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+function setupGitRepoWithStore() {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doctor-git-test-'));
+  execSync('git init', { cwd: tmpDir, stdio: 'ignore' });
+  execSync('git config user.name "Test"', { cwd: tmpDir, stdio: 'ignore' });
+  execSync('git config user.email "test@example.com"', { cwd: tmpDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Test\n', 'utf8');
+  execSync('git add README.md && git commit -m "initial commit"', { cwd: tmpDir, stdio: 'ignore' });
+  const fgosDir = path.join(tmpDir, '.fgos');
+  initStore(fgosDir);
+  return { tmpDir, fgosDir };
+}
+
+test('knowledge-doctor - doc-current-path-missing fails when a live doc\'s currentPath is not committed at HEAD', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docLifecycle: 'active' });
+
+    const checkObj = DOCTOR_CHECKS.find(c => c.id === 'doc-current-path-missing');
+    const res1 = checkObj.check(tmpDir);
+    assert.equal(res1.passed, false);
+    assert.ok(res1.message.includes('t1:guide'));
+
+    const docFile = path.join(tmpDir, 'docs/test/guide.md');
+    fs.mkdirSync(path.dirname(docFile), { recursive: true });
+    fs.writeFileSync(docFile, '# Guide\n', 'utf8');
+    execSync('git add docs/test/guide.md && git commit -m "add guide"', { cwd: tmpDir, stdio: 'ignore' });
+
+    const res2 = checkObj.check(tmpDir);
+    assert.equal(res2.passed, true);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-doctor - doc-source-unreachable fails when a path-shaped sourceCaptureIds entry resolves nowhere', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
+    registerDocStore(fgosDir, {
+      docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docLifecycle: 'active',
+      sourceCaptureIds: ['docs/test/guide.md', 'docs/gone/nowhere.md'],
+    });
+
+    const checkObj = DOCTOR_CHECKS.find(c => c.id === 'doc-source-unreachable');
+    const res = checkObj.check(tmpDir);
+    assert.equal(res.passed, false);
+    assert.ok(res.message.includes('docs/gone/nowhere.md'));
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-doctor - doc-source-unreachable passes when every path-shaped source is the doc\'s own current or alias path', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
+    registerDocStore(fgosDir, {
+      docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docLifecycle: 'active',
+      sourceCaptureIds: ['docs/test/guide.md'], aliases: ['docs/test/guide-old.md'],
+    });
+
+    const checkObj = DOCTOR_CHECKS.find(c => c.id === 'doc-source-unreachable');
+    assert.equal(checkObj.check(tmpDir).passed, true);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-doctor - doc-source-conservation flags a target doc with no source (empty sourceCaptureIds)', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docLifecycle: 'active', sourceCaptureIds: [] });
+
+    const checkObj = DOCTOR_CHECKS.find(c => c.id === 'doc-source-conservation');
+    const res = checkObj.check(tmpDir);
+    assert.equal(res.passed, false);
+    assert.ok(res.message.includes('target document has no source'));
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-doctor - doc-source-conservation flags a duplicate migration-inventory source and a lost one', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docLifecycle: 'active', sourceCaptureIds: ['docs/test/guide.md'] });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventory = [
+      // duplicate: same oldPath claimed by two rows
+      { topicId: 't1', role: 'guide', oldPath: 'docs/dup.md' },
+      { topicId: 't2', role: 'guide', oldPath: 'docs/dup.md' },
+      // lost: neither on disk nor reachable through the registry
+      { topicId: 't3', role: 'guide', oldPath: 'docs/lost.md' },
+    ];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventory), 'utf8');
+
+    const checkObj = DOCTOR_CHECKS.find(c => c.id === 'doc-source-conservation');
+    const res = checkObj.check(tmpDir);
+    assert.equal(res.passed, false);
+    assert.ok(res.message.includes("inventory source 'docs/dup.md' appears 2 times"));
+    assert.ok(res.message.includes('docs/lost.md'));
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-doctor - doc-source-conservation passes for a clean registry with no inventory file', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docLifecycle: 'active', sourceCaptureIds: ['docs/test/guide.md'] });
+
+    const checkObj = DOCTOR_CHECKS.find(c => c.id === 'doc-source-conservation');
+    assert.equal(checkObj.check(tmpDir).passed, true);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

@@ -2058,6 +2058,10 @@ export function promoteDocStore(dir, { docId, topicId, role }) {
   return appendKnowledgeEvent(dir, 'doc.promote', { docId, topicId, role });
 }
 
+export function demoteDocStore(dir, { docId, topicId, role }) {
+  return appendKnowledgeEvent(dir, 'doc.demote', { docId, topicId, role });
+}
+
 export function supersedeDocStore(dir, { docId, topicId, role, supersededBy }) {
   return appendKnowledgeEvent(dir, 'doc.supersede', { docId, topicId, role, supersededBy });
 }

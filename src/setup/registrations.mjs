@@ -2652,27 +2652,134 @@ function checkDocRoleUnderused(cwd) {
   return { passed: true, message: `${underused.length} roles used by single doc: ${underused.map(([r]) => r).join(', ')}` };
 }
 
+// docs/architect/knowledge-registry-redesign.md §14.6: "current path absent
+// at HEAD" -- a doc's own currentPath is the thing every other check
+// (resolver, migration, doc-alias-broken) treats as ground truth; if the
+// file isn't actually committed there, every one of those checks is
+// silently trusting a path that doesn't exist.
+function checkDocCurrentPathMissing(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  if (!fs.existsSync(path.join(root, '.git'))) return { passed: true, message: 'skipped (not a git checkout)' };
+  const view = rebuild(fgosDir);
+  const missing = [];
+  for (const doc of Object.values(view.docs || {})) {
+    if (doc.docLifecycle === 'retired') continue;
+    try {
+      execFileSync('git', ['cat-file', '-e', `HEAD:${doc.currentPath}`], { cwd: root, stdio: 'ignore' });
+    } catch {
+      missing.push(`${doc.docId} (${doc.currentPath})`);
+    }
+  }
+  if (missing.length === 0) return { passed: true, message: 'every live doc currentPath exists at HEAD' };
+  return { passed: false, message: `${missing.length} doc(s) with currentPath absent at HEAD: ${missing.join(', ')}` };
+}
+
+// docs/architect/knowledge-registry-redesign.md §14.6: "source capture
+// linkage cannot be reached through current or alias paths." Only checks
+// sourceCaptureIds entries that are themselves a repo-relative doc path
+// (the shape scripts/knowledge-bootstrap.mjs seeds -- the doc's own
+// original oldPath, recorded as its first "capture") -- a captureId that
+// is a work-item id (via `doc.attest`) is not a path and has nothing to
+// resolve here.
+function looksLikeDocPath(value) {
+  return typeof value === 'string' && value.startsWith('docs/') && value.endsWith('.md');
+}
+
+function checkDocSourceUnreachable(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
+  const view = rebuild(fgosDir);
+  const unreachable = [];
+  for (const doc of Object.values(view.docs || {})) {
+    if (doc.docLifecycle === 'retired') continue;
+    for (const captureId of doc.sourceCaptureIds || []) {
+      if (!looksLikeDocPath(captureId)) continue;
+      const isOwnPath = captureId === doc.currentPath || (doc.aliases || []).includes(captureId);
+      if (isOwnPath) continue;
+      const resolved = resolveDocPath(view, captureId);
+      const resolvesToSameDoc = resolved && !Array.isArray(resolved) && resolved.docId === doc.docId;
+      if (!resolvesToSameDoc) {
+        unreachable.push(`${doc.docId}: source '${captureId}' not reachable through its own current or alias paths`);
+      }
+    }
+  }
+  if (unreachable.length === 0) return { passed: true, message: 'every path-shaped source capture is reachable' };
+  return { passed: false, message: `${unreachable.length} unreachable source capture(s): ${unreachable.join('; ')}` };
+}
+
+// docs/architect/knowledge-registry-redesign.md §13.4/§14.6: "migration
+// inventory or apply loses a source." Four real conservation properties,
+// not just the original outcome-reachability check:
+//   1. every source captures reachable (pre-existing: view.outcomes[].docPath
+//      resolves through the live registry);
+//   2. every migration-inventory source appears exactly once (a classifier
+//      bug assigning the same file to two rows, same shape
+//      scripts/knowledge-migration.mjs's own conservation check refuses at
+//      apply time -- this check catches it even when migration never runs);
+//   3. every live (non-retired) doc has at least one sourceCaptureIds entry
+//      -- a "target document with no source" (§13.4);
+//   4. every migration-inventory source is still traceable -- either still
+//      on disk at its original oldPath (not migrated yet), or reachable
+//      through the live registry (properly migrated with an alias) -- never
+//      neither, which would mean a source was physically lost mid-migration.
 function checkDocSourceConservation(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
   const fgosDir = path.join(root, '.fgos');
   if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
   const view = rebuild(fgosDir);
+  const problems = [];
+
   const outcomes = view.outcomes || {};
-  let missingCount = 0;
+  let unreachableOutcomeCount = 0;
   for (const outcome of Object.values(outcomes)) {
-    if (outcome.docPath) {
-      const resolved = resolveDocPath(view, outcome.docPath);
-      if (!resolved) missingCount++;
+    if (outcome.docPath && !resolveDocPath(view, outcome.docPath)) unreachableOutcomeCount++;
+  }
+  if (unreachableOutcomeCount > 0) problems.push(`${unreachableOutcomeCount} outcome source capture(s) unresolvable`);
+
+  for (const doc of Object.values(view.docs || {})) {
+    if (doc.docLifecycle !== 'retired' && (doc.sourceCaptureIds || []).length === 0) {
+      problems.push(`${doc.docId}: target document has no source (empty sourceCaptureIds)`);
     }
   }
-  if (missingCount === 0) return { passed: true, message: 'all source captures reachable' };
-  return { passed: false, message: `${missingCount} source captures unresolvable` };
+
+  const inventoryPath = path.join(root, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json');
+  if (fs.existsSync(inventoryPath)) {
+    let inventory = [];
+    try {
+      inventory = JSON.parse(fs.readFileSync(inventoryPath, 'utf8'));
+    } catch {
+      inventory = [];
+    }
+    const sourceCounts = new Map();
+    for (const row of inventory) {
+      if (typeof row.oldPath !== 'string') continue;
+      sourceCounts.set(row.oldPath, (sourceCounts.get(row.oldPath) ?? 0) + 1);
+    }
+    for (const [oldPath, count] of sourceCounts) {
+      if (count > 1) problems.push(`inventory source '${oldPath}' appears ${count} times, not exactly once`);
+    }
+    const lost = [];
+    for (const oldPath of sourceCounts.keys()) {
+      if (fs.existsSync(path.join(root, oldPath))) continue; // not migrated yet -- still where the inventory says
+      if (resolveDocPath(view, oldPath)) continue; // migrated, still traceable via alias/currentPath
+      lost.push(oldPath);
+    }
+    if (lost.length > 0) problems.push(`${lost.length} inventory source(s) lost (neither on disk nor reachable through the registry): ${lost.join(', ')}`);
+  }
+
+  if (problems.length === 0) return { passed: true, message: 'source conservation holds' };
+  return { passed: false, message: problems.join('; ') };
 }
 
 registerCheck({ id: 'doc-registry-stale', description: 'docs/doc-registry.md and doc-registry.json up to date', check: checkDocRegistryStale });
 registerFix({ id: 'doc-registry-stale', fix: fixDocRegistryStale });
 registerCheck({ id: 'doc-alias-broken', description: 'doc aliases point to valid paths', check: checkDocAliasBroken });
 registerCheck({ id: 'doc-active-duplicate', description: 'no duplicate active docs for same topic and role', check: checkDocActiveDuplicate });
+registerCheck({ id: 'doc-current-path-missing', description: 'doc currentPath absent at HEAD', check: checkDocCurrentPathMissing });
+registerCheck({ id: 'doc-source-unreachable', description: 'source capture linkage reachable through current or alias paths', check: checkDocSourceUnreachable });
 registerCheck({ id: 'doc-near-duplicate', description: 'near-duplicate authoritative claims check', check: checkDocNearDuplicate });
 registerCheck({ id: 'doc-provisional-aged', description: 'provisional docs age check', check: checkDocProvisionalAged });
 registerCheck({ id: 'doc-topic-oversized', description: 'topic size check against ceiling', check: checkDocTopicOversized });

@@ -94,6 +94,8 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'doc-registry-stale',
       'doc-alias-broken',
       'doc-active-duplicate',
+      'doc-current-path-missing',
+      'doc-source-unreachable',
       'doc-near-duplicate',
       'doc-provisional-aged',
       'doc-topic-oversized',

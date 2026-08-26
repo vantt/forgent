@@ -14,6 +14,7 @@ import {
   registerTopicStore,
   registerDocStore,
   promoteDocStore,
+  demoteDocStore,
   reserveDocStore,
   splitTopicStore,
   mergeTopicStore,
@@ -684,6 +685,31 @@ test('doc.mark-rendered fails closed on a doc that is not reserved, instead of a
 
     const view = rebuild(tmpDir);
     assert.equal(view.docs.d1.docLifecycle, 'provisional', 'a refused mark-rendered must not have moved the state');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.demote moves an active doc back to provisional; refuses any other lifecycle', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+
+    demoteDocStore(tmpDir, { docId: 'd1' });
+    let view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'provisional');
+
+    assert.throws(() => {
+      demoteDocStore(tmpDir, { docId: 'd1' });
+    }, /doc\.demote: doc 'd1' is 'provisional', must be 'active'/);
+
+    registerTopicStore(tmpDir, { topicId: 't2', purposeSlug: 'topic-two' });
+    registerDocStore(tmpDir, { docId: 'd2', topicId: 't2', role: 'guide', currentPath: 'docs/t2/guide.md', docLifecycle: 'reserved' });
+    assert.throws(() => {
+      demoteDocStore(tmpDir, { docId: 'd2' });
+    }, /doc\.demote: doc 'd2' is 'reserved', must be 'active'/);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

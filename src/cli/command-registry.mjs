@@ -1138,7 +1138,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'doc',
     invoke: 'fgos doc <subcommand>',
-    description: 'Manage knowledge doc slots and lifecycles (reserve, register, mark-rendered, move-path, promote, supersede, retire).',
+    description: 'Manage knowledge doc slots and lifecycles (reserve, register, mark-rendered, move-path, promote, demote, supersede, retire).',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: [
       'fgos doc reserve worktree-reclaim guide docs/worktree-reclaim/guide.md',

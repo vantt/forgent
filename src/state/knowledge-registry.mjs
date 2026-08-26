@@ -540,6 +540,32 @@ export function applyKnowledgeEvent(view, event) {
       break;
     }
 
+    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration
+    // "leaves every migrated document provisional unless explicitly
+    // promoted" -- an active doc whose content moved out from under it
+    // needs re-verification before it counts as authoritative again, but
+    // nothing in the reducer could legitimately move active -> provisional
+    // before this event existed (doc.register's own lifecycle guard
+    // deliberately refuses that exact transition as a silent-demote
+    // vector). doc.demote is the explicit, auditable door for it -- the
+    // mirror image of doc.promote, never inferred from any other event.
+    case 'doc.demote': {
+      const { docId, topicId, role } = payload;
+      const id = resolveDocId(view, { docId, topicId, role });
+      const doc = view.docs[id];
+      if (!doc) {
+        throw new KnowledgeValidationError(`doc.demote: doc '${id}' not found`);
+      }
+      if (doc.docLifecycle !== 'active') {
+        throw new KnowledgeValidationError(
+          `doc.demote: doc '${id}' is '${doc.docLifecycle}', must be 'active'`
+        );
+      }
+      doc.docLifecycle = 'provisional';
+      doc.updatedAt = event.ts ?? Date.now();
+      break;
+    }
+
     case 'doc.supersede': {
       const { docId, topicId, role, supersededBy } = payload;
       const id = resolveDocId(view, { docId, topicId, role });

@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
@@ -1657,7 +1657,7 @@ async function runVerb(verb, flags, positional, dir) {
     case 'doc': {
       const sub = positional[0];
       if (!sub) {
-        throw new StoreError('validation', 'doc requires a subcommand (reserve, register, mark-rendered, move-path, promote, supersede, retire).');
+        throw new StoreError('validation', 'doc requires a subcommand (reserve, register, mark-rendered, move-path, promote, demote, supersede, retire).');
       }
       if (sub === 'reserve') {
         const topicId = requireField(positional[1] ?? flags['topic-id'], 'doc reserve requires topicId');
@@ -1770,6 +1770,10 @@ async function runVerb(verb, flags, positional, dir) {
         }
 
         return promoteDocStore(dir, { docId: targetDoc.docId, topicId: targetDoc.topicId, role: targetDoc.role });
+      } else if (sub === 'demote') {
+        const topicId = positional[1] ?? flags['topic-id'];
+        const role = positional[2] ?? flags.role;
+        return demoteDocStore(dir, { docId: flags['doc-id'], topicId, role });
       } else if (sub === 'supersede') {
         const topicId = positional[1] ?? flags['topic-id'];
         const role = positional[2] ?? flags.role;

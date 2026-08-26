@@ -155,6 +155,32 @@ test('knowledge-verbs - doc lifecycle and promote preconditions', async () => {
     view = rebuild(fgosDir);
     assert.equal(view.docs['t1:guide'].docLifecycle, 'active');
 
+    // doc demote is the mirror of promote (active -> provisional, e.g. for
+    // migration's "leaves every migrated document provisional" policy) --
+    // refuses a non-active doc, then succeeds and re-promote restores the
+    // active state the rest of this test expects below.
+    errOutput = '';
+    try {
+      execSync(`node "${fgosBin}" doc demote t1 guide`, { cwd: tmpDir, stdio: 'pipe' });
+    } catch (err) {
+      errOutput = 'unexpected-throw:' + err.stderr.toString();
+    }
+    assert.equal(errOutput, '', 'demote on an active doc must succeed');
+    view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide'].docLifecycle, 'provisional');
+
+    errOutput = '';
+    try {
+      execSync(`node "${fgosBin}" doc demote t1 guide`, { cwd: tmpDir, stdio: 'pipe' });
+    } catch (err) {
+      errOutput = err.stderr.toString();
+    }
+    assert.ok(errOutput.includes("is 'provisional', must be 'active'"), 'demote on a non-active doc must be refused');
+
+    execSync(`node "${fgosBin}" doc promote t1 guide`, { cwd: tmpDir });
+    view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide'].docLifecycle, 'active');
+
     // 3. Register second provisional doc for same (t1, guide) WHILE first is still
     // active -> MUST refuse immediately, at register time (not deferred to promote):
     // a second non-retired/non-superseded doc for the same (topicId, role) is the

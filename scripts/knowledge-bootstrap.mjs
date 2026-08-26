@@ -67,7 +67,8 @@ export function bootstrapRegistry(dir, inventoryDataPath) {
   let docsCreated = 0;
 
   for (const item of inventory) {
-    if (!view.topics || !view.topics[item.topicId]) {
+    const existingTopic = view.topics?.[item.topicId];
+    if (!existingTopic) {
       registerTopicStore(dir, {
         topicId: item.topicId,
         purposeSlug: item.purposeSlug,
@@ -76,10 +77,23 @@ export function bootstrapRegistry(dir, inventoryDataPath) {
       });
       view = rebuild(dir);
       topicsCreated++;
+    } else if (item.purposeSlug && existingTopic.purposeSlug !== item.purposeSlug) {
+      // A topic that already exists but disagrees with the classifier's
+      // current output on its own purposeSlug is real drift, not a no-op --
+      // silently skipping it would report "idempotent" while the registry
+      // and the classifier corpus have actually diverged. Bootstrap has no
+      // authority to decide which one is right (same reasoning as the
+      // duplicate-pairs refusal above); it fails loud and names both values
+      // so a person can reconcile with "fgos topic rename" or a corrected
+      // inventory row.
+      throw new Error(
+        `Bootstrap refused: topic '${item.topicId}' already exists with purposeSlug '${existingTopic.purposeSlug}', but the inventory row wants '${item.purposeSlug}' -- registry and classifier output have drifted. Reconcile with "fgos topic rename" or fix the inventory row before bootstrapping.`
+      );
     }
 
     const docId = `${item.topicId}:${item.role}`;
-    if (!view.docs || !view.docs[docId]) {
+    const existingDoc = view.docs?.[docId];
+    if (!existingDoc) {
       registerDocStore(dir, {
         docId,
         topicId: item.topicId,
@@ -93,6 +107,13 @@ export function bootstrapRegistry(dir, inventoryDataPath) {
       });
       view = rebuild(dir);
       docsCreated++;
+    } else if (existingDoc.currentPath !== item.oldPath) {
+      // Same reasoning as the topic drift check above, for the doc's own
+      // currentPath -- an existing doc whose path no longer matches the
+      // classifier's inventory is drift bootstrap must name, not skip past.
+      throw new Error(
+        `Bootstrap refused: doc '${docId}' already exists with currentPath '${existingDoc.currentPath}', but the inventory row wants '${item.oldPath}' -- registry and classifier output have drifted. Reconcile with "fgos doc move-path" or fix the inventory row before bootstrapping.`
+      );
     }
   }
 
