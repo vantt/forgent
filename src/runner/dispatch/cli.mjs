@@ -15,17 +15,18 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { DEFAULTS } from '../../state/work.mjs';
-import { DOMAINS, resolveDomainName, skillForStage, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
+import { DOMAINS, resolveDomainName, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
 import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
 import { listWork, resolveWriterLogPath } from '../../state/store.mjs';
 import { appendEvent } from '../../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier } from './resolve.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, EXECUTOR_ADAPTERS, DispatchError } from './transport.mjs';
 import { buildPrompt } from './prepare.mjs';
+import { compileDispatchPlan } from './plan.mjs';
 import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { hasWorkerSlotRoom } from '../../state/worker-slots.mjs';
 
@@ -47,37 +48,11 @@ import {
 } from '../main-checkout-lock.mjs';
 import { checkoutDirtyPaths } from '../worktree.mjs';
 
-
-/**
- * Executor identifier for a work item's executing-stage dispatch (D3,
- * tsk-62v): the skill name executing-stage resolves to for the item's
- * domain — the same `skillForStage`/`DOMAINS` formula `buildPrompt` already
- * applies internally to build its own `skillPath` (never recomputed a
- * different way, per D3). Kept as its own small function rather than
- * folded into `buildPrompt` itself so `buildPrompt`'s own pinned
- * "single console.warn on an unrecognized domain" behavior (str91 D6/D7)
- * stays untouched — this calls `resolveDomainName` its own time, same as
- * `selectTemplate` already being called a second time inside `spawnWorker`
- * below for template logging (P49's same "cheap, deterministic, no
- * duplicated LOGIC" precedent).
- *
- * Exported (tsk-5tm-6 D12(iii)): `decideExecutorCli`'s `--work <id>` path
- * below is the work-item-shaped lookup `fgos-fanout` needs to consult the
- * dispatch decision protocol before firing an Agent for a candidate,
- * instead of hardcoding native dispatch unconditionally.
- *
- * (tsk-in1-4 D12: re-confirmed at shaping time — a `executorIdForWork`
- * result MISSING from `cfg.executors` (keyed by executor name, not job
- * identity) is intentional, not a bug; `decideExecutorCli`'s own `--work`
- * branch below already documents the fallback this design implies.)
- *
- * `stage` defaults to `stage ?? work?.stage ?? 'executing'`.
- */
-export function executorIdForWork(work, stage) {
-  const domainObj = DOMAINS[resolveDomainName(work?.domain)];
-  const targetStage = stage ?? work?.stage ?? 'executing';
-  return skillForStage(domainObj, targetStage);
-}
+// executorIdForWork moved to resolve.mjs (self-review finding, 2026-08-25:
+// closes the plan.mjs<->cli.mjs import cycle) -- imported above alongside
+// this file's other resolve.mjs symbols; this module's own internal
+// callers below are unaffected, and dispatch.mjs's barrel now re-exports
+// it from resolve.mjs directly (no other file imports it from here).
 
 /**
  * Resolve persona/agentType for a given taskSpec header & list of registered agent-types (D20/D21/D22/D32).
@@ -214,7 +189,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // a command-less/adapter-less/invocation-less executor with no static
   // agentType of its own -- see resolveAgentTypeForWork's own doc comment.
   const resolvedAgentType = resolveAgentTypeForWork(work, cwd, opts.stage);
-  const { command, args, env, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
+  const { command, args, env, adapter, provider, baseCommit, headRef, governance } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -264,9 +239,10 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     model,
   }).then(
     // executorId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl)/command
-    // (tsk-33w D9): additive only — every field this function already
-    // returned stays exactly where it was.
-    (result) => ({ ...result, templateName, templateHash, executorId, provider, command, baseCommit, headRef }),
+    // (tsk-33w D9)/governance (self-review finding, 2026-08-25): additive
+    // only — every field this function already returned stays exactly
+    // where it was.
+    (result) => ({ ...result, templateName, templateHash, executorId, provider, command, baseCommit, headRef, governance }),
     (err) => {
       if (err instanceof DispatchError) {
         err.templateName = templateName;
@@ -295,10 +271,11 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
  * `src/state/events.mjs`) — no extra locking needed here even when
  * multiple gather branches log concurrently.
  */
-export function logExecutorDispatch(fgosDir, { id, executorId, provider, command, model }) {
+export function logExecutorDispatch(fgosDir, { id, executorId, provider, command, model, governance, plan }) {
+  const gov = governance ?? plan?.governance ?? null;
   return appendEvent(resolveWriterLogPath(fgosDir), {
     type: 'executor.dispatch',
-    payload: { id, executorId, provider, command, model, baseCommit: null, headRef: null },
+    payload: { id, executorId, provider, command, model, baseCommit: null, headRef: null, governance: gov },
   });
 }
 
@@ -627,106 +604,44 @@ export async function executeExecutorCli(
  */
 export async function decideExecutorCli(
   executorIdArg,
-  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg, stage: stageArg, needsSoul = false } = {},
+  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg, stage: stageArg, needsSoul = false, caller } = {},
 ) {
   if (!executorIdArg && !purpose && !workIdArg && !needsSoul) {
     throw new RunnerConfigError(
       'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
     );
   }
-  // Same main-checkout resolution as executeExecutorCli above, same reason.
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const cfg = ensureRunnerConfigForDir(root);
-  // Indirect binding (purpose OR work-item) each report executorId back
-  // additively (see below) -- same byte-identical-shape reasoning
-  // `executeExecutorCli` above already uses, generalized past purpose-only.
-  const resolvedIndirectly = !executorIdArg;
-  let executorId = executorIdArg;
-  let workResolved;
-  let workResolvedInputId;
-  if (!executorId && workIdArg) {
+
+  let workItem;
+  if (!executorIdArg && workIdArg) {
     const fgosDir = fgosDirFromRoot(root);
-    const workItem = listWork(fgosDir).work[workIdArg];
+    workItem = listWork(fgosDir).work[workIdArg];
     if (!workItem) {
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
-    executorId = executorIdForWork(workItem, stageArg);
-    workResolvedInputId = executorId;
-    workResolved = resolveExecutorAndOverrides(cfg, executorId);
-    // tsk-5tm-6 D4: a work-item-resolved executorId with NO explicit
-    // cfg.executors entry means "no override configured" -- per
-    // Native-First Dispatch Doctrine (docs/decisions/0026) rule 2, every
-    // fgos-fanout candidate is a same-provider (Claude), soul-needing
-    // target (a full rootTask run through /fgOS:pick) and therefore
-    // defaults to native, NOT to decideExecutorDispatchMechanism's generic
-    // "no registered executor -> out-of-process" fallback below (correct
-    // only for a NAMED executor helper that may genuinely have no native
-    // equivalent, e.g. agy -- confirmed live: `resolve fgos-coding-implement`
-    // silently falls back to the bare global executor, the exact "blind
-    // cli/spawn even though the caller is already a live same-provider
-    // soul" bug 0026 itself names as the motivating gap). Deliberately
-    // narrower than the name/purpose-resolved paths below -- both keep
-    // their pre-D4 "no executor -> out-of-process" behavior byte-identical,
-    // since naming a specific executorId/purpose asks about that
-    // registered target specifically, not a work item's default dispatch.
-    const hasExplicitExecutor = workResolved.configured;
-    if (!hasExplicitExecutor) {
-      const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
-      return { mechanism, executorId, configured: false };
-    }
-  }
-  // Purpose-based binding, same precedence as executeExecutorCli above. No
-  // match is a legitimate "not configured yet" state for `decide`
-  // specifically -- `mechanism: "unavailable"` lets a caller like
-  // gather's own fan-out branch tell "fall back to native" apart from
-  // "in-process"/"out-of-process" with one more enum value, never a thrown
-  // error for an expected, common state.
-  if (!executorId && purpose) {
-    executorId = resolveExecutorIdForPurpose(cfg, purpose);
-  }
-  if (!executorId) {
-    // needsSoul (D2): an empty resolution defaults to native dispatch
-    // instead of "unavailable" -- same default `work`'s own
-    // hasExplicitExecutor branch above already hardcodes, generalized to
-    // every door.
-    if (needsSoul) {
-      const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
-      return { mechanism, configured: false };
-    }
-    return { mechanism: 'unavailable', configured: false };
-  }
-  const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
-  const { executor, configured } = workResolved && workResolvedInputId === executorId
-    ? workResolved
-    : resolveExecutorAndOverrides(cfg, executorId);
-  const agentType = executor?.agentType;
-
-  // tsk-45f D10: MCP hand-back -- a tool-kind executor with an mcp
-  // invocation and a matching entry in that invocation's own `tools` map
-  // (piece 3) hands back `mcpTool` the same way an agent-kind executor
-  // hands back `agentType`: dispatch has neither an Agent/Task tool nor an
-  // MCP client of its own (AGENTS.md's own Dispatch section, D12), so the
-  // caller calls its OWN MCP tool directly. Only overrides `mechanism` when
-  // it would otherwise be `out-of-process` -- an agent-kind executor's own
-  // `agentType` hand-back always wins, unchanged. The purpose used to look
-  // up the map is the explicit `--for` value when given, else the
-  // executor's own sole `for` entry when it names exactly one (a direct
-  // `decide <executorId>` call has no purpose of its own to disambiguate
-  // among several).
-  let mcpTool;
-  if (mechanism === 'out-of-process') {
-    const mcpInvocation = Array.isArray(executor?.invocations) ? executor.invocations.find((inv) => inv.via === 'mcp') : undefined;
-    const lookupPurpose = purpose ?? (Array.isArray(executor?.for) && executor.for.length === 1 ? executor.for[0] : undefined);
-    const candidate = lookupPurpose && mcpInvocation?.tools ? mcpInvocation.tools[lookupPurpose] : undefined;
-    if (typeof candidate === 'string' && candidate) mcpTool = candidate;
   }
 
-  const base = mcpTool
-    ? { mechanism: 'in-process', mcpTool, configured }
-    : typeof agentType === 'string' && agentType
-      ? { mechanism, agentType, configured }
-      : { mechanism, configured };
-  return resolvedIndirectly ? { ...base, executorId } : base;
+  const plan = compileDispatchPlan(cfg, {
+    executorId: executorIdArg,
+    for: purpose,
+    work: workIdArg,
+    stage: stageArg,
+    needsSoul,
+    hasLiveTaskAccess,
+    caller,
+    workItem,
+  });
+
+  const resolvedIndirectly = !executorIdArg;
+  const base = plan.mcpTool
+    ? { mechanism: 'in-process', mcpTool: plan.mcpTool, configured: plan.configured }
+    : typeof plan.agentType === 'string' && plan.agentType
+      ? { mechanism: plan.mechanism, agentType: plan.agentType, configured: plan.configured }
+      : { mechanism: plan.mechanism, configured: plan.configured };
+
+  return resolvedIndirectly && plan.executorId ? { ...base, executorId: plan.executorId } : base;
 }
 
 /**

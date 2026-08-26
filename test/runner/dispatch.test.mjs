@@ -22,6 +22,7 @@ import {
   decideDispatchMechanism,
   decideExecutorDispatchMechanism,
   decideExecutorCli,
+  compileDispatchPlan,
   fanoutBatchExecutorCli,
   spawnWorker,
   RunnerConfigError,
@@ -1034,8 +1035,8 @@ test('loadRunnerConfig rejects a "executors.<id>" entry whose allowCrossProvider
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
-test('EXECUTOR_ADAPTERS registers exactly two adapters (D13, tsk-in1-5): cli-spawn (default) and http (the D13 pluggability precedent) — the RPC/app-server adapter stays deferred per D a4fe4c2b', () => {
-  assert.deepEqual(Object.keys(EXECUTOR_ADAPTERS), ['cli-spawn', 'http']);
+test('EXECUTOR_ADAPTERS registers adapters: cli-spawn (default), http, and herdr-spawn', () => {
+  assert.deepEqual(Object.keys(EXECUTOR_ADAPTERS), ['cli-spawn', 'http', 'herdr-spawn']);
   assert.equal(DEFAULT_ADAPTER, 'cli-spawn');
 });
 
@@ -2321,8 +2322,21 @@ test('decideExecutorCli never hands back mcpTool when the requested purpose has 
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
+  // gitnexus declares ONLY an mcp invocation, no via:"cli" one at all --
+  // once mcp-handback doesn't match (purpose "other" has no tools[] entry,
+  // which is what this test pins), there is genuinely no way to dispatch
+  // this executorId for this purpose: not via mcp (no matching tool), and
+  // not via cli (resolveExecutorConfig's own Gate B3 refuses -- no
+  // via:"cli" invocation exists to fall back to). Reporting
+  // "out-of-process, configured:true" here was itself a real instance of
+  // the same class of bug the second-round self-review found: this
+  // executorId would refuse at actual dispatch time. "unavailable" is the
+  // honest answer. `configured` stays true (third-round advisor finding,
+  // real): gitnexus DOES have a real executors.gitnexus entry -- the
+  // refusal is that it cannot be dispatched via cli, not that it is
+  // unregistered; conflating the two under one field was itself a bug.
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'other', hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'out-of-process', executorId: 'gitnexus', configured: true });
+  assert.deepEqual(decided, { mechanism: 'unavailable', executorId: 'gitnexus', configured: true });
 });
 
 test('decideExecutorCli never hands back mcpTool for a direct executorId call when the executor names more than one "for" entry -- ambiguous, no purpose to disambiguate', async () => {
@@ -2340,8 +2354,12 @@ test('decideExecutorCli never hands back mcpTool for a direct executorId call wh
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
+  // Same underlying gap as the sibling test above: gitnexus has no
+  // via:"cli" invocation at all, so a direct executorId call with no
+  // purpose to match against its mcp tools map can dispatch neither way.
+  // configured stays true for the same reason as the sibling test.
   const decided = await decideExecutorCli('gitnexus', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true });
+  assert.deepEqual(decided, { mechanism: 'unavailable', configured: true });
 });
 
 test('decideExecutorCli never hands back mcpTool for an agent-kind executor -- agentType always wins, mcpTool and agentType are mutually exclusive', async () => {
@@ -4280,7 +4298,9 @@ test('decideExecutorCli resolves a purpose-named executorId via capabilities.<na
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } },
+    // allowCrossProvider: true -- see the "(0a fix)" test's own comment
+    // above for why this is required now (second-round self-review finding).
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
@@ -5138,6 +5158,7 @@ test('resolveExecutorCommand returns env block from resolved executor', () => {
         kind: 'agent',
         command: 'claude',
         args: ['-p', '{prompt}'],
+        allowCrossProvider: true,
         env: {
           ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
           ANTHROPIC_AUTH_TOKEN: '${TEST_OPENROUTER_KEY}',
@@ -5223,6 +5244,7 @@ test('registered executors.glm entry resolves command "claude" and env block', (
         description: 'Claude Code CLI routing to OpenRouter GLM 5.2 model',
         command: 'claude',
         args: ['-p', '{prompt}', '--model', '{model}'],
+        allowCrossProvider: true,
         env: {
           ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
           ANTHROPIC_AUTH_TOKEN: '${GLM_OPENROUTER_API_KEY}',
@@ -5249,4 +5271,174 @@ test('registered executors.glm entry resolves command "claude" and env block', (
   const res = resolveExecutorCommand(cfg, { prompt: 'test', model: 'sonnet', tier: 'standard', executorId: 'glm' });
   assert.equal(res.command, 'claude');
   assert.equal(res.provider, 'claude');
+});
+
+// --- DispatchPlan / compileDispatchPlan & decide --for capabilities.prefer (tsk-5x7-1) ---
+
+test('decideExecutorCli resolves --for via capabilities.<name>.prefer returning executorId, out-of-process, configured:true (0a fix)', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    // allowCrossProvider: true -- matches the real .fgos/config.json shape
+    // (agy is always cross-provider) and is required since the governance
+    // gate now applies inside compileDispatchPlan's resolution too
+    // (second-round self-review finding); without it this executor would
+    // correctly report unavailable/configured:false, which is not what
+    // THIS test is pinning (executor resolution via capabilities.prefer).
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'fgos-coding-implement', hasLiveTaskAccess: false });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', executorId: 'agy', configured: true });
+});
+
+test('compileDispatchPlan builds a canonical DispatchPlan for all four selector forms (0b)', () => {
+  const cfg = {
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+  };
+
+  // Form 1: executor selector
+  const plan1 = compileDispatchPlan(cfg, { executorId: 'agy' });
+  assert.equal(plan1.selector.type, 'executor');
+  assert.equal(plan1.selector.value, 'agy');
+  assert.equal(plan1.mechanism, 'out-of-process');
+  assert.equal(plan1.executorId, 'agy');
+  assert.deepEqual(plan1.invocation, { via: 'cli', adapter: 'cli-spawn', protocol: 'prompt-stdout-v1' });
+  // governance (self-review finding, 2026-08-25): must be the REAL
+  // resolveExecutorConfig output, not an approximation -- proves the plan
+  // reuses the same resolution execution actually goes through.
+  assert.deepEqual(plan1.governance, {
+    providerFamily: 'agy',
+    egress: { kind: 'cross-provider', target: 'agy', content: 'repo-content' },
+  });
+  assert.ok(plan1.reasonCodes.includes('native-first.0033.cli-spawn-shaped'));
+
+  // Form 2: purpose selector (--for)
+  const plan2 = compileDispatchPlan(cfg, { for: 'fgos-coding-implement' });
+  assert.equal(plan2.selector.type, 'purpose');
+  assert.equal(plan2.selector.value, 'fgos-coding-implement');
+  assert.equal(plan2.mechanism, 'out-of-process');
+  assert.equal(plan2.executorId, 'agy');
+  assert.equal(plan2.capability, 'fgos-coding-implement');
+
+  // Form 3: work selector (--work)
+  const sample = sampleWork();
+  const plan3 = compileDispatchPlan(cfg, { work: sample.id, workItem: sample });
+  assert.equal(plan3.selector.type, 'work');
+  assert.equal(plan3.selector.value, sample.id);
+  assert.equal(plan3.mechanism, 'out-of-process');
+  assert.equal(plan3.executorId, 'fgos-coding-implement');
+
+  // Form 4: adHocAgent selector (--needs-soul)
+  const plan4 = compileDispatchPlan(cfg, { needsSoul: true });
+  assert.equal(plan4.selector.type, 'adHocAgent');
+  assert.equal(plan4.selector.value, true);
+  assert.equal(plan4.mechanism, 'out-of-process');
+  assert.equal(plan4.configured, false);
+});
+
+test('compileDispatchPlan selector precedence matches actual resolution precedence: an explicit executorId always wins over work/purpose, even when both are passed (self-review finding)', () => {
+  const cfg = {
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+  };
+  const sample = sampleWork();
+  // Both executorId AND work are passed -- resolution's own `if (!executorId
+  // && workIdArg)` guard means the work item is never even touched, so
+  // selector must report 'executor', never 'work'.
+  const plan = compileDispatchPlan(cfg, { executorId: 'agy', work: sample.id, workItem: sample });
+  assert.equal(plan.selector.type, 'executor');
+  assert.equal(plan.selector.value, 'agy');
+  assert.equal(plan.executorId, 'agy');
+});
+
+test('compileDispatchPlan governance shape is consistent across every branch, including "unavailable" for a genuinely unregistered purpose (self-review finding, second round)', () => {
+  const plan = compileDispatchPlan({}, { for: 'no-such-purpose' });
+  assert.equal(plan.mechanism, 'unavailable');
+  assert.equal(plan.configured, false);
+  // Every other branch reports governance as {providerFamily, egress} --
+  // this one used to be the sole holdout still shaped {carries: [], egress}.
+  assert.deepEqual(plan.governance, { providerFamily: null, egress: null });
+});
+
+test('compileDispatchPlan.invocation selects the real via:"cli" entry among an executor\'s invocations[], never blindly invocations[0] (self-review finding)', () => {
+  const cfg = {
+    executors: {
+      mixedInvocations: {
+        kind: 'tool',
+        allowCrossProvider: true,
+        invocations: [
+          { via: 'mcp', tools: {} },
+          { via: 'cli', command: 'real-cli-command', args: ['{prompt}'], adapter: 'cli-spawn' },
+        ],
+      },
+    },
+  };
+  const plan = compileDispatchPlan(cfg, { executorId: 'mixedInvocations' });
+  // The old `invocations[0]` approximation would have reported the mcp
+  // entry's own (nonexistent) `via`/adapter here instead of the cli one.
+  assert.equal(plan.invocation.via, 'cli');
+  assert.equal(plan.invocation.adapter, 'cli-spawn');
+});
+
+test('compileDispatchPlan never reports a governance-blocked executor as dispatchable -- mechanism/configured must reflect the real refusal, not a silently-degraded governance stub (second-round self-review finding)', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      // cross-provider (non-Claude command), deliberately no allowCrossProvider
+      // declared -- resolveExecutorConfig throws for this at real dispatch time.
+      blockedExec: { kind: 'agent', command: 'some-other-cli', args: ['{prompt}'] },
+    },
+  };
+  const plan = compileDispatchPlan(cfg, { executorId: 'blockedExec' });
+  // Before this fix: mechanism stayed "out-of-process" and governance
+  // silently degraded to null -- a caller reading only mechanism would
+  // wrongly conclude this executor is dispatchable, when the exact same
+  // executorId passed to `execute` throws. The plan must never claim
+  // success while hiding that.
+  assert.equal(plan.mechanism, 'unavailable');
+  // `configured` means "does this executorId resolve to a real config
+  // entry" (third-round advisor finding, real) -- blockedExec DOES have
+  // one (executors.blockedExec), so configured stays true; the refusal
+  // itself is carried by mechanism + blockedReason, never by overloading
+  // this field with a second meaning.
+  assert.equal(plan.configured, true);
+  assert.ok(plan.reasonCodes.includes('governance.blocked'));
+  assert.ok(plan.blockedReason && plan.blockedReason.includes('cross-provider'), `expected a cross-provider blockedReason, got: ${plan.blockedReason}`);
+});
+
+test('compileDispatchPlan mcp-handback (in-process) never attempts cli resolution -- an mcp-only executor with no via:"cli" invocation at all must NOT be reported as governance-blocked (second-round self-review finding)', () => {
+  const cfg = {
+    executors: {
+      mcpOnlyExec: {
+        kind: 'tool',
+        for: ['some-purpose'],
+        invocations: [{ via: 'mcp', tools: { 'some-purpose': 'the_real_tool' } }],
+      },
+    },
+  };
+  const plan = compileDispatchPlan(cfg, { for: 'some-purpose' });
+  assert.equal(plan.mechanism, 'in-process');
+  assert.equal(plan.mcpTool, 'the_real_tool');
+  assert.equal(plan.configured, true);
+  // No cli dispatch happens for this mechanism -- invocation is honestly
+  // null, never a fabricated cli shape for a purely-mcp executor.
+  assert.equal(plan.invocation, null);
+});
+
+test('logExecutorDispatch writes governance payload into executor.dispatch event generically (0c)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const gov = { carries: ['repo-content'], egress: null };
+  const event = logExecutorDispatch(fgosDir, {
+    id: 'tsk-5x7-1',
+    executorId: 'agy',
+    provider: 'agy',
+    command: 'agy',
+    model: 'gemini-flash',
+    governance: gov,
+  });
+  assert.equal(event.type, 'executor.dispatch');
+  assert.deepEqual(event.payload.governance, gov);
 });

@@ -942,6 +942,15 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
             model: worker.model,
             baseCommit: worker.baseCommit,
             headRef: worker.headRef,
+            // governance (self-review finding, 2026-08-25): providerFamily
+            // + effective egress{kind,target,content}, threaded from
+            // resolveExecutorConfig through spawnWorker -- previously
+            // computed and then discarded before ever reaching a real
+            // production dispatch event, so no audit entry could ever show
+            // which real dispatches were cross-provider (the stated
+            // purpose of the D1/D2/D6 governance work). Same audit-only,
+            // ignored-by-replay.mjs event this call site already uses.
+            governance: worker.governance,
           },
         });
       });
