@@ -12,7 +12,7 @@ The current system has:
 
 - a runner config that maps capabilities/purposes to concrete executors;
 - executor declarations with kind, carries, provider/model policy, invocation shape, and optional adapter;
-- a `decide` command that chooses whether a target should run native/in-process or out-of-process;
+- a `decide` command that chooses whether a target should run native/in-process or out-of-process (this command is the concrete result of D0026's 4 done phases, with phase 5 extending native detection to agy deliberately deferred per `docs/specs/runner.md`'s "Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào" section);
 - an `execute` path that resolves an executor, spawns a process, captures output, and returns a JSON result;
 - prompt contracts for work items and ad-hoc dispatches;
 - legacy stdout tokens such as `[DONE]` and `[BLOCKED]`;

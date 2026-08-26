@@ -53,6 +53,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `settleClaim` (`src/state/store.mjs`) no longer refuses `fgos return`/
+  `fgos plan`/`putInAwaiting` on a durable revision drift caused entirely
+  by the SAME writer that holds the claim — the routine mid-lifecycle
+  `fgos edit` calls `fgos-coding-planning`/`fgos-coding-discovering` make
+  by design. It now reconciles when every event touching the item since
+  claim time is positively attributed to the claiming writer, and still
+  refuses exactly as before when any event carries a different (or
+  missing) writer id — a genuine concurrent conflict is unaffected.
 - `mergeRunnerItem` now performs an ownership-checked lock renewal synchronously
   after verify/invariant checks and before `git commit`, so a lost merge lock
   is caught deterministically as `lock-lost-mid-merge` instead of depending on
