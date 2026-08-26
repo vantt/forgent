@@ -12,16 +12,25 @@
 export function resolveDocPath(view, path) {
   if (!view || !view.docs || !path) return null;
 
-  // 1. Direct match on currentPath among non-retired docs
-  const activeDocs = Object.values(view.docs).filter(
-    (d) => d.currentPath === path && d.docLifecycle !== 'retired'
-  );
+  // "Live" means both the doc itself is non-retired AND its own topic is
+  // still active -- docs/architect/knowledge-registry-redesign.md §14.3's
+  // producer gate explicitly requires attestation to reject retired topics,
+  // not just retired documents. A topic retired directly (fgos topic
+  // retire, as opposed to split/merge, which always move a doc's topicId
+  // onto a still-active successor) has no lineage forward to anything, so
+  // excluding it here also correctly makes step 3's lineage chase below
+  // find no active successor for it -- the doc becomes fully unresolvable,
+  // not silently still-attestable.
+  const isLive = (d) => d.docLifecycle !== 'retired' && view.topics?.[d.topicId]?.status === 'active';
+
+  // 1. Direct match on currentPath among live docs
+  const activeDocs = Object.values(view.docs).filter((d) => d.currentPath === path && isLive(d));
   if (activeDocs.length === 1) return activeDocs[0];
   if (activeDocs.length > 1) return activeDocs;
 
-  // 2. Direct match on aliases among non-retired docs
+  // 2. Direct match on aliases among live docs
   const aliasDocs = Object.values(view.docs).filter(
-    (d) => Array.isArray(d.aliases) && d.aliases.includes(path) && d.docLifecycle !== 'retired'
+    (d) => Array.isArray(d.aliases) && d.aliases.includes(path) && isLive(d)
   );
   if (aliasDocs.length === 1) return aliasDocs[0];
   if (aliasDocs.length > 1) return aliasDocs;

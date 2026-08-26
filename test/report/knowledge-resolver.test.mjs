@@ -109,3 +109,22 @@ test('resolveDocPath - a lineage cycle reachable from an active topic does not c
   assert.doesNotThrow(() => resolveDocPath(view, 'docs/old/guide.md'));
   assert.equal(resolveDocPath(view, 'docs/old/guide.md'), null);
 });
+
+test('resolveDocPath - a live (non-retired) doc under a retired topic is unresolvable', () => {
+  // docs/architect/knowledge-registry-redesign.md §14.3: attestation must
+  // reject retired topics, not just retired documents. t1 was retired
+  // directly (fgos topic retire) with its doc left in place -- unlike
+  // split/merge, plain retire never moves the doc's topicId onto a
+  // still-active successor, so there is no lineage to chase it through
+  // either; it must become fully unresolvable, not still-attestable.
+  const view = {
+    topics: {
+      t1: { topicId: 't1', status: 'retired' }
+    },
+    docs: {
+      'd1': { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active', aliases: [] }
+    }
+  };
+
+  assert.equal(resolveDocPath(view, 'docs/t1/guide.md'), null);
+});

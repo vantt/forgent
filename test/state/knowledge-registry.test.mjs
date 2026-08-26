@@ -19,6 +19,8 @@ import {
   mergeTopicStore,
   retireTopicStore,
   markDocRenderedStore,
+  supersedeDocStore,
+  retireDocStore,
   rebuild,
 } from '../../src/state/store.mjs';
 
@@ -444,6 +446,61 @@ test('topic.merge refuses a self-merge, a missing source, and a duplicate source
     const view = rebuild(tmpDir);
     assert.equal(view.topics.target.status, 'active');
     assert.equal(view.topics.target.lineage, null);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.register refuses to change an existing docId\'s topicId, role, or currentPath', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 'topic-a', purposeSlug: 'topic-a' });
+    registerTopicStore(tmpDir, { topicId: 'topic-b', purposeSlug: 'topic-b' });
+    registerDocStore(tmpDir, { docId: 'd', topicId: 'topic-a', role: 'guide', currentPath: 'docs/a/guide.md', docLifecycle: 'active' });
+
+    // Same docId, different topicId AND role -- the exact repro: this must
+    // never silently move the doc; topic/role changes go through
+    // topic.split/topic.merge, which carry real lineage.
+    assert.throws(() => {
+      registerDocStore(tmpDir, { docId: 'd', topicId: 'topic-b', role: 'pitfall', currentPath: 'docs/b/pitfall.md', docLifecycle: 'active' });
+    }, /register cannot change a doc's identity or path/);
+
+    // Same docId, same topicId/role, only currentPath differs -- path
+    // changes go through doc.path-move (which preserves the old path as an
+    // alias), never register.
+    assert.throws(() => {
+      registerDocStore(tmpDir, { docId: 'd', topicId: 'topic-a', role: 'guide', currentPath: 'docs/a/guide-renamed.md', docLifecycle: 'active' });
+    }, /register cannot change a doc's identity or path/);
+
+    // Identity-preserving update (lifecycle only) still works.
+    registerDocStore(tmpDir, { docId: 'd', topicId: 'topic-a', role: 'guide', currentPath: 'docs/a/guide.md', docLifecycle: 'active' });
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs.d.topicId, 'topic-a');
+    assert.equal(view.docs.d.role, 'guide');
+    assert.equal(view.docs.d.currentPath, 'docs/a/guide.md');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.supersede and doc.retire fail closed (throw) when the doc does not exist, instead of silently no-oping', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+
+    assert.throws(() => {
+      supersedeDocStore(tmpDir, { docId: 'does-not-exist' });
+    }, /doc\.supersede: doc 'does-not-exist' not found/);
+
+    assert.throws(() => {
+      retireDocStore(tmpDir, { docId: 'does-not-exist' });
+    }, /doc\.retire: doc 'does-not-exist' not found/);
+
+    assert.throws(() => {
+      supersedeDocStore(tmpDir, { topicId: 'no-such-topic', role: 'guide' });
+    }, /not found/);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

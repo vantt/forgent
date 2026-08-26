@@ -423,6 +423,11 @@ export function applyKnowledgeEvent(view, event) {
       }
       const id = docId ?? `${topicId}:${role}`;
       const existing = view.docs[id];
+      if (existing && (existing.topicId !== topicId || existing.role !== role || existing.currentPath !== currentPath)) {
+        throw new KnowledgeValidationError(
+          `doc.register: doc '${id}' already exists with topicId='${existing.topicId}', role='${existing.role}', currentPath='${existing.currentPath}' — register cannot change a doc's identity or path. Use "fgos topic split"/"fgos topic merge" to change topicId/role (with lineage), or "fgos doc move-path" to change currentPath (preserves the old path as an alias).`
+        );
+      }
       const resolvedFramework = framework ?? existing?.framework ?? 'diataxis';
       const resolvedMode = mode ?? existing?.mode ?? 'explanation';
       assertFrameworkModeRoleValid({ framework: resolvedFramework, mode: resolvedMode, role });
@@ -502,11 +507,12 @@ export function applyKnowledgeEvent(view, event) {
       const { docId, topicId, role, supersededBy } = payload;
       const id = resolveDocId(view, { docId, topicId, role });
       const doc = view.docs[id];
-      if (doc) {
-        doc.docLifecycle = 'superseded';
-        if (supersededBy) doc.supersededBy = supersededBy;
-        doc.updatedAt = event.ts ?? Date.now();
+      if (!doc) {
+        throw new KnowledgeValidationError(`doc.supersede: doc '${id}' not found`);
       }
+      doc.docLifecycle = 'superseded';
+      if (supersededBy) doc.supersededBy = supersededBy;
+      doc.updatedAt = event.ts ?? Date.now();
       break;
     }
 
@@ -514,10 +520,11 @@ export function applyKnowledgeEvent(view, event) {
       const { docId, topicId, role } = payload;
       const id = resolveDocId(view, { docId, topicId, role });
       const doc = view.docs[id];
-      if (doc) {
-        doc.docLifecycle = 'retired';
-        doc.updatedAt = event.ts ?? Date.now();
+      if (!doc) {
+        throw new KnowledgeValidationError(`doc.retire: doc '${id}' not found`);
       }
+      doc.docLifecycle = 'retired';
+      doc.updatedAt = event.ts ?? Date.now();
       break;
     }
 
