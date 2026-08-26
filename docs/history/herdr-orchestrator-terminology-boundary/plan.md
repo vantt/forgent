@@ -74,9 +74,15 @@ Risk map:
 | Naming only `PaneOrchestrator` misses its sibling Rust identifiers (`OrchestratorSettings`, `HerdrOrchestratorToggles`, same `herdr-orchestrator`/`herdrOrchestrator` naming family, confirmed real in `herdr-plugin/src/settings.rs`/`main.rs` — `RESEARCH.md` round 1, point 2) | low | the new subsection explicitly names the whole family, not just the one literal string the acceptance text quotes |
 | Manual judgment needed on whether "every hit has a clear meaning" (993 raw `rg` hits) | low | `RESEARCH.md` round 1, point 1: the volume is concentrated in a small number of documented senses (product name / fgOS glossary entry / Rust identifier family), not per-occurrence ambiguity — the new subsection is what makes every sense resolvable, not a per-line audit |
 
-Impact-analysis capability gate: not run — this is a prose-only addition to
-one markdown file, no code call graph or blast-radius question applies
-(`impact-analysis: inactive` for this item's own scope).
+Impact-analysis capability gate: checked live at validating
+(`fgos tool query --capability impact-analysis --status present`) —
+`gitnexus` is registered and `present`, so the posture is `full`, not
+`inactive` (corrected after `fgos-coding-validating`'s reality gate caught
+the earlier mislabel — `full` only means the MUST rules apply when a proof
+point actually leans on blast-radius evidence; this plan's risk map has no
+such row, since the change is prose-only with no call graph or renamed
+identifier involved, so no MUST rule is triggered despite the `full`
+posture).
 
 ## Shape
 
