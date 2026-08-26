@@ -2142,6 +2142,7 @@ planning chi tiết per-file (vòng 22).
   mới). Chức danh (PO/PM/TechLead/SE/Tester) = **agent-type definition
   sẵn có** (`.claude/agents/*.md`), khai eligibility bằng đúng **một
   field frontmatter `claims: [phiếu]`** — positions suy ra từ phiếu.
+  *(Ghi chú: Field `claims:` trong D-12 đã bị đảo ngược bởi decision D-20 tại `docs/history/core-foundation-domain-boundary/DISCUSSION.md:461` và `assignable-to` được đổi tên thành `agent:` bởi decision D-26 tại `:467`. Mô hình hiện hành: agent-type khai báo `skills:` trên agent-type definition; task-spec khai báo `requires-skill:` hoặc chỉ định agent-type cụ thể qua `agent:`).*
   Không roster file, không humans registry, không agent-pools: pool size
   = worker-slots sẵn có; spawn-on-demand = runner/dispatch sẵn có; thẩm
   quyền human = pull-door verbs sẵn có (approve/answer do người chạy).
