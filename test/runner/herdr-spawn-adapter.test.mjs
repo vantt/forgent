@@ -951,15 +951,39 @@ test('pi-agent-session.mjs live renderer formats JSONL correctly (Requirement 3)
   assert.ok(output.includes('← read [OK]'));
 });
 
-test('herdr-spawn adapter (LIVE): dispatch via real agy-herdr executor against real herdr and agy binaries (Requirement 5)', { skip: AGY_HERDR_SKIP }, async () => {
+test('herdr-spawn adapter (LIVE): dispatch a real agy-shaped executor via herdr-spawn against real herdr and agy binaries (Requirement 5)', { skip: AGY_HERDR_SKIP }, async () => {
+  // Self-contained config fixture (same pattern as this file's very first
+  // test, `writeRunnerConfigFixture`), not a named executor read from the
+  // real, shared `.fgos/config.json` -- that live config change ships as
+  // its own separate main-checkout commit (ADR0020: a worker branch must
+  // never carry a `.fgos/` change, docs/how-to/fix-fgos-write-rejected-
+  // merge-block.md), so this test proves the MECHANISM (a real agy-shaped
+  // executor dispatched via herdr-spawn against the real binaries) without
+  // depending on that unrelated config change having actually landed.
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'live-agy-proof-'));
   execFileSync('git', ['init'], { cwd: tmpRoot });
   execFileSync('git', ['commit', '--allow-empty', '-m', 'initial'], { cwd: tmpRoot });
+  writeRunnerConfigFixture(tmpRoot, {
+    executor: { command: 'agy', args: ['-p', '{prompt}', '--model', '{model}'] },
+    models: { light: 'gemini-3.6-flash-medium' },
+    timeoutMs: 60000,
+    executors: {
+      'test-agy-herdr': {
+        kind: 'agent',
+        allowCrossProvider: true,
+        invocations: [{
+          via: 'cli',
+          adapter: 'herdr-spawn',
+          command: 'agy',
+          args: ['-p', '{prompt}', '--mode', 'accept-edits', '--new-project', '--print-timeout', '30m', '--model', '{model}'],
+        }],
+      },
+    },
+  });
 
-  const root = path.resolve('.');
-  const res = await executeExecutorCli('agy-herdr', {
+  const res = await executeExecutorCli('test-agy-herdr', {
     prompt: 'Print Hello from agy-herdr live proof and exit. Write [DONE] when done.',
-    repoRoot: root,
+    repoRoot: tmpRoot,
     cwd: tmpRoot,
     tier: 'light',
   });
