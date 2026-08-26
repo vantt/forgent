@@ -551,6 +551,25 @@
     "evidence": "first H1: Keep a real-fs-writing integration test from leaving a tracked file dirty"
   },
   {
+    "oldPath": "docs/how-to/land-a-delivered-item-whose-branch-was-never-actually-merged.md",
+    "topicId": "how-to-land-a-work-item-s-branch-into-main-when-its-status-already-reads-delivered-but-the-branch-was-never-actually-merged",
+    "purposeSlug": "how-to-land-a-work-item-s-branch-into-main-when-its-status-already-reads-delivered-but-the-branch-was-never-actually-merged",
+    "purposeTitle": "how to land a work item's branch into main when its status already reads delivered but the branch was never actually merged",
+    "role": "land-a-delivered-item-whose-branch-was-never-actually-merged",
+    "entities": [
+      "delivered",
+      "orphaned-branch",
+      "land",
+      "approve",
+      "status-machine"
+    ],
+    "framework": "diataxis",
+    "mode": "how-to",
+    "targetPath": "docs/how-to-land-a-work-item-s-branch-into-main-when-its-status-already-reads-delivered-but-the-branch-was-never-actually-merged/land-a-delivered-item-whose-branch-was-never-actually-merged.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: how to land a work item's branch into main when its status already reads delivered but the branch was never actually merged"
+  },
+  {
     "oldPath": "docs/how-to/launch-claude-in-a-new-herdr-pane-from-a-plugin.md",
     "topicId": "launch-claude-in-a-new-herdr-pane-from-a-plugin",
     "purposeSlug": "launch-claude-in-a-new-herdr-pane-from-a-plugin",
@@ -783,6 +802,24 @@
     "evidence": "first H1: How to recover `fgos approve`/`fgos sync-root` from inside a worktree with `--trust-dir`"
   },
   {
+    "oldPath": "docs/how-to/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
+    "topicId": "merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-conflict-block-reason-instead-of-parking-to-ask-a-person",
+    "purposeSlug": "merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-conflict-block-reason-instead-of-parking-to-ask-a-person",
+    "purposeTitle": "merge-loop and merge-next self-run fgos catchup on a merge-conflict block reason instead of parking to ask a person",
+    "role": "recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup",
+    "entities": [
+      "merge-loop",
+      "merge-next",
+      "catchup",
+      "merge-conflict"
+    ],
+    "framework": "diataxis",
+    "mode": "how-to",
+    "targetPath": "docs/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-conflict-block-reason-instead-of-parking-to-ask-a-person/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: merge-loop and merge-next self-run fgos catchup on a merge-conflict block reason instead of parking to ask a person"
+  },
+  {
     "oldPath": "docs/how-to/register-a-fixable-doctor-check-in-fgos.md",
     "topicId": "how-to-register-a-fixable-doctor-check-in-fgos",
     "purposeSlug": "how-to-register-a-fixable-doctor-check-in-fgos",
@@ -807,6 +844,19 @@
     "targetPath": "docs/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two-branches-claiming-the-same-decision-id/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
     "confidence": "medium",
     "evidence": "first H1: How to resolve an `fgos approve` merge-conflict caused by two branches claiming the same decision ID"
+  },
+  {
+    "oldPath": "docs/how-to/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md",
+    "topicId": "how-to-resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider",
+    "purposeSlug": "how-to-resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider",
+    "purposeTitle": "How to resolve ambiguous multi-target errors from an impact-analysis provider",
+    "role": "resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "how-to",
+    "targetPath": "docs/how-to-resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md",
+    "confidence": "medium",
+    "evidence": "first H1: How to resolve ambiguous multi-target errors from an impact-analysis provider"
   },
   {
     "oldPath": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md",
@@ -898,6 +948,25 @@
     "targetPath": "docs/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md",
     "confidence": "medium",
     "evidence": "first H1: How to see done items in `fgos list` / `fgos triage`"
+  },
+  {
+    "oldPath": "docs/how-to/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+    "topicId": "how-to-self-resolve-a-merge-block-reported-as-verify-timeout-post-merge-integration-drift-or-merge-failed-unclassified-and-what-the-narrowed-same-id-twice-stop-rule-now-covers",
+    "purposeSlug": "how-to-self-resolve-a-merge-block-reported-as-verify-timeout-post-merge-integration-drift-or-merge-failed-unclassified-and-what-the-narrowed-same-id-twice-stop-rule-now-covers",
+    "purposeTitle": "how to self-resolve a merge block reported as verify-timeout-post-merge, integration-drift, or merge-failed-unclassified, and what the narrowed same-id-twice stop rule now covers",
+    "role": "self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures",
+    "entities": [
+      "merge",
+      "catchup",
+      "playbook",
+      "verify-timeout",
+      "integration-drift"
+    ],
+    "framework": "diataxis",
+    "mode": "how-to",
+    "targetPath": "docs/how-to-self-resolve-a-merge-block-reported-as-verify-timeout-post-merge-integration-drift-or-merge-failed-unclassified-and-what-the-narrowed-same-id-twice-stop-rule-now-covers/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: how to self-resolve a merge block reported as verify-timeout-post-merge, integration-drift, or merge-failed-unclassified, and what the narrowed same-id-twice stop rule now covers"
   },
   {
     "oldPath": "docs/how-to/set-or-clear-a-work-items-parent-lineage-via-cli.md",
@@ -1083,29 +1152,29 @@
   },
   {
     "oldPath": "docs/how-to/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
-    "topicId": "how-to-wire-a-skill-s-dispatch-of-a-executor-or-subtask-through-the-native-vs-cli-spawn-decision",
-    "purposeSlug": "how-to-wire-a-skill-s-dispatch-of-a-executor-or-subtask-through-the-native-vs-cli-spawn-decision",
-    "purposeTitle": "How to wire a skill's dispatch of a executor or subTask through the native-vs-cli/spawn decision",
+    "topicId": "how-to-wire-a-skill-through-the-dispatch-decision",
+    "purposeSlug": "how-to-wire-a-skill-through-the-dispatch-decision",
+    "purposeTitle": "How to wire a skill through the dispatch decision",
     "role": "wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision",
     "entities": [],
     "framework": "diataxis",
     "mode": "how-to",
-    "targetPath": "docs/how-to-wire-a-skill-s-dispatch-of-a-executor-or-subtask-through-the-native-vs-cli-spawn-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+    "targetPath": "docs/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
     "confidence": "medium",
-    "evidence": "first H1: How to wire a skill's dispatch of a executor or subTask through the native-vs-cli/spawn decision"
+    "evidence": "first H1: How to wire a skill through the dispatch decision"
   },
   {
     "oldPath": "docs/how-to/wire-a-skill-to-an-executor-by-purpose-not-name.md",
-    "topicId": "how-to-wire-a-skill-to-a-executor-by-purpose-not-by-name",
-    "purposeSlug": "how-to-wire-a-skill-to-a-executor-by-purpose-not-by-name",
-    "purposeTitle": "How to wire a skill to a executor by purpose, not by name",
+    "topicId": "how-to-wire-a-skill-to-an-executor-by-purpose-not-by-name",
+    "purposeSlug": "how-to-wire-a-skill-to-an-executor-by-purpose-not-by-name",
+    "purposeTitle": "How to wire a skill to an executor by purpose, not by name",
     "role": "wire-a-skill-to-an-executor-by-purpose-not-name",
     "entities": [],
     "framework": "diataxis",
     "mode": "how-to",
-    "targetPath": "docs/how-to-wire-a-skill-to-a-executor-by-purpose-not-by-name/wire-a-skill-to-an-executor-by-purpose-not-name.md",
+    "targetPath": "docs/how-to-wire-a-skill-to-an-executor-by-purpose-not-by-name/wire-a-skill-to-an-executor-by-purpose-not-name.md",
     "confidence": "medium",
-    "evidence": "first H1: How to wire a skill to a executor by purpose, not by name"
+    "evidence": "first H1: How to wire a skill to an executor by purpose, not by name"
   },
   {
     "oldPath": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
@@ -1456,6 +1525,44 @@
     "evidence": "first H1: Why fgOS keeps growing the same decision logic in more than one place"
   },
   {
+    "oldPath": "docs/explanation/fgos-cook-worktree-claim-before-drive.md",
+    "topicId": "fgos-cook-worktree-claim-before-drive",
+    "purposeSlug": "fgos-cook-worktree-claim-before-drive",
+    "purposeTitle": "fgos-cook worktree-claim-before-drive",
+    "role": "fgos-cook-worktree-claim-before-drive",
+    "entities": [
+      "cook",
+      "worktree",
+      "claim-timing",
+      "fgos-coding-driving",
+      "branch-isolation"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: fgos-cook worktree-claim-before-drive"
+  },
+  {
+    "oldPath": "docs/explanation/fgos-discover-claim-via-pick-not-take.md",
+    "topicId": "fgos-discover-claim-via-pick-not-take",
+    "purposeSlug": "fgos-discover-claim-via-pick-not-take",
+    "purposeTitle": "fgos-discover claim-via-pick-not-take",
+    "role": "fgos-discover-claim-via-pick-not-take",
+    "entities": [
+      "discover",
+      "worktree",
+      "claim-timing",
+      "fgos-coding-driving",
+      "branch-isolation"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: fgos-discover claim-via-pick-not-take"
+  },
+  {
     "oldPath": "docs/explanation/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md",
     "topicId": "why-fgos-discover-now-trusts-a-locked-context-md-instead-of-blindly-re-judging",
     "purposeSlug": "why-fgos-discover-now-trusts-a-locked-context-md-instead-of-blindly-re-judging",
@@ -1522,16 +1629,21 @@
   },
   {
     "oldPath": "docs/explanation/fgos-self-uninstall-package-removal-spike.md",
-    "topicId": "can-fgos-reliably-remove-its-own-installed-package",
-    "purposeSlug": "can-fgos-reliably-remove-its-own-installed-package",
-    "purposeTitle": "Can fgOS reliably remove its own installed package?",
+    "topicId": "whether-fgos-uninstall-remove-package-can-reliably-remove-its-own-package-which-package-managers-platforms-it-covers-and-how-it-handles-an-unconfirmed-install-method",
+    "purposeSlug": "whether-fgos-uninstall-remove-package-can-reliably-remove-its-own-package-which-package-managers-platforms-it-covers-and-how-it-handles-an-unconfirmed-install-method",
+    "purposeTitle": "whether fgos uninstall --remove-package can reliably remove its own package, which package managers/platforms it covers, and how it handles an unconfirmed install method",
     "role": "fgos-self-uninstall-package-removal-spike",
-    "entities": [],
+    "entities": [
+      "uninstall",
+      "npm",
+      "package-manager",
+      "self-removal"
+    ],
     "framework": "diataxis",
     "mode": "explanation",
-    "targetPath": "docs/can-fgos-reliably-remove-its-own-installed-package/fgos-self-uninstall-package-removal-spike.md",
-    "confidence": "medium",
-    "evidence": "first H1: Can fgOS reliably remove its own installed package?"
+    "targetPath": "docs/whether-fgos-uninstall-remove-package-can-reliably-remove-its-own-package-which-package-managers-platforms-it-covers-and-how-it-handles-an-unconfirmed-install-method/fgos-self-uninstall-package-removal-spike.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: whether fgos uninstall --remove-package can reliably remove its own package, which package managers/platforms it covers, and how it handles an unconfirmed install method"
   },
   {
     "oldPath": "docs/explanation/fgos-uninstall-feature-overview.md",
@@ -2008,16 +2120,34 @@
   },
   {
     "oldPath": "docs/explanation/state-decisions-splits-engine-bookkeeping-from-cited-design-decisions.md",
-    "topicId": "state-decisions-splits-engine-bookkeeping-from-cited-design-decisions",
-    "purposeSlug": "state-decisions-splits-engine-bookkeeping-from-cited-design-decisions",
-    "purposeTitle": "state.decisions splits engine bookkeeping from cited design decisions",
+    "topicId": "why-state-decisions-splits-engine-bookkeeping-from-design-decisions-and-how-the-canonical-decision-projection-docs-decisions-index-md-docs-specs-area-md-narrative-is-wired-onto-that-same-clean-zone-with-no-second-store",
+    "purposeSlug": "why-state-decisions-splits-engine-bookkeeping-from-design-decisions-and-how-the-canonical-decision-projection-docs-decisions-index-md-docs-specs-area-md-narrative-is-wired-onto-that-same-clean-zone-with-no-second-store",
+    "purposeTitle": "why state.decisions splits engine bookkeeping from design decisions, and how the canonical decision projection (docs/decisions/index.md, docs/specs/<area>.md narrative) is wired onto that same clean zone with no second store",
     "role": "decision-record",
     "entities": [],
     "framework": "diataxis",
     "mode": "explanation",
-    "targetPath": "docs/state-decisions-splits-engine-bookkeeping-from-cited-design-decisions/decision-record.md",
-    "confidence": "medium",
-    "evidence": "first H1: state.decisions splits engine bookkeeping from cited design decisions"
+    "targetPath": "docs/why-state-decisions-splits-engine-bookkeeping-from-design-decisions-and-how-the-canonical-decision-projection-docs-decisions-index-md-docs-specs-area-md-narrative-is-wired-onto-that-same-clean-zone-with-no-second-store/decision-record.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why state.decisions splits engine bookkeeping from design decisions, and how the canonical decision projection (docs/decisions/index.md, docs/specs/<area>.md narrative) is wired onto that same clean zone with no second store"
+  },
+  {
+    "oldPath": "docs/explanation/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
+    "topicId": "keeping-a-multi-file-small-edit-item-unsplit-because-each-child-s-worktree-merge-gate-lifecycle-overhead-would-exceed-the-actual-edit-work",
+    "purposeSlug": "keeping-a-multi-file-small-edit-item-unsplit-because-each-child-s-worktree-merge-gate-lifecycle-overhead-would-exceed-the-actual-edit-work",
+    "purposeTitle": "keeping a multi-file small-edit item unsplit because each child's worktree/merge-gate lifecycle overhead would exceed the actual edit work",
+    "role": "tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work",
+    "entities": [
+      "decompose",
+      "planning",
+      "footprint",
+      "lifecycle-cost"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/keeping-a-multi-file-small-edit-item-unsplit-because-each-child-s-worktree-merge-gate-lifecycle-overhead-would-exceed-the-actual-edit-work/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: keeping a multi-file small-edit item unsplit because each child's worktree/merge-gate lifecycle overhead would exceed the actual edit work"
   },
   {
     "oldPath": "docs/explanation/title-semantic-contract-lives-in-submitting-skills.md",
@@ -2059,6 +2189,74 @@
     "evidence": "first H1: Why a clean `npm test` run missed 16 edge gaps after the lifecycle rebuild"
   },
   {
+    "oldPath": "docs/explanation/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+    "topicId": "why-fgos-registers-a-doctor-check-confirming-every-stage-name-across-all-of-a-domain-s-registered-workflows-resolves-to-a-real-skillmap-entry",
+    "purposeSlug": "why-fgos-registers-a-doctor-check-confirming-every-stage-name-across-all-of-a-domain-s-registered-workflows-resolves-to-a-real-skillmap-entry",
+    "purposeTitle": "why fgOS registers a doctor check confirming every stage name across ALL of a domain's registered workflows resolves to a real skillMap entry",
+    "role": "why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-registers-a-doctor-check-confirming-every-stage-name-across-all-of-a-domain-s-registered-workflows-resolves-to-a-real-skillmap-entry/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS registers a doctor check confirming every stage name across ALL of a domain's registered workflows resolves to a real skillMap entry"
+  },
+  {
+    "oldPath": "docs/explanation/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+    "topicId": "why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered-when-it-has-no-plan-md-and-why-the-two-historical-violations-that-surfaced-this-gap-were-left-uncorrected",
+    "purposeSlug": "why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered-when-it-has-no-plan-md-and-why-the-two-historical-violations-that-surfaced-this-gap-were-left-uncorrected",
+    "purposeTitle": "why fgOS now gates a risk:heavy item from reaching delivered when it has no plan.md, and why the two historical violations that surfaced this gap were left uncorrected",
+    "role": "why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md",
+    "entities": [
+      "risk",
+      "plan-md",
+      "iron-law",
+      "delivered",
+      "governance"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered-when-it-has-no-plan-md-and-why-the-two-historical-violations-that-surfaced-this-gap-were-left-uncorrected/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS now gates a risk:heavy item from reaching delivered when it has no plan.md, and why the two historical violations that surfaced this gap were left uncorrected"
+  },
+  {
+    "oldPath": "docs/explanation/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
+    "topicId": "why-a-leaf-to-root-approve-no-longer-requires-the-shared-main-checkout-to-be-clean-while-a-root-to-main-approve-still-does",
+    "purposeSlug": "why-a-leaf-to-root-approve-no-longer-requires-the-shared-main-checkout-to-be-clean-while-a-root-to-main-approve-still-does",
+    "purposeTitle": "why a leaf-to-root approve no longer requires the shared main checkout to be clean, while a root-to-main approve still does",
+    "role": "why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean",
+    "entities": [
+      "approve",
+      "merge",
+      "clean-tree",
+      "worktree-isolation"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-a-leaf-to-root-approve-no-longer-requires-the-shared-main-checkout-to-be-clean-while-a-root-to-main-approve-still-does/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why a leaf-to-root approve no longer requires the shared main checkout to be clean, while a root-to-main approve still does"
+  },
+  {
+    "oldPath": "docs/explanation/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md",
+    "topicId": "why-resolveplan-s-decompose-verdict-no-longer-treats-the-presence-of-any-one-child-as-proof-the-whole-split-already-completed",
+    "purposeSlug": "why-resolveplan-s-decompose-verdict-no-longer-treats-the-presence-of-any-one-child-as-proof-the-whole-split-already-completed",
+    "purposeTitle": "why resolvePlan's decompose verdict no longer treats the presence of any one child as proof the whole split already completed",
+    "role": "why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children",
+    "entities": [
+      "resolvePlan",
+      "decompose",
+      "footprint-overlap",
+      "atomicity"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-resolveplan-s-decompose-verdict-no-longer-treats-the-presence-of-any-one-child-as-proof-the-whole-split-already-completed/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why resolvePlan's decompose verdict no longer treats the presence of any one child as proof the whole split already completed"
+  },
+  {
     "oldPath": "docs/explanation/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner.md",
     "topicId": "why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner",
     "purposeSlug": "why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner",
@@ -2083,6 +2281,24 @@
     "targetPath": "docs/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
     "confidence": "medium",
     "evidence": "first H1: Why a retired stage name sometimes keeps a drain-only alias"
+  },
+  {
+    "oldPath": "docs/explanation/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md",
+    "topicId": "why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test-count-lower-than-any-of-its-own-children-why-the-fix-is-an-addendum-rather-than-an-edit-and-the-general-stale-worktree-index-guard-this-incident-led-to",
+    "purposeSlug": "why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test-count-lower-than-any-of-its-own-children-why-the-fix-is-an-addendum-rather-than-an-edit-and-the-general-stale-worktree-index-guard-this-incident-led-to",
+    "purposeTitle": "why the tsk-51m root Iron Law evidence file recorded a test count lower than any of its own children, why the fix is an addendum rather than an edit, and the general stale-worktree-index guard this incident led to",
+    "role": "why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count",
+    "entities": [
+      "iron-law",
+      "evidence",
+      "worktree",
+      "addendum"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test-count-lower-than-any-of-its-own-children-why-the-fix-is-an-addendum-rather-than-an-edit-and-the-general-stale-worktree-index-guard-this-incident-led-to/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why the tsk-51m root Iron Law evidence file recorded a test count lower than any of its own children, why the fix is an addendum rather than an edit, and the general stale-worktree-index guard this incident led to"
   },
   {
     "oldPath": "docs/explanation/why-a-verify-command-cannot-mutate-live-work-state.md",
@@ -2122,6 +2338,19 @@
     "targetPath": "docs/why-abortmergeifpossible-checks-merge-head-before-aborting/why-abortmergeifpossible-checks-merge-head-before-aborting.md",
     "confidence": "medium",
     "evidence": "first H1: Why `abortMergeIfPossible` checks `MERGE_HEAD` before aborting"
+  },
+  {
+    "oldPath": "docs/explanation/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md",
+    "topicId": "why-the-agy-cli-executor-needs-new-project-in-its-invocation-args-the-real-incident-that-surfaced-the-cwd-bug-and-why-agy-dispatch-still-isn-t-considered-fully-reliable-even-after-that-fix",
+    "purposeSlug": "why-the-agy-cli-executor-needs-new-project-in-its-invocation-args-the-real-incident-that-surfaced-the-cwd-bug-and-why-agy-dispatch-still-isn-t-considered-fully-reliable-even-after-that-fix",
+    "purposeTitle": "why the agy CLI executor needs --new-project in its invocation args, the real incident that surfaced the cwd bug, and why agy dispatch still isn't considered fully reliable even after that fix",
+    "role": "why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-the-agy-cli-executor-needs-new-project-in-its-invocation-args-the-real-incident-that-surfaced-the-cwd-bug-and-why-agy-dispatch-still-isn-t-considered-fully-reliable-even-after-that-fix/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why the agy CLI executor needs --new-project in its invocation args, the real incident that surfaced the cwd bug, and why agy dispatch still isn't considered fully reliable even after that fix"
   },
   {
     "oldPath": "docs/explanation/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md",
@@ -2267,6 +2496,38 @@
     "evidence": "first H1: Why `BEE_`-prefixed identifiers became `FGOS_`-prefixed (and some didn't)"
   },
   {
+    "oldPath": "docs/explanation/why-capability-executor-and-capacity-are-three-separate-concepts.md",
+    "topicId": "why-runner-config-splits-capability-curated-vocab-executor-named-registry-of-how-a-capability-is-fulfilled-and-capacity-the-for-purpose-lookup-binding-into-three-distinct-concepts-instead-of-the-two-overlapping-ones-tool-registry-s-free-text-capability-dispatch-mjs-s-closed-enum-purpose-that-existed-before",
+    "purposeSlug": "why-runner-config-splits-capability-curated-vocab-executor-named-registry-of-how-a-capability-is-fulfilled-and-capacity-the-for-purpose-lookup-binding-into-three-distinct-concepts-instead-of-the-two-overlapping-ones-tool-registry-s-free-text-capability-dispatch-mjs-s-closed-enum-purpose-that-existed-before",
+    "purposeTitle": "why runner config splits capability (curated vocab), executor (named registry of how a capability is fulfilled), and capacity (the for-purpose lookup binding) into three distinct concepts instead of the two overlapping ones (tool-registry's free-text capability, dispatch.mjs's closed-enum purpose) that existed before",
+    "role": "why-capability-executor-and-capacity-are-three-separate-concepts",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-runner-config-splits-capability-curated-vocab-executor-named-registry-of-how-a-capability-is-fulfilled-and-capacity-the-for-purpose-lookup-binding-into-three-distinct-concepts-instead-of-the-two-overlapping-ones-tool-registry-s-free-text-capability-dispatch-mjs-s-closed-enum-purpose-that-existed-before/why-capability-executor-and-capacity-are-three-separate-concepts.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why runner config splits capability (curated vocab), executor (named registry of how a capability is fulfilled), and capacity (the for-purpose lookup binding) into three distinct concepts instead of the two overlapping ones (tool-registry's free-text capability, dispatch.mjs's closed-enum purpose) that existed before"
+  },
+  {
+    "oldPath": "docs/explanation/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md",
+    "topicId": "why-decide-for-execute-for-impact-analysis-reported-unavailable-despite-a-registered-gitnexus-capacity-and-how-the-for-capability-field-split-was-unified",
+    "purposeSlug": "why-decide-for-execute-for-impact-analysis-reported-unavailable-despite-a-registered-gitnexus-capacity-and-how-the-for-capability-field-split-was-unified",
+    "purposeTitle": "why decide --for/execute --for impact-analysis reported unavailable despite a registered gitnexus capacity, and how the for/capability field split was unified",
+    "role": "why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back",
+    "entities": [
+      "dispatch",
+      "capacity",
+      "mcp",
+      "impact-analysis",
+      "capability-gate"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-decide-for-execute-for-impact-analysis-reported-unavailable-despite-a-registered-gitnexus-capacity-and-how-the-for-capability-field-split-was-unified/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why decide --for/execute --for impact-analysis reported unavailable despite a registered gitnexus capacity, and how the for/capability field split was unified"
+  },
+  {
     "oldPath": "docs/explanation/why-catchup-needed-its-own-already-caught-up-guard.md",
     "topicId": "why-fgos-catchup-needed-its-own-already-caught-up-guard",
     "purposeSlug": "why-fgos-catchup-needed-its-own-already-caught-up-guard",
@@ -2350,6 +2611,51 @@
     "evidence": "first H1: Why `/fgOS:cleanup-next` keeps exit-code classification instead of a driver call"
   },
   {
+    "oldPath": "docs/explanation/why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement.md",
+    "topicId": "why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt-support-is-an-additive-second-credential-layer-on-top-of-the-existing-bearer-token-never-a-replacement-for-it-and-why-every-auth-failure-returns-an-identical-blind-404",
+    "purposeSlug": "why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt-support-is-an-additive-second-credential-layer-on-top-of-the-existing-bearer-token-never-a-replacement-for-it-and-why-every-auth-failure-returns-an-identical-blind-404",
+    "purposeTitle": "why the herdr web dashboard gateway's Cloudflare Access JWT support is an additive second credential layer on top of the existing Bearer token, never a replacement for it, and why every auth failure returns an identical blind 404",
+    "role": "why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt-support-is-an-additive-second-credential-layer-on-top-of-the-existing-bearer-token-never-a-replacement-for-it-and-why-every-auth-failure-returns-an-identical-blind-404/why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why the herdr web dashboard gateway's Cloudflare Access JWT support is an additive second credential layer on top of the existing Bearer token, never a replacement for it, and why every auth failure returns an identical blind 404"
+  },
+  {
+    "oldPath": "docs/explanation/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+    "topicId": "coding-domain-s-role-holder-axis-handoff-verb-task-spec-skill-knowledge-context-ontology-and-workflow-hierarchy-design-decisions",
+    "purposeSlug": "coding-domain-s-role-holder-axis-handoff-verb-task-spec-skill-knowledge-context-ontology-and-workflow-hierarchy-design-decisions",
+    "purposeTitle": "coding domain's role/holder axis, handoff verb, task-spec/skill/knowledge/context ontology, and workflow hierarchy design decisions",
+    "role": "why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skill-knowledge-context-ontology-and-workflow-hierarchy-design-decisions/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: coding domain's role/holder axis, handoff verb, task-spec/skill/knowledge/context ontology, and workflow hierarchy design decisions"
+  },
+  {
+    "oldPath": "docs/explanation/why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout.md",
+    "topicId": "why-fgos-s-concurrency-tests-batch-spawned-processes-to-reduce-peak-events-lock-contention-instead-of-scaling-the-lock-timeout-budget",
+    "purposeSlug": "why-fgos-s-concurrency-tests-batch-spawned-processes-to-reduce-peak-events-lock-contention-instead-of-scaling-the-lock-timeout-budget",
+    "purposeTitle": "why fgOS's concurrency tests batch spawned processes to reduce peak events.lock contention instead of scaling the lock-timeout budget",
+    "role": "why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout",
+    "entities": [
+      "testing",
+      "concurrency",
+      "flake",
+      "events-lock",
+      "contention"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-s-concurrency-tests-batch-spawned-processes-to-reduce-peak-events-lock-contention-instead-of-scaling-the-lock-timeout-budget/why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS's concurrency tests batch spawned processes to reduce peak events.lock contention instead of scaling the lock-timeout budget"
+  },
+  {
     "oldPath": "docs/explanation/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving.md",
     "topicId": "why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving",
     "purposeSlug": "why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving",
@@ -2383,16 +2689,21 @@
   },
   {
     "oldPath": "docs/explanation/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
-    "topicId": "why-createdetachedmergeworktree-crashed-for-roots-a-live-session-dispatched",
-    "purposeSlug": "why-createdetachedmergeworktree-crashed-for-roots-a-live-session-dispatched",
-    "purposeTitle": "Why `createDetachedMergeWorktree` crashed for roots a live session dispatched",
+    "topicId": "why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist-yet-at-merge-time-and-every-call-site-that-needed-its-own-fallback-for-it",
+    "purposeSlug": "why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist-yet-at-merge-time-and-every-call-site-that-needed-its-own-fallback-for-it",
+    "purposeTitle": "why a session-driven root's fgw/<rootId> branch may not exist yet at merge time, and every call site that needed its own fallback for it",
     "role": "why-createdetachedmergeworktree-crashed-for-session-driven-roots",
-    "entities": [],
+    "entities": [
+      "merge",
+      "worktree",
+      "branch-creation",
+      "session-driven-dispatch"
+    ],
     "framework": "diataxis",
     "mode": "explanation",
-    "targetPath": "docs/why-createdetachedmergeworktree-crashed-for-roots-a-live-session-dispatched/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
-    "confidence": "medium",
-    "evidence": "first H1: Why `createDetachedMergeWorktree` crashed for roots a live session dispatched"
+    "targetPath": "docs/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist-yet-at-merge-time-and-every-call-site-that-needed-its-own-fallback-for-it/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why a session-driven root's fgw/<rootId> branch may not exist yet at merge time, and every call site that needed its own fallback for it"
   },
   {
     "oldPath": "docs/explanation/why-decompose-checks-footprint-overlap-before-creating-children.md",
@@ -2421,6 +2732,25 @@
     "evidence": "first H1: Why `decompose`'s skip-and-advance is narrower than `discovery`'s"
   },
   {
+    "oldPath": "docs/explanation/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+    "topicId": "why-fgos-started-recording-mergedsha-and-mergedinto-on-the-delivered-work-move-event-instead-of-inferring-merge-status-from-git-ancestry",
+    "purposeSlug": "why-fgos-started-recording-mergedsha-and-mergedinto-on-the-delivered-work-move-event-instead-of-inferring-merge-status-from-git-ancestry",
+    "purposeTitle": "why fgOS started recording mergedSha and mergedInto on the delivered work.move event instead of inferring merge status from git ancestry",
+    "role": "why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred",
+    "entities": [
+      "delivered",
+      "provenance",
+      "merge",
+      "events",
+      "iron-law"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-delivered-work-move-event-instead-of-inferring-merge-status-from-git-ancestry/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS started recording mergedSha and mergedInto on the delivered work.move event instead of inferring merge status from git ancestry"
+  },
+  {
     "oldPath": "docs/explanation/why-discover-next-shrank-to-a-picker.md",
     "topicId": "why-fgos-discover-next-shrank-to-a-picker",
     "purposeSlug": "why-fgos-discover-next-shrank-to-a-picker",
@@ -2447,6 +2777,37 @@
     "evidence": "first H1: Why `discover` was rewritten as a clean/enrich/self-research recipe"
   },
   {
+    "oldPath": "docs/explanation/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+    "topicId": "why-every-agent-task-tool-dispatch-is-enforced-through-a-pretooluse-hook-that-runs-dispatch-mjs-decide-itself-why-the-hook-self-invokes-decide-instead-of-tracking-whether-the-caller-already-did-why-needs-soul-exists-why-decide-reports-configured-true-false-instead-of-throwing-why-resolve-was-retired-in-favor-of-decide-execute-and-why-mcp-tool-access-is-a-hand-back-rather-than-a-second-client-dispatch-mjs-opens-itself",
+    "purposeSlug": "why-every-agent-task-tool-dispatch-is-enforced-through-a-pretooluse-hook-that-runs-dispatch-mjs-decide-itself-why-the-hook-self-invokes-decide-instead-of-tracking-whether-the-caller-already-did-why-needs-soul-exists-why-decide-reports-configured-true-false-instead-of-throwing-why-resolve-was-retired-in-favor-of-decide-execute-and-why-mcp-tool-access-is-a-hand-back-rather-than-a-second-client-dispatch-mjs-opens-itself",
+    "purposeTitle": "why every Agent/Task-tool dispatch is enforced through a PreToolUse hook that runs dispatch.mjs decide itself, why the hook self-invokes decide instead of tracking whether the caller already did, why --needs-soul exists, why decide reports configured:true|false instead of throwing, why resolve was retired in favor of decide/execute, and why MCP tool access is a hand-back rather than a second client dispatch.mjs opens itself",
+    "role": "why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-every-agent-task-tool-dispatch-is-enforced-through-a-pretooluse-hook-that-runs-dispatch-mjs-decide-itself-why-the-hook-self-invokes-decide-instead-of-tracking-whether-the-caller-already-did-why-needs-soul-exists-why-decide-reports-configured-true-false-instead-of-throwing-why-resolve-was-retired-in-favor-of-decide-execute-and-why-mcp-tool-access-is-a-hand-back-rather-than-a-second-client-dispatch-mjs-opens-itself/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why every Agent/Task-tool dispatch is enforced through a PreToolUse hook that runs dispatch.mjs decide itself, why the hook self-invokes decide instead of tracking whether the caller already did, why --needs-soul exists, why decide reports configured:true|false instead of throwing, why resolve was retired in favor of decide/execute, and why MCP tool access is a hand-back rather than a second client dispatch.mjs opens itself"
+  },
+  {
+    "oldPath": "docs/explanation/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+    "topicId": "why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-redesigned-around-task-as-the-unifying-concept-and-the-12-locked-decisions-behind-that-redesign",
+    "purposeSlug": "why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-redesigned-around-task-as-the-unifying-concept-and-the-12-locked-decisions-behind-that-redesign",
+    "purposeTitle": "why src/runner/dispatch.mjs's capacity/executor layer was redesigned around \"task\" as the unifying concept, and the 12 locked decisions behind that redesign",
+    "role": "why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity",
+    "entities": [
+      "dispatch",
+      "executor",
+      "capacity",
+      "task-dispatch-unification"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-redesigned-around-task-as-the-unifying-concept-and-the-12-locked-decisions-behind-that-redesign/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why src/runner/dispatch.mjs's capacity/executor layer was redesigned around \"task\" as the unifying concept, and the 12 locked decisions behind that redesign"
+  },
+  {
     "oldPath": "docs/explanation/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
     "topicId": "why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list",
     "purposeSlug": "why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list",
@@ -2458,6 +2819,44 @@
     "targetPath": "docs/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
     "confidence": "medium",
     "evidence": "first H1: Why doctor checks are documented as an open registry, not a fixed list"
+  },
+  {
+    "oldPath": "docs/explanation/why-doctor-now-fails-on-a-degraded-impact-analysis-tool-instead-of-passing.md",
+    "topicId": "why-fgos-doctor-s-checktoolregistryconfigured-now-reports-failure-for-a-degraded-impact-analysis-tool-instead-of-passed-true",
+    "purposeSlug": "why-fgos-doctor-s-checktoolregistryconfigured-now-reports-failure-for-a-degraded-impact-analysis-tool-instead-of-passed-true",
+    "purposeTitle": "why fgos doctor's checkToolRegistryConfigured now reports failure for a degraded impact-analysis tool instead of passed:true",
+    "role": "why-doctor-now-fails-on-a-degraded-impact-analysis-tool-instead-of-passing",
+    "entities": [
+      "doctor",
+      "impact-analysis",
+      "gitnexus",
+      "tool-registry",
+      "capability-gate"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-doctor-s-checktoolregistryconfigured-now-reports-failure-for-a-degraded-impact-analysis-tool-instead-of-passed-true/why-doctor-now-fails-on-a-degraded-impact-analysis-tool-instead-of-passing.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgos doctor's checkToolRegistryConfigured now reports failure for a degraded impact-analysis tool instead of passed:true"
+  },
+  {
+    "oldPath": "docs/explanation/why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd.md",
+    "topicId": "why-fgos-doctor-setup-uninstall-resolve-the-real-main-checkout-instead-of-process-cwd-and-why-every-config-check-used-to-lie-from-inside-a-linked-worktree",
+    "purposeSlug": "why-fgos-doctor-setup-uninstall-resolve-the-real-main-checkout-instead-of-process-cwd-and-why-every-config-check-used-to-lie-from-inside-a-linked-worktree",
+    "purposeTitle": "why fgos doctor/setup/uninstall resolve the real main checkout instead of process.cwd(), and why every config check used to lie from inside a linked worktree",
+    "role": "why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd",
+    "entities": [
+      "doctor",
+      "setup",
+      "uninstall",
+      "worktree",
+      "dir-resolution"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-doctor-setup-uninstall-resolve-the-real-main-checkout-instead-of-process-cwd-and-why-every-config-check-used-to-lie-from-inside-a-linked-worktree/why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgos doctor/setup/uninstall resolve the real main checkout instead of process.cwd(), and why every config check used to lie from inside a linked worktree"
   },
   {
     "oldPath": "docs/explanation/why-done-split-into-delivered-retrospective-cleanup-done.md",
@@ -2494,6 +2893,25 @@
     "evidence": "first H1: Why execution fan-out reuses `computeSchedule`, not `selectWave`, and stays a capability, not an entry point"
   },
   {
+    "oldPath": "docs/explanation/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md",
+    "topicId": "why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolation-refusal-as-a-recoverable-race-instead-of-lowering-its-batch-cap-or-serializing-dispatch",
+    "purposeSlug": "why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolation-refusal-as-a-recoverable-race-instead-of-lowering-its-batch-cap-or-serializing-dispatch",
+    "purposeTitle": "why fgos-fanout treats a dispatched Agent's worktree-isolation refusal as a recoverable race instead of lowering its batch cap or serializing dispatch",
+    "role": "why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap",
+    "entities": [
+      "fgos-fanout",
+      "worktree",
+      "isolation",
+      "concurrency",
+      "harness"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolation-refusal-as-a-recoverable-race-instead-of-lowering-its-batch-cap-or-serializing-dispatch/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgos-fanout treats a dispatched Agent's worktree-isolation refusal as a recoverable race instead of lowering its batch cap or serializing dispatch"
+  },
+  {
     "oldPath": "docs/explanation/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md",
     "topicId": "why-fgos-add-items-landed-permanently-at-stage-executing-with-no-path-back",
     "purposeSlug": "why-fgos-add-items-landed-permanently-at-stage-executing-with-no-path-back",
@@ -2520,6 +2938,24 @@
     "evidence": "first H1: Why fgOS added `sync-root` and drift detection"
   },
   {
+    "oldPath": "docs/explanation/why-fgos-answer-resumes-to-statusatask-not-always-todo.md",
+    "topicId": "why-fgos-answer-s-real-resume-behavior-is-statusatask-rather-than-always-todo-and-why-its-cli-help-text-was-corrected-to-match",
+    "purposeSlug": "why-fgos-answer-s-real-resume-behavior-is-statusatask-rather-than-always-todo-and-why-its-cli-help-text-was-corrected-to-match",
+    "purposeTitle": "why fgos answer's real resume behavior is statusAtAsk rather than always todo, and why its CLI help text was corrected to match",
+    "role": "why-fgos-answer-resumes-to-statusatask-not-always-todo",
+    "entities": [
+      "fgos-answer",
+      "awaiting-human",
+      "claim-lock",
+      "cli-help"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-answer-s-real-resume-behavior-is-statusatask-rather-than-always-todo-and-why-its-cli-help-text-was-corrected-to-match/why-fgos-answer-resumes-to-statusatask-not-always-todo.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgos answer's real resume behavior is statusAtAsk rather than always todo, and why its CLI help text was corrected to match"
+  },
+  {
     "oldPath": "docs/explanation/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md",
     "topicId": "why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict",
     "purposeSlug": "why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict",
@@ -2531,6 +2967,26 @@
     "targetPath": "docs/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md",
     "confidence": "medium",
     "evidence": "first H1: Why `fgos approve` distinguishes a pre-existing `MERGE_HEAD` from its own conflict"
+  },
+  {
+    "oldPath": "docs/explanation/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+    "topicId": "why-fgos-install-setup-resolves-the-fgos-binary-through-a-3-tier-cached-scheme-and-why-skill-materialization-no-longer-depends-on-the-claude-cli-or-plugin-marketplace",
+    "purposeSlug": "why-fgos-install-setup-resolves-the-fgos-binary-through-a-3-tier-cached-scheme-and-why-skill-materialization-no-longer-depends-on-the-claude-cli-or-plugin-marketplace",
+    "purposeTitle": "why fgOS install/setup resolves the fgos binary through a 3-tier cached scheme, and why skill materialization no longer depends on the claude CLI or plugin marketplace",
+    "role": "why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution",
+    "entities": [
+      "distribution",
+      "install",
+      "setup",
+      "doctor",
+      "skill-materialization",
+      "external-project"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3-tier-cached-scheme-and-why-skill-materialization-no-longer-depends-on-the-claude-cli-or-plugin-marketplace/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS install/setup resolves the fgos binary through a 3-tier cached scheme, and why skill materialization no longer depends on the claude CLI or plugin marketplace"
   },
   {
     "oldPath": "docs/explanation/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
@@ -2554,6 +3010,19 @@
     "evidence": "first H1: Why `fgos` checks repo invariants at `return` and merge instead of running the full test suite"
   },
   {
+    "oldPath": "docs/explanation/why-fgos-citations-carry-a-gloss-and-check-mechanically.md",
+    "topicId": "why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-gloss-alongside-the-bare-id-why-the-enforcement-extends-the-existing-decision-citation-drift-script-rather-than-adding-a-new-one-and-why-it-ships-as-a-checked-in-baseline-ratchet",
+    "purposeSlug": "why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-gloss-alongside-the-bare-id-why-the-enforcement-extends-the-existing-decision-citation-drift-script-rather-than-adding-a-new-one-and-why-it-ships-as-a-checked-in-baseline-ratchet",
+    "purposeTitle": "why fgOS's D-ID/RUL-ID/ADR citations must carry a one-line gloss alongside the bare id, why the enforcement extends the existing decision-citation-drift script rather than adding a new one, and why it ships as a checked-in baseline ratchet",
+    "role": "why-fgos-citations-carry-a-gloss-and-check-mechanically",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-gloss-alongside-the-bare-id-why-the-enforcement-extends-the-existing-decision-citation-drift-script-rather-than-adding-a-new-one-and-why-it-ships-as-a-checked-in-baseline-ratchet/why-fgos-citations-carry-a-gloss-and-check-mechanically.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS's D-ID/RUL-ID/ADR citations must carry a one-line gloss alongside the bare id, why the enforcement extends the existing decision-citation-drift script rather than adding a new one, and why it ships as a checked-in baseline ratchet"
+  },
+  {
     "oldPath": "docs/explanation/why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place.md",
     "topicId": "why-fgos-coding-driving-s-title-description-print-lives-in-one-shared-place",
     "purposeSlug": "why-fgos-coding-driving-s-title-description-print-lives-in-one-shared-place",
@@ -2572,17 +3041,53 @@
     "evidence": "first H1: Why `fgos-coding-driving`'s title/description print lives in one shared place"
   },
   {
-    "oldPath": "docs/explanation/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
-    "topicId": "why-fgos-coding-compounding-refuses-to-commit-when-merge-head-is-set",
-    "purposeSlug": "why-fgos-coding-compounding-refuses-to-commit-when-merge-head-is-set",
-    "purposeTitle": "Why `fgos-coding-compounding` refuses to commit when `MERGE_HEAD` is set",
-    "role": "why-fgos-compounding-refuses-to-commit-when-merge-head-is-set",
+    "oldPath": "docs/explanation/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+    "topicId": "why-a-pass-through-non-split-item-s-designed-proof-surface-command-is-synced-onto-work-verify-by-fgos-coding-planning-and-why-the-fix-is-skill-prose-rather-than-an-engine-change",
+    "purposeSlug": "why-a-pass-through-non-split-item-s-designed-proof-surface-command-is-synced-onto-work-verify-by-fgos-coding-planning-and-why-the-fix-is-skill-prose-rather-than-an-engine-change",
+    "purposeTitle": "why a pass-through (non-split) item's designed proof-surface command is synced onto work.verify by fgos-coding-planning, and why the fix is skill prose rather than an engine change",
+    "role": "why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff",
+    "entities": [
+      "fgos-coding-planning",
+      "verify",
+      "plan-mjs",
+      "placeholder"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-a-pass-through-non-split-item-s-designed-proof-surface-command-is-synced-onto-work-verify-by-fgos-coding-planning-and-why-the-fix-is-skill-prose-rather-than-an-engine-change/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why a pass-through (non-split) item's designed proof-surface command is synced onto work.verify by fgos-coding-planning, and why the fix is skill prose rather than an engine change"
+  },
+  {
+    "oldPath": "docs/explanation/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+    "topicId": "why-fgos-coding-planning-writes-docsref-immediately-after-creating-a-new-docs-history-feature-dir-for-a-clear-discovery-item-instead-of-only-reading-docsref-the-way-its-bootstrap-step-normally-does",
+    "purposeSlug": "why-fgos-coding-planning-writes-docsref-immediately-after-creating-a-new-docs-history-feature-dir-for-a-clear-discovery-item-instead-of-only-reading-docsref-the-way-its-bootstrap-step-normally-does",
+    "purposeTitle": "why fgos-coding-planning writes docsRef immediately after creating a new docs/history/<feature>/ dir for a clear-discovery item, instead of only reading docsRef the way its Bootstrap step normally does",
+    "role": "why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir",
     "entities": [],
     "framework": "diataxis",
     "mode": "explanation",
-    "targetPath": "docs/why-fgos-coding-compounding-refuses-to-commit-when-merge-head-is-set/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
-    "confidence": "medium",
-    "evidence": "first H1: Why `fgos-coding-compounding` refuses to commit when `MERGE_HEAD` is set"
+    "targetPath": "docs/why-fgos-coding-planning-writes-docsref-immediately-after-creating-a-new-docs-history-feature-dir-for-a-clear-discovery-item-instead-of-only-reading-docsref-the-way-its-bootstrap-step-normally-does/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgos-coding-planning writes docsRef immediately after creating a new docs/history/<feature>/ dir for a clear-discovery item, instead of only reading docsRef the way its Bootstrap step normally does"
+  },
+  {
+    "oldPath": "docs/explanation/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
+    "topicId": "why-fgos-coding-compounding-s-retrospective-synthesis-commit-step-refuses-when-merge-head-is-already-set-the-5-real-historical-instances-that-motivated-it-and-each-instance-s-own-per-item-audit-outcome",
+    "purposeSlug": "why-fgos-coding-compounding-s-retrospective-synthesis-commit-step-refuses-when-merge-head-is-already-set-the-5-real-historical-instances-that-motivated-it-and-each-instance-s-own-per-item-audit-outcome",
+    "purposeTitle": "why fgos-coding-compounding's retrospective-synthesis commit step refuses when MERGE_HEAD is already set, the 5 real historical instances that motivated it, and each instance's own per-item audit outcome",
+    "role": "why-fgos-compounding-refuses-to-commit-when-merge-head-is-set",
+    "entities": [
+      "fgos-coding-compounding",
+      "merge-head",
+      "retrospective-synthesis",
+      "audit"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-coding-compounding-s-retrospective-synthesis-commit-step-refuses-when-merge-head-is-already-set-the-5-real-historical-instances-that-motivated-it-and-each-instance-s-own-per-item-audit-outcome/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgos-coding-compounding's retrospective-synthesis commit step refuses when MERGE_HEAD is already set, the 5 real historical instances that motivated it, and each instance's own per-item audit outcome"
   },
   {
     "oldPath": "docs/explanation/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md",
@@ -2609,6 +3114,24 @@
     "targetPath": "docs/why-fgos-dispatch-splits-into-gather-packets-with-a-second-exec-packet-shape-kept-gated/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md",
     "confidence": "medium",
     "evidence": "first H1: Why fgOS dispatch splits into gather packets, with a second exec-packet shape kept gated"
+  },
+  {
+    "oldPath": "docs/explanation/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+    "topicId": "why-fgos-install-moved-from-always-pulling-main-head-to-a-tag-pinned-semver-release-and-how-tags-get-cut",
+    "purposeSlug": "why-fgos-install-moved-from-always-pulling-main-head-to-a-tag-pinned-semver-release-and-how-tags-get-cut",
+    "purposeTitle": "why fgOS install moved from always pulling main HEAD to a tag-pinned semver release, and how tags get cut",
+    "role": "why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head",
+    "entities": [
+      "distribution",
+      "semver",
+      "release",
+      "install"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-install-moved-from-always-pulling-main-head-to-a-tag-pinned-semver-release-and-how-tags-get-cut/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS install moved from always pulling main HEAD to a tag-pinned semver release, and how tags get cut"
   },
   {
     "oldPath": "docs/explanation/why-fgos-merge-now-refuses-outside-the-main-checkout.md",
@@ -2675,6 +3198,26 @@
     "evidence": "first H1: Why fgos-coding-planning's mode gate moved to fgos-routing, and gate traceability stayed inline"
   },
   {
+    "oldPath": "docs/explanation/why-fgos-refuses-a-staged-fgos-deletion-at-commit-time.md",
+    "topicId": "why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion-under-fgos-and-why-git-stash-on-the-main-checkout-is-a-separate-named-hazard",
+    "purposeSlug": "why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion-under-fgos-and-why-git-stash-on-the-main-checkout-is-a-separate-named-hazard",
+    "purposeTitle": "why fgOS added a pre-commit guard refusing a staged deletion under .fgos/, and why git stash on the main checkout is a separate named hazard",
+    "role": "why-fgos-refuses-a-staged-fgos-deletion-at-commit-time",
+    "entities": [
+      "fgos",
+      "git",
+      "pre-commit",
+      "worktree",
+      "events-jsonl",
+      "stash"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion-under-fgos-and-why-git-stash-on-the-main-checkout-is-a-separate-named-hazard/why-fgos-refuses-a-staged-fgos-deletion-at-commit-time.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS added a pre-commit guard refusing a staged deletion under .fgos/, and why git stash on the main checkout is a separate named hazard"
+  },
+  {
     "oldPath": "docs/explanation/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md",
     "topicId": "why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing-its-fallback-chain",
     "purposeSlug": "why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing-its-fallback-chain",
@@ -2699,6 +3242,32 @@
     "targetPath": "docs/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-diffs/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md",
     "confidence": "medium",
     "evidence": "first H1: Why `fgos review` crashed with ENOBUFS on very stale branch diffs"
+  },
+  {
+    "oldPath": "docs/explanation/why-fgos-self-development-is-not-the-default-mission.md",
+    "topicId": "why-fgos-treats-self-development-as-a-bounded-lane-with-its-own-gate-not-the-default-mission-and-where-the-full-mechanism-narrative-lives",
+    "purposeSlug": "why-fgos-treats-self-development-as-a-bounded-lane-with-its-own-gate-not-the-default-mission-and-where-the-full-mechanism-narrative-lives",
+    "purposeTitle": "why fgOS treats self-development as a bounded lane with its own gate, not the default mission, and where the full mechanism narrative lives",
+    "role": "why-fgos-self-development-is-not-the-default-mission",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-treats-self-development-as-a-bounded-lane-with-its-own-gate-not-the-default-mission-and-where-the-full-mechanism-narrative-lives/why-fgos-self-development-is-not-the-default-mission.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS treats self-development as a bounded lane with its own gate, not the default mission, and where the full mechanism narrative lives"
+  },
+  {
+    "oldPath": "docs/explanation/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+    "topicId": "why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line-skill-md-references-md-shape-why-citation-rules-differ-between-product-shippable-skill-files-and-process-build-time-docs-and-the-safety-net-used-while-doing-a-mass-skill-prose-rewrite",
+    "purposeSlug": "why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line-skill-md-references-md-shape-why-citation-rules-differ-between-product-shippable-skill-files-and-process-build-time-docs-and-the-safety-net-used-while-doing-a-mass-skill-prose-rewrite",
+    "purposeTitle": "why fgOS's coding-domain skills were rewritten to a 300-line SKILL.md + references/*.md shape, why citation rules differ between product/shippable skill files and process/build-time docs, and the safety net used while doing a mass skill-prose rewrite",
+    "role": "why-fgos-skills-split-into-skillmd-plus-references-under-300-lines",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "reference",
+    "targetPath": "docs/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line-skill-md-references-md-shape-why-citation-rules-differ-between-product-shippable-skill-files-and-process-build-time-docs-and-the-safety-net-used-while-doing-a-mass-skill-prose-rewrite/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS's coding-domain skills were rewritten to a 300-line SKILL.md + references/*.md shape, why citation rules differ between product/shippable skill files and process/build-time docs, and the safety net used while doing a mass skill-prose rewrite"
   },
   {
     "oldPath": "docs/explanation/why-fgos-unlocks-error-message-stopped-claiming-a-live-session-it-never-checked.md",
@@ -2732,6 +3301,25 @@
     "evidence": "first H1: Why gate approval was separated from move-next"
   },
   {
+    "oldPath": "docs/explanation/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md",
+    "topicId": "why-fgos-requires-a-gate-ask-question-to-restate-its-own-context-and-problem-why-that-requirement-got-real-machine-enforcement-and-why-the-enforcement-targets-structural-completeness-rather-than-citation-format",
+    "purposeSlug": "why-fgos-requires-a-gate-ask-question-to-restate-its-own-context-and-problem-why-that-requirement-got-real-machine-enforcement-and-why-the-enforcement-targets-structural-completeness-rather-than-citation-format",
+    "purposeTitle": "why fgOS requires a gate/ask question to restate its own context and problem, why that requirement got real machine enforcement, and why the enforcement targets structural completeness rather than citation format",
+    "role": "why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it",
+    "entities": [
+      "gate",
+      "ask",
+      "question-quality",
+      "markdown",
+      "STR71"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-requires-a-gate-ask-question-to-restate-its-own-context-and-problem-why-that-requirement-got-real-machine-enforcement-and-why-the-enforcement-targets-structural-completeness-rather-than-citation-format/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS requires a gate/ask question to restate its own context and problem, why that requirement got real machine enforcement, and why the enforcement targets structural completeness rather than citation format"
+  },
+  {
     "oldPath": "docs/explanation/why-heavy-keywords-matching-moved-to-word-boundaries.md",
     "topicId": "why-heavy-keywords-matching-moved-from-substring-to-word-boundary",
     "purposeSlug": "why-heavy-keywords-matching-moved-from-substring-to-word-boundary",
@@ -2743,6 +3331,24 @@
     "targetPath": "docs/why-heavy-keywords-matching-moved-from-substring-to-word-boundary/why-heavy-keywords-matching-moved-to-word-boundaries.md",
     "confidence": "medium",
     "evidence": "first H1: Why `HEAVY_KEYWORDS` matching moved from substring to word-boundary"
+  },
+  {
+    "oldPath": "docs/explanation/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+    "topicId": "why-herdr-cockpit-stacked-worker-launches-into-a-single-reused-pane-and-relaunched-its-discovery-worker-during-boot",
+    "purposeSlug": "why-herdr-cockpit-stacked-worker-launches-into-a-single-reused-pane-and-relaunched-its-discovery-worker-during-boot",
+    "purposeTitle": "why herdr cockpit stacked worker launches into a single reused pane and relaunched its discovery worker during boot",
+    "role": "why-herdr-cockpit-stacked-worker-launches-into-one-pane",
+    "entities": [
+      "herdr",
+      "pane",
+      "launch-guard",
+      "boot-window"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-herdr-cockpit-stacked-worker-launches-into-a-single-reused-pane-and-relaunched-its-discovery-worker-during-boot/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why herdr cockpit stacked worker launches into a single reused pane and relaunched its discovery worker during boot"
   },
   {
     "oldPath": "docs/explanation/why-herdr-plugins-discover-pane-launches-always-pass-autoclose.md",
@@ -2761,6 +3367,19 @@
     "targetPath": "docs/why-herdr-plugin-s-discover-pane-launches-always-pass-autoclose/why-herdr-plugins-discover-pane-launches-always-pass-autoclose.md",
     "confidence": "medium",
     "evidence": "first H1: Why herdr-plugin's discover pane launches always pass `--autoClose`"
+  },
+  {
+    "oldPath": "docs/explanation/why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log.md",
+    "topicId": "why-a-real-trip-and-acknowledge-event-recordironlawacknowledge-is-recorded-when-acknowledge-iron-law-is-actually-used-to-pass-a-merge-distinct-from-the-existing-warn-level-skip-record",
+    "purposeSlug": "why-a-real-trip-and-acknowledge-event-recordironlawacknowledge-is-recorded-when-acknowledge-iron-law-is-actually-used-to-pass-a-merge-distinct-from-the-existing-warn-level-skip-record",
+    "purposeTitle": "why a real trip-and-acknowledge event (recordIronLawAcknowledge) is recorded when --acknowledge-iron-law is actually used to pass a merge, distinct from the existing warn-level skip record",
+    "role": "why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-a-real-trip-and-acknowledge-event-recordironlawacknowledge-is-recorded-when-acknowledge-iron-law-is-actually-used-to-pass-a-merge-distinct-from-the-existing-warn-level-skip-record/why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why a real trip-and-acknowledge event (recordIronLawAcknowledge) is recorded when --acknowledge-iron-law is actually used to pass a merge, distinct from the existing warn-level skip record"
   },
   {
     "oldPath": "docs/explanation/why-isdepsandlineageready-uses-resolved-statuses-not-just-done.md",
@@ -2787,6 +3406,19 @@
     "targetPath": "docs/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a-split/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
     "confidence": "medium",
     "evidence": "first H1: Why the live events.jsonl corrupted, and why the fix needed a split"
+  },
+  {
+    "oldPath": "docs/explanation/why-locked-decisions-heading-contract-fails-open-not-closed.md",
+    "topicId": "why-the-locked-decisions-heading-contract-between-plan-mjs-s-reader-and-fgos-coding-exploring-s-writer-silently-fails-open-on-a-non-literal-heading-and-why-the-fix-widens-the-writer-adds-a-loud-test-instead-of-loosening-the-reader-s-regex",
+    "purposeSlug": "why-the-locked-decisions-heading-contract-between-plan-mjs-s-reader-and-fgos-coding-exploring-s-writer-silently-fails-open-on-a-non-literal-heading-and-why-the-fix-widens-the-writer-adds-a-loud-test-instead-of-loosening-the-reader-s-regex",
+    "purposeTitle": "why the \"## Locked decisions\" heading contract between plan.mjs's reader and fgos-coding-exploring's writer silently fails open on a non-literal heading, and why the fix widens the writer/adds a loud test instead of loosening the reader's regex",
+    "role": "decision-record",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-the-locked-decisions-heading-contract-between-plan-mjs-s-reader-and-fgos-coding-exploring-s-writer-silently-fails-open-on-a-non-literal-heading-and-why-the-fix-widens-the-writer-adds-a-loud-test-instead-of-loosening-the-reader-s-regex/decision-record.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why the \"## Locked decisions\" heading contract between plan.mjs's reader and fgos-coding-exploring's writer silently fails open on a non-literal heading, and why the fix widens the writer/adds a loud test instead of loosening the reader's regex"
   },
   {
     "oldPath": "docs/explanation/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
@@ -2828,6 +3460,19 @@
     "evidence": "first H1: Why `/fgOS:merge-loop` (`tsk-1sm`) recurses into `loop`, not `ck-loop`"
   },
   {
+    "oldPath": "docs/explanation/why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards.md",
+    "topicId": "why-fgos-sync-root-fgos-merge-next-and-fgos-review-resolve-cli-flags-verify-timeout-wait-pr-lazily-after-their-own-use-case-guards-instead-of-eagerly-in-the-cli-adapter-the-tsk-49i-2-flag-parsing-move-regression-family",
+    "purposeSlug": "why-fgos-sync-root-fgos-merge-next-and-fgos-review-resolve-cli-flags-verify-timeout-wait-pr-lazily-after-their-own-use-case-guards-instead-of-eagerly-in-the-cli-adapter-the-tsk-49i-2-flag-parsing-move-regression-family",
+    "purposeTitle": "why fgos sync-root, fgos merge next, and fgos review resolve CLI flags (verify timeout, --wait, --pr) lazily, after their own use-case guards, instead of eagerly in the CLI adapter — the tsk-49i-2 flag-parsing-move regression family",
+    "role": "why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-sync-root-fgos-merge-next-and-fgos-review-resolve-cli-flags-verify-timeout-wait-pr-lazily-after-their-own-use-case-guards-instead-of-eagerly-in-the-cli-adapter-the-tsk-49i-2-flag-parsing-move-regression-family/why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgos sync-root, fgos merge next, and fgos review resolve CLI flags (verify timeout, --wait, --pr) lazily, after their own use-case guards, instead of eagerly in the CLI adapter — the tsk-49i-2 flag-parsing-move regression family"
+  },
+  {
     "oldPath": "docs/explanation/why-merge-next-auto-syncs-blockedonsync-roots.md",
     "topicId": "why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-root",
     "purposeSlug": "why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-root",
@@ -2852,6 +3497,25 @@
     "targetPath": "docs/why-merge-standardization-tsk-4j9-reuses-existing-mechanisms-instead-of-building-new-ones/why-merge-standardization-reuses-existing-mechanisms.md",
     "confidence": "medium",
     "evidence": "first H1: Why merge-standardization (`tsk-4j9`) reuses existing mechanisms instead of building new ones"
+  },
+  {
+    "oldPath": "docs/explanation/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+    "topicId": "why-fgos-merge-throughput-bottlenecked-despite-parallel-dispatch-and-the-merge-target-ref-queue-design-that-replaced-a-hard-concurrency-cap",
+    "purposeSlug": "why-fgos-merge-throughput-bottlenecked-despite-parallel-dispatch-and-the-merge-target-ref-queue-design-that-replaced-a-hard-concurrency-cap",
+    "purposeTitle": "why fgOS merge throughput bottlenecked despite parallel dispatch, and the merge target-ref queue design that replaced a hard concurrency cap",
+    "role": "why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline",
+    "entities": [
+      "merge",
+      "throughput",
+      "iron-law",
+      "main-checkout-lock",
+      "clean-tree"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-merge-throughput-bottlenecked-despite-parallel-dispatch-and-the-merge-target-ref-queue-design-that-replaced-a-hard-concurrency-cap/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS merge throughput bottlenecked despite parallel dispatch, and the merge target-ref queue design that replaced a hard concurrency cap"
   },
   {
     "oldPath": "docs/explanation/why-mergereadiness-excludes-superseded-items.md",
@@ -2950,6 +3614,43 @@
     "evidence": "first H1: Why `mergeTree` groups by parent and sorts recursively by `blocks`"
   },
   {
+    "oldPath": "docs/explanation/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+    "topicId": "why-fgos-move-gained-an-answer-flag-closing-the-last-unreachable-edge-out-of-awaiting-human",
+    "purposeSlug": "why-fgos-move-gained-an-answer-flag-closing-the-last-unreachable-edge-out-of-awaiting-human",
+    "purposeTitle": "why fgos move gained an --answer flag, closing the last unreachable edge out of awaiting-human",
+    "role": "why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human",
+    "entities": [
+      "move",
+      "status-fsm",
+      "awaiting-human",
+      "wontfix"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-move-gained-an-answer-flag-closing-the-last-unreachable-edge-out-of-awaiting-human/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgos move gained an --answer flag, closing the last unreachable edge out of awaiting-human"
+  },
+  {
+    "oldPath": "docs/explanation/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+    "topicId": "why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-when-the-branch-has-no-commits-of-its-own-and-never-when-it-does",
+    "purposeSlug": "why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-when-the-branch-has-no-commits-of-its-own-and-never-when-it-does",
+    "purposeTitle": "why fgOS refreshes a work item's branch base at pick time when the branch has no commits of its own, and never when it does",
+    "role": "why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one",
+    "entities": [
+      "pick",
+      "worktree",
+      "baseRef",
+      "decompose",
+      "staleness"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-when-the-branch-has-no-commits-of-its-own-and-never-when-it-does/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS refreshes a work item's branch base at pick time when the branch has no commits of its own, and never when it does"
+  },
+  {
     "oldPath": "docs/explanation/why-plan-mjs-refined-pass-skips-priority-when-a-human-override-decision-exists.md",
     "topicId": "why-plan-mjs-s-refined-pass-skips-its-priority-write-when-a-human-override-decision-exists",
     "purposeSlug": "why-plan-mjs-s-refined-pass-skips-its-priority-write-when-a-human-override-decision-exists",
@@ -2961,6 +3662,63 @@
     "targetPath": "docs/why-plan-mjs-s-refined-pass-skips-its-priority-write-when-a-human-override-decision-exists/why-plan-mjs-refined-pass-skips-priority-when-a-human-override-decision-exists.md",
     "confidence": "medium",
     "evidence": "first H1: Why `plan.mjs`'s refined pass skips its priority write when a human override decision exists"
+  },
+  {
+    "oldPath": "docs/explanation/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+    "topicId": "why-fgos-coding-planning-and-fgos-coding-validating-merged-their-two-approval-gates-into-one-and-how-that-one-gate-decides-when-to-ask-a-person-versus-proceed",
+    "purposeSlug": "why-fgos-coding-planning-and-fgos-coding-validating-merged-their-two-approval-gates-into-one-and-how-that-one-gate-decides-when-to-ask-a-person-versus-proceed",
+    "purposeTitle": "why fgos-coding-planning and fgos-coding-validating merged their two approval gates into one, and how that one gate decides when to ask a person versus proceed",
+    "role": "why-planning-and-validating-collapsed-into-one-co-adjustment-gate",
+    "entities": [
+      "fgos-coding-planning",
+      "fgos-coding-validating",
+      "gate",
+      "gate-bypass",
+      "human-release"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-coding-planning-and-fgos-coding-validating-merged-their-two-approval-gates-into-one-and-how-that-one-gate-decides-when-to-ask-a-person-versus-proceed/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgos-coding-planning and fgos-coding-validating merged their two approval gates into one, and how that one gate decides when to ask a person versus proceed"
+  },
+  {
+    "oldPath": "docs/explanation/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+    "topicId": "why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-got-unknown-skill-errors-and-why-the-fix-is-a-third-enforced-mirror-rather-than-a-runtime-fallback",
+    "purposeSlug": "why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-got-unknown-skill-errors-and-why-the-fix-is-a-third-enforced-mirror-rather-than-a-runtime-fallback",
+    "purposeTitle": "why a repo that only installs fgOS as a Claude Code plugin got Unknown skill errors, and why the fix is a third enforced mirror rather than a runtime fallback",
+    "role": "why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills",
+    "entities": [
+      "distribution",
+      "plugin",
+      "skills",
+      "mirror",
+      "packaging"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-got-unknown-skill-errors-and-why-the-fix-is-a-third-enforced-mirror-rather-than-a-runtime-fallback/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why a repo that only installs fgOS as a Claude Code plugin got Unknown skill errors, and why the fix is a third enforced mirror rather than a runtime fallback"
+  },
+  {
+    "oldPath": "docs/explanation/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md",
+    "topicId": "why-fgos-detects-post-land-drift-among-sibling-leaves-by-intersecting-real-git-changed-paths-instead-of-triggering-mass-catchup-or-comparing-declared-footprints",
+    "purposeSlug": "why-fgos-detects-post-land-drift-among-sibling-leaves-by-intersecting-real-git-changed-paths-instead-of-triggering-mass-catchup-or-comparing-declared-footprints",
+    "purposeTitle": "why fgOS detects post-land drift among sibling leaves by intersecting real git changed-paths instead of triggering mass catchup or comparing declared footprints",
+    "role": "why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint",
+    "entities": [
+      "merge",
+      "drift",
+      "footprint",
+      "catchup",
+      "changedFiles"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-detects-post-land-drift-among-sibling-leaves-by-intersecting-real-git-changed-paths-instead-of-triggering-mass-catchup-or-comparing-declared-footprints/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS detects post-land drift among sibling leaves by intersecting real git changed-paths instead of triggering mass catchup or comparing declared footprints"
   },
   {
     "oldPath": "docs/explanation/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
@@ -3130,6 +3888,25 @@
     "evidence": "first H1: Why session-claim liveness measures worktree activity, not PID or event-log age"
   },
   {
+    "oldPath": "docs/explanation/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+    "topicId": "why-fgos-coding-driving-s-pick-through-approve-skills-instruct-leaving-the-worktree-before-approve-and-why-they-call-the-fgos-shell-wrapper-instead-of-a-compound-root-command",
+    "purposeSlug": "why-fgos-coding-driving-s-pick-through-approve-skills-instruct-leaving-the-worktree-before-approve-and-why-they-call-the-fgos-shell-wrapper-instead-of-a-compound-root-command",
+    "purposeTitle": "why fgos-coding-driving's pick-through-approve skills instruct leaving the worktree before approve, and why they call the fgos shell wrapper instead of a compound root=$(...) command",
+    "role": "why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in",
+    "entities": [
+      "worktree",
+      "isolation-guard",
+      "approve",
+      "pick",
+      "main-checkout"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-coding-driving-s-pick-through-approve-skills-instruct-leaving-the-worktree-before-approve-and-why-they-call-the-fgos-shell-wrapper-instead-of-a-compound-root-command/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgos-coding-driving's pick-through-approve skills instruct leaving the worktree before approve, and why they call the fgos shell wrapper instead of a compound root=$(...) command"
+  },
+  {
     "oldPath": "docs/explanation/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md",
     "topicId": "why-splitting-test-files-hits-a-floor-and-why-narrowing-verify-never-helped",
     "purposeSlug": "why-splitting-test-files-hits-a-floor-and-why-narrowing-verify-never-helped",
@@ -3154,6 +3931,26 @@
     "targetPath": "docs/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-their-own-reasoning/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
     "confidence": "medium",
     "evidence": "first H1: Why stage-skills forbid ad hoc Task/Agent delegation for their own reasoning"
+  },
+  {
+    "oldPath": "docs/explanation/why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer.md",
+    "topicId": "why-fgos-cut-specific-state-runner-import-edges-consolidated-the-iron-law-check-and-started-extracting-bin-fgos-mjs-s-inline-verb-logic-into-a-src-verbs-domain-verb-mjs-use-case-layer",
+    "purposeSlug": "why-fgos-cut-specific-state-runner-import-edges-consolidated-the-iron-law-check-and-started-extracting-bin-fgos-mjs-s-inline-verb-logic-into-a-src-verbs-domain-verb-mjs-use-case-layer",
+    "purposeTitle": "why fgOS cut specific state<->runner import edges, consolidated the Iron Law check, and started extracting bin/fgos.mjs's inline verb logic into a src/verbs/<domain>/<verb>.mjs use-case layer",
+    "role": "why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer",
+    "entities": [
+      "architecture",
+      "module-boundary",
+      "state",
+      "runner",
+      "iron-law",
+      "cli"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-cut-specific-state-runner-import-edges-consolidated-the-iron-law-check-and-started-extracting-bin-fgos-mjs-s-inline-verb-logic-into-a-src-verbs-domain-verb-mjs-use-case-layer/why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS cut specific state<->runner import edges, consolidated the Iron Law check, and started extracting bin/fgos.mjs's inline verb logic into a src/verbs/<domain>/<verb>.mjs use-case layer"
   },
   {
     "oldPath": "docs/explanation/why-state-json-became-an-incrementally-read-snapshot.md",
@@ -3225,6 +4022,114 @@
     "evidence": "first H1: Why `docs/enduser-docs-index.json` needed a doctor check, not just a regenerate skill"
   },
   {
+    "oldPath": "docs/explanation/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+    "topicId": "why-the-fgos-interface-daemon-combines-gateway-and-orchestrator-into-one-process-why-it-never-links-the-core-lib-in-process-and-how-its-rest-rpc-and-future-mcp-surfaces-are-scoped",
+    "purposeSlug": "why-the-fgos-interface-daemon-combines-gateway-and-orchestrator-into-one-process-why-it-never-links-the-core-lib-in-process-and-how-its-rest-rpc-and-future-mcp-surfaces-are-scoped",
+    "purposeTitle": "why the fgOS interface daemon combines gateway and orchestrator into one process, why it never links the core lib in-process, and how its REST/RPC and future MCP surfaces are scoped",
+    "role": "why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli",
+    "entities": [
+      "interface-daemon",
+      "gateway",
+      "orchestrator",
+      "herdr",
+      "mcp",
+      "distribution"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-the-fgos-interface-daemon-combines-gateway-and-orchestrator-into-one-process-why-it-never-links-the-core-lib-in-process-and-how-its-rest-rpc-and-future-mcp-surfaces-are-scoped/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why the fgOS interface daemon combines gateway and orchestrator into one process, why it never links the core lib in-process, and how its REST/RPC and future MCP surfaces are scoped"
+  },
+  {
+    "oldPath": "docs/explanation/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+    "topicId": "why-the-gateway-s-patch-work-id-edit-route-uses-patch-semantics-reads-its-accepted-fields-from-editable-fields-instead-of-hardcoding-a-list-and-passes-fgos-edit-s-own-refusal-to-the-client-verbatim-instead-of-re-validating",
+    "purposeSlug": "why-the-gateway-s-patch-work-id-edit-route-uses-patch-semantics-reads-its-accepted-fields-from-editable-fields-instead-of-hardcoding-a-list-and-passes-fgos-edit-s-own-refusal-to-the-client-verbatim-instead-of-re-validating",
+    "purposeTitle": "why the gateway's PATCH /work/{id} edit route uses PATCH semantics, reads its accepted fields from EDITABLE_FIELDS instead of hardcoding a list, and passes fgos edit's own refusal to the client verbatim instead of re-validating",
+    "role": "why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semantics-reads-its-accepted-fields-from-editable-fields-instead-of-hardcoding-a-list-and-passes-fgos-edit-s-own-refusal-to-the-client-verbatim-instead-of-re-validating/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why the gateway's PATCH /work/{id} edit route uses PATCH semantics, reads its accepted fields from EDITABLE_FIELDS instead of hardcoding a list, and passes fgos edit's own refusal to the client verbatim instead of re-validating"
+  },
+  {
+    "oldPath": "docs/explanation/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+    "topicId": "why-the-herdr-web-dashboard-s-architecture-moved-from-a-standalone-embedded-webserver-to-a-static-bundle-served-by-the-existing-gateway-and-the-security-lifecycle-decisions-that-survived-the-realignment",
+    "purposeSlug": "why-the-herdr-web-dashboard-s-architecture-moved-from-a-standalone-embedded-webserver-to-a-static-bundle-served-by-the-existing-gateway-and-the-security-lifecycle-decisions-that-survived-the-realignment",
+    "purposeTitle": "why the herdr web dashboard's architecture moved from a standalone embedded webserver to a static bundle served by the existing gateway, and the security/lifecycle decisions that survived the realignment",
+    "role": "why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server",
+    "entities": [
+      "herdr",
+      "web-dashboard",
+      "gateway",
+      "realignment",
+      "auth"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-the-herdr-web-dashboard-s-architecture-moved-from-a-standalone-embedded-webserver-to-a-static-bundle-served-by-the-existing-gateway-and-the-security-lifecycle-decisions-that-survived-the-realignment/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why the herdr web dashboard's architecture moved from a standalone embedded webserver to a static bundle served by the existing gateway, and the security/lifecycle decisions that survived the realignment"
+  },
+  {
+    "oldPath": "docs/explanation/why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot.md",
+    "topicId": "why-the-install-packaging-e2e-test-replaced-a-byte-identical-before-after-fgos-snapshot-diff-with-a-leaked-path-scan",
+    "purposeSlug": "why-the-install-packaging-e2e-test-replaced-a-byte-identical-before-after-fgos-snapshot-diff-with-a-leaked-path-scan",
+    "purposeTitle": "why the install-packaging e2e test replaced a byte-identical before/after .fgos snapshot diff with a leaked-path scan",
+    "role": "why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot",
+    "entities": [
+      "testing",
+      "e2e",
+      "install-packaging",
+      "concurrency",
+      "flake"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-the-install-packaging-e2e-test-replaced-a-byte-identical-before-after-fgos-snapshot-diff-with-a-leaked-path-scan/why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why the install-packaging e2e test replaced a byte-identical before/after .fgos snapshot diff with a leaked-path scan"
+  },
+  {
+    "oldPath": "docs/explanation/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+    "topicId": "why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary-why-it-s-ask-warn-not-a-bypass-field-and-why-one-fgos-approve-skill-wraps-both-approve-and-sync-root",
+    "purposeSlug": "why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary-why-it-s-ask-warn-not-a-bypass-field-and-why-one-fgos-approve-skill-wraps-both-approve-and-sync-root",
+    "purposeTitle": "why the Iron Law gate only runs at the trunk merge boundary, why it's ask/warn (not a bypass field), and why one /fgOS:approve skill wraps both approve and sync-root",
+    "role": "why-the-iron-law-gate-only-fires-at-the-trunk-boundary",
+    "entities": [
+      "iron-law",
+      "merge",
+      "gate",
+      "human-ux",
+      "approve"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary-why-it-s-ask-warn-not-a-bypass-field-and-why-one-fgos-approve-skill-wraps-both-approve-and-sync-root/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why the Iron Law gate only runs at the trunk merge boundary, why it's ask/warn (not a bypass field), and why one /fgOS:approve skill wraps both approve and sync-root"
+  },
+  {
+    "oldPath": "docs/explanation/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+    "topicId": "why-the-judge-discovery-judge-decompose-capacity-entries-were-deleted-from-fgos-config-json",
+    "purposeSlug": "why-the-judge-discovery-judge-decompose-capacity-entries-were-deleted-from-fgos-config-json",
+    "purposeTitle": "why the judge-discovery/judge-decompose capacity entries were deleted from .fgos/config.json",
+    "role": "why-the-judge-discovery-and-judge-decompose-capacities-were-removed",
+    "entities": [
+      "dispatch",
+      "judge",
+      "native-first-dispatch",
+      "cleanup"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-the-judge-discovery-judge-decompose-capacity-entries-were-deleted-from-fgos-config-json/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why the judge-discovery/judge-decompose capacity entries were deleted from .fgos/config.json"
+  },
+  {
     "oldPath": "docs/explanation/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
     "topicId": "why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it",
     "purposeSlug": "why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it",
@@ -3264,6 +4169,25 @@
     "evidence": "first H1: Why the main-checkout lock needs a heartbeat during merge verify"
   },
   {
+    "oldPath": "docs/explanation/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+    "topicId": "why-withmergetargetslot-passes-allowselfrecognition-false-while-main-checkout-lock-keeps-self-recognition-enabled",
+    "purposeSlug": "why-withmergetargetslot-passes-allowselfrecognition-false-while-main-checkout-lock-keeps-self-recognition-enabled",
+    "purposeTitle": "why withMergeTargetSlot passes allowSelfRecognition false while main-checkout.lock keeps self-recognition enabled",
+    "role": "why-the-merge-target-ref-slot-disabled-lock-self-recognition",
+    "entities": [
+      "merge",
+      "lock",
+      "self-recognition",
+      "concurrency",
+      "session-identity"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-withmergetargetslot-passes-allowselfrecognition-false-while-main-checkout-lock-keeps-self-recognition-enabled/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why withMergeTargetSlot passes allowSelfRecognition false while main-checkout.lock keeps self-recognition enabled"
+  },
+  {
     "oldPath": "docs/explanation/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md",
     "topicId": "why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lock-ttl",
     "purposeSlug": "why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lock-ttl",
@@ -3278,16 +4202,21 @@
   },
   {
     "oldPath": "docs/explanation/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
-    "topicId": "why-the-retrospective-content-gate-checked-the-wrong-fields",
-    "purposeSlug": "why-the-retrospective-content-gate-checked-the-wrong-fields",
-    "purposeTitle": "Why the retrospective content gate checked the wrong fields",
+    "topicId": "why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-outcome-decision-fields-the-way-it-does-and-which-engine-written-decisions-it-must-exclude",
+    "purposeSlug": "why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-outcome-decision-fields-the-way-it-does-and-which-engine-written-decisions-it-must-exclude",
+    "purposeTitle": "why checkRetrospectiveContent's cleanup-to-done gate reads outcome/decision fields the way it does, and which engine-written decisions it must exclude",
     "role": "why-the-retrospective-content-gate-checked-the-wrong-fields",
-    "entities": [],
+    "entities": [
+      "retrospective",
+      "cleanup-gate",
+      "engine-decision",
+      "kind"
+    ],
     "framework": "diataxis",
     "mode": "explanation",
-    "targetPath": "docs/why-the-retrospective-content-gate-checked-the-wrong-fields/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
-    "confidence": "medium",
-    "evidence": "first H1: Why the retrospective content gate checked the wrong fields"
+    "targetPath": "docs/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-outcome-decision-fields-the-way-it-does-and-which-engine-written-decisions-it-must-exclude/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why checkRetrospectiveContent's cleanup-to-done gate reads outcome/decision fields the way it does, and which engine-written decisions it must exclude"
   },
   {
     "oldPath": "docs/explanation/why-the-stage-status-driving-split-decision-got-superseded.md",
@@ -3301,6 +4230,43 @@
     "targetPath": "docs/why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-stay-separate-decision-got-superseded/why-the-stage-status-driving-split-decision-got-superseded.md",
     "confidence": "medium",
     "evidence": "first H1: Why the \"stage-axis driving loop and status-axis pool-sweep stay separate\" decision got superseded"
+  },
+  {
+    "oldPath": "docs/explanation/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md",
+    "topicId": "why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a-blocked-item-to-awaiting-approval-rather-than-a-non-existent-proposed-status",
+    "purposeSlug": "why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a-blocked-item-to-awaiting-approval-rather-than-a-non-existent-proposed-status",
+    "purposeTitle": "why the verify-fail-post-merge playbook's retry step moves a blocked item to awaiting-approval rather than a non-existent proposed status",
+    "role": "why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed",
+    "entities": [
+      "merge-loop",
+      "status-fsm",
+      "playbook",
+      "prose-fix"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a-blocked-item-to-awaiting-approval-rather-than-a-non-existent-proposed-status/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why the verify-fail-post-merge playbook's retry step moves a blocked item to awaiting-approval rather than a non-existent proposed status"
+  },
+  {
+    "oldPath": "docs/explanation/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+    "topicId": "why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-outbound-land-side-to-catchup-s-inbound-gate-so-a-landed-merge-s-own-critical-section-only-needs-a-fast-forward",
+    "purposeSlug": "why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-outbound-land-side-to-catchup-s-inbound-gate-so-a-landed-merge-s-own-critical-section-only-needs-a-fast-forward",
+    "purposeTitle": "why fgOS moved the full verify run from the merge lock's outbound (land) side to catchup's inbound gate, so a landed merge's own critical section only needs a fast-forward",
+    "role": "why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate",
+    "entities": [
+      "merge",
+      "verify",
+      "main-checkout-lock",
+      "catchup",
+      "fast-forward"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-outbound-land-side-to-catchup-s-inbound-gate-so-a-landed-merge-s-own-critical-section-only-needs-a-fast-forward/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: why fgOS moved the full verify run from the merge lock's outbound (land) side to catchup's inbound gate, so a landed merge's own critical section only needs a fast-forward"
   },
   {
     "oldPath": "docs/explanation/windows-npm-global-install-has-no-lib-or-bin-subfolder.md",
@@ -3360,6 +4326,26 @@
     "evidence": "first H1: Why work-item titles get a 100-character ceiling at the store layer"
   },
   {
+    "oldPath": "docs/explanation/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+    "topicId": "worker-slot-concept-and-engine-wide-worker-occupancy-ceiling-shared-by-herdr-plugin-fgos-runner-fgos-fanout",
+    "purposeSlug": "worker-slot-concept-and-engine-wide-worker-occupancy-ceiling-shared-by-herdr-plugin-fgos-runner-fgos-fanout",
+    "purposeTitle": "worker slot concept and engine-wide worker occupancy ceiling shared by herdr-plugin, fgos-runner, fgos-fanout",
+    "role": "worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher",
+    "entities": [
+      "worker-slot",
+      "occupancy",
+      "herdr-plugin",
+      "fgos-runner",
+      "fgos-fanout",
+      "ceiling"
+    ],
+    "framework": "diataxis",
+    "mode": "explanation",
+    "targetPath": "docs/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling-shared-by-herdr-plugin-fgos-runner-fgos-fanout/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: worker slot concept and engine-wide worker occupancy ceiling shared by herdr-plugin, fgos-runner, fgos-fanout"
+  },
+  {
     "oldPath": "docs/explanation/worktree-dispatch-attestation-level-1-advisory-only.md",
     "topicId": "worktree-dispatch-attestation-level-1-advisory-only-never-a-gate",
     "purposeSlug": "worktree-dispatch-attestation-level-1-advisory-only-never-a-gate",
@@ -3384,6 +4370,24 @@
     "targetPath": "docs/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying-it/worktree-isolation-axis-decision.md",
     "confidence": "medium",
     "evidence": "first H1: Why fgOS worktrees block `.fgos/` instead of locking or copying it"
+  },
+  {
+    "oldPath": "docs/reference/backlog-status-schema.md",
+    "topicId": "the-schema-shape-of-the-backlog-work-item-status-statuses-transitions-and-statuslabels-wiring",
+    "purposeSlug": "the-schema-shape-of-the-backlog-work-item-status-statuses-transitions-and-statuslabels-wiring",
+    "purposeTitle": "the schema shape of the backlog work-item status — STATUSES, TRANSITIONS, and statusLabels wiring",
+    "role": "backlog-status-schema",
+    "entities": [
+      "status-fsm",
+      "backlog",
+      "work-item",
+      "schema"
+    ],
+    "framework": "diataxis",
+    "mode": "reference",
+    "targetPath": "docs/the-schema-shape-of-the-backlog-work-item-status-statuses-transitions-and-statuslabels-wiring/backlog-status-schema.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: the schema shape of the backlog work-item status — STATUSES, TRANSITIONS, and statusLabels wiring"
   },
   {
     "oldPath": "docs/reference/discover-pool-pick-next-sort-key-order.md",
@@ -3438,6 +4442,24 @@
     "evidence": "first H1: fgOS choke-point survey — ranked priority table"
   },
   {
+    "oldPath": "docs/reference/fgos-gateway-api-ctr010.md",
+    "topicId": "the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and-where-the-spec-lives",
+    "purposeSlug": "the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and-where-the-spec-lives",
+    "purposeTitle": "the fgOS gateway HTTP+JSON API contract — CTR010, its scope, and where the spec lives",
+    "role": "fgos-gateway-api-ctr010",
+    "entities": [
+      "gateway",
+      "openapi",
+      "contract",
+      "interface-daemon"
+    ],
+    "framework": "diataxis",
+    "mode": "reference",
+    "targetPath": "docs/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and-where-the-spec-lives/fgos-gateway-api-ctr010.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: the fgOS gateway HTTP+JSON API contract — CTR010, its scope, and where the spec lives"
+  },
+  {
     "oldPath": "docs/reference/fgos-list-side-log-scoping.md",
     "topicId": "fgos-list-s-side-log-scoping",
     "purposeSlug": "fgos-list-s-side-log-scoping",
@@ -3481,6 +4503,25 @@
     "evidence": "first H1: `fgos show <id>` output fields"
   },
   {
+    "oldPath": "docs/reference/fgos-slots-verb-output-fields.md",
+    "topicId": "fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling-gate-inside-claimwork",
+    "purposeSlug": "fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling-gate-inside-claimwork",
+    "purposeTitle": "fgos slots CLI verb output shape and the worker-slot ceiling gate inside claimWork",
+    "role": "fgos-slots-verb-output-fields",
+    "entities": [
+      "cli",
+      "worker-slots",
+      "occupancy",
+      "ceiling",
+      "claimWork"
+    ],
+    "framework": "diataxis",
+    "mode": "reference",
+    "targetPath": "docs/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling-gate-inside-claimwork/fgos-slots-verb-output-fields.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: fgos slots CLI verb output shape and the worker-slot ceiling gate inside claimWork"
+  },
+  {
     "oldPath": "docs/reference/fgos-sync-root-outcome-shape.md",
     "topicId": "fgos-sync-root-s-real-guards-and-outcome-shape",
     "purposeSlug": "fgos-sync-root-s-real-guards-and-outcome-shape",
@@ -3492,6 +4533,24 @@
     "targetPath": "docs/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md",
     "confidence": "medium",
     "evidence": "first H1: `fgos sync-root`'s real guards and outcome shape"
+  },
+  {
+    "oldPath": "docs/reference/fgos-version-verb-output-fields.md",
+    "topicId": "fgos-version-cli-verb-output-shape-and-the-cli-version-visible-doctor-check",
+    "purposeSlug": "fgos-version-cli-verb-output-shape-and-the-cli-version-visible-doctor-check",
+    "purposeTitle": "fgos version CLI verb output shape and the cli-version-visible doctor check",
+    "role": "fgos-version-verb-output-fields",
+    "entities": [
+      "cli",
+      "version",
+      "doctor",
+      "install"
+    ],
+    "framework": "diataxis",
+    "mode": "reference",
+    "targetPath": "docs/fgos-version-cli-verb-output-shape-and-the-cli-version-visible-doctor-check/fgos-version-verb-output-fields.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: fgos version CLI verb output shape and the cli-version-visible doctor check"
   },
   {
     "oldPath": "docs/reference/forgentx-tool-registry-configuration.md",
@@ -3520,6 +4579,25 @@
     "evidence": "first H1: Gate-bypass config"
   },
   {
+    "oldPath": "docs/reference/gateway-subsystem-audit-260814-findings.md",
+    "topicId": "the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-review-audit-of-fgos-s-gateway-subsystem-rest-rpc-mcp-surface-and-which-work-item-tracks-each",
+    "purposeSlug": "the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-review-audit-of-fgos-s-gateway-subsystem-rest-rpc-mcp-surface-and-which-work-item-tracks-each",
+    "purposeTitle": "the 9 findings from the 2026-08-14 haiku-scan + fable code-review audit of fgOS's gateway subsystem (REST/RPC + MCP surface), and which work item tracks each",
+    "role": "gateway-subsystem-audit-260814-findings",
+    "entities": [
+      "audit",
+      "gateway",
+      "mcp",
+      "interface-daemon",
+      "code-review"
+    ],
+    "framework": "diataxis",
+    "mode": "reference",
+    "targetPath": "docs/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-review-audit-of-fgos-s-gateway-subsystem-rest-rpc-mcp-surface-and-which-work-item-tracks-each/gateway-subsystem-audit-260814-findings.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: the 9 findings from the 2026-08-14 haiku-scan + fable code-review audit of fgOS's gateway subsystem (REST/RPC + MCP surface), and which work item tracks each"
+  },
+  {
     "oldPath": "docs/reference/herdr-dashboard-layout-and-action-queues.md",
     "topicId": "herdr-plugin-dashboard-layout-work-items-panel-action-queue-boxes",
     "purposeSlug": "herdr-plugin-dashboard-layout-work-items-panel-action-queue-boxes",
@@ -3544,6 +4622,19 @@
     "targetPath": "docs/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
     "confidence": "medium",
     "evidence": "first H1: herdr web dashboard: layout, userflow and visual language"
+  },
+  {
+    "oldPath": "docs/reference/herdr-web-dashboard-stitch-export-to-component-map.md",
+    "topicId": "which-stitch-generated-design-export-maps-to-which-real-react-component-in-the-herdr-web-dashboard-and-what-each-component-covers",
+    "purposeSlug": "which-stitch-generated-design-export-maps-to-which-real-react-component-in-the-herdr-web-dashboard-and-what-each-component-covers",
+    "purposeTitle": "which stitch-generated design export maps to which real React component in the herdr web dashboard, and what each component covers",
+    "role": "herdr-web-dashboard-stitch-export-to-component-map",
+    "entities": [],
+    "framework": "diataxis",
+    "mode": "reference",
+    "targetPath": "docs/which-stitch-generated-design-export-maps-to-which-real-react-component-in-the-herdr-web-dashboard-and-what-each-component-covers/herdr-web-dashboard-stitch-export-to-component-map.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: which stitch-generated design export maps to which real React component in the herdr web dashboard, and what each component covers"
   },
   {
     "oldPath": "docs/reference/judge-fail-safe-debug-log-fields.md",
@@ -3665,6 +4756,25 @@
     "targetPath": "docs/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md",
     "confidence": "medium",
     "evidence": "first H1: Work-item pipeline: stages, verbs, actors, handoffs"
+  },
+  {
+    "oldPath": "docs/reference/worktree-merge-lifecycle-audit-260814-findings.md",
+    "topicId": "the-9-findings-from-the-2026-08-14-fable-code-review-audit-of-fgos-s-worktree-claim-merge-cleanup-lifecycle-and-which-work-item-tracks-each",
+    "purposeSlug": "the-9-findings-from-the-2026-08-14-fable-code-review-audit-of-fgos-s-worktree-claim-merge-cleanup-lifecycle-and-which-work-item-tracks-each",
+    "purposeTitle": "the 9 findings from the 2026-08-14 fable code-review audit of fgOS's worktree claim/merge/cleanup lifecycle, and which work item tracks each",
+    "role": "worktree-merge-lifecycle-audit-260814-findings",
+    "entities": [
+      "audit",
+      "worktree",
+      "merge",
+      "lifecycle",
+      "code-review"
+    ],
+    "framework": "diataxis",
+    "mode": "reference",
+    "targetPath": "docs/the-9-findings-from-the-2026-08-14-fable-code-review-audit-of-fgos-s-worktree-claim-merge-cleanup-lifecycle-and-which-work-item-tracks-each/worktree-merge-lifecycle-audit-260814-findings.md",
+    "confidence": "high",
+    "evidence": "frontmatter authoritative_for: the 9 findings from the 2026-08-14 fable code-review audit of fgOS's worktree claim/merge/cleanup lifecycle, and which work item tracks each"
   },
   {
     "oldPath": "docs/tutorials/walking-a-heavy-item-through-a-3-child-split.md",
