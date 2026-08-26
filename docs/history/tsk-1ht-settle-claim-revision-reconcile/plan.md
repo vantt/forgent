@@ -23,14 +23,22 @@ reconcile branch instead of an unconditional refuse: when
 `readRawEvents(dir)` (`src/state/store.mjs:1998`) for every event whose
 payload references this item's `id`, filtered to those appended strictly
 after the claim's own `acquiredAt` timestamp. **Implementation detail
-confirmed at Repo fit (validating Step 2):** raw events stamp `ts` as
-`Date.now()` (a numeric epoch-ms — `src/state/store.mjs:2018`'s
-`appendEventLocked`), while `claim.acquiredAt` is stored as
-`new Date().toISOString()` (`src/state/runtime-coordination.mjs:214,242`)
-— an ISO string, not a number. The reconcile branch must convert
-(`new Date(freshClaim.acquiredAt).getTime()`) before comparing to
-`event.ts`; comparing them directly (string vs number) would silently
-never filter anything. If every one of those
+corrected during actual implementation (this plan's own earlier "Repo fit"
+row got this wrong — see below):** both `event.ts` and `claim.acquiredAt`
+are ISO strings (`new Date().toISOString()`, stamped by the REAL append
+path, `src/state/events.mjs`'s `appendEventCore` — the caller's own
+`{type, payload}` object never carries a `ts` at all; `appendEventCore`
+stamps it unconditionally). The `store.mjs:2018` numeric `Date.now()` this
+plan originally cited turned out to be a different, unused-on-this-path
+constructor, not the one `appendEventLocked` actually uses — comparing
+`event.ts` directly against a NUMBER (`new Date(claim.acquiredAt).getTime()`)
+silently coerced the string to `NaN` via `>`, always false, which made the
+FIRST implementation attempt's reconcile check pass unconditionally
+regardless of writer — caught by this item's own new regression test
+("still refuses a revision drift caused by a GENUINELY DIFFERENT writer")
+failing during the very first test run, before this ever shipped. Fixed by
+converting BOTH sides via `new Date(...).getTime()` before comparing. If
+every one of those
 events carries `payload.writer.id === freshClaim.writerId` (the SAME
 writer that holds this claim — `resolveWriterIdentity`'s stamp, already
 present on every mutating event per RESEARCH.md round 1 point 4), the
@@ -103,25 +111,39 @@ so there is no cross-item sequencing to honor.
 ## Shape
 
 Single, focused fix — not split into multiple items (see "Decide the
-split" below). Concrete cases to prove, scaled to `high-risk`:
+split" below). Concrete cases proved, scaled to `high-risk` (all landed as
+real tests in `test/state/runtime-coordination.test.mjs`, not just
+sketched here):
 
-- **Same-writer drift, single edit** — claim → one `fgos edit` (same
-  writer) → `fgos return` succeeds (the tsk-1sl repro, minimal form).
-- **Same-writer drift, multiple edits across stages** — claim → `fgos
-  edit`(tier/kind/risk) → `fgos discover` → `fgos edit`(docsRef) → `fgos
-  gate-approve` → `fgos plan` → `fgos return` succeeds (tsk-1sl's full
-  reported sequence).
+- **Same-writer drift, multiple edits** — claim → several `fgos edit`
+  calls (tier, docsRef, verify/action/footprint — the actual shape
+  `fgos-coding-planning`'s own field-sync steps make) as the SAME writer →
+  settle succeeds (reconciled). Subsumes the single-edit case mechanically
+  (the check has no special-case for edit count), so no separate minimal
+  test was added — one same-writer multi-edit test already exercises the
+  exact code path a single edit would.
 - **Genuine cross-writer conflict still refuses** — claim under writer A →
   a durable edit stamped with a DIFFERENT writer id lands on the item →
-  `fgos return` (as writer A) still throws `StoreError('conflict', ...)` —
-  the new regression test this plan requires.
+  settle (as writer A) still throws `StoreError('conflict', ...)`.
+- **An event with no writer stamp at all fails closed** — `recordClaimAttempt`'s
+  own reclaim record (`src/runner/claim-port.mjs`) never stamps
+  `payload.writer`; simulating one landing in the drift window must still
+  refuse, never treat "no evidence" as "same writer".
+- **A bogus/fabricated preClaimRevision with ZERO explaining events must
+  still refuse** — this is the vacuous-truth case RESEARCH.md round 3
+  documents catching live: `events.every()` on an empty filtered set is
+  trivially true, which would otherwise reconcile a mismatch nothing in
+  the log actually caused. Covered by the two PRE-EXISTING tests this
+  fix must not break (`settleClaim CAS validation failure`, `settleClaim
+  on a CAS/revision conflict leaves the claim untouched`), both of which
+  construct exactly this shape.
 - **Existing status-drift and claimId-mismatch checks untouched** — the
   pre-existing checks at store.mjs:1039-1043 (claimId) and 1064-1065/1086-
-  1088 (settling writer identity) are orthogonal to this fix and must keep
+  1088 (settling writer identity) are orthogonal to this fix and keep
   behaving exactly as today; the full existing suite is the proof.
 - **No event exists yet for a claim with no prior writes** (the common,
-  unmodified case) — revision matches, no reconcile branch even entered;
-  must stay a no-op, same as today.
+  unmodified case) — revision matches, the reconcile branch is never even
+  entered; stays a no-op, same as today.
 
 ## Decide the split, if any
 

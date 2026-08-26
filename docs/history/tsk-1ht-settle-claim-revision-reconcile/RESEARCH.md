@@ -99,3 +99,137 @@ to confirm the existing CAS-conflict-must-refuse tests still pass
 unchanged, plus a NEW test that constructs two distinct `writerId`s writing
 to the same claimed item (a case the current suite does not cover) and
 confirms settleClaim still refuses in that case.
+
+## Round 2 — 2026-08-26 (live confirmation during this item's own planning->executing edge)
+
+While driving THIS item through `fgos-coding-validating`'s own Gate, the
+`fgos plan tsk-1ht --verdict pass-through` call itself hit the exact bug
+being fixed, live, expanding the confirmed blast radius beyond `fgos
+return`:
+
+**What happened:** this item's own `risk` field is `heavy` (correctly
+classified at discovery, per RESEARCH.md round 1 and the plan's own risk
+map). `src/intake/plan.mjs`'s `resolvePlan` (lines 766-816) has an
+INDEPENDENT engine-level floor: `keywordRiskGate = work.risk ===
+HEAVY_RISK && !heavyRiskAlreadyConfirmed && !citesRealEvidence` — true
+here (no CONTEXT.md/locked decision exists, since discovery's own verdict
+was `clear` and skipped `exploring`). This forces `putInAwaiting` (line
+814) regardless of the caller's own `--verdict pass-through`, exactly as
+`fgos plan --help`'s own text warns ("downstream safety gates ...  still
+apply unconditionally").
+
+`putInAwaiting` (`src/state/store.mjs:1306-1320`) delegates straight to
+`settleClaim` when a claim is active (line 1309) — and THIS call hit the
+CAS refuse, live:
+
+```
+StoreError: settleClaim: item "tsk-1ht" durable revision changed from "c0ae0a2d0d7819c2" to "6290017cc469f02b".
+    at file:///.../src/state/store.mjs:1104:17
+    at withClaimsLock (file:///.../src/state/runtime-coordination.mjs:103:12)
+    at file:///.../src/state/store.mjs:1069:27
+    at withEventsLockAndRefresh (file:///.../src/state/store.mjs:212:17)
+    at settleClaim (file:///.../src/state/store.mjs:1068:17)
+    at putInAwaiting (file:///.../src/state/store.mjs:1309:12)
+    at resolvePlan (file:///.../src/intake/plan.mjs:814:5)
+```
+
+**Why this matters:** the original report (tsk-1sl repro) only showed
+`fgos return` refusing. This live hit proves the SAME bug also blocks the
+engine's own heavy-risk ask-gate (`putInAwaiting`) — meaning a heavy-risk
+coding item that picks up ANY same-writer edit after claim (the ordinary,
+expected `fgos-coding-planning`/`fgos-coding-discovering` pattern) can get
+fully stuck: unable to `return`, and unable to even be parked to ask a
+person. This is a genuinely worse failure mode than originally scoped —
+recorded here as additional evidence, not a scope change to the fix
+itself (the SAME reconcile branch in `settleClaim` fixes both call paths,
+since both go through the identical CAS check at store.mjs:1101-1105).
+
+This also confirms `putInAwaiting` belongs in this item's blast-radius
+list (already-listed in plan.md's risk map as "store.mjs's own internal
+delegate", now identified precisely).
+
+## Round 3 — 2026-08-26 (implementation: two real bugs caught by the new tests, before they ever shipped)
+
+Implementing `revisionDriftIsSelfCaused` in `src/state/store.mjs` and
+running the new regression tests (see plan.md's Shape) caught two real
+defects in the FIRST version of the reconcile logic — both fixed before
+this change was considered done, neither found by inspection alone:
+
+1. **ts-format bug (silently disabled the entire refuse path).** The first
+   version compared `event.ts` directly against a NUMBER
+   (`new Date(claim.acquiredAt).getTime()`), based on this plan's own
+   earlier (wrong) Repo-fit finding that `event.ts` was a numeric
+   `Date.now()`. The REAL append path (`src/state/events.mjs`'s
+   `appendEventCore`) always stamps `ts: new Date().toISOString()` — an ISO
+   STRING — overriding whatever the caller passed. Comparing a string to a
+   number via `>` silently coerces to `NaN`, always false, which made
+   EVERY event look like it was outside the drift window regardless of
+   writer — the reconcile fired unconditionally, for ANY writer. Caught
+   immediately: the "still refuses a GENUINELY DIFFERENT writer" test
+   failed to throw on the very first run. Fixed by converting both sides
+   via `new Date(...).getTime()`.
+2. **Vacuous-truth bug (reconciled drift that no event explained at all).**
+   `events.every(predicate)` on the empty set (no events in the drift
+   window) trivially returns `true` — after fixing bug 1, this made TWO
+   pre-existing tests fail (`settleClaim CAS validation failure`,
+   `settleClaim on a CAS/revision conflict leaves the claim untouched`),
+   both of which construct a bogus/fabricated `preClaimRevision` with ZERO
+   real events since claim time. The fix requires POSITIVE evidence — at
+   least one same-writer event actually explaining the drift — never
+   reconciling a mismatch nothing in the log accounts for.
+
+Both fixes are in the shipped `revisionDriftIsSelfCaused`
+(`src/state/store.mjs`). Full suite: 24/24 pass in
+`test/state/runtime-coordination.test.mjs`, including both fixed
+pre-existing tests, the new same-writer/different-writer/unstamped-event
+tests, and a corrected version of "a durable content change with the SAME
+status..." (its own comment always claimed a different actor; the
+implementation now actually constructs one via `FGOS_SESSION_ID`, matching
+what it always said it tested).
+
+## Round 4 — 2026-08-26 (a real live bug found only by retrying against the real repo, plus a third bug caught by an intermittent test flake)
+
+**Bug 3 (blast-radius gap): decision/gate-approve events treated as
+drift-relevant.** Retrying `fgos plan tsk-1ht` against the REAL repo (not
+a synthetic test fixture) after round 3's fixes STILL refused. Live
+inspection of the actual `.fgos/` event log for `tsk-1ht`
+(`readRawEvents` against the real store) showed `decision` and
+`work.gate-approve` events with `payload.writer: undefined` sitting inside
+the drift window — exactly the routine `fgos decision`/`fgos gate-approve`
+calls `fgos-coding-planning`/`fgos-coding-validating` make by design. The
+original design scanned EVERY event referencing the item's id regardless
+of type, so these unstamped-but-harmless events made the reconcile fail
+closed on every real coding-domain item — the synthetic unit tests never
+caught this because none of them called `addDecision`/`recordGateApprove`
+mid-window. Confirmed via `replay.mjs`'s fold switch that `decision` →
+`view.decisions`/`decisionsById`, `work.gate-approve` → `view.gates`,
+`work.discovery` → `view.discovery`, `work.outcome` → `view.outcomes`,
+`work.friction` → `view.frictions`, `work.call-summary` → `view.callThreads`
+— all side-log structures `getItemDurableRevision` never hashes (it only
+hashes `view.work[id]`). Fixed by adding `SIDE_LOG_ONLY_EVENT_TYPES`, a
+DENYLIST (not allowlist, so an unrecognized future type defaults to the
+safe/conservative "still scanned" path) of these six types, skipped by the
+scan regardless of writer. A new regression test
+("...even when unstamped side-log events (decision, gate-approve) also
+happened mid-claim") locks this in.
+
+**Bug 4 (real intermittent flake, ~20% of full-suite runs): strict `>`
+timestamp comparison.** Adding bug 3's regression test surfaced a
+genuinely intermittent failure — passed standalone and paired every time,
+but failed roughly 1 in 5 full-suite runs. Root cause: `ts`/`acquiredAt`
+both have millisecond resolution, and the very FIRST event appended right
+after `acquireClaim` (e.g. the test's own first `editWork` call) can
+legitimately land in the SAME millisecond as `claim.acquiredAt` on a fast
+machine — `eventTsMs > acquiredAtMs` is then false, silently excluding
+that edit from the scan and leaving `sawSelfCausedEvent` false (no
+qualifying event seen at all), so the whole check failed CLOSED
+non-deterministically. Fixed by using `>=` instead of `>` — an event from
+strictly BEFORE the claim (e.g. the item's own `work.add`) has a
+genuinely earlier, non-colliding timestamp in practice, so this loses no
+real exclusion. Confirmed fixed: 7/7 clean full-suite runs after the
+change (the pre-fix rate was roughly 4/5 clean, 1/5 failing).
+
+Both of these were caught by actually retrying the fix against the real
+repo and by the test suite's own intermittent behavior — neither would
+have been caught by code review alone.
+

@@ -981,6 +981,80 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
 }
 
 /**
+ * tsk-1ht: `getItemDurableRevision` hashes ONLY `view.work[id]` — never
+ * `view.decisions`/`decisionsById`, `view.gates`, `view.discovery`,
+ * `view.outcomes`, `view.frictions`, or `view.callThreads` (all separate,
+ * side-log-only structures per `replay.mjs`'s fold switch). An event whose
+ * type folds into one of those side logs can NEVER cause a revision drift,
+ * no matter who wrote it or whether it carries a writer stamp at all — a
+ * confirmed live case: `fgos decision`/`fgos gate-approve` (routinely
+ * called by `fgos-coding-planning`/`fgos-coding-validating` mid-lifecycle,
+ * by design) never stamp `payload.writer`, so treating them as
+ * drift-relevant made the very first version of this fix fail closed on
+ * every real coding-domain item, never actually reconciling anything.
+ * `SIDE_LOG_ONLY_EVENT_TYPES` is a DENYLIST, not an allowlist, on purpose:
+ * an unrecognized future event type defaults to being scanned (the safe,
+ * conservative direction) rather than silently trusted.
+ */
+const SIDE_LOG_ONLY_EVENT_TYPES = new Set([
+  'decision',
+  'work.gate-approve',
+  'work.discovery',
+  'work.outcome',
+  'work.friction',
+  'work.call-summary',
+]);
+
+/**
+ * settleClaim's revision-CAS check used to refuse ANY durable drift since
+ * claim time, even when every intervening write came from the SAME writer
+ * that now holds the claim — the routine mid-lifecycle `fgos edit` calls
+ * `fgos-coding-planning`/`fgos-coding-discovering` make by design, never a
+ * concurrent conflict. This reconciles exactly that case: every
+ * `view.work[id]`-mutating event (per `SIDE_LOG_ONLY_EVENT_TYPES` above)
+ * since the claim's own `acquiredAt` must be positively attributed
+ * (`payload.writer.id`) to `claim.writerId` — an event with no writer
+ * stamp at all (e.g. `recordClaimAttempt`'s reclaim record,
+ * src/runner/claim-port.mjs's stale-claim-reclaim path) or one stamped
+ * with a different writer fails this closed, keeping the original refuse.
+ * `claim.writerId` absent (a claim written before that field existed) is
+ * never reconciled either — no positive evidence exists to reconcile
+ * against, the same "never a false positive on old data" floor the
+ * writer-identity check above already holds to. `readRawEvents` is a
+ * plain read (see its own doc comment) — safe to call here, already inside
+ * the held events.lock/claims.lock critical section.
+ */
+function revisionDriftIsSelfCaused(dir, id, claim) {
+  if (!claim.writerId) return false;
+  const acquiredAtMs = new Date(claim.acquiredAt).getTime();
+  if (!Number.isFinite(acquiredAtMs)) return false;
+  const events = readRawEvents(dir);
+  // Require POSITIVE evidence, never a vacuous pass: a preClaimRevision that
+  // was simply wrong to begin with (corrupt data, a fabricated value) has NO
+  // events explaining the drift at all -- `.every()` on an empty filtered
+  // set would otherwise reconcile a mismatch nothing actually caused. At
+  // least one same-writer event in the window is required, and any event in
+  // the window from a different (or missing) writer fails the whole check
+  // closed immediately.
+  let sawSelfCausedEvent = false;
+  for (const event of events) {
+    if (event.payload?.id !== id) continue;
+    if (SIDE_LOG_ONLY_EVENT_TYPES.has(event.type)) continue;
+    const eventTsMs = new Date(event.ts).getTime();
+    // `>=`, not `>`: `ts` has only millisecond resolution, and the very
+    // first post-claim event can legitimately share the exact same
+    // millisecond as `acquiredAt` (a real, intermittently-reproducing flake
+    // this fix caught in its own test suite) -- still strictly excludes an
+    // event from BEFORE the claim (e.g. the item's own `work.add`), which
+    // never shares that millisecond in practice.
+    if (!Number.isFinite(eventTsMs) || !(eventTsMs >= acquiredAtMs)) continue;
+    if (event.payload?.writer?.id !== claim.writerId) return false;
+    sawSelfCausedEvent = true;
+  }
+  return sawSelfCausedEvent;
+}
+
+/**
  * Settle an active runtime claim on item `id`, transitioning it DIRECTLY
  * from its preClaimStatus to `finalStatus` (D2; docs/architect/
  * doing-coordination-redesign.md §7.3/§9.2) — no durable intermediate
@@ -996,7 +1070,8 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
  * then releases the runtime claim in that SAME critical section,
  * immediately after the write succeeds — never on a failed settle (a
  * caught CAS/revision conflict leaves the claim untouched for its owner
- * to retry or reconcile).
+ * to retry or reconcile, unless the drift is self-caused, per
+ * `revisionDriftIsSelfCaused` above — reconciled instead of refused).
  */
 export function settleClaim(dir, {
   id,
@@ -1101,7 +1176,10 @@ export function settleClaim(dir, {
       if (freshClaim.preClaimRevision) {
         const curRev = getItemDurableRevision(before, id);
         if (curRev !== freshClaim.preClaimRevision) {
-          throw new StoreError('conflict', `settleClaim: item "${id}" durable revision changed from "${freshClaim.preClaimRevision}" to "${curRev}".`);
+          if (!revisionDriftIsSelfCaused(dir, id, freshClaim)) {
+            throw new StoreError('conflict', `settleClaim: item "${id}" durable revision changed from "${freshClaim.preClaimRevision}" to "${curRev}".`);
+          }
+          process.stderr.write(`fgos: settleClaim reconciled a same-writer revision drift for "${id}" (writer "${freshClaim.writerId}") -- preClaimRevision "${freshClaim.preClaimRevision}" -> "${curRev}"\n`);
         }
       }
 
