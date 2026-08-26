@@ -108,10 +108,21 @@ existing behavior changes.
 **Files touched, in order:**
 1. `src/report/dispatch-confidence.mjs` (new) — the classification reader,
    importing tsk-2tr's extracted ladder helper once that lands.
-2. `src/cli/command-registry.mjs` — register the `dispatch-report` verb.
+2. `src/cli/command-registry.mjs` and `bin/fgos.mjs` — register the
+   `dispatch-report` verb and wire its dispatcher case (every registered
+   verb needs both, matching every sibling verb's own wiring).
 3. `test/runner/dispatch.test.mjs` (extended) — new test cases for the
    reader, per the item's own Verify field.
-4. `docs/history/dispatch-result-confidence-reader/plan.md` (this file).
+4. `docs/architecture-manifest.json` — register the new file's layer
+   (`infra`, matching sibling `src/report/decision-index.mjs`'s own
+   precedent: touches the filesystem directly and imports `infra`-ranked
+   `src/runner/paths.mjs`/`src/runner/dispatch/result-ladder.mjs`, so its
+   own rank cannot sit deeper than `infra` without violating the
+   one-directional-layer rule against those two imports). Caught live by
+   `fgos return`'s own repo-invariant check
+   (`test/architecture.test.mjs`) on the first return attempt — not
+   anticipated in round 1/2 of this plan.
+5. `docs/history/dispatch-result-confidence-reader/plan.md` (this file).
 
 ## Shape
 
