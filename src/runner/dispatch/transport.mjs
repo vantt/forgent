@@ -318,17 +318,76 @@ function cliSpawnAdapter(invocation, opts) {
       if (idleTimer) clearTimeout(idleTimer);
     };
 
+    // RELEASE OUR OWN READ END ON EVERY SETTLE PATH (self-review finding,
+    // real, 2026-08-26, confirmed live): rejecting immediately on timeout
+    // (below) bounds the PROMISE, but the parent process's own event loop
+    // stays alive as long as `child.stdout`/`child.stderr` remain open
+    // Node-side handles — and an escaped descendant (e.g. `setsid ...
+    // sleep 5 &`) inherits the pipe's write end independent of process
+    // groups, so it alone can keep that pipe from ever closing. Confirmed
+    // live: even with the promise settling at ~112ms, a caller that never
+    // force-exits hung for the full ~5s the escaped descendant kept
+    // running. Destroying our own read-side streams (never the writer's
+    // problem to close) drops that handle immediately regardless of what
+    // any descendant does afterward. Harmless on the normal 'close' path
+    // too — the streams have already ended themselves by then.
+    const releaseStdio = () => {
+      try { child.stdout.destroy(); } catch {}
+      try { child.stderr.destroy(); } catch {}
+    };
+
     const finish = (fn) => {
       if (settled) return;
       settled = true;
       clearTimers();
+      releaseStdio();
       fn();
+    };
+
+    // TIMEOUT/MAXBUFFER SETTLE IMMEDIATELY ON KILL, NEVER WAIT FOR 'close'
+    // (self-review finding, real, 2026-08-26, confirmed live): switching
+    // normal completion to 'close' (below) fixed a real stdout-loss race,
+    // but it also made a rejection that USED TO fire on the killed child's
+    // own 'exit'/'close' start waiting on the SAME event instead — and
+    // `killChildTree`'s process-group SIGTERM only reaches descendants
+    // still in the child's own process group. A descendant that escaped it
+    // (e.g. `setsid sh -c 'sleep 1' &`) keeps inheriting the stdout pipe
+    // open for as long as IT runs, regardless of the SIGTERM — confirmed
+    // live: `timeoutMs: 100` against `sh -c "setsid sh -c 'sleep 1' &
+    // echo parent-done"` rejected worker-timeout after ~1006ms, not
+    // ~100ms. `timeoutMs` is a promised ceiling on how long a caller waits
+    // for an ANSWER, not on how long an escaped grandchild is allowed to
+    // keep a pipe open — so the timeout/idle-timeout/maxBuffer paths each
+    // settle THEMSELVES, synchronously, right after killing, with whatever
+    // stdout/stderr has been captured so far. `close` (below) still owns
+    // NORMAL completion (no kill involved, so no escape risk) — `finish`'s
+    // `settled` guard makes it a harmless no-op on the already-settled path.
+    const settleTimeout = () => {
+      finish(() => {
+        reject(new DispatchError(
+          'worker-timeout',
+          idleTimedOut
+            ? `executor for work "${workId}" was killed after ${idleTimeoutMs}ms with no output (idle timeout).`
+            : `executor timed out after ${timeoutMs}ms for work "${workId}".`,
+          { workId, tier, model, stdout, stderr },
+        ));
+      });
+    };
+    const settleMaxBuffer = () => {
+      finish(() => {
+        reject(new DispatchError(
+          'worker-spawn-fail',
+          `executor for work "${workId}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
+          { workId, tier, model, cause: 'maxBuffer exceeded', stdout, stderr },
+        ));
+      });
     };
 
     if (timeoutMs) {
       timer = setTimeout(() => {
         timedOut = true;
         killChildTree(child, 'SIGTERM');
+        settleTimeout();
       }, timeoutMs);
     }
 
@@ -346,6 +405,7 @@ function cliSpawnAdapter(invocation, opts) {
         timedOut = true;
         idleTimedOut = true;
         killChildTree(child, 'SIGTERM');
+        settleTimeout();
       }, idleTimeoutMs);
     };
     armIdleTimer();
@@ -358,6 +418,7 @@ function cliSpawnAdapter(invocation, opts) {
         if (!maxBufferExceeded) {
           maxBufferExceeded = true;
           killChildTree(child, 'SIGTERM');
+          settleMaxBuffer();
         }
         return;
       }
@@ -371,6 +432,7 @@ function cliSpawnAdapter(invocation, opts) {
         if (!maxBufferExceeded) {
           maxBufferExceeded = true;
           killChildTree(child, 'SIGTERM');
+          settleMaxBuffer();
         }
         return;
       }
@@ -400,35 +462,13 @@ function cliSpawnAdapter(invocation, opts) {
     // worker output under load, not a test-only artifact: `result.stdout`
     // itself would have been truncated the same way for any real caller.
     // 'close' is what Node's OWN `child_process.exec`/`execFile` wait for
-    // internally, for exactly this reason. Switching to it is safe against
-    // the timeout concern a prior version of this comment raised: `timer`/
-    // `idleTimer` stay armed independently of this listener (cleared only
-    // inside `finish()`, which only runs once this fires) — an orphaned
-    // grandchild holding the pipe open still gets torn down by
-    // `killChildTree`'s process-group SIGTERM once `timeoutMs` elapses,
-    // which closes the pipe and lets 'close' fire immediately after; the
-    // worst case is the same bounded wait the timeout already guarantees,
-    // never an unbounded hang.
+    // internally, for exactly this reason. Only the NORMAL completion path
+    // waits for it now — timeout/idle-timeout/maxBuffer each settle
+    // themselves the instant they kill (see settleTimeout/settleMaxBuffer
+    // above), so this handler firing after one of them already has is
+    // always a no-op via `finish`'s `settled` guard.
     child.on('close', (code, signal) => {
       finish(() => {
-        if (timedOut) {
-          reject(new DispatchError(
-            'worker-timeout',
-            idleTimedOut
-              ? `executor for work "${workId}" was killed after ${idleTimeoutMs}ms with no output (idle timeout).`
-              : `executor timed out after ${timeoutMs}ms for work "${workId}".`,
-            { workId, tier, model, stdout, stderr },
-          ));
-          return;
-        }
-        if (maxBufferExceeded) {
-          reject(new DispatchError(
-            'worker-spawn-fail',
-            `executor for work "${workId}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
-            { workId, tier, model, cause: 'maxBuffer exceeded', stdout, stderr },
-          ));
-          return;
-        }
         resolve({ status: code, signal, stdout, stderr, tier, model });
       });
     });
@@ -752,10 +792,25 @@ function herdrSpawnAdapter(invocation, opts) {
     // the prior round), just no longer entangled with the token question.
     const waitArgs = ['pane', 'wait-output', paneId, '--regex', `(?m)^${sentinel}:\\d+`, '--source', 'recent-unwrapped', '--lines', '500'];
 
+    // `detached: true` (self-review finding, real, 2026-08-26 -- same
+    // process-group-kill pattern cliSpawnAdapter's own `child` already
+    // uses): without it, `waitChild` joins THIS process's own process
+    // group rather than becoming its own group leader, so
+    // `killChildTree`'s primary `process.kill(-pid, ...)` call always
+    // fails (no such group) and silently falls back to a single-pid
+    // `waitChild.kill(signal)` -- which reaches only the `herdr`/mock
+    // process itself, never any child IT spawned. Confirmed live: a mock
+    // `wait-output` handler running `sleep 10` as a plain foreground
+    // command (not itself detached) survived as an orphan after
+    // `waitChild` was killed, continuing to hold the inherited stdout
+    // pipe open for the remaining ~9s regardless of the timeout firing.
+    // With this, `waitChild` is its own group leader, so the SAME
+    // process-group SIGTERM now reaches both it and any child it spawns.
     const waitChild = spawn(herdrBin, waitArgs, {
       cwd,
       env: fullEnv,
       shell: false,
+      detached: true,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
 
@@ -792,6 +847,27 @@ function herdrSpawnAdapter(invocation, opts) {
             timeout: 5000,
           });
         } catch {}
+        // TIMEOUT SETTLES IMMEDIATELY, NEVER WAITS FOR waitChild's OWN
+        // 'close' (self-review finding, real, 2026-08-26 -- same class as
+        // cliSpawnAdapter's own timeout-authority fix): waiting for
+        // 'close' after a kill means a lingering/escaped descendant of
+        // `waitChild` holding its stdout pipe open would delay this
+        // rejection past `timeoutMs` by however long that descendant
+        // keeps running -- `timeoutMs` is a ceiling on the answer, not on
+        // whatever a killed process's own descendants do afterward.
+        // Destroying our own read end (not just rejecting the promise)
+        // also stops THIS PROCESS's event loop from staying alive waiting
+        // on that same lingering pipe -- confirmed live: without this, a
+        // caller that never force-exits hangs for however long the
+        // descendant keeps the write end open, even though the promise
+        // itself already settled.
+        try { waitChild.stdout.destroy(); } catch {}
+        cleanupScript();
+        reject(new DispatchError(
+          'worker-timeout',
+          `executor timed out after ${timeoutMs}ms for work "${workId}".`,
+          { workId, tier, model },
+        ));
       }, timeoutMs);
     }
 
@@ -809,18 +885,13 @@ function herdrSpawnAdapter(invocation, opts) {
     // above (self-review finding, 2026-08-26): `waitStdout` is accumulated
     // from `waitChild.stdout`'s 'data' events, and 'exit' can fire before
     // all of them have landed, truncating the JSON this handler parses
-    // below under load.
+    // below under load. Only the NORMAL (non-timeout) completion path
+    // reaches here now -- the timeout timer above already rejected and
+    // settled the promise synchronously on its own path, so `timedOut`
+    // being true here just means "already handled, do nothing further".
     waitChild.on('close', (code, signal) => {
       if (timer) clearTimeout(timer);
-      if (timedOut) {
-        cleanupScript();
-        reject(new DispatchError(
-          'worker-timeout',
-          `executor timed out after ${timeoutMs}ms for work "${workId}".`,
-          { workId, tier, model },
-        ));
-        return;
-      }
+      if (timedOut) return;
 
       // OBSERVER FAILURE MUST NEVER MASQUERADE AS A WORKER RESULT
       // (fifth-round advisor finding, real, 2026-08-25): a non-zero exit
