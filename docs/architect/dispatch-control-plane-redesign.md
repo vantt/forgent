@@ -531,6 +531,22 @@ Herdr is not the authority for:
 
 Those facts come from runner state, structured agent events, artifact refs, and verification.
 
+### 12.1a Herdr Own Rust Vocabulary Is a Separate Namespace
+
+Herdr's Rust implementation (`herdr-plugin/src/`) names several of its own
+types with "orchestrator" in Rust-identifier casing: the `PaneOrchestrator`
+trait (`ports.rs`) governing pane open/reuse/focus, and the
+`OrchestratorSettings`/`HerdrOrchestratorToggles` structs (`settings.rs`,
+`main.rs`) governing the `herdrOrchestrator` auto-launch config section
+(auto-discover/auto-merge/auto-retro/auto-cleanup pane launching). These
+are Rust port terms describing Herdr's own pane-lifecycle and toggle
+mechanics — a different vocabulary from this document's own "orchestrator"
+glossary entry above (§5.1: the T0 composition layer that manages N units of work and stays attached). Do not
+rename `PaneOrchestrator` or its sibling identifiers to align with that
+glossary sense, and do not read a `PaneOrchestrator`/`OrchestratorSettings`
+citation elsewhere in the repo as evidence fgOS's own dispatch layer is
+being described.
+
 ### 12.2 Near-Term Herdr Adapter
 
 The near-term implementation should use:

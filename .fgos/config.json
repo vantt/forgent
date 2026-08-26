@@ -38,8 +38,8 @@
         "description": "Compliance-driven work -- value comes from following the plan, changes files, must pass verify (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for execute -> agy, never built: no caller invokes this purpose yet)"
       },
       "fgos-coding-implement": {
-        "description": "code-implement work for the coding domain's executing stage -- pinned to gemini-3.6-flash-medium via this capability's own providerModel/rigorOverrides (agy/gemini, lightweight policy tier; see modelPolicies.gemini.lightweight for the literal model string), dispatched visibly inside a Herdr pane (adapter: herdr-spawn) via executors.agy-herdr instead of the invisible cli-spawn subprocess executors.agy-cli would give -- agy already streams its own headless output live (docs/history/herdr-spawn-generalize-live-visibility/RESEARCH.md), so no liveOutput renderer is needed here",
-        "prefer": "agy-herdr",
+        "description": "code-implement work for the coding domain's executing stage -- pinned to gemini-3.6-flash-medium via this capability's own providerModel/rigorOverrides (agy/gemini, lightweight policy tier; see modelPolicies.gemini.lightweight for the literal model string). Reverted to executors.agy-cli (invisible cli-spawn subprocess) after a real, reproducible failure: executors.agy-herdr's -i interactiveMode invocation never actually delivers the prompt to agy's chat the way -p does -- agy just opens its idle interactive REPL banner and sits there, headBefore==headAfter, no real work done, while agent_status genuinely (and honestly) reports 'idle' the whole time. Confirmed twice independently (another session's real dispatch, and a disposable-repo repro in this session) before reverting. Do not flip prefer back to agy-herdr until this is fixed and re-verified live.",
+        "prefer": "agy-cli",
         "overrides": {
           "providerModel": "gemini",
           "rigorOverrides": {
@@ -103,7 +103,7 @@
       },
       "agy-herdr": {
         "kind": "agent",
-        "description": "Antigravity CLI, same invocation as executors.agy-cli, dispatched via adapter:\"herdr-spawn\" (real Herdr pane) instead of cli-spawn -- ACTIVE (tsk-5jl): agy's own headless mode already streams live plain text natively (confirmed, docs/history/herdr-spawn-generalize-live-visibility/RESEARCH.md and docs/history/executor-dispatch-fallback-live-monitor/RESEARCH.md), so no liveOutput renderer is declared here.",
+        "description": "Antigravity CLI, dispatched via adapter:\"herdr-spawn\" with interactiveMode (real Herdr pane, -i real TUI) -- ACTIVE (tsk-10j): flipped from the -p headless invocation (tsk-5jl) to agy's real interactive TUI so a person watching the pane sees the actual agent, not a headless text stream; the adapter polls agent_status until idle/done, types the exitCommand, waits for real termination, then extracts the exit code via a completion sentinel and auto-closes the pane. stdout is best-effort only for this path (docs/history/herdr-spawn-agy-interactive-mode/iron-law-evidence.md) -- only the real exit code and pane auto-close are guaranteed.",
         "allowCrossProvider": true,
         "invocations": [
           {
@@ -111,16 +111,17 @@
             "adapter": "herdr-spawn",
             "command": "agy",
             "args": [
-              "-p",
+              "-i",
               "{prompt}",
               "--mode",
               "accept-edits",
               "--new-project",
-              "--print-timeout",
-              "30m",
               "--model",
               "{model}"
-            ]
+            ],
+            "interactiveMode": {
+              "exitCommand": "/exit"
+            }
           }
         ],
         "providerModel": "gemini",

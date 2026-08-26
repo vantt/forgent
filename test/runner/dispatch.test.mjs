@@ -38,6 +38,7 @@ import {
   resolveAgentTypeForTaskSpec,
   resolveAgentTypeForWork,
 } from '../../src/runner/dispatch.mjs';
+import { buildDispatchResult } from '../../src/runner/dispatch/result-ladder.mjs';
 import { initStore, addWork, listWork, readRawEvents } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
@@ -3470,6 +3471,89 @@ test('executeExecutorCli returns outcome:"unsignaled" when [DONE] or [BLOCKED] a
   assert.equal(resQuotedAndDone.outcome, undefined);
 });
 
+// --- buildDispatchResult (extract-dispatch-result-normalization-ladder):
+// direct unit tests against the pure helper itself, isolated from the real
+// subprocess/git-repo machinery the executeExecutorCli-level tests above
+// already exercise -- same ladder (reported/legacy-signal/inferred), no
+// behavior change, no new fields. ---------------------------------------
+
+test('buildDispatchResult: reported rung — every field on the raw adapter result is spread through unchanged, alongside mechanism/provider/command', () => {
+  const result = buildDispatchResult({
+    mechanism: 'out-of-process',
+    result: { status: 0, signal: null, stdout: '[DONE]', stderr: '', tier: 'standard', model: 'sonnet' },
+    headBefore: 'sha-before',
+    headAfter: 'sha-after',
+    provider: 'agy',
+    command: '/usr/local/bin/agy',
+  });
+  assert.equal(result.mechanism, 'out-of-process');
+  assert.equal(result.status, 0);
+  assert.equal(result.signal, null);
+  assert.equal(result.stdout, '[DONE]');
+  assert.equal(result.stderr, '');
+  assert.equal(result.tier, 'standard');
+  assert.equal(result.model, 'sonnet');
+  assert.equal(result.provider, 'agy');
+  assert.equal(result.command, '/usr/local/bin/agy');
+});
+
+test('buildDispatchResult: legacy-signal rung — a real [DONE]/[BLOCKED] token in stdout omits outcome/headBefore/headAfter entirely', () => {
+  const done = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'task complete [DONE]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(done.outcome, undefined);
+  assert.equal(done.headBefore, undefined);
+  assert.equal(done.headAfter, undefined);
+
+  const blocked = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'stuck [BLOCKED]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(blocked.outcome, undefined);
+  assert.equal(blocked.headBefore, undefined);
+  assert.equal(blocked.headAfter, undefined);
+});
+
+test('buildDispatchResult: inferred rung — no [DONE]/[BLOCKED] anywhere in stdout resolves outcome:"unsignaled" carrying headBefore/headAfter', () => {
+  const result = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'no contract signal here' }, headBefore: 'sha-before', headAfter: 'sha-after', provider: 'p', command: 'c' });
+  assert.equal(result.outcome, 'unsignaled');
+  assert.equal(result.headBefore, 'sha-before');
+  assert.equal(result.headAfter, 'sha-after');
+});
+
+test('buildDispatchResult: a [DONE]/[BLOCKED] mention inside backtick-quoted text never counts as a real signal (tsk-5gd) — falls to the inferred rung', () => {
+  const quotedOnly = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'implemented the `[DONE]` and `[BLOCKED]` token scan' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(quotedOnly.outcome, 'unsignaled');
+  assert.equal(quotedOnly.headBefore, 'a');
+  assert.equal(quotedOnly.headAfter, 'b');
+
+  // A quoted mention ALONGSIDE a real, unquoted token still counts as signaled.
+  const quotedAndReal = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'implemented `[DONE]` scan\n\n[DONE]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(quotedAndReal.outcome, undefined);
+});
+
+test('buildDispatchResult: verifiedSha is added only for a real [DONE] with a truthy headAfter, never for [BLOCKED] or a null headAfter', () => {
+  const done = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
+  assert.equal(done.verifiedSha, 'sha-after');
+
+  const blocked = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[BLOCKED]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
+  assert.equal(blocked.verifiedSha, undefined);
+
+  const doneNoHeadAfter = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: null, provider: 'p', command: 'c' });
+  assert.equal(doneNoHeadAfter.verifiedSha, undefined);
+});
+
+test('buildDispatchResult: lostUncommittedPaths is included only when given, omitted (never null/empty) otherwise', () => {
+  const withLost = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: 'b', lostUncommittedPaths: ['plan.md'], provider: 'p', command: 'c' });
+  assert.deepEqual(withLost.lostUncommittedPaths, ['plan.md']);
+
+  const withoutLost = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal('lostUncommittedPaths' in withoutLost, false);
+});
+
+test('buildDispatchResult: a missing or non-string result.stdout is treated as empty, never throws, and resolves the inferred rung', () => {
+  const noResult = buildDispatchResult({ mechanism: 'out-of-process', result: undefined, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(noResult.outcome, 'unsignaled');
+
+  const nonStringStdout = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: null }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(nonStringStdout.outcome, 'unsignaled');
+});
+
 test('executeExecutorCli throws when no executor is registered for the given purpose — nothing left to execute', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
@@ -4893,6 +4977,38 @@ test('fanoutBatchExecutorCli: real end-to-end out-of-process fire -- pick/execut
   // Never trust the return value alone -- independently re-read real state.
   const view = listWork(fgosDir);
   assert.equal(view.work.cand1.status, 'awaiting-approval');
+});
+
+test('fanoutBatchExecutorCli returns candidate as unavailable when executor is governance-blocked', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeCommittingExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  addWork(fgosDir, {
+    id: 'cand1',
+    title: 'Candidate 1',
+    kind: 'task',
+    status: 'todo',
+    domain: 'coding',
+    stage: 'executing',
+    deps: [],
+    refs: [],
+    risk: 'light',
+    verify: 'true',
+  });
+
+  const result = await fanoutBatchExecutorCli(['cand1'], { repoRoot, hasLiveTaskAccess: false });
+
+  assert.equal(result.fired.length, 0);
+  assert.equal(result.mechanismChanged.length, 0);
+  assert.equal(result.unavailable.length, 1);
+  assert.equal(result.unavailable[0].id, 'cand1');
+  assert.equal(result.unavailable[0].executorId, 'fgos-coding-implement');
 });
 
 test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlapping execution windows', async () => {
