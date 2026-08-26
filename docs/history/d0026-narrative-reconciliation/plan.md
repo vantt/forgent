@@ -80,3 +80,16 @@ No split. One piece, one item, stays as `tsk-17m` itself through
 ## Outstanding questions
 
 None.
+
+## Post-return correction
+
+The item's own `verify` field carried a trailing human-readable qualifier
+("-- all hits should consistently state whether closed via 4/5 done
+phases, current caller contract, or Pha 5 deferred") appended after the
+real `rg` command. Executed literally by `fgos return`, that tail was fed
+to `rg` as extra positional file arguments ("all", "hits", "should", ...),
+each failing with "No such file or directory" — an execution defect in the
+verify string itself, unrelated to the actual narrative-reconciliation
+work (already committed, unchanged). Corrected `work.verify` to the bare
+runnable command; the qualifier note stays documented here instead of in
+an executed string.
