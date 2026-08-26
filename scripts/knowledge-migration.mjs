@@ -254,13 +254,16 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
         // missing and newPath occupied on disk -- a rerun would then see
         // "missing source file" AND "target already exists," a state that
         // no longer self-heals by rerunning migration alone. Rolling the
-        // rename back here restores the exact pre-attempt filesystem
-        // state (this fs.renameSync is a plain filesystem op, independent
-        // of whatever git problem caused the failure above), so the
-        // thrown error is the ONLY residue -- resolving the underlying
-        // git problem and rerunning is sufficient, no manual filesystem
-        // surgery required.
+        // rename back here restores the pre-attempt PATH (this
+        // fs.renameSync is a plain filesystem op, independent of whatever
+        // git problem caused the failure above) -- but the frontmatter
+        // update above already wrote transformed CONTENT to srcAbs before
+        // any of this ran, so path rollback alone still leaves a doc edit
+        // sitting uncommitted at oldPath if the operator aborts here.
+        // Restoring `raw` (captured before the transform) makes "unchanged
+        // on disk" literally true, not just true for the path.
         fs.renameSync(destAbs, srcAbs);
+        fs.writeFileSync(srcAbs, raw, 'utf8');
         throw new Error(
           `knowledge-migration: attempted to rename '${move.oldPath}' to '${move.newPath}', but "git add" failed to stage it (${err.message}) -- rolled the rename back, '${move.oldPath}' is unchanged on disk. Resolve the underlying git problem (e.g. a locked index) and rerun; the registry was NOT updated for this move.`
         );

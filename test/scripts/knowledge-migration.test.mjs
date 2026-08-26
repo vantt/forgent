@@ -605,6 +605,7 @@ test('knowledge-migration - a locked git index (both "git mv" and the fallback "
       assert.equal(view.docs['t1:guide'].currentPath, 'docs/how-to/reclaim.md', 'the registry must NOT claim the move happened when git never tracked it');
       assert.equal(fs.existsSync(oldFile), true, 'the rename must have been rolled back -- the source file must be exactly where it started');
       assert.equal(fs.existsSync(path.join(tmpDir, 'docs/worktree-reclaim/guide.md')), false, 'nothing must be left sitting at the target path either');
+      assert.equal(fs.readFileSync(oldFile, 'utf8'), '# Reclaim\n', 'content must be rolled back too -- the frontmatter transform applied before the move attempt must not survive a failed apply as an uncommitted doc edit');
     } finally {
       fs.rmSync(lockFile, { force: true });
     }
