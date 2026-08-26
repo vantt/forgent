@@ -5,7 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync, execFileSync } from 'node:child_process';
 import { runKnowledgeMigration } from '../../scripts/knowledge-migration.mjs';
-import { initStore, registerTopicStore, registerDocStore, retireDocStore, rebuild } from '../../src/state/store.mjs';
+import { initStore, registerTopicStore, registerDocStore, retireDocStore, retireTopicStore, rebuild } from '../../src/state/store.mjs';
 
 function setupGitRepoWithStore() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-migration-test-'));
@@ -619,6 +619,83 @@ test('knowledge-migration - a locked git index (both "git mv" and the fallback "
     assert.equal(retryApply.appliedCount, 1);
     const finalView = rebuild(fgosDir);
     assert.equal(finalView.docs['t1:guide'].currentPath, 'docs/worktree-reclaim/guide.md');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-migration - refuses a planned move for an ACTIVE doc under a retired topic before any file mutation', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/how-to/reclaim.md', docLifecycle: 'active' });
+    // topic.retire never force-retires its docs -- the doc is left active
+    // under a now-retired topic, exactly the drift shape a classifier
+    // still naming this row as a live source represents.
+    retireTopicStore(fgosDir, { topicId: 't1' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Reclaim\n', 'utf8');
+    execSync('git add docs/how-to/reclaim.md && git commit -m "add reclaim"', { cwd: tmpDir, stdio: 'ignore' });
+
+    const dry = runKnowledgeMigration(tmpDir, { dryRun: true });
+    assert.equal(
+      dry.conservationErrors.some((e) => e.includes("doc 't1:guide' is under topic 't1', which is 'retired' (not active)")),
+      true,
+      `expected a non-active-topic conservation error, got: ${JSON.stringify(dry.conservationErrors)}`
+    );
+
+    assert.throws(() => {
+      runKnowledgeMigration(tmpDir, { dryRun: false });
+    }, /is under topic 't1', which is 'retired' \(not active\)/);
+
+    // Nothing must have moved before the refusal -- an active doc under a
+    // retired topic used to move the file and record doc.path-move, only
+    // THEN throw on doc.demote (assertTopicWritable), leaving the file
+    // relocated with no demote applied.
+    assert.equal(fs.existsSync(oldFile), true);
+    assert.equal(fs.existsSync(path.join(tmpDir, 'docs/worktree-reclaim/guide.md')), false);
+    const view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide'].currentPath, 'docs/how-to/reclaim.md');
+    assert.equal(view.docs['t1:guide'].docLifecycle, 'active');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-migration - refuses a planned move for a PROVISIONAL doc under a retired topic (no demote involved to catch it otherwise)', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/how-to/reclaim.md', docLifecycle: 'provisional' });
+    retireTopicStore(fgosDir, { topicId: 't1' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Reclaim\n', 'utf8');
+    execSync('git add docs/how-to/reclaim.md && git commit -m "add reclaim"', { cwd: tmpDir, stdio: 'ignore' });
+
+    // Without the topic check, a provisional doc (no doc.demote call, so
+    // nothing downstream would ever catch this) would complete the move
+    // "successfully" under a retired topic.
+    assert.throws(() => {
+      runKnowledgeMigration(tmpDir, { dryRun: false });
+    }, /is under topic 't1', which is 'retired' \(not active\)/);
+
+    assert.equal(fs.existsSync(oldFile), true);
+    const view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide'].currentPath, 'docs/how-to/reclaim.md');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

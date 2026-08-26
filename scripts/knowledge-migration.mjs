@@ -86,6 +86,22 @@ function computeConservationErrors(repoRoot, view, inventory, plannedMoves) {
       // ever checking this) is never correct -- the inventory row still
       // treating it as a live source is drift this run must surface.
       errors.push(`doc '${move.docId}' is '${doc.docLifecycle}' (not live) -- refusing to migrate a dead doc's file`);
+    } else if (view.topics?.[doc.topicId]?.status !== 'active') {
+      // doc.path-move itself is exempt from the reducer's own
+      // assertTopicWritable (it is a physical-relocation operation, not
+      // new content) -- so a doc left active/provisional under a topic
+      // retired directly (topic.retire never force-retires its docs)
+      // would otherwise move successfully at the reducer level. But
+      // doc.demote is NOT exempt (this item's own earlier fix), so an
+      // active doc under a retired topic would move the file, record
+      // doc.path-move, and only THEN throw on doc.demote -- leaving the
+      // file at its new path and the registry mid-migrated with no
+      // demote applied. A provisional doc (no demote attempted) would
+      // instead complete "successfully" under a retired topic with
+      // nothing catching it at all. Both shapes are drift the classifier
+      // inventory still treating a retired-topic doc as a live source
+      // must surface here, before either kind of file mutation.
+      errors.push(`doc '${move.docId}' is under topic '${doc.topicId}', which is '${view.topics?.[doc.topicId]?.status}' (not active) -- refusing to migrate a doc under a non-active topic`);
     }
   }
 
