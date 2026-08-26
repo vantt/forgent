@@ -24,6 +24,7 @@
     "src/runner/dispatch/plan.mjs": "infra",
     "src/runner/dispatch/transport.mjs": "infra",
     "src/runner/dispatch/prepare.mjs": "infra",
+    "src/runner/dispatch/result-ladder.mjs": "infra",
     "src/runner/dispatch/cli.mjs": "infra",
     "src/runner/dispatch/live-renderers/claude-stream-json.mjs": "infra",
     "src/runner/dispatch/live-renderers/pi-agent-session.mjs": "infra",

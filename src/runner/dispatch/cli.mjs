@@ -29,6 +29,7 @@ import { buildPrompt } from './prepare.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { hasWorkerSlotRoom } from '../../state/worker-slots.mjs';
+import { buildDispatchResult } from './result-ladder.mjs';
 
 // Resolved against THIS module's own file location, never a caller-supplied
 // `root` -- `bin/fgos.mjs` is a fixed sibling of this checkout's own
@@ -513,19 +514,7 @@ export async function executeExecutorCli(
         );
       }
     }
-    const stdoutStr = result && typeof result.stdout === 'string' ? result.stdout : '';
-    const cleanStdout = stdoutStr.replace(/`+[\s\S]*?`+/g, '');
-    const hasSignal = cleanStdout.includes('[DONE]') || cleanStdout.includes('[BLOCKED]');
-    const isDone = cleanStdout.includes('[DONE]');
-    const base = {
-      mechanism,
-      ...result,
-      ...(hasSignal ? {} : { outcome: 'unsignaled', headBefore, headAfter }),
-      ...(isDone && headAfter ? { verifiedSha: headAfter } : {}),
-      ...(lostUncommittedPaths ? { lostUncommittedPaths } : {}),
-      provider,
-      command,
-    };
+    const base = buildDispatchResult({ mechanism, result, headBefore, headAfter, lostUncommittedPaths, provider, command });
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
     lockRes.release();
