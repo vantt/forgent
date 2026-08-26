@@ -90,6 +90,7 @@
     "src/report/enduser-index.mjs": "domain",
     "src/report/enduser-index-generate.mjs": "infra",
     "src/report/decision-index.mjs": "infra",
+    "src/report/dispatch-confidence.mjs": "infra",
     "src/report/context-render.mjs": "domain",
     "src/report/frontmatter.mjs": "domain",
     "src/report/authoritative-match.mjs": "domain",
