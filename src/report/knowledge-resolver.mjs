@@ -12,16 +12,20 @@
 export function resolveDocPath(view, path) {
   if (!view || !view.docs || !path) return null;
 
-  // "Live" means both the doc itself is non-retired AND its own topic is
-  // still active -- docs/architect/knowledge-registry-redesign.md §14.3's
-  // producer gate explicitly requires attestation to reject retired topics,
-  // not just retired documents. A topic retired directly (fgos topic
+  // "Live" means the doc itself is neither retired nor superseded, AND its
+  // own topic is still active -- docs/architect/knowledge-registry-
+  // redesign.md §14.3's producer gate explicitly requires attestation to
+  // reject retired topics, not just retired documents; a superseded doc is
+  // excluded the same way because doc.supersede already moved "current" to
+  // supersededBy, so this doc is no longer the authoritative slot occupant
+  // even though it isn't retired. A topic retired directly (fgos topic
   // retire, as opposed to split/merge, which always move a doc's topicId
   // onto a still-active successor) has no lineage forward to anything, so
   // excluding it here also correctly makes step 3's lineage chase below
   // find no active successor for it -- the doc becomes fully unresolvable,
   // not silently still-attestable.
-  const isLive = (d) => d.docLifecycle !== 'retired' && view.topics?.[d.topicId]?.status === 'active';
+  const isLive = (d) =>
+    d.docLifecycle !== 'retired' && d.docLifecycle !== 'superseded' && view.topics?.[d.topicId]?.status === 'active';
 
   // 1. Direct match on currentPath among live docs
   const activeDocs = Object.values(view.docs).filter((d) => d.currentPath === path && isLive(d));
@@ -68,14 +72,18 @@ export function resolveDocPath(view, path) {
     for (const t of currentTopics) {
       if (leadsFrom(t.topicId, rDoc.topicId)) {
         const docsInT = Object.values(view.docs).filter(
-          (d) => d.topicId === t.topicId && d.docLifecycle !== 'retired' && d.role === rDoc.role
+          (d) =>
+            d.topicId === t.topicId &&
+            d.docLifecycle !== 'retired' &&
+            d.docLifecycle !== 'superseded' &&
+            d.role === rDoc.role
         );
-        // If exact role match exists, add those; otherwise add all non-retired docs in t
+        // If exact role match exists, add those; otherwise add all live docs in t
         if (docsInT.length > 0) {
           for (const d of docsInT) targetDocs.add(d);
         } else {
           const allDocsInT = Object.values(view.docs).filter(
-            (d) => d.topicId === t.topicId && d.docLifecycle !== 'retired'
+            (d) => d.topicId === t.topicId && d.docLifecycle !== 'retired' && d.docLifecycle !== 'superseded'
           );
           for (const d of allDocsInT) targetDocs.add(d);
         }

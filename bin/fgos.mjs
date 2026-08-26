@@ -1831,32 +1831,48 @@ async function runVerb(verb, flags, positional, dir) {
           throw new StoreError('validation', `knowledge attest: path '${docPath}' is not committed at git HEAD. Remedy: commit file '${docPath}' to git HEAD first.`);
         }
 
-        if (Array.isArray(resolved)) {
-          throw new StoreError('validation', `knowledge attest: path '${docPath}' resolves ambiguously to ${resolved.length} docs (${resolved.map((d) => d.docId).join(', ')}) — fail-closed rather than guess which one to attest.`);
-        }
-        const match = resolved;
-        if (!match) {
-          throw new StoreError('validation', `knowledge attest: path '${docPath}' is not registered in knowledge registry. Remedy: run 'fgos doc reserve' or 'fgos doc register' first.`);
-        }
+        // docs/history/compound-learn-artifact-registry/ phase-06-attest-gate.md
+        // requirement 1: attest's registry-membership gate (conditions 2-4 --
+        // enforcement on, path is a live currentPath, path is not an alias)
+        // is itself gated by docRegistry.enforce, default false, so
+        // retrospective items are never deadlocked before bootstrap/migration
+        // finishes (see that file's own "Risks & rollback"). Only the git-HEAD
+        // check above (condition 1, pre-existing before this gate was added)
+        // always applies regardless of the flag.
+        const sharedConfig = readSharedConfigOrEmpty(repoRoot);
+        const enforceRegistry = sharedConfig?.docRegistry?.enforce === true;
 
-        if (match.currentPath !== docPath) {
-          throw new StoreError('validation', `knowledge attest: path '${docPath}' is an ALIAS, not currentPath '${match.currentPath}'. Remedy: use official currentPath '${match.currentPath}'.`);
+        const captureId = requireField(flags['capture-id'], 'knowledge attest requires --capture-id');
+
+        if (enforceRegistry) {
+          if (Array.isArray(resolved)) {
+            throw new StoreError('validation', `knowledge attest: path '${docPath}' resolves ambiguously to ${resolved.length} docs (${resolved.map((d) => d.docId).join(', ')}) — fail-closed rather than guess which one to attest.`);
+          }
+          if (!resolved) {
+            throw new StoreError('validation', `knowledge attest: path '${docPath}' is not registered in knowledge registry. Remedy: run 'fgos doc reserve' or 'fgos doc register' first.`);
+          }
+          if (resolved.currentPath !== docPath) {
+            throw new StoreError('validation', `knowledge attest: path '${docPath}' is an ALIAS, not currentPath '${resolved.currentPath}'. Remedy: use official currentPath '${resolved.currentPath}'.`);
+          }
+        } else if (Array.isArray(resolved) || !resolved || resolved.currentPath !== docPath) {
+          // Enforcement is off: don't block the caller, but there is no
+          // single live registry doc to attach this capture to either --
+          // report that plainly instead of a misleading "attested: true".
+          return { attested: false, reason: 'docRegistry.enforce is off and this path does not resolve to a single registered currentPath', docPath, captureId };
         }
 
         // docs/architect/knowledge-registry-redesign.md §7.4: an
         // attestation links a real capture (a work item id) to this doc
         // slot -- "the precise replacement for the old 'compound stores
-        // docType/docPath' meaning". `--capture-id` is optional here
-        // (existing callers that only need path/registry validation keep
-        // working unchanged) but is what actually persists the linkage
-        // this verb's own name promises; the fgos-coding-knowledge skill
+        // docType/docPath' meaning". --capture-id is required: this verb's
+        // own name promises the linkage gets recorded, so a caller passing
+        // only --doc-path must not get back "attested: true" while nothing
+        // was actually written -- the fgos-coding-knowledge skill always
         // passes the item id it is retrospecting.
-        const captureId = optionalField(flags['capture-id'], 'knowledge attest --capture-id requires a non-empty value.');
-        if (captureId !== undefined) {
-          attestDocStore(dir, { docId: match.docId, topicId: match.topicId, role: match.role, captureId });
-        }
+        const match = resolved;
+        attestDocStore(dir, { docId: match.docId, topicId: match.topicId, role: match.role, captureId });
 
-        return { attested: true, docId: match.docId, currentPath: match.currentPath, captureId: captureId ?? null };
+        return { attested: true, docId: match.docId, currentPath: match.currentPath, captureId };
       } else {
         throw new StoreError('validation', `knowledge: unknown subcommand "${sub}".`);
       }

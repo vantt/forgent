@@ -128,3 +128,34 @@ test('resolveDocPath - a live (non-retired) doc under a retired topic is unresol
 
   assert.equal(resolveDocPath(view, 'docs/t1/guide.md'), null);
 });
+
+test('resolveDocPath - a superseded doc\'s own currentPath redirects to its live successor, never to the dead doc itself', () => {
+  // doc.supersede already moved "current" to supersededBy -- a superseded
+  // doc is no longer the authoritative slot occupant even though it is not
+  // retired, so step 1's direct-match must skip it. Because d1 and d2 share
+  // the same still-active topic, the step-3 lineage-chase fallback's
+  // self-loop (a topic trivially "leads from" itself) then correctly
+  // re-routes the old path onto d2, the live occupant of that (topicId,
+  // role) slot -- resolveDocPath must never hand back the stale d1 itself.
+  const view = {
+    topics: { t1: { topicId: 't1', status: 'active' } },
+    docs: {
+      d1: { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'superseded', aliases: [], supersededBy: 'd2' },
+      d2: { docId: 'd2', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide-v2.md', docLifecycle: 'active', aliases: [] }
+    }
+  };
+
+  assert.equal(resolveDocPath(view, 'docs/t1/guide.md').docId, 'd2');
+  assert.equal(resolveDocPath(view, 'docs/t1/guide-v2.md').docId, 'd2');
+});
+
+test('resolveDocPath - a superseded doc with no live successor in its topic is fully unresolvable', () => {
+  const view = {
+    topics: { t1: { topicId: 't1', status: 'active' } },
+    docs: {
+      d1: { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'superseded', aliases: [] }
+    }
+  };
+
+  assert.equal(resolveDocPath(view, 'docs/t1/guide.md'), null);
+});

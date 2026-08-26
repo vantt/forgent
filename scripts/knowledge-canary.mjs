@@ -23,7 +23,7 @@ export function runKnowledgeCanary(repoRoot) {
   execSync(`git add ${docPath} && git commit -m "docs(canary): write guide"`, { cwd: repoRoot, stdio: 'ignore' });
 
   // 4. Attest
-  const attestOut = execSync(`node "${fgosBin}" knowledge attest --doc-path ${docPath}`, { cwd: repoRoot, encoding: 'utf8' });
+  const attestOut = execSync(`node "${fgosBin}" knowledge attest --doc-path ${docPath} --capture-id canary-capture`, { cwd: repoRoot, encoding: 'utf8' });
   if (!attestOut.includes('attested')) {
     throw new Error('Canary failed: knowledge attest did not return attested: true');
   }

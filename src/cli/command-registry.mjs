@@ -1153,14 +1153,14 @@ export const COMMAND_REGISTRY = [
   {
     name: 'knowledge',
     invoke: 'fgos knowledge <subcommand>',
-    description: 'Knowledge ecosystem verbs: status (view summary) and attest (validate a doc path, optionally recording a --capture-id linkage).',
+    description: 'Knowledge ecosystem verbs: status (view summary) and attest (validate a doc path and record the required --capture-id linkage).',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos knowledge status', 'fgos knowledge attest --doc-path docs/worktree/guide.md --capture-id tsk-123'],
     // tsk-28x code review finding: `status`/`attest` both call `rebuild(dir)`,
     // which requires a real `.fgos` store -- `requiresExistingStore: false`
     // was wrong for both subcommands. `attest` also durably records a
-    // doc.attest event whenever `--capture-id` is supplied (§7.4) -- no
-    // longer unconditionally read-only.
+    // doc.attest event -- `--capture-id` is required (§7.4), so this verb is
+    // never unconditionally read-only.
     touchesState: true,
     requiresExistingStore: true,
     externalEffect: false,

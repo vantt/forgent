@@ -39,12 +39,14 @@ test('fgos-coding-knowledge skill flow - end to end sequence', async () => {
   execSync(`git add ${docPath} && git commit -m "add guide"`, { cwd: tmpDir, stdio: 'ignore' });
 
   // 4. Attest
-  const attestResult = execSync(`node "${fgosBin}" knowledge attest --doc-path ${docPath}`, { cwd: tmpDir, encoding: 'utf8' });
+  const attestResult = execSync(`node "${fgosBin}" knowledge attest --doc-path ${docPath} --capture-id tsk-skill-flow`, { cwd: tmpDir, encoding: 'utf8' });
   assert.ok(attestResult.includes('attested'));
+  let view = rebuild(fgosDir);
+  assert.ok(view.docs['t1:guide'].sourceCaptureIds.includes('tsk-skill-flow'));
 
   // 5. Mark rendered -> provisional
   execSync(`node "${fgosBin}" doc mark-rendered --topic-id t1 --role guide`, { cwd: tmpDir });
-  let view = rebuild(fgosDir);
+  view = rebuild(fgosDir);
   assert.equal(view.docs['t1:guide'].docLifecycle, 'provisional');
 
   // 6. Promote -> active

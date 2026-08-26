@@ -222,6 +222,9 @@ export function applyKnowledgeEvent(view, event) {
       if (!oldTopic) {
         throw new KnowledgeValidationError(`topic.split: old topic '${topicId}' not found`);
       }
+      if (oldTopic.status !== 'active') {
+        throw new KnowledgeValidationError(`topic.split: source topic '${topicId}' is '${oldTopic.status}', must be 'active'`);
+      }
       if (!Array.isArray(newTopics) || newTopics.length < 2) {
         throw new KnowledgeValidationError('topic.split requires at least 2 successor topics -- a single-successor split is a rename ("fgos topic rename"), not a split');
       }
@@ -291,6 +294,9 @@ export function applyKnowledgeEvent(view, event) {
       const targetTopic = view.topics[targetTopicId];
       if (!targetTopic) {
         throw new KnowledgeValidationError(`topic.merge: target topic '${targetTopicId}' not found`);
+      }
+      if (targetTopic.status !== 'active') {
+        throw new KnowledgeValidationError(`topic.merge: target topic '${targetTopicId}' is '${targetTopic.status}', must be 'active'`);
       }
 
       // Fail-closed on the source list itself before the role-collision check
@@ -365,10 +371,11 @@ export function applyKnowledgeEvent(view, event) {
     case 'topic.retire': {
       const { topicId } = payload;
       const topic = view.topics[topicId];
-      if (topic) {
-        topic.status = 'retired';
-        topic.updatedAt = event.ts ?? Date.now();
+      if (!topic) {
+        throw new KnowledgeValidationError(`topic.retire: topic '${topicId}' not found`);
       }
+      topic.status = 'retired';
+      topic.updatedAt = event.ts ?? Date.now();
       break;
     }
 
@@ -417,16 +424,43 @@ export function applyKnowledgeEvent(view, event) {
         throw new KnowledgeValidationError(`doc.register: topicId "${topicId}" is not registered — run "fgos topic register" first`);
       }
       assertTopicWritable(view, topicId, 'doc.register');
-      const lifecycle = docLifecycle ?? 'provisional';
-      if (lifecycle === 'draft' || !VALID_DOC_LIFECYCLE.includes(lifecycle)) {
-        throw new KnowledgeValidationError(`Invalid docLifecycle: '${lifecycle}'`);
-      }
       const id = docId ?? `${topicId}:${role}`;
       const existing = view.docs[id];
       if (existing && (existing.topicId !== topicId || existing.role !== role || existing.currentPath !== currentPath)) {
         throw new KnowledgeValidationError(
           `doc.register: doc '${id}' already exists with topicId='${existing.topicId}', role='${existing.role}', currentPath='${existing.currentPath}' — register cannot change a doc's identity or path. Use "fgos topic split"/"fgos topic merge" to change topicId/role (with lineage), or "fgos doc move-path" to change currentPath (preserves the old path as an alias).`
         );
+      }
+      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is
+      // the sole provisional->active gate, doc.supersede/doc.retire are the
+      // sole way out of 'active'. Re-registering an EXISTING docId must
+      // never itself move the lifecycle beyond one narrow, already-tested
+      // bridge: defaulting to 'provisional' on a bare re-register (no
+      // --lifecycle given) would silently demote an already-'active' doc,
+      // and accepting an arbitrary explicit docLifecycle would resurrect a
+      // 'retired'/'superseded' doc back to 'active' through this side door.
+      // The one legitimate register-driven transition is 'reserved' ->
+      // 'provisional': "doc reserve" creates the empty slot, "doc register"
+      // with real content is how that slot gets its first draft, and that
+      // flow is exercised end-to-end by knowledge-verbs/knowledge-attest-
+      // gate tests. Anything else -- an explicit lifecycle that disagrees
+      // with the current one, outside that one bridge -- is refused.
+      let lifecycle;
+      if (existing) {
+        if (docLifecycle === undefined || docLifecycle === existing.docLifecycle) {
+          lifecycle = existing.docLifecycle;
+        } else if (existing.docLifecycle === 'reserved' && docLifecycle === 'provisional') {
+          lifecycle = 'provisional';
+        } else {
+          throw new KnowledgeValidationError(
+            `doc.register: doc '${id}' already exists with docLifecycle='${existing.docLifecycle}' — register cannot change lifecycle to '${docLifecycle}'; use "fgos doc promote"/"fgos doc supersede"/"fgos doc retire" instead.`
+          );
+        }
+      } else {
+        lifecycle = docLifecycle ?? 'provisional';
+        if (lifecycle === 'draft' || !VALID_DOC_LIFECYCLE.includes(lifecycle)) {
+          throw new KnowledgeValidationError(`Invalid docLifecycle: '${lifecycle}'`);
+        }
       }
       const resolvedFramework = framework ?? existing?.framework ?? 'diataxis';
       const resolvedMode = mode ?? existing?.mode ?? 'explanation';
@@ -543,6 +577,19 @@ export function applyKnowledgeEvent(view, event) {
       if (!doc) {
         throw new KnowledgeValidationError(`doc.attest: doc '${id}' not found`);
       }
+      // docs/architect/knowledge-registry-redesign.md §14.3: "attestation
+      // rejects retired topics and retired documents". This must live here,
+      // in the reducer, not only in the CLI's resolveDocPath-based
+      // pre-check -- any caller using the write facade directly (attest-
+      // DocStore) would otherwise bypass that check entirely. 'superseded'
+      // is rejected the same way retired is: a superseded doc is no longer
+      // the authoritative slot occupant (doc.supersede already moved that
+      // role to supersededBy), so a capture attested here would silently
+      // attach to a doc nothing points at as current anymore.
+      if (doc.docLifecycle === 'retired' || doc.docLifecycle === 'superseded') {
+        throw new KnowledgeValidationError(`doc.attest: doc '${id}' is ${doc.docLifecycle}`);
+      }
+      assertTopicWritable(view, doc.topicId, 'doc.attest');
       if (!captureId || typeof captureId !== 'string' || !captureId.trim()) {
         throw new KnowledgeValidationError('doc.attest requires captureId');
       }
