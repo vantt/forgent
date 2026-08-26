@@ -4401,36 +4401,17 @@ async function runVerb(verb, flags, positional, dir) {
       }
       const confirmed = Boolean(flags.confirm);
       const dirty = !isMainTreeClean(repoRoot);
-      let lostCommitCount = 0;
-      let lostCommitsOutput = '';
       try {
-        const revList = gitAt(repoRoot, ['rev-list', `${sha}..HEAD`]).trim();
-        if (revList) {
-          const commits = revList.split('\n').filter(Boolean);
-          lostCommitCount = commits.length;
-          if (lostCommitCount > 0) {
-            lostCommitsOutput = gitAt(repoRoot, ['log', `${sha}..HEAD`, '--format=%h %an (%ae): %s', '--stat']).trim();
-          }
-        }
-      } catch (_err) {
-        // If git rev-list fails (e.g. invalid SHA), reset --hard below will fail with git's error.
-      }
-
-      try {
-        assertSafeMainCheckoutReset({ dirty, confirmed, lostCommitCount, sha });
+        assertSafeMainCheckoutReset({ dirty, confirmed });
       } catch (err) {
-        let details = `main-checkout-reset: ${err.message}`;
-        if (dirty) {
-          const statusOutput = gitAt(repoRoot, ['status', '--porcelain']).trim();
-          details += `\n\nFull git status (main checkout, whole repo):\n${statusOutput || '(empty)'}`;
-        }
-        if (lostCommitCount > 0) {
-          details += `\n\nCommits about to be discarded (${lostCommitCount}):\n${lostCommitsOutput || '(none)'}`;
-        }
-        throw new StoreError('validation', details);
+        const statusOutput = gitAt(repoRoot, ['status', '--porcelain']).trim();
+        throw new StoreError(
+          'validation',
+          `main-checkout-reset: ${err.message}\n\nFull git status (main checkout, whole repo):\n${statusOutput || '(empty)'}`,
+        );
       }
       gitAt(repoRoot, ['reset', '--hard', sha]);
-      return { sha, wasDirty: dirty, lostCommitCount, confirmed };
+      return { sha, wasDirty: dirty, confirmed };
     }
 
     default:

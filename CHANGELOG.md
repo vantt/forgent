@@ -9,7 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Extended `fgos main-checkout-reset` safety guard (`assertSafeMainCheckoutReset`, `src/runner/main-checkout-reset-guard.mjs`) to detect when `--sha` is behind current `HEAD` by committed commits and refuse unconfirmed resets, formatting the list of commits about to be discarded (author, message, files touched).
 - Moved 5 diagnostic/telemetry logs (`approve-post-success-faults.jsonl`, `main-checkout-guard-warnings.jsonl`, `changelog-nag-history.jsonl`, `entropy-history.jsonl`, `invocation-faults.jsonl`) from `.fgos/` root into the already-gitignored `.fgos/logs/` bucket — none of these is the event log, so they never needed to be git-tracked; they were only kept dirty/committed by omission. Removed their now-dead `.gitattributes` `merge=union` entries.
 - Moved `tool-status.local.json` and `events-jsonl.truncation-guard.json` (both already gitignored) into `.fgos/runtime/`, matching the same per-machine/local-only bucket convention as `.fgos/logs/`.
 - Added `src/state/fgos-file-registry.mjs` (kernel layer) as the single source of truth for well-known `.fgos/` file paths (`resolveFgosFile`/`FGOS_FILE`), replacing independent path-building in every module and test that touched them. Moved `state.json` into `.fgos/cache/` (already gitignored) on top of it — the first attempt at this move broke 51 tests across 21 files with hardcoded copies of the old path; this shared resolver closes that gap for good.
