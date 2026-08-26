@@ -4,8 +4,11 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
-import { spawn, spawnSync } from 'node:child_process';
-import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../../src/runner/gateway-control.mjs';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { startGateway, stopGateway, gatewayStatus, acquireGatewayLock, GatewayControlError } from '../../src/runner/gateway-control.mjs';
+
+const GATEWAY_CONTROL_MOD_PATH = fileURLToPath(new URL('../../src/runner/gateway-control.mjs', import.meta.url));
 
 // Every test builds its own disposable temp dir (mkdtemp) for both the fake
 // repo root and its `.fgos` -- no test ever touches THIS repo's real
@@ -29,12 +32,46 @@ function cleanup(repoRoot) {
   }
 }
 
+function isAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (err) {
+    return err.code === 'EPERM';
+  }
+}
+
 /** A real, throwaway long-lived process this test controls entirely --
  * gives a genuinely live pid without depending on the real herdr-fgos
- * binary or cargo. Killed in the test's own cleanup. */
+ * binary or cargo. Spawned as a genuine ORPHAN (via `setsid` backgrounded
+ * from a `sh -c` that itself exits immediately), never a direct Node
+ * child of this test process -- matching real production topology, where
+ * `fgos gateway stop` always targets an already-detached, already-
+ * orphaned process from a long-exited `start` invocation, never its own
+ * child. A direct `spawn()`-ed child here would go zombie the moment
+ * `stopGateway`'s synchronous `Atomics.wait` poll loop blocks this
+ * process's own event loop from ever reaping it -- a real artifact of
+ * same-process children, not a bug in `stopGateway` itself (confirmed
+ * live: an orphaned process dies within ~50ms under the exact same
+ * blocking poll). Returns `{ pid, kill(signal) }`. */
 function spawnThrowaway() {
-  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
-  return child;
+  const out = execFileSync('sh', [
+    '-c',
+    `setsid "$0" -e "$1" </dev/null >/dev/null 2>&1 & echo $!`,
+    process.execPath,
+    'setInterval(() => {}, 1000)',
+  ]);
+  const pid = parseInt(out.toString().trim(), 10);
+  return {
+    pid,
+    kill(signal) {
+      try {
+        process.kill(pid, signal);
+      } catch (err) {
+        if (err.code !== 'ESRCH') throw err;
+      }
+    },
+  };
 }
 
 function writeRegistry(fgosDir, entry) {
@@ -145,15 +182,53 @@ test('stopGateway: a live pid is genuinely SIGTERM-ed and the registry is cleare
   const child = spawnThrowaway();
   try {
     writeRegistry(fgosDir, { pid: child.pid, port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
-    const exited = new Promise((resolve) => child.once('exit', resolve));
     const result = stopGateway(fgosDir);
     assert.equal(result.alreadyStopped, false);
     assert.equal(result.pid, child.pid);
-    await exited; // real proof: the process this test spawned actually died
+    assert.equal(isAlive(child.pid), false); // stopGateway itself already waited for real death (tsk-2n2)
     assert.equal(fs.existsSync(path.join(fgosDir, 'gateway.json')), false);
   } finally {
-    if (!child.killed) child.kill('SIGKILL');
+    child.kill('SIGKILL');
     cleanup(repoRoot);
+  }
+});
+
+test('stopGateway: escalates to SIGKILL when the process ignores SIGTERM, and still clears the registry', async () => {
+  const { repoRoot, fgosDir } = mkFgosDir();
+  // A process with a real SIGTERM handler that swallows the signal --
+  // proves the escalation path fires for a genuine "won't die" process,
+  // not just a slow-but-cooperative one. It writes a ready-marker file
+  // right after registering the handler; the test polls for that marker
+  // before calling stopGateway, since a Node process' own startup
+  // (module bootstrap) takes real time and sending SIGTERM before the
+  // handler line has executed would just terminate it normally (a real
+  // race caught live while writing this test: an immediate kill after
+  // spawn killed the "SIGTERM-swallowing" process anyway).
+  const readyPath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gateway-test-ready-')), 'ready');
+  const script = `process.on('SIGTERM', () => {}); require('fs').writeFileSync(${JSON.stringify(readyPath)}, '1'); setInterval(() => {}, 1000);`;
+  const out = execFileSync('sh', ['-c', `setsid "$0" -e "$1" </dev/null >/dev/null 2>&1 & echo $!`, process.execPath, script]);
+  const child = { pid: parseInt(out.toString().trim(), 10) };
+  try {
+    const readyDeadline = Date.now() + 5000;
+    while (!fs.existsSync(readyPath)) {
+      assert.ok(Date.now() < readyDeadline, 'throwaway process never reached its SIGTERM-handler line');
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    writeRegistry(fgosDir, { pid: child.pid, port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
+    const start = Date.now();
+    const result = stopGateway(fgosDir);
+    assert.equal(result.alreadyStopped, false);
+    assert.ok(Date.now() - start >= 5000, 'expected stopGateway to wait through STOP_TIMEOUT_MS before escalating');
+    assert.equal(isAlive(child.pid), false);
+    assert.equal(fs.existsSync(path.join(fgosDir, 'gateway.json')), false);
+  } finally {
+    try {
+      process.kill(child.pid, 'SIGKILL');
+    } catch (err) {
+      if (err.code !== 'ESRCH') throw err;
+    }
+    cleanup(repoRoot);
+    cleanup(path.dirname(readyPath));
   }
 });
 
@@ -182,6 +257,59 @@ test('startGateway: a repo with no herdr-plugin/ directory is refused with a rea
       return true;
     });
   } finally {
+    cleanup(repoRoot);
+  }
+});
+
+// tsk-2n2: real cross-process mutual exclusion. A single JS thread cannot
+// prove a lock actually excludes a CONCURRENT holder (everything in one
+// process is serialized by the event loop regardless of the lock) -- a
+// second real OS process is spawned to hold `gateway.lock` while this
+// process attempts to acquire the SAME lock, proving the exclusion is
+// real, not just an in-process illusion.
+test('acquireGatewayLock: a live holder in ANOTHER process blocks this process from acquiring, and names the real holder pid', async () => {
+  const { repoRoot, fgosDir } = mkFgosDir();
+  fs.mkdirSync(fgosDir, { recursive: true });
+  const holderReadyPath = path.join(fgosDir, 'holder-ready');
+  const holderScript = `
+    import fs from 'node:fs';
+    import { acquireGatewayLock } from ${JSON.stringify(GATEWAY_CONTROL_MOD_PATH)};
+    const lock = acquireGatewayLock(${JSON.stringify(fgosDir)});
+    fs.writeFileSync(${JSON.stringify(holderReadyPath)}, String(process.pid));
+    setTimeout(() => { lock.release(); }, 2000);
+    setInterval(() => {}, 1000);
+  `;
+  const out = execFileSync('sh', [
+    '-c',
+    `setsid "$0" --input-type=module -e "$1" </dev/null >/dev/null 2>&1 & echo $!`,
+    process.execPath,
+    holderScript,
+  ]);
+  const holderPid = parseInt(out.toString().trim(), 10);
+  try {
+    const readyDeadline = Date.now() + 5000;
+    while (!fs.existsSync(holderReadyPath)) {
+      assert.ok(Date.now() < readyDeadline, 'holder process never acquired the lock');
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+
+    assert.throws(
+      () => acquireGatewayLock(fgosDir, { timeoutMs: 300, retryMs: 20 }),
+      (err) => {
+        assert.ok(err instanceof GatewayControlError);
+        assert.match(err.message, /timed out acquiring gateway\.lock/);
+        assert.equal(err.holderPid, holderPid);
+        return true;
+      },
+    );
+
+    // The holder releases after 2s (already elapsed by now) -- a fresh
+    // acquire attempt with a real window succeeds, proving this is a
+    // real, releasable lock, not a permanent deadlock.
+    const lock = acquireGatewayLock(fgosDir, { timeoutMs: 3000, retryMs: 20 });
+    lock.release();
+  } finally {
+    process.kill(holderPid, 'SIGKILL');
     cleanup(repoRoot);
   }
 });
