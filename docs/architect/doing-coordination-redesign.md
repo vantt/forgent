@@ -1,8 +1,15 @@
 # Doing Coordination Redesign
 
-Status: design target
+Status: implemented — shipped via tsk-40m (mergedInto main, mergedSha
+401a2282ee381b5c2831e6f4d7538e834ada6503); §17 review checklist re-audited
+2026-08-26 (tsk-1sl) against real `src/` state — all 14 §15 Acceptance
+Criteria confirmed pass with cited evidence, zero unclassified hit.
 Date: 2026-08-25
 Scope: fgOS work-item claim, coordination, durable event history, effective status views
+History: original design/implementation context lives at
+docs/history/runtime-claim-doing-separation/ (CONTEXT.md/plan.md/RESEARCH.md);
+that CONTEXT.md's own SUPERSEDED banner points back here for anything it
+still locks (D1-D6), consistent with this file remaining the live spec.
 
 ## 1. Problem Statement
 
