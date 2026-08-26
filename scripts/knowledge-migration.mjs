@@ -23,20 +23,30 @@ import { computeKnowledgeProjection } from '../src/report/knowledge-projection.m
 // apply (file relocated, registry never updated). Checking it here, before
 // any mutation, is what makes apply's "nothing partially applied" promise
 // true instead of aspirational.
-function computeConservationErrors(repoRoot, view, plannedMoves) {
+function computeConservationErrors(repoRoot, view, inventory, plannedMoves) {
   const errors = [];
 
-  const sourceCounts = new Map();
-  const targetCounts = new Map();
-  for (const move of plannedMoves) {
-    sourceCounts.set(move.oldPath, (sourceCounts.get(move.oldPath) ?? 0) + 1);
-    targetCounts.set(move.newPath, (targetCounts.get(move.newPath) ?? 0) + 1);
+  // §13.4 ("every old file must appear exactly once") is a property of the
+  // INVENTORY's own oldPath assignments -- a classifier bug that names the
+  // same source file for two different (topicId, role) rows is still a
+  // real duplicate-source violation even when BOTH rows happen to already
+  // be migrated (excluded from plannedMoves entirely). Checked against
+  // every inventory row directly, never just the subset still pending a
+  // move.
+  const inventorySourceCounts = new Map();
+  for (const item of inventory) {
+    if (typeof item.oldPath !== 'string') continue;
+    inventorySourceCounts.set(item.oldPath, (inventorySourceCounts.get(item.oldPath) ?? 0) + 1);
+  }
+  for (const [oldPath, count] of inventorySourceCounts) {
+    if (count > 1) {
+      errors.push(`duplicate source assignment: '${oldPath}' is claimed by ${count} inventory rows`);
+    }
   }
 
-  for (const [oldPath, count] of sourceCounts) {
-    if (count > 1) {
-      errors.push(`duplicate source assignment: '${oldPath}' is claimed by ${count} planned moves`);
-    }
+  const targetCounts = new Map();
+  for (const move of plannedMoves) {
+    targetCounts.set(move.newPath, (targetCounts.get(move.newPath) ?? 0) + 1);
   }
   for (const [newPath, count] of targetCounts) {
     if (count > 1) {
@@ -117,7 +127,7 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
     });
   }
 
-  const conservationErrors = computeConservationErrors(repoRoot, view, plannedMoves);
+  const conservationErrors = computeConservationErrors(repoRoot, view, inventory, plannedMoves);
 
   if (dryRun) {
     return {

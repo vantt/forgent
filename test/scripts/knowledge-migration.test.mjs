@@ -326,3 +326,37 @@ test('knowledge-migration - apply moves a source path containing shell metachara
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledge-migration - dry-run reports a duplicate-source conservation error even when both rows are already migrated (moveCount 0)', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    // Two different docs, both already sitting at their real targets --
+    // neither produces a plannedMoves entry -- but the inventory itself
+    // still names the SAME oldPath for both, a real classifier duplicate-
+    // assignment bug that has nothing to do with whether anything is left
+    // to move.
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'shared' });
+    registerTopicStore(fgosDir, { topicId: 't2', purposeSlug: 'shared' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/shared/guide.md', docLifecycle: 'active' });
+    registerDocStore(fgosDir, { docId: 't2:pitfall', topicId: 't2', role: 'pitfall', currentPath: 'docs/shared/pitfall.md', docLifecycle: 'active' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventory = [
+      { topicId: 't1', role: 'guide', oldPath: 'docs/dup-already-migrated.md', mode: 'how-to' },
+      { topicId: 't2', role: 'pitfall', oldPath: 'docs/dup-already-migrated.md', mode: 'reference' },
+    ];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventory), 'utf8');
+
+    const dry = runKnowledgeMigration(tmpDir, { dryRun: true });
+    assert.equal(dry.moveCount, 0);
+    assert.equal(dry.alreadyMigratedCount, 2);
+    assert.equal(
+      dry.conservationErrors.some((e) => e.includes("duplicate source assignment: 'docs/dup-already-migrated.md' is claimed by 2 inventory rows")),
+      true,
+      `expected a duplicate-source conservation error, got: ${JSON.stringify(dry.conservationErrors)}`
+    );
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

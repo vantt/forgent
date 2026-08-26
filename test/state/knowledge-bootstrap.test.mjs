@@ -154,3 +154,30 @@ test('knowledge-bootstrap - a drift refusal on a LATER row leaves NO partial wri
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledge-bootstrap - a later row that fails the REDUCER\'s own validation (e.g. invalid mode) leaves an earlier row\'s topic/doc uncreated too', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  try {
+    const dataPath = path.join(tmpDir, 'inventory.json');
+    // t1's row is entirely valid; t2's row has a mode the reducer's own
+    // framework/mode vocabulary rejects. Neither row exists in the
+    // registry yet -- the drift preflight has nothing to catch here, only
+    // the simulated-apply preflight (replaying against the real reducer)
+    // can.
+    const inventory = [
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+      { oldPath: 'docs/how-to/two.md', topicId: 't2', purposeSlug: 't2', purposeTitle: 'T2', role: 'guide', framework: 'diataxis', mode: 'bad-mode', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(inventory), 'utf8');
+
+    assert.throws(() => {
+      bootstrapRegistry(tmpDir, dataPath);
+    }, /Invalid mode: 'bad-mode'/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.topics, undefined, 't1 (the earlier, valid row) must not have been created either -- nothing durable until the whole batch validates');
+    assert.equal(view.docs, undefined);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

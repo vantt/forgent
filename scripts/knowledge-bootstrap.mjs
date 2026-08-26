@@ -10,6 +10,7 @@ import {
   registerTopicStore,
   registerDocStore,
 } from '../src/state/store.mjs';
+import { applyKnowledgeEvent } from '../src/state/knowledge-registry.mjs';
 
 /**
  * Bootstrap the knowledge registry in target fgos directory using classifier output JSON.
@@ -105,9 +106,53 @@ export function bootstrapRegistry(dir, inventoryDataPath) {
     );
   }
 
+  // Simulated-apply preflight: replay every row's topic.register/
+  // doc.register event against an in-memory CLONE of the view, through the
+  // real reducer (applyKnowledgeEvent) -- never a re-implementation of its
+  // rules. This is what actually catches an invalid purposeSlug/framework/
+  // mode, a role/mode collision, a currentPath already claimed by another
+  // doc, or an occupied (topicId, role) slot BEFORE the mutation pass
+  // below durably writes anything. The drift check above only compares
+  // against ALREADY-registered rows; this simulation is what proves the
+  // NEW writes this run is about to make are valid at all -- without it, a
+  // later row's reducer error (e.g. "Invalid mode") would only surface
+  // after the mutation pass had already durably created earlier rows'
+  // topics/docs, the exact partial-write shape the drift preflight alone
+  // does not prevent.
+  // Only topics/docs are cloned (never the whole app-wide `view` rebuild()
+  // returns) -- applyKnowledgeEvent reads/writes nothing else, and the rest
+  // of that view can carry data structuredClone has no business touching.
+  const simulatedView = { topics: structuredClone(view.topics ?? {}), docs: structuredClone(view.docs ?? {}) };
+  for (const item of inventory) {
+    if (!simulatedView.topics[item.topicId]) {
+      applyKnowledgeEvent(simulatedView, {
+        type: 'topic.register',
+        payload: { topicId: item.topicId, purposeSlug: item.purposeSlug, purposeTitle: item.purposeTitle, entities: item.entities },
+      });
+    }
+    const docId = `${item.topicId}:${item.role}`;
+    if (!simulatedView.docs[docId]) {
+      applyKnowledgeEvent(simulatedView, {
+        type: 'doc.register',
+        payload: {
+          docId,
+          topicId: item.topicId,
+          role: item.role,
+          currentPath: item.oldPath,
+          framework: item.framework || 'diataxis',
+          mode: item.mode || 'explanation',
+          docLifecycle: 'active',
+          aliases: [],
+          sourceCaptureIds: [item.oldPath],
+        },
+      });
+    }
+  }
+
   // Mutation pass: the registry is now known drift-free against this whole
-  // inventory -- every remaining unregistered row can be created safely,
-  // with no risk of a later row's own check aborting mid-write.
+  // inventory, AND the whole batch of new writes has already been proven
+  // valid by the simulation above -- every remaining unregistered row can
+  // be created for real, with no risk of a later row aborting mid-write.
   let mutableView = view;
   let topicsCreated = 0;
   let docsCreated = 0;
