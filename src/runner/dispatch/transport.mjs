@@ -692,10 +692,12 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
       // send the exit command" -- matching only "idle" left short
       // responses hanging until the JS timeout, confirmed live.
       //
-      // False-idle race fix (tsk-2rr): only trust an "idle" or "done" reading
-      // if checkIdle has already observed "working" at least once during this
+      // False-idle race fix (tsk-2rr): only trust an "idle" reading if
+      // checkIdle has already observed "working" at least once during this
       // turn. Early premature "idle" reports before the agent starts generation
-      // are ignored, continuing to poll until "working" then terminal state.
+      // are ignored, continuing to poll until "working" then a real terminal
+      // state. ("done" is handled differently -- see the asymmetry comment
+      // below.)
       //
       // Mid-turn debounce (tsk-2rr follow-up): a single "working" sighting is
       // not enough on its own -- a multi-step turn (e.g. edit a file, THEN
