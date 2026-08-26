@@ -616,6 +616,8 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     }
 
     let settled = false;
+    let sawWorking = false;
+    let consecutiveTerminalPolls = 0;
     let pollInterval = null;
     let timeoutTimer = null;
     let waitChild = null;
@@ -677,6 +679,10 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
         agentStatus = parsed?.result?.pane?.agent_status ?? parsed?.result?.agent_status ?? parsed?.pane?.agent_status ?? parsed?.agent_status;
       } catch {}
 
+      if (agentStatus === 'working') {
+        sawWorking = true;
+      }
+
       // Real live testing found TWO distinct terminal states herdr reports
       // for a finished agent turn, not just one -- a longer multi-second
       // response settled at "idle" while a short single-line answer
@@ -685,7 +691,61 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
       // "the agent has genuinely stopped generating and it is safe to
       // send the exit command" -- matching only "idle" left short
       // responses hanging until the JS timeout, confirmed live.
-      if (agentStatus === 'idle' || agentStatus === 'done') {
+      //
+      // False-idle race fix (tsk-2rr): only trust an "idle" reading if
+      // checkIdle has already observed "working" at least once during this
+      // turn. Early premature "idle" reports before the agent starts generation
+      // are ignored, continuing to poll until "working" then a real terminal
+      // state. ("done" is handled differently -- see the asymmetry comment
+      // below.)
+      //
+      // Mid-turn debounce (tsk-2rr follow-up): a single "working" sighting is
+      // not enough on its own -- a multi-step turn (e.g. edit a file, THEN
+      // run a shell command) can show a brief idle-looking gap BETWEEN two
+      // real tool calls, live-confirmed to intermittently fool a one-shot
+      // "sawWorking" gate into exiting mid-turn (~25% of live runs before
+      // this debounce -- see docs/history/agy-herdr-false-idle-polling-race/
+      // RESEARCH.md Round 3). Require three consecutive 500ms polls that
+      // are each terminal (idle or done, not necessarily the same one of
+      // the two -- consecutiveTerminalPolls counts any idle/done reading,
+      // per the asymmetry below) before trusting it -- a
+      // genuine finish stays idle/done for many poll cycles, while a
+      // mid-turn gap flips back to "working" within one or two cycles
+      // almost every time (two consecutive polls closed most of the gap
+      // live-confirmed, three closes the residual flake seen specifically
+      // under full-suite concurrent load, RESEARCH.md Round 3).
+      //
+      // "idle" vs "done" asymmetry (review finding, RESEARCH.md Round 4):
+      // every confirmed false-positive in this whole investigation (startup
+      // race, mid-turn race) was herdr reporting "idle" -- never "done".
+      // Live-probing several genuinely ultra-short prompts found them
+      // settling at "idle" too (through a real "working" phase first), never
+      // at "done" at all in this agy/herdr version -- "done" could not be
+      // reproduced on demand, so there is no live evidence it is ever a
+      // false startup signal, and gating it behind sawWorking risks hanging
+      // an agent whose first-ever response is fast enough to report "done"
+      // before any poll ever samples "working" (the exact regression tsk-10j
+      // bug #2 already fixed once for the pre-tsk-2rr code, which this must
+      // not reintroduce). Only "idle" requires sawWorking; "done" only needs
+      // the 3-consecutive-poll debounce on its own.
+      if (agentStatus === 'idle') {
+        if (sawWorking) {
+          consecutiveTerminalPolls += 1;
+        } else {
+          consecutiveTerminalPolls = 0;
+        }
+      } else if (agentStatus === 'done') {
+        consecutiveTerminalPolls += 1;
+      } else {
+        consecutiveTerminalPolls = 0;
+      }
+
+      // No separate sawWorking check here -- it is already enforced above:
+      // the "idle" branch only increments consecutiveTerminalPolls when
+      // sawWorking is true (reset to 0 otherwise), so reaching 3 via "idle"
+      // implies sawWorking is already true. The "done" branch increments
+      // unconditionally by design (see the asymmetry comment above).
+      if (consecutiveTerminalPolls >= 3) {
         if (pollInterval) {
           clearInterval(pollInterval);
           pollInterval = null;

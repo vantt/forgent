@@ -1,0 +1,1 @@
+{"seq":1,"ts":"2026-08-26T16:00:56.400Z","type":"work.outcome","payload":{"id":"tsk-by0","predicted":{"tier":"standard","deps":0,"priorVisits":0,"role":"session","branchHeadAtTake":"a111c239549bc7f51b6cc7f92c63f7aad05ffc49"}},"v":3,"src":"6cf44436-a8a6-471d-9c04-f0fab0aeace9","h":"da2f48d6cda262dd"}
