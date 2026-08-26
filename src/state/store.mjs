@@ -601,11 +601,11 @@ export function assertAcceptanceEvidence(id, work) {
  * carrying only iron-law-evidence.md). Same shape as
  * `assertAcceptanceEvidence` (RUL58) immediately above — a small assert
  * called from both `moveWork`'s `to === 'delivered'` backstop and
- * `approve`'s pre-flight call sites (`bin/fgos.mjs`) — but NOT pure: it
- * checks the item's own `fgw/<id>` branch via `git cat-file -e`, never a
- * plain `fs.existsSync` on the caller's current working tree, so the same
- * function is correct both before a merge (pre-flight, branch not yet in
- * `repoRoot`'s checkout) and after (backstop, already merged).
+ * `approve`'s pre-flight call sites (`bin/fgos.mjs`) — but NOT pure: when an
+ * `fgw/<id>` branch exists, it checks that branch via `git cat-file -e` (so the
+ * pre-flight check succeeds before a merge when the branch is not yet in
+ * `repoRoot`'s checkout); when no branch exists (pull/legacy or retroactive
+ * items), it falls back to checking the current working tree via `fs.existsSync`.
  *
  * `risk === 'heavy'` only, not a live re-derivation of "touches an
  * Iron-Law-gated module" — that classification is the separate, existing
@@ -626,18 +626,34 @@ export function assertPlanEvidence(id, work, repoRoot) {
     candidates.push(path.posix.join(work.docsRef.replace(/\/+$/, ''), 'plan.md'));
   }
   candidates.push(`docs/history/${id}/plan.md`);
-  const hasPlan = candidates.some((candidate) => {
+
+  const hasBranch = (() => {
     try {
-      execFileSync('git', ['cat-file', '-e', `${branch}:${candidate}`], { cwd: repoRoot, stdio: 'ignore' });
+      execFileSync('git', ['rev-parse', '--verify', '--quiet', `refs/heads/${branch}`], { cwd: repoRoot, stdio: 'ignore' });
       return true;
     } catch {
       return false;
     }
+  })();
+
+  const hasPlan = candidates.some((candidate) => {
+    if (hasBranch) {
+      try {
+        execFileSync('git', ['cat-file', '-e', `${branch}:${candidate}`], { cwd: repoRoot, stdio: 'ignore' });
+        return true;
+      } catch {
+        return false;
+      }
+    } else {
+      return fs.existsSync(path.join(repoRoot, candidate));
+    }
   });
+
   if (!hasPlan) {
+    const locDesc = hasBranch ? `on branch "${branch}"` : `in current tree (no branch "${branch}")`;
     throw new StoreError(
       'precondition',
-      `work "${id}" cannot move to "delivered" — risk:heavy but no plan.md found on branch "${branch}" (checked ${candidates.join(', ')}); write one before landing.`,
+      `work "${id}" cannot move to "delivered" — risk:heavy but no plan.md found ${locDesc} (checked ${candidates.join(', ')}); write one before landing.`,
     );
   }
 }
