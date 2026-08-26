@@ -11,6 +11,7 @@ import {
   writeGuardMark,
   checkEventsJsonlTruncationGuard,
   advanceEventsJsonlTruncationGuard,
+  forceRebaselineTruncationGuard,
   runOpportunisticMainCheckoutChecks,
   getUncommittedEventCount,
 } from "../../src/state/events-jsonl-truncation-guard.mjs";
@@ -485,3 +486,117 @@ test("FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 opts out of opportunistic checks compl
     fs.rmSync(repoRoot, { recursive: true, force: true });
   }
 });
+
+// --- forceRebaselineTruncationGuard (tsk-46v) --------------------------------
+
+test("forceRebaselineTruncationGuard moves a genuinely BROKEN file's mark to its current tip, restoring ok: true on check", () => {
+  const dir = mkTempDir("truncguard-force-broken-");
+  const logPath = path.join(dir, "events.jsonl");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
+
+  // Set initial mark at seq 2
+  fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
+  advanceEventsJsonlTruncationGuard(logPath, guardPath);
+  assert.equal(readGuardMark(guardPath, "events.jsonl").seq, 2);
+
+  // Truncate file back to seq 1 -> causes regressed break
+  fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a")]), "utf8");
+  assert.equal(checkEventsJsonlTruncationGuard(logPath, guardPath).ok, false);
+
+  // forceRebaselineTruncationGuard unconditionally updates mark to seq 1
+  const summary = forceRebaselineTruncationGuard(dir, guardPath);
+  assert.deepEqual(summary.rebaselined, [{ fileKey: "events.jsonl", mark: computeGuardMark(raw([ev(1, "2026-01-01T00:00:00.000Z", "a")])) }]);
+  assert.deepEqual(summary.skippedEmpty, []);
+
+  // Fresh check against the same file now reports ok: true
+  const freshCheck = checkEventsJsonlTruncationGuard(logPath, guardPath);
+  assert.equal(freshCheck.ok, true);
+  assert.equal(readGuardMark(guardPath, "events.jsonl").seq, 1);
+
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("forceRebaselineTruncationGuard moves a content-mismatch BROKEN file's mark to current tip", () => {
+  const dir = mkTempDir("truncguard-force-mismatch-");
+  const logPath = path.join(dir, "events.jsonl");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
+
+  const origLines = [ev(1, "2026-01-01T00:00:00.000Z", "orig-1"), ev(2, "2026-01-01T00:00:01.000Z", "orig-2")];
+  fs.writeFileSync(logPath, raw(origLines), "utf8");
+  advanceEventsJsonlTruncationGuard(logPath, guardPath);
+
+  // Truncate and re-append past old mark (different event at seq 2)
+  const newLines = [ev(1, "2026-01-01T00:00:00.000Z", "orig-1"), ev(2, "2026-01-01T00:00:05.000Z", "new-2"), ev(3, "2026-01-01T00:00:06.000Z", "new-3")];
+  fs.writeFileSync(logPath, raw(newLines), "utf8");
+  assert.equal(checkEventsJsonlTruncationGuard(logPath, guardPath).ok, false);
+
+  const summary = forceRebaselineTruncationGuard(dir, guardPath);
+  assert.equal(summary.rebaselined.length, 1);
+  assert.equal(summary.rebaselined[0].mark.seq, 3);
+
+  const freshCheck = checkEventsJsonlTruncationGuard(logPath, guardPath);
+  assert.equal(freshCheck.ok, true);
+
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("forceRebaselineTruncationGuard works correctly on a clean/bootstrap file", () => {
+  const dir = mkTempDir("truncguard-force-clean-");
+  const logPath = path.join(dir, "events.jsonl");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
+
+  fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
+
+  const summary = forceRebaselineTruncationGuard(dir, guardPath);
+  assert.equal(summary.rebaselined.length, 1);
+  assert.equal(summary.rebaselined[0].fileKey, "events.jsonl");
+  assert.equal(summary.rebaselined[0].mark.seq, 2);
+  assert.deepEqual(summary.skippedEmpty, []);
+
+  assert.equal(readGuardMark(guardPath, "events.jsonl").seq, 2);
+  assert.equal(checkEventsJsonlTruncationGuard(logPath, guardPath).ok, true);
+
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("forceRebaselineTruncationGuard reports skippedEmpty for files with no seq tail", () => {
+  const dir = mkTempDir("truncguard-force-empty-");
+  const logPath = path.join(dir, "events.jsonl");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
+
+  fs.writeFileSync(logPath, "", "utf8");
+
+  const summary = forceRebaselineTruncationGuard(dir, guardPath);
+  assert.equal(summary.rebaselined.length, 0);
+  assert.deepEqual(summary.skippedEmpty, ["events.jsonl"]);
+
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("CLI --force-rebaseline-all mode calls forceRebaselineTruncationGuard and outputs summary JSON with exit code 0", () => {
+  const dir = mkTempDir("truncguard-cli-force-");
+  const logPath = path.join(dir, "events.jsonl");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
+
+  fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a"), ev(2, "2026-01-01T00:00:01.000Z", "b")]), "utf8");
+  advanceEventsJsonlTruncationGuard(logPath, guardPath);
+
+  // Break the log
+  fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a")]), "utf8");
+  assert.equal(checkEventsJsonlTruncationGuard(logPath, guardPath).ok, false);
+
+  const scriptPath = path.resolve("scripts/events-jsonl-truncation-guard.mjs");
+  const out = execFileSync(process.execPath, [scriptPath, "--force-rebaseline-all", dir, guardPath], {
+    encoding: "utf8",
+  });
+
+  const parsed = JSON.parse(out);
+  assert.equal(parsed.rebaselined.length, 1);
+  assert.equal(parsed.rebaselined[0].fileKey, "events.jsonl");
+  assert.equal(parsed.rebaselined[0].mark.seq, 1);
+
+  assert.equal(checkEventsJsonlTruncationGuard(logPath, guardPath).ok, true);
+
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+

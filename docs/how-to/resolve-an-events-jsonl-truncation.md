@@ -63,7 +63,7 @@ recovery — there is nothing to recover.
    still has no fix:
 
    ```bash
-   node scripts/events-jsonl-truncation-guard.mjs --advance .fgos/events.jsonl .fgos/events-jsonl.truncation-guard.json
+   node scripts/events-jsonl-truncation-guard.mjs --force-rebaseline-all .fgos .fgos/runtime/events-jsonl.truncation-guard.json
    ```
 
    This advances the mark to the log's current tip. `fgos doctor` will

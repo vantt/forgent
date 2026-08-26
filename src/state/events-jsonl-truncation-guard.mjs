@@ -248,6 +248,35 @@ function discoverGuardedFiles(fgosDir) {
   return result;
 }
 
+/**
+ * Unconditionally re-baselines the truncation guard mark for all discovered log files
+ * in `fgosDir` that exist on disk.
+ *
+ * Unlike `advanceEventsJsonlTruncationGuard`, which refuses to update the mark when
+ * a break is detected, this function computes and writes the current tip mark
+ * unconditionally -- acknowledging any break and bringing the mark up to date.
+ *
+ * @param {string} fgosDir - Path to the `.fgos` directory
+ * @param {string} guardPath - Path to the guard sidecar file
+ * @returns {{ rebaselined: Array<{fileKey: string, mark: {seq: number, hash: string}}>, skippedEmpty: Array<string> }}
+ */
+export function forceRebaselineTruncationGuard(fgosDir, guardPath) {
+  const rebaselined = [];
+  const skippedEmpty = [];
+  for (const { fileKey, logPath } of discoverGuardedFiles(fgosDir)) {
+    if (!fs.existsSync(logPath)) continue;
+    const raw = fs.readFileSync(logPath, "utf8");
+    const mark = computeGuardMark(raw);
+    if (mark === null) {
+      skippedEmpty.push(fileKey);
+    } else {
+      writeGuardMark(guardPath, fileKey, mark);
+      rebaselined.push({ fileKey, mark });
+    }
+  }
+  return { rebaselined, skippedEmpty };
+}
+
 export const DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC = 3600; // 3600 seconds (1 hour) fallback interval
 
 /** The single-file core `getUncommittedEventCount` (below) sums over every
