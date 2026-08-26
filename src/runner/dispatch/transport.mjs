@@ -387,14 +387,29 @@ function cliSpawnAdapter(invocation, opts) {
       });
     });
 
-    // 'exit' (fires once the spawned process itself terminates), never
-    // 'close' (waits for the stdio PIPES to fully close too) — matching
-    // spawnSync's own timeout semantics: a kill decision is made and
-    // reported based on the process's own termination, never waiting out
-    // however long a still-open pipe (e.g. an orphaned grandchild that
-    // escaped the process-group kill) keeps it open — resolving on 'close'
-    // instead would defeat the timeout.
-    child.on('exit', (code, signal) => {
+    // 'close' (waits for the child's stdio PIPES to fully close, not just
+    // the process itself to terminate), NOT 'exit' (self-review finding,
+    // real, 2026-08-26): Node's own docs are explicit that 'exit' can fire
+    // BEFORE all buffered stdout/stderr 'data' events have been delivered —
+    // the OS pipe can still hold output at the instant the child terminates,
+    // with the final 'data' event landing on a later event-loop tick. Under
+    // light load this race resolves in 'data''s favor almost every time,
+    // which is why this went unnoticed until a CONCURRENT dispatch test
+    // (two workers' stdout competing for CPU) reproducibly captured an empty
+    // `stdout` for one of them — a live-tee log silently losing entire
+    // worker output under load, not a test-only artifact: `result.stdout`
+    // itself would have been truncated the same way for any real caller.
+    // 'close' is what Node's OWN `child_process.exec`/`execFile` wait for
+    // internally, for exactly this reason. Switching to it is safe against
+    // the timeout concern a prior version of this comment raised: `timer`/
+    // `idleTimer` stay armed independently of this listener (cleared only
+    // inside `finish()`, which only runs once this fires) — an orphaned
+    // grandchild holding the pipe open still gets torn down by
+    // `killChildTree`'s process-group SIGTERM once `timeoutMs` elapses,
+    // which closes the pipe and lets 'close' fire immediately after; the
+    // worst case is the same bounded wait the timeout already guarantees,
+    // never an unbounded hang.
+    child.on('close', (code, signal) => {
       finish(() => {
         if (timedOut) {
           reject(new DispatchError(
@@ -605,7 +620,7 @@ function herdrSpawnAdapter(invocation, opts) {
     // SIGNAL FALLBACK (self-review finding, 2026-08-25): `herdr pane
     // wait-output --regex` can ONLY detect completion by matching text the
     // dispatched agent itself chooses to print -- unlike `cliSpawnAdapter`,
-    // which observes the real child process's own 'exit' event regardless
+    // which observes the real child process's own termination regardless
     // of what it printed. An agent that does real work (commits, edits)
     // but never emits `[DONE]`/`[BLOCKED]` -- the exact case the existing
     // ladder's `headBefore`/`headAfter` git-inference fallback exists to
@@ -728,7 +743,7 @@ function herdrSpawnAdapter(invocation, opts) {
     // ever runs. The sentinel has no such collision risk (a random,
     // adapter-owned marker no real prompt could plausibly contain) and
     // fires EXACTLY ONCE, immediately after the real command truly exits
-    // -- the same fact `child.on('exit')` gives `cliSpawnAdapter` for free.
+    // -- the same fact `child.on('close')` gives `cliSpawnAdapter` for free.
     // Token detection still happens, just downstream in cli.mjs against
     // the final `stdout` this resolve() call returns, exactly like
     // cliSpawnAdapter already does -- no behavior lost, only the false
@@ -790,7 +805,12 @@ function herdrSpawnAdapter(invocation, opts) {
       ));
     });
 
-    waitChild.on('exit', (code, signal) => {
+    // 'close', not 'exit' -- same reasoning as cliSpawnAdapter's own fix
+    // above (self-review finding, 2026-08-26): `waitStdout` is accumulated
+    // from `waitChild.stdout`'s 'data' events, and 'exit' can fire before
+    // all of them have landed, truncating the JSON this handler parses
+    // below under load.
+    waitChild.on('close', (code, signal) => {
       if (timer) clearTimeout(timer);
       if (timedOut) {
         cleanupScript();
