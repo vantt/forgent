@@ -25,6 +25,21 @@ export const VALID_FRAMEWORKS = Object.freeze(['diataxis']);
 export const DIATAXIS_MODES = Object.freeze(['tutorial', 'how-to', 'reference', 'explanation']);
 
 /**
+ * A doc is "live" (still the authoritative slot occupant) when it is
+ * neither 'retired' nor 'superseded' -- doc.supersede already moved
+ * "current" to supersededBy, so a superseded doc is excluded the same way
+ * a retired one is, even though it isn't retired itself. This is the ONE
+ * definition every reader of docLifecycle liveness shares: resolveDocId
+ * below, src/report/knowledge-resolver.mjs's own resolution logic, and the
+ * knowledge doctor checks in src/setup/registrations.mjs -- previously
+ * re-implemented independently in each of those three places, free to
+ * silently drift apart on a future lifecycle change.
+ */
+export function isLiveDocLifecycle(docLifecycle) {
+  return docLifecycle !== 'retired' && docLifecycle !== 'superseded';
+}
+
+/**
  * Enforces the narrow, mechanical slice of the closed role/framework/mode
  * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1
  * already states unconditionally: framework must be a registered one, mode
@@ -162,7 +177,7 @@ export function resolveDocId(view, { docId, topicId, role }) {
   if (!topicId || !role) return null;
   const matches = Object.values(view.docs).filter((d) => d.topicId === topicId && d.role === role);
   if (matches.length === 0) return null;
-  const live = matches.find((d) => d.docLifecycle !== 'retired' && d.docLifecycle !== 'superseded');
+  const live = matches.find((d) => isLiveDocLifecycle(d.docLifecycle));
   return (live ?? matches[0]).docId;
 }
 
@@ -556,6 +571,7 @@ export function applyKnowledgeEvent(view, event) {
       if (!doc) {
         throw new KnowledgeValidationError(`doc.demote: doc '${id}' not found`);
       }
+      assertTopicWritable(view, doc.topicId, 'doc.demote');
       if (doc.docLifecycle !== 'active') {
         throw new KnowledgeValidationError(
           `doc.demote: doc '${id}' is '${doc.docLifecycle}', must be 'active'`

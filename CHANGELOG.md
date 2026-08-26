@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `fgos knowledge attest` now requires `--capture-id` — a call that only names `--doc-path` used to return `{attested: true}` while recording no linkage at all; now it either records the capture id or returns `{attested: false, reason: ...}` when `docRegistry.enforce` is off, never a misleading unconditional success (tsk-3uc).
+
+### Fixed
+
+- Closed a series of real gaps in the knowledge registry's lifecycle/migration/bootstrap enforcement (tsk-3uc, follow-on to tsk-28x): `doc.register` could silently move an existing doc's lifecycle (demoting `active` back to `provisional` on a bare re-register, or resurrecting a `retired`/`superseded` doc); `doc.attest`/`doc-current-path-missing`/`doc-source-unreachable`/`doc-source-conservation` treated a `superseded` doc as still live; `topic.merge`/`topic.split` accepted a non-`active` target/source; `topic.retire` on a nonexistent topic was a silent no-op; `doc.supersede` accepted an unvalidated `supersededBy` pointer; `doc.mark-rendered` silently no-oped on a non-`reserved` doc; `scripts/knowledge-migration.mjs` could partially apply (file moved before the registry write, which could then fail), never validated conservation against the full inventory (only the still-pending subset), used shell-interpolated `git mv`/`git add`, and its "already migrated" shortcut accepted a dead doc or an unreachable file as success; `scripts/knowledge-bootstrap.mjs` could partially write across rows in one inventory (an earlier row durably created before a later row's own drift/validation failure) and treated a `retired`/`superseded` doc or `purposeSlug`/`framework`/`mode` drift as idempotent success.
+
+### Added
+
+- `fgos doc demote` — the mirror of `fgos doc promote` (`active` -> `provisional`), the door `scripts/knowledge-migration.mjs` needs to satisfy the registry redesign's "leaves every migrated document provisional unless explicitly promoted" rule (tsk-3uc).
+- Doctor checks `doc-current-path-missing` (a live doc's `currentPath` not committed at `HEAD`) and `doc-source-unreachable` (a path-shaped `sourceCaptureIds` entry not reachable through its own current/alias paths); `doc-source-conservation` extended from a single outcome-reachability check to also catch a target document with no source, a duplicate migration-inventory source assignment, and a source lost mid-migration (tsk-3uc).
+
 - Moved 5 diagnostic/telemetry logs (`approve-post-success-faults.jsonl`, `main-checkout-guard-warnings.jsonl`, `changelog-nag-history.jsonl`, `entropy-history.jsonl`, `invocation-faults.jsonl`) from `.fgos/` root into the already-gitignored `.fgos/logs/` bucket — none of these is the event log, so they never needed to be git-tracked; they were only kept dirty/committed by omission. Removed their now-dead `.gitattributes` `merge=union` entries.
 - Moved `tool-status.local.json` and `events-jsonl.truncation-guard.json` (both already gitignored) into `.fgos/runtime/`, matching the same per-machine/local-only bucket convention as `.fgos/logs/`.
 - Added `src/state/fgos-file-registry.mjs` (kernel layer) as the single source of truth for well-known `.fgos/` file paths (`resolveFgosFile`/`FGOS_FILE`), replacing independent path-building in every module and test that touched them. Moved `state.json` into `.fgos/cache/` (already gitignored) on top of it — the first attempt at this move broke 51 tests across 21 files with hardcoded copies of the old path; this shared resolver closes that gap for good.

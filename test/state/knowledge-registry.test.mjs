@@ -714,3 +714,25 @@ test('doc.demote moves an active doc back to provisional; refuses any other life
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('doc.demote refuses under a retired topic, same as reserve/register/mark-rendered/promote', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'dead-topic' });
+    // Doc reaches 'active' while the topic is still active -- topic.retire
+    // never force-retires its docs, so this is the real repro shape: an
+    // active doc left in place under a topic retired directly afterward.
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+    retireTopicStore(tmpDir, { topicId: 't1' });
+
+    assert.throws(() => {
+      demoteDocStore(tmpDir, { docId: 'd1' });
+    }, /is retired/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'active', 'a refused demote must not have moved the state');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

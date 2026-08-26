@@ -468,3 +468,30 @@ test('knowledge-migration - refuses (does not report success) a live doc that al
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledge-migration - dry-run against a completely fresh store (no bootstrap ever run) reports a clean error, not a TypeError', () => {
+  const { tmpDir } = setupGitRepoWithStore();
+  try {
+    // Deliberately never register any topic/doc -- view.topics is only
+    // initialized lazily by the reducer, so on a store with zero knowledge
+    // events it stays `undefined`. An inventory row referencing it must
+    // not crash on an unguarded `view.topics[item.topicId]`.
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Reclaim\n', 'utf8');
+
+    const dry = runKnowledgeMigration(tmpDir, { dryRun: true });
+    assert.equal(
+      dry.conservationErrors.some((e) => e.includes("doc 't1:guide' is not registered in the knowledge registry")),
+      true,
+      `expected a clean doc-not-registered error, got: ${JSON.stringify(dry.conservationErrors)}`
+    );
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

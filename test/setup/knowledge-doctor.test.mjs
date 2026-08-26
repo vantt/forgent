@@ -222,3 +222,23 @@ test('knowledge-doctor - doc-source-conservation passes for a clean registry wit
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledge-doctor - doc-source-conservation does not crash (and just skips the inventory checks) when inventory-data.json is valid JSON but not an array', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'test-topic' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/test/guide.md', docLifecycle: 'active', sourceCaptureIds: ['docs/test/guide.md'] });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    // A buggy classifier run writing a single object (or `null`) instead of
+    // an array -- valid JSON, so the parse itself never throws.
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify({ not: 'an array' }), 'utf8');
+
+    const checkObj = DOCTOR_CHECKS.find(c => c.id === 'doc-source-conservation');
+    assert.doesNotThrow(() => checkObj.check(tmpDir));
+    assert.equal(checkObj.check(tmpDir).passed, true);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

@@ -1,5 +1,7 @@
 // src/report/knowledge-resolver.mjs
 
+import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
+
 /**
  * Pure resolver function mapping an oldPath or currentPath to current active doc(s).
  * Accepts folded state view from knowledge registry.
@@ -24,8 +26,7 @@ export function resolveDocPath(view, path) {
   // excluding it here also correctly makes step 3's lineage chase below
   // find no active successor for it -- the doc becomes fully unresolvable,
   // not silently still-attestable.
-  const isLive = (d) =>
-    d.docLifecycle !== 'retired' && d.docLifecycle !== 'superseded' && view.topics?.[d.topicId]?.status === 'active';
+  const isLive = (d) => isLiveDocLifecycle(d.docLifecycle) && view.topics?.[d.topicId]?.status === 'active';
 
   // 1. Direct match on currentPath among live docs
   const activeDocs = Object.values(view.docs).filter((d) => d.currentPath === path && isLive(d));
@@ -72,18 +73,14 @@ export function resolveDocPath(view, path) {
     for (const t of currentTopics) {
       if (leadsFrom(t.topicId, rDoc.topicId)) {
         const docsInT = Object.values(view.docs).filter(
-          (d) =>
-            d.topicId === t.topicId &&
-            d.docLifecycle !== 'retired' &&
-            d.docLifecycle !== 'superseded' &&
-            d.role === rDoc.role
+          (d) => d.topicId === t.topicId && isLiveDocLifecycle(d.docLifecycle) && d.role === rDoc.role
         );
         // If exact role match exists, add those; otherwise add all live docs in t
         if (docsInT.length > 0) {
           for (const d of docsInT) targetDocs.add(d);
         } else {
           const allDocsInT = Object.values(view.docs).filter(
-            (d) => d.topicId === t.topicId && d.docLifecycle !== 'retired' && d.docLifecycle !== 'superseded'
+            (d) => d.topicId === t.topicId && isLiveDocLifecycle(d.docLifecycle)
           );
           for (const d of allDocsInT) targetDocs.add(d);
         }

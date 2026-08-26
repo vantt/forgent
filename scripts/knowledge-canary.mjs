@@ -28,8 +28,20 @@ export function runKnowledgeCanary(repoRoot) {
 
   // 4. Attest
   const attestOut = execSync(`node "${fgosBin}" knowledge attest --doc-path ${docPath} --capture-id canary-capture`, { cwd: repoRoot, encoding: 'utf8' });
-  if (!attestOut.includes('attested')) {
-    throw new Error('Canary failed: knowledge attest did not return attested: true');
+  // `attestOut.includes('attested')` used to match the literal field NAME
+  // regardless of its value -- a `{"attested":false,"reason":...}` soft-fail
+  // response (the docRegistry.enforce-off path) contains that same
+  // substring, so the canary -- whose whole purpose is to catch exactly
+  // this kind of end-to-end regression -- would have proceeded as if
+  // attestation succeeded. Parse the real JSON and check the actual value.
+  let attestResult;
+  try {
+    attestResult = JSON.parse(attestOut).data;
+  } catch (err) {
+    throw new Error(`Canary failed: knowledge attest output was not valid JSON: ${err.message}`);
+  }
+  if (!attestResult || attestResult.attested !== true) {
+    throw new Error(`Canary failed: knowledge attest did not return attested: true (got: ${attestOut.trim()})`);
   }
 
   // 5. Mark rendered

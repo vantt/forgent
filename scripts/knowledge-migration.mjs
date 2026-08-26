@@ -105,7 +105,7 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
   let alreadyMigratedCount = 0;
 
   for (const item of inventory) {
-    const topic = view.topics[item.topicId];
+    const topic = view.topics?.[item.topicId];
     const purposeSlug = topic?.purposeSlug || item.topicId;
     const targetPath = `docs/${purposeSlug}/${item.role}.md`;
 
@@ -199,18 +199,13 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
       } catch {}
     }
 
-    // Record moveDocPathStore event
-    moveDocPathStore(fgosDir, { docId: move.docId, topicId: move.topicId, role: move.role, newPath: move.newPath });
-
-    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: "leaves
-    // every migrated document provisional unless explicitly promoted."
-    // Only an 'active' doc needs demoting -- a 'provisional'/'reserved' doc
-    // is already below 'active' and doc.demote itself requires 'active'.
-    if (move.preLifecycle === 'active') {
-      demoteDocStore(fgosDir, { docId: move.docId });
-    }
-
-    // Update frontmatter
+    // Update frontmatter BEFORE recording any registry event for this move
+    // -- parseFrontmatter/renderFrontmatter/writeFileSync throwing here
+    // must never leave the registry claiming a move that only half
+    // happened. Recording moveDocPathStore/demoteDocStore first (the
+    // previous order) meant a frontmatter-write failure left the registry
+    // "ahead of reality": the exact class of gap this whole item exists to
+    // close, reintroduced one step later in the same loop.
     if (fs.existsSync(destAbs)) {
       const raw = fs.readFileSync(destAbs, 'utf8');
       const parsed = parseFrontmatter(raw);
@@ -221,6 +216,17 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
       };
       const updated = renderFrontmatter(newMeta, parsed.body);
       fs.writeFileSync(destAbs, updated, 'utf8');
+    }
+
+    // Record moveDocPathStore event
+    moveDocPathStore(fgosDir, { docId: move.docId, topicId: move.topicId, role: move.role, newPath: move.newPath });
+
+    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: "leaves
+    // every migrated document provisional unless explicitly promoted."
+    // Only an 'active' doc needs demoting -- a 'provisional'/'reserved' doc
+    // is already below 'active' and doc.demote itself requires 'active'.
+    if (move.preLifecycle === 'active') {
+      demoteDocStore(fgosDir, { docId: move.docId });
     }
 
     appliedCount++;

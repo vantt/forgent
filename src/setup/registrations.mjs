@@ -63,6 +63,7 @@ import { readMainCheckoutGuardWarnings } from '../state/main-checkout-guard-warn
 import { computeKnowledgeProjection } from '../report/knowledge-projection.mjs';
 import { rebuild } from '../state/store.mjs';
 import { resolveDocPath } from '../report/knowledge-resolver.mjs';
+import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
 import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.mjs';
 import { parseFrontmatter } from '../report/frontmatter.mjs';
 
@@ -2652,17 +2653,6 @@ function checkDocRoleUnderused(cwd) {
   return { passed: true, message: `${underused.length} roles used by single doc: ${underused.map(([r]) => r).join(', ')}` };
 }
 
-// src/report/knowledge-resolver.mjs's own `isLive` (resolveDocPath) treats a
-// doc as live when it is neither 'retired' nor 'superseded' -- a superseded
-// doc's slot has already moved to supersededBy, so its own currentPath/
-// aliases/sourceCaptureIds are frozen history, not something these doctor
-// checks should still hold to today's HEAD/reachability bar. Shared here so
-// the three checks below can't drift from the resolver's own definition the
-// way skipping only 'retired' did before.
-function isLiveDocLifecycle(docLifecycle) {
-  return docLifecycle !== 'retired' && docLifecycle !== 'superseded';
-}
-
 // docs/architect/knowledge-registry-redesign.md §14.6: "current path absent
 // at HEAD" -- a doc's own currentPath is the thing every other check
 // (resolver, migration, doc-alias-broken) treats as ground truth; if the
@@ -2762,6 +2752,15 @@ function checkDocSourceConservation(cwd) {
     try {
       inventory = JSON.parse(fs.readFileSync(inventoryPath, 'utf8'));
     } catch {
+      inventory = [];
+    }
+    // The try/catch above only guards a JSON *parse* failure -- valid JSON
+    // that isn't an array (a buggy classifier run writing `{}`/`null`/a
+    // single object) parses cleanly and would otherwise reach `for...of`
+    // below and throw, taking down every OTHER doctor check in the same
+    // `fgos doctor` run (bin/fgos.mjs calls every check with no per-check
+    // try/catch of its own).
+    if (!Array.isArray(inventory)) {
       inventory = [];
     }
     const sourceCounts = new Map();
