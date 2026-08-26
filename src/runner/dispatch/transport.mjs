@@ -646,8 +646,24 @@ function herdrSpawnAdapter(invocation, opts) {
     // containing a byte of prompt content) removes the entire class of
     // echo-pollution and echo-mangling risk at its source, rather than
     // trying to clean up an echo whose exact shape can't be trusted.
+    // SELF-DELETING SCRIPT (self-review finding, real, 2026-08-26): the
+    // script file above carries the same prompt/repo content the echo
+    // fix exists to keep out of stdout, now sitting as a 0700 file in
+    // `os.tmpdir()` instead. `cleanupScript` below only ever runs after
+    // this promise settles -- a process crash (or a kill -9) between
+    // `pane run` and that point leaves the file behind indefinitely,
+    // trading terminal-echo leakage for local temp-file exposure. `rm -f
+    // "$0"` as the script's own FIRST line closes that window at its
+    // source: POSIX shells keep the file descriptor open once they start
+    // reading a script, so unlinking the directory entry immediately
+    // (before `quotedCmd` -- and therefore any of its content -- ever
+    // runs) does not disturb the already-running interpreter, the same
+    // "self-destructing script" pattern used for any short-lived secret
+    // script. `cleanupScript` stays as a fallback for the case this
+    // script is written but never actually run (e.g. `pane run` itself
+    // fails right after the write).
     const scriptPath = path.join(os.tmpdir(), `fgos-herdr-run-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.sh`);
-    fs.writeFileSync(scriptPath, `${quotedCmd}\necho "${sentinel}:$?"\n`, { mode: 0o700 });
+    fs.writeFileSync(scriptPath, `rm -f "$0"\n${quotedCmd}\necho "${sentinel}:$?"\n`, { mode: 0o700 });
     const typedCmd = `sh ${posixShellQuote(scriptPath)}`;
 
     const cleanupScript = () => {
