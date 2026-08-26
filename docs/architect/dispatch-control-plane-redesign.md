@@ -1,7 +1,7 @@
 # Dispatch Control Plane Redesign
 
-Status: design target with narrow implementation slice
-Date: 2026-08-25
+Status: design target with reviewed narrow implementation candidate
+Date: 2026-08-26
 Scope: fgOS dispatch selection, executor governance, worker protocol, result signaling, artifact handoff, and Herdr runtime visibility
 
 ## 1. Problem Statement
@@ -19,12 +19,13 @@ The current system has:
 - an `unsignaled` fallback that compares git state before and after execution;
 - an existing Herdr executor entry and Herdr-related product work around pane visibility.
 
-The problem is that these concepts are spread across config, resolver, mechanism, transport, prompt text, and documentation. That creates four practical gaps.
+The problem is that these concepts are spread across config, resolver, mechanism, transport, prompt text, and documentation. That creates five practical gaps.
 
 1. The decision surface is not canonical. `execute --for` and `decide --for` do not use the same resolver path, so a capability `prefer` can be honored by execution while the decision command reports unavailable.
 2. Governance asks the wrong question in one important place. A cross-provider gate that checks only the command name misses cases where the command is local-looking but environment/model settings route the content elsewhere.
 3. Protocol is mixed with transport. Stdin/stdout is treated as the protocol boundary, while it is only one possible delivery mechanism.
 4. Result truth is unclear. A structured result, a legacy token, and a git-state inference have different trust levels, but current output does not model that distinction as a first-class contract.
+5. Terminal visibility is valuable, but it must not turn the terminal runtime into the semantic authority for task state.
 
 ## 2. Goals
 
@@ -97,6 +98,21 @@ Therefore a near-term Herdr integration does not need a new protocol layer. An e
 CLI agents are third-party workers controlled by prompt, not by hard schema enforcement. A worker may exit successfully without emitting a structured result or even a legacy status token.
 
 The existing `unsignaled` outcome captures this reality by returning `headBefore` and `headAfter`. It should not be deleted until a replacement reader exists and provider compliance data proves it is safe.
+
+### 4.6 Herdr Visibility Does Not Require Mailbox Yet
+
+The near-term Herdr use case is:
+
+```txt
+agent A asks fgOS to activate agent B
+fgOS launches B in a Herdr pane
+Herdr owns the terminal/runtime surface
+fgOS still owns dispatch result interpretation and task state
+```
+
+In this shape, A and B do not need a direct communication channel. B returns through the same worker-output path as any CLI dispatch: terminal transcript is captured by the Herdr adapter and handed back to fgOS. fgOS then applies the existing result ladder. Herdr provides visibility and process control, not semantic routing.
+
+Therefore mailbox and AgentMessage are still design targets, not prerequisites for the current Herdr adapter.
 
 ## 5. Vocabulary
 
@@ -445,6 +461,8 @@ Do not add confidence telemetry as a write-only field. A migration must include 
 
 Until that reader exists, keep the current fallback behavior and avoid pretending the telemetry migration has started.
 
+Current narrow-slice status: the implementation keeps the fallback ladder behavior but does not yet add a first-class `confidence` field. That is intentional. A `confidence` field becomes useful only when a production reader, dashboard, gate, or compliance report consumes it.
+
 ## 11. Artifact Store
 
 Messages should carry control and references, not heavy content.
@@ -525,6 +543,29 @@ This lets the resolver keep its current CLI-shaped contract while the transport 
 
 The later design target may add a true `protocol:"herdr"` or mailbox transport, but that should wait until a real AgentMessage consumer exists.
 
+Implemented adapter contract for the reviewed narrow slice:
+
+- `herdr-spawn` is selected only by the executor adapter field.
+- The adapter always creates a fresh Herdr pane for the dispatched worker; it does not reuse an existing pane.
+- The worker command is run through a temporary script so prompt text and shell metacharacters are not reinterpreted as a pane command.
+- The temporary script removes itself at startup so a crash does not leave the full prompt behind on disk.
+- The adapter injects a runner-owned completion sentinel after the real worker command exits.
+- Herdr observation waits for that runner-owned sentinel, not for `[DONE]` or `[BLOCKED]`.
+- The captured Herdr transcript is normalized by stripping echoed script-invocation lines before downstream result parsing.
+- Missing `result.read.text`, missing sentinel evidence, or observer failure is a transport failure, not a worker success.
+- Timeout belongs to the adapter: on timeout it closes the pane, kills the observer process group, releases local pipes, and rejects immediately without waiting for Herdr or descendant processes to close.
+- Resolved executor environment is passed into the pane, but secret values are not included in adapter error messages.
+
+The important protocol split:
+
+```txt
+runner-owned sentinel = proves the pane command exited and transcript is complete
+[DONE]/[BLOCKED]      = optional legacy semantic signal emitted by the worker
+git head delta        = fallback inference when no semantic signal appears
+```
+
+This keeps Herdr compatible with the current prompt/stdout protocol while avoiding the false conclusion that a terminal token is a full AgentMessage.
+
 ## 13. Full Design Target
 
 The full target architecture is:
@@ -559,78 +600,96 @@ State layer:
   fgOS event log and derived state; runner remains the writer
 ```
 
-## 14. Narrow Implementation Plan
+## 14. Narrow Implementation Status
 
 This is the current implementation slice. It intentionally does not implement the full design target.
 
+Reviewed candidate branch:
+
+```txt
+fgw/tsk-5x7
+```
+
+Review outcome:
+
+- no remaining P1/P2 findings in the committed diff;
+- ready to merge by `main...HEAD` review scope;
+- unrelated dirty worktree state remains outside the committed-diff scope;
+- full AgentMessage, mailbox, artifact store, and structured confidence telemetry remain deferred.
+
 ### 14.1 Item 0 - Fix `decide --for` And Add Minimal DispatchPlan
 
-Goal:
+Status: implemented in the reviewed candidate.
 
-- make `decide --for <purpose>` use the same capability-aware resolution as `execute --for`;
-- return the selected `executorId` when a capability `prefer` maps the purpose to a concrete executor;
-- introduce only the smallest `DispatchPlan` shape needed to make the decision output explicit.
+Implemented behavior:
 
-Proof:
+- `decide --for <purpose>` uses the same capability-aware resolution as `execute --for`;
+- the selected `executorId` is visible when a capability `prefer` maps the purpose to a concrete executor;
+- `compileDispatchPlan()` centralizes selector handling and returns a consistent governance/invocation shape;
+- explicit executor selector wins over work/purpose selector when both are present;
+- governance-blocked executors are not reported as dispatchable.
+
+Proof command:
 
 ```txt
 node src/runner/dispatch.mjs decide --for fgos-coding-implement --has-live-task-access
 ```
 
-must return a configured plan with `executorId:"agy"` instead of unavailable.
+Observed proof:
 
-Expected touched area:
-
-- `src/runner/dispatch/cli.mjs`
-- possibly `src/runner/dispatch/plan.mjs`
-- focused dispatch tests
+```json
+{"mechanism":"out-of-process","configured":true,"executorId":"agy"}
+```
 
 ### 14.2 Item 1 - Governance Egress
 
-Goal:
+Status: implemented in the reviewed candidate.
 
-- replace command-only cross-provider judgment with effective egress judgment;
-- reuse `carries` for content class;
-- record provider, command, effective egress target, carries, mechanism, and reason codes in dispatch audit output.
+Implemented behavior:
 
-This item is dep-free and should run early because it closes a live policy gap.
+- command-only cross-provider judgment is replaced with effective egress judgment;
+- `carries` remains the content-class vocabulary;
+- egress classification records provider family, target, content class, command, and adapter context through the resolved executor path;
+- a Claude-looking command with `ANTHROPIC_BASE_URL` routed to OpenRouter is cross-provider egress and fails closed unless explicitly allowed;
+- malformed or deceptive endpoint overrides fail closed;
+- same-provider Claude resolves as same-provider governance;
+- non-Claude executors must explicitly allow cross-provider egress when carrying repo content.
 
 Proof:
 
 - an executor that routes to another provider through env/model is not allowed merely because its command is `claude`;
-- dispatch audit contains provider + command + effective egress target + carries.
-
-Expected touched area:
-
-- `src/runner/dispatch/config.mjs`
-- `src/runner/dispatch/resolve.mjs`
-- `src/runner/dispatch/transport.mjs`
-- `src/runner/dispatch/cli.mjs`
-- focused governance tests
+- governance tests cover allowed and blocked cross-provider cases.
 
 ### 14.3 Item 2 - `herdr-spawn` Adapter
 
-Goal:
+Status: implemented in the reviewed candidate.
 
-- launch a worker in a visible Herdr pane instead of a hidden subprocess;
-- keep `invocation.via:"cli"` for resolver compatibility;
-- select behavior through `executor.adapter:"herdr-spawn"`;
-- keep result handling on the existing fallback path for now.
+Implemented behavior:
 
-This item gives the human the desired immediate value: seeing the agent run.
+- a configured executor with `adapter:"herdr-spawn"` routes through the Herdr adapter;
+- `invocation.via:"cli"` remains the resolver-compatible invocation type;
+- every dispatch creates a fresh pane;
+- pane output is captured and normalized before the existing result parser sees it;
+- worker completion is detected by the runner-owned sentinel after real command exit, not by `[DONE]`/`[BLOCKED]`;
+- prompts that mention `[DONE]` as instructional prose do not trigger false success;
+- workers that emit no semantic token still resolve through the existing `unsignaled`/git-state fallback path;
+- timeouts close the Herdr pane and do not wait on observer descendants that keep pipes open;
+- observer failures surface as transport failures.
 
 Proof:
 
-- a configured executor with `adapter:"herdr-spawn"` routes through the new adapter;
-- Herdr starts or reuses a pane and runs the intended command;
+- a configured executor with `adapter:"herdr-spawn"` routes through the adapter;
+- Herdr starts a fresh pane and runs the intended command;
 - Herdr does not write or decide fgOS task state;
 - result handling still accepts structured output if present, then `[DONE]`/`[BLOCKED]`, then git-state inference.
 
-Expected touched area:
+Review verification:
 
-- `src/runner/dispatch/transport.mjs`
-- `.fgos/config.json` only if a real Herdr executor config is updated in this slice
-- focused adapter tests
+- `node --test test/runner/herdr-spawn-adapter.test.mjs` - 20/20 pass.
+- `node --test test/runner/egress-governance.test.mjs` - 6/6 pass.
+- `node --test test/runner/dispatch.test.mjs test/runner/loop.test.mjs` - 401/401 pass.
+- `git diff --check main...HEAD` - clean.
+- Live timeout probes reject around 104-112ms instead of the earlier 1000-10000ms delayed failure shape.
 
 ## 15. Deferred Until A Consumer Exists
 
@@ -656,6 +715,7 @@ Entry criteria to pull one of these forward:
 
 Current dispatch files:
 
+- `src/runner/dispatch/plan.mjs`
 - `src/runner/dispatch/config.mjs`
 - `src/runner/dispatch/resolve.mjs`
 - `src/runner/dispatch/mechanism.mjs`
@@ -670,9 +730,17 @@ Current prompt/protocol references:
 - `plugins/fgOS/skills/_shared/coding-worker-contract.md`
 - `src/runner/prompt-templates/worker-prompt-skill-pointer.txt`
 
+Current focused tests for the narrow slice:
+
+- `test/runner/dispatch.test.mjs`
+- `test/runner/egress-governance.test.mjs`
+- `test/runner/herdr-spawn-adapter.test.mjs`
+- `test/runner/loop.test.mjs`
+
 Decision/history anchors:
 
 - `docs/specs/runner.md` sections for Native-First Dispatch Doctrine and executor/capability rename;
 - `docs/history/two-layer-dispatch/`;
 - `docs/history/dispatch-concept-boundary/`;
 - `docs/history/task-dispatch-unification/`.
+- `docs/history/tsk-5x7/`.
