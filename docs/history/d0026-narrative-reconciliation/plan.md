@@ -56,6 +56,13 @@ prove against running code. The one thing worth re-confirming before
 between planning and execution) — a one-line `rg` re-check at
 implementation time covers this, not a separate proof point.
 
+**Impact-analysis posture:** `full` (`fgos tool query --capability
+impact-analysis --status present` returned `gitnexus`, status `present`,
+2026-08-26) — but this plan touches zero code, only Markdown prose in 2
+doc files, so it leans on no blast-radius evidence at all. GitNexus's
+presence is recorded for completeness, not because this plan needs its
+output.
+
 ## Shape
 
 Both edits stay inline prose/table edits in the two files above — no new
