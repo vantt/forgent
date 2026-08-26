@@ -158,3 +158,8 @@ was competing for CPU at retry time, so this is not solely a this-machine-
 right-now load artifact; it is this test's own timing margin being too
 tight under `node --test`'s real concurrency, independent of any code this
 item touches.
+
+Three occurrences of the same assertion in one session is worth its own
+standing record, separate from this item's own return — filed as a fresh
+work item once this item lands, so the flake itself gets tracked and
+eventually fixed rather than re-discovered per affected item.
