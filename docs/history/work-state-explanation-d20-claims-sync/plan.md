@@ -49,11 +49,14 @@ not the task's estimated 466), and naming the real fields in force today
 | `src/runner/agent-roster.mjs` docstring edit | light — comment-only, inside a `//` block, not parsed at runtime (confirmed: the changed lines are plain `//` comments, not JSDoc consumed by any tool in this repo) | `npm test` unchanged (no behavior touched) |
 
 No medium/high-risk component — no proof point beyond the mechanical
-verify below is needed. Impact-analysis posture: **inactive** — this plan
-makes no blast-radius claim (comment-only in code, prose-only in docs), so
-the `fgos tool query --capability impact-analysis` gate is skipped per
-CLAUDE.md's own gate ("skip impact-analysis evidence in verify/test scope"
-when no such claim is being made).
+verify below is needed. Impact-analysis posture: **n/a — no blast-radius
+claim made**, not "inactive" in CLAUDE.md's gate sense (`fgos tool query
+--capability impact-analysis --status present` confirms GitNexus IS
+registered and `present`, so the provider-count sense of "inactive" does
+not literally apply here). This plan's own risk map (above) has no
+medium/high-risk row and none leans on blast-radius evidence — comment-only
+code change, prose-only doc changes — so this axis has nothing to check
+regardless of GitNexus's status.
 
 **Files touched, in order** (no ordering dependency between them — `fgos
 graph --json` shows tsk-gli as an isolated size-1 component, no
