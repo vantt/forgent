@@ -84,3 +84,24 @@ match the evidence (two-file prose edit, no schema/behavior change).
 
 **Verify carried forward:**
 `node --test test/state/runtime-coordination.test.mjs test/runner/claim-port.test.mjs`
+
+## Round 2 (2026-08-26, discovery stage, resubmit after tsk-38i-class truncation loss)
+
+**Asked:** Does Round 1's evidence still hold for the resubmitted item?
+
+**Checked:** Same `fgw/tsk-4kn` branch, same commits (`ef2dd826`, `cff86806`,
+`83eb4065`, `8d28f3ba`) — nothing in the repo's own code changed between
+Round 1 and this resubmission (same session, minutes apart, no other
+commit landed on `main` in between per `git log`). The doc corrections
+from `83eb4065`/`8d28f3ba` are already committed on this exact branch and
+were independently re-verified by the driving session (diff read in full,
+one stray-English-word typo fixed and committed, `node --test
+test/state/runtime-coordination.test.mjs test/runner/claim-port.test.mjs`
+rerun clean at 47/47) before the original item's event history was lost to
+the truncation incident tracked at `tsk-38i`.
+
+**Verdict:** `clear` (unchanged from Round 1). Classification unchanged:
+`kind: docs`, `tier: light`, `risk: light`.
+
+**Verify carried forward (unchanged):**
+`node --test test/state/runtime-coordination.test.mjs test/runner/claim-port.test.mjs`
