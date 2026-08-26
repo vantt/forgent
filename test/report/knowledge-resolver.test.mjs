@@ -85,3 +85,27 @@ test('resolveDocPath - multi-level lineage chain (split then merge)', () => {
   const res = resolveDocPath(view, 'docs/t1/guide.md');
   assert.equal(res.docId, 'd3');
 });
+
+test('resolveDocPath - a lineage cycle reachable from an active topic does not crash (visited set breaks the recursion)', () => {
+  // topic.split/merge refuse to create a cycle from the write side now, but
+  // this stays defensive for lineage data that predates that guard -- a
+  // RangeError here would crash every reader of this resolver. t2 and t3
+  // cycle through each other (t2 -> splitFrom t3 -> mergedFrom t2 -> ...);
+  // t4 is active and traces into that cycle but never actually reaches t1,
+  // the doc's own retired topic, so the correct answer is "unresolvable",
+  // not a crash.
+  const view = {
+    topics: {
+      t1: { topicId: 't1', status: 'retired' },
+      t2: { topicId: 't2', status: 'retired', lineage: { splitFrom: 't3' } },
+      t3: { topicId: 't3', status: 'retired', lineage: { mergedFrom: ['t2'] } },
+      t4: { topicId: 't4', status: 'active', lineage: { splitFrom: 't2' } }
+    },
+    docs: {
+      d1: { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/old/guide.md', docLifecycle: 'retired', aliases: [] }
+    }
+  };
+
+  assert.doesNotThrow(() => resolveDocPath(view, 'docs/old/guide.md'));
+  assert.equal(resolveDocPath(view, 'docs/old/guide.md'), null);
+});

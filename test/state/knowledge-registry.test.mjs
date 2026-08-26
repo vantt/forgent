@@ -316,7 +316,10 @@ test('resolveDocId finds a doc by (topicId, role) after topic.split moved its to
     reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md' });
     splitTopicStore(tmpDir, {
       topicId: 't1',
-      newTopics: [{ topicId: 't2', purposeSlug: 'worktree-reclaim', rolesToMove: ['guide'] }],
+      newTopics: [
+        { topicId: 't2', purposeSlug: 'worktree-reclaim', rolesToMove: ['guide'] },
+        { topicId: 't3', purposeSlug: 'worktree-cleanup' },
+      ],
     });
 
     const view = rebuild(tmpDir);
@@ -356,6 +359,91 @@ test('framework/mode/role vocabulary - unknown framework, unknown mode, and role
     reserveDocStore(tmpDir, { topicId: 't1', role: 'pitfall', currentPath: 'docs/t1/d.md', mode: 'explanation' });
     const view = rebuild(tmpDir);
     assert.equal(view.docs['t1:pitfall'].mode, 'explanation');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('topic.split refuses a self-referencing successor, a duplicate successor id, and an existing topicId -- atomically', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'source-topic' });
+    registerTopicStore(tmpDir, { topicId: 'existing-active', purposeSlug: 'already-here' });
+
+    // Successor id equal to the source.
+    assert.throws(() => {
+      splitTopicStore(tmpDir, {
+        topicId: 't1',
+        newTopics: [{ topicId: 't1', purposeSlug: 'self' }, { topicId: 't2', purposeSlug: 'other' }],
+      });
+    }, /cannot equal the source topicId/);
+
+    // Duplicate successor id within the same split call.
+    assert.throws(() => {
+      splitTopicStore(tmpDir, {
+        topicId: 't1',
+        newTopics: [{ topicId: 't2', purposeSlug: 'a' }, { topicId: 't2', purposeSlug: 'b' }],
+      });
+    }, /listed more than once/);
+
+    // Successor id that already names an existing (active) topic.
+    assert.throws(() => {
+      splitTopicStore(tmpDir, {
+        topicId: 't1',
+        newTopics: [{ topicId: 'existing-active', purposeSlug: 'clobber' }, { topicId: 't3', purposeSlug: 'other' }],
+      });
+    }, /already exists/);
+
+    // A single-successor split is a rename, not a split.
+    assert.throws(() => {
+      splitTopicStore(tmpDir, { topicId: 't1', newTopics: [{ topicId: 't2', purposeSlug: 'only-one' }] });
+    }, /at least 2 successor/);
+
+    // None of the above mutated anything -- source is still active, no
+    // successor topics or docs exist.
+    const view = rebuild(tmpDir);
+    assert.equal(view.topics.t1.status, 'active');
+    assert.equal(view.topics['existing-active'].purposeSlug, 'already-here');
+    assert.equal(view.topics.t2, undefined);
+    assert.equal(view.topics.t3, undefined);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('topic.merge refuses a self-merge, a missing source, and a duplicate source -- atomically', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 'target', purposeSlug: 'target-topic' });
+    registerTopicStore(tmpDir, { topicId: 'source', purposeSlug: 'source-topic' });
+
+    // Source equal to target: would retire the target (srcTopic === targetTopic).
+    assert.throws(() => {
+      mergeTopicStore(tmpDir, { sourceTopicIds: ['target'], targetTopicId: 'target' });
+    }, /cannot equal targetTopicId/);
+
+    // Source that doesn't exist at all -- must not silently land in lineage.mergedFrom.
+    assert.throws(() => {
+      mergeTopicStore(tmpDir, { sourceTopicIds: ['does-not-exist'], targetTopicId: 'target' });
+    }, /not found/);
+
+    // Duplicate source in one merge call.
+    assert.throws(() => {
+      mergeTopicStore(tmpDir, { sourceTopicIds: ['source', 'source'], targetTopicId: 'target' });
+    }, /listed more than once/);
+
+    // A retired source is not mergeable.
+    retireTopicStore(tmpDir, { topicId: 'source' });
+    assert.throws(() => {
+      mergeTopicStore(tmpDir, { sourceTopicIds: ['source'], targetTopicId: 'target' });
+    }, /must be 'active'/);
+
+    // None of the above mutated the target.
+    const view = rebuild(tmpDir);
+    assert.equal(view.topics.target.status, 'active');
+    assert.equal(view.topics.target.lineage, null);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

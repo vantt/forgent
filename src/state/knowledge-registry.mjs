@@ -222,8 +222,34 @@ export function applyKnowledgeEvent(view, event) {
       if (!oldTopic) {
         throw new KnowledgeValidationError(`topic.split: old topic '${topicId}' not found`);
       }
-      if (!Array.isArray(newTopics) || newTopics.length === 0) {
-        throw new KnowledgeValidationError('topic.split requires non-empty newTopics array');
+      if (!Array.isArray(newTopics) || newTopics.length < 2) {
+        throw new KnowledgeValidationError('topic.split requires at least 2 successor topics -- a single-successor split is a rename ("fgos topic rename"), not a split');
+      }
+
+      // Validate the WHOLE newTopics array before mutating anything: a
+      // successor id equal to the source would un-retire the source topic
+      // right after this case retires it (and its lineage.splitFrom would
+      // point at itself); a successor id repeated within one split call
+      // means only the last one's metadata survives, silently discarding
+      // the others'; a successor id that already names an existing topic
+      // (active or retired) would silently overwrite that topic's own
+      // history/status.
+      const seenSuccessors = new Set();
+      for (const nt of newTopics) {
+        const newTopicId = nt?.topicId;
+        if (!newTopicId || !nt?.purposeSlug) {
+          throw new KnowledgeValidationError('topic.split new topic requires topicId and purposeSlug');
+        }
+        if (newTopicId === topicId) {
+          throw new KnowledgeValidationError(`topic.split: successor topicId '${newTopicId}' cannot equal the source topicId`);
+        }
+        if (seenSuccessors.has(newTopicId)) {
+          throw new KnowledgeValidationError(`topic.split: successor topicId '${newTopicId}' listed more than once in newTopics`);
+        }
+        seenSuccessors.add(newTopicId);
+        if (view.topics[newTopicId]) {
+          throw new KnowledgeValidationError(`topic.split: successor topicId '${newTopicId}' already exists (${view.topics[newTopicId].status}) -- topic ids are create-only`);
+        }
       }
 
       // Mark old topic as retired
@@ -234,9 +260,6 @@ export function applyKnowledgeEvent(view, event) {
 
       for (const nt of newTopics) {
         const { topicId: newTopicId, purposeSlug, purposeTitle, entities, rolesToMove } = nt;
-        if (!newTopicId || !purposeSlug) {
-          throw new KnowledgeValidationError('topic.split new topic requires topicId and purposeSlug');
-        }
         view.topics[newTopicId] = {
           topicId: newTopicId,
           purposeSlug,
@@ -268,6 +291,33 @@ export function applyKnowledgeEvent(view, event) {
       const targetTopic = view.topics[targetTopicId];
       if (!targetTopic) {
         throw new KnowledgeValidationError(`topic.merge: target topic '${targetTopicId}' not found`);
+      }
+
+      // Fail-closed on the source list itself before the role-collision check
+      // or any mutation: a source equal to targetTopicId means srcTopic and
+      // targetTopic are the SAME object below, so the mutation loop would
+      // retire the target right after giving it a lineage.mergedFrom entry
+      // pointing at itself; a source that doesn't exist would otherwise be
+      // silently recorded into lineage.mergedFrom by the spread below without
+      // ever being retired or moving any docs; a non-active source (already
+      // retired, or mid-merge as some other merge's own target) means its
+      // docs were already supposed to have moved elsewhere.
+      const seenSources = new Set();
+      for (const sId of sourceTopicIds) {
+        if (sId === targetTopicId) {
+          throw new KnowledgeValidationError(`topic.merge: source '${sId}' cannot equal targetTopicId`);
+        }
+        if (seenSources.has(sId)) {
+          throw new KnowledgeValidationError(`topic.merge: source '${sId}' listed more than once in sourceTopicIds`);
+        }
+        seenSources.add(sId);
+        const srcTopic = view.topics[sId];
+        if (!srcTopic) {
+          throw new KnowledgeValidationError(`topic.merge: source topic '${sId}' not found`);
+        }
+        if (srcTopic.status !== 'active') {
+          throw new KnowledgeValidationError(`topic.merge: source topic '${sId}' is '${srcTopic.status}', must be 'active'`);
+        }
       }
 
       // Validate BEFORE mutating anything: merge moves doc.topicId directly,

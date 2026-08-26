@@ -35,12 +35,21 @@ export function resolveDocPath(view, path) {
 
   const targetDocs = new Set();
 
-  function leadsFrom(tId, ancestorId) {
+  // `visited` guards against a lineage cycle (splitFrom/mergedFrom pointing
+  // back through some chain to a topic already on the current path) turning
+  // this into unbounded recursion -- a RangeError here would crash every
+  // reader of this resolver (knowledge attest, the end-user doc index,
+  // doctor), not just this one lookup. The write side (topic.split/merge)
+  // now refuses to create a cycle going forward, but this stays defensive
+  // for any lineage data that predates that guard.
+  function leadsFrom(tId, ancestorId, visited = new Set()) {
     if (tId === ancestorId) return true;
+    if (visited.has(tId)) return false;
+    visited.add(tId);
     const t = view.topics?.[tId];
     if (!t) return false;
-    if (t.lineage?.splitFrom && leadsFrom(t.lineage.splitFrom, ancestorId)) return true;
-    if (Array.isArray(t.lineage?.mergedFrom) && t.lineage.mergedFrom.some((m) => leadsFrom(m, ancestorId))) return true;
+    if (t.lineage?.splitFrom && leadsFrom(t.lineage.splitFrom, ancestorId, visited)) return true;
+    if (Array.isArray(t.lineage?.mergedFrom) && t.lineage.mergedFrom.some((m) => leadsFrom(m, ancestorId, visited))) return true;
     return false;
   }
 

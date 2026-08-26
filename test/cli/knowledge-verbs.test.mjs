@@ -70,7 +70,10 @@ test('knowledge-verbs - doc verbs resolve by (topicId, role) after topic split, 
     // split leaves stale since docId stays "t1:guide" while topicId moves.
     execSync(`node "${fgosBin}" doc reserve t1 guide docs/worktree-all/guide.md`, { cwd: tmpDir });
 
-    const intoJson = JSON.stringify([{ topicId: 't2', purposeSlug: 'worktree-reclaim', rolesToMove: ['guide'] }]);
+    const intoJson = JSON.stringify([
+      { topicId: 't2', purposeSlug: 'worktree-reclaim', rolesToMove: ['guide'] },
+      { topicId: 't3', purposeSlug: 'worktree-cleanup' },
+    ]);
     execSync(`node "${fgosBin}" topic split t1 --into '${intoJson}'`, { cwd: tmpDir });
 
     let view = rebuild(fgosDir);
