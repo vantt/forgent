@@ -330,6 +330,7 @@ export function addWork(dir, work) {
     assertNoCycle(item, before.work);
     assertNoUnifiedCycle(item, before.work);
 
+    item.writer = resolveWriterIdentity(dir);
     return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.add', payload: item }, dir);
   });
 }

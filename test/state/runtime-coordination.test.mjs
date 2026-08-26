@@ -608,6 +608,34 @@ test('settleClaim reconciles a same-writer drift even when unstamped side-log ev
   }
 });
 
+test('settleClaim reconciles a same-writer drift caused by a post-claim work.add event (wipe+resubmit shape)', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task 21', kind: 'bug', status: 'todo', deps: [], refs: [], risk: 'heavy', verify: 'npm test', domain: 'coding' });
+
+  const originalSessionId = process.env.FGOS_SESSION_ID;
+  try {
+    process.env.FGOS_SESSION_ID = 'session-A';
+    const preClaimRevision = getItemDurableRevision(listWork(dir), 'tsk-1');
+    const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision });
+
+    fs.rmSync(path.join(dir, 'events.jsonl'), { force: true });
+    fs.rmSync(path.join(dir, 'events'), { recursive: true, force: true });
+    fs.rmSync(resolveFgosFile(dir, FGOS_FILE.STATE), { force: true });
+    initStore(dir);
+    addWork(dir, { id: 'tsk-1', title: 'Task 21 (resubmitted)', kind: 'bug', status: 'todo', deps: [], refs: [], risk: 'heavy', verify: 'npm test', domain: 'coding' });
+
+    const curRev = getItemDurableRevision(listWork(dir), 'tsk-1');
+    assert.notEqual(curRev, preClaimRevision, 'the post-claim work.add event must actually have drifted the durable revision, or this test proves nothing');
+
+    const res = settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' });
+    assert.equal(res.view.work['tsk-1'].status, 'awaiting-approval', 'a same-writer work.add event landing post-claim must reconcile, not refuse');
+    assert.equal(readClaim(dir, 'tsk-1'), null, 'the claim must release normally on a successful (reconciled) settle');
+  } finally {
+    if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = originalSessionId;
+  }
+});
+
 // The distinguishing case the reconcile must never let through: a durable
 // edit stamped with a GENUINELY DIFFERENT writer's identity landing on a
 // claimed item must still refuse settle exactly as before this fix --
