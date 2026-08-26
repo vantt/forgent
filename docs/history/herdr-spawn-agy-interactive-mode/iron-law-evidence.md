@@ -41,6 +41,13 @@ concurrent system load during the full run — confirmed a real timing
 flake, not a regression, by re-running it alone in isolation right after
 (passed cleanly, ~812ms). Not touched by any file this item changed.
 
+Re-verify after recovering from a system-wide inode-exhaustion incident
+(unrelated to this item's own code — `df -ih /` had hit 100%/0 free
+during the prior verify attempt, causing real `ENOSPC` failures across
+~466 unrelated tests; confirmed recovered at 12% used / 27M free before
+re-running): full suite, real run, 4152 pass / 0 fail / 5 skipped (out of
+4157) — clean, no flakes this time.
+
 ## Failing-test-first proof (real, not narrated)
 
 Method: temporarily swapped all four changed files
