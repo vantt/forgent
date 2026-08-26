@@ -710,15 +710,38 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
       // almost every time (two consecutive polls closed most of the gap
       // live-confirmed, three closes the residual flake seen specifically
       // under full-suite concurrent load, RESEARCH.md Round 3).
-      if (agentStatus === 'idle' || agentStatus === 'done') {
+      //
+      // "idle" vs "done" asymmetry (review finding, RESEARCH.md Round 4):
+      // every confirmed false-positive in this whole investigation (startup
+      // race, mid-turn race) was herdr reporting "idle" -- never "done".
+      // Live-probing several genuinely ultra-short prompts found them
+      // settling at "idle" too (through a real "working" phase first), never
+      // at "done" at all in this agy/herdr version -- "done" could not be
+      // reproduced on demand, so there is no live evidence it is ever a
+      // false startup signal, and gating it behind sawWorking risks hanging
+      // an agent whose first-ever response is fast enough to report "done"
+      // before any poll ever samples "working" (the exact regression tsk-10j
+      // bug #2 already fixed once for the pre-tsk-2rr code, which this must
+      // not reintroduce). Only "idle" requires sawWorking; "done" only needs
+      // the 3-consecutive-poll debounce on its own.
+      if (agentStatus === 'idle') {
         if (sawWorking) {
           consecutiveTerminalPolls += 1;
+        } else {
+          consecutiveTerminalPolls = 0;
         }
+      } else if (agentStatus === 'done') {
+        consecutiveTerminalPolls += 1;
       } else {
         consecutiveTerminalPolls = 0;
       }
 
-      if (sawWorking && consecutiveTerminalPolls >= 3) {
+      // No separate sawWorking check here -- it is already enforced above:
+      // the "idle" branch only increments consecutiveTerminalPolls when
+      // sawWorking is true (reset to 0 otherwise), so reaching 3 via "idle"
+      // implies sawWorking is already true. The "done" branch increments
+      // unconditionally by design (see the asymmetry comment above).
+      if (consecutiveTerminalPolls >= 3) {
         if (pollInterval) {
           clearInterval(pollInterval);
           pollInterval = null;

@@ -140,3 +140,54 @@ permanent, deterministic fix: a load-dependent residual flake of this
 kind is inherent to polling a heuristic, load-sensitive external signal
 (`herdr`'s own `agent_status` classifier) rather than something this
 adapter can fully control from its own side.
+
+## Round 4 (2026-08-26) — advisor review found 2 real gaps before approval
+
+An independent advisor review of this fix (requested before merging tsk-2rr)
+found two concrete issues neither Round 2 nor Round 3 had actually settled:
+
+1. **`done` was gated on `sawWorking` the same way `idle` is, with no
+   evidence justifying it.** The code required `sawWorking` before trusting
+   *either* `idle` or `done`. But every confirmed false-positive in this
+   entire investigation (Rounds 1-3) was herdr reporting `idle` — never
+   `done`. Requiring `sawWorking` for `done` risks reintroducing the exact
+   regression tsk-10j's own bug #2 already fixed once: an agent whose
+   first-ever response is fast enough to report `done` before any poll
+   samples `working` would hang until the outer timeout instead of
+   completing.
+
+   **Checked live**: split a fresh pane, ran two different genuinely
+   ultra-short prompts ("Reply with exactly: OK", "Say OK") with
+   fine-grained (200-500ms) polling from the start. Both settled at
+   `idle` — through a real, multi-second `working` phase first — never at
+   `done` at all. `done` could not be reproduced on demand in this
+   agy/herdr version. Grepping the existing test file for `'done'`
+   confirmed **zero** tests (mocked or live) had ever exercised the `done`
+   code path — the whole branch shipped in Round 2/3 was untested.
+
+   **Fix**: decoupled the two. `idle` still requires `sawWorking` (the
+   confirmed-risky value); `done` only needs the 3-consecutive-poll
+   debounce on its own, no `sawWorking` requirement. Added a real,
+   deterministic mocked test (`agent_status` sequence `unknown, unknown,
+   done, done, done` — `working` never appears at all) proving a
+   `done`-only completion still finishes correctly rather than hanging.
+
+2. **The Round 3 mocked test only proved *a* debounce existed, not the
+   specific 3-consecutive-poll requirement.** Its own assertion
+   (`totalPolls >= 3`) would have passed identically under a weaker 1-poll
+   or 2-poll gate — it never actually exercised the mid-turn-dip scenario
+   Round 3's own prose describes (working, THEN a brief false idle,
+   THEN working again, THEN the real finish).
+
+   **Fix**: added a new deterministic mocked test with the sequence
+   `working, idle, idle, working, idle, idle, idle` — a dip back to
+   `working` after only 2 consecutive idle readings, forcing the counter
+   to reset, then a full fresh 3-in-a-row run. Confirmed by construction
+   that this test would have FAILED against a 2-poll debounce (which
+   would have fired at the first `idle, idle` pair, poll count 3, well
+   under this test's own `>= 7` assertion) — this is a real discriminating
+   test, not one that merely tolerates the current implementation.
+
+**Verdict, updated**: both gaps closed. Full suite (`test/runner/herdr-
+spawn-adapter.test.mjs`) re-run green, 32/32, including both new tests and
+the existing live interactive test.
