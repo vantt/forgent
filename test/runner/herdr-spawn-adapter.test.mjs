@@ -562,3 +562,49 @@ test('herdr-spawn adapter (LIVE): "pane split" is called with the required --dir
     try { herdrPane(['pane', 'close', res.paneId]); } catch {}
   }
 });
+
+test('herdr-spawn adapter (LIVE): a worker that prints [DONE] and then keeps running is NOT treated as complete until it actually exits (fifth-round advisor finding)', { skip: HERDR_SKIP }, async () => {
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  const start = Date.now();
+  const res = await herdrSpawn(
+    { command: 'sh', args: ['-c', "echo '[DONE]'; sleep 2; echo still-running-after-done"], env: {} },
+    { cwd: '/tmp', timeoutMs: 10000, workId: 'live-early-resolve-item', tier: 'standard', model: 'sonnet', herdrBin: HERDR_BIN },
+  );
+  const elapsedMs = Date.now() - start;
+  try {
+    // Matching herdr, having resolved on the [DONE] token alone (the old
+    // design) would return in well under a second here -- confirmed live
+    // this scenario previously resolved in ~10ms, before the worker had
+    // done anything past printing the token.
+    assert.ok(elapsedMs >= 1800, `expected to wait for the real exit (~2s), only waited ${elapsedMs}ms -- resolved before the worker actually finished`);
+    assert.ok(res.stdout.includes('still-running-after-done'), 'output produced AFTER the [DONE] token must still be captured -- proves this adapter waited for the real exit, not the token');
+  } finally {
+    try { herdrPane(['pane', 'close', res.paneId]); } catch {}
+  }
+});
+
+test('herdr-spawn adapter (LIVE): an observer failure (pane closed out from under wait-output) rejects, it is never reported as if it were a worker result (fifth-round advisor finding)', { skip: HERDR_SKIP }, async () => {
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  const dispatchPromise = herdrSpawn(
+    { command: 'sh', args: ['-c', 'sleep 10'], env: {} },
+    { cwd: '/tmp', timeoutMs: 15000, workId: 'live-observer-fail-item', tier: 'standard', model: 'sonnet', herdrBin: HERDR_BIN },
+  );
+  // Give the adapter a moment to split its own pane and start waiting,
+  // then find and close it externally -- exactly the shape of a real
+  // observer failure (someone/something else closes the pane, herdr
+  // reports an error) this adapter never causes itself. This test owns no
+  // /tmp panes of its own beforehand, so every no-agent /tmp pane found
+  // here is the adapter's own fresh split.
+  await new Promise((r) => setTimeout(r, 500));
+  let caught;
+  try {
+    const panes = JSON.parse(herdrPane(['pane', 'list'])).result.panes.filter((p) => p.cwd === '/tmp' && !p.agent);
+    for (const p of panes) {
+      try { herdrPane(['pane', 'close', p.pane_id]); } catch {}
+    }
+    await dispatchPromise;
+  } catch (err) {
+    caught = err;
+  }
+  assert.ok(caught instanceof DispatchError, `expected a DispatchError rejection, got: ${caught}`);
+});

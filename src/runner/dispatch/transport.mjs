@@ -657,31 +657,34 @@ function herdrSpawnAdapter(invocation, opts) {
     // timeout authority, the same single-source-of-truth shape
     // `cliSpawnAdapter` already uses for its own child process.
     //
-    // `(?m)^` anchoring on BOTH alternatives (self-review finding,
-    // 2026-08-25, confirmed live -- a genuinely serious one): `wait-output`
-    // "searches immediately, including existing output" per its own
-    // --help, and the FIRST thing to appear in a fresh pane's scrollback is
-    // the shell's own echo of the typed command line itself -- which
-    // contains the sentinel's literal text verbatim (`echo "sentinel:$?"`,
-    // unevaluated) and, in real production use, near-certainly contains
-    // the literal substrings "[DONE]"/"[BLOCKED]" too, since the worker's
-    // own dispatched prompt (built by buildPrompt, typed as part of this
-    // same command) instructs it to print exactly those tokens. An
-    // unanchored regex matches that echoed instruction/typed-text
-    // immediately -- confirmed live: an unanchored sentinel regex matched
-    // within milliseconds against only the echoed input, before a 2-second
-    // real sleep even started, with `sentinelMatch` failing to parse a real
-    // exit code from the literal unevaluated `$?` and silently falling back
-    // to a wrong status. `(?m)^` requires the match to START its own real
-    // output line -- confirmed live against a prompt literally containing
-    // "Report [DONE] when finished..." as instructional prose: the
-    // anchored pattern correctly skipped that line (mid-line, not
-    // line-initial) and matched only the worker's real standalone `[DONE]`
-    // line once it actually appeared. This also matches the coding-worker-
-    // contract's own established rule (tsk-5gd) that a valid completion
-    // token must be a standalone, unquoted status line -- never text
-    // embedded elsewhere.
-    const waitArgs = ['pane', 'wait-output', paneId, '--regex', `(?m)^\\[(DONE|BLOCKED)\\]|(?m)^${sentinel}:\\d+`, '--source', 'recent-unwrapped', '--lines', '500'];
+    // SENTINEL-ONLY completion signal -- never [DONE]/[BLOCKED] here
+    // (fifth-round advisor finding, real, 2026-08-25): `pane run` types
+    // the command into the pane's shell and returns immediately; the
+    // worker is NOT this adapter's child process the way `cliSpawnAdapter`'s
+    // `child` is. `cliSpawnAdapter` only ever inspects [DONE]/[BLOCKED]
+    // AFTER the real process has exited (cli.mjs's own hasSignal/isDone
+    // check runs against the FINAL accumulated stdout, downstream of
+    // resolve). Matching [DONE]/[BLOCKED] here too meant this adapter could
+    // resolve the MOMENT the token appeared, even if the worker printed it
+    // and then kept running -- confirmed live: a worker that printed
+    // [DONE] and continued for another second resolved in ~10ms, before
+    // the worker had actually finished. This also fully closes a second,
+    // related gap: a MULTILINE dispatched prompt (real repo/user content
+    // substituted via {prompt}) could itself contain a LINE starting with
+    // the literal text "[DONE]"/"[BLOCKED]" (an example, a quoted
+    // instruction) -- the pane's own echo of that typed prompt would then
+    // satisfy even the `(?m)^` anchored token pattern before the worker
+    // ever runs. The sentinel has no such collision risk (a random,
+    // adapter-owned marker no real prompt could plausibly contain) and
+    // fires EXACTLY ONCE, immediately after the real command truly exits
+    // -- the same fact `child.on('exit')` gives `cliSpawnAdapter` for free.
+    // Token detection still happens, just downstream in cli.mjs against
+    // the final `stdout` this resolve() call returns, exactly like
+    // cliSpawnAdapter already does -- no behavior lost, only the false
+    // early-resolve removed. `(?m)^` stays on the sentinel alone: the same
+    // echoed-typed-command-line risk applies to it too (confirmed live in
+    // the prior round), just no longer entangled with the token question.
+    const waitArgs = ['pane', 'wait-output', paneId, '--regex', `(?m)^${sentinel}:\\d+`, '--source', 'recent-unwrapped', '--lines', '500'];
 
     const waitChild = spawn(herdrBin, waitArgs, {
       cwd,
@@ -746,6 +749,26 @@ function herdrSpawnAdapter(invocation, opts) {
         return;
       }
 
+      // OBSERVER FAILURE MUST NEVER MASQUERADE AS A WORKER RESULT
+      // (fifth-round advisor finding, real, 2026-08-25): a non-zero exit
+      // that is NOT this adapter's own SIGTERM-triggered timeout means
+      // `wait-output` itself failed to observe completion -- the pane was
+      // closed out from under it, a herdr-side error, a malformed
+      // response -- never the dispatched worker's own exit code (that
+      // fact ONLY ever reaches this adapter via the sentinel, parsed from
+      // real captured text below, never from wait-output's own process
+      // exit code). Falling through to the "success" path here would
+      // silently report a transport/tooling failure as if it were a real
+      // (if odd) worker result. Reject honestly instead.
+      if (code !== 0) {
+        reject(new DispatchError(
+          'worker-spawn-fail',
+          `executor failed to observe completion for work "${workId}": herdr pane wait-output exited with code ${code}${signal ? ` (signal ${signal})` : ''}.`,
+          { workId, tier, model, cause: 'herdr pane wait-output observer failure', exitCode: code },
+        ));
+        return;
+      }
+
       // 4. Extract the scrollback text directly from wait-output's OWN
       // embedded read result (self-review finding, 2026-08-25, confirmed
       // live) -- NOT a separate `herdr pane read <paneId>` call, which was
@@ -758,15 +781,14 @@ function herdrSpawnAdapter(invocation, opts) {
       // own embedded read (same --source/--lines flags, requested above)
       // reliably captured both a short (4-line) and a long (200+ line)
       // transcript in live testing; a second, separately-behaving call
-      // never needed to exist at all.
+      // never needed to exist at all. `code` is always 0 here -- any other
+      // value already rejected above as an observer failure.
       let stdout = '';
-      if (code === 0) {
-        try {
-          const parsed = JSON.parse(waitStdout);
-          stdout = typeof parsed?.result?.read?.text === 'string' ? parsed.result.read.text : '';
-        } catch {
-          stdout = '';
-        }
+      try {
+        const parsed = JSON.parse(waitStdout);
+        stdout = typeof parsed?.result?.read?.text === 'string' ? parsed.result.read.text : '';
+      } catch {
+        stdout = '';
       }
 
       // P2 (self-review finding, 2026-08-25): `status` used to be `herdr
@@ -775,12 +797,12 @@ function herdrSpawnAdapter(invocation, opts) {
       // the real one (`echo "${sentinel}:$?"`, `$?` captured immediately
       // after the real command exits) -- parsed out here and stripped from
       // the returned stdout so it never leaks into what looks like worker
-      // output. Falls back to wait-output's own exit code only when the
-      // sentinel line genuinely never made it into scrollback (e.g. the
-      // `--lines 500` cap truncated it away) -- same as this adapter's
-      // pre-existing behavior for that edge case.
+      // output. Falls back to 0 only when the sentinel line genuinely
+      // never made it into scrollback (e.g. the `--lines 500` cap
+      // truncated it away) -- same as this adapter's pre-existing
+      // behavior for that edge case.
       const sentinelMatch = stdout.match(new RegExp(`${sentinel}:(\\d+)`));
-      const realStatus = sentinelMatch ? Number(sentinelMatch[1]) : (code === 0 ? 0 : code);
+      const realStatus = sentinelMatch ? Number(sentinelMatch[1]) : 0;
       // Strip EVERY occurrence, not just the first (self-review finding,
       // 2026-08-25, confirmed live): the pane's shell echoes the typed
       // command line back verbatim BEFORE evaluating it, so the sentinel's
