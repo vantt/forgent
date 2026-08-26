@@ -130,6 +130,22 @@ export function bootstrapRegistry(dir, inventoryDataPath) {
             `doc '${docId}' already exists with framework '${existingDoc.framework}', but the inventory row wants '${wantFramework}'`
           );
         }
+        if (!(existingDoc.sourceCaptureIds || []).includes(item.oldPath)) {
+          // A clean bootstrap re-run must be able to prove its own past
+          // work: the existing doc's identity/framework/mode already
+          // match, but if sourceCaptureIds never recorded THIS row's own
+          // oldPath, the classifier's source assignment for this doc was
+          // never actually captured -- reporting idempotent success here
+          // would silently drop the evidence trail for the item, the same
+          // "reachable source" property doctor's own doc-source-
+          // conservation check exists to verify after the fact. Bootstrap
+          // has no repair event of its own to append a missing capture
+          // (that is doc.attest's job, tied to a real capture id, not a
+          // bare path) -- it fails loud instead of guessing.
+          driftErrors.push(
+            `doc '${docId}' already exists but its sourceCaptureIds (${JSON.stringify(existingDoc.sourceCaptureIds || [])}) does not include the inventory row's oldPath '${item.oldPath}'`
+          );
+        }
         if (existingDoc.mode !== wantMode) {
           driftErrors.push(
             `doc '${docId}' already exists with mode '${existingDoc.mode}', but the inventory row wants '${wantMode}'`

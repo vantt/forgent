@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { bootstrapRegistry } from '../../scripts/knowledge-bootstrap.mjs';
-import { rebuild, initStore, retireDocStore, supersedeDocStore, retireTopicStore } from '../../src/state/store.mjs';
+import { rebuild, initStore, registerTopicStore, registerDocStore, retireDocStore, supersedeDocStore, retireTopicStore } from '../../src/state/store.mjs';
 import { assertActiveDocCardinality } from '../../src/state/knowledge-registry.mjs';
 
 test('knowledge-bootstrap - missing field rejects before writing entries', () => {
@@ -267,6 +267,32 @@ test('knowledge-bootstrap - refuses a live doc whose framework or mode drifted f
     assert.throws(() => {
       bootstrapRegistry(tmpDir, dataPath);
     }, /doc 't1:guide' already exists with mode 'how-to', but the inventory row wants 'reference'/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row\'s own oldPath', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  try {
+    const dataPath = path.join(tmpDir, 'inventory.json');
+    const inventory = [
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(inventory), 'utf8');
+
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 't1', purposeTitle: 'T1', entities: [] });
+    // Identity/framework/mode/lifecycle all match the inventory row, but
+    // the classifier's own source assignment for this doc was never
+    // captured -- registerDocStore's own default (undefined
+    // sourceCaptureIds) mirrors a doc created some other way than through
+    // this bootstrap script's own seeding.
+    registerDocStore(tmpDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/how-to/one.md', framework: 'diataxis', mode: 'how-to', docLifecycle: 'active', aliases: [], sourceCaptureIds: [] });
+
+    assert.throws(() => {
+      bootstrapRegistry(tmpDir, dataPath);
+    }, /doc 't1:guide' already exists but its sourceCaptureIds \(\[\]\) does not include the inventory row's oldPath 'docs\/how-to\/one\.md'/);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

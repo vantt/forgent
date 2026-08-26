@@ -700,3 +700,50 @@ test('knowledge-migration - refuses a planned move for a PROVISIONAL doc under a
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledge-migration - the "already migrated" shortcut also refuses a live doc already at its target under a retired topic', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    // Already at its computed target -- the planned-move path's own
+    // topic-active check never runs for this row, since it never becomes
+    // a plannedMoves entry in the first place unless the shortcut itself
+    // also checks topic status.
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/worktree-reclaim/guide.md', docLifecycle: 'active' });
+    retireTopicStore(fgosDir, { topicId: 't1' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/worktree-reclaim/guide.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const targetFile = path.join(tmpDir, 'docs/worktree-reclaim/guide.md');
+    fs.mkdirSync(path.dirname(targetFile), { recursive: true });
+    fs.writeFileSync(targetFile, '# Guide\n', 'utf8');
+
+    const dry = runKnowledgeMigration(tmpDir, { dryRun: true });
+    assert.equal(dry.alreadyMigratedCount, 0, 'a doc under a retired topic must not be silently counted as already-migrated success');
+    assert.equal(
+      dry.conservationErrors.some((e) => e.includes("doc 't1:guide' is under topic 't1', which is 'retired' (not active)")),
+      true,
+      `expected a non-active-topic conservation error, got: ${JSON.stringify(dry.conservationErrors)}`
+    );
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-migration - a valid-but-non-array inventory-data.json fails with a clear message, not "is not iterable"', () => {
+  const { tmpDir } = setupGitRepoWithStore();
+  try {
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify({ not: 'an array' }), 'utf8');
+
+    assert.throws(() => {
+      runKnowledgeMigration(tmpDir, { dryRun: true });
+    }, /must contain a JSON array/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

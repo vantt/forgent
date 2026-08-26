@@ -3,11 +3,24 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execSync, execFileSync } from 'node:child_process';
 import { rebuild } from '../src/state/store.mjs';
 
 export function runKnowledgeCanary(repoRoot) {
-  const fgosBin = path.resolve('bin/fgos.mjs');
+  // The canary exercises a DISPOSABLE sandbox repo passed as `repoRoot`
+  // (see the test: a throwaway tmpdir with no fgOS install of its own) by
+  // driving it with the REAL project's `bin/fgos.mjs` -- the binary and
+  // the target repo are deliberately different things here, unlike
+  // knowledge-migration.mjs/knowledge-bootstrap.mjs, which always operate
+  // on their own containing project. `path.resolve('bin/fgos.mjs')`
+  // (the previous shape) got this right only by accident, by depending on
+  // the CALLING process's cwd already being this project's root -- true
+  // for `node --test`, but not guaranteed for any other caller. Resolving
+  // from this script's own location (fileURLToPath(import.meta.url))
+  // finds the real binary unconditionally, independent of both the
+  // caller's cwd and the sandbox repoRoot.
+  const fgosBin = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'bin', 'fgos.mjs');
 
   // 1. Topic register
   execSync(`node "${fgosBin}" topic register t1 --purpose-slug worktree-reclaim --purpose-title "Worktree Reclaim"`, { cwd: repoRoot });

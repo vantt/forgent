@@ -115,6 +115,15 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
   let inventory = [];
   if (fs.existsSync(inventoryPath)) {
     inventory = JSON.parse(fs.readFileSync(inventoryPath, 'utf8'));
+    // A JSON *parse* failure already throws on its own (a real syntax
+    // error is loud by default); a valid-but-non-array value (`{}`,
+    // `null`, a single object from a buggy classifier run) would
+    // otherwise reach `for (const item of inventory)` below and throw the
+    // much less clear "inventory is not iterable" -- fail with a message
+    // that actually names the problem instead.
+    if (!Array.isArray(inventory)) {
+      throw new Error(`knowledge-migration: '${inventoryPath}' must contain a JSON array, got ${typeof inventory === 'object' && inventory !== null ? JSON.stringify(Object.keys(inventory)) : typeof inventory}`);
+    }
   }
 
   const view = rebuild(fgosDir);
@@ -165,7 +174,16 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
     // alias to name).
     const isLive = existingDoc && isLiveDocLifecycle(existingDoc.docLifecycle);
     const targetFileReachable = existingDoc && fs.existsSync(path.join(repoRoot, targetPath));
-    if (existingDoc && sourcePath === targetPath && isLive && targetFileReachable) {
+    // A live doc under a non-active topic is drift regardless of whether
+    // anything is left to move (topic.retire never force-retires its own
+    // docs) -- the planned-move path already refuses this via
+    // computeConservationErrors' own topic-liveness check; the shortcut
+    // must not let the SAME doc slip through as silent success just
+    // because it happens to already sit at its computed target. Not
+    // satisfying this condition falls through to plannedMoves below,
+    // where that existing check reports it with the same message.
+    const topicIsActive = existingDoc && view.topics?.[existingDoc.topicId]?.status === 'active';
+    if (existingDoc && sourcePath === targetPath && isLive && targetFileReachable && topicIsActive) {
       const oldPathTraceable = item.oldPath === existingDoc.currentPath || (existingDoc.aliases || []).includes(item.oldPath);
       if (oldPathTraceable) {
         alreadyMigratedCount++;

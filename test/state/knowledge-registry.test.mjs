@@ -16,6 +16,7 @@ import {
   promoteDocStore,
   demoteDocStore,
   reserveDocStore,
+  renameTopicStore,
   splitTopicStore,
   mergeTopicStore,
   retireTopicStore,
@@ -23,6 +24,7 @@ import {
   supersedeDocStore,
   retireDocStore,
   attestDocStore,
+  moveDocPathStore,
   rebuild,
 } from '../../src/state/store.mjs';
 
@@ -732,6 +734,124 @@ test('doc.demote refuses under a retired topic, same as reserve/register/mark-re
 
     const view = rebuild(tmpDir);
     assert.equal(view.docs.d1.docLifecycle, 'active', 'a refused demote must not have moved the state');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('topic.register/rename/split refuse a path-traversal or multi-segment purposeSlug/topicId', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+
+    for (const bad of ['../evil', 'a/b', '..', '.']) {
+      assert.throws(() => {
+        registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: bad });
+      }, /must be a safe single path segment/, `purposeSlug ${JSON.stringify(bad)} must be refused`);
+    }
+    for (const bad of ['../evil-topic', 'a/b']) {
+      assert.throws(() => {
+        registerTopicStore(tmpDir, { topicId: bad, purposeSlug: 'ok' });
+      }, /must be a safe single path segment/, `topicId ${JSON.stringify(bad)} must be refused`);
+    }
+
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'ok-topic' });
+    assert.throws(() => {
+      renameTopicStore(tmpDir, { topicId: 't1', newPurposeSlug: '../escape' });
+    }, /must be a safe single path segment/);
+
+    assert.throws(() => {
+      splitTopicStore(tmpDir, { topicId: 't1', newTopics: [{ topicId: '../evil', purposeSlug: 'ok' }, { topicId: 't2', purposeSlug: 'ok2' }] });
+    }, /must be a safe single path segment/);
+    assert.throws(() => {
+      splitTopicStore(tmpDir, { topicId: 't1', newTopics: [{ topicId: 't2', purposeSlug: '../escape' }, { topicId: 't3', purposeSlug: 'ok2' }] });
+    }, /must be a safe single path segment/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.topics.t1.purposeSlug, 'ok-topic', 'no refused mutation must have taken effect');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.reserve/register/path-move refuse a path-traversal, absolute, or out-of-docs currentPath, and an unsafe role', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+
+    const badPaths = ['docs/../evil/guide.md', 'docs/ok/../escape.md', '/etc/passwd', 'docs\\evil\\guide.md', 'not-under-docs/guide.md'];
+    for (const bad of badPaths) {
+      assert.throws(() => {
+        reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: bad });
+      }, /must (be a non-empty string|not contain backslashes|be repo-relative|live under 'docs\/'|not contain '\.', '\.\.')/, `currentPath ${JSON.stringify(bad)} must be refused`);
+    }
+
+    for (const badRole of ['../evil', 'a/b']) {
+      assert.throws(() => {
+        reserveDocStore(tmpDir, { topicId: 't1', role: badRole, currentPath: 'docs/t1/guide.md' });
+      }, /must be a safe single path segment/, `role ${JSON.stringify(badRole)} must be refused`);
+    }
+
+    reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docId: 'd1' });
+    assert.throws(() => {
+      moveDocPathStore(tmpDir, { docId: 'd1', newPath: 'docs/../evil/guide.md' });
+    }, /must not contain '\.', '\.\.'/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.currentPath, 'docs/t1/guide.md', 'a refused path-move must not have moved the doc');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('topic.split refuses a live doc left unassigned by every successor\'s rolesToMove, and a role duplicated across successors', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'source-topic' });
+    registerDocStore(tmpDir, { docId: 'd-guide', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+    registerDocStore(tmpDir, { docId: 'd-pitfall', topicId: 't1', role: 'pitfall', currentPath: 'docs/t1/pitfall.md', docLifecycle: 'provisional' });
+
+    // 'pitfall' is never listed in any successor's rolesToMove -- it would
+    // be stranded under the now-retired source topic.
+    assert.throws(() => {
+      splitTopicStore(tmpDir, {
+        topicId: 't1',
+        newTopics: [{ topicId: 't2', purposeSlug: 'reclaim', rolesToMove: ['guide'] }, { topicId: 't3', purposeSlug: 'cleanup' }],
+      });
+    }, /1 live doc\(s\) under source topic 't1' are not assigned.*d-pitfall \(role 'pitfall'\)/);
+
+    let view = rebuild(tmpDir);
+    assert.equal(view.topics.t1.status, 'active', 'a refused split must not have retired the source');
+    assert.equal(view.docs['d-guide'].topicId, 't1');
+
+    // Same role listed in two DIFFERENT successors' rolesToMove.
+    assert.throws(() => {
+      splitTopicStore(tmpDir, {
+        topicId: 't1',
+        newTopics: [
+          { topicId: 't2', purposeSlug: 'reclaim', rolesToMove: ['guide', 'pitfall'] },
+          { topicId: 't3', purposeSlug: 'cleanup', rolesToMove: ['pitfall'] },
+        ],
+      });
+    }, /role 'pitfall' is listed in more than one successor's rolesToMove/);
+
+    view = rebuild(tmpDir);
+    assert.equal(view.topics.t1.status, 'active', 'a refused split must not have retired the source');
+
+    // A correct assignment (every live doc covered exactly once) succeeds.
+    splitTopicStore(tmpDir, {
+      topicId: 't1',
+      newTopics: [
+        { topicId: 't2', purposeSlug: 'reclaim', rolesToMove: ['guide'] },
+        { topicId: 't3', purposeSlug: 'cleanup', rolesToMove: ['pitfall'] },
+      ],
+    });
+    view = rebuild(tmpDir);
+    assert.equal(view.topics.t1.status, 'retired');
+    assert.equal(view.docs['d-guide'].topicId, 't2');
+    assert.equal(view.docs['d-pitfall'].topicId, 't3');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

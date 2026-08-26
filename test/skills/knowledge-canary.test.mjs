@@ -37,3 +37,18 @@ test('knowledge-canary - canary execution GREEN end to end', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledge-canary - finds the real bin/fgos.mjs regardless of the calling process\'s own cwd', () => {
+  const { tmpDir } = setupGitRepoWithStore();
+  const otherCwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-canary-othercwd-'));
+  const originalCwd = process.cwd();
+  try {
+    process.chdir(otherCwd);
+    const res = runKnowledgeCanary(tmpDir);
+    assert.equal(res.success, true);
+  } finally {
+    process.chdir(originalCwd);
+    fs.rmSync(otherCwd, { recursive: true, force: true });
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

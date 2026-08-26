@@ -39,6 +39,50 @@ export function isLiveDocLifecycle(docLifecycle) {
   return docLifecycle !== 'retired' && docLifecycle !== 'superseded';
 }
 
+// A single safe path SEGMENT: no '/' or '\', can't start with '.' (rules
+// out '.', '..', and hidden-file-style segments in one regex), non-empty.
+// topicId/purposeSlug/role all become filesystem path segments downstream
+// (scripts/knowledge-migration.mjs builds `docs/${purposeSlug}/${role}.md`
+// directly from registry-accepted values) -- nothing before this validated
+// that, so `purposeSlug: '../../evil'` or `role: '../escape'` reached the
+// reducer, and from there the filesystem, unchecked.
+const SAFE_SLUG_RE = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+
+function assertSafeSlug(value, label) {
+  if (typeof value !== 'string' || !SAFE_SLUG_RE.test(value)) {
+    throw new KnowledgeValidationError(
+      `${label} must be a safe single path segment (letters/digits, then letters/digits/./-/_, never '/', '\\', or starting with '.'): got ${JSON.stringify(value)}`
+    );
+  }
+}
+
+// A repo-relative doc path that must stay under docs/ -- rejects an
+// absolute path, a backslash, and any '.'/'..'/empty path segment (the
+// literal path-traversal shape: 'docs/../evil/guide.md',
+// 'docs/ok/../escape.md'). Deliberately string-only (no `node:path`
+// import) to keep this module's own "pure domain model" contract --
+// normalizing '..' segments manually is enough to prove the path can never
+// climb out of docs/, without adding a filesystem-adjacent dependency to a
+// module that has none today.
+function assertSafeDocPath(value, label) {
+  if (typeof value !== 'string' || value.length === 0) {
+    throw new KnowledgeValidationError(`${label} must be a non-empty string`);
+  }
+  if (value.includes('\\')) {
+    throw new KnowledgeValidationError(`${label} must not contain backslashes: got ${JSON.stringify(value)}`);
+  }
+  if (value.startsWith('/') || /^[A-Za-z]:/.test(value)) {
+    throw new KnowledgeValidationError(`${label} must be repo-relative, never absolute: got ${JSON.stringify(value)}`);
+  }
+  if (!value.startsWith('docs/')) {
+    throw new KnowledgeValidationError(`${label} must live under 'docs/': got ${JSON.stringify(value)}`);
+  }
+  const segments = value.split('/');
+  if (segments.some((seg) => seg === '.' || seg === '..' || seg === '')) {
+    throw new KnowledgeValidationError(`${label} must not contain '.', '..', or empty path segments: got ${JSON.stringify(value)}`);
+  }
+}
+
 /**
  * Enforces the narrow, mechanical slice of the closed role/framework/mode
  * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1
@@ -197,6 +241,8 @@ export function applyKnowledgeEvent(view, event) {
       if (!topicId || !purposeSlug) {
         throw new KnowledgeValidationError('topic.register requires topicId and purposeSlug');
       }
+      assertSafeSlug(topicId, 'topic.register: topicId');
+      assertSafeSlug(purposeSlug, 'topic.register: purposeSlug');
       if (view.topics[topicId]) {
         throw new KnowledgeValidationError(
           `topic.register: topic '${topicId}' already exists (${view.topics[topicId].status}) — register is create-only; use "fgos topic rename"/"fgos topic split"/"fgos topic merge" to change an existing topic.`
@@ -225,7 +271,10 @@ export function applyKnowledgeEvent(view, event) {
         ...(topic.lineage ?? {}),
         renamedFrom: topic.purposeSlug,
       };
-      if (newPurposeSlug) topic.purposeSlug = newPurposeSlug;
+      if (newPurposeSlug) {
+        assertSafeSlug(newPurposeSlug, 'topic.rename: newPurposeSlug');
+        topic.purposeSlug = newPurposeSlug;
+      }
       if (newPurposeTitle) topic.purposeTitle = newPurposeTitle;
       topic.updatedAt = event.ts ?? Date.now();
       break;
@@ -258,6 +307,8 @@ export function applyKnowledgeEvent(view, event) {
         if (!newTopicId || !nt?.purposeSlug) {
           throw new KnowledgeValidationError('topic.split new topic requires topicId and purposeSlug');
         }
+        assertSafeSlug(newTopicId, 'topic.split: successor topicId');
+        assertSafeSlug(nt.purposeSlug, 'topic.split: successor purposeSlug');
         if (newTopicId === topicId) {
           throw new KnowledgeValidationError(`topic.split: successor topicId '${newTopicId}' cannot equal the source topicId`);
         }
@@ -268,6 +319,39 @@ export function applyKnowledgeEvent(view, event) {
         if (view.topics[newTopicId]) {
           throw new KnowledgeValidationError(`topic.split: successor topicId '${newTopicId}' already exists (${view.topics[newTopicId].status}) -- topic ids are create-only`);
         }
+      }
+
+      // Every LIVE doc under the source topic must land under exactly one
+      // successor via rolesToMove -- checked BEFORE any mutation, same
+      // fail-nothing-mutates discipline as the successor checks above.
+      // Without this: a role missing from every successor's rolesToMove
+      // stays on the OLD topicId, which this case is about to retire --
+      // stranding a live doc under a retired topic, the exact invariant
+      // this whole item's other fixes (doc.demote's assertTopicWritable,
+      // migration's topic-liveness preflight) already treat as a real
+      // problem. A role listed in MORE than one successor's rolesToMove
+      // would silently land the doc under whichever successor processes
+      // last, discarding the caller's real intent with no error.
+      const liveDocsUnderSource = Object.values(view.docs).filter(
+        (d) => d.topicId === topicId && isLiveDocLifecycle(d.docLifecycle)
+      );
+      const roleAssignedTo = new Map();
+      for (const nt of newTopics) {
+        if (!Array.isArray(nt.rolesToMove)) continue;
+        for (const role of nt.rolesToMove) {
+          if (roleAssignedTo.has(role)) {
+            throw new KnowledgeValidationError(
+              `topic.split: role '${role}' is listed in more than one successor's rolesToMove (both '${roleAssignedTo.get(role)}' and '${nt.topicId}') -- a role can only move to exactly one successor`
+            );
+          }
+          roleAssignedTo.set(role, nt.topicId);
+        }
+      }
+      const strandedDocs = liveDocsUnderSource.filter((d) => !roleAssignedTo.has(d.role));
+      if (strandedDocs.length > 0) {
+        throw new KnowledgeValidationError(
+          `topic.split: ${strandedDocs.length} live doc(s) under source topic '${topicId}' are not assigned to any successor's rolesToMove (${strandedDocs.map((d) => `${d.docId} (role '${d.role}')`).join(', ')}) -- every live doc must move to a successor, or be explicitly retired/superseded first`
+        );
       }
 
       // Mark old topic as retired
@@ -402,6 +486,8 @@ export function applyKnowledgeEvent(view, event) {
       if (!view.topics[topicId]) {
         throw new KnowledgeValidationError(`doc.reserve: topicId "${topicId}" is not registered — run "fgos topic register" first`);
       }
+      assertSafeSlug(role, 'doc.reserve: role');
+      assertSafeDocPath(currentPath, 'doc.reserve: currentPath');
       assertTopicWritable(view, topicId, 'doc.reserve');
       const resolvedFramework = framework ?? 'diataxis';
       const resolvedMode = mode ?? 'explanation';
@@ -438,6 +524,8 @@ export function applyKnowledgeEvent(view, event) {
       if (!view.topics[topicId]) {
         throw new KnowledgeValidationError(`doc.register: topicId "${topicId}" is not registered — run "fgos topic register" first`);
       }
+      assertSafeSlug(role, 'doc.register: role');
+      assertSafeDocPath(currentPath, 'doc.register: currentPath');
       assertTopicWritable(view, topicId, 'doc.register');
       const id = docId ?? `${topicId}:${role}`;
       const existing = view.docs[id];
@@ -676,6 +764,7 @@ export function applyKnowledgeEvent(view, event) {
       if (!newPath) {
         throw new KnowledgeValidationError('doc.path-move requires newPath');
       }
+      assertSafeDocPath(newPath, 'doc.path-move: newPath');
       assertCurrentPathUnique(view, id, newPath);
       if (doc.currentPath && doc.currentPath !== newPath && !doc.aliases.includes(doc.currentPath)) {
         doc.aliases.push(doc.currentPath);
