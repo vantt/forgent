@@ -137,3 +137,55 @@ a pure read-path check, no new write).
 ## Outstanding questions
 
 None
+
+## Reality gate (fgos-coding-validating)
+
+- **Mode fit — PASS.** High-risk lane matches the 4-flag count above
+  (one hard-gate flag, audit/security, already forces it regardless of
+  count) — not over- or under-built for a change to the `delivered`
+  evidence gate.
+- **Repo fit — PASS.** Every file/function/line cited in RESEARCH.md
+  round 1 was read directly, not assumed: `store.mjs:621-643`
+  (`assertPlanEvidence`), `store.mjs:881-884` (`moveWork` backstop),
+  `approve.mjs:383-406` (runner pre-flight), `approve.mjs:888-923`
+  (pull/legacy path), `approve.mjs:76-101` (`moveDeliveredOrRecordFault`),
+  `merge.mjs:236-245` (`classifySource`), `worktree.mjs:259-270`
+  (`branchExists`, the pattern to mirror inline in `store.mjs` without a
+  layering-violating import).
+- **Assumptions — PASS.** Every assumption the Approach section leans on
+  traces to a specific read cited above (the current-tree-verify
+  precedent at `approve.mjs:888-890`; `store.mjs`'s own import list
+  confirmed it imports nothing from `src/runner/*`, so the fix must
+  duplicate a small `branchExists`-style check inline rather than import
+  `worktree.mjs`).
+- **Smaller path — PASS, none found.** Deleting the check outright for
+  pull/legacy items would be smaller but dishonestly so — it removes the
+  evidence requirement instead of correctly locating it; not considered a
+  real alternative.
+- **Proof surface — PASS.** `work.verify` (set at discovery) is a real,
+  runnable command scoped to the touched modules: `node --test
+  test/state/store.test.mjs test/verbs/merge/approve.test.mjs
+  test/cli/fgos-approve.test.mjs`. Not a placeholder.
+- **Impact-analysis posture — PASS (degraded, matches).** `fgos tool
+  query --capability impact-analysis --status present` (re-checked at
+  this Gate, same session) still returns GitNexus `present`;
+  `mcp__gitnexus__list_repos` still shows this repo's index 2095 commits
+  behind. Matches the `degraded` posture the Approach section already
+  recorded — no drift between planning-time and gate-time.
+
+No FAIL on any dimension.
+
+## Feasibility matrix
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| `fgw/<id>` branch existence is the correct discriminator for when the current-tree fallback applies | medium (behavior change on an audit/security gate) | Confirm the fallback can only ever fire in the intended no-branch case across every real call site | `store.mjs:881-884`'s backstop always runs `assertPlanEvidence` regardless of source (this is exactly the gap being fixed); `approve.mjs:383/406`'s own pre-flight is scoped inside `if (source === 'runner')`, so a branch always exists there — the fallback path is never reachable from that call site either way | PASS |
+| No third, unaccounted-for caller of `assertPlanEvidence` exists | medium (an unknown caller could hit the new fallback in an unintended context) | Exhaustive search for every call site | `rg -n "assertPlanEvidence" src/state/store.mjs` (definition + 1 call, `moveWork`) and `rg -n "assertPlanEvidence" src/verbs/merge/approve.mjs` (import + 2 calls, lines 349/406) — 3 real call sites total, all accounted for above; GitNexus's own auto-hook on the first `rg` call independently reported the same caller set | PASS |
+| GitNexus's `impactedCount: 0` on `assertPlanEvidence` (upstream) is a stale-index artifact, not evidence of zero real callers | medium (if inverted, the row above's evidence base would be wrong) | Cross-check the tool's zero-result against direct source reads, per CLAUDE.md's impact-analysis gate | `mcp__gitnexus__list_repos` shows this index 2095 commits behind; direct `Read`/`rg` against the current checked-out source shows the real call sites named above — ground truth is the live source, not a stale graph | PASS |
+
+Every row has accepted evidence (a command actually run, a file actually
+read) — no plausibility language. No row is unresolved.
+
+## Decide
+
+**READY.**
