@@ -6,7 +6,13 @@ import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { EXECUTOR_ADAPTERS, DispatchError, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from '../../src/runner/dispatch/transport.mjs';
 import { loadRunnerConfig } from '../../src/runner/dispatch/config.mjs';
+import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
+
+function writeRunnerConfigFixture(root, cfg) {
+  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+}
 
 // Live-binary regression guard (self-review finding, 2026-08-25, fourth
 // round): every mock in this file simulates herdr's CLI contract by hand,
@@ -113,14 +119,84 @@ process.exit(0);
   return { scriptPath, outputsDir };
 }
 
+// Same as createRealisticMockHerdrScript, except "pane run" echoes the
+// typed line TWICE before running it -- once bare, once with a fake shell
+// prompt prefix -- reproducing a real live finding (2026-08-26): herdr's
+// actual pane transcript shows the typed "sh '<scriptPath>'" invocation
+// twice (the typed keystrokes, then again once the pane redraws with the
+// shell's own prompt in front of it). A fix that strips only the FIRST
+// occurrence leaves the second one sitting in the "cleaned" stdout.
+function createDoubleEchoMockHerdrScript(tmpDir) {
+  const scriptPath = path.join(tmpDir, 'double-echo-mock-herdr.mjs');
+  const outputsDir = path.join(tmpDir, 'pane-outputs');
+  const code = `
+import fs from 'node:fs';
+import path from 'node:path';
+import { execSync } from 'node:child_process';
+const outputsDir = ${JSON.stringify(outputsDir)};
+fs.mkdirSync(outputsDir, { recursive: true });
+const args = process.argv.slice(2);
+const subcommand = args[0];
+const action = args[1];
+
+if (subcommand === 'pane' && action === 'split') {
+  const paneId = 'pane-double-echo-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+  fs.writeFileSync(path.join(outputsDir, paneId + '.txt'), '');
+  console.log(JSON.stringify({ result: { pane: { pane_id: paneId } } }));
+  process.exit(0);
+}
+
+if (subcommand === 'pane' && action === 'run') {
+  const paneId = args[2];
+  const cmd = args[3];
+  const outFile = path.join(outputsDir, paneId + '.txt');
+  fs.appendFileSync(outFile, cmd + '\\n');
+  fs.appendFileSync(outFile, '\\u2794  /tmp ' + cmd + '\\n');
+  let out = '';
+  try {
+    out = execSync(cmd, { shell: '/bin/sh', encoding: 'utf8' });
+  } catch (err) {
+    out = (err.stdout || '') + (err.stderr || '');
+  }
+  fs.appendFileSync(outFile, out);
+  process.exit(0);
+}
+
+if (subcommand === 'pane' && action === 'wait-output') {
+  const paneId = args[2];
+  const regexIdx = args.indexOf('--regex');
+  const rawPattern = args[regexIdx + 1];
+  const re = new RegExp(rawPattern.replace(/\\(\\?m\\)/g, ''), 'm');
+  const outFile = path.join(outputsDir, paneId + '.txt');
+  const deadline = Date.now() + 5000;
+  while (Date.now() < deadline) {
+    const content = fs.existsSync(outFile) ? fs.readFileSync(outFile, 'utf8') : '';
+    const match = re.exec(content);
+    if (match) {
+      console.log(JSON.stringify({ result: { matched_line: match[0], read: { text: content } } }));
+      process.exit(0);
+    }
+  }
+  console.log(JSON.stringify({ error: { code: 'timeout', message: 'timed out waiting for output match' } }));
+  process.exit(1);
+}
+
+process.exit(0);
+`;
+  fs.writeFileSync(scriptPath, code);
+  return { scriptPath, outputsDir };
+}
+
 function createMockHerdrScript(tmpDir) {
   const scriptPath = path.join(tmpDir, 'mock-herdr.mjs');
   const logPath = path.join(tmpDir, 'herdr-calls.jsonl');
+  const scriptContentsPath = path.join(tmpDir, 'herdr-run-script-contents.jsonl');
 
   const code = `
 import fs from 'node:fs';
 const args = process.argv.slice(2);
 const logPath = ${JSON.stringify(logPath)};
+const scriptContentsPath = ${JSON.stringify(scriptContentsPath)};
 let counter = 1;
 try {
   const existing = fs.readFileSync(logPath, 'utf8').trim().split('\\n').filter(Boolean);
@@ -147,6 +223,20 @@ if (subcommand === 'pane' && action === 'split') {
 }
 
 if (subcommand === 'pane' && action === 'run') {
+  // Script-file indirection (sixth-round fix): the typed text is no longer
+  // the full command -- it is a short "sh '<scriptPath>'" invocation, and
+  // the real quoted command lives in that script FILE, which the adapter
+  // deletes once it settles. Read the file's content here (before that
+  // cleanup can run) and log it, so a test can inspect the real quoted
+  // command after the dispatch has already resolved/rejected.
+  const typedCmd = args[3] || '';
+  const pathMatch = typedCmd.match(/^sh '(.*)'$/);
+  if (pathMatch) {
+    try {
+      const scriptContent = fs.readFileSync(pathMatch[1], 'utf8');
+      fs.appendFileSync(scriptContentsPath, JSON.stringify({ paneId: args[2], scriptContent }) + '\\n');
+    } catch {}
+  }
   process.exit(0);
 }
 
@@ -157,10 +247,23 @@ if (subcommand === 'pane' && action === 'wait-output') {
   // "pane read" call (which the real binary can return EMPTY for on a
   // "recent"/"recent-unwrapped" source when nothing has scrolled
   // off-screen yet).
+  //
+  // Sentinel-aware (sixth-round fix, 2026-08-26): the adapter now REJECTS
+  // any wait-output response whose captured text carries no evaluated
+  // completion sentinel (never defaults to status 0) -- a canned response
+  // with no sentinel at all, as this mock used to return unconditionally,
+  // would make every test using this mock fail. The real sentinel is
+  // embedded in the --regex this mock was actually called with, so it is
+  // extracted from there rather than hardcoded.
+  const regexIdx = args.indexOf('--regex');
+  const rawPattern = args[regexIdx + 1] || '';
+  const sentinelMatch = rawPattern.match(/__fgos_herdr_exit_[^:]+__/);
+  const sentinelToken = sentinelMatch ? sentinelMatch[0] : '__fgos_herdr_exit_unknown__';
+  const matchedLine = sentinelToken + ':0';
   console.log(JSON.stringify({
     result: {
-      matched_line: '[DONE]',
-      read: { text: '[DONE] Work completed successfully inside herdr pane' },
+      matched_line: matchedLine,
+      read: { text: '[DONE] Work completed successfully inside herdr pane\\n' + matchedLine },
     },
   }));
   process.exit(0);
@@ -169,7 +272,7 @@ if (subcommand === 'pane' && action === 'wait-output') {
 process.exit(0);
 `;
   fs.writeFileSync(scriptPath, code);
-  return { scriptPath, logPath };
+  return { scriptPath, logPath, scriptContentsPath };
 }
 
 test('herdr-spawn adapter is registered in EXECUTOR_ADAPTERS and validated by loadRunnerConfig', () => {
@@ -329,7 +432,7 @@ test('D2 hard constraint assertion: Herdr runtime signals alone NEVER mutate tas
 
 test('herdr-spawn adapter: shell metacharacters in a prompt/arg never execute when the typed pane command is later run by a real POSIX shell (self-review finding)', async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-shell-injection-test-'));
-  const { scriptPath, logPath } = createMockHerdrScript(tmpDir);
+  const { scriptPath, logPath, scriptContentsPath } = createMockHerdrScript(tmpDir);
   const wrapperPath = path.join(tmpDir, 'herdr-wrapper.sh');
   fs.writeFileSync(wrapperPath, `#!/bin/sh\nexec node "${scriptPath}" "$@"\n`);
   fs.chmodSync(wrapperPath, 0o755);
@@ -347,21 +450,31 @@ test('herdr-spawn adapter: shell metacharacters in a prompt/arg never execute wh
   );
   assert.ok(res.paneId);
 
-  // Extract the exact text herdr-spawn typed into "pane run <paneId> <text>".
+  // Extract the real quoted command -- since the script-file indirection
+  // fix (sixth-round), "pane run"'s own 4th argv element is no longer the
+  // full command; it is a short "sh '<scriptPath>'" invocation, and the
+  // real quoted command lives in that script FILE, which the adapter
+  // deletes once it settles. The mock's own "run" handler above captured
+  // that file's content into the log before cleanup could run.
   const calls = fs.readFileSync(logPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
   const runCall = calls.find((c) => c.args[0] === 'pane' && c.args[1] === 'run');
   assert.ok(runCall, 'expected a "pane run" call to be logged');
   const typedText = runCall.args[3];
   assert.ok(typedText, 'expected the typed command text as pane run\'s 4th argv element');
+  assert.match(typedText, /^sh '.*'$/, 'the typed pane-run text must be a short, fixed-shape script invocation, never the raw command itself');
 
-  // The real proof: actually hand the captured text to a real POSIX shell,
-  // exactly like herdr's own pane would ("types the given text into
-  // whatever shell is already running in that pane"). If quoting is
-  // broken, `touch <markerFile>` fires and the file exists afterward.
-  // (The typed text also carries a trailing `; echo "<sentinel>:$?"` --
-  // the completion-detection sentinel, a separate self-review fix -- so
-  // only the FIRST line is the real echo output under test here.)
-  const shellOutput = execFileSync('sh', ['-c', typedText], { encoding: 'utf8' });
+  const scriptContentCalls = fs.readFileSync(scriptContentsPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  assert.equal(scriptContentCalls.length, 1, 'expected the mock to have captured exactly one real script file content');
+  const scriptContent = scriptContentCalls[0].scriptContent;
+
+  // The real proof: actually hand the captured script content to a real
+  // POSIX shell, exactly like herdr's own pane would run it via the "sh
+  // '<scriptPath>'" invocation. If quoting is broken, `touch <markerFile>`
+  // fires and the file exists afterward. (The script also carries a
+  // trailing `echo "<sentinel>:$?"` line -- the completion-detection
+  // sentinel, a separate self-review fix -- so only the FIRST line is the
+  // real echo output under test here.)
+  const shellOutput = execFileSync('sh', ['-c', scriptContent], { encoding: 'utf8' });
   assert.ok(!fs.existsSync(markerFile), 'command substitution/backtick/semicolon/pipe in the prompt must NEVER execute when the pane types this text into its shell');
   assert.equal(shellOutput.split('\n')[0], dangerousArg, 'echo must receive the dangerous string as ONE literal argument, unmangled');
 
@@ -403,7 +516,7 @@ test('herdr-spawn adapter: a worker that finishes WITHOUT ever printing [DONE]/[
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('herdr-spawn adapter: the worker\'s own [DONE] token still resolves the fast path correctly against a realistic mock (regression guard for the sentinel regex alternation)', async () => {
+test('herdr-spawn adapter: the worker\'s own [DONE] token remains visible to downstream result parsing after sentinel-based completion (regression guard -- wait-output no longer matches on the token at all)', async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-token-fastpath-test-'));
   const { scriptPath } = createRealisticMockHerdrScript(tmpDir);
   const wrapperPath = path.join(tmpDir, 'herdr-wrapper.sh');
@@ -474,6 +587,140 @@ test('herdr-spawn adapter never leaks a resolved env secret into its own Dispatc
   }
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('herdr-spawn adapter rejects worker-spawn-fail when wait-output reports success but its response carries no result.read.text (sixth-round advisor finding, P2)', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-missing-read-text-test-'));
+  const wrapperPath = path.join(tmpDir, 'herdr-missing-read-text.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh
+if [ "$1" = "pane" ] && [ "$2" = "split" ]; then
+  echo '{"result":{"pane":{"pane_id":"pane-missing-read-text"}}}'
+  exit 0
+fi
+if [ "$1" = "pane" ] && [ "$2" = "run" ]; then
+  exit 0
+fi
+if [ "$1" = "pane" ] && [ "$2" = "wait-output" ]; then
+  echo '{"result":{}}'
+  exit 0
+fi
+exit 0
+`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  try {
+    await herdrSpawn(
+      { command: 'echo', args: ['hi'], env: {} },
+      { cwd: tmpDir, timeoutMs: 5000, workId: 'missing-read-text-item', tier: 'standard', model: 'sonnet', herdrBin: wrapperPath },
+    );
+    assert.fail('should have rejected -- wait-output reported success with no readable scrollback');
+  } catch (err) {
+    assert.ok(err instanceof DispatchError);
+    assert.equal(err.errorClass, 'worker-spawn-fail');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('herdr-spawn adapter rejects worker-spawn-fail when the captured transcript carries no evaluated completion sentinel (sixth-round advisor finding, P2 -- never defaults status to 0)', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-missing-sentinel-test-'));
+  const wrapperPath = path.join(tmpDir, 'herdr-missing-sentinel.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh
+if [ "$1" = "pane" ] && [ "$2" = "split" ]; then
+  echo '{"result":{"pane":{"pane_id":"pane-missing-sentinel"}}}'
+  exit 0
+fi
+if [ "$1" = "pane" ] && [ "$2" = "run" ]; then
+  exit 0
+fi
+if [ "$1" = "pane" ] && [ "$2" = "wait-output" ]; then
+  echo '{"result":{"read":{"text":"worker output\\n"}}}'
+  exit 0
+fi
+exit 0
+`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  try {
+    await herdrSpawn(
+      { command: 'echo', args: ['hi'], env: {} },
+      { cwd: tmpDir, timeoutMs: 5000, workId: 'missing-sentinel-item', tier: 'standard', model: 'sonnet', herdrBin: wrapperPath },
+    );
+    assert.fail('should have rejected -- no sentinel means unconfirmed completion, never assume status 0');
+  } catch (err) {
+    assert.ok(err instanceof DispatchError);
+    assert.equal(err.errorClass, 'worker-spawn-fail');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('herdr-spawn adapter: BOTH occurrences of the pane\'s echoed script invocation are stripped, not just the first (regression guard, 2026-08-26 live finding)', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-double-echo-test-'));
+  const { scriptPath } = createDoubleEchoMockHerdrScript(tmpDir);
+  const wrapperPath = path.join(tmpDir, 'herdr-wrapper.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh\nexec node "${scriptPath}" "$@"\n`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  const res = await herdrSpawn(
+    { command: 'sh', args: ['-c', 'echo worker-with-no-contract-signal'], env: {} },
+    { cwd: tmpDir, timeoutMs: 5000, workId: 'double-echo-item', tier: 'standard', model: 'sonnet', herdrBin: wrapperPath },
+  );
+
+  assert.equal(
+    res.stdout.trim(),
+    'worker-with-no-contract-signal',
+    `the returned stdout must contain ONLY the worker's real output, no remnant of either echoed occurrence of the typed script invocation -- got: ${JSON.stringify(res.stdout)}`,
+  );
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('executeExecutorCli via herdr-spawn: a dispatched prompt mentioning "[DONE]" as instructional prose never leaks into stdout through the pane\'s command echo, and a worker that never signals resolves outcome "unsignaled" (sixth-round advisor finding, acceptance test)', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-execute-unsignaled-test-'));
+  const { scriptPath } = createRealisticMockHerdrScript(tmpDir);
+  const wrapperPath = path.join(tmpDir, 'herdr-wrapper.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh\nexec node "${scriptPath}" "$@"\n`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  // A fake "agent CLI" that ignores its own argv (the substituted prompt)
+  // entirely and prints only a benign, contract-silent line -- modeling a
+  // real worker that does real work but never emits [DONE]/[BLOCKED].
+  const fakeAgentCliPath = path.join(tmpDir, 'fake-agent-cli.sh');
+  fs.writeFileSync(fakeAgentCliPath, '#!/bin/sh\necho worker-with-no-contract-signal\n');
+  fs.chmodSync(fakeAgentCliPath, 0o755);
+
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-execute-unsignaled-root-'));
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: {
+      'herdr-worker': { kind: 'agent', command: fakeAgentCliPath, args: ['{prompt}'], adapter: 'herdr-spawn', allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const dispatchedPrompt = 'Do the task. Report [DONE] when finished, or [BLOCKED] if stuck.';
+  const prevHerdrBin = process.env.FGOS_HERDR_BIN;
+  process.env.FGOS_HERDR_BIN = wrapperPath;
+  try {
+    const result = await executeExecutorCli('herdr-worker', { prompt: dispatchedPrompt, repoRoot: root, cwd: tmpDir, tier: 'standard' });
+    assert.equal(result.outcome, 'unsignaled', 'a worker that never itself prints [DONE]/[BLOCKED] must resolve outcome "unsignaled", never a false positive from the echoed prompt');
+    assert.ok(result.stdout.includes('worker-with-no-contract-signal'), 'the worker\'s own real output must still be present');
+    assert.ok(!result.stdout.includes('[DONE]'), 'the dispatched prompt\'s own "[DONE]" mention must never leak into stdout via the pane\'s command echo');
+    assert.ok(!result.stdout.includes('[BLOCKED]'), 'the dispatched prompt\'s own "[BLOCKED]" mention must never leak into stdout via the pane\'s command echo');
+    assert.ok(!result.stdout.includes(dispatchedPrompt), 'the raw dispatched prompt text must never appear in stdout at all');
+  } finally {
+    if (prevHerdrBin !== undefined) {
+      process.env.FGOS_HERDR_BIN = prevHerdrBin;
+    } else {
+      delete process.env.FGOS_HERDR_BIN;
+    }
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
 
 // --- Live-binary regression guard (fourth-round self-review findings) ---
