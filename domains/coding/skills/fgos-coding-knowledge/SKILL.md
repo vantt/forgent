@@ -32,9 +32,10 @@ Runs while a work item sits at status `retrospective`. This skill turns the item
    git add <currentPath>
    git commit -m "docs(<id>): retrospective synthesis"
    ```
-4. **Attest document.** Run:
+4. **Attest document.** Links this item's own capture to the doc slot
+   (docs/architect/knowledge-registry-redesign.md §7.4). Run:
    ```bash
-   fgos knowledge attest --doc-path <currentPath>
+   fgos knowledge attest --doc-path <currentPath> --capture-id <id>
    ```
 5. **Mark rendered.** Update lifecycle from `reserved` to `provisional`:
    ```bash

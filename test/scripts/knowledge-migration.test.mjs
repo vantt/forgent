@@ -30,7 +30,7 @@ test('knowledge-migration - dry-run does not mutate disk or store', () => {
 
     const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
     fs.mkdirSync(reportsDir, { recursive: true });
-    const inventoryData = [{ topicId: 't1', role: 'guide', docId: 't1:guide', docPath: 'docs/how-to/reclaim.md', quadrant: 'how-to' }];
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
     fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
 
     const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');
@@ -57,7 +57,7 @@ test('knowledge-migration - apply moves file and updates store currentPath and a
 
     const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
     fs.mkdirSync(reportsDir, { recursive: true });
-    const inventoryData = [{ topicId: 't1', role: 'guide', docId: 't1:guide', docPath: 'docs/how-to/reclaim.md', quadrant: 'how-to' }];
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
     fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
 
     const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');

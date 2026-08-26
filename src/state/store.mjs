@@ -2012,12 +2012,12 @@ export function rebuild(dir) {
  * Append a knowledge event after validating payload and invariants inside lock.
  */
 export function appendKnowledgeEvent(dir, type, payload) {
-  const { logPath } = paths(dir);
+  const logPath = resolveWriterLogPath(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
     const before = currentView(dir);
     const event = { type, payload, ts: Date.now() };
     applyKnowledgeEvent(before, event);
-    appendEventLocked(logPath, { type, payload });
+    appendEventLocked(logPath, { type, payload }, dir);
     return event;
   });
 }
@@ -2062,8 +2062,12 @@ export function supersedeDocStore(dir, { docId, topicId, role, supersededBy }) {
   return appendKnowledgeEvent(dir, 'doc.supersede', { docId, topicId, role, supersededBy });
 }
 
-export function retireDocStore(dir, { topicId, role }) {
+export function retireDocStore(dir, { docId, topicId, role }) {
   return appendKnowledgeEvent(dir, 'doc.retire', { docId, topicId, role });
+}
+
+export function attestDocStore(dir, { docId, topicId, role, captureId }) {
+  return appendKnowledgeEvent(dir, 'doc.attest', { docId, topicId, role, captureId });
 }
 
 export function moveDocPathStore(dir, { docId, topicId, role, newPath }) {

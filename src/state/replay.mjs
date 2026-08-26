@@ -635,7 +635,8 @@ function applyEvent(view, event) {
     case 'doc.promote':
     case 'doc.supersede':
     case 'doc.retire':
-    case 'doc.path-move': {
+    case 'doc.path-move':
+    case 'doc.attest': {
       applyKnowledgeEvent(view, event);
       break;
     }

@@ -177,6 +177,9 @@ export function applyKnowledgeEvent(view, event) {
       if (!topicId || !role || !currentPath) {
         throw new KnowledgeValidationError('doc.reserve requires topicId, role, and currentPath');
       }
+      if (!view.topics[topicId]) {
+        throw new KnowledgeValidationError(`doc.reserve: topicId "${topicId}" is not registered — run "fgos topic register" first`);
+      }
       const id = docId ?? `${topicId}:${role}`;
       view.docs[id] = {
         docId: id,
@@ -198,6 +201,9 @@ export function applyKnowledgeEvent(view, event) {
       const { topicId, role, currentPath, framework, mode, docLifecycle, aliases, sourceCaptureIds, docId } = payload;
       if (!topicId || !role || !currentPath) {
         throw new KnowledgeValidationError('doc.register requires topicId, role, and currentPath');
+      }
+      if (!view.topics[topicId]) {
+        throw new KnowledgeValidationError(`doc.register: topicId "${topicId}" is not registered — run "fgos topic register" first`);
       }
       const lifecycle = docLifecycle ?? 'provisional';
       if (lifecycle === 'draft' || !VALID_DOC_LIFECYCLE.includes(lifecycle)) {
@@ -293,6 +299,32 @@ export function applyKnowledgeEvent(view, event) {
         doc.docLifecycle = 'retired';
         doc.updatedAt = event.ts ?? Date.now();
       }
+      break;
+    }
+
+    // docs/architect/knowledge-registry-redesign.md §7.4: "Attestation
+    // links a capture to a document slot ... the precise replacement for
+    // the old 'compound stores docType/docPath' meaning." Modeled as
+    // accumulating into the SAME `sourceCaptureIds` field `doc.register`
+    // already seeds from bootstrap (docs/architect/...md §7.2's own
+    // example schema) -- one array of every capture that has ever
+    // justified this doc's content, never overwritten, mirroring
+    // `work.friction`'s own accumulate-never-replace fold rule.
+    case 'doc.attest': {
+      const { docId, topicId, role, captureId } = payload;
+      const id = docId ?? (topicId && role ? `${topicId}:${role}` : null);
+      const doc = view.docs[id];
+      if (!doc) {
+        throw new KnowledgeValidationError(`doc.attest: doc '${id}' not found`);
+      }
+      if (!captureId || typeof captureId !== 'string' || !captureId.trim()) {
+        throw new KnowledgeValidationError('doc.attest requires captureId');
+      }
+      if (!Array.isArray(doc.sourceCaptureIds)) doc.sourceCaptureIds = [];
+      if (!doc.sourceCaptureIds.includes(captureId)) {
+        doc.sourceCaptureIds.push(captureId);
+      }
+      doc.updatedAt = event.ts ?? Date.now();
       break;
     }
 

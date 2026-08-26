@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
 import { collectWideSourceFiles, findWideCitationFindings, isDLocalId } from '../scripts/check-decision-citation-drift.mjs';
@@ -1838,7 +1838,20 @@ async function runVerb(verb, flags, positional, dir) {
           throw new StoreError('validation', `knowledge attest: path '${docPath}' is an ALIAS, not currentPath '${match.currentPath}'. Remedy: use official currentPath '${match.currentPath}'.`);
         }
 
-        return { attested: true, docId: match.docId, currentPath: match.currentPath };
+        // docs/architect/knowledge-registry-redesign.md §7.4: an
+        // attestation links a real capture (a work item id) to this doc
+        // slot -- "the precise replacement for the old 'compound stores
+        // docType/docPath' meaning". `--capture-id` is optional here
+        // (existing callers that only need path/registry validation keep
+        // working unchanged) but is what actually persists the linkage
+        // this verb's own name promises; the fgos-coding-knowledge skill
+        // passes the item id it is retrospecting.
+        const captureId = optionalField(flags['capture-id'], 'knowledge attest --capture-id requires a non-empty value.');
+        if (captureId !== undefined) {
+          attestDocStore(dir, { docId: match.docId, topicId: match.topicId, role: match.role, captureId });
+        }
+
+        return { attested: true, docId: match.docId, currentPath: match.currentPath, captureId: captureId ?? null };
       } else {
         throw new StoreError('validation', `knowledge: unknown subcommand "${sub}".`);
       }
@@ -1892,6 +1905,27 @@ async function runVerb(verb, flags, positional, dir) {
           execFileSync('git', ['cat-file', '-e', `HEAD:${docPath}`], { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'ignore', 'pipe'] });
         } catch {
           throw new StoreError('validation', `compound: --doc-path "${docPath}" is not committed at the main checkout's HEAD ("${repoRoot}") — write and commit the document there before tagging it.`);
+        }
+        // docs/architect/knowledge-registry-redesign.md §8: "The new
+        // producer gate extends [the HEAD-commit rule]: require registry
+        // enforcement active, require path equals a registered document
+        // currentPath, reject alias paths". This legacy verb is deprecated
+        // (see the warning above) but stays reachable until `fgos knowledge
+        // attest`/`fgos doc *` fully replace it — enforcing the SAME
+        // registry-membership rule here (when the operator has turned
+        // enforcement on) closes the gap that let it keep tagging a path
+        // the registry never heard of.
+        const sharedConfig = readSharedConfigOrEmpty(repoRoot);
+        if (sharedConfig?.docRegistry?.enforce === true) {
+          const registryView = rebuild(dir);
+          const resolved = resolveDocPath(registryView, docPath);
+          const match = Array.isArray(resolved) ? resolved[0] : resolved;
+          if (!match) {
+            throw new StoreError('validation', `compound: --doc-path "${docPath}" is not registered in the knowledge registry (docRegistry.enforce is on) — run "fgos doc reserve"/"fgos doc register" first, or use "fgos knowledge attest" instead of this deprecated verb.`);
+          }
+          if (match.currentPath !== docPath) {
+            throw new StoreError('validation', `compound: --doc-path "${docPath}" is an ALIAS, not the registered currentPath "${match.currentPath}" (docRegistry.enforce is on) — use the currentPath.`);
+          }
         }
       }
       const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });

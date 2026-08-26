@@ -23,16 +23,16 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
     const topic = view.topics[item.topicId];
     const purposeSlug = topic?.purposeSlug || item.topicId;
     const targetPath = `docs/${purposeSlug}/${item.role}.md`;
-    const currentPath = item.docPath;
+    const currentPath = item.oldPath;
 
     if (currentPath !== targetPath) {
       plannedMoves.push({
-        docId: item.docId,
+        docId: `${item.topicId}:${item.role}`,
         topicId: item.topicId,
         role: item.role,
         oldPath: currentPath,
         newPath: targetPath,
-        quadrant: item.quadrant,
+        quadrant: item.mode,
       });
     }
   }
@@ -63,7 +63,7 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
       }
 
       // Record moveDocPathStore event
-      moveDocPathStore(fgosDir, { docId: move.docId, newPath: move.newPath });
+      moveDocPathStore(fgosDir, { docId: move.docId, topicId: move.topicId, role: move.role, newPath: move.newPath });
 
       // Update frontmatter
       if (fs.existsSync(destAbs)) {

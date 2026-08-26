@@ -64,6 +64,7 @@ import { computeKnowledgeProjection } from '../report/knowledge-projection.mjs';
 import { rebuild } from '../state/store.mjs';
 import { resolveDocPath } from '../report/knowledge-resolver.mjs';
 import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.mjs';
+import { parseFrontmatter } from '../report/frontmatter.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -2521,21 +2522,40 @@ function fixDocRegistryStale(cwd) {
   return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };
 }
 
+// tsk-28x code review finding: this used to treat "no file on disk at the
+// alias path" as broken -- but D-tsk28x-9 defines an alias as a doc's OLD
+// path, kept purely as a historical lookup key (never a live location);
+// after a real migration (`fgos doc move-path`), the file legitimately no
+// longer exists there, which is the correct, expected post-migration
+// state, not a defect. That made this check fail every doc a migration
+// had already moved. The real "broken" shape (per resolveDocPath, this
+// same file's own resolver) is an alias that resolves AMBIGUOUSLY: two or
+// more non-retired docs claiming the identical alias string, or an alias
+// that collides with a DIFFERENT doc's own currentPath.
 function checkDocAliasBroken(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
   const fgosDir = path.join(root, '.fgos');
   if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };
   const view = rebuild(fgosDir);
-  const broken = [];
-  for (const doc of Object.values(view.docs || {})) {
+  const docs = Object.values(view.docs || {}).filter((d) => d.docLifecycle !== 'retired');
+  const aliasOwners = new Map();
+  for (const doc of docs) {
     for (const alias of doc.aliases || []) {
-      if (!fs.existsSync(path.join(root, alias))) {
-        broken.push(`${doc.docId}: ${alias}`);
-      }
+      if (!aliasOwners.has(alias)) aliasOwners.set(alias, []);
+      aliasOwners.get(alias).push(doc.docId);
+    }
+  }
+  const currentPaths = new Map(docs.map((d) => [d.currentPath, d.docId]));
+  const broken = [];
+  for (const [alias, owners] of aliasOwners) {
+    if (owners.length > 1) {
+      broken.push(`${alias}: claimed by ${owners.length} docs (${owners.join(', ')})`);
+    } else if (currentPaths.has(alias) && currentPaths.get(alias) !== owners[0]) {
+      broken.push(`${alias}: alias of ${owners[0]} but also the currentPath of ${currentPaths.get(alias)}`);
     }
   }
   if (broken.length === 0) return { passed: true, message: 'no broken doc aliases' };
-  return { passed: false, message: `found ${broken.length} broken doc aliases: ${broken.join(', ')}` };
+  return { passed: false, message: `found ${broken.length} broken doc aliases: ${broken.join('; ')}` };
 }
 
 function checkDocActiveDuplicate(cwd) {
@@ -2555,13 +2575,34 @@ function checkDocActiveDuplicate(cwd) {
   return { passed: false, message: `active duplicate docs found for: ${dupes.map(([k]) => k).join(', ')}` };
 }
 
+// tsk-28x code review finding: this used to pass `docsDir` (a bare string
+// path) straight to findDuplicateAuthoritativeClaims, which expects an
+// ARRAY of `{path, authoritativeFor}` candidates -- iterating a string
+// yields its individual characters, none of which ever carry an
+// `authoritativeFor` property, so the check always reported zero groups
+// regardless of real duplicates. Also scoped to `docs/how-to` only, a
+// layout assumption the knowledge-registry migration retires (docs move to
+// a flat `docs/<purposeSlug>/<role>.md` layout, no quadrant subfolders).
+// Fixed: walk the whole `docs/` tree, read each file's real frontmatter,
+// and build the candidate array the function actually expects.
 function checkDocNearDuplicate(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
-  const docsDir = path.join(root, 'docs/how-to');
+  const docsDir = path.join(root, 'docs');
   if (!fs.existsSync(docsDir)) return { passed: true, message: 'skipped' };
-  const groups = findDuplicateAuthoritativeClaims(docsDir);
+  const candidates = [];
+  for (const relPath of fs.readdirSync(docsDir, { recursive: true })) {
+    if (!relPath.endsWith('.md')) continue;
+    const absPath = path.join(docsDir, relPath);
+    if (!fs.statSync(absPath).isFile()) continue;
+    const { meta } = parseFrontmatter(fs.readFileSync(absPath, 'utf8'));
+    const authoritativeFor = Array.isArray(meta.authoritative_for) ? meta.authoritative_for[0] : meta.authoritative_for;
+    if (typeof authoritativeFor === 'string' && authoritativeFor.trim()) {
+      candidates.push({ path: path.join('docs', relPath), authoritativeFor });
+    }
+  }
+  const groups = findDuplicateAuthoritativeClaims(candidates);
   if (groups.length === 0) return { passed: true, message: 'no near-duplicate authoritative claims' };
-  return { passed: false, message: `found ${groups.length} near-duplicate claim groups` };
+  return { passed: false, message: `found ${groups.length} near-duplicate claim groups: ${groups.map((g) => g.map((c) => c.path).join(' ~ ')).join('; ')}` };
 }
 
 function checkDocProvisionalAged(cwd) {

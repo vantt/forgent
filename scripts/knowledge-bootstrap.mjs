@@ -47,16 +47,17 @@ export function bootstrapRegistry(dir, inventoryDataPath) {
     }
   }
 
-  // Disambiguate duplicate pairs if any exist
-  for (const row of inventory) {
-    const key = `${row.topicId}:${row.role}`;
-    const paths = seenPairs.get(key);
-    if (paths && paths.length > 1) {
-      const index = paths.indexOf(row.oldPath);
-      if (index > 0) {
-        row.role = `${row.role}-${index + 1}`;
-      }
-    }
+  // A duplicate (topicId, role) pair from the classifier is a real anti-sprawl
+  // violation, never something bootstrap should paper over by inventing a new
+  // role suffix -- D-tsk28x-14's own invariant #2 requires an explicit
+  // `topic.split` with real lineage for two docs to legitimately share a
+  // role, and bootstrap has no authority to make that product decision on
+  // its own. Fail loudly and name every colliding pair so the classifier's
+  // own output (or the underlying legacy docs) can be fixed for real.
+  const duplicatePairs = [...seenPairs.entries()].filter(([, paths]) => paths.length > 1);
+  if (duplicatePairs.length > 0) {
+    const detail = duplicatePairs.map(([key, paths]) => `${key} <- ${paths.join(', ')}`).join('; ');
+    throw new Error(`Bootstrap refused: ${duplicatePairs.length} duplicate (topicId, role) pair(s) in the classifier inventory -- these need an explicit topic.split with lineage, not an invented role suffix: ${detail}`);
   }
 
   initStore(dir);
