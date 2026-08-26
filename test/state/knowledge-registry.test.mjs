@@ -331,3 +331,32 @@ test('resolveDocId finds a doc by (topicId, role) after topic.split moved its to
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('framework/mode/role vocabulary - unknown framework, unknown mode, and role-vs-mode collisions are refused', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'vocab-test' });
+
+    assert.throws(() => {
+      reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/a.md', framework: 'not-a-real-framework' });
+    }, /Invalid framework/);
+
+    assert.throws(() => {
+      reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/b.md', mode: 'not-a-real-mode' });
+    }, /Invalid mode/);
+
+    // Rule 1 (docs/architect/knowledge-registry-redesign.md §7.2): a role
+    // name must not equal a framework mode name.
+    assert.throws(() => {
+      reserveDocStore(tmpDir, { topicId: 't1', role: 'reference', currentPath: 'docs/t1/c.md' });
+    }, /must not equal a Diataxis mode name/);
+
+    // A real role, real mode, real framework -- must still succeed.
+    reserveDocStore(tmpDir, { topicId: 't1', role: 'pitfall', currentPath: 'docs/t1/d.md', mode: 'explanation' });
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs['t1:pitfall'].mode, 'explanation');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

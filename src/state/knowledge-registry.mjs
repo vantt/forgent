@@ -17,6 +17,44 @@ export const VALID_DOC_LIFECYCLE = Object.freeze([
   'retired',
 ]);
 
+// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'
+// is a registered framework today, and its 4 modes are a closed set --
+// growing either list is a real product decision (a new writing framework,
+// or a new Diataxis mode), never a typo a reducer should silently accept.
+export const VALID_FRAMEWORKS = Object.freeze(['diataxis']);
+export const DIATAXIS_MODES = Object.freeze(['tutorial', 'how-to', 'reference', 'explanation']);
+
+/**
+ * Enforces the narrow, mechanical slice of the closed role/framework/mode
+ * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1
+ * already states unconditionally: framework must be a registered one, mode
+ * must be one of that framework's own modes, and role must never equal a
+ * mode name ("a role name must not equal any framework mode name"). This
+ * does NOT enforce a closed set of *role* values -- that needs a registered
+ * per-role vocabulary (meaning/defaultFramework/defaultMode/lifecyclePolicy
+ * per §7.2) seeded from a real reclassification of the corpus, a product
+ * decision beyond this mechanical guard's scope.
+ */
+function assertFrameworkModeRoleValid({ framework, mode, role }) {
+  if (!VALID_FRAMEWORKS.includes(framework)) {
+    throw new KnowledgeValidationError(
+      `Invalid framework: '${framework}' — registered frameworks are: ${VALID_FRAMEWORKS.join(', ')}.`
+    );
+  }
+  if (framework === 'diataxis') {
+    if (!DIATAXIS_MODES.includes(mode)) {
+      throw new KnowledgeValidationError(
+        `Invalid mode: '${mode}' for framework 'diataxis' — valid modes are: ${DIATAXIS_MODES.join(', ')}.`
+      );
+    }
+    if (DIATAXIS_MODES.includes(role)) {
+      throw new KnowledgeValidationError(
+        `Invalid role: '${role}' — a role name must not equal a Diataxis mode name (${DIATAXIS_MODES.join(', ')}).`
+      );
+    }
+  }
+}
+
 /**
  * Return all active docs matching (topicId, role) in view.
  */
@@ -293,6 +331,9 @@ export function applyKnowledgeEvent(view, event) {
         throw new KnowledgeValidationError(`doc.reserve: topicId "${topicId}" is not registered — run "fgos topic register" first`);
       }
       assertTopicWritable(view, topicId, 'doc.reserve');
+      const resolvedFramework = framework ?? 'diataxis';
+      const resolvedMode = mode ?? 'explanation';
+      assertFrameworkModeRoleValid({ framework: resolvedFramework, mode: resolvedMode, role });
       const id = docId ?? `${topicId}:${role}`;
       if (view.docs[id]) {
         throw new KnowledgeValidationError(
@@ -305,8 +346,8 @@ export function applyKnowledgeEvent(view, event) {
         docId: id,
         topicId,
         role,
-        framework: framework ?? 'diataxis',
-        mode: mode ?? 'explanation',
+        framework: resolvedFramework,
+        mode: resolvedMode,
         docLifecycle: 'reserved',
         currentPath,
         aliases: [],
@@ -331,6 +372,10 @@ export function applyKnowledgeEvent(view, event) {
         throw new KnowledgeValidationError(`Invalid docLifecycle: '${lifecycle}'`);
       }
       const id = docId ?? `${topicId}:${role}`;
+      const existing = view.docs[id];
+      const resolvedFramework = framework ?? existing?.framework ?? 'diataxis';
+      const resolvedMode = mode ?? existing?.mode ?? 'explanation';
+      assertFrameworkModeRoleValid({ framework: resolvedFramework, mode: resolvedMode, role });
       if (lifecycle === 'active') {
         const activeDocs = getActiveDocs(view, topicId, role);
         if (activeDocs.length > 0 && activeDocs[0].docId !== id) {
@@ -341,13 +386,12 @@ export function applyKnowledgeEvent(view, event) {
       }
       assertDocSlotAvailable(view, id, topicId, role);
       assertCurrentPathUnique(view, id, currentPath);
-      const existing = view.docs[id];
       view.docs[id] = {
         docId: id,
         topicId,
         role,
-        framework: framework ?? existing?.framework ?? 'diataxis',
-        mode: mode ?? existing?.mode ?? 'explanation',
+        framework: resolvedFramework,
+        mode: resolvedMode,
         docLifecycle: lifecycle,
         currentPath,
         aliases: Array.isArray(aliases) ? [...aliases] : (existing?.aliases ?? []),
