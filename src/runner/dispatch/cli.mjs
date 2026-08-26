@@ -684,14 +684,11 @@ export async function fanoutBatchExecutorCli(
         return { kind: 'unavailable', entry: { id: candidateId, reason: 'not-found' } };
       }
 
-      const executorId = executorIdForWork(workItem);
-      const hasExplicitExecutor = resolveExecutorAndOverrides(cfg, executorId).configured;
-      let mechanism;
-      if (!hasExplicitExecutor) {
-        mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
-      } else {
-        mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
-      }
+      const { mechanism, executorId } = compileDispatchPlan(cfg, {
+        work: candidateId,
+        workItem,
+        hasLiveTaskAccess,
+      });
 
       if (mechanism === 'in-process') {
         return { kind: 'mechanismChanged', entry: { id: candidateId, mechanism, executorId } };
