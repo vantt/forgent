@@ -241,9 +241,27 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
       execFileSync('git', ['mv', move.oldPath, move.newPath], { cwd: repoRoot, stdio: 'ignore' });
     } catch {
       fs.renameSync(srcAbs, destAbs);
+      // Never swallow this: if `git add` fails (a locked index, a
+      // permission error, a corrupted index), the file has already been
+      // physically renamed on disk but git's index does not know it --
+      // `git status` would show a deletion at oldPath and an untracked
+      // file at newPath. Swallowing this and proceeding to record
+      // moveDocPathStore/demoteDocStore anyway is exactly the "registry
+      // says moved, git never actually tracked it" gap this whole item
+      // exists to close: a later commit could omit the migrated file
+      // entirely while the registry insists it moved. Throwing here
+      // instead means NO registry event gets recorded for this move
+      // (moveDocPathStore is the very next call, never reached) -- the
+      // registry stays honestly "not yet moved" even though the file
+      // itself is stuck at newPath until a person resolves the underlying
+      // git problem and reruns.
       try {
         execFileSync('git', ['add', move.newPath, move.oldPath], { cwd: repoRoot, stdio: 'ignore' });
-      } catch {}
+      } catch (err) {
+        throw new Error(
+          `knowledge-migration: '${move.oldPath}' was renamed to '${move.newPath}' on disk, but "git add" failed to stage it (${err.message}) -- the git index does not reflect this move. Resolve the underlying git problem (e.g. a locked index) and rerun; the registry was NOT updated for this move.`
+        );
+      }
     }
 
     // Record moveDocPathStore event

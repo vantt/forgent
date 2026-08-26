@@ -574,3 +574,39 @@ test('knowledge-migration - a frontmatter-write failure leaves the source file a
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledge-migration - a locked git index (both "git mv" and the fallback "git add" fail) throws instead of reporting silent success', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/how-to/reclaim.md', docLifecycle: 'active' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Reclaim\n', 'utf8');
+    execSync('git add docs/how-to/reclaim.md && git commit -m "add reclaim"', { cwd: tmpDir, stdio: 'ignore' });
+
+    // A stale/held index.lock makes BOTH "git mv" (the primary attempt)
+    // and the fallback "git add" fail -- the exact repro shape (the
+    // fallback path used to swallow this and report success anyway).
+    const lockFile = path.join(tmpDir, '.git', 'index.lock');
+    fs.writeFileSync(lockFile, '', 'utf8');
+    try {
+      assert.throws(() => {
+        runKnowledgeMigration(tmpDir, { dryRun: false });
+      }, /git add.*failed to stage it/);
+
+      const view = rebuild(fgosDir);
+      assert.equal(view.docs['t1:guide'].currentPath, 'docs/how-to/reclaim.md', 'the registry must NOT claim the move happened when git never tracked it');
+    } finally {
+      fs.rmSync(lockFile, { force: true });
+    }
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
