@@ -24,3 +24,31 @@ test('allows the reset outright when the tree is already clean', () => {
     assertSafeMainCheckoutReset({ dirty: false, confirmed: false });
   });
 });
+
+test('refuses a destructive main-checkout reset when reset would discard committed commits and unconfirmed', () => {
+  assert.throws(
+    () => {
+      assertSafeMainCheckoutReset({ dirty: false, confirmed: false, lostCommitCount: 2, sha: '16e9cff4' });
+    },
+    (err) => {
+      return err.message.includes('would discard 2 committed commit(s)');
+    }
+  );
+});
+
+test('refuses reset when tree is dirty AND would discard committed commits and unconfirmed', () => {
+  assert.throws(
+    () => {
+      assertSafeMainCheckoutReset({ dirty: true, confirmed: false, lostCommitCount: 1, sha: '16e9cff4' });
+    },
+    (err) => {
+      return err.message.includes('uncommitted changes') && err.message.includes('would discard 1 committed commit(s)');
+    }
+  );
+});
+
+test('allows resetting behind committed commits once confirmed', () => {
+  assert.doesNotThrow(() => {
+    assertSafeMainCheckoutReset({ dirty: false, confirmed: true, lostCommitCount: 2, sha: '16e9cff4' });
+  });
+});
