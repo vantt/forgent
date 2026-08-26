@@ -104,6 +104,29 @@ first fix's own live test result rather than trusting a single green run:
    same "real timing flake, not a regression" class this repo already
    accepts, per tsk-10j's own iron-law-evidence.md precedent).
 
+3. **`done` gated on `sawWorking` with no evidence, found by an
+   independent advisor review (RESEARCH.md Round 4).** Confirmed real by
+   a failing-test-first check: swapped `transport.mjs` back to the
+   pre-Round-4 commit (`e8cfa897`), kept the new Round 4 test file, and
+   ran the new "done never passing through working" mock test against
+   it — it failed for real:
+
+   ```
+   ✖ herdr-spawn adapter interactiveMode: a "done" completion never
+     passing through "working" still completes, not gated on sawWorking
+     (review finding, tsk-2rr) (5069.553079ms)
+     Error [DispatchError]: executor timed out after 5000ms for work
+     "done-no-working-item".
+   ```
+
+   Restored the fix (`git checkout HEAD -- <path>`, re-applied — see
+   commit `945e7fc4`), confirmed both new tests pass, full suite 32/32.
+   A second independent finding in the same review (the existing
+   debounce test only proved *a* debounce existed, not the specific
+   3-poll requirement) was closed with a new deterministic test proven
+   to discriminate a 2-poll gate from a 3-poll gate by construction
+   (RESEARCH.md Round 4 has the full reasoning).
+
 ## Accepted scope decision (not a defect)
 
 The 3-consecutive-poll debounce adds up to ~1000ms of extra latency
