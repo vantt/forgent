@@ -550,6 +550,9 @@ function validateInvocationShape(invocation, label, capabilityNames) {
       throw new RunnerConfigError(`runner config (${label}) "url" must be a non-empty string when "via" is "api".`);
     }
   }
+  if (invocation.interactiveMode !== undefined) {
+    validateInteractiveModeShape(invocation.interactiveMode, `${label} "interactiveMode"`);
+  }
   if (invocation.liveOutput !== undefined) {
     if (!invocation.liveOutput || typeof invocation.liveOutput !== 'object' || Array.isArray(invocation.liveOutput)) {
       throw new RunnerConfigError(`runner config (${label}) "liveOutput" must be an object when present.`);
@@ -563,6 +566,15 @@ function validateInvocationShape(invocation, label, capabilityNames) {
   }
   // via: 'task' needs neither `command` nor `args` — native in-session
   // Task/Agent dispatch carries no subprocess argv at all.
+}
+
+function validateInteractiveModeShape(interactiveMode, label) {
+  if (!interactiveMode || typeof interactiveMode !== 'object' || Array.isArray(interactiveMode)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object when present.`);
+  }
+  if (typeof interactiveMode.exitCommand !== 'string' || !interactiveMode.exitCommand.trim()) {
+    throw new RunnerConfigError(`runner config (${label}) "exitCommand" must be a non-empty string when present.`);
+  }
 }
 
 /**
@@ -627,6 +639,9 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
   // but when present it must be one of EXECUTOR_CARRIES, never a free
   // string (D15's own "TAP GIA TRI phai khai ro" rule, same enum-not-
   // free-string treatment `for` already gets above).
+  if (executor.interactiveMode !== undefined) {
+    validateInteractiveModeShape(executor.interactiveMode, `${label} "interactiveMode"`);
+  }
   if (executor.carries !== undefined && !EXECUTOR_CARRIES.includes(executor.carries)) {
     throw new RunnerConfigError(`runner config (${label}) "carries" must be one of ${EXECUTOR_CARRIES.join('/')}, got: ${JSON.stringify(executor.carries)}.`);
   }

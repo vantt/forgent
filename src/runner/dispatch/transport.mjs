@@ -164,6 +164,7 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     args,
     env: executor.env,
     liveOutput: executor.liveOutput,
+    interactiveMode: executor.interactiveMode,
     adapter,
     provider: executor.provider ?? executor.command,
     baseCommit: attestation.baseCommit,
@@ -534,7 +535,375 @@ async function httpAdapter(invocation, opts) {
  * Results come back through the existing ladder (stdout captured via `herdr pane read`).
  * Selected purely by `executor.adapter === 'herdr-spawn'`.
  */
+function herdrSpawnInteractiveAdapter(invocation, opts) {
+  const { command, args, env: rawEnv, interactiveMode } = invocation;
+  const { exitCommand } = interactiveMode;
+  const { cwd, timeoutMs, workId, tier, model, herdrBin: optsHerdrBin, onChunk } = opts;
+
+  const depth = currentDispatchDepth();
+  if (depth >= MAX_DISPATCH_DEPTH) {
+    return Promise.reject(new DispatchError(
+      'dispatch-depth-exceeded',
+      `executor for work "${workId}" refused: nested out-of-process dispatch depth ${depth} is already at the cap (${MAX_DISPATCH_DEPTH}) -- a dispatched executor tried to dispatch another executor too many levels deep.`,
+      { workId, tier, model, depth },
+    ));
+  }
+
+  const resolvedEnv = resolveExecutorEnv(rawEnv);
+  const herdrBin = optsHerdrBin ?? process.env.FGOS_HERDR_BIN ?? 'herdr';
+  const fullEnv = { ...process.env, ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) };
+
+  return new Promise((resolve, reject) => {
+    const splitArgs = ['pane', 'split', '--direction', 'right', '--no-focus'];
+    if (cwd) {
+      splitArgs.push('--cwd', cwd);
+    }
+    for (const [key, value] of Object.entries(resolvedEnv)) {
+      splitArgs.push('--env', `${key}=${value}`);
+    }
+
+    let splitOutput;
+    try {
+      splitOutput = execFileSync(herdrBin, splitArgs, {
+        cwd,
+        env: fullEnv,
+        encoding: 'utf8',
+        shell: false,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+    } catch (err) {
+      return reject(new DispatchError(
+        'worker-spawn-fail',
+        `executor failed to start for work "${workId}": herdr pane split failed (exit code ${err.status ?? 'unknown'}).`,
+        { workId, tier, model, cause: 'herdr pane split failed', exitCode: err.status ?? null },
+      ));
+    }
+
+    let paneId;
+    try {
+      const parsed = JSON.parse(splitOutput);
+      paneId = parsed?.result?.pane?.pane_id ?? parsed?.result?.pane_id ?? parsed?.result?.root_pane?.pane_id ?? parsed?.pane_id;
+    } catch {
+      paneId = splitOutput ? splitOutput.trim() : null;
+    }
+
+    if (!paneId) {
+      return reject(new DispatchError(
+        'worker-spawn-fail',
+        `executor failed to start for work "${workId}": could not parse pane_id from herdr pane split output: "${splitOutput}"`,
+        { workId, tier, model, cause: 'invalid pane split output' },
+      ));
+    }
+
+    const posixShellQuote = (value) => `'${String(value).replace(/'/g, `'\\''`)}'`;
+    const effectiveArgs = args || [];
+    const quotedCmd = [command, ...effectiveArgs].map(posixShellQuote).join(' ');
+
+    try {
+      execFileSync(herdrBin, ['pane', 'run', paneId, quotedCmd], {
+        cwd,
+        env: fullEnv,
+        encoding: 'utf8',
+        shell: false,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+    } catch (err) {
+      return reject(new DispatchError(
+        'worker-spawn-fail',
+        `executor failed to start for work "${workId}": herdr pane run failed: ${err.message}`,
+        { workId, tier, model, cause: err.message },
+      ));
+    }
+
+    let settled = false;
+    let pollInterval = null;
+    let timeoutTimer = null;
+    let waitChild = null;
+
+    const cleanupTimers = () => {
+      if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+      if (timeoutTimer) { clearTimeout(timeoutTimer); timeoutTimer = null; }
+    };
+
+    const closePaneBestEffort = () => {
+      try {
+        execFileSync(herdrBin, ['pane', 'close', paneId], {
+          cwd,
+          env: fullEnv,
+          encoding: 'utf8',
+          shell: false,
+          stdio: ['ignore', 'pipe', 'pipe'],
+          timeout: 5000,
+        });
+      } catch {}
+    };
+
+    if (timeoutMs) {
+      timeoutTimer = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        cleanupTimers();
+        if (waitChild) {
+          try { killChildTree(waitChild, 'SIGTERM'); } catch {}
+          try { waitChild.stdout.destroy(); } catch {}
+        }
+        closePaneBestEffort();
+        reject(new DispatchError(
+          'worker-timeout',
+          `executor timed out after ${timeoutMs}ms for work "${workId}".`,
+          { workId, tier, model },
+        ));
+      }, timeoutMs);
+    }
+
+    const checkIdle = () => {
+      if (settled) return;
+      let getOutput;
+      try {
+        getOutput = execFileSync(herdrBin, ['pane', 'get', paneId], {
+          cwd,
+          env: fullEnv,
+          encoding: 'utf8',
+          shell: false,
+          stdio: ['ignore', 'pipe', 'pipe'],
+        });
+      } catch {
+        return;
+      }
+
+      let agentStatus;
+      try {
+        const parsed = JSON.parse(getOutput);
+        agentStatus = parsed?.result?.pane?.agent_status ?? parsed?.result?.agent_status ?? parsed?.pane?.agent_status ?? parsed?.agent_status;
+      } catch {}
+
+      // Real live testing found TWO distinct terminal states herdr reports
+      // for a finished agent turn, not just one -- a longer multi-second
+      // response settled at "idle" while a short single-line answer
+      // settled at "done" instead (confirmed live: both are stable,
+      // neither is a transient step toward the other). Treat both as
+      // "the agent has genuinely stopped generating and it is safe to
+      // send the exit command" -- matching only "idle" left short
+      // responses hanging until the JS timeout, confirmed live.
+      if (agentStatus === 'idle' || agentStatus === 'done') {
+        if (pollInterval) {
+          clearInterval(pollInterval);
+          pollInterval = null;
+        }
+        runExitSequence();
+      }
+    };
+
+    pollInterval = setInterval(checkIdle, 500);
+
+    const runExitSequence = () => {
+      if (settled) return;
+
+      try {
+        execFileSync(herdrBin, ['pane', 'run', paneId, exitCommand], {
+          cwd,
+          env: fullEnv,
+          encoding: 'utf8',
+          shell: false,
+          stdio: ['ignore', 'pipe', 'pipe'],
+        });
+      } catch (err) {
+        if (settled) return;
+        settled = true;
+        cleanupTimers();
+        closePaneBestEffort();
+        return reject(new DispatchError(
+          'worker-spawn-fail',
+          `executor failed to observe completion for work "${workId}": herdr pane run exit command failed: ${err.message}`,
+          { workId, tier, model, cause: err.message },
+        ));
+      }
+
+      // RACE CONDITION, confirmed live: typing `exitCommand` and the
+      // sentinel echo back-to-back (no gap) sent the echo text to `agy`
+      // itself, not the shell -- `agy` had not actually torn down yet
+      // (real teardown takes on the order of ~1s: it writes its own
+      // "Resume with -c ..." conversation-resume hint before the process
+      // truly exits), so the echo was swallowed as more chat input and
+      // the sentinel never printed at all. Poll `pane get` until the
+      // pane's own reported foreground `agent` is gone (confirming the
+      // shell, not agy, now owns the pane) before sending the echo --
+      // bounded and best-effort: if it never clears, fall through anyway
+      // and let the existing "no sentinel found" rejection below catch it
+      // honestly rather than hang past this adapter's own real timeout.
+      const exitConfirmDeadline = Date.now() + 10000;
+      while (Date.now() < exitConfirmDeadline) {
+        let stillPresent = true;
+        try {
+          const getOutput = execFileSync(herdrBin, ['pane', 'get', paneId], {
+            cwd,
+            env: fullEnv,
+            encoding: 'utf8',
+            shell: false,
+            stdio: ['ignore', 'pipe', 'pipe'],
+          });
+          const parsed = JSON.parse(getOutput);
+          const agent = parsed?.result?.pane?.agent ?? parsed?.result?.agent ?? parsed?.pane?.agent ?? parsed?.agent;
+          stillPresent = Boolean(agent);
+        } catch {
+          stillPresent = false;
+        }
+        if (!stillPresent) break;
+        // Synchronous sleep (same `Atomics.wait` pattern already used
+        // elsewhere in this codebase, e.g. runtime-coordination.mjs's
+        // `sleepSync`) -- this whole exit sequence is deliberately
+        // synchronous end to end, matching every other `execFileSync`
+        // call around it.
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 250);
+      }
+
+      const sentinel = `__fgos_herdr_exit_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}__`;
+      const echoCmd = `echo "${sentinel}:$?"`;
+      try {
+        execFileSync(herdrBin, ['pane', 'run', paneId, echoCmd], {
+          cwd,
+          env: fullEnv,
+          encoding: 'utf8',
+          shell: false,
+          stdio: ['ignore', 'pipe', 'pipe'],
+        });
+      } catch (err) {
+        if (settled) return;
+        settled = true;
+        cleanupTimers();
+        closePaneBestEffort();
+        return reject(new DispatchError(
+          'worker-spawn-fail',
+          `executor failed to observe completion for work "${workId}": herdr pane run sentinel echo failed: ${err.message}`,
+          { workId, tier, model, cause: err.message },
+        ));
+      }
+
+      const waitArgs = ['pane', 'wait-output', paneId, '--regex', `(?m)^${sentinel}:\\d+`, '--source', 'recent-unwrapped', '--lines', '500'];
+      waitChild = spawn(herdrBin, waitArgs, {
+        cwd,
+        env: fullEnv,
+        shell: false,
+        detached: true,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+
+      let waitStdout = '';
+      waitChild.stdout.setEncoding('utf8');
+      waitChild.stdout.on('data', (chunk) => { waitStdout += chunk; });
+
+      waitChild.on('error', (err) => {
+        if (settled) return;
+        settled = true;
+        cleanupTimers();
+        closePaneBestEffort();
+        reject(new DispatchError(
+          'worker-spawn-fail',
+          `executor failed to observe completion for work "${workId}": ${err.message}`,
+          { workId, tier, model, cause: err.message },
+        ));
+      });
+
+      waitChild.on('close', (code, signal) => {
+        if (settled) return;
+
+        if (code !== 0) {
+          settled = true;
+          cleanupTimers();
+          closePaneBestEffort();
+          reject(new DispatchError(
+            'worker-spawn-fail',
+            `executor failed to observe completion for work "${workId}": herdr pane wait-output exited with code ${code}${signal ? ` (signal ${signal})` : ''}.`,
+            { workId, tier, model, cause: 'herdr pane wait-output observer failure', exitCode: code },
+          ));
+          return;
+        }
+
+        let rawStdout;
+        try {
+          const parsed = JSON.parse(waitStdout);
+          rawStdout = typeof parsed?.result?.read?.text === 'string' ? parsed.result.read.text : undefined;
+        } catch {
+          rawStdout = undefined;
+        }
+
+        if (rawStdout === undefined) {
+          settled = true;
+          cleanupTimers();
+          closePaneBestEffort();
+          reject(new DispatchError(
+            'worker-spawn-fail',
+            `executor for work "${workId}" could not confirm completion: herdr pane wait-output reported success but its response carried no readable scrollback.`,
+            { workId, tier, model, cause: 'herdr pane wait-output response missing result.read.text' },
+          ));
+          return;
+        }
+
+        // BEST-EFFORT stdout, accepted scope decision (tsk-10j, confirmed
+        // live): agy's own full-screen redraw on `/exit` means herdr's
+        // "recent-unwrapped" scrollback capture does not reliably retain
+        // the conversation content from BEFORE that screen clear -- a
+        // real, structural difference from the headless (`-p`) path's
+        // plain, never-cleared transcript, not a bug in the stripping
+        // logic below. The two guarantees this path actually keeps are
+        // the real exit code (from the sentinel, unaffected by this) and
+        // the pane auto-closing -- full response text landing in the
+        // returned `stdout` is opportunistic, not promised, for
+        // `interactiveMode` dispatches specifically.
+        const sentinelPattern = new RegExp(`${sentinel}:(?:\\$\\?|\\d+)`);
+        const sentinelIdx = rawStdout.search(sentinelPattern);
+        const searchRegion = sentinelIdx === -1 ? rawStdout : rawStdout.slice(0, sentinelIdx);
+
+        // Strip initial typed command echo
+        const initialEchoIdx = searchRegion.lastIndexOf(quotedCmd);
+        const stdoutAfterInitial = initialEchoIdx === -1 ? searchRegion : searchRegion.slice(initialEchoIdx + quotedCmd.length);
+
+        // Strip exit command echo (from the first occurrence after initial echo)
+        const exitEchoIdx = stdoutAfterInitial.indexOf(exitCommand);
+        let stdout = exitEchoIdx === -1 ? stdoutAfterInitial : stdoutAfterInitial.slice(0, exitEchoIdx);
+        stdout = stdout.replace(/^\r?\n+/, '').replace(/\r?\n+$/, '');
+
+        const sentinelMatch = rawStdout.match(new RegExp(`${sentinel}:(\\d+)`));
+        if (!sentinelMatch) {
+          settled = true;
+          cleanupTimers();
+          closePaneBestEffort();
+          reject(new DispatchError(
+            'worker-spawn-fail',
+            `executor for work "${workId}" could not confirm completion: no sentinel found in the captured output.`,
+            { workId, tier, model, cause: 'sentinel not found in post-echo stdout' },
+          ));
+          return;
+        }
+        const realStatus = Number(sentinelMatch[1]);
+
+        settled = true;
+        cleanupTimers();
+
+        if (onChunk && stdout) {
+          teeChunk(onChunk, 'stdout', stdout);
+        }
+
+        closePaneBestEffort();
+
+        resolve({
+          status: realStatus,
+          signal,
+          stdout,
+          stderr: '',
+          tier,
+          model,
+          paneId,
+        });
+      });
+    };
+  });
+}
+
 function herdrSpawnAdapter(invocation, opts) {
+  if (invocation.interactiveMode) {
+    return herdrSpawnInteractiveAdapter(invocation, opts);
+  }
   const { command, args, env: rawEnv } = invocation;
   const { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId, tier, model, herdrBin: optsHerdrBin } = opts;
 
