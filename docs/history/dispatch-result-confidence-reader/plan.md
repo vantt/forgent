@@ -13,7 +13,11 @@ item's own submitted acceptance criteria, cited inline.
 dispatch-report [id]`, registered in `src/cli/command-registry.mjs`
 following the exact metadata shape `graph`/`triage` already use there
 (`name`/`invoke`/`description`/`parameters`/`examples`/`touchesState:
-false`/`requiresExistingStore: true`/`externalEffect: false`). Its handler
+false`/`requiresExistingStore: false`/`externalEffect: false` — corrected
+round 2: `graph`/`triage` both actually set `requiresExistingStore:
+false`, direct read `command-registry.mjs:1064` — consistent with this
+reader's own `missing`-by-default degradation, so a missing/empty store
+should read as empty rather than refuse). Its handler
 (new module, `src/report/dispatch-confidence.mjs`) classifies each real
 dispatch it finds as one of `reported | legacy-signal | inferred |
 missing`:
