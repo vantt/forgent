@@ -4894,6 +4894,38 @@ test('fanoutBatchExecutorCli: real end-to-end out-of-process fire -- pick/execut
   assert.equal(view.work.cand1.status, 'awaiting-approval');
 });
 
+test('fanoutBatchExecutorCli returns candidate as unavailable when executor is governance-blocked', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeCommittingExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  addWork(fgosDir, {
+    id: 'cand1',
+    title: 'Candidate 1',
+    kind: 'task',
+    status: 'todo',
+    domain: 'coding',
+    stage: 'executing',
+    deps: [],
+    refs: [],
+    risk: 'light',
+    verify: 'true',
+  });
+
+  const result = await fanoutBatchExecutorCli(['cand1'], { repoRoot, hasLiveTaskAccess: false });
+
+  assert.equal(result.fired.length, 0);
+  assert.equal(result.mechanismChanged.length, 0);
+  assert.equal(result.unavailable.length, 1);
+  assert.equal(result.unavailable[0].id, 'cand1');
+  assert.equal(result.unavailable[0].executorId, 'fgos-coding-implement');
+});
+
 test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlapping execution windows', async () => {
   const { repoRoot, fgosDir } = mkTempGitRepo();
   const dir = mkTempDir();
