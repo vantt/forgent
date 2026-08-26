@@ -126,6 +126,12 @@ test('main-checkout-reset from a linked worktree with no --dir refuses before to
 });
 
 
+// tsk-1ck: targetSha sits 1 committed commit behind HEAD here (third.txt),
+// so the ancestor/commit-loss check this item added now refuses without
+// --confirm -- this test's own point is --dir routing (does the reset land
+// on the real main checkout, not the worktree), not commit-loss consent, so
+// it opts in with --confirm exactly like a real caller who saw the printed
+// commit list would.
 test('main-checkout-reset from a linked worktree WITH --dir <mainRoot> targets the real main checkout, exactly as if run from there directly', () => {
   const { main, wt } = tmpLinkedWorktree();
   commitFile(main, 'second.txt');
@@ -133,12 +139,16 @@ test('main-checkout-reset from a linked worktree WITH --dir <mainRoot> targets t
   commitFile(main, 'third.txt');
   assert.notEqual(gitHead(main), targetSha);
 
-  const result = run(wt, ['main-checkout-reset', '--sha', targetSha, '--dir', main]);
+  const result = run(wt, ['main-checkout-reset', '--sha', targetSha, '--dir', main, '--confirm']);
   assert.equal(result.status, 0, `main-checkout-reset --dir unexpectedly failed: ${result.stderr}`);
   assert.equal(gitHead(main), targetSha, 'the real main checkout must land on the requested sha');
 });
 
 
+// tsk-1ck: same shape as above -- targetSha is 1 committed commit behind
+// HEAD, so this now needs --confirm too. This test's own point is that the
+// main-checkout-cwd path (no --dir) still resolves and runs at all, not
+// commit-loss consent.
 test('main-checkout-reset from the main checkout itself, no --dir, still works exactly as before (no regression on the common case)', () => {
   const cwd = initGitCwd();
   commitFile(cwd, 'second.txt');
@@ -146,7 +156,7 @@ test('main-checkout-reset from the main checkout itself, no --dir, still works e
   commitFile(cwd, 'third.txt');
   assert.notEqual(gitHead(cwd), targetSha);
 
-  const result = run(cwd, ['main-checkout-reset', '--sha', targetSha]);
+  const result = run(cwd, ['main-checkout-reset', '--sha', targetSha, '--confirm']);
   assert.equal(result.status, 0, `main-checkout-reset from the main checkout unexpectedly failed: ${result.stderr}`);
   assert.equal(gitHead(cwd), targetSha);
 });
