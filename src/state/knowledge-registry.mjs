@@ -41,6 +41,26 @@ export function assertActiveDocCardinality(view, topicId, role) {
 }
 
 /**
+ * Refuses `currentPath` when a DIFFERENT non-retired doc already claims it
+ * as its own currentPath -- resolveDocPath's "direct match on currentPath"
+ * step (src/report/knowledge-resolver.mjs) can only ever return one doc for
+ * a given path; two docs silently sharing one currentPath means a caller
+ * (knowledge attest, the legacy compound gate) resolves an ambiguous
+ * `[doc, otherDoc]` array and picks `[0]` without knowing it -- exactly the
+ * "capture attaches to the wrong doc" shape a fail-closed check must catch
+ * at write time instead.
+ */
+function assertCurrentPathUnique(view, id, currentPath) {
+  for (const doc of Object.values(view.docs)) {
+    if (doc.docId !== id && doc.currentPath === currentPath && doc.docLifecycle !== 'retired') {
+      throw new KnowledgeValidationError(
+        `currentPath "${currentPath}" is already claimed by doc '${doc.docId}' — currentPath must be unique among non-retired docs.`
+      );
+    }
+  }
+}
+
+/**
  * Apply a single knowledge event (topic.* or doc.*) onto view.
  * view = { topics: {...}, docs: {...}, ... }
  */
@@ -181,6 +201,7 @@ export function applyKnowledgeEvent(view, event) {
         throw new KnowledgeValidationError(`doc.reserve: topicId "${topicId}" is not registered — run "fgos topic register" first`);
       }
       const id = docId ?? `${topicId}:${role}`;
+      assertCurrentPathUnique(view, id, currentPath);
       view.docs[id] = {
         docId: id,
         topicId,
@@ -218,6 +239,7 @@ export function applyKnowledgeEvent(view, event) {
           );
         }
       }
+      assertCurrentPathUnique(view, id, currentPath);
       const existing = view.docs[id];
       view.docs[id] = {
         docId: id,
@@ -338,6 +360,7 @@ export function applyKnowledgeEvent(view, event) {
       if (!newPath) {
         throw new KnowledgeValidationError('doc.path-move requires newPath');
       }
+      assertCurrentPathUnique(view, id, newPath);
       if (doc.currentPath && doc.currentPath !== newPath && !doc.aliases.includes(doc.currentPath)) {
         doc.aliases.push(doc.currentPath);
       }

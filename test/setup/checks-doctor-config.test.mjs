@@ -31,7 +31,7 @@ import {
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
-import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, DEFAULT_DOC_REGISTRY_SETTINGS } from '../../src/setup/registrations.mjs';
 
 // tsk-in1-1 D1: a tool provider is declared directly in
 // `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
@@ -215,6 +215,7 @@ test('config-not-stale passes when the existing config already has every default
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
+      docRegistry: DEFAULT_DOC_REGISTRY_SETTINGS,
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);

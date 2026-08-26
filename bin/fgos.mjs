@@ -1708,9 +1708,10 @@ async function runVerb(verb, flags, positional, dir) {
           targetDoc = view.docs?.[docId] ?? null;
         } else if (docPath) {
           const resolved = resolveDocPath(view, docPath);
-          if (resolved) {
-            targetDoc = Array.isArray(resolved) ? resolved[0] : resolved;
+          if (Array.isArray(resolved)) {
+            throw new StoreError('validation', `doc promote: --doc-path "${docPath}" resolves ambiguously to ${resolved.length} docs (${resolved.map((d) => d.docId).join(', ')}) — use --topic-id/--role to name the exact doc instead.`);
           }
+          targetDoc = resolved ?? null;
         }
 
         if (!targetDoc) {
@@ -1829,7 +1830,10 @@ async function runVerb(verb, flags, positional, dir) {
           throw new StoreError('validation', `knowledge attest: path '${docPath}' is not committed at git HEAD. Remedy: commit file '${docPath}' to git HEAD first.`);
         }
 
-        const match = Array.isArray(resolved) ? resolved[0] : resolved;
+        if (Array.isArray(resolved)) {
+          throw new StoreError('validation', `knowledge attest: path '${docPath}' resolves ambiguously to ${resolved.length} docs (${resolved.map((d) => d.docId).join(', ')}) — fail-closed rather than guess which one to attest.`);
+        }
+        const match = resolved;
         if (!match) {
           throw new StoreError('validation', `knowledge attest: path '${docPath}' is not registered in knowledge registry. Remedy: run 'fgos doc reserve' or 'fgos doc register' first.`);
         }
@@ -1919,7 +1923,10 @@ async function runVerb(verb, flags, positional, dir) {
         if (sharedConfig?.docRegistry?.enforce === true) {
           const registryView = rebuild(dir);
           const resolved = resolveDocPath(registryView, docPath);
-          const match = Array.isArray(resolved) ? resolved[0] : resolved;
+          if (Array.isArray(resolved)) {
+            throw new StoreError('validation', `compound: --doc-path "${docPath}" resolves ambiguously to ${resolved.length} docs (${resolved.map((d) => d.docId).join(', ')}) (docRegistry.enforce is on) — fail-closed rather than guess which one to tag.`);
+          }
+          const match = resolved;
           if (!match) {
             throw new StoreError('validation', `compound: --doc-path "${docPath}" is not registered in the knowledge registry (docRegistry.enforce is on) — run "fgos doc reserve"/"fgos doc register" first, or use "fgos knowledge attest" instead of this deprecated verb.`);
           }

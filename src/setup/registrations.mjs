@@ -2448,7 +2448,7 @@ registerFix({
   fix: (cwd) => fixDecisionIndexStale(cwd),
 });
 
-const DEFAULT_DOC_REGISTRY_SETTINGS = Object.freeze({
+export const DEFAULT_DOC_REGISTRY_SETTINGS = Object.freeze({
   enforce: false,
 });
 

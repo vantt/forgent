@@ -272,5 +272,11 @@
   },
   "herdrWebDashboard": {
     "staticServing": true
+  },
+  "checkpoint": {
+    "fallbackIntervalSec": 3600
+  },
+  "docRegistry": {
+    "enforce": false
   }
 }
