@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `herdr-spawn` executor adapter now requires `interactiveMode` on every invocation (non-interactive dispatch paths and live-renderers removed per tsk-by0).
 - Extended `fgos main-checkout-reset` safety guard (`assertSafeMainCheckoutReset`, `src/runner/main-checkout-reset-guard.mjs`) to detect when `--sha` is behind current `HEAD` by committed commits and refuse unconfirmed resets, formatting the list of commits about to be discarded (author, message, files touched).
 - Moved 5 diagnostic/telemetry logs (`approve-post-success-faults.jsonl`, `main-checkout-guard-warnings.jsonl`, `changelog-nag-history.jsonl`, `entropy-history.jsonl`, `invocation-faults.jsonl`) from `.fgos/` root into the already-gitignored `.fgos/logs/` bucket — none of these is the event log, so they never needed to be git-tracked; they were only kept dirty/committed by omission. Removed their now-dead `.gitattributes` `merge=union` entries.
 - Moved `tool-status.local.json` and `events-jsonl.truncation-guard.json` (both already gitignored) into `.fgos/runtime/`, matching the same per-machine/local-only bucket convention as `.fgos/logs/`.
