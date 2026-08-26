@@ -241,25 +241,28 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
       execFileSync('git', ['mv', move.oldPath, move.newPath], { cwd: repoRoot, stdio: 'ignore' });
     } catch {
       fs.renameSync(srcAbs, destAbs);
-      // Never swallow this: if `git add` fails (a locked index, a
-      // permission error, a corrupted index), the file has already been
-      // physically renamed on disk but git's index does not know it --
-      // `git status` would show a deletion at oldPath and an untracked
-      // file at newPath. Swallowing this and proceeding to record
-      // moveDocPathStore/demoteDocStore anyway is exactly the "registry
-      // says moved, git never actually tracked it" gap this whole item
-      // exists to close: a later commit could omit the migrated file
-      // entirely while the registry insists it moved. Throwing here
-      // instead means NO registry event gets recorded for this move
-      // (moveDocPathStore is the very next call, never reached) -- the
-      // registry stays honestly "not yet moved" even though the file
-      // itself is stuck at newPath until a person resolves the underlying
-      // git problem and reruns.
       try {
         execFileSync('git', ['add', move.newPath, move.oldPath], { cwd: repoRoot, stdio: 'ignore' });
       } catch (err) {
+        // Never swallow this, and never leave the filesystem stuck either.
+        // If `git add` fails (a locked index, a permission error, a
+        // corrupted index), the file has already been physically renamed
+        // on disk but git's index does not know it -- `git status` would
+        // show a deletion at oldPath and an untracked file at newPath.
+        // Just throwing here (the previous fix) stops the registry from
+        // recording a move git never actually tracked, but leaves oldPath
+        // missing and newPath occupied on disk -- a rerun would then see
+        // "missing source file" AND "target already exists," a state that
+        // no longer self-heals by rerunning migration alone. Rolling the
+        // rename back here restores the exact pre-attempt filesystem
+        // state (this fs.renameSync is a plain filesystem op, independent
+        // of whatever git problem caused the failure above), so the
+        // thrown error is the ONLY residue -- resolving the underlying
+        // git problem and rerunning is sufficient, no manual filesystem
+        // surgery required.
+        fs.renameSync(destAbs, srcAbs);
         throw new Error(
-          `knowledge-migration: '${move.oldPath}' was renamed to '${move.newPath}' on disk, but "git add" failed to stage it (${err.message}) -- the git index does not reflect this move. Resolve the underlying git problem (e.g. a locked index) and rerun; the registry was NOT updated for this move.`
+          `knowledge-migration: attempted to rename '${move.oldPath}' to '${move.newPath}', but "git add" failed to stage it (${err.message}) -- rolled the rename back, '${move.oldPath}' is unchanged on disk. Resolve the underlying git problem (e.g. a locked index) and rerun; the registry was NOT updated for this move.`
         );
       }
     }

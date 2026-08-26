@@ -603,9 +603,21 @@ test('knowledge-migration - a locked git index (both "git mv" and the fallback "
 
       const view = rebuild(fgosDir);
       assert.equal(view.docs['t1:guide'].currentPath, 'docs/how-to/reclaim.md', 'the registry must NOT claim the move happened when git never tracked it');
+      assert.equal(fs.existsSync(oldFile), true, 'the rename must have been rolled back -- the source file must be exactly where it started');
+      assert.equal(fs.existsSync(path.join(tmpDir, 'docs/worktree-reclaim/guide.md')), false, 'nothing must be left sitting at the target path either');
     } finally {
       fs.rmSync(lockFile, { force: true });
     }
+
+    // The whole point of rolling the rename back: once the underlying git
+    // problem is gone, a plain rerun must work cleanly -- no leftover
+    // "missing source file" / "target already exists" deadlock.
+    const retryDry = runKnowledgeMigration(tmpDir, { dryRun: true });
+    assert.deepEqual(retryDry.conservationErrors, [], `rerun after clearing the lock must be clean, got: ${JSON.stringify(retryDry.conservationErrors)}`);
+    const retryApply = runKnowledgeMigration(tmpDir, { dryRun: false });
+    assert.equal(retryApply.appliedCount, 1);
+    const finalView = rebuild(fgosDir);
+    assert.equal(finalView.docs['t1:guide'].currentPath, 'docs/worktree-reclaim/guide.md');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
