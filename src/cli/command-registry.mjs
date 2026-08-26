@@ -1342,6 +1342,24 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'unclaim',
+    invoke: 'fgos unclaim <id>',
+    description: 'Safely clears orphaned or stale runtime claim file for work item <id>. Clears unconditionally if durable status is not doing; checks liveness and refuses if genuinely live.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item ID' },
+      },
+      required: ['id'],
+    },
+    examples: ['fgos unclaim tsk-uio'],
+    touchesState: true,
+    requiresExistingStore: true,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'unlock',
     invoke: 'fgos unlock',
     description: 'Safely clears .fgos/main-checkout.lock (the STR65 concurrent-writer guard) when it is stale or corrupt. Never force-deletes: refuses and reports the holder identity when a different session genuinely still holds it live.',

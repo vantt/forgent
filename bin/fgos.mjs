@@ -29,6 +29,7 @@ import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src
 import { parseFrontmatter } from '../src/report/frontmatter.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
+import { rebuildViewFromDir } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
@@ -55,7 +56,7 @@ import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.m
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
-import { readClaim } from '../src/state/runtime-coordination.mjs';
+import { readClaim, releaseClaim } from '../src/state/runtime-coordination.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
@@ -73,6 +74,7 @@ import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
+import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
 import {
   acquireMainCheckoutLock,
@@ -4295,6 +4297,30 @@ async function runVerb(verb, flags, positional, dir) {
         return { id, description, passed, message };
       });
       return fixed === undefined ? { checks } : { fixed, checks };
+    }
+
+    case 'unclaim': {
+      const id = requireField(positional[0] ?? flags.id, 'unclaim requires an id: fgos unclaim <id>');
+      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const claim = readClaim(dir, id);
+      if (!claim) return { released: false, reason: 'no-claim' };
+      const durableView = rebuildViewFromDir(dir);
+      const durableStatus = durableView.work[id]?.status;
+      if (durableStatus !== 'doing') {
+        releaseClaim(dir, { id });
+        return { released: true, reason: 'durable-status-mismatch', durableStatus: durableStatus ?? 'not-found' };
+      }
+      if (!isReclaimEligible(repoRoot, id, claim.claimRole)) {
+        const holderDesc = `writer ${claim.writerId ?? 'unknown'}` + (claim.actor ? ` (${claim.actor})` : '');
+        const ageMs = claim.acquiredAt ? Date.now() - new Date(claim.acquiredAt).getTime() : NaN;
+        const ageDesc = Number.isFinite(ageMs) ? formatLockDurationMs(ageMs) : 'unknown age';
+        throw new ClaimError(
+          'conflict',
+          `unclaim: claim for "${id}" is held by ${holderDesc}, acquired ${ageDesc} ago -- refusing to clear live claim.`,
+        );
+      }
+      releaseClaim(dir, { id });
+      return { released: true, reason: 'stale-liveness' };
     }
 
     // Safely clears .fgos/main-checkout.lock (tsk-3h4). Never force-deletes:
