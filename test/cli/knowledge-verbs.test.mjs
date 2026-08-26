@@ -60,6 +60,49 @@ test('knowledge-verbs - topic register, rename, split, merge, retire', async () 
   }
 });
 
+test('knowledge-verbs - doc verbs resolve by (topicId, role) after topic split, not by a stale docId string', async () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    const fgosBin = path.resolve('bin/fgos.mjs');
+
+    execSync(`node "${fgosBin}" topic register t1 --purpose-slug worktree-all`, { cwd: tmpDir });
+    // Default docId (no --doc-id): the common case, and exactly what a
+    // split leaves stale since docId stays "t1:guide" while topicId moves.
+    execSync(`node "${fgosBin}" doc reserve t1 guide docs/worktree-all/guide.md`, { cwd: tmpDir });
+
+    const intoJson = JSON.stringify([{ topicId: 't2', purposeSlug: 'worktree-reclaim', rolesToMove: ['guide'] }]);
+    execSync(`node "${fgosBin}" topic split t1 --into '${intoJson}'`, { cwd: tmpDir });
+
+    let view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide'].topicId, 't2');
+
+    // doc mark-rendered (by new topicId/role) must find and advance the SAME
+    // doc, not "doc not found" from reconstructing a "t2:guide" key that was
+    // never the real docId.
+    execSync(`node "${fgosBin}" doc mark-rendered t2 guide`, { cwd: tmpDir });
+    view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide'].docLifecycle, 'provisional');
+    assert.equal(view.docs['t2:guide'], undefined);
+
+    const docFile = path.join(tmpDir, 'docs/worktree-all/guide.md');
+    fs.mkdirSync(path.dirname(docFile), { recursive: true });
+    fs.writeFileSync(docFile, '# Guide\n', 'utf8');
+    execSync('git add docs/worktree-all/guide.md && git commit -m "add guide"', { cwd: tmpDir, stdio: 'ignore' });
+
+    // doc promote (by new topicId/role) must resolve the same pre-split docId.
+    execSync(`node "${fgosBin}" doc promote t2 guide`, { cwd: tmpDir });
+    view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide'].docLifecycle, 'active');
+
+    // doc move-path (by new topicId/role) must resolve the same pre-split docId.
+    execSync(`node "${fgosBin}" doc move-path t2 guide --new-path docs/worktree-reclaim/guide.md`, { cwd: tmpDir });
+    view = rebuild(fgosDir);
+    assert.equal(view.docs['t1:guide'].currentPath, 'docs/worktree-reclaim/guide.md');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
 test('knowledge-verbs - doc lifecycle and promote preconditions', async () => {
   const { tmpDir, fgosDir } = setupGitRepoWithStore();
   try {

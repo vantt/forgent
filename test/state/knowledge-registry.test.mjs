@@ -6,9 +6,21 @@ import os from 'node:os';
 import {
   foldKnowledgeEvents,
   assertActiveDocCardinality,
+  resolveDocId,
   KnowledgeValidationError,
 } from '../../src/state/knowledge-registry.mjs';
-import { initStore, registerTopicStore, registerDocStore, promoteDocStore, reserveDocStore, splitTopicStore } from '../../src/state/store.mjs';
+import {
+  initStore,
+  registerTopicStore,
+  registerDocStore,
+  promoteDocStore,
+  reserveDocStore,
+  splitTopicStore,
+  mergeTopicStore,
+  retireTopicStore,
+  markDocRenderedStore,
+  rebuild,
+} from '../../src/state/store.mjs';
 
 test('foldKnowledgeEvents - basic topic and doc fold', () => {
   const events = [
@@ -217,6 +229,104 @@ test('topic.register is create-only - re-registering an existing topicId is refu
     assert.throws(() => {
       registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-test-overwritten' });
     }, /create-only/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('topic.merge refuses a role collision atomically -- nothing mutates when it throws', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 'target', purposeSlug: 'target-topic' });
+    registerTopicStore(tmpDir, { topicId: 'source', purposeSlug: 'source-topic' });
+    registerDocStore(tmpDir, { docId: 'dt', topicId: 'target', role: 'guide', currentPath: 'docs/t/guide.md', docLifecycle: 'active' });
+    registerDocStore(tmpDir, { docId: 'ds', topicId: 'source', role: 'guide', currentPath: 'docs/s/guide.md', docLifecycle: 'active' });
+
+    assert.throws(() => {
+      mergeTopicStore(tmpDir, { sourceTopicIds: ['source'], targetTopicId: 'target' });
+    }, /would have two live docs/);
+
+    // Merge must fail whole -- neither topic's status nor either doc's topicId moved.
+    const view = rebuild(tmpDir);
+    assert.equal(view.topics.source.status, 'active');
+    assert.equal(view.topics.target.lineage, null);
+    assert.equal(view.docs.dt.topicId, 'target');
+    assert.equal(view.docs.ds.topicId, 'source');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('topic.merge succeeds when the colliding source doc is already superseded', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 'target', purposeSlug: 'target-topic' });
+    registerTopicStore(tmpDir, { topicId: 'source', purposeSlug: 'source-topic' });
+    registerDocStore(tmpDir, { docId: 'dt', topicId: 'target', role: 'guide', currentPath: 'docs/t/guide.md', docLifecycle: 'active' });
+    registerDocStore(tmpDir, { docId: 'ds', topicId: 'source', role: 'guide', currentPath: 'docs/s/guide.md', docLifecycle: 'superseded' });
+
+    mergeTopicStore(tmpDir, { sourceTopicIds: ['source'], targetTopicId: 'target' });
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.topics.source.status, 'retired');
+    assert.equal(view.docs.ds.topicId, 'target');
+    assert.equal(view.docs.dt.docLifecycle, 'active');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('a retired topic refuses new doc writes (reserve, register, mark-rendered, promote)', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'dead-topic' });
+    reserveDocStore(tmpDir, { topicId: 't1', role: 'pitfall', currentPath: 'docs/t1/pitfall.md', docId: 'd-pitfall' });
+    retireTopicStore(tmpDir, { topicId: 't1' });
+
+    assert.throws(() => {
+      reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docId: 'd-guide' });
+    }, /is retired/);
+
+    assert.throws(() => {
+      registerDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docId: 'd-guide2', docLifecycle: 'provisional' });
+    }, /is retired/);
+
+    assert.throws(() => {
+      markDocRenderedStore(tmpDir, { docId: 'd-pitfall' });
+    }, /is retired/);
+
+    assert.throws(() => {
+      promoteDocStore(tmpDir, { docId: 'd-pitfall' });
+    }, /is retired/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('resolveDocId finds a doc by (topicId, role) after topic.split moved its topicId without renaming its docId', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'worktree-all' });
+    // Default docId, derived from the OLD topicId -- this is the common case
+    // (no explicit --doc-id), and exactly what a split leaves stale.
+    reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md' });
+    splitTopicStore(tmpDir, {
+      topicId: 't1',
+      newTopics: [{ topicId: 't2', purposeSlug: 'worktree-reclaim', rolesToMove: ['guide'] }],
+    });
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs['t1:guide'].topicId, 't2', 'docId stays stable even though topicId moved');
+
+    const found = resolveDocId(view, { topicId: 't2', role: 'guide' });
+    assert.equal(found, 't1:guide');
+
+    // The stale reconstruction a naive caller would build no longer resolves.
+    assert.equal(view.docs['t2:guide'], undefined);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
