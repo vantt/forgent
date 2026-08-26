@@ -61,23 +61,20 @@ export function bootstrapRegistry(dir, inventoryDataPath) {
   }
 
   initStore(dir);
-  let view = rebuild(dir);
+  const view = rebuild(dir);
 
-  let topicsCreated = 0;
-  let docsCreated = 0;
-
+  // Preflight pass: check EVERY row's existing topic/doc for drift against
+  // the registry, against the SAME pre-mutation view, before any row gets
+  // to mutate anything. Interleaving drift checks with registerTopicStore/
+  // registerDocStore calls (the previous shape) meant an early row could
+  // durably create real topics/docs before a LATER row's drift throw --
+  // bootstrap reported "refused" while the registry had already been
+  // written to. Batches every drift issue into one error, same pattern the
+  // duplicate-pairs check above already uses.
+  const driftErrors = [];
   for (const item of inventory) {
     const existingTopic = view.topics?.[item.topicId];
-    if (!existingTopic) {
-      registerTopicStore(dir, {
-        topicId: item.topicId,
-        purposeSlug: item.purposeSlug,
-        purposeTitle: item.purposeTitle,
-        entities: item.entities,
-      });
-      view = rebuild(dir);
-      topicsCreated++;
-    } else if (item.purposeSlug && existingTopic.purposeSlug !== item.purposeSlug) {
+    if (existingTopic && item.purposeSlug && existingTopic.purposeSlug !== item.purposeSlug) {
       // A topic that already exists but disagrees with the classifier's
       // current output on its own purposeSlug is real drift, not a no-op --
       // silently skipping it would report "idempotent" while the registry
@@ -86,14 +83,49 @@ export function bootstrapRegistry(dir, inventoryDataPath) {
       // duplicate-pairs refusal above); it fails loud and names both values
       // so a person can reconcile with "fgos topic rename" or a corrected
       // inventory row.
-      throw new Error(
-        `Bootstrap refused: topic '${item.topicId}' already exists with purposeSlug '${existingTopic.purposeSlug}', but the inventory row wants '${item.purposeSlug}' -- registry and classifier output have drifted. Reconcile with "fgos topic rename" or fix the inventory row before bootstrapping.`
+      driftErrors.push(
+        `topic '${item.topicId}' already exists with purposeSlug '${existingTopic.purposeSlug}', but the inventory row wants '${item.purposeSlug}'`
       );
     }
 
     const docId = `${item.topicId}:${item.role}`;
     const existingDoc = view.docs?.[docId];
-    if (!existingDoc) {
+    if (existingDoc && existingDoc.currentPath !== item.oldPath) {
+      // Same reasoning as the topic drift check above, for the doc's own
+      // currentPath -- an existing doc whose path no longer matches the
+      // classifier's inventory is drift bootstrap must name, not skip past.
+      driftErrors.push(
+        `doc '${docId}' already exists with currentPath '${existingDoc.currentPath}', but the inventory row wants '${item.oldPath}'`
+      );
+    }
+  }
+  if (driftErrors.length > 0) {
+    throw new Error(
+      `Bootstrap refused: ${driftErrors.length} drift issue(s) between the registry and the classifier inventory -- registry and classifier output have drifted. Reconcile with "fgos topic rename"/"fgos doc move-path" or fix the inventory rows before bootstrapping: ${driftErrors.join('; ')}`
+    );
+  }
+
+  // Mutation pass: the registry is now known drift-free against this whole
+  // inventory -- every remaining unregistered row can be created safely,
+  // with no risk of a later row's own check aborting mid-write.
+  let mutableView = view;
+  let topicsCreated = 0;
+  let docsCreated = 0;
+
+  for (const item of inventory) {
+    if (!mutableView.topics || !mutableView.topics[item.topicId]) {
+      registerTopicStore(dir, {
+        topicId: item.topicId,
+        purposeSlug: item.purposeSlug,
+        purposeTitle: item.purposeTitle,
+        entities: item.entities,
+      });
+      mutableView = rebuild(dir);
+      topicsCreated++;
+    }
+
+    const docId = `${item.topicId}:${item.role}`;
+    if (!mutableView.docs || !mutableView.docs[docId]) {
       registerDocStore(dir, {
         docId,
         topicId: item.topicId,
@@ -105,19 +137,12 @@ export function bootstrapRegistry(dir, inventoryDataPath) {
         aliases: [],
         sourceCaptureIds: [item.oldPath],
       });
-      view = rebuild(dir);
+      mutableView = rebuild(dir);
       docsCreated++;
-    } else if (existingDoc.currentPath !== item.oldPath) {
-      // Same reasoning as the topic drift check above, for the doc's own
-      // currentPath -- an existing doc whose path no longer matches the
-      // classifier's inventory is drift bootstrap must name, not skip past.
-      throw new Error(
-        `Bootstrap refused: doc '${docId}' already exists with currentPath '${existingDoc.currentPath}', but the inventory row wants '${item.oldPath}' -- registry and classifier output have drifted. Reconcile with "fgos doc move-path" or fix the inventory row before bootstrapping.`
-      );
     }
   }
 
-  return { topicsCreated, docsCreated, totalDocs: Object.keys(view.docs || {}).length };
+  return { topicsCreated, docsCreated, totalDocs: Object.keys(mutableView.docs || {}).length };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

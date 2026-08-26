@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 import { runKnowledgeMigration } from '../../scripts/knowledge-migration.mjs';
 import { initStore, registerTopicStore, registerDocStore, rebuild } from '../../src/state/store.mjs';
 
@@ -293,6 +293,35 @@ test('knowledge-migration - dry-run reports conservation errors for duplicate so
     assert.throws(() => {
       runKnowledgeMigration(tmpDir, { dryRun: false });
     }, /conservation violation/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-migration - apply moves a source path containing shell metacharacters correctly (execFileSync, not a shell string)', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    const weirdOldPath = 'docs/how-to/weird"quote;semi$(x).md';
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: weirdOldPath, docLifecycle: 'active' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: weirdOldPath, mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, weirdOldPath);
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Weird\n', 'utf8');
+    execFileSync('git', ['add', '--', weirdOldPath], { cwd: tmpDir, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'add weird'], { cwd: tmpDir, stdio: 'ignore' });
+
+    const res = runKnowledgeMigration(tmpDir, { dryRun: false });
+    assert.equal(res.appliedCount, 1);
+
+    const newFile = path.join(tmpDir, 'docs/worktree-reclaim/guide.md');
+    assert.ok(fs.existsSync(newFile), 'the shell-hostile source file must have been moved to its real target');
+    assert.equal(fs.existsSync(oldFile), false);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

@@ -3,7 +3,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 import { rebuild } from '../src/state/store.mjs';
 
 export function runKnowledgeCanary(repoRoot) {
@@ -20,7 +20,11 @@ export function runKnowledgeCanary(repoRoot) {
   const fullPath = path.join(repoRoot, docPath);
   fs.mkdirSync(path.dirname(fullPath), { recursive: true });
   fs.writeFileSync(fullPath, `---\nframework: diataxis\nmode: how-to\n---\n# Worktree Reclaim Guide\n`, 'utf8');
-  execSync(`git add ${docPath} && git commit -m "docs(canary): write guide"`, { cwd: repoRoot, stdio: 'ignore' });
+  // execFileSync (argv array, no shell) -- docPath is a fixed literal here,
+  // but this is the same shell-interpolation shape flagged in
+  // knowledge-migration.mjs's own git mv/git add, kept consistent.
+  execFileSync('git', ['add', docPath], { cwd: repoRoot, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'docs(canary): write guide'], { cwd: repoRoot, stdio: 'ignore' });
 
   // 4. Attest
   const attestOut = execSync(`node "${fgosBin}" knowledge attest --doc-path ${docPath} --capture-id canary-capture`, { cwd: repoRoot, encoding: 'utf8' });

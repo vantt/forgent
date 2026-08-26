@@ -119,3 +119,38 @@ test('knowledge-bootstrap - refuses (does not silently skip) a doc whose current
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledge-bootstrap - a drift refusal on a LATER row leaves NO partial write from earlier rows in the same run', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  try {
+    const dataPath = path.join(tmpDir, 'inventory.json');
+
+    // Bootstrap once so t1 already exists with a KNOWN purposeSlug.
+    const first = [
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1-original', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(first), 'utf8');
+    bootstrapRegistry(tmpDir, dataPath);
+
+    // A single run whose FIRST row is brand-new (t2, would normally get
+    // created) and whose SECOND row re-touches t1 with drifted data. The
+    // old interleaved-check shape would have durably created t2/t2:guide
+    // before ever reaching t1's drift throw.
+    const mixed = [
+      { oldPath: 'docs/how-to/two.md', topicId: 't2', purposeSlug: 't2', purposeTitle: 'T2', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1-drifted', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(mixed), 'utf8');
+
+    assert.throws(() => {
+      bootstrapRegistry(tmpDir, dataPath);
+    }, /topic 't1' already exists with purposeSlug 't1-original', but the inventory row wants 't1-drifted'/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.topics.t2, undefined, 'a refused bootstrap must not have created t2 from an earlier row in the same run');
+    assert.equal(view.docs['t2:guide'], undefined, 'a refused bootstrap must not have created t2:guide from an earlier row in the same run');
+    assert.equal(view.topics.t1.purposeSlug, 't1-original', 't1 itself must also be untouched');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

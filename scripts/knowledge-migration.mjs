@@ -3,7 +3,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { rebuild, moveDocPathStore, demoteDocStore } from '../src/state/store.mjs';
 import { parseFrontmatter, renderFrontmatter } from '../src/report/frontmatter.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
@@ -149,11 +149,15 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
 
     fs.mkdirSync(path.dirname(destAbs), { recursive: true });
     try {
-      execSync(`git mv "${move.oldPath}" "${move.newPath}"`, { cwd: repoRoot, stdio: 'ignore' });
+      // execFileSync (argv array, no shell) rather than a shell string --
+      // move.oldPath/move.newPath come from the migration inventory file,
+      // untrusted input; a path containing a quote or shell metacharacter
+      // must never be interpreted by a shell.
+      execFileSync('git', ['mv', move.oldPath, move.newPath], { cwd: repoRoot, stdio: 'ignore' });
     } catch {
       fs.renameSync(srcAbs, destAbs);
       try {
-        execSync(`git add "${move.newPath}" "${move.oldPath}"`, { cwd: repoRoot, stdio: 'ignore' });
+        execFileSync('git', ['add', move.newPath, move.oldPath], { cwd: repoRoot, stdio: 'ignore' });
       } catch {}
     }
 
