@@ -906,7 +906,7 @@ function herdrSpawnAdapter(invocation, opts) {
   }
   return Promise.reject(new DispatchError(
     'invalid-config',
-    `executor for work "${opts?.workId}" refused: herdr-spawn adapter requires interactiveMode to be configured (non-interactive dispatch paths removed per tsk-by0).`,
+    `executor for work "${opts?.workId}" refused: herdr-spawn adapter requires interactiveMode to be configured -- it no longer supports a non-interactive dispatch path.`,
     { workId: opts?.workId, tier: opts?.tier, model: opts?.model },
   ));
 }
