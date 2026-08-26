@@ -48,7 +48,7 @@ owned, per `0031`'s own cleanup list.
 
 The full reasoning for the retirement — including why a narrower "fix"
 (exempting only the new sense) wasn't viable for a plain string-match
-guard — lives in `docs/decisions/0031-bo-guard-cam-tu-orchestrator-sau-khi-0029-gan-nghia-moi.md`.
+guard — lives in `docs/specs/runner.md` (mục "### 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới").
 "Launcher" itself remains the correct, unretired name for the one-item,
 fire-and-forget role `0026` originally described — only the *guard*
 enforcing that was removed, not the naming decision itself.
