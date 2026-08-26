@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { readAllEventsFromDir } from '../state/replay.mjs';
 import { resolveLogsDir, fgosDirFromRoot } from '../runner/paths.mjs';
+import { buildDispatchResult } from '../runner/dispatch/result-ladder.mjs';
 
 /**
  * Classifies a single dispatch log content / event pairing.
@@ -50,23 +51,28 @@ export function classifyDispatchResult({ logContent, dispatchEvent } = {}) {
   }
 
   const fullStdout = stdoutBlocks.length > 0 ? stdoutBlocks.join('\n') : logContent;
-  const cleanStdout = fullStdout.replace(/`+[\s\S]*?`+/g, '');
 
-  // 2. Check for legacy signal tokens: [DONE] / [BLOCKED]
-  const hasDone = cleanStdout.includes('[DONE]');
-  const hasBlocked = cleanStdout.includes('[BLOCKED]');
-  if (hasDone || hasBlocked) {
-    return {
-      confidence: 'legacy-signal',
-      outcome: hasDone ? 'done' : 'blocked',
-    };
-  }
-
-  // 3. Check for explicit reported outcome from adapter
+  // 2. Check for an explicit reported outcome from the adapter's own durable
+  // event first (tsk-2tr's ladder only ever fills `outcome` for the
+  // unsignaled/inferred rung, never for a real reported result, so a
+  // present non-'unsignaled' outcome here is a genuine structured report).
   if (dispatchEvent?.payload?.outcome && dispatchEvent.payload.outcome !== 'unsignaled') {
     return {
       confidence: 'reported',
       outcome: dispatchEvent.payload.outcome,
+    };
+  }
+
+  // 3. Classify the local stdout through tsk-2tr's own extracted ladder
+  // helper (src/runner/dispatch/result-ladder.mjs) rather than
+  // re-implementing the [DONE]/[BLOCKED] token scan and backtick-quote
+  // stripping here a second time (plan.md's own "Alternatives rejected").
+  const built = buildDispatchResult({ mechanism: 'reconstructed', result: { stdout: fullStdout } });
+  if (built.outcome !== 'unsignaled') {
+    const cleanStdout = fullStdout.replace(/`+[\s\S]*?`+/g, '');
+    return {
+      confidence: 'legacy-signal',
+      outcome: cleanStdout.includes('[DONE]') ? 'done' : 'blocked',
     };
   }
 
