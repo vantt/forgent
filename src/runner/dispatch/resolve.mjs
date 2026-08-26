@@ -10,6 +10,37 @@
 // CONTEXT.md` D7 for the split rationale.
 
 import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, DEFAULT_TIER_TO_POLICY } from './config.mjs';
+import { DOMAINS, resolveDomainName, skillForStage } from '../../state/workflow-stage-graphs.mjs';
+
+/**
+ * Executor identifier for a work item's executing-stage dispatch (D3,
+ * tsk-62v): the skill name executing-stage resolves to for the item's
+ * domain — the same `skillForStage`/`DOMAINS` formula `buildPrompt` already
+ * applies internally to build its own `skillPath` (never recomputed a
+ * different way, per D3). Kept as its own small function rather than
+ * folded into `buildPrompt` itself so `buildPrompt`'s own pinned
+ * "single console.warn on an unrecognized domain" behavior (str91 D6/D7)
+ * stays untouched — this calls `resolveDomainName` its own time, same as
+ * `selectTemplate` already being called a second time inside `spawnWorker`
+ * for template logging (P49's same "cheap, deterministic, no duplicated
+ * LOGIC" precedent).
+ *
+ * Moved here from `dispatch/cli.mjs` (self-review finding, 2026-08-25):
+ * `plan.mjs` (a canonical, lower-level planner) importing this from
+ * `cli.mjs` (the CLI facade, which itself imports `compileDispatchPlan`
+ * from `plan.mjs`) was a real import cycle -- Node loaded it fine via ESM
+ * live bindings, but a planner depending on the facade built on top of it
+ * is backwards layering. This function has no dependency on anything
+ * `cli.mjs`-specific; `resolve.mjs` is the shared, lower-layer module both
+ * `plan.mjs` and `cli.mjs` already depend on either way.
+ *
+ * `stage` defaults to `stage ?? work?.stage ?? 'executing'`.
+ */
+export function executorIdForWork(work, stage) {
+  const domainObj = DOMAINS[resolveDomainName(work?.domain)];
+  const targetStage = stage ?? work?.stage ?? 'executing';
+  return skillForStage(domainObj, targetStage);
+}
 
 /**
  * Resolve `tier` (per D6; falls back to `work.mjs`'s declared default when a
@@ -309,23 +340,69 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');
   }
 
-  // Cross-provider governance (D2/D3, tsk-32n): exempts ONLY the
-  // agentType-resolved path (`buildAgentTypeExecutor` always reuses the
-  // global `cfg.executor.command`, always Claude in practice, so the
-  // check below is already inert for it) — never a broad `kind` exemption.
-  // Pre-tsk-in1-4 this read `executor.kind !== 'task'`; `'task'` is no
-  // longer a legal `kind` value at all (D5: `kind` is `agent`/`tool` now,
-  // orthogonal to invocation `via`), and a `kind:"agent"` executor like
-  // `agy` dispatched via its own `via:"cli"` invocation MUST still clear
-  // this gate — that is exactly what `allowCrossProvider` already governs
-  // for it today.
-  if (executorEntry && !resolvedViaAgentType && !CLAUDE_CLI_COMMANDS.includes(executor.command) && executorEntry.allowCrossProvider !== true) {
+  // Declared egress & Cross-provider governance (D1/D2/D6):
+  // Inspect providerFamily and effective egress {kind, target, content}.
+  // An env override (e.g. ANTHROPIC_BASE_URL, OPENAI_BASE_URL, BASE_URL)
+  // or a non-Claude command/provider routes egress to a cross-provider backend.
+  const envBlock = executor.env ?? cliInvocation?.env ?? executorEntry?.env;
+  const envTarget = envBlock?.ANTHROPIC_BASE_URL || envBlock?.OPENAI_BASE_URL || envBlock?.BASE_URL;
+  // Security review finding (self-review, 2026-08-25): a substring check
+  // (`envTarget.includes('api.anthropic.com')`) is bypassable by any URL
+  // that merely CONTAINS that literal text anywhere — a path segment
+  // (`https://evil.example.com/api.anthropic.com`), a query param, or a
+  // subdomain-lookalike host all read as "same-provider" under a substring
+  // test, silently clearing the cross-provider gate this check exists to
+  // enforce. Real hostname comparison, fail-closed: an unparseable URL is
+  // never trusted as "still Anthropic" — it counts as an override, same as
+  // any other non-matching host.
+  const isAnthropicApiHost = (urlString) => {
+    try {
+      const { hostname } = new URL(urlString);
+      return hostname === 'api.anthropic.com' || hostname.endsWith('.api.anthropic.com');
+    } catch {
+      return false;
+    }
+  };
+  const isEnvUrlOverride = typeof envTarget === 'string' && envTarget.trim().length > 0 && !isAnthropicApiHost(envTarget);
+
+  const providerFamily =
+    typeof executorEntry?.providerModel === 'string' && executorEntry.providerModel.trim()
+      ? executorEntry.providerModel
+      : typeof executorEntry?.provider === 'string' && executorEntry.provider.trim()
+        ? executorEntry.provider
+        : CLAUDE_CLI_COMMANDS.includes(executor.command)
+          ? 'claude'
+          : executor.command;
+
+  const egressTarget = isEnvUrlOverride ? envTarget : executor.command;
+
+  const isCrossProvider =
+    isEnvUrlOverride ||
+    !CLAUDE_CLI_COMMANDS.includes(executor.command) ||
+    (executorEntry?.providerModel !== undefined && executorEntry.providerModel !== 'claude');
+
+  const egressKind = isCrossProvider ? 'cross-provider' : 'same-provider';
+  const egressContent = executorEntry?.carries ?? contentCarries ?? 'repo-content';
+
+  const governance = {
+    providerFamily,
+    egress: {
+      kind: egressKind,
+      target: egressTarget,
+      content: egressContent,
+    },
+  };
+
+  if (executorEntry && !resolvedViaAgentType && egressKind === 'cross-provider' && executorEntry.allowCrossProvider !== true) {
     const remediationId = realExecutorId && realExecutorId !== executorId ? realExecutorId : executorId;
     const resolvedNote = realExecutorId && realExecutorId !== executorId ? ` (resolved via capabilities."${executorId}".prefer to executor "${realExecutorId}")` : '';
     throw new RunnerConfigError(
-      `executor "${executorId}"${resolvedNote} resolves to non-Claude command "${executor.command}" — prompt content would leave the Claude ecosystem. Set executors.${remediationId}.allowCrossProvider: true to permit this.`,
+      `executor "${executorId}"${resolvedNote} resolves to cross-provider egress target "${egressTarget}" — prompt content would leave the Claude ecosystem. Set executors.${remediationId}.allowCrossProvider: true to permit this.`,
     );
   }
 
-  return executor;
+  return {
+    ...executor,
+    governance,
+  };
 }

@@ -21,6 +21,7 @@
     "src/runner/dispatch/config.mjs": "infra",
     "src/runner/dispatch/resolve.mjs": "infra",
     "src/runner/dispatch/mechanism.mjs": "infra",
+    "src/runner/dispatch/plan.mjs": "infra",
     "src/runner/dispatch/transport.mjs": "infra",
     "src/runner/dispatch/prepare.mjs": "infra",
     "src/runner/dispatch/cli.mjs": "infra",

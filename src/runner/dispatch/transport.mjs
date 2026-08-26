@@ -33,6 +33,8 @@
 // design, not a reaction to an observed incident.
 
 import path from 'node:path';
+import fs from 'node:fs';
+import os from 'node:os';
 import { spawn, execFileSync } from 'node:child_process';
 import { RunnerConfigError } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
@@ -165,6 +167,14 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     provider: executor.provider ?? executor.command,
     baseCommit: attestation.baseCommit,
     headRef: attestation.headRef,
+    // governance (self-review finding, 2026-08-25): resolveExecutorConfig
+    // already computes this (providerFamily + egress{kind,target,content})
+    // -- it was being discarded here, so the real production dispatch path
+    // (spawnWorker -> loop.mjs's `executor.dispatch` event) never recorded
+    // which dispatches were cross-provider, the entire stated purpose of
+    // the D1/D2/D6 governance work. Additive only: every existing caller
+    // that destructures a subset of this object is unaffected.
+    governance: executor.governance,
   };
 }
 
@@ -308,17 +318,76 @@ function cliSpawnAdapter(invocation, opts) {
       if (idleTimer) clearTimeout(idleTimer);
     };
 
+    // RELEASE OUR OWN READ END ON EVERY SETTLE PATH (self-review finding,
+    // real, 2026-08-26, confirmed live): rejecting immediately on timeout
+    // (below) bounds the PROMISE, but the parent process's own event loop
+    // stays alive as long as `child.stdout`/`child.stderr` remain open
+    // Node-side handles — and an escaped descendant (e.g. `setsid ...
+    // sleep 5 &`) inherits the pipe's write end independent of process
+    // groups, so it alone can keep that pipe from ever closing. Confirmed
+    // live: even with the promise settling at ~112ms, a caller that never
+    // force-exits hung for the full ~5s the escaped descendant kept
+    // running. Destroying our own read-side streams (never the writer's
+    // problem to close) drops that handle immediately regardless of what
+    // any descendant does afterward. Harmless on the normal 'close' path
+    // too — the streams have already ended themselves by then.
+    const releaseStdio = () => {
+      try { child.stdout.destroy(); } catch {}
+      try { child.stderr.destroy(); } catch {}
+    };
+
     const finish = (fn) => {
       if (settled) return;
       settled = true;
       clearTimers();
+      releaseStdio();
       fn();
+    };
+
+    // TIMEOUT/MAXBUFFER SETTLE IMMEDIATELY ON KILL, NEVER WAIT FOR 'close'
+    // (self-review finding, real, 2026-08-26, confirmed live): switching
+    // normal completion to 'close' (below) fixed a real stdout-loss race,
+    // but it also made a rejection that USED TO fire on the killed child's
+    // own 'exit'/'close' start waiting on the SAME event instead — and
+    // `killChildTree`'s process-group SIGTERM only reaches descendants
+    // still in the child's own process group. A descendant that escaped it
+    // (e.g. `setsid sh -c 'sleep 1' &`) keeps inheriting the stdout pipe
+    // open for as long as IT runs, regardless of the SIGTERM — confirmed
+    // live: `timeoutMs: 100` against `sh -c "setsid sh -c 'sleep 1' &
+    // echo parent-done"` rejected worker-timeout after ~1006ms, not
+    // ~100ms. `timeoutMs` is a promised ceiling on how long a caller waits
+    // for an ANSWER, not on how long an escaped grandchild is allowed to
+    // keep a pipe open — so the timeout/idle-timeout/maxBuffer paths each
+    // settle THEMSELVES, synchronously, right after killing, with whatever
+    // stdout/stderr has been captured so far. `close` (below) still owns
+    // NORMAL completion (no kill involved, so no escape risk) — `finish`'s
+    // `settled` guard makes it a harmless no-op on the already-settled path.
+    const settleTimeout = () => {
+      finish(() => {
+        reject(new DispatchError(
+          'worker-timeout',
+          idleTimedOut
+            ? `executor for work "${workId}" was killed after ${idleTimeoutMs}ms with no output (idle timeout).`
+            : `executor timed out after ${timeoutMs}ms for work "${workId}".`,
+          { workId, tier, model, stdout, stderr },
+        ));
+      });
+    };
+    const settleMaxBuffer = () => {
+      finish(() => {
+        reject(new DispatchError(
+          'worker-spawn-fail',
+          `executor for work "${workId}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
+          { workId, tier, model, cause: 'maxBuffer exceeded', stdout, stderr },
+        ));
+      });
     };
 
     if (timeoutMs) {
       timer = setTimeout(() => {
         timedOut = true;
         killChildTree(child, 'SIGTERM');
+        settleTimeout();
       }, timeoutMs);
     }
 
@@ -336,6 +405,7 @@ function cliSpawnAdapter(invocation, opts) {
         timedOut = true;
         idleTimedOut = true;
         killChildTree(child, 'SIGTERM');
+        settleTimeout();
       }, idleTimeoutMs);
     };
     armIdleTimer();
@@ -348,6 +418,7 @@ function cliSpawnAdapter(invocation, opts) {
         if (!maxBufferExceeded) {
           maxBufferExceeded = true;
           killChildTree(child, 'SIGTERM');
+          settleMaxBuffer();
         }
         return;
       }
@@ -361,6 +432,7 @@ function cliSpawnAdapter(invocation, opts) {
         if (!maxBufferExceeded) {
           maxBufferExceeded = true;
           killChildTree(child, 'SIGTERM');
+          settleMaxBuffer();
         }
         return;
       }
@@ -377,33 +449,26 @@ function cliSpawnAdapter(invocation, opts) {
       });
     });
 
-    // 'exit' (fires once the spawned process itself terminates), never
-    // 'close' (waits for the stdio PIPES to fully close too) — matching
-    // spawnSync's own timeout semantics: a kill decision is made and
-    // reported based on the process's own termination, never waiting out
-    // however long a still-open pipe (e.g. an orphaned grandchild that
-    // escaped the process-group kill) keeps it open — resolving on 'close'
-    // instead would defeat the timeout.
-    child.on('exit', (code, signal) => {
+    // 'close' (waits for the child's stdio PIPES to fully close, not just
+    // the process itself to terminate), NOT 'exit' (self-review finding,
+    // real, 2026-08-26): Node's own docs are explicit that 'exit' can fire
+    // BEFORE all buffered stdout/stderr 'data' events have been delivered —
+    // the OS pipe can still hold output at the instant the child terminates,
+    // with the final 'data' event landing on a later event-loop tick. Under
+    // light load this race resolves in 'data''s favor almost every time,
+    // which is why this went unnoticed until a CONCURRENT dispatch test
+    // (two workers' stdout competing for CPU) reproducibly captured an empty
+    // `stdout` for one of them — a live-tee log silently losing entire
+    // worker output under load, not a test-only artifact: `result.stdout`
+    // itself would have been truncated the same way for any real caller.
+    // 'close' is what Node's OWN `child_process.exec`/`execFile` wait for
+    // internally, for exactly this reason. Only the NORMAL completion path
+    // waits for it now — timeout/idle-timeout/maxBuffer each settle
+    // themselves the instant they kill (see settleTimeout/settleMaxBuffer
+    // above), so this handler firing after one of them already has is
+    // always a no-op via `finish`'s `settled` guard.
+    child.on('close', (code, signal) => {
       finish(() => {
-        if (timedOut) {
-          reject(new DispatchError(
-            'worker-timeout',
-            idleTimedOut
-              ? `executor for work "${workId}" was killed after ${idleTimeoutMs}ms with no output (idle timeout).`
-              : `executor timed out after ${timeoutMs}ms for work "${workId}".`,
-            { workId, tier, model, stdout, stderr },
-          ));
-          return;
-        }
-        if (maxBufferExceeded) {
-          reject(new DispatchError(
-            'worker-spawn-fail',
-            `executor for work "${workId}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
-            { workId, tier, model, cause: 'maxBuffer exceeded', stdout, stderr },
-          ));
-          return;
-        }
         resolve({ status: code, signal, stdout, stderr, tier, model });
       });
     });
@@ -455,5 +520,531 @@ async function httpAdapter(invocation, opts) {
   return { status: response.status, body: text, headers: Object.fromEntries(response.headers.entries()), tier, model };
 }
 
+/**
+ * D3/D6 (tsk-5x7-3): `herdr-spawn` executor adapter.
+ * Launches the worker inside a Herdr pane instead of a stdout-captured
+ * subprocess, allowing a person to watch the agent work live.
+ *
+ * HARD CONSTRAINT (tsk-1nih, live evidence): this adapter MUST ALWAYS create a
+ * fresh pane (`herdr pane split`) on every dispatch and MUST NEVER reuse an
+ * existing pane. Reusing a finished worker's pane delivers the next dispatch
+ * as a chat message into an idle interactive agent REPL.
+ *
+ * Results come back through the existing ladder (stdout captured via `herdr pane read`).
+ * Selected purely by `executor.adapter === 'herdr-spawn'`.
+ */
+function herdrSpawnAdapter(invocation, opts) {
+  const { command, args, env: rawEnv } = invocation;
+  const { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId, tier, model, herdrBin: optsHerdrBin } = opts;
+
+  const depth = currentDispatchDepth();
+  if (depth >= MAX_DISPATCH_DEPTH) {
+    return Promise.reject(new DispatchError(
+      'dispatch-depth-exceeded',
+      `executor for work "${workId}" refused: nested out-of-process dispatch depth ${depth} is already at the cap (${MAX_DISPATCH_DEPTH}) -- a dispatched executor tried to dispatch another executor too many levels deep.`,
+      { workId, tier, model, depth },
+    ));
+  }
+
+  const resolvedEnv = resolveExecutorEnv(rawEnv);
+  const herdrBin = optsHerdrBin ?? process.env.FGOS_HERDR_BIN ?? 'herdr';
+  const fullEnv = { ...process.env, ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) };
+
+  return new Promise((resolve, reject) => {
+    // 1. HARD CONSTRAINT (tsk-1nih): ALWAYS create a fresh pane via `herdr pane split`
+    //
+    // `--direction right|down` is REQUIRED, not optional (self-review
+    // finding, 2026-08-25, confirmed live against the real installed
+    // binary: `herdr pane split --no-focus --cwd /tmp` refuses with exit 2
+    // -- "usage: herdr pane split [<pane_id>|--pane ID|--current]
+    // --direction right|down ..."). Every prior version of this adapter
+    // omitted it entirely, so it could never have actually split a pane
+    // against a real herdr install. `right` is an arbitrary but reasonable
+    // default (matches this repo's own documented example,
+    // docs/distillery/deep-dives/how-to-use-herdr.md) -- no config knob
+    // for it exists yet because nothing has needed one.
+    const splitArgs = ['pane', 'split', '--direction', 'right', '--no-focus'];
+    if (cwd) {
+      splitArgs.push('--cwd', cwd);
+    }
+    // Resolved env into the pane itself (self-review finding, 2026-08-25):
+    // `fullEnv` above only ever governed the *local* execFileSync/spawn
+    // calls this adapter makes to the `herdr` CLI -- it never reached the
+    // worker actually running inside the pane at all, which instead ran
+    // under whatever ambient/default env that shell already had. An
+    // executor declaring `ANTHROPIC_BASE_URL`/an API key/a model env would
+    // dispatch to one backend while the audit event (built from the
+    // RESOLVED config, per the governance-propagation fix) recorded a
+    // different one -- the exact kind of gap the governance work exists to
+    // close. `herdr pane split --env KEY=VALUE` (repeatable; confirmed
+    // real, `docs/history/herdr-cockpit-project-root/CONTEXT.md:71`, and
+    // already part of this piece's own accepted design,
+    // `docs/history/dispatch-plan-protocol-redesign/plan.md:277`) sets it
+    // on the pane's own shell before anything runs there.
+    //
+    // ACCEPTED RISK, decided by the person (2026-08-25, fourth-round
+    // advisor review): `--env KEY=VALUE` puts secret values in the
+    // `herdr` CLI process's own argv, visible via `ps`/process listings
+    // and possibly herdr's own internal logs, for the duration of this
+    // one `pane split` call -- inherent to any CLI tool taking secrets as
+    // command-line arguments, not something avoidable from this side
+    // given herdr's current interface (no env-file/stdin/daemon
+    // alternative is documented). Ship as-is; revisit only if herdr ever
+    // adds a non-argv env-setting mechanism. The DispatchError path right
+    // below is still sanitized so a *failure* here never additionally
+    // echoes the secret into fgOS's own logs.
+    for (const [key, value] of Object.entries(resolvedEnv)) {
+      splitArgs.push('--env', `${key}=${value}`);
+    }
+
+    let splitOutput;
+    try {
+      splitOutput = execFileSync(herdrBin, splitArgs, {
+        cwd,
+        env: fullEnv,
+        encoding: 'utf8',
+        shell: false,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+    } catch (err) {
+      // Never interpolate err.message/err.cmd here: a non-ENOENT
+      // execFileSync failure embeds the full argv in its own message
+      // ("Command failed: herdr pane split --env KEY=<real-value> ..."),
+      // which would leak a resolved secret into this DispatchError's own
+      // message text -- and from there into whatever surface logs/reports
+      // it (self-review finding: "không log secret").
+      return reject(new DispatchError(
+        'worker-spawn-fail',
+        `executor failed to start for work "${workId}": herdr pane split failed (exit code ${err.status ?? 'unknown'}).`,
+        { workId, tier, model, cause: 'herdr pane split failed', exitCode: err.status ?? null },
+      ));
+    }
+
+    let paneId;
+    try {
+      const parsed = JSON.parse(splitOutput);
+      paneId = parsed?.result?.pane?.pane_id ?? parsed?.result?.pane_id ?? parsed?.result?.root_pane?.pane_id ?? parsed?.pane_id;
+    } catch {
+      paneId = splitOutput ? splitOutput.trim() : null;
+    }
+
+    if (!paneId) {
+      return reject(new DispatchError(
+        'worker-spawn-fail',
+        `executor failed to start for work "${workId}": could not parse pane_id from herdr pane split output: "${splitOutput}"`,
+        { workId, tier, model, cause: 'invalid pane split output' },
+      ));
+    }
+
+    // 2. Launch worker inside the newly created pane via `herdr pane run <paneId> <cmd>`
+    //
+    // SECURITY (self-review finding, 2026-08-25): `herdr pane run` is not a
+    // spawn -- it types the given text into whatever shell is already
+    // running in the pane (docs/how-to/launch-claude-in-a-new-herdr-pane-
+    // from-a-plugin.md §2: "There is no shell-safe argv boundary"). The
+    // prior JSON.stringify-based double-quote wrapping still let `$()`/
+    // backticks inside a double-quoted shell string execute as command
+    // substitution -- and `command`/`args` here can carry untrusted prompt
+    // content (repo text, user text) substituted in by resolveExecutorCommand.
+    // POSIX single-quote wrapping (`'` -> close-quote, escaped literal
+    // quote, reopen-quote: `'\''`) is the standard way to embed an
+    // arbitrary string as one shell word with ZERO interpolation --
+    // nothing inside single quotes is special to a POSIX shell, not even a
+    // backslash. Every token (including `command` itself, previously never
+    // quoted at all) goes through this, never a regex-based "does this
+    // token look dangerous" allowlist -- that heuristic is exactly what
+    // let a metacharacter combination it didn't anticipate through before.
+    const posixShellQuote = (value) => `'${String(value).replace(/'/g, `'\\''`)}'`;
+    const quotedCmd = [command, ...(args || [])].map(posixShellQuote).join(' ');
+
+    // SIGNAL FALLBACK (self-review finding, 2026-08-25): `herdr pane
+    // wait-output --regex` can ONLY detect completion by matching text the
+    // dispatched agent itself chooses to print -- unlike `cliSpawnAdapter`,
+    // which observes the real child process's own termination regardless
+    // of what it printed. An agent that does real work (commits, edits)
+    // but never emits `[DONE]`/`[BLOCKED]` -- the exact case the existing
+    // ladder's `headBefore`/`headAfter` git-inference fallback exists to
+    // handle -- would otherwise just sit until this adapter's own timeout
+    // elapses and hard-rejects, discarding that fallback entirely (this
+    // piece's own action text: "Results come back through the EXISTING
+    // ladder ... this piece introduces no new result protocol"). A
+    // runner-owned sentinel closes that gap without inventing a new
+    // protocol: it is not a signal the worker or `[DONE]`/`[BLOCKED]`
+    // ladder ever sees or needs to know about -- it only tells THIS
+    // adapter "the shell command has exited", the same fact `child.on
+    // ('exit')` already gives `cliSpawnAdapter` for free, plus the real
+    // exit code (closes the separate P2 finding: `status` below used to
+    // be `herdr pane wait-output`'s own exit code, never the worker's).
+    const sentinel = `__fgos_herdr_exit_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}__`;
+
+    // SCRIPT-FILE INDIRECTION, not typing the real command directly
+    // (sixth-round advisor finding, real, 2026-08-25): typing the FULL
+    // `quotedCmd` (which carries the entire dispatched prompt -- often
+    // thousands of characters, built by buildPrompt) directly into the
+    // pane means the pane's OWN echo of that typed line pollutes the
+    // final captured stdout with prompt content, including the literal
+    // substrings "[DONE]"/"[BLOCKED]" the worker-contract prompt itself
+    // instructs the worker to print -- confirmed live: an unsignaled
+    // worker whose prompt merely MENTIONED "[DONE]" as an instruction
+    // still satisfied cli.mjs's plain substring hasSignal/isDone check
+    // once that echo reached stdout. Worse, confirmed live a second time:
+    // attempting to strip that echo by matching the exact long typed text
+    // is itself unreliable -- a sufficiently long/complex typed line
+    // (quotes and brackets close together, well past one terminal-width)
+    // came back from the pane with part of it (the trailing sentinel
+    // echo) silently altered by the pane's own shell/readline rendering,
+    // no longer byte-identical to what was sent. Writing the real command
+    // to a temp script FILE (via fs.writeFileSync -- never shell
+    // interpolation, so none of this applies to the file's own content)
+    // and typing only a SHORT, fixed-shape invocation of that file
+    // (`sh '<path>'`, always well under one terminal line, never
+    // containing a byte of prompt content) removes the entire class of
+    // echo-pollution and echo-mangling risk at its source, rather than
+    // trying to clean up an echo whose exact shape can't be trusted.
+    // SELF-DELETING SCRIPT (self-review finding, real, 2026-08-26): the
+    // script file above carries the same prompt/repo content the echo
+    // fix exists to keep out of stdout, now sitting as a 0700 file in
+    // `os.tmpdir()` instead. `cleanupScript` below only ever runs after
+    // this promise settles -- a process crash (or a kill -9) between
+    // `pane run` and that point leaves the file behind indefinitely,
+    // trading terminal-echo leakage for local temp-file exposure. `rm -f
+    // "$0"` as the script's own FIRST line closes that window at its
+    // source: POSIX shells keep the file descriptor open once they start
+    // reading a script, so unlinking the directory entry immediately
+    // (before `quotedCmd` -- and therefore any of its content -- ever
+    // runs) does not disturb the already-running interpreter, the same
+    // "self-destructing script" pattern used for any short-lived secret
+    // script. `cleanupScript` stays as a fallback for the case this
+    // script is written but never actually run (e.g. `pane run` itself
+    // fails right after the write).
+    const scriptPath = path.join(os.tmpdir(), `fgos-herdr-run-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.sh`);
+    fs.writeFileSync(scriptPath, `rm -f "$0"\n${quotedCmd}\necho "${sentinel}:$?"\n`, { mode: 0o700 });
+    const typedCmd = `sh ${posixShellQuote(scriptPath)}`;
+
+    const cleanupScript = () => {
+      try { fs.unlinkSync(scriptPath); } catch {}
+    };
+
+    try {
+      execFileSync(herdrBin, ['pane', 'run', paneId, typedCmd], {
+        cwd,
+        env: fullEnv,
+        encoding: 'utf8',
+        shell: false,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+    } catch (err) {
+      cleanupScript();
+      return reject(new DispatchError(
+        'worker-spawn-fail',
+        `executor failed to start for work "${workId}": herdr pane run failed: ${err.message}`,
+        { workId, tier, model, cause: err.message },
+      ));
+    }
+
+    // 3. Observe completion using `herdr pane wait-output`, waiting SOLELY
+    // on the runner-owned sentinel above (the shell command itself has
+    // exited) -- never the worker's own [DONE]/[BLOCKED] token (see the
+    // SENTINEL-ONLY COMPLETION SIGNAL comment below for why matching the
+    // token here was itself a bug, not a legitimate fast path).
+    //
+    // Deliberately NO `--timeout` flag (self-review finding, 2026-08-25,
+    // confirmed live): passing BOTH herdr's own `--timeout` and this
+    // adapter's own JS setTimeout at the identical duration is a genuine
+    // race -- confirmed empirically against the real binary that when
+    // herdr's own timeout wins, `wait-output` exits 1 with an
+    // `{"error":{"code":"timeout",...}}` body and NO `result.read` at all,
+    // which this adapter's own `timedOut` flag (set only by ITS OWN
+    // setTimeout) never sees, so it fell through to the "success" branch
+    // and silently resolved `{status:1, stdout:''}` instead of rejecting
+    // `worker-timeout` -- a real timeout invisible to every caller that
+    // branches on that error class. Per `--help`, wait-output with no
+    // `--timeout` "waits indefinitely" -- the JS timer below is the SOLE
+    // timeout authority, the same single-source-of-truth shape
+    // `cliSpawnAdapter` already uses for its own child process.
+    //
+    // SENTINEL-ONLY completion signal -- never [DONE]/[BLOCKED] here
+    // (fifth-round advisor finding, real, 2026-08-25): `pane run` types
+    // the command into the pane's shell and returns immediately; the
+    // worker is NOT this adapter's child process the way `cliSpawnAdapter`'s
+    // `child` is. `cliSpawnAdapter` only ever inspects [DONE]/[BLOCKED]
+    // AFTER the real process has exited (cli.mjs's own hasSignal/isDone
+    // check runs against the FINAL accumulated stdout, downstream of
+    // resolve). Matching [DONE]/[BLOCKED] here too meant this adapter could
+    // resolve the MOMENT the token appeared, even if the worker printed it
+    // and then kept running -- confirmed live: a worker that printed
+    // [DONE] and continued for another second resolved in ~10ms, before
+    // the worker had actually finished. This also fully closes a second,
+    // related gap: a MULTILINE dispatched prompt (real repo/user content
+    // substituted via {prompt}) could itself contain a LINE starting with
+    // the literal text "[DONE]"/"[BLOCKED]" (an example, a quoted
+    // instruction) -- the pane's own echo of that typed prompt would then
+    // satisfy even the `(?m)^` anchored token pattern before the worker
+    // ever runs. The sentinel has no such collision risk (a random,
+    // adapter-owned marker no real prompt could plausibly contain) and
+    // fires EXACTLY ONCE, immediately after the real command truly exits
+    // -- the same fact `child.on('close')` gives `cliSpawnAdapter` for free.
+    // Token detection still happens, just downstream in cli.mjs against
+    // the final `stdout` this resolve() call returns, exactly like
+    // cliSpawnAdapter already does -- no behavior lost, only the false
+    // early-resolve removed. `(?m)^` stays on the sentinel alone: the same
+    // echoed-typed-command-line risk applies to it too (confirmed live in
+    // the prior round), just no longer entangled with the token question.
+    const waitArgs = ['pane', 'wait-output', paneId, '--regex', `(?m)^${sentinel}:\\d+`, '--source', 'recent-unwrapped', '--lines', '500'];
+
+    // `detached: true` (self-review finding, real, 2026-08-26 -- same
+    // process-group-kill pattern cliSpawnAdapter's own `child` already
+    // uses): without it, `waitChild` joins THIS process's own process
+    // group rather than becoming its own group leader, so
+    // `killChildTree`'s primary `process.kill(-pid, ...)` call always
+    // fails (no such group) and silently falls back to a single-pid
+    // `waitChild.kill(signal)` -- which reaches only the `herdr`/mock
+    // process itself, never any child IT spawned. Confirmed live: a mock
+    // `wait-output` handler running `sleep 10` as a plain foreground
+    // command (not itself detached) survived as an orphan after
+    // `waitChild` was killed, continuing to hold the inherited stdout
+    // pipe open for the remaining ~9s regardless of the timeout firing.
+    // With this, `waitChild` is its own group leader, so the SAME
+    // process-group SIGTERM now reaches both it and any child it spawns.
+    const waitChild = spawn(herdrBin, waitArgs, {
+      cwd,
+      env: fullEnv,
+      shell: false,
+      detached: true,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    let timedOut = false;
+    let timer = null;
+    let waitStdout = '';
+    waitChild.stdout.setEncoding('utf8');
+    waitChild.stdout.on('data', (chunk) => { waitStdout += chunk; });
+
+    // TIMEOUT MUST STOP THE WORKER, NOT JUST THE WATCHER (self-review
+    // finding, 2026-08-25, confirmed live): `pane run` types text into the
+    // pane's own shell -- it is not this adapter's child process, so
+    // killing `waitChild` (a separate `wait-output` polling process) never
+    // touches whatever the worker is still doing inside the pane. Verified
+    // empirically: a real `sleep 45` launched via `pane run`, still
+    // visible in `ps` under its own pty, was gone within one second of
+    // `herdr pane close <paneId>` -- the same real mechanism used here.
+    // Best-effort and never allowed to block or fail the reject: losing
+    // the ability to positively confirm the close is strictly better than
+    // losing the timeout report itself.
+    if (timeoutMs) {
+      timer = setTimeout(() => {
+        timedOut = true;
+        try {
+          killChildTree(waitChild, 'SIGTERM');
+        } catch {}
+        try {
+          execFileSync(herdrBin, ['pane', 'close', paneId], {
+            cwd,
+            env: fullEnv,
+            encoding: 'utf8',
+            shell: false,
+            stdio: ['ignore', 'pipe', 'pipe'],
+            timeout: 5000,
+          });
+        } catch {}
+        // TIMEOUT SETTLES IMMEDIATELY, NEVER WAITS FOR waitChild's OWN
+        // 'close' (self-review finding, real, 2026-08-26 -- same class as
+        // cliSpawnAdapter's own timeout-authority fix): waiting for
+        // 'close' after a kill means a lingering/escaped descendant of
+        // `waitChild` holding its stdout pipe open would delay this
+        // rejection past `timeoutMs` by however long that descendant
+        // keeps running -- `timeoutMs` is a ceiling on the answer, not on
+        // whatever a killed process's own descendants do afterward.
+        // Destroying our own read end (not just rejecting the promise)
+        // also stops THIS PROCESS's event loop from staying alive waiting
+        // on that same lingering pipe -- confirmed live: without this, a
+        // caller that never force-exits hangs for however long the
+        // descendant keeps the write end open, even though the promise
+        // itself already settled.
+        try { waitChild.stdout.destroy(); } catch {}
+        cleanupScript();
+        reject(new DispatchError(
+          'worker-timeout',
+          `executor timed out after ${timeoutMs}ms for work "${workId}".`,
+          { workId, tier, model },
+        ));
+      }, timeoutMs);
+    }
+
+    waitChild.on('error', (err) => {
+      if (timer) clearTimeout(timer);
+      cleanupScript();
+      reject(new DispatchError(
+        'worker-spawn-fail',
+        `executor failed to observe completion for work "${workId}": ${err.message}`,
+        { workId, tier, model, cause: err.message },
+      ));
+    });
+
+    // 'close', not 'exit' -- same reasoning as cliSpawnAdapter's own fix
+    // above (self-review finding, 2026-08-26): `waitStdout` is accumulated
+    // from `waitChild.stdout`'s 'data' events, and 'exit' can fire before
+    // all of them have landed, truncating the JSON this handler parses
+    // below under load. Only the NORMAL (non-timeout) completion path
+    // reaches here now -- the timeout timer above already rejected and
+    // settled the promise synchronously on its own path, so `timedOut`
+    // being true here just means "already handled, do nothing further".
+    waitChild.on('close', (code, signal) => {
+      if (timer) clearTimeout(timer);
+      if (timedOut) return;
+
+      // OBSERVER FAILURE MUST NEVER MASQUERADE AS A WORKER RESULT
+      // (fifth-round advisor finding, real, 2026-08-25): a non-zero exit
+      // that is NOT this adapter's own SIGTERM-triggered timeout means
+      // `wait-output` itself failed to observe completion -- the pane was
+      // closed out from under it, a herdr-side error, a malformed
+      // response -- never the dispatched worker's own exit code (that
+      // fact ONLY ever reaches this adapter via the sentinel, parsed from
+      // real captured text below, never from wait-output's own process
+      // exit code). Falling through to the "success" path here would
+      // silently report a transport/tooling failure as if it were a real
+      // (if odd) worker result. Reject honestly instead.
+      if (code !== 0) {
+        cleanupScript();
+        reject(new DispatchError(
+          'worker-spawn-fail',
+          `executor failed to observe completion for work "${workId}": herdr pane wait-output exited with code ${code}${signal ? ` (signal ${signal})` : ''}.`,
+          { workId, tier, model, cause: 'herdr pane wait-output observer failure', exitCode: code },
+        ));
+        return;
+      }
+
+      // 4. Extract the scrollback text directly from wait-output's OWN
+      // embedded read result (self-review finding, 2026-08-25, confirmed
+      // live) -- NOT a separate `herdr pane read <paneId>` call, which was
+      // this adapter's prior design. Confirmed empirically against the
+      // real binary: a standalone `pane read --source recent-unwrapped`
+      // call returns EMPTY whenever the pane's total output still fits
+      // within the visible viewport (nothing has scrolled off-screen yet
+      // for "recent"/"recent-unwrapped" to find) -- the common case for a
+      // short [DONE]/[BLOCKED] confirmation or a brief error. wait-output's
+      // own embedded read (same --source/--lines flags, requested above)
+      // reliably captured both a short (4-line) and a long (200+ line)
+      // transcript in live testing; a second, separately-behaving call
+      // never needed to exist at all. `code` is always 0 here -- any other
+      // value already rejected above as an observer failure.
+      let rawStdout;
+      try {
+        const parsed = JSON.parse(waitStdout);
+        rawStdout = typeof parsed?.result?.read?.text === 'string' ? parsed.result.read.text : undefined;
+      } catch {
+        rawStdout = undefined;
+      }
+
+      // OBSERVER FAILURE, PART 2 (sixth-round advisor finding, real,
+      // 2026-08-25): wait-output exited 0 (claims a match) but its own
+      // response could not be parsed, or carried no `result.read.text` at
+      // all -- confirmed live via a mock `wait-output` response of
+      // `{"result":{}}`. This is NOT "the worker exited 0"; it is this
+      // adapter having no evidence of what actually happened. Falling
+      // through used to default `realStatus` to 0, silently reporting a
+      // fabricated success. Reject honestly instead of guessing.
+      if (rawStdout === undefined) {
+        cleanupScript();
+        reject(new DispatchError(
+          'worker-spawn-fail',
+          `executor for work "${workId}" could not confirm completion: herdr pane wait-output reported success but its response carried no readable scrollback.`,
+          { workId, tier, model, cause: 'herdr pane wait-output response missing result.read.text' },
+        ));
+        return;
+      }
+
+      // STDOUT MUST NOT INCLUDE THE PANE'S OWN ECHO OF THE TYPED COMMAND
+      // (sixth-round advisor finding, real, 2026-08-25): `rawStdout` is a
+      // raw TERMINAL TRANSCRIPT (prompt + typed-command echo + real
+      // output), never equivalent in shape to `cliSpawnAdapter`'s stdout
+      // (a real subprocess's own output stream, which never echoes its
+      // own invocation). Before the script-file indirection above, the
+      // TYPED text was the full dispatched prompt itself, so its echo
+      // reliably polluted stdout with content like "[DONE]" mentioned as
+      // worker-contract instructional prose -- confirmed live: an
+      // unsignaled worker whose prompt merely MENTIONED "[DONE]" still
+      // satisfied `executeExecutorCli`'s plain, unanchored hasSignal/isDone
+      // substring scan (cli.mjs) once that echo reached stdout unstripped.
+      // `typedCmd` is now always the short, fixed-shape `sh '<scriptPath>'`
+      // invocation -- it never contains a byte of prompt content, so
+      // stripping it is safe and reliable (a short, simple string, not the
+      // long complex one a prior attempt at this same fix found could come
+      // back altered by the pane's own shell/readline rendering).
+      //
+      // TWO occurrences, not one (confirmed live, 2026-08-26, follow-up
+      // review): `herdr pane run` types the command and the pane's
+      // transcript then shows it TWICE -- once as a bare echoed line (the
+      // typed keystrokes, no shell prompt yet) and again with the shell's
+      // own prompt prefix once the pane redraws after the shell has
+      // actually started executing it (e.g. "sh '<path>'\n➜  /tmp sh
+      // '<path>'\n<worker output>..."). Stripping only the FIRST occurrence
+      // (the previous version of this fix) left the second, prompt-
+      // prefixed occurrence sitting at the front of the "cleaned" stdout --
+      // confirmed live: the returned stdout still started with "➜  /tmp sh
+      // '<path>'" instead of the worker's real first line. The LAST
+      // occurrence of `typedCmd` that appears BEFORE the evaluated sentinel
+      // is always the terminal's own final echo of the invocation, never
+      // worker output (the sentinel is only ever emitted by the script
+      // AFTER the real command has fully exited) -- searching only the
+      // region before the sentinel also means a worker whose own output
+      // coincidentally contained this exact random-scriptPath string could
+      // never be mistaken for the echo.
+      const sentinelPattern = new RegExp(`${sentinel}:(?:\\$\\?|\\d+)`);
+      const sentinelIdx = rawStdout.search(sentinelPattern);
+      const searchRegion = sentinelIdx === -1 ? rawStdout : rawStdout.slice(0, sentinelIdx);
+      const echoEndIndex = searchRegion.lastIndexOf(typedCmd);
+      const stdout = echoEndIndex === -1 ? rawStdout : rawStdout.slice(echoEndIndex + typedCmd.length).replace(/^\r?\n+/, '');
+
+      // P2 (self-review finding, 2026-08-25): `status` used to be `herdr
+      // pane wait-output`'s OWN exit code -- a completion-watcher process,
+      // never the dispatched worker's. The sentinel above always carries
+      // the real one (`echo "${sentinel}:$?"`, `$?` captured immediately
+      // after the real command exits) -- parsed out here, from the
+      // ECHO-STRIPPED text above, and removed from the returned stdout so
+      // it never leaks into what looks like worker output.
+      const sentinelMatch = stdout.match(new RegExp(`${sentinel}:(\\d+)`));
+      // Sixth-round advisor finding, real: a code-0 wait-output response
+      // whose text (after stripping the echo, which is where the
+      // sentinel's own unevaluated literal form always lived) still
+      // carries no digit-suffixed sentinel match is unconfirmed
+      // completion, not "assume status 0" -- e.g. the real evaluated
+      // sentinel line fell outside the `--lines 500` cap on a very long
+      // transcript. Reject rather than fabricate a status with no
+      // evidence behind it.
+      if (!sentinelMatch) {
+        cleanupScript();
+        reject(new DispatchError(
+          'worker-spawn-fail',
+          `executor for work "${workId}" could not confirm completion: no sentinel found in the captured output.`,
+          { workId, tier, model, cause: 'sentinel not found in post-echo stdout' },
+        ));
+        return;
+      }
+      const realStatus = Number(sentinelMatch[1]);
+      const cleanedStdout = stdout.replace(new RegExp(`${sentinel}:(?:\\$\\?|\\d+)\\n?`, 'g'), '');
+
+      if (onChunk && cleanedStdout) {
+        teeChunk(onChunk, 'stdout', cleanedStdout);
+      }
+
+      cleanupScript();
+      resolve({
+        status: realStatus,
+        signal,
+        stdout: cleanedStdout,
+        stderr: '',
+        tier,
+        model,
+        paneId,
+      });
+    });
+  });
+}
+
 /** C9 v2 executor-adapter registry — see `cliSpawnAdapter`'s doc comment. */
-export const EXECUTOR_ADAPTERS = { [DEFAULT_ADAPTER]: cliSpawnAdapter, http: httpAdapter };
+export const EXECUTOR_ADAPTERS = {
+  [DEFAULT_ADAPTER]: cliSpawnAdapter,
+  http: httpAdapter,
+  'herdr-spawn': herdrSpawnAdapter,
+};
