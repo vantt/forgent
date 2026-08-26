@@ -163,6 +163,7 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     command: executor.command,
     args,
     env: executor.env,
+    liveOutput: executor.liveOutput,
     adapter,
     provider: executor.provider ?? executor.command,
     baseCommit: attestation.baseCommit,
@@ -655,74 +656,48 @@ function herdrSpawnAdapter(invocation, opts) {
     // token look dangerous" allowlist -- that heuristic is exactly what
     // let a metacharacter combination it didn't anticipate through before.
     const posixShellQuote = (value) => `'${String(value).replace(/'/g, `'\\''`)}'`;
-    const quotedCmd = [command, ...(args || [])].map(posixShellQuote).join(' ');
+    const liveOutput = invocation.liveOutput;
+    const effectiveArgs = liveOutput?.streamFlags
+      ? [...(args || []), ...liveOutput.streamFlags]
+      : (args || []);
+    const quotedCmd = [command, ...effectiveArgs].map(posixShellQuote).join(' ');
 
-    // SIGNAL FALLBACK (self-review finding, 2026-08-25): `herdr pane
-    // wait-output --regex` can ONLY detect completion by matching text the
-    // dispatched agent itself chooses to print -- unlike `cliSpawnAdapter`,
-    // which observes the real child process's own termination regardless
-    // of what it printed. An agent that does real work (commits, edits)
-    // but never emits `[DONE]`/`[BLOCKED]` -- the exact case the existing
-    // ladder's `headBefore`/`headAfter` git-inference fallback exists to
-    // handle -- would otherwise just sit until this adapter's own timeout
-    // elapses and hard-rejects, discarding that fallback entirely (this
-    // piece's own action text: "Results come back through the EXISTING
-    // ladder ... this piece introduces no new result protocol"). A
-    // runner-owned sentinel closes that gap without inventing a new
-    // protocol: it is not a signal the worker or `[DONE]`/`[BLOCKED]`
-    // ladder ever sees or needs to know about -- it only tells THIS
-    // adapter "the shell command has exited", the same fact `child.on
-    // ('exit')` already gives `cliSpawnAdapter` for free, plus the real
-    // exit code (closes the separate P2 finding: `status` below used to
-    // be `herdr pane wait-output`'s own exit code, never the worker's).
     const sentinel = `__fgos_herdr_exit_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}__`;
-
-    // SCRIPT-FILE INDIRECTION, not typing the real command directly
-    // (sixth-round advisor finding, real, 2026-08-25): typing the FULL
-    // `quotedCmd` (which carries the entire dispatched prompt -- often
-    // thousands of characters, built by buildPrompt) directly into the
-    // pane means the pane's OWN echo of that typed line pollutes the
-    // final captured stdout with prompt content, including the literal
-    // substrings "[DONE]"/"[BLOCKED]" the worker-contract prompt itself
-    // instructs the worker to print -- confirmed live: an unsignaled
-    // worker whose prompt merely MENTIONED "[DONE]" as an instruction
-    // still satisfied cli.mjs's plain substring hasSignal/isDone check
-    // once that echo reached stdout. Worse, confirmed live a second time:
-    // attempting to strip that echo by matching the exact long typed text
-    // is itself unreliable -- a sufficiently long/complex typed line
-    // (quotes and brackets close together, well past one terminal-width)
-    // came back from the pane with part of it (the trailing sentinel
-    // echo) silently altered by the pane's own shell/readline rendering,
-    // no longer byte-identical to what was sent. Writing the real command
-    // to a temp script FILE (via fs.writeFileSync -- never shell
-    // interpolation, so none of this applies to the file's own content)
-    // and typing only a SHORT, fixed-shape invocation of that file
-    // (`sh '<path>'`, always well under one terminal line, never
-    // containing a byte of prompt content) removes the entire class of
-    // echo-pollution and echo-mangling risk at its source, rather than
-    // trying to clean up an echo whose exact shape can't be trusted.
-    // SELF-DELETING SCRIPT (self-review finding, real, 2026-08-26): the
-    // script file above carries the same prompt/repo content the echo
-    // fix exists to keep out of stdout, now sitting as a 0700 file in
-    // `os.tmpdir()` instead. `cleanupScript` below only ever runs after
-    // this promise settles -- a process crash (or a kill -9) between
-    // `pane run` and that point leaves the file behind indefinitely,
-    // trading terminal-echo leakage for local temp-file exposure. `rm -f
-    // "$0"` as the script's own FIRST line closes that window at its
-    // source: POSIX shells keep the file descriptor open once they start
-    // reading a script, so unlinking the directory entry immediately
-    // (before `quotedCmd` -- and therefore any of its content -- ever
-    // runs) does not disturb the already-running interpreter, the same
-    // "self-destructing script" pattern used for any short-lived secret
-    // script. `cleanupScript` stays as a fallback for the case this
-    // script is written but never actually run (e.g. `pane run` itself
-    // fails right after the write).
     const scriptPath = path.join(os.tmpdir(), `fgos-herdr-run-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.sh`);
-    fs.writeFileSync(scriptPath, `rm -f "$0"\n${quotedCmd}\necho "${sentinel}:$?"\n`, { mode: 0o700 });
-    const typedCmd = `sh ${posixShellQuote(scriptPath)}`;
+    let rawJsonlPath = null;
+    let typedCmd;
+
+    if (liveOutput) {
+      rawJsonlPath = path.join(os.tmpdir(), `fgos-herdr-raw-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.jsonl`);
+      let rendererPath = liveOutput.renderer;
+      if (!path.isAbsolute(rendererPath)) {
+        const candidateCwd = path.resolve(cwd || process.cwd(), rendererPath);
+        if (fs.existsSync(candidateCwd)) {
+          rendererPath = candidateCwd;
+        } else {
+          rendererPath = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', rendererPath);
+        }
+      }
+
+      const scriptContent = `#!/usr/bin/env bash
+rm -f "$0" ${posixShellQuote(rawJsonlPath)}
+${quotedCmd} | tee ${posixShellQuote(rawJsonlPath)} | node ${posixShellQuote(rendererPath)}
+__exit_code=\${PIPESTATUS[0]}
+rm -f ${posixShellQuote(rawJsonlPath)}
+echo "${sentinel}:\${__exit_code}"
+`;
+      fs.writeFileSync(scriptPath, scriptContent, { mode: 0o700 });
+      typedCmd = `bash ${posixShellQuote(scriptPath)}`;
+    } else {
+      fs.writeFileSync(scriptPath, `rm -f "$0"\n${quotedCmd}\necho "${sentinel}:$?"\n`, { mode: 0o700 });
+      typedCmd = `sh ${posixShellQuote(scriptPath)}`;
+    }
 
     const cleanupScript = () => {
       try { fs.unlinkSync(scriptPath); } catch {}
+      if (rawJsonlPath) {
+        try { fs.unlinkSync(rawJsonlPath); } catch {}
+      }
     };
 
     try {
@@ -742,70 +717,8 @@ function herdrSpawnAdapter(invocation, opts) {
       ));
     }
 
-    // 3. Observe completion using `herdr pane wait-output`, waiting SOLELY
-    // on the runner-owned sentinel above (the shell command itself has
-    // exited) -- never the worker's own [DONE]/[BLOCKED] token (see the
-    // SENTINEL-ONLY COMPLETION SIGNAL comment below for why matching the
-    // token here was itself a bug, not a legitimate fast path).
-    //
-    // Deliberately NO `--timeout` flag (self-review finding, 2026-08-25,
-    // confirmed live): passing BOTH herdr's own `--timeout` and this
-    // adapter's own JS setTimeout at the identical duration is a genuine
-    // race -- confirmed empirically against the real binary that when
-    // herdr's own timeout wins, `wait-output` exits 1 with an
-    // `{"error":{"code":"timeout",...}}` body and NO `result.read` at all,
-    // which this adapter's own `timedOut` flag (set only by ITS OWN
-    // setTimeout) never sees, so it fell through to the "success" branch
-    // and silently resolved `{status:1, stdout:''}` instead of rejecting
-    // `worker-timeout` -- a real timeout invisible to every caller that
-    // branches on that error class. Per `--help`, wait-output with no
-    // `--timeout` "waits indefinitely" -- the JS timer below is the SOLE
-    // timeout authority, the same single-source-of-truth shape
-    // `cliSpawnAdapter` already uses for its own child process.
-    //
-    // SENTINEL-ONLY completion signal -- never [DONE]/[BLOCKED] here
-    // (fifth-round advisor finding, real, 2026-08-25): `pane run` types
-    // the command into the pane's shell and returns immediately; the
-    // worker is NOT this adapter's child process the way `cliSpawnAdapter`'s
-    // `child` is. `cliSpawnAdapter` only ever inspects [DONE]/[BLOCKED]
-    // AFTER the real process has exited (cli.mjs's own hasSignal/isDone
-    // check runs against the FINAL accumulated stdout, downstream of
-    // resolve). Matching [DONE]/[BLOCKED] here too meant this adapter could
-    // resolve the MOMENT the token appeared, even if the worker printed it
-    // and then kept running -- confirmed live: a worker that printed
-    // [DONE] and continued for another second resolved in ~10ms, before
-    // the worker had actually finished. This also fully closes a second,
-    // related gap: a MULTILINE dispatched prompt (real repo/user content
-    // substituted via {prompt}) could itself contain a LINE starting with
-    // the literal text "[DONE]"/"[BLOCKED]" (an example, a quoted
-    // instruction) -- the pane's own echo of that typed prompt would then
-    // satisfy even the `(?m)^` anchored token pattern before the worker
-    // ever runs. The sentinel has no such collision risk (a random,
-    // adapter-owned marker no real prompt could plausibly contain) and
-    // fires EXACTLY ONCE, immediately after the real command truly exits
-    // -- the same fact `child.on('close')` gives `cliSpawnAdapter` for free.
-    // Token detection still happens, just downstream in cli.mjs against
-    // the final `stdout` this resolve() call returns, exactly like
-    // cliSpawnAdapter already does -- no behavior lost, only the false
-    // early-resolve removed. `(?m)^` stays on the sentinel alone: the same
-    // echoed-typed-command-line risk applies to it too (confirmed live in
-    // the prior round), just no longer entangled with the token question.
     const waitArgs = ['pane', 'wait-output', paneId, '--regex', `(?m)^${sentinel}:\\d+`, '--source', 'recent-unwrapped', '--lines', '500'];
 
-    // `detached: true` (self-review finding, real, 2026-08-26 -- same
-    // process-group-kill pattern cliSpawnAdapter's own `child` already
-    // uses): without it, `waitChild` joins THIS process's own process
-    // group rather than becoming its own group leader, so
-    // `killChildTree`'s primary `process.kill(-pid, ...)` call always
-    // fails (no such group) and silently falls back to a single-pid
-    // `waitChild.kill(signal)` -- which reaches only the `herdr`/mock
-    // process itself, never any child IT spawned. Confirmed live: a mock
-    // `wait-output` handler running `sleep 10` as a plain foreground
-    // command (not itself detached) survived as an orphan after
-    // `waitChild` was killed, continuing to hold the inherited stdout
-    // pipe open for the remaining ~9s regardless of the timeout firing.
-    // With this, `waitChild` is its own group leader, so the SAME
-    // process-group SIGTERM now reaches both it and any child it spawns.
     const waitChild = spawn(herdrBin, waitArgs, {
       cwd,
       env: fullEnv,
@@ -820,17 +733,6 @@ function herdrSpawnAdapter(invocation, opts) {
     waitChild.stdout.setEncoding('utf8');
     waitChild.stdout.on('data', (chunk) => { waitStdout += chunk; });
 
-    // TIMEOUT MUST STOP THE WORKER, NOT JUST THE WATCHER (self-review
-    // finding, 2026-08-25, confirmed live): `pane run` types text into the
-    // pane's own shell -- it is not this adapter's child process, so
-    // killing `waitChild` (a separate `wait-output` polling process) never
-    // touches whatever the worker is still doing inside the pane. Verified
-    // empirically: a real `sleep 45` launched via `pane run`, still
-    // visible in `ps` under its own pty, was gone within one second of
-    // `herdr pane close <paneId>` -- the same real mechanism used here.
-    // Best-effort and never allowed to block or fail the reject: losing
-    // the ability to positively confirm the close is strictly better than
-    // losing the timeout report itself.
     if (timeoutMs) {
       timer = setTimeout(() => {
         timedOut = true;
@@ -847,20 +749,6 @@ function herdrSpawnAdapter(invocation, opts) {
             timeout: 5000,
           });
         } catch {}
-        // TIMEOUT SETTLES IMMEDIATELY, NEVER WAITS FOR waitChild's OWN
-        // 'close' (self-review finding, real, 2026-08-26 -- same class as
-        // cliSpawnAdapter's own timeout-authority fix): waiting for
-        // 'close' after a kill means a lingering/escaped descendant of
-        // `waitChild` holding its stdout pipe open would delay this
-        // rejection past `timeoutMs` by however long that descendant
-        // keeps running -- `timeoutMs` is a ceiling on the answer, not on
-        // whatever a killed process's own descendants do afterward.
-        // Destroying our own read end (not just rejecting the promise)
-        // also stops THIS PROCESS's event loop from staying alive waiting
-        // on that same lingering pipe -- confirmed live: without this, a
-        // caller that never force-exits hangs for however long the
-        // descendant keeps the write end open, even though the promise
-        // itself already settled.
         try { waitChild.stdout.destroy(); } catch {}
         cleanupScript();
         reject(new DispatchError(
@@ -881,29 +769,10 @@ function herdrSpawnAdapter(invocation, opts) {
       ));
     });
 
-    // 'close', not 'exit' -- same reasoning as cliSpawnAdapter's own fix
-    // above (self-review finding, 2026-08-26): `waitStdout` is accumulated
-    // from `waitChild.stdout`'s 'data' events, and 'exit' can fire before
-    // all of them have landed, truncating the JSON this handler parses
-    // below under load. Only the NORMAL (non-timeout) completion path
-    // reaches here now -- the timeout timer above already rejected and
-    // settled the promise synchronously on its own path, so `timedOut`
-    // being true here just means "already handled, do nothing further".
     waitChild.on('close', (code, signal) => {
       if (timer) clearTimeout(timer);
       if (timedOut) return;
 
-      // OBSERVER FAILURE MUST NEVER MASQUERADE AS A WORKER RESULT
-      // (fifth-round advisor finding, real, 2026-08-25): a non-zero exit
-      // that is NOT this adapter's own SIGTERM-triggered timeout means
-      // `wait-output` itself failed to observe completion -- the pane was
-      // closed out from under it, a herdr-side error, a malformed
-      // response -- never the dispatched worker's own exit code (that
-      // fact ONLY ever reaches this adapter via the sentinel, parsed from
-      // real captured text below, never from wait-output's own process
-      // exit code). Falling through to the "success" path here would
-      // silently report a transport/tooling failure as if it were a real
-      // (if odd) worker result. Reject honestly instead.
       if (code !== 0) {
         cleanupScript();
         reject(new DispatchError(
@@ -914,20 +783,6 @@ function herdrSpawnAdapter(invocation, opts) {
         return;
       }
 
-      // 4. Extract the scrollback text directly from wait-output's OWN
-      // embedded read result (self-review finding, 2026-08-25, confirmed
-      // live) -- NOT a separate `herdr pane read <paneId>` call, which was
-      // this adapter's prior design. Confirmed empirically against the
-      // real binary: a standalone `pane read --source recent-unwrapped`
-      // call returns EMPTY whenever the pane's total output still fits
-      // within the visible viewport (nothing has scrolled off-screen yet
-      // for "recent"/"recent-unwrapped" to find) -- the common case for a
-      // short [DONE]/[BLOCKED] confirmation or a brief error. wait-output's
-      // own embedded read (same --source/--lines flags, requested above)
-      // reliably captured both a short (4-line) and a long (200+ line)
-      // transcript in live testing; a second, separately-behaving call
-      // never needed to exist at all. `code` is always 0 here -- any other
-      // value already rejected above as an observer failure.
       let rawStdout;
       try {
         const parsed = JSON.parse(waitStdout);
@@ -936,14 +791,6 @@ function herdrSpawnAdapter(invocation, opts) {
         rawStdout = undefined;
       }
 
-      // OBSERVER FAILURE, PART 2 (sixth-round advisor finding, real,
-      // 2026-08-25): wait-output exited 0 (claims a match) but its own
-      // response could not be parsed, or carried no `result.read.text` at
-      // all -- confirmed live via a mock `wait-output` response of
-      // `{"result":{}}`. This is NOT "the worker exited 0"; it is this
-      // adapter having no evidence of what actually happened. Falling
-      // through used to default `realStatus` to 0, silently reporting a
-      // fabricated success. Reject honestly instead of guessing.
       if (rawStdout === undefined) {
         cleanupScript();
         reject(new DispatchError(
@@ -954,64 +801,13 @@ function herdrSpawnAdapter(invocation, opts) {
         return;
       }
 
-      // STDOUT MUST NOT INCLUDE THE PANE'S OWN ECHO OF THE TYPED COMMAND
-      // (sixth-round advisor finding, real, 2026-08-25): `rawStdout` is a
-      // raw TERMINAL TRANSCRIPT (prompt + typed-command echo + real
-      // output), never equivalent in shape to `cliSpawnAdapter`'s stdout
-      // (a real subprocess's own output stream, which never echoes its
-      // own invocation). Before the script-file indirection above, the
-      // TYPED text was the full dispatched prompt itself, so its echo
-      // reliably polluted stdout with content like "[DONE]" mentioned as
-      // worker-contract instructional prose -- confirmed live: an
-      // unsignaled worker whose prompt merely MENTIONED "[DONE]" still
-      // satisfied `executeExecutorCli`'s plain, unanchored hasSignal/isDone
-      // substring scan (cli.mjs) once that echo reached stdout unstripped.
-      // `typedCmd` is now always the short, fixed-shape `sh '<scriptPath>'`
-      // invocation -- it never contains a byte of prompt content, so
-      // stripping it is safe and reliable (a short, simple string, not the
-      // long complex one a prior attempt at this same fix found could come
-      // back altered by the pane's own shell/readline rendering).
-      //
-      // TWO occurrences, not one (confirmed live, 2026-08-26, follow-up
-      // review): `herdr pane run` types the command and the pane's
-      // transcript then shows it TWICE -- once as a bare echoed line (the
-      // typed keystrokes, no shell prompt yet) and again with the shell's
-      // own prompt prefix once the pane redraws after the shell has
-      // actually started executing it (e.g. "sh '<path>'\n➜  /tmp sh
-      // '<path>'\n<worker output>..."). Stripping only the FIRST occurrence
-      // (the previous version of this fix) left the second, prompt-
-      // prefixed occurrence sitting at the front of the "cleaned" stdout --
-      // confirmed live: the returned stdout still started with "➜  /tmp sh
-      // '<path>'" instead of the worker's real first line. The LAST
-      // occurrence of `typedCmd` that appears BEFORE the evaluated sentinel
-      // is always the terminal's own final echo of the invocation, never
-      // worker output (the sentinel is only ever emitted by the script
-      // AFTER the real command has fully exited) -- searching only the
-      // region before the sentinel also means a worker whose own output
-      // coincidentally contained this exact random-scriptPath string could
-      // never be mistaken for the echo.
       const sentinelPattern = new RegExp(`${sentinel}:(?:\\$\\?|\\d+)`);
       const sentinelIdx = rawStdout.search(sentinelPattern);
       const searchRegion = sentinelIdx === -1 ? rawStdout : rawStdout.slice(0, sentinelIdx);
       const echoEndIndex = searchRegion.lastIndexOf(typedCmd);
       const stdout = echoEndIndex === -1 ? rawStdout : rawStdout.slice(echoEndIndex + typedCmd.length).replace(/^\r?\n+/, '');
 
-      // P2 (self-review finding, 2026-08-25): `status` used to be `herdr
-      // pane wait-output`'s OWN exit code -- a completion-watcher process,
-      // never the dispatched worker's. The sentinel above always carries
-      // the real one (`echo "${sentinel}:$?"`, `$?` captured immediately
-      // after the real command exits) -- parsed out here, from the
-      // ECHO-STRIPPED text above, and removed from the returned stdout so
-      // it never leaks into what looks like worker output.
       const sentinelMatch = stdout.match(new RegExp(`${sentinel}:(\\d+)`));
-      // Sixth-round advisor finding, real: a code-0 wait-output response
-      // whose text (after stripping the echo, which is where the
-      // sentinel's own unevaluated literal form always lived) still
-      // carries no digit-suffixed sentinel match is unconfirmed
-      // completion, not "assume status 0" -- e.g. the real evaluated
-      // sentinel line fell outside the `--lines 500` cap on a very long
-      // transcript. Reject rather than fabricate a status with no
-      // evidence behind it.
       if (!sentinelMatch) {
         cleanupScript();
         reject(new DispatchError(
@@ -1027,6 +823,17 @@ function herdrSpawnAdapter(invocation, opts) {
       if (onChunk && cleanedStdout) {
         teeChunk(onChunk, 'stdout', cleanedStdout);
       }
+
+      try {
+        execFileSync(herdrBin, ['pane', 'close', paneId], {
+          cwd,
+          env: fullEnv,
+          encoding: 'utf8',
+          shell: false,
+          stdio: ['ignore', 'pipe', 'pipe'],
+          timeout: 5000,
+        });
+      } catch {}
 
       cleanupScript();
       resolve({
