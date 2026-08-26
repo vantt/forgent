@@ -556,7 +556,7 @@ dispatch (`fgos ready`) — cửa pull không mở một tập riêng.
 `return` chỉ hoàn tất một `take`: một item có trạng thái hiệu lực `doing` nhưng KHÔNG mang
 `claimRole` là `human`/`session` (nghĩa là claim của chính runner, hoặc một
 claim di sản không role) bị `return` từ chối `validation` — cửa pull không
-bao giờ đụng vào claim of runner.
+bao giờ đụng vào claim của runner.
 
 #### Cửa pull mở rộng: hoàn tất một đề xuất nguồn-nhánh bị đỗ
 
