@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { rebuild, moveDocPathStore, demoteDocStore } from '../src/state/store.mjs';
 import { parseFrontmatter, renderFrontmatter } from '../src/report/frontmatter.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
+import { isLiveDocLifecycle } from '../src/state/knowledge-registry.mjs';
 
 // docs/architect/knowledge-registry-redesign.md §13.4 (Conservation): "every
 // old file must appear exactly once ... missing files, duplicate source
@@ -78,7 +79,7 @@ function computeConservationErrors(repoRoot, view, inventory, plannedMoves) {
       errors.push(
         `doc '${move.docId}' registry identity (topicId='${doc.topicId}', role='${doc.role}', currentPath='${doc.currentPath}') no longer matches the planned move (topicId='${move.topicId}', role='${move.role}', oldPath='${move.oldPath}') -- the registry changed since planning; re-run migration to re-plan`
       );
-    } else if (doc.docLifecycle === 'retired' || doc.docLifecycle === 'superseded') {
+    } else if (!isLiveDocLifecycle(doc.docLifecycle)) {
       // Same reasoning knowledge-bootstrap.mjs's own drift check uses: a
       // doc the registry already retired/superseded is not live, so
       // migrating its file (or accepting it as "already migrated" without
@@ -102,6 +103,7 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
 
   const view = rebuild(fgosDir);
   const plannedMoves = [];
+  const untraceableOldPathErrors = [];
   let alreadyMigratedCount = 0;
 
   for (const item of inventory) {
@@ -123,24 +125,39 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
     const existingDoc = view.docs?.[docId];
     const sourcePath = existingDoc ? existingDoc.currentPath : item.oldPath;
 
-    // Genuinely already migrated requires THREE things, not just the path
+    // Genuinely already migrated requires FOUR things, not just the path
     // comparison: the doc must actually be registered (requiring
     // `existingDoc`, not just `sourcePath === targetPath`, matters because
     // an unregistered row's `sourcePath` falls back to `item.oldPath`,
     // which can coincidentally already equal targetPath); the doc must
     // still be LIVE (a retired/superseded doc "already at its target" is
     // drift, not success -- same reasoning knowledge-bootstrap.mjs's own
-    // drift check uses); and the file must actually be reachable on disk
+    // drift check uses); the file must actually be reachable on disk
     // (design §13.5 rule 5, "verifies source reachability" -- a registry
     // that claims a path with no real file behind it is corruption this
-    // run must surface, not silently accept). Any row that fails one of
-    // these falls through to plannedMoves below, where
-    // computeConservationErrors' own missing-source-file and dead-doc
-    // checks explain exactly which one.
-    const isLive = existingDoc && existingDoc.docLifecycle !== 'retired' && existingDoc.docLifecycle !== 'superseded';
+    // run must surface, not silently accept); and the classifier's own
+    // `item.oldPath` must itself still be traceable -- either it already
+    // IS the doc's currentPath, or it survives as a recorded alias.
+    // Without that last check, a doc that reached its target through some
+    // OTHER path than the one this particular inventory row names would
+    // still read as "already migrated," even though that row's own old
+    // path was never preserved anywhere -- violating design §13.4's "every
+    // old file must appear exactly once [...] and remain traceable." Any
+    // row that fails one of these falls through to plannedMoves below (or,
+    // for the oldPath-traceability case specifically, straight into
+    // conservationErrors -- there is no file left to move, only a missing
+    // alias to name).
+    const isLive = existingDoc && isLiveDocLifecycle(existingDoc.docLifecycle);
     const targetFileReachable = existingDoc && fs.existsSync(path.join(repoRoot, targetPath));
     if (existingDoc && sourcePath === targetPath && isLive && targetFileReachable) {
-      alreadyMigratedCount++;
+      const oldPathTraceable = item.oldPath === existingDoc.currentPath || (existingDoc.aliases || []).includes(item.oldPath);
+      if (oldPathTraceable) {
+        alreadyMigratedCount++;
+        continue;
+      }
+      untraceableOldPathErrors.push(
+        `doc '${docId}' is already at its target '${targetPath}', but the inventory's oldPath '${item.oldPath}' is neither its currentPath nor a recorded alias -- that old path is not traceable anywhere; reconcile the inventory row or restore the alias before this run can be considered clean`
+      );
       continue;
     }
 
@@ -155,7 +172,7 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
     });
   }
 
-  const conservationErrors = computeConservationErrors(repoRoot, view, inventory, plannedMoves);
+  const conservationErrors = [...untraceableOldPathErrors, ...computeConservationErrors(repoRoot, view, inventory, plannedMoves)];
 
   if (dryRun) {
     return {
@@ -185,6 +202,36 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
     const srcAbs = path.join(repoRoot, move.oldPath);
     const destAbs = path.join(repoRoot, move.newPath);
 
+    // Update frontmatter on the SOURCE file, BEFORE the physical move and
+    // BEFORE any registry event -- this is the only order where a failure
+    // at any single step leaves nothing inconsistent behind:
+    //   - a throw here (parseFrontmatter/renderFrontmatter/writeFileSync):
+    //     the file never moved, no registry event recorded -- srcAbs is
+    //     the only thing possibly touched, and it's still at oldPath.
+    //   - a throw during the git mv/rename below: same as above, the
+    //     frontmatter update already succeeded but nothing was recorded
+    //     as moved either.
+    //   - a throw from moveDocPathStore/demoteDocStore after a successful
+    //     move: the file has already reached its final, correctly-
+    //     rendered content at newPath -- the ONLY residual gap is the
+    //     registry event itself, the single least-likely-to-fail step
+    //     here (a local JSON append, not a filesystem rename or a content
+    //     transform).
+    // The previous order (move first, frontmatter on destAbs, THEN
+    // registry) meant a frontmatter-write failure left the file already
+    // relocated to newPath while the registry still pointed at oldPath --
+    // a real partial apply, the exact class of gap this whole item exists
+    // to close.
+    const raw = fs.readFileSync(srcAbs, 'utf8');
+    const parsed = parseFrontmatter(raw);
+    const newMeta = {
+      ...parsed.meta,
+      framework: 'diataxis',
+      mode: move.quadrant,
+    };
+    const updated = renderFrontmatter(newMeta, parsed.body);
+    fs.writeFileSync(srcAbs, updated, 'utf8');
+
     fs.mkdirSync(path.dirname(destAbs), { recursive: true });
     try {
       // execFileSync (argv array, no shell) rather than a shell string --
@@ -197,25 +244,6 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
       try {
         execFileSync('git', ['add', move.newPath, move.oldPath], { cwd: repoRoot, stdio: 'ignore' });
       } catch {}
-    }
-
-    // Update frontmatter BEFORE recording any registry event for this move
-    // -- parseFrontmatter/renderFrontmatter/writeFileSync throwing here
-    // must never leave the registry claiming a move that only half
-    // happened. Recording moveDocPathStore/demoteDocStore first (the
-    // previous order) meant a frontmatter-write failure left the registry
-    // "ahead of reality": the exact class of gap this whole item exists to
-    // close, reintroduced one step later in the same loop.
-    if (fs.existsSync(destAbs)) {
-      const raw = fs.readFileSync(destAbs, 'utf8');
-      const parsed = parseFrontmatter(raw);
-      const newMeta = {
-        ...parsed.meta,
-        framework: 'diataxis',
-        mode: move.quadrant,
-      };
-      const updated = renderFrontmatter(newMeta, parsed.body);
-      fs.writeFileSync(destAbs, updated, 'utf8');
     }
 
     // Record moveDocPathStore event

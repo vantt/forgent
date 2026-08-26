@@ -337,8 +337,12 @@ test('knowledge-migration - dry-run reports a duplicate-source conservation erro
     // to move.
     registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'shared' });
     registerTopicStore(fgosDir, { topicId: 't2', purposeSlug: 'shared' });
-    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/shared/guide.md', docLifecycle: 'active' });
-    registerDocStore(fgosDir, { docId: 't2:pitfall', topicId: 't2', role: 'pitfall', currentPath: 'docs/shared/pitfall.md', docLifecycle: 'active' });
+    // Both docs carry the shared old path as a recorded alias -- the
+    // "already migrated" shortcut also requires the inventory's oldPath to
+    // remain traceable (currentPath or an alias), so this test isolates
+    // the duplicate-source check specifically, not that one.
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/shared/guide.md', docLifecycle: 'active', aliases: ['docs/dup-already-migrated.md'] });
+    registerDocStore(fgosDir, { docId: 't2:pitfall', topicId: 't2', role: 'pitfall', currentPath: 'docs/shared/pitfall.md', docLifecycle: 'active', aliases: ['docs/dup-already-migrated.md'] });
     // The "already migrated" shortcut also requires the target file to be
     // real/reachable on disk (design §13.5 rule 5) -- create both so this
     // test exercises the duplicate-source check in isolation, not that one.
@@ -491,6 +495,81 @@ test('knowledge-migration - dry-run against a completely fresh store (no bootstr
       true,
       `expected a clean doc-not-registered error, got: ${JSON.stringify(dry.conservationErrors)}`
     );
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-migration - refuses "already migrated" when the inventory oldPath is neither the doc\'s currentPath nor a recorded alias', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    // Doc is live, already sitting at its computed target, and the file is
+    // real on disk -- every other already-migrated condition holds. But
+    // the doc's own alias trail never recorded this inventory row's
+    // oldPath (e.g. it reached its target through some path other than
+    // the one this row names), so that old path is untraceable.
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/worktree-reclaim/guide.md', docLifecycle: 'active' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/never-recorded.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const targetFile = path.join(tmpDir, 'docs/worktree-reclaim/guide.md');
+    fs.mkdirSync(path.dirname(targetFile), { recursive: true });
+    fs.writeFileSync(targetFile, '# Guide\n', 'utf8');
+
+    const dry = runKnowledgeMigration(tmpDir, { dryRun: true });
+    assert.equal(dry.alreadyMigratedCount, 0, 'an untraceable oldPath must not be silently counted as already-migrated success');
+    assert.equal(
+      dry.conservationErrors.some((e) => e.includes("doc 't1:guide' is already at its target") && e.includes("'docs/how-to/never-recorded.md' is neither its currentPath nor a recorded alias")),
+      true,
+      `expected an untraceable-oldPath conservation error, got: ${JSON.stringify(dry.conservationErrors)}`
+    );
+
+    assert.throws(() => {
+      runKnowledgeMigration(tmpDir, { dryRun: false });
+    }, /is neither its currentPath nor a recorded alias/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-migration - a frontmatter-write failure leaves the source file and the registry untouched (no partial apply)', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: 'docs/how-to/reclaim.md', docLifecycle: 'active' });
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/how-to/reclaim.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, 'docs/how-to/reclaim.md');
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Reclaim\n', 'utf8');
+    execSync('git add docs/how-to/reclaim.md && git commit -m "add reclaim"', { cwd: tmpDir, stdio: 'ignore' });
+
+    // Frontmatter is now updated on the SOURCE file before any physical
+    // move or registry event -- a read-only source file makes that write
+    // throw EACCES at exactly the point the real bug report reproduced.
+    fs.chmodSync(oldFile, 0o444);
+    try {
+      assert.throws(() => {
+        runKnowledgeMigration(tmpDir, { dryRun: false });
+      }, /EACCES/);
+
+      const newFile = path.join(tmpDir, 'docs/worktree-reclaim/guide.md');
+      assert.equal(fs.existsSync(oldFile), true, 'source file must still exist at its old path');
+      assert.equal(fs.existsSync(newFile), false, 'nothing must have moved to the target path');
+
+      const view = rebuild(fgosDir);
+      assert.equal(view.docs['t1:guide'].currentPath, 'docs/how-to/reclaim.md', 'registry must not claim a move that never completed');
+    } finally {
+      fs.chmodSync(oldFile, 0o644);
+    }
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
