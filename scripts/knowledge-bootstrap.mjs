@@ -75,29 +75,67 @@ export function bootstrapRegistry(dir, inventoryDataPath) {
   const driftErrors = [];
   for (const item of inventory) {
     const existingTopic = view.topics?.[item.topicId];
-    if (existingTopic && item.purposeSlug && existingTopic.purposeSlug !== item.purposeSlug) {
-      // A topic that already exists but disagrees with the classifier's
-      // current output on its own purposeSlug is real drift, not a no-op --
-      // silently skipping it would report "idempotent" while the registry
-      // and the classifier corpus have actually diverged. Bootstrap has no
-      // authority to decide which one is right (same reasoning as the
-      // duplicate-pairs refusal above); it fails loud and names both values
-      // so a person can reconcile with "fgos topic rename" or a corrected
-      // inventory row.
-      driftErrors.push(
-        `topic '${item.topicId}' already exists with purposeSlug '${existingTopic.purposeSlug}', but the inventory row wants '${item.purposeSlug}'`
-      );
+    if (existingTopic) {
+      if (existingTopic.status !== 'active') {
+        // A topic the inventory still references as a live source, but the
+        // registry has retired -- same drift shape as the checks below:
+        // the classifier's corpus view and the registry have diverged, and
+        // bootstrap has no authority to decide which one is right.
+        driftErrors.push(
+          `topic '${item.topicId}' already exists but is '${existingTopic.status}' (not active) -- the inventory still names it as a live source`
+        );
+      }
+      if (item.purposeSlug && existingTopic.purposeSlug !== item.purposeSlug) {
+        // A topic that already exists but disagrees with the classifier's
+        // current output on its own purposeSlug is real drift, not a no-op --
+        // silently skipping it would report "idempotent" while the registry
+        // and the classifier corpus have actually diverged. Bootstrap has no
+        // authority to decide which one is right (same reasoning as the
+        // duplicate-pairs refusal above); it fails loud and names both values
+        // so a person can reconcile with "fgos topic rename" or a corrected
+        // inventory row.
+        driftErrors.push(
+          `topic '${item.topicId}' already exists with purposeSlug '${existingTopic.purposeSlug}', but the inventory row wants '${item.purposeSlug}'`
+        );
+      }
     }
 
     const docId = `${item.topicId}:${item.role}`;
     const existingDoc = view.docs?.[docId];
-    if (existingDoc && existingDoc.currentPath !== item.oldPath) {
-      // Same reasoning as the topic drift check above, for the doc's own
-      // currentPath -- an existing doc whose path no longer matches the
-      // classifier's inventory is drift bootstrap must name, not skip past.
-      driftErrors.push(
-        `doc '${docId}' already exists with currentPath '${existingDoc.currentPath}', but the inventory row wants '${item.oldPath}'`
-      );
+    if (existingDoc) {
+      if (existingDoc.docLifecycle === 'retired' || existingDoc.docLifecycle === 'superseded') {
+        // A doc the inventory still names as a live corpus source, but the
+        // registry has already retired/superseded, is drift -- treating it
+        // as "already there, skip" would report idempotent success while
+        // there is in fact no LIVE doc for enforcement (attest, resolver,
+        // doctor) to use for this (topicId, role). Bootstrap cannot decide
+        // on its own whether the classifier is stale or the registry's
+        // retirement/supersession was a mistake; it fails loud.
+        driftErrors.push(
+          `doc '${docId}' already exists but is '${existingDoc.docLifecycle}' (not live) -- the inventory still names '${item.oldPath}' as a live source`
+        );
+      } else {
+        if (existingDoc.currentPath !== item.oldPath) {
+          // Same reasoning as the topic drift check above, for the doc's own
+          // currentPath -- an existing doc whose path no longer matches the
+          // classifier's inventory is drift bootstrap must name, not skip past.
+          driftErrors.push(
+            `doc '${docId}' already exists with currentPath '${existingDoc.currentPath}', but the inventory row wants '${item.oldPath}'`
+          );
+        }
+        const wantFramework = item.framework || 'diataxis';
+        const wantMode = item.mode || 'explanation';
+        if (existingDoc.framework !== wantFramework) {
+          driftErrors.push(
+            `doc '${docId}' already exists with framework '${existingDoc.framework}', but the inventory row wants '${wantFramework}'`
+          );
+        }
+        if (existingDoc.mode !== wantMode) {
+          driftErrors.push(
+            `doc '${docId}' already exists with mode '${existingDoc.mode}', but the inventory row wants '${wantMode}'`
+          );
+        }
+      }
     }
   }
   if (driftErrors.length > 0) {

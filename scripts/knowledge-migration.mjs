@@ -110,8 +110,18 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
     const existingDoc = view.docs?.[docId];
     const sourcePath = existingDoc ? existingDoc.currentPath : item.oldPath;
 
-    if (sourcePath === targetPath) {
-      // Already at its target -- nothing to plan, not a conservation gap.
+    if (existingDoc && sourcePath === targetPath) {
+      // Genuinely already migrated: the doc IS registered AND its real
+      // (registry) currentPath already equals the computed target --
+      // nothing to plan, not a conservation gap. Requiring `existingDoc`
+      // here (not just the path comparison) matters: when the doc isn't
+      // registered at all, `sourcePath` falls back to `item.oldPath`, and
+      // an inventory row whose oldPath happens to already equal the
+      // computed targetPath would otherwise be silently counted as
+      // "already migrated" and skipped entirely -- never checked for
+      // registry membership at all, unlike every other unregistered row
+      // (which reaches computeConservationErrors's own membership check
+      // via plannedMoves below).
       alreadyMigratedCount++;
       continue;
     }

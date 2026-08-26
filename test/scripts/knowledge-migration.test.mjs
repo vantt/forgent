@@ -360,3 +360,41 @@ test('knowledge-migration - dry-run reports a duplicate-source conservation erro
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledge-migration - refuses (does not silently report success) an unregistered doc whose inventory oldPath already equals the computed target', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  try {
+    registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
+    // Deliberately never register the t1:guide doc itself.
+
+    const reportsDir = path.join(tmpDir, 'docs/history/compound-learn-artifact-registry/reports');
+    fs.mkdirSync(reportsDir, { recursive: true });
+    // oldPath already equals what the target path would compute to
+    // (docs/worktree-reclaim/guide.md) -- the OLD code's `sourcePath ===
+    // targetPath` check fired on this coincidence alone and silently
+    // counted it as "already migrated", never checking whether the doc
+    // was even registered.
+    const inventoryData = [{ topicId: 't1', role: 'guide', oldPath: 'docs/worktree-reclaim/guide.md', mode: 'how-to' }];
+    fs.writeFileSync(path.join(reportsDir, 'inventory-data.json'), JSON.stringify(inventoryData, null, 2), 'utf8');
+
+    const oldFile = path.join(tmpDir, 'docs/worktree-reclaim/guide.md');
+    fs.mkdirSync(path.dirname(oldFile), { recursive: true });
+    fs.writeFileSync(oldFile, '# Guide\n', 'utf8');
+    execSync('git add docs/worktree-reclaim/guide.md && git commit -m "add guide"', { cwd: tmpDir, stdio: 'ignore' });
+
+    const dry = runKnowledgeMigration(tmpDir, { dryRun: true });
+    assert.equal(dry.alreadyMigratedCount, 0, 'must NOT be silently counted as already-migrated when the doc was never registered');
+    assert.equal(dry.moveCount, 1, 'must be planned (and therefore membership-checked) instead of skipped');
+    assert.equal(
+      dry.conservationErrors.some((e) => e.includes("doc 't1:guide' is not registered in the knowledge registry")),
+      true,
+      `expected a doc-not-registered conservation error, got: ${JSON.stringify(dry.conservationErrors)}`
+    );
+
+    assert.throws(() => {
+      runKnowledgeMigration(tmpDir, { dryRun: false });
+    }, /doc 't1:guide' is not registered in the knowledge registry/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});

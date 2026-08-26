@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { bootstrapRegistry } from '../../scripts/knowledge-bootstrap.mjs';
-import { rebuild, initStore } from '../../src/state/store.mjs';
+import { rebuild, initStore, retireDocStore, supersedeDocStore, retireTopicStore } from '../../src/state/store.mjs';
 import { assertActiveDocCardinality } from '../../src/state/knowledge-registry.mjs';
 
 test('knowledge-bootstrap - missing field rejects before writing entries', () => {
@@ -177,6 +177,96 @@ test('knowledge-bootstrap - a later row that fails the REDUCER\'s own validation
     const view = rebuild(tmpDir);
     assert.equal(view.topics, undefined, 't1 (the earlier, valid row) must not have been created either -- nothing durable until the whole batch validates');
     assert.equal(view.docs, undefined);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-bootstrap - refuses (does not report idempotent success) a doc the registry already retired', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  try {
+    const dataPath = path.join(tmpDir, 'inventory.json');
+    const first = [
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(first), 'utf8');
+    const res1 = bootstrapRegistry(tmpDir, dataPath);
+    assert.equal(res1.docsCreated, 1);
+
+    retireDocStore(tmpDir, { docId: 't1:guide' });
+
+    // The classifier re-scans the same corpus and still finds this row --
+    // as far as it knows, this is a live source. bootstrap must refuse,
+    // not silently report "docsCreated: 0" as if nothing was wrong.
+    assert.throws(() => {
+      bootstrapRegistry(tmpDir, dataPath);
+    }, /doc 't1:guide' already exists but is 'retired' \(not live\)/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-bootstrap - refuses a doc the registry already superseded', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  try {
+    const dataPath = path.join(tmpDir, 'inventory.json');
+    const first = [
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(first), 'utf8');
+    bootstrapRegistry(tmpDir, dataPath);
+    supersedeDocStore(tmpDir, { docId: 't1:guide' });
+
+    assert.throws(() => {
+      bootstrapRegistry(tmpDir, dataPath);
+    }, /doc 't1:guide' already exists but is 'superseded' \(not live\)/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-bootstrap - refuses a topic the registry already retired', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  try {
+    const dataPath = path.join(tmpDir, 'inventory.json');
+    const first = [
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(first), 'utf8');
+    bootstrapRegistry(tmpDir, dataPath);
+    retireDocStore(tmpDir, { docId: 't1:guide' });
+    retireTopicStore(tmpDir, { topicId: 't1' });
+
+    let errOutput = '';
+    try {
+      bootstrapRegistry(tmpDir, dataPath);
+    } catch (e) {
+      errOutput = e.message;
+    }
+    assert.ok(errOutput.includes("topic 't1' already exists but is 'retired' (not active)"));
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('knowledge-bootstrap - refuses a live doc whose framework or mode drifted from the registry', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  try {
+    const dataPath = path.join(tmpDir, 'inventory.json');
+    const first = [
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'how-to', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(first), 'utf8');
+    bootstrapRegistry(tmpDir, dataPath);
+
+    const driftedMode = [
+      { oldPath: 'docs/how-to/one.md', topicId: 't1', purposeSlug: 't1', purposeTitle: 'T1', role: 'guide', framework: 'diataxis', mode: 'reference', entities: [] },
+    ];
+    fs.writeFileSync(dataPath, JSON.stringify(driftedMode), 'utf8');
+
+    assert.throws(() => {
+      bootstrapRegistry(tmpDir, dataPath);
+    }, /doc 't1:guide' already exists with mode 'how-to', but the inventory row wants 'reference'/);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
