@@ -96,3 +96,47 @@ signal demonstrated above without needing to change polling cadence or
 understand herdr's internal heuristic further. A slower first-poll delay
 alone would not be a reliable fix (this Round's 3500ms false report is
 already past what a modest initial delay would buy).
+
+## Round 3 (2026-08-26) — implementing the fix surfaced a second, related race
+
+**Found during implementation:** the `sawWorking` gate alone (a single
+boolean, trusting the very next `idle`/`done` reading once `working` had
+been seen once) closed the original false-idle race, but left a residual
+flake: independent live re-runs of the strengthened test (a multi-step
+prompt: create a file, THEN run a separate `git commit` shell command)
+showed **1 failure out of 4 isolated runs** (`PROOF.txt` never created,
+same symptom as Round 2, but now occurring mid-turn instead of at
+startup) — and **2 failures out of 3 full-test-file runs** (this test
+alongside several other concurrently-executing live tests in the same
+file).
+
+**Mechanism:** a multi-step turn (file edit, then a separate Bash tool
+call for the git commands) can show a brief `idle`-looking gap on
+`agent_status` BETWEEN the two real tool calls — the model/tool-call
+round-trip has its own latency, and herdr's activity heuristic can read
+that gap as `idle` for one poll cycle. Once `sawWorking` had already
+latched `true` from the first tool call, that one-poll gap alone was
+enough to satisfy the original gate and fire `/exit` before the second
+tool call (the actual `git commit`) ever ran.
+
+**Fix, incremental, both steps live-tested:**
+- Requiring the SAME terminal reading on **2 consecutive** 500ms polls:
+  0 failures across 5 isolated re-runs (up from 1/4), but still 2
+  failures across 3 full-test-file (concurrent) runs — real resource
+  contention from multiple simultaneous live herdr/agy dispatches appears
+  to widen the mid-turn gap beyond one extra poll cycle under load.
+- Requiring **3 consecutive** polls: 0 failures across 4 full-test-file
+  runs (up from 1/3 with 2 polls). Not proof of "never" — LLM-backed
+  live timing is not perfectly bounded — but a real, measured
+  improvement over both the original bug (0/6+ successes) and the
+  2-poll debounce (1/3 full-file runs still failed).
+
+**Verdict:** accept the 3-consecutive-poll debounce as the shipped fix.
+This adds up to 1000ms of extra latency (two more 500ms poll cycles)
+before a genuine completion is recognized — negligible against the
+multi-second-to-tens-of-seconds real dispatch times observed throughout
+this investigation. Documented here plainly rather than claimed as a
+permanent, deterministic fix: a load-dependent residual flake of this
+kind is inherent to polling a heuristic, load-sensitive external signal
+(`herdr`'s own `agent_status` classifier) rather than something this
+adapter can fully control from its own side.

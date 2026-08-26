@@ -1182,9 +1182,124 @@ exit 0
   }
 });
 
+test('herdr-spawn adapter interactiveMode ignores premature idle signal until working is observed at least once (tsk-2rr)', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-false-idle-mock-test-'));
+  const scriptPath = path.join(tmpDir, 'false-idle-mock-herdr.mjs');
+  const outputsDir = path.join(tmpDir, 'pane-outputs');
+  fs.mkdirSync(outputsDir, { recursive: true });
+
+  // A mock herdr whose pane get returns:
+  // Poll 0: 'idle' (false-idle reading!)
+  // Poll 1: 'working'
+  // Poll 2: 'idle' (real completion)
+  const code = `
+import fs from 'node:fs';
+import path from 'node:path';
+const outputsDir = ${JSON.stringify(outputsDir)};
+const args = process.argv.slice(2);
+const subcommand = args[0];
+const action = args[1];
+
+if (subcommand === 'pane' && action === 'split') {
+  const paneId = 'pane-false-idle-' + Date.now();
+  fs.writeFileSync(path.join(outputsDir, paneId + '.txt'), '');
+  fs.writeFileSync(path.join(outputsDir, paneId + '-polls.txt'), '0');
+  fs.writeFileSync(path.join(outputsDir, paneId + '-exit-sent.txt'), 'false');
+  console.log(JSON.stringify({ result: { pane: { pane_id: paneId } } }));
+  process.exit(0);
+}
+
+if (subcommand === 'pane' && action === 'run') {
+  const paneId = args[2];
+  const cmd = args[3];
+  const outFile = path.join(outputsDir, paneId + '.txt');
+  fs.appendFileSync(outFile, cmd + '\\n');
+  if (cmd.includes('__fgos_herdr_exit_')) {
+    fs.writeFileSync(path.join(outputsDir, paneId + '-exit-sent.txt'), 'true');
+    const sentinelMatch = cmd.match(/__fgos_herdr_exit_[^:]+/);
+    if (sentinelMatch) {
+      fs.appendFileSync(outFile, sentinelMatch[0] + ':0\\n');
+    }
+  }
+  process.exit(0);
+}
+
+if (subcommand === 'pane' && action === 'get') {
+  const paneId = args[2];
+  const pollsFile = path.join(outputsDir, paneId + '-polls.txt');
+  let count = 0;
+  try { count = parseInt(fs.readFileSync(pollsFile, 'utf8'), 10) || 0; } catch {}
+  fs.writeFileSync(pollsFile, String(count + 1));
+
+  let status = 'unknown';
+  if (count === 0) {
+    status = 'idle'; // False idle!
+  } else if (count === 1) {
+    status = 'working';
+  } else {
+    status = 'idle'; // Real completion after working
+  }
+  console.log(JSON.stringify({ result: { pane: { pane_id: paneId, agent_status: status } } }));
+  process.exit(0);
+}
+
+if (subcommand === 'pane' && action === 'wait-output') {
+  const paneId = args[2];
+  const regexIdx = args.indexOf('--regex');
+  const rawPattern = args[regexIdx + 1];
+  const re = new RegExp(rawPattern.replace(/\\(\\?m\\)/g, ''), 'm');
+  const outFile = path.join(outputsDir, paneId + '.txt');
+  const deadline = Date.now() + 5000;
+  while (Date.now() < deadline) {
+    const content = fs.existsSync(outFile) ? fs.readFileSync(outFile, 'utf8') : '';
+    const match = re.exec(content);
+    if (match) {
+      console.log(JSON.stringify({ result: { matched_line: match[0], read: { text: content } } }));
+      process.exit(0);
+    }
+  }
+  process.exit(1);
+}
+
+process.exit(0);
+`;
+  fs.writeFileSync(scriptPath, code);
+  const wrapperPath = path.join(tmpDir, 'herdr-wrapper.sh');
+  fs.writeFileSync(wrapperPath, `#!/bin/sh\nexec node "${scriptPath}" "$@"\n`);
+  fs.chmodSync(wrapperPath, 0o755);
+
+  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
+  const res = await herdrSpawn(
+    {
+      command: 'agy',
+      args: ['-i', 'prompt test'],
+      env: {},
+      interactiveMode: { exitCommand: '/exit' },
+    },
+    { cwd: tmpDir, timeoutMs: 5000, workId: 'false-idle-item', tier: 'standard', model: 'sonnet', herdrBin: wrapperPath },
+  );
+
+  assert.equal(res.status, 0);
+  // Verify poll count reached at least 3 (meaning poll 0 was ignored)
+  const pollFiles = fs.readdirSync(outputsDir).filter((f) => f.endsWith('-polls.txt'));
+  assert.equal(pollFiles.length, 1);
+  const totalPolls = parseInt(fs.readFileSync(path.join(outputsDir, pollFiles[0]), 'utf8'), 10);
+  assert.ok(totalPolls >= 3, `expected at least 3 polls (0: premature idle, 1: working, 2: real idle), got ${totalPolls}`);
+
+  // Verify exit command was sent
+  const exitFiles = fs.readdirSync(outputsDir).filter((f) => f.endsWith('-exit-sent.txt'));
+  assert.equal(exitFiles.length, 1);
+  const exitSent = fs.readFileSync(path.join(outputsDir, exitFiles[0]), 'utf8');
+  assert.equal(exitSent, 'true');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
 test('herdr-spawn adapter (LIVE): dispatch a real agy-herdr interactiveMode executor against real binaries', { skip: AGY_HERDR_SKIP }, async () => {
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'live-agy-interactive-proof-'));
   execFileSync('git', ['init'], { cwd: tmpRoot });
+  execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tmpRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tmpRoot });
   execFileSync('git', ['commit', '--allow-empty', '-m', 'initial'], { cwd: tmpRoot });
   writeRunnerConfigFixture(tmpRoot, {
     executor: { command: 'agy', args: ['-i', '{prompt}', '--model', '{model}'] },
@@ -1206,23 +1321,20 @@ test('herdr-spawn adapter (LIVE): dispatch a real agy-herdr interactiveMode exec
   });
 
   const res = await executeExecutorCli('test-agy-herdr-interactive', {
-    prompt: 'Print Hello from agy-herdr interactive live proof.',
+    prompt: 'Create a file named PROOF.txt containing "proof content", add PROOF.txt to git, and run git commit -m "proof commit". Do not ask questions, execute now.',
     repoRoot: tmpRoot,
     cwd: tmpRoot,
     tier: 'light',
   });
 
-  // stdout is BEST-EFFORT ONLY for interactiveMode (accepted scope
-  // decision, tsk-10j): confirmed live that agy's own screen clear on
-  // `/exit` means herdr's "recent-unwrapped" scrollback capture does not
-  // reliably retain the conversation content from before that clear --
-  // unlike the headless (`-p`) path's plain, never-cleared transcript.
-  // The two guarantees this item's own design actually promises are the
-  // real exit code and the pane auto-closing, both asserted below; full
-  // conversation text in the returned stdout is not a guarantee this
-  // path can honestly make.
   try {
     assert.equal(res.status, 0);
+    const proofPath = path.join(tmpRoot, 'PROOF.txt');
+    assert.ok(fs.existsSync(proofPath), 'PROOF.txt must exist on disk after interactive dispatch');
+    const content = fs.readFileSync(proofPath, 'utf8');
+    assert.ok(content.includes('proof content'), 'PROOF.txt must contain expected proof content');
+    const gitLog = execFileSync('git', ['log', '-1', '--oneline'], { cwd: tmpRoot, encoding: 'utf8' });
+    assert.ok(gitLog.includes('proof commit'), 'git log must confirm a new commit landed');
   } finally {
     fs.rmSync(tmpRoot, { recursive: true, force: true });
   }

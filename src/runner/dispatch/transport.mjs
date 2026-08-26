@@ -616,6 +616,8 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     }
 
     let settled = false;
+    let sawWorking = false;
+    let consecutiveTerminalPolls = 0;
     let pollInterval = null;
     let timeoutTimer = null;
     let waitChild = null;
@@ -677,6 +679,10 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
         agentStatus = parsed?.result?.pane?.agent_status ?? parsed?.result?.agent_status ?? parsed?.pane?.agent_status ?? parsed?.agent_status;
       } catch {}
 
+      if (agentStatus === 'working') {
+        sawWorking = true;
+      }
+
       // Real live testing found TWO distinct terminal states herdr reports
       // for a finished agent turn, not just one -- a longer multi-second
       // response settled at "idle" while a short single-line answer
@@ -685,7 +691,34 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
       // "the agent has genuinely stopped generating and it is safe to
       // send the exit command" -- matching only "idle" left short
       // responses hanging until the JS timeout, confirmed live.
+      //
+      // False-idle race fix (tsk-2rr): only trust an "idle" or "done" reading
+      // if checkIdle has already observed "working" at least once during this
+      // turn. Early premature "idle" reports before the agent starts generation
+      // are ignored, continuing to poll until "working" then terminal state.
+      //
+      // Mid-turn debounce (tsk-2rr follow-up): a single "working" sighting is
+      // not enough on its own -- a multi-step turn (e.g. edit a file, THEN
+      // run a shell command) can show a brief idle-looking gap BETWEEN two
+      // real tool calls, live-confirmed to intermittently fool a one-shot
+      // "sawWorking" gate into exiting mid-turn (~25% of live runs before
+      // this debounce -- see docs/history/agy-herdr-false-idle-polling-race/
+      // RESEARCH.md Round 3). Require the SAME terminal reading (idle or
+      // done) on three consecutive 500ms polls before trusting it -- a
+      // genuine finish stays idle/done for many poll cycles, while a
+      // mid-turn gap flips back to "working" within one or two cycles
+      // almost every time (two consecutive polls closed most of the gap
+      // live-confirmed, three closes the residual flake seen specifically
+      // under full-suite concurrent load, RESEARCH.md Round 3).
       if (agentStatus === 'idle' || agentStatus === 'done') {
+        if (sawWorking) {
+          consecutiveTerminalPolls += 1;
+        }
+      } else {
+        consecutiveTerminalPolls = 0;
+      }
+
+      if (sawWorking && consecutiveTerminalPolls >= 3) {
         if (pollInterval) {
           clearInterval(pollInterval);
           pollInterval = null;
