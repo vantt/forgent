@@ -29,7 +29,10 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/agent-executor-executor-aware-dispatch.md",
     "title": "Why executor-aware backend dispatch exists",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-64p",
+    "aliases": [
+      "docs/explanation/agent-executor-capacity-aware-dispatch.md"
+    ]
   },
   {
     "quadrant": "explanation",
@@ -61,7 +64,10 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
     "title": "The coding-classify-intake executor's full lifecycle — created, never wired, retired as dead config",
-    "sourceCaptureId": "tsk-6ar"
+    "sourceCaptureId": "tsk-3fj",
+    "aliases": [
+      "docs/explanation/coding-classify-intake-capacity-lifecycle-created-then-retired-as-dead-config.md"
+    ]
   },
   {
     "quadrant": "explanation",
@@ -157,7 +163,10 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/executor-dispatch-audit-records-command-not-just-provider-label.md",
     "title": "Why executor.dispatch audits record command alongside provider",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-33w",
+    "aliases": [
+      "docs/explanation/capacity-dispatch-audit-records-command-not-just-provider-label.md"
+    ]
   },
   {
     "quadrant": "explanation",
@@ -1885,7 +1894,10 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/configure-an-executor-to-dispatch-via-a-named-agent.md",
     "title": "How to configure a executor to dispatch via a named agent instead of a raw command",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-3sw",
+    "aliases": [
+      "docs/how-to/configure-a-capacity-to-dispatch-via-a-named-agent.md"
+    ]
   },
   {
     "quadrant": "how-to",
@@ -1989,7 +2001,10 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/generalize-a-judge-retry-helper-for-any-executor-dispatch.md",
     "title": "How to extract a judge-only retry helper into a executor-agnostic one",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-418",
+    "aliases": [
+      "docs/how-to/generalize-a-judge-retry-helper-for-any-capacity-dispatch.md"
+    ]
   },
   {
     "quadrant": "how-to",
@@ -2229,7 +2244,10 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/reuse-the-shared-executor-dispatch-fallback-fragment.md",
     "title": "How to reuse the shared executor-dispatch-fallback fragment in a new skill",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-53h",
+    "aliases": [
+      "docs/how-to/reuse-the-shared-capacity-dispatch-fallback-fragment.md"
+    ]
   },
   {
     "quadrant": "how-to",
@@ -2285,7 +2303,10 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md",
     "title": "How to smoke-test fgos-coding-implement with a trivial verify=true item",
-    "sourceCaptureId": null
+    "sourceCaptureId": "str89-case-study-executing",
+    "aliases": [
+      "docs/how-to/smoke-test-fgos-executing-with-a-trivial-item.md"
+    ]
   },
   {
     "quadrant": "how-to",
@@ -2373,7 +2394,10 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/wire-a-headless-function-through-an-agent-executor-executor.md",
     "title": "How to wire a headless function through an agent-executor executor",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-2yp",
+    "aliases": [
+      "docs/how-to/wire-a-headless-function-through-an-agent-executor-capacity.md"
+    ]
   },
   {
     "quadrant": "how-to",
@@ -2389,7 +2413,10 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/wire-a-skill-to-an-executor-by-purpose-not-name.md",
     "title": "How to wire a skill to an executor by purpose, not by name",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-2c1",
+    "aliases": [
+      "docs/how-to/wire-a-skill-to-a-capacity-by-purpose-not-name.md"
+    ]
   },
   {
     "quadrant": "how-to",
@@ -2397,7 +2424,10 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
     "title": "How to wire an existing skill's inline-reasoning step through an agent-executor executor",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-5l2-3",
+    "aliases": [
+      "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md"
+    ]
   },
   {
     "quadrant": "how-to",
@@ -2453,7 +2483,10 @@
     "audience": "A user who needs precise facts about a specific field/command/API.",
     "docPath": "docs/reference/executor-cross-provider-governance.md",
     "title": "executor cross-provider governance",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-32n",
+    "aliases": [
+      "docs/reference/capacity-cross-provider-governance.md"
+    ]
   },
   {
     "quadrant": "reference",

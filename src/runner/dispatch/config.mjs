@@ -550,6 +550,17 @@ function validateInvocationShape(invocation, label, capabilityNames) {
       throw new RunnerConfigError(`runner config (${label}) "url" must be a non-empty string when "via" is "api".`);
     }
   }
+  if (invocation.liveOutput !== undefined) {
+    if (!invocation.liveOutput || typeof invocation.liveOutput !== 'object' || Array.isArray(invocation.liveOutput)) {
+      throw new RunnerConfigError(`runner config (${label}) "liveOutput" must be an object when present.`);
+    }
+    if (!Array.isArray(invocation.liveOutput.streamFlags) || !invocation.liveOutput.streamFlags.every((flag) => typeof flag === 'string')) {
+      throw new RunnerConfigError(`runner config (${label}) "liveOutput.streamFlags" must be an array of strings when present.`);
+    }
+    if (typeof invocation.liveOutput.renderer !== 'string' || !invocation.liveOutput.renderer.trim()) {
+      throw new RunnerConfigError(`runner config (${label}) "liveOutput.renderer" must be a non-empty string when present.`);
+    }
+  }
   // via: 'task' needs neither `command` nor `args` — native in-session
   // Task/Agent dispatch carries no subprocess argv at all.
 }
