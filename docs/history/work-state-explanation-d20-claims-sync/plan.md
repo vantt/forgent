@@ -149,3 +149,12 @@ isolation, away from full-suite concurrency load: both passed cleanly.
 concurrent load and passing in isolation — this is a known, pre-existing
 environment-timing flake in the test suite, not a regression from this
 item's docs-only diff.
+
+A SECOND full-suite retry (after the note above) failed on the exact same
+single test, same shape, still the only failure (4138/4144 pass) — the
+third occurrence of this specific flake across this session's own work
+(tsk-1sl's evidence, then this item twice). No other background process
+was competing for CPU at retry time, so this is not solely a this-machine-
+right-now load artifact; it is this test's own timing margin being too
+tight under `node --test`'s real concurrency, independent of any code this
+item touches.
