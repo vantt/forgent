@@ -500,10 +500,13 @@ export function applyKnowledgeEvent(view, event) {
         throw new KnowledgeValidationError(`doc.mark-rendered: doc '${id}' not found`);
       }
       assertTopicWritable(view, doc.topicId, 'doc.mark-rendered');
-      if (doc.docLifecycle === 'reserved') {
-        doc.docLifecycle = 'provisional';
-        doc.updatedAt = event.ts ?? Date.now();
+      if (doc.docLifecycle !== 'reserved') {
+        throw new KnowledgeValidationError(
+          `doc.mark-rendered: doc '${id}' is '${doc.docLifecycle}', must be 'reserved'`
+        );
       }
+      doc.docLifecycle = 'provisional';
+      doc.updatedAt = event.ts ?? Date.now();
       break;
     }
 
@@ -544,8 +547,28 @@ export function applyKnowledgeEvent(view, event) {
       if (!doc) {
         throw new KnowledgeValidationError(`doc.supersede: doc '${id}' not found`);
       }
+      // supersededBy is a lineage pointer other readers (the resolver's
+      // fallback, doctors, end-user doc indexing) can follow forward from a
+      // dead doc to its replacement -- an unvalidated value (a docId that
+      // doesn't exist, points back at itself, or points at another already-
+      // dead doc) would corrupt that lineage silently instead of failing at
+      // write time where the mistake is still cheap to catch.
+      if (supersededBy) {
+        if (supersededBy === id) {
+          throw new KnowledgeValidationError(`doc.supersede: doc '${id}' cannot be supersededBy itself`);
+        }
+        const successor = view.docs[supersededBy];
+        if (!successor) {
+          throw new KnowledgeValidationError(`doc.supersede: supersededBy doc '${supersededBy}' not found`);
+        }
+        if (successor.docLifecycle === 'retired' || successor.docLifecycle === 'superseded') {
+          throw new KnowledgeValidationError(
+            `doc.supersede: supersededBy doc '${supersededBy}' is '${successor.docLifecycle}' — must be a live doc, not another dead one`
+          );
+        }
+        doc.supersededBy = supersededBy;
+      }
       doc.docLifecycle = 'superseded';
-      if (supersededBy) doc.supersededBy = supersededBy;
       doc.updatedAt = event.ts ?? Date.now();
       break;
     }

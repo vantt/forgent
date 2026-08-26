@@ -632,3 +632,59 @@ test('topic.retire fails closed on a nonexistent topicId instead of a silent no-
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('doc.supersede validates supersededBy -- refuses missing, self, and dead-doc targets', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+    registerDocStore(tmpDir, { docId: 'd-dead', topicId: 't1', role: 'pitfall', currentPath: 'docs/t1/pitfall.md', docLifecycle: 'active' });
+    retireDocStore(tmpDir, { docId: 'd-dead' });
+
+    assert.throws(() => {
+      supersedeDocStore(tmpDir, { docId: 'd1', supersededBy: 'does-not-exist' });
+    }, /doc\.supersede: supersededBy doc 'does-not-exist' not found/);
+
+    assert.throws(() => {
+      supersedeDocStore(tmpDir, { docId: 'd1', supersededBy: 'd1' });
+    }, /doc\.supersede: doc 'd1' cannot be supersededBy itself/);
+
+    assert.throws(() => {
+      supersedeDocStore(tmpDir, { docId: 'd1', supersededBy: 'd-dead' });
+    }, /doc\.supersede: supersededBy doc 'd-dead' is 'retired' — must be a live doc, not another dead one/);
+    let view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'active', 'every refused supersede above must not have mutated d1');
+
+    // Real sequencing: the replacement doc can only be registered once d1's
+    // own (topicId, role) slot is freed, so supersede first (no pointer
+    // yet), register the successor, then supersede again (idempotent
+    // re-supersede) to attach the now-real supersededBy pointer.
+    supersedeDocStore(tmpDir, { docId: 'd1' });
+    registerDocStore(tmpDir, { docId: 'd2', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide2.md', docLifecycle: 'provisional' });
+    supersedeDocStore(tmpDir, { docId: 'd1', supersededBy: 'd2' });
+    view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'superseded');
+    assert.equal(view.docs.d1.supersededBy, 'd2');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.mark-rendered fails closed on a doc that is not reserved, instead of a silent no-op', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'provisional' });
+
+    assert.throws(() => {
+      markDocRenderedStore(tmpDir, { docId: 'd1' });
+    }, /doc\.mark-rendered: doc 'd1' is 'provisional', must be 'reserved'/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'provisional', 'a refused mark-rendered must not have moved the state');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
