@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `main-checkout-hook-wired` reported a false negative on an absolute `core.hooksPath`
 
 `tsk-1gn` found `fgos doctor` reporting `main-checkout-hook-wired:
