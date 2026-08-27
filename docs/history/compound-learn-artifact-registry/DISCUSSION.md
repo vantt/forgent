@@ -366,6 +366,7 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | D-tsk28x-13 | **Supersede** mệnh đề chống-trùng của D-tsk28x-5: đường dẫn duy nhất chỉ là backstop VẬT LÝ; anti-fork ngữ nghĩa vẫn bắt buộc — và **đã tồn tại** (`fgos authoritative-match`, tsk-1lv-6). Đề bài là nâng phủ (20%) + cưỡng chế khai báo, không phải xây mới | Advisor ngoài phản biện Q1; kiểm chứng vòng 10. §3 dòng D18/D19 |
 | D-tsk28x-14 | Invariant `activeDoc(topicId, role) <= 1`, không escape hatch lúc ghi; thêm active doc chỉ qua split/merge/đổi-role tường minh có lineage; `docId` là danh tính kỹ thuật, không phải khoá cardinality | Session phản biện cửa thoát của advisor, chủ sản phẩm đồng ý + thắt chặt hơn. §3 dòng D22 |
 | D-tsk28x-15 | Lifecycle hai tầng: chất liệu dùng `material:draft`/`extracted_material`; tài liệu dùng `provisional`/`active`/`superseded`/`retired`. Chữ `draft` không xuất hiện ở tầng tài liệu | Giữ luật Q4 (cấm một nhãn cùng chữ ở hai trục khác nghĩa). §3 dòng D23 |
+| D-tsk28x-16 | **Supersede** mệnh đề layout của D-tsk28x-5: đường dẫn chiếu đổi từ `docs/<mục-đích>/<vai-trò>.md` sang `docs/knowledge/<mục-đích>/<vai-trò>.md` (thêm tiền tố `knowledge/`). Mệnh đề đường-dẫn-là-cặp-danh-tính (chống-trùng miễn phí) của D-tsk28x-5 không đổi, chỉ đổi tiền tố vật lý | Người dùng phản hồi trực tiếp khi xem dry-run của `tsk-5mh`: ~180 thư mục đơn-mục-đích đổ thẳng dưới `docs/` là "quá lộn xộn". Ghi qua `tsk-ozk`, `fgos decision --relation supersedes:D-tsk28x-5` |
 
 ## 5. Q&A log
 
