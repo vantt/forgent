@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # `recordGateApprove`'s real contract
 
 `recordGateApprove(dir, { id, gate, actor, verify })`
