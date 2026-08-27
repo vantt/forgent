@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # `fgos approve`'s "verify-only" mode checks the current cwd, not the item's real branch
 
 `tsk-2qz` was decomposed into `tsk-2qz-1`/`tsk-2qz-2`. Neither child got its
