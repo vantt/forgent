@@ -4,6 +4,8 @@ title: How to hand a material CONTEXT.md gap back from fgos-coding-planning to f
 tags: [fgos-coding-planning, fgos-coding-exploring, decompose, clarify, context-md, hand-back]
 timestamp: 2026-07-31T11:41:27.922Z
 source_capture_ids: [tsk-4y8]
+framework: diataxis
+mode: how-to
 ---
 
 # How to hand a material CONTEXT.md gap back from fgos-coding-planning to fgos-coding-exploring
