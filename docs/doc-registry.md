@@ -11,1991 +11,2570 @@ generated: true
 - Status: **active**
 - Purpose Slug: `how-to-add-a-changelog-md-entry-for-a-user-visible-change`
 - Docs:
-  - `add-a-changelog-entry-for-a-user-visible-change` (active): `docs/how-to/add-a-changelog-entry-for-a-user-visible-change.md`
+  - `add-a-changelog-entry-for-a-user-visible-change` (provisional): `docs/knowledge/how-to-add-a-changelog-md-entry-for-a-user-visible-change/add-a-changelog-entry-for-a-user-visible-change.md`
+    - Aliases: `docs/how-to/add-a-changelog-entry-for-a-user-visible-change.md`, `docs/how-to-add-a-changelog-md-entry-for-a-user-visible-change/add-a-changelog-entry-for-a-user-visible-change.md`
 
 ### How to add a drift guard for CLI registry help prose (`how-to-add-a-drift-guard-for-cli-registry-help-prose`)
 - Status: **active**
 - Purpose Slug: `how-to-add-a-drift-guard-for-cli-registry-help-prose`
 - Docs:
-  - `add-a-drift-guard-for-cli-registry-help-prose` (active): `docs/how-to/add-a-drift-guard-for-cli-registry-help-prose.md`
+  - `add-a-drift-guard-for-cli-registry-help-prose` (provisional): `docs/knowledge/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md`
+    - Aliases: `docs/how-to/add-a-drift-guard-for-cli-registry-help-prose.md`, `docs/how-to-add-a-drift-guard-for-cli-registry-help-prose/add-a-drift-guard-for-cli-registry-help-prose.md`
 
 ### How to add a new `createWorktree` call site without hand-writing cleanup (`how-to-add-a-new-createworktree-call-site-without-hand-writing-cleanup`)
 - Status: **active**
-- Purpose Slug: `how-to-add-a-new-createworktree-call-site-without-hand-writing-cleanup`
+- Purpose Slug: `how-to-add-a-new-createworktree-call-site-without-hand-writi`
+- Lineage: {"renamedFrom":"how-to-add-a-new-createworktree-call-site-without-hand-writing-cleanup"}
 - Docs:
-  - `add-a-new-createworktree-call-site` (active): `docs/how-to/add-a-new-createworktree-call-site.md`
+  - `add-a-new-createworktree-call-site` (provisional): `docs/knowledge/how-to-add-a-new-createworktree-call-site-without-hand-writi/add-a-new-createworktree-call-site.md`
+    - Aliases: `docs/how-to/add-a-new-createworktree-call-site.md`, `docs/how-to-add-a-new-createworktree-call-site-without-hand-writing-cleanup/add-a-new-createworktree-call-site.md`
 
 ### Add a new npm dependency to forgent (`add-a-new-npm-dependency-to-forgent`)
 - Status: **active**
 - Purpose Slug: `add-a-new-npm-dependency-to-forgent`
 - Docs:
-  - `add-a-new-npm-dependency-to-forgent` (active): `docs/how-to/add-a-new-npm-dependency-to-forgent.md`
+  - `add-a-new-npm-dependency-to-forgent` (provisional): `docs/knowledge/add-a-new-npm-dependency-to-forgent/add-a-new-npm-dependency-to-forgent.md`
+    - Aliases: `docs/how-to/add-a-new-npm-dependency-to-forgent.md`, `docs/add-a-new-npm-dependency-to-forgent/add-a-new-npm-dependency-to-forgent.md`
 
 ### Add a read-only fgOS verb and its plugin skill (`add-a-read-only-fgos-verb-and-its-plugin-skill`)
 - Status: **active**
 - Purpose Slug: `add-a-read-only-fgos-verb-and-its-plugin-skill`
 - Docs:
-  - `add-a-read-only-fgos-verb-and-plugin-skill` (active): `docs/how-to/add-a-read-only-fgos-verb-and-plugin-skill.md`
+  - `add-a-read-only-fgos-verb-and-plugin-skill` (provisional): `docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md`
+    - Aliases: `docs/how-to/add-a-read-only-fgos-verb-and-plugin-skill.md`, `docs/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md`
 
 ### How to grant a nested `claude -p` executor call its own scoped `allowedTools` (`how-to-grant-a-nested-claude-p-executor-call-its-own-scoped-allowedtools`)
 - Status: **active**
-- Purpose Slug: `how-to-grant-a-nested-claude-p-executor-call-its-own-scoped-allowedtools`
+- Purpose Slug: `how-to-grant-a-nested-claude-p-executor-call-its-own-scoped`
+- Lineage: {"renamedFrom":"how-to-grant-a-nested-claude-p-executor-call-its-own-scoped-allowedtools"}
 - Docs:
-  - `add-a-scoped-allowedtools-override-for-a-nested-executor-call` (active): `docs/how-to/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md`
+  - `add-a-scoped-allowedtools-override-for-a-nested-executor-call` (provisional): `docs/knowledge/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md`
+    - Aliases: `docs/how-to/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md`, `docs/how-to-grant-a-nested-claude-p-executor-call-its-own-scoped-allowedtools/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md`
 
 ### Add a single-item `--id` filter to an existing `list`-style verb (`add-a-single-item-id-filter-to-an-existing-list-style-verb`)
 - Status: **active**
 - Purpose Slug: `add-a-single-item-id-filter-to-an-existing-list-style-verb`
 - Docs:
-  - `add-a-single-item-id-filter-to-an-existing-list-verb` (active): `docs/how-to/add-a-single-item-id-filter-to-an-existing-list-verb.md`
+  - `add-a-single-item-id-filter-to-an-existing-list-verb` (provisional): `docs/knowledge/add-a-single-item-id-filter-to-an-existing-list-style-verb/add-a-single-item-id-filter-to-an-existing-list-verb.md`
+    - Aliases: `docs/how-to/add-a-single-item-id-filter-to-an-existing-list-verb.md`, `docs/add-a-single-item-id-filter-to-an-existing-list-style-verb/add-a-single-item-id-filter-to-an-existing-list-verb.md`
 
 ### Add a stateful fgOS verb-group with a local status overlay (`add-a-stateful-fgos-verb-group-with-a-local-status-overlay`)
 - Status: **active**
 - Purpose Slug: `add-a-stateful-fgos-verb-group-with-a-local-status-overlay`
 - Docs:
-  - `add-a-stateful-fgos-verb-group-with-a-local-status-overlay` (active): `docs/how-to/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md`
+  - `add-a-stateful-fgos-verb-group-with-a-local-status-overlay` (provisional): `docs/knowledge/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md`
+    - Aliases: `docs/how-to/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md`, `docs/add-a-stateful-fgos-verb-group-with-a-local-status-overlay/add-a-stateful-fgos-verb-group-with-a-local-status-overlay.md`
 
 ### How to advance a work item through `clarify` and `decompose` with `discover`/`decompose` (`how-to-advance-a-work-item-through-clarify-and-decompose-with-discover-decompose`)
 - Status: **active**
-- Purpose Slug: `how-to-advance-a-work-item-through-clarify-and-decompose-with-discover-decompose`
+- Purpose Slug: `how-to-advance-a-work-item-through-clarify-and-decompose-wit`
+- Lineage: {"renamedFrom":"how-to-advance-a-work-item-through-clarify-and-decompose-with-discover-decompose"}
 - Docs:
-  - `advance-a-clarify-or-decompose-stage-item-with-discover-decompose` (active): `docs/how-to/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md`
+  - `advance-a-clarify-or-decompose-stage-item-with-discover-decompose` (provisional): `docs/knowledge/how-to-advance-a-work-item-through-clarify-and-decompose-wit/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md`
+    - Aliases: `docs/how-to/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md`, `docs/how-to-advance-a-work-item-through-clarify-and-decompose-with-discover-decompose/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md`
 
 ### How to avoid a hung `verify` command on `fgos return`/`approve`/`catchup` (`how-to-avoid-a-hung-verify-command-on-fgos-return-approve-catchup`)
 - Status: **active**
-- Purpose Slug: `how-to-avoid-a-hung-verify-command-on-fgos-return-approve-catchup`
+- Purpose Slug: `how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca`
+- Lineage: {"renamedFrom":"how-to-avoid-a-hung-verify-command-on-fgos-return-approve-catchup"}
 - Docs:
-  - `avoid-a-hung-verify-on-return-approve-catchup` (active): `docs/how-to/avoid-a-hung-verify-on-return-approve-catchup.md`
+  - `avoid-a-hung-verify-on-return-approve-catchup` (provisional): `docs/knowledge/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-ca/avoid-a-hung-verify-on-return-approve-catchup.md`
+    - Aliases: `docs/how-to/avoid-a-hung-verify-on-return-approve-catchup.md`, `docs/how-to-avoid-a-hung-verify-command-on-fgos-return-approve-catchup/avoid-a-hung-verify-on-return-approve-catchup.md`
 
 ### Avoid a vacuous pass from `node --test --test-name-pattern` (`avoid-a-vacuous-pass-from-node-test-test-name-pattern`)
 - Status: **active**
 - Purpose Slug: `avoid-a-vacuous-pass-from-node-test-test-name-pattern`
 - Docs:
-  - `avoid-vacuous-pass-with-node-test-test-name-pattern` (active): `docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md`
+  - `avoid-vacuous-pass-with-node-test-test-name-pattern` (provisional): `docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md`
+    - Aliases: `docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md`, `docs/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md`
 
 ### How to branch fgos-coding-driving's claim step by a domain's worktreeBacked flag (`how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s-worktreebacked-flag`)
 - Status: **active**
-- Purpose Slug: `how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s-worktreebacked-flag`
+- Purpose Slug: `how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s`
+- Lineage: {"renamedFrom":"how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s-worktreebacked-flag"}
 - Docs:
-  - `branch-fgos-coding-driving-claim-step-by-domain-worktreebacked` (active): `docs/how-to/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md`
+  - `branch-fgos-coding-driving-claim-step-by-domain-worktreebacked` (provisional): `docs/knowledge/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md`
+    - Aliases: `docs/how-to/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md`, `docs/how-to-branch-fgos-coding-driving-s-claim-step-by-a-domain-s-worktreebacked-flag/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md`
 
 ### How to check main-checkout-lock status before retrying (`how-to-check-main-checkout-lock-status-before-retrying`)
 - Status: **active**
 - Purpose Slug: `how-to-check-main-checkout-lock-status-before-retrying`
 - Docs:
-  - `check-main-checkout-lock-status-before-retrying` (active): `docs/how-to/check-main-checkout-lock-status-before-retrying.md`
+  - `check-main-checkout-lock-status-before-retrying` (provisional): `docs/knowledge/how-to-check-main-checkout-lock-status-before-retrying/check-main-checkout-lock-status-before-retrying.md`
+    - Aliases: `docs/how-to/check-main-checkout-lock-status-before-retrying.md`, `docs/how-to-check-main-checkout-lock-status-before-retrying/check-main-checkout-lock-status-before-retrying.md`
 
 ### How to check a root item's progress with `fgos rollup` (`how-to-check-a-root-item-s-progress-with-fgos-rollup`)
 - Status: **active**
 - Purpose Slug: `how-to-check-a-root-item-s-progress-with-fgos-rollup`
 - Docs:
-  - `check-rollup-progress` (active): `docs/how-to/check-rollup-progress.md`
+  - `check-rollup-progress` (provisional): `docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md`
+    - Aliases: `docs/how-to/check-rollup-progress.md`, `docs/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md`
 
 ### How to check whether a suspected racing mechanism ever actually fired, before fixing it (`how-to-check-whether-a-suspected-racing-mechanism-ever-actually-fired-before-fixing-it`)
 - Status: **active**
-- Purpose Slug: `how-to-check-whether-a-suspected-racing-mechanism-ever-actually-fired-before-fixing-it`
+- Purpose Slug: `how-to-check-whether-a-suspected-racing-mechanism-ever-actua`
+- Lineage: {"renamedFrom":"how-to-check-whether-a-suspected-racing-mechanism-ever-actually-fired-before-fixing-it"}
 - Docs:
-  - `check-whether-a-suspected-mechanism-ever-fired-before-fixing-it` (active): `docs/how-to/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md`
+  - `check-whether-a-suspected-mechanism-ever-fired-before-fixing-it` (provisional): `docs/knowledge/how-to-check-whether-a-suspected-racing-mechanism-ever-actua/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md`
+    - Aliases: `docs/how-to/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md`, `docs/how-to-check-whether-a-suspected-racing-mechanism-ever-actually-fired-before-fixing-it/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md`
 
 ### How to claim an item that is still at stage `clarify` or `decompose` (`how-to-claim-an-item-that-is-still-at-stage-clarify-or-decompose`)
 - Status: **active**
-- Purpose Slug: `how-to-claim-an-item-that-is-still-at-stage-clarify-or-decompose`
+- Purpose Slug: `how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom`
+- Lineage: {"renamedFrom":"how-to-claim-an-item-that-is-still-at-stage-clarify-or-decompose"}
 - Docs:
-  - `claim-a-clarify-or-decompose-stage-item` (active): `docs/how-to/claim-a-clarify-or-decompose-stage-item.md`
+  - `claim-a-clarify-or-decompose-stage-item` (provisional): `docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md`
+    - Aliases: `docs/how-to/claim-a-clarify-or-decompose-stage-item.md`, `docs/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decompose/claim-a-clarify-or-decompose-stage-item.md`
 
 ### How to clear a stuck `.fgos/main-checkout.lock` (`how-to-clear-a-stuck-fgos-main-checkout-lock`)
 - Status: **active**
 - Purpose Slug: `how-to-clear-a-stuck-fgos-main-checkout-lock`
 - Docs:
-  - `clear-a-stuck-main-checkout-lock` (active): `docs/how-to/clear-a-stuck-main-checkout-lock.md`
+  - `clear-a-stuck-main-checkout-lock` (provisional): `docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md`
+    - Aliases: `docs/how-to/clear-a-stuck-main-checkout-lock.md`, `docs/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md`
 
 ### Close out a decomposed root item after all its children are done (`close-out-a-decomposed-root-item-after-all-its-children-are-done`)
 - Status: **active**
-- Purpose Slug: `close-out-a-decomposed-root-item-after-all-its-children-are-done`
+- Purpose Slug: `close-out-a-decomposed-root-item-after-all-its-children-are`
+- Lineage: {"renamedFrom":"close-out-a-decomposed-root-item-after-all-its-children-are-done"}
 - Docs:
-  - `close-out-a-decomposed-root-item-after-all-children-are-done` (active): `docs/how-to/close-out-a-decomposed-root-item-after-all-children-are-done.md`
+  - `close-out-a-decomposed-root-item-after-all-children-are-done` (provisional): `docs/knowledge/close-out-a-decomposed-root-item-after-all-its-children-are/close-out-a-decomposed-root-item-after-all-children-are-done.md`
+    - Aliases: `docs/how-to/close-out-a-decomposed-root-item-after-all-children-are-done.md`, `docs/close-out-a-decomposed-root-item-after-all-its-children-are-done/close-out-a-decomposed-root-item-after-all-children-are-done.md`
 
 ### How to close out a goalTier milestone/MVP item once all its targets are done (`how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its-targets-are-done`)
 - Status: **active**
-- Purpose Slug: `how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its-targets-are-done`
+- Purpose Slug: `how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its`
+- Lineage: {"renamedFrom":"how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its-targets-are-done"}
 - Docs:
-  - `close-out-a-goaltier-milestone-after-all-targets-are-done` (active): `docs/how-to/close-out-a-goaltier-milestone-after-all-targets-are-done.md`
+  - `close-out-a-goaltier-milestone-after-all-targets-are-done` (provisional): `docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md`
+    - Aliases: `docs/how-to/close-out-a-goaltier-milestone-after-all-targets-are-done.md`, `docs/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its-targets-are-done/close-out-a-goaltier-milestone-after-all-targets-are-done.md`
 
 ### How to close out a work item whose real work was already done before this claim (`how-to-close-out-a-work-item-whose-real-work-was-already-done-before-this-claim`)
 - Status: **active**
-- Purpose Slug: `how-to-close-out-a-work-item-whose-real-work-was-already-done-before-this-claim`
+- Purpose Slug: `how-to-close-out-a-work-item-whose-real-work-was-already-don`
+- Lineage: {"renamedFrom":"how-to-close-out-a-work-item-whose-real-work-was-already-done-before-this-claim"}
 - Docs:
-  - `close-out-a-work-item-already-done-before-claim` (active): `docs/how-to/close-out-a-work-item-already-done-before-claim.md`
+  - `close-out-a-work-item-already-done-before-claim` (provisional): `docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md`
+    - Aliases: `docs/how-to/close-out-a-work-item-already-done-before-claim.md`, `docs/how-to-close-out-a-work-item-whose-real-work-was-already-done-before-this-claim/close-out-a-work-item-already-done-before-claim.md`
 
 ### How to compute a parallel dispatch wave schedule (`how-to-compute-a-parallel-dispatch-wave-schedule`)
 - Status: **active**
 - Purpose Slug: `how-to-compute-a-parallel-dispatch-wave-schedule`
 - Docs:
-  - `compute-a-parallel-dispatch-wave-schedule` (active): `docs/how-to/compute-a-parallel-dispatch-wave-schedule.md`
+  - `compute-a-parallel-dispatch-wave-schedule` (provisional): `docs/knowledge/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md`
+    - Aliases: `docs/how-to/compute-a-parallel-dispatch-wave-schedule.md`, `docs/how-to-compute-a-parallel-dispatch-wave-schedule/compute-a-parallel-dispatch-wave-schedule.md`
 
 ### How to configure a executor to dispatch via a named agent instead of a raw command (`how-to-configure-a-executor-to-dispatch-via-a-named-agent-instead-of-a-raw-command`)
 - Status: **active**
-- Purpose Slug: `how-to-configure-a-executor-to-dispatch-via-a-named-agent-instead-of-a-raw-command`
+- Purpose Slug: `how-to-configure-a-executor-to-dispatch-via-a-named-agent-in`
+- Lineage: {"renamedFrom":"how-to-configure-a-executor-to-dispatch-via-a-named-agent-instead-of-a-raw-command"}
 - Docs:
-  - `configure-an-executor-to-dispatch-via-a-named-agent` (active): `docs/how-to/configure-an-executor-to-dispatch-via-a-named-agent.md`
+  - `configure-an-executor-to-dispatch-via-a-named-agent` (provisional): `docs/knowledge/how-to-configure-a-executor-to-dispatch-via-a-named-agent-in/configure-an-executor-to-dispatch-via-a-named-agent.md`
+    - Aliases: `docs/how-to/configure-a-capacity-to-dispatch-via-a-named-agent.md`, `docs/how-to/configure-an-executor-to-dispatch-via-a-named-agent.md`, `docs/how-to-configure-a-executor-to-dispatch-via-a-named-agent-instead-of-a-raw-command/configure-an-executor-to-dispatch-via-a-named-agent.md`
 
 ### How to continue when a root item decomposes into children mid-session (`how-to-continue-when-a-root-item-decomposes-into-children-mid-session`)
 - Status: **active**
-- Purpose Slug: `how-to-continue-when-a-root-item-decomposes-into-children-mid-session`
+- Purpose Slug: `how-to-continue-when-a-root-item-decomposes-into-children-mi`
+- Lineage: {"renamedFrom":"how-to-continue-when-a-root-item-decomposes-into-children-mid-session"}
 - Docs:
-  - `continue-after-root-decomposes-mid-session` (active): `docs/how-to/continue-after-root-decomposes-mid-session.md`
+  - `continue-after-root-decomposes-mid-session` (provisional): `docs/knowledge/how-to-continue-when-a-root-item-decomposes-into-children-mi/continue-after-root-decomposes-mid-session.md`
+    - Aliases: `docs/how-to/continue-after-root-decomposes-mid-session.md`, `docs/how-to-continue-when-a-root-item-decomposes-into-children-mid-session/continue-after-root-decomposes-mid-session.md`
 
 ### How to cut a fgOS release tag (`how-to-cut-a-fgos-release-tag`)
 - Status: **active**
 - Purpose Slug: `how-to-cut-a-fgos-release-tag`
 - Docs:
-  - `cut-a-fgos-release-tag` (active): `docs/how-to/cut-a-fgos-release-tag.md`
+  - `cut-a-fgos-release-tag` (provisional): `docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md`
+    - Aliases: `docs/how-to/cut-a-fgos-release-tag.md`, `docs/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md`
 
 ### How to declare `--footprint` when `fgos-coding-planning` splits an item (`how-to-declare-footprint-when-fgos-coding-planning-splits-an-item`)
 - Status: **active**
-- Purpose Slug: `how-to-declare-footprint-when-fgos-coding-planning-splits-an-item`
+- Purpose Slug: `how-to-declare-footprint-when-fgos-coding-planning-splits-an`
+- Lineage: {"renamedFrom":"how-to-declare-footprint-when-fgos-coding-planning-splits-an-item"}
 - Docs:
-  - `declare-footprint-when-fgos-planning-splits-an-item` (active): `docs/how-to/declare-footprint-when-fgos-planning-splits-an-item.md`
+  - `declare-footprint-when-fgos-planning-splits-an-item` (provisional): `docs/knowledge/how-to-declare-footprint-when-fgos-coding-planning-splits-an/declare-footprint-when-fgos-planning-splits-an-item.md`
+    - Aliases: `docs/how-to/declare-footprint-when-fgos-planning-splits-an-item.md`, `docs/how-to-declare-footprint-when-fgos-coding-planning-splits-an-item/declare-footprint-when-fgos-planning-splits-an-item.md`
 
 ### How to diagnose a `fgos return` blocked by a verify failure unrelated to your change (`how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-unrelated-to-your-change`)
 - Status: **active**
-- Purpose Slug: `how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-unrelated-to-your-change`
+- Purpose Slug: `how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un`
+- Lineage: {"renamedFrom":"how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-unrelated-to-your-change"}
 - Docs:
-  - `diagnose-a-blocked-return-from-an-unrelated-verify-failure` (active): `docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md`
+  - `diagnose-a-blocked-return-from-an-unrelated-verify-failure` (provisional): `docs/knowledge/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-un/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md`
+    - Aliases: `docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md`, `docs/how-to-diagnose-a-fgos-return-blocked-by-a-verify-failure-unrelated-to-your-change/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md`
 
 ### How to diagnose an `fgos approve` blocked by `verify-fail-post-merge` (`how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post-merge`)
 - Status: **active**
-- Purpose Slug: `how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post-merge`
+- Purpose Slug: `how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post`
+- Lineage: {"renamedFrom":"how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post-merge"}
 - Docs:
-  - `diagnose-a-verify-fail-post-merge-block-on-approve` (active): `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md`
+  - `diagnose-a-verify-fail-post-merge-block-on-approve` (provisional): `docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md`
+    - Aliases: `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md`, `docs/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post-merge/diagnose-a-verify-fail-post-merge-block-on-approve.md`
 
 ### How to: label a herdr pane with the claimed task from a chrome-only fgOS skill (`how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrome-only-fgos-skill`)
 - Status: **active**
-- Purpose Slug: `how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrome-only-fgos-skill`
+- Purpose Slug: `how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom`
+- Lineage: {"renamedFrom":"how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrome-only-fgos-skill"}
 - Docs:
-  - `fgos-terminal-pane-rename` (active): `docs/how-to/fgos-terminal-pane-rename.md`
+  - `fgos-terminal-pane-rename` (provisional): `docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md`
+    - Aliases: `docs/how-to/fgos-terminal-pane-rename.md`, `docs/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrome-only-fgos-skill/fgos-terminal-pane-rename.md`
 
 ### How to find every caller before making a CLI flag required (`how-to-find-every-caller-before-making-a-cli-flag-required`)
 - Status: **active**
 - Purpose Slug: `how-to-find-every-caller-before-making-a-cli-flag-required`
 - Docs:
-  - `find-every-caller-before-requiring-a-cli-flag` (active): `docs/how-to/find-every-caller-before-requiring-a-cli-flag.md`
+  - `find-every-caller-before-requiring-a-cli-flag` (provisional): `docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md`
+    - Aliases: `docs/how-to/find-every-caller-before-requiring-a-cli-flag.md`, `docs/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md`
 
 ### Fix a pre-existing item that keeps re-asking an already-answered clarify question (`fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question`)
 - Status: **active**
-- Purpose Slug: `fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question`
+- Purpose Slug: `fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ`
+- Lineage: {"renamedFrom":"fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question"}
 - Docs:
-  - `fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question` (active): `docs/how-to/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md`
+  - `fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question` (provisional): `docs/knowledge/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answ/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md`
+    - Aliases: `docs/how-to/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md`, `docs/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md`
 
 ### How to fix a verify command that mixes prose with a real command (`how-to-fix-a-verify-command-that-mixes-prose-with-a-real-command`)
 - Status: **active**
-- Purpose Slug: `how-to-fix-a-verify-command-that-mixes-prose-with-a-real-command`
+- Purpose Slug: `how-to-fix-a-verify-command-that-mixes-prose-with-a-real-com`
+- Lineage: {"renamedFrom":"how-to-fix-a-verify-command-that-mixes-prose-with-a-real-command"}
 - Docs:
-  - `fix-a-verify-command-broken-by-mixed-in-prose` (active): `docs/how-to/fix-a-verify-command-broken-by-mixed-in-prose.md`
+  - `fix-a-verify-command-broken-by-mixed-in-prose` (provisional): `docs/knowledge/how-to-fix-a-verify-command-that-mixes-prose-with-a-real-com/fix-a-verify-command-broken-by-mixed-in-prose.md`
+    - Aliases: `docs/how-to/fix-a-verify-command-broken-by-mixed-in-prose.md`, `docs/how-to-fix-a-verify-command-that-mixes-prose-with-a-real-command/fix-a-verify-command-broken-by-mixed-in-prose.md`
 
 ### Fix dead fgOS shell-rc source lines (`fix-dead-fgos-shell-rc-source-lines`)
 - Status: **active**
 - Purpose Slug: `fix-dead-fgos-shell-rc-source-lines`
 - Docs:
-  - `fix-dead-fgos-shell-rc-source-lines` (active): `docs/how-to/fix-dead-fgos-shell-rc-source-lines.md`
+  - `fix-dead-fgos-shell-rc-source-lines` (provisional): `docs/knowledge/fix-dead-fgos-shell-rc-source-lines/fix-dead-fgos-shell-rc-source-lines.md`
+    - Aliases: `docs/how-to/fix-dead-fgos-shell-rc-source-lines.md`, `docs/fix-dead-fgos-shell-rc-source-lines/fix-dead-fgos-shell-rc-source-lines.md`
 
 ### How to fix a `fgos-write-rejected` merge block on a `.fgos/` change (`how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change`)
 - Status: **active**
-- Purpose Slug: `how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change`
+- Purpose Slug: `how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang`
+- Lineage: {"renamedFrom":"how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change"}
 - Docs:
-  - `fix-fgos-write-rejected-merge-block` (active): `docs/how-to/fix-fgos-write-rejected-merge-block.md`
+  - `fix-fgos-write-rejected-merge-block` (provisional): `docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md`
+    - Aliases: `docs/how-to/fix-fgos-write-rejected-merge-block.md`, `docs/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change/fix-fgos-write-rejected-merge-block.md`
 
 ### Fix a project skill that `Skill()` reports as "Unknown skill" (`fix-a-project-skill-that-skill-reports-as-unknown-skill`)
 - Status: **active**
 - Purpose Slug: `fix-a-project-skill-that-skill-reports-as-unknown-skill`
 - Docs:
-  - `fix-invisible-nested-project-skills` (active): `docs/how-to/fix-invisible-nested-project-skills.md`
+  - `fix-invisible-nested-project-skills` (provisional): `docs/knowledge/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md`
+    - Aliases: `docs/how-to/fix-invisible-nested-project-skills.md`, `docs/fix-a-project-skill-that-skill-reports-as-unknown-skill/fix-invisible-nested-project-skills.md`
 
 ### How to extract a judge-only retry helper into a executor-agnostic one (`how-to-extract-a-judge-only-retry-helper-into-a-executor-agnostic-one`)
 - Status: **active**
-- Purpose Slug: `how-to-extract-a-judge-only-retry-helper-into-a-executor-agnostic-one`
+- Purpose Slug: `how-to-extract-a-judge-only-retry-helper-into-a-executor-agn`
+- Lineage: {"renamedFrom":"how-to-extract-a-judge-only-retry-helper-into-a-executor-agnostic-one"}
 - Docs:
-  - `generalize-a-judge-retry-helper-for-any-executor-dispatch` (active): `docs/how-to/generalize-a-judge-retry-helper-for-any-executor-dispatch.md`
+  - `generalize-a-judge-retry-helper-for-any-executor-dispatch` (provisional): `docs/knowledge/how-to-extract-a-judge-only-retry-helper-into-a-executor-agn/generalize-a-judge-retry-helper-for-any-executor-dispatch.md`
+    - Aliases: `docs/how-to/generalize-a-judge-retry-helper-for-any-capacity-dispatch.md`, `docs/how-to/generalize-a-judge-retry-helper-for-any-executor-dispatch.md`, `docs/how-to-extract-a-judge-only-retry-helper-into-a-executor-agnostic-one/generalize-a-judge-retry-helper-for-any-executor-dispatch.md`
 
 ### How to hand a material CONTEXT.md gap back from fgos-coding-planning to fgos-coding-exploring (`how-to-hand-a-material-context-md-gap-back-from-fgos-coding-planning-to-fgos-coding-exploring`)
 - Status: **active**
-- Purpose Slug: `how-to-hand-a-material-context-md-gap-back-from-fgos-coding-planning-to-fgos-coding-exploring`
+- Purpose Slug: `how-to-hand-a-material-context-md-gap-back-from-fgos-coding`
+- Lineage: {"renamedFrom":"how-to-hand-a-material-context-md-gap-back-from-fgos-coding-planning-to-fgos-coding-exploring"}
 - Docs:
-  - `hand-back-a-material-context-gap-during-planning` (active): `docs/how-to/hand-back-a-material-context-gap-during-planning.md`
+  - `hand-back-a-material-context-gap-during-planning` (provisional): `docs/knowledge/how-to-hand-a-material-context-md-gap-back-from-fgos-coding/hand-back-a-material-context-gap-during-planning.md`
+    - Aliases: `docs/how-to/hand-back-a-material-context-gap-during-planning.md`, `docs/how-to-hand-a-material-context-md-gap-back-from-fgos-coding-planning-to-fgos-coding-exploring/hand-back-a-material-context-gap-during-planning.md`
 
 ### How to close a duplicate, superseded, or admin-decided work item (`how-to-close-a-duplicate-superseded-or-admin-decided-work-item`)
 - Status: **active**
-- Purpose Slug: `how-to-close-a-duplicate-superseded-or-admin-decided-work-item`
+- Purpose Slug: `how-to-close-a-duplicate-superseded-or-admin-decided-work-it`
+- Lineage: {"renamedFrom":"how-to-close-a-duplicate-superseded-or-admin-decided-work-item"}
 - Docs:
-  - `handle-a-duplicate-work-item` (active): `docs/how-to/handle-a-duplicate-work-item.md`
+  - `handle-a-duplicate-work-item` (provisional): `docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md`
+    - Aliases: `docs/how-to/handle-a-duplicate-work-item.md`, `docs/how-to-close-a-duplicate-superseded-or-admin-decided-work-item/handle-a-duplicate-work-item.md`
 
 ### How to hold an open-ended design brainstorm with `fgos-coding-shaping` (`how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping`)
 - Status: **active**
-- Purpose Slug: `how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping`
+- Purpose Slug: `how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding`
+- Lineage: {"renamedFrom":"how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping"}
 - Docs:
-  - `hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping` (active): `docs/how-to/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md`
+  - `hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping` (provisional): `docs/knowledge/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md`
+    - Aliases: `docs/how-to/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md`, `docs/how-to-hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md`
 
 ### How to get the fgOS Claude Code plugin installed via `fgos doctor` (`how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-doctor`)
 - Status: **active**
-- Purpose Slug: `how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-doctor`
+- Purpose Slug: `how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-do`
+- Lineage: {"renamedFrom":"how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-doctor"}
 - Docs:
-  - `install-the-fgos-claude-code-plugin-via-doctor` (active): `docs/how-to/install-the-fgos-claude-code-plugin-via-doctor.md`
+  - `install-the-fgos-claude-code-plugin-via-doctor` (provisional): `docs/knowledge/how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-do/install-the-fgos-claude-code-plugin-via-doctor.md`
+    - Aliases: `docs/how-to/install-the-fgos-claude-code-plugin-via-doctor.md`, `docs/how-to-get-the-fgos-claude-code-plugin-installed-via-fgos-doctor/install-the-fgos-claude-code-plugin-via-doctor.md`
 
 ### Keep a real-fs-writing integration test from leaving a tracked file dirty (`keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty`)
 - Status: **active**
-- Purpose Slug: `keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty`
+- Purpose Slug: `keep-a-real-fs-writing-integration-test-from-leaving-a-track`
+- Lineage: {"renamedFrom":"keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty"}
 - Docs:
-  - `keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty` (active): `docs/how-to/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md`
+  - `keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty` (provisional): `docs/knowledge/keep-a-real-fs-writing-integration-test-from-leaving-a-track/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md`
+    - Aliases: `docs/how-to/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md`, `docs/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md`
 
 ### how to land a work item's branch into main when its status already reads delivered but the branch was never actually merged (`how-to-land-a-work-item-s-branch-into-main-when-its-status-already-reads-delivered-but-the-branch-was-never-actually-merged`)
 - Status: **active**
-- Purpose Slug: `how-to-land-a-work-item-s-branch-into-main-when-its-status-already-reads-delivered-but-the-branch-was-never-actually-merged`
+- Purpose Slug: `how-to-land-a-work-item-s-branch-into-main-when-its-status-a`
+- Lineage: {"renamedFrom":"how-to-land-a-work-item-s-branch-into-main-when-its-status-already-reads-delivered-but-the-branch-was-never-actually-merged"}
 - Docs:
-  - `land-a-delivered-item-whose-branch-was-never-actually-merged` (active): `docs/how-to/land-a-delivered-item-whose-branch-was-never-actually-merged.md`
+  - `land-a-delivered-item-whose-branch-was-never-actually-merged` (provisional): `docs/knowledge/how-to-land-a-work-item-s-branch-into-main-when-its-status-a/land-a-delivered-item-whose-branch-was-never-actually-merged.md`
+    - Aliases: `docs/how-to/land-a-delivered-item-whose-branch-was-never-actually-merged.md`, `docs/how-to-land-a-work-item-s-branch-into-main-when-its-status-already-reads-delivered-but-the-branch-was-never-actually-merged/land-a-delivered-item-whose-branch-was-never-actually-merged.md`
 
 ### Launch claude in a new herdr pane from a plugin (`launch-claude-in-a-new-herdr-pane-from-a-plugin`)
 - Status: **active**
 - Purpose Slug: `launch-claude-in-a-new-herdr-pane-from-a-plugin`
 - Docs:
-  - `launch-claude-in-a-new-herdr-pane-from-a-plugin` (active): `docs/how-to/launch-claude-in-a-new-herdr-pane-from-a-plugin.md`
+  - `launch-claude-in-a-new-herdr-pane-from-a-plugin` (provisional): `docs/knowledge/launch-claude-in-a-new-herdr-pane-from-a-plugin/launch-claude-in-a-new-herdr-pane-from-a-plugin.md`
+    - Aliases: `docs/how-to/launch-claude-in-a-new-herdr-pane-from-a-plugin.md`, `docs/launch-claude-in-a-new-herdr-pane-from-a-plugin/launch-claude-in-a-new-herdr-pane-from-a-plugin.md`
 
 ### Make a fail-safe catch block visible without breaking it (`make-a-fail-safe-catch-block-visible-without-breaking-it`)
 - Status: **active**
 - Purpose Slug: `make-a-fail-safe-catch-block-visible-without-breaking-it`
 - Docs:
-  - `make-a-fail-safe-catch-block-visible-without-breaking-it` (active): `docs/how-to/make-a-fail-safe-catch-block-visible-without-breaking-it.md`
+  - `make-a-fail-safe-catch-block-visible-without-breaking-it` (provisional): `docs/knowledge/make-a-fail-safe-catch-block-visible-without-breaking-it/make-a-fail-safe-catch-block-visible-without-breaking-it.md`
+    - Aliases: `docs/how-to/make-a-fail-safe-catch-block-visible-without-breaking-it.md`, `docs/make-a-fail-safe-catch-block-visible-without-breaking-it/make-a-fail-safe-catch-block-visible-without-breaking-it.md`
 
 ### Make a hardcoded stage check domain-aware via `stageForStep` (`make-a-hardcoded-stage-check-domain-aware-via-stageforstep`)
 - Status: **active**
 - Purpose Slug: `make-a-hardcoded-stage-check-domain-aware-via-stageforstep`
 - Docs:
-  - `make-discover-decompose-domain-aware-via-stageforstep` (active): `docs/how-to/make-discover-decompose-domain-aware-via-stageforstep.md`
+  - `make-discover-decompose-domain-aware-via-stageforstep` (provisional): `docs/knowledge/make-a-hardcoded-stage-check-domain-aware-via-stageforstep/make-discover-decompose-domain-aware-via-stageforstep.md`
+    - Aliases: `docs/how-to/make-discover-decompose-domain-aware-via-stageforstep.md`, `docs/make-a-hardcoded-stage-check-domain-aware-via-stageforstep/make-discover-decompose-domain-aware-via-stageforstep.md`
 
 ### How to pass a caller-supplied verdict to `fgos discover`/`fgos plan` (`how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos-plan`)
 - Status: **active**
-- Purpose Slug: `how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos-plan`
+- Purpose Slug: `how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos`
+- Lineage: {"renamedFrom":"how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos-plan"}
 - Docs:
-  - `pass-a-caller-supplied-verdict-to-discover-or-decompose` (active): `docs/how-to/pass-a-caller-supplied-verdict-to-discover-or-decompose.md`
+  - `pass-a-caller-supplied-verdict-to-discover-or-decompose` (provisional): `docs/knowledge/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos/pass-a-caller-supplied-verdict-to-discover-or-decompose.md`
+    - Aliases: `docs/how-to/pass-a-caller-supplied-verdict-to-discover-or-decompose.md`, `docs/how-to-pass-a-caller-supplied-verdict-to-fgos-discover-fgos-plan/pass-a-caller-supplied-verdict-to-discover-or-decompose.md`
 
 ### Poll fgOS CLI data from a Rust plugin (`poll-fgos-cli-data-from-a-rust-plugin`)
 - Status: **active**
 - Purpose Slug: `poll-fgos-cli-data-from-a-rust-plugin`
 - Docs:
-  - `poll-fgos-cli-data-from-a-rust-plugin` (active): `docs/how-to/poll-fgos-cli-data-from-a-rust-plugin.md`
+  - `poll-fgos-cli-data-from-a-rust-plugin` (provisional): `docs/knowledge/poll-fgos-cli-data-from-a-rust-plugin/poll-fgos-cli-data-from-a-rust-plugin.md`
+    - Aliases: `docs/how-to/poll-fgos-cli-data-from-a-rust-plugin.md`, `docs/poll-fgos-cli-data-from-a-rust-plugin/poll-fgos-cli-data-from-a-rust-plugin.md`
 
 ### How to preserve shell escapes when transcribing a verify command (`how-to-preserve-shell-escapes-when-transcribing-a-verify-command`)
 - Status: **active**
-- Purpose Slug: `how-to-preserve-shell-escapes-when-transcribing-a-verify-command`
+- Purpose Slug: `how-to-preserve-shell-escapes-when-transcribing-a-verify-com`
+- Lineage: {"renamedFrom":"how-to-preserve-shell-escapes-when-transcribing-a-verify-command"}
 - Docs:
-  - `preserve-shell-escapes-when-transcribing-a-verify-command` (active): `docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md`
+  - `preserve-shell-escapes-when-transcribing-a-verify-command` (provisional): `docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md`
+    - Aliases: `docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md`, `docs/how-to-preserve-shell-escapes-when-transcribing-a-verify-command/preserve-shell-escapes-when-transcribing-a-verify-command.md`
 
 ### How to process the next clarify/decompose item with `/fgOS:discover-next` (`how-to-process-the-next-clarify-decompose-item-with-fgos-discover-next`)
 - Status: **active**
-- Purpose Slug: `how-to-process-the-next-clarify-decompose-item-with-fgos-discover-next`
+- Purpose Slug: `how-to-process-the-next-clarify-decompose-item-with-fgos-dis`
+- Lineage: {"renamedFrom":"how-to-process-the-next-clarify-decompose-item-with-fgos-discover-next"}
 - Docs:
-  - `process-the-next-clarify-or-decompose-item-with-discover-next` (active): `docs/how-to/process-the-next-clarify-or-decompose-item-with-discover-next.md`
+  - `process-the-next-clarify-or-decompose-item-with-discover-next` (provisional): `docs/knowledge/how-to-process-the-next-clarify-decompose-item-with-fgos-dis/process-the-next-clarify-or-decompose-item-with-discover-next.md`
+    - Aliases: `docs/how-to/process-the-next-clarify-or-decompose-item-with-discover-next.md`, `docs/how-to-process-the-next-clarify-decompose-item-with-fgos-discover-next/process-the-next-clarify-or-decompose-item-with-discover-next.md`
 
 ### Produce failing-test-first proof for an Iron Law-gated diff (`produce-failing-test-first-proof-for-an-iron-law-gated-diff`)
 - Status: **active**
 - Purpose Slug: `produce-failing-test-first-proof-for-an-iron-law-gated-diff`
 - Docs:
-  - `produce-failing-test-first-proof-for-an-iron-law-gated-diff` (active): `docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`
+  - `produce-failing-test-first-proof-for-an-iron-law-gated-diff` (provisional): `docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`
+    - Aliases: `docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`, `docs/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`
 
 ### How to read a CRITICAL impact-analysis result before treating it as a real blocker (`how-to-read-a-critical-impact-analysis-result-before-treating-it-as-a-real-blocker`)
 - Status: **active**
-- Purpose Slug: `how-to-read-a-critical-impact-analysis-result-before-treating-it-as-a-real-blocker`
+- Purpose Slug: `how-to-read-a-critical-impact-analysis-result-before-treatin`
+- Lineage: {"renamedFrom":"how-to-read-a-critical-impact-analysis-result-before-treating-it-as-a-real-blocker"}
 - Docs:
-  - `read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker` (active): `docs/how-to/read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker.md`
+  - `read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker` (provisional): `docs/knowledge/how-to-read-a-critical-impact-analysis-result-before-treatin/read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker.md`
+    - Aliases: `docs/how-to/read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker.md`, `docs/how-to-read-a-critical-impact-analysis-result-before-treating-it-as-a-real-blocker/read-a-critical-impact-analysis-result-before-treating-it-as-a-blocker.md`
 
 ### How to recognize a Claude Code hook `ENOENT posix_spawn '/bin/sh'` failure (`how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-sh-failure`)
 - Status: **active**
-- Purpose Slug: `how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-sh-failure`
+- Purpose Slug: `how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s`
+- Lineage: {"renamedFrom":"how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-sh-failure"}
 - Docs:
-  - `recognize-a-claude-code-hook-spawn-enoent-failure` (active): `docs/how-to/recognize-a-claude-code-hook-spawn-enoent-failure.md`
+  - `recognize-a-claude-code-hook-spawn-enoent-failure` (provisional): `docs/knowledge/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-s/recognize-a-claude-code-hook-spawn-enoent-failure.md`
+    - Aliases: `docs/how-to/recognize-a-claude-code-hook-spawn-enoent-failure.md`, `docs/how-to-recognize-a-claude-code-hook-enoent-posix-spawn-bin-sh-failure/recognize-a-claude-code-hook-spawn-enoent-failure.md`
 
 ### How to reconcile a blocked item after a leaf-into-root merge race (`how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge-race`)
 - Status: **active**
-- Purpose Slug: `how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge-race`
+- Purpose Slug: `how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge`
+- Lineage: {"renamedFrom":"how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge-race"}
 - Docs:
-  - `reconcile-a-blocked-item-after-a-leaf-into-root-merge-race` (active): `docs/how-to/reconcile-a-blocked-item-after-a-leaf-into-root-merge-race.md`
+  - `reconcile-a-blocked-item-after-a-leaf-into-root-merge-race` (provisional): `docs/knowledge/how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge/reconcile-a-blocked-item-after-a-leaf-into-root-merge-race.md`
+    - Aliases: `docs/how-to/reconcile-a-blocked-item-after-a-leaf-into-root-merge-race.md`, `docs/how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge-race/reconcile-a-blocked-item-after-a-leaf-into-root-merge-race.md`
 
 ### Reconcile a strategic backlog row against real execution state (`reconcile-a-strategic-backlog-row-against-real-execution-state`)
 - Status: **active**
-- Purpose Slug: `reconcile-a-strategic-backlog-row-against-real-execution-state`
+- Purpose Slug: `reconcile-a-strategic-backlog-row-against-real-execution-sta`
+- Lineage: {"renamedFrom":"reconcile-a-strategic-backlog-row-against-real-execution-state"}
 - Docs:
-  - `reconcile-a-strategic-backlog-row-against-real-execution-state` (active): `docs/how-to/reconcile-a-strategic-backlog-row-against-real-execution-state.md`
+  - `reconcile-a-strategic-backlog-row-against-real-execution-state` (provisional): `docs/knowledge/reconcile-a-strategic-backlog-row-against-real-execution-sta/reconcile-a-strategic-backlog-row-against-real-execution-state.md`
+    - Aliases: `docs/how-to/reconcile-a-strategic-backlog-row-against-real-execution-state.md`, `docs/reconcile-a-strategic-backlog-row-against-real-execution-state/reconcile-a-strategic-backlog-row-against-real-execution-state.md`
 
 ### How to reconstruct fgOS tracking state after an operator mistake discards `.fgos/events.jsonl` mid-session (`how-to-reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-fgos-events-jsonl-mid-session`)
 - Status: **active**
-- Purpose Slug: `how-to-reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-fgos-events-jsonl-mid-session`
+- Purpose Slug: `how-to-reconstruct-fgos-tracking-state-after-an-operator-mis`
+- Lineage: {"renamedFrom":"how-to-reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-fgos-events-jsonl-mid-session"}
 - Docs:
-  - `reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl` (active): `docs/how-to/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md`
+  - `reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl` (provisional): `docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md`
+    - Aliases: `docs/how-to/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md`, `docs/how-to-reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-fgos-events-jsonl-mid-session/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md`
 
 ### How to recover a `blocked` item with `fgos catchup` from inside its own worktree (`how-to-recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree`)
 - Status: **active**
-- Purpose Slug: `how-to-recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree`
+- Purpose Slug: `how-to-recover-a-blocked-item-with-fgos-catchup-from-inside`
+- Lineage: {"renamedFrom":"how-to-recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree"}
 - Docs:
-  - `recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree` (active): `docs/how-to/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md`
+  - `recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree` (provisional): `docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md`
+    - Aliases: `docs/how-to/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md`, `docs/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md`
 
 ### How to recover a blocked merge-conflict item when `fgos catchup` itself can't reconcile it (`how-to-recover-a-blocked-merge-conflict-item-when-fgos-catchup-itself-can-t-reconcile-it`)
 - Status: **active**
-- Purpose Slug: `how-to-recover-a-blocked-merge-conflict-item-when-fgos-catchup-itself-can-t-reconcile-it`
+- Purpose Slug: `how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch`
+- Lineage: {"renamedFrom":"how-to-recover-a-blocked-merge-conflict-item-when-fgos-catchup-itself-can-t-reconcile-it"}
 - Docs:
-  - `recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it` (active): `docs/how-to/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md`
+  - `recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it` (provisional): `docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md`
+    - Aliases: `docs/how-to/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md`, `docs/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catchup-itself-can-t-reconcile-it/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md`
 
 ### How to recover a stuck `doing` claim after a worktree-creation failure (`how-to-recover-a-stuck-doing-claim-after-a-worktree-creation-failure`)
 - Status: **active**
-- Purpose Slug: `how-to-recover-a-stuck-doing-claim-after-a-worktree-creation-failure`
+- Purpose Slug: `how-to-recover-a-stuck-doing-claim-after-a-worktree-creation`
+- Lineage: {"renamedFrom":"how-to-recover-a-stuck-doing-claim-after-a-worktree-creation-failure"}
 - Docs:
-  - `recover-a-stuck-doing-claim-after-worktree-creation-failure` (active): `docs/how-to/recover-a-stuck-doing-claim-after-worktree-creation-failure.md`
+  - `recover-a-stuck-doing-claim-after-worktree-creation-failure` (provisional): `docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md`
+    - Aliases: `docs/how-to/recover-a-stuck-doing-claim-after-worktree-creation-failure.md`, `docs/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation-failure/recover-a-stuck-doing-claim-after-worktree-creation-failure.md`
 
 ### How to recover `fgos approve`/`fgos sync-root` from inside a worktree with `--trust-dir` (`how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-worktree-with-trust-dir`)
 - Status: **active**
-- Purpose Slug: `how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-worktree-with-trust-dir`
+- Purpose Slug: `how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-wor`
+- Lineage: {"renamedFrom":"how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-worktree-with-trust-dir"}
 - Docs:
-  - `recover-approve-sync-root-from-inside-a-worktree-with-trust-dir` (active): `docs/how-to/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md`
+  - `recover-approve-sync-root-from-inside-a-worktree-with-trust-dir` (provisional): `docs/knowledge/how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-wor/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md`
+    - Aliases: `docs/how-to/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md`, `docs/how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-worktree-with-trust-dir/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md`
 
 ### merge-loop and merge-next self-run fgos catchup on a merge-conflict block reason instead of parking to ask a person (`merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-conflict-block-reason-instead-of-parking-to-ask-a-person`)
 - Status: **active**
-- Purpose Slug: `merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-conflict-block-reason-instead-of-parking-to-ask-a-person`
+- Purpose Slug: `merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c`
+- Lineage: {"renamedFrom":"merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-conflict-block-reason-instead-of-parking-to-ask-a-person"}
 - Docs:
-  - `recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup` (active): `docs/how-to/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md`
+  - `recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup` (provisional): `docs/knowledge/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-c/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md`
+    - Aliases: `docs/how-to/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md`, `docs/merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-conflict-block-reason-instead-of-parking-to-ask-a-person/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md`
 
 ### How to register a fixable doctor check in fgOS (`how-to-register-a-fixable-doctor-check-in-fgos`)
 - Status: **active**
 - Purpose Slug: `how-to-register-a-fixable-doctor-check-in-fgos`
 - Docs:
-  - `register-a-fixable-doctor-check-in-fgos` (active): `docs/how-to/register-a-fixable-doctor-check-in-fgos.md`
+  - `register-a-fixable-doctor-check-in-fgos` (provisional): `docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md`
+    - Aliases: `docs/how-to/register-a-fixable-doctor-check-in-fgos.md`, `docs/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md`
 
 ### How to resolve an `fgos approve` merge-conflict caused by two branches claiming the same decision ID (`how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two-branches-claiming-the-same-decision-id`)
 - Status: **active**
-- Purpose Slug: `how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two-branches-claiming-the-same-decision-id`
+- Purpose Slug: `how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two`
+- Lineage: {"renamedFrom":"how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two-branches-claiming-the-same-decision-id"}
 - Docs:
-  - `resolve-a-decision-id-collision-merge-conflict-on-approve` (active): `docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md`
+  - `resolve-a-decision-id-collision-merge-conflict-on-approve` (provisional): `docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md`
+    - Aliases: `docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md`, `docs/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two-branches-claiming-the-same-decision-id/resolve-a-decision-id-collision-merge-conflict-on-approve.md`
 
 ### How to resolve ambiguous multi-target errors from an impact-analysis provider (`how-to-resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider`)
 - Status: **active**
-- Purpose Slug: `how-to-resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider`
+- Purpose Slug: `how-to-resolve-ambiguous-multi-target-errors-from-an-impact`
+- Lineage: {"renamedFrom":"how-to-resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider"}
 - Docs:
-  - `resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider` (active): `docs/how-to/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md`
+  - `resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider` (provisional): `docs/knowledge/how-to-resolve-ambiguous-multi-target-errors-from-an-impact/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md`
+    - Aliases: `docs/how-to/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md`, `docs/how-to-resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md`
 
 ### How to resolve a git merge conflict on `.fgos/events.jsonl` without breaking seq contiguity (`how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-without-breaking-seq-contiguity`)
 - Status: **active**
-- Purpose Slug: `how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-without-breaking-seq-contiguity`
+- Purpose Slug: `how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit`
+- Lineage: {"renamedFrom":"how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-without-breaking-seq-contiguity"}
 - Docs:
-  - `resolve-an-events-jsonl-merge-conflict` (active): `docs/how-to/resolve-an-events-jsonl-merge-conflict.md`
+  - `resolve-an-events-jsonl-merge-conflict` (provisional): `docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md`
+    - Aliases: `docs/how-to/resolve-an-events-jsonl-merge-conflict.md`, `docs/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-without-breaking-seq-contiguity/resolve-an-events-jsonl-merge-conflict.md`
 
 ### How to respond when `fgos doctor` reports a shared `.fgos/events.jsonl` truncation (`how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation`)
 - Status: **active**
-- Purpose Slug: `how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation`
+- Purpose Slug: `how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events`
+- Lineage: {"renamedFrom":"how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation"}
 - Docs:
-  - `resolve-an-events-jsonl-truncation` (active): `docs/how-to/resolve-an-events-jsonl-truncation.md`
+  - `resolve-an-events-jsonl-truncation` (provisional): `docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`
+    - Aliases: `docs/how-to/resolve-an-events-jsonl-truncation.md`, `docs/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation/resolve-an-events-jsonl-truncation.md`
 
 ### How to reuse the shared executor-dispatch-fallback fragment in a new skill (`how-to-reuse-the-shared-executor-dispatch-fallback-fragment-in-a-new-skill`)
 - Status: **active**
-- Purpose Slug: `how-to-reuse-the-shared-executor-dispatch-fallback-fragment-in-a-new-skill`
+- Purpose Slug: `how-to-reuse-the-shared-executor-dispatch-fallback-fragment`
+- Lineage: {"renamedFrom":"how-to-reuse-the-shared-executor-dispatch-fallback-fragment-in-a-new-skill"}
 - Docs:
-  - `reuse-the-shared-executor-dispatch-fallback-fragment` (active): `docs/how-to/reuse-the-shared-executor-dispatch-fallback-fragment.md`
+  - `reuse-the-shared-executor-dispatch-fallback-fragment` (provisional): `docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md`
+    - Aliases: `docs/how-to/reuse-the-shared-capacity-dispatch-fallback-fragment.md`, `docs/how-to/reuse-the-shared-executor-dispatch-fallback-fragment.md`, `docs/how-to-reuse-the-shared-executor-dispatch-fallback-fragment-in-a-new-skill/reuse-the-shared-executor-dispatch-fallback-fragment.md`
 
 ### How to run a state-writing `fgos` verb from inside a picked worktree (`how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-worktree`)
 - Status: **active**
-- Purpose Slug: `how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-worktree`
+- Purpose Slug: `how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo`
+- Lineage: {"renamedFrom":"how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-worktree"}
 - Docs:
-  - `run-a-state-verb-from-inside-a-worktree` (active): `docs/how-to/run-a-state-verb-from-inside-a-worktree.md`
+  - `run-a-state-verb-from-inside-a-worktree` (provisional): `docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md`
+    - Aliases: `docs/how-to/run-a-state-verb-from-inside-a-worktree.md`, `docs/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-worktree/run-a-state-verb-from-inside-a-worktree.md`
 
 ### How to safely `git reset --hard` the main checkout (`how-to-safely-git-reset-hard-the-main-checkout`)
 - Status: **active**
 - Purpose Slug: `how-to-safely-git-reset-hard-the-main-checkout`
 - Docs:
-  - `safely-reset-the-main-checkout` (active): `docs/how-to/safely-reset-the-main-checkout.md`
+  - `safely-reset-the-main-checkout` (provisional): `docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md`
+    - Aliases: `docs/how-to/safely-reset-the-main-checkout.md`, `docs/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md`
 
 ### Scaffold and link a herdr plugin (`scaffold-and-link-a-herdr-plugin`)
 - Status: **active**
 - Purpose Slug: `scaffold-and-link-a-herdr-plugin`
 - Docs:
-  - `scaffold-and-link-a-herdr-plugin` (active): `docs/how-to/scaffold-and-link-a-herdr-plugin.md`
+  - `scaffold-and-link-a-herdr-plugin` (provisional): `docs/knowledge/scaffold-and-link-a-herdr-plugin/scaffold-and-link-a-herdr-plugin.md`
+    - Aliases: `docs/how-to/scaffold-and-link-a-herdr-plugin.md`, `docs/scaffold-and-link-a-herdr-plugin/scaffold-and-link-a-herdr-plugin.md`
 
 ### How to see done items in `fgos list` / `fgos triage` (`how-to-see-done-items-in-fgos-list-fgos-triage`)
 - Status: **active**
 - Purpose Slug: `how-to-see-done-items-in-fgos-list-fgos-triage`
 - Docs:
-  - `see-done-items-in-list-and-triage` (active): `docs/how-to/see-done-items-in-list-and-triage.md`
+  - `see-done-items-in-list-and-triage` (provisional): `docs/knowledge/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md`
+    - Aliases: `docs/how-to/see-done-items-in-list-and-triage.md`, `docs/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md`
 
 ### how to self-resolve a merge block reported as verify-timeout-post-merge, integration-drift, or merge-failed-unclassified, and what the narrowed same-id-twice stop rule now covers (`how-to-self-resolve-a-merge-block-reported-as-verify-timeout-post-merge-integration-drift-or-merge-failed-unclassified-and-what-the-narrowed-same-id-twice-stop-rule-now-covers`)
 - Status: **active**
-- Purpose Slug: `how-to-self-resolve-a-merge-block-reported-as-verify-timeout-post-merge-integration-drift-or-merge-failed-unclassified-and-what-the-narrowed-same-id-twice-stop-rule-now-covers`
+- Purpose Slug: `how-to-self-resolve-a-merge-block-reported-as-verify-timeout`
+- Lineage: {"renamedFrom":"how-to-self-resolve-a-merge-block-reported-as-verify-timeout-post-merge-integration-drift-or-merge-failed-unclassified-and-what-the-narrowed-same-id-twice-stop-rule-now-covers"}
 - Docs:
-  - `self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures` (active): `docs/how-to/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md`
+  - `self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures` (provisional): `docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md`
+    - Aliases: `docs/how-to/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md`, `docs/how-to-self-resolve-a-merge-block-reported-as-verify-timeout-post-merge-integration-drift-or-merge-failed-unclassified-and-what-the-narrowed-same-id-twice-stop-rule-now-covers/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md`
 
 ### Set or clear a work item's `parent` lineage via CLI (`set-or-clear-a-work-item-s-parent-lineage-via-cli`)
 - Status: **active**
 - Purpose Slug: `set-or-clear-a-work-item-s-parent-lineage-via-cli`
 - Docs:
-  - `set-or-clear-a-work-items-parent-lineage-via-cli` (active): `docs/how-to/set-or-clear-a-work-items-parent-lineage-via-cli.md`
+  - `set-or-clear-a-work-items-parent-lineage-via-cli` (provisional): `docs/knowledge/set-or-clear-a-work-item-s-parent-lineage-via-cli/set-or-clear-a-work-items-parent-lineage-via-cli.md`
+    - Aliases: `docs/how-to/set-or-clear-a-work-items-parent-lineage-via-cli.md`, `docs/set-or-clear-a-work-item-s-parent-lineage-via-cli/set-or-clear-a-work-items-parent-lineage-via-cli.md`
 
 ### How to smoke-test fgos-coding-implement with a trivial verify=true item (`how-to-smoke-test-fgos-coding-implement-with-a-trivial-verify-true-item`)
 - Status: **active**
-- Purpose Slug: `how-to-smoke-test-fgos-coding-implement-with-a-trivial-verify-true-item`
+- Purpose Slug: `how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif`
+- Lineage: {"renamedFrom":"how-to-smoke-test-fgos-coding-implement-with-a-trivial-verify-true-item"}
 - Docs:
-  - `smoke-test-fgos-code-implement-with-a-trivial-item` (active): `docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md`
+  - `smoke-test-fgos-code-implement-with-a-trivial-item` (provisional): `docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md`
+    - Aliases: `docs/how-to/smoke-test-fgos-executing-with-a-trivial-item.md`, `docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md`, `docs/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verify-true-item/smoke-test-fgos-code-implement-with-a-trivial-item.md`
 
 ### Submit a work item with a known verify command (`submit-a-work-item-with-a-known-verify-command`)
 - Status: **active**
 - Purpose Slug: `submit-a-work-item-with-a-known-verify-command`
 - Docs:
-  - `submit-a-work-item-with-a-known-verify-command` (active): `docs/how-to/submit-a-work-item-with-a-known-verify-command.md`
+  - `submit-a-work-item-with-a-known-verify-command` (provisional): `docs/knowledge/submit-a-work-item-with-a-known-verify-command/submit-a-work-item-with-a-known-verify-command.md`
+    - Aliases: `docs/how-to/submit-a-work-item-with-a-known-verify-command.md`, `docs/submit-a-work-item-with-a-known-verify-command/submit-a-work-item-with-a-known-verify-command.md`
 
 ### How to sweep the clarify/decompose backlog with `/fgOS:discover-loop` (`how-to-sweep-the-clarify-decompose-backlog-with-fgos-discover-loop`)
 - Status: **active**
-- Purpose Slug: `how-to-sweep-the-clarify-decompose-backlog-with-fgos-discover-loop`
+- Purpose Slug: `how-to-sweep-the-clarify-decompose-backlog-with-fgos-discove`
+- Lineage: {"renamedFrom":"how-to-sweep-the-clarify-decompose-backlog-with-fgos-discover-loop"}
 - Docs:
-  - `sweep-the-clarify-decompose-backlog-with-discover-loop` (active): `docs/how-to/sweep-the-clarify-decompose-backlog-with-discover-loop.md`
+  - `sweep-the-clarify-decompose-backlog-with-discover-loop` (provisional): `docs/knowledge/how-to-sweep-the-clarify-decompose-backlog-with-fgos-discove/sweep-the-clarify-decompose-backlog-with-discover-loop.md`
+    - Aliases: `docs/how-to/sweep-the-clarify-decompose-backlog-with-discover-loop.md`, `docs/how-to-sweep-the-clarify-decompose-backlog-with-fgos-discover-loop/sweep-the-clarify-decompose-backlog-with-discover-loop.md`
 
 ### Sync an fgOS item whose fix already shipped outside the normal claim/return/approve lifecycle (`sync-an-fgos-item-whose-fix-already-shipped-outside-the-normal-claim-return-approve-lifecycle`)
 - Status: **active**
-- Purpose Slug: `sync-an-fgos-item-whose-fix-already-shipped-outside-the-normal-claim-return-approve-lifecycle`
+- Purpose Slug: `sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm`
+- Lineage: {"renamedFrom":"sync-an-fgos-item-whose-fix-already-shipped-outside-the-normal-claim-return-approve-lifecycle"}
 - Docs:
-  - `sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle` (active): `docs/how-to/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md`
+  - `sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle` (provisional): `docs/knowledge/sync-an-fgos-item-whose-fix-already-shipped-outside-the-norm/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md`
+    - Aliases: `docs/how-to/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md`, `docs/sync-an-fgos-item-whose-fix-already-shipped-outside-the-normal-claim-return-approve-lifecycle/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md`
 
 ### How to tell a stale worktree index apart from real uncommitted work (`how-to-tell-a-stale-worktree-index-apart-from-real-uncommitted-work`)
 - Status: **active**
-- Purpose Slug: `how-to-tell-a-stale-worktree-index-apart-from-real-uncommitted-work`
+- Purpose Slug: `how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt`
+- Lineage: {"renamedFrom":"how-to-tell-a-stale-worktree-index-apart-from-real-uncommitted-work"}
 - Docs:
-  - `tell-a-stale-worktree-index-apart-from-real-uncommitted-work` (active): `docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md`
+  - `tell-a-stale-worktree-index-apart-from-real-uncommitted-work` (provisional): `docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md`
+    - Aliases: `docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md`, `docs/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitted-work/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md`
 
 ### How to unify two independently-written working-tree-clean checks into one scope-parameterized function (`how-to-unify-two-independently-written-working-tree-clean-checks-into-one-scope-parameterized-function`)
 - Status: **active**
-- Purpose Slug: `how-to-unify-two-independently-written-working-tree-clean-checks-into-one-scope-parameterized-function`
+- Purpose Slug: `how-to-unify-two-independently-written-working-tree-clean-ch`
+- Lineage: {"renamedFrom":"how-to-unify-two-independently-written-working-tree-clean-checks-into-one-scope-parameterized-function"}
 - Docs:
-  - `unify-a-duplicated-clean-tree-check-across-return-and-approve` (active): `docs/how-to/unify-a-duplicated-clean-tree-check-across-return-and-approve.md`
+  - `unify-a-duplicated-clean-tree-check-across-return-and-approve` (provisional): `docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md`
+    - Aliases: `docs/how-to/unify-a-duplicated-clean-tree-check-across-return-and-approve.md`, `docs/how-to-unify-two-independently-written-working-tree-clean-checks-into-one-scope-parameterized-function/unify-a-duplicated-clean-tree-check-across-return-and-approve.md`
 
 ### Reverse `fgos setup`'s wiring with `fgos uninstall` (`reverse-fgos-setup-s-wiring-with-fgos-uninstall`)
 - Status: **active**
 - Purpose Slug: `reverse-fgos-setup-s-wiring-with-fgos-uninstall`
 - Docs:
-  - `uninstall-fgos-wiring` (active): `docs/how-to/uninstall-fgos-wiring.md`
+  - `uninstall-fgos-wiring` (provisional): `docs/knowledge/reverse-fgos-setup-s-wiring-with-fgos-uninstall/uninstall-fgos-wiring.md`
+    - Aliases: `docs/how-to/uninstall-fgos-wiring.md`, `docs/reverse-fgos-setup-s-wiring-with-fgos-uninstall/uninstall-fgos-wiring.md`
 
 ### Use `--force` to clear a red-first verify disagreement at clarify (`use-force-to-clear-a-red-first-verify-disagreement-at-clarify`)
 - Status: **active**
-- Purpose Slug: `use-force-to-clear-a-red-first-verify-disagreement-at-clarify`
+- Purpose Slug: `use-force-to-clear-a-red-first-verify-disagreement-at-clarif`
+- Lineage: {"renamedFrom":"use-force-to-clear-a-red-first-verify-disagreement-at-clarify"}
 - Docs:
-  - `use-force-to-clear-a-red-first-verify-disagreement-at-clarify` (active): `docs/how-to/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md`
+  - `use-force-to-clear-a-red-first-verify-disagreement-at-clarify` (provisional): `docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md`
+    - Aliases: `docs/how-to/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md`, `docs/use-force-to-clear-a-red-first-verify-disagreement-at-clarify/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md`
 
 ### How to verify every citer before retiring a shared skill fragment (`how-to-verify-every-citer-before-retiring-a-shared-skill-fragment`)
 - Status: **active**
-- Purpose Slug: `how-to-verify-every-citer-before-retiring-a-shared-skill-fragment`
+- Purpose Slug: `how-to-verify-every-citer-before-retiring-a-shared-skill-fra`
+- Lineage: {"renamedFrom":"how-to-verify-every-citer-before-retiring-a-shared-skill-fragment"}
 - Docs:
-  - `verify-every-citer-before-retiring-a-shared-skill-fragment` (active): `docs/how-to/verify-every-citer-before-retiring-a-shared-skill-fragment.md`
+  - `verify-every-citer-before-retiring-a-shared-skill-fragment` (provisional): `docs/knowledge/how-to-verify-every-citer-before-retiring-a-shared-skill-fra/verify-every-citer-before-retiring-a-shared-skill-fragment.md`
+    - Aliases: `docs/how-to/verify-every-citer-before-retiring-a-shared-skill-fragment.md`, `docs/how-to-verify-every-citer-before-retiring-a-shared-skill-fragment/verify-every-citer-before-retiring-a-shared-skill-fragment.md`
 
 ### How to verify herdr cockpit reuses its existing tab instead of overwriting yours (`how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead-of-overwriting-yours`)
 - Status: **active**
-- Purpose Slug: `how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead-of-overwriting-yours`
+- Purpose Slug: `how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead`
+- Lineage: {"renamedFrom":"how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead-of-overwriting-yours"}
 - Docs:
-  - `verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one` (active): `docs/how-to/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md`
+  - `verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one` (provisional): `docs/knowledge/how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md`
+    - Aliases: `docs/how-to/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md`, `docs/how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead-of-overwriting-yours/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md`
 
 ### How to wait out a genuinely active main-checkout lock holder (`how-to-wait-out-a-genuinely-active-main-checkout-lock-holder`)
 - Status: **active**
 - Purpose Slug: `how-to-wait-out-a-genuinely-active-main-checkout-lock-holder`
 - Docs:
-  - `wait-out-an-active-main-checkout-lock-holder` (active): `docs/how-to/wait-out-an-active-main-checkout-lock-holder.md`
+  - `wait-out-an-active-main-checkout-lock-holder` (provisional): `docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md`
+    - Aliases: `docs/how-to/wait-out-an-active-main-checkout-lock-holder.md`, `docs/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md`
 
 ### How to wire a headless function through an agent-executor executor (`how-to-wire-a-headless-function-through-an-agent-executor-executor`)
 - Status: **active**
-- Purpose Slug: `how-to-wire-a-headless-function-through-an-agent-executor-executor`
+- Purpose Slug: `how-to-wire-a-headless-function-through-an-agent-executor-ex`
+- Lineage: {"renamedFrom":"how-to-wire-a-headless-function-through-an-agent-executor-executor"}
 - Docs:
-  - `wire-a-headless-function-through-an-agent-executor-executor` (active): `docs/how-to/wire-a-headless-function-through-an-agent-executor-executor.md`
+  - `wire-a-headless-function-through-an-agent-executor-executor` (provisional): `docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md`
+    - Aliases: `docs/how-to/wire-a-headless-function-through-an-agent-executor-capacity.md`, `docs/how-to/wire-a-headless-function-through-an-agent-executor-executor.md`, `docs/how-to-wire-a-headless-function-through-an-agent-executor-executor/wire-a-headless-function-through-an-agent-executor-executor.md`
 
 ### How to wire a skill through the dispatch decision (`how-to-wire-a-skill-through-the-dispatch-decision`)
 - Status: **active**
 - Purpose Slug: `how-to-wire-a-skill-through-the-dispatch-decision`
 - Docs:
-  - `wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision` (active): `docs/how-to/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md`
+  - `wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision` (provisional): `docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md`
+    - Aliases: `docs/how-to/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md`, `docs/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md`
 
 ### How to wire a skill to an executor by purpose, not by name (`how-to-wire-a-skill-to-an-executor-by-purpose-not-by-name`)
 - Status: **active**
 - Purpose Slug: `how-to-wire-a-skill-to-an-executor-by-purpose-not-by-name`
 - Docs:
-  - `wire-a-skill-to-an-executor-by-purpose-not-name` (active): `docs/how-to/wire-a-skill-to-an-executor-by-purpose-not-name.md`
+  - `wire-a-skill-to-an-executor-by-purpose-not-name` (provisional): `docs/knowledge/how-to-wire-a-skill-to-an-executor-by-purpose-not-by-name/wire-a-skill-to-an-executor-by-purpose-not-name.md`
+    - Aliases: `docs/how-to/wire-a-skill-to-a-capacity-by-purpose-not-name.md`, `docs/how-to/wire-a-skill-to-an-executor-by-purpose-not-name.md`, `docs/how-to-wire-a-skill-to-an-executor-by-purpose-not-by-name/wire-a-skill-to-an-executor-by-purpose-not-name.md`
 
 ### How to wire an existing skill's inline-reasoning step through an agent-executor executor (`how-to-wire-an-existing-skill-s-inline-reasoning-step-through-an-agent-executor-executor`)
 - Status: **active**
-- Purpose Slug: `how-to-wire-an-existing-skill-s-inline-reasoning-step-through-an-agent-executor-executor`
+- Purpose Slug: `how-to-wire-an-existing-skill-s-inline-reasoning-step-throug`
+- Lineage: {"renamedFrom":"how-to-wire-an-existing-skill-s-inline-reasoning-step-through-an-agent-executor-executor"}
 - Docs:
-  - `wire-a-skills-classify-step-through-an-agent-executor-executor` (active): `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md`
+  - `wire-a-skills-classify-step-through-an-agent-executor-executor` (provisional): `docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md`
+    - Aliases: `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md`, `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md`, `docs/how-to-wire-an-existing-skill-s-inline-reasoning-step-through-an-agent-executor-executor/wire-a-skills-classify-step-through-an-agent-executor-executor.md`
 
 ### How to write a doctor check that detects real shell-function breakage, not just text presence (`how-to-write-a-doctor-check-that-detects-real-shell-function-breakage-not-just-text-presence`)
 - Status: **active**
-- Purpose Slug: `how-to-write-a-doctor-check-that-detects-real-shell-function-breakage-not-just-text-presence`
+- Purpose Slug: `how-to-write-a-doctor-check-that-detects-real-shell-function`
+- Lineage: {"renamedFrom":"how-to-write-a-doctor-check-that-detects-real-shell-function-breakage-not-just-text-presence"}
 - Docs:
-  - `write-a-doctor-check-that-detects-real-shell-function-breakage` (active): `docs/how-to/write-a-doctor-check-that-detects-real-shell-function-breakage.md`
+  - `write-a-doctor-check-that-detects-real-shell-function-breakage` (provisional): `docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md`
+    - Aliases: `docs/how-to/write-a-doctor-check-that-detects-real-shell-function-breakage.md`, `docs/how-to-write-a-doctor-check-that-detects-real-shell-function-breakage-not-just-text-presence/write-a-doctor-check-that-detects-real-shell-function-breakage.md`
 
 ### How to write a task-spec (`how-to-write-a-task-spec`)
 - Status: **active**
 - Purpose Slug: `how-to-write-a-task-spec`
 - Docs:
-  - `write-a-task-spec` (active): `docs/how-to/write-a-task-spec.md`
+  - `write-a-task-spec` (provisional): `docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md`
+    - Aliases: `docs/how-to/write-a-task-spec.md`, `docs/how-to-write-a-task-spec/write-a-task-spec.md`
 
 ### Viết verify cho một item thay đổi skill prose (`vi-t-verify-cho-m-t-item-thay-i-skill-prose`)
 - Status: **active**
 - Purpose Slug: `vi-t-verify-cho-m-t-item-thay-i-skill-prose`
 - Docs:
-  - `write-verify-for-a-skill-prose-change` (active): `docs/how-to/write-verify-for-a-skill-prose-change.md`
+  - `write-verify-for-a-skill-prose-change` (provisional): `docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md`
+    - Aliases: `docs/how-to/write-verify-for-a-skill-prose-change.md`, `docs/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md`
 
 ### A decision doc can be superseded twice — superseded_by becomes a list (`a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list`)
 - Status: **active**
-- Purpose Slug: `a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list`
+- Purpose Slug: `a-decision-doc-can-be-superseded-twice-superseded-by-becomes`
+- Lineage: {"renamedFrom":"a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list"}
 - Docs:
-  - `a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list` (active): `docs/explanation/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md`
+  - `a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list` (provisional): `docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md`
+    - Aliases: `docs/explanation/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md`, `docs/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md`
 
 ### Why `work.acceptance` gets a narrow write-time evidence-traceability check (`why-work-acceptance-gets-a-narrow-write-time-evidence-traceability-check`)
 - Status: **active**
-- Purpose Slug: `why-work-acceptance-gets-a-narrow-write-time-evidence-traceability-check`
+- Purpose Slug: `why-work-acceptance-gets-a-narrow-write-time-evidence-tracea`
+- Lineage: {"renamedFrom":"why-work-acceptance-gets-a-narrow-write-time-evidence-traceability-check"}
 - Docs:
-  - `acceptance-evidence-traceability-gate` (active): `docs/explanation/acceptance-evidence-traceability-gate.md`
+  - `acceptance-evidence-traceability-gate` (provisional): `docs/knowledge/why-work-acceptance-gets-a-narrow-write-time-evidence-tracea/acceptance-evidence-traceability-gate.md`
+    - Aliases: `docs/explanation/acceptance-evidence-traceability-gate.md`, `docs/why-work-acceptance-gets-a-narrow-write-time-evidence-traceability-check/acceptance-evidence-traceability-gate.md`
 
 ### Why executor-aware backend dispatch exists (`why-executor-aware-backend-dispatch-exists`)
 - Status: **active**
 - Purpose Slug: `why-executor-aware-backend-dispatch-exists`
 - Docs:
-  - `agent-executor-executor-aware-dispatch` (active): `docs/explanation/agent-executor-executor-aware-dispatch.md`
+  - `agent-executor-executor-aware-dispatch` (provisional): `docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md`
+    - Aliases: `docs/explanation/agent-executor-capacity-aware-dispatch.md`, `docs/explanation/agent-executor-executor-aware-dispatch.md`, `docs/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md`
 
 ### `fgos approve`'s "verify-only" mode checks the current cwd, not the item's real branch (`fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-the-item-s-real-branch`)
 - Status: **active**
-- Purpose Slug: `fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-the-item-s-real-branch`
+- Purpose Slug: `fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t`
+- Lineage: {"renamedFrom":"fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-the-item-s-real-branch"}
 - Docs:
-  - `approve-verify-only-mode-checks-cwd-not-the-items-real-branch` (active): `docs/explanation/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md`
+  - `approve-verify-only-mode-checks-cwd-not-the-items-real-branch` (provisional): `docs/knowledge/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-t/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md`
+    - Aliases: `docs/explanation/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md`, `docs/fgos-approve-s-verify-only-mode-checks-the-current-cwd-not-the-item-s-real-branch/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md`
 
 ### Auto-decompose can drop a locked decision from every child's footprint (`auto-decompose-can-drop-a-locked-decision-from-every-child-s-footprint`)
 - Status: **active**
-- Purpose Slug: `auto-decompose-can-drop-a-locked-decision-from-every-child-s-footprint`
+- Purpose Slug: `auto-decompose-can-drop-a-locked-decision-from-every-child-s`
+- Lineage: {"renamedFrom":"auto-decompose-can-drop-a-locked-decision-from-every-child-s-footprint"}
 - Docs:
-  - `auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint` (active): `docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md`
+  - `auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint` (provisional): `docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md`
+    - Aliases: `docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md`, `docs/auto-decompose-can-drop-a-locked-decision-from-every-child-s-footprint/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md`
 
 ### Why malformed CLI invocations now leave a provenance trace (`why-malformed-cli-invocations-now-leave-a-provenance-trace`)
 - Status: **active**
 - Purpose Slug: `why-malformed-cli-invocations-now-leave-a-provenance-trace`
 - Docs:
-  - `cli-invocation-fault-provenance` (active): `docs/explanation/cli-invocation-fault-provenance.md`
+  - `cli-invocation-fault-provenance` (provisional): `docs/knowledge/why-malformed-cli-invocations-now-leave-a-provenance-trace/cli-invocation-fault-provenance.md`
+    - Aliases: `docs/explanation/cli-invocation-fault-provenance.md`, `docs/why-malformed-cli-invocations-now-leave-a-provenance-trace/cli-invocation-fault-provenance.md`
 
 ### The coding-classify-intake executor's full lifecycle — created, never wired, retired as dead config (`the-coding-classify-intake-executor-s-full-lifecycle-created-never-wired-retired-as-dead-config`)
 - Status: **active**
-- Purpose Slug: `the-coding-classify-intake-executor-s-full-lifecycle-created-never-wired-retired-as-dead-config`
+- Purpose Slug: `the-coding-classify-intake-executor-s-full-lifecycle-created`
+- Lineage: {"renamedFrom":"the-coding-classify-intake-executor-s-full-lifecycle-created-never-wired-retired-as-dead-config"}
 - Docs:
-  - `coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config` (active): `docs/explanation/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md`
+  - `coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config` (provisional): `docs/knowledge/the-coding-classify-intake-executor-s-full-lifecycle-created/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md`
+    - Aliases: `docs/explanation/coding-classify-intake-capacity-lifecycle-created-then-retired-as-dead-config.md`, `docs/explanation/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md`, `docs/the-coding-classify-intake-executor-s-full-lifecycle-created-never-wired-retired-as-dead-config/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md`
 
 ### Why CONTEXT.md enforcement is scoped to (b) OR (c), and why it's hard (`why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s-hard`)
 - Status: **active**
-- Purpose Slug: `why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s-hard`
+- Purpose Slug: `why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s`
+- Lineage: {"renamedFrom":"why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s-hard"}
 - Docs:
-  - `context-md-enforcement-scope` (active): `docs/explanation/context-md-enforcement-scope.md`
+  - `context-md-enforcement-scope` (provisional): `docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md`
+    - Aliases: `docs/explanation/context-md-enforcement-scope.md`, `docs/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s-hard/context-md-enforcement-scope.md`
 
 ### Why decisions already locked and approved by a person still had to be restated to the engine's own clarify judge (`why-decisions-already-locked-and-approved-by-a-person-still-had-to-be-restated-to-the-engine-s-own-clarify-judge`)
 - Status: **active**
-- Purpose Slug: `why-decisions-already-locked-and-approved-by-a-person-still-had-to-be-restated-to-the-engine-s-own-clarify-judge`
+- Purpose Slug: `why-decisions-already-locked-and-approved-by-a-person-still`
+- Lineage: {"renamedFrom":"why-decisions-already-locked-and-approved-by-a-person-still-had-to-be-restated-to-the-engine-s-own-clarify-judge"}
 - Docs:
-  - `decision-record` (active): `docs/explanation/decisions-locked-with-a-person-still-need-restating-to-the-machine-judge.md`
+  - `decision-record` (provisional): `docs/knowledge/why-decisions-already-locked-and-approved-by-a-person-still/decision-record.md`
+    - Aliases: `docs/explanation/decisions-locked-with-a-person-still-need-restating-to-the-machine-judge.md`, `docs/why-decisions-already-locked-and-approved-by-a-person-still-had-to-be-restated-to-the-engine-s-own-clarify-judge/decision-record.md`
 
 ### Why a work branch must never be `git checkout`'d directly on the main checkout (`why-a-work-branch-must-never-be-git-checkout-d-directly-on-the-main-checkout`)
 - Status: **active**
-- Purpose Slug: `why-a-work-branch-must-never-be-git-checkout-d-directly-on-the-main-checkout`
+- Purpose Slug: `why-a-work-branch-must-never-be-git-checkout-d-directly-on-t`
+- Lineage: {"renamedFrom":"why-a-work-branch-must-never-be-git-checkout-d-directly-on-the-main-checkout"}
 - Docs:
-  - `direct-branch-checkout-on-main-checkout-instead-of-worktree` (active): `docs/explanation/direct-branch-checkout-on-main-checkout-instead-of-worktree.md`
+  - `direct-branch-checkout-on-main-checkout-instead-of-worktree` (provisional): `docs/knowledge/why-a-work-branch-must-never-be-git-checkout-d-directly-on-t/direct-branch-checkout-on-main-checkout-instead-of-worktree.md`
+    - Aliases: `docs/explanation/direct-branch-checkout-on-main-checkout-instead-of-worktree.md`, `docs/why-a-work-branch-must-never-be-git-checkout-d-directly-on-the-main-checkout/direct-branch-checkout-on-main-checkout-instead-of-worktree.md`
 
 ### Why discover-loop's pool ordering and stop rules diverge from merge-loop's (`why-discover-loop-s-pool-ordering-and-stop-rules-diverge-from-merge-loop-s`)
 - Status: **active**
-- Purpose Slug: `why-discover-loop-s-pool-ordering-and-stop-rules-diverge-from-merge-loop-s`
+- Purpose Slug: `why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro`
+- Lineage: {"renamedFrom":"why-discover-loop-s-pool-ordering-and-stop-rules-diverge-from-merge-loop-s"}
 - Docs:
-  - `discover-loop-pool-ordering-and-stop-rules` (active): `docs/explanation/discover-loop-pool-ordering-and-stop-rules.md`
+  - `discover-loop-pool-ordering-and-stop-rules` (provisional): `docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md`
+    - Aliases: `docs/explanation/discover-loop-pool-ordering-and-stop-rules.md`, `docs/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-from-merge-loop-s/discover-loop-pool-ordering-and-stop-rules.md`
 
 ### Why `fgos discover` could overwrite an already-locked `verify` command (`why-fgos-discover-could-overwrite-an-already-locked-verify-command`)
 - Status: **active**
-- Purpose Slug: `why-fgos-discover-could-overwrite-an-already-locked-verify-command`
+- Purpose Slug: `why-fgos-discover-could-overwrite-an-already-locked-verify-c`
+- Lineage: {"renamedFrom":"why-fgos-discover-could-overwrite-an-already-locked-verify-command"}
 - Docs:
-  - `discovery-decompose-reporoot-verify-overwrite` (active): `docs/explanation/discovery-decompose-reporoot-verify-overwrite.md`
+  - `discovery-decompose-reporoot-verify-overwrite` (provisional): `docs/knowledge/why-fgos-discover-could-overwrite-an-already-locked-verify-c/discovery-decompose-reporoot-verify-overwrite.md`
+    - Aliases: `docs/explanation/discovery-decompose-reporoot-verify-overwrite.md`, `docs/why-fgos-discover-could-overwrite-an-already-locked-verify-command/discovery-decompose-reporoot-verify-overwrite.md`
 
 ### Why dispatch binding moved from name-keying to needs/for capability declaration (`why-dispatch-binding-moved-from-name-keying-to-needs-for-capability-declaration`)
 - Status: **active**
-- Purpose Slug: `why-dispatch-binding-moved-from-name-keying-to-needs-for-capability-declaration`
+- Purpose Slug: `why-dispatch-binding-moved-from-name-keying-to-needs-for-cap`
+- Lineage: {"renamedFrom":"why-dispatch-binding-moved-from-name-keying-to-needs-for-capability-declaration"}
 - Docs:
-  - `dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration` (active): `docs/explanation/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md`
+  - `dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration` (provisional): `docs/knowledge/why-dispatch-binding-moved-from-name-keying-to-needs-for-cap/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md`
+    - Aliases: `docs/explanation/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md`, `docs/why-dispatch-binding-moved-from-name-keying-to-needs-for-capability-declaration/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md`
 
 ### Why the dispatch gate widened to `kind !== 'task'` and mechanism values renamed to process location (`why-the-dispatch-gate-widened-to-kind-task-and-mechanism-values-renamed-to-process-location`)
 - Status: **active**
-- Purpose Slug: `why-the-dispatch-gate-widened-to-kind-task-and-mechanism-values-renamed-to-process-location`
+- Purpose Slug: `why-the-dispatch-gate-widened-to-kind-task-and-mechanism-val`
+- Lineage: {"renamedFrom":"why-the-dispatch-gate-widened-to-kind-task-and-mechanism-values-renamed-to-process-location"}
 - Docs:
-  - `dispatch-gate-widens-to-kind-not-task-and-mechanism-renames-to-process-location` (active): `docs/explanation/dispatch-gate-widens-to-kind-not-task-and-mechanism-renames-to-process-location.md`
+  - `dispatch-gate-widens-to-kind-not-task-and-mechanism-renames-to-process-location` (provisional): `docs/knowledge/why-the-dispatch-gate-widened-to-kind-task-and-mechanism-val/dispatch-gate-widens-to-kind-not-task-and-mechanism-renames-to-process-location.md`
+    - Aliases: `docs/explanation/dispatch-gate-widens-to-kind-not-task-and-mechanism-renames-to-process-location.md`, `docs/why-the-dispatch-gate-widened-to-kind-task-and-mechanism-values-renamed-to-process-location/dispatch-gate-widens-to-kind-not-task-and-mechanism-renames-to-process-location.md`
 
 ### Why disposable worktrees need their own dependency install (`why-disposable-worktrees-need-their-own-dependency-install`)
 - Status: **active**
 - Purpose Slug: `why-disposable-worktrees-need-their-own-dependency-install`
 - Docs:
-  - `disposable-worktree-dependency-provisioning` (active): `docs/explanation/disposable-worktree-dependency-provisioning.md`
+  - `disposable-worktree-dependency-provisioning` (provisional): `docs/knowledge/why-disposable-worktrees-need-their-own-dependency-install/disposable-worktree-dependency-provisioning.md`
+    - Aliases: `docs/explanation/disposable-worktree-dependency-provisioning.md`, `docs/why-disposable-worktrees-need-their-own-dependency-install/disposable-worktree-dependency-provisioning.md`
 
 ### Why `docs-index` preserves a doc's prior id when the store is unreachable (`why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is-unreachable`)
 - Status: **active**
-- Purpose Slug: `why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is-unreachable`
+- Purpose Slug: `why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is`
+- Lineage: {"renamedFrom":"why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is-unreachable"}
 - Docs:
-  - `docs-index-preserves-prior-id-when-the-store-is-unreachable` (active): `docs/explanation/docs-index-preserves-prior-id-when-the-store-is-unreachable.md`
+  - `docs-index-preserves-prior-id-when-the-store-is-unreachable` (provisional): `docs/knowledge/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is/docs-index-preserves-prior-id-when-the-store-is-unreachable.md`
+    - Aliases: `docs/explanation/docs-index-preserves-prior-id-when-the-store-is-unreachable.md`, `docs/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is-unreachable/docs-index-preserves-prior-id-when-the-store-is-unreachable.md`
 
 ### How fgOS's event log is allowed to evolve without breaking replay (`how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-replay`)
 - Status: **active**
-- Purpose Slug: `how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-replay`
+- Purpose Slug: `how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r`
+- Lineage: {"renamedFrom":"how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-replay"}
 - Docs:
-  - `event-log-evolution-discipline` (active): `docs/explanation/event-log-evolution-discipline.md`
+  - `event-log-evolution-discipline` (provisional): `docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md`
+    - Aliases: `docs/explanation/event-log-evolution-discipline.md`, `docs/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-replay/event-log-evolution-discipline.md`
 
 ### Why `.fgos/events.jsonl` can silently lose lines under concurrent session writes (`why-fgos-events-jsonl-can-silently-lose-lines-under-concurrent-session-writes`)
 - Status: **active**
-- Purpose Slug: `why-fgos-events-jsonl-can-silently-lose-lines-under-concurrent-session-writes`
+- Purpose Slug: `why-fgos-events-jsonl-can-silently-lose-lines-under-concurre`
+- Lineage: {"renamedFrom":"why-fgos-events-jsonl-can-silently-lose-lines-under-concurrent-session-writes"}
 - Docs:
-  - `events-jsonl-lost-update-race-under-concurrent-session-writes` (active): `docs/explanation/events-jsonl-lost-update-race-under-concurrent-session-writes.md`
+  - `events-jsonl-lost-update-race-under-concurrent-session-writes` (provisional): `docs/knowledge/why-fgos-events-jsonl-can-silently-lose-lines-under-concurre/events-jsonl-lost-update-race-under-concurrent-session-writes.md`
+    - Aliases: `docs/explanation/events-jsonl-lost-update-race-under-concurrent-session-writes.md`, `docs/why-fgos-events-jsonl-can-silently-lose-lines-under-concurrent-session-writes/events-jsonl-lost-update-race-under-concurrent-session-writes.md`
 
 ### Why executor.dispatch audits record command alongside provider (`why-executor-dispatch-audits-record-command-alongside-provider`)
 - Status: **active**
-- Purpose Slug: `why-executor-dispatch-audits-record-command-alongside-provider`
+- Purpose Slug: `why-executor-dispatch-audits-record-command-alongside-provid`
+- Lineage: {"renamedFrom":"why-executor-dispatch-audits-record-command-alongside-provider"}
 - Docs:
-  - `executor-dispatch-audit-records-command-not-just-provider-label` (active): `docs/explanation/executor-dispatch-audit-records-command-not-just-provider-label.md`
+  - `executor-dispatch-audit-records-command-not-just-provider-label` (provisional): `docs/knowledge/why-executor-dispatch-audits-record-command-alongside-provid/executor-dispatch-audit-records-command-not-just-provider-label.md`
+    - Aliases: `docs/explanation/capacity-dispatch-audit-records-command-not-just-provider-label.md`, `docs/explanation/executor-dispatch-audit-records-command-not-just-provider-label.md`, `docs/why-executor-dispatch-audits-record-command-alongside-provider/executor-dispatch-audit-records-command-not-just-provider-label.md`
 
 ### Explanatory prose can outlive the locked decision that superseded it (`explanatory-prose-can-outlive-the-locked-decision-that-superseded-it`)
 - Status: **active**
-- Purpose Slug: `explanatory-prose-can-outlive-the-locked-decision-that-superseded-it`
+- Purpose Slug: `explanatory-prose-can-outlive-the-locked-decision-that-super`
+- Lineage: {"renamedFrom":"explanatory-prose-can-outlive-the-locked-decision-that-superseded-it"}
 - Docs:
-  - `explanatory-prose-can-outlive-the-locked-decision-that-superseded-it` (active): `docs/explanation/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md`
+  - `explanatory-prose-can-outlive-the-locked-decision-that-superseded-it` (provisional): `docs/knowledge/explanatory-prose-can-outlive-the-locked-decision-that-super/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md`
+    - Aliases: `docs/explanation/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md`, `docs/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md`
 
 ### Why fgOS's automatic capture records the what, but not the why (`why-fgos-s-automatic-capture-records-the-what-but-not-the-why`)
 - Status: **active**
-- Purpose Slug: `why-fgos-s-automatic-capture-records-the-what-but-not-the-why`
+- Purpose Slug: `why-fgos-s-automatic-capture-records-the-what-but-not-the-wh`
+- Lineage: {"renamedFrom":"why-fgos-s-automatic-capture-records-the-what-but-not-the-why"}
 - Docs:
-  - `fgos-capture-points-and-the-why-gap` (active): `docs/explanation/fgos-capture-points-and-the-why-gap.md`
+  - `fgos-capture-points-and-the-why-gap` (provisional): `docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md`
+    - Aliases: `docs/explanation/fgos-capture-points-and-the-why-gap.md`, `docs/why-fgos-s-automatic-capture-records-the-what-but-not-the-why/fgos-capture-points-and-the-why-gap.md`
 
 ### Why fgOS keeps growing the same decision logic in more than one place (`why-fgos-keeps-growing-the-same-decision-logic-in-more-than-one-place`)
 - Status: **active**
-- Purpose Slug: `why-fgos-keeps-growing-the-same-decision-logic-in-more-than-one-place`
+- Purpose Slug: `why-fgos-keeps-growing-the-same-decision-logic-in-more-than`
+- Lineage: {"renamedFrom":"why-fgos-keeps-growing-the-same-decision-logic-in-more-than-one-place"}
 - Docs:
-  - `fgos-choke-point-pattern` (active): `docs/explanation/fgos-choke-point-pattern.md`
+  - `fgos-choke-point-pattern` (provisional): `docs/knowledge/why-fgos-keeps-growing-the-same-decision-logic-in-more-than/fgos-choke-point-pattern.md`
+    - Aliases: `docs/explanation/fgos-choke-point-pattern.md`, `docs/why-fgos-keeps-growing-the-same-decision-logic-in-more-than-one-place/fgos-choke-point-pattern.md`
 
 ### fgos-cook worktree-claim-before-drive (`fgos-cook-worktree-claim-before-drive`)
 - Status: **active**
 - Purpose Slug: `fgos-cook-worktree-claim-before-drive`
 - Docs:
-  - `fgos-cook-worktree-claim-before-drive` (active): `docs/explanation/fgos-cook-worktree-claim-before-drive.md`
+  - `fgos-cook-worktree-claim-before-drive` (provisional): `docs/knowledge/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md`
+    - Aliases: `docs/explanation/fgos-cook-worktree-claim-before-drive.md`, `docs/fgos-cook-worktree-claim-before-drive/fgos-cook-worktree-claim-before-drive.md`
 
 ### fgos-discover claim-via-pick-not-take (`fgos-discover-claim-via-pick-not-take`)
 - Status: **active**
 - Purpose Slug: `fgos-discover-claim-via-pick-not-take`
 - Docs:
-  - `fgos-discover-claim-via-pick-not-take` (active): `docs/explanation/fgos-discover-claim-via-pick-not-take.md`
+  - `fgos-discover-claim-via-pick-not-take` (provisional): `docs/knowledge/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md`
+    - Aliases: `docs/explanation/fgos-discover-claim-via-pick-not-take.md`, `docs/fgos-discover-claim-via-pick-not-take/fgos-discover-claim-via-pick-not-take.md`
 
 ### Why `fgos discover` now trusts a locked CONTEXT.md instead of blindly re-judging (`why-fgos-discover-now-trusts-a-locked-context-md-instead-of-blindly-re-judging`)
 - Status: **active**
-- Purpose Slug: `why-fgos-discover-now-trusts-a-locked-context-md-instead-of-blindly-re-judging`
+- Purpose Slug: `why-fgos-discover-now-trusts-a-locked-context-md-instead-of`
+- Lineage: {"renamedFrom":"why-fgos-discover-now-trusts-a-locked-context-md-instead-of-blindly-re-judging"}
 - Docs:
-  - `fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging` (active): `docs/explanation/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md`
+  - `fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging` (provisional): `docs/knowledge/why-fgos-discover-now-trusts-a-locked-context-md-instead-of/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md`
+    - Aliases: `docs/explanation/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md`, `docs/why-fgos-discover-now-trusts-a-locked-context-md-instead-of-blindly-re-judging/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md`
 
 ### Explanation: when the engine's own auto-generated verify is wrong (`explanation-when-the-engine-s-own-auto-generated-verify-is-wrong`)
 - Status: **active**
-- Purpose Slug: `explanation-when-the-engine-s-own-auto-generated-verify-is-wrong`
+- Purpose Slug: `explanation-when-the-engine-s-own-auto-generated-verify-is-w`
+- Lineage: {"renamedFrom":"explanation-when-the-engine-s-own-auto-generated-verify-is-wrong"}
 - Docs:
-  - `fgos-discover-verify-path-drift` (active): `docs/explanation/fgos-discover-verify-path-drift.md`
+  - `fgos-discover-verify-path-drift` (provisional): `docs/knowledge/explanation-when-the-engine-s-own-auto-generated-verify-is-w/fgos-discover-verify-path-drift.md`
+    - Aliases: `docs/explanation/fgos-discover-verify-path-drift.md`, `docs/explanation-when-the-engine-s-own-auto-generated-verify-is-wrong/fgos-discover-verify-path-drift.md`
 
 ### fgos-researching's D2 fan-out rule, verified live on a real dogfood run (`fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-dogfood-run`)
 - Status: **active**
-- Purpose Slug: `fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-dogfood-run`
+- Purpose Slug: `fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d`
+- Lineage: {"renamedFrom":"fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-dogfood-run"}
 - Docs:
-  - `fgos-researching-d2-fanout-verified-live` (active): `docs/explanation/fgos-researching-d2-fanout-verified-live.md`
+  - `fgos-researching-d2-fanout-verified-live` (provisional): `docs/knowledge/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-d/fgos-researching-d2-fanout-verified-live.md`
+    - Aliases: `docs/explanation/fgos-researching-d2-fanout-verified-live.md`, `docs/fgos-researching-s-d2-fan-out-rule-verified-live-on-a-real-dogfood-run/fgos-researching-d2-fanout-verified-live.md`
 
 ### Why `/fgOS:retro-loop` restores the `compound` verb instead of inventing a new one (`why-fgos-retro-loop-restores-the-compound-verb-instead-of-inventing-a-new-one`)
 - Status: **active**
-- Purpose Slug: `why-fgos-retro-loop-restores-the-compound-verb-instead-of-inventing-a-new-one`
+- Purpose Slug: `why-fgos-retro-loop-restores-the-compound-verb-instead-of-in`
+- Lineage: {"renamedFrom":"why-fgos-retro-loop-restores-the-compound-verb-instead-of-inventing-a-new-one"}
 - Docs:
-  - `fgos-retro-loop-and-the-restored-compound-verb` (active): `docs/explanation/fgos-retro-loop-and-the-restored-compound-verb.md`
+  - `fgos-retro-loop-and-the-restored-compound-verb` (provisional): `docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md`
+    - Aliases: `docs/explanation/fgos-retro-loop-and-the-restored-compound-verb.md`, `docs/why-fgos-retro-loop-restores-the-compound-verb-instead-of-inventing-a-new-one/fgos-retro-loop-and-the-restored-compound-verb.md`
 
 ### Explanation: `fgos return` runs `verify` as a literal shell command — a placeholder string is not special-cased (`explanation-fgos-return-runs-verify-as-a-literal-shell-command-a-placeholder-string-is-not-special-cased`)
 - Status: **active**
-- Purpose Slug: `explanation-fgos-return-runs-verify-as-a-literal-shell-command-a-placeholder-string-is-not-special-cased`
+- Purpose Slug: `explanation-fgos-return-runs-verify-as-a-literal-shell-comma`
+- Lineage: {"renamedFrom":"explanation-fgos-return-runs-verify-as-a-literal-shell-command-a-placeholder-string-is-not-special-cased"}
 - Docs:
-  - `fgos-return-executes-verify-as-a-literal-shell-command` (active): `docs/explanation/fgos-return-executes-verify-as-a-literal-shell-command.md`
+  - `fgos-return-executes-verify-as-a-literal-shell-command` (provisional): `docs/knowledge/explanation-fgos-return-runs-verify-as-a-literal-shell-comma/fgos-return-executes-verify-as-a-literal-shell-command.md`
+    - Aliases: `docs/explanation/fgos-return-executes-verify-as-a-literal-shell-command.md`, `docs/explanation-fgos-return-runs-verify-as-a-literal-shell-command-a-placeholder-string-is-not-special-cased/fgos-return-executes-verify-as-a-literal-shell-command.md`
 
 ### whether fgos uninstall --remove-package can reliably remove its own package, which package managers/platforms it covers, and how it handles an unconfirmed install method (`whether-fgos-uninstall-remove-package-can-reliably-remove-its-own-package-which-package-managers-platforms-it-covers-and-how-it-handles-an-unconfirmed-install-method`)
 - Status: **active**
-- Purpose Slug: `whether-fgos-uninstall-remove-package-can-reliably-remove-its-own-package-which-package-managers-platforms-it-covers-and-how-it-handles-an-unconfirmed-install-method`
+- Purpose Slug: `whether-fgos-uninstall-remove-package-can-reliably-remove-it`
+- Lineage: {"renamedFrom":"whether-fgos-uninstall-remove-package-can-reliably-remove-its-own-package-which-package-managers-platforms-it-covers-and-how-it-handles-an-unconfirmed-install-method"}
 - Docs:
-  - `fgos-self-uninstall-package-removal-spike` (active): `docs/explanation/fgos-self-uninstall-package-removal-spike.md`
+  - `fgos-self-uninstall-package-removal-spike` (provisional): `docs/knowledge/whether-fgos-uninstall-remove-package-can-reliably-remove-it/fgos-self-uninstall-package-removal-spike.md`
+    - Aliases: `docs/explanation/fgos-self-uninstall-package-removal-spike.md`, `docs/whether-fgos-uninstall-remove-package-can-reliably-remove-its-own-package-which-package-managers-platforms-it-covers-and-how-it-handles-an-unconfirmed-install-method/fgos-self-uninstall-package-removal-spike.md`
 
 ### Why `fgos uninstall` shipped as two pieces (`why-fgos-uninstall-shipped-as-two-pieces`)
 - Status: **active**
 - Purpose Slug: `why-fgos-uninstall-shipped-as-two-pieces`
 - Docs:
-  - `fgos-uninstall-feature-overview` (active): `docs/explanation/fgos-uninstall-feature-overview.md`
+  - `fgos-uninstall-feature-overview` (provisional): `docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md`
+    - Aliases: `docs/explanation/fgos-uninstall-feature-overview.md`, `docs/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md`
 
 ### Friction and decision events are real storytelling material, once boilerplate is filtered (`friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered`)
 - Status: **active**
-- Purpose Slug: `friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered`
+- Purpose Slug: `friction-and-decision-events-are-real-storytelling-material`
+- Lineage: {"renamedFrom":"friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered"}
 - Docs:
-  - `friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered` (active): `docs/explanation/friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered.md`
+  - `friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered` (provisional): `docs/knowledge/friction-and-decision-events-are-real-storytelling-material/friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered.md`
+    - Aliases: `docs/explanation/friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered.md`, `docs/friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered/friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered.md`
 
 ### FSM refusal messages now name a remedy, and `wontfix` gains an `awaiting-human` door (`fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an-awaiting-human-door`)
 - Status: **active**
-- Purpose Slug: `fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an-awaiting-human-door`
+- Purpose Slug: `fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an`
+- Lineage: {"renamedFrom":"fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an-awaiting-human-door"}
 - Docs:
-  - `fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door` (active): `docs/explanation/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md`
+  - `fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door` (provisional): `docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md`
+    - Aliases: `docs/explanation/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md`, `docs/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an-awaiting-human-door/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md`
 
 ### Why gate-bypass is shaped the way it is (`why-gate-bypass-is-shaped-the-way-it-is`)
 - Status: **active**
 - Purpose Slug: `why-gate-bypass-is-shaped-the-way-it-is`
 - Docs:
-  - `gate-bypass-design` (active): `docs/explanation/gate-bypass-design.md`
+  - `gate-bypass-design` (provisional): `docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md`
+    - Aliases: `docs/explanation/gate-bypass-design.md`, `docs/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md`
 
 ### Why a gate dialogue keeps the agent's checkpoint separate from the human's answer (`why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-from-the-human-s-answer`)
 - Status: **active**
-- Purpose Slug: `why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-from-the-human-s-answer`
+- Purpose Slug: `why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-fr`
+- Lineage: {"renamedFrom":"why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-from-the-human-s-answer"}
 - Docs:
-  - `gate-checkpoint-vs-answer-separation` (active): `docs/explanation/gate-checkpoint-vs-answer-separation.md`
+  - `gate-checkpoint-vs-answer-separation` (provisional): `docs/knowledge/why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-fr/gate-checkpoint-vs-answer-separation.md`
+    - Aliases: `docs/explanation/gate-checkpoint-vs-answer-separation.md`, `docs/why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-from-the-human-s-answer/gate-checkpoint-vs-answer-separation.md`
 
 ### Global config merge reuses the existing fill-missing-only primitive (`global-config-merge-reuses-the-existing-fill-missing-only-primitive`)
 - Status: **active**
-- Purpose Slug: `global-config-merge-reuses-the-existing-fill-missing-only-primitive`
+- Purpose Slug: `global-config-merge-reuses-the-existing-fill-missing-only-pr`
+- Lineage: {"renamedFrom":"global-config-merge-reuses-the-existing-fill-missing-only-primitive"}
 - Docs:
-  - `global-config-merge-reuses-fill-missing-only-primitive` (active): `docs/explanation/global-config-merge-reuses-fill-missing-only-primitive.md`
+  - `global-config-merge-reuses-fill-missing-only-primitive` (provisional): `docs/knowledge/global-config-merge-reuses-the-existing-fill-missing-only-pr/global-config-merge-reuses-fill-missing-only-primitive.md`
+    - Aliases: `docs/explanation/global-config-merge-reuses-fill-missing-only-primitive.md`, `docs/global-config-merge-reuses-the-existing-fill-missing-only-primitive/global-config-merge-reuses-fill-missing-only-primitive.md`
 
 ### Why `fgos()`/`fgos-runner()` died in every agent shell (`why-fgos-fgos-runner-died-in-every-agent-shell`)
 - Status: **active**
 - Purpose Slug: `why-fgos-fgos-runner-died-in-every-agent-shell`
 - Docs:
-  - `harness-shell-snapshot-strips-underscore-prefixed-helper-functions` (active): `docs/explanation/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md`
+  - `harness-shell-snapshot-strips-underscore-prefixed-helper-functions` (provisional): `docs/knowledge/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md`
+    - Aliases: `docs/explanation/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md`, `docs/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md`
 
 ### Why herdr's dashboard lists became real tables, and why "in process" widened (`why-herdr-s-dashboard-lists-became-real-tables-and-why-in-process-widened`)
 - Status: **active**
-- Purpose Slug: `why-herdr-s-dashboard-lists-became-real-tables-and-why-in-process-widened`
+- Purpose Slug: `why-herdr-s-dashboard-lists-became-real-tables-and-why-in-pr`
+- Lineage: {"renamedFrom":"why-herdr-s-dashboard-lists-became-real-tables-and-why-in-process-widened"}
 - Docs:
-  - `herdr-dashboard-table-view-scope-and-sort` (active): `docs/explanation/herdr-dashboard-table-view-scope-and-sort.md`
+  - `herdr-dashboard-table-view-scope-and-sort` (provisional): `docs/knowledge/why-herdr-s-dashboard-lists-became-real-tables-and-why-in-pr/herdr-dashboard-table-view-scope-and-sort.md`
+    - Aliases: `docs/explanation/herdr-dashboard-table-view-scope-and-sort.md`, `docs/why-herdr-s-dashboard-lists-became-real-tables-and-why-in-process-widened/herdr-dashboard-table-view-scope-and-sort.md`
 
 ### Why the herdr fgOS dashboard shipped as three sequential children, and what surfaced along the way (`why-the-herdr-fgos-dashboard-shipped-as-three-sequential-children-and-what-surfaced-along-the-way`)
 - Status: **active**
-- Purpose Slug: `why-the-herdr-fgos-dashboard-shipped-as-three-sequential-children-and-what-surfaced-along-the-way`
+- Purpose Slug: `why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi`
+- Lineage: {"renamedFrom":"why-the-herdr-fgos-dashboard-shipped-as-three-sequential-children-and-what-surfaced-along-the-way"}
 - Docs:
-  - `herdr-fgos-dashboard-three-piece-build` (active): `docs/explanation/herdr-fgos-dashboard-three-piece-build.md`
+  - `herdr-fgos-dashboard-three-piece-build` (provisional): `docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md`
+    - Aliases: `docs/explanation/herdr-fgos-dashboard-three-piece-build.md`, `docs/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-children-and-what-surfaced-along-the-way/herdr-fgos-dashboard-three-piece-build.md`
 
 ### Why a work item's id is TSK<hash>, not a bare hash (`why-a-work-item-s-id-is-tsk-hash-not-a-bare-hash`)
 - Status: **active**
 - Purpose Slug: `why-a-work-item-s-id-is-tsk-hash-not-a-bare-hash`
 - Docs:
-  - `id-generation-design` (active): `docs/explanation/id-generation-design.md`
+  - `id-generation-design` (provisional): `docs/knowledge/why-a-work-item-s-id-is-tsk-hash-not-a-bare-hash/id-generation-design.md`
+    - Aliases: `docs/explanation/id-generation-design.md`, `docs/why-a-work-item-s-id-is-tsk-hash-not-a-bare-hash/id-generation-design.md`
 
 ### Why workflow prose gates on a capability query, not a hardcoded tool name (`why-workflow-prose-gates-on-a-capability-query-not-a-hardcoded-tool-name`)
 - Status: **active**
-- Purpose Slug: `why-workflow-prose-gates-on-a-capability-query-not-a-hardcoded-tool-name`
+- Purpose Slug: `why-workflow-prose-gates-on-a-capability-query-not-a-hardcod`
+- Lineage: {"renamedFrom":"why-workflow-prose-gates-on-a-capability-query-not-a-hardcoded-tool-name"}
 - Docs:
-  - `impact-analysis-capability-gate-replaces-hardcoded-gitnexus` (active): `docs/explanation/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md`
+  - `impact-analysis-capability-gate-replaces-hardcoded-gitnexus` (provisional): `docs/knowledge/why-workflow-prose-gates-on-a-capability-query-not-a-hardcod/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md`
+    - Aliases: `docs/explanation/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md`, `docs/why-workflow-prose-gates-on-a-capability-query-not-a-hardcoded-tool-name/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md`
 
 ### Why intake classification moved to after clarify, and back to the owning domain (`why-intake-classification-moved-to-after-clarify-and-back-to-the-owning-domain`)
 - Status: **active**
-- Purpose Slug: `why-intake-classification-moved-to-after-clarify-and-back-to-the-owning-domain`
+- Purpose Slug: `why-intake-classification-moved-to-after-clarify-and-back-to`
+- Lineage: {"renamedFrom":"why-intake-classification-moved-to-after-clarify-and-back-to-the-owning-domain"}
 - Docs:
-  - `intake-classification-moves-after-clarify-and-back-to-the-owning-domain` (active): `docs/explanation/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md`
+  - `intake-classification-moves-after-clarify-and-back-to-the-owning-domain` (provisional): `docs/knowledge/why-intake-classification-moved-to-after-clarify-and-back-to/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md`
+    - Aliases: `docs/explanation/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md`, `docs/why-intake-classification-moved-to-after-clarify-and-back-to-the-owning-domain/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md`
 
 ### Why the Iron Law evidence contract gathers proof but never acknowledges (`why-the-iron-law-evidence-contract-gathers-proof-but-never-acknowledges`)
 - Status: **active**
-- Purpose Slug: `why-the-iron-law-evidence-contract-gathers-proof-but-never-acknowledges`
+- Purpose Slug: `why-the-iron-law-evidence-contract-gathers-proof-but-never-a`
+- Lineage: {"renamedFrom":"why-the-iron-law-evidence-contract-gathers-proof-but-never-acknowledges"}
 - Docs:
-  - `iron-law-evidence-contract-stays-human-gated` (active): `docs/explanation/iron-law-evidence-contract-stays-human-gated.md`
+  - `iron-law-evidence-contract-stays-human-gated` (provisional): `docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md`
+    - Aliases: `docs/explanation/iron-law-evidence-contract-stays-human-gated.md`, `docs/why-the-iron-law-evidence-contract-gathers-proof-but-never-acknowledges/iron-law-evidence-contract-stays-human-gated.md`
 
 ### Why judgeDiscovery/judgeDecompose run a second, independent judge pass on `verify` (`why-judgediscovery-judgedecompose-run-a-second-independent-judge-pass-on-verify`)
 - Status: **active**
-- Purpose Slug: `why-judgediscovery-judgedecompose-run-a-second-independent-judge-pass-on-verify`
+- Purpose Slug: `why-judgediscovery-judgedecompose-run-a-second-independent-j`
+- Lineage: {"renamedFrom":"why-judgediscovery-judgedecompose-run-a-second-independent-judge-pass-on-verify"}
 - Docs:
-  - `judge-verdict-second-pass-semantic-check` (active): `docs/explanation/judge-verdict-second-pass-semantic-check.md`
+  - `judge-verdict-second-pass-semantic-check` (provisional): `docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md`
+    - Aliases: `docs/explanation/judge-verdict-second-pass-semantic-check.md`, `docs/why-judgediscovery-judgedecompose-run-a-second-independent-judge-pass-on-verify/judge-verdict-second-pass-semantic-check.md`
 
 ### Judging real test duplication vs. superficially-similar tests (`judging-real-test-duplication-vs-superficially-similar-tests`)
 - Status: **active**
 - Purpose Slug: `judging-real-test-duplication-vs-superficially-similar-tests`
 - Docs:
-  - `judging-real-test-duplication` (active): `docs/explanation/judging-real-test-duplication.md`
+  - `judging-real-test-duplication` (provisional): `docs/knowledge/judging-real-test-duplication-vs-superficially-similar-tests/judging-real-test-duplication.md`
+    - Aliases: `docs/explanation/judging-real-test-duplication.md`, `docs/judging-real-test-duplication-vs-superficially-similar-tests/judging-real-test-duplication.md`
 
 ### Why `keywordRiskGate` now skips the heavy-risk ask when a verdict cites a locked decision (`why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verdict-cites-a-locked-decision`)
 - Status: **active**
-- Purpose Slug: `why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verdict-cites-a-locked-decision`
+- Purpose Slug: `why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verd`
+- Lineage: {"renamedFrom":"why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verdict-cites-a-locked-decision"}
 - Docs:
-  - `keywordriskgate-skips-when-verdict-cites-a-locked-decision` (active): `docs/explanation/keywordriskgate-skips-when-verdict-cites-a-locked-decision.md`
+  - `keywordriskgate-skips-when-verdict-cites-a-locked-decision` (provisional): `docs/knowledge/why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verd/keywordriskgate-skips-when-verdict-cites-a-locked-decision.md`
+    - Aliases: `docs/explanation/keywordriskgate-skips-when-verdict-cites-a-locked-decision.md`, `docs/why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verdict-cites-a-locked-decision/keywordriskgate-skips-when-verdict-cites-a-locked-decision.md`
 
 ### fgOS's layered architecture is a live, tested invariant — not a diagram (`fgos-s-layered-architecture-is-a-live-tested-invariant-not-a-diagram`)
 - Status: **active**
-- Purpose Slug: `fgos-s-layered-architecture-is-a-live-tested-invariant-not-a-diagram`
+- Purpose Slug: `fgos-s-layered-architecture-is-a-live-tested-invariant-not-a`
+- Lineage: {"renamedFrom":"fgos-s-layered-architecture-is-a-live-tested-invariant-not-a-diagram"}
 - Docs:
-  - `layered-architecture-invariant` (active): `docs/explanation/layered-architecture-invariant.md`
+  - `layered-architecture-invariant` (provisional): `docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md`
+    - Aliases: `docs/explanation/layered-architecture-invariant.md`, `docs/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a-diagram/layered-architecture-invariant.md`
 
 ### Why `fgos add` now caps a work item's id at 30 characters (`why-fgos-add-now-caps-a-work-item-s-id-at-30-characters`)
 - Status: **active**
 - Purpose Slug: `why-fgos-add-now-caps-a-work-item-s-id-at-30-characters`
 - Docs:
-  - `long-work-item-ids-max-length-guard` (active): `docs/explanation/long-work-item-ids-max-length-guard.md`
+  - `long-work-item-ids-max-length-guard` (provisional): `docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md`
+    - Aliases: `docs/explanation/long-work-item-ids-max-length-guard.md`, `docs/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md`
 
 ### Why `acquireMainCheckoutLock`'s release-on-exit is opt-in, never the default (`why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-never-the-default`)
 - Status: **active**
-- Purpose Slug: `why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-never-the-default`
+- Purpose Slug: `why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-neve`
+- Lineage: {"renamedFrom":"why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-never-the-default"}
 - Docs:
-  - `main-checkout-lock-release-on-exit-opt-in` (active): `docs/explanation/main-checkout-lock-release-on-exit-opt-in.md`
+  - `main-checkout-lock-release-on-exit-opt-in` (provisional): `docs/knowledge/why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-neve/main-checkout-lock-release-on-exit-opt-in.md`
+    - Aliases: `docs/explanation/main-checkout-lock-release-on-exit-opt-in.md`, `docs/why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-never-the-default/main-checkout-lock-release-on-exit-opt-in.md`
 
 ### Why `.fgos/main-checkout.lock` could report AMBIGUOUS with no real contention (`why-fgos-main-checkout-lock-could-report-ambiguous-with-no-real-contention`)
 - Status: **active**
-- Purpose Slug: `why-fgos-main-checkout-lock-could-report-ambiguous-with-no-real-contention`
+- Purpose Slug: `why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r`
+- Lineage: {"renamedFrom":"why-fgos-main-checkout-lock-could-report-ambiguous-with-no-real-contention"}
 - Docs:
-  - `main-checkout-lock-toctou-race` (active): `docs/explanation/main-checkout-lock-toctou-race.md`
+  - `main-checkout-lock-toctou-race` (provisional): `docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md`
+    - Aliases: `docs/explanation/main-checkout-lock-toctou-race.md`, `docs/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-real-contention/main-checkout-lock-toctou-race.md`
 
 ### Why the decision-ID-collision auto-resolver only trusts a shared link target, not a shared id, to detect an edit dispute (`why-the-decision-id-collision-auto-resolver-only-trusts-a-shared-link-target-not-a-shared-id-to-detect-an-edit-dispute`)
 - Status: **active**
-- Purpose Slug: `why-the-decision-id-collision-auto-resolver-only-trusts-a-shared-link-target-not-a-shared-id-to-detect-an-edit-dispute`
+- Purpose Slug: `why-the-decision-id-collision-auto-resolver-only-trusts-a-sh`
+- Lineage: {"renamedFrom":"why-the-decision-id-collision-auto-resolver-only-trusts-a-shared-link-target-not-a-shared-id-to-detect-an-edit-dispute"}
 - Docs:
-  - `merge-auto-resolves-decision-id-collision` (active): `docs/explanation/merge-auto-resolves-decision-id-collision.md`
+  - `merge-auto-resolves-decision-id-collision` (provisional): `docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md`
+    - Aliases: `docs/explanation/merge-auto-resolves-decision-id-collision.md`, `docs/why-the-decision-id-collision-auto-resolver-only-trusts-a-shared-link-target-not-a-shared-id-to-detect-an-edit-dispute/merge-auto-resolves-decision-id-collision.md`
 
 ### Why `mergeRunnerItem` now checks ancestry before attempting a merge (`why-mergerunneritem-now-checks-ancestry-before-attempting-a-merge`)
 - Status: **active**
-- Purpose Slug: `why-mergerunneritem-now-checks-ancestry-before-attempting-a-merge`
+- Purpose Slug: `why-mergerunneritem-now-checks-ancestry-before-attempting-a`
+- Lineage: {"renamedFrom":"why-mergerunneritem-now-checks-ancestry-before-attempting-a-merge"}
 - Docs:
-  - `merge-idempotent-on-already-merged-branch` (active): `docs/explanation/merge-idempotent-on-already-merged-branch.md`
+  - `merge-idempotent-on-already-merged-branch` (provisional): `docs/knowledge/why-mergerunneritem-now-checks-ancestry-before-attempting-a/merge-idempotent-on-already-merged-branch.md`
+    - Aliases: `docs/explanation/merge-idempotent-on-already-merged-branch.md`, `docs/why-mergerunneritem-now-checks-ancestry-before-attempting-a-merge/merge-idempotent-on-already-merged-branch.md`
 
 ### Why merge-loop self-diagnoses only verify-fail-post-merge, never anything else, before counting a block (`why-merge-loop-self-diagnoses-only-verify-fail-post-merge-never-anything-else-before-counting-a-block`)
 - Status: **active**
-- Purpose Slug: `why-merge-loop-self-diagnoses-only-verify-fail-post-merge-never-anything-else-before-counting-a-block`
+- Purpose Slug: `why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne`
+- Lineage: {"renamedFrom":"why-merge-loop-self-diagnoses-only-verify-fail-post-merge-never-anything-else-before-counting-a-block"}
 - Docs:
-  - `merge-loop-self-diagnoses-verify-fail-post-merge` (active): `docs/explanation/merge-loop-self-diagnoses-verify-fail-post-merge.md`
+  - `merge-loop-self-diagnoses-verify-fail-post-merge` (provisional): `docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md`
+    - Aliases: `docs/explanation/merge-loop-self-diagnoses-verify-fail-post-merge.md`, `docs/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-never-anything-else-before-counting-a-block/merge-loop-self-diagnoses-verify-fail-post-merge.md`
 
 ### tsk-3mv feature summary — teaching merge-loop to self-resolve the two block reasons that already had a proven playbook (`tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve-the-two-block-reasons-that-already-had-a-proven-playbook`)
 - Status: **active**
-- Purpose Slug: `tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve-the-two-block-reasons-that-already-had-a-proven-playbook`
+- Purpose Slug: `tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve`
+- Lineage: {"renamedFrom":"tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve-the-two-block-reasons-that-already-had-a-proven-playbook"}
 - Docs:
-  - `merge-loop-self-resolve-feature-summary` (active): `docs/explanation/merge-loop-self-resolve-feature-summary.md`
+  - `merge-loop-self-resolve-feature-summary` (provisional): `docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md`
+    - Aliases: `docs/explanation/merge-loop-self-resolve-feature-summary.md`, `docs/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve-the-two-block-reasons-that-already-had-a-proven-playbook/merge-loop-self-resolve-feature-summary.md`
 
 ### Why "register a finished item into the merge list" needs no new code (`why-register-a-finished-item-into-the-merge-list-needs-no-new-code`)
 - Status: **active**
-- Purpose Slug: `why-register-a-finished-item-into-the-merge-list-needs-no-new-code`
+- Purpose Slug: `why-register-a-finished-item-into-the-merge-list-needs-no-ne`
+- Lineage: {"renamedFrom":"why-register-a-finished-item-into-the-merge-list-needs-no-new-code"}
 - Docs:
-  - `merge-ready-registration-is-already-idempotent` (active): `docs/explanation/merge-ready-registration-is-already-idempotent.md`
+  - `merge-ready-registration-is-already-idempotent` (provisional): `docs/knowledge/why-register-a-finished-item-into-the-merge-list-needs-no-ne/merge-ready-registration-is-already-idempotent.md`
+    - Aliases: `docs/explanation/merge-ready-registration-is-already-idempotent.md`, `docs/why-register-a-finished-item-into-the-merge-list-needs-no-new-code/merge-ready-registration-is-already-idempotent.md`
 
 ### Why status splits into status + statusCategory only for the front segment of the lifecycle (`why-status-splits-into-status-statuscategory-only-for-the-front-segment-of-the-lifecycle`)
 - Status: **active**
-- Purpose Slug: `why-status-splits-into-status-statuscategory-only-for-the-front-segment-of-the-lifecycle`
+- Purpose Slug: `why-status-splits-into-status-statuscategory-only-for-the-fr`
+- Lineage: {"renamedFrom":"why-status-splits-into-status-statuscategory-only-for-the-front-segment-of-the-lifecycle"}
 - Docs:
-  - `multi-domain-status-category-schema` (active): `docs/explanation/multi-domain-status-category-schema.md`
+  - `multi-domain-status-category-schema` (provisional): `docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md`
+    - Aliases: `docs/explanation/multi-domain-status-category-schema.md`, `docs/why-status-splits-into-status-statuscategory-only-for-the-front-segment-of-the-lifecycle/multi-domain-status-category-schema.md`
 
 ### Why reclaiming an orphaned worktree checkout must check for live uncommitted work first (`why-reclaiming-an-orphaned-worktree-checkout-must-check-for-live-uncommitted-work-first`)
 - Status: **active**
-- Purpose Slug: `why-reclaiming-an-orphaned-worktree-checkout-must-check-for-live-uncommitted-work-first`
+- Purpose Slug: `why-reclaiming-an-orphaned-worktree-checkout-must-check-for`
+- Lineage: {"renamedFrom":"why-reclaiming-an-orphaned-worktree-checkout-must-check-for-live-uncommitted-work-first"}
 - Docs:
-  - `orphaned-worktree-reclaim-must-check-for-live-uncommitted-work` (active): `docs/explanation/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md`
+  - `orphaned-worktree-reclaim-must-check-for-live-uncommitted-work` (provisional): `docs/knowledge/why-reclaiming-an-orphaned-worktree-checkout-must-check-for/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md`
+    - Aliases: `docs/explanation/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md`, `docs/why-reclaiming-an-orphaned-worktree-checkout-must-check-for-live-uncommitted-work-first/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md`
 
 ### Why a leaf claim can now be refused, and why status:done already proves the merge happened (`why-a-leaf-claim-can-now-be-refused-and-why-status-done-already-proves-the-merge-happened`)
 - Status: **active**
-- Purpose Slug: `why-a-leaf-claim-can-now-be-refused-and-why-status-done-already-proves-the-merge-happened`
+- Purpose Slug: `why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre`
+- Lineage: {"renamedFrom":"why-a-leaf-claim-can-now-be-refused-and-why-status-done-already-proves-the-merge-happened"}
 - Docs:
-  - `pick-leaf-fork-and-sibling-merge-guard` (active): `docs/explanation/pick-leaf-fork-and-sibling-merge-guard.md`
+  - `pick-leaf-fork-and-sibling-merge-guard` (provisional): `docs/knowledge/why-a-leaf-claim-can-now-be-refused-and-why-status-done-alre/pick-leaf-fork-and-sibling-merge-guard.md`
+    - Aliases: `docs/explanation/pick-leaf-fork-and-sibling-merge-guard.md`, `docs/why-a-leaf-claim-can-now-be-refused-and-why-status-done-already-proves-the-merge-happened/pick-leaf-fork-and-sibling-merge-guard.md`
 
 ### Why plugin skills need a CLI path fallback (`why-plugin-skills-need-a-cli-path-fallback`)
 - Status: **active**
 - Purpose Slug: `why-plugin-skills-need-a-cli-path-fallback`
 - Docs:
-  - `plugin-skill-cli-path-resolution-fallback` (active): `docs/explanation/plugin-skill-cli-path-resolution-fallback.md`
+  - `plugin-skill-cli-path-resolution-fallback` (provisional): `docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md`
+    - Aliases: `docs/explanation/plugin-skill-cli-path-resolution-fallback.md`, `docs/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md`
 
 ### Why a work item whose whole content is a `.fgos/` state mutation can't close through `fgos return`/`approve` (`why-a-work-item-whose-whole-content-is-a-fgos-state-mutation-can-t-close-through-fgos-return-approve`)
 - Status: **active**
-- Purpose Slug: `why-a-work-item-whose-whole-content-is-a-fgos-state-mutation-can-t-close-through-fgos-return-approve`
+- Purpose Slug: `why-a-work-item-whose-whole-content-is-a-fgos-state-mutation`
+- Lineage: {"renamedFrom":"why-a-work-item-whose-whole-content-is-a-fgos-state-mutation-can-t-close-through-fgos-return-approve"}
 - Docs:
-  - `pure-fgos-state-items-cannot-close-through-return` (active): `docs/explanation/pure-fgos-state-items-cannot-close-through-return.md`
+  - `pure-fgos-state-items-cannot-close-through-return` (provisional): `docs/knowledge/why-a-work-item-whose-whole-content-is-a-fgos-state-mutation/pure-fgos-state-items-cannot-close-through-return.md`
+    - Aliases: `docs/explanation/pure-fgos-state-items-cannot-close-through-return.md`, `docs/why-a-work-item-whose-whole-content-is-a-fgos-state-mutation-can-t-close-through-fgos-return-approve/pure-fgos-state-items-cannot-close-through-return.md`
 
 ### Design safeguards in fgOS's runner — anti-loop breakers, model-judgment fail-safes, and guard ordering (`design-safeguards-in-fgos-s-runner-anti-loop-breakers-model-judgment-fail-safes-and-guard-ordering`)
 - Status: **active**
-- Purpose Slug: `design-safeguards-in-fgos-s-runner-anti-loop-breakers-model-judgment-fail-safes-and-guard-ordering`
+- Purpose Slug: `design-safeguards-in-fgos-s-runner-anti-loop-breakers-model`
+- Lineage: {"renamedFrom":"design-safeguards-in-fgos-s-runner-anti-loop-breakers-model-judgment-fail-safes-and-guard-ordering"}
 - Docs:
-  - `runner-execution-safety` (active): `docs/explanation/runner-execution-safety.md`
+  - `runner-execution-safety` (provisional): `docs/knowledge/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model/runner-execution-safety.md`
+    - Aliases: `docs/explanation/runner-execution-safety.md`, `docs/design-safeguards-in-fgos-s-runner-anti-loop-breakers-model-judgment-fail-safes-and-guard-ordering/runner-execution-safety.md`
 
 ### How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off (`how-fgos-isolates-concurrent-sessions-and-why-the-event-log-s-write-door-blocks-instead-of-backing-off`)
 - Status: **active**
-- Purpose Slug: `how-fgos-isolates-concurrent-sessions-and-why-the-event-log-s-write-door-blocks-instead-of-backing-off`
+- Purpose Slug: `how-fgos-isolates-concurrent-sessions-and-why-the-event-log`
+- Lineage: {"renamedFrom":"how-fgos-isolates-concurrent-sessions-and-why-the-event-log-s-write-door-blocks-instead-of-backing-off"}
 - Docs:
-  - `session-isolation-and-concurrency` (active): `docs/explanation/session-isolation-and-concurrency.md`
+  - `session-isolation-and-concurrency` (provisional): `docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md`
+    - Aliases: `docs/explanation/session-isolation-and-concurrency.md`, `docs/how-fgos-isolates-concurrent-sessions-and-why-the-event-log-s-write-door-blocks-instead-of-backing-off/session-isolation-and-concurrency.md`
 
 ### Shell fallback detection needs `type -P`, not `command -v` (`shell-fallback-detection-needs-type-p-not-command-v`)
 - Status: **active**
 - Purpose Slug: `shell-fallback-detection-needs-type-p-not-command-v`
 - Docs:
-  - `shell-fallback-detection-needs-type-p-not-command-v` (active): `docs/explanation/shell-fallback-detection-needs-type-p-not-command-v.md`
+  - `shell-fallback-detection-needs-type-p-not-command-v` (provisional): `docs/knowledge/shell-fallback-detection-needs-type-p-not-command-v/shell-fallback-detection-needs-type-p-not-command-v.md`
+    - Aliases: `docs/explanation/shell-fallback-detection-needs-type-p-not-command-v.md`, `docs/shell-fallback-detection-needs-type-p-not-command-v/shell-fallback-detection-needs-type-p-not-command-v.md`
 
 ### Spec docs drift silently when only the code has an exact-match test (`spec-docs-drift-silently-when-only-the-code-has-an-exact-match-test`)
 - Status: **active**
-- Purpose Slug: `spec-docs-drift-silently-when-only-the-code-has-an-exact-match-test`
+- Purpose Slug: `spec-docs-drift-silently-when-only-the-code-has-an-exact-mat`
+- Lineage: {"renamedFrom":"spec-docs-drift-silently-when-only-the-code-has-an-exact-match-test"}
 - Docs:
-  - `spec-docs-drift-silently-when-only-code-has-an-exact-match-test` (active): `docs/explanation/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md`
+  - `spec-docs-drift-silently-when-only-code-has-an-exact-match-test` (provisional): `docs/knowledge/spec-docs-drift-silently-when-only-the-code-has-an-exact-mat/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md`
+    - Aliases: `docs/explanation/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md`, `docs/spec-docs-drift-silently-when-only-the-code-has-an-exact-match-test/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md`
 
 ### why state.decisions splits engine bookkeeping from design decisions, and how the canonical decision projection (docs/decisions/index.md, docs/specs/<area>.md narrative) is wired onto that same clean zone with no second store (`why-state-decisions-splits-engine-bookkeeping-from-design-decisions-and-how-the-canonical-decision-projection-docs-decisions-index-md-docs-specs-area-md-narrative-is-wired-onto-that-same-clean-zone-with-no-second-store`)
 - Status: **active**
-- Purpose Slug: `why-state-decisions-splits-engine-bookkeeping-from-design-decisions-and-how-the-canonical-decision-projection-docs-decisions-index-md-docs-specs-area-md-narrative-is-wired-onto-that-same-clean-zone-with-no-second-store`
+- Purpose Slug: `why-state-decisions-splits-engine-bookkeeping-from-design-de`
+- Lineage: {"renamedFrom":"why-state-decisions-splits-engine-bookkeeping-from-design-decisions-and-how-the-canonical-decision-projection-docs-decisions-index-md-docs-specs-area-md-narrative-is-wired-onto-that-same-clean-zone-with-no-second-store"}
 - Docs:
-  - `decision-record` (active): `docs/explanation/state-decisions-splits-engine-bookkeeping-from-cited-design-decisions.md`
+  - `decision-record` (provisional): `docs/knowledge/why-state-decisions-splits-engine-bookkeeping-from-design-de/decision-record.md`
+    - Aliases: `docs/explanation/state-decisions-splits-engine-bookkeeping-from-cited-design-decisions.md`, `docs/why-state-decisions-splits-engine-bookkeeping-from-design-decisions-and-how-the-canonical-decision-projection-docs-decisions-index-md-docs-specs-area-md-narrative-is-wired-onto-that-same-clean-zone-with-no-second-store/decision-record.md`
 
 ### keeping a multi-file small-edit item unsplit because each child's worktree/merge-gate lifecycle overhead would exceed the actual edit work (`keeping-a-multi-file-small-edit-item-unsplit-because-each-child-s-worktree-merge-gate-lifecycle-overhead-would-exceed-the-actual-edit-work`)
 - Status: **active**
-- Purpose Slug: `keeping-a-multi-file-small-edit-item-unsplit-because-each-child-s-worktree-merge-gate-lifecycle-overhead-would-exceed-the-actual-edit-work`
+- Purpose Slug: `keeping-a-multi-file-small-edit-item-unsplit-because-each-ch`
+- Lineage: {"renamedFrom":"keeping-a-multi-file-small-edit-item-unsplit-because-each-child-s-worktree-merge-gate-lifecycle-overhead-would-exceed-the-actual-edit-work"}
 - Docs:
-  - `tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work` (active): `docs/explanation/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md`
+  - `tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work` (provisional): `docs/knowledge/keeping-a-multi-file-small-edit-item-unsplit-because-each-ch/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md`
+    - Aliases: `docs/explanation/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md`, `docs/keeping-a-multi-file-small-edit-item-unsplit-because-each-child-s-worktree-merge-gate-lifecycle-overhead-would-exceed-the-actual-edit-work/tiny-multi-file-edits-stay-one-item-when-split-overhead-exceeds-the-work.md`
 
 ### Why a work item title's "object + action + scope" rule lives in the submitting skills, not just the decompose prompt (`why-a-work-item-title-s-object-action-scope-rule-lives-in-the-submitting-skills-not-just-the-decompose-prompt`)
 - Status: **active**
-- Purpose Slug: `why-a-work-item-title-s-object-action-scope-rule-lives-in-the-submitting-skills-not-just-the-decompose-prompt`
+- Purpose Slug: `why-a-work-item-title-s-object-action-scope-rule-lives-in-th`
+- Lineage: {"renamedFrom":"why-a-work-item-title-s-object-action-scope-rule-lives-in-the-submitting-skills-not-just-the-decompose-prompt"}
 - Docs:
-  - `title-semantic-contract-lives-in-submitting-skills` (active): `docs/explanation/title-semantic-contract-lives-in-submitting-skills.md`
+  - `title-semantic-contract-lives-in-submitting-skills` (provisional): `docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md`
+    - Aliases: `docs/explanation/title-semantic-contract-lives-in-submitting-skills.md`, `docs/why-a-work-item-title-s-object-action-scope-rule-lives-in-the-submitting-skills-not-just-the-decompose-prompt/title-semantic-contract-lives-in-submitting-skills.md`
 
 ### Tool-registry: capability lookup is a prose contract, not compiled logic (`tool-registry-capability-lookup-is-a-prose-contract-not-compiled-logic`)
 - Status: **active**
-- Purpose Slug: `tool-registry-capability-lookup-is-a-prose-contract-not-compiled-logic`
+- Purpose Slug: `tool-registry-capability-lookup-is-a-prose-contract-not-comp`
+- Lineage: {"renamedFrom":"tool-registry-capability-lookup-is-a-prose-contract-not-compiled-logic"}
 - Docs:
-  - `tool-registry-capability-is-a-prose-contract-not-compiled-logic` (active): `docs/explanation/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md`
+  - `tool-registry-capability-is-a-prose-contract-not-compiled-logic` (provisional): `docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md`
+    - Aliases: `docs/explanation/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md`, `docs/tool-registry-capability-lookup-is-a-prose-contract-not-compiled-logic/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md`
 
 ### Why a clean `npm test` run missed 16 edge gaps after the lifecycle rebuild (`why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild`)
 - Status: **active**
-- Purpose Slug: `why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild`
+- Purpose Slug: `why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec`
+- Lineage: {"renamedFrom":"why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild"}
 - Docs:
-  - `why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild` (active): `docs/explanation/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md`
+  - `why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild` (provisional): `docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md`
+    - Aliases: `docs/explanation/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md`, `docs/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md`
 
 ### why fgOS registers a doctor check confirming every stage name across ALL of a domain's registered workflows resolves to a real skillMap entry (`why-fgos-registers-a-doctor-check-confirming-every-stage-name-across-all-of-a-domain-s-registered-workflows-resolves-to-a-real-skillmap-entry`)
 - Status: **active**
-- Purpose Slug: `why-fgos-registers-a-doctor-check-confirming-every-stage-name-across-all-of-a-domain-s-registered-workflows-resolves-to-a-real-skillmap-entry`
+- Purpose Slug: `why-fgos-registers-a-doctor-check-confirming-every-stage-nam`
+- Lineage: {"renamedFrom":"why-fgos-registers-a-doctor-check-confirming-every-stage-name-across-all-of-a-domain-s-registered-workflows-resolves-to-a-real-skillmap-entry"}
 - Docs:
-  - `why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner` (active): `docs/explanation/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md`
+  - `why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner` (provisional): `docs/knowledge/why-fgos-registers-a-doctor-check-confirming-every-stage-nam/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md`
+    - Aliases: `docs/explanation/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md`, `docs/why-fgos-registers-a-doctor-check-confirming-every-stage-name-across-all-of-a-domain-s-registered-workflows-resolves-to-a-real-skillmap-entry/why-a-doctor-check-verifies-every-workflow-stage-has-a-skillmap-owner.md`
 
 ### why fgOS now gates a risk:heavy item from reaching delivered when it has no plan.md, and why the two historical violations that surfaced this gap were left uncorrected (`why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered-when-it-has-no-plan-md-and-why-the-two-historical-violations-that-surfaced-this-gap-were-left-uncorrected`)
 - Status: **active**
-- Purpose Slug: `why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered-when-it-has-no-plan-md-and-why-the-two-historical-violations-that-surfaced-this-gap-were-left-uncorrected`
+- Purpose Slug: `why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered`
+- Lineage: {"renamedFrom":"why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered-when-it-has-no-plan-md-and-why-the-two-historical-violations-that-surfaced-this-gap-were-left-uncorrected"}
 - Docs:
-  - `why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md` (active): `docs/explanation/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md`
+  - `why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md` (provisional): `docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md`
+    - Aliases: `docs/explanation/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md`, `docs/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered-when-it-has-no-plan-md-and-why-the-two-historical-violations-that-surfaced-this-gap-were-left-uncorrected/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md`
 
 ### why a leaf-to-root approve no longer requires the shared main checkout to be clean, while a root-to-main approve still does (`why-a-leaf-to-root-approve-no-longer-requires-the-shared-main-checkout-to-be-clean-while-a-root-to-main-approve-still-does`)
 - Status: **active**
-- Purpose Slug: `why-a-leaf-to-root-approve-no-longer-requires-the-shared-main-checkout-to-be-clean-while-a-root-to-main-approve-still-does`
+- Purpose Slug: `why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai`
+- Lineage: {"renamedFrom":"why-a-leaf-to-root-approve-no-longer-requires-the-shared-main-checkout-to-be-clean-while-a-root-to-main-approve-still-does"}
 - Docs:
-  - `why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean` (active): `docs/explanation/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md`
+  - `why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean` (provisional): `docs/knowledge/why-a-leaf-to-root-approve-no-longer-requires-the-shared-mai/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md`
+    - Aliases: `docs/explanation/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md`, `docs/why-a-leaf-to-root-approve-no-longer-requires-the-shared-main-checkout-to-be-clean-while-a-root-to-main-approve-still-does/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md`
 
 ### why resolvePlan's decompose verdict no longer treats the presence of any one child as proof the whole split already completed (`why-resolveplan-s-decompose-verdict-no-longer-treats-the-presence-of-any-one-child-as-proof-the-whole-split-already-completed`)
 - Status: **active**
-- Purpose Slug: `why-resolveplan-s-decompose-verdict-no-longer-treats-the-presence-of-any-one-child-as-proof-the-whole-split-already-completed`
+- Purpose Slug: `why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre`
+- Lineage: {"renamedFrom":"why-resolveplan-s-decompose-verdict-no-longer-treats-the-presence-of-any-one-child-as-proof-the-whole-split-already-completed"}
 - Docs:
-  - `why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children` (active): `docs/explanation/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md`
+  - `why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children` (provisional): `docs/knowledge/why-resolveplan-s-decompose-verdict-no-longer-treats-the-pre/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md`
+    - Aliases: `docs/explanation/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md`, `docs/why-resolveplan-s-decompose-verdict-no-longer-treats-the-presence-of-any-one-child-as-proof-the-whole-split-already-completed/why-a-partially-materialized-decompose-no-longer-locks-out-the-remaining-children.md`
 
 ### Why a per-stage exception in the driver meant that stage had no owner (`why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner`)
 - Status: **active**
-- Purpose Slug: `why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner`
+- Purpose Slug: `why-a-per-stage-exception-in-the-driver-meant-that-stage-had`
+- Lineage: {"renamedFrom":"why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner"}
 - Docs:
-  - `why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner` (active): `docs/explanation/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner.md`
+  - `why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner` (provisional): `docs/knowledge/why-a-per-stage-exception-in-the-driver-meant-that-stage-had/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner.md`
+    - Aliases: `docs/explanation/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner.md`, `docs/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner.md`
 
 ### Why a retired stage name sometimes keeps a drain-only alias (`why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias`)
 - Status: **active**
 - Purpose Slug: `why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias`
 - Docs:
-  - `why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias` (active): `docs/explanation/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md`
+  - `why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias` (provisional): `docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md`
+    - Aliases: `docs/explanation/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md`, `docs/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md`
 
 ### why the tsk-51m root Iron Law evidence file recorded a test count lower than any of its own children, why the fix is an addendum rather than an edit, and the general stale-worktree-index guard this incident led to (`why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test-count-lower-than-any-of-its-own-children-why-the-fix-is-an-addendum-rather-than-an-edit-and-the-general-stale-worktree-index-guard-this-incident-led-to`)
 - Status: **active**
-- Purpose Slug: `why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test-count-lower-than-any-of-its-own-children-why-the-fix-is-an-addendum-rather-than-an-edit-and-the-general-stale-worktree-index-guard-this-incident-led-to`
+- Purpose Slug: `why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test`
+- Lineage: {"renamedFrom":"why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test-count-lower-than-any-of-its-own-children-why-the-fix-is-an-addendum-rather-than-an-edit-and-the-general-stale-worktree-index-guard-this-incident-led-to"}
 - Docs:
-  - `why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count` (active): `docs/explanation/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md`
+  - `why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count` (provisional): `docs/knowledge/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md`
+    - Aliases: `docs/explanation/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md`, `docs/why-the-tsk-51m-root-iron-law-evidence-file-recorded-a-test-count-lower-than-any-of-its-own-children-why-the-fix-is-an-addendum-rather-than-an-edit-and-the-general-stale-worktree-index-guard-this-incident-led-to/why-a-stale-worktree-index-produced-a-wrong-iron-law-test-count.md`
 
 ### Why a `verify` command cannot itself mutate live work state (`why-a-verify-command-cannot-itself-mutate-live-work-state`)
 - Status: **active**
 - Purpose Slug: `why-a-verify-command-cannot-itself-mutate-live-work-state`
 - Docs:
-  - `why-a-verify-command-cannot-mutate-live-work-state` (active): `docs/explanation/why-a-verify-command-cannot-mutate-live-work-state.md`
+  - `why-a-verify-command-cannot-mutate-live-work-state` (provisional): `docs/knowledge/why-a-verify-command-cannot-itself-mutate-live-work-state/why-a-verify-command-cannot-mutate-live-work-state.md`
+    - Aliases: `docs/explanation/why-a-verify-command-cannot-mutate-live-work-state.md`, `docs/why-a-verify-command-cannot-itself-mutate-live-work-state/why-a-verify-command-cannot-mutate-live-work-state.md`
 
 ### Why locking a new risk/kind vocabulary didn't fix the 68 items already on disk (`why-locking-a-new-risk-kind-vocabulary-didn-t-fix-the-68-items-already-on-disk`)
 - Status: **active**
-- Purpose Slug: `why-locking-a-new-risk-kind-vocabulary-didn-t-fix-the-68-items-already-on-disk`
+- Purpose Slug: `why-locking-a-new-risk-kind-vocabulary-didn-t-fix-the-68-ite`
+- Lineage: {"renamedFrom":"why-locking-a-new-risk-kind-vocabulary-didn-t-fix-the-68-items-already-on-disk"}
 - Docs:
-  - `why-a-vocabulary-lock-alone-cant-fix-grandfathered-risk-and-kind-values` (active): `docs/explanation/why-a-vocabulary-lock-alone-cant-fix-grandfathered-risk-and-kind-values.md`
+  - `why-a-vocabulary-lock-alone-cant-fix-grandfathered-risk-and-kind-values` (provisional): `docs/knowledge/why-locking-a-new-risk-kind-vocabulary-didn-t-fix-the-68-ite/why-a-vocabulary-lock-alone-cant-fix-grandfathered-risk-and-kind-values.md`
+    - Aliases: `docs/explanation/why-a-vocabulary-lock-alone-cant-fix-grandfathered-risk-and-kind-values.md`, `docs/why-locking-a-new-risk-kind-vocabulary-didn-t-fix-the-68-items-already-on-disk/why-a-vocabulary-lock-alone-cant-fix-grandfathered-risk-and-kind-values.md`
 
 ### Why `abortMergeIfPossible` checks `MERGE_HEAD` before aborting (`why-abortmergeifpossible-checks-merge-head-before-aborting`)
 - Status: **active**
 - Purpose Slug: `why-abortmergeifpossible-checks-merge-head-before-aborting`
 - Docs:
-  - `why-abortmergeifpossible-checks-merge-head-before-aborting` (active): `docs/explanation/why-abortmergeifpossible-checks-merge-head-before-aborting.md`
+  - `why-abortmergeifpossible-checks-merge-head-before-aborting` (provisional): `docs/knowledge/why-abortmergeifpossible-checks-merge-head-before-aborting/why-abortmergeifpossible-checks-merge-head-before-aborting.md`
+    - Aliases: `docs/explanation/why-abortmergeifpossible-checks-merge-head-before-aborting.md`, `docs/why-abortmergeifpossible-checks-merge-head-before-aborting/why-abortmergeifpossible-checks-merge-head-before-aborting.md`
 
 ### why the agy CLI executor needs --new-project in its invocation args, the real incident that surfaced the cwd bug, and why agy dispatch still isn't considered fully reliable even after that fix (`why-the-agy-cli-executor-needs-new-project-in-its-invocation-args-the-real-incident-that-surfaced-the-cwd-bug-and-why-agy-dispatch-still-isn-t-considered-fully-reliable-even-after-that-fix`)
 - Status: **active**
-- Purpose Slug: `why-the-agy-cli-executor-needs-new-project-in-its-invocation-args-the-real-incident-that-surfaced-the-cwd-bug-and-why-agy-dispatch-still-isn-t-considered-fully-reliable-even-after-that-fix`
+- Purpose Slug: `why-the-agy-cli-executor-needs-new-project-in-its-invocation`
+- Lineage: {"renamedFrom":"why-the-agy-cli-executor-needs-new-project-in-its-invocation-args-the-real-incident-that-surfaced-the-cwd-bug-and-why-agy-dispatch-still-isn-t-considered-fully-reliable-even-after-that-fix"}
 - Docs:
-  - `why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable` (active): `docs/explanation/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md`
+  - `why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable` (provisional): `docs/knowledge/why-the-agy-cli-executor-needs-new-project-in-its-invocation/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md`
+    - Aliases: `docs/explanation/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md`, `docs/why-the-agy-cli-executor-needs-new-project-in-its-invocation-args-the-real-incident-that-surfaced-the-cwd-bug-and-why-agy-dispatch-still-isn-t-considered-fully-reliable-even-after-that-fix/why-agy-dispatch-needed-new-project-and-still-isnt-fully-reliable.md`
 
 ### Why an `is-ancestor-of-main` verify check can never pass through `fgos approve` (`why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve`)
 - Status: **active**
-- Purpose Slug: `why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve`
+- Purpose Slug: `why-an-is-ancestor-of-main-verify-check-can-never-pass-throu`
+- Lineage: {"renamedFrom":"why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve"}
 - Docs:
-  - `why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve` (active): `docs/explanation/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md`
+  - `why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve` (provisional): `docs/knowledge/why-an-is-ancestor-of-main-verify-check-can-never-pass-throu/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md`
+    - Aliases: `docs/explanation/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md`, `docs/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md`
 
 ### Why `approve` blocks closing a milestone with drifted targets (`why-approve-blocks-closing-a-milestone-with-drifted-targets`)
 - Status: **active**
 - Purpose Slug: `why-approve-blocks-closing-a-milestone-with-drifted-targets`
 - Docs:
-  - `why-approve-blocks-closing-a-milestone-with-drifted-targets` (active): `docs/explanation/why-approve-blocks-closing-a-milestone-with-drifted-targets.md`
+  - `why-approve-blocks-closing-a-milestone-with-drifted-targets` (provisional): `docs/knowledge/why-approve-blocks-closing-a-milestone-with-drifted-targets/why-approve-blocks-closing-a-milestone-with-drifted-targets.md`
+    - Aliases: `docs/explanation/why-approve-blocks-closing-a-milestone-with-drifted-targets.md`, `docs/why-approve-blocks-closing-a-milestone-with-drifted-targets/why-approve-blocks-closing-a-milestone-with-drifted-targets.md`
 
 ### Why `approve` checks acceptance evidence before merging, not after (`why-approve-checks-acceptance-evidence-before-merging-not-after`)
 - Status: **active**
-- Purpose Slug: `why-approve-checks-acceptance-evidence-before-merging-not-after`
+- Purpose Slug: `why-approve-checks-acceptance-evidence-before-merging-not-af`
+- Lineage: {"renamedFrom":"why-approve-checks-acceptance-evidence-before-merging-not-after"}
 - Docs:
-  - `why-approve-checks-acceptance-evidence-before-merging-not-after` (active): `docs/explanation/why-approve-checks-acceptance-evidence-before-merging-not-after.md`
+  - `why-approve-checks-acceptance-evidence-before-merging-not-after` (provisional): `docs/knowledge/why-approve-checks-acceptance-evidence-before-merging-not-af/why-approve-checks-acceptance-evidence-before-merging-not-after.md`
+    - Aliases: `docs/explanation/why-approve-checks-acceptance-evidence-before-merging-not-after.md`, `docs/why-approve-checks-acceptance-evidence-before-merging-not-after/why-approve-checks-acceptance-evidence-before-merging-not-after.md`
 
 ### Why `approve` logs post-success `moveWork` faults outside `events.lock` (`why-approve-logs-post-success-movework-faults-outside-events-lock`)
 - Status: **active**
-- Purpose Slug: `why-approve-logs-post-success-movework-faults-outside-events-lock`
+- Purpose Slug: `why-approve-logs-post-success-movework-faults-outside-events`
+- Lineage: {"renamedFrom":"why-approve-logs-post-success-movework-faults-outside-events-lock"}
 - Docs:
-  - `why-approve-logs-post-success-movework-faults-outside-events-lock` (active): `docs/explanation/why-approve-logs-post-success-movework-faults-outside-events-lock.md`
+  - `why-approve-logs-post-success-movework-faults-outside-events-lock` (provisional): `docs/knowledge/why-approve-logs-post-success-movework-faults-outside-events/why-approve-logs-post-success-movework-faults-outside-events-lock.md`
+    - Aliases: `docs/explanation/why-approve-logs-post-success-movework-faults-outside-events-lock.md`, `docs/why-approve-logs-post-success-movework-faults-outside-events-lock/why-approve-logs-post-success-movework-faults-outside-events-lock.md`
 
 ### Why `fgos approve` refuses a leaf merging into an already-resolved root (`why-fgos-approve-refuses-a-leaf-merging-into-an-already-resolved-root`)
 - Status: **active**
-- Purpose Slug: `why-fgos-approve-refuses-a-leaf-merging-into-an-already-resolved-root`
+- Purpose Slug: `why-fgos-approve-refuses-a-leaf-merging-into-an-already-reso`
+- Lineage: {"renamedFrom":"why-fgos-approve-refuses-a-leaf-merging-into-an-already-resolved-root"}
 - Docs:
-  - `why-approve-refuses-a-leaf-merging-into-an-already-resolved-root` (active): `docs/explanation/why-approve-refuses-a-leaf-merging-into-an-already-resolved-root.md`
+  - `why-approve-refuses-a-leaf-merging-into-an-already-resolved-root` (provisional): `docs/knowledge/why-fgos-approve-refuses-a-leaf-merging-into-an-already-reso/why-approve-refuses-a-leaf-merging-into-an-already-resolved-root.md`
+    - Aliases: `docs/explanation/why-approve-refuses-a-leaf-merging-into-an-already-resolved-root.md`, `docs/why-fgos-approve-refuses-a-leaf-merging-into-an-already-resolved-root/why-approve-refuses-a-leaf-merging-into-an-already-resolved-root.md`
 
 ### Why `approve`'s Iron Law gate scopes `changedFiles` to the leaf's own root (`why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf-s-own-root`)
 - Status: **active**
-- Purpose Slug: `why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf-s-own-root`
+- Purpose Slug: `why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf`
+- Lineage: {"renamedFrom":"why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf-s-own-root"}
 - Docs:
-  - `why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root` (active): `docs/explanation/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md`
+  - `why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root` (provisional): `docs/knowledge/why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md`
+    - Aliases: `docs/explanation/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md`, `docs/why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf-s-own-root/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md`
 
 ### Why auto-decompose children now carry `action` + `read_first` directive prose (`why-auto-decompose-children-now-carry-action-read-first-directive-prose`)
 - Status: **active**
-- Purpose Slug: `why-auto-decompose-children-now-carry-action-read-first-directive-prose`
+- Purpose Slug: `why-auto-decompose-children-now-carry-action-read-first-dire`
+- Lineage: {"renamedFrom":"why-auto-decompose-children-now-carry-action-read-first-directive-prose"}
 - Docs:
-  - `why-auto-decompose-children-carry-action-and-read-first-directive-prose` (active): `docs/explanation/why-auto-decompose-children-carry-action-and-read-first-directive-prose.md`
+  - `why-auto-decompose-children-carry-action-and-read-first-directive-prose` (provisional): `docs/knowledge/why-auto-decompose-children-now-carry-action-read-first-dire/why-auto-decompose-children-carry-action-and-read-first-directive-prose.md`
+    - Aliases: `docs/explanation/why-auto-decompose-children-carry-action-and-read-first-directive-prose.md`, `docs/why-auto-decompose-children-now-carry-action-read-first-directive-prose/why-auto-decompose-children-carry-action-and-read-first-directive-prose.md`
 
 ### Why auto-launched herdr panes must be labeled before spawning `claude`, unlike person-triggered ones (`why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude-unlike-person-triggered-ones`)
 - Status: **active**
-- Purpose Slug: `why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude-unlike-person-triggered-ones`
+- Purpose Slug: `why-auto-launched-herdr-panes-must-be-labeled-before-spawnin`
+- Lineage: {"renamedFrom":"why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude-unlike-person-triggered-ones"}
 - Docs:
-  - `why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude` (active): `docs/explanation/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md`
+  - `why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude` (provisional): `docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md`
+    - Aliases: `docs/explanation/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md`, `docs/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude-unlike-person-triggered-ones/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md`
 
 ### Why `awaiting-approval` became an overridable ceiling, not a hard stop (`why-awaiting-approval-became-an-overridable-ceiling-not-a-hard-stop`)
 - Status: **active**
-- Purpose Slug: `why-awaiting-approval-became-an-overridable-ceiling-not-a-hard-stop`
+- Purpose Slug: `why-awaiting-approval-became-an-overridable-ceiling-not-a-ha`
+- Lineage: {"renamedFrom":"why-awaiting-approval-became-an-overridable-ceiling-not-a-hard-stop"}
 - Docs:
-  - `why-awaiting-approval-became-an-overridable-ceiling` (active): `docs/explanation/why-awaiting-approval-became-an-overridable-ceiling.md`
+  - `why-awaiting-approval-became-an-overridable-ceiling` (provisional): `docs/knowledge/why-awaiting-approval-became-an-overridable-ceiling-not-a-ha/why-awaiting-approval-became-an-overridable-ceiling.md`
+    - Aliases: `docs/explanation/why-awaiting-approval-became-an-overridable-ceiling.md`, `docs/why-awaiting-approval-became-an-overridable-ceiling-not-a-hard-stop/why-awaiting-approval-became-an-overridable-ceiling.md`
 
 ### Why `backlog` is a new global status before `todo`, not a domain relabel (`why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel`)
 - Status: **active**
-- Purpose Slug: `why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel`
+- Purpose Slug: `why-backlog-is-a-new-global-status-before-todo-not-a-domain`
+- Lineage: {"renamedFrom":"why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel"}
 - Docs:
-  - `why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel` (active): `docs/explanation/why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel.md`
+  - `why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel` (provisional): `docs/knowledge/why-backlog-is-a-new-global-status-before-todo-not-a-domain/why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel.md`
+    - Aliases: `docs/explanation/why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel.md`, `docs/why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel/why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel.md`
 
 ### Why `BEE_`-prefixed identifiers became `FGOS_`-prefixed (and some didn't) (`why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-didn-t`)
 - Status: **active**
-- Purpose Slug: `why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-didn-t`
+- Purpose Slug: `why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d`
+- Lineage: {"renamedFrom":"why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-didn-t"}
 - Docs:
-  - `why-bee-prefixed-identifiers-became-fgos-prefixed` (active): `docs/explanation/why-bee-prefixed-identifiers-became-fgos-prefixed.md`
+  - `why-bee-prefixed-identifiers-became-fgos-prefixed` (provisional): `docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md`
+    - Aliases: `docs/explanation/why-bee-prefixed-identifiers-became-fgos-prefixed.md`, `docs/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-didn-t/why-bee-prefixed-identifiers-became-fgos-prefixed.md`
 
 ### why runner config splits capability (curated vocab), executor (named registry of how a capability is fulfilled), and capacity (the for-purpose lookup binding) into three distinct concepts instead of the two overlapping ones (tool-registry's free-text capability, dispatch.mjs's closed-enum purpose) that existed before (`why-runner-config-splits-capability-curated-vocab-executor-named-registry-of-how-a-capability-is-fulfilled-and-capacity-the-for-purpose-lookup-binding-into-three-distinct-concepts-instead-of-the-two-overlapping-ones-tool-registry-s-free-text-capability-dispatch-mjs-s-closed-enum-purpose-that-existed-before`)
 - Status: **active**
-- Purpose Slug: `why-runner-config-splits-capability-curated-vocab-executor-named-registry-of-how-a-capability-is-fulfilled-and-capacity-the-for-purpose-lookup-binding-into-three-distinct-concepts-instead-of-the-two-overlapping-ones-tool-registry-s-free-text-capability-dispatch-mjs-s-closed-enum-purpose-that-existed-before`
+- Purpose Slug: `why-runner-config-splits-capability-curated-vocab-executor-n`
+- Lineage: {"renamedFrom":"why-runner-config-splits-capability-curated-vocab-executor-named-registry-of-how-a-capability-is-fulfilled-and-capacity-the-for-purpose-lookup-binding-into-three-distinct-concepts-instead-of-the-two-overlapping-ones-tool-registry-s-free-text-capability-dispatch-mjs-s-closed-enum-purpose-that-existed-before"}
 - Docs:
-  - `why-capability-executor-and-capacity-are-three-separate-concepts` (active): `docs/explanation/why-capability-executor-and-capacity-are-three-separate-concepts.md`
+  - `why-capability-executor-and-capacity-are-three-separate-concepts` (provisional): `docs/knowledge/why-runner-config-splits-capability-curated-vocab-executor-n/why-capability-executor-and-capacity-are-three-separate-concepts.md`
+    - Aliases: `docs/explanation/why-capability-executor-and-capacity-are-three-separate-concepts.md`
 
 ### why decide --for/execute --for impact-analysis reported unavailable despite a registered gitnexus capacity, and how the for/capability field split was unified (`why-decide-for-execute-for-impact-analysis-reported-unavailable-despite-a-registered-gitnexus-capacity-and-how-the-for-capability-field-split-was-unified`)
 - Status: **active**
-- Purpose Slug: `why-decide-for-execute-for-impact-analysis-reported-unavailable-despite-a-registered-gitnexus-capacity-and-how-the-for-capability-field-split-was-unified`
+- Purpose Slug: `why-decide-for-execute-for-impact-analysis-reported-unavaila`
+- Lineage: {"renamedFrom":"why-decide-for-execute-for-impact-analysis-reported-unavailable-despite-a-registered-gitnexus-capacity-and-how-the-for-capability-field-split-was-unified"}
 - Docs:
-  - `why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back` (active): `docs/explanation/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md`
+  - `why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back` (provisional): `docs/knowledge/why-decide-for-execute-for-impact-analysis-reported-unavaila/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md`
+    - Aliases: `docs/explanation/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md`
 
 ### Why `fgos catchup` needed its own already-caught-up guard (`why-fgos-catchup-needed-its-own-already-caught-up-guard`)
 - Status: **active**
 - Purpose Slug: `why-fgos-catchup-needed-its-own-already-caught-up-guard`
 - Docs:
-  - `why-catchup-needed-its-own-already-caught-up-guard` (active): `docs/explanation/why-catchup-needed-its-own-already-caught-up-guard.md`
+  - `why-catchup-needed-its-own-already-caught-up-guard` (provisional): `docs/knowledge/why-fgos-catchup-needed-its-own-already-caught-up-guard/why-catchup-needed-its-own-already-caught-up-guard.md`
+    - Aliases: `docs/explanation/why-catchup-needed-its-own-already-caught-up-guard.md`
 
 ### Why `checkMergeStillResolves` can false-positive after a root branch prune (`why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune`)
 - Status: **active**
-- Purpose Slug: `why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune`
+- Purpose Slug: `why-checkmergestillresolves-can-false-positive-after-a-root`
+- Lineage: {"renamedFrom":"why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune"}
 - Docs:
-  - `why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune` (active): `docs/explanation/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md`
+  - `why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune` (provisional): `docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md`
+    - Aliases: `docs/explanation/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md`
 
 ### Why `claimWork`'s CAS reread stays while its one redundant full-log read was deduped (`why-claimwork-s-cas-reread-stays-while-its-one-redundant-full-log-read-was-deduped`)
 - Status: **active**
-- Purpose Slug: `why-claimwork-s-cas-reread-stays-while-its-one-redundant-full-log-read-was-deduped`
+- Purpose Slug: `why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful`
+- Lineage: {"renamedFrom":"why-claimwork-s-cas-reread-stays-while-its-one-redundant-full-log-read-was-deduped"}
 - Docs:
-  - `why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped` (active): `docs/explanation/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md`
+  - `why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped` (provisional): `docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md`
+    - Aliases: `docs/explanation/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md`
 
 ### Why `clarify` split into `clarify`, `discovery`, and `exploring` (`why-clarify-split-into-clarify-discovery-and-exploring`)
 - Status: **active**
 - Purpose Slug: `why-clarify-split-into-clarify-discovery-and-exploring`
 - Docs:
-  - `why-clarify-split-into-clarify-discovery-and-exploring` (active): `docs/explanation/why-clarify-split-into-clarify-discovery-and-exploring.md`
+  - `why-clarify-split-into-clarify-discovery-and-exploring` (provisional): `docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md`
+    - Aliases: `docs/explanation/why-clarify-split-into-clarify-discovery-and-exploring.md`
 
 ### Why `cleanup-loop` has no iteration cap, unlike `discover-loop` (`why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop`)
 - Status: **active**
 - Purpose Slug: `why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop`
 - Docs:
-  - `why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop` (active): `docs/explanation/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop.md`
+  - `why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop` (provisional): `docs/knowledge/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop.md`
+    - Aliases: `docs/explanation/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop.md`
 
 ### Why `/fgOS:cleanup-next` keeps exit-code classification instead of a driver call (`why-fgos-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call`)
 - Status: **active**
-- Purpose Slug: `why-fgos-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call`
+- Purpose Slug: `why-fgos-cleanup-next-keeps-exit-code-classification-instead`
+- Lineage: {"renamedFrom":"why-fgos-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call"}
 - Docs:
-  - `why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call` (active): `docs/explanation/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md`
+  - `why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call` (provisional): `docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md`
+    - Aliases: `docs/explanation/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md`
 
 ### why the herdr web dashboard gateway's Cloudflare Access JWT support is an additive second credential layer on top of the existing Bearer token, never a replacement for it, and why every auth failure returns an identical blind 404 (`why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt-support-is-an-additive-second-credential-layer-on-top-of-the-existing-bearer-token-never-a-replacement-for-it-and-why-every-auth-failure-returns-an-identical-blind-404`)
 - Status: **active**
-- Purpose Slug: `why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt-support-is-an-additive-second-credential-layer-on-top-of-the-existing-bearer-token-never-a-replacement-for-it-and-why-every-auth-failure-returns-an-identical-blind-404`
+- Purpose Slug: `why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt`
+- Lineage: {"renamedFrom":"why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt-support-is-an-additive-second-credential-layer-on-top-of-the-existing-bearer-token-never-a-replacement-for-it-and-why-every-auth-failure-returns-an-identical-blind-404"}
 - Docs:
-  - `why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement` (active): `docs/explanation/why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement.md`
+  - `why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement` (provisional): `docs/knowledge/why-the-herdr-web-dashboard-gateway-s-cloudflare-access-jwt/why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement.md`
+    - Aliases: `docs/explanation/why-cloudflare-access-is-an-additive-second-auth-layer-not-a-replacement.md`
 
 ### coding domain's role/holder axis, handoff verb, task-spec/skill/knowledge/context ontology, and workflow hierarchy design decisions (`coding-domain-s-role-holder-axis-handoff-verb-task-spec-skill-knowledge-context-ontology-and-workflow-hierarchy-design-decisions`)
 - Status: **active**
-- Purpose Slug: `coding-domain-s-role-holder-axis-handoff-verb-task-spec-skill-knowledge-context-ontology-and-workflow-hierarchy-design-decisions`
+- Purpose Slug: `coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil`
+- Lineage: {"renamedFrom":"coding-domain-s-role-holder-axis-handoff-verb-task-spec-skill-knowledge-context-ontology-and-workflow-hierarchy-design-decisions"}
 - Docs:
-  - `why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology` (active): `docs/explanation/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md`
+  - `why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology` (provisional): `docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md`
+    - Aliases: `docs/explanation/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md`
 
 ### why fgOS's concurrency tests batch spawned processes to reduce peak events.lock contention instead of scaling the lock-timeout budget (`why-fgos-s-concurrency-tests-batch-spawned-processes-to-reduce-peak-events-lock-contention-instead-of-scaling-the-lock-timeout-budget`)
 - Status: **active**
-- Purpose Slug: `why-fgos-s-concurrency-tests-batch-spawned-processes-to-reduce-peak-events-lock-contention-instead-of-scaling-the-lock-timeout-budget`
+- Purpose Slug: `why-fgos-s-concurrency-tests-batch-spawned-processes-to-redu`
+- Lineage: {"renamedFrom":"why-fgos-s-concurrency-tests-batch-spawned-processes-to-reduce-peak-events-lock-contention-instead-of-scaling-the-lock-timeout-budget"}
 - Docs:
-  - `why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout` (active): `docs/explanation/why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout.md`
+  - `why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout` (provisional): `docs/knowledge/why-fgos-s-concurrency-tests-batch-spawned-processes-to-redu/why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout.md`
+    - Aliases: `docs/explanation/why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout.md`
 
 ### Why `cook` and `pick` were retrofitted to call `fgos-coding-driving` (`why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving`)
 - Status: **active**
-- Purpose Slug: `why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving`
+- Purpose Slug: `why-cook-and-pick-were-retrofitted-to-call-fgos-coding-drivi`
+- Lineage: {"renamedFrom":"why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving"}
 - Docs:
-  - `why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving` (active): `docs/explanation/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving.md`
+  - `why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving` (provisional): `docs/knowledge/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-drivi/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving.md`
+    - Aliases: `docs/explanation/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving.md`
 
 ### Why cook's "never auto-approve" prose lost to gate-bypass (`why-cook-s-never-auto-approve-prose-lost-to-gate-bypass`)
 - Status: **active**
 - Purpose Slug: `why-cook-s-never-auto-approve-prose-lost-to-gate-bypass`
 - Docs:
-  - `why-cooks-never-auto-approve-prose-lost-to-gate-bypass` (active): `docs/explanation/why-cooks-never-auto-approve-prose-lost-to-gate-bypass.md`
+  - `why-cooks-never-auto-approve-prose-lost-to-gate-bypass` (provisional): `docs/knowledge/why-cook-s-never-auto-approve-prose-lost-to-gate-bypass/why-cooks-never-auto-approve-prose-lost-to-gate-bypass.md`
+    - Aliases: `docs/explanation/why-cooks-never-auto-approve-prose-lost-to-gate-bypass.md`
 
 ### why a session-driven root's fgw/<rootId> branch may not exist yet at merge time, and every call site that needed its own fallback for it (`why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist-yet-at-merge-time-and-every-call-site-that-needed-its-own-fallback-for-it`)
 - Status: **active**
-- Purpose Slug: `why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist-yet-at-merge-time-and-every-call-site-that-needed-its-own-fallback-for-it`
+- Purpose Slug: `why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist`
+- Lineage: {"renamedFrom":"why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist-yet-at-merge-time-and-every-call-site-that-needed-its-own-fallback-for-it"}
 - Docs:
-  - `why-createdetachedmergeworktree-crashed-for-session-driven-roots` (active): `docs/explanation/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md`
+  - `why-createdetachedmergeworktree-crashed-for-session-driven-roots` (provisional): `docs/knowledge/why-a-session-driven-root-s-fgw-rootid-branch-may-not-exist/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md`
+    - Aliases: `docs/explanation/why-createdetachedmergeworktree-crashed-for-session-driven-roots.md`
 
 ### Why `decompose` checks footprint overlap before creating children (`why-decompose-checks-footprint-overlap-before-creating-children`)
 - Status: **active**
-- Purpose Slug: `why-decompose-checks-footprint-overlap-before-creating-children`
+- Purpose Slug: `why-decompose-checks-footprint-overlap-before-creating-child`
+- Lineage: {"renamedFrom":"why-decompose-checks-footprint-overlap-before-creating-children"}
 - Docs:
-  - `why-decompose-checks-footprint-overlap-before-creating-children` (active): `docs/explanation/why-decompose-checks-footprint-overlap-before-creating-children.md`
+  - `why-decompose-checks-footprint-overlap-before-creating-children` (provisional): `docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md`
+    - Aliases: `docs/explanation/why-decompose-checks-footprint-overlap-before-creating-children.md`
 
 ### Why `decompose`'s skip-and-advance is narrower than `discovery`'s (`why-decompose-s-skip-and-advance-is-narrower-than-discovery-s`)
 - Status: **active**
-- Purpose Slug: `why-decompose-s-skip-and-advance-is-narrower-than-discovery-s`
+- Purpose Slug: `why-decompose-s-skip-and-advance-is-narrower-than-discovery`
+- Lineage: {"renamedFrom":"why-decompose-s-skip-and-advance-is-narrower-than-discovery-s"}
 - Docs:
-  - `why-decomposes-skip-and-advance-is-narrower-than-discoverys` (active): `docs/explanation/why-decomposes-skip-and-advance-is-narrower-than-discoverys.md`
+  - `why-decomposes-skip-and-advance-is-narrower-than-discoverys` (provisional): `docs/knowledge/why-decompose-s-skip-and-advance-is-narrower-than-discovery/why-decomposes-skip-and-advance-is-narrower-than-discoverys.md`
+    - Aliases: `docs/explanation/why-decomposes-skip-and-advance-is-narrower-than-discoverys.md`
 
 ### why fgOS started recording mergedSha and mergedInto on the delivered work.move event instead of inferring merge status from git ancestry (`why-fgos-started-recording-mergedsha-and-mergedinto-on-the-delivered-work-move-event-instead-of-inferring-merge-status-from-git-ancestry`)
 - Status: **active**
-- Purpose Slug: `why-fgos-started-recording-mergedsha-and-mergedinto-on-the-delivered-work-move-event-instead-of-inferring-merge-status-from-git-ancestry`
+- Purpose Slug: `why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d`
+- Lineage: {"renamedFrom":"why-fgos-started-recording-mergedsha-and-mergedinto-on-the-delivered-work-move-event-instead-of-inferring-merge-status-from-git-ancestry"}
 - Docs:
-  - `why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred` (active): `docs/explanation/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md`
+  - `why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred` (provisional): `docs/knowledge/why-fgos-started-recording-mergedsha-and-mergedinto-on-the-d/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md`
+    - Aliases: `docs/explanation/why-delivered-events-now-record-real-merge-provenance-instead-of-being-inferred.md`
 
 ### Why `/fgOS:discover-next` shrank to a picker (`why-fgos-discover-next-shrank-to-a-picker`)
 - Status: **active**
 - Purpose Slug: `why-fgos-discover-next-shrank-to-a-picker`
 - Docs:
-  - `why-discover-next-shrank-to-a-picker` (active): `docs/explanation/why-discover-next-shrank-to-a-picker.md`
+  - `why-discover-next-shrank-to-a-picker` (provisional): `docs/knowledge/why-fgos-discover-next-shrank-to-a-picker/why-discover-next-shrank-to-a-picker.md`
+    - Aliases: `docs/explanation/why-discover-next-shrank-to-a-picker.md`
 
 ### Why `discover` was rewritten as a clean/enrich/self-research recipe (`why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe`)
 - Status: **active**
-- Purpose Slug: `why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe`
+- Purpose Slug: `why-discover-was-rewritten-as-a-clean-enrich-self-research-r`
+- Lineage: {"renamedFrom":"why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe"}
 - Docs:
-  - `why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe` (active): `docs/explanation/why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe.md`
+  - `why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe` (provisional): `docs/knowledge/why-discover-was-rewritten-as-a-clean-enrich-self-research-r/why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe.md`
+    - Aliases: `docs/explanation/why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe.md`
 
 ### why every Agent/Task-tool dispatch is enforced through a PreToolUse hook that runs dispatch.mjs decide itself, why the hook self-invokes decide instead of tracking whether the caller already did, why --needs-soul exists, why decide reports configured:true|false instead of throwing, why resolve was retired in favor of decide/execute, and why MCP tool access is a hand-back rather than a second client dispatch.mjs opens itself (`why-every-agent-task-tool-dispatch-is-enforced-through-a-pretooluse-hook-that-runs-dispatch-mjs-decide-itself-why-the-hook-self-invokes-decide-instead-of-tracking-whether-the-caller-already-did-why-needs-soul-exists-why-decide-reports-configured-true-false-instead-of-throwing-why-resolve-was-retired-in-favor-of-decide-execute-and-why-mcp-tool-access-is-a-hand-back-rather-than-a-second-client-dispatch-mjs-opens-itself`)
 - Status: **active**
-- Purpose Slug: `why-every-agent-task-tool-dispatch-is-enforced-through-a-pretooluse-hook-that-runs-dispatch-mjs-decide-itself-why-the-hook-self-invokes-decide-instead-of-tracking-whether-the-caller-already-did-why-needs-soul-exists-why-decide-reports-configured-true-false-instead-of-throwing-why-resolve-was-retired-in-favor-of-decide-execute-and-why-mcp-tool-access-is-a-hand-back-rather-than-a-second-client-dispatch-mjs-opens-itself`
+- Purpose Slug: `why-every-agent-task-tool-dispatch-is-enforced-through-a-pre`
+- Lineage: {"renamedFrom":"why-every-agent-task-tool-dispatch-is-enforced-through-a-pretooluse-hook-that-runs-dispatch-mjs-decide-itself-why-the-hook-self-invokes-decide-instead-of-tracking-whether-the-caller-already-did-why-needs-soul-exists-why-decide-reports-configured-true-false-instead-of-throwing-why-resolve-was-retired-in-favor-of-decide-execute-and-why-mcp-tool-access-is-a-hand-back-rather-than-a-second-client-dispatch-mjs-opens-itself"}
 - Docs:
-  - `why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention` (active): `docs/explanation/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md`
+  - `why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention` (provisional): `docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md`
+    - Aliases: `docs/explanation/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md`
 
 ### why src/runner/dispatch.mjs's capacity/executor layer was redesigned around "task" as the unifying concept, and the 12 locked decisions behind that redesign (`why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-redesigned-around-task-as-the-unifying-concept-and-the-12-locked-decisions-behind-that-redesign`)
 - Status: **active**
-- Purpose Slug: `why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-redesigned-around-task-as-the-unifying-concept-and-the-12-locked-decisions-behind-that-redesign`
+- Purpose Slug: `why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re`
+- Lineage: {"renamedFrom":"why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-redesigned-around-task-as-the-unifying-concept-and-the-12-locked-decisions-behind-that-redesign"}
 - Docs:
-  - `why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity` (active): `docs/explanation/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md`
+  - `why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity` (provisional): `docs/knowledge/why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-re/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md`
+    - Aliases: `docs/explanation/why-dispatch-mjs-was-redesigned-around-task-not-agent-capacity.md`
 
 ### Why doctor checks are documented as an open registry, not a fixed list (`why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list`)
 - Status: **active**
-- Purpose Slug: `why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list`
+- Purpose Slug: `why-doctor-checks-are-documented-as-an-open-registry-not-a-f`
+- Lineage: {"renamedFrom":"why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list"}
 - Docs:
-  - `why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list` (active): `docs/explanation/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md`
+  - `why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list` (provisional): `docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md`
+    - Aliases: `docs/explanation/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md`
 
 ### why fgos doctor's checkToolRegistryConfigured now reports failure for a degraded impact-analysis tool instead of passed:true (`why-fgos-doctor-s-checktoolregistryconfigured-now-reports-failure-for-a-degraded-impact-analysis-tool-instead-of-passed-true`)
 - Status: **active**
-- Purpose Slug: `why-fgos-doctor-s-checktoolregistryconfigured-now-reports-failure-for-a-degraded-impact-analysis-tool-instead-of-passed-true`
+- Purpose Slug: `why-fgos-doctor-s-checktoolregistryconfigured-now-reports-fa`
+- Lineage: {"renamedFrom":"why-fgos-doctor-s-checktoolregistryconfigured-now-reports-failure-for-a-degraded-impact-analysis-tool-instead-of-passed-true"}
 - Docs:
-  - `why-doctor-now-fails-on-a-degraded-impact-analysis-tool-instead-of-passing` (active): `docs/explanation/why-doctor-now-fails-on-a-degraded-impact-analysis-tool-instead-of-passing.md`
+  - `why-doctor-now-fails-on-a-degraded-impact-analysis-tool-instead-of-passing` (provisional): `docs/knowledge/why-fgos-doctor-s-checktoolregistryconfigured-now-reports-fa/why-doctor-now-fails-on-a-degraded-impact-analysis-tool-instead-of-passing.md`
+    - Aliases: `docs/explanation/why-doctor-now-fails-on-a-degraded-impact-analysis-tool-instead-of-passing.md`
 
 ### why fgos doctor/setup/uninstall resolve the real main checkout instead of process.cwd(), and why every config check used to lie from inside a linked worktree (`why-fgos-doctor-setup-uninstall-resolve-the-real-main-checkout-instead-of-process-cwd-and-why-every-config-check-used-to-lie-from-inside-a-linked-worktree`)
 - Status: **active**
-- Purpose Slug: `why-fgos-doctor-setup-uninstall-resolve-the-real-main-checkout-instead-of-process-cwd-and-why-every-config-check-used-to-lie-from-inside-a-linked-worktree`
+- Purpose Slug: `why-fgos-doctor-setup-uninstall-resolve-the-real-main-checko`
+- Lineage: {"renamedFrom":"why-fgos-doctor-setup-uninstall-resolve-the-real-main-checkout-instead-of-process-cwd-and-why-every-config-check-used-to-lie-from-inside-a-linked-worktree"}
 - Docs:
-  - `why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd` (active): `docs/explanation/why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd.md`
+  - `why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd` (provisional): `docs/knowledge/why-fgos-doctor-setup-uninstall-resolve-the-real-main-checko/why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd.md`
+    - Aliases: `docs/explanation/why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd.md`
 
 ### Why a single `done` status split into delivered → retrospective → cleanup → done (`why-a-single-done-status-split-into-delivered-retrospective-cleanup-done`)
 - Status: **active**
-- Purpose Slug: `why-a-single-done-status-split-into-delivered-retrospective-cleanup-done`
+- Purpose Slug: `why-a-single-done-status-split-into-delivered-retrospective`
+- Lineage: {"renamedFrom":"why-a-single-done-status-split-into-delivered-retrospective-cleanup-done"}
 - Docs:
-  - `why-done-split-into-delivered-retrospective-cleanup-done` (active): `docs/explanation/why-done-split-into-delivered-retrospective-cleanup-done.md`
+  - `why-done-split-into-delivered-retrospective-cleanup-done` (provisional): `docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md`
+    - Aliases: `docs/explanation/why-done-split-into-delivered-retrospective-cleanup-done.md`
 
 ### Why execution fan-out reuses `computeSchedule`, not `selectWave`, and stays a capability, not an entry point (`why-execution-fan-out-reuses-computeschedule-not-selectwave-and-stays-a-capability-not-an-entry-point`)
 - Status: **active**
-- Purpose Slug: `why-execution-fan-out-reuses-computeschedule-not-selectwave-and-stays-a-capability-not-an-entry-point`
+- Purpose Slug: `why-execution-fan-out-reuses-computeschedule-not-selectwave`
+- Lineage: {"renamedFrom":"why-execution-fan-out-reuses-computeschedule-not-selectwave-and-stays-a-capability-not-an-entry-point"}
 - Docs:
-  - `why-execution-fan-out-reuses-computeschedule-instead-of-selectwave` (active): `docs/explanation/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md`
+  - `why-execution-fan-out-reuses-computeschedule-instead-of-selectwave` (provisional): `docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md`
+    - Aliases: `docs/explanation/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md`
 
 ### why fgos-fanout treats a dispatched Agent's worktree-isolation refusal as a recoverable race instead of lowering its batch cap or serializing dispatch (`why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolation-refusal-as-a-recoverable-race-instead-of-lowering-its-batch-cap-or-serializing-dispatch`)
 - Status: **active**
-- Purpose Slug: `why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolation-refusal-as-a-recoverable-race-instead-of-lowering-its-batch-cap-or-serializing-dispatch`
+- Purpose Slug: `why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati`
+- Lineage: {"renamedFrom":"why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolation-refusal-as-a-recoverable-race-instead-of-lowering-its-batch-cap-or-serializing-dispatch"}
 - Docs:
-  - `why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap` (active): `docs/explanation/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md`
+  - `why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap` (provisional): `docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md`
+    - Aliases: `docs/explanation/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md`
 
 ### Why `fgos add` items landed permanently at stage `executing`, with no path back (`why-fgos-add-items-landed-permanently-at-stage-executing-with-no-path-back`)
 - Status: **active**
-- Purpose Slug: `why-fgos-add-items-landed-permanently-at-stage-executing-with-no-path-back`
+- Purpose Slug: `why-fgos-add-items-landed-permanently-at-stage-executing-wit`
+- Lineage: {"renamedFrom":"why-fgos-add-items-landed-permanently-at-stage-executing-with-no-path-back"}
 - Docs:
-  - `why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back` (active): `docs/explanation/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md`
+  - `why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back` (provisional): `docs/knowledge/why-fgos-add-items-landed-permanently-at-stage-executing-wit/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md`
+    - Aliases: `docs/explanation/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md`
 
 ### Why fgOS added `sync-root` and drift detection (`why-fgos-added-sync-root-and-drift-detection`)
 - Status: **active**
 - Purpose Slug: `why-fgos-added-sync-root-and-drift-detection`
 - Docs:
-  - `why-fgos-added-sync-root-and-drift-detection` (active): `docs/explanation/why-fgos-added-sync-root-and-drift-detection.md`
+  - `why-fgos-added-sync-root-and-drift-detection` (provisional): `docs/knowledge/why-fgos-added-sync-root-and-drift-detection/why-fgos-added-sync-root-and-drift-detection.md`
+    - Aliases: `docs/explanation/why-fgos-added-sync-root-and-drift-detection.md`
 
 ### why fgos answer's real resume behavior is statusAtAsk rather than always todo, and why its CLI help text was corrected to match (`why-fgos-answer-s-real-resume-behavior-is-statusatask-rather-than-always-todo-and-why-its-cli-help-text-was-corrected-to-match`)
 - Status: **active**
-- Purpose Slug: `why-fgos-answer-s-real-resume-behavior-is-statusatask-rather-than-always-todo-and-why-its-cli-help-text-was-corrected-to-match`
+- Purpose Slug: `why-fgos-answer-s-real-resume-behavior-is-statusatask-rather`
+- Lineage: {"renamedFrom":"why-fgos-answer-s-real-resume-behavior-is-statusatask-rather-than-always-todo-and-why-its-cli-help-text-was-corrected-to-match"}
 - Docs:
-  - `why-fgos-answer-resumes-to-statusatask-not-always-todo` (active): `docs/explanation/why-fgos-answer-resumes-to-statusatask-not-always-todo.md`
+  - `why-fgos-answer-resumes-to-statusatask-not-always-todo` (provisional): `docs/knowledge/why-fgos-answer-s-real-resume-behavior-is-statusatask-rather/why-fgos-answer-resumes-to-statusatask-not-always-todo.md`
+    - Aliases: `docs/explanation/why-fgos-answer-resumes-to-statusatask-not-always-todo.md`
 
 ### Why `fgos approve` distinguishes a pre-existing `MERGE_HEAD` from its own conflict (`why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict`)
 - Status: **active**
-- Purpose Slug: `why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict`
+- Purpose Slug: `why-fgos-approve-distinguishes-a-pre-existing-merge-head-fro`
+- Lineage: {"renamedFrom":"why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict"}
 - Docs:
-  - `why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict` (active): `docs/explanation/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md`
+  - `why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict` (provisional): `docs/knowledge/why-fgos-approve-distinguishes-a-pre-existing-merge-head-fro/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md`
+    - Aliases: `docs/explanation/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md`
 
 ### why fgOS install/setup resolves the fgos binary through a 3-tier cached scheme, and why skill materialization no longer depends on the claude CLI or plugin marketplace (`why-fgos-install-setup-resolves-the-fgos-binary-through-a-3-tier-cached-scheme-and-why-skill-materialization-no-longer-depends-on-the-claude-cli-or-plugin-marketplace`)
 - Status: **active**
-- Purpose Slug: `why-fgos-install-setup-resolves-the-fgos-binary-through-a-3-tier-cached-scheme-and-why-skill-materialization-no-longer-depends-on-the-claude-cli-or-plugin-marketplace`
+- Purpose Slug: `why-fgos-install-setup-resolves-the-fgos-binary-through-a-3`
+- Lineage: {"renamedFrom":"why-fgos-install-setup-resolves-the-fgos-binary-through-a-3-tier-cached-scheme-and-why-skill-materialization-no-longer-depends-on-the-claude-cli-or-plugin-marketplace"}
 - Docs:
-  - `why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution` (active): `docs/explanation/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md`
+  - `why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution` (provisional): `docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md`
+    - Aliases: `docs/explanation/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md`
 
 ### Why `fgos` checks repo invariants at `return` and merge instead of running the full test suite (`why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-running-the-full-test-suite`)
 - Status: **active**
-- Purpose Slug: `why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-running-the-full-test-suite`
+- Purpose Slug: `why-fgos-checks-repo-invariants-at-return-and-merge-instead`
+- Lineage: {"renamedFrom":"why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-running-the-full-test-suite"}
 - Docs:
-  - `why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite` (active): `docs/explanation/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md`
+  - `why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite` (provisional): `docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md`
+    - Aliases: `docs/explanation/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md`
 
 ### why fgOS's D-ID/RUL-ID/ADR citations must carry a one-line gloss alongside the bare id, why the enforcement extends the existing decision-citation-drift script rather than adding a new one, and why it ships as a checked-in baseline ratchet (`why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-gloss-alongside-the-bare-id-why-the-enforcement-extends-the-existing-decision-citation-drift-script-rather-than-adding-a-new-one-and-why-it-ships-as-a-checked-in-baseline-ratchet`)
 - Status: **active**
-- Purpose Slug: `why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-gloss-alongside-the-bare-id-why-the-enforcement-extends-the-existing-decision-citation-drift-script-rather-than-adding-a-new-one-and-why-it-ships-as-a-checked-in-baseline-ratchet`
+- Purpose Slug: `why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g`
+- Lineage: {"renamedFrom":"why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-gloss-alongside-the-bare-id-why-the-enforcement-extends-the-existing-decision-citation-drift-script-rather-than-adding-a-new-one-and-why-it-ships-as-a-checked-in-baseline-ratchet"}
 - Docs:
-  - `why-fgos-citations-carry-a-gloss-and-check-mechanically` (active): `docs/explanation/why-fgos-citations-carry-a-gloss-and-check-mechanically.md`
+  - `why-fgos-citations-carry-a-gloss-and-check-mechanically` (provisional): `docs/knowledge/why-fgos-s-d-id-rul-id-adr-citations-must-carry-a-one-line-g/why-fgos-citations-carry-a-gloss-and-check-mechanically.md`
+    - Aliases: `docs/explanation/why-fgos-citations-carry-a-gloss-and-check-mechanically.md`
 
 ### Why `fgos-coding-driving`'s title/description print lives in one shared place (`why-fgos-coding-driving-s-title-description-print-lives-in-one-shared-place`)
 - Status: **active**
-- Purpose Slug: `why-fgos-coding-driving-s-title-description-print-lives-in-one-shared-place`
+- Purpose Slug: `why-fgos-coding-driving-s-title-description-print-lives-in-o`
+- Lineage: {"renamedFrom":"why-fgos-coding-driving-s-title-description-print-lives-in-one-shared-place"}
 - Docs:
-  - `why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place` (active): `docs/explanation/why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place.md`
+  - `why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place` (provisional): `docs/knowledge/why-fgos-coding-driving-s-title-description-print-lives-in-o/why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place.md`
+    - Aliases: `docs/explanation/why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place.md`
 
 ### why a pass-through (non-split) item's designed proof-surface command is synced onto work.verify by fgos-coding-planning, and why the fix is skill prose rather than an engine change (`why-a-pass-through-non-split-item-s-designed-proof-surface-command-is-synced-onto-work-verify-by-fgos-coding-planning-and-why-the-fix-is-skill-prose-rather-than-an-engine-change`)
 - Status: **active**
-- Purpose Slug: `why-a-pass-through-non-split-item-s-designed-proof-surface-command-is-synced-onto-work-verify-by-fgos-coding-planning-and-why-the-fix-is-skill-prose-rather-than-an-engine-change`
+- Purpose Slug: `why-a-pass-through-non-split-item-s-designed-proof-surface-c`
+- Lineage: {"renamedFrom":"why-a-pass-through-non-split-item-s-designed-proof-surface-command-is-synced-onto-work-verify-by-fgos-coding-planning-and-why-the-fix-is-skill-prose-rather-than-an-engine-change"}
 - Docs:
-  - `why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff` (active): `docs/explanation/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md`
+  - `why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff` (provisional): `docs/knowledge/why-a-pass-through-non-split-item-s-designed-proof-surface-c/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md`
+    - Aliases: `docs/explanation/why-fgos-coding-planning-writes-a-pass-through-items-real-verify-before-handoff.md`
 
 ### why fgos-coding-planning writes docsRef immediately after creating a new docs/history/<feature>/ dir for a clear-discovery item, instead of only reading docsRef the way its Bootstrap step normally does (`why-fgos-coding-planning-writes-docsref-immediately-after-creating-a-new-docs-history-feature-dir-for-a-clear-discovery-item-instead-of-only-reading-docsref-the-way-its-bootstrap-step-normally-does`)
 - Status: **active**
-- Purpose Slug: `why-fgos-coding-planning-writes-docsref-immediately-after-creating-a-new-docs-history-feature-dir-for-a-clear-discovery-item-instead-of-only-reading-docsref-the-way-its-bootstrap-step-normally-does`
+- Purpose Slug: `why-fgos-coding-planning-writes-docsref-immediately-after-cr`
+- Lineage: {"renamedFrom":"why-fgos-coding-planning-writes-docsref-immediately-after-creating-a-new-docs-history-feature-dir-for-a-clear-discovery-item-instead-of-only-reading-docsref-the-way-its-bootstrap-step-normally-does"}
 - Docs:
-  - `why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir` (active): `docs/explanation/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md`
+  - `why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir` (provisional): `docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md`
+    - Aliases: `docs/explanation/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md`
 
 ### why fgos-coding-compounding's retrospective-synthesis commit step refuses when MERGE_HEAD is already set, the 5 real historical instances that motivated it, and each instance's own per-item audit outcome (`why-fgos-coding-compounding-s-retrospective-synthesis-commit-step-refuses-when-merge-head-is-already-set-the-5-real-historical-instances-that-motivated-it-and-each-instance-s-own-per-item-audit-outcome`)
 - Status: **active**
-- Purpose Slug: `why-fgos-coding-compounding-s-retrospective-synthesis-commit-step-refuses-when-merge-head-is-already-set-the-5-real-historical-instances-that-motivated-it-and-each-instance-s-own-per-item-audit-outcome`
+- Purpose Slug: `why-fgos-coding-compounding-s-retrospective-synthesis-commit`
+- Lineage: {"renamedFrom":"why-fgos-coding-compounding-s-retrospective-synthesis-commit-step-refuses-when-merge-head-is-already-set-the-5-real-historical-instances-that-motivated-it-and-each-instance-s-own-per-item-audit-outcome"}
 - Docs:
-  - `why-fgos-compounding-refuses-to-commit-when-merge-head-is-set` (active): `docs/explanation/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md`
+  - `why-fgos-compounding-refuses-to-commit-when-merge-head-is-set` (provisional): `docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md`
+    - Aliases: `docs/explanation/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md`
 
 ### Why `fgos discover` embeds repo layout in its verify-proposal prompt (`why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt`)
 - Status: **active**
-- Purpose Slug: `why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt`
+- Purpose Slug: `why-fgos-discover-embeds-repo-layout-in-its-verify-proposal`
+- Lineage: {"renamedFrom":"why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt"}
 - Docs:
-  - `why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt` (active): `docs/explanation/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md`
+  - `why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt` (provisional): `docs/knowledge/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md`
+    - Aliases: `docs/explanation/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md`
 
 ### Why fgOS dispatch splits into gather packets, with a second exec-packet shape kept gated (`why-fgos-dispatch-splits-into-gather-packets-with-a-second-exec-packet-shape-kept-gated`)
 - Status: **active**
-- Purpose Slug: `why-fgos-dispatch-splits-into-gather-packets-with-a-second-exec-packet-shape-kept-gated`
+- Purpose Slug: `why-fgos-dispatch-splits-into-gather-packets-with-a-second-e`
+- Lineage: {"renamedFrom":"why-fgos-dispatch-splits-into-gather-packets-with-a-second-exec-packet-shape-kept-gated"}
 - Docs:
-  - `why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet` (active): `docs/explanation/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md`
+  - `why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet` (provisional): `docs/knowledge/why-fgos-dispatch-splits-into-gather-packets-with-a-second-e/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md`
+    - Aliases: `docs/explanation/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md`
 
 ### why fgOS install moved from always pulling main HEAD to a tag-pinned semver release, and how tags get cut (`why-fgos-install-moved-from-always-pulling-main-head-to-a-tag-pinned-semver-release-and-how-tags-get-cut`)
 - Status: **active**
-- Purpose Slug: `why-fgos-install-moved-from-always-pulling-main-head-to-a-tag-pinned-semver-release-and-how-tags-get-cut`
+- Purpose Slug: `why-fgos-install-moved-from-always-pulling-main-head-to-a-ta`
+- Lineage: {"renamedFrom":"why-fgos-install-moved-from-always-pulling-main-head-to-a-tag-pinned-semver-release-and-how-tags-get-cut"}
 - Docs:
-  - `why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head` (active): `docs/explanation/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md`
+  - `why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head` (provisional): `docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md`
+    - Aliases: `docs/explanation/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md`
 
 ### Why `fgos merge` now refuses outside the main checkout (`why-fgos-merge-now-refuses-outside-the-main-checkout`)
 - Status: **active**
 - Purpose Slug: `why-fgos-merge-now-refuses-outside-the-main-checkout`
 - Docs:
-  - `why-fgos-merge-now-refuses-outside-the-main-checkout` (active): `docs/explanation/why-fgos-merge-now-refuses-outside-the-main-checkout.md`
+  - `why-fgos-merge-now-refuses-outside-the-main-checkout` (provisional): `docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md`
+    - Aliases: `docs/explanation/why-fgos-merge-now-refuses-outside-the-main-checkout.md`
 
 ### Why fgOS's merge safety work shipped as ten items under one milestone (`why-fgos-s-merge-safety-work-shipped-as-ten-items-under-one-milestone`)
 - Status: **active**
-- Purpose Slug: `why-fgos-s-merge-safety-work-shipped-as-ten-items-under-one-milestone`
+- Purpose Slug: `why-fgos-s-merge-safety-work-shipped-as-ten-items-under-one`
+- Lineage: {"renamedFrom":"why-fgos-s-merge-safety-work-shipped-as-ten-items-under-one-milestone"}
 - Docs:
-  - `why-fgos-merge-safety-shipped-as-ten-items-under-one-milestone` (active): `docs/explanation/why-fgos-merge-safety-shipped-as-ten-items-under-one-milestone.md`
+  - `why-fgos-merge-safety-shipped-as-ten-items-under-one-milestone` (provisional): `docs/knowledge/why-fgos-s-merge-safety-work-shipped-as-ten-items-under-one/why-fgos-merge-safety-shipped-as-ten-items-under-one-milestone.md`
+    - Aliases: `docs/explanation/why-fgos-merge-safety-shipped-as-ten-items-under-one-milestone.md`
 
 ### Why `fgos move --to awaiting-approval` refuses a `doing` item without `--skip-return-guard` (`why-fgos-move-to-awaiting-approval-refuses-a-doing-item-without-skip-return-guard`)
 - Status: **active**
-- Purpose Slug: `why-fgos-move-to-awaiting-approval-refuses-a-doing-item-without-skip-return-guard`
+- Purpose Slug: `why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with`
+- Lineage: {"renamedFrom":"why-fgos-move-to-awaiting-approval-refuses-a-doing-item-without-skip-return-guard"}
 - Docs:
-  - `why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard` (active): `docs/explanation/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md`
+  - `why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard` (provisional): `docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md`
+    - Aliases: `docs/explanation/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md`
 
 ### Why fgos-coding-planning's mode gate moved to fgos-routing, and gate traceability stayed inline (`why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-and-gate-traceability-stayed-inline`)
 - Status: **active**
-- Purpose Slug: `why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-and-gate-traceability-stayed-inline`
+- Purpose Slug: `why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a`
+- Lineage: {"renamedFrom":"why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-and-gate-traceability-stayed-inline"}
 - Docs:
-  - `why-fgos-planning-moved-mode-gate-to-fgos-routing` (active): `docs/explanation/why-fgos-planning-moved-mode-gate-to-fgos-routing.md`
+  - `why-fgos-planning-moved-mode-gate-to-fgos-routing` (provisional): `docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md`
+    - Aliases: `docs/explanation/why-fgos-planning-moved-mode-gate-to-fgos-routing.md`
 
 ### why fgOS added a pre-commit guard refusing a staged deletion under .fgos/, and why git stash on the main checkout is a separate named hazard (`why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion-under-fgos-and-why-git-stash-on-the-main-checkout-is-a-separate-named-hazard`)
 - Status: **active**
-- Purpose Slug: `why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion-under-fgos-and-why-git-stash-on-the-main-checkout-is-a-separate-named-hazard`
+- Purpose Slug: `why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion`
+- Lineage: {"renamedFrom":"why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion-under-fgos-and-why-git-stash-on-the-main-checkout-is-a-separate-named-hazard"}
 - Docs:
-  - `why-fgos-refuses-a-staged-fgos-deletion-at-commit-time` (active): `docs/explanation/why-fgos-refuses-a-staged-fgos-deletion-at-commit-time.md`
+  - `why-fgos-refuses-a-staged-fgos-deletion-at-commit-time` (provisional): `docs/knowledge/why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion/why-fgos-refuses-a-staged-fgos-deletion-at-commit-time.md`
+    - Aliases: `docs/explanation/why-fgos-refuses-a-staged-fgos-deletion-at-commit-time.md`
 
 ### Why fgOS retired `.fgos-runner.json` entirely instead of fixing its fallback chain (`why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing-its-fallback-chain`)
 - Status: **active**
-- Purpose Slug: `why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing-its-fallback-chain`
+- Purpose Slug: `why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing`
+- Lineage: {"renamedFrom":"why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing-its-fallback-chain"}
 - Docs:
-  - `why-fgos-retired-the-fgos-runner-json-legacy-config-fallback` (active): `docs/explanation/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md`
+  - `why-fgos-retired-the-fgos-runner-json-legacy-config-fallback` (provisional): `docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md`
+    - Aliases: `docs/explanation/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md`
 
 ### Why `fgos review` crashed with ENOBUFS on very stale branch diffs (`why-fgos-review-crashed-with-enobufs-on-very-stale-branch-diffs`)
 - Status: **active**
-- Purpose Slug: `why-fgos-review-crashed-with-enobufs-on-very-stale-branch-diffs`
+- Purpose Slug: `why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di`
+- Lineage: {"renamedFrom":"why-fgos-review-crashed-with-enobufs-on-very-stale-branch-diffs"}
 - Docs:
-  - `why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs` (active): `docs/explanation/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md`
+  - `why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs` (provisional): `docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md`
+    - Aliases: `docs/explanation/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md`
 
 ### why fgOS treats self-development as a bounded lane with its own gate, not the default mission, and where the full mechanism narrative lives (`why-fgos-treats-self-development-as-a-bounded-lane-with-its-own-gate-not-the-default-mission-and-where-the-full-mechanism-narrative-lives`)
 - Status: **active**
-- Purpose Slug: `why-fgos-treats-self-development-as-a-bounded-lane-with-its-own-gate-not-the-default-mission-and-where-the-full-mechanism-narrative-lives`
+- Purpose Slug: `why-fgos-treats-self-development-as-a-bounded-lane-with-its`
+- Lineage: {"renamedFrom":"why-fgos-treats-self-development-as-a-bounded-lane-with-its-own-gate-not-the-default-mission-and-where-the-full-mechanism-narrative-lives"}
 - Docs:
-  - `why-fgos-self-development-is-not-the-default-mission` (active): `docs/explanation/why-fgos-self-development-is-not-the-default-mission.md`
+  - `why-fgos-self-development-is-not-the-default-mission` (provisional): `docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md`
+    - Aliases: `docs/explanation/why-fgos-self-development-is-not-the-default-mission.md`
 
 ### why fgOS's coding-domain skills were rewritten to a 300-line SKILL.md + references/*.md shape, why citation rules differ between product/shippable skill files and process/build-time docs, and the safety net used while doing a mass skill-prose rewrite (`why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line-skill-md-references-md-shape-why-citation-rules-differ-between-product-shippable-skill-files-and-process-build-time-docs-and-the-safety-net-used-while-doing-a-mass-skill-prose-rewrite`)
 - Status: **active**
-- Purpose Slug: `why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line-skill-md-references-md-shape-why-citation-rules-differ-between-product-shippable-skill-files-and-process-build-time-docs-and-the-safety-net-used-while-doing-a-mass-skill-prose-rewrite`
+- Purpose Slug: `why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line`
+- Lineage: {"renamedFrom":"why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line-skill-md-references-md-shape-why-citation-rules-differ-between-product-shippable-skill-files-and-process-build-time-docs-and-the-safety-net-used-while-doing-a-mass-skill-prose-rewrite"}
 - Docs:
-  - `why-fgos-skills-split-into-skillmd-plus-references-under-300-lines` (active): `docs/explanation/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md`
+  - `why-fgos-skills-split-into-skillmd-plus-references-under-300-lines` (provisional): `docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md`
+    - Aliases: `docs/explanation/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md`
 
 ### Why `fgos unlock`'s error message stopped claiming a live session it never checked (`why-fgos-unlock-s-error-message-stopped-claiming-a-live-session-it-never-checked`)
 - Status: **active**
-- Purpose Slug: `why-fgos-unlock-s-error-message-stopped-claiming-a-live-session-it-never-checked`
+- Purpose Slug: `why-fgos-unlock-s-error-message-stopped-claiming-a-live-sess`
+- Lineage: {"renamedFrom":"why-fgos-unlock-s-error-message-stopped-claiming-a-live-session-it-never-checked"}
 - Docs:
-  - `why-fgos-unlocks-error-message-stopped-claiming-a-live-session-it-never-checked` (active): `docs/explanation/why-fgos-unlocks-error-message-stopped-claiming-a-live-session-it-never-checked.md`
+  - `why-fgos-unlocks-error-message-stopped-claiming-a-live-session-it-never-checked` (provisional): `docs/knowledge/why-fgos-unlock-s-error-message-stopped-claiming-a-live-sess/why-fgos-unlocks-error-message-stopped-claiming-a-live-session-it-never-checked.md`
+    - Aliases: `docs/explanation/why-fgos-unlocks-error-message-stopped-claiming-a-live-session-it-never-checked.md`
 
 ### Why gate approval was separated from move-next (`why-gate-approval-was-separated-from-move-next`)
 - Status: **active**
 - Purpose Slug: `why-gate-approval-was-separated-from-move-next`
 - Docs:
-  - `why-gate-approval-was-separated-from-move-next` (active): `docs/explanation/why-gate-approval-was-separated-from-move-next.md`
+  - `why-gate-approval-was-separated-from-move-next` (provisional): `docs/knowledge/why-gate-approval-was-separated-from-move-next/why-gate-approval-was-separated-from-move-next.md`
+    - Aliases: `docs/explanation/why-gate-approval-was-separated-from-move-next.md`
 
 ### why fgOS requires a gate/ask question to restate its own context and problem, why that requirement got real machine enforcement, and why the enforcement targets structural completeness rather than citation format (`why-fgos-requires-a-gate-ask-question-to-restate-its-own-context-and-problem-why-that-requirement-got-real-machine-enforcement-and-why-the-enforcement-targets-structural-completeness-rather-than-citation-format`)
 - Status: **active**
-- Purpose Slug: `why-fgos-requires-a-gate-ask-question-to-restate-its-own-context-and-problem-why-that-requirement-got-real-machine-enforcement-and-why-the-enforcement-targets-structural-completeness-rather-than-citation-format`
+- Purpose Slug: `why-fgos-requires-a-gate-ask-question-to-restate-its-own-con`
+- Lineage: {"renamedFrom":"why-fgos-requires-a-gate-ask-question-to-restate-its-own-context-and-problem-why-that-requirement-got-real-machine-enforcement-and-why-the-enforcement-targets-structural-completeness-rather-than-citation-format"}
 - Docs:
-  - `why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it` (active): `docs/explanation/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md`
+  - `why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it` (provisional): `docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md`
+    - Aliases: `docs/explanation/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md`
 
 ### Why `HEAVY_KEYWORDS` matching moved from substring to word-boundary (`why-heavy-keywords-matching-moved-from-substring-to-word-boundary`)
 - Status: **active**
-- Purpose Slug: `why-heavy-keywords-matching-moved-from-substring-to-word-boundary`
+- Purpose Slug: `why-heavy-keywords-matching-moved-from-substring-to-word-bou`
+- Lineage: {"renamedFrom":"why-heavy-keywords-matching-moved-from-substring-to-word-boundary"}
 - Docs:
-  - `why-heavy-keywords-matching-moved-to-word-boundaries` (active): `docs/explanation/why-heavy-keywords-matching-moved-to-word-boundaries.md`
+  - `why-heavy-keywords-matching-moved-to-word-boundaries` (provisional): `docs/knowledge/why-heavy-keywords-matching-moved-from-substring-to-word-bou/why-heavy-keywords-matching-moved-to-word-boundaries.md`
+    - Aliases: `docs/explanation/why-heavy-keywords-matching-moved-to-word-boundaries.md`
 
 ### why herdr cockpit stacked worker launches into a single reused pane and relaunched its discovery worker during boot (`why-herdr-cockpit-stacked-worker-launches-into-a-single-reused-pane-and-relaunched-its-discovery-worker-during-boot`)
 - Status: **active**
-- Purpose Slug: `why-herdr-cockpit-stacked-worker-launches-into-a-single-reused-pane-and-relaunched-its-discovery-worker-during-boot`
+- Purpose Slug: `why-herdr-cockpit-stacked-worker-launches-into-a-single-reus`
+- Lineage: {"renamedFrom":"why-herdr-cockpit-stacked-worker-launches-into-a-single-reused-pane-and-relaunched-its-discovery-worker-during-boot"}
 - Docs:
-  - `why-herdr-cockpit-stacked-worker-launches-into-one-pane` (active): `docs/explanation/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md`
+  - `why-herdr-cockpit-stacked-worker-launches-into-one-pane` (provisional): `docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md`
+    - Aliases: `docs/explanation/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md`
 
 ### Why herdr-plugin's discover pane launches always pass `--autoClose` (`why-herdr-plugin-s-discover-pane-launches-always-pass-autoclose`)
 - Status: **active**
-- Purpose Slug: `why-herdr-plugin-s-discover-pane-launches-always-pass-autoclose`
+- Purpose Slug: `why-herdr-plugin-s-discover-pane-launches-always-pass-autocl`
+- Lineage: {"renamedFrom":"why-herdr-plugin-s-discover-pane-launches-always-pass-autoclose"}
 - Docs:
-  - `why-herdr-plugins-discover-pane-launches-always-pass-autoclose` (active): `docs/explanation/why-herdr-plugins-discover-pane-launches-always-pass-autoclose.md`
+  - `why-herdr-plugins-discover-pane-launches-always-pass-autoclose` (provisional): `docs/knowledge/why-herdr-plugin-s-discover-pane-launches-always-pass-autocl/why-herdr-plugins-discover-pane-launches-always-pass-autoclose.md`
+    - Aliases: `docs/explanation/why-herdr-plugins-discover-pane-launches-always-pass-autoclose.md`
 
 ### why a real trip-and-acknowledge event (recordIronLawAcknowledge) is recorded when --acknowledge-iron-law is actually used to pass a merge, distinct from the existing warn-level skip record (`why-a-real-trip-and-acknowledge-event-recordironlawacknowledge-is-recorded-when-acknowledge-iron-law-is-actually-used-to-pass-a-merge-distinct-from-the-existing-warn-level-skip-record`)
 - Status: **active**
-- Purpose Slug: `why-a-real-trip-and-acknowledge-event-recordironlawacknowledge-is-recorded-when-acknowledge-iron-law-is-actually-used-to-pass-a-merge-distinct-from-the-existing-warn-level-skip-record`
+- Purpose Slug: `why-a-real-trip-and-acknowledge-event-recordironlawacknowled`
+- Lineage: {"renamedFrom":"why-a-real-trip-and-acknowledge-event-recordironlawacknowledge-is-recorded-when-acknowledge-iron-law-is-actually-used-to-pass-a-merge-distinct-from-the-existing-warn-level-skip-record"}
 - Docs:
-  - `why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log` (active): `docs/explanation/why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log.md`
+  - `why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log` (provisional): `docs/knowledge/why-a-real-trip-and-acknowledge-event-recordironlawacknowled/why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log.md`
+    - Aliases: `docs/explanation/why-iron-law-acknowledge-writes-its-own-event-not-just-a-warn-log.md`
 
 ### Why `isDepsAndLineageReady` uses `RESOLVED_STATUSES`, not just `done` (`why-isdepsandlineageready-uses-resolved-statuses-not-just-done`)
 - Status: **active**
-- Purpose Slug: `why-isdepsandlineageready-uses-resolved-statuses-not-just-done`
+- Purpose Slug: `why-isdepsandlineageready-uses-resolved-statuses-not-just-do`
+- Lineage: {"renamedFrom":"why-isdepsandlineageready-uses-resolved-statuses-not-just-done"}
 - Docs:
-  - `why-isdepsandlineageready-uses-resolved-statuses-not-just-done` (active): `docs/explanation/why-isdepsandlineageready-uses-resolved-statuses-not-just-done.md`
+  - `why-isdepsandlineageready-uses-resolved-statuses-not-just-done` (provisional): `docs/knowledge/why-isdepsandlineageready-uses-resolved-statuses-not-just-do/why-isdepsandlineageready-uses-resolved-statuses-not-just-done.md`
+    - Aliases: `docs/explanation/why-isdepsandlineageready-uses-resolved-statuses-not-just-done.md`
 
 ### Why the live events.jsonl corrupted, and why the fix needed a split (`why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a-split`)
 - Status: **active**
-- Purpose Slug: `why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a-split`
+- Purpose Slug: `why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a`
+- Lineage: {"renamedFrom":"why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a-split"}
 - Docs:
-  - `why-live-events-jsonl-corrupted-and-how-it-was-fixed` (active): `docs/explanation/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md`
+  - `why-live-events-jsonl-corrupted-and-how-it-was-fixed` (provisional): `docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md`
+    - Aliases: `docs/explanation/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md`
 
 ### why the "## Locked decisions" heading contract between plan.mjs's reader and fgos-coding-exploring's writer silently fails open on a non-literal heading, and why the fix widens the writer/adds a loud test instead of loosening the reader's regex (`why-the-locked-decisions-heading-contract-between-plan-mjs-s-reader-and-fgos-coding-exploring-s-writer-silently-fails-open-on-a-non-literal-heading-and-why-the-fix-widens-the-writer-adds-a-loud-test-instead-of-loosening-the-reader-s-regex`)
 - Status: **active**
-- Purpose Slug: `why-the-locked-decisions-heading-contract-between-plan-mjs-s-reader-and-fgos-coding-exploring-s-writer-silently-fails-open-on-a-non-literal-heading-and-why-the-fix-widens-the-writer-adds-a-loud-test-instead-of-loosening-the-reader-s-regex`
+- Purpose Slug: `why-the-locked-decisions-heading-contract-between-plan-mjs-s`
+- Lineage: {"renamedFrom":"why-the-locked-decisions-heading-contract-between-plan-mjs-s-reader-and-fgos-coding-exploring-s-writer-silently-fails-open-on-a-non-literal-heading-and-why-the-fix-widens-the-writer-adds-a-loud-test-instead-of-loosening-the-reader-s-regex"}
 - Docs:
-  - `decision-record` (active): `docs/explanation/why-locked-decisions-heading-contract-fails-open-not-closed.md`
+  - `decision-record` (provisional): `docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md`
+    - Aliases: `docs/explanation/why-locked-decisions-heading-contract-fails-open-not-closed.md`
 
 ### Why `main-checkout-hook-wired` reported a false negative on an absolute `core.hooksPath` (`why-main-checkout-hook-wired-reported-a-false-negative-on-an-absolute-core-hookspath`)
 - Status: **active**
-- Purpose Slug: `why-main-checkout-hook-wired-reported-a-false-negative-on-an-absolute-core-hookspath`
+- Purpose Slug: `why-main-checkout-hook-wired-reported-a-false-negative-on-an`
+- Lineage: {"renamedFrom":"why-main-checkout-hook-wired-reported-a-false-negative-on-an-absolute-core-hookspath"}
 - Docs:
-  - `why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths` (active): `docs/explanation/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md`
+  - `why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths` (provisional): `docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md`
+    - Aliases: `docs/explanation/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md`
 
 ### Why merge's ephemeral worktree checks out a scratch ref, not the real branch name (`why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not-the-real-branch-name`)
 - Status: **active**
-- Purpose Slug: `why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not-the-real-branch-name`
+- Purpose Slug: `why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not`
+- Lineage: {"renamedFrom":"why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not-the-real-branch-name"}
 - Docs:
-  - `why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name` (active): `docs/explanation/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md`
+  - `why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name` (provisional): `docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md`
+    - Aliases: `docs/explanation/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md`
 
 ### Why `/fgOS:merge-loop` (`tsk-1sm`) recurses into `loop`, not `ck-loop` (`why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop`)
 - Status: **active**
 - Purpose Slug: `why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop`
 - Docs:
-  - `why-merge-loop-recurses-into-loop-not-ck-loop` (active): `docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`
+  - `why-merge-loop-recurses-into-loop-not-ck-loop` (provisional): `docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md`
+    - Aliases: `docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md`
 
 ### why fgos sync-root, fgos merge next, and fgos review resolve CLI flags (verify timeout, --wait, --pr) lazily, after their own use-case guards, instead of eagerly in the CLI adapter — the tsk-49i-2 flag-parsing-move regression family (`why-fgos-sync-root-fgos-merge-next-and-fgos-review-resolve-cli-flags-verify-timeout-wait-pr-lazily-after-their-own-use-case-guards-instead-of-eagerly-in-the-cli-adapter-the-tsk-49i-2-flag-parsing-move-regression-family`)
 - Status: **active**
-- Purpose Slug: `why-fgos-sync-root-fgos-merge-next-and-fgos-review-resolve-cli-flags-verify-timeout-wait-pr-lazily-after-their-own-use-case-guards-instead-of-eagerly-in-the-cli-adapter-the-tsk-49i-2-flag-parsing-move-regression-family`
+- Purpose Slug: `why-fgos-sync-root-fgos-merge-next-and-fgos-review-resolve-c`
+- Lineage: {"renamedFrom":"why-fgos-sync-root-fgos-merge-next-and-fgos-review-resolve-cli-flags-verify-timeout-wait-pr-lazily-after-their-own-use-case-guards-instead-of-eagerly-in-the-cli-adapter-the-tsk-49i-2-flag-parsing-move-regression-family"}
 - Docs:
-  - `why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards` (active): `docs/explanation/why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards.md`
+  - `why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards` (provisional): `docs/knowledge/why-fgos-sync-root-fgos-merge-next-and-fgos-review-resolve-c/why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards.md`
+    - Aliases: `docs/explanation/why-merge-next-and-sync-root-resolve-verify-timeout-after-their-guards.md`
 
 ### Why `fgos merge next` now auto-syncs a clean `blockedOnSync` root (`why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-root`)
 - Status: **active**
-- Purpose Slug: `why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-root`
+- Purpose Slug: `why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo`
+- Lineage: {"renamedFrom":"why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-root"}
 - Docs:
-  - `why-merge-next-auto-syncs-blockedonsync-roots` (active): `docs/explanation/why-merge-next-auto-syncs-blockedonsync-roots.md`
+  - `why-merge-next-auto-syncs-blockedonsync-roots` (provisional): `docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md`
+    - Aliases: `docs/explanation/why-merge-next-auto-syncs-blockedonsync-roots.md`
 
 ### Why merge-standardization (`tsk-4j9`) reuses existing mechanisms instead of building new ones (`why-merge-standardization-tsk-4j9-reuses-existing-mechanisms-instead-of-building-new-ones`)
 - Status: **active**
-- Purpose Slug: `why-merge-standardization-tsk-4j9-reuses-existing-mechanisms-instead-of-building-new-ones`
+- Purpose Slug: `why-merge-standardization-tsk-4j9-reuses-existing-mechanisms`
+- Lineage: {"renamedFrom":"why-merge-standardization-tsk-4j9-reuses-existing-mechanisms-instead-of-building-new-ones"}
 - Docs:
-  - `why-merge-standardization-reuses-existing-mechanisms` (active): `docs/explanation/why-merge-standardization-reuses-existing-mechanisms.md`
+  - `why-merge-standardization-reuses-existing-mechanisms` (provisional): `docs/knowledge/why-merge-standardization-tsk-4j9-reuses-existing-mechanisms/why-merge-standardization-reuses-existing-mechanisms.md`
+    - Aliases: `docs/explanation/why-merge-standardization-reuses-existing-mechanisms.md`
 
 ### why fgOS merge throughput bottlenecked despite parallel dispatch, and the merge target-ref queue design that replaced a hard concurrency cap (`why-fgos-merge-throughput-bottlenecked-despite-parallel-dispatch-and-the-merge-target-ref-queue-design-that-replaced-a-hard-concurrency-cap`)
 - Status: **active**
-- Purpose Slug: `why-fgos-merge-throughput-bottlenecked-despite-parallel-dispatch-and-the-merge-target-ref-queue-design-that-replaced-a-hard-concurrency-cap`
+- Purpose Slug: `why-fgos-merge-throughput-bottlenecked-despite-parallel-disp`
+- Lineage: {"renamedFrom":"why-fgos-merge-throughput-bottlenecked-despite-parallel-dispatch-and-the-merge-target-ref-queue-design-that-replaced-a-hard-concurrency-cap"}
 - Docs:
-  - `why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline` (active): `docs/explanation/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md`
+  - `why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline` (provisional): `docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md`
+    - Aliases: `docs/explanation/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md`
 
 ### Why `mergeReadiness` excludes superseded items (`why-mergereadiness-excludes-superseded-items`)
 - Status: **active**
 - Purpose Slug: `why-mergereadiness-excludes-superseded-items`
 - Docs:
-  - `why-mergereadiness-excludes-superseded-items` (active): `docs/explanation/why-mergereadiness-excludes-superseded-items.md`
+  - `why-mergereadiness-excludes-superseded-items` (provisional): `docs/knowledge/why-mergereadiness-excludes-superseded-items/why-mergereadiness-excludes-superseded-items.md`
+    - Aliases: `docs/explanation/why-mergereadiness-excludes-superseded-items.md`
 
 ### Why `mergeRunnerItem`'s commit-failure error now carries git's real stderr (`why-mergerunneritem-s-commit-failure-error-now-carries-git-s-real-stderr`)
 - Status: **active**
-- Purpose Slug: `why-mergerunneritem-s-commit-failure-error-now-carries-git-s-real-stderr`
+- Purpose Slug: `why-mergerunneritem-s-commit-failure-error-now-carries-git-s`
+- Lineage: {"renamedFrom":"why-mergerunneritem-s-commit-failure-error-now-carries-git-s-real-stderr"}
 - Docs:
-  - `why-mergeruneritems-commit-failure-error-now-carries-gits-real-stderr` (active): `docs/explanation/why-mergeruneritems-commit-failure-error-now-carries-gits-real-stderr.md`
+  - `why-mergeruneritems-commit-failure-error-now-carries-gits-real-stderr` (provisional): `docs/knowledge/why-mergerunneritem-s-commit-failure-error-now-carries-git-s/why-mergeruneritems-commit-failure-error-now-carries-gits-real-stderr.md`
+    - Aliases: `docs/explanation/why-mergeruneritems-commit-failure-error-now-carries-gits-real-stderr.md`
 
 ### Why `mergeRunnerItem` returns `merge-failed-unclassified` instead of crashing (`why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing`)
 - Status: **active**
-- Purpose Slug: `why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing`
+- Purpose Slug: `why-mergerunneritem-returns-merge-failed-unclassified-instea`
+- Lineage: {"renamedFrom":"why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing"}
 - Docs:
-  - `why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing` (active): `docs/explanation/why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing.md`
+  - `why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing` (provisional): `docs/knowledge/why-mergerunneritem-returns-merge-failed-unclassified-instea/why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing.md`
+    - Aliases: `docs/explanation/why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing.md`
 
 ### Why `mergeRunnerItem` takes a separate `lockRoot` param (`why-mergerunneritem-takes-a-separate-lockroot-param`)
 - Status: **active**
 - Purpose Slug: `why-mergerunneritem-takes-a-separate-lockroot-param`
 - Docs:
-  - `why-mergerunneritem-takes-a-separate-lockroot-param` (active): `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`
+  - `why-mergerunneritem-takes-a-separate-lockroot-param` (provisional): `docs/knowledge/why-mergerunneritem-takes-a-separate-lockroot-param/why-mergerunneritem-takes-a-separate-lockroot-param.md`
+    - Aliases: `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`
 
 ### Why `mergeRunnerItem`'s already-merged fast path checks content, not just ancestry (`why-mergerunneritem-s-already-merged-fast-path-checks-content-not-just-ancestry`)
 - Status: **active**
-- Purpose Slug: `why-mergerunneritem-s-already-merged-fast-path-checks-content-not-just-ancestry`
+- Purpose Slug: `why-mergerunneritem-s-already-merged-fast-path-checks-conten`
+- Lineage: {"renamedFrom":"why-mergerunneritem-s-already-merged-fast-path-checks-content-not-just-ancestry"}
 - Docs:
-  - `why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry` (active): `docs/explanation/why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry.md`
+  - `why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry` (provisional): `docs/knowledge/why-mergerunneritem-s-already-merged-fast-path-checks-conten/why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry.md`
+    - Aliases: `docs/explanation/why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry.md`
 
 ### Why `mergeSets` groups conflicts instead of dropping them from `ready` (`why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready`)
 - Status: **active**
-- Purpose Slug: `why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready`
+- Purpose Slug: `why-mergesets-groups-conflicts-instead-of-dropping-them-from`
+- Lineage: {"renamedFrom":"why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready"}
 - Docs:
-  - `why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready` (active): `docs/explanation/why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready.md`
+  - `why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready` (provisional): `docs/knowledge/why-mergesets-groups-conflicts-instead-of-dropping-them-from/why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready.md`
+    - Aliases: `docs/explanation/why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready.md`
 
 ### Why `mergeTree` groups by parent and sorts recursively by `blocks` (`why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks`)
 - Status: **active**
-- Purpose Slug: `why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks`
+- Purpose Slug: `why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc`
+- Lineage: {"renamedFrom":"why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks"}
 - Docs:
-  - `why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks` (active): `docs/explanation/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md`
+  - `why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks` (provisional): `docs/knowledge/why-mergetree-groups-by-parent-and-sorts-recursively-by-bloc/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md`
+    - Aliases: `docs/explanation/why-mergetree-groups-by-parent-and-sorts-recursively-by-blocks.md`
 
 ### why fgos move gained an --answer flag, closing the last unreachable edge out of awaiting-human (`why-fgos-move-gained-an-answer-flag-closing-the-last-unreachable-edge-out-of-awaiting-human`)
 - Status: **active**
-- Purpose Slug: `why-fgos-move-gained-an-answer-flag-closing-the-last-unreachable-edge-out-of-awaiting-human`
+- Purpose Slug: `why-fgos-move-gained-an-answer-flag-closing-the-last-unreach`
+- Lineage: {"renamedFrom":"why-fgos-move-gained-an-answer-flag-closing-the-last-unreachable-edge-out-of-awaiting-human"}
 - Docs:
-  - `why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human` (active): `docs/explanation/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md`
+  - `why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human` (provisional): `docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md`
+    - Aliases: `docs/explanation/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md`
 
 ### why fgOS refreshes a work item's branch base at pick time when the branch has no commits of its own, and never when it does (`why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-when-the-branch-has-no-commits-of-its-own-and-never-when-it-does`)
 - Status: **active**
-- Purpose Slug: `why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-when-the-branch-has-no-commits-of-its-own-and-never-when-it-does`
+- Purpose Slug: `why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh`
+- Lineage: {"renamedFrom":"why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-when-the-branch-has-no-commits-of-its-own-and-never-when-it-does"}
 - Docs:
-  - `why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one` (active): `docs/explanation/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md`
+  - `why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one` (provisional): `docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md`
+    - Aliases: `docs/explanation/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md`
 
 ### Why `plan.mjs`'s refined pass skips its priority write when a human override decision exists (`why-plan-mjs-s-refined-pass-skips-its-priority-write-when-a-human-override-decision-exists`)
 - Status: **active**
-- Purpose Slug: `why-plan-mjs-s-refined-pass-skips-its-priority-write-when-a-human-override-decision-exists`
+- Purpose Slug: `why-plan-mjs-s-refined-pass-skips-its-priority-write-when-a`
+- Lineage: {"renamedFrom":"why-plan-mjs-s-refined-pass-skips-its-priority-write-when-a-human-override-decision-exists"}
 - Docs:
-  - `why-plan-mjs-refined-pass-skips-priority-when-a-human-override-decision-exists` (active): `docs/explanation/why-plan-mjs-refined-pass-skips-priority-when-a-human-override-decision-exists.md`
+  - `why-plan-mjs-refined-pass-skips-priority-when-a-human-override-decision-exists` (provisional): `docs/knowledge/why-plan-mjs-s-refined-pass-skips-its-priority-write-when-a/why-plan-mjs-refined-pass-skips-priority-when-a-human-override-decision-exists.md`
+    - Aliases: `docs/explanation/why-plan-mjs-refined-pass-skips-priority-when-a-human-override-decision-exists.md`
 
 ### why fgos-coding-planning and fgos-coding-validating merged their two approval gates into one, and how that one gate decides when to ask a person versus proceed (`why-fgos-coding-planning-and-fgos-coding-validating-merged-their-two-approval-gates-into-one-and-how-that-one-gate-decides-when-to-ask-a-person-versus-proceed`)
 - Status: **active**
-- Purpose Slug: `why-fgos-coding-planning-and-fgos-coding-validating-merged-their-two-approval-gates-into-one-and-how-that-one-gate-decides-when-to-ask-a-person-versus-proceed`
+- Purpose Slug: `why-fgos-coding-planning-and-fgos-coding-validating-merged-t`
+- Lineage: {"renamedFrom":"why-fgos-coding-planning-and-fgos-coding-validating-merged-their-two-approval-gates-into-one-and-how-that-one-gate-decides-when-to-ask-a-person-versus-proceed"}
 - Docs:
-  - `why-planning-and-validating-collapsed-into-one-co-adjustment-gate` (active): `docs/explanation/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md`
+  - `why-planning-and-validating-collapsed-into-one-co-adjustment-gate` (provisional): `docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md`
+    - Aliases: `docs/explanation/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md`
 
 ### why a repo that only installs fgOS as a Claude Code plugin got Unknown skill errors, and why the fix is a third enforced mirror rather than a runtime fallback (`why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-got-unknown-skill-errors-and-why-the-fix-is-a-third-enforced-mirror-rather-than-a-runtime-fallback`)
 - Status: **active**
-- Purpose Slug: `why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-got-unknown-skill-errors-and-why-the-fix-is-a-third-enforced-mirror-rather-than-a-runtime-fallback`
+- Purpose Slug: `why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g`
+- Lineage: {"renamedFrom":"why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-got-unknown-skill-errors-and-why-the-fix-is-a-third-enforced-mirror-rather-than-a-runtime-fallback"}
 - Docs:
-  - `why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills` (active): `docs/explanation/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md`
+  - `why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills` (provisional): `docs/knowledge/why-a-repo-that-only-installs-fgos-as-a-claude-code-plugin-g/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md`
+    - Aliases: `docs/explanation/why-plugin-only-installs-could-not-reach-fgoss-coding-domain-dev-skills.md`
 
 ### why fgOS detects post-land drift among sibling leaves by intersecting real git changed-paths instead of triggering mass catchup or comparing declared footprints (`why-fgos-detects-post-land-drift-among-sibling-leaves-by-intersecting-real-git-changed-paths-instead-of-triggering-mass-catchup-or-comparing-declared-footprints`)
 - Status: **active**
-- Purpose Slug: `why-fgos-detects-post-land-drift-among-sibling-leaves-by-intersecting-real-git-changed-paths-instead-of-triggering-mass-catchup-or-comparing-declared-footprints`
+- Purpose Slug: `why-fgos-detects-post-land-drift-among-sibling-leaves-by-int`
+- Lineage: {"renamedFrom":"why-fgos-detects-post-land-drift-among-sibling-leaves-by-intersecting-real-git-changed-paths-instead-of-triggering-mass-catchup-or-comparing-declared-footprints"}
 - Docs:
-  - `why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint` (active): `docs/explanation/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md`
+  - `why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint` (provisional): `docs/knowledge/why-fgos-detects-post-land-drift-among-sibling-leaves-by-int/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md`
+    - Aliases: `docs/explanation/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md`
 
 ### Why `ppidOf` bounds its `ps` call with a 200ms timeout (`why-ppidof-bounds-its-ps-call-with-a-200ms-timeout`)
 - Status: **active**
 - Purpose Slug: `why-ppidof-bounds-its-ps-call-with-a-200ms-timeout`
 - Docs:
-  - `why-ppidof-bounds-its-ps-call-with-a-200ms-timeout` (active): `docs/explanation/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md`
+  - `why-ppidof-bounds-its-ps-call-with-a-200ms-timeout` (provisional): `docs/knowledge/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md`
+    - Aliases: `docs/explanation/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md`
 
 ### Why `promote-engine` merges members instead of rebasing them (`why-promote-engine-merges-members-instead-of-rebasing-them`)
 - Status: **active**
 - Purpose Slug: `why-promote-engine-merges-members-instead-of-rebasing-them`
 - Docs:
-  - `why-promote-engine-merges-members-instead-of-rebasing-them` (active): `docs/explanation/why-promote-engine-merges-members-instead-of-rebasing-them.md`
+  - `why-promote-engine-merges-members-instead-of-rebasing-them` (provisional): `docs/knowledge/why-promote-engine-merges-members-instead-of-rebasing-them/why-promote-engine-merges-members-instead-of-rebasing-them.md`
+    - Aliases: `docs/explanation/why-promote-engine-merges-members-instead-of-rebasing-them.md`
 
 ### Why `promote-preflight` uses `git merge-tree` instead of a real merge (`why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge`)
 - Status: **active**
-- Purpose Slug: `why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge`
+- Purpose Slug: `why-promote-preflight-uses-git-merge-tree-instead-of-a-real`
+- Lineage: {"renamedFrom":"why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge"}
 - Docs:
-  - `why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge` (active): `docs/explanation/why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge.md`
+  - `why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge` (provisional): `docs/knowledge/why-promote-preflight-uses-git-merge-tree-instead-of-a-real/why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge.md`
+    - Aliases: `docs/explanation/why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge.md`
 
 ### Why `promote-to-component` reports `merged-parent-rejected` separately (`why-promote-to-component-reports-merged-parent-rejected-separately`)
 - Status: **active**
-- Purpose Slug: `why-promote-to-component-reports-merged-parent-rejected-separately`
+- Purpose Slug: `why-promote-to-component-reports-merged-parent-rejected-sepa`
+- Lineage: {"renamedFrom":"why-promote-to-component-reports-merged-parent-rejected-separately"}
 - Docs:
-  - `why-promote-to-component-reports-merged-parent-rejected-separately` (active): `docs/explanation/why-promote-to-component-reports-merged-parent-rejected-separately.md`
+  - `why-promote-to-component-reports-merged-parent-rejected-separately` (provisional): `docs/knowledge/why-promote-to-component-reports-merged-parent-rejected-sepa/why-promote-to-component-reports-merged-parent-rejected-separately.md`
+    - Aliases: `docs/explanation/why-promote-to-component-reports-merged-parent-rejected-separately.md`
 
 ### Why `promote-to-component` restructures git before writing parent state (`why-promote-to-component-restructures-git-before-writing-parent-state`)
 - Status: **active**
-- Purpose Slug: `why-promote-to-component-restructures-git-before-writing-parent-state`
+- Purpose Slug: `why-promote-to-component-restructures-git-before-writing-par`
+- Lineage: {"renamedFrom":"why-promote-to-component-restructures-git-before-writing-parent-state"}
 - Docs:
-  - `why-promote-to-component-restructures-git-before-writing-parent-state` (active): `docs/explanation/why-promote-to-component-restructures-git-before-writing-parent-state.md`
+  - `why-promote-to-component-restructures-git-before-writing-parent-state` (provisional): `docs/knowledge/why-promote-to-component-restructures-git-before-writing-par/why-promote-to-component-restructures-git-before-writing-parent-state.md`
+    - Aliases: `docs/explanation/why-promote-to-component-restructures-git-before-writing-parent-state.md`
 
 ### Why `reclaimOrphanedCheckout` refuses a checkout the calling session is live inside (`why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-session-is-live-inside`)
 - Status: **active**
-- Purpose Slug: `why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-session-is-live-inside`
+- Purpose Slug: `why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-s`
+- Lineage: {"renamedFrom":"why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-session-is-live-inside"}
 - Docs:
-  - `why-reclaimorphanedcheckout-refuses-a-live-session-worktree` (active): `docs/explanation/why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md`
+  - `why-reclaimorphanedcheckout-refuses-a-live-session-worktree` (provisional): `docs/knowledge/why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-s/why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md`
+    - Aliases: `docs/explanation/why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md`
 
 ### Why `resolveDiscovery` guards re-parking an already-parked item (`why-resolvediscovery-guards-re-parking-an-already-parked-item`)
 - Status: **active**
-- Purpose Slug: `why-resolvediscovery-guards-re-parking-an-already-parked-item`
+- Purpose Slug: `why-resolvediscovery-guards-re-parking-an-already-parked-ite`
+- Lineage: {"renamedFrom":"why-resolvediscovery-guards-re-parking-an-already-parked-item"}
 - Docs:
-  - `why-resolvediscovery-guards-re-parking-an-already-parked-item` (active): `docs/explanation/why-resolvediscovery-guards-re-parking-an-already-parked-item.md`
+  - `why-resolvediscovery-guards-re-parking-an-already-parked-item` (provisional): `docs/knowledge/why-resolvediscovery-guards-re-parking-an-already-parked-ite/why-resolvediscovery-guards-re-parking-an-already-parked-item.md`
+    - Aliases: `docs/explanation/why-resolvediscovery-guards-re-parking-an-already-parked-item.md`
 
 ### Why `resolvePlan`'s pass-through path now checks `planApproveVerify` before `executing` (`why-resolveplan-s-pass-through-path-now-checks-planapproveverify-before-executing`)
 - Status: **active**
-- Purpose Slug: `why-resolveplan-s-pass-through-path-now-checks-planapproveverify-before-executing`
+- Purpose Slug: `why-resolveplan-s-pass-through-path-now-checks-planapproveve`
+- Lineage: {"renamedFrom":"why-resolveplan-s-pass-through-path-now-checks-planapproveverify-before-executing"}
 - Docs:
-  - `why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing` (active): `docs/explanation/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md`
+  - `why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing` (provisional): `docs/knowledge/why-resolveplan-s-pass-through-path-now-checks-planapproveve/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md`
+    - Aliases: `docs/explanation/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md`
 
 ### Why `/fgOS:retro-next` shrank to a launcher (`why-fgos-retro-next-shrank-to-a-launcher`)
 - Status: **active**
 - Purpose Slug: `why-fgos-retro-next-shrank-to-a-launcher`
 - Docs:
-  - `why-retro-next-shrank-to-a-launcher` (active): `docs/explanation/why-retro-next-shrank-to-a-launcher.md`
+  - `why-retro-next-shrank-to-a-launcher` (provisional): `docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md`
+    - Aliases: `docs/explanation/why-retro-next-shrank-to-a-launcher.md`
 
 ### Why retrospective documents vanished on orphaned branches (`why-retrospective-documents-vanished-on-orphaned-branches`)
 - Status: **active**
 - Purpose Slug: `why-retrospective-documents-vanished-on-orphaned-branches`
 - Docs:
-  - `why-retrospective-documents-vanished-on-orphaned-branches` (active): `docs/explanation/why-retrospective-documents-vanished-on-orphaned-branches.md`
+  - `why-retrospective-documents-vanished-on-orphaned-branches` (provisional): `docs/knowledge/why-retrospective-documents-vanished-on-orphaned-branches/why-retrospective-documents-vanished-on-orphaned-branches.md`
+    - Aliases: `docs/explanation/why-retrospective-documents-vanished-on-orphaned-branches.md`
 
 ### Why `return`'s blocked-friction hint checks real output, not the verify command string (`why-return-s-blocked-friction-hint-checks-real-output-not-the-verify-command-string`)
 - Status: **active**
-- Purpose Slug: `why-return-s-blocked-friction-hint-checks-real-output-not-the-verify-command-string`
+- Purpose Slug: `why-return-s-blocked-friction-hint-checks-real-output-not-th`
+- Lineage: {"renamedFrom":"why-return-s-blocked-friction-hint-checks-real-output-not-the-verify-command-string"}
 - Docs:
-  - `why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match` (active): `docs/explanation/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md`
+  - `why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match` (provisional): `docs/knowledge/why-return-s-blocked-friction-hint-checks-real-output-not-th/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md`
+    - Aliases: `docs/explanation/why-returns-blocked-friction-hints-at-a-fgos-dependent-verify-by-output-not-string-match.md`
 
 ### Why session-claim liveness measures worktree activity, not PID or event-log age (`why-session-claim-liveness-measures-worktree-activity-not-pid-or-event-log-age`)
 - Status: **active**
-- Purpose Slug: `why-session-claim-liveness-measures-worktree-activity-not-pid-or-event-log-age`
+- Purpose Slug: `why-session-claim-liveness-measures-worktree-activity-not-pi`
+- Lineage: {"renamedFrom":"why-session-claim-liveness-measures-worktree-activity-not-pid-or-event-log-age"}
 - Docs:
-  - `why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age` (active): `docs/explanation/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md`
+  - `why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age` (provisional): `docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md`
+    - Aliases: `docs/explanation/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md`
 
 ### why fgos-coding-driving's pick-through-approve skills instruct leaving the worktree before approve, and why they call the fgos shell wrapper instead of a compound root=$(...) command (`why-fgos-coding-driving-s-pick-through-approve-skills-instruct-leaving-the-worktree-before-approve-and-why-they-call-the-fgos-shell-wrapper-instead-of-a-compound-root-command`)
 - Status: **active**
-- Purpose Slug: `why-fgos-coding-driving-s-pick-through-approve-skills-instruct-leaving-the-worktree-before-approve-and-why-they-call-the-fgos-shell-wrapper-instead-of-a-compound-root-command`
+- Purpose Slug: `why-fgos-coding-driving-s-pick-through-approve-skills-instru`
+- Lineage: {"renamedFrom":"why-fgos-coding-driving-s-pick-through-approve-skills-instruct-leaving-the-worktree-before-approve-and-why-they-call-the-fgos-shell-wrapper-instead-of-a-compound-root-command"}
 - Docs:
-  - `why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in` (active): `docs/explanation/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md`
+  - `why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in` (provisional): `docs/knowledge/why-fgos-coding-driving-s-pick-through-approve-skills-instru/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md`
+    - Aliases: `docs/explanation/why-skill-prose-had-to-match-the-worktree-isolated-environment-it-runs-in.md`
 
 ### Why splitting test files hits a floor, and why narrowing verify never helped (`why-splitting-test-files-hits-a-floor-and-why-narrowing-verify-never-helped`)
 - Status: **active**
-- Purpose Slug: `why-splitting-test-files-hits-a-floor-and-why-narrowing-verify-never-helped`
+- Purpose Slug: `why-splitting-test-files-hits-a-floor-and-why-narrowing-veri`
+- Lineage: {"renamedFrom":"why-splitting-test-files-hits-a-floor-and-why-narrowing-verify-never-helped"}
 - Docs:
-  - `why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped` (active): `docs/explanation/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md`
+  - `why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped` (provisional): `docs/knowledge/why-splitting-test-files-hits-a-floor-and-why-narrowing-veri/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md`
+    - Aliases: `docs/explanation/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md`
 
 ### Why stage-skills forbid ad hoc Task/Agent delegation for their own reasoning (`why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-their-own-reasoning`)
 - Status: **active**
-- Purpose Slug: `why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-their-own-reasoning`
+- Purpose Slug: `why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the`
+- Lineage: {"renamedFrom":"why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-their-own-reasoning"}
 - Docs:
-  - `why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning` (active): `docs/explanation/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md`
+  - `why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning` (provisional): `docs/knowledge/why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-the/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md`
+    - Aliases: `docs/explanation/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md`
 
 ### why fgOS cut specific state<->runner import edges, consolidated the Iron Law check, and started extracting bin/fgos.mjs's inline verb logic into a src/verbs/<domain>/<verb>.mjs use-case layer (`why-fgos-cut-specific-state-runner-import-edges-consolidated-the-iron-law-check-and-started-extracting-bin-fgos-mjs-s-inline-verb-logic-into-a-src-verbs-domain-verb-mjs-use-case-layer`)
 - Status: **active**
-- Purpose Slug: `why-fgos-cut-specific-state-runner-import-edges-consolidated-the-iron-law-check-and-started-extracting-bin-fgos-mjs-s-inline-verb-logic-into-a-src-verbs-domain-verb-mjs-use-case-layer`
+- Purpose Slug: `why-fgos-cut-specific-state-runner-import-edges-consolidated`
+- Lineage: {"renamedFrom":"why-fgos-cut-specific-state-runner-import-edges-consolidated-the-iron-law-check-and-started-extracting-bin-fgos-mjs-s-inline-verb-logic-into-a-src-verbs-domain-verb-mjs-use-case-layer"}
 - Docs:
-  - `why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer` (active): `docs/explanation/why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer.md`
+  - `why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer` (provisional): `docs/knowledge/why-fgos-cut-specific-state-runner-import-edges-consolidated/why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer.md`
+    - Aliases: `docs/explanation/why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer.md`
 
 ### Why `state.json` became an incrementally-read snapshot (`why-state-json-became-an-incrementally-read-snapshot`)
 - Status: **active**
 - Purpose Slug: `why-state-json-became-an-incrementally-read-snapshot`
 - Docs:
-  - `why-state-json-became-an-incrementally-read-snapshot` (active): `docs/explanation/why-state-json-became-an-incrementally-read-snapshot.md`
+  - `why-state-json-became-an-incrementally-read-snapshot` (provisional): `docs/knowledge/why-state-json-became-an-incrementally-read-snapshot/why-state-json-became-an-incrementally-read-snapshot.md`
+    - Aliases: `docs/explanation/why-state-json-became-an-incrementally-read-snapshot.md`
 
 ### Why `state.json`'s write became atomic while its lock-scope claim turned out already fixed (`why-state-json-s-write-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed`)
 - Status: **active**
-- Purpose Slug: `why-state-json-s-write-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed`
+- Purpose Slug: `why-state-json-s-write-became-atomic-while-its-lock-scope-cl`
+- Lineage: {"renamedFrom":"why-state-json-s-write-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed"}
 - Docs:
-  - `why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed` (active): `docs/explanation/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md`
+  - `why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed` (provisional): `docs/knowledge/why-state-json-s-write-became-atomic-while-its-lock-scope-cl/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md`
+    - Aliases: `docs/explanation/why-state-json-writes-became-atomic-while-its-lock-scope-claim-turned-out-already-fixed.md`
 
 ### Why the decision-code check ratchets against a baseline instead of blocking everything (`why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything`)
 - Status: **active**
-- Purpose Slug: `why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything`
+- Purpose Slug: `why-the-decision-code-check-ratchets-against-a-baseline-inst`
+- Lineage: {"renamedFrom":"why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything"}
 - Docs:
-  - `why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything` (active): `docs/explanation/why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything.md`
+  - `why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything` (provisional): `docs/knowledge/why-the-decision-code-check-ratchets-against-a-baseline-inst/why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything.md`
+    - Aliases: `docs/explanation/why-the-decision-code-check-ratchets-against-a-baseline-instead-of-blocking-everything.md`
 
 ### Why `docs/enduser-docs-index.json` needed a doctor check, not just a regenerate skill (`why-docs-enduser-docs-index-json-needed-a-doctor-check-not-just-a-regenerate-skill`)
 - Status: **active**
-- Purpose Slug: `why-docs-enduser-docs-index-json-needed-a-doctor-check-not-just-a-regenerate-skill`
+- Purpose Slug: `why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j`
+- Lineage: {"renamedFrom":"why-docs-enduser-docs-index-json-needed-a-doctor-check-not-just-a-regenerate-skill"}
 - Docs:
-  - `why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill` (active): `docs/explanation/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md`
+  - `why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill` (provisional): `docs/knowledge/why-docs-enduser-docs-index-json-needed-a-doctor-check-not-j/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md`
+    - Aliases: `docs/explanation/why-the-enduser-docs-index-needed-a-doctor-check-not-just-a-regenerate-skill.md`
 
 ### why the fgOS interface daemon combines gateway and orchestrator into one process, why it never links the core lib in-process, and how its REST/RPC and future MCP surfaces are scoped (`why-the-fgos-interface-daemon-combines-gateway-and-orchestrator-into-one-process-why-it-never-links-the-core-lib-in-process-and-how-its-rest-rpc-and-future-mcp-surfaces-are-scoped`)
 - Status: **active**
-- Purpose Slug: `why-the-fgos-interface-daemon-combines-gateway-and-orchestrator-into-one-process-why-it-never-links-the-core-lib-in-process-and-how-its-rest-rpc-and-future-mcp-surfaces-are-scoped`
+- Purpose Slug: `why-the-fgos-interface-daemon-combines-gateway-and-orchestra`
+- Lineage: {"renamedFrom":"why-the-fgos-interface-daemon-combines-gateway-and-orchestrator-into-one-process-why-it-never-links-the-core-lib-in-process-and-how-its-rest-rpc-and-future-mcp-surfaces-are-scoped"}
 - Docs:
-  - `why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli` (active): `docs/explanation/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md`
+  - `why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli` (provisional): `docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md`
+    - Aliases: `docs/explanation/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md`
 
 ### why the gateway's PATCH /work/{id} edit route uses PATCH semantics, reads its accepted fields from EDITABLE_FIELDS instead of hardcoding a list, and passes fgos edit's own refusal to the client verbatim instead of re-validating (`why-the-gateway-s-patch-work-id-edit-route-uses-patch-semantics-reads-its-accepted-fields-from-editable-fields-instead-of-hardcoding-a-list-and-passes-fgos-edit-s-own-refusal-to-the-client-verbatim-instead-of-re-validating`)
 - Status: **active**
-- Purpose Slug: `why-the-gateway-s-patch-work-id-edit-route-uses-patch-semantics-reads-its-accepted-fields-from-editable-fields-instead-of-hardcoding-a-list-and-passes-fgos-edit-s-own-refusal-to-the-client-verbatim-instead-of-re-validating`
+- Purpose Slug: `why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant`
+- Lineage: {"renamedFrom":"why-the-gateway-s-patch-work-id-edit-route-uses-patch-semantics-reads-its-accepted-fields-from-editable-fields-instead-of-hardcoding-a-list-and-passes-fgos-edit-s-own-refusal-to-the-client-verbatim-instead-of-re-validating"}
 - Docs:
-  - `why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal` (active): `docs/explanation/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md`
+  - `why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal` (provisional): `docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md`
+    - Aliases: `docs/explanation/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md`
 
 ### why the herdr web dashboard's architecture moved from a standalone embedded webserver to a static bundle served by the existing gateway, and the security/lifecycle decisions that survived the realignment (`why-the-herdr-web-dashboard-s-architecture-moved-from-a-standalone-embedded-webserver-to-a-static-bundle-served-by-the-existing-gateway-and-the-security-lifecycle-decisions-that-survived-the-realignment`)
 - Status: **active**
-- Purpose Slug: `why-the-herdr-web-dashboard-s-architecture-moved-from-a-standalone-embedded-webserver-to-a-static-bundle-served-by-the-existing-gateway-and-the-security-lifecycle-decisions-that-survived-the-realignment`
+- Purpose Slug: `why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan`
+- Lineage: {"renamedFrom":"why-the-herdr-web-dashboard-s-architecture-moved-from-a-standalone-embedded-webserver-to-a-static-bundle-served-by-the-existing-gateway-and-the-security-lifecycle-decisions-that-survived-the-realignment"}
 - Docs:
-  - `why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server` (active): `docs/explanation/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md`
+  - `why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server` (provisional): `docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md`
+    - Aliases: `docs/explanation/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md`
 
 ### why the install-packaging e2e test replaced a byte-identical before/after .fgos snapshot diff with a leaked-path scan (`why-the-install-packaging-e2e-test-replaced-a-byte-identical-before-after-fgos-snapshot-diff-with-a-leaked-path-scan`)
 - Status: **active**
-- Purpose Slug: `why-the-install-packaging-e2e-test-replaced-a-byte-identical-before-after-fgos-snapshot-diff-with-a-leaked-path-scan`
+- Purpose Slug: `why-the-install-packaging-e2e-test-replaced-a-byte-identical`
+- Lineage: {"renamedFrom":"why-the-install-packaging-e2e-test-replaced-a-byte-identical-before-after-fgos-snapshot-diff-with-a-leaked-path-scan"}
 - Docs:
-  - `why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot` (active): `docs/explanation/why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot.md`
+  - `why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot` (provisional): `docs/knowledge/why-the-install-packaging-e2e-test-replaced-a-byte-identical/why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot.md`
+    - Aliases: `docs/explanation/why-the-install-packaging-e2e-test-checks-for-leaked-paths-not-a-byte-identical-fgos-snapshot.md`
 
 ### why the Iron Law gate only runs at the trunk merge boundary, why it's ask/warn (not a bypass field), and why one /fgOS:approve skill wraps both approve and sync-root (`why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary-why-it-s-ask-warn-not-a-bypass-field-and-why-one-fgos-approve-skill-wraps-both-approve-and-sync-root`)
 - Status: **active**
-- Purpose Slug: `why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary-why-it-s-ask-warn-not-a-bypass-field-and-why-one-fgos-approve-skill-wraps-both-approve-and-sync-root`
+- Purpose Slug: `why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary`
+- Lineage: {"renamedFrom":"why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary-why-it-s-ask-warn-not-a-bypass-field-and-why-one-fgos-approve-skill-wraps-both-approve-and-sync-root"}
 - Docs:
-  - `why-the-iron-law-gate-only-fires-at-the-trunk-boundary` (active): `docs/explanation/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md`
+  - `why-the-iron-law-gate-only-fires-at-the-trunk-boundary` (provisional): `docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md`
+    - Aliases: `docs/explanation/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md`
 
 ### why the judge-discovery/judge-decompose capacity entries were deleted from .fgos/config.json (`why-the-judge-discovery-judge-decompose-capacity-entries-were-deleted-from-fgos-config-json`)
 - Status: **active**
-- Purpose Slug: `why-the-judge-discovery-judge-decompose-capacity-entries-were-deleted-from-fgos-config-json`
+- Purpose Slug: `why-the-judge-discovery-judge-decompose-capacity-entries-wer`
+- Lineage: {"renamedFrom":"why-the-judge-discovery-judge-decompose-capacity-entries-were-deleted-from-fgos-config-json"}
 - Docs:
-  - `why-the-judge-discovery-and-judge-decompose-capacities-were-removed` (active): `docs/explanation/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md`
+  - `why-the-judge-discovery-and-judge-decompose-capacities-were-removed` (provisional): `docs/knowledge/why-the-judge-discovery-judge-decompose-capacity-entries-wer/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md`
+    - Aliases: `docs/explanation/why-the-judge-discovery-and-judge-decompose-capacities-were-removed.md`
 
 ### Why the launcher-vocabulary word guard was retired right after `tsk-1s5` fixed it (`why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it`)
 - Status: **active**
-- Purpose Slug: `why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it`
+- Purpose Slug: `why-the-launcher-vocabulary-word-guard-was-retired-right-aft`
+- Lineage: {"renamedFrom":"why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it"}
 - Docs:
-  - `why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it` (active): `docs/explanation/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md`
+  - `why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it` (provisional): `docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md`
+    - Aliases: `docs/explanation/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md`
 
 ### Why the main-checkout-lock hook used to block worktree commits it had no reason to touch (`why-the-main-checkout-lock-hook-used-to-block-worktree-commits-it-had-no-reason-to-touch`)
 - Status: **active**
-- Purpose Slug: `why-the-main-checkout-lock-hook-used-to-block-worktree-commits-it-had-no-reason-to-touch`
+- Purpose Slug: `why-the-main-checkout-lock-hook-used-to-block-worktree-commi`
+- Lineage: {"renamedFrom":"why-the-main-checkout-lock-hook-used-to-block-worktree-commits-it-had-no-reason-to-touch"}
 - Docs:
-  - `why-the-main-checkout-lock-hook-used-to-block-worktree-commits` (active): `docs/explanation/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md`
+  - `why-the-main-checkout-lock-hook-used-to-block-worktree-commits` (provisional): `docs/knowledge/why-the-main-checkout-lock-hook-used-to-block-worktree-commi/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md`
+    - Aliases: `docs/explanation/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md`
 
 ### Why the main-checkout lock needs a heartbeat during merge verify (`why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify`)
 - Status: **active**
-- Purpose Slug: `why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify`
+- Purpose Slug: `why-the-main-checkout-lock-needs-a-heartbeat-during-merge-ve`
+- Lineage: {"renamedFrom":"why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify"}
 - Docs:
-  - `why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify` (active): `docs/explanation/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify.md`
+  - `why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify` (provisional): `docs/knowledge/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-ve/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify.md`
+    - Aliases: `docs/explanation/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify.md`
 
 ### why withMergeTargetSlot passes allowSelfRecognition false while main-checkout.lock keeps self-recognition enabled (`why-withmergetargetslot-passes-allowselfrecognition-false-while-main-checkout-lock-keeps-self-recognition-enabled`)
 - Status: **active**
-- Purpose Slug: `why-withmergetargetslot-passes-allowselfrecognition-false-while-main-checkout-lock-keeps-self-recognition-enabled`
+- Purpose Slug: `why-withmergetargetslot-passes-allowselfrecognition-false-wh`
+- Lineage: {"renamedFrom":"why-withmergetargetslot-passes-allowselfrecognition-false-while-main-checkout-lock-keeps-self-recognition-enabled"}
 - Docs:
-  - `why-the-merge-target-ref-slot-disabled-lock-self-recognition` (active): `docs/explanation/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md`
+  - `why-the-merge-target-ref-slot-disabled-lock-self-recognition` (provisional): `docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md`
+    - Aliases: `docs/explanation/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md`
 
 ### Why the pre-commit hook got its own shorter main-checkout-lock TTL (`why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lock-ttl`)
 - Status: **active**
-- Purpose Slug: `why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lock-ttl`
+- Purpose Slug: `why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo`
+- Lineage: {"renamedFrom":"why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lock-ttl"}
 - Docs:
-  - `why-the-pre-commit-hook-got-its-own-shorter-lock-ttl` (active): `docs/explanation/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md`
+  - `why-the-pre-commit-hook-got-its-own-shorter-lock-ttl` (provisional): `docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md`
+    - Aliases: `docs/explanation/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md`
 
 ### why checkRetrospectiveContent's cleanup-to-done gate reads outcome/decision fields the way it does, and which engine-written decisions it must exclude (`why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-outcome-decision-fields-the-way-it-does-and-which-engine-written-decisions-it-must-exclude`)
 - Status: **active**
-- Purpose Slug: `why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-outcome-decision-fields-the-way-it-does-and-which-engine-written-decisions-it-must-exclude`
+- Purpose Slug: `why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o`
+- Lineage: {"renamedFrom":"why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-outcome-decision-fields-the-way-it-does-and-which-engine-written-decisions-it-must-exclude"}
 - Docs:
-  - `why-the-retrospective-content-gate-checked-the-wrong-fields` (active): `docs/explanation/why-the-retrospective-content-gate-checked-the-wrong-fields.md`
+  - `why-the-retrospective-content-gate-checked-the-wrong-fields` (provisional): `docs/knowledge/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o/why-the-retrospective-content-gate-checked-the-wrong-fields.md`
+    - Aliases: `docs/explanation/why-the-retrospective-content-gate-checked-the-wrong-fields.md`
 
 ### Why the "stage-axis driving loop and status-axis pool-sweep stay separate" decision got superseded (`why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-stay-separate-decision-got-superseded`)
 - Status: **active**
-- Purpose Slug: `why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-stay-separate-decision-got-superseded`
+- Purpose Slug: `why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-s`
+- Lineage: {"renamedFrom":"why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-stay-separate-decision-got-superseded"}
 - Docs:
-  - `why-the-stage-status-driving-split-decision-got-superseded` (active): `docs/explanation/why-the-stage-status-driving-split-decision-got-superseded.md`
+  - `why-the-stage-status-driving-split-decision-got-superseded` (provisional): `docs/knowledge/why-the-stage-axis-driving-loop-and-status-axis-pool-sweep-s/why-the-stage-status-driving-split-decision-got-superseded.md`
+    - Aliases: `docs/explanation/why-the-stage-status-driving-split-decision-got-superseded.md`
 
 ### why the verify-fail-post-merge playbook's retry step moves a blocked item to awaiting-approval rather than a non-existent proposed status (`why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a-blocked-item-to-awaiting-approval-rather-than-a-non-existent-proposed-status`)
 - Status: **active**
-- Purpose Slug: `why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a-blocked-item-to-awaiting-approval-rather-than-a-non-existent-proposed-status`
+- Purpose Slug: `why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a`
+- Lineage: {"renamedFrom":"why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a-blocked-item-to-awaiting-approval-rather-than-a-non-existent-proposed-status"}
 - Docs:
-  - `why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed` (active): `docs/explanation/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md`
+  - `why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed` (provisional): `docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md`
+    - Aliases: `docs/explanation/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md`
 
 ### why fgOS moved the full verify run from the merge lock's outbound (land) side to catchup's inbound gate, so a landed merge's own critical section only needs a fast-forward (`why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-outbound-land-side-to-catchup-s-inbound-gate-so-a-landed-merge-s-own-critical-section-only-needs-a-fast-forward`)
 - Status: **active**
-- Purpose Slug: `why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-outbound-land-side-to-catchup-s-inbound-gate-so-a-landed-merge-s-own-critical-section-only-needs-a-fast-forward`
+- Purpose Slug: `why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out`
+- Lineage: {"renamedFrom":"why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-outbound-land-side-to-catchup-s-inbound-gate-so-a-landed-merge-s-own-critical-section-only-needs-a-fast-forward"}
 - Docs:
-  - `why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate` (active): `docs/explanation/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md`
+  - `why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate` (provisional): `docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md`
+    - Aliases: `docs/explanation/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md`
 
 ### Windows `npm install -g --prefix` has no `lib` or `bin` subfolder (`windows-npm-install-g-prefix-has-no-lib-or-bin-subfolder`)
 - Status: **active**
 - Purpose Slug: `windows-npm-install-g-prefix-has-no-lib-or-bin-subfolder`
 - Docs:
-  - `windows-npm-global-install-has-no-lib-or-bin-subfolder` (active): `docs/explanation/windows-npm-global-install-has-no-lib-or-bin-subfolder.md`
+  - `windows-npm-global-install-has-no-lib-or-bin-subfolder` (provisional): `docs/knowledge/windows-npm-install-g-prefix-has-no-lib-or-bin-subfolder/windows-npm-global-install-has-no-lib-or-bin-subfolder.md`
+    - Aliases: `docs/explanation/windows-npm-global-install-has-no-lib-or-bin-subfolder.md`
 
 ### Why `wontfix` had to join `done` at every "is this resolved?" check site (`why-wontfix-had-to-join-done-at-every-is-this-resolved-check-site`)
 - Status: **active**
-- Purpose Slug: `why-wontfix-had-to-join-done-at-every-is-this-resolved-check-site`
+- Purpose Slug: `why-wontfix-had-to-join-done-at-every-is-this-resolved-check`
+- Lineage: {"renamedFrom":"why-wontfix-had-to-join-done-at-every-is-this-resolved-check-site"}
 - Docs:
-  - `wontfix-terminal-status-filter-consistency` (active): `docs/explanation/wontfix-terminal-status-filter-consistency.md`
+  - `wontfix-terminal-status-filter-consistency` (provisional): `docs/knowledge/why-wontfix-had-to-join-done-at-every-is-this-resolved-check/wontfix-terminal-status-filter-consistency.md`
+    - Aliases: `docs/explanation/wontfix-terminal-status-filter-consistency.md`
 
 ### Why the work-item lifecycle keeps status and stage separate, and what extending it costs (`why-the-work-item-lifecycle-keeps-status-and-stage-separate-and-what-extending-it-costs`)
 - Status: **active**
-- Purpose Slug: `why-the-work-item-lifecycle-keeps-status-and-stage-separate-and-what-extending-it-costs`
+- Purpose Slug: `why-the-work-item-lifecycle-keeps-status-and-stage-separate`
+- Lineage: {"renamedFrom":"why-the-work-item-lifecycle-keeps-status-and-stage-separate-and-what-extending-it-costs"}
 - Docs:
-  - `work-item-lifecycle-and-domain-model` (active): `docs/explanation/work-item-lifecycle-and-domain-model.md`
+  - `work-item-lifecycle-and-domain-model` (provisional): `docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md`
+    - Aliases: `docs/explanation/work-item-lifecycle-and-domain-model.md`
 
 ### Why work-item titles get a 100-character ceiling at the store layer (`why-work-item-titles-get-a-100-character-ceiling-at-the-store-layer`)
 - Status: **active**
-- Purpose Slug: `why-work-item-titles-get-a-100-character-ceiling-at-the-store-layer`
+- Purpose Slug: `why-work-item-titles-get-a-100-character-ceiling-at-the-stor`
+- Lineage: {"renamedFrom":"why-work-item-titles-get-a-100-character-ceiling-at-the-store-layer"}
 - Docs:
-  - `work-item-title-length-ceiling` (active): `docs/explanation/work-item-title-length-ceiling.md`
+  - `work-item-title-length-ceiling` (provisional): `docs/knowledge/why-work-item-titles-get-a-100-character-ceiling-at-the-stor/work-item-title-length-ceiling.md`
+    - Aliases: `docs/explanation/work-item-title-length-ceiling.md`
 
 ### worker slot concept and engine-wide worker occupancy ceiling shared by herdr-plugin, fgos-runner, fgos-fanout (`worker-slot-concept-and-engine-wide-worker-occupancy-ceiling-shared-by-herdr-plugin-fgos-runner-fgos-fanout`)
 - Status: **active**
-- Purpose Slug: `worker-slot-concept-and-engine-wide-worker-occupancy-ceiling-shared-by-herdr-plugin-fgos-runner-fgos-fanout`
+- Purpose Slug: `worker-slot-concept-and-engine-wide-worker-occupancy-ceiling`
+- Lineage: {"renamedFrom":"worker-slot-concept-and-engine-wide-worker-occupancy-ceiling-shared-by-herdr-plugin-fgos-runner-fgos-fanout"}
 - Docs:
-  - `worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher` (active): `docs/explanation/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md`
+  - `worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher` (provisional): `docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md`
+    - Aliases: `docs/explanation/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md`
 
 ### Worktree-dispatch attestation, level 1: advisory-only, never a gate (`worktree-dispatch-attestation-level-1-advisory-only-never-a-gate`)
 - Status: **active**
-- Purpose Slug: `worktree-dispatch-attestation-level-1-advisory-only-never-a-gate`
+- Purpose Slug: `worktree-dispatch-attestation-level-1-advisory-only-never-a`
+- Lineage: {"renamedFrom":"worktree-dispatch-attestation-level-1-advisory-only-never-a-gate"}
 - Docs:
-  - `worktree-dispatch-attestation-level-1-advisory-only` (active): `docs/explanation/worktree-dispatch-attestation-level-1-advisory-only.md`
+  - `worktree-dispatch-attestation-level-1-advisory-only` (provisional): `docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md`
+    - Aliases: `docs/explanation/worktree-dispatch-attestation-level-1-advisory-only.md`
 
 ### Why fgOS worktrees block `.fgos/` instead of locking or copying it (`why-fgos-worktrees-block-fgos-instead-of-locking-or-copying-it`)
 - Status: **active**
-- Purpose Slug: `why-fgos-worktrees-block-fgos-instead-of-locking-or-copying-it`
+- Purpose Slug: `why-fgos-worktrees-block-fgos-instead-of-locking-or-copying`
+- Lineage: {"renamedFrom":"why-fgos-worktrees-block-fgos-instead-of-locking-or-copying-it"}
 - Docs:
-  - `worktree-isolation-axis-decision` (active): `docs/explanation/worktree-isolation-axis-decision.md`
+  - `worktree-isolation-axis-decision` (provisional): `docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md`
+    - Aliases: `docs/explanation/worktree-isolation-axis-decision.md`
 
 ### the schema shape of the backlog work-item status — STATUSES, TRANSITIONS, and statusLabels wiring (`the-schema-shape-of-the-backlog-work-item-status-statuses-transitions-and-statuslabels-wiring`)
 - Status: **active**
-- Purpose Slug: `the-schema-shape-of-the-backlog-work-item-status-statuses-transitions-and-statuslabels-wiring`
+- Purpose Slug: `the-schema-shape-of-the-backlog-work-item-status-statuses-tr`
+- Lineage: {"renamedFrom":"the-schema-shape-of-the-backlog-work-item-status-statuses-transitions-and-statuslabels-wiring"}
 - Docs:
-  - `backlog-status-schema` (active): `docs/reference/backlog-status-schema.md`
+  - `backlog-status-schema` (provisional): `docs/knowledge/the-schema-shape-of-the-backlog-work-item-status-statuses-tr/backlog-status-schema.md`
+    - Aliases: `docs/reference/backlog-status-schema.md`
 
 ### `pickNextDiscoverItem`'s real sort-key order (`picknextdiscoveritem-s-real-sort-key-order`)
 - Status: **active**
 - Purpose Slug: `picknextdiscoveritem-s-real-sort-key-order`
 - Docs:
-  - `discover-pool-pick-next-sort-key-order` (active): `docs/reference/discover-pool-pick-next-sort-key-order.md`
+  - `discover-pool-pick-next-sort-key-order` (provisional): `docs/knowledge/picknextdiscoveritem-s-real-sort-key-order/discover-pool-pick-next-sort-key-order.md`
+    - Aliases: `docs/reference/discover-pool-pick-next-sort-key-order.md`
 
 ### `driftStatus`'s real return shape (`driftstatus-s-real-return-shape`)
 - Status: **active**
 - Purpose Slug: `driftstatus-s-real-return-shape`
 - Docs:
-  - `drift-status-return-shape` (active): `docs/reference/drift-status-return-shape.md`
+  - `drift-status-return-shape` (provisional): `docs/knowledge/driftstatus-s-real-return-shape/drift-status-return-shape.md`
+    - Aliases: `docs/reference/drift-status-return-shape.md`
 
 ### executor cross-provider governance (`executor-cross-provider-governance`)
 - Status: **active**
 - Purpose Slug: `executor-cross-provider-governance`
 - Docs:
-  - `executor-cross-provider-governance` (active): `docs/reference/executor-cross-provider-governance.md`
+  - `executor-cross-provider-governance` (provisional): `docs/knowledge/executor-cross-provider-governance/executor-cross-provider-governance.md`
+    - Aliases: `docs/reference/capacity-cross-provider-governance.md`, `docs/reference/executor-cross-provider-governance.md`
 
 ### fgOS choke-point survey — ranked priority table (`fgos-choke-point-survey-ranked-priority-table`)
 - Status: **active**
 - Purpose Slug: `fgos-choke-point-survey-ranked-priority-table`
 - Docs:
-  - `fgos-choke-point-ranked-priority` (active): `docs/reference/fgos-choke-point-ranked-priority.md`
+  - `fgos-choke-point-ranked-priority` (provisional): `docs/knowledge/fgos-choke-point-survey-ranked-priority-table/fgos-choke-point-ranked-priority.md`
+    - Aliases: `docs/reference/fgos-choke-point-ranked-priority.md`
 
 ### the fgOS gateway HTTP+JSON API contract — CTR010, its scope, and where the spec lives (`the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and-where-the-spec-lives`)
 - Status: **active**
-- Purpose Slug: `the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and-where-the-spec-lives`
+- Purpose Slug: `the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and`
+- Lineage: {"renamedFrom":"the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and-where-the-spec-lives"}
 - Docs:
-  - `fgos-gateway-api-ctr010` (active): `docs/reference/fgos-gateway-api-ctr010.md`
+  - `fgos-gateway-api-ctr010` (provisional): `docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md`
+    - Aliases: `docs/reference/fgos-gateway-api-ctr010.md`
 
 ### `fgos list`'s side-log scoping (`fgos-list-s-side-log-scoping`)
 - Status: **active**
 - Purpose Slug: `fgos-list-s-side-log-scoping`
 - Docs:
-  - `fgos-list-side-log-scoping` (active): `docs/reference/fgos-list-side-log-scoping.md`
+  - `fgos-list-side-log-scoping` (provisional): `docs/knowledge/fgos-list-s-side-log-scoping/fgos-list-side-log-scoping.md`
+    - Aliases: `docs/reference/fgos-list-side-log-scoping.md`
 
 ### fgOS participant contract — what it takes to be a full participant in any language (`fgos-participant-contract-what-it-takes-to-be-a-full-participant-in-any-language`)
 - Status: **active**
-- Purpose Slug: `fgos-participant-contract-what-it-takes-to-be-a-full-participant-in-any-language`
+- Purpose Slug: `fgos-participant-contract-what-it-takes-to-be-a-full-partici`
+- Lineage: {"renamedFrom":"fgos-participant-contract-what-it-takes-to-be-a-full-participant-in-any-language"}
 - Docs:
-  - `fgos-participant-contract` (active): `docs/reference/fgos-participant-contract.md`
+  - `fgos-participant-contract` (provisional): `docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md`
+    - Aliases: `docs/reference/fgos-participant-contract.md`
 
 ### `fgos show <id>` output fields (`fgos-show-id-output-fields`)
 - Status: **active**
 - Purpose Slug: `fgos-show-id-output-fields`
 - Docs:
-  - `fgos-show-verb-output-fields` (active): `docs/reference/fgos-show-verb-output-fields.md`
+  - `fgos-show-verb-output-fields` (provisional): `docs/knowledge/fgos-show-id-output-fields/fgos-show-verb-output-fields.md`
+    - Aliases: `docs/reference/fgos-show-verb-output-fields.md`
 
 ### fgos slots CLI verb output shape and the worker-slot ceiling gate inside claimWork (`fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling-gate-inside-claimwork`)
 - Status: **active**
-- Purpose Slug: `fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling-gate-inside-claimwork`
+- Purpose Slug: `fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling`
+- Lineage: {"renamedFrom":"fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling-gate-inside-claimwork"}
 - Docs:
-  - `fgos-slots-verb-output-fields` (active): `docs/reference/fgos-slots-verb-output-fields.md`
+  - `fgos-slots-verb-output-fields` (provisional): `docs/knowledge/fgos-slots-cli-verb-output-shape-and-the-worker-slot-ceiling/fgos-slots-verb-output-fields.md`
+    - Aliases: `docs/reference/fgos-slots-verb-output-fields.md`
 
 ### `fgos sync-root`'s real guards and outcome shape (`fgos-sync-root-s-real-guards-and-outcome-shape`)
 - Status: **active**
 - Purpose Slug: `fgos-sync-root-s-real-guards-and-outcome-shape`
 - Docs:
-  - `fgos-sync-root-outcome-shape` (active): `docs/reference/fgos-sync-root-outcome-shape.md`
+  - `fgos-sync-root-outcome-shape` (provisional): `docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md`
+    - Aliases: `docs/reference/fgos-sync-root-outcome-shape.md`
 
 ### fgos version CLI verb output shape and the cli-version-visible doctor check (`fgos-version-cli-verb-output-shape-and-the-cli-version-visible-doctor-check`)
 - Status: **active**
-- Purpose Slug: `fgos-version-cli-verb-output-shape-and-the-cli-version-visible-doctor-check`
+- Purpose Slug: `fgos-version-cli-verb-output-shape-and-the-cli-version-visib`
+- Lineage: {"renamedFrom":"fgos-version-cli-verb-output-shape-and-the-cli-version-visible-doctor-check"}
 - Docs:
-  - `fgos-version-verb-output-fields` (active): `docs/reference/fgos-version-verb-output-fields.md`
+  - `fgos-version-verb-output-fields` (provisional): `docs/knowledge/fgos-version-cli-verb-output-shape-and-the-cli-version-visib/fgos-version-verb-output-fields.md`
+    - Aliases: `docs/reference/fgos-version-verb-output-fields.md`
 
 ### forgentX repo's tool-registry configuration (`forgentx-repo-s-tool-registry-configuration`)
 - Status: **active**
 - Purpose Slug: `forgentx-repo-s-tool-registry-configuration`
 - Docs:
-  - `forgentx-tool-registry-configuration` (active): `docs/reference/forgentx-tool-registry-configuration.md`
+  - `forgentx-tool-registry-configuration` (provisional): `docs/knowledge/forgentx-repo-s-tool-registry-configuration/forgentx-tool-registry-configuration.md`
+    - Aliases: `docs/reference/forgentx-tool-registry-configuration.md`
 
 ### Gate-bypass config (`gate-bypass-config`)
 - Status: **active**
 - Purpose Slug: `gate-bypass-config`
 - Docs:
-  - `gate-bypass-config` (active): `docs/reference/gate-bypass-config.md`
+  - `gate-bypass-config` (provisional): `docs/knowledge/gate-bypass-config/gate-bypass-config.md`
+    - Aliases: `docs/reference/gate-bypass-config.md`
 
 ### the 9 findings from the 2026-08-14 haiku-scan + fable code-review audit of fgOS's gateway subsystem (REST/RPC + MCP surface), and which work item tracks each (`the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-review-audit-of-fgos-s-gateway-subsystem-rest-rpc-mcp-surface-and-which-work-item-tracks-each`)
 - Status: **active**
-- Purpose Slug: `the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-review-audit-of-fgos-s-gateway-subsystem-rest-rpc-mcp-surface-and-which-work-item-tracks-each`
+- Purpose Slug: `the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev`
+- Lineage: {"renamedFrom":"the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-review-audit-of-fgos-s-gateway-subsystem-rest-rpc-mcp-surface-and-which-work-item-tracks-each"}
 - Docs:
-  - `gateway-subsystem-audit-260814-findings` (active): `docs/reference/gateway-subsystem-audit-260814-findings.md`
+  - `gateway-subsystem-audit-260814-findings` (provisional): `docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md`
+    - Aliases: `docs/reference/gateway-subsystem-audit-260814-findings.md`
 
 ### herdr-plugin dashboard layout: work-items panel + action-queue boxes (`herdr-plugin-dashboard-layout-work-items-panel-action-queue-boxes`)
 - Status: **active**
-- Purpose Slug: `herdr-plugin-dashboard-layout-work-items-panel-action-queue-boxes`
+- Purpose Slug: `herdr-plugin-dashboard-layout-work-items-panel-action-queue`
+- Lineage: {"renamedFrom":"herdr-plugin-dashboard-layout-work-items-panel-action-queue-boxes"}
 - Docs:
-  - `herdr-dashboard-layout-and-action-queues` (active): `docs/reference/herdr-dashboard-layout-and-action-queues.md`
+  - `herdr-dashboard-layout-and-action-queues` (provisional): `docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md`
+    - Aliases: `docs/reference/herdr-dashboard-layout-and-action-queues.md`
 
 ### herdr web dashboard: layout, userflow and visual language (`herdr-web-dashboard-layout-userflow-and-visual-language`)
 - Status: **active**
 - Purpose Slug: `herdr-web-dashboard-layout-userflow-and-visual-language`
 - Docs:
-  - `herdr-web-dashboard-layout` (active): `docs/reference/herdr-web-dashboard-layout.md`
+  - `herdr-web-dashboard-layout` (provisional): `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`
+    - Aliases: `docs/reference/herdr-web-dashboard-layout.md`
 
 ### which stitch-generated design export maps to which real React component in the herdr web dashboard, and what each component covers (`which-stitch-generated-design-export-maps-to-which-real-react-component-in-the-herdr-web-dashboard-and-what-each-component-covers`)
 - Status: **active**
-- Purpose Slug: `which-stitch-generated-design-export-maps-to-which-real-react-component-in-the-herdr-web-dashboard-and-what-each-component-covers`
+- Purpose Slug: `which-stitch-generated-design-export-maps-to-which-real-reac`
+- Lineage: {"renamedFrom":"which-stitch-generated-design-export-maps-to-which-real-react-component-in-the-herdr-web-dashboard-and-what-each-component-covers"}
 - Docs:
-  - `herdr-web-dashboard-stitch-export-to-component-map` (active): `docs/reference/herdr-web-dashboard-stitch-export-to-component-map.md`
+  - `herdr-web-dashboard-stitch-export-to-component-map` (provisional): `docs/knowledge/which-stitch-generated-design-export-maps-to-which-real-reac/herdr-web-dashboard-stitch-export-to-component-map.md`
+    - Aliases: `docs/reference/herdr-web-dashboard-stitch-export-to-component-map.md`
 
 ### judge fail-safe debug log (`judge-fail-safe-debug-log`)
 - Status: **active**
 - Purpose Slug: `judge-fail-safe-debug-log`
 - Docs:
-  - `judge-fail-safe-debug-log-fields` (active): `docs/reference/judge-fail-safe-debug-log-fields.md`
+  - `judge-fail-safe-debug-log-fields` (provisional): `docs/knowledge/judge-fail-safe-debug-log/judge-fail-safe-debug-log-fields.md`
+    - Aliases: `docs/reference/judge-fail-safe-debug-log-fields.md`
 
 ### Work-item `priority`: calculated formula, and `intent`'s retirement (`work-item-priority-calculated-formula-and-intent-s-retirement`)
 - Status: **active**
-- Purpose Slug: `work-item-priority-calculated-formula-and-intent-s-retirement`
+- Purpose Slug: `work-item-priority-calculated-formula-and-intent-s-retiremen`
+- Lineage: {"renamedFrom":"work-item-priority-calculated-formula-and-intent-s-retirement"}
 - Docs:
-  - `priority-formula-and-intent-retirement` (active): `docs/reference/priority-formula-and-intent-retirement.md`
+  - `priority-formula-and-intent-retirement` (provisional): `docs/knowledge/work-item-priority-calculated-formula-and-intent-s-retiremen/priority-formula-and-intent-retirement.md`
+    - Aliases: `docs/reference/priority-formula-and-intent-retirement.md`
 
 ### `rankImpact`'s real sort-key order (`rankimpact-s-real-sort-key-order`)
 - Status: **active**
 - Purpose Slug: `rankimpact-s-real-sort-key-order`
 - Docs:
-  - `rankimpact-sort-key-order` (active): `docs/reference/rankimpact-sort-key-order.md`
+  - `rankimpact-sort-key-order` (provisional): `docs/knowledge/rankimpact-s-real-sort-key-order/rankimpact-sort-key-order.md`
+    - Aliases: `docs/reference/rankimpact-sort-key-order.md`
 
 ### `recordGateApprove`'s real contract (`recordgateapprove-s-real-contract`)
 - Status: **active**
 - Purpose Slug: `recordgateapprove-s-real-contract`
 - Docs:
-  - `recordgateapprove-contract` (active): `docs/reference/recordgateapprove-contract.md`
+  - `recordgateapprove-contract` (provisional): `docs/knowledge/recordgateapprove-s-real-contract/recordgateapprove-contract.md`
+    - Aliases: `docs/reference/recordgateapprove-contract.md`
 
 ### State-machine module file names (`state-machine-module-file-names`)
 - Status: **active**
 - Purpose Slug: `state-machine-module-file-names`
 - Docs:
-  - `state-machine-module-file-names` (active): `docs/reference/state-machine-module-file-names.md`
+  - `state-machine-module-file-names` (provisional): `docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md`
+    - Aliases: `docs/reference/state-machine-module-file-names.md`
 
 ### Test suite legibility/dedup cleanup — before/after numbers (`test-suite-legibility-dedup-cleanup-before-after-numbers`)
 - Status: **active**
 - Purpose Slug: `test-suite-legibility-dedup-cleanup-before-after-numbers`
 - Docs:
-  - `test-suite-legibility-cleanup-numbers` (active): `docs/reference/test-suite-legibility-cleanup-numbers.md`
+  - `test-suite-legibility-cleanup-numbers` (provisional): `docs/knowledge/test-suite-legibility-dedup-cleanup-before-after-numbers/test-suite-legibility-cleanup-numbers.md`
+    - Aliases: `docs/reference/test-suite-legibility-cleanup-numbers.md`
 
 ### `/fgOS:triage` table columns (`fgos-triage-table-columns`)
 - Status: **active**
 - Purpose Slug: `fgos-triage-table-columns`
 - Docs:
-  - `triage-table-columns` (active): `docs/reference/triage-table-columns.md`
+  - `triage-table-columns` (provisional): `docs/knowledge/fgos-triage-table-columns/triage-table-columns.md`
+    - Aliases: `docs/reference/triage-table-columns.md`
 
 ### Verify-cost audit: real pick/return/approve cycle counts (`verify-cost-audit-real-pick-return-approve-cycle-counts`)
 - Status: **active**
 - Purpose Slug: `verify-cost-audit-real-pick-return-approve-cycle-counts`
 - Docs:
-  - `verify-cost-audit-pick-return-approve-cycle-counts` (active): `docs/reference/verify-cost-audit-pick-return-approve-cycle-counts.md`
+  - `verify-cost-audit-pick-return-approve-cycle-counts` (provisional): `docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md`
+    - Aliases: `docs/reference/verify-cost-audit-pick-return-approve-cycle-counts.md`
 
 ### Work-item pipeline: stages, verbs, actors, handoffs (`work-item-pipeline-stages-verbs-actors-handoffs`)
 - Status: **active**
 - Purpose Slug: `work-item-pipeline-stages-verbs-actors-handoffs`
 - Docs:
-  - `work-item-pipeline-stages-verbs-and-handoffs` (active): `docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md`
+  - `work-item-pipeline-stages-verbs-and-handoffs` (provisional): `docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md`
+    - Aliases: `docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md`
 
 ### the 9 findings from the 2026-08-14 fable code-review audit of fgOS's worktree claim/merge/cleanup lifecycle, and which work item tracks each (`the-9-findings-from-the-2026-08-14-fable-code-review-audit-of-fgos-s-worktree-claim-merge-cleanup-lifecycle-and-which-work-item-tracks-each`)
 - Status: **active**
-- Purpose Slug: `the-9-findings-from-the-2026-08-14-fable-code-review-audit-of-fgos-s-worktree-claim-merge-cleanup-lifecycle-and-which-work-item-tracks-each`
+- Purpose Slug: `the-9-findings-from-the-2026-08-14-fable-code-review-audit-o`
+- Lineage: {"renamedFrom":"the-9-findings-from-the-2026-08-14-fable-code-review-audit-of-fgos-s-worktree-claim-merge-cleanup-lifecycle-and-which-work-item-tracks-each"}
 - Docs:
-  - `worktree-merge-lifecycle-audit-260814-findings` (active): `docs/reference/worktree-merge-lifecycle-audit-260814-findings.md`
+  - `worktree-merge-lifecycle-audit-260814-findings` (provisional): `docs/knowledge/the-9-findings-from-the-2026-08-14-fable-code-review-audit-o/worktree-merge-lifecycle-audit-260814-findings.md`
+    - Aliases: `docs/reference/worktree-merge-lifecycle-audit-260814-findings.md`
 
 ### Walking a heavy fgOS item through exploring, a 3-child split, and done (`walking-a-heavy-fgos-item-through-exploring-a-3-child-split-and-done`)
 - Status: **active**
-- Purpose Slug: `walking-a-heavy-fgos-item-through-exploring-a-3-child-split-and-done`
+- Purpose Slug: `walking-a-heavy-fgos-item-through-exploring-a-3-child-split`
+- Lineage: {"renamedFrom":"walking-a-heavy-fgos-item-through-exploring-a-3-child-split-and-done"}
 - Docs:
-  - `walking-a-heavy-item-through-a-3-child-split` (active): `docs/tutorials/walking-a-heavy-item-through-a-3-child-split.md`
+  - `walking-a-heavy-item-through-a-3-child-split` (provisional): `docs/knowledge/walking-a-heavy-fgos-item-through-exploring-a-3-child-split/walking-a-heavy-item-through-a-3-child-split.md`
+    - Aliases: `docs/tutorials/walking-a-heavy-item-through-a-3-child-split.md`
 
 ### Decisions index (`decisions-index`)
 - Status: **active**
 - Purpose Slug: `decisions-index`
 - Docs:
-  - `decision-record` (active): `docs/decisions/index.md`
+  - `decision-record` (provisional): `docs/knowledge/decisions-index/decision-record.md`
+    - Aliases: `docs/decisions/index.md`
 
