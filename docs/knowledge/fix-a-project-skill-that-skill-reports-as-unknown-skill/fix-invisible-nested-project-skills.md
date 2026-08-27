@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Fix a project skill that `Skill()` reports as "Unknown skill"
 
 Use this when a skill file genuinely exists on disk under
