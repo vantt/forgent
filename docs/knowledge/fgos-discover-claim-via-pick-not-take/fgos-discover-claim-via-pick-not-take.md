@@ -5,6 +5,8 @@ tags: [discover, worktree, claim-timing, fgos-coding-driving, branch-isolation]
 timestamp: 2026-08-20T00:00:00.000Z
 source_capture_ids: [tsk-20p]
 authoritative_for: fgos-discover claim-via-pick-not-take
+framework: diataxis
+mode: explanation
 ---
 
 # Why `/fgOS:discover` claims via `fgos pick` instead of `fgos take`
