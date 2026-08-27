@@ -3,6 +3,8 @@ type: how-to
 title: How to add a CHANGELOG.md entry for a user-visible change
 tags: []
 source_capture_ids: [tsk-469, tsk-3ip]
+framework: diataxis
+mode: how-to
 ---
 # How to add a CHANGELOG.md entry for a user-visible change
 
