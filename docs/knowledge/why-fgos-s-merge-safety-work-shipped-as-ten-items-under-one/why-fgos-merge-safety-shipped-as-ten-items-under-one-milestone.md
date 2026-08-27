@@ -3,6 +3,8 @@ type: explanation
 title: Why fgOS's merge safety work shipped as ten items under one milestone
 tags: [merge, approve, main-checkout-lock, multi-session, milestone]
 source_capture_ids: [tsk-5t3a]
+framework: diataxis
+mode: explanation
 ---
 # Why fgOS's merge safety work shipped as ten items under one milestone
 
