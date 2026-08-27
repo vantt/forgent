@@ -1,5 +1,7 @@
 ---
 authoritative_for: why fgOS registers a doctor check confirming every stage name across ALL of a domain's registered workflows resolves to a real skillMap entry
+framework: diataxis
+mode: explanation
 ---
 
 # Why a doctor check verifies every workflow stage has a `skillMap` owner
