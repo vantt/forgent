@@ -3,6 +3,8 @@ type: explanation
 title: Why fgos-coding-driving's title/description print lives in one shared place
 tags: [fgos-coding-driving, pick, interactive, transparency-law]
 source_capture_ids: [tsk-23z]
+framework: diataxis
+mode: explanation
 ---
 # Why `fgos-coding-driving`'s title/description print lives in one shared place
 
