@@ -4,6 +4,8 @@ title: How to verify every citer before retiring a shared skill fragment
 tags: []
 timestamp: 2026-08-10T11:00:00.000Z
 source_capture_ids: [tsk-4ns]
+framework: diataxis
+mode: how-to
 ---
 # How to verify every citer before retiring a shared skill fragment
 
