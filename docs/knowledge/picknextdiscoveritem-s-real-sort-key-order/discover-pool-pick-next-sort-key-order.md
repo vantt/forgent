@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # `pickNextDiscoverItem`'s real sort-key order
 
 `pickNextDiscoverItem` (`src/state/discover-pool.mjs`, tsk-3go-1) picks
