@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `mergeRunnerItem` now checks ancestry before attempting a merge
 
 `mergeRunnerItem`/`mergeRunnerItemLocked` (`src/runner/merge.mjs`) turns an
