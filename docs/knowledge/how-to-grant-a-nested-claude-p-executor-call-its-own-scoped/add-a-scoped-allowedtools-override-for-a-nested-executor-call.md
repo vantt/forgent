@@ -4,6 +4,8 @@ title: How to grant a nested `claude -p` executor call its own scoped `allowedTo
 tags: [runner, judge-executor, allowedTools, security]
 timestamp: 2026-07-31T00:00:00.000Z
 source_capture_ids: [tsk-62d]
+framework: diataxis
+mode: how-to
 ---
 # How to grant a nested `claude -p` executor call its own scoped `allowedTools`
 
