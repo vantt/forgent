@@ -1,6 +1,8 @@
 ---
 type: reference
 source_capture_ids: [tsk-6bx-1, tsk-6bx-2]
+framework: diataxis
+mode: reference
 ---
 
 # Gate-bypass config
