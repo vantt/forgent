@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `cleanup-loop` has no iteration cap, unlike `discover-loop`
 
 `/fgOS:cleanup-loop` scans `status:cleanup` work items and runs `fgos
