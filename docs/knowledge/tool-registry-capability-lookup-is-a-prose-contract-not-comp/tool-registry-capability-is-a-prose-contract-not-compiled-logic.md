@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Tool-registry: capability lookup is a prose contract, not compiled logic
 
 `tsk-2br` asked what `repository-harness`'s "tool registry" mechanism is
