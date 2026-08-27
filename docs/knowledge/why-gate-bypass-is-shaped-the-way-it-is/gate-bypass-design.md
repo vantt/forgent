@@ -1,6 +1,8 @@
 ---
 type: explanation
 source_capture_ids: [tsk-6bx, tsk-1ds, tsk-1vi, tsk-3i8]
+framework: diataxis
+mode: explanation
 ---
 
 # Why gate-bypass is shaped the way it is
