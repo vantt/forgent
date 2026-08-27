@@ -4,6 +4,8 @@ title: Sync an fgOS item whose fix already shipped outside the normal claim/retu
 tags: [lifecycle, guardrail-bypass, main-checkout, take, return]
 timestamp: 2026-08-06T00:00:00.000Z
 source_capture_ids: [tsk-3w3x]
+framework: diataxis
+mode: how-to
 ---
 
 # Sync an fgOS item whose fix already shipped outside the normal claim/return/approve lifecycle
