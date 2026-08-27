@@ -4,6 +4,8 @@ title: Why fgos answer resumes to statusAtAsk, not always todo
 tags: [fgos-answer, awaiting-human, claim-lock, cli-help]
 source_capture_ids: [tsk-f3p]
 authoritative_for: why fgos answer's real resume behavior is statusAtAsk rather than always todo, and why its CLI help text was corrected to match
+framework: diataxis
+mode: explanation
 ---
 # Why `fgos answer` resumes to `statusAtAsk`, not always `todo`
 
