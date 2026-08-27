@@ -4,6 +4,8 @@ title: How to fix a verify command that mixes prose with a real command
 tags: []
 timestamp: 2026-07-29T10:44:23.697Z
 source_capture_ids: [tsk-34y, tsk-45u]
+framework: diataxis
+mode: how-to
 ---
 # How to fix a verify command that mixes prose with a real command
 
