@@ -2,6 +2,8 @@
 type: how-to
 title: Add a read-only fgOS verb and its plugin skill
 source_capture_ids: [tsk-2ew]
+framework: diataxis
+mode: how-to
 ---
 # Add a read-only fgOS verb and its plugin skill
 
