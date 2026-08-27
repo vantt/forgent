@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `abortMergeIfPossible` checks `MERGE_HEAD` before aborting
 
 `fgos approve`/`mergeRunnerItem` used to crash when a runner item's
