@@ -4,6 +4,8 @@ title: Why the herdr web dashboard became a static client of the gateway, not it
 tags: [herdr, web-dashboard, gateway, realignment, auth]
 source_capture_ids: [tsk-54j, tsk-3x6, tsk-ldb, tsk-48w, tsk-5jr, tsk-4id, tsk-6d2, tsk-yo0, tsk-54y]
 authoritative_for: why the herdr web dashboard's architecture moved from a standalone embedded webserver to a static bundle served by the existing gateway, and the security/lifecycle decisions that survived the realignment
+framework: diataxis
+mode: explanation
 ---
 # Why the herdr web dashboard became a static client of the gateway, not its own server
 
