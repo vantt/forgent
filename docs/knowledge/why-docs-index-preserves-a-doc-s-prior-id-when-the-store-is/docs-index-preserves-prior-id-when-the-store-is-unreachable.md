@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `docs-index` preserves a doc's prior id when the store is unreachable
 
 `tsk-f31` fixed a real, reproducible data-corruption bug: running `fgos
