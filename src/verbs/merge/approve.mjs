@@ -25,6 +25,7 @@ import {
   assertAcceptanceEvidence,
   assertPlanEvidence,
   StoreError,
+  categoryOf,
 } from '../../state/store.mjs';
 import { EventLogError } from '../../state/events.mjs';
 import { resolveRoot, isResolvedStatus } from '../../state/frontier.mjs';
@@ -105,6 +106,25 @@ function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { me
         + `diagnostic recorded to ${diagnosticLog ?? '(unrecorded — see this stderr line)'}.\n`,
     );
     return { event: null, error: err, diagnosticLog };
+  }
+}
+
+function moveBlockedOrConflict(dir, { id, reason, role = 'system' }) {
+  try {
+    moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role });
+    return null;
+  } catch (err) {
+    if (categoryOf(err) === 'conflict') {
+      const work = listWork(dir).work[id];
+      const actual = work ? work.status : 'unknown';
+      return {
+        outcome: 'blocked',
+        reason: 'state-changed-concurrently',
+        expected: 'awaiting-approval',
+        actual,
+      };
+    }
+    throw err;
   }
 }
 
@@ -368,7 +388,8 @@ export async function approveUseCase(
     // plus a friction record carrying the failure layer and gh's stderr.
     const reason = result.reason;
     const layer = { 'auth-failure': 'environment', 'rate-limited': 'environment', 'unreachable': 'environment', 'gh-invocation-failed': 'state' }[reason] || 'state';
-    moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role: 'system' });
+    const conflict = moveBlockedOrConflict(dir, { id, reason, role: 'system' });
+    if (conflict) return conflict;
     addFriction(dir, {
       id,
       disposition: 'blocked',
@@ -415,7 +436,8 @@ export async function approveUseCase(
       const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
       if (!attestation.ok) {
         const targetBranch = rootId !== id ? branchNameFor(rootId) : detectTrunk(repoRoot);
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: attestation.reason, role: 'system' });
+        const conflict = moveBlockedOrConflict(dir, { id, reason: attestation.reason, role: 'system' });
+        if (conflict) return conflict;
         addFriction(dir, {
           id,
           disposition: 'blocked',
@@ -509,7 +531,8 @@ export async function approveUseCase(
         if (!alreadyAncestor) {
           const catchupResult = await performCatchUp(repoRoot, id, item, rootBranch, timeoutMs);
           if (catchupResult.outcome === 'conflict') {
-            moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
+            const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' });
+            if (conflict) return conflict;
             addFriction(dir, {
               id,
               disposition: 'blocked',
@@ -521,7 +544,8 @@ export async function approveUseCase(
             return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch, conflictedFiles: catchupResult.conflictedFiles };
           }
           if (catchupResult.outcome === 'merge-refused') {
-            moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-failed-unclassified', role: 'system' });
+            const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' });
+            if (conflict) return conflict;
             addFriction(dir, {
               id,
               disposition: 'blocked',
@@ -534,7 +558,8 @@ export async function approveUseCase(
           }
           if (catchupResult.outcome === 'verify-fail') {
             const mergeReason = catchupResult.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
-            moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: mergeReason, role: 'system' });
+            const conflict = moveBlockedOrConflict(dir, { id, reason: mergeReason, role: 'system' });
+            if (conflict) return conflict;
             addFriction(dir, {
               id,
               disposition: 'blocked',
@@ -564,7 +589,8 @@ export async function approveUseCase(
         const result = await runMerge(() => mergeRunnerItem(ephemeral.path, effectiveItem, { timeoutMs, lockRoot: repoRoot, targetSlot: true }));
 
         if (result.outcome === 'conflict') {
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
+          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' });
+          if (conflict) return conflict;
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -583,7 +609,8 @@ export async function approveUseCase(
           // 'merge-conflict'. Real stderr/exit-code carried through so
           // this is actually diagnosable, unlike the static
           // 'merge-conflict' detail string.
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-failed-unclassified', role: 'system' });
+          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' });
+          if (conflict) return conflict;
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -602,7 +629,8 @@ export async function approveUseCase(
           // git merge --no-commit --no-ff was never attempted and
           // git merge --abort was never called, so ${rootBranch}'s own
           // merge state (if any) is exactly as this call found it.
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-blocked-other-item', role: 'system' });
+          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-blocked-other-item', role: 'system' });
+          if (conflict) return conflict;
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -618,7 +646,8 @@ export async function approveUseCase(
           // tsk-2qp: main checkout lock was lost mid-merge (heartbeat renewal failed).
           // Merge commit was not performed and git merge --abort was never called,
           // preserving the new lock holder's tree state intact.
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'lock-lost-mid-merge', role: 'system' });
+          const conflict = moveBlockedOrConflict(dir, { id, reason: 'lock-lost-mid-merge', role: 'system' });
+          if (conflict) return conflict;
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -631,7 +660,8 @@ export async function approveUseCase(
         }
 
         if (result.outcome === 'fgos-write-rejected') {
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
+          const conflict = moveBlockedOrConflict(dir, { id, reason: 'fgos-write-rejected', role: 'system' });
+          if (conflict) return conflict;
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -648,7 +678,8 @@ export async function approveUseCase(
           // the merge is bad — park under a distinct, catchup-resolvable
           // reason instead of the misleading merge-fail label.
           const mergeReason = result.check.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: mergeReason, role: 'system' });
+          const conflict = moveBlockedOrConflict(dir, { id, reason: mergeReason, role: 'system' });
+          if (conflict) return conflict;
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -741,7 +772,8 @@ export async function approveUseCase(
       const detail = hadChildren
         ? `cross-root integration drift at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`
         : `git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`;
-      moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason, role: 'system' });
+      if (conflict) return conflict;
       addFriction(dir, {
         id,
         disposition: 'blocked',
@@ -762,7 +794,8 @@ export async function approveUseCase(
       const detail = hadChildren
         ? `cross-root integration attempt at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`
         : `git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`;
-      moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-failed-unclassified', role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' });
+      if (conflict) return conflict;
       addFriction(dir, {
         id,
         disposition: 'blocked',
@@ -784,7 +817,8 @@ export async function approveUseCase(
       const detail = hadChildren
         ? `cross-root integration attempt at main@${currentHead(repoRoot)}; main checkout already has a MERGE_HEAD from another item's in-progress merge; merge of ${result.branch} was never attempted`
         : `main checkout already has a MERGE_HEAD from another item's in-progress merge; merge of ${result.branch} was never attempted`;
-      moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-blocked-other-item', role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-blocked-other-item', role: 'system' });
+      if (conflict) return conflict;
       addFriction(dir, {
         id,
         disposition: 'blocked',
@@ -802,7 +836,8 @@ export async function approveUseCase(
       const detail = hadChildren
         ? `cross-root integration attempt at main@${currentHead(repoRoot)}; main checkout lock was lost mid-merge; merge of ${result.branch} was stopped before commit`
         : `main checkout lock was lost mid-merge; merge of ${result.branch} was stopped before commit`;
-      moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'lock-lost-mid-merge', role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason: 'lock-lost-mid-merge', role: 'system' });
+      if (conflict) return conflict;
       addFriction(dir, {
         id,
         disposition: 'blocked',
@@ -815,7 +850,8 @@ export async function approveUseCase(
     }
 
     if (result.outcome === 'fgos-write-rejected') {
-      moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason: 'fgos-write-rejected', role: 'system' });
+      if (conflict) return conflict;
       addFriction(dir, {
         id,
         disposition: 'blocked',
@@ -837,7 +873,8 @@ export async function approveUseCase(
         : hadChildren
           ? `cross-root integration drift at main@${currentHead(repoRoot)}; goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`
           : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;
-      moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason, role: 'system' });
+      if (conflict) return conflict;
       addFriction(dir, {
         id,
         disposition: 'blocked',
@@ -893,7 +930,8 @@ export async function approveUseCase(
   if (!check.passed) {
     // tsk-53o: same timeout/fail distinction as `return` — a timeout is
     // not proof the item's verify failed.
-    moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+    const conflict = moveBlockedOrConflict(dir, { id, reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+    if (conflict) return conflict;
     addFriction(dir, {
       id,
       disposition: 'blocked',
