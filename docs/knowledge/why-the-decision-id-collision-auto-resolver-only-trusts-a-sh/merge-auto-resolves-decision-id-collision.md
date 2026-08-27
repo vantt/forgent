@@ -4,6 +4,8 @@ title: Why the decision-ID-collision auto-resolver only trusts a shared link tar
 tags: []
 timestamp: 2026-07-30T00:35:06.723Z
 source_capture_ids: [tsk-3mv-1]
+framework: diataxis
+mode: explanation
 ---
 # Why the decision-ID-collision auto-resolver only trusts a shared link target, not a shared id, to detect an edit dispute
 
