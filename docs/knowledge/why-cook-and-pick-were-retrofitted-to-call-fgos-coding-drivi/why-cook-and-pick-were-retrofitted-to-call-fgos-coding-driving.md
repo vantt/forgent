@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `cook` and `pick` were retrofitted to call `fgos-coding-driving`
 
 `tsk-19j`'s own D14 decision anticipated this: once the shared driver
