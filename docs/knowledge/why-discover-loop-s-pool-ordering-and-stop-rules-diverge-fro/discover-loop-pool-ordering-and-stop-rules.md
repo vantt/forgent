@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why discover-loop's pool ordering and stop rules diverge from merge-loop's
 
 `/fgOS:discover-loop` (backed by `/fgOS:discover-next`, tsk-3go) mirrors
