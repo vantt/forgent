@@ -31,6 +31,16 @@ behavior, and no public contract changes; nothing here touches auth,
 data, or external systems. Files touched: only this feature's own
 `docs/history/` pair (`plan.md`, `RESEARCH.md`).
 
+**Impact-analysis posture: degraded** — `fgos tool query --capability
+impact-analysis --status present` returns GitNexus `present`, but its
+index is flagged stale (last indexed `7bb3231`, behind current HEAD).
+Not load-bearing here: this item's own footprint is docs-only
+(`plan.md`/`RESEARCH.md`), so no blast radius exists to measure; the code
+evidence above (commit `10e44585`, the two `(tsk-tr9 regression)` tests,
+and the live `node --test` run) was cross-checked directly via
+Read/git log/git show rather than trusted from the graph, per the
+degraded-posture cross-check rule.
+
 ## Shape
 
 This is a single honest piece (pass-through, no split): confirm the fix
