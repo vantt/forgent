@@ -1,6 +1,8 @@
 ---
 type: explanation
 source_capture_ids: [tsk-52g]
+framework: diataxis
+mode: explanation
 ---
 
 # Why decisions already locked and approved by a person still had to be restated to the engine's own clarify judge
