@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `promote-engine` merges members instead of rebasing them
 
 `promote-to-component`'s original plan described the mutating step as
