@@ -4,6 +4,8 @@ title: fgos slots verb output fields
 tags: [cli, worker-slots, occupancy, ceiling, claimWork]
 source_capture_ids: [tsk-3dt]
 authoritative_for: fgos slots CLI verb output shape and the worker-slot ceiling gate inside claimWork
+framework: diataxis
+mode: reference
 ---
 # `fgos slots` verb output fields
 
