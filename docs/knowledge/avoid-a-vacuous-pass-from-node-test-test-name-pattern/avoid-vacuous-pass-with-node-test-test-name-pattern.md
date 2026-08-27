@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Avoid a vacuous pass from `node --test --test-name-pattern`
 
 Use this when a `verify` command (or any other check) relies on
