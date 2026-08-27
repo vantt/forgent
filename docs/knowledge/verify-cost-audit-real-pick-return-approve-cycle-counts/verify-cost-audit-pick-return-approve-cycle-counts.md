@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # Verify-cost audit: real pick/return/approve cycle counts
 
 `tsk-vms` measured the real cost of an item's `verify` cycle directly
