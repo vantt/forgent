@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why workflow prose gates on a capability query, not a hardcoded tool name
 
 `tsk-1e4` rewrote `CLAUDE.md` and the `fgos-coding-planning`/`fgos-coding-validating`/
