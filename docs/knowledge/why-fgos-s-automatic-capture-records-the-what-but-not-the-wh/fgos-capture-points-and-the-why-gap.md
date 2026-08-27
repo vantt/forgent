@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why fgOS's automatic capture records the what, but not the why
 
 Source: `plans/reports/capture-recording-points-audit-260729-1745-report.md`
