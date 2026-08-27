@@ -4,6 +4,8 @@ title: Why planning and validating collapsed into one co-adjustment gate
 tags: [fgos-coding-planning, fgos-coding-validating, gate, gate-bypass, human-release]
 source_capture_ids: [tsk-224, tsk-2tk, tsk-blk, tsk-4vz, tsk-13s]
 authoritative_for: why fgos-coding-planning and fgos-coding-validating merged their two approval gates into one, and how that one gate decides when to ask a person versus proceed
+framework: diataxis
+mode: explanation
 ---
 # Why planning and validating collapsed into one co-adjustment gate
 
