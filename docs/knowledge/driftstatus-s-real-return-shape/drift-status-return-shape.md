@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # `driftStatus`'s real return shape
 
 `driftStatus(repoRoot, view)` (`src/state/drift-status.mjs`, `tsk-5m7`,
