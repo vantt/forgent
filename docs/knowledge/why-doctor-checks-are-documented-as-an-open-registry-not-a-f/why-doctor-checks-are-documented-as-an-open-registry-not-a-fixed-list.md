@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why doctor checks are documented as an open registry, not a fixed list
 
 `docs/specs/distribution.md` used to describe `fgos doctor` in terms that
