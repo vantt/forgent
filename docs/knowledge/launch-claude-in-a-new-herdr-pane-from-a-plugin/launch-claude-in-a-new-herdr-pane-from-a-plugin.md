@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Launch claude in a new herdr pane from a plugin
 
 A recipe for a plugin that needs to open a new herdr pane and start an
