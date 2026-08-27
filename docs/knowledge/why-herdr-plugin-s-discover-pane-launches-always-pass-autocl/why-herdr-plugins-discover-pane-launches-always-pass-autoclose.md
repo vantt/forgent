@@ -3,6 +3,8 @@ type: explanation
 title: Why herdr-plugin's discover pane launches always pass --autoClose
 tags: [herdr-plugin, discover, autoclose, terminal-close]
 source_capture_ids: [tsk-358]
+framework: diataxis
+mode: explanation
 ---
 # Why herdr-plugin's discover pane launches always pass `--autoClose`
 
