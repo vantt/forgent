@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why retrospective documents vanished on orphaned branches
 
 `tsk-3ts` started from a scan finding 36 of 182 recorded `docPath` values
