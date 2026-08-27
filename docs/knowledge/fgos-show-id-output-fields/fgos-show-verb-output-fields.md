@@ -1,9 +1,11 @@
 ---
 type: reference
-title: "`fgos show <id>` output fields"
+title: `fgos show <id>` output fields
 tags: []
 timestamp: 2026-07-30T08:44:32.944Z
 source_capture_ids: [tsk-2fw]
+framework: diataxis
+mode: reference
 ---
 
 # `fgos show <id>` output fields
