@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why stage-skills forbid ad hoc Task/Agent delegation for their own reasoning
 
 `fgos-coding-exploring/SKILL.md` (commit `2bc193d`, corrected `8c1dab1`) was the
