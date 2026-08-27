@@ -3,6 +3,8 @@ type: explanation
 title: Why fgos unlock's error message stopped claiming a live session it never checked
 tags: [main-checkout-lock, unlock, string-identity, ttl]
 source_capture_ids: [tsk-24t]
+framework: diataxis
+mode: explanation
 ---
 # Why `fgos unlock`'s error message stopped claiming a live session it never checked
 
