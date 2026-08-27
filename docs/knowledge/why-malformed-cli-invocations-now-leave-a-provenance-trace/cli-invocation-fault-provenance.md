@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why malformed CLI invocations now leave a provenance trace
 
 ## The gap this closes
