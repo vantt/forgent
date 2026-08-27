@@ -9,6 +9,7 @@ import {
   checkTruncationGuard,
   readGuardMark,
   writeGuardMark,
+  deriveFileKeyFromLogPath,
   checkEventsJsonlTruncationGuard,
   advanceEventsJsonlTruncationGuard,
   forceRebaselineTruncationGuard,
@@ -208,6 +209,46 @@ test("advanceEventsJsonlTruncationGuard treats a missing log as an empty one (bo
   const result = advanceEventsJsonlTruncationGuard(logPath, guardPath);
   assert.equal(result.ok, true);
   assert.equal(result.mark, null);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("deriveFileKeyFromLogPath derives events/<name> when parent dir is named events", () => {
+  assert.equal(deriveFileKeyFromLogPath("/repo/.fgos/events/writer-1.jsonl"), "events/writer-1.jsonl");
+  assert.equal(deriveFileKeyFromLogPath("/repo/.fgos/events.jsonl"), "events.jsonl");
+  assert.equal(deriveFileKeyFromLogPath("/some/dir/custom.jsonl"), "custom.jsonl");
+});
+
+test("checkEventsJsonlTruncationGuard defaults fileKey to events/<name> for a shard file in an events/ directory", () => {
+  const dir = mkTempDir("truncguard-check-shard-");
+  const eventsDir = path.join(dir, "events");
+  fs.mkdirSync(eventsDir, { recursive: true });
+  const logPath = path.join(eventsDir, "writer-42.jsonl");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
+  fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a")]), "utf8");
+
+  // Pre-seed sidecar mark under the correct key 'events/writer-42.jsonl'
+  writeGuardMark(guardPath, "events/writer-42.jsonl", { seq: 1, hash: computeGuardMark(fs.readFileSync(logPath, "utf8")).hash });
+
+  // Calling check with NO fileKey arg should auto-derive 'events/writer-42.jsonl'
+  const result = checkEventsJsonlTruncationGuard(logPath, guardPath);
+  assert.equal(result.ok, true);
+  assert.equal(result.reason, "clean");
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("advanceEventsJsonlTruncationGuard defaults fileKey to events/<name> for a shard file in an events/ directory", () => {
+  const dir = mkTempDir("truncguard-advance-shard-");
+  const eventsDir = path.join(dir, "events");
+  fs.mkdirSync(eventsDir, { recursive: true });
+  const logPath = path.join(eventsDir, "writer-42.jsonl");
+  const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
+  fs.writeFileSync(logPath, raw([ev(1, "2026-01-01T00:00:00.000Z", "a")]), "utf8");
+
+  // Calling advance with NO fileKey arg should write sidecar mark under 'events/writer-42.jsonl'
+  const result = advanceEventsJsonlTruncationGuard(logPath, guardPath);
+  assert.equal(result.ok, true);
+  assert.equal(readGuardMark(guardPath, "events/writer-42.jsonl")?.seq, 1);
+  assert.equal(readGuardMark(guardPath, "writer-42.jsonl"), null, "must not write under bare basename");
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
