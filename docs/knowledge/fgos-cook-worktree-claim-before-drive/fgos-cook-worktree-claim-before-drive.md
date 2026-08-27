@@ -5,6 +5,8 @@ tags: [cook, worktree, claim-timing, fgos-coding-driving, branch-isolation]
 timestamp: 2026-08-20T00:00:00.000Z
 source_capture_ids: [tsk-hes]
 authoritative_for: fgos-cook worktree-claim-before-drive
+framework: diataxis
+mode: explanation
 ---
 
 # Why `/fgOS:cook` claims a worktree before driving instead of dirtying the main checkout
