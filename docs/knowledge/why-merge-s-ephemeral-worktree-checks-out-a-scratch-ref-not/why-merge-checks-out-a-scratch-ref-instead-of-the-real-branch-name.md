@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why merge's ephemeral worktree checks out a scratch ref, not the real branch name
 
 `tsk-5yp` found a real data-loss-shaped bug: approving/merging a child
