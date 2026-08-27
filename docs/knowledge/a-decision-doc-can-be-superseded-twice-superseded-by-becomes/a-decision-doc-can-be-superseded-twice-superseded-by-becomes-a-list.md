@@ -2,6 +2,8 @@
 type: explanation
 title: A decision doc can be superseded twice — superseded_by becomes a list
 source_capture_ids: [tsk-5wf, tsk-18t, tsk-55h]
+framework: diataxis
+mode: explanation
 ---
 
 # A decision doc can be superseded twice — superseded_by becomes a list
