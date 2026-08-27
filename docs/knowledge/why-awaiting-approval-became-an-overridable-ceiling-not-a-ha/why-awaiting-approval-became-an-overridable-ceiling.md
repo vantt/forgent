@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `awaiting-approval` became an overridable ceiling, not a hard stop
 
 `fgos-coding-driving` used to resolve each loop iteration's next step by
