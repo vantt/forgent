@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Fix dead fgOS shell-rc source lines
 
 Symptom: every interactive shell open prints one `no such file or
