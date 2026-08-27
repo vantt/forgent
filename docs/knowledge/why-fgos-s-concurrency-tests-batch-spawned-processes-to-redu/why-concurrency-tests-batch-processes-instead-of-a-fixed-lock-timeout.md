@@ -4,6 +4,8 @@ title: Why concurrency tests batch processes instead of relying on a fixed lock 
 tags: [testing, concurrency, flake, events-lock, contention]
 source_capture_ids: [tsk-4fx, tsk-2va]
 authoritative_for: why fgOS's concurrency tests batch spawned processes to reduce peak events.lock contention instead of scaling the lock-timeout budget
+framework: diataxis
+mode: explanation
 ---
 # Why concurrency tests batch processes instead of relying on a fixed lock timeout
 
