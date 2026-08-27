@@ -4,6 +4,8 @@ title: Why fgos-coding-planning writes a pass-through item's real verify before 
 tags: [fgos-coding-planning, verify, plan-mjs, placeholder]
 source_capture_ids: [tsk-14a, tsk-13b, tsk-1zo]
 authoritative_for: why a pass-through (non-split) item's designed proof-surface command is synced onto work.verify by fgos-coding-planning, and why the fix is skill prose rather than an engine change
+framework: diataxis
+mode: explanation
 ---
 # Why `fgos-coding-planning` writes a pass-through item's real verify before handoff
 
