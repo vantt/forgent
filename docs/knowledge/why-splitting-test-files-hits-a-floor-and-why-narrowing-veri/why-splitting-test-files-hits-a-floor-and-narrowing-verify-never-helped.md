@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why splitting test files hits a floor, and why narrowing verify never helped
 
 Every item in this repo pays for `npm test` at least twice — once at
