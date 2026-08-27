@@ -4,6 +4,8 @@ title: Why merge was a single-lane funnel under a 16-lane dispatch pipeline
 tags: [merge, throughput, iron-law, main-checkout-lock, clean-tree]
 source_capture_ids: [tsk-51m, tsk-xyr, tsk-5k4]
 authoritative_for: why fgOS merge throughput bottlenecked despite parallel dispatch, and the merge target-ref queue design that replaced a hard concurrency cap
+framework: diataxis
+mode: explanation
 ---
 # Why merge was a single-lane funnel under a 16-lane dispatch pipeline
 
