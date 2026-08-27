@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # How to sweep the clarify/decompose backlog with `/fgOS:discover-loop`
 
 Use this when you want every `stage:clarify`/`stage:decompose` fgOS work
