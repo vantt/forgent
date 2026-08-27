@@ -4,6 +4,8 @@ title: How to advance a work item through `clarify` and `decompose` with `discov
 tags: [discover, decompose, clarify, verbs]
 timestamp: 2026-07-31T07:05:09.000Z
 source_capture_ids: [tsk-2b0]
+framework: diataxis
+mode: how-to
 ---
 
 # How to advance a work item through `clarify` and `decompose` with `discover`/`decompose`
