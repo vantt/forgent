@@ -108,8 +108,21 @@ function computeConservationErrors(repoRoot, view, inventory, plannedMoves) {
   return errors;
 }
 
-export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
-  const fgosDir = path.join(repoRoot, '.fgos');
+export function runKnowledgeMigration(repoRoot, { dryRun = true, fgosRoot = repoRoot } = {}) {
+  // `fgosRoot` defaults to `repoRoot` (unchanged behavior for every existing
+  // caller, incl. every test fixture where both live under one tmpDir), but
+  // a worktree-isolated session needs to decouple them: `.fgos/` never
+  // exists inside a worktree (ADR0020 -- src/state/store.mjs's own `--dir`
+  // convention exists for exactly this), while the real file moves (`git
+  // mv` below) correctly belong to the worktree's own working tree/branch.
+  // The first real `--apply` run (tsk-5mh) hit this live: running from
+  // inside `fgw/tsk-5mh`'s worktree with no split produced 332 spurious
+  // "not registered" conservation errors against an empty registry view --
+  // `.fgos/` was silently absent there, not stale or wrong.
+  const fgosDir = path.join(fgosRoot, '.fgos');
+  if (!fs.existsSync(fgosDir)) {
+    throw new Error(`knowledge-migration: no '.fgos/' directory at '${fgosDir}' -- pass the main checkout root as fgosRoot/--dir when running from a worktree (ADR0020: worktrees never carry '.fgos/')`);
+  }
   const inventoryPath = path.join(repoRoot, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json');
 
   let inventory = [];
@@ -345,6 +358,12 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true } = {}) {
 if (process.argv[1] && process.argv[1].endsWith('knowledge-migration.mjs')) {
   const isApply = process.argv.includes('--apply');
   const repoRoot = process.cwd();
-  const res = runKnowledgeMigration(repoRoot, { dryRun: !isApply });
+  // `--dir <path>` mirrors the `fgos` CLI's own worktree-vs-store split:
+  // when running from inside a worktree, the real `.fgos/` registry lives
+  // at the main checkout, not `process.cwd()` (ADR0020) -- see the
+  // `fgosRoot` comment on `runKnowledgeMigration` above.
+  const dirFlagIndex = process.argv.indexOf('--dir');
+  const fgosRoot = dirFlagIndex !== -1 ? process.argv[dirFlagIndex + 1] : repoRoot;
+  const res = runKnowledgeMigration(repoRoot, { dryRun: !isApply, fgosRoot });
   console.log(JSON.stringify(res, null, 2));
 }
