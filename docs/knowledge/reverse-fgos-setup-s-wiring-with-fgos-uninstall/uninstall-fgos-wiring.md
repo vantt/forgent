@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Reverse `fgos setup`'s wiring with `fgos uninstall`
 
 Goal: undo what `fgos setup` wired into a project — the git hooks
