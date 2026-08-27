@@ -4,6 +4,8 @@ title: Test suite legibility/dedup cleanup — before/after numbers
 tags: []
 timestamp: 2026-07-29T03:14:35.000Z
 source_capture_ids: [tsk-3wr-3]
+framework: diataxis
+mode: reference
 ---
 # Test suite legibility/dedup cleanup — before/after numbers
 
