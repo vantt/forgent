@@ -4,6 +4,8 @@ title: Why move needed an --answer flag to reach wontfix from awaiting-human
 tags: [move, status-fsm, awaiting-human, wontfix]
 source_capture_ids: [tsk-2lc]
 authoritative_for: why fgos move gained an --answer flag, closing the last unreachable edge out of awaiting-human
+framework: diataxis
+mode: explanation
 ---
 # Why `move` needed an `--answer` flag to reach `wontfix` from `awaiting-human`
 
