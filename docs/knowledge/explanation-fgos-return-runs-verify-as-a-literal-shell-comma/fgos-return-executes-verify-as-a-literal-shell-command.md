@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Explanation: `fgos return` runs `verify` as a literal shell command — a placeholder string is not special-cased
 
 ## What happened (tsk-iun)
