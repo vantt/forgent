@@ -3,6 +3,8 @@ type: explanation
 title: fgos-researching's D2 fan-out rule, verified live on a real dogfood run
 tags: []
 source_capture_ids: [tsk-o4l]
+framework: diataxis
+mode: explanation
 ---
 # fgos-researching's D2 fan-out rule, verified live on a real dogfood run
 
