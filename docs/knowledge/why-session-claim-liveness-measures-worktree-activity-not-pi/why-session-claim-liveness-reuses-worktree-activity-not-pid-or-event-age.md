@@ -3,6 +3,8 @@ type: explanation
 title: Why session-claim liveness measures worktree activity, not PID or event-log age
 tags: []
 source_capture_ids: [tsk-3ni]
+framework: diataxis
+mode: explanation
 ---
 # Why session-claim liveness measures worktree activity, not PID or event-log age
 
