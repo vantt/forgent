@@ -4,6 +4,8 @@ title: Why fgos-coding-planning's mode gate moved to fgos-routing, and gate trac
 tags: [fgos-coding-planning, fgos-routing, mode-gate, triage-before-load, gate-traceability]
 timestamp: 2026-08-06T00:00:00.000Z
 source_capture_ids: [tsk-5ay]
+framework: diataxis
+mode: explanation
 ---
 
 # Why fgos-coding-planning's mode gate moved to fgos-routing, and gate traceability stayed inline
