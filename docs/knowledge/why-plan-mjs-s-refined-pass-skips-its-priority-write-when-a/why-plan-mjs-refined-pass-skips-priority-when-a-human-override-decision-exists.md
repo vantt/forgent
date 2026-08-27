@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `plan.mjs`'s refined pass skips its priority write when a human override decision exists
 
 `work.priority` had no guard against being silently clobbered by the
