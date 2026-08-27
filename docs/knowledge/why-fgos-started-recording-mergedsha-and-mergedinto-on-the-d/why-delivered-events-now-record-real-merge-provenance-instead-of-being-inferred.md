@@ -4,6 +4,8 @@ title: Why delivered events now record real merge provenance instead of being in
 tags: [delivered, provenance, merge, events, iron-law]
 source_capture_ids: [tsk-5dk]
 authoritative_for: why fgOS started recording mergedSha and mergedInto on the delivered work.move event instead of inferring merge status from git ancestry
+framework: diataxis
+mode: explanation
 ---
 # Why delivered events now record real merge provenance instead of being inferred
 
