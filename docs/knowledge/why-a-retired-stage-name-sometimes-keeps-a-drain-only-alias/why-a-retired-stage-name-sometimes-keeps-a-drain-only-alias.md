@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why a retired stage name sometimes keeps a drain-only alias
 
 Renaming a stage is not a text edit. A work item's `stage` field holds the
