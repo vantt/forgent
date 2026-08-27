@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `fgos discover` now trusts a locked CONTEXT.md instead of blindly re-judging
 
 `tsk-ozl` fixed a real, live-observed friction: right after a person ran
