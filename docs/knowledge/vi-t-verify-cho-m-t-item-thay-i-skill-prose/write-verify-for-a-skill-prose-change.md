@@ -4,6 +4,8 @@ title: Viết verify cho một item thay đổi skill prose
 tags: []
 timestamp: 2026-08-05T00:00:00.000Z
 source_capture_ids: []
+framework: diataxis
+mode: how-to
 ---
 
 # Viết verify cho một item thay đổi skill prose
