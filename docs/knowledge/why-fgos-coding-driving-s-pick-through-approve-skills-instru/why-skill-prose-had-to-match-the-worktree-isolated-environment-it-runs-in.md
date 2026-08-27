@@ -4,6 +4,8 @@ title: Why skill prose had to match the worktree-isolated environment it runs in
 tags: [worktree, isolation-guard, approve, pick, main-checkout]
 source_capture_ids: [tsk-3rg]
 authoritative_for: why fgos-coding-driving's pick-through-approve skills instruct leaving the worktree before approve, and why they call the fgos shell wrapper instead of a compound root=$(...) command
+framework: diataxis
+mode: explanation
 ---
 # Why skill prose had to match the worktree-isolated environment it runs in
 
