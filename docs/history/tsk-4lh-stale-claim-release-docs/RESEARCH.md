@@ -49,3 +49,47 @@ stale assumption?
 **Still open:** none — both stale locations identified, both confirmed
 against live source, correct replacement wording available as a template
 (`src/runner/worktree.mjs:1054-1060`).
+
+## Round 2 — 2026-08-27 (post-implement recovery)
+
+**Asked:** the out-of-process worker's first implement pass (`fgw/tsk-4lh`
+commit `502532e`) wrote the two replacement paragraphs citing `(tsk-40m
+D5)` / `Under tsk-40m D5, ...`. `fgos return`'s own full-suite verify run
+(the real `npm test`, 4180 tests — much larger than the worker's own
+scoped local run of 37) failed one test that neither Round 1 nor the
+worker's own local check surfaced: is this a real regression, and what is
+the correct fix?
+
+**Checked:**
+- `test/scripts/check-decision-citation-drift.test.mjs:758` failure
+  output (captured from the `fgos return` background run): flagged all
+  four real copies of the two edited files (`.agents/skills/...`,
+  `plugins/fgOS/skills/...` — `domains/coding/skills/...` is not scanned
+  by this test, confirmed by reading the test file's own `--skills-dir`
+  args at line 767-768) for citing a bare `D5` token outside a
+  `CONTEXT.md`.
+- `scripts/check-decision-citation-drift.mjs:42-160` (repo read): the
+  `CITATION_RE` regex `\b(ADR|RUL|D)(\d{1,4})\b` matches ANY bare
+  `D<digits>` token regardless of prefix text on the same line —
+  `(tsk-40m D5)` still matches on `D5` alone. `findCitationFormatFindings`
+  flags every such match outside a file whose path ends `/CONTEXT.md`,
+  message: "decision 0017 -- inline the content, delete the id". This is
+  a real, pre-existing repo-wide lint this item's own plan/verify never
+  accounted for — not a false positive.
+
+**Found:** the fix decision 0017 itself names is exactly right for this
+case: the D5 fact was already fully inlined in prose (both paragraphs
+already explain the tsk-40m retirement in plain English); the bare `D5`
+citation was redundant on top of that inlining, not load-bearing. Fix:
+drop the literal `D5` token, keep the item id `tsk-40m` (not itself a
+bare `D<digits>` token, so it doesn't trip the regex) as plain
+attribution. Re-ran `node scripts/check-decision-citation-drift.mjs
+--skills-dir .agents/skills --skills-dir plugins/fgOS/skills` directly
+after the fix (commit `ca107ac3`): `no new findings (225 baselined)`.
+Also updated the item's own `verify` field (`grep -q 'tsk-40m D5'` →
+`grep -q 'tsk-40m'`, plus an added `! rg ... '\b(ADR|RUL|D)[0-9]{1,4}\b'`
+regression guard on the four real mirror files) so this exact class of
+break re-triggers verify red if it recurs, rather than only surfacing at
+`fgos return`'s own full-suite run.
+
+**Still open:** none.
