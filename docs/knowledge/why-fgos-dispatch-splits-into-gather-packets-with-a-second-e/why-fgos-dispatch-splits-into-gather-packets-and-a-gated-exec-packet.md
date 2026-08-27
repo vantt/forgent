@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why fgOS dispatch splits into gather packets, with a second exec-packet shape kept gated
 
 `tsk-2t6` designed a second, lighter way to split work in fgOS. Until
