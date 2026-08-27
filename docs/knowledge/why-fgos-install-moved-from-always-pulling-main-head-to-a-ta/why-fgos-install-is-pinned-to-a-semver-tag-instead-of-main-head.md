@@ -4,6 +4,8 @@ title: Why fgOS install is pinned to a semver tag instead of main HEAD
 tags: [distribution, semver, release, install]
 source_capture_ids: [tsk-jtb, tsk-2t8]
 authoritative_for: why fgOS install moved from always pulling main HEAD to a tag-pinned semver release, and how tags get cut
+framework: diataxis
+mode: explanation
 ---
 # Why fgOS install is pinned to a semver tag instead of `main` HEAD
 
