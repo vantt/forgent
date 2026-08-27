@@ -4,6 +4,8 @@ title: How to write a doctor check that detects real shell-function breakage, no
 tags: []
 timestamp: 2026-08-10T11:39:00.000Z
 source_capture_ids: [tsk-2wpi]
+framework: diataxis
+mode: how-to
 ---
 # How to write a doctor check that detects real shell-function breakage, not just text presence
 
