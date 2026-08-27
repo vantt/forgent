@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # fgOS participant contract — what it takes to be a full participant in any language
 
 Hand-authored reference, verified 2026-08-09 by reading the real source
