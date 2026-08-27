@@ -4,6 +4,8 @@ title: Why the merge target-ref slot disabled lock self-recognition
 tags: [merge, lock, self-recognition, concurrency, session-identity]
 source_capture_ids: [tsk-1wr, tsk-70l, tsk-25r, tsk-18k]
 authoritative_for: why withMergeTargetSlot passes allowSelfRecognition false while main-checkout.lock keeps self-recognition enabled
+framework: diataxis
+mode: explanation
 ---
 # Why the merge target-ref slot disabled lock self-recognition
 
