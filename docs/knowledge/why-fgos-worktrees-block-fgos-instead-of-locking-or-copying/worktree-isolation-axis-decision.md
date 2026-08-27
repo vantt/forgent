@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why fgOS worktrees block `.fgos/` instead of locking or copying it
 
 `worktree-in-out` was the rollup tracking eight items that all traced back
