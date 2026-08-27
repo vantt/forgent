@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why work-item titles get a 100-character ceiling at the store layer
 
 ## The complaint, and what the data actually showed
