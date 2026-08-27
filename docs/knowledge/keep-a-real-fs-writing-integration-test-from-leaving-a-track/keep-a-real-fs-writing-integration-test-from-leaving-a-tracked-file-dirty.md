@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Keep a real-fs-writing integration test from leaving a tracked file dirty
 
 A recipe for the case where an integration test deliberately exercises a
