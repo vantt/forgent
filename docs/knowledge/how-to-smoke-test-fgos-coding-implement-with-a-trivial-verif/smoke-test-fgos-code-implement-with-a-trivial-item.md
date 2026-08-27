@@ -4,6 +4,8 @@ title: How to smoke-test fgos-coding-implement with a trivial verify=true item
 tags: []
 timestamp: 2026-07-29T00:00:00.000Z
 source_capture_ids: [str89-case-study-executing]
+framework: diataxis
+mode: how-to
 ---
 # How to smoke-test fgos-coding-implement with a trivial verify=true item
 
