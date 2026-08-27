@@ -4,6 +4,8 @@ title: Why a leaf claim can now be refused, and why status:done already proves t
 tags: [claim, pick, leaf, worktree, baseRef, deps]
 timestamp: 2026-07-29T10:43:51.000Z
 source_capture_ids: [tsk-3t4]
+framework: diataxis
+mode: explanation
 ---
 # Why a leaf claim can now be refused, and why status:done already proves the merge happened
 
