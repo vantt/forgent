@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Fix a pre-existing item that keeps re-asking an already-answered clarify question
 
 `fgos-coding-exploring`'s trust-skip mechanism (see
