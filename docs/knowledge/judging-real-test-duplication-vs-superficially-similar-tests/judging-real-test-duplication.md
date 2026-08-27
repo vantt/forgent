@@ -4,6 +4,8 @@ title: Judging real test duplication vs. superficially-similar tests
 tags: []
 timestamp: 2026-07-29T02:54:18.000Z
 source_capture_ids: [tsk-3wr-2]
+framework: diataxis
+mode: explanation
 ---
 # Judging real test duplication vs. superficially-similar tests
 
