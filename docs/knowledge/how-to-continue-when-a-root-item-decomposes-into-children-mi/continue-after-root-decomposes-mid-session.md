@@ -4,6 +4,8 @@ title: How to continue when a root item decomposes into children mid-session
 tags: []
 timestamp: 2026-07-28T00:00:00.000Z
 source_capture_ids: [tsk-424]
+framework: diataxis
+mode: how-to
 ---
 
 # How to continue when a root item decomposes into children mid-session
