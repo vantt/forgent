@@ -4,6 +4,8 @@ title: backlog status schema
 tags: [status-fsm, backlog, work-item, schema]
 source_capture_ids: [tsk-5vs, tsk-4rdi, tsk-1av, tsk-584]
 authoritative_for: the schema shape of the backlog work-item status — STATUSES, TRANSITIONS, and statusLabels wiring
+framework: diataxis
+mode: reference
 ---
 # `backlog` status schema
 
