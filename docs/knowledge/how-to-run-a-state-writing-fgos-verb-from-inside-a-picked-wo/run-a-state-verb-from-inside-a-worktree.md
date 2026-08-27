@@ -4,6 +4,8 @@ title: How to run a state-writing `fgos` verb from inside a picked worktree
 tags: []
 timestamp: 2026-07-29T08:40:07.000Z
 source_capture_ids: [tsk-56t, tsk-1wn]
+framework: diataxis
+mode: how-to
 ---
 
 # How to run a state-writing `fgos` verb from inside a picked worktree
