@@ -4,6 +4,8 @@ title: Why the verify-fail-post-merge playbook retries through awaiting-approval
 tags: [merge-loop, status-fsm, playbook, prose-fix]
 source_capture_ids: [tsk-3q8, tsk-63jf]
 authoritative_for: why the verify-fail-post-merge playbook's retry step moves a blocked item to awaiting-approval rather than a non-existent proposed status
+framework: diataxis
+mode: explanation
 ---
 # Why the verify-fail-post-merge playbook retries through `awaiting-approval`, not `proposed`
 
