@@ -3,6 +3,8 @@ type: explanation
 title: Why intake classification moved to after clarify, and back to the owning domain
 tags: []
 source_capture_ids: [tsk-5wz]
+framework: diataxis
+mode: explanation
 ---
 # Why intake classification moved to after clarify, and back to the owning domain
 
