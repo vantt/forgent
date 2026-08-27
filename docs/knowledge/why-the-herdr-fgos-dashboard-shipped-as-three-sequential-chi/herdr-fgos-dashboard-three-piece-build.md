@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why the herdr fgOS dashboard shipped as three sequential children, and what surfaced along the way
 
 `tsk-19y` — a herdr plugin cockpit for fgOS — was split (D6, mid-planning
