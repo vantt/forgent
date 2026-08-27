@@ -3,6 +3,8 @@ type: explanation
 title: Why `state.json` became an incrementally-read snapshot
 tags: [state, replay, store, performance, events-jsonl]
 source_capture_ids: [tsk-49e]
+framework: diataxis
+mode: explanation
 ---
 
 # Why `state.json` became an incrementally-read snapshot
