@@ -4,6 +4,8 @@ title: Why the install-packaging e2e test checks for leaked paths, not a byte-id
 tags: [testing, e2e, install-packaging, concurrency, flake]
 source_capture_ids: [tsk-1u77]
 authoritative_for: why the install-packaging e2e test replaced a byte-identical before/after .fgos snapshot diff with a leaked-path scan
+framework: diataxis
+mode: explanation
 ---
 # Why the install-packaging e2e test checks for leaked paths, not a byte-identical `.fgos` snapshot
 
