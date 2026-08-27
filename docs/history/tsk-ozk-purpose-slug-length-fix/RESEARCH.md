@@ -131,3 +131,73 @@ process.stdin.on("end", () => {
   process.exit(over.length > 0 ? 1 : 0);
 });'
 ```
+
+## Round 2 — post-implementation gap discovered (2026-08-27)
+
+**Asked:** after the `out-of-process` dispatched worker (provider `agy`,
+model `gemini-3.6-flash-medium`) reported `[DONE]` with "Verified that 0
+active topics exceed 60 bytes" and "Recorded the superseding decision",
+does the CANONICAL main-checkout store (`/home/vantt/projects/forgentX/
+.fgos`) actually reflect either change?
+
+**Checked:** `fgos list --all --json --dir "/home/vantt/projects/forgentX"`
+→ `data.topics` still showed **247** active topics over 60 bytes (same
+count as before dispatch), and `fgos show tsk-ozk --json`'s `decisions`
+array had no `supersedes:D-tsk28x-5` entry. Grepped
+`/home/vantt/projects/forgentX/.fgos/events.jsonl` and every shard under
+`/home/vantt/projects/forgentX/.fgos/events/*.jsonl` for `topic.rename` —
+zero hits anywhere in the canonical store.
+
+**Finding — the out-of-process worker's registry-state writes landed in a
+disconnected, worktree-local `.fgos/` copy, not the canonical store.**
+This item's own worktree (`.claude/worktrees/tsk-ozk-3JZPls`) was found to
+carry a FULLY POPULATED local `.fgos/` (real `events.jsonl`, a per-writer
+shard `events/460fde17-...-20260827T070034256Z.jsonl` containing the
+worker's own 247 `topic.rename` events, `config.json`, etc.) — a distinct
+inode from the main checkout's `.fgos` (confirmed via `stat -c '%i'` on
+both paths), not a symlink. The worker's own helper script
+(`apply-topic-renames.mjs`) resolved its store with a bare
+`path.resolve('.fgos')` relative to whatever cwd the `agy` cli-spawn
+provider actually used — that resolved to a real, populated `.fgos`
+(the rename calls succeeded, not "topic not found," meaning the 332
+original `topic.register` events WERE present there), but it was not the
+one the rest of fgOS reads from. The worker's own git-tracked deliverables
+(source diff in `scripts/knowledge-migration.mjs`/
+`scripts/knowledge-classifier.mjs`/docs/tests, plus
+`iron-law-evidence.md`'s real red/green transcript) landed correctly on
+the shared branch `fgw/tsk-ozk` — only the EVENT-LOG state mutations
+(`topic.rename` × 247, the `fgos decision` call) diverged. This is a real
+gap in the out-of-process dispatch mechanism's worktree/`.fgos` isolation
+for THIS provider (`agy`/cli-spawn), not a flaw in the worker's own
+reasoning or in `apply-topic-renames.mjs`'s algorithm — filed for
+awareness via `SendFeedback`, not fixed here (out of this item's own
+scope).
+
+**Recovery applied:** re-ran the exact same deterministic
+`apply-topic-renames.mjs` algorithm (same inputs → same outputs, so the
+computed mapping is identical) directly against the canonical store, this
+time via 247 real `fgos topic rename <topicId> --new-purpose-slug
+<computed> --dir /home/vantt/projects/forgentX` CLI calls (the sanctioned
+one-door-write, not a raw event-log write) — see
+`apply-real-renames.mjs` invocation in this session's own transcript
+(script itself lives only in the scratchpad, not committed — the
+COMMITTED `apply-topic-renames.mjs` already documents the identical
+algorithm). Re-ran `fgos decision --id tsk-ozk ... --relation
+supersedes:D-tsk28x-5` for real against the canonical store (`seq: 268`).
+Re-verified: `fgos list --all --json --dir /home/vantt/projects/forgentX`
+→ 0 active topics over 60 bytes; `fgos show tsk-ozk`'s decisions array now
+carries the real supersession entry.
+
+**Also found and fixed: the item's own `verify` command was itself
+fragile.** It used `$(git rev-parse --show-toplevel)` (resolves to
+whichever worktree it runs FROM, not reliably the main checkout) piped
+through a bare `fgos` word (only resolves via this interactive session's
+own shell-function alias — `fgos return`'s own spawned verify subprocess
+does not have that alias loaded, so `fgos` there hit a stale global
+install with an older schema missing `data.topics` entirely, producing a
+`TypeError: Cannot convert undefined or null to object` on the first
+`fgos return` retry). Fixed by rewriting `verify` to an absolute,
+alias-free, substitution-free form: `node
+/home/vantt/projects/forgentX/bin/fgos.mjs list --all --json --dir
+/home/vantt/projects/forgentX | node -e '...'` — synced via `fgos edit
+tsk-ozk --verify "..."`.
