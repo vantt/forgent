@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `.fgos/main-checkout.lock` could report AMBIGUOUS with no real contention
 
 `tryAcquireOnce()` (`src/runner/main-checkout-lock.mjs`) used to create a
