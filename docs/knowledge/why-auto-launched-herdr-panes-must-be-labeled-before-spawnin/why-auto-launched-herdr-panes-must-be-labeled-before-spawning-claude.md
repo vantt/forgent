@@ -3,6 +3,8 @@ type: explanation
 title: Why auto-launched herdr panes must be labeled before spawning claude, unlike person-triggered ones
 tags: []
 source_capture_ids: [tsk-2ja, tsk-57q]
+framework: diataxis
+mode: explanation
 ---
 # Why auto-launched herdr panes must be labeled before spawning `claude`, unlike person-triggered ones
 
