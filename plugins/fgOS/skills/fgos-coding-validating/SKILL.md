@@ -189,16 +189,13 @@ item's stage (now `executing`) and points at the right place. A NOT READY
 verdict hands the item back to `fgos-coding-planning` instead, with the
 matrix attached, never onward, and never fires the `fgos plan` call.
 
-**The `fgos plan` call also releases the item's claim back to `todo`**
-the moment the item reaches `executing` — this is expected and correct,
-but any path that continues from here WITHOUT going back through the
-`fgos-coding-driving` loop (which re-checks claim status fresh right
-before invoking the `executing`-stage skill) is not automatically safe:
-the claim may already be released, so a session driving stage-by-stage by
-hand must re-read the item's live status itself and re-claim before
-calling `fgos-coding-implement` directly. Skipping this re-check risks
-implementing against an item that no longer holds its claim, and `fgos
-return` will simply refuse later with "is todo, not doing".
+**A runtime claim now stays active unbroken through `clarify → executing` (tsk-40m)** —
+`releaseClaimOnExecuting` was retired, so the `fgos plan` call no longer
+releases the claim back to `todo` upon reaching `executing`. Any path
+that continues from here WITHOUT going back through the
+`fgos-coding-driving` loop is still advised to confirm live claim status
+before proceeding to `fgos-coding-implement` directly, ensuring the item
+holds a live `doing` claim so `fgos return` does not refuse later.
 
 ## Red flags
 
