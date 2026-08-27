@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # forgentX repo's tool-registry configuration
 
 Lookup facts about the `fgos tool` registry's real, live configuration in
