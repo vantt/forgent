@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # Work-item `priority`: calculated formula, and `intent`'s retirement
 
 `tsk-4y5` changed `priority` from an explicit-only input (STR7) to a
