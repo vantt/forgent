@@ -3,6 +3,8 @@ type: explanation
 title: Why ppidOf bounds its ps call with a 200ms timeout
 tags: [state, session-identity, events-lock, concurrency]
 source_capture_ids: [tsk-13m]
+framework: diataxis
+mode: explanation
 ---
 # Why `ppidOf` bounds its `ps` call with a 200ms timeout
 
