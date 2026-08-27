@@ -1,6 +1,8 @@
 ---
 type: explanation
 source_capture_ids: [tsk-4vo]
+framework: diataxis
+mode: explanation
 ---
 
 # Why herdr's dashboard lists became real tables, and why "in process" widened
