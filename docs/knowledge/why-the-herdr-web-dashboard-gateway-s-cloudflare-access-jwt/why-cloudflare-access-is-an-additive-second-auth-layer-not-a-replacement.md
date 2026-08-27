@@ -1,5 +1,7 @@
 ---
 authoritative_for: why the herdr web dashboard gateway's Cloudflare Access JWT support is an additive second credential layer on top of the existing Bearer token, never a replacement for it, and why every auth failure returns an identical blind 404
+framework: diataxis
+mode: explanation
 ---
 
 # Why Cloudflare Access is an additive second auth layer, not a replacement
