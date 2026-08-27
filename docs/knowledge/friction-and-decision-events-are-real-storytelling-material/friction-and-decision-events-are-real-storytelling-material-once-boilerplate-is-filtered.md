@@ -3,6 +3,8 @@ type: explanation
 title: Friction and decision events are real storytelling material, once boilerplate is filtered
 tags: []
 source_capture_ids: [tsk-1hy]
+framework: diataxis
+mode: explanation
 ---
 # Friction and decision events are real storytelling material, once boilerplate is filtered
 
