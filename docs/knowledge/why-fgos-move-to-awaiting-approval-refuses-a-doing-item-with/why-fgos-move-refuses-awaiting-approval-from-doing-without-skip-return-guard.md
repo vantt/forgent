@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `fgos move --to awaiting-approval` refuses a `doing` item without `--skip-return-guard`
 
 `fgos return` is the one verb built to prove real progress before an item
