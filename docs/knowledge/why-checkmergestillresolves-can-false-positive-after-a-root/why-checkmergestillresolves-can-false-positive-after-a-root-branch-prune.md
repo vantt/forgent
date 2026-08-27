@@ -2,6 +2,8 @@
 type: explanation
 title: Why `checkMergeStillResolves` can false-positive after a root branch prune
 source_capture_ids: [tsk-psb, tsk-2q8, tsk-597z, tsk-4bh]
+framework: diataxis
+mode: explanation
 ---
 # Why `checkMergeStillResolves` can false-positive after a root branch prune
 
