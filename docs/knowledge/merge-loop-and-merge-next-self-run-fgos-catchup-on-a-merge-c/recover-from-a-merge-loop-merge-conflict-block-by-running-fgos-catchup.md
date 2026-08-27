@@ -4,6 +4,8 @@ title: How to recover from a merge-loop merge-conflict block by running fgos cat
 tags: [merge-loop, merge-next, catchup, merge-conflict]
 source_capture_ids: [tsk-60h]
 authoritative_for: merge-loop and merge-next self-run fgos catchup on a merge-conflict block reason instead of parking to ask a person
+framework: diataxis
+mode: how-to
 ---
 # How to recover from a merge-loop `merge-conflict` block by running `fgos catchup`
 
