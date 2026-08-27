@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why "register a finished item into the merge list" needs no new code
 
 A natural first instinct, when asked to make a finished worktree item
