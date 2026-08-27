@@ -4,6 +4,8 @@ title: fgOS Gateway API (CTR010)
 tags: [gateway, openapi, contract, interface-daemon]
 source_capture_ids: [tsk-7l9-1, tsk-7l9-2, tsk-7l9-3]
 authoritative_for: the fgOS gateway HTTP+JSON API contract — CTR010, its scope, and where the spec lives
+framework: diataxis
+mode: reference
 ---
 # fgOS Gateway API (CTR010)
 
