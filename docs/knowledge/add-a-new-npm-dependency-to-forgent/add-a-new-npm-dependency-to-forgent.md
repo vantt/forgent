@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Add a new npm dependency to forgent
 
 A recipe grounded in `tsk-slq`, which added `yaml` as forgent's first-ever
