@@ -3,6 +3,8 @@ type: explanation
 title: Why mergeTree groups by parent and sorts recursively by blocks
 tags: []
 source_capture_ids: [tsk-2x9k, tsk-59b]
+framework: diataxis
+mode: explanation
 ---
 # Why `mergeTree` groups by parent and sorts recursively by `blocks`
 
