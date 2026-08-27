@@ -189,7 +189,7 @@ item's stage (now `executing`) and points at the right place. A NOT READY
 verdict hands the item back to `fgos-coding-planning` instead, with the
 matrix attached, never onward, and never fires the `fgos plan` call.
 
-**A runtime claim now stays active unbroken through `clarify → executing` (tsk-40m D5)** —
+**A runtime claim now stays active unbroken through `clarify → executing` (tsk-40m)** —
 `releaseClaimOnExecuting` was retired, so the `fgos plan` call no longer
 releases the claim back to `todo` upon reaching `executing`. Any path
 that continues from here WITHOUT going back through the

@@ -16,7 +16,7 @@ If this session did not arrive here via the `fgos-coding-driving` loop
 skill) — for example, a session driving stage-by-stage by hand, straight
 from `fgos-coding-validating`'s own `fgos plan` call — re-check the
 item's live `status` (`fgos list --id <id> --json`) before doing
-anything else. Under tsk-40m D5, a runtime claim stays active unbroken
+anything else. Per tsk-40m, a runtime claim stays active unbroken
 through `clarify → executing` (the former `releaseClaimOnExecuting` behavior
 was retired, so the `planning`→`executing` edge no longer releases claims
 back to `todo`). However, if `status` still reads `todo` for any reason,
