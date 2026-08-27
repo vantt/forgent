@@ -4,6 +4,8 @@ title: Why createDetachedMergeWorktree crashed for roots a live session dispatch
 tags: [merge, worktree, branch-creation, session-driven-dispatch]
 source_capture_ids: [tsk-6ch, tsk-5zg]
 authoritative_for: why a session-driven root's fgw/<rootId> branch may not exist yet at merge time, and every call site that needed its own fallback for it
+framework: diataxis
+mode: explanation
 ---
 # Why `createDetachedMergeWorktree` crashed for roots a live session dispatched
 
