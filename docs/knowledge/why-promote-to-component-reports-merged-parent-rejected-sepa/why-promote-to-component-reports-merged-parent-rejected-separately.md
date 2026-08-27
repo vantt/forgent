@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `promote-to-component` reports `merged-parent-rejected` separately
 
 `promote-to-component`'s locked design (per the item's own framing,
