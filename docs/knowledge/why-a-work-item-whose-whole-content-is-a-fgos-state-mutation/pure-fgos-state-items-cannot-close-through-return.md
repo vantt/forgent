@@ -1,6 +1,8 @@
 ---
 type: explanation
 source_capture_ids: [tsk-4zg]
+framework: diataxis
+mode: explanation
 ---
 
 # Why a work item whose whole content is a `.fgos/` state mutation can't close through `fgos return`/`approve`
