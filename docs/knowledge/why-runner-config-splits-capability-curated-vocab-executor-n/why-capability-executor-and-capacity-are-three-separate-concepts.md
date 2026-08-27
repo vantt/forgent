@@ -1,5 +1,7 @@
 ---
 authoritative_for: why runner config splits capability (curated vocab), executor (named registry of how a capability is fulfilled), and capacity (the for-purpose lookup binding) into three distinct concepts instead of the two overlapping ones (tool-registry's free-text capability, dispatch.mjs's closed-enum purpose) that existed before
+framework: diataxis
+mode: explanation
 ---
 
 # Why capability, executor, and capacity are three separate concepts
