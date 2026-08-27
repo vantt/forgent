@@ -4,6 +4,8 @@ title: Why plugin-only installs could not reach fgOS's coding-domain dev-skills
 tags: [distribution, plugin, skills, mirror, packaging]
 source_capture_ids: [tsk-32b]
 authoritative_for: why a repo that only installs fgOS as a Claude Code plugin got Unknown skill errors, and why the fix is a third enforced mirror rather than a runtime fallback
+framework: diataxis
+mode: explanation
 ---
 # Why plugin-only installs could not reach fgOS's coding-domain dev-skills
 
