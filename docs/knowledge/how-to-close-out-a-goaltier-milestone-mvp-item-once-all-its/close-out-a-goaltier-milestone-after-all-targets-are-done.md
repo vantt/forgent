@@ -4,6 +4,8 @@ title: How to close out a goalTier milestone/MVP item once all its targets are d
 tags: []
 timestamp: 2026-08-01T10:31:22.000Z
 source_capture_ids: [tsk-u9k]
+framework: diataxis
+mode: how-to
 ---
 # How to close out a goalTier milestone/MVP item once all its targets are done
 
