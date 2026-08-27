@@ -4,6 +4,8 @@ title: How to diagnose an `fgos approve` blocked by `verify-fail-post-merge`
 tags: []
 timestamp: 2026-07-29T15:01:43.000Z
 source_capture_ids: [tsk-2z3]
+framework: diataxis
+mode: how-to
 ---
 # How to diagnose an `fgos approve` blocked by `verify-fail-post-merge`
 
