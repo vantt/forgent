@@ -4,6 +4,8 @@ title: Why the retrospective content gate checked the wrong fields
 tags: [retrospective, cleanup-gate, engine-decision, kind]
 source_capture_ids: [tsk-558, tsk-4kw, tsk-5dn]
 authoritative_for: why checkRetrospectiveContent's cleanup-to-done gate reads outcome/decision fields the way it does, and which engine-written decisions it must exclude
+framework: diataxis
+mode: explanation
 ---
 # Why the retrospective content gate checked the wrong fields
 
