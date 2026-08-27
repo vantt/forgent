@@ -4,6 +4,8 @@ title: Worktree/merge lifecycle audit findings (2026-08-14)
 tags: [audit, worktree, merge, lifecycle, code-review]
 source_capture_ids: [tsk-25r, tsk-18k, tsk-1mn, tsk-2iz, tsk-ikd, tsk-4bh, tsk-2jn, tsk-4yv, tsk-386, tsk-f8f]
 authoritative_for: the 9 findings from the 2026-08-14 fable code-review audit of fgOS's worktree claim/merge/cleanup lifecycle, and which work item tracks each
+framework: diataxis
+mode: reference
 ---
 # Worktree/merge lifecycle audit findings (2026-08-14)
 
