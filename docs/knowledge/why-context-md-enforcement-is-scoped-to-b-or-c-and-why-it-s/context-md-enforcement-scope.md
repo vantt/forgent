@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why CONTEXT.md enforcement is scoped to (b) OR (c), and why it's hard
 
 `CONTEXT.md` is fgOS's one structured record of *why* a decision landed
