@@ -4,6 +4,8 @@ title: fgOS's layered architecture is a live, tested invariant — not a diagram
 tags: [architecture, layering, module-boundaries]
 timestamp: 2026-07-22T00:00:00.000Z
 source_capture_ids: [tsk-1kh]
+framework: diataxis
+mode: explanation
 ---
 
 # fgOS's layered architecture is a live, tested invariant — not a diagram
