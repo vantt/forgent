@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `approve` blocks closing a milestone with drifted targets
 
 This closes the loop back to the real incident that started the whole
