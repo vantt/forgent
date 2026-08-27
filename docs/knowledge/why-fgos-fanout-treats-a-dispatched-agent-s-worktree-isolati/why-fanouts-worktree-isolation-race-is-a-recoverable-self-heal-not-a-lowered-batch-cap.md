@@ -4,6 +4,8 @@ title: Why fanout's worktree isolation race is a recoverable self-heal, not a lo
 tags: [fgos-fanout, worktree, isolation, concurrency, harness]
 source_capture_ids: [tsk-2k0, tsk-8v1]
 authoritative_for: why fgos-fanout treats a dispatched Agent's worktree-isolation refusal as a recoverable race instead of lowering its batch cap or serializing dispatch
+framework: diataxis
+mode: explanation
 ---
 # Why fanout's worktree isolation race is a recoverable self-heal, not a lowered batch cap
 
