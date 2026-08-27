@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `work.acceptance` gets a narrow write-time evidence-traceability check
 
 ## The failure this backstops
