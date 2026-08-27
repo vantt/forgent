@@ -4,6 +4,8 @@ title: How to verify herdr cockpit reuses its existing tab instead of overwritin
 tags: []
 timestamp: 2026-07-31T01:23:28.338Z
 source_capture_ids: [tsk-3i3]
+framework: diataxis
+mode: how-to
 ---
 # How to verify herdr cockpit reuses its existing tab instead of overwriting yours
 
