@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `mergeSets` groups conflicts instead of dropping them from `ready`
 
 `mergeReadiness` used to silently drop a conflicting pair from `ready`
