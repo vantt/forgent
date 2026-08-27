@@ -1,5 +1,7 @@
 ---
 title: Why plugin skills need a CLI path fallback
+framework: diataxis
+mode: explanation
 ---
 
 # Why plugin skills need a CLI path fallback
