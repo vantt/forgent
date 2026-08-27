@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `keywordRiskGate` now skips the heavy-risk ask when a verdict cites a locked decision
 
 `tsk-wve` narrowed `resolveDecompose`'s heavy-risk floor
