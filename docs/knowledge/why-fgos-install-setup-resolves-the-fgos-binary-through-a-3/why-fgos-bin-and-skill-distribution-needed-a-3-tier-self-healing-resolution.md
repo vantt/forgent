@@ -4,6 +4,8 @@ title: Why fgOS bin and skill distribution needed a 3-tier self-healing resoluti
 tags: [distribution, install, setup, doctor, skill-materialization, external-project]
 source_capture_ids: [tsk-2qc, tsk-2qc-1, tsk-1qi, tsk-424n]
 authoritative_for: why fgOS install/setup resolves the fgos binary through a 3-tier cached scheme, and why skill materialization no longer depends on the claude CLI or plugin marketplace
+framework: diataxis
+mode: explanation
 ---
 # Why fgOS bin and skill distribution needed a 3-tier self-healing resolution
 
