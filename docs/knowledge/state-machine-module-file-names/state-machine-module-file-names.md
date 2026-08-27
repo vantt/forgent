@@ -4,6 +4,8 @@ title: State-machine module file names (fsm.mjs/stage.mjs rename)
 tags: [state, fsm, naming]
 timestamp: 2026-08-06T09:51:30.000Z
 source_capture_ids: [tsk-3id]
+framework: diataxis
+mode: reference
 ---
 
 # State-machine module file names
