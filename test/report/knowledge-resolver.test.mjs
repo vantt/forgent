@@ -180,11 +180,12 @@ test('resolveDocPath - supersededBy resolves to the EXACT successor even when it
   assert.equal(resolved.docId, 'd2');
 });
 
-test('resolveDocPath - falls back to the lineage/role chase when supersededBy points at a doc that is itself no longer live', () => {
+test('resolveDocPath - walks a supersededBy chain (d1 -> d2 -> d3) to its live end, not just one hop', () => {
   // d1 -> d2 -> d3, a chain of supersessions. d2 is no longer live (it was
-  // superseded again by d3), so following d1's pointer to d2 must not
-  // stop there -- the lineage/role fallback (same topic, same role) is
-  // what correctly finds d3.
+  // superseded again by d3) -- following d1's pointer to d2 and stopping
+  // there (one hop) would find nothing live and fall back to the lineage/
+  // role guess. The chain walk instead keeps following d2's own
+  // supersededBy to reach d3 directly.
   const view = {
     topics: { t1: { topicId: 't1', status: 'active' } },
     docs: {
@@ -194,5 +195,47 @@ test('resolveDocPath - falls back to the lineage/role chase when supersededBy po
     }
   };
 
+  assert.equal(resolveDocPath(view, 'docs/t1/guide-v1.md').docId, 'd3');
+});
+
+test('resolveDocPath - a supersededBy chain resolves to the exact terminal successor even when its role differs and an unrelated live doc shares the topic', () => {
+  // Same chain shape (d1 -> d2 -> d3), but this time d3's role differs
+  // from d1/d2's, and an unrelated live doc (d4) shares the topic. A
+  // one-hop-only pointer follow would give up at d2 (not live) and fall
+  // back to the lineage/role guess, which -- with no exact-role match
+  // for d1's own role in the topic -- would ambiguously add every live
+  // doc in the topic (d3 AND d4). The chain walk must still land on
+  // exactly d3.
+  const view = {
+    topics: { t1: { topicId: 't1', status: 'active' } },
+    docs: {
+      d1: { docId: 'd1', topicId: 't1', role: 'pitfall', currentPath: 'docs/t1/pitfall-v1.md', docLifecycle: 'superseded', aliases: [], supersededBy: 'd2' },
+      d2: { docId: 'd2', topicId: 't1', role: 'pitfall', currentPath: 'docs/t1/pitfall-v2.md', docLifecycle: 'superseded', aliases: [], supersededBy: 'd3' },
+      d3: { docId: 'd3', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active', aliases: [] },
+      d4: { docId: 'd4', topicId: 't1', role: 'reference', currentPath: 'docs/t1/reference.md', docLifecycle: 'active', aliases: [] }
+    }
+  };
+
+  const resolved = resolveDocPath(view, 'docs/t1/pitfall-v1.md');
+  assert.equal(Array.isArray(resolved), false, `expected the exact terminal successor, got an ambiguous array: ${JSON.stringify(resolved)}`);
+  assert.equal(resolved.docId, 'd3');
+});
+
+test('resolveDocPath - a supersededBy chain with a cycle does not crash, and falls back to lineage/role', () => {
+  // d1 -> d2 -> d1 (a corrupt/pre-guard lineage, same defensive posture as
+  // the topic-lineage cycle test above) -- the chain walk's own visited
+  // set must break the recursion instead of a RangeError, and since
+  // neither d1 nor d2 is live, this falls through to the lineage/role
+  // fallback, which finds the unrelated live d3 in the same topic.
+  const view = {
+    topics: { t1: { topicId: 't1', status: 'active' } },
+    docs: {
+      d1: { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide-v1.md', docLifecycle: 'superseded', aliases: [], supersededBy: 'd2' },
+      d2: { docId: 'd2', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide-v2.md', docLifecycle: 'superseded', aliases: [], supersededBy: 'd1' },
+      d3: { docId: 'd3', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide-v3.md', docLifecycle: 'active', aliases: [] }
+    }
+  };
+
+  assert.doesNotThrow(() => resolveDocPath(view, 'docs/t1/guide-v1.md'));
   assert.equal(resolveDocPath(view, 'docs/t1/guide-v1.md').docId, 'd3');
 });

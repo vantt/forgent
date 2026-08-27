@@ -674,6 +674,34 @@ test('doc.supersede validates supersededBy -- refuses missing, self, and dead-do
   }
 });
 
+test('doc.supersede refuses a supersededBy target whose doc lifecycle is live but whose OWN topic is retired', () => {
+  // src/report/knowledge-resolver.mjs's own "live" is doc-live AND
+  // topic-active -- a successor passing only the doc-lifecycle check
+  // would still never be resolvable by any reader, the same "write
+  // something no reader can use" shape assertTopicWritable already
+  // closes elsewhere in this reducer.
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+    registerTopicStore(tmpDir, { topicId: 't2', purposeSlug: 'topic-two' });
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+    registerDocStore(tmpDir, { docId: 'd2', topicId: 't2', role: 'guide', currentPath: 'docs/t2/guide.md', docLifecycle: 'active' });
+    retireTopicStore(tmpDir, { topicId: 't2' });
+    // d2 itself is still 'active' -- topic.retire never force-retires its
+    // own docs -- but its topic is now retired.
+
+    assert.throws(() => {
+      supersedeDocStore(tmpDir, { docId: 'd1', supersededBy: 'd2' });
+    }, /doc\.supersede: supersededBy doc 'd2' is under topic 't2', which is 'retired' \(not active\)/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'active', 'a refused supersede must not have mutated d1');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
 test('doc.mark-rendered fails closed on a doc that is not reserved, instead of a silent no-op', () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
   try {

@@ -69,22 +69,37 @@ export function resolveDocPath(view, path) {
 
   const currentTopics = Object.values(view.topics || {}).filter((t) => t.status === 'active');
 
+  // doc.supersede records an EXACT successor pointer -- when the registry
+  // already names which live doc replaced a dead one, that is strictly
+  // more precise than the lineage/role guess below (which can only infer
+  // a successor from topic lineage and role matching, and goes ambiguous
+  // the moment a same-topic successor has a different role than the
+  // superseded doc, or another unrelated live doc shares the topic). A
+  // chain of supersessions (d1 -> d2 -> d3, where d2 was itself later
+  // superseded) must be walked to its live end, not given up on after one
+  // hop -- stopping at the first dead link and falling back to lineage/
+  // role would reintroduce the exact same ambiguity this pointer exists
+  // to avoid, just one hop further down the chain. `visited` guards
+  // against a cycle the same way `leadsFrom` below does for topic
+  // lineage.
+  function resolveSupersededByChain(docId, visited = new Set()) {
+    if (visited.has(docId)) return null;
+    visited.add(docId);
+    const doc = view.docs[docId];
+    if (!doc) return null;
+    if (isLive(doc)) return doc;
+    if (!doc.supersededBy) return null;
+    return resolveSupersededByChain(doc.supersededBy, visited);
+  }
+
   for (const rDoc of matchingRetiredDocs) {
-    // doc.supersede records an EXACT successor pointer -- when the
-    // registry already names which live doc replaced this one, that is
-    // strictly more precise than the lineage/role guess below (which can
-    // only infer a successor from topic lineage and role matching, and
-    // goes ambiguous the moment a same-topic successor has a different
-    // role than the superseded doc, or another unrelated live doc shares
-    // the topic). Follow the pointer first; only fall back to the
-    // lineage/role chase when there is no pointer, it targets a doc that
-    // no longer exists, or that doc isn't live itself (e.g. a chain of
-    // supersessions where the immediate successor was later superseded
-    // again -- resolving that chain is exactly what the lineage/role
-    // fallback below already knows how to do).
+    // Only fall back to the lineage/role chase when the whole chain has
+    // no live terminal successor at all (no pointer anywhere in the
+    // chain, every pointer target missing, or every doc in the chain
+    // itself dead).
     if (rDoc.supersededBy) {
-      const successor = view.docs[rDoc.supersededBy];
-      if (successor && isLive(successor)) {
+      const successor = resolveSupersededByChain(rDoc.supersededBy);
+      if (successor) {
         targetDocs.add(successor);
         continue;
       }

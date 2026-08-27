@@ -691,9 +691,24 @@ export function applyKnowledgeEvent(view, event) {
         if (!successor) {
           throw new KnowledgeValidationError(`doc.supersede: supersededBy doc '${supersededBy}' not found`);
         }
-        if (successor.docLifecycle === 'retired' || successor.docLifecycle === 'superseded') {
+        if (!isLiveDocLifecycle(successor.docLifecycle)) {
           throw new KnowledgeValidationError(
             `doc.supersede: supersededBy doc '${supersededBy}' is '${successor.docLifecycle}' — must be a live doc, not another dead one`
+          );
+        }
+        // src/report/knowledge-resolver.mjs's own definition of "live" is
+        // doc-live AND topic-active -- a successor whose OWN topic is
+        // retired would pass the docLifecycle check above yet never be
+        // treated as a valid resolution target by any reader (the
+        // resolver's isLive, doctor's isLiveDocLifecycle-based checks).
+        // Writing a supersededBy pointer the read side can never honor is
+        // the same "registry accepts something no reader can use" shape
+        // this reducer's other guards (assertTopicWritable, the topic-
+        // active checks on topic.merge/split) already close elsewhere.
+        const successorTopic = view.topics[successor.topicId];
+        if (!successorTopic || successorTopic.status !== 'active') {
+          throw new KnowledgeValidationError(
+            `doc.supersede: supersededBy doc '${supersededBy}' is under topic '${successor.topicId}', which is '${successorTopic?.status ?? 'missing'}' (not active) — the successor's own topic must be active for any reader to ever resolve this pointer`
           );
         }
         doc.supersededBy = supersededBy;
