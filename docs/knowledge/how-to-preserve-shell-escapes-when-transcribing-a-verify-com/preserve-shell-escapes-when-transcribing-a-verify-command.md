@@ -4,6 +4,8 @@ title: How to preserve shell escapes when transcribing a verify command
 tags: []
 timestamp: 2026-08-13T00:00:00.000Z
 source_capture_ids: [tsk-12p, tsk-463]
+framework: diataxis
+mode: how-to
 ---
 
 # How to preserve shell escapes when transcribing a verify command
