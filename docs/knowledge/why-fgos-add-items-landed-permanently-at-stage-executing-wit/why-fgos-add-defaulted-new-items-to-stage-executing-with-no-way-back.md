@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `fgos add` items landed permanently at stage `executing`, with no path back
 
 `tsk-621` found that every item created via `fgos add` skipped
