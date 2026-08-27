@@ -4,6 +4,8 @@ title: How to find every caller before making a CLI flag required
 tags: []
 timestamp: 2026-07-29T13:44:00.000Z
 source_capture_ids: [tsk-63c]
+framework: diataxis
+mode: how-to
 ---
 # How to find every caller before making a CLI flag required
 
