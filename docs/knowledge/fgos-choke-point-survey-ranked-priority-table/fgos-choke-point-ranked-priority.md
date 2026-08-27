@@ -4,6 +4,8 @@ title: fgOS choke-point survey — ranked priority table
 tags: []
 timestamp: 2026-07-29T06:18:36.000Z
 source_capture_ids: [tsk-1ab-1, tsk-1ab-2]
+framework: diataxis
+mode: reference
 ---
 # fgOS choke-point survey — ranked priority table
 
