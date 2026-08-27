@@ -4,6 +4,8 @@ title: How to see done items in `fgos list` / `fgos triage`
 tags: []
 timestamp: 2026-07-29T00:00:00.000Z
 source_capture_ids: [tsk-5oa]
+framework: diataxis
+mode: how-to
 ---
 # How to see done items in `fgos list` / `fgos triage`
 
