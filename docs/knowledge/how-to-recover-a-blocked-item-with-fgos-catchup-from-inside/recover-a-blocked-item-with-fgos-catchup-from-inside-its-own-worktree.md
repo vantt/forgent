@@ -4,6 +4,8 @@ title: How to recover a `blocked` item with `fgos catchup` from inside its own w
 tags: [catchup, worktree, blocked, verify-fail-post-merge]
 timestamp: 2026-08-11T12:02:00.000Z
 source_capture_ids: [tsk-5vl]
+framework: diataxis
+mode: how-to
 ---
 
 # How to recover a `blocked` item with `fgos catchup` from inside its own worktree
