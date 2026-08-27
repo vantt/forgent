@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `resolvePlan`'s pass-through path now checks `planApproveVerify` before `executing`
 
 `resolvePlan` (`src/intake/plan.mjs`) computes `planApproveVerify =
