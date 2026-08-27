@@ -4,6 +4,8 @@ title: Why the judge-discovery and judge-decompose capacities were removed
 tags: [dispatch, judge, native-first-dispatch, cleanup]
 source_capture_ids: [tsk-4w4]
 authoritative_for: why the judge-discovery/judge-decompose capacity entries were deleted from .fgos/config.json
+framework: diataxis
+mode: explanation
 ---
 # Why the `judge-discovery` and `judge-decompose` capacities were removed
 
