@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `reclaimOrphanedCheckout` refuses a checkout the calling session is live inside
 
 `fgos approve`'s merge cleanup (`cleanupMergedBranch` ->
