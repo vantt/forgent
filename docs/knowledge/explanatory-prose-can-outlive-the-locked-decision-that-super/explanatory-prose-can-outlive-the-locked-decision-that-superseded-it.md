@@ -1,5 +1,7 @@
 ---
 title: Explanatory prose can outlive the locked decision that superseded it
+framework: diataxis
+mode: explanation
 ---
 
 # Explanatory prose can outlive the locked decision that superseded it
