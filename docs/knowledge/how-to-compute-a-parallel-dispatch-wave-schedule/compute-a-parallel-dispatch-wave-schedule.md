@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # How to compute a parallel dispatch wave schedule
 
 Use this when you need to know how many ready work items can be dispatched
