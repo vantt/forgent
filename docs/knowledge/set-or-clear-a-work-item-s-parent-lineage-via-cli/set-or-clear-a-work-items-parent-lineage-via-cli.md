@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Set or clear a work item's `parent` lineage via CLI
 
 `tsk-1xx` wired a `--parent` flag into `fgos add` and `fgos edit` — before
