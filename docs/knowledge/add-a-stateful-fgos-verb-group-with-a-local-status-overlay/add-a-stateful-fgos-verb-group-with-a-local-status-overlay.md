@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Add a stateful fgOS verb-group with a local status overlay
 
 A recipe for porting a mutating, multi-verb capability into fgOS — grounded
