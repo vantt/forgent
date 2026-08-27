@@ -4,6 +4,8 @@ title: How to recognize a Claude Code hook `ENOENT posix_spawn '/bin/sh'` failur
 tags: [claude-code, hooks]
 timestamp: 2026-08-06T05:52:00.000Z
 source_capture_ids: [tsk-2aa]
+framework: diataxis
+mode: how-to
 ---
 # How to recognize a Claude Code hook `ENOENT posix_spawn '/bin/sh'` failure
 
