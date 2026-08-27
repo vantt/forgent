@@ -3,6 +3,8 @@ type: explanation
 title: Why .fgos/events.jsonl can silently lose lines under concurrent session writes
 tags: []
 source_capture_ids: [tsk-2xt, tsk-1q5, tsk-3wq]
+framework: diataxis
+mode: explanation
 ---
 # Why `.fgos/events.jsonl` can silently lose lines under concurrent session writes
 
