@@ -4,6 +4,8 @@ title: Why the fgOS interface daemon is one process that only ever shells out to
 tags: [interface-daemon, gateway, orchestrator, herdr, mcp, distribution]
 source_capture_ids: [tsk-7l9]
 authoritative_for: why the fgOS interface daemon combines gateway and orchestrator into one process, why it never links the core lib in-process, and how its REST/RPC and future MCP surfaces are scoped
+framework: diataxis
+mode: explanation
 ---
 # Why the fgOS interface daemon is one process that only ever shells out to the CLI
 
