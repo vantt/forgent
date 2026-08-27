@@ -2,6 +2,8 @@
 type: explanation
 title: Why fgOS added `sync-root` and drift detection
 source_capture_ids: [tsk-2ec, tsk-66t]
+framework: diataxis
+mode: explanation
 ---
 # Why fgOS added `sync-root` and drift detection
 
