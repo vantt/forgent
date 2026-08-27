@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Scaffold and link a herdr plugin
 
 A recipe for standing up the first working slice of a herdr plugin
