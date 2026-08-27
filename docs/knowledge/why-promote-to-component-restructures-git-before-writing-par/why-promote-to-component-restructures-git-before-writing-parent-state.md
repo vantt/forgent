@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `promote-to-component` restructures git before writing parent state
 
 fgOS sometimes finds that N items filed as independent, flatly linked
