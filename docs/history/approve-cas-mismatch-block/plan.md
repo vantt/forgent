@@ -8,10 +8,15 @@ written:
 
 - `src/verbs/merge/approve.mjs` calls
   `moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval',
-  reason, role: 'system' })` at ~15 call sites (grep count) — every
+  reason, role: 'system' })` at exactly 18 call sites (confirmed by grep
+  sweep during validating: `grep -c "to: 'blocked', expectedStatus:
+  'awaiting-approval'" src/verbs/merge/approve.mjs` → 18) — every
   failure-to-block path the item's own description names (attestation
   refusal, catchup conflict/merge-refused/verify-fail, --github failure,
-  plus more further down the file), all unguarded.
+  plus more further down the file), all unguarded. Every one of the 18
+  follows the identical 3-step shape `moveWork(...); addFriction(...);
+  return {...};` (spot-checked at lines 371, 418, 512-651, 744, 787-840,
+  896 — every site fits this shape, no outlier found).
 - `src/state/status-fsm.mjs:257-259` — `transitionWork`'s CAS check throws
   `FsmError('conflict', 'transitionWork: expected status "<expected>" ...
   but found "<actual>" ...')` when the item's real status no longer
@@ -24,6 +29,12 @@ written:
   err.category === 'conflict'`) — this plan follows the `categoryOf`
   helper instead, per store.mjs's own doc comment ("read the property
   directly rather than an instanceof-chain").
+- `listWork(dir).work[id]` (`src/state/store.mjs:1903-1905`) is the
+  existing read shape for a fresh single-item status re-read, already used
+  the same way at `src/verbs/merge/reject.mjs:14`
+  (`listWork(dir).work[id]`) and `src/state/store.mjs:2015`
+  (`view.work[id].status`) — this plan's `actual` field reuses this exact
+  precedent, not a new read path.
 - `moveDeliveredOrRecordFault` (`approve.mjs:76-109`) is the file's own
   existing precedent for wrapping one `moveWork` call, catching one error
   class, and returning a structured non-throwing result instead of a raw
@@ -91,7 +102,7 @@ helper in `approve.mjs`. It wraps exactly the `moveWork(...to:
 **Files touched, in order:**
 1. `src/verbs/merge/approve.mjs` — add `categoryOf` to the existing
    `store.mjs` import; add `moveBlockedOrConflict` helper near
-   `moveDeliveredOrRecordFault`; replace each of the ~15
+   `moveDeliveredOrRecordFault`; replace each of the 18
    `moveWork(...to:'blocked', expectedStatus:'awaiting-approval'...)`
    call sites with a call to the helper + an `if (conflict) return
    conflict;` guard ahead of that site's own `addFriction`/`return`.
@@ -105,7 +116,7 @@ helper in `approve.mjs`. It wraps exactly the `moveWork(...to:
 |---|---|---|
 | Helper catches the RIGHT error class only (`conflict`, not `precondition`/`unexpected`) | standard | AC4 test: simulate the race, assert structured result, exit 0 (not exit 3/raw throw) |
 | Success paths (merge landed, `moveDeliveredOrRecordFault`) stay untouched | standard | Existing approve test suite (this file is shared; a broken success path would show as regressions across fgos-approve*.test.mjs) |
-| Every one of the ~15 call sites gets the same guard, none skipped | light — mechanical, but easy to miss one in a 927-line file | Full-file grep sweep (`grep -c "to: 'blocked', expectedStatus: 'awaiting-approval'"` before/after edit, same count on the helper-call form) as part of implementing, plus `npm test` regression on the whole approve suite |
+| Every one of the 18 call sites gets the same guard, none skipped | light — mechanical, but easy to miss one in a 927-line file | Full-file grep sweep (`grep -c "to: 'blocked', expectedStatus: 'awaiting-approval'"` before edit is 18; after edit that count must be 0 and the helper-call form's count must be 18) as part of implementing, plus `npm test` regression on the whole approve suite |
 | `actual` read reflects reality, not a stale in-memory copy | standard | AC5 test: simulate event-regression replay leaving a stale `actual`, assert the read is fresh |
 
 `impact-analysis: degraded` (see Discovery grounding above) — the proof
@@ -145,6 +156,69 @@ prove, matching this item's own AC4/AC5:
    passing unmodified, proving the helper's `null`-return / fall-through
    path is byte-identical to today's direct `moveWork` call on the
    non-conflict case.
+
+## Feasibility matrix (fgos-coding-validating)
+
+Reality gate (all six dimensions, each with a concrete citation):
+
+- **Mode fit** — PASS. `small` matches a single-file mechanical wrap
+  applied uniformly, no gray areas — neither `tiny` (18 call sites across
+  a 927-line file is more than "a couple of files, one direct task") nor
+  `standard`/`high-risk` (no auth/data-model/audit/external-system/
+  public-contract/cross-platform/multi-domain flag applies; the one flag
+  that does — existing covered behavior — is exactly what `small`'s "a few
+  files, no gray areas" already covers for a single already-tested file).
+- **Repo fit** — PASS. Every file/function/pattern this plan leans on was
+  read directly, not assumed: `approve.mjs`'s 18 call sites (grep-counted
+  above), `status-fsm.mjs:257-259`'s exact `FsmError('conflict', ...)`
+  shape, `store.mjs:88`'s `categoryOf`, `store.mjs:1903-1905`'s
+  `listWork`, and the `moveDeliveredOrRecordFault` precedent
+  (`approve.mjs:76-109`, 3 call sites: lines 688, 862, 914).
+- **Assumptions** — PASS, see feasibility matrix rows below (all three
+  medium-or-higher rows carry accepted evidence).
+- **Smaller path** — PASS. Wrapping only the 4 explicitly-named call sites
+  from the item's own description instead of all 18 was considered and
+  rejected: AC1 says "approve must catch CAS mismatch from failure-to-block
+  transitions" (unscoped to a named subset), and a partial fix would leave
+  the remaining 14 sites still raw-throwing on the exact same race —
+  defeating the item's own purpose. One shared helper applied uniformly is
+  the smaller path, not a larger one.
+- **Proof surface** — PASS. `verify` field synced to `node --test
+  test/cli/fgos-approve-2.test.mjs` (real, runnable, not a placeholder).
+- **Impact-analysis posture** — PASS (degraded, named plainly, not
+  silently dropped). Re-checked at validating time
+  (`fgos tool query --capability impact-analysis --status present`):
+  identical result to the planning-time check — gitnexus `present` but its
+  nearest indexed target is 2276 commits behind HEAD and its own `impact`
+  lookup for `approveUseCase`/`approve` returned "not found" against that
+  stale index; this item's worktree isn't indexed at all. Per the
+  Discovery-grounding section above, cross-checked via direct grep instead
+  (only `merge.mjs`/`bin/fgos.mjs` call `approveUseCase`).
+
+Feasibility matrix (rows for every risk-map item flagged `standard` or
+higher — the `light` mechanical-sweep row is below that threshold and
+carries its own proof plan already: a grep-count sweep plus full
+regression, both named in the risk map above):
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| The helper catches only `categoryOf(err) === 'conflict'`, letting every other error class (`precondition`, `unexpected`, `EventLogError`) propagate unchanged | standard | Confirm `transitionWork`'s only CAS-mismatch category is `'conflict'`, and that `moveWork` re-throws it verbatim rather than wrapping it | Read `status-fsm.mjs:247-259`: the precondition guards throw `FsmError('precondition', ...)`; the CAS check (line 257) throws `FsmError('conflict', ...)` — the only two categories reachable before the transition-table lookup. Read `store.mjs:675-690` (`moveWork`): calls `transitionWork` directly with no surrounding try/catch — nothing wraps or reclassifies its throw before it reaches `approve.mjs`. | PASS |
+| Success paths (`moveDeliveredOrRecordFault` and its 3 `to:'delivered'` call sites) are structurally untouched by this change | standard | Confirm the delivered-path helper and its call sites share no code with the 18 blocked-path sites this plan touches | Read `approve.mjs:76-109` (`moveDeliveredOrRecordFault`) and grepped its 3 call sites (688, 862, 914) plus the separate direct `to:'delivered'` call in the `--github` merged branch (line 363) — none call or are called by the new `moveBlockedOrConflict` helper; disjoint code paths. | PASS |
+| `listWork(dir).work[id].status`, read immediately after the caught conflict, reflects the item's real current status rather than stale in-memory data | standard | An existing precedent in this same module reads the store the same synchronous way, with no caching layer in front of it | `store.mjs:1903-1905`: `listWork(dir)` calls `currentEffectiveView(dir)` directly — rebuilds from the event log fresh, every call, no cache. Same read shape already used for a fresh single-item status check at `reject.mjs:14` and `store.mjs:2015`. | PASS |
+
+**Decide: READY.** Every reality-gate dimension passed with a concrete
+citation; every medium-or-higher risk-map row carries accepted evidence,
+no unproven row. Not `READY WITH CONSTRAINTS` — no accepted-but-caveated
+row exists; not `NOT READY` — no FAIL anywhere.
+
+**Gate Step 1 (tier A/B).** No trigger fired: T1 (competing options) does
+not apply — the Approach section above already compared and rejected the
+two real alternatives (outer-boundary catch, message-string parsing) with
+concrete reasons, nothing is still standing; T2 (CONTEXT.md conflict)
+does not apply — no CONTEXT.md exists for this item (discovery verdict
+was `clear`, skipping `exploring`); T3 (unwritable child spec) does not
+apply — this is a pass-through item, no children. Cost verdict:
+**REVERSIBLE**.
 
 ## Outstanding questions
 
