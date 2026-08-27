@@ -3,6 +3,8 @@ type: explanation
 title: FSM refusal messages now name a remedy, and wontfix gains an awaiting-human door
 tags: []
 source_capture_ids: [tsk-2ub]
+framework: diataxis
+mode: explanation
 ---
 # FSM refusal messages now name a remedy, and `wontfix` gains an `awaiting-human` door
 
