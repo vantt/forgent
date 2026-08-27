@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why the "stage-axis driving loop and status-axis pool-sweep stay separate" decision got superseded
 
 `docs/history/stage-status-driving-coordination/CONTEXT.md` (produced by
