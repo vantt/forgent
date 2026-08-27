@@ -4,6 +4,8 @@ title: How fgOS isolates concurrent sessions, and why the event log's write door
 tags: [multi-session, concurrency, worktree, crash-recovery]
 timestamp: 2026-07-22T00:00:00.000Z
 source_capture_ids: [tsk-1jp, tsk-3wn, tsk-597]
+framework: diataxis
+mode: explanation
 ---
 
 # How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off
