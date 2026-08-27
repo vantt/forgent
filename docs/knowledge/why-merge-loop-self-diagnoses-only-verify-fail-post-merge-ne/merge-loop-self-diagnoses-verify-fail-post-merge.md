@@ -4,6 +4,8 @@ title: Why merge-loop self-diagnoses only verify-fail-post-merge, never anything
 tags: []
 timestamp: 2026-07-30T00:23:34.715Z
 source_capture_ids: [tsk-3mv-2]
+framework: diataxis
+mode: explanation
 ---
 # Why merge-loop self-diagnoses only verify-fail-post-merge, never anything else, before counting a block
 
