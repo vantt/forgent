@@ -4,6 +4,8 @@ title: How to wire a headless function through an agent-executor executor
 tags: []
 timestamp: 2026-08-01T16:16:00.000Z
 source_capture_ids: [tsk-2yp]
+framework: diataxis
+mode: how-to
 ---
 
 # How to wire a headless function through an agent-executor executor
