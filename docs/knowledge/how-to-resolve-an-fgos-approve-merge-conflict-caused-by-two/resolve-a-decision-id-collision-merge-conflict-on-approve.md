@@ -4,6 +4,8 @@ title: How to resolve an `fgos approve` merge-conflict caused by two branches cl
 tags: []
 timestamp: 2026-07-29T15:26:46.000Z
 source_capture_ids: [tsk-66l]
+framework: diataxis
+mode: how-to
 ---
 # How to resolve an `fgos approve` merge-conflict caused by two branches claiming the same decision ID
 
