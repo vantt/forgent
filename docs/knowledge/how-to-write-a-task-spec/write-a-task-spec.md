@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # How to write a task-spec
 
 Task-specs live at `domains/<domain>/task-specs/<id>.md` for a
