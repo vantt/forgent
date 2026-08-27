@@ -4,6 +4,8 @@ title: Why dispatch.mjs was redesigned around task, not agent capacity
 tags: [dispatch, executor, capacity, task-dispatch-unification]
 source_capture_ids: [tsk-5tm-1, tsk-5tm-2, tsk-5tm-3, tsk-5tm-4, tsk-5tm-5, tsk-5tm-6, tsk-2y4, tsk-5tm, tsk-5er, tsk-1qn, tsk-2te]
 authoritative_for: why src/runner/dispatch.mjs's capacity/executor layer was redesigned around "task" as the unifying concept, and the 12 locked decisions behind that redesign
+framework: diataxis
+mode: explanation
 ---
 # Why `dispatch.mjs` was redesigned around "task," not agent capacity
 
