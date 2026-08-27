@@ -1,5 +1,7 @@
 ---
 authoritative_for: why a real trip-and-acknowledge event (recordIronLawAcknowledge) is recorded when --acknowledge-iron-law is actually used to pass a merge, distinct from the existing warn-level skip record
+framework: diataxis
+mode: explanation
 ---
 
 # Why Iron Law acknowledge writes its own event, not just a warn log
