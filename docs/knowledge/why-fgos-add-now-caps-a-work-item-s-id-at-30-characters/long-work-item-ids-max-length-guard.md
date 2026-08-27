@@ -1,6 +1,8 @@
 ---
 type: explanation
 source_capture_ids: [tsk-3tk]
+framework: diataxis
+mode: explanation
 ---
 
 # Why `fgos add` now caps a work item's id at 30 characters
