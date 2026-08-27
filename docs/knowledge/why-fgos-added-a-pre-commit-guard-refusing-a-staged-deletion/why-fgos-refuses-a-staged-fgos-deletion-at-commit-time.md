@@ -4,6 +4,8 @@ title: Why fgOS refuses a staged .fgos deletion at commit time
 tags: [fgos, git, pre-commit, worktree, events-jsonl, stash]
 source_capture_ids: [tsk-56u]
 authoritative_for: why fgOS added a pre-commit guard refusing a staged deletion under .fgos/, and why git stash on the main checkout is a separate named hazard
+framework: diataxis
+mode: explanation
 ---
 # Why fgOS refuses a staged `.fgos` deletion at commit time
 
