@@ -4,6 +4,8 @@ title: Can fgOS reliably remove its own installed package?
 tags: [uninstall, npm, package-manager, self-removal]
 source_capture_ids: [tsk-4iv-2, tsk-652]
 authoritative_for: whether fgos uninstall --remove-package can reliably remove its own package, which package managers/platforms it covers, and how it handles an unconfirmed install method
+framework: diataxis
+mode: explanation
 ---
 # Can fgOS reliably remove its own installed package?
 
