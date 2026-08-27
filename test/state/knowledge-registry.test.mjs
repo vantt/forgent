@@ -14,13 +14,17 @@ import {
   registerTopicStore,
   registerDocStore,
   promoteDocStore,
+  demoteDocStore,
   reserveDocStore,
+  renameTopicStore,
   splitTopicStore,
   mergeTopicStore,
   retireTopicStore,
   markDocRenderedStore,
   supersedeDocStore,
   retireDocStore,
+  attestDocStore,
+  moveDocPathStore,
   rebuild,
 } from '../../src/state/store.mjs';
 
@@ -501,6 +505,381 @@ test('doc.supersede and doc.retire fail closed (throw) when the doc does not exi
     assert.throws(() => {
       supersedeDocStore(tmpDir, { topicId: 'no-such-topic', role: 'guide' });
     }, /not found/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.attest rejects a retired doc and a doc under a retired topic -- enforced in the reducer, not only the CLI', () => {
+  // docs/architect/knowledge-registry-redesign.md §14.3: "attestation
+  // rejects retired topics and retired documents". The CLI's own
+  // resolveDocPath-based pre-check already excludes these, but any caller
+  // using the write facade directly (attestDocStore) must be refused here
+  // too, or that pre-check is just a CLI-only suggestion.
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+    retireDocStore(tmpDir, { docId: 'd1' });
+
+    assert.throws(() => {
+      attestDocStore(tmpDir, { docId: 'd1', captureId: 'tsk-x' });
+    }, /doc\.attest: doc 'd1' is retired/);
+
+    registerTopicStore(tmpDir, { topicId: 't2', purposeSlug: 'topic-two' });
+    registerDocStore(tmpDir, { docId: 'd2', topicId: 't2', role: 'guide', currentPath: 'docs/t2/guide.md', docLifecycle: 'active' });
+    retireTopicStore(tmpDir, { topicId: 't2' });
+
+    assert.throws(() => {
+      attestDocStore(tmpDir, { docId: 'd2', captureId: 'tsk-y' });
+    }, /is retired/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.register never moves lifecycle on an existing docId except the reserved -> provisional bridge', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+
+    // The one legitimate register-driven transition: reserve creates the
+    // slot, register with real content advances it to provisional.
+    reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docId: 'd1' });
+    registerDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docId: 'd1', docLifecycle: 'provisional' });
+    let view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'provisional');
+
+    promoteDocStore(tmpDir, { docId: 'd1' });
+    view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'active');
+
+    // Bare re-register with no --lifecycle must NOT silently demote an
+    // active doc back to provisional.
+    registerDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docId: 'd1' });
+    view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'active', 'omitting --lifecycle on re-register must preserve the current lifecycle');
+
+    // An explicit lifecycle that disagrees with the current one (outside
+    // the reserved -> provisional bridge) must be refused, not silently
+    // applied -- doc.promote/supersede/retire are the only doors.
+    assert.throws(() => {
+      registerDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docId: 'd1', docLifecycle: 'provisional' });
+    }, /register cannot change lifecycle/);
+
+    // Resurrecting a retired/superseded doc back to active through
+    // register must also be refused.
+    retireDocStore(tmpDir, { docId: 'd1' });
+    view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'retired');
+    assert.throws(() => {
+      registerDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docId: 'd1', docLifecycle: 'active' });
+    }, /register cannot change lifecycle/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.attest rejects a superseded doc the same way it rejects a retired one', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+    supersedeDocStore(tmpDir, { docId: 'd1' });
+
+    assert.throws(() => {
+      attestDocStore(tmpDir, { docId: 'd1', captureId: 'tsk-x' });
+    }, /doc\.attest: doc 'd1' is superseded/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('topic.merge refuses a non-active target; topic.split refuses a non-active source', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 'source', purposeSlug: 'source-topic' });
+    registerTopicStore(tmpDir, { topicId: 'target', purposeSlug: 'target-topic' });
+    retireTopicStore(tmpDir, { topicId: 'target' });
+
+    // Merging into a retired target must be refused -- otherwise the
+    // source's docs move onto a topic that can never be written to again.
+    assert.throws(() => {
+      mergeTopicStore(tmpDir, { sourceTopicIds: ['source'], targetTopicId: 'target' });
+    }, /topic\.merge: target topic 'target' is 'retired', must be 'active'/);
+
+    // Splitting an already-retired topic must be refused -- it would
+    // create a new active successor out of an ended lineage.
+    registerTopicStore(tmpDir, { topicId: 'old', purposeSlug: 'old-topic' });
+    retireTopicStore(tmpDir, { topicId: 'old' });
+    assert.throws(() => {
+      splitTopicStore(tmpDir, { topicId: 'old', newTopics: [{ topicId: 'a', purposeSlug: 'a' }, { topicId: 'b', purposeSlug: 'b' }] });
+    }, /topic\.split: source topic 'old' is 'retired', must be 'active'/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('topic.retire fails closed on a nonexistent topicId instead of a silent no-op', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    assert.throws(() => {
+      retireTopicStore(tmpDir, { topicId: 'does-not-exist' });
+    }, /topic\.retire: topic 'does-not-exist' not found/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.supersede validates supersededBy -- refuses missing, self, and dead-doc targets', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+    registerDocStore(tmpDir, { docId: 'd-dead', topicId: 't1', role: 'pitfall', currentPath: 'docs/t1/pitfall.md', docLifecycle: 'active' });
+    retireDocStore(tmpDir, { docId: 'd-dead' });
+
+    assert.throws(() => {
+      supersedeDocStore(tmpDir, { docId: 'd1', supersededBy: 'does-not-exist' });
+    }, /doc\.supersede: supersededBy doc 'does-not-exist' not found/);
+
+    assert.throws(() => {
+      supersedeDocStore(tmpDir, { docId: 'd1', supersededBy: 'd1' });
+    }, /doc\.supersede: doc 'd1' cannot be supersededBy itself/);
+
+    assert.throws(() => {
+      supersedeDocStore(tmpDir, { docId: 'd1', supersededBy: 'd-dead' });
+    }, /doc\.supersede: supersededBy doc 'd-dead' is 'retired' — must be a live doc, not another dead one/);
+    let view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'active', 'every refused supersede above must not have mutated d1');
+
+    // Real sequencing: the replacement doc can only be registered once d1's
+    // own (topicId, role) slot is freed, so supersede first (no pointer
+    // yet), register the successor, then supersede again (idempotent
+    // re-supersede) to attach the now-real supersededBy pointer.
+    supersedeDocStore(tmpDir, { docId: 'd1' });
+    registerDocStore(tmpDir, { docId: 'd2', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide2.md', docLifecycle: 'provisional' });
+    supersedeDocStore(tmpDir, { docId: 'd1', supersededBy: 'd2' });
+    view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'superseded');
+    assert.equal(view.docs.d1.supersededBy, 'd2');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.supersede refuses a supersededBy target whose doc lifecycle is live but whose OWN topic is retired', () => {
+  // src/report/knowledge-resolver.mjs's own "live" is doc-live AND
+  // topic-active -- a successor passing only the doc-lifecycle check
+  // would still never be resolvable by any reader, the same "write
+  // something no reader can use" shape assertTopicWritable already
+  // closes elsewhere in this reducer.
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+    registerTopicStore(tmpDir, { topicId: 't2', purposeSlug: 'topic-two' });
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+    registerDocStore(tmpDir, { docId: 'd2', topicId: 't2', role: 'guide', currentPath: 'docs/t2/guide.md', docLifecycle: 'active' });
+    retireTopicStore(tmpDir, { topicId: 't2' });
+    // d2 itself is still 'active' -- topic.retire never force-retires its
+    // own docs -- but its topic is now retired.
+
+    assert.throws(() => {
+      supersedeDocStore(tmpDir, { docId: 'd1', supersededBy: 'd2' });
+    }, /doc\.supersede: supersededBy doc 'd2' is under topic 't2', which is 'retired' \(not active\)/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'active', 'a refused supersede must not have mutated d1');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.mark-rendered fails closed on a doc that is not reserved, instead of a silent no-op', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'provisional' });
+
+    assert.throws(() => {
+      markDocRenderedStore(tmpDir, { docId: 'd1' });
+    }, /doc\.mark-rendered: doc 'd1' is 'provisional', must be 'reserved'/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'provisional', 'a refused mark-rendered must not have moved the state');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.demote moves an active doc back to provisional; refuses any other lifecycle', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+
+    demoteDocStore(tmpDir, { docId: 'd1' });
+    let view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'provisional');
+
+    assert.throws(() => {
+      demoteDocStore(tmpDir, { docId: 'd1' });
+    }, /doc\.demote: doc 'd1' is 'provisional', must be 'active'/);
+
+    registerTopicStore(tmpDir, { topicId: 't2', purposeSlug: 'topic-two' });
+    registerDocStore(tmpDir, { docId: 'd2', topicId: 't2', role: 'guide', currentPath: 'docs/t2/guide.md', docLifecycle: 'reserved' });
+    assert.throws(() => {
+      demoteDocStore(tmpDir, { docId: 'd2' });
+    }, /doc\.demote: doc 'd2' is 'reserved', must be 'active'/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.demote refuses under a retired topic, same as reserve/register/mark-rendered/promote', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'dead-topic' });
+    // Doc reaches 'active' while the topic is still active -- topic.retire
+    // never force-retires its docs, so this is the real repro shape: an
+    // active doc left in place under a topic retired directly afterward.
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+    retireTopicStore(tmpDir, { topicId: 't1' });
+
+    assert.throws(() => {
+      demoteDocStore(tmpDir, { docId: 'd1' });
+    }, /is retired/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.docLifecycle, 'active', 'a refused demote must not have moved the state');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('topic.register/rename/split refuse a path-traversal or multi-segment purposeSlug/topicId', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+
+    for (const bad of ['../evil', 'a/b', '..', '.']) {
+      assert.throws(() => {
+        registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: bad });
+      }, /must be a safe single path segment/, `purposeSlug ${JSON.stringify(bad)} must be refused`);
+    }
+    for (const bad of ['../evil-topic', 'a/b']) {
+      assert.throws(() => {
+        registerTopicStore(tmpDir, { topicId: bad, purposeSlug: 'ok' });
+      }, /must be a safe single path segment/, `topicId ${JSON.stringify(bad)} must be refused`);
+    }
+
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'ok-topic' });
+    assert.throws(() => {
+      renameTopicStore(tmpDir, { topicId: 't1', newPurposeSlug: '../escape' });
+    }, /must be a safe single path segment/);
+
+    assert.throws(() => {
+      splitTopicStore(tmpDir, { topicId: 't1', newTopics: [{ topicId: '../evil', purposeSlug: 'ok' }, { topicId: 't2', purposeSlug: 'ok2' }] });
+    }, /must be a safe single path segment/);
+    assert.throws(() => {
+      splitTopicStore(tmpDir, { topicId: 't1', newTopics: [{ topicId: 't2', purposeSlug: '../escape' }, { topicId: 't3', purposeSlug: 'ok2' }] });
+    }, /must be a safe single path segment/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.topics.t1.purposeSlug, 'ok-topic', 'no refused mutation must have taken effect');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('doc.reserve/register/path-move refuse a path-traversal, absolute, or out-of-docs currentPath, and an unsafe role', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+
+    const badPaths = ['docs/../evil/guide.md', 'docs/ok/../escape.md', '/etc/passwd', 'docs\\evil\\guide.md', 'not-under-docs/guide.md'];
+    for (const bad of badPaths) {
+      assert.throws(() => {
+        reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: bad });
+      }, /must (be a non-empty string|not contain backslashes|be repo-relative|live under 'docs\/'|not contain '\.', '\.\.')/, `currentPath ${JSON.stringify(bad)} must be refused`);
+    }
+
+    for (const badRole of ['../evil', 'a/b']) {
+      assert.throws(() => {
+        reserveDocStore(tmpDir, { topicId: 't1', role: badRole, currentPath: 'docs/t1/guide.md' });
+      }, /must be a safe single path segment/, `role ${JSON.stringify(badRole)} must be refused`);
+    }
+
+    reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docId: 'd1' });
+    assert.throws(() => {
+      moveDocPathStore(tmpDir, { docId: 'd1', newPath: 'docs/../evil/guide.md' });
+    }, /must not contain '\.', '\.\.'/);
+
+    const view = rebuild(tmpDir);
+    assert.equal(view.docs.d1.currentPath, 'docs/t1/guide.md', 'a refused path-move must not have moved the doc');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('topic.split refuses a live doc left unassigned by every successor\'s rolesToMove, and a role duplicated across successors', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-'));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'source-topic' });
+    registerDocStore(tmpDir, { docId: 'd-guide', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+    registerDocStore(tmpDir, { docId: 'd-pitfall', topicId: 't1', role: 'pitfall', currentPath: 'docs/t1/pitfall.md', docLifecycle: 'provisional' });
+
+    // 'pitfall' is never listed in any successor's rolesToMove -- it would
+    // be stranded under the now-retired source topic.
+    assert.throws(() => {
+      splitTopicStore(tmpDir, {
+        topicId: 't1',
+        newTopics: [{ topicId: 't2', purposeSlug: 'reclaim', rolesToMove: ['guide'] }, { topicId: 't3', purposeSlug: 'cleanup' }],
+      });
+    }, /1 live doc\(s\) under source topic 't1' are not assigned.*d-pitfall \(role 'pitfall'\)/);
+
+    let view = rebuild(tmpDir);
+    assert.equal(view.topics.t1.status, 'active', 'a refused split must not have retired the source');
+    assert.equal(view.docs['d-guide'].topicId, 't1');
+
+    // Same role listed in two DIFFERENT successors' rolesToMove.
+    assert.throws(() => {
+      splitTopicStore(tmpDir, {
+        topicId: 't1',
+        newTopics: [
+          { topicId: 't2', purposeSlug: 'reclaim', rolesToMove: ['guide', 'pitfall'] },
+          { topicId: 't3', purposeSlug: 'cleanup', rolesToMove: ['pitfall'] },
+        ],
+      });
+    }, /role 'pitfall' is listed in more than one successor's rolesToMove/);
+
+    view = rebuild(tmpDir);
+    assert.equal(view.topics.t1.status, 'active', 'a refused split must not have retired the source');
+
+    // A correct assignment (every live doc covered exactly once) succeeds.
+    splitTopicStore(tmpDir, {
+      topicId: 't1',
+      newTopics: [
+        { topicId: 't2', purposeSlug: 'reclaim', rolesToMove: ['guide'] },
+        { topicId: 't3', purposeSlug: 'cleanup', rolesToMove: ['pitfall'] },
+      ],
+    });
+    view = rebuild(tmpDir);
+    assert.equal(view.topics.t1.status, 'retired');
+    assert.equal(view.docs['d-guide'].topicId, 't2');
+    assert.equal(view.docs['d-pitfall'].topicId, 't3');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
