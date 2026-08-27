@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `fgos uninstall` shipped as two pieces
 
 `tsk-4iv` — first-attempt success, verify (`npm test`) passed,
