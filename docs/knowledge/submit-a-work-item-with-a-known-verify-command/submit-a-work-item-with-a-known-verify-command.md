@@ -2,6 +2,8 @@
 type: how-to
 title: Submit a work item with a known verify command
 source_capture_ids: [tsk-5gu]
+framework: diataxis
+mode: how-to
 ---
 # Submit a work item with a known verify command
 
