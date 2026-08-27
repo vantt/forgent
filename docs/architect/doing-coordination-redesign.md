@@ -948,3 +948,102 @@ This is the only model that preserves all required meanings:
 - "actively being worked";
 - "submitted/blocked/final";
 - "safe to settle without racing main-checkout claim churn".
+
+## 21. Implementation Pointers
+
+Real files this redesign landed in, found by scanning the `tsk-40m` / `tsk-1sl` /
+`tsk-1ht` commit ranges (`git show --stat`) below. Files touched only as
+incidental test-fixture updates (many `test/cli/fgos-*.test.mjs` files needed
+their CAS-base assertions adjusted once claim-time no longer writes durable
+`doing`) are grouped at the end instead of listed individually.
+
+Core module-boundary files (§8):
+
+- `src/state/runtime-coordination.mjs` — new; owns the runtime coordination
+  store from §8.1 (acquire/read/release/reclaim active claims).
+- `src/state/store.mjs` — durable store module (§8.2): `settleClaim`,
+  attempt-event append, revision/CAS validation.
+- `src/state/status-fsm.mjs` — durable FSM edges; removes normal `-> doing`
+  claim-acquire edges per §6.1/§6.3.
+- `src/state/replay.mjs` — projects `attemptCount`/`hasStarted`/`lastAttempt`
+  (§6.3, §7.2) into the derived durable view.
+- `src/runner/claim-port.mjs` — the claim port (§8.4): the single choke point
+  for claim acquire/settle/release/reclaim.
+- `src/runner/anti-loop.mjs` — switched to counting `work.attempt` events
+  instead of `work.move -> doing` (§13).
+- `src/runner/loop.mjs` — driving loop reads/writes through the effective
+  view and runtime claims.
+- `src/runner/merge.mjs`, `src/runner/worktree.mjs` — settle/merge and
+  worktree-prep paths updated for the new claim data model.
+- `src/intake/discovery.mjs`, `src/intake/plan.mjs` — planning/discovery
+  claim-lock behavior for §9.6 (planning to executing).
+- `src/state/fgos-file-registry.mjs`, `src/state/cleanup-harness.mjs` —
+  register/ignore the new runtime coordination file class (§10.2).
+- `src/cli/command-registry.mjs`, `bin/fgos.mjs` — CLI wiring for the new
+  claim/settle/list surfaces.
+- `docs/architecture-manifest.json` — module registration.
+
+Focused tests:
+
+- `test/state/runtime-coordination.test.mjs` — new; unit coverage for the
+  runtime coordination store itself.
+- `test/state/store.test.mjs`, `test/state/fsm.test.mjs`,
+  `test/state/awaiting.test.mjs`, `test/state/replay.test.mjs`,
+  `test/state/status-category.test.mjs`, `test/state/worker-slots.test.mjs`,
+  `test/state/compound-learn-done-gate.test.mjs`,
+  `test/state/retrospective-doors.test.mjs`
+- `test/runner/claim-port.test.mjs`, `test/runner/loop.test.mjs`,
+  `test/runner/anti-loop.test.mjs`,
+  `test/runner/concurrent-claim-eventlog-loss.test.mjs`
+- `test/intake/discovery.test.mjs`, `test/intake/plan.test.mjs`
+
+Repo-wide fixture churn (CAS-base and status-assertion updates only, not new
+behavior of their own): most of `test/cli/fgos-*.test.mjs` (claim, claim-2,
+edit, handoff, intake, intake-4, iron-law-gate, merge, merge-2, move,
+post-merge, post-merge-4, read, read-4, read-5, return, return-2, return-3,
+setup, stage-3, take-pick-claim-eligibility, `helpers/fgos-cli-harness.mjs`)
+and `test/e2e/{fixture-marketing-domain,rebuild-determinism,runner-loop,
+synthetic-domain}.test.mjs`.
+
+Decision/history anchor: `docs/history/runtime-claim-doing-separation/`
+(CONTEXT.md/plan.md/RESEARCH.md/iron-law-evidence.md).
+
+## 22. Implementation Tasks
+
+Single work item, delivered 2026-08-25, no decomposed children (decompose
+verdict: pass-through, one indivisible piece — every mechanism below had to
+land in the same claim or the system would break mid-migration):
+
+- **tsk-40m** — Tách live claim/doing khỏi durable eventlog (mergedInto
+  `main`, mergedSha `401a2282ee381b5c2831e6f4d7538e834ada6503`).
+
+Commits, in landing order (all 2026-08-25):
+
+1. `7dffb476` docs(tsk-40m): lock exploring decisions for runtime-claim/doing separation (D1-D6)
+2. `6c3cfe40` docs(tsk-40m): write plan.md for runtime-claim/doing separation
+3. `7c4c4a13` refactor(runner): separate live claim/doing from durable eventlog (tsk-40m)
+4. `a152af34` docs(tsk-40m): Iron Law evidence for runtime-claim/doing separation
+5. `9f94e847` fix(tsk-40m): close claim/settle correctness gaps found in code review
+6. `3a59ac68` docs(tsk-40m): correct stale releaseClaimOnExecuting wording
+7. `5f2e12b7` fix(tsk-40m): close round-2 claim/settle gaps found in follow-up code review
+8. `27d47bce` feat(tsk-40m): enforce writer-identity ownership on settleClaim
+9. `3d6c0044` fix(tsk-40m): close settleClaim's TOCTOU race on the write lock
+10. `2e43ce3e` fix(tsk-40m): close settleClaim atomicity + release-timing gaps
+11. `afc4d3dd` fix(tsk-40m): settleClaim returns the raw final event, not a nested one
+12. `012af034` feat(tsk-40m): settle claim time directly to finalStatus, drop durable doing
+13. `e4d269bf` fix(tsk-40m): stop ask/answer from ever writing durable doing (P1)
+14. `835f162e` fix(tsk-40m): anti-loop hard-cut per locked D3, supersede stale plan.md
+15. `860852fb` docs(tsk-40m): fix stale answerAwaiting comment on claim un-stale fringe case
+
+Follow-up verification/fix tasks, delivered 2026-08-26 (day after, not part
+of the original deployment batch above, but closing gaps this redesign left):
+
+- **tsk-1sl** — §17 review-checklist + §15 acceptance-criteria re-audit against
+  real `src/` state; confirmed clean, flipped this doc's status header
+  (mergedSha `e7a799207165bb0ffb4a9d5dd02e4034e7f49d11`).
+- **tsk-1ht** — `settleClaim`'s revision-CAS check had no reconcile path for a
+  claim-holder's own mid-lifecycle edits (§16.3 gap noted in this doc's status
+  header at the time); fixed and delivered (mergedSha
+  `5f818ee63c3b62abaab721ca28e46613f7ebf76a`). The status-header note above
+  describing this as an open gap is now stale — kept as written since fixing
+  the gap is a separate item's job, not this doc-history append's.

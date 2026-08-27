@@ -630,3 +630,114 @@ This proves the writer is registry-first. Migration tooling proves folding. They
 - Current authoritative-topic helper: `src/report/authoritative-match.mjs`.
 - Current frontmatter helper: `src/report/frontmatter.mjs`.
 - Current index helpers: `src/report/enduser-index.mjs` and `src/report/enduser-index-generate.mjs`.
+
+## 18. Implementation Tasks
+
+Work items that carried this design into code, in the order they were built. All `delivered`.
+
+| id | title |
+|---|---|
+| `tsk-28x` | Extensible multi-audience artifact-producer registry for fgOS's compound-learn/retrospective (root item) |
+| `tsk-28x-1` | Knowledge registry domain model: `topic.*` / `doc.*` events, reducer, invariants |
+| `tsk-28x-2` | Resolver `oldPath` -> `currentPath` qua aliases + lineage, chưa đổi consumer nào |
+| `tsk-28x-3` | Classifier/inventory dry-run trên 268 tài liệu |
+| `tsk-28x-4` | Bootstrap registry bằng chính output classifier (`currentPath=oldPath`), idempotent và chạy lại được |
+| `tsk-28x-5` | Verb surfaces: `fgos topic register\|split\|merge\|rename\|retire` và `fgos doc *` |
+| `tsk-28x-6` | `fgos knowledge attest` + registry gate 4 điều kiện (alias KHÔNG được tag) + cờ `docRegistry.enforce` |
+| `tsk-28x-7` | `doc-sources` và `docs-index` đọc qua resolver: `oldPath` vẫn trả capture sau khi đổi, `currentPath` gom đúng |
+| `tsk-28x-8` | Hai ảnh cuối cùng (JSON cho máy + Markdown cho người) và 8 doctor check knowledge |
+| `tsk-28x-9` | Skill `fgos-coding-knowledge`: đổi từ chọn-quadrant-tự-đặt-path sang registry-first |
+| `tsk-28x-10` | Writer canary: một item thật đi hết đường writer mới, là cổng trước migration |
+| `tsk-28x-11` | Migration dry-run (inventory + conservation gate) rồi apply/fold 268 tài liệu theo từng target |
+| `tsk-28x-12` | Deprecate `fgos compound` trỏ sang `fgos knowledge attest`, cập nhật spec/hard-rule/CHANGELOG |
+| `tsk-3uc` | Fix 4 gap thật trong lifecycle/migration/bootstrap enforcement phát hiện qua code review (follow-on tsk-28x): `doc.register` lifecycle bypass, attest vào doc đã superseded, `topic.merge`/`split` chống non-active source/target, `topic.retire` silent no-op, `doc.supersede` successor không validate, migration partial-apply + shell-interpolated `git mv`/`add`, bootstrap partial-write across rows, path-traversal trong slug/path, `resolveDocPath` supersededBy chain |
+
+Trạng thái thật đã verify trực tiếp (không chỉ dựa `delivered`), tại thời điểm `tsk-3uc` merge (2026-08-27): registry đã bootstrap thật 332/332 topic + 332/332 doc `active`; migration apply thật (bước 9, `tsk-28x-11`'s cutover) **chưa chạy** — phần lớn corpus vẫn ở layout quadrant cũ; `docRegistry.enforce` **vẫn `false`** trong `.fgos/config.json` — cổng chặn 4-điều-kiện (`tsk-28x-6`) có code nhưng chưa bật. Track B3 (integration harness sau migration thật) và B6 (metrics harness) chưa làm.
+
+## 19. Implementation Pointers
+
+Real files landed by `tsk-28x`'s 12-phase build (`5c948d2a` and its
+discovery/plan/Iron-Law-evidence siblings, isolated from unrelated files
+picked up by main-catchup merges) plus `tsk-3uc`'s hardening pass
+(commits matched by `git log --grep tsk-3uc --no-merges`). These supersede
+§17's pre-implementation pointer list — §17 still records what the design
+started from; this section records what actually exists in `src/`/`scripts/`
+now.
+
+### 19.1 Registry Model And Resolver (§6, §7, §9)
+
+- `src/state/knowledge-registry.mjs` — the `topic.*`/`doc.*` event reducer,
+  invariants (`activeDoc(topicId, role) <= 1`, role-vs-mode collision,
+  supersession chain), and registry replay.
+- `src/report/knowledge-resolver.mjs` — `resolveDocPath` (§9): current-path
+  hit, alias hit, `supersededBy` chain walk, null on miss.
+- `src/report/knowledge-projection.mjs` — machine (`docs/knowledge-registry.json`)
+  and human (`docs/knowledge-registry.md`) projections (§10).
+
+### 19.2 Verb Surfaces And Producer Gate (§8, §12)
+
+- `bin/fgos.mjs` — `fgos topic register|split|merge|rename|retire`,
+  `fgos doc reserve|mark-rendered|move-path|promote|supersede|retire`,
+  `fgos knowledge attest`, and the legacy `fgos compound` compatibility
+  branch routed through the same gate.
+- `src/cli/command-registry.mjs` — CLI wiring for the verbs above.
+- `src/state/store.mjs` — durable event validation for `topic.*`/`doc.*`
+  ops, folded into the existing durable-store module.
+- `src/state/replay.mjs` — registry projection hookup into the durable
+  replay pipeline.
+
+### 19.3 Classification, Bootstrap, Migration, Canary (§11, §13, §15)
+
+- `scripts/knowledge-classifier.mjs` — read-only inventory/classification
+  pass (§13.1) over the pre-migration corpus.
+- `scripts/knowledge-bootstrap.mjs` — bootstraps registry rows with
+  `currentPath = oldPath`, idempotent (§13.2).
+- `scripts/knowledge-migration.mjs` — dry-run/conservation/apply (§13.3-13.5):
+  move-or-fold by target document, alias creation, projection rebuild.
+- `scripts/knowledge-canary.mjs` — the pre-migration writer canary (§15).
+
+### 19.4 Read Surfaces And Doctor Checks (§9, §14.6)
+
+- `src/report/enduser-index.mjs`, `src/report/enduser-index-generate.mjs` —
+  `doc-sources`/`docs-index` read through the resolver (old-path and
+  current-path lookup, §9).
+- `src/setup/registrations.mjs` — registers the 9 `knowledge-*` doctor
+  checks from §14.6 into `fgos doctor`'s check registry.
+- `src/state/workflow-stage-graphs.mjs` — retrospective stage now routes to
+  the `fgos-coding-knowledge` skill (§12 writer flow) instead of the old
+  quadrant-picking path.
+- `src/runner/merge.mjs` — merge-time hookup for registry-aware retrospective
+  handoff.
+
+### 19.5 Skill And Compatibility
+
+- `domains/coding/skills/fgos-coding-knowledge/SKILL.md` — the registry-first
+  writer skill (§12), mirrored byte-identical at `.agents/skills/`,
+  `.claude/skills/`, and `plugins/fgOS/skills/`.
+- `domains/coding/skills/fgos-coding-compounding/SKILL.md` — legacy producer
+  skill, updated to route through the same gate (§4's compatibility-alias
+  rule), mirrored at the same three locations.
+- `CHANGELOG.md`, `docs/architecture-manifest.json` — user-visible change log
+  and module registration.
+
+### 19.6 Focused Tests
+
+- `test/state/knowledge-registry.test.mjs`, `test/state/knowledge-bootstrap.test.mjs`
+  — reducer/invariant harness (§14.1) and bootstrap idempotency.
+- `test/report/knowledge-resolver.test.mjs` — resolver harness (§14.4).
+- `test/cli/knowledge-verbs.test.mjs`, `test/cli/knowledge-attest-gate.test.mjs`,
+  `test/cli/knowledge-deprecation.test.mjs` — CLI harness (§14.2) and producer
+  gate harness (§14.3).
+- `test/scripts/knowledge-classifier.test.mjs`, `test/scripts/knowledge-migration.test.mjs`
+  — migration harness (§14.5).
+- `test/setup/knowledge-doctor.test.mjs` — doctor-check harness (§14.6).
+- `test/skills/fgos-coding-knowledge.test.mjs`, `test/skills/knowledge-canary.test.mjs`
+  — writer-skill and canary coverage (§12, §15).
+- Incidental fixture updates (not new behavior of their own):
+  `test/e2e/fixture-marketing-domain.test.mjs`, `test/report/enduser-index.test.mjs`,
+  `test/runner/merge.test.mjs`, `test/state/workflow-stage-graphs.test.mjs`,
+  `test/setup/checks.test.mjs`.
+
+Decision/history anchors: `docs/history/compound-learn-artifact-registry/`
+(DISCUSSION.md, RESEARCH.md), plus each `tsk-28x-*`/`tsk-3uc` item's own
+`docs/history/<slug>/plan.md` and `iron-law-evidence.md`.

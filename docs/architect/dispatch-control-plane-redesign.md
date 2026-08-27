@@ -739,7 +739,13 @@ Current dispatch files:
 - `src/runner/dispatch/transport.mjs`
 - `src/runner/dispatch/prepare.mjs`
 - `src/runner/dispatch/cli.mjs`
+- `src/runner/dispatch/result-ladder.mjs` — confidence-ladder result normalization, extracted from `cli.mjs` by `tsk-2tr` (§17.2/§17.3), consumed by `src/report/dispatch-confidence.mjs`.
 - `src/runner/dispatch.mjs`
+
+Result-confidence reader (§10/§15 entry criterion pulled forward by `tsk-1g6`, §17.2/§17.3):
+
+- `src/report/dispatch-confidence.mjs`
+- wired into `bin/fgos.mjs` and `src/cli/command-registry.mjs`
 
 Current prompt/protocol references:
 
@@ -761,3 +767,80 @@ Decision/history anchors:
 - `docs/history/dispatch-concept-boundary/`;
 - `docs/history/task-dispatch-unification/`.
 - `docs/history/tsk-5x7/`.
+
+## 17. Task Sets That Implemented This Plan (2026-08-25 → 2026-08-26)
+
+Found by scanning git log on `src/runner/dispatch*` and this doc over the
+last 2-3 days. Root item is `tsk-5x7`; everything else is a follow-on task
+that either landed a deferred/reviewed piece of the design or fixed a
+regression the redesign introduced.
+
+### 17.1 `tsk-5x7` — Dispatch semantic control plane + Herdr-ready orchestration (root)
+
+Plan: `docs/history/dispatch-plan-protocol-redesign/plan.md`. Split into
+three dep-free children per D6 (2026-08-25):
+
+- **`tsk-5x7-1`** — piece 0: fix `decide --for` to read `capabilities.prefer`,
+  add minimal `DispatchPlan`, hoist the audit-event write.
+  Plan: `docs/history/tsk-5x7-1/plan.md`. → §14.1 above.
+- **`tsk-5x7-2`** — piece 1: declared-egress governance (replaces the
+  `command !== claude` substring check).
+  Plan: `docs/history/tsk-5x7-2/plan.md`. → §14.2 above.
+- **`tsk-5x7-3`** — piece 2: `herdr-spawn` adapter, protocol untouched.
+  Plan: `docs/history/tsk-5x7-3/plan.md`. → §14.3 above.
+
+The root `tsk-5x7` branch then absorbed a long self-review/hardening pass
+(governance-descriptor discard, shell-injection in the pane run, timeout
+waiting on descendants, echo-stripping gaps, secret-env passthrough,
+`plan.mjs`↔`cli.mjs` import cycle, whitespace hygiene) before merge —
+commits `580fe09e` .. `76d8539d`, 2026-08-25 18:43–23:02. This doc's own
+§14 status section and the "reviewed narrow implementation candidate"
+framing in the header were written from that merged state
+(`8e835dc1` / `ebdf69d5`, 2026-08-25 22:18 / 2026-08-26 13:20).
+
+### 17.2 Follow-on task sets (2026-08-26), each pulling one §15 "deferred" item forward or fixing a redesign regression
+
+| Task | Title | Plan doc | Relation to this design |
+|---|---|---|---|
+| `tsk-17m` | D0026 native-dispatch-doctrine narrative reconciliation | `docs/history/d0026-narrative-reconciliation/plan.md` | Doc-only; reconciles the Native-First Dispatch Doctrine narrative this plan depends on (§4.2, §6.3). |
+| `tsk-5jl` | Generalize `herdr-spawn` executor adapter for live visibility (config-driven, correct result) | `docs/history/herdr-spawn-generalize-live-visibility/plan.md` | Extends §12.2's near-term Herdr adapter beyond the tsk-5x7-3 slice. |
+| `tsk-10j` | agy-herdr interactive-mode redesign — real TUI visibility | `docs/history/herdr-spawn-agy-interactive-mode/plan.md` | Builds on the `herdr-spawn` adapter (§12.2) for the `agy` executor specifically. |
+| `tsk-10n` | Herdr runtime boundary and orchestrator terminology | `docs/history/herdr-orchestrator-terminology-boundary/plan.md` | Landed as this doc's own §12.1a (Herdr Rust vocabulary is a separate namespace from §5.1's `orchestrator`). |
+| `tsk-2tr` | Extract dispatch result normalization ladder | `docs/history/extract-dispatch-result-normalization-ladder/plan.md` | Refactors the §10 confidence-ladder result handling into a shared helper, ahead of tsk-1g6. |
+| `tsk-1g6` | Dispatch result confidence — production reader | `docs/history/dispatch-result-confidence-reader/plan.md` | Pulls forward the §10/§15 "confidence telemetry needs a reader" entry criterion — first production consumer of result confidence, reusing tsk-2tr's ladder helper. |
+| `tsk-2rr` | Fix false-idle polling race in `herdrSpawnInteractiveAdapter` | `docs/history/agy-herdr-false-idle-polling-race/plan.md` | Regression fix in the §12.2 Herdr adapter's idle/completion detection (decouple `done` from `sawWorking`, 3-poll debounce). |
+| `tsk-by0` | Remove `herdr-spawn`'s non-interactive dispatch paths | `docs/history/herdr-spawn-remove-noninteractive-paths/plan.md` | Narrows §12.2's adapter to interactive-only after tsk-5jl/tsk-10j generalized it. |
+
+Also same-window but only tangential to this doc: `tsk-2ii` (rename `agy`
+executor id), `tsk-3vz` (flip `executors.agy-herdr` config default),
+`tsk-1dd` (D0026 gap/duplicate check, mode tiny) — these touch dispatch
+config/executors but don't implement a numbered item or §15 deferred entry
+from this design.
+
+### 17.3 Implementation Pointers Per Task Set
+
+Real source/test files each task set actually touched (`git diff --stat`
+per task's commit range), scoped to code — not the `docs/history/<task>/`
+plan/research/iron-law-evidence files every task also writes. Doc-only
+tasks are noted as such rather than listing their own plan doc again.
+
+| Task | Files touched |
+|---|---|
+| `tsk-5x7-1` | none yet — piece lands its `decide --for`/`DispatchPlan` code in the root's later hardening pass below, not in its own commit range. |
+| `tsk-5x7-2` | `docs/architecture-manifest.json` (registration only; governance code landed with the root). |
+| `tsk-5x7-3` | none of its own — adapter code lands with the root's hardening pass below. |
+| `tsk-5x7` (root hardening pass, `580fe09e..76d8539d`) | `src/runner/dispatch.mjs`, `src/runner/dispatch/cli.mjs`, `src/runner/dispatch/plan.mjs`, `src/runner/dispatch/resolve.mjs`, `src/runner/dispatch/transport.mjs`, `src/runner/loop.mjs`, `test/runner/dispatch.test.mjs`, `test/runner/herdr-spawn-adapter.test.mjs`, `test/runner/loop.test.mjs` |
+| `tsk-17m` | doc-only: `docs/specs/runner.md`, this doc's own header/status text — no source/test files. |
+| `tsk-5jl` | `src/runner/dispatch/config.mjs`, `src/runner/dispatch/live-renderers/claude-stream-json.mjs` (new), `src/runner/dispatch/live-renderers/pi-agent-session.mjs` (new), `src/runner/dispatch/resolve.mjs`, `src/runner/dispatch/transport.mjs`, `test/runner/herdr-spawn-adapter.test.mjs`, `docs/architecture-manifest.json`, `docs/enduser-docs-index.json` |
+| `tsk-10j` | `src/runner/dispatch/cli.mjs`, `src/runner/dispatch/config.mjs`, `src/runner/dispatch/resolve.mjs`, `src/runner/dispatch/transport.mjs`, `test/runner/herdr-spawn-adapter.test.mjs` |
+| `tsk-10n` | doc-only: this doc's own §12.1a — no source/test files. |
+| `tsk-2tr` | `src/runner/dispatch/cli.mjs`, `src/runner/dispatch/result-ladder.mjs` (new), `test/runner/dispatch.test.mjs`, `docs/architecture-manifest.json` |
+| `tsk-1g6` | `bin/fgos.mjs`, `src/cli/command-registry.mjs`, `src/report/dispatch-confidence.mjs` (new), `test/runner/dispatch.test.mjs`, `docs/architecture-manifest.json` |
+| `tsk-2rr` | `src/runner/dispatch/transport.mjs`, `test/runner/herdr-spawn-adapter.test.mjs` |
+| `tsk-by0` | `src/runner/dispatch/transport.mjs` (shrunk), `test/runner/herdr-spawn-adapter.test.mjs` (shrunk), `CHANGELOG.md`, `docs/architecture-manifest.json` (entries removed); deleted `src/runner/dispatch/live-renderers/claude-stream-json.mjs` and `pi-agent-session.mjs` (the two live-renderer files `tsk-5jl` had added) |
+
+Net effect on §16's file list: `src/runner/dispatch/result-ladder.mjs` and
+`src/report/dispatch-confidence.mjs` are new files this window added and
+belong in §16's pointer list; `src/runner/dispatch/live-renderers/` was
+added by `tsk-5jl` and removed again by `tsk-by0` — it no longer exists on
+`main` and should not be added to §16.
