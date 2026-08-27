@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `mergeRunnerItem`'s already-merged fast path checks content, not just ancestry
 
 `mergeRunnerItemLocked`'s `isAlreadyMerged` fast path
