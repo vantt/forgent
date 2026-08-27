@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `mergeReadiness` excludes superseded items
 
 Two independent items can end up solving the exact same problem, with
