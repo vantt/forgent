@@ -4,6 +4,8 @@ title: How to close out a work item whose real work was already done before this
 tags: []
 timestamp: 2026-07-30T08:39:01.707Z
 source_capture_ids: [tsk-4on]
+framework: diataxis
+mode: how-to
 ---
 # How to close out a work item whose real work was already done before this claim
 
