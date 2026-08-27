@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `approve`'s Iron Law gate scopes `changedFiles` to the leaf's own root
 
 `classifyIronLaw` was returning `required: true` based on modules a leaf
