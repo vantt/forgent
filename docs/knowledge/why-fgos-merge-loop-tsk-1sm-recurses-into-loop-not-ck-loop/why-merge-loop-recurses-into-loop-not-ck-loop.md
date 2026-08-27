@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `/fgOS:merge-loop` (`tsk-1sm`) recurses into `loop`, not `ck-loop`
 
 `tsk-1sm` added `/fgOS:merge-loop`, a thin skill that repeats
