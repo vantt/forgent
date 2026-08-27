@@ -4,6 +4,8 @@ title: Why verify moved from the merge lock to catchup's inbound gate
 tags: [merge, verify, main-checkout-lock, catchup, fast-forward]
 source_capture_ids: [tsk-4ax]
 authoritative_for: why fgOS moved the full verify run from the merge lock's outbound (land) side to catchup's inbound gate, so a landed merge's own critical section only needs a fast-forward
+framework: diataxis
+mode: explanation
 ---
 # Why verify moved from the merge lock to catchup's inbound gate
 
