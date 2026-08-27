@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # Work-item pipeline: stages, verbs, actors, handoffs
 
 Hand-authored reference, verified 2026-07-31 by reading the real source
