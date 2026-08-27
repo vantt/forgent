@@ -1,5 +1,7 @@
 ---
 authoritative_for: why fgos sync-root, fgos merge next, and fgos review resolve CLI flags (verify timeout, --wait, --pr) lazily, after their own use-case guards, instead of eagerly in the CLI adapter — the tsk-49i-2 flag-parsing-move regression family
+framework: diataxis
+mode: explanation
 ---
 
 # Why merge-next, sync-root, and review resolve their flags after their guards
