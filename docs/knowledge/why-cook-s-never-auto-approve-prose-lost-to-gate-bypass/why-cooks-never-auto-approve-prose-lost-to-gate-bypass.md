@@ -3,6 +3,8 @@ type: explanation
 title: Why cook's "never auto-approve" prose lost to gate-bypass
 tags: [cook, gate-bypass, fgos-coding-exploring, fgos-coding-planning, fgos-coding-validating]
 source_capture_ids: [tsk-104]
+framework: diataxis
+mode: explanation
 ---
 # Why cook's "never auto-approve" prose lost to gate-bypass
 
