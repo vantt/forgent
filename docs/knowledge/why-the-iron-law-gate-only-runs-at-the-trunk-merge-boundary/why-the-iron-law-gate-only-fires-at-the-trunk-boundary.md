@@ -4,6 +4,8 @@ title: Why the Iron Law gate only fires at the trunk boundary
 tags: [iron-law, merge, gate, human-ux, approve]
 source_capture_ids: [tsk-1y6-1, tsk-1y6-2, tsk-1y6-3, tsk-1y6-4]
 authoritative_for: why the Iron Law gate only runs at the trunk merge boundary, why it's ask/warn (not a bypass field), and why one /fgOS:approve skill wraps both approve and sync-root
+framework: diataxis
+mode: explanation
 ---
 # Why the Iron Law gate only fires at the trunk boundary
 
