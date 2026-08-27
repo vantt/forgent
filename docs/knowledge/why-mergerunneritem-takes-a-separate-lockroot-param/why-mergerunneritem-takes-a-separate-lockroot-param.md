@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `mergeRunnerItem` takes a separate `lockRoot` param
 
 A leaf `approve` was holding the main-checkout lock against a throwaway
