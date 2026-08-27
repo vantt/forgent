@@ -4,6 +4,8 @@ title: How to read a CRITICAL impact-analysis result before treating it as a rea
 tags: []
 timestamp: 2026-08-10T11:10:00.000Z
 source_capture_ids: [tsk-2x9, tsk-5lr]
+framework: diataxis
+mode: how-to
 ---
 # How to read a CRITICAL impact-analysis result before treating it as a real blocker
 
