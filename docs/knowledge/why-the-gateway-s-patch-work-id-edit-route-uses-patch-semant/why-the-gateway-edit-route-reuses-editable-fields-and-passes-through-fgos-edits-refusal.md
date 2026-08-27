@@ -1,5 +1,7 @@
 ---
 authoritative_for: why the gateway's PATCH /work/{id} edit route uses PATCH semantics, reads its accepted fields from EDITABLE_FIELDS instead of hardcoding a list, and passes fgos edit's own refusal to the client verbatim instead of re-validating
+framework: diataxis
+mode: explanation
 ---
 
 # Why the gateway edit route reuses EDITABLE_FIELDS and passes through `fgos edit`'s refusal
