@@ -1,5 +1,7 @@
 ---
 authoritative_for: why fgos-coding-planning writes docsRef immediately after creating a new docs/history/<feature>/ dir for a clear-discovery item, instead of only reading docsRef the way its Bootstrap step normally does
+framework: diataxis
+mode: explanation
 ---
 
 # Why fgos-coding-planning writes `docsRef` when it self-creates a feature dir
