@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # judge fail-safe debug log
 
 `judgeDiscovery` (`src/intake/discovery.mjs`) and `judgeDecompose`
