@@ -4,6 +4,8 @@ title: How to hold an open-ended design brainstorm with fgos-coding-shaping
 tags: [fgos-coding-shaping, discussion, brainstorm, clarify]
 timestamp: 2026-08-06T09:50:00.000Z
 source_capture_ids: [tsk-69g, tsk-5qs]
+framework: diataxis
+mode: how-to
 ---
 
 # How to hold an open-ended design brainstorm with `fgos-coding-shaping`
