@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # herdr web dashboard: layout, userflow and visual language
 
 The read-in-one-pass layout document for the herdr web dashboard. This is
