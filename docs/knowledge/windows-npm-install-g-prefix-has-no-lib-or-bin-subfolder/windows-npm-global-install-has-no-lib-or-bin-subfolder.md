@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Windows `npm install -g --prefix` has no `lib` or `bin` subfolder
 
 `tsk-49r` added a CI workflow running the test suite across an OS matrix
