@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Make a hardcoded stage check domain-aware via `stageForStep`
 
 Goal: when a stage check compares `work.stage` against a literal coding
