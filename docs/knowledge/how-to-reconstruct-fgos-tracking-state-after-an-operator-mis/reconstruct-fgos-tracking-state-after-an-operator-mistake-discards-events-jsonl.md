@@ -4,6 +4,8 @@ title: How to reconstruct fgOS tracking state after an operator mistake discards
 tags: []
 timestamp: 2026-08-10T00:00:00.000Z
 source_capture_ids: [tsk-4cx]
+framework: diataxis
+mode: how-to
 ---
 # How to reconstruct fgOS tracking state after an operator mistake discards `.fgos/events.jsonl` mid-session
 
