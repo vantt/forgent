@@ -4,6 +4,8 @@ title: Use --force to clear a red-first verify disagreement at clarify
 tags: [clarify, discover, force, verify, red-first, behavior_change]
 timestamp: 2026-08-06T00:00:00.000Z
 source_capture_ids: [tsk-66o]
+framework: diataxis
+mode: how-to
 ---
 
 # Use `--force` to clear a red-first verify disagreement at clarify
