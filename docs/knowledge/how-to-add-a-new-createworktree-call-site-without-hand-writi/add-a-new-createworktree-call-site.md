@@ -4,6 +4,8 @@ title: How to add a new `createWorktree` call site without hand-writing cleanup
 tags: [worktree, choke-point]
 timestamp: 2026-07-29T00:00:00.000Z
 source_capture_ids: [choke-point-createworktree-callsite-wrapper]
+framework: diataxis
+mode: how-to
 ---
 # How to add a new `createWorktree` call site without hand-writing cleanup
 
