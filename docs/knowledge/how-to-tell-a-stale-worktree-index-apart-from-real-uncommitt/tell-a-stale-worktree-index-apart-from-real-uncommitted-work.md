@@ -4,6 +4,8 @@ title: How to tell a stale worktree index apart from real uncommitted work
 tags: []
 timestamp: 2026-08-14T03:02:00.000Z
 source_capture_ids: [tsk-4l1]
+framework: diataxis
+mode: how-to
 ---
 # How to tell a stale worktree index apart from real uncommitted work
 
