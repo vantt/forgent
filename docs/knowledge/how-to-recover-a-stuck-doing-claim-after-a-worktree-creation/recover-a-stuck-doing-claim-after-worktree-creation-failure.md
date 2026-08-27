@@ -4,6 +4,8 @@ title: How to recover a stuck `doing` claim after a worktree-creation failure
 tags: [worktree, claim]
 timestamp: 2026-07-31T05:50:00.000Z
 source_capture_ids: [tsk-4m0, tsk-3lx, tsk-k8u]
+framework: diataxis
+mode: how-to
 ---
 # How to recover a stuck `doing` claim after a worktree-creation failure
 
