@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `decompose`'s skip-and-advance is narrower than `discovery`'s
 
 `resolveDiscovery` already had a skip-and-advance trust signal: when a
