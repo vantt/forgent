@@ -4,6 +4,8 @@ title: fgos version verb output fields
 tags: [cli, version, doctor, install]
 source_capture_ids: [tsk-2ej]
 authoritative_for: fgos version CLI verb output shape and the cli-version-visible doctor check
+framework: diataxis
+mode: reference
 ---
 # `fgos version` verb output fields
 
