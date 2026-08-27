@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `decompose` checks footprint overlap before creating children
 
 `decompose.mjs` used to write a predicted `footprint` field for each
