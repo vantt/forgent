@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why reclaiming an orphaned worktree checkout must check for live uncommitted work first
 
 `reclaimOrphanedCheckout` (`src/runner/worktree.mjs`) force-removes an
