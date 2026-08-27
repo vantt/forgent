@@ -4,6 +4,8 @@ title: How to unify two independently-written working-tree-clean checks into one
 tags: []
 timestamp: 2026-07-29T16:24:57.893Z
 source_capture_ids: [choke-point-workingtree-clean-duplication]
+framework: diataxis
+mode: how-to
 ---
 # How to unify two independently-written working-tree-clean checks into one scope-parameterized function
 
