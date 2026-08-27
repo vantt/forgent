@@ -4,6 +4,8 @@ title: How to recover a blocked merge-conflict item when `fgos catchup` itself c
 tags: []
 timestamp: 2026-07-30T07:37:00.000Z
 source_capture_ids: [tsk-6c2]
+framework: diataxis
+mode: how-to
 ---
 # How to recover a blocked merge-conflict item when `fgos catchup` itself can't reconcile it
 
