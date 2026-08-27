@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why a gate dialogue keeps the agent's checkpoint separate from the human's answer
 
 Source: `docs/history/checkpoint-distillate-gate-provenance/CONTEXT.md`
