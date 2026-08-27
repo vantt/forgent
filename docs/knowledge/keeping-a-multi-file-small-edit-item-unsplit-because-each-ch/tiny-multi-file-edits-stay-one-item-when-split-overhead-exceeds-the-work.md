@@ -4,6 +4,8 @@ title: Tiny multi-file edits stay one item when split overhead exceeds the work
 tags: [decompose, planning, footprint, lifecycle-cost]
 source_capture_ids: [tsk-3j1, tsk-1xn]
 authoritative_for: keeping a multi-file small-edit item unsplit because each child's worktree/merge-gate lifecycle overhead would exceed the actual edit work
+framework: diataxis
+mode: explanation
 ---
 # Tiny multi-file edits stay one item when split overhead exceeds the work
 
