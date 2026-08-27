@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `fgos merge` now refuses outside the main checkout
 
 `fgos merge list`/`fgos merge next`, run without `--dir` from a cwd that
