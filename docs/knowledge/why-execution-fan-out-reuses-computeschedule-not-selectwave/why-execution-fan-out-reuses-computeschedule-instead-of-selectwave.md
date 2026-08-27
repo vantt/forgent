@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why execution fan-out reuses `computeSchedule`, not `selectWave`, and stays a capability, not an entry point
 
 `tsk-umc` designed **execution fan-out** — dispatching N real, full-
