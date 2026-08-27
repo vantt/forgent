@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # How to get the fgOS Claude Code plugin installed via `fgos doctor`
 
 Use this when `fgos doctor` reports the fgOS Claude Code plugin is not
