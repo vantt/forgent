@@ -3,6 +3,8 @@ type: explanation
 title: Why state.json's write became atomic while its lock-scope claim turned out already fixed
 tags: [state, replay, store, atomic-write, events-lock]
 source_capture_ids: [tsk-4mx]
+framework: diataxis
+mode: explanation
 ---
 # Why `state.json`'s write became atomic while its lock-scope claim turned out already fixed
 
