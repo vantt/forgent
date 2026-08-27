@@ -1,5 +1,7 @@
 ---
 authoritative_for: why fgOS treats self-development as a bounded lane with its own gate, not the default mission, and where the full mechanism narrative lives
+framework: diataxis
+mode: explanation
 ---
 
 # Why fgOS self-development is not the default mission
