@@ -4,6 +4,8 @@ title: Why doctor now fails on a degraded impact-analysis tool instead of passin
 tags: [doctor, impact-analysis, gitnexus, tool-registry, capability-gate]
 source_capture_ids: [tsk-3oa2]
 authoritative_for: why fgos doctor's checkToolRegistryConfigured now reports failure for a degraded impact-analysis tool instead of passed:true
+framework: diataxis
+mode: explanation
 ---
 # Why `doctor` now fails on a degraded impact-analysis tool instead of passing
 
