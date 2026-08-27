@@ -3,6 +3,8 @@ type: how-to
 title: How to cut a fgOS release tag
 tags: []
 source_capture_ids: [tsk-jtb]
+framework: diataxis
+mode: how-to
 ---
 # How to cut a fgOS release tag
 
