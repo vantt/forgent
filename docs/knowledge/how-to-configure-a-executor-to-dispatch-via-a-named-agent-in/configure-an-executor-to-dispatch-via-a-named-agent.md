@@ -4,6 +4,8 @@ title: How to configure a executor to dispatch via a named agent instead of a ra
 tags: []
 timestamp: 2026-08-03T09:41:35.301Z
 source_capture_ids: [tsk-3sw]
+framework: diataxis
+mode: how-to
 ---
 
 # How to configure a executor to dispatch via a named agent instead of a raw command
