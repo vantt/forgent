@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # How to register a fixable doctor check in fgOS
 
 You have a module that wants `fgos doctor` to detect a problem AND repair
