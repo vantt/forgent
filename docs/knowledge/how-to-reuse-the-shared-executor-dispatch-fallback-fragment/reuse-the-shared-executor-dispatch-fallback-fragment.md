@@ -3,6 +3,8 @@ type: how-to
 title: How to reuse the shared executor-dispatch-fallback fragment in a new skill
 tags: []
 source_capture_ids: [tsk-53h]
+framework: diataxis
+mode: how-to
 ---
 # How to reuse the shared executor-dispatch-fallback fragment in a new skill
 
