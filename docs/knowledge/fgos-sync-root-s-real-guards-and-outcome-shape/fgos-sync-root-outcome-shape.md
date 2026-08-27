@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # `fgos sync-root`'s real guards and outcome shape
 
 `fgos sync-root <root-id>` (`bin/fgos.mjs`, `tsk-50i`, child of `tsk-3bn`)
