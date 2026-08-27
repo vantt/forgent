@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `resolveDiscovery` guards re-parking an already-parked item
 
 `resolveDiscovery`'s `unclear` branch used to call `putInAwaiting`
