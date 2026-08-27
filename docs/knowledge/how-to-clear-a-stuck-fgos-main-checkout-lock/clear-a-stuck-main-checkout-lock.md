@@ -4,6 +4,8 @@ title: How to clear a stuck `.fgos/main-checkout.lock`
 tags: []
 timestamp: 2026-07-29T05:58:21.000Z
 source_capture_ids: [tsk-3h4]
+framework: diataxis
+mode: how-to
 ---
 # How to clear a stuck `.fgos/main-checkout.lock`
 
