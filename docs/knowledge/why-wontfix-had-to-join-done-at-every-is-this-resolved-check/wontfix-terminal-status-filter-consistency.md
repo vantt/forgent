@@ -1,6 +1,8 @@
 ---
 type: explanation
 source_capture_ids: [tsk-37u]
+framework: diataxis
+mode: explanation
 ---
 
 # Why `wontfix` had to join `done` at every "is this resolved?" check site
