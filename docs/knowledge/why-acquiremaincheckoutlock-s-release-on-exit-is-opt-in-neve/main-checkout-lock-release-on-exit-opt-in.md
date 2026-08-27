@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `acquireMainCheckoutLock`'s release-on-exit is opt-in, never the default
 
 `.fgos/main-checkout.lock` (`src/runner/main-checkout-lock.mjs`) is held two
