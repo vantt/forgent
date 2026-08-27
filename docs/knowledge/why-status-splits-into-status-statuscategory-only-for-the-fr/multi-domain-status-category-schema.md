@@ -4,6 +4,8 @@ title: Why status splits into status + statusCategory only for the front segment
 tags: [work-item, status, statusCategory, domain-model, multi-domain]
 timestamp: 2026-08-04T00:00:00.000Z
 source_capture_ids: [tsk-38t]
+framework: diataxis
+mode: explanation
 ---
 
 # Why status splits into status + statusCategory only for the front segment of the lifecycle
