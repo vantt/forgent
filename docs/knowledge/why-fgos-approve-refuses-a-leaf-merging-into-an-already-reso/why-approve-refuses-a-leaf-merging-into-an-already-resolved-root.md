@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `fgos approve` refuses a leaf merging into an already-resolved root
 
 Every decomposed item merges into `fgw/<root>` first (`leaf-to-root`),
