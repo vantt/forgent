@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # `rankImpact`'s real sort-key order
 
 `rankImpact` (`src/state/impact.mjs`) ranks open work items for
