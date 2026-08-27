@@ -3,6 +3,8 @@ type: explanation
 title: Why the pre-commit hook got its own shorter main-checkout-lock TTL
 tags: []
 source_capture_ids: [tsk-1d9]
+framework: diataxis
+mode: explanation
 ---
 # Why the pre-commit hook got its own shorter main-checkout-lock TTL
 
