@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Poll fgOS CLI data from a Rust plugin
 
 A recipe for wiring a compiled plugin binary to real fgOS state through the
