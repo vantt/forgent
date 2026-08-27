@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Shell fallback detection needs `type -P`, not `command -v`
 
 `tsk-2ta-3` added a fallback to `scripts/fgos-shell-integration.sh`'s
