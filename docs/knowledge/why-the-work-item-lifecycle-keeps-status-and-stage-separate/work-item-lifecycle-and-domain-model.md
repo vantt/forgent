@@ -4,6 +4,8 @@ title: Why the work-item lifecycle keeps status and stage separate, and what ext
 tags: [work-item, fsm, lifecycle, domain-model]
 timestamp: 2026-07-22T00:00:00.000Z
 source_capture_ids: []
+framework: diataxis
+mode: explanation
 ---
 
 # Why the work-item lifecycle keeps status and stage separate, and what extending it costs
