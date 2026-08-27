@@ -4,6 +4,8 @@ title: Gateway subsystem audit findings (2026-08-14)
 tags: [audit, gateway, mcp, interface-daemon, code-review]
 source_capture_ids: [tsk-1zg, tsk-4uh, tsk-og6, tsk-4lf, tsk-1qe, tsk-1ah, tsk-5m1, tsk-4qf, tsk-67gr, tsk-4r1]
 authoritative_for: the 9 findings from the 2026-08-14 haiku-scan + fable code-review audit of fgOS's gateway subsystem (REST/RPC + MCP surface), and which work item tracks each
+framework: diataxis
+mode: reference
 ---
 # Gateway subsystem audit findings (2026-08-14)
 
