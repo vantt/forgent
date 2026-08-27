@@ -4,6 +4,8 @@ title: How to check whether a suspected racing mechanism ever actually fired, be
 tags: []
 timestamp: 2026-08-10T13:15:00.000Z
 source_capture_ids: [tsk-3cs]
+framework: diataxis
+mode: how-to
 ---
 # How to check whether a suspected racing mechanism ever actually fired, before fixing it
 
