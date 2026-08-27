@@ -4,6 +4,8 @@ title: Why fgOS keeps growing the same decision logic in more than one place
 tags: [choke-point, claim, worktree, verify]
 timestamp: 2026-07-29T07:01:26.000Z
 source_capture_ids: [tsk-1ab, tsk-1ab-1, tsk-1ab-2]
+framework: diataxis
+mode: explanation
 ---
 # Why fgOS keeps growing the same decision logic in more than one place
 
