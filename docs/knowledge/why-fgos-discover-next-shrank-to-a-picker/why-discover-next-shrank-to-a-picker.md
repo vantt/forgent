@@ -2,6 +2,8 @@
 type: explanation
 title: Why `/fgOS:discover-next` shrank to a picker
 source_capture_ids: [tsk-lya]
+framework: diataxis
+mode: explanation
 ---
 # Why `/fgOS:discover-next` shrank to a picker
 
