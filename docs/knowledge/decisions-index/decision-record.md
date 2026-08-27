@@ -2,6 +2,8 @@
 type: explanation
 title: Decisions index
 generated: true
+framework: diataxis
+mode: explanation
 ---
 
 # Decisions index
