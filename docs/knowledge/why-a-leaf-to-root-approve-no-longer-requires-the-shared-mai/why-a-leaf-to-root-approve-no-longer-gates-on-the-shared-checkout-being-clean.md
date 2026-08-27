@@ -4,6 +4,8 @@ title: Why a leaf-to-root approve no longer gates on the shared checkout being c
 tags: [approve, merge, clean-tree, worktree-isolation]
 source_capture_ids: [tsk-kv3]
 authoritative_for: why a leaf-to-root approve no longer requires the shared main checkout to be clean, while a root-to-main approve still does
+framework: diataxis
+mode: explanation
 ---
 # Why a leaf-to-root approve no longer gates on the shared checkout being clean
 
