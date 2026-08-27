@@ -3,6 +3,8 @@ type: how-to
 title: Make a fail-safe catch block visible without breaking it
 tags: []
 source_capture_ids: [tsk-6d8]
+framework: diataxis
+mode: how-to
 ---
 # Make a fail-safe catch block visible without breaking it
 
