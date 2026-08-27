@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Global config merge reuses the existing fill-missing-only primitive
 
 `tsk-2ta-1` needed fgOS to read a new global config file
