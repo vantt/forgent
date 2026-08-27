@@ -4,6 +4,8 @@ title: Walking a heavy fgOS item through exploring, a 3-child split, and done
 tags: []
 timestamp: 2026-07-29T03:44:15.000Z
 source_capture_ids: [tsk-3wr]
+framework: diataxis
+mode: tutorial
 ---
 # Walking a heavy fgOS item through exploring, a 3-child split, and done
 
