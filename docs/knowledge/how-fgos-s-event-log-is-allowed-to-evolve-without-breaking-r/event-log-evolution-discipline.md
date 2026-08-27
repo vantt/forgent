@@ -4,6 +4,8 @@ title: How fgOS's event log is allowed to evolve without breaking replay
 tags: [event-log, replay, state-layer, backward-compat]
 timestamp: 2026-07-22T00:00:00.000Z
 source_capture_ids: []
+framework: diataxis
+mode: explanation
 ---
 
 # How fgOS's event log is allowed to evolve without breaking replay
