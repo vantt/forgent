@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `isDepsAndLineageReady` uses `RESOLVED_STATUSES`, not just `done`
 
 `isDepsAndLineageReady` (`frontier.mjs`, used by `bin/fgos.mjs`'s
