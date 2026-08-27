@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why fgOS retired `.fgos-runner.json` entirely instead of fixing its fallback chain
 
 `tsk-5hv` removed `.fgos-runner.json` — the legacy config file
