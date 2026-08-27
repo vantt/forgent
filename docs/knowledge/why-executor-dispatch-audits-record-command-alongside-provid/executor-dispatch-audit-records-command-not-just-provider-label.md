@@ -1,5 +1,7 @@
 ---
 title: Why executor.dispatch audits record command alongside provider
+framework: diataxis
+mode: explanation
 ---
 
 # Why executor.dispatch audits record command alongside provider
