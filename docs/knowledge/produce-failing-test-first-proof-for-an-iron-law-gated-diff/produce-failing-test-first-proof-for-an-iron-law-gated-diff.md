@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Produce failing-test-first proof for an Iron Law-gated diff
 
 `tsk-62v` touched `src/runner/dispatch.mjs` and `src/runner/loop.mjs` —
