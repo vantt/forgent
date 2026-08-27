@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `approve` logs post-success `moveWork` faults outside `events.lock`
 
 `fgos approve`'s three success paths in `bin/fgos.mjs` (`case 'approve'`)
