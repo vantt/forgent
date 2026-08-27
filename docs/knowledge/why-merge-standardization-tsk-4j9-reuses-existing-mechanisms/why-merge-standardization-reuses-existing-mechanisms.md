@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why merge-standardization (`tsk-4j9`) reuses existing mechanisms instead of building new ones
 
 `tsk-4j9` ("Chuẩn hóa merge") added an ordering/selection layer over the
