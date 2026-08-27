@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `fgos catchup` needed its own already-caught-up guard
 
 `tsk-k7i` fixed a failure mode in `fgos catchup <id>` (`bin/fgos.mjs`,
