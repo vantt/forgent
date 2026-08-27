@@ -377,3 +377,39 @@ test('approve of a legacy item with a passing verify closes it to done — legac
   assert.equal(result.status, 0, result.stderr);
   assert.equal(stateView(cwd).work['approve-legacy-ok-item'].status, 'delivered');
 });
+
+
+test('approve catches transitionWork CAS conflict when item becomes blocked before failure block write, returning structured result (AC4)', () => {
+  const cwd = tmpCwd();
+  const verifyCmd = `node --input-type=module -e 'import { moveWork } from "${REAL_REPO_ROOT}/src/state/store.mjs"; moveWork(".fgos", { id: "cas-blocked-item", to: "blocked", expectedStatus: "awaiting-approval", reason: "concurrent-block", role: "system" }); process.exit(1);'`;
+  addOk(cwd, 'cas-blocked-item', { verify: verifyCmd });
+  run(cwd, ['move', 'cas-blocked-item', '--to', 'doing']);
+  run(cwd, ['move', 'cas-blocked-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup"]);
+
+  const result = run(cwd, ['approve', 'cas-blocked-item']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'blocked');
+  assert.equal(data.reason, 'state-changed-concurrently');
+  assert.equal(data.expected, 'awaiting-approval');
+  assert.equal(data.actual, 'blocked');
+});
+
+
+test('approve CAS conflict returns fresh actual status from store on event-regression replay / stale status (AC5)', () => {
+  const cwd = tmpCwd();
+  const verifyCmd = `node --input-type=module -e 'import { moveWork } from "${REAL_REPO_ROOT}/src/state/store.mjs"; moveWork(".fgos", { id: "cas-todo-item", to: "todo", expectedStatus: "awaiting-approval", reason: "concurrent-todo", role: "system" }); process.exit(1);'`;
+  addOk(cwd, 'cas-todo-item', { verify: verifyCmd });
+  run(cwd, ['move', 'cas-todo-item', '--to', 'doing']);
+  run(cwd, ['move', 'cas-todo-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup"]);
+
+  const result = run(cwd, ['approve', 'cas-todo-item']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'blocked');
+  assert.equal(data.reason, 'state-changed-concurrently');
+  assert.equal(data.expected, 'awaiting-approval');
+  assert.equal(data.actual, 'todo');
+});
+
+
