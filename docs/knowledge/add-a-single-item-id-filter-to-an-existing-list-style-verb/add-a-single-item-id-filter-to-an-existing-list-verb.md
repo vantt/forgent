@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Add a single-item `--id` filter to an existing `list`-style verb
 
 A recipe for narrowing an existing multi-item read verb to one item by id,
