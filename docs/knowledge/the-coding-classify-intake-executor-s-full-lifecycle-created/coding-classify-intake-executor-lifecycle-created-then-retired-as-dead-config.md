@@ -3,6 +3,8 @@ type: explanation
 title: The coding-classify-intake executor's full lifecycle — created, never wired, retired as dead config
 tags: []
 source_capture_ids: [tsk-3fj, tsk-4fk, tsk-6ar]
+framework: diataxis
+mode: explanation
 ---
 # The coding-classify-intake executor's full lifecycle — created, never wired, retired as dead config
 
