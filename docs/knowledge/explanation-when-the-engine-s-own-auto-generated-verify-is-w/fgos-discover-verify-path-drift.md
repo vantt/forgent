@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Explanation: when the engine's own auto-generated verify is wrong
 
 `fgos discover`'s clarify/decompose judgment writes a `verify` field (and,
