@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # herdr-plugin dashboard layout: work-items panel + action-queue boxes
 
 `tsk-1d5` redesigned herdr-plugin's TUI (`herdr-plugin/src/ui.rs`) from a
