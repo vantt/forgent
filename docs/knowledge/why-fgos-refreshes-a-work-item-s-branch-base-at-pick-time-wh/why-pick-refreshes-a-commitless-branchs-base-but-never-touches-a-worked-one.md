@@ -4,6 +4,8 @@ title: Why pick refreshes a commitless branch's base but never touches a worked 
 tags: [pick, worktree, baseRef, decompose, staleness]
 source_capture_ids: [tsk-55p]
 authoritative_for: why fgOS refreshes a work item's branch base at pick time when the branch has no commits of its own, and never when it does
+framework: diataxis
+mode: explanation
 ---
 # Why `pick` refreshes a commitless branch's base but never touches a worked one
 
