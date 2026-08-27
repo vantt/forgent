@@ -4,6 +4,8 @@ title: Why gate questions must be self-sufficient, and mechanically checked for 
 tags: [gate, ask, question-quality, markdown, STR71]
 source_capture_ids: [tsk-539]
 authoritative_for: why fgOS requires a gate/ask question to restate its own context and problem, why that requirement got real machine enforcement, and why the enforcement targets structural completeness rather than citation format
+framework: diataxis
+mode: explanation
 ---
 # Why gate questions must be self-sufficient, and mechanically checked for it
 
