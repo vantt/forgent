@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why the main-checkout lock needs a heartbeat during merge verify
 
 `mergeRunnerItem` (`src/runner/merge.mjs`) acquires
