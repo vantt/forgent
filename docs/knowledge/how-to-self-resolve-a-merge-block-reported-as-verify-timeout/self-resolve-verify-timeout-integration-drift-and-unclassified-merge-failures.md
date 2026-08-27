@@ -4,6 +4,8 @@ title: Self-resolve verify-timeout, integration-drift, and unclassified merge fa
 tags: [merge, catchup, playbook, verify-timeout, integration-drift]
 source_capture_ids: [tsk-4xq]
 authoritative_for: how to self-resolve a merge block reported as verify-timeout-post-merge, integration-drift, or merge-failed-unclassified, and what the narrowed same-id-twice stop rule now covers
+framework: diataxis
+mode: how-to
 ---
 # Self-resolve verify-timeout, integration-drift, and unclassified merge failures
 
