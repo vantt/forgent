@@ -3,6 +3,8 @@ type: explanation
 title: Why docs/enduser-docs-index.json needed a doctor check, not just a regenerate skill
 tags: []
 source_capture_ids: [tsk-1m0]
+framework: diataxis
+mode: explanation
 ---
 # Why `docs/enduser-docs-index.json` needed a doctor check, not just a regenerate skill
 
