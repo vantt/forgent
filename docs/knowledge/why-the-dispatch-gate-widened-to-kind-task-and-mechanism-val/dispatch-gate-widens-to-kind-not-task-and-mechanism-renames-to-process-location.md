@@ -1,5 +1,7 @@
 ---
 title: Why the dispatch gate widened to `kind !== 'task'` and mechanism values renamed to process location
+framework: diataxis
+mode: explanation
 ---
 
 # Why the dispatch gate widened to `kind !== 'task'` and mechanism values renamed to process location
