@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `mergeRunnerItem` returns `merge-failed-unclassified` instead of crashing
 
 `fgos merge next` picking a branch used to crash outright on a class of
