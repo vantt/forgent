@@ -389,6 +389,6 @@
     "fallbackIntervalSec": 3600
   },
   "docRegistry": {
-    "enforce": false
+    "enforce": true
   }
 }
