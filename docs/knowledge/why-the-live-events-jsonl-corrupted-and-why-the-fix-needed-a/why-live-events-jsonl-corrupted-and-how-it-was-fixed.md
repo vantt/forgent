@@ -4,6 +4,8 @@ title: Why the live events.jsonl corrupted, and why the fix needed a split
 tags: []
 timestamp: 2026-07-30T00:00:00.000Z
 source_capture_ids: [tsk-n4i]
+framework: diataxis
+mode: explanation
 ---
 # Why the live events.jsonl corrupted, and why the fix needed a split
 
