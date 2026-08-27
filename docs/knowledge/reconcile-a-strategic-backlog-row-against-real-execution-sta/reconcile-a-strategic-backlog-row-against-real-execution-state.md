@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Reconcile a strategic backlog row against real execution state
 
 ## When to use
