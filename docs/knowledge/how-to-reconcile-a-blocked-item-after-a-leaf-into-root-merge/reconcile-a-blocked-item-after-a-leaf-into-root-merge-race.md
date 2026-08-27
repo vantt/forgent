@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # How to reconcile a blocked item after a leaf-into-root merge race
 
 Use this when a leaf item's `approve` reports `blocked`/`verify-fail`,
