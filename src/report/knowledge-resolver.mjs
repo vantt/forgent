@@ -70,6 +70,26 @@ export function resolveDocPath(view, path) {
   const currentTopics = Object.values(view.topics || {}).filter((t) => t.status === 'active');
 
   for (const rDoc of matchingRetiredDocs) {
+    // doc.supersede records an EXACT successor pointer -- when the
+    // registry already names which live doc replaced this one, that is
+    // strictly more precise than the lineage/role guess below (which can
+    // only infer a successor from topic lineage and role matching, and
+    // goes ambiguous the moment a same-topic successor has a different
+    // role than the superseded doc, or another unrelated live doc shares
+    // the topic). Follow the pointer first; only fall back to the
+    // lineage/role chase when there is no pointer, it targets a doc that
+    // no longer exists, or that doc isn't live itself (e.g. a chain of
+    // supersessions where the immediate successor was later superseded
+    // again -- resolving that chain is exactly what the lineage/role
+    // fallback below already knows how to do).
+    if (rDoc.supersededBy) {
+      const successor = view.docs[rDoc.supersededBy];
+      if (successor && isLive(successor)) {
+        targetDocs.add(successor);
+        continue;
+      }
+    }
+
     for (const t of currentTopics) {
       if (leadsFrom(t.topicId, rDoc.topicId)) {
         const docsInT = Object.values(view.docs).filter(

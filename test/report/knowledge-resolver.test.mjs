@@ -159,3 +159,40 @@ test('resolveDocPath - a superseded doc with no live successor in its topic is f
 
   assert.equal(resolveDocPath(view, 'docs/t1/guide.md'), null);
 });
+
+test('resolveDocPath - supersededBy resolves to the EXACT successor even when it has a different role and another unrelated live doc shares the topic', () => {
+  // The lineage/role fallback alone is ambiguous here: d2 (the real
+  // successor) has a DIFFERENT role than d1, so the exact-role match
+  // finds nothing and the fallback would add every live doc in the topic
+  // -- both d2 and the unrelated d3 -- even though the registry already
+  // names d2 as the one true successor via supersededBy.
+  const view = {
+    topics: { t1: { topicId: 't1', status: 'active' } },
+    docs: {
+      d1: { docId: 'd1', topicId: 't1', role: 'pitfall', currentPath: 'docs/t1/pitfall.md', docLifecycle: 'superseded', aliases: [], supersededBy: 'd2' },
+      d2: { docId: 'd2', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active', aliases: [] },
+      d3: { docId: 'd3', topicId: 't1', role: 'reference', currentPath: 'docs/t1/reference.md', docLifecycle: 'active', aliases: [] }
+    }
+  };
+
+  const resolved = resolveDocPath(view, 'docs/t1/pitfall.md');
+  assert.equal(Array.isArray(resolved), false, `expected the exact successor, got an ambiguous array: ${JSON.stringify(resolved)}`);
+  assert.equal(resolved.docId, 'd2');
+});
+
+test('resolveDocPath - falls back to the lineage/role chase when supersededBy points at a doc that is itself no longer live', () => {
+  // d1 -> d2 -> d3, a chain of supersessions. d2 is no longer live (it was
+  // superseded again by d3), so following d1's pointer to d2 must not
+  // stop there -- the lineage/role fallback (same topic, same role) is
+  // what correctly finds d3.
+  const view = {
+    topics: { t1: { topicId: 't1', status: 'active' } },
+    docs: {
+      d1: { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide-v1.md', docLifecycle: 'superseded', aliases: [], supersededBy: 'd2' },
+      d2: { docId: 'd2', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide-v2.md', docLifecycle: 'superseded', aliases: [], supersededBy: 'd3' },
+      d3: { docId: 'd3', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide-v3.md', docLifecycle: 'active', aliases: [] }
+    }
+  };
+
+  assert.equal(resolveDocPath(view, 'docs/t1/guide-v1.md').docId, 'd3');
+});
