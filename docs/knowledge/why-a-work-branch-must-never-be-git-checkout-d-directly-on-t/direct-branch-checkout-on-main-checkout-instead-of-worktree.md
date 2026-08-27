@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why a work branch must never be `git checkout`'d directly on the main checkout
 
 Twice, a session ran a direct `git checkout <fgw/branch>` on the main
