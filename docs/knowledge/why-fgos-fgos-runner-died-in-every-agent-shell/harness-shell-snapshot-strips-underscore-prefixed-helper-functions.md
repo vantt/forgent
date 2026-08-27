@@ -3,6 +3,8 @@ type: explanation
 title: Why fgos()/fgos-runner() died in every agent shell — the harness strips underscore-prefixed helpers
 tags: []
 source_capture_ids: [tsk-3k2]
+framework: diataxis
+mode: explanation
 ---
 # Why `fgos()`/`fgos-runner()` died in every agent shell
 
