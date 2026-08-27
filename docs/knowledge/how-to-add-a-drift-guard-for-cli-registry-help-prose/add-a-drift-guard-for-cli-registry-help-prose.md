@@ -4,6 +4,8 @@ title: How to add a drift guard for CLI registry help prose
 tags: []
 timestamp: 2026-08-15T07:35:00.000Z
 source_capture_ids: [tsk-2so]
+framework: diataxis
+mode: how-to
 ---
 # How to add a drift guard for CLI registry help prose
 
