@@ -4,6 +4,8 @@ title: Land a delivered item whose branch was never actually merged
 tags: [delivered, orphaned-branch, land, approve, status-machine]
 source_capture_ids: [tsk-1l9]
 authoritative_for: how to land a work item's branch into main when its status already reads delivered but the branch was never actually merged
+framework: diataxis
+mode: how-to
 ---
 # Land a delivered item whose branch was never actually merged
 
