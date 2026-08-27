@@ -1,5 +1,7 @@
 ---
 authoritative_for: why every Agent/Task-tool dispatch is enforced through a PreToolUse hook that runs dispatch.mjs decide itself, why the hook self-invokes decide instead of tracking whether the caller already did, why --needs-soul exists, why decide reports configured:true|false instead of throwing, why resolve was retired in favor of decide/execute, and why MCP tool access is a hand-back rather than a second client dispatch.mjs opens itself
+framework: diataxis
+mode: explanation
 ---
 
 # Why `dispatch decide` is a hard, hook-enforced gate, not a convention
