@@ -4,6 +4,8 @@ title: How to check main-checkout-lock status before retrying
 tags: []
 timestamp: 2026-08-05T11:55:50.000Z
 source_capture_ids: [tsk-5z2]
+framework: diataxis
+mode: how-to
 ---
 
 # How to check main-checkout-lock status before retrying
