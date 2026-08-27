@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `fgos discover` embeds repo layout in its verify-proposal prompt
 
 `fgos discover`'s context-discovery judgment
