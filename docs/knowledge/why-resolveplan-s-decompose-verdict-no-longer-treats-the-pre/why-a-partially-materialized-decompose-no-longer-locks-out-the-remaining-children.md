@@ -4,6 +4,8 @@ title: Why a partially materialized decompose no longer locks out the remaining 
 tags: [resolvePlan, decompose, footprint-overlap, atomicity]
 source_capture_ids: [tsk-4n8, tsk-11v]
 authoritative_for: why resolvePlan's decompose verdict no longer treats the presence of any one child as proof the whole split already completed
+framework: diataxis
+mode: explanation
 ---
 # Why a partially materialized decompose no longer locks out the remaining children
 
