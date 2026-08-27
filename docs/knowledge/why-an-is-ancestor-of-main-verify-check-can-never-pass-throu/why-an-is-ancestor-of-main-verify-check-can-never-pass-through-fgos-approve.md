@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why an `is-ancestor-of-main` verify check can never pass through `fgos approve`
 
 An item's `verify` command runs at two points: `fgos return` (on the
