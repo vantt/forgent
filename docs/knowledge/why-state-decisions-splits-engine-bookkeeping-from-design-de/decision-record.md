@@ -4,6 +4,8 @@ title: state.decisions splits engine bookkeeping from cited design decisions
 tags: []
 source_capture_ids: [tsk-1ud, tsk-1lv]
 authoritative_for: why state.decisions splits engine bookkeeping from design decisions, and how the canonical decision projection (docs/decisions/index.md, docs/specs/<area>.md narrative) is wired onto that same clean zone with no second store
+framework: diataxis
+mode: explanation
 ---
 # state.decisions splits engine bookkeeping from cited design decisions
 
