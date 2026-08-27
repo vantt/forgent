@@ -1,6 +1,8 @@
 ---
 type: explanation
 source_capture_ids: [tsk-52g-2]
+framework: diataxis
+mode: explanation
 ---
 
 # Why a work item title's "object + action + scope" rule lives in the submitting skills, not just the decompose prompt
