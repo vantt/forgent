@@ -4,6 +4,8 @@ title: How to wire a skill through the dispatch decision
 tags: []
 timestamp: 2026-08-03T14:00:00.000Z
 source_capture_ids: [tsk-3ik, tsk-3ik-4]
+framework: diataxis
+mode: how-to
 ---
 
 # How to wire a skill through the dispatch decision
