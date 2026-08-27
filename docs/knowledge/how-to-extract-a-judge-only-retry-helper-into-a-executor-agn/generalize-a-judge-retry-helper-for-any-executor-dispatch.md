@@ -4,6 +4,8 @@ title: How to extract a judge-only retry helper into a executor-agnostic one
 tags: [judge-executor, retry, executor-dispatch, runner, escalation]
 timestamp: 2026-08-01T10:10:37.000Z
 source_capture_ids: [tsk-418-1, tsk-418-2, tsk-418]
+framework: diataxis
+mode: how-to
 ---
 
 # How to extract a judge-only retry helper into a executor-agnostic one
