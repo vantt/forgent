@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # How to process the next clarify/decompose item with `/fgOS:discover-next`
 
 Use this when you want the single next `stage:clarify` or
