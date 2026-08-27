@@ -4,6 +4,8 @@ title: How to resolve a git merge conflict on `.fgos/events.jsonl` without break
 tags: []
 timestamp: 2026-07-30T00:00:00.000Z
 source_capture_ids: [tsk-n4i-2]
+framework: diataxis
+mode: how-to
 ---
 # How to resolve a git merge conflict on `.fgos/events.jsonl` without breaking seq contiguity
 
