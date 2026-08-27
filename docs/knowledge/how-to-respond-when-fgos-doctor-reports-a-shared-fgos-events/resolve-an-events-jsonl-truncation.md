@@ -4,6 +4,8 @@ title: How to respond when fgos doctor reports a shared events.jsonl truncation
 tags: []
 timestamp: 2026-08-11T00:00:00.000Z
 source_capture_ids: []
+framework: diataxis
+mode: how-to
 ---
 # How to respond when `fgos doctor` reports a shared `.fgos/events.jsonl` truncation
 
