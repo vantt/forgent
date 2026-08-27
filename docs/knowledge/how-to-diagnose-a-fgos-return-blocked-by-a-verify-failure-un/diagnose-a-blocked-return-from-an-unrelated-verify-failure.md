@@ -4,6 +4,8 @@ title: How to diagnose a `fgos return` blocked by a verify failure unrelated to 
 tags: []
 timestamp: 2026-07-29T01:09:46.000Z
 source_capture_ids: [tsk-3wr-1]
+framework: diataxis
+mode: how-to
 ---
 # How to diagnose a `fgos return` blocked by a verify failure unrelated to your change
 
