@@ -4,6 +4,8 @@ title: Why a single `done` status split into delivered → retrospective → cle
 tags: [work-item, status, lifecycle, delivered, retrospective, cleanup, done]
 timestamp: 2026-08-06T00:00:00.000Z
 source_capture_ids: [tsk-1ca]
+framework: diataxis
+mode: explanation
 ---
 
 # Why a single `done` status split into delivered → retrospective → cleanup → done
