@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why executor-aware backend dispatch exists
 
 Before this cluster, forgent's runner dispatched every unit of work
