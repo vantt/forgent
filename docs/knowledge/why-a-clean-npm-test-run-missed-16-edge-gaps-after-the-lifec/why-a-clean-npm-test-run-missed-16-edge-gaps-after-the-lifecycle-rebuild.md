@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why a clean `npm test` run missed 16 edge gaps after the lifecycle rebuild
 
 `tsk-5sr` is the umbrella item (9 children) that closed the edge gaps a
