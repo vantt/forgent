@@ -3,6 +3,8 @@ type: explanation
 title: Why `fgos review` crashed with ENOBUFS on very stale branch diffs
 tags: []
 source_capture_ids: [tsk-648]
+framework: diataxis
+mode: explanation
 ---
 # Why `fgos review` crashed with ENOBUFS on very stale branch diffs
 
