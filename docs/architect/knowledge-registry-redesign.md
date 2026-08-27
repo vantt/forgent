@@ -94,7 +94,7 @@ A topic grows slower than work items. A normal retrospective writer must not sil
 Purpose is the reader-facing form of a topic. It appears in the filesystem as the directory slug:
 
 ```txt
-docs/<purposeSlug>/<role>.md
+docs/knowledge/<purposeSlug>/<role>.md
 ```
 
 Purpose must not be a restatement of a single work item title. It must describe a reusable reader job or problem domain.
@@ -163,7 +163,7 @@ If the system needs more than one active document for what appears to be the sam
 The normal projected path is:
 
 ```txt
-docs/<purposeSlug>/<role>.md
+docs/knowledge/<purposeSlug>/<role>.md
 ```
 
 This path is a projection of registry state, not the source of truth. It gives the filesystem the structure humans want from `ls docs/`, while the registry preserves identity across moves.
