@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # How to: label a herdr pane with the claimed task from a chrome-only fgOS skill
 
 Goal: give a `/fgOS:<verb>` skill a best-effort side effect against herdr
