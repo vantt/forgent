@@ -3,6 +3,8 @@ type: explanation
 title: Why mergeRunnerItem's commit-failure error now carries git's real stderr
 tags: [merge, approve, error-handling, diagnosability]
 source_capture_ids: [tsk-50i7]
+framework: diataxis
+mode: explanation
 ---
 # Why `mergeRunnerItem`'s commit-failure error now carries git's real stderr
 
