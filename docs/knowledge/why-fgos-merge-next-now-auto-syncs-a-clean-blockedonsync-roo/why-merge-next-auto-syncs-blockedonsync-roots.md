@@ -2,6 +2,8 @@
 type: explanation
 title: Why `fgos merge next` now auto-syncs a clean `blockedOnSync` root
 source_capture_ids: [tsk-4qu]
+framework: diataxis
+mode: explanation
 ---
 # Why `fgos merge next` now auto-syncs a clean `blockedOnSync` root
 
