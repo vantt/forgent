@@ -4,6 +4,8 @@ title: How to fix a `fgos-write-rejected` merge block on a `.fgos/` change
 tags: []
 timestamp: 2026-07-30T00:00:00.000Z
 source_capture_ids: [tsk-n4i-1, tsk-5vf, tsk-4eu, tsk-5ge, tsk-53n, tsk-3v2]
+framework: diataxis
+mode: how-to
 ---
 # How to fix a `fgos-write-rejected` merge block on a `.fgos/` change
 
