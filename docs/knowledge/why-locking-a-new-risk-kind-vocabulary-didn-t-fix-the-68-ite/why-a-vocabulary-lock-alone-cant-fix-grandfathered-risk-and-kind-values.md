@@ -3,6 +3,8 @@ type: explanation
 title: Why locking a new risk/kind vocabulary didn't fix the 68 items already on disk
 tags: []
 source_capture_ids: [tsk-6ax]
+framework: diataxis
+mode: explanation
 ---
 # Why locking a new risk/kind vocabulary didn't fix the 68 items already on disk
 
