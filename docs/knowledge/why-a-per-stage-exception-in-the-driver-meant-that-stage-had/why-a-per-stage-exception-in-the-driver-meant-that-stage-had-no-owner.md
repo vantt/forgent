@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why a per-stage exception in the driver meant that stage had no owner
 
 `fgos-coding-driving` is meant to be one mechanical loop with no per-stage
