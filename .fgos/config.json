@@ -39,7 +39,7 @@
       },
       "fgos-coding-implement": {
         "description": "code-implement work for the coding domain's executing stage -- pinned to gemini-3.6-flash-medium via this capability's own providerModel/rigorOverrides (agy/gemini, lightweight policy tier; see modelPolicies.gemini.lightweight for the literal model string). Reverted to executors.agy-cli (invisible cli-spawn subprocess) after a real, reproducible failure: executors.agy-herdr's -i interactiveMode invocation never actually delivers the prompt to agy's chat the way -p does -- agy just opens its idle interactive REPL banner and sits there, headBefore==headAfter, no real work done, while agent_status genuinely (and honestly) reports 'idle' the whole time. Confirmed twice independently (another session's real dispatch, and a disposable-repo repro in this session) before reverting. Do not flip prefer back to agy-herdr until this is fixed and re-verified live.",
-        "prefer": "agy-herdr",
+        "prefer": "agy-cli",
         "overrides": {
           "providerModel": "gemini",
           "rigorOverrides": {
