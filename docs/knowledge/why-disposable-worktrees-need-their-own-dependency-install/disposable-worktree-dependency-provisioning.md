@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why disposable worktrees need their own dependency install
 
 fgOS creates short-lived, disposable git worktrees in two places: `fgos
