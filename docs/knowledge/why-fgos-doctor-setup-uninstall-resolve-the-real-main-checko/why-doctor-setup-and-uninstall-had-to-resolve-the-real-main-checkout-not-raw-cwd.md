@@ -4,6 +4,8 @@ title: Why doctor, setup, and uninstall had to resolve the real main checkout, n
 tags: [doctor, setup, uninstall, worktree, dir-resolution]
 source_capture_ids: [tsk-2xj]
 authoritative_for: why fgos doctor/setup/uninstall resolve the real main checkout instead of process.cwd(), and why every config check used to lie from inside a linked worktree
+framework: diataxis
+mode: explanation
 ---
 # Why `doctor`, `setup`, and `uninstall` had to resolve the real main checkout, not raw cwd
 
