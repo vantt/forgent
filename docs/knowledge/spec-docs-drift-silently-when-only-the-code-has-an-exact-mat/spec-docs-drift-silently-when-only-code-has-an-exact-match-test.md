@@ -2,6 +2,8 @@
 type: explanation
 title: Spec docs drift silently when only the code has an exact-match test
 source_capture_ids: [tsk-2m5]
+framework: diataxis
+mode: explanation
 ---
 # Spec docs drift silently when only the code has an exact-match test
 
