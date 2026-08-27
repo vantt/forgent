@@ -272,6 +272,84 @@ The audit event must record at least:
 
 The important rule: command is evidence, not the whole answer.
 
+### 7.2 Policy Resolution Before DispatchPlan
+
+Team dispatch adds one layer before `DispatchPlan`: an effective execution
+policy resolver.
+
+```txt
+stage operation + role + persona + work + assignment + human override
+  -> effective dispatch policy
+  -> DispatchPlan
+  -> governance
+  -> transport
+```
+
+This policy resolver must not become a second dispatch mechanism. It prepares
+the selector and execution hints that the existing dispatch resolver already
+understands.
+
+Canonical specificity order:
+
+```txt
+Global defaults
+-> Domain defaults
+-> Workflow defaults
+-> Stage defaults
+-> Stage operation / taskSpec defaults
+-> Role defaults
+-> Persona defaults
+-> Work-item policy
+-> Assignment explicit policy
+-> Human / CLI explicit override
+-> Governance gate
+```
+
+Different fields resolve differently:
+
+| Field family | Rule |
+|---|---|
+| Constraints | union, then fail closed if unsatisfied |
+| Provider / executor preference | highest-specificity wins |
+| Fallback executors | preserve ordered list from the most specific layer, with broader fallbacks appended if useful |
+| Tier / rigor | strongest required tier wins |
+| Model name | resolve from provider/model policy after effective provider and tier are known |
+| Literal model name | assignment or human/CLI override only |
+| Governance / egress | final gate, never bypassed by policy |
+
+Example:
+
+```txt
+role reviewer requires minTier=standard
+operation validate-plan prefers persona=code-reviewer
+work risk=high raises minTier=critical
+assignment prefers executor=claude
+governance checks effective egress
+```
+
+The resulting `DispatchPlan.execution` carries the concrete model and adapter.
+The workflow does not need to hardcode a provider to prove team coordination.
+
+### 7.3 Recommended V1 Provider Policy For Coding Feature Flow
+
+Use these as defaults for the first team-dispatch proof, not permanent hard
+bindings.
+
+| Stage | Operation | Preferred execution | Rationale |
+|---|---|---|---|
+| planning | `shape-plan` | `claude` / Claude `sonnet` | plan synthesis and tradeoff writing are the current stable default path |
+| planning | `resolve-question` | `pi` / OpenAI-Codex `gpt-5.5` | independent consult benefits from provider diversity; `pi` has a verified JSON cli-spawn path |
+| planning | `scout-blast-radius` | `gitnexus`, then `pi` if synthesis is needed | graph/tool evidence should precede model judgment |
+| planning | `validate-plan` | `claude` / `sonnet`, raise to `opus` for critical work | review/proving should be evidence-first and may need stronger rigor |
+| executing | `implement-item` | `agy-cli` / Gemini `gemini-3.6-flash-medium` | current repo config already pins `fgos-coding-implement` to the stable headless agy path |
+| executing | `review-item` | `claude` / `sonnet`, raise to `opus` for critical work | separate reviewer from implementation provider where possible |
+| executing | `fix-verify-red` | `claude` for diagnosis, `agy-cli` for bounded edits | root-cause work and mechanical fix work have different execution needs |
+| executing | `scoped-subtask` | `agy-cli` or `pi` | bounded helper work should use a cheaper/fast executor when evidence gates are clear |
+
+Do not use `agy-herdr`, `codex-herdr`, or other interactive Herdr paths as the
+authority for the first team proof. They can be tried later as visibility
+adapters after cli-spawn assignment execution and evidence handling are stable.
+
 ## 8. DispatchAssignment
 
 `DispatchAssignment` is the design-target replacement for the current six-field ad-hoc task / exec packet.
@@ -282,7 +360,7 @@ It is for runtime-composed work that has no lifecycle row of its own. It does no
 
 ```json
 {
-  "assignmentId": "asgn_01K...",
+  "assignmentId": "asgn_example_001",
   "origin": {
     "type": "adhoc",
     "scope": "tsk-123",
@@ -332,10 +410,18 @@ If compatibility is required, the existing six fields map directly:
 The current `<scope>#p<n>` id remains valid for old prompt contracts. In the breaking design, typed ids are clearer:
 
 - `tsk_...` or existing `tsk-*` - lifecycle work;
-- `asgn_...` - dispatch assignment;
-- `msg_...` - protocol message;
-- `run_...` - one execution run;
-- `trace_...` - distributed trace.
+- `asgn_*` - dispatch assignment;
+- `msg_*` - protocol message;
+- `run_*` - one execution run;
+- `trace_*` - distributed trace.
+
+Implementation note:
+
+```txt
+Only `tsk-*` work ids exist today as durable lifecycle ids.
+`asgn_*`, `msg_*`, `run_*`, and `trace_*` are design-target namespaces until
+the assignment, message, runtime, and observability layers add real writers.
+```
 
 ## 9. AgentMessage
 
@@ -354,11 +440,11 @@ Transport = how the envelope moves
 {
   "schema": "agent-message",
   "schemaVersion": "1.0",
-  "messageId": "msg_01K...",
+  "messageId": "msg_example_001",
   "messageType": "ASSIGN",
   "from": {
     "agentId": "claude.architect",
-    "runId": "run_123"
+    "runId": "run_example_001"
   },
   "to": {
     "selector": {
@@ -368,9 +454,9 @@ Transport = how the envelope moves
     "agentId": null
   },
   "correlation": {
-    "traceId": "trace_abc",
+    "traceId": "trace_example_001",
     "parentWorkId": "tsk-123",
-    "assignmentId": "asgn_01K...",
+    "assignmentId": "asgn_example_001",
     "replyTo": null
   },
   "delivery": {
@@ -388,14 +474,14 @@ Transport = how the envelope moves
   },
   "payload": {
     "kind": "dispatch-assignment",
-    "assignmentId": "asgn_01K..."
+    "assignmentId": "asgn_example_001"
   },
   "artifacts": {
     "inputs": [],
     "outputsExpected": []
   },
   "observability": {
-    "traceId": "trace_abc",
+    "traceId": "trace_example_001",
     "spanId": "span_001",
     "parentSpanId": null
   }

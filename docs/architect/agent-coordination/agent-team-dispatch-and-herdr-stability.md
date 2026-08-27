@@ -8,7 +8,7 @@ Scope: multi-provider agent dispatch, Herdr visibility, runtime evidence, AgentM
 
 fgOS wants dispatch to feel like a team of agents: different roles can be handled by different providers such as Codex, Claude, agy, pi, MCP tools, or future executors. Those agents should be able to contribute to one larger mission through discussion, review, implementation, verification, and coordination.
 
-For the shared vocabulary behind `mission`, `work`, `assignment`, `job`,
+For the shared vocabulary behind `mission`, `work`, `assignment`, `run`,
 `evidence`, `visibility`, and the coordination roles, see
 `orchestration-vocabulary-map.md`.
 
@@ -57,7 +57,7 @@ Examples:
 - agy headless prompt mode if it is the stable path;
 - MCP tool invocation;
 - HTTP/API call;
-- local mailbox/job file consumed by an executor.
+- local mailbox/run file consumed by an executor.
 
 The truth channel should expose at least one concrete completion signal:
 
@@ -65,7 +65,7 @@ The truth channel should expose at least one concrete completion signal:
 - structured JSON/JSONL completion event;
 - result file written;
 - mailbox result message;
-- job state transition.
+- run state transition.
 
 Interactive TUI text should be the truth channel only when no better channel exists.
 
@@ -108,7 +108,7 @@ Defines the larger objective a team is working on.
 
 ```json
 {
-  "missionId": "m-123",
+  "missionId": "mission_example_001",
   "objective": "Make multi-provider dispatch stable",
   "constraints": ["keep Herdr as visibility only"],
   "successCriteria": ["no pane-status false success"]
@@ -139,8 +139,8 @@ Defines semantic communication between roles.
 ```json
 {
   "type": "TASK",
-  "assignmentId": "a-001",
-  "missionId": "m-123",
+  "assignmentId": "asgn_example_001",
+  "missionId": "mission_example_001",
   "toRole": "implementer",
   "objective": "Stop treating Herdr pane status as completion proof",
   "contextRefs": ["src/runner/dispatch/transport.mjs"],
@@ -158,10 +158,10 @@ Defines how one assignment is actually executed.
 
 ```json
 {
-  "jobId": "job-a-001",
-  "assignmentId": "a-001",
+  "runId": "run_asgn_example_001_01",
+  "assignmentId": "asgn_example_001",
   "executorId": "codex",
-  "command": ["codex", "exec", "--json", "-o", ".fgos/results/a-001.txt", "{prompt}"],
+  "command": ["codex", "exec", "--json", "-o", ".fgos/results/asgn_example_001.txt", "{prompt}"],
   "cwd": "/repo/worktree",
   "timeoutMs": 1800000,
   "visibility": {
@@ -180,7 +180,7 @@ Defines the normalized outcome and why fgOS trusts it.
 
 ```json
 {
-  "assignmentId": "a-001",
+  "assignmentId": "asgn_example_001",
   "status": "done",
   "confidence": "reported+verified",
   "agentClaim": {
@@ -207,7 +207,7 @@ It answers: what happened, what did the agent claim, what did the runtime observ
 Mission
   -> creates Assignment / AgentMessage
     -> dispatcher selects Role + Executor
-      -> Runtime Execution Contract runs one job
+      -> Runtime Execution Contract runs one run
         -> Visibility Channel lets a human watch
         -> Verification Channel gathers evidence
           -> Evidence / Result Contract is appended back to the mission thread
@@ -217,7 +217,7 @@ Short form:
 
 ```txt
 AgentMessage = meaning
-Runtime job  = execution
+Runtime run  = execution
 Herdr        = visibility
 Evidence     = proof
 ```
@@ -301,14 +301,19 @@ For V1, the physical storage can be small:
   thread.jsonl
   assignments/
     <assignment-id>.json
-  jobs/
-    <assignment-id>/
+  results/
+    <assignment-id>.json
+
+.fgos/assignments/<assignment-id>/
+  assignment.json
+  runs/
+    01/
+      run.json
       stdout.log
       stderr.log
       exit.json
+      result.json
       evidence.json
-  results/
-    <assignment-id>.json
 ```
 
 This does not require a daemon or mailbox on day one.
@@ -318,14 +323,14 @@ This does not require a daemon or mailbox on day one.
 The long-term stable model is:
 
 ```txt
-Universal job wrapper + result directory + external verification.
+Universal run wrapper + result directory + external verification.
 Visibility surface optional.
 Per-agent adapter chooses the best truth command.
 ```
 
-The job wrapper should:
+The run wrapper should:
 
-- create a job directory;
+- create a run directory;
 - write started metadata;
 - snapshot git/artifact state before execution;
 - run the selected executor command;
@@ -336,7 +341,7 @@ The job wrapper should:
 - classify confidence;
 - write the normalized result.
 
-Herdr then runs or displays that job, but does not own result semantics.
+Herdr then runs or displays that run, but does not own result semantics.
 
 ## 9. Near-Term Stabilization For `agy-herdr`
 
@@ -366,14 +371,19 @@ Concrete evidence signals can include:
 Wrap prompts with a unique assignment id and nonce.
 
 ```txt
-Assignment id: fgos-<id>
-Nonce: fgos-<nonce>
+Assignment id: asgn_<token>
+Nonce: nonce_<token>
 
-When you start, mention: fgos-started-<nonce>
-When finished, mention: fgos-finished-<nonce>
+When you start, mention: fgos-started-<nonce_token>
+When finished, mention: fgos-finished-<nonce_token>
 ```
 
-This is not a hard proof of correctness, but it helps diagnose prompt delivery and pane-capture mismatches.
+The assignment id identifies the semantic request. The nonce is only a
+runtime-correlation guard used to prove the prompt reached the worker output
+surface. Do not use the nonce as a lifecycle id.
+
+This is not a hard proof of correctness, but it helps diagnose prompt delivery
+and pane-capture mismatches.
 
 ### 9.3 Snapshot Git Before And After
 
@@ -429,10 +439,10 @@ Near-term:
 
 Next:
 
-1. Add a minimal job directory/result wrapper.
+1. Add a minimal run directory/result wrapper.
 2. Run Codex through `codex exec --json -o <result-file>` inside Herdr.
 3. Classify result confidence from structured result, process exit, and git/artifact evidence.
-4. Introduce Assignment/AgentMessage only as the semantic payload once job evidence is stable.
+4. Introduce Assignment/AgentMessage only as the semantic payload once run evidence is stable.
 
 Later:
 
@@ -454,9 +464,9 @@ Later:
 The stable shape is not "Herdr dispatches agents". The stable shape is:
 
 ```txt
-fgOS dispatches jobs.
+fgOS dispatches runs.
 Executors perform assignments.
-Herdr shows the job.
+Herdr shows the run.
 Evidence proves the outcome.
 AgentMessage carries meaning between roles.
 ```

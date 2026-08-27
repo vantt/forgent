@@ -16,7 +16,7 @@ The main rule:
 Do not create a second lifecycle system beside work.
 ```
 
-`work` remains the lifecycle authority. `mission`, `assignment`, `job`, and `AgentMessage` sit around it for team coordination and execution.
+`work` remains the lifecycle authority. `mission`, `assignment`, `run`, and `AgentMessage` sit around it for team coordination and execution.
 
 ## 2. Layer Map
 
@@ -36,7 +36,7 @@ Stage Protocol     = legal operations and outcomes inside a stage [Proposed/Form
 Stage Operation    = one task-shaped action available inside a stage [Proposed/Formalized]
 Assignment layer   = bounded semantic request to one role/executor [Proposed/Formalized]
 Dispatch layer     = decide which executor/mechanism should run [Existing]
-Runtime layer      = process/job execution and logs [Existing/Formalized]
+Runtime layer      = process/run execution and logs [Existing/Formalized]
 Evidence layer     = proof and confidence classification [Existing/Formalized]
 Visibility layer   = Herdr/tmux/dashboard surfaces for humans [Existing]
 ```
@@ -190,12 +190,20 @@ input/output/gates. A skill may implement one or many operations.
 
 `exec packet` is the legacy transport-shaped name.
 
-`DispatchAssignment` is the preferred design-target name if the protocol layer is later renamed. It should mean the bounded semantic assignment handed to dispatch, not the process job that executes it.
+`DispatchAssignment` is the preferred design-target name if the protocol layer is later renamed. It should mean the bounded semantic assignment handed to dispatch, not the process run that executes it.
 
 Near-term rule:
 
 ```txt
 Keep current code names unless a real implementation consumer needs the rename.
+```
+
+ID note:
+
+```txt
+Assignment ids are design-target until Step 03 implements a generator.
+Use an explicit prefix such as `asgn_<token>` in new examples.
+Do not reuse `tsk-*`; that namespace belongs to lifecycle work.
 ```
 
 ### 3.10 AgentMessage
@@ -209,8 +217,8 @@ Examples:
 ```json
 {
   "type": "TASK",
-  "assignmentId": "a-001",
-  "missionId": "m-001",
+  "assignmentId": "asgn_001",
+  "missionId": "mission_001",
   "toRole": "reviewer",
   "objective": "Review the dispatch adapter's completion rules",
   "contextRefs": ["docs/architect/agent-coordination/dispatch-control-plane-redesign.md"],
@@ -221,20 +229,20 @@ Examples:
 ```json
 {
   "type": "RESULT",
-  "assignmentId": "a-001",
+  "assignmentId": "asgn_001",
   "status": "done",
   "summary": "The done path can still false-positive without evidence.",
-  "artifacts": ["report:a-001"]
+  "artifacts": ["report:asgn_001"]
 }
 ```
 
 An `AgentMessage RESULT` is an agent claim. It becomes trustworthy only after runtime and evidence data are attached.
 
-### 3.11 Job
+### 3.11 Run
 
-`job` is one runtime execution attempt for an assignment.
+`run` is one runtime execution attempt for an assignment.
 
-A job answers:
+A run answers:
 
 ```txt
 Which executor was run?
@@ -244,9 +252,13 @@ What was the timeout?
 Where are stdout, stderr, exit data, and evidence?
 ```
 
-Jobs belong to the runtime layer, not the semantic team layer.
+Runs belong to the runtime layer, not the semantic team layer.
 
-Use `job` when recording actual execution.
+Use `run` when recording actual execution.
+
+Reserve `job` for a future queued or scheduled execution unit with its own
+lease, priority, cancellation, or worker-pool semantics. V1 team dispatch does
+not need that concept.
 
 ### 3.12 Capability
 
@@ -319,16 +331,16 @@ Given this target, what execution mechanism should fgOS use?
 
 ### 3.17 Runtime Execution Contract
 
-The runtime execution contract describes how a job runs.
+The runtime execution contract describes how a run executes.
 
 It is still needed. It just sits below `AgentMessage`.
 
 ```json
 {
-  "jobId": "job-a-001",
-  "assignmentId": "a-001",
+  "runId": "run_asgn_001_01",
+  "assignmentId": "asgn_001",
   "executorId": "codex",
-  "command": ["codex", "exec", "--json", "-o", ".fgos/results/a-001.txt", "{prompt}"],
+  "command": ["codex", "exec", "--json", "-o", ".fgos/results/asgn_001.txt", "{prompt}"],
   "cwd": "/repo/worktree",
   "timeoutMs": 1800000,
   "visibility": {
@@ -371,6 +383,109 @@ Herdr status can help decide when to inspect.
 Herdr status cannot prove success.
 ```
 
+### 3.20 Dispatch Policy / Execution Policy
+
+`dispatch policy` or `execution policy` is the set of constraints and
+preferences used before a `DispatchPlan` chooses the concrete execution path.
+
+It answers:
+
+```txt
+For this role, operation, work item, and assignment, what execution shape is preferred or required?
+```
+
+It may influence:
+
+- provider family;
+- executor id;
+- model tier;
+- model name;
+- persona;
+- tool scope;
+- visibility mode;
+- egress allowance;
+- fallback executors.
+
+Policy is not all one kind of override. It has three different semantics:
+
+| Policy kind | Meaning | Merge rule |
+|---|---|---|
+| Constraint | A requirement that cannot be weakened by a lower layer. | union / fail closed |
+| Preference | A desired choice when no stronger selector overrides it. | highest-specificity wins |
+| Rigor | Minimum reasoning/review strength. | strongest required tier wins |
+
+Examples:
+
+- a reviewer role may require at least `standard` tier;
+- a high-risk work item may raise review to `critical`;
+- `review-item` may prefer the `code-reviewer` persona;
+- a human may explicitly request a visible Herdr run;
+- governance may refuse a cross-provider executor even when it was preferred.
+
+Canonical policy resolution order:
+
+```txt
+Global defaults
+-> Domain defaults
+-> Workflow defaults
+-> Stage defaults
+-> Stage operation / taskSpec defaults
+-> Role defaults
+-> Persona defaults
+-> Work-item policy
+-> Assignment explicit policy
+-> Human / CLI explicit override
+-> Governance gate
+```
+
+Field-specific rules:
+
+- provider/executor preference uses highest-specificity wins;
+- tier/rigor uses strongest required tier wins;
+- model name resolves after provider and tier through provider-specific model
+  policy;
+- literal model-name override is allowed only at assignment or human/CLI level;
+- governance is final and may reject the resolved plan.
+
+Workflow operations should mostly declare role, task-spec, skill, mode, and
+lightweight policy hints. They should not hardcode one provider permanently
+unless the operation truly requires that backend.
+
+### 3.21 ID Namespaces
+
+Team dispatch introduces several conceptual ids. They must not collapse into
+the existing work id namespace.
+
+Current implemented ids:
+
+| ID | Shape | Created by | Authority |
+|---|---|---|---|
+| Work id | `tsk-<hash>` for submitted work, or `parent-id-<n>` for decomposed child work | `generateId()` in intake classification; child reconciliation in planning | fgOS work event log |
+| Claim id | implementation/runtime-specific claim token | claim/runtime coordination code | runtime claim overlay and attempt events |
+| Executor id | config key such as `claude`, `agy-cli`, `pi`, `gitnexus` | runner config | runner config |
+| Operation id | usually task-spec id such as `validate-plan` | workflow YAML / task-spec catalog | domain workflow registry |
+
+Design-target ids:
+
+| ID | Recommended shape | Future creator | Notes |
+|---|---|---|---|
+| Mission id | `mission_<token>` | mission/thread layer, deferred | no V1 lifecycle |
+| Assignment id | `asgn_<token>` | assignment builder in Step 03 | semantic request, not work |
+| Run id | `run_<assignment-id>_<attempt>` | run executor / RunResult writer | one runtime attempt |
+| AgentMessage id | `msg_<token>` | AgentMessage/mailbox layer, deferred | only when message protocol exists |
+| Trace id | `trace_<token>` | observability/correlation layer, deferred | distributed trace correlation |
+
+Rules:
+
+- `tsk-*` is reserved for lifecycle work only.
+- `asgn_*` must not imply lifecycle, claim, merge, approval, or backlog
+  visibility.
+- `run_*` is created only when execution starts.
+- `msg_*` and `trace_*` must remain examples until their respective layers have
+  real writers and readers.
+- Docs may use placeholder ids only when they are labeled as examples or
+  design-target ids.
+
 ## 4. Coordination Roles
 
 Coordination roles are not a linear call chain. They sit in four decision
@@ -392,7 +507,7 @@ flowchart TD
   Driver[Driver<br/>drive one item through flow] --> Protocol[Stage Protocol<br/>allowed operations]
   Protocol --> Operation[Stage Operation<br/>task-shaped action]
   Operation --> Dispatcher
-  Dispatcher[Dispatcher<br/>execution broker] --> Runtime[Runtime Job<br/>process/tool call]
+  Dispatcher[Dispatcher<br/>execution broker] --> Runtime[Runtime Run<br/>process/tool call]
   Runtime --> Evidence[Evidence / Result]
   Evidence --> Driver
   Evidence --> Orchestrator
@@ -447,7 +562,7 @@ Examples:
 
 - activate the next selected item;
 - call the equivalent of pick/cook/start for one item;
-- start a job and let another loop observe the result later.
+- start a run and let another loop observe the result later.
 
 Launcher is not strategy and is not flow ownership. If the actor continues to
 read state and progress the item, it is acting as a driver, not only a launcher.
@@ -549,14 +664,14 @@ An assignment can implement, review, research, or verify a work item. It should 
 
 If the request needs tracking, claim, return, verification, and merge, make it child work. If it is just a bounded call to an actor, make it an assignment.
 
-### 5.3 Assignment vs Job
+### 5.3 Assignment vs Run
 
 ```txt
 Assignment = semantic request
-Job        = runtime attempt
+Run        = runtime attempt
 ```
 
-An assignment may have multiple jobs if it retries or runs on several executors.
+An assignment may have multiple runs if it retries or runs on several executors.
 
 ### 5.4 Stage vs Stage Operation vs TaskSpec vs Skill
 
@@ -595,6 +710,23 @@ Provider = model/service family
 ```
 
 Do not bind roles permanently to providers. Use role-to-executor preferences that can be overridden by mission, work kind, cost, availability, or governance.
+
+### 5.6a Role vs Persona vs Dispatch Policy
+
+```txt
+Role            = responsibility seat
+Persona         = behavioral identity sitting in that seat
+Dispatch Policy = constraints and preferences for how that actor runs
+```
+
+Role is more durable than persona. Persona is more durable than provider.
+Provider and model should remain late-bound unless the operation requires a
+specific tool ecosystem.
+
+For example, `review-item` can require the reviewer role and prefer the
+`code-reviewer` persona. The dispatch policy can then prefer Claude for code
+review, allow `pi` as a fallback, and raise tier when the work item is high
+risk.
 
 ### 5.7 Dispatch vs Handoff
 
@@ -637,7 +769,7 @@ Mission
           -> Stage Operation
             -> Assignment
               -> DispatchPlan
-                -> Job / Runtime Execution
+                -> Run / Runtime Execution
                   -> Evidence / Result
                     -> Visibility
 ```
@@ -647,7 +779,7 @@ concept to become a separate physical file or runtime object in the first
 implementation.
 
 The simplified implementation profile for team dispatch is documented in
-`team-dispatch-v1-implementation-profile.md`.
+`step-00-team-dispatch-v1-overview.md`.
 
 ## 7. Rules For Creating Things
 
@@ -694,11 +826,14 @@ Create `assignment` when:
 - the request can be represented as a message/prompt/tool call;
 - independent lifecycle is not needed.
 
-Create `job` when:
+Create `run` when:
 
 - an assignment is actually executed;
 - a retry is attempted;
 - a different executor is tried for the same assignment.
+
+Create `job` only in a future queue/scheduler design where the execution unit
+has queue ownership, lease, priority, cancellation, or worker-pool semantics.
 
 Create `AgentMessage` when:
 
@@ -709,6 +844,15 @@ Create `DispatchPlan` when:
 
 - fgOS must decide native vs out-of-process;
 - an executor, capability, work item, or assignment needs execution.
+
+Create or apply `dispatch policy` when:
+
+- a stage operation needs default execution preferences;
+- a role or persona has a minimum tier or tool boundary;
+- a work item raises or narrows execution requirements;
+- an assignment needs an explicit executor, tier, visibility mode, or fallback
+  set;
+- a human/CLI explicitly overrides the execution target.
 
 ## 8. Deprecated Or Risky Vocabulary
 
@@ -728,7 +872,7 @@ This vocabulary map sits above the existing specialized docs:
 
 - `dispatch-control-plane-redesign.md` defines DispatchPlan, governance, executor invocation, adapter selection, Herdr visibility, and result signaling.
 - `agent-team-dispatch-and-herdr-stability.md` defines the three-channel model, evidence wrapper direction, and near-term Herdr stabilization.
-- `team-dispatch-v1-implementation-profile.md` defines the simplified implementation profile for this full vocabulary.
+- `step-00-team-dispatch-v1-overview.md` defines the simplified implementation profile for this full vocabulary.
 - `doing-coordination-redesign.md` defines the separation between runtime claims and durable state history.
 - `knowledge-registry-redesign.md` covers knowledge organization and registry concerns.
 
@@ -738,17 +882,17 @@ The intended split:
 dispatch-control-plane-redesign = how one target is selected and run
 agent-team-dispatch-and-herdr-stability = how team dispatch uses reliable execution and visibility
 orchestration-vocabulary-map = what each concept means
-team-dispatch-v1-implementation-profile = how to implement the first small slice
+step-00-team-dispatch-v1-overview = how to implement the first small slice
 ```
 
 ## 10. Open Questions
 
 1. Whether `mission` should remain a lightweight file/thread envelope forever or later gain a formal lifecycle.
 2. Whether `DispatchAssignment` should replace current ad-hoc task / exec packet naming in code, or stay design-target only.
-3. How role-to-executor selection should rank provider, model tier, cost, availability, and governance.
-4. Whether team dispatch should allow agents to propose assignments only, or eventually allow trusted roles to create assignments directly under policy.
-5. Where the current `claims:` vs `skills:` vocabulary drift should be officially recorded if not in this file.
-6. Whether stage operations should eventually become their own reusable registry or remain embedded under workflow stages.
+3. Whether team dispatch should allow agents to propose assignments only, or eventually allow trusted roles to create assignments directly under policy.
+4. Where the current `claims:` vs `skills:` vocabulary drift should be officially recorded if not in this file.
+5. Whether stage operations should eventually become their own reusable registry or remain embedded under workflow stages.
+6. Whether dispatch policy should stay embedded in workflow/role/persona config or later become a reusable named policy profile registry.
 
 ## 11. Summary
 
@@ -761,9 +905,10 @@ Workflow selects the flow.
 Stage marks the item's phase.
 Stage Protocol lists legal operations.
 Stage Operation names one task-shaped action.
+Dispatch Policy resolves constraints, preferences, tier, provider, and persona.
 Assignment gives one bounded request to one actor.
 DispatchPlan chooses how that target should run.
-Job records the runtime attempt.
+Run records the runtime attempt.
 Evidence proves or downgrades the result.
 Herdr shows the work to humans.
 ```
