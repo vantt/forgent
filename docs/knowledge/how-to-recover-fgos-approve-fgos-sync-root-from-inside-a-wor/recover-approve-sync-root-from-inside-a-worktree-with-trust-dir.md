@@ -3,6 +3,8 @@ type: how-to
 title: How to recover `fgos approve`/`fgos sync-root` from inside a worktree with `--trust-dir`
 tags: []
 timestamp: 2026-08-11T00:00:00.000Z
+framework: diataxis
+mode: how-to
 ---
 # How to recover `fgos approve`/`fgos sync-root` from inside a worktree with `--trust-dir`
 
