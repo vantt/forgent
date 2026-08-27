@@ -4,6 +4,8 @@ title: How to close a duplicate, superseded, or admin-decided work item
 tags: []
 timestamp: 2026-07-29T11:06:51.870Z
 source_capture_ids: [tsk-1ua]
+framework: diataxis
+mode: how-to
 ---
 # How to close a duplicate, superseded, or admin-decided work item
 
