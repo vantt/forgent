@@ -1,5 +1,7 @@
 ---
 authoritative_for: coding domain's role/holder axis, handoff verb, task-spec/skill/knowledge/context ontology, and workflow hierarchy design decisions
+framework: diataxis
+mode: explanation
 ---
 
 # Why the coding domain has a role/holder axis and a task-spec ontology
