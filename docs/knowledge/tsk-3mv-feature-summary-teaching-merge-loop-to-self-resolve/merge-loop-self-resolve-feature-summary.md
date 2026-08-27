@@ -4,6 +4,8 @@ title: tsk-3mv feature summary — teaching merge-loop to self-resolve the two b
 tags: []
 timestamp: 2026-07-30T01:41:23.516Z
 source_capture_ids: [tsk-3mv, tsk-3mv-1, tsk-3mv-2]
+framework: diataxis
+mode: explanation
 ---
 # tsk-3mv feature summary — teaching merge-loop to self-resolve the two block reasons that already had a proven playbook
 
