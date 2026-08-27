@@ -4,6 +4,8 @@ title: Why a work item's id is TSK<hash>, not a bare hash
 tags: [id-generation, work-item, id-systems]
 timestamp: 2026-07-22T00:00:00.000Z
 source_capture_ids: []
+framework: diataxis
+mode: explanation
 ---
 
 # Why a work item's id is TSK<hash>, not a bare hash
