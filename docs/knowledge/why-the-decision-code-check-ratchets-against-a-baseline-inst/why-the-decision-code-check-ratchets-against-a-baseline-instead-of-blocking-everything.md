@@ -3,6 +3,8 @@ type: explanation
 title: Why the decision-code check ratchets against a baseline instead of blocking everything
 tags: [decision-codes, verify, test-conventions, ratchet]
 source_capture_ids: [tsk-3ch]
+framework: diataxis
+mode: explanation
 ---
 # Why the decision-code check ratchets against a baseline instead of blocking everything
 
