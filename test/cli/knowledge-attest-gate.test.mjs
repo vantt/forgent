@@ -102,7 +102,7 @@ test('knowledge attest gate - 6 key conditions and regression', async () => {
   assert.equal(view.docs['t1:concept'].docLifecycle, 'reserved');
 });
 
-test('knowledge attest - with docRegistry.enforce off (the real default), an unregistered path is skipped, not refused or silently accepted', async () => {
+test('knowledge attest - with docRegistry.enforce off (fgos setup\'s own fresh-install default), an unregistered path is skipped, not refused or silently accepted', async () => {
   // enforceRegistry defaults to false here -- the actual shipped default,
   // kept that way so retrospective items are never deadlocked before
   // bootstrap/migration finishes (phase-06-attest-gate.md's own "Risks &
