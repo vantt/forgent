@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `promote-preflight` uses `git merge-tree` instead of a real merge
 
 `preflightRetarget` (`src/runner/promote-preflight.mjs`, `tsk-3gx-1`)
