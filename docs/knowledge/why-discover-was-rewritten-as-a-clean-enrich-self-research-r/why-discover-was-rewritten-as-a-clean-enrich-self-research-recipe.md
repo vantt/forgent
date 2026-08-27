@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `discover` was rewritten as a clean/enrich/self-research recipe
 
 The original complaint: running 15 discover rounds against real backlog
