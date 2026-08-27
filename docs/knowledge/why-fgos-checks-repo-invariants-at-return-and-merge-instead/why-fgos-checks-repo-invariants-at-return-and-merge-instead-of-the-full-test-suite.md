@@ -3,6 +3,8 @@ type: explanation
 title: Why fgos checks repo invariants at return and merge instead of running the full test suite
 tags: [return, approve, merge, verify, invariant-check, setup, doctor]
 source_capture_ids: [tsk-516]
+framework: diataxis
+mode: explanation
 ---
 # Why `fgos` checks repo invariants at `return` and merge instead of running the full test suite
 
