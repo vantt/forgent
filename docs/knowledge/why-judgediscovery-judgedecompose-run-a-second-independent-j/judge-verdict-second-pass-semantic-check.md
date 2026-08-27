@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why judgeDiscovery/judgeDecompose run a second, independent judge pass on `verify`
 
 ## The failure this closes
