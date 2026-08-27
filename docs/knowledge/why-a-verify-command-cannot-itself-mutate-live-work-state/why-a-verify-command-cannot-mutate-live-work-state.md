@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why a `verify` command cannot itself mutate live work state
 
 An item's `verify` field is meant to prove the item's own change is
