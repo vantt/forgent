@@ -4,6 +4,8 @@ title: How to wire an existing skill's inline-reasoning step through an agent-ex
 tags: []
 timestamp: 2026-08-01T11:45:00.000Z
 source_capture_ids: [tsk-5l2-3]
+framework: diataxis
+mode: how-to
 ---
 
 # How to wire an existing skill's inline-reasoning step through an agent-executor executor
