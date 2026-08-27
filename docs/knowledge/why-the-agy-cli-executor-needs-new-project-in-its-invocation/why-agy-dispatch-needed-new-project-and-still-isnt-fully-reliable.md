@@ -1,5 +1,7 @@
 ---
 authoritative_for: why the agy CLI executor needs --new-project in its invocation args, the real incident that surfaced the cwd bug, and why agy dispatch still isn't considered fully reliable even after that fix
+framework: diataxis
+mode: explanation
 ---
 
 # Why `agy` dispatch needed `--new-project`, and still isn't fully reliable
