@@ -2,6 +2,8 @@
 type: explanation
 title: Why `BEE_`-prefixed identifiers became `FGOS_`-prefixed (and some didn't)
 source_capture_ids: [tsk-19z]
+framework: diataxis
+mode: explanation
 ---
 # Why `BEE_`-prefixed identifiers became `FGOS_`-prefixed (and some didn't)
 
