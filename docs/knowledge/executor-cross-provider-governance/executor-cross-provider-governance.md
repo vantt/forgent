@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: reference
+---
 # executor cross-provider governance
 
 Reference for `executors.<id>.allowCrossProvider`, the config field that
