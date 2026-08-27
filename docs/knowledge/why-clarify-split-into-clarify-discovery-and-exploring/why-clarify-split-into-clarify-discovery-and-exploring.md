@@ -2,6 +2,8 @@
 type: explanation
 title: Why `clarify` split into `clarify`, `discovery`, and `exploring`
 source_capture_ids: [tsk-4b2, tsk-12p, tsk-4v6, tsk-30v]
+framework: diataxis
+mode: explanation
 ---
 # Why `clarify` split into `clarify`, `discovery`, and `exploring`
 
