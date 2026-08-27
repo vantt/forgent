@@ -4,6 +4,8 @@ title: Worker slot is the engine-owned occupancy unit across every launcher
 tags: [worker-slot, occupancy, herdr-plugin, fgos-runner, fgos-fanout, ceiling]
 source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk, tsk-1oz, tsk-qrs, tsk-nwz, tsk-37t]
 authoritative_for: worker slot concept and engine-wide worker occupancy ceiling shared by herdr-plugin, fgos-runner, fgos-fanout
+framework: diataxis
+mode: explanation
 ---
 # Worker slot is the engine-owned occupancy unit across every launcher
 
