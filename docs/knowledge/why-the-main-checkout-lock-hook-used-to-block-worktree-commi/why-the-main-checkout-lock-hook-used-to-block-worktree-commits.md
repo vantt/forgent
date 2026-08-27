@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why the main-checkout-lock hook used to block worktree commits it had no reason to touch
 
 `.githooks/pre-commit` enforces the STR65 main-checkout activity lock —
