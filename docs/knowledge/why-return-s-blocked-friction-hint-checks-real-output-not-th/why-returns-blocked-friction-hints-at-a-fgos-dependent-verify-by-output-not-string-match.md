@@ -3,6 +3,8 @@ type: explanation
 title: Why return's blocked-friction hint checks real output, not the verify command string
 tags: [return, friction, goal-check, adr0020, worktree]
 source_capture_ids: [tsk-4o9]
+framework: diataxis
+mode: explanation
 ---
 # Why `return`'s blocked-friction hint checks real output, not the verify command string
 
