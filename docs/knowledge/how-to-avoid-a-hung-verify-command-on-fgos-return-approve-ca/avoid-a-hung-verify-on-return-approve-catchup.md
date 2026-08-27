@@ -4,6 +4,8 @@ title: How to avoid a hung `verify` command on `fgos return`/`approve`/`catchup`
 tags: []
 timestamp: 2026-07-30T06:11:02.926Z
 source_capture_ids: [tsk-3vo]
+framework: diataxis
+mode: how-to
 ---
 # How to avoid a hung `verify` command on `fgos return`/`approve`/`catchup`
 
