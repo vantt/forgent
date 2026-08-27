@@ -3,6 +3,8 @@ type: how-to
 title: How to safely `git reset --hard` the main checkout
 tags: []
 source_capture_ids: [tsk-3au]
+framework: diataxis
+mode: how-to
 ---
 # How to safely `git reset --hard` the main checkout
 
