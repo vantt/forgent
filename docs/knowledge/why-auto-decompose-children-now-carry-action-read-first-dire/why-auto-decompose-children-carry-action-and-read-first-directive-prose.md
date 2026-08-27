@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why auto-decompose children now carry `action` + `read_first` directive prose
 
 `tsk-3xd` fixed a real gap: `src/intake/plan.mjs`'s auto-decompose
