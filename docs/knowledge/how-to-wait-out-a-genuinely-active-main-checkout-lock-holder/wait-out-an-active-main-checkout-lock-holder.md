@@ -4,6 +4,8 @@ title: How to wait out a genuinely active main-checkout lock holder
 tags: []
 timestamp: 2026-08-04T08:50:44.000Z
 source_capture_ids: [tsk-2rf, tsk-mgb]
+framework: diataxis
+mode: how-to
 ---
 # How to wait out a genuinely active main-checkout lock holder
 
