@@ -4,6 +4,8 @@ title: How to resolve ambiguous multi-target errors from an impact-analysis prov
 tags: []
 timestamp: 2026-08-19T13:25:26.000Z
 source_capture_ids: [tsk-5nz]
+framework: diataxis
+mode: how-to
 ---
 
 # How to resolve ambiguous multi-target errors from an impact-analysis provider
