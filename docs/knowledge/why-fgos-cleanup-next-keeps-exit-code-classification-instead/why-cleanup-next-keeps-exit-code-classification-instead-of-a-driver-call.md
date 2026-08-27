@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `/fgOS:cleanup-next` keeps exit-code classification instead of a driver call
 
 When `/fgOS:retro-next` was rewritten to hand its picked item to
