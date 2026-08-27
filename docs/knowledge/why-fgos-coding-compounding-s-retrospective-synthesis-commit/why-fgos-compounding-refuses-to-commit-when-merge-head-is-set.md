@@ -4,6 +4,8 @@ title: Why fgos-coding-compounding refuses to commit when MERGE_HEAD is set
 tags: [fgos-coding-compounding, merge-head, retrospective-synthesis, audit]
 source_capture_ids: [tsk-2oy, tsk-67t, tsk-4dy, tsk-3u8, tsk-5z9]
 authoritative_for: why fgos-coding-compounding's retrospective-synthesis commit step refuses when MERGE_HEAD is already set, the 5 real historical instances that motivated it, and each instance's own per-item audit outcome
+framework: diataxis
+mode: explanation
 ---
 # Why `fgos-coding-compounding` refuses to commit when `MERGE_HEAD` is set
 
