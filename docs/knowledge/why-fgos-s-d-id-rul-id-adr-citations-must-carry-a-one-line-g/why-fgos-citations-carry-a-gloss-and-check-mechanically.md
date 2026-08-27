@@ -1,5 +1,7 @@
 ---
 authoritative_for: why fgOS's D-ID/RUL-ID/ADR citations must carry a one-line gloss alongside the bare id, why the enforcement extends the existing decision-citation-drift script rather than adding a new one, and why it ships as a checked-in baseline ratchet
+framework: diataxis
+mode: explanation
 ---
 
 # Why fgOS citations carry a gloss, checked mechanically
