@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Worktree-dispatch attestation, level 1: advisory-only, never a gate
 
 Two ready-to-pick items can run in parallel worktrees without stepping on
