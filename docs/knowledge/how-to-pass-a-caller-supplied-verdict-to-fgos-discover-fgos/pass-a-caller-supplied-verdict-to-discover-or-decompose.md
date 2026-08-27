@@ -3,6 +3,8 @@ type: how-to
 title: How to pass a caller-supplied verdict to fgos discover/fgos plan
 tags: []
 source_capture_ids: [tsk-27y]
+framework: diataxis
+mode: how-to
 ---
 # How to pass a caller-supplied verdict to `fgos discover`/`fgos plan`
 
