@@ -1,6 +1,8 @@
 ---
 type: explanation
 source_capture_ids: [tsk-5t3]
+framework: diataxis
+mode: explanation
 ---
 
 # Why the Iron Law evidence contract gathers proof but never acknowledges
