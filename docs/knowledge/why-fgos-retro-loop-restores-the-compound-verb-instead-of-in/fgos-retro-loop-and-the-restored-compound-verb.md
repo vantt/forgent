@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `/fgOS:retro-loop` restores the `compound` verb instead of inventing a new one
 
 `tsk-3o3` set out to build the retrospective half of the
