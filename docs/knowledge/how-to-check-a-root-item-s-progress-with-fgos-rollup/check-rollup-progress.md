@@ -4,6 +4,8 @@ title: How to check a root item's progress with `fgos rollup`
 tags: []
 timestamp: 2026-07-22T00:00:00.000Z
 source_capture_ids: [doc-fgos-rollup-howto]
+framework: diataxis
+mode: how-to
 ---
 # How to check a root item's progress with `fgos rollup`
 
