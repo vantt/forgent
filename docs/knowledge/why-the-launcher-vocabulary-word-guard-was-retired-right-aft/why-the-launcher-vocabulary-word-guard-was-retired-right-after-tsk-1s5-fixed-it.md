@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why the launcher-vocabulary word guard was retired right after `tsk-1s5` fixed it
 
 `tsk-1s5` reported that the pinned term "orchestrator" (retired in favor
