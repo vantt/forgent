@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `/fgOS:retro-next` shrank to a launcher
 
 `/fgOS:retro-next` used to hand-roll its own sequencing: resolve the
