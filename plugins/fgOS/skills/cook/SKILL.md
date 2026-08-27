@@ -94,7 +94,7 @@ never re-implements a dev-skill's substance inline; it invokes them.
 
 1. **Submit.** Follow the exact same protocol as the `submit` skill
    (`plugins/fgOS/skills/submit/SKILL.md`) against the free-text argument:
-   scan `fgos list --json` for a textually-grounded dependency candidate,
+   scan `fgos list --all --json` for a textually-grounded dependency candidate,
    present it and require an explicit confirm/edit/reject before attaching
    anything, then call `fgos submit "<text>" [--deps <ids>]`. Capture the
    returned id as the root id and push it onto a work queue.

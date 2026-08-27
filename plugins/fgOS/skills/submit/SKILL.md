@@ -67,7 +67,7 @@ later by `discovery`'s own judgment, not by this skill.
    See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
 
    ```
-   list --json
+   list --all --json
    ```
 
    Read the returned items' titles/text and look for candidate matches against
