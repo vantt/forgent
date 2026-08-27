@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `approve` checks acceptance evidence before merging, not after
 
 `fgos approve`'s merge paths — local (leaf→root and root→main, both in
