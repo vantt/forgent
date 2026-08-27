@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # Close out a decomposed root item after all its children are done
 
 **Update (tsk-580):** step 3's own verify command, when it needs to check
