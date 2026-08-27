@@ -4,6 +4,8 @@ title: How to claim an item that is still at stage `clarify` or `decompose`
 tags: []
 timestamp: 2026-07-29T03:25:44.000Z
 source_capture_ids: [tsk-1ab-1, choke-point-take-vs-pick-claim-eligibility, tsk-65n]
+framework: diataxis
+mode: how-to
 ---
 # How to claim an item that is still at stage `clarify` or `decompose`
 
