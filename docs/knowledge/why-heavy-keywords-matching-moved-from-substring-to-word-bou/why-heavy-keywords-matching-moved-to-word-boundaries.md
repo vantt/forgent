@@ -2,6 +2,8 @@
 type: explanation
 title: Why `HEAVY_KEYWORDS` matching moved from substring to word-boundary
 source_capture_ids: [tsk-1gj]
+framework: diataxis
+mode: explanation
 ---
 # Why `HEAVY_KEYWORDS` matching moved from substring to word-boundary
 
