@@ -87,7 +87,7 @@ export function classifyDocFile(relativePath, content) {
   }
 
   const role = sanitizeRole(rawRole);
-  const targetPath = `docs/${purposeSlug}/${role}.md`;
+  const targetPath = `docs/knowledge/${purposeSlug}/${role}.md`;
 
   const entities = Array.isArray(meta.entities)
     ? meta.entities
