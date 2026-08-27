@@ -4,6 +4,8 @@ title: Why capacity for and capability fields were unified, and MCP tools get a 
 tags: [dispatch, capacity, mcp, impact-analysis, capability-gate]
 source_capture_ids: [tsk-45f]
 authoritative_for: why decide --for/execute --for impact-analysis reported unavailable despite a registered gitnexus capacity, and how the for/capability field split was unified
+framework: diataxis
+mode: explanation
 ---
 # Why capacity `for`/`capability` fields were unified, and MCP tools get a hand-back
 
