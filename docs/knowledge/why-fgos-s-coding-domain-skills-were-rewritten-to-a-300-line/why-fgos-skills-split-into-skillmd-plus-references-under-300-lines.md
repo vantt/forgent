@@ -1,5 +1,7 @@
 ---
 authoritative_for: why fgOS's coding-domain skills were rewritten to a 300-line SKILL.md + references/*.md shape, why citation rules differ between product/shippable skill files and process/build-time docs, and the safety net used while doing a mass skill-prose rewrite
+framework: diataxis
+mode: reference
 ---
 
 # Why fgOS skills split into `SKILL.md` + `references/`, under 300 lines each
