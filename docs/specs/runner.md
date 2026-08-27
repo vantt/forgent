@@ -15,10 +15,10 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 - `fgos-runner --once` → chạy đúng một vòng: gặt-lại → tìm việc → giao việc theo MẺ (nhiều việc cùng lúc, giới hạn hai tầng) → chấm từng việc → ghi, rồi nạp lại mẻ kế tiếp — lặp tới khi không còn việc đang chạy VÀ không còn việc sẵn-sàng (xem "Giao việc theo mẻ, song song có giới hạn" dưới)
 - `fgos-runner --dry-run` → in kế hoạch (việc nào sẽ chạy, model nào) mà không làm gì
 - `fgos-runner --watch [--poll-ms <n>]` → chạy BỀN, không tự thoát khi frontier rỗng; lặp lại vòng đời `--once` mỗi lượt, phản ứng gần-tức-thời khi lượt vừa xong có ghi gì đó, nghỉ `--poll-ms` (mặc định 5000) khi lượt đó không ghi gì; dừng CHỈ qua SIGINT/SIGTERM tường minh — xem "Vòng cầm-giao bền (--watch)" dưới
-- Khởi động MỌI vòng đều bắt đầu bằng bước **gặt-lại** (reap): việc kẹt ở `doing` từ lần chạy đổ trước được giải quyết trước khi tìm việc mới
+- Khởi động MỌI vòng đều bắt đầu bằng bước **gặt-lại** (reap): giải quyết các claim runtime (hoặc item mang trạng thái bền `doing` di sản) từ lần chạy trước bị crash trước khi tìm việc mới — xem "Gặt-lại lúc khởi động" dưới
 - Ngay sau gặt-lại, TRƯỚC khi tìm việc thi công: **quét nghiên-cứu** — giao worker thật cho mọi item ở stage `discovery`; xem "Quét nghiên-cứu trước dispatch" dưới
 - Ngay sau quét nghiên-cứu, CÙNG TRƯỚC khi tìm việc thi công: **quét chia-việc** — mọi item ở stage `planning`, cộng tên stage di sản `decompose`; xem "Quét chia-việc trước dispatch" dưới
-- `fgos take`/`fgos return` (cửa pull, ngoài vòng runner — xem spec Work-State "Cửa pull giao–nhận việc") claim/trả việc qua đúng CAS + goal-check runner tự dùng; gặt-lại lúc khởi động BỎ QUA claim đến từ cửa pull — xem "Gặt-lại lúc khởi động" dưới
+- `fgos take`/`fgos return` (cửa pull, ngoài vòng runner — xem spec Work-State "Cửa pull giao–nhận việc") claim/trả việc qua bản ghi runtime claim (mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` — *new claims do not durably write into doing*) + CAS + goal-check runner tự dùng; gặt-lại lúc khởi động BỎ QUA claim đến từ cửa pull — xem "Gặt-lại lúc khởi động" dưới
 - `fgos review <id>` / `fgos approve <id> [--timeout <ms>] [--acknowledge-iron-law]` / `fgos reject <id> --reason "..."` (ngoài vòng runner, gọi bởi người vận hành) — cổng duyệt PR nội bộ cho một đề xuất `awaiting-approval` đã sẵn, MỘT cổng cho cả nguồn runner lẫn pull-door; `approve` nguồn runner còn chạy phán Iron Law trước khi merge, nhưng CHỈ khi lần merge đó land lên trunk (self-improve loop STR13 Slice 3, ranh giới trunk per `0032`) — xem "Cổng duyệt PR nội bộ" dưới
 - `fgos review <id> --github [--pr <n>]` / `fgos approve <id> --github --pr <n>` (ngoài vòng runner, gọi bởi người vận hành, tuỳ chọn — github-adapter) — vận chuyển thay thế của CÙNG cổng duyệt trên, đưa việc duyệt sang GitHub thay vì diff/merge cục bộ, chỉ áp dụng cho đề xuất nguồn runner; `review --github` kèm `--pr` là phép hỏi thăm trạng thái sống của một PR đã mở, không mở PR mới (github-adapter, phát hiện đóng-không-merge) — xem "Cổng duyệt qua GitHub" dưới
 - `fgos catchup <id>` (ngoài vòng runner, gọi bởi người vận hành) — đồng bộ lại một việc đang đỗ (`blocked`) vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp): kéo trạng thái mới nhất của đích vào nhánh riêng của việc rồi thử lại — xem "Đồng bộ lại một việc đỗ (catch-up)" dưới
@@ -54,7 +54,7 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 ### Một vòng --once (hạnh phúc)
 
 - **Runs when:** người vận hành gọi; MỘT hoặc NHIỀU việc cùng lúc trong một mẻ (xem "Giao việc theo mẻ, song song có giới hạn" dưới) — mỗi việc đi đúng vòng đời dưới đây, độc lập với việc khác trong cùng mẻ.
-- **What changes:** việc đầu frontier được claim (`todo→doing` có kỳ vọng); **ngay sau khi claim, runner ghi nửa DỰ ĐOÁN của một bản ghi kết quả (outcome) cho việc đó** — tier dự kiến, số dep, số lần nhận trước đó (xem spec Work-State); worktree + nhánh `fgw/<id>` mở ra từ đỉnh cây chính; trợ lý chạy nền với prompt dựng từ chính việc đó (mục tiêu / mô tả gốc nguyên văn / ranh giới worktree / proof kỳ vọng / cấm tự ghi trạng thái — cộng thêm một mục Human feedback khi item mang câu trả lời làm-rõ mới nhất và/hoặc lý do từ-chối/đỗ mới nhất, xem RUL23 (phản hồi người threading vào prompt worker)), dưới quyền TỐI THIỂU khai trong `.fgos/config.json`'s `runner` section (xem RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp)), model chọn theo tier của việc; trợ lý tự commit trong worktree; **runner tự chạy lệnh proof của việc trong worktree** — không tin lời trợ lý; đạt → `doing→awaiting-approval`, và **CÙNG LÚC runner ghi nửa THỰC TẾ tương ứng** (kết cục `awaiting-approval`, goal-check đạt, số lần thử, số commit, số lần nhận) — đo từ chính goal-check/kiểm nhánh của runner, không bao giờ từ lời tự báo của trợ lý; worktree dọn đi, **nhánh ở lại** làm đề xuất.
+- **What changes:** việc đầu frontier được claim qua `claimWork` / `acquireClaim` (tạo bản ghi claim runtime `.fgos/runtime/claims/<id>.json`, trạng thái bền giữ nguyên pre-claim, trạng thái hiệu lực `effectiveStatus` hiển thị `doing`; mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` vào nhật ký — *new claims do not durably write into doing*); **ngay sau khi claim, runner ghi nửa DỰ ĐOÁN của một bản ghi kết quả (outcome) cho việc đó** — tier dự kiến, số dep, số lần nhận trước đó (xem spec Work-State); worktree + nhánh `fgw/<id>` mở ra từ đỉnh cây chính; trợ lý chạy nền với prompt dựng từ chính việc đó (mục tiêu / mô tả gốc nguyên văn / ranh giới worktree / proof kỳ vọng / cấm tự ghi trạng thái — cộng thêm một mục Human feedback khi item mang câu trả lời làm-rõ mới nhất và/hoặc lý do từ-chối/đỗ mới nhất, xem RUL23 (phản hồi người threading vào prompt worker)), dưới quyền TỐI THIỂU khai trong `.fgos/config.json`'s `runner` section (xem RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp)), model chọn theo tier của việc; trợ lý tự commit trong worktree; **runner tự chạy lệnh proof của việc trong worktree** — không tin lời trợ lý; đạt → `settleClaim` chuyển bền trực tiếp từ `preClaimStatus → awaiting-approval` (không qua trạng thái trung gian bền `doing`) và giải phóng claim file, và **CÙNG LÚC runner ghi nửa THỰC TẾ tương ứng** (kết cục `awaiting-approval`, goal-check đạt, số lần thử, số commit, số lần nhận) — đo từ chính goal-check/kiểm nhánh của runner, không bao giờ từ lời tự báo của trợ lý; worktree dọn đi, **nhánh ở lại** làm đề xuất.
 - **Side effects:** đúng các sự kiện chuyển trạng thái trong nhật ký; output của trợ lý được in console NHƯ CŨ, và CÒN được nối thêm vào một bản ghi cục bộ riêng cho việc đó (xem "Ghi lại output của trợ lý sau mỗi lượt dispatch" dưới) — bản ghi này không bao giờ vào cây committed.
 - **Afterwards:** người vận hành thấy việc ở `awaiting-approval` + nhánh để review; việc phụ thuộc CHƯA mở (chờ duyệt/merge → `done`); vòng --once thứ hai không giao lại việc nào (frontier trống). Kết cục cuối của lượt được in ra dưới dạng phong bì máy-đọc (xem RUL61 (kết-cục cuối của `fgos-runner` nay bọc cùng phong bì máy-đọc `fgos.v1` như mọi verb) dưới), dòng cuối cùng của output.
 
@@ -187,8 +187,11 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 
 ### Gặt-lại lúc khởi động (reap — phục hồi sau crash)
 
-- **Runs when:** đầu MỌI lần chạy.
-- **What changes:** trước hết, mọi item `doing` mang `claimRole` là `human`/`session` (cầm qua cửa pull `take` — xem spec Work-State) bị BỎ QUA hoàn toàn — người/phiên cầm vô thời hạn, gặt-lại không bao giờ giẫm lên claim đó (stage-decompose). Với phần còn lại (claim của runner, hoặc claim di sản không role), việc kẹt ở `doing` (runner lần trước chết giữa chừng) được giải quyết theo nhánh của nó: có commit + proof đạt → hoàn tất `doing→awaiting-approval` (idempotent); không → `doing→blocked` kèm lý do gặt-do-crash. Nhánh bị worktree mồ côi giữ được đòi lại (dọn worktree cũ rồi mở lại); nhánh rỗng không commit → tỉa; nhánh có hàng → giữ cho người review.
+- **Runs when:** đầu MỌI lần chạy (`startupReap` trong `src/runner/loop.mjs`).
+- **What changes:** `startupReap` thực hiện hai lượt quét theo thứ tự:
+  1. **Lượt quét chính trên các bản ghi runtime claim (`readClaims`):** Duyệt qua mọi file claim runtime đang hoạt động (`.fgos/runtime/claims/*.json`). Các claim có `claimRole` (hoặc `actor`) là `human` hoặc `session` (claim từ cửa pull `take`/`pick` — xem spec Work-State) bị BỎ QUA hoàn toàn — người/phiên cầm vô thời hạn, gặt-lại không bao giờ giẫm lên claim đó. Với các claim runner còn lại (nghĩa là runner lần trước bị sập giữa chừng), gặt-lại giải quyết trực tiếp qua `settleClaim(..., finalStatus, role: 'runner')` chuyển thẳng từ `preClaimStatus` sang `finalStatus` (`awaiting-approval` nếu có commit + proof đạt, hoặc `blocked` kèm lý do gặt-do-crash nếu không đạt), giải phóng claim file mà KHÔNG ghi trạng thái trung gian bền `doing`.
+  2. **Lượt quét fallback trên các item mang trạng thái bền `status: 'doing'` không có claim runtime:** Duyệt các item còn mang trạng thái **bền** `doing` trong nhật ký sự kiện mà KHÔNG có file claim runtime tương ứng (dữ liệu di sản chưa migrate hoặc vết từ đường ghi cũ). Lượt quét này trực tiếp gọi `moveWork(..., expectedStatus: 'doing', ...)` chuyển trạng thái bền sang `awaiting-approval` hoặc `blocked`. Lượt quét này cũng bỏ qua nếu `claimRole` của item là `human` hoặc `session`.
+  Dọn dẹp nhánh/worktree theo nhánh của việc: nhánh bị worktree mồ côi giữ được đòi lại (dọn worktree cũ rồi mở lại); nhánh rỗng không commit → tỉa; nhánh có hàng → giữ cho người review.
 - **On failure:** lỗi worktree khi gặt → việc đó về `blocked` có lý do, bước gặt KHÔNG BAO GIỜ chết thô — chạy-lại-sau-crash an toàn tự thân (có test giết thật giữa chừng).
 
 ### Chấm trượt / lỗi giữa vòng
@@ -1114,6 +1117,29 @@ Not applicable — không có màn hình.
 - `scripts/install-git-hooks.mjs` (STR65) — wire `core.hooksPath` về `.githooks` khi checkout có git thật (dev clone); vắng git (cài như dependency qua `npm install <github-url>`, không giữ lại git — xem `docs/specs/distribution.md`) thì thoát 0 im lặng, không throw; gọi qua `prepare` lifecycle script của `package.json` — chạy tự động sau `npm install` trên một clone mới, không cần bước cài tay riêng.
 - Test: `test/runner/*` (gồm `test/runner/merge.test.mjs` — unit `classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`; `test/runner/write-queue.test.mjs` — chứng minh serialize thật qua marker enter/exit không xen kẽ; `test/runner/root-affinity.test.mjs` — resolveRoot/claimRoot/steerFrontier, khuôn race 2-tác-nhân đã spike-proven; `test/runner/goal-check.test.mjs` — mới, real-fake-executor) + `test/e2e/runner-loop.test.mjs` (executor giả, repo git tạm, bao gồm 3 kịch bản stage-discovery — dispatch worker thật rồi phán quyết đủ rõ đẩy item sang `planning`, phán quyết chưa đủ rõ đẩy sang `exploring` + đậu chờ người, worker sập thì item đứng yên tại `discovery`/`todo` — cộng các kịch bản stage-clarify/stage-decompose còn lại, nay khẳng định `--once` KHÔNG tự phán ở hai tên stage đó: pass-through, chia-con-chặn-frontier, cần-người + 1 kịch bản S2-pull: `take` người + `fgos-runner --once` song song không giẫm + `return` xanh + kịch bản con fork từ tip nhánh gốc) + `test/e2e/pr-gate.test.mjs` (4 kịch bản thật qua binary + git: runner item full loop review→approve→merge→done, merge conflict thật với tree nguyên vẹn sau abort, pull-door item full loop, reject pull-door giữ commit làm lịch sử) + `test/cli/fgos.test.mjs` (unit CLI cho `take`/`return`/`review`/`approve`/`reject`/`catchup`: frontier-head claim, CAS conflict, dirty-tree/HEAD-chưa-tiến refusal, verify xanh/đỏ, main-never-holds-broken-merge cho cả conflict lẫn verify-fail, legacy degrade, leaf-vs-root branch targeting, integration-drift reason, catch-up sạch/xung-đột-thật/lý-do-không-áp-dụng-được) + `test/state/replay.test.mjs` (fold `claimRole`/`headAtTake`/`headAtReturn`) + `test/state/fsm.test.mjs` (cạnh `blocked→awaiting-approval`) + `test/report/entropy.test.mjs` (entropy thuần) + kịch bản chồng-lấn-thật hai việc song song trong `test/runner/loop.test.mjs` (peak-concurrency counter, không phải suy luận thời gian tường) + `test/runner/worker-log.test.mjs` (mới — create/append, nối-không-đè qua nhiều lần thử, degrade không throw khi field vắng) + `test/runner/frozen-judge.test.mjs` (STR63 — unit `frozenJudgeHits`, mọi rule + exact-path footprint match) + benchmark ngoài suite `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (F4, real binaries, expected-delta khai trước run); 1380 test toàn suite tính tới STR63 (`cd repo && npm test`, số cũ 637 đã trôi qua nhiều feature trước đó — không phải drift do cell này)
 
+## Từ vựng dispatch hiện hành
+
+Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control plane hợp nhất (chuỗi ADR 0026 / 0028 / 0029 / 0031 / 0034 — Native-First Dispatch Doctrine và lịch sử tiến hóa control plane). Các thuật ngữ cũ như `rootTask`, `subTask` đã được loại bỏ hoàn toàn (superseded bởi ADR 0029 — Sửa ba mệnh đề từ vựng dispatch, xem `docs/decisions/index.md`), và `capacity` cũ đã được phân tách thành `capability` và `executor` (superseded bởi ADR 0034 — Đổi tên capacity/capacities thành executor/executors, xem `docs/decisions/index.md`).
+
+### Bảng đối chiếu từ vựng dispatch
+
+| Thuật ngữ hiện hành | Thuật ngữ cũ / superseded | Ý nghĩa ngắn gọn | Con trỏ tham chiếu |
+|---|---|---|---|
+| `work` | `rootTask` | Đơn vị công việc gốc (T2, `tsk-*`) mang vai trò T1 khi được kích hoạt | `runner.md:1958` (ADR 0029) |
+| `child work` | `subTask` | Công việc con được phân rã từ một work cha | `runner.md:1959` (ADR 0029) |
+| `executor` | `capacity` (đơn vị thực thi) | Đối tượng thực thi cụ thể (agentType/cli/task/mcp) đảm nhận một job/capability | `runner.md:2434` (ADR 0034) |
+| `capability` | `capacity` (năng lực) | Năng lực / lời hứa hành vi có tên (abstract behavior promise) mà executor cung cấp | `runner.md:2434` (ADR 0034), `dispatch-control-plane-redesign.md:125` |
+| `launcher` | `orchestrator` (nghĩa cũ `0026`) | Tiến trình/cơ chế quyết định kích hoạt work, dựng work lên rồi rời đi (buông) | `runner.md:1871` (ADR 0028) |
+| `driver` | (không đổi) | Tiến trình/phiên đồng hành cùng work từ đầu đến cuối (ở lại) | `runner.md:1986` (ADR 0029), `runner.md:2172` (ADR 0031) |
+| `orchestrator` | (tái gán nghĩa `0029`) | Tầng hợp thành T0 quản lý N đơn vị work (ở lại) | `runner.md:1995` (ADR 0029), `runner.md:2172` (ADR 0031) |
+| `DispatchPlan` | (mới) | Kế hoạch dispatch được resolved gồm mechanism, target agent/tool, và metadata | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:175` |
+| `DispatchAssignment` | (mới) | Đơn vị phân công dispatch cụ thể gán executor cho work item | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:210` |
+
+*Ghi chú:*
+- Về vai trò bên gọi `launcher` / `driver` / `orchestrator`: xem lưới 2×2 tại `runner.md:2172-2180` (kỷ yếu `0031`) tóm tắt trục T1/T0.
+- Khái niệm `capacity` trong lịch sử từng đại diện cho cả năng lực lẫn đơn vị thực thi; từ ADR 0034 (`runner.md:2434`), các cấu hình `capacities.<id>` được chuyển thành `executors.<id>` và `capabilities.<id>`.
+- `rootTask` và `subTask` đã bị loại bỏ khỏi từ vựng dispatch per ADR 0029 (xem `docs/decisions/index.md`).
+
 ## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
 
 Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
@@ -1784,29 +1810,15 @@ implement gì).
    (headless-runner spawn `claude --agent <name>`) CHÍNH LÀ case này —
    hợp lệ, không sai, không bị tầm nhìn này phủ nhận.
 
-#### Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào
+#### Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào (Đã hoàn thành 4/5 pha; Pha 5 hoãn/YAGNI)
 
-Hôm nay CHƯA có lớp quyết định nào tự động áp quy tắc 1-4 ở trên. Bằng
-chứng sống, cụ thể (`tsk-1ni`, truy ra trong buổi thảo luận dẫn tới quyết
-định này): `judgeDiscovery`/`judgeDecompose` — 1 capacity cần soul (helper
-functional, không phải subTask) — LUÔN cli/spawn 1 `claude -p` con, dù caller
-(chính session đang gọi `fgos discover`) đã là 1 soul sống, CÙNG provider,
-đã có sẵn context tốt hơn (đã đọc CONTEXT.md, đã tự Socratic xong). Đúng
-lẽ ra phải rơi vào nhánh 2 (native — tự suy luận tiếp, không cần spawn gì
-cả) nhưng lại rơi vào nhánh 3/4 một cách âm thầm, sai — không phải vì
-thiếu khái niệm kiến trúc, mà vì thiếu cơ chế PHÁT HIỆN "tôi đang được
-gọi từ 1 soul sống cùng provider hay không" trước khi quyết định.
+Hiện nay 4 trong 5 pha triển khai doctrine (`tsk-1ni`, `tsk-27y`, `tsk-53h`, `tsk-3ik`) đã HOÀN THÀNH, và Pha 5 (`tsk-6db`, mở rộng native detection sang `agy`) được hoãn lại có chủ đích (deferred/YAGNI, chưa có consumer thật) — không phải gap chưa được giải quyết.
 
-Lớp thiếu này cần LÀ MỘT PHÁN ĐOÁN CỦA LLM (không thuần cơ học) vì tín
-hiệu quyết định không chỉ là 1 biến môi trường boolean (`CLAUDECODE` có
-mặt hay không) — còn phải cân nhắc: capacity này có thật sự cần soul
-không, có tồn tại cơ chế native tương ứng không, config có ép cli/spawn
-không, và (khi native khả dụng) có đáng dùng native hay vẫn nên cli/spawn
-vì lý do cô lập/tài nguyên. Đây chính là "lớp LLM vừa đủ thông minh" mà
-tầm nhìn này đòi hỏi — chưa xây, chỉ mới có mầm mống ý định
-(`tsk-3sw`'s "Revised design": *"the calling skill... MAY call Task tool
-natively instead of exec'ing... if it already has live Agent/Task tool
-access"*).
+Bối cảnh lịch sử và bằng chứng ban đầu (`tsk-1ni`): `judgeDiscovery`/`judgeDecompose` — 1 capacity cần soul (helper functional, không phải subTask) — trước đây LUÔN cli/spawn 1 `claude -p` con, dù caller (chính session đang gọi `fgos discover`) đã là 1 soul sống, CÙNG provider, đã có sẵn context tốt hơn (đã đọc CONTEXT.md, đã tự Socratic xong). Đúng lẽ ra phải rơi vào nhánh 2 (native — tự suy luận tiếp, không cần spawn gì cả) nhưng lại rơi vào nhánh 3/4 một cách âm thầm, sai — không phải vì thiếu khái niệm kiến trúc, mà vì thiếu cơ chế PHÁT HIỆN "tôi đang được gọi từ 1 soul sống cùng provider hay không" trước khi quyết định.
+
+Tầm nhìn ban đầu cho rằng lớp thiếu này cần LÀ MỘT PHÁN ĐOÁN CỦA LLM (không thuần cơ học) vì tín hiệu quyết định không chỉ là 1 biến môi trường boolean (`CLAUDECODE` có mặt hay không) — còn phải cân nhắc: capacity này có thật sự cần soul không, có tồn tại cơ chế native tương ứng không, config có ép cli/spawn không, và (khi native khả dụng) có đáng dùng native hay vẫn nên cli/spawn vì lý do cô lập/tài nguyên.
+
+**Bản thu hẹp có chủ đích trong thực tế:** Những gì đã được ship (`tsk-53h` / `tsk-3ik`) là một bản thu hẹp có chủ đích (deliberate narrowing) của tầm nhìn 4 yếu tố phán đoán LLM ban đầu: 3 yếu tố được giải quyết cơ học ở thời điểm cấu hình (config-time: shape/kind agent vs tool, config ép cli-spawn), và yếu tố runtime duy nhất còn lại ("liệu tôi có đang là 1 soul sống có quyền truy cập Task tool hay không") được thu gọn thành cờ tự khai báo `--has-live-task-access` do caller truyền trực tiếp (không bao giờ tự dò tìm hay đoán mò). Bằng chứng mã nguồn: `src/runner/dispatch/mechanism.mjs:42` (`decideDispatchMechanism`) và `src/runner/dispatch/mechanism.mjs:82` (`decideExecutorDispatchMechanism`).
 
 #### Quan hệ với việc đã khoá — không mâu thuẫn, chỉ hẹp hơn
 
@@ -1817,9 +1829,9 @@ access"*).
 - `tsk-53h`'s nesting rule + bằng chứng đa-provider (Claude/agy/Codex 3
   shape khác nhau) — ĐÚNG NỀN TẢNG quy tắc 2/3 ở trên dựa vào, không đổi.
 - Cả 2 item đó và gap `tsk-1ni` đều chỉ là MẢNH GHÉP hẹp (cơ chế
-  `capacities.<id>` config riêng của fgOS) của bức tranh rộng hơn tầm
+  `capabilities.<id>` config riêng của fgOS) của bức tranh rộng hơn tầm
   nhìn này vẽ ra (gộp cả việc tự gọi Task tool ngoài cơ chế
-  `capacities.<id>`, gộp cả khái niệm launcher tường minh).
+  `capabilities.<id>`, gộp cả khái niệm launcher tường minh).
 
 #### Ranh giới quan sát được (observability) — tránh ngộ nhận
 
@@ -1835,29 +1847,21 @@ scout-notes.md (đã trace thật trong buổi thảo luận này). Không đán
 "dùng native" với "quan sát được" — 2 lợi ích tách biệt, chỉ trùng nhau
 khi launcher vốn đã tương tác.
 
-#### Việc chưa quyết, để lại cho item build lớp quyết định thật
+#### Việc chưa quyết, để lại cho item build lớp quyết định thật (Đã hoàn tất qua `dispatch.mjs decide` & Pha 1-4; Pha 5 hoãn)
 
-- Tín hiệu phát hiện "launcher hiện tại có phải soul sống cùng
-  provider không" cho từng provider (Claude: `CLAUDECODE` env var đã xác
-  nhận tồn tại; agy/Codex: chưa verify tín hiệu tương đương).
-- Cơ chế tường minh nào áp CÙNG 1 quyết định dispatch (quy tắc 1-4) cho
-  cả subTask lẫn capacity trong code thật — hôm nay `capacities.<id>`
-  (fgOS config) và lời gọi Task tool trực tiếp của 1 session (kích hoạt
-  subTask) là 2 đường tách biệt hoàn toàn, chưa đi qua cùng 1 lớp quyết
-  định nào cả.
-- Địa điểm đặt lớp quyết định native-vs-cli/spawn: trong `resolveExecutorConfig`
-  bản thân nó (không thể — là hàm Node thuần, không tự gọi Task được),
-  hay ở tầng gọi nó (skill/engine-verb caller, nơi có soul thật)?
+- Tín hiệu phát hiện "launcher hiện tại có phải soul sống cùng provider không": Caller tự khai báo qua cờ `--has-live-task-access` khi gọi `dispatch.mjs decide` (Pha 3/4). Pha 5 mở rộng sang `agy` hoãn lại (YAGNI).
+- Cơ chế tường minh áp CÙNG 1 quyết định dispatch cho cả subTask lẫn capacity trong code thật: `dispatch.mjs decide` đã hợp nhất qua 1 entry point duy nhất (Pha 4, `tsk-3ik`).
+- Địa điểm đặt lớp quyết định native-vs-cli/spawn: Nằm ở helper `decideDispatchMechanism` / `decideExecutorDispatchMechanism` (`src/runner/dispatch/mechanism.mjs`), được gọi bởi `dispatch.mjs decide`.
 
 #### Kế hoạch triển khai (5 pha, đã file thành work item, deps thật)
 
-| Pha | Item | Phụ thuộc | Song song được với |
-|---|---|---|---|
-| 1 | `tsk-1ni` — fix `repoRoot` (state-root/content-root lẫn nhau) + verify-overwrite | không | Pha 3 (`tsk-53h`, khác file) |
-| 2 | `tsk-27y` — protocol caller tự khai verdict cho `fgos discover`/`fgos plan` | không (chỉ overlap footprint với Pha 1, không phải dep logic) | Pha 3 (`tsk-53h`, khác file) |
-| 3 | `tsk-53h` — shared helper phát hiện native-vs-cli/spawn cho skill-facing capacity | `tsk-3sw` (đã done) | Pha 1, Pha 2 (khác file, không overlap) |
-| 4 | `tsk-3ik` — hợp nhất `capacities.<id>` config dispatch với lời gọi Task tool trực tiếp | `tsk-27y` + `tsk-53h` | không (chờ cả 2 xong) |
-| 5 | `tsk-6db` — mở rộng native detection sang `agy` (deferred, YAGNI, chưa consumer thật) | `tsk-53h` | Pha 2, Pha 4 (concern khác nhau) |
+| Pha | Item | Phụ thuộc | Song song được với | Trạng thái |
+|---|---|---|---|---|
+| 1 | `tsk-1ni` — fix `repoRoot` (state-root/content-root lẫn nhau) + verify-overwrite | không | Pha 3 (`tsk-53h`, khác file) | Done |
+| 2 | `tsk-27y` — protocol caller tự khai verdict cho `fgos discover`/`fgos plan` | không (chỉ overlap footprint với Pha 1, không phải dep logic) | Pha 3 (`tsk-53h`, khác file) | Done |
+| 3 | `tsk-53h` — shared helper phát hiện native-vs-cli/spawn cho skill-facing capacity | `tsk-3sw` (đã done) | Pha 1, Pha 2 (khác file, không overlap) | Done |
+| 4 | `tsk-3ik` — hợp nhất `capabilities.<id>` config dispatch với lời gọi Task tool trực tiếp | `tsk-27y` + `tsk-53h` | không (chờ cả 2 xong) | Done |
+| 5 | `tsk-6db` — mở rộng native detection sang `agy` (deferred, YAGNI, chưa consumer thật) | `tsk-53h` | Pha 2, Pha 4 (concern khác nhau) | Hoãn / Deferred (YAGNI) |
 
 #### Tham chiếu
 

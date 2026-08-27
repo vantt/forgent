@@ -11,6 +11,7 @@
 // below unchanged as a barrel. See `docs/history/dispatch-activation-and-
 // handoff-redesign/CONTEXT.md` D7 for the split rationale.
 
+import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -29,6 +30,7 @@ import { buildPrompt } from './prepare.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { hasWorkerSlotRoom } from '../../state/worker-slots.mjs';
+import { buildDispatchResult } from './result-ladder.mjs';
 
 // Resolved against THIS module's own file location, never a caller-supplied
 // `root` -- `bin/fgos.mjs` is a fixed sibling of this checkout's own
@@ -189,7 +191,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // a command-less/adapter-less/invocation-less executor with no static
   // agentType of its own -- see resolveAgentTypeForWork's own doc comment.
   const resolvedAgentType = resolveAgentTypeForWork(work, cwd, opts.stage);
-  const { command, args, env, adapter, provider, baseCommit, headRef, governance } = resolveExecutorCommand(cfg, {
+  const { command, args, env, liveOutput, interactiveMode, adapter, provider, baseCommit, headRef, governance } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -228,7 +230,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
 
-  return adapterFn({ command, args, env }, {
+  return adapterFn({ command, args, env, liveOutput, interactiveMode }, {
     cwd,
     timeoutMs,
     idleTimeoutMs,
@@ -442,7 +444,7 @@ export async function executeExecutorCli(
     rigorOverrides: capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides,
   });
   const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
-  const { command, args, env, adapter, provider } = resolveExecutorCommand(cfg, {
+  const { command, args, env, liveOutput, interactiveMode, adapter, provider } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -499,7 +501,7 @@ export async function executeExecutorCli(
     );
     const headBefore = captureHeadSha(cwd);
     const dirtyBefore = checkoutDirtyPaths(root, cwd);
-    const result = await adapterFn({ command, args, env }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
+    const result = await adapterFn({ command, args, env, liveOutput, interactiveMode }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
     const headAfter = captureHeadSha(cwd);
     const dirtyAfter = checkoutDirtyPaths(root, cwd);
     let lostUncommittedPaths;
@@ -513,19 +515,7 @@ export async function executeExecutorCli(
         );
       }
     }
-    const stdoutStr = result && typeof result.stdout === 'string' ? result.stdout : '';
-    const cleanStdout = stdoutStr.replace(/`+[\s\S]*?`+/g, '');
-    const hasSignal = cleanStdout.includes('[DONE]') || cleanStdout.includes('[BLOCKED]');
-    const isDone = cleanStdout.includes('[DONE]');
-    const base = {
-      mechanism,
-      ...result,
-      ...(hasSignal ? {} : { outcome: 'unsignaled', headBefore, headAfter }),
-      ...(isDone && headAfter ? { verifiedSha: headAfter } : {}),
-      ...(lostUncommittedPaths ? { lostUncommittedPaths } : {}),
-      provider,
-      command,
-    };
+    const base = buildDispatchResult({ mechanism, result, headBefore, headAfter, lostUncommittedPaths, provider, command });
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
     lockRes.release();
@@ -684,14 +674,11 @@ export async function fanoutBatchExecutorCli(
         return { kind: 'unavailable', entry: { id: candidateId, reason: 'not-found' } };
       }
 
-      const executorId = executorIdForWork(workItem);
-      const hasExplicitExecutor = resolveExecutorAndOverrides(cfg, executorId).configured;
-      let mechanism;
-      if (!hasExplicitExecutor) {
-        mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
-      } else {
-        mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
-      }
+      const { mechanism, executorId } = compileDispatchPlan(cfg, {
+        work: candidateId,
+        workItem,
+        hasLiveTaskAccess,
+      });
 
       if (mechanism === 'in-process') {
         return { kind: 'mechanismChanged', entry: { id: candidateId, mechanism, executorId } };
@@ -792,6 +779,25 @@ export async function fanoutBatchExecutorCli(
 }
 
 /**
+ * Guard against --repo-root being passed without --cwd when process.cwd() resolves
+ * to a different main-checkout root (or is not a main checkout at all, e.g. a worktree).
+ * (tsk-322 / D-ADR0030)
+ */
+export function guardCwdRepoRootDivergence(cwd, repoRoot) {
+  if (repoRoot && !cwd) {
+    const mainRoot = resolveMainCheckoutRoot(process.cwd());
+    const resolvedMain = mainRoot ? path.resolve(mainRoot) : null;
+    const resolvedRepo = path.resolve(repoRoot);
+    if (!resolvedMain || resolvedMain !== resolvedRepo) {
+      const displayMain = mainRoot ? `"${mainRoot}"` : 'not a main checkout';
+      throw new RunnerConfigError(
+        `--repo-root ("${repoRoot}") passed without --cwd, but process.cwd() main checkout root resolved to ${displayMain} — pass --cwd explicitly.`,
+      );
+    }
+  }
+}
+
+/**
  * CLI entry point body (D7 module split): was an inline `if
  * (import.meta.url === ...)` script guard directly in `dispatch.mjs`
  * before this split — now a named export so the barrel `dispatch.mjs`
@@ -837,6 +843,16 @@ export function runDispatchCli() {
           break;
         }
       }
+      try {
+        guardCwdRepoRootDivergence(flagValue('--cwd') ?? flagValue('--dir'), flagValue('--repo-root'));
+      } catch (err) {
+        process.stdout.write(
+          `${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`,
+        );
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+        break;
+      }
       executeExecutorCli(executorId, {
         prompt,
         model: flagValue('--model'),
@@ -868,8 +884,16 @@ export function runDispatchCli() {
       break;
     }
     case 'decide': {
+      try {
+        guardCwdRepoRootDivergence(flagValue('--cwd') ?? flagValue('--dir'), flagValue('--repo-root'));
+      } catch (err) {
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+        break;
+      }
       decideExecutorCli(executorId, {
         cwd: flagValue('--cwd') ?? flagValue('--dir'),
+        repoRoot: flagValue('--repo-root'),
         hasLiveTaskAccess: rest.includes('--has-live-task-access'),
         for: flagValue('--for'),
         work: flagValue('--work'),

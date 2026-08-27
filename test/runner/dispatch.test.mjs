@@ -38,9 +38,11 @@ import {
   resolveAgentTypeForTaskSpec,
   resolveAgentTypeForWork,
 } from '../../src/runner/dispatch.mjs';
+import { buildDispatchResult } from '../../src/runner/dispatch/result-ladder.mjs';
 import { initStore, addWork, listWork, readRawEvents } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
+import { classifyDispatchConfidence, classifyDispatchResult } from '../../src/report/dispatch-confidence.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time. No real agent CLI is
@@ -867,10 +869,10 @@ test('resolveExecutorCommand still enforces cross-provider governance for an inv
   );
 });
 
-test('the committed .fgos/config.json runner section declares the agy reference executor (tsk-5tm-4 D11): invocations[]-shaped, kind agent (migrated at tsk-in1-4 D5), allowCrossProvider true, resolves to the real installed agy binary', () => {
+test('the committed .fgos/config.json runner section declares the agy-cli reference executor (tsk-5tm-4 D11, renamed from executors.agy at tsk-5jl/tsk-2ii so it stands apart from executors.agy-herdr): invocations[]-shaped, kind agent (migrated at tsk-in1-4 D5), allowCrossProvider true, resolves to the real installed agy binary', () => {
   const cfg = committedRunnerConfig();
-  const executor = cfg.executors?.agy;
-  assert.ok(executor, 'executors.agy must exist');
+  const executor = cfg.executors?.['agy-cli'];
+  assert.ok(executor, 'executors.agy-cli must exist');
   assert.equal(executor.kind, 'agent');
   assert.equal(executor.allowCrossProvider, true);
   assert.ok(Array.isArray(executor.invocations) && executor.invocations.length === 1);
@@ -1208,9 +1210,9 @@ test('the committed .fgos/config.json runner section loads and is well-formed', 
   assert.deepEqual(Object.keys(cfg.modelPolicies.claude).sort(), ['analytical', 'creative', 'critical', 'lightweight', 'standard']);
 });
 
-test('the committed .fgos/config.json runner section wires the agy executor to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece fixes)', () => {
+test('the committed .fgos/config.json runner section wires the agy-cli executor to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece fixes; key renamed from executors.agy at tsk-5jl/tsk-2ii)', () => {
   const cfg = committedRunnerConfig();
-  assert.equal(cfg.executors?.agy?.providerModel, 'gemini');
+  assert.equal(cfg.executors?.['agy-cli']?.providerModel, 'gemini');
   assert.equal(typeof cfg.modelPolicies?.gemini?.lightweight, 'string');
   assert.ok(cfg.modelPolicies.gemini.lightweight.length > 0);
 });
@@ -2487,6 +2489,90 @@ test('the "execute" CLI entry point tees the spawned executor\'s own stdout/stde
   assert.equal(parsed.status, 0);
 });
 
+// --- tsk-322: guard helper for --repo-root without --cwd when process.cwd() diverges ---
+
+test('dispatch CLI: --repo-root alone with process.cwd() resolving to a DIFFERENT main checkout refuses with a clear error, no worker spawned', () => {
+  const repo1 = mkTempGitRepo();
+  const repo2 = mkTempGitRepo();
+  const scriptPath = writeEchoExecutor(repo2.repoRoot);
+  writeRunnerConfigFixture(repo2.repoRoot, {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'probe', '--repo-root', repo2.repoRoot],
+    { encoding: 'utf8', cwd: repo1.repoRoot },
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /--repo-root/);
+  assert.match(result.stderr, /pass --cwd explicitly/);
+});
+
+test('dispatch CLI: --repo-root alone with process.cwd() resolving to the SAME path unchanged, worker spawns normally', () => {
+  const { repoRoot } = mkTempGitRepo();
+  const scriptPath = writeEchoExecutor(repoRoot);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'probe', '--prompt', 'hello', '--repo-root', repoRoot],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout.trim());
+  assert.equal(parsed.status, 0);
+});
+
+test('dispatch CLI: both --cwd and --repo-root given unchanged, no guard fires', () => {
+  const repo1 = mkTempGitRepo();
+  const repo2 = mkTempGitRepo();
+  const scriptPath = writeEchoExecutor(repo2.repoRoot);
+  writeRunnerConfigFixture(repo2.repoRoot, {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'probe', '--prompt', 'hello', '--cwd', repo2.repoRoot, '--repo-root', repo2.repoRoot],
+    { encoding: 'utf8', cwd: repo1.repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout.trim());
+  assert.equal(parsed.status, 0);
+});
+
+test('dispatch CLI: neither given unchanged, existing default-process.cwd() behavior untouched', () => {
+  const { repoRoot } = mkTempGitRepo();
+  const scriptPath = writeEchoExecutor(repoRoot);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'probe', '--prompt', 'hello'],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout.trim());
+  assert.equal(parsed.status, 0);
+});
+
 // --- spawnWorker: fake executor, tier->model, cwd, timeout, spawn-fail --
 
 test('spawnWorker resolves tier -> model, runs in cwd, and passes the prompt via argv', async () => {
@@ -3467,6 +3553,89 @@ test('executeExecutorCli returns outcome:"unsignaled" when [DONE] or [BLOCKED] a
 
   const resQuotedAndDone = await executeExecutorCli('quoted-and-done-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'p' });
   assert.equal(resQuotedAndDone.outcome, undefined);
+});
+
+// --- buildDispatchResult (extract-dispatch-result-normalization-ladder):
+// direct unit tests against the pure helper itself, isolated from the real
+// subprocess/git-repo machinery the executeExecutorCli-level tests above
+// already exercise -- same ladder (reported/legacy-signal/inferred), no
+// behavior change, no new fields. ---------------------------------------
+
+test('buildDispatchResult: reported rung — every field on the raw adapter result is spread through unchanged, alongside mechanism/provider/command', () => {
+  const result = buildDispatchResult({
+    mechanism: 'out-of-process',
+    result: { status: 0, signal: null, stdout: '[DONE]', stderr: '', tier: 'standard', model: 'sonnet' },
+    headBefore: 'sha-before',
+    headAfter: 'sha-after',
+    provider: 'agy',
+    command: '/usr/local/bin/agy',
+  });
+  assert.equal(result.mechanism, 'out-of-process');
+  assert.equal(result.status, 0);
+  assert.equal(result.signal, null);
+  assert.equal(result.stdout, '[DONE]');
+  assert.equal(result.stderr, '');
+  assert.equal(result.tier, 'standard');
+  assert.equal(result.model, 'sonnet');
+  assert.equal(result.provider, 'agy');
+  assert.equal(result.command, '/usr/local/bin/agy');
+});
+
+test('buildDispatchResult: legacy-signal rung — a real [DONE]/[BLOCKED] token in stdout omits outcome/headBefore/headAfter entirely', () => {
+  const done = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'task complete [DONE]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(done.outcome, undefined);
+  assert.equal(done.headBefore, undefined);
+  assert.equal(done.headAfter, undefined);
+
+  const blocked = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'stuck [BLOCKED]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(blocked.outcome, undefined);
+  assert.equal(blocked.headBefore, undefined);
+  assert.equal(blocked.headAfter, undefined);
+});
+
+test('buildDispatchResult: inferred rung — no [DONE]/[BLOCKED] anywhere in stdout resolves outcome:"unsignaled" carrying headBefore/headAfter', () => {
+  const result = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'no contract signal here' }, headBefore: 'sha-before', headAfter: 'sha-after', provider: 'p', command: 'c' });
+  assert.equal(result.outcome, 'unsignaled');
+  assert.equal(result.headBefore, 'sha-before');
+  assert.equal(result.headAfter, 'sha-after');
+});
+
+test('buildDispatchResult: a [DONE]/[BLOCKED] mention inside backtick-quoted text never counts as a real signal (tsk-5gd) — falls to the inferred rung', () => {
+  const quotedOnly = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'implemented the `[DONE]` and `[BLOCKED]` token scan' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(quotedOnly.outcome, 'unsignaled');
+  assert.equal(quotedOnly.headBefore, 'a');
+  assert.equal(quotedOnly.headAfter, 'b');
+
+  // A quoted mention ALONGSIDE a real, unquoted token still counts as signaled.
+  const quotedAndReal = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'implemented `[DONE]` scan\n\n[DONE]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(quotedAndReal.outcome, undefined);
+});
+
+test('buildDispatchResult: verifiedSha is added only for a real [DONE] with a truthy headAfter, never for [BLOCKED] or a null headAfter', () => {
+  const done = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
+  assert.equal(done.verifiedSha, 'sha-after');
+
+  const blocked = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[BLOCKED]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
+  assert.equal(blocked.verifiedSha, undefined);
+
+  const doneNoHeadAfter = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: null, provider: 'p', command: 'c' });
+  assert.equal(doneNoHeadAfter.verifiedSha, undefined);
+});
+
+test('buildDispatchResult: lostUncommittedPaths is included only when given, omitted (never null/empty) otherwise', () => {
+  const withLost = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: 'b', lostUncommittedPaths: ['plan.md'], provider: 'p', command: 'c' });
+  assert.deepEqual(withLost.lostUncommittedPaths, ['plan.md']);
+
+  const withoutLost = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal('lostUncommittedPaths' in withoutLost, false);
+});
+
+test('buildDispatchResult: a missing or non-string result.stdout is treated as empty, never throws, and resolves the inferred rung', () => {
+  const noResult = buildDispatchResult({ mechanism: 'out-of-process', result: undefined, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(noResult.outcome, 'unsignaled');
+
+  const nonStringStdout = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: null }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
+  assert.equal(nonStringStdout.outcome, 'unsignaled');
 });
 
 test('executeExecutorCli throws when no executor is registered for the given purpose — nothing left to execute', async () => {
@@ -4894,6 +5063,38 @@ test('fanoutBatchExecutorCli: real end-to-end out-of-process fire -- pick/execut
   assert.equal(view.work.cand1.status, 'awaiting-approval');
 });
 
+test('fanoutBatchExecutorCli returns candidate as unavailable when executor is governance-blocked', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeCommittingExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  addWork(fgosDir, {
+    id: 'cand1',
+    title: 'Candidate 1',
+    kind: 'task',
+    status: 'todo',
+    domain: 'coding',
+    stage: 'executing',
+    deps: [],
+    refs: [],
+    risk: 'light',
+    verify: 'true',
+  });
+
+  const result = await fanoutBatchExecutorCli(['cand1'], { repoRoot, hasLiveTaskAccess: false });
+
+  assert.equal(result.fired.length, 0);
+  assert.equal(result.mechanismChanged.length, 0);
+  assert.equal(result.unavailable.length, 1);
+  assert.equal(result.unavailable[0].id, 'cand1');
+  assert.equal(result.unavailable[0].executorId, 'fgos-coding-implement');
+});
+
 test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlapping execution windows', async () => {
   const { repoRoot, fgosDir } = mkTempGitRepo();
   const dir = mkTempDir();
@@ -5441,4 +5642,147 @@ test('logExecutorDispatch writes governance payload into executor.dispatch event
   });
   assert.equal(event.type, 'executor.dispatch');
   assert.deepEqual(event.payload.governance, gov);
+});
+
+test('classifyDispatchConfidence classifies legacy-signal token in local worker log (a)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-test-legacy';
+  logExecutorDispatch(fgosDir, {
+    id: workId,
+    executorId: 'claude',
+    provider: 'claude',
+    command: 'claude',
+    model: 'claude-3-5-sonnet',
+  });
+
+  const logsDir = path.join(fgosDir, 'logs');
+  fs.mkdirSync(logsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(logsDir, `${workId}.log`),
+    `=== 2026-08-26T00:00:00.000Z | work ${workId} | exit 0 ===\n--- STDOUT ---\nTask completed successfully. [DONE]\n--- STDERR ---\n`,
+  );
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.id, workId);
+  assert.equal(report.dispatches.length, 1);
+  assert.equal(report.dispatches[0].confidence, 'legacy-signal');
+  assert.equal(report.dispatches[0].outcome, 'done');
+  assert.equal(report.summary['legacy-signal'], 1);
+});
+
+test('classifyDispatchConfidence classifies inferred when log exists with no token (b)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-test-inferred';
+  logExecutorDispatch(fgosDir, {
+    id: workId,
+    executorId: 'claude',
+    provider: 'claude',
+    command: 'claude',
+    model: 'claude-3-5-sonnet',
+  });
+
+  const logsDir = path.join(fgosDir, 'logs');
+  fs.mkdirSync(logsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(logsDir, `${workId}.log`),
+    `=== 2026-08-26T00:00:00.000Z | work ${workId} | exit 0 ===\n--- STDOUT ---\nModified files headBefore: abc1234 headAfter: def5678\n--- STDERR ---\n`,
+  );
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.id, workId);
+  assert.equal(report.dispatches.length, 1);
+  assert.equal(report.dispatches[0].confidence, 'inferred');
+  assert.equal(report.dispatches[0].outcome, 'unsignaled');
+  assert.equal(report.summary.inferred, 1);
+});
+
+test('classifyDispatchConfidence classifies missing when executor.dispatch event exists but log file is missing (c)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-test-missing-log';
+  logExecutorDispatch(fgosDir, {
+    id: workId,
+    executorId: 'claude',
+    provider: 'claude',
+    command: 'claude',
+    model: 'claude-3-5-sonnet',
+  });
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.id, workId);
+  assert.equal(report.dispatches.length, 1);
+  assert.equal(report.dispatches[0].confidence, 'missing');
+  assert.equal(report.dispatches[0].outcome, null);
+  assert.equal(report.summary.missing, 1);
+});
+
+test('classifyDispatchConfidence degrades to missing when log file is malformed/empty (d)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-test-malformed';
+  logExecutorDispatch(fgosDir, {
+    id: workId,
+    executorId: 'claude',
+    provider: 'claude',
+    command: 'claude',
+    model: 'claude-3-5-sonnet',
+  });
+
+  const logsDir = path.join(fgosDir, 'logs');
+  fs.mkdirSync(logsDir, { recursive: true });
+  fs.writeFileSync(path.join(logsDir, `${workId}.log`), '');
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.id, workId);
+  assert.equal(report.dispatches.length, 1);
+  assert.equal(report.dispatches[0].confidence, 'missing');
+  assert.equal(report.summary.missing, 1);
+});
+
+test('classifyDispatchConfidence reports non-existent id plainly with zero dispatches (e)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-nonexistent';
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.id, workId);
+  assert.equal(report.dispatches.length, 0);
+  assert.equal(report.summary.total, 0);
+  assert.equal(report.summary.missing, 0);
+});
+
+test('classifyDispatchConfidence classifies reported when event payload carries explicit outcome', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const workId = 'tsk-test-reported';
+  logExecutorDispatch(fgosDir, {
+    id: workId,
+    executorId: 'claude',
+    provider: 'claude',
+    command: 'claude',
+    model: 'claude-3-5-sonnet',
+  });
+
+  const eventsPath = path.join(fgosDir, 'events.jsonl');
+  fs.appendFileSync(
+    eventsPath,
+    JSON.stringify({
+      type: 'executor.dispatch',
+      payload: {
+        id: workId,
+        executorId: 'claude',
+        outcome: 'success',
+      },
+      ts: new Date(Date.now() + 1000).toISOString(),
+    }) + '\n',
+  );
+
+  const logsDir = path.join(fgosDir, 'logs');
+  fs.mkdirSync(logsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(logsDir, `${workId}.log`),
+    `=== 2026-08-26T00:00:00.000Z | work ${workId} | exit 0 ===\n--- STDOUT ---\nSome output without token\n--- STDERR ---\n`,
+  );
+
+  const report = classifyDispatchConfidence(fgosDir, { id: workId });
+  assert.equal(report.dispatches.length, 2);
+  const lastDispatch = report.dispatches[1];
+  assert.equal(lastDispatch.confidence, 'reported');
+  assert.equal(lastDispatch.outcome, 'success');
 });

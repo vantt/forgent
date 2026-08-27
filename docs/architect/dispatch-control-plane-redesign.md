@@ -12,7 +12,7 @@ The current system has:
 
 - a runner config that maps capabilities/purposes to concrete executors;
 - executor declarations with kind, carries, provider/model policy, invocation shape, and optional adapter;
-- a `decide` command that chooses whether a target should run native/in-process or out-of-process;
+- a `decide` command that chooses whether a target should run native/in-process or out-of-process (this command is the concrete result of D0026's 4 done phases, with phase 5 extending native detection to agy deliberately deferred per `docs/specs/runner.md`'s "Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào" section);
 - an `execute` path that resolves an executor, spawns a process, captures output, and returns a JSON result;
 - prompt contracts for work items and ad-hoc dispatches;
 - legacy stdout tokens such as `[DONE]` and `[BLOCKED]`;
@@ -120,13 +120,14 @@ Therefore mailbox and AgentMessage are still design targets, not prerequisites f
 
 - `launcher` - starts a work item or dispatch target and may step away.
 - `driver` - stays attached and continues coordinating after activation.
+- `orchestrator` - T0 composition layer that manages N units of work and stays attached.
 - `work` - lifecycle-bearing fgOS unit with state, events, claim/return, and merge semantics.
 - `child work` - a normal work item related to a parent; not a separate dispatch category.
 - `capability` - an abstract behavior promise such as `fgos-coding-implement`.
 - `executor` - the concrete implementation of a capability, such as `agy`, `codex`, `gitnexus`, or `herdr`.
 - `ad-hoc task` / `exec packet` - an ephemeral runtime-composed unit outside the work ledger.
 
-The old `rootTask`/`subTask` vocabulary is not part of the current dispatch model. A "subtask" is either child work with lifecycle or an ephemeral ad-hoc dispatch target.
+The old `rootTask`/`subTask` vocabulary is not part of the current dispatch model. A "subtask" is either child work with lifecycle or an ephemeral ad-hoc dispatch target. Note that the runner spec's (`docs/specs/runner.md`) historical `capacity` concept maps to `capability` for abstract behavior promises and to `executor` for concrete execution units per ADR 0034.
 
 ### 5.2 Design-Target Rename
 
@@ -529,6 +530,22 @@ Herdr is not the authority for:
 - whether artifacts are accepted.
 
 Those facts come from runner state, structured agent events, artifact refs, and verification.
+
+### 12.1a Herdr Own Rust Vocabulary Is a Separate Namespace
+
+Herdr's Rust implementation (`herdr-plugin/src/`) names several of its own
+types with "orchestrator" in Rust-identifier casing: the `PaneOrchestrator`
+trait (`ports.rs`) governing pane open/reuse/focus, and the
+`OrchestratorSettings`/`HerdrOrchestratorToggles` structs (`settings.rs`,
+`main.rs`) governing the `herdrOrchestrator` auto-launch config section
+(auto-discover/auto-merge/auto-retro/auto-cleanup pane launching). These
+are Rust port terms describing Herdr's own pane-lifecycle and toggle
+mechanics — a different vocabulary from this document's own "orchestrator"
+glossary entry above (§5.1: the T0 composition layer that manages N units of work and stays attached). Do not
+rename `PaneOrchestrator` or its sibling identifiers to align with that
+glossary sense, and do not read a `PaneOrchestrator`/`OrchestratorSettings`
+citation elsewhere in the repo as evidence fgOS's own dispatch layer is
+being described.
 
 ### 12.2 Near-Term Herdr Adapter
 

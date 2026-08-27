@@ -1,5 +1,9 @@
 # orchestrator-worker-slots — DISCUSSION
 
+> **DISAMBIGUATION (2026-08-26) — từ "orchestrator" trong tài liệu này được dùng theo nghĩa MỚI (ADR0029 D17, tầng hợp thành T0).**
+> Cần phân biệt với nghĩa CŨ trong ADR0026 (đã retired; ADR0028 đổi tên nghĩa cũ thành "launcher").
+> Chi tiết chuỗi quyết định 0026→0028→0029→0031 xem tại `docs/decisions/index.md` (dòng 28-32) và `docs/explanation/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md`.
+
 Item: `tsk-2sj`.
 
 ## 1. Trạng thái hiện tại

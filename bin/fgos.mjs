@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
@@ -29,11 +29,13 @@ import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src
 import { parseFrontmatter } from '../src/report/frontmatter.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
+import { rebuildViewFromDir } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
+import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
 // `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
@@ -54,7 +56,7 @@ import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.m
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
-import { readClaim } from '../src/state/runtime-coordination.mjs';
+import { readClaim, releaseClaim } from '../src/state/runtime-coordination.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
@@ -72,6 +74,7 @@ import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
+import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
 import {
   acquireMainCheckoutLock,
@@ -2918,6 +2921,11 @@ async function runVerb(verb, flags, positional, dir) {
       return { id, stopReason: stopReason ?? null, seq: event.seq };
     }
 
+    case 'dispatch-report': {
+      const id = optionalField(positional[0] ?? flags.id, 'dispatch-report [id]');
+      return classifyDispatchConfidence(dir, { id });
+    }
+
     case 'conflicts': {
       // tsk-4zj D7: footprintConflicts' candidate set now spans multiple
       // stages (tsk-4so's frontierAcrossSteps), so stageEffective is real
@@ -4311,6 +4319,90 @@ async function runVerb(verb, flags, positional, dir) {
       return fixed === undefined ? { checks } : { fixed, checks };
     }
 
+    case 'unclaim': {
+      const id = requireField(positional[0] ?? flags.id, 'unclaim requires an id: fgos unclaim <id>');
+      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const claim = readClaim(dir, id);
+      if (!claim) return { released: false, reason: 'no-claim' };
+      const durableView = rebuildViewFromDir(dir);
+      const durableStatus = durableView.work[id]?.status;
+      if (durableStatus !== 'doing') {
+        releaseClaim(dir, { id });
+        return { released: true, reason: 'durable-status-mismatch', durableStatus: durableStatus ?? 'not-found' };
+      }
+      if (!isReclaimEligible(repoRoot, id, claim.claimRole)) {
+        const holderDesc = `writer ${claim.writerId ?? 'unknown'}` + (claim.actor ? ` (${claim.actor})` : '');
+        const ageMs = claim.acquiredAt ? Date.now() - new Date(claim.acquiredAt).getTime() : NaN;
+        const ageDesc = Number.isFinite(ageMs) ? formatLockDurationMs(ageMs) : 'unknown age';
+        throw new ClaimError(
+          'conflict',
+          `unclaim: claim for "${id}" is held by ${holderDesc}, acquired ${ageDesc} ago -- refusing to clear live claim.`,
+        );
+      }
+      releaseClaim(dir, { id });
+      return { released: true, reason: 'stale-liveness' };
+    }
+
+    case 'preflight': {
+      const cwd = flags.dir !== undefined ? path.resolve(flags.dir) : process.cwd();
+      const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd, encoding: 'utf8' }).trim();
+
+      const checks = [];
+
+      // 1. mirror-sync-diff
+      {
+        const id = 'mirror-sync-diff';
+        const description = 'Verify skill wrappers across .claude/skills and plugins/fgOS/skills are in sync with source';
+        const buildRes = spawnSync('npm', ['run', 'build:skills'], { cwd: repoRoot, encoding: 'utf8' });
+        if (buildRes.status !== 0) {
+          const msg = (buildRes.stderr || buildRes.stdout || 'npm run build:skills failed').trim();
+          checks.push({ id, description, passed: false, message: msg });
+        } else {
+          const diffRes = spawnSync('git', ['diff', '--exit-code', '--', '.claude/skills', 'plugins/fgOS/skills'], { cwd: repoRoot, encoding: 'utf8' });
+          if (diffRes.status !== 0) {
+            const msg = (diffRes.stdout || diffRes.stderr || 'uncommitted skill wrapper drift in .claude/skills or plugins/fgOS/skills').trim();
+            checks.push({ id, description, passed: false, message: msg });
+          } else {
+            checks.push({ id, description, passed: true, message: 'skill wrappers in .claude/skills and plugins/fgOS/skills are in sync' });
+          }
+        }
+      }
+
+      // 2. decision-citation-drift
+      {
+        const id = 'decision-citation-drift';
+        const description = 'Verify decision citations across specs and skills do not drift from decision index';
+        const res = spawnSync(process.execPath, ['scripts/check-decision-citation-drift.mjs'], { cwd: repoRoot, encoding: 'utf8' });
+        if (res.status !== 0) {
+          const msg = (res.stdout || res.stderr || 'decision citation drift check failed').trim();
+          checks.push({ id, description, passed: false, message: msg });
+        } else {
+          checks.push({ id, description, passed: true, message: (res.stdout || 'no decision citation drift found').trim() });
+        }
+      }
+
+      // 3. backlog-reconciliation
+      {
+        const id = 'backlog-reconciliation';
+        const description = 'Verify backlog item status reconciliation';
+        const res = spawnSync(process.execPath, ['scripts/check-backlog-reconciliation.mjs'], { cwd: repoRoot, encoding: 'utf8' });
+        if (res.status !== 0) {
+          const msg = (res.stderr || res.stdout || 'backlog reconciliation check failed').trim();
+          checks.push({ id, description, passed: false, message: msg });
+        } else {
+          checks.push({ id, description, passed: true, message: (res.stdout || 'all backlog items reconciled').trim() });
+        }
+      }
+
+      const failures = checks.filter((c) => !c.passed);
+      if (failures.length > 0) {
+        const failureList = failures.map((c) => `  - ${c.id}: ${c.message}`).join('\n');
+        throw new StoreError('validation', `fgos preflight: ${failures.length} of ${checks.length} check(s) failed:\n${failureList}`);
+      }
+
+      return { checks };
+    }
+
     // Safely clears .fgos/main-checkout.lock (tsk-3h4). Never force-deletes:
     // reuses acquireMainCheckoutLock as-is for the ACQUIRED (free/stale,
     // reclaimed as a side effect of the acquire attempt then immediately
@@ -4421,17 +4513,36 @@ async function runVerb(verb, flags, positional, dir) {
       }
       const confirmed = Boolean(flags.confirm);
       const dirty = !isMainTreeClean(repoRoot);
+      let lostCommitCount = 0;
+      let lostCommitsOutput = '';
       try {
-        assertSafeMainCheckoutReset({ dirty, confirmed });
+        const revList = gitAt(repoRoot, ['rev-list', `${sha}..HEAD`]).trim();
+        if (revList) {
+          const commits = revList.split('\n').filter(Boolean);
+          lostCommitCount = commits.length;
+          if (lostCommitCount > 0) {
+            lostCommitsOutput = gitAt(repoRoot, ['log', `${sha}..HEAD`, '--format=%h %an (%ae): %s', '--stat']).trim();
+          }
+        }
+      } catch (_err) {
+        // If git rev-list fails (e.g. invalid SHA), reset --hard below will fail with git's error.
+      }
+
+      try {
+        assertSafeMainCheckoutReset({ dirty, confirmed, lostCommitCount, sha });
       } catch (err) {
-        const statusOutput = gitAt(repoRoot, ['status', '--porcelain']).trim();
-        throw new StoreError(
-          'validation',
-          `main-checkout-reset: ${err.message}\n\nFull git status (main checkout, whole repo):\n${statusOutput || '(empty)'}`,
-        );
+        let details = `main-checkout-reset: ${err.message}`;
+        if (dirty) {
+          const statusOutput = gitAt(repoRoot, ['status', '--porcelain']).trim();
+          details += `\n\nFull git status (main checkout, whole repo):\n${statusOutput || '(empty)'}`;
+        }
+        if (lostCommitCount > 0) {
+          details += `\n\nCommits about to be discarded (${lostCommitCount}):\n${lostCommitsOutput || '(none)'}`;
+        }
+        throw new StoreError('validation', details);
       }
       gitAt(repoRoot, ['reset', '--hard', sha]);
-      return { sha, wasDirty: dirty, confirmed };
+      return { sha, wasDirty: dirty, lostCommitCount, confirmed };
     }
 
     default:

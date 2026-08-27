@@ -8,11 +8,23 @@ import { fileURLToPath } from 'node:url';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { LOCK_FILE, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 import { initStore, addWork, moveWork, settleClaim, listWork, FsmError, readRawEvents } from '../../src/state/store.mjs';
-import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
+import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 
 const CLAIM_PORT_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/claim-port.mjs');
+const FGOS_BIN = path.resolve(fileURLToPath(import.meta.url), '../../../bin/fgos.mjs');
+
+function runUnclaim(repoRoot, id) {
+  try {
+    const stdout = execFileSync(process.execPath, [FGOS_BIN, 'unclaim', id, '--dir', repoRoot], { cwd: repoRoot, encoding: 'utf8' });
+    return { status: 0, json: JSON.parse(stdout) };
+  } catch (err) {
+    let json = null;
+    try { json = JSON.parse(err.stdout); } catch {}
+    return { status: err.status, stderr: err.stderr || '', stdout: err.stdout || '', json };
+  }
+}
 
 // claim-port.mjs's claimWork shares main-checkout.lock with .githooks/
 // pre-commit (tsk-3w8) — the hook writes a STRING-identity record per commit
@@ -590,6 +602,77 @@ test('claimWork pre-check never fires for take (isolate:false), even against a c
 
   const after = listWork(dir).work['item-a'];
   assert.equal(after.claimRole, 'session', 'take must never reclaim, even a quiet claim -- pick is the only door (D5 scope narrowing)');
+});
+
+test('fgos unclaim on an id with no claim at all returns {released:false, reason:"no-claim"}, no error (tsk-uio)', () => {
+  const { repoRoot } = setup();
+  const res = runUnclaim(repoRoot, 'item-a');
+  assert.equal(res.status, 0);
+  assert.deepEqual(res.json.data, { released: false, reason: 'no-claim' });
+});
+
+test('fgos unclaim clears unconditionally with durable-status-mismatch when claim exists but durable status is todo or non-existent (tsk-uio)', () => {
+  const { repoRoot, dir } = setup();
+  acquireClaim(dir, { id: 'item-a', actor: 'session', force: true });
+  assert.ok(readClaim(dir, 'item-a'));
+
+  const res = runUnclaim(repoRoot, 'item-a');
+  assert.equal(res.status, 0);
+  assert.deepEqual(res.json.data, {
+    released: true,
+    reason: 'durable-status-mismatch',
+    durableStatus: 'todo',
+  });
+  assert.equal(readClaim(dir, 'item-a'), null);
+
+  acquireClaim(dir, { id: 'nonexistent-item', actor: 'session', force: true });
+  assert.ok(readClaim(dir, 'nonexistent-item'));
+
+  const resNonexistent = runUnclaim(repoRoot, 'nonexistent-item');
+  assert.equal(resNonexistent.status, 0);
+  assert.deepEqual(resNonexistent.json.data, {
+    released: true,
+    reason: 'durable-status-mismatch',
+    durableStatus: 'not-found',
+  });
+  assert.equal(readClaim(dir, 'nonexistent-item'), null);
+});
+
+test('fgos unclaim refuses with a clear error naming holder when durable status is doing and activity is fresh (tsk-uio)', () => {
+  const { repoRoot, dir } = setup();
+  addWork(dir, { id: 'doing-item', title: 'Doing Item', kind: 'task', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true' });
+  const claim = acquireClaim(dir, { id: 'doing-item', actor: 'session', claimRole: 'session', force: true });
+
+  const headBranch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  execFileSync('git', ['checkout', '-b', 'fgw/doing-item'], { cwd: repoRoot });
+  commitAt(repoRoot, 'fresh.txt', 'fresh content', Math.floor(Date.now() / 1000));
+  execFileSync('git', ['checkout', headBranch], { cwd: repoRoot });
+
+  const res = runUnclaim(repoRoot, 'doing-item');
+  assert.notEqual(res.status, 0);
+  assert.match(res.stderr, /unclaim: claim for "doing-item" is held by/);
+  assert.match(res.stderr, new RegExp(claim.writerId));
+  assert.ok(readClaim(dir, 'doing-item'), 'claim must remain un-cleared');
+});
+
+test('fgos unclaim clears stale claim with {released:true, reason:"stale-liveness"} when durable status is doing and activity is stale (tsk-uio)', () => {
+  const { repoRoot, dir } = setup();
+  addWork(dir, { id: 'doing-item', title: 'Doing Item', kind: 'task', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true' });
+  acquireClaim(dir, { id: 'doing-item', actor: 'session', claimRole: 'runner', force: true });
+
+  const headBranch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  execFileSync('git', ['checkout', '-b', 'fgw/doing-item'], { cwd: repoRoot });
+  const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
+  commitAt(repoRoot, 'stale.txt', 'stale content', staleSeconds);
+  execFileSync('git', ['checkout', headBranch], { cwd: repoRoot });
+
+  const res = runUnclaim(repoRoot, 'doing-item');
+  assert.equal(res.status, 0);
+  assert.deepEqual(res.json.data, {
+    released: true,
+    reason: 'stale-liveness',
+  });
+  assert.equal(readClaim(dir, 'doing-item'), null, 'claim must be cleared');
 });
 
 test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and succeeds even when truncation guard detects a break', () => {

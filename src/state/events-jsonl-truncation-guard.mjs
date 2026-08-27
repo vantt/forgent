@@ -191,16 +191,24 @@ export function writeGuardMark(guardPath, fileKey, mark) {
   writeGuardMarks(guardPath, marks);
 }
 
+/**
+ * Derives the canonical sidecar `fileKey` from a log path.
+ * If the log file lives directly inside an `events` directory (e.g. `.fgos/events/<name>.jsonl`),
+ * returns `events/<name>`. Otherwise defaults to `path.basename(logPath)`.
+ */
+export function deriveFileKeyFromLogPath(logPath) {
+  const parent = path.basename(path.dirname(logPath));
+  return parent === "events" ? `events/${path.basename(logPath)}` : path.basename(logPath);
+}
+
 /** Read-only: run `checkTruncationGuard` against real files on disk,
  * never writing the sidecar. Unlocked read of the log -- mirrors
  * `checkEventsJsonlContiguity`'s own precedent (a report that races a
  * concurrent append at worst reads a slightly stale snapshot, never a
  * torn/corrupt one; `appendEvent`'s own lock still protects the file
- * itself from a torn write). `fileKey` defaults to `logPath`'s own
- * basename -- byte-identical to the pre-T5 single-file behavior for any
- * caller that never passes it (e.g. the CLI wrapper, always called
- * against baseline-0). */
-export function checkEventsJsonlTruncationGuard(logPath, guardPath, fileKey = path.basename(logPath)) {
+ * itself from a torn write). `fileKey` defaults to `deriveFileKeyFromLogPath(logPath)` --
+ * `events/<name>` when inside an `events/` directory, or `path.basename(logPath)` otherwise. */
+export function checkEventsJsonlTruncationGuard(logPath, guardPath, fileKey = deriveFileKeyFromLogPath(logPath)) {
   const raw = fs.existsSync(logPath) ? fs.readFileSync(logPath, "utf8") : "";
   const storedMark = readGuardMark(guardPath, fileKey);
   return checkTruncationGuard(raw, storedMark);
@@ -212,7 +220,7 @@ export function checkEventsJsonlTruncationGuard(logPath, guardPath, fileKey = pa
  * ever gets to move). Never advances the mark on a break, so the failing
  * mark stays pointed at the last known-good position for whoever
  * investigates. Same `fileKey` default as `checkEventsJsonlTruncationGuard`. */
-export function advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey = path.basename(logPath)) {
+export function advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey = deriveFileKeyFromLogPath(logPath)) {
   const report = checkEventsJsonlTruncationGuard(logPath, guardPath, fileKey);
   if (report.ok && report.mark !== null) {
     writeGuardMark(guardPath, fileKey, report.mark);
@@ -246,6 +254,35 @@ function discoverGuardedFiles(fgosDir) {
     result.push({ fileKey: `events/${name}`, logPath: path.join(eventsDirPath, name) });
   }
   return result;
+}
+
+/**
+ * Unconditionally re-baselines the truncation guard mark for all discovered log files
+ * in `fgosDir` that exist on disk.
+ *
+ * Unlike `advanceEventsJsonlTruncationGuard`, which refuses to update the mark when
+ * a break is detected, this function computes and writes the current tip mark
+ * unconditionally -- acknowledging any break and bringing the mark up to date.
+ *
+ * @param {string} fgosDir - Path to the `.fgos` directory
+ * @param {string} guardPath - Path to the guard sidecar file
+ * @returns {{ rebaselined: Array<{fileKey: string, mark: {seq: number, hash: string}}>, skippedEmpty: Array<string> }}
+ */
+export function forceRebaselineTruncationGuard(fgosDir, guardPath) {
+  const rebaselined = [];
+  const skippedEmpty = [];
+  for (const { fileKey, logPath } of discoverGuardedFiles(fgosDir)) {
+    if (!fs.existsSync(logPath)) continue;
+    const raw = fs.readFileSync(logPath, "utf8");
+    const mark = computeGuardMark(raw);
+    if (mark === null) {
+      skippedEmpty.push(fileKey);
+    } else {
+      writeGuardMark(guardPath, fileKey, mark);
+      rebaselined.push({ fileKey, mark });
+    }
+  }
+  return { rebaselined, skippedEmpty };
 }
 
 export const DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC = 3600; // 3600 seconds (1 hour) fallback interval

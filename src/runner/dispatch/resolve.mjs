@@ -329,7 +329,7 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
   const effectiveAgentType = executorEntry?.agentType ?? resolvedAgentType;
   const resolvedViaAgentType = !cliInvocation && !(executorEntry && (executorEntry.adapter || executorEntry.command)) && Boolean(effectiveAgentType && cfg && cfg.executor);
   const byExecutor = cliInvocation
-    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry.provider, env: cliInvocation.env ?? executorEntry.env }
+    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry.provider, env: cliInvocation.env ?? executorEntry.env, liveOutput: cliInvocation.liveOutput ?? executorEntry.liveOutput, interactiveMode: cliInvocation.interactiveMode ?? executorEntry.interactiveMode }
     : executorEntry && (executorEntry.adapter || executorEntry.command)
       ? executorEntry
       : resolvedViaAgentType

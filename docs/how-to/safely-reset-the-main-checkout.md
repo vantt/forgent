@@ -42,25 +42,16 @@ it was never `git add`-ed.
    fgos main-checkout-reset --sha 3a7eb10
    ```
 
-2. **If the main checkout is dirty, it refuses** and prints the full
-   whole-repo `git status --porcelain` output (not scoped to the files
-   you meant to touch):
+2. **If the main checkout is dirty or `--sha` is behind current HEAD**, it refuses and prints the full whole-repo `git status --porcelain` and/or the list of committed commits about to be discarded (with author, message, and files touched):
 
    ```
-   main-checkout-reset: Main checkout has uncommitted changes (full git
-   status, not just the files you meant to touch) — refusing to reset
-   --hard without --confirm. Review the status output, then re-run with
-   --confirm once you are sure none of it belongs to another in-flight
-   session.
+   main-checkout-reset: Main checkout reset to <sha> would discard N committed commit(s) ahead of target SHA — refusing to reset --hard without --confirm. Review the lost commits, then re-run with --confirm once you are sure none of it belongs to another in-flight session.
 
-   Full git status (main checkout, whole repo):
-   <porcelain output>
+   Commits about to be discarded (N):
+   <git log --stat output>
    ```
 
-3. **Read the printed status.** Confirm none of the listed changes
-   belong to another in-flight session (another worktree's
-   merge-loop/runner process may depend on state you don't recognize as
-   yours).
+3. **Read the printed status and lost commits.** Confirm none of the listed changes or commits belong to another in-flight session (another worktree's merge-loop/runner process may depend on state or commits you don't recognize as yours).
 
 4. **Re-run with `--confirm` only once you're sure:**
 
@@ -68,18 +59,13 @@ it was never `git add`-ed.
    fgos main-checkout-reset --sha 3a7eb10 --confirm
    ```
 
-   The reset proceeds only when the tree is clean, or when it's dirty
-   *and* `--confirm` is explicitly passed.
+   The reset proceeds only when the tree is clean and `--sha` is not behind `HEAD` by unconfirmed commits, or when `--confirm` is explicitly passed.
 
 ## Why this exists
 
 The guard (`assertSafeMainCheckoutReset`,
 `src/runner/main-checkout-reset-guard.mjs`) refuses when the whole-repo
-tree is dirty (reusing `isMainTreeClean`, the same whole-repo check
-`approve` already uses) unless the caller passes `--confirm` after
-seeing the full status the error itself prints. `repoRoot` is derived
-from `--dir`, never `process.cwd()`, so the verb behaves identically
-whether invoked from the main checkout or from a worktree's cwd.
+tree is dirty (reusing `isMainTreeClean`) or when `--sha` is behind `HEAD` with committed commits ahead of target SHA unless the caller passes `--confirm` after seeing the full status or lost commits details the error itself prints. `repoRoot` is derived from `--dir` (or `git common-dir`), so the verb behaves identically whether invoked from the main checkout or from a worktree's cwd.
 
 This item's own scope is the destructive-git-op safety net only — a
 required full-tree status check plus explicit human confirmation before
