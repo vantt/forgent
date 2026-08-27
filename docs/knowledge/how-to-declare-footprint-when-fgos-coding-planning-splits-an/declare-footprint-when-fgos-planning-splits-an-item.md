@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: how-to
+---
 # How to declare `--footprint` when `fgos-coding-planning` splits an item
 
 Use this when `fgos-coding-planning`'s own "Decide the split" step is creating
