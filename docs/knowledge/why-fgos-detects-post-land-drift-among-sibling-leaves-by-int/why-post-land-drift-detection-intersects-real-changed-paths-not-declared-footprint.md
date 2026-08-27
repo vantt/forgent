@@ -4,6 +4,8 @@ title: Why post-land drift detection intersects real changed paths, not declared
 tags: [merge, drift, footprint, catchup, changedFiles]
 source_capture_ids: [tsk-2ypd]
 authoritative_for: why fgOS detects post-land drift among sibling leaves by intersecting real git changed-paths instead of triggering mass catchup or comparing declared footprints
+framework: diataxis
+mode: explanation
 ---
 # Why post-land drift detection intersects real changed paths, not declared footprint
 
