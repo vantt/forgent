@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Auto-decompose can drop a locked decision from every child's footprint
 
 `tsk-2ta` locked two decisions in its `CONTEXT.md` during `fgos-coding-exploring`:
