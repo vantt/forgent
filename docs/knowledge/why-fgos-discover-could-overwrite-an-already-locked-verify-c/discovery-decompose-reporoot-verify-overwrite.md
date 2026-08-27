@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `fgos discover` could overwrite an already-locked `verify` command
 
 `resolveDiscovery` (`src/intake/discovery.mjs`) and `resolveDecompose`
