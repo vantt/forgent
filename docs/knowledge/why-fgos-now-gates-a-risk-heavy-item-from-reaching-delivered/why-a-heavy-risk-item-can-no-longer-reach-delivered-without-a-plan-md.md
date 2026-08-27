@@ -4,6 +4,8 @@ title: Why a heavy-risk item can no longer reach delivered without a plan.md
 tags: [risk, plan-md, iron-law, delivered, governance]
 source_capture_ids: [tsk-2p6]
 authoritative_for: why fgOS now gates a risk:heavy item from reaching delivered when it has no plan.md, and why the two historical violations that surfaced this gap were left uncorrected
+framework: diataxis
+mode: explanation
 ---
 # Why a heavy-risk item can no longer reach `delivered` without a `plan.md`
 
