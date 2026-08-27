@@ -3,6 +3,8 @@ type: explanation
 title: Why claimWork's CAS reread stays while its one redundant full-log read was deduped
 tags: [state, replay, claim-port, performance]
 source_capture_ids: [tsk-3jh]
+framework: diataxis
+mode: explanation
 ---
 # Why `claimWork`'s CAS reread stays while its one redundant full-log read was deduped
 
