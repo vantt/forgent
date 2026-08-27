@@ -4,6 +4,8 @@ title: How to branch fgos-coding-driving's claim step by a domain's worktreeBack
 tags: []
 timestamp: 2026-08-04T09:30:44.306Z
 source_capture_ids: [tsk-5y5]
+framework: diataxis
+mode: how-to
 ---
 # How to branch fgos-coding-driving's claim step by a domain's worktreeBacked flag
 
