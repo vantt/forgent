@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `backlog` is a new global status before `todo`, not a domain relabel
 
 Before this item (`tsk-5wr`), the work-item lifecycle had no place for "an
