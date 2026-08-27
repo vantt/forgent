@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why gate approval was separated from move-next
 
 ## The original observation
