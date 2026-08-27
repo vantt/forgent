@@ -1360,6 +1360,22 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'preflight',
+    invoke: 'fgos preflight',
+    description: 'Runs fast preflight checks (mirror sync diff, decision citation drift, backlog reconciliation) against the current checkout to detect uncommitted drift before returning.',
+    parameters: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+    examples: ['fgos preflight'],
+    touchesState: true,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'unlock',
     invoke: 'fgos unlock',
     description: 'Safely clears .fgos/main-checkout.lock (the STR65 concurrent-writer guard) when it is stale or corrupt. Never force-deletes: refuses and reports the holder identity when a different session genuinely still holds it live.',

@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
@@ -4321,6 +4321,66 @@ async function runVerb(verb, flags, positional, dir) {
       }
       releaseClaim(dir, { id });
       return { released: true, reason: 'stale-liveness' };
+    }
+
+    case 'preflight': {
+      const cwd = flags.dir !== undefined ? path.resolve(flags.dir) : process.cwd();
+      const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd, encoding: 'utf8' }).trim();
+
+      const checks = [];
+
+      // 1. mirror-sync-diff
+      {
+        const id = 'mirror-sync-diff';
+        const description = 'Verify skill wrappers across .claude/skills and plugins/fgOS/skills are in sync with source';
+        const buildRes = spawnSync('npm', ['run', 'build:skills'], { cwd: repoRoot, encoding: 'utf8' });
+        if (buildRes.status !== 0) {
+          const msg = (buildRes.stderr || buildRes.stdout || 'npm run build:skills failed').trim();
+          checks.push({ id, description, passed: false, message: msg });
+        } else {
+          const diffRes = spawnSync('git', ['diff', '--exit-code', '--', '.claude/skills', 'plugins/fgOS/skills'], { cwd: repoRoot, encoding: 'utf8' });
+          if (diffRes.status !== 0) {
+            const msg = (diffRes.stdout || diffRes.stderr || 'uncommitted skill wrapper drift in .claude/skills or plugins/fgOS/skills').trim();
+            checks.push({ id, description, passed: false, message: msg });
+          } else {
+            checks.push({ id, description, passed: true, message: 'skill wrappers in .claude/skills and plugins/fgOS/skills are in sync' });
+          }
+        }
+      }
+
+      // 2. decision-citation-drift
+      {
+        const id = 'decision-citation-drift';
+        const description = 'Verify decision citations across specs and skills do not drift from decision index';
+        const res = spawnSync(process.execPath, ['scripts/check-decision-citation-drift.mjs'], { cwd: repoRoot, encoding: 'utf8' });
+        if (res.status !== 0) {
+          const msg = (res.stdout || res.stderr || 'decision citation drift check failed').trim();
+          checks.push({ id, description, passed: false, message: msg });
+        } else {
+          checks.push({ id, description, passed: true, message: (res.stdout || 'no decision citation drift found').trim() });
+        }
+      }
+
+      // 3. backlog-reconciliation
+      {
+        const id = 'backlog-reconciliation';
+        const description = 'Verify backlog item status reconciliation';
+        const res = spawnSync(process.execPath, ['scripts/check-backlog-reconciliation.mjs'], { cwd: repoRoot, encoding: 'utf8' });
+        if (res.status !== 0) {
+          const msg = (res.stderr || res.stdout || 'backlog reconciliation check failed').trim();
+          checks.push({ id, description, passed: false, message: msg });
+        } else {
+          checks.push({ id, description, passed: true, message: (res.stdout || 'all backlog items reconciled').trim() });
+        }
+      }
+
+      const failures = checks.filter((c) => !c.passed);
+      if (failures.length > 0) {
+        const failureList = failures.map((c) => `  - ${c.id}: ${c.message}`).join('\n');
+        throw new StoreError('validation', `fgos preflight: ${failures.length} of ${checks.length} check(s) failed:\n${failureList}`);
+      }
+
+      return { checks };
     }
 
     // Safely clears .fgos/main-checkout.lock (tsk-3h4). Never force-deletes:
