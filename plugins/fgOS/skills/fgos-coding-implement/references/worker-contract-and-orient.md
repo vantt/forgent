@@ -16,10 +16,12 @@ If this session did not arrive here via the `fgos-coding-driving` loop
 skill) — for example, a session driving stage-by-stage by hand, straight
 from `fgos-coding-validating`'s own `fgos plan` call — re-check the
 item's live `status` (`fgos list --id <id> --json`) before doing
-anything else: the `planning`→`executing` edge releases the claim back
-to `todo`, so the claim may already be released. If `status` reads
-`todo`, re-claim (`fgos pick <id>`) before Implementing — proceeding
-without a live claim risks `fgos return` refusing later with "is todo,
+anything else. Under tsk-40m D5, a runtime claim stays active unbroken
+through `clarify → executing` (the former `releaseClaimOnExecuting` behavior
+was retired, so the `planning`→`executing` edge no longer releases claims
+back to `todo`). However, if `status` still reads `todo` for any reason,
+re-claim (`fgos pick <id>`) before Implementing — proceeding without a
+live claim risks `fgos return` refusing later with "is todo,
 not doing".
 
 ## Reclaim the ball if it isn't yours
