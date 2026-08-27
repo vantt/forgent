@@ -1,3 +1,7 @@
+---
+framework: diataxis
+mode: explanation
+---
 # Why `fgos approve` distinguishes a pre-existing `MERGE_HEAD` from its own conflict
 
 `mergeRunnerItemLocked` (`src/runner/merge.mjs`) attempts `git merge
