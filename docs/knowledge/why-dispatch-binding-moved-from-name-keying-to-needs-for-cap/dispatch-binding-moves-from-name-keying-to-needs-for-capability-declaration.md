@@ -1,5 +1,7 @@
 ---
 title: Why dispatch binding moved from name-keying to needs/for capability declaration
+framework: diataxis
+mode: explanation
 ---
 
 # Why dispatch binding moved from name-keying to needs/for capability declaration
