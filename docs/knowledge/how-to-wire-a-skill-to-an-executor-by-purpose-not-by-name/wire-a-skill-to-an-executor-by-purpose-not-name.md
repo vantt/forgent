@@ -4,6 +4,8 @@ title: How to wire a skill to an executor by purpose, not by name
 tags: []
 timestamp: 2026-08-09T00:00:00.000Z
 source_capture_ids: [tsk-2c1]
+framework: diataxis
+mode: how-to
 ---
 # How to wire a skill to an executor by purpose, not by name
 
