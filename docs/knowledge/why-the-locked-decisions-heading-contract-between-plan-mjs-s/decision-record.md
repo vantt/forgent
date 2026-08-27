@@ -1,5 +1,7 @@
 ---
 authoritative_for: why the "## Locked decisions" heading contract between plan.mjs's reader and fgos-coding-exploring's writer silently fails open on a non-literal heading, and why the fix widens the writer/adds a loud test instead of loosening the reader's regex
+framework: diataxis
+mode: explanation
 ---
 
 # Why the "Locked decisions" heading contract fails open, not closed
