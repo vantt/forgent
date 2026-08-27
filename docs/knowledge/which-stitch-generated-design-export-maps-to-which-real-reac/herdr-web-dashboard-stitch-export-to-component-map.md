@@ -1,5 +1,7 @@
 ---
 authoritative_for: which stitch-generated design export maps to which real React component in the herdr web dashboard, and what each component covers
+framework: diataxis
+mode: reference
 ---
 
 # Herdr web dashboard: stitch export to component map
