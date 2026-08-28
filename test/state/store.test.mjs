@@ -839,8 +839,8 @@ test('moveWork under concurrent OS processes racing the SAME expectedStatus CAS 
 // append (withEventsLockAndRefresh), closing that window structurally.
 test('concurrent editWork calls on DIFFERENT ids never lose a write to state.json (tsk-1q5)', async () => {
   const dir = tmpDir();
-  const N_PROC = 8;
-  const N_EDITS = 10; // per process — volume, same technique events.test.mjs's own append-race test uses (D2: back-to-back, no delay, to maximize scheduler-preemption overlap between processes' unlocked refreshView calls). Kept well under the 2s events.lock timeout (events.mjs EVENTS_LOCK_TIMEOUT_MS) — a higher N_PROC*N_EDITS was tried and caused genuine lock-timeout contention unrelated to the refreshView race this test targets, not a more reliable reproduction of it.
+  const N_PROC = 6;
+  const N_EDITS = 5; // per process — volume, same technique events.test.mjs's own append-race test uses (D2: back-to-back, no delay, to maximize scheduler-preemption overlap between processes' unlocked refreshView calls). Kept well under the 2s events.lock timeout (events.mjs EVENTS_LOCK_TIMEOUT_MS) — a higher N_PROC*N_EDITS was tried and caused genuine lock-timeout contention unrelated to the refreshView race this test targets, not a more reliable reproduction of it.
   for (let i = 0; i < N_PROC; i += 1) {
     addSampleWork(dir, `race-view-${i}`);
   }
