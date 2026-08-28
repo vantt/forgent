@@ -13,6 +13,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { DEFAULT_DOMAIN } from '../../state/workflow-stage-graphs.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError } from './config.mjs';
 import { buildAssignment, isReadOnlyAssignment } from './assignment.mjs';
@@ -245,7 +246,7 @@ export function createMissionAssignment(
   const assignment = buildAssignment({
     workId: null,
     missionId,
-    domain: 'coding',
+    domain: opts.domain ?? DEFAULT_DOMAIN,
     stage,
     operation,
     role,
