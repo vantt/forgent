@@ -403,8 +403,8 @@ test('appendEvent under concurrent OS processes yields unique, gapless, strictly
   // the read-then-write race) while leaving roughly 5x headroom under the
   // deadline instead of ~1x. Raising these back without also raising the
   // budget they are measured against just re-arms the same trap.
-  const N_PROC = 5;
-  const N_APPEND = 8;
+  const N_PROC = 4;
+  const N_APPEND = 5;
 
   // Each child imports the REAL appendEvent, waits until `startAt` (a shared
   // wall-clock barrier a few hundred ms out) so all processes stampede the

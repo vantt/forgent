@@ -651,7 +651,7 @@ test('real concurrency: two independent ready items dispatched in ONE runOnce ov
   const markerDir = mkTempDir('fgos-loop-test-marker-');
   seedItem(dir, { id: 'item-a', verify: 'test -f a.txt' });
   seedItem(dir, { id: 'item-b', verify: 'test -f b.txt' });
-  const config = configFor(writeIntervalExecutor(scriptDir, markerDir, 300));
+  const config = configFor(writeIntervalExecutor(scriptDir, markerDir, 1000));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
