@@ -40,8 +40,4 @@ domain: coding | role: reviewer | reason: review | requires-skill: fgos-coding-v
 The Gate's own "ask a person" branch has no `fgos ask`/`fgos answer`
 anywhere in it — every question is live, in-session, resolved the same
 turn via `fgos gate-approve --actor human`, never a real async park.
-`role: reviewer` above names the function this task performs
-(reviewing the plan), not the roleGraph's `reviewer` role — this task
-runs as `implementer` throughout, same as every other `planning`-stage
-task (tsk-2t9c D14/D15 — found wiring this skill for real; the previous
-`advise (async)` row here was inaccurate).
+`role: reviewer` is the roleGraph reviewer role for this operation in stage `planning`, dispatched via Assignment.
