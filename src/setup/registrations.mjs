@@ -745,31 +745,35 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
             seenOpIds.add(op.id);
           }
 
-          if (op.taskSpec) {
-            if (typeof op.taskSpec !== 'string') {
-              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec must be a string`);
-            } else {
-              const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
-              if (!fs.existsSync(specPath)) {
-                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
-              }
+          if (!op.taskSpec || typeof op.taskSpec !== 'string' || op.taskSpec.trim() === '') {
+            problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec must be a non-empty string`);
+          } else {
+            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
+            if (!fs.existsSync(specPath)) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
             }
           }
 
           if (domain.roleGraph && Array.isArray(domain.roleGraph.roles)) {
-            if (op.role && !domain.roleGraph.roles.includes(op.role)) {
+            if (!op.role || typeof op.role !== 'string' || op.role.trim() === '') {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> role must be a non-empty string in roleGraph.roles [${domain.roleGraph.roles.join(', ')}]`);
+            } else if (!domain.roleGraph.roles.includes(op.role)) {
               problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> role "${op.role}" not in roleGraph.roles [${domain.roleGraph.roles.join(', ')}]`);
             }
+          } else if (op.role !== undefined && (typeof op.role !== 'string' || op.role.trim() === '')) {
+            problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> role must be a non-empty string`);
           }
 
-          if (op.skills !== undefined) {
-            if (!Array.isArray(op.skills) || op.skills.some((s) => typeof s !== 'string')) {
-              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skills must be an array of strings`);
-            } else {
-              for (const skill of op.skills) {
-                if (agentSkillsMap.size > 0 && !allProvidedSkills.has(skill)) {
-                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skill "${skill}" not provided by any registered agent-type`);
-                }
+          if (!Array.isArray(op.skills) || op.skills.some((s) => typeof s !== 'string')) {
+            problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skills must be an array of strings`);
+          } else if (op.skills.length === 0) {
+            problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skills must be a non-empty array of skill names`);
+          } else {
+            for (const skill of op.skills) {
+              if (typeof skill !== 'string' || skill.trim() === '') {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skill name must be a non-empty string`);
+              } else if (agentSkillsMap.size > 0 && !allProvidedSkills.has(skill)) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skill "${skill}" not provided by any registered agent-type`);
               }
             }
           }
@@ -779,9 +783,9 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
             if (!Array.isArray(stageEdges) || stageEdges.length === 0) {
               problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> reason "${op.reason}" has no declared edges for stage "${stage}" in roleGraph`);
             } else {
-              const matchingEdge = stageEdges.find((e) => e.reason === op.reason && (!op.role || e.to === op.role || e.from === op.role));
+              const matchingEdge = stageEdges.find((e) => e.reason === op.reason && (!op.role || e.to === op.role));
               if (!matchingEdge) {
-                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> reason "${op.reason}" (role "${op.role}") does not match any legal roleGraph edge at stage "${stage}"`);
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> reason "${op.reason}" (target role "${op.role}") does not match any legal roleGraph edge at stage "${stage}"`);
               }
             }
           }
@@ -806,6 +810,11 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
             if (typeof op.policy !== 'object' || op.policy === null || Array.isArray(op.policy)) {
               problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy must be an object`);
             } else {
+              const ALLOWED_POLICY_KEYS = new Set(['minTier', 'preferPersona', 'preferExecutor', 'fallbackExecutors', 'visibility']);
+              const disallowedKeys = Object.keys(op.policy).filter((k) => !ALLOWED_POLICY_KEYS.has(k));
+              if (disallowedKeys.length > 0) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy contains disallowed key(s) [${disallowedKeys.join(', ')}] (allowed: ${[...ALLOWED_POLICY_KEYS].join(', ')})`);
+              }
               if (op.policy.minTier && !MODEL_POLICY_TIERS.includes(op.policy.minTier)) {
                 problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.minTier "${op.policy.minTier}" not in recognized tiers [${MODEL_POLICY_TIERS.join(', ')}]`);
               }

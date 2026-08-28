@@ -831,6 +831,94 @@ test('findWorkflowStageOperationProblems fails on duplicate operation id or empt
   assert.ok(problems.some((p) => p.includes('operation id must be a non-empty string')));
 });
 
+test('findWorkflowStageOperationProblems fails when required fields taskSpec, role, or skills are missing or empty', () => {
+  const customDomains = {
+    coding: {
+      roleGraph: {
+        roles: ['implementer', 'researcher', 'reviewer'],
+      },
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'missing-taskSpec', role: 'implementer', skills: ['fgos-coding-planning'] },
+              { id: 'missing-role', taskSpec: 'shape-plan', skills: ['fgos-coding-planning'] },
+              { id: 'missing-skills', taskSpec: 'shape-plan', role: 'implementer' },
+              { id: 'empty-skills', taskSpec: 'shape-plan', role: 'implementer', skills: [] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('missing-taskSpec') && p.includes('taskSpec must be a non-empty string')));
+  assert.ok(problems.some((p) => p.includes('missing-role') && p.includes('role must be a non-empty string in roleGraph.roles')));
+  assert.ok(problems.some((p) => p.includes('missing-skills') && p.includes('skills must be an array of strings')));
+  assert.ok(problems.some((p) => p.includes('empty-skills') && p.includes('skills must be a non-empty array of skill names')));
+});
+
+test('findWorkflowStageOperationProblems strictly enforces role as TARGET role (to) for reason edges', () => {
+  const customDomains = {
+    coding: {
+      roleGraph: {
+        roles: ['implementer', 'researcher', 'reviewer'],
+        edges: {
+          executing: [
+            // reviewer -> researcher (consult)
+            { from: 'reviewer', to: 'researcher', reason: 'consult', mode: 'sync' },
+          ],
+        },
+      },
+      workflows: {
+        feature: {
+          operationMap: {
+            executing: [
+              // An operation declaring role: reviewer with reason: consult should NOT match reviewer -> researcher edge
+              // because reviewer is the SOURCE (from), not the TARGET (to).
+              { id: 'bad-target-op', taskSpec: 'resolve-question', role: 'reviewer', reason: 'consult', skills: ['fgos-researching'] },
+              // While role: researcher with reason: consult correctly matches
+              { id: 'good-target-op', taskSpec: 'resolve-question', role: 'researcher', reason: 'consult', skills: ['fgos-researching'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('bad-target-op') && p.includes('does not match any legal roleGraph edge')));
+  assert.ok(!problems.some((p) => p.includes('good-target-op')));
+});
+
+test('findWorkflowStageOperationProblems fails when policy contains disallowed keys', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              {
+                id: 'shape-plan',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                policy: {
+                  minTier: 'standard',
+                  model: 'gpt-5.5',
+                  timeoutMs: 999999,
+                  prompt: 'Do something',
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('policy contains disallowed key(s) [model, timeoutMs, prompt]')));
+});
+
 test('domain-workflow-operations-coverage doctor check is registered and passes on clean repo', () => {
   const check = DOCTOR_CHECKS.find((c) => c.id === 'domain-workflow-operations-coverage');
   assert.ok(check, 'domain-workflow-operations-coverage doctor check must be registered');

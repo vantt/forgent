@@ -673,7 +673,7 @@ export function operationsForStage(domain, stage, options = {}) {
     const primaryOp = Object.freeze({
       id: bundle.taskSpec || stage,
       primary: true,
-      taskSpec: bundle.taskSpec || null,
+      taskSpec: bundle.taskSpec || stage,
       role: domainObj?.roleGraph?.defaultRole || 'implementer',
       skills: bundle.skill ? Object.freeze([bundle.skill]) : Object.freeze([]),
     });
