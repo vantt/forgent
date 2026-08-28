@@ -11,16 +11,43 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
 import { writeSharedConfig } from '../../config/shared-config-file.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { renderAssignmentPrompt } from './assignment.mjs';
 import { executeExecutorCli } from './cli.mjs';
-import { currentHead } from '../worktree.mjs';
 
 /**
- * Classify RunResult status and confidence from execution outcome and evidence (Step 03 §5.1).
+ * Read git HEAD sha safely without emitting error noise on non-git directories.
+ *
+ * @param {string} dir
+ * @returns {string|null}
+ */
+function safeGitHead(dir) {
+  if (!dir) return null;
+  try {
+    return execFileSync('git', ['rev-parse', 'HEAD'], {
+      cwd: dir,
+      encoding: 'utf8',
+      shell: false,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Classify RunResult status and confidence from execution outcome and evidence (Step 01 §11 / Step 03 §5.1).
+ *
+ * Confidence ladder:
+ * - `failed`: timeout, nonzero exit, invalid result, or explicit failure.
+ * - `verified`: structured claim says done + external evidence (such as git delta or external verification).
+ * - `reported`: structured claim says done + consult/review read-only operation + worker-produced result/report artifact exists.
+ * - `inferred`: no structured claim, but external evidence (git/artifact delta) exists.
+ * - `no-evidence`: process settled, but no structured claim with worker artifact, and no external proof.
  *
  * @param {object} params
  * @param {number|null} params.exitCode
@@ -53,26 +80,27 @@ export function classifyRunEvidence({
     return { status: 'blocked', confidence: 'reported' };
   }
 
-  const hasExternalEvidence = changedFiles.length > 0 || workerArtifacts.length > 0;
+  const hasExternalEvidence = changedFiles.length > 0;
+  const hasWorkerReport = workerArtifacts.length > 0;
 
   if (agentClaim && agentClaim.status === 'done') {
+    // Verified requires external evidence (git delta / external test proof)
     if (hasExternalEvidence) {
       return { status: 'done', confidence: 'verified' };
     }
-    if (isReadOnlyOperation) {
+    // Reported for read-only consult/review when a worker-produced result or report artifact exists
+    if (isReadOnlyOperation && hasWorkerReport) {
       return { status: 'done', confidence: 'reported' };
     }
-    return { status: 'done', confidence: 'no-evidence' };
+    return { status: 'no-evidence', confidence: 'no-evidence' };
   }
 
+  // Inferred when external evidence exists without structured claim
   if (hasExternalEvidence) {
     return { status: 'done', confidence: 'inferred' };
   }
 
-  if (isReadOnlyOperation && exitCode === 0) {
-    return { status: 'done', confidence: 'reported' };
-  }
-
+  // A settled process with no claim/report and no external proof is always no-evidence
   return { status: 'no-evidence', confidence: 'no-evidence' };
 }
 
@@ -153,12 +181,7 @@ export async function executeAssignment(assignment, opts = {}) {
 
   fs.writeFileSync(path.join(runDir, 'run.json'), `${JSON.stringify(runMeta, null, 2)}\n`);
 
-  let gitBefore = null;
-  try {
-    gitBefore = currentHead(cwd);
-  } catch {
-    gitBefore = null;
-  }
+  const gitBefore = safeGitHead(cwd);
 
   const startTime = Date.now();
   let rawResult;
@@ -178,23 +201,19 @@ export async function executeAssignment(assignment, opts = {}) {
     });
   } catch (err) {
     executionError = err;
+    const isTimeoutErr = err.category === 'worker-timeout' || /timed out/i.test(err.message);
     rawResult = {
-      status: 'failed',
-      signal: null,
-      stdout: '',
-      stderr: err.message || String(err),
+      status: isTimeoutErr ? 'timeout' : 'failed',
+      signal: isTimeoutErr ? 'SIGTERM' : null,
+      stdout: err.stdout || '',
+      stderr: err.stderr || err.message || String(err),
     };
   }
 
   const durationMs = Date.now() - startTime;
   const settledAt = new Date().toISOString();
 
-  let gitAfter = null;
-  try {
-    gitAfter = currentHead(cwd);
-  } catch {
-    gitAfter = null;
-  }
+  const gitAfter = safeGitHead(cwd);
 
   const stdoutText = rawResult.stdout || '';
   const stderrText = rawResult.stderr || (executionError ? executionError.message : '');

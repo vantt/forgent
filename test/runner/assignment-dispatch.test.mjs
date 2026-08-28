@@ -16,8 +16,20 @@ function writeEchoExecutor(dir) {
   fs.writeFileSync(
     scriptPath,
     `
-    const args = process.argv.slice(2);
-    process.stdout.write(JSON.stringify({ args, cwd: process.cwd() }));
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    const runsDir = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(runsDir)) {
+      for (const asgn of fs.readdirSync(runsDir)) {
+        const runDir = path.join(runsDir, asgn, 'runs', '01');
+        if (fs.existsSync(runDir)) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDone.\\n');
+          fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+        }
+      }
+    }
+    process.stdout.write("All good\\n");
     process.exit(0);
     `,
   );
@@ -31,6 +43,21 @@ function writeFailingExecutor(dir, exitCode = 1) {
     `
     process.stderr.write("Simulated failure\\n");
     process.exit(${exitCode});
+    `,
+  );
+  return scriptPath;
+}
+
+function writeHangingExecutor(dir) {
+  const scriptPath = path.join(dir, 'hanging-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    process.stdout.write("Starting long work...\\n");
+    setTimeout(() => {
+      process.stdout.write("Finished\\n");
+      process.exit(0);
+    }, 10000);
     `,
   );
   return scriptPath;
@@ -66,6 +93,7 @@ test('executeAssignment executes non-mutating validate-plan assignment through f
   assert.equal(result.workId, 'tsk-test-1');
   assert.equal(result.runtime.exitCode, 0);
   assert.equal(result.status, 'done');
+  assert.equal(result.confidence, 'reported');
 
   // Verify Work object remains completely unchanged
   assert.equal(work.status, 'doing');
@@ -102,6 +130,59 @@ test('executeAssignment captures stderr and nonzero exit code as failed result w
   assert.equal(result.runtime.exitCode, 2);
   assert.equal(result.status, 'failed');
   assert.equal(result.confidence, 'failed');
+
+  // Work remains untouched
+  assert.equal(work.status, 'doing');
+  assert.equal(work.stage, 'planning');
+});
+
+test('executeAssignment captures timeout with partial stdout and writes failed RunResult storage (P2)', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeHangingExecutor(tempDir);
+
+  const runnerConfig = {
+    executor: {
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 150,
+  };
+
+  const work = { id: 'tsk-test-timeout', status: 'doing', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({
+    work,
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    timeoutMs: 150,
+  });
+
+  assert.equal(result.assignmentId, assignment.assignmentId);
+  assert.equal(result.status, 'failed');
+  assert.equal(result.confidence, 'failed');
+  assert.equal(result.runtime.exitCode, 124);
+
+  // Storage assertions
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  assert.ok(fs.existsSync(path.join(runDir, 'run.json')));
+  assert.ok(fs.existsSync(path.join(runDir, 'stdout.log')));
+  assert.ok(fs.existsSync(path.join(runDir, 'stderr.log')));
+  assert.ok(fs.existsSync(path.join(runDir, 'exit.json')));
+  assert.ok(fs.existsSync(path.join(runDir, 'evidence.json')));
+  assert.ok(fs.existsSync(path.join(runDir, 'result.json')));
+
+  const stdoutContent = fs.readFileSync(path.join(runDir, 'stdout.log'), 'utf8');
+  assert.match(stdoutContent, /Starting long work/);
+
+  const exitData = JSON.parse(fs.readFileSync(path.join(runDir, 'exit.json'), 'utf8'));
+  assert.equal(exitData.exitCode, 124);
+  assert.equal(exitData.signal, 'SIGTERM');
 
   // Work remains untouched
   assert.equal(work.status, 'doing');
