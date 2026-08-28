@@ -96,6 +96,7 @@ import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } fro
 import { resolvePlan } from '../intake/plan.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
+import { chooseStageOperation, executeDriverOperationChoice } from './dispatch/operation-choice.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 
 // errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
@@ -1405,8 +1406,35 @@ export async function runOnce(options = {}) {
           (item.stage === planningStage || item.stage === legacyPlanStage) &&
           (item.status === 'todo' || item.status === 'doing')
         ) {
-          resolvePlan(dir, item.id, config, 'runner');
-          log(`fgos-runner: chia-việc swept plan item "${item.id}"`);
+          const choice = chooseStageOperation({ work: item, stage: item.stage, domain: domain.name ?? item.domain, workflow: workflow?.name ?? item.workflow, repoRoot });
+          if (choice.dispatch === 'assignment' && choice.operation === 'validate-plan') {
+            const outcome = await executeDriverOperationChoice(item, choice, {
+              cwd: repoRoot,
+              repoRoot,
+              runnerConfig: config,
+              work: item,
+            });
+            log(`fgos-runner: reviewer validation assignment for "${item.id}" executed (confidence: ${outcome.runResult?.confidence}, status: ${outcome.runResult?.status})`);
+            if (outcome.canAdvanceEdge) {
+              const agentClaim = outcome.runResult?.agentClaim;
+              const callerVerdict = outcome.verdictPayload ?? (
+                agentClaim?.verdictPayload ?? (
+                  Array.isArray(agentClaim?.children) && agentClaim.children.length > 0
+                    ? { verdict: 'decompose', children: agentClaim.children, reason: agentClaim?.summary }
+                    : agentClaim?.verdict === 'need-human'
+                      ? { verdict: 'need-human', reason: agentClaim?.summary }
+                      : { verdict: 'pass-through', reason: agentClaim?.summary }
+                )
+              );
+              resolvePlan(dir, item.id, config, 'runner', callerVerdict);
+              log(`fgos-runner: chia-việc swept plan item "${item.id}" after READY validation`);
+            } else {
+              log(`fgos-runner: validation for "${item.id}" did not report READY (${outcome.reason}) — Work lifecycle untouched`);
+            }
+          } else {
+            resolvePlan(dir, item.id, config, 'runner');
+            log(`fgos-runner: chia-việc swept plan item "${item.id}"`);
+          }
         }
       }
     }

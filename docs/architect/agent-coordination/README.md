@@ -14,7 +14,17 @@ Herdr visibility.
 4. [step-01-team-dispatch-v1-rollout.md](step-01-team-dispatch-v1-rollout.md) - staged rollout from current code to team dispatch.
 5. [step-02-workflow-stage-operations.md](step-02-workflow-stage-operations.md) - workflow operations schema, lookup, and validation.
 6. [step-03-assignment-runresult.md](step-03-assignment-runresult.md) - assignment, run, and RunResult execution evidence.
-7. [agent-team-dispatch-and-herdr-stability.md](agent-team-dispatch-and-herdr-stability.md) - Herdr stability, visibility,
+7. [team-communication-protocol-v1.md](team-communication-protocol-v1.md) - role-to-role communication protocol for
+   stage operations, assignments, claims, and evidence.
+8. [step-04-assignment-runresult-hardening.md](step-04-assignment-runresult-hardening.md) - harden assignment execution so
+   RunResult confidence cannot false-pass from stale or missing evidence.
+9. [step-05-coding-driver-operation-choice.md](step-05-coding-driver-operation-choice.md) - make the coding driver choose
+   legal stage operations without replacing the Work lifecycle.
+10. [step-06-work-attached-team-adoption.md](step-06-work-attached-team-adoption.md) - adopt team dispatch on real
+   work-attached planning/executing scenarios.
+11. [step-07-mission-lite-brainstorm-debate.md](step-07-mission-lite-brainstorm-debate.md) - introduce mission-lite
+   read-only brainstorming/debate after Work-attached evidence is stable.
+12. [agent-team-dispatch-and-herdr-stability.md](agent-team-dispatch-and-herdr-stability.md) - Herdr stability, visibility,
    and evidence discipline for interactive/visible execution.
 
 ## Core Map
@@ -52,4 +62,16 @@ Add operationsForStage().
 Add operations to coding feature workflow.
 Validate operation taskSpecs, roles, skills, and reasons.
 Keep driver behavior unchanged.
+```
+
+## Post-Merge Implementation Track
+
+The merged V1 baseline has enough code to inspect and execute assignments, but
+the next work should harden evidence before broader adoption:
+
+```txt
+Step 04: prevent false-success RunResults.
+Step 05: teach the coding driver to choose declared operations.
+Step 06: use the operation path on real Work-attached scenarios.
+Step 07: only then try mission-lite brainstorming/debate without Work.
 ```

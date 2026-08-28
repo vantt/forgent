@@ -240,6 +240,17 @@ Examples:
 
 An `AgentMessage RESULT` is an agent claim. It becomes trustworthy only after runtime and evidence data are attached.
 
+Near-term implementation note:
+
+```txt
+Team Communication Protocol V1 uses Assignment + RunResult files as the concrete
+message/result substrate. AgentMessage remains the semantic vocabulary. Do not
+build a daemon or mailbox until a real reader needs it.
+```
+
+For the current role-to-role rules, see
+`team-communication-protocol-v1.md`.
+
 ### 3.11 Run
 
 `run` is one runtime execution attempt for an assignment.

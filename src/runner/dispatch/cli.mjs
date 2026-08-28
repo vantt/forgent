@@ -31,6 +31,7 @@ import { compileDispatchPlan } from './plan.mjs';
 import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { hasWorkerSlotRoom } from '../../state/worker-slots.mjs';
 import { buildDispatchResult } from './result-ladder.mjs';
+import { executeAssignment } from './assignment-runner.mjs';
 
 // Resolved against THIS module's own file location, never a caller-supplied
 // `root` -- `bin/fgos.mjs` is a fixed sibling of this checkout's own
@@ -594,11 +595,21 @@ export async function executeExecutorCli(
  */
 export async function decideExecutorCli(
   executorIdArg,
-  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg, stage: stageArg, needsSoul = false, caller } = {},
+  {
+    cwd = process.cwd(),
+    repoRoot,
+    hasLiveTaskAccess = false,
+    for: purpose,
+    work: workIdArg,
+    assignment: assignmentArg,
+    stage: stageArg,
+    needsSoul = false,
+    caller,
+  } = {},
 ) {
-  if (!executorIdArg && !purpose && !workIdArg && !needsSoul) {
+  if (!executorIdArg && !purpose && !workIdArg && !assignmentArg && !needsSoul) {
     throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
+      'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
     );
   }
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
@@ -613,15 +624,33 @@ export async function decideExecutorCli(
     }
   }
 
+  let assignmentItem;
+  if (!executorIdArg && assignmentArg) {
+    const fgosDir = fgosDirFromRoot(root);
+    const asgnId = typeof assignmentArg === 'string' ? assignmentArg : assignmentArg?.assignmentId;
+    if (asgnId) {
+      const assignmentPath = path.join(fgosDir, 'assignments', asgnId, 'assignment.json');
+      if (fs.existsSync(assignmentPath)) {
+        try {
+          assignmentItem = JSON.parse(fs.readFileSync(assignmentPath, 'utf8'));
+        } catch {
+          assignmentItem = null;
+        }
+      }
+    }
+  }
+
   const plan = compileDispatchPlan(cfg, {
     executorId: executorIdArg,
     for: purpose,
     work: workIdArg,
+    assignment: assignmentArg,
     stage: stageArg,
     needsSoul,
     hasLiveTaskAccess,
     caller,
     workItem,
+    assignmentItem,
   });
 
   const resolvedIndirectly = !executorIdArg;
@@ -829,6 +858,54 @@ export function runDispatchCli() {
       // branch was the one caller that never passed it -- RESEARCH.md).
       // stdout is left untouched, still carrying only the single final JSON
       // line below, so a scripted caller's JSON.parse(stdout) sees no change.
+      const assignmentId = flagValue('--assignment');
+      if (assignmentId) {
+        const cwd = flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd();
+        let root = flagValue('--repo-root') ?? resolveMainCheckoutRoot(cwd);
+        if (!root) {
+          try {
+            root = resolveRepoRoot(cwd);
+          } catch {
+            root = cwd;
+          }
+        }
+        const fgosDir = fgosDirFromRoot(root);
+        const asgnPath = path.isAbsolute(assignmentId) || assignmentId.endsWith('.json')
+          ? path.resolve(root, assignmentId)
+          : path.join(fgosDir, 'assignments', assignmentId, 'assignment.json');
+        if (!fs.existsSync(asgnPath)) {
+          process.stderr.write(`assignment "${assignmentId}" not found at ${asgnPath}\n`);
+          process.exitCode = 1;
+          break;
+        }
+        let asgnObj;
+        try {
+          asgnObj = JSON.parse(fs.readFileSync(asgnPath, 'utf8'));
+        } catch (err) {
+          process.stderr.write(`failed to parse assignment at ${asgnPath}: ${err.message}\n`);
+          process.exitCode = 1;
+          break;
+        }
+        const cliOverride = {};
+        if (flagValue('--model')) cliOverride.model = flagValue('--model');
+        if (flagValue('--tier')) cliOverride.tier = flagValue('--tier');
+        executeAssignment(asgnObj, {
+          cwd: flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd(),
+          repoRoot: root,
+          cliOverride,
+          onChunk: (stream, chunk) => process.stderr.write(chunk),
+        }).then(
+          (result) => {
+            process.stdout.write(`${JSON.stringify(result)}\n`);
+          },
+          (err) => {
+            process.stderr.write(`${err.message}\n`);
+            process.exitCode = 1;
+          },
+        );
+        break;
+      }
+
       let prompt = flagValue('--prompt') ?? '';
       const promptFile = flagValue('--prompt-file');
       if (promptFile) {
@@ -897,6 +974,7 @@ export function runDispatchCli() {
         hasLiveTaskAccess: rest.includes('--has-live-task-access'),
         for: flagValue('--for'),
         work: flagValue('--work'),
+        assignment: flagValue('--assignment'),
         stage: flagValue('--stage'),
         needsSoul: rest.includes('--needs-soul'),
       }).then(

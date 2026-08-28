@@ -34,10 +34,11 @@ domain: coding | role: reviewer | reason: review | requires-skill: fgos-coding-v
 | Trigger | Call | To | Reason | Bóng về mang |
 |---|---|---|---|---|
 | A precondition the reality gate needs cannot be resolved from context in hand (tier A's `fgos-researching` dispatch) | consult (sync) | researcher | consult | finding |
-| No trigger matches | — decide and fire the planning→executing edge — | | | |
+| No trigger matches | — write verdict artifacts (`agent-result.json` & `agent-report.md`) to runDir — | | | |
 
 **No `advise` call from this task, even when a trigger (T1/T2/T3) fires.**
 The Gate's own "ask a person" branch has no `fgos ask`/`fgos answer`
 anywhere in it — every question is live, in-session, resolved the same
 turn via `fgos gate-approve --actor human`, never a real async park.
 `role: reviewer` is the roleGraph reviewer role for this operation in stage `planning`, dispatched via Assignment.
+When dispatched as a reviewer Assignment, the reviewer MUST ONLY write verdict artifacts (`agent-result.json` and `agent-report.md`) to `<runDir>/`. The reviewer MUST NOT call `fgos plan` or fire Work lifecycle edges directly; the driver evaluates the verdict artifacts and executes the lifecycle movement. When executing via the direct compatibility mode (non-Assignment path), the skill fires the planning→executing engine verb directly.

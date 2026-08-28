@@ -68,11 +68,15 @@ function writeCommittingExecutor(scriptDir, counterFile, produce = 'output.txt')
     scriptPath,
     `
 import fs from 'node:fs';
+import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
-fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
+fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker ' + Date.now() + '\\n');
 execFileSync('git', ['add', ${JSON.stringify(produce)}]);
-execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`)}]);
+const statusStr = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' });
+if (statusStr.trim().length > 0) {
+  execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`)}]);
+}
 `,
   );
   return scriptPath;

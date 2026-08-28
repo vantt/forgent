@@ -1,9 +1,14 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   createAssignmentId,
   buildAssignment,
   renderAssignmentPrompt,
+  isReadOnlyAssignment,
+  validateAgentResultClaim,
 } from '../../src/runner/dispatch/assignment.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 
@@ -21,6 +26,23 @@ test('createAssignmentId produces deterministic asgn_<safe-work>_<safe-op>_<seq>
 
   const idNoWork = createAssignmentId({ operation: 'resolve-question' });
   assert.equal(idNoWork, 'asgn_nowork_resolve_question_001');
+});
+
+test('createAssignmentId scans assignmentsDir on filesystem and avoids collision without overwriting', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-collision-test-'));
+  const assignmentsDir = path.join(tempDir, '.fgos', 'assignments');
+  fs.mkdirSync(path.join(assignmentsDir, 'asgn_tsk_col_validate_plan_001'), { recursive: true });
+  fs.mkdirSync(path.join(assignmentsDir, 'asgn_tsk_col_validate_plan_003'), { recursive: true });
+
+  const id = createAssignmentId({
+    workId: 'tsk-col',
+    stage: 'planning',
+    operation: 'validate-plan',
+    assignmentsDir,
+  });
+
+  // max is 003, next should be 004
+  assert.equal(id, 'asgn_tsk_col_validate_plan_004');
 });
 
 test('buildAssignment creates frozen Assignment from planning.validate-plan with role, taskSpec, skills, and policy', () => {
@@ -63,6 +85,29 @@ test('buildAssignment creates frozen Assignment from planning.validate-plan with
 
   // Does not mutate work
   assert.deepEqual(work, { id: 'tsk-123', domain: 'coding', title: 'Test item' });
+});
+
+test('buildAssignment creates frozen Assignment from executing.review-item with reviewer role', () => {
+  const work = { id: 'tsk-exec-1', domain: 'coding', title: 'Execute item' };
+  const assignment = buildAssignment({
+    work,
+    stage: 'executing',
+    operation: 'review-item',
+    objective: 'Review the item implementation',
+    contextRefs: ['src/state/store.mjs'],
+    expectedOutputs: ['review-verdict'],
+  });
+
+  assert.equal(assignment.assignmentId, 'asgn_tsk_exec_1_review_item_001');
+  assert.equal(assignment.workId, 'tsk-exec-1');
+  assert.equal(assignment.stage, 'executing');
+  assert.equal(assignment.operation, 'review-item');
+  assert.equal(assignment.role, 'reviewer');
+  assert.equal(assignment.reason, 'review');
+  assert.equal(assignment.taskSpec, 'review-item');
+  assert.deepEqual(assignment.skills, ['fgos-coding-validating']);
+  assert.deepEqual(assignment.contextRefs, ['src/state/store.mjs']);
+  assert.deepEqual(assignment.expectedOutputs, ['review-verdict']);
 });
 
 test('buildAssignment preserves dispatch: human-only for exploring.answer-question', () => {
@@ -114,4 +159,157 @@ test('renderAssignmentPrompt formats prompt with references and outputs without 
   assert.match(prompt, /- src\/state\/store\.mjs/);
   assert.match(prompt, /- verdict/);
   assert.match(prompt, /- findings if blocked/);
+  // Without runDir, result artifact section should not appear
+  assert.doesNotMatch(prompt, /Result artifact/);
+});
+
+// ─── Step 04 Tests ───────────────────────────────────────────────────────────
+
+test('renderAssignmentPrompt includes concrete result artifact paths when runDir is supplied (Step 04 §5.1)', () => {
+  const assignment = buildAssignment({
+    workId: 'tsk-rd-test',
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const runDir = '/tmp/fgos-asgn-rd-test/runs/01';
+  const prompt = renderAssignmentPrompt(assignment, { runDir });
+
+  assert.match(prompt, /Result artifact:/m);
+  assert.match(prompt, /Write structured JSON to .*agent-result\.json/m);
+  assert.match(prompt, /Optional human-readable report: .*agent-report\.md/m);
+  assert.match(prompt, /Do not call Work lifecycle verbs/m);
+  // Both artifact paths must include the runDir
+  assert.ok(prompt.includes(path.join(runDir, 'agent-result.json')), 'prompt must contain absolute agent-result.json path');
+  assert.ok(prompt.includes(path.join(runDir, 'agent-report.md')), 'prompt must contain absolute agent-report.md path');
+});
+
+test('isReadOnlyAssignment classifies reviewer/researcher/advisor as read-only (Step 04 §5.4)', () => {
+  const cases = [
+    { role: 'reviewer', operation: 'validate-plan', expected: true },
+    { role: 'reviewer', operation: 'review-item', expected: true },
+    { role: 'researcher', operation: 'resolve-question', expected: true },
+    { role: 'researcher', operation: 'scout-blast-radius', expected: true },
+    { role: 'advisor', operation: 'answer-question', expected: true },
+    { role: 'implementer', operation: 'implement-item', expected: false },
+    { role: 'implementer', operation: 'fix-verify-red', expected: false },
+    { role: 'helper', operation: 'scoped-subtask', expected: false },
+  ];
+
+  for (const { role, operation, expected } of cases) {
+    const result = isReadOnlyAssignment({ role, operation });
+    assert.equal(result, expected, `isReadOnlyAssignment({role:'${role}', operation:'${operation}'}) should be ${expected}`);
+  }
+});
+
+test('isReadOnlyAssignment returns false for unknown/null assignment (Step 04 §5.4)', () => {
+  assert.equal(isReadOnlyAssignment(null), false);
+  assert.equal(isReadOnlyAssignment(undefined), false);
+  assert.equal(isReadOnlyAssignment({}), false); // defaults to 'implementer'
+});
+
+test('validateAgentResultClaim accepts valid done/blocked/failed/no-evidence claims (Step 04 §5.2)', () => {
+  // done with evidenceRefs
+  const doneClaim = { status: 'done', summary: 'Plan is valid.', evidenceRefs: ['plan.md'] };
+  assert.deepEqual(validateAgentResultClaim(doneClaim), { valid: true });
+
+  // done with minimal fields (evidenceRefs not required at validator level; caller checks artifact)
+  const doneMinimal = { status: 'done', summary: 'All good.' };
+  assert.deepEqual(validateAgentResultClaim(doneMinimal), { valid: true });
+
+  // blocked with blocker
+  const blockedClaim = { status: 'blocked', summary: 'Blocked by missing test.', blocker: 'test/missing.test.mjs does not exist' };
+  assert.deepEqual(validateAgentResultClaim(blockedClaim), { valid: true });
+
+  // failed with error
+  const failedClaim = { status: 'failed', summary: 'Validation errored.', error: 'Cannot parse plan.md' };
+  assert.deepEqual(validateAgentResultClaim(failedClaim), { valid: true });
+
+  // no-evidence
+  const noEvClaim = { status: 'no-evidence', summary: 'No output produced.' };
+  assert.deepEqual(validateAgentResultClaim(noEvClaim), { valid: true });
+});
+
+test('validateAgentResultClaim rejects invalid schema and unknown status (Step 04 §5.2)', () => {
+  // Not an object
+  assert.equal(validateAgentResultClaim(null).valid, false);
+  assert.equal(validateAgentResultClaim('done').valid, false);
+  assert.equal(validateAgentResultClaim([]).valid, false);
+  assert.equal(validateAgentResultClaim(42).valid, false);
+
+  // Unknown status
+  const unknownStatus = validateAgentResultClaim({ status: 'success', summary: 'Done' });
+  assert.equal(unknownStatus.valid, false);
+  assert.match(unknownStatus.reason, /status must be one of/i);
+
+  // Missing summary
+  const noSummary = validateAgentResultClaim({ status: 'done' });
+  assert.equal(noSummary.valid, false);
+  assert.match(noSummary.reason, /non-empty summary/i);
+
+  // Empty summary
+  const emptySummary = validateAgentResultClaim({ status: 'done', summary: '   ' });
+  assert.equal(emptySummary.valid, false);
+
+  // blocked without blocker
+  const blockedNoBlocker = validateAgentResultClaim({ status: 'blocked', summary: 'Stuck.' });
+  assert.equal(blockedNoBlocker.valid, false);
+  assert.match(blockedNoBlocker.reason, /blocker/i);
+
+  // failed without error
+  const failedNoError = validateAgentResultClaim({ status: 'failed', summary: 'Crashed.' });
+  assert.equal(failedNoError.valid, false);
+  assert.match(failedNoError.reason, /error/i);
+
+  // evidenceRefs not an array
+  const evidenceRefsNotArray = validateAgentResultClaim({ status: 'done', summary: 'Done', evidenceRefs: 'file.md' });
+  assert.equal(evidenceRefsNotArray.valid, false);
+  assert.match(evidenceRefsNotArray.reason, /array/i);
+
+  // evidenceRefs contains empty string
+  const evidenceRefsEmptyString = validateAgentResultClaim({ status: 'done', summary: 'Done', evidenceRefs: [''] });
+  assert.equal(evidenceRefsEmptyString.valid, false);
+  assert.match(evidenceRefsEmptyString.reason, /non-empty strings/i);
+});
+
+test('buildAssignment refuses missing taskSpec file when repoRoot is supplied (Step 04 §5.6)', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-taskspec-guard-'));
+
+  // No task-spec files exist in tempDir — buildAssignment must refuse
+  assert.throws(
+    () => buildAssignment({
+      workId: 'tsk-ts-guard',
+      stage: 'planning',
+      operation: 'validate-plan',
+      options: { repoRoot: tempDir },
+    }),
+    (err) => err instanceof RunnerConfigError && /taskSpec file does not exist/i.test(err.message),
+    'buildAssignment must throw when taskSpec file is missing and repoRoot is given',
+  );
+});
+
+test('buildAssignment succeeds when taskSpec file exists on disk (Step 04 §5.6)', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-taskspec-present-'));
+  // Create the task-spec file at the expected location
+  const taskSpecDir = path.join(tempDir, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'validate-plan.md'), '# validate-plan\n');
+
+  const assignment = buildAssignment({
+    workId: 'tsk-ts-present',
+    stage: 'planning',
+    operation: 'validate-plan',
+    options: { repoRoot: tempDir },
+  });
+
+  assert.equal(assignment.taskSpec, 'validate-plan');
+  assert.ok(Object.isFrozen(assignment));
+});
+
+test('buildAssignment({ stage: "decompose", operation: "decompose" }) refuses missing taskSpec by default (Step 04 §5.6)', () => {
+  assert.throws(
+    () => buildAssignment({ stage: 'decompose', operation: 'decompose' }),
+    (err) => err instanceof RunnerConfigError && /taskSpec file does not exist/i.test(err.message),
+    'buildAssignment must refuse missing taskSpec operation even without explicit options',
+  );
 });

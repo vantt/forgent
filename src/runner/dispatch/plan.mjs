@@ -9,6 +9,7 @@
 import { RunnerConfigError } from './config.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorConfig, executorIdForWork } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
+import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 
 /**
  * Compiles a canonical DispatchPlan object for a dispatch request.
@@ -18,11 +19,13 @@ import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mech
  * @param {string} [opts.executorId] - Positional executor identifier
  * @param {string} [opts.for] - Purpose identifier
  * @param {string} [opts.work] - Work item identifier
+ * @param {string|object} [opts.assignment] - Assignment identifier or object
  * @param {string} [opts.stage] - Workflow stage
  * @param {boolean} [opts.needsSoul=false] - True if caller needs a soul-bearing agent
  * @param {boolean} [opts.hasLiveTaskAccess=false] - True if caller holds live Task tool access
  * @param {object} [opts.caller] - Caller role descriptors ({ role: 'driver'|'launcher' })
  * @param {object} [opts.workItem] - Pre-resolved work item object (for --work option)
+ * @param {object} [opts.assignmentItem] - Pre-resolved assignment object (for --assignment option)
  * @returns {object} DispatchPlan
  */
 export function compileDispatchPlan(
@@ -31,16 +34,18 @@ export function compileDispatchPlan(
     executorId: executorIdArg,
     for: purpose,
     work: workIdArg,
+    assignment: assignmentArg,
     stage: stageArg,
     needsSoul = false,
     hasLiveTaskAccess = false,
     caller = { role: 'driver' },
     workItem,
+    assignmentItem,
   } = {},
 ) {
-  if (!executorIdArg && !purpose && !workIdArg && !needsSoul) {
+  if (!executorIdArg && !purpose && !workIdArg && !assignmentArg && !needsSoul) {
     throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
+      'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
     );
   }
 
@@ -59,6 +64,11 @@ export function compileDispatchPlan(
   let selector;
   if (executorIdArg) {
     selector = { type: 'executor', value: executorIdArg };
+  } else if (assignmentArg) {
+    selector = {
+      type: 'assignment',
+      value: typeof assignmentArg === 'string' ? assignmentArg : assignmentArg.assignmentId,
+    };
   } else if (workIdArg) {
     selector = { type: 'work', value: workIdArg };
   } else if (purpose) {
@@ -73,6 +83,19 @@ export function compileDispatchPlan(
   let executorId = executorIdArg;
   let workResolved;
   let workResolvedInputId;
+  let assignmentResolved;
+
+  if (!executorId && assignmentArg) {
+    const asgnObj = assignmentItem ?? (typeof assignmentArg === 'object' ? assignmentArg : null);
+    if (asgnObj) {
+      const policy = resolveAssignmentDispatchPolicy({
+        assignment: asgnObj,
+        runnerConfig: cfg,
+      });
+      executorId = policy.executorPreference[0];
+      assignmentResolved = resolveExecutorAndOverrides(cfg, executorId);
+    }
+  }
 
   if (!executorId && workIdArg) {
     if (!workItem) {
@@ -144,9 +167,11 @@ export function compileDispatchPlan(
 
   const resolved = workResolved && workResolvedInputId === executorId
     ? workResolved
-    : purposeResolved && purposeResolved.executorId === executorId
-      ? purposeResolved
-      : resolveExecutorAndOverrides(cfg, executorId);
+    : assignmentResolved && assignmentResolved.executorId === executorId
+      ? assignmentResolved
+      : purposeResolved && purposeResolved.executorId === executorId
+        ? purposeResolved
+        : resolveExecutorAndOverrides(cfg, executorId);
   const { executor, configured } = resolved;
 
   let mcpTool;

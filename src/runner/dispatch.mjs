@@ -70,6 +70,17 @@ export {
   classifyRunEvidence,
 } from './dispatch/assignment-runner.mjs';
 
+export {
+  createMission,
+  getMission,
+  listMissions,
+  appendThreadMessage,
+  readThreadMessages,
+  createMissionAssignment,
+  runMissionAssignment,
+  synthesizeMission,
+} from './dispatch/mission-lite.mjs';
+
 import { runDispatchCli } from './dispatch/cli.mjs';
 
 // CLI entry point — only runs when this file is executed directly (`node

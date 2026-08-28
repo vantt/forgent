@@ -13,6 +13,18 @@ the next step.
 V1 keeps this file-based and local. No mailbox, daemon, or full AgentMessage
 protocol is required.
 
+Post-merge hardening note:
+
+```txt
+The first implementation can write RunResult files, but the coding driver must
+not consume RunResult as lifecycle proof until Step 04 hardens the evidence
+contract.
+```
+
+Step 04 owns the stricter worker artifact path, `agent-result.json` schema,
+dirty-before/after evidence subtraction, malformed-claim failure behavior, and
+read-only versus mutating confidence rules.
+
 ## 2. Assignment Shape
 
 Minimal assignment:
@@ -190,11 +202,18 @@ Context refs:
 - <ref>
 Expected outputs:
 - <output>
+Result artifact:
+- Write structured JSON to <runDir>/agent-result.json
+- Optional human-readable report: <runDir>/agent-report.md
 ```
 
 The prompt can be rendered through existing dispatch prompt utilities, but it
 must remain assignment-shaped. Do not pretend the Assignment is a Work item or
 ask the worker to call Work lifecycle verbs.
+
+For runtime execution, `<runDir>` must be concrete and writeable. Prefer an
+absolute path in the actual prompt because the worker may run from a worktree
+while assignment storage lives under the main checkout's `.fgos/` directory.
 
 ### 3.1 Effective Dispatch Policy
 
@@ -462,6 +481,15 @@ Status values in V1:
 
 `status` and `confidence` are separate. A read-only consult may be `done` with
 `reported` confidence. A process may exit zero and still become `no-evidence`.
+
+Malformed structured claims are not absent claims. If a worker writes
+`agent-result.json` and it is invalid JSON or fails the required schema, the
+RunResult should be `failed/failed`, not `no-evidence/no-evidence`.
+
+Dirty working tree evidence must be run-relative. A file that was already dirty
+before the run started cannot prove the Assignment changed anything unless a
+future implementation records content hashes and proves the file changed again
+during the run.
 
 ## 5.1 Evidence And Confidence Classification
 

@@ -164,11 +164,7 @@ is still the only thing that validates and applies that move.
 
 ## Handoff
 
-Once `plan.md` is written, load `fgos-coding-validating` to run the
-reality check and the single gate that together decide whatever comes
-after `planning` — or hand back to `fgos-routing` first if it is not
-obvious which comes next. This skill's own job ends at a written plan; it
-never proves the plan against reality itself, and it never approves it.
+Once `plan.md` is written, hand off for validation. Before Step 05 adoption, load `fgos-coding-validating` directly as the compatibility path. After Step 05 adoption, the driver should represent this as `planning.validate-plan` reviewer Assignment and the driver owns the eventual `fgos plan` call. This skill's own job ends at a written plan; it never proves the plan against reality itself, and it never approves it.
 
 ## Red flags
 

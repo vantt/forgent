@@ -108,6 +108,16 @@ a slice can be split further:
 7. Slice 6: let the coding driver choose declared/legal operations.
 8. Slice 7: coordinate multiple items or assignments above the driver.
 
+Post-merge hardening continues the same dependency chain:
+
+9. Step 04: harden Assignment RunResult evidence before any driver consumes it.
+10. Step 05: wire coding driver operation choice for the smallest safe
+    secondary operation path.
+11. Step 06: adopt Work-attached team dispatch on real planning/executing
+    scenarios.
+12. Step 07: try mission-lite read-only brainstorming/debate after Work-attached
+    evidence is stable.
+
 Do not start Slice 4 before Slice 3a has a minimal policy resolver. Do not
 start Slice 6 before Slice 5 can distinguish `reported`, `verified`,
 `inferred`, `no-evidence`, and `failed`.
@@ -124,6 +134,10 @@ start Slice 6 before Slice 5 can distinguish `reported`, `verified`,
 | 5 | RunResult evidence | assignment storage writer, result classifier, dispatch result bridge, filesystem tests | Step 03 | writes `.fgos/assignments/` |
 | 6 | driver operation choice | `fgos-coding-driving`, stage skills, `src/state/handoff.mjs` guard use, loop tests | driver/stage skill guidance | driver may dispatch legal operations |
 | 7 | team orchestration | orchestrator/launcher strategy layer, runner selection tests | strategy guidance | multiple assignments/items coordinated |
+| 8 | evidence hardening | assignment prompt, RunResult classifier, dirty-before/after snapshots, result schema tests | Step 04, Team Communication Protocol V1 | makes Assignment results safe for driver consumption |
+| 9 | coding driver adoption | operation-choice helper, planning validate-plan wiring, loop tests, skill prose | Step 05 | one secondary operation can run inside Work lifecycle |
+| 10 | live Work-attached adoption | real planning/executing scenarios, fake+live executor tests, adoption notes | Step 06 | real Work uses Team Dispatch without changing lifecycle authority |
+| 11 | mission-lite experiment | read-only mission envelope, thread/results storage, synthesis report tests | Step 07 | non-Work team debate/brainstorm, no mutation |
 
 ## 6. Slice 1 - Operation Registry Only
 

@@ -21,6 +21,8 @@
 # .fgos/ root for now (deferred, on the git hook's own live import path —
 # see plan.md phase-02 "held back" section).
 .fgos/runtime/
+.fgos/assignments/
+cache/
 node_modules/
 
 # test-leak artifacts — belt against auto-commit clobber (backlog STR74/STR65)

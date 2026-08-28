@@ -149,3 +149,22 @@ test('governance gate rejects disallowed egress/provider', () => {
     (err) => err instanceof RunnerConfigError && /disallowed egress/i.test(err.message),
   );
 });
+
+test('literal model override is rejected if it originates from workflow YAML policy without explicit override', () => {
+  const assignment = {
+    assignmentId: 'asgn_test_001',
+    role: 'reviewer',
+    stage: 'planning',
+    operation: 'validate-plan',
+    policy: {
+      model: 'pinned-yaml-model',
+      _fromYaml: true,
+    },
+  };
+
+  assert.throws(
+    () => resolveAssignmentDispatchPolicy({ assignment }),
+    (err) => err instanceof RunnerConfigError && /workflow YAML cannot pin literal model names/i.test(err.message),
+  );
+});
+

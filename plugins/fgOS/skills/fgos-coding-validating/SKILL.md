@@ -90,23 +90,12 @@ fabricates a pass to keep the item moving.
   the item's `fgw/<id>` branch. A READY verdict on an uncommitted plan
   hands off to an edge whose own artifacts are invisible to whichever
   session re-claims the item next.
-- This session IS that later session, right here: once the Gate below
+- In direct compatibility mode, this session IS that later session, right here: once the Gate below
   approves, fire `fgos plan` yourself, passing the split decision
   plan.md's own Step 4 already locked as an explicit `--verdict` — never
   leave the transition to a later blind call that would re-derive a
-  split decision this session already made with real evidence.
-- **Multi-role team harness**: this whole skill runs as role
-  `implementer` on the `planning` stage's role graph — reviewing the plan
-  is the *function* this skill performs, not the role graph's `reviewer`
-  role, which the domain only ever declares edges for at stage
-  `executing`. Tier A's `fgos-researching` dispatch (Gate Step 1 below)
-  is a real `consult` interaction: log the handoff right after it, same
-  as every other coding-domain skill. The Gate's own "ask a person"
-  branch is **not** an `advise` handoff, even though `advise` is the only
-  human-facing reason the role graph declares — this Gate has no `fgos
-  ask`/`fgos answer` anywhere in it; every question it asks is live,
-  in-session, resolved the same turn via `gate-approve --actor human`,
-  never a real async park.
+  split decision this session already made with real evidence. When running as a reviewer Assignment, do NOT call `fgos plan`; write the structured verdict (`agent-result.json`/`agent-report.md`) into `<runDir>/` and let the driver invoke the engine verb.
+- **Multi-role team harness**: When running as the direct compatibility path, validating may run as a same-session `implementer` function. When running as `planning.validate-plan` Assignment, it runs as a `reviewer` role operation. When running as a reviewer Assignment, it writes structured verdict artifacts (`agent-result.json`/`agent-report.md`) only and must not call `fgos plan` directly; the lifecycle driver owns the engine verb. Tier A's `fgos-researching` dispatch (Gate Step 1 below) is a real `consult` interaction: log the handoff right after it, same as every other coding-domain skill. The Gate's own "ask a person" branch is **not** an `advise` handoff, even though `advise` is the only human-facing reason the role graph declares — this Gate has no `fgos ask`/`fgos answer` anywhere in it; every question it asks is live, in-session, resolved the same turn via `gate-approve --actor human`, never a real async park.
 
 ## Flow
 
@@ -173,12 +162,7 @@ ceiling, plan.md's own open-items scan, and Gate Step 1's cost verdict —
 each of which can only push toward asking, never toward silence. On
 `true`, skip the question and record a bypass approval; on `false`, ask
 with the stuck point and your own attempt shown first, never a
-restate-the-whole-plan closed question. Either way, immediately fire the
-`planning`→`executing` engine call — this is where split children first
-become real, via `--verdict decompose --children` with plan.md's own
-JSON block passed through verbatim, or `--verdict pass-through` when
-plan.md called for one honest piece. Full mechanics (exact bash for both
-branches and both plan verdicts): `references/gate-auto-approve-mechanics.md`.
+restate-the-whole-plan closed question. Either way, in direct compatibility mode, immediately fire the `planning`→`executing` engine call — this is where split children first become real, via `--verdict decompose --children` with plan.md's own JSON block passed through verbatim, or `--verdict pass-through` when plan.md called for one honest piece. (When running as `planning.validate-plan` reviewer Assignment, do NOT fire `fgos plan`; record the verdict in `<runDir>/agent-result.json` / `agent-report.md` for the driver to consume). Full mechanics (exact bash for both branches and both plan verdicts): `references/gate-auto-approve-mechanics.md`.
 
 ## Handoff
 

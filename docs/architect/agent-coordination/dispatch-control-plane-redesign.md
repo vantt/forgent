@@ -548,7 +548,20 @@ Do not add confidence telemetry as a write-only field. A migration must include 
 
 Until that reader exists, keep the current fallback behavior and avoid pretending the telemetry migration has started.
 
-Current narrow-slice status: the implementation keeps the fallback ladder behavior but does not yet add a first-class `confidence` field. That is intentional. A `confidence` field becomes useful only when a production reader, dashboard, gate, or compliance report consumes it.
+Current post-merge status: Assignment RunResult storage now has first-class
+`confidence` labels, but Step 04 must harden the evidence contract before the
+coding driver treats those labels as lifecycle proof.
+
+For Team Dispatch V1, the concrete post-merge rule is:
+
+```txt
+No driver may advance Work from an Assignment result unless the RunResult
+confidence was computed from evidence produced during that run.
+```
+
+This is why Step 04 hardens dirty-before/after snapshots, structured
+`agent-result.json` validation, and read-only report artifacts before Step 05
+lets the coding driver choose secondary operations.
 
 ## 11. Artifact Store
 

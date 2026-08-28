@@ -90,7 +90,13 @@ on how you got here:
   silently.** (Return's own `review` handoff is the one exception — the
   engine fires it for you as a side effect of `return`/`catchup` reaching
   `awaiting-approval`; every other point below is still this skill's own
-  job to fire.) The role/holder axis only stays truthful if the session
+  job to fire.) Stage operations map to team communication modes as:
+  `consult` -> `scout-blast-radius` or `resolve-question` Assignment;
+  `assist`  -> `scoped-subtask` Assignment;
+  `review`  -> `review-item` Assignment;
+  `fix`     -> `fix-verify-red` operation (usually direct implementer path);
+  `advise`  -> async advisor path (not cli-spawn unless explicitly supported).
+  The role/holder axis only stays truthful if the session
   actually records who is holding the item. `fgos handoff` is opt-in
   per-domain (only fires for a domain with a declared role graph); if the
   item's domain declares none, skip every call below silently. A refusal
