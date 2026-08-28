@@ -139,20 +139,6 @@ export function chooseStageOperation({
     });
   }
 
-  // Explicit secondary operation requested via contextSignals
-  if (contextSignals.secondaryOperation) {
-    const selectedOp = ops.find((o) => o.id === contextSignals.secondaryOperation);
-    if (selectedOp) {
-      return Object.freeze({
-        operation: selectedOp.id,
-        reason: `secondary-operation-${selectedOp.id}`,
-        dispatch: selectedOp.dispatch === 'human-only' ? 'human-only' : 'assignment',
-        stop: selectedOp.dispatch === 'human-only',
-        canAdvanceEdge: false,
-      });
-    }
-  }
-
   const primaryOp = ops.find((o) => o.primary) ?? ops[0];
 
   // Deterministic rules per stage (Step 05 §6)
@@ -335,6 +321,19 @@ export function chooseStageOperation({
   }
 
   // Fallback for other stages
+  if (contextSignals.secondaryOperation && contextSignals.secondaryOperation !== primaryOp.id) {
+    const selectedOp = ops.find((o) => o.id === contextSignals.secondaryOperation);
+    if (selectedOp) {
+      return Object.freeze({
+        operation: selectedOp.id,
+        reason: `secondary-operation-${selectedOp.id}`,
+        dispatch: selectedOp.dispatch === 'human-only' ? 'human-only' : 'assignment',
+        stop: selectedOp.dispatch === 'human-only',
+        canAdvanceEdge: false,
+      });
+    }
+  }
+
   const isHumanOnly = primaryOp.dispatch === 'human-only';
   return Object.freeze({
     operation: primaryOp.id,

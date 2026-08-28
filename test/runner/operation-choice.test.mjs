@@ -1081,4 +1081,32 @@ test('interpretAssignmentRunResult rejects out-of-protocol top-level verdict "de
   assert.equal(res.reason, 'validate-plan-missing-structured-verdict');
 });
 
+test('chooseStageOperation ignores secondaryOperation equal to primaryOp.id in planning (Finding P2 fix)', () => {
+  const work = { id: 'tsk-plan-primary', stage: 'planning', domain: 'coding' };
+  const choice = chooseStageOperation({
+    work,
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    contextSignals: { secondaryOperation: 'shape-plan' },
+  });
+
+  assert.equal(choice.operation, 'shape-plan');
+  assert.equal(choice.dispatch, 'direct-stage-skill');
+});
+
+test('chooseStageOperation ignores secondaryOperation equal to primaryOp.id in executing (Finding P2 fix)', () => {
+  const work = { id: 'tsk-exec-primary', stage: 'executing', domain: 'coding' };
+  const choice = chooseStageOperation({
+    work,
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    contextSignals: { secondaryOperation: 'implement-item' },
+  });
+
+  assert.equal(choice.operation, 'implement-item');
+  assert.equal(choice.dispatch, 'direct-stage-skill');
+});
+
 
