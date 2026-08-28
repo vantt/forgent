@@ -305,7 +305,17 @@ export async function executeAssignment(assignment, opts = {}) {
   if (opts.runnerConfig) {
     writeSharedConfig(root, { runner: opts.runnerConfig });
   }
-  const cfg = opts.runnerConfig ?? ensureRunnerConfigForDir(root);
+  const rawCfg = opts.runnerConfig ?? ensureRunnerConfigForDir(root);
+  const cfg = { ...rawCfg };
+  if (rawCfg.executor) {
+    const defaultExec = { allowCrossProvider: true, ...rawCfg.executor };
+    cfg.executor = defaultExec;
+    cfg.executors = {
+      ...(rawCfg.executors || {}),
+      claude: { allowCrossProvider: true, ...(rawCfg.executors?.claude || {}), ...rawCfg.executor },
+      ...(rawCfg.executor.command ? { [rawCfg.executor.command]: defaultExec } : {}),
+    };
+  }
 
   // Storage setup under .fgos/assignments/<assignmentId>/
   const fgosDir = fgosDirFromRoot(root);
@@ -343,6 +353,20 @@ export async function executeAssignment(assignment, opts = {}) {
 
   validateAssignmentLegality(effectiveAssignment, opts);
 
+  // Enforce decide-first governance gate (Step 06)
+  const compiledPlan = compileDispatchPlan(cfg, {
+    assignment: effectiveAssignment.assignmentId,
+    assignmentItem: effectiveAssignment,
+    work: effectiveAssignment.workId,
+    stage: effectiveAssignment.stage,
+    hasLiveTaskAccess: opts.hasLiveTaskAccess ?? false,
+    cliOverride: opts.cliOverride,
+  });
+
+  if (compiledPlan.dispatch === 'human-only') {
+    throw new RunnerConfigError(`cannot execute human-only operation "${effectiveAssignment.operation}" via cli-spawn`);
+  }
+
   const effectivePolicy = resolveAssignmentDispatchPolicy({
     assignment: effectiveAssignment,
     work: opts.work,
@@ -379,12 +403,6 @@ export async function executeAssignment(assignment, opts = {}) {
   const startedAt = new Date().toISOString();
 
   const dispatchPlanPath = path.join(runDir, 'dispatch-plan.json');
-  const compiledPlan = compileDispatchPlan(cfg, {
-    assignment: effectiveAssignment.assignmentId,
-    assignmentItem: effectiveAssignment,
-    work: effectiveAssignment.workId,
-    stage: effectiveAssignment.stage,
-  });
   fs.writeFileSync(dispatchPlanPath, `${JSON.stringify(compiledPlan, null, 2)}\n`);
 
   const runMeta = {
@@ -410,11 +428,13 @@ export async function executeAssignment(assignment, opts = {}) {
   let rawResult;
   let executionError = null;
 
+  const executorId = effectivePolicy.executorPreference[0] ?? 'claude';
   try {
-    rawResult = await executeExecutorCli(effectivePolicy.executorPreference[0], {
+    rawResult = await executeExecutorCli(executorId, {
       prompt,
       cwd,
       repoRoot: root,
+      runnerConfig: cfg,
       model: effectivePolicy.model,
       tier: effectivePolicy.tier,
       timeoutMs,

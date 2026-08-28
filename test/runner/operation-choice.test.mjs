@@ -209,6 +209,7 @@ test('hasPlanMd detects presence of non-empty plan.md under docsRef', () => {
 
 test('validate-plan no-evidence does not move Work', async () => {
   const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['validate-plan']);
   const executorScript = writeNoEvidenceExecutor(tempDir);
 
   const runnerConfig = {
@@ -230,7 +231,7 @@ test('validate-plan no-evidence does not move Work', async () => {
 
   const outcome = await executeDriverOperationChoice(work, choice, {
     cwd: tempDir,
-    repoRoot: PROJECT_ROOT,
+    repoRoot: tempDir,
     runnerConfig,
   });
 
@@ -247,6 +248,7 @@ test('validate-plan no-evidence does not move Work', async () => {
 
 test('validate-plan failed does not move Work', async () => {
   const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['validate-plan']);
   const executorScript = writeFailingExecutor(tempDir);
 
   const runnerConfig = {
@@ -266,7 +268,7 @@ test('validate-plan failed does not move Work', async () => {
 
   const outcome = await executeDriverOperationChoice(work, choice, {
     cwd: tempDir,
-    repoRoot: PROJECT_ROOT,
+    repoRoot: tempDir,
     runnerConfig,
   });
 
@@ -284,6 +286,7 @@ test('validate-plan failed does not move Work', async () => {
 
 test('reported READY allows existing planning edge path', async () => {
   const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['validate-plan']);
   const executorScript = writeFakeExecutor(tempDir, { status: 'done', verdict: 'READY', summary: 'Feasible' });
 
   const runnerConfig = {
@@ -303,7 +306,7 @@ test('reported READY allows existing planning edge path', async () => {
 
   const outcome = await executeDriverOperationChoice(work, choice, {
     cwd: tempDir,
-    repoRoot: PROJECT_ROOT,
+    repoRoot: tempDir,
     runnerConfig,
   });
 

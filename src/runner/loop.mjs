@@ -892,6 +892,36 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       // loop converges — without them the next round re-produces the same
       // rejected proposal. Read fresh: `item` predates this claim's moves.
       const feedbackView = listWork(dir);
+
+      const domain = getDomain(item.domain);
+      const workflow = resolveWorkflow(domain, item.kind);
+      const opChoice = chooseStageOperation({
+        work: item,
+        stage: item.stage,
+        domain: domain?.name ?? item.domain,
+        workflow: workflow?.name ?? item.workflow,
+        repoRoot,
+      });
+
+      if (opChoice.dispatch === 'assignment') {
+        log(`fgos-runner: executing operation "${opChoice.operation}" for "${item.id}" via Assignment`);
+        const outcome = await executeDriverOperationChoice(item, opChoice, {
+          cwd: wt.path,
+          repoRoot,
+          runnerConfig: config,
+          work: item,
+        });
+        log(`fgos-runner: operation "${opChoice.operation}" for "${item.id}" finished (confidence: ${outcome.runResult?.confidence}, status: ${outcome.runResult?.status})`);
+
+        if (outcome.stop || outcome.runResult?.status === 'no-evidence' || outcome.runResult?.status === 'failed') {
+          log(`fgos-runner: operation "${opChoice.operation}" for "${item.id}" stopped safely (${outcome.reason}) — Work lifecycle untouched`);
+          removeDispatchWorktree(repoRoot, wt.path, log);
+          return { outcome: 'stopped', id: item.id, reason: outcome.reason, exitCode: 0 };
+        }
+        removeDispatchWorktree(repoRoot, wt.path, log);
+        return { outcome: 'secondary-operation-completed', id: item.id, operation: opChoice.operation, outcomeReason: outcome.reason, exitCode: 0 };
+      }
+
       const worker = await spawnWorker(item, config, wt.path, {
         // tsk-62v D6: lets a `kind: "cli"` executor's presence be checked
         // via `fgos tool query`'s own functions instead of re-probing PATH.

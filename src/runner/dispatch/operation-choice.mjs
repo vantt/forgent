@@ -268,8 +268,63 @@ export function chooseStageOperation({
     });
   }
 
-  // 3. Executing stage choice (Step 05 §6.3)
+  // 3. Executing stage choice (Step 05 §6.3 / Step 06)
   if (currentStage === 'executing') {
+    const reviewOp = ops.find((o) => o.id === 'review-item');
+    const scoutOp = ops.find((o) => o.id === 'scout-blast-radius');
+    const subtaskOp = ops.find((o) => o.id === 'scoped-subtask');
+
+    const requestedSecondaryOp =
+      contextSignals.secondaryOperation ??
+      work?.secondaryOperation ??
+      work?.operation ??
+      work?.nextOperation ??
+      (contextSignals.needsReview || contextSignals.hasCandidateImplementation ? 'review-item' : null) ??
+      (contextSignals.needsScout || contextSignals.riskyEdit ? 'scout-blast-radius' : null);
+
+    if (lastRunResult && (requestedSecondaryOp === 'review-item' || lastRunResult?.operation === 'review-item')) {
+      const interpreted = interpretAssignmentRunResult({
+        choice: { operation: 'review-item' },
+        runResult: lastRunResult,
+        contextSignals,
+      });
+
+      if (interpreted.reason === 'review-item-rejected-route-fix') {
+        const fixOp = ops.find((o) => o.id === 'fix-verify-red');
+        return Object.freeze({
+          operation: fixOp ? fixOp.id : primaryOp.id,
+          reason: 'review-rejected-route-to-fix',
+          dispatch: fixOp ? (fixOp.dispatch === 'human-only' ? 'human-only' : 'direct-stage-skill') : 'direct-stage-skill',
+          stop: false,
+          canAdvanceEdge: false,
+          nextOperation: 'fix-verify-red',
+        });
+      }
+
+      if (interpreted.stop) {
+        return Object.freeze({
+          operation: 'review-item',
+          reason: interpreted.reason,
+          dispatch: 'assignment',
+          stop: true,
+          canAdvanceEdge: false,
+        });
+      }
+    }
+
+    if (requestedSecondaryOp && requestedSecondaryOp !== primaryOp.id) {
+      const selectedOp = ops.find((o) => o.id === requestedSecondaryOp);
+      if (selectedOp) {
+        return Object.freeze({
+          operation: selectedOp.id,
+          reason: `secondary-operation-${selectedOp.id}`,
+          dispatch: selectedOp.dispatch === 'human-only' ? 'human-only' : 'assignment',
+          stop: selectedOp.dispatch === 'human-only',
+          canAdvanceEdge: false,
+        });
+      }
+    }
+
     return Object.freeze({
       operation: primaryOp.id,
       reason: 'primary-stage-owner-work',

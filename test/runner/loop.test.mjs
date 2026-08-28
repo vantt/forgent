@@ -2276,3 +2276,58 @@ test('tsk-34o5: startupReap does NOT halt a legitimate retry on a branch with pr
   const view = listWork(dir);
   assert.equal(view.work[id].status, 'awaiting-approval');
 });
+
+test('Step 06 executing-stage scout-blast-radius operation choice runs through runOnce loop safely without mutating Work', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
+  const id = 'exec-scout-item';
+  const taskSpecDir = path.join(repoRoot, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'scout-blast-radius.md'), '# scout-blast-radius\n');
+
+  const executorScript = path.join(scriptDir, 'fake-scout-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const resultPath = match[1];
+      const runDir = path.dirname(resultPath);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nBlast radius analysis.\\n');
+      fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Scouted 2 symbols', findings: [] }));
+    }
+    process.exit(0);
+    `,
+  );
+
+  const cfg = configFor(executorScript);
+  seedItem(dir, {
+    id,
+    stage: 'executing',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    secondaryOperation: 'scout-blast-radius',
+  });
+
+  const res = await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+
+  assert.equal(res.outcome, 'drained');
+  assert.equal(res.dispatched[0].outcome, 'secondary-operation-completed');
+
+  const item = listWork(dir).work[id];
+  assert.equal(item.status, 'doing');
+  assert.equal(item.stage, 'executing');
+
+  const asgnDir = path.join(dir, 'assignments');
+  assert.ok(fs.existsSync(asgnDir));
+  const assignments = fs.readdirSync(asgnDir);
+  assert.ok(assignments.length > 0);
+  const runsDir = path.join(asgnDir, assignments[0], 'runs', '01');
+  assert.ok(fs.existsSync(path.join(runsDir, 'result.json')));
+  assert.ok(fs.existsSync(path.join(runsDir, 'dispatch-plan.json')));
+});
+

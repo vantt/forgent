@@ -22,16 +22,27 @@ function writeEchoExecutor(dir) {
     `
     import fs from 'node:fs';
     import path from 'node:path';
-    const cwd = process.cwd();
-    const runsDir = path.join(cwd, '.fgos', 'assignments');
-    if (fs.existsSync(runsDir)) {
-      for (const asgn of fs.readdirSync(runsDir)) {
-        const runDir = path.join(runsDir, asgn, 'runs', '01');
-        if (fs.existsSync(runDir)) {
-          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDone.\\n');
-          fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    let runDir;
+    if (match) {
+      runDir = path.dirname(match[1]);
+    } else {
+      const asgnDir = path.join(dir, '.fgos', 'assignments');
+      if (fs.existsSync(asgnDir)) {
+        for (const asgn of fs.readdirSync(asgnDir)) {
+          const rDir = path.join(asgnDir, asgn, 'runs', '01');
+          if (fs.existsSync(rDir)) {
+            runDir = rDir;
+            break;
+          }
         }
       }
+    }
+    if (runDir) {
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDone.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     }
     process.stdout.write("All good\\n");
     process.exit(0);

@@ -1337,11 +1337,13 @@ export function createDispatchWorktree(repoRoot, id, opts = {}) {
 }
 
 /** Cleanup half of the runner-dispatch pair — see `createDispatchWorktree`. */
-export function removeDispatchWorktree(repoRoot, worktreePath, log) {
+export function removeDispatchWorktree(repoRoot, worktreePath, log = () => {}) {
   try {
     removeWorktree(repoRoot, worktreePath, { force: true });
   } catch (err) {
-    log(`fgos-runner: worktree cleanup failed for "${worktreePath}": ${err.message}`);
+    if (typeof log === 'function') {
+      log(`fgos-runner: worktree cleanup failed for "${worktreePath}": ${err.message}`);
+    }
   }
 }
 

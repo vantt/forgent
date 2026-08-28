@@ -336,6 +336,7 @@ export async function executeExecutorCli(
     prompt = '',
     cwd = process.cwd(),
     repoRoot,
+    runnerConfig,
     model: modelOverride,
     tier: tierOverride,
     for: purpose,
@@ -345,12 +346,6 @@ export async function executeExecutorCli(
     idleTimeoutMs: idleTimeoutOverride,
     maxBuffer: maxBufferOverride,
     onChunk,
-    // D20/D22 (review finding H1, tsk-397): optional, work-item-aware
-    // callers (fanoutBatchExecutorCli) can pass the real work item so this
-    // otherwise work-agnostic primitive resolves an agentType the same way
-    // spawnWorker does. Omitted (every pre-H1-wiring caller, and any
-    // caller with no specific work item -- e.g. a `--for <purpose>`
-    // dispatch) skips resolution entirely, byte-identical to before.
     work,
     stage,
   } = {},
@@ -360,14 +355,17 @@ export async function executeExecutorCli(
       'usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...]',
     );
   }
-  // MAIN CHECKOUT root, not resolveRepoRoot's worktree-own root (tsk-5hv):
-  // ensureRunnerConfigForDir reads .fgos/config.json, unconditionally
-  // wiped from every freshly-created worktree (ADR0020) — resolving to a
-  // worktree's own root here would silently bootstrap a throwaway default
-  // config instead of the real one on every worktree-resident call.
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const fgosDir = fgosDirFromRoot(root);
-  const cfg = ensureRunnerConfigForDir(root);
+  const rawCfg = runnerConfig ?? ensureRunnerConfigForDir(root);
+  const cfg = { ...rawCfg };
+  if (rawCfg.executor) {
+    cfg.executors = {
+      ...(rawCfg.executors || {}),
+      claude: rawCfg.executor,
+      ...(rawCfg.executor.command ? { [rawCfg.executor.command]: rawCfg.executor } : {}),
+    };
+  }
   const resolvedByPurpose = !executorIdArg;
   // D4 (docs/history/capability-capacity-remodel/CONTEXT.md): resolve
   // through the shared resolver on WHICHEVER key this call actually gave
@@ -836,7 +834,7 @@ export function guardCwdRepoRootDivergence(cwd, repoRoot) {
  * byte-identical to before the split, only wrapped in a function instead
  * of an `if` block.
  */
-export function runDispatchCli() {
+export async function runDispatchCli() {
   const [subcommand, ...afterSubcommand] = process.argv.slice(2);
   // Purpose-based binding (tsk-2c1): a caller with no pre-registered
   // executorId to name (a gather branch) passes `--for <purpose>` instead
@@ -886,20 +884,40 @@ export function runDispatchCli() {
           process.exitCode = 1;
           break;
         }
-        const cliOverride = {};
-        if (flagValue('--model')) cliOverride.model = flagValue('--model');
-        if (flagValue('--tier')) cliOverride.tier = flagValue('--tier');
-        executeAssignment(asgnObj, {
-          cwd: flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd(),
+        const hasLiveTaskAccess = rest.includes('--has-live-task-access');
+        decideExecutorCli(undefined, {
+          cwd,
           repoRoot: root,
-          cliOverride,
-          onChunk: (stream, chunk) => process.stderr.write(chunk),
+          assignment: assignmentId,
+          hasLiveTaskAccess,
         }).then(
-          (result) => {
-            process.stdout.write(`${JSON.stringify(result)}\n`);
+          (decided) => {
+            if (decided && (decided.dispatch === 'human-only' || decided.mechanism === null)) {
+              process.stderr.write(`dispatch decide blocked assignment execution: ${decided.reason ?? 'unexecutable mechanism'}\n`);
+              process.exitCode = 1;
+              return;
+            }
+            const cliOverride = {};
+            if (flagValue('--model')) cliOverride.model = flagValue('--model');
+            if (flagValue('--tier')) cliOverride.tier = flagValue('--tier');
+            return executeAssignment(asgnObj, {
+              cwd: flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd(),
+              repoRoot: root,
+              cliOverride,
+              hasLiveTaskAccess,
+              onChunk: (stream, chunk) => process.stderr.write(chunk),
+            }).then(
+              (result) => {
+                process.stdout.write(`${JSON.stringify(result)}\n`);
+              },
+              (err) => {
+                process.stderr.write(`${err.message}\n`);
+                process.exitCode = 1;
+              },
+            );
           },
           (err) => {
-            process.stderr.write(`${err.message}\n`);
+            process.stderr.write(`dispatch decide failed: ${err.message}\n`);
             process.exitCode = 1;
           },
         );
