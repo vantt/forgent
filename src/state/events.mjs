@@ -49,7 +49,9 @@ import { resolveWriterIdentity } from '../util/session-identity.mjs';
 // slow disk, yet short enough that a truly stuck/deadlocked path surfaces as a
 // clear 'lock-timeout' error instead of hanging a CLI command indefinitely.
 const EVENTS_LOCK_FILE = 'events.lock';
-const EVENTS_LOCK_TIMEOUT_MS = 2000;
+const EVENTS_LOCK_TIMEOUT_MS = process.env.FGOS_EVENTS_LOCK_TIMEOUT_MS
+  ? Number(process.env.FGOS_EVENTS_LOCK_TIMEOUT_MS)
+  : 5000;
 const EVENTS_LOCK_RETRY_MS = 10;
 
 /**
