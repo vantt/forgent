@@ -1445,4 +1445,27 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
+  {
+    name: 'workflow',
+    invoke: 'fgos workflow [operations] --stage <stage> [--domain <domain>] [--workflow <workflow>]',
+    description: 'Inspect declared stage operations for a domain and workflow.',
+    parameters: {
+      type: 'object',
+      properties: {
+        stage: { type: 'string', description: 'Workflow stage name to inspect operations for.' },
+        domain: { type: 'string', description: 'Optional domain name (defaults to coding).' },
+        workflow: { type: 'string', description: 'Optional workflow name (defaults to domain default).' },
+      },
+      required: [],
+    },
+    examples: [
+      'fgos workflow operations --stage planning',
+      'fgos workflow operations --domain coding --stage planning --json',
+    ],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
 ];

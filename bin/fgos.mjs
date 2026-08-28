@@ -92,7 +92,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, Sessi
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
-import { getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName, operationsForStage } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
@@ -2837,6 +2837,29 @@ async function runVerb(verb, flags, positional, dir) {
     // crashed unconditionally on a pure global npm install of fgOS onto a
     // different project (docs/history/tsk-65q-gate-bypass-global-install-
     // resolution/RESEARCH.md).
+    case 'workflow': {
+      let stage = flags.stage;
+      if (!stage) {
+        if (positional[0] === 'operations') {
+          stage = positional[1];
+        } else if (positional[0]) {
+          stage = positional[0];
+        }
+      }
+      if (!stage) {
+        throw new StoreError('validation', 'workflow operations requires --stage <stage>');
+      }
+      const domain = flags.domain || DEFAULT_DOMAIN;
+      const workflow = flags.workflow || undefined;
+      const ops = operationsForStage(domain, stage, { kind: workflow });
+      return {
+        domain: resolveDomainName(domain),
+        workflow: workflow || 'feature',
+        stage,
+        operations: ops,
+      };
+    }
+
     case 'gate-check': {
       const id = requireField(positional[0] ?? flags.id, 'gate-check requires an id: fgos gate-check <id> --gate <contextApprove|validateApprove> ...');
       const gate = requireField(flags.gate, 'gate-check requires --gate <contextApprove|validateApprove>');
