@@ -201,7 +201,7 @@ export async function executeAssignment(assignment, opts = {}) {
     });
   } catch (err) {
     executionError = err;
-    const isTimeoutErr = err.category === 'worker-timeout' || /timed out/i.test(err.message);
+    const isTimeoutErr = err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message);
     rawResult = {
       status: isTimeoutErr ? 'timeout' : 'failed',
       signal: isTimeoutErr ? 'SIGTERM' : null,
