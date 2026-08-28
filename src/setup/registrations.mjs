@@ -720,10 +720,17 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
     for (const [wfName, wf] of workflows) {
       if (!wf) continue;
       const operationMap = wf.operationMap;
-      if (!operationMap || typeof operationMap !== 'object') continue;
+      if (operationMap === undefined || operationMap === null) continue;
+      if (typeof operationMap !== 'object' || Array.isArray(operationMap)) {
+        problems.push(`${domainName}.${wfName}.operationMap: must be an object`);
+        continue;
+      }
 
       for (const [stage, ops] of Object.entries(operationMap)) {
-        if (!Array.isArray(ops)) continue;
+        if (!Array.isArray(ops)) {
+          problems.push(`${domainName}.${wfName}.${stage}.operations: must be an array of operation objects`);
+          continue;
+        }
 
         let primaryCount = 0;
         let primaryOp = null;

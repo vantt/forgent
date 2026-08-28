@@ -220,8 +220,10 @@ function normalizeWorkflow(raw) {
           if (item.step) stepMap[item.name] = item.step;
           if (item.skill !== undefined) skillMap[item.name] = item.skill;
           if (item.taskSpec !== undefined) taskSpecMap[item.name] = item.taskSpec;
-          if (Array.isArray(item.operations)) {
-            operationMap[item.name] = item.operations.map(freezeOperation);
+          if (item.operations !== undefined) {
+            operationMap[item.name] = Array.isArray(item.operations)
+              ? item.operations.map(freezeOperation)
+              : item.operations;
           }
         }
       }
@@ -239,9 +241,9 @@ function normalizeWorkflow(raw) {
   }
   if (raw.operationMap && typeof raw.operationMap === 'object') {
     for (const [stage, ops] of Object.entries(raw.operationMap)) {
-      if (Array.isArray(ops)) {
-        operationMap[stage] = ops.map(freezeOperation);
-      }
+      operationMap[stage] = Array.isArray(ops)
+        ? ops.map(freezeOperation)
+        : ops;
     }
   }
   if (raw.statusSkills && typeof raw.statusSkills === 'object') {
@@ -259,7 +261,7 @@ function normalizeWorkflow(raw) {
 
   const frozenOperationMap = {};
   for (const [stage, ops] of Object.entries(operationMap)) {
-    frozenOperationMap[stage] = Object.freeze(ops);
+    frozenOperationMap[stage] = Array.isArray(ops) ? Object.freeze(ops) : ops;
   }
 
   return Object.freeze({

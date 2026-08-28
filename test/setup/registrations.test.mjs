@@ -919,6 +919,36 @@ test('findWorkflowStageOperationProblems fails when policy contains disallowed k
   assert.ok(problems.some((p) => p.includes('policy contains disallowed key(s) [model, timeoutMs, prompt]')));
 });
 
+test('findWorkflowStageOperationProblems fails when stage operations is not an array or operationMap is not an object', () => {
+  const customDomainsNonArray = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: 'not-an-array-string',
+            discovery: { id: 'not-an-array-obj' },
+          },
+        },
+      },
+    },
+  };
+  const problemsNonArray = findWorkflowStageOperationProblems(process.cwd(), customDomainsNonArray);
+  assert.ok(problemsNonArray.some((p) => p.includes('coding.feature.planning.operations: must be an array of operation objects')));
+  assert.ok(problemsNonArray.some((p) => p.includes('coding.feature.discovery.operations: must be an array of operation objects')));
+
+  const customDomainsBadMap = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: 'not-an-object',
+        },
+      },
+    },
+  };
+  const problemsBadMap = findWorkflowStageOperationProblems(process.cwd(), customDomainsBadMap);
+  assert.ok(problemsBadMap.some((p) => p.includes('coding.feature.operationMap: must be an object')));
+});
+
 test('domain-workflow-operations-coverage doctor check is registered and passes on clean repo', () => {
   const check = DOCTOR_CHECKS.find((c) => c.id === 'domain-workflow-operations-coverage');
   assert.ok(check, 'domain-workflow-operations-coverage doctor check must be registered');
