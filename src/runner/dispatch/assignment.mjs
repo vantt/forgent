@@ -346,7 +346,7 @@ export function isReadOnlyAssignment(assignment) {
   if (KNOWN_MUTATING_OPS.has(op)) {
     return false;
   }
-  if (READ_ONLY_ROLES.has(role) || READ_ONLY_OPS.has(op) || assignment.missionId || assignment.workId === null) {
+  if (READ_ONLY_ROLES.has(role) || READ_ONLY_OPS.has(op)) {
     return true;
   }
   return false;

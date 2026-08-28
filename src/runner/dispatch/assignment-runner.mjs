@@ -271,14 +271,6 @@ function validateAssignmentLegality(asgn, opts = {}) {
     throw new RunnerConfigError(`cannot execute human-only operation "${asgn.operation}" via cli-spawn`);
   }
 
-  // Step 07 §7: Mission-lite is strictly read-only. Reject mutating operations.
-  const isMission = Boolean(asgn.missionId || asgn.workId === null || opts.isMissionLite);
-  if (isMission && !isReadOnlyAssignment(asgn)) {
-    throw new RunnerConfigError(
-      `cannot execute mutating operation "${asgn.operation}" (role: "${asgn.role}") in mission-lite mode — mission-lite is strictly read-only`,
-    );
-  }
-
   return matchedOp;
 }
 
