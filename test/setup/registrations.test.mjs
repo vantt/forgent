@@ -947,6 +947,23 @@ test('findWorkflowStageOperationProblems fails when stage operations is not an a
   };
   const problemsBadMap = findWorkflowStageOperationProblems(process.cwd(), customDomainsBadMap);
   assert.ok(problemsBadMap.some((p) => p.includes('coding.feature.operationMap: must be an object')));
+
+  // Test unnormalized raw stages array with malformed operations
+  const customDomainsRawStages = {
+    coding: {
+      workflows: {
+        feature: {
+          stages: [
+            { name: 'planning', operations: 'validate-plan' },
+            { name: 'discovery', operations: { id: 'judge-ambiguity' } },
+          ],
+        },
+      },
+    },
+  };
+  const problemsRawStages = findWorkflowStageOperationProblems(process.cwd(), customDomainsRawStages);
+  assert.ok(problemsRawStages.some((p) => p.includes('coding.feature.planning.operations: must be an array of operation objects')));
+  assert.ok(problemsRawStages.some((p) => p.includes('coding.feature.discovery.operations: must be an array of operation objects')));
 });
 
 test('domain-workflow-operations-coverage doctor check is registered and passes on clean repo', () => {

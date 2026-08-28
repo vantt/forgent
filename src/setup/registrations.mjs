@@ -719,6 +719,17 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
 
     for (const [wfName, wf] of workflows) {
       if (!wf) continue;
+
+      if (Array.isArray(wf.stages)) {
+        for (const item of wf.stages) {
+          if (item && typeof item === 'object' && item.name && item.operations !== undefined) {
+            if (!Array.isArray(item.operations)) {
+              problems.push(`${domainName}.${wfName}.${item.name}.operations: must be an array of operation objects`);
+            }
+          }
+        }
+      }
+
       const operationMap = wf.operationMap;
       if (operationMap === undefined || operationMap === null) continue;
       if (typeof operationMap !== 'object' || Array.isArray(operationMap)) {
@@ -728,7 +739,10 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
 
       for (const [stage, ops] of Object.entries(operationMap)) {
         if (!Array.isArray(ops)) {
-          problems.push(`${domainName}.${wfName}.${stage}.operations: must be an array of operation objects`);
+          const msg = `${domainName}.${wfName}.${stage}.operations: must be an array of operation objects`;
+          if (!problems.includes(msg)) {
+            problems.push(msg);
+          }
           continue;
         }
 
