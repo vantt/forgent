@@ -167,9 +167,11 @@ export function chooseStageOperation({
     // If lastRunResult exists from validate-plan:
     if (lastRunResult) {
       const interpreted = interpretAssignmentRunResult({
-        choice: { operation: 'validate-plan' },
+        choice: { operation: 'validate-plan', work },
         runResult: lastRunResult,
         contextSignals,
+        work,
+        repoRoot,
       });
 
       if (interpreted.reason === 'assignment-validate-plan-no-evidence') {

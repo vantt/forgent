@@ -1023,4 +1023,44 @@ test('Step 06 Herdr and visibility tracking fields do not alter confidence ladde
   assert.equal(resWithHerdr.reason, 'validate-plan-ready');
 });
 
+test('chooseStageOperation with lastRunResult READY WITH CONSTRAINTS verifies plan.md constraints via work and repoRoot (Finding P2 fix)', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+
+  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-resume-constraints');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nPlan.\n\n## Constraints\n- Scope limited to 1 file\n');
+
+  const work = {
+    id: 'tsk-resume-constraints',
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    docsRef: 'docs/history/feat-resume-constraints',
+  };
+
+  const lastRunResult = {
+    status: 'done',
+    confidence: 'reported',
+    agentClaim: {
+      status: 'done',
+      verdict: 'READY WITH CONSTRAINTS',
+      summary: 'Plan ready with constraints',
+    },
+  };
+
+  const choice = chooseStageOperation({
+    work,
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    lastRunResult,
+    repoRoot: tempDir,
+  });
+
+  assert.equal(choice.canAdvanceEdge, true);
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
 
