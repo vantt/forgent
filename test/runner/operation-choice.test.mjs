@@ -1063,4 +1063,19 @@ test('chooseStageOperation with lastRunResult READY WITH CONSTRAINTS verifies pl
   assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
 });
 
+test('interpretAssignmentRunResult rejects out-of-protocol top-level verdict "decompose" (Finding P2 fix)', () => {
+  const res = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: { status: 'done', verdict: 'decompose', summary: 'Invalid top-level verdict' },
+    },
+  });
+
+  assert.equal(res.canAdvanceEdge, false);
+  assert.equal(res.stop, true);
+  assert.equal(res.reason, 'validate-plan-missing-structured-verdict');
+});
+
 

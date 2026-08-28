@@ -383,7 +383,7 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
           : { verdict: 'pass-through', reason: agentClaim?.summary }
     );
 
-    if (verdict === 'READY' || verdict === 'DECOMPOSE' || rawVerdict === 'decompose') {
+    if (verdict === 'READY') {
       return Object.freeze({
         canAdvanceEdge: true,
         stop: false,
