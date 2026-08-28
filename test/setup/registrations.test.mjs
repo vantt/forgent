@@ -737,3 +737,11 @@ test('findWorkflowStageOperationProblems fails when policy minTier or preferPers
   assert.ok(problems.some((p) => p.includes('policy.preferPersona')));
 });
 
+test('domain-workflow-operations-coverage doctor check is registered and passes on clean repo', () => {
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'domain-workflow-operations-coverage');
+  assert.ok(check, 'domain-workflow-operations-coverage doctor check must be registered');
+  const result = check.check(process.cwd());
+  assert.equal(result.passed, true);
+  assert.match(result.message, /every stage operation across domain workflows resolves/);
+});
+

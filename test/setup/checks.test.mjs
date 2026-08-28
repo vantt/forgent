@@ -75,6 +75,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'work-classification-vocabulary',
       'work-stage-vocabulary',
       'domain-workflow-skillmap-coverage',
+      'domain-workflow-operations-coverage',
       'delivered-not-on-trunk',
       'enduser-docs-index-stale',
       'invariant-checks-configured',

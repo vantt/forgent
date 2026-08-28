@@ -1202,6 +1202,26 @@ registerCheck({
   check: () => checkDomainWorkflowSkillMapCoverage(),
 });
 
+export function checkDomainWorkflowOperationsCoverage(cwd) {
+  const problems = findWorkflowStageOperationProblems(cwd);
+  if (problems.length === 0) {
+    return {
+      passed: true,
+      message: "every stage operation across domain workflows resolves to valid task-specs, roles, skills, and legal roleGraph edges",
+    };
+  }
+  return {
+    passed: false,
+    message: `${problems.length} workflow stage operation problem(s): ${problems.join('; ')}`,
+  };
+}
+
+registerCheck({
+  id: 'domain-workflow-operations-coverage',
+  description: "every stage operation across domain workflows resolves to valid task-specs, roles, skills, and legal roleGraph edges (tsk-team-dispatch-slice-1)",
+  check: (cwd) => checkDomainWorkflowOperationsCoverage(cwd),
+});
+
 registerCheck({
   id: 'root-drift',
   description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge (tsk-3bn)',

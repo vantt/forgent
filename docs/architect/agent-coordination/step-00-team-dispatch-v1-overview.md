@@ -763,13 +763,11 @@ Slice 1 changes harness metadata loading and workflow declarations; it does not 
 
 ### 18.4 Current Reality To Pin
 
-Step 00 should explicitly confirm these facts:
+Step 00 pins these facts (and records their post-Slice-1 landed state):
 
-1. `feature.yaml` currently maps each stage to one primary `skill` and often
-   one primary `taskSpec`.
-2. `normalizeWorkflow()` currently extracts `skillMap` and `taskSpecMap`, not
-   an operation set.
-3. `bundleForStage()` currently returns one `{ skill, taskSpec }`.
+1. `feature.yaml` maps each stage to one primary `skill` and one primary `taskSpec` (when present), and now declares explicit `operations` for live stages.
+2. `normalizeWorkflow()` extracts `operationMap` (frozen operations per stage) while preserving backward-compatible `skillMap` and `taskSpecMap`.
+3. `bundleForStage()` returns one `{ skill, taskSpec }`, and `operationsForStage()` returns the full operation set for that stage.
 4. `fgos-coding-driving` currently loads one registry-selected skill for the
    current position.
 5. `discovery` is a machine-alone stage. It must not ask the human directly.
@@ -992,16 +990,14 @@ Current facts:
    and `workflowFor`.
 2. `domains/coding/workflows/feature.yaml` is the only concrete coding
    workflow file currently present.
-3. `feature.yaml` currently declares:
+3. `feature.yaml` declares:
    - stages: `discovery`, `exploring`, `decompose`, `planning`, `executing`;
    - per-stage `skill`;
-   - per-stage `taskSpec` for most live stages;
+   - per-stage `taskSpec` for live stages;
    - transitions;
-   - `statusSkills.retrospective`.
-4. The current YAML shape does not declare `operations`.
-5. `workflow-stage-graphs.mjs` already supports multiple workflows by loading
-   `domains/<domain>/workflows/*.yaml`, but coding currently defaults to
-   `feature`.
+   - `statusSkills.retrospective`;
+   - `operations` arrays for `discovery`, `exploring`, `planning`, and `executing` (Slice 1).
+4. `workflow-stage-graphs.mjs` extracts `operationMap` and defaults coding to `feature`.
 
 Step 00 conclusion:
 

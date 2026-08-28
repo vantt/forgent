@@ -532,7 +532,7 @@ test('operationsForStage synthesizes primary operation when stage has no explici
   assert.deepEqual(ops[0], {
     id: 'decompose',
     primary: true,
-    taskSpec: 'decompose',
+    taskSpec: null,
     role: 'implementer',
     skills: ['fgos-coding-planning'],
   });
