@@ -26,6 +26,7 @@ Minimal assignment:
   "stage": "planning",
   "operation": "validate-plan",
   "role": "reviewer",
+  "dispatch": "assignment",
   "taskSpec": "validate-plan",
   "policy": {
     "minTier": "standard",
@@ -63,6 +64,9 @@ Required fields:
 - `stage` - workflow stage where the operation is available.
 - `operation` - operation id from `operationsForStage()`.
 - `role` - role expected to perform the operation.
+- `dispatch` - `assignment` for cli-spawn dispatchable operations or
+  `human-only` for operations that remain visible protocol options but are not
+  executed by an agent in V1.
 - `taskSpec` - task-spec id the actor must satisfy.
 - `objective` - concise semantic request.
 - `contextRefs` - file/work/result refs the actor must read.
@@ -77,6 +81,20 @@ Optional fields:
 - `createdBy` - launcher/driver/orchestrator identity when available.
 - `attemptLimit` - optional guard for assignment retries, not a scheduler.
 - `metadata` - small structured values only; no logs or embedded file content.
+
+Role contract:
+
+- Assignment `role` is the target role for the semantic request.
+- For `planning.validate-plan`, V1 treats the Assignment as a request to
+  `role: reviewer`.
+- Before `planning.validate-plan` can be executed as an Assignment, the
+  task-spec prose must agree with that roleGraph role. If the task-spec still
+  says reviewer is only a function and the operation runs as implementer, the
+  implementation must stop at Slice 2/3 and reconcile the docs before runtime
+  dispatch.
+- Operations marked `dispatch: human-only`, such as current `answer-question`,
+  may be shown as legal stage protocol options but must not be sent to
+  cli-spawn.
 
 ## 2.1 ID Creation
 
@@ -149,14 +167,15 @@ Builder responsibilities:
 
 1. Generate a stable assignment id through the assignment id helper.
 2. Copy work/domain/workflow/stage identity.
-3. Copy operation id, role, taskSpec, reason, and skills.
+3. Copy operation id, role, dispatch mode, taskSpec, reason, and skills.
 4. Copy operation policy as declared policy, without resolving provider/model
    yet.
 5. Keep context refs as refs, not embedded large content.
 6. Produce a prompt payload compatible with existing cli-spawn dispatch.
-7. Reject an operation that is not declared for the stage.
-8. Reject a taskSpec that does not resolve.
-9. Preserve Work lifecycle state exactly as-is.
+7. Reject runtime dispatch for `dispatch: human-only`.
+8. Reject an operation that is not declared for the stage.
+9. Reject a taskSpec that does not resolve.
+10. Preserve Work lifecycle state exactly as-is.
 
 Suggested prompt contract:
 
@@ -402,7 +421,9 @@ Minimal RunResult:
     "gitBefore": "abc",
     "gitAfter": "abc",
     "changedFiles": [],
-    "artifacts": [".fgos/assignments/asgn_tsk_abc_validate_plan_001/runs/01/result.json"],
+    "artifacts": [
+      ".fgos/assignments/asgn_tsk_abc_validate_plan_001/runs/01/agent-report.md"
+    ],
     "tests": []
   }
 }
@@ -448,7 +469,7 @@ Classification inputs:
 
 - process exit/timeout/spawn failure;
 - stdout/stderr logs;
-- structured result artifact;
+- worker-produced structured claim or report artifact;
 - legacy stdout tokens when still supported by the existing result ladder;
 - git head before/after;
 - changed files;
@@ -472,7 +493,7 @@ Classification rules:
 - `reported`
   - structured claim exists; and
   - operation is consult/review/read-only; and
-  - a result artifact exists; and
+  - a worker-produced result/report artifact exists; and
   - no contradictory external evidence exists.
 - `inferred`
   - no structured claim exists; and
@@ -508,8 +529,8 @@ No-evidence behavior:
 - Mark RunResult `status: no-evidence`.
 - Mark `confidence: no-evidence`.
 - Treat this as a non-success for driver/orchestrator decisions.
-- For consult/review, missing result artifact is enough to classify
-  `no-evidence` even if the process exits zero.
+- For consult/review, missing worker-produced result/report artifact is enough
+  to classify `no-evidence` even if the process exits zero.
 - For repo-mutating work, missing git/artifact evidence prevents `verified`.
 
 ## 6. Run Storage
@@ -525,6 +546,8 @@ Suggested storage:
       stdout.log
       stderr.log
       exit.json
+      agent-result.json
+      agent-report.md
       result.json
       evidence.json
 ```
@@ -536,12 +559,14 @@ Rules:
 - Always write `runs/<n>/exit.json` after process settlement.
 - Always write `runs/<n>/result.json`, even for failure.
 - For repo-mutating operations, snapshot git state before and after.
-- For consult/review operations, require at least a result artifact.
+- For consult/review operations, require at least one worker-produced result or
+  report artifact.
 - Prefer atomic write-then-rename for JSON files.
 - Never write under the reserved future queue/scheduler namespace.
 - Do not mix Assignment run logs with existing `.fgos/logs/<work-id>.log`.
 - `assignment.json` is shared by attempts; run-specific copies belong under the
   attempt directory only if needed for audit.
+- The control-plane `result.json` is never evidence for itself.
 
 Recommended files:
 
@@ -552,8 +577,25 @@ Recommended files:
 - `stdout.log` - stdout stream for this attempt.
 - `stderr.log` - stderr stream for this attempt.
 - `exit.json` - process settlement data.
+- `agent-result.json` - optional worker-produced structured claim, if the
+  executor can write one.
+- `agent-report.md` - optional worker-produced report for read-only
+  consult/review operations.
 - `result.json` - normalized RunResult.
 - `evidence.json` - evidence details used to classify confidence.
+
+Evidence artifact rule:
+
+```txt
+Control-plane files prove recording happened.
+Worker-produced files prove the assignment produced something.
+```
+
+`result.json`, `run.json`, `exit.json`, and `evidence.json` must not be listed
+as evidence artifacts for `reported` or `verified` confidence. Evidence
+artifacts must be produced by the worker or by an external verifier, such as
+`agent-result.json`, `agent-report.md`, changed source files, commits, or test
+reports.
 
 Recommended `exit.json`:
 
@@ -576,7 +618,7 @@ Recommended `evidence.json`:
   "gitAfter": "abc",
   "changedFiles": [],
   "artifacts": [
-    ".fgos/assignments/asgn_tsk_abc_validate_plan_001/runs/01/result.json"
+    ".fgos/assignments/asgn_tsk_abc_validate_plan_001/runs/01/agent-report.md"
   ],
   "tests": [],
   "classificationInputs": [
@@ -599,10 +641,11 @@ Minimum tests:
 5. Refuse unknown operation.
 6. Refuse operation whose taskSpec does not resolve.
 7. cli-spawn fake executor writes stdout/stderr/exit/result files.
-8. Consult assignment with result artifact classifies as `reported`.
+8. Consult assignment with worker-produced result/report artifact classifies as
+   `reported`.
 9. Work assignment with git delta classifies as `inferred` or `verified`.
-10. Settled process with no result artifact and no git delta classifies as
-   `no-evidence`.
+10. Settled process with no worker-produced result/report artifact and no git
+   delta classifies as `no-evidence`.
 11. Work risk or assignment policy can raise tier above operation default.
 12. Assignment/human executor override wins over operation preference but still
     fails when governance rejects it.
@@ -614,10 +657,11 @@ Minimum tests:
 16. `run.json` is written before process spawn.
 17. `exit.json`, `result.json`, and `evidence.json` are written for timeout and
     nonzero exit.
-18. A zero-exit run with no structured claim and no artifact becomes
+18. A zero-exit run with no structured claim and no worker-produced artifact becomes
     `no-evidence`.
-19. Herdr or pane-style visibility signals do not classify success.
-20. Existing `execute --for` and `spawnWorker()` work-dispatch behavior remains
+19. `result.json` alone never classifies as `reported` or `verified`.
+20. Herdr or pane-style visibility signals do not classify success.
+21. Existing `execute --for` and `spawnWorker()` work-dispatch behavior remains
     unchanged when no Assignment is involved.
 
 Useful verification commands:
@@ -670,8 +714,10 @@ Check:
 - Assignment storage uses `.fgos/assignments/<assignment-id>/assignment.json`.
 - Run storage uses `.fgos/assignments/<assignment-id>/runs/<attempt>/`.
 - `run.json`, stdout/stderr logs, `exit.json`, `result.json`, and `evidence.json` are written consistently, including failures.
-- Consult/review operations can classify as `reported` only with a result artifact.
+- Consult/review operations can classify as `reported` only with a
+  worker-produced result/report artifact.
 - Repo-mutating operations require git/artifact evidence before `verified`.
+- Control-plane `result.json` is never counted as evidence for itself.
 - Settled processes with no useful proof become `no-evidence`, not success.
 - Policy overrides respect specificity while constraints fail closed and governance remains final.
 - Execution goes through existing cli-spawn dispatch, not a parallel transport path.

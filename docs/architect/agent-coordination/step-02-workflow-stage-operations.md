@@ -54,6 +54,7 @@ stages:
         taskSpec: validate-plan
         role: reviewer
         reason: review
+        dispatch: assignment
         skills:
           - fgos-coding-validating
         policy:
@@ -109,6 +110,7 @@ operations:
     taskSpec: validate-plan
     role: reviewer
     reason: review
+    dispatch: assignment
     skills:
       - fgos-coding-validating
     policy:
@@ -134,6 +136,9 @@ Optional fields:
 - `primary` - boolean. At most one operation per stage may set `true`.
 - `reason` - roleGraph handoff reason, required for cross-role consult/review/
   advise/assist operations and omitted for the current role's primary operation.
+- `dispatch` - execution mode for this operation. Omitted means ordinary
+  Assignment dispatch when the operation is selected. `human-only` means the
+  operation is visible in the stage protocol but must not be sent to cli-spawn.
 - `policy` - inert execution hints preserved for later policy resolution.
 
 Allowed `policy` fields in V1:
@@ -152,6 +157,17 @@ V1 should not add provider command templates, literal model names, prompt text,
 timeouts, filesystem paths, or secrets to workflow operation policy. Those
 belong to assignment policy, CLI/human overrides, or runner config.
 
+Role contract:
+
+- `operation.role` is the target role for an Assignment or handoff.
+- If existing task-spec prose says a role name is only the function being
+  performed, implementation must reconcile that prose in the same slice before
+  enabling dispatch for that operation.
+- V1's intended `planning.validate-plan` contract is a review Assignment to
+  `role: reviewer`, not a hidden implementer self-call. That means
+  `domains/coding/task-specs/validate-plan.md` must stop saying the reviewer
+  role is not the roleGraph reviewer before Slice 3/4 dispatches it.
+
 ### 3.2 Normalized Operation Shape
 
 `normalizeWorkflow()` should preserve the operation fields without interpreting
@@ -164,6 +180,7 @@ runtime policy:
   taskSpec: 'validate-plan',
   role: 'reviewer',
   reason: 'review',
+  dispatch: 'assignment',
   skills: Object.freeze(['fgos-coding-validating']),
   policy: Object.freeze({
     minTier: 'standard',
@@ -271,12 +288,12 @@ discovery:
 
 exploring:
   lock-decisions                  -> primary, planner, prefer claude/sonnet
-  answer-question                 -> advise, advisor, prefer claude/sonnet
+  answer-question                 -> human-only advise, advisor, no cli-spawn executor in V1
   resolve-question                -> consult, researcher, prefer pi/openai-codex:gpt-5.5
 
 planning:
   shape-plan                      -> primary, planner, prefer claude/sonnet
-  validate-plan                   -> review, reviewer, prefer claude/sonnet, critical -> opus
+  validate-plan                   -> review assignment, reviewer, prefer claude/sonnet, critical -> opus
   scout-blast-radius              -> consult, researcher/tool, prefer gitnexus then pi
   resolve-question                -> consult, researcher, prefer pi/openai-codex:gpt-5.5
 
@@ -294,23 +311,27 @@ needs explicit operations.
 
 Expected coding feature operation declarations:
 
-| Stage | Operation | Primary | TaskSpec | Role | Reason | Skills |
-|---|---|---:|---|---|---|---|
-| `discovery` | `judge-ambiguity` | yes | `judge-ambiguity` | `implementer` | omitted | `fgos-coding-discovering` |
-| `discovery` | `resolve-question` | no | `resolve-question` | `researcher` | `consult` | `fgos-researching` |
-| `exploring` | `lock-decisions` | yes | `lock-decisions` | `implementer` | omitted | `fgos-coding-exploring` |
-| `exploring` | `answer-question` | no | `answer-question` | `advisor` | `advise` | `fgos-coding-exploring` |
-| `exploring` | `resolve-question` | no | `resolve-question` | `researcher` | `consult` | `fgos-researching` |
-| `planning` | `shape-plan` | yes | `shape-plan` | `implementer` | omitted | `fgos-coding-planning` |
-| `planning` | `validate-plan` | no | `validate-plan` | `reviewer` | `review` | `fgos-coding-validating` |
-| `planning` | `scout-blast-radius` | no | `scout-blast-radius` | `researcher` | `consult` | `fgos-researching` |
-| `planning` | `resolve-question` | no | `resolve-question` | `researcher` | `consult` | `fgos-researching` |
-| `executing` | `implement-item` | yes | `implement-item` | `implementer` | omitted | `fgos-coding-implement` |
-| `executing` | `review-item` | no | `review-item` | `reviewer` | `review` | `fgos-coding-validating` |
-| `executing` | `fix-verify-red` | no | `fix-verify-red` | `implementer` | omitted | `fgos-coding-implement` |
-| `executing` | `scoped-subtask` | no | `scoped-subtask` | `helper` | `assist` | `fgos-coding-implement` |
-| `executing` | `scout-blast-radius` | no | `scout-blast-radius` | `researcher` | `consult` | `fgos-researching` |
-| `executing` | `resolve-question` | no | `resolve-question` | `researcher` | `consult` | `fgos-researching` |
+| Stage | Operation | Primary | TaskSpec | Role | Reason | Dispatch | Skills |
+|---|---|---:|---|---|---|---|---|
+| `discovery` | `judge-ambiguity` | yes | `judge-ambiguity` | `implementer` | omitted | `assignment` | `fgos-coding-discovering` |
+| `discovery` | `resolve-question` | no | `resolve-question` | `researcher` | `consult` | `assignment` | `fgos-researching` |
+| `exploring` | `lock-decisions` | yes | `lock-decisions` | `implementer` | omitted | `assignment` | `fgos-coding-exploring` |
+| `exploring` | `answer-question` | no | `answer-question` | `advisor` | `advise` | `human-only` | `fgos-coding-exploring` |
+| `exploring` | `resolve-question` | no | `resolve-question` | `researcher` | `consult` | `assignment` | `fgos-researching` |
+| `planning` | `shape-plan` | yes | `shape-plan` | `implementer` | omitted | `assignment` | `fgos-coding-planning` |
+| `planning` | `validate-plan` | no | `validate-plan` | `reviewer` | `review` | `assignment` | `fgos-coding-validating` |
+| `planning` | `scout-blast-radius` | no | `scout-blast-radius` | `researcher` | `consult` | `assignment` | `fgos-researching` |
+| `planning` | `resolve-question` | no | `resolve-question` | `researcher` | `consult` | `assignment` | `fgos-researching` |
+| `executing` | `implement-item` | yes | `implement-item` | `implementer` | omitted | `assignment` | `fgos-coding-implement` |
+| `executing` | `review-item` | no | `review-item` | `reviewer` | `review` | `assignment` | `fgos-coding-validating` |
+| `executing` | `fix-verify-red` | no | `fix-verify-red` | `implementer` | omitted | `assignment` | `fgos-coding-implement` |
+| `executing` | `scoped-subtask` | no | `scoped-subtask` | `helper` | `assist` | `assignment` | `fgos-coding-implement` |
+| `executing` | `scout-blast-radius` | no | `scout-blast-radius` | `researcher` | `consult` | `assignment` | `fgos-researching` |
+| `executing` | `resolve-question` | no | `resolve-question` | `researcher` | `consult` | `assignment` | `fgos-researching` |
+
+`answer-question` is intentionally visible but `human-only` in V1. The current
+task-spec says its executor is a person through `fgos ask`/`answer`; do not add
+Claude/Codex/agy policy for it until a real advisor-agent contract exists.
 
 Discovery rule:
 
@@ -349,6 +370,8 @@ Checks:
 12. `skills`, when present, is an array of strings.
 13. `policy.fallbackExecutors`, when present, is an array of strings.
 14. `policy.visibility`, when present, is either `headless` or `visible`.
+15. `dispatch`, when present, is either `assignment` or `human-only`.
+16. `dispatch: human-only` operations must not require an executor policy.
 
 Validation should fail setup/doctor loudly for declared operation drift.
 Validation should not fail because a synthesized compatibility operation's
@@ -421,6 +444,10 @@ Cover these explicitly:
 - operation policy names an unknown `minTier` - validation rejects;
 - operation policy names a literal model - validation rejects because literal
   models are not part of the workflow schema.
+- `answer-question` accidentally gains provider/executor policy while still
+  `human-only` - validation rejects or the workflow review rejects the config;
+- `validate-plan` remains documented as an implementer self-call while the
+  operation declares `role: reviewer` - implementation is not ready to dispatch.
 
 ## 8. Rollout Rule
 

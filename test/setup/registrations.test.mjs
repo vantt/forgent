@@ -737,6 +737,100 @@ test('findWorkflowStageOperationProblems fails when policy minTier or preferPers
   assert.ok(problems.some((p) => p.includes('policy.preferPersona')));
 });
 
+test('findWorkflowStageOperationProblems fails on invalid dispatch mode or human-only with executor policy', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              {
+                id: 'bad-dispatch',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                dispatch: 'robot-only',
+              },
+              {
+                id: 'bad-human-only',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                dispatch: 'human-only',
+                policy: { preferExecutor: 'claude' },
+              },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('invalid dispatch mode "robot-only"')));
+  assert.ok(problems.some((p) => p.includes('dispatch: human-only operation must not declare executor policy')));
+});
+
+test('findWorkflowStageOperationProblems fails on invalid preferExecutor, fallbackExecutors shape/names, or visibility', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              {
+                id: 'op1',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                policy: {
+                  preferExecutor: 'does-not-exist',
+                  fallbackExecutors: 'pi', // string instead of array
+                  visibility: 'opaque',
+                },
+              },
+              {
+                id: 'op2',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                policy: {
+                  fallbackExecutors: ['unrecognized-fake-executor'],
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('policy.preferExecutor "does-not-exist" is not a recognized executor')));
+  assert.ok(problems.some((p) => p.includes('policy.fallbackExecutors must be an array of strings')));
+  assert.ok(problems.some((p) => p.includes('policy.visibility "opaque" must be "headless" or "visible"')));
+  assert.ok(problems.some((p) => p.includes('policy.fallbackExecutors contains unrecognized executor "unrecognized-fake-executor"')));
+});
+
+test('findWorkflowStageOperationProblems fails on duplicate operation id or empty id', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'duplicate-id', taskSpec: 'shape-plan', role: 'implementer', skills: ['fgos-coding-planning'] },
+              { id: 'duplicate-id', taskSpec: 'shape-plan', role: 'implementer', skills: ['fgos-coding-planning'] },
+              { id: '', taskSpec: 'shape-plan', role: 'implementer', skills: ['fgos-coding-planning'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('duplicate operation id "duplicate-id"')));
+  assert.ok(problems.some((p) => p.includes('operation id must be a non-empty string')));
+});
+
 test('domain-workflow-operations-coverage doctor check is registered and passes on clean repo', () => {
   const check = DOCTOR_CHECKS.find((c) => c.id === 'domain-workflow-operations-coverage');
   assert.ok(check, 'domain-workflow-operations-coverage doctor check must be registered');

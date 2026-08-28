@@ -40,6 +40,9 @@ The current codebase already has these surfaces:
 - `domains/coding/task-specs/*.md` already defines task-shaped contracts for
   discovery, exploring, planning, executing, review, consult, assist, and fix
   work.
+- Some task-spec prose still distinguishes function from roleGraph holder.
+  Before runtime dispatch, operation `role` must be reconciled with each
+  task-spec's execution contract.
 - `domains/coding/skills/fgos-coding-driving/SKILL.md` is the mechanical loop
   that resolves the current position to one stage skill, invokes it, and
   re-reads state.
@@ -145,7 +148,8 @@ Exact code/config surfaces:
     compatible.
 - `src/setup/registrations.mjs`
   - Validate operation task-specs, roles, skills, reasons, duplicate primary
-    operations, policy vocabulary, and primary-operation contradictions.
+    operations, dispatch mode, policy vocabulary, and primary-operation
+    contradictions.
 - Tests:
   - `test/state/workflow-stage-graphs.test.mjs`
   - `test/setup/registrations.test.mjs`
@@ -191,6 +195,7 @@ Done criteria:
 bundleForStage(coding, planning) still returns fgos-coding-planning / shape-plan.
 operationsForStage(coding, planning) exposes shape-plan, validate-plan, scout-blast-radius, resolve-question.
 Bad operation config fails setup/doctor validation.
+Human-only operations are visible but not dispatchable through cli-spawn.
 No dispatch/driver test changes are required except compatibility assertions.
 ```
 
@@ -306,6 +311,10 @@ node --test test/state/workflow-stage-graphs.test.mjs
 Minimum tests:
 
 - building from `planning.validate-plan` copies role/taskSpec/skills/policy;
+- `planning.validate-plan` is blocked from runtime dispatch until task-spec
+  prose agrees it is a reviewer Assignment;
+- `answer-question` remains visible as `human-only` and is not converted into a
+  cli-spawn Assignment;
 - unknown stage or operation refuses;
 - missing taskSpec refuses;
 - generated id uses `asgn_*`;
@@ -521,14 +530,17 @@ node --test test/runner/dispatch.test.mjs
 
 Minimum tests:
 
-- `reported` for consult/review with structured claim and result artifact;
+- `reported` for consult/review with structured claim and worker-produced
+  result/report artifact;
 - `verified` for structured claim plus external proof;
 - `inferred` for git/artifact evidence without structured claim;
-- `no-evidence` for settled process with no result artifact and no useful
-  external proof;
+- `no-evidence` for settled process with no worker-produced result/report
+  artifact and no useful external proof;
 - `failed` for timeout, nonzero exit, invalid result, or explicit failure;
 - failure still writes `run.json`, logs, `exit.json`, `result.json`, and
   `evidence.json`.
+- control-plane `result.json` alone never counts as evidence for `reported` or
+  `verified`.
 
 Rollback strategy:
 

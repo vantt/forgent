@@ -31,6 +31,7 @@ stages:
         taskSpec: answer-question
         role: advisor
         reason: advise
+        dispatch: human-only
         skills:
           - fgos-coding-exploring
       - id: resolve-question

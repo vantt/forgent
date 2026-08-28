@@ -513,6 +513,10 @@ test('operationsForStage resolves explicit operations for discovery, exploring, 
   const exploringOps = operationsForStage('coding', 'exploring');
   assert.deepEqual(exploringOps.map((o) => o.id), ['lock-decisions', 'answer-question', 'resolve-question']);
   assert.equal(exploringOps[0].primary, true);
+  const answerOp = exploringOps.find((o) => o.id === 'answer-question');
+  assert.equal(answerOp.dispatch, 'human-only');
+  assert.equal(answerOp.role, 'advisor');
+  assert.equal(answerOp.reason, 'advise');
 
   const executingOps = operationsForStage('coding', 'executing');
   assert.deepEqual(executingOps.map((o) => o.id), [

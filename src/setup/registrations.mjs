@@ -693,6 +693,23 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
     for (const s of skillsSet) allProvidedSkills.add(s);
   }
 
+  const sharedConfig = readSharedConfig(cwd);
+  const knownExecutors = new Set([
+    ...Object.keys(sharedConfig?.runner?.executors || {}),
+    ...Object.keys(DEFAULT_RUNNER_CONFIG?.executors || {}),
+    'claude',
+    'agy-cli',
+    'agy-herdr',
+    'codex',
+    'pi',
+    'glm',
+    'claude-herdr',
+    'pi-herdr',
+    'codex-herdr',
+    'gitnexus',
+    'herdr',
+  ]);
+
   for (const [domainName, domain] of Object.entries(domains)) {
     if (!domain) continue;
 
@@ -710,30 +727,49 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
 
         let primaryCount = 0;
         let primaryOp = null;
+        const seenOpIds = new Set();
 
         for (const op of ops) {
-          if (!op || typeof op !== 'object') {
-            problems.push(`${domainName}.${wfName}.${stage}: invalid operation item`);
+          if (!op || typeof op !== 'object' || Array.isArray(op)) {
+            problems.push(`${domainName}.${wfName}.${stage}: operation item must be a non-null object`);
             continue;
           }
 
+          const opLabel = op.id || '?';
+
+          if (!op.id || typeof op.id !== 'string' || op.id.trim() === '') {
+            problems.push(`${domainName}.${wfName}.${stage}: operation id must be a non-empty string`);
+          } else if (seenOpIds.has(op.id)) {
+            problems.push(`${domainName}.${wfName}.${stage}: duplicate operation id "${op.id}"`);
+          } else {
+            seenOpIds.add(op.id);
+          }
+
           if (op.taskSpec) {
-            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
-            if (!fs.existsSync(specPath)) {
-              problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || op.taskSpec}] -> taskSpec "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
+            if (typeof op.taskSpec !== 'string') {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec must be a string`);
+            } else {
+              const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
+              if (!fs.existsSync(specPath)) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
+              }
             }
           }
 
           if (domain.roleGraph && Array.isArray(domain.roleGraph.roles)) {
             if (op.role && !domain.roleGraph.roles.includes(op.role)) {
-              problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> role "${op.role}" not in roleGraph.roles [${domain.roleGraph.roles.join(', ')}]`);
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> role "${op.role}" not in roleGraph.roles [${domain.roleGraph.roles.join(', ')}]`);
             }
           }
 
-          if (Array.isArray(op.skills)) {
-            for (const skill of op.skills) {
-              if (agentSkillsMap.size > 0 && !allProvidedSkills.has(skill)) {
-                problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> skill "${skill}" not provided by any registered agent-type`);
+          if (op.skills !== undefined) {
+            if (!Array.isArray(op.skills) || op.skills.some((s) => typeof s !== 'string')) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skills must be an array of strings`);
+            } else {
+              for (const skill of op.skills) {
+                if (agentSkillsMap.size > 0 && !allProvidedSkills.has(skill)) {
+                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skill "${skill}" not provided by any registered agent-type`);
+                }
               }
             }
           }
@@ -741,11 +777,22 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
           if (op.reason && domain.roleGraph?.edges) {
             const stageEdges = domain.roleGraph.edges[stage];
             if (!Array.isArray(stageEdges) || stageEdges.length === 0) {
-              problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> reason "${op.reason}" has no declared edges for stage "${stage}" in roleGraph`);
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> reason "${op.reason}" has no declared edges for stage "${stage}" in roleGraph`);
             } else {
               const matchingEdge = stageEdges.find((e) => e.reason === op.reason && (!op.role || e.to === op.role || e.from === op.role));
               if (!matchingEdge) {
-                problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> reason "${op.reason}" (role "${op.role}") does not match any legal roleGraph edge at stage "${stage}"`);
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> reason "${op.reason}" (role "${op.role}") does not match any legal roleGraph edge at stage "${stage}"`);
+              }
+            }
+          }
+
+          if (op.dispatch !== undefined) {
+            if (!['assignment', 'human-only'].includes(op.dispatch)) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> invalid dispatch mode "${op.dispatch}" (allowed: assignment, human-only)`);
+            }
+            if (op.dispatch === 'human-only') {
+              if (op.policy && (op.policy.preferExecutor || (Array.isArray(op.policy.fallbackExecutors) && op.policy.fallbackExecutors.length > 0))) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> dispatch: human-only operation must not declare executor policy (preferExecutor/fallbackExecutors)`);
               }
             }
           }
@@ -755,12 +802,39 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
             primaryOp = op;
           }
 
-          if (op.policy && typeof op.policy === 'object') {
-            if (op.policy.minTier && !MODEL_POLICY_TIERS.includes(op.policy.minTier)) {
-              problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> policy.minTier "${op.policy.minTier}" not in recognized tiers [${MODEL_POLICY_TIERS.join(', ')}]`);
-            }
-            if (op.policy.preferPersona && agentSkillsMap.size > 0 && !agentSkillsMap.has(op.policy.preferPersona)) {
-              problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> policy.preferPersona "${op.policy.preferPersona}" not a recognized agent-type`);
+          if (op.policy !== undefined) {
+            if (typeof op.policy !== 'object' || op.policy === null || Array.isArray(op.policy)) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy must be an object`);
+            } else {
+              if (op.policy.minTier && !MODEL_POLICY_TIERS.includes(op.policy.minTier)) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.minTier "${op.policy.minTier}" not in recognized tiers [${MODEL_POLICY_TIERS.join(', ')}]`);
+              }
+              if (op.policy.preferPersona) {
+                if (typeof op.policy.preferPersona !== 'string' || (agentSkillsMap.size > 0 && !agentSkillsMap.has(op.policy.preferPersona))) {
+                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.preferPersona "${op.policy.preferPersona}" not a recognized agent-type`);
+                }
+              }
+              if (op.policy.preferExecutor) {
+                if (typeof op.policy.preferExecutor !== 'string' || (knownExecutors.size > 0 && !knownExecutors.has(op.policy.preferExecutor))) {
+                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.preferExecutor "${op.policy.preferExecutor}" is not a recognized executor`);
+                }
+              }
+              if (op.policy.fallbackExecutors !== undefined) {
+                if (!Array.isArray(op.policy.fallbackExecutors) || op.policy.fallbackExecutors.some((e) => typeof e !== 'string')) {
+                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.fallbackExecutors must be an array of strings`);
+                } else {
+                  for (const fb of op.policy.fallbackExecutors) {
+                    if (knownExecutors.size > 0 && !knownExecutors.has(fb)) {
+                      problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.fallbackExecutors contains unrecognized executor "${fb}"`);
+                    }
+                  }
+                }
+              }
+              if (op.policy.visibility !== undefined) {
+                if (!['headless', 'visible'].includes(op.policy.visibility)) {
+                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.visibility "${op.policy.visibility}" must be "headless" or "visible"`);
+                }
+              }
             }
           }
         }
