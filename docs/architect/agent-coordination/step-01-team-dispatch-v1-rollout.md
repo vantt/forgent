@@ -305,3 +305,45 @@ driver behavior changes
 Herdr
 mission/thread
 ```
+
+## 12. Independent Code Review Prompt
+
+Use this prompt to review Step 01 independently after the staged rollout plan
+is implemented:
+
+```txt
+Review the Team Dispatch V1 rollout implementation.
+
+Scope:
+- Confirm implementation follows docs/architect/agent-coordination/step-01-team-dispatch-v1-rollout.md.
+- Review slice boundaries and make sure later-slice behavior did not leak into earlier slices.
+- Focus on sequencing, compatibility, and rollback safety.
+
+Read:
+- docs/architect/agent-coordination/step-01-team-dispatch-v1-rollout.md
+- docs/architect/agent-coordination/step-00-team-dispatch-v1-overview.md
+- docs/architect/agent-coordination/step-02-workflow-stage-operations.md
+- docs/architect/agent-coordination/step-03-assignment-runresult.md
+- src/state/workflow-stage-graphs.mjs
+- src/setup/registrations.mjs
+- src/runner/dispatch/cli.mjs
+- src/runner/dispatch/resolve.mjs
+- src/runner/dispatch/prepare.mjs
+- domains/coding/workflows/feature.yaml
+- domains/coding/skills/fgos-coding-driving/SKILL.md
+
+Check:
+- Slice 1 changes only workflow loader/validation and workflow YAML metadata.
+- Slice 2 is read-only if implemented.
+- Slice 3 builds Assignment without creating child work or changing work lifecycle.
+- Slice 3a resolves policy without hardcoding provider choices into workflow runtime.
+- Slice 4 uses existing cli-spawn dispatch instead of introducing a second dispatch path.
+- Slice 5 writes RunResult/evidence and does not trust terminal narration as success.
+- Slice 6 lets the driver choose only declared/legal operations.
+- Slice 7 keeps orchestrator strategy above driver/dispatcher and does not require mission lifecycle.
+
+Findings format:
+- Lead with boundary violations, behavioral regressions, missing tests, or unclear rollback risk.
+- Include file/line references.
+- If no issues, say so and list residual risk.
+```

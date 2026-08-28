@@ -34,6 +34,7 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { checkAgyPermissionsConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
+import { MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
@@ -413,11 +414,27 @@ function checkTaskSpecsResolve(cwd) {
   const missing = [];
   for (const [domainName, domain] of Object.entries(DOMAINS)) {
     const taskSpecMap = domain.taskSpecMap;
-    if (!taskSpecMap) continue;
-    for (const [stage, specId] of Object.entries(taskSpecMap)) {
-      const specPath = resolveTaskSpecPath(domainName, specId, cwd);
-      if (!fs.existsSync(specPath)) {
-        missing.push(`${domainName}.taskSpecMap.${stage} -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
+    if (taskSpecMap) {
+      for (const [stage, specId] of Object.entries(taskSpecMap)) {
+        const specPath = resolveTaskSpecPath(domainName, specId, cwd);
+        if (!fs.existsSync(specPath)) {
+          missing.push(`${domainName}.taskSpecMap.${stage} -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
+        }
+      }
+    }
+    const workflows = domain.workflows ? Object.values(domain.workflows) : [domain];
+    for (const wf of workflows) {
+      if (!wf?.operationMap) continue;
+      for (const [stage, ops] of Object.entries(wf.operationMap)) {
+        if (!Array.isArray(ops)) continue;
+        for (const op of ops) {
+          if (op.taskSpec) {
+            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
+            if (!fs.existsSync(specPath)) {
+              missing.push(`${domainName}.operations.${stage}[${op.id || op.taskSpec}] -> "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
+            }
+          }
+        }
       }
     }
   }
@@ -439,7 +456,7 @@ function checkTaskSpecsResolve(cwd) {
   if (missing.length > 0) {
     return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };
   }
-  return { passed: true, message: 'every domain\'s taskSpecMap entry resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };
+  return { passed: true, message: 'every domain\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };
 }
 
 function allTaskSpecs(cwd) {
@@ -646,6 +663,127 @@ function checkAgentClaimsResolve(cwd) {
     return { passed: false, message: problems.join('; ') };
   }
   return { passed: true, message: 'every task-spec\'s requires-skill/agent eligibility declaration resolves to real agent skills' };
+}
+
+/**
+ * Validates stage operations across domain workflows (Step 02 / D19).
+ *
+ * @param {string} [cwd] Working directory
+ * @param {object} [domains] Domain registry map (defaults to DOMAINS)
+ * @returns {string[]} List of problem descriptions, empty if all valid.
+ */
+export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains = DOMAINS) {
+  const problems = [];
+
+  const agentFiles = allAgentYamlFiles(cwd);
+  const agentSkillsMap = new Map();
+  for (const file of agentFiles) {
+    try {
+      const text = fs.readFileSync(file.filePath, 'utf8');
+      const nameMatch = text.match(/^name:\s*(\S+)/m);
+      const name = nameMatch ? nameMatch[1] : file.fileName.replace(/\.yaml$|\.yml$/, '');
+      const skills = extractSkillsFromYamlText(text);
+      agentSkillsMap.set(name, new Set(skills));
+    } catch {
+      continue;
+    }
+  }
+  const allProvidedSkills = new Set();
+  for (const skillsSet of agentSkillsMap.values()) {
+    for (const s of skillsSet) allProvidedSkills.add(s);
+  }
+
+  for (const [domainName, domain] of Object.entries(domains)) {
+    if (!domain) continue;
+
+    const workflows = domain.workflows
+      ? Object.entries(domain.workflows)
+      : [['default', domain]];
+
+    for (const [wfName, wf] of workflows) {
+      if (!wf) continue;
+      const operationMap = wf.operationMap;
+      if (!operationMap || typeof operationMap !== 'object') continue;
+
+      for (const [stage, ops] of Object.entries(operationMap)) {
+        if (!Array.isArray(ops)) continue;
+
+        let primaryCount = 0;
+        let primaryOp = null;
+
+        for (const op of ops) {
+          if (!op || typeof op !== 'object') {
+            problems.push(`${domainName}.${wfName}.${stage}: invalid operation item`);
+            continue;
+          }
+
+          if (op.taskSpec) {
+            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
+            if (!fs.existsSync(specPath)) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || op.taskSpec}] -> taskSpec "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
+            }
+          }
+
+          if (domain.roleGraph && Array.isArray(domain.roleGraph.roles)) {
+            if (op.role && !domain.roleGraph.roles.includes(op.role)) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> role "${op.role}" not in roleGraph.roles [${domain.roleGraph.roles.join(', ')}]`);
+            }
+          }
+
+          if (Array.isArray(op.skills)) {
+            for (const skill of op.skills) {
+              if (agentSkillsMap.size > 0 && !allProvidedSkills.has(skill)) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> skill "${skill}" not provided by any registered agent-type`);
+              }
+            }
+          }
+
+          if (op.reason && domain.roleGraph?.edges) {
+            const stageEdges = domain.roleGraph.edges[stage];
+            if (!Array.isArray(stageEdges) || stageEdges.length === 0) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> reason "${op.reason}" has no declared edges for stage "${stage}" in roleGraph`);
+            } else {
+              const matchingEdge = stageEdges.find((e) => e.reason === op.reason && (!op.role || e.to === op.role || e.from === op.role));
+              if (!matchingEdge) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> reason "${op.reason}" (role "${op.role}") does not match any legal roleGraph edge at stage "${stage}"`);
+              }
+            }
+          }
+
+          if (op.primary) {
+            primaryCount++;
+            primaryOp = op;
+          }
+
+          if (op.policy && typeof op.policy === 'object') {
+            if (op.policy.minTier && !MODEL_POLICY_TIERS.includes(op.policy.minTier)) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> policy.minTier "${op.policy.minTier}" not in recognized tiers [${MODEL_POLICY_TIERS.join(', ')}]`);
+            }
+            if (op.policy.preferPersona && agentSkillsMap.size > 0 && !agentSkillsMap.has(op.policy.preferPersona)) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${op.id || '?'}] -> policy.preferPersona "${op.policy.preferPersona}" not a recognized agent-type`);
+            }
+          }
+        }
+
+        if (primaryCount > 1) {
+          problems.push(`${domainName}.${wfName}.${stage}: has ${primaryCount} operations marked primary: true (at most one allowed)`);
+        }
+
+        const stageSkill = wf.skillMap?.[stage] ?? domain.skillMap?.[stage];
+        const stageTaskSpec = wf.taskSpecMap?.[stage] ?? domain.taskSpecMap?.[stage];
+        if (primaryOp) {
+          if (stageTaskSpec && primaryOp.taskSpec && primaryOp.taskSpec !== stageTaskSpec) {
+            problems.push(`${domainName}.${wfName}.${stage}: primary operation taskSpec "${primaryOp.taskSpec}" contradicts stage taskSpec "${stageTaskSpec}"`);
+          }
+          if (stageSkill && Array.isArray(primaryOp.skills) && primaryOp.skills.length > 0 && !primaryOp.skills.includes(stageSkill)) {
+            problems.push(`${domainName}.${wfName}.${stage}: primary operation skills [${primaryOp.skills.join(', ')}] does not include stage skill "${stageSkill}"`);
+          }
+        }
+      }
+    }
+  }
+
+  return problems;
 }
 
 function checkAgentTypeNamesUnique(cwd) {

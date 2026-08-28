@@ -58,7 +58,9 @@ The current implementation already has the right foundation:
 - `fgos-coding-discovering` already performs a real internal consult loop:
   it scouts ambiguity from claimed work context, calls `fgos-researching` as a
   researcher helper as many times as needed, logs each consult through
-  `fgos handoff`, then applies a `clear` or `unclear` discovery verdict.
+  `fgos handoff`, then applies a `clear` or `unclear` discovery verdict. This
+  is machine-only collaboration between agents/helpers, not human-facing
+  clarification.
 - `roleGraph` already declares legal consult/review/assist/advice edges, but
   only as legality checks. It does not define the complete operation set for
   a stage.
@@ -419,7 +421,6 @@ Initial operation set:
 discovery:
   judge-ambiguity
   resolve-question
-  research-ambiguity          (alias over resolve-question / fgos-researching consult)
 
 exploring:
   lock-decisions
@@ -771,9 +772,12 @@ Step 00 should explicitly confirm these facts:
 3. `bundleForStage()` currently returns one `{ skill, taskSpec }`.
 4. `fgos-coding-driving` currently loads one registry-selected skill for the
    current position.
-5. `discovery` is not a no-collaboration stage. Its primary
-   `judge-ambiguity` operation can synchronously consult researcher helpers to
-   gather facts before applying `clear` or `unclear`.
+5. `discovery` is a machine-alone stage. It must not ask the human directly.
+   Its primary `judge-ambiguity` operation may synchronously consult
+   researcher helpers through `resolve-question` to gather facts and make the
+   best possible machine verdict. If the ambiguity cannot be resolved from
+   available evidence, discovery applies `unclear` and routes the item to
+   `exploring`, where human-agent clarification belongs.
 6. `roleGraph` guards legal handoff edges but does not declare the complete
    operation set for a stage.
 7. The task-spec directory already contains task-shaped operations that do not
@@ -1520,3 +1524,41 @@ Slice 1 is done when:
 - existing stage skill/taskSpec behavior is unchanged;
 - no driver behavior changes;
 - no assignment execution exists yet.
+
+## 22. Independent Code Review Prompt
+
+Use this prompt to review Step 00 independently after its implementation lands:
+
+```txt
+Review the Step 00 implementation baseline for Team Dispatch V1.
+
+Scope:
+- Confirm the implementation matches docs/architect/agent-coordination/step-00-team-dispatch-v1-overview.md.
+- Confirm the codebase reality described in Step 00 is still true.
+- Confirm the first implementation slice remains bounded to workflow operation metadata and validation.
+
+Read:
+- docs/architect/agent-coordination/orchestration-vocabulary-map.md
+- docs/architect/agent-coordination/step-00-team-dispatch-v1-overview.md
+- docs/architect/agent-coordination/step-01-team-dispatch-v1-rollout.md
+- docs/architect/agent-coordination/step-02-workflow-stage-operations.md
+- domains/coding/workflows/feature.yaml
+- domains/coding/registry.yaml
+- domains/coding/task-specs/*.md
+- src/state/workflow-stage-graphs.mjs
+- src/setup/registrations.mjs
+- domains/coding/skills/fgos-coding-driving/SKILL.md
+- domains/coding/skills/fgos-coding-discovering/SKILL.md
+
+Check:
+- Work remains the lifecycle authority; no mission, assignment, or run lifecycle was added accidentally.
+- Discovery is machine-alone: it may consult researcher helpers, but it must not ask the human directly.
+- Existing stage.skill/taskSpec behavior is documented as the primary operation compatibility path.
+- Step 00 does not prescribe driver/runtime/provider behavior changes before operation metadata exists.
+- The next slice can start at Step 02 without reopening vocabulary or scope.
+
+Findings format:
+- Lead with bugs, architectural drift, missing evidence, or missing tests.
+- Include file/line references.
+- If no issues, say so and list residual risk.
+```

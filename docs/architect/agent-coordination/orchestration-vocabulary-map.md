@@ -159,7 +159,9 @@ Examples:
   plan;
 - executing may implement, assist, review, fix after review, verify, or ask for
   advice;
-- discovery may judge ambiguity, consult research, or route into exploring.
+- discovery may judge ambiguity, consult researcher helpers for evidence, or
+  route into exploring. It is machine-alone and must not ask the human
+  directly; human-agent clarification belongs in exploring.
 
 Stage protocol should provide guardrails, not script every decision. The skill
 or soul chooses among legal operations; the driver enforces the protocol.
@@ -675,6 +677,8 @@ An assignment may have multiple runs if it retries or runs on several executors.
 
 ### 5.4 Stage vs Stage Operation vs TaskSpec vs Skill
 
+![Stage, Stage Operation, TaskSpec, and Skill relationship](stage-operation-taskspec-skill-relationship.svg)
+
 ```txt
 Stage           = phase in the workflow
 Stage Protocol  = allowed operations/outcomes inside that phase
@@ -683,9 +687,58 @@ TaskSpec        = input/output/gates contract for an operation
 Skill           = know-how used to perform one or more operations
 ```
 
+Relationship shape:
+
+```txt
+Workflow
+  -> Stage
+    -> Stage Protocol
+      -> Stage Operation(s)
+        -> TaskSpec
+        -> Skill(s)
+        -> Role / policy hints
+```
+
+Dependencies:
+
+- `Stage` belongs to a workflow and marks the item's current phase.
+- `Stage Protocol` belongs to a stage and declares what may happen inside that
+  phase.
+- `Stage Operation` belongs to a stage protocol and names one concrete action
+  the driver may choose.
+- `TaskSpec` is referenced by an operation and defines the input, output,
+  gates, verification expectations, and collaboration table for that action.
+- `Skill` is referenced by an operation and provides the know-how/prose for
+  performing it. One skill may cover several operations; one operation may use
+  a primary skill and helper skills.
+
 A stage should not be reduced to one task and one skill. The current
 stage-to-skill/taskSpec mapping is the primary operation compatibility shape.
 The fuller model is one stage with many legal operations.
+
+Example:
+
+```txt
+Stage planning
+  primary operation: shape-plan
+  optional operations:
+    validate-plan
+    scout-blast-radius
+    resolve-question
+```
+
+Runtime usage:
+
+```txt
+Driver reads current Stage
+  -> reads Stage Protocol / allowed Operations
+  -> chooses one Stage Operation
+  -> resolves TaskSpec + Skill + Role/policy hints
+  -> builds Assignment
+  -> Dispatcher selects executor
+  -> Run executes
+  -> RunResult/Evidence returns to Driver
+```
 
 The stage graph should define legality and guardrails. It should not hardcode
 every consult/review/verify/fix loop as a separate FSM state. The skill or soul
@@ -722,6 +775,87 @@ Dispatch Policy = constraints and preferences for how that actor runs
 Role is more durable than persona. Persona is more durable than provider.
 Provider and model should remain late-bound unless the operation requires a
 specific tool ecosystem.
+
+Hãy nghĩ `role` như **chức năng xã hội trong một tình huống**, không phải con người cụ thể.
+
+Ví dụ một phiên tòa:
+
+```txt
+Role:
+- thẩm phán
+- luật sư bào chữa
+- công tố viên
+- thư ký tòa
+- nhân chứng
+```
+
+Các role này là các **seat**. Nghĩa là phiên tòa cần những vị trí trách nhiệm đó để vận hành đúng. Ai ngồi vào ghế có thể thay đổi, nhưng “ghế thẩm phán” vẫn là “ghế thẩm phán”.
+
+```txt
+Role = ghế/trách nhiệm cần có
+Person = người đang ngồi ghế đó
+Persona = phong cách/năng lực/hành vi của người đó
+Provider/executor = tổ chức/cơ chế đưa người đó vào làm việc
+```
+
+Ví dụ:
+
+```txt
+Role: thẩm phán
+Persona: thẩm phán nghiêm khắc, thiên về thủ tục
+Person/executor: bà A được phân công xử vụ này
+```
+
+Sang vụ khác:
+
+```txt
+Role: thẩm phán
+Persona: thẩm phán hòa giải, thiên về thương lượng
+Person/executor: ông B được phân công xử vụ khác
+```
+
+Role không đổi: vẫn là **thẩm phán**. Nhưng persona và người thực hiện có thể đổi.
+
+Another everyday process:
+
+```txt
+Restaurant shift:
+
+Role / seat:
+  - server
+  - cook
+  - cashier
+  - shift manager
+
+Meaning:
+  The process needs someone to take orders, prepare food, take payment,
+  and resolve exceptions.
+  A person may be the server today and the shift manager tomorrow.
+  The role is the process responsibility being filled, not the actor's identity.
+```
+
+In fgOS:
+
+```txt
+Role:
+  reviewer
+
+Meaning:
+  The workflow needs a review responsibility to be filled.
+  It does not mean "Claude reviewer", "Codex reviewer", or any other
+  specific agent type.
+
+Persona:
+  code-reviewer
+
+Meaning:
+  The actor sitting in the reviewer seat should behave like a code reviewer:
+  use the expected skills, tool scope, decision boundary, rigor, and style.
+
+Dispatch policy:
+  Selects the executor, provider, model tier, visibility mode, and fallback
+  path that should fill that reviewer seat for this mission or work item.
+```
 
 For example, `review-item` can require the reviewer role and prefer the
 `code-reviewer` persona. The dispatch policy can then prefer Claude for code

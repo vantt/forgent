@@ -74,6 +74,7 @@ export const DEFAULT_DOMAIN = 'coding';
 const planningEdges = Object.freeze([
   Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
   Object.freeze({ from: 'implementer', to: 'advisor', reason: 'advise', mode: 'async' }),
+  Object.freeze({ from: 'implementer', to: 'reviewer', reason: 'review', mode: 'async' }),
 ]);
 
 const fallbackCodingDomain = Object.freeze({
@@ -179,6 +180,7 @@ const fallbackCodingDomain = Object.freeze({
         executing: 'implement-item',
         retrospective: 'compound-learn',
       }),
+      operationMap: Object.freeze({}),
     }),
   }),
 });
@@ -190,6 +192,23 @@ function normalizeWorkflow(raw) {
   const stepMap = {};
   const skillMap = {};
   const taskSpecMap = {};
+  const operationMap = {};
+
+  function freezeOperation(op) {
+    if (!op || typeof op !== 'object') return op;
+    const opCopy = { ...op };
+    if (Array.isArray(op.skills)) {
+      opCopy.skills = Object.freeze([...op.skills]);
+    }
+    if (op.policy && typeof op.policy === 'object') {
+      const policyCopy = { ...op.policy };
+      if (Array.isArray(op.policy.fallbackExecutors)) {
+        policyCopy.fallbackExecutors = Object.freeze([...op.policy.fallbackExecutors]);
+      }
+      opCopy.policy = Object.freeze(policyCopy);
+    }
+    return Object.freeze(opCopy);
+  }
 
   if (Array.isArray(raw.stages)) {
     for (const item of raw.stages) {
@@ -201,6 +220,9 @@ function normalizeWorkflow(raw) {
           if (item.step) stepMap[item.name] = item.step;
           if (item.skill !== undefined) skillMap[item.name] = item.skill;
           if (item.taskSpec !== undefined) taskSpecMap[item.name] = item.taskSpec;
+          if (Array.isArray(item.operations)) {
+            operationMap[item.name] = item.operations.map(freezeOperation);
+          }
         }
       }
     }
@@ -215,6 +237,13 @@ function normalizeWorkflow(raw) {
   if (raw.taskSpecMap && typeof raw.taskSpecMap === 'object') {
     Object.assign(taskSpecMap, raw.taskSpecMap);
   }
+  if (raw.operationMap && typeof raw.operationMap === 'object') {
+    for (const [stage, ops] of Object.entries(raw.operationMap)) {
+      if (Array.isArray(ops)) {
+        operationMap[stage] = ops.map(freezeOperation);
+      }
+    }
+  }
   if (raw.statusSkills && typeof raw.statusSkills === 'object') {
     for (const [key, val] of Object.entries(raw.statusSkills)) {
       if (val && typeof val === 'object') {
@@ -228,12 +257,18 @@ function normalizeWorkflow(raw) {
     ? raw.transitions.map((t) => Object.freeze({ from: t.from, to: t.to }))
     : [];
 
+  const frozenOperationMap = {};
+  for (const [stage, ops] of Object.entries(operationMap)) {
+    frozenOperationMap[stage] = Object.freeze(ops);
+  }
+
   return Object.freeze({
     stages: Object.freeze(stages),
     stepMap: Object.freeze(stepMap),
     transitions: Object.freeze(transitions),
     skillMap: Object.freeze(skillMap),
     taskSpecMap: Object.freeze(taskSpecMap),
+    operationMap: Object.freeze(frozenOperationMap),
   });
 }
 
@@ -313,6 +348,7 @@ function loadDomainsFromDisk() {
           transitions: activeWorkflow.transitions,
           skillMap: activeWorkflow.skillMap,
           taskSpecMap: activeWorkflow.taskSpecMap,
+          operationMap: activeWorkflow.operationMap,
         } : {}),
         workflows: Object.freeze(workflows),
         defaultWorkflow,
@@ -606,6 +642,45 @@ export function bundleForStage(domain, stage, options = {}) {
   const taskSpec = (taskSpecMap && taskSpecMap[stage]) ?? null;
 
   return { skill, taskSpec };
+}
+
+/**
+ * Resolves the allowed operations for `stage` within `domain` (Step 02 / D19).
+ * Resolves workflow first via `resolveWorkflow(domainObj, kind)`.
+ * If explicit operations exist, return them.
+ * If not, synthesize one primary operation from `bundleForStage()`.
+ * If no skill and no taskSpec exist, return [].
+ * Never throws for absent stage/config; returns [].
+ *
+ * @param {string|object} domain Domain name or domain object
+ * @param {string} stage Stage name
+ * @param {string|object} [options] Optional kind string or options object { kind }
+ * @returns {readonly object[]}
+ */
+export function operationsForStage(domain, stage, options = {}) {
+  if (!stage) return Object.freeze([]);
+  const domainObj = typeof domain === 'object' && domain !== null ? domain : getDomain(domain);
+  const kind = typeof options === 'string' ? options : options?.kind;
+  const wf = resolveWorkflow(domainObj, kind);
+
+  const operationMap = wf?.operationMap ?? domainObj?.operationMap;
+  if (operationMap && Object.hasOwn(operationMap, stage) && Array.isArray(operationMap[stage])) {
+    return operationMap[stage];
+  }
+
+  const bundle = bundleForStage(domainObj, stage, options);
+  if (bundle.skill || bundle.taskSpec) {
+    const primaryOp = Object.freeze({
+      id: bundle.taskSpec || stage,
+      primary: true,
+      taskSpec: bundle.taskSpec || stage,
+      role: domainObj?.roleGraph?.defaultRole || 'implementer',
+      skills: bundle.skill ? Object.freeze([bundle.skill]) : Object.freeze([]),
+    });
+    return Object.freeze([primaryOp]);
+  }
+
+  return Object.freeze([]);
 }
 
 

@@ -131,7 +131,7 @@ Initial explicit operation set:
 ```txt
 discovery:
   judge-ambiguity                 -> primary, planner/discoverer, current default executor
-  resolve-question                -> consult, researcher, prefer pi/openai-codex:gpt-5.5
+  resolve-question                -> machine-only consult, researcher, gather ambiguity evidence, prefer pi/openai-codex:gpt-5.5
 
 exploring:
   lock-decisions                  -> primary, planner, prefer claude/sonnet
@@ -199,3 +199,41 @@ This slice must not change runtime driving behavior.
 
 The driver may keep loading the same primary stage skill. The new operation
 lookup exists so the next slice can choose operations deliberately.
+
+## 9. Independent Code Review Prompt
+
+Use this prompt to review Step 02 independently after implementation:
+
+```txt
+Review the workflow stage operations implementation.
+
+Scope:
+- Confirm implementation follows docs/architect/agent-coordination/step-02-workflow-stage-operations.md.
+- Focus on workflow YAML normalization, operation lookup, validation, and compatibility.
+- Do not review assignment execution or driver autonomy unless the implementation unexpectedly changes them.
+
+Read:
+- docs/architect/agent-coordination/step-02-workflow-stage-operations.md
+- docs/architect/agent-coordination/orchestration-vocabulary-map.md
+- domains/coding/workflows/feature.yaml
+- domains/coding/registry.yaml
+- domains/coding/task-specs/*.md
+- src/state/workflow-stage-graphs.mjs
+- src/setup/registrations.mjs
+- related tests for workflow normalization, setup/doctor validation, and dispatch/driver compatibility
+
+Check:
+- `stage.operations` is preserved in normalized workflow data.
+- `operationsForStage()` returns explicit operations when declared.
+- `operationsForStage()` synthesizes one primary operation from existing `skill`/`taskSpec` when operations are absent.
+- Existing `skillForStage()` and `bundleForStage()` behavior is unchanged.
+- Coding feature workflow declares operations for discovery, exploring, planning, and executing.
+- Discovery `resolve-question` remains machine-only consult/evidence gathering, not human clarification.
+- Validation catches bad taskSpec, role, skill, reason, duplicate primary, malformed policy, and primary-operation contradictions.
+- Operation policy metadata is preserved but does not change executor selection in this slice.
+
+Findings format:
+- Lead with compatibility regressions, bad validation gaps, config drift, or missing tests.
+- Include file/line references.
+- If no issues, say so and list residual risk.
+```

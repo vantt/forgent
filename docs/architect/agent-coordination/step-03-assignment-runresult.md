@@ -318,3 +318,46 @@ Minimum tests:
 The first assignment dispatch should not mutate repo state. Prove the
 assignment, Run, and RunResult path with consult/review before
 implementation/fix operations.
+
+## 9. Independent Code Review Prompt
+
+Use this prompt to review Step 03 independently after implementation:
+
+```txt
+Review the Assignment, Run, and RunResult implementation.
+
+Scope:
+- Confirm implementation follows docs/architect/agent-coordination/step-03-assignment-runresult.md.
+- Focus on assignment construction, policy resolution inputs, cli-spawn integration, run metadata, result storage, and evidence classification.
+- Do not review full mission lifecycle, AgentMessage/mailbox, Herdr visibility, or autonomous driver behavior unless the implementation unexpectedly adds them.
+
+Read:
+- docs/architect/agent-coordination/step-03-assignment-runresult.md
+- docs/architect/agent-coordination/step-01-team-dispatch-v1-rollout.md
+- docs/architect/agent-coordination/dispatch-control-plane-redesign.md
+- docs/architect/agent-coordination/agent-team-dispatch-and-herdr-stability.md
+- src/runner/dispatch/cli.mjs
+- src/runner/dispatch/resolve.mjs
+- src/runner/dispatch/prepare.mjs
+- src/runner/dispatch/result parsing or adapter modules touched by the implementation
+- any new src/runner/team/* or src/runner/assignment/* modules
+- tests covering assignment building, cli-spawn fake executor, run storage, and confidence classification
+
+Check:
+- Assignment is semantic and does not become lifecycle work.
+- Assignment ids use `asgn_*`; work ids stay `tsk-*`.
+- Run ids are created only when execution starts and use `run_<assignment-id>_<attempt>`.
+- Assignment storage uses `.fgos/assignments/<assignment-id>/assignment.json`.
+- Run storage uses `.fgos/assignments/<assignment-id>/runs/<attempt>/`.
+- `run.json`, stdout/stderr logs, `exit.json`, `result.json`, and `evidence.json` are written consistently, including failures.
+- Consult/review operations can classify as `reported` only with a result artifact.
+- Repo-mutating operations require git/artifact evidence before `verified`.
+- Settled processes with no useful proof become `no-evidence`, not success.
+- Policy overrides respect specificity while constraints fail closed and governance remains final.
+- Execution goes through existing cli-spawn dispatch, not a parallel transport path.
+
+Findings format:
+- Lead with false-success risks, lifecycle leaks, evidence gaps, policy/governance bypasses, storage bugs, or missing tests.
+- Include file/line references.
+- If no issues, say so and list residual risk.
+```

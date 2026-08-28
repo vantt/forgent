@@ -13,7 +13,7 @@ import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
-import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT, findWorkflowStageOperationProblems } from '../../src/setup/registrations.mjs';
 import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-guard-warnings.mjs';
 
 
@@ -574,3 +574,166 @@ test('events-compaction-verified fails and names the broken manifest when the ba
   assert.equal(result.passed, false);
   assert.match(result.message, /compact-1\.manifest\.json/);
 });
+
+// --- workflow stage operations validation (Step 02 / D19) ---
+
+test('findWorkflowStageOperationProblems passes on the live repository setup', () => {
+  const problems = findWorkflowStageOperationProblems(process.cwd());
+  assert.deepEqual(problems, []);
+});
+
+test('findWorkflowStageOperationProblems fails when operation taskSpec does not resolve', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'bad-task', taskSpec: 'nonexistent-task-spec-file', role: 'implementer', skills: ['fgos-coding-planning'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length > 0, true);
+  assert.match(problems[0], /nonexistent-task-spec-file/);
+});
+
+test('findWorkflowStageOperationProblems fails when operation role is not in roleGraph.roles', () => {
+  const customDomains = {
+    coding: {
+      roleGraph: {
+        roles: ['implementer', 'researcher'],
+      },
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'shape-plan', taskSpec: 'shape-plan', role: 'unknown-role-xyz', skills: ['fgos-coding-planning'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length > 0, true);
+  assert.match(problems[0], /unknown-role-xyz/);
+});
+
+test('findWorkflowStageOperationProblems fails when operation skill is not provided by any agent-type', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'shape-plan', taskSpec: 'shape-plan', role: 'implementer', skills: ['fgos-completely-fake-skill-123'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length > 0, true);
+  assert.match(problems[0], /fgos-completely-fake-skill-123/);
+});
+
+test('findWorkflowStageOperationProblems fails when operation reason has no matching roleGraph edge', () => {
+  const customDomains = {
+    coding: {
+      roleGraph: {
+        roles: ['implementer', 'reviewer'],
+        edges: {
+          planning: [
+            { from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' },
+          ],
+        },
+      },
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'validate-plan', taskSpec: 'validate-plan', role: 'reviewer', reason: 'review', skills: ['fgos-coding-validating'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length > 0, true);
+  assert.match(problems[0], /does not match any legal roleGraph edge/);
+});
+
+test('findWorkflowStageOperationProblems fails when multiple operations are marked primary: true', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'shape-plan', primary: true, taskSpec: 'shape-plan', role: 'implementer', skills: ['fgos-coding-planning'] },
+              { id: 'scout-blast-radius', primary: true, taskSpec: 'scout-blast-radius', role: 'researcher', skills: ['fgos-researching'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length > 0, true);
+  assert.match(problems[0], /2 operations marked primary: true/);
+});
+
+test('findWorkflowStageOperationProblems fails when primary operation contradicts stage taskSpec or skill', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          skillMap: { planning: 'fgos-coding-planning' },
+          taskSpecMap: { planning: 'shape-plan' },
+          operationMap: {
+            planning: [
+              { id: 'validate-plan', primary: true, taskSpec: 'validate-plan', role: 'reviewer', skills: ['fgos-coding-validating'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length >= 2, true);
+  assert.ok(problems.some((p) => p.includes('contradicts stage taskSpec')));
+  assert.ok(problems.some((p) => p.includes('does not include stage skill')));
+});
+
+test('findWorkflowStageOperationProblems fails when policy minTier or preferPersona is invalid', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              {
+                id: 'shape-plan',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                policy: { minTier: 'ultra-mega-tier', preferPersona: 'alien-persona' },
+              },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length >= 2, true);
+  assert.ok(problems.some((p) => p.includes('policy.minTier')));
+  assert.ok(problems.some((p) => p.includes('policy.preferPersona')));
+});
+
