@@ -276,13 +276,12 @@ test('cleanup (to blocked branch) releases main-checkout lock held by caller ses
   run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'retrospective']);
   run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'cleanup']);
 
-  const dir = path.join(cwd, '.fgos');
+  const sessionId = 'session-cleanup-lock-blocked';
   const lockPath = mainCheckoutLockPath(cwd);
-  const writerId = resolveWriterIdentity(dir).id;
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: writerId, ts: Date.now() }));
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
   assert.equal(fs.existsSync(lockPath), true);
 
-  const result = run(cwd, ['cleanup', 'cleanup-lock-blocked']);
+  const result = run(cwd, ['cleanup', 'cleanup-lock-blocked'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(envelopeData(result.stdout).to, 'blocked');
   assert.equal(fs.existsSync(lockPath), false, 'cleanup -> blocked must release the session lock early');
@@ -305,12 +304,12 @@ test('cleanup (to done branch) releases main-checkout lock held by caller sessio
   addOutcome(dir, { id: 'cleanup-lock-done', docType: 'how-to', docPath: 'docs/how-to/cleanup-lock-done.md' });
   run(cwd, ['move', 'cleanup-lock-done', '--to', 'cleanup']);
 
+  const sessionId = 'session-cleanup-lock-done';
   const lockPath = mainCheckoutLockPath(cwd);
-  const writerId = resolveWriterIdentity(dir).id;
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: writerId, ts: Date.now() }));
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
   assert.equal(fs.existsSync(lockPath), true);
 
-  const result = run(cwd, ['cleanup', 'cleanup-lock-done']);
+  const result = run(cwd, ['cleanup', 'cleanup-lock-done'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(envelopeData(result.stdout).to, 'done');
   assert.equal(fs.existsSync(lockPath), false, 'cleanup -> done must release the session lock early');
@@ -330,13 +329,12 @@ test('compound releases main-checkout lock held by caller session (tsk-5zv)', ()
   gitAtCwd(cwd, ['add', '-A']);
   gitAtCwd(cwd, ['commit', '-q', '-m', 'add doc']);
 
-  const dir = path.join(cwd, '.fgos');
+  const sessionId = 'session-compound-lock-item';
   const lockPath = mainCheckoutLockPath(cwd);
-  const writerId = resolveWriterIdentity(dir).id;
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: writerId, ts: Date.now() }));
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
   assert.equal(fs.existsSync(lockPath), true);
 
-  const result = run(cwd, ['compound', 'compound-lock-item', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/compound-lock-item.md']);
+  const result = run(cwd, ['compound', 'compound-lock-item', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/compound-lock-item.md'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(fs.existsSync(lockPath), false, 'compound must release the session lock early after addOutcome');
 });
