@@ -238,7 +238,7 @@ if (priorRuns === 0) {
 
 function configFor(scriptPath) {
   return {
-    executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
+    executor: { allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
     models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
     timeoutMs: 30000,
   };
@@ -269,7 +269,9 @@ function countRuns(counterFile) {
  * leaf-to-root merge mechanism. */
 function plantCommit(repoRoot, worktreeDir, id, filename, contents) {
   const wt = createWorktree(repoRoot, id, { worktreeDir });
-  fs.writeFileSync(path.join(wt.path, filename), contents);
+  const fullPath = path.join(wt.path, filename);
+  fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+  fs.writeFileSync(fullPath, contents);
   execFileSync('git', ['add', filename], { cwd: wt.path });
   execFileSync('git', ['commit', '-q', '-m', `planted: ${filename}`], { cwd: wt.path });
   removeWorktree(repoRoot, wt.path);
@@ -2290,14 +2292,23 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
     `
     import fs from 'node:fs';
     import path from 'node:path';
+    import { execFileSync } from 'node:child_process';
     const prompt = process.argv.slice(2).join(' ');
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
     if (match) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nBlast radius analysis.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\\nSearch posture: active rg cross-check\\nCallers: src/runner/loop.mjs\\nAffected processes: none\\nRisk read: low risk\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Scouted 2 symbols', findings: [] }));
+    } else {
+      fs.writeFileSync('output.txt', 'done\\n');
+      try {
+        execFileSync('git', ['add', 'output.txt']);
+        execFileSync('git', ['commit', '-m', 'feat: implement']);
+      } catch (err) {
+        fs.writeFileSync('commit-error.txt', err.stack || String(err));
+      }
     }
     process.exit(0);
     `,
@@ -2316,10 +2327,10 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
   const res = await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
 
   assert.equal(res.outcome, 'drained');
-  assert.equal(res.dispatched[0].outcome, 'secondary-operation-completed');
+  assert.equal(res.dispatched[0].outcome, 'awaiting-approval');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.status, 'doing');
+  assert.equal(item.status, 'awaiting-approval');
   assert.equal(item.stage, 'executing');
 
   const asgnDir = path.join(dir, 'assignments');
@@ -2330,4 +2341,659 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
   assert.ok(fs.existsSync(path.join(runsDir, 'result.json')));
   assert.ok(fs.existsSync(path.join(runsDir, 'dispatch-plan.json')));
 });
+
+test('driver loop runOnce: executing scout-blast-radius with failed or no-evidence result settles item to blocked and DOES NOT fall through to implement-item (Finding P2 fix)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
+  const id = 'exec-scout-noev-item';
+  const taskSpecDir = path.join(repoRoot, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'scout-blast-radius.md'), '# scout-blast-radius\n');
+
+  // Executor exits zero without producing any report or result artifacts -> no-evidence
+  const executorScript = path.join(scriptDir, 'fake-scout-noev-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    process.exit(0);
+    `,
+  );
+
+  const cfg = configFor(executorScript);
+  seedItem(dir, {
+    id,
+    stage: 'executing',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    secondaryOperation: 'scout-blast-radius',
+  });
+
+  // Pass 1: scout-blast-radius runs and produces no-evidence -> settles Work to blocked and stops without falling through to implement-item
+  const res1 = await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+
+  assert.equal(res1.outcome, 'drained');
+  assert.equal(res1.dispatched.length, 1);
+  assert.equal(res1.dispatched[0].outcome, 'stopped');
+  assert.equal(res1.dispatched[0].reason, 'assignment-scout-blast-radius-no-evidence');
+
+  const itemAfterPass1 = listWork(dir).work[id];
+  assert.equal(itemAfterPass1.status, 'blocked');
+  assert.equal(itemAfterPass1.stage, 'executing');
+  assert.equal(itemAfterPass1.secondaryOperation ?? null, null);
+
+  // Pass 2: subsequent runOnce sees item is blocked and does NOT fall through to implement-item
+  const res2 = await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+  assert.equal(res2.dispatched.length, 0);
+});
+
+test('driver loop runOnce: executing review-item with REJECT verdict on existing candidate routes to fix operation (Finding P2 fix)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
+  const taskSpecDir = path.join(repoRoot, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'review-item.md'), '# review-item\n');
+
+  const id = 'tsk-driver-review-reject';
+  const branch = `fgw/${id}`;
+  execFileSync('git', ['checkout', '-b', branch], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'candidate.txt'), 'candidate impl\n');
+  execFileSync('git', ['add', 'candidate.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-m', 'feat: candidate implementation'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
+
+  const executorScript = path.join(scriptDir, 'fake-reject-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    import { execFileSync } from 'node:child_process';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match && prompt.includes('review-item')) {
+      const resultPath = match[1];
+      const runDir = path.dirname(resultPath);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nREJECT: evidence:candidate-diff implementation failed verify check in evidence:verify-fail.\\nEvaluation: REJECT.\\n');
+      fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'REJECT', summary: 'Verify failed', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-fail'] }));
+    } else if (match) {
+      const resultPath = match[1];
+      const runDir = path.dirname(resultPath);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Fix Report\\nFix applied.\\n');
+      fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Fix applied', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] }));
+      fs.writeFileSync('output.txt', 'done\\n');
+      try {
+        execFileSync('git', ['add', 'output.txt']);
+        execFileSync('git', ['commit', '-m', 'feat: implement fix']);
+      } catch (err) {}
+    } else {
+      fs.writeFileSync('output.txt', 'done\\n');
+      try {
+        execFileSync('git', ['add', 'output.txt']);
+        execFileSync('git', ['commit', '-m', 'feat: implement fix']);
+      } catch (err) {}
+    }
+    process.exit(0);
+    `,
+  );
+
+  const cfg = configFor(executorScript);
+  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+
+  seedItem(dir, {
+    id,
+    stage: 'executing',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    secondaryOperation: 'review-item',
+    refs: ['evidence:candidate-diff', 'evidence:verify-fail'],
+    verify: 'node -e "process.exit(0)"',
+  });
+
+  // Pass 1: Review Assignment executes on existing candidate (wave 1) and routes to fix implementation (wave 2)
+  const res1 = await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+
+  assert.equal(res1.outcome, 'drained');
+  assert.equal(res1.dispatched.length, 2);
+  assert.equal(res1.dispatched[0].outcome, 'secondary-operation-completed');
+  assert.equal(res1.dispatched[0].operation, 'review-item');
+  assert.equal(res1.dispatched[0].nextOperation, 'fix-verify-red');
+  assert.equal(res1.dispatched[1].outcome, 'awaiting-approval');
+
+  const itemAfterPass1 = listWork(dir).work[id];
+  assert.equal(itemAfterPass1.status, 'awaiting-approval');
+});
+
+test('driver loop runOnce: executing review-item with APPROVED verdict and passing goal-check verify advances to awaiting-approval (Finding P1 & P2 fix)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
+  const taskSpecDir = path.join(repoRoot, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'review-item.md'), '# review-item\n');
+
+  const id = 'tsk-driver-review-approve';
+  const branch = `fgw/${id}`;
+  execFileSync('git', ['checkout', '-b', branch], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'candidate.txt'), 'candidate impl\n');
+  execFileSync('git', ['add', 'candidate.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-m', 'feat: candidate implementation'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
+
+  const executorScript = path.join(scriptDir, 'fake-approve-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    import { execFileSync } from 'node:child_process';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const resultPath = match[1];
+      const runDir = path.dirname(resultPath);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nAPPROVED: evidence:candidate-diff changes verified against evidence:verify-pass.\\nEvaluation: APPROVED.\\nRationale: Clean code implementation.\\n');
+      fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'APPROVED', summary: 'Clean code', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] }));
+    } else {
+      fs.writeFileSync('output.txt', 'done\\n');
+      try {
+        execFileSync('git', ['add', 'output.txt']);
+        execFileSync('git', ['commit', '-m', 'feat: implement']);
+      } catch (err) {}
+    }
+    process.exit(0);
+    `,
+  );
+
+  const cfg = configFor(executorScript);
+  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+
+  seedItem(dir, {
+    id,
+    stage: 'executing',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    secondaryOperation: 'review-item',
+    refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+    verify: 'node -e "process.exit(0)"',
+  });
+
+  // Pass 1: Review Assignment executes on existing candidate (aheadCount > 0) with passing verify gate — APPROVED verdict chooses approve path directly
+  const res1 = await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+
+  assert.equal(res1.outcome, 'drained');
+  assert.equal(res1.dispatched.length, 1);
+  assert.equal(res1.dispatched[0].outcome, 'awaiting-approval');
+  assert.equal(res1.dispatched[0].operation, 'review-item');
+
+  const itemAfterPass1 = listWork(dir).work[id];
+  assert.equal(itemAfterPass1.status, 'awaiting-approval');
+  assert.equal(itemAfterPass1.secondaryOperation ?? null, null);
+
+  const events = readRawEvents(dir).filter((e) => e.payload?.id === id && e.payload?.to === 'awaiting-approval');
+  assert.ok(events.length > 0);
+  assert.ok(events[0].payload.branchHeadAtReturn);
+});
+
+test('driver loop runOnce: executing review-item with APPROVED verdict but failing goal-check verify refuses awaiting-approval and routes to fix (Finding P1 & P2 fix)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
+  const taskSpecDir = path.join(repoRoot, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'review-item.md'), '# review-item\n');
+
+  const id = 'tsk-driver-review-fail-verify';
+  const branch = `fgw/${id}`;
+  execFileSync('git', ['checkout', '-b', branch], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'candidate.txt'), 'candidate impl\n');
+  execFileSync('git', ['add', 'candidate.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-m', 'feat: candidate implementation'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
+
+  const executorScript = path.join(scriptDir, 'fake-approve-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    import { execFileSync } from 'node:child_process';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const resultPath = match[1];
+      const runDir = path.dirname(resultPath);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nAPPROVED: evidence:candidate-diff changes verified against evidence:verify-fail.\\nEvaluation: APPROVED.\\nRationale: Clean code implementation.\\n');
+      fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'APPROVED', summary: 'Clean code', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-fail'] }));
+    } else {
+      fs.writeFileSync('output.txt', 'done\\n');
+      try {
+        execFileSync('git', ['add', 'output.txt']);
+        execFileSync('git', ['commit', '-m', 'feat: implement fix']);
+      } catch (err) {}
+    }
+    process.exit(0);
+    `,
+  );
+
+  const cfg = configFor(executorScript);
+  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+
+  seedItem(dir, {
+    id,
+    stage: 'executing',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    secondaryOperation: 'review-item',
+    refs: ['evidence:candidate-diff', 'evidence:verify-fail'],
+    verify: 'node -e "process.exit(1)"',
+  });
+
+  // Pass 1: Review Assignment executes on candidate but goal-check verify fails — refuses awaiting-approval and routes wave 2 to fix-verify-red
+  const res1 = await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+
+  assert.equal(res1.outcome, 'drained');
+  assert.equal(res1.dispatched.length, 2);
+  assert.equal(res1.dispatched[0].outcome, 'secondary-operation-completed');
+  assert.equal(res1.dispatched[0].operation, 'review-item');
+  assert.equal(res1.dispatched[0].nextOperation, 'fix-verify-red');
+
+  const itemAfterPass1 = listWork(dir).work[id];
+  assert.equal(itemAfterPass1.status, 'blocked');
+  assert.equal(itemAfterPass1.secondaryOperation ?? null, null);
+});
+
+test('driver loop runOnce: executing review-item on Work with NO candidate diff/verify refs fails evidence gate and stops driver execution (Finding P2 fix)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
+  const taskSpecDir = path.join(repoRoot, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'review-item.md'), '# review-item\n');
+
+  const id = 'tsk-driver-review-no-refs';
+  const executorScript = path.join(scriptDir, 'fake-approve-no-refs-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const resultPath = match[1];
+      const runDir = path.dirname(resultPath);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nAPPROVED\\n');
+      fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'APPROVED', summary: 'Clean code', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] }));
+    }
+    process.exit(0);
+    `,
+  );
+
+  const cfg = configFor(executorScript);
+  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+
+  seedItem(dir, {
+    id,
+    stage: 'executing',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    secondaryOperation: 'review-item',
+    refs: [], // No real diff/verify evidence refs provided on Work
+  });
+
+  const res = await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+
+  assert.equal(res.outcome, 'drained');
+  assert.equal(res.dispatched.length, 1);
+  assert.equal(res.dispatched[0].outcome, 'stopped');
+  assert.equal(res.dispatched[0].reason, 'review-item-missing-candidate-diff-and-verify-refs');
+
+  const itemAfter = listWork(dir).work[id];
+  assert.equal(itemAfter.status, 'blocked');
+  assert.equal(itemAfter.stage, 'executing');
+  assert.equal(itemAfter.secondaryOperation ?? null, null);
+});
+
+test('Finding 5 regression test: scout-blast-radius/review-item assignment paths do not log duplicate cleanup failures', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
+  const taskSpecDir = path.join(repoRoot, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'scout-blast-radius.md'), '# scout-blast-radius\n');
+
+  const id = 'tsk-no-dup-cleanup';
+  const executorScript = path.join(scriptDir, 'fake-scout-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const resultPath = match[1];
+      const runDir = path.dirname(resultPath);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nFiles: src/main.js\\nPosture: active\\n');
+      fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', files: ['src/main.js'], posture: 'active', summary: 'Scouted' }));
+    }
+    process.exit(0);
+    `,
+  );
+
+  const cfg = configFor(executorScript);
+  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+
+  seedItem(dir, {
+    id,
+    stage: 'executing',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    secondaryOperation: 'scout-blast-radius',
+  });
+
+  const logs = [];
+  const captureLog = (msg) => logs.push(msg);
+
+  await runOnce({ repoRoot, config: cfg, worktreeDir, log: captureLog });
+
+  const duplicateCleanupLogged = logs.some((l) => /is not a working tree/i.test(l) || /duplicate worktree cleanup/i.test(l));
+  assert.equal(duplicateCleanupLogged, false, 'must not log duplicate worktree cleanup failures');
+});
+
+test('Finding 1 regression test: planning Work item with status doing (live claim) is not swept, validated, or moved by runOnce', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
+  const id = 'plan-doing-item';
+  const taskSpecDir = path.join(repoRoot, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'validate-plan.md'), '# validate-plan\n');
+
+  const counterFile = path.join(scriptDir, 'counter.txt');
+  const executorScript = writeCommittingExecutor(scriptDir, counterFile);
+  const cfg = configFor(executorScript);
+
+  seedItem(dir, {
+    id,
+    stage: 'planning',
+    status: 'doing',
+    domain: 'coding',
+    workflow: 'feature',
+  });
+  acquireClaim(dir, { id, actor: 'session', claimRole: 'session' });
+
+  const res = await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+
+  const dispatchedIds = res.dispatched.map((d) => d.id ?? d.workId);
+  assert.equal(dispatchedIds.includes(id), false);
+
+  const item = listWork(dir).work[id];
+  assert.equal(item.status, 'doing');
+  assert.equal(item.stage, 'planning');
+});
+
+test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assignment in worktree root when plan.md exists only in worktree', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
+  const id = 'plan-wt-cwd-item';
+  const taskSpecDir = path.join(repoRoot, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'validate-plan.md'), '# validate-plan\n');
+
+  const docsRef = 'docs/history/plan-wt-cwd-item';
+  const planContent = '# Plan in worktree\n## Reality gate\n- Mode fit: PASS (src/index.mjs)\n- Repo fit: PASS (src/index.mjs)\n- Assumptions: PASS (src/index.mjs)\n- Smaller path: PASS (src/index.mjs)\n- Proof surface: PASS (src/index.mjs)\n- Impact-analysis posture: PASS (src/index.mjs)\n## Feasibility matrix\n- medium risk: src/index.mjs\n';
+
+  const wt = createWorktree(repoRoot, id, { worktreeDir });
+  const wtPlanPath = path.join(wt.path, docsRef, 'plan.md');
+  fs.mkdirSync(path.dirname(wtPlanPath), { recursive: true });
+  fs.writeFileSync(wtPlanPath, planContent);
+  execFileSync('git', ['add', docsRef], { cwd: wt.path });
+  execFileSync('git', ['commit', '-m', 'add plan.md in worktree'], { cwd: wt.path });
+
+  const cwdCheckLog = path.join(scriptDir, 'cwd-check.log');
+  const executorScript = path.join(scriptDir, 'validate-wt-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    fs.writeFileSync('${cwdCheckLog}', cwd);
+
+    const runsDir = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(runsDir)) {
+      for (const asgn of fs.readdirSync(runsDir)) {
+        const runDir = path.join(runsDir, asgn, 'runs', '01');
+        if (fs.existsSync(runDir)) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nPlan in worktree is sound.\\n');
+          fs.writeFileSync(
+            path.join(runDir, 'agent-result.json'),
+            JSON.stringify({
+              status: 'done',
+              verdict: 'READY',
+              summary: 'Plan sound',
+              realityGate: {
+                modeFit: { status: 'PASS', citation: 'src/index.mjs' },
+                repoFit: { status: 'PASS', citation: 'src/index.mjs' },
+                assumptions: { status: 'PASS', citation: 'src/index.mjs' },
+                smallerPath: { status: 'PASS', citation: 'src/index.mjs' },
+                proofSurface: { status: 'PASS', citation: 'src/index.mjs' },
+                impactAnalysisPosture: { status: 'PASS', citation: 'src/index.mjs' },
+              },
+              feasibilityMatrix: [{ risk: 'medium risk', backing: 'src/index.mjs' }],
+            }),
+          );
+        }
+      }
+    }
+    process.exit(0);
+    `,
+  );
+
+  const cfg = configFor(executorScript);
+
+  seedItem(dir, {
+    id,
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    docsRef,
+  });
+
+  await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+
+  const executedCwd = fs.existsSync(cwdCheckLog) ? fs.readFileSync(cwdCheckLog, 'utf8').trim() : '';
+  assert.ok(executedCwd, 'executor was called');
+  assert.equal(fs.existsSync(path.join(executedCwd, docsRef, 'plan.md')), true, 'cwd was content root containing plan.md');
+});
+
+// ---------------------------------------------------------------------------
+// Cell 6.1: planning.validate-plan fake-executor happy path (composed runOnce).
+// Fixtures reuse the :2736 cwd-selection template (task-spec stub in the temp
+// repo, committed plan.md, seeded planning/todo item) plus the
+// assignment-dispatch.test.mjs:83 fake-executor contract (a valid READY claim
+// + substantive report written into the run dir parsed from the prompt).
+// ---------------------------------------------------------------------------
+
+/** Fake executor for the validate-plan happy path: assignment prompts (the
+ * "Write structured JSON to ...agent-result.json" instruction) get a valid
+ * READY claim + a substantive report into the run dir parsed from the prompt;
+ * any other prompt (the drain run's primary worker, when the planning edge
+ * actually advances) produces and commits output.txt so the engine's own
+ * verify can pass. Never touches `.fgos/`. */
+function writeValidatePlanHappyExecutor(scriptDir) {
+  const scriptPath = path.join(scriptDir, 'validate-plan-happy-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+const prompt = process.argv.slice(2).join(' ');
+const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+if (match) {
+  const runDir = path.dirname(match[1]);
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(runDir, 'agent-report.md'),
+    '# Validation Report\\nReality gate: all six dimensions PASS with citations (src/index.mjs).\\nFeasibility matrix: the medium risk row is backed by src/index.mjs.\\nConclusion: the plan is sound and ready.\\n',
+  );
+  fs.writeFileSync(
+    path.join(runDir, 'agent-result.json'),
+    JSON.stringify({
+      status: 'done',
+      verdict: 'READY',
+      summary: 'Plan sound',
+      realityGate: {
+        modeFit: { status: 'PASS', citation: 'src/index.mjs' },
+        repoFit: { status: 'PASS', citation: 'src/index.mjs' },
+        assumptions: { status: 'PASS', citation: 'src/index.mjs' },
+        smallerPath: { status: 'PASS', citation: 'src/index.mjs' },
+        proofSurface: { status: 'PASS', citation: 'src/index.mjs' },
+        impactAnalysisPosture: { status: 'PASS', citation: 'src/index.mjs' },
+      },
+      feasibilityMatrix: [{ risk: 'medium risk', backing: 'src/index.mjs' }],
+    }),
+  );
+} else {
+  fs.writeFileSync('output.txt', 'produced by worker\\n');
+  execFileSync('git', ['add', 'output.txt']);
+  const statusStr = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' });
+  if (statusStr.trim().length > 0) {
+    execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);
+  }
+}
+process.exit(0);
+`,
+  );
+  return scriptPath;
+}
+
+/** Cell 6.1 fixture: temp repo with the validate-plan task-spec stub, a real
+ * src/index.mjs citation target, a committed docsRef/plan.md (`planModeLine`
+ * optionally declares tiny/small mode so resolvePlan's runner pass-through
+ * edge is reachable), and the seeded planning/todo item. */
+function setupValidatePlanFixture({ planModeLine = '' } = {}) {
+  const base = setup();
+  const id = 'cell61-plan-item';
+  const taskSpecDir = path.join(base.repoRoot, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'validate-plan.md'), '# validate-plan\n');
+  fs.mkdirSync(path.join(base.repoRoot, 'src'), { recursive: true });
+  fs.writeFileSync(path.join(base.repoRoot, 'src', 'index.mjs'), '// citation target\n');
+
+  const docsRef = 'docs/history/cell61-plan-item';
+  const planContent = `${planModeLine}## Reality gate\n- Mode fit: PASS (src/index.mjs)\n- Repo fit: PASS (src/index.mjs)\n- Assumptions: PASS (src/index.mjs)\n- Smaller path: PASS (src/index.mjs)\n- Proof surface: PASS (src/index.mjs)\n- Impact-analysis posture: PASS (src/index.mjs)\n## Feasibility matrix\n- medium risk: src/index.mjs\n`;
+  fs.mkdirSync(path.join(base.repoRoot, docsRef), { recursive: true });
+  fs.writeFileSync(path.join(base.repoRoot, docsRef, 'plan.md'), planContent);
+  execFileSync('git', ['add', docsRef, 'src'], { cwd: base.repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'add plan.md and citation target'], { cwd: base.repoRoot });
+
+  const executorScript = writeValidatePlanHappyExecutor(base.scriptDir);
+  const cfg = configFor(executorScript);
+
+  seedItem(base.dir, {
+    id,
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    docsRef,
+  });
+  return { ...base, id, docsRef, cfg };
+}
+
+function cell61RunDir(repoRoot) {
+  const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
+  const asgnIds = fs.readdirSync(assignmentsDir).filter((d) => d.startsWith('asgn_'));
+  assert.equal(asgnIds.length, 1, 'exactly one validate-plan Assignment ran');
+  return { assignmentsDir, asgnId: asgnIds[0], runDir: path.join(assignmentsDir, asgnIds[0], 'runs', '01') };
+}
+
+test('Cell 6.1 happy path: runOnce dispatches planning.validate-plan to a fake executor and stores a done/reported RunResult', async () => {
+  const { repoRoot, dir, cfg, worktreeDir, id } = setupValidatePlanFixture();
+
+  await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+
+  const { runDir } = cell61RunDir(repoRoot);
+  const result = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  assert.equal(result.workId, id);
+  assert.equal(result.status, 'done');
+  assert.equal(result.confidence, 'reported');
+
+  // The Assignment never moves Work: without a tiny/small mode declaration
+  // resolvePlan's runner call conservatively no-ops, so the item is exactly
+  // where the sweep found it.
+  const item = listWork(dir).work[id];
+  assert.equal(item.stage, 'planning');
+  assert.equal(item.status, 'todo');
+});
+
+test('Cell 6.1 happy path: driver consumes READY+reported and feeds the existing planning edge through engine verbs only', async () => {
+  const { repoRoot, dir, cfg, worktreeDir, id } = setupValidatePlanFixture({ planModeLine: 'Mode: tiny\n' });
+  const capture = [];
+  await runOnce({ repoRoot, config: cfg, worktreeDir, log: (l) => capture.push(l) });
+
+  // The driver consumed the READY verdict (canAdvanceEdge) and called the
+  // existing planning edge (resolvePlan) — the plan.md tiny/small mode makes
+  // the runner pass-through reachable in-test.
+  const readyLine = capture.find((l) => l.includes('after READY validation'));
+  assert.ok(readyLine, 'driver must consume the READY verdict and call the planning edge');
+  assert.match(readyLine, /\(pass-through\)/);
+
+  // Work stage/status changed only through engine verbs: resolvePlan's
+  // moveStage advanced planning -> executing; the drain run's own claim and
+  // settle (verify passed + committed work) then reached awaiting-approval.
+  const item = listWork(dir).work[id];
+  assert.equal(item.stage, 'executing');
+  assert.equal(item.status, 'awaiting-approval');
+
+  // Ordering proves the driver, not the Assignment, moved Work: the
+  // assignment-finished log precedes the verdict-consumption log.
+  const finishedIdx = capture.findIndex((l) => l.includes('executed (confidence: reported, status: done)'));
+  assert.ok(finishedIdx !== -1, 'assignment finished with a reported RunResult');
+  const consumedIdx = capture.findIndex((l) => l.includes('after READY validation'));
+  assert.ok(consumedIdx > finishedIdx, 'Work moved only after the Assignment had settled, via resolvePlan');
+});
+
+test('Cell 6.1 happy path: run evidence is complete and the verdict artifact is a worker artifact, never a control-plane file', async () => {
+  const { repoRoot, cfg, worktreeDir } = setupValidatePlanFixture();
+
+  await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+
+  const { asgnId, runDir } = cell61RunDir(repoRoot);
+  const asgnDir = path.dirname(path.dirname(runDir));
+
+  // Immutable assignment input lives at the assignment root; the run dir
+  // carries the per-run evidence set.
+  assert.ok(fs.existsSync(path.join(asgnDir, 'assignment.json')), 'assignment.json persisted at the assignment root');
+  for (const f of ['run.json', 'agent-result.json', 'agent-report.md', 'result.json', 'evidence.json']) {
+    assert.ok(fs.existsSync(path.join(runDir, f)), `runs/01 must contain ${f}`);
+  }
+
+  const evidence = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
+  assert.equal(evidence.operationMutability, 'read-only');
+  assert.deepEqual(
+    evidence.artifacts.map((a) => a.kind).sort(),
+    ['agent-report', 'agent-result'],
+    'evidence lists exactly the worker-produced artifacts',
+  );
+
+  // The verdict artifact (agent-result.json) is worker output — none of the
+  // runner's control-plane files are ever presented as worker artifacts.
+  const controlPlane = ['assignment.json', 'run.json', 'result.json', 'evidence.json', 'stdout.log', 'stderr.log', 'exit.json', 'dispatch-plan.json'];
+  for (const entry of evidence.artifacts) {
+    assert.equal(
+      controlPlane.includes(path.basename(entry.path)),
+      false,
+      `${entry.path} must never be presented as a worker artifact`,
+    );
+  }
+
+  const claim = JSON.parse(fs.readFileSync(path.join(runDir, 'agent-result.json'), 'utf8'));
+  assert.equal(claim.verdict, 'READY');
+  assert.equal(asgnId.startsWith('asgn_'), true);
+});
+
 
