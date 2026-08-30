@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { execFileSync, execSync } from 'node:child_process';
 import {
   chooseStageOperation,
@@ -3392,7 +3393,10 @@ test('Finding 2: validate-plan matrix covering subset of medium+ risks in plan.m
 
   const work = { id: 'tsk-f2', docsRef: 'docs/feature' };
 
-  // Negative test: feasibility matrix only covers "rollback", omitting "auth" and "migration"
+  // Negative test: feasibility matrix only covers "rollback", omitting "auth" and "migration".
+  // Evidence scoping contract: report text is only read from a derivable run
+  // dir, so these fixtures record the stdout log that locates the run dir
+  // (the dir the report was physically written to).
   const resNegative = interpretAssignmentRunResult({
     choice: { operation: 'validate-plan' },
     runResult: {
@@ -3412,6 +3416,7 @@ test('Finding 2: validate-plan matrix covering subset of medium+ risks in plan.m
         feasibilityMatrix: [{ risk: 'rollback', citation: 'src/main.mjs' }],
       },
       evidence: { artifacts: [reportPath] },
+      runtime: { stdoutLog: path.join(reportDir, 'stdout.log') },
     },
     work,
     repoRoot: tempDir,
@@ -3445,6 +3450,7 @@ test('Finding 2: validate-plan matrix covering subset of medium+ risks in plan.m
         ],
       },
       evidence: { artifacts: [reportPath] },
+      runtime: { stdoutLog: path.join(reportDir, 'stdout.log') },
     },
     work,
     repoRoot: tempDir,
@@ -3474,6 +3480,7 @@ test('Finding 3: resolve-question report-text citation: made-up-ref without conc
       confidence: 'reported',
       agentClaim: { status: 'done', summary: 'Answered' },
       evidence: { artifacts: [reportPath] },
+      runtime: { stdoutLog: path.join(reportDir, 'stdout.log') },
     },
     repoRoot: tempDir,
   });
@@ -3499,6 +3506,7 @@ test('Finding 4: scout-blast-radius file-only and posture-only reports fail clos
       confidence: 'reported',
       agentClaim: { status: 'done', files: ['src/foo.mjs'] },
       evidence: { artifacts: [reportFileOnly] },
+      runtime: { stdoutLog: path.join(reportDir, 'stdout.log') },
     },
     repoRoot: tempDir,
   });
@@ -3518,6 +3526,7 @@ test('Finding 4: scout-blast-radius file-only and posture-only reports fail clos
       confidence: 'reported',
       agentClaim: { status: 'done', posture: 'rg checked' },
       evidence: { artifacts: [reportPostureOnly] },
+      runtime: { stdoutLog: path.join(reportDir, 'stdout.log') },
     },
     repoRoot: tempDir,
   });
@@ -3664,6 +3673,7 @@ test('Fix validate-plan NOT READY verdict with em dash: interpretAssignmentRunRe
     confidence: 'reported',
     operation: 'validate-plan',
     runDir: tempDir,
+    runtime: { stdoutLog: path.join(tempDir, 'stdout.log') },
     workerArtifacts: [{ path: 'agent-report.md', kind: 'agent-report', valid: true }],
     agentClaim: {
       status: 'done',
@@ -4003,3 +4013,507 @@ test('review evidence gate: string-only refs and inline text claims are never ev
 
 
 
+
+// ---------------------------------------------------------------------------
+// Cell 6.2: cross-pass staleness + read-back hardening for stored
+// planning.validate-plan RunResults (findLatestAssignmentRunResult path).
+// ---------------------------------------------------------------------------
+
+const PLAN_V1_CONTENT = '# Mode: tiny\nOriginal plan.\n';
+
+const SUBSTANTIVE_REPORT_TEXT =
+  '# Reality Gate & Feasibility Report\n' +
+  '## Reality Gate Score\n' +
+  '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+  '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+  '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+  '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+  '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+  '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+  '## Feasibility Matrix\n- Low risk (verified: src/runner/dispatch/operation-choice.mjs)\n';
+
+const READY_CLAIM_GATES = {
+  'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+  'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+  'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+  'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+  'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+  'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+};
+
+/** Hand-craft a stored validate-plan Assignment + run result the way the real
+ * runner persists it: substantive report on disk, READY structured claim,
+ * done/reported classification, the dispatch-time plan.md content hash the
+ * runner records before the worker runs, the runner-owned dispatched-run
+ * manifest in assignment.json, and the claim-bytes binding (sha256 of the
+ * exact agent-result.json bytes the runner classified). */
+function seedStoredValidatePlanResult(tempDir, { id, docsRef, planContent = PLAN_V1_CONTENT, withHash = false, withBinding = true, withReport = true, claimOverride = null, resultExtra = {}, manifest = ['01'] } = {}) {
+  const docsDir = path.join(tempDir, docsRef);
+  fs.mkdirSync(docsDir, { recursive: true });
+  const planPath = path.join(docsDir, 'plan.md');
+  fs.writeFileSync(planPath, planContent);
+
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', `asgn_${id.replace(/[^a-z0-9_-]/gi, '_')}`);
+  const runDir = path.join(asgnDir, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const asgnId = path.basename(asgnDir);
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify({
+    assignmentId: asgnId,
+    workId: id,
+    stage: 'planning',
+    operation: 'validate-plan',
+    dispatchedRuns: manifest,
+  }));
+  if (withReport) {
+    fs.writeFileSync(path.join(runDir, 'agent-report.md'), SUBSTANTIVE_REPORT_TEXT);
+  }
+
+  const agentClaim = claimOverride ?? {
+    status: 'done',
+    verdict: 'READY',
+    summary: 'Plan validated',
+    realityGate: READY_CLAIM_GATES,
+    feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+  };
+  // The claim exists as worker-written bytes on disk; the binding recorded in
+  // result.json is the sha256 of those exact bytes.
+  const claimBytes = JSON.stringify(agentClaim);
+  fs.writeFileSync(path.join(runDir, 'agent-result.json'), claimBytes);
+
+  const resultJson = {
+    runId: `run_${asgnId}_01`,
+    assignmentId: asgnId,
+    status: 'done',
+    confidence: withReport ? 'reported' : 'no-evidence',
+    evidence: { artifacts: withReport ? [path.join(runDir, 'agent-report.md')] : [path.join(runDir, 'agent-result.json')], changedFiles: [], tests: [] },
+    agentClaim,
+    ...(withBinding ? { claimSha256: crypto.createHash('sha256').update(claimBytes).digest('hex') } : {}),
+    ...resultExtra,
+  };
+  if (withHash) {
+    resultJson.planContentHash = crypto.createHash('sha256').update(fs.readFileSync(planPath)).digest('hex');
+  }
+  const resultPath = path.join(runDir, 'result.json');
+  fs.writeFileSync(resultPath, JSON.stringify(resultJson));
+  return { planPath, resultPath, runDir, asgnDir, asgnId };
+}
+
+function planningWorkFor(id, docsRef) {
+  return { id, stage: 'planning', domain: 'coding', workflow: 'feature', docsRef };
+}
+
+function choosePlanning(tempDir, work, extra = {}) {
+  return chooseStageOperation({
+    work,
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    repoRoot: tempDir,
+    ...extra,
+  });
+}
+
+test('stored validate-plan result with a matching plan content hash is consumable cross-pass (same-content positive)', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/hash-consume';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-hash-consume',
+    docsRef,
+    withHash: true,
+  });
+  // Deterministic mtime order: result recorded strictly after plan.md.
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-hash-consume', docsRef));
+  assert.equal(choice.canAdvanceEdge, true);
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
+test('stored validate-plan result whose plan content hash mismatches the current plan.md is never consumed cross-pass', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/hash-mismatch';
+  const { planPath, resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-hash-mismatch',
+    docsRef,
+    withHash: true,
+  });
+
+  // Edit plan.md AFTER the verdict settled, then hide the edit from the
+  // mtime pre-filter: the worker controls mtimes, it cannot re-roll the
+  // runner-recorded content hash.
+  fs.writeFileSync(planPath, '# Mode: tiny\nEdited plan V2.\n');
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-hash-mismatch', docsRef));
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
+test('stored validate-plan result recorded without a plan content hash is not consumed when plan.md exists', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/hash-missing';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-hash-missing',
+    docsRef,
+    withHash: false,
+  });
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  // Fail closed: without the dispatch-time content anchor there is no way to
+  // prove the verdict was computed against the current plan revision.
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-hash-missing', docsRef));
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
+test('tampered stored validate-plan result with a schema-broken agentClaim is never consumed cross-pass', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/hash-tampered-claim';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-hash-tampered-claim',
+    docsRef,
+    withHash: true,
+    // Schema-invalid: validateAgentResultClaim requires a non-empty summary.
+    // The verdict/gates stay intact so ONLY the schema re-validation can
+    // reject this result.
+    claimOverride: {
+      status: 'done',
+      verdict: 'READY',
+      realityGate: READY_CLAIM_GATES,
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+    },
+  });
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-hash-tampered-claim', docsRef));
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
+test('tampered stored validate-plan result whose recorded evidence refs point at missing files is never consumed cross-pass', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/hash-dead-refs';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-hash-dead-refs',
+    docsRef,
+    withHash: true,
+    // Unprefixed path refs that do not exist anywhere under repoRoot.
+    claimOverride: {
+      status: 'done',
+      verdict: 'READY',
+      summary: 'Plan validated',
+      evidenceRefs: ['docs/history/hash-dead-refs/vanished-evidence.md', 'docs/vanished-proof.txt'],
+      realityGate: READY_CLAIM_GATES,
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+    },
+  });
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-hash-dead-refs', docsRef));
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
+test('in-memory validate-plan result carrying a mismatched plan content hash is not consumed even when its settle time postdates the plan edit', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/hash-inmemory';
+  const docsDir = path.join(tempDir, docsRef);
+  fs.mkdirSync(docsDir, { recursive: true });
+  const planPath = path.join(docsDir, 'plan.md');
+  fs.writeFileSync(planPath, PLAN_V1_CONTENT);
+
+  const reportDir = path.join(tempDir, 'reports', 'in-memory-u6');
+  fs.mkdirSync(reportDir, { recursive: true });
+  fs.writeFileSync(path.join(reportDir, 'agent-report.md'), SUBSTANTIVE_REPORT_TEXT);
+
+  const lastRunResult = {
+    status: 'done',
+    confidence: 'reported',
+    // Settled AFTER the (hypothetical) plan edit: the mtime/staleness branch
+    // passes, so only the recorded content hash can reject this result.
+    settledAt: new Date(Date.now() + 30000).toISOString(),
+    planContentHash: crypto.createHash('sha256').update('# Mode: tiny\nEdited plan V2.\n').digest('hex'),
+    agentClaim: {
+      status: 'done',
+      verdict: 'READY',
+      summary: 'Plan validated',
+      realityGate: READY_CLAIM_GATES,
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+    },
+    evidence: { artifacts: [path.join(reportDir, 'agent-report.md')] },
+  };
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-hash-inmemory', docsRef), { lastRunResult });
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
+// --- Fix round 1 (red-team F2c/F2d/F4b): dispatched-run membership, claim-bytes
+// --- binding, run-dir-local artifacts, dead-ref tightening. All RED before the
+// --- matching production change.
+
+test('F2d(a): a phantom run dir the runner never dispatched is never consumed cross-pass even when fully self-consistent', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/f2d-phantom';
+  const { planPath, asgnDir, asgnId } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-f2d-phantom',
+    docsRef,
+    withHash: true,
+    manifest: ['01'],
+  });
+
+  // Post-exit writer plants runs/02 beyond the dispatched set: fully
+  // self-consistent (own report, own claim bytes, binding over those bytes,
+  // plan hash recomputed for the edited plan, future mtime). ONLY the
+  // dispatched-run manifest can reject it.
+  const planV2 = `${fs.readFileSync(planPath, 'utf8')}\n<!-- V2: unvalidated edit -->\n`;
+  fs.writeFileSync(planPath, planV2);
+  const forgedDir = path.join(asgnDir, 'runs', '02');
+  fs.mkdirSync(forgedDir, { recursive: true });
+  const forgedClaim = {
+    status: 'done',
+    verdict: 'READY',
+    summary: 'Plan validated',
+    realityGate: READY_CLAIM_GATES,
+    feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+  };
+  const forgedClaimBytes = JSON.stringify(forgedClaim);
+  fs.writeFileSync(path.join(forgedDir, 'agent-report.md'), SUBSTANTIVE_REPORT_TEXT);
+  fs.writeFileSync(path.join(forgedDir, 'agent-result.json'), forgedClaimBytes);
+  const forgedResultPath = path.join(forgedDir, 'result.json');
+  fs.writeFileSync(forgedResultPath, JSON.stringify({
+    runId: `run_${asgnId}_02`,
+    assignmentId: asgnId,
+    status: 'done',
+    confidence: 'reported',
+    planContentHash: crypto.createHash('sha256').update(planV2).digest('hex'),
+    claimSha256: crypto.createHash('sha256').update(forgedClaimBytes).digest('hex'),
+    evidence: { artifacts: [path.join(forgedDir, 'agent-report.md')], changedFiles: [], tests: [] },
+    agentClaim: forgedClaim,
+  }));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(forgedResultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-f2d-phantom', docsRef));
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
+test('F2c: a stored result recorded without the claim-bytes binding is not consumable (fail closed)', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/f2c-no-binding';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-f2c-no-binding',
+    docsRef,
+    withHash: true,
+    withBinding: false,
+  });
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  // Without the settle-time binding there is no way to prove the stored
+  // claim is the claim the runner classified — same fail-closed precedent
+  // as the missing plan content hash.
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-f2c-no-binding', docsRef));
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
+test('F2c: a schema-valid verdict flip inside the stored result.json is never consumed cross-pass', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/f2c-flip';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-f2c-flip',
+    docsRef,
+    withHash: true,
+  });
+
+  // Schema-valid tamper: flip the stored verdict to READY without touching
+  // the run's own agent-result.json bytes (whose binding still holds). Only
+  // re-reading the claim and comparing it against the stored copy can catch
+  // this divergence.
+  const flipped = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  flipped.agentClaim = { ...flipped.agentClaim, verdict: 'READY', summary: 'Plan sound and ready.' };
+  fs.writeFileSync(resultPath, JSON.stringify(flipped, null, 2));
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-f2c-flip', docsRef));
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
+test('F4b: mixed live+ghost evidence refs resolving inside the run tree are never consumed cross-pass', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/f4b-mixed';
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_tsk-f4b-mixed');
+  const runDir = path.join(asgnDir, 'runs', '01');
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-f4b-mixed',
+    docsRef,
+    withHash: true,
+    // The claim itself (file bytes and stored copy agree, binding holds) cites
+    // one live in-tree path and one ghost in-tree path.
+    claimOverride: {
+      status: 'done',
+      verdict: 'READY',
+      summary: 'Plan validated',
+      evidenceRefs: [
+        path.relative(tempDir, path.join(runDir, 'agent-report.md')),
+        path.relative(tempDir, path.join(asgnDir, 'runs', '01', 'ghost-evidence.md')),
+      ],
+      realityGate: READY_CLAIM_GATES,
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+    },
+  });
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-f4b-mixed', docsRef));
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
+test('F2d(b): interpretation never satisfies the report gate from a sibling run\'s recorded artifact path', () => {
+  const tempDir = mkTempDir();
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_f2d_sib');
+  const siblingRunDir = path.join(asgnDir, 'runs', '01');
+  const consumingRunDir = path.join(asgnDir, 'runs', '02');
+  fs.mkdirSync(consumingRunDir, { recursive: true });
+  fs.mkdirSync(siblingRunDir, { recursive: true });
+  // The sibling run's REAL substantive report — the only report on disk.
+  fs.writeFileSync(path.join(siblingRunDir, 'agent-report.md'), SUBSTANTIVE_REPORT_TEXT);
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      runId: 'run_asgn_f2d_sib_02',
+      assignmentId: 'asgn_f2d_sib',
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(consumingRunDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'Plan validated',
+        realityGate: READY_CLAIM_GATES,
+        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+      },
+      // Spread-inherited sibling path: the consuming run's own dir has no report.
+      evidence: { artifacts: [path.join(siblingRunDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-missing-report-artifact');
+});
+
+test('F2d(c): a member whose runId was corrupted is skipped at the scan — a planted out-tree report never satisfies the gate', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/f2dc-spoof';
+  // Honest pass 1: READY claim written by the worker, but NO report artifact
+  // — the run dir has nothing for the report gate to read.
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-f2dc-spoof',
+    docsRef,
+    withHash: true,
+    withReport: false,
+  });
+  // Result.json-only tamper: agentClaim and agent-result.json are untouched,
+  // so the claim-bytes binding still holds. The attacker corrupts the runId
+  // (killing runId-based evidence derivation) and redirects the result's own
+  // evidence fields at a substantive report planted OUTSIDE the assignment
+  // tree — under stdoutLog-based scoping this relocates the report gate to
+  // a file the attacker authored.
+  const plantedDir = path.join(tempDir, 'docs', 'history', 'f2dc-spoof', 'planted');
+  fs.mkdirSync(plantedDir, { recursive: true });
+  fs.writeFileSync(path.join(plantedDir, 'agent-report.md'), SUBSTANTIVE_REPORT_TEXT);
+  const tampered = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  tampered.runId = 'spoofed-no-run-prefix';
+  tampered.status = 'done';
+  tampered.confidence = 'reported';
+  tampered.evidence = { ...tampered.evidence, artifacts: [path.join('docs', 'history', 'f2dc-spoof', 'planted', 'agent-report.md')] };
+  tampered.runtime = { stdoutLog: path.join('docs', 'history', 'f2dc-spoof', 'planted', 'run.log') };
+  fs.writeFileSync(resultPath, JSON.stringify(tampered, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-f2dc-spoof', docsRef));
+  assert.equal(choice.canAdvanceEdge, false, 'a result whose runId does not match the dispatched member must never be consumed');
+  assert.equal(choice.reason, 'plan-written-needs-reality-check', 'the corrupted member is skipped — fresh validate-plan re-dispatch');
+});
+
+test('F2d(c): a runId-less member cannot relocate its evidence via runtime.stdoutLog — scoping stays pinned to the dispatched run dir', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/f2dc-pin';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-f2dc-pin',
+    docsRef,
+    withHash: true,
+    withReport: false,
+  });
+  // Same tamper family, but the redirect points INSIDE the assignment tree
+  // at a sibling run dir no runner dispatched (runs/02), and the attacker
+  // DELETES the runId so the stdoutLog fallback is the only derivation left.
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_tsk-f2dc-pin');
+  const plantedRunDir = path.join(asgnDir, 'runs', '02');
+  fs.mkdirSync(plantedRunDir, { recursive: true });
+  fs.writeFileSync(path.join(plantedRunDir, 'agent-report.md'), SUBSTANTIVE_REPORT_TEXT);
+  const tampered = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  delete tampered.runId;
+  tampered.status = 'done';
+  tampered.confidence = 'reported';
+  tampered.evidence = { ...tampered.evidence, artifacts: [path.join(plantedRunDir, 'agent-report.md')] };
+  tampered.runtime = { stdoutLog: path.join(plantedRunDir, 'stdout.log') };
+  fs.writeFileSync(resultPath, JSON.stringify(tampered, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-f2dc-pin', docsRef));
+  assert.equal(choice.canAdvanceEdge, false, 'evidence must be read from the dispatched run dir only — the planted sibling report is ignored');
+  assert.equal(choice.reason, 'validate-plan-missing-report-artifact', 'the consuming run dir has no report — stop, never raw recorded-path resolution');
+});

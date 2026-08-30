@@ -598,7 +598,7 @@ test('executeAssignment evidence.json contains dirtyBefore, dirtyAfter, changedF
   assert.ok(typeof evidence.changedFileReasons === 'object', 'changedFileReasons must be an object');
 });
 
-test('classifyRunEvidence: read-only operation cannot be reported without a valid artifact or evidenceRefs (Step 04 §5.4 / P1)', () => {
+test('classifyRunEvidence: read-only operation cannot be reported without a companion report artifact (self-attested evidenceRefs never substitute)', () => {
   // 1. Read-only with bare agent-result.json path in workerArtifacts but no evidenceRefs and no companion report => no-evidence
   const resultBareClaim = classifyRunEvidence({
     exitCode: 0,
@@ -610,7 +610,11 @@ test('classifyRunEvidence: read-only operation cannot be reported without a vali
   assert.deepEqual(resultBareClaim, { status: 'no-evidence', confidence: 'no-evidence' },
     'bare agent-result.json without evidenceRefs or companion report artifact must produce no-evidence');
 
-  // 2. Read-only with claim + evidenceRefs => reported
+  // 2. Read-only with claim + string-only evidenceRefs => no-evidence.
+    // The worker fully controls agent-result.json, so string-only
+    // evidenceRefs (even refs pointing at real files) can never satisfy the
+    // worker-report requirement — only a companion report artifact the
+    // runner detected in the run dir may produce `reported`.
   const resultWithEvidenceRefs = classifyRunEvidence({
     exitCode: 0,
     agentClaim: { status: 'done', summary: 'Checked', evidenceRefs: ['docs/plan.md'] },
@@ -618,7 +622,7 @@ test('classifyRunEvidence: read-only operation cannot be reported without a vali
     changedFiles: [],
     isReadOnlyOperation: true,
   });
-  assert.deepEqual(resultWithEvidenceRefs, { status: 'done', confidence: 'reported' });
+  assert.deepEqual(resultWithEvidenceRefs, { status: 'no-evidence', confidence: 'no-evidence' });
 
   // 3. Read-only with claim + companion agent-report.md => reported
   const resultWithReport = classifyRunEvidence({
@@ -640,6 +644,28 @@ test('classifyRunEvidence: read-only operation cannot be reported without a vali
   });
   assert.deepEqual(resultMutatedReadOnly, { status: 'failed', confidence: 'failed' },
     'read-only operation that mutates repo files must fail closed with status: failed and confidence: failed');
+});
+
+test('classifyRunEvidence: prefixed string evidenceRefs without any companion report artifact never classify reported (red-team)', () => {
+  // A forged claim: prefixed refs (evidence:/diff:/verify:/doc:/...) pass
+  // string checks without any file existing on disk. The worker fully
+  // controls agent-result.json, so string-only evidenceRefs must never
+  // satisfy the worker-report requirement — only a companion report
+  // artifact the runner detected in the run dir may produce `reported`.
+  const resultForgedRefs = classifyRunEvidence({
+    exitCode: 0,
+    agentClaim: {
+      status: 'done',
+      summary: 'Validated',
+      evidenceRefs: ['evidence:plan-validated', 'verify:all-checks-passed', 'doc:plan.md'],
+    },
+    workerArtifacts: ['runs/01/agent-result.json'],
+    changedFiles: [],
+    isReadOnlyOperation: true,
+    cwd: '/nonexistent-cwd-for-red-team-test',
+  });
+  assert.deepEqual(resultForgedRefs, { status: 'no-evidence', confidence: 'no-evidence' },
+    'string-only evidenceRefs must never substitute for an on-disk companion report');
 });
 
 test('classifyRunEvidence: mutating operation cannot be verified without post-run external evidence (Step 04 §5.4)', () => {

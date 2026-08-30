@@ -9,6 +9,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import {
   DEFAULT_DOMAIN,
@@ -16,9 +17,15 @@ import {
   operationsForStage,
 } from '../../state/workflow-stage-graphs.mjs';
 import { resolveContentRoot } from '../../intake/plan.mjs';
-import { buildAssignment } from './assignment.mjs';
+import { buildAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeAssignment, isSubstantiveReportText } from './assignment-runner.mjs';
 import { detectTrunk } from '../worktree.mjs';
+
+// Non-enumerable stamp the cross-pass scan attaches to a consumed runResult:
+// the dispatched member dir the result was physically read from. Evidence
+// scoping derives from this runner-owned location; result.json fields are
+// post-settle writable and never locate evidence.
+const CONSUMING_RUN_DIR = Symbol('fgos:consumingRunDir');
 
 /**
  * Check whether plan.md exists for a given work item.
@@ -104,17 +111,147 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, operation = 'val
         if (targetStage && asgn.stage && asgn.stage !== targetStage) continue;
         if (operation && asgn.operation && asgn.operation !== operation) continue;
 
+        // Dispatched-run membership: only run dirs the runner itself
+        // dispatched (recorded in assignment.json at dispatch time) count as
+        // evidence. A run dir planted in the tree without a dispatch — no
+        // matter how self-consistent its result.json — is skipped, and an
+        // assignment without the manifest fails closed.
+        const dispatchedRuns = Array.isArray(asgn.dispatchedRuns) ? asgn.dispatchedRuns : null;
+        if (!dispatchedRuns) continue;
+        const asgnId = path.basename(asgnDir);
+
         const runsDir = path.join(asgnDir, 'runs');
         if (!fs.existsSync(runsDir)) continue;
 
         const runSubdirs = fs.readdirSync(runsDir);
         for (const runSub of runSubdirs) {
+          if (!dispatchedRuns.includes(runSub)) continue;
           const resultJsonPath = path.join(runsDir, runSub, 'result.json');
           if (!fs.existsSync(resultJsonPath)) continue;
 
+          // Read-back hardening: parse each stored result independently so one
+          // tampered or unreadable result.json can never abort the remaining
+          // runs of the same assignment.
+          let runResult = null;
+          try {
+            runResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+          } catch {
+            continue;
+          }
+          if (!runResult || typeof runResult !== 'object') continue;
+
+          // runId-vs-member identity: the runner writes runId as
+          // `run_<assignmentId>_<runSub>` when it dispatches this member. A
+          // result.json field is post-settle writable, so a present runId that
+          // CONTRADICTS the member it was read from marks the result as
+          // tampered — skip it outright. (An ABSENT runId does not contradict
+          // anything; its evidence is pinned below to this member's own dir.)
+          if (typeof runResult.runId === 'string' && runResult.runId !== '') {
+            if (runResult.runId !== `run_${asgnId}_${runSub}`) continue;
+          }
+
+          // Pin the evidence dir to the dispatched member this result was
+          // read from. Evidence scoping (which report files a consumer may
+          // honor) derives from the runner-owned manifest, never from
+          // result.json fields the worker or a post-settle writer controls.
+          try {
+            Object.defineProperty(runResult, CONSUMING_RUN_DIR, {
+              value: path.join(runsDir, runSub),
+              enumerable: false,
+              configurable: true,
+              writable: false,
+            });
+          } catch {}
+
+          // Read-back re-validation: a claim tampered after settle must not be
+          // consumable cross-pass. The runner enforced this schema at
+          // classification time; re-run the same gate here.
+          if (runResult.agentClaim !== undefined && runResult.agentClaim !== null) {
+            try {
+              if (!validateAgentResultClaim(runResult.agentClaim).valid) continue;
+            } catch {
+              continue;
+            }
+          }
+
+          // Claim-bytes binding: the runner recorded the sha256 of the exact
+          // agent-result.json bytes it classified. Re-read that file and
+          // require BOTH the hash and the parsed content to still match the
+          // stored claim copy — a post-settle edit of either side (flip the
+          // verdict in result.json, or in the worker's own file) breaks the
+          // pairing. A schema-valid result recorded without the binding is
+          // not consumable (fail closed, same stance as the plan hash).
+          if (runResult.agentClaim !== undefined && runResult.agentClaim !== null) {
+            const recordedClaimHash = typeof runResult.claimSha256 === 'string' ? runResult.claimSha256 : '';
+            if (!recordedClaimHash) continue;
+            let storedClaimBytes = null;
+            try {
+              storedClaimBytes = fs.readFileSync(path.join(runsDir, runSub, 'agent-result.json'));
+            } catch {
+              continue;
+            }
+            let actualClaimHash = null;
+            try {
+              actualClaimHash = crypto.createHash('sha256').update(storedClaimBytes).digest('hex');
+            } catch {
+              continue;
+            }
+            if (actualClaimHash !== recordedClaimHash) continue;
+            let storedClaim = null;
+            try {
+              storedClaim = JSON.parse(storedClaimBytes.toString('utf8'));
+            } catch {
+              continue;
+            }
+            if (JSON.stringify(storedClaim) !== JSON.stringify(runResult.agentClaim)) continue;
+          }
+
+          // Recorded evidence refs pointing at repo files must still exist:
+          // a stored verdict whose recorded path evidence has vanished is
+          // dead evidence. A ref resolving inside this assignment's own tree
+          // must exist on its own — mixing one live ref with ghost siblings
+          // must not launder the dead ones through the all-missing backstop.
+          // Refs outside the assignment tree are informational (they may name
+          // repo paths owned by other passes) and keep only the existing
+          // all-missing backstop. Symbolic refs (evidence:/diff:/verify:/
+          // test:) are resolved by the operation's own resolvers, not by
+          // path lookup.
+          const claimRefs = Array.isArray(runResult.agentClaim?.evidenceRefs)
+            ? runResult.agentClaim.evidenceRefs
+            : [];
+          const pathRefs = claimRefs.filter(
+            (r) => typeof r === 'string' && r.trim() !== '' && !/^[a-z0-9_-]+:/i.test(r.trim()),
+          );
+          if (pathRefs.length > 0) {
+            const missingInTreeRef = pathRefs.some((ref) => {
+              let resolved;
+              try {
+                resolved = path.resolve(repoRoot, ref.trim());
+              } catch {
+                return true;
+              }
+              const inTree = resolved === asgnDir || resolved.startsWith(`${asgnDir}${path.sep}`);
+              return inTree && !fs.existsSync(resolved);
+            });
+            if (missingInTreeRef) continue;
+            const allPathRefsMissing = pathRefs.every((ref) => {
+              try {
+                return !fs.existsSync(path.resolve(repoRoot, ref.trim()));
+              } catch {
+                return true;
+              }
+            });
+            if (allPathRefsMissing) continue;
+          }
+
           const stat = fs.statSync(resultJsonPath);
 
-          // Finding 3: Check plan evidence identity (if plan.md was modified after result.json, it's stale)
+          // Plan evidence identity. The mtime comparison stays as a cheap
+          // pre-filter; the authoritative gate is the plan content hash the
+          // runner recorded at dispatch time — mtimes are worker-controllable
+          // (cwd == repoRoot), the recorded hash is not. A stored result
+          // without the dispatch-time anchor is not consumable when plan.md
+          // exists (fail closed).
           if (work?.docsRef && work?.id) {
             const contentRoot = resolveContentRoot(repoRoot, work.id, work.docsRef);
             const planPath = path.join(contentRoot, work.docsRef, 'plan.md');
@@ -123,11 +260,23 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, operation = 'val
               if (planStat.mtimeMs > stat.mtimeMs) {
                 continue;
               }
+              const recordedHash = typeof runResult.planContentHash === 'string' ? runResult.planContentHash : '';
+              if (!recordedHash) {
+                continue;
+              }
+              let currentPlanHash = null;
+              try {
+                currentPlanHash = crypto.createHash('sha256').update(fs.readFileSync(planPath)).digest('hex');
+              } catch {
+                continue;
+              }
+              if (recordedHash !== currentPlanHash) {
+                continue;
+              }
             }
           }
 
           if (stat.mtimeMs > latestMtime) {
-            const runResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
             latestMtime = stat.mtimeMs;
             latestRunResult = runResult;
           }
@@ -455,6 +604,19 @@ export function chooseStageOperation({
           const settledMs = rawTime ? Date.parse(rawTime) : NaN;
           if (Number.isFinite(settledMs) && settledMs > 0 && planStat.mtimeMs > settledMs) {
             effectiveLastRunResult = null;
+          } else if (typeof effectiveLastRunResult.planContentHash === 'string' && effectiveLastRunResult.planContentHash) {
+            // Results carrying the dispatch-time plan content hash must match
+            // the current plan.md even when the settle time postdates the
+            // edit — mtimes line up too easily to be trusted alone.
+            let currentPlanHash = null;
+            try {
+              currentPlanHash = crypto.createHash('sha256').update(fs.readFileSync(planPath)).digest('hex');
+            } catch {
+              currentPlanHash = null;
+            }
+            if (!currentPlanHash || currentPlanHash !== effectiveLastRunResult.planContentHash) {
+              effectiveLastRunResult = null;
+            }
           }
         }
       }
@@ -1114,6 +1276,41 @@ function getArtifactList(runResult) {
   return [];
 }
 
+// The run dir whose evidence a consuming pass may actually read, in trust
+// order:
+// 1. The scan's manifest-pinned dir (the Symbol set by
+//    findLatestAssignmentRunResult from the dispatched member the result was
+//    read from). result.json fields are post-settle writable and never
+//    locate evidence for a scanned result.
+// 2. The result's own runId (run_<assignmentId>_<attempt>; the attempt is
+//    the last '_' segment since assignment ids contain underscores) — the
+//    runner writes this field when it builds a fresh in-pass result. A
+//    PRESENT-but-unusable runId pins the result to NO dir: falling back to
+//    other result.json fields the same writer controls would let a tampered
+//    result relocate its own evidence.
+// 3. Legacy shapes with no runId at all: the dir of the recorded stdout log.
+// Returns null when no trustworthy dir can be derived — callers then see NO
+// report text (missing-report/insufficient stop), never raw recorded-path
+// resolution.
+function consumingRunDirFor(runResult, root) {
+  const pinned = runResult?.[CONSUMING_RUN_DIR];
+  if (typeof pinned === 'string' && pinned !== '') {
+    return pinned;
+  }
+  if (typeof runResult?.runId === 'string' && runResult.runId !== '') {
+    const attempt = runResult.runId.split('_').pop();
+    const asgnId = runResult?.assignmentId ?? runResult?.assignment?.assignmentId;
+    if (asgnId && /^\d+$/.test(attempt)) {
+      return path.join(root, '.fgos', 'assignments', asgnId, 'runs', attempt);
+    }
+    return null;
+  }
+  if (runResult?.runtime?.stdoutLog) {
+    return path.dirname(path.resolve(root, runResult.runtime.stdoutLog));
+  }
+  return null;
+}
+
 export function getReportText(runResult, repoRoot) {
   const artifacts = getArtifactList(runResult);
   if (artifacts.length === 0) {
@@ -1140,23 +1337,31 @@ export function getReportText(runResult, repoRoot) {
 
   if (!reportPath) return null;
 
-  const candidatePaths = [
-    reportPath,
-    path.resolve(root, reportPath),
-  ];
-
-  const asgnId = runResult?.assignmentId ?? runResult?.assignment?.assignmentId ?? (typeof runResult?.runId === 'string' && runResult.runId.startsWith('run_') ? runResult.runId.split('_')[1] : null);
-  if (asgnId) {
-    const asgnDir = path.join(root, '.fgos', 'assignments', asgnId);
-    candidatePaths.push(path.join(asgnDir, 'runs', '01', path.basename(reportPath)));
-    candidatePaths.push(path.join(asgnDir, 'runs', '01', 'agent-report.md'));
+  const consumingDir = consumingRunDirFor(runResult, root);
+  if (!consumingDir) {
+    // No trustworthy run dir: no report text. The report gate then stops as
+    // missing-report/insufficient. Recorded artifact paths are never
+    // resolved raw — the recorded path itself is result.json-writable, and
+    // whoever wrote it also controls whether the planted file exists.
+    return null;
   }
-
-  if (runResult?.runtime?.stdoutLog) {
-    const runDir = path.dirname(path.resolve(root, runResult.runtime.stdoutLog));
-    candidatePaths.push(path.join(runDir, path.basename(reportPath)));
-    candidatePaths.push(path.join(runDir, 'agent-report.md'));
+  // Only the consuming run's own dir counts. A recorded path is honored
+  // when it resolves inside that dir; a bare name is honored as that
+  // dir's file. A recorded path into a sibling run's dir is ignored —
+  // one run's report must never satisfy another run's gate.
+  const candidatePaths = [];
+  let resolvedRecorded = null;
+  try {
+    resolvedRecorded = path.resolve(root, reportPath);
+  } catch {
+    resolvedRecorded = null;
   }
+  const recordedInRun =
+    resolvedRecorded !== null &&
+    (resolvedRecorded === consumingDir || resolvedRecorded.startsWith(`${consumingDir}${path.sep}`));
+  if (recordedInRun) candidatePaths.push(resolvedRecorded);
+  candidatePaths.push(path.join(consumingDir, path.basename(reportPath)));
+  candidatePaths.push(path.join(consumingDir, 'agent-report.md'));
 
   for (const p of candidatePaths) {
     try {

@@ -27,6 +27,7 @@ import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
+import { resolveContentRoot } from '../../intake/plan.mjs';
 
 /**
  * Check if report text is non-empty and contains substantive content (not a placeholder).
@@ -404,17 +405,18 @@ export function classifyRunEvidence({
   }
 
   // Step 04 §5.2: agent-result.json is the structured claim, not evidence by itself.
-  // A read-only operation requires either a companion report artifact (e.g. agent-report.md)
-  // or explicit evidenceRefs in agent-result.json to classify as reported.
+  // A read-only operation classifies as reported only with a companion report
+  // artifact (e.g. agent-report.md) the runner detected in the run dir.
+  // Self-attested evidenceRefs strings never substitute for it: the worker
+  // fully controls agent-result.json, so string refs prove nothing on disk.
   const companionReportArtifacts = workerArtifacts.filter(
     (p) => typeof p === 'string' && !p.endsWith('agent-result.json'),
   );
-  const hasEvidenceRefs = Array.isArray(agentClaim?.evidenceRefs) &&
-    agentClaim.evidenceRefs.some((ref) => isSubstantiveEvidenceRef(ref, { cwd, repoRoot, assignment, work }));
-  const hasWorkerReport = companionReportArtifacts.length > 0 || hasEvidenceRefs;
+  const hasWorkerReport = companionReportArtifacts.length > 0;
 
   if (agentClaim && agentClaim.status === 'done') {
-    // Reported for read-only consult/review when a worker-produced report artifact or evidenceRefs exists.
+    // Reported for read-only consult/review only when a runner-detected
+    // worker-produced report artifact exists.
     if (isReadOnlyOperation) {
       if (hasWorkerReport) {
         return { status: 'done', confidence: 'reported' };
@@ -599,6 +601,25 @@ export async function executeAssignment(assignment, opts = {}) {
   }
   fs.mkdirSync(runDir, { recursive: true });
 
+  // Dispatched-run membership: record every run attempt THIS runner actually
+  // dispatched, appended to assignment.json right after the run dir exists.
+  // assignment.json's assignment fields stay the immutable input per Step 03
+  // §2 — this one key is runner-owned append-only bookkeeping, so cross-pass
+  // consumption can refuse run dirs no runner ever dispatched (a planted
+  // runs/NN directory must never look like evidence of a real run).
+  try {
+    const manifestRaw = JSON.parse(fs.readFileSync(assignmentJsonPath, 'utf8'));
+    const prevDispatched = Array.isArray(manifestRaw.dispatchedRuns) ? manifestRaw.dispatchedRuns : [];
+    const nextDispatched = prevDispatched.includes(attemptStr) ? prevDispatched : [...prevDispatched, attemptStr];
+    fs.writeFileSync(
+      assignmentJsonPath,
+      `${JSON.stringify({ ...manifestRaw, dispatchedRuns: nextDispatched }, null, 2)}\n`,
+    );
+  } catch {
+    // Bookkeeping must never abort a dispatch that already started; a missing
+    // entry only costs this run its cross-pass consumability (fail closed).
+  }
+
   // Step 04 §5.1: pass concrete runDir so worker knows exactly where to write
   // agent-result.json and agent-report.md. Use absolute path to avoid worktree ambiguity.
   const prompt = renderAssignmentPrompt(effectiveAssignment, { cwd, runDir: path.resolve(runDir) });
@@ -610,12 +631,32 @@ export async function executeAssignment(assignment, opts = {}) {
   const dispatchPlanPath = path.join(runDir, 'dispatch-plan.json');
   fs.writeFileSync(dispatchPlanPath, `${JSON.stringify(compiledPlan, null, 2)}\n`);
 
+  // Plan content identity, recorded runner-side BEFORE the worker runs: the
+  // sha256 of the Work's plan.md at dispatch time. Cross-pass consumption
+  // recomputes this hash so a verdict computed against an older plan
+  // revision is never consumed, even when the worker hides the edit by
+  // rewinding file mtimes (the worker controls mtimes; it never controls
+  // this runner-recorded hash).
+  let planContentHash = null;
+  if (effectiveAssignment.workId && opts.work?.docsRef) {
+    try {
+      const planContentRoot = resolveContentRoot(root, effectiveAssignment.workId, opts.work.docsRef);
+      const planInputPath = path.join(planContentRoot, opts.work.docsRef, 'plan.md');
+      if (fs.existsSync(planInputPath)) {
+        planContentHash = crypto.createHash('sha256').update(fs.readFileSync(planInputPath)).digest('hex');
+      }
+    } catch {
+      planContentHash = null;
+    }
+  }
+
   const runMeta = {
     runId,
     assignmentId: effectiveAssignment.assignmentId,
     attempt: attemptNum,
     executorId: effectivePolicy.executorPreference[0],
     ...(compiledPlan ? { dispatchPlanPath: path.relative(root, dispatchPlanPath) } : {}),
+    ...(planContentHash ? { planContentHash } : {}),
     cwd,
     startedAt,
     timeoutMs,
@@ -696,14 +737,27 @@ export async function executeAssignment(assignment, opts = {}) {
   // Step 04 §5.2: validate agent-result.json; invalid schema must produce failed/failed.
   let agentClaim = null;
   let claimInvalid = false;
+  // Claim-bytes binding: the sha256 of the EXACT agent-result.json bytes this
+  // runner classified. result.json records it alongside the claim copy, so
+  // cross-pass consumption can prove the stored claim still matches the
+  // worker's own file — a post-exit edit of either side breaks the pairing.
+  let claimSha256 = null;
   const agentResultExists = fs.existsSync(agentResultPath);
   if (agentResultExists) {
-    let parsedClaim;
+    let claimBytes;
     let parseError = false;
     try {
-      parsedClaim = JSON.parse(fs.readFileSync(agentResultPath, 'utf8'));
+      claimBytes = fs.readFileSync(agentResultPath);
     } catch {
       parseError = true;
+    }
+    let parsedClaim = null;
+    if (!parseError) {
+      try {
+        parsedClaim = JSON.parse(claimBytes.toString('utf8'));
+      } catch {
+        parseError = true;
+      }
     }
     if (parseError) {
       // Malformed JSON: treat as invalid claim (not absent)
@@ -712,6 +766,11 @@ export async function executeAssignment(assignment, opts = {}) {
       const validation = validateAgentResultClaim(parsedClaim);
       if (validation.valid) {
         agentClaim = parsedClaim;
+        try {
+          claimSha256 = crypto.createHash('sha256').update(claimBytes).digest('hex');
+        } catch {
+          claimSha256 = null;
+        }
       } else {
         // Present but invalid schema: fail closed
         claimInvalid = true;
@@ -813,6 +872,8 @@ export async function executeAssignment(assignment, opts = {}) {
     workId: effectiveAssignment.workId,
     executorId: effectivePolicy.executorPreference[0],
     policy: effectivePolicy,
+    ...(planContentHash ? { planContentHash } : {}),
+    ...(claimSha256 ? { claimSha256 } : {}),
     status,
     confidence,
     runtime: {
