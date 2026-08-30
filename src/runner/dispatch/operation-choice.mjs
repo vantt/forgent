@@ -17,8 +17,8 @@ import {
   operationsForStage,
 } from '../../state/workflow-stage-graphs.mjs';
 import { resolveContentRoot } from '../../intake/plan.mjs';
-import { buildAssignment, validateAgentResultClaim } from './assignment.mjs';
-import { executeAssignment, isSubstantiveReportText } from './assignment-runner.mjs';
+import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
+import { executeAssignment, classifyRunEvidence, isSubstantiveReportText } from './assignment-runner.mjs';
 import { detectTrunk } from '../worktree.mjs';
 
 // Non-enumerable stamp the cross-pass scan attaches to a consumed runResult:
@@ -206,6 +206,55 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, operation = 'val
             if (JSON.stringify(storedClaim) !== JSON.stringify(runResult.agentClaim)) continue;
           }
 
+          // Settle-report binding: the runner recorded, at classification
+          // time, every companion report artifact it actually saw, with the
+          // sha256 of its exact bytes. Re-verify every entry on disk: a
+          // report edited, deleted, or planted after settle is not the
+          // evidence the classifier judged — skip the member (fail closed;
+          // legacy pre-binding results lose cross-pass consumability, one
+          // conservative re-dispatch, same stance as the claim binding).
+          // Entries must also resolve inside this member's own dir: the
+          // runner only ever binds reports from the run dir it classified.
+          const settleReports = Array.isArray(runResult.settleReports) ? runResult.settleReports : null;
+          if (!settleReports) continue;
+          const memberDir = path.join(runsDir, runSub);
+          let settleSetValid = true;
+          for (const entry of settleReports) {
+            const rel = entry && typeof entry.path === 'string' ? entry.path : '';
+            const recordedHash = entry && typeof entry.sha256 === 'string' ? entry.sha256 : '';
+            let resolvedEntry = null;
+            if (rel && recordedHash) {
+              try {
+                resolvedEntry = path.resolve(repoRoot, rel);
+              } catch {
+                resolvedEntry = null;
+              }
+            }
+            if (!resolvedEntry || (resolvedEntry !== memberDir && !resolvedEntry.startsWith(`${memberDir}${path.sep}`))) {
+              settleSetValid = false;
+              break;
+            }
+            let settleBytes = null;
+            try {
+              settleBytes = fs.readFileSync(resolvedEntry);
+            } catch {
+              settleSetValid = false;
+              break;
+            }
+            let actualSettleHash = null;
+            try {
+              actualSettleHash = crypto.createHash('sha256').update(settleBytes).digest('hex');
+            } catch {
+              settleSetValid = false;
+              break;
+            }
+            if (actualSettleHash !== recordedHash) {
+              settleSetValid = false;
+              break;
+            }
+          }
+          if (!settleSetValid) continue;
+
           // Recorded evidence refs pointing at repo files must still exist:
           // a stored verdict whose recorded path evidence has vanished is
           // dead evidence. A ref resolving inside this assignment's own tree
@@ -274,6 +323,52 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, operation = 'val
                 continue;
               }
             }
+          }
+
+          // Read-back re-derivation: stored status/confidence live in the
+          // same result.json as every other attacker-writable field, so they
+          // are advisory only. Re-run the classifier over the hash-verified
+          // evidence — the byte-bound claim and the settle-bound reports —
+          // and let the derived values drive every consumption decision. A
+          // stored flip with an empty or failed settle set can never reach
+          // reported/READY.
+          //
+          // Monotonic re-derivation: the settle-time verdict is the floor.
+          // Re-derivation reads runtime.exitCode and evidence.changedFiles
+          // from the same attacker-writable result.json, and inputs the
+          // result never persisted (the read-only dirty-mutation flag) are
+          // simply absent — so a derived pair MORE advancing than what the
+          // runner recorded at settle is a forged or lost fact, never new
+          // truth. An honestly settled failed run (non-zero/timeout exit,
+          // dirty mutation) must never re-derive upward to done/reported:
+          // the stored verdict stands and the member stops per failed
+          // semantics. Downgrades and equal derivations still apply — that
+          // is what makes a stored flip inert.
+          const runtimeInfo = runResult.runtime && typeof runResult.runtime === 'object' ? runResult.runtime : {};
+          const derived = classifyRunEvidence({
+            exitCode: typeof runtimeInfo.exitCode === 'number' ? runtimeInfo.exitCode : null,
+            signal: typeof runtimeInfo.signal === 'string' ? runtimeInfo.signal : null,
+            isTimeout: runtimeInfo.isTimeout === true,
+            agentClaim: runResult.agentClaim ?? null,
+            claimInvalid: false,
+            workerArtifacts: [
+              ...settleReports.map((e) => e.path),
+              path.relative(repoRoot, path.join(runsDir, runSub, 'agent-result.json')),
+            ],
+            changedFiles: Array.isArray(runResult.evidence?.changedFiles)
+              ? runResult.evidence.changedFiles.filter((f) => typeof f === 'string')
+              : [],
+            hasDirtyBeforeMutation: false,
+            isReadOnlyOperation: isReadOnlyAssignment(asgn),
+            repoRoot,
+          });
+          const settlesAdvance =
+            runResult.status === 'done' && (runResult.confidence === 'reported' || runResult.confidence === 'verified');
+          const derivedAdvances =
+            derived.status === 'done' && (derived.confidence === 'reported' || derived.confidence === 'verified');
+          if (!derivedAdvances || settlesAdvance) {
+            runResult.status = derived.status;
+            runResult.confidence = derived.confidence;
           }
 
           if (stat.mtimeMs > latestMtime) {
@@ -1311,32 +1406,70 @@ function consumingRunDirFor(runResult, root) {
   return null;
 }
 
+// Report-artifact name predicate: control-plane files and logs never count;
+// markdown or report-named files do. Shared by getReportText and
+// hasWorkerReportArtifact.
+function isReportArtifactPath(art) {
+  if (typeof art !== 'string') return false;
+  const base = path.basename(art);
+  if (
+    base === 'agent-result.json' ||
+    base === 'run.json' ||
+    base === 'exit.json' ||
+    base === 'evidence.json' ||
+    base === 'assignment.json' ||
+    base === 'dispatch-plan.json' ||
+    base === 'stdout.log' ||
+    base === 'stderr.log'
+  ) {
+    return false;
+  }
+  return base.endsWith('.md') || /report|feasibility|validation/i.test(base);
+}
+
 export function getReportText(runResult, repoRoot) {
   const artifacts = getArtifactList(runResult);
   if (artifacts.length === 0) {
     return null;
   }
   const root = repoRoot || process.cwd();
-  const reportPath = artifacts.find((art) => {
-    if (typeof art !== 'string') return false;
-    const base = path.basename(art);
-    if (
-      base === 'agent-result.json' ||
-      base === 'run.json' ||
-      base === 'exit.json' ||
-      base === 'evidence.json' ||
-      base === 'assignment.json' ||
-      base === 'dispatch-plan.json' ||
-      base === 'stdout.log' ||
-      base === 'stderr.log'
-    ) {
-      return false;
+  const reportCandidates = artifacts.filter(isReportArtifactPath);
+  if (reportCandidates.length === 0) return null;
+
+  const settleSet = Array.isArray(runResult?.settleReports) ? runResult.settleReports : null;
+  if (settleSet) {
+    // Reports are bound at settle: only files in the settle set (hash-verified
+    // by the cross-pass scan; runner-recorded for fresh in-pass results) may
+    // supply report text. Recorded artifact paths outside the set — and the
+    // consuming-dir fallbacks below — are ignored: a report planted or edited
+    // after settle is not the evidence the classifier judged, and dir-level
+    // fallbacks would read it anyway.
+    const allowed = new Set();
+    for (const entry of settleSet) {
+      if (!entry || typeof entry.path !== 'string') continue;
+      try {
+        allowed.add(path.resolve(root, entry.path));
+      } catch {}
     }
-    return base.endsWith('.md') || /report|feasibility|validation/i.test(base);
-  });
+    if (allowed.size === 0) return null;
+    for (const candidate of reportCandidates) {
+      let resolvedCandidate = null;
+      try {
+        resolvedCandidate = path.resolve(root, candidate);
+      } catch {
+        resolvedCandidate = null;
+      }
+      if (resolvedCandidate === null || !allowed.has(resolvedCandidate)) continue;
+      try {
+        if (fs.existsSync(resolvedCandidate) && fs.statSync(resolvedCandidate).isFile()) {
+          return fs.readFileSync(resolvedCandidate, 'utf8');
+        }
+      } catch {}
+    }
+    return null;
+  }
 
-  if (!reportPath) return null;
-
+  const reportPath = reportCandidates[0];
   const consumingDir = consumingRunDirFor(runResult, root);
   if (!consumingDir) {
     // No trustworthy run dir: no report text. The report gate then stops as
@@ -1386,23 +1519,7 @@ export function hasWorkerReportArtifact(runResult, repoRoot) {
   if (artifacts.length === 0) {
     return false;
   }
-  const hasReportPath = artifacts.some((art) => {
-    if (typeof art !== 'string') return false;
-    const base = path.basename(art);
-    if (
-      base === 'agent-result.json' ||
-      base === 'run.json' ||
-      base === 'exit.json' ||
-      base === 'evidence.json' ||
-      base === 'assignment.json' ||
-      base === 'dispatch-plan.json' ||
-      base === 'stdout.log' ||
-      base === 'stderr.log'
-    ) {
-      return false;
-    }
-    return base.endsWith('.md') || /report|feasibility|validation/i.test(base);
-  });
+  const hasReportPath = artifacts.some(isReportArtifactPath);
   if (!hasReportPath) return false;
 
   const text = getReportText(runResult, repoRoot);

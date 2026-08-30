@@ -46,7 +46,7 @@ green without weakening assertions. See `current-cell.md`.
 |---|---|---|
 | 6.0 | Reconcile in-flight review-item verdict routing to green (blocking fix) | done |
 | 6.1 | planning.validate-plan fake executor happy path | done |
-| 6.2 | planning.validate-plan negative cases | open |
+| 6.2 | planning.validate-plan negative cases | done |
 | 6.3 | planning.validate-plan live smoke | pending |
 | 6.4 | executing.review-item fake executor | pending |
 | 6.5 | executing.scout-blast-radius read-only researcher | pending |
@@ -61,3 +61,22 @@ artifacts, inline-text evidence removed). Tests: 5 new negatives, 14 honest
 re-groundings (1 documented assertion-contract change). Battery all green.
 Deferred-hardening list lives in
 `step-06-cell-0-reconcile-review-item.md` close-out section.
+
+## Cell 6.2 Close Summary (2026-08-30)
+
+Tests-first red-team hardening campaign, 5 rounds: round 0 closes the 3
+proven Cell 6.1 exploits (companion-report-only classification,
+runner-computed `planContentHash`, read-back re-validation); rounds 1-4
+close the Cell 6.2 red-team exploits (claimSha256 + content compare,
+dispatchedRuns manifest, manifest-pinned Symbol evidence scoping, settle-bound
+`settleReports` + read-back re-derivation, monotonic re-derivation floor).
+All RED tests verified red before each fix; no weakened assertions; no new
+modules; `loop.mjs` untouched. Battery: operation-choice 118/118, loop
+101/101 (cell 6.1 happy path 3/3), runresult 23/23, dispatch 12/12, e2e 15/15,
+fgos-stage 19/19; red-team harnesses all at documented outcomes. Residual:
+post-exit .fgos/ forgery inside accepted user decision A (semi-trusted
+workers; minimal remaining forge = three result.json fields or the settle-set
+class) — trust-boundary options B/C DEFERRED TO STEP 7. Deferred-hardening
+bucket (persist dirty signal at settle for write-ops, plan hash binds
+plan.md only, out-tree dead-ref hygiene, execFileSync timeout, rev-list perf)
+lives in `step-06-cell-2-validate-plan-negative.md` Gaps.

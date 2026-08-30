@@ -3228,6 +3228,50 @@ process.exit(0);
   return scriptPath;
 }
 
+/** READY-claim executor that writes the claim + a substantive report and
+ * THEN exits 1: the honest settle classification is failed/failed (runtime
+ * exitCode 1) with the report settle-bound — the shape a single unbound
+ * runtime.exitCode flip would erase cross-pass. */
+function writeReadyFailExitExecutor(scriptDir) {
+  const scriptPath = path.join(scriptDir, 'validate-plan-ready-fail-exit-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import path from 'node:path';
+const prompt = process.argv.slice(2).join(' ');
+const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+if (match) {
+  const runDir = path.dirname(match[1]);
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(runDir, 'agent-report.md'),
+    '# Validation Report\\nReality gate: all six dimensions PASS with citations (src/index.mjs).\\nFeasibility matrix: the medium risk row is backed by src/index.mjs.\\nConclusion: the plan is sound and ready.\\n',
+  );
+  fs.writeFileSync(
+    path.join(runDir, 'agent-result.json'),
+    JSON.stringify({
+      status: 'done',
+      verdict: 'READY',
+      summary: 'Plan sound and ready.',
+      realityGate: {
+        modeFit: { status: 'PASS', citation: 'src/index.mjs' },
+        repoFit: { status: 'PASS', citation: 'src/index.mjs' },
+        assumptions: { status: 'PASS', citation: 'src/index.mjs' },
+        smallerPath: { status: 'PASS', citation: 'src/index.mjs' },
+        proofSurface: { status: 'PASS', citation: 'src/index.mjs' },
+        impactAnalysisPosture: { status: 'PASS', citation: 'src/index.mjs' },
+      },
+      feasibilityMatrix: [{ risk: 'medium risk', backing: 'src/index.mjs' }],
+    }),
+  );
+}
+process.exit(1);
+`,
+  );
+  return scriptPath;
+}
+
 /** Full work-record snapshot for the negative tests: stage/status assertions
  * alone would miss any other record mutation a forged artifact could sneak
  * in, so every Cell 6.2 negative test compares the WHOLE record before and
@@ -3613,4 +3657,92 @@ test('F2d(c) composed: a result.json-only tamper cannot relocate evidence to a p
   assert.equal(item.stage, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the redirect-tamper pass must not mutate any work-record field');
+});
+
+test('P4a composed: a planted pinned-dir report and result.json field edits cannot forge a READY verdict — Work stays untouched', async () => {
+  const { repoRoot, dir, cfg, worktreeDir, id, docsRef } = setupValidatePlanFixture({ planModeLine: 'Mode: tiny\n', executorFactory: writeReadyNoReportExecutor });
+  const itemBefore = readWorkSnapshot(dir, id);
+
+  // Honest pass 1: the worker writes a READY claim but no report —
+  // classified no-evidence, the report gate stops the edge, Work untouched.
+  await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+  const first = cell62RunDirs(repoRoot);
+  assert.deepEqual(first.runs, ['01']);
+
+  // Post-settle attack, three files: (1) plant a substantive report INSIDE
+  // the pinned dispatched dir (the runner never classified it — not in the
+  // settle set), (2) edit plan.md to V2 tiny with a rewound mtime, (3)
+  // result.json FIELD EDITS ONLY — recompute the plan hash for V2, flip
+  // status/confidence, point evidence.artifacts at the planted report. The
+  // agentClaim copy and agent-result.json are untouched, so the claim-bytes
+  // binding still holds.
+  fs.writeFileSync(path.join(first.runsDir, '01', 'agent-report.md'), '# Validation Report\nReality gate: all six dimensions PASS with citations (src/index.mjs).\nFeasibility matrix: the medium risk row is backed by src/index.mjs.\nConclusion: the plan is sound and ready.\n');
+  const planPath = path.join(repoRoot, docsRef, 'plan.md');
+  const planV2 = `${fs.readFileSync(planPath, 'utf8')}<!-- V2: unvalidated edit -->\n`;
+  fs.writeFileSync(planPath, planV2);
+  const resultPath = path.join(first.runsDir, '01', 'result.json');
+  const res = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  fs.writeFileSync(resultPath, JSON.stringify({
+    ...res,
+    status: 'done',
+    confidence: 'reported',
+    planContentHash: crypto.createHash('sha256').update(planV2).digest('hex'),
+    evidence: { ...res.evidence, artifacts: [
+      path.join('.fgos', 'assignments', first.asgnId, 'runs', '01', 'agent-report.md'),
+      path.join('.fgos', 'assignments', first.asgnId, 'runs', '01', 'agent-result.json'),
+    ] },
+  }, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+  const older = new Date(Date.now() - 60000);
+  fs.utimesSync(planPath, older, older);
+
+  // The planted report is not in the settle set and the flipped stored
+  // fields are advisory: the member re-derives to no-evidence and the
+  // driver stops without dispatching a fresh run.
+  const secondLogs = [];
+  await runOnce({ repoRoot, config: cfg, worktreeDir, log: (l) => secondLogs.push(l) });
+
+  const second = cell62RunDirs(repoRoot);
+  assert.deepEqual(second.runs, ['01'], 'a forged READY verdict must never be consumed and must not trigger a dispatch on forged evidence');
+  assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'planted pinned-dir evidence must never feed the planning edge');
+
+  const item = listWork(dir).work[id];
+  assert.equal(item.stage, 'planning');
+  assert.equal(item.status, 'todo');
+  assert.deepEqual(item, itemBefore, 'the pinned-dir plant pass must not mutate any work-record field');
+});
+
+test('S3a composed: a single runtime.exitCode flip cannot erase a settle-classified failed run — Work stays untouched', async () => {
+  const { repoRoot, dir, cfg, worktreeDir, id } = setupValidatePlanFixture({ planModeLine: 'Mode: tiny\n', executorFactory: writeReadyFailExitExecutor });
+  const itemBefore = readWorkSnapshot(dir, id);
+
+  // Honest pass 1: valid READY claim + substantive report, then exit 1 —
+  // classified failed/failed, the report is settle-bound, Work untouched.
+  await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
+  const first = cell62RunDirs(repoRoot);
+  assert.deepEqual(first.runs, ['01']);
+
+  // One result.json field edit: runtime.exitCode 1 -> 0 (claim bytes, settle
+  // set, plan hash, stored status/confidence all untouched), future mtime.
+  const resultPath = path.join(first.runsDir, '01', 'result.json');
+  const res = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  assert.equal(res.status, 'failed', 'pass 1 settles as failed — the exploit only works if the stored verdict is honest');
+  fs.writeFileSync(resultPath, JSON.stringify({ ...res, runtime: { ...res.runtime, exitCode: 0 } }, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  // The settle-time failed verdict stands: the member is consumed as failed,
+  // the driver stops per failed semantics — no dispatch, no advance.
+  const secondLogs = [];
+  await runOnce({ repoRoot, config: cfg, worktreeDir, log: (l) => secondLogs.push(l) });
+
+  const second = cell62RunDirs(repoRoot);
+  assert.deepEqual(second.runs, ['01'], 'a failed RunResult must never be re-derived into a READY verdict — no dispatch, no advance');
+  assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'a re-derived failed verdict must never feed the planning edge');
+
+  const item = listWork(dir).work[id];
+  assert.equal(item.stage, 'planning');
+  assert.equal(item.status, 'todo');
+  assert.deepEqual(item, itemBefore, 'the exitCode-flip pass must not mutate any work-record field');
 });

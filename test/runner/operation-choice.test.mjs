@@ -4047,7 +4047,7 @@ const READY_CLAIM_GATES = {
  * runner records before the worker runs, the runner-owned dispatched-run
  * manifest in assignment.json, and the claim-bytes binding (sha256 of the
  * exact agent-result.json bytes the runner classified). */
-function seedStoredValidatePlanResult(tempDir, { id, docsRef, planContent = PLAN_V1_CONTENT, withHash = false, withBinding = true, withReport = true, claimOverride = null, resultExtra = {}, manifest = ['01'] } = {}) {
+function seedStoredValidatePlanResult(tempDir, { id, docsRef, planContent = PLAN_V1_CONTENT, withHash = false, withBinding = true, withReport = true, claimOverride = null, resultExtra = {}, manifest = ['01'], failedExit = null } = {}) {
   const docsDir = path.join(tempDir, docsRef);
   fs.mkdirSync(docsDir, { recursive: true });
   const planPath = path.join(docsDir, 'plan.md');
@@ -4064,8 +4064,17 @@ function seedStoredValidatePlanResult(tempDir, { id, docsRef, planContent = PLAN
     operation: 'validate-plan',
     dispatchedRuns: manifest,
   }));
+  // Settle-report binding: the runner records every companion report artifact
+  // it actually classified, with the sha256 of its exact bytes. An honest
+  // no-report run records an EMPTY settle set — the binding of "the classifier
+  // saw no report".
+  const settleReports = [];
   if (withReport) {
     fs.writeFileSync(path.join(runDir, 'agent-report.md'), SUBSTANTIVE_REPORT_TEXT);
+    settleReports.push({
+      path: path.relative(tempDir, path.join(runDir, 'agent-report.md')),
+      sha256: crypto.createHash('sha256').update(SUBSTANTIVE_REPORT_TEXT).digest('hex'),
+    });
   }
 
   const agentClaim = claimOverride ?? {
@@ -4083,10 +4092,16 @@ function seedStoredValidatePlanResult(tempDir, { id, docsRef, planContent = PLAN
   const resultJson = {
     runId: `run_${asgnId}_01`,
     assignmentId: asgnId,
-    status: 'done',
-    confidence: withReport ? 'reported' : 'no-evidence',
+    // failedExit != null mirrors the honest settle shape the runner records
+    // for a process that exited non-zero (or timed out, exit 124) after
+    // writing a valid claim + report: classified failed/failed, runtime
+    // carries the recorded exitCode, the settle set still binds the report.
+    status: failedExit != null ? 'failed' : 'done',
+    confidence: failedExit != null ? 'failed' : (withReport ? 'reported' : 'no-evidence'),
     evidence: { artifacts: withReport ? [path.join(runDir, 'agent-report.md')] : [path.join(runDir, 'agent-result.json')], changedFiles: [], tests: [] },
     agentClaim,
+    settleReports,
+    ...(failedExit != null ? { runtime: { exitCode: failedExit, stdoutLog: path.relative(tempDir, path.join(runDir, 'stdout.log')), stderrLog: path.relative(tempDir, path.join(runDir, 'stderr.log')) } } : {}),
     ...(withBinding ? { claimSha256: crypto.createHash('sha256').update(claimBytes).digest('hex') } : {}),
     ...resultExtra,
   };
@@ -4515,5 +4530,217 @@ test('F2d(c): a runId-less member cannot relocate its evidence via runtime.stdou
 
   const choice = choosePlanning(tempDir, planningWorkFor('tsk-f2dc-pin', docsRef));
   assert.equal(choice.canAdvanceEdge, false, 'evidence must be read from the dispatched run dir only — the planted sibling report is ignored');
-  assert.equal(choice.reason, 'validate-plan-missing-report-artifact', 'the consuming run dir has no report — stop, never raw recorded-path resolution');
+  // Assertion-contract change (round 3): with read-back re-derivation, the
+  // flipped stored confidence is inert — the empty settle set re-derives
+  // no-evidence, which stops BEFORE the report-artifact gate (previously
+  // this asserted 'validate-plan-missing-report-artifact' with the stored
+  // reported confidence still authoritative). chooseStageOperation maps the
+  // interpretation's no-evidence stop to its own surface reason — same
+  // stop, one level up.
+  assert.equal(choice.reason, 'validation-no-evidence-do-not-advance-work', 're-derivation from the empty settle set classifies the run no-evidence — stored fields are advisory');
+});
+
+test('P4a: a planted pinned-dir report plus result.json-only field edits cannot forge a READY verdict — evidence derives from the settle-bound set', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/p4a-plant';
+  // Honest pass 1: READY claim, NO report — classified no-evidence, claim
+  // bytes bound, settle set empty.
+  const { resultPath, runDir } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-p4a-plant',
+    docsRef,
+    withHash: true,
+    withReport: false,
+  });
+  // The P4a chain: (1) plant a substantive report INSIDE the pinned dir, (2)
+  // edit plan.md to V2 tiny with a rewound mtime, (3) result.json field edits
+  // ONLY — recompute the plan hash for V2, flip status/confidence, point
+  // evidence.artifacts at the planted report. agentClaim and the worker's own
+  // agent-result.json are untouched, so the claim-bytes binding still holds.
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), SUBSTANTIVE_REPORT_TEXT);
+  const planPath = path.join(tempDir, docsRef, 'plan.md');
+  fs.appendFileSync(planPath, 'Mode: tiny\n');
+  fs.utimesSync(planPath, new Date(Date.now() - 60000), new Date(Date.now() - 60000));
+  const tampered = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  tampered.planContentHash = crypto.createHash('sha256').update(fs.readFileSync(planPath)).digest('hex');
+  tampered.status = 'done';
+  tampered.confidence = 'reported';
+  tampered.evidence = {
+    ...tampered.evidence,
+    artifacts: [path.join(runDir, 'agent-report.md'), path.join(runDir, 'agent-result.json')],
+  };
+  fs.writeFileSync(resultPath, JSON.stringify(tampered, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-p4a-plant', docsRef));
+  assert.equal(choice.canAdvanceEdge, false, 'a report the classifier never bound at settle can never satisfy the report gate');
+  // chooseStageOperation maps the interpretation's no-evidence stop to its
+  // own surface reason — same stop, one level up.
+  assert.equal(choice.reason, 'validation-no-evidence-do-not-advance-work', 're-derivation over the empty settle set classifies the run no-evidence — stored fields are advisory');
+});
+
+test('P4a: a settle-bound report edited after settle fails the byte binding — the member is skipped, never consumed', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/p4a-drift';
+  const { runDir } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-p4a-drift',
+    docsRef,
+    withHash: true,
+    withReport: true,
+  });
+  // Post-settle drift: the bound report's bytes change after the runner
+  // classified them, so the recorded settle hash no longer matches disk.
+  fs.appendFileSync(path.join(runDir, 'agent-report.md'), '\nDrifted after settle.\n');
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-p4a-drift', docsRef));
+  assert.equal(choice.canAdvanceEdge, false, 'settle-bound evidence that no longer matches its recorded bytes must never be consumed');
+  assert.equal(choice.reason, 'plan-written-needs-reality-check', 'the drift-bound member is skipped — fresh validate-plan re-dispatch');
+});
+
+test('P4a: a confidence/status flip in result.json is never authoritative — an empty settle set derives no-evidence even with a planted report present', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/p4a-flip';
+  const { resultPath, runDir } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-p4a-flip',
+    docsRef,
+    withHash: true,
+    withReport: false,
+  });
+  // Field-only flip, no plan edit: plant the report in the pinned dir and
+  // flip the unbound status/confidence fields. Even with the planted file
+  // physically present, the settle set (empty) decides the classification.
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), SUBSTANTIVE_REPORT_TEXT);
+  const tampered = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  tampered.status = 'done';
+  tampered.confidence = 'reported';
+  tampered.evidence = { ...tampered.evidence, artifacts: [path.join(runDir, 'agent-report.md'), path.join(runDir, 'agent-result.json')] };
+  fs.writeFileSync(resultPath, JSON.stringify(tampered, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-p4a-flip', docsRef));
+  assert.equal(choice.canAdvanceEdge, false, 'stored confidence fields are advisory — the settle set decides');
+  // chooseStageOperation maps the interpretation's no-evidence stop to its
+  // own surface reason — same stop, one level up.
+  assert.equal(choice.reason, 'validation-no-evidence-do-not-advance-work', 'the empty settle set derives no-evidence regardless of the stored flip');
+});
+
+test('S3a: an exitCode field flip on a settle-classified failed run never re-derives it to done/reported — the settle verdict stands', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  // Honest settle shape: the process wrote a valid READY claim + substantive
+  // report, then exited 1 — classified failed/failed at settle, report bound.
+  const docsRef = 'docs/history/s3a-exit-flip';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-s3a-exit-flip',
+    docsRef,
+    withHash: true,
+    withReport: true,
+    failedExit: 1,
+  });
+  // One result.json field edit: runtime.exitCode 1 -> 0. Claim bytes, settle
+  // set, plan hash, stored status/confidence all honest.
+  const tampered = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  tampered.runtime = { ...tampered.runtime, exitCode: 0 };
+  fs.writeFileSync(resultPath, JSON.stringify(tampered, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-s3a-exit-flip', docsRef));
+  assert.equal(choice.canAdvanceEdge, false, 'a failed RunResult must never advance Work — re-derivation may not erase a recorded failure');
+  assert.equal(choice.reason, 'validation-failed-do-not-advance-work', 'the settle-time failed verdict stands when the derived pair would ascend');
+});
+
+test('S3b: deleting runtime.exitCode cannot erase a settle-classified failure', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/s3b-exit-delete';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-s3b-exit-delete',
+    docsRef,
+    withHash: true,
+    withReport: true,
+    failedExit: 1,
+  });
+  const tampered = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  delete tampered.runtime.exitCode;
+  fs.writeFileSync(resultPath, JSON.stringify(tampered, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-s3b-exit-delete', docsRef));
+  assert.equal(choice.canAdvanceEdge, false, 'an absence the attacker created is not the absence of a failure');
+  assert.equal(choice.reason, 'validation-failed-do-not-advance-work', 'deleting the failure signal cannot upgrade the settle-time failed verdict');
+});
+
+test('S3e: a timed-out run whose exitCode flips 124 -> 0 stays failed — the timeout is never erased by one field', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/s3e-timeout';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-s3e-timeout',
+    docsRef,
+    withHash: true,
+    withReport: true,
+    failedExit: 124,
+  });
+  const tampered = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  tampered.runtime = { ...tampered.runtime, exitCode: 0 };
+  fs.writeFileSync(resultPath, JSON.stringify(tampered, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-s3e-timeout', docsRef));
+  assert.equal(choice.canAdvanceEdge, false, 'a timed-out run re-written as exit 0 must not re-derive to done/reported');
+  assert.equal(choice.reason, 'validation-failed-do-not-advance-work', 'the settle-time failed verdict survives the exitCode rewrite');
+});
+
+test('reviewer LOW: a stored failed result from a read-only dirty mutation never re-derives upward — the unpersisted dirty signal cannot be manufactured post-settle', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/s3-dirty-mutation';
+  // Honest settle shape with ZERO tampering: exit 0, valid claim + bound
+  // report, but the read-only worker mutated a pre-dirty file at run time
+  // (hasDirtyBeforeMutation true) so the classifier recorded failed/failed.
+  // That flag is not persisted in result.json, so plain re-derivation would
+  // lose it — the settle verdict must stand instead.
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-s3-dirty',
+    docsRef,
+    withHash: true,
+    withReport: true,
+    failedExit: 0,
+  });
+  // Deterministic mtime order only — no field edit: the stored pair stays
+  // the honest failed/failed the runner recorded.
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-s3-dirty', docsRef));
+  assert.equal(choice.canAdvanceEdge, false, 'a settle-classified failed run stays failed even when the derivation inputs alone would call it reported');
+  assert.equal(choice.reason, 'validation-failed-do-not-advance-work', 'the lost dirty-mutation fact may not upgrade the recorded failed verdict');
 });

@@ -781,20 +781,39 @@ export async function executeAssignment(assignment, opts = {}) {
   // Build worker artifact list (agent-report.md and agent-result.json are worker-produced).
   // Control-plane files (result.json, evidence.json, etc.) are never listed here.
   const workerArtifacts = [];
+  // Settle-report binding: hash the EXACT bytes of every companion report
+  // artifact the classifier will count. result.json records the settle set,
+  // so cross-pass consumption can prove each report is still the bytes that
+  // were classified — a report planted or edited after settle is not in the
+  // set (or no longer matches) and can never satisfy a report gate. An
+  // honest no-report run records an empty settle set.
+  const settleReports = [];
   const agentReportExists = fs.existsSync(agentReportPath);
   if (agentReportExists) {
     let reportValid = false;
+    let reportSha256 = null;
     try {
-      const content = fs.readFileSync(agentReportPath, 'utf8');
-      reportValid = isSubstantiveReportText(content);
+      const reportBytes = fs.readFileSync(agentReportPath);
+      reportValid = isSubstantiveReportText(reportBytes.toString('utf8'));
+      if (reportValid) {
+        try {
+          reportSha256 = crypto.createHash('sha256').update(reportBytes).digest('hex');
+        } catch {
+          reportSha256 = null;
+        }
+      }
     } catch {
       reportValid = false;
     }
+    const reportRelPath = path.relative(root, agentReportPath);
     workerArtifacts.push({
-      path: path.relative(root, agentReportPath),
+      path: reportRelPath,
       kind: 'agent-report',
       valid: reportValid,
     });
+    if (reportValid && reportSha256) {
+      settleReports.push({ path: reportRelPath, sha256: reportSha256 });
+    }
   }
   if (agentResultExists) {
     workerArtifacts.push({
@@ -874,6 +893,7 @@ export async function executeAssignment(assignment, opts = {}) {
     policy: effectivePolicy,
     ...(planContentHash ? { planContentHash } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
+    settleReports,
     status,
     confidence,
     runtime: {
