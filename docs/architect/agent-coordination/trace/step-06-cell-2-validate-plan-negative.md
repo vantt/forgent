@@ -1,0 +1,110 @@
+# Cell 6.2 — planning.validate-plan Negative Cases + Red-Team Hardening
+
+Status: done
+Date: 2026-08-30
+Cell brief: `current-cell.md` (Cell 6.2)
+
+## Goal
+
+Prove validate-plan fails safe and close the 3 proven Cell 6.1 red-team exploits, tests first: (1) string-only evidenceRefs classifying `reported`; (2) cross-pass staleness defeated by mtime manipulation; (3) tampered stored results consumed cross-pass. Fix round 1 then closes the Cell 6.2 red-team exploits: forged result.json (F2d), schema-valid verdict flip (F2c), mixed dead evidence refs (F4b). Harness: /tmp/redteam-6-2/attack-6-2.mjs. Fix round 2 closes the reviewer-found stdoutLog evidence redirect (review NEW-HOLE (c)). Harnesses: /tmp/redteam-6-2/reattack-6-2-r1.mjs, /tmp/redteam-6-2/reattack-ra3-control.mjs.
+
+## Round 0 — exploit -> test -> fix mapping
+
+### Exploit 1 — self-attested evidenceRefs classified `reported`
+
+- RED tests (run before any production change): `classifyRunEvidence: prefixed string evidenceRefs without any companion report artifact never classify reported (red-team)` (assignment-runresult.test.mjs) — actual `{done, reported}`; `Cell 6.2 red-team: string-only evidenceRefs ... never classify reported nor advance Work` (loop.test.mjs) — actual confidence `reported`. Collateral: baseline `...cannot be reported without a valid artifact or evidenceRefs` part 2 asserted the exploit itself (evidenceRefs => reported).
+- Fix (assignment-runner.mjs `classifyRunEvidence`): `hasWorkerReport = companionReportArtifacts.length > 0` — the `|| hasEvidenceRefs` arm and its `isSubstantiveEvidenceRef` call are gone; only a runner-detected companion report artifact (anything but agent-result.json in workerArtifacts) produces `reported`.
+- Re-grounding (assertion-contract change of record): the baseline test is renamed `...cannot be reported without a companion report artifact` and its part 2 now expects `no-evidence`; `isSubstantiveEvidenceRef` stays exported (public contract) but has no internal caller left.
+- Boundary note: driver-level consumption was ALREADY defended in depth (`validate-plan-missing-report-artifact` stop), so the composed test's RED signal is the recorded confidence; the classification hole is the fix.
+
+### Exploit 2 — cross-pass staleness (mtime guards are worker-controllable)
+
+- RED tests (unit, operation-choice.test.mjs, all run red before fix): `...plan content hash mismatches the current plan.md is never consumed cross-pass` (actual: consumed); `...recorded without a plan content hash is not consumed when plan.md exists` (fail-closed on missing anchor, actual: consumed); `in-memory ... mismatched plan content hash is not consumed even when its settle time postdates the plan edit`; loop: `...an mtime-hidden plan.md edit is still caught by the recorded plan content hash` (utimesSync-rewound plan.md; V1 verdict was consumed).
+- Fix: dispatch side (assignment-runner.mjs `executeAssignment`) computes `planContentHash` = sha256(plan.md via `resolveContentRoot`) BEFORE spawning the worker, into `run.json` + `result.json` (the worker never computes it). Consumption (`findLatestAssignmentRunResult`): mtime stays a cheap pre-filter; with plan.md present a result is consumable ONLY with a matching `planContentHash` — missing hash fails closed. In-memory staleness branch: same hash check when the field is carried.
+- Same-content consume preserved (contract guard) before AND after; cell 6.1 3/3 green. Honest already-green: the plain-edit variant was green before the fix (the mtime guard catches un-hidden edits).
+
+### Exploit 3 — read-back re-validation
+
+- RED tests (run before fix): `tampered stored validate-plan result with a schema-broken agentClaim is never consumed cross-pass` (unit); `...whose recorded evidence refs point at missing files is never consumed cross-pass` (unit); `Cell 6.2 read-back tamper: ...` (loop) — all actual: consumed (the loop variant fed the planning edge).
+- Fix (operation-choice.mjs `findLatestAssignmentRunResult`): per-run `JSON.parse` in its own try (one tampered result.json can no longer abort sibling runs); `validateAgentResultClaim` re-run on the stored claim; recorded unprefixed path refs must still exist (ALL missing => skip); unreadable/non-object results are never consumed.
+- Honest already-green variant: `...a deleted agent-report.md is never consumed cross-pass` (loop) — interpretation re-reads the report from disk. Test pins it.
+
+### Tests 4-6 (documented honestly — all already-green, no production change)
+
+- No-evidence stop (executor writes nothing): `no-evidence/no-evidence`, `did not report READY (...)`, Work untouched. Green on first run.
+- Failed stop (malformed agent-result.json): `failed/failed`, clean stop (Step 04 contract). Green on first run.
+- NOT READY routing: `done/reported` verdict logs `returned NOT READY — routing back to primary planning path`, Work stays planning/todo. Its first red was a FIXTURE bug (placeholder citation `none`); concrete citations passed with no production change.
+
+## Fix round 1 — Cell 6.2 red-team exploits (F2c/F2d/F4b), tests first
+
+All RED tests below ran red against the pre-fix tree; the positive guards stayed green before AND after.
+
+- F2c (stored verdict flip, schema-valid, consumed cross-pass, Work advanced): RED — unit `F2c: a stored result recorded without the claim-bytes binding is not consumable (fail closed)`; unit `F2c: a schema-valid verdict flip inside the stored result.json is never consumed cross-pass`; loop `F2c composed: ...` (actual: consumed, `after READY validation`, no re-dispatch). The flip edits result.json's agentClaim COPY — a recorded file hash alone would still match the untouched worker file, so the closure needs the content compare too.
+  - Fix (claim-bytes binding): dispatch — runner hashes the EXACT agent-result.json bytes it classifies (`claimSha256` in result.json); consumption — re-read that file from the run dir, require hash AND parsed-content equality (`JSON.stringify` compare; key-order divergence only fails closed) against the stored copy; binding missing => skip (fail closed; legacy pre-binding results lose cross-pass consumability => one conservative re-dispatch, documented).
+- F2d (forged future run dir with recomputed plan hash; sibling-run report path inherited via recorded artifacts; consumed cross-pass): RED — unit `F2d(a): a phantom run dir the runner never dispatched is never consumed cross-pass even when fully self-consistent` (actual: consumed); unit `F2d(b): interpretation never satisfies the report gate from a sibling run's recorded artifact path` (actual: EDGE); loop `F2d composed: ...` (actual: consumed, Work advanced).
+  - Fix (a) dispatched-run membership: the runner appends every attempt it dispatches to `dispatchedRuns` in assignment.json right after run-dir mkdir (assignment FIELDS stay the immutable input; one runner-owned append-only key); the scan consumes only manifest members; missing manifest fails closed.
+  - Fix (b) run-dir-local artifacts: `consumingRunDirFor` derives the consuming run's own dir (run_<asgnId>_<attempt>, attempt = last '_' segment since assignment ids contain underscores; fallback = recorded stdoutLog dir); `getReportText` honors a recorded artifact path only when it resolves INSIDE that dir (bare names resolve as that dir's file) and drops the old hardcoded runs/01 fallback; results with no derivable run dir keep raw recorded-path resolution (fail-closed direction — baseline stop-expectation fixtures stay green).
+- F4b (claim evidenceRefs [live, ghost] passes the ALL-missing check => EDGE): RED — unit `F4b: mixed live+ghost evidence refs resolving inside the run tree are never consumed cross-pass` (actual: consumed). Fix: a path ref resolving inside the scanned assignment's own tree must exist on its own (any missing => skip); refs outside the tree keep the existing ALL-missing backstop (stricter than the brief minimum; the existing dead-refs test pins out-tree refs).
+- Positive guards (green throughout): same-content consume (unit); loop `F5 anti-wedge: honest re-plan then re-dispatch then consume keeps the normal cycle healthy` — pass1 NOT READY => planner edit => pass2 re-dispatch => pass3 consumes: runs exactly ['01','02'], no third dispatch, planning/todo, record untouched. Note: the phantom dir occupies its attempt number, so the fresh dispatch lands on the next free dir — the loop test asserts "exactly one fresh dispatched run that is not the phantom", not a literal '02'.
+
+## Work-record snapshot assertions (red-team 6.1 recap addendum)
+
+- All 8 round-0 negative tests snapshot the WHOLE work record before the runOnce under test (`readWorkSnapshot`) and `assert.deepEqual` after — stage/status asserts stay as readable failure lines; a forged artifact mutating any other record field now fails the test. Green on first run — no record mutation existed to catch; non-vacuous (`listWork` rebuilds from the event log each call; Cell 6.1 test 2 observes real changes through that same read). Round-1 loop tests inherit the same pattern.
+
+## Fix round 2 — reviewer NEW-HOLE (c): stdoutLog evidence redirect, tests first
+
+The hole (harness RA4): a result.json-ONLY tamper (agentClaim + agent-result.json untouched => claim-bytes binding passes) corrupted the recorded runId to a non-`run_` value, so `consumingRunDirFor` fell back to `dirname(runtime.stdoutLog)` — an attacker-chosen dir — and `getReportText` honored recorded artifact paths resolving inside it. One planted substantive agent-report.md anywhere in the repo => consumed EDGE, no re-dispatch, Work advanced. (Round 1 had called the no-derivable-dir raw recorded-path resolution "fail-closed" — wrong: the attacker CREATES the planted file, so existence checks pass; the fallback was a trust hole.)
+
+- RED tests (all red pre-fix, on the exploit signal `canAdvanceEdge true`): unit `F2d(c): a member whose runId was corrupted is skipped at the scan — a planted out-tree report never satisfies the gate`; unit `F2d(c): a runId-less member cannot relocate its evidence via runtime.stdoutLog — scoping stays pinned to the dispatched run dir` (stdoutLog redirected to a SIBLING run dir inside the assignment tree); loop `F2d(c) composed: a result.json-only tamper cannot relocate evidence to a planted report — validate-plan re-dispatches` (new `writeReadyNoReportExecutor`: honest pass-1 READY claim with NO report => no-evidence classification; tamper edits result.json only, recomputes the plan hash for V2, plants the report out-tree).
+- Fix (evidence scoping pinned to the DISPATCHED manifest, not result.json fields):
+  - Scan gate: a member whose PRESENT runId contradicts the member it was read from (`run_<assignmentId>_<runSub>`) is tampered evidence — skipped outright; an ABSENT runId does not contradict anything and stays consumable.
+  - Manifest-pinned evidence dir: the scan stamps every consumed member with its own dispatched dir (non-enumerable Symbol); `consumingRunDirFor` honors that stamp first.
+  - `consumingRunDirFor` trust order: pinned dir => the result's own runId (fresh in-pass results; a PRESENT-but-unusable runId pins to NO dir — no fallback to other result.json fields the same writer controls) => recorded stdoutLog dir ONLY for legacy shapes with no runId at all (the unit-fixture shape; the brief's allowed retention).
+  - Raw recorded-path resolution DELETED: no derivable dir => no report text => missing-report/insufficient stop, never raw resolution.
+- Re-grounding (assertion-contract change of record): 5 runResults in 4 fixtures recorded absolute artifact paths with no runtime and relied on the raw branch (Finding 2 x2, Finding 3, Finding 4 x2, em-dash NOT READY); each now records `runtime.stdoutLog` locating the dir the report was physically written to — original assertions unchanged (they test citation quality/matrix coverage, not path trust).
+- Must-stay-green confirmed: attack-6-2.mjs (F2c 1->2 re-dispatch, F2d phantom rejected + fresh dispatch, F4b form not consumed, F5 healthy, F1a-c/F2a/F2b/F3a-d/F4a unchanged); reattack-ra3-control.mjs RA3a-d unchanged; residual (b) stays deferred — not touched here.
+- RA4 after fix: tampered member skipped => `plan-written-needs-reality-check`, run dirs 1->2 (fresh re-dispatch), item stays planning/todo.
+- Flake check: reviewer's 1-in-8 `expected: executing` suspicion — operation-choice suite run 3x post-fix, all 111/111 clean => not reproduced (10 clean runs since the observation); nothing masked or weakened.
+
+## Commands run (one line each)
+
+- `node --test --test-name-pattern "F2d|F2c|F4b" test/runner/operation-choice.test.mjs` — 5 red before fix; 5/5 after.
+- `node --test --test-name-pattern "F2d composed|F2c composed|F5 anti-wedge" test/runner/loop.test.mjs` — L1/L2 red + L3 green before fix; 3/3 after.
+- `node --test --test-name-pattern "Cell 6.2" test/runner/loop.test.mjs` — round 0: 4 red / 4 already-green; 8/8 after; 8/8 again with snapshots.
+- `node --test --test-name-pattern "prefixed string evidenceRefs" test/runner/assignment-runresult.test.mjs` — red before fix (actual `reported`).
+- `node --test test/runner/operation-choice.test.mjs` — 109/109 (98 baseline + 6 round-0 + 5 round-1).
+- `node --test test/runner/loop.test.mjs` — 98/98 (87 + 8 round-0 + 3 round-1; cell 6.1 3/3).
+- `node --test test/runner/assignment-runresult.test.mjs` — 23/23; `node --test test/runner/assignment-dispatch.test.mjs` — 12/12; `node --test test/e2e/runner-loop.test.mjs` — 15/15; `node --test test/cli/fgos-stage.test.mjs` — 19/19.
+- `node --test --test-name-pattern "F2d\(c\)" test/runner/operation-choice.test.mjs` — round 2: 2 red before fix; 2/2 after.
+- `node --test --test-name-pattern "F2d\(c\) composed" test/runner/loop.test.mjs` — red before fix (tamper consumed); green after (re-dispatch).
+- `node --test test/runner/operation-choice.test.mjs` — 111/111 (109 + 2 round-2); 3x repeated clean (flake not reproduced).
+- `node --test test/runner/loop.test.mjs` — 99/99 (98 + 1 round-2).
+- `node /tmp/redteam-6-2/attack-6-2.mjs` — post-round-2: F2c re-dispatches (1->2), F2d phantom rejected + fresh dispatch, F4b form not consumed, F5 stays 2 runs planning/todo; F2a/F3a-d/F4a unchanged.
+- `node /tmp/redteam-6-2/reattack-6-2-r1.mjs` — RA1 ISOLATED, RA2 still composes (documented residual), RA4 closed (re-dispatch, planning/todo).
+- `node /tmp/redteam-6-2/reattack-ra3-control.mjs` — RA3a-d unchanged (executing/blocked via normal pass-2, edge=false).
+
+## Files touched
+
+- `src/runner/dispatch/assignment-runner.mjs` — exploit-1 fix (companion report only); dispatch-time `planContentHash` into run.json + result.json; round-1: `dispatchedRuns` manifest append at run-dir creation; claim-bytes binding (`claimSha256` of the classified bytes) into result.json.
+- `src/runner/dispatch/operation-choice.mjs` — scan hardening (independent parse, claim schema re-validation, dead-path-ref check, plan hash gate fail-closed); in-memory staleness hash check; round-1: dispatched-run manifest gate, claim-bytes binding gate (hash + content compare), in-tree dead-ref hard gate, `consumingRunDirFor` + run-dir-local report candidates (hardcoded runs/01 fallback dropped); round-2: runId-vs-member scan gate, manifest-pinned evidence dir (Symbol stamp), `consumingRunDirFor` trust order (pinned => runId => stdoutLog only for runId-absent shapes), raw recorded-path resolution removed.
+- `test/runner/loop.test.mjs` — 8 round-0 cell tests (full-record snapshots) + 3 round-1 tests + 1 round-2 composed test + 5 fake executors + `executorFactory` param on the 6.1 fixture helper (default preserves 6.1).
+- `test/runner/operation-choice.test.mjs` — 6 round-0 unit tests + 5 round-1 + 2 round-2 + shared stored-result fixture helper (binding/manifest params); round-2 re-grounding: 5 runResults in 4 fixtures now record `runtime.stdoutLog` for evidence-dir derivation.
+- `test/runner/assignment-runresult.test.mjs` — 1 new red-team test + re-grounded baseline test whose assertion encoded exploit 1.
+- `src/runner/loop.mjs` — NOT touched (consumption hook needed no change).
+
+## Residual risk (explicit)
+
+- (a) Post-exit .fgos/-write forgery remains possible for a worker able to write .fgos/ after its run settles: manifest, binding, and plan hash all live inside .fgos/, so a detached post-exit process can still forge all of them (coordinated multi-file forgery — harness RA2 composes end to end). Round 1 raises the bar from single-file edits to coordinated forgeries; it does NOT make .fgos/ trusted. Full closure = settlement outside worker reach / sandboxing — a user decision, pending; not touched in round 2.
+- (b) Out-tree dead refs (the harness F4b form: refs outside the assignment tree) keep only the ALL-missing backstop — one live out-tree ref can still launder ghost siblings; in-tree refs are hardened. (The harness form now also fails closed via the binding gate, but the out-tree rule per se is unchanged.) Deferred hygiene; not closed in round 2.
+- (c) stdoutLog evidence redirect (review NEW-HOLE): CLOSED in round 2 — evidence scoping derives from the runner-owned dispatched manifest, never result.json fields; raw recorded-path resolution removed. Retained stdoutLog fallback covers only legacy shapes with NO runId at all (unit fixtures, fresh in-pass runner results), not scan members.
+- UtimesSync on result.json itself is NOT defended (a .fgos/-writer can fake recency); the content hash, not mtime, is the plan identity authority.
+
+## Gaps (deferred-hardening bucket)
+
+- The plan hash binds plan.md only; other planning inputs (task spec, docsRef siblings) are not hash-anchored. Results without a hash are rejected only when plan.md exists.
+- Symbolic evidence refs (evidence:/diff:/verify:/test:) resolve through the operation's own resolvers, not path existence — deliberate boundary, covered by the 6.0 resolver gates.
+- Hashless synthetic in-memory results keep mtime-only staleness behavior (test-pinned).
+
+## Status
+
+done — round-0 tests 1-3 red before their fixes, green after; tests 4-6 + snapshot addendum already-green (documented); round-1: all 7 RED tests red before the fixes, green after; round-2: all 3 RED tests red before the fix, green after, positive guards green throughout; cell 6.1 3/3; full battery green (operation-choice 111, loop 99, runresult 23, dispatch 12, e2e 15, fgos-stage 19); harnesses confirm F2c/F2d/RA4 closed, F5 healthy, RA3 controls unchanged; flake suspicion not reproduced (3 clean 111/111 runs); no weakened assertions; no new modules; loop.mjs untouched; no commit.

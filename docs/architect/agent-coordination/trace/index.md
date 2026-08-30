@@ -45,8 +45,8 @@ green without weakening assertions. See `current-cell.md`.
 | Cell | Scope | Status |
 |---|---|---|
 | 6.0 | Reconcile in-flight review-item verdict routing to green (blocking fix) | done |
-| 6.1 | planning.validate-plan fake executor happy path | open |
-| 6.2 | planning.validate-plan negative cases | pending |
+| 6.1 | planning.validate-plan fake executor happy path | done |
+| 6.2 | planning.validate-plan negative cases | open |
 | 6.3 | planning.validate-plan live smoke | pending |
 | 6.4 | executing.review-item fake executor | pending |
 | 6.5 | executing.scout-blast-radius read-only researcher | pending |

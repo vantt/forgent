@@ -1,73 +1,91 @@
-# Current Cell - 6.1 planning.validate-plan Fake Executor Happy Path
+# Current Cell - 6.2 planning.validate-plan Negative Cases + Red-Team Hardening
 
 Status: open
 Date: 2026-08-30
-Cell trace file: `docs/architect/agent-coordination/trace/step-06-cell-1-validate-plan-happy-path.md`
+Cell trace file: `docs/architect/agent-coordination/trace/step-06-cell-2-validate-plan-negative.md`
 
 ## Goal
 
-Prove the composed happy path end to end: a real planning Work item (committed
-plan.md) goes through `runOnce` -> driver selects `planning.validate-plan`
--> Assignment runs via fake executor -> worker writes `agent-result.json`
-(READY verdict) + `agent-report.md` -> RunResult is `done/reported` -> driver
-consumes the verdict -> Work moves only via existing engine verbs; the
-Assignment itself never moves Work.
+Prove validate-plan FAILS SAFE: every non-happy outcome stops or re-dispatches,
+never advances Work on false evidence. Also close the 3 proven Cell 6.1
+red-team exploits (mandatory scope, tests first):
+
+1. Self-attested evidenceRefs must NOT classify `reported` without an on-disk
+   companion report (assignment-runner.mjs isSubstantiveEvidenceRef :82-115).
+2. Cross-pass staleness: plan.md edited after the verdict run must NOT be
+   consumed. Replace/augment worker-controllable mtime guards
+   (operation-choice.mjs :113-127, :443-458) with a plan.md content hash
+   recorded runner-side at dispatch (in run.json or result.json), rechecked at
+   consumption. utimesSync must not defeat it.
+3. Read-back re-validation: a result.json/agent-result.json tampered after
+   settle (schema-broken claim, or evidence refs pointing at now-missing
+   files) must NOT be consumed cross-pass (findLatestAssignmentRunResult path).
 
 ## Non-Goals
 
-- No negative cases (cell 6.2), no live smoke (cell 6.3), no executing-stage ops.
 - No workflow YAML change, no FSM/store change, no new modules.
-- No Step 7, Mission, Herdr-truth, Job/scheduler.
+- No executing-stage ops (6.4+), no live smoke (6.3), no Job/scheduler/Step 7.
 - No commit (user decides).
+- Cell 6.0 deferred-hardening list stays deferred.
 
 ## Must-Read Files
 
 - this file
-- `docs/architect/agent-coordination/step-06-work-attached-team-adoption.md` sections 3 (slice 6.1), 5 (evidence table), 6 (tests)
-- `src/runner/loop.mjs` around line 1520 (validate-plan assignment dispatch + verdict consumption)
-- `test/runner/loop.test.mjs` line ~2736 (existing cwd-selection test = fixture template)
-- `test/runner/assignment-dispatch.test.mjs` line ~83 (existing fake-executor execution test)
+- `docs/architect/agent-coordination/step-06-work-attached-team-adoption.md`
+  section 6 (negative test list for planning.validate-plan)
+- `src/runner/dispatch/assignment-runner.mjs` :82-115, :365-447, :700-808
+- `src/runner/dispatch/operation-choice.mjs` :100-130, :430-470,
+  findLatestAssignmentRunResult + consumption site
+- `test/runner/loop.test.mjs` :2840-2990 (cell 6.1 fixture helpers)
 
 ## May-Inspect Files
 
-- `src/runner/dispatch/operation-choice.mjs` (planning selection rules)
-- `src/runner/dispatch/assignment-runner.mjs` (reported classification)
-- `domains/coding/task-specs/validate-plan.md` (verdict vocabulary)
+- `src/runner/loop.mjs` :1460-1560 (plan sweep + validate-plan hook)
+- `domains/coding/task-specs/validate-plan.md` (NOT READY semantics)
+- `src/intake/plan.mjs` :655-700
 
 ## Do-Not-Touch Files
 
-- workflow YAML, FSM modules, `src/state/store.mjs`, `operation-choice.mjs` resolvers
+- workflow YAML, FSM modules, `src/state/store.mjs`
 - docs other than the cell trace; `.fgos/` outside test-created temp dirs
+- cell-6.0 resolver gates (refs/heads qualification, mtime correlation)
 
-## Tests To Add First (failing before implementation)
+## Tests To Add First (all red before implementation)
 
-1. runOnce happy path: planning Work (docsRef + committed plan.md, no open blockers)
-   -> runOnce dispatches validate-plan Assignment to fake executor
-   -> executor writes valid `agent-result.json` (verdict READY) + `agent-report.md`
-   -> RunResult `status: done`, `confidence: reported`.
-2. Same scenario: driver consumes READY + reported and feeds the existing
-   planning edge (or a conservative stop if the edge is not reachable in-test) —
-   assert Work stage/status changed only through engine verbs, and the
-   assignment did not set status/stage itself.
-3. Assert evidence: `.fgos/assignments/<asgn_*>/runs/01/` contains
-   `assignment.json`, `run.json`, `agent-result.json`, `agent-report.md`,
-   `result.json`, `evidence.json`; verdict artifact is NOT a control-plane file.
+1. Claim `done` whose evidenceRefs are strings only (no agent-report.md on
+   disk) -> RunResult NOT `reported`; driver must not consume; Work untouched.
+2. Cross-pass staleness: verdict run on plan.md V1; edit plan.md to V2 after
+   settle (AND a second variant using utimesSync to keep mtime identical);
+   second runOnce -> stale verdict NOT consumed; validate-plan re-dispatched
+   (runs/02) or conservative stop; Work never advances on the V1 verdict.
+3. Read-back tamper: after a legit done/reported run, break result.json claim
+   schema or delete agent-report.md; second runOnce -> NOT consumed; treated
+   as no-evidence/failed stop; Work untouched.
+4. No-evidence stop: executor writes nothing -> RunResult no-evidence ->
+   runOnce stops cleanly, Work untouched, no crash.
+5. Failed stop: malformed agent-result.json -> failed/failed -> stop,
+   Work untouched.
+6. NOT READY verdict routes per step-06 section 6 spec (shape-plan/stop, not
+   advance); assert the exact documented routing.
 
 ## Acceptance Criteria
 
-- New happy-path tests added and passing; they fail (red) before any needed glue change.
-- If runOnce already composes the path (expected, per loop.mjs:1520), the cell may be test-only — say so in the trace.
-- Regression green: loop (84+), operation-choice (98), assignment-dispatch (12),
-  assignment-runresult (22), e2e runner-loop (15), fgos-stage (19).
-- No weakening of existing tests.
+- Tests 1-3 (red-team) red before fix, green after; tests 4-6 document actual
+  behavior — if any is already-green, mark it as such in the trace honestly.
+- All 3 exploit fixes are production changes kept minimal (no new modules,
+  no schema migration; run.json/result.json may gain one field).
+- Regression green: loop (87+), operation-choice (98+new),
+  assignment-runresult (22+new ok), assignment-dispatch (12),
+  e2e runner-loop (15), fgos-stage (19). No weakened assertions.
+- Cell 6.1 happy-path tests 3/3 still green (staleness hash must not break
+  the legit same-content consume).
 
-## Bug Taxonomy (findings classify into)
+## Bug Taxonomy
 
-- Work lifecycle authority leak; evidence false-success; no-evidence/failed
-  advances Work; dirty-before counted as evidence; primary path regression;
-  operation legality bypass; missing positive/negative tests; trace/proof gap.
+- evidence false-success; no-evidence/failed advances Work; lifecycle
+  authority leak; missing negative test; trace/proof gap.
 
 ## Trace Update Requirements
 
-- Doer updates `step-06-cell-1-validate-plan-happy-path.md`: goal, code paths,
-  commands + one-line results, status, gaps. Under 150 lines, no long stdout.
+- Doer updates `step-06-cell-2-validate-plan-negative.md`: exploit->test->fix
+  mapping, commands one-line each, status, gaps. Under 150 lines.

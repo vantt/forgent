@@ -106,3 +106,28 @@ done
 - Test 2's tail (executing -> awaiting-approval) rides the existing drain-run
   primary path already covered by the e2e suite; it is composition evidence,
   not new primary-path coverage.
+
+## Close-out (coordinator, 2026-08-30)
+
+Final status: **done**. Red-team verdict: 3 exploitable / 2 refuted — all three
+exploits live in PRE-EXISTING production paths (classification, staleness
+guards, read-back), outside this test-only cell's scope. Cell claims hold:
+happy path composes via real engine verbs, Work untouched by the Assignment.
+
+Red-team findings deferred to Cell 6.2 as MANDATORY scope:
+
+1. isSubstantiveEvidenceRef (assignment-runner.mjs:82-115) counts any
+   prefix-matching string (evidence:/diff:/verify:/...) as a worker report —
+   no existence check. Forger claim without agent-report.md classifies
+   done/reported.
+2. Cross-pass staleness guards (operation-choice.mjs:113-127, :443-458)
+   compare mtimes the worker controls (cwd = repoRoot -> utimesSync plan.md) —
+   stale V1 verdict consumed after plan.md edited to V2; no re-dispatch.
+3. No read-back re-validation: forged/edited result.json consumed cross-pass
+   (schema + report existence checked only at classification time).
+
+Fix guidance (red-team minimal): content hash of plan.md recorded in
+result.json for staleness; existence-check companion report before
+reported; re-validate claim schema + report existence at consumption time.
+Lifecycle bounding noted: false advance requires plan.md tiny/small
+pass-through; non-tiny plans noop.
