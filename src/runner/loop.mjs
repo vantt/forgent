@@ -93,7 +93,7 @@ import { hasWorkerSlotRoom, countWorkerSlots } from '../state/worker-slots.mjs';
 import { readSharedConfig, readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
-import { resolvePlan } from '../intake/plan.mjs';
+import { resolvePlan, resolveContentRoot } from '../intake/plan.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
 import { chooseStageOperation, executeDriverOperationChoice } from './dispatch/operation-choice.mjs';
@@ -915,11 +915,90 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
 
         if (outcome.stop || outcome.runResult?.status === 'no-evidence' || outcome.runResult?.status === 'failed') {
           log(`fgos-runner: operation "${opChoice.operation}" for "${item.id}" stopped safely (${outcome.reason}) — Work lifecycle untouched`);
+          const isSecondary = opChoice.operation === 'scout-blast-radius' || opChoice.operation === 'review-item' || opChoice.operation === 'resolve-question';
+          const finalStatus = isSecondary ? 'blocked' : 'todo';
+          settleClaim(dir, {
+            id: item.id,
+            claimId,
+            finalStatus,
+            reason: outcome.reason,
+            role: 'runner',
+            patch: { secondaryOperation: null },
+          });
           removeDispatchWorktree(repoRoot, wt.path, log);
+          wt = null;
           return { outcome: 'stopped', id: item.id, reason: outcome.reason, exitCode: 0 };
         }
-        removeDispatchWorktree(repoRoot, wt.path, log);
-        return { outcome: 'secondary-operation-completed', id: item.id, operation: opChoice.operation, outcomeReason: outcome.reason, exitCode: 0 };
+
+        const facts = branchFacts(repoRoot, wt.branch);
+
+        if (opChoice.operation === 'scout-blast-radius') {
+          log(`fgos-runner: scout-blast-radius operation for "${item.id}" completed; proceeding to primary worker implementation`);
+        } else if (opChoice.operation === 'review-item' && outcome.reason === 'review-item-approved' && facts.aheadCount > 0) {
+          const check = await runGoalCheck(item, wt.path, config.timeoutMs);
+          if (check.passed) {
+            log(`fgos-runner: review-item for "${item.id}" approved candidate implementation (${facts.aheadCount} commit(s), verify passed) — settling to awaiting-approval`);
+            const branchHead = git(repoRoot, ['rev-parse', '--verify', `refs/heads/${wt.branch}`]).trim();
+            settleClaim(dir, {
+              id: item.id,
+              claimId,
+              finalStatus: 'awaiting-approval',
+              reason: outcome.reason,
+              role: 'runner',
+              branchHeadAtReturn: branchHead,
+              patch: { secondaryOperation: null },
+            });
+            const visits = visitCount(readRawEvents(dir), item.id);
+            addOutcome(dir, {
+              id: item.id,
+              actual: {
+                outcome: 'awaiting-approval',
+                passed: true,
+                attempts: attempt,
+                errorClass: null,
+                aheadCount: facts.aheadCount,
+                visits,
+              },
+            });
+            removeDispatchWorktree(repoRoot, wt.path, log);
+            wt = null;
+            return { outcome: 'awaiting-approval', id: item.id, operation: opChoice.operation, outcomeReason: outcome.reason, exitCode: 0 };
+          }
+          log(`fgos-runner: review-item for "${item.id}" approved candidate but verify failed — routing to fix-verify-red`);
+          settleClaim(dir, {
+            id: item.id,
+            claimId,
+            finalStatus: 'todo',
+            reason: outcome.reason,
+            role: 'runner',
+            patch: { nextOperation: 'fix-verify-red', secondaryOperation: null },
+          });
+          removeDispatchWorktree(repoRoot, wt.path, log);
+          wt = null;
+          return { outcome: 'secondary-operation-completed', id: item.id, operation: opChoice.operation, outcomeReason: outcome.reason, nextOperation: 'fix-verify-red', exitCode: 0 };
+        } else {
+          const updates = {};
+          if (outcome.nextOperation) {
+            updates.nextOperation = outcome.nextOperation;
+            updates.secondaryOperation = null;
+          } else if (opChoice.operation === 'review-item') {
+            updates.secondaryOperation = null;
+            if (item.nextOperation) {
+              updates.nextOperation = null;
+            }
+          }
+          settleClaim(dir, {
+            id: item.id,
+            claimId,
+            finalStatus: 'todo',
+            reason: outcome.reason,
+            role: 'runner',
+            patch: Object.keys(updates).length > 0 ? updates : undefined,
+          });
+          removeDispatchWorktree(repoRoot, wt.path, log);
+          wt = null;
+          return { outcome: 'secondary-operation-completed', id: item.id, operation: opChoice.operation, outcomeReason: outcome.reason, nextOperation: outcome.nextOperation ?? null, exitCode: 0 };
+        }
       }
 
       const worker = await spawnWorker(item, config, wt.path, {
@@ -1012,7 +1091,8 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
           // at settle time (that reads a DIFFERENT actor's claimId if this
           // one was reclaimed as stale in the meantime, and would silently
           // settle their claim instead of failing closed).
-          settleClaim(dir, { id: item.id, claimId, finalStatus: 'awaiting-approval', role: 'runner' });
+          const branchHead = git(repoRoot, ['rev-parse', '--verify', `refs/heads/${wt.branch}`]).trim();
+          settleClaim(dir, { id: item.id, claimId, finalStatus: 'awaiting-approval', role: 'runner', branchHeadAtReturn: branchHead });
         });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
         log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
@@ -1434,35 +1514,30 @@ export async function runOnce(options = {}) {
         if (
           planningStage !== undefined &&
           (item.stage === planningStage || item.stage === legacyPlanStage) &&
-          (item.status === 'todo' || item.status === 'doing')
+          item.status === 'todo'
         ) {
           const choice = chooseStageOperation({ work: item, stage: item.stage, domain: domain.name ?? item.domain, workflow: workflow?.name ?? item.workflow, repoRoot });
           if (choice.dispatch === 'assignment' && choice.operation === 'validate-plan') {
+            const contentRoot = resolveContentRoot(repoRoot, item.id, item.docsRef);
             const outcome = await executeDriverOperationChoice(item, choice, {
-              cwd: repoRoot,
+              cwd: contentRoot,
               repoRoot,
               runnerConfig: config,
               work: item,
             });
             log(`fgos-runner: reviewer validation assignment for "${item.id}" executed (confidence: ${outcome.runResult?.confidence}, status: ${outcome.runResult?.status})`);
             if (outcome.canAdvanceEdge) {
-              const agentClaim = outcome.runResult?.agentClaim;
-              const callerVerdict = outcome.verdictPayload ?? (
-                agentClaim?.verdictPayload ?? (
-                  Array.isArray(agentClaim?.children) && agentClaim.children.length > 0
-                    ? { verdict: 'decompose', children: agentClaim.children, reason: agentClaim?.summary }
-                    : agentClaim?.verdict === 'need-human'
-                      ? { verdict: 'need-human', reason: agentClaim?.summary }
-                      : { verdict: 'pass-through', reason: agentClaim?.summary }
-                )
-              );
-              resolvePlan(dir, item.id, config, 'runner', callerVerdict);
-              log(`fgos-runner: chia-việc swept plan item "${item.id}" after READY validation`);
+              const callerVerdictToPass = item.verdictPayload ?? item.callerVerdict ?? options.callerVerdict ?? options.verdictPayload;
+              const planOutcome = resolvePlan(dir, item.id, config, 'runner', callerVerdictToPass);
+              log(`fgos-runner: chia-việc swept plan item "${item.id}" after READY validation (${planOutcome?.outcome ?? 'done'})`);
+            } else if (outcome.nextOperation === 'shape-plan') {
+              log(`fgos-runner: validation for "${item.id}" returned NOT READY — routing back to primary planning path`);
             } else {
               log(`fgos-runner: validation for "${item.id}" did not report READY (${outcome.reason}) — Work lifecycle untouched`);
             }
           } else {
-            resolvePlan(dir, item.id, config, 'runner');
+            const callerVerdictToPass = item.verdictPayload ?? item.callerVerdict ?? options.callerVerdict ?? options.verdictPayload;
+            resolvePlan(dir, item.id, config, 'runner', callerVerdictToPass);
             log(`fgos-runner: chia-việc swept plan item "${item.id}"`);
           }
         }

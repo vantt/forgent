@@ -3,12 +3,16 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import {
   chooseStageOperation,
   executeDriverOperationChoice,
   hasPlanMd,
   interpretAssignmentRunResult,
+  deriveCandidateReviewRefs,
+  hasValidReviewEvidenceRefs,
+  isResolvableDiffRef,
+  isResolvableVerifyRef,
 } from '../../src/runner/dispatch/operation-choice.mjs';
 import { operationsForStage } from '../../src/state/workflow-stage-graphs.mjs';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
@@ -33,12 +37,26 @@ const PROJECT_ROOT = process.cwd();
 
 function writeFakeExecutor(dir, payloadOverrides = {}) {
   const scriptPath = path.join(dir, 'fake-reviewer-executor.mjs');
-  const payloadStr = JSON.stringify({
+  const mainMjsPath = path.join(dir, 'src', 'main.mjs');
+  if (!fs.existsSync(mainMjsPath)) {
+    fs.mkdirSync(path.dirname(mainMjsPath), { recursive: true });
+    fs.writeFileSync(mainMjsPath, '// main\n');
+  }
+  const payloadObj = {
     status: 'done',
     summary: 'Plan is feasible',
     verdict: 'READY',
+    realityGate: {
+      'mode-fit': 'PASS (citation: src/main.mjs:L1)',
+      'repo-fit': 'PASS (citation: src/main.mjs:L1)',
+      'assumptions-fit': 'PASS (citation: src/main.mjs:L1)',
+      'smaller-path-fit': 'PASS (citation: src/main.mjs:L1)',
+      'proof-surface-fit': 'PASS (citation: src/main.mjs:L1)',
+      'impact-analysis-posture': 'PASS (citation: src/main.mjs:L1)',
+    },
+    feasibilityMatrix: [{ risk: 'Risk 1', rating: 'Low', citation: 'src/main.mjs:L1' }],
     ...payloadOverrides,
-  });
+  };
   fs.writeFileSync(
     scriptPath,
     `
@@ -62,23 +80,23 @@ function writeFakeExecutor(dir, payloadOverrides = {}) {
         }
       }
     }
-      if (resultPath) {
-        const runDir = path.dirname(resultPath);
-        fs.mkdirSync(runDir, { recursive: true });
-        fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nPlan holds up under reality check.\\n');
-        fs.writeFileSync(resultPath, ${JSON.stringify(payloadStr)});
-        if (${Boolean(payloadOverrides.appendConstraintsToPlan)}) {
-          const cwd = process.cwd();
-          const planFiles = fs.readdirSync(cwd, { recursive: true }).filter((f) => String(f).endsWith('plan.md'));
-          for (const pf of planFiles) {
-            const full = path.join(cwd, pf);
-            try {
-              const old = fs.readFileSync(full, 'utf8');
-              fs.writeFileSync(full, old + '\\n## Constraints\\n- Must complete in 1 iteration\\n');
-            } catch {}
-          }
+    if (resultPath) {
+      const runDir = path.dirname(resultPath);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Reality Gate Validation & Feasibility Matrix Report\\n## Reality Gate Score\\n- Mode fit: PASS (citation: src/main.mjs:L1)\\n- Repo fit: PASS (citation: src/main.mjs:L1)\\n- Assumptions: PASS (citation: src/main.mjs:L1)\\n- Smaller path: PASS (citation: src/main.mjs:L1)\\n- Proof surface: PASS (citation: src/main.mjs:L1)\\n- Impact-analysis posture: PASS (citation: src/main.mjs:L1)\\n## Feasibility Matrix\\n- Feasibility matrix: verified (citation: src/main.mjs:L1).\\n## Review Evaluation\\n- Candidate diff: evidence:candidate-diff verified.\\n- Verify result: evidence:verify-pass evidence:verify-fail test pass confirmed.\\n- Rationale: APPROVED clean implementation.\\n## Scout Blast Radius\\n- Symbol: execute in src/core.js\\n- Search posture: active rg cross-check\\n- Callers: src/main.mjs\\n- Affected processes: none\\n- Risk read: low risk\\n## Question Resolution\\n- Answer: verified.\\n- Citations: ref: src/main.mjs:L1\\n- Verdict: clear\\n- Remaining uncertainty: None.\\nPlan holds up under reality check.\\n');
+      fs.writeFileSync(resultPath, JSON.stringify(${JSON.stringify(payloadObj)}, null, 2));
+      if (${Boolean(payloadOverrides.appendConstraintsToPlan)}) {
+        const cwd = process.cwd();
+        const planFiles = fs.readdirSync(cwd, { recursive: true }).filter((f) => String(f).endsWith('plan.md'));
+        for (const pf of planFiles) {
+          const full = path.join(cwd, pf);
+          try {
+            const old = fs.readFileSync(full, 'utf8');
+            fs.writeFileSync(full, old + '\\n## Constraints\\n- Requirement 1 (citation: src/main.mjs:L1)\\n');
+          } catch {}
         }
       }
+    }
     process.stdout.write("All good\\n");
     process.exit(0);
     `,
@@ -214,6 +232,7 @@ test('validate-plan no-evidence does not move Work', async () => {
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -253,6 +272,7 @@ test('validate-plan failed does not move Work', async () => {
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -291,6 +311,7 @@ test('reported READY allows existing planning edge path', async () => {
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -323,17 +344,52 @@ test('reported READY allows existing planning edge path', async () => {
 });
 
 test('driver chooses shape-plan after lastRunResult returned NOT READY', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_nr', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const reportPath = path.join(runDir, 'agent-report.md');
+  fs.writeFileSync(
+    reportPath,
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+  );
+
   const work = { id: 'tsk-not-ready', stage: 'planning', domain: 'coding' };
   const lastRunResult = {
     status: 'done',
     confidence: 'reported',
-    agentClaim: { status: 'done', verdict: 'NOT READY - RETURN TO PLANNING', summary: 'Gaps found' },
+    runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+    agentClaim: {
+      status: 'done',
+      verdict: 'NOT READY - RETURN TO PLANNING',
+      summary: 'Gaps found',
+      realityGate: {
+        'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+      },
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+    },
+    evidence: {
+      artifacts: [reportPath],
+    },
   };
 
   const choice = chooseStageOperation({
     work,
     lastRunResult,
     contextSignals: { hasPlan: true },
+    repoRoot: tempDir,
   });
 
   assert.equal(choice.operation, 'shape-plan');
@@ -447,19 +503,50 @@ test('Step 06 planning.validate-plan failed stops safely and does not advance Wo
 });
 
 test('Step 06 planning.validate-plan READY WITH CONSTRAINTS requires recorded constraints before advancing edge', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_rwc', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const reportPath = path.join(runDir, 'agent-report.md');
+  fs.writeFileSync(
+    reportPath,
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+  );
+
   const lastRunResult = {
     status: 'done',
     confidence: 'reported',
+    runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
     agentClaim: {
       status: 'done',
       verdict: 'READY WITH CONSTRAINTS',
       summary: 'Proceed only after constraints are captured',
+      realityGate: {
+        'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+      },
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+    },
+    evidence: { 
+      artifacts: [reportPath],
     },
   };
 
   const blocked = interpretAssignmentRunResult({
     choice: { operation: 'validate-plan' },
     runResult: lastRunResult,
+    repoRoot: tempDir,
   });
   assert.equal(blocked.canAdvanceEdge, false);
   assert.equal(blocked.stop, true);
@@ -468,19 +555,54 @@ test('Step 06 planning.validate-plan READY WITH CONSTRAINTS requires recorded co
     choice: { operation: 'validate-plan' },
     runResult: lastRunResult,
     contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
   });
   assert.equal(accepted.canAdvanceEdge, true);
   assert.equal(accepted.stop, false);
 });
 
 test('Step 06 planning.validate-plan bare done claim without verdict cannot advance Work', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_bare', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const reportPath = path.join(runDir, 'agent-report.md');
+  fs.writeFileSync(
+    reportPath,
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+  );
+
   const choice = chooseStageOperation({
     work: { id: 'tsk-weak-result', stage: 'planning', domain: 'coding' },
     contextSignals: { hasPlan: true },
+    repoRoot: tempDir,
     lastRunResult: {
       status: 'done',
       confidence: 'reported',
-      agentClaim: { status: 'done', summary: 'Looks acceptable' },
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        summary: 'Looks acceptable',
+        realityGate: {
+          'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        },
+        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+      },
+      evidence: { 
+        artifacts: [reportPath],
+      },
     },
   });
 
@@ -493,22 +615,33 @@ test('Step 06 planning.validate-plan bare done claim without verdict cannot adva
 
 test('Step 06 executing.review-item reject routes to fix operation without lifecycle movement', async () => {
   const tempDir = mkTempDir();
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/main.js b/src/main.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: FAIL\n');
   seedTaskSpecs(tempDir, ['review-item']);
   const executorScript = writeFakeExecutor(tempDir, {
     status: 'done',
     verdict: 'REJECT',
     summary: 'REJECT: verify failure needs a fix',
+    evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-fail'],
   });
-  const work = { id: 'tsk-step06-review', status: 'doing', stage: 'executing', domain: 'coding' };
+  const work = {
+    id: 'tsk-step06-review',
+    status: 'doing',
+    stage: 'executing',
+    domain: 'coding',
+    refs: ['evidence:candidate-diff', 'evidence:verify-fail'],
+  };
   const choice = chooseStageOperation({
     work,
     contextSignals: { secondaryOperation: 'review-item' },
+    repoRoot: tempDir,
   });
 
   const outcome = await executeDriverOperationChoice(work, choice, {
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig: runnerConfigFor(executorScript),
+    contextSignals: { secondaryOperation: 'review-item', candidateDiffContent: 'diff content', candidateVerifyContent: 'verify output' },
   });
 
   assert.equal(outcome.executed, true);
@@ -525,19 +658,170 @@ test('Step 06 executing.review-item reject routes to fix operation without lifec
 });
 
 test('Step 06 executing.review-item approval is not a Work lifecycle edge', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_rev_appr', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
+  const reportPath = path.join(runDir, 'agent-report.md');
+  fs.writeFileSync(reportPath, '# Review Report\nAPPROVED: evidence:candidate-diff evidence:verify-pass clean evaluation\n');
+
   const interpreted = interpretAssignmentRunResult({
-    choice: { operation: 'review-item' },
+    choice: {
+      operation: 'review-item',
+      assignment: { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+    },
     runResult: {
       status: 'done',
       confidence: 'reported',
-      agentClaim: { status: 'done', verdict: 'APPROVED', summary: 'APPROVED' },
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'APPROVED',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+      },
+      evidence: {
+        artifacts: [reportPath],
+      },
     },
+    repoRoot: tempDir,
   });
 
-  assert.equal(interpreted.canProceed, true);
   assert.equal(interpreted.canAdvanceEdge, false);
   assert.equal(interpreted.stop, false);
   assert.equal(interpreted.reason, 'review-item-approved');
+});
+
+test('validate-plan and review-item require report artifact and fail closed when missing', () => {
+  const tempDir = mkTempDir();
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
+
+  const choiceValidate = { operation: 'validate-plan' };
+  const resValidateNoArt = interpretAssignmentRunResult({
+    choice: choiceValidate,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: { status: 'done', verdict: 'READY', summary: 'Feasible' },
+      evidence: { artifacts: ['agent-result.json'] },
+    },
+  });
+  assert.equal(resValidateNoArt.canAdvanceEdge, false);
+  assert.equal(resValidateNoArt.stop, true);
+  assert.equal(resValidateNoArt.reason, 'validate-plan-missing-report-artifact');
+
+  const choiceReview = {
+    operation: 'review-item',
+    assignment: { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+  };
+  const resReviewNoArt = interpretAssignmentRunResult({
+    choice: choiceReview,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'Clean code',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+      },
+      evidence: { artifacts: ['agent-result.json'] },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(resReviewNoArt.canAdvanceEdge, false);
+  assert.equal(resReviewNoArt.stop, true);
+  assert.equal(resReviewNoArt.reason, 'review-item-missing-report-artifact');
+});
+
+test('Step 06 executing.review-item evidenceRefs must be bound to provided contextRefs or work.refs', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_rev_bound', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const reportPath = path.join(runDir, 'agent-report.md');
+  fs.writeFileSync(reportPath, '# Review Report\nAPPROVED: diff:custom-candidate-diff verify:custom-verify-pass clean evaluation\n');
+
+  const choiceWithProvidedRefs = {
+    operation: 'review-item',
+    assignment: { contextRefs: ['diff:custom-candidate-diff', 'verify:custom-verify-pass'] },
+  };
+
+  // 1. No refs provided in claim
+  const interpretedNoRefs = interpretAssignmentRunResult({
+    choice: choiceWithProvidedRefs,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', verdict: 'APPROVED', summary: 'Clean code' },
+      evidence: { artifacts: [reportPath] },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(interpretedNoRefs.stop, true);
+  assert.equal(interpretedNoRefs.reason, 'review-item-missing-evidence-refs');
+
+  // 2. Unprovided sentinel names returned when not in assignment contextRefs
+  const interpretedUnprovidedSentinels = interpretAssignmentRunResult({
+    choice: choiceWithProvidedRefs,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'Clean code',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+      },
+      evidence: { artifacts: ['agent-report.md'] },
+    },
+  });
+  assert.equal(interpretedUnprovidedSentinels.stop, true);
+  assert.equal(interpretedUnprovidedSentinels.reason, 'review-item-missing-evidence-refs');
+
+  // 3. Unrelated/fake refs
+  const interpretedFakeRefs = interpretAssignmentRunResult({
+    choice: choiceWithProvidedRefs,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'Clean code',
+        evidenceRefs: ['fake-diff', 'fake-test'],
+      },
+      evidence: { artifacts: ['agent-report.md'] },
+    },
+  });
+  assert.equal(interpretedFakeRefs.stop, true);
+  assert.equal(interpretedFakeRefs.reason, 'review-item-missing-evidence-refs');
+
+  // 4. Exact provided refs returned with real candidate evidence
+  fs.writeFileSync(path.join(tempDir, 'custom-candidate-diff'), 'diff --git a/a.js b/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'custom-verify-pass'), 'VERIFY: PASS\n');
+  const interpretedValidBoundRefs = interpretAssignmentRunResult({
+    choice: choiceWithProvidedRefs,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'Clean code',
+        evidenceRefs: ['diff:custom-candidate-diff', 'verify:custom-verify-pass'],
+      },
+      evidence: {
+        artifacts: [reportPath],
+      },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(interpretedValidBoundRefs.canProceed, true);
+  assert.equal(interpretedValidBoundRefs.reason, 'review-item-approved');
 });
 
 test('driver loop runOnce: validate-plan no-evidence keeps Work in planning without advancing stage', async () => {
@@ -738,7 +1022,7 @@ test('chooseStageOperation accepts domain passed as object without throwing or w
   assert.equal(choice.dispatch, 'direct-stage-skill');
 });
 
-test('driver loop runOnce: validate-plan with READY + agentClaim.verdict "decompose" materializes child items (Finding 1)', async () => {
+test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayload "decompose" and does not create children (Finding 1 fix)', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -779,15 +1063,13 @@ test('driver loop runOnce: validate-plan with READY + agentClaim.verdict "decomp
 
   const view = listWork(tempDir);
   const rootItem = view.work['tsk-driver-decomp'];
-  assert.equal(rootItem.stage, 'executing');
+  assert.equal(rootItem.stage, 'planning');
 
   const childItems = Object.values(view.work).filter((w) => w.id.startsWith('tsk-driver-decomp-'));
-  assert.equal(childItems.length, 2);
-  assert.equal(childItems[0].title, 'Subtask A');
-  assert.equal(childItems[1].title, 'Subtask B');
+  assert.equal(childItems.length, 0);
 });
 
-test('driver loop runOnce: validate-plan with READY + agentClaim.verdict "need-human" parks in awaiting-human (Finding 1)', async () => {
+test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayload "need-human" and does not park item (Finding 1 fix)', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -822,7 +1104,8 @@ test('driver loop runOnce: validate-plan with READY + agentClaim.verdict "need-h
   await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
 
   const item = listWork(tempDir).work['tsk-driver-human'];
-  assert.equal(item.status, 'awaiting-human');
+  assert.equal(item.status, 'todo');
+  assert.equal(item.stage, 'planning');
 });
 
 test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker self-claim alone STOPS in planning (Finding P2 fix)', async () => {
@@ -864,7 +1147,7 @@ test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker 
   assert.equal(item.stage, 'planning');
 });
 
-test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and VERIFIED recorded plan.md constraints ADVANCES to executing (Finding P2 fix)', async () => {
+test('driver loop runOnce: validate-plan modifying dirty-before plan.md fails closed and does not advance Work (Finding 2 fix)', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -900,17 +1183,52 @@ test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and VERIFIE
   await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
 
   const item = listWork(tempDir).work['tsk-driver-recorded'];
-  assert.equal(item.stage, 'executing');
+  assert.equal(item.stage, 'planning');
 });
 
 test('interpretAssignmentRunResult maps REJECTED verdict to NOT READY - RETURN TO PLANNING (Finding 3)', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_reject', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const reportPath = path.join(runDir, 'agent-report.md');
+  fs.writeFileSync(
+    reportPath,
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+  );
+
   const res = interpretAssignmentRunResult({
     choice: { operation: 'validate-plan' },
     runResult: {
       status: 'done',
       confidence: 'reported',
-      agentClaim: { status: 'done', verdict: 'REJECTED', summary: 'Plan rejected' },
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'REJECTED',
+        summary: 'Plan rejected',
+        realityGate: {
+          'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        },
+        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+      },
+      evidence: {
+        artifacts: [reportPath],
+      },
     },
+    repoRoot: tempDir,
   });
 
   assert.equal(res.canAdvanceEdge, false);
@@ -950,6 +1268,57 @@ test('Step 06 executing.scout-blast-radius report with fake executor stores all 
   assert.equal(work.stage, 'executing');
 });
 
+test('Step 06 executing.scout-blast-radius mutating repository state fails closed and stops driver execution', async () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  seedTaskSpecs(tempDir, ['scout-blast-radius']);
+
+  const executorScript = path.join(tempDir, 'mutating-scout-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const resultPath = match[1];
+      const runDir = path.dirname(resultPath);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\\nSearch posture: active rg cross-check\\n');
+      fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Scouted 2 symbols' }));
+    }
+    fs.writeFileSync(path.join(process.cwd(), 'accidental.txt'), 'unintended mutation\\n');
+    process.exit(0);
+    `,
+  );
+
+  const work = {
+    id: 'tsk-scout-mutate',
+    status: 'doing',
+    stage: 'executing',
+    domain: 'coding',
+    secondaryOperation: 'scout-blast-radius',
+  };
+
+  const choice = chooseStageOperation({
+    work,
+    contextSignals: { secondaryOperation: 'scout-blast-radius' },
+  });
+
+  const outcome = await executeDriverOperationChoice(work, choice, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig: runnerConfigFor(executorScript),
+  });
+
+  assert.equal(outcome.executed, true);
+  assert.equal(outcome.runResult.confidence, 'failed');
+  assert.equal(outcome.canAdvanceEdge, false);
+  assert.equal(outcome.stop, true);
+  assert.equal(outcome.reason, 'assignment-scout-blast-radius-failed');
+});
+
 test('Step 06 executing.scoped-subtask requires verified confidence (changed-file evidence) to proceed', () => {
   const reportedRes = interpretAssignmentRunResult({
     choice: { operation: 'scoped-subtask' },
@@ -980,18 +1349,22 @@ test('Step 06 executing.scoped-subtask requires verified confidence (changed-fil
 
 test('Step 06 governance-blocked or failed executor returns a stop without advancing Work', async () => {
   const tempDir = mkTempDir();
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/main.js b/src/main.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
   seedTaskSpecs(tempDir, ['review-item']);
   const executorScript = writeFailingExecutor(tempDir);
-  const work = { id: 'tsk-step06-fail', status: 'doing', stage: 'executing', domain: 'coding' };
+  const work = { id: 'tsk-step06-fail', status: 'doing', stage: 'executing', domain: 'coding', refs: ['diff:candidate-1', 'verify:pass'] };
   const choice = chooseStageOperation({
     work,
     contextSignals: { secondaryOperation: 'review-item' },
+    repoRoot: tempDir,
   });
 
   const outcome = await executeDriverOperationChoice(work, choice, {
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig: runnerConfigFor(executorScript),
+    contextSignals: { secondaryOperation: 'review-item', candidateDiffContent: 'diff content', candidateVerifyContent: 'verify output' },
   });
 
   assert.equal(outcome.executed, true);
@@ -1005,20 +1378,50 @@ test('Step 06 governance-blocked or failed executor returns a stop without advan
 });
 
 test('Step 06 Herdr and visibility tracking fields do not alter confidence ladder judgment', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_herdr', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(runDir, 'agent-report.md'),
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+  );
+
   const resWithHerdr = interpretAssignmentRunResult({
     choice: { operation: 'validate-plan' },
     runResult: {
       status: 'done',
       confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
       agentClaim: {
         status: 'done',
         verdict: 'READY',
         summary: 'Plan validated',
+        realityGate: {
+          'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        },
+        feasibilityMatrix: [{ risk: 'Risk 1', rating: 'Low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
         herdrStatus: 'active',
         herdrPane: 'pane-42',
         visibility: 'internal',
       },
+      evidence: {
+        artifacts: [path.join(runDir, 'agent-report.md')],
+      },
     },
+    repoRoot: tempDir,
   });
 
   assert.equal(resWithHerdr.canAdvanceEdge, true);
@@ -1034,6 +1437,21 @@ test('chooseStageOperation with lastRunResult READY WITH CONSTRAINTS verifies pl
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-resume-constraints');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nPlan.\n\n## Constraints\n- Scope limited to 1 file\n');
+  
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_constraints', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(runDir, 'agent-report.md'),
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Low risk (verified: src/runner/dispatch/operation-choice.mjs)\n'
+  );
 
   const work = {
     id: 'tsk-resume-constraints',
@@ -1046,11 +1464,22 @@ test('chooseStageOperation with lastRunResult READY WITH CONSTRAINTS verifies pl
   const lastRunResult = {
     status: 'done',
     confidence: 'reported',
+    runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
     agentClaim: {
       status: 'done',
       verdict: 'READY WITH CONSTRAINTS',
       summary: 'Plan ready with constraints',
+      realityGate: {
+        'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+      },
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
     },
+    evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
   };
 
   const choice = chooseStageOperation({
@@ -1067,13 +1496,47 @@ test('chooseStageOperation with lastRunResult READY WITH CONSTRAINTS verifies pl
 });
 
 test('interpretAssignmentRunResult rejects out-of-protocol top-level verdict "decompose" (Finding P2 fix)', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_decomp_top', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(runDir, 'agent-report.md'),
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+  );
+
   const res = interpretAssignmentRunResult({
     choice: { operation: 'validate-plan' },
     runResult: {
       status: 'done',
       confidence: 'reported',
-      agentClaim: { status: 'done', verdict: 'decompose', summary: 'Invalid top-level verdict' },
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'decompose',
+        summary: 'Invalid top-level verdict',
+        realityGate: {
+          'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        },
+        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+      },
+      evidence: {
+        artifacts: [path.join(runDir, 'agent-report.md')],
+      },
     },
+    repoRoot: tempDir,
   });
 
   assert.equal(res.canAdvanceEdge, false);
@@ -1108,5 +1571,2435 @@ test('chooseStageOperation ignores secondaryOperation equal to primaryOp.id in e
   assert.equal(choice.operation, 'implement-item');
   assert.equal(choice.dispatch, 'direct-stage-skill');
 });
+
+test('Negative test: validate-plan READY with only agent-result.json + evidenceRefs, no agent-report.md, must not advance', () => {
+  const choice = { operation: 'validate-plan' };
+  const interpreted = interpretAssignmentRunResult({
+    choice,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'Plan is ready',
+        evidenceRefs: ['docs/history/feat/plan.md'],
+      },
+      evidence: {
+        artifacts: ['.fgos/assignments/asgn_1/runs/01/agent-result.json'],
+      },
+    },
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-missing-report-artifact');
+});
+
+test('Negative test: review-item APPROVED with bound diff/verify evidenceRefs, no agent-report.md, must not approve or route forward', () => {
+  const tempDir = mkTempDir();
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
+  const choice = {
+    operation: 'review-item',
+    assignment: { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+  };
+  const interpreted = interpretAssignmentRunResult({
+    choice,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'APPROVED',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+      },
+      evidence: {
+        artifacts: ['.fgos/assignments/asgn_2/runs/01/agent-result.json'],
+      },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'review-item-missing-report-artifact');
+});
+
+test('Negative test: validate-plan READY with valid agent-result.json + empty agent-report.md must stop and not advance Work', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_empty', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '   \n  \n');
+  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({
+    status: 'done',
+    verdict: 'READY',
+    summary: 'Plan is ready',
+  }));
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', verdict: 'READY', summary: 'Plan is ready' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md'), path.join(runDir, 'agent-result.json')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-missing-report-artifact');
+});
+
+test('Negative test: validate-plan READY with generic report without feasibility matrix/reality-gate evidence must stop', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_generic', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\nEverything looks fine and complete.\n');
+  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({
+    status: 'done',
+    verdict: 'READY',
+    summary: 'Looks good',
+  }));
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', verdict: 'READY', summary: 'Looks good' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-insufficient-evidence');
+});
+
+test('Negative test: review-item APPROVED with bound refs + empty/generic agent-report.md must not approve or proceed', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_rev_generic', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\nChanges look okay with implementation notes.\n');
+  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({
+    status: 'done',
+    verdict: 'APPROVED',
+    summary: 'Approved',
+    evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+  }));
+
+  const choice = {
+    operation: 'review-item',
+    assignment: { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+  };
+
+  const interpreted = interpretAssignmentRunResult({
+    choice,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'Approved',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+});
+
+test('Negative test: scout-blast-radius reported with generic report must stop', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_scout_gen', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\nScouted codebase for blast radius.\n');
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'scout-blast-radius' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', summary: 'Done' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'scout-blast-radius-insufficient-evidence');
+});
+
+test('Negative test: resolve-question reported with generic report must stop', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_res_gen', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Research Report\nResearch question resolved.\n');
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'resolve-question' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', summary: 'Done' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'resolve-question-insufficient-evidence');
+});
+
+test('Negative test: validate-plan READY with keyword-only report text "Plan validated and feasible" must stop', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_kw', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\nPlan validated and feasible.\n');
+  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({
+    status: 'done',
+    verdict: 'READY',
+    summary: 'Plan validated and feasible',
+  }));
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', verdict: 'READY', summary: 'Plan validated and feasible' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-insufficient-evidence');
+});
+
+test('Negative test: review-item APPROVED with keyword-only report text "APPROVED: clean code" must stop', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_rev_kw', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\nAPPROVED: clean code.\n');
+  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({
+    status: 'done',
+    verdict: 'APPROVED',
+    summary: 'APPROVED: clean code',
+    evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+  }));
+
+  const choice = {
+    operation: 'review-item',
+    assignment: { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+  };
+
+  const interpreted = interpretAssignmentRunResult({
+    choice,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'APPROVED: clean code',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'review-item-insufficient-evidence');
+});
+
+test('Negative test: scout-blast-radius report with generic impact/search words without named files/symbols and posture must stop', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_scout_kw', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\nScout blast radius impact analysis search completed.\n');
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'scout-blast-radius' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', summary: 'Scouted' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canProceed, false);
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'scout-blast-radius-insufficient-evidence');
+});
+
+test('Negative test: resolve-question report with generic research words without answer/citation/uncertainty structure must stop', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_res_kw', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Research Report\nResearch question studied and facts found.\n');
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'resolve-question' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', summary: 'Researched' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canProceed, false);
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'resolve-question-insufficient-evidence');
+});
+
+test('P2 fix: chooseStageOperation review-item lastRunResult with missing report artifact path does not route to fix-verify-red', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
+  const choice = chooseStageOperation({
+    work: {
+      id: 'tsk',
+      stage: 'executing',
+      domain: 'coding',
+      workflow: 'feature',
+      refs: ['evidence:candidate-diff', 'evidence:verify-fail'],
+    },
+    contextSignals: { secondaryOperation: 'review-item' },
+    lastRunResult: {
+      operation: 'review-item',
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: {
+        status: 'done',
+        verdict: 'REJECT',
+        summary: 'no',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-fail'],
+      },
+      evidence: { artifacts: ['missing-agent-report.md'] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(choice.operation, 'review-item');
+  assert.equal(choice.reason, 'review-item-missing-report-artifact');
+  assert.equal(choice.stop, true);
+  assert.notEqual(choice.nextOperation, 'fix-verify-red');
+});
+
+test('Positive tests: real valid reports for validate-plan, review-item, scout-blast-radius, resolve-question pass', () => {
+  const tempDir = mkTempDir();
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
+
+  // 1. validate-plan valid
+  const valDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_pos', 'runs', '01');
+  fs.mkdirSync(valDir, { recursive: true });
+  fs.writeFileSync(path.join(valDir, 'agent-report.md'),
+    '# Reality Gate & Feasibility Report\n' +
+    '## Reality Gate Score\n' +
+    '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+    '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+    '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+    '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+    '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+    '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
+    '## Feasibility Matrix\n- Risk 1: Low (verified: src/runner/dispatch/operation-choice.mjs)\n'
+  );
+  const resVal = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(valDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'Plan is ready',
+        realityGate: {
+          'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        },
+        feasibilityMatrix: [
+          { risk: 'Risk 1', rating: 'Low', citation: 'src/runner/dispatch/operation-choice.mjs' },
+        ],
+      },
+      evidence: { artifacts: [path.join(valDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(resVal.canAdvanceEdge, true);
+  assert.equal(resVal.reason, 'validate-plan-ready');
+
+  // 2. review-item valid APPROVED
+  const revDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_rev_pos', 'runs', '01');
+  fs.mkdirSync(revDir, { recursive: true });
+  fs.writeFileSync(path.join(revDir, 'agent-report.md'),
+    '# Review Report\n' +
+    'Verdict: APPROVED\n' +
+    '- Candidate diff: evidence:candidate-diff changes in src/runner/loop.mjs verified.\n' +
+    '- Verify result: evidence:verify-pass 157 tests pass.\n' +
+    'Rationale: Clean code implementation.\n'
+  );
+  const resRev = interpretAssignmentRunResult({
+    choice: {
+      operation: 'review-item',
+      assignment: { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+    },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(revDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'Approved',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+      },
+      evidence: { artifacts: [path.join(revDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(resRev.canProceed, true);
+  assert.equal(resRev.reason, 'review-item-approved');
+
+  // 3. scout-blast-radius valid
+  const scoutDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_scout_pos', 'runs', '01');
+  fs.mkdirSync(scoutDir, { recursive: true });
+  fs.writeFileSync(path.join(scoutDir, 'agent-report.md'),
+    '# Scout Report\n' +
+    'Symbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\n' +
+    'Search posture: active rg cross-check performed.\n' +
+    'Affected callers: src/runner/loop.mjs\n' +
+    'Affected processes: none\n' +
+    'Risk read: low risk\n'
+  );
+  const resScout = interpretAssignmentRunResult({
+    choice: { operation: 'scout-blast-radius' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(scoutDir, 'stdout.log') },
+      agentClaim: { status: 'done', summary: 'Scouted' },
+      evidence: { artifacts: [path.join(scoutDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(resScout.canProceed, true);
+  assert.equal(resScout.reason, 'scout-blast-radius-reported');
+
+  // 4. resolve-question valid
+  const resDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_res_pos', 'runs', '01');
+  fs.mkdirSync(resDir, { recursive: true });
+  fs.writeFileSync(path.join(resDir, 'agent-report.md'),
+    '# Question Resolution Report\n' +
+    'Answer: repoRoot parameter is passed to interpretAssignmentRunResult.\n' +
+    'Citations: ref: src/runner/dispatch/operation-choice.mjs:L285\n' +
+    'Verdict: clear\n' +
+    'Remaining uncertainty: None.\n'
+  );
+  const resRes = interpretAssignmentRunResult({
+    choice: { operation: 'resolve-question' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(resDir, 'stdout.log') },
+      agentClaim: { status: 'done', summary: 'Resolved' },
+      evidence: { artifacts: [path.join(resDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(resRes.canProceed, true);
+  assert.equal(resRes.reason, 'resolve-question-reported');
+});
+
+test('Negative test: validate-plan READY + realityGate: {} + feasibilityMatrix: {} + generic report must stop with validate-plan-insufficient-evidence', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_empty_struct', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\nEverything looks fine.\n');
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'ok',
+        realityGate: {},
+        feasibilityMatrix: {},
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-insufficient-evidence');
+});
+
+test('Negative test: validate-plan READY + feasibilityMatrix: [] or entries with no citation/evidence must stop', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_no_cit', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\nValidation done.\n');
+
+  // Case A: feasibilityMatrix: []
+  const resEmptyArr = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'ok',
+        realityGate: { modeFit: 'PASS' },
+        feasibilityMatrix: [],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(resEmptyArr.canAdvanceEdge, false);
+  assert.equal(resEmptyArr.stop, true);
+  assert.equal(resEmptyArr.reason, 'validate-plan-insufficient-evidence');
+
+  // Case B: feasibilityMatrix entries with no citation/evidence
+  const resNoCit = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'ok',
+        realityGate: { modeFit: 'PASS' },
+        feasibilityMatrix: [{ risk: 'high' }],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(resNoCit.canAdvanceEdge, false);
+  assert.equal(resNoCit.stop, true);
+  assert.equal(resNoCit.reason, 'validate-plan-insufficient-evidence');
+});
+
+test('Negative test: review-item APPROVED + bound diff/verify refs + findings: [{}] + generic report must stop with review-item-insufficient-evidence', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_rev_empty_findings', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\nChanges look okay with implementation notes.\n');
+
+  const choice = {
+    operation: 'review-item',
+    assignment: { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+  };
+
+  const interpreted = interpretAssignmentRunResult({
+    choice,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'ok',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+        findings: [{}],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'review-item-insufficient-evidence');
+});
+
+test('Negative test: review-item APPROVED + findings not tied to diff/verify refs must stop', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_rev_untied_findings', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\nChanges look okay with implementation notes.\n');
+
+  const choice = {
+    operation: 'review-item',
+    assignment: { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+  };
+
+  const interpreted = interpretAssignmentRunResult({
+    choice,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'ok',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+        findings: [{ topic: 'formatting', comment: 'check indent' }],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'review-item-insufficient-evidence');
+});
+
+test('Positive test: valid structured validate-plan claim with real gate rows and feasibility rows passes', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_struct_pos', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'),
+    '# Reality Gate & Feasibility Validation Report\n' +
+    '## Reality Gate Score\n' +
+    '- Mode fit: PASS (citation: src/runner/loop.mjs)\n' +
+    '- Repo fit: PASS (citation: src/runner/loop.mjs)\n' +
+    '- Assumptions: PASS (citation: src/runner/loop.mjs)\n' +
+    '- Smaller path: PASS (citation: src/runner/loop.mjs)\n' +
+    '- Proof surface: PASS (citation: src/runner/loop.mjs)\n' +
+    '- Impact-analysis posture: PASS (citation: src/runner/loop.mjs)\n' +
+    '## Feasibility Matrix\n- Risk 1: Low (verified: src/runner/loop.mjs)\n'
+  );
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'Plan validated',
+        realityGate: {
+          modeFit: 'PASS (citation: src/runner/loop.mjs:L100)',
+          repoFit: 'PASS (citation: src/runner/loop.mjs:L100)',
+          assumptions: 'PASS (citation: src/runner/loop.mjs:L100)',
+          smallerPath: 'PASS (citation: src/runner/loop.mjs:L100)',
+          proofSurface: 'PASS (citation: src/runner/loop.mjs:L100)',
+          impactAnalysisPosture: 'PASS (citation: src/runner/loop.mjs:L100)',
+        },
+        feasibilityMatrix: [{ risk: 'high', citation: 'src/runner/loop.mjs:L100' }],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, true);
+  assert.equal(interpreted.stop, false);
+  assert.equal(interpreted.reason, 'validate-plan-ready');
+});
+
+test('Positive test: valid structured review-item claim with real findings tied to provided diff/verify refs passes', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_rev_struct_pos', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\nSee structured agent-result.json claim.\n');
+
+  const choice = {
+    operation: 'review-item',
+    assignment: { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+  };
+
+  const interpreted = interpretAssignmentRunResult({
+    choice,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'Approved',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+        findings: [{ diffRef: 'evidence:candidate-diff', verifyRef: 'evidence:verify-pass', comment: 'APPROVED clean code' }],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canProceed, true);
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, false);
+  assert.equal(interpreted.reason, 'review-item-approved');
+});
+
+test('Finding 2: executeAssignment fails closed on read-only validate-plan mutations without running automatic rollback', async () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan']);
+
+  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-iso');
+  fs.mkdirSync(docsDir, { recursive: true });
+  const planPath = path.join(docsDir, 'plan.md');
+  const originalPlanContent = '# Plan\nOriginal plan content.\n';
+  fs.writeFileSync(planPath, originalPlanContent);
+  execSync(`git add ${planPath} && git commit -m "initial plan"`, { cwd: tempDir, stdio: 'ignore' });
+
+  addWork(tempDir, {
+    id: 'tsk-iso-val',
+    title: 'Test isolation for validate-plan',
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    kind: 'feature',
+    risk: 'standard',
+    deps: [],
+    refs: [],
+    verify: 'node -e "process.exit(0)"',
+    docsRef: 'docs/history/feat-iso',
+  });
+
+  const assignment = buildAssignment({
+    work: listWork(tempDir).work['tsk-iso-val'],
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  // Fake executor that misbehaves by dirtying the repo (writing a temp file and mutating plan.md)
+  const dirtyTmpPath = path.join(tempDir, 'plan-validation.tmp');
+  const executorScript = writeFakeExecutor(tempDir, {
+    status: 'done',
+    verdict: 'READY',
+    summary: 'Mutating validate-plan executor',
+  });
+
+  // Inject file write into executor script after top-level imports
+  const scriptContent = fs.readFileSync(executorScript, 'utf8');
+  const mutatingScriptContent = scriptContent.replace(
+    "import path from 'node:path';",
+    "import path from 'node:path';\n    fs.writeFileSync('" + dirtyTmpPath + "', 'dirty temp data');\n    fs.writeFileSync('" + planPath + "', '# Dirty modified plan\\n');"
+  );
+  fs.writeFileSync(executorScript, mutatingScriptContent);
+
+  const cfg = runnerConfigFor(executorScript);
+
+  const runResult = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig: cfg,
+  });
+
+  assert.equal(runResult.status, 'failed');
+  assert.equal(runResult.confidence, 'failed');
+
+  // Verify evidence recorded the mutations
+  assert.ok(runResult.evidence.changedFiles.some((f) => f.includes('plan-validation.tmp')));
+  assert.ok(runResult.evidence.changedFiles.some((f) => f.includes('plan.md')));
+
+  // Verify files were not automatically deleted or restored (no automatic rollback)
+  assert.equal(fs.existsSync(dirtyTmpPath), true, 'untracked dirty file should not be automatically removed');
+  assert.equal(fs.readFileSync(planPath, 'utf8'), '# Dirty modified plan\n', 'tracked file changes should not be automatically restored');
+});
+
+test('Finding 3 negative test: validate-plan READY with headings-only report text stops', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_headings', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'Reality gate: PASS\nFeasibility matrix: PASS\n');
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', verdict: 'READY', summary: 'Plan validated' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-insufficient-evidence');
+});
+
+test('Finding 3 negative test: scout-blast-radius reported with whitespace string array or blank value stops', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_scout_blank', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\nScouting complete.\n');
+
+  // Test 1: whitespace files and whitespace posture
+  const interpretedWhitespace = interpretAssignmentRunResult({
+    choice: { operation: 'scout-blast-radius' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', files: ['   '], posture: '   ' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpretedWhitespace.canProceed, false);
+  assert.equal(interpretedWhitespace.stop, true);
+  assert.equal(interpretedWhitespace.reason, 'scout-blast-radius-insufficient-evidence');
+
+  // Test 2: array containing blank values
+  const interpretedBlankArray = interpretAssignmentRunResult({
+    choice: { operation: 'scout-blast-radius' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', files: ['src/main.js', '   '], posture: 'active' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpretedBlankArray.canProceed, false);
+  assert.equal(interpretedBlankArray.stop, true);
+  assert.equal(interpretedBlankArray.reason, 'scout-blast-radius-insufficient-evidence');
+});
+
+test('Finding 3 negative test: resolve-question reported with whitespace answer or citations or blank array elements stops', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_res_blank', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Question Resolution\nResolved question.\n');
+
+  // Test 1: whitespace answer and whitespace citations
+  const interpretedWhitespace = interpretAssignmentRunResult({
+    choice: { operation: 'resolve-question' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', answer: '   ', citations: ['   '], verdict: 'clear' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpretedWhitespace.canProceed, false);
+  assert.equal(interpretedWhitespace.stop, true);
+  assert.equal(interpretedWhitespace.reason, 'resolve-question-insufficient-evidence');
+
+  // Test 2: array containing blank elements in citations
+  const interpretedBlankCitations = interpretAssignmentRunResult({
+    choice: { operation: 'resolve-question' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', answer: 'Concrete answer here', citations: ['src/a.js:L10', '  '], verdict: 'clear' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpretedBlankCitations.canProceed, false);
+  assert.equal(interpretedBlankCitations.stop, true);
+  assert.equal(interpretedBlankCitations.reason, 'resolve-question-insufficient-evidence');
+});
+
+test('Finding 1 regression test: valid validate-plan NOT READY RunResult causes next driver action to be shape-plan', async () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-notready');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nProposed plan.\n');
+
+  addWork(tempDir, {
+    id: 'tsk-driver-notready',
+    title: 'Test NOT READY driver loop',
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    kind: 'feature',
+    risk: 'standard',
+    deps: [],
+    refs: [],
+    verify: 'node -e "process.exit(0)"',
+    docsRef: 'docs/history/feat-notready',
+  });
+
+  const executorScript = writeFakeExecutor(tempDir, {
+    status: 'done',
+    verdict: 'NOT READY - RETURN TO PLANNING',
+    summary: 'Plan has gaps',
+  });
+  const cfg = runnerConfigFor(executorScript);
+
+  // First pass: runs validate-plan and stores assignment & run result
+  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
+
+  const itemAfterFirst = listWork(tempDir).work['tsk-driver-notready'];
+  assert.equal(itemAfterFirst.stage, 'planning', 'Work must remain in planning stage');
+
+  // Second pass: chooseStageOperation must choose shape-plan, not validate-plan
+  const choiceOnNextPass = chooseStageOperation({
+    work: itemAfterFirst,
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    repoRoot: tempDir,
+  });
+
+  assert.equal(choiceOnNextPass.operation, 'shape-plan');
+  assert.equal(choiceOnNextPass.dispatch, 'direct-stage-skill');
+  assert.equal(choiceOnNextPass.canAdvanceEdge, false);
+});
+
+test('Finding 2 negative test: missing dimensions in realityGate stops with validate-plan-insufficient-evidence', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_missing_dims', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'Report text\n');
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'Plan validated',
+        realityGate: { modeFit: 'PASS (citation: src/main.js)', repoFit: 'PASS (citation: src/main.js)' },
+        feasibilityMatrix: [{ risk: 'low', citation: 'src/main.js' }],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-insufficient-evidence');
+});
+
+test('Finding 2 negative test: PASS-only without citation in realityGate stops with validate-plan-insufficient-evidence', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_nocite', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'Report text\n');
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'Plan validated',
+        realityGate: {
+          modeFit: 'PASS',
+          repoFit: 'PASS',
+          assumptions: 'PASS',
+          smallerPath: 'PASS',
+          proofSurface: 'PASS',
+          impactAnalysisPosture: 'PASS',
+        },
+        feasibilityMatrix: [{ risk: 'low', citation: 'src/main.js' }],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-insufficient-evidence');
+});
+
+test('Finding 2 negative test: evidence-looking placeholder keys stop with validate-plan-insufficient-evidence', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_placeholder', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'Report text\n');
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'Plan validated',
+        realityGate: {
+          modeFit: { status: 'PASS', citation: 'evidence-looking-key' },
+          repoFit: { status: 'PASS', citation: 'placeholder' },
+          assumptions: { status: 'PASS', citation: 'none' },
+          smallerPath: { status: 'PASS', citation: 'todo' },
+          proofSurface: { status: 'PASS', citation: 'tbd' },
+          impactAnalysisPosture: { status: 'PASS', citation: 'n/a' },
+        },
+        feasibilityMatrix: [{ risk: 'low', citation: 'placeholder' }],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-insufficient-evidence');
+});
+
+test('Finding 4 negative test: review-item evidenceRefs present but findings/report not citing those exact refs stops', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_rev_generic', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\nGeneric diff reviewed and verify passed.\n');
+
+  const choice = {
+    operation: 'review-item',
+    assignment: { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+  };
+
+  const interpreted = interpretAssignmentRunResult({
+    choice,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'Generic approval',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+        findings: [{ comment: 'diff reviewed and verify passed' }],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'review-item-insufficient-evidence');
+});
+
+test('Finding 3: chooseStageOperation ignores stale stored READY result when plan.md modified after assignment run', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-stale');
+  fs.mkdirSync(docsDir, { recursive: true });
+  const planPath = path.join(docsDir, 'plan.md');
+  fs.writeFileSync(planPath, '# Mode: tiny\nOriginal plan.\n');
+
+  const work = {
+    id: 'tsk-stale-ready',
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    docsRef: 'docs/history/feat-stale',
+  };
+
+  // Create stored validate-plan READY assignment result in .fgos/assignments
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_stale_1');
+  const runDir = path.join(asgnDir, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify({
+    assignmentId: 'asgn_stale_1',
+    workId: 'tsk-stale-ready',
+    stage: 'planning',
+    operation: 'validate-plan',
+  }));
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\nPlan validated.\n');
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
+    status: 'done',
+    confidence: 'reported',
+    agentClaim: { status: 'done', verdict: 'READY', summary: 'Ready' },
+  }));
+
+  // Update plan.md timestamp to be newer than result.json
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(planPath, future, future);
+
+  const choice = chooseStageOperation({
+    work,
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    repoRoot: tempDir,
+  });
+
+  // Stale READY result is ignored, choice dispatches validate-plan for fresh validation
+  assert.equal(choice.operation, 'validate-plan');
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
+test('Finding 3: chooseStageOperation ignores stale stored READY result when plan.md modified after assignment run in worktree', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const id = 'tsk-stale-wt-ready';
+  const docsRef = 'docs/history/feat-wt-stale';
+  const branch = `fgw/${id}`;
+  execFileSync('git', ['branch', branch], { cwd: tempDir });
+  const wtDir = path.join(tempDir, 'fgw', id);
+  execFileSync('git', ['worktree', 'add', wtDir, branch], { cwd: tempDir });
+  const wtDocsDir = path.join(wtDir, docsRef);
+  fs.mkdirSync(wtDocsDir, { recursive: true });
+  const wtPlanPath = path.join(wtDocsDir, 'plan.md');
+  fs.writeFileSync(wtPlanPath, '# Mode: tiny\nWorktree plan.\n');
+
+  const work = {
+    id,
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    docsRef,
+  };
+
+  // Create stored validate-plan READY assignment result in .fgos/assignments
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_stale_wt_1');
+  const runDir = path.join(asgnDir, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify({
+    assignmentId: 'asgn_stale_wt_1',
+    workId: id,
+    stage: 'planning',
+    operation: 'validate-plan',
+  }));
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\nPlan validated.\n');
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
+    status: 'done',
+    confidence: 'reported',
+    agentClaim: { status: 'done', verdict: 'READY', summary: 'Ready' },
+  }));
+
+  // Update worktree plan.md timestamp to be newer than result.json
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(wtPlanPath, future, future);
+
+  const choice = chooseStageOperation({
+    work,
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    repoRoot: tempDir,
+  });
+
+  // Stale READY result is ignored because worktree plan.md was updated, dispatches validate-plan for fresh validation
+  assert.equal(choice.operation, 'validate-plan');
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
+test('Finding 3: chooseStageOperation ignores latest non-validate assignment result on same Work id', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-nonval');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nPlan content.\n');
+
+  const work = {
+    id: 'tsk-nonval-op',
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    docsRef: 'docs/history/feat-nonval',
+  };
+
+  // Create stored scout-blast-radius assignment result for same workId
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_nonval_1');
+  const runDir = path.join(asgnDir, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify({
+    assignmentId: 'asgn_nonval_1',
+    workId: 'tsk-nonval-op',
+    stage: 'executing',
+    operation: 'scout-blast-radius',
+  }));
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
+    status: 'done',
+    confidence: 'reported',
+    agentClaim: { status: 'done', verdict: 'READY', summary: 'Scout done' },
+  }));
+
+  const choice = chooseStageOperation({
+    work,
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    repoRoot: tempDir,
+  });
+
+  // Non-validate operation assignment is ignored
+  assert.equal(choice.operation, 'validate-plan');
+});
+
+test('Finding 4: review-item selected without work.refs or candidate diff/verify refs stops before spawn', () => {
+  const tempDir = mkTempDir();
+  const work = {
+    id: 'tsk-no-refs',
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    refs: [],
+  };
+
+  const choice = chooseStageOperation({
+    work,
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    contextSignals: { needsReview: true, hasCandidateImplementation: false },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(choice.operation, 'review-item');
+  assert.equal(choice.stop, true);
+  assert.equal(choice.reason, 'review-item-missing-candidate-diff-and-verify-refs');
+});
+
+test('Finding 4: review-item happy path with candidate implementation signal binds candidate diff/verify refs into contextRefs', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  execFileSync('git', ['checkout', '-b', 'fgw/tsk-candidate-refs'], { cwd: tempDir });
+  fs.writeFileSync(path.join(tempDir, 'feat.txt'), 'candidate impl\n');
+  execFileSync('git', ['add', 'feat.txt'], { cwd: tempDir });
+  execFileSync('git', ['commit', '-m', 'feat: candidate'], { cwd: tempDir });
+  execFileSync('git', ['checkout', 'main'], { cwd: tempDir });
+  const work = {
+    id: 'tsk-candidate-refs',
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    refs: ['diff:feat-1', 'verify:pass-1'],
+    verify: 'node -e "process.exit(0)"',
+  };
+
+  const choice = chooseStageOperation({
+    work,
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    contextSignals: { hasCandidateImplementation: true },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(choice.operation, 'review-item');
+  assert.equal(choice.stop, false);
+  assert.ok(Array.isArray(choice.contextRefs));
+  assert.ok(choice.contextRefs.some((r) => r.includes('diff')));
+  assert.ok(choice.contextRefs.some((r) => r.includes('verify')));
+});
+
+test('Finding 5 negative test: resolve-question rejects placeholder citations in structured claims', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_res_ph', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Research Report\nDetailed findings...\n');
+
+  const placeholders = ['n/a', 'placeholder', 'none', 'todo', 'some random text without file or line ref'];
+
+  for (const ph of placeholders) {
+    const interpreted = interpretAssignmentRunResult({
+      choice: { operation: 'resolve-question' },
+      runResult: {
+        status: 'done',
+        confidence: 'reported',
+        runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+        agentClaim: {
+          status: 'done',
+          verdict: 'clear',
+          answer: 'The answer is path A',
+          citations: [ph],
+        },
+        evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+      },
+      repoRoot: tempDir,
+    });
+
+    assert.equal(interpreted.canProceed, false, `Placeholder citation "${ph}" should fail canProceed`);
+    assert.equal(interpreted.stop, true, `Placeholder citation "${ph}" should stop execution`);
+    assert.equal(interpreted.reason, 'resolve-question-insufficient-evidence');
+  }
+});
+
+test('P1 fix: review-item with hasCandidateImplementation: true but no real diff/verify refs stops before spawn', () => {
+  const tempDir = mkTempDir();
+  const work = {
+    id: 'tsk-candidate-no-real-refs',
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    refs: [],
+  };
+
+  const choice = chooseStageOperation({
+    work,
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    contextSignals: { hasCandidateImplementation: true },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(choice.operation, 'review-item');
+  assert.equal(choice.stop, true);
+  assert.equal(choice.reason, 'review-item-missing-candidate-diff-and-verify-refs');
+});
+
+test('P1 fix: review-item approval fails when only fabricated synthetic placeholder refs are supplied in approval', () => {
+  const tempDir = mkTempDir();
+  const work = {
+    id: 'tsk-candidate-approval-fail',
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    refs: [],
+  };
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'review-item' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      verdict: 'APPROVED',
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+        findings: [{ text: 'APPROVED evidence:candidate-diff evidence:verify-pass' }],
+      },
+      evidence: { artifacts: ['agent-report.md'] },
+    },
+    work,
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canProceed, undefined);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'review-item-missing-evidence-refs');
+});
+
+test('P1 fix: review-item happy path with real bound diff/verify refs still passes', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  execFileSync('git', ['checkout', '-b', 'fgw/tsk-real-bound-refs'], { cwd: tempDir });
+  fs.writeFileSync(path.join(tempDir, 'patch.txt'), 'candidate impl\n');
+  execFileSync('git', ['add', 'patch.txt'], { cwd: tempDir });
+  execFileSync('git', ['commit', '-m', 'feat: candidate'], { cwd: tempDir });
+  execFileSync('git', ['checkout', 'main'], { cwd: tempDir });
+  const work = {
+    id: 'tsk-real-bound-refs',
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    refs: ['diff:patch-01', 'verify:pass-01'],
+    verify: 'node -e "process.exit(0)"',
+  };
+
+  const choice = chooseStageOperation({
+    work,
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    contextSignals: { hasCandidateImplementation: true },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(choice.operation, 'review-item');
+  assert.equal(choice.stop, false);
+  assert.deepEqual(Array.from(choice.contextRefs), ['diff:patch-01', 'verify:pass-01']);
+});
+
+test('P1 fix: review-item in actual git repo with bogus refs (diff:patch-01, verify:pass-01) without real evidence fails closed', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_rev_bogus', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const reportPath = path.join(runDir, 'agent-report.md');
+  fs.writeFileSync(reportPath, '# Review Report\nAPPROVED: diff:patch-01 verify:pass-01 clean evaluation\n');
+
+  const work = {
+    id: 'tsk-bogus-refs',
+    stage: 'executing',
+    verify: 'node -e "process.exit(0)"',
+    refs: ['diff:patch-01', 'verify:pass-01'],
+  };
+
+  const choice = {
+    operation: 'review-item',
+    assignment: { contextRefs: ['diff:patch-01', 'verify:pass-01'] },
+  };
+
+  const interpreted = interpretAssignmentRunResult({
+    choice,
+    work,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'Clean code',
+        evidenceRefs: ['diff:patch-01', 'verify:pass-01'],
+      },
+      evidence: {
+        artifacts: [reportPath],
+      },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'review-item-missing-evidence-refs');
+});
+
+test('P1 fix: validate-plan with unreadable report and fake citations fails closed', () => {
+  const tempDir = mkTempDir();
+  const runResult = {
+    status: 'done',
+    confidence: 'reported',
+    agentClaim: {
+      status: 'done',
+      verdict: 'READY',
+      summary: 'Plan is ready',
+      realityGate: {
+        modeFit: 'PASS citation: no/such/file.mjs:L1',
+        repoFit: 'PASS citation: no/such/file.mjs:L1',
+        assumptionsFit: 'PASS citation: no/such/file.mjs:L1',
+        smallerPathFit: 'PASS citation: no/such/file.mjs:L1',
+        proofSurfaceFit: 'PASS citation: no/such/file.mjs:L1',
+        impactAnalysisPosture: 'PASS citation: no/such/file.mjs:L1',
+      },
+      feasibilityMatrix: ['Feasible citation: no/such/file.mjs:L1'],
+    },
+    evidence: { artifacts: ['agent-report.md'] },
+  };
+
+  // Without repoRoot (unreadable report)
+  const interpretedNoRoot = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult,
+  });
+
+  assert.equal(interpretedNoRoot.canAdvanceEdge, false);
+  assert.equal(interpretedNoRoot.stop, true);
+  assert.equal(interpretedNoRoot.reason, 'validate-plan-missing-report-artifact');
+
+  // With repoRoot where file does not exist
+  const interpretedWithRoot = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult,
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpretedWithRoot.canAdvanceEdge, false);
+  assert.equal(interpretedWithRoot.stop, true);
+});
+
+test('P2 fix: stale validate-plan check does not crash when lastRunResult is provided in-memory with existing plan.md', () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['validate-plan']);
+  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-stale-test');
+  fs.mkdirSync(docsDir, { recursive: true });
+  const planPath = path.join(docsDir, 'plan.md');
+  fs.writeFileSync(planPath, '# Plan\nInitial content\n');
+
+  const work = {
+    id: 'tsk-stale-stat-test',
+    stage: 'planning',
+    domain: 'coding',
+    workflow: 'feature',
+    docsRef: 'docs/history/feat-stale-test',
+  };
+
+  const oldTime = new Date(Date.now() - 100000).toISOString();
+  const lastRunResult = {
+    operation: 'validate-plan',
+    stage: 'planning',
+    settledAt: oldTime,
+    status: 'done',
+    confidence: 'reported',
+    agentClaim: { verdict: 'READY' },
+  };
+
+  // Calling chooseStageOperation must not throw ReferenceError: planStat is not defined
+  assert.doesNotThrow(() => {
+    const choice = chooseStageOperation({
+      work,
+      stage: 'planning',
+      domain: 'coding',
+      workflow: 'feature',
+      lastRunResult,
+      repoRoot: tempDir,
+    });
+    assert.equal(choice.operation, 'validate-plan');
+    assert.equal(choice.reason, 'plan-written-needs-reality-check');
+  });
+});
+
+test('Finding 1 regression test: Assignment-backed validate-plan with returned children or verdictPayload cannot create child Work', async () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan']);
+
+  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-val-children');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: standard\nProposed plan.\n');
+
+  addWork(tempDir, {
+    id: 'tsk-val-no-children',
+    title: 'Test validate-plan cannot decompose',
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    kind: 'feature',
+    risk: 'standard',
+    deps: [],
+    refs: [],
+    verify: 'node -e "process.exit(0)"',
+    docsRef: 'docs/history/feat-val-children',
+  });
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_child', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(runDir, 'agent-report.md'),
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: src/runner/loop.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/loop.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/loop.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/loop.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/loop.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/loop.mjs)\n' +
+      '## Feasibility Matrix\n- Risk 1: Low (verified: src/runner/loop.mjs)\n'
+  );
+
+  const executorScript = writeFakeExecutor(tempDir, {
+    status: 'done',
+    verdict: 'READY',
+    summary: 'Validation ready with child proposal',
+    children: [
+      { title: 'Illegal Child Work 1', footprint: ['src/illegal1.mjs'], verify: 'node -e "process.exit(0)"' },
+      { title: 'Illegal Child Work 2', footprint: ['src/illegal2.mjs'], verify: 'node -e "process.exit(0)"' },
+    ],
+    verdictPayload: {
+      verdict: 'decompose',
+      children: [
+        { title: 'Illegal Child Work 1', footprint: ['src/illegal1.mjs'], verify: 'node -e "process.exit(0)"' },
+      ],
+    },
+    realityGate: {
+      'mode-fit': 'PASS (citation: src/runner/loop.mjs)',
+      'repo-fit': 'PASS (citation: src/runner/loop.mjs)',
+      'assumptions-fit': 'PASS (citation: src/runner/loop.mjs)',
+      'smaller-path-fit': 'PASS (citation: src/runner/loop.mjs)',
+      'proof-surface-fit': 'PASS (citation: src/runner/loop.mjs)',
+      'impact-analysis-posture': 'PASS (citation: src/runner/loop.mjs)',
+    },
+    feasibilityMatrix: [{ risk: 'Risk 1', rating: 'Low', citation: 'src/runner/loop.mjs' }],
+  });
+
+  const cfg = runnerConfigFor(executorScript);
+  const work = listWork(tempDir).work['tsk-val-no-children'];
+  const choice = {
+    operation: 'validate-plan',
+    dispatch: 'assignment',
+    stage: 'planning',
+  };
+
+  const outcome = await executeDriverOperationChoice(work, choice, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig: cfg,
+  });
+
+  assert.equal(outcome.verdictPayload, undefined);
+  assert.equal(outcome.canAdvanceEdge, true);
+
+  // Check store state: no child work items added
+  const currentStore = listWork(tempDir);
+  const children = Object.values(currentStore.work).filter((w) => w.parent === 'tsk-val-no-children');
+  assert.equal(children.length, 0);
+});
+
+test('Finding 2 regression test: report-only READY validate-plan without realityGate and feasibilityMatrix cannot advance', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_report_only', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(runDir, 'agent-report.md'),
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: src/runner/loop.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/loop.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/loop.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/loop.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/loop.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/loop.mjs)\n' +
+      '## Feasibility Matrix\n- Risk 1: Low (verified: src/runner/loop.mjs)\n'
+  );
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', verdict: 'READY', summary: 'Plan ready' }, // missing realityGate + feasibilityMatrix
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-insufficient-evidence');
+});
+
+test('Finding 3 regression test: citation: made-up-ref and nonexistent file references cannot advance validate-plan', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_fake_cite', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(runDir, 'agent-report.md'),
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: made-up-ref)\n' +
+      '- Repo fit: PASS (citation: made-up-ref)\n' +
+      '- Assumptions: PASS (citation: made-up-ref)\n' +
+      '- Smaller path: PASS (citation: made-up-ref)\n' +
+      '- Proof surface: PASS (citation: made-up-ref)\n' +
+      '- Impact-analysis posture: PASS (citation: made-up-ref)\n' +
+      '## Feasibility Matrix\n- Risk 1: Low (verified: made-up-ref)\n'
+  );
+
+  // Test Case A: citation: made-up-ref
+  const interpretedFakeCite = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'Plan ready',
+        realityGate: {
+          'mode-fit': 'PASS (citation: made-up-ref)',
+          'repo-fit': 'PASS (citation: made-up-ref)',
+          'assumptions-fit': 'PASS (citation: made-up-ref)',
+          'smaller-path-fit': 'PASS (citation: made-up-ref)',
+          'proof-surface-fit': 'PASS (citation: made-up-ref)',
+          'impact-analysis-posture': 'PASS (citation: made-up-ref)',
+        },
+        feasibilityMatrix: [{ risk: 'Risk 1', rating: 'Low', citation: 'citation: made-up-ref' }],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpretedFakeCite.canAdvanceEdge, false);
+  assert.equal(interpretedFakeCite.stop, true);
+  assert.equal(interpretedFakeCite.reason, 'validate-plan-insufficient-evidence');
+
+  // Test Case B: nonexistent file reference
+  const interpretedNonexistentFile = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'Plan ready',
+        realityGate: {
+          'mode-fit': 'PASS (citation: src/nonexistent-file-123.mjs)',
+          'repo-fit': 'PASS (citation: src/nonexistent-file-123.mjs)',
+          'assumptions-fit': 'PASS (citation: src/nonexistent-file-123.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/nonexistent-file-123.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/nonexistent-file-123.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/nonexistent-file-123.mjs)',
+        },
+        feasibilityMatrix: [{ risk: 'Risk 1', rating: 'Low', citation: 'src/nonexistent-file-123.mjs' }],
+      },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpretedNonexistentFile.canAdvanceEdge, false);
+  assert.equal(interpretedNonexistentFile.stop, true);
+  assert.equal(interpretedNonexistentFile.reason, 'validate-plan-insufficient-evidence');
+});
+
+test('Finding 4 regression test: missing agent-report.md plus inline report text cannot satisfy report artifact requirement', () => {
+  const tempDir = mkTempDir();
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'Plan ready',
+        realityGate: {
+          'mode-fit': 'PASS (citation: src/runner/loop.mjs)',
+          'repo-fit': 'PASS (citation: src/runner/loop.mjs)',
+          'assumptions-fit': 'PASS (citation: src/runner/loop.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/runner/loop.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/runner/loop.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/runner/loop.mjs)',
+        },
+        feasibilityMatrix: [{ risk: 'Risk 1', rating: 'Low', citation: 'src/runner/loop.mjs' }],
+      },
+      evidence: {
+        artifacts: [path.join(tempDir, 'missing-agent-report.md')],
+        reportText:
+          '# Reality Gate & Feasibility Report\n' +
+          '## Reality Gate Score\n' +
+          '- Mode fit: PASS (citation: src/runner/loop.mjs)\n' +
+          '- Repo fit: PASS (citation: src/runner/loop.mjs)\n' +
+          '- Assumptions: PASS (citation: src/runner/loop.mjs)\n' +
+          '- Smaller path: PASS (citation: src/runner/loop.mjs)\n' +
+          '- Proof surface: PASS (citation: src/runner/loop.mjs)\n' +
+          '- Impact-analysis posture: PASS (citation: src/runner/loop.mjs)\n' +
+          '## Feasibility Matrix\n- Risk 1: Low (verified: src/runner/loop.mjs)\n',
+      },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'validate-plan-missing-report-artifact');
+});
+
+test('Finding 2: validate-plan matrix covering subset of medium+ risks in plan.md fails closed, covering all passes', () => {
+  const tempDir = mkTempDir();
+  const docsDir = path.join(tempDir, 'docs', 'feature');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(docsDir, 'plan.md'),
+    '# plan.md\n\n' +
+    '## Risk Map\n\n' +
+    '| Risk | Level | Mitigation |\n' +
+    '|---|---|---|\n' +
+    '| auth | medium | ... |\n' +
+    '| migration | high | ... |\n' +
+    '| rollback | critical | ... |\n'
+  );
+
+  const mainFile = path.join(tempDir, 'src', 'main.mjs');
+  fs.mkdirSync(path.dirname(mainFile), { recursive: true });
+  fs.writeFileSync(mainFile, '// main\n');
+
+  const reportDir = path.join(tempDir, 'run01');
+  fs.mkdirSync(reportDir, { recursive: true });
+  const reportPath = path.join(reportDir, 'agent-report.md');
+  fs.writeFileSync(reportPath,
+    '# Reality Gate Score & Feasibility Matrix Report\n' +
+    'Mode fit: PASS (citation: src/main.mjs)\n' +
+    'Repo fit: PASS (citation: src/main.mjs)\n' +
+    'Assumptions: PASS (citation: src/main.mjs)\n' +
+    'Smaller path: PASS (citation: src/main.mjs)\n' +
+    'Proof surface: PASS (citation: src/main.mjs)\n' +
+    'Impact-analysis posture: PASS (citation: src/main.mjs)\n' +
+    'Feasibility matrix: verified.\n'
+  );
+
+  const work = { id: 'tsk-f2', docsRef: 'docs/feature' };
+
+  // Negative test: feasibility matrix only covers "rollback", omitting "auth" and "migration"
+  const resNegative = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        realityGate: {
+          'mode-fit': 'PASS (citation: src/main.mjs)',
+          'repo-fit': 'PASS (citation: src/main.mjs)',
+          'assumptions-fit': 'PASS (citation: src/main.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/main.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/main.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/main.mjs)',
+        },
+        feasibilityMatrix: [{ risk: 'rollback', citation: 'src/main.mjs' }],
+      },
+      evidence: { artifacts: [reportPath] },
+    },
+    work,
+    repoRoot: tempDir,
+  });
+
+  assert.equal(resNegative.canAdvanceEdge, false);
+  assert.equal(resNegative.stop, true);
+  assert.equal(resNegative.reason, 'validate-plan-insufficient-evidence');
+
+  // Positive test: feasibility matrix covers all three medium+ risks ("auth", "migration", "rollback")
+  const resPositive = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: {
+        status: 'done',
+        verdict: 'READY',
+        realityGate: {
+          'mode-fit': 'PASS (citation: src/main.mjs)',
+          'repo-fit': 'PASS (citation: src/main.mjs)',
+          'assumptions-fit': 'PASS (citation: src/main.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/main.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/main.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/main.mjs)',
+        },
+        feasibilityMatrix: [
+          { risk: 'auth', citation: 'src/main.mjs' },
+          { risk: 'migration', citation: 'src/main.mjs' },
+          { risk: 'rollback', citation: 'src/main.mjs' },
+        ],
+      },
+      evidence: { artifacts: [reportPath] },
+    },
+    work,
+    repoRoot: tempDir,
+  });
+
+  assert.equal(resPositive.canAdvanceEdge, true);
+  assert.equal(resPositive.stop, false);
+  assert.equal(resPositive.reason, 'validate-plan-ready');
+});
+
+test('Finding 3: resolve-question report-text citation: made-up-ref without concrete citation fails closed', () => {
+  const tempDir = mkTempDir();
+  const reportDir = path.join(tempDir, 'run01');
+  fs.mkdirSync(reportDir, { recursive: true });
+  const reportPath = path.join(reportDir, 'agent-report.md');
+  fs.writeFileSync(reportPath,
+    '# Question Resolution Report\n' +
+    'Answer: use option A\n' +
+    'Citation: made-up-ref\n' +
+    'Verdict: clear\n'
+  );
+
+  const res = interpretAssignmentRunResult({
+    choice: { operation: 'resolve-question' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: { status: 'done', summary: 'Answered' },
+      evidence: { artifacts: [reportPath] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(res.canProceed, false);
+  assert.equal(res.stop, true);
+  assert.equal(res.reason, 'resolve-question-insufficient-evidence');
+});
+
+test('Finding 4: scout-blast-radius file-only and posture-only reports fail closed', () => {
+  const tempDir = mkTempDir();
+  const reportDir = path.join(tempDir, 'run01');
+  fs.mkdirSync(reportDir, { recursive: true });
+
+  // File-only report (missing posture, callers, affected, risk read)
+  const reportFileOnly = path.join(reportDir, 'agent-report-file-only.md');
+  fs.writeFileSync(reportFileOnly, '# Scout Report\nFiles: src/foo.mjs\n');
+
+  const resFileOnly = interpretAssignmentRunResult({
+    choice: { operation: 'scout-blast-radius' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: { status: 'done', files: ['src/foo.mjs'] },
+      evidence: { artifacts: [reportFileOnly] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(resFileOnly.canProceed, false);
+  assert.equal(resFileOnly.stop, true);
+  assert.equal(resFileOnly.reason, 'scout-blast-radius-insufficient-evidence');
+
+  // Posture-only report (missing files/symbols, callers, affected, risk read)
+  const reportPostureOnly = path.join(reportDir, 'agent-report-posture-only.md');
+  fs.writeFileSync(reportPostureOnly, '# Scout Report\nSearch posture: rg checked\n');
+
+  const resPostureOnly = interpretAssignmentRunResult({
+    choice: { operation: 'scout-blast-radius' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: { status: 'done', posture: 'rg checked' },
+      evidence: { artifacts: [reportPostureOnly] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(resPostureOnly.canProceed, false);
+  assert.equal(resPostureOnly.stop, true);
+  assert.equal(resPostureOnly.reason, 'scout-blast-radius-insufficient-evidence');
+});
+
+test('Finding 1 regression tests: misspelled executing-stage markers like review-itm and fix-verfy-red stop without primary implementation dispatch', () => {
+  const workReviewTypo = { id: 'tsk-1', stage: 'executing', domain: 'coding', secondaryOperation: 'review-itm' };
+  const choiceReviewTypo = chooseStageOperation({ work: workReviewTypo });
+  assert.equal(choiceReviewTypo.stop, true);
+  assert.equal(choiceReviewTypo.dispatch, null);
+  assert.equal(choiceReviewTypo.operation, 'review-itm');
+  assert.equal(choiceReviewTypo.reason, 'undeclared-stage-operation-review-itm');
+
+  const workFixTypo = { id: 'tsk-2', stage: 'executing', domain: 'coding', nextOperation: 'fix-verfy-red' };
+  const choiceFixTypo = chooseStageOperation({ work: workFixTypo });
+  assert.equal(choiceFixTypo.stop, true);
+  assert.equal(choiceFixTypo.dispatch, null);
+  assert.equal(choiceFixTypo.operation, 'fix-verfy-red');
+  assert.equal(choiceFixTypo.reason, 'undeclared-stage-operation-fix-verfy-red');
+
+  const workNoMarker = { id: 'tsk-3', stage: 'executing', domain: 'coding' };
+  const choiceNoMarker = chooseStageOperation({ work: workNoMarker });
+  assert.equal(choiceNoMarker.stop, false);
+  assert.equal(choiceNoMarker.dispatch, 'direct-stage-skill');
+  assert.equal(choiceNoMarker.operation, 'implement-item');
+});
+
+test('Finding 2 regression tests: keyword-only paths like docs/test-plan.md and docs/difficulty-notes.md cannot satisfy review evidence', () => {
+  const workDiffPlusDoc = {
+    id: 'tsk-rev-bind',
+    stage: 'executing',
+    domain: 'coding',
+    refs: ['diff:candidate-1', 'docs/test-plan.md'],
+  };
+  const derivedDiffPlusDoc = deriveCandidateReviewRefs({ work: workDiffPlusDoc });
+  assert.equal(derivedDiffPlusDoc.canProduce, false);
+
+  const workDocPlusVerify = {
+    id: 'tsk-rev-bind2',
+    stage: 'executing',
+    domain: 'coding',
+    refs: ['docs/difficulty-notes.md', 'verify:pass'],
+  };
+  const derivedDocPlusVerify = deriveCandidateReviewRefs({ work: workDocPlusVerify });
+  assert.equal(derivedDocPlusVerify.canProduce, false);
+
+  const validDiffAndVerify = {
+    id: 'tsk-rev-bind3',
+    stage: 'executing',
+    domain: 'coding',
+    refs: ['diff:candidate-1', 'verify:pass'],
+    verify: 'node -e "process.exit(0)"',
+  };
+  const validRepo = mkTempDir();
+  initRepo(validRepo);
+  execFileSync('git', ['checkout', '-b', 'fgw/tsk-rev-bind3'], { cwd: validRepo });
+  fs.writeFileSync(path.join(validRepo, 'candidate-1.txt'), 'candidate impl\n');
+  execFileSync('git', ['add', 'candidate-1.txt'], { cwd: validRepo });
+  execFileSync('git', ['commit', '-m', 'feat: candidate'], { cwd: validRepo });
+  execFileSync('git', ['checkout', 'main'], { cwd: validRepo });
+  const derivedValid = deriveCandidateReviewRefs({
+    work: validDiffAndVerify,
+    repoRoot: validRepo,
+  });
+  assert.equal(derivedValid.canProduce, true);
+
+  const isValidBoth = hasValidReviewEvidenceRefs(
+    ['diff:candidate-1', 'verify:pass'],
+    { assignment: { contextRefs: ['diff:candidate-1', 'verify:pass'] } },
+    validDiffAndVerify,
+    validRepo,
+  );
+  assert.equal(isValidBoth, true);
+
+  const isValidDiffPlusDoc = hasValidReviewEvidenceRefs(
+    ['diff:candidate-1', 'docs/test-plan.md'],
+    { assignment: { contextRefs: ['diff:candidate-1', 'docs/test-plan.md'] } },
+    workDiffPlusDoc,
+  );
+  assert.equal(isValidDiffPlusDoc, false);
+
+  const isValidDocPlusVerify = hasValidReviewEvidenceRefs(
+    ['docs/difficulty-notes.md', 'verify:pass'],
+    { assignment: { contextRefs: ['docs/difficulty-notes.md', 'verify:pass'] } },
+    workDocPlusVerify,
+  );
+  assert.equal(isValidDocPlusVerify, false);
+});
+
+test('Finding 3 regression tests: executeDriverOperationChoice stopped choices never spawn and human-only choices are non-executed', async () => {
+  const tempDir = mkTempDir();
+  const work = { id: 'tsk-stopped-choice', stage: 'executing', domain: 'coding' };
+
+  const stoppedChoice = {
+    operation: 'review-item',
+    dispatch: 'assignment',
+    stop: true,
+    reason: 'review-item-missing-candidate-diff-and-verify-refs',
+  };
+
+  const outcome = await executeDriverOperationChoice(work, stoppedChoice, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+  });
+
+  assert.equal(outcome.executed, false);
+  assert.equal(outcome.stop, true);
+  assert.equal(outcome.reason, 'review-item-missing-candidate-diff-and-verify-refs');
+  assert.equal(fs.existsSync(path.join(tempDir, '.fgos', 'assignments')), false);
+
+  const humanChoice = {
+    operation: 'review-item',
+    dispatch: 'human-only',
+    stop: true,
+    reason: 'human-only-operation',
+  };
+
+  const humanOutcome = await executeDriverOperationChoice(work, humanChoice, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+  });
+
+  assert.equal(humanOutcome.executed, false);
+  assert.equal(humanOutcome.dispatchType, 'human-only');
+});
+
+test('Fix validate-plan NOT READY verdict with em dash: interpretAssignmentRunResult returns shape-plan nextOperation', () => {
+  const tempDir = mkTempDir();
+  fs.mkdirSync(path.join(tempDir, 'src'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'src', 'index.mjs'), '// src/index.mjs\n');
+
+  const reportPath = path.join(tempDir, 'agent-report.md');
+  fs.writeFileSync(
+    reportPath,
+    '# Validation Report\n## Reality gate\n- Mode fit: PASS (src/index.mjs)\n- Repo fit: PASS (src/index.mjs)\n- Assumptions: PASS (src/index.mjs)\n- Smaller path: PASS (src/index.mjs)\n- Proof surface: PASS (src/index.mjs)\n- Impact-analysis posture: PASS (src/index.mjs)\n## Feasibility matrix\n- medium risk: src/index.mjs\nValidation report notes reality gate and feasibility matrix.\n',
+  );
+
+  const runResult = {
+    status: 'done',
+    confidence: 'reported',
+    operation: 'validate-plan',
+    runDir: tempDir,
+    workerArtifacts: [{ path: 'agent-report.md', kind: 'agent-report', valid: true }],
+    agentClaim: {
+      status: 'done',
+      verdict: 'NOT READY — RETURN TO PLANNING',
+      summary: 'Plan is not ready',
+      realityGate: {
+        modeFit: { status: 'PASS', citation: 'src/index.mjs' },
+        repoFit: { status: 'PASS', citation: 'src/index.mjs' },
+        assumptions: { status: 'PASS', citation: 'src/index.mjs' },
+        smallerPath: { status: 'PASS', citation: 'src/index.mjs' },
+        proofSurface: { status: 'PASS', citation: 'src/index.mjs' },
+        impactAnalysisPosture: { status: 'PASS', citation: 'src/index.mjs' },
+      },
+      feasibilityMatrix: [
+        { risk: 'medium risk', backing: 'src/index.mjs' },
+      ],
+    },
+  };
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult,
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, false);
+  assert.equal(interpreted.nextOperation, 'shape-plan');
+  assert.equal(interpreted.reason, 'validate-plan-return-to-planning');
+});
+
+test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY and verdict is decompose creates children and advances Work', async () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-med-decomp');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: medium\nMedium split plan.\n## Locked decisions\n| ID | Decision |\n| D1 | Perform step 1 |\n');
+
+  const children = [
+    {
+      title: 'Child item 1',
+      verify: 'node -e "process.exit(0)"',
+      action: 'Perform step 1 D1',
+    },
+  ];
+
+  addWork(tempDir, {
+    id: 'tsk-med-decomp',
+    title: 'Test medium decompose driver loop',
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    kind: 'feature',
+    risk: 'standard',
+    deps: [],
+    refs: [],
+    verify: 'node -e "process.exit(0)"',
+    docsRef: 'docs/history/feat-med-decomp',
+  });
+
+  const reportPath = path.join(tempDir, 'agent-report.md');
+  fs.writeFileSync(
+    reportPath,
+    '# Validation Report\n## Reality gate\n- Mode fit: PASS (docs/history/feat-med-decomp/plan.md)\n- Repo fit: PASS (docs/history/feat-med-decomp/plan.md)\n- Assumptions: PASS (docs/history/feat-med-decomp/plan.md)\n- Smaller path: PASS (docs/history/feat-med-decomp/plan.md)\n- Proof surface: PASS (docs/history/feat-med-decomp/plan.md)\n- Impact-analysis posture: PASS (docs/history/feat-med-decomp/plan.md)\n## Feasibility matrix\n- medium risk: docs/history/feat-med-decomp/plan.md\nValidation notes feasibility matrix.\n',
+  );
+
+  const executorScript = writeFakeExecutor(tempDir, {
+    status: 'done',
+    verdict: 'READY',
+    summary: 'Plan validated',
+    workerArtifacts: [{ path: 'agent-report.md', kind: 'agent-report', valid: true }],
+    agentClaim: {
+      status: 'done',
+      verdict: 'READY',
+      summary: 'Plan validated',
+      realityGate: {
+        modeFit: { status: 'PASS', citation: 'docs/history/feat-med-decomp/plan.md' },
+        repoFit: { status: 'PASS', citation: 'docs/history/feat-med-decomp/plan.md' },
+        assumptions: { status: 'PASS', citation: 'docs/history/feat-med-decomp/plan.md' },
+        smallerPath: { status: 'PASS', citation: 'docs/history/feat-med-decomp/plan.md' },
+        proofSurface: { status: 'PASS', citation: 'docs/history/feat-med-decomp/plan.md' },
+        impactAnalysisPosture: { status: 'PASS', citation: 'docs/history/feat-med-decomp/plan.md' },
+      },
+      feasibilityMatrix: [{ risk: 'medium risk', backing: 'docs/history/feat-med-decomp/plan.md' }],
+    },
+  });
+
+  const cfg = runnerConfigFor(executorScript);
+
+  const callerVerdict = { verdict: 'decompose', reason: 'Split into subtasks', children };
+  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg, callerVerdict });
+
+  const view = listWork(tempDir);
+  const parentItem = view.work['tsk-med-decomp'];
+  assert.equal(parentItem.stage, 'executing');
+
+  const createdChildren = Object.values(view.work).filter((w) => w.parent === 'tsk-med-decomp');
+  assert.equal(createdChildren.length, 1);
+  assert.equal(createdChildren[0].title, 'Child item 1');
+});
+
+test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY and verdict is pass-through advances Work', async () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-med-pass');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: medium\nMedium pass-through plan.\n');
+
+  addWork(tempDir, {
+    id: 'tsk-med-pass',
+    title: 'Test medium pass-through driver loop',
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    kind: 'feature',
+    risk: 'standard',
+    deps: [],
+    refs: [],
+    verify: 'node -e "process.exit(0)"',
+    docsRef: 'docs/history/feat-med-pass',
+  });
+
+  const reportPath = path.join(tempDir, 'agent-report.md');
+  fs.writeFileSync(
+    reportPath,
+    '# Validation Report\n## Reality gate\n- Mode fit: PASS (docs/history/feat-med-pass/plan.md)\n- Repo fit: PASS (docs/history/feat-med-pass/plan.md)\n- Assumptions: PASS (docs/history/feat-med-pass/plan.md)\n- Smaller path: PASS (docs/history/feat-med-pass/plan.md)\n- Proof surface: PASS (docs/history/feat-med-pass/plan.md)\n- Impact-analysis posture: PASS (docs/history/feat-med-pass/plan.md)\n## Feasibility matrix\n- medium risk: docs/history/feat-med-pass/plan.md\nValidation notes feasibility matrix.\n',
+  );
+
+  const executorScript = writeFakeExecutor(tempDir, {
+    status: 'done',
+    verdict: 'READY',
+    summary: 'Plan validated',
+    workerArtifacts: [{ path: 'agent-report.md', kind: 'agent-report', valid: true }],
+    agentClaim: {
+      status: 'done',
+      verdict: 'READY',
+      summary: 'Plan validated',
+      realityGate: {
+        modeFit: { status: 'PASS', citation: 'docs/history/feat-med-pass/plan.md' },
+        repoFit: { status: 'PASS', citation: 'docs/history/feat-med-pass/plan.md' },
+        assumptions: { status: 'PASS', citation: 'docs/history/feat-med-pass/plan.md' },
+        smallerPath: { status: 'PASS', citation: 'docs/history/feat-med-pass/plan.md' },
+        proofSurface: { status: 'PASS', citation: 'docs/history/feat-med-pass/plan.md' },
+        impactAnalysisPosture: { status: 'PASS', citation: 'docs/history/feat-med-pass/plan.md' },
+      },
+      feasibilityMatrix: [{ risk: 'medium risk', backing: 'docs/history/feat-med-pass/plan.md' }],
+    },
+  });
+
+  const cfg = runnerConfigFor(executorScript);
+
+  const callerVerdict = { verdict: 'pass-through', reason: 'Single piece implementation' };
+  await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg, callerVerdict });
+
+  const parentItem = listWork(tempDir).work['tsk-med-pass'];
+  assert.equal(parentItem.stage, 'executing');
+});
+
+test('Finding 2 fix: echoed sentinel refs without resolvable diff content or verify output stop review-item', () => {
+  const dummyRepo = mkTempDir();
+  const workSentinelsOnly = {
+    id: 'tsk-sentinel-bare',
+    stage: 'executing',
+    domain: 'coding',
+    refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+  };
+
+  const derived = deriveCandidateReviewRefs({ work: workSentinelsOnly, repoRoot: dummyRepo });
+  assert.equal(derived.canProduce, false);
+
+  const isValid = hasValidReviewEvidenceRefs(
+    ['evidence:candidate-diff', 'evidence:verify-pass'],
+    { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+    workSentinelsOnly,
+    dummyRepo,
+  );
+  assert.equal(isValid, false);
+});
+
+test('review evidence gate: a tag named fgw/<id> is not a candidate branch and satisfies no gate', () => {
+  const repoRoot = mkTempDir();
+  initRepo(repoRoot);
+  execFileSync('git', ['tag', 'fgw/tsk-rt-tag'], { cwd: repoRoot });
+
+  const work = {
+    id: 'tsk-rt-tag',
+    stage: 'executing',
+    domain: 'coding',
+    refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+    verify: 'node -e "process.exit(0)"',
+  };
+
+  assert.equal(isResolvableDiffRef('evidence:candidate-diff', { work, repoRoot }), false);
+  assert.equal(isResolvableVerifyRef('evidence:verify-pass', { work, repoRoot }), false);
+
+  const derived = deriveCandidateReviewRefs({ work, repoRoot });
+  assert.equal(derived.canProduce, false);
+
+  const choice = chooseStageOperation({
+    work,
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    contextSignals: { secondaryOperation: 'review-item' },
+    repoRoot,
+  });
+  assert.equal(choice.stop, true);
+  assert.equal(choice.reason, 'review-item-missing-candidate-diff-and-verify-refs');
+});
+
+test('review evidence gate: an early-minted zero-commit fgw/<id> branch produces no candidate evidence', () => {
+  const repoRoot = mkTempDir();
+  initRepo(repoRoot);
+  execFileSync('git', ['branch', 'fgw/tsk-rt-bare'], { cwd: repoRoot });
+
+  const work = {
+    id: 'tsk-rt-bare',
+    stage: 'executing',
+    domain: 'coding',
+    refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+    verify: 'node -e "process.exit(0)"',
+  };
+
+  assert.equal(isResolvableDiffRef('evidence:candidate-diff', { work, repoRoot }), false);
+
+  const derived = deriveCandidateReviewRefs({ work, repoRoot });
+  assert.equal(derived.canProduce, false);
+
+  const choice = chooseStageOperation({
+    work,
+    stage: 'executing',
+    domain: 'coding',
+    workflow: 'feature',
+    contextSignals: { secondaryOperation: 'review-item' },
+    repoRoot,
+  });
+  assert.equal(choice.stop, true);
+  assert.equal(choice.reason, 'review-item-missing-candidate-diff-and-verify-refs');
+});
+
+test('review evidence gate: a candidate branch with commits ahead of base resolves the diff gate but never the verify gate', () => {
+  const repoRoot = mkTempDir();
+  initRepo(repoRoot);
+  execFileSync('git', ['checkout', '-b', 'fgw/tsk-rt-commits'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'candidate.txt'), 'candidate impl\n');
+  execFileSync('git', ['add', 'candidate.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-m', 'feat: candidate'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
+
+  const workNoVerifyCommand = {
+    id: 'tsk-rt-commits',
+    stage: 'executing',
+    domain: 'coding',
+    refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+  };
+
+  assert.equal(isResolvableDiffRef('evidence:candidate-diff', { work: workNoVerifyCommand, repoRoot }), true);
+  assert.equal(isResolvableVerifyRef('evidence:verify-pass', { work: workNoVerifyCommand, repoRoot }), false);
+
+  const derived = deriveCandidateReviewRefs({ work: workNoVerifyCommand, repoRoot });
+  assert.equal(derived.canProduce, false);
+});
+
+test('review evidence gate: repoRoot convention artifacts older than the Work item are stale and satisfy no gate', () => {
+  const repoRoot = mkTempDir();
+  const staleTime = new Date(Date.now() - 60 * 60 * 1000);
+  fs.writeFileSync(path.join(repoRoot, 'candidate-diff.patch'), 'diff --git a/a.js b/a.js\n');
+  fs.writeFileSync(path.join(repoRoot, 'verify.log'), 'VERIFY: PASS\n');
+  fs.utimesSync(path.join(repoRoot, 'candidate-diff.patch'), staleTime, staleTime);
+  fs.utimesSync(path.join(repoRoot, 'verify.log'), staleTime, staleTime);
+
+  const work = {
+    id: 'tsk-rt-stale',
+    stage: 'executing',
+    domain: 'coding',
+    createdAt: new Date().toISOString(),
+    refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+    verify: 'node -e "process.exit(0)"',
+  };
+
+  assert.equal(isResolvableDiffRef('evidence:candidate-diff', { work, repoRoot }), false);
+  assert.equal(isResolvableVerifyRef('evidence:verify-pass', { work, repoRoot }), false);
+
+  const derived = deriveCandidateReviewRefs({ work, repoRoot });
+  assert.equal(derived.canProduce, false);
+});
+
+test('review evidence gate: string-only refs and inline text claims are never evidence', () => {
+  const repoRoot = mkTempDir();
+
+  const work = {
+    id: 'tsk-rt-strings',
+    stage: 'executing',
+    domain: 'coding',
+    refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+  };
+
+  // Sentinel refs with no on-disk artifact, no git ref, no verify command.
+  assert.equal(isResolvableDiffRef('evidence:candidate-diff', { work, repoRoot }), false);
+  assert.equal(isResolvableVerifyRef('evidence:verify-pass', { work, repoRoot }), false);
+
+  // Inline diff/verify text smuggled inside the ref string is not evidence.
+  assert.equal(
+    isResolvableDiffRef('evidence:candidate-diff\ndiff --git a/f.js b/f.js\n@@ -1 +1 @@', { work, repoRoot }),
+    false,
+  );
+  assert.equal(isResolvableVerifyRef('verify:EXIT CODE: 0', { work, repoRoot }), false);
+  assert.equal(isResolvableVerifyRef('verify:ALL 12 TESTS PASSED', { work, repoRoot }), false);
+
+  // Report-text claims are verdict-interpretation input, not resolver evidence.
+  assert.equal(
+    isResolvableVerifyRef('evidence:verify-pass', { work, repoRoot, reportText: 'VERIFY: PASS EXIT CODE: 0' }),
+    false,
+  );
+
+  // Caller-declared content/boolean signals are not evidence either.
+  assert.equal(
+    isResolvableDiffRef('evidence:candidate-diff', { work, repoRoot, contextSignals: { candidateDiffContent: 'diff --git a/x b/x', hasCandidateImplementation: true } }),
+    false,
+  );
+  assert.equal(
+    isResolvableVerifyRef('evidence:verify-pass', { work, repoRoot, contextSignals: { candidateVerifyContent: 'VERIFY: PASS', hasCandidateVerify: true } }),
+    false,
+  );
+
+  const derived = deriveCandidateReviewRefs({ work, repoRoot });
+  assert.equal(derived.canProduce, false);
+});
+
 
 

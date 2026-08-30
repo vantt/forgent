@@ -189,6 +189,8 @@ export const COMMAND_REGISTRY = [
         reason: { type: 'string', description: 'Required with --verdict need-human or --verdict decompose (optional with pass-through): why this call is verdicting the way it is.' },
         children: { type: 'string', description: 'Required with --verdict decompose: JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?}).', multiValueFormat: 'json-array' },
         force: { type: 'boolean', description: 'Only meaningful with --verdict decompose: proceed past a disputed second-pass verify judge on a child, instead of parking the whole decompose verdict in awaiting-human. Always logged as a decision naming the disagreement it overrode -- never a silent bypass. Mirrors discover --force (tsk-5cf D1b).' },
+        validate: { type: 'boolean', description: 'Explicitly run reviewer validation (planning.validate-plan) before processing the plan verdict.' },
+        direct: { type: 'boolean', description: 'Bypass reviewer validation (planning.validate-plan) and proceed directly to resolvePlan.' },
       },
       positional: ['id'],
       required: ['id'],

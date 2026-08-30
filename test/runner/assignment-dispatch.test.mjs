@@ -3,13 +3,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { prepareDispatch } from '../../src/runner/dispatch/prepare.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
+import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
+import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-dispatch-test-'));
@@ -41,7 +43,7 @@ function writeEchoExecutor(dir) {
     }
     if (runDir) {
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDone.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nAssignment execution completed successfully with full report content.\\n');
       fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     }
     process.stdout.write("All good\\n");
@@ -84,6 +86,7 @@ test('executeAssignment executes non-mutating validate-plan assignment through f
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -121,6 +124,7 @@ test('executeAssignment captures stderr and nonzero exit code as failed result w
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -157,6 +161,7 @@ test('executeAssignment captures timeout with partial stdout and writes failed R
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -286,6 +291,7 @@ test('dispatch CLI execute subcommand with --assignment executes assignment and 
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -317,6 +323,184 @@ test('dispatch CLI execute subcommand with --assignment executes assignment and 
   assert.equal(parsed.assignmentId, assignment.assignmentId);
   assert.equal(parsed.status, 'done');
   assert.equal(parsed.confidence, 'reported');
+});
+
+test('compileDispatchPlan and executeAssignment respect cliOverride.preferExecutor without dispatch plan mismatch (Finding P2 fix)', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    executors: {
+      custom_executor: {
+        allowCrossProvider: true,
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+      },
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-cli-override-asgn',
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const plan = compileDispatchPlan(runnerConfig, {
+    assignment: assignment.assignmentId,
+    assignmentItem: assignment,
+    cliOverride: { preferExecutor: 'custom_executor' },
+  });
+
+  assert.equal(plan.executorId, 'custom_executor');
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    cliOverride: { preferExecutor: 'custom_executor' },
+  });
+
+  assert.equal(result.status, 'done');
+  assert.equal(result.confidence, 'reported');
+
+  const storedPlan = JSON.parse(
+    fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01', 'dispatch-plan.json'), 'utf8'),
+  );
+  assert.equal(storedPlan.executorId, 'custom_executor');
+});
+
+test('settleClaim atomically applies patch before releasing runtime claim (Finding P2 fix)', () => {
+  const dir = path.join(mkTempDir(), '.fgos');
+  initStore(dir);
+  addWork(dir, { id: 'tsk-settle-patch', title: 'Test Settle Patch', domain: 'coding', kind: 'feature', status: 'todo', stage: 'executing', risk: 'standard', priority: 0, verify: 'true', deps: [], refs: [] });
+
+  const claim = acquireClaim(dir, { id: 'tsk-settle-patch', actor: 'runner' });
+  assert.ok(claim.claimId);
+
+  settleClaim(dir, {
+    id: 'tsk-settle-patch',
+    claimId: claim.claimId,
+    finalStatus: 'todo',
+    reason: 'testing-patch-settle',
+    role: 'runner',
+    patch: { nextOperation: 'fix-verify-red', secondaryOperation: null },
+  });
+
+  const updated = listWork(dir).work['tsk-settle-patch'];
+  assert.equal(updated.nextOperation, 'fix-verify-red');
+  assert.equal(updated.secondaryOperation ?? null, null);
+  assert.equal(readClaim(dir, 'tsk-settle-patch'), null);
+});
+
+test('settleClaim({ patch }) runs full editWork validation suite (Finding P2 fix)', () => {
+  const dir = path.join(mkTempDir(), '.fgos');
+  initStore(dir);
+  addWork(dir, { id: 'tsk-a', title: 'Task A', domain: 'coding', kind: 'feature', status: 'doing', stage: 'executing', risk: 'standard', priority: 0, verify: 'true', deps: [], refs: [] });
+
+  const claim = acquireClaim(dir, { id: 'tsk-a', actor: 'runner' });
+  assert.ok(claim.claimId);
+
+  // Rejects un-editable fields
+  assert.throws(
+    () => settleClaim(dir, { id: 'tsk-a', claimId: claim.claimId, finalStatus: 'todo', patch: { stage: 'planning' } }),
+    /edit cannot change "stage"/,
+  );
+
+  // Rejects changing kind when status is not todo
+  assert.throws(
+    () => settleClaim(dir, { id: 'tsk-a', claimId: claim.claimId, finalStatus: 'todo', patch: { kind: 'bug' } }),
+    /edit cannot change "kind" on work "tsk-a"/,
+  );
+});
+
+test('Finding 3 regression test: read-only assignment committing a new file leaves checkout clean after failing closed', async () => {
+  const tempDir = mkTempDir();
+  execSync('git init', { cwd: tempDir, stdio: 'ignore' });
+  execSync('git config user.name "Test" && git config user.email "test@test.local"', { cwd: tempDir, stdio: 'ignore' });
+  initStore(tempDir);
+
+  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-commit-readonly');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nPlan.\n');
+  execSync(`git add ${docsDir} && git commit -m "add plan"`, { cwd: tempDir, stdio: 'ignore' });
+
+  addWork(tempDir, {
+    id: 'tsk-commit-readonly',
+    title: 'Test read-only commit rollback',
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    kind: 'feature',
+    risk: 'standard',
+    deps: [],
+    refs: [],
+    verify: 'node -e "process.exit(0)"',
+    docsRef: 'docs/history/feat-commit-readonly',
+  });
+
+  const assignment = buildAssignment({
+    work: listWork(tempDir).work['tsk-commit-readonly'],
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const newFilePath = path.join(tempDir, 'new-from-readonly.txt');
+  const executorScript = path.join(tempDir, 'mutating-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    import { execSync } from 'node:child_process';
+    fs.writeFileSync('${newFilePath}', 'committed new file');
+    try {
+      const out = execSync('git config user.email "test@example.com" && git config user.name "Test" && git add new-from-readonly.txt && git commit -m "added file from readonly"', { cwd: '${tempDir}' });
+      fs.writeFileSync(path.join('${tempDir}', 'exec-out.log'), out.toString());
+    } catch (err) {
+      fs.writeFileSync(path.join('${tempDir}', 'exec-error.log'), (err.stderr ? err.stderr.toString() : '') + (err.stack || String(err)));
+    }
+
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    let runDir;
+    if (match) {
+      runDir = path.dirname(match[1]);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDone.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+    }
+    process.exit(0);
+    `,
+  );
+
+  const cfg = {
+    executor: {
+      kind: 'cli',
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+      allowCrossProvider: true,
+    },
+    models: { standard: 'test-model' },
+  };
+
+  const runResult = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig: cfg,
+  });
+
+  assert.equal(runResult.status, 'failed');
+  assert.equal(runResult.confidence, 'failed');
+  assert.ok(runResult.evidence.changedFiles.some((f) => f.includes('new-from-readonly.txt')), 'changedFiles must record the mutated file');
+  assert.equal(fs.existsSync(newFilePath), true, 'read-only execution must fail closed without automatic destructive file rollback');
 });
 
 

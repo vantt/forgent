@@ -205,8 +205,8 @@ export function buildAssignment({
     : Object.freeze([]);
 
   const derivedContextRefs = Array.isArray(contextRefs) ? [...contextRefs] : [];
-  if (derivedContextRefs.length === 0 && work) {
-    if (work.docsRef) {
+  if (work) {
+    if (work.docsRef && derivedContextRefs.length === 0) {
       derivedContextRefs.push(work.docsRef);
       derivedContextRefs.push(path.join(work.docsRef, 'plan.md'));
       derivedContextRefs.push(path.join(work.docsRef, 'CONTEXT.md'));
@@ -222,6 +222,9 @@ export function buildAssignment({
   if (derivedExpectedOutputs.length === 0) {
     if (operation === 'validate-plan') {
       derivedExpectedOutputs.push('agent-result.json (verdict: READY | NOT READY | READY WITH CONSTRAINTS)');
+      derivedExpectedOutputs.push('agent-report.md (reviewer findings and evaluation)');
+    } else if (operation === 'review-item') {
+      derivedExpectedOutputs.push('agent-result.json (verdict: APPROVED | REJECT, evidenceRefs: [candidate diff ref, verify result ref])');
       derivedExpectedOutputs.push('agent-report.md (reviewer findings and evaluation)');
     }
   }

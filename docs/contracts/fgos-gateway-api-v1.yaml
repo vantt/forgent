@@ -784,7 +784,7 @@ components:
       description: |
         tsk-41h: `PATCH /work/{id}`'s request body -- every field
         `src/state/store.mjs`'s `EDITABLE_FIELDS` allows `fgos edit` to
-        change (21 entries, read directly from that constant, never
+        change (25 entries, read directly from that constant, never
         re-guessed). All optional; only fields present in the body are
         patched. `id`/`status`/`domain`/`stage` are never editable through
         this route (`status` moves only through `/work/{id}/move`,
@@ -814,6 +814,7 @@ components:
           description: "Despite the name, a string enum (confirmed via a live `fgos edit --urgent` smoke test: the literal boolean `true` is rejected by the engine), not a boolean flag."
         impact: { type: number }
         effort: { type: number }
+        action: { type: string, description: "Action directive prose." }
         mergeAfter: { type: array, items: { type: string } }
         supersededBy: { type: string, nullable: true, description: "Empty string clears." }
         duplicates: { type: array, items: { type: string } }
@@ -821,6 +822,8 @@ components:
           type: object
           description: Replaces the whole object (latest-wins) for the item's `domain`, never a deep merge of nested keys.
         goalTier: { type: string, description: "'mvp' or 'milestone'." }
+        nextOperation: { type: string, nullable: true, description: "Next recommended stage operation or fix operation. Empty string or null clears." }
+        secondaryOperation: { type: string, nullable: true, description: "Active secondary consult/review operation. Empty string or null clears." }
 
     Session:
       type: object

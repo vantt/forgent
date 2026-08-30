@@ -158,6 +158,122 @@ test("plan on an item sitting at stage planning dispatches to resolvePlan and pa
 });
 
 
+test('fgos plan with --verdict and plan.md present directly processes caller verdict without running validate-plan assignment (Finding 2 fix)', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Feature split test']).stdout).data.id;
+
+  advanceThroughDiscoveryToPlanning(cwd, id);
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.stage, 'planning');
+
+  // Create docsRef/plan.md for the item
+  const docsRef = `docs/history/${id}`;
+  editWork(path.join(cwd, '.fgos'), { id, patch: { docsRef } });
+  const docsDir = path.join(cwd, docsRef);
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Feature Plan\n\n## Subtasks\n- Child 1\n- Child 2\n');
+
+  // Interactive fgos plan with explicit caller verdict --verdict decompose
+  const children = JSON.stringify([
+    { title: 'Child 1', action: 'Implement subtask 1', verify: 'npm test -- c1' },
+    { title: 'Child 2', action: 'Implement subtask 2', verify: 'npm test -- c2' },
+  ]);
+  const res = run(cwd, ['plan', id, '--verdict', 'decompose', '--reason', 'two subtasks', '--children', children]);
+  assert.equal(res.status, 0);
+  const envelope = JSON.parse(res.stdout);
+  assert.equal(envelope.data.outcome, 'decompose');
+  assert.equal(envelope.data.childIds.length, 2);
+});
+
+test('fgos plan on a standard plan without caller verdict advances Work to executing after READY validation', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Standard plan validation adoption test']).stdout).data.id;
+
+  advanceThroughDiscoveryToPlanning(cwd, id);
+  const docsRef = `docs/history/${id}`;
+  editWork(path.join(cwd, '.fgos'), { id, patch: { docsRef } });
+  const docsDir = path.join(cwd, docsRef);
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: standard\nStandard feature plan.\n');
+
+  const taskSpecDir = path.join(cwd, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(taskSpecDir, 'validate-plan.md'),
+    '# validate-plan\nContract: assignment\nOperation: validate-plan\nDescription: Validate plan\n',
+  );
+
+  const mainPath = path.join(cwd, 'src', 'main.mjs');
+  fs.mkdirSync(path.dirname(mainPath), { recursive: true });
+  fs.writeFileSync(mainPath, '// main\n');
+
+  // Configure a fake executor for validate-plan that returns READY with valid evidence
+  const executorScript = path.join(cwd, 'fake-validator.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    let resultPath = null;
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      resultPath = match[1];
+    } else {
+      const asgnDir = path.join(process.cwd(), '.fgos', 'assignments');
+      if (fs.existsSync(asgnDir)) {
+        const subdirs = fs.readdirSync(asgnDir)
+          .map((a) => path.join(asgnDir, a, 'runs', '01'))
+          .filter((p) => fs.existsSync(p));
+        subdirs.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
+        if (subdirs.length > 0) {
+          resultPath = path.join(subdirs[0], 'agent-result.json');
+        }
+      }
+    }
+    if (resultPath) {
+      const runDir = path.dirname(resultPath);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Reality Gate Validation & Feasibility Matrix Report\\n## Reality Gate Score\\n- Mode fit: PASS (citation: src/main.mjs:L1)\\n- Repo fit: PASS (citation: src/main.mjs:L1)\\n- Assumptions: PASS (citation: src/main.mjs:L1)\\n- Smaller path: PASS (citation: src/main.mjs:L1)\\n- Proof surface: PASS (citation: src/main.mjs:L1)\\n- Impact-analysis posture: PASS (citation: src/main.mjs:L1)\\n## Feasibility Matrix\\n- Feasibility matrix: verified (citation: src/main.mjs:L1).\\nPlan holds up under reality check.\\n');
+      const claim = {
+        status: 'done',
+        verdict: 'READY',
+        summary: 'Plan validated READY',
+        realityGate: {
+          'mode-fit': 'PASS citation: src/main.mjs:L1',
+          'repo-fit': 'PASS citation: src/main.mjs:L1',
+          'assumptions-fit': 'PASS citation: src/main.mjs:L1',
+          'smaller-path-fit': 'PASS citation: src/main.mjs:L1',
+          'proof-surface-fit': 'PASS citation: src/main.mjs:L1',
+          'impact-analysis-posture': 'PASS citation: src/main.mjs:L1',
+        },
+        feasibilityMatrix: [{ risk: 'Risk 1', rating: 'Low', citation: 'src/main.mjs:L1' }],
+      };
+      fs.writeFileSync(resultPath, JSON.stringify(claim));
+    }
+    process.exit(0);
+    `,
+  );
+  const runnerCfg = {
+    executor: {
+      kind: 'cli',
+      command: process.execPath,
+      args: [executorScript],
+      allowCrossProvider: true,
+    },
+  };
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: runnerCfg }, null, 2));
+
+  // Interactive fgos plan without --verdict
+  const res = run(cwd, ['plan', id, '--validate']);
+  if (res.status !== 0) console.error('STDERR LOG:', res.stderr, 'STDOUT LOG:', res.stdout);
+  assert.equal(res.status, 0);
+  const envelope = JSON.parse(res.stdout);
+  assert.equal(envelope.data.outcome, 'pass-through');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
+});
+
+
 test('discover on a planning-stage item errors instead of silently dispatching to resolvePlan (tsk-2b0 D1: hard split, no fallback)', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;

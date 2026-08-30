@@ -633,7 +633,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
     return { outcome: 'already-decomposed', id };
   }
 
-  const stateRoot = path.dirname(dir);
+  const stateRoot = path.basename(dir) === '.fgos' ? path.dirname(dir) : dir;
   // repoRoot (tsk-1ni D1): resolved to the item's own worktree when one
   // exists, never the raw state root -- see resolveContentRoot's own
   // comment above. Reused below for readLockedContext's own read AND

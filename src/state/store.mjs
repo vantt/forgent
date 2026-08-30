@@ -340,7 +340,7 @@ export function addWork(dir, work) {
 // write path (identity is immutable; `status` is `move`'s; `stage` is
 // `moveStage`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'action', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier']);
+const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'action', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier', 'nextOperation', 'secondaryOperation']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door
@@ -360,113 +360,60 @@ const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify
 // addWork/moveWork/moveStage on ids that would collide (e.g. a deps/parent
 // cycle only the second writer's patch creates), can no longer both read a
 // precondition that the other's not-yet-visible write is about to invalidate.
+function validateWorkPatch(view, dir, id, patch, role, writer) {
+  const work = view.work[id];
+  if (!work) {
+    throw new StoreError('validation', `work "${id}" not found.`);
+  }
+  if (!patch || typeof patch !== 'object' || Array.isArray(patch) || Object.keys(patch).length === 0) {
+    throw new StoreError('validation', 'edit requires at least one field to change.');
+  }
+  for (const key of Object.keys(patch)) {
+    if (!EDITABLE_FIELDS.has(key)) {
+      throw new StoreError(
+        'validation',
+        `edit cannot change "${key}" — allowed fields are: ${[...EDITABLE_FIELDS].join(', ')}.`,
+      );
+    }
+  }
+  if (patch.kind !== undefined && work.status !== 'todo') {
+    throw new StoreError(
+      'validation',
+      `edit cannot change "kind" on work "${id}" -- status is "${work.status}", not "todo". `
+      + `kind selects the item's workflow/stage graph; it can only change while status is still todo, `
+      + `before a claim lets the item start walking that graph.`,
+    );
+  }
+  const normalizedPatch = typeof patch.title === 'string'
+    ? { ...patch, title: truncateTitle(patch.title) }
+    : patch;
+
+  const candidate = { ...work, ...normalizedPatch };
+  const touchedFields = new Set(Object.keys(patch));
+  validateWork(candidate, Object.keys(view.work), touchedFields);
+  if (touchedFields.has('domainFields')) {
+    validateDomainFields(candidate, getDomain(candidate.domain));
+  }
+  if (touchedFields.has('acceptance')) {
+    checkAcceptanceEvidenceTraceable(candidate, path.dirname(dir));
+  }
+  assertNoCycle(candidate, view.work);
+  assertNoUnifiedCycle(candidate, view.work);
+
+  const payload = { id, patch: normalizedPatch };
+  if (role !== undefined) {
+    payload.role = role;
+  }
+  payload.writer = writer;
+  return payload;
+}
+
 export function editWork(dir, { id, patch, role } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
     const before = currentView(dir);
-    const work = before.work[id];
-    if (!work) {
-      throw new StoreError('validation', `work "${id}" not found.`);
-    }
-    if (!patch || typeof patch !== 'object' || Array.isArray(patch) || Object.keys(patch).length === 0) {
-      throw new StoreError('validation', 'edit requires at least one field to change.');
-    }
-    for (const key of Object.keys(patch)) {
-      if (!EDITABLE_FIELDS.has(key)) {
-        throw new StoreError(
-          'validation',
-          `edit cannot change "${key}" — allowed fields are: ${[...EDITABLE_FIELDS].join(', ')}.`,
-        );
-      }
-    }
-    // tsk-2t9c D16: `kind` selects which workflow's stage graph an item
-    // follows (`resolveWorkflow`, `src/state/workflow-stage-graphs.mjs`).
-    // `status: 'todo'` is the ONLY status a claimed item's `stage` is still
-    // free to move through discovery/exploring/planning under -- claim
-    // (`todo` -> `doing`) happens right before the FIRST invocation of the
-    // `executing`-stage skill, never earlier (fgos-coding-driving's own
-    // hard rule), so every stage-graph-consuming call an item makes while
-    // still `todo` already reflects `kind`'s CURRENT value at read time.
-    // Refusing this edit once `status` has left `todo` means `kind` can
-    // never drift out from under a stage graph the item is actively
-    // walking -- no separate frozen `workflow` field needed, no second
-    // write door, no validated-change verb to get subtly wrong: `kind`
-    // itself simply stops being a live variable once it would matter.
-    if (patch.kind !== undefined && work.status !== 'todo') {
-      throw new StoreError(
-        'validation',
-        `edit cannot change "kind" on work "${id}" -- status is "${work.status}", not "todo". `
-        + `kind selects the item's workflow/stage graph; it can only change while status is still todo, `
-        + `before a claim lets the item start walking that graph.`,
-      );
-    }
-
-    // Per work-item-title-contract D2/D5, the same title bound addWork applies,
-    // applied to the PATCH rather than to the candidate: the event this door
-    // appends carries `patch` verbatim (see payload below), so bounding only
-    // the candidate would leave replay rebuilding the untruncated title and the
-    // view disagreeing with its own log. A patch that does not carry a title is
-    // passed through untouched, so an unrelated edit never silently reshapes a
-    // title that was already stored.
-    const normalizedPatch = typeof patch.title === 'string'
-      ? { ...patch, title: truncateTitle(patch.title) }
-      : patch;
-
-    const candidate = { ...work, ...normalizedPatch };
-    // tsk-1ne D1/D2: re-validate only the fields this patch actually
-    // touches, not the whole merged candidate — a legacy item can carry a
-    // field that predates a since-tightened rule (e.g. a `stage` value no
-    // longer in the enum, an over-length `id`) and was never rejected by
-    // this door before this check existed; re-validating it on every
-    // UNRELATED edit blocked that item from being edited AT ALL. `id`/
-    // `stage`/`status`/`domain` can never be in `patch` in the first place
-    // (rejected by the EDITABLE_FIELDS loop above), so this only ever
-    // grandfathers a field the patch could never have touched anyway —
-    // never a field the patch is actually trying to change.
-    const touchedFields = new Set(Object.keys(patch));
-    validateWork(candidate, Object.keys(before.work), touchedFields);
-    // domainFields fieldSchema (decision record 0027, D6): same narrower
-    // per-domain check addWork runs above — only actually reachable when
-    // `patch.domainFields` is present, same tsk-1ne scoping as validateWork
-    // above (no domain declares a fieldSchema today, so this is dormant
-    // either way — gated for the same general reason, not observed impact).
-    if (touchedFields.has('domainFields')) {
-      validateDomainFields(candidate, getDomain(candidate.domain));
-    }
-    // tsk-5q5-2 (D1/D3): same narrow check addWork applies above — gated to
-    // only run when `patch.acceptance` is present (tsk-1ne D1/D2): an item
-    // with a pre-existing non-traceable `acceptance` clause would otherwise
-    // block every unrelated edit the same way the stage/id bug did.
-    if (touchedFields.has('acceptance')) {
-      checkAcceptanceEvidenceTraceable(candidate, path.dirname(dir));
-    }
-    // Same guard pair as addWork above. deps-only first (work-graph-intelligence
-    // S1) — this is the gap that used to close silently: a patch introducing an
-    // A<->B cycle through `deps` (an EDITABLE_FIELDS entry) went straight
-    // through, since validateDeps only checks existence, never acyclicity — and
-    // it keeps the S1 "dependency cycle" message for that pure-deps case. Then
-    // the UNIFIED check (S2a, record 0012) catches a cycle that a `parent` edge
-    // participates in — now including a cycle closed by a `parent` patch
-    // itself (parent-flag-cli D1): `assertNoUnifiedCycle` revalidates the
-    // whole merged candidate unconditionally, so allowing `parent` into
-    // EDITABLE_FIELDS needed no new guard code, only the new allowed key.
-    // Both the deps-patch-against-a-fixed-parent-edge case (the original gap)
-    // and the parent-patch-itself case are caught by this one call, reported
-    // as a "graph cycle". Same validation/exit-4 contract; no schema change
-    // (R11).
-    assertNoCycle(candidate, before.work);
-    assertNoUnifiedCycle(candidate, before.work);
-
-    const payload = { id, patch: normalizedPatch };
-    if (role !== undefined) {
-      payload.role = role;
-    }
-    // Writer provenance (D8/D15/D17/D18, str46-io-contract): stamped
-    // post-transition exactly like role above, but unconditional -- every
-    // event through this door records who wrote it. resolveWriterIdentity
-    // never throws and never blocks the mutation (D18); no validator sits on
-    // this path.
-    payload.writer = resolveWriterIdentity(dir);
+    const writer = resolveWriterIdentity(dir);
+    const payload = validateWorkPatch(before, dir, id, patch, role, writer);
     return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.edit', payload }, dir);
   });
 }
@@ -1114,6 +1061,7 @@ export function settleClaim(dir, {
   mergedInto,
   phase = 'execute',
   result,
+  patch,
 } = {}) {
   if (!id || typeof id !== 'string') {
     throw new StoreError('validation', 'settleClaim: "id" is required.');
@@ -1256,6 +1204,11 @@ export function settleClaim(dir, {
       }
 
       const writerLogPath = resolveWriterLogPath(dir);
+
+      if (patch && typeof patch === 'object' && !Array.isArray(patch) && Object.keys(patch).length > 0) {
+        const editPayload = validateWorkPatch(before, dir, id, patch, role, writer);
+        appendEventLocked(writerLogPath, { type: 'work.edit', payload: editPayload }, dir);
+      }
 
       // work.attempt: the complete durable record of this attempt —
       // enriched with from/to/branch/head/timing metadata (design doc

@@ -33,6 +33,7 @@ import { rebuildViewFromDir } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
+import { chooseStageOperation, executeDriverOperationChoice } from '../src/runner/dispatch/operation-choice.mjs';
 import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
@@ -1387,7 +1388,48 @@ async function runVerb(verb, flags, positional, dir) {
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parsePlanCallerVerdict(flags);
-      return resolvePlan(dir, id, cfg, 'session', callerVerdict);
+      const repoRoot = path.dirname(dir);
+      const isValidateRequested = Boolean(flags.validate);
+      const choice = chooseStageOperation({
+        work,
+        stage: work.stage,
+        domain: domain.name ?? work.domain,
+        workflow: work.workflow,
+        repoRoot,
+      });
+      const shouldValidate = !flags.direct && (isValidateRequested || choice.operation === 'validate-plan' || !callerVerdict);
+
+      let validatedVerdict;
+      if (shouldValidate) {
+        let validateChoice = choice;
+        if (validateChoice.operation !== 'validate-plan') {
+          validateChoice = {
+            dispatch: 'assignment',
+            operation: 'validate-plan',
+            taskSpecName: 'validate-plan',
+          };
+        }
+        if (validateChoice.dispatch === 'assignment' && validateChoice.operation === 'validate-plan') {
+          const contentRoot = resolveContentRoot(repoRoot, work.id, work.docsRef);
+          const outcome = await executeDriverOperationChoice(work, validateChoice, {
+            cwd: contentRoot,
+            repoRoot,
+            runnerConfig: cfg,
+            work,
+          });
+
+          if (!outcome.canAdvanceEdge) {
+            if (outcome.nextOperation === 'shape-plan') {
+              throw new StoreError('validation', `plan: validation for "${id}" returned NOT READY -- routing back to shape-plan.`);
+            }
+            throw new StoreError('validation', `plan: validation for "${id}" did not report READY (${outcome.reason}) -- cannot advance Work.`);
+          }
+          validatedVerdict = outcome.verdictPayload ?? { verdict: 'pass-through', reason: 'Plan validated READY by planning.validate-plan' };
+        }
+      }
+
+      const finalVerdict = callerVerdict ?? validatedVerdict;
+      return resolvePlan(dir, id, cfg, 'session', finalVerdict);
     }
 
     case 'move': {

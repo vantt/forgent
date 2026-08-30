@@ -49,11 +49,12 @@ test('classifyRunEvidence classifies evidence confidence ladder correctly per St
   });
   assert.deepEqual(reportedRes, { status: 'done', confidence: 'reported' });
 
-  // 6. inferred when external evidence exists without structured claim
+  // 6. inferred when external evidence exists without structured claim for mutating operations
   const inferredRes = classifyRunEvidence({
     exitCode: 0,
     agentClaim: null,
     changedFiles: ['src/index.js'],
+    isReadOnlyOperation: false,
   });
   assert.deepEqual(inferredRes, { status: 'done', confidence: 'inferred' });
 
@@ -106,6 +107,7 @@ test('executeAssignment produces status: done and confidence: reported when work
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -164,6 +166,7 @@ test('executeAssignment produces status: no-evidence when executor exits zero wi
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -203,6 +206,7 @@ test('failure still writes all storage files including exit.json, evidence.json,
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -303,6 +307,7 @@ test('executeAssignment allocates next run attempt monotonically when gaps exist
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -341,6 +346,7 @@ test('executeAssignment reads and respects persisted assignment.json as immutabl
 
   const runnerConfig = {
     executor: {
+      allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
@@ -431,7 +437,7 @@ test('executeAssignment fails closed on malformed agent-result.json (Step 04 §5
   );
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [executorScript, '{prompt}'] },
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
@@ -474,7 +480,7 @@ test('executeAssignment fails closed on invalid agent-result.json schema (Step 0
   );
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [executorScript, '{prompt}'] },
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
@@ -507,7 +513,7 @@ test('executeAssignment does not count pre-existing dirty files as run evidence 
   fs.writeFileSync(executorScript, 'process.exit(0);');
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [executorScript, '{prompt}'] },
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
@@ -545,7 +551,7 @@ test('executeAssignment counts only new dirty files as run evidence (Step 04 §5
   );
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [executorScript, '{prompt}'] },
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
@@ -567,7 +573,7 @@ test('executeAssignment evidence.json contains dirtyBefore, dirtyAfter, changedF
   fs.writeFileSync(executorScript, 'process.exit(0);');
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [executorScript, '{prompt}'] },
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
@@ -623,6 +629,17 @@ test('classifyRunEvidence: read-only operation cannot be reported without a vali
     isReadOnlyOperation: true,
   });
   assert.deepEqual(resultWithReport, { status: 'done', confidence: 'reported' });
+
+  // 4. Read-only operation with accidental changed files MUST fail closed (status: failed, confidence: failed)
+  const resultMutatedReadOnly = classifyRunEvidence({
+    exitCode: 0,
+    agentClaim: { status: 'done', summary: 'Scouted' },
+    workerArtifacts: ['runs/01/agent-report.md', 'runs/01/agent-result.json'],
+    changedFiles: ['src/unintended.mjs'],
+    isReadOnlyOperation: true,
+  });
+  assert.deepEqual(resultMutatedReadOnly, { status: 'failed', confidence: 'failed' },
+    'read-only operation that mutates repo files must fail closed with status: failed and confidence: failed');
 });
 
 test('classifyRunEvidence: mutating operation cannot be verified without post-run external evidence (Step 04 §5.4)', () => {
@@ -666,7 +683,7 @@ test('executeAssignment with no-op executor and pre-existing dirty file must pro
   fs.writeFileSync(noopScript, 'process.exit(0);');
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [noopScript, '{prompt}'] },
+    executor: { allowCrossProvider: true, command: process.execPath, args: [noopScript, '{prompt}'] },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
@@ -692,7 +709,7 @@ test('executeAssignment with corrupt persisted assignment.json must throw Runner
   fs.writeFileSync(noopScript, 'process.exit(0);');
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [noopScript, '{prompt}'] },
+    executor: { allowCrossProvider: true, command: process.execPath, args: [noopScript, '{prompt}'] },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
@@ -740,7 +757,7 @@ test('executeAssignment with bare agent-result.json (no evidenceRefs, no compani
   );
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [executorScript, '{prompt}'] },
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
@@ -780,7 +797,7 @@ test('executeAssignment with malformed evidenceRefs: [""] fails closed with stat
   );
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [executorScript, '{prompt}'] },
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
@@ -793,4 +810,116 @@ test('executeAssignment with malformed evidenceRefs: [""] fails closed with stat
   assert.equal(result.status, 'failed', 'malformed evidenceRefs must produce status: failed');
   assert.equal(result.confidence, 'failed', 'malformed evidenceRefs must produce confidence: failed');
 });
+
+test('executeAssignment with placeholder report text (TODO/N/A/keyword-only) produces no-evidence', async () => {
+  const tempDir = mkTempDir();
+
+  const executorScript = path.join(tempDir, 'placeholder-report-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    const runsDir = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(runsDir)) {
+      for (const asgn of fs.readdirSync(runsDir)) {
+        const runDir = path.join(runsDir, asgn, 'runs', '01');
+        if (fs.existsSync(runDir)) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nTODO\\n');
+          fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+        }
+      }
+    }
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({ workId: 'tsk-todo-report', stage: 'planning', operation: 'validate-plan' });
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  assert.equal(result.status, 'no-evidence', 'placeholder TODO report text must produce status: no-evidence');
+  assert.equal(result.confidence, 'no-evidence', 'placeholder TODO report text must produce confidence: no-evidence');
+});
+
+test('executeAssignment with placeholder evidenceRefs (TODO/N/A/fabricated path) produces no-evidence', async () => {
+  const tempDir = mkTempDir();
+
+  const executorScript = path.join(tempDir, 'placeholder-ref-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    const runsDir = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(runsDir)) {
+      for (const asgn of fs.readdirSync(runsDir)) {
+        const runDir = path.join(runsDir, asgn, 'runs', '01');
+        if (fs.existsSync(runDir)) {
+          fs.writeFileSync(path.join(runDir, 'agent-result.json'),
+            JSON.stringify({ status: 'done', summary: 'Done', evidenceRefs: ['TODO', 'fake_fabricated_file.txt'] }));
+        }
+      }
+    }
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({ workId: 'tsk-placeholder-ref', stage: 'planning', operation: 'validate-plan' });
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  assert.equal(result.status, 'no-evidence', 'placeholder evidenceRefs must produce status: no-evidence');
+  assert.equal(result.confidence, 'no-evidence', 'placeholder evidenceRefs must produce confidence: no-evidence');
+});
+
+test('executeAssignment with real substantive report text produces confidence: reported', async () => {
+  const tempDir = mkTempDir();
+
+  const executorScript = path.join(tempDir, 'real-report-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    const runsDir = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(runsDir)) {
+      for (const asgn of fs.readdirSync(runsDir)) {
+        const runDir = path.join(runsDir, asgn, 'runs', '01');
+        if (fs.existsSync(runDir)) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nPlan is sound and verified against codebase.\\n');
+          fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Plan sound' }));
+        }
+      }
+    }
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({ workId: 'tsk-real-report', stage: 'planning', operation: 'validate-plan' });
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  assert.equal(result.status, 'done', 'real report text must produce status: done');
+  assert.equal(result.confidence, 'reported', 'real report text must produce confidence: reported');
+});
+
 

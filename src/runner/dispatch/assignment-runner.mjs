@@ -15,18 +15,104 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import {
   DEFAULT_DOMAIN,
   operationsForStage,
 } from '../../state/workflow-stage-graphs.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
-import { writeSharedConfig } from '../../config/shared-config-file.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
+
+/**
+ * Check if report text is non-empty and contains substantive content (not a placeholder).
+ *
+ * @param {string} text
+ * @returns {boolean}
+ */
+/**
+ * Check if report text is non-empty and contains substantive content (not a placeholder).
+ *
+ * @param {string} text
+ * @returns {boolean}
+ */
+export function isSubstantiveReportText(text) {
+  if (typeof text !== 'string') return false;
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+
+  if (/^(todo|n\/?a|none|tbd|placeholder|null|undefined)[\s.!\-:#]*$/i.test(trimmed)) {
+    return false;
+  }
+
+  const words = trimmed.toUpperCase().match(/\b[A-Z0-9_-]+\b/g) || [];
+  if (words.length === 0) return false;
+
+  const GENERIC_KEYWORDS = new Set([
+    'TODO', 'N', 'A', 'NA', 'NONE', 'TBD', 'PLACEHOLDER', 'NULL', 'UNDEFINED',
+    'DONE', 'PASSED', 'PASS', 'FAIL', 'FAILED', 'REJECTED', 'READY', 'SUMMARY',
+    'VERDICT', 'REPORT', 'OK', 'STATUS', 'YES', 'NO', 'RESULT', 'RESULTS',
+    'CHECK', 'TITLE', 'HEADER', 'NOTES', 'NOTE', 'DETAILS', 'FINDINGS',
+  ]);
+
+  const nonGenericWords = words.filter((w) => !GENERIC_KEYWORDS.has(w));
+  if (nonGenericWords.length === 0) {
+    return false;
+  }
+
+  const hasExplicitPlaceholder = /\b(todo|n\/?a|none|tbd|placeholder)\b/i.test(trimmed);
+  if (hasExplicitPlaceholder && nonGenericWords.length < 3) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Validate that an evidenceRef is substantive and not a placeholder or fabricated reference.
+ *
+ * @param {string} ref
+ * @param {object} [opts]
+ * @returns {boolean}
+ */
+export function isSubstantiveEvidenceRef(ref, opts = {}) {
+  if (typeof ref !== 'string') return false;
+  const trimmed = ref.trim();
+  if (!trimmed) return false;
+  if (/^(todo|n\/?a|na|none|none\.txt|placeholder|tbd|null|undefined)[\s.!\-#]*$/i.test(trimmed)) {
+    return false;
+  }
+
+  if (/^(evidence|diff|verify|test|doc|file|git):/i.test(trimmed)) {
+    const value = trimmed.split(':')[1]?.trim();
+    if (!value || /^(todo|n\/?a|na|none|placeholder|tbd)$/i.test(value)) return false;
+    return true;
+  }
+
+  const cwd = opts.cwd || opts.repoRoot;
+  if (cwd && fs.existsSync(path.resolve(cwd, trimmed))) {
+    return true;
+  }
+
+  const known = new Set([
+    ...(opts.assignment?.contextRefs || []),
+    ...(opts.work?.refs || []),
+    ...(opts.choice?.contextRefs || []),
+  ]);
+  if (known.has(trimmed)) {
+    return true;
+  }
+
+  if (cwd || known.size > 0) {
+    return false;
+  }
+
+  return !/^[a-z0-9_-]+$/i.test(trimmed) || trimmed.includes('/') || trimmed.includes('.');
+}
 
 /**
  * Read git HEAD sha safely without emitting error noise on non-git directories.
@@ -154,6 +240,82 @@ function computeChangedFiles(dir, gitBefore, gitAfter, dirtyBefore, dirtyAfter) 
 }
 
 /**
+ * Roll back any repository state modifications caused by a read-only operation.
+ * Restores modified tracked files and removes newly created untracked files in dir,
+ * ignoring pre-existing dirty files in dirtyBefore.
+ */
+function rollbackReadOnlyMutations(dir, changedFiles, dirtyBefore, gitBefore, gitAfter) {
+  if (!dir || !Array.isArray(changedFiles) || changedFiles.length === 0) return;
+  const dirtyBeforeSet = new Set(dirtyBefore ?? []);
+
+  if (gitBefore && gitAfter && gitBefore !== gitAfter) {
+    try {
+      execFileSync('git', ['reset', '--soft', gitBefore], {
+        cwd: dir,
+        stdio: ['ignore', 'ignore', 'ignore'],
+      });
+    } catch {
+      // ignore
+    }
+  }
+
+  for (const relPath of changedFiles) {
+    if (dirtyBeforeSet.has(relPath)) {
+      continue;
+    }
+    const fullPath = path.join(dir, relPath);
+    let existedAtBefore = false;
+    if (gitBefore) {
+      try {
+        execFileSync('git', ['cat-file', '-e', `${gitBefore}:${relPath}`], {
+          cwd: dir,
+          stdio: ['ignore', 'ignore', 'ignore'],
+        });
+        existedAtBefore = true;
+      } catch {
+        existedAtBefore = false;
+      }
+    } else {
+      try {
+        execFileSync('git', ['ls-files', '--error-unmatch', relPath], {
+          cwd: dir,
+          stdio: ['ignore', 'ignore', 'ignore'],
+        });
+        existedAtBefore = true;
+      } catch {
+        existedAtBefore = false;
+      }
+    }
+
+    try {
+      execFileSync('git', ['reset', 'HEAD', '--', relPath], {
+        cwd: dir,
+        stdio: ['ignore', 'ignore', 'ignore'],
+      });
+    } catch {
+      // ignore
+    }
+
+    if (existedAtBefore) {
+      try {
+        execFileSync('git', ['checkout', 'HEAD', '--', relPath], {
+          cwd: dir,
+          stdio: ['ignore', 'ignore', 'ignore'],
+        });
+      } catch {
+        // ignore
+      }
+    } else if (fs.existsSync(fullPath)) {
+      try {
+        fs.rmSync(fullPath, { recursive: true, force: true });
+      } catch {
+        // ignore
+      }
+    }
+  }
+}
+
+/**
  * Classify RunResult status and confidence from execution outcome and evidence
  * (Step 01 §11 / Step 03 §5.1 / Step 04 §5.2).
  *
@@ -166,15 +328,37 @@ function computeChangedFiles(dir, gitBefore, gitAfter, dirtyBefore, dirtyAfter) 
  *   Step 04: requires a valid claim; invalid claim must not produce reported.
  * - `inferred`: no structured claim, but external evidence (git/artifact delta) exists.
  * - `no-evidence`: process settled, but no structured claim with worker artifact, and no external proof.
+ */
+function snapshotDirtyBeforeFiles(dir, dirtyBefore) {
+  const snapshots = new Map();
+  if (!dir || !Array.isArray(dirtyBefore)) return snapshots;
+  for (const relPath of dirtyBefore) {
+    const fullPath = path.join(dir, relPath);
+    try {
+      if (fs.existsSync(fullPath)) {
+        const content = fs.readFileSync(fullPath);
+        const hash = crypto.createHash('sha256').update(content).digest('hex');
+        snapshots.set(relPath, { content, hash, exists: true });
+      } else {
+        snapshots.set(relPath, { content: null, hash: null, exists: false });
+      }
+    } catch {}
+  }
+  return snapshots;
+}
+
+/**
+ * Classify RunResult status and confidence from evidence (Step 04 §5.2).
  *
  * @param {object} params
  * @param {number|null} params.exitCode
  * @param {string|null} params.signal
  * @param {boolean} params.isTimeout
- * @param {object|null} params.agentClaim Parsed agent-result.json content (null if absent or unparseable)
- * @param {boolean} [params.claimInvalid] True when agent-result.json was present but failed schema validation (Step 04)
- * @param {string[]} params.workerArtifacts
- * @param {string[]} params.changedFiles Post-run changed files (dirty-before already subtracted, Step 04)
+ * @param {object|null} params.agentClaim
+ * @param {boolean} [params.claimInvalid]
+ * @param {string[]} [params.workerArtifacts]
+ * @param {string[]} [params.changedFiles]
+ * @param {boolean} [params.hasDirtyBeforeMutation]
  * @param {boolean} params.isReadOnlyOperation
  * @returns {{ status: 'done'|'blocked'|'failed'|'no-evidence', confidence: 'verified'|'reported'|'inferred'|'no-evidence'|'failed' }}
  */
@@ -186,7 +370,12 @@ export function classifyRunEvidence({
   claimInvalid = false,
   workerArtifacts = [],
   changedFiles = [],
+  hasDirtyBeforeMutation = false,
   isReadOnlyOperation = true,
+  cwd,
+  repoRoot,
+  assignment,
+  work,
 }) {
   if (isTimeout || (exitCode !== null && exitCode !== undefined && exitCode !== 0) || signal) {
     return { status: 'failed', confidence: 'failed' };
@@ -205,7 +394,15 @@ export function classifyRunEvidence({
     return { status: 'blocked', confidence: 'reported' };
   }
 
-  const hasExternalEvidence = changedFiles.length > 0;
+  const hasExternalEvidence = changedFiles.length > 0 || hasDirtyBeforeMutation;
+
+  // Step 06 P1: Read-only operation MUST NOT mutate repo state.
+  // If a read-only assignment modified files in the repository (hasExternalEvidence === true),
+  // it violates the read-only contract and must fail closed with confidence: 'failed'.
+  if (isReadOnlyOperation && hasExternalEvidence) {
+    return { status: 'failed', confidence: 'failed' };
+  }
+
   // Step 04 §5.2: agent-result.json is the structured claim, not evidence by itself.
   // A read-only operation requires either a companion report artifact (e.g. agent-report.md)
   // or explicit evidenceRefs in agent-result.json to classify as reported.
@@ -213,25 +410,27 @@ export function classifyRunEvidence({
     (p) => typeof p === 'string' && !p.endsWith('agent-result.json'),
   );
   const hasEvidenceRefs = Array.isArray(agentClaim?.evidenceRefs) &&
-    agentClaim.evidenceRefs.some((ref) => typeof ref === 'string' && ref.trim() !== '');
+    agentClaim.evidenceRefs.some((ref) => isSubstantiveEvidenceRef(ref, { cwd, repoRoot, assignment, work }));
   const hasWorkerReport = companionReportArtifacts.length > 0 || hasEvidenceRefs;
 
   if (agentClaim && agentClaim.status === 'done') {
-    // Verified requires external evidence (git delta / external test proof)
+    // Reported for read-only consult/review when a worker-produced report artifact or evidenceRefs exists.
+    if (isReadOnlyOperation) {
+      if (hasWorkerReport) {
+        return { status: 'done', confidence: 'reported' };
+      }
+      return { status: 'no-evidence', confidence: 'no-evidence' };
+    }
+    // Verified requires external evidence for mutating operations (git delta / external test proof)
     // Step 04: changedFiles are already dirty-before-subtracted; only post-run files qualify.
     if (hasExternalEvidence) {
       return { status: 'done', confidence: 'verified' };
     }
-    // Reported for read-only consult/review when a worker-produced report artifact or evidenceRefs exists.
-    // Step 04: requires a valid claim (claimInvalid=false is guaranteed above) and real report artifact / evidenceRefs.
-    if (isReadOnlyOperation && hasWorkerReport) {
-      return { status: 'done', confidence: 'reported' };
-    }
     return { status: 'no-evidence', confidence: 'no-evidence' };
   }
 
-  // Inferred when external evidence exists without structured claim
-  if (hasExternalEvidence) {
+  // Inferred when external evidence exists without structured claim for mutating operations
+  if (!isReadOnlyOperation && hasExternalEvidence) {
     return { status: 'done', confidence: 'inferred' };
   }
 
@@ -302,17 +501,14 @@ export async function executeAssignment(assignment, opts = {}) {
 
   const cwd = opts.cwd ?? process.cwd();
   const root = opts.repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
-  if (opts.runnerConfig) {
-    writeSharedConfig(root, { runner: opts.runnerConfig });
-  }
   const rawCfg = opts.runnerConfig ?? ensureRunnerConfigForDir(root);
   const cfg = { ...rawCfg };
   if (rawCfg.executor) {
-    const defaultExec = { allowCrossProvider: true, ...rawCfg.executor };
+    const defaultExec = { ...rawCfg.executor };
     cfg.executor = defaultExec;
     cfg.executors = {
       ...(rawCfg.executors || {}),
-      claude: { allowCrossProvider: true, ...(rawCfg.executors?.claude || {}), ...rawCfg.executor },
+      claude: { ...(rawCfg.executors?.claude || {}), ...rawCfg.executor },
       ...(rawCfg.executor.command ? { [rawCfg.executor.command]: defaultExec } : {}),
     };
   }
@@ -361,10 +557,12 @@ export async function executeAssignment(assignment, opts = {}) {
     stage: effectiveAssignment.stage,
     hasLiveTaskAccess: opts.hasLiveTaskAccess ?? false,
     cliOverride: opts.cliOverride,
+    options: opts.options,
   });
 
-  if (compiledPlan.dispatch === 'human-only') {
-    throw new RunnerConfigError(`cannot execute human-only operation "${effectiveAssignment.operation}" via cli-spawn`);
+  if (compiledPlan.dispatch === 'human-only' || compiledPlan.mechanism === 'unavailable' || compiledPlan.mechanism === null) {
+    const reason = compiledPlan.blockedReason ?? compiledPlan.reasonCodes?.join(', ') ?? 'governance-blocked or unavailable mechanism';
+    throw new RunnerConfigError(`dispatch decide blocked operation "${effectiveAssignment.operation}": ${reason}`);
   }
 
   const effectivePolicy = resolveAssignmentDispatchPolicy({
@@ -374,6 +572,13 @@ export async function executeAssignment(assignment, opts = {}) {
     cliOverride: opts.cliOverride,
     options: opts.options,
   });
+
+  const decidedExecutor = compiledPlan.executorId ?? compiledPlan.invocation?.executorId;
+  if (decidedExecutor && decidedExecutor !== effectivePolicy.executorPreference[0]) {
+    throw new RunnerConfigError(
+      `dispatch decide mismatch for operation "${effectiveAssignment.operation}": decided executor "${decidedExecutor}" does not match execution policy executor "${effectivePolicy.executorPreference[0]}"`,
+    );
+  }
 
   // Determine run attempt number monotonically without reusing existing dirs
   const existingAttempts = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d));
@@ -419,10 +624,12 @@ export async function executeAssignment(assignment, opts = {}) {
 
   fs.writeFileSync(path.join(runDir, 'run.json'), `${JSON.stringify(runMeta, null, 2)}\n`);
 
+  const effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
+
   // Step 04 §5.3: snapshot dirty state BEFORE the run so pre-existing dirty files
   // are never counted as post-run evidence.
-  const gitBefore = safeGitHead(cwd);
-  const dirtyBefore = safeGitStatusFiles(cwd);
+  const dirtyBefore = safeGitStatusFiles(effectiveCwd);
+  const dirtyBeforeSnapshots = snapshotDirtyBeforeFiles(effectiveCwd, dirtyBefore);
 
   const startTime = Date.now();
   let rawResult;
@@ -456,9 +663,10 @@ export async function executeAssignment(assignment, opts = {}) {
   const durationMs = Date.now() - startTime;
   const settledAt = new Date().toISOString();
 
-  const gitAfter = safeGitHead(cwd);
+  const gitBefore = rawResult?.headBefore ?? safeGitHead(effectiveCwd);
+  const gitAfter = rawResult?.headAfter ?? safeGitHead(effectiveCwd);
   // Step 04 §5.3: snapshot dirty state AFTER the run for subtraction
-  const dirtyAfter = safeGitStatusFiles(cwd);
+  const dirtyAfter = safeGitStatusFiles(effectiveCwd);
 
   const stdoutText = rawResult.stdout || '';
   const stderrText = rawResult.stderr || (executionError ? executionError.message : '');
@@ -516,10 +724,17 @@ export async function executeAssignment(assignment, opts = {}) {
   const workerArtifacts = [];
   const agentReportExists = fs.existsSync(agentReportPath);
   if (agentReportExists) {
+    let reportValid = false;
+    try {
+      const content = fs.readFileSync(agentReportPath, 'utf8');
+      reportValid = isSubstantiveReportText(content);
+    } catch {
+      reportValid = false;
+    }
     workerArtifacts.push({
       path: path.relative(root, agentReportPath),
       kind: 'agent-report',
-      valid: true,
+      valid: reportValid,
     });
   }
   if (agentResultExists) {
@@ -529,8 +744,8 @@ export async function executeAssignment(assignment, opts = {}) {
       valid: !claimInvalid,
     });
   }
-  // Flatten to paths for classifyRunEvidence (string[] interface preserved for compat)
-  const workerArtifactPaths = workerArtifacts.map((a) => a.path);
+  // Flatten to paths for classifyRunEvidence (only valid worker artifacts count towards evidence)
+  const workerArtifactPaths = workerArtifacts.filter((a) => a.valid).map((a) => a.path);
 
   // Step 04 §5.4: use isReadOnlyAssignment helper instead of inline role check
   const isReadOnly = isReadOnlyAssignment(effectiveAssignment);
@@ -540,6 +755,27 @@ export async function executeAssignment(assignment, opts = {}) {
   // so pre-existing dirty files are excluded from post-run evidence.
   const { changedFiles, changedFileReasons } = computeChangedFiles(cwd, gitBefore, gitAfter, dirtyBefore, dirtyAfter);
 
+  const mutatedDirtyBeforeFiles = [];
+  if (isReadOnly) {
+    for (const [relPath, snap] of dirtyBeforeSnapshots) {
+      const fullPath = path.join(cwd, relPath);
+      let currentContent = null;
+      let currentHash = null;
+      let currentExists = false;
+      try {
+        if (fs.existsSync(fullPath)) {
+          currentContent = fs.readFileSync(fullPath);
+          currentHash = crypto.createHash('sha256').update(currentContent).digest('hex');
+          currentExists = true;
+        }
+      } catch {}
+
+      if (currentExists !== snap.exists || currentHash !== snap.hash) {
+        mutatedDirtyBeforeFiles.push(relPath);
+      }
+    }
+  }
+
   const { status, confidence } = classifyRunEvidence({
     exitCode,
     signal,
@@ -548,7 +784,12 @@ export async function executeAssignment(assignment, opts = {}) {
     claimInvalid,
     workerArtifacts: workerArtifactPaths,
     changedFiles,
+    hasDirtyBeforeMutation: mutatedDirtyBeforeFiles.length > 0,
     isReadOnlyOperation: isReadOnly,
+    cwd,
+    repoRoot: root,
+    assignment: effectiveAssignment,
+    work: opts.work,
   });
 
   // Step 04 §5.5: richer evidence.json with provenance fields.

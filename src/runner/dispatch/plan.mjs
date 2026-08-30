@@ -41,6 +41,8 @@ export function compileDispatchPlan(
     caller = { role: 'driver' },
     workItem,
     assignmentItem,
+    cliOverride,
+    options,
   } = {},
 ) {
   if (!executorIdArg && !purpose && !workIdArg && !assignmentArg && !needsSoul) {
@@ -91,6 +93,8 @@ export function compileDispatchPlan(
       const policy = resolveAssignmentDispatchPolicy({
         assignment: asgnObj,
         runnerConfig: cfg,
+        cliOverride,
+        options,
       });
       executorId = policy.executorPreference[0];
       assignmentResolved = resolveExecutorAndOverrides(cfg, executorId);

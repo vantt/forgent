@@ -892,8 +892,8 @@ export async function runDispatchCli() {
           hasLiveTaskAccess,
         }).then(
           (decided) => {
-            if (decided && (decided.dispatch === 'human-only' || decided.mechanism === null)) {
-              process.stderr.write(`dispatch decide blocked assignment execution: ${decided.reason ?? 'unexecutable mechanism'}\n`);
+            if (decided && (decided.dispatch === 'human-only' || decided.mechanism === 'unavailable' || decided.mechanism === null)) {
+              process.stderr.write(`dispatch decide blocked assignment execution: ${decided.blockedReason ?? decided.reason ?? 'unexecutable mechanism'}\n`);
               process.exitCode = 1;
               return;
             }
