@@ -17,8 +17,10 @@ import {
   operationsForStage,
 } from '../../state/workflow-stage-graphs.mjs';
 import { resolveContentRoot } from '../../intake/plan.mjs';
+import { planVerdictFromPlanMd } from '../../intake/plan-verdict-from-plan-md.mjs';
 import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeAssignment, classifyRunEvidence, isSubstantiveReportText } from './assignment-runner.mjs';
+import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { detectTrunk } from '../worktree.mjs';
 
 // Non-enumerable stamp the cross-pass scan attaches to a consumed runResult:
@@ -88,7 +90,14 @@ export function hasPlanConstraints({ work, docsRef, repoRoot }) {
   return false;
 }
 
-function findLatestAssignmentRunResult({ work, repoRoot, stage, operation = 'validate-plan' }) {
+// ADR-006 R5: candidates are filtered by the Assignment's own stamped
+// `resultKind` field, not the `operation` id -- default matches the sole
+// caller's `validate-plan` intent (`assignment-normalizer.mjs`'s stamp for
+// `validate-plan` is `'gate-verdict'`). Same permissive-on-missing-field
+// stance as the pre-existing `operation` filter it replaces: an assignment.json
+// written before this field existed (or one whose value is simply absent)
+// is not excluded by this filter alone.
+function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'gate-verdict' }) {
   if (!work?.id || !repoRoot) return null;
   const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
   if (!fs.existsSync(assignmentsDir)) return null;
@@ -109,7 +118,7 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, operation = 'val
         const asgn = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
         if (asgn.workId !== work.id && asgn.work?.id !== work.id) continue;
         if (targetStage && asgn.stage && asgn.stage !== targetStage) continue;
-        if (operation && asgn.operation && asgn.operation !== operation) continue;
+        if (resultKind && asgn.resultKind && asgn.resultKind !== resultKind) continue;
 
         // Dispatched-run membership: only run dirs the runner itself
         // dispatched (recorded in assignment.json at dispatch time) count as
@@ -717,7 +726,7 @@ export function chooseStageOperation({
       }
     }
     if (!effectiveLastRunResult && work && repoRoot) {
-      effectiveLastRunResult = findLatestAssignmentRunResult({ work, repoRoot, stage: currentStage, operation: 'validate-plan' });
+      effectiveLastRunResult = findLatestAssignmentRunResult({ work, repoRoot, stage: currentStage, resultKind: 'gate-verdict' });
     }
 
     // If lastRunResult exists from validate-plan:
@@ -1569,10 +1578,48 @@ export function hasWorkerReportArtifact(runResult, repoRoot) {
  * @param {object} [params.contextSignals] Driver context signals
  * @returns {Readonly<object>}
  */
+// ADR-006 R5: when neither `choice.assignment` nor `runResult.assignment`
+// carries a stamped Assignment (every direct unit-test call into
+// `interpretAssignmentRunResult`, and the two `chooseStageOperation`-internal
+// calls that interpret an already-completed run without rebuilding an
+// Assignment), derive the SAME `resultKind` `assignment-normalizer.mjs` would
+// stamp for this operation, from that module's own single source of truth --
+// never a second, independently hand-maintained table that could drift from
+// it. `stampDeclaredAssignment` never throws for a string operation (every
+// branch resolves via its own mutation-derived default), so this only
+// returns `undefined` for a missing/non-string operation.
+function fallbackResultKindForOperation(operation) {
+  if (typeof operation !== 'string' || !operation) return undefined;
+  try {
+    return stampDeclaredAssignment({ operation }).resultKind;
+  } catch {
+    return undefined;
+  }
+}
+
 export function interpretAssignmentRunResult({ choice, runResult, contextSignals = {}, work, repoRoot }) {
   const confidence = runResult?.confidence;
   const status = runResult?.status;
   const operation = choice?.operation;
+
+  // ADR-006 R5: interpretation reads the Assignment's own stamped fields, not
+  // the operation id. `choice.assignment` is the real stamped Assignment on
+  // the production path (`executeDriverOperationChoice` always builds one via
+  // `buildAssignment`, which stamps `resultKind`/`evidence.required`, before
+  // calling this function). `chooseStageOperation`'s two cross-pass call
+  // sites never populate `choice.assignment` -- they pass only `{ operation,
+  // ... }`, so this falls through to `fallbackResultKindForOperation` below
+  // for those callers rather than reading anything persisted (P02.2 Red-Team
+  // MEDIUM-4: `findLatestAssignmentRunResult` does read the real, disk-
+  // persisted `resultKind` as its own filter, but its return value never
+  // carries that field forward to here -- deliberate for now, since no
+  // producer anywhere in `src/` ever sets a `runResult.assignment`, and
+  // fixing it means changing the return shape of the codebase's highest
+  // tamper-detection-sensitivity function; see `docs/architect/agent-
+  // coordination/verification/step-07-mvp/index.md`'s Follow-Ups).
+  const stampedAssignment = choice?.assignment ?? null;
+  const resultKind = stampedAssignment?.resultKind ?? fallbackResultKindForOperation(operation);
+  const evidenceRequired = stampedAssignment?.evidence?.required;
 
   if (confidence === 'no-evidence' || status === 'no-evidence') {
     return Object.freeze({
@@ -1598,7 +1645,29 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  const hasReportConfidence = confidence === 'reported' || confidence === 'verified';
+  // ADR-006 R5 (result-ladder confidence checks reference the stamped
+  // requirement): when the Assignment's own stamped `evidence.required` is
+  // known and is `'verified'`, that is the confidence floor here --
+  // `'reported'` alone is not sufficient. `assignment-normalizer.mjs` stamps
+  // `evidence.required: 'verified'` unconditionally for `fix-verify-red`,
+  // `scoped-subtask`, AND `implement-item`, so on the real production path
+  // (`executeDriverOperationChoice` always builds a real Assignment via
+  // `buildAssignment` before calling this function) this gate is the
+  // EFFECTIVE confidence floor for all three operations: it always
+  // evaluates first and is strictly stricter-or-equal to their deeper
+  // per-branch `confidence !== 'verified'` re-checks, so those re-checks
+  // (and their distinct `<op>-requires-verified-evidence` reason string)
+  // are unreachable for any dispatch that carries a stamped Assignment --
+  // not merely redundant defense-in-depth. They are left in place verbatim
+  // only because they remain reachable, and still needed, for direct
+  // unit-test call sites that construct a bare `choice` with no stamped
+  // Assignment at all (no `choice.assignment`/`runResult.assignment`); see
+  // `test/runner/operation-choice.test.mjs` for regression coverage of both
+  // shapes. When `evidence.required` is not available (no stamped
+  // Assignment reached this call), the floor stays the original uniform
+  // `'reported' || 'verified'` check.
+  const hasReportConfidence =
+    evidenceRequired === 'verified' ? confidence === 'verified' : confidence === 'reported' || confidence === 'verified';
   if (!hasReportConfidence || status !== 'done') {
     return Object.freeze({
       canAdvanceEdge: false,
@@ -1607,7 +1676,7 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  if (operation === 'validate-plan') {
+  if (resultKind === 'gate-verdict') {
     if (!hasWorkerReportArtifact(runResult, repoRoot)) {
       return Object.freeze({
         canAdvanceEdge: false,
@@ -1686,7 +1755,7 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  if (operation === 'review-item') {
+  if (resultKind === 'review-verdict') {
     const reportText = getReportText(runResult, repoRoot);
     const evidenceRefs = runResult?.agentClaim?.evidenceRefs;
     if (!hasValidReviewEvidenceRefs(evidenceRefs, choice, work, repoRoot, contextSignals, reportText, runResult)) {
@@ -1756,7 +1825,7 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  if (operation === 'scout-blast-radius') {
+  if (resultKind === 'advisory' && operation === 'scout-blast-radius') {
     if (confidence !== 'reported' && confidence !== 'verified') {
       return Object.freeze({
         canAdvanceEdge: false,
@@ -1855,7 +1924,7 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  if (operation === 'resolve-question') {
+  if (resultKind === 'advisory' && operation === 'resolve-question') {
     if (confidence !== 'reported' && confidence !== 'verified') {
       return Object.freeze({
         canAdvanceEdge: false,
@@ -1918,7 +1987,7 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  if (operation === 'fix-verify-red') {
+  if (resultKind === 'work-product' && operation === 'fix-verify-red') {
     return Object.freeze({
       canAdvanceEdge: false,
       stop: confidence !== 'verified',
@@ -1929,7 +1998,7 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  if (operation === 'scoped-subtask') {
+  if (resultKind === 'work-product' && operation === 'scoped-subtask') {
     if (confidence !== 'verified') {
       return Object.freeze({
         canAdvanceEdge: false,
@@ -2065,8 +2134,30 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
     });
 
     let verdictPayload;
-    if (choice.operation === 'validate-plan') {
-      verdictPayload = undefined;
+    if (assignment.onAdvance === 'derive-plan-verdict-from-plan-md') {
+      // ADR-006 R5: replaces the old hardcoded `verdictPayload = undefined`
+      // special case with `onAdvance` dispatch to Phase 01's
+      // `planVerdictFromPlanMd` -- mechanically re-derives the verdict from
+      // plan.md's own committed text (never the agent's self-reported claim;
+      // that is exactly the Finding 1 hardening this replaces and preserves).
+      // Same repoRoot/contentRoot resolution `loop.mjs` already uses for this
+      // exact function; `work.docsRef` absent or plan.md unreadable both fall
+      // through to an empty `planContent`, which `planVerdictFromPlanMd`
+      // itself resolves to `null` (never a fabricated verdict).
+      let planContent = '';
+      const docsRef = typeof work?.docsRef === 'string' ? work.docsRef.trim() : '';
+      if (docsRef) {
+        const repoRootForPlan = opts.repoRoot ?? opts.cwd;
+        const contentRoot = resolveContentRoot(repoRootForPlan, work.id, docsRef);
+        const planPath = path.join(contentRoot, docsRef, 'plan.md');
+        try {
+          planContent = fs.readFileSync(planPath, 'utf8');
+        } catch {
+          // missing/unreadable plan.md -- planVerdictFromPlanMd('') returns
+          // null below, the same as the pre-onAdvance behavior's `undefined`.
+        }
+      }
+      verdictPayload = planVerdictFromPlanMd(planContent, work.id) ?? undefined;
     } else {
       verdictPayload = interpreted.verdictPayload ?? (
         runResult?.agentClaim?.verdictPayload ?? (

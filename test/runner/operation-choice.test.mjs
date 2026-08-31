@@ -1553,6 +1553,84 @@ test('Step 06 Cell 6.6 fix-verify-red confidence check is unchanged after splitt
   assert.equal(withFootprintFieldsPresent.reason, 'fix-verify-red-verified');
 });
 
+// The three tests below pin the real production-path shape for a
+// buildAssignment-stamped Assignment (evidence.required: 'verified',
+// stamped by assignment-normalizer.mjs for all three of these operations)
+// reaching interpretAssignmentRunResult with confidence: 'reported'. The
+// top-level confidence gate reads the stamped evidence.required and stops
+// the dispatch there, so these never reach the branch-level
+// '<op>-requires-verified-evidence' re-check below (that shape is reachable
+// only for a bare choice with no stamped assignment, as the tests above
+// exercise). This is the intended, real dispatch-path behavior, not a bug.
+test('scoped-subtask: a real buildAssignment Assignment with reported confidence stops at the top-level gate, not the branch-level re-check', () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['scoped-subtask']);
+
+  const assignment = buildAssignment({
+    workId: 'tsk-scoped-topgate',
+    stage: 'executing',
+    operation: 'scoped-subtask',
+    options: { repoRoot: tempDir },
+  });
+
+  const result = interpretAssignmentRunResult({
+    choice: { operation: 'scoped-subtask', assignment },
+    runResult: { status: 'done', confidence: 'reported' },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(result.canAdvanceEdge, false);
+  assert.equal(result.stop, true);
+  assert.equal(result.reason, 'assignment-scoped-subtask-insufficient-confidence');
+  assert.equal(result.canProceed, undefined);
+});
+
+test('fix-verify-red: a real buildAssignment Assignment with reported confidence stops at the top-level gate, not the branch-level re-check', () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['fix-verify-red']);
+
+  const assignment = buildAssignment({
+    workId: 'tsk-fvr-topgate',
+    stage: 'executing',
+    operation: 'fix-verify-red',
+    options: { repoRoot: tempDir },
+  });
+
+  const result = interpretAssignmentRunResult({
+    choice: { operation: 'fix-verify-red', assignment },
+    runResult: { status: 'done', confidence: 'reported' },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(result.canAdvanceEdge, false);
+  assert.equal(result.stop, true);
+  assert.equal(result.reason, 'assignment-fix-verify-red-insufficient-confidence');
+  assert.equal(result.canProceed, undefined);
+});
+
+test('implement-item: a real buildAssignment Assignment with reported confidence stops at the top-level gate one step before the unsupported-operation catch-all', () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['implement-item']);
+
+  const assignment = buildAssignment({
+    workId: 'tsk-implement-topgate',
+    stage: 'executing',
+    operation: 'implement-item',
+    options: { repoRoot: tempDir },
+  });
+
+  const result = interpretAssignmentRunResult({
+    choice: { operation: 'implement-item', assignment },
+    runResult: { status: 'done', confidence: 'reported' },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(result.canAdvanceEdge, false);
+  assert.equal(result.stop, true);
+  assert.equal(result.reason, 'assignment-implement-item-insufficient-confidence');
+  assert.equal(result.canProceed, undefined);
+});
+
 test('Step 06 Cell 6.6 end-to-end: executeAssignment + interpretAssignmentRunResult refuse a real undeclared-file mutation and allow a fully-declared one', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
@@ -5142,4 +5220,128 @@ test('reviewer LOW: a stored failed result from a read-only dirty mutation never
   const choice = choosePlanning(tempDir, planningWorkFor('tsk-s3-dirty', docsRef));
   assert.equal(choice.canAdvanceEdge, false, 'a settle-classified failed run stays failed even when the derivation inputs alone would call it reported');
   assert.equal(choice.reason, 'validation-failed-do-not-advance-work', 'the lost dirty-mutation fact may not upgrade the recorded failed verdict');
+});
+
+// ---------------------------------------------------------------------------
+// ADR-006 R5: interpretAssignmentRunResult/findLatestAssignmentRunResult
+// dispatch on the Assignment's own stamped fields, not the operation id;
+// executeDriverOperationChoice's validate-plan special case becomes
+// onAdvance dispatch to Phase 01's planVerdictFromPlanMd.
+// ---------------------------------------------------------------------------
+
+test('ADR-006 R5: interpretAssignmentRunResult dispatches into the validate-plan-shaped branch off the stamped resultKind "gate-verdict", independent of the operation string', () => {
+  // The operation string here names an operation that has no branch of its
+  // own at all ("shape-plan" falls through to the final unsupported-operation
+  // catch-all when read the old way). The ONLY way the validate-plan-shaped
+  // branch can fire is by reading `choice.assignment.resultKind` -- proving
+  // the dispatch key genuinely changed, not merely that the five originally-
+  // tested operation strings still happen to work.
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'shape-plan', assignment: { resultKind: 'gate-verdict' } },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: { status: 'done', verdict: 'READY', summary: 'Feasible' },
+      evidence: { artifacts: ['agent-result.json'] },
+    },
+  });
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  // 'validate-plan-missing-report-artifact' is a reason string that only the
+  // validate-plan-shaped branch body ever returns (checked before any of that
+  // branch's other logic) -- reaching it proves that branch executed, not the
+  // final `assignment-shape-plan-unsupported-operation` catch-all.
+  assert.equal(interpreted.reason, 'validate-plan-missing-report-artifact');
+});
+
+test('ADR-006 R5: interpretAssignmentRunResult dispatches into the review-item-shaped branch off the stamped resultKind "review-verdict", independent of the operation string', () => {
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'not-a-real-operation', assignment: { resultKind: 'review-verdict' } },
+    runResult: { status: 'done', confidence: 'reported' },
+  });
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  // 'review-item-missing-evidence-refs' is review-item's own branch body's
+  // FIRST check -- reaching it proves the review-item-shaped branch fired
+  // off resultKind alone, since 'not-a-real-operation' matches no operation
+  // string anywhere in the function.
+  assert.equal(interpreted.reason, 'review-item-missing-evidence-refs');
+});
+
+test('ADR-006 R5: an Assignment with no stamped resultKind at all (bare choice, no assignment field) still resolves an unrecognized operation to the unsupported-operation catch-all — the fallback derivation never invents a resultKind for an operation outside the known table', () => {
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'not-a-real-operation' },
+    runResult: { status: 'done', confidence: 'reported' },
+  });
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'assignment-not-a-real-operation-unsupported-operation');
+});
+
+test('ADR-006 R5: findLatestAssignmentRunResult filters candidates by the stamped resultKind field, not the operation id (planning cross-pass path unaffected when assignment.json predates the field)', () => {
+  // seedStoredValidatePlanResult (Cell 6.2 fixture, above) writes
+  // assignment.json with `operation: 'validate-plan'` and no `resultKind`
+  // field at all -- the exact shape an assignment.json written before this
+  // ADR-006 stamp existed would have. The permissive-on-missing-field filter
+  // must still surface it (same stance the old operation-based filter took).
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+  const docsRef = 'docs/history/r5-resultkind-filter';
+  seedStoredValidatePlanResult(tempDir, { id: 'tsk-r5-filter', docsRef, withHash: true, withReport: true });
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r5-filter', docsRef));
+  assert.equal(choice.canAdvanceEdge, true, 'a stored validate-plan result with no resultKind field on disk must still be found and interpreted');
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
+test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch derives a decompose verdictPayload from plan.md\'s own committed "## Split" section', async () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['validate-plan']);
+  const docsRef = 'docs/history/r5-onadvance-decompose';
+  const docsDir = path.join(tempDir, docsRef);
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(docsDir, 'plan.md'),
+    '# Mode: standard\nProposed plan.\n\n## Split\n```json\n[{"title": "Child A"}]\n```\n',
+  );
+
+  const executorScript = writeFakeExecutor(tempDir, { status: 'done', verdict: 'READY', summary: 'READY' });
+  const work = { id: 'tsk-r5-onadvance', status: 'doing', stage: 'planning', domain: 'coding', workflow: 'feature', docsRef };
+  const choice = chooseStageOperation({ work, contextSignals: { hasPlan: true, validationDue: true } });
+
+  const outcome = await executeDriverOperationChoice(work, choice, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig: runnerConfigFor(executorScript),
+  });
+
+  assert.equal(outcome.canAdvanceEdge, true);
+  assert.equal(outcome.assignment.onAdvance, 'derive-plan-verdict-from-plan-md');
+  assert.deepEqual(outcome.verdictPayload, {
+    verdict: 'decompose',
+    children: [{ title: 'Child A' }],
+    reason: 'plan.md\'s own "## Split" section declares a split into 1 piece(s).',
+  });
+});
+
+test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch resolves verdictPayload undefined when plan.md never reaches a "## Split" section — never fabricates a verdict from silence', async () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['validate-plan']);
+  const docsRef = 'docs/history/r5-onadvance-no-split';
+  const docsDir = path.join(tempDir, docsRef);
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: standard\nProposed plan, no split section at all.\n');
+
+  const executorScript = writeFakeExecutor(tempDir, { status: 'done', verdict: 'READY', summary: 'READY' });
+  const work = { id: 'tsk-r5-onadvance-noop', status: 'doing', stage: 'planning', domain: 'coding', workflow: 'feature', docsRef };
+  const choice = chooseStageOperation({ work, contextSignals: { hasPlan: true, validationDue: true } });
+
+  const outcome = await executeDriverOperationChoice(work, choice, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig: runnerConfigFor(executorScript),
+  });
+
+  assert.equal(outcome.canAdvanceEdge, true);
+  assert.equal(outcome.assignment.onAdvance, 'derive-plan-verdict-from-plan-md');
+  assert.equal(outcome.verdictPayload, undefined);
 });
