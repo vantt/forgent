@@ -119,6 +119,17 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
         if (asgn.workId !== work.id && asgn.work?.id !== work.id) continue;
         if (targetStage && asgn.stage && asgn.stage !== targetStage) continue;
         if (resultKind && asgn.resultKind && asgn.resultKind !== resultKind) continue;
+        // ADR-007 §3: an inline Assignment's RunResult is non-driving
+        // evidence -- driver operation choice must never interpret it as a
+        // Stage verdict or lifecycle signal. Skip it here, in the same
+        // filter chain as the declared-shape checks above (not a
+        // continue-then-fall-through into evidence it shouldn't reach),
+        // so `chooseStageOperation` never even receives it as
+        // `lastRunResult`. Same permissive-on-missing-field stance as its
+        // neighbors: an assignment.json written before `provenance` existed
+        // (or one that simply omits it) is not excluded by this filter
+        // alone -- only an EXPLICIT `provenance.kind === 'inline'` skips.
+        if (asgn.provenance?.kind === 'inline') continue;
 
         // Dispatched-run membership: only run dirs the runner itself
         // dispatched (recorded in assignment.json at dispatch time) count as
@@ -645,6 +656,36 @@ export function chooseStageOperation({
   contextSignals = {},
   repoRoot,
 }) {
+  // ADR-007 §3: the non-driving guarantee must hold regardless of how
+  // `lastRunResult` reached this function -- not only via the internal
+  // auto-discovery fallback further below (`findLatestAssignmentRunResult`,
+  // which already skips a stored result whose assignment.json carries
+  // `provenance.kind === 'inline'`). A caller-supplied `lastRunResult` is
+  // the real RunResult shape `assignment-runner.mjs`'s `executeAssignment`
+  // persists: it never carries provenance directly, only its own
+  // `assignmentId` -- so re-derive that Assignment's provenance from the
+  // same on-disk `assignment.json` the auto-discovery path already reads,
+  // and normalize an inline-provenance `lastRunResult` to absent right
+  // here, before either the planning-stage branch or the review-item
+  // branch below can read it as evidence.
+  if (lastRunResult && typeof lastRunResult.assignmentId === 'string' && lastRunResult.assignmentId && repoRoot) {
+    try {
+      const asgnJsonPath = path.join(repoRoot, '.fgos', 'assignments', lastRunResult.assignmentId, 'assignment.json');
+      const asgn = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
+      if (asgn?.provenance?.kind === 'inline') {
+        lastRunResult = null;
+      }
+    } catch {
+      // Unreadable/missing/corrupt assignment.json for the assignmentId a
+      // caller-supplied lastRunResult names: fail open here, the same
+      // permissive-on-missing-data stance this file already takes for a
+      // hand-constructed or legacy lastRunResult elsewhere -- the
+      // auto-discovery fallback below applies its own, independent,
+      // fail-closed filtering whenever IT is the one populating
+      // `lastRunResult` instead of a caller.
+    }
+  }
+
   const currentStage = stage ?? work?.stage;
   if (!currentStage) {
     return Object.freeze({

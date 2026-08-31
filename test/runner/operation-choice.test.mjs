@@ -5472,6 +5472,103 @@ test('ADR-006 R5: findLatestAssignmentRunResult filters candidates by the stampe
   assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
 });
 
+// ---------------------------------------------------------------------------
+// ADR-007 §3: the non-driving rule -- an inline Assignment's RunResult is
+// never interpreted as a Stage verdict or lifecycle signal.
+// findLatestAssignmentRunResult must skip a stored result whose
+// assignment.json carries provenance.kind === 'inline', in the same
+// filter chain as its existing stage/resultKind checks.
+// ---------------------------------------------------------------------------
+
+test('ADR-007 §3: an inline Assignment with a READY-looking claim on a planning Work is never picked up by the cross-pass filter -- the driver falls back to requesting a real validate-plan run instead of advancing the edge', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r2-inline-non-driving';
+  const { asgnDir } = seedStoredValidatePlanResult(tempDir, { id: 'tsk-r2-inline', docsRef, withHash: true, withReport: true });
+
+  // Stamp the exact same stored, otherwise-fully-valid READY result as
+  // inline provenance -- everything about the evidence itself (claim,
+  // report, hashes, dispatched-run manifest) stays legitimate; only the
+  // provenance kind changes.
+  const asgnJsonPath = path.join(asgnDir, 'assignment.json');
+  const asgnJson = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
+  asgnJson.provenance = { kind: 'inline' };
+  fs.writeFileSync(asgnJsonPath, JSON.stringify(asgnJson));
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r2-inline', docsRef));
+  // Not advanced: the inline result must be invisible to the driver, so
+  // planning falls back to its own "plan.md exists, validation still due"
+  // default path rather than reading validate-plan's READY verdict.
+  assert.equal(choice.canAdvanceEdge, false, 'an inline Assignment\'s RunResult must never be treated as a Stage verdict');
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+  assert.notEqual(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
+test('ADR-007 §3 regression: a declared validate-plan READY result (provenance.kind: "declared") still advances the edge unmodified', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r2-declared-regression';
+  const { asgnDir } = seedStoredValidatePlanResult(tempDir, { id: 'tsk-r2-declared', docsRef, withHash: true, withReport: true });
+
+  const asgnJsonPath = path.join(asgnDir, 'assignment.json');
+  const asgnJson = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
+  asgnJson.provenance = { kind: 'declared' };
+  fs.writeFileSync(asgnJsonPath, JSON.stringify(asgnJson));
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r2-declared', docsRef));
+  assert.equal(choice.canAdvanceEdge, true, 'an explicitly declared-provenance result must still be consumable cross-pass');
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
+test('ADR-007 §3: an inline Assignment\'s RunResult fed directly into chooseStageOperation\'s own lastRunResult parameter is ignored, not just when discovered via the internal cross-pass scan', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r2-inline-direct-injection';
+  const { asgnDir, resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r2-inline-direct',
+    docsRef,
+    withHash: true,
+    withReport: true,
+  });
+
+  const asgnJsonPath = path.join(asgnDir, 'assignment.json');
+  const asgnJson = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
+  asgnJson.provenance = { kind: 'inline' };
+  fs.writeFileSync(asgnJsonPath, JSON.stringify(asgnJson));
+
+  // The exact real-RunResult shape a caller would hold after reading
+  // result.json back (or after a real executeAssignment() call): it never
+  // carries provenance directly, only its own assignmentId.
+  const realRunResult = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  assert.equal(realRunResult.assignmentId, asgnJson.assignmentId);
+  assert.equal(realRunResult.provenance, undefined, 'a real RunResult never carries provenance directly -- only assignmentId');
+
+  const bypassAttempt = choosePlanning(tempDir, planningWorkFor('tsk-r2-inline-direct', docsRef), {
+    lastRunResult: realRunResult,
+  });
+  assert.equal(
+    bypassAttempt.canAdvanceEdge,
+    false,
+    'an inline Assignment\'s real RunResult, fed directly as lastRunResult, must never drive canAdvanceEdge -- regardless of how lastRunResult was populated',
+  );
+  assert.notEqual(bypassAttempt.reason, 'validation-passed-ready-for-planning-edge');
+
+  // Matches the auto-discovery path's own outcome for the exact same
+  // on-disk state -- the direct-injection path and the internal fallback
+  // must agree once the guard is in place.
+  const autoDiscovery = choosePlanning(tempDir, planningWorkFor('tsk-r2-inline-direct', docsRef));
+  assert.equal(bypassAttempt.reason, autoDiscovery.reason);
+});
+
 test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch derives a decompose verdictPayload from plan.md\'s own committed "## Split" section', async () => {
   const tempDir = mkTempDir();
   seedTaskSpecs(tempDir, ['validate-plan']);

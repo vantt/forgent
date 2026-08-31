@@ -30,6 +30,14 @@ const ACCEPTED_CONTRACT_FIELDS = new Set([
   'role',
   'capabilities',
   'budget',
+  // ADR-007 §1/§3: the operation id an inline contract claims to support,
+  // when it is attached to a Work at a declared Stage. Format-check only
+  // here (non-empty string when present) -- this generic, domain-ignorant
+  // validator never knows what a legal operation id is; that semantic
+  // legality check belongs solely to the domain harness seam
+  // (domains/coding/harness/enrich-and-validate-contract.mjs), which the
+  // foundation calls strictly after this validator (ADR-007 §2).
+  'supports',
 ]);
 
 const ACCEPTED_CALLER_FIELDS = new Set(['writerId', 'parentAssignmentId']);
@@ -137,6 +145,9 @@ export function validateExecutionContract({ contract, caller } = {}) {
 
   if (!isNonEmptyString(contract.role)) {
     fail('contract.role must be a non-empty string (role hint)');
+  }
+  if (contract.supports !== undefined && !isNonEmptyString(contract.supports)) {
+    fail('contract.supports must be a non-empty string when provided (an operation id it claims to support -- legality against the Work\'s declared Stage is checked by the domain harness seam, ADR-007 §3, not here)');
   }
   if (contract.capabilities !== undefined && !isStringArray(contract.capabilities)) {
     fail('contract.capabilities must be an array of strings when provided (capability hints)');

@@ -190,3 +190,39 @@ test('validateExecutionContract rejects a negative or non-finite budget.tokens t
     (err) => err instanceof RunnerConfigError,
   );
 });
+
+// ─── ADR-007 §1: the optional "supports" field -- format check only ────────
+// This generic, domain-ignorant validator never knows what a legal
+// operation id is; that semantic legality check belongs solely to the
+// domain harness seam (domains/coding/harness/enrich-and-validate-contract.mjs).
+
+test('validateExecutionContract accepts a contract with no "supports" field at all (optional)', () => {
+  const contract = validContract();
+  assert.equal(contract.supports, undefined);
+  assert.doesNotThrow(() => validateExecutionContract({ contract, caller: validCaller() }));
+});
+
+test('validateExecutionContract accepts a contract with a non-empty "supports" string, regardless of whether it names a real operation', () => {
+  assert.doesNotThrow(() =>
+    validateExecutionContract({ contract: validContract({ supports: 'validate-plan' }), caller: validCaller() }),
+  );
+  // Format check only -- this validator has no domain/stage context to
+  // check legality against, so a nonsense value still passes here.
+  assert.doesNotThrow(() =>
+    validateExecutionContract({ contract: validContract({ supports: 'not-a-real-operation-id' }), caller: validCaller() }),
+  );
+});
+
+test('validateExecutionContract rejects an empty-string "supports" field', () => {
+  assert.throws(
+    () => validateExecutionContract({ contract: validContract({ supports: '' }), caller: validCaller() }),
+    (err) => err instanceof RunnerConfigError && /supports/.test(err.message),
+  );
+});
+
+test('validateExecutionContract rejects a non-string "supports" field', () => {
+  assert.throws(
+    () => validateExecutionContract({ contract: validContract({ supports: 42 }), caller: validCaller() }),
+    (err) => err instanceof RunnerConfigError && /supports/.test(err.message),
+  );
+});
