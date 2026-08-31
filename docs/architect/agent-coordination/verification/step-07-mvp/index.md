@@ -49,7 +49,8 @@ Noted, not touched by this track: `.agentkit/`, `.claude/agents/*.md`,
 | P02 | R1–R4 | done | P02.1 | `P02.1.md`, commit `0fdd61d9` |
 | P02 | R5 | done | P02.2 | `P02.2.md`, commit `d2df76cc` |
 | P02 | R6 (G3) | done | P02.3 | `P02.3.md`, commit `b262ced1` |
-| P02 | R7–R8 | missing | P02.4 | — |
+| P02 | R7 | done | P02.4 | `P02.4.md`, commit `cfe60bfb` |
+| P02 | R8 | missing | P02.5 | — |
 | P03 | R1–R2 | missing | P03.1 | — |
 | P03 | R3 | missing | P03.2 | — |
 | P03 | R4–R6 | missing | P03.3 | — |
@@ -113,10 +114,18 @@ Populated in Phase 03 per plan requirement R6.
 
 ## Active Cell
 
-None. P02.3 closed 2026-08-31 (commit `b262ced1`). Phase 02 R1-R6 all done;
-only R7-R8 (P02.4) remain.
+None. P02.4 closed 2026-08-31 (commit `cfe60bfb`). R7 done — this cell
+grew substantially beyond its original scope: R7's own files, plus 3
+rounds of finding-and-fixing the same "raw read-back bypasses the
+normalizer" bug class at 4 locations (`operation-choice.mjs`,
+`mission-lite.mjs`, `cli.mjs`, and finally the structurally-correct root
+cause in `assignment-runner.mjs`'s `executeAssignment` itself). 2 Review
+rounds, 2 Red-Team rounds, all found real issues, all fixed and
+re-verified. Phase 02 now R1-R7 done; only R8 (P02.5) remains.
 
 ## Next Action
 
-Prepare cell P02.4 (R7: remove the `missionId || workId === null`
-read-only heuristic; R8: mission-lite migration onto the inline path).
+Prepare cell P02.5 (R8: mission-lite migration onto the inline path,
+stop copying assignment.json/result JSON into `.fgos/missions/`,
+`validateAssignmentLegality` accepting inline-shaped Assignments — the
+piece this cell's own split explicitly deferred).

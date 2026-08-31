@@ -3,13 +3,14 @@
 Status: idle
 Owner: —
 Last updated: 2026-08-31
-Next action: prepare P02.4
+Next action: prepare P02.5
 
-P02.3 closed. See `index.md` for the phase/requirement matrix and
-`P02.3.md` for its full trace (1 Review round: 1 MEDIUM + 1 LOW, both
-fixed directly; 1 Red-Team round: explicit clean verdict after 5 fresh
-attacks; no HIGH ever found across this cell or its predecessor P02.2 —
-the tamper-detection/monotonic-re-derivation invariants in
-`findLatestAssignmentRunResult` have now been independently scrutinized
-across 4 adversarial rounds total and remain intact). Phase 02 R1-R6 all
-done; only R7-R8 (P02.4) remain before Phase 03.
+P02.4 closed. See `index.md` for the phase/requirement matrix and
+`P02.4.md` for its full trace — the cell grew substantially: R7's own
+heuristic removal, then 3 successive rounds finding and fixing the same
+"raw read-back bypasses the normalizer" bug class at 4 locations, ending
+at the structurally-correct root cause inside `executeAssignment` itself.
+2 Review rounds + 2 Red-Team rounds, every round found real issues, all
+fixed and independently re-verified (including a personal revert-and-check
+by the Coordinator on the final fix). Phase 02 R1-R7 all done; only R8
+(P02.5) remains before Phase 03.
