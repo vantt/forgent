@@ -1514,6 +1514,34 @@ export function getReportText(runResult, repoRoot) {
  * @param {string} [repoRoot]
  * @returns {boolean}
  */
+// Repo-relative path comparisons must not depend on the OS path separator —
+// evidence.json/changedFiles are recorded with git's forward-slash paths, but
+// a caller-declared expectedFiles entry could be typed with either.
+function normalizeRelPath(p) {
+  return typeof p === 'string' ? p.replace(/\\/g, '/').trim() : '';
+}
+
+// Step 06 Slice 6.4: dirtyBefore is written to evidence.json on disk by
+// assignment-runner.mjs but is not part of the in-memory RunResult shape
+// (only evidence.gitBefore/gitAfter/changedFiles are). Read it back from the
+// same trusted consuming-run dir used for report text so a caller-declared
+// scoped-subtask footprint can be checked against it. Returns [] when the
+// dir/file is unavailable or malformed — absence of dirtyBefore data must
+// never itself trigger a refusal.
+function getEvidenceDirtyBefore(runResult, repoRoot) {
+  const root = repoRoot || process.cwd();
+  const consumingDir = consumingRunDirFor(runResult, root);
+  if (!consumingDir) return [];
+  const evidencePath = path.join(consumingDir, 'evidence.json');
+  try {
+    if (!fs.existsSync(evidencePath) || !fs.statSync(evidencePath).isFile()) return [];
+    const parsed = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
+    return Array.isArray(parsed?.dirtyBefore) ? parsed.dirtyBefore.filter((f) => typeof f === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
 export function hasWorkerReportArtifact(runResult, repoRoot) {
   const artifacts = getArtifactList(runResult);
   if (artifacts.length === 0) {
@@ -1890,7 +1918,7 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  if (operation === 'scoped-subtask' || operation === 'fix-verify-red') {
+  if (operation === 'fix-verify-red') {
     return Object.freeze({
       canAdvanceEdge: false,
       stop: confidence !== 'verified',
@@ -1898,6 +1926,64 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
       reason: confidence === 'verified'
         ? `${operation}-verified`
         : `${operation}-requires-verified-evidence`,
+    });
+  }
+
+  if (operation === 'scoped-subtask') {
+    if (confidence !== 'verified') {
+      return Object.freeze({
+        canAdvanceEdge: false,
+        stop: true,
+        canProceed: false,
+        reason: `${operation}-requires-verified-evidence`,
+      });
+    }
+
+    // Step 06 Slice 6.4: when the caller declared an expected footprint,
+    // refuse to proceed if the helper touched an undeclared file, or if the
+    // declared footprint itself overlaps files already dirty before the
+    // helper ran (the caller's own in-flight edits). No declaration at all
+    // falls back to the pre-existing verified-confidence-only behavior —
+    // declaration is not retroactively mandatory for existing callers.
+    const declaredExpectedFiles = choice?.expectedFiles ?? choice?.assignment?.expectedFiles;
+    const hasDeclaredFootprint = Array.isArray(declaredExpectedFiles) && declaredExpectedFiles.length > 0;
+
+    if (hasDeclaredFootprint) {
+      const declaredSet = new Set(declaredExpectedFiles.map(normalizeRelPath));
+      const changedFiles = Array.isArray(runResult?.evidence?.changedFiles) ? runResult.evidence.changedFiles : [];
+
+      const undeclaredFiles = changedFiles.filter((f) => !declaredSet.has(normalizeRelPath(f)));
+      if (undeclaredFiles.length > 0) {
+        return Object.freeze({
+          canAdvanceEdge: false,
+          stop: true,
+          canProceed: false,
+          reason: 'scoped-subtask-undeclared-files',
+          undeclaredFiles: Object.freeze(undeclaredFiles),
+        });
+      }
+
+      const dirtyBefore = getEvidenceDirtyBefore(runResult, repoRoot);
+      if (dirtyBefore.length > 0) {
+        const dirtyBeforeSet = new Set(dirtyBefore.map(normalizeRelPath));
+        const overlappingFiles = [...declaredSet].filter((f) => dirtyBeforeSet.has(f));
+        if (overlappingFiles.length > 0) {
+          return Object.freeze({
+            canAdvanceEdge: false,
+            stop: true,
+            canProceed: false,
+            reason: 'scoped-subtask-overlaps-caller-edits',
+            overlappingFiles: Object.freeze(overlappingFiles),
+          });
+        }
+      }
+    }
+
+    return Object.freeze({
+      canAdvanceEdge: false,
+      stop: false,
+      canProceed: true,
+      reason: `${operation}-verified`,
     });
   }
 
@@ -1965,6 +2051,7 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
       stage: choice.stage ?? work.stage,
       operation: choice.operation,
       contextRefs: choice.contextRefs,
+      expectedFiles: choice.expectedFiles,
       options: opts,
     });
 

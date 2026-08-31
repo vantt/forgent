@@ -1414,6 +1414,219 @@ test('Step 06 executing.scoped-subtask requires verified confidence (changed-fil
   assert.equal(verifiedRes.reason, 'scoped-subtask-verified');
 });
 
+test('Step 06 Cell 6.6 buildAssignment declares expectedFiles for scoped-subtask and persists it into assignment.json; omitted declaration defaults to empty array', async () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['scoped-subtask']);
+
+  const declared = buildAssignment({
+    workId: 'tsk-scoped-declared',
+    stage: 'executing',
+    operation: 'scoped-subtask',
+    expectedFiles: ['src/declared.mjs', 'src/other.mjs'],
+    options: { repoRoot: tempDir },
+  });
+  assert.deepEqual(declared.expectedFiles, ['src/declared.mjs', 'src/other.mjs']);
+
+  const undeclared = buildAssignment({
+    workId: 'tsk-scoped-undeclared',
+    stage: 'executing',
+    operation: 'scoped-subtask',
+    options: { repoRoot: tempDir },
+  });
+  assert.deepEqual(undeclared.expectedFiles, []);
+
+  // Persisted verbatim into assignment.json by executeAssignment (immutable-input contract).
+  const executorScript = writeFakeExecutor(tempDir, { status: 'done', summary: 'no-op subtask' });
+  await executeAssignment(declared, { cwd: tempDir, repoRoot: tempDir, runnerConfig: runnerConfigFor(executorScript) });
+  const persisted = JSON.parse(
+    fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', declared.assignmentId, 'assignment.json'), 'utf8'),
+  );
+  assert.deepEqual(persisted.expectedFiles, ['src/declared.mjs', 'src/other.mjs']);
+});
+
+test('Step 06 Cell 6.6 scoped-subtask refuses when helper touches an undeclared file', () => {
+  const result = interpretAssignmentRunResult({
+    choice: { operation: 'scoped-subtask', expectedFiles: ['src/a.mjs', 'src/b.mjs'] },
+    runResult: {
+      status: 'done',
+      confidence: 'verified',
+      agentClaim: { status: 'done', summary: 'Subtask completed' },
+      evidence: { changedFiles: ['src/a.mjs', 'src/unexpected.mjs'] },
+    },
+  });
+  assert.equal(result.canAdvanceEdge, false);
+  assert.equal(result.stop, true);
+  assert.equal(result.canProceed, false);
+  assert.equal(result.reason, 'scoped-subtask-undeclared-files');
+  assert.deepEqual(result.undeclaredFiles, ['src/unexpected.mjs']);
+});
+
+test('Step 06 Cell 6.6 scoped-subtask resolves verified when helper touches only declared files', () => {
+  const result = interpretAssignmentRunResult({
+    choice: { operation: 'scoped-subtask', expectedFiles: ['src/a.mjs', 'src/b.mjs'] },
+    runResult: {
+      status: 'done',
+      confidence: 'verified',
+      agentClaim: { status: 'done', summary: 'Subtask completed' },
+      evidence: { changedFiles: ['src/a.mjs'] },
+    },
+  });
+  assert.equal(result.canAdvanceEdge, false);
+  assert.equal(result.stop, false);
+  assert.equal(result.canProceed, true);
+  assert.equal(result.reason, 'scoped-subtask-verified');
+});
+
+test('Step 06 Cell 6.6 scoped-subtask refuses when the declared footprint overlaps the caller\'s in-flight edits', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_overlap', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'evidence.json'), JSON.stringify({ dirtyBefore: ['src/caller-dirty.mjs'] }, null, 2));
+
+  const result = interpretAssignmentRunResult({
+    choice: { operation: 'scoped-subtask', expectedFiles: ['src/caller-dirty.mjs'] },
+    runResult: {
+      status: 'done',
+      confidence: 'verified',
+      agentClaim: { status: 'done', summary: 'Subtask completed' },
+      evidence: { changedFiles: [] },
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(result.canAdvanceEdge, false);
+  assert.equal(result.stop, true);
+  assert.equal(result.canProceed, false);
+  assert.equal(result.reason, 'scoped-subtask-overlaps-caller-edits');
+  assert.deepEqual(result.overlappingFiles, ['src/caller-dirty.mjs']);
+});
+
+test('Step 06 Cell 6.6 scoped-subtask with no expectedFiles declared falls back to verified-confidence-only behavior', () => {
+  const result = interpretAssignmentRunResult({
+    choice: { operation: 'scoped-subtask' },
+    runResult: {
+      status: 'done',
+      confidence: 'verified',
+      agentClaim: { status: 'done', summary: 'Subtask completed' },
+      evidence: { changedFiles: ['src/anything.mjs', 'src/whatever-else.mjs'] },
+    },
+  });
+  assert.equal(result.stop, false);
+  assert.equal(result.canProceed, true);
+  assert.equal(result.reason, 'scoped-subtask-verified');
+});
+
+test('Step 06 Cell 6.6 fix-verify-red confidence check is unchanged after splitting the shared scoped-subtask/fix-verify-red branch', () => {
+  const reportedRes = interpretAssignmentRunResult({
+    choice: { operation: 'fix-verify-red' },
+    runResult: { status: 'done', confidence: 'reported', agentClaim: { status: 'done', summary: 'Fixed' } },
+  });
+  assert.equal(reportedRes.canAdvanceEdge, false);
+  assert.equal(reportedRes.stop, true);
+  assert.equal(reportedRes.canProceed, false);
+  assert.equal(reportedRes.reason, 'fix-verify-red-requires-verified-evidence');
+
+  const verifiedRes = interpretAssignmentRunResult({
+    choice: { operation: 'fix-verify-red' },
+    runResult: { status: 'done', confidence: 'verified', agentClaim: { status: 'done', summary: 'Fixed with verify rerun' } },
+  });
+  assert.equal(verifiedRes.canAdvanceEdge, false);
+  assert.equal(verifiedRes.stop, false);
+  assert.equal(verifiedRes.canProceed, true);
+  assert.equal(verifiedRes.reason, 'fix-verify-red-verified');
+
+  // fix-verify-red must never apply scoped-subtask's footprint check, even when
+  // expectedFiles/changedFiles happen to be present on the choice/runResult.
+  const withFootprintFieldsPresent = interpretAssignmentRunResult({
+    choice: { operation: 'fix-verify-red', expectedFiles: ['src/only.mjs'] },
+    runResult: {
+      status: 'done',
+      confidence: 'verified',
+      agentClaim: { status: 'done', summary: 'Fixed' },
+      evidence: { changedFiles: ['src/only.mjs', 'src/unrelated.mjs'] },
+    },
+  });
+  assert.equal(withFootprintFieldsPresent.stop, false);
+  assert.equal(withFootprintFieldsPresent.canProceed, true);
+  assert.equal(withFootprintFieldsPresent.reason, 'fix-verify-red-verified');
+});
+
+test('Step 06 Cell 6.6 end-to-end: executeAssignment + interpretAssignmentRunResult refuse a real undeclared-file mutation and allow a fully-declared one', async () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['scoped-subtask']);
+  fs.mkdirSync(path.join(tempDir, 'src'), { recursive: true });
+
+  const declaredFile = 'src/declared.mjs';
+  const undeclaredFile = 'src/undeclared.mjs';
+
+  // Case 1: helper touches only the declared file.
+  {
+    const assignment = buildAssignment({
+      workId: 'tsk-scoped-ok',
+      stage: 'executing',
+      operation: 'scoped-subtask',
+      expectedFiles: [declaredFile],
+      options: { repoRoot: tempDir },
+    });
+    const executorScript = writeFakeExecutor(tempDir, { status: 'done', summary: 'Touched only the declared file' });
+    const scriptContent = fs.readFileSync(executorScript, 'utf8');
+    fs.writeFileSync(
+      executorScript,
+      scriptContent.replace(
+        "import path from 'node:path';",
+        `import path from 'node:path';\n    fs.writeFileSync('${path.join(tempDir, declaredFile)}', 'declared content');`,
+      ),
+    );
+    const runResult = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig: runnerConfigFor(executorScript) });
+    assert.equal(runResult.confidence, 'verified');
+
+    const interpreted = interpretAssignmentRunResult({
+      choice: { operation: 'scoped-subtask', assignment },
+      runResult,
+      repoRoot: tempDir,
+    });
+    assert.equal(interpreted.stop, false);
+    assert.equal(interpreted.canProceed, true);
+    assert.equal(interpreted.reason, 'scoped-subtask-verified');
+  }
+
+  // Case 2: helper touches an undeclared file in addition to the declared one.
+  {
+    const assignment = buildAssignment({
+      workId: 'tsk-scoped-bad',
+      stage: 'executing',
+      operation: 'scoped-subtask',
+      expectedFiles: [declaredFile],
+      options: { repoRoot: tempDir },
+    });
+    const executorScript = writeFakeExecutor(tempDir, { status: 'done', summary: 'Touched an undeclared file too' });
+    const scriptContent = fs.readFileSync(executorScript, 'utf8');
+    fs.writeFileSync(
+      executorScript,
+      scriptContent.replace(
+        "import path from 'node:path';",
+        `import path from 'node:path';\n    fs.writeFileSync('${path.join(tempDir, declaredFile)}', 'declared content 2');\n    fs.writeFileSync('${path.join(tempDir, undeclaredFile)}', 'undeclared content');`,
+      ),
+    );
+    const runResult = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig: runnerConfigFor(executorScript) });
+    assert.equal(runResult.confidence, 'verified');
+
+    const interpreted = interpretAssignmentRunResult({
+      choice: { operation: 'scoped-subtask', assignment },
+      runResult,
+      repoRoot: tempDir,
+    });
+    assert.equal(interpreted.stop, true);
+    assert.equal(interpreted.canProceed, false);
+    assert.equal(interpreted.reason, 'scoped-subtask-undeclared-files');
+    assert.ok(interpreted.undeclaredFiles.some((f) => f.includes('undeclared.mjs')));
+  }
+});
+
 test('Step 06 governance-blocked or failed executor returns a stop without advancing Work', async () => {
   const tempDir = mkTempDir();
   fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/main.js b/src/main.js\n');

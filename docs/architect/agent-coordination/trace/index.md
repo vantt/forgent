@@ -50,8 +50,8 @@ green without weakening assertions. See `current-cell.md`.
 | 6.3 | planning.validate-plan live smoke | done |
 | 6.4 | executing.review-item fake executor | done |
 | 6.5 | executing.scout-blast-radius read-only researcher | done |
-| 6.6 | executing.scoped-subtask mutating helper | in-progress |
-| 6.final | consolidate Step 6 | pending |
+| 6.6 | executing.scoped-subtask mutating helper | done |
+| 6.final | consolidate Step 6 | in-progress |
 
 ## Cell 6.0 Close Summary (2026-08-30)
 
@@ -128,6 +128,35 @@ and full battery (297/297 green) before closing without a separate
 Reviewer/Red-team round, given the narrow single-block scope and
 per-fixture trace already on record. Full detail in
 `step-06-cell-5-scout-blast-radius.md`.
+
+## Cell 6.6 Close Summary (2026-08-31)
+
+First non-audit build in Step 6's executing-stage cells: coordinator
+confirmed step-06's Slice 6.4 3rd acceptance criterion ("driver refuses
+to proceed if helper touched undeclared or overlapping files") was 100%
+unimplemented for `scoped-subtask` (driver only checked
+`confidence === 'verified'`). Built the smallest version: a new
+`expectedFiles` field on `buildAssignment` (threaded pre-dispatch, same
+pattern as `contextRefs`), checked at interpretation time against the
+real `changedFiles` evidence (undeclared-file refusal) and against a
+`dirtyBefore` snapshot read back from `evidence.json` (overlap-with-
+caller-edits refusal); no declaration falls back to unchanged prior
+behavior. `fix-verify-red`'s previously-shared branch split out
+byte-identical. Combined Reviewer+Red-team pass (independently re-ran
+battery, matched 304/304 exactly): no Critical/High findings; one Medium
+accepted residual (M1 — a file already dirty before the run and mutated
+without being declared is invisible to both new checks, inherited from
+Cell 6.2's dirty-before-subtraction scope, not a new regression);
+confirmed the worker cannot influence `expectedFiles` (locked in
+pre-dispatch), the fail-open path in the new `evidence.json` reader is
+provably unreachable when `confidence === 'verified'`, and
+`canAdvanceEdge` stays `false` throughout. Non-defect note carried
+forward: nothing in `src/` yet populates `choice.expectedFiles` for a
+real dispatch — the mechanism is built and tested but INERT until a
+future driver caller declares a footprint, so `scoped-subtask` is not yet
+"used" per step-06 §8's Adoption Completion Criteria in the same sense
+Cell 6.3's live validate-plan smoke was. Full detail in
+`step-06-cell-6-scoped-subtask.md`.
 
 ## Cell 6.3 Close Summary (2026-08-31)
 

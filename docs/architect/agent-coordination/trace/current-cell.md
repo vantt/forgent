@@ -1,27 +1,30 @@
 # Current Cell — none (idle)
 
-Status: closed — Cell 6.4 done, awaiting user decision
+Status: closed — Cell 6.6 done, proceeding to 6.final (user-authorized auto-proceed)
 Date: 2026-08-31
-Closed trace: `docs/architect/agent-coordination/trace/step-06-cell-4-review-item.md`
+Closed trace: `docs/architect/agent-coordination/trace/step-06-cell-6-scoped-subtask.md`
 
 ## State
 
-Cell 6.4 (executing.review-item fake executor) closed. Audit-only cell:
-confirmed the `lastRunResult` self-fetch asymmetry between planning and
-executing stages is by design, not a gap (see close summary in
-`trace/index.md`). One real coverage gap found and fixed (Herdr/visibility
-neutrality test was validate-plan-only; now review-item has its own).
-Zero production code changed — one new test only. Battery 293/293 green.
-Closed after direct coordinator verification (spot-checked the audit's
-two load-bearing code citations) rather than a full separate
-Reviewer/Red-team pass, given the no-production-code-change profile.
+Cell 6.6 (`scoped-subtask` footprint check) closed. Real new
+functionality built (not just tests) — Slice 6.4's 3rd acceptance
+criterion was previously unimplemented. Combined Reviewer+Red-team pass:
+safe to close, no Critical/High findings, one Medium accepted residual
+(M1, inherited Cell 6.2 scope). Battery 304/304 green.
 
-Uncommitted on disk: `test/runner/operation-choice.test.mjs`, this trace
-pair, `trace/step-06-cell-4-review-item.md` (new).
+Important carry-forward for Cell 6.final's audit: nothing in `src/` yet
+populates `choice.expectedFiles` for a real dispatch (mechanism built,
+inert) — and more broadly, `review-item`/`scout-blast-radius`/
+`scoped-subtask` have all been fake-executor-tested only, never LIVE
+dispatched, unlike Cell 6.3's real `validate-plan` smoke. Step 6 §8's
+Adoption Completion Criteria wants "at least two real Work-attached
+operations... used": item 1 (read-only) is genuinely satisfied (Cell 6.3
+live smoke); item 2 (executing-stage) is NOT yet satisfied in the same
+live sense. 6.final must audit this explicitly and decide/report whether
+a supplementary live executing-stage smoke is needed before declaring
+Step 6 fully done, or whether to close Step 6 with that gap named
+plainly.
 
-Next cells (6.5 scout-blast-radius, 6.6 scoped-subtask, 6.final) open
-only on user instruction.
-
-Standing decisions on record: trust boundary residual (a) accepted for
-Step 6 (Cell 6.2); Cell 6.3's reviewer-executor-scoping finding fixed,
-not deferred (2 fix rounds, committed `4cfdd2ab`).
+Uncommitted from Cell 6.6 (about to be committed): `assignment.mjs`,
+`operation-choice.mjs`, `test/runner/operation-choice.test.mjs`, this
+trace pair, `step-06-cell-6-scoped-subtask.md` (new).

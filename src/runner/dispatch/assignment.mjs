@@ -108,6 +108,10 @@ export function createAssignmentId({ workId, missionId, stage, operation, existi
  * @param {string} [params.objective] Concise semantic request
  * @param {string[]} [params.contextRefs] List of context file/work references
  * @param {string[]} [params.expectedOutputs] List of expected output artifacts or verdicts
+ * @param {string[]} [params.expectedFiles] Declared footprint (repo-relative paths) the
+ *   assigned helper is expected to touch — used by `scoped-subtask` to refuse undeclared
+ *   or caller-overlapping file mutations (Step 06 Slice 6.4). Optional; omitted/empty means
+ *   no footprint was declared.
  * @param {object} [params.policy] Optional caller-supplied policy overrides
  * @param {string} [params.role] Optional role override
  * @param {string} [params.reason] Optional roleGraph handoff reason
@@ -126,6 +130,7 @@ export function buildAssignment({
   objective,
   contextRefs = [],
   expectedOutputs = [],
+  expectedFiles = [],
   policy,
   role,
   reason,
@@ -231,6 +236,9 @@ export function buildAssignment({
 
   const frozenContextRefs = Object.freeze([...derivedContextRefs]);
   const frozenExpectedOutputs = Object.freeze([...derivedExpectedOutputs]);
+  const frozenExpectedFiles = Object.freeze(
+    Array.isArray(expectedFiles) ? expectedFiles.filter((f) => typeof f === 'string' && f.trim() !== '') : [],
+  );
 
   const assignment = {
     assignmentId,
@@ -247,6 +255,7 @@ export function buildAssignment({
     objective: defaultObjective,
     contextRefs: frozenContextRefs,
     expectedOutputs: frozenExpectedOutputs,
+    expectedFiles: frozenExpectedFiles,
     ...(opReason ? { reason: opReason } : {}),
     ...(mergedPolicy ? { policy: mergedPolicy } : {}),
     createdAt: options.createdAt ?? new Date().toISOString(),
