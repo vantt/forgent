@@ -832,3 +832,85 @@ The current discussion narrows the Assignment-first MVP as follows:
 - immediate-parent branch integration as a global invariant;
 - declared standalone Protocol Phase/Stage representation;
 - general extension/plugin framework.
+
+## 19. Discussion Checkpoint: MVP Boundary Locked (2026-08-31)
+
+**Discussion status:** the user locked the Step 07 MVP boundary after two
+review rounds. Locked items were extracted to
+[ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)
+and [ADR-007](../decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md).
+Everything else in this proposal remains Proposed or Open.
+
+### Scope Of What Was Locked
+
+- Assignment provenance `declared | inline`; normalizer-stamped `mutation` and
+  `evidence.required`; interpretation reads Assignment fields (ADR-006).
+- First slice: inline read-only only; inline schema has no session or
+  coordination reference; unknown fields rejected (ADR-006 §6).
+- One pure domain seam `enrichAndValidateContract`; inline-on-Work must
+  `supports` a legal Stage Operation and its result is non-driving (ADR-007).
+- MVP = two one-shot proofs on one core: (1) standalone inline read-only with
+  no Session/Task/Work/Stage; (2) read-only coding consult supporting a
+  planning Work (throwaway item), harness-enriched, same build/dispatch/result
+  path. Implementation plan: `plans/260831-1637-step07-inline-assignment-mvp/`.
+
+### Evidence Recorded
+
+- `buildAssignment()` hard-requires stage + operation from
+  `operationsForStage()` and an on-disk TaskSpec (`assignment.mjs:140-178`);
+  `executeAssignment()` is the sole executor entry with three call sites.
+- Mutation classification: `READ_ONLY_ROLES` / `KNOWN_MUTATING_OPS` and the
+  `missionId || workId === null` heuristic (`assignment.mjs:352,367`,
+  `assignment-runner.mjs:480`). Evidence requirements: per-operation branches
+  (`operation-choice.mjs:1760,1859,1924-1933`).
+- Mission-lite: unit tests only, no CLI exposure, no `.fgos/missions/` on
+  disk, borrows `stage: 'planning'` (`mission-lite.mjs:230`). It is retained as
+  the brainstorm/debate consumer and migrated onto the inline path; its four
+  one-shot tests become Proof 1 exit tests, its two debate/synthesis tests
+  become the first multi-step consumer.
+- Assignment-path planning gap (Cell 6.7 "verdictPayload" finding): reviewer
+  READY leads to `resolvePlan(runner, undefined)`; only tiny/small plans
+  advance, split-children plans no-op. Gate verdict (reviewer) and plan verdict
+  (plan.md) were conflated. Resolution: driver derives the plan verdict
+  deterministically from plan.md on READY; encoded as `resultKind: gate-verdict`
+  + `onAdvance` under ADR-006. Live smoke Cell 6.3 used a tiny-mode plan, which
+  is why the gap stayed hidden.
+
+### Shape Locked, Implementation Deferred
+
+- Coordination ledger, not a Session entity: caller-supplied
+  `coordinationId`; manifest must exist before the first Assignment; holds
+  aggregate bounds and provenance root only; references canonical
+  `.fgos/assignments/`; no adoption of prior Assignments. The mission-lite
+  mission directory is the prototype of this ledger and becomes it in the
+  multi-step slice.
+
+### Deferred, Still Open In Step 07
+
+- AdhocTask necessity (direct Assignment dependency is only the MVP graph);
+  TaskCandidate persistence (ephemeral planning IR in MVP); first-class
+  AgentMessage (not in MVP); inherited mutating cells, serialization,
+  ephemeral worktree integration; the children -> cells default flip (product
+  hypothesis, not a decision); AdhocTask promotion; nested Work branch
+  topology (approve resolves the topmost root via `resolveRoot`, sync-root
+  lands on the immediate parent — deliberate in code, open as a trust
+  boundary); declared Coordination Protocol graph/Phase (only when legal
+  transitions, communication edges, budgets, or auditability can no longer be
+  expressed safely by inline contracts plus dependencies).
+
+### Recorded Dissent
+
+- One reviewer preferred keeping the `workId === null => read-only` clause for
+  the declared legacy path. Accepted position: remove it in the same change
+  that migrates mission-lite, because no declared caller passes `workId: null`
+  afterwards and a dead loosening clause is a risk; a negative test guards the
+  declared path.
+
+### Related Gaps Sequenced With The MVP
+
+From Cell 6.7 (seven real gaps; the "nine" figure counted failing tests):
+G1 layering import and G6 post-crash git snapshot timing land before the
+provenance change (same function); G3 dirty-mutation re-derivation and G5
+verdict derivation merge into it; G4 verify-skip at merge is security-relevant
+and gets its own item; G2 (`resolvePlan` `.fgos` basename, four failing tests)
+gets its own item before any planning-materialization work.

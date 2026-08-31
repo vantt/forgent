@@ -2,7 +2,7 @@
 
 Document type: Contract
 Design status: Accepted
-Implementation: Implemented
+Implementation: Partial
 Last reviewed: 2026-08-31
 Canonical for: semantic requests, runtime attempts, normalized results, and evidence
 
@@ -26,11 +26,16 @@ Assignment construction has two accepted provenance classes:
 2. an agent-proposed inline execution contract validated by foundation policy
    and any selected domain harness.
 
-The second class does not yet have an accepted field-level schema. Until that
-contract is approved and implemented, the existing declared-operation path
-remains the only implemented general builder. The future inline path must carry
-equivalent objective, constraint, output, mutation, evidence, capability,
-budget, and provenance semantics and must use the same dispatch/runtime stores.
+[ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)
+accepts how both classes converge: every Assignment carries
+`provenance.kind = declared | inline` with policy/normalizer versions and the
+validator chain, and the normalizer stamps `mutation` and `evidence.required`
+onto the immutable snapshot. Result interpretation reads those fields rather
+than switching on the operation id. The minimum inline field set is listed in
+ADR-006; in the first slice inline contracts are read-only only and carry no
+session reference. Implementation of the inline class and the stamped snapshot
+has not started; the declared-operation path remains the only implemented
+general builder until then.
 
 Assignment does not contain attempt status as lifecycle truth. Retry does not
 rewrite the Assignment.

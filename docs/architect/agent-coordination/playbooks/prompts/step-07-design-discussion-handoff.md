@@ -400,3 +400,10 @@ phải tuân theo documentation-governance.md.
 This handoff prompt may be updated while Step 07 remains under discussion. Once
 Step 07 is accepted, replace it with a shorter implementation handoff that
 references the accepted ADRs/contracts, then archive this discussion prompt.
+
+## Locked So Far
+
+Do not re-litigate in a fresh chat: the MVP boundary was locked on 2026-08-31
+and extracted to ADR-006 and ADR-007; see proposal §19 for the checkpoint,
+deferred list, and dissent. A fresh discussion chat starts from the still-open
+items in §19, not from the full question list above.
