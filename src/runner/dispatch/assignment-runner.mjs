@@ -582,6 +582,26 @@ export async function executeAssignment(assignment, opts = {}) {
     );
   }
 
+  // Reviewer/researcher/advisor executor scoping (Red-team finding, Cell 6.3
+  // Fix Round 1; widened in Fix Round 2 to cover operation-based read-only
+  // classification too, not just role): a read-only Assignment (per
+  // isReadOnlyAssignment -- role in READ_ONLY_ROLES OR a READ_ONLY_OPS
+  // operation, unless overridden by KNOWN_MUTATING_OPS) must never resolve
+  // to the same executor profile as a worker (acceptEdits + Bash(git
+  // add/commit)) when the resolved family is the default "claude". Only
+  // ever redirects a *default* "claude" resolution -- an explicit
+  // non-"claude" preferExecutor (pi, agy-cli, codex, ...) is untouched.
+  // Absent-safe: no `runner.executors.claude-reviewer` entry configured ->
+  // falls through to the unchanged `defaultExecutorId`, byte-identical to
+  // before this fix.
+  const defaultExecutorId = effectivePolicy.executorPreference[0] ?? 'claude';
+  const resolvedExecutorId =
+    isReadOnlyAssignment(effectiveAssignment) &&
+    defaultExecutorId === 'claude' &&
+    cfg.executors?.['claude-reviewer']
+      ? 'claude-reviewer'
+      : defaultExecutorId;
+
   // Determine run attempt number monotonically without reusing existing dirs
   const existingAttempts = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d));
   let maxAttempt = 0;
@@ -654,7 +674,7 @@ export async function executeAssignment(assignment, opts = {}) {
     runId,
     assignmentId: effectiveAssignment.assignmentId,
     attempt: attemptNum,
-    executorId: effectivePolicy.executorPreference[0],
+    executorId: resolvedExecutorId,
     ...(compiledPlan ? { dispatchPlanPath: path.relative(root, dispatchPlanPath) } : {}),
     ...(planContentHash ? { planContentHash } : {}),
     cwd,
@@ -676,7 +696,7 @@ export async function executeAssignment(assignment, opts = {}) {
   let rawResult;
   let executionError = null;
 
-  const executorId = effectivePolicy.executorPreference[0] ?? 'claude';
+  const executorId = resolvedExecutorId;
   try {
     rawResult = await executeExecutorCli(executorId, {
       prompt,
@@ -889,7 +909,7 @@ export async function executeAssignment(assignment, opts = {}) {
     runId,
     assignmentId: effectiveAssignment.assignmentId,
     workId: effectiveAssignment.workId,
-    executorId: effectivePolicy.executorPreference[0],
+    executorId: resolvedExecutorId,
     policy: effectivePolicy,
     ...(planContentHash ? { planContentHash } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),

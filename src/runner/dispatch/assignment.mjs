@@ -331,9 +331,15 @@ export function renderAssignmentPrompt(assignment, options = {}) {
  * @param {object} assignment Assignment object
  * @returns {boolean} true when the assignment is read-only
  */
+// Roles whose Assignments must only ever produce verdict/report artifacts,
+// never a Work-lifecycle edge or a repo mutation (Step 04 §5.4 / Step 07 §7).
+// Hoisted to module scope (was function-local) so a dispatch-time executor
+// resolution can also gate on it directly, not just isReadOnlyAssignment's
+// broader read-only classification below.
+export const READ_ONLY_ROLES = new Set(['reviewer', 'researcher', 'advisor']);
+
 export function isReadOnlyAssignment(assignment) {
   if (!assignment || typeof assignment !== 'object') return false;
-  const READ_ONLY_ROLES = new Set(['reviewer', 'researcher', 'advisor']);
   const KNOWN_MUTATING_OPS = new Set(['implement-item', 'fix-verify-red', 'scoped-subtask']);
   const READ_ONLY_OPS = new Set([
     'validate-plan',

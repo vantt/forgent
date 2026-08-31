@@ -47,7 +47,7 @@ green without weakening assertions. See `current-cell.md`.
 | 6.0 | Reconcile in-flight review-item verdict routing to green (blocking fix) | done |
 | 6.1 | planning.validate-plan fake executor happy path | done |
 | 6.2 | planning.validate-plan negative cases | done |
-| 6.3 | planning.validate-plan live smoke | pending |
+| 6.3 | planning.validate-plan live smoke | done |
 | 6.4 | executing.review-item fake executor | pending |
 | 6.5 | executing.scout-blast-radius read-only researcher | pending |
 | 6.6 | executing.scoped-subtask mutating helper | pending |
@@ -80,3 +80,30 @@ class) — trust-boundary options B/C DEFERRED TO STEP 7. Deferred-hardening
 bucket (persist dirty signal at settle for write-ops, plan hash binds
 plan.md only, out-tree dead-ref hygiene, execFileSync timeout, rev-list perf)
 lives in `step-06-cell-2-validate-plan-negative.md` Gaps.
+
+## Cell 6.3 Close Summary (2026-08-31)
+
+First LIVE (non-fake-executor) proof: one real out-of-process `claude`
+reviewer subprocess ran `planning.validate-plan` against throwaway item
+`tsk-5ka` (verdict READY, `changedFiles: []`, no in-Assignment lifecycle
+move; parked `wontfix` afterward via real engine verb). Reviewer verified
+the evidence chain independently (hashes, timing, event log — not
+narrative trust): SAFE, no blockers. Red-team found one MEDIUM
+design-gap: reviewer-role dispatch resolved the identical git-write
+executor profile as a worker (prompt-discipline + incidental-allowlist +
+post-hoc-rollback boundary, not a scoped permission profile) — user
+elected to fix now rather than defer. Fix Round 1 added a scoped
+`runner.executors.claude-reviewer` profile (git-write grant dropped),
+gated on `READ_ONLY_ROLES`; a follow-up review pass found that gate
+missed operation-based read-only ops (`judge-ambiguity`/`lock-decisions`/
+`shape-plan` at their real default `role: implementer` wiring) — HIGH,
+fix overstated. Fix Round 2 widened the gate to
+`isReadOnlyAssignment(...)`, closing the coverage hole, re-verified by
+the coordinator directly (diff read line-by-line, full battery re-run).
+Accepted residual: tool-family gate (no git-write, any path), not
+per-run path-scoped Write enforcement — Claude Code's own permission
+syntax doesn't consult `Write(path)` rules, only `Edit(path)`; wiring
+`Edit(<runDir>/**)` needs a new templating dimension, out of this cell's
+scope. Existing settle-time fail-closed rollback remains the
+defense-in-depth for that residual. Battery: 292/292 green. Full history
+in `step-06-cell-3-validate-plan-live-smoke.md`.

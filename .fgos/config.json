@@ -72,6 +72,25 @@
           }
         ]
       },
+      "claude-reviewer": {
+        "kind": "agent",
+        "description": "Claude Code CLI, scoped for a READ_ONLY_ROLES (reviewer/researcher/advisor) Assignment (Cell 6.3 Fix Round 1, Red-team finding): identical to executors.claude except it drops the git-write grant (Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)) and the --allowedTools flag entirely -- a reviewer never had a legitimate need for any Bash grant, and dropping the flag leaves only the CLI's own built-in read-only Bash allowlist (git status/diff/log-class commands), never write-capable ones. --permission-mode acceptEdits is kept so the reviewer can still Write its own agent-result.json/agent-report.md into its own run dir (proven live in Cell 6.3) -- this is a tool-family gate (no git-write for ANY path), not real path-scoping: Claude Code only consults path rules written as Edit(path)/Read(path) (a Write(path) rule is accepted but never consulted -- code.claude.com/docs/en/permissions), and this executor's args are a static config-time template with no per-run runDir substitution today, so an Edit(<runDir>/**) rule cannot be wired without adding a new templating dimension -- out of this fix round's scope (see docs/architect/agent-coordination/trace/step-06-cell-3-validate-plan-live-smoke.md's Fix Round 1 section for the accepted residual).",
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "claude",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}",
+              "--permission-mode",
+              "acceptEdits"
+            ]
+          }
+        ]
+      },
       "agy-cli": {
         "kind": "agent",
         "description": "Antigravity Cli (headless, invisible cli-spawn subprocess -- renamed from executors.agy, tsk-5jl, so the name distinguishes it from executors.agy-herdr's real-pane dispatch)",
