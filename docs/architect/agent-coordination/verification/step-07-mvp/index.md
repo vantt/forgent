@@ -47,11 +47,23 @@ Noted, not touched by this track: `.agentkit/`, `.claude/agents/*.md`,
 | P01 | R4 | done | P01.2 | `P01.2.md`, commit `d97837d3` |
 | P01 | R5 | done | P01.2 | `P01.2.md`, commit `d97837d3` |
 | P02 | R1–R4 | done | P02.1 | `P02.1.md`, commit `0fdd61d9` |
-| P02 | R5–R6 | missing | P02.2 | — |
-| P02 | R7–R8 | missing | P02.3 | — |
+| P02 | R5 | done | P02.2 | `P02.2.md`, commit `d2df76cc` |
+| P02 | R6 (G3) | missing | P02.3 | — |
+| P02 | R7–R8 | missing | P02.4 | — |
 | P03 | R1–R2 | missing | P03.1 | — |
 | P03 | R3 | missing | P03.2 | — |
 | P03 | R4–R6 | missing | P03.3 | — |
+
+Cell split deviates from plan.md's suggested "P02.2 (R5+R6), P02.3
+(R7+R8)" — Coordinator split R5/R6 into separate cells (P02.2, P02.3)
+after reading `interpretAssignmentRunResult`/`findLatestAssignmentRunResult`
+directly: ~420 and ~300 lines respectively, carrying explicit
+tamper-detection/monotonic-re-derivation security invariants; bundling R5's
+broad dispatch-key rewrite with R6's narrow dirty-before-persistence fix in
+one cell risked one change masking a regression in the other. R7/R8 shift
+to P02.4. Total cell count for Phase 02 rises from 3 to 4; this is a
+tactical cell-sizing decision within Coordinator authority, not a scope
+change to the plan's requirements.
 
 ## ADR Traceability
 
@@ -66,14 +78,45 @@ Populated in Phase 03 per plan requirement R6.
   (RT-2, LOW, deferred). Fix direction: `mkdirSync` without `recursive`,
   retry next number on `EEXIST`. Pick up whenever a future phase next
   touches this function.
+- `loop.mjs`'s planning sweep still computes its own plan-verdict directly
+  (`resolveContentRoot` + `readFileSync` + `planVerdictFromPlanMd`, from
+  Cell P01.2) instead of consuming `executeDriverOperationChoice`'s new
+  `outcome.verdictPayload` field (P02.2's `onAdvance` wiring, which is
+  correct in isolation but currently dead output on the real end-to-end
+  path). Found by P02.2 Review (MEDIUM-2, deferred). Consolidate once
+  R6/R7/R8 have finished changing this same interpretation surface, so the
+  consolidation isn't redone mid-phase.
+- P02.1's `RESULT_KIND_BY_OPERATION`/`EVIDENCE_REQUIRED_BY_OPERATION`
+  tables stamp the same `resultKind` for `scout-blast-radius`/
+  `resolve-question` (`advisory`) and for `fix-verify-red`/`scoped-subtask`
+  (`work-product`), forcing P02.2's `interpretAssignmentRunResult` to add
+  `operation` as a compound secondary key for those four branches — R5's
+  ADR-006 §3 intent ("replacing `operation === ...` branches") is only
+  fully realized for 2 of 6. Found by P02.2 Review (MEDIUM-3, accepted as
+  a design trade-off, not reopened since P02.1 is already closed/verified).
+  Widen the tables for finer-grained `resultKind` values if a future phase
+  wants full realization.
+- `findLatestAssignmentRunResult`'s two cross-pass callers
+  (`chooseStageOperation`) never receive the real, disk-persisted
+  `resultKind`/`mutation`/`evidence` fields it already reads during its own
+  filter step — `interpretAssignmentRunResult` re-derives them fresh via
+  `fallbackResultKindForOperation` instead. Found by P02.2 Red-Team
+  (MEDIUM-4). Currently zero live impact (deterministic re-derivation
+  matches the persisted value under the one existing `normalizerVersion`);
+  becomes a real staleness risk the first time `assignment-normalizer.mjs`'s
+  tables gain a second version. Fix direction: have
+  `findLatestAssignmentRunResult` attach a `{resultKind, mutation,
+  evidence}` slice (never the whole raw `assignment.json`) onto its
+  returned `runResult` as `.assignment`. Deferred rather than fixed now
+  because it touches the return shape of the codebase's highest
+  tamper-detection-sensitivity function for a presently zero-impact issue.
 
 ## Active Cell
 
-None. P02.1 closed 2026-08-31 (commit `0fdd61d9`).
+None. P02.2 closed 2026-08-31 (commit `d2df76cc`).
 
 ## Next Action
 
-Prepare cell P02.2 (R5-R6: interpretation reads stamped fields instead of
-operation-id switching; G3 dirty-before persistence) — per plan.md's own
-"land R1-R4 first, prove goldens, then R5-R8" ordering, now that P02.1's
-goldens are proven.
+Prepare cell P02.3 (R6, G3 dirty-before persistence — same function as
+P02.2, narrow scope: replace `hasDirtyBeforeMutation: false` with a real
+persisted-and-re-derived value).
