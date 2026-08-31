@@ -1761,11 +1761,30 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
       isNonEmptyString(agentClaim?.symbol);
     const hasNamedFilesOrSymbols = hasReportTextFilesOrSymbols || hasClaimFilesOrSymbols;
 
-    const hasReportTextPosture = Boolean(
-      reportText && /\brg\b|ripgrep|graph\b|\bposture\b|degraded|inactive|cross-check/i.test(reportText)
+    const postureStateOf = (text) => {
+      if (!isNonEmptyString(text)) return null;
+      const match = /\b(active|full|degraded|inactive)\b/i.exec(text);
+      return match ? match[1].toLowerCase() : null;
+    };
+    const namedPostureState =
+      postureStateOf(reportText) ||
+      postureStateOf(agentClaim?.posture) ||
+      postureStateOf(agentClaim?.searchPosture) ||
+      postureStateOf(agentClaim?.graphPosture);
+
+    const CROSS_CHECK_RE = /\brg\b|ripgrep|cross-check/i;
+    const hasCrossCheckMention = Boolean(
+      (reportText && CROSS_CHECK_RE.test(reportText)) ||
+      (isNonEmptyString(agentClaim?.posture) && CROSS_CHECK_RE.test(agentClaim.posture)) ||
+      (isNonEmptyString(agentClaim?.searchPosture) && CROSS_CHECK_RE.test(agentClaim.searchPosture)) ||
+      (isNonEmptyString(agentClaim?.graphPosture) && CROSS_CHECK_RE.test(agentClaim.graphPosture)) ||
+      agentClaim?.crossCheck === true ||
+      isNonEmptyString(agentClaim?.crossCheck) ||
+      isNonEmptyString(agentClaim?.rgCrossCheck)
     );
-    const hasClaimPosture = isNonEmptyString(agentClaim?.posture) || isNonEmptyString(agentClaim?.searchPosture) || isNonEmptyString(agentClaim?.graphPosture);
-    const hasPostureEvidence = hasReportTextPosture || hasClaimPosture;
+
+    const requiresCrossCheck = namedPostureState === 'degraded' || namedPostureState === 'inactive';
+    const hasPostureEvidence = Boolean(namedPostureState) && (!requiresCrossCheck || hasCrossCheckMention);
 
     const hasReportTextCallers = Boolean(
       reportText && /callers?:|direct callers|called by|invoked by|caller list/i.test(reportText)

@@ -49,8 +49,8 @@ green without weakening assertions. See `current-cell.md`.
 | 6.2 | planning.validate-plan negative cases | done |
 | 6.3 | planning.validate-plan live smoke | done |
 | 6.4 | executing.review-item fake executor | done |
-| 6.5 | executing.scout-blast-radius read-only researcher | pending |
-| 6.6 | executing.scoped-subtask mutating helper | pending |
+| 6.5 | executing.scout-blast-radius read-only researcher | done |
+| 6.6 | executing.scoped-subtask mutating helper | in-progress |
 | 6.final | consolidate Step 6 | pending |
 
 ## Cell 6.0 Close Summary (2026-08-30)
@@ -107,6 +107,27 @@ distinct interpretation branch) and filled with one new test. Battery:
 293/293 green. Given zero production code changed, closed after direct
 coordinator verification rather than a full separate Reviewer/Red-team
 pass. Full detail in `step-06-cell-4-review-item.md`.
+
+## Cell 6.5 Close Summary (2026-08-31)
+
+Audit found all step-06 §6 scenarios for `scout-blast-radius` already
+covered from prior work, plus one genuine production gap: the
+posture-evidence check (`operation-choice.mjs:1764-1768`) accepted any
+bare technique-word (`rg`/`graph`/`posture`) as sufficient, never
+requiring an explicit posture state, and never requiring a
+degraded/inactive claim to be backed by an actual `rg` cross-check per
+the task-spec — the exact "stale index silently treated as full coverage"
+failure mode the root `CLAUDE.md` impact-analysis gate warns against,
+recurring at the automated evidence-check layer. Fixed: now requires an
+explicit state token (`active`/`full`/`degraded`/`inactive`) plus, for
+`degraded`/`inactive`, a cross-check mention. 4 new tests target exactly
+the fix's 4 cases; all 8 pre-existing scout-blast-radius tests re-verified
+individually against the new logic (none regressed, one already-positive
+fixture needed zero changes). Coordinator independently re-ran the diff
+and full battery (297/297 green) before closing without a separate
+Reviewer/Red-team round, given the narrow single-block scope and
+per-fixture trace already on record. Full detail in
+`step-06-cell-5-scout-blast-radius.md`.
 
 ## Cell 6.3 Close Summary (2026-08-31)
 

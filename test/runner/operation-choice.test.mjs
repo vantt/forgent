@@ -1927,6 +1927,126 @@ test('Negative test: scout-blast-radius report with generic impact/search words 
   assert.equal(interpreted.reason, 'scout-blast-radius-insufficient-evidence');
 });
 
+test('Fix Round 1: scout-blast-radius posture with technique-word only (no state token) must stop', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_scout_posture_tech_only', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'),
+    '# Scout Report\n' +
+    'Symbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\n' +
+    'Used the dependency graph to trace callers via rg.\n' +
+    'Affected callers: src/runner/loop.mjs\n' +
+    'Affected processes: none\n' +
+    'Risk read: low risk\n'
+  );
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'scout-blast-radius' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', summary: 'Scouted' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canProceed, false);
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'scout-blast-radius-insufficient-evidence');
+});
+
+test('Fix Round 1: scout-blast-radius posture naming active/full without rg cross-check still passes', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_scout_posture_active', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'),
+    '# Scout Report\n' +
+    'Symbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\n' +
+    'Search posture: active.\n' +
+    'Affected callers: src/runner/loop.mjs\n' +
+    'Affected processes: none\n' +
+    'Risk read: low risk\n'
+  );
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'scout-blast-radius' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', summary: 'Scouted' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canProceed, true);
+  assert.equal(interpreted.reason, 'scout-blast-radius-reported');
+});
+
+test('Fix Round 1: scout-blast-radius posture naming degraded/inactive WITHOUT rg cross-check now fails', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_scout_posture_degraded_no_rg', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'),
+    '# Scout Report\n' +
+    'Symbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\n' +
+    'Search posture: degraded.\n' +
+    'Affected callers: src/runner/loop.mjs\n' +
+    'Affected processes: none\n' +
+    'Risk read: low risk\n'
+  );
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'scout-blast-radius' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', summary: 'Scouted' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canProceed, false);
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'scout-blast-radius-insufficient-evidence');
+});
+
+test('Fix Round 1: scout-blast-radius posture naming degraded/inactive WITH rg cross-check still passes', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_scout_posture_degraded_with_rg', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-report.md'),
+    '# Scout Report\n' +
+    'Symbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\n' +
+    'Search posture: degraded, backed by an rg cross-check of direct callers.\n' +
+    'Affected callers: src/runner/loop.mjs\n' +
+    'Affected processes: none\n' +
+    'Risk read: low risk\n'
+  );
+
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'scout-blast-radius' },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: { status: 'done', summary: 'Scouted' },
+      evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
+    },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(interpreted.canProceed, true);
+  assert.equal(interpreted.reason, 'scout-blast-radius-reported');
+});
+
 test('Negative test: resolve-question report with generic research words without answer/citation/uncertainty structure must stop', () => {
   const tempDir = mkTempDir();
   const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_res_kw', 'runs', '01');
