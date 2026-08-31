@@ -485,17 +485,35 @@ function validateAssignmentLegality(asgn, opts = {}) {
     throw new RunnerConfigError('executeAssignment requires an assignment object');
   }
 
-  const stageOps = operationsForStage(asgn.domain, asgn.stage, { kind: asgn.workflow });
-  const matchedOp = stageOps.find((o) => o.id === asgn.operation);
+  // ADR-006 R8: an inline Assignment (provenance.kind === 'inline') never
+  // carries domain/stage/operation -- buildInlineAssignment sets none of
+  // these (ADR-006 R4), so the declared-operation legality check below
+  // (operationsForStage/matchedOp, and the matchedOp-driven human-only
+  // dispatch check it feeds) is meaningless for it and is skipped
+  // entirely; `matchedOp` stays `undefined` in that case, which is safe --
+  // its return value is never consumed by either call site of this
+  // function (both are bare statements). This is the ONLY change to this
+  // function (and its caller, `executeAssignment`, is untouched beyond
+  // this one branch) -- the existing hardening here (the mission-refusal
+  // gate immediately below, and `executeAssignment`'s own
+  // `effectiveAssignment` mutation backfill) stays exactly as-is and
+  // still runs unconditionally for both shapes.
+  const isInline = asgn.provenance?.kind === 'inline';
+  let matchedOp;
 
-  if (!matchedOp) {
-    throw new RunnerConfigError(
-      `unknown operation "${asgn.operation}" for stage "${asgn.stage}" in domain "${asgn.domain}" (declared operations: [${stageOps.map((o) => o.id).join(', ')}])`,
-    );
-  }
+  if (!isInline) {
+    const stageOps = operationsForStage(asgn.domain, asgn.stage, { kind: asgn.workflow });
+    matchedOp = stageOps.find((o) => o.id === asgn.operation);
 
-  if (asgn.dispatch === 'human-only' || matchedOp.dispatch === 'human-only') {
-    throw new RunnerConfigError(`cannot execute human-only operation "${asgn.operation}" via cli-spawn`);
+    if (!matchedOp) {
+      throw new RunnerConfigError(
+        `unknown operation "${asgn.operation}" for stage "${asgn.stage}" in domain "${asgn.domain}" (declared operations: [${stageOps.map((o) => o.id).join(', ')}])`,
+      );
+    }
+
+    if (asgn.dispatch === 'human-only' || matchedOp.dispatch === 'human-only') {
+      throw new RunnerConfigError(`cannot execute human-only operation "${asgn.operation}" via cli-spawn`);
+    }
   }
 
   // Step 07 §7: Mission-lite is strictly read-only. Reject mutating operations.
@@ -503,6 +521,9 @@ function validateAssignmentLegality(asgn, opts = {}) {
   // `runMissionAssignment()` always passes it) -- not re-derived from
   // `missionId`/`workId` here (ADR-006 R7 retires that heuristic; read-only
   // status now comes solely from the stamped `mutation` field below).
+  // Applies identically to declared and inline Assignments (ADR-006 R8) --
+  // this gate is unconditional and runs for BOTH shapes, regardless of the
+  // inline-only skip above.
   const isMission = Boolean(opts.isMissionLite);
   if (isMission && !isReadOnlyAssignment(asgn)) {
     throw new RunnerConfigError(

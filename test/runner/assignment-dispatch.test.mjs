@@ -10,6 +10,7 @@ import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { prepareDispatch } from '../../src/runner/dispatch/prepare.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
+import { createMission, createMissionAssignment } from '../../src/runner/dispatch/mission-lite.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 
@@ -366,6 +367,57 @@ test('dispatch CLI execute subcommand refuses a mutating, missionId-bearing assi
   const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
   fs.mkdirSync(asgnDir, { recursive: true });
   fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [dispatchScript, 'execute', '--assignment', assignment.assignmentId, '--cwd', tempDir],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /mission-lite mode.*strictly read-only/i);
+      return true;
+    },
+  );
+});
+
+test('dispatch CLI execute subcommand refuses a mutating inline mission-lite assignment.json even though it carries no missionId field', () => {
+  const tempDir = mkTempDir();
+
+  createMission(
+    {
+      missionId: 'mission_cli_inline_refuse_test',
+      objective: 'Evaluate reviewer assignment for planning validation.',
+    },
+    { cwd: tempDir },
+  );
+
+  const assignment = createMissionAssignment(
+    {
+      missionId: 'mission_cli_inline_refuse_test',
+      role: 'researcher',
+      objective: 'Gather facts and existing code paths for planning validation.',
+    },
+    { cwd: tempDir },
+  );
+  assert.equal(assignment.mutation, 'read-only');
+  assert.equal(assignment.provenance.kind, 'inline');
+  assert.equal(assignment.stage, undefined);
+  assert.equal(assignment.operation, undefined);
+  assert.equal(assignment.missionId, undefined);
+
+  // Tamper the canonical assignment.json on disk (the only copy
+  // createMissionAssignment ever writes) to mutation: 'mutating' -- the
+  // real inline shape createMissionAssignment produces (no
+  // stage/operation/missionId field, provenance.kind: 'inline'), so
+  // `asgnObj.missionId` alone can never signal "apply the mission-refusal
+  // gate" for this shape.
+  const asgnPath = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'assignment.json');
+  const tampered = { ...JSON.parse(fs.readFileSync(asgnPath, 'utf8')), mutation: 'mutating' };
+  fs.writeFileSync(asgnPath, `${JSON.stringify(tampered, null, 2)}\n`);
 
   const dispatchScript = path.resolve('src/runner/dispatch.mjs');
   assert.throws(

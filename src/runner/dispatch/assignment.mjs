@@ -454,15 +454,26 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     throw new RunnerConfigError('renderAssignmentPrompt requires an assignment object');
   }
 
-  const taskSpecRelPath = resolveTaskSpecPath(assignment.domain, assignment.taskSpec, options);
+  // ADR-006 R8: an inline Assignment (provenance.kind === 'inline') never
+  // carries stage/operation/domain/taskSpec (buildInlineAssignment sets
+  // none of these, ADR-006 R4) -- guard each declared-only line instead of
+  // rendering it unconditionally, so a real worker sees a clean prompt
+  // instead of literal "Stage operation: undefined.undefined" /
+  // "Task-spec: domains/coding/task-specs/undefined.md" text. Declared
+  // Assignments always have all four fields set (buildDeclaredAssignment
+  // requires stage/operation and refuses a missing taskSpec), so this is a
+  // value-preserving no-op for them.
+  const taskSpecRelPath = assignment.taskSpec
+    ? resolveTaskSpecPath(assignment.domain, assignment.taskSpec, options)
+    : null;
 
   const lines = [
     `Assignment: ${assignment.assignmentId}`,
     `Work: ${assignment.workId || '(none)'}`,
     ...(assignment.missionId ? [`Mission: ${assignment.missionId}`] : []),
-    `Stage operation: ${assignment.stage}.${assignment.operation}`,
+    ...(assignment.stage && assignment.operation ? [`Stage operation: ${assignment.stage}.${assignment.operation}`] : []),
     `Role: ${assignment.role}`,
-    `Task-spec: ${taskSpecRelPath}`,
+    ...(taskSpecRelPath ? [`Task-spec: ${taskSpecRelPath}`] : []),
     `Objective: ${assignment.objective}`,
   ];
 

@@ -905,7 +905,7 @@ export async function runDispatchCli() {
               repoRoot: root,
               cliOverride,
               hasLiveTaskAccess,
-              isMissionLite: Boolean(asgnObj.missionId),
+              isMissionLite: Boolean(asgnObj.missionId) || asgnObj.provenance?.kind === 'inline',
               onChunk: (stream, chunk) => process.stderr.write(chunk),
             }).then(
               (result) => {
