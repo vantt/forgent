@@ -48,7 +48,7 @@ Noted, not touched by this track: `.agentkit/`, `.claude/agents/*.md`,
 | P01 | R5 | done | P01.2 | `P01.2.md`, commit `d97837d3` |
 | P02 | R1–R4 | done | P02.1 | `P02.1.md`, commit `0fdd61d9` |
 | P02 | R5 | done | P02.2 | `P02.2.md`, commit `d2df76cc` |
-| P02 | R6 (G3) | missing | P02.3 | — |
+| P02 | R6 (G3) | done | P02.3 | `P02.3.md`, commit `b262ced1` |
 | P02 | R7–R8 | missing | P02.4 | — |
 | P03 | R1–R2 | missing | P03.1 | — |
 | P03 | R3 | missing | P03.2 | — |
@@ -113,10 +113,10 @@ Populated in Phase 03 per plan requirement R6.
 
 ## Active Cell
 
-None. P02.2 closed 2026-08-31 (commit `d2df76cc`).
+None. P02.3 closed 2026-08-31 (commit `b262ced1`). Phase 02 R1-R6 all done;
+only R7-R8 (P02.4) remain.
 
 ## Next Action
 
-Prepare cell P02.3 (R6, G3 dirty-before persistence — same function as
-P02.2, narrow scope: replace `hasDirtyBeforeMutation: false` with a real
-persisted-and-re-derived value).
+Prepare cell P02.4 (R7: remove the `missionId || workId === null`
+read-only heuristic; R8: mission-lite migration onto the inline path).
