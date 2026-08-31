@@ -8,10 +8,14 @@ Canonical for: navigation across accepted architecture
 
 ## Documents
 
+Read the [Agent Coordination Foundation Vision](../vision.md) before this
+directory. Architecture refines that direction into accepted system boundaries.
+
 1. [System Context](system-context.md) defines system purpose and major
    authority boundaries.
-2. [Protocol Model](protocol-model.md) defines the hard/soft coordination model
-   around Workflow, Stage, Operation, TaskSpec, Skill, and Role.
+2. [Protocol Model](protocol-model.md) defines declared and agent-led planning
+   sources plus the hard/soft coordination model around Workflow, Stage,
+   Operation, TaskSpec, Skill, and Role.
 3. [Runtime Model](runtime-model.md) defines Assignment, dispatch, Run,
    RunResult, and evidence flow.
 4. [Work Integration](work-integration.md) defines how coordination may attach

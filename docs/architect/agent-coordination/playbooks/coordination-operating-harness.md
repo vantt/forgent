@@ -25,7 +25,7 @@ feature behavior.
 
 This playbook is independent of runtime Step numbering. The current Step 07
 architecture discussion is captured in
-[Step 07 - CoordinationSession And AdhocTask Graph](../proposals/step-07-coordination-session-adhoc-task.md).
+[Step 07 - CoordinationSession, AdhocTask, And Planning Boundary](../proposals/step-07-coordination-session-adhoc-task.md).
 
 ## 1. Goal
 

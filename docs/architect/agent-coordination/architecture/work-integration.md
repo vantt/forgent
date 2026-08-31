@@ -13,6 +13,11 @@ Work lifecycle is owned only by Work engine verbs.
 Coordination returns evidence and recommendations to the Work driver.
 ```
 
+Work attachment is optional per the
+[Agent Coordination Foundation Vision](../vision.md). These boundaries apply
+whenever a session references Work; standalone coordination uses the same
+dispatch/runtime/evidence core without gaining a delivery lifecycle.
+
 ## Coordination May
 
 - read Work requirements, decisions, artifacts, stage, and allowed repository

@@ -17,7 +17,8 @@ Drivers decide what the evidence permits.
 
 ## Evidence Sources
 
-Depending on TaskSpec, evidence may include:
+Depending on the selected TaskSpec or validated inline execution contract,
+evidence may include:
 
 - structured worker result artifact;
 - process settlement and exit metadata;
@@ -35,7 +36,8 @@ No one source proves every operation type.
 - Exit code zero cannot satisfy missing semantic outputs.
 - Pre-existing dirty files cannot count as changes produced by the Run.
 - Stale or cross-Assignment evidence must be rejected.
-- Read-only analytical output may remain `reported` when TaskSpec permits it.
+- Read-only analytical output may remain `reported` when the TaskSpec or inline
+  execution contract permits it.
 - Mutating success requires post-run external evidence appropriate to the claim.
 - Missing/malformed required evidence must not false-pass.
 

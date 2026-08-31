@@ -12,6 +12,9 @@ This directory is the single source of truth for agent-coordination terms.
 Architecture, contracts, proposals, roadmaps, tests, and Skills should link here
 instead of introducing local definitions.
 
+Term meanings refine the [Agent Coordination Foundation Vision](../vision.md)
+and must not make Work or a predeclared protocol universally mandatory.
+
 Vocabulary entries describe meaning and ownership. Detailed behavior belongs in
 architecture or contracts.
 

@@ -18,6 +18,12 @@ operation has an identity and may reference:
 - dispatch policy hints;
 - mutation/evidence expectations supplied by TaskSpec or policy.
 
+This contract governs declared Workflow operations. Per the
+[Agent Coordination Foundation Vision](../vision.md), a standalone agent-led
+session need not fabricate a Workflow Stage to access coordination. Its future
+inline execution-contract path is governed by the Assignment contract and must
+not alter this compatibility contract.
+
 ## Primary Compatibility Path
 
 Existing consumers may continue to read:

@@ -14,15 +14,14 @@ Objective/lifecycle
             \                         /
              -> CoordinationSession <-
 
-Protocol definition
-  Workflow -> Stage -> Stage Protocol -> Stage Operation
-                                      -> TaskSpec
-                                      -> Skill(s)
-                                      -> Role
-                                      -> policy hints
+Planning and constraints (composable)
+  Agent-led runtime planning -----------\
+  optional Coordination Protocol -------+-> semantic execution contract
+  Workflow -> Stage -> Stage Operation -/       -> TaskSpec or validated inline contract
+  optional domain/organization harness --------> enrichment / validation
 
 Coordination runtime
-  CoordinationSession -> AdhocTask graph -> Assignment
+  CoordinationSession -> optional AdhocTask graph -> Assignment
 
 Dispatch/runtime
   Assignment -> DispatchPlan -> Dispatcher -> Executor -> Run -> RunResult
@@ -41,20 +40,23 @@ Dashed/proposed concepts in prose are defined in
 Work-attached
   Work
     -> optional CoordinationSession
-      -> AdhocTask graph
+      -> optional declared protocol / agent-led planning / domain harness
+      -> zero, one, or many AdhocTasks
         -> Assignment -> Run -> RunResult / Evidence
     -> outcome returned to Work driver
 
 Standalone
   optional Mission
     -> CoordinationSession
-      -> AdhocTask graph
+      -> agent-led or optional declared protocol planning
+      -> zero, one, or many AdhocTasks
         -> Assignment -> Run -> RunResult / Evidence
       -> Synthesis
 ```
 
-The profiles share protocol, dispatch, runtime, and evidence machinery. They do
-not share lifecycle authority.
+The profiles share planning-contract, dispatch, runtime, and evidence machinery
+and may share declared protocols when selected. They do not share lifecycle
+authority.
 
 ## Ownership Rules
 
@@ -63,9 +65,12 @@ not share lifecycle authority.
 | Work status/stage/claim/approval/merge | Work engine verbs |
 | Legal lifecycle transition | Workflow graph and Work driver |
 | Legal operation in a stage/phase | Active protocol graph |
-| Input/output/evidence contract | TaskSpec |
+| Legal dynamic execution | Foundation policy plus validated inline execution contract |
+| Input/output/evidence contract | TaskSpec or validated inline Assignment contract |
 | Adaptive execution judgment | Skill, within hard constraints |
-| Role responsibility | Protocol definition |
+| Role responsibility | Declared protocol or validated dynamic execution contract |
+| Dynamic planning proposal | Coordinator agent/Skill, within policy and budget |
+| Domain plan/resource/evidence validation | Selected domain/organization harness |
 | Task dependencies/progress | CoordinationSession/AdhocTask runtime, proposed |
 | Executor/provider/model/mechanism | Dispatch control plane |
 | Runtime attempt | Run |
@@ -77,10 +82,12 @@ not share lifecycle authority.
 - Normal intake creates Work.
 - A Work driver may start a Work-attached CoordinationSession.
 - An authorized standalone caller may start a session without Work.
-- A validated task graph materializes AdhocTasks inside a session.
+- A session may lower directly to one Assignment or materialize validated
+  AdhocTasks from a declared or dynamically proposed graph.
 - Independent lifecycle candidates create child Work only through normal Work
   intake.
-- An operation selection creates an Assignment request.
+- A declared operation selection or validated inline execution contract creates
+  an Assignment request.
 - Dispatch creates a Run for an Assignment.
 - Runtime settlement produces one RunResult per Run.
 - Synthesis reads accepted result/evidence refs; it does not create truth.
@@ -96,6 +103,7 @@ Run != RunResult
 Role != Executor
 Skill != TaskSpec
 Stage Operation != Assignment
+Coordination Protocol != CoordinationSession requirement
 Herdr state != Evidence
 Synthesis != Approval
 Job != Assignment/Run/Task

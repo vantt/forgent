@@ -13,6 +13,12 @@ Scope: role-to-role communication inside coding-domain stage protocols, Work-att
 Team Dispatch V1 needs a communication protocol, but it must stay smaller than
 a mailbox, daemon, or second lifecycle system.
 
+This proposal describes a Work-attached coding-domain protocol and one early
+standalone prototype. It is not the universal entry model for Agent
+Coordination. Per the [Agent Coordination Foundation Vision](../vision.md), an
+agent-led session may coordinate through validated dynamic execution contracts
+without a predeclared Workflow/Stage graph.
+
 The protocol defines how roles communicate while `Work` remains the lifecycle
 authority:
 
@@ -320,6 +326,11 @@ mission-lite objective
   -> advisor product framing
   -> driver synthesis
 ```
+
+Mission-lite currently borrows coding Stage Operations. That is prototype
+behavior, not a foundation requirement. The target standalone path may instead
+construct validated dynamic Assignments and may optionally select a reusable
+protocol.
 
 Rules:
 

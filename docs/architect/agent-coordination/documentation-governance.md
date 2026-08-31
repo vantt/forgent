@@ -15,6 +15,7 @@ verification evidence, operating instructions, and historical records.
 
 | Type | Purpose | Normative |
 |---|---|---|
+| Vision | Highest-level product identity, foundation boundaries, and direction. | Yes. |
 | Portal | Top-level navigation and reading paths. | No. |
 | Policy | Documentation authority and maintenance rules. | Yes, for documentation. |
 | Index | Navigation within one documentation area. | No. |
@@ -56,14 +57,19 @@ discussion-stage design.
 
 When documents disagree, use this order:
 
-1. accepted ADR for the specific decision;
-2. accepted contract for machine-visible behavior;
-3. accepted architecture document;
-4. canonical vocabulary for term meaning;
-5. proposal;
-6. roadmap;
-7. playbook;
-8. verification or history as evidence of what happened.
+1. accepted Vision for product identity, foundation boundaries, and direction;
+2. accepted ADR for a specific decision within the Vision;
+3. accepted contract for machine-visible behavior;
+4. accepted architecture document;
+5. canonical vocabulary for term meaning;
+6. proposal;
+7. roadmap;
+8. playbook;
+9. verification or history as evidence of what happened.
+
+The Vision is not a substitute for exact schemas or state rules. ADRs and
+contracts refine it, but they cannot silently make a Vision capability
+mandatory, optional, or impossible in the opposite direction.
 
 An implementation mismatch does not silently rewrite the design. Mark the
 implementation state `Drifted`, then reconcile code or amend the accepted
@@ -72,6 +78,7 @@ decision explicitly.
 ## Source-Of-Truth Rules
 
 - Define a term only in `vocabulary/`; other documents link to it.
+- Put product identity and foundation-versus-domain boundaries in `vision.md`.
 - Put durable system boundaries in `architecture/`, not numbered steps.
 - Put exact schemas and state/evidence rules in `contracts/`.
 - Keep unresolved alternatives in `proposals/` until accepted.
@@ -88,6 +95,8 @@ decision explicitly.
 
 - A canonical term change that affects boundaries requires an ADR or an update
   to the ADR that owns the decision.
+- A change to product identity or the foundation/domain boundary updates the
+  Vision first, then reconciles every affected downstream document.
 - An accepted contract change requires compatibility and migration notes.
 - Proposal approval requires extracting accepted content into canonical docs;
   do not merely relabel the entire proposal as accepted.

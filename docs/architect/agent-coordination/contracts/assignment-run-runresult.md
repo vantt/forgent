@@ -20,6 +20,18 @@ Assignment is an immutable semantic request. It should identify:
 - result/artifact destination contract;
 - creation timestamp and caller provenance.
 
+Assignment construction has two accepted provenance classes:
+
+1. a declared Stage Operation and TaskSpec;
+2. an agent-proposed inline execution contract validated by foundation policy
+   and any selected domain harness.
+
+The second class does not yet have an accepted field-level schema. Until that
+contract is approved and implemented, the existing declared-operation path
+remains the only implemented general builder. The future inline path must carry
+equivalent objective, constraint, output, mutation, evidence, capability,
+budget, and provenance semantics and must use the same dispatch/runtime stores.
+
 Assignment does not contain attempt status as lifecycle truth. Retry does not
 rewrite the Assignment.
 

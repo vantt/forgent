@@ -12,6 +12,10 @@ This documentation describes how fgOS coordinates agents across providers,
 models, tiers, roles, capabilities, and execution mechanisms while preserving
 Work lifecycle authority and evidence integrity.
 
+Read [Agent Coordination Foundation Vision](vision.md) first. It is the highest
+authority for system identity, foundation boundaries, optional coordination
+structure, and domain augmentation.
+
 The documentation is organized by authority. Canonical vocabulary and accepted
 architecture are separated from proposals, implementation roadmaps,
 verification evidence, playbooks, and history.
@@ -23,14 +27,16 @@ definitions, statuses, or document placement.
 
 ### Understand The System
 
-1. [Vocabulary](vocabulary/README.md)
-2. [System Context](architecture/system-context.md)
-3. [Protocol Model](architecture/protocol-model.md)
-4. [Runtime Model](architecture/runtime-model.md)
-5. [Work Integration](architecture/work-integration.md)
-6. [Dispatch Control Plane](architecture/dispatch-control-plane.md)
-7. [Evidence And Results](architecture/evidence-and-results.md)
-8. [Visibility And Herdr](architecture/visibility-and-herdr.md)
+1. [Agent Coordination Foundation Vision](vision.md)
+2. [Documentation Governance](documentation-governance.md)
+3. [Vocabulary](vocabulary/README.md)
+4. [System Context](architecture/system-context.md)
+5. [Protocol Model](architecture/protocol-model.md)
+6. [Runtime Model](architecture/runtime-model.md)
+7. [Work Integration](architecture/work-integration.md)
+8. [Dispatch Control Plane](architecture/dispatch-control-plane.md)
+9. [Evidence And Results](architecture/evidence-and-results.md)
+10. [Visibility And Herdr](architecture/visibility-and-herdr.md)
 
 ### Implement Or Review Current Contracts
 
@@ -41,8 +47,8 @@ definitions, statuses, or document placement.
 
 ### Continue The Design Discussion
 
-1. [Step 07: CoordinationSession And AdhocTask](proposals/step-07-coordination-session-adhoc-task.md)
-2. [Step 08: Standalone Coordination Protocols](proposals/step-08-standalone-coordination-protocols.md)
+1. [Step 07: CoordinationSession, AdhocTask, And Planning Boundary](proposals/step-07-coordination-session-adhoc-task.md)
+2. [Step 08: Standalone Coordination And Optional Protocols](proposals/step-08-standalone-coordination-protocols.md)
 3. [Team Communication Protocol V1](proposals/team-communication-protocol-v1.md)
 4. [Dispatch Control Plane Redesign](proposals/dispatch-control-plane-redesign.md)
 
@@ -50,6 +56,7 @@ definitions, statuses, or document placement.
 
 | Area | Authority | Contents |
 |---|---|---|
+| [`vision.md`](vision.md) | Highest product authority | System identity, foundation/domain boundary, accepted direction, and rejected interpretations. |
 | [`vocabulary/`](vocabulary/README.md) | Canonical terminology | Terms, relationships, aliases, reserved/deprecated vocabulary. |
 | [`architecture/`](architecture/README.md) | Accepted design | System boundaries, responsibilities, trust model, and invariants. |
 | [`contracts/`](contracts/README.md) | Accepted behavior | Machine-visible schemas, normalization, validation, state, and evidence rules. |
@@ -76,6 +83,15 @@ Team Dispatch V1 currently establishes:
 - Herdr as visibility rather than truth;
 - Job reserved for a future scheduler.
 
+The accepted Vision additionally establishes that:
+
+- Work is an optional integration profile rather than coordination identity;
+- a predeclared Workflow or Coordination Protocol is optional;
+- every executable request still requires a validated semantic contract;
+- agent-led, protocol-led, and domain-assisted planning are composable;
+- dispatch, evidence, authority, and execution bounds remain foundation rules;
+- domain and organization augmentation provide differentiated experience.
+
 ## Active Design Frontier
 
 The next design frontier remains intentionally non-canonical:
@@ -84,12 +100,15 @@ The next design frontier remains intentionally non-canonical:
 Step 07
   CoordinationSession
   AdhocTask graph
+  dynamic and declared planning inputs
+  inline execution-contract boundary
   planning materialization
   lifecycle versus isolation
   Work integration and branch topology
 
 Step 08
   Work-independent coordination
+  agent-led coordination without a predefined protocol
   research / consult / brainstorm / debate
   leader-worker and peer communication
   protocol graph and synthesis
@@ -100,11 +119,16 @@ Step 07 and Step 08 are discussion drafts. Their proposed entities and schemas
 must not be treated as accepted contracts until promoted according to
 [Documentation Governance](documentation-governance.md).
 
+They must, however, preserve the accepted direction in the
+[Vision](vision.md); the proposals may choose implementation shape but cannot
+make Work or a predeclared protocol universally mandatory.
+
 ## Core Invariants
 
 ```txt
 Work owns delivery lifecycle.
-Protocol definition constrains legal operations.
+Declared protocol definition constrains legal operations when selected.
+Every dynamic or declared execution has a validated semantic contract.
 Assignment carries semantic intent.
 Dispatch governs execution infrastructure.
 Run records one attempt.
@@ -115,6 +139,8 @@ Herdr provides visibility only.
 ## Maintenance Rules
 
 - Update vocabulary before introducing a new canonical term.
+- Reconcile `vision.md` first when changing system identity or the
+  foundation/domain boundary.
 - Record durable boundary decisions with an ADR.
 - Keep numbered Steps in roadmap/proposals, not canonical architecture.
 - Keep prompts out of architecture and contracts.

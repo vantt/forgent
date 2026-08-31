@@ -1,4 +1,4 @@
-# Step 07 - CoordinationSession And AdhocTask Graph
+# Step 07 - CoordinationSession, AdhocTask, And Planning Boundary
 
 Document type: Proposal
 Design status: Discussion
@@ -7,8 +7,8 @@ Last reviewed: 2026-08-31
 Canonical for: nothing until explicitly accepted
 Original date: 2026-08-31
 Scope: capture the current discussion about an independent coordination runtime,
-session-local task decomposition, planning materialization, isolation, and the
-boundary with Work lifecycle
+optional session-local task decomposition, agent-led/declared/domain-assisted
+planning, execution contracts, isolation, and the boundary with Work lifecycle
 
 Implementation note: only related primitives/prototypes exist; this proposed
 runtime contract has not been implemented as a whole.
@@ -23,6 +23,10 @@ This document deliberately separates three kinds of statements:
 
 Nothing marked Proposed is an approved contract. This draft exists so the
 discussion can continue without reconstructing the model from chat history.
+
+The [Agent Coordination Foundation Vision](../vision.md) now owns the accepted
+product direction above this proposal. Statements labeled Proposed or Open here
+may choose runtime shape but must preserve Vision decisions V-001 through V-012.
 
 For a fresh discussion session, use the
 [Step 07 Design Discussion Handoff Prompt](../playbooks/prompts/step-07-design-discussion-handoff.md).
@@ -54,6 +58,18 @@ The current design and implementation are pulled in two directions:
 The design must keep the useful hard structure without making Work mandatory
 or creating a second lifecycle authority beside Work.
 
+The accepted Vision adds a second dimension to the problem: a predeclared
+Workflow or Coordination Protocol is optional. Step 07 must support agent-led
+runtime planning and declared/domain-assisted planning through one governed
+execution core. It must not require a standalone objective to fabricate coding
+Stage/TaskSpec structure, and it must not turn optional structure into
+unstructured execution.
+
+The unresolved Step 07 problem is therefore the smallest session/task/runtime
+boundary that can represent trivial, dynamic, declared, and domain-enriched
+coordination while preserving authority, budgets, dispatch, evidence, recovery,
+and optional Work integration.
+
 ## 3. Current Observations
 
 ### 3.1 Workflow And Protocol Definition
@@ -74,8 +90,14 @@ driver          -> protocol enforcement and operation choice
 dispatcher      -> executor/provider/model/mechanism selection
 ```
 
-**Proposed:** preserve this model. Step 07 should generalize where it can run,
-not replace it with an unstructured chat loop.
+**Accepted by Vision:** preserve this model when a declared Workflow or
+Coordination Protocol is selected. Step 07 should generalize where coordination
+can run, not replace hard runtime contracts with an unstructured chat loop and
+not make a predeclared graph universal.
+
+**Open:** define how an agent-led dynamic execution contract carries equivalent
+objective, constraints, expected outputs, mutation, evidence, capability,
+budget, and provenance semantics without pretending to be a Stage Operation.
 
 ### 3.2 Planning Materialization
 
@@ -125,14 +147,16 @@ before it becomes a contract.
 
 ## 4. Design Goals Under Discussion
 
-**Proposed goals:**
+The direction of these goals is accepted by the Vision; their runtime shape is
+still under discussion:
 
 1. Run useful coordination with or without a Work item.
 2. Keep Work as the sole authority for durable delivery lifecycle.
 3. Introduce session-local task decomposition without turning every task into
    Work.
-4. Reuse Stage/Protocol/Operation/TaskSpec/Skill structure for both runtime
-   profiles where semantics genuinely match.
+4. Reuse Stage/Protocol/Operation/TaskSpec/Skill structure when selected and
+   where semantics genuinely match; support validated agent-led execution
+   without requiring those declarations.
 5. Support sequential and parallel task graphs with explicit dependencies.
 6. Separate lifecycle ownership from process/Git isolation.
 7. Route all agent execution through Assignment -> dispatch -> Run ->
@@ -142,6 +166,10 @@ before it becomes a contract.
 9. Preserve evidence provenance through task aggregation and synthesis.
 10. Permit a temporary task to be promoted to child Work when its scope becomes
     independently governable.
+11. Let domain and organization harnesses enrich or reject planning without
+    forking the dispatch/runtime core.
+12. Prove both agent-led research/brainstorm and domain-assisted coding as unlike
+    consumers of the same foundation.
 
 **Proposed non-goals for Step 07:**
 
@@ -164,7 +192,8 @@ Work-attached profile
 
 Work (lifecycle authority)
   -> CoordinationSession (optional collaboration run)
-    -> AdhocTask graph (session-local decomposition)
+    -> agent-led / declared / domain-assisted planning
+    -> optional AdhocTask graph (session-local decomposition)
       -> Assignment (semantic request)
         -> Run (runtime attempt)
           -> RunResult + Evidence
@@ -174,7 +203,8 @@ Standalone profile
 
 Mission (optional objective envelope)
   -> CoordinationSession (one executable collaboration flow)
-    -> AdhocTask graph
+    -> agent-led or optional declared protocol planning
+    -> optional AdhocTask graph
       -> Assignment
         -> Run
           -> RunResult + Evidence
@@ -185,14 +215,18 @@ Mission is optional because a single brainstorm, consult, or research session
 does not need a larger container. A Mission may group several sessions around a
 broader objective, but must not become a hidden Work replacement.
 
+A declared Coordination Protocol is also optional. A one-shot consult may lower
+directly to one Assignment; an agent-led research session may grow a task graph
+incrementally; a repeatable protocol may start with a declared graph.
+
 ### 5.2 Candidate Concept Responsibilities
 
 | Concept | Candidate responsibility | Must not own |
 |---|---|---|
 | `Work` | Durable delivery lifecycle, dashboard ownership, acceptance, approval, durable branch/merge. | Per-agent runtime attempts. |
 | `Mission` | Optional envelope for a broader non-Work objective and related sessions. | Work lifecycle or automatic code delivery. |
-| `CoordinationSession` | One invocation of a collaboration protocol, its context, task graph, participants, and aggregate outcome. | Work stage/status, approval, or merge state. |
-| `TaskCandidate` | Planner output before lifecycle and isolation validation/materialization. | Runtime execution or durable lifecycle by itself. |
+| `CoordinationSession` | One bounded coordination invocation, its context, planning sources, optional task graph, participants, budgets, and aggregate outcome. | Work stage/status, approval, or merge state. |
+| `TaskCandidate` | Optional planner output before lifecycle and isolation validation/materialization. | Universal session entry, runtime execution, or durable lifecycle by itself. |
 | `AdhocTask` | Session-local unit of intent, dependency, ownership, state, and evidence roll-up. | Durable backlog lifecycle or an implicit Run. |
 | `Assignment` | Immutable semantic request from one role to an execution target. | Task lifecycle, retries, or Work mutation authority. |
 | `Run` | One concrete execution attempt through an approved mechanism. | Semantic task identity. |
@@ -264,8 +298,9 @@ mode before each task is understood.
 
 Instead:
 
-1. keep pass-through when no decomposition is required;
-2. otherwise produce a dependency graph of `TaskCandidate` nodes;
+1. lower a trivial one-shot request directly when no decomposition is required;
+2. otherwise allow agent, declared protocol, or domain planner to propose a
+   dependency graph of `TaskCandidate` nodes, upfront or incrementally;
 3. classify each candidate independently;
 4. validate the complete graph;
 5. materialize each node according to its properties.
@@ -300,6 +335,9 @@ reason: Bounded evidence gathering for the parent plan
 then deterministically validated, or fully resolved by a policy function. The
 likely answer is agent judgment plus deterministic invariant validation, but
 the exact boundary is not settled.
+
+**Accepted by Vision:** TaskCandidate is optional intermediate planning material,
+not a required persisted entity or universal session input.
 
 ### 7.3 Validation Before Materialization
 
@@ -555,14 +593,16 @@ Exit candidate: sequential and fan-out/fan-in graphs pass deterministic tests.
 
 ### 7.3 Bind Protocol Definition To Session Runtime
 
-- define how a protocol's phases/stages and operations are resolved;
+- define how optional protocol phases/stages and operations are resolved;
+- define how agent-led inline execution contracts are validated without a fake
+  Stage;
 - reuse normalization and validation where semantics match Work workflow;
 - keep `stage.skill`/`taskSpec` compatibility behavior intact;
 - reject operations not legal for the current session phase;
 - route communication edges through Assignment governance.
 
-Exit candidate: one non-Work read-only protocol runs without selecting a coding
-Work stage as a surrogate.
+Exit candidate: one non-Work read-only agent-led session and one declared
+protocol session run without selecting a coding Work stage as a surrogate.
 
 ### 7.4 Attach Sessions To Work Without Lifecycle Leakage
 
@@ -632,6 +672,10 @@ not from terminal visibility or agent narrative.
 9. Immediate-parent integration can conflict with current root resolution.
 10. Detailed artifacts can save repeated context but become stale if they are
     not generated from canonical runtime records.
+11. Treating agent-led planning as unstructured prose may bypass contract,
+    budget, privacy, mutation, or evidence enforcement.
+12. Designing a universal extension SDK before two unlike consumers may freeze
+    the wrong foundation boundary.
 
 ## 16. Open Decisions Before Approval
 
@@ -640,8 +684,8 @@ The following are intentionally not settled:
 1. Is `CoordinationSession` the final name and persistence boundary?
 2. Is Mission needed in the first standalone runtime, or only later for grouping?
 3. What is the minimum AdhocTask state machine?
-4. Which protocol graph concepts can reuse Workflow Stage directly, and which
-   require a neutral Phase type?
+4. For sessions that select a declared protocol, which graph concepts can reuse
+   Workflow Stage directly, and which require a neutral Phase/common primitive?
 5. Who proposes and who validates `lifecycle` and `isolation`?
 6. What budget limits govern dynamic task creation and cross-agent exchange?
 7. What is the canonical AgentMessage/event storage model?
@@ -651,6 +695,10 @@ The following are intentionally not settled:
 11. How does an AdhocTask promotion adopt existing evidence and commits safely?
 12. Which Step 07 slice is the smallest honest proof before planning behavior is
     changed?
+13. What is the minimum validated inline execution contract for agent-led
+    coordination?
+14. Which extension seams are actually shared by agent-led research and
+    domain-assisted coding?
 
 ## 17. Evidence To Revisit During Design Review
 
@@ -666,3 +714,121 @@ Before approving implementation, review at least:
 - one real planning case that should remain child Work;
 - one real planning case that should become only AdhocTasks;
 - one mixed case with both lifecycle types and isolated mutations.
+
+## 18. Discussion Checkpoint: Assignment-First Candidate
+
+**Discussion status:** current recommendation only; not an accepted architecture
+decision or implementation authorization.
+
+### Recording Rule
+
+When several agents discuss Step 07, they return structured review notes to one
+designated synthesizer. The synthesizer appends one checkpoint here after
+reconciling evidence and dissent. A checkpoint records scope, claims,
+observations versus inferences, benefits, costs/failure modes, simpler
+alternatives, unresolved dissent, and affected open decisions. It must not
+silently promote a discussion outcome into canonical architecture or contracts.
+
+The current code review supports evaluating an Assignment-first Step 07 slice:
+
+```txt
+one-shot
+  Objective
+    -> proposed inline execution contract
+    -> foundation validation, plus optional domain enrichment/validation
+    -> Assignment with explicit provenance
+    -> governed dispatch -> Run -> RunResult / Evidence
+
+multi-step
+  Objective
+    -> CoordinationSession only when aggregate budget, recovery, synthesis,
+       participant/context ownership, or task-graph ownership requires it
+    -> optional AdhocTask graph
+    -> validated contracts -> Assignments -> governed runtime
+```
+
+This candidate does **not** mean that every agent-led request is unstructured.
+The inline contract remains mandatory and must carry equivalent objective,
+constraints/authority, expected outputs, mutation policy, evidence expectations,
+role/capability, budget, and caller provenance. It must enter the same
+Assignment, dispatch, Run, RunResult, and evidence stores as a declared Stage
+Operation.
+
+### Why This Can Serve Both Proof Consumers
+
+**Standalone agent-led coordination** can lower a bounded one-shot consult or
+research request without Work, a Workflow Stage, a TaskSpec file, a Session, or
+an AdhocTask, provided its inline contract passes foundation validation. This
+proves that a declared coding Stage is not a hidden entry requirement.
+
+**Coding-domain coordination** uses the same Assignment and governed runtime,
+but a coding harness may enrich or reject the proposal with domain facts such as
+repository scope, resource/footprint advice, mutation/isolation requirements,
+and coding-specific evidence rules. A declared coding Stage Operation remains
+the existing compatible provenance path. The coding harness must not create a
+second Assignment runner or grant a dispatch/lifecycle bypass.
+
+The candidate fails the foundation test if the two consumers need different
+Assignment, dispatch, Run, RunResult, or evidence cores. It is not sufficient
+that they merely share a prompt shape.
+
+### Observed Implementation Gap
+
+Current `buildAssignment()` and `executeAssignment()` both validate an
+Assignment by resolving `domain + workflow + stage + operation` to a declared
+Stage Operation and TaskSpec. Mission-lite sets `workId: null`, but still uses
+that coding Stage Operation path. Therefore neither the validated inline
+contract nor Assignment provenance for it exists in the implementation yet.
+
+The first proof slice must change that boundary before introducing Session or
+AdhocTask persistence. It must preserve the existing declared-operation path
+and its `stage.skill` / `stage.taskSpec` compatibility behavior.
+
+### Meaning Of Read-Only In The First Proof
+
+`read-only` means the executable request is forbidden from changing the
+coordinated domain state: in the coding consumer, no repository source/config,
+Git branch/commit/index, or Work lifecycle state may change. It does not mean
+the runtime writes nothing: canonical Assignment, Run, RunResult, evidence,
+and worker-result artifacts may be persisted as control-plane records.
+
+Read-only is a mutation-policy constraint, not a lower evidence standard. A
+worker still needs to return the expected structured result and evidence/report
+artifact; zero process exit, terminal visibility, or a self-reported conclusion
+does not satisfy the request by itself.
+
+### Current MVP Clarifications
+
+The current discussion narrows the Assignment-first MVP as follows:
+
+- Budget enforcement is limited to `timeoutMs` and a hard per-Assignment
+  `maxRuns` cap, if the cap is checked before each Run starts. Token usage may
+  be recorded when an executor reports it, but `maxTokens` is not enforceable
+  uniformly in the MVP and must not be treated as a hard pass/fail budget.
+- `evidence.required` uses only `reported` and `verified` as requested
+  requirement levels. `reported` still requires the expected structured
+  artifact/report and claim-to-evidence links. `verified` requires
+  independently checkable evidence. `inferred`, weak support, `no-evidence`,
+  and failed verification are result classifications, not contract
+  requirements.
+- The current `workId: null` read-only heuristic is legacy declared-path
+  compatibility only. Inline provenance must carry an explicit stamped
+  mutation policy, and the MVP rejects inline Assignments with missing or
+  mutating policy.
+- Mission-lite is the right standalone consumer to migrate, but the migration
+  is not a one-call-site change. The proof must remove fake
+  `stage: 'planning'` dependency from mission-lite Assignments while preserving
+  canonical Assignment, Run, RunResult, and evidence authority. Mission-local
+  records may remain as compatibility/index data during the MVP, but they
+  should not become a second authoritative Assignment store.
+
+### Deferred Until The Boundary Is Proven
+
+- mandatory CoordinationSession creation for one-shots;
+- persisted TaskCandidate;
+- AdhocTask graph/state and task-satisfaction roll-up;
+- mutating inherited tasks and ephemeral worktree integration;
+- AdhocTask-to-Work promotion and commit adoption;
+- immediate-parent branch integration as a global invariant;
+- declared standalone Protocol Phase/Stage representation;
+- general extension/plugin framework.

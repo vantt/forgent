@@ -1,4 +1,4 @@
-# Step 08 - Standalone Coordination Protocols
+# Step 08 - Standalone Coordination And Optional Protocols
 
 Document type: Proposal
 Design status: Discussion
@@ -6,9 +6,10 @@ Implementation: Partial
 Last reviewed: 2026-08-31
 Canonical for: nothing until explicitly accepted
 Original date: 2026-08-31
-Scope: capture the current discussion about Work-independent research,
-brainstorm, debate, consult, leader-worker, and peer collaboration on top of
-the proposed Step 07 CoordinationSession/AdhocTask runtime
+Scope: capture the current discussion about agent-led and optionally
+protocol-led Work-independent research, brainstorm, debate, consult,
+leader-worker, and peer collaboration on top of the proposed Step 07
+CoordinationSession/AdhocTask runtime
 
 Implementation note: a mission-lite prototype exists, but the generalized
 standalone protocol model remains unimplemented.
@@ -25,6 +26,11 @@ The protocol set, schemas, CLI, runtime slices, and acceptance criteria below
 are not approved implementation instructions. They are preserved now so Step 08
 can be refined after Step 07 boundaries are settled.
 
+The [Agent Coordination Foundation Vision](../vision.md) is accepted authority
+above this proposal. Coordination Protocols are optional reusable accelerators;
+Step 08 must not make a predeclared protocol an entry requirement for standalone
+coordination.
+
 ## 2. Reframed Goal
 
 The earlier mission-lite plan asked whether Team Dispatch could run a read-only
@@ -38,6 +44,14 @@ without requiring a placeholder Work item,
 while preserving dispatch governance and evidence integrity.
 ```
 
+The accepted goal is broader than protocol execution alone:
+
+```txt
+Run agent-led or optionally protocol-led multi-agent coordination
+from an objective, without Work or a fabricated coding Stage,
+then reuse domain/protocol augmentation when it adds real value.
+```
+
 Brainstorm and debate are two protocols, not the whole standalone runtime.
 Research/discovery, consult, leader-worker, peer review, and synthesis should
 fit the same model when their semantics are declared explicitly.
@@ -47,8 +61,8 @@ The expected relationship is:
 ```txt
 optional Mission
   -> CoordinationSession
-    -> protocol phase/stage graph
-      -> AdhocTask dependency graph
+    -> agent-led planning or optional protocol phase/stage graph
+      -> optional/dynamic AdhocTask dependency graph
         -> Assignment
           -> Run
             -> RunResult + Evidence
@@ -67,6 +81,10 @@ optional Mission
 - dispatch policy and provider/model/tier resolution;
 - budgets, retries, cancellation, and recovery;
 - the boundary that only Work verbs can mutate Work lifecycle.
+
+**Accepted by Vision:** Step 08 must prove at least one agent-led session with no
+predeclared protocol. Declared research/consult/brainstorm/debate definitions
+then demonstrate reusable doctrine, not mandatory routing.
 
 Step 08 supplies protocol definitions, participant topology, operation
 contracts, synthesis rules, and real adoption scenarios.
@@ -97,8 +115,9 @@ provide a prototype that can:
    is not yet independent.
 4. Assignment patterns are hard-coded around the first debate shape.
 5. Source/tests retain old Step 07 naming after the plan moved to Step 08.
-6. Focused verification on 2026-08-31 had four mission-lite failures caused by
-   dispatch-governance rejection of test executors.
+6. Earlier focused verification had four mission-lite failures caused by
+   dispatch-governance rejection of test executors; later Step 06 hardening
+   verification records those mission-lite tests as fixed and passing.
 7. The earlier document described implementation as future work, which no
    longer matched repository reality.
 
@@ -152,7 +171,8 @@ mission-lite record as a session and defer multi-session Mission grouping.
 
 ### 7.1 Hard And Soft Coordination
 
-**Proposed:** preserve the existing design strength:
+**Proposed for sessions that select a declared protocol:** preserve the existing
+design strength:
 
 ```txt
 Protocol graph
@@ -172,9 +192,13 @@ and challenge weak claims. Runtime policy constrains cost and execution.
 This does not conflict with flexibility as long as prose cannot override hard
 rules and hard rules do not attempt to encode every reasoning move.
 
+Agent-led sessions instead create validated runtime execution contracts under
+foundation policy and optional domain validation. They do not need to invent a
+protocol phase solely to access dispatch.
+
 ### 7.2 Workflow Reuse Question
 
-**Open:** standalone protocol phases may reuse the normalized Workflow Stage
+**Open for declared protocols only:** standalone protocol phases may reuse the normalized Workflow Stage
 shape, or may need a neutral `Phase` abstraction shared by WorkWorkflow and
 CoordinationProtocol.
 
@@ -189,7 +213,14 @@ Candidate options:
 This decision must be based on actual schema overlap. Reusing the word Stage
 must not import Work lifecycle transitions into a standalone session.
 
+It also must not make Stage, Phase, or a declared graph mandatory for an
+agent-led session.
+
 ## 8. Candidate Protocol Families
+
+These families are optional reusable doctrine/configuration packages. An agent
+may perform the corresponding coordination dynamically from an objective before
+or without selecting one of these named definitions.
 
 ### 8.1 Research / Discovering
 
@@ -586,6 +617,9 @@ storage or lifecycle ownership.
 Exit candidate: one consult protocol and one fan-out protocol validate from
 declarative config.
 
+This slice does not gate agent-led standalone coordination and must not become
+the only Assignment-construction path.
+
 ### 8.2 Implement Consult First
 
 - run a primary-agent task;
@@ -668,7 +702,9 @@ remains impossible through the session API.
 
 ### Protocol And Graph
 
-- invalid phase/operation/role/Skill/TaskSpec refs are rejected;
+- declared protocols reject invalid phase/operation/role/Skill/TaskSpec refs;
+- agent-led sessions require no fake Stage/Phase/protocol reference and reject
+  invalid or under-specified inline execution contracts;
 - illegal communication edge is rejected;
 - dependency cycle and missing task are rejected;
 - fan-out branches cannot see each other when independence is required;
@@ -708,6 +744,7 @@ Step 08 should not be considered complete merely because several agents
 produced text. Candidate completion requires:
 
 - at least one standalone session starts and completes without Work;
+- at least one agent-led session completes without a predeclared protocol;
 - consult and one multi-branch protocol use declarative legal operations;
 - tasks execute only through governed Assignment/Run paths;
 - communication topology is enforced, not only described in prompts;
@@ -739,7 +776,8 @@ produced text. Candidate completion requires:
 
 1. Which protocol is the smallest first implementation: consult or research?
 2. Is Mission included in V1 or deferred until multiple sessions need grouping?
-3. Do standalone protocols reuse Stage or introduce a neutral Phase concept?
+3. For declared standalone protocols, do they reuse Stage or introduce a
+   neutral Phase/common graph primitive?
 4. What is the minimum declarative communication-topology schema?
 5. Which direct peer exchanges are necessary for coding collaboration?
 6. How many rebuttal/clarification rounds are allowed by default?
@@ -750,10 +788,15 @@ produced text. Candidate completion requires:
 11. What is the minimum CLI or API surface after the file-module prototype?
 12. Which business case best measures quality improvement rather than merely
     proving that multiple processes ran?
+13. Which agent-led business case best proves the validated inline execution
+    contract without smuggling in a protocol graph?
 
 ## 21. Explicit Non-Goals
 
 - no mandatory Work item for standalone coordination;
+- no mandatory Workflow, Stage, Phase, TaskSpec file, or Coordination Protocol
+  for agent-led standalone coordination;
+- no unvalidated free-form executor request when declared structure is absent;
 - no queued `Job`, scheduler, daemon, or general mailbox;
 - no autonomous creation of delivery Work from synthesis;
 - no Work lifecycle mutation by Mission, Session, Task, Assignment, or result;
@@ -763,3 +806,22 @@ produced text. Candidate completion requires:
 - no claim that debate consensus replaces human/product authority;
 - no final commitment in this draft to names, schema, paths, or implementation
   order.
+
+## 22. Discussion Checkpoints
+
+**Discussion status:** this section records synthesized discussion only; it is
+not an accepted architecture, contract, or implementation authorization.
+
+When several agents discuss standalone coordination, one designated synthesizer
+appends a checkpoint here after reconciling their review notes. A checkpoint
+must state its scope, claims, evidence, observations versus inferences,
+benefits, costs/failure modes, simpler alternatives, unresolved dissent, and
+affected open decisions.
+
+Use this section for agent-led standalone research/consult/brainstorm/debate,
+optional declared protocol, Mission grouping, standalone synthesis, and
+standalone proof-consumer questions. Keep Step 07 runtime-boundary questions in
+the Step 07 proposal. Keep communication-topology and AgentMessage questions in
+the Team Communication Protocol proposal. Do not promote a checkpoint into
+Vision, vocabulary, accepted architecture, contracts, or ADRs until an explicit
+human decision is recorded under documentation governance.

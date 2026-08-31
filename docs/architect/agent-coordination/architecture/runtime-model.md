@@ -9,7 +9,8 @@ Canonical for: semantic request, dispatch, runtime attempt, and normalized resul
 ## Execution Chain
 
 ```txt
-legal Stage Operation
+declared legal Stage Operation
+  or validated inline execution contract
   -> Assignment
     -> dispatch policy resolution
       -> DispatchPlan
@@ -22,6 +23,10 @@ legal Stage Operation
 ## Invariants
 
 - Assignment is immutable semantic intent, not an execution attempt.
+- Assignment provenance identifies whether its contract came from a declared
+  operation/TaskSpec or validated agent-led planning.
+- The inline path must satisfy foundation authority, budget, mutation, privacy,
+  evidence, and dispatch validation; it is not a compatibility bypass.
 - Each dispatch attempt creates a distinct Run.
 - Retry creates another Run for the same Assignment.
 - Each settled Run produces a normalized RunResult or explicit failure record.

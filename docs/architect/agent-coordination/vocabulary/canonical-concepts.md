@@ -55,17 +55,26 @@ primary operation projection.
 
 ### Coordination Protocol
 
-A graph and doctrine for one class of collaboration, such as consult, research,
-leader-worker, review, brainstorm, or debate. It declares legal phases,
-operations, communication edges, budgets, and synthesis requirements.
+An optional reusable graph and doctrine for one class of collaboration, such as
+consult, research, leader-worker, review, brainstorm, or debate. When selected,
+it declares legal phases, operations, communication edges, budgets, and
+synthesis requirements.
+
+A CoordinationSession does not require a Coordination Protocol. Agent-led
+planning may create runtime tasks and execution contracts dynamically under
+foundation policy.
 
 Design status: Proposed for the generalized standalone runtime.
 
 ### TaskSpec
 
-A machine-readable execution contract defining required inputs, expected
-outputs, gates, mutation/evidence expectations, and completion criteria for an
-operation.
+A reusable machine-readable execution contract defining required inputs,
+expected outputs, gates, mutation/evidence expectations, and completion
+criteria for an operation.
+
+A registered TaskSpec is optional for agent-led coordination. Every executable
+request still requires equivalent validated semantic fields in its Assignment
+contract. The exact inline representation remains under design.
 
 ### Skill
 
@@ -83,9 +92,10 @@ provider, model, terminal, or process.
 
 ### CoordinationSession
 
-One bounded execution of a Coordination Protocol, with context, participants,
-task graph, budgets, events, and aggregate outcome. It may be Work-attached or
-standalone.
+One bounded coordination invocation, with context, participants, budgets,
+events, runtime tasks/Assignments when needed, and aggregate outcome. It may be
+Work-attached or standalone, agent-led or protocol-led. A task graph may be
+trivial, dynamic, or declared.
 
 It owns collaboration progress only, never Work lifecycle.
 
@@ -96,6 +106,9 @@ Design status: Proposed.
 A planner-proposed node before graph validation and materialization. Candidate
 properties may independently describe inherited/independent lifecycle and
 shared/isolated execution.
+
+TaskCandidate is an optional intermediate representation, not a required input
+for one-shot or incrementally planned coordination.
 
 Design status: Proposed.
 
@@ -115,6 +128,10 @@ Design status: Proposed.
 An immutable semantic request to perform one operation for a caller/context. It
 contains objective, inputs, constraints, expected outputs, role, operation, and
 policy context. It does not own retries or lifecycle progress.
+
+An Assignment may originate from a declared Stage Operation/TaskSpec or from an
+agent-proposed inline execution contract that passes foundation and selected
+domain validation. Both paths use the same dispatch and runtime governance.
 
 ### AgentMessage
 

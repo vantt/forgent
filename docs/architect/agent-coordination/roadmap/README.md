@@ -15,3 +15,8 @@ Canonical for: implementation sequence only
 
 Roadmap documents reference canonical vocabulary, architecture, and contracts.
 They are not a source of new system definitions.
+
+Implementation sequencing begins from the
+[Agent Coordination Foundation Vision](../vision.md), then accepted
+architecture/contracts/ADRs. A roadmap may not make optional Work or protocol
+structure mandatory by implementation convenience.
