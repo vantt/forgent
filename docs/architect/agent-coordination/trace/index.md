@@ -11,7 +11,7 @@ Test counts are live `node --test` results on the dirty worktree unless noted.
 | 03 | Operation -> Assignment -> Run -> RunResult storage (step-03) | `src/runner/dispatch/assignment.mjs` (`asgn_` ids, builder refuses unknown op / unresolved taskSpec), `assignment-policy.mjs`, `cli.mjs` `decide/execute --assignment`, `assignment-runner.mjs` (`.fgos/assignments/<id>/runs/NN/`) | `test/runner/assignment.test.mjs` 15/15, `assignment-dispatch.test.mjs` 12/12 | unknown-op, missing-taskSpec, human-only-refusal cases in same files | fake-executor dispatch tests green | done | none |
 | 04 | Evidence hardening: dirty-before subtraction, strict `agent-result.json`, malformed->failed, artifact paths in prompt (step-04) | `assignment-runner.mjs` `computeChangedFiles` (dirtyBefore set), `validateAgentResultClaim`, `isReadOnlyAssignment`, provenance `evidence.json` | `test/runner/assignment-runresult.test.mjs` 22/22 | malformed claim, pre-existing dirty file, zero-exit-no-artifact, control-plane-files-not-evidence cases | same suite green | done | none |
 | 05 | Driver operation choice, `planning.validate-plan` reviewer Assignment, no-evidence/failed cannot advance (step-05) | `src/runner/dispatch/operation-choice.mjs` (`chooseStageOperation`), `src/runner/loop.mjs` secondary-op wiring, `domains/coding/task-specs/validate-plan.md` role prose reconciled (`role: reviewer`, MUST NOT call `fgos plan`) | `test/runner/operation-choice.test.mjs` 93/93; loop planning.validate-plan tests incl. worktree cwd-selection fix | human-only not executed, undeclared op refused, no-evidence stops | planning.validate-plan fake + runOnce tests green | done for planning.validate-plan | executing.review-item routing in-flight (see 6.0) |
-| primary path | Existing primary Work path remains green (step-06 prereq) | `src/runner/loop.mjs`, engine verbs only | e2e `test/e2e/runner-loop.test.mjs` 15/15, `test/state/handoff.test.mjs` 18/18 | loop no-progress/caps tests | `test/runner/loop.test.mjs` 84 tests: 81 pass, **3 fail** | BLOCKED | 3 review-item verdict-routing tests red in worktree; HEAD baseline also carries 1 committed red (scout-blast-radius runOnce, fixed by worktree) |
+| primary path | Existing primary Work path remains green (step-06 prereq) | `src/runner/loop.mjs`, engine verbs only | e2e `test/e2e/runner-loop.test.mjs` 15/15, `test/state/handoff.test.mjs` 18/18 | loop no-progress/caps tests | Resolved by Cell 6.0 (2026-08-30); full 6-suite battery reproduced green at every subsequent cell close through 6.final (2026-08-31): 304/304 | done | none — was BLOCKED (3 red), fixed by Cell 6.0, held green through Cells 6.1-6.final |
 
 ## Doctor (2026-08-30)
 
@@ -36,9 +36,13 @@ dirty-before discipline will blur every later cell.
 
 ## Verdict
 
-Step 6 cannot start clean. Smallest blocking fix = Cell 6.0: finish the
-in-flight `executing.review-item` verdict routing until `loop.test.mjs` is
-green without weakening assertions. See `current-cell.md`.
+**Superseded — Step 6 is now DONE (2026-08-31).** This section originally
+recorded the 2026-08-30 pre-Step-6 blocker (Cell 6.0's target). That
+blocker was fixed the same day; Cells 6.1-6.6 and 6.final then completed
+the full Step 6 rollout with two real live-proven Adoption Completion
+Criteria operations. See "Cell 6.final Close Summary" below for the final
+verdict and residuals, and the Cell Registry immediately below for the
+per-cell status.
 
 ## Cell Registry
 
@@ -51,7 +55,7 @@ green without weakening assertions. See `current-cell.md`.
 | 6.4 | executing.review-item fake executor | done |
 | 6.5 | executing.scout-blast-radius read-only researcher | done |
 | 6.6 | executing.scoped-subtask mutating helper | done |
-| 6.final | consolidate Step 6 | in-progress |
+| 6.final | consolidate Step 6 | done |
 
 ## Cell 6.0 Close Summary (2026-08-30)
 
@@ -157,6 +161,49 @@ future driver caller declares a footprint, so `scoped-subtask` is not yet
 "used" per step-06 §8's Adoption Completion Criteria in the same sense
 Cell 6.3's live validate-plan smoke was. Full detail in
 `step-06-cell-6-scoped-subtask.md`.
+
+## Cell 6.final Close Summary (2026-08-31) — STEP 6 DONE
+
+Full audit of step-06-work-attached-team-adoption.md §2-§9 against Cells
+6.0-6.6: every prerequisite, Slice acceptance criterion, governance rule,
+evidence-table row, and §6 test scenario traces to a closed cell, a named
+test, or a direct code citation — no genuinely new open item found beyond
+the one gap the coordinator had already flagged closing Cell 6.6: §8's
+Adoption Completion Criteria wants two real (non-fake-executor)
+Work-attached operations "used," and item 2 (executing-stage) had only
+ever been fake-executor-tested. Closed in this cell: one real
+out-of-process `review-item` reviewer Assignment dispatched against a new
+throwaway `stage: executing` item (`tsk-1br`) with a REAL candidate diff
+(`fgw/tsk-1br@09f4a59d`, made via a real `fgos pick` worktree since this
+repo's own pre-commit hook refuses direct `fgw/*` commits from the main
+checkout) and a REAL verify result (`21b27a40`) — verdict `APPROVED`,
+`confidence: reported`, `changedFiles: []`, correctly resolved the scoped
+`claude-reviewer` executor profile (Cell 6.3's own fix), no lifecycle verb
+fired inside the Assignment; parked `wontfix` afterward via the normal
+engine verb. Coordinator independently re-verified: real git commits/
+branch/worktree exist, artifact contents match the claimed verdict/
+evidence, full regression battery reproduces 304/304 (matches Cell 6.6
+exactly, no regression from the live dispatch).
+
+**Both §8 Adoption Completion Criteria items now satisfied with real live
+evidence:** (1) read-only — `planning.validate-plan` (Cell 6.3, `tsk-5ka`);
+(2) executing-stage — `executing.review-item` (Cell 6.final, `tsk-1br`).
+
+**Residuals carried forward, none blocking:**
+- `scoped-subtask`'s `expectedFiles` mechanism (Cell 6.6) is built and
+  tested but inert — no real driver caller populates it yet. Does not
+  block §8 (item 2 is satisfied by `review-item` alone).
+- M1 from Cell 6.6: a file already dirty pre-run, mutated without being
+  declared, is invisible to `scoped-subtask`'s new checks (inherited
+  Cell 2's dirty-before-subtraction scope).
+- Trust-boundary residual (a) from Cell 6.2, accepted for Step 6;
+  settlement-outside-worker-reach (B) vs worker sandboxing (C) formally
+  DEFERRED TO STEP 7.
+- A `fgw/tsk-1br` worktree (`.claude/worktrees/tsk-1br-5Qmtbl`) was left
+  in place after parking, consistent with this repo's existing pattern of
+  many similar unreaped worktrees — reclaim is out of Step 6's scope.
+
+**STEP 6 VERDICT: DONE.** Full detail in `step-06-final-consolidation.md`.
 
 ## Cell 6.3 Close Summary (2026-08-31)
 
