@@ -84,6 +84,7 @@
     "src/state/worker-slots.mjs": "domain",
     "src/intake/discovery.mjs": "use-case",
     "src/intake/plan.mjs": "use-case",
+    "src/intake/plan-verdict-from-plan-md.mjs": "use-case",
     "src/intake/verify-pattern-check.mjs": "kernel",
     "src/cli/command-registry.mjs": "kernel",
     "src/cli/version.mjs": "kernel",

@@ -41,11 +41,11 @@ Noted, not touched by this track: `.agentkit/`, `.claude/agents/*.md`,
 
 | Phase | Req | Status | Cell | Evidence |
 |---|---|---|---|---|
-| P01 | R1 (G1) | done | P01.1 | `P01.1.md` |
-| P01 | R2 (G6) | done | P01.1 | `P01.1.md` |
-| P01 | R3 (G5) | missing | P01.2 | — |
-| P01 | R4 | missing | P01.2 | — |
-| P01 | R5 | missing | P01.2 | — |
+| P01 | R1 (G1) | done | P01.1 | `P01.1.md`, commit `07f2d943` |
+| P01 | R2 (G6) | done | P01.1 | `P01.1.md`, commit `07f2d943` |
+| P01 | R3 (G5) | done | P01.2 | `P01.2.md`, commit pending |
+| P01 | R4 | done | P01.2 | `P01.2.md`, commit pending |
+| P01 | R5 | done | P01.2 | `P01.2.md`, commit pending |
 | P02 | R1–R4 | missing | P02.1 | — |
 | P02 | R5–R6 | missing | P02.2 | — |
 | P02 | R7–R8 | missing | P02.3 | — |
@@ -69,9 +69,10 @@ Populated in Phase 03 per plan requirement R6.
 
 ## Active Cell
 
-None. P01.1 closed 2026-08-31 (commit pending).
+None. P01.2 closed 2026-08-31 (commit pending). Phase 01 (R1-R5) fully
+done.
 
 ## Next Action
 
-Prepare cell P01.2 (R3 G5 plan-verdict derivation, R4 loop.mjs wiring, R5
-verdictPayload no-op).
+Prepare cell P02.1 (R1-R4, declared path only, goldens — per plan.md's own
+"land R1-R4 first, prove goldens, then R5-R8" ordering).

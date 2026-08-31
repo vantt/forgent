@@ -94,6 +94,7 @@ import { readSharedConfig, readSharedConfigOrEmpty } from '../config/shared-conf
 import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
 import { resolvePlan, resolveContentRoot } from '../intake/plan.mjs';
+import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
 import { chooseStageOperation, executeDriverOperationChoice } from './dispatch/operation-choice.mjs';
@@ -1527,8 +1528,36 @@ export async function runOnce(options = {}) {
             });
             log(`fgos-runner: reviewer validation assignment for "${item.id}" executed (confidence: ${outcome.runResult?.confidence}, status: ${outcome.runResult?.status})`);
             if (outcome.canAdvanceEdge) {
-              const callerVerdictToPass = item.verdictPayload ?? item.callerVerdict ?? options.callerVerdict ?? options.verdictPayload;
-              const planOutcome = resolvePlan(dir, item.id, config, 'runner', callerVerdictToPass);
+              // Cell P01.2 (R4/G5): `item.verdictPayload`/`item.callerVerdict`
+              // are dead reads (grep-confirmed: no writer for either exists
+              // anywhere in `src/`) -- removed. `options.callerVerdict` /
+              // `options.verdictPayload` (an explicit override a `runOnce`
+              // caller supplies, e.g. tests) are still live and still win
+              // when present -- same "explicit beats heuristic" precedent
+              // `resolvePlan` itself already applies to its own
+              // callerVerdict-vs-tiny/small-heuristic fork. Otherwise, the
+              // driver never re-derives what `planning.validate-plan`
+              // already reasoned live and recorded in plan.md itself
+              // (gate-auto-approve-mechanics.md: "hand that same JSON block
+              // through verbatim, never a re-derived or re-worded version of
+              // it") -- it mechanically re-reads plan.md's own committed
+              // text and derives the same verdict plan.md already declared.
+              let verdict = options.callerVerdict ?? options.verdictPayload;
+              if (!verdict) {
+                let planContent = '';
+                const planPath = typeof item.docsRef === 'string' && item.docsRef.trim() ? path.join(contentRoot, item.docsRef, 'plan.md') : null;
+                if (planPath) {
+                  try {
+                    planContent = fs.readFileSync(planPath, 'utf8');
+                  } catch {
+                    // missing/unreadable plan.md -- planVerdictFromPlanMd('')
+                    // returns null, same as no callerVerdict at all: resolvePlan
+                    // falls through to its own tiny/small check / noop / refuse.
+                  }
+                }
+                verdict = planVerdictFromPlanMd(planContent, item.id);
+              }
+              const planOutcome = resolvePlan(dir, item.id, config, 'runner', verdict);
               log(`fgos-runner: chia-việc swept plan item "${item.id}" after READY validation (${planOutcome?.outcome ?? 'done'})`);
             } else if (outcome.nextOperation === 'shape-plan') {
               log(`fgos-runner: validation for "${item.id}" returned NOT READY — routing back to primary planning path`);
@@ -1536,7 +1565,11 @@ export async function runOnce(options = {}) {
               log(`fgos-runner: validation for "${item.id}" did not report READY (${outcome.reason}) — Work lifecycle untouched`);
             }
           } else {
-            const callerVerdictToPass = item.verdictPayload ?? item.callerVerdict ?? options.callerVerdict ?? options.verdictPayload;
+            // Non-assignment dispatch: `item.verdictPayload`/
+            // `item.callerVerdict` were dead reads (same finding as above),
+            // removed; `options.callerVerdict`/`options.verdictPayload`
+            // stay live for this path too.
+            const callerVerdictToPass = options.callerVerdict ?? options.verdictPayload;
             resolvePlan(dir, item.id, config, 'runner', callerVerdictToPass);
             log(`fgos-runner: chia-việc swept plan item "${item.id}"`);
           }
