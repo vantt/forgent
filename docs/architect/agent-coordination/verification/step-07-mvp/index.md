@@ -46,7 +46,7 @@ Noted, not touched by this track: `.agentkit/`, `.claude/agents/*.md`,
 | P01 | R3 (G5) | done | P01.2 | `P01.2.md`, commit `d97837d3` |
 | P01 | R4 | done | P01.2 | `P01.2.md`, commit `d97837d3` |
 | P01 | R5 | done | P01.2 | `P01.2.md`, commit `d97837d3` |
-| P02 | R1–R4 | missing | P02.1 | — |
+| P02 | R1–R4 | done | P02.1 | `P02.1.md`, commit `0fdd61d9` |
 | P02 | R5–R6 | missing | P02.2 | — |
 | P02 | R7–R8 | missing | P02.3 | — |
 | P03 | R1–R2 | missing | P03.1 | — |
@@ -69,10 +69,11 @@ Populated in Phase 03 per plan requirement R6.
 
 ## Active Cell
 
-None. P01.2 closed 2026-08-31 (commit `d97837d3`). Phase 01 (R1-R5) fully
-done.
+None. P02.1 closed 2026-08-31 (commit `0fdd61d9`).
 
 ## Next Action
 
-Prepare cell P02.1 (R1-R4, declared path only, goldens — per plan.md's own
-"land R1-R4 first, prove goldens, then R5-R8" ordering).
+Prepare cell P02.2 (R5-R6: interpretation reads stamped fields instead of
+operation-id switching; G3 dirty-before persistence) — per plan.md's own
+"land R1-R4 first, prove goldens, then R5-R8" ordering, now that P02.1's
+goldens are proven.
