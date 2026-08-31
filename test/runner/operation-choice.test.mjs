@@ -694,6 +694,72 @@ test('Step 06 executing.review-item approval is not a Work lifecycle edge', () =
   assert.equal(interpreted.reason, 'review-item-approved');
 });
 
+test('Step 06 executing.review-item Herdr and visibility tracking fields do not alter confidence ladder judgment', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_rev_herdr', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');
+  fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
+  const approveReportPath = path.join(runDir, 'agent-report.md');
+  fs.writeFileSync(approveReportPath, '# Review Report\nAPPROVED: evidence:candidate-diff evidence:verify-pass clean evaluation\n');
+
+  const choice = {
+    operation: 'review-item',
+    assignment: { contextRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] },
+  };
+
+  const interpretedApproved = interpretAssignmentRunResult({
+    choice,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'APPROVED',
+        summary: 'APPROVED',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+        herdrStatus: 'active',
+        herdrPane: 'pane-42',
+        visibility: 'internal',
+      },
+      evidence: { artifacts: [approveReportPath] },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(interpretedApproved.canAdvanceEdge, false);
+  assert.equal(interpretedApproved.stop, false);
+  assert.equal(interpretedApproved.canProceed, true);
+  assert.equal(interpretedApproved.reason, 'review-item-approved');
+
+  const rejectReportPath = path.join(runDir, 'agent-report-reject.md');
+  fs.writeFileSync(rejectReportPath, '# Review Report\nREJECT: evidence:candidate-diff evidence:verify-pass finding needs work\n');
+
+  const interpretedRejected = interpretAssignmentRunResult({
+    choice,
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+      agentClaim: {
+        status: 'done',
+        verdict: 'REJECT',
+        summary: 'REJECT',
+        evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'],
+        herdrStatus: 'stale',
+        herdrPane: 'pane-99',
+        visibility: 'external',
+      },
+      evidence: { artifacts: [rejectReportPath] },
+    },
+    repoRoot: tempDir,
+  });
+  assert.equal(interpretedRejected.canAdvanceEdge, false);
+  assert.equal(interpretedRejected.stop, false);
+  assert.equal(interpretedRejected.nextOperation, 'fix-verify-red');
+  assert.equal(interpretedRejected.reason, 'review-item-rejected-route-fix');
+});
+
 test('validate-plan and review-item require report artifact and fail closed when missing', () => {
   const tempDir = mkTempDir();
   fs.writeFileSync(path.join(tempDir, 'candidate-diff.patch'), 'diff --git a/src/a.js b/src/a.js\n');

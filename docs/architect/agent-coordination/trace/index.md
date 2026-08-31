@@ -48,7 +48,7 @@ green without weakening assertions. See `current-cell.md`.
 | 6.1 | planning.validate-plan fake executor happy path | done |
 | 6.2 | planning.validate-plan negative cases | done |
 | 6.3 | planning.validate-plan live smoke | done |
-| 6.4 | executing.review-item fake executor | pending |
+| 6.4 | executing.review-item fake executor | done |
 | 6.5 | executing.scout-blast-radius read-only researcher | pending |
 | 6.6 | executing.scoped-subtask mutating helper | pending |
 | 6.final | consolidate Step 6 | pending |
@@ -80,6 +80,33 @@ class) — trust-boundary options B/C DEFERRED TO STEP 7. Deferred-hardening
 bucket (persist dirty signal at settle for write-ops, plan hash binds
 plan.md only, out-tree dead-ref hygiene, execFileSync timeout, rev-list perf)
 lives in `step-06-cell-2-validate-plan-negative.md` Gaps.
+
+## Cell 6.4 Close Summary (2026-08-31)
+
+Audit-only cell, no production code touched. Confirmed the `lastRunResult`
+self-fetch asymmetry between planning (`validate-plan`, self-fetches
+across separate `runOnce` calls) and executing (`review-item`, no
+self-fetch) is by design, not a gap: every real caller dispatches +
+interprets `review-item` inline in one `executeDriverOperationChoice`
+call (no code path ever produces a "dispatched but uninterpreted"
+review-item Assignment for a later call to discover), and a review-item
+stop parks the item at `blocked` (removed from auto-resweep) rather than
+leaving it `todo`/re-swept indefinitely like a failed plan validation —
+so review-item has no unbounded-resweep cost to guard against with a
+cache, and caching a stale verdict there would risk reusing outdated
+review evidence instead of re-reviewing fresh diff/verify state.
+Coordinator independently spot-verified the two load-bearing citations
+(`executeDriverOperationChoice`'s inline dispatch+interpret;
+`bin/fgos.mjs`'s `fgos plan` verb forcing `validate-plan` regardless of
+`chooseStageOperation`'s raw choice). Gap analysis vs step-06 §6 found
+Cell 6.0 already covers reject-routes-to-fix, APPROVED pass/fail-verify,
+missing-evidence-gate, and governance-blocked-executor for `review-item`
+specifically; one real coverage gap found (Herdr/visibility-neutrality
+test existed only for `validate-plan`, not `review-item`'s structurally
+distinct interpretation branch) and filled with one new test. Battery:
+293/293 green. Given zero production code changed, closed after direct
+coordinator verification rather than a full separate Reviewer/Red-team
+pass. Full detail in `step-06-cell-4-review-item.md`.
 
 ## Cell 6.3 Close Summary (2026-08-31)
 
