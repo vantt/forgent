@@ -27,6 +27,29 @@ import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
+import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
+
+// ADR-006 R7 (P02.4 Red-Team HIGH fix): executeAssignment's own
+// `effectiveAssignment` derivation reads a stored assignment.json back from
+// disk via raw JSON.parse (below), bypassing buildAssignment()/the
+// normalizer entirely -- so `mutation` is `undefined` on any assignment.json
+// written before that field existed (or otherwise missing it). This is the
+// same read-back gap already fixed for `findLatestAssignmentRunResult`
+// (operation-choice.mjs) and `runMissionAssignment`'s string-ID branch
+// (mission-lite.mjs); mirrors that exact pattern here, at the one location
+// that makes the fix caller-independent: derive the SAME value
+// assignment-normalizer.mjs would stamp for this role/operation pair, from
+// that module's own single source of truth -- never a second,
+// independently hand-maintained table that could drift from it.
+function fallbackMutationForAssignment(asgn) {
+  const operation = asgn?.operation;
+  if (typeof operation !== 'string' || !operation) return undefined;
+  try {
+    return stampDeclaredAssignment({ role: asgn?.role, operation }).mutation;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * Check if report text is non-empty and contains substantive content (not a placeholder).
@@ -476,7 +499,11 @@ function validateAssignmentLegality(asgn, opts = {}) {
   }
 
   // Step 07 §7: Mission-lite is strictly read-only. Reject mutating operations.
-  const isMission = Boolean(asgn.missionId || asgn.workId === null || opts.isMissionLite);
+  // `opts.isMissionLite` is an explicit, caller-supplied flag (mission-lite's
+  // `runMissionAssignment()` always passes it) -- not re-derived from
+  // `missionId`/`workId` here (ADR-006 R7 retires that heuristic; read-only
+  // status now comes solely from the stamped `mutation` field below).
+  const isMission = Boolean(opts.isMissionLite);
   if (isMission && !isReadOnlyAssignment(asgn)) {
     throw new RunnerConfigError(
       `cannot execute mutating operation "${asgn.operation}" (role: "${asgn.role}") in mission-lite mode — mission-lite is strictly read-only`,
@@ -552,6 +579,22 @@ export async function executeAssignment(assignment, opts = {}) {
     }
   }
 
+  // ADR-006 R7 (P02.4 Red-Team HIGH fix): backfill `mutation` on
+  // `effectiveAssignment` before it is used anywhere below -- covers BOTH
+  // branches above (the fresh-write branch already carries a valid
+  // `mutation` from buildAssignment()/the normalizer, so this is a
+  // value-preserving no-op there; the raw disk read-back branch is the one
+  // that actually needs it). `effectiveAssignment` is reassigned to a new
+  // frozen object here (never mutated in place -- it may already be
+  // frozen per the read-back branch above), mirroring the exact
+  // `Object.freeze({ ...x, mutation: effective })` pattern already applied
+  // in `operation-choice.mjs` and `mission-lite.mjs`.
+  const effectiveMutation =
+    effectiveAssignment.mutation === 'read-only' || effectiveAssignment.mutation === 'mutating'
+      ? effectiveAssignment.mutation
+      : fallbackMutationForAssignment(effectiveAssignment);
+  effectiveAssignment = Object.freeze({ ...effectiveAssignment, mutation: effectiveMutation });
+
   validateAssignmentLegality(effectiveAssignment, opts);
 
   // Enforce decide-first governance gate (Step 06)
@@ -588,10 +631,11 @@ export async function executeAssignment(assignment, opts = {}) {
   // Reviewer/researcher/advisor executor scoping (Red-team finding, Cell 6.3
   // Fix Round 1; widened in Fix Round 2 to cover operation-based read-only
   // classification too, not just role): a read-only Assignment (per
-  // isReadOnlyAssignment -- role in READ_ONLY_ROLES OR a READ_ONLY_OPS
-  // operation, unless overridden by KNOWN_MUTATING_OPS) must never resolve
-  // to the same executor profile as a worker (acceptEdits + Bash(git
-  // add/commit)) when the resolved family is the default "claude". Only
+  // isReadOnlyAssignment -- assignment.mutation === 'read-only', stamped
+  // once at build time by assignment-normalizer.mjs from role/operation)
+  // must never resolve to the same executor profile as a worker (acceptEdits
+  // + Bash(git add/commit)) when the resolved family is the default
+  // "claude". Only
   // ever redirects a *default* "claude" resolution -- an explicit
   // non-"claude" preferExecutor (pi, agy-cli, codex, ...) is untouched.
   // Absent-safe: no `runner.executors.claude-reviewer` entry configured ->

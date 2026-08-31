@@ -152,6 +152,83 @@ test('executeAssignment produces status: done and confidence: reported when work
   assert.equal(storedResult.confidence, 'reported');
 });
 
+test('executeAssignment backfills mutation for its own effectiveAssignment re-read when a legacy assignment.json already exists on disk (ADR-006 R7, P02.4 Red-Team HIGH fix)', async () => {
+  const tempDir = mkTempDir();
+
+  const executorScript = path.join(tempDir, 'legacy-reporter-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    const asgnDir = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(asgnDir)) {
+      for (const a of fs.readdirSync(asgnDir)) {
+        const runDir = path.join(asgnDir, a, 'runs', '01');
+        if (fs.existsSync(runDir)) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Background Brief\\nFound existing code paths.\\n');
+          fs.writeFileSync(
+            path.join(runDir, 'agent-result.json'),
+            JSON.stringify({ status: 'done', summary: 'Background evidence gathered' }),
+          );
+        }
+      }
+    }
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  // A genuinely read-only, mission-shaped assignment (missionId set, correctly
+  // stamped mutation: 'read-only' by buildAssignment/the normalizer).
+  const assignment = buildAssignment({
+    workId: null,
+    missionId: 'mission_effectiveassignment_legacy_test',
+    stage: 'planning',
+    operation: 'resolve-question',
+    role: 'researcher',
+    objective: 'Gather facts for planning validation.',
+  });
+  assert.equal(assignment.mutation, 'read-only');
+
+  // Pre-seed a LEGACY assignment.json at the exact path executeAssignment's
+  // own effectiveAssignment re-read consults (.fgos/assignments/<id>/assignment.json)
+  // -- simulating a file persisted before ADR-006 R2 added the mutation/
+  // resultKind/evidence/onAdvance stamps -- BEFORE executeAssignment is ever
+  // called, so its "already exists on disk" branch fires and discards
+  // whatever object the caller passes in.
+  const assignmentDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  fs.mkdirSync(assignmentDir, { recursive: true });
+  const legacyAssignment = { ...assignment };
+  delete legacyAssignment.mutation;
+  delete legacyAssignment.resultKind;
+  delete legacyAssignment.evidence;
+  delete legacyAssignment.onAdvance;
+  fs.writeFileSync(path.join(assignmentDir, 'assignment.json'), `${JSON.stringify(legacyAssignment, null, 2)}\n`);
+
+  // Mirrors cli.mjs's execute --assignment subcommand: a mission-shaped
+  // assignment object drives isMissionLite: true.
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    isMissionLite: true,
+  });
+
+  assert.equal(result.status, 'done');
+  assert.equal(result.confidence, 'reported');
+});
+
 test('executeAssignment produces status: no-evidence when executor exits zero without producing report artifacts', async () => {
   const tempDir = mkTempDir();
 

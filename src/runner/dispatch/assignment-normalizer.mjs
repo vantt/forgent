@@ -11,13 +11,13 @@
 // mutation/evidence-requirement mapping. `READ_ONLY_ROLES`, and
 // `isReadOnlyAssignment()`'s formerly function-local `KNOWN_MUTATING_OPS`/
 // `READ_ONLY_OPS` sets, moved here from `assignment.mjs` verbatim (ADR-006
-// R2) — `assignment.mjs` re-exports/re-imports them so `isReadOnlyAssignment`
-// keeps its exact pre-existing behavior (including its own
-// `missionId || workId === null` heuristic clause, which stays in
-// `assignment.mjs` and is NOT reproduced here: ADR-006 §7/R7 retires that
-// heuristic in a later cell, and this module's role/operation-only mapping
-// is the clean, heuristic-free classification R7 will eventually point
-// read-only enforcement at).
+// R2). `assignment.mjs` still re-exports `READ_ONLY_ROLES` (public surface,
+// unaffected); `KNOWN_MUTATING_OPS`/`READ_ONLY_OPS` stay here as the
+// declared-mapping source of truth ONLY, consulted exclusively by
+// `classifyDeclaredMutation`/`stampDeclaredAssignment` below at build time.
+// `isReadOnlyAssignment()` (ADR-006 R7) no longer re-derives classification
+// from role/operation/missionId/workId at all — it reads the `mutation`
+// field this module stamps, once, per Assignment.
 //
 // The per-operation evidence-requirement table below is lifted from
 // `operation-choice.mjs`'s existing `interpretAssignmentRunResult` branches

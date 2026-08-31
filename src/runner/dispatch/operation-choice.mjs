@@ -371,7 +371,13 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
             hasDirtyBeforeMutation: Array.isArray(runResult.evidence?.mutatedDirtyBeforeFiles)
               ? runResult.evidence.mutatedDirtyBeforeFiles.length > 0
               : false,
-            isReadOnlyOperation: isReadOnlyAssignment(asgn),
+            isReadOnlyOperation: isReadOnlyAssignment({
+              ...asgn,
+              mutation:
+                asgn.mutation === 'read-only' || asgn.mutation === 'mutating'
+                  ? asgn.mutation
+                  : fallbackMutationForAssignment(asgn),
+            }),
             repoRoot,
           });
           const settlesAdvance =
@@ -1595,6 +1601,27 @@ function fallbackResultKindForOperation(operation) {
   if (typeof operation !== 'string' || !operation) return undefined;
   try {
     return stampDeclaredAssignment({ operation }).resultKind;
+  } catch {
+    return undefined;
+  }
+}
+
+// ADR-006 R7 (P02.4 scope widening): findLatestAssignmentRunResult reads a
+// stored assignment.json back from disk via raw JSON.parse, bypassing
+// buildAssignment()/the normalizer entirely -- so `mutation` is `undefined`
+// on every Assignment reached this way (an assignment.json written before
+// the field existed, or any other reason it might be absent). This is the
+// same read-back gap R5 already solved for `resultKind` above via
+// fallbackResultKindForOperation; mirrors that exact pattern for `mutation`:
+// derive the SAME value assignment-normalizer.mjs would stamp for this
+// role/operation pair, from that module's own single source of truth --
+// never a second, independently hand-maintained table that could drift
+// from it.
+function fallbackMutationForAssignment(asgn) {
+  const operation = asgn?.operation;
+  if (typeof operation !== 'string' || !operation) return undefined;
+  try {
+    return stampDeclaredAssignment({ role: asgn?.role, operation }).mutation;
   } catch {
     return undefined;
   }

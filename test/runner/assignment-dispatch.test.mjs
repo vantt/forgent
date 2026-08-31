@@ -351,6 +351,38 @@ test('dispatch CLI execute subcommand with --assignment executes assignment and 
   assert.equal(parsed.confidence, 'reported');
 });
 
+test('dispatch CLI execute subcommand refuses a mutating, missionId-bearing assignment.json (mission-refusal gate restored for cli.mjs execute)', () => {
+  const tempDir = mkTempDir();
+
+  const assignment = buildAssignment({
+    workId: 'tsk-cli-mission-refuse',
+    missionId: 'mission_cli_refuse_test',
+    stage: 'executing',
+    operation: 'implement-item',
+  });
+  assert.equal(assignment.mutation, 'mutating');
+  assert.equal(assignment.missionId, 'mission_cli_refuse_test');
+
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  fs.mkdirSync(asgnDir, { recursive: true });
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [dispatchScript, 'execute', '--assignment', assignment.assignmentId, '--cwd', tempDir],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /mission-lite mode.*strictly read-only/i);
+      return true;
+    },
+  );
+});
+
 test('compileDispatchPlan and executeAssignment respect cliOverride.preferExecutor without dispatch plan mismatch (Finding P2 fix)', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);

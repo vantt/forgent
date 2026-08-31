@@ -141,6 +141,174 @@ test('workId:null assignment works for read-only operation in mission-lite', asy
   assert.equal(threadMsgs[1].resultRef, `results/${assignment.assignmentId}.json`);
 });
 
+test('runMissionAssignment by string ID backfills mutation for a legacy assignment.json missing the field (ADR-006 R7 gap)', async () => {
+  const tempDir = mkTempDir();
+
+  createMission(
+    {
+      missionId: 'mission_legacy_string_id_test',
+      objective: 'Evaluate reviewer assignment for planning validation.',
+    },
+    { cwd: tempDir },
+  );
+
+  const executorScript = path.join(tempDir, 'mock-researcher.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    const asgnDir = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(asgnDir)) {
+      for (const a of fs.readdirSync(asgnDir)) {
+        const runDir = path.join(asgnDir, a, 'runs', '01');
+        if (fs.existsSync(runDir)) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Background Brief\\nFound existing code paths.\\n');
+          fs.writeFileSync(
+            path.join(runDir, 'agent-result.json'),
+            JSON.stringify({ status: 'done', summary: 'Background evidence gathered', evidenceRefs: ['docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md'] })
+          );
+        }
+      }
+    }
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: { command: process.execPath, args: [executorScript, '{prompt}'], allowCrossProvider: true },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = createMissionAssignment(
+    {
+      missionId: 'mission_legacy_string_id_test',
+      stage: 'planning',
+      operation: 'resolve-question',
+      role: 'researcher',
+      objective: 'Gather facts and existing code paths for planning validation.',
+    },
+    { cwd: tempDir },
+  );
+
+  assert.equal(assignment.mutation, 'read-only');
+
+  // Simulate an assignment.json persisted before ADR-006 R2 added the
+  // `mutation`/`resultKind`/`evidence`/`onAdvance` stamps -- strip them
+  // from the stored file, then invoke by STRING assignmentId so
+  // runMissionAssignment must read the raw (unbackfilled) object back
+  // from disk itself.
+  const assignmentFile = path.join(
+    tempDir,
+    '.fgos',
+    'missions',
+    'mission_legacy_string_id_test',
+    'assignments',
+    `${assignment.assignmentId}.json`,
+  );
+  const legacyAssignment = JSON.parse(fs.readFileSync(assignmentFile, 'utf8'));
+  delete legacyAssignment.mutation;
+  delete legacyAssignment.resultKind;
+  delete legacyAssignment.evidence;
+  delete legacyAssignment.onAdvance;
+  fs.writeFileSync(assignmentFile, `${JSON.stringify(legacyAssignment, null, 2)}\n`);
+
+  const result = await runMissionAssignment('mission_legacy_string_id_test', assignment.assignmentId, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+  });
+
+  assert.equal(result.status, 'done');
+  assert.equal(result.confidence, 'reported');
+});
+
+test('runMissionAssignment (object form, already-backfilled) is still refused by a stale mutation-less shadow assignment.json at the same assignmentId, unless executeAssignment itself backfills (ADR-006 R7, P02.4 Red-Team HIGH fix)', async () => {
+  const tempDir = mkTempDir();
+
+  createMission(
+    {
+      missionId: 'mission_shadow_file_test',
+      objective: 'Evaluate reviewer assignment for planning validation.',
+    },
+    { cwd: tempDir },
+  );
+
+  const executorScript = path.join(tempDir, 'mock-researcher.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    const asgnDir = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(asgnDir)) {
+      for (const a of fs.readdirSync(asgnDir)) {
+        const runDir = path.join(asgnDir, a, 'runs', '01');
+        if (fs.existsSync(runDir)) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Background Brief\\nFound existing code paths.\\n');
+          fs.writeFileSync(
+            path.join(runDir, 'agent-result.json'),
+            JSON.stringify({ status: 'done', summary: 'Background evidence gathered' })
+          );
+        }
+      }
+    }
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: { command: process.execPath, args: [executorScript, '{prompt}'], allowCrossProvider: true },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  // The mission's own assignment.json copy is built fresh, correctly stamped
+  // (mutation: 'read-only'), and NEVER touched by this test.
+  const assignment = createMissionAssignment(
+    {
+      missionId: 'mission_shadow_file_test',
+      stage: 'planning',
+      operation: 'resolve-question',
+      role: 'researcher',
+      objective: 'Gather facts and existing code paths for planning validation.',
+    },
+    { cwd: tempDir },
+  );
+  assert.equal(assignment.mutation, 'read-only');
+
+  // Pre-seed a STALE, mutation-less shadow copy directly at the path
+  // executeAssignment's own effectiveAssignment re-read owns
+  // (.fgos/assignments/<assignmentId>/assignment.json) -- simulating
+  // leftover state from a version predating the `mutation` field. This is a
+  // DIFFERENT file than the mission's own assignments/<id>.json copy above.
+  const shadowDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  fs.mkdirSync(shadowDir, { recursive: true });
+  const shadowAssignment = { ...assignment };
+  delete shadowAssignment.mutation;
+  delete shadowAssignment.resultKind;
+  delete shadowAssignment.evidence;
+  delete shadowAssignment.onAdvance;
+  fs.writeFileSync(path.join(shadowDir, 'assignment.json'), `${JSON.stringify(shadowAssignment, null, 2)}\n`);
+
+  // Called with the OBJECT form (not string) -- mission-lite.mjs's own
+  // fallbackMutationForAssignment backfill is a complete no-op here since
+  // `assignment.mutation` is already 'read-only' going in. Only a backfill
+  // inside executeAssignment itself (assignment-runner.mjs) can prevent the
+  // stale shadow file from causing a false-positive refusal.
+  const result = await runMissionAssignment('mission_shadow_file_test', assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+  });
+
+  assert.equal(result.status, 'done');
+  assert.equal(result.confidence, 'reported');
+});
+
 test('mutating mission-lite assignment is refused', async () => {
   const tempDir = mkTempDir();
 

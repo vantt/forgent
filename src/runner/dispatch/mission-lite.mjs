@@ -18,6 +18,7 @@ import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../pa
 import { RunnerConfigError } from './config.mjs';
 import { buildAssignment, isReadOnlyAssignment } from './assignment.mjs';
 import { executeAssignment } from './assignment-runner.mjs';
+import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 
 /**
  * Resolve root and missions directory for a given workspace.
@@ -287,6 +288,25 @@ export function createMissionAssignment(
   return assignment;
 }
 
+// ADR-006 R7 (P02.4 Review HIGH fix): runMissionAssignment's string-ID
+// branch reads a stored assignment.json back from disk via raw JSON.parse,
+// bypassing buildAssignment()/the normalizer entirely -- so `mutation` is
+// `undefined` on any assignment.json written before that field existed (or
+// otherwise missing it). This mirrors the exact read-back gap already fixed
+// for `findLatestAssignmentRunResult` in operation-choice.mjs: derive the
+// SAME value assignment-normalizer.mjs would stamp for this role/operation
+// pair, from that module's own single source of truth -- never a second,
+// independently hand-maintained table that could drift from it.
+function fallbackMutationForAssignment(asgn) {
+  const operation = asgn?.operation;
+  if (typeof operation !== 'string' || !operation) return undefined;
+  try {
+    return stampDeclaredAssignment({ role: asgn?.role, operation }).mutation;
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * Execute a mission-lite assignment through the hardened Assignment/RunResult path (Step 07 §7).
  *
@@ -311,7 +331,18 @@ export async function runMissionAssignment(missionId, assignmentOrId, opts = {})
     assignment = Object.freeze(JSON.parse(fs.readFileSync(assignmentPath, 'utf8')));
   }
 
-  // Step 07 §7: Refuse mutating operations in mission-lite.
+  // Step 07 §7: Refuse mutating operations in mission-lite. Backfill
+  // `mutation` for a raw disk read-back (assignment.json predating the
+  // field) instead of calling isReadOnlyAssignment on the unbackfilled
+  // object directly -- see fallbackMutationForAssignment above. The
+  // backfilled object (never the original mutated in place) is what
+  // flows into executeAssignment below too, so its own internal legality
+  // gate sees the same derived, correct `mutation` value.
+  const effectiveMutation =
+    assignment.mutation === 'read-only' || assignment.mutation === 'mutating'
+      ? assignment.mutation
+      : fallbackMutationForAssignment(assignment);
+  assignment = Object.freeze({ ...assignment, mutation: effectiveMutation });
   if (!isReadOnlyAssignment(assignment)) {
     throw new RunnerConfigError(
       `cannot execute mutating operation "${assignment.operation}" (role: "${assignment.role}") in mission-lite mode — mission-lite is strictly read-only`,

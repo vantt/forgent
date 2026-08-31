@@ -184,28 +184,57 @@ test('renderAssignmentPrompt includes concrete result artifact paths when runDir
   assert.ok(prompt.includes(path.join(runDir, 'agent-report.md')), 'prompt must contain absolute agent-report.md path');
 });
 
-test('isReadOnlyAssignment classifies reviewer/researcher/advisor as read-only (Step 04 §5.4)', () => {
+test('isReadOnlyAssignment reads the stamped mutation field directly, not role/operation (ADR-006 R7)', () => {
+  // Same role/operation pairs the pre-R7 heuristic classified from directly,
+  // now passed with the `mutation` field a real buildAssignment() call would
+  // have stamped for that pair (assignment-normalizer.mjs's
+  // classifyDeclaredMutation). isReadOnlyAssignment must key off `mutation`
+  // alone and reach the identical outcome for every pair.
   const cases = [
-    { role: 'reviewer', operation: 'validate-plan', expected: true },
-    { role: 'reviewer', operation: 'review-item', expected: true },
-    { role: 'researcher', operation: 'resolve-question', expected: true },
-    { role: 'researcher', operation: 'scout-blast-radius', expected: true },
-    { role: 'advisor', operation: 'answer-question', expected: true },
-    { role: 'implementer', operation: 'implement-item', expected: false },
-    { role: 'implementer', operation: 'fix-verify-red', expected: false },
-    { role: 'helper', operation: 'scoped-subtask', expected: false },
+    { role: 'reviewer', operation: 'validate-plan', mutation: 'read-only', expected: true },
+    { role: 'reviewer', operation: 'review-item', mutation: 'read-only', expected: true },
+    { role: 'researcher', operation: 'resolve-question', mutation: 'read-only', expected: true },
+    { role: 'researcher', operation: 'scout-blast-radius', mutation: 'read-only', expected: true },
+    { role: 'advisor', operation: 'answer-question', mutation: 'read-only', expected: true },
+    { role: 'implementer', operation: 'implement-item', mutation: 'mutating', expected: false },
+    { role: 'implementer', operation: 'fix-verify-red', mutation: 'mutating', expected: false },
+    { role: 'helper', operation: 'scoped-subtask', mutation: 'mutating', expected: false },
   ];
 
-  for (const { role, operation, expected } of cases) {
-    const result = isReadOnlyAssignment({ role, operation });
-    assert.equal(result, expected, `isReadOnlyAssignment({role:'${role}', operation:'${operation}'}) should be ${expected}`);
+  for (const { role, operation, mutation, expected } of cases) {
+    const result = isReadOnlyAssignment({ role, operation, mutation });
+    assert.equal(
+      result,
+      expected,
+      `isReadOnlyAssignment({role:'${role}', operation:'${operation}', mutation:'${mutation}'}) should be ${expected}`,
+    );
   }
+});
+
+test('isReadOnlyAssignment no longer re-derives classification from role/operation alone (ADR-006 R7)', () => {
+  // Before R7, role alone (READ_ONLY_ROLES) was enough to classify this as
+  // read-only. After R7, isReadOnlyAssignment only reads the stamped
+  // `mutation` field; an Assignment-shaped object missing that stamp is not
+  // read-only regardless of role/operation.
+  assert.equal(isReadOnlyAssignment({ role: 'reviewer', operation: 'validate-plan' }), false);
+  assert.equal(isReadOnlyAssignment({ role: 'researcher', operation: 'resolve-question' }), false);
 });
 
 test('isReadOnlyAssignment returns false for unknown/null assignment (Step 04 §5.4)', () => {
   assert.equal(isReadOnlyAssignment(null), false);
   assert.equal(isReadOnlyAssignment(undefined), false);
   assert.equal(isReadOnlyAssignment({}), false); // defaults to 'implementer'
+});
+
+test('isReadOnlyAssignment no longer infers read-only from missionId/workId:null (ADR-006 R7 heuristic removed)', () => {
+  // Before R7: `assignment.missionId || assignment.workId === null` alone was
+  // sufficient to classify as read-only, regardless of the mutation stamp.
+  // After R7: only `mutation === 'read-only'` counts; a mission-shaped
+  // Assignment stamped mutating is correctly refused as mutating.
+  assert.equal(isReadOnlyAssignment({ workId: null, mutation: 'mutating' }), false);
+  assert.equal(isReadOnlyAssignment({ missionId: 'mission_001', mutation: 'mutating' }), false);
+  // The stamp is still authoritative for the mission-shaped case that IS read-only.
+  assert.equal(isReadOnlyAssignment({ workId: null, missionId: 'mission_001', mutation: 'read-only' }), true);
 });
 
 test('validateAgentResultClaim accepts valid done/blocked/failed/no-evidence claims (Step 04 §5.2)', () => {

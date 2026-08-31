@@ -20,12 +20,10 @@
 //   `resultKind`/`onAdvance`.
 // - renderAssignmentPrompt: renders the standard semantic prompt for workers,
 //   including concrete result artifact paths when runDir is supplied (Step 04).
-// - isReadOnlyAssignment: classifies assignment as read-only or mutating
-//   (Step 04); its role/operation mapping is imported from
-//   ./assignment-normalizer.mjs (ADR-006 R2 single source of truth), but the
-//   function still carries its own extra `missionId || workId === null`
-//   heuristic clause unchanged (ADR-006 §7/R7 retires that clause in a later
-//   cell, not this one).
+// - isReadOnlyAssignment: classifies assignment as read-only or mutating by
+//   reading the `mutation` field stamped once, at build time, by
+//   ./assignment-normalizer.mjs (ADR-006 R2/R7 -- no role/operation/
+//   missionId/workId re-derivation here).
 // - validateAgentResultClaim: validates agent-result.json schema; malformed
 //   claims must produce failed/failed, not no-evidence (Step 04).
 //
@@ -46,8 +44,6 @@ import { RunnerConfigError } from './config.mjs';
 import {
   NORMALIZER_VERSION,
   READ_ONLY_ROLES,
-  KNOWN_MUTATING_OPS,
-  READ_ONLY_OPS,
   stampDeclaredAssignment,
   stampInlineAssignment,
 } from './assignment-normalizer.mjs';
@@ -503,22 +499,22 @@ export function renderAssignmentPrompt(assignment, options = {}) {
 }
 
 /**
- * Classify an assignment as read-only or mutating (Step 04 §5.4 / Step 07 §7).
+ * Classify an assignment as read-only or mutating (Step 04 §5.4 / ADR-006 R7).
  *
- * Initial rule:
- * - reviewer / researcher / advisor => read-only unless operation id is
- *   explicitly known mutating.
- * - implementer / helper => mutating unless taskSpec/operation is read-only
- *   or assignment belongs to mission-lite read-only mode.
+ * Reads the `mutation` field stamped once, at build time, by
+ * `assignment-normalizer.mjs` (`stampDeclaredAssignment` for the declared
+ * shape, `stampInlineAssignment` for the inline shape) — every Assignment
+ * built via `buildAssignment()` carries this field. Does not re-derive
+ * classification from `role`/`operation`/`missionId`/`workId` here; that
+ * classification happens exactly once, at build time.
  *
  * @param {object} assignment Assignment object
  * @returns {boolean} true when the assignment is read-only
  */
 // Roles whose Assignments must only ever produce verdict/report artifacts,
-// never a Work-lifecycle edge or a repo mutation (Step 04 §5.4 / Step 07 §7).
+// never a Work-lifecycle edge or a repo mutation (Step 04 §5.4).
 // Hoisted to module scope (was function-local) so a dispatch-time executor
-// resolution can also gate on it directly, not just isReadOnlyAssignment's
-// broader read-only classification below.
+// resolution can also gate on it directly.
 //
 // Defined in assignment-normalizer.mjs (ADR-006 R2 single source of truth
 // for the declared mutation mapping) and re-exported here unchanged so this
@@ -527,15 +523,7 @@ export { READ_ONLY_ROLES };
 
 export function isReadOnlyAssignment(assignment) {
   if (!assignment || typeof assignment !== 'object') return false;
-  const role = assignment.role ?? 'implementer';
-  const op = assignment.operation ?? '';
-  if (KNOWN_MUTATING_OPS.has(op)) {
-    return false;
-  }
-  if (READ_ONLY_ROLES.has(role) || READ_ONLY_OPS.has(op) || assignment.missionId || assignment.workId === null) {
-    return true;
-  }
-  return false;
+  return assignment.mutation === 'read-only';
 }
 
 // Allowed status values for agent-result.json (Step 04 §5.2).

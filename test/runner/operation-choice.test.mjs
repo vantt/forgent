@@ -5362,6 +5362,45 @@ test('R6/G3: a malformed (non-array) mutatedDirtyBeforeFiles fails safe to hasDi
     'a non-array mutatedDirtyBeforeFiles must fail safe via Array.isArray, never throw or coerce to hasDirtyBeforeMutation: true');
 });
 
+test('ADR-006 R7 (P02.4 mutation backfill): findLatestAssignmentRunResult re-derives mutation from the operation when assignment.json predates the field -- a genuinely read-only validate-plan result is not misclassified as mutating', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r7-mutation-backfill';
+  // seedStoredValidatePlanResult's assignment.json intentionally carries no
+  // `role`/`mutation` field -- the "assignment.json predates the field"
+  // scenario R5 already documented for `resultKind` and this cell now closes
+  // for `mutation` too. No external evidence (no changedFiles, no dirty
+  // mutation) -- a genuinely read-only validate-plan result.
+  const { resultPath, asgnDir } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r7-mutation-backfill',
+    docsRef,
+    withHash: true,
+    withReport: true,
+  });
+  const asgnJson = JSON.parse(fs.readFileSync(path.join(asgnDir, 'assignment.json'), 'utf8'));
+  assert.equal(asgnJson.mutation, undefined, 'fixture precondition: assignment.json carries no mutation field');
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r7-mutation-backfill', docsRef));
+  // Without the backfill, isReadOnlyAssignment(asgn) sees mutation ===
+  // undefined and returns false (R7's own field-only read has no fallback),
+  // misclassifying this genuinely read-only result as mutating --
+  // classifyRunEvidence then falls into the mutating "done" branch
+  // (hasExternalEvidence false) and derives no-evidence/no-evidence,
+  // blocking the edge instead of advancing it. With the backfill, mutation
+  // re-derives to 'read-only' for the validate-plan operation (the same
+  // value assignment-normalizer.mjs would have stamped at build time), and
+  // the reported claim + bound report correctly advances the edge.
+  assert.equal(choice.canAdvanceEdge, true,
+    'a stored validate-plan result with no persisted mutation field must still classify read-only via the operation-derived backfill');
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge',
+    'the mutation backfill must let a genuinely read-only cross-pass result advance the edge, not misclassify it as mutating no-evidence');
+});
+
 // ---------------------------------------------------------------------------
 // ADR-006 R5: interpretAssignmentRunResult/findLatestAssignmentRunResult
 // dispatch on the Assignment's own stamped fields, not the operation id;
