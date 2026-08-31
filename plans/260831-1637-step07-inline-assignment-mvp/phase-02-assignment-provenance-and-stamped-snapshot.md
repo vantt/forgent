@@ -13,6 +13,9 @@ interpretation field-driven while keeping declared behavior byte-for-byte.
   Declared: `{ domain, workflow, stage, operation, taskSpec }` under
   `provenance.declared`. Inline: `{ contract, caller: { writerId, parentAssignmentId? } }`
   under `provenance.inline`. `writerId` from `src/util/session-identity.mjs`.
+  P02.1 validates `writerId`'s FORMAT only (charset/length floor in
+  `execution-contract.mjs`), not real identity; wiring an actual
+  `resolveWriterIdentity()` call at a live caller is R8's job.
 - R2 Normalizer. New pure module `src/runner/dispatch/assignment-normalizer.mjs`
   stamps `mutation` and `evidence.required`:
   - declared: from `READ_ONLY_ROLES`/`KNOWN_MUTATING_OPS` (moved here) and a

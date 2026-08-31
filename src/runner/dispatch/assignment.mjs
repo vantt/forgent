@@ -1,14 +1,31 @@
 // dispatch/assignment.mjs — Assignment builder, ID creation, prompt rendering,
 // read-only classification, and agent-result validation for Team Dispatch V1
-// (Step 01 / Step 03 / Step 04).
+// (Step 01 / Step 03 / Step 04), plus the ADR-006 R1/R4 provenance/inline
+// build path (Step 07 Phase 02).
 //
 // Pure data module:
-// - createAssignmentId: deterministic asgn_<work>_<op>_<seq> generator.
-// - buildAssignment: converts one declared stage operation into an Assignment;
-//   refuses operations whose taskSpec file does not resolve on disk (Step 04).
+// - createAssignmentId: deterministic asgn_<work>_<op>_<seq> generator; falls
+//   back to a caller.writerId-derived token, then 'nowork', when no workId or
+//   missionId is present (ADR-006 R4, the inline no-Work-attached case).
+// - buildAssignment: dispatches on shape. The DECLARED shape
+//   ({ stage, operation, ... }, unchanged) converts one declared stage
+//   operation into an Assignment; refuses operations whose taskSpec file
+//   does not resolve on disk (Step 04). The INLINE shape
+//   ({ provenance: { kind: 'inline', contract, caller } }, ADR-006 R4)
+//   validates an agent-proposed execution contract via
+//   ./execution-contract.mjs and builds an Assignment straight from it, no
+//   domain/workflow/stage/operation/taskSpec involved. Both shapes stamp
+//   `provenance`/`mutation`/`evidence` via ./assignment-normalizer.mjs
+//   (ADR-006 R1/R2); the declared shape additionally stamps
+//   `resultKind`/`onAdvance`.
 // - renderAssignmentPrompt: renders the standard semantic prompt for workers,
 //   including concrete result artifact paths when runDir is supplied (Step 04).
-// - isReadOnlyAssignment: classifies assignment as read-only or mutating (Step 04).
+// - isReadOnlyAssignment: classifies assignment as read-only or mutating
+//   (Step 04); its role/operation mapping is imported from
+//   ./assignment-normalizer.mjs (ADR-006 R2 single source of truth), but the
+//   function still carries its own extra `missionId || workId === null`
+//   heuristic clause unchanged (ADR-006 §7/R7 retires that clause in a later
+//   cell, not this one).
 // - validateAgentResultClaim: validates agent-result.json schema; malformed
 //   claims must produce failed/failed, not no-evidence (Step 04).
 //
@@ -26,6 +43,15 @@ import {
   resolveTaskSpecPath,
 } from '../../state/workflow-stage-graphs.mjs';
 import { RunnerConfigError } from './config.mjs';
+import {
+  NORMALIZER_VERSION,
+  READ_ONLY_ROLES,
+  KNOWN_MUTATING_OPS,
+  READ_ONLY_OPS,
+  stampDeclaredAssignment,
+  stampInlineAssignment,
+} from './assignment-normalizer.mjs';
+import { CONTRACT_POLICY_VERSION, validateExecutionContract } from './execution-contract.mjs';
 
 /**
  * Sanitize a string token for use in assignment / run IDs.
@@ -44,12 +70,21 @@ function sanitizeToken(token) {
  * @param {string} [params.missionId] Mission id (e.g. 'mission_001')
  * @param {string} [params.stage] Stage name
  * @param {string} params.operation Operation id (e.g. 'validate-plan')
+ * @param {{writerId?: string}} [params.caller] Inline caller provenance (ADR-006 R4);
+ *   `caller.writerId` names the id when neither `workId` nor `missionId` is present
+ *   (the inline, no-Work-attached case) instead of the bare 'nowork' literal.
  * @param {string[]|Set<string>} [params.existingIds] Existing assignment IDs to avoid collision
  * @param {string} [params.assignmentsDir] Directory containing existing assignment folders
  * @returns {string} e.g. 'asgn_tsk_abc_validate_plan_001'
  */
-export function createAssignmentId({ workId, missionId, stage, operation, existingIds = [], assignmentsDir }) {
-  const safeWork = workId ? sanitizeToken(workId) : (missionId ? sanitizeToken(missionId) : 'nowork');
+export function createAssignmentId({ workId, missionId, stage, operation, caller, existingIds = [], assignmentsDir }) {
+  const safeWork = workId
+    ? sanitizeToken(workId)
+    : missionId
+      ? sanitizeToken(missionId)
+      : caller?.writerId
+        ? sanitizeToken(String(caller.writerId))
+        : 'nowork';
   const safeOp = sanitizeToken(operation || stage || 'op');
   const prefix = `asgn_${safeWork}_${safeOp}_`;
 
@@ -119,7 +154,30 @@ export function createAssignmentId({ workId, missionId, stage, operation, existi
  * @param {object} [params.options] Optional execution / lookup options
  * @returns {Readonly<object>} Frozen Assignment object
  */
-export function buildAssignment({
+// `buildInlineAssignment`'s actual accepted top-level params (kept in sync
+// with its destructuring signature below: `{ provenance, work, workId,
+// createdBy, options }`). Any OTHER top-level key on `params` when
+// `provenance.kind === 'inline'` is a declared-shape field silently riding
+// along -- rejected below by whitelist rather than by naming each declared
+// field individually, so this closes the whole class of bug (any
+// declared-only field, present or future) instead of needing a new named
+// exception every time another one is discovered.
+const INLINE_ASSIGNMENT_PARAM_WHITELIST = new Set(['provenance', 'work', 'workId', 'createdBy', 'options']);
+
+export function buildAssignment(params = {}) {
+  if (params?.provenance?.kind === 'inline') {
+    const conflicting = Object.keys(params).filter((key) => !INLINE_ASSIGNMENT_PARAM_WHITELIST.has(key));
+    if (conflicting.length > 0) {
+      throw new RunnerConfigError(
+        `buildAssignment: inline provenance cannot be combined with declared-shape field(s): ${conflicting.join(', ')}`,
+      );
+    }
+    return buildInlineAssignment(params);
+  }
+  return buildDeclaredAssignment(params);
+}
+
+function buildDeclaredAssignment({
   work,
   workId,
   missionId,
@@ -240,6 +298,17 @@ export function buildAssignment({
     Array.isArray(expectedFiles) ? expectedFiles.filter((f) => typeof f === 'string' && f.trim() !== '') : [],
   );
 
+  // ADR-006 R1/R2: stamp provenance + the normalized mutation/evidence
+  // snapshot. Declared legality (workflow/stage/operation + taskSpec
+  // resolution) already ran above; this only records WHICH validators ran
+  // and what the normalizer derived from role/operation -- it does not
+  // change any branch above (Step 02-06 golden behavior is unaffected).
+  const stamped = stampDeclaredAssignment({ role: targetRole, operation: matchedOp.id });
+  const provenanceValidators = Object.freeze([
+    'workflow-stage-graph-legality',
+    ...(options.allowSyntheticCompatibilityOperation ? [] : ['task-spec-existence']),
+  ]);
+
   const assignment = {
     assignmentId,
     workId: resolvedWorkId,
@@ -260,6 +329,111 @@ export function buildAssignment({
     ...(mergedPolicy ? { policy: mergedPolicy } : {}),
     createdAt: options.createdAt ?? new Date().toISOString(),
     ...(createdBy ? { createdBy } : {}),
+    provenance: Object.freeze({
+      kind: 'declared',
+      contractPolicyVersion: CONTRACT_POLICY_VERSION,
+      normalizerVersion: NORMALIZER_VERSION,
+      validators: provenanceValidators,
+      declared: Object.freeze({
+        domain: resolvedDomain,
+        workflow: resolvedWorkflow,
+        stage,
+        operation: matchedOp.id,
+        taskSpec: matchedOp.taskSpec,
+      }),
+    }),
+    mutation: stamped.mutation,
+    evidence: stamped.evidence,
+    resultKind: stamped.resultKind,
+    ...(stamped.onAdvance ? { onAdvance: stamped.onAdvance } : {}),
+  };
+
+  return Object.freeze(assignment);
+}
+
+/**
+ * Convert an agent-proposed inline execution contract into an immutable
+ * Assignment object (ADR-006 R4, second `buildAssignment()` accepted shape).
+ *
+ * Unlike the declared path, no domain/workflow/stage/operation/taskSpec
+ * legality exists to check -- the contract itself IS the request, validated
+ * against ADR-006 §4's minimum field set by `execution-contract.mjs`
+ * (`mutation: 'mutating'` and any session/coordination field are rejected
+ * fail-closed there, ADR-006 §6). `provenance.inline.caller.writerId` is
+ * whatever the caller passed in; ADR-006 R1 says that value is expected to
+ * come from `resolveWriterIdentity()` (src/util/session-identity.mjs) --
+ * this module does not call it itself, since resolving a writer identity is
+ * a caller-side (session-aware) concern, not a build-time (pure) one.
+ *
+ * @param {object} params
+ * @param {object} params.provenance `{ kind: 'inline', contract, caller }`
+ * @param {object} [params.work] Optional work item to attach (not required for inline)
+ * @param {string} [params.workId] Optional work item id (if work object omitted)
+ * @param {string} [params.createdBy] Identity of creator
+ * @param {object} [params.options] Optional execution / lookup options
+ * @returns {Readonly<object>} Frozen Assignment object
+ */
+function buildInlineAssignment({ provenance, work, workId, createdBy, options = {} }) {
+  const { contract, caller } = provenance ?? {};
+
+  validateExecutionContract({ contract, caller });
+
+  const stamped = stampInlineAssignment(contract);
+
+  const resolvedWorkId = work?.id ?? workId ?? null;
+
+  const existingIds = options.existingIds ?? [];
+  const assignmentId = createAssignmentId({
+    workId: resolvedWorkId,
+    caller,
+    existingIds,
+    assignmentsDir: options.assignmentsDir,
+  });
+
+  const frozenContextRefs = Object.freeze([...contract.contextRefs]);
+  const frozenExpectedOutputs = Object.freeze([...contract.expectedOutputs]);
+  const frozenConstraints = Object.freeze([...contract.constraints]);
+  const frozenCapabilities = Object.freeze(Array.isArray(contract.capabilities) ? [...contract.capabilities] : []);
+  const frozenBudget = Object.freeze({ ...contract.budget });
+  const frozenEvidence = Object.freeze({ ...contract.evidence });
+
+  const frozenContract = Object.freeze({
+    objective: contract.objective,
+    contextRefs: frozenContextRefs,
+    constraints: frozenConstraints,
+    expectedOutputs: frozenExpectedOutputs,
+    mutation: contract.mutation,
+    evidence: frozenEvidence,
+    role: contract.role,
+    capabilities: frozenCapabilities,
+    budget: frozenBudget,
+  });
+
+  const frozenCaller = Object.freeze({
+    writerId: caller.writerId,
+    ...(caller.parentAssignmentId ? { parentAssignmentId: caller.parentAssignmentId } : {}),
+  });
+
+  const assignment = {
+    assignmentId,
+    workId: resolvedWorkId,
+    role: contract.role,
+    dispatch: 'assignment',
+    objective: contract.objective,
+    contextRefs: frozenContextRefs,
+    expectedOutputs: frozenExpectedOutputs,
+    expectedFiles: Object.freeze([]),
+    createdAt: options.createdAt ?? new Date().toISOString(),
+    ...(createdBy ? { createdBy } : {}),
+    provenance: Object.freeze({
+      kind: 'inline',
+      contractPolicyVersion: CONTRACT_POLICY_VERSION,
+      normalizerVersion: NORMALIZER_VERSION,
+      validators: Object.freeze(['execution-contract-schema']),
+      inline: Object.freeze({ contract: frozenContract, caller: frozenCaller }),
+    }),
+    mutation: stamped.mutation,
+    evidence: stamped.evidence,
   };
 
   return Object.freeze(assignment);
@@ -345,20 +519,14 @@ export function renderAssignmentPrompt(assignment, options = {}) {
 // Hoisted to module scope (was function-local) so a dispatch-time executor
 // resolution can also gate on it directly, not just isReadOnlyAssignment's
 // broader read-only classification below.
-export const READ_ONLY_ROLES = new Set(['reviewer', 'researcher', 'advisor']);
+//
+// Defined in assignment-normalizer.mjs (ADR-006 R2 single source of truth
+// for the declared mutation mapping) and re-exported here unchanged so this
+// module's public surface is unaffected.
+export { READ_ONLY_ROLES };
 
 export function isReadOnlyAssignment(assignment) {
   if (!assignment || typeof assignment !== 'object') return false;
-  const KNOWN_MUTATING_OPS = new Set(['implement-item', 'fix-verify-red', 'scoped-subtask']);
-  const READ_ONLY_OPS = new Set([
-    'validate-plan',
-    'resolve-question',
-    'scout-blast-radius',
-    'shape-plan',
-    'lock-decisions',
-    'judge-ambiguity',
-    'compound-learn',
-  ]);
   const role = assignment.role ?? 'implementer';
   const op = assignment.operation ?? '';
   if (KNOWN_MUTATING_OPS.has(op)) {

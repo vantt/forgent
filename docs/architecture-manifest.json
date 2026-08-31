@@ -26,6 +26,8 @@
     "src/runner/dispatch/prepare.mjs": "infra",
     "src/runner/dispatch/result-ladder.mjs": "infra",
     "src/runner/dispatch/assignment.mjs": "infra",
+    "src/runner/dispatch/assignment-normalizer.mjs": "infra",
+    "src/runner/dispatch/execution-contract.mjs": "infra",
     "src/runner/dispatch/assignment-policy.mjs": "infra",
     "src/runner/dispatch/assignment-runner.mjs": "infra",
     "src/runner/dispatch/cli.mjs": "infra",
