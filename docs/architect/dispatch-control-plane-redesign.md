@@ -1,8 +1,12 @@
 # Dispatch Control Plane Redesign
 
-Canonical document moved to:
+Canonical architecture moved to:
 
-`docs/architect/agent-coordination/dispatch-control-plane-redesign.md`
+`docs/architect/agent-coordination/architecture/dispatch-control-plane.md`
+
+The unresolved redesign source is retained at:
+
+`docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md`
 
 For the full related architecture set, start at:
 

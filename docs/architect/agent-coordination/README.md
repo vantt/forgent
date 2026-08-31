@@ -1,77 +1,123 @@
-# Agent Coordination Architecture
+# Agent Coordination Documentation
 
-This folder groups the architecture notes for fgOS multi-agent coordination:
-team strategy, work/flow vocabulary, dispatch control, runtime evidence, and
-Herdr visibility.
+Document type: Portal
+Design status: Accepted
+Implementation: Partial
+Last reviewed: 2026-08-31
+Canonical for: navigation only
 
-## Reading Order
+## Purpose
 
-1. [orchestration-vocabulary-map.md](orchestration-vocabulary-map.md) - canonical terms and layer boundaries.
-2. [dispatch-control-plane-redesign.md](dispatch-control-plane-redesign.md) - how one selected target resolves to
-   executor, mechanism, governance, adapter, and result handling.
-3. [step-00-team-dispatch-v1-overview.md](step-00-team-dispatch-v1-overview.md) - the small implementation
-   profile for team dispatch through existing workflow config and cli-spawn.
-4. [step-01-team-dispatch-v1-rollout.md](step-01-team-dispatch-v1-rollout.md) - staged rollout from current code to team dispatch.
-5. [step-02-workflow-stage-operations.md](step-02-workflow-stage-operations.md) - workflow operations schema, lookup, and validation.
-6. [step-03-assignment-runresult.md](step-03-assignment-runresult.md) - assignment, run, and RunResult execution evidence.
-7. [team-communication-protocol-v1.md](team-communication-protocol-v1.md) - role-to-role communication protocol for
-   stage operations, assignments, claims, and evidence.
-8. [step-04-assignment-runresult-hardening.md](step-04-assignment-runresult-hardening.md) - harden assignment execution so
-   RunResult confidence cannot false-pass from stale or missing evidence.
-9. [step-05-coding-driver-operation-choice.md](step-05-coding-driver-operation-choice.md) - make the coding driver choose
-   legal stage operations without replacing the Work lifecycle.
-10. [step-06-work-attached-team-adoption.md](step-06-work-attached-team-adoption.md) - adopt team dispatch on real
-   work-attached planning/executing scenarios.
-11. [step-07-mission-lite-brainstorm-debate.md](step-07-mission-lite-brainstorm-debate.md) - introduce mission-lite
-   read-only brainstorming/debate after Work-attached evidence is stable.
-12. [agent-team-dispatch-and-herdr-stability.md](agent-team-dispatch-and-herdr-stability.md) - Herdr stability, visibility,
-   and evidence discipline for interactive/visible execution.
+This documentation describes how fgOS coordinates agents across providers,
+models, tiers, roles, capabilities, and execution mechanisms while preserving
+Work lifecycle authority and evidence integrity.
 
-## Core Map
+The documentation is organized by authority. Canonical vocabulary and accepted
+architecture are separated from proposals, implementation roadmaps,
+verification evidence, playbooks, and history.
+
+Read [Documentation Governance](documentation-governance.md) before changing
+definitions, statuses, or document placement.
+
+## Start Here
+
+### Understand The System
+
+1. [Vocabulary](vocabulary/README.md)
+2. [System Context](architecture/system-context.md)
+3. [Protocol Model](architecture/protocol-model.md)
+4. [Runtime Model](architecture/runtime-model.md)
+5. [Work Integration](architecture/work-integration.md)
+6. [Dispatch Control Plane](architecture/dispatch-control-plane.md)
+7. [Evidence And Results](architecture/evidence-and-results.md)
+8. [Visibility And Herdr](architecture/visibility-and-herdr.md)
+
+### Implement Or Review Current Contracts
+
+1. [Workflow Stage Operation Contract](contracts/workflow-stage-operation.md)
+2. [Assignment, Run, And RunResult Contract](contracts/assignment-run-runresult.md)
+3. [Architecture Decisions](decisions/README.md)
+4. [Team Dispatch V1 Verification](verification/team-dispatch-v1/index.md)
+
+### Continue The Design Discussion
+
+1. [Step 07: CoordinationSession And AdhocTask](proposals/step-07-coordination-session-adhoc-task.md)
+2. [Step 08: Standalone Coordination Protocols](proposals/step-08-standalone-coordination-protocols.md)
+3. [Team Communication Protocol V1](proposals/team-communication-protocol-v1.md)
+4. [Dispatch Control Plane Redesign](proposals/dispatch-control-plane-redesign.md)
+
+## Documentation Areas
+
+| Area | Authority | Contents |
+|---|---|---|
+| [`vocabulary/`](vocabulary/README.md) | Canonical terminology | Terms, relationships, aliases, reserved/deprecated vocabulary. |
+| [`architecture/`](architecture/README.md) | Accepted design | System boundaries, responsibilities, trust model, and invariants. |
+| [`contracts/`](contracts/README.md) | Accepted behavior | Machine-visible schemas, normalization, validation, state, and evidence rules. |
+| [`decisions/`](decisions/README.md) | Accepted decisions | ADRs with context, decision, and consequences. |
+| [`proposals/`](proposals/README.md) | Non-canonical | Discussion drafts and target designs awaiting approval. |
+| [`roadmap/`](roadmap/README.md) | Implementation sequence | Numbered Steps, files, tests, rollout, and acceptance plans. |
+| [`verification/`](verification/README.md) | Conformance evidence | Traceability, tests, negative cases, review, red-team, and live proof. |
+| [`playbooks/`](playbooks/README.md) | Engineering bootstrap only | Manual coordinator/doer/reviewer workflows and fallback procedures; never a runtime dependency. |
+| [`history/`](history/README.md) | Non-canonical history | Brainstorms, superseded plans, and pre-migration source material. |
+
+## Current Accepted Baseline
+
+Team Dispatch V1 currently establishes:
+
+- Work as the sole delivery lifecycle authority;
+- Workflow Stage Operations with `stage.skill`/`stage.taskSpec` primary
+  compatibility;
+- operation normalization, lookup, and setup/doctor validation;
+- Assignment as semantic request;
+- governed dispatch and CLI-spawn execution;
+- Run as one attempt and RunResult as normalized outcome/evidence;
+- driver selection of bounded legal Stage Operations;
+- Work-attached adoption for selected planning/executing operations;
+- Herdr as visibility rather than truth;
+- Job reserved for a future scheduler.
+
+## Active Design Frontier
+
+The next design frontier remains intentionally non-canonical:
 
 ```txt
-Mission -> Work -> Workflow -> Stage -> Stage Protocol -> Stage Operation -> Assignment -> Dispatch -> Runtime -> Evidence -> Visibility
+Step 07
+  CoordinationSession
+  AdhocTask graph
+  planning materialization
+  lifecycle versus isolation
+  Work integration and branch topology
+
+Step 08
+  Work-independent coordination
+  research / consult / brainstorm / debate
+  leader-worker and peer communication
+  protocol graph and synthesis
+  migration of the mission-lite prototype
 ```
 
-## Coordination Rings
+Step 07 and Step 08 are discussion drafts. Their proposed entities and schemas
+must not be treated as accepted contracts until promoted according to
+[Documentation Governance](documentation-governance.md).
+
+## Core Invariants
 
 ```txt
-Strategic ring  = Orchestrator
-Activation ring = Launcher
-Flow ring       = Router + Driver
-Execution ring  = Dispatcher
+Work owns delivery lifecycle.
+Protocol definition constrains legal operations.
+Assignment carries semantic intent.
+Dispatch governs execution infrastructure.
+Run records one attempt.
+RunResult records normalized outcome and evidence.
+Herdr provides visibility only.
 ```
 
-## Principle
+## Maintenance Rules
 
-```txt
-fgOS dispatches runs.
-Executors perform assignments.
-Herdr shows the run.
-Evidence proves the outcome.
-AgentMessage carries meaning between roles.
-```
-
-## First Implementation Slice
-
-Start with [step-02-workflow-stage-operations.md](step-02-workflow-stage-operations.md):
-
-```txt
-Preserve operations in workflow normalization.
-Add operationsForStage().
-Add operations to coding feature workflow.
-Validate operation taskSpecs, roles, skills, and reasons.
-Keep driver behavior unchanged.
-```
-
-## Post-Merge Implementation Track
-
-The merged V1 baseline has enough code to inspect and execute assignments, but
-the next work should harden evidence before broader adoption:
-
-```txt
-Step 04: prevent false-success RunResults.
-Step 05: teach the coding driver to choose declared operations.
-Step 06: use the operation path on real Work-attached scenarios.
-Step 07: only then try mission-lite brainstorming/debate without Work.
-```
+- Update vocabulary before introducing a new canonical term.
+- Record durable boundary decisions with an ADR.
+- Keep numbered Steps in roadmap/proposals, not canonical architecture.
+- Keep prompts out of architecture and contracts.
+- Keep test/live-run output in verification.
+- Mark historical sources as non-canonical instead of deleting rationale.
+- Check all local links after moving documents.

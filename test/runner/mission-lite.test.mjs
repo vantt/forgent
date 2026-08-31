@@ -74,7 +74,7 @@ test('workId:null assignment works for read-only operation in mission-lite', asy
           fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Background Brief\\nFound existing code paths.\\n');
           fs.writeFileSync(
             path.join(runDir, 'agent-result.json'),
-            JSON.stringify({ status: 'done', summary: 'Background evidence gathered', evidenceRefs: ['docs/architect/agent-coordination/step-05-coding-driver-operation-choice.md'] })
+            JSON.stringify({ status: 'done', summary: 'Background evidence gathered', evidenceRefs: ['docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md'] })
           );
         }
       }
@@ -205,7 +205,7 @@ test('no Work item is created or modified during mission-lite execution', async 
           fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nAnalysis complete.\\n');
           fs.writeFileSync(
             path.join(runDir, 'agent-result.json'),
-            JSON.stringify({ status: 'done', summary: 'Read-only debate finding', evidenceRefs: ['docs/architect/agent-coordination/step-07-mission-lite-brainstorm-debate.md'] })
+            JSON.stringify({ status: 'done', summary: 'Read-only debate finding', evidenceRefs: ['docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md'] })
           );
         }
       }
@@ -285,7 +285,7 @@ test('no-evidence role result is not treated as consensus and synthesis cites ro
           fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Research\\nDocs reviewed.\\n');
           fs.writeFileSync(
             path.join(runDir, 'agent-result.json'),
-            JSON.stringify({ status: 'done', summary: 'Prior docs favor waiting for executing stability.', evidenceRefs: ['docs/architect/agent-coordination/step-07-mission-lite-brainstorm-debate.md'] })
+            JSON.stringify({ status: 'done', summary: 'Prior docs favor waiting for executing stability.', evidenceRefs: ['docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md'] })
           );
         }
       }
@@ -407,7 +407,7 @@ test('first business case debate mission runs with three role assignments and pr
           fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Role Report\\n' + summaryText + '\\n');
           fs.writeFileSync(
             path.join(runDir, 'agent-result.json'),
-            JSON.stringify({ status: 'done', summary: summaryText, evidenceRefs: ['docs/architect/agent-coordination/step-07-mission-lite-brainstorm-debate.md'] })
+            JSON.stringify({ status: 'done', summary: summaryText, evidenceRefs: ['docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md'] })
           );
         }
       }
