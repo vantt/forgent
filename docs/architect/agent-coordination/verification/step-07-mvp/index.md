@@ -50,7 +50,7 @@ Noted, not touched by this track: `.agentkit/`, `.claude/agents/*.md`,
 | P02 | R5 | done | P02.2 | `P02.2.md`, commit `d2df76cc` |
 | P02 | R6 (G3) | done | P02.3 | `P02.3.md`, commit `b262ced1` |
 | P02 | R7 | done | P02.4 | `P02.4.md`, commit `cfe60bfb` |
-| P02 | R8 | missing | P02.5 | — |
+| P02 | R8 | done | P02.5 | `P02.5.md`, commit `a77b95ef` |
 | P03 | R1–R2 | missing | P03.1 | — |
 | P03 | R3 | missing | P03.2 | — |
 | P03 | R4–R6 | missing | P03.3 | — |
@@ -111,21 +111,27 @@ Populated in Phase 03 per plan requirement R6.
   returned `runResult` as `.assignment`. Deferred rather than fixed now
   because it touches the return shape of the codebase's highest
   tamper-detection-sensitivity function for a presently zero-impact issue.
+- Code comments and test titles in already-closed, already-committed
+  cells P02.2 and P02.4 carry embedded cell/finding labels (`P02.2`,
+  `P02.4`, `Red-Team HIGH fix`, `Review HIGH fix`) in violation of the
+  master coordinator prompt's own "Stable Code Artifacts" rule (no cell/
+  finding IDs in code comments or test names). Found by P02.5's own
+  Fixer round flagging the same pattern about to be introduced fresh;
+  fixed going forward in P02.5 (not yet committed at the time), but the
+  already-committed instances were NOT retroactively touched (would mean
+  amending closed cells, separately forbidden). Locations:
+  `operation-choice.mjs:1609,1642`, `assignment-runner.mjs:32,603`,
+  `mission-lite.mjs:359`, `assignment-runresult.test.mjs:155`,
+  `operation-choice.test.mjs:5365`. Comment/test-name wording only, zero
+  behavior change — safe cleanup whenever convenient, does not block
+  Phase 03.
 
 ## Active Cell
 
-None. P02.4 closed 2026-08-31 (commit `cfe60bfb`). R7 done — this cell
-grew substantially beyond its original scope: R7's own files, plus 3
-rounds of finding-and-fixing the same "raw read-back bypasses the
-normalizer" bug class at 4 locations (`operation-choice.mjs`,
-`mission-lite.mjs`, `cli.mjs`, and finally the structurally-correct root
-cause in `assignment-runner.mjs`'s `executeAssignment` itself). 2 Review
-rounds, 2 Red-Team rounds, all found real issues, all fixed and
-re-verified. Phase 02 now R1-R7 done; only R8 (P02.5) remains.
+None. Phase 02 (R1-R8) is complete. Next cell (P03.1) not yet prepared.
 
 ## Next Action
 
-Prepare cell P02.5 (R8: mission-lite migration onto the inline path,
-stop copying assignment.json/result JSON into `.fgos/missions/`,
-`validateAssignmentLegality` accepting inline-shaped Assignments — the
-piece this cell's own split explicitly deferred).
+Prepare cell P03.1 — Phase 03 R1-R2 (domain harness seam
+`enrichAndValidateContract` + the non-driving rule: inline RunResults never
+drive Stage transitions).
