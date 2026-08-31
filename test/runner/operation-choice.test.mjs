@@ -5222,6 +5222,146 @@ test('reviewer LOW: a stored failed result from a read-only dirty mutation never
   assert.equal(choice.reason, 'validation-failed-do-not-advance-work', 'the lost dirty-mutation fact may not upgrade the recorded failed verdict');
 });
 
+test('R6/G3: cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles fact and correctly reports failed, not silently downgraded to no-evidence', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r6-dirty-mutation-persisted';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r6-dirty-persisted',
+    docsRef,
+    withHash: true,
+    withReport: false,
+  });
+
+  // Honest settle shape: a read-only worker mutated a pre-existing dirty
+  // file (fail-closed at settle time, exit 0, no claim was ever written, no
+  // report), and the runner persisted the real mutatedDirtyBeforeFiles fact
+  // this cell adds. Without R6, hasDirtyBeforeMutation is hardcoded false
+  // cross-pass, so `changedFiles: [] || false` never trips the read-only
+  // fail-close branch, agentClaim is null so the done/blocked branches are
+  // skipped too, and the settled failed/failed verdict is silently
+  // downgraded to no-evidence/no-evidence on read-back (a real bug -- see
+  // this cell's safety-reasoning writeup for why this is a correctness
+  // fix, not just a hardening one).
+  const stored = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  stored.status = 'failed';
+  stored.confidence = 'failed';
+  stored.agentClaim = null;
+  delete stored.claimSha256;
+  stored.settleReports = [];
+  stored.runtime = { exitCode: 0, stdoutLog: 'stdout.log', stderrLog: 'stderr.log' };
+  stored.evidence = {
+    ...stored.evidence,
+    changedFiles: [],
+    mutatedDirtyBeforeFiles: [path.join(docsRef, 'preexisting-dirty.txt')],
+  };
+  fs.writeFileSync(resultPath, JSON.stringify(stored, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r6-dirty-persisted', docsRef));
+  assert.equal(choice.canAdvanceEdge, false);
+  assert.equal(choice.reason, 'validation-failed-do-not-advance-work',
+    'the persisted mutatedDirtyBeforeFiles fact must re-derive to failed, not silently downgrade to no-evidence');
+});
+
+test('R6/G3: an empty (but present) persisted mutatedDirtyBeforeFiles correctly derives false -- unchanged dirty files never block a legitimate reported verdict', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r6-dirty-unchanged';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r6-dirty-unchanged',
+    docsRef,
+    withHash: true,
+    withReport: true,
+  });
+
+  const stored = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  // A genuinely-unchanged pre-existing dirty file: the runner recorded an
+  // EXPLICIT empty mutatedDirtyBeforeFiles, not an absent key -- this must
+  // derive `false`, not just fall through to a default that happens to
+  // also be false.
+  stored.evidence = { ...stored.evidence, mutatedDirtyBeforeFiles: [] };
+  fs.writeFileSync(resultPath, JSON.stringify(stored, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r6-dirty-unchanged', docsRef));
+  assert.equal(choice.canAdvanceEdge, true);
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge',
+    'an explicit empty mutatedDirtyBeforeFiles must derive hasDirtyBeforeMutation: false, not block a legitimate reported verdict');
+});
+
+test('R6/G3: an evidence.json written before this field existed (no mutatedDirtyBeforeFiles key) fails safe to hasDirtyBeforeMutation: false', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r6-legacy-no-key';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r6-legacy-no-key',
+    docsRef,
+    withHash: true,
+    withReport: false,
+  });
+
+  const stored = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  // Legacy shape: settled no-evidence (no claim, no report), and this
+  // result.json predates R6 -- no mutatedDirtyBeforeFiles key at all.
+  stored.status = 'no-evidence';
+  stored.confidence = 'no-evidence';
+  stored.agentClaim = null;
+  delete stored.claimSha256;
+  stored.settleReports = [];
+  stored.runtime = { exitCode: 0, stdoutLog: 'stdout.log', stderrLog: 'stderr.log' };
+  stored.evidence = { changedFiles: [] };
+  fs.writeFileSync(resultPath, JSON.stringify(stored, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r6-legacy-no-key', docsRef));
+  assert.equal(choice.canAdvanceEdge, false);
+  assert.equal(choice.reason, 'validation-no-evidence-do-not-advance-work',
+    'a missing mutatedDirtyBeforeFiles key must fail safe to hasDirtyBeforeMutation: false, matching the no-evidence settle verdict');
+});
+
+test('R6/G3: a malformed (non-array) mutatedDirtyBeforeFiles fails safe to hasDirtyBeforeMutation: false rather than throwing', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r6-malformed-field';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r6-malformed-field',
+    docsRef,
+    withHash: true,
+    withReport: true,
+  });
+
+  const stored = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  // A tampered or corrupted result.json where mutatedDirtyBeforeFiles is
+  // present but not an array (e.g. a stray boolean/string) -- the
+  // Array.isArray guard must fail safe to false, never throw and never
+  // coerce a truthy non-array into hasDirtyBeforeMutation: true.
+  stored.evidence = { ...stored.evidence, mutatedDirtyBeforeFiles: true };
+  fs.writeFileSync(resultPath, JSON.stringify(stored, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r6-malformed-field', docsRef));
+  assert.equal(choice.canAdvanceEdge, true);
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge',
+    'a non-array mutatedDirtyBeforeFiles must fail safe via Array.isArray, never throw or coerce to hasDirtyBeforeMutation: true');
+});
+
 // ---------------------------------------------------------------------------
 // ADR-006 R5: interpretAssignmentRunResult/findLatestAssignmentRunResult
 // dispatch on the Assignment's own stamped fields, not the operation id;

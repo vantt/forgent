@@ -343,16 +343,17 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
           // reported/READY.
           //
           // Monotonic re-derivation: the settle-time verdict is the floor.
-          // Re-derivation reads runtime.exitCode and evidence.changedFiles
-          // from the same attacker-writable result.json, and inputs the
-          // result never persisted (the read-only dirty-mutation flag) are
-          // simply absent — so a derived pair MORE advancing than what the
-          // runner recorded at settle is a forged or lost fact, never new
-          // truth. An honestly settled failed run (non-zero/timeout exit,
-          // dirty mutation) must never re-derive upward to done/reported:
-          // the stored verdict stands and the member stops per failed
-          // semantics. Downgrades and equal derivations still apply — that
-          // is what makes a stored flip inert.
+          // Re-derivation reads runtime.exitCode, evidence.changedFiles, and
+          // (as of R6/G3) evidence.mutatedDirtyBeforeFiles from the same
+          // attacker-writable result.json — none of these inputs are
+          // hash-bound the way runId/claimSha256 are — so a derived pair
+          // MORE advancing than what the runner recorded at settle is a
+          // forged or lost fact, never new truth. An honestly settled
+          // failed run (non-zero/timeout exit, dirty mutation) must never
+          // re-derive upward to done/reported: the stored verdict stands
+          // and the member stops per failed semantics. Downgrades and equal
+          // derivations still apply — that is what makes a stored flip
+          // inert.
           const runtimeInfo = runResult.runtime && typeof runResult.runtime === 'object' ? runResult.runtime : {};
           const derived = classifyRunEvidence({
             exitCode: typeof runtimeInfo.exitCode === 'number' ? runtimeInfo.exitCode : null,
@@ -367,7 +368,9 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
             changedFiles: Array.isArray(runResult.evidence?.changedFiles)
               ? runResult.evidence.changedFiles.filter((f) => typeof f === 'string')
               : [],
-            hasDirtyBeforeMutation: false,
+            hasDirtyBeforeMutation: Array.isArray(runResult.evidence?.mutatedDirtyBeforeFiles)
+              ? runResult.evidence.mutatedDirtyBeforeFiles.length > 0
+              : false,
             isReadOnlyOperation: isReadOnlyAssignment(asgn),
             repoRoot,
           });

@@ -526,6 +526,61 @@ test('executeAssignment does not count pre-existing dirty files as run evidence 
     'pre-existing dirty file must not be counted as run evidence');
   assert.equal(result.status, 'no-evidence');
   assert.equal(result.confidence, 'no-evidence');
+  // R6/G3: an unchanged pre-existing dirty file must correctly derive an
+  // EMPTY mutatedDirtyBeforeFiles (re-read hash matched the pre-launch
+  // snapshot) -- not just a default/absent value.
+  assert.ok(Array.isArray(result.evidence.mutatedDirtyBeforeFiles),
+    'evidence.mutatedDirtyBeforeFiles must be present as an array');
+  assert.deepEqual(result.evidence.mutatedDirtyBeforeFiles, [],
+    'an unchanged pre-existing dirty file must not appear in mutatedDirtyBeforeFiles');
+});
+
+test('executeAssignment persists mutatedDirtyBeforeFiles (in both evidence.json and result.json) for a read-only op whose worker mutates a pre-existing dirty file (R6/G3)', async () => {
+  const tempDir = mkTempDir();
+
+  execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: tempDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tempDir, 'committed.txt'), 'initial\n');
+  execFileSync('git', ['add', '.'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial'], { cwd: tempDir, stdio: 'ignore' });
+  // Make a file dirty BEFORE the run, then have the (read-only) worker
+  // mutate that same file further during the run.
+  fs.writeFileSync(path.join(tempDir, 'preexisting-dirty.txt'), 'dirty before run\n');
+
+  const executorScript = path.join(tempDir, 'mutate-dirty-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    fs.writeFileSync(path.join(process.cwd(), 'preexisting-dirty.txt'), 'mutated during run\\n');
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({ workId: 'tsk-dirty-mutated', stage: 'planning', operation: 'validate-plan' });
+
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  // A read-only op that mutates a pre-existing dirty file must fail closed.
+  assert.equal(result.status, 'failed', 'a read-only op that mutates a pre-existing dirty file must fail closed');
+  assert.equal(result.confidence, 'failed');
+  assert.deepEqual(result.evidence.mutatedDirtyBeforeFiles, ['preexisting-dirty.txt'],
+    'result.json evidence must persist the mutated pre-existing dirty file (R6)');
+
+  const evidencePath = path.join(
+    tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01', 'evidence.json',
+  );
+  const evidence = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
+  assert.deepEqual(evidence.mutatedDirtyBeforeFiles, ['preexisting-dirty.txt'],
+    'evidence.json must also persist the mutated pre-existing dirty file (R6)');
 });
 
 test('executeAssignment counts only new dirty files as run evidence (Step 04 §5.3)', async () => {

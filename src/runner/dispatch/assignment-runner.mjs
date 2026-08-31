@@ -928,6 +928,7 @@ export async function executeAssignment(assignment, opts = {}) {
     gitBeforeSource,
     dirtyBefore,
     dirtyAfter,
+    mutatedDirtyBeforeFiles,
     changedFiles,
     changedFileReasons,
     artifacts: workerArtifacts,
@@ -973,6 +974,7 @@ export async function executeAssignment(assignment, opts = {}) {
       // gitBefore/gitAfter were captured at genuinely different instants.
       gitBeforeSource,
       changedFiles,
+      mutatedDirtyBeforeFiles,
       artifacts: workerArtifactPaths,
       tests: [],
     },
