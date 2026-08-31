@@ -1,33 +1,21 @@
-# Current Cell — none (idle, Step 6 complete)
+# Current Cell — none (idle)
 
-Status: closed — Step 6 DONE (all cells 6.0-6.6 + 6.final closed)
+Status: closed — Cell 6.7 done, Step 6 verdict unchanged (still DONE)
 Date: 2026-08-31
-Closed trace: `docs/architect/agent-coordination/trace/step-06-final-consolidation.md`
+Closed trace: `docs/architect/agent-coordination/trace/step-06-cell-7-post-close-hardening.md`
 
 ## State
 
-Step 6 (Work-Attached Team Dispatch Adoption) is fully done. Full
-traceability against step-06-work-attached-team-adoption.md §2-§9
-confirmed in `step-06-final-consolidation.md`. Both §8 Adoption
-Completion Criteria items are satisfied with real, non-fake-executor live
-evidence: (1) `planning.validate-plan` (Cell 6.3, `tsk-5ka`); (2)
-`executing.review-item` (Cell 6.final, `tsk-1br`). Full regression battery
-green at 304/304, reproduced independently by the coordinator at every
-cell close.
+Cell 6.7 (post-close hardening from a user-requested cross-cutting review
+of the full Step 6 diff) closed. 3 confirmed bugs fixed and independently
+verified: Bug A (read-only fail-closed check ordering), Bug B
+(`executorRedirected` field for record consistency), Bug C (mission-lite
+test fixtures opted into the deliberate cross-provider egress gate). Full
+`npm test`: 12 → 9 failures. 9 findings from the review remain
+deliberately open (Gaps, see `trace/index.md`'s Cell 6.7 close summary)
+— none block Step 6's Adoption Completion Criteria.
 
-Residuals carried forward, none blocking (see `trace/index.md`'s Cell
-6.final close summary for full detail): `scoped-subtask`'s `expectedFiles`
-mechanism built/tested but inert (no real caller yet); a dirty-before/
-undeclared-file edge case (M1, inherited Cell 6.2 scope); the Step-6
-accepted trust-boundary residual (a) with settlement-outside-worker-reach
-(B) vs worker sandboxing (C) formally deferred to Step 7; an unreaped
-`fgw/tsk-1br` worktree.
-
-No further Step 6 work is open. Next steps (Step 7 planning, or anything
-else) require fresh user instruction — Step 7 has no written plan yet in
-this repo.
-
-Uncommitted from Cell 6.final: throwaway `plan.md`/`candidate-note.md`/
-`verify-result.txt` docs are already committed on `main`
-(`b8bfca2b`)/`fgw/tsk-1br` (`09f4a59d`, `21b27a40`); this trace pair +
-`step-06-final-consolidation.md` are about to be committed.
+No further Step 6 work is open. The 9 open Gaps each need their own
+scoped decision from the user before any further fix work — do not fold
+them into a new cell without that decision. Step 7 has no written plan
+yet in this repo.

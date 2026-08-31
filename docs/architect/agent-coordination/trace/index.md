@@ -56,6 +56,7 @@ per-cell status.
 | 6.5 | executing.scout-blast-radius read-only researcher | done |
 | 6.6 | executing.scoped-subtask mutating helper | done |
 | 6.final | consolidate Step 6 | done |
+| 6.7 | post-close hardening: cross-cutting review findings (3 confirmed bugs) | done |
 
 ## Cell 6.0 Close Summary (2026-08-30)
 
@@ -161,6 +162,61 @@ future driver caller declares a footprint, so `scoped-subtask` is not yet
 "used" per step-06 §8's Adoption Completion Criteria in the same sense
 Cell 6.3's live validate-plan smoke was. Full detail in
 `step-06-cell-6-scoped-subtask.md`.
+
+## Cell 6.7 Close Summary (2026-08-31) — post-close hardening
+
+User requested a cross-cutting `/code-review` of the full Step 6 diff
+(`9235bbe1..HEAD`, `src/` only) after Cell 6.final declared Step 6 done.
+Found 12 real `npm test` failures (coordinator independently ran the full
+4494-test suite — the 6-file battery used throughout Step 6 never
+exercised `test/intake/`, `test/architecture.test.mjs`,
+`test/runner/mission-lite.test.mjs`, or `test/e2e/pr-gate.test.mjs`/
+`self-improve-loop.test.mjs`) plus several latent bugs. Coordinator
+independently verified the highest-confidence findings by direct code
+reading before acting (not trusting the review agent's severity claims
+uncritically — one finding, `verdictPayload` always undefined for
+`validate-plan`, was flagged as possibly-intentional-by-design rather
+than a bug, pending product judgment).
+
+User authorized fixing 3 confirmed bugs now:
+- **Bug A** (pre-existing, Cell 6.0 baseline): a read-only worker that
+  mutates a dirty file and self-reports `status: 'blocked'` escaped the
+  P1 read-only-contract fail-closed check. Fixed: reordered the check
+  ahead of the `blocked` short-circuit in `classifyRunEvidence`.
+- **Bug B** (from this coordinator's own Cell 6.3 fix): the persisted
+  record for a read-only-redirected dispatch had `policy.executorPreference`
+  (declared) disagreeing with `executorId` (actually-resolved) with
+  nothing marking that as intentional. Fixed: added an explicit
+  `executorRedirected` boolean instead of picking a winner.
+- **Bug C** (pre-existing, Cell 6.0 baseline): 4 `mission-lite.test.mjs`
+  failures from a cross-provider egress gate rejection. Investigated
+  first (git history + every sibling test file's pattern) before fixing
+  — confirmed the gate is deliberate governance (D2/D3, tsk-32n), not an
+  accidentally-removed default; fixed the one outlier test file's
+  fixtures to opt in like every other test already does, rather than
+  weakening the runtime gate.
+
+All 3 independently re-verified by the coordinator (diffs read line by
+line, tests re-run directly, not just trusted from agent reports). Full
+`npm test`: **12 → 9 failures**. Remaining 9: all either tracked below as
+open Gaps needing their own scoped decision, or one environmental flake
+(`herdr-spawn adapter LIVE` — a real external-CLI dispatch test that
+passed once and failed twice after, unrelated to any diff in this
+session). Full detail: `step-06-cell-7-post-close-hardening.md`.
+
+**9 findings deliberately left open (Gaps), not folded into this cell:**
+architecture layering violation (`assignment-runner.mjs` importing
+`intake/plan.mjs`); `resolvePlan`'s `.fgos`-basename assumption (4 tests);
+`hasDirtyBeforeMutation` hardcoded `false` in cross-pass re-derivation
+(already flagged in Cell 6.2's own Gaps); `branchHeadAtReturn` activating
+merge.mjs's verify-skip optimization on the primary worker's own settle
+path (2 e2e tests, security-relevant); `verdictPayload` always undefined
+for `validate-plan` (possibly by-design, needs product judgment, not
+just a code fix); `gitBefore`/`gitAfter` post-crash provenance loss; 1
+pre-existing unrelated flake. **Step 6's "DONE" verdict stands** — these
+are pre-existing gaps this cross-cutting review surfaced, not new
+regressions from Step 6's own cells, and none block the Adoption
+Completion Criteria already satisfied in Cell 6.final.
 
 ## Cell 6.final Close Summary (2026-08-31) — STEP 6 DONE
 

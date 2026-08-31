@@ -646,6 +646,24 @@ test('classifyRunEvidence: read-only operation cannot be reported without a comp
     'read-only operation that mutates repo files must fail closed with status: failed and confidence: failed');
 });
 
+test('classifyRunEvidence: a self-reported "blocked" status must not escape the read-only fail-closed check when the op mutated a pre-existing dirty file (Cell 6.7 Bug A)', () => {
+  // A read-only worker (reviewer/researcher/advisor) that mutates a
+  // pre-existing dirty file and reports status: 'blocked' in
+  // agent-result.json must still settle failed/failed -- the read-only
+  // contract violation is what happened, regardless of what status the
+  // agent self-reports. Before the fix, the `blocked` short-circuit
+  // returned before this fail-closed check ever ran.
+  const resultBlockedMutatedReadOnly = classifyRunEvidence({
+    exitCode: 0,
+    agentClaim: { status: 'blocked', summary: 'Could not proceed' },
+    hasDirtyBeforeMutation: true,
+    changedFiles: [],
+    isReadOnlyOperation: true,
+  });
+  assert.deepEqual(resultBlockedMutatedReadOnly, { status: 'failed', confidence: 'failed' },
+    'a read-only op that mutated a pre-existing dirty file must fail closed even when the worker self-reports blocked');
+});
+
 test('classifyRunEvidence: prefixed string evidenceRefs without any companion report artifact never classify reported (red-team)', () => {
   // A forged claim: prefixed refs (evidence:/diff:/verify:/doc:/...) pass
   // string checks without any file existing on disk. The worker fully

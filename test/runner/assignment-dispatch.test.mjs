@@ -570,6 +570,15 @@ test('Cell 6.3 Fix Round 1: a role:reviewer assignment resolves the scoped claud
     !reviewerArgs.some((arg) => arg.includes('Bash(git commit')),
     'reviewer-resolved executor args must never include Bash(git commit',
   );
+
+  // Cell 6.7 Bug B: the persisted record must not be self-contradictory --
+  // `policy.executorPreference[0]` stays the DECLARED preference ("claude"),
+  // `executorId` is the ACTUALLY-resolved executor ("claude-reviewer"), and
+  // `executorRedirected` makes that intentional divergence explicit instead
+  // of leaving an auditor to infer it from two disagreeing fields.
+  assert.equal(result.policy.executorPreference[0], 'claude');
+  assert.equal(result.executorId, 'claude-reviewer');
+  assert.equal(result.executorRedirected, true);
 });
 
 test('a genuinely mutating assignment (implement-item, default implementer role) is unaffected -- still resolves the git-write claude profile', async () => {
@@ -638,6 +647,8 @@ test('a genuinely mutating assignment (implement-item, default implementer role)
   assert.equal(result.executorId, 'claude');
   assert.ok(result.evidence.changedFiles.includes('tracked.txt'), 'the mutation must be captured as real changedFiles evidence');
   assert.equal(fs.existsSync(reviewer.argvCapturePath), false, 'a mutating assignment must never spawn the claude-reviewer profile');
+  // Cell 6.7 Bug B: no redirection happened here, so the record must say so.
+  assert.equal(result.executorRedirected, false);
 
   const workerArgs = JSON.parse(fs.readFileSync(workerArgvCapturePath, 'utf8'));
   assert.ok(

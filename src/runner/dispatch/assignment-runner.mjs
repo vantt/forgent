@@ -391,17 +391,21 @@ export function classifyRunEvidence({
     return { status: 'failed', confidence: 'failed' };
   }
 
-  if (agentClaim?.status === 'blocked') {
-    return { status: 'blocked', confidence: 'reported' };
-  }
-
   const hasExternalEvidence = changedFiles.length > 0 || hasDirtyBeforeMutation;
 
   // Step 06 P1: Read-only operation MUST NOT mutate repo state.
   // If a read-only assignment modified files in the repository (hasExternalEvidence === true),
   // it violates the read-only contract and must fail closed with confidence: 'failed'.
+  // This check MUST run before the `blocked` short-circuit below: a worker that
+  // mutates a pre-existing dirty file and then self-reports `status: 'blocked'`
+  // must not be allowed to escape the fail-closed verdict by choosing which
+  // status string it writes to agent-result.json (Cell 6.7 Bug A).
   if (isReadOnlyOperation && hasExternalEvidence) {
     return { status: 'failed', confidence: 'failed' };
+  }
+
+  if (agentClaim?.status === 'blocked') {
+    return { status: 'blocked', confidence: 'reported' };
   }
 
   // Step 04 §5.2: agent-result.json is the structured claim, not evidence by itself.
@@ -601,6 +605,15 @@ export async function executeAssignment(assignment, opts = {}) {
     cfg.executors?.['claude-reviewer']
       ? 'claude-reviewer'
       : defaultExecutorId;
+  // Cell 6.7 Bug B: `resolvedExecutorId` can diverge from `defaultExecutorId`
+  // for a redirected read-only op (above). `policy.executorPreference[0]`
+  // (persisted below, unchanged) always records the DECLARED preference
+  // before that redirection, while `executorId` records what ACTUALLY ran --
+  // these are two distinct, non-contradictory fields by design, not a stale
+  // duplicate. `executorRedirected` makes that divergence explicit in the
+  // persisted record instead of leaving an auditor to infer it by comparing
+  // the two fields themselves.
+  const executorRedirected = resolvedExecutorId !== defaultExecutorId;
 
   // Determine run attempt number monotonically without reusing existing dirs
   const existingAttempts = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d));
@@ -909,8 +922,14 @@ export async function executeAssignment(assignment, opts = {}) {
     runId,
     assignmentId: effectiveAssignment.assignmentId,
     workId: effectiveAssignment.workId,
+    // executorId: the executor that ACTUALLY ran this attempt (post-redirect).
+    // policy.executorPreference[0]: the DECLARED preference (pre-redirect).
+    // executorRedirected: true when the two above disagree, so the redirect
+    // is explicit in the persisted record rather than left to be inferred by
+    // diffing the two fields (Cell 6.7 Bug B).
     executorId: resolvedExecutorId,
     policy: effectivePolicy,
+    executorRedirected,
     ...(planContentHash ? { planContentHash } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports,

@@ -84,7 +84,7 @@ test('workId:null assignment works for read-only operation in mission-lite', asy
   );
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [executorScript, '{prompt}'] },
+    executor: { command: process.execPath, args: [executorScript, '{prompt}'], allowCrossProvider: true },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
@@ -215,7 +215,7 @@ test('no Work item is created or modified during mission-lite execution', async 
   );
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [executorScript, '{prompt}'] },
+    executor: { command: process.execPath, args: [executorScript, '{prompt}'], allowCrossProvider: true },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
@@ -324,7 +324,7 @@ test('no-evidence role result is not treated as consensus and synthesis cites ro
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig: {
-      executor: { command: process.execPath, args: [researcherScript, '{prompt}'] },
+      executor: { command: process.execPath, args: [researcherScript, '{prompt}'], allowCrossProvider: true },
       models: { standard: 'test-model' },
       timeoutMs: 5000,
     },
@@ -334,7 +334,7 @@ test('no-evidence role result is not treated as consensus and synthesis cites ro
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig: {
-      executor: { command: process.execPath, args: [reviewerScript, '{prompt}'] },
+      executor: { command: process.execPath, args: [reviewerScript, '{prompt}'], allowCrossProvider: true },
       models: { standard: 'test-model' },
       timeoutMs: 5000,
     },
@@ -417,7 +417,7 @@ test('first business case debate mission runs with three role assignments and pr
   );
 
   const runnerConfig = {
-    executor: { command: process.execPath, args: [debateExecutorScript, '{prompt}'] },
+    executor: { command: process.execPath, args: [debateExecutorScript, '{prompt}'], allowCrossProvider: true },
     models: { standard: 'test-model' },
     timeoutMs: 5000,
   };
