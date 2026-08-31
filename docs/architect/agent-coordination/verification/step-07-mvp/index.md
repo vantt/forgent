@@ -51,7 +51,7 @@ Noted, not touched by this track: `.agentkit/`, `.claude/agents/*.md`,
 | P02 | R6 (G3) | done | P02.3 | `P02.3.md`, commit `b262ced1` |
 | P02 | R7 | done | P02.4 | `P02.4.md`, commit `cfe60bfb` |
 | P02 | R8 | done | P02.5 | `P02.5.md`, commit `a77b95ef` |
-| P03 | R1–R2 | missing | P03.1 | — |
+| P03 | R1–R2 | done | P03.1 | `P03.1.md`, commit `2a22c93c` |
 | P03 | R3 | missing | P03.2 | — |
 | P03 | R4–R6 | missing | P03.3 | — |
 
@@ -122,16 +122,19 @@ Populated in Phase 03 per plan requirement R6.
   amending closed cells, separately forbidden). Locations:
   `operation-choice.mjs:1609,1642`, `assignment-runner.mjs:32,603`,
   `mission-lite.mjs:359`, `assignment-runresult.test.mjs:155`,
-  `operation-choice.test.mjs:5365`. Comment/test-name wording only, zero
-  behavior change — safe cleanup whenever convenient, does not block
-  Phase 03.
+  `operation-choice.test.mjs:5365`, and (found during P03.1's Coordinator
+  Verification while grepping the diff for the same pattern)
+  `assignment-provenance.test.mjs:76` (`"...untouched this cell"`, a
+  pre-existing test title, not touched by P03.1's own diff). Comment/
+  test-name wording only, zero behavior change — safe cleanup whenever
+  convenient, does not block Phase 03.
 
 ## Active Cell
 
-None. Phase 02 (R1-R8) is complete. Next cell (P03.1) not yet prepared.
+None. P03.1 (R1+R2) is closed. Next cell (P03.2, R3: CLI `--contract`
+door) not yet prepared.
 
 ## Next Action
 
-Prepare cell P03.1 — Phase 03 R1-R2 (domain harness seam
-`enrichAndValidateContract` + the non-driving rule: inline RunResults never
-drive Stage transitions).
+Prepare cell P03.2 — Phase 03 R3 (CLI `--contract` door in
+`src/runner/dispatch/cli.mjs`'s `execute` subcommand).

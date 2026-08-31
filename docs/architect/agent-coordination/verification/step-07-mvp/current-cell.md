@@ -1,179 +1,167 @@
-# Current Cell: P02.5
+# Current Cell: P03.1
 
 Status: closed
 Owner: Coordinator (independent verification complete, cell closed)
 Last updated: 2026-09-01
-Next action: prepare P03.1 (Phase 03, R1-R2: harness seam + non-driving rule)
+Next action: prepare P03.2 (Phase 03, R3: CLI `--contract` door)
 
 ## Goal
 
-Land ADR-006 R8: migrate mission-lite onto the inline Assignment path.
-`createMissionAssignment` builds an inline contract (role from the mission
-role, `mutation: 'read-only'`, `evidence.required: 'reported'`, objective
-and context refs from the mission) instead of a declared
-`domain+stage+operation` shape. Stop the duplicate-write pattern:
-`.fgos/missions/<id>/assignments/*.json` and
-`.fgos/missions/<id>/results/*.json` currently hold FULL COPIES of what
-`executeAssignment()` already writes canonically under
-`.fgos/assignments/<assignmentId>/`; mission-lite's own records
-(`thread.jsonl`) should store assignment/run IDs as references instead.
-`thread.jsonl`/`mission.json` themselves are unchanged (they stay the
-ledger prototype).
+Land ADR-007 R1 (the domain harness seam) and R2 (the non-driving rule).
+Phase 03's first cell, per plan.md's own suggested split
+(`P03.1 (R1 + R2), P03.2 (R3), P03.3 (R4+R5+R6 live proofs)`).
 
-## Why This Is Its Own Cell
+With Phase 02 done, the inline Assignment class exists and mission-lite
+already builds one (`createMissionAssignment`, no `work` attached). This
+cell adds the ONE thing a Work-attached inline contract needs before Phase
+03's live proofs can run: a domain seam that enriches/rejects an inline
+contract against a Work's declared Stage, and a guarantee that the result
+of running it can never be mistaken for a Stage verdict.
 
-Split from the plan's suggested "R7+R8" back in P02.4's own prep, because
-R8 needs `validateAssignmentLegality` (`assignment-runner.mjs`) to accept
-inline-shaped Assignments at all — confirmed again just now by reading the
-function directly: it unconditionally calls `operationsForStage(asgn.domain,
-asgn.stage, ...)` and throws "unknown operation" for ANY Assignment with no
-`domain`/`stage`/`operation`, which is exactly what an inline Assignment
-looks like (`buildInlineAssignment` sets none of these). This is a real
-prerequisite change to the same function P02.4 just spent 3 rounds
-hardening — read that history (`P02.4.md`) before touching this function
-again.
+## Requirements
 
-## Non-Goals
+- **R1 — Seam.** New file `domains/coding/harness/enrich-and-validate-contract.mjs`
+  exporting a pure `enrichAndValidateContract(contract, { domain, work })`.
+  Per ADR-007 §1, when called for a Work at a declared Stage it:
+  - requires `contract.supports` to be an operation id in
+    `operationsForStage(domain, work.stage)` (reject otherwise, fail-closed
+    — this is the ADR-007 §3 "inline may not replace or extend the declared
+    path" guarantee, mechanically enforced here);
+  - adds `contextRefs` (CONTEXT.md, plan.md — same `resolveContentRoot`
+    resolution `buildDeclaredAssignment`'s own `work.docsRef` branch already
+    uses, `src/runner/paths.mjs`);
+  - adds an allowed-scope constraint (repository read scope — this is a
+    read-only-only slice, ADR-006 §6 still applies to inline);
+  - sets the coding read-only evidence rule: `reported` evidence requires an
+    `agent-report.md` artifact (mirror how `buildDeclaredAssignment`'s
+    `derivedExpectedOutputs` already documents the expected evidence
+    artifact for `validate-plan`/`review-item`, so a worker gets the same
+    kind of concrete instruction, not a bare policy statement);
+  - writes role→tier hints into `policy` (same merge shape
+    `buildDeclaredAssignment`'s `mergedPolicy` already uses:
+    `{...opPolicy, ...callerPolicy}`, `_fromYaml` marker when the tier came
+    from YAML and the caller didn't override it).
+  - It never sets an executor id, never dispatches, never touches Work
+    lifecycle — `compileDispatchPlan` stays the sole execution chooser
+    (ADR-007 §1, this is a hard boundary, not a style preference).
+  - Foundation (`buildAssignment` / `buildInlineAssignment`,
+    `src/runner/dispatch/assignment.mjs`) calls it between the generic
+    validator (`execution-contract.mjs`'s `validateExecutionContract`,
+    unchanged) and the normalizer (`stampInlineAssignment`,
+    `assignment-normalizer.mjs`, unchanged) — **only when a `domain` is
+    resolvable for the call** (i.e. a `work` was attached with a domain, or
+    an explicit domain option was passed). A standalone inline call with no
+    Work/domain skips the seam entirely and passes on generic validation
+    alone (ADR-007 §2 — this is the actual evidence the foundation boundary
+    doesn't depend on any domain; do not weaken it by making the seam call
+    unconditional "for consistency").
+  - `execution-contract.mjs`'s `ACCEPTED_CONTRACT_FIELDS` whitelist
+    currently has no `supports` field — read it
+    (`src/runner/dispatch/execution-contract.mjs`) before touching it. It
+    must accept an *optional* `supports` field at the generic-validator
+    layer (format check only, e.g. non-empty string when present) without
+    itself knowing what a legal operation id is — that semantic check is
+    the seam's job alone, keeping the generic validator domain-ignorant
+    per ADR-007 §2.
+- **R2 — Non-driving rule.** `findLatestAssignmentRunResult`
+  (`src/runner/dispatch/operation-choice.mjs:100`) already reads each
+  candidate's parsed `assignment.json` (`asgn`) and filters on
+  `asgn.workId`, `asgn.stage`, `asgn.resultKind` in sequence — add
+  `asgn.provenance?.kind === 'inline'` to that same filter chain (skip, do
+  not `continue`-then-fall-through into evidence it shouldn't reach) so an
+  inline Assignment's RunResult is never returned as `lastRunResult` to
+  `chooseStageOperation`. Read the function's own doc comment above it
+  first (ADR-006 R5 history) and its "Follow-Ups" entry in `index.md`
+  (already flagged as this codebase's highest tamper-detection-sensitivity
+  function) before editing — this is a filter addition alongside existing
+  ones, not a restructure.
+  - `chooseStageOperation` itself (`operation-choice.mjs:638`) only ever
+    consumes the already-filtered `lastRunResult` parameter and never reads
+    `assignment.json`/`provenance` directly (confirmed by grep before
+    writing this contract) — the fix belongs solely in
+    `findLatestAssignmentRunResult`; do not add a second, redundant filter
+    inside `chooseStageOperation` "for defense in depth" without first
+    confirming empirically it can actually receive an inline result some
+    other way a grep might have missed.
 
-Phase 03 work (harness seam, CLI `--contract` door, live proofs). Do not
-change `mission.json`/`thread.jsonl`'s own schema or `appendThreadMessage`/
-`getMission`/`listMissions` (unchanged per R8's own text). Do not change
-anything about the mutating-inline-rejection rule (`execution-contract.mjs`,
-P02.1, closed — stays fail-closed).
+## Files
 
-## Must Read
+- Create: `domains/coding/harness/enrich-and-validate-contract.mjs` + its
+  test file.
+- Modify: `src/runner/dispatch/assignment.mjs` (seam call site in
+  `buildInlineAssignment`), `src/runner/dispatch/execution-contract.mjs`
+  (`supports` field accepted), `src/runner/dispatch/operation-choice.mjs`
+  (R2 filter + test).
 
-- `plans/260831-1637-step07-inline-assignment-mvp/phase-02-assignment-provenance-and-stamped-snapshot.md`
-  — R8 only (its Tests subsection references specific test line numbers
-  from BEFORE this track's own P02.1-P02.4 work; those line numbers are
-  now stale — match by test NAME/behavior described, not the stale line
-  numbers)
-- `docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md`
-  §4 (minimum inline contract fields), §5 ("Same stores and governance...
-  Both classes use `.fgos/assignments/`")
-- `docs/architect/agent-coordination/verification/step-07-mvp/P02.4.md`
-  — READ THIS FULLY before touching `assignment-runner.mjs` again. This
-  function (`validateAssignmentLegality`/`executeAssignment`) was just
-  hardened across 2 Review + 2 Red-Team rounds for a real bug class
-  (raw-read-back bypassing the normalizer). Do not undo any of that work;
-  build on top of it.
-- `src/runner/dispatch/assignment-runner.mjs`:
-  - `validateAssignmentLegality()` (~line 483-514) — the declared-operation
-    legality check (`operationsForStage`/`matchedOp`) must be SKIPPED for
-    an inline Assignment (`asgn.provenance?.kind === 'inline'`); the
-    mission-lite refusal gate (`isMission && !isReadOnlyAssignment(asgn)`)
-    stays, unchanged, applying to both shapes. `matchedOp`'s return value
-    is never used by either call site (confirmed: both calls are bare
-    statements) — for inline, returning `undefined` is fine.
-- `src/runner/dispatch/assignment.mjs`:
-  - `buildInlineAssignment` (from P02.1) — the exact accepted contract
-    shape; `createMissionAssignment` needs to construct one of these
-    instead of the current declared-shape call.
-  - `execution-contract.mjs` (P02.1) — confirms inline contracts are
-    ALREADY fail-closed against `mutation: 'mutating'` at build time, so
-    mission-lite's own read-only refusal check becomes defense-in-depth,
-    not the only gate (same "advisory only" relationship P02.4 already
-    established between `isReadOnlyAssignment` and the stamped field).
-- `src/runner/dispatch/mission-lite.mjs`:
-  - `createMissionAssignment` (~line 228-283) — the declared-shape call to
-    rewrite; currently ALSO writes `assignment.json` directly to
-    `missionDir/assignments/<id>.json` (~line 268-270) — this is one half
-    of the "duplicate write" R8 wants stopped, since `executeAssignment()`
-    ITSELF writes the canonical copy under `.fgos/assignments/<assignmentId>/
-    assignment.json` (`assignment-runner.mjs:560-563`) the moment
-    `runMissionAssignment` is later called on the same assignment. Confirm
-    this duplication yourself before removing the write — don't assume.
-  - `runMissionAssignment` (~line 300-375) — currently writes the FULL
-    `runResult` object a second time to
-    `missionDir/results/<assignmentId>.json` (~line 359-360) — the other
-    half of the duplicate-write pattern; `executeAssignment()` already
-    persists the canonical `result.json` under
-    `.fgos/assignments/<assignmentId>/runs/<NN>/result.json`. Replace with
-    a reference (assignmentId + runId, or a path pointer) in the
-    `thread.jsonl` RESULT message instead of a full copy — that message
-    already carries `resultRef: 'results/<assignmentId>.json'`; change
-    what it points to (or add a companion field) once the full copy is
-    gone, so nothing reading `thread.jsonl` silently breaks.
+## Non-Goals (Out Of Scope For This Cell)
 
-## May Inspect
+Phase 03 R3 (CLI `--contract` door), R4/R5 (the two live proofs), R6
+(ADR traceability table). Do not change `execution-contract.mjs`'s
+`mutation`/`FORBIDDEN_SESSION_FIELDS` gates (untouched, still read-only-only
+this slice). Do not change `mission-lite.mjs`'s `createMissionAssignment`
+call shape (it never attaches a `work`, so the seam is a no-op for it —
+confirm this with a test, don't just assume it).
 
-`test/runner/mission-lite.test.mjs` (existing tests — the phase file's own
-description: 4 tests currently exercise one-shot role assignments and must
-keep passing, ported onto the inline shape with an added assertion that no
-`stage`/`operation` appears on the resulting Assignment; identify the
-debate/synthesis-shaped tests by behavior, not stale line numbers, and if
-genuinely multi-step/out-of-scope for this MVP slice, mark pending with a
-reason rather than deleting — but only if actually inapplicable, don't mark
-pending just to avoid fixing them), `test/runner/assignment-provenance.test.mjs`
-(P02.1's inline-shape test patterns, for reference).
+## Watch-Fors (From Reading The Code Before Dispatch, Not Guessing)
 
-## Do Not Touch
+- `buildInlineAssignment`'s current signature
+  (`{ provenance, work, workId, createdBy, options }`) has no `domain`
+  parameter today. Deciding how a caller supplies `domain` for the seam to
+  fire (from `work.domain`, an explicit `options.domain`, or both) is an
+  implementation decision within this cell's scope — make it, document the
+  choice and why in `P03.1.md`'s Gaps section, same as every prior cell's
+  judgment calls.
+- The enriched contract's `contextRefs`/`constraints` need to reach the
+  frozen Assignment the same way the raw contract's fields already do
+  (`buildInlineAssignment`'s `frozenContext Refs`/`frozenConstraints`
+  locals) — but `policy` is NOT one of `execution-contract.mjs`'s
+  `ACCEPTED_CONTRACT_FIELDS` and per ADR-006 §4 never will be (that field
+  set is the wire contract an agent proposes; `policy` is host-side
+  guidance the harness adds afterward, same layering as
+  `buildDeclaredAssignment`'s own `mergedPolicy`, which lives on the
+  Assignment, not inside `matchedOp`'s caller-facing shape). Do not
+  re-validate the seam's output against `ACCEPTED_CONTRACT_FIELDS` — that
+  whitelist governs the agent-proposed contract only, not the
+  harness-enriched one.
+- `INLINE_ASSIGNMENT_PARAM_WHITELIST` in `assignment.mjs` currently rejects
+  any top-level `buildAssignment()` param outside
+  `{provenance, work, workId, createdBy, options}` for inline calls — if a
+  new top-level `domain` param is added, this whitelist must grow with it
+  or every inline caller (including `mission-lite.mjs`, currently
+  passing none) breaks confusingly on an unrelated change. Grep all real
+  callers of `buildAssignment`/`buildInlineAssignment` before finalizing
+  the signature.
 
-`execution-contract.mjs`/`assignment-normalizer.mjs` (P02.1, closed — the
-inline validation rules stay exactly as accepted); `operation-choice.mjs`
-(P02.2/P02.3/P02.4, closed); anything in `assignment-runner.mjs` beyond the
-one `validateAssignmentLegality` branch (its tamper-detection/read-back
-logic was just hardened across 4 adversarial rounds in P02.4 — do not
-disturb); `mission.json`/`thread.jsonl` schema; `getMission`/`listMissions`/
-`appendThreadMessage`/`readThreadMessages`.
+## Tests First (Per current-cell.md's Own Convention)
 
-## Tests First
-
-- Port the existing one-shot mission-lite tests onto the inline shape;
-  each must assert the resulting Assignment carries `provenance.kind ===
-  'inline'` and NO `stage`/`operation` fields.
-- New test: `validateAssignmentLegality` accepts an inline Assignment
-  (skips the declared-operation check) but still enforces the mission-lite
-  read-only refusal gate.
-- New test: confirm `.fgos/assignments/<assignmentId>/assignment.json` (the
-  canonical location) is the ONLY place the assignment is written —
-  `missionDir/assignments/` no longer gets a duplicate; confirm
-  `missionDir/results/` no longer gets a full `result.json` copy, only a
-  reference persists in `thread.jsonl`.
-- Golden: full `test/runner/mission-lite.test.mjs` plus
-  `test/runner/**` + `test/architecture.test.mjs` before/after.
-- Run: `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/runner/**/*.test.mjs' 'test/architecture.test.mjs'`.
-
-## Acceptance
-
-- `createMissionAssignment` builds an inline contract (no `stage`, no
-  `operation`); `validateAssignmentLegality` accepts inline Assignments.
-- No duplicate `assignment.json`/full `result.json` under
-  `.fgos/missions/<id>/`; `thread.jsonl` carries references instead.
-- `mission.json`/`thread.jsonl` schema and their own read/write helpers
-  unchanged.
-- Golden battery passes with no outcome changes beyond what R8 itself
-  intends (the inline-shape assertion, the reference-not-copy storage
-  change).
-- Run: `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/runner/**/*.test.mjs' 'test/architecture.test.mjs'`
-  — no new failures beyond the recorded baseline.
-
-## Bug Taxonomy
-
-Given this cell's own prerequisite is a second change to
-`validateAssignmentLegality` (the function P02.4 spent 4 rounds hardening
-against a "raw read-back bypasses the normalizer" bug class): re-introduce
-that EXACT bug class here if the inline branch skips legality checking in
-a way that also accidentally skips the `mutation` backfill/read-only gate;
-confirm the inline branch still goes through the SAME `isMission &&
-!isReadOnlyAssignment(asgn)` check, unconditionally, for both shapes.
-Removing the duplicate-write without confirming the canonical write
-genuinely always happens first/reliably (a real Assignment must still be
-recoverable even if a caller only ever looks under
-`.fgos/missions/<id>/`, via the reference, not by re-deriving from
-nothing). Breaking `thread.jsonl`'s consumers by changing `resultRef`'s
-shape without checking who reads it.
+- Seam unit tests (new file): rejects a contract with no/illegal
+  `supports` for the Work's stage; adds `contextRefs`/constraint/evidence
+  guidance; never sets an executor id; identical output for identical
+  input (purity — same assertion style as any other pure module in this
+  repo, e.g. `assignment-normalizer.mjs`'s own tests).
+- R2 test: an inline Assignment with a READY-looking claim on a planning
+  Work does not get returned by `findLatestAssignmentRunResult` / does not
+  advance the edge via `chooseStageOperation`; a declared `validate-plan`
+  READY still does (regression, must still pass unmodified).
+- Confirm via a real (not just read-code) test that
+  `createMissionAssignment`'s existing calls (no `work` attached) are
+  completely unaffected by this cell — the whole `test/runner/mission-lite.test.mjs`
+  suite must stay green with zero modification.
 
 ## Trace Update
 
-Doer writes Proof Matrix (R8 row), Commands, Gaps in
-`docs/architect/agent-coordination/verification/step-07-mvp/P02.5.md`. Doer
-does not write Review/Red-Team sections.
+Doer writes Requirements (R1+R2 rows), Proof Matrix, Commands, Gaps in
+`docs/architect/agent-coordination/verification/step-07-mvp/P03.1.md`
+(new file). Doer does not write Review/Red-Team sections. No cell/finding
+IDs in code comments, test names, or commit messages — ADR-006/ADR-007
+section references are fine (durable), transient coordination labels are
+not.
 
 ## Closure
 
-Cell closed. Full history (Doer → Coordinator Verification → Review [2
-MEDIUM, both fixed] → Red-Team [1 MEDIUM TOCTOU race, fixed] → Coordinator
-Verification of the Red-Team fix) is in `P02.5.md`. R8 done; Phase 02
-(R1-R8) is now complete. See `index.md` for the updated Phase/Requirement
-Matrix and Follow-Ups.
+Cell closed. Full history (Doer → Coordinator Verification → Review [3
+findings, 1 HIGH + 1 MEDIUM + 1 LOW, all fixed] → Fixer → Coordinator
+Verification → Red-Team [2 HIGH + 1 LOW, all fixed and independently
+verified by revert-and-reproduce] → Fixer → Coordinator Verification) is
+in `P03.1.md`. R1+R2 done; Phase 03 continues with R3 (CLI `--contract`
+door, P03.2). See `index.md` for the updated Phase/Requirement Matrix.
