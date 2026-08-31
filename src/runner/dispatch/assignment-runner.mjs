@@ -22,12 +22,11 @@ import {
   operationsForStage,
 } from '../../state/workflow-stage-graphs.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
-import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
+import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveContentRoot } from '../paths.mjs';
 import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
-import { resolveContentRoot } from '../../intake/plan.mjs';
 
 /**
  * Check if report text is non-empty and contains substantive content (not a placeholder).
@@ -705,6 +704,24 @@ export async function executeAssignment(assignment, opts = {}) {
   const dirtyBefore = safeGitStatusFiles(effectiveCwd);
   const dirtyBeforeSnapshots = snapshotDirtyBeforeFiles(effectiveCwd, dirtyBefore);
 
+  // Cell 6.7 G6: capture gitBefore BEFORE the worker launches, unconditionally
+  // (not only on a settled/happy path) -- a worker that commits then crashes
+  // must never have gitBefore/gitAfter read at the same post-crash instant,
+  // which would silently hide that a commit happened during the run. This
+  // pre-launch capture is the ONLY source for gitBefore below; a settled
+  // rawResult's own headBefore (when the out-of-process adapter also
+  // captured one) is intentionally not consulted, so provenance stays
+  // consistent across both the settle and the crash path.
+  const gitBefore = safeGitHead(effectiveCwd);
+  // safeGitHead already fails closed to null internally and never throws,
+  // so no runtime path today fails to reach the capture above --
+  // gitBeforeSource is always 'pre-launch'. The literal is still named
+  // (rather than inlined at each write site below) and 'post-crash-fallback'
+  // kept as the sibling value so a future change that captures gitBefore
+  // through a different path is forced to say so explicitly instead of
+  // silently inheriting this call's provenance.
+  const gitBeforeSource = 'pre-launch';
+
   const startTime = Date.now();
   let rawResult;
   let executionError = null;
@@ -737,7 +754,6 @@ export async function executeAssignment(assignment, opts = {}) {
   const durationMs = Date.now() - startTime;
   const settledAt = new Date().toISOString();
 
-  const gitBefore = rawResult?.headBefore ?? safeGitHead(effectiveCwd);
   const gitAfter = rawResult?.headAfter ?? safeGitHead(effectiveCwd);
   // Step 04 §5.3: snapshot dirty state AFTER the run for subtraction
   const dirtyAfter = safeGitStatusFiles(effectiveCwd);
@@ -909,6 +925,7 @@ export async function executeAssignment(assignment, opts = {}) {
     operationMutability: isReadOnly ? 'read-only' : 'mutates-repo',
     gitBefore,
     gitAfter,
+    gitBeforeSource,
     dirtyBefore,
     dirtyAfter,
     changedFiles,
@@ -950,6 +967,11 @@ export async function executeAssignment(assignment, opts = {}) {
       // changedFiles at top level for RunResult backward compatibility (Step 03 §5 shape)
       gitBefore,
       gitAfter,
+      // Cell 6.7 G6: explicit provenance for gitBefore -- 'pre-launch' (the
+      // normal case, captured before the worker ever runs) vs
+      // 'post-crash-fallback', so a consumer never has to guess whether
+      // gitBefore/gitAfter were captured at genuinely different instants.
+      gitBeforeSource,
       changedFiles,
       artifacts: workerArtifactPaths,
       tests: [],

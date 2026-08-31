@@ -26,84 +26,22 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
 import { getDomain, resolveWorkflow, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT, isRecognizedRisk } from '../state/priority-formula.mjs';
 import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
-import { branchNameFor, findCheckoutPath } from '../runner/worktree.mjs';
+import { readLockedContext, resolveContentRoot } from '../runner/paths.mjs';
 
-// Best-effort read of the locked-decisions artifacts fgos-coding-exploring/
-// fgos-coding-planning write under `work.docsRef` (docs/history/<feature>/). A
-// missing docsRef, or a missing/unreadable file under it, is never fatal.
-//
-// EXPORTED (tsk-ozl D2): discovery.mjs's resolveDiscovery reuses this same
-// read as its clarify-stage trust signal — a non-empty result means a
-// human already locked decisions into CONTEXT.md, so re-judging blind is
-// both wasteful and can re-ask an already-answered question.
-export function readLockedContext(repoRoot, docsRef) {
-  if (typeof docsRef !== 'string' || !docsRef.trim()) return '';
-  const featureDir = path.join(repoRoot, docsRef);
-  const sections = [];
-  for (const file of ['CONTEXT.md', 'plan.md']) {
-    try {
-      const content = fs.readFileSync(path.join(featureDir, file), 'utf8');
-      if (content.trim()) sections.push(`## ${file}\n${content.trim()}`);
-    } catch {
-      // optional artifact; absence is not an error (item may still be
-      // mid-clarify with no plan.md yet, or predate fgos-coding-exploring)
-    }
-  }
-  return sections.join('\n\n');
-}
-
-// CONTENT-ROOT RESOLUTION (tsk-1ni D1): every caller of readLockedContext
-// used to pass `stateRoot` (`path.dirname(dir)`, always the main checkout
-// per ADR0020) as the content root too -- but fgos-coding-exploring/fgos-coding-planning
-// commit CONTEXT.md/plan.md to the item's OWN fgw/<id> branch/worktree,
-// never to main, so that always missed the real content in the standard
-// interactive workflow (the exact scenario the trust-signal shortcuts
-// above exist to serve). Tries, in order, first hit wins:
-// 1) `process.cwd()` -- the common case: an interactive session invokes
-//    `fgos discover`/`fgos plan` from inside the worktree it just
-//    committed to (fgos-coding-exploring's/fgos-coding-planning's own hard rule: commit
-//    before calling either verb). Zero extra cost.
-// 2) the item's own fgw/<id> worktree via `git worktree list --porcelain`
-//    (`findCheckoutPath`, the exact parse `promote-preflight.mjs` already
-//    reuses for the same "is this branch checked out somewhere" question)
-//    -- covers the crashed-mid-session case tsk-ozl D3 named as the
-//    reason a sweep should trust a committed CONTEXT.md even with no live
-//    session attached: the worktree still exists on disk after the
-//    session that created it ends.
-// 3) `stateRoot` itself -- today's prior behavior, last resort: the
-//    item's branch already merged to main (content really does live at
-//    stateRoot now), or a genuinely untouched item with nothing to find
-//    either way (correctly fails open to requiring an explicit verdict,
-//    unchanged).
-// Never throws: any git/fs failure at a candidate just falls through to
-// the next one, ending at the always-available stateRoot.
-export function resolveContentRoot(stateRoot, id, docsRef) {
-  const candidates = [process.cwd()];
-  try {
-    const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], {
-      cwd: stateRoot,
-      encoding: 'utf8',
-      shell: false,
-    });
-    const worktreePath = findCheckoutPath(listing, branchNameFor(id));
-    if (worktreePath) candidates.push(worktreePath);
-  } catch {
-    // no git, or worktree list failed -- fall through to stateRoot
-  }
-  candidates.push(stateRoot);
-
-  for (const candidate of candidates) {
-    if (readLockedContext(candidate, docsRef)) return candidate;
-  }
-  return stateRoot;
-}
+// readLockedContext/resolveContentRoot MOVED to src/runner/paths.mjs (Cell
+// 6.7 G1): dispatch/runner code (e.g. assignment-runner.mjs, infra layer)
+// needed resolveContentRoot without depending on this use-case-layer module
+// at runtime (test/architecture.test.mjs's one-directional-layer check).
+// Re-exported here unchanged so every existing caller of this module
+// (discovery.mjs, bin/fgos.mjs, operation-choice.mjs, loop.mjs, this file's
+// own internal use below, ...) keeps working without modification.
+export { readLockedContext, resolveContentRoot };
 
 const DEFAULT_NEED_HUMAN_REASON =
   'Không phán được rõ ràng — cần người xác nhận cách chia.';

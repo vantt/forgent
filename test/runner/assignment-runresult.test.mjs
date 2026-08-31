@@ -966,4 +966,167 @@ test('executeAssignment with real substantive report text produces confidence: r
   assert.equal(result.confidence, 'reported', 'real report text must produce confidence: reported');
 });
 
+test('executeAssignment captures gitBefore pre-launch when the worker commits then crashes (Cell 6.7 G6)', async () => {
+  const tempDir = mkTempDir();
+
+  // Real git repo, one committed file.
+  execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: tempDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tempDir, 'tracked.txt'), 'initial content\n');
+  execFileSync('git', ['add', '.'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial'], { cwd: tempDir, stdio: 'ignore' });
+  const shaBeforeRun = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tempDir, encoding: 'utf8' }).trim();
+
+  // Worker commits a change, then exits nonzero -- simulates a crash AFTER a
+  // real commit landed, the exact scenario G6 exists to make visible instead
+  // of silently masking (gitBefore/gitAfter must never both read the git
+  // HEAD post-crash, which would make them look identical even though a
+  // commit happened mid-run).
+  const executorScript = path.join(tempDir, 'crash-after-commit-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    import { execFileSync } from 'node:child_process';
+    const cwd = process.cwd();
+    fs.writeFileSync(path.join(cwd, 'tracked.txt'), 'worker committed content\\n');
+    execFileSync('git', ['add', '.'], { cwd, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'worker commit before crash'], { cwd, stdio: 'ignore' });
+    process.stderr.write('Simulated crash after commit\\n');
+    process.exit(1);
+    `,
+  );
+
+  const runnerConfig = {
+    executors: {
+      claude: {
+        kind: 'agent',
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+        allowCrossProvider: true,
+      },
+    },
+    modelPolicies: {
+      claude: { standard: 'test-model' },
+    },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-crash-after-commit',
+    stage: 'executing',
+    operation: 'implement-item',
+  });
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+  });
+
+  // Worker crashed (nonzero exit) -- must fail closed regardless of the
+  // commit it made.
+  assert.equal(result.status, 'failed');
+  assert.equal(result.confidence, 'failed');
+
+  // The core G6 assertion: gitBefore was captured BEFORE the worker's
+  // commit landed, so it must differ from gitAfter (captured post-crash) --
+  // and must equal the real pre-run HEAD sha, not the post-commit one.
+  assert.equal(result.evidence.gitBefore, shaBeforeRun);
+  assert.notEqual(result.evidence.gitBefore, result.evidence.gitAfter);
+  assert.equal(result.evidence.gitBeforeSource, 'pre-launch');
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const evidenceData = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
+  assert.equal(evidenceData.gitBefore, shaBeforeRun);
+  assert.notEqual(evidenceData.gitBefore, evidenceData.gitAfter);
+  assert.equal(evidenceData.gitBeforeSource, 'pre-launch');
+});
+
+// This test and the one above it exercise genuinely different code paths: a
+// nonzero exit still RESOLVES executeExecutorCli (proving status/confidence
+// classification of a crash), while this test forces executeExecutorCli to
+// REJECT (proving gitBefore is captured pre-launch, not read from a
+// rawResult that a rejection path never produces).
+test('executeAssignment captures gitBefore pre-launch when the worker commits then the run rejects via worker-timeout', async () => {
+  const tempDir = mkTempDir();
+
+  // Real git repo, one committed file.
+  execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: tempDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tempDir, 'tracked.txt'), 'initial content\n');
+  execFileSync('git', ['add', '.'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial'], { cwd: tempDir, stdio: 'ignore' });
+  const shaBeforeRun = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tempDir, encoding: 'utf8' }).trim();
+
+  // Worker commits a change, then hangs well past a short timeoutMs -- this
+  // makes executeExecutorCli genuinely REJECT with a worker-timeout
+  // DispatchError, landing in assignment-runner.mjs's own catch block
+  // (rawResult built with no headBefore/headAfter field), the only branch
+  // the R2 fix actually changes.
+  const executorScript = path.join(tempDir, 'commit-then-hang-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    import { execFileSync } from 'node:child_process';
+    const cwd = process.cwd();
+    fs.writeFileSync(path.join(cwd, 'tracked.txt'), 'worker committed content before hang\\n');
+    execFileSync('git', ['add', '.'], { cwd, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'worker commit before hang'], { cwd, stdio: 'ignore' });
+    process.stderr.write('Simulated hang after commit\\n');
+    execFileSync('sleep', ['5']);
+    `,
+  );
+
+  const runnerConfig = {
+    executors: {
+      claude: {
+        kind: 'agent',
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+        allowCrossProvider: true,
+      },
+    },
+    modelPolicies: {
+      claude: { standard: 'test-model' },
+    },
+    timeoutMs: 300,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-commit-then-hang',
+    stage: 'executing',
+    operation: 'implement-item',
+  });
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+  });
+
+  // Worker was killed on timeout -- must fail closed regardless of the
+  // commit it made before hanging.
+  assert.equal(result.status, 'failed');
+  assert.equal(result.confidence, 'failed');
+
+  // The core assertion: gitBefore was captured BEFORE the worker's commit
+  // landed, so it must differ from gitAfter (captured post-timeout) -- and
+  // must equal the real pre-run HEAD sha, not the post-commit one.
+  assert.equal(result.evidence.gitBefore, shaBeforeRun);
+  assert.notEqual(result.evidence.gitBefore, result.evidence.gitAfter);
+  assert.equal(result.evidence.gitBeforeSource, 'pre-launch');
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const evidenceData = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
+  assert.equal(evidenceData.gitBefore, shaBeforeRun);
+  assert.notEqual(evidenceData.gitBefore, evidenceData.gitAfter);
+  assert.equal(evidenceData.gitBeforeSource, 'pre-launch');
+});
+
 
