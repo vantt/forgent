@@ -7,7 +7,7 @@ import {
   TIER_STRENGTH,
 } from '../../src/runner/dispatch/assignment-policy.mjs';
 import { RunnerConfigError, supportsPolicyTier } from '../../src/runner/dispatch/config.mjs';
-import { resolvePolicyTierModel, deriveProviderFamily } from '../../src/runner/dispatch/resolve.mjs';
+import { resolvePolicyTierModel, deriveProviderFamily, resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 
 test('resolveStrongerTier correctly orders tiers monotonically', () => {
   assert.equal(resolveStrongerTier('standard', 'lightweight'), 'standard');
@@ -287,6 +287,46 @@ test('resolveAssignmentDispatchPolicy derives providerModel from the registered 
   assert.equal(effective.providerModel, 'z-ai');
   assert.equal(effective.model, 'glm-4.6');
   assert.notEqual(effective.providerModel, effective.executorId);
+});
+
+test('resolveAssignmentDispatchPolicy agrees with resolve.mjs\'s resolveExecutorConfig on provider family for a registered executor with no providerModel/provider whose real command is not a Claude CLI command (codex-cli shape)', () => {
+  const executors = {
+    'codex-cli': {
+      kind: 'agent',
+      allowCrossProvider: true,
+      invocations: [
+        { via: 'cli', adapter: 'cli-spawn', command: 'codex', args: ['exec', '{prompt}'] },
+      ],
+    },
+  };
+  const runnerConfig = {
+    executor: { command: 'claude' },
+    executors,
+    modelPolicies: {
+      claude: { standard: 'claude-3-7-sonnet-20250219' },
+      codex: { standard: 'codex-default-model' },
+    },
+  };
+  const assignment = buildAssignment({
+    stage: 'planning',
+    operation: 'validate-plan',
+    policy: { preferExecutor: 'codex-cli' },
+  });
+
+  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig });
+
+  // Pins the fix: a single-argument deriveProviderFamily call silently
+  // defaults its resolvedCommand parameter to "claude", so before the fix
+  // this asserted 'claude' instead of the executor's real command family.
+  assert.equal(effective.providerModel, 'codex');
+  assert.equal(effective.provenance.provider.value, 'codex');
+  assert.notEqual(effective.providerModel, 'claude');
+
+  // Cross-check against resolve.mjs's own resolveExecutorConfig (the
+  // already-correct two-argument call site, resolve.mjs:429) for the same
+  // executor shape — both call sites must derive the same provider family.
+  const resolvedExecutor = resolveExecutorConfig(runnerConfig, 'standard', 'codex-cli');
+  assert.equal(resolvedExecutor.governance.providerFamily, effective.providerModel);
 });
 
 test('resolveAssignmentDispatchPolicy defaults providerModel to "claude" only when the executor is registered but declares no providerModel of its own', () => {

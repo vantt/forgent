@@ -501,7 +501,6 @@ test('operationsForStage resolves explicit operations for planning stage', () =>
     minTier: 'standard',
     preferPersona: 'code-reviewer',
     preferExecutor: 'claude',
-    fallbackExecutors: ['pi'],
   });
 });
 

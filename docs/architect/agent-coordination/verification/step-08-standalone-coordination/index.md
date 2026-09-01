@@ -55,7 +55,7 @@ none
 
 ## Next Action
 
-prepare (P00.4)
+prepare (P01.1)
 
 ## Cell Log
 
@@ -63,16 +63,19 @@ prepare (P00.4)
 |---|---|---|---|
 | P00.1 | Phase 00 R1, R2, R3, R4 | done | `33494fd6` |
 | P00.2 | Phase 00 R5, R6, R7, R8 (+ R10 partial) | done | `7957f6f3` |
-| P00.3 | Phase 00 R9, R10, R11 | done | pending |
+| P00.3 | Phase 00 R9, R10, R11 | done | `454ecb56` |
+| P00.4 | provider-family derivation fix (closes Phase 00) | done | pending |
 
 ## Phase 00 Status
 
-R1-R11 closed across P00.1-P00.3. R11's glm-cli half is a permanent,
-honestly-documented partial (live-executor timeout, not a stop gate — see
-P00.3.md Review). Phase 00 is functionally landed, but **not fully closed**
-per the plan's own Proofs And Exit bar — P00.4 (below) fixes a real
-governance-truthfulness defect discovered live during P00.3. Do not mark
-plan.md's Phase 00 row `done` until P00.4 closes.
+**CLOSED.** R1-R11 across P00.1-P00.4. R11's glm-cli half remains a
+permanent, honestly-documented partial (live-executor timeout, not a stop
+gate — see P00.3.md Review). P00.4 fixed the provider-family derivation
+disagreement (3 registered executors, then a 4th live one discovered by
+its own Red-Team — `gitnexus`) with a loud advisory warning rather than a
+risky full-parity fix; one residual, currently-latent gap remains
+(bare-shape executor with a non-Claude command) and is intentionally
+mitigated, not eliminated — documented in P00.4.md's Gaps section.
 
 P00.2 went through 3 rounds: Doer -> Reviewer (1 HIGH + 1 MEDIUM + 2 LOW,
 all fixed) -> Red-Team (1 new HIGH, RT1, fixed) -> Red-Team re-check
@@ -86,7 +89,7 @@ fixed; this index.md's missing P00.4 entry, fixed directly by the
 Coordinator; a third `deriveProviderFamily`-family instance in
 `transport.mjs`, folded into P00.4) -> Red-Team re-check (confirmed).
 
-## Cell P00.4 (planned, not yet opened)
+## Cell P00.4 (done, closes Phase 00)
 
 **Scope**: fix the `deriveProviderFamily` call-site disagreement —
 live-confirmed during P00.3's codex-cli proof

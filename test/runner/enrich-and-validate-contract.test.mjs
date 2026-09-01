@@ -142,7 +142,6 @@ test('enrichAndValidateContract writes the matched operation\'s own declared pol
     minTier: 'standard',
     preferPersona: 'code-reviewer',
     preferExecutor: 'claude',
-    fallbackExecutors: ['pi'],
   });
   assert.ok(Object.isFrozen(policy));
   assert.ok(Object.isFrozen(policy.fallbackExecutors));

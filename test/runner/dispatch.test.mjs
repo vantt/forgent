@@ -1624,6 +1624,136 @@ test('loadRunnerConfig rejects a "executors.<id>" entry whose providerModel is n
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
+test('loadRunnerConfig does not warn for a "executors.<id>" entry that declares providerModel explicitly', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'has-provider-model.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { 'glm-cli': { kind: 'agent', providerModel: 'z-ai', command: 'glm', args: [] } },
+      modelPolicies: { claude: { standard: 'sonnet' }, 'z-ai': { standard: 'glm-4.6' } },
+      timeoutMs: 1000,
+    }),
+  );
+  const original = console.warn;
+  const calls = [];
+  console.warn = (...args) => calls.push(args);
+  try {
+    loadRunnerConfig(configPath);
+    assert.equal(calls.length, 0);
+  } finally {
+    console.warn = original;
+  }
+});
+
+test('loadRunnerConfig does not warn for a "executors.<id>" entry with a Claude CLI command and no providerModel (correct default case)', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'claude-command-no-provider-model.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { 'custom-claude-executor': { kind: 'agent', command: 'claude', args: ['{prompt}'] } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  const original = console.warn;
+  const calls = [];
+  console.warn = (...args) => calls.push(args);
+  try {
+    loadRunnerConfig(configPath);
+    assert.equal(calls.length, 0);
+  } finally {
+    console.warn = original;
+  }
+});
+
+test('loadRunnerConfig warns (never throws) for a "executors.<id>" entry with a non-Claude command and no providerModel/provider', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'non-claude-command-no-provider-model.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { 'bare-nonclaude': { kind: 'agent', command: 'some-other-tool', args: [] } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  const original = console.warn;
+  const calls = [];
+  console.warn = (...args) => calls.push(args);
+  try {
+    assert.doesNotThrow(() => loadRunnerConfig(configPath));
+    assert.equal(calls.length, 1);
+    assert.match(calls[0][0], /bare-nonclaude/);
+    assert.match(calls[0][0], /some-other-tool/);
+  } finally {
+    console.warn = original;
+  }
+});
+
+test('loadRunnerConfig does not warn for an "invocations[]"-shaped "executors.<id>" entry with no providerModel/provider and a non-Claude cli command (codex-cli shape) — assignment-policy.mjs and resolve.mjs already agree for this shape', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'invocations-shaped-no-provider-model.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: {
+        'codex-cli': {
+          kind: 'agent',
+          invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'codex', args: ['{prompt}'] }],
+        },
+      },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  const original = console.warn;
+  const calls = [];
+  console.warn = (...args) => calls.push(args);
+  try {
+    loadRunnerConfig(configPath);
+    assert.equal(calls.length, 0);
+  } finally {
+    console.warn = original;
+  }
+});
+
+test('loadRunnerConfig warns (never throws) for an "invocations[]"-shaped "executors.<id>" entry with no via:"cli" entry at all (gitnexus shape: mcp-only) and no providerModel/provider — assignment-policy.mjs has no command to extract for this shape', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'invocations-shaped-mcp-only-no-provider-model.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'impact-analysis': {} },
+      executors: {
+        gitnexus: {
+          kind: 'tool',
+          for: ['impact-analysis'],
+          invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
+        },
+      },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  const original = console.warn;
+  const calls = [];
+  console.warn = (...args) => calls.push(args);
+  try {
+    assert.doesNotThrow(() => loadRunnerConfig(configPath));
+    assert.equal(calls.length, 1);
+    assert.match(calls[0][0], /gitnexus/);
+  } finally {
+    console.warn = original;
+  }
+});
+
 test('loadRunnerConfig rejects a "executors.<id>" entry whose rigorOverrides key is not a valid tier', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'bad-rigor-key.json');
@@ -1832,6 +1962,33 @@ test('resolveExecutorCommand result carries an explicit "provider" alias when th
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' });
   assert.equal(resolved.provider, 'agy');
   assert.equal(resolved.command, '/usr/local/bin/agy-cli');
+});
+
+// tsk-2uf-1 Phase 00 R6 follow-up: no cited existing test discriminated
+// this fallback (each either pinned an explicit "provider" alias, or had
+// no providerModel with a command for which the old and new fallback
+// coincidentally agreed) -- glm-cli's real shape (a "claude" command
+// routed to z-ai via env override, no "provider" alias of its own) is the
+// one case where the old fallback (raw executor.command, "claude") and
+// the new one (governance.providerFamily, "z-ai") actually diverge.
+test('resolveExecutorCommand result carries the providerModel-derived family, not the raw command, for an executor with providerModel set and no "provider" alias (glm-cli shape)', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      'glm-cli': {
+        kind: 'agent',
+        providerModel: 'z-ai',
+        allowCrossProvider: true,
+        invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['{prompt}'] }],
+      },
+    },
+    models: {},
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'm', executorId: 'glm-cli' });
+  assert.equal(resolved.command, 'claude');
+  assert.equal(resolved.provider, 'z-ai');
+  assert.notEqual(resolved.provider, resolved.command);
 });
 
 test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" executor is not registered and fgosDir is given', () => {

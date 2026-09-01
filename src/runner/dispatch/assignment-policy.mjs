@@ -197,8 +197,24 @@ export function resolveAssignmentDispatchPolicy({
   // `runnerConfig?.executor?.command` instead here would derive the wrong
   // family whenever those two differ (e.g. an explicit `preferExecutor:
   // 'claude'` override while the global `executor.command` is `'pi'`).
+  // A registered entry's real command lives under `invocations[].command`
+  // (the `via: "cli"` entry — same selection resolve.mjs's
+  // resolveExecutorConfig uses) for every currently-registered production
+  // executor shape (.fgos/config.json's `runner.executors` — every entry
+  // invocations[]-shaped). Without this, `deriveProviderFamily` below
+  // would silently default its `resolvedCommand` parameter to `'claude'`,
+  // disagreeing with resolve.mjs:429's own two-argument call for any
+  // registered executor whose real command isn't a Claude CLI command
+  // (e.g. `codex-cli`). A bare (non-invocations) entry shape has no such
+  // structured signal to extract from — `registeredExecutorCommand` stays
+  // `undefined` there, so `deriveProviderFamily`'s own default parameter
+  // (`'claude'`) applies exactly as it did before this fix, unchanged for
+  // every bare-shape entry (including one whose flat `.command` is a
+  // locally-swapped-in test executable that carries no real provider
+  // signal of its own).
+  const registeredExecutorCommand = registeredExecutorEntry?.invocations?.find((inv) => inv.via === 'cli')?.command;
   const resolvedProvider = registeredExecutorEntry
-    ? deriveProviderFamily(registeredExecutorEntry)
+    ? deriveProviderFamily(registeredExecutorEntry, registeredExecutorCommand)
     : isImplicitDefaultExecutor
       ? deriveProviderFamily({ command: runnerConfig?.executor?.command }, primaryExecutor)
       : primaryExecutor;

@@ -578,6 +578,45 @@ function validateInteractiveModeShape(interactiveMode, label) {
 }
 
 /**
+ * Advisory-only, config-load-time warning: an `executors.<id>` entry that
+ * declares neither `providerModel` nor `provider`, and for which
+ * `assignment-policy.mjs`'s own pre-spawn command extraction
+ * (`invocations[].find((inv) => inv.via === 'cli')?.command` — mirrored
+ * here EXACTLY, since that's the only signal that call site ever reads)
+ * yields no usable command, has no reliable way to name its own provider
+ * family there — `deriveProviderFamily` falls straight to its `'claude'`
+ * default. That's SAFE only when a genuine `via:"cli"` invocation with a
+ * real command exists (`resolve.mjs`'s `resolveExecutorConfig` reads the
+ * exact same signal for that shape, e.g. `codex-cli` — both call sites
+ * already agree, nothing to flag). It's UNSAFE for every other shape that
+ * still lacks `providerModel`/`provider`: a bare (non-`invocations[]`)
+ * entry with a real non-Claude flat `.command` (resolve.mjs correctly
+ * reads that bare command; assignment-policy.mjs never does), and an
+ * `invocations[]`-shaped entry with no `via:"cli"` entry at all — e.g. this
+ * repo's own live `gitnexus` (`invocations: [{via:'mcp', ...}]`, MCP-only)
+ * — where assignment-policy.mjs has literally nothing to extract and
+ * silently defaults to `'claude'` while other call sites resolve a
+ * different (or no) provider family. Never throws — this must not break a
+ * config that currently loads fine; it only recommends declaring
+ * `providerModel` explicitly so every call site agrees.
+ */
+function warnIfProviderFamilyUnreliable(executorId, executor) {
+  if (executor.providerModel !== undefined || executor.provider !== undefined) return;
+  const cliInvocationCommand = Array.isArray(executor.invocations)
+    ? executor.invocations.find((inv) => inv.via === 'cli')?.command
+    : undefined;
+  if (typeof cliInvocationCommand === 'string' && cliInvocationCommand.trim()) return;
+  const command = executor.command;
+  if (typeof command === 'string' && command.trim() && CLAUDE_CLI_COMMANDS.includes(command)) return;
+  const commandDescription = typeof command === 'string' && command.trim() ? JSON.stringify(command) : 'none resolvable from its config';
+  console.warn(
+    `fgos: executor "${executorId}" declares no "providerModel"/"provider" and its command ` +
+      `(${commandDescription}) is not a recognized Claude CLI command — its resolved provider ` +
+      `family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.`,
+  );
+}
+
+/**
  * `capabilityNames` (D15, tsk-in1-4): the Set of valid `for` targets —
  * every key of `cfg.capabilities` (D4/D14) plus every declared `aliases[]`
  * entry, built once by `validateRunnerConfigShape` from the ALREADY-
@@ -836,6 +875,7 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
     }
     for (const [executorId, executor] of Object.entries(cfg.executors)) {
       validateExecutorEntryShape(executor, `${sourceLabel} executors.${executorId}`, capabilityNames);
+      warnIfProviderFamilyUnreliable(executorId, executor);
     }
   }
   // `prefer` names a real executor (D5, docs/history/capability-capacity-
