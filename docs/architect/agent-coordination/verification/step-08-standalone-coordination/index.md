@@ -40,7 +40,7 @@ of a blanket "unrelated" pass.
 | 01 | R1-R8 | done |
 | 02 | R1-R8 | done |
 | 03 | R1-R8 | done |
-| 04 | R1-R9 | missing (depends on 03) |
+| 04 | R1-R9 | R1-R4 done; R5-R9 outstanding (P04.2) |
 | 05 | R1-R8 | missing (depends on 04) |
 | 06 | R1-R8 | missing (depends on 05) |
 | 07 | R1-R8 | missing (depends on 06) |
@@ -51,7 +51,7 @@ none
 
 ## Next Action
 
-prepare (P04.1)
+prepare (P04.2)
 
 ## Cell Log
 
@@ -67,6 +67,7 @@ prepare (P04.1)
 | P02.2 | Phase 02 R5, R6, R7, R8 (closes Phase 02) | done | `bbb71784` |
 | P03.1 | Phase 03 R1, R2, R3, R4 | done | `8fc3130a` |
 | P03.2 | Phase 03 R5, R6, R7, R8 (closes Phase 03) | done | `38a9a010` |
+| P04.1 | Phase 04 R1, R2, R3, R4 | done | pending |
 
 ## Phase 00 Status
 
@@ -301,5 +302,48 @@ live-proof genuineness) independently confirmed clean. Full suite:
 new failure. Deferral Audit: AC-I002/AC-I003/AC-I006 all MET, AC-I008
 still deferred to Phase 07 as planned.
 
-Next: P04.1 (Phase 04 -- research fan-out/Cohort Planner, R1-R4: pure
-deterministic Cohort Planner and unsatisfied explanations).
+## Phase 04 Status (in progress)
+
+**P04.1 CLOSED** (Phase 04 R1-R4): created `src/runner/coordination/cohort-planner.mjs`
+(`buildCandidateInventory`, `matchCandidateToRequirement`, `planCohort`,
+`verifyPlannedAllocationAgainstCurrentConfig`) -- a pure, deterministic
+planner reusing three already-hardened shared functions verbatim
+(`deriveProviderFamily`/`resolveExecutorConfig` for R1's candidate
+inventory, `resolveAssignmentDispatchPolicy` for R4's resolver handoff,
+`mergePolicyStack` for PolicyPatch composition) rather than reimplementing
+any of their logic a second time. Stable candidate/actor order proven
+under permuted insertion order; 6 distinct named rejection reasons
+(executor/provider/tier/capability/context/governance); soft diversity
+degradation only with a declared fallback rule, always recorded, never
+silent; zero scoring/ranking logic (grep-confirmed). Went through 1
+Reviewer round (matching P02.1's proportional-rigor precedent -- pure, no
+fs/concurrency/execution surface, so no Red-Team round): found 1 MEDIUM
+genuine reproducible crash bug (an `agentType`-only executor entry
+combined with a non-Claude global command tripped the module's own
+defensive provider-family invariant, aborting the entire inventory build
+for every candidate -- fixed by correctly replicating
+`resolveExecutorConfig`'s full command-resolution fallback chain) and 1
+MEDIUM documentation-accuracy gap (the R4 resolver-handoff function's
+docstring overclaimed governance-dimension coverage it doesn't actually
+provide -- fixed with an explicit disclosure of the gap and the P04.2
+caller obligation, no behavior change). Both fixes independently
+re-verified by the Coordinator via direct reproduction. Full suite:
+4847/4860 pass, all 8 failures match the documented baseline exactly, no
+new failure.
+
+Next: P04.2 (Phase 04 R5-R9 -- independent fan-out execution, context
+isolation/fan-in, evidence/contradiction handling, two-provider live
+proof, impossible-fixture failure proof; closes Phase 04). Note: R8's
+live proof requires "every tier it requires configured" for at least two
+real provider families -- the real `.fgos/config.json` today only has
+`lightweight` tier configured for every non-`claude` provider family
+(`gemini`/`openai-codex`/`z-ai`), confirmed during P04.1's own
+inventory-building work. If the P04.2 research fixture's design is kept
+to `lightweight` tier, at least 2 of 3 non-`claude` families remain
+viable for a genuine two-provider proof; if a higher tier turns out to be
+genuinely required and no config path can satisfy it after one bounded
+recovery attempt, this maps directly to this plan's own named stop gate
+#4 ("a required live CLI executor/provider is absent, unconfigured, lacks
+the exact required tier...") -- a declared stop condition per phase-04.md's
+own Risks/Rollback text ("not an implementation failure"), not something
+to work around with a fabricated proof.
