@@ -38,7 +38,7 @@ of a blanket "unrelated" pass.
 |---|---|---|
 | 00 | R1-R11 | done |
 | 01 | R1-R8 | done |
-| 02 | R1-R8 | missing (depends on 01) |
+| 02 | R1-R8 | R1-R4 done; R5-R8 outstanding (P02.2) |
 | 03 | R1-R8 | missing (depends on 02) |
 | 04 | R1-R9 | missing (depends on 03) |
 | 05 | R1-R8 | missing (depends on 04) |
@@ -51,7 +51,7 @@ none
 
 ## Next Action
 
-prepare (P02.1)
+prepare (P02.2)
 
 ## Cell Log
 
@@ -63,6 +63,7 @@ prepare (P02.1)
 | P00.4 | provider-family derivation fix (closes Phase 00) | done | `45137208` |
 | P01.1 | Phase 01 R1, R2, R3, R4 | done | `626e057b` |
 | P01.2 | Phase 01 R5, R6, R7, R8 (closes Phase 01) | done | `85206dca` |
+| P02.1 | Phase 02 R1, R2, R3, R4 | done | pending |
 
 ## Phase 00 Status
 
@@ -163,3 +164,37 @@ mirroring the already-correct sibling call. **Do not close Phase 00 (do not
 mark plan.md's Phase 00 row done) until this cell closes or is explicitly
 re-scoped by the maintainer.** Source: `P00.3.md`'s Review section (HIGH
 finding) and Red-Team section (MEDIUM finding #4).
+
+## Phase 02 Status (in progress)
+
+**P02.1 CLOSED** (Phase 02 R1-R4): created `src/runner/definitions/schema.mjs`
+(`validateFlowDefinition`, `mergePolicyStack`, `FlowDefinitionError`) --
+a pure, neutral FlowDefinition IR validator matching
+`flow-definition.md`/ADR-009 exactly: node `kind` derived not stored, no
+`purpose` field, both `Workflow`/`CoordinationProtocol` profiles with
+their mutually-forbidden fields enforced structurally via field
+whitelists, `gate-verdict` legal only under `Workflow`, PolicyPatch
+`minTier` monotonicity (raise-only) across scopes, `missionId` forbidden
+at any nesting depth. Zero existing files touched -- standalone new
+package, no adapter/loader/fixtures yet (R5-R8, P02.2). Went through 1
+Reviewer round: field-by-field contract cross-check plus an edge-case
+sweep (cycle safety, freeze-depth, empty-array handling) found one real
+MEDIUM bug (a `__proto__`-keyed `baseStepMap` entry silently vanished
+with no error -- fixed via `Object.create(null)`) and 2 LOW notes
+(document-scoped not branch-scoped cycle guard, documented not fixed;
+`missionId` test depth broadened). One genuinely ambiguous scope question
+(does `topology.edges[].from/to` need actor cross-referencing) was
+independently adjudicated by the Reviewer against the contract's own
+literal text as a legitimate, contract-supported deferral, not a defect --
+recorded as a Gap for a later phase. No further Red-Team round dispatched:
+unlike the CoordinationSession session-engine cells, this is a pure
+synchronous validator with no concurrency/crash-safety surface, so a
+single thorough Reviewer round was judged proportional. Full suite:
+4763/4776 pass, all 8 failures match the documented baseline exactly, no
+new failure. Phase-level exit criteria (AC-I003/005/006 proofs,
+zero-consumer-migration audit) deferred to P02.2's own close, since this
+cell's module has zero consumers by construction.
+
+Next: P02.2 (Phase 02 R5-R8 -- additive Workflow projection adapter,
+CoordinationProtocol loader, fixtures, setup/doctor registration; closes
+Phase 02).

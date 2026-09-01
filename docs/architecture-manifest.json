@@ -36,6 +36,7 @@
     "src/runner/coordination/store.mjs": "use-case",
     "src/runner/coordination/replay.mjs": "use-case",
     "src/runner/coordination/session-engine.mjs": "use-case",
+    "src/runner/definitions/schema.mjs": "infra",
     "src/runner/prompt-templates.mjs": "infra",
     "src/runner/worker-log.mjs": "infra",
     "src/runner/agent-roster.mjs": "infra",

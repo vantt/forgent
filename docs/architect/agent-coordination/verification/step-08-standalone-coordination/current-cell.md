@@ -4,4 +4,4 @@ none
 
 ## Next Action
 
-prepare (P02.1)
+prepare (P02.2)
