@@ -1,0 +1,49 @@
+{
+  "runId": "run_asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001_01",
+  "assignmentId": "asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001",
+  "workId": null,
+  "executorId": "claude-reviewer",
+  "policy": {
+    "role": "reviewer",
+    "persona": "code-reviewer",
+    "executorPreference": [
+      "claude"
+    ],
+    "providerModel": "claude",
+    "tier": "standard",
+    "model": "sonnet",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    }
+  },
+  "executorRedirected": true,
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001/runs/01/agent-report.md",
+      "sha256": "6739fa69d717a94187b6d727d77554964bc58981757485d9801f7a339fe3cc07"
+    }
+  ],
+  "status": "failed",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "failed",
+    "summary": "agent-result.json was present but failed schema validation"
+  },
+  "evidence": {
+    "gitBefore": "05e79b40e427d11bdbdacb347e95744ee9e41d37",
+    "gitAfter": "05e79b40e427d11bdbdacb347e95744ee9e41d37",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001/runs/01/agent-report.md"
+    ],
+    "tests": []
+  }
+}

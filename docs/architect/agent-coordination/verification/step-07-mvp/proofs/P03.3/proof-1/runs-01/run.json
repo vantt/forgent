@@ -1,0 +1,11 @@
+{
+  "runId": "run_asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001_01",
+  "assignmentId": "asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001",
+  "attempt": 1,
+  "executorId": "claude-reviewer",
+  "dispatchPlanPath": ".fgos/assignments/asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001/runs/01/dispatch-plan.json",
+  "cwd": "/home/vantt/projects/forgentX",
+  "startedAt": "2026-09-01T01:59:12.456Z",
+  "timeoutMs": 2100000,
+  "status": "running"
+}

@@ -37,6 +37,13 @@ Noted, not touched by this track: `.agentkit/`, `.claude/agents/*.md`,
 `.fgos/events/*.jsonl`, `plans/reports/reviewer-cell-6-6-...-report.md`
 (untracked, pre-existing before branch creation).
 
+Noted mid-track (during P03.3, 2026-09-01), also not touched by this
+track: `.fgos/config.json` shows a modified working-tree state
+(`executors.codex`/`.pi`/`.glm` renamed to `.codex-cli`/`.codex-pi`/
+`.glm-cli`) that no cell in this track made — apparently concurrent work
+from elsewhere in this shared checkout. Left alone; not staged by any of
+this track's own commits.
+
 ## Phase / Requirement Matrix
 
 | Phase | Req | Status | Cell | Evidence |
@@ -53,7 +60,7 @@ Noted, not touched by this track: `.agentkit/`, `.claude/agents/*.md`,
 | P02 | R8 | done | P02.5 | `P02.5.md`, commit `a77b95ef` |
 | P03 | R1–R2 | done | P03.1 | `P03.1.md`, commit `2a22c93c` |
 | P03 | R3 | done | P03.2 | `P03.2.md`, commit `7abe80c4` |
-| P03 | R4–R6 | missing | P03.3 | — |
+| P03 | R4–R6 | done | P03.3 | `P03.3.md`, commit (pending, this close) |
 
 Cell split deviates from plan.md's suggested "P02.2 (R5+R6), P02.3
 (R7+R8)" — Coordinator split R5/R6 into separate cells (P02.2, P02.3)
@@ -68,7 +75,29 @@ change to the plan's requirements.
 
 ## ADR Traceability
 
-Populated in Phase 03 per plan requirement R6.
+One row per ADR-006/ADR-007 Decision-section clause, pulled fresh from
+each ADR's own numbered list (not from memory), cross-referenced against
+this track's own closed cells for a unit-test home vs. proof-only
+coverage (R6).
+
+| ADR | Clause | Summary | Unit-test home | Live-proof confirmation |
+|---|---|---|---|---|
+| ADR-006 | §1 | Two provenance classes, one Assignment (`provenance.kind`, `contractPolicyVersion`, `normalizerVersion`, validator chain) | `test/runner/assignment-provenance.test.mjs` (P02.1) | P03.3 Proof 1/2: both `assignment.json`s carry `provenance.kind: "inline"`, `contractPolicyVersion`, `normalizerVersion`, `validators` |
+| ADR-006 | §2 | Normalizer stamps `mutation`/`evidence.required` at build time; missing value is a build failure, never a default | `test/runner/assignment-normalizer.test.mjs` (P02.1) | P03.3 Proof 1/2: both contracts declared `mutation`/`evidence.required` explicitly; a contract omitting either is rejected before build (already covered negative-test territory, not re-exercised live here) |
+| ADR-006 | §3 | Interpretation reads the Assignment (`resultKind`, `onAdvance`), not the operation id | `test/runner/operation-choice.test.mjs` (P02.2) | Follow-Ups (`loop.mjs`'s planning sweep still computes its own verdict directly rather than consuming `outcome.verdictPayload`) notes this is only fully realized on the declared path — inline Assignments carry no `resultKind`/`onAdvance` branch to begin with (non-driving, ADR-007 §3) |
+| ADR-006 | §4 | Minimum inline contract field set; unknown fields rejected | `test/runner/execution-contract.test.mjs` (P02.1) | P03.3 Proof 1/2: both contract files hand-authored strictly from this field list; both accepted |
+| ADR-006 | §5 | Same stores and governance for both provenance classes (`.fgos/assignments/`, `executeAssignment()`, `compileDispatchPlan`, same Run/RunResult normalization) | `test/runner/assignment.test.mjs`, `test/runner/assignment-runresult.test.mjs` (P02.1) | P03.3 Proof 1/2: both ran through the identical `execute --contract` -> `executeAssignment()` -> `compileDispatchPlan` path P03.2's declared-path callers also use; no separate code path exercised (satisfies Phase 03's own Risk stop-gate: no foundation-boundary mismatch found) |
+| ADR-006 | §6 | First slice is read-only; a `mutation: 'mutating'` inline contract is rejected fail-closed; no session/coordination reference in this slice | `test/runner/execution-contract.test.mjs` (P02.1), `test/runner/assignment-dispatch.test.mjs` (P03.2, R3.2's mutating-contract-exits-non-zero tests) | P03.3 Proof 1/2: both contracts `mutation: "read-only"`, neither carries any of the forbidden session fields; both settled with `gitBefore === gitAfter`, `changedFiles: []` |
+| ADR-006 | §7 | Retire the standalone `missionId \|\| workId === null` read-only heuristic once no declared caller passes `workId: null` | `test/runner/mission-lite.test.mjs`, `test/runner/assignment.test.mjs:229` ("isReadOnlyAssignment no longer infers read-only from missionId/workId:null", P02.4) | n/a — a removal, confirmed by the heuristic's absence from the current source (P02.4's own diff), not something a live proof re-demonstrates |
+| ADR-007 | §1 | One pure seam per domain (`enrichAndValidateContract`); may add contextRefs/constraints/evidence rule/policy hints; may reject; may not dispatch, choose executor/provider/tier, or touch Work lifecycle | `test/runner/enrich-and-validate-contract.test.mjs` (P03.1, R1.1-R1.4) | P03.3 Proof 1's own objective is a fresh, independent live re-read of every one of these four guarantees against the current source (`verdict: "match"`, zero mismatch); P03.3 Proof 2: `assignment.json`'s harness-added `contextRefs`/`constraints`/`expectedOutputs` visible on a real run |
+| ADR-007 | §2 | Standalone uses the generic validator only — the evidence the foundation boundary does not depend on any domain | `test/runner/assignment-provenance.test.mjs`: "buildAssignment (inline) skips the harness seam entirely when no domain is resolvable ... — ADR-007 §2" (P03.1, R1.5) | P03.3 Proof 1: real live run, `provenance.validators` is `["execution-contract-schema"]` only (no `"domain-harness-seam"`), zero `stage`/`domain`/`taskSpec`/`operation` field anywhere in the persisted `assignment.json` |
+| ADR-007 | §3 | Inline-on-Work is supporting, never driving: `supports` must name a legal Stage Operation (harness rejects otherwise); a declared Stage Operation must use the declared path; the RunResult of an inline Assignment is non-driving evidence | `test/runner/enrich-and-validate-contract.test.mjs` (P03.1, R1.1, `supports` legality); `test/runner/operation-choice.test.mjs` (P03.1, R2.1, non-driving filter) | P03.3 Proof 2: real run against a real Work at `stage: planning`, `contract.supports: "shape-plan"` (a real legal operation) accepted; `provenance.validators` includes `"domain-harness-seam"`; Work's `stage`/`status` provably unchanged after the run; `dispatch.mjs decide --work` output byte-identical before/after the run, proving the driver's next-operation choice ignored the inline RunResult |
+| ADR-007 | §4 | No registry or lifecycle hooks yet — additional seams require a second real consumer demonstrating the need | n/a — a design constraint (an absence), not a positive behavior a unit test asserts | n/a — confirmed by inspection: `domains/coding/harness/` contains exactly one seam file, no registry/plugin-loader module exists anywhere in `src/runner/dispatch/`; P03.3's own two proofs are themselves the "two unlike consumers" (standalone read-only reviewer vs. Work-attached planning advisor) this ADR's own Rejected Alternatives cites as the bar for ever building one |
+
+Phase 01 (R1-R5, `plans/260831-1637-step07-inline-assignment-mvp/phase-01-execute-assignment-hardening-and-plan-verdict-derivation.md`)
+is prerequisite groundwork (G1/G6 hardening, `planVerdictFromPlanMd`) for
+Phase 02's `onAdvance` wiring — it does not itself implement an ADR-006/007
+clause and has no row above.
 
 ## Follow-Ups (Out Of Scope, Logged For Later Phases)
 
@@ -143,19 +172,45 @@ Populated in Phase 03 per plan requirement R6.
   `Object.create(null)` at the source so every consumer gets it for free.
   Cross-cutting both call sites — pick up in a future cell that touches
   either one.
+- `current-cell.md`'s Proof 1 instructions (P03.3) asked for a
+  `preferExecutor: "claude-reviewer"` policy-hint contract field that does
+  not exist in `execution-contract.mjs`'s `ACCEPTED_CONTRACT_FIELDS` — the
+  Doer correctly omitted it (executor selection resolved via the existing
+  `isReadOnlyAssignment` redirect instead) but this was undocumented until
+  P03.3 Red-Team caught it. No fix needed — either add a real
+  `preferExecutor`-style contract field in a future phase if inline
+  callers need to hint an executor, or update the cell-authoring template
+  to stop suggesting a field that doesn't exist.
+- `renderAssignmentPrompt` (`src/runner/dispatch/assignment.mjs:612-670`)
+  never states the `{status, summary}` minimum shape
+  `validateAgentResultClaim` actually requires of `agent-result.json` for
+  a standalone inline Assignment (one with no TaskSpec to document that
+  schema) — a declared operation's TaskSpec markdown documents it, but an
+  inline contract has none. Found live by P03.3 Proof 1: the executor did
+  genuinely correct work but wrote its own reasonable, non-conforming JSON
+  shape, and settled `status: "failed"` purely on the schema mismatch, not
+  the underlying answer's quality. Coordinator accepted this as a real,
+  non-blocking finding (Non-Goals forbade a source change in P03.3 itself)
+  — see `P03.3.md`'s Gaps and `proof-1-standalone-inline-read-only.md`'s
+  "Genuine finding" section for the full trace. Fix direction: render the
+  `{status, summary}` minimum shape into `renderAssignmentPrompt`'s
+  "Result artifact" block unconditionally, for every Assignment (declared
+  or inline), not only TaskSpec-documented ones.
 
 ## Active Cell
 
-None. P03.2 (R3, CLI `--contract` door) is closed — see `P03.2.md`. Two
-review/red-team rounds: HIGH #1 (sequential assignmentId collision) fixed
-and rechecked clean; HIGH #2 (true-concurrency assignmentId collision, an
-atomic `claimAssignmentId` mkdirSync-based claim) fixed and rechecked
-clean; 2 LOW findings logged as Follow-Ups above, non-blocking. 29/29
-targeted tests pass; full suite 4643 tests, 4630 pass, 8 fail (all match
-recorded baseline, zero new failures).
+None. P03.3 (R4-R6) is closed — see `P03.3.md`. Both live proofs ran for
+real against the configured `claude-reviewer` executor and were
+independently verified authentic by Coordinator, Reviewer, and Red-Team
+against raw artifacts; ADR Traceability populated (11 rows); 2 MEDIUM
+docs-citation defects found and fixed, 1 LOW documentation gap logged.
+Phase 03 (R1-R6) is now fully done. **All three phases of this plan are
+now done.**
 
 ## Next Action
 
-Prepare cell P03.3 — Phase 03 R4–R6 (Proof 1 standalone, Proof 2 coding
-consult, ADR traceability). Executor `claude-reviewer` is configured in
-`.fgos/config.json`, so the live-proof stop gate does not apply.
+Plan complete. Proceed to master-coordinator.md step J (COMPLETE): final
+full-suite run (done, this close — 4643/4630/8-fail, matches baseline),
+set `plan.md` Status: done, update ADR-006/ADR-007 `Implementation:`
+metadata, add a pointer from the Step 07 checkpoint to this index, commit
+`docs(step-07-mvp): close step-07-mvp`, emit the final report.
