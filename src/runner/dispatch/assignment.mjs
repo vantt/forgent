@@ -177,6 +177,68 @@ export function createAssignmentId({ workId, missionId, stage, operation, caller
   return candidateId;
 }
 
+// Same retry ceiling as mission-lite.mjs's own independent claim loop
+// (MAX_ASSIGNMENT_CLAIM_ATTEMPTS = 8) -- kept as a separate local constant
+// rather than importing mission-lite's, since mission-lite.mjs is a
+// deliberately untouched call site (out of scope for this fix) and this
+// value is a retry-count tuning knob, not a shared invariant that would
+// drift if the two ever diverged.
+const MAX_ASSIGNMENT_ID_CLAIM_ATTEMPTS = 8;
+
+/**
+ * Atomically claim a collision-free assignmentId for an inline call site
+ * that must NOT hand-roll a write of `assignment.json`'s content (ADR-006
+ * R3.5-style constraint) -- unlike `createMissionAssignment`'s own claim
+ * loop (which additionally opens `assignment.json` with `wx` to persist the
+ * content it claims), this only reserves the id.
+ *
+ * `createAssignmentId`'s own directory scan (above) is check-then-act: two
+ * genuinely concurrent callers can both compute the same candidate id
+ * before either one's directory exists on disk. `fs.mkdirSync(dir)`
+ * (no `{ recursive: true }`) is atomic at the OS level -- it throws EEXIST
+ * if the directory already exists -- so it doubles as the claim: on
+ * success the id is genuinely reserved (no need to write anything inside
+ * it; `executeAssignment()`'s own lazy first-write, which already does
+ * `fs.mkdirSync(runsDir, { recursive: true })` before checking for
+ * `assignment.json`, tolerates the directory pre-existing and just writes
+ * into it). On EEXIST, rebuild: the losing attempt's own claimed-but-empty
+ * directory is still on disk, so the next `buildCandidate()` call's
+ * `createAssignmentId` scan sees it and advances past it to a fresh id.
+ *
+ * @param {() => object} buildCandidate Builds a fresh candidate Assignment
+ *   each call (must re-derive `assignmentId` from current disk state, e.g.
+ *   by passing `options.assignmentsDir` through to `buildAssignment`).
+ * @param {string} assignmentsDir Directory the candidate ids are claimed under.
+ * @returns {object} The claimed (already frozen) Assignment.
+ */
+export function claimAssignmentId(buildCandidate, assignmentsDir) {
+  // `assignmentsDir` is only created once `buildCandidate()` has produced a
+  // legal candidate at least once -- a caller whose contract fails
+  // validation (e.g. a mutating contract, ADR-006 R3.2) must throw with
+  // zero filesystem side effects, matching this door's pre-claim behavior
+  // exactly (no `.fgos/assignments` directory ever created for a rejected
+  // contract).
+  let assignmentsDirEnsured = false;
+  for (let attempt = 0; attempt < MAX_ASSIGNMENT_ID_CLAIM_ATTEMPTS; attempt += 1) {
+    const assignment = buildCandidate();
+    if (!assignmentsDirEnsured) {
+      fs.mkdirSync(assignmentsDir, { recursive: true });
+      assignmentsDirEnsured = true;
+    }
+    const assignmentDir = path.join(assignmentsDir, assignment.assignmentId);
+    try {
+      fs.mkdirSync(assignmentDir);
+      return assignment;
+    } catch (err) {
+      if (err.code !== 'EEXIST') throw err;
+      // Another writer already claimed this exact id -- retry with a fresh candidate.
+    }
+  }
+  throw new RunnerConfigError(
+    `claimAssignmentId could not claim a unique assignmentId under "${assignmentsDir}" after ${MAX_ASSIGNMENT_ID_CLAIM_ATTEMPTS} attempts -- persistent assignmentId collisions`,
+  );
+}
+
 /**
  * Convert one selected stage operation into an immutable Assignment object (Step 03).
  *

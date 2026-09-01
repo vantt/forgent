@@ -56,6 +56,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   alongside the existing human-readable stderr message, so a calling skill
   can branch on the failure class instead of only ever seeing a bare exit
   code.
+- `node dispatch.mjs execute --contract <file>` — a CLI door that builds and
+  runs an inline Assignment straight from a caller-authored execution
+  contract file (ADR-006 §4's field set, flat JSON; an optional top-level
+  `caller` key overrides the auto-resolved writer identity), with no Work
+  item, Stage, or `decide --for` involved. Mutually exclusive with `--for`
+  and `--assignment`. Accepts `--work <id>` to attach the contract to a real
+  Work at a declared Stage, firing that domain's harness seam (ADR-007 §1)
+  when one exists.
 
 ### Fixed
 

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execSync, execFileSync } from 'node:child_process';
+import { execSync, execFileSync, execFile } from 'node:child_process';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
@@ -16,6 +16,24 @@ import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mj
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-dispatch-test-'));
+}
+
+// Genuine OS-level concurrency (real subprocesses launched via Promise.all),
+// not sequential execFileSync -- the only way to actually exercise the
+// assignmentId claim race, as opposed to the sequential/retry case the
+// earlier Fix Round 1 test already covers.
+function execFileAsync(command, args, options) {
+  return new Promise((resolve, reject) => {
+    execFile(command, args, options, (err, stdout, stderr) => {
+      if (err) {
+        err.stdout = stdout;
+        err.stderr = stderr;
+        reject(err);
+      } else {
+        resolve({ stdout, stderr });
+      }
+    });
+  });
 }
 
 function writeEchoExecutor(dir) {
@@ -821,6 +839,535 @@ test('Cell 6.3 Fix Round 1: absent claude-reviewer config entry falls back uncha
   assert.equal(result.status, 'done');
   assert.equal(result.executorId, 'claude');
   assert.equal(fs.existsSync(worker.argvCapturePath), true, 'absent config must still fall back to spawning plain claude');
+});
+
+// ─── ADR-007 R3: `execute --contract <file>` CLI door ──────────────────────
+
+// The file IS the contract (ADR-006 §4's field list, flat) -- a minimal
+// read-only inline contract a human or calling agent could hand-write.
+function inlineContractFileContent(overrides = {}) {
+  return {
+    objective: 'Answer one bounded design question about this repo.',
+    contextRefs: [],
+    constraints: [],
+    expectedOutputs: ['a written report'],
+    mutation: 'read-only',
+    evidence: { required: 'reported' },
+    role: 'reviewer',
+    budget: { timeoutMs: 5000, maxRuns: 1 },
+    ...overrides,
+  };
+}
+
+test('dispatch CLI execute subcommand rejects --contract combined with --for before doing anything else', () => {
+  const tempDir = mkTempDir();
+  const contractPath = path.join(tempDir, 'contract.json');
+  fs.writeFileSync(contractPath, JSON.stringify(inlineContractFileContent()));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [dispatchScript, 'execute', '--contract', contractPath, '--for', 'reviewer', '--cwd', tempDir],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /--contract cannot be combined with --for/);
+      return true;
+    },
+  );
+  assert.equal(
+    fs.existsSync(path.join(tempDir, '.fgos', 'assignments')),
+    false,
+    'a rejected flag combination must never reach assignment building',
+  );
+});
+
+test('dispatch CLI execute subcommand rejects --contract combined with --assignment before doing anything else', () => {
+  const tempDir = mkTempDir();
+  const contractPath = path.join(tempDir, 'contract.json');
+  fs.writeFileSync(contractPath, JSON.stringify(inlineContractFileContent()));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [dispatchScript, 'execute', '--contract', contractPath, '--assignment', 'asgn_does_not_exist_001', '--cwd', tempDir],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /--contract cannot be combined with --assignment/);
+      return true;
+    },
+  );
+});
+
+test('dispatch CLI execute subcommand with --contract exits non-zero for a mutating contract before any executor is invoked', () => {
+  const tempDir = mkTempDir();
+  fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
+
+  const markerPath = path.join(tempDir, 'executor-was-invoked.marker');
+  const executorScript = path.join(tempDir, 'marker-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    fs.writeFileSync(${JSON.stringify(markerPath)}, 'invoked');
+    process.exit(0);
+    `,
+  );
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const contractPath = path.join(tempDir, 'contract.json');
+  fs.writeFileSync(contractPath, JSON.stringify(inlineContractFileContent({ mutation: 'mutating' })));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [dispatchScript, 'execute', '--contract', contractPath, '--cwd', tempDir],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /mutating.*rejected/i);
+      return true;
+    },
+  );
+  assert.equal(fs.existsSync(markerPath), false, 'a mutating contract must be rejected before any executor is ever spawned');
+  assert.equal(
+    fs.existsSync(path.join(tempDir, '.fgos', 'assignments')),
+    false,
+    'no assignment/run directory should be created for a rejected mutating contract',
+  );
+});
+
+test('dispatch CLI execute subcommand with --contract exits non-zero when the contract omits mutation entirely', () => {
+  const tempDir = mkTempDir();
+  fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
+  const contractPath = path.join(tempDir, 'contract.json');
+  const { mutation, ...withoutMutation } = inlineContractFileContent();
+  fs.writeFileSync(contractPath, JSON.stringify(withoutMutation));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [dispatchScript, 'execute', '--contract', contractPath, '--cwd', tempDir],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /mutation/i);
+      return true;
+    },
+  );
+});
+
+test('dispatch CLI execute subcommand with --contract and --work fires the domain harness seam through a real subprocess run', async () => {
+  const tempDir = mkTempDir();
+  const fgosDir = path.join(tempDir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, {
+    id: 'tsk-contract-cli-seam',
+    title: 'Contract CLI seam target',
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    kind: 'feature',
+    risk: 'standard',
+    deps: [],
+    refs: [],
+    verify: 'true',
+    docsRef: 'docs/history/contract-cli-seam',
+  });
+
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const contractPath = path.join(tempDir, 'contract.json');
+  fs.writeFileSync(
+    contractPath,
+    JSON.stringify(inlineContractFileContent({ role: 'advisor', supports: 'validate-plan' })),
+  );
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  const stdout = execFileSync(
+    process.execPath,
+    [dispatchScript, 'execute', '--contract', contractPath, '--work', 'tsk-contract-cli-seam', '--cwd', tempDir],
+    { encoding: 'utf8', cwd: tempDir },
+  );
+
+  const parsed = JSON.parse(stdout.trim());
+  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.workId, 'tsk-contract-cli-seam');
+
+  const assignmentJson = JSON.parse(
+    fs.readFileSync(path.join(fgosDir, 'assignments', parsed.assignmentId, 'assignment.json'), 'utf8'),
+  );
+  assert.equal(assignmentJson.provenance.kind, 'inline');
+  assert.deepEqual(assignmentJson.provenance.validators, ['execution-contract-schema', 'domain-harness-seam']);
+  assert.equal(assignmentJson.workId, 'tsk-contract-cli-seam');
+  assert.ok(
+    assignmentJson.contextRefs.includes('docs/history/contract-cli-seam/plan.md'),
+    'the harness-added context refs must be visible on the persisted assignment.json',
+  );
+});
+
+test('dispatch CLI execute subcommand with --contract and no --work builds a standalone inline Assignment, no Stage/domain involved (Proof 1 shape)', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+  fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const contractPath = path.join(tempDir, 'contract.json');
+  fs.writeFileSync(contractPath, JSON.stringify(inlineContractFileContent()));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  const stdout = execFileSync(
+    process.execPath,
+    [dispatchScript, 'execute', '--contract', contractPath, '--cwd', tempDir],
+    { encoding: 'utf8', cwd: tempDir },
+  );
+
+  const parsed = JSON.parse(stdout.trim());
+  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.workId, null);
+
+  const assignmentJson = JSON.parse(
+    fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', parsed.assignmentId, 'assignment.json'), 'utf8'),
+  );
+  assert.equal(assignmentJson.provenance.kind, 'inline');
+  assert.deepEqual(assignmentJson.provenance.validators, ['execution-contract-schema']);
+  assert.equal(assignmentJson.stage, undefined);
+  assert.equal(assignmentJson.domain, undefined);
+  assert.equal(assignmentJson.operation, undefined);
+  assert.ok(
+    typeof assignmentJson.provenance.inline.caller.writerId === 'string' && assignmentJson.provenance.inline.caller.writerId.length > 0,
+    'caller.writerId must be auto-resolved via resolveWriterIdentity() when the contract file omits it',
+  );
+});
+
+test('dispatch CLI execute subcommand with --contract honors a file-supplied caller.writerId verbatim instead of overwriting it', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+  fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const contractPath = path.join(tempDir, 'contract.json');
+  fs.writeFileSync(
+    contractPath,
+    JSON.stringify({ ...inlineContractFileContent(), caller: { writerId: 'explicit-caller-007' } }),
+  );
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  const stdout = execFileSync(
+    process.execPath,
+    [dispatchScript, 'execute', '--contract', contractPath, '--cwd', tempDir],
+    { encoding: 'utf8', cwd: tempDir },
+  );
+
+  const parsed = JSON.parse(stdout.trim());
+  assert.equal(parsed.status, 'done');
+
+  const assignmentJson = JSON.parse(
+    fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', parsed.assignmentId, 'assignment.json'), 'utf8'),
+  );
+  assert.equal(assignmentJson.provenance.inline.caller.writerId, 'explicit-caller-007');
+  assert.match(parsed.assignmentId, /^asgn_explicit_caller_007_op_\d{3}$/);
+});
+
+test('dispatch CLI execute subcommand with --contract and an unknown --work id fails clearly without building an assignment', () => {
+  const tempDir = mkTempDir();
+  fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
+  const contractPath = path.join(tempDir, 'contract.json');
+  fs.writeFileSync(contractPath, JSON.stringify(inlineContractFileContent({ role: 'advisor', supports: 'validate-plan' })));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [dispatchScript, 'execute', '--contract', contractPath, '--work', 'tsk-does-not-exist', '--cwd', tempDir],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /no work item "tsk-does-not-exist" found/);
+      return true;
+    },
+  );
+  assert.equal(
+    fs.existsSync(path.join(tempDir, '.fgos', 'assignments')),
+    false,
+    'an unknown --work id must fail before any assignment is built',
+  );
+});
+
+test('dispatch CLI execute subcommand with --contract computes a distinct assignmentId on a second --work invocation instead of silently re-executing the stale first one (Fix Round 1)', () => {
+  const tempDir = mkTempDir();
+  const fgosDir = path.join(tempDir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, {
+    id: 'tsk-contract-collision',
+    title: 'Contract collision regression target',
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    kind: 'feature',
+    risk: 'standard',
+    deps: [],
+    refs: [],
+    verify: 'true',
+    docsRef: 'docs/history/contract-collision',
+  });
+
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const contract1Path = path.join(tempDir, 'contract1.json');
+  fs.writeFileSync(
+    contract1Path,
+    JSON.stringify(inlineContractFileContent({
+      role: 'advisor',
+      supports: 'validate-plan',
+      objective: 'FIRST invocation objective — should be run 1.',
+      caller: { writerId: 'collision-writer' },
+    })),
+  );
+  const contract2Path = path.join(tempDir, 'contract2.json');
+  fs.writeFileSync(
+    contract2Path,
+    JSON.stringify(inlineContractFileContent({
+      role: 'advisor',
+      supports: 'validate-plan',
+      objective: 'SECOND invocation objective — should be run 2, not run 1.',
+      caller: { writerId: 'collision-writer' },
+    })),
+  );
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  const stdout1 = execFileSync(
+    process.execPath,
+    [dispatchScript, 'execute', '--contract', contract1Path, '--work', 'tsk-contract-collision', '--cwd', tempDir],
+    { encoding: 'utf8', cwd: tempDir },
+  );
+  const parsed1 = JSON.parse(stdout1.trim());
+  assert.equal(parsed1.status, 'done');
+
+  const stdout2 = execFileSync(
+    process.execPath,
+    [dispatchScript, 'execute', '--contract', contract2Path, '--work', 'tsk-contract-collision', '--cwd', tempDir],
+    { encoding: 'utf8', cwd: tempDir },
+  );
+  const parsed2 = JSON.parse(stdout2.trim());
+  assert.equal(parsed2.status, 'done');
+
+  assert.notEqual(parsed2.assignmentId, parsed1.assignmentId, 'a second --contract --work invocation under the same writer must never collide with the first assignmentId');
+
+  const assignment2Json = JSON.parse(
+    fs.readFileSync(path.join(fgosDir, 'assignments', parsed2.assignmentId, 'assignment.json'), 'utf8'),
+  );
+  assert.equal(
+    assignment2Json.provenance.inline.contract.objective,
+    'SECOND invocation objective — should be run 2, not run 1.',
+    'the second call must persist its OWN contract content, not silently re-execute the first',
+  );
+});
+
+test('dispatch CLI execute subcommand with --contract computes distinct assignmentIds for genuinely concurrent invocations under the same --work id, and both contracts persist (Red-Team fix)', async () => {
+  const tempDir = mkTempDir();
+  const fgosDir = path.join(tempDir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, {
+    id: 'tsk-contract-race',
+    title: 'Contract concurrency race target',
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    kind: 'feature',
+    risk: 'standard',
+    deps: [],
+    refs: [],
+    verify: 'true',
+    docsRef: 'docs/history/contract-race',
+  });
+
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const contract1Path = path.join(tempDir, 'race-contract1.json');
+  fs.writeFileSync(
+    contract1Path,
+    JSON.stringify(inlineContractFileContent({
+      role: 'advisor',
+      supports: 'validate-plan',
+      objective: 'RACE CONTRACT ONE',
+      caller: { writerId: 'race-writer' },
+    })),
+  );
+  const contract2Path = path.join(tempDir, 'race-contract2.json');
+  fs.writeFileSync(
+    contract2Path,
+    JSON.stringify(inlineContractFileContent({
+      role: 'advisor',
+      supports: 'validate-plan',
+      objective: 'RACE CONTRACT TWO',
+      caller: { writerId: 'race-writer' },
+    })),
+  );
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  const run = (contractPath) =>
+    execFileAsync(
+      process.execPath,
+      [dispatchScript, 'execute', '--contract', contractPath, '--work', 'tsk-contract-race', '--cwd', tempDir],
+      { encoding: 'utf8', cwd: tempDir },
+    );
+
+  const [result1, result2] = await Promise.all([run(contract1Path), run(contract2Path)]);
+  const parsed1 = JSON.parse(result1.stdout.trim());
+  const parsed2 = JSON.parse(result2.stdout.trim());
+
+  // Do NOT assert both calls reach status 'done': cli.mjs:467-483's
+  // pre-existing per-cwd single-flight lock (unrelated to assignmentId
+  // claiming -- it serializes actual executor SPAWNS, not the id claim)
+  // can legitimately reject one of two genuinely concurrent executor runs
+  // against the same cwd with a loud 'dispatch ... already in flight'
+  // failure. That is an honest, visible error, not the silent false
+  // success this fix targets -- what must never happen is a collided
+  // assignmentId or lost contract content, asserted below.
+  assert.ok(parsed1.assignmentId, 'call 1 must produce an assignmentId');
+  assert.ok(parsed2.assignmentId, 'call 2 must produce an assignmentId');
+  assert.notEqual(
+    parsed2.assignmentId,
+    parsed1.assignmentId,
+    'two genuinely concurrent --contract --work invocations under the same Work must never collide on assignmentId',
+  );
+
+  const assignmentsDir = path.join(fgosDir, 'assignments');
+  const readObjective = (assignmentId) =>
+    JSON.parse(fs.readFileSync(path.join(assignmentsDir, assignmentId, 'assignment.json'), 'utf8')).provenance
+      .inline.contract.objective;
+  assert.equal(
+    readObjective(parsed1.assignmentId),
+    'RACE CONTRACT ONE',
+    'call 1 own persisted assignment.json must carry its own contract content, not be silently discarded',
+  );
+  assert.equal(
+    readObjective(parsed2.assignmentId),
+    'RACE CONTRACT TWO',
+    'call 2 own persisted assignment.json must carry its own contract content, not be silently discarded',
+  );
+});
+
+test('dispatch CLI execute subcommand with --contract computes distinct assignmentIds for genuinely concurrent invocations with no --work at all (writer-identity-only fallback id path) (Red-Team fix)', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+  fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const contract1Path = path.join(tempDir, 'nowork-race1.json');
+  fs.writeFileSync(
+    contract1Path,
+    JSON.stringify(inlineContractFileContent({
+      objective: 'NOWORK RACE ONE',
+      caller: { writerId: 'nowork-race-writer' },
+    })),
+  );
+  const contract2Path = path.join(tempDir, 'nowork-race2.json');
+  fs.writeFileSync(
+    contract2Path,
+    JSON.stringify(inlineContractFileContent({
+      objective: 'NOWORK RACE TWO',
+      caller: { writerId: 'nowork-race-writer' },
+    })),
+  );
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  const run = (contractPath) =>
+    execFileAsync(
+      process.execPath,
+      [dispatchScript, 'execute', '--contract', contractPath, '--cwd', tempDir],
+      { encoding: 'utf8', cwd: tempDir },
+    );
+
+  const [result1, result2] = await Promise.all([run(contract1Path), run(contract2Path)]);
+  const parsed1 = JSON.parse(result1.stdout.trim());
+  const parsed2 = JSON.parse(result2.stdout.trim());
+
+  // See the same-Work race test above for why this does not assert both
+  // calls reach status 'done' -- the pre-existing per-cwd single-flight
+  // lock (cli.mjs:467-483) can legitimately reject one concurrent
+  // executor spawn with a loud, honest error unrelated to assignmentId
+  // claiming. What must never happen -- a collided id or lost content --
+  // is asserted below.
+  assert.ok(parsed1.assignmentId, 'call 1 must produce an assignmentId');
+  assert.ok(parsed2.assignmentId, 'call 2 must produce an assignmentId');
+  assert.notEqual(
+    parsed2.assignmentId,
+    parsed1.assignmentId,
+    'two genuinely concurrent --contract invocations with no --work under the same caller.writerId must never collide on assignmentId',
+  );
+
+  const assignmentsDir = path.join(tempDir, '.fgos', 'assignments');
+  const readObjective = (assignmentId) =>
+    JSON.parse(fs.readFileSync(path.join(assignmentsDir, assignmentId, 'assignment.json'), 'utf8')).provenance
+      .inline.contract.objective;
+  assert.equal(
+    readObjective(parsed1.assignmentId),
+    'NOWORK RACE ONE',
+    'call 1 own persisted assignment.json must carry its own contract content, not be silently discarded',
+  );
+  assert.equal(
+    readObjective(parsed2.assignmentId),
+    'NOWORK RACE TWO',
+    'call 2 own persisted assignment.json must carry its own contract content, not be silently discarded',
+  );
 });
 
 

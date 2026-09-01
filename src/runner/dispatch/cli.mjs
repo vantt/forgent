@@ -32,6 +32,8 @@ import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { hasWorkerSlotRoom } from '../../state/worker-slots.mjs';
 import { buildDispatchResult } from './result-ladder.mjs';
 import { executeAssignment } from './assignment-runner.mjs';
+import { buildAssignment, claimAssignmentId } from './assignment.mjs';
+import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
 // Resolved against THIS module's own file location, never a caller-supplied
 // `root` -- `bin/fgos.mjs` is a fixed sibling of this checkout's own
@@ -857,6 +859,22 @@ export async function runDispatchCli() {
       // stdout is left untouched, still carrying only the single final JSON
       // line below, so a scripted caller's JSON.parse(stdout) sees no change.
       const assignmentId = flagValue('--assignment');
+      const contractFile = flagValue('--contract');
+      // ADR-007 R3: `--contract <file>` is its own dispatch door -- an
+      // inline, no-Work/no-Stage/no-`decide --for` Assignment built
+      // straight from a caller-authored execution contract file. Reject it
+      // combined with `--for` or `--assignment` up front, before anything
+      // else in this subcommand happens (parse, build, dispatch), mirroring
+      // how `--assignment` already short-circuits the rest of this branch
+      // on its own flag alone, immediately below.
+      if (contractFile && (assignmentId || flagValue('--for'))) {
+        const conflictingFlag = assignmentId ? '--assignment' : '--for';
+        process.stderr.write(
+          `execute --contract cannot be combined with ${conflictingFlag} -- pick exactly one dispatch door\n`,
+        );
+        process.exitCode = 1;
+        break;
+      }
       if (assignmentId) {
         const cwd = flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd();
         let root = flagValue('--repo-root') ?? resolveMainCheckoutRoot(cwd);
@@ -922,6 +940,158 @@ export async function runDispatchCli() {
             process.exitCode = 1;
           },
         );
+        break;
+      }
+
+      if (contractFile) {
+        // Same cwd/root resolution as the `--assignment` branch just above
+        // (ADR-007 R3 explicitly asks this door to match it, not diverge).
+        // Note this branch, like `--assignment`, does NOT call
+        // `guardCwdRepoRootDivergence` -- that guard is only wired into the
+        // plain-prompt path further below; `--assignment` never called it
+        // either, so this stays consistent with the closest existing
+        // precedent rather than adding a new check unasked.
+        const cwd = flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd();
+        let root = flagValue('--repo-root') ?? resolveMainCheckoutRoot(cwd);
+        if (!root) {
+          try {
+            root = resolveRepoRoot(cwd);
+          } catch {
+            root = cwd;
+          }
+        }
+        const fgosDir = fgosDirFromRoot(root);
+
+        // `--contract <file>` reads a raw path exactly like `--prompt-file`
+        // above resolves it (relative to process.cwd(), no path.resolve
+        // against root/cwd flags) -- same convention, not a new one.
+        let raw;
+        try {
+          raw = fs.readFileSync(contractFile, 'utf8');
+        } catch (err) {
+          process.stderr.write(`failed to read contract file at ${contractFile}: ${err.message}\n`);
+          process.exitCode = 1;
+          break;
+        }
+        let parsed;
+        try {
+          parsed = JSON.parse(raw);
+        } catch (err) {
+          process.stderr.write(`failed to parse contract file at ${contractFile}: ${err.message}\n`);
+          process.exitCode = 1;
+          break;
+        }
+
+        // The file IS the contract (ADR-006 §4's field list, flat) -- the
+        // one exception is an optional top-level `caller` key, pulled out
+        // here rather than left for execution-contract.mjs's own
+        // unknown-field gate to reject it (`caller` is caller PROVENANCE,
+        // never one of execution-contract.mjs's ACCEPTED_CONTRACT_FIELDS).
+        let fileCaller;
+        let contractFields = parsed;
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          ({ caller: fileCaller, ...contractFields } = parsed);
+        }
+
+        // `caller.writerId` is auto-resolved via resolveWriterIdentity()
+        // only when the file does not already supply a non-empty one --
+        // this door is the SECOND real call site for that function
+        // (mission-lite.mjs's createMissionAssignment is the first). A
+        // file-supplied `parentAssignmentId` always survives untouched
+        // either way. See this cell's trace (P03.2.md Gaps) for why
+        // "only when absent" was chosen over unconditionally overwriting
+        // whatever the file says.
+        let caller;
+        if (
+          fileCaller &&
+          typeof fileCaller === 'object' &&
+          typeof fileCaller.writerId === 'string' &&
+          fileCaller.writerId.trim() !== ''
+        ) {
+          caller = fileCaller;
+        } else {
+          const resolvedWriter = resolveWriterIdentity(fgosDir);
+          caller = {
+            ...(fileCaller && typeof fileCaller === 'object' ? fileCaller : {}),
+            writerId: String(resolvedWriter.id),
+          };
+        }
+
+        // ADR-007 §1/R5: reuse the exact `--work <id>` lookup `decide
+        // --work` already established (cli.mjs, `listWork(fgosDir).work[workIdArg]`)
+        // -- this is what lets the domain harness seam actually fire for an
+        // inline contract attached to a real Work at a declared Stage.
+        const workIdArg = flagValue('--work');
+        let work;
+        if (workIdArg) {
+          work = listWork(fgosDir).work[workIdArg];
+          if (!work) {
+            process.stderr.write(`no work item "${workIdArg}" found -- cannot attach inline contract to it\n`);
+            process.exitCode = 1;
+            break;
+          }
+        }
+
+        // A mutating contract (or any other execution-contract.mjs /
+        // domain-harness rejection) must exit non-zero HERE, before
+        // executeAssignment (and therefore any executor) is ever reached --
+        // buildAssignment()'s inline path throws RunnerConfigError
+        // synchronously for exactly this (ADR-006 §6).
+        // ADR-006 R4 / Red-Team fix (P03.2): createAssignmentId's own
+        // directory scan is check-then-act, so two genuinely concurrent
+        // invocations under the same writer identity or Work can compute
+        // the same candidate id before either directory exists. Claim the
+        // id atomically (claimAssignmentId, assignment.mjs) instead of
+        // building once -- this rebuilds and rescans on collision without
+        // writing assignment.json's content itself (R3.5), which stays
+        // executeAssignment()'s own lazy first-write responsibility.
+        const assignmentsDir = path.join(fgosDir, 'assignments');
+        let assignment;
+        try {
+          assignment = claimAssignmentId(
+            () =>
+              buildAssignment({
+                ...(work ? { work } : {}),
+                options: { assignmentsDir },
+                provenance: {
+                  kind: 'inline',
+                  contract: contractFields,
+                  caller,
+                },
+              }),
+            assignmentsDir,
+          );
+        } catch (err) {
+          process.stderr.write(`${err.message}\n`);
+          process.exitCode = 1;
+          break;
+        }
+
+        const hasLiveTaskAccess = rest.includes('--has-live-task-access');
+        try {
+          // No separate decideExecutorCli pre-flight here -- mirrors
+          // mission-lite's own real call site (mission-lite.mjs's
+          // runMissionAssignment), which never calls it either:
+          // executeAssignment() already runs the identical governance gate
+          // (compileDispatchPlan) internally before ever spawning an
+          // executor, so a second, earlier call here would only duplicate
+          // that same check under a different error message, not add one.
+          // `isMissionLite: true` unconditionally -- this Assignment's
+          // `provenance.kind` is always 'inline' by construction, the exact
+          // condition the `--assignment` branch above already treats as
+          // mission-lite-strictly-read-only (ADR-006 R8).
+          const result = await executeAssignment(assignment, {
+            cwd,
+            repoRoot: root,
+            hasLiveTaskAccess,
+            isMissionLite: true,
+            onChunk: (stream, chunk) => process.stderr.write(chunk),
+          });
+          process.stdout.write(`${JSON.stringify(result)}\n`);
+        } catch (err) {
+          process.stderr.write(`${err.message}\n`);
+          process.exitCode = 1;
+        }
         break;
       }
 
