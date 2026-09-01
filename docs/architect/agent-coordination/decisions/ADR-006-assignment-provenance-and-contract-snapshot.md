@@ -2,8 +2,8 @@
 
 Document type: ADR
 Design status: Accepted
-Implementation: Not started
-Last reviewed: 2026-08-31
+Implementation: Implemented
+Last reviewed: 2026-09-01
 Canonical for: how declared and agent-led execution requests converge on one Assignment
 Related: [Vision V-003/V-004](../vision.md), [ADR-002](ADR-002-stage-operation-compatibility.md), [ADR-003](ADR-003-assignment-run-runresult-separation.md), [Assignment contract](../contracts/assignment-run-runresult.md)
 
