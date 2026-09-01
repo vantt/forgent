@@ -72,7 +72,7 @@ maps to plan's stop gate #5). See current-cell.md.
 | P04.1 | Phase 04 R1, R2, R3, R4 | done | `11375173` |
 | P04.2 | Phase 04 R5, R6, R7, R9 | done | `d7d24923` |
 | P04.2b | Phase 04 R8 (stop-gate resolution, closes Phase 04) | done | `37e1185b` |
-| P05.1 | Phase 05 R1, R2, R3, R4 | done | pending |
+| P05.1 | Phase 05 R1, R2, R3, R4 | done | `833888ba` |
 
 ## Phase 00 Status
 
