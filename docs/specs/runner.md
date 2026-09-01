@@ -1147,8 +1147,12 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 coordination` — canonical đầy đủ (schema, ADR, ví dụ) sống ở
 `docs/architect/agent-coordination/`; mục này chỉ tóm lược đủ để một phiên
 đọc `docs/specs/` biết ranh giới tồn tại và trỏ đúng chỗ. Tính tới
-2026-09-01, đây là THIẾT KẾ đã accepted (ADR-008/ADR-009/ADR-010), CHƯA có
-runtime — không có module nào dưới `src/runner/coordination/**` tồn tại.
+2026-09-01 (Phase 01 R1-R4, cell P01.1): manifest/event store + replay đã
+có runtime thật tại `src/runner/coordination/{schema,store,replay}.mjs`
+(test: `test/runner/coordination-*.test.mjs`) — store/schema/events/direct
+cutover từ `mission-lite.mjs` cũ (đã xoá). Session engine thật (R5), dynamic
+consult (R6), resume/idempotency đầy đủ (R7), và live agent-led proof (R8)
+CHƯA tồn tại — đó là P01.2.
 
 **CoordinationSession là gì.** Một lần điều phối agent có biên (bounded) —
 objective, actor, budget, task/Assignment runtime khi cần, kết quả tổng hợp —

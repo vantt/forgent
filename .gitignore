@@ -22,6 +22,7 @@
 # see plan.md phase-02 "held back" section).
 .fgos/runtime/
 .fgos/assignments/
+.fgos/coordination/
 cache/
 node_modules/
 

@@ -189,11 +189,10 @@ test('executeAssignment backfills mutation for its own effectiveAssignment re-re
     timeoutMs: 5000,
   };
 
-  // A genuinely read-only, mission-shaped assignment (missionId set, correctly
-  // stamped mutation: 'read-only' by buildAssignment/the normalizer).
+  // A genuinely read-only, no-Work-attached assignment (correctly stamped
+  // mutation: 'read-only' by buildAssignment/the normalizer).
   const assignment = buildAssignment({
     workId: null,
-    missionId: 'mission_effectiveassignment_legacy_test',
     stage: 'planning',
     operation: 'resolve-question',
     role: 'researcher',
@@ -216,13 +215,13 @@ test('executeAssignment backfills mutation for its own effectiveAssignment re-re
   delete legacyAssignment.onAdvance;
   fs.writeFileSync(path.join(assignmentDir, 'assignment.json'), `${JSON.stringify(legacyAssignment, null, 2)}\n`);
 
-  // Mirrors cli.mjs's execute --assignment subcommand: a mission-shaped
-  // assignment object drives isMissionLite: true.
+  // Mirrors cli.mjs's execute --assignment subcommand for an inline
+  // Assignment: the caller drives isReadOnlyMode: true.
   const result = await executeAssignment(assignment, {
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig,
-    isMissionLite: true,
+    isReadOnlyMode: true,
   });
 
   assert.equal(result.status, 'done');

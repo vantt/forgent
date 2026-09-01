@@ -36,8 +36,8 @@ of a blanket "unrelated" pass.
 
 | Phase | Requirements | Status |
 |---|---|---|
-| 00 | R1-R11 | missing |
-| 01 | R1-R8 | missing (depends on 00) |
+| 00 | R1-R11 | done |
+| 01 | R1-R8 | R1-R4 done; R5-R8 outstanding (P01.2) |
 | 02 | R1-R8 | missing (depends on 01) |
 | 03 | R1-R8 | missing (depends on 02) |
 | 04 | R1-R9 | missing (depends on 03) |
@@ -45,17 +45,13 @@ of a blanket "unrelated" pass.
 | 06 | R1-R8 | missing (depends on 05) |
 | 07 | R1-R8 | missing (depends on 06) |
 
-No implementation exists yet for any phase; this is the initial audit for a
-freshly opened track. No feature code exists to classify as done/partial/
-drifted.
-
 ## Active Cell
 
 none
 
 ## Next Action
 
-prepare (P01.1)
+prepare (P01.2)
 
 ## Cell Log
 
@@ -64,7 +60,8 @@ prepare (P01.1)
 | P00.1 | Phase 00 R1, R2, R3, R4 | done | `33494fd6` |
 | P00.2 | Phase 00 R5, R6, R7, R8 (+ R10 partial) | done | `7957f6f3` |
 | P00.3 | Phase 00 R9, R10, R11 | done | `454ecb56` |
-| P00.4 | provider-family derivation fix (closes Phase 00) | done | pending |
+| P00.4 | provider-family derivation fix (closes Phase 00) | done | `45137208` |
+| P01.1 | Phase 01 R1, R2, R3, R4 | done | pending |
 
 ## Phase 00 Status
 
@@ -88,6 +85,27 @@ an off-by-one and a false-positive in the new duplicate-flag detector, both
 fixed; this index.md's missing P00.4 entry, fixed directly by the
 Coordinator; a third `deriveProviderFamily`-family instance in
 `transport.mjs`, folded into P00.4) -> Red-Team re-check (confirmed).
+
+## Phase 01 Status (in progress)
+
+**P01.1 CLOSED** (Phase 01 R1-R4): created `src/runner/coordination/{schema,store,replay}.mjs`
+(manifest/event store matching `coordination-session.md` exactly, reusing
+`state/events.mjs`'s cross-process lock and `assignment.mjs`'s
+`buildAssignment`/`claimAssignmentId`); direct `mission-lite.mjs` cutover
+(deleted, minimal-surface edits to `assignment.mjs`/`assignment-runner.mjs`/
+`cli.mjs`/`dispatch.mjs`, `isMissionLite` renamed `isReadOnlyMode`). Went
+through 2 full Doer->Reviewer->Red-Team->Fixer->Red-Team-recheck rounds,
+both on genuine crash-safety bugs in the idempotent-Assignment-claim
+mechanism: round 1 fixed a duplicate-Assignment-on-crash-retry bug; round 2
+(triggered by Red-Team finding the round-1 fix itself incomplete) fixed a
+"phantom never-registered Assignment" self-healing gap and a taskKey-hash
+collision bug — the Fixer also self-caught and fixed a third latent bug
+(duplicate event on an inner crash window) while verifying its own round-2
+fix. One trivial LOW (unguarded JSON.parse on a torn claim-file write)
+deferred as a named one-line follow-up, not blocking.
+
+Next: P01.2 (Phase 01 R5-R8 — session engine, dynamic consult, resume/
+idempotency, live agent-led proof through real `cli-spawn` workers).
 
 ## Cell P00.4 (done, closes Phase 00)
 

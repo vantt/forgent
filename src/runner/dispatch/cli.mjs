@@ -959,7 +959,7 @@ export async function runDispatchCli() {
               repoRoot: root,
               cliOverride,
               hasLiveTaskAccess,
-              isMissionLite: Boolean(asgnObj.missionId) || asgnObj.provenance?.kind === 'inline',
+              isReadOnlyMode: asgnObj.provenance?.kind === 'inline',
               onChunk: (stream, chunk) => process.stderr.write(chunk),
             }).then(
               (result) => {
@@ -1112,7 +1112,7 @@ export async function runDispatchCli() {
           // (compileDispatchPlan) internally before ever spawning an
           // executor, so a second, earlier call here would only duplicate
           // that same check under a different error message, not add one.
-          // `isMissionLite: true` unconditionally -- this Assignment's
+          // `isReadOnlyMode: true` unconditionally -- this Assignment's
           // `provenance.kind` is always 'inline' by construction, the exact
           // condition the `--assignment` branch above already treats as
           // mission-lite-strictly-read-only (ADR-006 R8).
@@ -1131,7 +1131,7 @@ export async function runDispatchCli() {
             repoRoot: root,
             cliOverride,
             hasLiveTaskAccess,
-            isMissionLite: true,
+            isReadOnlyMode: true,
             onChunk: (stream, chunk) => process.stderr.write(chunk),
           });
           process.stdout.write(`${JSON.stringify(result)}\n`);

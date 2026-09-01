@@ -77,12 +77,14 @@ test('buildAssignment (declared) still rejects an undeclared operation with the 
   );
 });
 
-test('buildAssignment (declared) with workId: null (mission-lite style) is unaffected by the new stamping (R7 heuristic untouched this cell)', () => {
-  const assignment = buildAssignment({ workId: null, missionId: 'mission_001', stage: 'planning', operation: 'validate-plan' });
+test('buildAssignment (declared) with workId: null (no-Work-attached style) is unaffected by the new stamping (R7 heuristic untouched this cell)', () => {
+  const assignment = buildAssignment({ workId: null, stage: 'planning', operation: 'validate-plan' });
   assert.equal(assignment.workId, null);
-  assert.equal(assignment.missionId, 'mission_001');
+  // Step 08 Phase 01 R4: the prototype `missionId` field/param is retired
+  // from Assignment construction entirely (ADR-008 Decision 5).
+  assert.equal(assignment.missionId, undefined);
   // Declared stamping is role/operation-derived only; it does not itself
-  // consult workId/missionId (that heuristic still lives solely in
+  // consult workId (that heuristic still lives solely in
   // isReadOnlyAssignment, R7 is a later cell).
   assert.equal(assignment.mutation, 'read-only');
 });

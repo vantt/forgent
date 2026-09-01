@@ -10,7 +10,7 @@ import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { prepareDispatch } from '../../src/runner/dispatch/prepare.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
-import { createMission, createMissionAssignment } from '../../src/runner/dispatch/mission-lite.mjs';
+import { openSession, createSessionAssignment } from '../../src/runner/coordination/store.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 
@@ -630,54 +630,44 @@ test('dispatch CLI execute subcommand with --assignment does not false-positive 
   assert.doesNotMatch(stderr, /duplicate flag/);
 });
 
-test('dispatch CLI execute subcommand refuses a mutating, missionId-bearing assignment.json (mission-refusal gate restored for cli.mjs execute)', () => {
+// The `missionId`-bearing declared-assignment scenario this test used to
+// cover (a declared, Work-attached Assignment tagged with a `missionId`
+// that the CLI's `isMissionLite` flag inspected) is retired along with
+// `missionId` itself (Step 08 Phase 01 R4, ADR-008 Decision 5) --
+// `buildAssignment()` never stamps that field onto any Assignment shape
+// any more, so the scenario is now structurally unreachable through any
+// real construction path. Its coverage intent (a mutating Assignment
+// refused under read-only-mode enforcement) lives on in the inline-shape
+// test immediately below, which is the shape a standalone
+// CoordinationSession actually uses.
+
+test('dispatch CLI execute subcommand refuses a mutating inline Assignment (mission-refusal / read-only-mode gate for cli.mjs execute)', () => {
   const tempDir = mkTempDir();
 
-  const assignment = buildAssignment({
-    workId: 'tsk-cli-mission-refuse',
-    missionId: 'mission_cli_refuse_test',
-    stage: 'executing',
-    operation: 'implement-item',
-  });
-  assert.equal(assignment.mutation, 'mutating');
-  assert.equal(assignment.missionId, 'mission_cli_refuse_test');
-
-  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
-  fs.mkdirSync(asgnDir, { recursive: true });
-  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2));
-
-  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
-  assert.throws(
-    () => {
-      execFileSync(
-        process.execPath,
-        [dispatchScript, 'execute', '--assignment', assignment.assignmentId, '--cwd', tempDir],
-        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
-      );
-    },
-    (err) => {
-      assert.match(String(err.stderr), /mission-lite mode.*strictly read-only/i);
-      return true;
-    },
-  );
-});
-
-test('dispatch CLI execute subcommand refuses a mutating inline mission-lite assignment.json even though it carries no missionId field', () => {
-  const tempDir = mkTempDir();
-
-  createMission(
+  openSession(
     {
-      missionId: 'mission_cli_inline_refuse_test',
+      coordinationId: 'coord_cli_inline_refuse_test',
       objective: 'Evaluate reviewer assignment for planning validation.',
+      provenanceRoot: { writerId: 'test-writer-cli-inline-refuse' },
     },
     { cwd: tempDir },
   );
 
-  const assignment = createMissionAssignment(
+  const assignment = createSessionAssignment(
     {
-      missionId: 'mission_cli_inline_refuse_test',
-      role: 'researcher',
-      objective: 'Gather facts and existing code paths for planning validation.',
+      coordinationId: 'coord_cli_inline_refuse_test',
+      taskKey: 'researcher-round-1',
+      contract: {
+        objective: 'Gather facts and existing code paths for planning validation.',
+        contextRefs: [],
+        constraints: [],
+        expectedOutputs: ['agent-result.json (status, summary)'],
+        mutation: 'read-only',
+        evidence: { required: 'reported' },
+        role: 'researcher',
+        budget: { timeoutMs: 60000, maxRuns: 1 },
+      },
+      caller: { writerId: 'test-writer-cli-inline-refuse' },
     },
     { cwd: tempDir },
   );
@@ -688,10 +678,10 @@ test('dispatch CLI execute subcommand refuses a mutating inline mission-lite ass
   assert.equal(assignment.missionId, undefined);
 
   // Tamper the canonical assignment.json on disk (the only copy
-  // createMissionAssignment ever writes) to mutation: 'mutating' -- the
-  // real inline shape createMissionAssignment produces (no
-  // stage/operation/missionId field, provenance.kind: 'inline'), so
-  // `asgnObj.missionId` alone can never signal "apply the mission-refusal
+  // createSessionAssignment ever writes) to mutation: 'mutating' -- the
+  // real inline shape it produces (no stage/operation/missionId field,
+  // provenance.kind: 'inline'), so `asgnObj.provenance?.kind === 'inline'`
+  // alone is what signals "apply the mission-refusal / read-only-mode
   // gate" for this shape.
   const asgnPath = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'assignment.json');
   const tampered = { ...JSON.parse(fs.readFileSync(asgnPath, 'utf8')), mutation: 'mutating' };

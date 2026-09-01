@@ -23,6 +23,7 @@ Assignment stays session-blind.
     session.json                     # manifest (Decision below)
     events.jsonl                     # append-only session event log
     synthesis.md                     # optional synthesis artifact
+    tasks/<hash>.json                # internal idempotent-claim record, one per taskKey (hash of the raw taskKey)
 ```
 
 Assignments, Runs, and RunResults are referenced by id from
