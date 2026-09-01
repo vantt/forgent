@@ -9,7 +9,7 @@
 // barrel. See `docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md` D7 for the split rationale.
 
-import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, DEFAULT_TIER_TO_POLICY } from './config.mjs';
+import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, DEFAULT_TIER_TO_POLICY, MODEL_POLICY_TIERS, supportsPolicyTier } from './config.mjs';
 import { DOMAINS, resolveDomainName, skillForStage } from '../../state/workflow-stage-graphs.mjs';
 
 /**
@@ -79,6 +79,67 @@ export function modelForTier(cfg, tier, { providerModel = 'claude', rigorOverrid
     throw new RunnerConfigError(`no model configured for tier "${tier}".`);
   }
   return models[tier];
+}
+
+/**
+ * Resolve a POLICY tier (`lightweight|standard|creative|analytical|critical`)
+ * DIRECTLY against `cfg.modelPolicies.<providerModel>` — no
+ * `DEFAULT_TIER_TO_POLICY` indirection (that map is `modelForTier`'s own
+ * WORK-tier (`light|standard|heavy`) bridge, untouched by this function).
+ * This is the resolver `resolveAssignmentDispatchPolicy` calls: its
+ * `effectiveTier` is always already one of `MODEL_POLICY_TIERS` (Phase 00
+ * R5, fixes B1 — `assignment-policy.mjs` used to call `modelForTier` with a
+ * policy tier as its `tier` arg, which only matches `DEFAULT_TIER_TO_POLICY`
+ * by coincidence at `"standard"`; every other policy tier threw, and the
+ * caller silently swallowed it).
+ *
+ * Mirrors `modelForTier`'s own two-table fallback (`cfg.modelPolicies`
+ * preferred, else the legacy flat `cfg.models` map — the two are
+ * mutually-substitutable per this module's own D9 precedent) but reads
+ * `policyTier` directly against whichever table is present, never through a
+ * work-tier alias. Fails closed with a named `RunnerConfigError` (provider +
+ * tier) when neither table declares the requested tier — never swallowed by
+ * a caller.
+ */
+export function resolvePolicyTierModel(cfg, policyTier, providerModel = 'claude') {
+  if (!MODEL_POLICY_TIERS.includes(policyTier)) {
+    throw new RunnerConfigError(`unrecognized policy tier "${policyTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+  }
+  if (cfg && cfg.modelPolicies) {
+    if (!supportsPolicyTier(cfg, providerModel, policyTier)) {
+      throw new RunnerConfigError(`no model configured for policy tier "${policyTier}" under provider "${providerModel}".`);
+    }
+    return cfg.modelPolicies[providerModel][policyTier];
+  }
+  const models = cfg && cfg.models;
+  if (!models || typeof models[policyTier] !== 'string') {
+    throw new RunnerConfigError(`no model configured for policy tier "${policyTier}" (no modelPolicies table and no legacy models["${policyTier}"] entry).`);
+  }
+  return models[policyTier];
+}
+
+/**
+ * Derive a executor's PROVIDER FAMILY (tsk-2uf-1, Phase 00 R6, fixes H2a):
+ * the executor's own declared `providerModel` field wins, then `provider`,
+ * then a Claude-CLI-command inference, then the resolved command literal
+ * itself. Extracted (pure move, byte-identical for every existing caller)
+ * from `resolveExecutorConfig`'s own inline derivation below so a second
+ * caller (`assignment-policy.mjs`'s pre-spawn policy resolution, which has
+ * no resolved `executor.command` yet) reads the SAME rule instead of a
+ * third, independently-drifting copy of it — `resolvedCommand` defaults to
+ * `'claude'` for that caller, which resolves through the
+ * `CLAUDE_CLI_COMMANDS` branch to `'claude'`, matching R6's own simpler
+ * rule ("default to claude only when the executor is registered but names
+ * no providerModel of its own").
+ */
+export function deriveProviderFamily(executorEntry, resolvedCommand = 'claude') {
+  return typeof executorEntry?.providerModel === 'string' && executorEntry.providerModel.trim()
+    ? executorEntry.providerModel
+    : typeof executorEntry?.provider === 'string' && executorEntry.provider.trim()
+      ? executorEntry.provider
+      : CLAUDE_CLI_COMMANDS.includes(resolvedCommand)
+        ? 'claude'
+        : resolvedCommand;
 }
 
 /**
@@ -365,14 +426,7 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
   };
   const isEnvUrlOverride = typeof envTarget === 'string' && envTarget.trim().length > 0 && !isAnthropicApiHost(envTarget);
 
-  const providerFamily =
-    typeof executorEntry?.providerModel === 'string' && executorEntry.providerModel.trim()
-      ? executorEntry.providerModel
-      : typeof executorEntry?.provider === 'string' && executorEntry.provider.trim()
-        ? executorEntry.provider
-        : CLAUDE_CLI_COMMANDS.includes(executor.command)
-          ? 'claude'
-          : executor.command;
+  const providerFamily = deriveProviderFamily(executorEntry, executor.command);
 
   const egressTarget = isEnvUrlOverride ? envTarget : executor.command;
 

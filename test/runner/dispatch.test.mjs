@@ -471,6 +471,57 @@ test('loadRunnerConfig rejects a config missing models', () => {
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
+test('loadRunnerConfig accepts a modelPolicies provider table declaring only some of the 5 policy tiers (Phase 00 R8)', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'partial-model-policies.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      models: {},
+      modelPolicies: {
+        claude: { standard: 'sonnet' },
+        'z-ai': { standard: 'glm-4.6', critical: 'glm-4.6-max' },
+      },
+      timeoutMs: 1000,
+    }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
+  assert.equal(cfg.modelPolicies['z-ai'].critical, 'glm-4.6-max');
+  assert.equal(cfg.modelPolicies.claude.analytical, undefined);
+});
+
+test('loadRunnerConfig rejects a modelPolicies tier key not in MODEL_POLICY_TIERS', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-model-policies-key.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      models: {},
+      modelPolicies: { claude: { 'not-a-real-tier': 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a modelPolicies entry whose model value is not a non-empty string', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-model-policies-value.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      models: {},
+      modelPolicies: { claude: { standard: '' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
 test('loadRunnerConfig rejects a non-positive timeoutMs', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'bad-timeout.json');

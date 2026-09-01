@@ -790,6 +790,20 @@ function validateModelPoliciesShape(modelPolicies, label) {
   }
 }
 
+/**
+ * Pure query (Phase 00 R8): does `cfg.modelPolicies.<providerModel>` declare
+ * `policyTier`? No I/O, no credential probing, no "is the executable on
+ * PATH" check — a provider table naming fewer than all 5
+ * `MODEL_POLICY_TIERS` (valid per `validateModelPoliciesShape` above) simply
+ * answers `false` for the tiers it omits. Read by `resolve.mjs`'s
+ * `resolvePolicyTierModel` and available to a future Cohort-Planner-facing
+ * caller that needs to exclude an executor for an activity's tier floor
+ * without triggering the resolver's own throw.
+ */
+export function supportsPolicyTier(cfg, providerModel, policyTier) {
+  return typeof cfg?.modelPolicies?.[providerModel]?.[policyTier] === 'string';
+}
+
 function validateRunnerConfigShape(cfg, sourceLabel) {
   if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must be an object.`);

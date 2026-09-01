@@ -51,14 +51,27 @@ drifted.
 
 ## Active Cell
 
-P00.1 — in-progress (prepared, dispatching Doer)
+none
 
 ## Next Action
 
-doer
+prepare (P00.3)
 
 ## Cell Log
 
 | Cell | Requirements | Status | Commit |
 |---|---|---|---|
-| P00.1 | Phase 00 R1, R2, R3, R4 | in-progress | - |
+| P00.1 | Phase 00 R1, R2, R3, R4 | done | `33494fd6` |
+| P00.2 | Phase 00 R5, R6, R7, R8 (+ R10 partial) | done | pending |
+
+## Phase 00 Status
+
+R1-R8 done (P00.1, P00.2). R10 partially done (fallbackExecutors marked
+reserved-not-executed; `feature.yaml`'s stale `pi` entry deferred to a
+follow-up — needs 3 test-fixture updates outside P00.2's core scope). R9,
+remainder of R10 outstanding (P00.3).
+
+P00.2 went through 3 rounds: Doer -> Reviewer (1 HIGH + 1 MEDIUM + 2 LOW,
+all fixed) -> Red-Team (1 new HIGH, RT1, fixed) -> Red-Team re-check
+(confirmed). Both HIGH findings were genuine governance-semantics gaps in
+the self-hosted dispatch policy resolver — caught before merge.
