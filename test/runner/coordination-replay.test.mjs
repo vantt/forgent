@@ -91,6 +91,28 @@ test('replaySession detects a duplicate assignment-created event for the same id
   );
 });
 
+test('replaySession detects a duplicate result-linked event for the same assignmentId, symmetric with its adjacent duplicate assignment-created check', () => {
+  const tempDir = mkTempDir();
+  const assignment = openAndCreate(tempDir, 'coord_replay_duplicate_link');
+  linkResult('coord_replay_duplicate_link', { assignmentId: assignment.assignmentId, runId: `${assignment.assignmentId}_run_01` }, { cwd: tempDir });
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_duplicate_link');
+  const lines = fs.readFileSync(eventsPath, 'utf8').trimEnd().split('\n');
+  const linkedLine = lines.find((l) => JSON.parse(l).type === 'result-linked');
+  const linkedEvent = JSON.parse(linkedLine);
+  // Hand-append a SECOND result-linked event directly to the raw log --
+  // bypassing store.mjs's own linkResult() write-time guard entirely -- so
+  // this test proves replaySession's own READ-time consistency check
+  // independently, the same way this file's other duplicate-ref test does
+  // for assignment-created.
+  const duplicated = { ...linkedEvent, seq: linkedEvent.seq + 100, payload: { ...linkedEvent.payload, runId: `${assignment.assignmentId}_run_02` } };
+  fs.appendFileSync(eventsPath, `${JSON.stringify(duplicated)}\n`);
+
+  assert.throws(
+    () => replaySession('coord_replay_duplicate_link', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'duplicate-ref' && new RegExp(assignment.assignmentId).test(err.message),
+  );
+});
+
 test('replaySession detects a foreign ref: assignmentRefs entry whose Assignment does not exist under .fgos/assignments/', () => {
   const tempDir = mkTempDir();
   const assignment = openAndCreate(tempDir, 'coord_replay_foreign');

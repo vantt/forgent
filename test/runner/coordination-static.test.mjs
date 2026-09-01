@@ -27,6 +27,11 @@ const FORBIDDEN_IMPORT_SUBSTRINGS = [
   '/state/stage.mjs',
   '/state/store.mjs',
   '/dispatch/transport.mjs',
+  // P01.2 R5: the session engine's executeAssignment() call is the ONLY
+  // execution entry point this directory may ever use -- no module here
+  // may spawn a process directly.
+  'child_process',
+  'node:child_process',
 ];
 
 function listModuleFiles(dir) {

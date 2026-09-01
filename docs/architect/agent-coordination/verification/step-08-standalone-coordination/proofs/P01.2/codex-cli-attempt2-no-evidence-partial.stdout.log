@@ -1,0 +1,111 @@
+=== STEP 1 (resume mode): session already open, skipping openStandaloneSession ===
+
+=== STEP 2: dispatchPrimaryTask via codex-cli ===
+primary.assignment.assignmentId = asgn_p01_2_live_proof_coordinator_op_001
+primary.resumed = false
+primary.runResult.status = no-evidence confidence = no-evidence
+{
+  "runId": "run_asgn_p01_2_live_proof_coordinator_op_001_01",
+  "assignmentId": "asgn_p01_2_live_proof_coordinator_op_001",
+  "workId": null,
+  "executorId": "codex-cli",
+  "policy": {
+    "role": "researcher",
+    "executorPreference": [
+      "codex-cli"
+    ],
+    "executorId": "codex-cli",
+    "providerModel": "codex",
+    "tier": "standard",
+    "model": "gpt-5.5",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "codex-cli",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "codex",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "codex-cli"
+        }
+      },
+      "model": {
+        "value": "gpt-5.5",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_p01_2_live_proof_coordinator_op_001"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "codex"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "claimSha256": "22e1ff0b280c45621e5e44e1f6a30905d1e34ca8bec5bc6740268839fcd3f97b",
+  "settleReports": [],
+  "status": "no-evidence",
+  "confidence": "no-evidence",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_p01_2_live_proof_coordinator_op_001/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_p01_2_live_proof_coordinator_op_001/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "done",
+    "summary": "Root package.json has name \"forgent\" and version \"0.1.0\".",
+    "package": {
+      "name": "forgent",
+      "version": "0.1.0"
+    }
+  },
+  "evidence": {
+    "gitBefore": "626e057b181510558e69064570c1cc4ed9794bd9",
+    "gitAfter": "626e057b181510558e69064570c1cc4ed9794bd9",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_p01_2_live_proof_coordinator_op_001/runs/01/agent-result.json"
+    ],
+    "tests": []
+  }
+}
+
+PRIMARY DID NOT COMPLETE -- stopping before consult (honest partial, not proceeding).

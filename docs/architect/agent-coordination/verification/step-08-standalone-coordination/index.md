@@ -37,7 +37,7 @@ of a blanket "unrelated" pass.
 | Phase | Requirements | Status |
 |---|---|---|
 | 00 | R1-R11 | done |
-| 01 | R1-R8 | R1-R4 done; R5-R8 outstanding (P01.2) |
+| 01 | R1-R8 | done |
 | 02 | R1-R8 | missing (depends on 01) |
 | 03 | R1-R8 | missing (depends on 02) |
 | 04 | R1-R9 | missing (depends on 03) |
@@ -51,7 +51,7 @@ none
 
 ## Next Action
 
-prepare (P01.2)
+prepare (P02.1)
 
 ## Cell Log
 
@@ -61,7 +61,8 @@ prepare (P01.2)
 | P00.2 | Phase 00 R5, R6, R7, R8 (+ R10 partial) | done | `7957f6f3` |
 | P00.3 | Phase 00 R9, R10, R11 | done | `454ecb56` |
 | P00.4 | provider-family derivation fix (closes Phase 00) | done | `45137208` |
-| P01.1 | Phase 01 R1, R2, R3, R4 | done | pending |
+| P01.1 | Phase 01 R1, R2, R3, R4 | done | `626e057b` |
+| P01.2 | Phase 01 R5, R6, R7, R8 (closes Phase 01) | done | pending |
 
 ## Phase 00 Status
 
@@ -86,7 +87,9 @@ fixed; this index.md's missing P00.4 entry, fixed directly by the
 Coordinator; a third `deriveProviderFamily`-family instance in
 `transport.mjs`, folded into P00.4) -> Red-Team re-check (confirmed).
 
-## Phase 01 Status (in progress)
+## Phase 01 Status
+
+**CLOSED.** R1-R8 across P01.1-P01.2.
 
 **P01.1 CLOSED** (Phase 01 R1-R4): created `src/runner/coordination/{schema,store,replay}.mjs`
 (manifest/event store matching `coordination-session.md` exactly, reusing
@@ -104,8 +107,39 @@ collision bug — the Fixer also self-caught and fixed a third latent bug
 fix. One trivial LOW (unguarded JSON.parse on a torn claim-file write)
 deferred as a named one-line follow-up, not blocking.
 
-Next: P01.2 (Phase 01 R5-R8 — session engine, dynamic consult, resume/
-idempotency, live agent-led proof through real `cli-spawn` workers).
+**P01.2 CLOSED** (Phase 01 R5-R8, closes Phase 01): created
+`src/runner/coordination/session-engine.mjs` (`openStandaloneSession`,
+`dispatchPrimaryTask`, `proposeConsult`, `validateConsultProposal`,
+`resumeSession`; sole internal call site for `executeAssignment`/
+`createSessionAssignment`, statically proven no-direct-spawn). Live proof
+captured for both `codex-cli` and `glm-cli` under `proofs/P01.2/`. Went
+through 1 Reviewer round (1 HIGH TOCTOU in `bindActor`, fixed) + 3
+Red-Team rounds each finding one further genuine race/correctness bug:
+round 2 (MEDIUM, role-substitution race in `proposeConsult`'s second
+unlocked read), round 3 (HIGH, unguarded concurrent dispatch letting two
+callers both spawn an executor and both link a result for the same
+Assignment — fixed via an exclusive `dispatch.claim` file plus
+`linkResult`/`replay.mjs` duplicate-`result-linked` detection), round 4
+(HIGH, round 3's permanent claim wrongly and permanently blocked a
+legitimate retry after ANY pre-spawn `executeAssignment` failure, e.g. a
+governance-blocked config — fixed by releasing the claim only on a
+provably pre-spawn `RunnerConfigError`, confirmed to cover every pre-spawn
+throw site with no post-spawn overlap). A final Red-Team re-check on
+round 4 (4 targeted angles + an empirical 6-run concurrency probe) found
+no further defect — convergence point for this cell. Two LOW gaps
+deferred (Proof Matrix count cosmetics; live-proof zero-duplicate-runs
+claim asserted in log prose rather than a separate raw-listing artifact,
+though independently proven by unit tests) plus one LOW gap from round 4
+(non-`ENOENT` unlink failure would mask the original `RunnerConfigError`
+diagnostic — extremely low-probability, not fixed). Full suite: 4739/4752
+pass, all 8 failures match the documented baseline exactly, no new
+failure. Deferral Audit: AC-I001/AC-I002/AC-I007 met, AC-I006 partially
+covered (main fix in Phase 00) with this cell reinforcing "no private
+dispatch core" + fail-closed-through-session-engine, AC-I008 deferred to
+Phase 07 as planned, AC-I009 satisfied vacuously (no mutating-actor
+capability exists yet in this engine).
+
+Next: P02.1 (Phase 02 — shared FlowDefinition kernel).
 
 ## Cell P00.4 (done, closes Phase 00)
 

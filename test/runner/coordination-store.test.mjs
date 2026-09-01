@@ -166,6 +166,34 @@ test('linkResult appends result-linked only for an assignment that is a real ses
   );
 });
 
+test('linkResult is idempotent for the SAME runId re-linked twice (a no-op, matching createSessionAssignment\'s own "retry returns existing" philosophy), but rejects a SECOND, DIFFERENT runId for an assignment that already has one linked -- defense in depth against session-engine.mjs\'s own duplicate-dispatch race', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_link_dup', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const assignment = createSessionAssignment(
+    { coordinationId: 'coord_link_dup', taskKey: 'primary-round-1', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+    { cwd: tempDir },
+  );
+  const runIdA = `${assignment.assignmentId}_run_01`;
+  const runIdB = `${assignment.assignmentId}_run_02`;
+
+  linkResult('coord_link_dup', { assignmentId: assignment.assignmentId, runId: runIdA }, { cwd: tempDir });
+
+  // Re-linking the SAME runId a second time is a harmless idempotent retry.
+  linkResult('coord_link_dup', { assignmentId: assignment.assignmentId, runId: runIdA }, { cwd: tempDir });
+  const eventsAfterSameRelink = readSessionEvents('coord_link_dup', { cwd: tempDir });
+  assert.equal(eventsAfterSameRelink.filter((e) => e.type === 'result-linked').length, 1, 'a same-runId re-link must not append a second event');
+
+  // Linking a genuinely DIFFERENT runId for an already-linked assignment is
+  // a real conflict -- two distinct real runs both claiming to be "the"
+  // result -- and must be rejected, not silently accepted as a second event.
+  assert.throws(
+    () => linkResult('coord_link_dup', { assignmentId: assignment.assignmentId, runId: runIdB }, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'duplicate-ref' && /already has a result linked/.test(err.message),
+  );
+  const eventsAfterConflict = readSessionEvents('coord_link_dup', { cwd: tempDir });
+  assert.equal(eventsAfterConflict.filter((e) => e.type === 'result-linked').length, 1, 'a different-runId conflict must not append a second event either');
+});
+
 test('bindActor appends actor-bound and updates manifest.actors atomically, refusing a duplicate actor id', () => {
   const tempDir = mkTempDir();
   openSession({ coordinationId: 'coord_bind_001', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
@@ -179,6 +207,40 @@ test('bindActor appends actor-bound and updates manifest.actors atomically, refu
     () => bindActor('coord_bind_001', { id: 'specialist', role: 'researcher' }, { cwd: tempDir }),
     (err) => err instanceof CoordinationError && /already has an actor bound/.test(err.message),
   );
+});
+
+test('bindActor with opts.primaryActorId rejects binding a second, different non-primary actor under the SAME locked critical section as the write -- closing the cross-process TOCTOU an earlier unlocked read-then-decide check cannot close by itself', () => {
+  const tempDir = mkTempDir();
+  openSession(
+    { coordinationId: 'coord_bind_single_specialist', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' }, actors: [{ id: 'primary', role: 'researcher' }] },
+    { cwd: tempDir },
+  );
+
+  // First specialist bind succeeds (no conflicting non-primary actor yet).
+  bindActor('coord_bind_single_specialist', { id: 'specialist-A', role: 'reviewer' }, { cwd: tempDir, primaryActorId: 'primary' });
+
+  // A second, DIFFERENT specialist id must be rejected -- this is the exact
+  // write-site check that the earlier, unlocked `validateConsultProposal`
+  // read in session-engine.mjs cannot enforce atomically by itself.
+  assert.throws(
+    () => bindActor('coord_bind_single_specialist', { id: 'specialist-B', role: 'reviewer' }, { cwd: tempDir, primaryActorId: 'primary' }),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /already has a non-primary actor bound/.test(err.message),
+  );
+
+  const manifest = readManifest('coord_bind_single_specialist', { cwd: tempDir });
+  const nonPrimaryIds = manifest.actors.filter((a) => a.id !== 'primary').map((a) => a.id);
+  assert.deepEqual(nonPrimaryIds, ['specialist-A']);
+});
+
+test('bindActor without opts.primaryActorId (the default) still allows binding multiple distinct actor ids -- the single-non-primary invariant is opt-in, not a blanket restriction', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_bind_multi_no_opt', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+
+  bindActor('coord_bind_multi_no_opt', { id: 'actor-1', role: 'reviewer' }, { cwd: tempDir });
+  bindActor('coord_bind_multi_no_opt', { id: 'actor-2', role: 'reviewer' }, { cwd: tempDir });
+
+  const manifest = readManifest('coord_bind_multi_no_opt', { cwd: tempDir });
+  assert.deepEqual(manifest.actors.map((a) => a.id).sort(), ['actor-1', 'actor-2']);
 });
 
 // ─── Terminal transitions ───────────────────────────────────────────────────

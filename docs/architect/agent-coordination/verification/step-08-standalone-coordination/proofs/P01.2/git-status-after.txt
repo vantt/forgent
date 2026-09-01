@@ -1,0 +1,40 @@
+ M AGENTS.md
+ M CLAUDE.md
+ M docs/architect/agent-coordination/proposals/README.md
+ M docs/architect/agent-coordination/roadmap/README.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md
+ M docs/architect/agent-coordination/vision.md
+ M docs/architecture-manifest.json
+ M test/runner/coordination-static.test.mjs
+?? .agentkit/
+?? .claude/agents/advisor.md
+?? .claude/agents/brainstormer.md
+?? .claude/agents/code-reviewer.md
+?? .claude/agents/code-simplifier.md
+?? .claude/agents/debugger.md
+?? .claude/agents/docs-manager.md
+?? .claude/agents/explore.md
+?? .claude/agents/fullstack-developer.md
+?? .claude/agents/git-manager.md
+?? .claude/agents/journal-writer.md
+?? .claude/agents/kongming.md
+?? .claude/agents/planner.md
+?? .claude/agents/project-manager.md
+?? .claude/agents/researcher.md
+?? .claude/agents/tester.md
+?? .claude/agents/ui-ux-designer.md
+?? .fgos/events/95d36507-d4a6-432f-a879-b01c562217b0-20260830T164608767Z.jsonl
+?? .fgos/events/ee2110a9-914f-4138-b75b-55779f988e6b-20260901T020317216Z.jsonl
+?? docs/architect/agent-coordination/proposals/component-boundary-advisory.md
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md
+?? plans/260831-1637-step07-inline-assignment-mvp/reports/
+?? plans/reports/handoff-260901-1011-GH-07-dispatch-executor-selection-fable-brainstorm-prompt.md
+?? plans/reports/handoff-260901-1123-GH-07-step08-standalone-coordination-protocols-design-prompt.md
+?? plans/reports/handoff-260901-1403-GH-07-step08-pre-plan-architecture-review-prompt.md
+?? plans/reports/researcher-260901-1049-GH-07-executor-provider-selection-architecture.md
+?? plans/reports/researcher2_260901-1120-step08-executor-provider-selection-architecture.md
+?? plans/reports/reviewer-260901-1403-GH-07-step08-pre-plan-architecture-review.md
+?? plans/reports/reviewer-cell-6-6-260831-0813-scoped-subtask-red-team-report.md
+?? src/runner/coordination/session-engine.mjs
+?? test/runner/coordination-session-engine.test.mjs

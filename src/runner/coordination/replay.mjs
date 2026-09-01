@@ -71,6 +71,9 @@ export function replaySession(coordinationId, opts = {}) {
           `session "${coordinationId}": "result-linked" event for assignment "${id}" that was never "assignment-created"`,
         );
       }
+      if (linkedIds.has(id)) {
+        throw new CoordinationError('duplicate-ref', `session "${coordinationId}": duplicate "result-linked" event for assignment "${id}"`);
+      }
       linkedIds.add(id);
     }
   }

@@ -204,6 +204,19 @@ export function openSession(
  * `actor-bound` and updating `session.json`'s `actors` array as one atomic
  * operation under the events lock (same discipline as
  * `createSessionAssignment` below).
+ *
+ * `opts.primaryActorId`, when provided, enforces "at most one OTHER
+ * (non-primary) actor ever bound to this session" as part of the SAME
+ * locked critical section as the write below -- not just the caller's own
+ * earlier, unlocked pre-check. This is what closes the cross-process TOCTOU
+ * a caller's own read-then-decide (e.g. session-engine.mjs's
+ * `validateConsultProposal`, which reads via an unlocked `replaySession()`)
+ * cannot close by itself: two callers can both pass that earlier check
+ * before either has bound anything, but only one of their `bindActor` calls
+ * can win the lock first here. This flag is opt-in (undefined = no
+ * invariant enforced) so callers that manage multiple non-primary actors by
+ * a different rule, or existing store-level tests that bind an arbitrary
+ * actor id with no "primary" concept at all, are unaffected.
  */
 export function bindActor(coordinationId, actor, opts = {}) {
   const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
@@ -224,6 +237,15 @@ export function bindActor(coordinationId, actor, opts = {}) {
     const existingActors = Array.isArray(manifest.actors) ? manifest.actors : [];
     if (existingActors.some((a) => a.id === actor.id)) {
       throw new CoordinationError('validation', `session "${coordinationId}" already has an actor bound with id "${actor.id}"`);
+    }
+    if (opts.primaryActorId !== undefined) {
+      const conflictingNonPrimary = existingActors.find((a) => a.id !== opts.primaryActorId && a.id !== actor.id);
+      if (conflictingNonPrimary) {
+        throw new CoordinationError(
+          'validation',
+          `session "${coordinationId}" already has a non-primary actor bound ("${conflictingNonPrimary.id}") -- cannot bind a second, different non-primary actor "${actor.id}" (exactly one consult round is allowed per session)`,
+        );
+      }
     }
     appendEventLocked(eventsPath, { type: 'actor-bound', payload }, sessionDir);
     manifest.actors = [...existingActors, { id: actor.id, role: actor.role, ...(actor.persona !== undefined ? { persona: actor.persona } : {}), ...(actor.policy !== undefined ? { policy: actor.policy } : {}) }];
@@ -458,6 +480,21 @@ export function createSessionAssignment(
  * Link a RunResult to a session Assignment (`result-linked` event). Purely
  * additive bookkeeping -- the canonical RunResult already lives under
  * `.fgos/assignments/<id>/runs/<NN>/result.json`; this never copies it.
+ *
+ * Defense in depth against `session-engine.mjs`'s `createAndExecuteSessionTask`
+ * dispatch race (its own `dispatch.claim` file is the primary fix; this
+ * guards the write site itself regardless of what called it): a second
+ * `result-linked` event for an `assignmentId` that already has one is
+ * rejected under this SAME locked critical section, via a fresh
+ * `readEvents()` read taken while the lock is held. Re-linking the SAME
+ * `runId` a second time is treated as an idempotent no-op -- mirrors
+ * `createSessionAssignment`'s own "retry returns existing, unchanged"
+ * philosophy, since re-confirming an already-linked run is not itself
+ * harmful. Linking a genuinely DIFFERENT `runId` for an already-linked
+ * `assignmentId` is a real conflict (two distinct real runs both trying to
+ * be "the" result) and throws `duplicate-ref` -- the same category
+ * `replay.mjs`'s own consistency check uses for the identical shape found
+ * later, at replay time.
  */
 export function linkResult(coordinationId, { assignmentId, runId }, opts = {}) {
   const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
@@ -469,6 +506,18 @@ export function linkResult(coordinationId, { assignmentId, runId }, opts = {}) {
     assertSchemaVersionCurrent(manifest, manifestPath);
     if (!manifest.assignmentRefs.includes(assignmentId)) {
       throw new CoordinationError('validation', `assignment "${assignmentId}" is not a member of session "${coordinationId}" -- cannot link a result to it`);
+    }
+    const existingLink = readEvents(eventsPath).find(
+      (event) => event.type === 'result-linked' && event.payload.assignmentId === assignmentId,
+    );
+    if (existingLink) {
+      if (existingLink.payload.runId === runId) {
+        return; // idempotent no-op: the SAME run is already linked
+      }
+      throw new CoordinationError(
+        'duplicate-ref',
+        `assignment "${assignmentId}" in session "${coordinationId}" already has a result linked (runId "${existingLink.payload.runId}") -- refusing to link a second, DIFFERENT run ("${runId}")`,
+      );
     }
     appendEventLocked(eventsPath, { type: 'result-linked', payload }, sessionDir);
   });
