@@ -1,0 +1,97 @@
+# core/coordination-protocols/independent-research-fan-out-fan-in.yaml --
+# Phase 02 R7 fixture: an independent research fan-out/fan-in protocol --
+# a coordinator dispatches to a cohort of independent researchers
+# (isolated-until-fan-in, so each researcher's own context stays isolated
+# from the others until synthesis), then synthesizes their findings.
+# Normalizes through validateFlowDefinition via
+# discoverCoordinationProtocols -- does NOT execute or wire into
+# CoordinationSession in this phase (AC-I003 must-not-preclude).
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.independent-research-fan-out-fan-in
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: isolated-until-fan-in
+      edges:
+        - from: coordinator-actor
+          to: researcher-a
+          intents: [research]
+          maxRounds: 1
+        - from: coordinator-actor
+          to: researcher-b
+          intents: [research]
+          maxRounds: 1
+    cohort:
+      count: 2
+      distinctProviderFamilies: 2
+      requiredRoles: [researcher]
+      independence: isolated-until-fan-in
+
+  roles:
+    - coordinator
+    - researcher
+
+  actors:
+    - id: coordinator-actor
+      role: coordinator
+    - id: researcher-a
+      role: researcher
+    - id: researcher-b
+      role: researcher
+
+  operations:
+    - id: dispatch-research
+      role: coordinator
+      capabilities: [fan-out]
+      task:
+        contractTemplate: research-fanout-dispatch
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: independent-research
+      role: researcher
+      capabilities: [research]
+      policy:
+        minTier: analytical
+      task:
+        contractTemplate: independent-research-brief
+      result:
+        kind: advisory
+        evidenceRequired: verified
+    - id: synthesize-findings
+      role: coordinator
+      capabilities: [synthesize]
+      task:
+        contractTemplate: research-synthesis
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+  graph:
+    entry: phase-fan-out
+    nodes:
+      - id: phase-fan-out
+        operations:
+          - ref: dispatch-research
+            actor: coordinator-actor
+        transitions: [phase-research]
+      - id: phase-research
+        operations:
+          - ref: independent-research
+            actor: researcher-a
+          - ref: independent-research
+            actor: researcher-b
+        transitions: [phase-fan-in]
+      - id: phase-fan-in
+        operations:
+          - ref: synthesize-findings
+            actor: coordinator-actor
+        transitions: []

@@ -38,7 +38,7 @@ of a blanket "unrelated" pass.
 |---|---|---|
 | 00 | R1-R11 | done |
 | 01 | R1-R8 | done |
-| 02 | R1-R8 | R1-R4 done; R5-R8 outstanding (P02.2) |
+| 02 | R1-R8 | done |
 | 03 | R1-R8 | missing (depends on 02) |
 | 04 | R1-R9 | missing (depends on 03) |
 | 05 | R1-R8 | missing (depends on 04) |
@@ -51,7 +51,7 @@ none
 
 ## Next Action
 
-prepare (P02.2)
+prepare (P03.1)
 
 ## Cell Log
 
@@ -64,6 +64,7 @@ prepare (P02.2)
 | P01.1 | Phase 01 R1, R2, R3, R4 | done | `626e057b` |
 | P01.2 | Phase 01 R5, R6, R7, R8 (closes Phase 01) | done | `85206dca` |
 | P02.1 | Phase 02 R1, R2, R3, R4 | done | `1f2260b1` |
+| P02.2 | Phase 02 R5, R6, R7, R8 (closes Phase 02) | done | pending |
 
 ## Phase 00 Status
 
@@ -165,7 +166,9 @@ mark plan.md's Phase 00 row done) until this cell closes or is explicitly
 re-scoped by the maintainer.** Source: `P00.3.md`'s Review section (HIGH
 finding) and Red-Team section (MEDIUM finding #4).
 
-## Phase 02 Status (in progress)
+## Phase 02 Status
+
+**CLOSED.** R1-R8 across P02.1-P02.2.
 
 **P02.1 CLOSED** (Phase 02 R1-R4): created `src/runner/definitions/schema.mjs`
 (`validateFlowDefinition`, `mergePolicyStack`, `FlowDefinitionError`) --
@@ -195,6 +198,33 @@ new failure. Phase-level exit criteria (AC-I003/005/006 proofs,
 zero-consumer-migration audit) deferred to P02.2's own close, since this
 cell's module has zero consumers by construction.
 
-Next: P02.2 (Phase 02 R5-R8 -- additive Workflow projection adapter,
-CoordinationProtocol loader, fixtures, setup/doctor registration; closes
-Phase 02).
+**P02.2 CLOSED** (Phase 02 R5-R8, closes Phase 02): created
+`src/runner/definitions/workflow-adapter.mjs` (R5, projects the
+already-normalized Workflow shape into a `Workflow`-profile FlowDefinition;
+`src/state/workflow-stage-graphs.mjs` itself is at ZERO diff -- the
+strongest possible zero-consumer-migration proof) and
+`src/runner/definitions/protocol-loader.mjs` (R6, deterministic
+project/domain/core `CoordinationProtocol` discovery, reusing P02.1's
+`validateFlowDefinition` for every document, read-only, no execution
+wiring). R7: two `core/coordination-protocols/` fixtures (declared-consult,
+independent research fan-out/fan-in) plus the coding `feature` Workflow
+golden, all independently confirmed genuinely discovered/validated (not
+mocked). R8: 2 new doctor checks registered in `src/setup/registrations.mjs`.
+Went through 1 Reviewer round: found 1 MEDIUM (a `shadowedBy`/`shadows`
+comment claiming a traceability field that didn't exist anywhere in the
+code -- corrected) and adjudicated 1 flagged item as a genuine MEDIUM
+gap, not a defensible scope reading (a `metadata.id` collision across two
+DIFFERENT domain directories silently shadows with no error and no trace,
+since the domain tier's per-directory duplicate-detection never
+cross-checks sibling domains) -- recorded as a tracked follow-up rather
+than fixed this cell, since zero `domains/*/coordination-protocols/`
+directories exist anywhere in this repo today (zero current blast
+radius), matching this track's proportional-rigor practice. Full suite:
+4782/4795 pass, all 8 failures match the documented baseline exactly, no
+new failure. Deferral Audit: AC-I003/AC-I005/AC-I006 all MET (no
+execution wiring; every tier through the same validated kernel;
+`src/runner/dispatch/**` and `src/runner/coordination/**` both remain at
+zero diff for the whole phase).
+
+Next: P03.1 (Phase 03 -- declared consult protocol, R1-R4: consult
+materialization/topology/policy provenance).

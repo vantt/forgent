@@ -1,0 +1,71 @@
+# core/coordination-protocols/declared-consult.yaml -- Phase 02 R7 fixture:
+# the simplest real CoordinationProtocol shape, a single declared consult
+# (one requester, one consultant, one round). Normalizes through
+# validateFlowDefinition (src/runner/definitions/schema.mjs) via
+# discoverCoordinationProtocols (src/runner/definitions/protocol-loader.mjs)
+# -- does NOT execute or wire into CoordinationSession in this phase
+# (AC-I003 must-not-preclude: protocols stay optional/explicit, never a
+# second execution core).
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.declared-consult
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: mediated
+      edges:
+        - from: requester-actor
+          to: consultant-actor
+          intents: [consult]
+          maxRounds: 1
+
+  roles:
+    - requester
+    - consultant
+
+  actors:
+    - id: requester-actor
+      role: requester
+    - id: consultant-actor
+      role: consultant
+
+  operations:
+    - id: request-consult
+      role: requester
+      capabilities: [consult]
+      task:
+        contractTemplate: consult-request
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: provide-consult
+      role: consultant
+      capabilities: [consult]
+      policy:
+        minTier: standard
+      task:
+        contractTemplate: consult-response
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+  graph:
+    entry: phase-request
+    nodes:
+      - id: phase-request
+        operations:
+          - ref: request-consult
+            actor: requester-actor
+        transitions: [phase-consult]
+      - id: phase-consult
+        operations:
+          - ref: provide-consult
+            actor: consultant-actor
+        transitions: []
