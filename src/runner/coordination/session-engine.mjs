@@ -58,6 +58,7 @@ import { CoordinationError } from './schema.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
+import { TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import { mergePolicyStack } from '../definitions/schema.mjs';
 import { planCohort, verifyPlannedAllocationAgainstCurrentConfig } from './cohort-planner.mjs';
@@ -91,7 +92,20 @@ function assertKnownReadOnlyRole(role, label) {
   }
 }
 
-function buildReadOnlyContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs }) {
+// `minTier` (Step 08 P04.2b, optional): when supplied, sets
+// `contract.policy = {minTier}` on the built inline contract --
+// `execution-contract.mjs`'s own narrow, exactly-one-field-wide
+// `contract.policy` exception (see that module's own doc comment). This is
+// the ONLY channel that reaches `resolveAssignmentDispatchPolicy`'s
+// `opPolicy.minTier` starting floor (`assignment-policy.mjs`,
+// `effectiveTier = opPolicy.minTier || 'standard'`) -- `cliOverride.minTier`
+// (composed separately by `dispatchDeclaredOperation` below) can only ever
+// RAISE that floor via `resolveStrongerTier`, never lower it, so without
+// this parameter a caller-composed tier requirement below `'standard'` had
+// no way to actually take effect. Every pre-existing caller omits this
+// parameter, so `contract.policy` stays absent and behavior is
+// byte-identical to before this parameter existed.
+function buildReadOnlyContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs, minTier }) {
   return {
     objective,
     contextRefs,
@@ -102,6 +116,7 @@ function buildReadOnlyContract({ objective, contextRefs, constraints, expectedOu
     role,
     ...(capabilities !== undefined ? { capabilities } : {}),
     budget: budget ?? { timeoutMs: timeoutMs ?? DEFAULT_TASK_TIMEOUT_MS, maxRuns: 1 },
+    ...(minTier !== undefined ? { policy: { minTier } } : {}),
   };
 }
 
@@ -1135,6 +1150,31 @@ export async function dispatchDeclaredOperation(
     capabilities: capabilities ?? operation.capabilities,
     budget,
     timeoutMs: opts.timeoutMs,
+    // Step 08 P04.2b: thread the composed policy stack's own resolved
+    // `minTier` into the inline contract's own `policy.minTier` ONLY when it
+    // resolves BELOW `resolveAssignmentDispatchPolicy`'s hardcoded default
+    // floor ('standard') -- that resolver's `effectiveTier = opPolicy.minTier
+    // || 'standard'` already starts at 'standard', and `cliOverride.minTier`
+    // (set unconditionally below, carrying this SAME `merged.minTier` value)
+    // already reaches and correctly attributes provenance for anything AT or
+    // ABOVE 'standard' by RAISING that default floor (`resolveStrongerTier`,
+    // monotonic, provenance sourced to whichever scope in `policyProvenance`
+    // actually won). Below 'standard' is the one case that channel can never
+    // reach (raise-only), which is the entire reason this parameter exists.
+    // Threading the SAME value through both channels unconditionally would
+    // make `opPolicy.minTier` and `cliOverride.minTier` equal whenever
+    // `merged.minTier` is 'standard' or higher, which collapses
+    // `resolveAssignmentDispatchPolicy`'s own `strength(cliTier) >
+    // strength(effectiveTier)` provenance-update check (strict `>`, ties
+    // don't update) -- misattributing the resolved tier's provenance to a
+    // synthetic `{scope: 'opPolicy', id: undefined}` instead of the real
+    // scope `policyProvenance.tier` names. Confirmed empirically: threading
+    // it unconditionally broke this exact provenance assertion in
+    // `coordination-declared-consult.test.mjs`'s R3 precedence-chain test.
+    minTier:
+      merged.minTier !== undefined && TIER_STRENGTH[merged.minTier] < TIER_STRENGTH.standard
+        ? merged.minTier
+        : undefined,
   });
   const caller = {
     writerId,

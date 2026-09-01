@@ -1,0 +1,29 @@
+{
+  "selector": {
+    "type": "assignment",
+    "value": "asgn_r8b_proof_driver_op_002"
+  },
+  "caller": {
+    "role": "driver"
+  },
+  "mechanism": "out-of-process",
+  "executorId": "agy-cli",
+  "capability": "agy-cli",
+  "invocation": {
+    "via": "cli",
+    "adapter": "cli-spawn",
+    "protocol": "prompt-stdout-v1"
+  },
+  "governance": {
+    "providerFamily": "gemini",
+    "egress": {
+      "kind": "cross-provider",
+      "target": "agy",
+      "content": "repo-content"
+    }
+  },
+  "reasonCodes": [
+    "native-first.0033.cli-spawn-shaped"
+  ],
+  "configured": true
+}

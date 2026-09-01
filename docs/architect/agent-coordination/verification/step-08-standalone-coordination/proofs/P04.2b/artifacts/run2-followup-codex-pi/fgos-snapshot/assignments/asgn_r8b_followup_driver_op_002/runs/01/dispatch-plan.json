@@ -1,0 +1,29 @@
+{
+  "selector": {
+    "type": "assignment",
+    "value": "asgn_r8b_followup_driver_op_002"
+  },
+  "caller": {
+    "role": "driver"
+  },
+  "mechanism": "out-of-process",
+  "executorId": "codex-pi",
+  "capability": "codex-pi",
+  "invocation": {
+    "via": "cli",
+    "adapter": "cli-spawn",
+    "protocol": "prompt-stdout-v1"
+  },
+  "governance": {
+    "providerFamily": "openai-codex",
+    "egress": {
+      "kind": "cross-provider",
+      "target": "pi",
+      "content": "repo-content"
+    }
+  },
+  "reasonCodes": [
+    "native-first.0033.cli-spawn-shaped"
+  ],
+  "configured": true
+}

@@ -586,3 +586,86 @@ test('supportsPolicyTier is a pure boolean query with no I/O -- true only for a 
   assert.equal(supportsPolicyTier({}, 'claude', 'standard'), false);
 });
 
+// ─── Step 08 P04.2b: the tier-floor stop gate this cell closes ─────────────
+//
+// resolveAssignmentDispatchPolicy's `effectiveTier = opPolicy.minTier ||
+// 'standard'` was previously UNCONDITIONAL: no inline (agent-led or declared
+// coordination) Assignment had any way to populate `assignment.policy` at
+// all (execution-contract.mjs's whitelist had no `policy` field), so every
+// inline dispatch's floor was always AT LEAST 'standard' -- and a real
+// `.fgos/config.json`-shaped runner config that only configures
+// `lightweight` for a non-claude provider family (this repo's own committed
+// config does, for gemini/openai-codex/z-ai) could never be dispatched
+// through this resolver at all. These tests exercise the REAL resolver end
+// to end, not a mock, against a realistic fixture matching that shape.
+
+function lightweightOnlyRunnerConfig() {
+  return {
+    executor: { command: 'claude' },
+    executors: {
+      'agy-cli': {
+        kind: 'agent',
+        providerModel: 'gemini',
+        invocations: [{ via: 'cli', command: 'agy', args: ['-p', '{prompt}', '--model', '{model}'] }],
+      },
+    },
+    // Matches the real committed .fgos/config.json shape: claude configures
+    // every tier, gemini configures ONLY lightweight.
+    modelPolicies: {
+      claude: { lightweight: 'haiku', standard: 'sonnet', creative: 'sonnet', analytical: 'sonnet', critical: 'opus' },
+      gemini: { lightweight: 'gemini-3.6-flash-medium' },
+    },
+  };
+}
+
+function lightweightOnlyInlineAssignment(overrides = {}) {
+  return buildAssignment({
+    provenance: {
+      kind: 'inline',
+      contract: {
+        objective: 'Read-only, bounded research task',
+        contextRefs: [],
+        constraints: [],
+        expectedOutputs: ['agent-result.json (status, summary)'],
+        mutation: 'read-only',
+        evidence: { required: 'reported' },
+        role: 'researcher',
+        budget: { timeoutMs: 60000, maxRuns: 1 },
+        ...overrides,
+      },
+      caller: { writerId: 'writer-tier-floor-probe' },
+    },
+  });
+}
+
+test('resolveAssignmentDispatchPolicy: WITHOUT contract.policy.minTier, an inline dispatch to a lightweight-only provider family fails closed at the default "standard" floor (proves the stop gate this cell closes was real)', () => {
+  const assignment = lightweightOnlyInlineAssignment();
+  assert.equal(assignment.policy, undefined);
+
+  assert.throws(
+    () =>
+      resolveAssignmentDispatchPolicy({
+        assignment,
+        runnerConfig: lightweightOnlyRunnerConfig(),
+        cliOverride: { preferExecutor: 'agy-cli' },
+      }),
+    (err) => err instanceof RunnerConfigError,
+  );
+});
+
+test('resolveAssignmentDispatchPolicy: contract.policy = {minTier: "lightweight"} resolves effectiveTier "lightweight" (not "standard") through the REAL resolver, for a provider family that only configures "lightweight"', () => {
+  const assignment = lightweightOnlyInlineAssignment({ policy: { minTier: 'lightweight' } });
+  assert.deepEqual(assignment.policy, { minTier: 'lightweight' });
+
+  const effective = resolveAssignmentDispatchPolicy({
+    assignment,
+    runnerConfig: lightweightOnlyRunnerConfig(),
+    cliOverride: { preferExecutor: 'agy-cli' },
+  });
+
+  assert.equal(effective.tier, 'lightweight');
+  assert.equal(effective.providerModel, 'gemini');
+  assert.equal(effective.model, 'gemini-3.6-flash-medium');
+  assert.deepEqual(effective.provenance.tier, { value: 'lightweight', source: { scope: 'opPolicy', id: undefined } });
+});
+

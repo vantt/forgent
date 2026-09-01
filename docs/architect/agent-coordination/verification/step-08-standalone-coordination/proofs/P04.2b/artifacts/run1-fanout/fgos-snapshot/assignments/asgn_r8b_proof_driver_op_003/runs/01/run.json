@@ -1,0 +1,11 @@
+{
+  "runId": "run_asgn_r8b_proof_driver_op_003_01",
+  "assignmentId": "asgn_r8b_proof_driver_op_003",
+  "attempt": 1,
+  "executorId": "claude-reviewer",
+  "dispatchPlanPath": ".fgos/assignments/asgn_r8b_proof_driver_op_003/runs/01/dispatch-plan.json",
+  "cwd": "/tmp/fgos-r8b-live-proof-Lqrnkz",
+  "startedAt": "2026-09-01T21:44:26.079Z",
+  "timeoutMs": 2100000,
+  "status": "running"
+}

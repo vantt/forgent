@@ -16,7 +16,7 @@
 //     accepted field set today -- so a future accidental addition to that
 //     set could never silently re-admit one of these.
 
-import { RunnerConfigError } from './config.mjs';
+import { MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
 
 export const CONTRACT_POLICY_VERSION = '1';
 
@@ -38,11 +38,32 @@ const ACCEPTED_CONTRACT_FIELDS = new Set([
   // (domains/coding/harness/enrich-and-validate-contract.mjs), which the
   // foundation calls strictly after this validator (ADR-007 §2).
   'supports',
+  // Step 08 P04.2b: an explicit, single-field exception, not a general
+  // PolicyPatch passthrough -- `contract.policy` may carry EXACTLY one key
+  // (`minTier`, checked against `ACCEPTED_POLICY_FIELDS` below), never
+  // `preferExecutor`/`preferPersona`/`model`/`visibility`/
+  // `fallbackExecutors`. Without this, no coordination dispatch (agent-led
+  // or declared) had any way to populate `assignment.policy`, so
+  // `resolveAssignmentDispatchPolicy`'s tier floor (`assignment-policy.mjs`,
+  // `opPolicy.minTier || 'standard'`) could never be lowered below
+  // `'standard'` -- and the real `.fgos/config.json` only configures
+  // `lightweight` for every non-`claude` provider family, so no
+  // coordination dispatch could ever reach a non-Claude provider family at
+  // all. This field exists solely to let a caller that has already
+  // composed a legal, lower tier requirement (e.g. Cohort Planner
+  // allocation) record it where `resolveAssignmentDispatchPolicy` actually
+  // reads its starting floor from, instead of only through
+  // `cliOverride.minTier` (which can only ever RAISE the floor, never
+  // lower it, per that resolver's own `resolveStrongerTier` monotonicity).
+  'policy',
 ]);
 
 const ACCEPTED_CALLER_FIELDS = new Set(['writerId', 'parentAssignmentId']);
 const ACCEPTED_BUDGET_FIELDS = new Set(['timeoutMs', 'maxRuns', 'tokens']);
 const ACCEPTED_EVIDENCE_FIELDS = new Set(['required']);
+// Step 08 P04.2b: see the `'policy'` entry in ACCEPTED_CONTRACT_FIELDS above
+// for why this exists and why it is exactly one field wide.
+const ACCEPTED_POLICY_FIELDS = new Set(['minTier']);
 
 // ADR-006 §6: no session or coordination reference in this slice.
 const FORBIDDEN_SESSION_FIELDS = new Set(['coordinationId', 'sessionId', 'threadId', 'coordinationRef']);
@@ -151,6 +172,20 @@ export function validateExecutionContract({ contract, caller } = {}) {
   }
   if (contract.capabilities !== undefined && !isStringArray(contract.capabilities)) {
     fail('contract.capabilities must be an array of strings when provided (capability hints)');
+  }
+
+  // Step 08 P04.2b: `contract.policy` is optional; when present it must
+  // carry EXACTLY `minTier` (one of MODEL_POLICY_TIERS) and nothing else --
+  // see ACCEPTED_CONTRACT_FIELDS' own doc comment above for why this narrow
+  // exception exists.
+  if (contract.policy !== undefined) {
+    if (!isPlainObject(contract.policy)) {
+      fail('contract.policy must be an object when provided');
+    }
+    assertOnlyAcceptedFields(contract.policy, ACCEPTED_POLICY_FIELDS, 'contract.policy');
+    if (!MODEL_POLICY_TIERS.includes(contract.policy.minTier)) {
+      fail(`contract.policy.minTier must be one of ${MODEL_POLICY_TIERS.join(', ')}`);
+    }
   }
 
   if (!isPlainObject(contract.budget)) {

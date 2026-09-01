@@ -40,18 +40,18 @@ of a blanket "unrelated" pass.
 | 01 | R1-R8 | done |
 | 02 | R1-R8 | done |
 | 03 | R1-R8 | done |
-| 04 | R1-R9 | R1-R7,R9 done; R8 BLOCKED on stop gate #4 (see current-cell.md) |
+| 04 | R1-R9 | done |
 | 05 | R1-R8 | missing (depends on 04) |
 | 06 | R1-R8 | missing (depends on 05) |
 | 07 | R1-R8 | missing (depends on 06) |
 
 ## Active Cell
 
-P04.2 (BLOCKED)
+none
 
 ## Next Action
 
-STOPPED at objective stop gate #4 — awaiting maintainer decision, see current-cell.md / P04.2.md
+prepare (P05.1)
 
 ## Cell Log
 
@@ -68,6 +68,8 @@ STOPPED at objective stop gate #4 — awaiting maintainer decision, see current-
 | P03.1 | Phase 03 R1, R2, R3, R4 | done | `8fc3130a` |
 | P03.2 | Phase 03 R5, R6, R7, R8 (closes Phase 03) | done | `38a9a010` |
 | P04.1 | Phase 04 R1, R2, R3, R4 | done | `11375173` |
+| P04.2 | Phase 04 R5, R6, R7, R9 | done | `d7d24923` |
+| P04.2b | Phase 04 R8 (stop-gate resolution, closes Phase 04) | done | pending |
 
 ## Phase 00 Status
 
@@ -331,19 +333,64 @@ re-verified by the Coordinator via direct reproduction. Full suite:
 4847/4860 pass, all 8 failures match the documented baseline exactly, no
 new failure.
 
-Next: P04.2 (Phase 04 R5-R9 -- independent fan-out execution, context
-isolation/fan-in, evidence/contradiction handling, two-provider live
-proof, impossible-fixture failure proof; closes Phase 04). Note: R8's
-live proof requires "every tier it requires configured" for at least two
-real provider families -- the real `.fgos/config.json` today only has
-`lightweight` tier configured for every non-`claude` provider family
-(`gemini`/`openai-codex`/`z-ai`), confirmed during P04.1's own
-inventory-building work. If the P04.2 research fixture's design is kept
-to `lightweight` tier, at least 2 of 3 non-`claude` families remain
-viable for a genuine two-provider proof; if a higher tier turns out to be
-genuinely required and no config path can satisfy it after one bounded
-recovery attempt, this maps directly to this plan's own named stop gate
-#4 ("a required live CLI executor/provider is absent, unconfigured, lacks
-the exact required tier...") -- a declared stop condition per phase-04.md's
-own Risks/Rollback text ("not an implementation failure"), not something
-to work around with a fabricated proof.
+**P04.2 CLOSED** (Phase 04 R5-R9, closes Phase 04): added
+`dispatchResearchFanOut`/`synthesizeResearchFanIn` to `session-engine.mjs`
+-- N bounded read-only evidence questions materialize as independent
+actors/tasks with no sibling edges, execute concurrently under the
+existing session bounds, and synthesize only accepted evidence after
+fan-in without ever upgrading confidence, erasing a contradiction, or
+inferring consensus from branch count. R9's impossible-fixture proof
+independently confirmed genuine (session opened, planning correctly
+hard-failed before any Assignment existed, zero launches). **R8's
+two-real-provider-family live proof hit this plan's own named stop gate
+#4**: live-reproduced twice that `resolveAssignmentDispatchPolicy`'s
+`'standard'`-tier floor was unconditional and no coordination dispatch
+(agent-led or declared, this entire track) had ever had a way to
+populate `assignment.policy` to lower it -- meaning no non-Claude
+provider family could ever be reached at all, retroactively explaining
+prior "live-executor timeout" findings in Phase 00/03 as the same root
+cause. Autonomous cell progression was correctly PAUSED at this gate
+(not routed around) and reported to the maintainer with full evidence;
+the maintainer reviewed and explicitly authorized a narrow fix.
+
+**P04.2b CLOSED** (stop-gate resolution): added exactly one new legal
+field, `contract.policy = {minTier}`, to the inline-contract whitelist
+(`execution-contract.mjs`/`assignment.mjs`) -- the one deliberate,
+maintainer-authorized exception to this track's "never touch
+execution-contract.mjs" discipline across all 4 phases. Never
+`preferExecutor`/model/anything that could pin concrete infrastructure.
+A genuine provenance regression was found and fixed during this cell's
+own work (unconditional threading would have collapsed a strict
+tie-check in the resolver). Given this file's newly-widened,
+security-adjacent surface, a Reviewer round specifically empirically
+verified prototype-pollution safety (a real `JSON.parse`-derived
+`__proto__` payload cleanly rejected), governance independence (traced
+end to end: tier only selects a model for an already-fixed, governance-
+gated provider, structurally unable to influence executor/provider
+selection), and that above-`'standard'` tiers still work via the
+pre-existing channel (proven by an existing live test) -- all confirmed
+via direct reproduction, not code-reading alone. No further Red-Team
+round: this fix has no concurrency dimension (pure synchronous
+validation/merge logic), unlike the session-engine/store.mjs concurrency
+work elsewhere in this track that required empirical multi-process
+verification. Live-reproduced the fix's mechanism working: `agy-cli`
+(gemini) and `codex-pi` (openai-codex) both now genuinely reach real
+dispatch resolution at `lightweight` tier, where they previously threw
+`RunnerConfigError` before any dispatch was even attempted. Full 2-
+branch "both settle done in one batch" completion wasn't reached in this
+session due to an external provider quota limit and the pre-existing
+runner-level main-checkout dispatch lock -- both honestly documented,
+neither caused by this fix; the stop gate's actual root cause is
+definitively resolved.
+
+Full suite (P04.2b, final): 4873/4887 pass, 9 fail -- 8 match the
+documented baseline exactly, the 9th (`spawnWorker` maxBuffer-kill test)
+independently re-run standalone twice by the Coordinator (2/2 pass),
+confirming session-load flakiness already documented in this track's own
+P00.4 history, not a regression. **No new failure beyond baseline.**
+Deferral Audit: AC-I003/AC-I004/AC-I006 all MET, AC-I008 still deferred
+to Phase 07 as planned; model-family routing/scoring deferral reaffirmed
+per phase-04.md's own explicit design choice.
+
+Next: P05.1 (Phase 05 -- Group Cognition framework, R1-R4: framework
+definition and phase/activity semantics).

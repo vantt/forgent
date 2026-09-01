@@ -57,6 +57,14 @@ import {
   stampInlineAssignment,
 } from './assignment-normalizer.mjs';
 import { CONTRACT_POLICY_VERSION, validateExecutionContract } from './execution-contract.mjs';
+// Step 08 P04.2b: `resolveStrongerTier` is the SAME tier-strength
+// comparison `resolveAssignmentDispatchPolicy` itself uses to guarantee a
+// more-specific scope can only RAISE a tier requirement, never lower one
+// already established -- reused here (never re-implemented) so that
+// merging a domain harness's own `policy.minTier` against an agent's
+// `contract.policy.minTier` at build time follows the exact same
+// never-weaken invariant, rather than a second, competing merge rule.
+import { resolveStrongerTier } from './assignment-policy.mjs';
 
 // ADR-007 §1: the domain harness seam. Foundation code (this module) must
 // never reference one specific domain's module by a hardcoded, literal
@@ -557,12 +565,40 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
     capabilities: frozenCapabilities,
     budget: frozenBudget,
     ...(contract.supports !== undefined ? { supports: contract.supports } : {}),
+    // Step 08 P04.2b: the agent-declared `{minTier}` policy fragment, when
+    // present -- recorded here so the persisted provenance always shows
+    // exactly what the caller's own inline contract carried, same as every
+    // other field in this snapshot.
+    ...(contract.policy !== undefined ? { policy: Object.freeze({ ...contract.policy }) } : {}),
   });
 
   const frozenCaller = Object.freeze({
     writerId: caller.writerId,
     ...(caller.parentAssignmentId ? { parentAssignmentId: caller.parentAssignmentId } : {}),
   });
+
+  // Step 08 P04.2b: merge the domain harness's own `policy` (matchedOp.policy
+  // hints, set BEFORE this cell, see harnessPolicy above) with the agent's
+  // own `contract.policy.minTier` (this cell's new, exactly-one-field-wide
+  // addition) -- `contract.policy` is more specific (assignment/caller-level,
+  // same specificity class buildDeclaredAssignment's own caller-supplied
+  // `policy` param already outranks `matchedOp.policy` at), so every OTHER
+  // harnessPolicy field (persona/model/etc.) passes through unchanged, but
+  // `minTier` specifically is resolved via `resolveStrongerTier` rather than
+  // a flat override -- a caller's own inline contract must never be able to
+  // silently WEAKEN a tier floor the domain harness already established,
+  // mirroring resolveAssignmentDispatchPolicy's own never-weaken invariant
+  // for `minTier` at the resolve layer (assignment-policy.mjs).
+  const contractPolicyMinTier = contract.policy?.minTier;
+  let mergedInlinePolicy = harnessPolicy;
+  if (contractPolicyMinTier !== undefined) {
+    mergedInlinePolicy = Object.freeze({
+      ...(harnessPolicy || {}),
+      minTier: harnessPolicy?.minTier
+        ? resolveStrongerTier(harnessPolicy.minTier, contractPolicyMinTier)
+        : contractPolicyMinTier,
+    });
+  }
 
   const assignment = {
     assignmentId,
@@ -575,7 +611,7 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
     expectedFiles: Object.freeze([]),
     createdAt: options.createdAt ?? new Date().toISOString(),
     ...(createdBy ? { createdBy } : {}),
-    ...(harnessPolicy ? { policy: harnessPolicy } : {}),
+    ...(mergedInlinePolicy ? { policy: mergedInlinePolicy } : {}),
     provenance: Object.freeze({
       kind: 'inline',
       contractPolicyVersion: CONTRACT_POLICY_VERSION,

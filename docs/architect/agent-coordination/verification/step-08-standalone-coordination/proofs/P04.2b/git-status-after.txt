@@ -1,0 +1,15 @@
+ M docs/architect/agent-coordination/proposals/README.md
+ M docs/architect/agent-coordination/roadmap/README.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md
+ M docs/architect/agent-coordination/vision.md
+ M docs/architect/component-boundary/README.md
+ M src/runner/coordination/session-engine.mjs
+ M src/runner/dispatch/assignment.mjs
+ M src/runner/dispatch/execution-contract.mjs
+ M test/runner/assignment-policy.test.mjs
+ M test/runner/assignment-provenance.test.mjs
+ M test/runner/execution-contract.test.mjs
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/
+?? docs/architect/component-boundary/node-to-rust-component-migration.md
+?? docs/architect/component-boundary/tmp/
