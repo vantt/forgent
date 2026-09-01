@@ -51,12 +51,15 @@ import {
   linkResult,
   readManifest,
   resolveSessionPaths,
+  hashTaskKey,
 } from './store.mjs';
 import { replaySession } from './replay.mjs';
 import { CoordinationError } from './schema.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
+import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
+import { mergePolicyStack } from '../definitions/schema.mjs';
 
 export const PRIMARY_ACTOR_ID = 'primary';
 export const DEFAULT_SPECIALIST_ACTOR_ID = 'specialist';
@@ -575,4 +578,597 @@ export async function proposeConsult(
     { coordinationId, taskKey: taskKey ?? `consult:${specialistActorId}`, actorId: specialistActorId, contract, caller },
     opts,
   );
+}
+
+// ─── Phase 03 R1-R4: declared CoordinationProtocol materialization ────────
+//
+// Everything below is a SECOND, EXPLICIT, opt-in caller of the exact same
+// `createAndExecuteSessionTask` primitive `dispatchPrimaryTask`/
+// `proposeConsult` already use above -- never a second execution core. The
+// only new execution-adjacent call in this block is `mergePolicyStack()`
+// (`../definitions/schema.mjs`, P02.1's own PolicyPatch monotonicity
+// validator, reused unmodified -- this file never reimplements the
+// "minTier may only raise, never lower" rule), plus one small, additive,
+// backward-compatible extension to `dispatch/assignment-policy.mjs`'s own
+// `resolveAssignmentDispatchPolicy()` (see that module's header) that lets
+// this file report WHICH scope in a fuller precedence chain produced a
+// `cliOverride`-carried value, instead of that resolver's generic
+// `{scope:'cliOverride'}` label.
+//
+// A declared protocol never writes a concrete `preferExecutor`/model pin at
+// a portable scope (definition/operation/role/actor): `assertNoPortableExecutorPin`
+// below rejects that BEFORE any Assignment is created, matching R1's own
+// words ("protocol materialization never writes a concrete executor/model
+// into the contract") and flow-definition.md's PolicyPatch section ("a
+// portable CoordinationProtocol ... expresses requirements, not literal
+// executor/model pins"). Only the `assignment`/`cli` scopes -- a trusted,
+// caller-supplied, session-specific override -- may legally carry one;
+// governance (`options.disallowedProviders`/`disallowedExecutors`, resolved
+// downstream inside `executeAssignment`/`resolveAssignmentDispatchPolicy`,
+// unchanged) still has the final veto regardless.
+
+// Scopes a portable FlowDefinition materialization may never pin a literal
+// executor at (flow-definition.md PolicyPatch section). `assignment` (a
+// caller-supplied per-dispatch override, this cell's own concept, not a
+// FlowDefinition field) and `cli` (the trusted human/CLI scope) are
+// deliberately absent -- both are legitimate places for a concrete
+// preference per the same contract section ("a trusted request/CLI actor
+// preference may still select concrete infrastructure").
+const PORTABLE_POLICY_SCOPES = new Set(['runner', 'definition', 'operation', 'role', 'actor']);
+
+function assertNoPortableExecutorPin(scopeStack) {
+  for (const entry of scopeStack) {
+    if (PORTABLE_POLICY_SCOPES.has(entry.scope) && entry.policy && entry.policy.preferExecutor !== undefined) {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: scope "${entry.scope}" (id: "${entry.id}") declares a literal preferExecutor "${entry.policy.preferExecutor}" -- a portable protocol/role/actor scope must express requirements (minTier, capabilities) only, never a concrete executor pin (flow-definition.md PolicyPatch section)`,
+      );
+    }
+  }
+}
+
+/**
+ * Source of the LAST (most specific) scope entry in `scopeStack` that sets
+ * `field`, or `{scope: 'default'}` when none does. `minTier` is monotonic
+ * (raise-only, enforced by `mergePolicyStack` itself, which throws before
+ * this is ever consulted for an invalid stack) so the last entry to set it
+ * is, by construction, the one that produced the final resolved value;
+ * every other field here is already most-specific-wins per the contract, so
+ * the same "last entry wins" rule applies identically. This function only
+ * tracks PROVENANCE (which scope gets credit) -- it never recomputes or
+ * second-guesses the actual resolved value, which stays `mergePolicyStack`'s
+ * job alone.
+ */
+function lastSourceFor(scopeStack, field) {
+  let source = { scope: 'default' };
+  for (const entry of scopeStack) {
+    if (entry.policy && entry.policy[field] !== undefined) {
+      source = { scope: entry.scope, ...(entry.id !== undefined ? { id: entry.id } : {}) };
+    }
+  }
+  return source;
+}
+
+/**
+ * Resolve one ordered policy scope stack (least specific first) through
+ * `mergePolicyStack` (reused, unmodified) and derive per-field provenance
+ * alongside it. Rejects a portable-scope executor pin first (before even
+ * attempting the merge), so a rejected materialization never partially
+ * resolves a policy.
+ *
+ * @param {{scope: string, id?: string, policy: object}[]} scopeStack Ordered
+ *   least-specific-first, per flow-definition.md's provenance scope order.
+ * @returns {{merged: Readonly<object>, provenance: {tier: object, persona: object, executor: object, visibility: object}}}
+ */
+function resolveDeclaredPolicyStack(scopeStack) {
+  assertNoPortableExecutorPin(scopeStack);
+  const merged = mergePolicyStack(scopeStack.map(({ scope, id, policy }) => ({ scope, source: id, policy: policy ?? {} })));
+  return {
+    merged,
+    provenance: {
+      tier: lastSourceFor(scopeStack, 'minTier'),
+      persona: lastSourceFor(scopeStack, 'preferPersona'),
+      executor: lastSourceFor(scopeStack, 'preferExecutor'),
+      visibility: lastSourceFor(scopeStack, 'visibility'),
+    },
+  };
+}
+
+/**
+ * Resolve which declared `spec.operations[]` entry, graph node, and
+ * `spec.actors[]` entry a `dispatchDeclaredOperation` call targets. Fails
+ * closed (R1: "materialize ... legal operations") when the operation is
+ * undeclared, unreachable from the graph, role-only (no actor binding --
+ * out of this cell's scope, a Cohort Planner concern), or bound to an actor
+ * whose declared role disagrees with the operation's own declared role (a
+ * malformed definition, or a materialization-time actor-impersonation
+ * shape R6's later negative sweep will exercise more fully).
+ */
+function resolveDeclaredOperationActor(definition, operationId) {
+  const operation = definition.spec.operations.find((op) => op.id === operationId);
+  if (!operation) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: operation "${operationId}" is not declared in this protocol's spec.operations`,
+    );
+  }
+
+  let matchedNode;
+  let matchedRef;
+  for (const node of definition.spec.graph.nodes) {
+    const ref = node.operations.find((o) => o.ref === operationId);
+    if (ref) {
+      matchedNode = node;
+      matchedRef = ref;
+      break;
+    }
+  }
+  if (!matchedNode || !matchedRef) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: operation "${operationId}" is not wired into this protocol's graph -- an operation must be reachable from a node to be materialized`,
+    );
+  }
+  if (!matchedRef.actor) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: operation "${operationId}" is role-only (no actor binding at node "${matchedNode.id}") -- this materialization requires a bound SessionActor`,
+    );
+  }
+
+  const actorEntry = (definition.spec.actors ?? []).find((a) => a.id === matchedRef.actor);
+  if (!actorEntry) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: operation "${operationId}" node "${matchedNode.id}" references actor "${matchedRef.actor}", which is not declared in spec.actors`,
+    );
+  }
+  if (actorEntry.role !== operation.role) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: operation "${operationId}" declares role "${operation.role}", but its bound actor "${actorEntry.id}" declares role "${actorEntry.role}" -- actor/operation role mismatch`,
+    );
+  }
+
+  return { operation, actorId: actorEntry.id, actorEntry, node: matchedNode };
+}
+
+/**
+ * Open a new standalone CoordinationSession bound to a declared, validated
+ * `CoordinationProtocol` FlowDefinition (R1). Loads `definitionId` through
+ * `loadCoordinationProtocol()` (`../definitions/protocol-loader.mjs`, P02.2 --
+ * never reimplemented or forked here), creates one stable SessionActor per
+ * `spec.actors[]` entry (`role`/`persona`/`policy` carried through verbatim),
+ * and records `{id, version}` on the manifest's `definitionRef` field --
+ * the SAME field `coordination-session.md`'s contract already reserves for
+ * exactly this ("a reference to a CoordinationProtocol FlowDefinition when
+ * the session is declared-protocol-led"). Every later `dispatchDeclaredOperation`
+ * call re-resolves and version-checks against this recorded reference
+ * (never trusts a second, separately-passed `definitionId`), so the
+ * manifest is the actual source of truth for which protocol governs this
+ * session, not just a decorative record.
+ *
+ * @param {object} params
+ * @param {string} params.definitionId `metadata.id` of a `CoordinationProtocol` FlowDefinition (e.g. 'core.coordination-protocol.declared-consult').
+ * @param {string} [params.coordinationId] Optional explicit id; auto-generated when omitted.
+ * @param {string} params.objective
+ * @param {string} params.writerId Caller identity opening the session.
+ * @param {string} [params.parentAssignmentId]
+ * @param {object} [params.aggregateBounds] Partial bounds; omitted fields default (schema.mjs).
+ * @param {string|null} [params.workRef] Optional read-only Work reference; never grants lifecycle authority.
+ * @param {object} [opts] Workspace options ({ cwd, repoRoot, packageRoot })
+ * @returns {Readonly<object>} The stored manifest
+ */
+export function openDeclaredProtocolSession(
+  { definitionId, coordinationId, objective, writerId, parentAssignmentId, aggregateBounds, workRef = null },
+  opts = {},
+) {
+  const definition = loadCoordinationProtocol(definitionId, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+
+  if (definition.spec.profile.kind !== 'CoordinationProtocol') {
+    throw new CoordinationError(
+      'validation',
+      `openDeclaredProtocolSession: definition "${definitionId}" is not a CoordinationProtocol-profile FlowDefinition (profile.kind: "${definition.spec.profile.kind}")`,
+    );
+  }
+  if (!Array.isArray(definition.spec.actors) || definition.spec.actors.length === 0) {
+    throw new CoordinationError(
+      'validation',
+      `openDeclaredProtocolSession: definition "${definitionId}" declares no spec.actors -- a declared standalone session requires stable SessionActor identities`,
+    );
+  }
+  if (!isNonEmptyString(definition.metadata.version)) {
+    throw new CoordinationError(
+      'validation',
+      `openDeclaredProtocolSession: definition "${definitionId}" has no metadata.version -- a session's definitionRef requires a stable, versioned reference`,
+    );
+  }
+
+  const actors = definition.spec.actors.map((actor) => ({
+    id: actor.id,
+    role: actor.role,
+    ...(actor.persona !== undefined ? { persona: actor.persona } : {}),
+    ...(actor.policy !== undefined ? { policy: actor.policy } : {}),
+  }));
+
+  return openSession(
+    {
+      coordinationId,
+      objective,
+      provenanceRoot: { writerId, ...(parentAssignmentId !== undefined ? { parentAssignmentId } : {}) },
+      definitionRef: { id: definition.metadata.id, version: definition.metadata.version },
+      workRef,
+      actors,
+      aggregateBounds,
+    },
+    opts,
+  );
+}
+
+/**
+ * Materialize and dispatch ONE declared operation of the protocol bound to
+ * `coordinationId` (R1), through the declared topology's request/response
+ * edges (R2) and the full policy precedence chain (R3), reusing
+ * `createAndExecuteSessionTask` -- the SAME shared dispatch primitive
+ * `dispatchPrimaryTask`/`proposeConsult` already call -- as the ONLY place
+ * this function ever reaches `executeAssignment`/`createSessionAssignment`.
+ *
+ * Topology (R2): resolves the operation's bound actor and looks up any
+ * topology edge whose `to` is that actor.
+ * - No such edge (a graph "entry"-shaped operation, e.g. this fixture's
+ *   `request-consult`): dispatches as a root task, no upstream reference
+ *   required, caller-supplied `contextRefs` allowed (bounded, defaults []) --
+ *   mirrors `dispatchPrimaryTask`'s own shape.
+ * - A declared edge exists (e.g. `provide-consult`, edge
+ *   `requester-actor -> consultant-actor`): `params.fromAssignmentId` is
+ *   REQUIRED and must be a real member of this session belonging to the
+ *   edge's declared `from` actor (never a fabricated or foreign id -- this
+ *   is what makes "response before request" structurally unreachable, not
+ *   merely discouraged); `params.intent` must be one of the edge's declared
+ *   `intents` (defaults to the edge's own single intent when only one is
+ *   declared); the edge's `maxRounds` cap is enforced against the number of
+ *   Assignments already created for the target actor (a brand-new
+ *   `taskKey` -- see `params.round` -- counts as a new round; a taskKey
+ *   that already has a claim record on disk is an idempotent RESUME of an
+ *   already-counted round, never a new one, mirroring
+ *   `createSessionAssignment`'s own claim-file semantics exactly, peeked at
+ *   read-only here); and `contextRefs` is ALWAYS exactly
+ *   `[params.fromAssignmentId]`, non-caller-overridable -- the specialist
+ *   actor never sees anything but the authorized request (mediated
+ *   visibility), never unrelated/sibling/global session state.
+ *
+ * Policy (R3): composes an ordered scope stack --
+ * `runner < definition < operation < role < actor < assignment < cli`
+ * (`params.runnerPolicy`/`params.rolePolicy`/`params.assignmentPolicy`/
+ * `params.cliPolicy` are optional caller-supplied PolicyPatch fragments for
+ * the scopes this V1 FlowDefinition schema has no first-class field for yet
+ * -- `runner`/`role`/`assignment` -- so the full documented chain is
+ * genuinely exercised even where the schema itself only ever populates
+ * `definition`/`operation`/`actor`) -- through `resolveDeclaredPolicyStack`
+ * (above), then forwards the merged, pre-governance PolicyPatch as
+ * `opts.cliOverride` to `createAndExecuteSessionTask` (the ONLY channel an
+ * inline Assignment contract has for a `minTier`/`preferPersona`/
+ * `preferExecutor`/`visibility` value at all -- `execution-contract.mjs`'s
+ * own field whitelist has no `policy` field for an inline contract to
+ * carry). `cliOverride.policyProvenance` (this cell's additive extension to
+ * `assignment-policy.mjs`) carries the derived per-field scope labels
+ * through, so the RunResult's own `policy.provenance` -- ALREADY the exact
+ * FlowDefinition PolicyPatch Provenance shape,
+ * `{field: {value, source: {scope, id}}}`, for every one of `executor`,
+ * `provider`, `model`, `tier`, `persona`, `visibility`, `constraints`,
+ * `governance` -- becomes the single, already-persisted, authoritative R3
+ * proof for this dispatch; this function never builds or persists a second,
+ * competing provenance record. Governance (`options.disallowedProviders`/
+ * `disallowedExecutors`) still runs downstream, inside
+ * `resolveAssignmentDispatchPolicy` itself, completely unchanged -- it
+ * stays final regardless of any declared or CLI-composed preference.
+ *
+ * @param {string} coordinationId Must already have a non-null `definitionRef` (opened via `openDeclaredProtocolSession`).
+ * @param {object} params
+ * @param {string} params.operationId
+ * @param {string} params.objective
+ * @param {string[]} params.expectedOutputs
+ * @param {string[]} [params.contextRefs] Only honored for a root (no-incoming-edge) operation.
+ * @param {string[]} [params.constraints]
+ * @param {string[]} [params.capabilities] Defaults to the operation's own declared `capabilities`.
+ * @param {object} [params.budget]
+ * @param {string} params.writerId
+ * @param {string} [params.parentAssignmentId] Only honored for a root operation.
+ * @param {string} [params.fromAssignmentId] Required when the operation's actor has a declared incoming edge.
+ * @param {string} [params.intent] Must be one of the edge's declared `intents`.
+ * @param {number} [params.round] Default 1; a fresh (never-before-used) value is a NEW round, checked against `edge.maxRounds`.
+ * @param {string} [params.taskKey] Overrides the default `declared:<operationId>[:round-N]` taskKey.
+ * @param {object} [params.runnerPolicy] Runner/global-scope PolicyPatch fragment.
+ * @param {object} [params.rolePolicy] Role-scope PolicyPatch fragment.
+ * @param {object} [params.assignmentPolicy] Assignment-scope PolicyPatch fragment.
+ * @param {object} [params.cliPolicy] Human/CLI-scope PolicyPatch fragment (the one scope legally allowed to carry a literal `preferExecutor`).
+ * @param {object} [opts] Forwarded to `createAndExecuteSessionTask`/`executeAssignment` (cwd, repoRoot, packageRoot, runnerConfig, timeoutMs, options, ...)
+ */
+export async function dispatchDeclaredOperation(
+  coordinationId,
+  {
+    operationId,
+    objective,
+    expectedOutputs,
+    contextRefs = [],
+    constraints = [],
+    capabilities,
+    budget,
+    writerId,
+    parentAssignmentId,
+    fromAssignmentId,
+    intent,
+    round = 1,
+    taskKey: explicitTaskKey,
+    runnerPolicy = {},
+    rolePolicy = {},
+    assignmentPolicy = {},
+    cliPolicy = {},
+  },
+  opts = {},
+) {
+  const manifest = readManifest(coordinationId, opts);
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- open it with openDeclaredProtocolSession()`,
+    );
+  }
+
+  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to materialize against a drifted definition`,
+    );
+  }
+
+  const { operation, actorId, actorEntry } = resolveDeclaredOperationActor(definition, operationId);
+  const topology = definition.spec.profile.topology;
+  const incomingEdge = topology?.edges?.find((edge) => edge.to === actorId);
+
+  let resolvedContextRefs;
+  let resolvedIntent = null;
+  let taskKey;
+
+  if (incomingEdge) {
+    if (!isNonEmptyString(fromAssignmentId)) {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: operation "${operationId}" is reached by a declared topology edge from "${incomingEdge.from}" -- fromAssignmentId is required`,
+      );
+    }
+    const { assignmentRefs, events } = replaySession(coordinationId, opts);
+    if (!assignmentRefs.includes(fromAssignmentId)) {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: fromAssignmentId "${fromAssignmentId}" is not a member of session "${coordinationId}"`,
+      );
+    }
+    const fromCreatedEvent = events.find(
+      (event) => event.type === 'assignment-created' && event.payload.assignmentId === fromAssignmentId,
+    );
+    if (!fromCreatedEvent || fromCreatedEvent.payload.actorId !== incomingEdge.from) {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: fromAssignmentId "${fromAssignmentId}" does not belong to declared edge source actor "${incomingEdge.from}" -- undeclared edge/direction`,
+      );
+    }
+
+    resolvedIntent = intent ?? incomingEdge.intents?.[0];
+    if (!incomingEdge.intents || !incomingEdge.intents.includes(resolvedIntent)) {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: intent "${resolvedIntent}" is not declared on the topology edge "${incomingEdge.from}" -> "${incomingEdge.to}" (declared intents: [${(incomingEdge.intents ?? []).join(', ')}])`,
+      );
+    }
+
+    taskKey = explicitTaskKey ?? `declared:${operationId}:round-${round}`;
+    const { sessionDir } = resolveSessionPaths(coordinationId, opts);
+    const taskClaimPath = path.join(sessionDir, 'tasks', `${hashTaskKey(taskKey)}.json`);
+    const isResumeOfThisRound = fs.existsSync(taskClaimPath);
+    if (!isResumeOfThisRound) {
+      const maxRounds = incomingEdge.maxRounds ?? Infinity;
+      const roundsAlreadyUsed = events.filter(
+        (event) => event.type === 'assignment-created' && event.payload.actorId === actorId,
+      ).length;
+      if (roundsAlreadyUsed >= maxRounds) {
+        throw new CoordinationError(
+          'validation',
+          `dispatchDeclaredOperation: topology edge "${incomingEdge.from}" -> "${incomingEdge.to}" allows at most ${maxRounds} round(s); a new round for actor "${actorId}" is rejected`,
+        );
+      }
+    }
+
+    // Mediated context visibility (R2): the specialist actor's contract
+    // NEVER carries caller-supplied contextRefs -- only the one authorized
+    // upstream Assignment, by construction. This is not a filter applied to
+    // caller input; there is no parameter path for extra contextRefs to
+    // reach this branch at all.
+    resolvedContextRefs = [fromAssignmentId];
+  } else {
+    taskKey = explicitTaskKey ?? `declared:${operationId}`;
+    resolvedContextRefs = Array.isArray(contextRefs) ? contextRefs : [];
+  }
+
+  const scopeStack = [
+    { scope: 'runner', id: 'runner-default', policy: runnerPolicy },
+    { scope: 'definition', id: definition.metadata.id, policy: definition.spec.policy ?? {} },
+    { scope: 'operation', id: operationId, policy: operation.policy ?? {} },
+    { scope: 'role', id: operation.role, policy: rolePolicy },
+    { scope: 'actor', id: actorId, policy: actorEntry.policy ?? {} },
+    { scope: 'assignment', id: taskKey, policy: assignmentPolicy },
+    { scope: 'cli', id: 'cli', policy: cliPolicy },
+  ];
+  const { merged, provenance: policyProvenance } = resolveDeclaredPolicyStack(scopeStack);
+
+  const cliOverride = {
+    ...(merged.minTier !== undefined ? { minTier: merged.minTier } : {}),
+    ...(merged.preferPersona !== undefined ? { preferPersona: merged.preferPersona } : {}),
+    ...(merged.preferExecutor !== undefined ? { preferExecutor: merged.preferExecutor } : {}),
+    ...(merged.fallbackExecutors !== undefined ? { fallbackExecutors: merged.fallbackExecutors } : {}),
+    ...(merged.visibility !== undefined ? { visibility: merged.visibility } : {}),
+    policyProvenance,
+  };
+
+  const contract = buildReadOnlyContract({
+    objective,
+    contextRefs: resolvedContextRefs,
+    constraints: [
+      ...constraints,
+      `protocol-operation:${definition.metadata.id}@${definition.metadata.version}#${operationId}`,
+    ],
+    expectedOutputs,
+    evidenceRequired: operation.result?.evidenceRequired ?? 'reported',
+    role: operation.role,
+    capabilities: capabilities ?? operation.capabilities,
+    budget,
+    timeoutMs: opts.timeoutMs,
+  });
+  const caller = {
+    writerId,
+    ...(incomingEdge
+      ? { parentAssignmentId: fromAssignmentId }
+      : parentAssignmentId !== undefined
+        ? { parentAssignmentId }
+        : {}),
+  };
+
+  // The pre-lock `roundsAlreadyUsed >= maxRounds` check above (inside the
+  // `if (incomingEdge)` branch) is a fast-fail/UX shortcut only -- it can be
+  // stale under real cross-process concurrency (two OS processes can both
+  // read `replaySession()` before either has created an Assignment). The
+  // AUTHORITATIVE, race-proof enforcement is `createSessionAssignment`'s own
+  // opt-in `opts.maxRoundsForActor` (store.mjs), which re-checks on a FRESH
+  // read taken INSIDE its own `withEventsLock` critical section. Forwarded
+  // unconditionally whenever a declared topology edge governs this
+  // dispatch (regardless of this function's own, possibly stale,
+  // `isResumeOfThisRound` guess) -- `createSessionAssignment`'s own
+  // `taskClaimPath` check already runs first and takes priority, so a
+  // genuine resume of the SAME taskKey still short-circuits before the cap
+  // check is ever reached, and is never double-counted.
+  const dispatchResult = await createAndExecuteSessionTask(
+    { coordinationId, taskKey, actorId, contract, caller },
+    {
+      ...opts,
+      cliOverride,
+      ...(incomingEdge ? { maxRoundsForActor: incomingEdge.maxRounds ?? Infinity } : {}),
+    },
+  );
+
+  return {
+    ...dispatchResult,
+    definitionRef: manifest.definitionRef,
+    edge: incomingEdge ? { from: incomingEdge.from, to: incomingEdge.to, intent: resolvedIntent } : null,
+  };
+}
+
+const DISPOSITION_VALUES = new Set(['accepted', 'rejected', 'partially-accepted']);
+// Same posture as CONSULT_OBJECTIVE_MAX_LENGTH above -- generous but real,
+// never unbounded by omission.
+const DISPOSITION_RATIONALE_MAX_LENGTH = 2000;
+
+/**
+ * Require the primary (requester) actor to record a disposition --
+ * `accepted | rejected | partially-accepted` plus a non-empty rationale --
+ * for a specialist's already-settled advice (R4). Advice is persisted as
+ * its own RunResult/evidence ref the moment `dispatchDeclaredOperation`
+ * links it (unchanged, existing mechanism); THIS function additionally
+ * requires that advice to already be linked before a disposition can be
+ * recorded at all -- "primary receives the specialist's result only after
+ * accepted evidence" (R2) is enforced here as an ordering precondition, not
+ * merely a naming convention.
+ *
+ * The disposition itself is materialized as one more governed Assignment
+ * under the requester actor -- reusing `createAndExecuteSessionTask` again,
+ * never a bespoke persistence path -- whose `constraints` array carries the
+ * caller-decided `disposition:<value>`/`rationale:<text>` pair verbatim (the
+ * inline contract schema has no dedicated structured field for this; see
+ * this cell's own report for the reasoning). `evidenceRequired` stays
+ * `'reported'` unconditionally: advice is advisory and a disposition can
+ * never make it "verified" -- there is no branch anywhere in this function
+ * that could produce `'verified'`.
+ *
+ * @param {string} coordinationId
+ * @param {object} params
+ * @param {string} params.requesterAssignmentId The primary's own Assignment (its actor's role is used for the disposition Assignment).
+ * @param {string} params.consultantAssignmentId The specialist Assignment whose advice is being dispositioned; must already have a linked RunResult.
+ * @param {'accepted'|'rejected'|'partially-accepted'} params.disposition
+ * @param {string} params.rationale Non-empty, bounded.
+ * @param {string} params.writerId
+ * @param {string[]} [params.expectedOutputs]
+ * @param {object} [params.budget]
+ * @param {object} [opts]
+ */
+export async function recordConsultDisposition(
+  coordinationId,
+  { requesterAssignmentId, consultantAssignmentId, disposition, rationale, writerId, expectedOutputs, budget },
+  opts = {},
+) {
+  if (!DISPOSITION_VALUES.has(disposition)) {
+    throw new CoordinationError(
+      'validation',
+      `recordConsultDisposition: disposition must be one of ${[...DISPOSITION_VALUES].join(', ')}`,
+    );
+  }
+  if (!isNonEmptyString(rationale) || rationale.length > DISPOSITION_RATIONALE_MAX_LENGTH) {
+    throw new CoordinationError(
+      'validation',
+      `recordConsultDisposition: rationale must be a non-empty, bounded string (max ${DISPOSITION_RATIONALE_MAX_LENGTH} characters)`,
+    );
+  }
+
+  const { assignmentRefs, events } = replaySession(coordinationId, opts);
+  if (!assignmentRefs.includes(requesterAssignmentId)) {
+    throw new CoordinationError(
+      'validation',
+      `recordConsultDisposition: requesterAssignmentId "${requesterAssignmentId}" is not a member of session "${coordinationId}"`,
+    );
+  }
+  if (!assignmentRefs.includes(consultantAssignmentId)) {
+    throw new CoordinationError(
+      'validation',
+      `recordConsultDisposition: consultantAssignmentId "${consultantAssignmentId}" is not a member of session "${coordinationId}"`,
+    );
+  }
+  const consultLinked = events.some(
+    (event) => event.type === 'result-linked' && event.payload.assignmentId === consultantAssignmentId,
+  );
+  if (!consultLinked) {
+    throw new CoordinationError(
+      'validation',
+      `recordConsultDisposition: consultantAssignmentId "${consultantAssignmentId}" has no linked RunResult yet -- advice must settle before a disposition can be recorded`,
+    );
+  }
+  const requesterCreatedEvent = events.find(
+    (event) => event.type === 'assignment-created' && event.payload.assignmentId === requesterAssignmentId,
+  );
+  const requesterActorId = requesterCreatedEvent?.payload?.actorId;
+  const manifest = readManifest(coordinationId, opts);
+  const requesterRole = (manifest.actors ?? []).find((actor) => actor.id === requesterActorId)?.role;
+  if (!requesterActorId || !requesterRole) {
+    throw new CoordinationError(
+      'validation',
+      `recordConsultDisposition: requesterAssignmentId "${requesterAssignmentId}" is not bound to a known SessionActor`,
+    );
+  }
+
+  const contract = buildReadOnlyContract({
+    objective: `Record disposition for consult advice from assignment "${consultantAssignmentId}".`,
+    contextRefs: [consultantAssignmentId],
+    constraints: [`disposition:${disposition}`, `rationale:${rationale}`],
+    expectedOutputs: expectedOutputs ?? ['agent-result.json (status, summary)'],
+    evidenceRequired: 'reported',
+    role: requesterRole,
+    budget,
+    timeoutMs: opts.timeoutMs,
+  });
+  const caller = { writerId, parentAssignmentId: consultantAssignmentId };
+
+  const dispatchResult = await createAndExecuteSessionTask(
+    { coordinationId, taskKey: `disposition:${consultantAssignmentId}`, actorId: requesterActorId, contract, caller },
+    opts,
+  );
+
+  return { ...dispatchResult, disposition, rationale };
 }

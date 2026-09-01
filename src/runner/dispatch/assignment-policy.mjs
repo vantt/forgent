@@ -11,6 +11,17 @@
 // - Tier resolves to the strongest required tier (cannot be weakened).
 // - Literal model names are accepted only from Assignment or human/CLI override (never workflow YAML).
 // - Executor/provider preference uses the most specific value.
+//
+// Step 08 R3 (declared CoordinationProtocol materialization): an optional
+// `cliOverride.policyProvenance` object (`{tier?, persona?, executor?,
+// visibility?}`, each a `{scope, id?}` pair) lets a caller that already
+// composed a full scoped policy stack upstream (runner/definition/operation/
+// role/actor/assignment/cli -- coordination/session-engine.mjs's
+// `dispatchDeclaredOperation`) record which scope actually won, instead of
+// this resolver's own generic `{scope: 'cliOverride'}` label. Purely
+// additive: `policyProvenance` is undefined for every pre-existing caller,
+// so their persisted provenance is byte-identical to before this field was
+// added.
 
 import { MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
 import { resolvePolicyTierModel, deriveProviderFamily } from './resolve.mjs';
@@ -99,7 +110,15 @@ export function resolveAssignmentDispatchPolicy({
     if (!MODEL_POLICY_TIERS.includes(cliTier)) {
       throw new RunnerConfigError(`invalid override tier "${cliTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
     }
-    if (strength(cliTier) > strength(effectiveTier)) tierSource = { scope: 'cliOverride' };
+    // Step 08 R3: a caller that has already composed a full scoped policy
+    // stack (runner/definition/operation/role/actor/assignment/cli, e.g. a
+    // declared CoordinationProtocol materialization) may name the ACTUAL
+    // winning scope via `cliOverride.policyProvenance.tier` instead of the
+    // generic `{scope: 'cliOverride'}` this resolver would otherwise stamp
+    // for every value it receives through this one channel -- additive only:
+    // `policyProvenance` is undefined for every pre-existing caller, so this
+    // is a value-preserving no-op unless a caller opts in.
+    if (strength(cliTier) > strength(effectiveTier)) tierSource = cliOverride.policyProvenance?.tier ?? { scope: 'cliOverride' };
     effectiveTier = resolveStrongerTier(effectiveTier, cliTier);
   }
 
@@ -113,7 +132,7 @@ export function resolveAssignmentDispatchPolicy({
     opPolicy.preferPersona ??
     (assignment.role === 'reviewer' ? 'code-reviewer' : undefined);
   const personaSource = cliOverride.preferPersona
-    ? { scope: 'cliOverride' }
+    ? (cliOverride.policyProvenance?.persona ?? { scope: 'cliOverride' })
     : opPolicy.preferPersona
       ? { scope: 'opPolicy', id: opId }
       : resolvedPersona
@@ -130,7 +149,7 @@ export function resolveAssignmentDispatchPolicy({
     runnerConfig?.executor?.command ??
     'claude';
   const executorSource = cliOverride.preferExecutor
-    ? { scope: 'cliOverride' }
+    ? (cliOverride.policyProvenance?.executor ?? { scope: 'cliOverride' })
     : opPolicy.preferExecutor
       ? { scope: 'opPolicy', id: opId }
       : { scope: 'default' };
@@ -244,7 +263,7 @@ export function resolveAssignmentDispatchPolicy({
   // 5. Visibility Resolution
   const resolvedVisibility = cliOverride.visibility ?? opPolicy.visibility ?? 'headless';
   const visibilitySource = cliOverride.visibility
-    ? { scope: 'cliOverride' }
+    ? (cliOverride.policyProvenance?.visibility ?? { scope: 'cliOverride' })
     : opPolicy.visibility
       ? { scope: 'opPolicy', id: opId }
       : { scope: 'default' };

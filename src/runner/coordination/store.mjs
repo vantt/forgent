@@ -387,6 +387,28 @@ function completeAssignmentRegistration({ manifest, manifestPath, eventsPath, se
  * @param {string} [params.createdBy]
  * @param {object} [params.options] Passed through to buildAssignment (e.g. domain).
  * @param {object} [opts] Workspace options
+ * @param {number} [opts.maxRoundsForActor] Opt-in extra invariant, mirroring
+ *   `bindActor`'s `opts.primaryActorId` pattern exactly: when provided, this
+ *   function additionally enforces "actor `actorId` has fewer than
+ *   `opts.maxRoundsForActor` prior `assignment-created` events" as part of
+ *   the SAME locked critical section as the write below, on a FRESH
+ *   `readEvents(eventsPath)` taken while the lock is held -- not a caller's
+ *   own earlier, unlocked read (e.g. session-engine.mjs's
+ *   `dispatchDeclaredOperation`, which reads via an unlocked
+ *   `replaySession()` for its own fast-fail check). This is what closes the
+ *   cross-process TOCTOU a caller's own read-then-decide cannot close by
+ *   itself: two callers can both pass an earlier, unlocked round-count check
+ *   before either has created an Assignment, but only one of their
+ *   `createSessionAssignment` calls can win this lock first. The check only
+ *   ever runs on the "genuinely new taskKey" path below (AFTER the
+ *   `taskClaimPath` existing-claim branch has already returned/self-healed) --
+ *   a legitimate RESUME of an already-claimed taskKey is never double-counted
+ *   against the cap, because the existing claim-file check above takes
+ *   priority and returns before this new check is ever reached. Opt-in
+ *   (undefined = no invariant enforced), so every pre-existing caller (the
+ *   agent-led `proposeConsult`/`dispatchPrimaryTask` paths, and every
+ *   existing test that calls this function with no round-cap concept at all)
+ *   sees byte-identical behavior.
  * @returns {Readonly<object>} The Assignment (freshly created, or the one already claimed for this taskKey)
  */
 export function createSessionAssignment(
@@ -436,6 +458,29 @@ export function createSessionAssignment(
         });
       }
       return Object.freeze(existing);
+    }
+
+    // Authoritative round-cap enforcement (opt-in): only reached once the
+    // claim-file check above has already established this is a genuinely
+    // NEW taskKey, never a resume -- so a resume is never double-counted.
+    // Counts against a FRESH, lock-held `readEvents`, never the caller's
+    // own earlier unlocked read, closing the cross-process TOCTOU window.
+    if (opts.maxRoundsForActor !== undefined) {
+      if (!isNonEmptyString(actorId)) {
+        throw new CoordinationError(
+          'validation',
+          `createSessionAssignment: opts.maxRoundsForActor requires a non-empty actorId (session "${coordinationId}", taskKey "${taskKey}")`,
+        );
+      }
+      const roundsAlreadyUsed = readEvents(eventsPath).filter(
+        (event) => event.type === 'assignment-created' && event.payload?.actorId === actorId,
+      ).length;
+      if (roundsAlreadyUsed >= opts.maxRoundsForActor) {
+        throw new CoordinationError(
+          'validation',
+          `createSessionAssignment: actor "${actorId}" in session "${coordinationId}" has already used ${roundsAlreadyUsed} round(s), at or above the declared cap of ${opts.maxRoundsForActor} -- refusing to create a new Assignment for a new round`,
+        );
+      }
     }
 
     const assignment = claimAssignmentId(

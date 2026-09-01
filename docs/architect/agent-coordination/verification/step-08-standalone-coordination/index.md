@@ -39,7 +39,7 @@ of a blanket "unrelated" pass.
 | 00 | R1-R11 | done |
 | 01 | R1-R8 | done |
 | 02 | R1-R8 | done |
-| 03 | R1-R8 | missing (depends on 02) |
+| 03 | R1-R8 | R1-R4 done; R5-R8 outstanding (P03.2) |
 | 04 | R1-R9 | missing (depends on 03) |
 | 05 | R1-R8 | missing (depends on 04) |
 | 06 | R1-R8 | missing (depends on 05) |
@@ -51,7 +51,7 @@ none
 
 ## Next Action
 
-prepare (P03.1)
+prepare (P03.2)
 
 ## Cell Log
 
@@ -65,6 +65,7 @@ prepare (P03.1)
 | P01.2 | Phase 01 R5, R6, R7, R8 (closes Phase 01) | done | `85206dca` |
 | P02.1 | Phase 02 R1, R2, R3, R4 | done | `1f2260b1` |
 | P02.2 | Phase 02 R5, R6, R7, R8 (closes Phase 02) | done | `bbb71784` |
+| P03.1 | Phase 03 R1, R2, R3, R4 | done | pending |
 
 ## Phase 00 Status
 
@@ -226,5 +227,48 @@ execution wiring; every tier through the same validated kernel;
 `src/runner/dispatch/**` and `src/runner/coordination/**` both remain at
 zero diff for the whole phase).
 
-Next: P03.1 (Phase 03 -- declared consult protocol, R1-R4: consult
-materialization/topology/policy provenance).
+## Phase 03 Status (in progress)
+
+**P03.1 CLOSED** (Phase 03 R1-R4): added `openDeclaredProtocolSession`/
+`dispatchDeclaredOperation`/`recordConsultDisposition` to
+`session-engine.mjs` -- a SECOND, declared-protocol dispatch path that
+routes exclusively through the same `createAndExecuteSessionTask` shared
+primitive the existing agent-led `proposeConsult` path already uses (no
+second execution core, statically confirmed). Materializes the
+`declared-consult` fixture's SessionActors/operations into inline
+Assignment contracts; enforces mediated topology (context isolation
+proven structural, not filtered, via a sentinel-string test); composes a
+7-scope policy precedence chain (`runner < definition < operation < role
+< actor < assignment < cli`) through a small additive extension to
+`assignment-policy.mjs` (`cliOverride.policyProvenance`, undefined for
+every pre-existing caller); requires a disposition
+(accepted/rejected/partially-accepted + rationale) that can never resolve
+to `evidence: 'verified'`. Went through 1 Reviewer round that found and
+EMPIRICALLY REPRODUCED (not just reasoned about) a HIGH cross-process
+TOCTOU: the `maxRounds` topology cap was checked via an unlocked read
+before the real atomic Assignment-creation write, letting two genuinely
+separate `node` OS processes both win a race and both create a round
+against a `maxRounds: 1` edge (15/15 reproductions, confirmed via
+persisted on-disk state, not process exit codes) -- a single-process race
+was proven impossible (zero `await` between the check and the lock), so
+this specifically needed real multi-process reproduction to find and to
+verify the fix. Fixed by extending `createSessionAssignment` (store.mjs)
+with an opt-in `opts.maxRoundsForActor`, checked on a fresh read INSIDE
+the function's own existing cross-process lock, positioned after the
+existing resume/self-heal short-circuit so a legitimate resume is never
+double-counted -- mirroring this same file's own P01.2 precedent
+(`bindActor`'s `opts.primaryActorId`) exactly. A Red-Team re-check
+re-ran the IDENTICAL 2-process reproduction against the fix: 0/15 (race
+closed), plus 10/10 confirming legitimate resume-vs-new-round concurrency
+was not overcorrected into false rejection. One LOW informational gap
+(a rare interleaving can surface a pre-existing, unrelated `replay.mjs`
+torn-read message instead of the round-cap message; fails closed either
+way, not fixed). Full suite: 4807/4820 pass, all 8 failures match the
+documented baseline exactly, no new failure. Dispatch smoke check
+(`mechanism` field) confirmed intact. Phase-level exit criteria
+(AC-I002/003/006/008, agent-led-vs-declared equivalence) deferred to
+P03.2 per the plan's own cell split.
+
+Next: P03.2 (Phase 03 R5-R8 -- session bounds enforcement, illegal-
+behavior negative sweep, agent-led-vs-declared equivalence proof, live
+interactive proof; closes Phase 03).

@@ -148,6 +148,88 @@ test('createSessionAssignment refuses to create an Assignment once the session h
   );
 });
 
+test('createSessionAssignment with opts.maxRoundsForActor rejects a genuinely new taskKey/round once the actor\'s round count is already at the cap -- checked inside the SAME locked critical section as the write, on a fresh readEvents(), not a caller\'s own earlier unlocked check', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_round_cap', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' }, actors: [{ id: 'consultant', role: 'reviewer' }] }, { cwd: tempDir });
+
+  // Round 1: no cap supplied yet -- simulates the actor already having used
+  // its one allowed round (e.g. via an earlier, uncapped call, or written
+  // directly to the event log before this call, as the TOCTOU scenario
+  // requires).
+  const first = createSessionAssignment(
+    { coordinationId: 'coord_round_cap', taskKey: 'round-1', actorId: 'consultant', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+    { cwd: tempDir },
+  );
+
+  // Round 2: a genuinely NEW taskKey for the SAME actor, with the cap now
+  // enforced -- must be rejected BEFORE any new Assignment/event is written,
+  // proving the check-and-write are atomic within one critical section.
+  assert.throws(
+    () =>
+      createSessionAssignment(
+        { coordinationId: 'coord_round_cap', taskKey: 'round-2', actorId: 'consultant', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+        { cwd: tempDir, maxRoundsForActor: 1 },
+      ),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /already used 1 round\(s\), at or above the declared cap of 1/.test(err.message),
+  );
+
+  const manifest = readManifest('coord_round_cap', { cwd: tempDir });
+  assert.deepEqual(manifest.assignmentRefs, [first.assignmentId], 'a rejected new round must not append a second assignmentRef');
+  const events = readSessionEvents('coord_round_cap', { cwd: tempDir });
+  assert.equal(events.filter((e) => e.type === 'assignment-created').length, 1, 'a rejected new round must not append a second assignment-created event');
+  const assignmentsDir = path.join(tempDir, '.fgos', 'assignments');
+  assert.deepEqual(fs.readdirSync(assignmentsDir), [first.assignmentId], 'a rejected new round must never even reserve a new assignmentId');
+});
+
+test('createSessionAssignment with opts.maxRoundsForActor never double-counts a legitimate RESUME of the SAME taskKey -- the existing taskClaimPath check runs first and takes priority over the new round-cap check', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_round_cap_resume', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' }, actors: [{ id: 'consultant', role: 'reviewer' }] }, { cwd: tempDir });
+
+  const params = { coordinationId: 'coord_round_cap_resume', taskKey: 'round-1', actorId: 'consultant', contract: inlineContract(), caller: { writerId: 'writer-1' } };
+  const opts = { cwd: tempDir, maxRoundsForActor: 1 };
+
+  const first = createSessionAssignment(params, opts);
+  // Resuming the SAME taskKey a second time, with the cap already "used" by
+  // this very round, must still succeed as an idempotent no-op -- not be
+  // wrongly rejected as "cap exceeded".
+  const resumed = createSessionAssignment(params, opts);
+
+  assert.equal(resumed.assignmentId, first.assignmentId);
+  const manifest = readManifest('coord_round_cap_resume', { cwd: tempDir });
+  assert.deepEqual(manifest.assignmentRefs, [first.assignmentId]);
+});
+
+test('createSessionAssignment without opts.maxRoundsForActor (the default) still allows creating multiple distinct-taskKey Assignments for the same actor -- the round-cap invariant is opt-in, not a blanket restriction', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_round_cap_default', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' }, actors: [{ id: 'consultant', role: 'reviewer' }] }, { cwd: tempDir });
+
+  const first = createSessionAssignment(
+    { coordinationId: 'coord_round_cap_default', taskKey: 'round-1', actorId: 'consultant', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+    { cwd: tempDir },
+  );
+  const second = createSessionAssignment(
+    { coordinationId: 'coord_round_cap_default', taskKey: 'round-2', actorId: 'consultant', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+    { cwd: tempDir },
+  );
+
+  const manifest = readManifest('coord_round_cap_default', { cwd: tempDir });
+  assert.deepEqual(manifest.assignmentRefs.sort(), [first.assignmentId, second.assignmentId].sort());
+});
+
+test('createSessionAssignment throws when opts.maxRoundsForActor is set but no actorId is supplied -- the round-cap check requires an actor identity to count against, and must fail loud rather than silently skip the invariant', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_round_cap_no_actor', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+
+  assert.throws(
+    () =>
+      createSessionAssignment(
+        { coordinationId: 'coord_round_cap_no_actor', taskKey: 'round-1', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+        { cwd: tempDir, maxRoundsForActor: 1 },
+      ),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /requires a non-empty actorId/.test(err.message),
+  );
+});
+
 test('linkResult appends result-linked only for an assignment that is a real session member', () => {
   const tempDir = mkTempDir();
   openSession({ coordinationId: 'coord_link_001', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
