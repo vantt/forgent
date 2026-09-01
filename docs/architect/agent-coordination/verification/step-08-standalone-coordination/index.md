@@ -66,7 +66,7 @@ prepare (P04.1)
 | P02.1 | Phase 02 R1, R2, R3, R4 | done | `1f2260b1` |
 | P02.2 | Phase 02 R5, R6, R7, R8 (closes Phase 02) | done | `bbb71784` |
 | P03.1 | Phase 03 R1, R2, R3, R4 | done | `8fc3130a` |
-| P03.2 | Phase 03 R5, R6, R7, R8 (closes Phase 03) | done | pending |
+| P03.2 | Phase 03 R5, R6, R7, R8 (closes Phase 03) | done | `38a9a010` |
 
 ## Phase 00 Status
 
