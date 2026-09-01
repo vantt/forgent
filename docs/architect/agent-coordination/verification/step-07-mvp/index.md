@@ -52,7 +52,7 @@ Noted, not touched by this track: `.agentkit/`, `.claude/agents/*.md`,
 | P02 | R7 | done | P02.4 | `P02.4.md`, commit `cfe60bfb` |
 | P02 | R8 | done | P02.5 | `P02.5.md`, commit `a77b95ef` |
 | P03 | R1–R2 | done | P03.1 | `P03.1.md`, commit `2a22c93c` |
-| P03 | R3 | missing | P03.2 | — |
+| P03 | R3 | done | P03.2 | `P03.2.md`, commit `7abe80c4` |
 | P03 | R4–R6 | missing | P03.3 | — |
 
 Cell split deviates from plan.md's suggested "P02.2 (R5+R6), P02.3
@@ -128,13 +128,34 @@ Populated in Phase 03 per plan requirement R6.
   pre-existing test title, not touched by P03.1's own diff). Comment/
   test-name wording only, zero behavior change — safe cleanup whenever
   convenient, does not block Phase 03.
+- `--work <id>` lookup (`cli.mjs:621` in the pre-existing `decide --work`
+  branch, and reused verbatim by P03.2's `--contract --work` branch) does
+  unguarded bracket access (`listWork(fgosDir).work[workIdArg]`) against a
+  plain object literal, so a `--work` value matching a JS built-in
+  property name (`__proto__`, `constructor`, `toString`, etc.) silently
+  resolves to that prototype value instead of erroring "no work item
+  found". Found by P03.2 Red-Team (LOW — no privilege escalation or
+  Work-lifecycle mutation found; the resolved "work" carries no
+  `stage`/`domain`/`id`, so the practical effect is the same as omitting
+  `--work` entirely, just without the honest error). Fix direction:
+  `Object.prototype.hasOwnProperty.call(...)` guard at both call sites, or
+  switch `state/store.mjs`'s `currentEffectiveView` `work` map to
+  `Object.create(null)` at the source so every consumer gets it for free.
+  Cross-cutting both call sites — pick up in a future cell that touches
+  either one.
 
 ## Active Cell
 
-None. P03.1 (R1+R2) is closed. Next cell (P03.2, R3: CLI `--contract`
-door) not yet prepared.
+None. P03.2 (R3, CLI `--contract` door) is closed — see `P03.2.md`. Two
+review/red-team rounds: HIGH #1 (sequential assignmentId collision) fixed
+and rechecked clean; HIGH #2 (true-concurrency assignmentId collision, an
+atomic `claimAssignmentId` mkdirSync-based claim) fixed and rechecked
+clean; 2 LOW findings logged as Follow-Ups above, non-blocking. 29/29
+targeted tests pass; full suite 4643 tests, 4630 pass, 8 fail (all match
+recorded baseline, zero new failures).
 
 ## Next Action
 
-Prepare cell P03.2 — Phase 03 R3 (CLI `--contract` door in
-`src/runner/dispatch/cli.mjs`'s `execute` subcommand).
+Prepare cell P03.3 — Phase 03 R4–R6 (Proof 1 standalone, Proof 2 coding
+consult, ADR traceability). Executor `claude-reviewer` is configured in
+`.fgos/config.json`, so the live-proof stop gate does not apply.

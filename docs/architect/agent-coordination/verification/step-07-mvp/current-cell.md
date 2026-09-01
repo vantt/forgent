@@ -1,167 +1,150 @@
-# Current Cell: P03.1
+# Current Cell: none
 
-Status: closed
-Owner: Coordinator (independent verification complete, cell closed)
+Status: idle
+Owner: Coordinator
 Last updated: 2026-09-01
-Next action: prepare P03.2 (Phase 03, R3: CLI `--contract` door)
+Next action: prepare cell P03.3 (Phase 03 R4–R6). P03.2 closed — see
+`P03.2.md` and `index.md`'s Active Cell/Phase-Requirement Matrix.
 
 ## Goal
 
-Land ADR-007 R1 (the domain harness seam) and R2 (the non-driving rule).
-Phase 03's first cell, per plan.md's own suggested split
-(`P03.1 (R1 + R2), P03.2 (R3), P03.3 (R4+R5+R6 live proofs)`).
-
-With Phase 02 done, the inline Assignment class exists and mission-lite
-already builds one (`createMissionAssignment`, no `work` attached). This
-cell adds the ONE thing a Work-attached inline contract needs before Phase
-03's live proofs can run: a domain seam that enriches/rejects an inline
-contract against a Work's declared Stage, and a guarantee that the result
-of running it can never be mistaken for a Stage verdict.
+Land ADR-007 R3: a CLI door that lets a real caller build and run an
+inline Assignment from a raw execution contract, without a Work item, a
+Stage, or `decide --for`. This is the door Phase 03's own two live proofs
+(R4/R5, next cell P03.3) will run through — `decide --for` purposes do not
+include reviewer/advisor roles per the plan text, so `execute --contract`
+is the only real path for either proof.
 
 ## Requirements
 
-- **R1 — Seam.** New file `domains/coding/harness/enrich-and-validate-contract.mjs`
-  exporting a pure `enrichAndValidateContract(contract, { domain, work })`.
-  Per ADR-007 §1, when called for a Work at a declared Stage it:
-  - requires `contract.supports` to be an operation id in
-    `operationsForStage(domain, work.stage)` (reject otherwise, fail-closed
-    — this is the ADR-007 §3 "inline may not replace or extend the declared
-    path" guarantee, mechanically enforced here);
-  - adds `contextRefs` (CONTEXT.md, plan.md — same `resolveContentRoot`
-    resolution `buildDeclaredAssignment`'s own `work.docsRef` branch already
-    uses, `src/runner/paths.mjs`);
-  - adds an allowed-scope constraint (repository read scope — this is a
-    read-only-only slice, ADR-006 §6 still applies to inline);
-  - sets the coding read-only evidence rule: `reported` evidence requires an
-    `agent-report.md` artifact (mirror how `buildDeclaredAssignment`'s
-    `derivedExpectedOutputs` already documents the expected evidence
-    artifact for `validate-plan`/`review-item`, so a worker gets the same
-    kind of concrete instruction, not a bare policy statement);
-  - writes role→tier hints into `policy` (same merge shape
-    `buildDeclaredAssignment`'s `mergedPolicy` already uses:
-    `{...opPolicy, ...callerPolicy}`, `_fromYaml` marker when the tier came
-    from YAML and the caller didn't override it).
-  - It never sets an executor id, never dispatches, never touches Work
-    lifecycle — `compileDispatchPlan` stays the sole execution chooser
-    (ADR-007 §1, this is a hard boundary, not a style preference).
-  - Foundation (`buildAssignment` / `buildInlineAssignment`,
-    `src/runner/dispatch/assignment.mjs`) calls it between the generic
-    validator (`execution-contract.mjs`'s `validateExecutionContract`,
-    unchanged) and the normalizer (`stampInlineAssignment`,
-    `assignment-normalizer.mjs`, unchanged) — **only when a `domain` is
-    resolvable for the call** (i.e. a `work` was attached with a domain, or
-    an explicit domain option was passed). A standalone inline call with no
-    Work/domain skips the seam entirely and passes on generic validation
-    alone (ADR-007 §2 — this is the actual evidence the foundation boundary
-    doesn't depend on any domain; do not weaken it by making the seam call
-    unconditional "for consistency").
-  - `execution-contract.mjs`'s `ACCEPTED_CONTRACT_FIELDS` whitelist
-    currently has no `supports` field — read it
-    (`src/runner/dispatch/execution-contract.mjs`) before touching it. It
-    must accept an *optional* `supports` field at the generic-validator
-    layer (format check only, e.g. non-empty string when present) without
-    itself knowing what a legal operation id is — that semantic check is
-    the seam's job alone, keeping the generic validator domain-ignorant
-    per ADR-007 §2.
-- **R2 — Non-driving rule.** `findLatestAssignmentRunResult`
-  (`src/runner/dispatch/operation-choice.mjs:100`) already reads each
-  candidate's parsed `assignment.json` (`asgn`) and filters on
-  `asgn.workId`, `asgn.stage`, `asgn.resultKind` in sequence — add
-  `asgn.provenance?.kind === 'inline'` to that same filter chain (skip, do
-  not `continue`-then-fall-through into evidence it shouldn't reach) so an
-  inline Assignment's RunResult is never returned as `lastRunResult` to
-  `chooseStageOperation`. Read the function's own doc comment above it
-  first (ADR-006 R5 history) and its "Follow-Ups" entry in `index.md`
-  (already flagged as this codebase's highest tamper-detection-sensitivity
-  function) before editing — this is a filter addition alongside existing
-  ones, not a restructure.
-  - `chooseStageOperation` itself (`operation-choice.mjs:638`) only ever
-    consumes the already-filtered `lastRunResult` parameter and never reads
-    `assignment.json`/`provenance` directly (confirmed by grep before
-    writing this contract) — the fix belongs solely in
-    `findLatestAssignmentRunResult`; do not add a second, redundant filter
-    inside `chooseStageOperation` "for defense in depth" without first
-    confirming empirically it can actually receive an inline result some
-    other way a grep might have missed.
-
-## Files
-
-- Create: `domains/coding/harness/enrich-and-validate-contract.mjs` + its
-  test file.
-- Modify: `src/runner/dispatch/assignment.mjs` (seam call site in
-  `buildInlineAssignment`), `src/runner/dispatch/execution-contract.mjs`
-  (`supports` field accepted), `src/runner/dispatch/operation-choice.mjs`
-  (R2 filter + test).
+- `src/runner/dispatch/cli.mjs`'s `execute` subcommand gains `--contract
+  <file>` (a path to a JSON file). Mutually exclusive with `--for` and any
+  stage-selection flag this subcommand already accepts — reject the
+  combination with a clear error, non-zero exit, before anything else
+  happens (mirror the existing mutual-exclusion style already used
+  elsewhere in this file, e.g. how `--assignment` short-circuits the rest
+  of the branch today at `cli.mjs:859`).
+- Reading `--contract <file>`: parse the JSON, build an inline Assignment
+  via the real public `buildAssignment()` API
+  (`provenance: { kind: 'inline', contract, caller }` — same shape
+  `mission-lite.mjs`'s `createMissionAssignment` already uses as its own
+  real call site, read it for the pattern). `caller.writerId` should be
+  auto-resolved via `resolveWriterIdentity()` (`src/util/session-identity.mjs`)
+  when the file doesn't supply one — this door is the SECOND real call
+  site for that function in the codebase (mission-lite.mjs is the first);
+  decide whether it should be filled in unconditionally, or only when
+  absent from the file, and document the choice.
+- A mutating contract must exit non-zero **before launch** — i.e., before
+  any executor is invoked. `buildAssignment()`'s own inline path already
+  throws `RunnerConfigError` on `mutation !== 'read-only'` via
+  `execution-contract.mjs`'s `validateExecutionContract` — this
+  requirement is satisfied by construction as long as `buildAssignment()`
+  runs and is allowed to throw BEFORE `executeAssignment()` is ever
+  called, not after. Verify this ordering explicitly with a test, don't
+  just assume it from reading the code.
+- Attaching to a Work: R5 (Proof 2, next cell) needs the harness seam
+  (R1, already landed in `domains/coding/harness/enrich-and-validate-contract.mjs`)
+  to actually fire through this CLI door, which requires a `work` object
+  to reach `buildAssignment()`. This door therefore needs a way to name a
+  Work to attach to — reuse the existing `--work <id>` flag this file
+  already parses for `decide --work` (`cli.mjs:995`, `listWork(fgosDir).work[workIdArg]`
+  is the established lookup pattern) rather than inventing a second flag
+  name for the same concept. Without this, R3's door could never be used
+  to prove R5, so this is in-scope for R3 itself, not scope creep into
+  R5's own cell.
+- Persistence: do NOT hand-roll a write of `assignment.json` in the CLI
+  branch. `executeAssignment()` (`assignment-runner.mjs:581-584`) already
+  lazily writes the canonical `assignment.json` the first time it runs for
+  an Assignment that doesn't yet have one on disk — the built (not yet
+  persisted) Assignment object from `buildAssignment()` can be passed
+  straight to `executeAssignment()`, the same way the existing
+  `--assignment <id>` branch already does after it reads an
+  *already-persisted* one back. Confirm this by reading
+  `executeAssignment` yourself, don't assume from this note alone.
+- Output: prints assignment id, run id, RunResult path (plain text or the
+  same JSON-on-stdout convention the rest of `execute` already uses —
+  match the existing `--assignment` branch's own output shape at
+  `cli.mjs:906` rather than inventing a new one).
+- `bin/fgos.mjs`: only touch if the dispatch subcommand wiring there
+  requires the new flag to be declared — check first, don't assume.
+- `CHANGELOG.md`: add one line under `## [Unreleased]` → `### Added`
+  (create that heading if the file's current `[Unreleased]` section
+  doesn't have one — see how a prior `### Added` block further down the
+  file is formatted). No new config default or env var is introduced by
+  this door; if you find yourself needing one, stop and flag it rather
+  than inventing a default silently (AGENTS.md's Install/setup/doctor
+  gate).
 
 ## Non-Goals (Out Of Scope For This Cell)
 
-Phase 03 R3 (CLI `--contract` door), R4/R5 (the two live proofs), R6
-(ADR traceability table). Do not change `execution-contract.mjs`'s
-`mutation`/`FORBIDDEN_SESSION_FIELDS` gates (untouched, still read-only-only
-this slice). Do not change `mission-lite.mjs`'s `createMissionAssignment`
-call shape (it never attaches a `work`, so the seam is a no-op for it —
-confirm this with a test, don't just assume it).
+The two live proofs themselves (R4/R5, next cell P03.3) — this cell only
+builds the door, does not run a real proof through it. R6 (ADR
+traceability table). Do not change `buildAssignment`/`buildInlineAssignment`
+(`assignment.mjs`) or the harness seam (`domains/coding/harness/`) —
+both already landed in P03.1 and are closed cells; if this cell finds a
+genuine gap in either, document it as a Gap/Follow-Up rather than
+reopening P03.1's own commit. Do not change `decide --for`'s own purpose
+table (the plan text already establishes `execute --contract` as the
+alternate door specifically because `decide --for` doesn't cover these
+roles — extending that table is a different, unrelated decision).
 
-## Watch-Fors (From Reading The Code Before Dispatch, Not Guessing)
+## Watch-Fors
 
-- `buildInlineAssignment`'s current signature
-  (`{ provenance, work, workId, createdBy, options }`) has no `domain`
-  parameter today. Deciding how a caller supplies `domain` for the seam to
-  fire (from `work.domain`, an explicit `options.domain`, or both) is an
-  implementation decision within this cell's scope — make it, document the
-  choice and why in `P03.1.md`'s Gaps section, same as every prior cell's
-  judgment calls.
-- The enriched contract's `contextRefs`/`constraints` need to reach the
-  frozen Assignment the same way the raw contract's fields already do
-  (`buildInlineAssignment`'s `frozenContext Refs`/`frozenConstraints`
-  locals) — but `policy` is NOT one of `execution-contract.mjs`'s
-  `ACCEPTED_CONTRACT_FIELDS` and per ADR-006 §4 never will be (that field
-  set is the wire contract an agent proposes; `policy` is host-side
-  guidance the harness adds afterward, same layering as
-  `buildDeclaredAssignment`'s own `mergedPolicy`, which lives on the
-  Assignment, not inside `matchedOp`'s caller-facing shape). Do not
-  re-validate the seam's output against `ACCEPTED_CONTRACT_FIELDS` — that
-  whitelist governs the agent-proposed contract only, not the
-  harness-enriched one.
-- `INLINE_ASSIGNMENT_PARAM_WHITELIST` in `assignment.mjs` currently rejects
-  any top-level `buildAssignment()` param outside
-  `{provenance, work, workId, createdBy, options}` for inline calls — if a
-  new top-level `domain` param is added, this whitelist must grow with it
-  or every inline caller (including `mission-lite.mjs`, currently
-  passing none) breaks confusingly on an unrelated change. Grep all real
-  callers of `buildAssignment`/`buildInlineAssignment` before finalizing
-  the signature.
+- `guardCwdRepoRootDivergence` is already called in the plain-prompt
+  `execute` path (`cli.mjs`, right before the final `executeExecutorCli`
+  call) — check whether the `--contract` branch needs the same guard
+  before resolving `--cwd`/`--repo-root`/`--dir`, matching the existing
+  `--assignment` branch's own `cwd`/`root` resolution logic
+  (`cli.mjs:861-869`) rather than diverging from it.
+- `decideExecutorCli` is called before `executeAssignment` in the existing
+  `--assignment` branch (to check dispatch mechanism/human-only gates
+  first) — decide whether `--contract` needs the same pre-flight decide
+  call or whether an inline, no-Work, no-Stage Assignment has no
+  equivalent gate to check (mission-lite's own `createMissionAssignment`
+  path does NOT call `decide` first — read why, in
+  `src/runner/dispatch/mission-lite.mjs`, before deciding which precedent
+  this door should follow).
+- The JSON file's exact shape is an open design call: does the file
+  contain the contract's own fields directly (the file IS the contract,
+  simplest for a caller to author), or a wrapper object like
+  `{ contract: {...}, caller: {...} }`? Make the call, document it in
+  `P03.2.md`'s Gaps section — whichever you choose, the two live proofs in
+  the NEXT cell will need to author a real file in this exact shape, so
+  get it right and keep it simple (a human or a calling agent should be
+  able to hand-write this file from ADR-006 §4's contract field list
+  alone).
 
-## Tests First (Per current-cell.md's Own Convention)
+## Tests First
 
-- Seam unit tests (new file): rejects a contract with no/illegal
-  `supports` for the Work's stage; adds `contextRefs`/constraint/evidence
-  guidance; never sets an executor id; identical output for identical
-  input (purity — same assertion style as any other pure module in this
-  repo, e.g. `assignment-normalizer.mjs`'s own tests).
-- R2 test: an inline Assignment with a READY-looking claim on a planning
-  Work does not get returned by `findLatestAssignmentRunResult` / does not
-  advance the edge via `chooseStageOperation`; a declared `validate-plan`
-  READY still does (regression, must still pass unmodified).
-- Confirm via a real (not just read-code) test that
-  `createMissionAssignment`'s existing calls (no `work` attached) are
-  completely unaffected by this cell — the whole `test/runner/mission-lite.test.mjs`
-  suite must stay green with zero modification.
+- `--contract <file>` with a mutating contract (`mutation: 'mutating'` or
+  missing/invalid) exits non-zero before any executor is invoked — assert
+  this by confirming no executor/adapter call happens (not just that the
+  exit code is non-zero).
+- `--contract` + `--for` together: rejected with a clear error, non-zero
+  exit, before any other work happens.
+- `--contract` + `--work <id>` naming a real Work at a declared Stage: the
+  harness seam actually fires (assert on the built `assignment.json`'s
+  `provenance.validators` containing `'domain-harness-seam'`, mirroring
+  the assertion style `test/runner/assignment-provenance.test.mjs`'s own
+  P03.1 tests already use).
+- `--contract` with no `--work`: a standalone inline Assignment, harness
+  seam does not fire, no Stage/domain involved at all (the actual Proof 1
+  shape — read R4's text in
+  `plans/260831-1637-step07-inline-assignment-mvp/phase-03-harness-seam-and-two-proofs.md`
+  again before writing this test).
+- A real (not mocked) run through `executeAssignment` — this repo's own
+  established standard for CLI subcommand tests is a real subprocess
+  invocation (`execFileSync(process.execPath, ['src/runner/dispatch.mjs',
+  'execute', '--contract', ...])`) against a fake/local executor, matching
+  how `test/runner/assignment-dispatch.test.mjs`'s existing `execute
+  --assignment` tests are structured — read one of those for the pattern
+  before writing new ones.
 
 ## Trace Update
 
-Doer writes Requirements (R1+R2 rows), Proof Matrix, Commands, Gaps in
-`docs/architect/agent-coordination/verification/step-07-mvp/P03.1.md`
+Doer writes Requirements, Proof Matrix, Commands, Gaps in
+`docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md`
 (new file). Doer does not write Review/Red-Team sections. No cell/finding
 IDs in code comments, test names, or commit messages — ADR-006/ADR-007
 section references are fine (durable), transient coordination labels are
 not.
-
-## Closure
-
-Cell closed. Full history (Doer → Coordinator Verification → Review [3
-findings, 1 HIGH + 1 MEDIUM + 1 LOW, all fixed] → Fixer → Coordinator
-Verification → Red-Team [2 HIGH + 1 LOW, all fixed and independently
-verified by revert-and-reproduce] → Fixer → Coordinator Verification) is
-in `P03.1.md`. R1+R2 done; Phase 03 continues with R3 (CLI `--contract`
-door, P03.2). See `index.md` for the updated Phase/Requirement Matrix.
