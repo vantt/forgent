@@ -3,7 +3,7 @@
 Document type: Portal
 Design status: Accepted
 Implementation: Partial
-Last reviewed: 2026-08-31
+Last reviewed: 2026-09-01
 Canonical for: navigation only
 
 ## Purpose
@@ -14,7 +14,9 @@ Work lifecycle authority and evidence integrity.
 
 Read [Agent Coordination Foundation Vision](vision.md) first. It is the highest
 authority for system identity, foundation boundaries, optional coordination
-structure, and domain augmentation.
+structure, and domain augmentation. Then read the
+[Intent Preservation Ledger](intent-preservation-ledger.md) before narrowing or
+deferring an Agent Coordination capability.
 
 The documentation is organized by authority. Canonical vocabulary and accepted
 architecture are separated from proposals, implementation roadmaps,
@@ -28,15 +30,16 @@ definitions, statuses, or document placement.
 ### Understand The System
 
 1. [Agent Coordination Foundation Vision](vision.md)
-2. [Documentation Governance](documentation-governance.md)
-3. [Vocabulary](vocabulary/README.md)
-4. [System Context](architecture/system-context.md)
-5. [Protocol Model](architecture/protocol-model.md)
-6. [Runtime Model](architecture/runtime-model.md)
-7. [Work Integration](architecture/work-integration.md)
-8. [Dispatch Control Plane](architecture/dispatch-control-plane.md)
-9. [Evidence And Results](architecture/evidence-and-results.md)
-10. [Visibility And Herdr](architecture/visibility-and-herdr.md)
+2. [Intent Preservation Ledger](intent-preservation-ledger.md)
+3. [Documentation Governance](documentation-governance.md)
+4. [Vocabulary](vocabulary/README.md)
+5. [System Context](architecture/system-context.md)
+6. [Protocol Model](architecture/protocol-model.md)
+7. [Runtime Model](architecture/runtime-model.md)
+8. [Work Integration](architecture/work-integration.md)
+9. [Dispatch Control Plane](architecture/dispatch-control-plane.md)
+10. [Evidence And Results](architecture/evidence-and-results.md)
+11. [Visibility And Herdr](architecture/visibility-and-herdr.md)
 
 ### Implement Or Review Current Contracts
 
@@ -57,6 +60,7 @@ definitions, statuses, or document placement.
 | Area | Authority | Contents |
 |---|---|---|
 | [`vision.md`](vision.md) | Highest product authority | System identity, foundation/domain boundary, accepted direction, and rejected interpretations. |
+| [`intent-preservation-ledger.md`](intent-preservation-ledger.md) | Traceability register | Original intentions, deliberate deferrals, non-preclusion constraints, and revisit triggers. |
 | [`vocabulary/`](vocabulary/README.md) | Canonical terminology | Terms, relationships, aliases, reserved/deprecated vocabulary. |
 | [`architecture/`](architecture/README.md) | Accepted design | System boundaries, responsibilities, trust model, and invariants. |
 | [`contracts/`](contracts/README.md) | Accepted behavior | Machine-visible schemas, normalization, validation, state, and evidence rules. |
@@ -91,6 +95,20 @@ The accepted Vision additionally establishes that:
 - agent-led, protocol-led, and domain-assisted planning are composable;
 - dispatch, evidence, authority, and execution bounds remain foundation rules;
 - domain and organization augmentation provide differentiated experience.
+
+Step 08 Phase 00 additionally establishes, per
+[ADR-008](decisions/ADR-008-coordination-session-and-mission-deferral.md),
+[ADR-009](decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md),
+and [ADR-010](decisions/ADR-010-interactive-headless-parity-and-work-isolation.md):
+
+- CoordinationSession is the V1 executable/recovery root, with one-way
+  session-to-Assignment membership and no `missionId` anywhere in V1 schemas;
+- `FlowDefinition` is the shared graph/operation/policy IR beneath typed
+  `Workflow` (Stage) and `CoordinationProtocol` (Phase) profiles, additive to
+  existing Workflow consumers;
+- interactive ships first with headless capability parity as an intended
+  future property, and domain-owned Work isolation stays out of coordination
+  code until a coding-domain live proof authorizes Work-attached mutation.
 
 ## Active Design Frontier
 
@@ -141,6 +159,8 @@ Herdr provides visibility only.
 - Update vocabulary before introducing a new canonical term.
 - Reconcile `vision.md` first when changing system identity or the
   foundation/domain boundary.
+- Audit the Intent Preservation Ledger before approving a narrower phase or
+  closing a deferred capability.
 - Record durable boundary decisions with an ADR.
 - Keep numbered Steps in roadmap/proposals, not canonical architecture.
 - Keep prompts out of architecture and contracts.

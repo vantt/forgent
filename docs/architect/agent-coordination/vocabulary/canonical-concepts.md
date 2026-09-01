@@ -3,7 +3,7 @@
 Document type: Vocabulary
 Design status: Accepted
 Implementation: Partial
-Last reviewed: 2026-08-31
+Last reviewed: 2026-09-01
 Canonical for: agent-coordination terminology
 
 ## Lifecycle And Objective Layer
@@ -25,9 +25,28 @@ Do not confuse Work with AdhocTask, Assignment, or Mission.
 An optional lightweight objective envelope for related standalone coordination
 sessions. Mission does not replace Work and owns no delivery lifecycle.
 
-Design status: Proposed. A one-off session must not require a Mission.
+Design status: Proposed; the boundary that Mission is `deferred-preserved` and
+must not gain a mandatory `missionId` on any V1 record is Accepted, per
+[ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md).
+A one-off session must not require a Mission.
 
 ## Protocol Definition Layer
+
+### FlowDefinition
+
+The shared, versioned graph/operation/policy intermediate representation
+beneath both [Workflow](#workflow) and [Coordination Protocol](#coordination-protocol).
+A FlowDefinition declares a common `spec` kernel (graph, roles, actors,
+operations, policy) plus a required typed profile discriminator selecting
+`Workflow` (Stage semantics, Work lifecycle integration) or
+`CoordinationProtocol` (Phase semantics, topology/cohort/synthesis, no Work
+lifecycle authority). FlowDefinition is an additive second projection of the
+already-normalized Workflow shape; it does not migrate existing Workflow
+consumers.
+
+Design status: Accepted, per
+[ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md).
+Exact schema: [FlowDefinition Contract](../contracts/flow-definition.md).
 
 ### Workflow
 
@@ -88,6 +107,31 @@ A semantic responsibility in a protocol, such as implementer, researcher,
 reviewer, advisor, helper, coordinator, or synthesizer. Role is not an executor,
 provider, model, terminal, or process.
 
+Role, seat, and responsibility position are the same concept and must not
+become separate fields or split into a distinct "Seat" entity; schema uses
+only `role`. An operation declares the Role it needs to be performed;
+[SessionActor](#sessionactor) is the addressable instance that fills a Role in
+a definition or session. Do not confuse Role with [Stance](#stance), a
+temporary viewpoint such as argument-for/argument-against, or with
+[Phase](#phase)/Stage, which is a position in the coordination graph rather
+than a responsibility.
+
+### Phase
+
+A named node in a `CoordinationProtocol` graph — the Phase-profile analog of
+[Stage](#stage) under the shared [FlowDefinition](#flowdefinition) IR. A
+FlowDefinition graph node's Phase-versus-Stage identity is derived from its
+definition's typed profile (`spec.profile.kind`), never restated as an
+independent per-node field.
+
+Public Stage and Phase semantics remain distinct even though both normalize
+onto the same internal graph-node shape: Stage carries Work lifecycle
+position; Phase carries standalone coordination-protocol position and never
+implies Work lifecycle authority.
+
+Design status: Accepted, per
+[ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md).
+
 ## Coordination Runtime Layer
 
 ### CoordinationSession
@@ -99,7 +143,55 @@ trivial, dynamic, or declared.
 
 It owns collaboration progress only, never Work lifecycle.
 
-Design status: Proposed.
+Design status: Accepted for identity/persistence boundary, per
+[ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)
+and the [CoordinationSession Contract](../contracts/coordination-session.md);
+the full runtime remains Proposed pending implementation.
+
+### SessionActor
+
+One addressable actor instance filling a [Role](#role) in a definition or
+session, config key `actors:`. Multiple SessionActors may fill the same Role
+(for example two independently isolated critics). An operation declares the
+Role it needs; a graph operation binding may assign that operation to a
+specific SessionActor. Topology edges, round limits, context visibility,
+actor-level policy, and cohort diversity address SessionActor ids, because
+Role alone cannot distinguish multiple fillers of one responsibility.
+
+The qualified SessionActor-to-Assignment reference lives only in the
+CoordinationSession's one-way ledger; it is never added as an Assignment
+field. `SessionActor` is not `Participant`: fgOS reserves `Participant` for
+the existing platform-level concept of any process that speaks the
+event-log contract (`docs/specs/platform-foundations.md` D0014); see
+[Deprecated And Reserved Terms](deprecated-and-reserved.md#participant).
+
+Design status: Accepted, per
+[ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md).
+
+### Persona
+
+The behavioral identity a SessionActor runs with, attached through
+`policy.preferPersona` at operation, Role, or SessionActor scope. Persona is
+not Role: Role is the responsibility a SessionActor fills; Persona is how
+that SessionActor performs it.
+
+Design status: Accepted, per
+[ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md).
+
+### Stance
+
+A temporary viewpoint a SessionActor argues from within one coordination
+episode, such as argument-for or argument-against. Stance is distinct from
+Role (a durable responsibility) and from Persona (a behavioral identity that
+outlives one episode).
+
+Design status: **Not a V1 schema field.** V1 expresses a stance-like
+distinction through Role/operation naming (for example separate
+`argument-for` and `argument-against` operations, or a `critical-reviewer`
+Role) rather than through a dedicated `stance` field. Introducing `stance` as
+a schema field is deferred until a framework needs to track it independently
+of Role; see [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)
+Decision 6.
 
 ### TaskCandidate
 

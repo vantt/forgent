@@ -1140,6 +1140,88 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 - Khái niệm `capacity` trong lịch sử từng đại diện cho cả năng lực lẫn đơn vị thực thi; từ ADR 0034 (`runner.md:2434`), các cấu hình `capacities.<id>` được chuyển thành `executors.<id>` và `capabilities.<id>`.
 - `rootTask` và `subTask` đã bị loại bỏ khỏi từ vựng dispatch per ADR 0029 (xem `docs/decisions/index.md`).
 
+## CoordinationSession — điều phối agent Work-độc-lập (Step 08 Phase 00)
+
+Đây là mô tả tầm SPEC (BA-grade, WHAT chứ không phải code) của ranh giới
+`CoordinationSession` đã được chốt ở Phase 00 của track `step-08-standalone-
+coordination` — canonical đầy đủ (schema, ADR, ví dụ) sống ở
+`docs/architect/agent-coordination/`; mục này chỉ tóm lược đủ để một phiên
+đọc `docs/specs/` biết ranh giới tồn tại và trỏ đúng chỗ. Tính tới
+2026-09-01, đây là THIẾT KẾ đã accepted (ADR-008/ADR-009/ADR-010), CHƯA có
+runtime — không có module nào dưới `src/runner/coordination/**` tồn tại.
+
+**CoordinationSession là gì.** Một lần điều phối agent có biên (bounded) —
+objective, actor, budget, task/Assignment runtime khi cần, kết quả tổng hợp —
+có thể chạy ĐỘC LẬP với Work (`workId: null`, không Stage, không TaskSpec,
+không protocol) hoặc tham chiếu Work chỉ như context đọc-thôi. Nó là ROOT
+thực thi/phục hồi của V1 — nghĩa là một phiên bị crash/resume tra cứu tiến độ
+qua đúng bản ghi này, không qua đâu khác. CoordinationSession sở hữu tiến độ
+điều phối, KHÔNG BAO GIỜ sở hữu vòng đời Work (bất biến cũ vẫn giữ nguyên,
+xem `docs/architect/agent-coordination/architecture/work-integration.md`).
+Chi tiết schema: `docs/architect/agent-coordination/contracts/coordination-session.md`;
+quyết định nền: `docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md`.
+
+**Tra cứu định nghĩa (definition discovery).** Một CoordinationSession có thể
+agent-led (không cần định nghĩa nào — coordinator tự đề xuất Assignment nội
+tuyến dưới chính sách nền tảng) hoặc declared (chọn một `CoordinationProtocol`
+— cùng họ `FlowDefinition` với `Workflow`, chỉ khác profile: `Workflow` dùng
+Stage + tích hợp vòng đời Work, `CoordinationProtocol` dùng Phase + topology/
+cohort/synthesis, KHÔNG mang thẩm quyền vòng đời Work). `FlowDefinition` là
+một IR (intermediate representation) đồ-thị/operation/policy dùng chung, CỘNG
+THÊM vào loader hiện có (`normalizeWorkflow()`, `getDomain`,
+`operationsForStage` và 15+ điểm gọi khác trong `src/runner/loop.mjs`,
+`src/intake/plan.mjs`, `src/report/entropy.mjs`, `src/state/work.mjs`,
+`src/setup/registrations.mjs`) — không migrate consumer nào trong giai đoạn
+này. Schema đầy đủ:
+`docs/architect/agent-coordination/contracts/flow-definition.md`; quyết định
+nền: `docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md`.
+
+**Dispatch-policy.** Một CoordinationSession/CoordinationProtocol không có
+đường dispatch riêng — mọi execution-triggering activity vẫn hội tụ về đúng
+MỘT lõi `Assignment -> DispatchPlan -> Run -> RunResult -> evidence` mà Team
+Dispatch V1 đã accepted (xem "Từ vựng dispatch hiện hành" trên và
+`docs/architect/agent-coordination/architecture/dispatch-control-plane.md`).
+Một Cohort Planner (điều phối heterogeneous cohort theo provider/model/tier,
+Step 08 Phase 04+) chỉ được phép EMIT policy input cho từng Assignment rồi
+gọi lại đúng resolver đã có — không bao giờ tự spawn executor hay đọc state
+của Assignment anh em (sibling) trước fan-in.
+
+**Persistence.** Trạng thái runtime/recovery của CoordinationSession sống tại
+`.fgos/coordination/sessions/<session-id>/` — CÂY GIT-IGNORED cục bộ, cùng
+tinh thần `.fgos/assignments/` — KHÔNG BAO GIỜ sao chép lại bản ghi Assignment/
+Run/RunResult canonical vào đây, chỉ tham chiếu id. Thành viên
+session-to-Assignment là MỘT CHIỀU: ledger của session ghi nhận một Assignment
+thuộc về nó NGAY TẠI LÚC Assignment được tạo (atomic, cùng khuôn `wx` mà
+mission-lite prototype đã dùng); bản thân Assignment KHÔNG BAO GIỜ mang một
+trường session/coordination nào (`sessionId`/`coordinationId`/`threadId`/
+`coordinationRef` — đúng `FORBIDDEN_SESSION_FIELDS` mà ADR-006 §6 đã khoá,
+`src/runner/dispatch/execution-contract.mjs:48`) — không có API "session nhận
+nuôi (adopt)" một Assignment tạo trước đó. Mission (đối tượng nhóm nhiều
+session lại, tuỳ chọn, tương lai) là `deferred-preserved`: V1 không có trường
+`missionId` ở bất kỳ đâu. Prototype `mission-lite` cũ (`src/runner/dispatch/
+mission-lite.mjs`) bị thay thế TRỰC TIẾP — không có reader/detector/reporter/
+migration tương thích ngược nào cho `.fgos/missions/`.
+
+**CLI.** Bề mặt tối thiểu (thiết kế, chưa có verb thật): `fgos coordination
+run --file <request>` (chạy đồng bộ) và `fgos coordination show <id> --json`
+(đọc-thôi). Override executor/model/tier con người vẫn đi qua đúng cửa
+Assignment CLI hiện có (`--executor`/`--model`/`--tier`), không mở cửa
+infrastructure riêng cho coordination.
+
+**Ranh giới Work.** Một CoordinationSession có thể THAM CHIẾU Work làm context
+đọc-thôi nhưng không bao giờ tự chuyển stage/status, không tự nhận acceptance/
+approval từ đồng thuận agent, không tự merge nhánh, không tự đánh dấu Work
+hoàn tất vì một Run/session hoàn tất — mọi hành vi đó vẫn phải qua đúng verb
+Work engine sẵn có (bất biến không đổi từ
+`docs/architect/agent-coordination/architecture/work-integration.md`). Không
+module nào dưới `src/runner/coordination/**` (kể cả tương lai) được cấp năng
+lực merge hay chuyển trạng thái Work; hai actor đang mutate không bao giờ
+chạy đồng thời trên cùng một worktree. Tất cả các live proof standalone đầu
+tiên của Step 08 giữ read-only; mutation gắn-Work là một stop gate cho tới khi
+một live proof ở domain coding chứng minh được cô lập/merge/recovery/thẩm
+quyền chuyển Work thật. Quyết định nền:
+`docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md`.
+
 ## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
 
 Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.

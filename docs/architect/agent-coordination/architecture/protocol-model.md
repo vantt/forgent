@@ -3,7 +3,7 @@
 Document type: Architecture
 Design status: Accepted
 Implementation: Implemented
-Last reviewed: 2026-08-31
+Last reviewed: 2026-09-01
 Canonical for: planning sources and graph, protocol, operation, TaskSpec, Skill, and Role responsibilities
 
 ## Planning Sources
@@ -99,13 +99,27 @@ The exact normalized contract is defined in
 ## Standalone Coordination
 
 Standalone coordination may run agent-led without a protocol definition or may
-select an optional reusable Coordination Protocol. If a declared standalone
-protocol uses a graph, whether it reuses Stage directly or introduces a neutral
-Phase/common graph primitive remains unresolved.
+select an optional reusable Coordination Protocol. When a declared standalone
+protocol uses a graph, it uses the shared, versioned `FlowDefinition`
+intermediate representation typed with the `CoordinationProtocol` profile,
+whose graph nodes are Phases — a neutral primitive shared with, but distinct
+from, Stage. `Workflow` and `CoordinationProtocol` are typed profiles of the
+same `FlowDefinition` kernel (graph, roles, actors, operations, policy); they
+do not share Stage/Phase identity itself. This resolves the representation
+question in favor of option 2 from the discussion record: extract a common
+graph/operation definition and keep Work Stage and Session Phase as distinct,
+profile-typed public names. See
+[ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md)
+and the [FlowDefinition Contract](../contracts/flow-definition.md) for the
+exact schema.
 
-That representation decision applies only to declared protocols. It must not
-make Stage or Phase mandatory for an agent-led session, and it must not import
-Work lifecycle semantics into standalone coordination.
+That representation decision applies only to declared protocols. It does not
+make Stage or Phase mandatory for an agent-led session — agent-led sessions
+still build validated inline execution contracts without selecting a
+FlowDefinition — and it does not import Work lifecycle semantics into
+standalone coordination: a `CoordinationProtocol` FlowDefinition is rejected
+at validation if it declares `profile.work`, `baseStepMap`, a mandatory
+`taskSpec`, or `result.kind: gate-verdict`.
 
 ## Domain Augmentation
 

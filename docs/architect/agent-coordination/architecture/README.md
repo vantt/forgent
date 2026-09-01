@@ -3,7 +3,7 @@
 Document type: Index
 Design status: Accepted
 Implementation: Partial
-Last reviewed: 2026-08-31
+Last reviewed: 2026-09-01
 Canonical for: navigation across accepted architecture
 
 ## Documents
@@ -27,5 +27,10 @@ directory. Architecture refines that direction into accepted system boundaries.
 7. [Visibility And Herdr](visibility-and-herdr.md) defines the observability
    boundary.
 
-Unaccepted extensions, including CoordinationSession/AdhocTask and standalone
-protocols, remain in [proposals](../proposals/README.md).
+CoordinationSession's identity/persistence boundary and the shared
+FlowDefinition graph/operation/policy IR are accepted per
+[ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)
+and [ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md)
+(schemas in [contracts/](../contracts/README.md)). Unaccepted extensions,
+including the full CoordinationSession runtime, AdhocTask, and the broader
+standalone protocol catalog, remain in [proposals](../proposals/README.md).

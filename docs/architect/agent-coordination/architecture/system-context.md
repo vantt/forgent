@@ -3,7 +3,7 @@
 Document type: Architecture
 Design status: Accepted
 Implementation: Partial
-Last reviewed: 2026-08-31
+Last reviewed: 2026-09-01
 Canonical for: system purpose, actors, layers, and top-level boundaries
 
 ## Purpose
@@ -82,10 +82,18 @@ Domain-assisted
   any profile -> domain context/plan/resource/evidence augmentation
 ```
 
-A generalized CoordinationSession/AdhocTask runtime and the exact dynamic
-execution-contract shape remain under discussion in
+CoordinationSession's identity, persistence, one-way Assignment-membership
+boundary, and the shared `FlowDefinition` graph/operation/policy IR are
+accepted per [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)
+and [ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md);
+their schemas are in the [CoordinationSession](../contracts/coordination-session.md)
+and [FlowDefinition](../contracts/flow-definition.md) contracts. The
+CoordinationSession runtime itself, the AdhocTask graph, and the exact dynamic
+execution-contract shape remain under implementation in the Step 08 roadmap
+and, for AdhocTask specifically, under discussion in
 [Step 07](../proposals/step-07-coordination-session-adhoc-task.md). Optional
-standalone protocol packages and agent-led adoption remain under discussion in
+standalone protocol packages beyond the accepted FlowDefinition/profile shape,
+and full agent-led adoption, remain under discussion in
 [Step 08](../proposals/step-08-standalone-coordination-protocols.md).
 
 ## Trust Boundaries
