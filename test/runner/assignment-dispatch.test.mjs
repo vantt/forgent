@@ -370,6 +370,266 @@ test('dispatch CLI execute subcommand with --assignment executes assignment and 
   assert.equal(parsed.confidence, 'reported');
 });
 
+test('dispatch CLI execute subcommand with --assignment and --executor dispatches through the named executor', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    executors: {
+      named_executor: {
+        kind: 'agent',
+        allowCrossProvider: true,
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+      },
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-cli-exec-flag-asgn',
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  fs.mkdirSync(asgnDir, { recursive: true });
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2));
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  const stdout = execFileSync(
+    process.execPath,
+    [dispatchScript, 'execute', '--assignment', assignment.assignmentId, '--executor', 'named_executor', '--cwd', tempDir],
+    { encoding: 'utf8', cwd: tempDir },
+  );
+
+  const parsed = JSON.parse(stdout.trim());
+  assert.equal(parsed.status, 'done');
+
+  const storedPlan = JSON.parse(
+    fs.readFileSync(path.join(asgnDir, 'runs', '01', 'dispatch-plan.json'), 'utf8'),
+  );
+  assert.equal(storedPlan.executorId, 'named_executor');
+});
+
+test('dispatch CLI execute subcommand with --assignment and an unregistered --executor rejects before spawn with a non-zero exit', () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    executors: {
+      named_executor: {
+        kind: 'agent',
+        allowCrossProvider: true,
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+      },
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-cli-exec-flag-bad-asgn',
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  fs.mkdirSync(asgnDir, { recursive: true });
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2));
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [dispatchScript, 'execute', '--assignment', assignment.assignmentId, '--executor', 'no_such_executor', '--cwd', tempDir],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /preferExecutor "no_such_executor" is not a registered executor/);
+      return true;
+    },
+  );
+});
+
+test('dispatch CLI execute subcommand with --assignment and a duplicate --executor flag rejects before spawn with a non-zero exit', () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    executors: {
+      named_executor: {
+        kind: 'agent',
+        allowCrossProvider: true,
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+      },
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-cli-exec-flag-dup-asgn',
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  fs.mkdirSync(asgnDir, { recursive: true });
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2));
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [
+          dispatchScript, 'execute', '--assignment', assignment.assignmentId,
+          '--executor', 'named_executor', '--executor', 'named_executor', '--cwd', tempDir,
+        ],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /duplicate flag "--executor" -- pass it at most once before launch/);
+      return true;
+    },
+  );
+});
+
+test('dispatch CLI execute subcommand with --assignment and a trailing bare duplicate --executor flag (no value after it) still rejects as a duplicate', () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    executors: {
+      named_executor: {
+        kind: 'agent',
+        allowCrossProvider: true,
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+      },
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-cli-exec-flag-dup-trailing-asgn',
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  fs.mkdirSync(asgnDir, { recursive: true });
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2));
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [
+          // --cwd placed before the flags under test so the duplicate
+          // --executor genuinely lands as the very last token in `rest`,
+          // not shielded by a trailing --cwd.
+          dispatchScript, 'execute', '--assignment', assignment.assignmentId, '--cwd', tempDir,
+          '--executor', 'named_executor', '--executor',
+        ],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /duplicate flag "--executor" -- pass it at most once before launch/);
+      return true;
+    },
+  );
+});
+
+test('dispatch CLI execute subcommand with --assignment does not false-positive a duplicate --executor when a flag name string only appears as a preceding flag\'s dangling value slot', () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    executors: {
+      named_executor: {
+        kind: 'agent',
+        allowCrossProvider: true,
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+      },
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-cli-exec-flag-no-false-dup-asgn',
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  fs.mkdirSync(asgnDir, { recursive: true });
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2));
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  // `--tier` here has no value of its own -- `--executor` immediately
+  // follows it, so `--executor`'s literal string is consumed as `--tier`'s
+  // dangling value slot. There is genuinely only one real `--executor`
+  // occurrence (the one paired with `named_executor`), so this must never
+  // be rejected with the "duplicate flag" message, whatever else happens.
+  let stderr = '';
+  try {
+    execFileSync(
+      process.execPath,
+      [
+        dispatchScript, 'execute', '--assignment', assignment.assignmentId, '--cwd', tempDir,
+        '--tier', '--executor', 'named_executor',
+      ],
+      { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+  } catch (err) {
+    stderr = String(err.stderr);
+  }
+  assert.doesNotMatch(stderr, /duplicate flag/);
+});
+
 test('dispatch CLI execute subcommand refuses a mutating, missionId-bearing assignment.json (mission-refusal gate restored for cli.mjs execute)', () => {
   const tempDir = mkTempDir();
 
@@ -1067,6 +1327,108 @@ test('dispatch CLI execute subcommand with --contract and no --work builds a sta
   assert.ok(
     typeof assignmentJson.provenance.inline.caller.writerId === 'string' && assignmentJson.provenance.inline.caller.writerId.length > 0,
     'caller.writerId must be auto-resolved via resolveWriterIdentity() when the contract file omits it',
+  );
+});
+
+test('dispatch CLI execute subcommand with --contract and --executor dispatches through the named executor', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    executors: {
+      named_executor: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+  fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const contractPath = path.join(tempDir, 'contract.json');
+  fs.writeFileSync(contractPath, JSON.stringify(inlineContractFileContent()));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  const stdout = execFileSync(
+    process.execPath,
+    [dispatchScript, 'execute', '--contract', contractPath, '--executor', 'named_executor', '--cwd', tempDir],
+    { encoding: 'utf8', cwd: tempDir },
+  );
+
+  const parsed = JSON.parse(stdout.trim());
+  assert.equal(parsed.status, 'done');
+
+  const storedPlan = JSON.parse(
+    fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', parsed.assignmentId, 'runs', '01', 'dispatch-plan.json'), 'utf8'),
+  );
+  assert.equal(storedPlan.executorId, 'named_executor');
+});
+
+test('dispatch CLI execute subcommand with --contract and an unregistered --executor rejects before spawn with a non-zero exit', () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    executors: {
+      named_executor: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+  fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const contractPath = path.join(tempDir, 'contract.json');
+  fs.writeFileSync(contractPath, JSON.stringify(inlineContractFileContent()));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [dispatchScript, 'execute', '--contract', contractPath, '--executor', 'no_such_executor', '--cwd', tempDir],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /preferExecutor "no_such_executor" is not a registered executor/);
+      return true;
+    },
+  );
+});
+
+test('dispatch CLI execute subcommand with --contract and a duplicate --executor flag rejects before spawn with a non-zero exit', () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    executors: {
+      named_executor: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+  fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  const contractPath = path.join(tempDir, 'contract.json');
+  fs.writeFileSync(contractPath, JSON.stringify(inlineContractFileContent()));
+
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [
+          dispatchScript, 'execute', '--contract', contractPath,
+          '--executor', 'named_executor', '--executor', 'named_executor', '--cwd', tempDir,
+        ],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /duplicate flag "--executor" -- pass it at most once before launch/);
+      return true;
+    },
   );
 });
 

@@ -850,6 +850,35 @@ export async function runDispatchCli() {
     const i = rest.indexOf(name);
     return i !== -1 ? rest[i + 1] : undefined;
   };
+  // R9: "Reject duplicate/conflicting flags ... before launch" -- applies to
+  // every `cliOverride` flag (`--executor`/`--model`/`--tier`), not just
+  // `--executor`. Returns the first duplicated flag name found, or null.
+  // Walks `rest` left to right, exactly mirroring `flagValue()`'s own
+  // convention that the token immediately after a flag name is that flag's
+  // value: once a token is read as a flag position, the next token is
+  // consumed as its value and is never itself re-examined as a flag
+  // position. This keeps the two functions from disagreeing about what
+  // counts as "this flag, with this value" vs. "a flag-looking string that
+  // is actually someone else's value" -- and, unlike a bare `indexOf`/
+  // `includes` scan, counts every flag position regardless of where in
+  // `rest` it falls, including the very last token.
+  const findDuplicateOverrideFlag = () => {
+    const flagNames = new Set(['--executor', '--model', '--tier']);
+    const counts = new Map();
+    let i = 0;
+    while (i < rest.length) {
+      if (flagNames.has(rest[i])) {
+        counts.set(rest[i], (counts.get(rest[i]) ?? 0) + 1);
+        i += 2;
+      } else {
+        i += 1;
+      }
+    }
+    for (const name of ['--executor', '--model', '--tier']) {
+      if ((counts.get(name) ?? 0) > 1) return name;
+    }
+    return null;
+  };
   switch (subcommand) {
     case 'execute': {
       // tsk-129: tee the spawned executor's own live stdout/stderr chunks to
@@ -915,9 +944,16 @@ export async function runDispatchCli() {
               process.exitCode = 1;
               return;
             }
+            const duplicateFlag = findDuplicateOverrideFlag();
+            if (duplicateFlag) {
+              process.stderr.write(`duplicate flag "${duplicateFlag}" -- pass it at most once before launch\n`);
+              process.exitCode = 1;
+              return;
+            }
             const cliOverride = {};
             if (flagValue('--model')) cliOverride.model = flagValue('--model');
             if (flagValue('--tier')) cliOverride.tier = flagValue('--tier');
+            if (flagValue('--executor')) cliOverride.preferExecutor = flagValue('--executor');
             return executeAssignment(asgnObj, {
               cwd: flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd(),
               repoRoot: root,
@@ -1080,9 +1116,20 @@ export async function runDispatchCli() {
           // `provenance.kind` is always 'inline' by construction, the exact
           // condition the `--assignment` branch above already treats as
           // mission-lite-strictly-read-only (ADR-006 R8).
+          const duplicateFlag = findDuplicateOverrideFlag();
+          if (duplicateFlag) {
+            process.stderr.write(`duplicate flag "${duplicateFlag}" -- pass it at most once before launch\n`);
+            process.exitCode = 1;
+            break;
+          }
+          const cliOverride = {};
+          if (flagValue('--model')) cliOverride.model = flagValue('--model');
+          if (flagValue('--tier')) cliOverride.tier = flagValue('--tier');
+          if (flagValue('--executor')) cliOverride.preferExecutor = flagValue('--executor');
           const result = await executeAssignment(assignment, {
             cwd,
             repoRoot: root,
+            cliOverride,
             hasLiveTaskAccess,
             isMissionLite: true,
             onChunk: (stream, chunk) => process.stderr.write(chunk),

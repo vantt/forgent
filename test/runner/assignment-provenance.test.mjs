@@ -252,7 +252,6 @@ test('buildAssignment (inline) fires the domain harness seam when a Work with a 
     minTier: 'standard',
     preferPersona: 'code-reviewer',
     preferExecutor: 'claude',
-    fallbackExecutors: ['pi'],
   });
   assert.deepEqual(assignment.provenance.validators, ['execution-contract-schema', 'domain-harness-seam']);
 });

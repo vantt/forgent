@@ -55,23 +55,56 @@ none
 
 ## Next Action
 
-prepare (P00.3)
+prepare (P00.4)
 
 ## Cell Log
 
 | Cell | Requirements | Status | Commit |
 |---|---|---|---|
 | P00.1 | Phase 00 R1, R2, R3, R4 | done | `33494fd6` |
-| P00.2 | Phase 00 R5, R6, R7, R8 (+ R10 partial) | done | pending |
+| P00.2 | Phase 00 R5, R6, R7, R8 (+ R10 partial) | done | `7957f6f3` |
+| P00.3 | Phase 00 R9, R10, R11 | done | pending |
 
 ## Phase 00 Status
 
-R1-R8 done (P00.1, P00.2). R10 partially done (fallbackExecutors marked
-reserved-not-executed; `feature.yaml`'s stale `pi` entry deferred to a
-follow-up — needs 3 test-fixture updates outside P00.2's core scope). R9,
-remainder of R10 outstanding (P00.3).
+R1-R11 closed across P00.1-P00.3. R11's glm-cli half is a permanent,
+honestly-documented partial (live-executor timeout, not a stop gate — see
+P00.3.md Review). Phase 00 is functionally landed, but **not fully closed**
+per the plan's own Proofs And Exit bar — P00.4 (below) fixes a real
+governance-truthfulness defect discovered live during P00.3. Do not mark
+plan.md's Phase 00 row `done` until P00.4 closes.
 
 P00.2 went through 3 rounds: Doer -> Reviewer (1 HIGH + 1 MEDIUM + 2 LOW,
 all fixed) -> Red-Team (1 new HIGH, RT1, fixed) -> Red-Team re-check
 (confirmed). Both HIGH findings were genuine governance-semantics gaps in
 the self-hosted dispatch policy resolver — caught before merge.
+
+P00.3 went through 2 fix rounds: Doer -> Reviewer (1 HIGH pre-existing/
+deferred to P00.4 + 1 MEDIUM, MEDIUM fixed) -> Red-Team (2 HIGH + 2 MEDIUM:
+an off-by-one and a false-positive in the new duplicate-flag detector, both
+fixed; this index.md's missing P00.4 entry, fixed directly by the
+Coordinator; a third `deriveProviderFamily`-family instance in
+`transport.mjs`, folded into P00.4) -> Red-Team re-check (confirmed).
+
+## Cell P00.4 (planned, not yet opened)
+
+**Scope**: fix the `deriveProviderFamily` call-site disagreement —
+live-confirmed during P00.3's codex-cli proof
+(`assignment-policy.mjs:201` calls it with one argument, defaulting
+`resolvedCommand` to `'claude'`; `resolve.mjs:429` calls it with the
+executor's real command — the two disagree for any registered executor with
+no `providerModel`/`provider` field whose real command isn't a Claude CLI
+command). Confirmed live to affect exactly 3 of 12 currently registered
+executors: `codex-cli`, `codex-herdr`, `herdr`. Creates a real
+governance-bypass risk: a `disallowedProviders` config naming one of these
+by its true command-derived family would silently fail to block it. P00.3's
+Red-Team found a third instance of the same root-cause family:
+`transport.mjs:163`'s stderr banner reads the dead `executor.provider`
+config field (0/12 executors set it) instead of the already-correct
+`governance.providerFamily` — fold into this cell's scope too. Smallest fix
+direction (per P00.3's Reviewer): pass the executor's real resolved command
+as `deriveProviderFamily`'s second argument at `assignment-policy.mjs:201`,
+mirroring the already-correct sibling call. **Do not close Phase 00 (do not
+mark plan.md's Phase 00 row done) until this cell closes or is explicitly
+re-scoped by the maintainer.** Source: `P00.3.md`'s Review section (HIGH
+finding) and Red-Team section (MEDIUM finding #4).

@@ -42,7 +42,7 @@ test('resolveAssignmentDispatchPolicy resolves validate-plan defaults: reviewer/
 
   assert.equal(effective.role, 'reviewer');
   assert.equal(effective.persona, 'code-reviewer');
-  assert.deepEqual(effective.executorPreference, ['claude', 'pi']);
+  assert.deepEqual(effective.executorPreference, ['claude']);
   assert.equal(effective.providerModel, 'claude');
   assert.equal(effective.tier, 'standard');
   assert.equal(effective.model, 'claude-3-7-sonnet-20250219');

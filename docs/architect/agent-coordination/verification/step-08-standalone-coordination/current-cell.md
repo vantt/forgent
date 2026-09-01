@@ -4,11 +4,12 @@ Cell: none
 Status: idle
 Owner: -
 Last updated: 2026-09-01
-Next action: prepare P00.3
+Next action: prepare P00.4
 
-P00.2 closed. See `P00.2.md` for its full trace (Proof Matrix, Review
-F1-F4, Red-Team RT1, three Fixer passes, Red-Team re-check confirming the
-RT1 fix). Next: prepare cell P00.3 (Phase 00 R9-R11 — CLI `--executor` wiring
-on both dispatch doors, `fallbackExecutors` reserved-not-executed CLI-side
-documentation, live codex-cli/glm-cli two-executor proof). R9/R10 remainder
-from P00.2's Gaps carries into this cell.
+P00.3 closed. See `P00.3.md` for its full trace (Proof Matrix, Review,
+2 Red-Team rounds, 3 Fixer passes, Red-Team re-check confirming the final
+fixes). Next: P00.4 (index.md has full scope) — fix the
+`deriveProviderFamily` call-site disagreement (governance-truthfulness
+defect, 3 of 12 registered executors affected) before Phase 00 is
+considered fully closed. Small, well-diagnosed cell: root cause and exact
+fix location are already known from P00.3's Review/Red-Team.
