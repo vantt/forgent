@@ -39,7 +39,7 @@ of a blanket "unrelated" pass.
 | 00 | R1-R11 | done |
 | 01 | R1-R8 | done |
 | 02 | R1-R8 | done |
-| 03 | R1-R8 | R1-R4 done; R5-R8 outstanding (P03.2) |
+| 03 | R1-R8 | done |
 | 04 | R1-R9 | missing (depends on 03) |
 | 05 | R1-R8 | missing (depends on 04) |
 | 06 | R1-R8 | missing (depends on 05) |
@@ -51,7 +51,7 @@ none
 
 ## Next Action
 
-prepare (P03.2)
+prepare (P04.1)
 
 ## Cell Log
 
@@ -66,6 +66,7 @@ prepare (P03.2)
 | P02.1 | Phase 02 R1, R2, R3, R4 | done | `1f2260b1` |
 | P02.2 | Phase 02 R5, R6, R7, R8 (closes Phase 02) | done | `bbb71784` |
 | P03.1 | Phase 03 R1, R2, R3, R4 | done | `8fc3130a` |
+| P03.2 | Phase 03 R5, R6, R7, R8 (closes Phase 03) | done | pending |
 
 ## Phase 00 Status
 
@@ -227,7 +228,9 @@ execution wiring; every tier through the same validated kernel;
 `src/runner/dispatch/**` and `src/runner/coordination/**` both remain at
 zero diff for the whole phase).
 
-## Phase 03 Status (in progress)
+## Phase 03 Status
+
+**CLOSED.** R1-R8 across P03.1-P03.2.
 
 **P03.1 CLOSED** (Phase 03 R1-R4): added `openDeclaredProtocolSession`/
 `dispatchDeclaredOperation`/`recordConsultDisposition` to
@@ -269,6 +272,34 @@ documented baseline exactly, no new failure. Dispatch smoke check
 (AC-I002/003/006/008, agent-led-vs-declared equivalence) deferred to
 P03.2 per the plan's own cell split.
 
-Next: P03.2 (Phase 03 R5-R8 -- session bounds enforcement, illegal-
-behavior negative sweep, agent-led-vs-declared equivalence proof, live
-interactive proof; closes Phase 03).
+**P03.2 CLOSED** (Phase 03 R5-R8, closes Phase 03): extended
+`createSessionAssignment` with 3 more lock-held session-wide bounds
+(`maxAssignmentsForSession`/`maxRoundsForSession`/`maxConcurrencyForSession`,
+same pattern as P03.1's own `maxRoundsForActor`) plus two pre-lock,
+authoritative-by-construction checks (`wallTimeMs`, `maxTaskDepth` --
+correctly reasoned as non-concurrency-sensitive: pure functions of real
+time and an immutable on-disk parent chain). Fixed a real foreign-
+evidence/actor-impersonation gap in `recordConsultDisposition` (it
+previously accepted ANY already-linked session member, including
+self-referentially, as "the specialist's advice" -- now requires a real
+declared topology edge between the two actors). Added the R7 agent-led-
+vs-declared equivalence comparator (non-vacuous, explicitly proves the
+stripped fields DO differ before asserting the kept confidence-rule
+fields match) and an R8 live proof (`claude` fully succeeded;
+`codex-cli`/`glm-cli` hit a real, honestly-documented, pre-existing
+config-tier gap -- itself live evidence of AC-I006's fail-closed
+invariant, not a cell failure). Went through 1 Reviewer round that,
+given this exact file's 2-for-2 track record of hiding real concurrency
+bugs from code review alone, was specifically tasked with an empirical
+multi-process stress test of the newest/most complex new check
+(`maxConcurrencyForSession`, cap=1/2/3, up to 8 concurrent racing
+processes, 40 total real cross-process trials) -- 0/40 violations, this
+check was correctly lock-scoped from the start. All 3 other flagged
+items (disposition scope-tightening safety, R7 comparator non-vacuity,
+live-proof genuineness) independently confirmed clean. Full suite:
+4819/4832 pass, all 8 failures match the documented baseline exactly, no
+new failure. Deferral Audit: AC-I002/AC-I003/AC-I006 all MET, AC-I008
+still deferred to Phase 07 as planned.
+
+Next: P04.1 (Phase 04 -- research fan-out/Cohort Planner, R1-R4: pure
+deterministic Cohort Planner and unsatisfied explanations).

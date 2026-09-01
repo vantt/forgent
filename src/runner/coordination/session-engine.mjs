@@ -733,6 +733,89 @@ function resolveDeclaredOperationActor(definition, operationId) {
   return { operation, actorId: actorEntry.id, actorEntry, node: matchedNode };
 }
 
+// ─── Phase 03 R5: session bounds, enforced before materialization/launch ──
+//
+// aggregateBounds has 5 fields (schema.mjs's DEFAULT_AGGREGATE_BOUNDS):
+// wallTimeMs, maxAssignments, maxConcurrency, maxRounds, maxTaskDepth. Only
+// TWO of them (maxAssignments, maxConcurrency, maxRounds -- session-wide,
+// distinct from this file's own per-topology-edge maxRounds/
+// opts.maxRoundsForActor) need lock-held, authoritative enforcement inside
+// `createSessionAssignment` (store.mjs): a check-then-act on a shared,
+// concurrently-writable counter is exactly the TOCTOU class P03.1's own
+// maxRounds fix closed, so those three are forwarded unconditionally as
+// store.mjs opts below, never enforced by a pre-lock read alone.
+//
+// wallTimeMs and maxTaskDepth are different in kind -- neither is a shared
+// mutable counter two concurrent callers could both "pass" before either
+// commits:
+// - wallTimeMs is `Date.now() - manifest.createdAt`, a pure function of real
+//   time. Two concurrent callers reading it concurrently observe the SAME
+//   answer (give or take clock granularity); there is no write for either to
+//   race against.
+// - maxTaskDepth is the length of a `provenance.inline.caller.parentAssignmentId`
+//   chain of Assignments that ALREADY EXIST (immutable once created) at the
+//   moment a new one is materialized. Two siblings racing to create children
+//   under the SAME already-existing parent compute the identical depth.
+// Both are therefore checked once, synchronously, before the lock is ever
+// taken -- authoritative by construction, not merely an advisory UX
+// shortcut (unlike this file's own pre-lock maxRounds fast-fail, which
+// P03.1's Red-Team proved IS just advisory for a genuinely shared counter).
+
+/**
+ * R5 wall-time bound: reject materializing a new declared-path Assignment
+ * once the session's `aggregateBounds.wallTimeMs` budget (measured from
+ * `manifest.createdAt`) has elapsed.
+ */
+function assertWithinWallTimeBudget(manifest, label) {
+  const elapsedMs = Date.now() - Date.parse(manifest.createdAt);
+  if (elapsedMs >= manifest.aggregateBounds.wallTimeMs) {
+    throw new CoordinationError(
+      'validation',
+      `${label}: session "${manifest.coordinationId}" wall-time budget (aggregateBounds.wallTimeMs: ${manifest.aggregateBounds.wallTimeMs}ms) has elapsed (${elapsedMs}ms since ${manifest.createdAt}) -- refusing to materialize a new Assignment`,
+    );
+  }
+}
+
+/**
+ * R5 task-depth bound: reject materializing a new declared-path Assignment
+ * whose real `parentAssignmentId` chain would reach a depth beyond
+ * `aggregateBounds.maxTaskDepth`. A root task (no parent) is depth 1; each
+ * hop up a REAL, on-disk `provenance.inline.caller.parentAssignmentId` chain
+ * (never a caller-asserted depth number) adds one. Every Assignment this
+ * chain walks is already a session member by the time this runs (the
+ * caller's own fromAssignmentId/consultantAssignmentId membership checks run
+ * first), so this never reads outside `.fgos/assignments/`.
+ */
+function assertWithinTaskDepth(fgosDir, immediateParentId, maxTaskDepth, label) {
+  let depth = 1;
+  let currentId = immediateParentId;
+  const visited = new Set();
+  while (currentId) {
+    if (visited.has(currentId)) {
+      throw new CoordinationError('corrupt-log', `${label}: parentAssignmentId chain contains a cycle at "${currentId}"`);
+    }
+    visited.add(currentId);
+    depth += 1;
+    if (depth > maxTaskDepth) {
+      throw new CoordinationError(
+        'validation',
+        `${label}: materializing this Assignment would reach task depth ${depth}, above the declared aggregateBounds.maxTaskDepth cap of ${maxTaskDepth}`,
+      );
+    }
+    const assignmentPath = path.join(fgosDir, 'assignments', currentId, 'assignment.json');
+    if (!fs.existsSync(assignmentPath)) {
+      throw new CoordinationError('dangling-ref', `${label}: parentAssignmentId "${currentId}" has no assignment.json on disk`);
+    }
+    let parsed;
+    try {
+      parsed = JSON.parse(fs.readFileSync(assignmentPath, 'utf8'));
+    } catch (err) {
+      throw new CoordinationError('corrupt-log', `${label}: assignment.json for "${currentId}" is not valid JSON: ${err.message}`);
+    }
+    currentId = parsed?.provenance?.inline?.caller?.parentAssignmentId ?? null;
+  }
+}
+
 /**
  * Open a new standalone CoordinationSession bound to a declared, validated
  * `CoordinationProtocol` FlowDefinition (R1). Loads `definitionId` through
@@ -914,6 +997,11 @@ export async function dispatchDeclaredOperation(
       `dispatchDeclaredOperation: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- open it with openDeclaredProtocolSession()`,
     );
   }
+  // R5: session bounds enforced BEFORE materialization/launch. wallTimeMs is
+  // not concurrency-sensitive (see the module-level comment above this
+  // function) -- this pre-lock check is authoritative by itself.
+  assertWithinWallTimeBudget(manifest, 'dispatchDeclaredOperation');
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
 
   const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
   if (definition.metadata.version !== manifest.definitionRef.version) {
@@ -991,6 +1079,11 @@ export async function dispatchDeclaredOperation(
     resolvedContextRefs = Array.isArray(contextRefs) ? contextRefs : [];
   }
 
+  // R5: task-depth bound, checked against the REAL parent chain (never a
+  // caller-asserted number) -- authoritative pre-lock, see the module-level
+  // comment above this function for why this one needs no lock.
+  assertWithinTaskDepth(fgosDir, incomingEdge ? fromAssignmentId : parentAssignmentId, manifest.aggregateBounds.maxTaskDepth, 'dispatchDeclaredOperation');
+
   const scopeStack = [
     { scope: 'runner', id: 'runner-default', policy: runnerPolicy },
     { scope: 'definition', id: definition.metadata.id, policy: definition.spec.policy ?? {} },
@@ -1047,11 +1140,20 @@ export async function dispatchDeclaredOperation(
   // `taskClaimPath` check already runs first and takes priority, so a
   // genuine resume of the SAME taskKey still short-circuits before the cap
   // check is ever reached, and is never double-counted.
+  // R5 (continued): the 3 remaining bounds (maxAssignments, maxConcurrency,
+  // maxRounds -- session-wide) ARE concurrency-sensitive (see the
+  // module-level comment above this function), so they are forwarded here
+  // unconditionally and enforced authoritatively inside
+  // `createSessionAssignment`'s own lock (store.mjs), never decided by a
+  // pre-lock read in this function.
   const dispatchResult = await createAndExecuteSessionTask(
     { coordinationId, taskKey, actorId, contract, caller },
     {
       ...opts,
       cliOverride,
+      maxAssignmentsForSession: manifest.aggregateBounds.maxAssignments,
+      maxConcurrencyForSession: manifest.aggregateBounds.maxConcurrency,
+      maxRoundsForSession: manifest.aggregateBounds.maxRounds,
       ...(incomingEdge ? { maxRoundsForActor: incomingEdge.maxRounds ?? Infinity } : {}),
     },
   );
@@ -1088,6 +1190,23 @@ const DISPOSITION_RATIONALE_MAX_LENGTH = 2000;
  * `'reported'` unconditionally: advice is advisory and a disposition can
  * never make it "verified" -- there is no branch anywhere in this function
  * that could produce `'verified'`.
+ *
+ * R6 foreign-evidence / actor-impersonation guard: beyond "already a session
+ * member" and "already linked," this function also requires
+ * `consultantAssignmentId`'s bound actor to be reachable from
+ * `requesterAssignmentId`'s bound actor via a REAL declared topology edge
+ * (`edge.from === requesterActorId && edge.to === consultantActorId`) on the
+ * session's own bound protocol. Without this, a caller could disposition ANY
+ * already-linked, already-a-member Assignment as if it were "the
+ * specialist's advice" -- including, in the degenerate case,
+ * `requesterAssignmentId` itself (self-referential: the requester
+ * "dispositioning" its own settled result) -- since neither prior check
+ * verifies WHICH actor produced the referenced evidence relative to the
+ * disposer. This is why `recordConsultDisposition` requires a declared
+ * protocol (`manifest.definitionRef`) even though nothing else in this
+ * function otherwise needs one: there is no session-topology-free way to
+ * decide "is this really the consultant's advice, from THIS requester's own
+ * consult" at all.
  *
  * @param {string} coordinationId
  * @param {object} params
@@ -1153,6 +1272,39 @@ export async function recordConsultDisposition(
     );
   }
 
+  // R6 foreign-evidence / actor-impersonation guard (see doc comment above):
+  // `consultantAssignmentId` must belong to an actor the session's own
+  // declared topology names as reachable FROM the requester's actor -- never
+  // trusted merely because it is "a real session member with a linked
+  // result" (that alone would also accept a self-referential or otherwise
+  // unrelated Assignment).
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `recordConsultDisposition: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- disposition requires a declared topology to verify the consultant actor is legitimately reachable from the requester`,
+    );
+  }
+  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  const consultantCreatedEvent = events.find(
+    (event) => event.type === 'assignment-created' && event.payload.assignmentId === consultantAssignmentId,
+  );
+  const consultantActorId = consultantCreatedEvent?.payload?.actorId;
+  const legitimateEdge = definition.spec.profile.topology?.edges?.find(
+    (edge) => edge.from === requesterActorId && edge.to === consultantActorId,
+  );
+  if (!consultantActorId || !legitimateEdge) {
+    throw new CoordinationError(
+      'foreign-ref',
+      `recordConsultDisposition: consultantAssignmentId "${consultantAssignmentId}" (actor "${consultantActorId ?? 'unknown'}") is not reachable from requester actor "${requesterActorId}" via any declared topology edge -- refusing to disposition foreign or self-referential evidence as if it were specialist advice`,
+    );
+  }
+
+  // R5: session bounds enforced BEFORE materialization -- same reasoning as
+  // dispatchDeclaredOperation's own module-level comment above.
+  assertWithinWallTimeBudget(manifest, 'recordConsultDisposition');
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  assertWithinTaskDepth(fgosDir, consultantAssignmentId, manifest.aggregateBounds.maxTaskDepth, 'recordConsultDisposition');
+
   const contract = buildReadOnlyContract({
     objective: `Record disposition for consult advice from assignment "${consultantAssignmentId}".`,
     contextRefs: [consultantAssignmentId],
@@ -1167,7 +1319,12 @@ export async function recordConsultDisposition(
 
   const dispatchResult = await createAndExecuteSessionTask(
     { coordinationId, taskKey: `disposition:${consultantAssignmentId}`, actorId: requesterActorId, contract, caller },
-    opts,
+    {
+      ...opts,
+      maxAssignmentsForSession: manifest.aggregateBounds.maxAssignments,
+      maxConcurrencyForSession: manifest.aggregateBounds.maxConcurrency,
+      maxRoundsForSession: manifest.aggregateBounds.maxRounds,
+    },
   );
 
   return { ...dispatchResult, disposition, rationale };

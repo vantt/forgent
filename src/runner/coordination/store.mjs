@@ -409,6 +409,38 @@ function completeAssignmentRegistration({ manifest, manifestPath, eventsPath, se
  *   agent-led `proposeConsult`/`dispatchPrimaryTask` paths, and every
  *   existing test that calls this function with no round-cap concept at all)
  *   sees byte-identical behavior.
+ * @param {number} [opts.maxAssignmentsForSession] Opt-in, SAME shape/placement
+ *   as `opts.maxRoundsForActor` above (Phase 03 R5): rejects a genuinely new
+ *   taskKey once `manifest.assignmentRefs.length` (the fresh manifest already
+ *   read at the top of this critical section) is at or above the cap --
+ *   `manifest.aggregateBounds.maxAssignments`, forwarded by the DECLARED
+ *   path only (session-engine.mjs's `dispatchDeclaredOperation`/
+ *   `recordConsultDisposition`). Session-wide (not per-actor); concurrency-
+ *   sensitive for the identical reason `maxRoundsForActor` is (two concurrent
+ *   NEW-taskKey callers could otherwise both read a stale, pre-write count),
+ *   so it is checked here, lock-held, on the fresh in-lock manifest -- never
+ *   as a caller's own earlier, unlocked read alone.
+ * @param {number} [opts.maxRoundsForSession] Opt-in, session-wide round cap
+ *   (`manifest.aggregateBounds.maxRounds`) -- distinct from the per-topology-
+ *   edge `opts.maxRoundsForActor` above (that one bounds ONE actor's rounds
+ *   against ONE declared edge; this one bounds the TOTAL round count across
+ *   every actor in the session). This V1 slice has no first-class concept of
+ *   a "round" other than "one Assignment materialized," so this check reads
+ *   the identical `manifest.assignmentRefs.length` value `maxAssignmentsForSession`
+ *   does, just against its own independently-configurable ceiling (the
+ *   contract's `aggregateBounds.maxRounds`/`maxAssignments` are two
+ *   separately-tunable fields with separate defaults, schema.mjs's
+ *   `DEFAULT_AGGREGATE_BOUNDS`, even though this slice measures them off the
+ *   same underlying count). Same concurrency-sensitivity and lock placement
+ *   as `maxAssignmentsForSession`.
+ * @param {number} [opts.maxConcurrencyForSession] Opt-in, session-wide cap on
+ *   Assignments currently IN FLIGHT (an `assignment-created` event with no
+ *   corresponding `result-linked` event yet) at the moment a genuinely new
+ *   taskKey would create one more. Inherently concurrency-sensitive by
+ *   definition (it measures simultaneity itself) -- computed from a FRESH,
+ *   lock-held `readEvents(eventsPath)` (created-ids minus linked-ids), never
+ *   a caller's own earlier unlocked snapshot, for the same TOCTOU reason
+ *   `maxRoundsForActor` is lock-held.
  * @returns {Readonly<object>} The Assignment (freshly created, or the one already claimed for this taskKey)
  */
 export function createSessionAssignment(
@@ -458,6 +490,49 @@ export function createSessionAssignment(
         });
       }
       return Object.freeze(existing);
+    }
+
+    // Authoritative, session-wide aggregateBounds enforcement (opt-in, Phase
+    // 03 R5): reached under the exact same "genuinely NEW taskKey only"
+    // condition as opts.maxRoundsForActor below -- a resume of an
+    // already-claimed taskKey already returned above and never reaches any
+    // of these checks, so none of them ever double-count a resume.
+    // `manifest` here is the fresh, lock-held read from the top of this
+    // critical section -- not a caller's own earlier `replaySession()` read.
+    if (opts.maxAssignmentsForSession !== undefined && manifest.assignmentRefs.length >= opts.maxAssignmentsForSession) {
+      throw new CoordinationError(
+        'validation',
+        `createSessionAssignment: session "${coordinationId}" has already created ${manifest.assignmentRefs.length} Assignment(s), at or above the declared aggregateBounds.maxAssignments cap of ${opts.maxAssignmentsForSession} -- refusing to create a new Assignment`,
+      );
+    }
+    if (opts.maxRoundsForSession !== undefined && manifest.assignmentRefs.length >= opts.maxRoundsForSession) {
+      throw new CoordinationError(
+        'validation',
+        `createSessionAssignment: session "${coordinationId}" has already used ${manifest.assignmentRefs.length} round(s) session-wide, at or above the declared aggregateBounds.maxRounds cap of ${opts.maxRoundsForSession} -- refusing to create a new Assignment for a new round`,
+      );
+    }
+    if (opts.maxConcurrencyForSession !== undefined) {
+      // Fresh, lock-held read -- in-flight means "created but not yet
+      // result-linked" (linkResult always runs strictly after the Assignment
+      // that settled, so an id present in createdIds but absent from
+      // linkedIds is still genuinely dispatched/pending).
+      const freshEventsForConcurrency = readEvents(eventsPath);
+      const createdIdsForConcurrency = new Set();
+      const linkedIdsForConcurrency = new Set();
+      for (const event of freshEventsForConcurrency) {
+        if (event.type === 'assignment-created' && event.payload?.assignmentId) createdIdsForConcurrency.add(event.payload.assignmentId);
+        if (event.type === 'result-linked' && event.payload?.assignmentId) linkedIdsForConcurrency.add(event.payload.assignmentId);
+      }
+      let inFlight = 0;
+      for (const id of createdIdsForConcurrency) {
+        if (!linkedIdsForConcurrency.has(id)) inFlight += 1;
+      }
+      if (inFlight >= opts.maxConcurrencyForSession) {
+        throw new CoordinationError(
+          'validation',
+          `createSessionAssignment: session "${coordinationId}" already has ${inFlight} Assignment(s) in flight (created but not yet result-linked), at or above the declared aggregateBounds.maxConcurrency cap of ${opts.maxConcurrencyForSession} -- refusing to create a new Assignment`,
+        );
+      }
     }
 
     // Authoritative round-cap enforcement (opt-in): only reached once the

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1",
+  "coordinationId": "coord_p032_live_1788289869_claude",
+  "objective": "Should we widen the retry budget for the ingest worker? Confirm using this repo's real package.json name/version as a bounded, verifiable fact.",
+  "status": "active",
+  "createdAt": "2026-09-01T19:11:09.488Z",
+  "provenanceRoot": {
+    "writerId": "p03-2-live-proof-coordinator"
+  },
+  "definitionRef": {
+    "id": "core.coordination-protocol.declared-consult",
+    "version": "1.0.0"
+  },
+  "workRef": null,
+  "actors": [
+    {
+      "id": "requester-actor",
+      "role": "requester"
+    },
+    {
+      "id": "consultant-actor",
+      "role": "consultant"
+    }
+  ],
+  "aggregateBounds": {
+    "wallTimeMs": 3600000,
+    "maxAssignments": 20,
+    "maxConcurrency": 4,
+    "maxRounds": 10,
+    "maxTaskDepth": 3
+  },
+  "assignmentRefs": [
+    "asgn_p03_2_live_proof_coordinator_op_002",
+    "asgn_p03_2_live_proof_coordinator_op_003",
+    "asgn_p03_2_live_proof_coordinator_op_004"
+  ],
+  "completedAt": null
+}

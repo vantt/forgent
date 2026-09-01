@@ -230,6 +230,101 @@ test('createSessionAssignment throws when opts.maxRoundsForActor is set but no a
   );
 });
 
+// ─── Phase 03 R5: session-wide aggregateBounds enforcement (opt-in, mirrors
+// opts.maxRoundsForActor's own shape and lock placement exactly) ──────────
+
+test('createSessionAssignment with opts.maxAssignmentsForSession rejects a genuinely new taskKey once the session\'s total assignment count is already at the cap, checked inside the SAME locked critical section as the write', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_max_asgn_session', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+
+  const first = createSessionAssignment(
+    { coordinationId: 'coord_max_asgn_session', taskKey: 'task-1', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+    { cwd: tempDir },
+  );
+
+  assert.throws(
+    () =>
+      createSessionAssignment(
+        { coordinationId: 'coord_max_asgn_session', taskKey: 'task-2', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+        { cwd: tempDir, maxAssignmentsForSession: 1 },
+      ),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /already created 1 Assignment\(s\), at or above the declared aggregateBounds\.maxAssignments cap of 1/.test(err.message),
+  );
+
+  const manifest = readManifest('coord_max_asgn_session', { cwd: tempDir });
+  assert.deepEqual(manifest.assignmentRefs, [first.assignmentId], 'a rejected new Assignment must not append a second assignmentRef');
+});
+
+test('createSessionAssignment with opts.maxAssignmentsForSession never double-counts a legitimate RESUME of the SAME taskKey -- the existing taskClaimPath check runs first and takes priority', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_max_asgn_resume', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+
+  const params = { coordinationId: 'coord_max_asgn_resume', taskKey: 'task-1', contract: inlineContract(), caller: { writerId: 'writer-1' } };
+  const opts = { cwd: tempDir, maxAssignmentsForSession: 1 };
+
+  const first = createSessionAssignment(params, opts);
+  const resumed = createSessionAssignment(params, opts);
+
+  assert.equal(resumed.assignmentId, first.assignmentId);
+  const manifest = readManifest('coord_max_asgn_resume', { cwd: tempDir });
+  assert.deepEqual(manifest.assignmentRefs, [first.assignmentId]);
+});
+
+test('createSessionAssignment with opts.maxRoundsForSession rejects a genuinely new taskKey once the session\'s total round count is already at the cap, independently of opts.maxAssignmentsForSession', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_max_rounds_session', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+
+  const first = createSessionAssignment(
+    { coordinationId: 'coord_max_rounds_session', taskKey: 'task-1', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+    { cwd: tempDir },
+  );
+
+  assert.throws(
+    () =>
+      createSessionAssignment(
+        { coordinationId: 'coord_max_rounds_session', taskKey: 'task-2', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+        // maxAssignmentsForSession deliberately absent/high (not set at all
+        // here) -- a rejection can only come from maxRoundsForSession.
+        { cwd: tempDir, maxRoundsForSession: 1 },
+      ),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /already used 1 round\(s\) session-wide, at or above the declared aggregateBounds\.maxRounds cap of 1/.test(err.message),
+  );
+
+  const manifest = readManifest('coord_max_rounds_session', { cwd: tempDir });
+  assert.deepEqual(manifest.assignmentRefs, [first.assignmentId]);
+});
+
+test('createSessionAssignment with opts.maxConcurrencyForSession rejects a genuinely new taskKey while an existing session Assignment is still in flight (created but not yet result-linked), and allows it again once that Assignment is linked', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_max_concurrency_session', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+
+  const first = createSessionAssignment(
+    { coordinationId: 'coord_max_concurrency_session', taskKey: 'task-1', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+    { cwd: tempDir },
+  );
+
+  // `first` has no linked result yet -- 1 Assignment in flight, at the cap.
+  assert.throws(
+    () =>
+      createSessionAssignment(
+        { coordinationId: 'coord_max_concurrency_session', taskKey: 'task-2', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+        { cwd: tempDir, maxConcurrencyForSession: 1 },
+      ),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /already has 1 Assignment\(s\) in flight .* at or above the declared aggregateBounds\.maxConcurrency cap of 1/.test(err.message),
+  );
+
+  // Once `first` settles (result-linked), in-flight count drops back to 0
+  // -- the SAME cap now legally admits a new Assignment.
+  linkResult('coord_max_concurrency_session', { assignmentId: first.assignmentId, runId: `run_${first.assignmentId}_01` }, { cwd: tempDir });
+  const second = createSessionAssignment(
+    { coordinationId: 'coord_max_concurrency_session', taskKey: 'task-2', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+    { cwd: tempDir, maxConcurrencyForSession: 1 },
+  );
+
+  const manifest = readManifest('coord_max_concurrency_session', { cwd: tempDir });
+  assert.deepEqual(manifest.assignmentRefs.sort(), [first.assignmentId, second.assignmentId].sort());
+});
+
 test('linkResult appends result-linked only for an assignment that is a real session member', () => {
   const tempDir = mkTempDir();
   openSession({ coordinationId: 'coord_link_001', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });

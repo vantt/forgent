@@ -1,0 +1,263 @@
+# P03.2 R8 live proof — declared CoordinationProtocol, session-engine.mjs
+# (no CLI door, no dispatch.mjs, no direct executor launch)
+
+Driver script (not committed elsewhere; copied here verbatim as evidence):
+`p032-live-proof-driver-script.mjs`. It imports and calls ONLY
+`openDeclaredProtocolSession`, `dispatchDeclaredOperation`,
+`recordConsultDisposition` from `src/runner/coordination/session-engine.mjs`
+-- no `child_process`, no `dispatch.mjs` CLI door, no other spawn path
+(`grep -c "child_process\|spawn(\|execFile(\|exec(" p032-live-proof-driver-script.mjs`
+matches only this file's own header comment, zero real call sites). Every
+executor dispatch below went through
+`session-engine.mjs -> createAndExecuteSessionTask() -> executeAssignment()`,
+the ONLY execution entry point this engine ever calls, for BOTH the
+declared-path functions this cell (P03.2) touches.
+
+Repo root / cwd for every invocation: `/home/vantt/projects/forgentX` (the
+real repo, not a temp fixture -- this proof's objective genuinely reads and
+reasons about this repo's real `package.json`, and the consult objective
+itself is the phase-03.md fixture's own bounded question, "Should we widen
+the retry budget for the ingest worker?").
+
+## Attempt 1 (session `coord1`) -- glm-cli: real, deterministic config-tier stop (honest, not a session-engine/dispatch defect, and NOT this cell's bug)
+
+```
+node p032-live-proof-driver-script.mjs coord_p032_live_<ts>_glm glm-cli open
+node p032-live-proof-driver-script.mjs coord_p032_live_<ts>_glm glm-cli request
+```
+Transcripts: `glm-cli-step1-open.std{out,err}.log`, `glm-cli-step2-request.std{out,err}.log`.
+
+`openDeclaredProtocolSession` succeeded (real `.fgos/coordination/sessions/
+coord_p032_live_<ts>_glm/session.json`/`events.jsonl` written, both
+`requester-actor`/`consultant-actor` bound). `dispatchDeclaredOperation`
+(`request-consult`, `cliPolicy: { preferExecutor: 'glm-cli', minTier:
+'lightweight' }`) genuinely materialized ONE real Assignment
+(`asgn_p03_2_live_proof_coordinator_op_001`, confirmed in
+`coord1-glm-codex-attempts-events.jsonl` seq 4 and
+`coord1-glm-codex-attempts-session.json`'s `assignmentRefs`) but threw
+BEFORE any subprocess ever spawned:
+```
+RunnerConfigError: no model configured for policy tier "standard" under provider "z-ai".
+    at resolvePolicyTierModel ... at resolveAssignmentDispatchPolicy ...
+    at compileDispatchPlan ... at executeAssignment ...
+    at createAndExecuteSessionTask (session-engine.mjs:257)
+    at dispatchDeclaredOperation (session-engine.mjs:1149)
+```
+
+**Root cause, confirmed by reading source directly (not guessed):**
+`assignment-policy.mjs:92`'s `effectiveTier = opPolicy.minTier || 'standard'`
+is an unconditional, pre-existing, system-wide floor -- `'standard'` unless
+the Assignment's OWN declared policy sets something else, and `minTier` is
+monotonic RAISE-ONLY (`resolveStrongerTier`/`strength()`,
+`assignment-policy.mjs:121-122`): a caller-supplied `minTier` LOWER than the
+current effective value is silently ignored, never lowers it. `.fgos/config.json`'s
+`modelPolicies.z-ai` has only a `lightweight` entry -- no `standard` --
+so ANY declared-path dispatch through `glm-cli`, for ANY operation
+(`request-consult` has no operation-level `minTier` either, so it inherits
+the SAME `'standard'` system floor), is structurally blocked. Confirmed this
+is not a fixable-by-caller condition for the DECLARED path specifically: the
+agent-led path's own `opts.cliOverride.model` (a raw pass-through field,
+`P01.2`'s own documented workaround for the identical class of stop against
+`codex-cli`) bypasses tier-based model lookup entirely -- but the declared
+path's `cliPolicy`/`resolveDeclaredPolicyStack` funnels every caller
+preference through `mergePolicyStack`'s PolicyPatch schema
+(`definitions/schema.mjs:66`,
+`POLICY_PATCH_FIELDS = {minTier, preferPersona, preferExecutor,
+fallbackExecutors, visibility}`), which has NO `model` field at all --
+confirmed by reading the schema directly. This is not a bug introduced by
+this cell: `assignment-policy.mjs`'s floor default predates P03.2 and is
+outside this cell's touchable surface (`src/runner/dispatch/**` is Do-Not-
+Touch); the declared path's PolicyPatch schema omitting a literal `model`
+field is itself R1's own by-design constraint ("a portable protocol...
+expresses requirements... never a literal executor/model pin"), just with
+the previously-undocumented side effect that it also removes the ONE escape
+hatch that makes a `lightweight`-only-configured provider (`z-ai`, `gemini`,
+`openai-codex`) reachable at all when an operation's effective tier resolves
+to `standard`. Worth a documentation note for a future cell, not a fix
+folded into this one (`.fgos/config.json` and `definitions/schema.mjs` are
+both outside P03.2's file ownership).
+
+## Attempt 2 (same session `coord1`) -- codex-cli: identical class of deterministic config-tier stop
+
+```
+node p032-live-proof-driver-script.mjs coord_p032_live_<ts>_glm codex-cli request
+```
+Transcript: `codex-cli-step2-request-config-stop.std{out,err}.log`.
+
+Same `taskKey` (`declared:request-consult`, no explicit override passed) as
+Attempt 1 -- `createSessionAssignment` correctly resumed the SAME already-
+materialized Assignment (no duplicate Assignment created; confirmed:
+`coord1-glm-codex-attempts-session.json`'s `assignmentRefs` still has
+exactly one entry after both attempts) and re-attempted a fresh dispatch
+with THIS call's own `cliOverride.preferExecutor: 'codex-cli'` --
+`no model configured for policy tier "standard" under provider "codex"`.
+`.fgos/config.json`'s `modelPolicies` has NO `codex` entry at all (only
+`claude`/`gemini`/`openai-codex`/`z-ai`) -- codex-cli is blocked even more
+completely than glm-cli (no tier at all resolves, not just `standard`). Same
+root cause class as Attempt 1, confirmed independently. This also
+incidentally re-confirms this cell's own resume/idempotency wiring live:
+two different executors, two different real dispatch attempts, ONE real
+Assignment, zero duplicates, zero dispatch.claim leaks (the first attempt's
+`RunnerConfigError` correctly removed its own claim file before spawning
+anything, per `createAndExecuteSessionTask`'s documented cleanup rule,
+confirmed by the second attempt succeeding in re-claiming it rather than
+hitting an `EEXIST` "dispatch already in progress" error).
+
+## Attempt 3 (session `coord1`, requester Assignment) -- claude: genuine live dispatch, but a SELF-INFLICTED methodology false-fail (kept as honest evidence, not hidden)
+
+```
+node p032-live-proof-driver-script.mjs coord_p032_live_<ts>_glm claude request
+```
+Transcript: `claude-attempt-self-inflicted-dirty-tree-false-fail.std{out,err}.log`.
+
+A REAL `claude` CLI subprocess genuinely spawned, read the real
+`package.json`, and answered correctly (`agentClaim.status: "done"`,
+`agentClaim.summary`: "Repository root package.json name is \"forgent\",
+version is \"0.1.0\"." -- the real, correct answer). But the persisted
+`RunResult` classified as `status: "failed", confidence: "failed"`, NOT
+`"done"`. Traced the cause directly, not guessed:
+`evidence.mutatedDirtyBeforeFiles` listed exactly one path -- THIS proof's
+own `claude-step3-request-live.stderr.log`, which my own shell redirect
+(`2> docs/.../proofs/P03.2/....stderr.log`) was writing INTO the tracked
+repo tree WHILE the Assignment's real-time mutation-freshness check
+(`assignment-runner.mjs`'s `mutatedDirtyBeforeFiles`/`hasDirtyBeforeMutation`,
+unmodified by this cell) was watching for exactly this shape of change
+against a read-only Assignment. This is a genuine, correctly-firing
+governance mechanism (P03.2 did not touch or weaken it) tripped by this
+proof's OWN test-harness log placement, not a session-engine/coordination
+defect -- confirmed by re-running the identical dispatch with stdout/stderr
+redirected OUTSIDE the repo tree (Attempt 4 below), which completed
+`status: "done"` with byte-identical `agentClaim` content. Kept here,
+unmodified, as required honest evidence rather than deleted/hidden; every
+subsequent live attempt in this proof redirects output to the scratchpad
+directory during the dispatch itself, copying transcripts into this
+directory only AFTER the assignment settles.
+
+## Attempt 4 -- claude, clean methodology: FULL successful live pass through the shared execution core (session `coord2`, fresh)
+
+```
+node p032-live-proof-driver-script.mjs coord_p032_live_<ts>_claude claude open
+node p032-live-proof-driver-script.mjs coord_p032_live_<ts>_claude claude request
+node p032-live-proof-driver-script.mjs coord_p032_live_<ts>_claude claude provide asgn_..._op_002
+node p032-live-proof-driver-script.mjs coord_p032_live_<ts>_claude claude disposition "" asgn_..._op_003 asgn_..._op_002
+```
+Transcripts: `claude-step1-open.std{out,err}.log`,
+`claude-step2-request-live.std{out,err}.log`,
+`claude-step3-provide-live.std{out,err}.log`,
+`claude-step4-disposition-live.std{out,err}.log`. Final on-disk session
+state: `coord2-final-session.json` / `coord2-final-events.jsonl`.
+
+### Step 1 -- openDeclaredProtocolSession
+
+`coord2-final-session.json`: `definitionRef: {id:
+"core.coordination-protocol.declared-consult", version: "1.0.0"}`, `actors:
+[{id:"requester-actor",role:"requester"},
+{id:"consultant-actor",role:"consultant"}]`. `coord2-final-events.jsonl` seq
+1-3: `session-opened`, `actor-bound`(requester-actor),
+`actor-bound`(consultant-actor) -- both actors bound before any Assignment
+exists (Recovery Rule #1).
+
+### Step 2 -- dispatchDeclaredOperation(request-consult), role requester, via claude
+
+`asgn_p03_2_live_proof_coordinator_op_002`. RunResult:
+`status: "done", confidence: "reported"`,
+`policy.executorId: "claude-reviewer"` (`executorRedirected: true` -- the
+governed read-only-role redirect this repo's own `.fgos/config.json`
+comment documents for `mutation: "read-only"` inline contracts, confirmed
+correctly firing for this DECLARED-path Assignment too, not an agent-led-
+only mechanism), `policy.provenance.governance.value: "allowed"`,
+`evidence.gitBefore === evidence.gitAfter`
+(`a55ebc940a6b20c30f724e55015e26d646cfcd6f`, unchanged), `evidence.changedFiles:
+[]`, `evidence.mutatedDirtyBeforeFiles: []` (the Attempt 3 false-fail cause,
+confirmed genuinely absent this time). `agentClaim.summary`: real correct
+answer ("forgent", "0.1.0"), `agentClaim.source`:
+`/home/vantt/projects/forgentX/package.json` -- the real file, not a canned
+response.
+
+### Step 3 -- dispatchDeclaredOperation(provide-consult), role consultant, mediated edge, via claude
+
+`asgn_p03_2_live_proof_coordinator_op_003`, dispatched with
+`fromAssignmentId: asgn_..._op_002` (the real Step 2 Assignment).
+`caller.parentAssignmentId` on the persisted Assignment equals that same id
+(confirmed in the raw stdout transcript) -- the topology edge's mediated
+reference is real, not asserted. RunResult: `status: "done", confidence:
+"reported"`, same zero-mutation evidence shape. `agentClaim`: an
+INDEPENDENT second read of `package.json` that agrees with Step 2
+("Confirmed name=\"forgent\", version=\"0.1.0\" (no correction needed)")
+plus genuine advisory content (conditioned retry-budget-widening advice,
+not an echo of the request) -- proving a real second LLM turn, not a
+replay.
+
+### Step 4 -- recordConsultDisposition (role requester), via claude
+
+`asgn_p03_2_live_proof_coordinator_op_004`. RunResult: `status: "done",
+confidence: "reported"` (never `"verified"` -- confirmed directly).
+`agentClaim.disposition.verdict: "accepted"`, referencing
+`consultAssignment: asgn_..._op_003` (the real Step 3 Assignment) by id,
+matching the `disposition:accepted`/`rationale:...` pair this cell's
+`recordConsultDisposition` bakes into the Assignment's own `constraints`
+(unchanged mechanism). Same zero-mutation evidence shape.
+
+### Final session state -- 9 events, no duplicates, no out-of-order refs
+
+`coord2-final-events.jsonl`: `session-opened, actor-bound(requester-actor),
+actor-bound(consultant-actor), assignment-created(op_002),
+result-linked(op_002), assignment-created(op_003), result-linked(op_003),
+assignment-created(op_004), result-linked(op_004)` -- exactly the shape a
+successful `replaySession()` requires (assignment-created strictly before
+its own result-linked, no id repeated). `coord2-final-session.json`'s
+`assignmentRefs: [op_002, op_003, op_004]`, `status: "active"` (this cell
+never transitions terminal status -- out of scope, R1-R4/R5-R8 do not
+require it).
+
+### No direct executor launch -- only through the governed executeAssignment path
+
+The driver script imports and calls ONLY the three `session-engine.mjs`
+exports named at the top of this log. Every RunResult above carries
+`runtime.stdoutLog`/`runtime.stderrLog` paths under
+`.fgos/assignments/<id>/runs/01/` -- the REAL governed run directories
+`assignment-runner.mjs`'s `executeAssignment()` creates, never a path this
+driver script constructed itself. `policy.provenance.executor`/`.provider`/
+`.governance` are all populated with real `{value, source}` pairs sourced
+from `resolveAssignmentDispatchPolicy` (`dispatch/assignment-policy.mjs`,
+unmodified by this cell) -- there is no code path in the driver script or in
+`dispatchDeclaredOperation`/`recordConsultDisposition` that spawns a process
+directly.
+
+### No Work or repository mutation
+
+```
+git rev-parse HEAD          # before AND after this entire proof: a55ebc940a6b20c30f724e55015e26d646cfcd6f (unchanged)
+git status --porcelain      # before/after: git-status-before.txt / git-status-after.txt
+```
+The only diff between `git-status-before.txt` and `git-status-after.txt` is
+the new untracked `proofs/P03.2/` directory itself (this proof's own
+evidence files, captured AFTER every live dispatch above had already
+settled -- never present during any of the dispatches themselves, per the
+Attempt 3 finding). No tracked file changed; no `git add`/`git commit` ran;
+no Work item was created, claimed, advanced, or merged (`workRef: null`
+throughout, confirmed on both sessions' manifests). `.fgos/coordination/`
+and `.fgos/assignments/` are both gitignored
+(`.gitignore:24`/`:25`, `git check-ignore -v` confirmed on real files inside
+each) -- their runtime state never appears in `git status` at all, before or
+after, matching P00.3/P01.2's own identical precedent.
+
+## Summary
+
+R8's live-proof requirement is met with `claude` as the real registered
+executor: `request-consult` -> `provide-consult` -> `recordConsultDisposition`
+all completed genuinely (`status: "done"`, `confidence: "reported"`, real,
+mutually-consistent, independently-reasoned answers; zero repository
+mutation; zero direct executor launch outside `executeAssignment()`).
+`glm-cli`/`codex-cli` (the two executors P00.3/P01.2 used for their own live
+proofs) were both genuinely attempted first and both hit the SAME real,
+deterministic, pre-existing config-tier gap (a `standard`-tier floor with no
+matching `modelPolicies` entry for either provider family, and no
+model-override escape hatch reachable through the declared path's own
+PolicyPatch schema) -- honestly documented as legitimate, non-fabricated
+partial evidence, not routed around or hidden, matching this track's
+established precedent for handling a genuine live-executor/config
+limitation. The one methodology false-fail (Attempt 3, this proof's own log
+file sitting inside the watched repo tree during a read-only dispatch) is
+kept unmodified as evidence and traced to its real cause rather than
+silently deleted or re-run without explanation.

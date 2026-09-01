@@ -531,6 +531,179 @@ for (const disposition of ['accepted', 'rejected', 'partially-accepted']) {
   });
 }
 
+// ─── R5: session bounds, enforced before materialization/launch ───────────
+
+test('R5: aggregateBounds.wallTimeMs is enforced -- a session past its wall-time budget rejects a new declared dispatch before materialization, creating zero Assignments', async () => {
+  const tempDir = mkTempDir();
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_declared_r5_walltime', objective: 'Prove the wall-time bound.', writerId: 'coordinator-1', aggregateBounds: { wallTimeMs: 1 } },
+    { cwd: tempDir },
+  );
+  const runnerConfig = fakeExecutor(tempDir);
+  await new Promise((resolve) => setTimeout(resolve, 15));
+
+  await assert.rejects(
+    dispatchRequest('coord_declared_r5_walltime', tempDir, runnerConfig),
+    (err) => err instanceof CoordinationError && /wall-time budget/.test(err.message),
+  );
+  const assignmentsDir = path.join(tempDir, '.fgos', 'assignments');
+  assert.ok(!fs.existsSync(assignmentsDir) || fs.readdirSync(assignmentsDir).length === 0, 'a rejected wall-time-exceeded dispatch must create zero Assignments');
+});
+
+test('R5: aggregateBounds.maxTaskDepth is enforced against the REAL parentAssignmentId chain -- recordConsultDisposition is rejected once it would reach a depth beyond the declared cap', async () => {
+  const tempDir = mkTempDir();
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_declared_r5_depth', objective: 'Prove the task-depth bound.', writerId: 'coordinator-1', aggregateBounds: { maxTaskDepth: 2 } },
+    { cwd: tempDir },
+  );
+  const runnerConfig = fakeExecutor(tempDir);
+  // request-consult (depth 1, root) -> provide-consult (depth 2, parent =
+  // request) both succeed under maxTaskDepth: 2; the disposition (depth 3,
+  // parent = provide) is the first hop that exceeds it.
+  const request = await dispatchRequest('coord_declared_r5_depth', tempDir, runnerConfig);
+  const provide = await dispatchProvide('coord_declared_r5_depth', tempDir, runnerConfig, request.assignment.assignmentId);
+
+  await assert.rejects(
+    recordConsultDisposition(
+      'coord_declared_r5_depth',
+      {
+        requesterAssignmentId: request.assignment.assignmentId,
+        consultantAssignmentId: provide.assignment.assignmentId,
+        disposition: 'accepted',
+        rationale: 'Looks correct.',
+        writerId: 'coordinator-1',
+      },
+      { cwd: tempDir, repoRoot: tempDir },
+    ),
+    (err) => err instanceof CoordinationError && /aggregateBounds\.maxTaskDepth/.test(err.message),
+  );
+});
+
+test('R5: aggregateBounds.maxAssignments is enforced session-wide for the declared path -- a second Assignment beyond the cap is rejected before materialization', async () => {
+  const tempDir = mkTempDir();
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_declared_r5_maxasgn', objective: 'Prove the maxAssignments bound.', writerId: 'coordinator-1', aggregateBounds: { maxAssignments: 1 } },
+    { cwd: tempDir },
+  );
+  const runnerConfig = fakeExecutor(tempDir);
+  const request = await dispatchRequest('coord_declared_r5_maxasgn', tempDir, runnerConfig);
+
+  await assert.rejects(
+    dispatchProvide('coord_declared_r5_maxasgn', tempDir, runnerConfig, request.assignment.assignmentId),
+    (err) => err instanceof CoordinationError && /aggregateBounds\.maxAssignments/.test(err.message),
+  );
+  const manifest = readManifest('coord_declared_r5_maxasgn', { cwd: tempDir });
+  assert.deepEqual(manifest.assignmentRefs, [request.assignment.assignmentId]);
+});
+
+test('R5: aggregateBounds.maxRounds (session-wide) is enforced independently of maxAssignments and the per-topology-edge maxRounds', async () => {
+  const tempDir = mkTempDir();
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_declared_r5_maxrounds', objective: 'Prove the session-wide maxRounds bound.', writerId: 'coordinator-1', aggregateBounds: { maxRounds: 1 } },
+    { cwd: tempDir },
+  );
+  const runnerConfig = fakeExecutor(tempDir);
+  // The requester's own request-consult already consumes the session's ONE
+  // allowed round; provide-consult would be a legal FIRST round against the
+  // edge's own (unrelated, also 1) per-actor cap -- so a rejection here can
+  // only come from the session-wide aggregateBounds.maxRounds check.
+  const request = await dispatchRequest('coord_declared_r5_maxrounds', tempDir, runnerConfig);
+
+  await assert.rejects(
+    dispatchProvide('coord_declared_r5_maxrounds', tempDir, runnerConfig, request.assignment.assignmentId),
+    (err) => err instanceof CoordinationError && /already used \d+ round\(s\) session-wide/.test(err.message),
+  );
+});
+
+test('R5: aggregateBounds.maxConcurrency is enforced session-wide -- of two concurrent NEW root dispatches, only one may be in flight at a time under maxConcurrency: 1', async () => {
+  const tempDir = mkTempDir();
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_declared_r5_concurrency', objective: 'Prove the maxConcurrency bound.', writerId: 'coordinator-1', aggregateBounds: { maxConcurrency: 1 } },
+    { cwd: tempDir },
+  );
+  const runnerConfig = fakeExecutor(tempDir);
+
+  // Two DIFFERENT root request-consult dispatches (distinct explicit
+  // taskKeys, so neither is a resume of the other) raced via Promise.all --
+  // deterministic in-process interleaving, not a flaky timing race: each
+  // call's synchronous prefix (through createSessionAssignment) runs to
+  // completion before its own first `await executeAssignment(...)`, so the
+  // SECOND call's synchronous prefix runs while the FIRST is still
+  // in-flight (created, not yet result-linked) -- exactly the window
+  // maxConcurrency measures.
+  const outcomes = await Promise.allSettled([
+    dispatchDeclaredOperation(
+      'coord_declared_r5_concurrency',
+      { operationId: 'request-consult', objective: 'First concurrent request.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'coordinator-1', taskKey: 'concurrent-req-a' },
+      { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+    ),
+    dispatchDeclaredOperation(
+      'coord_declared_r5_concurrency',
+      { operationId: 'request-consult', objective: 'Second concurrent request.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'coordinator-1', taskKey: 'concurrent-req-b' },
+      { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+    ),
+  ]);
+
+  const fulfilled = outcomes.filter((r) => r.status === 'fulfilled');
+  const rejected = outcomes.filter((r) => r.status === 'rejected');
+  assert.equal(fulfilled.length, 1, 'exactly one of two concurrent dispatches should succeed under aggregateBounds.maxConcurrency: 1');
+  assert.equal(rejected.length, 1);
+  assert.ok(rejected[0].reason instanceof CoordinationError && /aggregateBounds\.maxConcurrency/.test(rejected[0].reason.message));
+});
+
+// ─── R6: illegal behavior rejection -- completeness sweep (foreign evidence /
+// actor impersonation, the two negative cases not already exercised above) ─
+
+test('R6: recordConsultDisposition rejects self-referential evidence -- a requester cannot disposition its own settled result as if it were the consultant\'s advice', async () => {
+  const tempDir = mkTempDir();
+  openSessionWithConfig('coord_declared_r6_self_ref', tempDir);
+  const runnerConfig = fakeExecutor(tempDir);
+  const request = await dispatchRequest('coord_declared_r6_self_ref', tempDir, runnerConfig);
+
+  await assert.rejects(
+    recordConsultDisposition(
+      'coord_declared_r6_self_ref',
+      {
+        requesterAssignmentId: request.assignment.assignmentId,
+        consultantAssignmentId: request.assignment.assignmentId,
+        disposition: 'accepted',
+        rationale: 'Looks correct.',
+        writerId: 'coordinator-1',
+      },
+      { cwd: tempDir, repoRoot: tempDir },
+    ),
+    (err) => err instanceof CoordinationError && err.category === 'foreign-ref' && /not reachable from requester actor/.test(err.message),
+  );
+});
+
+test('R6: recordConsultDisposition rejects a consultantAssignmentId belonging to an unrelated, foreign session -- even though that foreign Assignment has its own real linked result (cross-session foreign evidence)', async () => {
+  const tempDir = mkTempDir();
+  openSessionWithConfig('coord_declared_r6_foreign_session', tempDir);
+  const runnerConfig = fakeExecutor(tempDir);
+  const request = await dispatchRequest('coord_declared_r6_foreign_session', tempDir, runnerConfig);
+
+  // A second, real, unrelated declared session with its own genuinely
+  // settled consultant advice -- never a member of the first session.
+  openSessionWithConfig('coord_declared_r6_foreign_session_other', tempDir);
+  const otherRequest = await dispatchRequest('coord_declared_r6_foreign_session_other', tempDir, runnerConfig);
+  const otherProvide = await dispatchProvide('coord_declared_r6_foreign_session_other', tempDir, runnerConfig, otherRequest.assignment.assignmentId);
+
+  await assert.rejects(
+    recordConsultDisposition(
+      'coord_declared_r6_foreign_session',
+      {
+        requesterAssignmentId: request.assignment.assignmentId,
+        consultantAssignmentId: otherProvide.assignment.assignmentId,
+        disposition: 'accepted',
+        rationale: 'Looks correct.',
+        writerId: 'coordinator-1',
+      },
+      { cwd: tempDir, repoRoot: tempDir },
+    ),
+    (err) => err instanceof CoordinationError && /is not a member of session/.test(err.message),
+  );
+});
+
 // ─── No second execution core ──────────────────────────────────────────────
 
 // Strips `//` line comments and `/** ... */`-style JSDoc continuation lines
