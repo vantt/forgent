@@ -63,7 +63,7 @@ prepare (P02.2)
 | P00.4 | provider-family derivation fix (closes Phase 00) | done | `45137208` |
 | P01.1 | Phase 01 R1, R2, R3, R4 | done | `626e057b` |
 | P01.2 | Phase 01 R5, R6, R7, R8 (closes Phase 01) | done | `85206dca` |
-| P02.1 | Phase 02 R1, R2, R3, R4 | done | pending |
+| P02.1 | Phase 02 R1, R2, R3, R4 | done | `1f2260b1` |
 
 ## Phase 00 Status
 
