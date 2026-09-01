@@ -51,11 +51,12 @@ const require = createRequire(import.meta.url);
 // R7: the two shipped core fixtures discover and normalize cleanly.
 // ---------------------------------------------------------------------------
 
-test('discoverCoordinationProtocols finds both core R7 fixtures (declared-consult, independent-research fan-out/fan-in) and normalizes them', () => {
+test('discoverCoordinationProtocols finds all shipped core fixtures (declared-consult, independent-research fan-out/fan-in R7, group-cognition-framework Phase 05 R1-R4) and normalizes them', () => {
   const entries = discoverCoordinationProtocols({ cwd: mkTempDir('flow-definition-loader-empty-cwd-') });
   const ids = entries.map((e) => e.definition.metadata.id).sort();
   assert.deepEqual(ids, [
     'core.coordination-protocol.declared-consult',
+    'core.coordination-protocol.group-cognition-framework',
     'core.coordination-protocol.independent-research-fan-out-fan-in',
   ]);
   for (const entry of entries) {

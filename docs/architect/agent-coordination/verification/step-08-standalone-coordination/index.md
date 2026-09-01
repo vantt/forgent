@@ -41,7 +41,7 @@ of a blanket "unrelated" pass.
 | 02 | R1-R8 | done |
 | 03 | R1-R8 | done |
 | 04 | R1-R9 | done |
-| 05 | R1-R8 | missing (depends on 04) |
+| 05 | R1-R8 | R1-R4 done; R5-R8 BLOCKED pending external-case decision |
 | 06 | R1-R8 | missing (depends on 05) |
 | 07 | R1-R8 | missing (depends on 06) |
 
@@ -51,7 +51,9 @@ none
 
 ## Next Action
 
-prepare (P05.1)
+BLOCKED — R5 (P05.2) requires the user to select a real external
+fgOS-using project's decision as the evaluation case (business judgment,
+maps to plan's stop gate #5). See current-cell.md.
 
 ## Cell Log
 
@@ -70,6 +72,7 @@ prepare (P05.1)
 | P04.1 | Phase 04 R1, R2, R3, R4 | done | `11375173` |
 | P04.2 | Phase 04 R5, R6, R7, R9 | done | `d7d24923` |
 | P04.2b | Phase 04 R8 (stop-gate resolution, closes Phase 04) | done | `37e1185b` |
+| P05.1 | Phase 05 R1, R2, R3, R4 | done | pending |
 
 ## Phase 00 Status
 
@@ -396,3 +399,49 @@ per phase-04.md's own explicit design choice.
 
 Next: P05.1 (Phase 05 -- Group Cognition framework, R1-R4: framework
 definition and phase/activity semantics).
+
+## Phase 05 Status (in progress, blocked)
+
+**P05.1 CLOSED** (Phase 05 R1-R4): created
+`core/coordination-protocols/group-cognition-framework.yaml` -- the
+first Group Cognition framework, declared entirely as a
+`CoordinationProtocol` FlowDefinition: 6 phases in order (divergent
+exploration -> cluster/deduplicate -> critical challenge -> evidence
+review -> convergent synthesis -> recommendation with dissent), 8
+actors across 6 roles, 5 topology edges (a 3-way mediated fan-out from
+a single facilitator, one single critique-intent edge capped at
+`maxRounds: 1`, one plain evidence-handoff edge with a different intent
+so it can never become a second critique round), activity-level tier
+floors spanning all three named cognitive tiers
+(`creative`/`analytical`/`critical`), and an R4 synthesis-contract
+convention (9 required fields, documented as a `contractTemplate`
+commitment since V1's schema has no structured output-field vocabulary
+of its own). Reuses three already-proven shapes from the two existing
+sibling fixtures (fan-out isolation, fan-in-no-edge, single-edge
+mediated handoff) and one already-built session-engine mechanism
+(`dispatchDeclaredOperation`'s `targetActorId`, built in P04.2
+specifically for "one operation template, multiple actors" -- this
+fixture is its first real consumer). Went through 1 Reviewer round
+(matching P02.1/P04.1's proportional-rigor precedent -- pure
+declarative/schema work, zero fs/concurrency/execution surface): came
+back completely clean, every reuse/compatibility/negative-test claim
+independently re-verified against real source (not re-trusted from the
+fixture's own comments), including the most structurally novel choice
+in the fixture (the multi-actor same-operation-id wiring). Two LOW,
+non-blocking documentation nits accepted, neither warranting a Fixer
+round. Full suite: 4895/4908 pass, all 8 failures match the documented
+baseline exactly, no new failure.
+
+**Phase 05 is now BLOCKED before P05.2.** R5 requires selecting and
+freezing one REAL read-only architecture/vendor/problem-solving decision
+from a project using fgOS outside this repository, before observing any
+candidate outputs (bias-avoidance is the entire point of R5's own
+ordering requirement). This is a genuine business-judgment call --
+WHICH external project, WHICH decision -- not a routine/reversible
+implementation detail this track's autonomous Coordinator role has ever
+self-authorized (matches this track's own "Scout First" doctrine:
+"Ask only when the repo has conflicting evidence, missing context,
+business judgment, or high reversibility risk" -- and maps directly to
+the plan's own named stop gate #5, "the external consuming-project case
+cannot be selected before observing candidate outputs"). Consulting the
+user before preparing P05.2.
