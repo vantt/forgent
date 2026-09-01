@@ -60,6 +60,7 @@ import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import { mergePolicyStack } from '../definitions/schema.mjs';
+import { planCohort, verifyPlannedAllocationAgainstCurrentConfig } from './cohort-planner.mjs';
 
 export const PRIMARY_ACTOR_ID = 'primary';
 export const DEFAULT_SPECIALIST_ACTOR_ID = 'specialist';
@@ -683,8 +684,19 @@ function resolveDeclaredPolicyStack(scopeStack) {
  * whose declared role disagrees with the operation's own declared role (a
  * malformed definition, or a materialization-time actor-impersonation
  * shape R6's later negative sweep will exercise more fully).
+ *
+ * `targetActorId` (Phase 04 R5 addition): a Cohort's independent fan-out
+ * branches legitimately share ONE `operationId` template across MULTIPLE
+ * distinct actors (e.g. `independent-research` wired once per researcher
+ * in the SAME graph node, one `{ref, actor}` pair per researcher) --
+ * without a disambiguator, the previous "first match wins" behavior would
+ * silently resolve every branch to the SAME single actor. When provided,
+ * this selects the specific `{ref, actor}` pairing for `targetActorId`
+ * instead of the first match; omitted (every pre-existing caller), it
+ * keeps the exact prior behavior (first match across all nodes, in graph
+ * order) byte-for-byte unchanged.
  */
-function resolveDeclaredOperationActor(definition, operationId) {
+function resolveDeclaredOperationActor(definition, operationId, targetActorId) {
   const operation = definition.spec.operations.find((op) => op.id === operationId);
   if (!operation) {
     throw new CoordinationError(
@@ -693,22 +705,22 @@ function resolveDeclaredOperationActor(definition, operationId) {
     );
   }
 
-  let matchedNode;
-  let matchedRef;
+  const matches = [];
   for (const node of definition.spec.graph.nodes) {
-    const ref = node.operations.find((o) => o.ref === operationId);
-    if (ref) {
-      matchedNode = node;
-      matchedRef = ref;
-      break;
+    for (const ref of node.operations) {
+      if (ref.ref === operationId) matches.push({ node, ref });
     }
   }
-  if (!matchedNode || !matchedRef) {
+  const picked = targetActorId !== undefined ? matches.find((m) => m.ref.actor === targetActorId) : matches[0];
+  if (!picked) {
     throw new CoordinationError(
       'validation',
-      `dispatchDeclaredOperation: operation "${operationId}" is not wired into this protocol's graph -- an operation must be reachable from a node to be materialized`,
+      targetActorId !== undefined
+        ? `dispatchDeclaredOperation: operation "${operationId}" bound to actor "${targetActorId}" is not wired into this protocol's graph -- no node pairs this operation with that actor`
+        : `dispatchDeclaredOperation: operation "${operationId}" is not wired into this protocol's graph -- an operation must be reachable from a node to be materialized`,
     );
   }
+  const { node: matchedNode, ref: matchedRef } = picked;
   if (!matchedRef.actor) {
     throw new CoordinationError(
       'validation',
@@ -949,6 +961,11 @@ export function openDeclaredProtocolSession(
  * @param {string} coordinationId Must already have a non-null `definitionRef` (opened via `openDeclaredProtocolSession`).
  * @param {object} params
  * @param {string} params.operationId
+ * @param {string} [params.targetActorId] Disambiguates which actor binding
+ *   to target when `operationId` is wired to MORE THAN ONE actor (an
+ *   independent fan-out cohort sharing one operation template, R5).
+ *   Omitted (every non-fan-out caller): resolves the first `{ref, actor}`
+ *   match, unchanged prior behavior.
  * @param {string} params.objective
  * @param {string[]} params.expectedOutputs
  * @param {string[]} [params.contextRefs] Only honored for a root (no-incoming-edge) operation.
@@ -971,6 +988,7 @@ export async function dispatchDeclaredOperation(
   coordinationId,
   {
     operationId,
+    targetActorId,
     objective,
     expectedOutputs,
     contextRefs = [],
@@ -1011,7 +1029,7 @@ export async function dispatchDeclaredOperation(
     );
   }
 
-  const { operation, actorId, actorEntry } = resolveDeclaredOperationActor(definition, operationId);
+  const { operation, actorId, actorEntry } = resolveDeclaredOperationActor(definition, operationId, targetActorId);
   const topology = definition.spec.profile.topology;
   const incomingEdge = topology?.edges?.find((edge) => edge.to === actorId);
 
@@ -1328,4 +1346,368 @@ export async function recordConsultDisposition(
   );
 
   return { ...dispatchResult, disposition, rationale };
+}
+
+// ─── Phase 04 R5-R9: independent research fan-out / isolated fan-in ───────
+//
+// Everything below consumes P04.1's Cohort Planner (`cohort-planner.mjs`,
+// read-only import -- this file never forks its allocation logic) and
+// dispatches ONLY through `dispatchDeclaredOperation` above -- itself the
+// only caller of `createAndExecuteSessionTask`, the sole shared execution
+// primitive. No second execution path is introduced here.
+//
+// R5 "record the intended set before launch, one-way refs atomically":
+// reused, not reinvented. `openDeclaredProtocolSession` already binds every
+// `spec.actors[]` entry (`actor-bound` events) before any Assignment for
+// this session exists (store.mjs's `openSession`); as long as the caller's
+// FlowDefinition declares every fan-out branch actor up front (this cell's
+// own fixture does), the intended cohort is already recorded atomically by
+// the time `dispatchResearchFanOut` runs. `manifest.assignmentRefs`'s own
+// atomic append (store.mjs's `completeAssignmentRegistration`, unchanged)
+// is the one-way ref ledger this function relies on for every branch.
+//
+// R5 "execute concurrently under session and runner caps": reused, not
+// reinvented, on BOTH halves of that phrase:
+// - "session cap": `dispatchDeclaredOperation` already forwards
+//   `maxAssignmentsForSession`/`maxConcurrencyForSession`/
+//   `maxRoundsForSession` from `manifest.aggregateBounds` on every call;
+//   calling it N times CONCURRENTLY (`Promise.allSettled`, below)
+//   exercises the SAME lock-held checks inside `createSessionAssignment`
+//   (store.mjs, P03.1/P03.2) N times racing for real, never a second,
+//   fan-out-specific concurrency primitive.
+// - "runner cap": this codebase already has ONE, pre-existing and
+//   completely outside this file's or this cell's ownership --
+//   `src/runner/main-checkout-lock.mjs`'s `dispatchLockFile(cwd)` +
+//   `acquireMainCheckoutLock`, consumed unconditionally by every
+//   out-of-process dispatch inside `dispatch/cli.mjs`'s
+//   `executeExecutorCli` (tsk-64hk, "per-item dispatch concurrency
+//   protection"). It allows only ONE real subprocess dispatch in flight
+//   per `cwd` at a time, held for that dispatch's full duration,
+//   regardless of mutation/read-only status. This function never
+//   bypasses it (every branch still dispatches exclusively through
+//   `dispatchDeclaredOperation` -> `createAndExecuteSessionTask` ->
+//   `executeAssignment` -> the real out-of-process transport, the SAME
+//   path every other caller in this file uses) -- a branch that loses
+//   that race settles with an HONEST, explicit RunResult
+//   (status/confidence: 'failed', `agentClaim.summary` naming
+//   "already in flight"), never a silent drop, a hang, or a duplicate
+//   dispatch. See this cell's own report for the full empirical trace
+//   that discovered this (mis-labeled at first as a suspected bug in
+//   this file, confirmed instead to be this pre-existing, correctly-
+//   functioning runner-level cap).
+
+/**
+ * R5/R4: fan out ONE declared operation template to N distinct, named
+ * branch actors, CONCURRENTLY, after re-verifying every planned allocation
+ * against the CURRENT runner config immediately before dispatch (R4's
+ * contract, wired for the first time in this track). Zero Assignments are
+ * created if planning (`planCohort`) or any single allocation's handoff
+ * verification fails -- the whole batch aborts before ANY branch launches,
+ * the same "launch nothing on a planning/verification failure" posture
+ * R9's impossible-fixture proof exercises explicitly.
+ *
+ * "No sibling edges" (R5) is checked structurally, not merely trusted from
+ * the caller's own topology design: this function rejects a definition
+ * whose topology declares ANY edge directly between two of the named
+ * branch actors. Each branch's own context isolation (R6) then falls out
+ * of `dispatchDeclaredOperation`'s EXISTING, unmodified edge-driven
+ * behavior: a branch actor reached by a declared topology edge (this
+ * fixture's `coordinator-actor -> researcher-*` shape) always resolves
+ * `contextRefs` to EXACTLY `[fromAssignmentId]` -- the dispatcher's own
+ * Assignment, never caller-overridable, never a sibling's -- and
+ * `fromAssignmentId` itself must belong to the edge's declared `from`
+ * actor (already enforced), so a sibling assignment id can never be
+ * substituted in. `synthesizeResearchFanIn` (below) independently
+ * re-verifies this from disk at fan-in time rather than only trusting
+ * dispatch-time construction.
+ *
+ * @param {string} coordinationId Must already have a non-null `definitionRef`.
+ * @param {object} params
+ * @param {string} params.operationId The shared operation template every branch actor is wired to (e.g. `independent-research`).
+ * @param {Array<{actorId: string, objective: string, expectedOutputs: string[], constraints?: string[], capabilities?: string[], budget?: object, writerId?: string, fromAssignmentId?: string, intent?: string, taskKey?: string}>} params.branches One entry per independent branch; `actorId` values must be distinct.
+ * @param {string} [params.writerId] Default caller identity used for any branch that omits its own.
+ * @param {string} [params.fromAssignmentId] Default dispatcher Assignment id (e.g. the coordinator's own fan-out dispatch task) used for any branch that omits its own; required when every branch actor is reached by a declared topology edge.
+ * @param {Array<{id?: string, appliesTo: string, reason?: string}>} [params.fallbackRules] Forwarded to `planCohort` for soft diversity degradation.
+ * @param {object} [opts] Forwarded to `dispatchDeclaredOperation`/`planCohort` (cwd, repoRoot, packageRoot, runnerConfig, timeoutMs, options, ...). `opts.runnerConfig` is read as the CURRENT runner config for both planning and the R4 re-verification.
+ * @returns {Promise<Readonly<{status: 'planning-failed'|'aborted'|'dispatched', plan?: object, reason?: string, actorId?: string, branches?: Array<object>}>>}
+ */
+export async function dispatchResearchFanOut(
+  coordinationId,
+  { operationId, branches, writerId, fromAssignmentId, fallbackRules = [] },
+  opts = {},
+) {
+  const manifest = readManifest(coordinationId, opts);
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchResearchFanOut: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- open it with openDeclaredProtocolSession()`,
+    );
+  }
+  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchResearchFanOut: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to materialize against a drifted definition`,
+    );
+  }
+
+  const cohort = definition.spec.profile.cohort;
+  if (!cohort || cohort.independence !== 'isolated-until-fan-in') {
+    throw new CoordinationError(
+      'validation',
+      `dispatchResearchFanOut: definition "${definition.metadata.id}" does not declare spec.profile.cohort.independence: "isolated-until-fan-in" -- this entry point only fans out a genuinely independent cohort`,
+    );
+  }
+  if (!Array.isArray(branches) || branches.length === 0) {
+    throw new CoordinationError('validation', 'dispatchResearchFanOut: branches must be a non-empty array of {actorId, objective, expectedOutputs, ...}');
+  }
+  const branchActorIds = branches.map((b) => b.actorId);
+  if (branchActorIds.some((id) => !isNonEmptyString(id))) {
+    throw new CoordinationError('validation', 'dispatchResearchFanOut: every branch requires a non-empty actorId');
+  }
+  if (new Set(branchActorIds).size !== branchActorIds.length) {
+    throw new CoordinationError('validation', 'dispatchResearchFanOut: branches must name distinct actorIds -- no actor may be dispatched twice in one fan-out');
+  }
+
+  // R5 structural proof (not merely trusted from the fixture's own design):
+  // reject any declared topology edge directly between two named branch
+  // actors -- "independent fan-out branches, no sibling edges."
+  const branchActorIdSet = new Set(branchActorIds);
+  const siblingEdge = (definition.spec.profile.topology?.edges ?? []).find(
+    (edge) => branchActorIdSet.has(edge.from) && branchActorIdSet.has(edge.to),
+  );
+  if (siblingEdge) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchResearchFanOut: topology declares an edge between two named fan-out branch actors ("${siblingEdge.from}" -> "${siblingEdge.to}") -- independent fan-out branches must have NO sibling edges`,
+    );
+  }
+
+  // R2/R4: plan cohort allocation (P04.1's planCohort, reused verbatim) then
+  // re-verify EVERY relevant planned allocation against the CURRENT runner
+  // config immediately before dispatch, aborting the WHOLE batch before any
+  // branch launches on the first `abort: true` -- R4's contract, wired for
+  // the first time in this track. `opts.runnerConfig` is read once and used
+  // identically for both planning and re-verification, so "current" means
+  // the same config snapshot throughout this call.
+  const currentRunnerConfig = opts.runnerConfig;
+  const plan = planCohort({ definition, runnerConfig: currentRunnerConfig, fallbackRules });
+  if (plan.status !== 'allocated') {
+    return Object.freeze({ status: 'planning-failed', plan, branches: Object.freeze([]) });
+  }
+
+  const relevantAllocations = plan.allocations.filter((a) => branchActorIdSet.has(a.actorId));
+  const missingAllocationActorId = branchActorIds.find((id) => !relevantAllocations.some((a) => a.actorId === id));
+  if (missingAllocationActorId) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchResearchFanOut: cohort plan has no allocation for branch actor "${missingAllocationActorId}" -- confirm it is declared in spec.actors and wired into the protocol graph`,
+    );
+  }
+
+  for (const allocation of relevantAllocations) {
+    const verification = verifyPlannedAllocationAgainstCurrentConfig(allocation, currentRunnerConfig);
+    if (verification.abort) {
+      return Object.freeze({
+        status: 'aborted',
+        reason: verification.reason,
+        actorId: allocation.actorId,
+        plan,
+        branches: Object.freeze([]),
+      });
+    }
+  }
+
+  // R5: dispatch every branch CONCURRENTLY through the SAME
+  // dispatchDeclaredOperation -> createAndExecuteSessionTask ->
+  // executeAssignment path every other declared-protocol dispatch in this
+  // file already uses. `cliPolicy` carries the planner's concrete
+  // `preferExecutor`/`minTier` choice at the ONE scope legally allowed to
+  // pin a literal executor (the trusted human/CLI scope,
+  // `assertNoPortableExecutorPin` above) -- never written into a portable
+  // definition/operation/role/actor scope.
+  const settled = await Promise.allSettled(
+    branches.map((branch) => {
+      const allocation = relevantAllocations.find((a) => a.actorId === branch.actorId);
+      return dispatchDeclaredOperation(
+        coordinationId,
+        {
+          operationId,
+          targetActorId: branch.actorId,
+          objective: branch.objective,
+          expectedOutputs: branch.expectedOutputs,
+          constraints: branch.constraints,
+          capabilities: branch.capabilities,
+          budget: branch.budget,
+          writerId: branch.writerId ?? writerId,
+          fromAssignmentId: branch.fromAssignmentId ?? fromAssignmentId,
+          intent: branch.intent,
+          taskKey: branch.taskKey ?? `research-branch:${branch.actorId}`,
+          cliPolicy: { preferExecutor: allocation.executorId, minTier: allocation.tier },
+        },
+        opts,
+      );
+    }),
+  );
+
+  const dispatchedBranches = settled.map((outcome, i) => ({
+    actorId: branches[i].actorId,
+    allocation: relevantAllocations.find((a) => a.actorId === branches[i].actorId),
+    status: outcome.status,
+    ...(outcome.status === 'fulfilled' ? { result: outcome.value } : { error: outcome.reason?.message ?? String(outcome.reason) }),
+  }));
+
+  return Object.freeze({ status: 'dispatched', plan, branches: Object.freeze(dispatchedBranches.map((b) => Object.freeze(b))) });
+}
+
+/**
+ * R6/R7: synthesize a fan-in over the named branch actors AFTER
+ * `dispatchResearchFanOut`, reading each branch's persisted Assignment/
+ * RunResult directly off disk (never trusting the dispatcher's own
+ * in-memory return value alone) so this function can run independently,
+ * any time after dispatch -- including a later process, matching this
+ * file's existing resume/replay discipline elsewhere.
+ *
+ * R6 (independently re-verified here, not just trusted from dispatch-time
+ * construction): for each branch, the persisted `assignment.json`'s own
+ * `provenance.inline.contract.contextRefs` must never reference ANOTHER
+ * named branch actor's Assignment -- a genuine on-disk proof of "no
+ * sibling visibility before fan-in," not an assertion.
+ *
+ * R7 (never launders, never erases, never infers consensus from count):
+ * - A branch RunResult's `confidence` is read and reported EXACTLY as
+ *   persisted -- only `confidence === 'verified'` branches enter
+ *   `accepted` (the bucket a caller may treat as a material, checkable
+ *   fact); `'reported'`/`'inferred'` branches are recorded in `unverified`,
+ *   NEVER promoted into `accepted`. (Read-only Assignments in this whole
+ *   standalone-session slice can never actually classify as `'verified'`
+ *   -- `classifyRunEvidence`'s read-only branch has no path to it,
+ *   confirmed directly in `assignment-runner.mjs` and already documented
+ *   by this track's own `coordination-declared-consult.test.mjs` R4 tests
+ *   -- so a real dispatch's `accepted` bucket is legitimately expected to
+ *   stay empty; this function proves it does not silently paper over that
+ *   by upgrading a `'reported'` finding instead.)
+ * - `caller-declared `contradictions` are passed through UNCHANGED into the
+ *   returned object -- this function has no domain knowledge to detect a
+ *   semantic contradiction between two branches' prose findings (out of
+ *   scope, no NLP/scoring), so it never invents or erases one; it only
+ *   guarantees whatever the caller already knows to be contradictory is
+ *   never silently dropped from the synthesis record.
+ * - `explanation` never claims "consensus" from `accepted.length` alone: it
+ *   is empty/absent when there are zero accepted entries, explicitly scoped
+ *   to "partial" when any required branch is missing/failed and a partial
+ *   policy is in effect, and explicitly withheld when `contradictions` is
+ *   non-empty.
+ * - Missing (no Assignment ever created, or created but not yet settled)
+ *   and failed (`status === 'failed'`/`confidence` in `{failed, no-evidence}`)
+ *   branches are both named explicitly, never silently absent from the
+ *   result.
+ *
+ * @param {string} coordinationId
+ * @param {object} params
+ * @param {string[]} params.branchActorIds The full set of required branch actor ids for this fan-in.
+ * @param {Array<{branchActorIds: string[], reason?: string}>} [params.contradictions] Caller-declared, pass-through only.
+ * @param {boolean} [params.partial] When true, synthesizes over whatever branches HAVE settled even if some required branches are still missing/failed (an explicit partial-completion policy, R6's "or an explicit partial policy is evaluated"); when false (default), returns `status: 'incomplete'` with zero accepted/unverified entries until every required branch has settled.
+ * @param {object} [opts] Workspace options (cwd, repoRoot).
+ * @returns {Readonly<object>}
+ */
+export function synthesizeResearchFanIn(coordinationId, { branchActorIds, contradictions = [], partial = false }, opts = {}) {
+  if (!Array.isArray(branchActorIds) || branchActorIds.length === 0) {
+    throw new CoordinationError('validation', 'synthesizeResearchFanIn: branchActorIds must be a non-empty array');
+  }
+  const { events } = replaySession(coordinationId, opts);
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  const branchActorIdSet = new Set(branchActorIds);
+
+  const createdEventByActor = new Map();
+  for (const actorId of branchActorIds) {
+    const createdEvent = events.find((e) => e.type === 'assignment-created' && e.payload.actorId === actorId);
+    if (createdEvent) createdEventByActor.set(actorId, createdEvent);
+  }
+
+  const accepted = [];
+  const unverified = [];
+  const failed = [];
+  const missing = [];
+
+  for (const actorId of branchActorIds) {
+    const createdEvent = createdEventByActor.get(actorId);
+    if (!createdEvent) {
+      missing.push({ actorId, reason: 'no Assignment was ever created for this branch actor' });
+      continue;
+    }
+    const assignmentId = createdEvent.payload.assignmentId;
+
+    // R6, independently re-verified at fan-in time: the persisted
+    // Assignment's own inline contract must never reference a SIBLING
+    // branch actor's Assignment as a contextRef.
+    const assignmentJsonPath = path.join(fgosDir, 'assignments', assignmentId, 'assignment.json');
+    let assignmentJson;
+    try {
+      assignmentJson = JSON.parse(fs.readFileSync(assignmentJsonPath, 'utf8'));
+    } catch (err) {
+      throw new CoordinationError('corrupt-log', `synthesizeResearchFanIn: assignment.json for "${assignmentId}" (actor "${actorId}") could not be read: ${err.message}`);
+    }
+    const branchContextRefs = assignmentJson?.provenance?.inline?.contract?.contextRefs ?? [];
+    for (const [otherActorId, otherCreatedEvent] of createdEventByActor) {
+      if (otherActorId === actorId) continue;
+      if (branchActorIdSet.has(otherActorId) && branchContextRefs.includes(otherCreatedEvent.payload.assignmentId)) {
+        throw new CoordinationError(
+          'foreign-ref',
+          `synthesizeResearchFanIn: branch actor "${actorId}"'s Assignment "${assignmentId}" contextRefs references sibling branch actor "${otherActorId}"'s Assignment -- sibling visibility before fan-in is rejected`,
+        );
+      }
+    }
+
+    const linkedEvent = events.find((e) => e.type === 'result-linked' && e.payload.assignmentId === assignmentId);
+    if (!linkedEvent) {
+      missing.push({ actorId, assignmentId, reason: 'Assignment created but not yet settled (no linked RunResult)' });
+      continue;
+    }
+    const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, linkedEvent.payload.runId);
+
+    if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') {
+      failed.push({ actorId, assignmentId, runId: runResult.runId, status: runResult.status, confidence: runResult.confidence });
+    } else if (runResult.confidence === 'verified') {
+      accepted.push({ actorId, assignmentId, runId: runResult.runId, confidence: runResult.confidence });
+    } else {
+      // 'reported' / 'inferred': recorded explicitly, NEVER promoted into
+      // `accepted` -- the evidence-laundering guard R7 requires.
+      unverified.push({ actorId, assignmentId, runId: runResult.runId, confidence: runResult.confidence });
+    }
+  }
+
+  const allRequiredSettled = missing.length === 0;
+  if (!allRequiredSettled && !partial) {
+    return Object.freeze({
+      status: 'incomplete',
+      reason: `${missing.length} of ${branchActorIds.length} required branch(es) have not settled -- fan-in requires every required branch to settle, or an explicit partial policy`,
+      accepted: Object.freeze([]),
+      unverified: Object.freeze([]),
+      failed: Object.freeze([]),
+      missing: Object.freeze(missing),
+      contradictions: Object.freeze([...contradictions]),
+    });
+  }
+
+  const explanation =
+    accepted.length === 0
+      ? missing.length > 0 || failed.length > 0
+        ? `No branch produced verified evidence under an explicit partial policy (${missing.length} missing, ${failed.length} failed) -- synthesis has no accepted material findings.`
+        : 'No branch produced verified evidence -- synthesis has no accepted material findings.'
+      : contradictions.length > 0
+        ? `${accepted.length} branch(es) produced verified evidence, but ${contradictions.length} declared contradiction(s) remain unresolved -- no consensus is reported.`
+        : missing.length > 0 || failed.length > 0
+          ? `${accepted.length} branch(es) accepted with verified evidence under an explicit partial policy (${missing.length} missing, ${failed.length} failed) -- consensus is scoped to the accepted branches only, never inferred from the full declared cohort's branch count.`
+          : `${accepted.length}/${branchActorIds.length} branch(es) produced verified evidence with no declared contradictions.`;
+
+  return Object.freeze({
+    status: 'synthesized',
+    accepted: Object.freeze(accepted.map((a) => Object.freeze(a))),
+    unverified: Object.freeze(unverified.map((a) => Object.freeze(a))),
+    failed: Object.freeze(failed.map((a) => Object.freeze(a))),
+    missing: Object.freeze(missing.map((a) => Object.freeze(a))),
+    contradictions: Object.freeze([...contradictions]),
+    explanation,
+  });
 }

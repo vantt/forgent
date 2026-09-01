@@ -40,18 +40,18 @@ of a blanket "unrelated" pass.
 | 01 | R1-R8 | done |
 | 02 | R1-R8 | done |
 | 03 | R1-R8 | done |
-| 04 | R1-R9 | R1-R4 done; R5-R9 outstanding (P04.2) |
+| 04 | R1-R9 | R1-R7,R9 done; R8 BLOCKED on stop gate #4 (see current-cell.md) |
 | 05 | R1-R8 | missing (depends on 04) |
 | 06 | R1-R8 | missing (depends on 05) |
 | 07 | R1-R8 | missing (depends on 06) |
 
 ## Active Cell
 
-none
+P04.2 (BLOCKED)
 
 ## Next Action
 
-prepare (P04.2)
+STOPPED at objective stop gate #4 — awaiting maintainer decision, see current-cell.md / P04.2.md
 
 ## Cell Log
 
