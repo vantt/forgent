@@ -69,7 +69,7 @@ prepare (P05.1)
 | P03.2 | Phase 03 R5, R6, R7, R8 (closes Phase 03) | done | `38a9a010` |
 | P04.1 | Phase 04 R1, R2, R3, R4 | done | `11375173` |
 | P04.2 | Phase 04 R5, R6, R7, R9 | done | `d7d24923` |
-| P04.2b | Phase 04 R8 (stop-gate resolution, closes Phase 04) | done | pending |
+| P04.2b | Phase 04 R8 (stop-gate resolution, closes Phase 04) | done | `37e1185b` |
 
 ## Phase 00 Status
 
@@ -304,7 +304,9 @@ live-proof genuineness) independently confirmed clean. Full suite:
 new failure. Deferral Audit: AC-I002/AC-I003/AC-I006 all MET, AC-I008
 still deferred to Phase 07 as planned.
 
-## Phase 04 Status (in progress)
+## Phase 04 Status
+
+**CLOSED.** R1-R9 across P04.1-P04.2b.
 
 **P04.1 CLOSED** (Phase 04 R1-R4): created `src/runner/coordination/cohort-planner.mjs`
 (`buildCandidateInventory`, `matchCandidateToRequirement`, `planCohort`,
