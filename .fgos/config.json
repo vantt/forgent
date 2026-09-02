@@ -150,7 +150,7 @@
           "heavy": "lightweight"
         }
       },
-      "codex": {
+      "codex-cli": {
         "kind": "agent",
         "description": "OpenAI Codex CLI (bypass-all -- no sandbox boundary, see docs/history/codex-bypass-executor/)",
         "allowCrossProvider": true,
@@ -167,7 +167,7 @@
           }
         ]
       },
-      "pi": {
+      "codex-pi": {
         "kind": "agent",
         "description": "pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)",
         "allowCrossProvider": true,
@@ -198,9 +198,10 @@
           "heavy": "lightweight"
         }
       },
-      "glm": {
+      "glm-cli": {
         "kind": "agent",
         "description": "Claude Code CLI routed to OpenRouter's GLM 5.2 model (z-ai/glm-5.2), not real Anthropic -- ANTHROPIC_BASE_URL/AUTH_TOKEN/MODEL overridden via this invocation's own env block (dispatch/transport.mjs's ${VAR} substitution against process.env, never a shell). Real key lives in .fgos/secrets.local.env (untracked, gitignored) as GLM_OPENROUTER_API_KEY -- never committed here. See docs/history/glm-openrouter-executor/plan.md (tsk-gb3).",
+        "allowCrossProvider": true,
         "invocations": [
           {
             "via": "cli",

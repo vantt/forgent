@@ -1,6 +1,6 @@
 # Step 07 MVP — Inline Assignment On One Governed Core
 
-Status: planned (not started) | Created: 2026-08-31 | Owner: maintainer
+Status: done (2026-09-01) | Created: 2026-08-31 | Owner: maintainer
 Authority: [ADR-006](../../docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md), [ADR-007](../../docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md), [Step 07 checkpoint §19](../../docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md)
 Advisory trail: `plans/reports/advisor-260831-1559-step07-strategy-revision-after-review-report.md`
 
@@ -13,11 +13,11 @@ inline provenance class that cannot bypass governance or the declared graph.
 
 ## Phases
 
-| # | Phase | Depends on | Exit |
-|---|---|---|---|
-| 1 | [executeAssignment hardening + plan-verdict derivation](phase-01-execute-assignment-hardening-and-plan-verdict-derivation.md) | — | G1, G6 fixed; `planVerdictFromPlanMd()` lands with READY+split-children test green |
-| 2 | [Assignment provenance + stamped snapshot](phase-02-assignment-provenance-and-stamped-snapshot.md) | 1 | declared path unchanged in behavior; `provenance`, `mutation`, `evidence.required` on every Assignment; interpretation field-driven; G3 closed; mission-lite off `stage:'planning'`; heuristic removed |
-| 3 | [Harness seam + two proofs](phase-03-harness-seam-and-two-proofs.md) | 2 | Proof 1 and Proof 2 recorded under `verification/`; `--contract` CLI door; negative tests green |
+| # | Phase | Depends on | Status | Exit |
+|---|---|---|---|---|
+| 1 | [executeAssignment hardening + plan-verdict derivation](phase-01-execute-assignment-hardening-and-plan-verdict-derivation.md) | — | done (P01.1 `07f2d943`, P01.2 `d97837d3`) | G1, G6 fixed; `planVerdictFromPlanMd()` lands with READY+split-children test green |
+| 2 | [Assignment provenance + stamped snapshot](phase-02-assignment-provenance-and-stamped-snapshot.md) | 1 | planned | declared path unchanged in behavior; `provenance`, `mutation`, `evidence.required` on every Assignment; interpretation field-driven; G3 closed; mission-lite off `stage:'planning'`; heuristic removed |
+| 3 | [Harness seam + two proofs](phase-03-harness-seam-and-two-proofs.md) | 2 | done (P03.1 `2a22c93c`, P03.2 `7abe80c4`/`05e79b40`, P03.3 `e82a54d0`) | Proof 1 and Proof 2 recorded under `verification/`; `--contract` CLI door; negative tests green |
 
 Separate items, not in this plan: **G4** verify-skip via `branchHeadAtReturn`
 (security-relevant, prioritize alongside); **G2** `resolvePlan` `.fgos`

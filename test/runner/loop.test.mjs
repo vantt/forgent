@@ -2924,9 +2924,11 @@ test('Cell 6.1 happy path: runOnce dispatches planning.validate-plan to a fake e
   assert.equal(result.status, 'done');
   assert.equal(result.confidence, 'reported');
 
-  // The Assignment never moves Work: without a tiny/small mode declaration
-  // resolvePlan's runner call conservatively no-ops, so the item is exactly
-  // where the sweep found it.
+  // The Assignment never moves Work: plan.md here has no "## Split" section
+  // at all, so planVerdictFromPlanMd (Cell P01.2, R3/G5) has no signal to
+  // derive a verdict from and returns null -- resolvePlan's own 'runner'
+  // fallback then conservatively no-ops, so the item is exactly where the
+  // sweep found it.
   const item = listWork(dir).work[id];
   assert.equal(item.stage, 'planning');
   assert.equal(item.status, 'todo');
@@ -2998,7 +3000,109 @@ test('Cell 6.1 happy path: run evidence is complete and the verdict artifact is 
   assert.equal(asgnId.startsWith('asgn_'), true);
 });
 
+// ---------------------------------------------------------------------------
+// Cell P01.2 (R4/G5): the driver derives its plan verdict mechanically from
+// plan.md's own committed "## Split" section (planVerdictFromPlanMd),
+// independent of whatever the reviewer worker itself self-reported — real
+// child specs in plan.md's own JSON block materialize through resolvePlan
+// exactly like the interactive `fgos plan --verdict decompose --children`
+// path, same D-ID-citation gate included.
+// ---------------------------------------------------------------------------
 
+/** Cell P01.2 fixture: like `setupValidatePlanFixture` but plan.md also
+ * carries a real "## Locked decisions" table and a "## Split" section with
+ * a real child-spec JSON block, so the Assignment/runner planning sweep has
+ * a genuine split to derive from `plan.md` itself (never from the worker's
+ * own self-reported verdict). */
+function setupValidatePlanDecomposeFixture({ id, docsRef, children }) {
+  const base = setup();
+  const taskSpecDir = path.join(base.repoRoot, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(taskSpecDir, { recursive: true });
+  fs.writeFileSync(path.join(taskSpecDir, 'validate-plan.md'), '# validate-plan\n');
+  fs.mkdirSync(path.join(base.repoRoot, 'src'), { recursive: true });
+  fs.writeFileSync(path.join(base.repoRoot, 'src', 'index.mjs'), '// citation target\n');
+
+  const planContent =
+    `## Reality gate\n- Mode fit: PASS (src/index.mjs)\n- Repo fit: PASS (src/index.mjs)\n- Assumptions: PASS (src/index.mjs)\n- Smaller path: PASS (src/index.mjs)\n- Proof surface: PASS (src/index.mjs)\n- Impact-analysis posture: PASS (src/index.mjs)\n` +
+    `## Feasibility matrix\n- medium risk: src/index.mjs\n` +
+    `## Locked decisions\n\nD1: Perform step 1 per the locked format.\n\n` +
+    `## Split\n\nTwo independently workable pieces.\n\n\`\`\`json\n${JSON.stringify(children, null, 2)}\n\`\`\`\n`;
+  fs.mkdirSync(path.join(base.repoRoot, docsRef), { recursive: true });
+  fs.writeFileSync(path.join(base.repoRoot, docsRef, 'plan.md'), planContent);
+  execFileSync('git', ['add', docsRef, 'src'], { cwd: base.repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'add plan.md with split children and citation target'], { cwd: base.repoRoot });
+
+  const executorScript = writeValidatePlanHappyExecutor(base.scriptDir);
+  const cfg = configFor(executorScript);
+
+  seedItem(base.dir, {
+    id,
+    stage: 'planning',
+    status: 'todo',
+    domain: 'coding',
+    workflow: 'feature',
+    docsRef,
+  });
+  return { ...base, id, docsRef, cfg };
+}
+
+test('Cell P01.2: reviewer READY on an item whose plan.md declares split children materializes children through resolvePlan and moves the root to executing', async () => {
+  const children = [
+    { title: 'Subtask A', verify: 'node -e "process.exit(0)"', action: 'D1: implement part A per the locked format.', footprint: ['src/a.js'] },
+    { title: 'Subtask B', verify: 'node -e "process.exit(0)"', action: 'D1: implement part B per the locked format.', footprint: ['src/b.js'] },
+  ];
+  const { repoRoot, dir, cfg, worktreeDir, id } = setupValidatePlanDecomposeFixture({
+    id: 'p012-decomp-item',
+    docsRef: 'docs/history/p012-decomp-item',
+    children,
+  });
+
+  const logs = [];
+  await runOnce({ repoRoot, config: cfg, worktreeDir, log: (l) => logs.push(l) });
+
+  assert.ok(logs.some((l) => l.includes('after READY validation') && l.includes('(decompose)')), 'the plan.md-derived decompose verdict must feed the planning edge');
+
+  const view = listWork(dir);
+  const root = view.work[id];
+  assert.equal(root.stage, 'executing');
+
+  const created = Object.values(view.work).filter((w) => w.parent === id);
+  assert.equal(created.length, 2);
+  assert.deepEqual(
+    created.map((w) => w.title).sort(),
+    ['Subtask A', 'Subtask B'],
+  );
+  for (const child of created) {
+    assert.equal(child.stage, 'executing');
+  }
+});
+
+test('Cell P01.2: a child spec without a cited D-ID in plan.md\'s own split JSON block is rejected on the Assignment/runner path too (same gate as the caller-verdict CLI path)', async () => {
+  const children = [
+    // No D-ID cited anywhere in this action -- normalizeChild (plan.mjs)
+    // rejects the WHOLE verdict, same as `fgos plan --verdict decompose`.
+    { title: 'Subtask A', verify: 'node -e "process.exit(0)"', action: 'implement part A, no decision cited.', footprint: ['src/a.js'] },
+  ];
+  const { repoRoot, dir, cfg, worktreeDir, id } = setupValidatePlanDecomposeFixture({
+    id: 'p012-badchild-item',
+    docsRef: 'docs/history/p012-badchild-item',
+    children,
+  });
+
+  const logs = [];
+  await runOnce({ repoRoot, config: cfg, worktreeDir, log: (l) => logs.push(l) });
+
+  assert.ok(logs.some((l) => l.includes('after READY validation') && l.includes('(invalid)')), 'a child spec missing a real D-ID citation must resolve invalid, never silently accepted');
+
+  const view = listWork(dir);
+  const root = view.work[id];
+  // rejected verdict: the root stays exactly where the sweep found it, and
+  // no child is ever written.
+  assert.equal(root.stage, 'planning');
+  assert.equal(root.status, 'todo');
+  const created = Object.values(view.work).filter((w) => w.parent === id);
+  assert.equal(created.length, 0);
+});
 
 // ---------------------------------------------------------------------------
 // Cell 6.2: planning.validate-plan negatives + red-team hardening, composed

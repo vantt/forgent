@@ -914,3 +914,18 @@ provenance change (same function); G3 dirty-mutation re-derivation and G5
 verdict derivation merge into it; G4 verify-skip at merge is security-relevant
 and gets its own item; G2 (`resolvePlan` `.fgos` basename, four failing tests)
 gets its own item before any planning-materialization work.
+
+### MVP Implementation Complete (2026-09-01)
+
+The MVP scope locked above (three phases: executeAssignment hardening +
+plan-verdict derivation; assignment provenance + stamped snapshot;
+domain harness seam + CLI door + the two live proofs) is done. Both
+proofs named in "Scope Of What Was Locked" above ran for real against a
+configured executor and are recorded, with full requirement-to-evidence
+traceability, at
+[`verification/step-07-mvp/index.md`](../verification/step-07-mvp/index.md)
+(see its "ADR Traceability" section for the ADR-006/ADR-007
+clause-by-clause mapping). ADR-006 and ADR-007 are both marked
+`Implementation: Implemented`. Everything under "Shape Locked,
+Implementation Deferred" and "Deferred, Still Open In Step 07" above
+remains exactly that — deferred, not part of this MVP's closed scope.

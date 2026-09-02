@@ -2,8 +2,8 @@
 
 Document type: ADR
 Design status: Accepted
-Implementation: Not started
-Last reviewed: 2026-08-31
+Implementation: Implemented
+Last reviewed: 2026-09-01
 Canonical for: the foundation/domain seam for agent-led contracts and the Work-attached inline boundary
 Related: [Vision V-006/V-008/V-012](../vision.md), [ADR-001](ADR-001-work-lifecycle-authority.md), [ADR-006](ADR-006-assignment-provenance-and-contract-snapshot.md), [Work Integration](../architecture/work-integration.md)
 

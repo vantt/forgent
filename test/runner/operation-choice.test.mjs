@@ -1553,6 +1553,84 @@ test('Step 06 Cell 6.6 fix-verify-red confidence check is unchanged after splitt
   assert.equal(withFootprintFieldsPresent.reason, 'fix-verify-red-verified');
 });
 
+// The three tests below pin the real production-path shape for a
+// buildAssignment-stamped Assignment (evidence.required: 'verified',
+// stamped by assignment-normalizer.mjs for all three of these operations)
+// reaching interpretAssignmentRunResult with confidence: 'reported'. The
+// top-level confidence gate reads the stamped evidence.required and stops
+// the dispatch there, so these never reach the branch-level
+// '<op>-requires-verified-evidence' re-check below (that shape is reachable
+// only for a bare choice with no stamped assignment, as the tests above
+// exercise). This is the intended, real dispatch-path behavior, not a bug.
+test('scoped-subtask: a real buildAssignment Assignment with reported confidence stops at the top-level gate, not the branch-level re-check', () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['scoped-subtask']);
+
+  const assignment = buildAssignment({
+    workId: 'tsk-scoped-topgate',
+    stage: 'executing',
+    operation: 'scoped-subtask',
+    options: { repoRoot: tempDir },
+  });
+
+  const result = interpretAssignmentRunResult({
+    choice: { operation: 'scoped-subtask', assignment },
+    runResult: { status: 'done', confidence: 'reported' },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(result.canAdvanceEdge, false);
+  assert.equal(result.stop, true);
+  assert.equal(result.reason, 'assignment-scoped-subtask-insufficient-confidence');
+  assert.equal(result.canProceed, undefined);
+});
+
+test('fix-verify-red: a real buildAssignment Assignment with reported confidence stops at the top-level gate, not the branch-level re-check', () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['fix-verify-red']);
+
+  const assignment = buildAssignment({
+    workId: 'tsk-fvr-topgate',
+    stage: 'executing',
+    operation: 'fix-verify-red',
+    options: { repoRoot: tempDir },
+  });
+
+  const result = interpretAssignmentRunResult({
+    choice: { operation: 'fix-verify-red', assignment },
+    runResult: { status: 'done', confidence: 'reported' },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(result.canAdvanceEdge, false);
+  assert.equal(result.stop, true);
+  assert.equal(result.reason, 'assignment-fix-verify-red-insufficient-confidence');
+  assert.equal(result.canProceed, undefined);
+});
+
+test('implement-item: a real buildAssignment Assignment with reported confidence stops at the top-level gate one step before the unsupported-operation catch-all', () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['implement-item']);
+
+  const assignment = buildAssignment({
+    workId: 'tsk-implement-topgate',
+    stage: 'executing',
+    operation: 'implement-item',
+    options: { repoRoot: tempDir },
+  });
+
+  const result = interpretAssignmentRunResult({
+    choice: { operation: 'implement-item', assignment },
+    runResult: { status: 'done', confidence: 'reported' },
+    repoRoot: tempDir,
+  });
+
+  assert.equal(result.canAdvanceEdge, false);
+  assert.equal(result.stop, true);
+  assert.equal(result.reason, 'assignment-implement-item-insufficient-confidence');
+  assert.equal(result.canProceed, undefined);
+});
+
 test('Step 06 Cell 6.6 end-to-end: executeAssignment + interpretAssignmentRunResult refuse a real undeclared-file mutation and allow a fully-declared one', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
@@ -5142,4 +5220,404 @@ test('reviewer LOW: a stored failed result from a read-only dirty mutation never
   const choice = choosePlanning(tempDir, planningWorkFor('tsk-s3-dirty', docsRef));
   assert.equal(choice.canAdvanceEdge, false, 'a settle-classified failed run stays failed even when the derivation inputs alone would call it reported');
   assert.equal(choice.reason, 'validation-failed-do-not-advance-work', 'the lost dirty-mutation fact may not upgrade the recorded failed verdict');
+});
+
+test('R6/G3: cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles fact and correctly reports failed, not silently downgraded to no-evidence', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r6-dirty-mutation-persisted';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r6-dirty-persisted',
+    docsRef,
+    withHash: true,
+    withReport: false,
+  });
+
+  // Honest settle shape: a read-only worker mutated a pre-existing dirty
+  // file (fail-closed at settle time, exit 0, no claim was ever written, no
+  // report), and the runner persisted the real mutatedDirtyBeforeFiles fact
+  // this cell adds. Without R6, hasDirtyBeforeMutation is hardcoded false
+  // cross-pass, so `changedFiles: [] || false` never trips the read-only
+  // fail-close branch, agentClaim is null so the done/blocked branches are
+  // skipped too, and the settled failed/failed verdict is silently
+  // downgraded to no-evidence/no-evidence on read-back (a real bug -- see
+  // this cell's safety-reasoning writeup for why this is a correctness
+  // fix, not just a hardening one).
+  const stored = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  stored.status = 'failed';
+  stored.confidence = 'failed';
+  stored.agentClaim = null;
+  delete stored.claimSha256;
+  stored.settleReports = [];
+  stored.runtime = { exitCode: 0, stdoutLog: 'stdout.log', stderrLog: 'stderr.log' };
+  stored.evidence = {
+    ...stored.evidence,
+    changedFiles: [],
+    mutatedDirtyBeforeFiles: [path.join(docsRef, 'preexisting-dirty.txt')],
+  };
+  fs.writeFileSync(resultPath, JSON.stringify(stored, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r6-dirty-persisted', docsRef));
+  assert.equal(choice.canAdvanceEdge, false);
+  assert.equal(choice.reason, 'validation-failed-do-not-advance-work',
+    'the persisted mutatedDirtyBeforeFiles fact must re-derive to failed, not silently downgrade to no-evidence');
+});
+
+test('R6/G3: an empty (but present) persisted mutatedDirtyBeforeFiles correctly derives false -- unchanged dirty files never block a legitimate reported verdict', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r6-dirty-unchanged';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r6-dirty-unchanged',
+    docsRef,
+    withHash: true,
+    withReport: true,
+  });
+
+  const stored = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  // A genuinely-unchanged pre-existing dirty file: the runner recorded an
+  // EXPLICIT empty mutatedDirtyBeforeFiles, not an absent key -- this must
+  // derive `false`, not just fall through to a default that happens to
+  // also be false.
+  stored.evidence = { ...stored.evidence, mutatedDirtyBeforeFiles: [] };
+  fs.writeFileSync(resultPath, JSON.stringify(stored, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r6-dirty-unchanged', docsRef));
+  assert.equal(choice.canAdvanceEdge, true);
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge',
+    'an explicit empty mutatedDirtyBeforeFiles must derive hasDirtyBeforeMutation: false, not block a legitimate reported verdict');
+});
+
+test('R6/G3: an evidence.json written before this field existed (no mutatedDirtyBeforeFiles key) fails safe to hasDirtyBeforeMutation: false', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r6-legacy-no-key';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r6-legacy-no-key',
+    docsRef,
+    withHash: true,
+    withReport: false,
+  });
+
+  const stored = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  // Legacy shape: settled no-evidence (no claim, no report), and this
+  // result.json predates R6 -- no mutatedDirtyBeforeFiles key at all.
+  stored.status = 'no-evidence';
+  stored.confidence = 'no-evidence';
+  stored.agentClaim = null;
+  delete stored.claimSha256;
+  stored.settleReports = [];
+  stored.runtime = { exitCode: 0, stdoutLog: 'stdout.log', stderrLog: 'stderr.log' };
+  stored.evidence = { changedFiles: [] };
+  fs.writeFileSync(resultPath, JSON.stringify(stored, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r6-legacy-no-key', docsRef));
+  assert.equal(choice.canAdvanceEdge, false);
+  assert.equal(choice.reason, 'validation-no-evidence-do-not-advance-work',
+    'a missing mutatedDirtyBeforeFiles key must fail safe to hasDirtyBeforeMutation: false, matching the no-evidence settle verdict');
+});
+
+test('R6/G3: a malformed (non-array) mutatedDirtyBeforeFiles fails safe to hasDirtyBeforeMutation: false rather than throwing', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r6-malformed-field';
+  const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r6-malformed-field',
+    docsRef,
+    withHash: true,
+    withReport: true,
+  });
+
+  const stored = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  // A tampered or corrupted result.json where mutatedDirtyBeforeFiles is
+  // present but not an array (e.g. a stray boolean/string) -- the
+  // Array.isArray guard must fail safe to false, never throw and never
+  // coerce a truthy non-array into hasDirtyBeforeMutation: true.
+  stored.evidence = { ...stored.evidence, mutatedDirtyBeforeFiles: true };
+  fs.writeFileSync(resultPath, JSON.stringify(stored, null, 2));
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r6-malformed-field', docsRef));
+  assert.equal(choice.canAdvanceEdge, true);
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge',
+    'a non-array mutatedDirtyBeforeFiles must fail safe via Array.isArray, never throw or coerce to hasDirtyBeforeMutation: true');
+});
+
+test('ADR-006 R7 (P02.4 mutation backfill): findLatestAssignmentRunResult re-derives mutation from the operation when assignment.json predates the field -- a genuinely read-only validate-plan result is not misclassified as mutating', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r7-mutation-backfill';
+  // seedStoredValidatePlanResult's assignment.json intentionally carries no
+  // `role`/`mutation` field -- the "assignment.json predates the field"
+  // scenario R5 already documented for `resultKind` and this cell now closes
+  // for `mutation` too. No external evidence (no changedFiles, no dirty
+  // mutation) -- a genuinely read-only validate-plan result.
+  const { resultPath, asgnDir } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r7-mutation-backfill',
+    docsRef,
+    withHash: true,
+    withReport: true,
+  });
+  const asgnJson = JSON.parse(fs.readFileSync(path.join(asgnDir, 'assignment.json'), 'utf8'));
+  assert.equal(asgnJson.mutation, undefined, 'fixture precondition: assignment.json carries no mutation field');
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r7-mutation-backfill', docsRef));
+  // Without the backfill, isReadOnlyAssignment(asgn) sees mutation ===
+  // undefined and returns false (R7's own field-only read has no fallback),
+  // misclassifying this genuinely read-only result as mutating --
+  // classifyRunEvidence then falls into the mutating "done" branch
+  // (hasExternalEvidence false) and derives no-evidence/no-evidence,
+  // blocking the edge instead of advancing it. With the backfill, mutation
+  // re-derives to 'read-only' for the validate-plan operation (the same
+  // value assignment-normalizer.mjs would have stamped at build time), and
+  // the reported claim + bound report correctly advances the edge.
+  assert.equal(choice.canAdvanceEdge, true,
+    'a stored validate-plan result with no persisted mutation field must still classify read-only via the operation-derived backfill');
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge',
+    'the mutation backfill must let a genuinely read-only cross-pass result advance the edge, not misclassify it as mutating no-evidence');
+});
+
+// ---------------------------------------------------------------------------
+// ADR-006 R5: interpretAssignmentRunResult/findLatestAssignmentRunResult
+// dispatch on the Assignment's own stamped fields, not the operation id;
+// executeDriverOperationChoice's validate-plan special case becomes
+// onAdvance dispatch to Phase 01's planVerdictFromPlanMd.
+// ---------------------------------------------------------------------------
+
+test('ADR-006 R5: interpretAssignmentRunResult dispatches into the validate-plan-shaped branch off the stamped resultKind "gate-verdict", independent of the operation string', () => {
+  // The operation string here names an operation that has no branch of its
+  // own at all ("shape-plan" falls through to the final unsupported-operation
+  // catch-all when read the old way). The ONLY way the validate-plan-shaped
+  // branch can fire is by reading `choice.assignment.resultKind` -- proving
+  // the dispatch key genuinely changed, not merely that the five originally-
+  // tested operation strings still happen to work.
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'shape-plan', assignment: { resultKind: 'gate-verdict' } },
+    runResult: {
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: { status: 'done', verdict: 'READY', summary: 'Feasible' },
+      evidence: { artifacts: ['agent-result.json'] },
+    },
+  });
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  // 'validate-plan-missing-report-artifact' is a reason string that only the
+  // validate-plan-shaped branch body ever returns (checked before any of that
+  // branch's other logic) -- reaching it proves that branch executed, not the
+  // final `assignment-shape-plan-unsupported-operation` catch-all.
+  assert.equal(interpreted.reason, 'validate-plan-missing-report-artifact');
+});
+
+test('ADR-006 R5: interpretAssignmentRunResult dispatches into the review-item-shaped branch off the stamped resultKind "review-verdict", independent of the operation string', () => {
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'not-a-real-operation', assignment: { resultKind: 'review-verdict' } },
+    runResult: { status: 'done', confidence: 'reported' },
+  });
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  // 'review-item-missing-evidence-refs' is review-item's own branch body's
+  // FIRST check -- reaching it proves the review-item-shaped branch fired
+  // off resultKind alone, since 'not-a-real-operation' matches no operation
+  // string anywhere in the function.
+  assert.equal(interpreted.reason, 'review-item-missing-evidence-refs');
+});
+
+test('ADR-006 R5: an Assignment with no stamped resultKind at all (bare choice, no assignment field) still resolves an unrecognized operation to the unsupported-operation catch-all — the fallback derivation never invents a resultKind for an operation outside the known table', () => {
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'not-a-real-operation' },
+    runResult: { status: 'done', confidence: 'reported' },
+  });
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'assignment-not-a-real-operation-unsupported-operation');
+});
+
+test('ADR-006 R5: findLatestAssignmentRunResult filters candidates by the stamped resultKind field, not the operation id (planning cross-pass path unaffected when assignment.json predates the field)', () => {
+  // seedStoredValidatePlanResult (Cell 6.2 fixture, above) writes
+  // assignment.json with `operation: 'validate-plan'` and no `resultKind`
+  // field at all -- the exact shape an assignment.json written before this
+  // ADR-006 stamp existed would have. The permissive-on-missing-field filter
+  // must still surface it (same stance the old operation-based filter took).
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+  const docsRef = 'docs/history/r5-resultkind-filter';
+  seedStoredValidatePlanResult(tempDir, { id: 'tsk-r5-filter', docsRef, withHash: true, withReport: true });
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r5-filter', docsRef));
+  assert.equal(choice.canAdvanceEdge, true, 'a stored validate-plan result with no resultKind field on disk must still be found and interpreted');
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
+// ---------------------------------------------------------------------------
+// ADR-007 §3: the non-driving rule -- an inline Assignment's RunResult is
+// never interpreted as a Stage verdict or lifecycle signal.
+// findLatestAssignmentRunResult must skip a stored result whose
+// assignment.json carries provenance.kind === 'inline', in the same
+// filter chain as its existing stage/resultKind checks.
+// ---------------------------------------------------------------------------
+
+test('ADR-007 §3: an inline Assignment with a READY-looking claim on a planning Work is never picked up by the cross-pass filter -- the driver falls back to requesting a real validate-plan run instead of advancing the edge', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r2-inline-non-driving';
+  const { asgnDir } = seedStoredValidatePlanResult(tempDir, { id: 'tsk-r2-inline', docsRef, withHash: true, withReport: true });
+
+  // Stamp the exact same stored, otherwise-fully-valid READY result as
+  // inline provenance -- everything about the evidence itself (claim,
+  // report, hashes, dispatched-run manifest) stays legitimate; only the
+  // provenance kind changes.
+  const asgnJsonPath = path.join(asgnDir, 'assignment.json');
+  const asgnJson = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
+  asgnJson.provenance = { kind: 'inline' };
+  fs.writeFileSync(asgnJsonPath, JSON.stringify(asgnJson));
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r2-inline', docsRef));
+  // Not advanced: the inline result must be invisible to the driver, so
+  // planning falls back to its own "plan.md exists, validation still due"
+  // default path rather than reading validate-plan's READY verdict.
+  assert.equal(choice.canAdvanceEdge, false, 'an inline Assignment\'s RunResult must never be treated as a Stage verdict');
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+  assert.notEqual(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
+test('ADR-007 §3 regression: a declared validate-plan READY result (provenance.kind: "declared") still advances the edge unmodified', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r2-declared-regression';
+  const { asgnDir } = seedStoredValidatePlanResult(tempDir, { id: 'tsk-r2-declared', docsRef, withHash: true, withReport: true });
+
+  const asgnJsonPath = path.join(asgnDir, 'assignment.json');
+  const asgnJson = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
+  asgnJson.provenance = { kind: 'declared' };
+  fs.writeFileSync(asgnJsonPath, JSON.stringify(asgnJson));
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-r2-declared', docsRef));
+  assert.equal(choice.canAdvanceEdge, true, 'an explicitly declared-provenance result must still be consumable cross-pass');
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
+test('ADR-007 §3: an inline Assignment\'s RunResult fed directly into chooseStageOperation\'s own lastRunResult parameter is ignored, not just when discovered via the internal cross-pass scan', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/r2-inline-direct-injection';
+  const { asgnDir, resultPath } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-r2-inline-direct',
+    docsRef,
+    withHash: true,
+    withReport: true,
+  });
+
+  const asgnJsonPath = path.join(asgnDir, 'assignment.json');
+  const asgnJson = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
+  asgnJson.provenance = { kind: 'inline' };
+  fs.writeFileSync(asgnJsonPath, JSON.stringify(asgnJson));
+
+  // The exact real-RunResult shape a caller would hold after reading
+  // result.json back (or after a real executeAssignment() call): it never
+  // carries provenance directly, only its own assignmentId.
+  const realRunResult = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  assert.equal(realRunResult.assignmentId, asgnJson.assignmentId);
+  assert.equal(realRunResult.provenance, undefined, 'a real RunResult never carries provenance directly -- only assignmentId');
+
+  const bypassAttempt = choosePlanning(tempDir, planningWorkFor('tsk-r2-inline-direct', docsRef), {
+    lastRunResult: realRunResult,
+  });
+  assert.equal(
+    bypassAttempt.canAdvanceEdge,
+    false,
+    'an inline Assignment\'s real RunResult, fed directly as lastRunResult, must never drive canAdvanceEdge -- regardless of how lastRunResult was populated',
+  );
+  assert.notEqual(bypassAttempt.reason, 'validation-passed-ready-for-planning-edge');
+
+  // Matches the auto-discovery path's own outcome for the exact same
+  // on-disk state -- the direct-injection path and the internal fallback
+  // must agree once the guard is in place.
+  const autoDiscovery = choosePlanning(tempDir, planningWorkFor('tsk-r2-inline-direct', docsRef));
+  assert.equal(bypassAttempt.reason, autoDiscovery.reason);
+});
+
+test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch derives a decompose verdictPayload from plan.md\'s own committed "## Split" section', async () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['validate-plan']);
+  const docsRef = 'docs/history/r5-onadvance-decompose';
+  const docsDir = path.join(tempDir, docsRef);
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(docsDir, 'plan.md'),
+    '# Mode: standard\nProposed plan.\n\n## Split\n```json\n[{"title": "Child A"}]\n```\n',
+  );
+
+  const executorScript = writeFakeExecutor(tempDir, { status: 'done', verdict: 'READY', summary: 'READY' });
+  const work = { id: 'tsk-r5-onadvance', status: 'doing', stage: 'planning', domain: 'coding', workflow: 'feature', docsRef };
+  const choice = chooseStageOperation({ work, contextSignals: { hasPlan: true, validationDue: true } });
+
+  const outcome = await executeDriverOperationChoice(work, choice, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig: runnerConfigFor(executorScript),
+  });
+
+  assert.equal(outcome.canAdvanceEdge, true);
+  assert.equal(outcome.assignment.onAdvance, 'derive-plan-verdict-from-plan-md');
+  assert.deepEqual(outcome.verdictPayload, {
+    verdict: 'decompose',
+    children: [{ title: 'Child A' }],
+    reason: 'plan.md\'s own "## Split" section declares a split into 1 piece(s).',
+  });
+});
+
+test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch resolves verdictPayload undefined when plan.md never reaches a "## Split" section — never fabricates a verdict from silence', async () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['validate-plan']);
+  const docsRef = 'docs/history/r5-onadvance-no-split';
+  const docsDir = path.join(tempDir, docsRef);
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: standard\nProposed plan, no split section at all.\n');
+
+  const executorScript = writeFakeExecutor(tempDir, { status: 'done', verdict: 'READY', summary: 'READY' });
+  const work = { id: 'tsk-r5-onadvance-noop', status: 'doing', stage: 'planning', domain: 'coding', workflow: 'feature', docsRef };
+  const choice = chooseStageOperation({ work, contextSignals: { hasPlan: true, validationDue: true } });
+
+  const outcome = await executeDriverOperationChoice(work, choice, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig: runnerConfigFor(executorScript),
+  });
+
+  assert.equal(outcome.canAdvanceEdge, true);
+  assert.equal(outcome.assignment.onAdvance, 'derive-plan-verdict-from-plan-md');
+  assert.equal(outcome.verdictPayload, undefined);
 });

@@ -152,6 +152,83 @@ test('executeAssignment produces status: done and confidence: reported when work
   assert.equal(storedResult.confidence, 'reported');
 });
 
+test('executeAssignment backfills mutation for its own effectiveAssignment re-read when a legacy assignment.json already exists on disk (ADR-006 R7, P02.4 Red-Team HIGH fix)', async () => {
+  const tempDir = mkTempDir();
+
+  const executorScript = path.join(tempDir, 'legacy-reporter-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    const asgnDir = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(asgnDir)) {
+      for (const a of fs.readdirSync(asgnDir)) {
+        const runDir = path.join(asgnDir, a, 'runs', '01');
+        if (fs.existsSync(runDir)) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Background Brief\\nFound existing code paths.\\n');
+          fs.writeFileSync(
+            path.join(runDir, 'agent-result.json'),
+            JSON.stringify({ status: 'done', summary: 'Background evidence gathered' }),
+          );
+        }
+      }
+    }
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  // A genuinely read-only, mission-shaped assignment (missionId set, correctly
+  // stamped mutation: 'read-only' by buildAssignment/the normalizer).
+  const assignment = buildAssignment({
+    workId: null,
+    missionId: 'mission_effectiveassignment_legacy_test',
+    stage: 'planning',
+    operation: 'resolve-question',
+    role: 'researcher',
+    objective: 'Gather facts for planning validation.',
+  });
+  assert.equal(assignment.mutation, 'read-only');
+
+  // Pre-seed a LEGACY assignment.json at the exact path executeAssignment's
+  // own effectiveAssignment re-read consults (.fgos/assignments/<id>/assignment.json)
+  // -- simulating a file persisted before ADR-006 R2 added the mutation/
+  // resultKind/evidence/onAdvance stamps -- BEFORE executeAssignment is ever
+  // called, so its "already exists on disk" branch fires and discards
+  // whatever object the caller passes in.
+  const assignmentDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  fs.mkdirSync(assignmentDir, { recursive: true });
+  const legacyAssignment = { ...assignment };
+  delete legacyAssignment.mutation;
+  delete legacyAssignment.resultKind;
+  delete legacyAssignment.evidence;
+  delete legacyAssignment.onAdvance;
+  fs.writeFileSync(path.join(assignmentDir, 'assignment.json'), `${JSON.stringify(legacyAssignment, null, 2)}\n`);
+
+  // Mirrors cli.mjs's execute --assignment subcommand: a mission-shaped
+  // assignment object drives isMissionLite: true.
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    isMissionLite: true,
+  });
+
+  assert.equal(result.status, 'done');
+  assert.equal(result.confidence, 'reported');
+});
+
 test('executeAssignment produces status: no-evidence when executor exits zero without producing report artifacts', async () => {
   const tempDir = mkTempDir();
 
@@ -526,6 +603,61 @@ test('executeAssignment does not count pre-existing dirty files as run evidence 
     'pre-existing dirty file must not be counted as run evidence');
   assert.equal(result.status, 'no-evidence');
   assert.equal(result.confidence, 'no-evidence');
+  // R6/G3: an unchanged pre-existing dirty file must correctly derive an
+  // EMPTY mutatedDirtyBeforeFiles (re-read hash matched the pre-launch
+  // snapshot) -- not just a default/absent value.
+  assert.ok(Array.isArray(result.evidence.mutatedDirtyBeforeFiles),
+    'evidence.mutatedDirtyBeforeFiles must be present as an array');
+  assert.deepEqual(result.evidence.mutatedDirtyBeforeFiles, [],
+    'an unchanged pre-existing dirty file must not appear in mutatedDirtyBeforeFiles');
+});
+
+test('executeAssignment persists mutatedDirtyBeforeFiles (in both evidence.json and result.json) for a read-only op whose worker mutates a pre-existing dirty file (R6/G3)', async () => {
+  const tempDir = mkTempDir();
+
+  execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: tempDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tempDir, 'committed.txt'), 'initial\n');
+  execFileSync('git', ['add', '.'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial'], { cwd: tempDir, stdio: 'ignore' });
+  // Make a file dirty BEFORE the run, then have the (read-only) worker
+  // mutate that same file further during the run.
+  fs.writeFileSync(path.join(tempDir, 'preexisting-dirty.txt'), 'dirty before run\n');
+
+  const executorScript = path.join(tempDir, 'mutate-dirty-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    fs.writeFileSync(path.join(process.cwd(), 'preexisting-dirty.txt'), 'mutated during run\\n');
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({ workId: 'tsk-dirty-mutated', stage: 'planning', operation: 'validate-plan' });
+
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  // A read-only op that mutates a pre-existing dirty file must fail closed.
+  assert.equal(result.status, 'failed', 'a read-only op that mutates a pre-existing dirty file must fail closed');
+  assert.equal(result.confidence, 'failed');
+  assert.deepEqual(result.evidence.mutatedDirtyBeforeFiles, ['preexisting-dirty.txt'],
+    'result.json evidence must persist the mutated pre-existing dirty file (R6)');
+
+  const evidencePath = path.join(
+    tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01', 'evidence.json',
+  );
+  const evidence = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
+  assert.deepEqual(evidence.mutatedDirtyBeforeFiles, ['preexisting-dirty.txt'],
+    'evidence.json must also persist the mutated pre-existing dirty file (R6)');
 });
 
 test('executeAssignment counts only new dirty files as run evidence (Step 04 §5.3)', async () => {
@@ -964,6 +1096,169 @@ test('executeAssignment with real substantive report text produces confidence: r
 
   assert.equal(result.status, 'done', 'real report text must produce status: done');
   assert.equal(result.confidence, 'reported', 'real report text must produce confidence: reported');
+});
+
+test('executeAssignment captures gitBefore pre-launch when the worker commits then crashes (Cell 6.7 G6)', async () => {
+  const tempDir = mkTempDir();
+
+  // Real git repo, one committed file.
+  execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: tempDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tempDir, 'tracked.txt'), 'initial content\n');
+  execFileSync('git', ['add', '.'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial'], { cwd: tempDir, stdio: 'ignore' });
+  const shaBeforeRun = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tempDir, encoding: 'utf8' }).trim();
+
+  // Worker commits a change, then exits nonzero -- simulates a crash AFTER a
+  // real commit landed, the exact scenario G6 exists to make visible instead
+  // of silently masking (gitBefore/gitAfter must never both read the git
+  // HEAD post-crash, which would make them look identical even though a
+  // commit happened mid-run).
+  const executorScript = path.join(tempDir, 'crash-after-commit-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    import { execFileSync } from 'node:child_process';
+    const cwd = process.cwd();
+    fs.writeFileSync(path.join(cwd, 'tracked.txt'), 'worker committed content\\n');
+    execFileSync('git', ['add', '.'], { cwd, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'worker commit before crash'], { cwd, stdio: 'ignore' });
+    process.stderr.write('Simulated crash after commit\\n');
+    process.exit(1);
+    `,
+  );
+
+  const runnerConfig = {
+    executors: {
+      claude: {
+        kind: 'agent',
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+        allowCrossProvider: true,
+      },
+    },
+    modelPolicies: {
+      claude: { standard: 'test-model' },
+    },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-crash-after-commit',
+    stage: 'executing',
+    operation: 'implement-item',
+  });
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+  });
+
+  // Worker crashed (nonzero exit) -- must fail closed regardless of the
+  // commit it made.
+  assert.equal(result.status, 'failed');
+  assert.equal(result.confidence, 'failed');
+
+  // The core G6 assertion: gitBefore was captured BEFORE the worker's
+  // commit landed, so it must differ from gitAfter (captured post-crash) --
+  // and must equal the real pre-run HEAD sha, not the post-commit one.
+  assert.equal(result.evidence.gitBefore, shaBeforeRun);
+  assert.notEqual(result.evidence.gitBefore, result.evidence.gitAfter);
+  assert.equal(result.evidence.gitBeforeSource, 'pre-launch');
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const evidenceData = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
+  assert.equal(evidenceData.gitBefore, shaBeforeRun);
+  assert.notEqual(evidenceData.gitBefore, evidenceData.gitAfter);
+  assert.equal(evidenceData.gitBeforeSource, 'pre-launch');
+});
+
+// This test and the one above it exercise genuinely different code paths: a
+// nonzero exit still RESOLVES executeExecutorCli (proving status/confidence
+// classification of a crash), while this test forces executeExecutorCli to
+// REJECT (proving gitBefore is captured pre-launch, not read from a
+// rawResult that a rejection path never produces).
+test('executeAssignment captures gitBefore pre-launch when the worker commits then the run rejects via worker-timeout', async () => {
+  const tempDir = mkTempDir();
+
+  // Real git repo, one committed file.
+  execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: tempDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tempDir, 'tracked.txt'), 'initial content\n');
+  execFileSync('git', ['add', '.'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial'], { cwd: tempDir, stdio: 'ignore' });
+  const shaBeforeRun = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tempDir, encoding: 'utf8' }).trim();
+
+  // Worker commits a change, then hangs well past a short timeoutMs -- this
+  // makes executeExecutorCli genuinely REJECT with a worker-timeout
+  // DispatchError, landing in assignment-runner.mjs's own catch block
+  // (rawResult built with no headBefore/headAfter field), the only branch
+  // the R2 fix actually changes.
+  const executorScript = path.join(tempDir, 'commit-then-hang-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    import { execFileSync } from 'node:child_process';
+    const cwd = process.cwd();
+    fs.writeFileSync(path.join(cwd, 'tracked.txt'), 'worker committed content before hang\\n');
+    execFileSync('git', ['add', '.'], { cwd, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'worker commit before hang'], { cwd, stdio: 'ignore' });
+    process.stderr.write('Simulated hang after commit\\n');
+    execFileSync('sleep', ['5']);
+    `,
+  );
+
+  const runnerConfig = {
+    executors: {
+      claude: {
+        kind: 'agent',
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+        allowCrossProvider: true,
+      },
+    },
+    modelPolicies: {
+      claude: { standard: 'test-model' },
+    },
+    timeoutMs: 300,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-commit-then-hang',
+    stage: 'executing',
+    operation: 'implement-item',
+  });
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+  });
+
+  // Worker was killed on timeout -- must fail closed regardless of the
+  // commit it made before hanging.
+  assert.equal(result.status, 'failed');
+  assert.equal(result.confidence, 'failed');
+
+  // The core assertion: gitBefore was captured BEFORE the worker's commit
+  // landed, so it must differ from gitAfter (captured post-timeout) -- and
+  // must equal the real pre-run HEAD sha, not the post-commit one.
+  assert.equal(result.evidence.gitBefore, shaBeforeRun);
+  assert.notEqual(result.evidence.gitBefore, result.evidence.gitAfter);
+  assert.equal(result.evidence.gitBeforeSource, 'pre-launch');
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const evidenceData = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
+  assert.equal(evidenceData.gitBefore, shaBeforeRun);
+  assert.notEqual(evidenceData.gitBefore, evidenceData.gitAfter);
+  assert.equal(evidenceData.gitBeforeSource, 'pre-launch');
 });
 
 
