@@ -58,18 +58,19 @@ of a blanket "unrelated" pass.
 | 04 | R1-R9 | done |
 | 05 | R1-R8 | done |
 | 06 | R1-R8 | done |
-| 07 | R1-R8 | pending (06 done; not yet scoped into cells) |
+| 07 | R1-R8 | R1-R4 done (P07.1); R5-R8 pending (P07.2, closes the plan) |
 
 ## Active Cell
 
-None (Phase 06 closed; Phase 07 not yet scoped)
+None (P07.1 closed; P07.2 not yet scoped — closes Phase 07 AND the
+entire plan)
 
 ## Next Action
 
-coordinator — read phase-07-headless-parity-cli-and-adoption.md in full
-and scope it into cells before dispatching a Doer; Phase 07 is the
-plan's own final phase (includes the plan-level final Deferral Audit,
-AC-I001-I009)
+coordinator — scope Phase 07 R5-R8 (capability parity live proof,
+external adoption live proof, canonical closure, the plan's own FINAL
+Deferral Audit AC-I001-I009) into a P07.2 brief before dispatching a
+Doer
 
 ## Cell Log
 
@@ -91,7 +92,8 @@ AC-I001-I009)
 | P05.1 | Phase 05 R1, R2, R3, R4 | done | `833888ba` |
 | P05.2 | Phase 05 R5, R6, R7, R8 (closes Phase 05) — honest null result | done | `7910fc22` (R5), `c852814d` (config), `bd785402` (R6-R8+trace) |
 | P06.1 | Phase 06 R1, R2, R3, R4 — 2 real HIGH bugs found+fixed (2 rounds) | done | `a9613222` |
-| P06.2 | Phase 06 R5, R6, R7, R8 (closes Phase 06) — 5 real bugs found+fixed (2 rounds) | done | pending |
+| P06.2 | Phase 06 R5, R6, R7, R8 (closes Phase 06) — 5 real bugs found+fixed (2 rounds) | done | `93108c14` |
+| P07.1 | Phase 07 R1, R2, R3, R4 — R2 boundary held clean; 1 content defect fixed | done | pending |
 
 ## Phase 00 Status
 

@@ -1,0 +1,113 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Run the full 6-phase Group Cognition framework over a design question: divergent exploration, clustering, adversarial critique, evidence review, convergent synthesis, and a final recommendation-with-dissent.",
+  "writerId": "coordination-example-group-cognition-framework",
+  "protocolRef": { "id": "core.coordination-protocol.group-cognition-framework" },
+  "steps": [
+    {
+      "type": "operation",
+      "as": "facilitate",
+      "operationId": "dispatch-exploration",
+      "objective": "Open the divergent-exploration phase for three independent explorers who will each receive the objective directly.",
+      "expectedOutputs": [
+        "A short framing/confirmation note (agent-result.json status, summary)",
+        "agent-report.md: a short human-readable framing/confirmation note"
+      ]
+    },
+    {
+      "type": "fan-out",
+      "as": "explore",
+      "operationId": "divergent-exploration",
+      "fromAssignmentId": "$ref:facilitate",
+      "branches": [
+        {
+          "actorId": "explorer-a",
+          "objective": "Explore unconventional or unexpected approaches to the objective above -- angles a straightforward answer might miss.",
+          "expectedOutputs": [
+            "A divergent exploration finding (agent-result.json status, summary)",
+            "agent-report.md: a short human-readable divergent exploration finding"
+          ]
+        },
+        {
+          "actorId": "explorer-b",
+          "objective": "Give a grounded, standard-practice approach to the objective above.",
+          "expectedOutputs": [
+            "A divergent exploration finding (agent-result.json status, summary)",
+            "agent-report.md: a short human-readable divergent exploration finding"
+          ]
+        },
+        {
+          "actorId": "explorer-c",
+          "objective": "Actively challenge the premise -- argue for why this might not be as simple as it looks, even if others would disagree.",
+          "expectedOutputs": [
+            "A divergent exploration finding (agent-result.json status, summary)",
+            "agent-report.md: a short human-readable divergent exploration finding"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "cluster",
+      "operationId": "cluster-deduplicate",
+      "objective": "Cluster and deduplicate the three explorers' findings into named groups. Explicitly preserve and label any minority/outlier point -- never discard or silently merge a dissenting view.",
+      "expectedOutputs": [
+        "Named clusters of findings",
+        "Explicitly labeled minority/outlier candidates preserved, not discarded",
+        "agent-report.md: a short human-readable report of named clusters and preserved minority/outlier candidates"
+      ],
+      "contextRefs": ["$ref:explore.explorer-a", "$ref:explore.explorer-b", "$ref:explore.explorer-c"]
+    },
+    {
+      "type": "operation",
+      "as": "critique",
+      "operationId": "critical-challenge",
+      "objective": "Adversarially critique the clustered findings: identify weak/unsupported claims and missing risks.",
+      "expectedOutputs": [
+        "A critique naming weak/unsupported claims and missing risks",
+        "agent-report.md: a short human-readable critique naming weak/unsupported claims and missing risks"
+      ],
+      "fromAssignmentId": "$ref:cluster"
+    },
+    {
+      "type": "operation",
+      "as": "evidence",
+      "operationId": "evidence-review",
+      "objective": "Audit the critic's critique for which claims are grounded in the objective/context vs. unsupported speculation.",
+      "expectedOutputs": [
+        "A per-claim grounded/unsupported assessment of the critique",
+        "agent-report.md: a short human-readable per-claim grounded/unsupported assessment"
+      ],
+      "fromAssignmentId": "$ref:critique"
+    },
+    {
+      "type": "operation",
+      "as": "synthesis",
+      "operationId": "convergent-synthesis",
+      "objective": "Synthesize a converged draft across every phase so far. Preserve decision criteria, accepted evidence, unsupported claims, alternatives, risks, and minority/dissenting positions exactly as found -- never infer consensus from branch count alone.",
+      "expectedOutputs": [
+        "A converged draft synthesis preserving dissent and unsupported-claim flags",
+        "agent-report.md: a short human-readable converged draft synthesis preserving dissent and unsupported-claim flags"
+      ],
+      "contextRefs": [
+        "$ref:explore.explorer-a", "$ref:explore.explorer-b", "$ref:explore.explorer-c",
+        "$ref:cluster", "$ref:critique", "$ref:evidence"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "recommendation",
+      "operationId": "recommend-with-dissent",
+      "objective": "Produce the final recommendation-with-dissent report: decision criteria, accepted evidence, unsupported claims, alternatives, risks, unresolved questions, minority/dissenting positions, missing/failed actors (if any), and a proposed next action.",
+      "expectedOutputs": [
+        "A recommendation-with-dissent report covering all required elements",
+        "agent-report.md: a short human-readable recommendation-with-dissent report covering all required elements"
+      ],
+      "contextRefs": [
+        "$ref:synthesis",
+        "$ref:explore.explorer-a", "$ref:explore.explorer-b", "$ref:explore.explorer-c",
+        "$ref:cluster", "$ref:critique", "$ref:evidence"
+      ]
+    }
+  ]
+}

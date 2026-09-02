@@ -1,0 +1,29 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Get a reviewer's second opinion on a reported version string before trusting it.",
+  "writerId": "coordination-example-declared-consult",
+  "protocolRef": { "id": "core.coordination-protocol.declared-consult" },
+  "steps": [
+    {
+      "type": "operation",
+      "as": "request",
+      "operationId": "request-consult",
+      "objective": "Read package.json and report the name/version you find, then ask the consultant to double-check it.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary) naming the package's name and version",
+        "agent-report.md: a short human-readable report stating the name and version you found"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "response",
+      "operationId": "provide-consult",
+      "objective": "Independently re-read package.json and confirm or correct the requester's reported name/version.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary) confirming or correcting the requester's finding",
+        "agent-report.md: a short human-readable report confirming or correcting the requester's finding"
+      ],
+      "fromAssignmentId": "$ref:request"
+    }
+  ]
+}

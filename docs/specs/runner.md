@@ -1254,11 +1254,19 @@ lúc huỷ vẫn được phép `linkResult` khi nó settle muộn. Mọi trạn
 đi tiếp từ trạng thái cuối. Chi tiết đầy đủ:
 `docs/architect/agent-coordination/contracts/coordination-session.md`.
 
-**CLI.** Bề mặt tối thiểu (thiết kế, chưa có verb thật): `fgos coordination
-run --file <request>` (chạy đồng bộ) và `fgos coordination show <id> --json`
-(đọc-thôi). Override executor/model/tier con người vẫn đi qua đúng cửa
-Assignment CLI hiện có (`--executor`/`--model`/`--tier`), không mở cửa
-infrastructure riêng cho coordination.
+**CLI.** Verb thật (Step 08 Phase 07 R1-R4, `src/verbs/coordination/{schema,run,show}.mjs`
++ `bin/fgos.mjs`): `fgos coordination run --file <request>` (chạy đồng bộ,
+mở session + dispatch mọi step khai báo + thử đóng-theo-quorum trong một
+lời gọi) và `fgos coordination show <id> --json` (đọc-thôi, không mutation/
+external effect). Override executor/model/tier con người đi qua đúng cờ CLI
+toàn cục hiện có (`--executor`/`--model`/`--tier`), không mở cửa
+infrastructure riêng cho coordination; chính sách per-actor (executor/model/
+tier/persona) chỉ được khai trong request file's `actors[]`, không bao giờ
+trong protocol reference. Headless adapter cùng entry point engine
+(`src/runner/coordination/headless-adapter.mjs`'s `runCoordinationHeadless`),
+khác duy nhất ở attachment/visibility/invocation lifecycle (R4). Ví dụ thật:
+`docs/how-to/coordination-examples/*.json`; how-to:
+`docs/how-to/run-a-coordination-session.md`.
 
 **Ranh giới Work.** Một CoordinationSession có thể THAM CHIẾU Work làm context
 đọc-thôi nhưng không bao giờ tự chuyển stage/status, không tự nhận acceptance/
