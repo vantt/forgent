@@ -126,8 +126,9 @@ vì trường `access` bị xoá). Mỗi mục verb mang:
   **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục
   độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,
   sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù
-  bản thân `review` không hề ghi trạng thái). Hôm nay chỉ `review` và
-  `approve` mang `externalEffect: true`.
+  bản thân `review` không hề ghi trạng thái). Xem `fgos --help --json` cho
+  danh sách hiện hành mang `externalEffect: true` (ví dụ `review`, `approve`,
+  `coordination` — dispatch executor thật tính là effect ngoài `.fgos/`).
 - `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng.
 
 Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa

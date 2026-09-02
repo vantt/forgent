@@ -1,0 +1,106 @@
+{
+  "runId": "run_asgn_p05_2_r7_proof_driver_op_006_01",
+  "assignmentId": "asgn_p05_2_r7_proof_driver_op_006",
+  "workId": null,
+  "executorId": "claude-reviewer",
+  "policy": {
+    "role": "critic",
+    "executorPreference": [
+      "claude"
+    ],
+    "executorId": "claude",
+    "providerModel": "claude",
+    "tier": "critical",
+    "model": "opus",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude"
+        }
+      },
+      "model": {
+        "value": "opus",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "claude.critical"
+        }
+      },
+      "tier": {
+        "value": "critical",
+        "source": {
+          "scope": "operation",
+          "id": "critical-challenge"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_p05_2_r7_proof_driver_op_006"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "executorRedirected": true,
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_006/runs/01/agent-report.md",
+      "sha256": "f0f040ca640bbbe6240b960858d8ce3f00d9350d187fc578798508b563e58786"
+    }
+  ],
+  "status": "failed",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_006/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_006/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "failed",
+    "summary": "agent-result.json was present but failed schema validation"
+  },
+  "evidence": {
+    "gitBefore": null,
+    "gitAfter": null,
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_006/runs/01/agent-report.md"
+    ],
+    "tests": []
+  }
+}

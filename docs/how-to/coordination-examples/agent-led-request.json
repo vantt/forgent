@@ -1,0 +1,13 @@
+{
+  "kind": "agent-led",
+  "objective": "Read package.json in the current workspace and report its declared name and version.",
+  "writerId": "coordination-example-agent-led",
+  "primaryRole": "researcher",
+  "task": {
+    "expectedOutputs": [
+      "agent-result.json (status, summary) naming the package's name and version",
+      "agent-report.md: a short human-readable report stating the package's name and version"
+    ],
+    "evidenceRequired": "reported"
+  }
+}

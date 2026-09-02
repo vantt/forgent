@@ -3,10 +3,22 @@
 Document type: Vocabulary
 Design status: Accepted
 Implementation: Active
-Last reviewed: 2026-08-31
+Last reviewed: 2026-09-01
 Canonical for: deprecated aliases, overloaded terms, and reserved vocabulary
 
 ## Reserved
+
+### Participant
+
+Reserved for the existing fgOS platform-level concept: any process that
+speaks the fgOS event-log contract is a full "participant"
+(`docs/specs/platform-foundations.md` D0014,
+`docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md`).
+That definition lives outside this documentation tree and is not restated
+here. Do not reuse `Participant` for the agent-coordination actor-instance
+concept — the addressable instance that fills a Role inside a definition or
+session is [SessionActor](canonical-concepts.md#sessionactor)
+(per [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)).
 
 ### Job
 
@@ -58,6 +70,8 @@ task satisfaction, Work completion, and visible terminal state.
 - Do not call every planner child Work.
 - Do not call every temporary helper unit an independent Work item.
 - Do not use consensus as a synonym for verified synthesis.
+- Do not call a SessionActor a Participant; Participant is reserved for the
+  platform-level event-log-contract concept.
 
 ## Historical Vocabulary
 

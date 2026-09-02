@@ -72,6 +72,8 @@ import { promoteToComponentUseCase } from '../src/verbs/merge/promote-to-compone
 import { approveUseCase } from '../src/verbs/merge/approve.mjs';
 import { mergeList, mergeNext } from '../src/verbs/merge/merge.mjs';
 import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
+import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
+import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -3102,6 +3104,44 @@ async function runVerb(verb, flags, positional, dir) {
         );
       }
       throw new StoreError('validation', `merge: unknown sub-verb "${sub}" (known: list, next).`);
+    }
+
+    // Public CLI onto the CoordinationSession runtime (Step 08 Phase 07
+    // R1): `run` opens+dispatches+closes one session synchronously in V1,
+    // `show` is a read-only status read. Both are thin doors onto
+    // src/verbs/coordination/{run,show}.mjs, which call ONLY through the
+    // existing, hardened session-engine.mjs exports (P00-P06) -- this
+    // adapter never touches session/Assignment/Run state directly.
+    case 'coordination': {
+      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show> ...');
+      // Same repoRoot resolution `catchup`/`merge next` already use:
+      // `--dir` names the main checkout's `.fgos/`, so its parent is the
+      // repo root; omitted, the caller's own cwd is the repo root.
+      const repoRootForCoordination = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
+      if (sub === 'run') {
+        const filePath = requireField(flags.file, 'coordination run requires --file <request-path>: fgos coordination run --file <request.json>');
+        return await runCoordinationUseCase(
+          {
+            cwd: repoRootForCoordination,
+            repoRoot: repoRootForCoordination,
+            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
+          },
+          {
+            requestPath: path.resolve(process.cwd(), filePath),
+            cliExecutor: flags.executor,
+            cliModel: flags.model,
+            cliTier: flags.tier,
+          },
+        );
+      }
+      if (sub === 'show') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination show requires an id: fgos coordination show <id> [--json]');
+        // `--json` is accepted as a no-op, same convention the existing
+        // `show` (work-item) verb already documents in the registry: the
+        // envelope is always JSON, so the flag changes nothing.
+        return showCoordinationUseCase({ cwd: repoRootForCoordination, repoRoot: repoRootForCoordination }, { id });
+      }
+      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: run, show).`);
     }
 
     case 'rebuild': {

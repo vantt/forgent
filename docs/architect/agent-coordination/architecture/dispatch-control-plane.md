@@ -3,7 +3,7 @@
 Document type: Architecture
 Design status: Accepted
 Implementation: Partial
-Last reviewed: 2026-08-31
+Last reviewed: 2026-09-01
 Canonical for: dispatch responsibility and governance boundaries
 
 ## Responsibility
@@ -54,7 +54,14 @@ caller      consumes evidence and invokes authorized lifecycle behavior, if any
 
 Planning may be agent-led, declared, or domain-assisted. Dispatch does not care
 which source proposed the validated Assignment and must not create separate
-runtime paths for them.
+runtime paths for them. A CoordinationSession or a declared
+`CoordinationProtocol` FlowDefinition (see
+[ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md),
+[ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md))
+is one more caller of this same flow: a Cohort Planner may emit actor policy
+inputs, but it resolves and dispatches exactly one Assignment at a time
+through this control plane — it may not spawn an executor directly or read
+sibling Assignment state.
 
 The detailed redesign source remains a
 [proposal](../proposals/dispatch-control-plane-redesign.md) until its unresolved

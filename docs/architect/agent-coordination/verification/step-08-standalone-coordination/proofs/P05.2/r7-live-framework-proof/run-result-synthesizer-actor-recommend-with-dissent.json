@@ -1,0 +1,99 @@
+{
+  "runId": "run_asgn_p05_2_r7_proof_driver_op_009_01",
+  "assignmentId": "asgn_p05_2_r7_proof_driver_op_009",
+  "workId": null,
+  "executorId": "gemini-clone-3",
+  "policy": {
+    "role": "synthesizer",
+    "executorPreference": [
+      "gemini-clone-3"
+    ],
+    "executorId": "gemini-clone-3",
+    "providerModel": "gemini",
+    "tier": "critical",
+    "model": "gemini-3.1-pro-high",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "gemini-clone-3",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "gemini-clone-3"
+        }
+      },
+      "model": {
+        "value": "gemini-3.1-pro-high",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "gemini.critical"
+        }
+      },
+      "tier": {
+        "value": "critical",
+        "source": {
+          "scope": "operation",
+          "id": "recommend-with-dissent"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_p05_2_r7_proof_driver_op_009"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "settleReports": [],
+  "status": "failed",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 1,
+    "stdoutLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_009/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_009/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "failed",
+    "summary": "Settled"
+  },
+  "evidence": {
+    "gitBefore": null,
+    "gitAfter": null,
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [],
+    "tests": []
+  }
+}

@@ -106,6 +106,9 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'main-checkout-guard-warnings',
       'events-compaction-verified',
       'no-stuck-merge-abort',
+      'coordination-protocol-fixtures-valid',
+      'coordination-example-requests-valid',
+      'workflow-flow-definition-projects-cleanly',
     ].sort(),
   );
 });

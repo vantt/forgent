@@ -1,0 +1,53 @@
+{
+  "assignmentId": "asgn_r8b_followup_driver_op_001",
+  "workId": null,
+  "role": "coordinator",
+  "dispatch": "assignment",
+  "objective": "Fan out.",
+  "contextRefs": [],
+  "expectedOutputs": [
+    "agent-result.json (status, summary)"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-01T21:54:48.561Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Fan out.",
+        "contextRefs": [],
+        "constraints": [
+          "protocol-operation:core.coordination-protocol.independent-research-fan-out-fan-in@1.0.0#dispatch-research"
+        ],
+        "expectedOutputs": [
+          "agent-result.json (status, summary)"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "coordinator",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 300000,
+          "maxRuns": 1
+        }
+      },
+      "caller": {
+        "writerId": "r8b-followup-driver"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

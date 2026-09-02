@@ -71,7 +71,6 @@ test('buildAssignment creates frozen Assignment from planning.validate-plan with
     minTier: 'standard',
     preferPersona: 'code-reviewer',
     preferExecutor: 'claude',
-    fallbackExecutors: ['pi'],
   });
   assert.deepEqual(assignment.contextRefs, ['docs/history/tsk-123/plan.md']);
   assert.deepEqual(assignment.expectedOutputs, ['verdict', 'findings if blocked']);

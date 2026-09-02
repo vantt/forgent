@@ -1,0 +1,5 @@
+{
+  "name": "StoreError",
+  "category": "validation",
+  "message": "coordination request: unknown field \"unknownField\" in request (allowed: kind, objective, writerId, coordinationId, workRef, aggregateBounds, partialPolicy, primaryRole, task, protocolRef, steps, actors)"
+}

@@ -5,8 +5,11 @@
 //
 // Pure data module:
 // - createAssignmentId: deterministic asgn_<work>_<op>_<seq> generator; falls
-//   back to a caller.writerId-derived token, then 'nowork', when no workId or
-//   missionId is present (ADR-006 R4, the inline no-Work-attached case).
+//   back to a caller.writerId-derived token, then 'nowork', when no workId
+//   is present (ADR-006 R4, the inline no-Work-attached case). Step 08
+//   Phase 01 R4: the prototype `missionId` parameter is retired along with
+//   mission-lite.mjs -- a future Mission groups session ids from above
+//   instead (ADR-008 Decision 5).
 // - buildAssignment: dispatches on shape. The DECLARED shape
 //   ({ stage, operation, ... }, unchanged) converts one declared stage
 //   operation into an Assignment; refuses operations whose taskSpec file
@@ -27,8 +30,8 @@
 //   including concrete result artifact paths when runDir is supplied (Step 04).
 // - isReadOnlyAssignment: classifies assignment as read-only or mutating by
 //   reading the `mutation` field stamped once, at build time, by
-//   ./assignment-normalizer.mjs (ADR-006 R2/R7 -- no role/operation/
-//   missionId/workId re-derivation here).
+//   ./assignment-normalizer.mjs (ADR-006 R2/R7 -- no role/operation/workId
+//   re-derivation here).
 // - validateAgentResultClaim: validates agent-result.json schema; malformed
 //   claims must produce failed/failed, not no-evidence (Step 04).
 //
@@ -54,6 +57,14 @@ import {
   stampInlineAssignment,
 } from './assignment-normalizer.mjs';
 import { CONTRACT_POLICY_VERSION, validateExecutionContract } from './execution-contract.mjs';
+// Step 08 P04.2b: `resolveStrongerTier` is the SAME tier-strength
+// comparison `resolveAssignmentDispatchPolicy` itself uses to guarantee a
+// more-specific scope can only RAISE a tier requirement, never lower one
+// already established -- reused here (never re-implemented) so that
+// merging a domain harness's own `policy.minTier` against an agent's
+// `contract.policy.minTier` at build time follows the exact same
+// never-weaken invariant, rather than a second, competing merge rule.
+import { resolveStrongerTier } from './assignment-policy.mjs';
 
 // ADR-007 §1: the domain harness seam. Foundation code (this module) must
 // never reference one specific domain's module by a hardcoded, literal
@@ -115,24 +126,21 @@ function sanitizeToken(token) {
  *
  * @param {object} params
  * @param {string} [params.workId] Work item id (e.g. 'tsk-abc')
- * @param {string} [params.missionId] Mission id (e.g. 'mission_001')
  * @param {string} [params.stage] Stage name
  * @param {string} params.operation Operation id (e.g. 'validate-plan')
  * @param {{writerId?: string}} [params.caller] Inline caller provenance (ADR-006 R4);
- *   `caller.writerId` names the id when neither `workId` nor `missionId` is present
+ *   `caller.writerId` names the id when `workId` is not present
  *   (the inline, no-Work-attached case) instead of the bare 'nowork' literal.
  * @param {string[]|Set<string>} [params.existingIds] Existing assignment IDs to avoid collision
  * @param {string} [params.assignmentsDir] Directory containing existing assignment folders
  * @returns {string} e.g. 'asgn_tsk_abc_validate_plan_001'
  */
-export function createAssignmentId({ workId, missionId, stage, operation, caller, existingIds = [], assignmentsDir }) {
+export function createAssignmentId({ workId, stage, operation, caller, existingIds = [], assignmentsDir }) {
   const safeWork = workId
     ? sanitizeToken(workId)
-    : missionId
-      ? sanitizeToken(missionId)
-      : caller?.writerId
-        ? sanitizeToken(String(caller.writerId))
-        : 'nowork';
+    : caller?.writerId
+      ? sanitizeToken(String(caller.writerId))
+      : 'nowork';
   const safeOp = sanitizeToken(operation || stage || 'op');
   const prefix = `asgn_${safeWork}_${safeOp}_`;
 
@@ -177,12 +185,12 @@ export function createAssignmentId({ workId, missionId, stage, operation, caller
   return candidateId;
 }
 
-// Same retry ceiling as mission-lite.mjs's own independent claim loop
-// (MAX_ASSIGNMENT_CLAIM_ATTEMPTS = 8) -- kept as a separate local constant
-// rather than importing mission-lite's, since mission-lite.mjs is a
-// deliberately untouched call site (out of scope for this fix) and this
+// Same retry ceiling mission-lite.mjs's own independent claim loop used
+// before its Step 08 Phase 01 direct cutover (MAX_ASSIGNMENT_CLAIM_ATTEMPTS
+// = 8, still mirrored by coordination/store.mjs's own claim loops) -- kept
+// as a separate local constant rather than a shared import, since this
 // value is a retry-count tuning knob, not a shared invariant that would
-// drift if the two ever diverged.
+// drift if the call sites ever diverged.
 const MAX_ASSIGNMENT_ID_CLAIM_ATTEMPTS = 8;
 
 /**
@@ -245,7 +253,6 @@ export function claimAssignmentId(buildCandidate, assignmentsDir) {
  * @param {object} params
  * @param {object} [params.work] Optional work item
  * @param {string} [params.workId] Work item id (if work object omitted)
- * @param {string} [params.missionId] Optional mission id for mission-lite
  * @param {string} [params.domain] Domain name (defaults to work.domain or 'coding')
  * @param {string} [params.workflow] Workflow name (defaults to 'feature')
  * @param {string} params.stage Stage name (e.g. 'planning')
@@ -290,7 +297,6 @@ export function buildAssignment(params = {}) {
 function buildDeclaredAssignment({
   work,
   workId,
-  missionId,
   domain,
   workflow,
   stage,
@@ -315,7 +321,6 @@ function buildDeclaredAssignment({
   const resolvedDomain = resolveDomainName(domain ?? work?.domain ?? DEFAULT_DOMAIN);
   const resolvedWorkflow = workflow ?? work?.workflow ?? 'feature';
   const resolvedWorkId = work?.id ?? workId ?? null;
-  const resolvedMissionId = missionId ?? options.missionId ?? null;
 
   const stageOps = operationsForStage(resolvedDomain, stage, { kind: resolvedWorkflow });
   const matchedOp = stageOps.find((o) => o.id === operation);
@@ -364,7 +369,6 @@ function buildDeclaredAssignment({
   const existingIds = options.existingIds ?? [];
   const assignmentId = createAssignmentId({
     workId: resolvedWorkId,
-    missionId: resolvedMissionId,
     stage,
     operation: matchedOp.id,
     existingIds,
@@ -422,7 +426,6 @@ function buildDeclaredAssignment({
   const assignment = {
     assignmentId,
     workId: resolvedWorkId,
-    ...(resolvedMissionId ? { missionId: resolvedMissionId } : {}),
     domain: resolvedDomain,
     workflow: resolvedWorkflow,
     stage,
@@ -562,12 +565,40 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
     capabilities: frozenCapabilities,
     budget: frozenBudget,
     ...(contract.supports !== undefined ? { supports: contract.supports } : {}),
+    // Step 08 P04.2b: the agent-declared `{minTier}` policy fragment, when
+    // present -- recorded here so the persisted provenance always shows
+    // exactly what the caller's own inline contract carried, same as every
+    // other field in this snapshot.
+    ...(contract.policy !== undefined ? { policy: Object.freeze({ ...contract.policy }) } : {}),
   });
 
   const frozenCaller = Object.freeze({
     writerId: caller.writerId,
     ...(caller.parentAssignmentId ? { parentAssignmentId: caller.parentAssignmentId } : {}),
   });
+
+  // Step 08 P04.2b: merge the domain harness's own `policy` (matchedOp.policy
+  // hints, set BEFORE this cell, see harnessPolicy above) with the agent's
+  // own `contract.policy.minTier` (this cell's new, exactly-one-field-wide
+  // addition) -- `contract.policy` is more specific (assignment/caller-level,
+  // same specificity class buildDeclaredAssignment's own caller-supplied
+  // `policy` param already outranks `matchedOp.policy` at), so every OTHER
+  // harnessPolicy field (persona/model/etc.) passes through unchanged, but
+  // `minTier` specifically is resolved via `resolveStrongerTier` rather than
+  // a flat override -- a caller's own inline contract must never be able to
+  // silently WEAKEN a tier floor the domain harness already established,
+  // mirroring resolveAssignmentDispatchPolicy's own never-weaken invariant
+  // for `minTier` at the resolve layer (assignment-policy.mjs).
+  const contractPolicyMinTier = contract.policy?.minTier;
+  let mergedInlinePolicy = harnessPolicy;
+  if (contractPolicyMinTier !== undefined) {
+    mergedInlinePolicy = Object.freeze({
+      ...(harnessPolicy || {}),
+      minTier: harnessPolicy?.minTier
+        ? resolveStrongerTier(harnessPolicy.minTier, contractPolicyMinTier)
+        : contractPolicyMinTier,
+    });
+  }
 
   const assignment = {
     assignmentId,
@@ -580,7 +611,7 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
     expectedFiles: Object.freeze([]),
     createdAt: options.createdAt ?? new Date().toISOString(),
     ...(createdBy ? { createdBy } : {}),
-    ...(harnessPolicy ? { policy: harnessPolicy } : {}),
+    ...(mergedInlinePolicy ? { policy: mergedInlinePolicy } : {}),
     provenance: Object.freeze({
       kind: 'inline',
       contractPolicyVersion: CONTRACT_POLICY_VERSION,
@@ -630,7 +661,6 @@ export function renderAssignmentPrompt(assignment, options = {}) {
   const lines = [
     `Assignment: ${assignment.assignmentId}`,
     `Work: ${assignment.workId || '(none)'}`,
-    ...(assignment.missionId ? [`Mission: ${assignment.missionId}`] : []),
     ...(assignment.stage && assignment.operation ? [`Stage operation: ${assignment.stage}.${assignment.operation}`] : []),
     `Role: ${assignment.role}`,
     ...(taskSpecRelPath ? [`Task-spec: ${taskSpecRelPath}`] : []),
@@ -676,7 +706,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
  * `assignment-normalizer.mjs` (`stampDeclaredAssignment` for the declared
  * shape, `stampInlineAssignment` for the inline shape) — every Assignment
  * built via `buildAssignment()` carries this field. Does not re-derive
- * classification from `role`/`operation`/`missionId`/`workId` here; that
+ * classification from `role`/`operation`/`workId` here; that
  * classification happens exactly once, at build time.
  *
  * @param {object} assignment Assignment object

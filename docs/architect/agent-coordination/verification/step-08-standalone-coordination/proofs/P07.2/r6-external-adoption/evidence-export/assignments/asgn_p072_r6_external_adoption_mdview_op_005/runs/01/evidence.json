@@ -1,0 +1,24 @@
+{
+  "operationMutability": "read-only",
+  "gitBefore": "84a6710ad2970d2702e6ff2814314fe39f9392b8",
+  "gitAfter": "84a6710ad2970d2702e6ff2814314fe39f9392b8",
+  "gitBeforeSource": "pre-launch",
+  "dirtyBefore": [],
+  "dirtyAfter": [],
+  "mutatedDirtyBeforeFiles": [],
+  "changedFiles": [],
+  "changedFileReasons": {},
+  "artifacts": [
+    {
+      "path": ".fgos/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/agent-report.md",
+      "kind": "agent-report",
+      "valid": true
+    },
+    {
+      "path": ".fgos/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/agent-result.json",
+      "kind": "agent-result",
+      "valid": false
+    }
+  ],
+  "tests": []
+}

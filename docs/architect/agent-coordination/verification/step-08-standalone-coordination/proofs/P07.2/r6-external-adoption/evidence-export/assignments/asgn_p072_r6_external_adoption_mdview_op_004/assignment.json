@@ -1,0 +1,57 @@
+{
+  "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_004",
+  "workId": null,
+  "role": "requester",
+  "dispatch": "assignment",
+  "objective": "Read Cargo.toml and report the package's name/version you find, then ask the consultant to double-check it.",
+  "contextRefs": [],
+  "expectedOutputs": [
+    "agent-result.json (status, summary) naming the package's name and version",
+    "agent-report.md: a short human-readable report stating the name and version you found"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-02T06:32:18.331Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Read Cargo.toml and report the package's name/version you find, then ask the consultant to double-check it.",
+        "contextRefs": [],
+        "constraints": [
+          "protocol-operation:core.coordination-protocol.declared-consult@1.0.0#request-consult"
+        ],
+        "expectedOutputs": [
+          "agent-result.json (status, summary) naming the package's name and version",
+          "agent-report.md: a short human-readable report stating the name and version you found"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "requester",
+        "capabilities": [
+          "consult"
+        ],
+        "budget": {
+          "timeoutMs": 300000,
+          "maxRuns": 1
+        }
+      },
+      "caller": {
+        "writerId": "p072-r6-external-adoption-mdview"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

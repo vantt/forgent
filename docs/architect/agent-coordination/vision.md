@@ -3,7 +3,7 @@
 Document type: Vision
 Design status: Accepted
 Implementation: Partial
-Last reviewed: 2026-08-31
+Last reviewed: 2026-09-01
 Canonical for: product identity, foundation boundaries, optional structure, and domain augmentation
 
 ## Authority And Reading Rule
@@ -15,6 +15,12 @@ must enable, and which concerns belong in the foundation versus a domain. ADRs,
 architecture, contracts, proposals, roadmaps, Skills, and implementation define
 more specific behavior underneath it. They may refine this Vision but must not
 silently narrow or contradict it.
+
+The [Intent Preservation Ledger](intent-preservation-ledger.md) is the required
+second read. It does not outrank this Vision or make deferred ideas accepted
+architecture. It makes deliberate narrowing visible and records what each
+increment must not preclude, so a temporary MVP does not silently replace the
+original direction.
 
 When a downstream document conflicts with this Vision:
 
@@ -385,3 +391,5 @@ Vision. They must be answered without reopening V-001 through V-012 implicitly.
    session/task/planning/isolation design still open under this Vision.
 7. [Step 08](proposals/step-08-standalone-coordination-protocols.md) develops
    optional reusable protocols and agent-led standalone adoption.
+8. [Step 09](../proposals/step-09-coding-domain-adoption.md) discusses bringing the
+   existing coding domain onto that foundation as its second unlike consumer.

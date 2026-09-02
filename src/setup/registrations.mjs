@@ -67,6 +67,10 @@ import { resolveDocPath } from '../report/knowledge-resolver.mjs';
 import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
 import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.mjs';
 import { parseFrontmatter } from '../report/frontmatter.mjs';
+import { discoverCoordinationProtocols, loadCoordinationProtocol } from '../runner/definitions/protocol-loader.mjs';
+import { projectWorkflowToFlowDefinition } from '../runner/definitions/workflow-adapter.mjs';
+import { FlowDefinitionError } from '../runner/definitions/schema.mjs';
+import { validateCoordinationRequest } from '../verbs/coordination/schema.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -3114,5 +3118,179 @@ registerCheck({
 registerFix({
   id: 'no-stuck-merge-abort',
   fix: (cwd) => fixNoStuckMergeAbort(cwd),
+});
+
+// Phase 02 R8 (docs/architect/agent-coordination/contracts/flow-definition.md,
+// ADR-009), AGENTS.md's install/setup/doctor gate: the new FlowDefinition
+// definition surface (Workflow projection adapter + CoordinationProtocol
+// loader, src/runner/definitions/) is a real infra dependency (it shells
+// out to `fs`, discovers files off disk, and validates their shape) --
+// this makes it discoverable through `fgos doctor` rather than standing
+// alone unregistered. Both checks are READ-ONLY (same RUL9 discipline
+// every other check in this file follows): `discoverCoordinationProtocols`
+// and `projectWorkflowToFlowDefinition` only read from disk/the in-memory
+// domain registry, never write. No new config default is registered
+// alongside these -- discovery is a fixed, deterministic filesystem
+// convention (project `.fgos/coordination-protocols/`, `domains/<name>/
+// coordination-protocols/`, packaged `core/coordination-protocols/`), the
+// same non-configurable style `workflow-stage-graphs.mjs`'s own
+// `domains/`/`core/task-specs/` discovery already uses -- there is no
+// runtime read of a "coordination protocols path" config key to register
+// a default for.
+
+// tsk-397's `resolveTaskSpecPath`'s own `core: 'core'` convention gives
+// `discoverCoordinationProtocols` its default `cwd`/`packageRoot`
+// resolution already (see protocol-loader.mjs's own header) -- this check
+// only needs to run it and report the FlowDefinitionError's own message,
+// which already carries the offending source path (protocol-loader.mjs's
+// `relativeToPackageRoot` suffix on every thrown error).
+function checkCoordinationProtocolFixturesValid(cwd) {
+  try {
+    const entries = discoverCoordinationProtocols({ cwd });
+    return {
+      passed: true,
+      message: `${entries.length} CoordinationProtocol definition(s) discovered and normalized cleanly (project/domain/core tiers)`,
+    };
+  } catch (err) {
+    if (err instanceof FlowDefinitionError) {
+      return { passed: false, message: `malformed CoordinationProtocol definition -- ${err.message}` };
+    }
+    throw err;
+  }
+}
+
+registerCheck({
+  id: 'coordination-protocol-fixtures-valid',
+  description: 'every discoverable CoordinationProtocol definition (project/domain/core tiers) normalizes through validateFlowDefinition (Phase 02 R6/R7)',
+  check: (cwd) => checkCoordinationProtocolFixturesValid(cwd),
+});
+
+// Exercises R5's adapter itself (not just R7's protocol fixtures) as a
+// doctor-visible health check: every domain that declares `workflows`
+// (today: only `coding`) must still project cleanly into a Workflow-
+// profile FlowDefinition. A domain with no `workflows` at all (every
+// other domain today) is not a failure -- `projectWorkflowToFlowDefinition`
+// only applies where the existing primary-operation compatibility path
+// already applies (flow-definition.md's Workflow profile section), so
+// those domains are a clean skip, not scanned at all.
+//
+// `projectWorkflowToFlowDefinition`'s public contract takes a `kind`, not a
+// workflow NAME (same `operationsForStage`/`resolveWorkflow` calling
+// convention it deliberately mirrors) -- a workflow reached only via
+// `domain.defaultWorkflow` is addressed with `kind: undefined`; a workflow
+// reached only through `domain.workflowFor`'s mapping needs a `kind` that
+// actually maps to it, found here by inverting that table. A workflow name
+// reachable through NEITHER (registered in `domain.workflows` but never
+// wired as anyone's default or `workflowFor` target) has no `kind` this
+// check can legitimately construct -- reported as `unreachable`, a real,
+// separate signal from a validation failure, not silently skipped.
+function checkWorkflowFlowDefinitionProjectsCleanly() {
+  const problems = [];
+  const unreachable = [];
+  let checkedCount = 0;
+  for (const [domainName, domain] of Object.entries(DOMAINS)) {
+    if (!domain?.workflows) continue;
+    const kindByWorkflowName = new Map();
+    for (const [kind, mappedName] of Object.entries(domain.workflowFor || {})) {
+      if (!kindByWorkflowName.has(mappedName)) kindByWorkflowName.set(mappedName, kind);
+    }
+    for (const workflowName of Object.keys(domain.workflows)) {
+      let kind;
+      if (workflowName === domain.defaultWorkflow) {
+        kind = undefined;
+      } else if (kindByWorkflowName.has(workflowName)) {
+        kind = kindByWorkflowName.get(workflowName);
+      } else {
+        unreachable.push(`${domainName}.${workflowName}`);
+        continue;
+      }
+      checkedCount += 1;
+      try {
+        projectWorkflowToFlowDefinition(domainName, { kind });
+      } catch (err) {
+        if (err instanceof FlowDefinitionError) {
+          problems.push(`${domainName}.${workflowName}: ${err.message}`);
+        } else {
+          throw err;
+        }
+      }
+    }
+  }
+  if (problems.length > 0) {
+    return { passed: false, message: problems.join('; ') };
+  }
+  const unreachableNote = unreachable.length > 0
+    ? ` (${unreachable.length} workflow(s) unreachable via any kind, not checked: ${unreachable.join(', ')})`
+    : '';
+  if (checkedCount === 0) {
+    return { passed: true, message: `no domain declares a reachable workflow -- nothing to project${unreachableNote}` };
+  }
+  return { passed: true, message: `${checkedCount} domain workflow(s) project cleanly into a Workflow-profile FlowDefinition${unreachableNote}` };
+}
+
+registerCheck({
+  id: 'workflow-flow-definition-projects-cleanly',
+  description: 'every domain-declared workflow projects cleanly into a Workflow-profile FlowDefinition via the additive adapter (Phase 02 R5)',
+  check: () => checkWorkflowFlowDefinitionProjectsCleanly(),
+});
+
+// Step 08 Phase 07 R3, AGENTS.md's install/setup/doctor gate: `fgos
+// coordination run --file <request>`'s own published example request
+// files (docs/how-to/coordination-examples/*.json -- one agent-led
+// request, one declared consult, one research protocol, one Group
+// Cognition framework example, per this phase's own requirement) are real
+// package contents a user copies and edits; this check keeps them from
+// silently rotting the same way `coordination-protocol-fixtures-valid`
+// above already keeps the protocol yaml fixtures themselves honest. Reuses
+// the SAME `validateCoordinationRequest` the CLI itself runs on every
+// invocation (never a second, drifting copy of the schema), plus
+// `loadCoordinationProtocol` for any example that references a protocol by
+// id, so a future protocol rename/removal is caught here too. Read-only
+// (RUL9): only reads the example files and the protocol registry, never
+// writes.
+function checkCoordinationExampleRequestsValid(cwd) {
+  const examplesDir = path.join(cwd, 'docs', 'how-to', 'coordination-examples');
+  if (!fs.existsSync(examplesDir)) {
+    return { passed: false, message: `no example request files found at ${path.relative(cwd, examplesDir)} -- Phase 07 R3 requires publishing one agent-led request, declared consult, research protocol, and Group Cognition framework example` };
+  }
+  const files = fs.readdirSync(examplesDir).filter((f) => f.endsWith('.json')).sort();
+  if (files.length === 0) {
+    return { passed: false, message: `${path.relative(cwd, examplesDir)} exists but contains no .json example request files` };
+  }
+  const problems = [];
+  for (const file of files) {
+    const filePath = path.join(examplesDir, file);
+    let raw;
+    try {
+      raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (err) {
+      problems.push(`${file}: not valid JSON (${err.message})`);
+      continue;
+    }
+    let normalized;
+    try {
+      normalized = validateCoordinationRequest(raw, {});
+    } catch (err) {
+      problems.push(`${file}: fails validateCoordinationRequest (${err.message})`);
+      continue;
+    }
+    if (normalized.kind === 'declared-protocol') {
+      try {
+        loadCoordinationProtocol(normalized.protocolRef.id, { cwd });
+      } catch (err) {
+        problems.push(`${file}: protocolRef.id "${normalized.protocolRef.id}" does not resolve (${err.message})`);
+      }
+    }
+  }
+  if (problems.length > 0) {
+    return { passed: false, message: problems.join('; ') };
+  }
+  return { passed: true, message: `${files.length} coordination example request(s) under ${path.relative(cwd, examplesDir)} validate cleanly and resolve every referenced protocolRef` };
+}
+
+registerCheck({
+  id: 'coordination-example-requests-valid',
+  description: 'published `fgos coordination run` example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef (Step 08 Phase 07 R3)',
+  check: (cwd) => checkCoordinationExampleRequestsValid(cwd),
 });
 

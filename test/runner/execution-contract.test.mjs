@@ -226,3 +226,73 @@ test('validateExecutionContract rejects a non-string "supports" field', () => {
     (err) => err instanceof RunnerConfigError && /supports/.test(err.message),
   );
 });
+
+// ─── Step 08 P04.2b: the narrow "contract.policy = {minTier}" exception ────
+// Explicitly authorized, exactly-one-field-wide addition to the wire
+// contract -- see execution-contract.mjs's own ACCEPTED_CONTRACT_FIELDS doc
+// comment for the full "why" (the tier-floor stop gate this closes).
+
+test('validateExecutionContract accepts a contract with no "policy" field at all (optional)', () => {
+  const contract = validContract();
+  assert.equal(contract.policy, undefined);
+  assert.doesNotThrow(() => validateExecutionContract({ contract, caller: validCaller() }));
+});
+
+test('validateExecutionContract accepts contract.policy = {minTier: "lightweight"} (the exact shape this cell exists to legalize)', () => {
+  assert.doesNotThrow(() =>
+    validateExecutionContract({ contract: validContract({ policy: { minTier: 'lightweight' } }), caller: validCaller() }),
+  );
+});
+
+test('validateExecutionContract accepts every legal MODEL_POLICY_TIERS value for contract.policy.minTier', () => {
+  for (const tier of ['lightweight', 'standard', 'creative', 'analytical', 'critical']) {
+    assert.doesNotThrow(
+      () => validateExecutionContract({ contract: validContract({ policy: { minTier: tier } }), caller: validCaller() }),
+      `expected contract.policy.minTier "${tier}" to be accepted`,
+    );
+  }
+});
+
+test('validateExecutionContract rejects contract.policy that is not an object', () => {
+  assert.throws(
+    () => validateExecutionContract({ contract: validContract({ policy: 'lightweight' }), caller: validCaller() }),
+    (err) => err instanceof RunnerConfigError && /contract\.policy must be an object/.test(err.message),
+  );
+});
+
+test('validateExecutionContract rejects contract.policy with a missing minTier', () => {
+  assert.throws(
+    () => validateExecutionContract({ contract: validContract({ policy: {} }), caller: validCaller() }),
+    (err) => err instanceof RunnerConfigError && /contract\.policy\.minTier must be one of/.test(err.message),
+  );
+});
+
+test('validateExecutionContract rejects contract.policy.minTier with an unrecognized tier value', () => {
+  assert.throws(
+    () => validateExecutionContract({ contract: validContract({ policy: { minTier: 'premium' } }), caller: validCaller() }),
+    (err) => err instanceof RunnerConfigError && /contract\.policy\.minTier must be one of/.test(err.message),
+  );
+});
+
+// ─── The exactly-one-field-wide guarantee: every OTHER PolicyPatch-shaped ──
+// field is rejected on contract.policy, never silently accepted -- this is
+// not a general PolicyPatch passthrough.
+test('validateExecutionContract rejects any field on contract.policy other than "minTier" (not a general PolicyPatch passthrough)', () => {
+  for (const [field, value] of [
+    ['preferExecutor', 'agy-cli'],
+    ['preferPersona', 'code-reviewer'],
+    ['model', 'gpt-5.5'],
+    ['visibility', 'visible'],
+    ['fallbackExecutors', ['codex-cli']],
+  ]) {
+    assert.throws(
+      () =>
+        validateExecutionContract({
+          contract: validContract({ policy: { minTier: 'lightweight', [field]: value } }),
+          caller: validCaller(),
+        }),
+      (err) => err instanceof RunnerConfigError && new RegExp(`unknown field "${field}"`).test(err.message),
+      `expected contract.policy.${field} to be rejected as an unknown field`,
+    );
+  }
+});

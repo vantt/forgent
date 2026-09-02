@@ -1,0 +1,15 @@
+Workspace: /tmp/fgos-r8b-followup-2zLvat
+fgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn provider=claude model=sonnet tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+Coordinator (claude) settled: failed failed
+fgos: dispatch capability=(none declared) executor=codex-pi via=cli-spawn provider=openai-codex model=gpt-5.5 tier=lightweight
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+codex-pi (openai-codex) dispatch settled:
+  status: failed  confidence: failed
+  executor: codex-pi  provider: openai-codex  tier: lightweight
+  agentClaim.summary: agent-result.json was present but failed schema validation
+
+Distinct real families that reached a settled RunResult in this follow-up: Set(0) {}
+Workspace (for inspection): /tmp/fgos-r8b-followup-2zLvat

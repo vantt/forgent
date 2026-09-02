@@ -3,7 +3,7 @@
 Document type: Architecture
 Design status: Accepted
 Implementation: Partial
-Last reviewed: 2026-08-31
+Last reviewed: 2026-09-01
 Canonical for: Work authority and coordination integration boundaries
 
 ## Core Invariant
@@ -53,3 +53,13 @@ physical checkout merely because declared source footprints differ.
 
 Nested immediate-parent branch integration is a candidate invariant, not yet an
 accepted cross-path contract.
+
+A CoordinationSession's local runtime state (`.fgos/coordination/`) may
+reference domain-provisioned workspace/isolation context for auditability, but
+that reference is not itself an isolation mechanism and grants no merge or
+Work-transition authority: those stay with the domain harness and Work engine
+verbs. Standalone coordination proofs stay read-only until a coding-domain
+live proof demonstrates resource-conflict detection, worktree isolation,
+merge ownership, recovery, and Work-transition authority under real
+concurrent load. See
+[ADR-010](../decisions/ADR-010-interactive-headless-parity-and-work-isolation.md).

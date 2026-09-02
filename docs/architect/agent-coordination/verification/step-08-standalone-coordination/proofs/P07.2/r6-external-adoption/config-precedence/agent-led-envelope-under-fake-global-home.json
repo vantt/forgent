@@ -1,0 +1,44 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-02T06:30:55.463Z",
+  "data_hash": "a35e320d9e0bbc47f2389ecf96f1d2d07c6290e1e819651e8ef75f81f7432d36",
+  "data": {
+    "coordinationId": "coord_mtjpwbjj_bfeyqw",
+    "kind": "agent-led",
+    "definitionRef": null,
+    "objective": "Read Cargo.toml in the current workspace and report its declared package name and version.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"coord_mtjpwbjj_bfeyqw\" is missing required actor(s) [primary] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "primary"
+      ],
+      "completed": [],
+      "failed": [
+        {
+          "actorId": "primary",
+          "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_002",
+          "runId": "run_asgn_p072_r6_external_adoption_mdview_op_002_01"
+        }
+      ],
+      "late": [],
+      "missing": [],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "primary",
+        "type": "operation",
+        "actorId": "primary",
+        "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_002",
+        "status": "failed",
+        "confidence": "failed",
+        "executor": "claude",
+        "provider": "claude",
+        "tier": "standard"
+      }
+    ]
+  }
+}

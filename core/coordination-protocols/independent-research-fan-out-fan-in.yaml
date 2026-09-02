@@ -1,0 +1,127 @@
+# core/coordination-protocols/independent-research-fan-out-fan-in.yaml --
+# Phase 02 R7 fixture: an independent research fan-out/fan-in protocol --
+# a coordinator dispatches to a cohort of independent researchers
+# (isolated-until-fan-in, so each researcher's own context stays isolated
+# from the others until synthesis), then synthesizes their findings.
+# Normalized+wired into CoordinationSession real execution (fan-out
+# dispatch/isolation/fan-in synthesis) starting Phase 04 R5-R9
+# (session-engine.mjs's dispatchResearchFanOut/synthesizeResearchFanIn).
+#
+# Two P04.2 fixes to the ORIGINAL P02.2 shape, both non-breaking (no
+# existing test asserted either value):
+# - `cohort.count: 2` removed: cohort-planner.mjs's planCohort() treats a
+#   declared `cohort.count` as "must equal spec.actors.length" (it plans
+#   EVERY declared actor, not just the diversified researcher role) -- this
+#   fixture declares 3 actors (coordinator-actor + 2 researchers), so the
+#   old `count: 2` made planCohort hard-fail immediately on load. `count`
+#   is optional; omitting it plans every declared actor with no count
+#   assertion, which is what this fixture actually needs.
+# - `independent-research`'s `policy.minTier` lowered from `analytical` to
+#   `lightweight`: `analytical` is only configured for the `claude`
+#   provider family in this repo's real .fgos/config.json, which would
+#   silently defeat the whole point of an independent, diverse-provider
+#   research cohort (every non-claude candidate would hard-fail the tier
+#   check). `lightweight` is the one tier genuinely configured for every
+#   real provider family this repo registers (claude/gemini/openai-codex/
+#   z-ai), matching this track's own P03.2-discovered "unspecified tier
+#   silently defaults higher" trap -- specified explicitly here, never left
+#   to a resolver default.
+# - Every operation's `capabilities:` field removed (P04.1's own flagged
+#   gap, verbatim: "requiredCapabilities matching is a no-op against the
+#   real committed config today (zero kind:"agent" executors declare a
+#   `for` entry) -- accurate reflection of real config state, not a
+#   planner bug; flagged for whoever writes P04.2's live-proof fixture").
+#   cohort-planner.mjs's matchCandidateToRequirement hard-rejects EVERY
+#   candidate once an operation declares ANY `capabilities` entry no real
+#   executor's own `for:` array satisfies -- since no executor in this
+#   repo's real config (or this fixture's own synthetic test doubles)
+#   declares a matching `for`, keeping a non-empty `capabilities:` here
+#   would make this fixture permanently unplannable, not merely
+#   under-tested. Read-only cell (P04.2 does not fork/patch
+#   cohort-planner.mjs); this fixture-level fix is the correct, additive
+#   place to resolve it.
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.independent-research-fan-out-fan-in
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: isolated-until-fan-in
+      edges:
+        - from: coordinator-actor
+          to: researcher-a
+          intents: [research]
+          maxRounds: 1
+        - from: coordinator-actor
+          to: researcher-b
+          intents: [research]
+          maxRounds: 1
+    cohort:
+      distinctProviderFamilies: 2
+      requiredRoles: [researcher]
+      independence: isolated-until-fan-in
+
+  roles:
+    - coordinator
+    - researcher
+
+  actors:
+    - id: coordinator-actor
+      role: coordinator
+    - id: researcher-a
+      role: researcher
+    - id: researcher-b
+      role: researcher
+
+  operations:
+    - id: dispatch-research
+      role: coordinator
+      task:
+        contractTemplate: research-fanout-dispatch
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: independent-research
+      role: researcher
+      policy:
+        minTier: lightweight
+      task:
+        contractTemplate: independent-research-brief
+      result:
+        kind: advisory
+        evidenceRequired: verified
+    - id: synthesize-findings
+      role: coordinator
+      task:
+        contractTemplate: research-synthesis
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+  graph:
+    entry: phase-fan-out
+    nodes:
+      - id: phase-fan-out
+        operations:
+          - ref: dispatch-research
+            actor: coordinator-actor
+        transitions: [phase-research]
+      - id: phase-research
+        operations:
+          - ref: independent-research
+            actor: researcher-a
+          - ref: independent-research
+            actor: researcher-b
+        transitions: [phase-fan-in]
+      - id: phase-fan-in
+        operations:
+          - ref: synthesize-findings
+            actor: coordinator-actor
+        transitions: []

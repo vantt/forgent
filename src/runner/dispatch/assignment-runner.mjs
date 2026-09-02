@@ -516,16 +516,19 @@ function validateAssignmentLegality(asgn, opts = {}) {
     }
   }
 
-  // Step 07 §7: Mission-lite is strictly read-only. Reject mutating operations.
-  // `opts.isMissionLite` is an explicit, caller-supplied flag (mission-lite's
-  // `runMissionAssignment()` always passes it) -- not re-derived from
-  // `missionId`/`workId` here (ADR-006 R7 retires that heuristic; read-only
-  // status now comes solely from the stamped `mutation` field below).
-  // Applies identically to declared and inline Assignments (ADR-006 R8) --
-  // this gate is unconditional and runs for BOTH shapes, regardless of the
-  // inline-only skip above.
-  const isMission = Boolean(opts.isMissionLite);
-  if (isMission && !isReadOnlyAssignment(asgn)) {
+  // Step 07 §7 / Step 08 Phase 01 R4: some callers require strictly
+  // read-only execution and reject a mutating Assignment outright.
+  // `opts.isReadOnlyMode` is an explicit, caller-supplied flag (mission-lite's
+  // `runMissionAssignment()` was the original caller of this gate under its
+  // former name `isMissionLite`; a standalone CoordinationSession's
+  // read-only proof, R6/R8, is the same mechanism under its new name) --
+  // not re-derived from `missionId`/`workId` here (ADR-006 R7 retires that
+  // heuristic; read-only status now comes solely from the stamped
+  // `mutation` field below). Applies identically to declared and inline
+  // Assignments (ADR-006 R8) -- this gate is unconditional and runs for
+  // BOTH shapes, regardless of the inline-only skip above.
+  const requireReadOnly = Boolean(opts.isReadOnlyMode);
+  if (requireReadOnly && !isReadOnlyAssignment(asgn)) {
     throw new RunnerConfigError(
       `cannot execute mutating operation "${asgn.operation}" (role: "${asgn.role}") in mission-lite mode — mission-lite is strictly read-only`,
     );
@@ -545,7 +548,7 @@ function validateAssignmentLegality(asgn, opts = {}) {
  * @param {object} [opts.cliOverride]
  * @param {number} [opts.timeoutMs]
  * @param {object} [opts.work]
- * @param {boolean} [opts.isMissionLite]
+ * @param {boolean} [opts.isReadOnlyMode]
  * @param {object} [opts.options]
  * @returns {Promise<Readonly<object>>} Stored RunResult object
  */

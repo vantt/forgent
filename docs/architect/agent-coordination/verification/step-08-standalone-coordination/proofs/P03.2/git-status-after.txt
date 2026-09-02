@@ -1,0 +1,47 @@
+ M AGENTS.md
+ M CLAUDE.md
+ M docs/architect/agent-coordination/proposals/README.md
+ M docs/architect/agent-coordination/roadmap/README.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md
+ M docs/architect/agent-coordination/vision.md
+ M docs/architect/component-boundary/README.md
+ M src/runner/coordination/session-engine.mjs
+ M src/runner/coordination/store.mjs
+ M test/runner/coordination-declared-consult.test.mjs
+ M test/runner/coordination-store.test.mjs
+?? .agentkit/
+?? .claude/agents/advisor.md
+?? .claude/agents/brainstormer.md
+?? .claude/agents/code-reviewer.md
+?? .claude/agents/code-simplifier.md
+?? .claude/agents/debugger.md
+?? .claude/agents/docs-manager.md
+?? .claude/agents/explore.md
+?? .claude/agents/fullstack-developer.md
+?? .claude/agents/git-manager.md
+?? .claude/agents/journal-writer.md
+?? .claude/agents/kongming.md
+?? .claude/agents/planner.md
+?? .claude/agents/project-manager.md
+?? .claude/agents/researcher.md
+?? .claude/agents/tester.md
+?? .claude/agents/ui-ux-designer.md
+?? .fgos/events/95d36507-d4a6-432f-a879-b01c562217b0-20260830T164608767Z.jsonl
+?? .fgos/events/ee2110a9-914f-4138-b75b-55779f988e6b-20260901T020317216Z.jsonl
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/
+?? docs/architect/component-boundary/node-to-rust-component-migration.md
+?? docs/architect/component-boundary/tmp/
+?? plans/260831-1637-step07-inline-assignment-mvp/reports/
+?? plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2210-GH-08-P01.2-session-engine-live-proof-report.md
+?? plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2320-GH-08-P01.2-session-engine-redteam-report.md
+?? plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2340-GH-08-P01.2-round2-fix-recheck-report.md
+?? plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2255-GH-08-P01.2-session-engine-review-report.md
+?? plans/reports/handoff-260901-1011-GH-07-dispatch-executor-selection-fable-brainstorm-prompt.md
+?? plans/reports/handoff-260901-1123-GH-07-step08-standalone-coordination-protocols-design-prompt.md
+?? plans/reports/handoff-260901-1403-GH-07-step08-pre-plan-architecture-review-prompt.md
+?? plans/reports/researcher-260901-1049-GH-07-executor-provider-selection-architecture.md
+?? plans/reports/researcher2_260901-1120-step08-executor-provider-selection-architecture.md
+?? plans/reports/reviewer-260901-1403-GH-07-step08-pre-plan-architecture-review.md
+?? plans/reports/reviewer-cell-6-6-260831-0813-scoped-subtask-red-team-report.md
+?? test/runner/coordination-declared-vs-agent-led-equivalence.test.mjs

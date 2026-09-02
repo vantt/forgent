@@ -1,0 +1,11 @@
+{
+  "runId": "run_asgn_p072_r6_external_adoption_mdview_op_005_01",
+  "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_005",
+  "attempt": 1,
+  "executorId": "claude",
+  "dispatchPlanPath": ".fgos/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/dispatch-plan.json",
+  "cwd": "/home/vantt/projects/mdview",
+  "startedAt": "2026-09-02T06:33:15.147Z",
+  "timeoutMs": 900000,
+  "status": "running"
+}

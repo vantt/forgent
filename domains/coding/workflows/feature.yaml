@@ -63,8 +63,6 @@ stages:
           minTier: standard
           preferPersona: code-reviewer
           preferExecutor: claude
-          fallbackExecutors:
-            - pi
       - id: scout-blast-radius
         taskSpec: scout-blast-radius
         role: researcher

@@ -1,0 +1,1 @@
+Independently re-read `Cargo.toml` and `crates/mdview/Cargo.toml`, and **confirmed** the requester's (op_004) reported finding: package name `mdview`, version `0.7.5` — no discrepancy. Wrote `agent-result.json` and `agent-report.md` to the run's output directory.

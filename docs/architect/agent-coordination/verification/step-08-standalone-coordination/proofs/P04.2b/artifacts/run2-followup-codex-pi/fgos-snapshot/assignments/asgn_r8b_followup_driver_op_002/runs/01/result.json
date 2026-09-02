@@ -1,0 +1,98 @@
+{
+  "runId": "run_asgn_r8b_followup_driver_op_002_01",
+  "assignmentId": "asgn_r8b_followup_driver_op_002",
+  "workId": null,
+  "executorId": "codex-pi",
+  "policy": {
+    "role": "researcher",
+    "executorPreference": [
+      "codex-pi"
+    ],
+    "executorId": "codex-pi",
+    "providerModel": "openai-codex",
+    "tier": "lightweight",
+    "model": "gpt-5.5",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "codex-pi",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "openai-codex",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "codex-pi"
+        }
+      },
+      "model": {
+        "value": "gpt-5.5",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "openai-codex.lightweight"
+        }
+      },
+      "tier": {
+        "value": "lightweight",
+        "source": {
+          "scope": "opPolicy"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_r8b_followup_driver_op_002"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "openai-codex"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "settleReports": [],
+  "status": "failed",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_r8b_followup_driver_op_002/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "failed",
+    "summary": "agent-result.json was present but failed schema validation"
+  },
+  "evidence": {
+    "gitBefore": null,
+    "gitAfter": null,
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [],
+    "tests": []
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "runId": "run_asgn_r8b_proof_driver_op_004_01",
+  "assignmentId": "asgn_r8b_proof_driver_op_004",
+  "attempt": 1,
+  "executorId": "agy-cli",
+  "dispatchPlanPath": ".fgos/assignments/asgn_r8b_proof_driver_op_004/runs/01/dispatch-plan.json",
+  "cwd": "/tmp/fgos-r8b-live-proof-Lqrnkz",
+  "startedAt": "2026-09-01T21:46:30.125Z",
+  "timeoutMs": 150000,
+  "status": "running"
+}

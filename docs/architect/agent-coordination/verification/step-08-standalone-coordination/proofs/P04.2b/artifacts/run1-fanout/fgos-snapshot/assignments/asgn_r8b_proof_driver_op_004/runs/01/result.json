@@ -1,0 +1,98 @@
+{
+  "runId": "run_asgn_r8b_proof_driver_op_004_01",
+  "assignmentId": "asgn_r8b_proof_driver_op_004",
+  "workId": null,
+  "executorId": "agy-cli",
+  "policy": {
+    "role": "researcher",
+    "executorPreference": [
+      "agy-cli"
+    ],
+    "executorId": "agy-cli",
+    "providerModel": "gemini",
+    "tier": "lightweight",
+    "model": "gemini-3.6-flash-medium",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "agy-cli",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "agy-cli"
+        }
+      },
+      "model": {
+        "value": "gemini-3.6-flash-medium",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "gemini.lightweight"
+        }
+      },
+      "tier": {
+        "value": "lightweight",
+        "source": {
+          "scope": "opPolicy"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_r8b_proof_driver_op_004"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "settleReports": [],
+  "status": "failed",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 1,
+    "stdoutLog": ".fgos/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_r8b_proof_driver_op_004/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "failed",
+    "summary": "Settled"
+  },
+  "evidence": {
+    "gitBefore": null,
+    "gitAfter": null,
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [],
+    "tests": []
+  }
+}

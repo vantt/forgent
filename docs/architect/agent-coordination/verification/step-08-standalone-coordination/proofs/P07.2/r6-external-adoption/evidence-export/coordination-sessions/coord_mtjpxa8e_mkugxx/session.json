@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1",
+  "coordinationId": "coord_mtjpxa8e_mkugxx",
+  "objective": "Read Cargo.toml in the current workspace and report its declared package name and version.",
+  "status": "active",
+  "createdAt": "2026-09-02T06:31:38.510Z",
+  "provenanceRoot": {
+    "writerId": "p072-r6-external-adoption-mdview"
+  },
+  "definitionRef": null,
+  "workRef": null,
+  "actors": [
+    {
+      "id": "primary",
+      "role": "researcher"
+    }
+  ],
+  "aggregateBounds": {
+    "wallTimeMs": 3600000,
+    "maxAssignments": 20,
+    "maxConcurrency": 4,
+    "maxRounds": 10,
+    "maxTaskDepth": 3
+  },
+  "assignmentRefs": [
+    "asgn_p072_r6_external_adoption_mdview_op_003"
+  ],
+  "completedAt": null,
+  "partialPolicy": null
+}

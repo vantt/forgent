@@ -77,12 +77,14 @@ test('buildAssignment (declared) still rejects an undeclared operation with the 
   );
 });
 
-test('buildAssignment (declared) with workId: null (mission-lite style) is unaffected by the new stamping (R7 heuristic untouched this cell)', () => {
-  const assignment = buildAssignment({ workId: null, missionId: 'mission_001', stage: 'planning', operation: 'validate-plan' });
+test('buildAssignment (declared) with workId: null (no-Work-attached style) is unaffected by the new stamping (R7 heuristic untouched this cell)', () => {
+  const assignment = buildAssignment({ workId: null, stage: 'planning', operation: 'validate-plan' });
   assert.equal(assignment.workId, null);
-  assert.equal(assignment.missionId, 'mission_001');
+  // Step 08 Phase 01 R4: the prototype `missionId` field/param is retired
+  // from Assignment construction entirely (ADR-008 Decision 5).
+  assert.equal(assignment.missionId, undefined);
   // Declared stamping is role/operation-derived only; it does not itself
-  // consult workId/missionId (that heuristic still lives solely in
+  // consult workId (that heuristic still lives solely in
   // isReadOnlyAssignment, R7 is a later cell).
   assert.equal(assignment.mutation, 'read-only');
 });
@@ -252,7 +254,6 @@ test('buildAssignment (inline) fires the domain harness seam when a Work with a 
     minTier: 'standard',
     preferPersona: 'code-reviewer',
     preferExecutor: 'claude',
-    fallbackExecutors: ['pi'],
   });
   assert.deepEqual(assignment.provenance.validators, ['execution-contract-schema', 'domain-harness-seam']);
 });
@@ -310,6 +311,78 @@ test('buildAssignment (inline) with no work attached at all never fires the harn
   });
   assert.deepEqual(assignment.provenance.validators, ['execution-contract-schema']);
   assert.equal(assignment.policy, undefined);
+});
+
+// ─── Step 08 P04.2b: the narrow "contract.policy = {minTier}" exception ────
+
+test('buildAssignment (inline) with contract.policy = {minTier: "lightweight"} stamps assignment.policy = {minTier: "lightweight"}', () => {
+  const assignment = buildAssignment({
+    provenance: {
+      kind: 'inline',
+      contract: inlineContract({ policy: { minTier: 'lightweight' } }),
+      caller: inlineCaller(),
+    },
+  });
+
+  assert.deepEqual(assignment.policy, { minTier: 'lightweight' });
+  assert.deepEqual(assignment.provenance.inline.contract.policy, { minTier: 'lightweight' });
+  assert.ok(Object.isFrozen(assignment.provenance.inline.contract.policy));
+});
+
+test('buildAssignment (inline) with no contract.policy leaves assignment.policy undefined (byte-identical default behavior)', () => {
+  const assignment = buildAssignment({
+    provenance: { kind: 'inline', contract: inlineContract(), caller: inlineCaller() },
+  });
+  assert.equal(assignment.policy, undefined);
+  assert.equal(assignment.provenance.inline.contract.policy, undefined);
+});
+
+test('buildAssignment (inline) rejects contract.policy = {preferExecutor: "x"} end to end (the whitelist widening is exactly one field wide)', () => {
+  assert.throws(
+    () =>
+      buildAssignment({
+        provenance: {
+          kind: 'inline',
+          contract: inlineContract({ policy: { preferExecutor: 'agy-cli' } }),
+          caller: inlineCaller(),
+        },
+      }),
+    (err) => err instanceof RunnerConfigError && /unknown field "preferExecutor"/.test(err.message),
+  );
+});
+
+test('buildAssignment (inline) merges contract.policy.minTier with a domain harness policy by taking the STRONGER tier, never letting the caller silently weaken a harness-mandated floor', () => {
+  // planning.validate-plan's own declared operation policy (workflow-stage-
+  // graphs.mjs fixture data) sets minTier: 'standard' via the coding domain
+  // harness seam (matchedOp.policy) -- confirmed by the pre-existing harness
+  // test above ("fires the domain harness seam ... assignment.policy ...
+  // minTier: 'standard'"). A caller-declared contract.policy.minTier BELOW
+  // that ('lightweight') must not weaken it below 'standard'.
+  const weakened = buildAssignment({
+    provenance: {
+      kind: 'inline',
+      contract: inlineContract({ role: 'reviewer', supports: 'validate-plan', policy: { minTier: 'lightweight' } }),
+      caller: inlineCaller(),
+    },
+    work: { id: 'tsk-harness-merge-weak', stage: 'planning', domain: 'coding', workflow: 'feature' },
+  });
+  assert.equal(weakened.policy.minTier, 'standard');
+
+  // A caller-declared minTier ABOVE the harness floor ('critical') must
+  // raise it.
+  const raised = buildAssignment({
+    provenance: {
+      kind: 'inline',
+      contract: inlineContract({ role: 'reviewer', supports: 'validate-plan', policy: { minTier: 'critical' } }),
+      caller: inlineCaller(),
+    },
+    work: { id: 'tsk-harness-merge-raise', stage: 'planning', domain: 'coding', workflow: 'feature' },
+  });
+  assert.equal(raised.policy.minTier, 'critical');
+  // Every other harnessPolicy field (persona/executor hints) still passes
+  // through unchanged -- only minTier is resolved via the strength merge.
+  assert.equal(raised.policy.preferPersona, 'code-reviewer');
+  assert.equal(raised.policy.preferExecutor, 'claude');
 });
 
 test('DOMAIN_HARNESS_SEAMS discovery isolates a broken domain harness module: it is skipped, not fatal to loading assignment.mjs for every other domain', () => {

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1",
+  "coordinationId": "coord_r8b_live_proof",
+  "objective": "P04.2b R8 live proof: real fan-out/fan-in research protocol, real subprocess dispatch, 2+ real distinct provider families.",
+  "status": "active",
+  "createdAt": "2026-09-01T21:44:26.073Z",
+  "provenanceRoot": {
+    "writerId": "r8b-proof-driver"
+  },
+  "definitionRef": {
+    "id": "core.coordination-protocol.independent-research-fan-out-fan-in",
+    "version": "1.0.0"
+  },
+  "workRef": null,
+  "actors": [
+    {
+      "id": "coordinator-actor",
+      "role": "coordinator"
+    },
+    {
+      "id": "researcher-a",
+      "role": "researcher"
+    },
+    {
+      "id": "researcher-b",
+      "role": "researcher"
+    }
+  ],
+  "aggregateBounds": {
+    "wallTimeMs": 3600000,
+    "maxAssignments": 20,
+    "maxConcurrency": 4,
+    "maxRounds": 10,
+    "maxTaskDepth": 3
+  },
+  "assignmentRefs": [
+    "asgn_r8b_proof_driver_op_003",
+    "asgn_r8b_proof_driver_op_004",
+    "asgn_r8b_proof_driver_op_005"
+  ],
+  "completedAt": null
+}

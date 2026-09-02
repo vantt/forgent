@@ -1,0 +1,319 @@
+# core/coordination-protocols/group-cognition-framework.yaml -- Phase 05
+# R1-R4 fixture (cell P05.1): the first Group Cognition framework, declared
+# ENTIRELY as FlowDefinition config -- six named phases, in this exact
+# order: divergent exploration -> cluster/deduplicate -> critical challenge
+# -> evidence review -> convergent synthesis -> recommendation with dissent.
+# Validated through the real, unmodified `validateFlowDefinition`
+# (src/runner/definitions/schema.mjs) via `discoverCoordinationProtocols`/
+# `loadCoordinationProtocol` (src/runner/definitions/protocol-loader.mjs) --
+# same discovery path as declared-consult.yaml/
+# independent-research-fan-out-fan-in.yaml. Does NOT execute or wire into
+# CoordinationSession in this cell (R5-R8 -- the external case lock, the
+# single-agent baseline, and the live heterogeneous proof -- are a later
+# cell, P05.2, per phase-05.md's own dependency chain). No launcher prose:
+# every activity, role, actor, topology edge, evidence rule, hard bound,
+# and cohort constraint below is data this schema already understands, not
+# a hardcoded sequence in a driver script.
+#
+# Shape reused, not reinvented (R1's own instruction: "Prefer no new core
+# module if current primitives suffice"):
+# - The divergent-exploration fan-out (facilitator-actor -> explorer-a/b/c,
+#   each its own mediated, maxRounds:1 topology edge) is the EXACT proven
+#   shape independent-research-fan-out-fan-in.yaml already uses for its own
+#   coordinator -> researcher-a/b edges -- a later cell can hand this
+#   fixture to the ALREADY-BUILT `dispatchResearchFanOut`
+#   (session-engine.mjs, P04.2) unmodified. Each edge's source is the
+#   facilitator ONLY, never a sibling explorer -- this is what makes
+#   "one branch reads another's output before cluster/fan-in" structurally
+#   unreachable, not merely discouraged (R3).
+# - cluster-deduplicate, convergent-synthesis, and recommend-with-dissent
+#   are all deliberately given NO incoming topology edge -- the exact
+#   "fan-in, no single edge" shape `synthesize-findings` already uses in
+#   the sibling fixture (a many-to-one aggregation cannot be expressed as
+#   one edge's `contextRefs: [fromAssignmentId]` anyway; a later cell reuses
+#   `synthesizeResearchFanIn`'s already-proven evidence discipline --
+#   never upgrades `reported` to `verified`, never erases a contradiction,
+#   never infers consensus from branch count -- for these operations,
+#   unmodified).
+# - critical-challenge and evidence-review are genuine 1:1 mediated
+#   handoffs (clusterer -> critic, critic -> evidence-reviewer), reusing
+#   `declared-consult.yaml`'s single-edge, `maxRounds: 1` shape verbatim.
+#   Only ONE of the two edges below carries a `critique` intent -- the
+#   declared "exactly one critique/rebuttal round" (R3); the other is a
+#   plain evidence handoff, structurally incapable of becoming a second
+#   critique round (different intent, same maxRounds: 1 cap, same
+#   already-hardened per-edge round-cap mechanism proven empirically in
+#   P03.1 -- reused here as pure declarative data, `topology.edges[].maxRounds`,
+#   never re-implemented).
+#
+# Judgment calls (recorded, not blocked on -- see this cell's own report
+# for the full reasoning):
+# - No operation declares `capabilities:`. Verified source: this fixture's
+#   own sibling, independent-research-fan-out-fan-in.yaml's header comment,
+#   documents that `cohort-planner.mjs`'s `matchCandidateToRequirement`
+#   hard-rejects every real candidate the moment ANY `capabilities` entry
+#   is declared, because zero `kind: "agent"` executors in this repo's real
+#   `.fgos/config.json` declare a matching `for:` array -- a real,
+#   already-discovered config gap, not a guess. Declaring `capabilities`
+#   here would plant the identical landmine for whichever later cell wires
+#   this framework through `planCohort`. `policy.minTier` and each actor's
+#   `persona` (below) carry R2's "capabilities/persona requirements" instead
+#   -- both are genuinely enforced today (`matchCandidateToRequirement`'s
+#   own `minTier` check; `persona` is descriptive PolicyPatch data, never a
+#   hard planner constraint, so it cannot create the same landmine).
+# - `spec.profile.cohort.count` is omitted for the same reason the sibling
+#   fixture omits it: `planCohort` treats a declared `count` as "must equal
+#   spec.actors.length" (every declared actor, not just the diversified
+#   role) -- this fixture declares 8 actors total, so any `count` value
+#   naming just the explorer cohort's own size would hard-fail planning
+#   immediately.
+# - Three explorer actors (not two, like the sibling fixture) -- divergent
+#   exploration with only two branches makes "minority candidate" ambiguous
+#   (1-of-2 is a tie, not a minority); three genuinely name a majority/
+#   minority split for cluster/deduplicate to preserve.
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.group-cognition-framework
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: isolated-until-fan-in
+      edges:
+        - from: facilitator-actor
+          to: explorer-a
+          intents: [explore]
+          maxRounds: 1
+        - from: facilitator-actor
+          to: explorer-b
+          intents: [explore]
+          maxRounds: 1
+        - from: facilitator-actor
+          to: explorer-c
+          intents: [explore]
+          maxRounds: 1
+        - from: clusterer-actor
+          to: critic-actor
+          intents: [critique]
+          maxRounds: 1
+        - from: critic-actor
+          to: evidence-reviewer-actor
+          intents: [evidence-handoff]
+          maxRounds: 1
+    cohort:
+      distinctProviderFamilies: 2
+      requiredRoles: [explorer]
+      independence: isolated-until-fan-in
+
+  roles:
+    - facilitator
+    - explorer
+    - clusterer
+    - critic
+    - evidence-reviewer
+    - synthesizer
+
+  actors:
+    - id: facilitator-actor
+      role: facilitator
+      persona: group-cognition-facilitator
+    - id: explorer-a
+      role: explorer
+      persona: lateral-thinker
+    - id: explorer-b
+      role: explorer
+      persona: domain-specialist
+    - id: explorer-c
+      role: explorer
+      persona: contrarian
+    - id: clusterer-actor
+      role: clusterer
+      persona: taxonomist
+    - id: critic-actor
+      role: critic
+      persona: red-team-critic
+    - id: evidence-reviewer-actor
+      role: evidence-reviewer
+      persona: evidence-auditor
+    - id: synthesizer-actor
+      role: synthesizer
+      persona: neutral-synthesizer
+
+  operations:
+    # Phase 1 (divergent exploration) root op: gives the facilitator its
+    # own Assignment id so each explore-edge below has a real
+    # `fromAssignmentId` to require -- mirrors dispatch-research's exact
+    # role in the sibling fixture.
+    - id: dispatch-exploration
+      role: facilitator
+      task:
+        contractTemplate: exploration-fanout-dispatch
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+    # Phase 1 (divergent exploration): one shared operation template wired
+    # to three independent, mediated-only-from-the-facilitator branch
+    # actors (explorer-a/b/c) -- never wired to a topology edge naming
+    # another explorer as `from` or `to`, which is what keeps every
+    # branch's own context isolated from its siblings before the declared
+    # cluster/fan-in point (R3).
+    - id: divergent-exploration
+      role: explorer
+      policy:
+        minTier: creative
+      task:
+        contractTemplate: divergent-exploration-brief
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+    # Phase 2 (cluster/deduplicate): deliberately no incoming topology edge
+    # -- a many-branches-to-one fan-in, the same shape synthesize-findings
+    # already uses, reused here rather than invented. Preserves minority
+    # candidates by construction: nothing in this operation's own
+    # declaration discards or ranks a branch away, it only clusters/dedupes
+    # (the actual dedup logic is a later cell's prompt/contractTemplate
+    # concern, out of this schema's vocabulary).
+    - id: cluster-deduplicate
+      role: clusterer
+      policy:
+        minTier: analytical
+      task:
+        contractTemplate: cluster-deduplicate-candidates
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+    # Phase 3 (critical challenge): the ONE declared critique/rebuttal
+    # round in this whole framework (topology edge above, intent
+    # "critique", maxRounds: 1) -- adversarial scrutiny tier ("critical").
+    - id: critical-challenge
+      role: critic
+      policy:
+        minTier: critical
+      task:
+        contractTemplate: critical-challenge-review
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+    # Phase 4 (evidence review): a plain mediated handoff from the critic
+    # (topology edge above, intent "evidence-handoff", maxRounds: 1) --
+    # NOT a second critique round (different declared intent, so it can
+    # never be dispatched as one). `evidenceRequired: verified` names this
+    # phase's own aspirational evidence bar (matching the sibling fixture's
+    # own independent-research operation, which declares the same value
+    # for the identical documented reason: a read-only dispatch can never
+    # actually classify 'verified' today, per session-engine.mjs's own
+    # synthesizeResearchFanIn doc comment -- declared here as the honest
+    # target this activity is FOR, not a claim that today's read-only
+    # execution already reaches it).
+    - id: evidence-review
+      role: evidence-reviewer
+      policy:
+        minTier: analytical
+      task:
+        contractTemplate: evidence-review-assessment
+      result:
+        kind: advisory
+        evidenceRequired: verified
+
+    # Phase 5 (convergent synthesis): no incoming topology edge -- a
+    # fan-in over cluster/critique/evidence-review context (and the
+    # original divergent branches), reusing the same no-single-edge
+    # fan-in shape as cluster-deduplicate above, never a new mechanism.
+    - id: convergent-synthesis
+      role: synthesizer
+      policy:
+        minTier: analytical
+      task:
+        contractTemplate: convergent-synthesis-draft
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+    # Phase 6 (recommendation with dissent): the SAME synthesizer-actor's
+    # second, sequential operation -- no new topology edge needed (a
+    # same-actor hand-off, exactly like the sibling fixture's coordinator
+    # performing both dispatch-research and synthesize-findings as two
+    # root operations). `result.kind: advisory` (never gate-verdict --
+    # illegal under CoordinationProtocol anyway -- and never work-product):
+    # this operation's output is ALWAYS advisory, per R4.
+    #
+    # R4 synthesis contract: the eventual rendered output for this
+    # operation (via contractTemplate "recommendation-with-dissent-report",
+    # resolved by whichever later cell wires real dispatch through this
+    # fixture -- V1's FlowDefinition schema has no structured "required
+    # output field" vocabulary of its own, so a documented contractTemplate
+    # convention is the declarative expression available today, matching
+    # every other contractTemplate id in this fixture family) MUST include:
+    #   1. decision criteria
+    #   2. accepted evidence refs
+    #   3. unsupported claims
+    #   4. alternatives
+    #   5. risks
+    #   6. unresolved questions
+    #   7. minority/dissenting positions
+    #   8. missing/failed actors
+    #   9. a proposed next action
+    # It must never hide or upgrade inputs: never promote a "reported"
+    # finding into "verified", never erase a contradiction/dissent, never
+    # infer consensus from branch count alone -- extending
+    # `synthesizeResearchFanIn`'s already-proven evidence-confidence
+    # discipline (session-engine.mjs, P04.2), reused unmodified by whichever
+    # later cell wires this operation through it, never re-implemented here.
+    - id: recommend-with-dissent
+      role: synthesizer
+      policy:
+        minTier: critical
+      task:
+        contractTemplate: recommendation-with-dissent-report
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+  graph:
+    entry: phase-divergent-exploration
+    nodes:
+      - id: phase-divergent-exploration
+        operations:
+          - ref: dispatch-exploration
+            actor: facilitator-actor
+          - ref: divergent-exploration
+            actor: explorer-a
+          - ref: divergent-exploration
+            actor: explorer-b
+          - ref: divergent-exploration
+            actor: explorer-c
+        transitions: [phase-cluster-deduplicate]
+      - id: phase-cluster-deduplicate
+        operations:
+          - ref: cluster-deduplicate
+            actor: clusterer-actor
+        transitions: [phase-critical-challenge]
+      - id: phase-critical-challenge
+        operations:
+          - ref: critical-challenge
+            actor: critic-actor
+        transitions: [phase-evidence-review]
+      - id: phase-evidence-review
+        operations:
+          - ref: evidence-review
+            actor: evidence-reviewer-actor
+        transitions: [phase-convergent-synthesis]
+      - id: phase-convergent-synthesis
+        operations:
+          - ref: convergent-synthesis
+            actor: synthesizer-actor
+        transitions: [phase-recommendation-with-dissent]
+      - id: phase-recommendation-with-dissent
+        operations:
+          - ref: recommend-with-dissent
+            actor: synthesizer-actor
+        transitions: []

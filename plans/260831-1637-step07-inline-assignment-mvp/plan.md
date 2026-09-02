@@ -16,7 +16,7 @@ inline provenance class that cannot bypass governance or the declared graph.
 | # | Phase | Depends on | Status | Exit |
 |---|---|---|---|---|
 | 1 | [executeAssignment hardening + plan-verdict derivation](phase-01-execute-assignment-hardening-and-plan-verdict-derivation.md) | — | done (P01.1 `07f2d943`, P01.2 `d97837d3`) | G1, G6 fixed; `planVerdictFromPlanMd()` lands with READY+split-children test green |
-| 2 | [Assignment provenance + stamped snapshot](phase-02-assignment-provenance-and-stamped-snapshot.md) | 1 | planned | declared path unchanged in behavior; `provenance`, `mutation`, `evidence.required` on every Assignment; interpretation field-driven; G3 closed; mission-lite off `stage:'planning'`; heuristic removed |
+| 2 | [Assignment provenance + stamped snapshot](phase-02-assignment-provenance-and-stamped-snapshot.md) | 1 | done (`c7c0ed39` "mark Phase 02 complete"; ADR-006 Implementation: Implemented; `verification/step-07-mvp/index.md` P02 rows done) | declared path unchanged in behavior; `provenance`, `mutation`, `evidence.required` on every Assignment; interpretation field-driven; G3 closed; mission-lite off `stage:'planning'`; heuristic removed |
 | 3 | [Harness seam + two proofs](phase-03-harness-seam-and-two-proofs.md) | 2 | done (P03.1 `2a22c93c`, P03.2 `7abe80c4`/`05e79b40`, P03.3 `e82a54d0`) | Proof 1 and Proof 2 recorded under `verification/`; `--contract` CLI door; negative tests green |
 
 Separate items, not in this plan: **G4** verify-skip via `branchHeadAtReturn`

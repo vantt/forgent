@@ -1,0 +1,53 @@
+{
+  "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_002",
+  "workId": null,
+  "role": "researcher",
+  "dispatch": "assignment",
+  "objective": "Read Cargo.toml in the current workspace and report its declared package name and version.",
+  "contextRefs": [],
+  "expectedOutputs": [
+    "agent-result.json (status, summary) naming the package's name and version",
+    "agent-report.md: a short human-readable report stating the package's name and version"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-02T06:30:53.554Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Read Cargo.toml in the current workspace and report its declared package name and version.",
+        "contextRefs": [],
+        "constraints": [],
+        "expectedOutputs": [
+          "agent-result.json (status, summary) naming the package's name and version",
+          "agent-report.md: a short human-readable report stating the package's name and version"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "researcher",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 300000,
+          "maxRuns": 1
+        }
+      },
+      "caller": {
+        "writerId": "p072-r6-external-adoption-mdview"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

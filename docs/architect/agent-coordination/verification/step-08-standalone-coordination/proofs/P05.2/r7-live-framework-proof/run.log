@@ -1,0 +1,296 @@
+=== P05.2 R7: live heterogeneous group-cognition-framework proof, real cli-spawn, no fakes ===
+
+--- git status --porcelain (forgentX, BEFORE) ---
+ M AGENTS.md
+ M CLAUDE.md
+ M docs/architect/agent-coordination/proposals/README.md
+ M docs/architect/agent-coordination/roadmap/README.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md
+ M docs/architect/agent-coordination/vision.md
+ M docs/architect/component-boundary/README.md
+?? .agentkit/
+?? .claude/agents/advisor.md
+?? .claude/agents/brainstormer.md
+?? .claude/agents/code-reviewer.md
+?? .claude/agents/code-simplifier.md
+?? .claude/agents/debugger.md
+?? .claude/agents/docs-manager.md
+?? .claude/agents/explore.md
+?? .claude/agents/fullstack-developer.md
+?? .claude/agents/git-manager.md
+?? .claude/agents/journal-writer.md
+?? .claude/agents/kongming.md
+?? .claude/agents/planner.md
+?? .claude/agents/project-manager.md
+?? .claude/agents/researcher.md
+?? .claude/agents/tester.md
+?? .claude/agents/ui-ux-designer.md
+?? .fgos/events/95d36507-d4a6-432f-a879-b01c562217b0-20260830T164608767Z.jsonl
+?? .fgos/events/ee2110a9-914f-4138-b75b-55779f988e6b-20260901T020317216Z.jsonl
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/case-brief.mjs
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-forgentx-before.txt
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r7-live-framework-proof/
+?? docs/architect/component-boundary/node-to-rust-component-migration.md
+?? docs/architect/component-boundary/tmp/
+?? plans/260831-1637-step07-inline-assignment-mvp/reports/
+?? plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2210-GH-08-P01.2-session-engine-live-proof-report.md
+?? plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2320-GH-08-P01.2-session-engine-redteam-report.md
+?? plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2340-GH-08-P01.2-round2-fix-recheck-report.md
+?? plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2255-GH-08-P01.2-session-engine-review-report.md
+?? plans/reports/handoff-260901-1011-GH-07-dispatch-executor-selection-fable-brainstorm-prompt.md
+?? plans/reports/handoff-260901-1123-GH-07-step08-standalone-coordination-protocols-design-prompt.md
+?? plans/reports/handoff-260901-1403-GH-07-step08-pre-plan-architecture-review-prompt.md
+?? plans/reports/researcher-260901-1049-GH-07-executor-provider-selection-architecture.md
+?? plans/reports/researcher2_260901-1120-step08-executor-provider-selection-architecture.md
+?? plans/reports/reviewer-260901-1403-GH-07-step08-pre-plan-architecture-review.md
+?? plans/reports/reviewer-cell-6-6-260831-0813-scoped-subtask-red-team-report.md
+
+
+--- git status --porcelain (mdview, BEFORE, read-only reference project) ---
+ M .fgos/events.jsonl
+
+mdview HEAD: 84a6710ad2970d2702e6ff2814314fe39f9392b8
+
+--- In-memory candidate executor ids for this run (never written to .fgos/config.json) ---
+agy-cli, claude, claude-clone-1, claude-clone-2, claude-reviewer, gemini-clone-1, gemini-clone-2, gemini-clone-3, gitnexus, herdr
+
+Workspace (isolated, no git repo, no secrets written): /tmp/fgos-p052-r7-live-proof-wsycE3
+
+=== Cohort planning: planCohort against the augmented in-memory runnerConfig ===
+status: allocated
+
+--- Allocation explanation (planCohort own output, verbatim) ---
+  actor "clusterer-actor" (role "clusterer") allocated to executor "agy-cli" (provider "gemini", tier "analytical") -- chosen from 8 eligible candidate(s) in stable order; provider family "gemini" not yet used by this cohort
+  actor "critic-actor" (role "critic") allocated to executor "claude" (provider "claude", tier "critical") -- chosen from 7 eligible candidate(s) in stable order; provider family "claude" not yet used by this cohort
+  actor "evidence-reviewer-actor" (role "evidence-reviewer") allocated to executor "claude-clone-1" (provider "claude", tier "analytical") -- chosen from 6 eligible candidate(s) in stable order; provider family "claude" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+  actor "explorer-a" (role "explorer") allocated to executor "claude-clone-2" (provider "claude", tier "creative") -- chosen from 5 eligible candidate(s) in stable order; provider family "claude" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+  actor "explorer-b" (role "explorer") allocated to executor "claude-reviewer" (provider "claude", tier "creative") -- chosen from 4 eligible candidate(s) in stable order; provider family "claude" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+  actor "explorer-c" (role "explorer") allocated to executor "gemini-clone-1" (provider "gemini", tier "creative") -- chosen from 3 eligible candidate(s) in stable order; provider family "gemini" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+  actor "facilitator-actor" (role "facilitator") allocated to executor "gemini-clone-2" (provider "gemini", tier "standard") -- chosen from 2 eligible candidate(s) in stable order; provider family "gemini" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+  actor "synthesizer-actor" (role "synthesizer") allocated to executor "gemini-clone-3" (provider "gemini", tier "analytical") -- chosen from 1 eligible candidate(s) in stable order; provider family "gemini" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+diversity: {"required":2,"achieved":2,"satisfied":true,"degraded":false,"fallbackRuleApplied":null}
+
+=== R4 handoff: verifyPlannedAllocationAgainstCurrentConfig for every actor, before ANY dispatch ===
+ clusterer-actor: ok=true abort=false
+ critic-actor: ok=true abort=false
+ evidence-reviewer-actor: ok=true abort=false
+ explorer-a: ok=true abort=false
+ explorer-b: ok=true abort=false
+ explorer-c: ok=true abort=false
+ facilitator-actor: ok=true abort=false
+ synthesizer-actor: ok=true abort=false
+
+Session opened: coord_mtjf5l0q_jq9y72
+actors bound before any Assignment: [
+  'facilitator-actor',
+  'explorer-a',
+  'explorer-b',
+  'explorer-c',
+  'clusterer-actor',
+  'critic-actor',
+  'evidence-reviewer-actor',
+  'synthesizer-actor'
+]
+aggregateBounds (real, unmodified defaults per case-lock.md): {"wallTimeMs":3600000,"maxAssignments":20,"maxConcurrency":4,"maxRounds":10,"maxTaskDepth":3}
+
+=== Phase 1a: dispatch-exploration (facilitator-actor) ===
+fgos: dispatch capability=(none declared) executor=gemini-clone-2 via=cli-spawn provider=gemini model=gemini-3.6-flash-high tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+settled: failed failed executor=gemini-clone-2 provider=gemini tier=standard wall=13131ms
+
+=== Phase 1b: divergent-exploration fan-out (explorer-a/b/c, distinctProviderFamilies:2 required) ===
+fgos: dispatch capability=(none declared) executor=claude-clone-2 via=cli-spawn provider=claude model=sonnet tier=creative
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fan-out status: dispatched
+
+--- Allocation explanation (planCohort, re-run inside dispatchResearchFanOut) ---
+  actor "clusterer-actor" (role "clusterer") allocated to executor "agy-cli" (provider "gemini", tier "analytical") -- chosen from 8 eligible candidate(s) in stable order; provider family "gemini" not yet used by this cohort
+  actor "critic-actor" (role "critic") allocated to executor "claude" (provider "claude", tier "critical") -- chosen from 7 eligible candidate(s) in stable order; provider family "claude" not yet used by this cohort
+  actor "evidence-reviewer-actor" (role "evidence-reviewer") allocated to executor "claude-clone-1" (provider "claude", tier "analytical") -- chosen from 6 eligible candidate(s) in stable order; provider family "claude" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+  actor "explorer-a" (role "explorer") allocated to executor "claude-clone-2" (provider "claude", tier "creative") -- chosen from 5 eligible candidate(s) in stable order; provider family "claude" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+  actor "explorer-b" (role "explorer") allocated to executor "claude-reviewer" (provider "claude", tier "creative") -- chosen from 4 eligible candidate(s) in stable order; provider family "claude" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+  actor "explorer-c" (role "explorer") allocated to executor "gemini-clone-1" (provider "gemini", tier "creative") -- chosen from 3 eligible candidate(s) in stable order; provider family "gemini" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+  actor "facilitator-actor" (role "facilitator") allocated to executor "gemini-clone-2" (provider "gemini", tier "standard") -- chosen from 2 eligible candidate(s) in stable order; provider family "gemini" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+  actor "synthesizer-actor" (role "synthesizer") allocated to executor "gemini-clone-3" (provider "gemini", tier "analytical") -- chosen from 1 eligible candidate(s) in stable order; provider family "gemini" already used by a prior actor in this cohort (no unused-family candidate was eligible)
+diversity: {"required":2,"achieved":2,"satisfied":true,"degraded":false,"fallbackRuleApplied":null}
+
+--- Branch outcomes (resolved provenance, real dispatch) ---
+  explorer-a: dispatch=fulfilled, runResult.status=failed, confidence=failed, executor=claude-clone-2, provider=claude, tier=creative
+    agentClaim.summary: agent-result.json was present but failed schema validation
+  explorer-b: dispatch=fulfilled, runResult.status=failed, confidence=failed, executor=claude-reviewer, provider=claude, tier=creative
+    agentClaim.summary: dispatch for cwd "/tmp/fgos-p052-r7-live-proof-wsycE3" is already in flight (held for 0s).
+  explorer-c: dispatch=fulfilled, runResult.status=failed, confidence=failed, executor=gemini-clone-1, provider=gemini, tier=creative
+    agentClaim.summary: dispatch for cwd "/tmp/fgos-p052-r7-live-proof-wsycE3" is already in flight (held for 0s).
+
+Distinct real provider families reached across explorer branches: [] (size 0)
+Concurrency overlap: batch wall time 122231ms for 3 concurrent branches (Promise.allSettled, one batch).
+
+=== Phase 2: cluster-deduplicate (clusterer-actor) ===
+fgos: dispatch capability=(none declared) executor=agy-cli via=cli-spawn provider=gemini model=gemini-3.1-pro-low tier=analytical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+settled: failed failed executor=agy-cli provider=gemini tier=analytical wall=10031ms
+agentClaim.summary: Settled
+
+=== Phase 3: critical-challenge (critic-actor) -- the ONE declared critique/rebuttal edge ===
+fgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn provider=claude model=opus tier=critical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+settled: failed failed executor=claude provider=claude tier=critical wall=145507ms
+edge: {"from":"clusterer-actor","to":"critic-actor","intent":"critique"}
+agentClaim.summary (critique content): agent-result.json was present but failed schema validation
+
+=== Phase 4: evidence-review (evidence-reviewer-actor) -- evidence-handoff edge ===
+fgos: dispatch capability=(none declared) executor=claude-clone-1 via=cli-spawn provider=claude model=sonnet tier=analytical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+settled: done reported executor=claude-clone-1 provider=claude tier=analytical wall=206239ms
+edge: {"from":"critic-actor","to":"evidence-reviewer-actor","intent":"evidence-handoff"}
+agentClaim.summary (evidence review content): Audited every major claim in the critic report (asgn_p05_2_r7_proof_driver_op_006) against the frozen mdview case context and the observed working-directory evidence. Most claims are grounded. One process claim (PROC-2) is contradicted by evidence the critic explicitly declined to read: op_002/op_003/op_004's own assignment.json files each embed the identical explicit inline-editing constraint paragraph, so the constraint is not enforced 'only at the critic stage' as claimed. One risk item (path traversal on the write route) is a generic addition not traceable to any text in the frozen brief.
+
+=== Phase 5: convergent-synthesis (synthesizer-actor) ===
+fgos: dispatch capability=(none declared) executor=gemini-clone-3 via=cli-spawn provider=gemini model=gemini-3.1-pro-low tier=analytical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+settled: failed failed executor=gemini-clone-3 provider=gemini tier=analytical wall=10714ms
+agentClaim.summary: Settled
+
+=== Phase 6: recommend-with-dissent (synthesizer-actor, second op, SAME actor) ===
+fgos: dispatch capability=(none declared) executor=gemini-clone-3 via=cli-spawn provider=gemini model=gemini-3.1-pro-high tier=critical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+settled: failed failed executor=gemini-clone-3 provider=gemini tier=critical wall=8778ms
+
+--- FINAL agentClaim.summary (recommend-with-dissent, full) ---
+Settled
+
+=== synthesizeResearchFanIn over the 3 explorer branches (independent, disk-re-verified) ===
+status: synthesized
+accepted: []
+unverified: []
+failed: [{"actorId":"explorer-a","assignmentId":"asgn_p05_2_r7_proof_driver_op_002","runId":"run_asgn_p05_2_r7_proof_driver_op_002_01","status":"failed","confidence":"failed"},{"actorId":"explorer-b","assignmentId":"asgn_p05_2_r7_proof_driver_op_003","runId":"run_asgn_p05_2_r7_proof_driver_op_003_01","status":"failed","confidence":"failed"},{"actorId":"explorer-c","assignmentId":"asgn_p05_2_r7_proof_driver_op_004","runId":"run_asgn_p05_2_r7_proof_driver_op_004_01","status":"failed","confidence":"failed"}]
+missing: []
+explanation: No branch produced verified evidence under an explicit partial policy (0 missing, 3 failed) -- synthesis has no accepted material findings.
+
+--- Final session membership (one-way ref ledger) ---
+assignmentRefs: [
+  'asgn_p05_2_r7_proof_driver_op_001',
+  'asgn_p05_2_r7_proof_driver_op_002',
+  'asgn_p05_2_r7_proof_driver_op_003',
+  'asgn_p05_2_r7_proof_driver_op_004',
+  'asgn_p05_2_r7_proof_driver_op_005',
+  'asgn_p05_2_r7_proof_driver_op_006',
+  'asgn_p05_2_r7_proof_driver_op_007',
+  'asgn_p05_2_r7_proof_driver_op_008',
+  'asgn_p05_2_r7_proof_driver_op_009'
+]
+event count: 27 types: [
+  'session-opened',     'actor-bound',
+  'actor-bound',        'actor-bound',
+  'actor-bound',        'actor-bound',
+  'actor-bound',        'actor-bound',
+  'actor-bound',        'assignment-created',
+  'result-linked',      'assignment-created',
+  'assignment-created', 'assignment-created',
+  'result-linked',      'result-linked',
+  'result-linked',      'assignment-created',
+  'result-linked',      'assignment-created',
+  'result-linked',      'assignment-created',
+  'result-linked',      'assignment-created',
+  'result-linked',      'assignment-created',
+  'result-linked'
+]
+
+--- Secret check: scanning persisted assignment.json/result.json for any env credential value ---
+secretFound: false (expected: false)
+
+--- Wall time per phase ---
+{
+  "dispatch-exploration": 13131,
+  "divergent-exploration-batch": 122231,
+  "cluster-deduplicate": 10031,
+  "critical-challenge": 145507,
+  "evidence-review": 206239,
+  "convergent-synthesis": 10714,
+  "recommend-with-dissent": 8778
+}
+Sum of phase wall times (sequential phases + one concurrent fan-out batch): 516631 ms
+
+--- Retries per actor (RunResult.attempt - 1, or "unknown") ---
+{
+  "facilitator-actor": "unknown",
+  "explorer-a": "unknown",
+  "explorer-b": "unknown",
+  "explorer-c": "unknown",
+  "clusterer-actor": "unknown",
+  "critic-actor": "unknown",
+  "evidence-reviewer-actor": "unknown",
+  "synthesizer-actor-draft": "unknown",
+  "synthesizer-actor-final": "unknown"
+}
+
+--- Operator intervention ---
+None. This driver ran unattended end to end; no manual retry, no manual config edit mid-run, no manual result correction.
+
+--- git status --porcelain (forgentX, AFTER) ---
+ M AGENTS.md
+ M CLAUDE.md
+ M docs/architect/agent-coordination/proposals/README.md
+ M docs/architect/agent-coordination/roadmap/README.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md
+ M docs/architect/agent-coordination/vision.md
+ M docs/architect/component-boundary/README.md
+?? .agentkit/
+?? .claude/agents/advisor.md
+?? .claude/agents/brainstormer.md
+?? .claude/agents/code-reviewer.md
+?? .claude/agents/code-simplifier.md
+?? .claude/agents/debugger.md
+?? .claude/agents/docs-manager.md
+?? .claude/agents/explore.md
+?? .claude/agents/fullstack-developer.md
+?? .claude/agents/git-manager.md
+?? .claude/agents/journal-writer.md
+?? .claude/agents/kongming.md
+?? .claude/agents/planner.md
+?? .claude/agents/project-manager.md
+?? .claude/agents/researcher.md
+?? .claude/agents/tester.md
+?? .claude/agents/ui-ux-designer.md
+?? .fgos/events/95d36507-d4a6-432f-a879-b01c562217b0-20260830T164608767Z.jsonl
+?? .fgos/events/ee2110a9-914f-4138-b75b-55779f988e6b-20260901T020317216Z.jsonl
+?? docs/architect/agent-coordination/proposals/step-09-coding-domain-adoption.md
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/case-brief.mjs
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-forgentx-before.txt
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r7-live-framework-proof/
+?? docs/architect/component-boundary/node-to-rust-component-migration.md
+?? docs/architect/component-boundary/tmp/
+?? plans/260831-1637-step07-inline-assignment-mvp/reports/
+?? plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2210-GH-08-P01.2-session-engine-live-proof-report.md
+?? plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2320-GH-08-P01.2-session-engine-redteam-report.md
+?? plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2340-GH-08-P01.2-round2-fix-recheck-report.md
+?? plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2255-GH-08-P01.2-session-engine-review-report.md
+?? plans/reports/handoff-260901-1011-GH-07-dispatch-executor-selection-fable-brainstorm-prompt.md
+?? plans/reports/handoff-260901-1123-GH-07-step08-standalone-coordination-protocols-design-prompt.md
+?? plans/reports/handoff-260901-1403-GH-07-step08-pre-plan-architecture-review-prompt.md
+?? plans/reports/researcher-260901-1049-GH-07-executor-provider-selection-architecture.md
+?? plans/reports/researcher2_260901-1120-step08-executor-provider-selection-architecture.md
+?? plans/reports/reviewer-260901-1403-GH-07-step08-pre-plan-architecture-review.md
+?? plans/reports/reviewer-cell-6-6-260831-0813-scoped-subtask-red-team-report.md
+
+
+--- git status --porcelain (mdview, AFTER) ---
+ M .fgos/events.jsonl
+
+
+=== P05.2 R7 LIVE PROOF SUMMARY ===
+All 6 phases (9 real dispatches across 8 actors) completed: yes
+Workspace (for independent inspection): /tmp/fgos-p052-r7-live-proof-wsycE3

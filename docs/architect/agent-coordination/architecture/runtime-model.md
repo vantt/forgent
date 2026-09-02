@@ -3,7 +3,7 @@
 Document type: Architecture
 Design status: Accepted
 Implementation: Implemented
-Last reviewed: 2026-08-31
+Last reviewed: 2026-09-01
 Canonical for: semantic request, dispatch, runtime attempt, and normalized result flow
 
 ## Execution Chain
@@ -57,3 +57,15 @@ rather than create conflicting copies.
 
 The field-level baseline is defined in
 [Assignment, Run, And RunResult Contract](../contracts/assignment-run-runresult.md).
+
+CoordinationSession persists membership as a one-way reference to these
+canonical records (session references Assignment; Assignment never carries a
+session/coordination field) per
+[ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)
+and the [CoordinationSession Contract](../contracts/coordination-session.md).
+A declared `CoordinationProtocol` lowers into this same execution chain
+through the shared `FlowDefinition` IR
+([ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md);
+[FlowDefinition Contract](../contracts/flow-definition.md)) exactly like a
+declared Workflow Stage Operation does; neither gains a private Run/RunResult
+path.
