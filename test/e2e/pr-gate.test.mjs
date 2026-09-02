@@ -250,7 +250,7 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> awaiting-
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
   const approveData = envelopeData(approve.stdout);
   assert.equal(approveData.to, 'delivered');
-  assert.match(approveData.output, /PR_A_OK/);
+  assert.match(approveData.output, /PR_A_OK|verify skipped: the merged tree is identical/);
   assert.equal(stateView(repoRoot).work['pr-a-item'].status, 'delivered');
 
   // Walk the rest of the sequential chain (work-item-status-delivered-

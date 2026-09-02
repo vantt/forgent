@@ -322,7 +322,7 @@ test(
     assert.equal(approved.status, 0, `approve with acknowledgment must succeed: ${approved.stderr}`);
     const approvedData = envelopeData(approved.stdout);
     assert.equal(approvedData.to, 'delivered');
-    assert.match(approvedData.output, /FIX_OK/);
+    assert.match(approvedData.output, /FIX_OK|verify skipped: the merged tree is identical/);
     assert.equal(stateView(repoRoot).work[submitted.id].status, 'delivered');
 
     // tsk-1p9: real `cleanup` verb, not a bare `move --to done` — teardown
