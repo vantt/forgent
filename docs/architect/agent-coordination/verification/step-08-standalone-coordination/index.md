@@ -91,7 +91,7 @@ step: set `plan.md`'s Status to `done` and make the closing commit.
 | P06.1 | Phase 06 R1, R2, R3, R4 — 2 real HIGH bugs found+fixed (2 rounds) | done | `a9613222` |
 | P06.2 | Phase 06 R5, R6, R7, R8 (closes Phase 06) — 5 real bugs found+fixed (2 rounds) | done | `93108c14` |
 | P07.1 | Phase 07 R1, R2, R3, R4 — R2 boundary held clean; 1 content defect fixed | done | `4a4d3d67` |
-| P07.2 | Phase 07 R5, R6, R7, R8 (closes Phase 07 + entire plan) — 2 proof-rigor gaps fixed | done | pending |
+| P07.2 | Phase 07 R5, R6, R7, R8 (closes Phase 07 + entire plan) — 2 proof-rigor gaps fixed | done | `e215769b` |
 
 ## Phase 00 Status
 
