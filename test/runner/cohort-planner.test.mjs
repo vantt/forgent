@@ -485,9 +485,9 @@ test('buildCandidateInventory against the real committed .fgos/config.json: only
 
   const byId = Object.fromEntries(inventory.map((c) => [c.executorId, c]));
   assert.equal(byId['agy-cli'].providerFamily, 'gemini');
-  assert.deepEqual(byId['agy-cli'].supportedTiers, ['lightweight']);
+  assert.deepEqual(byId['agy-cli'].supportedTiers, ['lightweight', 'standard', 'creative', 'analytical', 'critical']);
   assert.equal(byId['codex-pi'].providerFamily, 'openai-codex');
-  assert.deepEqual(byId['codex-pi'].supportedTiers, ['lightweight']);
+  assert.deepEqual(byId['codex-pi'].supportedTiers, ['lightweight', 'standard', 'creative', 'analytical', 'critical']);
   assert.equal(byId['glm-cli'].providerFamily, 'z-ai');
   assert.deepEqual(byId['glm-cli'].supportedTiers, ['lightweight']);
   assert.equal(byId['claude'].providerFamily, 'claude');

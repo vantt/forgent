@@ -26,6 +26,21 @@ BASE_REF, exit code 1. Full log:
 | 11 | withLockRetry: numeric holderPid self qualifier (tsk-6uc) | `test/runner/lock-wait.test.mjs:161` | assertion, unrelated (runner lock-wait) |
 
 This list may only shrink; any new failure beyond it blocks cell close.
+
+**Session-load flakiness addendum (P05.2, 2026-09-02):** 3 additional test
+names appeared under full-suite load with ~50 concurrent background
+teammates/subagents live in this session — `concurrent createSession
+from real separate OS processes never loses a registry entry`
+(`test/runner/session.test.mjs`), `spawnWorker throws worker-spawn-fail
+with stdout captured up to a maxBuffer kill` (`test/runner/dispatch.test.mjs`,
+same test already noted flaky under load at P04.2b's close), and
+`withLockRetry: renders remaining-TTL phrase and holder qualifier when
+remainingTtlMs > 0 (tsk-6ci)` (`test/runner/lock-wait.test.mjs`). All 3
+independently re-run standalone, isolated from full-suite load: 3/3 pass
+cleanly. Not added to the 11-row baseline table (that table is
+committed-HEAD-relative and environment-independent); recorded here as a
+now-twice-observed pattern for future cells to recognize quickly rather
+than re-investigate from scratch.
 Failures 8-10 touch `src/runner/dispatch/transport.mjs` (live executor
 timeouts against real `codex-cli`/`agy-herdr` binaries/network — environment-
 dependent, not logic failures) — P00.2/P00.3 touch dispatch files, so these
@@ -41,19 +56,21 @@ of a blanket "unrelated" pass.
 | 02 | R1-R8 | done |
 | 03 | R1-R8 | done |
 | 04 | R1-R9 | done |
-| 05 | R1-R8 | R1-R4 done; R5-R8 BLOCKED pending external-case decision |
-| 06 | R1-R8 | missing (depends on 05) |
+| 05 | R1-R8 | done |
+| 06 | R1-R8 | pending (05 done; not yet scoped into cells) |
 | 07 | R1-R8 | missing (depends on 06) |
 
 ## Active Cell
 
-none
+None (Phase 05 closed; Phase 06 not yet scoped)
 
 ## Next Action
 
-BLOCKED — R5 (P05.2) requires the user to select a real external
-fgOS-using project's decision as the evaluation case (business judgment,
-maps to plan's stop gate #5). See current-cell.md.
+coordinator — read phase-06-recovery-partial-completion-and-budgets.md in
+full and scope it into cells (R1-R8 is large: quorum/partial policy,
+retry/replacement, crash-recovery injection, cancellation, hard budgets,
+a security/adversarial suite, work-isolation negative contract,
+independent Reviewer+Red-Team closure) before dispatching any Doer
 
 ## Cell Log
 
@@ -73,6 +90,7 @@ maps to plan's stop gate #5). See current-cell.md.
 | P04.2 | Phase 04 R5, R6, R7, R9 | done | `d7d24923` |
 | P04.2b | Phase 04 R8 (stop-gate resolution, closes Phase 04) | done | `37e1185b` |
 | P05.1 | Phase 05 R1, R2, R3, R4 | done | `833888ba` |
+| P05.2 | Phase 05 R5, R6, R7, R8 (closes Phase 05) — honest null result | done | `7910fc22` (R5), `c852814d` (config), pending (R6-R8+trace) |
 
 ## Phase 00 Status
 
