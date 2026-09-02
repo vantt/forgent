@@ -365,10 +365,18 @@
         "critical": "opus"
       },
       "gemini": {
-        "lightweight": "gemini-3.6-flash-medium"
+        "lightweight": "gemini-3.6-flash-medium",
+        "standard": "gemini-3.6-flash-high",
+        "creative": "gemini-3.6-flash-high",
+        "analytical": "gemini-3.1-pro-low",
+        "critical": "gemini-3.1-pro-high"
       },
       "openai-codex": {
-        "lightweight": "gpt-5.5"
+        "lightweight": "gpt-5.5",
+        "standard": "gpt-5.5",
+        "creative": "gpt-5.5",
+        "analytical": "gpt-5.5",
+        "critical": "gpt-5.5"
       },
       "z-ai": {
         "lightweight": "z-ai/glm-5.2"
