@@ -57,20 +57,18 @@ of a blanket "unrelated" pass.
 | 03 | R1-R8 | done |
 | 04 | R1-R9 | done |
 | 05 | R1-R8 | done |
-| 06 | R1-R8 | pending (05 done; not yet scoped into cells) |
+| 06 | R1-R8 | R1-R4 done (P06.1); R5-R8 pending (P06.2) |
 | 07 | R1-R8 | missing (depends on 06) |
 
 ## Active Cell
 
-None (Phase 05 closed; Phase 06 not yet scoped)
+None (P06.1 closed; P06.2 not yet scoped)
 
 ## Next Action
 
-coordinator — read phase-06-recovery-partial-completion-and-budgets.md in
-full and scope it into cells (R1-R8 is large: quorum/partial policy,
-retry/replacement, crash-recovery injection, cancellation, hard budgets,
-a security/adversarial suite, work-isolation negative contract,
-independent Reviewer+Red-Team closure) before dispatching any Doer
+coordinator — scope Phase 06 R5-R8 (hard budgets, security/adversarial
+suite, work-isolation negative contract, independent closure of the full
+recovery/budget matrix) into a P06.2 brief before dispatching a Doer
 
 ## Cell Log
 
@@ -90,7 +88,8 @@ independent Reviewer+Red-Team closure) before dispatching any Doer
 | P04.2 | Phase 04 R5, R6, R7, R9 | done | `d7d24923` |
 | P04.2b | Phase 04 R8 (stop-gate resolution, closes Phase 04) | done | `37e1185b` |
 | P05.1 | Phase 05 R1, R2, R3, R4 | done | `833888ba` |
-| P05.2 | Phase 05 R5, R6, R7, R8 (closes Phase 05) — honest null result | done | `7910fc22` (R5), `c852814d` (config), pending (R6-R8+trace) |
+| P05.2 | Phase 05 R5, R6, R7, R8 (closes Phase 05) — honest null result | done | `7910fc22` (R5), `c852814d` (config), `bd785402` (R6-R8+trace) |
+| P06.1 | Phase 06 R1, R2, R3, R4 — 2 real HIGH bugs found+fixed (2 rounds) | done | pending |
 
 ## Phase 00 Status
 
@@ -450,16 +449,26 @@ non-blocking documentation nits accepted, neither warranting a Fixer
 round. Full suite: 4895/4908 pass, all 8 failures match the documented
 baseline exactly, no new failure.
 
-**Phase 05 is now BLOCKED before P05.2.** R5 requires selecting and
-freezing one REAL read-only architecture/vendor/problem-solving decision
-from a project using fgOS outside this repository, before observing any
-candidate outputs (bias-avoidance is the entire point of R5's own
-ordering requirement). This is a genuine business-judgment call --
-WHICH external project, WHICH decision -- not a routine/reversible
-implementation detail this track's autonomous Coordinator role has ever
-self-authorized (matches this track's own "Scout First" doctrine:
-"Ask only when the repo has conflicting evidence, missing context,
-business judgment, or high reversibility risk" -- and maps directly to
-the plan's own named stop gate #5, "the external consuming-project case
-cannot be selected before observing candidate outputs"). Consulting the
-user before preparing P05.2.
+**RESOLVED 2026-09-02.** The R5 stop gate below was hit, the Coordinator
+consulted the user directly (scouted and rejected two candidates first --
+forgentX itself, and herdr-gateway's terminal-scrolling question, both
+for genuine bias-avoidance reasons -- before the user selected mdview's
+editor-screen question), and R5 was frozen at commit `7910fc22`. Phase 05
+went on to close fully at P05.2 (`bd785402`) with an honest null result.
+This paragraph is kept as the historical record of the stop gate itself,
+not current status -- see the Phase/Requirement Matrix above and
+`P05.2.md` for the resolution and outcome.
+
+Original stop-gate note: Phase 05 was BLOCKED before P05.2. R5 requires
+selecting and freezing one REAL read-only architecture/vendor/problem-
+solving decision from a project using fgOS outside this repository,
+before observing any candidate outputs (bias-avoidance is the entire
+point of R5's own ordering requirement). This is a genuine business-
+judgment call -- WHICH external project, WHICH decision -- not a
+routine/reversible implementation detail this track's autonomous
+Coordinator role has ever self-authorized (matches this track's own
+"Scout First" doctrine: "Ask only when the repo has conflicting
+evidence, missing context, business judgment, or high reversibility
+risk" -- and maps directly to the plan's own named stop gate #5, "the
+external consuming-project case cannot be selected before observing
+candidate outputs").

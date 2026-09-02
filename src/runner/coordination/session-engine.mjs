@@ -49,6 +49,11 @@ import {
   bindActor,
   createSessionAssignment,
   linkResult,
+  recordRunRetry,
+  recordActorReplacement,
+  transitionSessionStatus,
+  transitionSessionStatusLocked,
+  withSessionLock,
   readManifest,
   resolveSessionPaths,
   hashTaskKey,
@@ -81,6 +86,23 @@ const EVIDENCE_REQUIRED_VALUES = new Set(['reported', 'verified']);
 
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim() !== '';
+}
+
+/**
+ * The LAST (most recent) event of `type` for `assignmentId`, or `undefined`.
+ * Every reader of a `result-linked` event in this file uses this instead of
+ * a plain `.find()` (which would return the FIRST/original match): after a
+ * Phase 06 R2 retry, store.mjs's `linkResult({allowSupersede: true})` can
+ * legally append a SECOND `result-linked` event for the same assignment, and
+ * that later event is always the authoritative "current" view -- the
+ * original stays in the log, immutable, as historical evidence.
+ */
+function lastEventFor(events, type, assignmentId) {
+  let found;
+  for (const event of events) {
+    if (event.type === type && event.payload.assignmentId === assignmentId) found = event;
+  }
+  return found;
 }
 
 function assertKnownReadOnlyRole(role, label) {
@@ -180,6 +202,20 @@ function findLatestRunResult(fgosDir, assignmentId) {
 }
 
 /**
+ * The engine's ONE literal `executeAssignment()` call site (a static
+ * structural test in `coordination-declared-consult.test.mjs` enforces
+ * this file never grows a second one) -- both `createAndExecuteSessionTask`
+ * (first dispatch) and `retrySessionTask` (Phase 06 R2, a new Run for an
+ * EXISTING Assignment) call through this same tiny wrapper rather than
+ * reaching `executeAssignment` directly, so "retry re-resolution through
+ * EXISTING dispatch APIs, never a new dispatch surface" holds structurally,
+ * not just by convention.
+ */
+async function runExecutorAttempt(assignment, opts) {
+  return executeAssignment(assignment, { ...opts, isReadOnlyMode: true });
+}
+
+/**
  * The engine's single dispatch primitive, shared by the primary task and
  * the dynamic consult task -- both are "one logical task under this
  * session," differing only in which actor/contract/caller they carry.
@@ -241,9 +277,7 @@ async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, c
 
   const assignment = createSessionAssignment({ coordinationId, taskKey, actorId, contract, caller }, opts);
 
-  const priorLink = reconciled.events.find(
-    (event) => event.type === 'result-linked' && event.payload.assignmentId === assignment.assignmentId,
-  );
+  const priorLink = lastEventFor(reconciled.events, 'result-linked', assignment.assignmentId);
   if (priorLink) {
     const runResult = readLinkedRunResultFromDisk(fgosDir, assignment.assignmentId, priorLink.payload.runId);
     return { assignment, runResult, resumed: true };
@@ -270,7 +304,7 @@ async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, c
 
   let runResult;
   try {
-    runResult = await executeAssignment(assignment, { ...opts, isReadOnlyMode: true });
+    runResult = await runExecutorAttempt(assignment, opts);
   } catch (err) {
     if (err instanceof RunnerConfigError) {
       try {
@@ -302,11 +336,12 @@ async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, c
  * @param {string} params.primaryRole Must be a legal/known read-only role (READ_ONLY_ROLES).
  * @param {object} [params.aggregateBounds] Partial bounds; omitted fields default (schema.mjs).
  * @param {string|null} [params.workRef] Optional read-only Work reference; never grants lifecycle authority.
+ * @param {{minimumActors?: number, allowedOmissions?: string[]}} [params.partialPolicy] R1: declared up front, before any Assignment is dispatched (store.mjs's openSession).
  * @param {object} [opts] Workspace options ({ cwd, repoRoot })
  * @returns {Readonly<object>} The stored manifest
  */
 export function openStandaloneSession(
-  { coordinationId, objective, writerId, parentAssignmentId, primaryRole, aggregateBounds, workRef = null },
+  { coordinationId, objective, writerId, parentAssignmentId, primaryRole, aggregateBounds, workRef = null, partialPolicy = null },
   opts = {},
 ) {
   assertKnownReadOnlyRole(primaryRole, 'openStandaloneSession');
@@ -318,6 +353,7 @@ export function openStandaloneSession(
       workRef,
       actors: [{ id: PRIMARY_ACTOR_ID, role: primaryRole }],
       aggregateBounds,
+      partialPolicy,
     },
     opts,
   );
@@ -866,11 +902,12 @@ function assertWithinTaskDepth(fgosDir, immediateParentId, maxTaskDepth, label) 
  * @param {string} [params.parentAssignmentId]
  * @param {object} [params.aggregateBounds] Partial bounds; omitted fields default (schema.mjs).
  * @param {string|null} [params.workRef] Optional read-only Work reference; never grants lifecycle authority.
+ * @param {{minimumActors?: number, allowedOmissions?: string[]}} [params.partialPolicy] R1: declared up front, before any Assignment is dispatched (store.mjs's openSession).
  * @param {object} [opts] Workspace options ({ cwd, repoRoot, packageRoot })
  * @returns {Readonly<object>} The stored manifest
  */
 export function openDeclaredProtocolSession(
-  { definitionId, coordinationId, objective, writerId, parentAssignmentId, aggregateBounds, workRef = null },
+  { definitionId, coordinationId, objective, writerId, parentAssignmentId, aggregateBounds, workRef = null, partialPolicy = null },
   opts = {},
 ) {
   const definition = loadCoordinationProtocol(definitionId, { cwd: opts.cwd, packageRoot: opts.packageRoot });
@@ -910,6 +947,7 @@ export function openDeclaredProtocolSession(
       workRef,
       actors,
       aggregateBounds,
+      partialPolicy,
     },
     opts,
   );
@@ -1699,7 +1737,7 @@ export function synthesizeResearchFanIn(coordinationId, { branchActorIds, contra
       }
     }
 
-    const linkedEvent = events.find((e) => e.type === 'result-linked' && e.payload.assignmentId === assignmentId);
+    const linkedEvent = lastEventFor(events, 'result-linked', assignmentId);
     if (!linkedEvent) {
       missing.push({ actorId, assignmentId, reason: 'Assignment created but not yet settled (no linked RunResult)' });
       continue;
@@ -1750,4 +1788,587 @@ export function synthesizeResearchFanIn(coordinationId, { branchActorIds, contra
     contradictions: Object.freeze([...contradictions]),
     explanation,
   });
+}
+
+// ─── Phase 06 R1-R4: quorum/partial policy, retry/replacement, crash
+// recovery, cancellation ───────────────────────────────────────────────────
+//
+// Everything below reuses the SAME store.mjs/replay.mjs primitives every
+// earlier phase already relies on (`replaySession`, `linkResult`,
+// `transitionSessionStatus`, `bindActor`) plus three new store.mjs doors
+// added for this phase (`recordRunRetry`, `recordActorReplacement`, and
+// `linkResult`'s `allowSupersede` opt-in) -- no new execution/dispatch
+// surface is introduced; retry re-executes through the EXISTING
+// `executeAssignment` import this file already uses for every other
+// dispatch, and actor replacement materializes new work only through the
+// EXISTING `dispatchDeclaredOperation`/`dispatchPrimaryTask`/`proposeConsult`
+// functions above (never a shortcut), which is what makes "re-runs
+// governance" true by construction rather than by a second, parallel check.
+
+/**
+ * R1: resolve each required SessionActor's outcome for `coordinationId`,
+ * following any `actor-replaced` chain to the CURRENT actor fulfilling that
+ * original slot. Pure/read-only -- never transitions the session; see
+ * `closeSessionByQuorum` for the write side.
+ *
+ * @param {string} coordinationId
+ * @param {object} [opts]
+ * @returns {Readonly<{requiredActorIds: string[], completed: object[], failed: object[], late: object[], missing: object[], replaced: object[]}>}
+ *   Every bucket entry carries `{actorId}` (the ORIGINAL required actor id);
+ *   `completed`/`failed` also carry `{assignmentId, runId}`; `late` carries
+ *   `{assignmentId}` (created, not yet settled); `replaced` carries
+ *   `{actorId, replacedBy}` (the actor id that now fulfills this slot) IN
+ *   ADDITION to that actor's own entry in exactly one of the other buckets
+ *   (a replaced slot is never silently absent from completed/failed/late/missing).
+ */
+export function evaluateSessionQuorum(coordinationId, opts = {}) {
+  const { manifest, events } = replaySession(coordinationId, opts);
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  return classifySessionQuorum(coordinationId, manifest, events, fgosDir);
+}
+
+// Shared classification body behind `evaluateSessionQuorum` (its own
+// standalone unlocked read+classify) AND `closeSessionByQuorum`'s internal
+// locked path below -- ONE classification implementation, never two
+// independently-maintained copies, regardless of which caller supplies
+// `{manifest, events}` (a fresh unlocked read for the former, a fresh read
+// taken INSIDE the terminal write's lock for the latter).
+function classifySessionQuorum(coordinationId, manifest, events, fgosDir) {
+  const requiredActorIds = (manifest.actors ?? []).map((actor) => actor.id);
+
+  const replacedBy = new Map(); // oldActorId -> replacementActorId
+  const replacementTargets = new Set(); // every id that is SOMEONE's replacement (never evaluated as its own top-level slot)
+  for (const event of events) {
+    if (event.type === 'actor-replaced') {
+      replacedBy.set(event.payload.oldActorId, event.payload.replacementActorId);
+      replacementTargets.add(event.payload.replacementActorId);
+    }
+  }
+  function resolveEffectiveActor(id) {
+    let current = id;
+    const seen = new Set();
+    while (replacedBy.has(current) && !seen.has(current)) {
+      seen.add(current);
+      current = replacedBy.get(current);
+    }
+    return current;
+  }
+
+  const completed = [];
+  const failed = [];
+  const late = [];
+  const missing = [];
+  const replaced = [];
+
+  for (const originalActorId of requiredActorIds) {
+    if (replacementTargets.has(originalActorId)) continue; // covered via its predecessor's resolution below
+    const effectiveId = resolveEffectiveActor(originalActorId);
+    if (effectiveId !== originalActorId) {
+      replaced.push({ actorId: originalActorId, replacedBy: effectiveId });
+    }
+
+    const createdEvent = events.find((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveId);
+    if (!createdEvent) {
+      missing.push({ actorId: originalActorId });
+      continue;
+    }
+    const assignmentId = createdEvent.payload.assignmentId;
+    const latestLink = lastEventFor(events, 'result-linked', assignmentId);
+    if (!latestLink) {
+      late.push({ actorId: originalActorId, assignmentId });
+      continue;
+    }
+    const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, latestLink.payload.runId);
+    if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') {
+      failed.push({ actorId: originalActorId, assignmentId, runId: runResult.runId });
+    } else {
+      completed.push({ actorId: originalActorId, assignmentId, runId: runResult.runId });
+    }
+  }
+
+  return Object.freeze({
+    requiredActorIds: Object.freeze(requiredActorIds),
+    completed: Object.freeze(completed.map((e) => Object.freeze(e))),
+    failed: Object.freeze(failed.map((e) => Object.freeze(e))),
+    late: Object.freeze(late.map((e) => Object.freeze(e))),
+    missing: Object.freeze(missing.map((e) => Object.freeze(e))),
+    replaced: Object.freeze(replaced.map((e) => Object.freeze(e))),
+  });
+}
+
+/**
+ * R1: close `coordinationId` to a terminal status by evaluating quorum
+ * against every required SessionActor (`evaluateSessionQuorum`).
+ * - Every required actor `completed` (none missing/failed/late) -> transitions
+ *   to `'completed'`.
+ * - Otherwise, requires the session's OWN declared `manifest.partialPolicy`
+ *   (set at `openSession`/`openStandaloneSession`/`openDeclaredProtocolSession`
+ *   time -- never conjured here) to explicitly name every incomplete actor in
+ *   `allowedOmissions`, and (when declared) requires at least
+ *   `minimumActors` to have completed. Closes to `'partial'` ONLY when both
+ *   hold -- "partial never serializes as consensus" (a distinct status from
+ *   `'completed'`, always).
+ * - No declared policy, or the policy does not cover every incomplete actor,
+ *   or too few actors completed: throws `CoordinationError('validation', ...)`
+ *   and the session stays `'active'` -- default completion requires every
+ *   required actor, and an unauthorized partial close is refused rather than
+ *   silently accepted.
+ *
+ * `dissentingActorIds` (optional): caller-declared pass-through, same
+ * philosophy as `synthesizeResearchFanIn`'s own `contradictions` parameter --
+ * this engine has no semantic model of "disagreement," so it never infers
+ * dissent, only records what the caller already knows to be true (e.g. from
+ * a `recordConsultDisposition` rejection it observed).
+ *
+ * @param {string} coordinationId
+ * @param {object} [params]
+ * @param {string[]} [params.dissentingActorIds]
+ * @returns {Readonly<object>} The transitioned manifest.
+ */
+export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [] } = {}, opts = {}) {
+  // The classification (which actors are complete/missing/failed/late) and
+  // the terminal write both happen INSIDE this ONE held lock, from a fresh
+  // `replaySession()` taken after acquiring it -- never from an earlier
+  // unlocked read. A result that genuinely lands between "we started
+  // closing" and "we actually write" is either (a) not yet durable when we
+  // acquire the lock, in which case it is correctly still missing/late, or
+  // (b) already durable (its own write went through this SAME lock first),
+  // in which case this fresh read sees it. There is no window where a
+  // genuinely-completed actor's result can be permanently, falsely recorded
+  // as missing in the absorbing terminal event.
+  return withSessionLock(
+    coordinationId,
+    (paths) => {
+      const { manifest, events } = replaySession(coordinationId, opts);
+      const quorum = classifySessionQuorum(coordinationId, manifest, events, paths.fgosDir);
+      const incomplete = [...quorum.failed, ...quorum.late, ...quorum.missing];
+      const incompleteActorIds = incomplete.map((entry) => entry.actorId);
+
+      if (incompleteActorIds.length === 0) {
+        return transitionSessionStatusLocked(
+          coordinationId,
+          'completed',
+          {
+            ...(quorum.replaced.length > 0 ? { replacedActors: quorum.replaced.map((r) => r.actorId) } : {}),
+            ...(dissentingActorIds.length > 0 ? { dissentingActors: dissentingActorIds } : {}),
+          },
+          paths,
+        );
+      }
+
+      const policy = manifest.partialPolicy;
+      if (!policy) {
+        throw new CoordinationError(
+          'validation',
+          `closeSessionByQuorum: session "${coordinationId}" is missing required actor(s) [${incompleteActorIds.join(', ')}] and declares no partialPolicy -- default completion requires every required SessionActor (R1)`,
+        );
+      }
+      const allowed = new Set(policy.allowedOmissions ?? []);
+      const notAllowed = incompleteActorIds.filter((id) => !allowed.has(id));
+      if (notAllowed.length > 0) {
+        throw new CoordinationError(
+          'validation',
+          `closeSessionByQuorum: actor(s) [${notAllowed.join(', ')}] are missing/failed/late but not named in session "${coordinationId}"'s declared partialPolicy.allowedOmissions -- refusing an undeclared partial close`,
+        );
+      }
+      if (policy.minimumActors !== undefined && quorum.completed.length < policy.minimumActors) {
+        throw new CoordinationError(
+          'validation',
+          `closeSessionByQuorum: only ${quorum.completed.length} actor(s) completed in session "${coordinationId}", below the declared partialPolicy.minimumActors (${policy.minimumActors})`,
+        );
+      }
+
+      return transitionSessionStatusLocked(
+        coordinationId,
+        'partial',
+        {
+          missingActors: incompleteActorIds,
+          ...(quorum.failed.length > 0 ? { failedActors: quorum.failed.map((f) => f.actorId) } : {}),
+          ...(quorum.late.length > 0 ? { lateActors: quorum.late.map((l) => l.actorId) } : {}),
+          ...(quorum.replaced.length > 0 ? { replacedActors: quorum.replaced.map((r) => r.actorId) } : {}),
+          ...(dissentingActorIds.length > 0 ? { dissentingActors: dissentingActorIds } : {}),
+        },
+        paths,
+      );
+    },
+    opts,
+  );
+}
+
+// A retry must always declare WHY (records intent, never a silent
+// resubmission) and a bounded policy -- "never unbounded by omission" is
+// this codebase's own established posture for every other cap
+// (aggregateBounds, schema.mjs DEFAULT_AGGREGATE_BOUNDS). 1 is the smallest
+// real, non-zero default: at most one retry unless the caller explicitly
+// declares a higher policy.
+const DEFAULT_MAX_RETRIES = 1;
+
+/**
+ * R2 (first half): retry `assignmentId` -- dispatch ONE new Run for the SAME
+ * Assignment (never a new Assignment) when the declared `maxRetries` policy
+ * still permits it, and record the new Run as the session's current result
+ * (`linkResult({allowSupersede: true})`) without ever deleting or rewriting
+ * the prior RunResult (it stays on disk, immutable, and stays in the event
+ * log as the earlier `result-linked` entry).
+ *
+ * Resume-safe (R3): always reconciles via `replaySession()` first. Three
+ * crash windows, each closed the same way `createAndExecuteSessionTask`'s
+ * own precedent closes the analogous windows for a first dispatch:
+ * - A settled attempt already sits on disk with no matching `result-linked`
+ *   yet (crash after the retry's `executeAssignment` succeeded, before
+ *   `linkResult`): self-heals by linking it, never re-dispatching.
+ * - A `run-retried` declaration exists with no settled attempt yet (crash
+ *   right after `recordRunRetry`, before dispatch started): `recordRunRetry`
+ *   itself detects this (`pendingRetries > 0`) and resumes the SAME
+ *   declaration rather than appending a second one or re-checking
+ *   `maxRetries` again.
+ * - A per-attempt claim file already exists with no settled result (crash
+ *   mid-dispatch, subprocess killed): fails closed with a named
+ *   `CoordinationError` describing exactly how to repair it (R3: "Ambiguous
+ *   state fails with repair guidance") -- the SAME posture
+ *   `createAndExecuteSessionTask`'s own `dispatch.claim` precedent already
+ *   established for a first dispatch, reused unchanged for a retry.
+ *
+ * @param {string} coordinationId
+ * @param {object} params
+ * @param {string} params.assignmentId Must already be a member of this session.
+ * @param {string} params.reason Non-empty; retry must record why.
+ * @param {number} [params.maxRetries] Default 1.
+ * @param {object} [opts] Forwarded to `executeAssignment`/store.mjs (cwd, repoRoot, runnerConfig, timeoutMs, ...)
+ */
+export async function retrySessionTask(coordinationId, { assignmentId, reason, maxRetries = DEFAULT_MAX_RETRIES }, opts = {}) {
+  if (!isNonEmptyString(assignmentId)) throw new CoordinationError('validation', 'retrySessionTask: assignmentId is required');
+  if (!isNonEmptyString(reason)) throw new CoordinationError('validation', 'retrySessionTask: reason is required -- retry must record why');
+  if (!Number.isInteger(maxRetries) || maxRetries < 1) throw new CoordinationError('validation', 'retrySessionTask: maxRetries must be a positive integer');
+
+  const reconciled = replaySession(coordinationId, opts);
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  if (!reconciled.assignmentRefs.includes(assignmentId)) {
+    throw new CoordinationError('validation', `retrySessionTask: assignment "${assignmentId}" is not a member of session "${coordinationId}"`);
+  }
+  const createdEvent = reconciled.events.find((event) => event.type === 'assignment-created' && event.payload.assignmentId === assignmentId);
+  const actorId = createdEvent?.payload?.actorId;
+
+  // Self-heal: a settled attempt already sits on disk but is not yet the
+  // linked view -- link it now, never re-dispatch a redundant attempt.
+  const latestOnDisk = findLatestRunResult(fgosDir, assignmentId);
+  const latestLinked = lastEventFor(reconciled.events, 'result-linked', assignmentId);
+  if (latestOnDisk && (!latestLinked || latestLinked.payload.runId !== latestOnDisk.runId)) {
+    linkResult(coordinationId, { assignmentId, runId: latestOnDisk.runId }, { ...opts, allowSupersede: true });
+    return { assignmentId, actorId, runResult: latestOnDisk, retried: false, resumed: true };
+  }
+
+  // recordRunRetry itself resumes a pending-but-undispatched declaration
+  // (never double-declares) and enforces maxRetries atomically, lock-held.
+  const { attempt } = recordRunRetry(coordinationId, { assignmentId, reason, previousRunId: latestLinked?.payload?.runId, maxRetries }, opts);
+
+  const assignmentPath = path.join(fgosDir, 'assignments', assignmentId, 'assignment.json');
+  let assignment;
+  try {
+    assignment = JSON.parse(fs.readFileSync(assignmentPath, 'utf8'));
+  } catch (err) {
+    throw new CoordinationError('corrupt-log', `retrySessionTask: assignment.json for "${assignmentId}" could not be read: ${err.message}`);
+  }
+
+  // Per-attempt exclusive claim -- same crash-safety shape as
+  // createAndExecuteSessionTask's own `dispatch.claim`, numbered per retry
+  // attempt so a resumed declaration (same `attempt` number) collides
+  // correctly with a genuinely still-in-flight sibling instead of a
+  // permanent one-shot flag from the FIRST dispatch.
+  const retryClaimPath = path.join(fgosDir, 'assignments', assignmentId, `retry-${attempt}.claim`);
+  try {
+    fs.closeSync(fs.openSync(retryClaimPath, 'wx'));
+  } catch (err) {
+    if (err.code === 'EEXIST') {
+      throw new CoordinationError(
+        'validation',
+        `retrySessionTask: retry attempt ${attempt} for assignment "${assignmentId}" in session "${coordinationId}" already has a claim in progress -- either a concurrent retry is genuinely in flight, or a prior attempt crashed mid-dispatch (ambiguous state, repair guidance: confirm no live process is still running this retry, then remove ${retryClaimPath} before retrying again)`,
+      );
+    }
+    throw err;
+  }
+
+  let runResult;
+  try {
+    runResult = await runExecutorAttempt(assignment, opts);
+  } catch (err) {
+    if (err instanceof RunnerConfigError) {
+      try {
+        fs.unlinkSync(retryClaimPath);
+      } catch (unlinkErr) {
+        if (unlinkErr.code !== 'ENOENT') throw unlinkErr;
+      }
+    }
+    throw err;
+  }
+  linkResult(coordinationId, { assignmentId, runId: runResult.runId }, { ...opts, allowSupersede: true });
+  return { assignmentId, actorId, runResult, retried: true, resumed: false };
+}
+
+/**
+ * R2 (second half): replace `oldActorId` with a newly-bound `newActorId`
+ * for `coordinationId`, recording old/new actor and (optional) allocation
+ * provenance. Because an Assignment's `assignment-created.actorId` is
+ * immutable once written (ADR-008), replacement never rewrites the old
+ * actor's existing Assignments -- it only binds a new SessionActor identity
+ * and an explicit `actor-replaced` link; the CALLER dispatches the
+ * replacement's actual work through the ordinary
+ * `dispatchDeclaredOperation`/`dispatchPrimaryTask`/`proposeConsult`
+ * functions above, which is what makes "re-runs governance" true by
+ * construction (there is no second, shortcut dispatch path here to bypass
+ * provider/tier/diversity/evidence requirements).
+ *
+ * The replacement actor's `role` is always inherited from `oldActorId`
+ * unchanged -- the one hard constraint R2 names explicitly ("cannot
+ * silently relax ... requirements"): a replacement may change WHO performs
+ * the role (persona/policy, which flow into WHICH provider/tier get
+ * selected) but never WHAT role governs the work.
+ *
+ * Resume-safe (R3): both writes below (`bindActor`, `recordActorReplacement`)
+ * are independently idempotent -- a crash between them leaves the new actor
+ * bound but unrecorded; a resumed call (the SAME `oldActorId`/`newActorId`
+ * pair as a prior, already-recorded `actor-replaced` event) skips the
+ * already-done `bindActor` step and only completes `recordActorReplacement`.
+ *
+ * A `newActorId` that is already bound but is NOT a resume of this exact
+ * pair is refused when the collision is decisively provable from on-disk
+ * EVENT state (`newActorId` already has its OWN independent
+ * `assignment-created` on record, or is already serving as some OTHER
+ * actor's replacement) -- either would let one actor's real result get
+ * silently double-counted to cover two required slots.
+ *
+ * The event log alone, however, can never disambiguate the remaining case:
+ * `newActorId` bound (an `actor-bound` event exists) with NEITHER of the
+ * above. `actor-bound` carries no provenance tying it to a specific
+ * caller's intent, so this state is genuinely identical on disk whether it
+ * came from THIS call's own crashed `bindActor` step, OR from a completely
+ * unrelated actor that merely happens to already be bound -- and that
+ * second case is not a rare corner case: EVERY session-declared required
+ * actor is bound via `actor-bound` at `openSession` time
+ * (`store.mjs#openSession`), with no `assignment-created` required, so
+ * "required but not yet dispatched" is the DEFAULT state for a fresh
+ * required actor. Treating that ambiguous state as an automatic resume
+ * (this function's earlier posture) let `newActorId` silently absorb an
+ * unrelated, still-required actor's own slot.
+ *
+ * A crash-file marker closes this gap the SAME way `retrySessionTask`'s own
+ * per-attempt `retry-${attempt}.claim` closes the analogous ambiguity for a
+ * retry dispatch: a `replaceClaimPath` file, keyed on the exact
+ * `(oldActorId, newActorId)` pair, is written to disk strictly BEFORE the
+ * `bindActor` call below. Its presence on a later call is the only thing
+ * that can durably prove "this is MY earlier, crashed `bindActor` step" --
+ * something no `actor-bound` event can ever prove by itself. So: bound +
+ * ambiguous event log + a claim file for this exact pair => genuine
+ * crash-resume (skip `bindActor`, proceed to `recordActorReplacement`).
+ * Bound + ambiguous event log + NO claim file for this exact pair => refused
+ * outright, since it cannot be told apart from an unrelated, independently
+ * required actor.
+ *
+ * @param {string} coordinationId
+ * @param {object} params
+ * @param {string} params.oldActorId Must already be bound to this session, and not itself already replaced.
+ * @param {string} params.newActorId Refused if it already has its own independent `assignment-created` on record, or already serves as some OTHER actor's replacement. Otherwise, if already bound, refused UNLESS a claim file for this exact `(oldActorId, newActorId)` pair already exists on disk (proving a genuine crash-resume of this exact call).
+ * @param {string} [params.persona]
+ * @param {object} [params.policy]
+ * @param {string} params.reason Non-empty.
+ * @param {object} [params.allocationProvenance] Opaque pass-through (e.g. a cohort-planner allocation record).
+ * @param {object} [opts]
+ * @returns {Readonly<object>} The updated manifest.
+ */
+export function replaceSessionActor(coordinationId, { oldActorId, newActorId, persona, policy, reason, allocationProvenance }, opts = {}) {
+  if (!isNonEmptyString(oldActorId) || !isNonEmptyString(newActorId)) {
+    throw new CoordinationError('validation', 'replaceSessionActor: oldActorId and newActorId are required');
+  }
+  if (oldActorId === newActorId) {
+    throw new CoordinationError('validation', 'replaceSessionActor: newActorId must differ from oldActorId');
+  }
+  if (!isNonEmptyString(reason)) {
+    throw new CoordinationError('validation', 'replaceSessionActor: reason is required');
+  }
+
+  const { manifest, events } = replaySession(coordinationId, opts);
+  if (manifest.status !== 'active') {
+    throw new CoordinationError(
+      'validation',
+      `replaceSessionActor: session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot replace an actor once new materialization has stopped`,
+    );
+  }
+  const oldActor = (manifest.actors ?? []).find((actor) => actor.id === oldActorId);
+  if (!oldActor) {
+    throw new CoordinationError('validation', `replaceSessionActor: actor "${oldActorId}" is not bound to session "${coordinationId}"`);
+  }
+  const alreadyReplaced = events.some((event) => event.type === 'actor-replaced' && event.payload.oldActorId === oldActorId);
+  if (alreadyReplaced) {
+    throw new CoordinationError(
+      'validation',
+      `replaceSessionActor: actor "${oldActorId}" in session "${coordinationId}" has already been replaced -- replace the actor that superseded it instead of replacing the same slot twice`,
+    );
+  }
+
+  // Crash-file marker for THIS EXACT (oldActorId, newActorId) pair -- same
+  // shape/location convention as retrySessionTask's own per-attempt
+  // `retry-${attempt}.claim` (session-engine.mjs, search that name),
+  // written strictly BEFORE bindActor below so its on-disk presence can
+  // later prove "this exact call reached this point before", completely
+  // separate from (and never inferable from) the event log. See the doc
+  // comment above for why the event log alone is not enough.
+  const { sessionDir } = resolveSessionPaths(coordinationId, opts);
+  const replaceClaimPath = path.join(sessionDir, `actor-replace-${oldActorId}--${newActorId}.claim`);
+
+  const alreadyBound = (manifest.actors ?? []).some((actor) => actor.id === newActorId);
+  if (alreadyBound) {
+    // Mirror recordActorReplacement's OWN idempotency check (store.mjs) --
+    // the exact same (oldActorId, newActorId) pair comparison -- so
+    // "already bound" is only ever treated as a resume of THIS SAME
+    // replacement call, never silently accepted as a collision with some
+    // other, independently-required actor that happens to already be bound
+    // for its own unrelated reason (which would otherwise let one actor's
+    // real result get double-counted to cover two required slots while the
+    // other required actor's work is never actually verified done).
+    const isResumeOfThisReplacement = events.some(
+      (event) => event.type === 'actor-replaced' && event.payload.oldActorId === oldActorId && event.payload.replacementActorId === newActorId,
+    );
+    if (!isResumeOfThisReplacement) {
+      // A definite, unambiguous collision: newActorId is EITHER (a) already
+      // has its OWN independent dispatch activity on record (an
+      // `assignment-created` under its own actorId -- never possible for
+      // THIS call's own crashed `bindActor` step, since replaceSessionActor
+      // never dispatches anything itself; the CALLER always dispatches the
+      // replacement's work in a SEPARATE call strictly AFTER this one
+      // returns -- see the doc comment above), or (b) already serving as
+      // some OTHER actor's replacement (`actor-replaced` names it as
+      // `replacementActorId`/`oldActorId` for a DIFFERENT pair). Both are
+      // refused outright -- this is exactly the shape that lets one actor's
+      // real result get silently double-counted to cover two required
+      // slots (the bug this check exists to close).
+      const isDefiniteCollision = events.some(
+        (event) =>
+          (event.type === 'assignment-created' && event.payload.actorId === newActorId) ||
+          (event.type === 'actor-replaced' && (event.payload.replacementActorId === newActorId || event.payload.oldActorId === newActorId)),
+      );
+      if (isDefiniteCollision) {
+        throw new CoordinationError(
+          'validation',
+          `replaceSessionActor: newActorId "${newActorId}" is already bound to session "${coordinationId}" with its own independent activity on record -- cannot replace "${oldActorId}" with an actor id that collides with it`,
+        );
+      }
+      // A `newActorId` that is bound but has NEITHER of those -- e.g. a
+      // session-declared required actor never yet dispatched, or an actor
+      // bound by some OTHER standalone `bindActor` call (`proposeConsult`'s
+      // specialist) -- is genuinely ambiguous from the EVENT LOG alone:
+      // `actor-bound` carries no provenance tying it to a specific caller's
+      // intent, so it cannot be told apart from THIS call's own crashed
+      // `bindActor` step by events alone. The claim file (see doc comment
+      // above) is what actually disambiguates: its presence proves this
+      // exact call already reached this point once before; its absence
+      // means this is some other, unrelated already-bound actor -- refuse
+      // outright rather than silently absorbing its required slot.
+      if (!fs.existsSync(replaceClaimPath)) {
+        throw new CoordinationError(
+          'validation',
+          `replaceSessionActor: newActorId "${newActorId}" is already bound to session "${coordinationId}" with no prior replacement claim recorded for this exact (oldActorId "${oldActorId}", newActorId "${newActorId}") pair -- refusing to replace "${oldActorId}" with an actor id that collides with an independently bound actor (e.g. a required actor never yet dispatched)`,
+        );
+      }
+      // else: our own claim file for this exact pair exists on disk --
+      // a genuine crash-resume of THIS call's earlier, incomplete
+      // `bindActor` step. Fall through to recordActorReplacement without
+      // re-binding.
+    }
+  } else {
+    // Write the claim BEFORE bindActor -- this is the durable marker that a
+    // later resumed call (or a genuinely concurrent one) checks above/below.
+    fs.mkdirSync(sessionDir, { recursive: true });
+    try {
+      fs.closeSync(fs.openSync(replaceClaimPath, 'wx'));
+    } catch (err) {
+      if (err.code !== 'EEXIST') throw err;
+      // The claim already exists but newActorId is NOT bound yet -- either a
+      // genuinely concurrent replaceSessionActor call for this exact pair is
+      // in flight right now, or a prior attempt crashed in the narrow window
+      // between writing the claim and calling bindActor. Both are ambiguous
+      // the same way retrySessionTask's own mid-dispatch claim collision is
+      // (R3: "ambiguous state fails with repair guidance") -- fail closed
+      // rather than guess.
+      throw new CoordinationError(
+        'validation',
+        `replaceSessionActor: a replacement from "${oldActorId}" to "${newActorId}" in session "${coordinationId}" already has a claim in progress -- either a concurrent replacement is genuinely in flight, or a prior attempt crashed before "${newActorId}" was bound (ambiguous state, repair guidance: confirm no live process is still running this replacement, then remove ${replaceClaimPath} before retrying again)`,
+      );
+    }
+    // role inherited unchanged from oldActorId -- see doc comment above.
+    bindActor(coordinationId, { id: newActorId, role: oldActor.role, persona, policy }, opts);
+  }
+
+  recordActorReplacement(coordinationId, { oldActorId, replacementActorId: newActorId, reason, allocationProvenance }, opts);
+  return readManifest(coordinationId, opts);
+}
+
+/**
+ * R4: cancel `coordinationId`. Records `reason` plus a snapshot of every
+ * currently in-flight Assignment (`assignment-created` with no
+ * `result-linked` yet, taken from a fresh `replaySession()`), then
+ * transitions to the terminal `'cancelled'` status via the SAME
+ * `transitionSessionStatus` primitive `closeSessionByQuorum` uses --
+ * absorbing (no further transition is ever legal afterward, per that
+ * function's own doc comment) and never deleting or mutating any persisted
+ * Assignment/Run/RunResult. "Stops new materialization" is enforced
+ * globally and for free: every write door that can create a new Assignment
+ * or dispatch a new Run (`createSessionAssignment`, `recordRunRetry`,
+ * `bindActor`) already refuses once `manifest.status !== 'active'`, and
+ * `'cancelled'` is exactly such a status. A genuinely in-flight Run that
+ * finishes AFTER cancellation is still allowed to `linkResult` (that
+ * function is intentionally status-agnostic) -- cancellation records what
+ * was in flight at the moment of cancellation, it never discards an outcome
+ * that arrives late.
+ *
+ * @param {string} coordinationId
+ * @param {object} params
+ * @param {string} params.reason Non-empty.
+ * @param {object} [opts]
+ * @returns {Readonly<object>} The transitioned manifest.
+ */
+export function cancelSession(coordinationId, { reason }, opts = {}) {
+  if (!isNonEmptyString(reason)) throw new CoordinationError('validation', 'cancelSession: reason is required');
+
+  // Same fresh-read-inside-the-lock shape as closeSessionByQuorum, applied
+  // here for structural consistency even though this snapshot is
+  // informational only (never a completion-consensus claim) -- a smaller
+  // blast radius than H2, but the same unlocked-read/locked-write race
+  // exists structurally, so it gets the same fix.
+  return withSessionLock(
+    coordinationId,
+    (paths) => {
+      const { assignmentRefs, events } = replaySession(coordinationId, opts);
+      const inFlightAssignmentIds = assignmentRefs.filter((id) => !lastEventFor(events, 'result-linked', id));
+      return transitionSessionStatusLocked(
+        coordinationId,
+        'cancelled',
+        { reason, ...(inFlightAssignmentIds.length > 0 ? { inFlightAssignmentIds } : {}) },
+        paths,
+      );
+    },
+    opts,
+  );
+}
+
+/**
+ * R4: derive a session's current lifecycle phase for observability/testing
+ * of the phase file's own named vocabulary ("planned/running/
+ * partially-complete/completed/failed/cancelled"). Per
+ * `coordination-session.md`'s own Status Vocabulary, only
+ * `active/completed/partial/failed/cancelled` are ever PERSISTED
+ * `manifest.status` values -- "planned" and "running" are transient,
+ * INFERRED sub-phases of `active` (never a separate persisted status), and
+ * the persisted `'partial'` status is reported here under the phase file's
+ * own more descriptive name, `'partially-complete'`.
+ *
+ * @param {string} coordinationId
+ * @param {object} [opts]
+ * @returns {'planned'|'running'|'partially-complete'|'completed'|'failed'|'cancelled'}
+ */
+export function deriveSessionPhase(coordinationId, opts = {}) {
+  const { manifest } = replaySession(coordinationId, opts);
+  if (manifest.status === 'active') {
+    return manifest.assignmentRefs.length === 0 ? 'planned' : 'running';
+  }
+  return manifest.status === 'partial' ? 'partially-complete' : manifest.status;
 }

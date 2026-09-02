@@ -53,7 +53,20 @@ export function replaySession(coordinationId, opts = {}) {
   const events = readEvents(eventsPath);
 
   const createdIds = new Map(); // assignmentId -> event
-  const linkedIds = new Set();
+  // Phase 06 R2: a second (or later) `result-linked` event for the SAME
+  // assignmentId is legal ONLY when a `run-retried` event for that
+  // assignmentId appears strictly between the previous link and this one --
+  // i.e. the supersession was properly DECLARED first (store.mjs's
+  // `linkResult({allowSupersede: true})` already enforces this at write
+  // time; this is the read-time mirror of that same rule, so a hand-crafted
+  // or corrupted log cannot fake a supersession replay would otherwise
+  // silently accept). `linkedCountByAssignment`/`retriedCountByAssignment`
+  // are running counters as the log is walked in order; `retriedCountAtLastLink`
+  // snapshots the retry counter at the moment of each accepted link, so the
+  // NEXT link is only accepted once that counter has strictly increased.
+  const linkedCountByAssignment = new Map();
+  const retriedCountByAssignment = new Map();
+  const retriedCountAtLastLink = new Map();
   for (const event of events) {
     validateEventPayload(event.type, event.payload);
 
@@ -63,6 +76,15 @@ export function replaySession(coordinationId, opts = {}) {
         throw new CoordinationError('duplicate-ref', `session "${coordinationId}": duplicate "assignment-created" event for assignment "${id}"`);
       }
       createdIds.set(id, event);
+    } else if (event.type === 'run-retried') {
+      const id = event.payload.assignmentId;
+      if (!createdIds.has(id)) {
+        throw new CoordinationError(
+          'out-of-order-ref',
+          `session "${coordinationId}": "run-retried" event for assignment "${id}" that was never "assignment-created"`,
+        );
+      }
+      retriedCountByAssignment.set(id, (retriedCountByAssignment.get(id) ?? 0) + 1);
     } else if (event.type === 'result-linked') {
       const id = event.payload.assignmentId;
       if (!createdIds.has(id)) {
@@ -71,10 +93,25 @@ export function replaySession(coordinationId, opts = {}) {
           `session "${coordinationId}": "result-linked" event for assignment "${id}" that was never "assignment-created"`,
         );
       }
-      if (linkedIds.has(id)) {
-        throw new CoordinationError('duplicate-ref', `session "${coordinationId}": duplicate "result-linked" event for assignment "${id}"`);
+      const priorLinks = linkedCountByAssignment.get(id) ?? 0;
+      if (priorLinks > 0) {
+        const retriedSoFar = retriedCountByAssignment.get(id) ?? 0;
+        const retriedAtLastLink = retriedCountAtLastLink.get(id) ?? 0;
+        if (retriedSoFar <= retriedAtLastLink) {
+          throw new CoordinationError(
+            'duplicate-ref',
+            `session "${coordinationId}": duplicate "result-linked" event for assignment "${id}" with no intervening "run-retried" authorization`,
+          );
+        }
       }
-      linkedIds.add(id);
+      linkedCountByAssignment.set(id, priorLinks + 1);
+      retriedCountAtLastLink.set(id, retriedCountByAssignment.get(id) ?? 0);
+    } else if (event.type === 'actor-replaced') {
+      // No ordering invariant beyond the generic shape check
+      // (validateEventPayload above) -- replaceSessionActor's own
+      // idempotent-append guard (recordActorReplacement) is what prevents a
+      // duplicate at write time; replay has no additional cross-event rule
+      // to enforce here.
     }
   }
 

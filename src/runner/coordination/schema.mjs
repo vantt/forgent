@@ -10,7 +10,7 @@
 
 export const SCHEMA_VERSION = '1';
 
-export const STATUS_VALUES = new Set(['active', 'completed', 'partial', 'failed']);
+export const STATUS_VALUES = new Set(['active', 'completed', 'partial', 'failed', 'cancelled']);
 
 // Contract's manifest field table, verbatim. Any OTHER top-level key
 // (missionId included) is rejected below by whitelist, not by naming it
@@ -29,11 +29,19 @@ const MANIFEST_FIELDS = new Set([
   'aggregateBounds',
   'assignmentRefs',
   'completedAt',
+  'partialPolicy',
 ]);
 
 const PROVENANCE_ROOT_FIELDS = new Set(['writerId', 'parentAssignmentId']);
 const ACTOR_FIELDS = new Set(['id', 'role', 'persona', 'policy']);
 const DEFINITION_REF_FIELDS = new Set(['id', 'version']);
+
+// R1 (Phase 06): "An explicit partial policy names minimum actors/results
+// and allowed omissions before execution." Persisted on the manifest so the
+// policy exists BEFORE any Assignment is dispatched (never conjured at
+// closure time) -- immutable once the session is opened, like every other
+// manifest field store.mjs's mutators never rewrite.
+const PARTIAL_POLICY_FIELDS = new Set(['minimumActors', 'allowedOmissions']);
 
 // ADR-008 Decision 5: no V1 schema carries `missionId`, mandatory or
 // optional, at any nesting level. `sessionId`/`threadId`/`coordinationRef`
@@ -137,6 +145,22 @@ function validateProvenanceRoot(provenanceRoot, label) {
   }
 }
 
+function validatePartialPolicy(policy, label) {
+  if (!isPlainObject(policy)) fail('validation', `${label} must be an object when provided`);
+  assertOnlyAcceptedFields(policy, PARTIAL_POLICY_FIELDS, label);
+  if (policy.minimumActors === undefined && policy.allowedOmissions === undefined) {
+    fail('validation', `${label} must declare at least one of minimumActors/allowedOmissions`);
+  }
+  if (policy.minimumActors !== undefined && !isPositiveInteger(policy.minimumActors)) {
+    fail('validation', `${label}.minimumActors must be a positive integer`);
+  }
+  if (policy.allowedOmissions !== undefined) {
+    if (!Array.isArray(policy.allowedOmissions) || policy.allowedOmissions.length === 0 || !policy.allowedOmissions.every(isNonEmptyString)) {
+      fail('validation', `${label}.allowedOmissions must be a non-empty array of non-empty strings when provided`);
+    }
+  }
+}
+
 function validateActor(actor, index) {
   const label = `actors[${index}]`;
   if (!isPlainObject(actor)) fail('validation', `${label} must be a non-null object`);
@@ -230,6 +254,10 @@ export function validateManifest(manifest) {
   if (manifest.status !== 'active' && !manifest.completedAt) {
     fail('validation', `manifest.completedAt must be set once status leaves "active" (status: "${manifest.status}")`);
   }
+
+  if (manifest.partialPolicy !== undefined && manifest.partialPolicy !== null) {
+    validatePartialPolicy(manifest.partialPolicy, 'manifest.partialPolicy');
+  }
 }
 
 // Event Log table (coordination-session.md), required/accepted payload
@@ -241,12 +269,40 @@ const EVENT_SPECS = {
   'actor-bound': { required: ['actorId', 'role'], accepted: ['actorId', 'role', 'persona', 'policy'] },
   'assignment-created': { required: ['assignmentId'], accepted: ['assignmentId', 'actorId'] },
   'result-linked': { required: ['assignmentId', 'runId'], accepted: ['assignmentId', 'runId'] },
-  'session-completed': { required: [], accepted: [] },
-  'session-partial': { required: ['missingActors'], accepted: ['missingActors'] },
+  // Phase 06 R2: retry creates a new Run for the SAME Assignment. Declared
+  // BEFORE dispatch (store.mjs's recordRunRetry appends this first, matching
+  // the "record intent before mutating/spawning" discipline every other
+  // store.mjs door already uses) so a crash between declaration and dispatch
+  // always leaves a durable, resumable trace -- never a silently lost retry.
+  'run-retried': { required: ['assignmentId', 'reason'], accepted: ['assignmentId', 'reason', 'previousRunId'] },
+  // Phase 06 R2: actor replacement, recorded ONLY through declared retry
+  // policy (session-engine.mjs's replaceSessionActor). `allocationProvenance`
+  // is an opaque, caller-supplied pass-through record (e.g. a cohort-planner
+  // allocation) -- this module has no allocation semantics of its own to
+  // invent.
+  'actor-replaced': { required: ['oldActorId', 'replacementActorId', 'reason'], accepted: ['oldActorId', 'replacementActorId', 'reason', 'allocationProvenance'] },
+  'session-completed': { required: [], accepted: ['replacedActors', 'dissentingActors'] },
+  // R1: "Final state lists every missing, failed, replaced, late, and
+  // dissenting branch; partial never serializes as consensus." `missingActors`
+  // stays the one REQUIRED field (contract-mandated); the rest are optional
+  // denormalized summaries -- the authoritative record of WHY/HOW stays the
+  // event log itself (`run-retried`/`actor-replaced`), these are just a
+  // durable, at-a-glance final-state snapshot on the terminal event.
+  'session-partial': { required: ['missingActors'], accepted: ['missingActors', 'failedActors', 'lateActors', 'replacedActors', 'dissentingActors'] },
   'session-failed': { required: ['reason'], accepted: ['reason'] },
+  // R4: cancellation "records in-flight outcomes" -- `inFlightAssignmentIds`
+  // is a snapshot (assignment-created with no result-linked yet) taken at
+  // the moment of cancellation, never mutated afterward.
+  'session-cancelled': { required: ['reason'], accepted: ['reason', 'inFlightAssignmentIds'] },
 };
 
 export const EVENT_KINDS = Object.freeze(Object.keys(EVENT_SPECS));
+
+// Optional array-of-non-empty-string fields shared by several event kinds
+// above (beyond the REQUIRED `missingActors`, already handled inline in
+// `validateEventPayload`). Centralized here so a new bucket name is added
+// in exactly one place.
+const OPTIONAL_STRING_ARRAY_FIELDS = new Set(['failedActors', 'lateActors', 'replacedActors', 'dissentingActors', 'inFlightAssignmentIds']);
 
 /**
  * Validate one event's `type` + `payload` against the contract's Event Log
@@ -278,6 +334,23 @@ export function validateEventPayload(type, payload) {
       continue;
     }
     if (!isNonEmptyString(value)) fail('validation', `event "${type}" payload.${field} must be a non-empty string`);
+  }
+
+  // Optional fields shared by more than one event kind, checked regardless
+  // of which kind is being validated (each is only ever ACCEPTED on the
+  // kinds that declare it above, so this never legalizes a field a given
+  // kind's own `accepted` list omits).
+  for (const field of OPTIONAL_STRING_ARRAY_FIELDS) {
+    if (body[field] === undefined) continue;
+    if (!Array.isArray(body[field]) || !body[field].every(isNonEmptyString)) {
+      fail('validation', `event "${type}" payload.${field} must be an array of non-empty strings when provided`);
+    }
+  }
+  if (body.previousRunId !== undefined && !isNonEmptyString(body.previousRunId)) {
+    fail('validation', `event "${type}" payload.previousRunId must be a non-empty string when provided`);
+  }
+  if (body.allocationProvenance !== undefined && !isPlainObject(body.allocationProvenance)) {
+    fail('validation', `event "${type}" payload.allocationProvenance must be an object when provided`);
   }
 
   if (type === 'session-opened') {

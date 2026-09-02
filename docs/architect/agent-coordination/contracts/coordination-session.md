@@ -2,8 +2,10 @@
 
 Document type: Contract
 Design status: Accepted
-Implementation: Not started
-Last reviewed: 2026-09-01
+Implementation: In progress (Phase 06 R1-R4 landed: quorum/partial policy,
+retry/replacement, crash recovery, cancellation — `src/runner/coordination/
+{schema,store,replay,session-engine}.mjs`)
+Last reviewed: 2026-09-02
 Canonical for: CoordinationSession manifest/event schema, storage layout, session-to-Assignment membership, and recovery rules
 Related: [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md), [Assignment, Run, And RunResult Contract](assignment-run-runresult.md), [Runtime Model](../architecture/runtime-model.md), [Work Integration](../architecture/work-integration.md)
 
@@ -48,6 +50,7 @@ is not committed truth.
 | `aggregateBounds` | object | yes | Hard session-wide limits: `{wallTimeMs, maxAssignments, maxConcurrency, maxRounds, maxTaskDepth}`. Any bound omitted at open time defaults to the foundation's configured ceiling; it is never unbounded by omission. |
 | `assignmentRefs` | array of string | yes | Assignment ids belonging to this session. This array, appended atomically at each Assignment's creation, **is** the one-way membership index (ADR-008 Decision 2). No other store may claim membership authority. |
 | `completedAt` | ISO 8601 timestamp \| null | no | Set when `status` leaves `active`. |
+| `partialPolicy` | `{minimumActors?: number, allowedOmissions?: string[]} \| null` | no | Phase 06 R1: declared at session-open time, before any Assignment is dispatched; immutable thereafter. `null` (default) means no partial close is ever legal for this session — default completion requires every required SessionActor. |
 
 **Forbidden fields:** `missionId` (mandatory or optional) must not appear on
 this manifest, at any nesting level (ADR-008 Decision 5). A field named
@@ -65,11 +68,20 @@ reaffirmed by ADR-006 §6 and ADR-008 §2).
 | `completed` | All required SessionActors/branches finished; synthesis, if any, is final. |
 | `partial` | Session closed under an explicit partial-completion policy with named missing actors/branches (never silently). |
 | `failed` | Session could not reach a valid completion state; failure reason is recorded in the event log. |
+| `cancelled` | Session was explicitly cancelled (Phase 06 R4): new materialization stops, in-flight Assignments at the moment of cancellation are recorded, and no Run/RunResult is deleted or mutated. |
 
 No other status value is legal in V1. A session must not represent "waiting
 on a human" or "recovering" as a manifest `status` value; those are transient
 runtime states inferred from the event log, not persisted lifecycle states of
-the manifest itself.
+the manifest itself. "Planned" and "running" are likewise inferred sub-phases
+of `active` (zero vs. at least one `assignmentRefs` entry), never a separate
+persisted status (`session-engine.mjs`'s `deriveSessionPhase`).
+
+Every status other than `active` is terminal and absorbing: once
+`transitionSessionStatus` moves a session out of `active`, no further
+transition to any status (including a different terminal one) is ever legal
+— exactly one transition per session, `active -> {completed | partial |
+failed | cancelled}`.
 
 ## Event Log (`events.jsonl`)
 
@@ -82,12 +94,27 @@ reference discipline as `assignmentRefs`. Minimum event kinds:
 | `actor-bound` | A SessionActor id is bound to a Role (and optionally a Persona/policy). | `actorId`, `role`, `ts` |
 | `assignment-created` | An Assignment was created under this session; written atomically with the corresponding `assignmentRefs` append. | `assignmentId`, `actorId?`, `ts` |
 | `result-linked` | A RunResult became available for a session Assignment. | `assignmentId`, `runId`, `ts` |
-| `session-completed` | Terminal `completed` transition. | `ts` |
-| `session-partial` | Terminal `partial` transition. | `ts`, `missingActors` (named, non-empty) |
+| `run-retried` | Phase 06 R2: a retry was declared for an existing Assignment, BEFORE its new Run dispatches. | `assignmentId`, `reason`, `ts`, `previousRunId?` |
+| `actor-replaced` | Phase 06 R2: `oldActorId` was replaced by `replacementActorId` (already `actor-bound` separately); provenance-only, never rewrites the old actor's own `assignment-created` events. | `oldActorId`, `replacementActorId`, `reason`, `ts`, `allocationProvenance?` |
+| `session-completed` | Terminal `completed` transition. | `ts`, `replacedActors?`, `dissentingActors?` |
+| `session-partial` | Terminal `partial` transition. | `ts`, `missingActors` (named, non-empty), `failedActors?`, `lateActors?`, `replacedActors?`, `dissentingActors?` |
 | `session-failed` | Terminal `failed` transition. | `ts`, `reason` |
+| `session-cancelled` | Phase 06 R4: terminal `cancelled` transition. | `ts`, `reason`, `inFlightAssignmentIds?` |
 
 Additional event kinds may be added by a future phase without breaking this
 contract as long as they do not change the meaning of the kinds above.
+
+**Retry supersession (Phase 06 R2).** A `result-linked` event for an
+`assignmentId` that already has one is legal ONLY when a `run-retried` event
+for that same `assignmentId` appears strictly between the previous link and
+this one — i.e. the supersession was properly declared first
+(`linkResult({allowSupersede: true})`, `store.mjs`; enforced identically at
+read time by `replay.mjs`). The earlier `result-linked` event and its
+RunResult are never rewritten or deleted; the LATEST `result-linked` event
+for an `assignmentId` is always the current authoritative view. A second
+`result-linked` for the same `assignmentId` with no intervening
+`run-retried` is rejected as `duplicate-ref`, at both write time and replay
+time.
 
 ## Recovery Rule
 
@@ -166,3 +193,13 @@ approval/merge state in `.fgos/coordination/`.
   read of a sibling actor's result before the declared fan-in event.
 - A session cannot reach `completed` while `aggregateBounds` required actors
   are missing, unless an explicit `session-partial` transition names them.
+- A second `result-linked` event for one `assignmentId` with no intervening
+  `run-retried` event is rejected as `duplicate-ref` (Phase 06 R2), both at
+  `linkResult` write time and at `replaySession` read time.
+- A session cannot close `partial` without a `partialPolicy` declared at
+  open time, and a `partialPolicy` that does not name every missing/failed/
+  late actor in `allowedOmissions` refuses the close (Phase 06 R1) —
+  `closeSessionByQuorum` never accepts an undeclared partial close.
+- Once a session leaves `active` (any of `completed|partial|failed|
+  cancelled`), every further `transitionSessionStatus` call is refused
+  (Phase 06 R4: terminal statuses are absorbing).

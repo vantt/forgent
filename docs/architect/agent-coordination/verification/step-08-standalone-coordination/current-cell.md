@@ -1,33 +1,31 @@
 # Current Cell
 
-Cell: P05.2 (closed) — Phase 05 done
+Cell: P06.1 (closed) — Phase 06 R1-R4 done
 Status: closed
 Owner: Coordinator
 Last updated: 2026-09-02
-Next action: coordinator (scope Phase 06 / P06.1)
+Next action: coordinator (scope P06.2 — Phase 06 R5-R8)
 
 ## Closure summary
 
-R5 (frozen `7910fc22`) through R8 all closed this cell. R6/R7 live
-dispatch by Doer, independently re-verified by the Coordinator against
-raw artifacts (not re-trusted from either agent's own narrative). R8
-independent evaluator (fresh context, zero exposure to how R6/R7 were
-produced) delivered an honest null-result verdict per case-lock.md's own
-rules. One real test regression from this cell's own prior config fix
-(`c852814d`) found and fixed (`test/runner/cohort-planner.test.mjs`'s
-stale `supportedTiers` expectations). Full trace: `P05.2.md`. Phase 05
-exit criterion satisfied via the honest-null-result branch — **Phase 05:
-done.**
+Full 2-round Doer→Reviewer→Fixer→Red-Team→Fixer→Red-Team-recheck cycle
+(matching P01.1's own precedent for this risk class): 2 real HIGH bugs
+found (H1 actor-id collision in `replaceSessionActor`, H2 unlocked-then-write
+race in `closeSessionByQuorum`), both fixed and adversarially re-verified
+with real multi-process repros — round 1's H1 fix was found incomplete by
+Red-Team and needed a second Fixer round (a per-pair on-disk claim file,
+mirroring `retrySessionTask`'s own precedent) before the final Red-Team
+recheck confirmed CLOSEABLE. Full trace: `P06.1.md`. Test suite: 226/226
+focused, 4921/4934 full (no new failure vs. documented baseline).
 
 ## Next action
 
-Phase 06 (Recovery, partial completion, and budget hardening) is next
-per the plan's own phase order. Phase 06 is large (R1-R8: quorum/partial
-policy, retry/replacement, crash-recovery injection at every persistence
-boundary, cancellation/terminal states, hard budgets, a security/
-adversarial suite, a work-isolation negative contract, and independent
-Reviewer+Red-Team closure) — the Coordinator must read
-`plans/260901-1542-step08-standalone-coordination/phase-06-recovery-partial-completion-and-budgets.md`
-in full and scope it into cells (mirroring how Phase 04/05 each needed
-more than one cell) before dispatching any Doer. Do not dispatch a Doer
-against the raw phase file directly.
+Phase 06 R5-R8 (hard budgets, security/adversarial suite, work-isolation
+negative contract, independent Reviewer+Red-Team closure of the FULL
+recovery/budget matrix) is P06.2, per the phase's own risk/rollback note
+("land quorum/retry separately from hard-budget/adversarial changes").
+The Coordinator must read
+`plans/260901-1542-step08-standalone-coordination/phase-06-recovery-partial-completion-and-budgets.md`'s
+full R5-R8 text again (already read once when scoping P06.1) and write a
+P06.2 brief before dispatching any Doer — do not dispatch against the
+raw phase file directly.

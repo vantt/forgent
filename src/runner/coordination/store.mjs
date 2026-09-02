@@ -109,11 +109,17 @@ function writeManifestRaw(manifestPath, manifest) {
  * @param {string|null} [params.workRef]
  * @param {Array<{id: string, role: string, persona?: string, policy?: object}>} [params.actors]
  * @param {object} [params.aggregateBounds] Partial bounds; omitted fields default (schema.mjs).
+ * @param {{minimumActors?: number, allowedOmissions?: string[]}|null} [params.partialPolicy]
+ *   Declared BEFORE any Assignment is dispatched (Phase 06 R1: "An explicit
+ *   partial policy names minimum actors/results and allowed omissions before
+ *   execution"); immutable once the session opens. `null` (default) means no
+ *   partial close is ever legal -- default completion requires every
+ *   required SessionActor.
  * @param {object} [opts] Workspace options ({ cwd, repoRoot })
  * @returns {Readonly<object>} The stored manifest
  */
 export function openSession(
-  { coordinationId, objective, provenanceRoot, definitionRef = null, workRef = null, actors, aggregateBounds },
+  { coordinationId, objective, provenanceRoot, definitionRef = null, workRef = null, actors, aggregateBounds, partialPolicy = null },
   opts = {},
 ) {
   const { sessionsDir } = resolveCoordinationPaths(opts);
@@ -171,6 +177,7 @@ export function openSession(
     aggregateBounds: applyAggregateBoundDefaults(aggregateBounds),
     assignmentRefs: [],
     completedAt: null,
+    partialPolicy,
   };
   validateManifest(manifest);
 
@@ -615,6 +622,19 @@ export function createSessionAssignment(
  * be "the" result) and throws `duplicate-ref` -- the same category
  * `replay.mjs`'s own consistency check uses for the identical shape found
  * later, at replay time.
+ *
+ * `opts.allowSupersede` (Phase 06 R2 retry, opt-in): permits linking a
+ * DIFFERENT runId over an already-linked assignment ONLY when a `run-retried`
+ * event for this exact assignmentId already exists AFTER the currently-linked
+ * event in the log -- i.e. only when a retry was properly DECLARED first
+ * (`recordRunRetry`, below). This never deletes or rewrites the prior
+ * `result-linked` event or its RunResult (both stay on disk, immutable,
+ * exactly as `replay.mjs`'s own reconstruction expects); it only appends ONE
+ * MORE `result-linked` event, which callers resolve by taking the LATEST
+ * match for an assignmentId as the current authoritative view (mirrors
+ * `session-engine.mjs`'s own `lastEventFor` helper). Every pre-existing
+ * caller omits this flag, so behavior is byte-identical to before it
+ * existed.
  */
 export function linkResult(coordinationId, { assignmentId, runId }, opts = {}) {
   const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
@@ -627,12 +647,26 @@ export function linkResult(coordinationId, { assignmentId, runId }, opts = {}) {
     if (!manifest.assignmentRefs.includes(assignmentId)) {
       throw new CoordinationError('validation', `assignment "${assignmentId}" is not a member of session "${coordinationId}" -- cannot link a result to it`);
     }
-    const existingLink = readEvents(eventsPath).find(
-      (event) => event.type === 'result-linked' && event.payload.assignmentId === assignmentId,
-    );
+    const freshEvents = readEvents(eventsPath);
+    const existingLinks = freshEvents.filter((event) => event.type === 'result-linked' && event.payload.assignmentId === assignmentId);
+    const existingLink = existingLinks[existingLinks.length - 1];
     if (existingLink) {
       if (existingLink.payload.runId === runId) {
         return; // idempotent no-op: the SAME run is already linked
+      }
+      if (opts.allowSupersede) {
+        const existingLinkIndex = freshEvents.indexOf(existingLink);
+        const authorizedByRetry = freshEvents
+          .slice(existingLinkIndex + 1)
+          .some((event) => event.type === 'run-retried' && event.payload.assignmentId === assignmentId);
+        if (!authorizedByRetry) {
+          throw new CoordinationError(
+            'validation',
+            `linkResult: supersede requested for assignment "${assignmentId}" but no "run-retried" event authorizes replacing runId "${existingLink.payload.runId}" with "${runId}" -- retries must be declared via recordRunRetry before their result can supersede the prior link`,
+          );
+        }
+        appendEventLocked(eventsPath, { type: 'result-linked', payload }, sessionDir);
+        return;
       }
       throw new CoordinationError(
         'duplicate-ref',
@@ -643,34 +677,188 @@ export function linkResult(coordinationId, { assignmentId, runId }, opts = {}) {
   });
 }
 
-const TERMINAL_EVENT_TYPE = { completed: 'session-completed', partial: 'session-partial', failed: 'session-failed' };
-
 /**
- * Transition a session to a terminal status (`completed`/`partial`/
- * `failed`), appending the matching terminal event and updating
- * `session.json`'s `status`/`completedAt` as one atomic operation.
+ * Declare ONE retry for `assignmentId` (Phase 06 R2: "Retry creates a new
+ * Run for the same Assignment when policy permits"). Appends `run-retried`
+ * BEFORE any dispatch happens -- the caller (`session-engine.mjs`'s
+ * `retrySessionTask`) always executes the new Run and calls
+ * `linkResult({..., allowSupersede: true})` strictly AFTER this returns, so
+ * a crash between this call and the actual dispatch always leaves a durable,
+ * self-describing "declared but not yet fulfilled" trace instead of a lost
+ * or ambiguous retry.
+ *
+ * Resume-safe / idempotent under the SAME rules `createSessionAssignment`
+ * already established: if a PRIOR `run-retried` declaration for this
+ * assignment has not yet been fulfilled by a matching `result-linked` (i.e.
+ * `pendingRetries > 0` below), this call is a genuine RESUME of that same
+ * declaration -- it appends NOTHING and returns the existing attempt number,
+ * so a caller retrying after a crash never double-declares or double-spends
+ * the retry budget. Only once every prior declaration is fulfilled does this
+ * function check `maxRetries` and (if permitted) declare a genuinely NEW
+ * retry, all inside the SAME lock-held critical section as the fresh
+ * `readEvents()` it reasons from -- the same cross-process TOCTOU closure
+ * `createSessionAssignment`'s own opt-in caps use.
+ *
+ * @param {object} params
+ * @param {string} params.assignmentId
+ * @param {string} params.reason Non-empty; retry must record why.
+ * @param {string} [params.previousRunId] The runId being superseded, if any.
+ * @param {number} [params.maxRetries] Declared retry policy ceiling; omitted = unbounded (caller's own responsibility -- `session-engine.mjs`'s `retrySessionTask` always passes one).
+ * @returns {{attempt: number, resumedDeclaration: boolean}}
  */
-export function transitionSessionStatus(coordinationId, status, extra = {}, opts = {}) {
-  const eventType = TERMINAL_EVENT_TYPE[status];
-  if (!eventType) throw new CoordinationError('validation', `transitionSessionStatus: status must be one of ${Object.keys(TERMINAL_EVENT_TYPE).join(', ')}`);
-
+export function recordRunRetry(coordinationId, { assignmentId, reason, previousRunId, maxRetries }, opts = {}) {
   const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
-  const payload = status === 'partial' ? { missingActors: extra.missingActors } : status === 'failed' ? { reason: extra.reason } : {};
-  validateEventPayload(eventType, payload);
 
   return withEventsLock(eventsPath, () => {
     const manifest = readManifestRaw(manifestPath);
     assertSchemaVersionCurrent(manifest, manifestPath);
     if (manifest.status !== 'active') {
-      throw new CoordinationError('validation', `session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot transition to "${status}"`);
+      throw new CoordinationError('validation', `recordRunRetry: session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot retry, new materialization is stopped once a session leaves active`);
     }
-    appendEventLocked(eventsPath, { type: eventType, payload }, sessionDir);
-    manifest.status = status;
-    manifest.completedAt = new Date().toISOString();
-    validateManifest(manifest);
-    writeManifestRaw(manifestPath, manifest);
-    return Object.freeze(manifest);
+    if (!manifest.assignmentRefs.includes(assignmentId)) {
+      throw new CoordinationError('validation', `recordRunRetry: assignment "${assignmentId}" is not a member of session "${coordinationId}"`);
+    }
+
+    const freshEvents = readEvents(eventsPath);
+    const priorRetries = freshEvents.filter((event) => event.type === 'run-retried' && event.payload.assignmentId === assignmentId).length;
+    const linkedCount = freshEvents.filter((event) => event.type === 'result-linked' && event.payload.assignmentId === assignmentId).length;
+    // Each `result-linked` beyond the very first fulfills exactly one prior
+    // declared retry; `linkedCount === 0` (never even settled once) also
+    // means zero retries have been FULFILLED yet, never a negative count.
+    const fulfilledRetries = Math.max(linkedCount - 1, 0);
+    const pendingRetries = priorRetries - fulfilledRetries;
+
+    if (pendingRetries > 0) {
+      // A retry was already declared but its dispatch never produced a
+      // linked result yet -- resume that SAME declaration, never a second
+      // one, and never double-count it against maxRetries.
+      return { attempt: priorRetries, resumedDeclaration: true };
+    }
+
+    if (maxRetries !== undefined && priorRetries >= maxRetries) {
+      throw new CoordinationError(
+        'validation',
+        `recordRunRetry: assignment "${assignmentId}" has already been retried ${priorRetries} time(s), at or above the declared maxRetries cap of ${maxRetries} -- refusing a further retry`,
+      );
+    }
+
+    const payload = { assignmentId, reason, ...(previousRunId !== undefined ? { previousRunId } : {}) };
+    validateEventPayload('run-retried', payload);
+    appendEventLocked(eventsPath, { type: 'run-retried', payload }, sessionDir);
+    return { attempt: priorRetries + 1, resumedDeclaration: false };
   });
+}
+
+/**
+ * Record an actor replacement (Phase 06 R2: "Actor replacement occurs only
+ * through declared retry policy, records old/new actor and allocation
+ * provenance"). The new actor must already be bound (`bindActor`, called by
+ * `session-engine.mjs`'s `replaceSessionActor` BEFORE this) -- this function
+ * only appends the provenance record, and does so idempotently: a second
+ * call for the SAME `(oldActorId, replacementActorId)` pair is a no-op
+ * (crash-resume self-heal, mirroring `completeAssignmentRegistration`'s own
+ * idempotent-append check), never a duplicate event.
+ */
+export function recordActorReplacement(coordinationId, { oldActorId, replacementActorId, reason, allocationProvenance }, opts = {}) {
+  const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const payload = { oldActorId, replacementActorId, reason, ...(allocationProvenance !== undefined ? { allocationProvenance } : {}) };
+  validateEventPayload('actor-replaced', payload);
+
+  return withEventsLock(eventsPath, () => {
+    const manifest = readManifestRaw(manifestPath);
+    assertSchemaVersionCurrent(manifest, manifestPath);
+    const alreadyRecorded = readEvents(eventsPath).some(
+      (event) => event.type === 'actor-replaced' && event.payload.oldActorId === oldActorId && event.payload.replacementActorId === replacementActorId,
+    );
+    if (alreadyRecorded) return;
+    appendEventLocked(eventsPath, { type: 'actor-replaced', payload }, sessionDir);
+  });
+}
+
+const TERMINAL_EVENT_TYPE = { completed: 'session-completed', partial: 'session-partial', failed: 'session-failed', cancelled: 'session-cancelled' };
+
+// Builds the exact payload shape each terminal event kind accepts (schema.mjs
+// EVENT_SPECS), passing through only the optional fields the CALLER actually
+// supplied -- never fabricating an empty array for a bucket the caller never
+// populated. Kept as one small table-driven function so a new terminal
+// status/field is added in exactly one place.
+function buildTerminalPayload(status, extra) {
+  const optional = (field) => (extra[field] !== undefined ? { [field]: extra[field] } : {});
+  switch (status) {
+    case 'completed':
+      return { ...optional('replacedActors'), ...optional('dissentingActors') };
+    case 'partial':
+      return { missingActors: extra.missingActors, ...optional('failedActors'), ...optional('lateActors'), ...optional('replacedActors'), ...optional('dissentingActors') };
+    case 'failed':
+      return { reason: extra.reason };
+    case 'cancelled':
+      return { reason: extra.reason, ...optional('inFlightAssignmentIds') };
+    default:
+      return {};
+  }
+}
+
+/**
+ * The unlocked core of `transitionSessionStatus` -- appends the terminal
+ * event and updates `session.json`'s `status`/`completedAt` as one atomic
+ * operation, but assumes the caller ALREADY holds `coordinationId`'s
+ * events.lock (via `withEventsLock` directly, or `withSessionLock` below).
+ * Exported only so a caller that needs to combine its OWN fresh
+ * classification read with this same terminal write as one atomic critical
+ * section (`session-engine.mjs`'s `closeSessionByQuorum`/`cancelSession`)
+ * can do so without re-acquiring the lock a second time (the lock is a
+ * plain on-disk file mutex, not reentrant -- a nested acquisition attempt
+ * from the SAME process would just retry against itself until timeout).
+ * Every other caller uses the public, self-locking `transitionSessionStatus`
+ * below instead.
+ */
+export function transitionSessionStatusLocked(coordinationId, status, extra, { sessionDir, eventsPath, manifestPath }) {
+  const eventType = TERMINAL_EVENT_TYPE[status];
+  if (!eventType) throw new CoordinationError('validation', `transitionSessionStatus: status must be one of ${Object.keys(TERMINAL_EVENT_TYPE).join(', ')}`);
+  const payload = buildTerminalPayload(status, extra);
+  validateEventPayload(eventType, payload);
+
+  const manifest = readManifestRaw(manifestPath);
+  assertSchemaVersionCurrent(manifest, manifestPath);
+  if (manifest.status !== 'active') {
+    throw new CoordinationError('validation', `session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot transition to "${status}"`);
+  }
+  appendEventLocked(eventsPath, { type: eventType, payload }, sessionDir);
+  manifest.status = status;
+  manifest.completedAt = new Date().toISOString();
+  validateManifest(manifest);
+  writeManifestRaw(manifestPath, manifest);
+  return Object.freeze(manifest);
+}
+
+/**
+ * Transition a session to a terminal status (`completed`/`partial`/
+ * `failed`/`cancelled`), appending the matching terminal event and updating
+ * `session.json`'s `status`/`completedAt` as one atomic operation. Every
+ * terminal status is absorbing: the `manifest.status !== 'active'` guard
+ * below means no further transition is ever legal out of ANY terminal
+ * status (Phase 06 R4: "bounded transitions" -- active -> exactly one of
+ * completed/partial/failed/cancelled, never anywhere else).
+ */
+export function transitionSessionStatus(coordinationId, status, extra = {}, opts = {}) {
+  const paths = resolveSessionPaths(coordinationId, opts);
+  return withEventsLock(paths.eventsPath, () => transitionSessionStatusLocked(coordinationId, status, extra, paths));
+}
+
+/**
+ * Acquire `coordinationId`'s events.lock and run `fn(paths)` inside it --
+ * the SAME held lock `transitionSessionStatus`/every other store.mjs
+ * mutator already uses. Exported so a caller that needs to (re-)read fresh
+ * state and decide+write a terminal transition as ONE atomic critical
+ * section can do so, instead of reading unlocked and handing a possibly-
+ * stale decision to a separately-locked write later (the exact TOCTOU
+ * `transitionSessionStatus`'s own `manifest.status !== 'active'` guard alone
+ * cannot close -- that guard only re-checks status, never a caller's own
+ * classification of WHICH actors/assignments are complete).
+ */
+export function withSessionLock(coordinationId, fn, opts = {}) {
+  const paths = resolveSessionPaths(coordinationId, opts);
+  return withEventsLock(paths.eventsPath, () => fn(paths));
 }
 
 /** Read the current manifest without replay reconstruction/consistency checks (see replay.mjs for that). */

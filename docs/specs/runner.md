@@ -1147,12 +1147,14 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 coordination` — canonical đầy đủ (schema, ADR, ví dụ) sống ở
 `docs/architect/agent-coordination/`; mục này chỉ tóm lược đủ để một phiên
 đọc `docs/specs/` biết ranh giới tồn tại và trỏ đúng chỗ. Tính tới
-2026-09-01 (Phase 01 R1-R4, cell P01.1): manifest/event store + replay đã
-có runtime thật tại `src/runner/coordination/{schema,store,replay}.mjs`
-(test: `test/runner/coordination-*.test.mjs`) — store/schema/events/direct
-cutover từ `mission-lite.mjs` cũ (đã xoá). Session engine thật (R5), dynamic
-consult (R6), resume/idempotency đầy đủ (R7), và live agent-led proof (R8)
-CHƯA tồn tại — đó là P01.2.
+2026-09-02 (Phase 06 R1-R4, cell P06.1): manifest/event store + replay +
+session engine + quorum/retry/cancellation runtime đều đã có thật tại
+`src/runner/coordination/{schema,store,replay,session-engine}.mjs` (test:
+`test/runner/coordination-*.test.mjs`) — store/schema/events/direct cutover
+từ `mission-lite.mjs` cũ (đã xoá). Phase 06 R5-R8 (hard budget, adversarial
+security suite, work-isolation static negative contract, independent
+Reviewer+Red-Team closure của toàn ma trận recovery/budget) CHƯA tồn tại —
+đó là cell P06.2 riêng.
 
 **CoordinationSession là gì.** Một lần điều phối agent có biên (bounded) —
 objective, actor, budget, task/Assignment runtime khi cần, kết quả tổng hợp —
@@ -1205,6 +1207,43 @@ session lại, tuỳ chọn, tương lai) là `deferred-preserved`: V1 không c�
 `missionId` ở bất kỳ đâu. Prototype `mission-lite` cũ (`src/runner/dispatch/
 mission-lite.mjs`) bị thay thế TRỰC TIẾP — không có reader/detector/reporter/
 migration tương thích ngược nào cho `.fgos/missions/`.
+
+**Quorum, retry/replacement, crash recovery, cancellation (Phase 06 R1-R4).**
+Mặc định, một session chỉ đóng `completed` khi MỌI SessionActor bắt buộc đã
+hoàn tất (evaluateSessionQuorum/closeSessionByQuorum,
+`src/runner/coordination/session-engine.mjs`); một `partialPolicy` khai báo
+NGAY LÚC MỞ session (`{minimumActors?, allowedOmissions?}`, bất biến sau đó,
+không bao giờ tự chế ra lúc đóng) mới cho phép đóng `partial` — và `partial`
+không bao giờ tự nhận là `completed`, trạng thái cuối luôn liệt kê đủ actor
+missing/failed/late/replaced/dissenting. Retry (`retrySessionTask`) tạo một
+Run MỚI cho ĐÚNG Assignment cũ (không tạo Assignment mới), theo policy
+`maxRetries` khai báo; kết quả mới `supersede` view hiện hành của session
+(`linkResult({allowSupersede: true})`) nhưng KHÔNG BAO GIỜ xoá/ghi đè
+RunResult cũ — cả hai đều ở lại event log, bất biến. Thay actor
+(`replaceSessionActor`) chỉ xảy ra qua đúng cơ chế này: bind actor mới CÙNG
+role với actor cũ (không bao giờ đổi role ngầm), ghi provenance actor
+cũ/mới + allocation, rồi việc dispatch thật cho actor mới vẫn đi qua đúng
+`dispatchDeclaredOperation`/`dispatchPrimaryTask`/`proposeConsult` sẵn có —
+không có đường dispatch tắt nào bỏ qua governance (provider/tier/diversity/
+evidence). Phục hồi sau crash: mọi ghi nhiều-bước mới (retry declare ->
+dispatch -> link; bind actor -> record replacement) đều tự self-heal khi
+resume (không double-count, không double-dispatch), nhờ một bản ghi claim
+trên đĩa riêng cho từng bước — với `replaceSessionActor`, claim khoá đúng
+theo cặp (actor cũ, actor thay thế), nên một actor KHÁC đã bind sẵn vì lý
+do độc lập (vd. một actor bắt buộc khai báo ngay lúc mở session nhưng chưa
+từng dispatch — trạng thái MẶC ĐỊNH của một actor bắt buộc còn mới, không
+phải ca hiếm) không bao giờ bị lẫn với resume của chính lệnh này và bị nuốt
+mất slot bắt buộc của riêng nó; một state không rõ ràng (claim còn treo,
+không rõ tiến trình cũ còn sống hay đã chết) fail closed với lỗi named rõ
+hướng sửa, không bao giờ đoán liều. Cancellation
+(`cancelSession`) chuyển sang trạng thái cuối `cancelled` (thêm vào
+`active|completed|partial|failed`), chặn MỌI Assignment/Run mới (mọi cửa ghi
+đều từ chối khi `status !== 'active'`), ghi lại ảnh chụp Assignment đang
+in-flight lúc huỷ, nhưng không xoá/sửa Run/RunResult đã có; một Run in-flight
+lúc huỷ vẫn được phép `linkResult` khi nó settle muộn. Mọi trạng thái cuối
+(`completed|partial|failed|cancelled`) là hấp thụ — không có transition nào
+đi tiếp từ trạng thái cuối. Chi tiết đầy đủ:
+`docs/architect/agent-coordination/contracts/coordination-session.md`.
 
 **CLI.** Bề mặt tối thiểu (thiết kế, chưa có verb thật): `fgos coordination
 run --file <request>` (chạy đồng bộ) và `fgos coordination show <id> --json`
