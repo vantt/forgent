@@ -51,10 +51,12 @@ definitions, statuses, or document placement.
 
 ### Continue The Design Discussion
 
-1. [Step 09: Coding Domain Adoption Of The Coordination Foundation](../proposals/step-09-coding-domain-adoption.md)
+1. [Step 09: Group Thinking Substrate](../proposals/step-09-group-thinking-substrate.md)
 2. [Team Communication Protocol V1](proposals/team-communication-protocol-v1.md)
 3. [Dispatch Control Plane Redesign](proposals/dispatch-control-plane-redesign.md)
-4. [Architecture Intent](../architecture-intent.md)
+4. [Step 10: Coding Domain Adoption Of The Coordination Foundation](../proposals/step-10-coding-domain-adoption.md)
+5. [Component Authority Boundary Map](../proposals/component-authority-boundary-map.md)
+6. [Architecture Intent](../architecture-intent.md)
    preserves broader architecture intent across deferred capabilities. Its
    first active thread covers group-thinking/problem-solving capability across
    Agent Coordination, Work Driver, Dispatch/Run, Run Result Evaluation, and
@@ -123,20 +125,25 @@ The next design frontier remains intentionally non-canonical:
 
 ```txt
 Step 09
+  standalone group-thinking substrate
+  Master Coordination style loop as first proof fixture
+  bounded adaptive declared rounds without Work dependency
+
+Step 10
   coding domain as the second unlike consumer
   duplicate-mechanism inventory and seams
-  foundation capabilities coding still needs
+  Work-attached adoption after substrate/boundary guardrails
   mutating live proof gated on ADR-010 §5
 
-Architecture Intent
-  richer group-thinking/problem-solving capability
-  communication-heavy loops without weakening isolation-heavy fixtures
-  eventual shape for coding-domain implementation cells
+Component Authority Boundary Map
+  parallel architect-level guardrail for Agent Coordination, Dispatch/Run,
+  RunResult Evaluation, Work Core, Coding Domain Core, and Host/Support surfaces
 ```
 
-Step 09 and architecture-wide group-cognitive expansion are discussion drafts.
-Their proposed entities and schemas must not be treated as accepted contracts
-until promoted according to [Documentation Governance](documentation-governance.md).
+Step 09, Step 10, and the Component Authority Boundary Map are discussion
+drafts. Their proposed entities and schemas must not be treated as accepted
+contracts until promoted according to
+[Documentation Governance](documentation-governance.md).
 
 They must, however, preserve the accepted direction in the
 [Vision](vision.md); the proposals may choose implementation shape but cannot

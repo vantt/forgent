@@ -17,8 +17,9 @@ review loops, without weakening the already-proven isolation-heavy
 
 Related:
 - `docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md`
-- `docs/architect/proposals/step-09-coding-domain-adoption.md`
-- `docs/architect/proposals/step-09-component-authority-layout-map.md`
+- `docs/architect/proposals/step-09-group-thinking-substrate.md`
+- `docs/architect/proposals/step-10-coding-domain-adoption.md`
+- `docs/architect/proposals/component-authority-boundary-map.md`
 - `docs/architect/agent-coordination/intent-preservation-ledger.md`
 
 This is a discussion document. It does not accept a design, does not change
@@ -644,83 +645,37 @@ These objections should stay visible until answered:
 ## 17. MVP Roadmap
 
 This is the plan shape, not a menu of questions. Each MVP keeps the original
-intention alive while adding only the architecture needed for that layer.
+intention alive while adding only the architecture needed for that layer. The
+detailed proposal lives in
+[Step 09 - Group Thinking Substrate](proposals/step-09-group-thinking-substrate.md).
+
+Stable spine:
+
+```txt
+FlowDefinition = static legality envelope
+CoordinationSession = event-sourced runtime ledger
+External driver = adaptive authority outside the worker graph
+Assignment / Run / RunResult = execution and evidence path
+Context grant = visibility and memory access path
+Skill / surface = thin launcher only
+```
 
 | MVP | Goal | Real shape | Architecture change | Proof |
 |---|---|---|---|---|
-| 0 | Keep existing guarantees stable. | `group-cognition-framework.yaml` remains isolation-heavy; no deviation envelope; existing negative tests stay meaningful. | None except documentation relocation and traceability. | Existing Step 08 R3/P05 proofs still pass unchanged. |
-| 1 | Remove infrastructure noise before judging cognition. | Provider quota preflight, per-cwd dispatch concurrency behavior, cross-provider result-status normalization. | Runtime reliability work, not cognition redesign. | Repeat a live coordination run without P05.2-style infra null result. |
-| 2 | Add bounded optional rounds without topology mutation. | Fixture declares optional operations; actor may `requestRound`; driver `authorizeDeclaredOperation` with evidence refs, artifact revision, and round key. | Small/medium: optional round schema + session events + context grant. | Reviewer/Red-Team first pass stays independent; recheck is a new Assignment, not retry; budget caps hold. |
-| 3 | Prove first useful group-cognitive slice. | `bounded-review-loop.yaml`: artifact/diff -> independent Reviewer + Red-Team -> driver-authorized recheck -> synthesis. | Uses MVP 2; no Work mutation. | Negative tests reject pre-verdict leakage, unauthorized actor dispatch, unbounded rounds, mutation, hidden contextRef. |
-| 4 | Add deliberation memory. | Typed events: `propose`, `challenge`, `clarify`, `respond`, `rank`, `request-round`, `authorize-round`, `disposition`. | Medium: deliberation event/object model tied to Assignments and evidence refs. | RFC/NGT-style transcript can be replayed without reading chat history. |
-| 5 | Add visibility windows and richer aggregation. | Per phase/epoch visibility: raw, mediated, aggregate/anonymized, judge-only; aggregation modes: synthesize, vote, rank, convergence, no-consensus, judge. | Medium: schema + validator + synthesis/aggregation contracts. | Delphi/NGT/adversarial-triad fixtures express their defining rules directly. |
-| 6 | Add dynamic specialist recruitment only if still needed. | Fixture opt-in `deviationEnvelope`; driver may add bounded specialist edge as event-sourced topology overlay. | Large: replayed topology overlay, authorization, race-proof caps, context provenance. | Same action works in opt-in fixture and is rejected in isolation fixture. |
-| 7 | Integrate coding domain read-only collaboration. | Step 09 Work Driver opens Work-attached read-only CoordinationSession for `validate-plan`, `review-item`, `scout-blast-radius`, etc. | Follows Step 09 authority map; CoordinationSession remains Work-lifecycle-blind. | Interactive and headless doors produce equivalent session/evidence records. |
-| 8 | Design mutating code implementation separately. | Work-attached mutating session with workspaceRef, mutation lease, worktree isolation, merge/approval boundaries. | Very large; new ADR/proof gate. | ADR-010 §5 style live proof: overlapping mutation refused, distinct worktrees allowed, Work transitions only through Work verbs. |
+| 0 | Shape lock. | Record the stable spine and boundaries before runtime work. | Docs-only. | Link/check review; no runtime/schema edit. |
+| 1 | Standalone Master Coordination fixture. | `plan.md` or `artifact.md` enters a declared worker graph: Doer, Reviewer, Red-Team, Fixer/Doer-followup, optional Synthesizer. Doer/Fixer produce session-local artifacts/revisions. | Fixture draft first; schema validation after acceptance. | Static skeleton expresses Master Coordination without Work fields or git authority. |
+| 2 | Driver authorization primitive. | Optional operations require `operation-authorized` before dispatch, with `authorizationId`, `operationId`, `targetActorId`, `invocationKey`, `authorizedBy`, `reason`, `grantedContextRefs`, and `artifactRevision`. | Schema/runtime after acceptance. | Missing authorization, undeclared operation, over-cap invocation, terminal-session authorization, and context beyond grant are rejected. |
+| 3 | Recheck and disposition. | Recheck is a new Assignment against a new artifact revision; disposition is a driver event, not worker self-report. | Schema/runtime after MVP 2. | Old verdict remains immutable; new verdict links to revision; synthesis preserves dissent and unresolved findings. |
+| 4 | Surface launcher. | A skill/slash surface builds a request for a declared fixture and calls `fgos coordination run --file`, then reads `coordination show`/evidence. | Surface only; no group-thinking logic inside the skill. | Launcher cannot bypass FlowDefinition/session authorization. |
+| 5 | Live standalone proof. | Run the Master Coordination loop with no Work: input plan, Doer artifact, Reviewer report, Red-Team report, driver-authorized fix, revision, recheck, final disposition. | CLI/headless run. | CLI/headless parity, crash/resume no duplicate, unauthorized optional operation rejected, hidden context rejected, bounds enforced. |
+| 6 | Deliberation memory. | Typed records such as `proposal`, `challenge`, `response`, `clarification`, `rank`, and `disposition`. | Deferred schema/runtime. | Replay preserves why a decision happened without chat history. |
+| 7 | Visibility windows. | First-pass isolation, post-verdict controlled sharing, aggregate/anonymized feedback, judge-only visibility. | Deferred schema/runtime. | RFC/NGT/Delphi fixtures can express their defining visibility rules. |
+| 8 | Aggregation rules. | Completion modes such as `synthesize-with-dissent`, `vote`, `rank`, `convergence`, `judge`, and `no-consensus`. | Deferred schema/runtime. | Synthesis cannot hide dissent, failed actors, missing actors, or unsupported claims, and cannot upgrade evidence confidence. |
+| 9 | Dynamic specialist pull-in. | Opt-in `addSessionEdge` or topology overlay after authorization/context/replay are solid. | Deferred large feature. | Same action works in an opt-in fixture and is rejected in isolation fixtures. |
 
-### 17.1 MVP 2 Real Shape
-
-```txt
-Actor result
-  -> requestRound event
-       requestedBy = actor
-       requestedOperation = reviewer-recheck | red-team-recheck | specialist-consult
-       triggerEvidenceRefs = [...]
-       reason = ...
-  -> driver reads evidence
-  -> authorizeDeclaredOperation event
-       authorizedBy = external driver identity
-       operationId = declared optional operation
-       roundKey = stable idempotency key
-       grantedContextRefs = exact artifact/verdict refs allowed
-  -> dispatchDeclaredOperation
-  -> Assignment / Run / RunResult
-  -> synthesis preserves old verdict + new verdict
-```
-
-This is deliberately not `addSessionEdge`. It expands feedback-loop and
-meta-control capability without opening dynamic topology.
-
-### 17.2 MVP 4 Real Shape
-
-```txt
-deliberation event
-  id
-  type = propose | challenge | clarify | respond | rank | disposition
-  actorId
-  targetRef = proposal/comment/verdict/artifact
-  evidenceRefs
-  visibilityClass
-  roundId
-  artifactRevision
-```
-
-This lets the runtime preserve intent across deferrals. A later agent should
-not have to infer from a final synthesis that "someone objected and the driver
-accepted/rejected it." The objection and disposition are first-class records.
-
-### 17.3 MVP 5 Real Shape
-
-```yaml
-visibility:
-  windows:
-    - until: first-independent-verdicts-linked
-      reviewer-actor: [starting-artifact]
-      red-team-actor: [starting-artifact]
-    - after: first-independent-verdicts-linked
-      driver: [reviewer-verdict, red-team-verdict]
-      synthesizer: [reviewer-verdict, red-team-verdict, dispositions]
-aggregation:
-  mode: rank | vote | convergence | judge | synthesize-with-dissent
-  preserve:
-    - dissent
-    - failedActors
-    - missingActors
-    - unsupportedClaims
-```
-
-This is where Delphi, NGT, RFC review, and adversarial triad stop being
-hand-written coordinator behavior and become declared protocol behavior.
+Step 09 considers read-only/mutation as an execution-effect dimension, but its
+MVP uses only read-only/session-local artifact production. Work, git, repo
+mutation, merge, and lifecycle transitions remain Step 10 or later concerns.
 
 ## 18. Intention Preservation Rules
 
@@ -737,25 +692,29 @@ plans defer a capability:
 4. A manual playbook success may justify a runtime capability, but it must not
    silently become runtime authority.
 5. Coordination may reference Work, but Work lifecycle and coding mutation stay
-   with the Work/Coding authorities named by Step 09 until a later accepted
-   mutation design changes that explicitly.
+   with the Work/Coding authorities named by the Component Authority Boundary
+   Map and Step 10 until a later accepted mutation design changes that
+   explicitly.
 
-## 19. Relation To Step 09 Coding Adoption
+## 19. Relation To Step 09 And Step 10
 
-Step 09 is the coding-domain adoption track. This file is the broader
-group-cognitive intention that Step 09 should not accidentally narrow.
+Step 09 is now the standalone group-thinking substrate track. Step 10 is the
+coding-domain adoption track. This file is the broader group-cognitive
+intention that neither step should accidentally narrow.
 
 How they connect:
 
-- Step 09's Work Driver / Domain Workflow Interpreter is the right owner for
+- Step 09 proves the group-thinking substrate with no Work dependency, using a
+  Master Coordination style loop as the first useful fixture.
+- Step 10's Work Driver / Domain Workflow Interpreter is the right owner for
   choosing legal coding operations and opening Work-attached sessions.
 - Agent Coordination owns CoordinationSession, topology/session bounds,
   Assignment membership, and group-cognitive protocol behavior.
 - Coding Domain owns repo mutation, worktree/branch/merge/technical approval,
   and evidence adapters.
 - The first coding adoption slice can use MVP 2/3 read-only review loops.
-- The true mutating implementation cell waits for Step 09's Work-attached
-  mutation proof and authority map.
+- The true mutating implementation cell waits for Step 10's Work-attached
+  mutation proof and the Component Authority Boundary Map.
 
 This avoids two distortions:
 

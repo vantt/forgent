@@ -1,4 +1,4 @@
-# Step 8b / Step 09 Replan Handoff Prompt
+# Step 09 / Step 10 Replan Handoff Prompt
 
 Document type: Handoff prompt
 Design status: Discussion
@@ -17,7 +17,7 @@ Chúng ta cần tiếp tục thiết kế fgOS ở giao điểm giữa:
    problem-solving/coding-review/adversarial/recheck thông dụng mà không làm
    yếu các invariant đã được Step 08 chứng minh.
 
-2. Step 09: đưa coding domain lên dùng coordination foundation đã delivered
+2. Step 10: đưa coding domain lên dùng coordination foundation đã delivered
    qua Step 08, giảm duplicate mechanism, xác định seam giữa foundation và
    coding domain, và chuẩn bị một implementation plan tốt hơn thay vì tiếp tục
    vá theo từng deferred decision.
@@ -31,10 +31,13 @@ Ngữ cảnh quan trọng:
   docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md
 - Step 07/08 proposal giờ là promoted history, không còn active design frontier:
   docs/architect/agent-coordination/proposals/README.md
-- Step 09 hiện là architect-level proposal, vì scope vượt khỏi riêng Agent
-  Coordination:
-  docs/architect/proposals/step-09-coding-domain-adoption.md
-  docs/architect/proposals/step-09-component-authority-layout-map.md
+- Step 09 hiện là group-thinking substrate proposal cấp architect.
+- Step 10 hiện là coding-domain adoption proposal cấp architect, vì scope vượt
+  khỏi riêng Agent Coordination.
+- Component authority boundary map là architect-level guardrail song song:
+  docs/architect/proposals/step-09-group-thinking-substrate.md
+  docs/architect/proposals/step-10-coding-domain-adoption.md
+  docs/architect/proposals/component-authority-boundary-map.md
 - Architecture-wide intent đang được giữ ở:
   docs/architect/architecture-intent.md
 
@@ -47,9 +50,10 @@ Ngữ cảnh quan trọng:
 5. docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md
 6. docs/architect/agent-coordination/contracts/coordination-session.md
 7. docs/architect/agent-coordination/contracts/flow-definition.md
-8. docs/architect/proposals/step-09-coding-domain-adoption.md
-9. docs/architect/proposals/step-09-component-authority-layout-map.md
-10. docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md
+8. docs/architect/proposals/step-09-group-thinking-substrate.md
+9. docs/architect/proposals/step-10-coding-domain-adoption.md
+10. docs/architect/proposals/component-authority-boundary-map.md
+11. docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md
 
 Sau khi đọc, đừng re-derive lịch sử cũ. Hãy trả lời như một architecture
 advisor chính, có phản biện, với mục tiêu tạo một plan sắc và thực thi được.
@@ -98,7 +102,7 @@ Việc cần làm trong chat mới:
    - ai được gọi primitive runtime deviation/round authorization?
 8. Đưa ra phản biện:
    - điểm nào trong Step 8b proposal hiện quá rộng hoặc sai thứ tự;
-   - điểm nào trong Step 09 proposal hiện quá migration-heavy mà chưa đạt
+   - điểm nào trong Step 10 proposal hiện quá migration-heavy mà chưa đạt
      design intent;
    - điểm nào nếu làm sớm sẽ phá R3/isolation proof hoặc làm Work authority
      bị lẫn vào coordination.
@@ -121,7 +125,7 @@ Ràng buộc:
   giữ isolation-heavy R3 proof.
 - Không đề xuất autonomous in-graph leader. Persistent coordinator/driver ở
   ngoài worker graph mới là authority stop/recheck.
-- Không biến Step 09 proposal thành accepted design. Nó vẫn là discussion cho
+- Không biến Step 09/Step 10 proposal thành accepted design. Chúng vẫn là discussion cho
   tới khi được promote.
 - Không đặt câu hỏi theo kiểu bắt người dùng chọn option. Hãy đưa plan có
   chính kiến, rồi nêu điểm cần chốt.
@@ -139,4 +143,3 @@ Tone mong muốn:
 - Tránh viết proposal trừu tượng khó hiểu; mỗi ý lớn phải nối được với file,
   schema, runtime primitive, proof, hoặc explicit deferred item.
 ```
-

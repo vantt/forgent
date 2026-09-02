@@ -13,6 +13,7 @@ Read boundary before layout:
 
 1. [Component Boundary Advisory](./component-boundary-advisory.md)
 2. [Repo Layout Vision](./repo-layout-vision.md)
+3. [Node To Rust Component Migration](./node-to-rust-component-migration.md)
 
 The first document answers:
 
@@ -31,6 +32,16 @@ Where should those components live physically in the repo?
 Which code should be a thin app entrypoint?
 Which code should become a reusable package?
 Which current paths are historical placement rather than architectural ownership?
+```
+
+The third document answers:
+
+```txt
+How can one component at a time move from Node to Rust?
+Which parts of fgos are already thin, partly thin, or not thin yet?
+How does fgos keep the same CLI and envelope while implementation changes?
+Which Rust boundary should be preferred first: binary, service, or direct lib?
+When does implementation movement become authority movement?
 ```
 
 Do not invert that order. Folder layout should express component boundaries; it
@@ -77,6 +88,24 @@ Use this document when deciding:
   separated physically;
 - what mechanical blast radius a later layout refactor is likely to touch.
 
+### Node To Rust Component Migration
+
+[node-to-rust-component-migration.md](./node-to-rust-component-migration.md)
+records the migration shape for replacing current Node harness internals with
+Rust components one boundary at a time while preserving the existing `fgos`
+surface.
+
+Use this document when deciding:
+
+- whether a Rust implementation should sit behind a Node facade;
+- which `fgos` verb clusters should be thinned in Node before Rust migration;
+- whether the first Rust boundary should be a binary, service, or direct
+  library binding;
+- how to preserve `fgos` CLI, envelope, error, and lifecycle contracts during a
+  gradual migration;
+- whether a proposed Rust slice is only moving implementation or is also trying
+  to move authority.
+
 ## 3. Relationship Between The Two
 
 `component-boundary-advisory.md` defines the conceptual map.
@@ -100,3 +129,39 @@ architecture, contract, spec, or ADR documents.
 
 When a decision becomes settled, extract the stable fact into the appropriate
 canonical document instead of treating this folder as the source of truth.
+
+## 5. External Review Links
+
+Use these outside documents as review material while shaping component
+boundaries. They are not part of this folder's source-of-truth chain unless a
+settled decision is later extracted into the owning canonical document.
+
+### Canonical Architecture And Specs
+
+- [Architecture Map](../../architecture-map.md) — structure/physics/authority
+  map, component registry, and contract registry.
+- [System Overview](../../specs/system-overview.md) — area map, shared
+  entities, actors, and cross-area flows.
+- [Platform Foundations](../../platform-foundations.md) — locked platform laws
+  and durability/DoD doctrine.
+- [Work Item Lifecycle Vision](../../work-item-lifecycle-vision.md) — base
+  workflow and coding-specific lifecycle mapping.
+- [Distribution Vision](../../distribution-vision.md) — install/setup/doctor
+  direction and config/default registration posture.
+
+### Agent Coordination Architecture
+
+- [Agent Coordination Portal](../agent-coordination/README.md) — reading entry
+  for the current accepted Agent Coordination architecture set.
+- [Agent Coordination Foundation Vision](../agent-coordination/vision.md) —
+  foundation/domain split, runtime contracts, and small-core constraints.
+- [System Context](../agent-coordination/architecture/system-context.md) —
+  boundaries, runtime profiles, and trust boundaries.
+- [Runtime Model](../agent-coordination/architecture/runtime-model.md) —
+  assignment execution chain, invariants, and failure domains.
+- [Dispatch Control Plane](../agent-coordination/architecture/dispatch-control-plane.md)
+  — executor/provider/model/tier/mechanism governance boundary.
+- [Evidence And Results](../agent-coordination/architecture/evidence-and-results.md)
+  — RunResult confidence and evidence boundary.
+- [Work Integration](../agent-coordination/architecture/work-integration.md) —
+  Work lifecycle integration boundary.

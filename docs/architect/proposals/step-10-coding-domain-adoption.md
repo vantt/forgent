@@ -1,4 +1,4 @@
-# Step 09 - Coding Domain Adoption Of The Coordination Foundation
+# Step 10 - Coding Domain Adoption Of The Coordination Foundation
 
 Document type: Proposal
 Design status: Discussion
@@ -7,24 +7,27 @@ Last reviewed: 2026-09-02
 Canonical for: nothing until explicitly accepted
 Original date: 2026-09-02
 Scope: capture the discussion about bringing the existing coding domain onto
-the Agent Coordination foundation delivered by Step 08 — which parts are
-normalization of duplicate mechanisms, which parts are new foundation
-capability the coding domain genuinely needs, the seams between them, and a
-candidate step sequence — without opening the Work-attached mutation gate
-before the proof ADR-010 §5 requires
+the Agent Coordination foundation after Step 09's group-thinking substrate
+direction is settled — which parts are normalization of duplicate mechanisms,
+which parts are new foundation capability the coding domain genuinely needs,
+the seams between them, and a candidate step sequence — without opening the
+Work-attached mutation gate before the proof ADR-010 §5 requires
 Intent traceability: [Agent Coordination Intent Preservation Ledger](../agent-coordination/intent-preservation-ledger.md),
 entries AC-I005, AC-I008, AC-I009; Vision V-012 (two unlike consumers)
-Related: [Agent Coordination Vision](../agent-coordination/vision.md),
+Related: [Step 09 Group Thinking Substrate](step-09-group-thinking-substrate.md),
+[Agent Coordination Vision](../agent-coordination/vision.md),
 [ADR-007](../agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md),
 [ADR-010](../agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md),
 [Work Integration](../agent-coordination/architecture/work-integration.md),
 [Component Boundary Advisory](../component-boundary/component-boundary-advisory.md),
 [Step 08 plan](../../../plans/260901-1542-step08-standalone-coordination/plan.md),
-[Architecture Intent](../architecture-intent.md)
+[Architecture Intent](../architecture-intent.md),
+[Component Authority Boundary Map](component-authority-boundary-map.md)
 
 Implementation note: nothing in this proposal is implemented. Step 08 has
-closed all 8 phases; this proposal must be reconciled with Step 08's final
-Deferral Audit before Step 09 implementation starts. This document records the
+closed all 8 phases. Step 09 now names the standalone group-thinking substrate
+track; this Step 10 proposal must consume that substrate rather than reshape it
+around coding-specific needs. This document records the coding-domain adoption
 discussion so the next track does not have to be reconstructed from chat
 history.
 
@@ -45,7 +48,7 @@ consumers) constrain every idea below.
 
 ## 1.1 Progress Tracking
 
-This proposal tracks discussion progress without pretending Step 09
+This proposal tracks discussion progress without pretending Step 10
 implementation has started. Status values:
 
 | Status | Meaning |
@@ -60,9 +63,9 @@ Current progress:
 
 | Track | Status | Notes |
 |---|---|---|
-| Step 1A — draft authority/layout map | `draft-ready` | May proceed now as docs-only discussion while Step 08 continues. |
-| Step 1B — promote accepted authority map | `waiting-step-08` | Requires reconciliation after Step 08 P07.2 final Deferral Audit. |
-| Step 2+ — coding adoption implementation | `waiting-step-08` | Must wait for Step 1B; mutating work also waits for the ADR-010 live proof gate. |
+| Boundary map — architect-level authority guardrail | `draft-ready` | Now tracked in `component-authority-boundary-map.md`, parallel to Step 09 and Step 10. |
+| Step 09 substrate dependency | `discussion-open` | Coding adoption should consume the standalone group-thinking substrate once accepted. |
+| Step 10 implementation | `waiting-step-09` | Must wait for the relevant Step 09 primitive plus boundary guardrails; mutating work also waits for the ADR-010 live proof gate. |
 
 ## 2. Question This Step Answers
 
@@ -82,7 +85,7 @@ sufficient one. The coding domain can consume the *read-only* layer of the
 foundation immediately after Step 08. The *mutating* layer is blocked by a
 named stop gate (ADR-010 §5; Step 08 plan "Locked Product Decisions"; ledger
 AC-I009) whose lifting condition is exactly a coding-domain live proof. That
-proof is therefore the middle of Step 09, not something that happens on its
+proof is therefore the middle of Step 10, not something that happens on its
 own once Step 08 closes.
 
 ## 3. Dependency On Step 08
@@ -91,13 +94,12 @@ own once Step 08 closes.
 the reconciliation source for what Step 08 deliberately delivered, deferred,
 or proved out of scope.
 
-**Proposed:** keep Step 1 split into two parts. Step 1A (draft authority/layout
-map) is a docs-only classification artifact. Step 1B (promote accepted
-authority map) reconciles that draft with Step 08's final Deferral Audit and
-promotes the settled map into accepted/canonical architecture. Step 2+
-implementation must not start before Step 1B. Mutating adoption remains
-blocked by the ADR-010 gate and depends on the Step 08 proofs for crash
-recovery and concurrent-mutating-actor refusal.
+**Proposed:** keep the authority map as a parallel architect-level
+prerequisite, not a child step of coding adoption. The
+[Component Authority Boundary Map](component-authority-boundary-map.md)
+classifies ownership and forbidden dependencies before Step 10 implementation
+starts. Mutating adoption remains blocked by the ADR-010 gate and depends on
+the Step 08 proofs for crash recovery and concurrent-mutating-actor refusal.
 
 **Observed, explicitly out of Step 08 scope and therefore *not* delivered:**
 
@@ -138,7 +140,7 @@ cohort allocation, session-wide budgets, and session recovery.
 
 Both doors converge on `executeDriverOperationChoice`
 (`src/runner/dispatch/operation-choice.mjs`). This is the single most useful
-fact for Step 09: changing the interior of that function's `assignment`
+fact for Step 10: changing the interior of that function's `assignment`
 branch changes both doors at once, which is the ADR-010 parity property for
 free.
 
@@ -155,7 +157,7 @@ reference field yet (the contract permits one; P06 R7 adds the refusal).
 ### 4.4 Inventory of duplicate mechanisms (the "tùm lum" list, RUL11)
 
 **Observed:** the following pairs each implement one responsibility twice.
-The Step 09 sequence in §8 is derived directly from this list.
+The Step 10 sequence in §8 is derived directly from this list.
 
 | # | Responsibility | Mechanism A | Mechanism B | Note |
 |---|---|---|---|---|
@@ -172,11 +174,11 @@ The Step 09 sequence in §8 is derived directly from this list.
 
 **Observed:** advisory §18 identifies several current code clusters that are
 used heavily by coding-domain workflows and therefore *look* coding-specific,
-but are actually broader platform or foundation machinery. Step 09 must not
+but are actually broader platform or foundation machinery. Step 10 must not
 start by moving all of them under Coding Domain merely because coding is the
 first serious consumer.
 
-| # | Current cluster | Candidate owner | Why it matters for Step 09 |
+| # | Current cluster | Candidate owner | Why it matters for Step 10 |
 |---|---|---|---|
 | F1 | Work State And Event Store Kernel (`src/state/events.mjs`, replay/store/registry) | Platform core / Work Lifecycle substrate | Event-store/log/replay is the truth substrate for many components, not coding-domain behavior. Coding consumes it through Work and evidence records. |
 | F2 | Claim And Runtime Occupancy Coordination (`claim-port`, `runtime-coordination`, `worker-slots`, main-checkout lock) | Shared runtime occupancy / Work Driver support | Coding uses it for worktrees and runner pressure today, but other Work-backed domains also need claim/occupancy semantics. |
@@ -192,8 +194,9 @@ are implementation history, not ownership. A cluster becomes Coding Domain only
 when its model depends on repository/code-change semantics; event logs,
 runtime occupancy, setup/doctor, host surfaces, and learning registries are
  platform-core, platform-support, or host-surface components even if coding is
- the first heavy user. The Step 1A draft separates **platform layer**
- (`platform-core`, `platform-support`, `domain`, `host-surface`) from
+ the first heavy user. The Component Authority Boundary Map separates
+ **platform layer** (`platform-core`, `platform-support`, `domain`,
+ `host-surface`) from
  **component category** (`foundation-engine`, `integration-engine`,
  `support-infrastructure`, `domain-component`, `adapter/surface`) so
  "foundation" does not become a vague synonym for "not coding-specific."
@@ -282,7 +285,7 @@ Two hazards attached to the seams:
 
 ## 7. Foundation Capabilities Coding Requires That Standalone Never Did
 
-**Proposed.** Roughly seven tenths of Step 09 is normalization. The remaining
+**Proposed.** Roughly seven tenths of Step 10 is normalization. The remaining
 three tenths is genuinely new capability, concentrated below. Standalone
 proofs never needed these because every Step 08 proof is read-only.
 
@@ -305,26 +308,26 @@ not only internal tidiness.
 
 | Step | Name | Closes | Depends on | Value class |
 |---|---|---|---|---|
-| 1A | Draft authority and layout map (docs-only discussion): turn advisory §18/§21 into a near-canonical draft; classify foundation/platform/domain/surface clusters; propose Node `apps/` + `packages/` overlay; no runtime code, no file moves, no accepted contract edits. | F1-F7 draft classification, D7 proposed ownership, Q7 draft layout direction | May start now during Step 08 P06/P07 | prerequisite draft |
-| 1B | Promote accepted authority and layout gate: reconcile 1A with Step 08 final contracts/spec and promote the settled map into accepted/canonical architecture before Step 09 implementation. Decide Open Q1 owner and Q2 first-slice posture. | accepted authority map, accepted implementation gate | 1A + Step 08 P07.2 final Deferral Audit | prerequisite |
-| 2 | Work-attached read-only `validate-plan` session only: Seams A, B, E, G for the single reviewer operation; both doors (`fgos plan --validate`, `fgos-runner --once`); golden Workflow tests unchanged; session engine remains lifecycle-blind. | first proof of N2 | 1B | **direct**: reviewer validation gains provenance/recovery without widening scope |
-| 3 | Coding evidence evaluator home: extract coding-specific RunResult interpretation from `operation-choice.mjs` into the coding domain behind the N4 seam; new ADR; keep Run Result Evaluator as final confidence owner. | D6 | 1B (can run after or beside 2, but must close before 5) | indirect |
+| 1 | Boundary and substrate readiness gate: consume the parallel Component Authority Boundary Map and the relevant accepted Step 09 group-thinking primitive; no runtime code, no file moves. | F1-F7 authority classification, D7 proposed ownership, Q7 draft layout direction, Step 09 dependency | Component Authority Boundary Map + accepted Step 09 slice | prerequisite |
+| 2 | Work-attached read-only `validate-plan` session only: Seams A, B, E, G for the single reviewer operation; both doors (`fgos plan --validate`, `fgos-runner --once`); golden Workflow tests unchanged; session engine remains lifecycle-blind. | first proof of N2 | 1 | **direct**: reviewer validation gains provenance/recovery without widening scope |
+| 3 | Coding evidence evaluator home: extract coding-specific RunResult interpretation from `operation-choice.mjs` into the coding domain behind the N4 seam; new ADR; keep Run Result Evaluator as final confidence owner. | D6 | 1 (can run after or beside 2, but must close before 5) | indirect |
 | 4 | Expand read-only collaboration sessions: `review-item`, `scout-blast-radius`, `resolve-question`; roleGraph → topology; `handoff.mjs` stays holder truth; add park/resume events and reconcile worker-slots vs session concurrency before any fan-out. | D3, D4, D8, N6, N7 | 2, 3 | **direct**: reviewer/consult get cohort diversity, provenance, recovery |
 | 5 | **Mutating live proof — the ADR-010 §5 gate itself:** Seams C, F; N1, N5. Scenario: one executing item; implementer + helper (`scoped-subtask`) concurrently in distinct worktrees; reviewer read-only; overlapping footprint refused before Assignment creation; crash mid-run then resume without duplicate; merge only through `approve`; transition only through `fgos return`. Exit: AC-I009 → implemented; gate lifted by a **new** ADR, ADR-010 untouched | — | 2, 3, 4, P06 R3/R7 | required for V-012 |
 | 6 | Executing path onto Assignment: `implement-item` becomes a mutating verified Assignment; goal-check becomes an evidence adapter; `spawnWorker` loses its reason to exist as a second core; in-process/manual-caller execution uses the Dispatch/Run Runtime mechanism from N3. | D2 | 5, N3 shape decided | indirect (removes false-success surface) |
 | 7 | One Work Driver, two doors: `fgos-coding-driving` loop + `loop.mjs` driver logic → one engine (N8); skills become thin launchers; `fgos-fanout` calls the driver's batch dispatch instead of spawning Agents; interactive = driver with an operator attached | D1, D5 | 6, N3 | **direct**: "release con người" (priority #2); interactive/headless identical capability |
 | 8 | Physical placement (optional): `operation-choice` → driver; domain loader → domains; git core → under coding domain; first Rust candidate per the migration note | D7 | 7 | optional |
 
-### 8.1 Step 1A / 1B output shape
+### 8.1 Boundary Map Input Shape
 
-Step 1A should produce ownership documents, not a file move and not accepted
-runtime authority. The minimum useful output is:
+The parallel Component Authority Boundary Map should produce ownership
+documents, not a file move and not accepted runtime authority. The minimum
+useful output is:
 
 1. **Component, Bounded-Context, And Authority Map.** Records each component's
    authority, state, ports, adapters, forbidden dependencies, and layer:
    foundation, platform support, domain, integration, host/surface, or plugin.
    Draft artifact:
-   [Step 09 Draft Component, Bounded-Context, And Authority Map](step-09-component-authority-layout-map.md).
+   [Component Authority Boundary Map](component-authority-boundary-map.md).
 2. **Foundation-vs-coding extraction matrix.** Classifies F1-F7 above and names
    which currently-coding-used modules are reusable foundation/platform
    components versus Coding Domain Core.
@@ -359,11 +362,11 @@ packages/
   learning-docs/          # retrospective knowledge and docs registry
 ```
 
-This vocabulary is deliberately not a required tree for Step 09. It is the
-shape Step 1A should draft and Step 1B should accept, revise, or reject after
-Step 08 closes.
+This vocabulary is deliberately not a required tree for Step 10. It is the
+shape the Component Authority Boundary Map should draft and later accepted
+boundary documents should accept, revise, or reject.
 
-**Proposed non-goals for Step 09:**
+**Proposed non-goals for Step 10:**
 
 - no AdhocTask entity (see §5 consequence 3);
 - no Workflow-runtime migration onto FlowDefinition;
@@ -393,7 +396,7 @@ Retained from Step 07 §15 and refined:
 
 ## 10. Open Questions
 
-1. **Q1 — `fgos handoff` after Step 09:** does it remain the write door for
+1. **Q1 — `fgos handoff` after Step 10:** does it remain the write door for
    collaboration records, or become a projection from the session ledger onto
    Work events? (Decides D8; blocks Seam D.)
 2. **Q2 — concurrency ceiling:** first read-only `validate-plan` slice should
@@ -416,11 +419,12 @@ Retained from Step 07 §15 and refined:
 6. **Q6 — whether step 7 is one step or two** (driver engine first, then
    fan-out onto the driver). The fan-out half carries the known worktree-pin
    race; splitting may be safer.
-7. **Q7 — Node repo-layout:** should Step 1 only produce the authority map, or
-   also accept a Node-side `apps/` + `packages/` overlay now? Recommended:
-   draft the overlay in Step 1A, then accept/revise/reject it in Step 1B after
-   Step 08 closes; forbid physical moves until the component has a facade and
-   contract tests, matching `node-to-rust-component-migration.md`.
+7. **Q7 — Node repo-layout:** should the Component Authority Boundary Map only
+   produce authority classification, or also accept a Node-side `apps/` +
+   `packages/` overlay now? Recommended: draft the overlay there, then
+   accept/revise/reject it after Step 09/Step 10 needs stabilize; forbid
+   physical moves until the component has a facade and contract tests, matching
+   `node-to-rust-component-migration.md`.
 
 ## 11. Intent Traceability
 
@@ -429,7 +433,7 @@ Retained from Step 07 §15 and refined:
 | AC-I005 (domain customization) | Coding becomes the second real consumer of the harness seam; N4 adds a Run Result Evaluator evidence-adapter seam justified by two consumers | seam count grows only with proven consumers; no plugin SDK |
 | AC-I008 (interactive/headless parity) | Seam G and step 7 extend parity from coordination to the Work driver; N3 is owned by Dispatch/Run Runtime so parity is not headless-only | no interactive-only or headless-only capability without naming the gap |
 | AC-I009 (domain-owned Work isolation) | Step 5 is the named proof; Seams C/F keep isolation, merge, transition in the domain | `src/runner/coordination/**` never gains merge/branch/transition API |
-| V-012 (two unlike consumers) | Step 09 is the coding half of the claim; if coding needs a separate core after step 6, the foundation boundary was not found | one execution core |
+| V-012 (two unlike consumers) | Step 10 is the coding half of the claim after Step 09 proves the standalone group-thinking substrate; if coding needs a separate core after step 6, the foundation boundary was not found | one execution core |
 
 Every implementation phase derived from this proposal must close with the
 ledger's Deferral Audit template.
@@ -516,7 +520,7 @@ ledger's Deferral Audit template.
   parent-child = responsibility grouping + runtime coupling + placement hint;
   dependency = explicit contract direction, never inferred from nesting.
 - **2026-09-02** — Step 1A artifact structure cleanup. Human flagged that
-  `step-09-component-authority-layout-map.md` had become ad hoc because new
+  `component-authority-boundary-map.md` had become ad hoc because new
   ideas were appended as the discussion evolved. The artifact was reorganized
   around the shorthand rule above: status, organizing formula, vocabulary,
   classification axes, parent-child responsibility map, authority ownership,
@@ -530,3 +534,10 @@ ledger's Deferral Audit template.
   loader, distinct from setup/distribution config; the upstream
   product/design flow name remains open; and the small-change path is not yet
   clear enough to call a full workflow.
+- **2026-09-02** — Step renumbering and substrate separation. Human clarified
+  the Master Coordination Prompt proof is not Coding Domain adoption; it is a
+  standalone test of Agent Coordination's group-thinking capability with no
+  Work dependency. Step 09 was split into the Group Thinking Substrate track,
+  Coding Domain Adoption moved to Step 10, and the component authority map was
+  promoted to a parallel architect-level guardrail rather than a child of
+  coding adoption.
