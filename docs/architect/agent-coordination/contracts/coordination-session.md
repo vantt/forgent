@@ -3,7 +3,10 @@
 Document type: Contract
 Design status: Accepted
 Implementation: In progress (Phase 06 R1-R4 landed: quorum/partial policy,
-retry/replacement, crash recovery, cancellation — `src/runner/coordination/
+retry/replacement, crash recovery, cancellation; R5-R7 landed: uniform
+hard-budget enforcement across every dispatch path, `coordinationId`
+path-traversal charset validation, write-time foreign-evidence rejection,
+work-isolation static export-surface check — `src/runner/coordination/
 {schema,store,replay,session-engine}.mjs`)
 Last reviewed: 2026-09-02
 Canonical for: CoordinationSession manifest/event schema, storage layout, session-to-Assignment membership, and recovery rules
@@ -28,6 +31,12 @@ Assignment stays session-blind.
     tasks/<hash>.json                # internal idempotent-claim record, one per taskKey (hash of the raw taskKey)
 ```
 
+`<session-id>` (`coordinationId`) is restricted to a safe filesystem charset
+(letters, digits, underscore, hyphen only — the exact shape `openSession`'s
+own auto-generated id produces) and rejected before it is ever used to build
+a path; this closes off path traversal (Phase 06 R6) through a `coordinationId`
+crafted with `../` segments or path separators.
+
 Assignments, Runs, and RunResults are referenced by id from
 `session.json`/`events.jsonl`; they are never copied or re-serialized into
 `.fgos/coordination/`. Durable verification evidence is exported deliberately
@@ -47,7 +56,7 @@ is not committed truth.
 | `definitionRef` | object \| null | no | `{id, version}` reference to a `CoordinationProtocol` FlowDefinition when the session is declared-protocol-led; `null` for agent-led sessions with no predeclared protocol (Vision V-009; must remain legal). |
 | `workRef` | string \| null | no | Optional, read-only Work id the session references for context. Referencing Work never grants lifecycle authority (see Work Boundary below). |
 | `actors` | array | no | `[{id, role, persona?, policy?}]`; present only when the session declares stable SessionActor identities (topology, cohort allocation). Absent for a trivial one-shot session. |
-| `aggregateBounds` | object | yes | Hard session-wide limits: `{wallTimeMs, maxAssignments, maxConcurrency, maxRounds, maxTaskDepth}`. Any bound omitted at open time defaults to the foundation's configured ceiling; it is never unbounded by omission. |
+| `aggregateBounds` | object | yes | Hard session-wide limits: `{wallTimeMs, maxAssignments, maxConcurrency, maxRounds, maxTaskDepth}`. Any bound omitted at open time defaults to the foundation's configured ceiling; it is never unbounded by omission. Enforced uniformly (Phase 06 R5) at every dispatch entry point — the agent-led (`dispatchPrimaryTask`/`proposeConsult`) and declared-protocol (`dispatchDeclaredOperation`/`recordConsultDisposition`) paths alike — never bypassable by which entry point a caller uses, and never bypassable by process restart (every bound is recomputed fresh from the on-disk manifest/event log on every call, never from in-memory state). |
 | `assignmentRefs` | array of string | yes | Assignment ids belonging to this session. This array, appended atomically at each Assignment's creation, **is** the one-way membership index (ADR-008 Decision 2). No other store may claim membership authority. |
 | `completedAt` | ISO 8601 timestamp \| null | no | Set when `status` leaves `active`. |
 | `partialPolicy` | `{minimumActors?: number, allowedOmissions?: string[]} \| null` | no | Phase 06 R1: declared at session-open time, before any Assignment is dispatched; immutable thereafter. `null` (default) means no partial close is ever legal for this session — default completion requires every required SessionActor. |
@@ -203,3 +212,25 @@ approval/merge state in `.fgos/coordination/`.
 - Once a session leaves `active` (any of `completed|partial|failed|
   cancelled`), every further `transitionSessionStatus` call is refused
   (Phase 06 R4: terminal statuses are absorbing).
+- A `coordinationId` containing a `..` traversal segment or any character
+  outside the safe filesystem charset is rejected before any path is built
+  from it, at every entry point (`openSession` and every other store.mjs
+  door via `resolveSessionPaths`) — never creates a directory outside
+  `.fgos/coordination/sessions/` (Phase 06 R6).
+- `linkResult` rejects a `runId` whose FULL shape does not exactly match
+  `run_<assignmentId>_<digits>` for the `assignmentId` it is being linked to
+  — a prefix-only check is not enough, since a same-prefix, malicious-suffix
+  runId (e.g. `run_<assignmentId>_../../../../tmp/evil`) genuinely starts
+  with the expected prefix — at write time, never accepting a genuine
+  sibling Assignment's own runId, or a traversal-shaped suffix, as if it
+  belonged to a different Assignment. `readLinkedRunResultFromDisk`
+  (`session-engine.mjs`) enforces the identical full-shape check at read
+  time too, so a hand-crafted/corrupt event log carrying such a runId still
+  fails closed even if it never went through `linkResult` (Phase 06 R6,
+  foreign evidence).
+- `aggregateBounds.wallTimeMs`/`maxAssignments`/`maxConcurrency`/`maxRounds`/
+  `maxTaskDepth` are enforced identically whether a session was opened
+  agent-led (`openStandaloneSession`) or declared-protocol-led
+  (`openDeclaredProtocolSession`) — boundary-equal (the Nth Assignment under
+  a cap of N succeeds, the N+1th is rejected), never bypassable by a fresh
+  process/restart (Phase 06 R5).

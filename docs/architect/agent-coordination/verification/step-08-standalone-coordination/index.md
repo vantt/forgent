@@ -57,18 +57,19 @@ of a blanket "unrelated" pass.
 | 03 | R1-R8 | done |
 | 04 | R1-R9 | done |
 | 05 | R1-R8 | done |
-| 06 | R1-R8 | R1-R4 done (P06.1); R5-R8 pending (P06.2) |
-| 07 | R1-R8 | missing (depends on 06) |
+| 06 | R1-R8 | done |
+| 07 | R1-R8 | pending (06 done; not yet scoped into cells) |
 
 ## Active Cell
 
-None (P06.1 closed; P06.2 not yet scoped)
+None (Phase 06 closed; Phase 07 not yet scoped)
 
 ## Next Action
 
-coordinator — scope Phase 06 R5-R8 (hard budgets, security/adversarial
-suite, work-isolation negative contract, independent closure of the full
-recovery/budget matrix) into a P06.2 brief before dispatching a Doer
+coordinator — read phase-07-headless-parity-cli-and-adoption.md in full
+and scope it into cells before dispatching a Doer; Phase 07 is the
+plan's own final phase (includes the plan-level final Deferral Audit,
+AC-I001-I009)
 
 ## Cell Log
 
@@ -89,7 +90,8 @@ recovery/budget matrix) into a P06.2 brief before dispatching a Doer
 | P04.2b | Phase 04 R8 (stop-gate resolution, closes Phase 04) | done | `37e1185b` |
 | P05.1 | Phase 05 R1, R2, R3, R4 | done | `833888ba` |
 | P05.2 | Phase 05 R5, R6, R7, R8 (closes Phase 05) — honest null result | done | `7910fc22` (R5), `c852814d` (config), `bd785402` (R6-R8+trace) |
-| P06.1 | Phase 06 R1, R2, R3, R4 — 2 real HIGH bugs found+fixed (2 rounds) | done | pending |
+| P06.1 | Phase 06 R1, R2, R3, R4 — 2 real HIGH bugs found+fixed (2 rounds) | done | `a9613222` |
+| P06.2 | Phase 06 R5, R6, R7, R8 (closes Phase 06) — 5 real bugs found+fixed (2 rounds) | done | pending |
 
 ## Phase 00 Status
 

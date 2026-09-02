@@ -94,7 +94,7 @@ test('replaySession detects a duplicate assignment-created event for the same id
 test('replaySession detects a duplicate result-linked event for the same assignmentId, symmetric with its adjacent duplicate assignment-created check', () => {
   const tempDir = mkTempDir();
   const assignment = openAndCreate(tempDir, 'coord_replay_duplicate_link');
-  linkResult('coord_replay_duplicate_link', { assignmentId: assignment.assignmentId, runId: `${assignment.assignmentId}_run_01` }, { cwd: tempDir });
+  linkResult('coord_replay_duplicate_link', { assignmentId: assignment.assignmentId, runId: `run_${assignment.assignmentId}_01` }, { cwd: tempDir });
   const { eventsPath } = sessionPaths(tempDir, 'coord_replay_duplicate_link');
   const lines = fs.readFileSync(eventsPath, 'utf8').trimEnd().split('\n');
   const linkedLine = lines.find((l) => JSON.parse(l).type === 'result-linked');
@@ -104,7 +104,7 @@ test('replaySession detects a duplicate result-linked event for the same assignm
   // this test proves replaySession's own READ-time consistency check
   // independently, the same way this file's other duplicate-ref test does
   // for assignment-created.
-  const duplicated = { ...linkedEvent, seq: linkedEvent.seq + 100, payload: { ...linkedEvent.payload, runId: `${assignment.assignmentId}_run_02` } };
+  const duplicated = { ...linkedEvent, seq: linkedEvent.seq + 100, payload: { ...linkedEvent.payload, runId: `run_${assignment.assignmentId}_02` } };
   fs.appendFileSync(eventsPath, `${JSON.stringify(duplicated)}\n`);
 
   assert.throws(
@@ -156,7 +156,7 @@ test('replaySession detects an out-of-order ref: result-linked for an assignment
 test('replaySession does not throw for a legitimate result-linked event following its own assignment-created', () => {
   const tempDir = mkTempDir();
   const assignment = openAndCreate(tempDir, 'coord_replay_linked_ok');
-  linkResult('coord_replay_linked_ok', { assignmentId: assignment.assignmentId, runId: `${assignment.assignmentId}_run_01` }, { cwd: tempDir });
+  linkResult('coord_replay_linked_ok', { assignmentId: assignment.assignmentId, runId: `run_${assignment.assignmentId}_01` }, { cwd: tempDir });
   assert.doesNotThrow(() => replaySession('coord_replay_linked_ok', { cwd: tempDir }));
 });
 

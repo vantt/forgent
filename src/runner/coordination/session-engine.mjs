@@ -57,6 +57,8 @@ import {
   readManifest,
   resolveSessionPaths,
   hashTaskKey,
+  assertSafeCoordinationId,
+  assertValidRunIdForAssignment,
 } from './store.mjs';
 import { replaySession } from './replay.mjs';
 import { CoordinationError } from './schema.mjs';
@@ -149,13 +151,17 @@ function buildReadOnlyContract({ objective, contextRefs, constraints, expectedOu
  * never silently guessed past.
  */
 function readLinkedRunResultFromDisk(fgosDir, assignmentId, runId) {
+  // R6 round 2: FULL-SHAPE validation (store.mjs's `assertValidRunIdForAssignment`,
+  // shared with `linkResult`'s own write-time gate), not a prefix-only check.
+  // A prefix-only check here previously let a same-prefix, malicious-suffix
+  // `runId` (e.g. `run_<assignmentId>_../../../../tmp/evil-marker`) reach the
+  // unvalidated `path.join` below via a hand-crafted/corrupt event log --
+  // defense in depth even though `linkResult` itself now also refuses this
+  // shape at write time (R6's own "corrupt ledger" attack class assumes the
+  // event log cannot always be trusted, even when the write-time gate is
+  // airtight).
+  assertValidRunIdForAssignment(assignmentId, runId, 'readLinkedRunResultFromDisk (result-linked event)');
   const prefix = `run_${assignmentId}_`;
-  if (!runId.startsWith(prefix)) {
-    throw new CoordinationError(
-      'foreign-ref',
-      `result-linked event runId "${runId}" does not match the expected shape for assignment "${assignmentId}"`,
-    );
-  }
   const attemptStr = runId.slice(prefix.length);
   const resultPath = path.join(fgosDir, 'assignments', assignmentId, 'runs', attemptStr, 'result.json');
   if (!fs.existsSync(resultPath)) {
@@ -404,6 +410,19 @@ export async function dispatchPrimaryTask(
     );
   }
 
+  // R5: session bounds enforced BEFORE materialization/launch -- same
+  // wall-time/task-depth checks `dispatchDeclaredOperation` already applies
+  // to the declared-protocol path (see that function's own module-level
+  // comment, above `assertWithinWallTimeBudget`, for why neither check is
+  // concurrency-sensitive and both are safe to run pre-lock here too). This
+  // is the agent-led, undeclared-protocol path's own admission gate --
+  // without it, a session opened via `openStandaloneSession` had NO
+  // wall-time or task-depth enforcement at all, regardless of what
+  // `aggregateBounds` declared.
+  assertWithinWallTimeBudget(manifest, 'dispatchPrimaryTask');
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  assertWithinTaskDepth(fgosDir, parentAssignmentId, manifest.aggregateBounds.maxTaskDepth, 'dispatchPrimaryTask');
+
   const contract = buildReadOnlyContract({
     objective,
     contextRefs,
@@ -417,7 +436,25 @@ export async function dispatchPrimaryTask(
   });
   const caller = { writerId, ...(parentAssignmentId !== undefined ? { parentAssignmentId } : {}) };
 
-  return createAndExecuteSessionTask({ coordinationId, taskKey, actorId: PRIMARY_ACTOR_ID, contract, caller }, opts);
+  // R5 (continued): the 3 remaining, concurrency-sensitive bounds
+  // (maxAssignments/maxConcurrency/maxRounds, session-wide) are forwarded
+  // unconditionally and enforced authoritatively inside
+  // `createSessionAssignment`'s own lock (store.mjs) -- same reasoning and
+  // forwarding shape as `dispatchDeclaredOperation`'s own call below. Before
+  // this fix, this was the ONE bound-enforcement gap in this file: the
+  // primary-task dispatch path forwarded none of these three, so a session
+  // opened via `openStandaloneSession` could create Assignments past its own
+  // declared `aggregateBounds.maxAssignments`/`maxConcurrency`/`maxRounds`
+  // ceiling with no error at all (confirmed empirically before this fix).
+  return createAndExecuteSessionTask(
+    { coordinationId, taskKey, actorId: PRIMARY_ACTOR_ID, contract, caller },
+    {
+      ...opts,
+      maxAssignmentsForSession: manifest.aggregateBounds.maxAssignments,
+      maxConcurrencyForSession: manifest.aggregateBounds.maxConcurrency,
+      maxRoundsForSession: manifest.aggregateBounds.maxRounds,
+    },
+  );
 }
 
 /**
@@ -480,6 +517,17 @@ export function validateConsultProposal(
   if (!primaryCreatedEvent || primaryCreatedEvent.payload.actorId !== PRIMARY_ACTOR_ID) {
     throw new CoordinationError('validation', `proposeConsult: primaryAssignmentId "${primaryAssignmentId}" is not the primary actor's Assignment`);
   }
+
+  // R5: session bounds enforced BEFORE materialization -- same wall-time/
+  // task-depth checks `dispatchDeclaredOperation` applies to the declared-
+  // protocol path (module-level comment above `assertWithinWallTimeBudget`
+  // for why both are safe pre-lock/unlocked checks). `primaryAssignmentId`
+  // is the consult's real `parentAssignmentId` (`proposeConsult` always sets
+  // `caller.parentAssignmentId = primaryAssignmentId`, never caller-
+  // overridable), so task depth is measured from there, exactly mirroring
+  // `recordConsultDisposition`'s own placement of this identical check.
+  assertWithinWallTimeBudget(manifest, 'proposeConsult');
+  assertWithinTaskDepth(fgosDir, primaryAssignmentId, manifest.aggregateBounds.maxTaskDepth, 'proposeConsult');
 
   // Exactly ONE request/response round (this engine's documented
   // interpretation, module header): reject once a DIFFERENT non-primary
@@ -626,9 +674,20 @@ export async function proposeConsult(
   });
   const caller = { writerId, parentAssignmentId: primaryAssignmentId };
 
+  // R5 (continued): forward the 3 concurrency-sensitive session-wide bounds,
+  // same shape as `dispatchDeclaredOperation`/`recordConsultDisposition`
+  // below -- `validateConsultProposal`'s own `maxAssignments` check above is
+  // a fast, unlocked pre-check only (same TOCTOU caveat as its "exactly one
+  // specialist" bindActor race, documented at that call site); this is the
+  // authoritative, lock-held enforcement inside `createSessionAssignment`.
   return createAndExecuteSessionTask(
     { coordinationId, taskKey: taskKey ?? `consult:${specialistActorId}`, actorId: specialistActorId, contract, caller },
-    opts,
+    {
+      ...opts,
+      maxAssignmentsForSession: manifest.aggregateBounds.maxAssignments,
+      maxConcurrencyForSession: manifest.aggregateBounds.maxConcurrency,
+      maxRoundsForSession: manifest.aggregateBounds.maxRounds,
+    },
   );
 }
 
@@ -2058,6 +2117,18 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
     return { assignmentId, actorId, runResult: latestOnDisk, retried: false, resumed: true };
   }
 
+  // R5: "enforce wall time ... before each launch" applies to a retry
+  // dispatch too (it spawns a real new executor subprocess, same as any
+  // other launch this file makes) -- checked ONLY past the self-heal branch
+  // above, never before it: self-heal only links an already-settled disk
+  // result, it launches nothing, so it must never be blocked by an elapsed
+  // wall-time budget (that would strand an already-completed result that
+  // can never be linked). A genuinely new or resumed-but-undispatched retry
+  // attempt, below, is a real launch and is gated the same way
+  // `dispatchDeclaredOperation`/`dispatchPrimaryTask` gate their own first
+  // dispatch.
+  assertWithinWallTimeBudget(reconciled.manifest, 'retrySessionTask');
+
   // recordRunRetry itself resumes a pending-but-undispatched declaration
   // (never double-declares) and enforces maxRetries atomically, lock-held.
   const { attempt } = recordRunRetry(coordinationId, { assignmentId, reason, previousRunId: latestLinked?.payload?.runId, maxRetries }, opts);
@@ -2185,6 +2256,18 @@ export function replaceSessionActor(coordinationId, { oldActorId, newActorId, pe
   if (!isNonEmptyString(reason)) {
     throw new CoordinationError('validation', 'replaceSessionActor: reason is required');
   }
+  // R6 (round 2, Bug #2): both ids must stay within the SAME safe filesystem
+  // charset `assertSafeCoordinationId` already enforces for `coordinationId`
+  // (store.mjs) -- both are interpolated directly into a `path.join` for
+  // this call's own crash-safety claim file below
+  // (`actor-replace-${oldActorId}--${newActorId}.claim`), with no other
+  // charset restriction before this fix. An unvalidated id (e.g.
+  // `newActorId = 'x/../../../../tmp/PWNED'`) could otherwise make that
+  // `path.join` resolve outside `.fgos/coordination/sessions/` entirely.
+  // Checked here, fail-fast, before `replaySession` does any real work for
+  // this call.
+  assertSafeCoordinationId(oldActorId, { label: 'replaceSessionActor: oldActorId' });
+  assertSafeCoordinationId(newActorId, { label: 'replaceSessionActor: newActorId' });
 
   const { manifest, events } = replaySession(coordinationId, opts);
   if (manifest.status !== 'active') {

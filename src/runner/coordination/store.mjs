@@ -56,10 +56,50 @@ function resolveCoordinationPaths(opts = {}) {
   return { root, cwd, fgosDir, sessionsDir };
 }
 
-function resolveSessionPaths(coordinationId, opts = {}) {
+// R6 (Phase 06, cell P06.2): safe filesystem-path charset for a caller-
+// supplied `coordinationId` -- alnum, underscore, hyphen only, matching the
+// exact shape `openSession`'s own auto-generated id already produces
+// (`coord_<base36-time>_<base36-random>`). No `.`/`/`/`\`/whitespace/any
+// other character is legal, so a value outside this set can never smuggle a
+// `..` traversal segment (or an absolute-path-shaped fragment `path.join`
+// would still treat as relative but a traversal chain could still escape
+// through) into `path.join(sessionsDir, coordinationId)` below. Confirmed
+// empirically before this fix: an unvalidated `coordinationId` containing
+// `../` sequences let `openSession`/`resolveSessionPaths` create a real
+// session directory OUTSIDE `.fgos/coordination/sessions/` entirely (a real
+// escape onto the host filesystem, not merely a theoretical one) -- this is
+// the fix. Applied at the ONE choke point (`resolveSessionPaths`) every
+// store.mjs door but `openSession`'s own explicit-id branch already funnels
+// through, plus `openSession` itself (see below), so every coordinationId
+// that ever reaches a real path is validated, not just some doors.
+const SAFE_COORDINATION_ID_RE = /^[A-Za-z0-9_-]+$/;
+
+// `label` defaults to describing a `coordinationId` (every pre-existing
+// caller omits it, so behavior/message text is byte-identical to before this
+// parameter existed). Exported (round 2, Bug #2) so any OTHER caller-supplied
+// id that gets interpolated into a `path.join` -- e.g. `session-engine.mjs`'s
+// `replaceSessionActor` `oldActorId`/`newActorId`, used to build
+// `actor-replace-${oldActorId}--${newActorId}.claim` -- reuses this SAME
+// safe-charset gate instead of inventing a second, independently-drifting
+// one. Actor ids follow the identical charset rule as coordinationId: both
+// are caller-supplied short tokens that only ever need to identify
+// something, never carry structure, so there is no genuine reason for them
+// to need a wider charset.
+export function assertSafeCoordinationId(coordinationId, opts = {}) {
+  const { label = 'coordinationId' } = opts;
   if (typeof coordinationId !== 'string' || !coordinationId.trim()) {
-    throw new CoordinationError('validation', 'coordinationId is required and must be a non-empty string');
+    throw new CoordinationError('validation', `${label} is required and must be a non-empty string`);
   }
+  if (!SAFE_COORDINATION_ID_RE.test(coordinationId)) {
+    throw new CoordinationError(
+      'validation',
+      `${label} "${coordinationId}" contains characters outside the safe filesystem charset (letters, digits, underscore, hyphen only) -- refusing to build a filesystem path from it`,
+    );
+  }
+}
+
+function resolveSessionPaths(coordinationId, opts = {}) {
+  assertSafeCoordinationId(coordinationId);
   const { fgosDir, sessionsDir, ...rest } = resolveCoordinationPaths(opts);
   const sessionDir = path.join(sessionsDir, coordinationId);
   const eventsPath = path.join(sessionDir, 'events.jsonl');
@@ -128,6 +168,13 @@ export function openSession(
   let id = coordinationId;
   let sessionDir;
   if (id) {
+    // R6 path-traversal guard (see assertSafeCoordinationId's own doc
+    // comment, below `resolveSessionPaths`): this explicit-id branch builds
+    // `sessionDir` directly, before any OTHER store.mjs door's own
+    // `resolveSessionPaths` call would ever see this id -- validated here
+    // too so a caller-supplied `coordinationId` can never escape
+    // `sessionsDir` on the very FIRST write.
+    assertSafeCoordinationId(id);
     sessionDir = path.join(sessionsDir, id);
     try {
       fs.mkdirSync(sessionDir);
@@ -603,6 +650,45 @@ export function createSessionAssignment(
   });
 }
 
+// R6 (Phase 06, cell P06.2, round 2): full-shape validation for a `runId`
+// claimed to belong to `assignmentId`. The real convention every genuine
+// dispatch in this codebase produces is exactly
+// `run_<assignmentId>_<one-or-more-digits>` (`assignment-runner.mjs`'s own
+// `runId = \`run_${effectiveAssignment.assignmentId}_${attemptStr}\`` --
+// `attemptStr` is `String(attemptNum).padStart(2, '0')`, so ALWAYS at least
+// 2 digits but not fixed-width beyond attempt 99, hence `\d+` here, not a
+// fixed-width match). A PREFIX-only check
+// (`runId.startsWith('run_' + assignmentId + '_')`) is not enough: it also
+// accepts a same-prefix, malicious-SUFFIX runId such as
+// `run_<assignmentId>_../../../../tmp/evil-marker` -- that string genuinely
+// starts with the expected prefix, so a prefix check alone is silently
+// bypassed by exactly the traversal shape `assertSafeCoordinationId` (above)
+// exists to block elsewhere. `assignmentId` is escaped for regex use even
+// though today's real assignment ids cannot contain regex-special
+// characters -- defensive, matching this module's own "validate at the
+// boundary, do not assume upstream shape" posture.
+//
+// Exported so `session-engine.mjs`'s `readLinkedRunResultFromDisk` (the
+// READ-time counterpart, which turns the validated suffix into a real
+// `path.join` segment) enforces the IDENTICAL pattern at read time too,
+// instead of maintaining a second, independently-drifting copy -- defense in
+// depth against a hand-crafted/corrupt event log carrying a malicious runId
+// that never went through `linkResult` at all (R6's own "corrupt ledger"
+// attack class).
+function escapeRegExpLiteral(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export function assertValidRunIdForAssignment(assignmentId, runId, context) {
+  const pattern = new RegExp(`^run_${escapeRegExpLiteral(assignmentId)}_\\d+$`);
+  if (typeof runId !== 'string' || !pattern.test(runId)) {
+    throw new CoordinationError(
+      'foreign-ref',
+      `${context}: runId "${runId}" does not match the expected shape for assignment "${assignmentId}" (expected "run_${assignmentId}_<digits>") -- refusing to treat this as evidence that genuinely belongs to this Assignment`,
+    );
+  }
+}
+
 /**
  * Link a RunResult to a session Assignment (`result-linked` event). Purely
  * additive bookkeeping -- the canonical RunResult already lives under
@@ -647,6 +733,35 @@ export function linkResult(coordinationId, { assignmentId, runId }, opts = {}) {
     if (!manifest.assignmentRefs.includes(assignmentId)) {
       throw new CoordinationError('validation', `assignment "${assignmentId}" is not a member of session "${coordinationId}" -- cannot link a result to it`);
     }
+
+    // R6 (Phase 06, cell P06.2): reject a `runId` that does not carry
+    // `assignmentId`'s own naming convention (`run_<assignmentId>_<attempt>`,
+    // the shape EVERY real dispatch in this codebase produces --
+    // `assignment-runner.mjs`'s own `runId` construction, unchanged) AT
+    // WRITE TIME, not just when the linked result is later read back
+    // (`session-engine.mjs`'s `readLinkedRunResultFromDisk` already throws
+    // `foreign-ref` for the identical mismatch, but only once something
+    // actually tries to read it -- e.g. at quorum evaluation). Confirmed
+    // empirically before this fix: `linkResult` accepted a REAL, genuine
+    // sibling Assignment's own runId (foreign evidence) with no complaint at
+    // write time, silently writing a permanently-unresolvable cross-linked
+    // event into the log -- it never produced a false SUCCESS (the later
+    // read still fails closed), but it violated this module's own
+    // established validate-at-the-boundary discipline (schema.mjs) by
+    // deferring a detectable, always-wrong write to a later, unrelated
+    // caller. Every legitimate caller already supplies a runId in this exact
+    // shape, so this is not a behavior change for any real dispatch path.
+    // Checked here, INSIDE the lock and AFTER the schema-version/membership
+    // checks above (same precedence every other check in this function
+    // already follows -- schema-version mismatch and non-membership both
+    // still win first, matching this function's own pre-existing tests).
+    //
+    // Round 2: uses the FULL-SHAPE `assertValidRunIdForAssignment` (above),
+    // not a prefix-only check -- a prefix-only check accepts a same-prefix,
+    // malicious-suffix runId (e.g. `run_<assignmentId>_../../../../tmp/evil`)
+    // since that string genuinely starts with the expected prefix.
+    assertValidRunIdForAssignment(assignmentId, runId, 'linkResult');
+
     const freshEvents = readEvents(eventsPath);
     const existingLinks = freshEvents.filter((event) => event.type === 'result-linked' && event.payload.assignmentId === assignmentId);
     const existingLink = existingLinks[existingLinks.length - 1];

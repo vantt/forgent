@@ -333,7 +333,7 @@ test('linkResult appends result-linked only for an assignment that is a real ses
     { cwd: tempDir },
   );
 
-  linkResult('coord_link_001', { assignmentId: assignment.assignmentId, runId: `${assignment.assignmentId}_run_01` }, { cwd: tempDir });
+  linkResult('coord_link_001', { assignmentId: assignment.assignmentId, runId: `run_${assignment.assignmentId}_01` }, { cwd: tempDir });
   const events = readSessionEvents('coord_link_001', { cwd: tempDir });
   assert.ok(events.some((e) => e.type === 'result-linked' && e.payload.assignmentId === assignment.assignmentId));
 
@@ -350,8 +350,8 @@ test('linkResult is idempotent for the SAME runId re-linked twice (a no-op, matc
     { coordinationId: 'coord_link_dup', taskKey: 'primary-round-1', contract: inlineContract(), caller: { writerId: 'writer-1' } },
     { cwd: tempDir },
   );
-  const runIdA = `${assignment.assignmentId}_run_01`;
-  const runIdB = `${assignment.assignmentId}_run_02`;
+  const runIdA = `run_${assignment.assignmentId}_01`;
+  const runIdB = `run_${assignment.assignmentId}_02`;
 
   linkResult('coord_link_dup', { assignmentId: assignment.assignmentId, runId: runIdA }, { cwd: tempDir });
 

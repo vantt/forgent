@@ -1147,14 +1147,23 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 coordination` — canonical đầy đủ (schema, ADR, ví dụ) sống ở
 `docs/architect/agent-coordination/`; mục này chỉ tóm lược đủ để một phiên
 đọc `docs/specs/` biết ranh giới tồn tại và trỏ đúng chỗ. Tính tới
-2026-09-02 (Phase 06 R1-R4, cell P06.1): manifest/event store + replay +
-session engine + quorum/retry/cancellation runtime đều đã có thật tại
-`src/runner/coordination/{schema,store,replay,session-engine}.mjs` (test:
-`test/runner/coordination-*.test.mjs`) — store/schema/events/direct cutover
-từ `mission-lite.mjs` cũ (đã xoá). Phase 06 R5-R8 (hard budget, adversarial
-security suite, work-isolation static negative contract, independent
-Reviewer+Red-Team closure của toàn ma trận recovery/budget) CHƯA tồn tại —
-đó là cell P06.2 riêng.
+2026-09-02 (Phase 06 R1-R7, cell P06.1+P06.2): manifest/event store + replay +
+session engine + quorum/retry/cancellation + hard-budget/security hardening
+đều đã có thật tại `src/runner/coordination/{schema,store,replay,
+session-engine}.mjs` (test: `test/runner/coordination-*.test.mjs`) —
+store/schema/events/direct cutover từ `mission-lite.mjs` cũ (đã xoá). Phase
+06 R5-R7 (cell P06.2): `aggregateBounds` enforcement nay ĐỒNG NHẤT trên mọi
+đường dispatch (trước đó, đường agent-led `dispatchPrimaryTask`/
+`proposeConsult` không forward 3 cap concurrency-sensitive nào và không
+chạy check wall-time/task-depth — tìm thấy và vá thật, không phải giả định);
+`coordinationId` nay bị chặn ký tự an toàn (alnum/underscore/hyphen), đóng
+một lỗ path-traversal thật (một `coordinationId` chứa `../` từng tạo được
+thư mục THẬT ngoài `.fgos/coordination/sessions/`); `linkResult` nay từ
+chối một `runId` không đúng quy ước của chính `assignmentId` nó gắn vào,
+ngay tại thời điểm ghi (đóng một lỗ foreign-evidence thật, dù lỗ đó chưa
+từng dẫn tới false-success vì đọc lại luôn fail-closed). Phase 06 R8 (đóng
+độc lập bởi Reviewer+Red-Team cho toàn ma trận recovery/budget R1-R7) là
+bước tiếp theo của Coordinator sau cell P06.2, chưa phải việc của Doer.
 
 **CoordinationSession là gì.** Một lần điều phối agent có biên (bounded) —
 objective, actor, budget, task/Assignment runtime khi cần, kết quả tổng hợp —

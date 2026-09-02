@@ -689,6 +689,54 @@ test('H1 residual-gap regression: replaceSessionActor throws when newActorId is 
   );
 });
 
+test('Bug #2 regression: replaceSessionActor refuses a newActorId containing ".." traversal segments BEFORE any file is created -- no unvalidated charset previously reached the actor-replace claim path.join', () => {
+  const tempDir = mkTempDir();
+  openSession(
+    { coordinationId: 'coord_replace_traversal_new', objective: 'x', provenanceRoot: { writerId: 'writer-1' }, actors: [{ id: 'specialist', role: 'reviewer' }] },
+    { cwd: tempDir },
+  );
+
+  const maliciousNewActorId = 'x/../../../../../../../../tmp/PWNED_EVIDENCE_MARKER';
+  const wouldBeClaimPath = path.join(
+    tempDir,
+    '.fgos',
+    'coordination',
+    'sessions',
+    'coord_replace_traversal_new',
+    `actor-replace-specialist--${maliciousNewActorId}.claim`,
+  );
+
+  assert.throws(
+    () => replaceSessionActor('coord_replace_traversal_new', { oldActorId: 'specialist', newActorId: maliciousNewActorId, reason: 'attack attempt' }, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /outside the safe filesystem charset/.test(err.message),
+  );
+  assert.ok(!fs.existsSync(wouldBeClaimPath), 'the claim file the malicious newActorId would have produced was genuinely never written');
+  // Also confirm no file escaped anywhere near the intended traversal target.
+  assert.ok(!fs.existsSync(path.join(os.tmpdir(), 'PWNED_EVIDENCE_MARKER')), 'no file escaped onto the host filesystem via the traversal attempt');
+
+  const events = readSessionEvents('coord_replace_traversal_new', { cwd: tempDir });
+  assert.equal(events.filter((e) => e.type === 'actor-replaced').length, 0, 'no actor-replaced event was written for a rejected traversal attempt');
+});
+
+test('Bug #2 regression: replaceSessionActor refuses an oldActorId containing ".." traversal segments too (defense in depth), before any file is created', () => {
+  const tempDir = mkTempDir();
+  openSession(
+    { coordinationId: 'coord_replace_traversal_old', objective: 'x', provenanceRoot: { writerId: 'writer-1' }, actors: [{ id: 'specialist', role: 'reviewer' }] },
+    { cwd: tempDir },
+  );
+
+  const maliciousOldActorId = '../../../../../../../../tmp/PWNED_OLD_ACTOR';
+
+  assert.throws(
+    () => replaceSessionActor('coord_replace_traversal_old', { oldActorId: maliciousOldActorId, newActorId: 'specialist-2', reason: 'attack attempt' }, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /outside the safe filesystem charset/.test(err.message),
+  );
+  assert.ok(!fs.existsSync(path.join(os.tmpdir(), 'PWNED_OLD_ACTOR')), 'no file escaped onto the host filesystem via the traversal attempt');
+
+  const events = readSessionEvents('coord_replace_traversal_old', { cwd: tempDir });
+  assert.equal(events.filter((e) => e.type === 'actor-replaced').length, 0, 'no actor-replaced event was written for a rejected traversal attempt');
+});
+
 // ─── R4: cancellation and terminal states ──────────────────────────────────
 
 test('cancelSession stops new materialization, records an accurate in-flight snapshot, and never deletes or mutates persisted evidence', () => {
