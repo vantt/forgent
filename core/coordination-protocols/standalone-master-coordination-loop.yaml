@@ -1,0 +1,122 @@
+# core/coordination-protocols/standalone-master-coordination-loop.yaml --
+# static CoordinationProtocol FlowDefinition fixture for the standalone
+# Master Coordination loop: a plan/artifact enters a declared worker graph
+# (Doer, Reviewer, Red-Team, Fixer) that produces a candidate, reviews and
+# red-teams it in a required first pass, then declares a revision and
+# recheck position for a later round. Normalizes through the real,
+# unmodified `validateFlowDefinition` (src/runner/definitions/schema.mjs)
+# via `discoverCoordinationProtocols`/`loadCoordinationProtocol`
+# (src/runner/definitions/protocol-loader.mjs) -- same discovery path as
+# declared-consult.yaml/independent-research-fan-out-fan-in.yaml/
+# group-cognition-framework.yaml. Does NOT execute or wire into
+# CoordinationSession here -- this is the static skeleton only.
+#
+# No `spec.actors[]` entry declares a `coordinator`/`driver` role. The
+# external coordinator that opens a session, reads evidence, authorizes
+# optional rounds, and records disposition is durable authority outside
+# this declared worker graph, never a worker actor inside it.
+#
+# No `spec.profile.topology` is declared. Doer/Reviewer/Red-Team/Fixer
+# operations here are root operations over explicit artifact/context refs
+# passed into the session, not topology-connected SessionActors passing
+# turns to each other -- an artifact/diff is not itself a SessionActor.
+#
+# `revise-candidate`, `reviewer-recheck`, and `red-team-recheck` are
+# declared graph positions with no different runtime treatment yet than
+# `produce-candidate`/`review-candidate`/`red-team-candidate`: the schema's
+# node-operation binding fields (`NODE_OPERATION_REF_FIELDS`,
+# src/runner/definitions/schema.mjs) accept only `ref` and `actor` today --
+# there is no `activation` field yet to mark a binding
+# `driver-authorized` versus `required`. Until that field exists, every
+# operation below materializes the same way; the graph position (after the
+# required first pass, in its own later phase) is the only signal that
+# revision/recheck are meant to become gated once driver authorization
+# ships. Do not read the current absence of a gate as "these three
+# operations are already optional" -- they are simply not yet
+# distinguishable from the required ones at the schema level.
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.standalone-master-coordination-loop
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+
+  roles:
+    - doer
+    - reviewer
+    - red-team
+    - fixer
+
+  actors:
+    - id: doer
+      role: doer
+    - id: reviewer
+      role: reviewer
+    - id: red-team
+      role: red-team
+    - id: fixer
+      role: fixer
+
+  operations:
+    - id: produce-candidate
+      role: doer
+      result:
+        kind: work-product
+        evidenceRequired: reported
+    - id: review-candidate
+      role: reviewer
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: red-team-candidate
+      role: red-team
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: revise-candidate
+      role: fixer
+      result:
+        kind: work-product
+        evidenceRequired: reported
+    - id: reviewer-recheck
+      role: reviewer
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: red-team-recheck
+      role: red-team
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+  graph:
+    entry: phase-produce
+    nodes:
+      - id: phase-produce
+        operations:
+          - ref: produce-candidate
+            actor: doer
+        transitions: [phase-first-pass]
+      - id: phase-first-pass
+        operations:
+          - ref: review-candidate
+            actor: reviewer
+          - ref: red-team-candidate
+            actor: red-team
+        transitions: [phase-revision]
+      - id: phase-revision
+        operations:
+          - ref: revise-candidate
+            actor: fixer
+        transitions: [phase-recheck]
+      - id: phase-recheck
+        operations:
+          - ref: reviewer-recheck
+            actor: reviewer
+          - ref: red-team-recheck
+            actor: red-team
+        transitions: []

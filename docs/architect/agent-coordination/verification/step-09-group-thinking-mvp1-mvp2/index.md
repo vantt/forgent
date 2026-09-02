@@ -60,23 +60,61 @@ This list may only shrink; any new failure beyond it blocks cell close.
 | Phase | Requirements | Status |
 |---|---|---|
 | 00 | R1-R4 | done |
-| 01 | R1-R6 | missing |
+| 01 | R1-R6 | done |
 | 02 | R1-R8 | missing |
 | 03 | R1-R7 | missing |
 
 ## Active Cell
 
-None — Phase 00 closed.
+None — Phase 01 closed.
 
 ## Next Action
 
-prepare P01.1 (Phase 01: MVP1 fixture skeleton)
+prepare P02.1 (Phase 02: driver authorization primitive)
 
 ## Cell Log
 
 | Cell | Requirements | Status | Commit |
 |---|---|---|---|
-| P00.1 | Phase 00 R1, R2, R3, R4 (closes Phase 00) | done | (pending commit) |
+| P00.1 | Phase 00 R1, R2, R3, R4 (closes Phase 00) | done | `e579fc6a` |
+| P01.1 | Phase 01 R1, R2, R3, R4, R5, R6 (closes Phase 01) | done | (pending commit) |
+
+## Phase 01 Status
+
+**CLOSED.** R1-R6 via P01.1. Added
+`core/coordination-protocols/standalone-master-coordination-loop.yaml` — a
+static `CoordinationProtocol` FlowDefinition fixture: worker-only actors
+(doer/reviewer/red-team/fixer, no coordinator), six operations, graph
+`phase-produce -> phase-first-pass (review+red-team required) ->
+phase-revision (revise-candidate) -> phase-recheck (reviewer-recheck +
+red-team-recheck)`, no topology, no Work fields. Zero `src/` diff — the
+existing unmodified schema/loader was already sufficient for the static
+skeleton. `revise-candidate`/`reviewer-recheck`/`red-team-recheck`
+currently materialize identically to the required first-pass operations
+(schema has no `activation` field yet — that's Phase 02's job); this is the
+honest, undecorated R4 state, documented in the fixture's own header
+comment and this cell's Gaps section, not faked.
+
+Went through 1 Reviewer round (CLEAN — 2 non-actionable LOW notes: an
+actor-id naming style divergence that correctly matches the authoritative
+substrate spec over sibling-fixture convention, and a wider-than-phase-file
+protected-fixture list, both non-issues) followed by 1 Red-Team round (1
+HIGH + 1 MEDIUM + 1 LOW). The HIGH was a genuine, independently-confirmed
+forward-looking finding, not a defect in this cell's own deliverable: this
+fixture is the first in the repo to bind one actor to two different
+operations at two graph positions, and `src/runner/coordination/
+cohort-planner.mjs:307`'s `resolveActorOperation` (already live, wired into
+`dispatchResearchFanOut`) resolves by first-match-on-actorId with no
+operation/node disambiguation — meaning it can never correctly resolve the
+second binding once cohort allocation is ever pointed at this fixture.
+Correctly kept out of scope to fix in this docs/fixture-only phase (see
+"Forward Note For Phase 02/03 Cell Preparation" below); recorded as a Gap
+instead. The MEDIUM + LOW (missing actor-binding and graph-shape test
+assertions) were fixed and Red-Team-recheck-confirmed resolved. Full suite
+not required for this cell (docs/fixture+test only, zero shared
+loader/schema diff); focused suite 49/49 pass throughout.
+
+## Forward Note For Phase 02/03 Cell Preparation
 
 ## Phase 00 Status
 
@@ -108,6 +146,29 @@ re-attempting each named exploit against the post-fix text). No HIGH/MEDIUM
 remains open. Docs-only cell throughout — `group-cognition-framework.yaml`
 and `assignment-run-runresult.md` confirmed at zero diff by Doer, Reviewer,
 Red-Team, and Coordinator independently.
+
+## Forward Note For Phase 02/03 Cell Preparation
+
+`P01.1`'s Red-Team found a real, independently-confirmed pre-existing bug
+in `src/runner/coordination/cohort-planner.mjs:307-316`
+(`resolveActorOperation`): it resolves an actor's wired operation by
+first-match scan keyed on `actorId` alone, with no `operationId`/`nodeId`
+disambiguation. `standalone-master-coordination-loop.yaml` is the first
+fixture where one actor (`reviewer`, `red-team`) is bound to two different
+operation ids at two different graph nodes — `resolveActorOperation`
+structurally can never return the second binding (`reviewer-recheck`/
+`red-team-recheck`), always the first (`review-candidate`/
+`red-team-candidate`). Currently masked because the paired operations
+share identical `role`/no `policy`/`capabilities`; breaks silently
+(wrong-value substitution, not a crash) the moment a future cell gives a
+recheck operation its own `policy`/`capabilities`. **Before any future
+phase points `planCohort`/`resolveActorOperation` at this fixture,
+re-key that function by `(nodeId, operationId, actorId)`, mirroring
+`session-engine.mjs:809-824`'s already-correct `resolveDeclaredOperationActor`
+(keyed by `operationId`).** Full detail: `P01.1.md`'s Red-Team HIGH-1 and
+Gaps section. Not a blocker for Phase 01/02/03 as currently scoped (neither
+phase's Files list touches `cohort-planner.mjs`), but must be checked
+before any phase introduces cohort allocation for this fixture.
 
 Next: P01.1 (Phase 01 — `standalone-master-coordination-loop.yaml` fixture
 skeleton, worker-only graph, required first-pass operations, declared

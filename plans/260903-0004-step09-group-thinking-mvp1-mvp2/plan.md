@@ -50,7 +50,7 @@ Deliver the smallest accepted substrate slice that can express:
 | # | Phase | Depends on | Exit | Status |
 |---|---|---|---|---|
 | 00 | [Promote minimal contract deltas](phase-00-promote-minimal-contract-deltas.md) | user-approved Step 09 direction | Accepted docs define fixture, authorization, artifact refs, recheck, disposition, and bounds semantics before code | done (P00.1, 2026-09-03) |
-| 01 | [MVP1 fixture skeleton and validation](phase-01-master-coordination-fixture-skeleton.md) | 00 | Fixture validates as a CoordinationProtocol without Work fields and without changing existing fixtures | planned |
+| 01 | [MVP1 fixture skeleton and validation](phase-01-master-coordination-fixture-skeleton.md) | 00 | Fixture validates as a CoordinationProtocol without Work fields and without changing existing fixtures | done (P01.1, 2026-09-03) |
 | 02 | [MVP2 driver authorization primitive](phase-02-driver-authorization-primitive.md) | 01 | Driver-authorized operations cannot dispatch without a valid event and cannot exceed binding/session caps | planned |
 | 03 | [Recheck, disposition, and live standalone proof](phase-03-recheck-disposition-live-proof.md) | 02 | A no-Work live run proves candidate, review, red-team, authorized revision, recheck, disposition, and close | planned |
 
