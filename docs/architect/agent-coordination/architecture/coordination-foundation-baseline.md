@@ -3,7 +3,7 @@
 Document type: Architecture
 Design status: Accepted
 Implementation: Implemented for Steps 00-08 delivered surface; deferred items named below
-Last reviewed: 2026-09-02
+Last reviewed: 2026-09-03
 Canonical for: accepted Step 00-08 Agent Coordination foundation shape after promotion from roadmap/proposal history
 
 Related: [Vision](../vision.md), [Runtime Model](runtime-model.md),
@@ -118,6 +118,9 @@ Deferring these does not mean they are rejected. The active architecture-wide
 intent is tracked in [Architecture Intent](../../architecture-intent.md), the
 group-thinking substrate expansion is tracked in Step 09, and coding-domain
 adoption is tracked in Step 10.
+
+See the [Master Multi-Agent Implementation Coordinator](../playbooks/prompts/master-coordinator.md)
+playbook's own Runtime Boundary section for its manual-only status.
 
 ## Reading Rule
 
