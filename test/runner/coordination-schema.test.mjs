@@ -172,6 +172,114 @@ test('validateEventPayload rejects a session-partial payload with an empty missi
   );
 });
 
+// ─── operation-authorized (driver-authorized optional operations) ──────────
+
+function authorizationPayload(overrides = {}) {
+  return {
+    authorizationId: 'auth_001',
+    operationId: 'reviewer-recheck',
+    nodeId: 'phase-recheck',
+    targetActorId: 'reviewer',
+    invocationKey: 'recheck:rev-2',
+    authorizedBy: { type: 'driver', id: 'coordinator-1' },
+    reason: 'Candidate was revised; a recheck against revision 2 is warranted.',
+    grantedContextRefs: ['asgn_a_001'],
+    ...overrides,
+  };
+}
+
+test('validateEventPayload accepts a full operation-authorized payload, with and without targetArtifactRef', () => {
+  assert.doesNotThrow(() => validateEventPayload('operation-authorized', authorizationPayload()));
+  assert.doesNotThrow(() => validateEventPayload('operation-authorized', authorizationPayload({ targetArtifactRef: 'artifact:candidate@2' })));
+  assert.doesNotThrow(() => validateEventPayload('operation-authorized', authorizationPayload({ grantedContextRefs: [] })));
+});
+
+for (const field of ['authorizationId', 'operationId', 'nodeId', 'targetActorId', 'invocationKey', 'authorizedBy', 'reason', 'grantedContextRefs']) {
+  test(`validateEventPayload rejects an operation-authorized payload missing "${field}"`, () => {
+    const payload = authorizationPayload();
+    delete payload[field];
+    assert.throws(
+      () => validateEventPayload('operation-authorized', payload),
+      (err) => err instanceof CoordinationError && new RegExp(`payload\\.${field}`).test(err.message),
+    );
+  });
+}
+
+test('validateEventPayload rejects an unlisted field on an operation-authorized payload', () => {
+  assert.throws(
+    () => validateEventPayload('operation-authorized', authorizationPayload({ grantedRoundBudget: 3 })),
+    (err) => err instanceof CoordinationError && /unknown field "grantedRoundBudget"/.test(err.message),
+  );
+});
+
+test('validateEventPayload requires operation-authorized authorizedBy to be a driver identity', () => {
+  for (const bad of [{ type: 'actor', id: 'reviewer' }, { type: 'driver' }, { id: 'coordinator-1' }, 'coordinator-1']) {
+    assert.throws(
+      () => validateEventPayload('operation-authorized', authorizationPayload({ authorizedBy: bad })),
+      (err) => err instanceof CoordinationError && /authorizedBy/.test(err.message),
+      `expected authorizedBy ${JSON.stringify(bad)} to be rejected`,
+    );
+  }
+});
+
+test('validateEventPayload requires operation-authorized grantedContextRefs to be an array of non-empty strings', () => {
+  for (const bad of ['asgn_a_001', [''], [1], {}]) {
+    assert.throws(
+      () => validateEventPayload('operation-authorized', authorizationPayload({ grantedContextRefs: bad })),
+      (err) => err instanceof CoordinationError && /grantedContextRefs/.test(err.message),
+      `expected grantedContextRefs ${JSON.stringify(bad)} to be rejected`,
+    );
+  }
+});
+
+test('validateEventPayload accepts driver-authorization provenance on assignment-created without changing the existing agent-led shape', () => {
+  // Existing agent-led shape, unchanged.
+  assert.doesNotThrow(() => validateEventPayload('assignment-created', { assignmentId: 'asgn_a_001' }));
+  assert.doesNotThrow(() => validateEventPayload('assignment-created', { assignmentId: 'asgn_a_001', actorId: 'primary' }));
+  // Additive driver-authorized provenance.
+  assert.doesNotThrow(() =>
+    validateEventPayload('assignment-created', {
+      assignmentId: 'asgn_a_001',
+      actorId: 'reviewer',
+      operationId: 'reviewer-recheck',
+      nodeId: 'phase-recheck',
+      authorizationId: 'auth_001',
+      invocationKey: 'recheck:rev-2',
+      contextGrant: { refs: ['asgn_a_000'] },
+    }),
+  );
+});
+
+test('validateEventPayload rejects a malformed contextGrant on assignment-created', () => {
+  for (const bad of [{ refs: 'asgn_a_000' }, { refs: [''] }, { refs: [], extra: 1 }, 'asgn_a_000']) {
+    assert.throws(
+      () => validateEventPayload('assignment-created', { assignmentId: 'asgn_a_001', contextGrant: bad }),
+      (err) => err instanceof CoordinationError && /contextGrant/.test(err.message),
+      `expected contextGrant ${JSON.stringify(bad)} to be rejected`,
+    );
+  }
+});
+
+test('validateEventPayload rejects assignment-created provenance that omits authorizationId -- the group travels together', () => {
+  for (const orphan of [
+    { operationId: 'reviewer-recheck' },
+    { nodeId: 'phase-recheck' },
+    { invocationKey: 'recheck:rev-2' },
+    { contextGrant: { refs: ['asgn_a_000'] } },
+    { operationId: 'reviewer-recheck', nodeId: 'phase-recheck', invocationKey: 'recheck:rev-2', contextGrant: { refs: [] } },
+  ]) {
+    assert.throws(
+      () => validateEventPayload('assignment-created', { assignmentId: 'asgn_a_001', actorId: 'reviewer', ...orphan }),
+      (err) => err instanceof CoordinationError && /without "authorizationId"/.test(err.message),
+      `expected ${JSON.stringify(orphan)} without authorizationId to be rejected`,
+    );
+    // The SAME shape is accepted the moment it names an authorization.
+    assert.doesNotThrow(() =>
+      validateEventPayload('assignment-created', { assignmentId: 'asgn_a_001', actorId: 'reviewer', authorizationId: 'auth_001', ...orphan }),
+    );
+  }
+});
+
 // ─── Assignment session-blindness (ADR-008 Decision 2) ─────────────────────
 
 test('assertAssignmentIsSessionBlind accepts a clean Assignment record', () => {

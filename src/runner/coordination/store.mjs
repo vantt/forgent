@@ -351,12 +351,12 @@ function readAssignmentJson(assignmentsDir, assignmentId) {
 // "interrupted, needs completing." Without this check, a further retry
 // re-entering this function would append a SECOND `assignment-created` for
 // the same id, which replay.mjs's duplicate-ref check fails closed on.
-function completeAssignmentRegistration({ manifest, manifestPath, eventsPath, sessionDir, assignmentId, actorId }) {
+function completeAssignmentRegistration({ manifest, manifestPath, eventsPath, sessionDir, assignmentId, actorId, authorizationProvenance }) {
   const alreadyAppended = readEvents(eventsPath).some(
     (event) => event.type === 'assignment-created' && event.payload?.assignmentId === assignmentId,
   );
   if (!alreadyAppended) {
-    const eventPayload = { assignmentId, ...(actorId ? { actorId } : {}) };
+    const eventPayload = { assignmentId, ...(actorId ? { actorId } : {}), ...(authorizationProvenance ?? {}) };
     validateEventPayload('assignment-created', eventPayload);
     appendEventLocked(eventsPath, { type: 'assignment-created', payload: eventPayload }, sessionDir);
   }
@@ -364,6 +364,52 @@ function completeAssignmentRegistration({ manifest, manifestPath, eventsPath, se
   manifest.assignmentRefs = [...manifest.assignmentRefs, assignmentId];
   validateManifest(manifest);
   writeManifestRaw(manifestPath, manifest);
+}
+
+// Driver-authorization provenance is VERIFIED against this session's own
+// log before it is written, never merely recorded. Two invariants, both on
+// one FRESH read taken while the events lock is already held -- never on the
+// caller's own earlier unlocked `replaySession()` gate
+// (session-engine.mjs's `dispatchDeclaredOperation`), which two concurrent
+// callers could both pass before either had created anything:
+//
+//  1. The `authorizationId` must name a real `operation-authorized` event in
+//     THIS session. Refusing here turns a fabricated provenance into a
+//     write-time rejection instead of a session whose every subsequent
+//     `replaySession` throws `dangling-ref` forever.
+//  2. It may be spent by at most ONE Assignment.
+//
+// `ownAssignmentId`, when supplied, is the Assignment whose interrupted
+// registration this call is completing: a consumer that IS that Assignment
+// is a genuine idempotent resume of its own authorization, not a second
+// consumption, so only a DIFFERENT consumer is a violation. Both of
+// `createSessionAssignment`'s writing paths -- the self-heal branch and the
+// genuinely-new-taskKey branch -- run this, so the invariant cannot be
+// reached around by crashing into the self-heal shape first.
+function assertAuthorizationSpendable({ eventsPath, coordinationId, authorizationProvenance, ownAssignmentId }) {
+  const authorizationId = authorizationProvenance?.authorizationId;
+  if (authorizationId === undefined) return;
+
+  const events = readEvents(eventsPath);
+  const issued = events.some(
+    (event) => event.type === 'operation-authorized' && event.payload?.authorizationId === authorizationId,
+  );
+  if (!issued) {
+    throw new CoordinationError(
+      'validation',
+      `createSessionAssignment: authorization "${authorizationId}" in session "${coordinationId}" names no "operation-authorized" event in this session -- refusing to record driver-authorization provenance no driver ever issued`,
+    );
+  }
+
+  const alreadyConsumedBy = events.find(
+    (event) => event.type === 'assignment-created' && event.payload?.authorizationId === authorizationId,
+  );
+  if (alreadyConsumedBy && alreadyConsumedBy.payload.assignmentId !== ownAssignmentId) {
+    throw new CoordinationError(
+      'validation',
+      `createSessionAssignment: authorization "${authorizationId}" in session "${coordinationId}" was already consumed by Assignment "${alreadyConsumedBy.payload.assignmentId}" -- one authorization materializes at most one Assignment`,
+    );
+  }
 }
 
 /**
@@ -498,7 +544,7 @@ function completeAssignmentRegistration({ manifest, manifestPath, eventsPath, se
  * @returns {Readonly<object>} The Assignment (freshly created, or the one already claimed for this taskKey)
  */
 export function createSessionAssignment(
-  { coordinationId, taskKey, actorId, contract, caller, work, workId, createdBy, options },
+  { coordinationId, taskKey, actorId, contract, caller, work, workId, createdBy, options, authorizationProvenance },
   opts = {},
 ) {
   assertValidTaskKey(taskKey);
@@ -534,6 +580,19 @@ export function createSessionAssignment(
         // assignment.json but crashed before the event/ref append
         // completed -- complete it now instead of returning a phantom
         // "successful" Assignment that was never a real session member.
+        //
+        // This branch APPENDS a consuming `assignment-created`, so it is
+        // bound by the same authorization invariants the genuinely-new-
+        // taskKey path below is. Exempting only this claim's OWN
+        // assignmentId keeps a genuine idempotent resume passing while
+        // refusing the crash-plus-race shape where a DIFFERENT taskKey
+        // spent this authorization first.
+        assertAuthorizationSpendable({
+          eventsPath,
+          coordinationId,
+          authorizationProvenance,
+          ownAssignmentId: claim.assignmentId,
+        });
         completeAssignmentRegistration({
           manifest,
           manifestPath,
@@ -541,10 +600,17 @@ export function createSessionAssignment(
           sessionDir,
           assignmentId: claim.assignmentId,
           actorId,
+          authorizationProvenance,
         });
       }
       return Object.freeze(existing);
     }
+
+    // A driver authorization must have been really issued, and is spent by
+    // exactly ONE Assignment. On this genuinely-NEW-taskKey path there is no
+    // own-Assignment exemption: this call has claimed nothing yet, so ANY
+    // existing consumer is a second consumption.
+    assertAuthorizationSpendable({ eventsPath, coordinationId, authorizationProvenance, ownAssignmentId: undefined });
 
     // Authoritative, session-wide aggregateBounds enforcement (opt-in, Phase
     // 03 R5): reached under the exact same "genuinely NEW taskKey only"
@@ -644,9 +710,76 @@ export function createSessionAssignment(
       sessionDir,
       assignmentId: assignment.assignmentId,
       actorId,
+      authorizationProvenance,
     });
 
     return assignment;
+  });
+}
+
+/**
+ * Append one `operation-authorized` event for a `driver-authorized` node-
+ * operation binding.
+ *
+ * Recovery Rule point 5: "Checking whether a session is still `active` and
+ * appending an `operation-authorized` event happen as part of the same
+ * atomic/serialized write path already used for `assignment-created` --
+ * never a plain check-then-act against a concurrent
+ * `transitionSessionStatus` call." That is literal here, not a convention:
+ * the manifest read, the status check, and the append all run inside ONE
+ * `withEventsLock(eventsPath, ...)` critical section -- the SAME on-disk
+ * `events.lock` (derived from `path.dirname(eventsPath)`, i.e. the session
+ * directory) that `createSessionAssignment`'s own
+ * `completeAssignmentRegistration` write and `transitionSessionStatus`'s own
+ * terminal write both acquire. A concurrent transition therefore cannot
+ * interleave between this status check and this append: whichever call wins
+ * the lock runs to completion first, and the loser re-reads the manifest the
+ * winner already wrote.
+ *
+ * Idempotent on `authorizationId` (crash-resume self-heal, mirroring
+ * `recordActorReplacement`/`completeAssignmentRegistration`): a repeated
+ * call for the same authorization appends nothing.
+ *
+ * This door validates SHAPE and session status only. Whether
+ * `(nodeId, operationId, targetActorId)` names a real, `driver-authorized`
+ * binding is a question only a caller holding the FlowDefinition can answer
+ * -- `session-engine.mjs`'s `authorizeDeclaredOperation` is that caller, and
+ * this module deliberately takes on no definition awareness of its own.
+ */
+export function authorizeOperation(
+  coordinationId,
+  { authorizationId, operationId, nodeId, targetActorId, invocationKey, authorizedBy, reason, grantedContextRefs, targetArtifactRef },
+  opts = {},
+) {
+  const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const payload = {
+    authorizationId,
+    operationId,
+    nodeId,
+    targetActorId,
+    invocationKey,
+    authorizedBy,
+    reason,
+    grantedContextRefs,
+    ...(targetArtifactRef !== undefined ? { targetArtifactRef } : {}),
+  };
+  validateEventPayload('operation-authorized', payload);
+
+  return withEventsLock(eventsPath, () => {
+    const manifest = readManifestRaw(manifestPath);
+    assertSchemaVersionCurrent(manifest, manifestPath);
+    if (manifest.status !== 'active') {
+      throw new CoordinationError(
+        'validation',
+        `authorizeOperation: session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot authorize a new operation once new materialization has stopped`,
+      );
+    }
+    const alreadyAuthorized = readEvents(eventsPath).some(
+      (event) => event.type === 'operation-authorized' && event.payload?.authorizationId === authorizationId,
+    );
+    if (alreadyAuthorized) return Object.freeze({ ...payload, appended: false });
+    appendEventLocked(eventsPath, { type: 'operation-authorized', payload }, sessionDir);
+    return Object.freeze({ ...payload, appended: true });
   });
 }
 

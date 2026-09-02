@@ -1,31 +1,33 @@
 # Current Cell
 
-Cell: P01.1 (closed) — Phase 01 done
+Cell: P02.1 (closed) — Phase 02 R1-R4 done, R5-R8 open
 Status: closed
 Owner: Coordinator
 Last updated: 2026-09-03
-Next action: coordinator (prepare P02.1 — see index.md)
+Next action: coordinator (prepare P02.2 — see index.md)
 
 ## Closure summary
 
-R1-R6 all closed this cell, closing Phase 01. Doer -> Reviewer (CLEAN) ->
-Red-Team (1 HIGH forward-gap about a pre-existing `cohort-planner.mjs` bug,
-documented not fixed here; 1 MEDIUM + 1 LOW test-coverage gaps, fixed and
-recheck-confirmed). Full trace: `P01.1.md`. 49/49 focused tests pass.
+R1-R4 closed this cell. Doer (opus) -> Reviewer (opus, APPROVE WITH
+CONCERNS: 1 MEDIUM + 2 LOW fixed, 1 MEDIUM deferred as forward gap) ->
+Red-Team (opus, BLOCK: 1 HIGH + 1 MEDIUM, both real, empirically reproduced
+with SIGKILL + multi-process trials) -> Fixer -> Red-Team recheck
+(CONFIRMED-RESOLVED, 0/46 real trials after fix vs. 10-11/20 before). The
+HIGH was a genuine self-heal-path double-consumption bug that could brick a
+session's event log permanently — found only by real concurrent
+reproduction, matching this track's own step-08 precedent for this class of
+bug. Full trace: `P02.1.md`. Full suite clean against baseline (7/7 match
+by name, no new failure).
 
 ## Next action
 
-Prepare cell P02.1 (Phase 02: driver authorization primitive — R1-R8, add
-`activation.mode`/`maxInvocations` to `src/runner/definitions/schema.mjs`'s
-`NODE_OPERATION_REF_FIELDS`, plus `operation-authorized` event
-append/replay validation in `src/runner/coordination/{schema,store,replay,
-session-engine}.mjs`). Before preparing this cell, re-read
-`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md`'s
-"Forward Note For Phase 02/03 Cell Preparation" section — the
-`cohort-planner.mjs` `resolveActorOperation` disambiguation bug is NOT part
-of Phase 02's own Files list (`cohort-planner.mjs` isn't named there), so it
-should stay a named risk to watch, not silently pulled into this phase's
-scope, unless Phase 02's own implementation genuinely needs cohort
-allocation against this fixture (it should not — Phase 02 is about
-`operation-authorized`/dispatch gating for a single already-allocated actor
-per role, not fan-out cohort planning).
+Prepare cell P02.2 (Phase 02 R5-R8: `invocationKey` exactly-once
+consumption/session-scoped uniqueness, context-grant enforcement at
+dispatch time, binding-cap-vs-aggregate-cap interaction with fresh
+on-disk counting, driver-authority identity pinning to session
+provenance). Before preparing, re-read `index.md`'s "Forward Notes For
+Later Phases" section — three pre-existing/adjacent gaps are recorded
+there (`cohort-planner.mjs` disambiguation, `resolveDeclaredOperationActor`
+node-selection, unlocked-replay-vs-concurrent-commit `dangling-ref`); none
+are P02.2's own requirements, but P02.2 should not silently rediscover them
+while touching the same files.

@@ -5,6 +5,7 @@ import {
   KIND,
   validateFlowDefinition,
   mergePolicyStack,
+  activationModeOf,
   FlowDefinitionError,
 } from '../../src/runner/definitions/schema.mjs';
 
@@ -266,6 +267,92 @@ test("rejects a spec.actors[] entry whose role is not declared in spec.roles", (
     () => validateFlowDefinition(def),
     throwsFlowDefinitionError(/actors\[0\]\.role "ghost-role" is not declared in spec\.roles/),
   );
+});
+
+// ---------------------------------------------------------------------------
+// Binding activation (node-operation binding scoped, never the shared
+// spec.operations[] template)
+// ---------------------------------------------------------------------------
+
+test('accepts activation.mode "driver-authorized" with maxInvocations on a node-operation binding', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.graph.nodes[0].operations[0].activation = { mode: 'driver-authorized', maxInvocations: 3 };
+  const result = validateFlowDefinition(def);
+  assert.deepEqual(result.spec.graph.nodes[0].operations[0].activation, { mode: 'driver-authorized', maxInvocations: 3 });
+});
+
+test('activation present without a mode key defaults to "required"', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.graph.nodes[0].operations[0].activation = { maxInvocations: 2 };
+  const result = validateFlowDefinition(def);
+  assert.deepEqual(result.spec.graph.nodes[0].operations[0].activation, { mode: 'required', maxInvocations: 2 });
+});
+
+test('a binding with no activation at all resolves to activation mode "required"', () => {
+  const result = validateFlowDefinition(minimalProtocolDefinition());
+  assert.equal(result.spec.graph.nodes[0].operations[0].activation, undefined);
+  assert.equal(activationModeOf(result.spec.graph.nodes[0].operations[0]), 'required');
+});
+
+test('activationModeOf resolves the contract default for every absent-mode shape', () => {
+  assert.equal(activationModeOf({ ref: 'op' }), 'required');
+  assert.equal(activationModeOf({ ref: 'op', activation: {} }), 'required');
+  assert.equal(activationModeOf({ ref: 'op', activation: { maxInvocations: 4 } }), 'required');
+  assert.equal(activationModeOf({ ref: 'op', activation: { mode: 'driver-authorized' } }), 'driver-authorized');
+});
+
+test('rejects an unknown activation.mode value', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.graph.nodes[0].operations[0].activation = { mode: 'optional' };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/nodes\[0\]\.operations\[0\]\.activation\.mode must be one of required \| driver-authorized/),
+  );
+});
+
+test('rejects an unknown field inside activation', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.graph.nodes[0].operations[0].activation = { mode: 'required', authorizedBy: 'driver' };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/nodes\[0\]\.operations\[0\]\.activation has unknown field "authorizedBy"/),
+  );
+});
+
+test('rejects a non-positive-integer activation.maxInvocations', () => {
+  for (const bad of [0, -1, 1.5, '2']) {
+    const def = minimalProtocolDefinition();
+    def.spec.graph.nodes[0].operations[0].activation = { mode: 'driver-authorized', maxInvocations: bad };
+    assert.throws(
+      () => validateFlowDefinition(def),
+      throwsFlowDefinitionError(/activation\.maxInvocations must be a positive integer when provided/),
+      `expected maxInvocations ${JSON.stringify(bad)} to be rejected`,
+    );
+  }
+});
+
+test('rejects activation declared on a reusable spec.operations[] template -- activation is binding-scoped only', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.operations[0].activation = { mode: 'driver-authorized' };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/operations\[0\] declares "activation".*binding/s),
+  );
+});
+
+test('the same operation id may be required at one graph position and driver-authorized at another', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.graph.nodes = [
+    { id: 'phase-research', operations: [{ ref: 'op-research', actor: 'actor-1' }], transitions: ['phase-recheck'] },
+    {
+      id: 'phase-recheck',
+      operations: [{ ref: 'op-research', actor: 'actor-1', activation: { mode: 'driver-authorized' } }],
+      transitions: [],
+    },
+  ];
+  const result = validateFlowDefinition(def);
+  assert.equal(activationModeOf(result.spec.graph.nodes[0].operations[0]), 'required');
+  assert.equal(activationModeOf(result.spec.graph.nodes[1].operations[0]), 'driver-authorized');
 });
 
 // ---------------------------------------------------------------------------

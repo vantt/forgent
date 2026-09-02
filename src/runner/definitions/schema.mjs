@@ -51,7 +51,17 @@ const GRAPH_FIELDS = new Set(['entry', 'nodes']);
 // spec.profile.kind, never a stored field on the node object (ADR-009
 // Decision 3). Any explicit `kind` key here is rejected by the whitelist.
 const NODE_FIELDS = new Set(['id', 'operations', 'transitions']);
-const NODE_OPERATION_REF_FIELDS = new Set(['ref', 'actor']);
+const NODE_OPERATION_REF_FIELDS = new Set(['ref', 'actor', 'activation']);
+const ACTIVATION_FIELDS = new Set(['mode', 'maxInvocations']);
+
+// `activation` is scoped to the node-operation BINDING, never to the
+// reusable `spec.operations[]` template: the same operation id may be
+// `required` at one graph position and `driver-authorized` at another
+// (contract: flow-definition.md "Activation"). `required` is the default
+// whenever `mode` itself is absent -- whether `activation` is omitted
+// entirely or present without a `mode` key.
+export const ACTIVATION_MODE_VALUES = Object.freeze(['required', 'driver-authorized']);
+export const DEFAULT_ACTIVATION_MODE = 'required';
 
 // Deliberately no `purpose` -- V1 omits it on purpose (ADR-009 Decision 5);
 // any explicit `purpose` key here is rejected by the whitelist below.
@@ -422,6 +432,14 @@ function validateOperations(operations, roleSet, profileKind) {
   const result = operations.map((op, i) => {
     const label = `spec.operations[${i}]`;
     if (!isPlainObject(op)) fail(`${label} must be an object`);
+    // `activation` gets its own named rejection rather than falling through
+    // to the generic unknown-field message below: the contract states the
+    // rule positively ("activation on the shared operation template itself
+    // is not a legal field and must be rejected"), and a reader hitting it
+    // needs to know WHERE the field does belong.
+    if (op.activation !== undefined) {
+      fail(`${label} declares "activation", which is scoped to a graph.nodes[].operations[] binding, never to a reusable spec.operations[] template`);
+    }
     // Whitelist excludes `purpose` -- an operation declaring it is
     // rejected here as an unknown field (ADR-009 Decision 5).
     assertOnlyAcceptedFields(op, OPERATION_FIELDS, label);
@@ -484,6 +502,36 @@ function validateOperations(operations, roleSet, profileKind) {
   return Object.freeze(result);
 }
 
+function validateActivation(activation, label) {
+  if (!isPlainObject(activation)) fail(`${label} must be an object when provided`);
+  assertOnlyAcceptedFields(activation, ACTIVATION_FIELDS, label);
+
+  const result = { mode: DEFAULT_ACTIVATION_MODE };
+  if (activation.mode !== undefined) {
+    if (!ACTIVATION_MODE_VALUES.includes(activation.mode)) {
+      fail(`${label}.mode must be one of ${ACTIVATION_MODE_VALUES.join(' | ')}`);
+    }
+    result.mode = activation.mode;
+  }
+  if (activation.maxInvocations !== undefined) {
+    if (!isPositiveInteger(activation.maxInvocations)) fail(`${label}.maxInvocations must be a positive integer when provided`);
+    result.maxInvocations = activation.maxInvocations;
+  }
+  return Object.freeze(result);
+}
+
+/**
+ * The activation mode governing one node-operation binding, applying the
+ * contract's default rule in exactly one place: `required` whenever `mode`
+ * itself is absent (no `activation` at all, or an `activation` object with
+ * no `mode` key). Accepts either a validated binding from
+ * `validateFlowDefinition` or a raw one, so a caller never has to re-derive
+ * the default and drift from it.
+ */
+export function activationModeOf(binding) {
+  return binding?.activation?.mode ?? DEFAULT_ACTIVATION_MODE;
+}
+
 function validateNodeOperationRef(opRef, label, operationIds, actorIds) {
   if (!isPlainObject(opRef)) fail(`${label} must be an object`);
   assertOnlyAcceptedFields(opRef, NODE_OPERATION_REF_FIELDS, label);
@@ -495,6 +543,9 @@ function validateNodeOperationRef(opRef, label, operationIds, actorIds) {
     if (!isNonEmptyString(opRef.actor)) fail(`${label}.actor must be a non-empty string when provided`);
     if (!actorIds.has(opRef.actor)) fail(`${label}.actor "${opRef.actor}" does not reference a declared spec.actors[] id`);
     result.actor = opRef.actor;
+  }
+  if (opRef.activation !== undefined) {
+    result.activation = validateActivation(opRef.activation, `${label}.activation`);
   }
   return Object.freeze(result);
 }

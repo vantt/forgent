@@ -28,6 +28,11 @@ import { CoordinationError, validateEventPayload, assertAssignmentIsSessionBlind
 // schemaVersion-mismatch check (schema.mjs's assertSchemaVersionCurrent,
 // shared with every store.mjs mutator) replay's "is this an old manifest on
 // disk" context calls for.
+// The four absorbing terminal event kinds (`transitionSessionStatus`'s own
+// TERMINAL_EVENT_TYPE table, store.mjs) -- once one appears in the log, no
+// later `operation-authorized` event is valid.
+const TERMINAL_EVENT_TYPES = new Set(['session-completed', 'session-partial', 'session-failed', 'session-cancelled']);
+
 function readManifestForReplay(manifestPath) {
   const manifest = readManifestRaw(manifestPath);
   assertSchemaVersionCurrent(manifest, manifestPath);
@@ -67,8 +72,52 @@ export function replaySession(coordinationId, opts = {}) {
   const linkedCountByAssignment = new Map();
   const retriedCountByAssignment = new Map();
   const retriedCountAtLastLink = new Map();
+
+  // Recovery Rule point 5, read side: "Regardless of write-time ordering,
+  // replay must treat any `operation-authorized` event appearing after a
+  // terminal event in `events.jsonl` as invalid/ignored." Ignored here means
+  // neutralized -- excluded from `authorizations` (so the dispatch gate,
+  // which only ever consults that list, can never be satisfied by one) and
+  // reported separately in `ignoredAuthorizations` rather than silently
+  // dropped. Deliberately NOT a throw: a post-terminal authorization is the
+  // exact race the write path's own lock exists to prevent, and the contract
+  // anticipates it reaching disk anyway -- making the whole session
+  // permanently unreadable over an authorization that can no longer
+  // authorize anything would be a strictly worse failure mode than
+  // neutralizing it, and the safety property ("it can never authorize a
+  // dispatch") holds identically either way.
+  const authorizations = [];
+  const ignoredAuthorizations = [];
+  const authorizationIds = new Set();
+  let terminalSeen = false;
+
   for (const event of events) {
     validateEventPayload(event.type, event.payload);
+
+    if (TERMINAL_EVENT_TYPES.has(event.type)) {
+      terminalSeen = true;
+    } else if (event.type === 'operation-authorized') {
+      const { authorizationId } = event.payload;
+      if (authorizationIds.has(authorizationId)) {
+        throw new CoordinationError(
+          'duplicate-ref',
+          `session "${coordinationId}": duplicate "operation-authorized" event for authorization "${authorizationId}"`,
+        );
+      }
+      authorizationIds.add(authorizationId);
+      const record = {
+        authorizationId,
+        operationId: event.payload.operationId,
+        nodeId: event.payload.nodeId,
+        targetActorId: event.payload.targetActorId,
+        invocationKey: event.payload.invocationKey,
+        authorizedBy: event.payload.authorizedBy,
+        grantedContextRefs: Object.freeze([...event.payload.grantedContextRefs]),
+        ...(event.payload.targetArtifactRef !== undefined ? { targetArtifactRef: event.payload.targetArtifactRef } : {}),
+        consumedByAssignmentId: null,
+      };
+      (terminalSeen ? ignoredAuthorizations : authorizations).push(record);
+    }
 
     if (event.type === 'assignment-created') {
       const id = event.payload.assignmentId;
@@ -113,6 +162,34 @@ export function replaySession(coordinationId, opts = {}) {
       // duplicate at write time; replay has no additional cross-event rule
       // to enforce here.
     }
+  }
+
+  // An authorization is CONSUMED by the one `assignment-created` event that
+  // carries its `authorizationId` (store.mjs enforces at most one, lock-held,
+  // at write time; this is the read-time reconstruction of that fact). An
+  // `assignment-created` naming an authorization the log never declared is a
+  // fabricated provenance claim -- fail closed, the same posture every other
+  // cross-event reference check in this function takes. Checked here, before
+  // the assignmentRefs cross-checks below, so the reported reason names the
+  // authorization rather than a downstream symptom.
+  const authorizationById = new Map(authorizations.map((record) => [record.authorizationId, record]));
+  for (const [id, event] of createdIds) {
+    const authorizationId = event.payload.authorizationId;
+    if (authorizationId === undefined) continue;
+    const record = authorizationById.get(authorizationId);
+    if (!record) {
+      throw new CoordinationError(
+        'dangling-ref',
+        `session "${coordinationId}": "assignment-created" event for "${id}" claims authorization "${authorizationId}", which no valid "operation-authorized" event in this session ever declared`,
+      );
+    }
+    if (record.consumedByAssignmentId !== null) {
+      throw new CoordinationError(
+        'duplicate-ref',
+        `session "${coordinationId}": authorization "${authorizationId}" is claimed by more than one "assignment-created" event ("${record.consumedByAssignmentId}" and "${id}") -- one authorization materializes at most one Assignment`,
+      );
+    }
+    record.consumedByAssignmentId = id;
   }
 
   const refsSet = new Set(manifest.assignmentRefs);
@@ -163,6 +240,8 @@ export function replaySession(coordinationId, opts = {}) {
     manifest: Object.freeze(manifest),
     assignmentRefs: Object.freeze([...manifest.assignmentRefs]),
     events: Object.freeze(events),
+    authorizations: Object.freeze(authorizations.map((record) => Object.freeze(record))),
+    ignoredAuthorizations: Object.freeze(ignoredAuthorizations.map((record) => Object.freeze(record))),
     sessionDir,
   });
 }

@@ -14,6 +14,7 @@ import {
   readSessionEvents,
   hashTaskKey,
   appendEvent,
+  authorizeOperation,
 } from '../../src/runner/coordination/store.mjs';
 import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
@@ -758,6 +759,212 @@ test('crash INSIDE the self-heal step itself (assignment-created event already a
     1,
     'the retry must not append a second assignment-created event for the same id (would trip replay.mjs\'s duplicate-ref check)',
   );
+});
+
+// ─── Driver-authorization provenance is verified on EVERY writing path,
+// including the self-heal branch ───────────────────────────────────────────
+//
+// These need no concurrency: the crash state the real race produces (claim
+// record + assignment.json written, no assignment-created event, no ref) is
+// constructed directly, exactly as the crash-point tests above do, and the
+// competing consumption is then performed sequentially.
+
+function authorizedProvenance(authorizationId) {
+  return {
+    operationId: 'reviewer-recheck',
+    nodeId: 'phase-recheck',
+    authorizationId,
+    invocationKey: `recheck:${authorizationId}`,
+    contextGrant: { refs: [] },
+  };
+}
+
+function issueAuthorization(coordinationId, authorizationId, tempDir) {
+  authorizeOperation(
+    coordinationId,
+    {
+      authorizationId,
+      operationId: 'reviewer-recheck',
+      nodeId: 'phase-recheck',
+      targetActorId: 'reviewer',
+      invocationKey: `recheck:${authorizationId}`,
+      authorizedBy: { type: 'driver', id: 'driver-1' },
+      reason: 'Recheck the revised candidate.',
+      grantedContextRefs: [],
+    },
+    { cwd: tempDir },
+  );
+}
+
+// Writes the "crashed between assignment.json and the event/ref append"
+// state for `taskKey` by hand, and returns the orphaned assignmentId.
+function writeUnregisteredClaim(tempDir, coordinationId, taskKey, orphanId) {
+  const sessionDir = path.join(tempDir, '.fgos', 'coordination', 'sessions', coordinationId);
+  const tasksDir = path.join(sessionDir, 'tasks');
+  fs.mkdirSync(tasksDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(tasksDir, `${hashTaskKey(taskKey)}.json`),
+    `${JSON.stringify({ taskKey, assignmentId: orphanId, claimedAt: new Date().toISOString() }, null, 2)}\n`,
+  );
+  const orphanDir = path.join(tempDir, '.fgos', 'assignments', orphanId);
+  fs.mkdirSync(orphanDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(orphanDir, 'assignment.json'),
+    `${JSON.stringify({ assignmentId: orphanId, workId: null, role: 'reviewer', mutation: 'read-only' }, null, 2)}\n`,
+  );
+  return orphanId;
+}
+
+test('the self-heal path refuses an authorization a DIFFERENT taskKey already consumed -- one authorization still materializes at most one Assignment', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_heal_double_spend', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+  issueAuthorization('coord_heal_double_spend', 'auth_recheck_1', tempDir);
+
+  // A genuinely new taskKey spends the authorization first.
+  const winner = createSessionAssignment(
+    {
+      coordinationId: 'coord_heal_double_spend',
+      taskKey: 'recheck-new',
+      actorId: 'reviewer',
+      contract: inlineContract(),
+      caller: { writerId: 'writer-1' },
+      authorizationProvenance: authorizedProvenance('auth_recheck_1'),
+    },
+    { cwd: tempDir },
+  );
+
+  // A SECOND taskKey crashed earlier, mid-registration, holding its own
+  // claimed-but-unregistered Assignment. Resuming it must not spend the
+  // authorization the winner above already spent.
+  const orphanId = writeUnregisteredClaim(tempDir, 'coord_heal_double_spend', 'recheck-crashed', 'asgn_writer_1_op_900');
+
+  assert.throws(
+    () =>
+      createSessionAssignment(
+        {
+          coordinationId: 'coord_heal_double_spend',
+          taskKey: 'recheck-crashed',
+          actorId: 'reviewer',
+          contract: inlineContract(),
+          caller: { writerId: 'writer-1' },
+          authorizationProvenance: authorizedProvenance('auth_recheck_1'),
+        },
+        { cwd: tempDir },
+      ),
+    (err) =>
+      err instanceof CoordinationError &&
+      err.category === 'validation' &&
+      /already consumed by Assignment "asgn_writer_1_op_001"/.test(err.message),
+  );
+
+  // Exactly ONE consumer reached the log, and the refused resume registered
+  // nothing -- so the session stays replayable rather than being bricked by
+  // a duplicate consumption.
+  const events = readSessionEvents('coord_heal_double_spend', { cwd: tempDir });
+  const consumers = events.filter((e) => e.type === 'assignment-created' && e.payload.authorizationId === 'auth_recheck_1');
+  assert.equal(consumers.length, 1, 'exactly one assignment-created may consume one authorizationId');
+  assert.equal(consumers[0].payload.assignmentId, winner.assignmentId);
+
+  const manifest = readManifest('coord_heal_double_spend', { cwd: tempDir });
+  assert.deepEqual(manifest.assignmentRefs, [winner.assignmentId]);
+  assert.ok(!manifest.assignmentRefs.includes(orphanId), 'the refused resume must not register its orphaned Assignment');
+  assert.doesNotThrow(() => replaySession('coord_heal_double_spend', { cwd: tempDir }));
+});
+
+test('the self-heal path still completes a genuine resume of its OWN authorization, whether or not the consuming event already landed', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_heal_own_auth', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+  issueAuthorization('coord_heal_own_auth', 'auth_a', tempDir);
+  issueAuthorization('coord_heal_own_auth', 'auth_b', tempDir);
+
+  // (a) Crash BEFORE the consuming event: the authorization is unconsumed,
+  // so the resume spends it and completes the registration.
+  const orphanA = writeUnregisteredClaim(tempDir, 'coord_heal_own_auth', 'recheck-a', 'asgn_writer_1_op_800');
+  const healedA = createSessionAssignment(
+    {
+      coordinationId: 'coord_heal_own_auth',
+      taskKey: 'recheck-a',
+      actorId: 'reviewer',
+      contract: inlineContract(),
+      caller: { writerId: 'writer-1' },
+      authorizationProvenance: authorizedProvenance('auth_a'),
+    },
+    { cwd: tempDir },
+  );
+  assert.equal(healedA.assignmentId, orphanA);
+  assert.ok(readManifest('coord_heal_own_auth', { cwd: tempDir }).assignmentRefs.includes(orphanA));
+
+  // (b) Crash INSIDE the self-heal, AFTER its own consuming event landed:
+  // the sole consumer is this very claim's Assignment, so the resume is
+  // exempt and only the still-missing assignmentRefs write is completed.
+  const orphanB = writeUnregisteredClaim(tempDir, 'coord_heal_own_auth', 'recheck-b', 'asgn_writer_1_op_801');
+  const sessionDir = path.join(tempDir, '.fgos', 'coordination', 'sessions', 'coord_heal_own_auth');
+  appendEvent(
+    path.join(sessionDir, 'events.jsonl'),
+    { type: 'assignment-created', payload: { assignmentId: orphanB, actorId: 'reviewer', ...authorizedProvenance('auth_b') } },
+    sessionDir,
+  );
+
+  const healedB = createSessionAssignment(
+    {
+      coordinationId: 'coord_heal_own_auth',
+      taskKey: 'recheck-b',
+      actorId: 'reviewer',
+      contract: inlineContract(),
+      caller: { writerId: 'writer-1' },
+      authorizationProvenance: authorizedProvenance('auth_b'),
+    },
+    { cwd: tempDir },
+  );
+  assert.equal(healedB.assignmentId, orphanB);
+  assert.ok(readManifest('coord_heal_own_auth', { cwd: tempDir }).assignmentRefs.includes(orphanB));
+  const events = readSessionEvents('coord_heal_own_auth', { cwd: tempDir });
+  assert.equal(
+    events.filter((e) => e.type === 'assignment-created' && e.payload.assignmentId === orphanB).length,
+    1,
+    'the exempt resume must not append a second consuming event',
+  );
+  assert.doesNotThrow(() => replaySession('coord_heal_own_auth', { cwd: tempDir }));
+});
+
+test('createSessionAssignment refuses provenance naming an authorizationId no operation-authorized event ever issued, at WRITE time', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_fabricated_auth', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+  issueAuthorization('coord_fabricated_auth', 'auth_real', tempDir);
+
+  for (const [taskKey, params] of [
+    ['recheck-fabricated', { coordinationId: 'coord_fabricated_auth', taskKey: 'recheck-fabricated' }],
+    ['recheck-crashed', { coordinationId: 'coord_fabricated_auth', taskKey: 'recheck-crashed' }],
+  ]) {
+    // The second iteration drives the SELF-HEAL branch, so the existence
+    // check is proven on both writing paths, not just the new-taskKey one.
+    if (taskKey === 'recheck-crashed') writeUnregisteredClaim(tempDir, 'coord_fabricated_auth', taskKey, 'asgn_writer_1_op_700');
+
+    assert.throws(
+      () =>
+        createSessionAssignment(
+          {
+            ...params,
+            actorId: 'reviewer',
+            contract: inlineContract(),
+            caller: { writerId: 'writer-1' },
+            authorizationProvenance: authorizedProvenance('auth_never_issued'),
+          },
+          { cwd: tempDir },
+        ),
+      (err) =>
+        err instanceof CoordinationError &&
+        err.category === 'validation' &&
+        /names no "operation-authorized" event/.test(err.message),
+      `expected the fabricated authorizationId to be refused on the "${taskKey}" path`,
+    );
+  }
+
+  // Nothing was written, so the session is still readable -- the whole point
+  // of refusing at write time instead of leaving replay to throw dangling-ref.
+  const events = readSessionEvents('coord_fabricated_auth', { cwd: tempDir });
+  assert.equal(events.filter((e) => e.type === 'assignment-created').length, 0);
+  assert.doesNotThrow(() => replaySession('coord_fabricated_auth', { cwd: tempDir }));
 });
 
 // ─── MEDIUM fix regression: claim-file naming is collision-resistant
