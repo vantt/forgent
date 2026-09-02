@@ -58,19 +58,16 @@ of a blanket "unrelated" pass.
 | 04 | R1-R9 | done |
 | 05 | R1-R8 | done |
 | 06 | R1-R8 | done |
-| 07 | R1-R8 | R1-R4 done (P07.1); R5-R8 pending (P07.2, closes the plan) |
+| 07 | R1-R8 | done — PLAN CLOSED |
 
 ## Active Cell
 
-None (P07.1 closed; P07.2 not yet scoped — closes Phase 07 AND the
-entire plan)
+None — **PLAN CLOSED**. All 8 phases done.
 
 ## Next Action
 
-coordinator — scope Phase 07 R5-R8 (capability parity live proof,
-external adoption live proof, canonical closure, the plan's own FINAL
-Deferral Audit AC-I001-I009) into a P07.2 brief before dispatching a
-Doer
+None (implementation/review complete). Remaining administrative-only
+step: set `plan.md`'s Status to `done` and make the closing commit.
 
 ## Cell Log
 
@@ -93,7 +90,8 @@ Doer
 | P05.2 | Phase 05 R5, R6, R7, R8 (closes Phase 05) — honest null result | done | `7910fc22` (R5), `c852814d` (config), `bd785402` (R6-R8+trace) |
 | P06.1 | Phase 06 R1, R2, R3, R4 — 2 real HIGH bugs found+fixed (2 rounds) | done | `a9613222` |
 | P06.2 | Phase 06 R5, R6, R7, R8 (closes Phase 06) — 5 real bugs found+fixed (2 rounds) | done | `93108c14` |
-| P07.1 | Phase 07 R1, R2, R3, R4 — R2 boundary held clean; 1 content defect fixed | done | pending |
+| P07.1 | Phase 07 R1, R2, R3, R4 — R2 boundary held clean; 1 content defect fixed | done | `4a4d3d67` |
+| P07.2 | Phase 07 R5, R6, R7, R8 (closes Phase 07 + entire plan) — 2 proof-rigor gaps fixed | done | pending |
 
 ## Phase 00 Status
 

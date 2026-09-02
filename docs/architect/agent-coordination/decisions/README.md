@@ -27,10 +27,16 @@ the remaining Step 07 questions (task graph, mutation and isolation, planning
 materialization, nested Work topology) stay in the proposal's discussion
 checkpoints. ADR-008, ADR-009, and ADR-010 extract the Step 08 Phase 00
 checkpoint decisions accepted on 2026-09-01
-(see [Intent Preservation Ledger](../intent-preservation-ledger.md)); the
-remaining Step 08 runtime (consult/research/Group Cognition implementation,
-Cohort Planner, communication topology enforcement) stays in the proposal's
-discussion checkpoints and roadmap.
+(see [Intent Preservation Ledger](../intent-preservation-ledger.md)). As of
+Step 08's close (Phase 07, P07.2), the runtime these three ADRs name --
+CoordinationSession, the shared FlowDefinition kernel, consult/research/Group
+Cognition, Cohort Planner, and interactive/headless capability parity -- is
+implemented and live-proved; see each ADR's own `Implementation` line and the
+plan's own final Deferral Audit
+(`docs/architect/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md`)
+for what remains `deferred-preserved` (Mission, additional frameworks,
+organization overlays, AgentMessage, AdhocTask, provider scoring/router,
+telemetry, herdr, and Work-attached mutation).
 
 Other discussion-stage schema and implementation choices from Step 07 and
 Step 08 must not be added here until explicitly accepted. They also must not reopen or

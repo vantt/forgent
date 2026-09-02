@@ -2,8 +2,10 @@
 
 Document type: ADR
 Design status: Accepted
-Implementation: Not started
-Last reviewed: 2026-09-01
+Implementation: Implemented (`src/runner/definitions/{schema,workflow-adapter,protocol-loader}.mjs`,
+Step 08 Phase 02; see `docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`
+for the per-phase trace and `deferral-audit.md` for the closing AC-I003/AC-I005 audit)
+Last reviewed: 2026-09-02
 Canonical for: the FlowDefinition intermediate representation, the Workflow/CoordinationProtocol profile split, and the V1 operation-primitive field set
 Related: [Vision V-006/V-008/V-012](../vision.md), [Protocol Model](../architecture/protocol-model.md), [Workflow Stage Operation Contract](../contracts/workflow-stage-operation.md), [FlowDefinition Contract](../contracts/flow-definition.md), [ADR-008](ADR-008-coordination-session-and-mission-deferral.md), [Intent Preservation Ledger AC-I003/AC-I005/AC-I006](../intent-preservation-ledger.md)
 

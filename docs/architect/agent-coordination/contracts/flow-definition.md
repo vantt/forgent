@@ -2,8 +2,13 @@
 
 Document type: Contract
 Design status: Accepted
-Implementation: Not started
-Last reviewed: 2026-09-01
+Implementation: Implemented (`src/runner/definitions/{schema,workflow-adapter,protocol-loader}.mjs`,
+Step 08 Phase 02; Workflow-profile projection additive at zero diff to
+`src/state/workflow-stage-graphs.mjs`; CoordinationProtocol-profile fixtures
+ship in `core/coordination-protocols/` and are discoverable from a real
+external consuming project, proven live at P07.2 R6. Full per-phase trace:
+`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`)
+Last reviewed: 2026-09-02
 Canonical for: the FlowDefinition IR schema, the Workflow/CoordinationProtocol profile discriminator, the operation primitive, and PolicyPatch provenance
 Related: [ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md), [Protocol Model](../architecture/protocol-model.md), [Workflow Stage Operation Contract](workflow-stage-operation.md), [CoordinationSession Contract](coordination-session.md)
 

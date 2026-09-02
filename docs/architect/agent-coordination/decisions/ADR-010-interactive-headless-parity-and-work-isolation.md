@@ -2,8 +2,14 @@
 
 Document type: ADR
 Design status: Accepted
-Implementation: Not started
-Last reviewed: 2026-09-01
+Implementation: Implemented (`src/verbs/coordination/{schema,run,show}.mjs`,
+`src/runner/coordination/headless-adapter.mjs`, Step 08 Phase 07; capability
+parity proven live at P07.2 R5, `docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/`;
+Work-isolation boundary proven at P06.2's static export-surface check and
+P07.1's R2 request/schema trust boundary. See
+`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`
+for the per-phase trace and `deferral-audit.md` for the closing AC-I008/AC-I009 audit)
+Last reviewed: 2026-09-02
 Canonical for: the interactive-first rollout sequencing intention and the boundary keeping merge/Work-transition authority out of `src/runner/coordination/**`
 Related: [Vision V-008/V-012](../vision.md), [Work Integration](../architecture/work-integration.md), [ADR-001](ADR-001-work-lifecycle-authority.md), [ADR-008](ADR-008-coordination-session-and-mission-deferral.md), [Intent Preservation Ledger AC-I008/AC-I009](../intent-preservation-ledger.md)
 

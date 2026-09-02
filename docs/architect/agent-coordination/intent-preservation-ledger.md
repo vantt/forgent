@@ -51,12 +51,20 @@ unbounded wish list.
 - **Original intent:** coordinate governed agent activity with or without Work.
 - **Source:** [Vision](vision.md#vision) and
   [V-001](vision.md#v-001-agent-coordination-is-a-foundation-layer).
-- **Status:** `deferred-preserved` beyond the implemented inline-Assignment
-  slice.
-- **Current slice:** Step 07 proves a non-driving inline Assignment; Step 08
-  plans a persistent standalone CoordinationSession.
-- **Deferred:** full standalone recovery, declared protocols, and broader
-  coordination families.
+- **Status:** `implemented` -- Step 08 P01.1/P01.2 built and live-proved a
+  persistent standalone CoordinationSession with `workId: null`, no
+  Workflow, no Stage, no TaskSpec, and no protocol id (plan.md's own
+  Plan-Level Acceptance criterion); reconfirmed live in P07.2's own R5/R6
+  proofs (`docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/`).
+- **Current slice:** persistent standalone CoordinationSession
+  (`src/runner/coordination/{schema,store,replay,session-engine}.mjs`),
+  crash-safe idempotent resume (P01.2), agent-led/declared/research/Group
+  Cognition families all running on the same session ledger (P01-P06),
+  exposed through the public CLI and headless adapter (P07).
+- **Deferred:** nothing residual specific to AC-I001 itself; the
+  "declared protocols" and "broader coordination families" this entry
+  originally deferred are now their own fully-tracked entries
+  (AC-I003/AC-I004 below).
 - **Must not preclude:** no universal Work, Stage, Workflow, or TaskSpec
   requirement may enter the execution core.
 - **Revisit when:** each Step 08 phase closes.
@@ -68,10 +76,18 @@ unbounded wish list.
   without selecting a Workflow or Coordination Protocol first.
 - **Source:** [V-005](vision.md#v-005-agents-own-adaptive-reasoning-the-foundation-owns-authority)
   and [V-009](vision.md#v-009-runtime-graphs-may-be-trivial-dynamic-or-declared).
-- **Status:** `deferred-preserved`.
-- **Current slice:** Step 8.1 plans one primary-investigator plus dynamic consult
-  proof using inline Assignments.
-- **Deferred:** richer dynamic task graphs and bounded adaptation.
+- **Status:** `implemented` for the accepted V1 shape (one primary actor plus
+  dynamic consult, no predeclared protocol required) -- P01.2 built
+  `openStandaloneSession`/`dispatchPrimaryTask`/`proposeConsult` and proved it
+  live; reconfirmed live in P07.2's own R5/R6 proofs. `deferred-preserved`
+  for anything beyond that fixed V1 shape (see Deferred).
+- **Current slice:** one primary actor may dynamically consult one specialist
+  actor mid-session, with no protocol id, Work, Stage, or TaskSpec required
+  (`kind: "agent-led"` in the public request schema, `src/verbs/coordination/schema.mjs`).
+- **Deferred:** richer dynamic task graphs (an agent freely authoring its own
+  multi-step branching plan at runtime, beyond one primary plus one consult)
+  and bounded adaptation -- never attempted in Step 08, no revisit trigger
+  hit yet.
 - **Must not preclude:** declared protocol config must remain optional.
 - **Revisit when:** Step 8.1 evidence is reviewed and whenever protocol loading
   becomes a runtime prerequisite.
@@ -83,11 +99,23 @@ unbounded wish list.
   coordination structures may constrain and accelerate repeated activity.
 - **Source:** [Vision](vision.md#vision) and the human-approved direction recorded
   in the [Step 08 checkpoint](proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01).
-- **Status:** `deferred-preserved`.
-- **Current slice:** shared `FlowDefinition` kernel with typed
-  `CoordinationProtocol`, consult, research fan-out/fan-in, then one Group
-  Cognition framework.
-- **Deferred:** broad protocol catalog, marketplace, and unrestricted peer chat.
+- **Status:** `implemented` -- P02.1/P02.2 built the shared `FlowDefinition`
+  kernel and typed `CoordinationProtocol` profile; P03 declared consult,
+  P04 research fan-out/fan-in, P05 one Group Cognition framework, all
+  statically AND runtime-proven to reach `executeAssignment` with no direct
+  spawn (this track's own recurring "one execution core" static-import
+  test, e.g. `test/runner/coordination-static.test.mjs`). Reconfirmed live
+  in P07.2's own R5/R6 proofs using the published `declared-consult`
+  protocol.
+- **Current slice:** three real `CoordinationProtocol` definitions ship in
+  `core/coordination-protocols/` (declared-consult, independent research
+  fan-out/fan-in, group-cognition-framework), discovered through a
+  project/domain/core loader (`src/runner/definitions/protocol-loader.mjs`)
+  reachable from a real external consuming project (P07.2 R6, confirmed via
+  `fgos doctor`'s `coordination-protocol-fixtures-valid` check from
+  `/home/vantt/projects/mdview`'s own cwd against the installed package).
+- **Deferred:** broad protocol catalog, marketplace, and unrestricted peer
+  chat.
 - **Must not preclude:** protocols remain optional and cannot create a second
   execution core.
 - **Revisit when:** Steps 8.3 through 8.5 close.
@@ -101,11 +129,30 @@ unbounded wish list.
   SessionActors may need different provider/model/tier characteristics.
 - **Source:** human-approved Step 08 discussion recorded on 2026-09-01 in the
   [Step 08 checkpoints](proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01).
-- **Status:** `deferred-preserved`.
-- **Current slice:** one heterogeneous diverge/challenge/evidence/converge proof
-  after deterministic Cohort Planner V1.
-- **Deferred:** complete framework library, fitness scoring, learning allocation,
-  and autonomous optimization.
+- **Status:** `implemented` at the MECHANISM level -- P04.1 built a
+  deterministic, zero-scoring/zero-ranking Cohort Planner
+  (`src/runner/coordination/cohort-planner.mjs`), P04.2 proved isolated
+  concurrent fan-out and fan-in synthesis that never upgrades `reported`,
+  failed, stale, or foreign evidence, P05.1 declared the first Group
+  Cognition framework, and P05.2 live-ran it against a real external
+  question with dissent-preservation behaving honestly. Whether the
+  framework delivers a real QUALITY GAIN over a single agent remains an
+  open empirical question -- P05.2's own live run returned an honest null
+  result (8 of 9 real dispatches failed for infrastructure/dispatch-layer
+  reasons, not for reasons traceable to the framework's cognitive design;
+  see `P05.2.md`), which Phase 05's own accepted exit criterion explicitly
+  treats as a valid, non-blocking close ("records quality gain or honest
+  null result with dissent preserved").
+- **Current slice:** deterministic heterogeneous cohort allocation plus one
+  real 6-phase Group Cognition framework (`core/coordination-protocols/group-cognition-framework.yaml`),
+  mechanism-proven; real-world quality gain unproven (honest null result,
+  not a negative result -- the pipeline mostly didn't finish executing).
+- **Deferred:** complete framework library, fitness scoring, learning
+  allocation, and autonomous optimization; a repeat live quality proof
+  outside the infrastructure friction observed in P05.2 (per-cwd dispatch
+  concurrency lock, provider-quota headroom, cross-provider
+  `agent-result.json` schema-validation mismatch -- all named as a
+  recommended product reassessment in P05.2's Gaps).
 - **Must not preclude:** per-role/actor/activity requirements, provider/model-family
   diversity constraints, dissent preservation, and evidence-aware synthesis.
 - **Revisit when:** Steps 8.4 and 8.5 close or a second framework needs a missing
@@ -119,11 +166,21 @@ unbounded wish list.
   protocols, roles, policy, validation, evidence posture, and lifecycle
   integration without forking foundation execution.
 - **Source:** [V-008](vision.md#v-008-domain-and-organization-augmentation-creates-differentiation).
-- **Status:** `deferred-preserved`.
-- **Current slice:** foundation and domain definitions share the versioned
-  definition loader and typed profile validators.
-- **Deferred:** organization overlay syntax and general extension SDK until two
-  real consumers prove a common seam.
+- **Status:** `implemented` for the project/domain/core discovery seam --
+  P02.2 built `discoverCoordinationProtocols`/`loadCoordinationProtocol`
+  (`src/runner/definitions/protocol-loader.mjs`), zero foundation fork
+  (`src/runner/dispatch/**` and `src/runner/coordination/**` stayed at zero
+  diff for the whole of Phase 02). Reconfirmed working from a REAL external
+  consuming project's own cwd in P07.2's own R6 proof (installed package,
+  not source checkout).
+- **Current slice:** foundation and domain definitions share one versioned
+  definition loader and typed profile validators; a project outside this
+  repo can add its own `.fgos/coordination-protocols/` (project tier) or
+  rely on the packaged core tier with no fork.
+- **Deferred:** organization overlay syntax and general extension SDK until
+  two real consumers prove a common seam -- mdview (P07.2 R6) is the first
+  real external consumer of the DISCOVERY seam, not yet of an organization
+  OVERLAY, so this trigger is not yet met.
 - **Must not preclude:** project/domain-owned definitions and policy enrichment
   through the same validated kernel.
 - **Revisit when:** a second organization consumer appears or a domain cannot
@@ -137,17 +194,21 @@ unbounded wish list.
   RunResult, and evidence through one core.
 - **Source:** [V-006](vision.md#v-006-planning-is-pluggable-and-composable) and
   [V-007](vision.md#v-007-dispatch-is-a-primary-foundation-capability).
-- **Status:** `implemented` for individual Assignment execution with a known
-  provenance defect (finding H2): `providerModel` is derived from the
-  executor **id** rather than the configured executor entry, so non-claude
-  provider/model provenance and governance's `disallowedProviders` key can be
-  wrong today. This defect is scheduled to be fixed in Phase 00's dispatch
-  cell (P00.2), not in this documentation cell (P00.1); `deferred-preserved`
-  for corrected provenance, cohort allocation, and session-wide policy
-  provenance until P00.2 lands and Steps 8.4/8.Final extend it.
-- **Current slice:** wire human executor/model/tier overrides, correct provider
-  provenance, and make Cohort Planner emit inputs to the existing Assignment
-  resolver rather than spawning directly.
+- **Status:** `implemented` -- the finding H2 provenance defect was fixed at
+  P00.2/P00.4 (`deriveProviderFamily` call-site disagreement, confirmed
+  affecting 3 of 12 registered executors, fixed and re-verified). Cohort
+  Planner (P04.1) emits inputs to the existing Assignment resolver, never
+  spawns directly (statically confirmed, zero scoring/ranking logic).
+  Session-wide policy provenance (the 7-scope PolicyPatch precedence chain
+  `runner < definition < operation < role < actor < assignment < cli`) landed
+  at P03.1. All three revisit triggers named below (Steps 8.0, 8.4, 8.Final)
+  have now closed.
+- **Current slice:** every live Assignment dispatch across every coordination
+  kind (agent-led, declared-protocol, research fan-out) resolves executor/
+  provider/tier/model through the one hardened resolver
+  (`resolveAssignmentDispatchPolicy`) and persists full provenance; unknown
+  executor/provider/tier fails closed (adversarially tested clean at P06.2
+  and again at P07.1's R2 trust-boundary review).
 - **Deferred:** generalized task-category scoring, cross-definition `purpose`
   routing, or autonomous provider router. Per finding M8, `purpose` is
   dropped from `FlowDefinition` V1 entirely
@@ -168,7 +229,15 @@ unbounded wish list.
   lifecycle or direct execution envelope.
 - **Source:** [Step 08, Mission Versus CoordinationSession](proposals/step-08-standalone-coordination-protocols.md#6-mission-versus-coordinationsession)
   and the human decision recorded on 2026-09-01.
-- **Status:** `deferred-preserved`, not replaced or rejected.
+- **Status:** `deferred-preserved`, not replaced or rejected -- by design,
+  for the whole of Step 08 (plan.md's own Out Of Scope list: "Mission
+  identity, persistence, aggregation, or migration compatibility"). The
+  must-not-preclude check is proven: `missionId` is structurally rejected
+  everywhere a coordination request or Assignment could carry it (P01.1's
+  direct mission-lite cutover dropped the field from Assignment
+  construction entirely; P07.1's request schema recursively rejects
+  `missionId` at any nesting depth, `src/verbs/coordination/schema.mjs`'s
+  `WORK_LIFECYCLE_KEYS`, adversarially tested clean).
 - **Current slice:** CoordinationSession is the V1 executable and recovery root.
 - **Deferred:** Mission identity, persistence, aggregation, and multi-session
   outcome policy.
@@ -188,11 +257,25 @@ unbounded wish list.
   the same capability quietly once that behavior is trusted.
 - **Source:** explicit human clarification recorded on 2026-09-01 in the
   [Step 08 checkpoint](proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01).
-- **Status:** `deferred-preserved`.
-- **Current slice:** implement and prove interactive operation first on the
-  shared CoordinationSession/dispatch/evidence core.
-- **Deferred:** unattended headless operation and telemetry for observing and
-  improving headless runs.
+- **Status:** `implemented` -- P07.1 built `runCoordinationHeadless`
+  (`src/runner/coordination/headless-adapter.mjs`), proven by reference
+  identity to call the exact same `runCoordinationUseCase` the interactive
+  CLI calls (no fork). P07.2's own R5 proof executed the same deterministic
+  `declared-consult` fixture through both doors and diffed the full
+  persisted output (manifest, Assignments, policy provenance, Runs/
+  RunResults, evidence, quorum, budgets, final status): zero unexplained
+  differences after normalizing only named, justified volatile fields
+  (timestamps, wall-clock durations, pid, the two doors' deliberately
+  distinct coordinationId, and live-LLM-generated content hashes); matching
+  negative-case parity confirmed too (`docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/`).
+- **Current slice:** interactive CLI (`fgos coordination run`/`show`) and
+  headless adapter both invoke one shared engine with proven equivalent
+  persisted output; visibility/operator-presence is the only intended
+  difference.
+- **Deferred:** telemetry for observing and improving headless runs --
+  explicitly out of V1 scope per plan.md's Locked Product Decisions
+  ("Interactive ships first for explicit observation... telemetry is
+  deferred"), never built.
 - **Must not preclude:** no interactive-only or headless-only coordination
   engine, contract, protocol semantics, recovery model, or evidence model.
   Temporary rollout gaps must be named and closed; visibility/operator presence
@@ -210,12 +293,23 @@ unbounded wish list.
 - **Source:** explicit human clarification recorded on 2026-09-01, consistent
   with [Vision, V-012](vision.md#v-012-generalization-requires-two-unlike-consumers)
   and [V-008](vision.md#v-008-domain-and-organization-augmentation-creates-differentiation).
-- **Status:** `deferred-preserved`.
+- **Status:** `deferred-preserved` -- by design, for the whole of Step 08
+  (plan.md's own Locked Product Decisions: "Standalone proofs are read-only.
+  Work-attached mutation is a stop gate..."). The must-not-preclude checks
+  are proven, currently vacuously for the concurrency-refusal half (V1 has
+  no mutating-actor capability at all yet) and structurally for the
+  no-private-authority half: P06.2 added a static export-surface check
+  confirming zero merge/Work-transition capability anywhere under
+  `src/runner/coordination/**`, adversarially tested; the request/schema
+  trust boundary (P07.1 R2) additionally rejects `mutation` unless it is
+  the literal string `"read-only"`, at every step/branch/task nesting
+  level, adversarially tested clean.
 - **Current slice:** standalone read-only coordination plus ledger fields that
   can reference domain-provisioned workspace/isolation context.
 - **Deferred:** Work-attached mutating coordination until a coding-domain live
   proof covers resource conflict, worktree allocation, serialization, merge
-  ownership, recovery, and Work transition authority.
+  ownership, recovery, and Work transition authority -- never attempted in
+  Step 08, no revisit trigger hit.
 - **Must not preclude:** two mutating actors never run concurrently in one
   worktree; coordination never creates private merge/lifecycle authority;
   domain-provisioned isolation and resource claims remain attachable and
@@ -236,6 +330,16 @@ unbounded wish list.
 | Interactive before headless, with target capability parity | Advances AC-I008; visibility and operator presence are the intended difference. | Accepted: [ADR-010](decisions/ADR-010-interactive-headless-parity-and-work-isolation.md) (P00.1); telemetry deferred. |
 | Gitignored coordination state plus domain-owned Work isolation | Advances AC-I009 without confusing local runtime state with Git/worktree isolation. | Accepted: [ADR-010](decisions/ADR-010-interactive-headless-parity-and-work-isolation.md), [CoordinationSession Contract](contracts/coordination-session.md) storage layout (P00.1). |
 | Mission-lite direct cutover | Removes prototype code/tests directly, with no legacy reader, detector, reporter, or stored-data migration for `.fgos/missions/` data. | Accepted: [ADR-008](decisions/ADR-008-coordination-session-and-mission-deferral.md) (P00.1); fgOS is unreleased with no customer consumer. Cutover implementation lands in P01.1. |
+
+The table above is a historical snapshot as of 2026-09-01 (Phase 00's own
+close) and is left unedited as that record. Every "not yet implemented"
+note in it is now stale: by the close of Phase 07 (P07.2, canonical
+closure), every row's runtime is built, live-proved, and reflected in each
+entry's own **Status** line above -- see those lines, and the plan's own
+Intent Traceability table (`plans/260901-1542-step08-standalone-coordination/plan.md`),
+for the current, accurate state. The plan's own final Deferral Audit
+(`docs/architect/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md`)
+is the authoritative closing record.
 
 ## Step 08 Phase 00 Intent Proof Matrix (Cell P00.1)
 

@@ -2,8 +2,13 @@
 
 Document type: Proposal
 Design status: Discussion
-Implementation: Partial
-Last reviewed: 2026-09-01
+Implementation: Delivered by `plans/260901-1542-step08-standalone-coordination/plan.md`
+(track `step-08-standalone-coordination`, Phases 00-07, closed) -- see that
+plan's own Intent Traceability table and the final Deferral Audit
+(`docs/architect/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md`)
+for what is implemented versus still `deferred-preserved`. This proposal
+itself stays non-normative discussion history, per "Canonical for" below.
+Last reviewed: 2026-09-02
 Canonical for: nothing until explicitly accepted; the extraction pointers below
 mark sections whose content has been promoted into accepted ADRs/contracts —
 those pointers do not make this proposal itself normative
@@ -13,10 +18,19 @@ protocol-led Work-independent research, brainstorm, debate, consult,
 leader-worker, and peer collaboration on top of the proposed Step 07
 CoordinationSession/AdhocTask runtime
 Intent traceability: [Agent Coordination Intent Preservation Ledger](../intent-preservation-ledger.md),
-entries AC-I001 through AC-I007; every implementation phase requires a Deferral Audit
+entries AC-I001 through AC-I009; every implementation phase requires a Deferral Audit
 
-Implementation note: a mission-lite prototype exists, but the generalized
-standalone protocol model remains unimplemented.
+Implementation note: the generalized standalone protocol model this proposal
+discussed is now implemented and live-proved end to end -- persistent
+standalone CoordinationSession, agent-led dynamic consult, declared
+protocols (consult/research fan-out-fan-in/Group Cognition) on a shared
+FlowDefinition kernel, a deterministic Cohort Planner, and interactive plus
+headless doors with proven capability parity. The mission-lite prototype
+this note originally referred to was directly cut over (removed, no
+migration reader) at Phase 01. Mission itself, additional frameworks,
+organization overlays, AgentMessage, AdhocTask, provider scoring/router,
+telemetry, herdr, and Work-attached mutation remain `deferred-preserved` --
+see the final Deferral Audit linked above.
 
 ## 1. How To Read This Draft
 

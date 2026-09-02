@@ -1,0 +1,64 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-02T06:34:41.894Z",
+  "data_hash": "882ce6ec7e0aaabad33cf005b8e5d11d89831761896125d7c3f4d9068c583175",
+  "data": {
+    "coordinationId": "coord_mtjpy4yb_1zfb5k",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.declared-consult",
+      "version": "1.0.0"
+    },
+    "objective": "Get a reviewer's second opinion on a reported package name/version string before trusting it.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"coord_mtjpy4yb_1zfb5k\" is missing required actor(s) [requester-actor, consultant-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "requester-actor",
+        "consultant-actor"
+      ],
+      "completed": [],
+      "failed": [
+        {
+          "actorId": "requester-actor",
+          "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_004",
+          "runId": "run_asgn_p072_r6_external_adoption_mdview_op_004_01"
+        },
+        {
+          "actorId": "consultant-actor",
+          "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_005",
+          "runId": "run_asgn_p072_r6_external_adoption_mdview_op_005_01"
+        }
+      ],
+      "late": [],
+      "missing": [],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "request",
+        "type": "operation",
+        "actorId": null,
+        "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_004",
+        "status": "failed",
+        "confidence": "failed",
+        "executor": "claude",
+        "provider": "claude",
+        "tier": "standard"
+      },
+      {
+        "as": "response",
+        "type": "operation",
+        "actorId": null,
+        "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_005",
+        "status": "failed",
+        "confidence": "failed",
+        "executor": "claude",
+        "provider": "claude",
+        "tier": "standard"
+      }
+    ]
+  }
+}

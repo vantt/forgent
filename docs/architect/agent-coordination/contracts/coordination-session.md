@@ -2,12 +2,20 @@
 
 Document type: Contract
 Design status: Accepted
-Implementation: In progress (Phase 06 R1-R4 landed: quorum/partial policy,
-retry/replacement, crash recovery, cancellation; R5-R7 landed: uniform
-hard-budget enforcement across every dispatch path, `coordinationId`
-path-traversal charset validation, write-time foreign-evidence rejection,
-work-isolation static export-surface check — `src/runner/coordination/
-{schema,store,replay,session-engine}.mjs`)
+Implementation: Implemented (Phase 01 R1-R8: manifest/event store, direct
+mission-lite cutover, shared engine, dynamic consult, crash-safe idempotent
+resume; Phase 03: declared-protocol dispatch on the same engine; Phase 04:
+research fan-out/fan-in on the same session bounds; Phase 06 R1-R4: quorum/
+partial policy, retry/replacement, crash recovery, cancellation; Phase 06
+R5-R8: uniform hard-budget enforcement across every dispatch path,
+`coordinationId` path-traversal charset validation, write-time
+foreign-evidence rejection, work-isolation static export-surface check;
+Phase 07: public CLI (`fgos coordination run/show`) and headless adapter
+both invoking this store through the one shared engine, capability parity
+live-proved — `src/runner/coordination/{schema,store,replay,session-engine}.mjs`,
+`src/verbs/coordination/{schema,run,show}.mjs`,
+`src/runner/coordination/headless-adapter.mjs`. Full per-phase trace:
+`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`)
 Last reviewed: 2026-09-02
 Canonical for: CoordinationSession manifest/event schema, storage layout, session-to-Assignment membership, and recovery rules
 Related: [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md), [Assignment, Run, And RunResult Contract](assignment-run-runresult.md), [Runtime Model](../architecture/runtime-model.md), [Work Integration](../architecture/work-integration.md)

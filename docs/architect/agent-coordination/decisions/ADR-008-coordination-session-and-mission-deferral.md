@@ -2,8 +2,10 @@
 
 Document type: ADR
 Design status: Accepted
-Implementation: Not started
-Last reviewed: 2026-09-01
+Implementation: Implemented (`src/runner/coordination/{schema,store,replay,session-engine}.mjs`,
+Step 08 Phases 01-07; see `docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`
+for the per-phase trace and `deferral-audit.md` for the closing AC-I001/AC-I007 audit)
+Last reviewed: 2026-09-02
 Canonical for: CoordinationSession identity/persistence boundary, session-to-Assignment membership direction, mission-lite cutover posture, and the Role/SessionActor/Persona/Stance actor-instance vocabulary
 Related: [Vision V-001/V-005/V-009](../vision.md), [ADR-006 §6](ADR-006-assignment-provenance-and-contract-snapshot.md), [Intent Preservation Ledger AC-I001/AC-I002/AC-I007](../intent-preservation-ledger.md), [CoordinationSession Contract](../contracts/coordination-session.md), [Step 08 checkpoint](../proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01)
 
