@@ -1,7 +1,7 @@
 # Step 08 - Standalone Coordination And Optional Protocols
 
-Document type: Proposal
-Design status: Discussion
+Document type: Proposal history
+Design status: Promoted history / superseded by accepted architecture and contracts
 Implementation: Delivered by `plans/260901-1542-step08-standalone-coordination/plan.md`
 (track `step-08-standalone-coordination`, Phases 00-07, closed) -- see that
 plan's own Intent Traceability table and the final Deferral Audit
@@ -9,9 +9,7 @@ plan's own Intent Traceability table and the final Deferral Audit
 for what is implemented versus still `deferred-preserved`. This proposal
 itself stays non-normative discussion history, per "Canonical for" below.
 Last reviewed: 2026-09-02
-Canonical for: nothing until explicitly accepted; the extraction pointers below
-mark sections whose content has been promoted into accepted ADRs/contracts —
-those pointers do not make this proposal itself normative
+Canonical for: nothing; accepted parts are promoted into architecture/contracts/ADRs
 Original date: 2026-08-31
 Scope: capture the current discussion about agent-led and optionally
 protocol-led Work-independent research, brainstorm, debate, consult,
@@ -31,6 +29,13 @@ migration reader) at Phase 01. Mission itself, additional frameworks,
 organization overlays, AgentMessage, AdhocTask, provider scoring/router,
 telemetry, herdr, and Work-attached mutation remain `deferred-preserved` --
 see the final Deferral Audit linked above.
+
+Promotion note (2026-09-02): this file remains historical discussion. For the
+accepted Step 00-08 foundation shape, read
+[Coordination Foundation Baseline](../architecture/coordination-foundation-baseline.md),
+[CoordinationSession](../contracts/coordination-session.md), and
+[FlowDefinition](../contracts/flow-definition.md). Deferred preserved topics
+remain non-canonical until separately accepted.
 
 ## 1. How To Read This Draft
 

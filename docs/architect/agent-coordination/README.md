@@ -34,12 +34,13 @@ definitions, statuses, or document placement.
 3. [Documentation Governance](documentation-governance.md)
 4. [Vocabulary](vocabulary/README.md)
 5. [System Context](architecture/system-context.md)
-6. [Protocol Model](architecture/protocol-model.md)
-7. [Runtime Model](architecture/runtime-model.md)
-8. [Work Integration](architecture/work-integration.md)
-9. [Dispatch Control Plane](architecture/dispatch-control-plane.md)
-10. [Evidence And Results](architecture/evidence-and-results.md)
-11. [Visibility And Herdr](architecture/visibility-and-herdr.md)
+6. [Coordination Foundation Baseline](architecture/coordination-foundation-baseline.md)
+7. [Protocol Model](architecture/protocol-model.md)
+8. [Runtime Model](architecture/runtime-model.md)
+9. [Work Integration](architecture/work-integration.md)
+10. [Dispatch Control Plane](architecture/dispatch-control-plane.md)
+11. [Evidence And Results](architecture/evidence-and-results.md)
+12. [Visibility And Herdr](architecture/visibility-and-herdr.md)
 
 ### Implement Or Review Current Contracts
 
@@ -50,10 +51,14 @@ definitions, statuses, or document placement.
 
 ### Continue The Design Discussion
 
-1. [Step 07: CoordinationSession, AdhocTask, And Planning Boundary](proposals/step-07-coordination-session-adhoc-task.md)
-2. [Step 08: Standalone Coordination And Optional Protocols](proposals/step-08-standalone-coordination-protocols.md)
-3. [Team Communication Protocol V1](proposals/team-communication-protocol-v1.md)
-4. [Dispatch Control Plane Redesign](proposals/dispatch-control-plane-redesign.md)
+1. [Step 09: Coding Domain Adoption Of The Coordination Foundation](../proposals/step-09-coding-domain-adoption.md)
+2. [Team Communication Protocol V1](proposals/team-communication-protocol-v1.md)
+3. [Dispatch Control Plane Redesign](proposals/dispatch-control-plane-redesign.md)
+4. [Architecture Intent](../architecture-intent.md)
+   preserves broader architecture intent across deferred capabilities. Its
+   first active thread covers group-thinking/problem-solving capability across
+   Agent Coordination, Work Driver, Dispatch/Run, Run Result Evaluation, and
+   Coding Domain adoption.
 
 ## Documentation Areas
 
@@ -112,30 +117,26 @@ and [ADR-010](decisions/ADR-010-interactive-headless-parity-and-work-isolation.m
 
 ## Active Design Frontier
 
+The accepted Step 00-08 foundation is summarized in
+[Coordination Foundation Baseline](architecture/coordination-foundation-baseline.md).
 The next design frontier remains intentionally non-canonical:
 
 ```txt
-Step 07
-  CoordinationSession
-  AdhocTask graph
-  dynamic and declared planning inputs
-  inline execution-contract boundary
-  planning materialization
-  lifecycle versus isolation
-  Work integration and branch topology
+Step 09
+  coding domain as the second unlike consumer
+  duplicate-mechanism inventory and seams
+  foundation capabilities coding still needs
+  mutating live proof gated on ADR-010 §5
 
-Step 08
-  Work-independent coordination
-  agent-led coordination without a predefined protocol
-  research / consult / brainstorm / debate
-  leader-worker and peer communication
-  protocol graph and synthesis
-  migration of the mission-lite prototype
+Architecture Intent
+  richer group-thinking/problem-solving capability
+  communication-heavy loops without weakening isolation-heavy fixtures
+  eventual shape for coding-domain implementation cells
 ```
 
-Step 07 and Step 08 are discussion drafts. Their proposed entities and schemas
-must not be treated as accepted contracts until promoted according to
-[Documentation Governance](documentation-governance.md).
+Step 09 and architecture-wide group-cognitive expansion are discussion drafts.
+Their proposed entities and schemas must not be treated as accepted contracts
+until promoted according to [Documentation Governance](documentation-governance.md).
 
 They must, however, preserve the accepted direction in the
 [Vision](vision.md); the proposals may choose implementation shape but cannot

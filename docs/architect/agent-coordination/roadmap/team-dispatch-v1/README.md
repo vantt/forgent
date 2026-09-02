@@ -20,6 +20,7 @@ Canonical for: Team Dispatch V1 step history and implementation sequence
 
 The stable outputs of this roadmap are maintained in:
 
+- [Coordination Foundation Baseline](../../architecture/coordination-foundation-baseline.md)
 - [Protocol Model](../../architecture/protocol-model.md)
 - [Runtime Model](../../architecture/runtime-model.md)
 - [Workflow Stage Operation Contract](../../contracts/workflow-stage-operation.md)

@@ -1,10 +1,10 @@
 # Step 07 - CoordinationSession, AdhocTask, And Planning Boundary
 
 Document type: Proposal
-Design status: Discussion
-Implementation: Partial
+Design status: Promoted history / partially superseded
+Implementation: Accepted portions implemented through Step 08; deferred portions remain unaccepted
 Last reviewed: 2026-08-31
-Canonical for: nothing until explicitly accepted
+Canonical for: nothing; accepted parts are promoted into architecture/contracts/ADRs
 Original date: 2026-08-31
 Scope: capture the current discussion about an independent coordination runtime,
 optional session-local task decomposition, agent-led/declared/domain-assisted
@@ -12,6 +12,13 @@ planning, execution contracts, isolation, and the boundary with Work lifecycle
 
 Implementation note: only related primitives/prototypes exist; this proposed
 runtime contract has not been implemented as a whole.
+
+Promotion note (2026-09-02): this file remains proposal history. Accepted
+CoordinationSession, FlowDefinition, runtime, evidence, and Work-boundary
+decisions now live in canonical architecture/contracts/ADRs, summarized by
+[Coordination Foundation Baseline](../architecture/coordination-foundation-baseline.md).
+AdhocTask and the generalized inline execution-contract schema are not
+accepted contracts.
 
 ## 1. How To Read This Draft
 
