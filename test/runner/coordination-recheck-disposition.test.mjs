@@ -494,6 +494,67 @@ test('R3: a disposition is refused once the session has left active', () => {
   assert.equal(readSessionEvents('coord_rd_disposition_terminal', ctx.opts).filter((e) => e.type === 'driver-disposition-recorded').length, 0);
 });
 
+// R8/P00.1 Gap #9: a disposition's targetRef/evidenceRefs must reference this
+// session's own refs, the same "no cross-session leak" rule R1 already
+// enforces for targetArtifactRef/grantedContextRefs.
+
+test('R3: a disposition targetRef naming another coordination session is refused, with nothing appended', () => {
+  const ctx = setup('coord_rd_disposition_foreign_target');
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_rd_disposition_foreign_other', objective: 'A different session entirely.', writerId: 'coordinator-1' },
+    ctx.opts,
+  );
+  const foreignRef = path.join('.fgos', 'coordination', 'sessions', 'coord_rd_disposition_foreign_other', 'events.jsonl');
+
+  assert.throws(
+    () => recordDriverDisposition('coord_rd_disposition_foreign_target', disposition({ targetRef: foreignRef }), ctx.opts),
+    (err) => err instanceof CoordinationError && /names a different coordination session/.test(err.message),
+  );
+  assert.equal(readSessionEvents('coord_rd_disposition_foreign_target', ctx.opts).filter((e) => e.type === 'driver-disposition-recorded').length, 0);
+});
+
+test('R3: a disposition evidenceRefs entry naming another coordination session is refused, with nothing appended', () => {
+  const ctx = setup('coord_rd_disposition_foreign_evidence');
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_rd_disposition_foreign_evidence_other', objective: 'A different session entirely.', writerId: 'coordinator-1' },
+    ctx.opts,
+  );
+  const foreignRef = path.join('.fgos', 'coordination', 'sessions', 'coord_rd_disposition_foreign_evidence_other', 'session.json');
+
+  assert.throws(
+    () => recordDriverDisposition('coord_rd_disposition_foreign_evidence', disposition({ evidenceRefs: [foreignRef] }), ctx.opts),
+    (err) => err instanceof CoordinationError && /names a different coordination session/.test(err.message),
+  );
+  assert.equal(readSessionEvents('coord_rd_disposition_foreign_evidence', ctx.opts).filter((e) => e.type === 'driver-disposition-recorded').length, 0);
+});
+
+test('R3: a disposition targetRef naming a real Assignment that belongs to a DIFFERENT session is refused', async () => {
+  const ctx = setup('coord_rd_disposition_foreign_asgn');
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_rd_disposition_foreign_asgn_other', objective: 'A different session entirely.', writerId: 'coordinator-1' },
+    ctx.opts,
+  );
+  const foreignProduced = await produce('coord_rd_disposition_foreign_asgn_other', ctx);
+
+  assert.throws(
+    () => recordDriverDisposition('coord_rd_disposition_foreign_asgn', disposition({ targetRef: foreignProduced.assignment.assignmentId }), ctx.opts),
+    (err) => err instanceof CoordinationError && /is not a member of coordination session/.test(err.message),
+  );
+  assert.equal(readSessionEvents('coord_rd_disposition_foreign_asgn', ctx.opts).filter((e) => e.type === 'driver-disposition-recorded').length, 0);
+});
+
+test('R3: a disposition targetRef naming this SAME session\'s own Assignment is accepted (own-session member ref)', async () => {
+  const ctx = setup('coord_rd_disposition_own_asgn');
+  const produced = await produce('coord_rd_disposition_own_asgn', ctx);
+
+  const result = recordDriverDisposition(
+    'coord_rd_disposition_own_asgn',
+    disposition({ targetRef: produced.assignment.assignmentId, evidenceRefs: [] }),
+    ctx.opts,
+  );
+  assert.equal(result.appended, true);
+});
+
 // ─── R4: replay reconstructs the whole loop from disk alone ────────────────
 
 test('R4: replay reconstructs authorization, dispatch provenance, result links, recheck lineage, and disposition', async () => {

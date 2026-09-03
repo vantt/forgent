@@ -996,6 +996,42 @@ export function authorizeOperation(
   });
 }
 
+// A disposition's `targetRef`/`evidenceRefs` may not name a different
+// CoordinationSession or an Assignment that is not this session's own
+// member -- the SAME rule `session-engine.mjs`'s `assertRefsOwnedBySession`
+// already enforces for `grantedContextRefs`/`targetArtifactRef` (Context-Grant
+// Enforcement), applied here to disposition's own refs (P00.1's
+// Carried-Forward Gap #9: "no session-scope check on targetRef/evidenceRefs
+// yet"). Inlined rather than imported: store.mjs sits BELOW session-engine.mjs
+// in the import graph, so it cannot import that helper back. Checked by
+// SEGMENT (not whole-string prefix) so a path-form ref into another
+// session's directory is caught the same as a bare id; a segment that merely
+// resembles an id but resolves to nothing on disk is left alone -- this
+// codebase has no artifact registry to resolve it against, matching the
+// established precedent exactly rather than inventing a stronger guarantee.
+function assertDispositionRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, label }) {
+  if (typeof ref !== 'string') {
+    throw new CoordinationError('validation', `${label}: ref must be a string, got ${typeof ref}`);
+  }
+  for (const segment of ref.split(/[\\/]/).filter(Boolean)) {
+    if (segment !== coordinationId && fs.existsSync(path.join(fgosDir, 'coordination', 'sessions', segment, 'session.json'))) {
+      throw new CoordinationError(
+        'validation',
+        `${label}: ref "${ref}" names a different coordination session -- cross-session disposition authority is out of scope`,
+      );
+    }
+    if (/^asgn_/.test(segment)) {
+      const exists = fs.existsSync(path.join(fgosDir, 'assignments', segment, 'assignment.json'));
+      if (exists && !assignmentRefs.includes(segment)) {
+        throw new CoordinationError(
+          'validation',
+          `${label}: ref "${ref}" resolves to an Assignment that is not a member of coordination session "${coordinationId}" -- a disposition may only target this session's own refs`,
+        );
+      }
+    }
+  }
+}
+
 /**
  * Append one `driver-disposition-recorded` event: the driver's own
  * accept/reject/close-a-round decision on a finding or artifact ref.
@@ -1023,7 +1059,7 @@ export function authorizeOperation(
  * ledger is not reopened.
  */
 export function recordDriverDisposition(coordinationId, { targetRef, disposition, rationale, evidenceRefs, authorizedBy }, opts = {}) {
-  const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const { fgosDir, sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
   const payload = { targetRef, disposition, rationale, evidenceRefs, authorizedBy };
   validateEventPayload('driver-disposition-recorded', payload);
 
@@ -1041,6 +1077,21 @@ export function recordDriverDisposition(coordinationId, { targetRef, disposition
       label: 'recordDriverDisposition',
       subject: 'a disposition',
     });
+
+    assertDispositionRefOwnedBySession(targetRef, {
+      coordinationId,
+      assignmentRefs: manifest.assignmentRefs,
+      fgosDir,
+      label: 'recordDriverDisposition: targetRef',
+    });
+    evidenceRefs.forEach((ref, i) =>
+      assertDispositionRefOwnedBySession(ref, {
+        coordinationId,
+        assignmentRefs: manifest.assignmentRefs,
+        fgosDir,
+        label: `recordDriverDisposition: evidenceRefs[${i}]`,
+      }),
+    );
 
     // Idempotency compares a CANONICAL shape, not the raw payload:
     // `JSON.stringify` is key-insertion-order sensitive, and `authorizedBy`

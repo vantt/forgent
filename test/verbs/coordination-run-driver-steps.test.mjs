@@ -33,6 +33,7 @@ import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
 import { StoreError } from '../../src/state/store.mjs';
 import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
 import { readSessionEvents, readManifest } from '../../src/runner/coordination/store.mjs';
+import { openDeclaredProtocolSession } from '../../src/runner/coordination/session-engine.mjs';
 
 const DEFINITION_ID = 'test.coordination-protocol.master-loop-driver-steps';
 
@@ -408,6 +409,52 @@ test('authorizing a "required" binding through the request door is refused -- a 
     (err) => err instanceof CoordinationError && /only a "driver-authorized" binding can be authorized/.test(err.message),
   );
   const sessions = fs.readdirSync(path.join(tempDir, '.fgos', 'coordination', 'sessions'));
+  assert.equal(eventsOfType(tempDir, sessions[0], 'operation-authorized').length, 0);
+});
+
+// R8's "unknown target" and "stale/nonexistent artifact ref" negative-
+// semantics cases, at the CLI/request door specifically (engine-level
+// coverage already exists: coordination-driver-authorization.test.mjs's
+// "R2: authorizeDeclaredOperation rejects an unknown operation..." and
+// coordination-recheck-disposition.test.mjs's "R1: a targetArtifactRef
+// naming another session is refused..." -- these are the door-level
+// companions the phase's own Tests First list implies matter separately).
+
+test('an "authorize" step naming a completely undeclared operation is refused at the request door: R8 "unknown target" fails closed', async () => {
+  const { tempDir, ctx } = setup();
+  await assert.rejects(
+    runCoordinationUseCase(ctx, {
+      requestObject: request({ steps: [produceStep(), reviewStep(), authorizeStep({ operationId: 'no-such-operation' })] }),
+    }),
+    (err) => err instanceof CoordinationError && /is not declared in this protocol's spec\.operations/.test(err.message),
+  );
+  const sessions = fs.readdirSync(path.join(tempDir, '.fgos', 'coordination', 'sessions'));
+  assert.equal(eventsOfType(tempDir, sessions[0], 'operation-authorized').length, 0);
+});
+
+test('an "authorize" step\'s targetArtifactRef naming another coordination session is refused at the request door: R8 "stale/nonexistent artifact ref" fails closed', async () => {
+  const { tempDir, ctx } = setup();
+  // A literal (non-"$ref:") id must be a bare safe-charset string at the
+  // request boundary (assertSafeRefOrId) -- a path-form foreign ref would be
+  // refused earlier, by the schema layer's own path-escape check, before
+  // ever reaching the engine's cross-session check this test targets. Using
+  // the foreign session's own id as the ref exercises the SAME
+  // assertRefsOwnedBySession segment check the engine-level test forges a
+  // path-form ref to reach.
+  const foreignCoordinationId = 'coord_driver_steps_foreign_other';
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: foreignCoordinationId, objective: 'A different session entirely.', writerId: WRITER_ID },
+    { cwd: tempDir, repoRoot: tempDir },
+  );
+
+  await assert.rejects(
+    runCoordinationUseCase(ctx, {
+      requestObject: request({ steps: [produceStep(), reviewStep(), authorizeStep({ targetArtifactRef: foreignCoordinationId })] }),
+    }),
+    (err) => err instanceof CoordinationError && /names a different coordination session/.test(err.message),
+  );
+  const sessions = fs.readdirSync(path.join(tempDir, '.fgos', 'coordination', 'sessions')).filter((id) => id !== foreignCoordinationId);
+  assert.equal(sessions.length, 1);
   assert.equal(eventsOfType(tempDir, sessions[0], 'operation-authorized').length, 0);
 });
 

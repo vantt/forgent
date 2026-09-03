@@ -46,7 +46,7 @@ own work.
 | Phase | MVP | Requirements | Status |
 |---|---|---|---|
 | 00 | Intake | R1-R4 | done |
-| 01 | MVP3 | R1-R6 (see phase file) | missing |
+| 01 | MVP3 | R1-R8 (see phase file) | done |
 | 02 | MVP4 | R1-Rn (see phase file) | missing |
 | 03 | Config | R1-Rn (see phase file) | missing |
 | 04 | MVP5 | R1-Rn (see phase file) | missing |
@@ -57,13 +57,66 @@ None.
 
 ## Next Action
 
-Prepare P01.1 (Phase 01 — MVP3 recheck lineage and driver disposition).
+Prepare P02.1 (Phase 02 — MVP4 thin surface launcher).
 
 ## Cell Log
 
 | Cell | Requirements | Status | Commit |
 |---|---|---|---|
 | P00.1 | Phase 00 R1, R2, R3, R4 (closes Phase 00) | done | `95f7971c` |
+| P01.1 | Phase 01 R1-R8 (closes Phase 01) | done | pending |
+
+## Phase 01 Status
+
+**CLOSED.** R1-R8 via P01.1, one cell (no split needed). Handoff-first
+review (R1) dispositioned each of R2-R8 individually against the closed
+MVP1/MVP2 track's own proof (`P03.1.md`): R3, R5, R7, R2's
+artifact-revision-link half, R6, and 3 of R8's 5 negative-semantics cases
+(missing authorization, reused invocation key, terminal-session-at-engine-
+level) accepted unchanged, no source touched, cited directly.
+
+One genuine gap closed: `recordDriverDisposition` (`store.mjs`) had no
+check that a disposition's `targetRef`/`evidenceRefs` resolve to a ref this
+session actually owns (`P00.1.md`'s Carried-Forward Gap #9, and the phase
+file's own named Tests-First bullet). Added `assertDispositionRefOwnedBySession`,
+mirroring `session-engine.mjs`'s existing `assertRefsOwnedBySession`
+pattern (existence-based, not naming-convention — the class of bug this
+track's predecessor repeatedly found and fixed), with 4 new
+mutation-verified tests.
+
+Two more R8 negative cases (unknown target, stale/nonexistent artifact ref)
+were already engine-proven but had no door-level (CLI/request) test; 2 new
+tests added to `test/verbs/coordination-run-driver-steps.test.mjs` — outside
+Phase 01's literal Files list, Coordinator-confirmed acceptable since
+P03.2 itself established that file as the door-level test home for this
+exact surface.
+
+Deferred, with reasoning, not fixed: R2's prior-finding/verdict lineage
+stays artifact-revision-scoped/best-effort (already ruled on by P03.1's own
+Coordinator, MEDIUM-3 — not re-litigated, no new evidence); R8's
+terminal-session case has no door-level test because it is structurally
+unreachable through `run.mjs`'s current open-once/close-once control flow
+without a resume door (Phase 04/MVP5's own future work, per `P00.1.md`
+Gap #17).
+
+Reviewer round (APPROVE, 1 LOW — stale line-number citations in the new
+door-level test file, cosmetic, tests genuinely exist and cover the
+claims) run in parallel with Red-Team round (APPROVE, 2 LOW — one
+corroborating the same stale-citation finding independently, one noting
+the trace's stated reasoning for closing gap #9 vs. deferring gap #8 was
+asymmetric even though the underlying calls are both correct). 0 HIGH,
+0 MEDIUM from either round; all 7 Red-Team attacks (bypass, over-refusal,
+under-refusal/naming-convention-class, test vacuity, R2 re-litigation,
+terminal-session reachability, scope escape, lock discipline) held. No fix
+round required — 3 LOW findings recorded as follow-up, not blocking close.
+
+Retry (`run-retried`) machinery untouched throughout — zero diff.
+`group-cognition-framework.yaml` untouched. No Work/git/coding-domain
+mutation path touched. Full suite: 5165 tests, 5158 pass, 1 fail — exactly
+the track's recorded baseline (`test/cli/fgos-intake-4.test.mjs:318`); no
+new failure. Focused glob (`test/runner/coordination*.test.mjs`) 314/314.
+
+Next: P02.1 (Phase 02 — MVP4, thin surface launcher).
 
 ## Phase 00 Status
 
