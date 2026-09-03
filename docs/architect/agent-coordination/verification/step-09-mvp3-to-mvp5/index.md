@@ -65,7 +65,7 @@ Prepare P02.2 (Phase 02 — MVP4 R5-R6: resume/show rendering + setup/doctor).
 |---|---|---|---|
 | P00.1 | Phase 00 R1, R2, R3, R4 (closes Phase 00) | done | `95f7971c` |
 | P01.1 | Phase 01 R1-R8 (closes Phase 01) | done | `633da1f5` |
-| P02.1 | Phase 02 R1-R4 | done | pending |
+| P02.1 | Phase 02 R1-R4 | done | `fb18c372` |
 
 ## Phase 02 Status (in progress)
 
