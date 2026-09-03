@@ -67,7 +67,7 @@ Prepare P04.1 (Phase 04 — MVP5: usable standalone live proof).
 | P01.1 | Phase 01 R1-R8 (closes Phase 01) | done | `633da1f5` |
 | P02.1 | Phase 02 R1-R4 | done | `fb18c372` |
 | P02.2 | Phase 02 R5-R6 (closes Phase 02) | done | `c963f2a7` |
-| P03.1 | Phase 03 R1-R8 (closes Phase 03) | done | pending |
+| P03.1 | Phase 03 R1-R8 (closes Phase 03) | done | `53a88522` |
 
 ## Phase 03 Status
 
