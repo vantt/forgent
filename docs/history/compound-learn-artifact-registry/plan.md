@@ -204,7 +204,25 @@ current `.fgos/` state against this branch's frozen snapshot — the
 `tsk-3v2` precedent in
 `docs/how-to/fix-fgos-write-rejected-merge-block.md`) — fixed by
 restoring/unstaging every `.fgos/` path before the merge commit, per that
-doc's own step 3-4.
+doc's own step 3-4. (A second attempt to re-sync those paths to main's
+*then-current* tip, since main had moved again in the interim, was itself
+refused by the same pre-commit guard — confirmed the guard checks each
+commit's own diff against its immediate parent, not the branch's overall
+divergence from main; reverted, left as ORIG_HEAD's restored snapshot,
+trusting `fgos approve`'s own merge-time logic to reconcile `.fgos/`
+against whatever main looks like at that moment rather than this branch
+needing to pre-match it.)
+
+**Second amendment:** the first real `fgos return` attempt also caught
+that its own verify re-runs in a disposable, detached worktree which
+never carries `.fgos/` either (same ADR0020 exclusion the recovery doc's
+step 5 already documents for exactly this) — `node
+scripts/knowledge-migration.mjs` needs live registry state to run at all,
+so it cannot pass there regardless of correctness. Verify narrowed once
+more to `node --test test/scripts/knowledge-migration.test.mjs` — the
+one thing this branch's own code change (the `fgosRoot` decoupling fix)
+can honestly prove from its own committed files, no live `.fgos/`
+dependency at all.
 
 Action: this `plan.md`.
 Footprint: `docs/**` (332 files moving path), `.fgos/` registry events
