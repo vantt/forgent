@@ -995,6 +995,119 @@ function assertRefsOwnedBySession(refs, { coordinationId, assignmentRefs, fgosDi
   }
 }
 
+// ─── Phase 06 R2 (P06.2): visibility-window runtime derivation ────────────
+//
+// A window's open/closed state is NEVER stored -- it is recomputed, fresh,
+// from the SAME event-log primitives every other read-side reconstruction
+// in this file already uses (`assignment-created`/`result-linked`/
+// `actor-replaced`, plus the on-disk RunResult a `result-linked` event
+// points at). `deriveVisibilityWindowState` is the ONE function both
+// `authorizeDeclaredOperation` and `dispatchDeclaredOperation` call --
+// never two independently-maintained copies -- and it is exported so a
+// caller holding an independently-taken `replaySession()` result (replay's
+// own reconstruction, or a test proving parity) reaches the identical
+// verdict the live dispatch path would have reached from the same disk
+// state, with no cache/latch anywhere in between (Bug Taxonomy: "a window
+// that silently stays permanently open once any single source links").
+
+/**
+ * `oldActorId -> replacementActorId` for every ACCEPTED `actor-replaced`
+ * event in `events`. Built once per `deriveVisibilityWindowState` call and
+ * threaded through to `resolveOperationOutcome`, mirroring
+ * `classifySessionQuorum`'s own `resolveEffectiveActor` map exactly (same
+ * lineage-following semantics, independently built here so this module
+ * stays a single self-contained read of the event log per call).
+ */
+function buildActorReplacementMap(events) {
+  const map = new Map();
+  for (const event of events) {
+    if (event.type === 'actor-replaced') map.set(event.payload.oldActorId, event.payload.replacementActorId);
+  }
+  return map;
+}
+
+/**
+ * The outcome of ONE `opensAfter.operationRefs[]` entry: resolve the
+ * operation's graph-bound actor (`resolveDeclaredOperationActor`, the SAME
+ * resolver `authorizeDeclaredOperation`/`dispatchDeclaredOperation` use for
+ * the operation actually being authorized/dispatched), follow any accepted
+ * `actor-replaced` lineage to the CURRENT effective actor (so "the
+ * replacement's own result-linked counts toward the window; the original
+ * failed/missing attempt's event stays in the log, untouched" holds without
+ * rewriting or re-deriving anything from the original attempt), then
+ * classify exactly the way `classifySessionQuorum`/`synthesizeResearchFanIn`
+ * already classify a settled Assignment -- the SAME failed/late vocabulary,
+ * never a second one:
+ * - no `assignment-created` for the effective actor -> `'missing'`.
+ * - created but no `result-linked` yet -> `'late'`.
+ * - linked but `runResult.status === 'failed'` or `confidence` in
+ *   `{failed, no-evidence}` -> `'failed'`.
+ * - otherwise -> satisfied.
+ *
+ * Deliberately resolves the FIRST graph binding for `operationId` (no
+ * `targetActorId` disambiguation) -- a source operation wired to more than
+ * one actor (independent fan-out) is not disambiguated by this cell; see
+ * this cell's own trace file Gaps section.
+ */
+function resolveOperationOutcome(definition, operationId, { events, fgosDir, replacedBy }) {
+  const { actorId } = resolveDeclaredOperationActor(definition, operationId);
+  let effectiveActorId = actorId;
+  const seen = new Set();
+  while (replacedBy.has(effectiveActorId) && !seen.has(effectiveActorId)) {
+    seen.add(effectiveActorId);
+    effectiveActorId = replacedBy.get(effectiveActorId);
+  }
+
+  const createdEvent = events.find((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveActorId);
+  if (!createdEvent) {
+    return { operationRef: operationId, satisfied: false, reason: 'missing', actorId: effectiveActorId, assignmentId: null };
+  }
+  const assignmentId = createdEvent.payload.assignmentId;
+
+  const linkedEvent = lastEventFor(events, 'result-linked', assignmentId);
+  if (!linkedEvent) {
+    return { operationRef: operationId, satisfied: false, reason: 'late', actorId: effectiveActorId, assignmentId };
+  }
+
+  const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, linkedEvent.payload.runId);
+  if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') {
+    return { operationRef: operationId, satisfied: false, reason: 'failed', actorId: effectiveActorId, assignmentId, runId: runResult.runId };
+  }
+  return { operationRef: operationId, satisfied: true, reason: null, actorId: effectiveActorId, assignmentId, runId: runResult.runId };
+}
+
+/**
+ * Derive whether `windowId` (a `spec.profile.topology.visibilityWindows[]`
+ * entry on `definition`) is currently OPEN: true iff EVERY
+ * `opensAfter.operationRefs[]` entry resolves to a satisfied
+ * `resolveOperationOutcome` (see above) -- a partial subset never opens it
+ * (Bug Taxonomy: "a partial-window bypass"). Pure function of `replayed`
+ * (a `replaySession()` result -- live dispatch and an independently-taken
+ * replay both pass one) and `fgosDir`; never reads or writes any stored
+ * "window state" of its own.
+ *
+ * @param {object} definition Loaded FlowDefinition (`loadCoordinationProtocol`).
+ * @param {string} windowId
+ * @param {{manifest: object, events: object[]}} replayed A `replaySession()` result.
+ * @param {string} fgosDir
+ * @returns {Readonly<{window: object, open: boolean, sources: Readonly<object>[]}>}
+ */
+export function deriveVisibilityWindowState(definition, windowId, replayed, fgosDir) {
+  const window = (definition.spec.profile.topology?.visibilityWindows ?? []).find((w) => w.id === windowId);
+  if (!window) {
+    throw new CoordinationError(
+      'dangling-ref',
+      `deriveVisibilityWindowState: visibility window "${windowId}" is not declared on protocol "${definition.metadata.id}@${definition.metadata.version}"`,
+    );
+  }
+  const replacedBy = buildActorReplacementMap(replayed.events);
+  const sources = window.opensAfter.operationRefs.map((operationRef) =>
+    resolveOperationOutcome(definition, operationRef, { events: replayed.events, fgosDir, replacedBy }),
+  );
+  const open = sources.every((source) => source.satisfied);
+  return Object.freeze({ window, open, sources: Object.freeze(sources.map((s) => Object.freeze(s))) });
+}
+
 /**
  * The Assignment id a prior attempt already claimed for `taskKey`, or
  * `null`. Read-only peek at `createSessionAssignment`'s own claim record
@@ -1101,6 +1214,27 @@ export function authorizeDeclaredOperation(
       fgosDir,
       label: `authorizeDeclaredOperation: targetArtifactRef`,
     });
+  }
+
+  // Visibility-window legality (Phase 06 R2, additive alongside the
+  // same-session ownership checks above -- never a replacement for them).
+  // Only a binding that actually declares `contextAccess.visibilityWindowRef`
+  // is gated; a binding with none stays byte/behavior-identical to before
+  // this check existed. Re-derived fresh from a NEW `replaySession()` call
+  // every time (never cached/latched -- Bug Taxonomy), so a window that was
+  // closed a moment ago and only just opened is picked up correctly, and one
+  // that silently closes again (it cannot, under the current append-only
+  // event vocabulary, but this call never assumes otherwise) is too.
+  const visibilityWindowRef = binding.contextAccess?.visibilityWindowRef;
+  if (visibilityWindowRef !== undefined) {
+    const replayedForWindow = replaySession(coordinationId, opts);
+    const { open } = deriveVisibilityWindowState(definition, visibilityWindowRef, replayedForWindow, fgosDir);
+    if (!open) {
+      throw new CoordinationError(
+        'validation',
+        `authorizeDeclaredOperation: operation "${operationId}" at node "${node.id}" for actor "${actorId}" requires visibility window "${visibilityWindowRef}" to be open before any context may be granted, and it is not open yet -- refusing to authorize`,
+      );
+    }
   }
 
   return authorizeOperation(
@@ -1626,6 +1760,28 @@ export async function dispatchDeclaredOperation(
         fgosDir,
         label: `dispatchDeclaredOperation: authorization "${authorization.authorizationId}" targetArtifactRef`,
       });
+    }
+
+    // (a2) Visibility-window legality, independently re-derived HERE at
+    //      dispatch time -- never trusting whatever `authorizeDeclaredOperation`
+    //      concluded earlier, the same "defense in depth, not merely two call
+    //      sites of one cached answer" posture the ownership checks above
+    //      already take (both re-run `assertRefsOwnedBySession`, not just
+    //      authorize time). Uses the SAME `deriveVisibilityWindowState`
+    //      function and the SAME already-taken `replayOnce()` reconstruction
+    //      this dispatch is already using for the edge/authorization checks
+    //      above, so a genuinely different verdict between authorize and
+    //      dispatch can only mean the underlying event log itself changed
+    //      between the two calls -- never a second, divergent derivation.
+    const visibilityWindowRef = binding.contextAccess?.visibilityWindowRef;
+    if (visibilityWindowRef !== undefined) {
+      const { open } = deriveVisibilityWindowState(definition, visibilityWindowRef, replayOnce(), fgosDir);
+      if (!open) {
+        throw new CoordinationError(
+          'validation',
+          `dispatchDeclaredOperation: operation "${operationId}" at node "${node.id}" for actor "${actorId}" requires visibility window "${visibilityWindowRef}" to be open, and it is not open -- refusing to dispatch a driver-authorized worker whose granted context is not yet legal`,
+        );
+      }
     }
 
     // (b) The dispatched worker may read ONLY the granted refs plus the base

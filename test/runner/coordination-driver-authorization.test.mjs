@@ -26,6 +26,8 @@ import {
   openDeclaredProtocolSession,
   dispatchDeclaredOperation,
   authorizeDeclaredOperation,
+  replaceSessionActor,
+  deriveVisibilityWindowState,
 } from '../../src/runner/coordination/session-engine.mjs';
 import {
   authorizeOperation,
@@ -34,9 +36,12 @@ import {
   transitionSessionStatus,
   appendEvent,
   resolveSessionPaths,
+  createSessionAssignment,
+  linkResult,
 } from '../../src/runner/coordination/store.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
+import { loadCoordinationProtocol } from '../../src/runner/definitions/protocol-loader.mjs';
 
 const DEFINITION_ID = 'test.coordination-protocol.driver-authorized-recheck';
 
@@ -1540,4 +1545,381 @@ test('R8: the session\'s own driver identity authorizes and dispatches normally'
   assert.equal(result.resumed, false);
   const authorized = readSessionEvents('coord_da_authority_ok', ctx.opts).find((e) => e.type === 'operation-authorized');
   assert.deepEqual(authorized.payload.authorizedBy, { type: 'driver', id: 'the-real-driver' });
+});
+
+// ─── Phase 06 R2 (P06.2): visibility windows -- runtime, grant enforcement,
+// and replay ─────────────────────────────────────────────────────────────
+//
+// Fixture: two REQUIRED research operations (`research-a`/`research-b`,
+// one actor each) feed a `post-research-window` visibility window; a
+// DRIVER-AUTHORIZED `synthesize` operation's node-operation binding names
+// that window via `contextAccess.visibilityWindowRef`. This is the
+// paradigm case P00.1 itself names ("private-first-pass vs.
+// post-independent-pass") -- the window's sources are ordinary required
+// dispatches, never driver-authorized themselves, proving window-state
+// derivation does not depend on `assignment-created.operationId` (only
+// populated for driver-authorized bindings) at all.
+
+const VISIBILITY_DEFINITION_ID = 'test.coordination-protocol.visibility-window';
+
+function writeVisibilityWindowFixture(tempDir) {
+  const dir = path.join(tempDir, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(dir, { recursive: true });
+  const definition = {
+    apiVersion: 'fgos.dev/v1alpha1',
+    kind: 'FlowDefinition',
+    metadata: { id: VISIBILITY_DEFINITION_ID, version: '1.0.0' },
+    spec: {
+      profile: {
+        kind: 'CoordinationProtocol',
+        topology: {
+          visibilityWindows: [
+            {
+              id: 'post-research-window',
+              opensAfter: { milestone: 'listed-results-linked', operationRefs: ['research-a', 'research-b'] },
+              permits: { sourceOperationRefs: ['research-a', 'research-b'], delivery: 'artifact-refs' },
+            },
+          ],
+        },
+      },
+      roles: ['researcher', 'synth'],
+      actors: [
+        { id: 'researcher-a', role: 'researcher' },
+        { id: 'researcher-b', role: 'researcher' },
+        { id: 'synth', role: 'synth' },
+      ],
+      operations: [
+        { id: 'research-a', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+        { id: 'research-b', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+        { id: 'synthesize', role: 'synth', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+      ],
+      graph: {
+        entry: 'phase-research',
+        nodes: [
+          {
+            id: 'phase-research',
+            operations: [
+              { ref: 'research-a', actor: 'researcher-a' },
+              { ref: 'research-b', actor: 'researcher-b' },
+            ],
+            transitions: ['phase-synthesize'],
+          },
+          {
+            id: 'phase-synthesize',
+            operations: [
+              {
+                ref: 'synthesize',
+                actor: 'synth',
+                activation: { mode: 'driver-authorized' },
+                contextAccess: { visibilityWindowRef: 'post-research-window' },
+              },
+            ],
+            transitions: [],
+          },
+        ],
+      },
+    },
+  };
+  fs.writeFileSync(path.join(dir, 'visibility-window.json'), `${JSON.stringify(definition, null, 2)}\n`);
+}
+
+function setupVisibilityWindow(coordinationId) {
+  const tempDir = mkTempDir();
+  writeVisibilityWindowFixture(tempDir);
+  openDeclaredProtocolSession(
+    {
+      definitionId: VISIBILITY_DEFINITION_ID,
+      coordinationId,
+      objective: 'Prove visibility-window runtime enforcement.',
+      writerId: 'coordinator-1',
+    },
+    { cwd: tempDir },
+  );
+  return { tempDir, runnerConfig: fakeExecutor(tempDir), opts: { cwd: tempDir, repoRoot: tempDir } };
+}
+
+function inlineResearchContract(overrides = {}) {
+  return {
+    objective: 'Research.',
+    contextRefs: [],
+    constraints: [],
+    expectedOutputs: ['agent-result.json (status, summary)'],
+    mutation: 'read-only',
+    evidence: { required: 'reported' },
+    role: 'researcher',
+    budget: { timeoutMs: 60000, maxRuns: 1 },
+    ...overrides,
+  };
+}
+
+async function dispatchResearch(coordinationId, ctx, operationId, targetActorId, runnerConfig) {
+  return dispatchDeclaredOperation(
+    coordinationId,
+    {
+      operationId,
+      targetActorId,
+      objective: `Perform ${operationId}.`,
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      writerId: 'coordinator-1',
+    },
+    { ...ctx.opts, runnerConfig: runnerConfig ?? ctx.runnerConfig },
+  );
+}
+
+function synthesizeAuthorization(overrides = {}) {
+  return {
+    operationId: 'synthesize',
+    targetActorId: 'synth',
+    authorizationId: 'auth_synth_1',
+    invocationKey: 'synth:1',
+    authorizedBy: { type: 'driver', id: 'coordinator-1' },
+    reason: 'Synthesize once both research operations settle.',
+    grantedContextRefs: [],
+    ...overrides,
+  };
+}
+
+function dispatchSynthesize(coordinationId, ctx) {
+  return dispatchDeclaredOperation(
+    coordinationId,
+    {
+      operationId: 'synthesize',
+      targetActorId: 'synth',
+      objective: 'Synthesize the research.',
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      writerId: 'coordinator-1',
+    },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+}
+
+test('visibility window stays closed with zero source result-linked events -- authorization is refused', () => {
+  const ctx = setupVisibilityWindow('coord_vw_zero_sources');
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_zero_sources', synthesizeAuthorization(), ctx.opts),
+    (err) =>
+      err instanceof CoordinationError &&
+      /visibility window "post-research-window"/.test(err.message) &&
+      /is not open/.test(err.message),
+  );
+  assert.equal(
+    readSessionEvents('coord_vw_zero_sources', ctx.opts).filter((e) => e.type === 'operation-authorized').length,
+    0,
+    'a window-refused authorization must not be appended to the log',
+  );
+});
+
+test('visibility window stays closed with a partial subset of required source events (research-a linked, research-b never dispatched)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_partial_sources');
+  await dispatchResearch('coord_vw_partial_sources', ctx, 'research-a', 'researcher-a');
+
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_partial_sources', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+  );
+});
+
+test('visibility window opens once ALL opensAfter.operationRefs[] have a qualifying result-linked, and both authorization and dispatch then succeed', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_open');
+  await dispatchResearch('coord_vw_open', ctx, 'research-a', 'researcher-a');
+  await dispatchResearch('coord_vw_open', ctx, 'research-b', 'researcher-b');
+
+  authorizeDeclaredOperation('coord_vw_open', synthesizeAuthorization(), ctx.opts);
+  const result = await dispatchSynthesize('coord_vw_open', ctx);
+  assert.equal(result.resumed, false);
+  assert.equal(result.runResult.status, 'done');
+});
+
+test('a failed source result does NOT open the window (research-a fails, research-b succeeds)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_failed_source');
+  await dispatchResearch('coord_vw_failed_source', ctx, 'research-a', 'researcher-a', fakeExecutor(ctx.tempDir, { status: 'failed' }));
+  await dispatchResearch('coord_vw_failed_source', ctx, 'research-b', 'researcher-b');
+
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_failed_source', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+  );
+});
+
+test('a "late" source (created, never result-linked) does NOT open the window even though the other source already settled', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_late_source');
+  await dispatchResearch('coord_vw_late_source', ctx, 'research-b', 'researcher-b');
+  // research-a is materialized through the raw store door, deliberately
+  // never linked (settled) -- the exact "late" shape classifySessionQuorum
+  // already names.
+  createSessionAssignment(
+    { coordinationId: 'coord_vw_late_source', taskKey: 'declared:research-a', actorId: 'researcher-a', contract: inlineResearchContract(), caller: { writerId: 'coordinator-1' } },
+    ctx.opts,
+  );
+
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_late_source', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+  );
+});
+
+test('an accepted actor-replaced lineage satisfies the original source obligation without the original failed event disappearing from the log', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_actor_replaced');
+  await dispatchResearch('coord_vw_actor_replaced', ctx, 'research-a', 'researcher-a', fakeExecutor(ctx.tempDir, { status: 'failed' }));
+  await dispatchResearch('coord_vw_actor_replaced', ctx, 'research-b', 'researcher-b');
+
+  const beforeEvents = readSessionEvents('coord_vw_actor_replaced', ctx.opts);
+  const originalCreated = beforeEvents.find((e) => e.type === 'assignment-created' && e.payload.actorId === 'researcher-a');
+  const originalLinked = beforeEvents.find((e) => e.type === 'result-linked' && e.payload.assignmentId === originalCreated.payload.assignmentId);
+  assert.ok(originalCreated && originalLinked, 'the original failed attempt must be on the log before replacement');
+
+  // Window still closed right after the failure -- research-a's ONLY
+  // linked result is the failed one.
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_actor_replaced', synthesizeAuthorization({ authorizationId: 'auth_too_early', invocationKey: 'synth:too-early' }), ctx.opts),
+    (err) => err instanceof CoordinationError && /is not open/.test(err.message),
+  );
+
+  replaceSessionActor(
+    'coord_vw_actor_replaced',
+    { oldActorId: 'researcher-a', newActorId: 'researcher-a-v2', reason: 'Original attempt failed; reassigning.' },
+    ctx.opts,
+  );
+
+  // The replacement's own attempt, materialized through the raw store door
+  // -- the FlowDefinition's static graph never learns about a dynamically
+  // allocated replacement actor, the same posture the existing R2 recovery/
+  // quorum fixtures already take for a replacement's re-dispatch.
+  const replacementAssignment = createSessionAssignment(
+    { coordinationId: 'coord_vw_actor_replaced', taskKey: 'declared:research-a:replacement', actorId: 'researcher-a-v2', contract: inlineResearchContract({ objective: 'Research A, redone by the replacement.' }), caller: { writerId: 'coordinator-1' } },
+    ctx.opts,
+  );
+  const runDir = path.join(ctx.tempDir, '.fgos', 'assignments', replacementAssignment.assignmentId, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const runId = `run_${replacementAssignment.assignmentId}_01`;
+  fs.writeFileSync(
+    path.join(runDir, 'result.json'),
+    JSON.stringify({ runId, assignmentId: replacementAssignment.assignmentId, status: 'done', confidence: 'reported' }, null, 2),
+  );
+  linkResult('coord_vw_actor_replaced', { assignmentId: replacementAssignment.assignmentId, runId }, ctx.opts);
+
+  // Now open: the replacement's own result-linked satisfies research-a's
+  // obligation; research-b already settled successfully.
+  authorizeDeclaredOperation('coord_vw_actor_replaced', synthesizeAuthorization(), ctx.opts);
+  const result = await dispatchSynthesize('coord_vw_actor_replaced', ctx);
+  assert.equal(result.resumed, false);
+
+  // The original failed attempt's events are STILL on the log, untouched --
+  // never rewritten, never removed.
+  const afterEvents = readSessionEvents('coord_vw_actor_replaced', ctx.opts);
+  assert.ok(
+    afterEvents.some((e) => e.type === 'assignment-created' && e.payload.assignmentId === originalCreated.payload.assignmentId),
+    'the original failed assignment-created event must remain on the log',
+  );
+  assert.ok(
+    afterEvents.some((e) => e.type === 'result-linked' && e.payload.assignmentId === originalCreated.payload.assignmentId),
+    'the original failed result-linked event must remain on the log',
+  );
+});
+
+test('authorization is refused when a granted ref\'s window is not yet open, even though the ref itself passes same-session ownership', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_ownership_vs_window');
+  const research = await dispatchResearch('coord_vw_ownership_vs_window', ctx, 'research-a', 'researcher-a');
+
+  // A ref naming research-a's OWN real, session-member Assignment --
+  // assertRefsOwnedBySession alone would accept it. research-b has not
+  // settled yet, so the window itself is still closed.
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_vw_ownership_vs_window',
+        synthesizeAuthorization({ grantedContextRefs: [research.assignment.assignmentId] }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+  );
+});
+
+test('dispatch independently refuses a window-gated operation even when authorization was forged straight through the raw store door (defense in depth)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_dispatch_defense_in_depth');
+  // Neither research-a nor research-b has settled -- the window is closed.
+  // Bypass authorizeDeclaredOperation entirely (which would itself refuse)
+  // and forge the "operation-authorized" event straight through the raw
+  // store door, exactly like this file's own `rawAuthorize` helper does for
+  // the ownership gate above.
+  authorizeOperation(
+    'coord_vw_dispatch_defense_in_depth',
+    {
+      authorizationId: 'auth_forged',
+      operationId: 'synthesize',
+      nodeId: 'phase-synthesize',
+      targetActorId: 'synth',
+      invocationKey: 'synth:forged',
+      authorizedBy: { type: 'driver', id: 'coordinator-1' },
+      reason: 'Forged straight through the raw store door.',
+      grantedContextRefs: [],
+    },
+    ctx.opts,
+  );
+
+  await assert.rejects(
+    dispatchSynthesize('coord_vw_dispatch_defense_in_depth', ctx),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+  );
+  assert.deepEqual(readManifest('coord_vw_dispatch_defense_in_depth', ctx.opts).assignmentRefs, []);
+});
+
+test('the existing same-session ownership gate stays enforced even when the visibility window is open (additive, never a replacement)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_ownership_still_enforced');
+  await dispatchResearch('coord_vw_ownership_still_enforced', ctx, 'research-a', 'researcher-a');
+  await dispatchResearch('coord_vw_ownership_still_enforced', ctx, 'research-b', 'researcher-b');
+
+  // A second, foreign session in the same workspace.
+  openDeclaredProtocolSession(
+    { definitionId: VISIBILITY_DEFINITION_ID, coordinationId: 'coord_vw_ownership_still_enforced_foreign', objective: 'Foreign.', writerId: 'coordinator-1' },
+    ctx.opts,
+  );
+
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_vw_ownership_still_enforced',
+        synthesizeAuthorization({ grantedContextRefs: ['coord_vw_ownership_still_enforced_foreign'] }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && /names a different coordination session/.test(err.message),
+  );
+});
+
+test('replay independently reconstructs the same window-open/closed decision as the live path (open scenario)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_replay_open');
+  await dispatchResearch('coord_vw_replay_open', ctx, 'research-a', 'researcher-a');
+  await dispatchResearch('coord_vw_replay_open', ctx, 'research-b', 'researcher-b');
+  authorizeDeclaredOperation('coord_vw_replay_open', synthesizeAuthorization(), ctx.opts);
+  const dispatched = await dispatchSynthesize('coord_vw_replay_open', ctx);
+  assert.equal(dispatched.resumed, false);
+
+  // A fresh, independent reconstruction -- never the live path's own
+  // in-memory state.
+  const definition = loadCoordinationProtocol(VISIBILITY_DEFINITION_ID, { cwd: ctx.tempDir });
+  const replayed = replaySession('coord_vw_replay_open', ctx.opts);
+  const { fgosDir } = resolveSessionPaths('coord_vw_replay_open', ctx.opts);
+  const { open, sources } = deriveVisibilityWindowState(definition, 'post-research-window', replayed, fgosDir);
+  assert.equal(open, true);
+  assert.ok(sources.every((s) => s.satisfied));
+});
+
+test('replay independently reconstructs the same window-open/closed decision as the live path (closed scenario, failed source)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_replay_closed');
+  await dispatchResearch('coord_vw_replay_closed', ctx, 'research-a', 'researcher-a', fakeExecutor(ctx.tempDir, { status: 'failed' }));
+  await dispatchResearch('coord_vw_replay_closed', ctx, 'research-b', 'researcher-b');
+
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_replay_closed', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /is not open/.test(err.message),
+  );
+
+  const definition = loadCoordinationProtocol(VISIBILITY_DEFINITION_ID, { cwd: ctx.tempDir });
+  const replayed = replaySession('coord_vw_replay_closed', ctx.opts);
+  const { fgosDir } = resolveSessionPaths('coord_vw_replay_closed', ctx.opts);
+  const { open, sources } = deriveVisibilityWindowState(definition, 'post-research-window', replayed, fgosDir);
+  assert.equal(open, false);
+  const researchA = sources.find((s) => s.operationRef === 'research-a');
+  assert.equal(researchA.satisfied, false);
+  assert.equal(researchA.reason, 'failed');
 });
