@@ -16,8 +16,9 @@
 //
 // Pure data module: no fs, no network, no session/store access, no dispatch.
 // It validates the SHAPE and LINEAGE of one contribution against a
-// caller-supplied context (declared operations + already-known
-// contributions in the same session) — it never resolves that context
+// caller-supplied context (declared operations, already-known contributions
+// in the same session, and optionally the known Assignments those
+// contributions claim provenance from) — it never resolves that context
 // itself. Session append/replay/visibility-window enforcement is P08.2's
 // concern, not this module's.
 //
@@ -87,6 +88,28 @@ export function validateContributionType(type) {
   }
 }
 
+function escapeRegExpLiteral(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * A `runId` that does not have the shape `run_<assignmentId>_<digits>` is not
+ * a Run of the Assignment it claims. Mirrors coordination/store.mjs's own
+ * `assertValidRunIdForAssignment` -- full shape, never a prefix-only check,
+ * since a prefix check accepts a same-prefix malicious suffix
+ * (`run_<assignmentId>_../../../../tmp/evil`). This module joins no paths, but
+ * it hands the ref onward to callers that do.
+ */
+function assertRunIdBelongsToAssignment(assignmentId, runId) {
+  const pattern = new RegExp(`^run_${escapeRegExpLiteral(assignmentId)}_\\d+$`);
+  if (!pattern.test(runId)) {
+    fail(
+      'foreign-provenance',
+      `contribution.runId "${runId}" does not match the expected shape for assignment "${assignmentId}" (expected "run_${assignmentId}_<digits>")`,
+    );
+  }
+}
+
 // One `deliberation-contribution-linked` record's shape (Candidate
 // Contract: "contribution type, Assignment/Run/artifact provenance,
 // anchors, response lineage, round key, visibility-window provenance, and
@@ -129,6 +152,7 @@ export function validateContributionShape(contribution) {
 
   if (!isNonEmptyString(contribution.assignmentId)) fail('validation', 'contribution.assignmentId must be a non-empty string');
   if (!isNonEmptyString(contribution.runId)) fail('validation', 'contribution.runId must be a non-empty string');
+  assertRunIdBelongsToAssignment(contribution.assignmentId, contribution.runId);
   if (!isNonEmptyString(contribution.artifactRef)) fail('validation', 'contribution.artifactRef must be a non-empty string');
   if (!isNonEmptyString(contribution.revision)) {
     fail('validation', 'contribution.revision must be a non-empty string -- an artifact ref without a revision pin is not immutable');
@@ -158,7 +182,9 @@ export function validateContributionShape(contribution) {
  */
 export function validateOperationDeclaresType(operationRef, type, declaredOperations) {
   if (!isPlainObject(declaredOperations)) fail('validation', 'declaredOperations must be a non-null object');
-  const operation = declaredOperations[operationRef];
+  // Own property only: a `declaredOperations` built over a prototype would
+  // otherwise legalize types the caller never declared on this object.
+  const operation = Object.hasOwn(declaredOperations, operationRef) ? declaredOperations[operationRef] : undefined;
   const allowedTypes = operation && Array.isArray(operation.allowedTypes) ? operation.allowedTypes : null;
   if (!allowedTypes || !allowedTypes.includes(type)) {
     fail(
@@ -252,10 +278,55 @@ export function validateResponseLineage(contribution, knownContributions, sessio
 }
 
 /**
+ * Validate the contribution's Assignment/Run provenance against a
+ * caller-supplied `knownAssignments` lookup:
+ * `Map<assignmentId, {sessionId, operationRef}>`.
+ *
+ * Optional by design, and for one structural reason: this module has no
+ * session/store access, so Assignment *existence* can only ever be known to a
+ * caller that does (the ledger layer, P08.2). The channel is declared here
+ * because P08.2 cannot add it later without changing this module's public
+ * signature. When it is not supplied, provenance stays presence-checked only,
+ * which the trace states plainly rather than calling "real".
+ *
+ * When it IS supplied, three things must hold, and each closes a different
+ * accepted-today forgery:
+ * - the `assignmentId` resolves at all (a fabricated Assignment is refused);
+ * - it belongs to the session under validation (a foreign-session Assignment
+ *   is refused, the same rule anchors and responses already carry);
+ * - it carries the claimed `operationRef` (an Assignment that answered one
+ *   operation cannot back a contribution labelled as another -- the "right
+ *   type, wrong operation" class the coordination layer needed its own
+ *   stamp channel to close one boundary down).
+ */
+export function validateAssignmentProvenance(contribution, knownAssignments, sessionId) {
+  if (knownAssignments === undefined) return;
+  if (!(knownAssignments instanceof Map)) fail('validation', 'knownAssignments must be a Map when provided');
+
+  const known = knownAssignments.get(contribution.assignmentId);
+  if (!known) {
+    fail('foreign-provenance', `contribution.assignmentId "${contribution.assignmentId}" does not resolve to a known Assignment`);
+  }
+  if (known.sessionId !== sessionId) {
+    fail(
+      'foreign-session-ref',
+      `contribution.assignmentId "${contribution.assignmentId}" resolves to an Assignment of a different session`,
+    );
+  }
+  if (known.operationRef !== contribution.operationRef) {
+    fail(
+      'foreign-provenance',
+      `contribution.assignmentId "${contribution.assignmentId}" answered operation "${known.operationRef}", not the claimed "${contribution.operationRef}"`,
+    );
+  }
+}
+
+/**
  * Top-level typed lineage validator: given one contribution and its
  * session-scoped context, throw `DeliberationError` on the first violation
  * found, in this fixed order: shape/enum, session membership,
- * operation/type declaration, anchors, response lineage. Returns a frozen
+ * operation/type declaration, Assignment provenance (when
+ * `knownAssignments` is supplied), anchors, response lineage. Returns a frozen
  * `{ok: true, contributionId}` on success — there is no "report, don't
  * throw" mode, since every rejection this validator names is a hard reject
  * per this cell's contract, not a soft/advisory finding.
@@ -265,14 +336,16 @@ export function validateResponseLineage(contribution, knownContributions, sessio
  * @param {string} context.sessionId
  * @param {Object<string, {allowedTypes: string[]}>} context.declaredOperations
  * @param {Map<string, {sessionId: string, respondsTo?: string}>} context.knownContributions
+ * @param {Map<string, {sessionId: string, operationRef: string}>} [context.knownAssignments]
  */
 export function validateContributionLineage(contribution, context) {
   validateContributionShape(contribution);
   if (!isPlainObject(context)) fail('validation', 'context must be a non-null object');
 
-  const { sessionId, declaredOperations, knownContributions } = context;
+  const { sessionId, declaredOperations, knownContributions, knownAssignments } = context;
   validateSessionMembership(contribution, sessionId);
   validateOperationDeclaresType(contribution.operationRef, contribution.type, declaredOperations);
+  validateAssignmentProvenance(contribution, knownAssignments, sessionId);
   validateAnchors(contribution, knownContributions, sessionId);
   validateResponseLineage(contribution, knownContributions, sessionId);
 

@@ -206,7 +206,7 @@ export function replaySession(coordinationId, opts = {}) {
       // A forger who omits these fields still produces an accepted event --
       // see this cell's trace for the full boundary.
       if (event.payload.outcome === 'consensus') {
-        for (const field of ['missingActors', 'failedActors', 'unresolvedContributionRefs']) {
+        for (const field of ['missingActors', 'failedActors', 'unresolvedContributionRefs', 'unboundSourceOperationRefs']) {
           if ((event.payload[field] ?? []).length > 0) {
             throw new CoordinationError(
               'validation',
@@ -230,6 +230,9 @@ export function replaySession(coordinationId, opts = {}) {
           : {}),
         ...(event.payload.missingActors !== undefined ? { missingActors: Object.freeze([...event.payload.missingActors]) } : {}),
         ...(event.payload.failedActors !== undefined ? { failedActors: Object.freeze([...event.payload.failedActors]) } : {}),
+        ...(event.payload.unboundSourceOperationRefs !== undefined
+          ? { unboundSourceOperationRefs: Object.freeze([...event.payload.unboundSourceOperationRefs]) }
+          : {}),
         ...(event.payload.artifactRevisionRefs !== undefined
           ? { artifactRevisionRefs: Object.freeze([...event.payload.artifactRevisionRefs]) }
           : {}),

@@ -20,7 +20,6 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -165,6 +164,21 @@ test('schema: a dangling aggregation operation ref is rejected in both fields', 
   );
 });
 
+test('schema: a duplicate sourceOperationRefs entry is rejected at definition time, not at session runtime', () => {
+  assert.throws(
+    () =>
+      validateFlowDefinition(protocolDoc({ mode: 'synthesize', aggregation: aggregationDecl({ sourceOperationRefs: ['research', 'research'] }) })),
+    (err) => err instanceof FlowDefinitionError && /sourceOperationRefs carries a duplicate entry/.test(err.message),
+  );
+});
+
+test('schema: an aggregation declaring zero required disclosures is rejected -- the evaluator refuses one too', () => {
+  assert.throws(
+    () => validateFlowDefinition(protocolDoc({ mode: 'synthesize', aggregation: aggregationDecl({ requiredDisclosures: [] }) })),
+    (err) => err instanceof FlowDefinitionError && /requiredDisclosures must name at least one disclosure/.test(err.message),
+  );
+});
+
 test('schema: an unknown field on the aggregation declaration is rejected (whitelist, like every other shape here)', () => {
   assert.throws(
     () => validateFlowDefinition(protocolDoc({ mode: 'synthesize', aggregation: aggregationDecl({ tieBreaker: 'majority' }) })),
@@ -282,11 +296,29 @@ test('event: validatedBy must be driver-shaped -- a worker-typed validator is re
   );
 });
 
-test('event: sourceResultRefs must be non-empty -- no evidence-free consensus', () => {
+test('event: an empty sourceResultRefs is refused for any outcome but a gap-naming no-consensus', () => {
+  // A consensus (or a qualified) with no evidence behind it is evidence-free
+  // truth, whatever else the payload says.
+  for (const outcome of ['consensus', 'qualified']) {
+    assert.throws(
+      () => validateEventPayload('aggregation-validated', eventPayload({ outcome, sourceResultRefs: [], missingActors: ['researcher-b'] })),
+      (err) => err instanceof CoordinationError && /sourceResultRefs is empty/.test(err.message),
+    );
+  }
+  // A no-consensus that names nothing is the same thing wearing a different
+  // outcome: the gap has to be on the record, not merely implied.
   assert.throws(
-    () => validateEventPayload('aggregation-validated', eventPayload({ sourceResultRefs: [] })),
-    (err) => err instanceof CoordinationError && /sourceResultRefs must be a non-empty array/.test(err.message),
+    () => validateEventPayload('aggregation-validated', eventPayload({ outcome: 'no-consensus', sourceResultRefs: [] })),
+    (err) => err instanceof CoordinationError && /sourceResultRefs is empty/.test(err.message),
   );
+});
+
+test('event: a no-consensus naming why no source survived IS a legal zero-evidence record', () => {
+  for (const named of [{ missingActors: ['researcher-b'] }, { failedActors: ['researcher-c'] }, { unresolvedContributionRefs: ['asgn_c'] }, { unboundSourceOperationRefs: ['research'] }]) {
+    assert.doesNotThrow(() =>
+      validateEventPayload('aggregation-validated', eventPayload({ outcome: 'no-consensus', sourceResultRefs: [], ...named })),
+    );
+  }
 });
 
 test('event: an aggregate naming its own output Assignment among its sources is refused (self-validated truth)', () => {
@@ -612,10 +644,6 @@ async function dispatchReview(coordinationId, ctx) {
   );
 }
 
-function definitionUnderTest(aggOverrides = {}) {
-  return validateFlowDefinition(protocolDoc({ mode: 'synthesize', aggregation: aggregationDecl(aggOverrides) }));
-}
-
 function validatedBy() {
   return { type: 'driver', id: 'coordinator-1' };
 }
@@ -630,7 +658,7 @@ test('runtime: a fully settled, revision-pinned cohort validates as consensus th
 
   const result = validateSessionAggregation(
     coordinationId,
-    { definition: definitionUnderTest(), aggregationId: 'agg_rt_1', validatedBy: validatedBy() },
+    { aggregationId: 'agg_rt_1', validatedBy: validatedBy() },
     ctx.opts,
   );
   assert.equal(result.outcome, 'consensus');
@@ -659,11 +687,10 @@ test('runtime: an artifact edited after settle makes its source stale -- no-cons
   const reportPath = path.join(fgosDir, 'assignments', a.assignmentId, 'runs', attempt, 'agent-report.md');
   const before = fs.readFileSync(reportPath, 'utf8');
   fs.writeFileSync(reportPath, `${before}\nQuietly appended after the run settled.\n`);
-  assert.notEqual(crypto.createHash('sha256').update(fs.readFileSync(reportPath)).digest('hex'), null);
 
   const result = validateSessionAggregation(
     coordinationId,
-    { definition: definitionUnderTest(), aggregationId: 'agg_rt_stale', validatedBy: validatedBy() },
+    { aggregationId: 'agg_rt_stale', validatedBy: validatedBy() },
     ctx.opts,
   );
   assert.equal(result.outcome, 'no-consensus');
@@ -685,11 +712,7 @@ test('runtime: a required disclosure the engine cannot derive fails coverage rat
 
   const result = validateSessionAggregation(
     coordinationId,
-    {
-      definition: definitionUnderTest({ requiredDisclosures: ['confidence', 'provenanceAttestation'] }),
-      aggregationId: 'agg_rt_disc',
-      validatedBy: validatedBy(),
-    },
+    { aggregationId: 'agg_rt_disc', validatedBy: validatedBy() },
     ctx.opts,
   );
   assert.equal(result.outcome, 'no-consensus');
@@ -710,7 +733,7 @@ test('runtime: a half-answered cohort never reaches consensus -- the missing bra
 
   const result = validateSessionAggregation(
     coordinationId,
-    { definition: definitionUnderTest(sources), aggregationId: 'agg_rt_partial', validatedBy: validatedBy() },
+    { aggregationId: 'agg_rt_partial', validatedBy: validatedBy() },
     ctx.opts,
   );
   assert.equal(result.outcome, 'no-consensus');
@@ -728,27 +751,61 @@ test('runtime: a half-answered cohort never reaches consensus -- the missing bra
   );
 });
 
-test('runtime: an aggregation with no usable evidence at all is refused outright rather than recorded as a verdict', async () => {
+test('runtime: a single-source aggregation with no surviving evidence records a no-consensus NAMING the gap, rather than throwing it away', async () => {
   const coordinationId = 'coord_agg_rt_no_evidence';
   const ctx = openAggregationSession(coordinationId);
   ctx.runnerConfig = fakeRunnerConfig(ctx.tempDir);
-  // The single declared source operation is half answered, so after the
-  // all-of rule nothing remains to validate. There is no honest
-  // `aggregation-validated` event to write here -- `sourceResultRefs` may
-  // never be empty -- so this fails closed instead.
+  // ONE declared source operation -- the likeliest protocol shape. The all-of
+  // rule leaves it with no surviving source, so nothing at all remains to
+  // aggregate. Throwing here would leave the gap real and the ledger silent
+  // about it; the verdict is `no-consensus` and the missing contributor is
+  // named on the event.
   await dispatchResearch(coordinationId, ctx, 'researcher-a');
 
+  const result = validateSessionAggregation(coordinationId, { aggregationId: 'agg_rt_none', validatedBy: validatedBy() }, ctx.opts);
+  assert.equal(result.outcome, 'no-consensus');
+  assert.deepEqual(result.event.sourceResultRefs, []);
+  assert.deepEqual(result.event.missingActors, ['researcher-b']);
+  assert.equal(result.classification.coverage.sourceCoverage.ok, false);
+
+  // The record survives an independent replay -- the gap is durable ledger
+  // state, readable without re-deriving it from the definition.
+  const replayed = replaySession(coordinationId, ctx.opts);
+  assert.equal(replayed.aggregations.length, 1);
+  assert.deepEqual([...replayed.aggregations[0].missingActors], ['researcher-b']);
+  // And it still cannot be used to close the session.
   assert.throws(
-    () =>
-      validateSessionAggregation(
-        coordinationId,
-        { definition: definitionUnderTest(), aggregationId: 'agg_rt_none', validatedBy: validatedBy() },
-        ctx.opts,
-      ),
-    (err) => err instanceof CoordinationError && /refusing to validate an aggregation with no evidence behind it/.test(err.message),
+    () => closeSessionByQuorum(coordinationId, { aggregationId: 'agg_rt_none' }, ctx.opts),
+    (err) => err instanceof CoordinationError && /refusing to close/.test(err.message),
   );
-  // Nothing was recorded, so nothing can later be cited as a validated verdict.
-  assert.deepEqual([...replaySession(coordinationId, ctx.opts).aggregations], []);
+});
+
+test('runtime: a declared source operation with NO graph binding at all is named as unbound, not silently dropped', async () => {
+  const coordinationId = 'coord_agg_rt_unbound';
+  // `review` is declared as a source but, in this protocol, hosted at no node
+  // -- nobody is wired to answer it, so there is no actor to name as missing
+  // and no Assignment to name as unresolved.
+  const tempDir = mkTempDir();
+  const protocolsDir = path.join(tempDir, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(protocolsDir, { recursive: true });
+  const doc = protocolDoc({ mode: 'synthesize', aggregation: aggregationDecl({ sourceOperationRefs: ['research', 'review'] }) });
+  doc.spec.graph.nodes[1].operations = [{ ref: 'synthesize', actor: 'coordinator-actor' }];
+  fs.writeFileSync(path.join(protocolsDir, 'aggregation-under-test.json'), JSON.stringify(doc, null, 2));
+  const opts = { cwd: tempDir, repoRoot: tempDir };
+  openDeclaredProtocolSession(
+    { definitionId: PROTOCOL_ID, coordinationId, objective: 'Aggregate over an unbound source operation.', writerId: 'coordinator-1' },
+    opts,
+  );
+  const ctx = { tempDir, opts, runnerConfig: fakeRunnerConfig(tempDir) };
+  await dispatchResearch(coordinationId, ctx, 'researcher-a');
+  await dispatchResearch(coordinationId, ctx, 'researcher-b');
+
+  const result = validateSessionAggregation(coordinationId, { aggregationId: 'agg_rt_unbound', validatedBy: validatedBy() }, opts);
+  assert.equal(result.outcome, 'no-consensus');
+  assert.deepEqual(result.event.unboundSourceOperationRefs, ['review']);
+  // Named, never dropped: the reason is on the record rather than having to be
+  // reconstructed by re-reading the definition.
+  assert.deepEqual([...replaySession(coordinationId, opts).aggregations[0].unboundSourceOperationRefs], ['review']);
 });
 
 test('runtime: validateSessionAggregation never transitions the session -- the manifest is still active afterwards', async () => {
@@ -760,7 +817,7 @@ test('runtime: validateSessionAggregation never transitions the session -- the m
 
   const result = validateSessionAggregation(
     coordinationId,
-    { definition: definitionUnderTest(), aggregationId: 'agg_rt_nt', validatedBy: validatedBy() },
+    { aggregationId: 'agg_rt_nt', validatedBy: validatedBy() },
     ctx.opts,
   );
   assert.equal(result.outcome, 'consensus');
@@ -785,7 +842,9 @@ test('runtime: closeSessionByQuorum refuses an aggregationId this session never 
 
 test('regression: closeSessionByQuorum with no aggregationId behaves exactly as it did before aggregation existed', async () => {
   const coordinationId = 'coord_agg_rt_no_agg_arg';
-  const ctx = openAggregationSession(coordinationId);
+  // The protocol's own declaration is what makes this aggregation fail
+  // coverage -- the definition is no longer something the call site can choose.
+  const ctx = openAggregationSession(coordinationId, { requiredDisclosures: ['nope'] });
   ctx.runnerConfig = fakeRunnerConfig(ctx.tempDir);
   await dispatchResearch(coordinationId, ctx, 'researcher-a');
   await dispatchResearch(coordinationId, ctx, 'researcher-b');
@@ -795,15 +854,85 @@ test('regression: closeSessionByQuorum with no aggregationId behaves exactly as 
   // must not consult it -- omitting the argument leaves the old path intact.
   const { fgosDir } = resolveSessionPaths(coordinationId, ctx.opts);
   assert.ok(fs.existsSync(fgosDir));
-  const partial = validateSessionAggregation(
-    coordinationId,
-    { definition: definitionUnderTest({ requiredDisclosures: ['nope'] }), aggregationId: 'agg_ignored', validatedBy: validatedBy() },
-    ctx.opts,
-  );
+  const partial = validateSessionAggregation(coordinationId, { aggregationId: 'agg_ignored', validatedBy: validatedBy() }, ctx.opts);
   assert.equal(partial.outcome, 'no-consensus');
 
   const manifest = closeSessionByQuorum(coordinationId, {}, ctx.opts);
   assert.equal(manifest.status, 'completed');
+});
+
+// ─── The definition is resolved from the session, never from the caller ────
+
+/**
+ * The Red-Team PoC's forged FlowDefinition: byte-identical metadata and
+ * byte-identical aggregation declaration, differing only in the cohort the
+ * verdict is derived over -- `research` is wired to the untampered
+ * `researcher-b` alone, so the tampered contributor is simply not part of the
+ * cohort the all-of rule runs against.
+ */
+function forgedCohortDefinition() {
+  const doc = protocolDoc({ mode: 'synthesize', aggregation: aggregationDecl() });
+  doc.spec.graph.nodes[0].operations = [{ ref: 'research', actor: 'researcher-b' }];
+  return doc;
+}
+
+test('regression: a caller cannot select the cohort the verdict is derived over -- the definition comes from the session, not the arguments', async () => {
+  const coordinationId = 'coord_agg_forged_definition';
+  const ctx = openAggregationSession(coordinationId);
+  ctx.runnerConfig = fakeRunnerConfig(ctx.tempDir);
+  const a = await dispatchResearch(coordinationId, ctx, 'researcher-a');
+  await dispatchResearch(coordinationId, ctx, 'researcher-b');
+  await dispatchReview(coordinationId, ctx);
+
+  // Both researchers settled, so quorum is satisfied. Then researcher-a's
+  // settled report is edited after settle -- the same tamper the staleness
+  // test uses, which the honest path classifies as `no-consensus`.
+  const { fgosDir } = resolveSessionPaths(coordinationId, ctx.opts);
+  const attempt = a.runId.slice(`run_${a.assignmentId}_`.length);
+  const reportPath = path.join(fgosDir, 'assignments', a.assignmentId, 'runs', attempt, 'agent-report.md');
+  fs.writeFileSync(reportPath, `${fs.readFileSync(reportPath, 'utf8')}\nQuietly appended after the run settled.\n`);
+
+  // The attack: hand the sanctioned door a definition whose cohort excludes
+  // the tampered contributor. It is ignored -- the door loads the session's
+  // own bound definition -- so the tampered source is still in the cohort and
+  // the verdict is still no-consensus.
+  const result = validateSessionAggregation(
+    coordinationId,
+    { definition: forgedCohortDefinition(), aggregationId: 'agg_forged_defn', validatedBy: validatedBy() },
+    ctx.opts,
+  );
+  assert.equal(result.outcome, 'no-consensus');
+  assert.equal(result.classification.revisionCurrency.ok, false);
+  assert.equal(result.event.sourceResultRefs.length, 2, 'both bound researchers stay in the cohort');
+
+  // And the session cannot be closed on it.
+  assert.throws(
+    () => closeSessionByQuorum(coordinationId, { aggregationId: 'agg_forged_defn' }, ctx.opts),
+    (err) => err instanceof CoordinationError && /refusing to close/.test(err.message),
+  );
+});
+
+test('regression: a definition that has drifted since the session was opened is refused, not silently used', async () => {
+  const coordinationId = 'coord_agg_defn_drift';
+  const ctx = openAggregationSession(coordinationId);
+  ctx.runnerConfig = fakeRunnerConfig(ctx.tempDir);
+  await dispatchResearch(coordinationId, ctx, 'researcher-a');
+  await dispatchResearch(coordinationId, ctx, 'researcher-b');
+
+  // Republish the protocol under a new version. The session's manifest still
+  // names the version it was opened against.
+  const drifted = protocolDoc({ mode: 'synthesize', aggregation: aggregationDecl() });
+  drifted.metadata.version = '2.0.0';
+  fs.writeFileSync(
+    path.join(ctx.tempDir, '.fgos', 'coordination-protocols', 'aggregation-under-test.json'),
+    JSON.stringify(drifted, null, 2),
+  );
+
+  assert.throws(
+    () => validateSessionAggregation(coordinationId, { aggregationId: 'agg_drift', validatedBy: validatedBy() }, ctx.opts),
+    (err) => err instanceof CoordinationError && /refusing to validate against a drifted definition/.test(err.message),
+  );
+  assert.deepEqual([...replaySession(coordinationId, ctx.opts).aggregations], []);
 });
 
 // ─── Authority boundary, statically ────────────────────────────────────────

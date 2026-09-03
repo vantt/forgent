@@ -10,6 +10,7 @@ import {
   validateAnchors,
   validateResponseLineage,
   validateContributionLineage,
+  validateAssignmentProvenance,
 } from '../../src/runner/deliberation/schema.mjs';
 
 const SESSION_ID = 'coord_session_001';
@@ -21,7 +22,7 @@ function baseContribution(overrides = {}) {
     operationRef: 'op-deliberate',
     type: 'proposal',
     assignmentId: 'asg_001',
-    runId: 'run_001',
+    runId: 'run_asg_001_01',
     artifactRef: 'artifact://proposal-1.md',
     revision: 'rev_abc123',
     roundKey: 'round-1',
@@ -225,12 +226,81 @@ test('rejects a contribution with an unknown field (no free-form body/status/rec
   );
 });
 
-test('rejects a contribution missing assignmentId/runId/artifactRef provenance', () => {
-  const contribution = baseContribution();
-  delete contribution.assignmentId;
+test('rejects a contribution missing any one of the assignmentId/runId/artifactRef provenance fields', () => {
+  for (const field of ['assignmentId', 'runId', 'artifactRef']) {
+    const contribution = baseContribution();
+    delete contribution[field];
+    assert.throws(
+      () => validateContributionShape(contribution),
+      (err) => err instanceof DeliberationError && new RegExp(`${field} must be a non-empty string`).test(err.message),
+      `expected a missing ${field} to be rejected`,
+    );
+  }
+});
+
+// --- runId bound to its own Assignment ----------------------------------------
+
+test('rejects a runId that does not have the shape of a Run of the claimed Assignment', () => {
+  for (const runId of ['not-even-a-runid-shape', 'run_asg_other_01', 'run_asg_001_../../../../tmp/evil-marker']) {
+    assert.throws(
+      () => validateContributionShape(baseContribution({ runId })),
+      (err) => err instanceof DeliberationError && err.category === 'foreign-provenance' && /does not match the expected shape/.test(err.message),
+      `expected runId "${runId}" to be rejected`,
+    );
+  }
+});
+
+// --- knownAssignments: provenance checked for reality, not just presence -------
+
+function knownAssignments(overrides = {}) {
+  return new Map([['asg_001', { sessionId: SESSION_ID, operationRef: 'op-deliberate', ...overrides }]]);
+}
+
+test('knownAssignments is optional -- omitting it leaves provenance presence-checked only', () => {
+  assert.doesNotThrow(() => validateAssignmentProvenance(baseContribution(), undefined, SESSION_ID));
+});
+
+test('validateContributionLineage accepts a contribution whose Assignment resolves, is in-session, and answered the claimed operation', () => {
+  const result = validateContributionLineage(baseContribution(), baseContext({ knownAssignments: knownAssignments() }));
+  assert.deepEqual(result, { ok: true, contributionId: 'contrib_001' });
+});
+
+test('validateContributionLineage rejects a fabricated Assignment once knownAssignments is supplied', () => {
+  const contribution = baseContribution({ assignmentId: 'asg_totally_made_up', runId: 'run_asg_totally_made_up_01' });
   assert.throws(
-    () => validateContributionShape(contribution),
-    (err) => err instanceof DeliberationError && /assignmentId must be a non-empty string/.test(err.message),
+    () => validateContributionLineage(contribution, baseContext({ knownAssignments: knownAssignments() })),
+    (err) => err instanceof DeliberationError && err.category === 'foreign-provenance' && /does not resolve to a known Assignment/.test(err.message),
+  );
+});
+
+test('validateContributionLineage rejects an Assignment belonging to a different coordination session', () => {
+  assert.throws(
+    () => validateContributionLineage(baseContribution(), baseContext({ knownAssignments: knownAssignments({ sessionId: 'coord_session_BRAVO' }) })),
+    (err) => err instanceof DeliberationError && err.category === 'foreign-session-ref' && /Assignment of a different session/.test(err.message),
+  );
+});
+
+test('validateContributionLineage rejects "right type, wrong operation" -- the Assignment answered another operation', () => {
+  assert.throws(
+    () => validateContributionLineage(baseContribution(), baseContext({ knownAssignments: knownAssignments({ operationRef: 'op-proposal-round' }) })),
+    (err) => err instanceof DeliberationError && err.category === 'foreign-provenance' && /answered operation "op-proposal-round", not the claimed "op-deliberate"/.test(err.message),
+  );
+});
+
+test('knownAssignments must be a Map when supplied', () => {
+  assert.throws(
+    () => validateContributionLineage(baseContribution(), baseContext({ knownAssignments: { asg_001: {} } })),
+    (err) => err instanceof DeliberationError && /knownAssignments must be a Map when provided/.test(err.message),
+  );
+});
+
+// --- allowedTypes may not be inherited ----------------------------------------
+
+test('an allowedTypes declaration reachable only through the prototype chain does not legalize a type', () => {
+  const declaredOperations = Object.create({ 'op-deliberate': { allowedTypes: ['proposal'] } });
+  assert.throws(
+    () => validateOperationDeclaresType('op-deliberate', 'proposal', declaredOperations),
+    (err) => err instanceof DeliberationError && err.category === 'operation-type-mismatch',
   );
 });
 

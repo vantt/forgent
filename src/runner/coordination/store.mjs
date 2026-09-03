@@ -1162,6 +1162,7 @@ export function recordAggregationValidation(
     missingActors,
     failedActors,
     artifactRevisionRefs,
+    unboundSourceOperationRefs,
   },
   opts = {},
 ) {
@@ -1179,6 +1180,7 @@ export function recordAggregationValidation(
     ...(unresolvedContributionRefs !== undefined ? { unresolvedContributionRefs } : {}),
     ...(missingActors !== undefined ? { missingActors } : {}),
     ...(failedActors !== undefined ? { failedActors } : {}),
+    ...(unboundSourceOperationRefs !== undefined ? { unboundSourceOperationRefs } : {}),
     ...(artifactRevisionRefs !== undefined ? { artifactRevisionRefs } : {}),
   };
   validateEventPayload('aggregation-validated', payload);

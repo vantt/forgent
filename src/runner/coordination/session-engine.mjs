@@ -1103,6 +1103,11 @@ function buildActorReplacementMap(events) {
  * concern out of this cell's scope; they contribute no branch either way,
  * and positive operation proof is still required for every branch that does.
  */
+/** Does any graph node pair `operationId` with a concrete actor? */
+function hasBoundActor(definition, operationId) {
+  return definition.spec.graph.nodes.some((node) => node.operations.some((ref) => ref.ref === operationId && ref.actor));
+}
+
 function declaredOperationBindingActors(definition, operationId) {
   const actorIds = [];
   for (const node of definition.spec.graph.nodes) {
@@ -3026,7 +3031,12 @@ function aggregationSourceFrom(fgosDir, sourceOperationRef, assignmentId, runId,
  * event.
  *
  * What is DERIVED from the session (never taken from the caller):
- * - which operations are sources -- `definition`'s own
+ * - the FlowDefinition itself -- loaded from `manifest.definitionRef`, with
+ *   the same version-drift refusal every other definition-consuming door
+ *   here already applies. A caller-supplied definition would let the caller
+ *   choose which operations count as sources and which bindings form each
+ *   cohort, which is the entire input the verdict is derived from;
+ * - which operations are sources -- the bound definition's own
  *   `completion.aggregation.sourceOperationRefs[]`;
  * - which Assignments answer them -- `resolveOperationOutcome`, the SAME
  *   stamp-verified derivation visibility windows use, so an Assignment that
@@ -3049,7 +3059,6 @@ function aggregationSourceFrom(fgosDir, sourceOperationRef, assignmentId, runId,
  *
  * @param {string} coordinationId
  * @param {object} params
- * @param {object} params.definition Loaded FlowDefinition declaring `completion.aggregation`.
  * @param {string} params.aggregationId
  * @param {{type: 'driver', id: string}} params.validatedBy
  * @param {string} [params.assignmentId] The aggregate's own output Assignment.
@@ -3060,12 +3069,28 @@ function aggregationSourceFrom(fgosDir, sourceOperationRef, assignmentId, runId,
  */
 export function validateSessionAggregation(
   coordinationId,
-  { definition, aggregationId, validatedBy, assignmentId, runId, outputArtifactRef, dissentRefs = [] },
+  { aggregationId, validatedBy, assignmentId, runId, outputArtifactRef, dissentRefs = [] },
   opts = {},
 ) {
   if (!isNonEmptyString(aggregationId)) {
     throw new CoordinationError('validation', 'validateSessionAggregation: aggregationId is required');
   }
+
+  const manifest = readManifest(coordinationId, opts);
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `validateSessionAggregation: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no declared aggregation to validate against`,
+    );
+  }
+  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `validateSessionAggregation: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to validate against a drifted definition`,
+    );
+  }
+
   const declaration = definition?.spec?.profile?.completion?.aggregation;
   if (!declaration) {
     throw new CoordinationError(
@@ -3091,8 +3116,21 @@ export function validateSessionAggregation(
   const unresolvedContributionRefs = [];
   const missingActors = [];
   const failedActors = [];
+  const unboundSourceOperationRefs = [];
 
   for (const sourceOperationRef of declaration.sourceOperationRefs) {
+    // A declared source operation that no node pairs with an actor has no
+    // cohort to resolve at all. `resolveOperationOutcome` would raise the
+    // binding resolver's own dispatch-shaped error here -- accurate, but it
+    // names neither this aggregation nor which declared source went
+    // unanswerable, and it leaves nothing on the ledger. Named, never
+    // dropped: the operation contributes no source (so the evaluator's
+    // coverage check still forces `no-consensus`) and the record says which
+    // one and why.
+    if (!hasBoundActor(definition, sourceOperationRef)) {
+      unboundSourceOperationRefs.push(sourceOperationRef);
+      continue;
+    }
     const outcome = resolveOperationOutcome(definition, sourceOperationRef, { events: replayed.events, fgosDir, replacedBy });
 
     // All-of over the operation's bindings, exactly the rule
@@ -3143,13 +3181,13 @@ export function validateSessionAggregation(
     }
   }
 
-  if (sourceResultRefs.length === 0) {
-    throw new CoordinationError(
-      'validation',
-      `validateSessionAggregation: no declared source operation of protocol "${definition.metadata.id}" resolved to a usable, revision-pinned result in session "${coordinationId}" -- refusing to validate an aggregation with no evidence behind it`,
-    );
-  }
-
+  // Zero surviving sources is a real verdict, not an error to raise at the
+  // driver. With a single declared source operation -- the likeliest protocol
+  // shape -- one missing or failed contributor wipes out every source, and
+  // throwing here would drop the very names this function just accumulated:
+  // the gap would exist with nothing on the ledger saying so. The evaluator's
+  // own coverage check turns an empty source set into `no-consensus`, and the
+  // event carries the named missing/failed/unbound reason with it.
   const classification = classifyAggregationOutcome({
     sourceOperationRefs: [...declaration.sourceOperationRefs],
     sources,
@@ -3173,6 +3211,7 @@ export function validateSessionAggregation(
       ...(unresolvedContributionRefs.length > 0 ? { unresolvedContributionRefs } : {}),
       ...(missingActors.length > 0 ? { missingActors } : {}),
       ...(failedActors.length > 0 ? { failedActors } : {}),
+      ...(unboundSourceOperationRefs.length > 0 ? { unboundSourceOperationRefs } : {}),
       ...(artifactRevisionRefs.length > 0 ? { artifactRevisionRefs } : {}),
     },
     opts,

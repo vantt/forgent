@@ -67,17 +67,14 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 |---|---|---|---|
 | 00 | Intake | R1-R4 (P00.1), file-ownership map (P00.2) | done |
 | 06 | MVP6 | P06.1 + P06.2 (4 fix rounds) + P06.3 all done | **done** |
-| 07 | MVP7 | P07.1 + P07.2-remainder done (full P07.2 scope now closed: outcome classification, hidden-dissent/stale-revision/malformed-disclosure/unresolved-dissent rejection); P07.3/P07.4 open | in-progress |
-| 08 | MVP8 | see phase-08 file | missing |
+| 07 | MVP7 | P07.1/P07.2 done; P07.3 done (session integration, 1 HIGH fixed); P07.4 (surface/regression proof, contract promotion) open | in-progress |
+| 08 | MVP8 | P08.1 done (contribution model/validation); P08.2/P08.3 open | in-progress |
 | 09 | MVP9 | see phase-09 file | missing |
 | 10 | External acceptance | see phase-10 file | missing |
 
 ## Active Cell
 
-Wave 3: P07.3 (FlowDefinition/session integration for aggregation) +
-P08.1 (contribution model/validation), each in its own isolated worktree
-(`step-09-mvp6-to-mvp9-p07.3`, `step-09-mvp6-to-mvp9-p08.1`, both branched
-from `487771aa`). See `current-cell.md`.
+None. Wave 3 (P07.3 + P08.1) closed — see "Wave 3 Status" below.
 
 **Process deviation, recorded honestly:** both P06.1 and P07.1 were
 dispatched as concurrent source-writers into the SAME shared worktree
@@ -96,12 +93,14 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Prepare and dispatch Wave 3: P07.3 (FlowDefinition and session integration
-for aggregation) + P08.1 (contribution model/validator, Team-Cognition-only
-paths), now genuinely ready — "P06 exit" (the full Phase 06, including
-P06.3) is satisfied. One integration owner for shared schema/session files
-per plan.md; P08.1 stays isolated in its own new paths. Continue using
-isolated per-cell worktrees for any concurrent non-read-only leaf cells.
+Prepare P07.4 (Surface And Regression Proof, closes Phase 07 — required
+for "P07 exit" before Wave 4/P08.2 can start per plan.md). P09.1
+(specialist-slot definition) "may prepare after P06 exit" per the map,
+which is already satisfied — may run in parallel with P07.4 in its own
+isolated worktree if their write scopes are confirmed disjoint (P09.1 is
+new FlowDefinition/`topology.specialistSlots[]` schema surface, closer to
+P06's `src/runner/definitions/schema.mjs` than P07's session files —
+re-confirm before dispatch). P08.2 stays blocked until P07.4 closes.
 
 ## Cell Log
 
@@ -111,9 +110,11 @@ isolated per-cell worktrees for any concurrent non-read-only leaf cells.
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
 | P06.1 | Phase 06 visibility definition schema/validation | done | `8d2fa7d8` |
 | P07.1 | Phase 07 Team Cognition evaluator skeleton (partial P07.2 slice) | done | `8d2fa7d8` |
+| P07.3 | Phase 07 FlowDefinition/session aggregation integration (1 HIGH fixed) | done | (pending commit) |
+| P08.1 | Phase 08 contribution model/validation | done | (pending commit) |
 | P06.2 | Phase 06 visibility runtime/grant enforcement/replay (4 fix rounds) | done | `0c80918c` |
 | P07.2 | Phase 07 aggregation outcome classification (remaining scope) | done | `0c80918c` |
-| P06.3 | Phase 06 proof and promotion (closes Phase 06) | done | (pending commit) |
+| P06.3 | Phase 06 proof and promotion (closes Phase 06) | done | `487771aa` |
 
 ## Phase 00 Status
 
@@ -367,3 +368,73 @@ test/runner/flow-definition-schema.test.mjs test/runner/flow-definition-protocol
 Next: Wave 3 — P07.3 (FlowDefinition/session integration for aggregation)
 + P08.1 (contribution model/validator), both genuinely ready now that "P06
 exit" is satisfied.
+
+## Wave 3 Status (P07.3 + P08.1)
+
+**CLOSED.** Isolated worktrees, sequential merge, combined-diff review.
+One process bug caught mid-wave: the Coordinator wrote both cells'
+detailed contracts into `current-cell.md` but did not commit before
+running `git worktree add`, so both isolated worktrees briefly had the
+stale pre-wave file (worktrees don't share uncommitted changes). Caught
+by P07.3's own Doer, fixed by copying the file in and having both Doers
+re-confirm; P08.1's Doer had already cross-checked against the fuller
+spec mid-task by coincidence. No rework needed either way — recorded here
+and in memory so future waves commit control docs before creating
+dependent worktrees.
+
+P08.1: clean on both independent first-pass rounds (Reviewer APPROVE,
+Red-Team's only P08.1 findings were 2 MEDIUM — fabricated/foreign
+Assignment provenance accepted, and "right type, wrong operation"
+(operationRef unbound to what the Assignment actually did) — both fixed
+in one round via an optional `knownAssignments` context channel plus a
+standalone `runId` shape assertion).
+
+P07.3: the hardest cell since P06.2. Both independent first-pass rounds
+converged on the SAME root defect from different angles — Reviewer's own
+prose said "what is unproven is that [the manifest-bound definition] was
+used at all"; Red-Team built the live PoC proving it wasn't:
+`validateSessionAggregation` took `definition` as a caller-supplied
+parameter instead of resolving it from the session's own
+`manifest.definitionRef`, letting a caller hand the mediated door a
+definition whose cohort excludes a tampered contributor — closing a
+session `completed` on a `consensus` its real bound protocol would have
+refused. Single fix round: resolve `definition` internally, mirroring 4
+sibling functions' existing precedent exactly. Final recheck confirmed
+the fix against the exact PoC plus 6 additional variant attacks, and
+independently confirmed both of the Fixer's own self-disclosed caveats
+(a Reviewer finding's stated mechanism didn't reproduce as described —
+throws, not vacuous pass — correctly re-diagnosed; a "sourceResultRefs
+never empty" invariant was deliberately narrowed to "empty only on a
+gap-naming no-consensus," verified still safe on both write and replay
+paths). One new residual surfaced by the final recheck itself: the
+definition is pinned by id+version, never content — but confirmed
+pre-existing across all 4 sibling functions (precedent parity, not a
+regression), same capability class as the already-disclosed raw-store-
+door residual, documented in P07.3.md's Gaps for P07.4's contract text.
+
+Also fixed in the same round: 2 LOW-MEDIUM P07.3 completeness gaps
+(single-source aggregation silently throwing instead of naming a gap;
+schema/evaluator disagreement on empty `requiredDisclosures[]`), 2 LOW
+P08.1/P07.3 schema dedup gaps, and test-hygiene cleanup.
+
+Both cells' terminal-transition-authority and mailbox-avoidance invariants
+verified independently by both rounds, at both rounds' own initiative
+(these were explicitly named as "distrust this, don't take it on faith"
+review priorities) — all held.
+
+Focused command, final: `test/runner/coordination-session-engine.test.mjs
+test/runner/coordination-replay.test.mjs test/runner/coordination-schema.test.mjs
+test/runner/flow-definition*.test.mjs test/runner/team-cognition*.test.mjs
+test/runner/coordination-aggregation.test.mjs test/runner/deliberation-schema.test.mjs
+test/runner/deliberation-static.test.mjs` — **281/281 pass** (was 267
+pre-fix-round). Broader coordination sweep: 551/552 (1 fail = the
+documented `coordination-static.test.mjs` worktree-path false-fail,
+independently reconfirmed clean from the main checkout).
+
+**This closes Wave 3.** Phase 07 remains in-progress (P07.4 open); Phase
+08 remains in-progress (P08.2/P08.3 open).
+
+Next: P07.4 (Surface And Regression Proof, closes Phase 07 — required for
+"P07 exit" before Wave 4/P08.2). P09.1 may prepare in parallel per
+plan.md ("P06 exit" already satisfied) if write scopes are confirmed
+disjoint.

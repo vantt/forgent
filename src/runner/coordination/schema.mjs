@@ -357,6 +357,7 @@ const EVENT_SPECS = {
       'missingActors',
       'failedActors',
       'artifactRevisionRefs',
+      'unboundSourceOperationRefs',
     ],
   },
   'session-failed': { required: ['reason'], accepted: ['reason'] },
@@ -398,7 +399,18 @@ export const AGGREGATION_OUTCOME_VALUES = Object.freeze(['consensus', 'qualified
 // existing kind at all (`missingActors` in particular is REQUIRED and
 // non-empty on `session-partial`, but merely optional here).
 const AGGREGATION_OPTIONAL_STRING_FIELDS = new Set(['assignmentId', 'runId', 'outputArtifactRef']);
-const AGGREGATION_OPTIONAL_ARRAY_FIELDS = new Set(['dissentRefs', 'unresolvedContributionRefs', 'missingActors', 'artifactRevisionRefs']);
+const AGGREGATION_OPTIONAL_ARRAY_FIELDS = new Set([
+  'dissentRefs',
+  'unresolvedContributionRefs',
+  'missingActors',
+  'artifactRevisionRefs',
+  // A declared source operation with no graph binding at all: nobody was ever
+  // wired to answer it, so there is no actor to name in missingActors and no
+  // Assignment to name in unresolvedContributionRefs. It gets its own field
+  // rather than falling through unexplained -- the operation still failed the
+  // evaluator's coverage check, and the event has to say which one and why.
+  'unboundSourceOperationRefs',
+]);
 
 const AUTHORIZED_BY_FIELDS = new Set(['type', 'id']);
 const CONTEXT_GRANT_FIELDS = new Set(['refs']);
@@ -461,11 +473,12 @@ export function validateEventPayload(type, payload) {
       continue;
     }
     if (field === 'sourceResultRefs') {
-      // NON-empty, unlike `grantedContextRefs`/`evidenceRefs` below: an
-      // aggregation validated against zero source results is an aggregate
+      // Shape only here. Emptiness is legal in exactly one case, enforced in
+      // the `aggregation-validated` block below: a `no-consensus` that names
+      // the gap it found. Anything else with zero sources is an aggregate
       // asserting itself with no evidence behind it.
-      if (!isStringArray(value) || value.length === 0) {
-        fail('validation', `event "${type}" payload.sourceResultRefs must be a non-empty array of non-empty strings`);
+      if (!isStringArray(value)) {
+        fail('validation', `event "${type}" payload.sourceResultRefs must be an array of non-empty strings`);
       }
       continue;
     }
@@ -541,6 +554,24 @@ export function validateEventPayload(type, payload) {
     for (const field of AGGREGATION_OPTIONAL_ARRAY_FIELDS) {
       if (body[field] !== undefined && !isStringArray(body[field])) {
         fail('validation', `event "aggregation-validated" payload.${field} must be an array of non-empty strings when provided`);
+      }
+    }
+    // Zero source results is honest ONLY as a `no-consensus` that names why
+    // no source survived. A cohort where every contributor is missing or
+    // failed still has to leave a record saying so -- "named, never dropped"
+    // must not degrade into "nothing was written at all" just because the
+    // protocol declared a single source operation. Any other outcome, or a
+    // `no-consensus` naming no gap, remains evidence-free truth and is
+    // refused, on both the write path and the replay read path.
+    if (body.sourceResultRefs.length === 0) {
+      const named = ['missingActors', 'failedActors', 'unresolvedContributionRefs', 'unboundSourceOperationRefs'].some(
+        (field) => (body[field] ?? []).length > 0,
+      );
+      if (body.outcome !== 'no-consensus' || !named) {
+        fail(
+          'validation',
+          `event "aggregation-validated" payload.sourceResultRefs is empty -- only a "no-consensus" outcome naming missingActors, failedActors, unresolvedContributionRefs, or unboundSourceOperationRefs may be validated against zero source results`,
+        );
       }
     }
     // Self-validated aggregate truth, structural form: the Assignment that

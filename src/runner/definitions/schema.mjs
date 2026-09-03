@@ -377,12 +377,23 @@ function validateAggregationDeclaration(aggregation, label) {
   if (aggregation.sourceOperationRefs.length === 0) {
     fail(`${label}.sourceOperationRefs must name at least one source operation -- an aggregation with no declared sources is self-validated truth`);
   }
+  if (new Set(aggregation.sourceOperationRefs).size !== aggregation.sourceOperationRefs.length) {
+    fail(`${label}.sourceOperationRefs carries a duplicate entry -- each declared source operation may appear at most once`);
+  }
   if (aggregation.sourceOperationRefs.includes(aggregation.outputOperationRef)) {
     fail(
       `${label}.outputOperationRef "${aggregation.outputOperationRef}" also appears in ${label}.sourceOperationRefs -- an aggregation may not cite its own output operation as one of its own sources`,
     );
   }
   assertStringArray(aggregation.requiredDisclosures, `${label}.requiredDisclosures`);
+  // Non-empty for the same reason as `sourceOperationRefs` above, and so the
+  // two layers agree: the evaluator this declaration is consumed by refuses an
+  // empty list outright, so accepting one here would only defer an authoring
+  // mistake to session runtime, surfacing as an error type from another
+  // boundary rather than a definition-validation failure.
+  if (aggregation.requiredDisclosures.length === 0) {
+    fail(`${label}.requiredDisclosures must name at least one disclosure -- an aggregation requiring no disclosure preserves no evidence`);
+  }
 
   return Object.freeze({
     method: aggregation.method,
