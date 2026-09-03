@@ -412,6 +412,15 @@ test('accepts a well-formed CoordinationProtocol visibilityWindows[] definition 
   assert.ok(Object.isFrozen(result.spec.profile.topology.visibilityWindows[0]));
 });
 
+test('rejects contextAccess declared on a reusable spec.operations[] template -- contextAccess is binding-scoped only', () => {
+  const def = withVisibilityWindow();
+  def.spec.operations[0].contextAccess = { visibilityWindowRef: 'window-1' };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/operations\[0\] has unknown field "contextAccess"/),
+  );
+});
+
 test('rejects an unknown contextAccess.visibilityWindowRef', () => {
   const def = withVisibilityWindow();
   def.spec.graph.nodes[0].operations[0].contextAccess = { visibilityWindowRef: 'no-such-window' };

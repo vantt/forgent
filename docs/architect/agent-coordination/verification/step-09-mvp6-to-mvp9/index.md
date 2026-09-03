@@ -66,7 +66,7 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | Phase | MVP | Requirements | Status |
 |---|---|---|---|
 | 00 | Intake | R1-R4 (P00.1), file-ownership map (P00.2) | done |
-| 06 | MVP6 | P06.1 done; P06.2 done (4 fix rounds — see Wave 2 Status); P06.3 (proof/promotion) open | in-progress |
+| 06 | MVP6 | P06.1 + P06.2 (4 fix rounds) + P06.3 all done | **done** |
 | 07 | MVP7 | P07.1 + P07.2-remainder done (full P07.2 scope now closed: outcome classification, hidden-dissent/stale-revision/malformed-disclosure/unresolved-dissent rejection); P07.3/P07.4 open | in-progress |
 | 08 | MVP8 | see phase-08 file | missing |
 | 09 | MVP9 | see phase-09 file | missing |
@@ -74,7 +74,8 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 
 ## Active Cell
 
-None. Wave 2 (P06.2 + P07.2-remainder) closed — see "Wave 2 Status" above.
+None. P06.3 closed — Phase 06 (MVP6) is now fully done. See "P06.3 /
+Phase 06 Status" below.
 
 **Process deviation, recorded honestly:** both P06.1 and P07.1 were
 dispatched as concurrent source-writers into the SAME shared worktree
@@ -93,11 +94,12 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Re-confirm Wave 3 sequencing against plan.md's Parallel Execution Map
-(P07.3 + P08.1 look ready; P06.3 also unblocked by P06.2's exit but may
-belong in a later wave per the map's own ordering), then prepare and
-dispatch. Continue using isolated per-cell worktrees for any concurrent
-non-read-only leaf cells.
+Prepare and dispatch Wave 3: P07.3 (FlowDefinition and session integration
+for aggregation) + P08.1 (contribution model/validator, Team-Cognition-only
+paths), now genuinely ready — "P06 exit" (the full Phase 06, including
+P06.3) is satisfied. One integration owner for shared schema/session files
+per plan.md; P08.1 stays isolated in its own new paths. Continue using
+isolated per-cell worktrees for any concurrent non-read-only leaf cells.
 
 ## Cell Log
 
@@ -107,8 +109,9 @@ non-read-only leaf cells.
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
 | P06.1 | Phase 06 visibility definition schema/validation | done | `8d2fa7d8` |
 | P07.1 | Phase 07 Team Cognition evaluator skeleton (partial P07.2 slice) | done | `8d2fa7d8` |
-| P06.2 | Phase 06 visibility runtime/grant enforcement/replay (4 fix rounds) | done | (pending Wave 2 commit) |
-| P07.2 | Phase 07 aggregation outcome classification (remaining scope) | done | (pending Wave 2 commit) |
+| P06.2 | Phase 06 visibility runtime/grant enforcement/replay (4 fix rounds) | done | `0c80918c` |
+| P07.2 | Phase 07 aggregation outcome classification (remaining scope) | done | `0c80918c` |
+| P06.3 | Phase 06 proof and promotion (closes Phase 06) | done | (pending commit) |
 
 ## Phase 00 Status
 
@@ -300,3 +303,65 @@ Team-Cognition-only paths). P06.3 (visibility proof and promotion) is
 also now unblocked (P06.2 exit) but plan.md places it in a later wave
 alongside P08.2/P09.1 — Coordinator to re-confirm exact wave sequencing
 against the Parallel Execution Map before dispatch.
+
+## P06.3 / Phase 06 Status
+
+**CLOSED. Phase 06 (MVP6) is done.**
+
+P06.3 proved the visibility-window mechanism (P06.1 schema + P06.2's
+final stamp-only enforcement, 4 fix rounds) against a real, committed
+opt-in fixture — `core/coordination-protocols/independent-research-fan-out-fan-in-gated.yaml`,
+the existing fan-out cohort protocol plus a `post-independent-pass` window
+gating a driver-authorized synthesis step — and promoted contract text
+into `docs/architect/agent-coordination/contracts/flow-definition.md`.
+
+All 9 named Tests-First scenarios present and non-vacuous: positive
+opt-in, pre-window, unlisted source, foreign session, missing/failed
+source, unknown window, Workflow profile, terminal authorization,
+crash/resume. Independently corroborated (not just claimed) that the new
+fixture-level tests would have failed against the pre-Round-3
+actor-id-only engine — both reviewers traced specific tests through the
+old code by hand and confirmed real failures, not assumed ones. No source
+file touched throughout (`git diff --stat -- src/` empty at every stage).
+
+Two independent first-pass rounds (Reviewer, Red-Team) found 0 HIGH, 11
+distinct findings between them with zero overlap — all closable inside
+docs+tests. The most substantial: Red-Team found a genuine bypass of the
+real fixture's window via a raw `recordActorReplacement` store-door call
+(collapsing two cohort branches onto one effective actor via an
+unaccepted lineage claim) — judged as a third instance of the SAME
+already-accepted unmediated-store-door trust boundary this feature's
+threat model settled on across P06.2's 4 fix rounds (not reachable through
+any mediated door), so named explicitly as a residual rather than
+reopening `session-engine.mjs`. A single Fixer pass closed all 9 items:
+named the degenerate empty-`operationRefs[]` case (permanently-open
+window) with a new negative test, recorded two decisions P06.2 had handed
+to P06.3, added a missing negative test and fixed a missing negation in
+promoted text, corrected an over-absolute "sole door" claim to "sole
+*mediated* door", added the third residual, tightened a loose test
+assertion, and added a CHANGELOG entry. A final independent recheck
+confirmed all 9 resolved and caught one more over-broad umbrella sentence
+(claiming all three residuals need raw store-door access, when one is
+reachable through ordinary mediated dispatch) — fixed directly by the
+Coordinator as a trivial one-sentence, docs-only, zero-code-or-test-change
+correction.
+
+**Full-suite note:** the complete sweep intermittently shows a SECOND
+failure beyond the known `fgos-intake-4.test.mjs:318` baseline —
+`test/runner/dispatch.test.mjs:3079` (`spawnWorker: idleTimeoutMs`),
+confirmed by two independent reviewers as a load-induced flake (354/354
+passing in isolation every time it was checked), consistent with this
+track's and its predecessor's own already-documented flake pattern for
+this exact test. Final full-suite count, most recent run: 5310 tests,
+5302 pass, 1 fail (known baseline only — flake did not reproduce that
+run), 7 skipped.
+
+Focused command, final: `test/runner/coordination-visibility-window-fixture.test.mjs
+test/runner/flow-definition-schema.test.mjs test/runner/flow-definition-protocol-loader.test.mjs`
+— **74/74 pass**.
+
+**This closes Phase 06 (MVP6) entirely.**
+
+Next: Wave 3 — P07.3 (FlowDefinition/session integration for aggregation)
++ P08.1 (contribution model/validator), both genuinely ready now that "P06
+exit" is satisfied.

@@ -1,0 +1,131 @@
+# core/coordination-protocols/independent-research-fan-out-fan-in-gated.yaml --
+# Phase 06 (MVP6) opt-in fixture: the SAME independent research
+# fan-out/fan-in protocol as its ungated sibling
+# (independent-research-fan-out-fan-in.yaml), plus a visibility window
+# gating synthesis on the whole research cohort settling. This is the
+# paradigm case the visibility-window feature targets: "private first pass,
+# then a post-independent-pass synthesis" -- each researcher's own context
+# stays isolated (contextVisibility: isolated-until-fan-in) while the
+# window is shut, and only once EVERY branch of `independent-research` has
+# a qualifying linked result may `synthesize-findings` be authorized any
+# context at all.
+#
+# A SEPARATE file rather than an edit to the ungated fixture, deliberately:
+# the window gate only applies to a `driver-authorized` binding (see the
+# limitation named in docs/architect/agent-coordination/contracts/
+# flow-definition.md), so proving it needs `synthesize-findings` to become
+# driver-authorized -- which would change the ungated fixture's own
+# already-tested dispatch path (`synthesizeResearchFanIn`, the CLI suite's
+# real fan-out run). Opt-in means opt-in: a definition that declares no
+# `visibilityWindows` is untouched, and so is every consumer of the
+# ungated fixture.
+#
+# Everything below except `spec.profile.topology.visibilityWindows`, the
+# `activation`/`contextAccess` on the `synthesize-findings` binding, and
+# `metadata.id` is byte-identical in meaning to the ungated fixture --
+# including the two P04.2 fixes recorded there (no `cohort.count`, no
+# `capabilities:` on any operation, `lightweight` minTier on
+# `independent-research`), which apply here for exactly the same reasons.
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.independent-research-fan-out-fan-in-gated
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: isolated-until-fan-in
+      edges:
+        - from: coordinator-actor
+          to: researcher-a
+          intents: [research]
+          maxRounds: 1
+        - from: coordinator-actor
+          to: researcher-b
+          intents: [research]
+          maxRounds: 1
+      visibilityWindows:
+        # Opens only once BOTH graph bindings of `independent-research`
+        # (researcher-a and researcher-b, one cohort at one node) have a
+        # qualifying linked result -- a partial cohort never opens it.
+        # `dispatch-research` is deliberately NOT listed: an operation
+        # outside `opensAfter.operationRefs[]` cannot satisfy this window,
+        # however legitimately it completed.
+        - id: post-independent-pass
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [independent-research]
+          permits:
+            sourceOperationRefs: [independent-research]
+            delivery: artifact-refs
+    cohort:
+      distinctProviderFamilies: 2
+      requiredRoles: [researcher]
+      independence: isolated-until-fan-in
+
+  roles:
+    - coordinator
+    - researcher
+
+  actors:
+    - id: coordinator-actor
+      role: coordinator
+    - id: researcher-a
+      role: researcher
+    - id: researcher-b
+      role: researcher
+
+  operations:
+    - id: dispatch-research
+      role: coordinator
+      task:
+        contractTemplate: research-fanout-dispatch
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: independent-research
+      role: researcher
+      policy:
+        minTier: lightweight
+      task:
+        contractTemplate: independent-research-brief
+      result:
+        kind: advisory
+        evidenceRequired: verified
+    - id: synthesize-findings
+      role: coordinator
+      task:
+        contractTemplate: research-synthesis
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+  graph:
+    entry: phase-fan-out
+    nodes:
+      - id: phase-fan-out
+        operations:
+          - ref: dispatch-research
+            actor: coordinator-actor
+        transitions: [phase-research]
+      - id: phase-research
+        operations:
+          - ref: independent-research
+            actor: researcher-a
+          - ref: independent-research
+            actor: researcher-b
+        transitions: [phase-fan-in]
+      - id: phase-fan-in
+        operations:
+          - ref: synthesize-findings
+            actor: coordinator-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-independent-pass
+        transitions: []
