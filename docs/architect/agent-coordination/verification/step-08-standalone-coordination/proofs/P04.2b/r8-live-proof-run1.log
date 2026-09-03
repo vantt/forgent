@@ -1,0 +1,166 @@
+=== P04.2b R8 live-proof re-run: real .fgos/config.json, real subprocess dispatch, no fakes ===
+
+--- Registered provider families (read live from the real config) ---
+  claude: providerModel=(claude, default)
+  claude-reviewer: providerModel=(claude, default)
+  agy-cli: providerModel=gemini
+  agy-herdr: providerModel=gemini
+  codex-cli: providerModel=(claude, default)
+  codex-pi: providerModel=openai-codex
+  glm-cli: providerModel=z-ai
+  claude-herdr: providerModel=(claude, default)
+  pi-herdr: providerModel=openai-codex
+  codex-herdr: providerModel=(claude, default)
+modelPolicies: {
+  "claude": {
+    "lightweight": "haiku",
+    "standard": "sonnet",
+    "creative": "sonnet",
+    "analytical": "sonnet",
+    "critical": "opus"
+  },
+  "gemini": {
+    "lightweight": "gemini-3.6-flash-medium"
+  },
+  "openai-codex": {
+    "lightweight": "gpt-5.5"
+  },
+  "z-ai": {
+    "lightweight": "z-ai/glm-5.2"
+  }
+}
+
+--- git status --porcelain -- src test domains core docs (BEFORE) ---
+ M docs/architect/agent-coordination/proposals/README.md
+ M docs/architect/agent-coordination/roadmap/README.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md
+ M docs/architect/agent-coordination/vision.md
+ M docs/architect/component-boundary/README.md
+ M src/runner/coordination/session-engine.mjs
+ M src/runner/dispatch/assignment.mjs
+ M src/runner/dispatch/execution-contract.mjs
+ M test/runner/assignment-policy.test.mjs
+ M test/runner/assignment-provenance.test.mjs
+ M test/runner/execution-contract.test.mjs
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/
+?? docs/architect/component-boundary/node-to-rust-component-migration.md
+?? docs/architect/component-boundary/tmp/
+
+Workspace (isolated, no git repo, no secrets written): /tmp/fgos-r8b-live-proof-Lqrnkz
+
+=== Step 0: re-run P04.2's own direct-pin reproduction (agy-cli/gemini, minTier "lightweight") -- was RunnerConfigError before this fix, must now SUCCEED ===
+fgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn provider=claude model=sonnet tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=agy-cli via=cli-spawn provider=gemini model=gemini-3.6-flash-medium tier=lightweight
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+Step 0 SUCCEEDED (as predicted by the fix):
+  runResult.status: failed  confidence: failed
+  policy.provenance.executor.value: agy-cli
+  policy.provenance.provider.value: gemini
+  policy.provenance.tier.value: lightweight
+  policy.provenance.tier.source: {"scope":"opPolicy"}
+
+=== Step 1: full live fan-out/fan-in proof through dispatchResearchFanOut (planCohort's own diversity-seeking allocation, real subprocess dispatch) ===
+Session opened. actors bound before any Assignment: [ 'coordinator-actor', 'researcher-a', 'researcher-b' ]
+fgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn provider=claude model=sonnet tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+Coordinator dispatch-research settled: done reported (family: claude)
+fgos: dispatch capability=(none declared) executor=agy-cli via=cli-spawn provider=gemini model=gemini-3.6-flash-medium tier=lightweight
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+
+fan-out status: dispatched
+
+--- Allocation explanation (planCohort output) ---
+  actor "coordinator-actor" (role "coordinator") allocated to executor "claude" (provider "claude", tier "standard") -- chosen from 3 eligible candidate(s) in stable order; provider family "claude" not yet used by this cohort
+  actor "researcher-a" (role "researcher") allocated to executor "agy-cli" (provider "gemini", tier "lightweight") -- chosen from 7 eligible candidate(s) in stable order; provider family "gemini" not yet used by this cohort
+  actor "researcher-b" (role "researcher") allocated to executor "codex-pi" (provider "openai-codex", tier "lightweight") -- chosen from 6 eligible candidate(s) in stable order; provider family "openai-codex" not yet used by this cohort
+diversity: {"required":2,"achieved":3,"satisfied":true,"degraded":false,"fallbackRuleApplied":null}
+
+--- Concurrency overlap ---
+Both branches launched via ONE Promise.allSettled batch; total wall time for the batch: 8183ms.
+
+--- Branch outcomes (resolved provenance, real dispatch) ---
+  researcher-a: dispatch=fulfilled, runResult.status=failed, confidence=failed, executor=agy-cli, provider=gemini, tier=lightweight
+    agentClaim.summary: Settled
+  researcher-b: dispatch=fulfilled, runResult.status=failed, confidence=failed, executor=codex-pi, provider=openai-codex, tier=lightweight
+    agentClaim.summary: dispatch for cwd "/tmp/fgos-r8b-live-proof-Lqrnkz" is already in flight (held for 0s).
+
+Coordinator family: claude; researcher families reached: []
+Distinct real provider families across coordinator + researcher branches: 1
+
+--- Branch isolation (contextRefs) ---
+  researcher-a: contextRefs = ["asgn_r8b_proof_driver_op_003"]
+  researcher-b: contextRefs = ["asgn_r8b_proof_driver_op_003"]
+
+--- Fan-in synthesis ---
+status: synthesized
+accepted: []
+unverified: []
+failed: [
+  {
+    "actorId": "researcher-a",
+    "assignmentId": "asgn_r8b_proof_driver_op_004",
+    "runId": "run_asgn_r8b_proof_driver_op_004_01",
+    "status": "failed",
+    "confidence": "failed"
+  },
+  {
+    "actorId": "researcher-b",
+    "assignmentId": "asgn_r8b_proof_driver_op_005",
+    "runId": "run_asgn_r8b_proof_driver_op_005_01",
+    "status": "failed",
+    "confidence": "failed"
+  }
+]
+missing: []
+contradictions: []
+explanation: No branch produced verified evidence under an explicit partial policy (0 missing, 2 failed) -- synthesis has no accepted material findings.
+
+--- Final session membership (one-way ref ledger) ---
+assignmentRefs: [
+  'asgn_r8b_proof_driver_op_003',
+  'asgn_r8b_proof_driver_op_004',
+  'asgn_r8b_proof_driver_op_005'
+]
+event count: 10 types: [
+  'session-opened',
+  'actor-bound',
+  'actor-bound',
+  'actor-bound',
+  'assignment-created',
+  'result-linked',
+  'assignment-created',
+  'assignment-created',
+  'result-linked',
+  'result-linked'
+]
+
+--- Secret check: scanning persisted assignment.json/result.json for any env credential value ---
+secretFound: false (expected: false)
+
+--- git status --porcelain -- src test domains core docs (AFTER) ---
+ M docs/architect/agent-coordination/proposals/README.md
+ M docs/architect/agent-coordination/roadmap/README.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md
+ M docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md
+ M docs/architect/agent-coordination/vision.md
+ M docs/architect/component-boundary/README.md
+ M src/runner/coordination/session-engine.mjs
+ M src/runner/dispatch/assignment.mjs
+ M src/runner/dispatch/execution-contract.mjs
+ M test/runner/assignment-policy.test.mjs
+ M test/runner/assignment-provenance.test.mjs
+ M test/runner/execution-contract.test.mjs
+?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/
+?? docs/architect/component-boundary/node-to-rust-component-migration.md
+?? docs/architect/component-boundary/tmp/
+
+
+=== P04.2b R8 LIVE PROOF SUMMARY ===
+Step 0 (direct pin to a second real provider family at "lightweight"): SUCCEEDED
+Workspace (for independent inspection): /tmp/fgos-r8b-live-proof-Lqrnkz

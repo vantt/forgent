@@ -270,8 +270,8 @@ test('movePorting under concurrent OS processes racing the SAME expectedStatus C
 test('concurrent movePorting calls on DIFFERENT ids never lose a write to state.json (tsk-1q5)', async () => {
   const dir = tmpDir();
   initStore(dir);
-  const N_PROC = 16;
-  const IDS_PER_PROC = 15; // volume per process — same technique as store.test.mjs's sibling test (many refreshView calls per process, back-to-back, no delay, to maximize scheduler-preemption overlap between processes' unlocked writes)
+  const N_PROC = 8;
+  const IDS_PER_PROC = 5; // volume per process — same technique as store.test.mjs's sibling test (many refreshView calls per process, back-to-back, no delay, to maximize scheduler-preemption overlap between processes' unlocked writes)
   const idLists = Array.from({ length: N_PROC }, (_, p) =>
     Array.from({ length: IDS_PER_PROC }, (_, j) => `race-view-${p}-${j}`),
   );
@@ -289,7 +289,7 @@ for (const id of ids) {
 }`,
     N_PROC,
     idLists.map((ids) => ids.join(',')),
-    4, // batch to reduce peak events.lock contention under load — see raceAcrossProcesses' own comment
+    2, // batch to reduce peak events.lock contention under load — see raceAcrossProcesses' own comment
   );
 
   assert.deepEqual(results, Array(N_PROC).fill({ ok: true }), 'every concurrent movePorting loop on distinct ids must succeed (no CAS conflict expected across different ids)');

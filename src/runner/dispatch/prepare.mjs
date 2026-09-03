@@ -152,7 +152,8 @@ export function prepareDispatch(unit, opts = {}) {
   if (!unit || typeof unit !== 'object' || Array.isArray(unit)) {
     throw new RunnerConfigError('prepareDispatch requires a "unit" object (the work item, or ad-hoc task, this dispatch is for).');
   }
-  if (typeof unit.id !== 'string' || !unit.id.trim()) {
+  const id = unit.id || unit.assignmentId;
+  if (typeof id !== 'string' || !id.trim()) {
     throw new RunnerConfigError('prepareDispatch requires "unit.id" (a non-empty string) — the dispatch target must be addressable.');
   }
   return { unit, opts };

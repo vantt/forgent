@@ -103,14 +103,14 @@ const waitMs = startAt - Date.now();
 if (waitMs > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs);
 
 let claimed = false;
-for (let attempt = 0; attempt < 100; attempt += 1) {
+for (let attempt = 0; attempt < 300; attempt += 1) {
   try {
     claimWork(fgosDir, { id: itemId, actor: 'session', isolate: false, repoRoot });
     claimed = true;
     break;
   } catch (err) {
-    if (err?.code === 'lock-held' || err?.category === 'lock-timeout') {
-      await new Promise((r) => setTimeout(r, 20));
+    if (err?.code === 'lock-held' || err?.category === 'lock-timeout' || err?.category === 'lock-held' || err?.message?.includes('lock')) {
+      await new Promise((r) => setTimeout(r, 20 + Math.floor(Math.random() * 30)));
       continue;
     }
     console.error(err);

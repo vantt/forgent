@@ -53,6 +53,23 @@ export {
   fanoutBatchExecutorCli,
 } from './dispatch/cli.mjs';
 
+export {
+  createAssignmentId,
+  buildAssignment,
+  renderAssignmentPrompt,
+} from './dispatch/assignment.mjs';
+
+export {
+  resolveAssignmentDispatchPolicy,
+  resolveStrongerTier,
+  TIER_STRENGTH,
+} from './dispatch/assignment-policy.mjs';
+
+export {
+  executeAssignment,
+  classifyRunEvidence,
+} from './dispatch/assignment-runner.mjs';
+
 import { runDispatchCli } from './dispatch/cli.mjs';
 
 // CLI entry point — only runs when this file is executed directly (`node

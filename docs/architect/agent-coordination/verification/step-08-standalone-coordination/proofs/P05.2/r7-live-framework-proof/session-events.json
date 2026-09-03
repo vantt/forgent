@@ -1,0 +1,336 @@
+[
+  {
+    "seq": 1,
+    "ts": "2026-09-02T01:30:09.964Z",
+    "type": "session-opened",
+    "payload": {
+      "coordinationId": "coord_mtjf5l0q_jq9y72",
+      "provenanceRoot": {
+        "writerId": "p05.2-r7-proof-driver"
+      }
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "938c403e86218f7f"
+  },
+  {
+    "seq": 2,
+    "ts": "2026-09-02T01:30:09.964Z",
+    "type": "actor-bound",
+    "payload": {
+      "actorId": "facilitator-actor",
+      "role": "facilitator",
+      "persona": "group-cognition-facilitator"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "55b9601034d0cc20"
+  },
+  {
+    "seq": 3,
+    "ts": "2026-09-02T01:30:09.964Z",
+    "type": "actor-bound",
+    "payload": {
+      "actorId": "explorer-a",
+      "role": "explorer",
+      "persona": "lateral-thinker"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "fe3db3aeb2d7f3e6"
+  },
+  {
+    "seq": 4,
+    "ts": "2026-09-02T01:30:09.964Z",
+    "type": "actor-bound",
+    "payload": {
+      "actorId": "explorer-b",
+      "role": "explorer",
+      "persona": "domain-specialist"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "830531aef93800a7"
+  },
+  {
+    "seq": 5,
+    "ts": "2026-09-02T01:30:09.964Z",
+    "type": "actor-bound",
+    "payload": {
+      "actorId": "explorer-c",
+      "role": "explorer",
+      "persona": "contrarian"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "a753692af6e46e5c"
+  },
+  {
+    "seq": 6,
+    "ts": "2026-09-02T01:30:09.964Z",
+    "type": "actor-bound",
+    "payload": {
+      "actorId": "clusterer-actor",
+      "role": "clusterer",
+      "persona": "taxonomist"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "0e95c1b29528b9cb"
+  },
+  {
+    "seq": 7,
+    "ts": "2026-09-02T01:30:09.964Z",
+    "type": "actor-bound",
+    "payload": {
+      "actorId": "critic-actor",
+      "role": "critic",
+      "persona": "red-team-critic"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "b105e5329b499fb8"
+  },
+  {
+    "seq": 8,
+    "ts": "2026-09-02T01:30:09.964Z",
+    "type": "actor-bound",
+    "payload": {
+      "actorId": "evidence-reviewer-actor",
+      "role": "evidence-reviewer",
+      "persona": "evidence-auditor"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "3d8b9d591ee6832d"
+  },
+  {
+    "seq": 9,
+    "ts": "2026-09-02T01:30:09.964Z",
+    "type": "actor-bound",
+    "payload": {
+      "actorId": "synthesizer-actor",
+      "role": "synthesizer",
+      "persona": "neutral-synthesizer"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "4115b4a47e61fabc"
+  },
+  {
+    "seq": 10,
+    "ts": "2026-09-02T01:30:09.973Z",
+    "type": "assignment-created",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_001",
+      "actorId": "facilitator-actor"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "811e3e6662c54fa4"
+  },
+  {
+    "seq": 11,
+    "ts": "2026-09-02T01:30:23.095Z",
+    "type": "result-linked",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_001",
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_001_01"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "69948a7adb135bf5"
+  },
+  {
+    "seq": 12,
+    "ts": "2026-09-02T01:30:23.111Z",
+    "type": "assignment-created",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_002",
+      "actorId": "explorer-a"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "74796faf3248c025"
+  },
+  {
+    "seq": 13,
+    "ts": "2026-09-02T01:30:23.135Z",
+    "type": "assignment-created",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_003",
+      "actorId": "explorer-b"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "adc3f0857e4e4046"
+  },
+  {
+    "seq": 14,
+    "ts": "2026-09-02T01:30:23.154Z",
+    "type": "assignment-created",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_004",
+      "actorId": "explorer-c"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "51627fd236ea59d7"
+  },
+  {
+    "seq": 15,
+    "ts": "2026-09-02T01:30:23.170Z",
+    "type": "result-linked",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_003",
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_003_01"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "58f82c9a057390a1"
+  },
+  {
+    "seq": 16,
+    "ts": "2026-09-02T01:30:23.170Z",
+    "type": "result-linked",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_004",
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_004_01"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "4546af9e1d6cd4a3"
+  },
+  {
+    "seq": 17,
+    "ts": "2026-09-02T01:32:25.327Z",
+    "type": "result-linked",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_002",
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_002_01"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "d7d07ca254165d81"
+  },
+  {
+    "seq": 18,
+    "ts": "2026-09-02T01:32:25.339Z",
+    "type": "assignment-created",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_005",
+      "actorId": "clusterer-actor"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "25db001d55bea7c9"
+  },
+  {
+    "seq": 19,
+    "ts": "2026-09-02T01:32:35.358Z",
+    "type": "result-linked",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_005",
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_005_01"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "a02a158896ddc22b"
+  },
+  {
+    "seq": 20,
+    "ts": "2026-09-02T01:32:35.364Z",
+    "type": "assignment-created",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_006",
+      "actorId": "critic-actor"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "a3990051284ccead"
+  },
+  {
+    "seq": 21,
+    "ts": "2026-09-02T01:35:00.865Z",
+    "type": "result-linked",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_006",
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_006_01"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "b98664d57bf24b0e"
+  },
+  {
+    "seq": 22,
+    "ts": "2026-09-02T01:35:00.870Z",
+    "type": "assignment-created",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_007",
+      "actorId": "evidence-reviewer-actor"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "5b361203120af417"
+  },
+  {
+    "seq": 23,
+    "ts": "2026-09-02T01:38:27.104Z",
+    "type": "result-linked",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_007",
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_007_01"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "fabe239696e43806"
+  },
+  {
+    "seq": 24,
+    "ts": "2026-09-02T01:38:27.113Z",
+    "type": "assignment-created",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_008",
+      "actorId": "synthesizer-actor"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "84ae9b4826297b3e"
+  },
+  {
+    "seq": 25,
+    "ts": "2026-09-02T01:38:37.818Z",
+    "type": "result-linked",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_008",
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_008_01"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "a46d460f92a2b634"
+  },
+  {
+    "seq": 26,
+    "ts": "2026-09-02T01:38:37.824Z",
+    "type": "assignment-created",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_009",
+      "actorId": "synthesizer-actor"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "73e92fd7f8e547f0"
+  },
+  {
+    "seq": 27,
+    "ts": "2026-09-02T01:38:46.595Z",
+    "type": "result-linked",
+    "payload": {
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_009",
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_009_01"
+    },
+    "v": 3,
+    "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+    "h": "83e22a7b0a435db5"
+  }
+]

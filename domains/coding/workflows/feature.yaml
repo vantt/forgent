@@ -4,19 +4,117 @@ stages:
   - name: discovery
     skill: fgos-coding-discovering
     taskSpec: judge-ambiguity
+    operations:
+      - id: judge-ambiguity
+        primary: true
+        taskSpec: judge-ambiguity
+        role: implementer
+        skills:
+          - fgos-coding-discovering
+      - id: resolve-question
+        taskSpec: resolve-question
+        role: researcher
+        reason: consult
+        skills:
+          - fgos-researching
   - name: exploring
     skill: fgos-coding-exploring
     taskSpec: lock-decisions
+    operations:
+      - id: lock-decisions
+        primary: true
+        taskSpec: lock-decisions
+        role: implementer
+        skills:
+          - fgos-coding-exploring
+      - id: answer-question
+        taskSpec: answer-question
+        role: advisor
+        reason: advise
+        dispatch: human-only
+        skills:
+          - fgos-coding-exploring
+      - id: resolve-question
+        taskSpec: resolve-question
+        role: researcher
+        reason: consult
+        skills:
+          - fgos-researching
   - name: decompose
     skill: fgos-coding-planning
   - name: planning
     step: Divide
     skill: fgos-coding-planning
     taskSpec: shape-plan
+    operations:
+      - id: shape-plan
+        primary: true
+        taskSpec: shape-plan
+        role: implementer
+        skills:
+          - fgos-coding-planning
+      - id: validate-plan
+        taskSpec: validate-plan
+        role: reviewer
+        reason: review
+        skills:
+          - fgos-coding-validating
+        policy:
+          minTier: standard
+          preferPersona: code-reviewer
+          preferExecutor: claude
+      - id: scout-blast-radius
+        taskSpec: scout-blast-radius
+        role: researcher
+        reason: consult
+        skills:
+          - fgos-researching
+      - id: resolve-question
+        taskSpec: resolve-question
+        role: researcher
+        reason: consult
+        skills:
+          - fgos-researching
   - name: executing
     step: Execute
     skill: fgos-coding-implement
     taskSpec: implement-item
+    operations:
+      - id: implement-item
+        primary: true
+        taskSpec: implement-item
+        role: implementer
+        skills:
+          - fgos-coding-implement
+      - id: review-item
+        taskSpec: review-item
+        role: reviewer
+        reason: review
+        skills:
+          - fgos-coding-validating
+      - id: fix-verify-red
+        taskSpec: fix-verify-red
+        role: implementer
+        skills:
+          - fgos-coding-implement
+      - id: scoped-subtask
+        taskSpec: scoped-subtask
+        role: helper
+        reason: assist
+        skills:
+          - fgos-coding-implement
+      - id: scout-blast-radius
+        taskSpec: scout-blast-radius
+        role: researcher
+        reason: consult
+        skills:
+          - fgos-researching
+      - id: resolve-question
+        taskSpec: resolve-question
+        role: researcher
+        reason: consult
+        skills:
+          - fgos-researching
 
 transitions:
   - from: clarify

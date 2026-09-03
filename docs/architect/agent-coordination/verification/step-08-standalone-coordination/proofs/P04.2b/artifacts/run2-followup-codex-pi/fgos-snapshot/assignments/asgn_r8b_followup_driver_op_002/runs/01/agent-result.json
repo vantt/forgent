@@ -1,0 +1,4 @@
+{
+  "status": "success",
+  "summary": "Python generators produce values lazily as they are iterated, whereas lists store all of their elements in memory at once. This can be verified by comparing sys.getsizeof((i for i in range(1000000))) with sys.getsizeof(list(range(1000000)))."
+}

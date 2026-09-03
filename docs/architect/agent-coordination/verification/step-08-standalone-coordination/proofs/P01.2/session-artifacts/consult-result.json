@@ -1,0 +1,108 @@
+{
+  "runId": "run_asgn_p01_2_live_proof_coordinator_op_003_01",
+  "assignmentId": "asgn_p01_2_live_proof_coordinator_op_003",
+  "workId": null,
+  "executorId": "codex-cli",
+  "policy": {
+    "role": "reviewer",
+    "persona": "code-reviewer",
+    "executorPreference": [
+      "codex-cli"
+    ],
+    "executorId": "codex-cli",
+    "providerModel": "codex",
+    "tier": "standard",
+    "model": "gpt-5.5",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "codex-cli",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "codex",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "codex-cli"
+        }
+      },
+      "model": {
+        "value": "gpt-5.5",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "value": "code-reviewer",
+        "source": {
+          "scope": "default",
+          "id": "reviewer"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_p01_2_live_proof_coordinator_op_003"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "codex"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "claimSha256": "464eba58b3ec3d67a3c2a34a49edb9ca87a51153c7ded58bb6520259bfdd0cab",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_p01_2_live_proof_coordinator_op_003/runs/01/agent-report.md",
+      "sha256": "302207303c38715e95939864c861a99ea38507a4b61288a97e85ea1f5eaed00f"
+    }
+  ],
+  "status": "done",
+  "confidence": "reported",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_p01_2_live_proof_coordinator_op_003/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_p01_2_live_proof_coordinator_op_003/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "done",
+    "summary": "Confirmed root package.json name/version string: forgent@0.1.0."
+  },
+  "evidence": {
+    "gitBefore": "626e057b181510558e69064570c1cc4ed9794bd9",
+    "gitAfter": "626e057b181510558e69064570c1cc4ed9794bd9",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_p01_2_live_proof_coordinator_op_003/runs/01/agent-report.md",
+      ".fgos/assignments/asgn_p01_2_live_proof_coordinator_op_003/runs/01/agent-result.json"
+    ],
+    "tests": []
+  }
+}

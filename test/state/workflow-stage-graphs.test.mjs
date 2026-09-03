@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus, effectiveStage, classificationVocabulary, resolveTaskSpecPath, bundleForStage } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus, effectiveStage, classificationVocabulary, resolveTaskSpecPath, bundleForStage, operationsForStage } from '../../src/state/workflow-stage-graphs.mjs';
 import { rebuildView } from '../../src/state/replay.mjs';
 import { RISK_DISCOUNTS } from '../../src/state/priority-formula.mjs';
 
@@ -461,4 +461,114 @@ test('workflow-derived fields take precedence over registryData top-level keys i
   assert.strictEqual(codingDomain.transitions, activeWf.transitions);
   assert.strictEqual(codingDomain.skillMap, activeWf.skillMap);
   assert.strictEqual(codingDomain.taskSpecMap, activeWf.taskSpecMap);
+  assert.strictEqual(codingDomain.operationMap, activeWf.operationMap);
 });
+
+// --- workflow stage operations (Step 02 / D19) ---
+
+test('DOMAINS.coding.operationMap is deeply frozen', () => {
+  assert.ok(Object.isFrozen(DOMAINS.coding.operationMap));
+  for (const [stage, ops] of Object.entries(DOMAINS.coding.operationMap)) {
+    assert.ok(Object.isFrozen(ops), `operation list for stage "${stage}" must be frozen`);
+    for (const op of ops) {
+      assert.ok(Object.isFrozen(op), `operation "${op.id}" in stage "${stage}" must be frozen`);
+      if (op.skills) assert.ok(Object.isFrozen(op.skills));
+      if (op.policy) assert.ok(Object.isFrozen(op.policy));
+      if (op.policy?.fallbackExecutors) assert.ok(Object.isFrozen(op.policy.fallbackExecutors));
+    }
+  }
+});
+
+test('operationsForStage resolves explicit operations for planning stage', () => {
+  const ops = operationsForStage('coding', 'planning');
+  assert.equal(Array.isArray(ops), true);
+  assert.equal(ops.length, 4);
+  assert.deepEqual(ops.map((o) => o.id), ['shape-plan', 'validate-plan', 'scout-blast-radius', 'resolve-question']);
+
+  const primaryOp = ops.find((o) => o.primary);
+  assert.ok(primaryOp);
+  assert.equal(primaryOp.id, 'shape-plan');
+  assert.equal(primaryOp.taskSpec, 'shape-plan');
+  assert.equal(primaryOp.role, 'implementer');
+  assert.deepEqual(primaryOp.skills, ['fgos-coding-planning']);
+
+  const validateOp = ops.find((o) => o.id === 'validate-plan');
+  assert.ok(validateOp);
+  assert.equal(validateOp.role, 'reviewer');
+  assert.equal(validateOp.reason, 'review');
+  assert.deepEqual(validateOp.skills, ['fgos-coding-validating']);
+  assert.deepEqual(validateOp.policy, {
+    minTier: 'standard',
+    preferPersona: 'code-reviewer',
+    preferExecutor: 'claude',
+  });
+});
+
+test('operationsForStage resolves explicit operations for discovery, exploring, and executing stages', () => {
+  const discoveryOps = operationsForStage('coding', 'discovery');
+  assert.deepEqual(discoveryOps.map((o) => o.id), ['judge-ambiguity', 'resolve-question']);
+  assert.equal(discoveryOps[0].primary, true);
+
+  const exploringOps = operationsForStage('coding', 'exploring');
+  assert.deepEqual(exploringOps.map((o) => o.id), ['lock-decisions', 'answer-question', 'resolve-question']);
+  assert.equal(exploringOps[0].primary, true);
+  const answerOp = exploringOps.find((o) => o.id === 'answer-question');
+  assert.equal(answerOp.dispatch, 'human-only');
+  assert.equal(answerOp.role, 'advisor');
+  assert.equal(answerOp.reason, 'advise');
+
+  const executingOps = operationsForStage('coding', 'executing');
+  assert.deepEqual(executingOps.map((o) => o.id), [
+    'implement-item',
+    'review-item',
+    'fix-verify-red',
+    'scoped-subtask',
+    'scout-blast-radius',
+    'resolve-question',
+  ]);
+  assert.equal(executingOps[0].primary, true);
+});
+
+test('operationsForStage synthesizes primary operation when stage has no explicit operations (decompose)', () => {
+  const ops = operationsForStage('coding', 'decompose');
+  assert.equal(ops.length, 1);
+  assert.deepEqual(ops[0], {
+    id: 'decompose',
+    primary: true,
+    taskSpec: 'decompose',
+    role: 'implementer',
+    skills: ['fgos-coding-planning'],
+  });
+  assert.ok(Object.isFrozen(ops));
+  assert.ok(Object.isFrozen(ops[0]));
+});
+
+test('operationsForStage returns empty array when stage has no skill and no taskSpec (synthetic domain)', () => {
+  const ops = operationsForStage('synthetic', 'assembling');
+  assert.deepEqual(ops, []);
+  assert.ok(Object.isFrozen(ops));
+});
+
+test('operationsForStage returns empty array for nonexistent stage or undefined input and never throws', () => {
+  assert.deepEqual(operationsForStage('coding', 'nonexistent-stage'), []);
+  assert.deepEqual(operationsForStage('coding', ''), []);
+  assert.deepEqual(operationsForStage(undefined, 'planning').map((o) => o.id), [
+    'shape-plan',
+    'validate-plan',
+    'scout-blast-radius',
+    'resolve-question',
+  ]);
+  assert.deepEqual(operationsForStage(DOMAINS.coding, 'planning').map((o) => o.id), [
+    'shape-plan',
+    'validate-plan',
+    'scout-blast-radius',
+    'resolve-question',
+  ]);
+  assert.deepEqual(operationsForStage('coding', 'planning', { kind: 'feature' }).map((o) => o.id), [
+    'shape-plan',
+    'validate-plan',
+    'scout-blast-radius',
+    'resolve-question',
+  ]);
+});
+

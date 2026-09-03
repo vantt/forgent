@@ -1181,7 +1181,7 @@ test('resolvePlan logs a decisionsById entry on a caller-supplied decompose verd
 // Track A approve record exists.
 
 function mkPlanFixture(storeDir, planContent) {
-  const repoRoot = path.dirname(storeDir);
+  const repoRoot = path.basename(storeDir) === '.fgos' ? path.dirname(storeDir) : storeDir;
   const featureDir = fs.mkdtempSync(path.join(repoRoot, 'fgos-plan-'));
   fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), '# CONTEXT\n\nD1: locked.\n');
   fs.writeFileSync(path.join(featureDir, 'plan.md'), planContent);
@@ -1189,7 +1189,7 @@ function mkPlanFixture(storeDir, planContent) {
 }
 
 function mkContextFixture(storeDir, contextContent) {
-  const repoRoot = path.dirname(storeDir);
+  const repoRoot = path.basename(storeDir) === '.fgos' ? path.dirname(storeDir) : storeDir;
   const featureDir = fs.mkdtempSync(path.join(repoRoot, 'fgos-ctx-'));
   fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), contextContent);
   return { docsRef: path.basename(featureDir), featureDir };
@@ -1589,9 +1589,9 @@ test('resolvePlan caller-supplied decompose verdict: an uncovered locked-decisio
   const storeDir = tmpStoreDir();
   const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
   const fixtureRelPath = `${docsRef}.mjs`;
-  fs.writeFileSync(path.join(path.dirname(storeDir), fixtureRelPath), '// fixture\n');
+  fs.writeFileSync(path.join(storeDir, fixtureRelPath), '// fixture\n');
   fs.writeFileSync(
-    path.join(path.dirname(storeDir), docsRef, 'CONTEXT.md'),
+    path.join(storeDir, docsRef, 'CONTEXT.md'),
     `## Locked decisions\n\nD1: canonical output lives at \`${fixtureRelPath}\`.\n`,
   );
   addWork(storeDir, sampleWork({ docsRef }));
@@ -1619,9 +1619,9 @@ test('resolvePlan caller-supplied decompose verdict: a child footprint that cove
   const storeDir = tmpStoreDir();
   const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
   const fixtureRelPath = `${docsRef}.mjs`;
-  fs.writeFileSync(path.join(path.dirname(storeDir), fixtureRelPath), '// fixture\n');
+  fs.writeFileSync(path.join(storeDir, fixtureRelPath), '// fixture\n');
   fs.writeFileSync(
-    path.join(path.dirname(storeDir), docsRef, 'CONTEXT.md'),
+    path.join(storeDir, docsRef, 'CONTEXT.md'),
     `## Locked decisions\n\nD1: canonical output lives at \`${fixtureRelPath}\`.\n`,
   );
   addWork(storeDir, sampleWork({ docsRef }));

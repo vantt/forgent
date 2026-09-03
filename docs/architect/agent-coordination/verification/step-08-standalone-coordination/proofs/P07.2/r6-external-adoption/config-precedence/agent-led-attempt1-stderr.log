@@ -1,0 +1,1 @@
+fgos: dispatch capability=(none declared) executor=claude via=cli-spawn provider=claude model=sonnet tier=standard

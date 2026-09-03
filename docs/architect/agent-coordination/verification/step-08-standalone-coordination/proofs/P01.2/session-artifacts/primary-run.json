@@ -1,0 +1,11 @@
+{
+  "runId": "run_asgn_p01_2_live_proof_coordinator_op_002_01",
+  "assignmentId": "asgn_p01_2_live_proof_coordinator_op_002",
+  "attempt": 1,
+  "executorId": "codex-cli",
+  "dispatchPlanPath": ".fgos/assignments/asgn_p01_2_live_proof_coordinator_op_002/runs/01/dispatch-plan.json",
+  "cwd": "/home/vantt/projects/forgentX",
+  "startedAt": "2026-09-01T15:23:49.218Z",
+  "timeoutMs": 180000,
+  "status": "running"
+}

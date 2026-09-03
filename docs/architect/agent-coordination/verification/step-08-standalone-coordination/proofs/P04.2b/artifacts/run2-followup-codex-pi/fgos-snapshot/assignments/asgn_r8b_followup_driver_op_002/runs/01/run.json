@@ -1,0 +1,11 @@
+{
+  "runId": "run_asgn_r8b_followup_driver_op_002_01",
+  "assignmentId": "asgn_r8b_followup_driver_op_002",
+  "attempt": 1,
+  "executorId": "codex-pi",
+  "dispatchPlanPath": ".fgos/assignments/asgn_r8b_followup_driver_op_002/runs/01/dispatch-plan.json",
+  "cwd": "/tmp/fgos-r8b-followup-2zLvat",
+  "startedAt": "2026-09-01T21:55:16.663Z",
+  "timeoutMs": 150000,
+  "status": "running"
+}

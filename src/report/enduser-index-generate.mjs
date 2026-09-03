@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES } from './enduser-index.mjs';
+import { parseFrontmatter } from './frontmatter.mjs';
 import { listWork } from '../state/store.mjs';
 
 // Scans one on-disk dir for `.md` files and pushes each as a docEntry
@@ -39,11 +40,51 @@ function scanDirAsQuadrant(repoRoot, quadrantDir, quadrant, docEntries) {
   }
 }
 
+// Scans docs/knowledge subdirectories for `.md` files and pushes
+// each as a docEntry tagged with `quadrant` determined from the file's own
+// frontmatter `mode` field (mapping singular `tutorial` -> `tutorials`).
+// Missing directories or invalid mode fields are skipped cleanly (ENOENT),
+// never a crash.
+function scanKnowledgeDirsAsQuadrant(repoRoot, docEntries) {
+  const knowledgeDir = path.join(repoRoot, 'docs', 'knowledge');
+  let purposeEntries;
+  try {
+    purposeEntries = fs.readdirSync(knowledgeDir, { withFileTypes: true });
+  } catch (err) {
+    if (err.code === 'ENOENT') return;
+    throw err;
+  }
+  for (const purposeEntry of purposeEntries) {
+    if (!purposeEntry.isDirectory()) continue;
+    const purposeDir = path.join(knowledgeDir, purposeEntry.name);
+    let files;
+    try {
+      files = fs.readdirSync(purposeDir, { withFileTypes: true });
+    } catch (err) {
+      if (err.code === 'ENOENT') continue;
+      throw err;
+    }
+    for (const file of files) {
+      if (!file.isFile() || !file.name.endsWith('.md')) continue;
+      const absPath = path.join(purposeDir, file.name);
+      const content = fs.readFileSync(absPath, 'utf8');
+      const { meta } = parseFrontmatter(content);
+      let quadrant = meta.mode;
+      if (quadrant === 'tutorial') quadrant = 'tutorials';
+      if (typeof quadrant !== 'string' || !QUADRANTS.includes(quadrant)) continue;
+
+      const docPath = path.relative(repoRoot, absPath).split(path.sep).join('/');
+      const h1 = content.match(/^#\s+(.+)$/m);
+      docEntries.push({ quadrant, docPath, title: h1 ? h1[1].trim() : null });
+    }
+  }
+}
+
 /**
  * Enumerate every real end-user doc on disk under `repoRoot`, across every
- * Diataxis quadrant plus its declared aliases (R10). Deterministically
- * sorted (quadrant, then docPath) so repeated runs over unchanged docs
- * produce byte-identical output.
+ * Diataxis quadrant plus its declared aliases (R10) and docs/knowledge/ subdirs.
+ * Deterministically sorted (quadrant, then docPath) so repeated runs over
+ * unchanged docs produce byte-identical output.
  */
 export function enumerateDocEntries(repoRoot) {
   const docEntries = [];
@@ -53,6 +94,7 @@ export function enumerateDocEntries(repoRoot) {
       scanDirAsQuadrant(repoRoot, path.join(repoRoot, 'docs', alias), quadrant, docEntries);
     }
   }
+  scanKnowledgeDirsAsQuadrant(repoRoot, docEntries);
   docEntries.sort((a, b) => (a.quadrant === b.quadrant ? (a.docPath < b.docPath ? -1 : 1) : (a.quadrant < b.quadrant ? -1 : 1)));
   return docEntries;
 }

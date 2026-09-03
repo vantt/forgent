@@ -34,6 +34,7 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { checkAgyPermissionsConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
+import { MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
@@ -66,6 +67,10 @@ import { resolveDocPath } from '../report/knowledge-resolver.mjs';
 import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
 import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.mjs';
 import { parseFrontmatter } from '../report/frontmatter.mjs';
+import { discoverCoordinationProtocols, loadCoordinationProtocol } from '../runner/definitions/protocol-loader.mjs';
+import { projectWorkflowToFlowDefinition } from '../runner/definitions/workflow-adapter.mjs';
+import { FlowDefinitionError } from '../runner/definitions/schema.mjs';
+import { validateCoordinationRequest } from '../verbs/coordination/schema.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -413,11 +418,27 @@ function checkTaskSpecsResolve(cwd) {
   const missing = [];
   for (const [domainName, domain] of Object.entries(DOMAINS)) {
     const taskSpecMap = domain.taskSpecMap;
-    if (!taskSpecMap) continue;
-    for (const [stage, specId] of Object.entries(taskSpecMap)) {
-      const specPath = resolveTaskSpecPath(domainName, specId, cwd);
-      if (!fs.existsSync(specPath)) {
-        missing.push(`${domainName}.taskSpecMap.${stage} -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
+    if (taskSpecMap) {
+      for (const [stage, specId] of Object.entries(taskSpecMap)) {
+        const specPath = resolveTaskSpecPath(domainName, specId, cwd);
+        if (!fs.existsSync(specPath)) {
+          missing.push(`${domainName}.taskSpecMap.${stage} -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
+        }
+      }
+    }
+    const workflows = domain.workflows ? Object.values(domain.workflows) : [domain];
+    for (const wf of workflows) {
+      if (!wf?.operationMap) continue;
+      for (const [stage, ops] of Object.entries(wf.operationMap)) {
+        if (!Array.isArray(ops)) continue;
+        for (const op of ops) {
+          if (op.taskSpec) {
+            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
+            if (!fs.existsSync(specPath)) {
+              missing.push(`${domainName}.operations.${stage}[${op.id || op.taskSpec}] -> "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
+            }
+          }
+        }
       }
     }
   }
@@ -439,7 +460,7 @@ function checkTaskSpecsResolve(cwd) {
   if (missing.length > 0) {
     return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };
   }
-  return { passed: true, message: 'every domain\'s taskSpecMap entry resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };
+  return { passed: true, message: 'every domain\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };
 }
 
 function allTaskSpecs(cwd) {
@@ -646,6 +667,231 @@ function checkAgentClaimsResolve(cwd) {
     return { passed: false, message: problems.join('; ') };
   }
   return { passed: true, message: 'every task-spec\'s requires-skill/agent eligibility declaration resolves to real agent skills' };
+}
+
+/**
+ * Validates stage operations across domain workflows (Step 02 / D19).
+ *
+ * @param {string} [cwd] Working directory
+ * @param {object} [domains] Domain registry map (defaults to DOMAINS)
+ * @returns {string[]} List of problem descriptions, empty if all valid.
+ */
+export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains = DOMAINS) {
+  const problems = [];
+
+  const agentFiles = allAgentYamlFiles(cwd);
+  const agentSkillsMap = new Map();
+  for (const file of agentFiles) {
+    try {
+      const text = fs.readFileSync(file.filePath, 'utf8');
+      const nameMatch = text.match(/^name:\s*(\S+)/m);
+      const name = nameMatch ? nameMatch[1] : file.fileName.replace(/\.yaml$|\.yml$/, '');
+      const skills = extractSkillsFromYamlText(text);
+      agentSkillsMap.set(name, new Set(skills));
+    } catch {
+      continue;
+    }
+  }
+  const allProvidedSkills = new Set();
+  for (const skillsSet of agentSkillsMap.values()) {
+    for (const s of skillsSet) allProvidedSkills.add(s);
+  }
+
+  const sharedConfig = readSharedConfig(cwd);
+  const knownExecutors = new Set([
+    ...Object.keys(sharedConfig?.runner?.executors || {}),
+    ...Object.keys(DEFAULT_RUNNER_CONFIG?.executors || {}),
+    'claude',
+    'agy-cli',
+    'agy-herdr',
+    'codex',
+    'pi',
+    'glm',
+    'claude-herdr',
+    'pi-herdr',
+    'codex-herdr',
+    'gitnexus',
+    'herdr',
+  ]);
+
+  for (const [domainName, domain] of Object.entries(domains)) {
+    if (!domain) continue;
+
+    const workflows = domain.workflows
+      ? Object.entries(domain.workflows)
+      : [['default', domain]];
+
+    for (const [wfName, wf] of workflows) {
+      if (!wf) continue;
+
+      if (Array.isArray(wf.stages)) {
+        for (const item of wf.stages) {
+          if (item && typeof item === 'object' && item.name && item.operations !== undefined) {
+            if (!Array.isArray(item.operations)) {
+              problems.push(`${domainName}.${wfName}.${item.name}.operations: must be an array of operation objects`);
+            }
+          }
+        }
+      }
+
+      const operationMap = wf.operationMap;
+      if (operationMap === undefined || operationMap === null) continue;
+      if (typeof operationMap !== 'object' || Array.isArray(operationMap)) {
+        problems.push(`${domainName}.${wfName}.operationMap: must be an object`);
+        continue;
+      }
+
+      for (const [stage, ops] of Object.entries(operationMap)) {
+        if (!Array.isArray(ops)) {
+          const msg = `${domainName}.${wfName}.${stage}.operations: must be an array of operation objects`;
+          if (!problems.includes(msg)) {
+            problems.push(msg);
+          }
+          continue;
+        }
+
+        let primaryCount = 0;
+        let primaryOp = null;
+        const seenOpIds = new Set();
+
+        for (const op of ops) {
+          if (!op || typeof op !== 'object' || Array.isArray(op)) {
+            problems.push(`${domainName}.${wfName}.${stage}: operation item must be a non-null object`);
+            continue;
+          }
+
+          const opLabel = op.id || '?';
+
+          if (!op.id || typeof op.id !== 'string' || op.id.trim() === '') {
+            problems.push(`${domainName}.${wfName}.${stage}: operation id must be a non-empty string`);
+          } else if (seenOpIds.has(op.id)) {
+            problems.push(`${domainName}.${wfName}.${stage}: duplicate operation id "${op.id}"`);
+          } else {
+            seenOpIds.add(op.id);
+          }
+
+          if (!op.taskSpec || typeof op.taskSpec !== 'string' || op.taskSpec.trim() === '') {
+            problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec must be a non-empty string`);
+          } else {
+            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
+            if (!fs.existsSync(specPath)) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
+            }
+          }
+
+          if (domain.roleGraph && Array.isArray(domain.roleGraph.roles)) {
+            if (!op.role || typeof op.role !== 'string' || op.role.trim() === '') {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> role must be a non-empty string in roleGraph.roles [${domain.roleGraph.roles.join(', ')}]`);
+            } else if (!domain.roleGraph.roles.includes(op.role)) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> role "${op.role}" not in roleGraph.roles [${domain.roleGraph.roles.join(', ')}]`);
+            }
+          } else if (op.role !== undefined && (typeof op.role !== 'string' || op.role.trim() === '')) {
+            problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> role must be a non-empty string`);
+          }
+
+          if (!Array.isArray(op.skills) || op.skills.some((s) => typeof s !== 'string')) {
+            problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skills must be an array of strings`);
+          } else if (op.skills.length === 0) {
+            problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skills must be a non-empty array of skill names`);
+          } else {
+            for (const skill of op.skills) {
+              if (typeof skill !== 'string' || skill.trim() === '') {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skill name must be a non-empty string`);
+              } else if (agentSkillsMap.size > 0 && !allProvidedSkills.has(skill)) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> skill "${skill}" not provided by any registered agent-type`);
+              }
+            }
+          }
+
+          if (op.reason && domain.roleGraph?.edges) {
+            const stageEdges = domain.roleGraph.edges[stage];
+            if (!Array.isArray(stageEdges) || stageEdges.length === 0) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> reason "${op.reason}" has no declared edges for stage "${stage}" in roleGraph`);
+            } else {
+              const matchingEdge = stageEdges.find((e) => e.reason === op.reason && (!op.role || e.to === op.role));
+              if (!matchingEdge) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> reason "${op.reason}" (target role "${op.role}") does not match any legal roleGraph edge at stage "${stage}"`);
+              }
+            }
+          }
+
+          if (op.dispatch !== undefined) {
+            if (!['assignment', 'human-only'].includes(op.dispatch)) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> invalid dispatch mode "${op.dispatch}" (allowed: assignment, human-only)`);
+            }
+            if (op.dispatch === 'human-only') {
+              if (op.policy && (op.policy.preferExecutor || (Array.isArray(op.policy.fallbackExecutors) && op.policy.fallbackExecutors.length > 0))) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> dispatch: human-only operation must not declare executor policy (preferExecutor/fallbackExecutors)`);
+              }
+            }
+          }
+
+          if (op.primary) {
+            primaryCount++;
+            primaryOp = op;
+          }
+
+          if (op.policy !== undefined) {
+            if (typeof op.policy !== 'object' || op.policy === null || Array.isArray(op.policy)) {
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy must be an object`);
+            } else {
+              const ALLOWED_POLICY_KEYS = new Set(['minTier', 'preferPersona', 'preferExecutor', 'fallbackExecutors', 'visibility']);
+              const disallowedKeys = Object.keys(op.policy).filter((k) => !ALLOWED_POLICY_KEYS.has(k));
+              if (disallowedKeys.length > 0) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy contains disallowed key(s) [${disallowedKeys.join(', ')}] (allowed: ${[...ALLOWED_POLICY_KEYS].join(', ')})`);
+              }
+              if (op.policy.minTier && !MODEL_POLICY_TIERS.includes(op.policy.minTier)) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.minTier "${op.policy.minTier}" not in recognized tiers [${MODEL_POLICY_TIERS.join(', ')}]`);
+              }
+              if (op.policy.preferPersona) {
+                if (typeof op.policy.preferPersona !== 'string' || (agentSkillsMap.size > 0 && !agentSkillsMap.has(op.policy.preferPersona))) {
+                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.preferPersona "${op.policy.preferPersona}" not a recognized agent-type`);
+                }
+              }
+              if (op.policy.preferExecutor) {
+                if (typeof op.policy.preferExecutor !== 'string' || (knownExecutors.size > 0 && !knownExecutors.has(op.policy.preferExecutor))) {
+                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.preferExecutor "${op.policy.preferExecutor}" is not a recognized executor`);
+                }
+              }
+              if (op.policy.fallbackExecutors !== undefined) {
+                if (!Array.isArray(op.policy.fallbackExecutors) || op.policy.fallbackExecutors.some((e) => typeof e !== 'string')) {
+                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.fallbackExecutors must be an array of strings`);
+                } else {
+                  for (const fb of op.policy.fallbackExecutors) {
+                    if (knownExecutors.size > 0 && !knownExecutors.has(fb)) {
+                      problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.fallbackExecutors contains unrecognized executor "${fb}"`);
+                    }
+                  }
+                }
+              }
+              if (op.policy.visibility !== undefined) {
+                if (!['headless', 'visible'].includes(op.policy.visibility)) {
+                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.visibility "${op.policy.visibility}" must be "headless" or "visible"`);
+                }
+              }
+            }
+          }
+        }
+
+        if (primaryCount > 1) {
+          problems.push(`${domainName}.${wfName}.${stage}: has ${primaryCount} operations marked primary: true (at most one allowed)`);
+        }
+
+        const stageSkill = wf.skillMap?.[stage] ?? domain.skillMap?.[stage];
+        const stageTaskSpec = wf.taskSpecMap?.[stage] ?? domain.taskSpecMap?.[stage];
+        if (primaryOp) {
+          if (stageTaskSpec && primaryOp.taskSpec && primaryOp.taskSpec !== stageTaskSpec) {
+            problems.push(`${domainName}.${wfName}.${stage}: primary operation taskSpec "${primaryOp.taskSpec}" contradicts stage taskSpec "${stageTaskSpec}"`);
+          }
+          if (stageSkill && Array.isArray(primaryOp.skills) && primaryOp.skills.length > 0 && !primaryOp.skills.includes(stageSkill)) {
+            problems.push(`${domainName}.${wfName}.${stage}: primary operation skills [${primaryOp.skills.join(', ')}] does not include stage skill "${stageSkill}"`);
+          }
+        }
+      }
+    }
+  }
+
+  return problems;
 }
 
 function checkAgentTypeNamesUnique(cwd) {
@@ -1062,6 +1308,26 @@ registerCheck({
   id: 'domain-workflow-skillmap-coverage',
   description: "every stage name across all of a domain's registered workflows resolves to a real skillMap entry, explicit null allowed (tsk-ogx)",
   check: () => checkDomainWorkflowSkillMapCoverage(),
+});
+
+export function checkDomainWorkflowOperationsCoverage(cwd) {
+  const problems = findWorkflowStageOperationProblems(cwd);
+  if (problems.length === 0) {
+    return {
+      passed: true,
+      message: "every stage operation across domain workflows resolves to valid task-specs, roles, skills, and legal roleGraph edges",
+    };
+  }
+  return {
+    passed: false,
+    message: `${problems.length} workflow stage operation problem(s): ${problems.join('; ')}`,
+  };
+}
+
+registerCheck({
+  id: 'domain-workflow-operations-coverage',
+  description: "every stage operation across domain workflows resolves to valid task-specs, roles, skills, and legal roleGraph edges (tsk-team-dispatch-slice-1)",
+  check: (cwd) => checkDomainWorkflowOperationsCoverage(cwd),
 });
 
 registerCheck({
@@ -2852,5 +3118,179 @@ registerCheck({
 registerFix({
   id: 'no-stuck-merge-abort',
   fix: (cwd) => fixNoStuckMergeAbort(cwd),
+});
+
+// Phase 02 R8 (docs/architect/agent-coordination/contracts/flow-definition.md,
+// ADR-009), AGENTS.md's install/setup/doctor gate: the new FlowDefinition
+// definition surface (Workflow projection adapter + CoordinationProtocol
+// loader, src/runner/definitions/) is a real infra dependency (it shells
+// out to `fs`, discovers files off disk, and validates their shape) --
+// this makes it discoverable through `fgos doctor` rather than standing
+// alone unregistered. Both checks are READ-ONLY (same RUL9 discipline
+// every other check in this file follows): `discoverCoordinationProtocols`
+// and `projectWorkflowToFlowDefinition` only read from disk/the in-memory
+// domain registry, never write. No new config default is registered
+// alongside these -- discovery is a fixed, deterministic filesystem
+// convention (project `.fgos/coordination-protocols/`, `domains/<name>/
+// coordination-protocols/`, packaged `core/coordination-protocols/`), the
+// same non-configurable style `workflow-stage-graphs.mjs`'s own
+// `domains/`/`core/task-specs/` discovery already uses -- there is no
+// runtime read of a "coordination protocols path" config key to register
+// a default for.
+
+// tsk-397's `resolveTaskSpecPath`'s own `core: 'core'` convention gives
+// `discoverCoordinationProtocols` its default `cwd`/`packageRoot`
+// resolution already (see protocol-loader.mjs's own header) -- this check
+// only needs to run it and report the FlowDefinitionError's own message,
+// which already carries the offending source path (protocol-loader.mjs's
+// `relativeToPackageRoot` suffix on every thrown error).
+function checkCoordinationProtocolFixturesValid(cwd) {
+  try {
+    const entries = discoverCoordinationProtocols({ cwd });
+    return {
+      passed: true,
+      message: `${entries.length} CoordinationProtocol definition(s) discovered and normalized cleanly (project/domain/core tiers)`,
+    };
+  } catch (err) {
+    if (err instanceof FlowDefinitionError) {
+      return { passed: false, message: `malformed CoordinationProtocol definition -- ${err.message}` };
+    }
+    throw err;
+  }
+}
+
+registerCheck({
+  id: 'coordination-protocol-fixtures-valid',
+  description: 'every discoverable CoordinationProtocol definition (project/domain/core tiers) normalizes through validateFlowDefinition (Phase 02 R6/R7)',
+  check: (cwd) => checkCoordinationProtocolFixturesValid(cwd),
+});
+
+// Exercises R5's adapter itself (not just R7's protocol fixtures) as a
+// doctor-visible health check: every domain that declares `workflows`
+// (today: only `coding`) must still project cleanly into a Workflow-
+// profile FlowDefinition. A domain with no `workflows` at all (every
+// other domain today) is not a failure -- `projectWorkflowToFlowDefinition`
+// only applies where the existing primary-operation compatibility path
+// already applies (flow-definition.md's Workflow profile section), so
+// those domains are a clean skip, not scanned at all.
+//
+// `projectWorkflowToFlowDefinition`'s public contract takes a `kind`, not a
+// workflow NAME (same `operationsForStage`/`resolveWorkflow` calling
+// convention it deliberately mirrors) -- a workflow reached only via
+// `domain.defaultWorkflow` is addressed with `kind: undefined`; a workflow
+// reached only through `domain.workflowFor`'s mapping needs a `kind` that
+// actually maps to it, found here by inverting that table. A workflow name
+// reachable through NEITHER (registered in `domain.workflows` but never
+// wired as anyone's default or `workflowFor` target) has no `kind` this
+// check can legitimately construct -- reported as `unreachable`, a real,
+// separate signal from a validation failure, not silently skipped.
+function checkWorkflowFlowDefinitionProjectsCleanly() {
+  const problems = [];
+  const unreachable = [];
+  let checkedCount = 0;
+  for (const [domainName, domain] of Object.entries(DOMAINS)) {
+    if (!domain?.workflows) continue;
+    const kindByWorkflowName = new Map();
+    for (const [kind, mappedName] of Object.entries(domain.workflowFor || {})) {
+      if (!kindByWorkflowName.has(mappedName)) kindByWorkflowName.set(mappedName, kind);
+    }
+    for (const workflowName of Object.keys(domain.workflows)) {
+      let kind;
+      if (workflowName === domain.defaultWorkflow) {
+        kind = undefined;
+      } else if (kindByWorkflowName.has(workflowName)) {
+        kind = kindByWorkflowName.get(workflowName);
+      } else {
+        unreachable.push(`${domainName}.${workflowName}`);
+        continue;
+      }
+      checkedCount += 1;
+      try {
+        projectWorkflowToFlowDefinition(domainName, { kind });
+      } catch (err) {
+        if (err instanceof FlowDefinitionError) {
+          problems.push(`${domainName}.${workflowName}: ${err.message}`);
+        } else {
+          throw err;
+        }
+      }
+    }
+  }
+  if (problems.length > 0) {
+    return { passed: false, message: problems.join('; ') };
+  }
+  const unreachableNote = unreachable.length > 0
+    ? ` (${unreachable.length} workflow(s) unreachable via any kind, not checked: ${unreachable.join(', ')})`
+    : '';
+  if (checkedCount === 0) {
+    return { passed: true, message: `no domain declares a reachable workflow -- nothing to project${unreachableNote}` };
+  }
+  return { passed: true, message: `${checkedCount} domain workflow(s) project cleanly into a Workflow-profile FlowDefinition${unreachableNote}` };
+}
+
+registerCheck({
+  id: 'workflow-flow-definition-projects-cleanly',
+  description: 'every domain-declared workflow projects cleanly into a Workflow-profile FlowDefinition via the additive adapter (Phase 02 R5)',
+  check: () => checkWorkflowFlowDefinitionProjectsCleanly(),
+});
+
+// Step 08 Phase 07 R3, AGENTS.md's install/setup/doctor gate: `fgos
+// coordination run --file <request>`'s own published example request
+// files (docs/how-to/coordination-examples/*.json -- one agent-led
+// request, one declared consult, one research protocol, one Group
+// Cognition framework example, per this phase's own requirement) are real
+// package contents a user copies and edits; this check keeps them from
+// silently rotting the same way `coordination-protocol-fixtures-valid`
+// above already keeps the protocol yaml fixtures themselves honest. Reuses
+// the SAME `validateCoordinationRequest` the CLI itself runs on every
+// invocation (never a second, drifting copy of the schema), plus
+// `loadCoordinationProtocol` for any example that references a protocol by
+// id, so a future protocol rename/removal is caught here too. Read-only
+// (RUL9): only reads the example files and the protocol registry, never
+// writes.
+function checkCoordinationExampleRequestsValid(cwd) {
+  const examplesDir = path.join(cwd, 'docs', 'how-to', 'coordination-examples');
+  if (!fs.existsSync(examplesDir)) {
+    return { passed: false, message: `no example request files found at ${path.relative(cwd, examplesDir)} -- Phase 07 R3 requires publishing one agent-led request, declared consult, research protocol, and Group Cognition framework example` };
+  }
+  const files = fs.readdirSync(examplesDir).filter((f) => f.endsWith('.json')).sort();
+  if (files.length === 0) {
+    return { passed: false, message: `${path.relative(cwd, examplesDir)} exists but contains no .json example request files` };
+  }
+  const problems = [];
+  for (const file of files) {
+    const filePath = path.join(examplesDir, file);
+    let raw;
+    try {
+      raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (err) {
+      problems.push(`${file}: not valid JSON (${err.message})`);
+      continue;
+    }
+    let normalized;
+    try {
+      normalized = validateCoordinationRequest(raw, {});
+    } catch (err) {
+      problems.push(`${file}: fails validateCoordinationRequest (${err.message})`);
+      continue;
+    }
+    if (normalized.kind === 'declared-protocol') {
+      try {
+        loadCoordinationProtocol(normalized.protocolRef.id, { cwd });
+      } catch (err) {
+        problems.push(`${file}: protocolRef.id "${normalized.protocolRef.id}" does not resolve (${err.message})`);
+      }
+    }
+  }
+  if (problems.length > 0) {
+    return { passed: false, message: problems.join('; ') };
+  }
+  return { passed: true, message: `${files.length} coordination example request(s) under ${path.relative(cwd, examplesDir)} validate cleanly and resolve every referenced protocolRef` };
+}
+
+registerCheck({
+  id: 'coordination-example-requests-valid',
+  description: 'published `fgos coordination run` example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef (Step 08 Phase 07 R3)',
+  check: (cwd) => checkCoordinationExampleRequestsValid(cwd),
 });
 

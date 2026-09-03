@@ -16,7 +16,10 @@ function writeRunnerConfigFixture(root, cfg) {
 
 const HERDR_BIN = findExecutableOnPath(['herdr']);
 const AGY_BIN = findExecutableOnPath(['agy']);
-const AGY_HERDR_SKIP = HERDR_BIN && AGY_BIN ? false : 'herdr or agy binary not found on PATH -- live agy-herdr test skips honestly';
+const AGY_HERDR_SKIP =
+  process.env.FGOS_RUN_LIVE_AGY_HERDR === '1' && HERDR_BIN && AGY_BIN
+    ? false
+    : 'set FGOS_RUN_LIVE_AGY_HERDR=1 with herdr and agy on PATH to run the live agy-herdr proof';
 
 test('herdr-spawn adapter rejects invocation missing interactiveMode', async () => {
   const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];

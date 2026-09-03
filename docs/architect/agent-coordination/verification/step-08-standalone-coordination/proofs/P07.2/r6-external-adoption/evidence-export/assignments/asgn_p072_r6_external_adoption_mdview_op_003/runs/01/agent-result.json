@@ -1,0 +1,6 @@
+{
+  "status": "success",
+  "summary": "Root Cargo.toml is a workspace manifest (no [package] section). The primary member crate is 'mdview' (crates/mdview/Cargo.toml), version 0.7.5, inherited from [workspace.package] in the root Cargo.toml.",
+  "package_name": "mdview",
+  "package_version": "0.7.5"
+}

@@ -13,7 +13,7 @@ import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
-import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT, findWorkflowStageOperationProblems } from '../../src/setup/registrations.mjs';
 import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-guard-warnings.mjs';
 
 
@@ -574,3 +574,403 @@ test('events-compaction-verified fails and names the broken manifest when the ba
   assert.equal(result.passed, false);
   assert.match(result.message, /compact-1\.manifest\.json/);
 });
+
+// --- workflow stage operations validation (Step 02 / D19) ---
+
+test('findWorkflowStageOperationProblems passes on the live repository setup', () => {
+  const problems = findWorkflowStageOperationProblems(process.cwd());
+  assert.deepEqual(problems, []);
+});
+
+test('findWorkflowStageOperationProblems fails when operation taskSpec does not resolve', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'bad-task', taskSpec: 'nonexistent-task-spec-file', role: 'implementer', skills: ['fgos-coding-planning'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length > 0, true);
+  assert.match(problems[0], /nonexistent-task-spec-file/);
+});
+
+test('findWorkflowStageOperationProblems fails when operation role is not in roleGraph.roles', () => {
+  const customDomains = {
+    coding: {
+      roleGraph: {
+        roles: ['implementer', 'researcher'],
+      },
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'shape-plan', taskSpec: 'shape-plan', role: 'unknown-role-xyz', skills: ['fgos-coding-planning'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length > 0, true);
+  assert.match(problems[0], /unknown-role-xyz/);
+});
+
+test('findWorkflowStageOperationProblems fails when operation skill is not provided by any agent-type', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'shape-plan', taskSpec: 'shape-plan', role: 'implementer', skills: ['fgos-completely-fake-skill-123'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length > 0, true);
+  assert.match(problems[0], /fgos-completely-fake-skill-123/);
+});
+
+test('findWorkflowStageOperationProblems fails when operation reason has no matching roleGraph edge', () => {
+  const customDomains = {
+    coding: {
+      roleGraph: {
+        roles: ['implementer', 'reviewer'],
+        edges: {
+          planning: [
+            { from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' },
+          ],
+        },
+      },
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'validate-plan', taskSpec: 'validate-plan', role: 'reviewer', reason: 'review', skills: ['fgos-coding-validating'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length > 0, true);
+  assert.match(problems[0], /does not match any legal roleGraph edge/);
+});
+
+test('findWorkflowStageOperationProblems fails when multiple operations are marked primary: true', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'shape-plan', primary: true, taskSpec: 'shape-plan', role: 'implementer', skills: ['fgos-coding-planning'] },
+              { id: 'scout-blast-radius', primary: true, taskSpec: 'scout-blast-radius', role: 'researcher', skills: ['fgos-researching'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length > 0, true);
+  assert.match(problems[0], /2 operations marked primary: true/);
+});
+
+test('findWorkflowStageOperationProblems fails when primary operation contradicts stage taskSpec or skill', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          skillMap: { planning: 'fgos-coding-planning' },
+          taskSpecMap: { planning: 'shape-plan' },
+          operationMap: {
+            planning: [
+              { id: 'validate-plan', primary: true, taskSpec: 'validate-plan', role: 'reviewer', skills: ['fgos-coding-validating'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length >= 2, true);
+  assert.ok(problems.some((p) => p.includes('contradicts stage taskSpec')));
+  assert.ok(problems.some((p) => p.includes('does not include stage skill')));
+});
+
+test('findWorkflowStageOperationProblems fails when policy minTier or preferPersona is invalid', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              {
+                id: 'shape-plan',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                policy: { minTier: 'ultra-mega-tier', preferPersona: 'alien-persona' },
+              },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.equal(problems.length >= 2, true);
+  assert.ok(problems.some((p) => p.includes('policy.minTier')));
+  assert.ok(problems.some((p) => p.includes('policy.preferPersona')));
+});
+
+test('findWorkflowStageOperationProblems fails on invalid dispatch mode or human-only with executor policy', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              {
+                id: 'bad-dispatch',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                dispatch: 'robot-only',
+              },
+              {
+                id: 'bad-human-only',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                dispatch: 'human-only',
+                policy: { preferExecutor: 'claude' },
+              },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('invalid dispatch mode "robot-only"')));
+  assert.ok(problems.some((p) => p.includes('dispatch: human-only operation must not declare executor policy')));
+});
+
+test('findWorkflowStageOperationProblems fails on invalid preferExecutor, fallbackExecutors shape/names, or visibility', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              {
+                id: 'op1',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                policy: {
+                  preferExecutor: 'does-not-exist',
+                  fallbackExecutors: 'pi', // string instead of array
+                  visibility: 'opaque',
+                },
+              },
+              {
+                id: 'op2',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                policy: {
+                  fallbackExecutors: ['unrecognized-fake-executor'],
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('policy.preferExecutor "does-not-exist" is not a recognized executor')));
+  assert.ok(problems.some((p) => p.includes('policy.fallbackExecutors must be an array of strings')));
+  assert.ok(problems.some((p) => p.includes('policy.visibility "opaque" must be "headless" or "visible"')));
+  assert.ok(problems.some((p) => p.includes('policy.fallbackExecutors contains unrecognized executor "unrecognized-fake-executor"')));
+});
+
+test('findWorkflowStageOperationProblems fails on duplicate operation id or empty id', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'duplicate-id', taskSpec: 'shape-plan', role: 'implementer', skills: ['fgos-coding-planning'] },
+              { id: 'duplicate-id', taskSpec: 'shape-plan', role: 'implementer', skills: ['fgos-coding-planning'] },
+              { id: '', taskSpec: 'shape-plan', role: 'implementer', skills: ['fgos-coding-planning'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('duplicate operation id "duplicate-id"')));
+  assert.ok(problems.some((p) => p.includes('operation id must be a non-empty string')));
+});
+
+test('findWorkflowStageOperationProblems fails when required fields taskSpec, role, or skills are missing or empty', () => {
+  const customDomains = {
+    coding: {
+      roleGraph: {
+        roles: ['implementer', 'researcher', 'reviewer'],
+      },
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              { id: 'missing-taskSpec', role: 'implementer', skills: ['fgos-coding-planning'] },
+              { id: 'missing-role', taskSpec: 'shape-plan', skills: ['fgos-coding-planning'] },
+              { id: 'missing-skills', taskSpec: 'shape-plan', role: 'implementer' },
+              { id: 'empty-skills', taskSpec: 'shape-plan', role: 'implementer', skills: [] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('missing-taskSpec') && p.includes('taskSpec must be a non-empty string')));
+  assert.ok(problems.some((p) => p.includes('missing-role') && p.includes('role must be a non-empty string in roleGraph.roles')));
+  assert.ok(problems.some((p) => p.includes('missing-skills') && p.includes('skills must be an array of strings')));
+  assert.ok(problems.some((p) => p.includes('empty-skills') && p.includes('skills must be a non-empty array of skill names')));
+});
+
+test('findWorkflowStageOperationProblems strictly enforces role as TARGET role (to) for reason edges', () => {
+  const customDomains = {
+    coding: {
+      roleGraph: {
+        roles: ['implementer', 'researcher', 'reviewer'],
+        edges: {
+          executing: [
+            // reviewer -> researcher (consult)
+            { from: 'reviewer', to: 'researcher', reason: 'consult', mode: 'sync' },
+          ],
+        },
+      },
+      workflows: {
+        feature: {
+          operationMap: {
+            executing: [
+              // An operation declaring role: reviewer with reason: consult should NOT match reviewer -> researcher edge
+              // because reviewer is the SOURCE (from), not the TARGET (to).
+              { id: 'bad-target-op', taskSpec: 'resolve-question', role: 'reviewer', reason: 'consult', skills: ['fgos-researching'] },
+              // While role: researcher with reason: consult correctly matches
+              { id: 'good-target-op', taskSpec: 'resolve-question', role: 'researcher', reason: 'consult', skills: ['fgos-researching'] },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('bad-target-op') && p.includes('does not match any legal roleGraph edge')));
+  assert.ok(!problems.some((p) => p.includes('good-target-op')));
+});
+
+test('findWorkflowStageOperationProblems fails when policy contains disallowed keys', () => {
+  const customDomains = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: [
+              {
+                id: 'shape-plan',
+                taskSpec: 'shape-plan',
+                role: 'implementer',
+                skills: ['fgos-coding-planning'],
+                policy: {
+                  minTier: 'standard',
+                  model: 'gpt-5.5',
+                  timeoutMs: 999999,
+                  prompt: 'Do something',
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  assert.ok(problems.some((p) => p.includes('policy contains disallowed key(s) [model, timeoutMs, prompt]')));
+});
+
+test('findWorkflowStageOperationProblems fails when stage operations is not an array or operationMap is not an object', () => {
+  const customDomainsNonArray = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: {
+            planning: 'not-an-array-string',
+            discovery: { id: 'not-an-array-obj' },
+          },
+        },
+      },
+    },
+  };
+  const problemsNonArray = findWorkflowStageOperationProblems(process.cwd(), customDomainsNonArray);
+  assert.ok(problemsNonArray.some((p) => p.includes('coding.feature.planning.operations: must be an array of operation objects')));
+  assert.ok(problemsNonArray.some((p) => p.includes('coding.feature.discovery.operations: must be an array of operation objects')));
+
+  const customDomainsBadMap = {
+    coding: {
+      workflows: {
+        feature: {
+          operationMap: 'not-an-object',
+        },
+      },
+    },
+  };
+  const problemsBadMap = findWorkflowStageOperationProblems(process.cwd(), customDomainsBadMap);
+  assert.ok(problemsBadMap.some((p) => p.includes('coding.feature.operationMap: must be an object')));
+
+  // Test unnormalized raw stages array with malformed operations
+  const customDomainsRawStages = {
+    coding: {
+      workflows: {
+        feature: {
+          stages: [
+            { name: 'planning', operations: 'validate-plan' },
+            { name: 'discovery', operations: { id: 'judge-ambiguity' } },
+          ],
+        },
+      },
+    },
+  };
+  const problemsRawStages = findWorkflowStageOperationProblems(process.cwd(), customDomainsRawStages);
+  assert.ok(problemsRawStages.some((p) => p.includes('coding.feature.planning.operations: must be an array of operation objects')));
+  assert.ok(problemsRawStages.some((p) => p.includes('coding.feature.discovery.operations: must be an array of operation objects')));
+});
+
+test('domain-workflow-operations-coverage doctor check is registered and passes on clean repo', () => {
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'domain-workflow-operations-coverage');
+  assert.ok(check, 'domain-workflow-operations-coverage doctor check must be registered');
+  const result = check.check(process.cwd());
+  assert.equal(result.passed, true);
+  assert.match(result.message, /every stage operation across domain workflows resolves/);
+});
+

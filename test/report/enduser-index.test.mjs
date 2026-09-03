@@ -7,6 +7,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { buildEnduserIndex, findSourceCaptureId, findSourceCaptureIds, QUADRANT_META, QUADRANTS } from '../../src/report/enduser-index.mjs';
+import { enumerateDocEntries } from '../../src/report/enduser-index-generate.mjs';
 import { parseFrontmatter } from '../../src/report/frontmatter.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -212,7 +213,7 @@ test('fgos docs-index tolerates a missing quadrant dir (tutorials has no alias) 
     assert.equal(result.status, 0, result.stderr);
     const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
     for (const entry of manifest) {
-      assert.notEqual(entry.quadrant, 'tutorials');
+      assert.ok(!entry.docPath.startsWith('docs/tutorials/'), 'no entries from docs/tutorials/ when that dir is missing');
     }
   } finally {
     if (manifestBefore !== undefined) fs.writeFileSync(MANIFEST_PATH, manifestBefore, 'utf8');
@@ -325,14 +326,17 @@ test('fgos docs-index reads BOTH the docs/decisions/ alias and the primary docs/
   const explanationEntries = manifest.filter((e) => e.quadrant === 'explanation');
   const decisionsCount = fs.readdirSync(path.join(REPO_ROOT, 'docs', 'decisions')).filter((f) => f.endsWith('.md')).length;
   const primaryExplanationCount = fs.readdirSync(path.join(REPO_ROOT, 'docs', 'explanation')).filter((f) => f.endsWith('.md')).length;
+  const legacyExplanationEntries = explanationEntries.filter(
+    (e) => e.docPath.startsWith('docs/decisions/') || e.docPath.startsWith('docs/explanation/'),
+  );
   assert.equal(
-    explanationEntries.length,
+    legacyExplanationEntries.length,
     decisionsCount + primaryExplanationCount,
     'every .md file under docs/decisions/ (alias) plus every .md file under docs/explanation/ (primary dir) must appear as one explanation-quadrant entry each',
   );
   for (const entry of explanationEntries) {
     assert.ok(
-      entry.docPath.startsWith('docs/decisions/') || entry.docPath.startsWith('docs/explanation/'),
+      entry.docPath.startsWith('docs/decisions/') || entry.docPath.startsWith('docs/explanation/') || entry.docPath.startsWith('docs/knowledge/'),
       `docPath must stay under a real on-disk dir for this quadrant: ${entry.docPath}`,
     );
     assert.equal(entry.purpose, QUADRANT_META.explanation.purpose);
@@ -418,4 +422,52 @@ test('findSourceCaptureIds resolves oldPath and currentPath through resolver sta
   assert.deepEqual(capturesOld.sort(), ['item-1', 'item-2']);
   assert.deepEqual(capturesNew.sort(), ['item-1', 'item-2']);
 });
+
+test('enumerateDocEntries finds docs/knowledge/<slug>/<role>.md fixtures with frontmatter mode and maps singular tutorial to tutorials', () => {
+  const cwd = tmpFixtureCwd();
+  const slugDir = path.join(cwd, 'docs', 'knowledge', 'sample-purpose');
+  fs.mkdirSync(slugDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(slugDir, 'guide.md'),
+    '---\nmode: how-to\n---\n# Sample Guide\nContent\n',
+  );
+  fs.writeFileSync(
+    path.join(slugDir, 'tut.md'),
+    '---\nmode: tutorial\n---\n# Sample Tutorial\nContent\n',
+  );
+
+  const entries = enumerateDocEntries(cwd);
+  assert.equal(entries.length, 2);
+  const guideEntry = entries.find((e) => e.docPath === 'docs/knowledge/sample-purpose/guide.md');
+  assert.ok(guideEntry);
+  assert.equal(guideEntry.quadrant, 'how-to');
+  assert.equal(guideEntry.title, 'Sample Guide');
+
+  const tutEntry = entries.find((e) => e.docPath === 'docs/knowledge/sample-purpose/tut.md');
+  assert.ok(tutEntry);
+  assert.equal(tutEntry.quadrant, 'tutorials');
+  assert.equal(tutEntry.title, 'Sample Tutorial');
+});
+
+test('enumerateDocEntries safely skips docs/knowledge files with no mode or invalid mode without crashing', () => {
+  const cwd = tmpFixtureCwd();
+  const slugDir = path.join(cwd, 'docs', 'knowledge', 'sample-purpose');
+  fs.mkdirSync(slugDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(slugDir, 'no-mode.md'),
+    '---\nframework: diataxis\n---\n# No Mode Doc\n',
+  );
+  fs.writeFileSync(
+    path.join(slugDir, 'invalid-mode.md'),
+    '---\nmode: bogus-quadrant\n---\n# Invalid Mode Doc\n',
+  );
+  fs.writeFileSync(
+    path.join(slugDir, 'plain.md'),
+    '# Plain Doc\nNo frontmatter\n',
+  );
+
+  const entries = enumerateDocEntries(cwd);
+  assert.equal(entries.length, 0);
+});
+
 

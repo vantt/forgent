@@ -1,0 +1,71 @@
+# P01.2 R8 live proof — glm-cli, session-engine.mjs (secondary executor attempt)
+
+Same driver script and import chain as `codex-cli-live-proof.log`
+(`p012-live-proof-driver-script.mjs`), same repo root, same objective. Tried
+as the second configured executor per the Doer prompt's instruction to try
+both when time allows (P00.3's own pattern) -- codex-cli's proof
+(`codex-cli-live-proof.log`) already fully succeeded (primary AND consult
+both `done`/`reported`, resume proven with zero duplicate runs), so this is
+a secondary attempt, not a blocking requirement.
+
+## Attempt 1 — config-tier stop (same class as codex-cli's attempt 1)
+
+```
+node p012-live-proof.mjs coord_p012_live_76518_glm glm-cli full
+```
+Transcript: `glm-cli-attempt1-config-tier-stop.stdout.log` / `.stderr.log`.
+
+```
+RunnerConfigError: no model configured for policy tier "standard" under provider "z-ai".
+```
+`.fgos/config.json`'s `glm-cli` entry declares `providerModel: "z-ai"` and a
+`rigorOverrides` table (`light/standard/heavy -> lightweight`), but
+`resolveAssignmentDispatchPolicy`'s direct `resolvePolicyTierModel(cfg,
+effectiveTier, resolvedProvider)` call (traced in
+`src/runner/dispatch/assignment-policy.mjs`, unmodified by this cell) does
+not consult `rigorOverrides` before that lookup -- `modelPolicies.z-ai` only
+declares `lightweight`, not `standard` (this repo's default tier absent an
+override). Same shape as codex-cli's attempt 1; same worked-around fix:
+`cliOverride.model` short-circuits the tier lookup entirely.
+
+## Attempt 2 — genuine live timeout (real subprocess, real 180s bound, honest failure)
+
+```
+node p012-live-proof.mjs coord_p012_live_76518_glm glm-cli resume z-ai/glm-5.2
+```
+Transcript: `glm-cli-attempt2-timeout.stdout.log` / `.stderr.log`.
+
+`dispatch-plan.json`/RunResult `policy` confirm accurate provenance BEFORE
+the hang: `executorId: "glm-cli"`, `provenance.provider.value: "z-ai"`,
+`provenance.model.value: "z-ai/glm-5.2"` (source `cliOverride`),
+`governance.value: "allowed"`, `source.id: "z-ai"` -- config and governance
+were both correct; this is not an "absent/unconfigured/wrong-tier/auth"
+failure. The real `claude` subprocess (glm-cli routes through the `claude`
+CLI binary with `ANTHROPIC_*` env overridden to OpenRouter's GLM 5.2 model,
+per `.fgos/config.json`'s own description) was genuinely spawned and hung
+with no further output until the bound fired:
+```
+"status": "failed", "confidence": "failed"
+"runtime": {"exitCode": 124, ...}
+"agentClaim": {"status":"failed","summary":"executor timed out after 180000ms for work \"glm-cli\"."}
+"evidence": {"gitBefore":"626e057b...","gitAfter":"626e057b...", "changedFiles":[]}
+```
+Exit code 124 (timeout), zero repository mutation (`gitBefore === gitAfter`).
+This is the SAME live-executor timeout pattern P00.3 already documented and
+disposed as a legitimate honest partial, not a stop gate ("a real timeout is
+legitimate evidence, never faked away" -- P01.2's own Bug Taxonomy, quoting
+that precedent). Per the Doer prompt's explicit instruction for this exact
+scenario, this is recorded honestly and NOT retried further, since codex-cli
+already produced one fully successful end-to-end proof (primary AND consult
+both completing) -- the bar for `DONE_WITH_CONCERNS` rather than `BLOCKED`.
+
+No secret value (API key, auth token) appears in either log file (checked
+directly: `grep -n "AUTH_TOKEN=.\|API_KEY=."` on both -- no match; only the
+env-var *names* the config declares, never a value, matching P00.3's own
+secret-redaction discipline).
+
+No repository mutation from either glm-cli attempt: `git status --porcelain`
+before and after these two attempts is identical (modulo this proof
+directory's own untracked files, which are proof output, not a side effect
+of the live-proof script) and `git rev-parse HEAD` is unchanged
+(`626e057b181510558e69064570c1cc4ed9794bd9`) throughout.

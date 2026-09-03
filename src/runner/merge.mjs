@@ -1107,9 +1107,17 @@ function branchContentMismatch(repoRoot, branch, ref) {
   } catch {
     return []; // no shared history to diff against — fail open, nothing to compare
   }
+  // tsk-52p: exclude .fgos/ paths outright, never just gated by
+  // isMergeUnionPath like resolveFgosOnlyConflict's own exemption a few
+  // dozen lines below — ADR0020 guarantees a worker branch can NEVER
+  // legitimately reflect main's live .fgos/ content, union-declared or
+  // not, so a branch-side .fgos/ diff (e.g. the documented recovery in
+  // docs/how-to/fix-fgos-write-rejected-merge-block.md: restoring .fgos/
+  // paths to the branch's own frozen pre-merge versions) is never real
+  // discarded content, just an expected, permanent divergence from HEAD.
   const introducedPaths = git(repoRoot, ['diff', '--name-only', `${base}..${branch}`])
     .split('\n')
-    .filter((p) => p !== '');
+    .filter((p) => p !== '' && p !== '.fgos' && !p.startsWith('.fgos/'));
   if (introducedPaths.length === 0) {
     return [];
   }

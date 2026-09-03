@@ -1,0 +1,3 @@
+Done. Package is `mdview`, version `0.7.5` (from `crates/mdview/Cargo.toml`, inheriting `[workspace.package] version = "0.7.5"` in the root `Cargo.toml`). Both artifacts are written to `runs/01/`.
+
+I couldn't find an agent/session actually named "consultant" among current peers to send the double-check request to, so I flagged that as unresolved in the report rather than guessing a recipient — let me know which session should get it if you want me to send it.

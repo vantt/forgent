@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "1",
+  "coordinationId": "coord_r8b_recovery_attempt",
+  "objective": "P04.2b Step 0: confirm a direct pin to a second real provider family (gemini) at \"lightweight\" now succeeds.",
+  "status": "active",
+  "createdAt": "2026-09-01T21:43:38.991Z",
+  "provenanceRoot": {
+    "writerId": "r8b-proof-driver"
+  },
+  "definitionRef": {
+    "id": "core.coordination-protocol.independent-research-fan-out-fan-in",
+    "version": "1.0.0"
+  },
+  "workRef": null,
+  "actors": [
+    {
+      "id": "coordinator-actor",
+      "role": "coordinator"
+    },
+    {
+      "id": "researcher-a",
+      "role": "researcher"
+    },
+    {
+      "id": "researcher-b",
+      "role": "researcher"
+    }
+  ],
+  "aggregateBounds": {
+    "wallTimeMs": 3600000,
+    "maxAssignments": 20,
+    "maxConcurrency": 4,
+    "maxRounds": 10,
+    "maxTaskDepth": 3
+  },
+  "assignmentRefs": [
+    "asgn_r8b_proof_driver_op_001",
+    "asgn_r8b_proof_driver_op_002"
+  ],
+  "completedAt": null
+}

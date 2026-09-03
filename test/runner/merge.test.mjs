@@ -1638,6 +1638,54 @@ test('mergeRunnerItem merges cleanly when a merge=union .fgos/ file genuinely di
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
+// tsk-52p: branchContentMismatch (the re-approve-of-an-already-merged-
+// branch fast path, exercised by a SECOND mergeRunnerItem call on a branch
+// already an ancestor of HEAD) used to have no .fgos/ exemption at all. A
+// worker branch's own .fgos/ diff (introducedPaths, base..branch) is, per
+// tsk-4gi just above, deliberately NOT reflected in the merge commit's own
+// diff (changedByMerge) -- main's .fgos/ content is restored to its own
+// pre-merge version right after the merge lands. That legitimate, ADR0020-
+// guaranteed divergence used to false-flag as "content discarded" on every
+// re-approve, even though the branch's real feature diff landed correctly.
+test('mergeRunnerItem does not false-flag an already-merged branch over a legitimate .fgos/ divergence (tsk-52p regression)', async () => {
+  const repoRoot = initRepo();
+
+  const logRelPath = resolveFgosFile('.fgos', FGOS_FILE.APPROVE_FAULT_LOG);
+  fs.writeFileSync(path.join(repoRoot, '.gitattributes'), `${logRelPath.replace(/\\/g, '/')} merge=union\n`);
+  fs.mkdirSync(path.join(repoRoot, path.dirname(logRelPath)), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, logRelPath), '{"ts":"2026-08-24T00:00:00.000Z","id":"base"}\n');
+  git(repoRoot, ['add', '.gitattributes', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .gitattributes and diagnostic log']);
+
+  // Worker branch produces its real feature file, plus its own frozen
+  // .fgos/ copy — the introducedPaths diff below sees both.
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  fs.writeFileSync(path.join(repoRoot, 'produced.txt'), 'ok\n');
+  git(repoRoot, ['add', 'produced.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'worker produces its own file']);
+  fs.appendFileSync(path.join(repoRoot, logRelPath), '{"ts":"2026-08-24T00:00:02.000Z","id":"worker-only"}\n');
+  git(repoRoot, ['add', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'worker grows its own frozen diagnostic log']);
+  git(repoRoot, ['checkout', 'main']);
+
+  // Main grows the same file independently before the first approve ever
+  // runs — the divergence branchContentMismatch must never mistake for a
+  // discard.
+  fs.appendFileSync(path.join(repoRoot, logRelPath), '{"ts":"2026-08-24T00:00:03.000Z","id":"main-only"}\n');
+  git(repoRoot, ['add', logRelPath]);
+  git(repoRoot, ['commit', '-q', '-m', 'main grows diagnostic log independently']);
+
+  const firstResult = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(firstResult.outcome, 'merged');
+
+  // Re-approve of the now-already-merged branch is exactly the path that
+  // runs branchContentMismatch — this must still report 'merged', not
+  // 'verify-fail'.
+  const secondResult = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(secondResult.outcome, 'merged');
+  assert.equal(secondResult.check.passed, true);
+});
+
 // tsk-4s6: mirrors the tsk-4gi union regression test's shape (a worker
 // branch that merges main in, then re-commits its OWN pre-merge .fgos/
 // content back per the ADR0020 pre-commit hook's own rule -- the real

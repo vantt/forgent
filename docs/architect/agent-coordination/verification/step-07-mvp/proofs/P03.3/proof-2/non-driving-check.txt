@@ -1,0 +1,6 @@
+=== decide --work tsk-44e (BEFORE Proof 2 run) ===
+{"mechanism":"out-of-process","configured":false,"executorId":"fgos-coding-planning"}
+=== decide --work tsk-44e (AFTER Proof 2 run) ===
+{"mechanism":"out-of-process","configured":false,"executorId":"fgos-coding-planning"}
+=== fgos show tsk-44e stage/status (AFTER Proof 2 run) ===
+stage: planning status: todo

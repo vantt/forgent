@@ -227,6 +227,15 @@ Every stop above lands a closing report on the item first
 (`fgos report <id> --text ... --stop-reason ...`), then reports the same
 thing to the caller — see `references/reclaim-and-role-graph.md`.
 
+## Operation-aware loop
+
+- The driver first checks lifecycle stops and ceilings exactly as today.
+- Then it resolves legal stage operations via `operationsForStage(domain, stage, { kind: workflow })`.
+- Primary operation (`primary: true`, e.g. `shape-plan` for planning) keeps the direct stage-skill compatibility path.
+- Secondary operation (e.g. `planning.validate-plan`) creates an Assignment only when the stage skill or deterministic rule selects it.
+- Assignment result is evidence input for driver decision, not lifecycle movement by itself.
+- Only engine verbs (`fgos plan`, `fgos discover`, `fgos return`) move Work lifecycle state.
+
 ## Caller contract
 
 Five callers reuse this exact loop with different `id` sources and

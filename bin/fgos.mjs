@@ -33,6 +33,7 @@ import { rebuildViewFromDir } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
+import { chooseStageOperation, executeDriverOperationChoice } from '../src/runner/dispatch/operation-choice.mjs';
 import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
@@ -71,6 +72,9 @@ import { promoteToComponentUseCase } from '../src/verbs/merge/promote-to-compone
 import { approveUseCase } from '../src/verbs/merge/approve.mjs';
 import { mergeList, mergeNext } from '../src/verbs/merge/merge.mjs';
 import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
+import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
+import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
+import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -92,7 +96,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, Sessi
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
-import { getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName, operationsForStage } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
@@ -1387,7 +1391,48 @@ async function runVerb(verb, flags, positional, dir) {
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parsePlanCallerVerdict(flags);
-      return resolvePlan(dir, id, cfg, 'session', callerVerdict);
+      const repoRoot = path.dirname(dir);
+      const isValidateRequested = Boolean(flags.validate);
+      const choice = chooseStageOperation({
+        work,
+        stage: work.stage,
+        domain: domain.name ?? work.domain,
+        workflow: work.workflow,
+        repoRoot,
+      });
+      const shouldValidate = !flags.direct && (isValidateRequested || choice.operation === 'validate-plan' || !callerVerdict);
+
+      let validatedVerdict;
+      if (shouldValidate) {
+        let validateChoice = choice;
+        if (validateChoice.operation !== 'validate-plan') {
+          validateChoice = {
+            dispatch: 'assignment',
+            operation: 'validate-plan',
+            taskSpecName: 'validate-plan',
+          };
+        }
+        if (validateChoice.dispatch === 'assignment' && validateChoice.operation === 'validate-plan') {
+          const contentRoot = resolveContentRoot(repoRoot, work.id, work.docsRef);
+          const outcome = await executeDriverOperationChoice(work, validateChoice, {
+            cwd: contentRoot,
+            repoRoot,
+            runnerConfig: cfg,
+            work,
+          });
+
+          if (!outcome.canAdvanceEdge) {
+            if (outcome.nextOperation === 'shape-plan') {
+              throw new StoreError('validation', `plan: validation for "${id}" returned NOT READY -- routing back to shape-plan.`);
+            }
+            throw new StoreError('validation', `plan: validation for "${id}" did not report READY (${outcome.reason}) -- cannot advance Work.`);
+          }
+          validatedVerdict = outcome.verdictPayload ?? { verdict: 'pass-through', reason: 'Plan validated READY by planning.validate-plan' };
+        }
+      }
+
+      const finalVerdict = callerVerdict ?? validatedVerdict;
+      return resolvePlan(dir, id, cfg, 'session', finalVerdict);
     }
 
     case 'move': {
@@ -2837,6 +2882,29 @@ async function runVerb(verb, flags, positional, dir) {
     // crashed unconditionally on a pure global npm install of fgOS onto a
     // different project (docs/history/tsk-65q-gate-bypass-global-install-
     // resolution/RESEARCH.md).
+    case 'workflow': {
+      let stage = flags.stage;
+      if (!stage) {
+        if (positional[0] === 'operations') {
+          stage = positional[1];
+        } else if (positional[0]) {
+          stage = positional[0];
+        }
+      }
+      if (!stage) {
+        throw new StoreError('validation', 'workflow operations requires --stage <stage>');
+      }
+      const domain = flags.domain || DEFAULT_DOMAIN;
+      const workflow = flags.workflow || undefined;
+      const ops = operationsForStage(domain, stage, { kind: workflow });
+      return {
+        domain: resolveDomainName(domain),
+        workflow: workflow || 'feature',
+        stage,
+        operations: ops,
+      };
+    }
+
     case 'gate-check': {
       const id = requireField(positional[0] ?? flags.id, 'gate-check requires an id: fgos gate-check <id> --gate <contextApprove|validateApprove> ...');
       const gate = requireField(flags.gate, 'gate-check requires --gate <contextApprove|validateApprove>');
@@ -3037,6 +3105,73 @@ async function runVerb(verb, flags, positional, dir) {
         );
       }
       throw new StoreError('validation', `merge: unknown sub-verb "${sub}" (known: list, next).`);
+    }
+
+    // Public CLI onto the CoordinationSession runtime (Step 08 Phase 07
+    // R1): `run` opens+dispatches+closes one session synchronously in V1,
+    // `show` is a read-only status read. Both are thin doors onto
+    // src/verbs/coordination/{run,show}.mjs, which call ONLY through the
+    // existing, hardened session-engine.mjs exports (P00-P06) -- this
+    // adapter never touches session/Assignment/Run state directly.
+    case 'coordination': {
+      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show|launch-master-loop> ...');
+      // Same repoRoot resolution `catchup`/`merge next` already use:
+      // `--dir` names the main checkout's `.fgos/`, so its parent is the
+      // repo root; omitted, the caller's own cwd is the repo root.
+      const repoRootForCoordination = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
+      if (sub === 'run') {
+        const filePath = requireField(flags.file, 'coordination run requires --file <request-path>: fgos coordination run --file <request.json>');
+        return await runCoordinationUseCase(
+          {
+            cwd: repoRootForCoordination,
+            repoRoot: repoRootForCoordination,
+            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
+          },
+          {
+            requestPath: path.resolve(process.cwd(), filePath),
+            cliExecutor: flags.executor,
+            cliModel: flags.model,
+            cliTier: flags.tier,
+          },
+        );
+      }
+      if (sub === 'show') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination show requires an id: fgos coordination show <id> [--json]');
+        // `--json` is accepted as a no-op, same convention the existing
+        // `show` (work-item) verb already documents in the registry: the
+        // envelope is always JSON, so the flag changes nothing.
+        return showCoordinationUseCase({ cwd: repoRootForCoordination, repoRoot: repoRootForCoordination }, { id });
+      }
+      if (sub === 'launch-master-loop') {
+        // MVP4 (Step 09, Phase 02) R1-R4: a thin, mechanical composer for
+        // the shipped standalone-master-coordination-loop fixture's
+        // required first pass ONLY -- never an authorize/disposition/
+        // revise/recheck step (see launch-master-loop.mjs's own header
+        // comment). Same door as `run` above: `launchMasterLoopUseCase`
+        // composes a request object and hands it to the SAME
+        // `runCoordinationUseCase` this file already calls for `run`.
+        const planPath = path.resolve(process.cwd(), requireField(flags.plan, 'coordination launch-master-loop requires --plan <path>'));
+        const objective = requireField(flags.objective, 'coordination launch-master-loop requires --objective <text>');
+        const writerId = requireField(flags['writer-id'], 'coordination launch-master-loop requires --writer-id <id>');
+        return await launchMasterLoopUseCase(
+          {
+            cwd: repoRootForCoordination,
+            repoRoot: repoRootForCoordination,
+            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
+          },
+          {
+            planPath,
+            objective,
+            writerId,
+            coordinationId: flags['coordination-id'],
+            expectedFixtureVersion: flags['fixture-version'],
+            cliExecutor: flags.executor,
+            cliModel: flags.model,
+            cliTier: flags.tier,
+          },
+        );
+      }
+      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: run, show, launch-master-loop).`);
     }
 
     case 'rebuild': {

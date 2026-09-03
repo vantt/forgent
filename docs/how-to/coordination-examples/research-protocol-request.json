@@ -1,0 +1,53 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Independently research two candidate approaches to a design question, then synthesize the findings.",
+  "writerId": "coordination-example-research-protocol",
+  "protocolRef": { "id": "core.coordination-protocol.independent-research-fan-out-fan-in" },
+  "steps": [
+    {
+      "type": "operation",
+      "as": "dispatch",
+      "operationId": "dispatch-research",
+      "objective": "Frame the research question for two independent researchers who will each answer it without seeing each other's work.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary) framing the research question",
+        "agent-report.md: a short human-readable report framing the research question"
+      ]
+    },
+    {
+      "type": "fan-out",
+      "as": "research",
+      "operationId": "independent-research",
+      "fromAssignmentId": "$ref:dispatch",
+      "branches": [
+        {
+          "actorId": "researcher-a",
+          "objective": "Research approach A independently and report your findings.",
+          "expectedOutputs": [
+            "agent-result.json (status, summary) with verified findings on approach A",
+            "agent-report.md: a short human-readable report with verified findings on approach A"
+          ]
+        },
+        {
+          "actorId": "researcher-b",
+          "objective": "Research approach B independently and report your findings.",
+          "expectedOutputs": [
+            "agent-result.json (status, summary) with verified findings on approach B",
+            "agent-report.md: a short human-readable report with verified findings on approach B"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "synthesis",
+      "operationId": "synthesize-findings",
+      "objective": "Synthesize both researchers' independent findings, preserving any disagreement between them.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary) synthesizing both findings without erasing disagreement",
+        "agent-report.md: a short human-readable report synthesizing both findings without erasing disagreement"
+      ],
+      "contextRefs": ["$ref:research.researcher-a", "$ref:research.researcher-b"]
+    }
+  ]
+}

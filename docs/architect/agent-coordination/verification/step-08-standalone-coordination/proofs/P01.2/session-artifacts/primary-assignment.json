@@ -1,0 +1,53 @@
+{
+  "assignmentId": "asgn_p01_2_live_proof_coordinator_op_002",
+  "workId": null,
+  "role": "researcher",
+  "dispatch": "assignment",
+  "objective": "Read package.json at the repository root and report its exact \"name\" and \"version\" fields.",
+  "contextRefs": [],
+  "expectedOutputs": [
+    "agent-result.json with status:\"done\" and a summary naming the package name and version",
+    "agent-report.md: a short human-readable report stating the exact name and version found"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-01T15:23:49.215Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Read package.json at the repository root and report its exact \"name\" and \"version\" fields.",
+        "contextRefs": [],
+        "constraints": [],
+        "expectedOutputs": [
+          "agent-result.json with status:\"done\" and a summary naming the package name and version",
+          "agent-report.md: a short human-readable report stating the exact name and version found"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "researcher",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 180000,
+          "maxRuns": 1
+        }
+      },
+      "caller": {
+        "writerId": "p01-2-live-proof-coordinator"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

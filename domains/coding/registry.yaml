@@ -33,6 +33,10 @@ roleGraph:
         to: advisor
         reason: advise
         mode: async
+      - from: implementer
+        to: reviewer
+        reason: review
+        mode: async
     decompose: *planningEdges
     executing:
       - from: implementer

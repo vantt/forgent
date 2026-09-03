@@ -147,7 +147,7 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true, fgosRoot = repo
   for (const item of inventory) {
     const topic = view.topics?.[item.topicId];
     const purposeSlug = topic?.purposeSlug || item.topicId;
-    const targetPath = `docs/${purposeSlug}/${item.role}.md`;
+    const targetPath = `docs/knowledge/${purposeSlug}/${item.role}.md`;
 
     // Idempotency (docs/architect/knowledge-registry-redesign.md §13.5,
     // "apply does not reduce the number of reachable source captures" on a
