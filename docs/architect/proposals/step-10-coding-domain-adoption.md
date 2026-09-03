@@ -424,7 +424,7 @@ Retained from Step 07 §15 and refined:
    `packages/` overlay now? Recommended: draft the overlay there, then
    accept/revise/reject it after Step 09/Step 10 needs stabilize; forbid
    physical moves until the component has a facade and contract tests, matching
-   `node-to-rust-component-migration.md`.
+   `docs/architect/host-invocation-routing/node-to-rust-component-migration.md`.
 
 ## 11. Intent Traceability
 

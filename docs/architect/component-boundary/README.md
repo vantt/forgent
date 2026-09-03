@@ -23,8 +23,8 @@ Read boundary before layout:
 
 1. [Component Boundary Advisory](./component-boundary-advisory.md)
 2. [Repo Layout Vision](./repo-layout-vision.md)
-3. [Host Invocation And Provider Routing](./host-invocation-provider-routing.md)
-4. [Node To Rust Component Migration](./node-to-rust-component-migration.md)
+3. [Host Invocation And Provider Routing](../host-invocation-routing/host-invocation-provider-routing.md)
+4. [Node To Rust Component Migration](../host-invocation-routing/node-to-rust-component-migration.md)
 
 The first document answers:
 
@@ -113,7 +113,7 @@ Use this document when deciding:
 
 ### Host Invocation And Provider Routing
 
-[host-invocation-provider-routing.md](./host-invocation-provider-routing.md)
+[host-invocation-provider-routing.md](../host-invocation-routing/host-invocation-provider-routing.md)
 defines the shared host invocation path and the Operation Provider Router.
 
 Use this document when deciding:
@@ -126,7 +126,7 @@ Use this document when deciding:
 
 ### Node To Rust Component Migration
 
-[node-to-rust-component-migration.md](./node-to-rust-component-migration.md)
+[node-to-rust-component-migration.md](../host-invocation-routing/node-to-rust-component-migration.md)
 records the migration shape for replacing Node harness internals with
 Rust components one boundary at a time while preserving the existing `fgos`
 surface.
