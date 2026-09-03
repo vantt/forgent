@@ -367,8 +367,18 @@ function twoLinkedResults(coordinationId) {
   return { tempDir, opts, assignmentIds: ids };
 }
 
+// One artifact revision pin per cited source, because replay now holds a
+// `consensus` record to that shape (a real validation pins exactly one per
+// surviving source, and a consensus requires every source to survive). A test
+// that wants the mismatch overrides `artifactRevisionRefs` explicitly.
 function storePayload(assignmentIds, overrides = {}) {
-  return { ...eventPayload({ sourceResultRefs: assignmentIds }), ...overrides };
+  return {
+    ...eventPayload({
+      sourceResultRefs: assignmentIds,
+      artifactRevisionRefs: assignmentIds.map((id, i) => `artifact://${id}@rev-${i}`),
+    }),
+    ...overrides,
+  };
 }
 
 test('store door: appends once, then is an idempotent no-op for a byte-identical payload', () => {
@@ -500,6 +510,56 @@ test('replay REJECTS a self-inconsistent forged consensus: outcome "consensus" a
     () => replaySession('coord_agg_forged_inconsistent', opts),
     (err) => err instanceof CoordinationError && /cannot reach consensus with an unsatisfied or unpinned source binding/.test(err.message),
   );
+});
+
+test('replay REJECTS a forged consensus carrying NO artifactRevisionRefs -- a real validation pins one artifact revision per surviving source', () => {
+  const { opts, assignmentIds } = twoLinkedResults('coord_agg_forged_no_pins');
+  const { eventsPath } = resolveSessionPaths('coord_agg_forged_no_pins', opts);
+  const payload = storePayload(assignmentIds, { outcome: 'consensus' });
+  delete payload.artifactRevisionRefs;
+  fs.appendFileSync(
+    eventsPath,
+    `${JSON.stringify({ seq: 903, ts: new Date().toISOString(), v: '1', type: 'aggregation-validated', payload })}\n`,
+  );
+  assert.throws(
+    () => replaySession('coord_agg_forged_no_pins', opts),
+    (err) => err instanceof CoordinationError && /claims outcome "consensus" with no artifactRevisionRefs/.test(err.message),
+  );
+});
+
+test('replay REJECTS a forged consensus whose artifactRevisionRefs count does not match its sourceResultRefs count', () => {
+  const { opts, assignmentIds } = twoLinkedResults('coord_agg_forged_pin_count');
+  const { eventsPath } = resolveSessionPaths('coord_agg_forged_pin_count', opts);
+  fs.appendFileSync(
+    eventsPath,
+    `${JSON.stringify({
+      seq: 904,
+      ts: new Date().toISOString(),
+      v: '1',
+      type: 'aggregation-validated',
+      payload: storePayload(assignmentIds, { outcome: 'consensus', artifactRevisionRefs: ['artifact://only-one@rev-0'] }),
+    })}\n`,
+  );
+  assert.throws(
+    () => replaySession('coord_agg_forged_pin_count', opts),
+    (err) => err instanceof CoordinationError && /1 artifactRevisionRefs against 2 sourceResultRefs/.test(err.message),
+  );
+});
+
+test('the same artifactRevisionRefs consistency rule does NOT constrain a non-consensus outcome -- an incomplete aggregation legitimately pins fewer sources', () => {
+  const { opts, assignmentIds } = twoLinkedResults('coord_agg_no_consensus_pins');
+  const { eventsPath } = resolveSessionPaths('coord_agg_no_consensus_pins', opts);
+  fs.appendFileSync(
+    eventsPath,
+    `${JSON.stringify({
+      seq: 905,
+      ts: new Date().toISOString(),
+      v: '1',
+      type: 'aggregation-validated',
+      payload: storePayload(assignmentIds, { outcome: 'no-consensus', artifactRevisionRefs: [], missingActors: ['researcher-b'] }),
+    })}\n`,
+  );
+  assert.equal(replaySession('coord_agg_no_consensus_pins', opts).aggregations.length, 1);
 });
 
 test('replay NEUTRALIZES a post-terminal aggregation instead of trusting it (same posture as a post-terminal authorization)', () => {

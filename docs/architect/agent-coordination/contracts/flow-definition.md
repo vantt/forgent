@@ -257,7 +257,10 @@ produces a byte-identical `completion` object.
 definition that declares `completion.aggregation` may not close on quorum
 alone: the request door refuses the close until an aggregation has been
 validated for that session, and the engine independently refuses any close
-whose named aggregation did not reach `consensus`. See
+whose named aggregation did not reach `consensus`. "Bound" is literal — the
+request door resolves the definition from the session's own
+`manifest.definitionRef` and refuses version drift, so what the *current*
+request names cannot change whether the session is gated. See
 [Evidence-Preserving Aggregation](coordination-session.md#evidence-preserving-aggregation-mvp7-step-09)
 in the CoordinationSession contract for the runtime half — the
 `aggregation-validated` event, what replay refuses, and why a validated
@@ -270,9 +273,12 @@ reaches exactly the close it reached before this field existed.
 **Named limitations.** `mode` remains *required* whenever `completion` is
 present, so declaring `aggregation` alone is still rejected — pre-existing
 behavior, deliberately left alone. The runtime-side limitations (a careful
-same-driver forgery of the validation event, and the definition being pinned
-by `{id, version}` rather than by content) are named in full in the
-CoordinationSession contract section linked above and are **not** closed here.
+same-driver forgery of the validation event, the definition being pinned by
+`{id, version}` rather than by content, a `partialPolicy`-permitted omission
+that can leave a declared-aggregation session permanently unclosable, and the
+non-atomic "latest validated aggregation supersedes" selection) are named in
+full in the CoordinationSession contract section linked above and are **not**
+closed here.
 
 - **Forbidden under `Workflow`:** `completion` entirely, and therefore
   `completion.aggregation` structurally.

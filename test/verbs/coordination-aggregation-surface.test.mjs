@@ -307,6 +307,74 @@ test('a validated NO-CONSENSUS aggregation still refuses the close, with the eng
   assert.equal(readManifest(coordinationId, opts).status, 'active');
 });
 
+// ─── 1b. The gate reads the SESSION's definition, never the request's ──────
+
+// A structurally identical protocol under a DIFFERENT id that declares no
+// aggregation -- the cheapest bypass an ordinary caller has: resume the
+// session naming this one instead.
+const AGGREGATION_FREE_PROTOCOL_ID = 'test.coordination-protocol.aggregation-surface-free';
+
+function writeAggregationFreeProtocol(tempDir) {
+  const doc = protocolDoc({ withAggregation: false });
+  doc.metadata = { id: AGGREGATION_FREE_PROTOCOL_ID, version: '1.0.0' };
+  const dir = path.join(tempDir, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'aggregation-surface-free.json'), `${JSON.stringify(doc, null, 2)}\n`);
+}
+
+/** Rewrite the BOUND protocol document in place, under its own id. */
+function rewriteBoundProtocol(tempDir, { withAggregation, version }) {
+  const doc = protocolDoc({ withAggregation });
+  doc.metadata = { id: PROTOCOL_ID, version };
+  fs.writeFileSync(
+    path.join(tempDir, '.fgos', 'coordination-protocols', 'aggregation-surface.json'),
+    `${JSON.stringify(doc, null, 2)}\n`,
+  );
+}
+
+test('a resume naming a DIFFERENT, aggregation-free protocolRef does NOT bypass the gate -- the close reads manifest.definitionRef, not the request', async () => {
+  const coordinationId = 'coord_agg_surface_swap';
+  const { ctx, opts, tempDir } = setup();
+  writeAggregationFreeProtocol(tempDir);
+
+  const first = await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+  assert.equal(first.closed, false);
+  assert.equal(readManifest(coordinationId, opts).definitionRef.id, PROTOCOL_ID);
+
+  // The bypass, verbatim: same session, same driver, one disposition step
+  // (which reaches no dispatch door), under an aggregation-free protocolRef.
+  const swapped = resumeRequest(coordinationId, anAssignmentOf(coordinationId, opts));
+  swapped.protocolRef = { id: AGGREGATION_FREE_PROTOCOL_ID };
+  const second = await runCoordinationUseCase(ctx, { requestObject: swapped });
+
+  assert.equal(second.closed, false);
+  assert.match(second.closeRefusalReason, /declares completion\.aggregation, but session "coord_agg_surface_swap" has validated no aggregation/);
+  assert.equal(readManifest(coordinationId, opts).status, 'active');
+  assert.equal(replaySession(coordinationId, opts).aggregations.length, 0);
+});
+
+test('editing the bound protocol in place to drop completion.aggregation does NOT bypass the gate -- the close refuses the drifted definition', async () => {
+  const coordinationId = 'coord_agg_surface_edited';
+  const { ctx, opts, tempDir } = setup();
+
+  const first = await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+  assert.equal(first.closed, false);
+
+  // Same protocol id, declaration dropped, version bumped -- the version pin
+  // is what catches this, and it is checked BEFORE the (now absent)
+  // declaration is read.
+  rewriteBoundProtocol(tempDir, { withAggregation: false, version: '9.9.9' });
+
+  const second = await runCoordinationUseCase(ctx, {
+    requestObject: resumeRequest(coordinationId, anAssignmentOf(coordinationId, opts)),
+  });
+
+  assert.equal(second.closed, false);
+  assert.match(second.closeRefusalReason, /was opened against definition "test\.coordination-protocol\.aggregation-surface@1\.0\.0", but the resolved definition is now version "9\.9\.9" -- refusing to close against a drifted definition/);
+  assert.equal(readManifest(coordinationId, opts).status, 'active');
+  assert.equal(replaySession(coordinationId, opts).aggregations.length, 0);
+});
+
 // ─── 2. Opt-in stays opt-in ────────────────────────────────────────────────
 
 test('regression: a protocol that declares NO aggregation closes exactly as it did before the gate existed', async () => {
@@ -397,7 +465,10 @@ test('show reports a post-terminal aggregation as NEUTRALIZED rather than hiding
 
   // The store door refuses to validate into a closed session, so a
   // post-terminal record can only arrive by a raw append -- exactly the shape
-  // replay neutralizes.
+  // replay neutralizes. One artifact revision pin per cited source, matching
+  // what a real validation emits: this test is about post-terminal
+  // neutralization, so the record must clear replay's own consensus
+  // consistency checks rather than fail one of them for an unrelated reason.
   const { eventsPath } = resolveSessionPaths(coordinationId, opts);
   const sourceRefs = replaySession(coordinationId, opts).results.map((entry) => entry.assignmentId);
   fs.appendFileSync(
@@ -407,7 +478,14 @@ test('show reports a post-terminal aggregation as NEUTRALIZED rather than hiding
       ts: new Date().toISOString(),
       v: '1',
       type: 'aggregation-validated',
-      payload: { aggregationId: 'agg_surface_late', method: AGGREGATION_METHOD, outcome: 'consensus', sourceResultRefs: sourceRefs, validatedBy: validatedBy() },
+      payload: {
+        aggregationId: 'agg_surface_late',
+        method: AGGREGATION_METHOD,
+        outcome: 'consensus',
+        sourceResultRefs: sourceRefs,
+        artifactRevisionRefs: sourceRefs.map((ref, i) => `artifact://${ref}@rev-${i}`),
+        validatedBy: validatedBy(),
+      },
     })}\n`,
   );
 
@@ -534,8 +612,17 @@ test('CLI/headless parity over a full aggregation scenario: refused close, valid
   assert.equal(headlessFirst.closed, false);
   assert.match(cliFirst.closeRefusalReason, /declares completion\.aggregation, but session ".*" has validated no aggregation/);
 
+  // The two `run` comparisons are the genuine two-door ones: a spawned
+  // subprocess against an in-process adapter, two separate workspaces.
   assert.deepEqual(normalize(headlessFirst), normalize(cliFirst));
   assert.deepEqual(normalize(headlessSecond), normalize(cliSecond));
+  // The `show` comparison is deliberately weaker, and is not claimed as a
+  // two-door proof: `runCoordinationHeadless` exposes no `show` surface of its
+  // own, and the CLI's `show` is a thin wrapper over the same
+  // `showCoordinationUseCase` this line calls directly. What it does prove is
+  // that the two workspaces reached identical rendered state and that the
+  // CLI's `--json` envelope round-trip drops nothing -- worth asserting,
+  // but it is not a second implementation of `show`.
   assert.deepEqual(normalize(headlessShown), normalize(cliShown));
 
   // And the scenario genuinely reached the far end on both doors.

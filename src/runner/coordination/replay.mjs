@@ -214,6 +214,25 @@ export function replaySession(coordinationId, opts = {}) {
             );
           }
         }
+        // Same class of check, one more field: a real validation pins exactly
+        // one `artifactRef@revision` per surviving source, and a `consensus`
+        // requires every source to survive -- so the two lists are the same
+        // length, and a consensus over zero pinned artifacts is not a shape a
+        // real validation can emit. Needs no definition, so it belongs here
+        // rather than at a definition-aware door.
+        const artifactRevisionRefs = event.payload.artifactRevisionRefs ?? [];
+        if (artifactRevisionRefs.length === 0) {
+          throw new CoordinationError(
+            'validation',
+            `session "${coordinationId}": "aggregation-validated" event "${aggregationId}" claims outcome "consensus" with no artifactRevisionRefs -- a real evidence-preserving validation pins one artifact revision per surviving source, so a consensus over zero pinned artifacts preserved no evidence`,
+          );
+        }
+        if (artifactRevisionRefs.length !== event.payload.sourceResultRefs.length) {
+          throw new CoordinationError(
+            'validation',
+            `session "${coordinationId}": "aggregation-validated" event "${aggregationId}" claims outcome "consensus" with ${artifactRevisionRefs.length} artifactRevisionRefs against ${event.payload.sourceResultRefs.length} sourceResultRefs -- a real evidence-preserving validation pins exactly one artifact revision per cited source result`,
+          );
+        }
       }
       const record = {
         aggregationId,

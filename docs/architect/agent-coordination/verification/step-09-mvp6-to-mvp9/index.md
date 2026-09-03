@@ -67,14 +67,14 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 |---|---|---|---|
 | 00 | Intake | R1-R4 (P00.1), file-ownership map (P00.2) | done |
 | 06 | MVP6 | P06.1 + P06.2 (4 fix rounds) + P06.3 all done | **done** |
-| 07 | MVP7 | P07.1/P07.2 done; P07.3 done (session integration, 1 HIGH fixed); P07.4 (surface/regression proof, contract promotion) open | in-progress |
+| 07 | MVP7 | P07.1-P07.4 all done (2 HIGH fixed across the phase) | **done** |
 | 08 | MVP8 | P08.1 done (contribution model/validation); P08.2/P08.3 open | in-progress |
-| 09 | MVP9 | see phase-09 file | missing |
+| 09 | MVP9 | P09.1 done (specialist slot schema, static-only prep); P09.2/P09.3 open (blocked on MVP8 gate) | in-progress |
 | 10 | External acceptance | see phase-10 file | missing |
 
 ## Active Cell
 
-None. Wave 3 (P07.3 + P08.1) closed — see "Wave 3 Status" below.
+None. Wave 4 (P07.4 + P09.1) closed — see "Wave 4 Status" below.
 
 **Process deviation, recorded honestly:** both P06.1 and P07.1 were
 dispatched as concurrent source-writers into the SAME shared worktree
@@ -93,14 +93,11 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Prepare P07.4 (Surface And Regression Proof, closes Phase 07 — required
-for "P07 exit" before Wave 4/P08.2 can start per plan.md). P09.1
-(specialist-slot definition) "may prepare after P06 exit" per the map,
-which is already satisfied — may run in parallel with P07.4 in its own
-isolated worktree if their write scopes are confirmed disjoint (P09.1 is
-new FlowDefinition/`topology.specialistSlots[]` schema surface, closer to
-P06's `src/runner/definitions/schema.mjs` than P07's session files —
-re-confirm before dispatch). P08.2 stays blocked until P07.4 closes.
+Prepare P08.2 (Session Ledger, Replay, And Visibility) — now ready
+("P07 exit" and P08.1 both satisfied per plan.md's Wave 4 readiness
+condition). P09.2 stays blocked until the MVP8 product gate (P08 exit) —
+phase-09.md is explicit that P09.1's schema prep "cannot integrate before
+the MVP8 product gate."
 
 ## Cell Log
 
@@ -108,10 +105,12 @@ re-confirm before dispatch). P08.2 stays blocked until P07.4 closes.
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
+| P07.4 | Phase 07 surface/regression proof, contract promotion (closes Phase 07; 1 HIGH fixed) | done | (pending commit) |
+| P09.1 | Phase 09 specialist slot schema, static-only prep | done | (pending commit) |
 | P06.1 | Phase 06 visibility definition schema/validation | done | `8d2fa7d8` |
 | P07.1 | Phase 07 Team Cognition evaluator skeleton (partial P07.2 slice) | done | `8d2fa7d8` |
-| P07.3 | Phase 07 FlowDefinition/session aggregation integration (1 HIGH fixed) | done | (pending commit) |
-| P08.1 | Phase 08 contribution model/validation | done | (pending commit) |
+| P07.3 | Phase 07 FlowDefinition/session aggregation integration (1 HIGH fixed) | done | `7263a15c` |
+| P08.1 | Phase 08 contribution model/validation | done | `7263a15c` |
 | P06.2 | Phase 06 visibility runtime/grant enforcement/replay (4 fix rounds) | done | `0c80918c` |
 | P07.2 | Phase 07 aggregation outcome classification (remaining scope) | done | `0c80918c` |
 | P06.3 | Phase 06 proof and promotion (closes Phase 06) | done | `487771aa` |
@@ -438,3 +437,81 @@ Next: P07.4 (Surface And Regression Proof, closes Phase 07 — required for
 "P07 exit" before Wave 4/P08.2). P09.1 may prepare in parallel per
 plan.md ("P06 exit" already satisfied) if write scopes are confirmed
 disjoint.
+
+## Wave 4 Status (P07.4 + P09.1)
+
+**CLOSED.** Isolated worktrees, sequential merge, combined review.
+
+The Coordinator's own dispatch brief asked reviewers to evaluate whether
+closing the aggregation opt-in gate "raised the significance" of an
+already-disclosed raw-store-door forgery residual. Both independent
+first-pass rounds instead found something more direct: the new close
+gate itself (`aggregationCloseParams`) read the definition the *request*
+named rather than the session's own bound `manifest.definitionRef` —
+**the third instance of the exact same bug class** first fixed in
+`7263a15c` (Wave 3), reintroduced one door over. Live-reproduced two
+ways (resume naming a different aggregation-free protocol; same protocol
+id with the file edited in place, version bumped and ignored) through
+the ordinary CLI request door — no forgery, no `.fgos` write access, no
+privileged capability of any kind. Both reviewers correctly identified
+that this also invalidated the Coordinator's own "raised significance"
+framing: the real cheapest bypass needed no raw-store-door access at
+all.
+
+Given the recurrence, the fix round was scoped to include a mandatory
+self-audit: grep the entire wave's diff for every place a definition or
+manifest value is threaded as a caller-supplied parameter into an
+aggregation-adjacent function, and confirm each resolves from the
+session's own bound state. Result: no further instance, with three named
+adjacent observations (one pre-existing and out of window, two already
+documented residuals). The final recheck independently rebuilt this audit
+from scratch and confirmed it accurate, plus independently reconstructed
+both original PoC variants against the fix and confirmed both refuse.
+
+Also fixed in the same round: two P09.1 schema gaps (a specialist slot
+whose declared `role` cannot legally perform its own `operationRefs[]`,
+statically undispatchable; a slot id colliding with a declared actor,
+role, operation, or node id, which both false-rejected a legal edge and
+made the slot silently routable) plus two smaller precedent-consistency
+gaps (`operationRefs[]` non-empty, no duplicates — mirroring
+`sourceOperationRefs`'s existing rules). A free, no-`store.mjs`-touch
+narrowing was added to the forged-aggregate residual (a replay-level
+check that a real validation's `artifactRevisionRefs` count always
+matches its `sourceResultRefs` count). The final recheck found the
+narrowing is real but count-only (padding with junk pins still passes) —
+named honestly rather than overclaimed.
+
+Two more trivial items closed directly by the Coordinator after the final
+recheck (both LOW, doc-wording/one-line-code): the `{id, version}`-pin
+residual's wording now states plainly that at the close-gate door
+specifically, this bypass silently disables the cell's one enforced
+property (not merely "a different cohort"); `specialistSlots[].id`
+disjointness now also checks against `visibilityWindows[].id`
+(`windowIds` was already computed at the right point — one array entry
+and one regression test).
+
+One real, honestly-named product consequence surfaced by the final
+attack round and NOT fixed (by design — no code touched, documented in
+both the contract text and P07.4.md's Gaps): enforcing the aggregation
+gate makes a session whose `partialPolicy` explicitly permits an omission
+that the aggregation rule then classifies `no-consensus` permanently
+unclosable — no `cancelSession` request-surface door exists today. Named
+as a future-work candidate (a driver-disposition escape or a cancel
+door), not silently discovered later.
+
+Focused command, final: `test/runner/flow-definition*.test.mjs
+test/runner/coordination-schema.test.mjs test/runner/coordination-session-engine.test.mjs
+test/runner/coordination-replay.test.mjs test/verbs/coordination-aggregation-surface.test.mjs
+test/architecture.test.mjs` — **179/179 pass** (was 171 pre-fix-round).
+Broader coordination/CLI/verbs sweep: 544/544 (recheck's own run showed
+464/465 on a narrower slice, the 1 fail being the documented
+`coordination-static.test.mjs` worktree-path false-fail). Full suite: 1
+known baseline failure only (`fgos-intake-4.test.mjs:318`).
+
+**This closes Wave 4.** Phase 07 (MVP7) is now fully done. Phase 08
+remains in-progress (P08.2/P08.3 open, P08.2 now unblocked). Phase 09
+remains in-progress (P09.1 done, P09.2/P09.3 blocked on the MVP8 product
+gate per phase-09.md's own explicit constraint).
+
+Next: P08.2 (Session Ledger, Replay, And Visibility) — ready now that
+"P07 exit" and P08.1 are both satisfied.

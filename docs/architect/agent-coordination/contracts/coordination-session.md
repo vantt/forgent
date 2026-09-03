@@ -297,39 +297,83 @@ upgrades a close.
 `completion.aggregation` (see [FlowDefinition Contract](flow-definition.md))
 may not close on quorum alone. The request door that drives a session
 (`src/verbs/coordination/run.mjs`, shared by `fgos coordination run` and the
-headless adapter) reads the bound definition, and when it declares an
-aggregation it resolves the session's most recently validated one and passes
-it to the close. With none validated, the close is refused and the session
-stays `active`; the remedy is to validate one and resume the session. A
+headless adapter) resolves the definition from the session's own
+`manifest.definitionRef` and refuses version drift — the same discipline the
+validation and dispatch doors use, and never the definition the current
+request names. A resume request naming a different `protocolRef`, or an
+in-place edit of the bound document, therefore cannot decide whether this
+session's close is gated. When the bound definition declares an aggregation
+the door resolves the session's most recently validated one and passes it to
+the close; with none validated, the close is refused and the session stays
+`active`, and the remedy is to validate one and resume the session. A
 definition that declares no aggregation is unaffected — the gate is opt-in at
 the schema level, and no protocol shipped under `core/` declares one today.
+
+Two consequences of enforcing it, stated rather than discovered later:
+
+- **A `partialPolicy`-permitted omission can make the session permanently
+  unclosable.** If an omission `partialPolicy` explicitly allows belongs to a
+  declared source operation, that unsatisfied binding forces `no-consensus`,
+  and no re-validation can reach `consensus` while the actor stays missing. The
+  gate then refuses every close, and no `cancelSession` door exists on the
+  request surface — so there is no other terminal exit. The same holds for a
+  permanently `qualified` outcome (unresolved dissent). This is a real product
+  limitation of MVP7, not a security property: it needs a future escape door (a
+  driver disposition recording why an aggregation cannot resolve, or a
+  `cancelSession` request surface). Neither is built here.
+- **"The latest validated aggregation supersedes" is not enforced atomically.**
+  The request door selects the most recent validated record outside the
+  engine's close lock, and the engine re-checks only the id it was handed. A
+  `no-consensus` validated in between does not supersede the `consensus`
+  already selected. Both writes need the same driver identity and an active
+  session, so this is a narrow same-driver race, not a cross-actor exposure —
+  named here rather than papered over by the stronger wording.
 
 **What replay refuses.** A worker-typed validator, a `validatedBy.id` that is
 not this session's own driver identity, a source result with no accepted
 `result-linked` earlier in the same log, an aggregate naming its own output
-Assignment among its sources, a duplicate `aggregationId`, and a claimed
+Assignment among its sources, a duplicate `aggregationId`, a claimed
 `consensus` that simultaneously names a missing/failed actor, an unresolved
-contribution, or an unbound source operation. A post-terminal
-`aggregation-validated` event is neutralized rather than trusted — reported
-separately, exactly as a post-terminal authorization is.
+contribution, or an unbound source operation, and a claimed `consensus` whose
+`artifactRevisionRefs` are absent/empty or do not number exactly one per cited
+`sourceResultRefs` entry. A post-terminal `aggregation-validated` event is
+neutralized rather than trusted — reported separately, exactly as a
+post-terminal authorization is.
 
 **Named limitations, not omitted.**
 
-1. **A careful forgery by the session's own driver identity is not detected.**
-   A driver writing `aggregation-validated` straight to the store with
-   `outcome: consensus` and genuinely linked source refs, with no evaluator
-   call behind it, produces an event replay accepts. This is structural:
-   replay is definition-blind by design, so it cannot re-derive the evidence
-   set or re-run the evaluator to compare verdicts. Same trust boundary as the
-   unmediated store-door residuals named for visibility windows. The
-   consistency check above catches only an *inconsistent* forgery.
+1. **A careful forgery by the session's own driver identity is not detected —
+   narrowed, not closed, and not structural.** A driver writing
+   `aggregation-validated` straight to the store with `outcome: consensus`,
+   genuinely linked source refs, and one artifact revision pin per source,
+   with no evaluator call behind it, still produces an event replay accepts.
+   What replay now catches is every forgery that does not mirror the shape of a
+   real validation: the coverage fields must be empty and the artifact revision
+   pins must be present and match the source count. What it still cannot catch
+   is a forger who mirrors that shape exactly, because replay is
+   definition-blind and cannot re-derive the evidence set or re-run the
+   evaluator to compare verdicts. Two narrowings are known and deliberately not
+   taken in MVP7, and neither is blocked by anything structural:
+   `recordAggregationValidation` (`store.mjs`) accepts `outcome` as a plain
+   caller parameter and could derive it instead — the same fix shape that
+   removed `definition` from the validation door's parameter list; and a
+   `sourceResultRefs` entry citing an Assignment for an operation that is not a
+   declared source could be refused at the one door that now holds the bound
+   definition (`aggregationCloseParams` / `validateSessionAggregation`), though
+   never at replay. Same trust boundary as the unmediated store-door residuals
+   named for visibility windows; recorded here as scheduled-but-not-done rather
+   than as unfixable.
 2. **The definition is pinned by `{id, version}`, never by content.** The
    validation door resolves the definition from `manifest.definitionRef` and
    refuses version drift, but nothing pins the loaded document's bytes — an
    actor with `.fgos` write access could still swap in a same-`{id, version}`
-   document declaring a different cohort. Every sibling definition-consuming
-   door in the engine shares this exposure; it is a known boundary at parity
-   with them, not a regression, and it is not closed by MVP7.
+   document declaring a different cohort. At the close-gate door specifically
+   (`aggregationCloseParams`), the same swap is stronger than "a different
+   cohort": editing the bound document to drop `completion.aggregation`
+   entirely turns the gate itself off, silently disabling the one property
+   this cell exists to enforce. Every sibling definition-consuming door in
+   the engine shares this exposure; it is a known boundary at parity with
+   them, not a regression, and it is not closed by MVP7.
 3. **`unresolvedContributionRefs` and hidden-dissent are wired but not driven
    end to end.** Both are covered at the event-schema and evaluator-unit
    layers; no session-level fixture produces the RunResult shapes that would

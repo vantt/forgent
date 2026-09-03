@@ -384,6 +384,23 @@ function validateSpecialistSlot(slot, label) {
   if (!isNonEmptyString(slot.id)) fail(`${label}.id must be a non-empty string`);
   if (!isNonEmptyString(slot.role)) fail(`${label}.role must be a non-empty string`);
   assertStringArray(slot.operationRefs, `${label}.operationRefs`);
+  // Non-empty and deduplicated, matching `completion.aggregation.sourceOperationRefs`'s
+  // existing precedent in this same file and for the same reason: a slot that
+  // may perform nothing bounds nothing, which is exactly the unboundedness the
+  // all-fields-required rule above exists to prevent.
+  if (slot.operationRefs.length === 0) {
+    fail(`${label}.operationRefs must name at least one operation -- a slot that may perform nothing bounds nothing`);
+  }
+  if (new Set(slot.operationRefs).size !== slot.operationRefs.length) {
+    fail(`${label}.operationRefs carries a duplicate entry -- each operation may appear at most once in one slot`);
+  }
+  // `requiredCapabilities` and `allowedVisibilityWindows` MAY be empty, and
+  // that is a decision rather than a side effect of the generic array
+  // validator: an empty list means "no gate on that dimension" (any capability
+  // set, any visibility window), which is a legitimate slot to declare. They
+  // differ from `operationRefs` because an empty `operationRefs` removes the
+  // slot's only positive statement of what it is for, while an empty gate list
+  // still leaves the slot bounded by its role, its operations, and its caps.
   assertStringArray(slot.requiredCapabilities, `${label}.requiredCapabilities`);
   assertStringArray(slot.allowedVisibilityWindows, `${label}.allowedVisibilityWindows`);
   if (!isPositiveInteger(slot.maxBindings)) fail(`${label}.maxBindings must be a positive integer`);
@@ -937,23 +954,47 @@ function assertVisibilityWindowsReferenceRealOperations(profile, operationIds) {
  * here (after `operations`/`roleSet` are computed) for the same ordering
  * reason.
  *
+ * Known, deliberate limitation of the two dangling-ref checks below:
+ * `requiredCapabilities[]` resolves against the definition-wide union of
+ * operation capabilities, and `allowedVisibilityWindows[]` against every
+ * declared window, so a slot may name a capability or a window that is
+ * scoped to an operation outside its own `operationRefs[]`. Such a slot is
+ * over-declared rather than unfillable (unlike the role mismatch below,
+ * which makes it undispatchable), and narrowing either to the slot's own
+ * operations is a product decision left to P09.2 rather than an oversight.
+ *
+ * A slot's `role` must also match the role of every operation it lists.
+ * `dispatchDeclaredOperation` (session-engine.mjs) refuses a binding whose
+ * actor role differs from the operation's declared role, so a slot naming an
+ * operation of another role is statically impossible to fill AND dispatch --
+ * an unfillable slot is an authoring error, not a legal declaration.
+ *
  * `graph.nodes[].operations[].actor` referencing a slot id (declared or
  * not) needs no dedicated check here: `actor` only ever resolves against
  * `spec.actors[]` ids (see `validateNodeOperationRef`), and a slot id is
- * never added to that set, so any such reference is already rejected by
- * the existing "actor not declared in spec.actors" check -- proving a
- * graph operation binding can never statically expand into an undeclared
- * (or any) specialist slot without new runtime authorization logic (P09.2).
+ * never added to that set -- which `assertSpecialistSlotIdsAreDisjoint`
+ * below now enforces rather than assumes -- so any such reference is
+ * already rejected by the existing "actor not declared in spec.actors"
+ * check, proving a graph operation binding can never statically expand into
+ * an undeclared (or any) specialist slot without new runtime authorization
+ * logic (P09.2).
  */
-function assertSpecialistSlotsReferenceRealEntities(profile, roleSet, operationIds, capabilityIds, windowIds) {
+function assertSpecialistSlotsReferenceRealEntities(profile, roleSet, operations, capabilityIds, windowIds) {
   const slots = profile.topology?.specialistSlots;
   if (!slots) return;
+  const operationsById = new Map(operations.map((op) => [op.id, op]));
   slots.forEach((slot, i) => {
     const label = `spec.profile.topology.specialistSlots[${i}]`;
     if (!roleSet.has(slot.role)) fail(`${label}.role "${slot.role}" is not declared in spec.roles`);
     slot.operationRefs.forEach((ref, j) => {
-      if (!operationIds.has(ref)) {
+      const operation = operationsById.get(ref);
+      if (operation === undefined) {
         fail(`${label}.operationRefs[${j}] "${ref}" does not reference a declared spec.operations[] id`);
+      }
+      if (operation.role !== slot.role) {
+        fail(
+          `${label}.operationRefs[${j}] "${ref}" is declared for role "${operation.role}", but the slot declares role "${slot.role}" -- a specialist of the slot's role could never be dispatched for it`,
+        );
       }
     });
     slot.requiredCapabilities.forEach((cap, j) => {
@@ -966,6 +1007,46 @@ function assertSpecialistSlotsReferenceRealEntities(profile, roleSet, operationI
         fail(`${label}.allowedVisibilityWindows[${j}] "${ref}" does not reference a declared spec.profile.topology.visibilityWindows[] id`);
       }
     });
+  });
+}
+
+/**
+ * A `specialistSlots[].id` must not collide with any other declared id space
+ * in the same definition -- `spec.actors[].id`, `spec.roles[]`,
+ * `spec.operations[].id`, or `spec.graph.nodes[].id`.
+ *
+ * Both directions of a collision are wrong, and the edges check in
+ * `validateProtocolProfile` cannot tell them apart without this: an
+ * `edges[]` entry between two REAL actors is rejected as "references a
+ * declared specialist slot id" when one actor's id happens to equal a slot
+ * id (false rejection), while a `graph.nodes[].operations[].actor` naming
+ * that same string resolves against `spec.actors[]` and binds -- making the
+ * slot id routable after all (false acceptance). Disjointness is what makes
+ * "a slot id is never in the actor id space" a property rather than an
+ * assumption. FlowDefinitions are portable protocol content, not
+ * operator-authored trusted data, so "an author would not do that" is not
+ * the applicable standard.
+ *
+ * Runs after `validateGraph` because `graph.nodes[].id` is only known then.
+ */
+function assertSpecialistSlotIdsAreDisjoint(profile, roleSet, actors, operationIds, graph, windowIds) {
+  const slots = profile.topology?.specialistSlots;
+  if (!slots) return;
+  const spaces = [
+    ['spec.actors[].id', new Set((actors ?? []).map((actor) => actor.id))],
+    ['spec.roles[]', roleSet],
+    ['spec.operations[].id', operationIds],
+    ['spec.graph.nodes[].id', new Set(graph.nodes.map((node) => node.id))],
+    ['spec.profile.topology.visibilityWindows[].id', windowIds],
+  ];
+  slots.forEach((slot, i) => {
+    for (const [space, ids] of spaces) {
+      if (ids.has(slot.id)) {
+        fail(
+          `spec.profile.topology.specialistSlots[${i}].id "${slot.id}" collides with a declared ${space} -- a slot id must be disjoint from every other declared id space, so a slot can never be reached as a routable actor, role, operation, or node`,
+        );
+      }
+    }
   });
 }
 
@@ -1004,8 +1085,9 @@ function validateSpec(spec) {
   assertAggregationReferencesRealOperations(profile, operationIds);
   const windowIds = new Set((profile.topology?.visibilityWindows ?? []).map((w) => w.id));
   const capabilityIds = new Set(operations.flatMap((op) => op.capabilities ?? []));
-  assertSpecialistSlotsReferenceRealEntities(profile, roleSet, operationIds, capabilityIds, windowIds);
+  assertSpecialistSlotsReferenceRealEntities(profile, roleSet, operations, capabilityIds, windowIds);
   const graph = validateGraph(spec.graph, operations, actors, profile.kind, windowIds);
+  assertSpecialistSlotIdsAreDisjoint(profile, roleSet, actors, operationIds, graph, windowIds);
   const policy = spec.policy !== undefined ? validatePolicyPatch(spec.policy, 'spec.policy') : undefined;
 
   // Definition-scope (`spec.policy`) is the least-specific declared scope

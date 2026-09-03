@@ -212,13 +212,35 @@ function resolveRefArray(values, labels, fieldLabel) {
 // aggregation (every shipped protocol under `core/` today) returns `{}` and
 // leaves the close byte-identical to what it was before aggregation existed.
 //
+// The definition is the SESSION's, never the request's. It is resolved here
+// from `manifest.definitionRef` and refused on version drift -- the same four
+// lines `validateSessionAggregation` and `dispatchDeclaredOperation`
+// (session-engine.mjs) already use, for the same reason. A request naming a
+// different `protocolRef.id` on resume, or an in-place edit of the bound
+// protocol document, therefore cannot decide whether this session's close is
+// gated: `findExistingManifest` resumes on `coordinationId` + `writerId`
+// alone, so the requested protocol is a caller value and nothing more. The
+// drift refusal deliberately runs BEFORE the declaration is read -- reading it
+// first would let an edit that DROPS the declaration (bumped version and all)
+// walk past the gate it just removed.
+//
 // The verdict is never judged here. This function only selects WHICH
 // validated aggregation speaks for the session; whether that outcome permits
 // a close is decided by the engine, inside its own close lock, from the event
 // log.
-function aggregationCloseParams(coordinationId, definition, engineOpts) {
+function aggregationCloseParams(coordinationId, engineOpts) {
+  const { manifest, aggregations } = resumeSession(coordinationId, engineOpts);
+  // An agent-led session has no FlowDefinition bound at all -- nothing can
+  // declare an aggregation over it.
+  if (!manifest.definitionRef) return {};
+  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: engineOpts.cwd, packageRoot: engineOpts.packageRoot });
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `coordination run: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to close against a drifted definition`,
+    );
+  }
   if (definition?.spec?.profile?.completion?.aggregation === undefined) return {};
-  const { aggregations } = resumeSession(coordinationId, engineOpts);
   if (aggregations.length === 0) {
     throw new CoordinationError(
       'validation',
@@ -231,6 +253,15 @@ function aggregationCloseParams(coordinationId, definition, engineOpts) {
   // aggregation and validate a new one"). `aggregations` never contains a
   // post-terminal record -- replay neutralizes those into
   // `ignoredAggregations`, which is deliberately not read here.
+  //
+  // Known, narrow race, stated rather than overstated: this selection happens
+  // outside the engine's close lock, and the engine re-checks only the id it
+  // is handed. A `no-consensus` validated between this read and that re-check
+  // does not supersede the `consensus` already selected, so "a later
+  // validation supersedes an earlier verdict" holds for every ordinary
+  // sequential use but is not enforced atomically. Both writes need the SAME
+  // driver identity and an active session, so this is a same-driver race, not
+  // a cross-actor exposure.
   return { aggregationId: aggregations[aggregations.length - 1].aggregationId };
 }
 
@@ -281,11 +312,6 @@ export async function runCoordinationUseCase(ctx, options = {}) {
   const stepResults = [];
   let manifest;
   let fanOutFailure = null;
-  // The bound protocol document, when there is one. Held beyond the
-  // declared-protocol branch below because the close-time aggregation gate
-  // needs it (`aggregationCloseParams`); an agent-led session has no
-  // FlowDefinition at all and leaves it `null`.
-  let definition = null;
 
   if (request.kind === 'agent-led') {
     manifest =
@@ -314,7 +340,7 @@ export async function runCoordinationUseCase(ctx, options = {}) {
     );
     stepResults.push({ as: 'primary', type: 'operation', actorId: 'primary', ...summarizeDispatch(dispatch) });
   } else {
-    definition = loadCoordinationProtocol(request.protocolRef.id, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
+    const definition = loadCoordinationProtocol(request.protocolRef.id, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
     const declaredActorIds = new Set((definition.spec.actors ?? []).map((a) => a.id));
     for (const actorEntry of request.actors) {
       if (!declaredActorIds.has(actorEntry.id)) {
@@ -497,7 +523,7 @@ export async function runCoordinationUseCase(ctx, options = {}) {
   let closed = false;
   let closeRefusalReason = null;
   try {
-    closeSessionByQuorum(manifest.coordinationId, aggregationCloseParams(manifest.coordinationId, definition, engineOpts), engineOpts);
+    closeSessionByQuorum(manifest.coordinationId, aggregationCloseParams(manifest.coordinationId, engineOpts), engineOpts);
     closed = true;
   } catch (err) {
     if (err instanceof CoordinationError) {

@@ -688,6 +688,64 @@ test('rejects an explicit topology.edges[] entry naming a declared specialist sl
   );
 });
 
+test('rejects a specialistSlots[].id colliding with a declared actor, role, operation, or graph node id', () => {
+  const collisions = [
+    ['actor-1', /specialistSlots\[0\]\.id "actor-1" collides with a declared spec\.actors\[\]\.id/],
+    ['researcher', /specialistSlots\[0\]\.id "researcher" collides with a declared spec\.roles\[\]/],
+    ['op-research', /specialistSlots\[0\]\.id "op-research" collides with a declared spec\.operations\[\]\.id/],
+    ['phase-research', /specialistSlots\[0\]\.id "phase-research" collides with a declared spec\.graph\.nodes\[\]\.id/],
+    ['window-1', /specialistSlots\[0\]\.id "window-1" collides with a declared spec\.profile\.topology\.visibilityWindows\[\]\.id/],
+  ];
+  for (const [id, pattern] of collisions) {
+    const def = withSpecialistSlot({ id });
+    assert.throws(() => validateFlowDefinition(def), throwsFlowDefinitionError(pattern), `expected slot id "${id}" to be rejected`);
+  }
+});
+
+test('a legal edge between two real actors is NOT rejected as a slot reference -- slot ids are disjoint from the actor id space', () => {
+  const def = withSpecialistSlot();
+  def.spec.actors.push({ id: 'actor-2', role: 'researcher' });
+  def.spec.profile.topology.edges = [{ from: 'actor-1', to: 'actor-2' }];
+  const result = validateFlowDefinition(def);
+  assert.deepEqual(result.spec.profile.topology.edges, [{ from: 'actor-1', to: 'actor-2' }]);
+});
+
+test("rejects a specialistSlots[] entry whose role differs from an operationRefs[] entry's own declared role", () => {
+  const def = withSpecialistSlot();
+  def.spec.roles.push('coordinator');
+  def.spec.operations.push({ id: 'op-review', role: 'coordinator', result: { kind: 'advisory' } });
+  def.spec.profile.topology.specialistSlots[0].operationRefs = ['op-review'];
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(
+      /specialistSlots\[0\]\.operationRefs\[0\] "op-review" is declared for role "coordinator", but the slot declares role "researcher" -- a specialist of the slot's role could never be dispatched for it/,
+    ),
+  );
+});
+
+test('rejects an empty specialistSlots[].operationRefs -- a slot that may perform nothing bounds nothing', () => {
+  const def = withSpecialistSlot({ operationRefs: [] });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/specialistSlots\[0\]\.operationRefs must name at least one operation -- a slot that may perform nothing bounds nothing/),
+  );
+});
+
+test('rejects a duplicate entry within one specialistSlots[].operationRefs', () => {
+  const def = withSpecialistSlot({ operationRefs: ['op-list-results', 'op-list-results'] });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/specialistSlots\[0\]\.operationRefs carries a duplicate entry -- each operation may appear at most once in one slot/),
+  );
+});
+
+test('accepts empty requiredCapabilities[]/allowedVisibilityWindows[] -- an empty gate list means "no gate on that dimension", a decision distinct from operationRefs', () => {
+  const def = withSpecialistSlot({ requiredCapabilities: [], allowedVisibilityWindows: [] });
+  const result = validateFlowDefinition(def);
+  assert.deepEqual(result.spec.profile.topology.specialistSlots[0].requiredCapabilities, []);
+  assert.deepEqual(result.spec.profile.topology.specialistSlots[0].allowedVisibilityWindows, []);
+});
+
 test('a graph node operation binding referencing an undeclared specialist slot id as its actor stays statically closed (rejected as an unknown actor, no slot-expansion path)', () => {
   const def = protocolDefinitionWithTwoOperations();
   def.spec.graph.nodes[0].operations[0].actor = 'slot-ghost';
