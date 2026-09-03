@@ -3,235 +3,417 @@
 **Status:** Vision / migration advisory, not a locked platform law and not an
 implementation plan.
 **Date:** 2026-09-01.
-**Source:** Product-owner planning discussion during component-boundary work.
+**Selected direction (2026-09-03):** ship the Rust `fgos` host first, delegate
+complete legacy operations to Node, then replace them one component at a time
+with statically linked Rust providers. Runtime loading is reserved for external
+extensions.
+**Source:** Product-owner planning and follow-up component-boundary discussion.
 
-This note records the migration shape for gradually replacing fgOS's current
-Node harness internals with Rust components while keeping the existing `fgos`
-binary and user-facing contracts stable.
+This document describes only the staged replacement of fgOS's current Node
+implementation by Rust while keeping caller-visible contracts stable. The
+general host/router architecture, including peer CLI and remote host use cases,
+provider kinds, plugin discovery, and capability routing, lives in
+[Host Invocation And Provider Routing Architecture](./host-invocation-provider-routing.md).
 
-## 1. Question
+## 1. Migration Question
 
-Today the harness is mostly Node. The current `fgos` binary acts as the host
-surface and dispatches into service modules that the component-boundary vision
-is trying to separate into clearer components.
+Today the harness is mostly Node and `bin/fgos.mjs` is both an entry surface and
+a composition root containing several use-case and policy clusters. The system
+cannot move to Rust in one rebuild.
 
-The long-term direction may be mostly or fully Rust, but the system cannot move
-there in one rebuild. The practical question is:
+The migration question is:
 
 ```txt
-How can one component at a time be implemented in Rust while current fgos
-callers, commands, envelopes, and lifecycle contracts do not change?
+How can Rust become the permanent fgos host first, while each existing Node
+operation keeps working until its whole component boundary is ready to move?
 ```
 
-## 2. Migration Principle
+The answer is a Rust-shell-first strangler:
 
-Keep `fgos` stable as a host surface. Replace implementation behind stable
-component ports.
+```txt
+fgos Rust host
+  -> LegacyNode for an unmigrated operation
+  -> NativeRust for a migrated built-in operation
+```
 
-The migration boundary should not be a JavaScript import path or a Rust crate
-layout. It should be an explicit component contract:
+Provider selection follows the architecture defined in
+[Host Invocation And Provider Routing](./host-invocation-provider-routing.md).
+This migration document defines how an operation moves from the first provider
+kind to the second.
+
+## 2. Migration Principles
+
+### Rust Host First
+
+The Rust executable becomes the stable product entry point before built-in
+components are ported. It initially behaves as a small bootstrap/router rather
+than a rewrite of all CLI semantics.
+
+### Whole Operation Fallback
+
+An unmigrated verb stays intact on the Node side. Its parser, orchestration,
+state transaction, `fgos.v1` rendering, stderr, and exit-code behavior move
+together or remain together.
+
+### Contract Before Replacement
+
+The migration boundary is not a JavaScript import path or a Rust crate. It is an
+explicit component operation contract:
 
 ```txt
 request schema
   -> component port
-  -> response schema / fgos.v1 envelope / typed error category
+  -> semantic result / typed error
+  -> host-specific presentation
 ```
 
-Node and Rust implementations are interchangeable only when they satisfy the
-same contract tests and preserve the same authority boundary.
+Node and Rust implementations are interchangeable only when they pass the same
+contract fixtures and preserve the same authority boundary.
 
-## 3. Current fgos Thinness Reading
+### Built-In Rust Means In-Process
 
-`fgos` is not yet a pure thin binary. It is currently both the host surface and
-a composition root that still contains several use-case and domain-policy
-clusters.
+Once migrated, a foundation component is normally a Rust crate statically
+linked into the Rust host and called through a typed trait. It does not retain a
+cross-process boundary merely because Node previously required one.
 
-The clean target is not to jump directly from this shape to Rust. The safer
-intermediate target is:
+### External Extensibility Is Separate
 
-```txt
-make fgos thin while still Node
-  -> then replace selected Node component implementations with Rust
-```
+Runtime discovery and no-recompile installation belong to external extensions,
+not built-in migration. Process/WASM plugin mechanics must not impose their ABI
+or latency on statically linked foundation components.
 
-This keeps the first refactor focused on component boundaries and caller
-contracts. Rust then becomes an implementation choice behind those contracts,
-not the thing that defines the boundary.
+## 3. Current `fgos` Thinness Reading
+
+The current Node CLI is not thin. This inventory determines migration order; it
+does not create a prerequisite to thin the entire Node host before Rust lands.
 
 ### Already Thin Or Near-Thin
 
-These parts of `fgos` mostly route to another module and are closer to the
-desired host-surface shape:
+These parts mostly route to another module and are closer to the desired port:
 
 - `version` routes to version resolution.
 - `review`, `approve`, `reject`, `catchup`, `sync-root`, and
-  `promote-to-component` already delegate substantial behavior to
-  `src/verbs/merge/*` use cases, with the CLI mostly parsing flags and
-  constructing context.
+  `promote-to-component` delegate substantial behavior to
+  `src/verbs/merge/*` use cases.
 - `gateway start|stop|status` routes to gateway lifecycle control.
-- `session start|end|list|gc` mostly routes to the session component, with
-  light payload shaping.
+- `session start|end|list|gc` mostly routes to the session component.
 - `triage` delegates to impact ranking.
 - `goal` mostly delegates to focus/set/show functions.
 
-These are useful precedents: the CLI is still the command surface, but the
-component behavior mostly lives behind a named module.
+These are candidates for early native-provider slices because the host-facing
+adapter and component behavior are already partly separated.
 
 ### Partly Thin
 
-These parts already have extracted helpers or core modules, but the CLI still
-performs meaningful orchestration:
+These parts have extracted helpers but the CLI still performs meaningful
+orchestration:
 
-- `submit` uses intake helpers, but `submitWork` still lives in the CLI and
-  composes title derivation, id generation, default verify, domain entry stage,
-  acceptance parsing, and the final add operation.
-- `discover` delegates to `resolveDiscovery`, but the CLI still owns verdict
-  parsing, stage/domain preconditions, config loading, and classification patch
-  application.
-- `plan` delegates to `resolvePlan`, but the CLI still owns validation-mode
-  branching, stage checks, verdict parsing, and child JSON parsing.
-- `setup` and `doctor` have `src/setup/*` primitives, but the CLI still owns
-  much of the sequence: rc wiring, hook install, shared config defaults, fixes,
-  checks, and pretty rendering.
-- `check`, `rollup`, and `evolve` use report/evolve helpers, but the CLI still
-  composes read-model shape and output payloads.
+- `submit` uses intake helpers, but `submitWork` still composes title derivation,
+  ID generation, default verify, domain entry stage, acceptance parsing, and
+  the final add operation.
+- `discover` delegates to `resolveDiscovery`, but still owns verdict parsing,
+  stage/domain preconditions, config loading, and classification patching.
+- `plan` delegates to `resolvePlan`, but still owns validation-mode branching,
+  stage checks, verdict parsing, and child JSON parsing.
+- `setup` and `doctor` have `src/setup/*` primitives, but the CLI still owns rc
+  wiring, hook installation, shared defaults, fixes, checks, and rendering.
+- `check`, `rollup`, and `evolve` use report/evolve helpers, but still compose
+  read-model and output payloads in the CLI.
 
-These should usually be thinned in Node before any Rust implementation is
-introduced.
+Their individual migration slice must first extract a coherent use-case port.
+That extraction happens only when the owning component is being migrated.
 
 ### Not Thin Yet
 
 These parts still carry clear component logic inside the CLI body:
 
 - `take`, `pick`, and `return` carry pull-door policy, git/worktree source
-  distinction, clean-tree checks, branch/main return paths, verification,
-  attestation, claim settlement, and advisory checks.
-- `move` is more than a raw FSM route; it owns guard logic such as delivered
-  overrides, return-guard bypass, and decision logging.
-- `add` and `edit` still carry substantial field parsing, normalization, and
-  validation composition.
+  distinctions, clean-tree checks, verification, attestation, claim settlement,
+  and advisory checks.
+- `move` owns guards such as delivered overrides, return-guard bypass, and
+  decision logging.
+- `add` and `edit` carry substantial parsing, normalization, and validation.
 - `uninstall`, `preflight`, `unlock`, `main-checkout-reset`, and
-  `resync-worktree` still mix host/system policy with CLI control flow.
-- Knowledge, docs, and registry verbs still have reporting and registry
-  orchestration in the CLI switch.
+  `resync-worktree` mix host/system policy with CLI control flow.
+- Knowledge, docs, and registry verbs still combine reporting and registry
+  orchestration inside the CLI switch.
 
-These are the best candidates for a Node-only thinness pass before Rust
-migration. The priority should follow component risk and authority clarity, not
-file length alone.
+These remain whole `LegacyNode` routes until their use-case, transaction, and
+authority boundaries can move as one slice. Priority follows risk and authority
+clarity, not file length.
 
-## 4. Transitional Shape
+## 4. Bootstrap The Rust CLI
 
-During migration, each extracted component should expose a thin Node facade.
-The rest of the harness imports the facade, not the implementation.
+The first Rust `fgos` release should own only concerns that remain stable across
+the migration:
+
+- executable bootstrap and install-level resolution;
+- host-global CLI options needed before provider selection;
+- command identity lookup;
+- invocation tracing, timeout, cancellation, and provider diagnostics;
+- routing to `LegacyNode` or `NativeRust`;
+- external plugin routing as defined by the host architecture.
+
+It should not immediately reimplement every Node parser, validation branch, or
+use-case orchestration.
+
+### Transparent Launcher Mode
+
+The smallest bootstrap recognizes an unmigrated command and forwards its argv
+and inherited stdio to the current Node CLI. This preserves byte-level behavior
+and lets Node continue producing `fgos.v1` and its existing exit code.
+
+This mode proves packaging and command parity, but the Rust host cannot yet
+observe a semantic result. It is a compatibility step, not the final port.
+
+### Legacy Bridge Mode
+
+The next step gives the Node entry point a framed invocation mode. It returns a
+structured legacy outcome containing stdout, stderr, exit status, and provider
+diagnostics without changing the public output bytes.
+
+The Rust host gains timeout, cancellation, tracing, and lifecycle control while
+Node still owns the whole legacy operation. The bridge starts Node at most once
+per ordinary CLI invocation.
+
+A persistent Node worker beyond the CLI lifetime is justified only for a
+long-running host, interactive session, or one invocation making repeated
+legacy calls. It otherwise introduces daemon lifecycle without eliminating
+meaningful per-command work.
+
+## 5. Avoid Double Parsing
+
+The Rust host needs enough metadata to identify an operation and choose a
+provider, but the same legacy verb must not acquire two independently maintained
+option parsers.
+
+Command descriptors distinguish:
+
+- host-visible command identity, namespace, summary, and provider;
+- provider-owned option grammar and semantic validation;
+- fully migrated typed request schemas owned by the component contract.
+
+During fallback, Rust recognizes only command identity and forwards the rest of
+argv unchanged. When an operation becomes native, its option grammar and
+request conversion move to Rust together. A generated/shared command descriptor
+may later remove duplicated help metadata, but it is not a prerequisite for the
+bootstrap launcher.
+
+## 6. Migration Boundary And Granularity
+
+Routing changes at whole-verb or whole-use-case granularity:
 
 ```txt
-bin/fgos.mjs
-  -> host/use-case layer
-      -> component facade / port
-          -> current Node implementation
-          -> or Rust binary adapter
-          -> or Rust service adapter
+OperationId -> LegacyNode
+
+becomes
+
+OperationId -> NativeRust
 ```
 
-The facade is the compatibility layer. It lets `fgos` keep the same CLI verbs,
-same output envelope, same exit-code taxonomy, and same caller expectations
-while the implementation behind the port changes.
+A mutating workflow must not be split so Rust performs half a transaction and
+Node performs the other half unless an existing port already defines atomicity,
+locking, recovery, and authority. Delegate the whole write operation, then move
+that authority as one tested slice.
 
-## 5. Preferred Rust Boundaries
+Multiple verbs may eventually call one component port. The port must expose
+semantic operations, not private helper calls copied from the Node module graph.
+A Rust component must not recursively spawn `fgos` or the legacy Node CLI to
+reach another component.
 
-### Rust Binary Adapter
-
-Use first for most migrations.
-
-A Rust binary gives a clear process boundary, simple rollback, independent
-build/test ownership, and explicit JSON/stdin/stdout contracts. It fits
-components that perform bounded work and return a result to the Node host.
-
-The Node facade is responsible for spawning the binary, applying timeouts,
-normalizing failures into fgOS error categories, and preserving the caller's
-existing contract.
-
-### Rust Service Adapter
-
-Use when the component naturally wants to be long-lived.
-
-A Rust service or gateway fits runtime control planes, dashboards, MCP/REST
-surfaces, or components that benefit from shared in-memory state and repeated
-requests. The current dispatch architecture already has an HTTP adapter
-precedent, but production config/resolution should be completed deliberately
-before treating `via: "api"` as a default component migration path.
-
-### Direct Rust Library Binding
-
-Treat as a later optimization, not the default migration path.
-
-N-API, WASM, or similar direct bindings can be useful for pure compute logic
-with stable schemas and no lifecycle side effects. They are a poor first
-migration boundary for authority-owning components because packaging, setup,
-doctor checks, ABI compatibility, and rollback become harder than a binary or
-service boundary.
-
-## 6. Authority Rule
+## 7. Authority Rule
 
 Moving implementation to Rust must not silently move authority.
 
-If a Rust component only replaces calculation or evaluation logic, it should
-return a result, recommendation, proof, or normalized error. The existing owner
-still applies lifecycle transitions and writes state.
+If a Rust component replaces only calculation or evaluation logic, it returns a
+result, recommendation, proof, or typed error. The existing owner still applies
+lifecycle transitions and writes state.
 
 Examples:
 
 - Work Lifecycle authority remains with the Work Lifecycle Engine until a
   separate spec/contract migration explicitly moves it.
-- A Run Result Evaluator may compute confidence, but it does not decide the
-  Work item's next lifecycle transition.
-- A Dispatch And Execution component may launch and observe a Run, but it does
-  not invent the semantic operation being dispatched.
-- A Coding Domain component may own repository/worktree/merge semantics, but
-  those semantics should not leak into domain-agnostic Work lifecycle code.
+- A Run Result Evaluator computes confidence but does not choose the Work
+  item's next lifecycle transition.
+- Dispatch And Execution launches and observes a Run but does not invent the
+  semantic operation being dispatched.
+- Coding Domain may own repository/worktree/merge semantics, but those
+  semantics do not leak into domain-agnostic Work lifecycle code.
 
-The safe migration rule is:
+The migration invariant is:
 
 ```txt
-implementation can move behind a port;
+implementation moves behind a port;
 authority moves only when the owning spec and contract say it moved.
 ```
 
-## 7. Compatibility Requirements
+## 8. Per-Component Strangler Slice
 
-For each component migration slice:
+For each component:
 
-- preserve the public `fgos` command shape;
-- preserve `fgos.v1` envelope semantics where the caller currently receives an
-  envelope;
-- preserve typed error categories and exit-code behavior;
-- keep `.fgos` writes behind the current authorized write door unless the slice
-  explicitly migrates write authority;
-- add contract tests that run the same fixtures against Node and Rust
-  implementations;
-- make setup/doctor aware of any new binary, service, directory, config default,
-  or build dependency introduced by the Rust implementation;
-- keep rollback possible by selecting the Node implementation through the same
-  facade until the Rust path has enough proof.
+1. Name its responsibility, semantic operations, authority, and state writes.
+2. Capture current Node behavior as request/result/error fixtures.
+3. Extract the smallest transport-neutral port needed for those operations.
+4. Move inline Node orchestration behind the port without changing behavior.
+5. Implement the Rust provider as a crate linked into the Rust host.
+6. Run Node and Rust providers against identical conformance fixtures.
+7. Shadow only side-effect-free reads; never dual-run state mutation.
+8. Flip the provider table from `LegacyNode` to `NativeRust` after parity proof.
+9. Keep explicit rollback temporarily, then delete that Node path in a later
+   cleanup slice.
 
-## 8. Suggested Rollout Pattern
+Read-only or mechanical operations should prove the pattern first. State-writing
+components move later because their locking, atomicity, crash recovery,
+idempotency, and error mapping need stronger evidence.
 
-Use a two-phase strangler pattern, one component at a time.
+## 9. Compatibility Requirements
 
-Phase A: make the boundary thin while still Node.
+Every migration slice preserves:
 
-1. Name the component boundary and authority owner.
-2. Extract a Node facade with a narrow request/response contract.
-3. Add contract tests around the existing Node behavior.
-4. Move current in-CLI logic behind that facade without changing public command
-   shape, envelope, exit codes, or state authority.
+- public `fgos` command and option shape;
+- `fgos.v1` success-envelope semantics;
+- typed error categories, stderr behavior, and exit-code mapping;
+- `.fgos` writes behind the authorized write door;
+- project-over-global configuration precedence;
+- caller-visible ordering, idempotency, and cancellation behavior;
+- setup/doctor coverage for new binaries, payloads, directories, config, and
+  build/runtime dependencies;
+- rollback through the provider table until the native path has enough proof.
 
-Phase B: replace the implementation behind the port.
+Contract tests run the same semantic fixtures against both implementations.
+CLI compatibility tests additionally compare presentation bytes and exit codes
+where the existing contract requires exact behavior.
 
-1. Implement the Rust binary or service behind the same facade.
-2. Run both implementations against the same fixtures.
-3. Flip default only after parity proof is stable.
-4. Retire the Node implementation in a later cleanup slice.
+## 10. Communication Cost During Migration
 
-This keeps the migration aligned with the component-boundary vision without
-requiring a full rewrite before the platform can benefit from Rust.
+Cross-process communication is acceptable for the temporary Rust-to-Node edge
+when each call represents a complete operation. It is not suitable for a chatty
+private-helper boundary.
+
+### Cold Legacy Invocation
+
+An unmigrated command pays Rust startup, Node startup, Node initialization, and
+Node work. A local spot check during this discussion put empty Node startup at
+roughly tens of milliseconds and `fgos version --json` at roughly a tenth of a
+second. These observations are environment-specific, not a benchmark or SLO,
+but they show that Rust-outer-first initially creates architectural leverage,
+not a latency improvement.
+
+### Persistent Bridge
+
+Persistent framed stdio or a local socket removes repeated runtime startup when
+one process performs many legacy operations. Use it for gateway/interactive or
+other genuinely long-lived execution, not automatically for every shell
+invocation.
+
+### Native Completion
+
+After an operation becomes `NativeRust`, communication with its built-in crate
+is a direct typed call in the same process. Its transition is therefore:
+
+```txt
+legacy:   Rust startup + Node startup + Node operation
+native:   Rust startup + direct Rust operation
+external: Rust startup + plugin transport + plugin operation
+```
+
+External plugin transport remains by design; the internal migration tax
+disappears component by component.
+
+## 11. Distribution And Rollback
+
+During transition, the installed product contains:
+
+- the Rust `fgos` executable;
+- the Node legacy payload and its runtime requirement;
+- the provider/command descriptors needed to select legacy versus native;
+- any independently installed external plugins.
+
+`fgos setup` and `fgos doctor` verify both built-in runtimes, show which provider
+serves an operation, and distinguish a missing legacy runtime from a missing
+external plugin.
+
+Rollback changes the provider selection for a migrated operation back to
+`LegacyNode` while the Node implementation remains packaged. Once no operation
+references `LegacyNode`, remove the Node payload, runtime checks, bridge, and
+rollback entries in one distinct release.
+
+The migration must never hardcode whether a global or project install is
+active. Project config continues to override global config, and both remain
+diagnosable.
+
+## 12. Physical Migration Layout
+
+Physical placement is component-first and language-second. A component's
+contract, conformance fixtures, and temporary dual implementations stay
+together so removing Node does not require another top-level reorganization.
+
+```txt
+apps/
+  fgos/                         # permanent Rust CLI adapter/binary
+  fgos-node-legacy/             # transitional Node entry/provider
+  gateway/                      # remote host adapter
+
+packages/
+  host-runtime/                 # architecture defined in companion document
+  component-protocol/
+    rust/
+    node/
+  work-lifecycle/
+    contracts/
+    conformance/
+    rust/
+    node/                       # removed after this component migrates
+  dispatch-execution/
+    contracts/
+    conformance/
+    rust/
+    node/
+
+domains/
+  coding/
+    workflows/
+    task-specs/
+    skills/
+    harness/
+      rust/
+      node/
+```
+
+The source tree's `plugins/` area, if present, is for bundled examples and
+development fixtures. Runtime plugin installation is owned by the distribution
+and registry architecture, not inferred from source layout.
+
+## 13. Full Selected Sequence
+
+1. Package the Rust `fgos` executable as the permanent entry point on every
+   supported platform.
+2. Route current commands through byte-compatible whole-operation `LegacyNode`
+   fallback.
+3. Establish provider descriptors, diagnostics, setup/doctor integration, and
+   the external plugin registry in the Rust host.
+4. Select the first read-only or mechanical component and define its operation
+   contract, authority, and conformance fixtures.
+5. Implement it as a statically linked Rust crate.
+6. Prove parity and flip its operation to `NativeRust`.
+7. Repeat at component boundaries, moving state-writing authority only after
+   its full failure and recovery contract is explicit.
+8. Keep external process/WASM provider support permanently; it is the ecosystem
+   seam, not migration residue.
+9. Remove the Node payload only when no built-in operation references it and
+   public CLI, setup/doctor, rollback, and evidence requirements are complete.
+
+This sequence is monotonic: the permanent host exists first, and every
+component migration removes one legacy edge without introducing a new internal
+process boundary.
+
+## 14. Remaining Migration Questions
+
+1. Which operation is the first migration proof?
+2. What parity, latency, and supported-platform evidence is required before the
+   Rust launcher replaces the current installed entry point?
+3. When does transparent launcher mode graduate to the structured legacy
+   bridge?
+4. How long must a migrated Node implementation remain packaged for rollback?
+5. Which state-owning component is safe to migrate first after read-only slices
+   establish the pattern?

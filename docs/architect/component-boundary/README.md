@@ -23,7 +23,8 @@ Read boundary before layout:
 
 1. [Component Boundary Advisory](./component-boundary-advisory.md)
 2. [Repo Layout Vision](./repo-layout-vision.md)
-3. [Node To Rust Component Migration](./node-to-rust-component-migration.md)
+3. [Host Invocation And Provider Routing](./host-invocation-provider-routing.md)
+4. [Node To Rust Component Migration](./node-to-rust-component-migration.md)
 
 The first document answers:
 
@@ -41,16 +42,24 @@ The second document answers:
 Where should those components live physically in the repo?
 Which code should be a thin app entrypoint?
 Which code should become a reusable package?
-Which current paths are historical placement rather than architectural ownership?
+Which source paths are placement, not architectural ownership?
 ```
 
 The third document answers:
 
 ```txt
+How do CLI and remote host use cases enter the same semantic operation path?
+How does one router select built-in, legacy, process-plugin, or WASM providers?
+Where do provider discovery, capability grants, and failure normalization live?
+```
+
+The fourth document answers:
+
+```txt
 How can one component at a time move from Node to Rust?
 Which parts of fgos are already thin, partly thin, or not thin yet?
 How does fgos keep the same CLI and envelope while implementation changes?
-Which Rust boundary should be preferred first: binary, service, or direct lib?
+How does the Rust host delegate whole operations to the legacy Node provider?
 When does implementation movement become authority movement?
 ```
 
@@ -100,46 +109,62 @@ Use this document when deciding:
 - whether a binary should be a thin app or a logic-owning package;
 - how existing Rust gateway, MCP, TUI, port, and web-dashboard code should be
   separated physically;
-- what mechanical blast radius a later layout refactor is likely to touch.
+- what mechanical blast radius a layout refactor is likely to touch.
+
+### Host Invocation And Provider Routing
+
+[host-invocation-provider-routing.md](./host-invocation-provider-routing.md)
+defines the shared host invocation path and the Operation Provider Router.
+
+Use this document when deciding:
+
+- how `cli-host-use-case` and `remote-host-use-case` remain peer entry paths;
+- where CLI/REST/MCP input becomes a transport-neutral semantic operation;
+- how one operation selects a built-in, legacy, process, or WASM provider;
+- how external plugins declare operations and requested capabilities;
+- which layer owns authority checks, provider lifecycle, and error projection.
 
 ### Node To Rust Component Migration
 
 [node-to-rust-component-migration.md](./node-to-rust-component-migration.md)
-records the migration shape for replacing current Node harness internals with
+records the migration shape for replacing Node harness internals with
 Rust components one boundary at a time while preserving the existing `fgos`
 surface.
 
 Use this document when deciding:
 
-- whether a Rust implementation should sit behind a Node facade;
-- which `fgos` verb clusters should be thinned in Node before Rust migration;
-- whether the first Rust boundary should be a binary, service, or direct
-  library binding;
+- how the Rust CLI delegates unmigrated operations to the legacy Node provider;
+- which `fgos` verb clusters are ready to become native Rust providers;
+- how to avoid double parsing and split transactions during migration;
 - how to preserve `fgos` CLI, envelope, error, and lifecycle contracts during a
   gradual migration;
-- whether a proposed Rust slice is only moving implementation or is also trying
-  to move authority.
+- when a Node implementation and rollback path can be removed.
 
-## 3. Relationship Between The Two
+## 3. Relationship Between These Documents
 
 `component-boundary-advisory.md` defines the conceptual map.
 `repo-layout-vision.md` defines a possible physical map.
+`host-invocation-provider-routing.md` defines the host/provider invocation map.
+`node-to-rust-component-migration.md` defines an implementation migration map
+from the legacy Node provider to built-in Rust providers.
 
 They are related but not interchangeable:
 
 - a component boundary can exist before files move;
-- a folder can contain implementation history that does not define ownership;
+- source placement can reflect old implementation choices instead of ownership;
 - some discovered boundaries may become subcomponents instead of top-level
   packages;
 - coding-specific repository integration should be discussed as a subcomponent
   of Coding Domain Core, not as a generic foundation package;
+- runtime-language migration should happen behind component contracts, not by
+  treating a Node file or Rust crate as authority;
 - layout refactors should happen only after the component authority is clear.
 
 ## 4. Current Status
 
-This folder is advisory. It can guide Step 08 Agent Coordination work and later
-repo-layout cleanup, but canonical contracts still live under their owning
-architecture, contract, spec, or ADR documents.
+This folder is advisory. It can guide repo-layout cleanup, component
+extraction, and authority-boundary review across fgOS, but canonical contracts
+still live under their owning architecture, contract, spec, or ADR documents.
 
 When a decision becomes settled, extract the stable fact into the appropriate
 canonical document instead of treating this folder as the source of truth.
