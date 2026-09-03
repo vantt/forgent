@@ -9,7 +9,13 @@ ship in `core/coordination-protocols/` and are discoverable from a real
 external consuming project, proven live at P07.2 R6. Full per-phase trace:
 `docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`.
 Phase 00 (Step 09): driver-authorized optional operations, disposition,
-recheck-vs-retry contract text accepted — implementation in Phases 01-03.)
+recheck-vs-retry contract text accepted — implemented across
+`step-09-group-thinking-mvp1-mvp2` Phases 01-03 (the `activation` schema
+field, `standalone-master-coordination-loop.yaml`'s real
+`driver-authorized` bindings) and `step-09-mvp3-to-mvp5` Phase 03
+(`policy.minTier` role-tier separation for the same fixture's operations).
+Full per-phase trace:
+`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md`.)
 Last reviewed: 2026-09-03
 Canonical for: the FlowDefinition IR schema, the Workflow/CoordinationProtocol profile discriminator, the operation primitive, and PolicyPatch provenance
 Related: [ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md), [Protocol Model](../architecture/protocol-model.md), [Workflow Stage Operation Contract](workflow-stage-operation.md), [CoordinationSession Contract](coordination-session.md)

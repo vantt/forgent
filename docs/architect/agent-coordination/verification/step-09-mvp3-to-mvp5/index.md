@@ -71,7 +71,7 @@ MVP6-9 future expansion) is a NEW track, not a continuation of this one.
 | P02.2 | Phase 02 R5-R6 (closes Phase 02) | done | `c963f2a7` |
 | P03.1 | Phase 03 R1-R8 (closes Phase 03) | done | `53a88522` |
 | P04.1 | Phase 04 R1-R7 | done | `9435663a` |
-| P04.2 | Phase 04 R8 (closes Phase 04 and this plan) | done | pending |
+| P04.2 | Phase 04 R8 (closes Phase 04 and this plan) | done | `44438705` |
 
 ## Phase 04 Status
 

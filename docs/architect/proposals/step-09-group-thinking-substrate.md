@@ -18,14 +18,21 @@ Related: [Coordination Foundation Baseline](../agent-coordination/architecture/c
 [Team Communication Protocol V1](../agent-coordination/proposals/team-communication-protocol-v1.md),
 [Component Authority Boundary Map](component-authority-boundary-map.md),
 [Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md),
-[Step 09 MVP1/MVP2 group-thinking verification](../agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md)
+[Step 09 MVP1/MVP2 group-thinking verification](../agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md),
+[Step 09 MVP3-MVP5 verification](../agent-coordination/verification/step-09-mvp3-to-mvp5/index.md),
+[MVP6+ Dogfood Handoff](../agent-coordination/playbooks/mvp6-dogfood-handoff.md)
 
 Implementation note: nothing in this proposal is implemented, except the
-MVP1/MVP2 slice promoted starting Phase 00 — see the verification index
-above. This document does not authorize runtime/schema changes and does not
-accept a design beyond that promoted slice. It exists so deferred
-implementation slices do not narrow the original intent into only the
-currently convenient fixture.
+MVP1-MVP5 slice promoted starting Phase 00 — see the two verification
+indexes above (`step-09-group-thinking-mvp1-mvp2` for MVP1/MVP2,
+`step-09-mvp3-to-mvp5` for MVP3-MVP5: recheck lineage/disposition
+hardening, a thin CLI launcher, intentional role-tier dispatch policy, and
+session resume). This document does not authorize runtime/schema changes
+and does not accept a design beyond that promoted slice — MVP6 visibility
+windows, MVP7 aggregation rules, MVP8 deliberation memory, and MVP9
+dynamic specialist pull-in remain Discussion-only, not implemented. It
+exists so deferred implementation slices do not narrow the original
+intent into only the currently convenient fixture.
 
 ## 1. Why This Step Exists
 

@@ -17,7 +17,16 @@ live-proved — `src/runner/coordination/{schema,store,replay,session-engine}.mj
 `src/runner/coordination/headless-adapter.mjs`. Full per-phase trace:
 `docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`.
 Phase 00 (Step 09): driver-authorized optional operations, disposition,
-recheck-vs-retry contract text accepted — implementation in Phases 01-03.)
+recheck-vs-retry contract text accepted — implemented across
+`step-09-group-thinking-mvp1-mvp2` Phases 01-03 (recheck-as-new-Assignment,
+`driver-disposition-recorded`, live no-Work standalone proof) and
+`step-09-mvp3-to-mvp5` Phases 00-04 (disposition ref session-ownership
+enforcement, a thin CLI launcher, intentional role-tier dispatch policy,
+and session resume through the same request door, with a foreign-writerId
+resume-hijack path closed). Full per-phase trace:
+`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md`.
+Dogfood handoff for MVP6+:
+`docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md`.)
 Last reviewed: 2026-09-03
 Canonical for: CoordinationSession manifest/event schema, storage layout, session-to-Assignment membership, and recovery rules
 Related: [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md), [Assignment, Run, And RunResult Contract](assignment-run-runresult.md), [Runtime Model](../architecture/runtime-model.md), [Work Integration](../architecture/work-integration.md)
