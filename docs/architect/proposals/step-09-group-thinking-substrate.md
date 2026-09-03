@@ -17,12 +17,15 @@ Related: [Coordination Foundation Baseline](../agent-coordination/architecture/c
 [FlowDefinition Contract](../agent-coordination/contracts/flow-definition.md),
 [Team Communication Protocol V1](../agent-coordination/proposals/team-communication-protocol-v1.md),
 [Component Authority Boundary Map](component-authority-boundary-map.md),
-[Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md)
+[Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md),
+[Step 09 MVP1/MVP2 group-thinking verification](../agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md)
 
-Implementation note: nothing in this proposal is implemented. This document
-does not authorize runtime/schema changes and does not accept a design. It
-exists so deferred implementation slices do not narrow the original intent into
-only the currently convenient fixture.
+Implementation note: nothing in this proposal is implemented, except the
+MVP1/MVP2 slice promoted starting Phase 00 — see the verification index
+above. This document does not authorize runtime/schema changes and does not
+accept a design beyond that promoted slice. It exists so deferred
+implementation slices do not narrow the original intent into only the
+currently convenient fixture.
 
 ## 1. Why This Step Exists
 
@@ -349,9 +352,9 @@ RFC review, adversarial triads, and specialist pull-in.
 | 3 | Recheck and disposition. | Recheck is a new Assignment against a new artifact revision; disposition is a driver event, not worker self-report. | Schema/runtime after MVP 2. | Old verdict remains immutable; new verdict links to revision; synthesis preserves dissent and unresolved findings. | Retry remains attempt supersession, not recheck. |
 | 4 | Surface launcher. | A skill/slash surface builds a request for a declared fixture and calls `fgos coordination run --file`, then reads `coordination show`/evidence. | Surface only; no group-thinking logic inside the skill. | Launcher cannot bypass FlowDefinition/session authorization. | Surface is not truth or coordination mechanism. |
 | 5 | Live standalone proof. | Run the Master Coordination loop with no Work: input plan, Doer artifact, Reviewer report, Red-Team report, driver-authorized fix, revision, recheck, final disposition. | CLI/headless run. | CLI/headless parity, crash/resume no duplicate, unauthorized optional operation rejected, hidden context rejected, bounds enforced. | No Work lifecycle, git, merge, or repo mutation. |
-| 6 | Deliberation memory. | Typed records such as `proposal`, `challenge`, `response`, `clarification`, `rank`, and `disposition`. | Deferred schema/runtime. | Replay preserves why a decision happened without chat history. | Not a mailbox or live chat system. |
-| 7 | Visibility windows. | First-pass isolation, post-verdict controlled sharing, aggregate/anonymized feedback, judge-only visibility. | Deferred schema/runtime. | RFC/NGT/Delphi fixtures can express their defining visibility rules. | Isolation-heavy fixtures still reject these windows unless opted in. |
-| 8 | Aggregation rules. | Completion modes such as `synthesize-with-dissent`, `vote`, `rank`, `convergence`, `judge`, and `no-consensus`. | Deferred schema/runtime. | Synthesis cannot hide dissent, failed actors, missing actors, or unsupported claims. | Aggregation never upgrades evidence confidence. |
+| 6 | Visibility windows. | First-pass isolation, post-verdict controlled sharing, aggregate/anonymized feedback, judge-only visibility. | Deferred schema/runtime. | RFC/NGT/Delphi fixtures can express their defining visibility rules. | Isolation-heavy fixtures still reject these windows unless opted in. |
+| 7 | Aggregation rules. | Completion modes such as `synthesize-with-dissent`, `vote`, `rank`, `convergence`, `judge`, and `no-consensus`. | Deferred schema/runtime. | Synthesis cannot hide dissent, failed actors, missing actors, or unsupported claims. | Aggregation never upgrades evidence confidence. |
+| 8 | Deliberation memory. | Typed records such as `proposal`, `challenge`, `response`, `clarification`, `rank`, and `disposition`. | Deferred schema/runtime. | Replay preserves why a decision happened without chat history. | Not a mailbox or live chat system. |
 | 9 | Dynamic specialist pull-in. | Opt-in `addSessionEdge` or topology overlay after authorization/context/replay are solid. | Deferred large feature. | Same action works in an opt-in fixture and is rejected in isolation fixture. | No global dynamic topology. |
 
 Step 10 starts after the relevant Step 09 substrate slice exists. Coding Domain

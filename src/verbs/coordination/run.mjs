@@ -11,6 +11,19 @@
 // check below, which reuses the SAME loadCoordinationProtocol the engine
 // itself calls, never a second copy of protocol-loading logic.
 //
+// TWO deliberate exceptions to that import rule, both from store.mjs:
+// `recordDriverDisposition` and `readSessionEvents`. A disposition is
+// driver ledger state about a ref -- it resolves no binding, materializes
+// nothing, and has no FlowDefinition-aware counterpart in session-engine.mjs
+// to delegate to, so store.mjs's door IS the door (it does its own shape
+// validation, active-session check, driver-identity pin, and lock-held
+// append). `readSessionEvents` reads back the real persisted
+// `operation-authorized` event on an "authorize" step's idempotent
+// (appended: false) path, so the reported step result never echoes a
+// repeat call's own (possibly different) payload as if it were now in
+// force -- session-engine.mjs has no equivalent read either. Importing both
+// here reaches the real doors rather than reimplementing any part of them.
+//
 // "run is synchronous in V1" (R1): every step in a request's `steps` array
 // (or the single `task` for an agent-led request) is awaited in order
 // before this function returns; a `fan-out` step dispatches its own
@@ -26,10 +39,12 @@ import {
   dispatchPrimaryTask,
   dispatchDeclaredOperation,
   dispatchResearchFanOut,
+  authorizeDeclaredOperation,
   evaluateSessionQuorum,
   closeSessionByQuorum,
   deriveSessionPhase,
 } from '../../runner/coordination/session-engine.mjs';
+import { recordDriverDisposition, readSessionEvents } from '../../runner/coordination/store.mjs';
 import { loadCoordinationProtocol } from '../../runner/definitions/protocol-loader.mjs';
 import { validateCoordinationRequest } from './schema.mjs';
 
@@ -178,7 +193,7 @@ export async function runCoordinationUseCase(ctx, options = {}) {
       ...actorPolicyFields(primaryActor, { globalExecutor: cliExecutor, globalTier: cliTier }),
       ...(primaryActor?.model !== undefined ? { model: primaryActor.model } : cliModel !== undefined ? { model: cliModel } : {}),
     };
-    const labels = {};
+    const labels = Object.create(null);
     const contextRefs = resolveRefArray(request.task.contextRefs, labels, 'task.contextRefs');
     const dispatch = await dispatchPrimaryTask(
       manifest.coordinationId,
@@ -226,7 +241,14 @@ export async function runCoordinationUseCase(ctx, options = {}) {
     }
     manifest = openDeclaredProtocolSession({ ...openParams, definitionId: request.protocolRef.id }, engineOpts);
 
-    const labels = {};
+    // The driver whose authority an "authorize"/"disposition" step writes
+    // under. There is exactly one legal value: the engine pins both events
+    // to `manifest.provenanceRoot.writerId`, which openParams just set from
+    // `request.writerId`. Derived rather than accepted from the request --
+    // see schema.mjs's assertNoAuthorizedBy.
+    const driverIdentity = { type: 'driver', id: request.writerId };
+
+    const labels = Object.create(null);
     for (const step of request.steps) {
       if (step.type === 'operation') {
         const actorEntry = step.targetActorId ? findActor(request.actors, step.targetActorId) : undefined;
@@ -259,6 +281,75 @@ export async function runCoordinationUseCase(ctx, options = {}) {
         // resolveDeclaredOperationActor resolves it internally and does not
         // return it on `dispatch` -- reported `null` rather than guessed.
         stepResults.push({ as: step.as, type: 'operation', actorId: step.targetActorId ?? null, ...summarizeDispatch(dispatch) });
+      } else if (step.type === 'authorize') {
+        const grantedContextRefs = resolveRefArray(step.grantedContextRefs, labels, `steps[${step.as}].grantedContextRefs`);
+        const targetArtifactRef = resolveRef(step.targetArtifactRef, labels, `steps[${step.as}].targetArtifactRef`);
+        const authorization = authorizeDeclaredOperation(
+          manifest.coordinationId,
+          {
+            operationId: step.operationId,
+            targetActorId: step.targetActorId,
+            nodeId: step.nodeId,
+            authorizationId: step.authorizationId,
+            invocationKey: step.invocationKey,
+            authorizedBy: driverIdentity,
+            reason: step.reason,
+            grantedContextRefs,
+            targetArtifactRef,
+          },
+          engineOpts,
+        );
+        // On the idempotent (appended: false) path, `authorizeOperation`
+        // (store.mjs) returns THIS CALL's own payload, not the
+        // already-persisted event -- a repeat `authorize` step naming an
+        // `authorizationId` that already exists, with DIFFERENT fields
+        // (a different grant, key, or reason), would otherwise report
+        // those different fields back as if they were now in force, when
+        // the persisted event -- the one `dispatchDeclaredOperation`'s gate
+        // actually reads -- never changed. Read the real event back on this
+        // path so the step result is always truthful, never echoed intent.
+        const persistedAuthorization = authorization.appended
+          ? authorization
+          : readSessionEvents(manifest.coordinationId, engineOpts).find(
+              (event) => event.type === 'operation-authorized' && event.payload.authorizationId === authorization.authorizationId,
+            ).payload;
+        // No `labels[step.as]` entry: this step materializes no Assignment,
+        // so a later `$ref:<label>` pointing at it has nothing to resolve to
+        // and is refused by resolveRef's own unknown-label check.
+        stepResults.push({
+          as: step.as,
+          type: 'authorize',
+          operationId: persistedAuthorization.operationId,
+          nodeId: persistedAuthorization.nodeId,
+          actorId: persistedAuthorization.targetActorId,
+          authorizationId: persistedAuthorization.authorizationId,
+          invocationKey: persistedAuthorization.invocationKey,
+          grantedContextRefs: persistedAuthorization.grantedContextRefs,
+          targetArtifactRef: persistedAuthorization.targetArtifactRef ?? null,
+          appended: authorization.appended,
+        });
+      } else if (step.type === 'disposition') {
+        const targetRef = resolveRef(step.targetRef, labels, `steps[${step.as}].targetRef`);
+        const evidenceRefs = resolveRefArray(step.evidenceRefs, labels, `steps[${step.as}].evidenceRefs`);
+        const disposition = recordDriverDisposition(
+          manifest.coordinationId,
+          {
+            targetRef,
+            disposition: step.disposition,
+            rationale: step.rationale,
+            evidenceRefs,
+            authorizedBy: driverIdentity,
+          },
+          engineOpts,
+        );
+        stepResults.push({
+          as: step.as,
+          type: 'disposition',
+          targetRef: disposition.targetRef,
+          disposition: disposition.disposition,
+          evidenceRefs: disposition.evidenceRefs,
+          appended: disposition.appended,
+        });
       } else {
         const fromAssignmentId = resolveRef(step.fromAssignmentId, labels, `steps[${step.as}].fromAssignmentId`);
         const branches = step.branches.map((branch) => ({

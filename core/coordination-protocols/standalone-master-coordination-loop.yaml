@@ -21,19 +21,14 @@
 # passed into the session, not topology-connected SessionActors passing
 # turns to each other -- an artifact/diff is not itself a SessionActor.
 #
-# `revise-candidate`, `reviewer-recheck`, and `red-team-recheck` are
-# declared graph positions with no different runtime treatment yet than
-# `produce-candidate`/`review-candidate`/`red-team-candidate`: the schema's
-# node-operation binding fields (`NODE_OPERATION_REF_FIELDS`,
-# src/runner/definitions/schema.mjs) accept only `ref` and `actor` today --
-# there is no `activation` field yet to mark a binding
-# `driver-authorized` versus `required`. Until that field exists, every
-# operation below materializes the same way; the graph position (after the
-# required first pass, in its own later phase) is the only signal that
-# revision/recheck are meant to become gated once driver authorization
-# ships. Do not read the current absence of a gate as "these three
-# operations are already optional" -- they are simply not yet
-# distinguishable from the required ones at the schema level.
+# `revise-candidate`, `reviewer-recheck`, and `red-team-recheck` are the
+# optional positions of this loop: each binding declares
+# `activation.mode: driver-authorized`, so none of them can materialize an
+# Assignment without a matching `operation-authorized` event issued by the
+# session's own driver. The first pass
+# (`produce-candidate`/`review-candidate`/`red-team-candidate`) stays
+# `required` -- it is what always runs, and it is what the driver reads
+# before deciding whether a revision round is warranted at all.
 
 apiVersion: fgos.dev/v1alpha1
 kind: FlowDefinition
@@ -112,11 +107,17 @@ spec:
         operations:
           - ref: revise-candidate
             actor: fixer
+            activation:
+              mode: driver-authorized
         transitions: [phase-recheck]
       - id: phase-recheck
         operations:
           - ref: reviewer-recheck
             actor: reviewer
+            activation:
+              mode: driver-authorized
           - ref: red-team-recheck
             actor: red-team
+            activation:
+              mode: driver-authorized
         transitions: []

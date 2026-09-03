@@ -277,6 +277,94 @@ function validateOperationStep(step, i) {
   };
 }
 
+const AUTHORIZE_STEP_ALLOWED_KEYS = new Set([
+  'type', 'as', 'operationId', 'targetActorId', 'nodeId', 'authorizationId',
+  'invocationKey', 'reason', 'grantedContextRefs', 'targetArtifactRef', 'mutation',
+]);
+
+const INVOCATION_KEY_MAX_LENGTH = 512;
+const REASON_MAX_LENGTH = 20000;
+
+// The driver identity an authorization/disposition is written under is
+// pinned by the engine to the session's own `provenanceRoot.writerId`
+// (store.mjs's `assertDriverIdentity`), which is the request's own
+// top-level `writerId`. A request-file `authorizedBy` would therefore be a
+// second identity channel that can only ever agree with `writerId` or be
+// refused deeper in the stack -- rejected here with a message that names
+// the real single channel, rather than accepted as a field with no
+// independent effect.
+function assertNoAuthorizedBy(step, label) {
+  if ('authorizedBy' in step) {
+    fail(`${label} declares "authorizedBy" -- driver provenance is pinned to the session's own top-level "writerId" (the session's provenanceRoot.writerId), so a request may never name a second driver identity`);
+  }
+}
+
+function validateAuthorizeStep(step, i) {
+  assertNoAuthorizedBy(step, `steps[${i}] (type "authorize")`);
+  assertAllowedKeys(step, AUTHORIZE_STEP_ALLOWED_KEYS, `steps[${i}] (type "authorize")`);
+  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  if (!isNonEmptyString(step.operationId)) fail(`steps[${i}].operationId is required`);
+  if (step.targetActorId !== undefined) assertSafeId(step.targetActorId, `steps[${i}].targetActorId`);
+  if (step.nodeId !== undefined) assertSafeId(step.nodeId, `steps[${i}].nodeId`);
+  // `authorizationId` is concatenated verbatim into a driver-authorized
+  // dispatch's default `taskKey` (session-engine.mjs), the same string this
+  // module already charset-checks when a caller supplies `taskKey` directly.
+  assertSafeId(step.authorizationId, `steps[${i}].authorizationId`);
+  if (!isNonEmptyString(step.invocationKey) || step.invocationKey.length > INVOCATION_KEY_MAX_LENGTH) {
+    fail(`steps[${i}].invocationKey is required and must be a non-empty string of at most ${INVOCATION_KEY_MAX_LENGTH} characters`);
+  }
+  if (!isNonEmptyString(step.reason) || step.reason.length > REASON_MAX_LENGTH) {
+    fail(`steps[${i}].reason is required and must be a non-empty string of at most ${REASON_MAX_LENGTH} characters`);
+  }
+  const grantedContextRefs = validateStringArray(step.grantedContextRefs, `steps[${i}].grantedContextRefs`);
+  grantedContextRefs.forEach((ref, j) => assertSafeRefOrId(ref, `steps[${i}].grantedContextRefs[${j}]`));
+  if (step.targetArtifactRef !== undefined) assertSafeRefOrId(step.targetArtifactRef, `steps[${i}].targetArtifactRef`);
+  return {
+    type: 'authorize',
+    as: step.as,
+    operationId: step.operationId,
+    targetActorId: step.targetActorId,
+    nodeId: step.nodeId,
+    authorizationId: step.authorizationId,
+    invocationKey: step.invocationKey,
+    reason: step.reason,
+    grantedContextRefs,
+    targetArtifactRef: step.targetArtifactRef,
+  };
+}
+
+const DISPOSITION_STEP_ALLOWED_KEYS = new Set([
+  'type', 'as', 'targetRef', 'disposition', 'rationale', 'evidenceRefs', 'mutation',
+]);
+
+const DISPOSITION_MAX_LENGTH = 200;
+
+function validateDispositionStep(step, i) {
+  assertNoAuthorizedBy(step, `steps[${i}] (type "disposition")`);
+  assertAllowedKeys(step, DISPOSITION_STEP_ALLOWED_KEYS, `steps[${i}] (type "disposition")`);
+  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertSafeRefOrId(step.targetRef, `steps[${i}].targetRef`);
+  // Shape only, deliberately not a closed vocabulary: the accepted contract
+  // says "e.g. accepted | rejected" and names closing a round as a third
+  // case, and the event schema this reaches validates it the same way.
+  if (!isNonEmptyString(step.disposition) || step.disposition.length > DISPOSITION_MAX_LENGTH) {
+    fail(`steps[${i}].disposition is required and must be a non-empty string of at most ${DISPOSITION_MAX_LENGTH} characters`);
+  }
+  if (!isNonEmptyString(step.rationale) || step.rationale.length > REASON_MAX_LENGTH) {
+    fail(`steps[${i}].rationale is required and must be a non-empty string of at most ${REASON_MAX_LENGTH} characters`);
+  }
+  const evidenceRefs = validateStringArray(step.evidenceRefs, `steps[${i}].evidenceRefs`);
+  evidenceRefs.forEach((ref, j) => assertSafeRefOrId(ref, `steps[${i}].evidenceRefs[${j}]`));
+  return {
+    type: 'disposition',
+    as: step.as,
+    targetRef: step.targetRef,
+    disposition: step.disposition,
+    rationale: step.rationale,
+    evidenceRefs,
+  };
+}
+
 const FAN_OUT_BRANCH_ALLOWED_KEYS = new Set(['actorId', 'objective', 'expectedOutputs', 'constraints', 'capabilities', 'fromAssignmentId', 'intent', 'taskKey', 'mutation']);
 
 function validateFanOutBranch(branch, i, j) {
@@ -331,7 +419,9 @@ function validateSteps(steps) {
     seenLabels.add(step.as);
     if (step.type === 'operation') return validateOperationStep(step, i);
     if (step.type === 'fan-out') return validateFanOutStep(step, i);
-    fail(`steps[${i}].type must be "operation" or "fan-out"`);
+    if (step.type === 'authorize') return validateAuthorizeStep(step, i);
+    if (step.type === 'disposition') return validateDispositionStep(step, i);
+    fail(`steps[${i}].type must be "operation", "fan-out", "authorize", or "disposition"`);
     return undefined; // unreachable, keeps linters happy
   });
 }

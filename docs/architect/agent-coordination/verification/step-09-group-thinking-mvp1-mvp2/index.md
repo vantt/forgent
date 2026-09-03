@@ -62,17 +62,19 @@ This list may only shrink; any new failure beyond it blocks cell close.
 | 00 | R1-R4 | done |
 | 01 | R1-R6 | done |
 | 02 | R1-R8 | done |
-| 03 | R1-R7 | in-progress |
+| 03 | R1-R7 | done |
 
 ## Active Cell
 
-None — P03.1 closed. P03.2 not yet started.
+None. **All cells closed — this plan's entire MVP1/MVP2 scope is done.**
 
 ## Next Action
 
-Prepare P03.2 (Phase 03 R5-R7: live CLI/no-Work proof, negative-proof
-battery, surface-readiness docs — closes Phase 03 and this plan's
-MVP1/MVP2 scope).
+None. Any further work (the shipped-fixture fan-out HIGH, the pre-existing
+session-wide-caps self-heal gap, the crash-bricked-`coordinationId` gap,
+R8's driver-handoff limitation, or a genuine thin-launcher surface) is a
+NEW track, not a continuation of this one — see "Forward Notes For Later
+Phases" below for the full list this plan hands off.
 
 ## Cell Log
 
@@ -82,7 +84,8 @@ MVP1/MVP2 scope).
 | P01.1 | Phase 01 R1, R2, R3, R4, R5, R6 (closes Phase 01) | done | `bec5e7f8` |
 | P02.1 | Phase 02 R1, R2, R3, R4 | done | `82610e7f` |
 | P02.2 | Phase 02 R5, R6, R7, R8 (closes Phase 02) | done | `bc65df22` |
-| P03.1 | Phase 03 R1, R2, R3, R4 | done | (pending commit) |
+| P03.1 | Phase 03 R1, R2, R3, R4 | done | `6c41b561` |
+| P03.2 | Phase 03 R5, R6, R7 (closes Phase 03) | done | (pending commit) |
 
 ## Phase 00 Status
 
@@ -304,6 +307,65 @@ TypeError class, two more audit-label slips) fixed.
 Full suite (final): 5134 tests, 5122 pass, 7 fail — exactly this track's
 recorded baseline; no new failure. Focused glob 368/368 pass.
 
+**P03.2 CLOSED (Phase 03 R5-R7; closes Phase 03 and this plan's entire
+MVP1/MVP2 scope).** A real, live, synchronous no-Work run through the
+actual public CLI/headless door (`fgos coordination run`) drove
+`standalone-master-coordination-loop.yaml`'s full shape end to end:
+produce → review + red-team (required) → authorize revision → revise →
+rejecting disposition → authorize reviewer recheck → reviewer recheck →
+authorize red-team recheck → red-team recheck → accepting disposition →
+close. Six Assignments, six `result-linked`, three `operation-authorized`,
+two `driver-disposition-recorded`, zero `run-retried` — the original
+review's RunResult provably never superseded by its recheck. No Work
+event, no Work item, no `.git` mutation, measured three ways including
+inside a real git repo carrying a pre-existing Work item. The CLI's
+request shape was extended with two new step types (`authorize`,
+`disposition`) reaching P03.1's own lock-held engine doors — no new CLI
+subcommand. All 17 bullets of the accepted contract's "Required Negative
+Tests" list tabulated against a named covering test; 4 genuine door-level
+gaps closed, the rest confirmed already covered at the engine level. A
+Coordinator-approved, Reviewer/Red-Team-confirmed-sound edit gave the
+shipped `standalone-master-coordination-loop.yaml` fixture real
+`activation: {mode: driver-authorized}` bindings for the first time,
+completing a deferral P01.1 recorded. `thin-launcher-surface-readiness.md`
+documents the future surface shape without implementing one.
+
+Reviewer round (opus): APPROVE WITH CONCERNS, 1 MEDIUM + 8 LOW. MEDIUM
+(an idempotent `authorize` step echoed the repeat caller's own payload
+instead of the persisted authorization — a real regression this cell
+introduced) fixed and confirmed with an independently-designed
+reproduction stronger than the original regression test. 6 of 7 original
+LOWs fixed at source (one comment/rationale correction needed no code
+change, one recorded as a documented limitation per the Reviewer's own
+call); a fix-round LOW (stale header comment) fixed too.
+
+Red-Team round (opus): **APPROVE, 0 HIGH, 0 MEDIUM, 4 LOW** — ~473 real
+OS processes across 133 barrier-synchronised trials plus 40 genuine
+`SIGKILL`s. Both handed-over concurrency targets (racing `openSession` on
+one `coordinationId`; the `Promise.all`-vs-real-concurrency gap behind
+contract bullet 1) empirically settled clean, plus two bonus targets
+(MEDIUM-1's unlocked readback; P02.1's HIGH-1 shape against the newly
+driver-authorized shipped fixture) also held. One real in-scope defect
+(LOW-2: `resolveRef`'s label lookup resolved prototype-chain names instead
+of refusing them — fixed, `Object.create(null)`) and two genuine
+pre-existing/new-dependency gaps recorded as forward notes below
+(LOW-1: a crash window that permanently bricks a `coordinationId`; LOW-3:
+the shipped fixture's new bindings have no per-binding invocation cap).
+One finding (the Reviewer's own LOW-7, "no git mutation" proof was
+indirect) got EMPIRICALLY CLOSED in the cell's favor rather than merely
+confirmed — Red-Team ran the live proof inside a real repo with a real
+Work item and found zero changes outside `.fgos/`.
+
+Full suite (final): 5159 tests, 5147 pass, 7 fail — exactly this track's
+recorded baseline; no new failure. Focused glob 425/425 pass.
+
+**This closes the entire step-09-group-thinking-mvp1-mvp2 track.** Six
+cells (P00.1, P01.1, P02.1, P02.2, P03.1, P03.2), each through a full
+Doer→Reviewer→Red-Team loop with empirical (not merely argued)
+concurrency evidence throughout. Every finding across all six cells was
+either fixed, or is recorded below as a named forward note for whichever
+future track picks it up next.
+
 ## Forward Notes For Later Phases
 
 **cohort-planner.mjs actor disambiguation (from Phase 01's Red-Team).**
@@ -463,16 +525,20 @@ are unchanged, which is why this is a target to attack rather than a
 standing finding.
 
 **Driver handoff is structurally impossible under R8's implemented identity
-check (from P02.2's Review, R8 ruling).** `authorizedBy.id ===
+check (from P02.2's Review, R8 ruling; UPDATED by P03.2 — a shipped fixture
+now declares `activation`).** `authorizedBy.id ===
 manifest.provenanceRoot.writerId` means a session opened by writer A can
 only ever be authorized by A — there is no `replaceDriver`/provenance-
-transfer path (`replaceSessionActor` covers actors, not the driver). Nothing
-regresses today (no shipped fixture declares `activation`), but Phase 03's
-`driver-disposition-recorded` will inherit the same pin, and a legitimate
-operator/process handover mid-session cannot issue authorizations under the
-current design. Worth an explicit product decision before this becomes load-
-bearing: either accept single-driver-for-session-lifetime as permanent, or
-give Phase 03 a real writer-identity/handoff primitive.
+transfer path (`replaceSessionActor` covers actors, not the driver). This
+is now user-visible rather than latent: P03.2 gave
+`standalone-master-coordination-loop.yaml` three `driver-authorized`
+bindings, so a real live proof runs against it today, and a request file's
+`writerId` is the only identity that can ever authorize or disposition in
+the session it opens (recorded as R7 hole #4 in
+`thin-launcher-surface-readiness.md`). Worth an explicit product decision
+before this becomes load-bearing further: either accept
+single-driver-for-session-lifetime as permanent, or give a future phase a
+real writer-identity/handoff primitive.
 
 **Provenance-vs-authorization consistency only checks fields that are
 present, not that the descriptive companions are present at all (from
@@ -510,6 +576,40 @@ Reachable only when a caller deliberately supplies that exact string.
 `src/verbs/coordination/run.mjs` forwards an optional `step.taskKey` —
 P03.2 should be aware this specific string is not safe to reuse as a
 "default" sentinel.
+
+**A crash between `mkdirSync` and `writeManifestRaw` permanently bricks a
+`coordinationId` (from P03.2's Red-Team, LOW-1, pre-existing).**
+`openSession` (`store.mjs`) creates the session directory before writing
+`session.json`; a crash in that narrow window (empirically reproduced: 12
+of 40 genuine `SIGKILL`s) leaves a directory with no manifest —
+unrecoverable, and self-contradictory across doors (`coordination run`
+says the session "already exists"; `coordination show`/`replaySession` say
+"no session found"). Fails closed, no corruption, but only a manual
+`rm -rf` recovers it. Matters more now than when first possible: P03.2's
+live proof ships a request file with a FIXED `coordinationId`, so one
+badly-timed crash makes that exact file permanently unrunnable in that
+workspace. Fix direction: write `session.json` (or at least a crash-safe
+marker) before or atomically with the directory claim, mirroring the
+temp-file-plus-rename discipline `writeManifestRaw` itself now uses
+elsewhere in this same file (P03.1's MEDIUM-2 fix). Not owned by any cell
+in this track; `store.mjs`'s `openSession` for whoever picks it up.
+
+**The shipped fixture's three driver-authorized bindings declare no
+`activation.maxInvocations` (from P03.2's Red-Team, LOW-3).**
+`standalone-master-coordination-loop.yaml`'s `revise-candidate`/
+`reviewer-recheck`/`red-team-recheck` bindings (added by P03.2) have no
+per-binding cap — only the session-wide `maxRounds` default backstops
+them (reproduced: 7 authorized-revision Assignments materialized from one
+request before the session-wide default, not any binding cap, stopped an
+8th). That session-wide cap family carries its OWN recorded gap (P02.2's
+Red-Team: 12/20 real concurrent overruns via the self-heal branch) — so
+this fixture's optional bindings now sit, for the first time, entirely
+behind a cap family already known to be imperfect under concurrency. Not
+exploitable through `fgos coordination run` today (one session per run,
+no concurrent dispatchers can share it). Fix direction, if ever needed:
+add `activation.maxInvocations` to the three bindings — a fixture
+modeling decision, not a code fix, left for whoever next relies on bounded
+round counts from this fixture under real concurrency.
 
 Next: P03.1 (Phase 03 — recheck as a new Assignment, `driver-disposition-recorded`,
 and a live no-Work standalone Master Coordination proof through the declared

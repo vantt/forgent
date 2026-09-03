@@ -14,7 +14,8 @@ Related: [Vision](../vision.md), [Runtime Model](runtime-model.md),
 [Step 07 proposal history](../proposals/step-07-coordination-session-adhoc-task.md),
 [Step 08 proposal history](../proposals/step-08-standalone-coordination-protocols.md),
 [Team Dispatch V1 verification](../verification/team-dispatch-v1/index.md),
-[Step 08 verification](../verification/step-08-standalone-coordination/index.md)
+[Step 08 verification](../verification/step-08-standalone-coordination/index.md),
+[Step 09 MVP1/MVP2 group-thinking verification](../verification/step-09-group-thinking-mvp1-mvp2/index.md)
 
 ## Purpose
 
