@@ -66,28 +66,53 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | Phase | MVP | Requirements | Status |
 |---|---|---|---|
 | 00 | Intake | R1-R4 (P00.1), file-ownership map (P00.2) | done |
-| 06 | MVP6 | see phase-06 file (P06.1 in progress; P06.2/P06.3 not started) | in-progress |
-| 07 | MVP7 | see phase-07 file (P07.1 in progress; P07.2-P07.4 not started) | in-progress |
+| 06 | MVP6 | P06.1 done; P06.2 (runtime/grant enforcement/replay), P06.3 (proof/promotion) open | in-progress |
+| 07 | MVP7 | P07.1 done (covers source-coverage/disclosure-presence slice of P07.2 only); outcome classification, hidden-dissent rejection, stale-revision rejection, consensus-with-unresolved-dissent still open (remaining P07.2 scope) + P07.3/P07.4 | in-progress |
 | 08 | MVP8 | see phase-08 file | missing |
 | 09 | MVP9 | see phase-09 file | missing |
 | 10 | External acceptance | see phase-10 file | missing |
 
 ## Active Cell
 
-Wave 1: P06.1 (visibility definition schema/validation) + P07.1 (Team
-Cognition evaluator skeleton), disjoint write scopes per `P00.2.md` §4,
-dispatched in parallel. See `current-cell.md`.
+None. Wave 1 (P06.1 + P07.1) closed — see Phase 06/07 status below and
+`current-cell.md`'s Wave 1 Disposition for the full review/red-team/fix
+history.
+
+**Process deviation, recorded honestly:** both P06.1 and P07.1 were
+dispatched as concurrent source-writers into the SAME shared worktree
+checkout (`.claude/worktrees/step-09-mvp6-to-mvp9`), relying only on
+disjoint file scopes (confirmed by `P00.2.md`). `plan.md`'s Shared-File
+Lease Rule states "A shared checkout never has concurrent source writers"
+and requires isolated workspaces/branches for concurrent non-read-only leaf
+cells — that requirement was not followed here. Outcome was safe in this
+instance: `git diff --stat` for each cell shows zero file overlap (P06.1:
+`src/runner/definitions/schema.mjs` + its own test file only; P07.1: a
+brand-new `src/runner/team-cognition/**` directory + its own test files
+only), and both focused test runs are green throughout, including after two
+fix rounds. Going forward in this track, any wave with more than one
+concurrent non-read-only leaf cell gets its own isolated worktree per cell,
+not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Dispatch P06.1 and P07.1 Doers in parallel (disjoint scopes: `src/runner/definitions/**` + fixtures vs. new `src/runner/team-cognition/**`).
+Prepare Wave 2: P06.2 (visibility runtime, grant enforcement, replay —
+`src/runner/coordination/*`, session-runtime lease) and the remaining P07.2
+scope (outcome classification/dissent/staleness — `src/runner/team-cognition/*`
++ its tests only, per `P00.2.md`'s original Wave-1-scoped write-scope split;
+re-confirm P07.2's exact write scope stays disjoint from P06.2's before
+dispatch). Per plan.md's Parallel Execution Map, both are "Ready after
+P06.1 and P07.1 respectively" — both now satisfied. **Dispatch into
+SEPARATE isolated worktrees this time**, not a shared checkout, per the
+process-deviation note above.
 
 ## Cell Log
 
 | Cell | Requirements | Status | Commit |
 |---|---|---|---|
-| P00.1 | Phase 00 baseline/handoff audit | done | (docs-only, not yet committed — bundled with P00.2 close) |
-| P00.2 | Phase 00 contract/file-ownership map | done | (docs-only, not yet committed — bundled with P00.1 close) |
+| P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
+| P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
+| P06.1 | Phase 06 visibility definition schema/validation | done | (pending Wave 1 commit) |
+| P07.1 | Phase 07 Team Cognition evaluator skeleton (partial P07.2 slice) | done | (pending Wave 1 commit) |
 
 ## Phase 00 Status
 
@@ -122,3 +147,53 @@ which are directly file+line verifiable).
 
 Next: Wave 1 — P06.1 (visibility definition schema/validation) + P07.1
 (Team Cognition evaluator skeleton), dispatched in parallel.
+
+## Wave 1 Status (P06.1 + P07.1)
+
+**CLOSED.** P06.1 (visibility-window definition schema/validation) and P07.1
+(Team Cognition evaluator skeleton) implemented in parallel in the shared
+worktree — see the process-deviation note above. Both correctly implement
+and test their own stated in-scope requirements per two independent
+Reviewer and Red-Team first-pass rounds (both APPROVE WITH CONCERNS, 0 HIGH,
+4 total accepted findings across both rounds, one overlap consolidated).
+
+P06.1: all 8 named requirements (CoordinationProtocol-only gating, unknown/
+dangling window/operation refs, duplicate ids, illegal delivery/milestone,
+Workflow-profile rejection, byte-compat regression for windows-less
+definitions) verified correct with zero findings routed to it.
+
+P07.1: correctly-scoped skeleton (source coverage + disclosure-presence
+validation, zero forbidden imports, pure/non-mutating), but its own trace
+initially overclaimed full P07.2 coverage — corrected. 4 findings accepted
+and fixed in two rounds: (1) trace wording, (2) immutability — sub-function
+results and a nested array were mutable despite a blanket "frozen" claim,
+closed with per-level `Object.freeze` plus a `Proxy`-wrapped Map (plain
+`Object.freeze` does not block `Map.set/delete/clear`), (3) the forbidden-
+import static guard was one-hop only — replaced with a real recursive
+resolver, proven against a red-team-built synthetic PoC, (4) missing
+input-mutation test — added. A Round-2 recheck by Red-Team found ONE more
+MEDIUM the Round-1 fix didn't reach (source objects inside the frozen array
+were still the caller's live, mutable references — the `revision`
+immutability pin was tamperable) — fixed with a deep-frozen defensive-copy
+snapshot (`freezeSourceSnapshot`), independently re-verified resolved, with
+one final residual LOW accepted as deferred (nested non-primitive
+disclosure values are only shallow-frozen — untriggerable today since
+disclosure-value shape is explicitly out of scope for this cell; a later
+cell that defines that shape owns closing it).
+
+Focused suite (`test/runner/flow-definition*.test.mjs
+test/runner/coordination-schema.test.mjs test/runner/team-cognition*.test.mjs`),
+final: **143/143 pass, 0 fail**, verified independently by the Coordinator
+after every fix round, not merely trusted from Doer/Fixer claims.
+`test/runner/coordination-static.test.mjs` (excluded from the focused glob
+per the worktree-path gotcha) separately re-run clean from the main
+checkout: 2/2 pass, confirming `src/runner/coordination/**` itself is
+untouched by this wave.
+
+**This closes Wave 1 (P06.1, P07.1). Phase 06 and Phase 07 both remain
+in-progress** — P06.2/P06.3 and the remaining P07.2 scope (outcome
+classification, dissent, staleness) plus P07.3/P07.4 are still open, per
+the Phase/Requirement Matrix above.
+
+Next: Wave 2 — P06.2 (runtime/grant enforcement/replay) + remaining P07.2
+scope, in separate isolated worktrees.

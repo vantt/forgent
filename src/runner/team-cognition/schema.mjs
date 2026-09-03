@@ -1,0 +1,119 @@
+// team-cognition/schema.mjs — pure shape validator for the data an
+// aggregation evaluator is handed: declared source operations, structured
+// evidence-source refs (each pointing at one immutable RunResult/artifact),
+// and required disclosure ids.
+//
+// Mirrors coordination/schema.mjs's own shape one boundary over (whitelist-
+// first field tables, fail-closed on the first violation, stable
+// caller-inspectable error category) but is a self-contained module: it
+// does not import coordination/schema.mjs or anything else under
+// src/runner/coordination/, so the team-cognition boundary never inherits
+// session-runtime authority by accident.
+//
+// Pure data module: no fs, no network, no dispatch, no session mutation.
+// component-authority-boundary-map.md §6 (Team Cognition Engine "Must not
+// own"): CoordinationSession terminal transitions, context-grant authority,
+// Assignment dispatch, RunResult confidence upgrades. This module (and its
+// sibling aggregation-evaluator.mjs) touches none of those -- it only
+// reads the shape of data callers already hold.
+
+export class AggregationError extends Error {
+  constructor(category, message) {
+    super(message);
+    this.name = 'AggregationError';
+    this.category = category;
+  }
+}
+
+function fail(category, reason) {
+  throw new AggregationError(category, `team-cognition: ${reason}`);
+}
+
+export function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+export function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
+function isNonEmptyStringArray(value) {
+  return Array.isArray(value) && value.length > 0 && value.every(isNonEmptyString);
+}
+
+function assertOnlyAcceptedFields(obj, accepted, label) {
+  for (const key of Object.keys(obj)) {
+    if (!accepted.has(key)) fail('validation', `${label} has unknown field "${key}"`);
+  }
+}
+
+// One structured evidence-source entry: a pointer to an immutable
+// RunResult/artifact, plus the disclosures its worker attached. `revision`
+// is the immutability pin -- without it a `runId`/`artifactRef` pair could
+// silently point at a still-mutable in-flight run, so it is required on
+// every entry, not just checked when present.
+const AGGREGATION_SOURCE_FIELDS = new Set([
+  'sourceOperationRef',
+  'assignmentId',
+  'runId',
+  'artifactRef',
+  'revision',
+  'disclosures',
+]);
+
+/**
+ * Validate one `sources[]` entry's shape. Throws `AggregationError`
+ * ('validation') on the first violation. Does not check whether
+ * `sourceOperationRef` is actually declared -- that cross-reference check
+ * belongs to aggregation-evaluator.mjs, which has both lists on hand.
+ */
+export function validateAggregationSource(source, index) {
+  const label = `sources[${index}]`;
+  if (!isPlainObject(source)) fail('validation', `${label} must be a non-null object`);
+  assertOnlyAcceptedFields(source, AGGREGATION_SOURCE_FIELDS, label);
+  if (!isNonEmptyString(source.sourceOperationRef)) fail('validation', `${label}.sourceOperationRef must be a non-empty string`);
+  if (!isNonEmptyString(source.assignmentId)) fail('validation', `${label}.assignmentId must be a non-empty string`);
+  if (!isNonEmptyString(source.runId)) fail('validation', `${label}.runId must be a non-empty string`);
+  if (!isNonEmptyString(source.artifactRef)) fail('validation', `${label}.artifactRef must be a non-empty string`);
+  if (!isNonEmptyString(source.revision)) {
+    fail('validation', `${label}.revision must be a non-empty string -- an artifact ref without a revision pin is not immutable`);
+  }
+  if (!isPlainObject(source.disclosures)) fail('validation', `${label}.disclosures must be an object`);
+}
+
+/**
+ * Validate the declared `sourceOperationRefs[]` list (candidate contract:
+ * `completion.aggregation.sourceOperationRefs[]`). Must be a non-empty
+ * array of unique, non-empty strings.
+ */
+export function validateSourceOperationRefs(sourceOperationRefs) {
+  if (!isNonEmptyStringArray(sourceOperationRefs)) {
+    fail('validation', 'sourceOperationRefs must be a non-empty array of non-empty strings');
+  }
+  const seen = new Set();
+  for (const ref of sourceOperationRefs) {
+    if (seen.has(ref)) fail('validation', `sourceOperationRefs carries duplicate entry "${ref}"`);
+    seen.add(ref);
+  }
+}
+
+/**
+ * Validate the full `sources[]` array shape (each entry via
+ * `validateAggregationSource`).
+ */
+export function validateSources(sources) {
+  if (!Array.isArray(sources)) fail('validation', 'sources must be an array');
+  sources.forEach(validateAggregationSource);
+}
+
+/**
+ * Validate the declared `requiredDisclosures[]` list (candidate contract:
+ * `completion.aggregation.requiredDisclosures[]`). Must be a non-empty
+ * array of non-empty strings naming disclosure ids every source is
+ * expected to carry under `disclosures`.
+ */
+export function validateRequiredDisclosures(requiredDisclosures) {
+  if (!isNonEmptyStringArray(requiredDisclosures)) {
+    fail('validation', 'requiredDisclosures must be a non-empty array of non-empty strings');
+  }
+}

@@ -356,6 +356,150 @@ test('the same operation id may be required at one graph position and driver-aut
 });
 
 // ---------------------------------------------------------------------------
+// Visibility windows (Step 09 MVP6 P06.1 -- schema/validation only, no
+// runtime enforcement; see docs/architect/agent-coordination/verification/
+// step-09-mvp6-to-mvp9/P00.2.md §3 for the candidate-contract freeze).
+// ---------------------------------------------------------------------------
+
+function protocolDefinitionWithTwoOperations(overrides = {}) {
+  const def = minimalProtocolDefinition(overrides);
+  def.spec.roles = ['researcher'];
+  def.spec.operations = [
+    { id: 'op-research', role: 'researcher', result: { kind: 'advisory' } },
+    { id: 'op-list-results', role: 'researcher', result: { kind: 'work-product' } },
+  ];
+  def.spec.graph.nodes[0].operations = [
+    { ref: 'op-research', actor: 'actor-1' },
+    { ref: 'op-list-results', actor: 'actor-1' },
+  ];
+  return def;
+}
+
+function withVisibilityWindow(overrides = {}) {
+  const def = protocolDefinitionWithTwoOperations();
+  def.spec.profile.topology.visibilityWindows = [
+    {
+      id: 'window-1',
+      opensAfter: { milestone: 'listed-results-linked', operationRefs: ['op-list-results'] },
+      permits: { sourceOperationRefs: ['op-research'], delivery: 'artifact-refs' },
+      ...overrides,
+    },
+  ];
+  return def;
+}
+
+test('a definition with no visibilityWindows validates byte/behavior-identical to before (regression)', () => {
+  const def = minimalProtocolDefinition();
+  const result = validateFlowDefinition(def);
+  assert.equal(result.spec.profile.topology.visibilityWindows, undefined);
+  assert.equal(result.spec.graph.nodes[0].operations[0].contextAccess, undefined);
+});
+
+test('accepts a well-formed CoordinationProtocol visibilityWindows[] definition and a matching contextAccess.visibilityWindowRef', () => {
+  const def = withVisibilityWindow();
+  def.spec.graph.nodes[0].operations[0].contextAccess = { visibilityWindowRef: 'window-1' };
+
+  const result = validateFlowDefinition(def);
+  assert.deepEqual(result.spec.profile.topology.visibilityWindows, [
+    {
+      id: 'window-1',
+      opensAfter: { milestone: 'listed-results-linked', operationRefs: ['op-list-results'] },
+      permits: { sourceOperationRefs: ['op-research'], delivery: 'artifact-refs' },
+    },
+  ]);
+  assert.deepEqual(result.spec.graph.nodes[0].operations[0].contextAccess, { visibilityWindowRef: 'window-1' });
+  assert.ok(Object.isFrozen(result.spec.profile.topology.visibilityWindows));
+  assert.ok(Object.isFrozen(result.spec.profile.topology.visibilityWindows[0]));
+});
+
+test('rejects an unknown contextAccess.visibilityWindowRef', () => {
+  const def = withVisibilityWindow();
+  def.spec.graph.nodes[0].operations[0].contextAccess = { visibilityWindowRef: 'no-such-window' };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/contextAccess\.visibilityWindowRef "no-such-window" does not reference a declared spec\.profile\.topology\.visibilityWindows\[\] id/),
+  );
+});
+
+test('rejects a dangling opensAfter.operationRefs[] entry', () => {
+  const def = withVisibilityWindow({ opensAfter: { milestone: 'listed-results-linked', operationRefs: ['no-such-op'] } });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/visibilityWindows\[0\]\.opensAfter\.operationRefs\[0\] "no-such-op" does not reference a declared spec\.operations\[\] id/),
+  );
+});
+
+test('rejects a dangling permits.sourceOperationRefs[] entry', () => {
+  const def = withVisibilityWindow({ permits: { sourceOperationRefs: ['no-such-op'], delivery: 'artifact-refs' } });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/visibilityWindows\[0\]\.permits\.sourceOperationRefs\[0\] "no-such-op" does not reference a declared spec\.operations\[\] id/),
+  );
+});
+
+test('rejects a duplicate visibilityWindows[] id', () => {
+  const def = protocolDefinitionWithTwoOperations();
+  const window = {
+    opensAfter: { milestone: 'listed-results-linked', operationRefs: ['op-list-results'] },
+    permits: { sourceOperationRefs: ['op-research'], delivery: 'artifact-refs' },
+  };
+  def.spec.profile.topology.visibilityWindows = [
+    { id: 'window-1', ...window },
+    { id: 'window-1', ...window },
+  ];
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/visibilityWindows carries duplicate window id "window-1"/),
+  );
+});
+
+test('rejects an illegal permits.delivery value', () => {
+  const def = withVisibilityWindow({ permits: { sourceOperationRefs: ['op-research'], delivery: 'live-stream' } });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/visibilityWindows\[0\]\.permits\.delivery must be one of artifact-refs/),
+  );
+});
+
+test('rejects an illegal opensAfter.milestone value', () => {
+  const def = withVisibilityWindow({ opensAfter: { milestone: 'all-results-linked', operationRefs: ['op-list-results'] } });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/visibilityWindows\[0\]\.opensAfter\.milestone must be one of listed-results-linked/),
+  );
+});
+
+test('rejects a Workflow-profile definition carrying spec.profile.topology.visibilityWindows', () => {
+  const def = minimalWorkflowDefinition({
+    spec: {
+      ...minimalWorkflowDefinition().spec,
+      profile: {
+        kind: 'Workflow',
+        topology: {
+          visibilityWindows: [
+            {
+              id: 'window-1',
+              opensAfter: { milestone: 'listed-results-linked', operationRefs: ['op-implement'] },
+              permits: { sourceOperationRefs: ['op-implement'], delivery: 'artifact-refs' },
+            },
+          ],
+        },
+      },
+    },
+  });
+  assert.throws(() => validateFlowDefinition(def), throwsFlowDefinitionError(/spec\.profile has unknown field "topology"/));
+});
+
+test('rejects a Workflow-profile definition carrying graph.nodes[].operations[].contextAccess', () => {
+  const def = minimalWorkflowDefinition();
+  def.spec.graph.nodes[0].operations[0].contextAccess = { visibilityWindowRef: 'window-1' };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/contextAccess is legal only under the CoordinationProtocol profile \(profile is "Workflow"\)/),
+  );
+});
+
+// ---------------------------------------------------------------------------
 // Determinism / immutability
 // ---------------------------------------------------------------------------
 

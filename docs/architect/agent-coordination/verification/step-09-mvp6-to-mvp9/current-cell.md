@@ -1,9 +1,65 @@
-# Current Cell(s): P06.1 + P07.1 (Wave 1, parallel, disjoint write scopes)
+# Current Cell(s): none (idle — Wave 1 closed, Wave 2 not yet dispatched)
 
-Status: in-progress
+Status: closed (Wave 1) / idle
 Owner: Coordinator (this session)
 Last updated: 2026-09-04
-Next action: dispatch both Doers in parallel (disjoint scopes per P00.2.md §4)
+Next action: prepare and dispatch Wave 2 (P06.2 + remaining P07.2 scope),
+each into its OWN isolated worktree this time — see index.md's Next Action
+and process-deviation note. This file's P06.1/P07.1 sections below are kept
+as the historical closed-cell contract; a new "## Wave 2" section will be
+added above them when Wave 2 is prepared.
+
+## Wave 1 Disposition (post Reviewer+Red-Team parallel first pass)
+
+Both rounds: APPROVE WITH CONCERNS, 0 HIGH. Reviewer: 2 MEDIUM + 2 LOW + 1 nit.
+Red-Team: 2 MEDIUM (0 LOW). Overlap: Reviewer's "frozen at every level" finding
+and Red-Team's "mutable sub-function results" finding are the same defect at
+different depth — consolidated into one fix below.
+
+**Accepted, routed to Fixer (P07.1 scope only, sequential, single Fixer):**
+1. `P07.1.md` Scope line overclaims P07.2 as covered — reword; `index.md` must
+   not record P07.2 as closed.
+2. Immutability: `validateSourceCoverage`/`validateRequiredDisclosureCoverage`
+   return mutable objects/arrays/Map despite the trace's blanket claim; even
+   `evaluateAggregationCoverage`'s frozen output has an unfrozen nested array
+   inside `missingDisclosuresBySource`. Freeze every exported function's
+   result at every nesting level; extend "result is frozen" test to check a
+   nested value too.
+3. `team-cognition-static.test.mjs`'s forbidden-import guard is one-hop only
+   (proven by Red-Team's synthetic PoC) — make it a real recursive resolver
+   over relative imports.
+4. No test proves the evaluator's inputs are left unmutated (named Bug
+   Taxonomy item) — add one.
+
+**Not accepted / no action:** Reviewer's LOW #4 (shared-worktree process
+deviation — already disclosed by Coordinator, not a code defect, no further
+action) and LOW #5 (current-cell.md wording nit re: "graph.nodes[]" — will
+fix as a free docs-only line while the Fixer is already in this file's
+neighborhood, not because it's a real requirement gap).
+
+P06.1 has zero findings routed to it — clean.
+
+## CRITICAL: working root
+
+ALL edits (source, tests, and this cell's own trace file) happen inside the
+dedicated worktree:
+`/home/vantt/projects/forgentX/.claude/worktrees/step-09-mvp6-to-mvp9/`
+(branch `step-09-mvp6-to-mvp9`). Do NOT write under
+`/home/vantt/projects/forgentX/` directly — that is the main checkout, on
+branch `main`, shared by unrelated concurrent work. (A prior Coordinator
+slip wrote Phase 00's trace files to the main-checkout path by accident and
+had to be moved before commit — do not repeat it.)
+
+Run focused/full test commands from THAT SAME worktree root
+(`cd /home/vantt/projects/forgentX/.claude/worktrees/step-09-mvp6-to-mvp9 &&
+FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test '<glob>'`) — this is where
+the edited code actually lives, so this is the only cwd that tests it.
+Exception: `test/runner/coordination-static.test.mjs` false-fails from this
+path (see index.md's Baseline note, it substring-matches "worktree" in
+resolved import paths) — neither P06.1's nor P07.1's own focused glob
+includes that file, so it does not apply here unless a Doer widens the
+glob, in which case run that one file's check from the main checkout
+instead and say so in the trace.
 
 Phase 00 (P00.1 + P00.2) closed — see index.md Cell Log. Full-suite baseline
 recorded in index.md.
@@ -73,7 +129,8 @@ Accepting `visibilityWindows` on a `Workflow` profile; a dangling
 `operationRefs`/`sourceOperationRefs` entry silently accepted instead of
 rejected; a definition with zero windows changing behavior/shape; validation
 that only checks presence, not that referenced operation ids actually exist
-in `graph.nodes[]`.
+in `spec.operations[]` (the same operation-id namespace every other
+operation ref in this schema resolves against).
 
 ### Trace Update
 Doer writes `P06.1.md` (Requirements/Proof Matrix/Commands/Gaps). Coordinator

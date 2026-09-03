@@ -51,7 +51,7 @@ const GRAPH_FIELDS = new Set(['entry', 'nodes']);
 // spec.profile.kind, never a stored field on the node object (ADR-009
 // Decision 3). Any explicit `kind` key here is rejected by the whitelist.
 const NODE_FIELDS = new Set(['id', 'operations', 'transitions']);
-const NODE_OPERATION_REF_FIELDS = new Set(['ref', 'actor', 'activation']);
+const NODE_OPERATION_REF_FIELDS = new Set(['ref', 'actor', 'activation', 'contextAccess']);
 const ACTIVATION_FIELDS = new Set(['mode', 'maxInvocations']);
 
 // `activation` is scoped to the node-operation BINDING, never to the
@@ -82,9 +82,26 @@ const WORKFLOW_WORK_FIELDS = new Set(['baseStepMap']);
 // forbidden: profile.work, baseStepMap" structurally, not by naming them.
 const PROTOCOL_PROFILE_FIELDS = new Set(['kind', 'completion', 'topology', 'cohort']);
 const PROTOCOL_COMPLETION_FIELDS = new Set(['mode']);
-const PROTOCOL_TOPOLOGY_FIELDS = new Set(['contextVisibility', 'edges']);
+const PROTOCOL_TOPOLOGY_FIELDS = new Set(['contextVisibility', 'edges', 'visibilityWindows']);
 const PROTOCOL_TOPOLOGY_EDGE_FIELDS = new Set(['from', 'to', 'intents', 'maxRounds']);
 const PROTOCOL_COHORT_FIELDS = new Set(['count', 'distinctProviderFamilies', 'requiredRoles', 'independence']);
+
+// Visibility windows (Step 09 MVP6, candidate contract --
+// docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md
+// §3 -- schema-shaped only, no runtime enforcement here). Legal only under
+// `CoordinationProtocol` because `visibilityWindows` lives inside
+// `topology`, and `topology` is already absent from WORKFLOW_PROFILE_FIELDS
+// -- a `Workflow` profile carrying `topology.visibilityWindows` is rejected
+// as an unknown `topology` field before this shape is ever inspected.
+const VISIBILITY_WINDOW_FIELDS = new Set(['id', 'opensAfter', 'permits']);
+const VISIBILITY_WINDOW_OPENS_AFTER_FIELDS = new Set(['milestone', 'operationRefs']);
+const VISIBILITY_WINDOW_PERMITS_FIELDS = new Set(['sourceOperationRefs', 'delivery']);
+export const VISIBILITY_WINDOW_MILESTONE_VALUES = Object.freeze(['listed-results-linked']);
+export const VISIBILITY_WINDOW_DELIVERY_VALUES = Object.freeze(['artifact-refs']);
+
+// `contextAccess` is a graph.nodes[].operations[] binding field (same
+// binding scope as `activation`), never a spec.operations[] template field.
+const CONTEXT_ACCESS_FIELDS = new Set(['visibilityWindowRef']);
 
 /**
  * Error raised by this module. `category` is a stable, caller-inspectable
@@ -279,6 +296,45 @@ function validateTopologyEdge(edge, label) {
   return Object.freeze(result);
 }
 
+/**
+ * Validate one `spec.profile.topology.visibilityWindows[]` entry against
+ * its exact field table. Cross-referential checks (operationRefs/
+ * sourceOperationRefs resolving to a real spec.operations[] id, duplicate
+ * window id) happen after this shape check -- the former needs `operations`,
+ * which is not computed yet at profile-validation time (see validateSpec).
+ */
+function validateVisibilityWindow(window, label) {
+  if (!isPlainObject(window)) fail(`${label} must be an object`);
+  assertOnlyAcceptedFields(window, VISIBILITY_WINDOW_FIELDS, label);
+  if (!isNonEmptyString(window.id)) fail(`${label}.id must be a non-empty string`);
+
+  if (!isPlainObject(window.opensAfter)) fail(`${label}.opensAfter must be an object`);
+  assertOnlyAcceptedFields(window.opensAfter, VISIBILITY_WINDOW_OPENS_AFTER_FIELDS, `${label}.opensAfter`);
+  if (!VISIBILITY_WINDOW_MILESTONE_VALUES.includes(window.opensAfter.milestone)) {
+    fail(`${label}.opensAfter.milestone must be one of ${VISIBILITY_WINDOW_MILESTONE_VALUES.join(' | ')}`);
+  }
+  assertStringArray(window.opensAfter.operationRefs, `${label}.opensAfter.operationRefs`);
+
+  if (!isPlainObject(window.permits)) fail(`${label}.permits must be an object`);
+  assertOnlyAcceptedFields(window.permits, VISIBILITY_WINDOW_PERMITS_FIELDS, `${label}.permits`);
+  assertStringArray(window.permits.sourceOperationRefs, `${label}.permits.sourceOperationRefs`);
+  if (!VISIBILITY_WINDOW_DELIVERY_VALUES.includes(window.permits.delivery)) {
+    fail(`${label}.permits.delivery must be one of ${VISIBILITY_WINDOW_DELIVERY_VALUES.join(' | ')}`);
+  }
+
+  return Object.freeze({
+    id: window.id,
+    opensAfter: Object.freeze({
+      milestone: window.opensAfter.milestone,
+      operationRefs: Object.freeze([...window.opensAfter.operationRefs]),
+    }),
+    permits: Object.freeze({
+      sourceOperationRefs: Object.freeze([...window.permits.sourceOperationRefs]),
+      delivery: window.permits.delivery,
+    }),
+  });
+}
+
 function validateWorkflowProfile(profile) {
   assertOnlyAcceptedFields(profile, WORKFLOW_PROFILE_FIELDS, 'spec.profile');
   const result = { kind: 'Workflow' };
@@ -340,6 +396,22 @@ function validateProtocolProfile(profile) {
       if (!Array.isArray(profile.topology.edges)) fail('spec.profile.topology.edges must be an array when provided');
       topology.edges = Object.freeze(
         profile.topology.edges.map((edge, i) => validateTopologyEdge(edge, `spec.profile.topology.edges[${i}]`)),
+      );
+    }
+    if (profile.topology.visibilityWindows !== undefined) {
+      if (!Array.isArray(profile.topology.visibilityWindows)) {
+        fail('spec.profile.topology.visibilityWindows must be an array when provided');
+      }
+      const seenWindowIds = new Set();
+      topology.visibilityWindows = Object.freeze(
+        profile.topology.visibilityWindows.map((window, i) => {
+          const validated = validateVisibilityWindow(window, `spec.profile.topology.visibilityWindows[${i}]`);
+          if (seenWindowIds.has(validated.id)) {
+            fail(`spec.profile.topology.visibilityWindows carries duplicate window id "${validated.id}"`);
+          }
+          seenWindowIds.add(validated.id);
+          return validated;
+        }),
       );
     }
     result.topology = Object.freeze(topology);
@@ -532,7 +604,31 @@ export function activationModeOf(binding) {
   return binding?.activation?.mode ?? DEFAULT_ACTIVATION_MODE;
 }
 
-function validateNodeOperationRef(opRef, label, operationIds, actorIds) {
+/**
+ * `contextAccess.visibilityWindowRef` is a CoordinationProtocol-only
+ * binding field -- rejected explicitly on any other profile kind rather
+ * than left to fall through to "unknown window ref" (windowIds is always
+ * empty for a non-CoordinationProtocol profile, so the fallthrough would
+ * still reject, but with a message that hides the real reason).
+ */
+function validateContextAccess(contextAccess, label, windowIds) {
+  if (!isPlainObject(contextAccess)) fail(`${label} must be an object`);
+  assertOnlyAcceptedFields(contextAccess, CONTEXT_ACCESS_FIELDS, label);
+
+  const result = {};
+  if (contextAccess.visibilityWindowRef !== undefined) {
+    if (!isNonEmptyString(contextAccess.visibilityWindowRef)) {
+      fail(`${label}.visibilityWindowRef must be a non-empty string when provided`);
+    }
+    if (!windowIds.has(contextAccess.visibilityWindowRef)) {
+      fail(`${label}.visibilityWindowRef "${contextAccess.visibilityWindowRef}" does not reference a declared spec.profile.topology.visibilityWindows[] id`);
+    }
+    result.visibilityWindowRef = contextAccess.visibilityWindowRef;
+  }
+  return Object.freeze(result);
+}
+
+function validateNodeOperationRef(opRef, label, operationIds, actorIds, profileKind, windowIds) {
   if (!isPlainObject(opRef)) fail(`${label} must be an object`);
   assertOnlyAcceptedFields(opRef, NODE_OPERATION_REF_FIELDS, label);
   if (!isNonEmptyString(opRef.ref)) fail(`${label}.ref must be a non-empty string`);
@@ -547,10 +643,16 @@ function validateNodeOperationRef(opRef, label, operationIds, actorIds) {
   if (opRef.activation !== undefined) {
     result.activation = validateActivation(opRef.activation, `${label}.activation`);
   }
+  if (opRef.contextAccess !== undefined) {
+    if (profileKind !== 'CoordinationProtocol') {
+      fail(`${label}.contextAccess is legal only under the CoordinationProtocol profile (profile is "${profileKind}")`);
+    }
+    result.contextAccess = validateContextAccess(opRef.contextAccess, `${label}.contextAccess`, windowIds);
+  }
   return Object.freeze(result);
 }
 
-function validateGraph(graph, operations, actors) {
+function validateGraph(graph, operations, actors, profileKind, windowIds) {
   if (!isPlainObject(graph)) fail('spec.graph must be a non-null object');
   assertOnlyAcceptedFields(graph, GRAPH_FIELDS, 'spec.graph');
   if (!isNonEmptyString(graph.entry)) fail('spec.graph.entry must be a non-empty string');
@@ -573,7 +675,7 @@ function validateGraph(graph, operations, actors) {
     let nodeOperations = [];
     if (node.operations !== undefined) {
       if (!Array.isArray(node.operations)) fail(`${label}.operations must be an array when provided`);
-      nodeOperations = node.operations.map((opRef, j) => validateNodeOperationRef(opRef, `${label}.operations[${j}]`, operationIds, actorIds));
+      nodeOperations = node.operations.map((opRef, j) => validateNodeOperationRef(opRef, `${label}.operations[${j}]`, operationIds, actorIds, profileKind, windowIds));
     }
 
     let transitions = [];
@@ -639,6 +741,31 @@ function assertAdvisoryReachableFromEntry(graph, operations) {
   }
 }
 
+/**
+ * `visibilityWindows[].opensAfter.operationRefs[]` and
+ * `.permits.sourceOperationRefs[]` must resolve to a real `spec.operations[]`
+ * id declared elsewhere in the same definition -- checked here, after
+ * `operations` is computed, rather than inside `validateProtocolProfile`
+ * (which runs before `operations` exists in `validateSpec`'s own order).
+ */
+function assertVisibilityWindowsReferenceRealOperations(profile, operationIds) {
+  const windows = profile.topology?.visibilityWindows;
+  if (!windows) return;
+  windows.forEach((window, i) => {
+    const label = `spec.profile.topology.visibilityWindows[${i}]`;
+    window.opensAfter.operationRefs.forEach((ref, j) => {
+      if (!operationIds.has(ref)) {
+        fail(`${label}.opensAfter.operationRefs[${j}] "${ref}" does not reference a declared spec.operations[] id`);
+      }
+    });
+    window.permits.sourceOperationRefs.forEach((ref, j) => {
+      if (!operationIds.has(ref)) {
+        fail(`${label}.permits.sourceOperationRefs[${j}] "${ref}" does not reference a declared spec.operations[] id`);
+      }
+    });
+  });
+}
+
 function validateSpec(spec) {
   if (!isPlainObject(spec)) fail('spec must be a non-null object');
   assertOnlyAcceptedFields(spec, SPEC_FIELDS, 'spec');
@@ -648,7 +775,10 @@ function validateSpec(spec) {
   const roleSet = new Set(roles);
   const actors = validateActors(spec.actors, roleSet);
   const operations = validateOperations(spec.operations, roleSet, profile.kind);
-  const graph = validateGraph(spec.graph, operations, actors);
+  const operationIds = new Set(operations.map((op) => op.id));
+  assertVisibilityWindowsReferenceRealOperations(profile, operationIds);
+  const windowIds = new Set((profile.topology?.visibilityWindows ?? []).map((w) => w.id));
+  const graph = validateGraph(spec.graph, operations, actors, profile.kind, windowIds);
   const policy = spec.policy !== undefined ? validatePolicyPatch(spec.policy, 'spec.policy') : undefined;
 
   // Definition-scope (`spec.policy`) is the least-specific declared scope
