@@ -197,6 +197,43 @@ function resolveRefArray(values, labels, fieldLabel) {
   return values.map((v, i) => resolveRef(v, labels, `${fieldLabel}[${i}]`));
 }
 
+// Phase 07 (MVP7): the close-time aggregation gate.
+//
+// `closeSessionByQuorum` consults an aggregation only when its caller passes
+// `aggregationId` -- it holds no FlowDefinition of its own at close time and
+// therefore cannot notice that the bound protocol declared
+// `completion.aggregation`. Until this function existed the gate had zero
+// production callers (P07.3's own named gap): a protocol could declare an
+// aggregation and close on quorum alone, and nothing noticed. This is the one
+// place a request reaches that close, so this is where the declaration is
+// turned into an enforced property.
+//
+// Opt-in stays opt-in at the SCHEMA level: a definition that declares no
+// aggregation (every shipped protocol under `core/` today) returns `{}` and
+// leaves the close byte-identical to what it was before aggregation existed.
+//
+// The verdict is never judged here. This function only selects WHICH
+// validated aggregation speaks for the session; whether that outcome permits
+// a close is decided by the engine, inside its own close lock, from the event
+// log.
+function aggregationCloseParams(coordinationId, definition, engineOpts) {
+  if (definition?.spec?.profile?.completion?.aggregation === undefined) return {};
+  const { aggregations } = resumeSession(coordinationId, engineOpts);
+  if (aggregations.length === 0) {
+    throw new CoordinationError(
+      'validation',
+      `coordination run: protocol "${definition.metadata.id}" declares completion.aggregation, but session "${coordinationId}" has validated no aggregation -- refusing to close a declared-aggregation protocol on quorum alone (validate one through validateSessionAggregation, then resume this session to close it)`,
+    );
+  }
+  // The most recently validated aggregation is the one that speaks: an earlier
+  // verdict is superseded by a later validation, which is exactly the remedy
+  // `closeSessionByQuorum`'s own refusal message prescribes ("resolve the
+  // aggregation and validate a new one"). `aggregations` never contains a
+  // post-terminal record -- replay neutralizes those into
+  // `ignoredAggregations`, which is deliberately not read here.
+  return { aggregationId: aggregations[aggregations.length - 1].aggregationId };
+}
+
 function summarizeDispatch({ assignment, runResult }) {
   return {
     assignmentId: assignment.assignmentId,
@@ -244,6 +281,11 @@ export async function runCoordinationUseCase(ctx, options = {}) {
   const stepResults = [];
   let manifest;
   let fanOutFailure = null;
+  // The bound protocol document, when there is one. Held beyond the
+  // declared-protocol branch below because the close-time aggregation gate
+  // needs it (`aggregationCloseParams`); an agent-led session has no
+  // FlowDefinition at all and leaves it `null`.
+  let definition = null;
 
   if (request.kind === 'agent-led') {
     manifest =
@@ -272,7 +314,7 @@ export async function runCoordinationUseCase(ctx, options = {}) {
     );
     stepResults.push({ as: 'primary', type: 'operation', actorId: 'primary', ...summarizeDispatch(dispatch) });
   } else {
-    const definition = loadCoordinationProtocol(request.protocolRef.id, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
+    definition = loadCoordinationProtocol(request.protocolRef.id, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
     const declaredActorIds = new Set((definition.spec.actors ?? []).map((a) => a.id));
     for (const actorEntry of request.actors) {
       if (!declaredActorIds.has(actorEntry.id)) {
@@ -455,7 +497,7 @@ export async function runCoordinationUseCase(ctx, options = {}) {
   let closed = false;
   let closeRefusalReason = null;
   try {
-    closeSessionByQuorum(manifest.coordinationId, {}, engineOpts);
+    closeSessionByQuorum(manifest.coordinationId, aggregationCloseParams(manifest.coordinationId, definition, engineOpts), engineOpts);
     closed = true;
   } catch (err) {
     if (err instanceof CoordinationError) {

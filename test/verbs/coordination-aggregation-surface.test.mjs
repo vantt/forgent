@@ -1,0 +1,546 @@
+// Step 09 Phase 07 (MVP7), cell P07.4: the SURFACE over evidence-preserving
+// aggregation, and the regression proof around it.
+//
+// P07.3 built the whole aggregation machine -- the `completion.aggregation`
+// declaration, the `aggregation-validated` event, its store door, its replay
+// reconstruction and refusals, and `closeSessionByQuorum`'s optional
+// `aggregationId` terminal-input gate -- and closed with one named gap: that
+// gate had ZERO production callers. `src/verbs/coordination/run.mjs` passed
+// `{}`, so a protocol could declare `completion.aggregation` and close on
+// quorum alone with nothing noticing. This file proves that gap closed, from
+// the request surface a real caller actually uses.
+//
+// Four things are proved here, and only here:
+//   1. a declared aggregation is ENFORCED at the close a request reaches --
+//      refused with no validated aggregation, refused on a non-consensus
+//      verdict, allowed on consensus;
+//   2. a definition declaring NOTHING is byte-unchanged (opt-in stays opt-in
+//      at the schema level);
+//   3. `fgos coordination show` renders the whole validated record -- method,
+//      outcome, sources, dissent, unresolved items, failures/omissions,
+//      artifact revisions -- including a neutralized post-terminal one;
+//   4. aggregation never upgrades a RunResult: a `consensus` verdict leaves
+//      every settled Assignment's own recorded status/confidence identical.
+//
+// Plus CLI/headless parity over a full aggregation scenario: the SAME
+// three-phase sequence (refused close -> validate -> resumed close) driven
+// once through a genuinely spawned `fgos coordination run --file` subprocess
+// and once through `runCoordinationHeadless`, deep-compared.
+//
+// Every run drives real Node subprocesses through the real dispatch path
+// against a project-tier protocol written into a temp dir -- no JS-level stub
+// over the engine, and no committed fixture under `core/` read or altered.
+
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
+import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
+import { runCoordinationHeadless } from '../../src/runner/coordination/headless-adapter.mjs';
+import { validateSessionAggregation } from '../../src/runner/coordination/session-engine.mjs';
+import { readManifest, resolveSessionPaths } from '../../src/runner/coordination/store.mjs';
+import { replaySession } from '../../src/runner/coordination/replay.mjs';
+
+const FGOS_CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../bin/fgos.mjs');
+const PROTOCOL_ID = 'test.coordination-protocol.aggregation-surface';
+const AGGREGATION_METHOD = 'evidence-preserving-synthesis';
+const WRITER_ID = 'coordinator-1';
+const OUTPUTS = ['agent-result.json (status, summary)'];
+
+function mkTempDir() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-agg-surface-'));
+}
+
+// The same graph P07.3's own runtime layer proved the evaluator over: two
+// research bindings feeding one declared aggregation, plus a coordinator
+// operation so every declared actor has the Assignment quorum requires of it
+// (without `review`, `closeSessionByQuorum` refuses on the pre-existing R1
+// rule and every assertion below would be watching the wrong refusal).
+function protocolDoc({ withAggregation }) {
+  const advisory = { kind: 'advisory', evidenceRequired: 'reported' };
+  return {
+    apiVersion: 'fgos.dev/v1alpha1',
+    kind: 'FlowDefinition',
+    metadata: { id: PROTOCOL_ID, version: '1.0.0' },
+    spec: {
+      profile: {
+        kind: 'CoordinationProtocol',
+        completion: {
+          mode: 'synthesize',
+          ...(withAggregation
+            ? {
+                aggregation: {
+                  method: AGGREGATION_METHOD,
+                  outputOperationRef: 'synthesize',
+                  sourceOperationRefs: ['research'],
+                  requiredDisclosures: ['confidence', 'dissent'],
+                },
+              }
+            : {}),
+        },
+      },
+      roles: ['coordinator', 'researcher'],
+      actors: [
+        { id: 'coordinator-actor', role: 'coordinator' },
+        { id: 'researcher-a', role: 'researcher' },
+        { id: 'researcher-b', role: 'researcher' },
+      ],
+      operations: [
+        { id: 'research', role: 'researcher', result: advisory },
+        { id: 'review', role: 'coordinator', result: advisory },
+        { id: 'synthesize', role: 'coordinator', result: advisory },
+      ],
+      graph: {
+        entry: 'phase-research',
+        nodes: [
+          {
+            id: 'phase-research',
+            operations: [
+              { ref: 'research', actor: 'researcher-a' },
+              { ref: 'research', actor: 'researcher-b' },
+            ],
+            transitions: ['phase-fan-in'],
+          },
+          {
+            id: 'phase-fan-in',
+            operations: [
+              { ref: 'review', actor: 'coordinator-actor' },
+              { ref: 'synthesize', actor: 'coordinator-actor' },
+            ],
+            transitions: [],
+          },
+        ],
+      },
+    },
+  };
+}
+
+function writeProtocol(tempDir, { withAggregation = true } = {}) {
+  const dir = path.join(tempDir, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'aggregation-surface.json'), `${JSON.stringify(protocolDoc({ withAggregation }), null, 2)}\n`);
+}
+
+// A real Node subprocess that settles whatever run it is handed. Written into
+// the workspace AND registered in `.fgos/config.json`, so the spawned CLI
+// (which resolves its runner config from that file) and an in-process caller
+// (which is handed the same object as `ctx.runnerConfig`) drive byte-identical
+// executor behavior -- the only honest basis for a parity comparison.
+function fakeRunnerConfig(tempDir) {
+  const executorScript = path.join(tempDir, 'fake-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const assignmentsRoot = path.join(process.cwd(), '.fgos', 'assignments');
+    if (fs.existsSync(assignmentsRoot)) {
+      for (const asgn of fs.readdirSync(assignmentsRoot)) {
+        const runsDir = path.join(assignmentsRoot, asgn, 'runs');
+        if (!fs.existsSync(runsDir)) continue;
+        for (const run of fs.readdirSync(runsDir)) {
+          const runDir = path.join(runsDir, run);
+          if (fs.existsSync(runDir) && !fs.existsSync(path.join(runDir, 'agent-result.json'))) {
+            fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Research Report\\nMeasured latency across three regions and recorded the observed percentiles.\\n');
+            fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Settled by the test executor.' }));
+          }
+        }
+      }
+    }
+    process.stdout.write('done\\n');
+    process.exit(0);
+    `,
+  );
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model', lightweight: 'test-model', creative: 'test-model', analytical: 'test-model', critical: 'test-model' },
+    timeoutMs: 20000,
+  };
+  const configPath = path.join(tempDir, '.fgos', 'config.json');
+  fs.mkdirSync(path.dirname(configPath), { recursive: true });
+  const existing = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  fs.writeFileSync(configPath, `${JSON.stringify({ ...existing, runner: { ...(existing.runner ?? {}), ...runnerConfig } }, null, 2)}\n`);
+  return runnerConfig;
+}
+
+function setup({ withAggregation = true } = {}) {
+  const tempDir = mkTempDir();
+  writeProtocol(tempDir, { withAggregation });
+  const runnerConfig = fakeRunnerConfig(tempDir);
+  return { tempDir, opts: { cwd: tempDir, repoRoot: tempDir }, ctx: { cwd: tempDir, repoRoot: tempDir, runnerConfig } };
+}
+
+// The dispatching request: both research bindings and the coordinator's own
+// operation. The explicit per-actor `taskKey` is required, not cosmetic --
+// `research` is bound to two actors at one node and the default
+// `declared:<operationId>` key carries no actor discriminator, so both
+// bindings would otherwise resume the SAME Assignment.
+function dispatchRequest(coordinationId) {
+  return {
+    kind: 'declared-protocol',
+    objective: 'Aggregate two independent research passes.',
+    writerId: WRITER_ID,
+    coordinationId,
+    protocolRef: { id: PROTOCOL_ID },
+    steps: [
+      { type: 'operation', as: 'research-a', operationId: 'research', targetActorId: 'researcher-a', taskKey: 'declared-research-researcher-a', objective: 'Independent research pass A.', expectedOutputs: OUTPUTS },
+      { type: 'operation', as: 'research-b', operationId: 'research', targetActorId: 'researcher-b', taskKey: 'declared-research-researcher-b', objective: 'Independent research pass B.', expectedOutputs: OUTPUTS },
+      { type: 'operation', as: 'review', operationId: 'review', targetActorId: 'coordinator-actor', taskKey: 'declared-review-coordinator-actor', objective: 'Review the collected research.', expectedOutputs: OUTPUTS },
+    ],
+  };
+}
+
+// A resume request that dispatches nothing: one driver disposition over an
+// Assignment the session already owns. Its only job is to reach the same
+// close the first request reached, now that an aggregation has been
+// validated. `targetRef` is a literal id rather than a `$ref:` label because
+// the label lives in the earlier invocation, not this one.
+function resumeRequest(coordinationId, targetAssignmentId) {
+  return {
+    kind: 'declared-protocol',
+    objective: 'Aggregate two independent research passes.',
+    writerId: WRITER_ID,
+    coordinationId,
+    protocolRef: { id: PROTOCOL_ID },
+    steps: [
+      {
+        type: 'disposition',
+        as: 'note-aggregate',
+        targetRef: targetAssignmentId,
+        disposition: 'accepted',
+        rationale: 'The validated aggregation covers this contribution.',
+        evidenceRefs: [],
+      },
+    ],
+  };
+}
+
+function anAssignmentOf(coordinationId, opts) {
+  return readManifest(coordinationId, opts).assignmentRefs[0];
+}
+
+/** Every settled RunResult of this session, read straight off disk. */
+function runResultsOnDisk(coordinationId, opts) {
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  const snapshot = {};
+  for (const assignmentId of readManifest(coordinationId, opts).assignmentRefs) {
+    const runsDir = path.join(fgosDir, 'assignments', assignmentId, 'runs');
+    if (!fs.existsSync(runsDir)) continue;
+    for (const attempt of fs.readdirSync(runsDir).sort()) {
+      const resultPath = path.join(runsDir, attempt, 'result.json');
+      if (!fs.existsSync(resultPath)) continue;
+      const result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+      snapshot[`${assignmentId}/${attempt}`] = { status: result.status, confidence: result.confidence };
+    }
+  }
+  return snapshot;
+}
+
+function validatedBy() {
+  return { type: 'driver', id: WRITER_ID };
+}
+
+// ─── 1. The declared aggregation is ENFORCED at the close a request reaches ─
+
+test('a protocol declaring completion.aggregation REFUSES to close on quorum alone -- the gate P07.3 left with zero production callers now has one', async () => {
+  const coordinationId = 'coord_agg_surface_refuse';
+  const { ctx, opts } = setup();
+
+  const data = await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+
+  assert.equal(data.closed, false);
+  assert.equal(data.closeAttempted, true);
+  assert.match(data.closeRefusalReason, /declares completion\.aggregation, but session "coord_agg_surface_refuse" has validated no aggregation/);
+  // Refused, not merely reported: the session is genuinely still open.
+  assert.equal(readManifest(coordinationId, opts).status, 'active');
+  assert.equal(replaySession(coordinationId, opts).aggregations.length, 0);
+});
+
+test('with a validated consensus aggregation on the log, the same close PROCEEDS -- and the engine, not the request, is what performed the transition', async () => {
+  const coordinationId = 'coord_agg_surface_consensus';
+  const { ctx, opts } = setup();
+
+  const first = await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+  assert.equal(first.closed, false);
+
+  const validated = validateSessionAggregation(coordinationId, { aggregationId: 'agg_surface_1', validatedBy: validatedBy() }, opts);
+  assert.equal(validated.outcome, 'consensus');
+
+  const second = await runCoordinationUseCase(ctx, {
+    requestObject: resumeRequest(coordinationId, anAssignmentOf(coordinationId, opts)),
+  });
+
+  assert.equal(second.closed, true);
+  assert.equal(second.closeRefusalReason, undefined);
+  assert.equal(readManifest(coordinationId, opts).status, 'completed');
+});
+
+test('a validated NO-CONSENSUS aggregation still refuses the close, with the engine\'s own refusal -- the request surface forwards the id, it never judges the verdict', async () => {
+  const coordinationId = 'coord_agg_surface_no_consensus';
+  const { ctx, opts, tempDir } = setup();
+
+  await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+
+  // Edit one settled report after the fact: its revision pin no longer
+  // matches, so the evaluator's own currency check forces `no-consensus`.
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  const researchAssignment = replaySession(coordinationId, opts).assignments.find((entry) => entry.actorId === 'researcher-a');
+  const runsDir = path.join(fgosDir, 'assignments', researchAssignment.assignmentId, 'runs');
+  const attempt = fs.readdirSync(runsDir).sort()[0];
+  fs.writeFileSync(path.join(runsDir, attempt, 'agent-report.md'), '# Tampered\nEdited after settle.\n');
+  assert.ok(tempDir);
+
+  const validated = validateSessionAggregation(coordinationId, { aggregationId: 'agg_surface_stale', validatedBy: validatedBy() }, opts);
+  assert.equal(validated.outcome, 'no-consensus');
+
+  const second = await runCoordinationUseCase(ctx, {
+    requestObject: resumeRequest(coordinationId, anAssignmentOf(coordinationId, opts)),
+  });
+
+  assert.equal(second.closed, false);
+  assert.match(second.closeRefusalReason, /validated as "no-consensus", not "consensus" -- refusing to close/);
+  assert.equal(readManifest(coordinationId, opts).status, 'active');
+});
+
+// ─── 2. Opt-in stays opt-in ────────────────────────────────────────────────
+
+test('regression: a protocol that declares NO aggregation closes exactly as it did before the gate existed', async () => {
+  const coordinationId = 'coord_agg_surface_optin';
+  const { ctx, opts } = setup({ withAggregation: false });
+
+  const data = await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+
+  assert.equal(data.closed, true);
+  assert.equal(data.closeRefusalReason, undefined);
+  assert.equal(readManifest(coordinationId, opts).status, 'completed');
+});
+
+// ─── 3. `show` renders the whole validated record ──────────────────────────
+
+const AGGREGATION_RENDER_FIELDS = [
+  'aggregationId',
+  'method',
+  'outcome',
+  'sourceResultRefs',
+  'artifactRevisionRefs',
+  'dissentRefs',
+  'unresolvedContributionRefs',
+  'missingActors',
+  'failedActors',
+  'unboundSourceOperationRefs',
+  'assignmentId',
+  'runId',
+  'outputArtifactRef',
+  'validatedBy',
+  'ts',
+];
+
+test('show renders a validated aggregation whole: method, outcome, sources, dissent, unresolved items, failures/omissions, artifact revisions', async () => {
+  const coordinationId = 'coord_agg_surface_show';
+  const { ctx, opts } = setup();
+
+  await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+  validateSessionAggregation(coordinationId, { aggregationId: 'agg_surface_shown', validatedBy: validatedBy() }, opts);
+
+  const shown = showCoordinationUseCase(opts, { id: coordinationId });
+
+  assert.equal(shown.aggregations.length, 1);
+  assert.deepEqual([...shown.ignoredAggregations], []);
+  const record = shown.aggregations[0];
+  // Every field is PRESENT, always -- an absent optional list renders as an
+  // empty array, never dropped, so "named no dissent" can never read as
+  // "dissent not surfaced".
+  assert.deepEqual(Object.keys(record).sort(), [...AGGREGATION_RENDER_FIELDS].sort());
+  assert.equal(record.aggregationId, 'agg_surface_shown');
+  assert.equal(record.method, AGGREGATION_METHOD);
+  assert.equal(record.outcome, 'consensus');
+  assert.equal(record.sourceResultRefs.length, 2);
+  assert.equal(record.artifactRevisionRefs.length, 2);
+  assert.deepEqual(record.dissentRefs, []);
+  assert.deepEqual(record.unresolvedContributionRefs, []);
+  assert.deepEqual(record.missingActors, []);
+  assert.deepEqual(record.failedActors, []);
+  assert.deepEqual(record.unboundSourceOperationRefs, []);
+  assert.deepEqual(record.validatedBy, validatedBy());
+  assert.ok(typeof record.ts === 'string' && record.ts.length > 0);
+});
+
+test('show names the gaps a no-consensus record found -- a missing contributor is rendered, not swallowed', async () => {
+  const coordinationId = 'coord_agg_surface_show_gaps';
+  const { ctx, opts } = setup();
+
+  // Only ONE of the two research bindings is dispatched, so the cohort is
+  // half-answered: the operation contributes nothing and the record names the
+  // contributor it never heard from.
+  const request = dispatchRequest(coordinationId);
+  request.steps = request.steps.filter((step) => step.as !== 'research-b');
+  await runCoordinationUseCase(ctx, { requestObject: request });
+
+  validateSessionAggregation(coordinationId, { aggregationId: 'agg_surface_gap', validatedBy: validatedBy() }, opts);
+  const record = showCoordinationUseCase(opts, { id: coordinationId }).aggregations[0];
+
+  assert.equal(record.outcome, 'no-consensus');
+  assert.deepEqual(record.missingActors, ['researcher-b']);
+});
+
+test('show reports a post-terminal aggregation as NEUTRALIZED rather than hiding it -- same posture as a post-terminal authorization', async () => {
+  const coordinationId = 'coord_agg_surface_post_terminal';
+  const { ctx, opts } = setup({ withAggregation: false });
+
+  await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+  assert.equal(readManifest(coordinationId, opts).status, 'completed');
+
+  // The store door refuses to validate into a closed session, so a
+  // post-terminal record can only arrive by a raw append -- exactly the shape
+  // replay neutralizes.
+  const { eventsPath } = resolveSessionPaths(coordinationId, opts);
+  const sourceRefs = replaySession(coordinationId, opts).results.map((entry) => entry.assignmentId);
+  fs.appendFileSync(
+    eventsPath,
+    `${JSON.stringify({
+      seq: 9001,
+      ts: new Date().toISOString(),
+      v: '1',
+      type: 'aggregation-validated',
+      payload: { aggregationId: 'agg_surface_late', method: AGGREGATION_METHOD, outcome: 'consensus', sourceResultRefs: sourceRefs, validatedBy: validatedBy() },
+    })}\n`,
+  );
+
+  const shown = showCoordinationUseCase(opts, { id: coordinationId });
+  assert.deepEqual([...shown.aggregations], []);
+  assert.equal(shown.ignoredAggregations.length, 1);
+  assert.equal(shown.ignoredAggregations[0].aggregationId, 'agg_surface_late');
+  assert.deepEqual(Object.keys(shown.ignoredAggregations[0]).sort(), [...AGGREGATION_RENDER_FIELDS].sort());
+});
+
+test('show on a session with no aggregation at all reports empty lists, not a missing field', async () => {
+  const coordinationId = 'coord_agg_surface_show_none';
+  const { ctx, opts } = setup({ withAggregation: false });
+
+  await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+  const shown = showCoordinationUseCase(opts, { id: coordinationId });
+
+  assert.deepEqual([...shown.aggregations], []);
+  assert.deepEqual([...shown.ignoredAggregations], []);
+});
+
+// ─── 4. Aggregation never upgrades a RunResult ─────────────────────────────
+
+test('a consensus aggregation NEVER upgrades RunResult confidence: every settled Assignment keeps its own recorded status/confidence, before and after the close', async () => {
+  const coordinationId = 'coord_agg_surface_confidence';
+  const { ctx, opts } = setup();
+
+  const first = await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+  const beforeDisk = runResultsOnDisk(coordinationId, opts);
+  const beforeReported = first.steps.map((step) => ({ as: step.as, status: step.status, confidence: step.confidence }));
+  assert.equal(Object.keys(beforeDisk).length, 3);
+
+  const validated = validateSessionAggregation(coordinationId, { aggregationId: 'agg_surface_conf', validatedBy: validatedBy() }, opts);
+  assert.equal(validated.outcome, 'consensus');
+  // The verdict is recorded and nothing beneath it moved.
+  assert.deepEqual(runResultsOnDisk(coordinationId, opts), beforeDisk);
+
+  const second = await runCoordinationUseCase(ctx, {
+    requestObject: resumeRequest(coordinationId, anAssignmentOf(coordinationId, opts)),
+  });
+  assert.equal(second.closed, true);
+
+  // Still identical after the terminal transition the consensus permitted:
+  // a cognitive outcome is terminal INPUT, never a rewrite of the evidence it
+  // was derived from.
+  assert.deepEqual(runResultsOnDisk(coordinationId, opts), beforeDisk);
+  // The confidences the request surface reported are the same ones still on
+  // disk -- the aggregation added a verdict beside the evidence, not over it.
+  for (const entry of beforeReported) {
+    assert.ok(entry.confidence !== undefined, `step "${entry.as}" reported no confidence`);
+  }
+  assert.deepEqual(
+    [...new Set(Object.values(beforeDisk).map((r) => r.confidence))].sort(),
+    [...new Set(beforeReported.map((r) => r.confidence))].sort(),
+  );
+});
+
+// ─── CLI/headless parity over one full aggregation scenario ────────────────
+
+// Ids and timestamps are the only legitimate difference between two runs of
+// the same scenario in two workspaces. Every `asgn_...` token is mapped to a
+// stable placeholder in first-appearance order and every ISO timestamp is
+// collapsed, so a genuine behavioral divergence -- a different refusal, a
+// different quorum, a dropped field -- still fails the comparison.
+function normalize(value, ids = new Map()) {
+  if (typeof value === 'string') {
+    return value
+      .replace(/asgn_[A-Za-z0-9]+/g, (match) => {
+        if (!ids.has(match)) ids.set(match, `<asgn-${ids.size}>`);
+        return ids.get(match);
+      })
+      .replace(/\d{4}-\d{2}-\d{2}T[\d:.]+Z/g, '<ts>');
+  }
+  if (Array.isArray(value)) return value.map((entry) => normalize(entry, ids));
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, normalize(entry, ids)]));
+  }
+  return value;
+}
+
+function cliRun(tempDir, requestObject, name) {
+  const requestPath = path.join(tempDir, `${name}.json`);
+  fs.writeFileSync(requestPath, `${JSON.stringify(requestObject, null, 2)}\n`);
+  const spawned = spawnSync(process.execPath, [FGOS_CLI, 'coordination', 'run', '--file', requestPath], { cwd: tempDir, encoding: 'utf8' });
+  assert.equal(spawned.status, 0, `fgos coordination run failed: ${spawned.stderr}`);
+  return JSON.parse(spawned.stdout).data;
+}
+
+function cliShow(tempDir, coordinationId) {
+  const spawned = spawnSync(process.execPath, [FGOS_CLI, 'coordination', 'show', coordinationId, '--json'], { cwd: tempDir, encoding: 'utf8' });
+  assert.equal(spawned.status, 0, `fgos coordination show failed: ${spawned.stderr}`);
+  return JSON.parse(spawned.stdout).data;
+}
+
+function initWorkspace() {
+  const tempDir = mkTempDir();
+  const spawned = spawnSync(process.execPath, [FGOS_CLI, 'init'], { cwd: tempDir, encoding: 'utf8' });
+  assert.equal(spawned.status, 0, `fgos init failed: ${spawned.stderr}`);
+  writeProtocol(tempDir, { withAggregation: true });
+  const runnerConfig = fakeRunnerConfig(tempDir);
+  return { tempDir, opts: { cwd: tempDir, repoRoot: tempDir }, runnerConfig };
+}
+
+test('CLI/headless parity over a full aggregation scenario: refused close, validation, resumed close, and the rendered record all match across both doors', async () => {
+  const coordinationId = 'coord_agg_surface_parity';
+
+  // Door 1: a genuinely spawned `fgos coordination run --file` subprocess.
+  const cli = initWorkspace();
+  const cliFirst = cliRun(cli.tempDir, dispatchRequest(coordinationId), 'dispatch');
+  validateSessionAggregation(coordinationId, { aggregationId: 'agg_parity', validatedBy: validatedBy() }, cli.opts);
+  const cliSecond = cliRun(cli.tempDir, resumeRequest(coordinationId, anAssignmentOf(coordinationId, cli.opts)), 'resume');
+  const cliShown = cliShow(cli.tempDir, coordinationId);
+
+  // Door 2: the headless adapter, in-process, same request objects.
+  const headless = initWorkspace();
+  const headlessCtx = { cwd: headless.tempDir, repoRoot: headless.tempDir, runnerConfig: headless.runnerConfig };
+  const headlessFirst = await runCoordinationHeadless(dispatchRequest(coordinationId), { ctx: headlessCtx });
+  validateSessionAggregation(coordinationId, { aggregationId: 'agg_parity', validatedBy: validatedBy() }, headless.opts);
+  const headlessSecond = await runCoordinationHeadless(resumeRequest(coordinationId, anAssignmentOf(coordinationId, headless.opts)), { ctx: headlessCtx });
+  const headlessShown = showCoordinationUseCase(headless.opts, { id: coordinationId });
+
+  // The refusal both doors produced is the aggregation gate's, verbatim.
+  assert.equal(cliFirst.closed, false);
+  assert.equal(headlessFirst.closed, false);
+  assert.match(cliFirst.closeRefusalReason, /declares completion\.aggregation, but session ".*" has validated no aggregation/);
+
+  assert.deepEqual(normalize(headlessFirst), normalize(cliFirst));
+  assert.deepEqual(normalize(headlessSecond), normalize(cliSecond));
+  assert.deepEqual(normalize(headlessShown), normalize(cliShown));
+
+  // And the scenario genuinely reached the far end on both doors.
+  assert.equal(cliSecond.closed, true);
+  assert.equal(headlessSecond.closed, true);
+  assert.equal(cliShown.aggregations[0].outcome, 'consensus');
+  assert.equal(headlessShown.aggregations[0].outcome, 'consensus');
+});

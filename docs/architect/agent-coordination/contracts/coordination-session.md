@@ -26,8 +26,17 @@ and session resume through the same request door, with a foreign-writerId
 resume-hijack path closed). Full per-phase trace:
 `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md`.
 Dogfood handoff for MVP6+:
-`docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md`.)
-Last reviewed: 2026-09-03
+`docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md`.
+Phase 07 (Step 09 MVP7): the `aggregation-validated` event, its write door,
+its replay refusals, and `closeSessionByQuorum`'s refuse-only aggregation
+input accepted and implemented —
+`src/runner/coordination/{schema,store,replay,session-engine}.mjs` (P07.3),
+enforced at the request door and rendered by `show` in
+`src/verbs/coordination/{run,show}.mjs` (P07.4). Promoted with the named
+limitations in Evidence-Preserving Aggregation below, not without them. Full
+per-phase trace:
+`docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`.)
+Last reviewed: 2026-09-04
 Canonical for: CoordinationSession manifest/event schema, storage layout, session-to-Assignment membership, and recovery rules
 Related: [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md), [Assignment, Run, And RunResult Contract](assignment-run-runresult.md), [Runtime Model](../architecture/runtime-model.md), [Work Integration](../architecture/work-integration.md)
 
@@ -130,6 +139,7 @@ reference discipline as `assignmentRefs`. Minimum event kinds:
 | `session-cancelled` | Phase 06 R4: terminal `cancelled` transition. | `ts`, `reason`, `inFlightAssignmentIds?` |
 | `operation-authorized` | Phase 00 (Step 09) MVP2: a driver authorizes a declared `driver-authorized` optional operation binding for dispatch (see [Driver-Authorized Optional Operations And Recheck](#driver-authorized-optional-operations-and-recheck-mvp1mvp2-step-09) below). | `authorizationId`, `operationId`, `nodeId`, `targetActorId`, `invocationKey`, `authorizedBy`, `reason`, `grantedContextRefs`, `targetArtifactRef?`, `ts` |
 | `driver-disposition-recorded` | Phase 00 (Step 09) MVP2: a driver records disposition on a finding/artifact; never a worker-authored result. | `targetRef`, `disposition`, `rationale`, `evidenceRefs`, `authorizedBy`, `ts` |
+| `aggregation-validated` | Phase 07 (Step 09) MVP7: a driver-authored record of one evidence-preserving aggregation the engine validated over this session's own evidence (see [Evidence-Preserving Aggregation](#evidence-preserving-aggregation-mvp7-step-09) below). Never a transition of its own. | `aggregationId`, `method`, `outcome`, `sourceResultRefs`, `validatedBy`, `ts`; optional `assignmentId?`, `runId?`, `outputArtifactRef?`, `dissentRefs?`, `unresolvedContributionRefs?`, `missingActors?`, `failedActors?`, `unboundSourceOperationRefs?`, `artifactRevisionRefs?` |
 
 Additional event kinds may be added by a future phase without breaking this
 contract as long as they do not change the meaning of the kinds above.
@@ -248,6 +258,82 @@ derives its `taskKey` the same way as the original binding (e.g. by
 `nodeId`+`operationId`+`actorId` alone) would incorrectly resume the
 original Assignment instead of creating a new one — this clause exists
 precisely to forbid that.
+
+## Evidence-Preserving Aggregation (MVP7, Step 09)
+
+One cognitive aggregation over this session's own contributions, recorded as
+`aggregation-validated`. The whole point of the phase is that **cognitive
+aggregation and session completion are separate authorities**, so this event
+never transitions anything:
+
+- the Team Cognition evaluator decides the cognitive `outcome` from evidence
+  it is handed (`consensus | qualified | no-consensus`);
+- this session's engine decides what evidence is real, and owns every
+  terminal transition.
+
+**The verdict is derived, never asserted.** The engine's validation door takes
+no `outcome` parameter. The caller supplies identity (`aggregationId`,
+`validatedBy`) and the aggregate's own output refs; everything the verdict
+rests on is derived from the session: which operations are sources comes from
+the bound FlowDefinition (resolved from `definitionRef`, refused on version
+drift — never accepted as a caller argument), which Assignments answer them
+comes from the same reserved `protocol-operation:` stamp visibility windows
+use, and each source's artifact ref, revision pin, and disclosures are read
+off the linked RunResult on disk. Disclosures are engine-classified from the
+filesystem, never taken from a worker's own claim. No prose is parsed for
+meaning anywhere on this path, and there is no vote, rank tally, weighted
+score, or convergence step.
+
+**Terminal input is refuse-only.** `closeSessionByQuorum` accepts an optional
+`aggregationId`; inside its existing lock it reads that record from the
+replayed event log (never `ignoredAggregations`, never a caller-supplied
+verdict) and refuses the close when the outcome is not `consensus`. It never
+selects a status, never relaxes `partialPolicy`, and never closes a session
+quorum would have refused. An aggregation therefore **can only narrow**: it
+never upgrades a RunResult's own recorded status/confidence, and never
+upgrades a close.
+
+**When an aggregation is required.** A protocol that declares
+`completion.aggregation` (see [FlowDefinition Contract](flow-definition.md))
+may not close on quorum alone. The request door that drives a session
+(`src/verbs/coordination/run.mjs`, shared by `fgos coordination run` and the
+headless adapter) reads the bound definition, and when it declares an
+aggregation it resolves the session's most recently validated one and passes
+it to the close. With none validated, the close is refused and the session
+stays `active`; the remedy is to validate one and resume the session. A
+definition that declares no aggregation is unaffected — the gate is opt-in at
+the schema level, and no protocol shipped under `core/` declares one today.
+
+**What replay refuses.** A worker-typed validator, a `validatedBy.id` that is
+not this session's own driver identity, a source result with no accepted
+`result-linked` earlier in the same log, an aggregate naming its own output
+Assignment among its sources, a duplicate `aggregationId`, and a claimed
+`consensus` that simultaneously names a missing/failed actor, an unresolved
+contribution, or an unbound source operation. A post-terminal
+`aggregation-validated` event is neutralized rather than trusted — reported
+separately, exactly as a post-terminal authorization is.
+
+**Named limitations, not omitted.**
+
+1. **A careful forgery by the session's own driver identity is not detected.**
+   A driver writing `aggregation-validated` straight to the store with
+   `outcome: consensus` and genuinely linked source refs, with no evaluator
+   call behind it, produces an event replay accepts. This is structural:
+   replay is definition-blind by design, so it cannot re-derive the evidence
+   set or re-run the evaluator to compare verdicts. Same trust boundary as the
+   unmediated store-door residuals named for visibility windows. The
+   consistency check above catches only an *inconsistent* forgery.
+2. **The definition is pinned by `{id, version}`, never by content.** The
+   validation door resolves the definition from `manifest.definitionRef` and
+   refuses version drift, but nothing pins the loaded document's bytes — an
+   actor with `.fgos` write access could still swap in a same-`{id, version}`
+   document declaring a different cohort. Every sibling definition-consuming
+   door in the engine shares this exposure; it is a known boundary at parity
+   with them, not a regression, and it is not closed by MVP7.
+3. **`unresolvedContributionRefs` and hidden-dissent are wired but not driven
+   end to end.** Both are covered at the event-schema and evaluator-unit
+   layers; no session-level fixture produces the RunResult shapes that would
+   exercise them through real dispatch.
 
 ## Recovery Rule
 
