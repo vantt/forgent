@@ -1,5 +1,5 @@
 ---
-authoritative_for: catchup/approve structural deadlock when a root branch needs a real content-conflict manual merge, two irreconcilable .fgos precondition checks, merge=union fix later superseded by moving diagnostic logs to a gitignored bucket
+authoritative_for: catchup/approve structural deadlock when a root branch needs a real content-conflict manual merge, two irreconcilable .fgos precondition checks, merge=union fix later superseded by moving diagnostic logs to a gitignored bucket, tsk-1wk sharded-file follow-up
 ---
 
 # A real structural deadlock — two guards required two different `.fgos` values, satisfiable by no snapshot at all
@@ -56,8 +56,25 @@ its own top, naming both `tsk-2xg` and the later bucketing plan.
 
 ## Still valid and untouched
 
-`.fgos/events.jsonl`'s own original `merge=union` (`tsk-3wq`) and
-[Tầng A's sharded per-writer files](eventlog-tier-a-multifile-content-hash-redesign.md)
-(`.fgos/events/*.jsonl`, `tsk-1wk`) are unaffected by either this item or
-its later supersession — the event log itself stays git-tracked, unlike
-the diagnostic logs this item's own fix targeted.
+`.fgos/events.jsonl`'s own original `merge=union` (`tsk-3wq`) is
+unaffected by either this item or its later supersession — the event log
+itself stays git-tracked, unlike the diagnostic logs this item's own fix
+targeted.
+
+## A same-class gap in the new sharded layout — `tsk-1wk`
+
+When [Tầng A's own event-log sharding](eventlog-tier-a-multifile-content-hash-redesign.md)
+landed, `.gitattributes` covered the legacy `events.jsonl` (`tsk-3wq`) and
+this item's own three diagnostic logs (`tsk-2xg`) with `merge=union`, but
+not the new sharded per-writer `.fgos/events/*.jsonl` files Tầng A
+introduced. `tsk-1wk` closed that gap: reproduced live while approving
+[`tsk-3tp`](eventlog-sweep-checkpoint-redesign.md) — any session's own
+live shard hit the identical append-conflict problem this item and
+`tsk-3wq` had already solved for the old layout, causing `fgos catchup`
+to report real conflicts on paths like
+`.fgos/events/<writer-id>-<ts>.jsonl` during ordinary catchup/approve
+cycles. Fixed by adding `.fgos/events/*.jsonl merge=union` to
+`.gitattributes`, matching the existing precedent exactly — this rule
+remains live and unaffected by the diagnostic-logs bucketing above, since
+the sharded event-log files stay git-tracked (they are the event log
+itself, not a diagnostic side-channel).
