@@ -4,6 +4,10 @@ import {
   validateSourceCoverage,
   validateRequiredDisclosureCoverage,
   evaluateAggregationCoverage,
+  validateDisclosureValueShapes,
+  validateSourceRevisionCurrency,
+  validateDissentSurfacing,
+  classifyAggregationOutcome,
 } from '../../src/runner/team-cognition/aggregation-evaluator.mjs';
 import { AggregationError } from '../../src/runner/team-cognition/schema.mjs';
 
@@ -240,4 +244,211 @@ test('validateSourceCoverage and validateRequiredDisclosureCoverage never mutate
   assert.deepEqual(sourceOperationRefs, before.sourceOperationRefs);
   assert.deepEqual(sources, before.sources);
   assert.deepEqual(requiredDisclosures, before.requiredDisclosures);
+});
+
+// === P07.2: outcome classification + adversarial fixtures ================
+//
+// Shared fixture shape used by every test below: one declared source
+// operation ('op-research'), a matching source entry carrying
+// {confidence, dissent} disclosures, a `dissentRefs[]` list, and a
+// `currentRevisions` map keyed by artifactRef. Deterministic classification
+// rule under test (documented in aggregation-evaluator.mjs's own
+// `classifyAggregationOutcome` JSDoc): no-consensus on any coverage/
+// disclosure-shape/revision-currency/hidden-dissent failure; qualified when
+// everything else passes but a dissent ref is not yet resolved; consensus
+// only when everything passes and no unresolved dissent remains.
+
+const CURRENT_REVISIONS = { 'artifact://findings.md': 'rev_abc123' };
+
+function classifyInput(overrides = {}) {
+  return {
+    sourceOperationRefs: ['op-research'],
+    sources: [source()],
+    requiredDisclosures: ['confidence', 'dissent'],
+    dissentRefs: [],
+    currentRevisions: CURRENT_REVISIONS,
+    ...overrides,
+  };
+}
+
+// --- malformed disclosure value shape (schema.mjs unit) -------------------
+
+test('validateDisclosureValueShapes: accepts every disclosure value that is a non-empty string (positive)', () => {
+  const result = validateDisclosureValueShapes([source()]);
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.malformedDisclosuresBySource, {});
+});
+
+test('validateDisclosureValueShapes: rejects a non-string disclosure value (negative)', () => {
+  const result = validateDisclosureValueShapes([source({ disclosures: { confidence: 42, dissent: 'none' } })]);
+  assert.equal(result.ok, false);
+  assert.deepEqual(result.malformedDisclosuresBySource['op-research:asg_001:run_001'], ['confidence']);
+});
+
+test('validateDisclosureValueShapes: rejects an empty-string disclosure value (negative)', () => {
+  const result = validateDisclosureValueShapes([source({ disclosures: { confidence: '', dissent: 'none' } })]);
+  assert.equal(result.ok, false);
+});
+
+// --- stale artifact-revision-provenance (aggregation-evaluator.mjs unit) --
+
+test('validateSourceRevisionCurrency: accepts a source whose revision matches the current-revision map (positive)', () => {
+  const result = validateSourceRevisionCurrency([source()], CURRENT_REVISIONS);
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.staleSourceKeys, []);
+});
+
+test('validateSourceRevisionCurrency: rejects a source whose revision does not match the current-revision entry (negative)', () => {
+  const result = validateSourceRevisionCurrency([source()], { 'artifact://findings.md': 'rev_NEWER' });
+  assert.equal(result.ok, false);
+  assert.deepEqual(result.staleSourceKeys, ['op-research:asg_001:run_001']);
+});
+
+test('validateSourceRevisionCurrency: fails closed when the artifact has no entry in currentRevisions at all (negative)', () => {
+  const result = validateSourceRevisionCurrency([source()], {});
+  assert.equal(result.ok, false);
+  assert.deepEqual(result.staleSourceKeys, ['op-research:asg_001:run_001']);
+});
+
+// --- hidden-dissent surfacing (aggregation-evaluator.mjs unit) ------------
+
+test('validateDissentSurfacing: a disclosed objection with a matching dissentRefs entry is surfaced, not hidden (positive)', () => {
+  const result = validateDissentSurfacing(
+    [source({ disclosures: { confidence: 'high', dissent: 'objection-scope' } })],
+    [{ sourceOperationRef: 'op-research', resolved: false }],
+  );
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.hiddenDissentSourceRefs, []);
+  assert.deepEqual(result.unresolvedDissentRefs, ['op-research']);
+});
+
+test('validateDissentSurfacing: a disclosed objection with no matching dissentRefs entry is reported as hidden dissent (negative)', () => {
+  const result = validateDissentSurfacing(
+    [source({ disclosures: { confidence: 'high', dissent: 'objection-scope' } })],
+    [],
+  );
+  assert.equal(result.ok, false);
+  assert.deepEqual(result.hiddenDissentSourceRefs, ['op-research']);
+});
+
+test('validateDissentSurfacing: a disclosed "none" dissent value never counts as hidden, even with no dissentRefs', () => {
+  const result = validateDissentSurfacing([source()], []);
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.hiddenDissentSourceRefs, []);
+});
+
+// --- classifyAggregationOutcome: one test per outcome, deterministic rule -
+
+test('classifyAggregationOutcome: consensus when coverage/disclosures/revisions pass and no unresolved dissent remains', () => {
+  const result = classifyAggregationOutcome(classifyInput());
+  assert.equal(result.outcome, 'consensus');
+  assert.equal(result.coverage.ok, true);
+  assert.equal(result.disclosureShape.ok, true);
+  assert.equal(result.revisionCurrency.ok, true);
+  assert.equal(result.dissentSurfacing.ok, true);
+});
+
+test('classifyAggregationOutcome: qualified when dissent is honestly surfaced but not yet resolved', () => {
+  const result = classifyAggregationOutcome(
+    classifyInput({
+      sources: [source({ disclosures: { confidence: 'high', dissent: 'objection-scope' } })],
+      dissentRefs: [{ sourceOperationRef: 'op-research', resolved: false }],
+    }),
+  );
+  assert.equal(result.outcome, 'qualified');
+  assert.equal(result.dissentSurfacing.ok, true, 'dissent was surfaced, so this is not a hidden-dissent failure');
+  assert.deepEqual(result.dissentSurfacing.unresolvedDissentRefs, ['op-research']);
+});
+
+test('classifyAggregationOutcome: no-consensus when source coverage fails (a declared source has no supplied source)', () => {
+  const result = classifyAggregationOutcome(
+    classifyInput({ sourceOperationRefs: ['op-research', 'op-review'] }),
+  );
+  assert.equal(result.outcome, 'no-consensus');
+  assert.equal(result.coverage.ok, false);
+});
+
+// --- negative: hidden-dissent rejection ------------------------------------
+
+test('classifyAggregationOutcome: rejects a would-be-consensus outcome when a disclosed objection is not surfaced in dissentRefs (hidden dissent)', () => {
+  const result = classifyAggregationOutcome(
+    classifyInput({
+      sources: [source({ disclosures: { confidence: 'high', dissent: 'objection-scope' } })],
+      dissentRefs: [], // the objection exists in disclosures but is quietly omitted here
+    }),
+  );
+  assert.equal(result.outcome, 'no-consensus');
+  assert.equal(result.dissentSurfacing.ok, false);
+  assert.deepEqual(result.dissentSurfacing.hiddenDissentSourceRefs, ['op-research']);
+});
+
+// --- negative: stale artifact-revision-provenance rejection ---------------
+
+test('classifyAggregationOutcome: rejects a would-be-consensus outcome when a source revision does not match the current-revision map', () => {
+  const result = classifyAggregationOutcome(
+    classifyInput({ currentRevisions: { 'artifact://findings.md': 'rev_NEWER' } }),
+  );
+  assert.equal(result.outcome, 'no-consensus');
+  assert.equal(result.revisionCurrency.ok, false);
+  assert.deepEqual(result.revisionCurrency.staleSourceKeys, ['op-research:asg_001:run_001']);
+});
+
+// --- negative: malformed disclosure rejection ------------------------------
+
+test('classifyAggregationOutcome: rejects a would-be-consensus outcome when a disclosure value is malformed (not well-typed)', () => {
+  const result = classifyAggregationOutcome(
+    classifyInput({ sources: [source({ disclosures: { confidence: 42, dissent: 'none' } })] }),
+  );
+  assert.equal(result.outcome, 'no-consensus');
+  assert.equal(result.disclosureShape.ok, false);
+  assert.deepEqual(result.disclosureShape.malformedDisclosuresBySource['op-research:asg_001:run_001'], ['confidence']);
+});
+
+// --- negative: consensus never coexists with an unresolved dissent ref ----
+
+test('classifyAggregationOutcome: never classifies as consensus while any dissentRefs entry remains unresolved, even with everything else passing', () => {
+  const result = classifyAggregationOutcome(
+    classifyInput({
+      sources: [source({ disclosures: { confidence: 'high', dissent: 'objection-scope' } })],
+      dissentRefs: [{ sourceOperationRef: 'op-research', resolved: false }],
+    }),
+  );
+  assert.notEqual(result.outcome, 'consensus');
+  assert.equal(result.outcome, 'qualified');
+});
+
+test('classifyAggregationOutcome: resolving the dissent ref (and only that) flips the same scenario to consensus', () => {
+  const result = classifyAggregationOutcome(
+    classifyInput({
+      sources: [source({ disclosures: { confidence: 'high', dissent: 'objection-scope' } })],
+      dissentRefs: [{ sourceOperationRef: 'op-research', resolved: true }],
+    }),
+  );
+  assert.equal(result.outcome, 'consensus');
+});
+
+// --- result immutability + no input mutation (matches P07.1's own pattern) -
+
+test('classifyAggregationOutcome: result is frozen at every level', () => {
+  const result = classifyAggregationOutcome(classifyInput());
+  assert.ok(Object.isFrozen(result));
+  assert.ok(Object.isFrozen(result.disclosureShape));
+  assert.ok(Object.isFrozen(result.revisionCurrency));
+  assert.ok(Object.isFrozen(result.dissentSurfacing));
+});
+
+test('classifyAggregationOutcome: never mutates its sources/dissentRefs/currentRevisions inputs', () => {
+  const input = deepFreeze({
+    sourceOperationRefs: ['op-research'],
+    sources: [source({ disclosures: { confidence: 'high', dissent: 'objection-scope' } })],
+    requiredDisclosures: ['confidence', 'dissent'],
+    dissentRefs: [{ sourceOperationRef: 'op-research', resolved: false }],
+    currentRevisions: { 'artifact://findings.md': 'rev_abc123' },
+  });
+  const before = structuredClone(input);
+
+  const result = classifyAggregationOutcome(input);
+
+  assert.equal(result.outcome, 'qualified');
+  assert.deepEqual(input, before);
 });

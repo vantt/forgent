@@ -6,6 +6,9 @@ import {
   validateSourceOperationRefs,
   validateSources,
   validateRequiredDisclosures,
+  validateDissentRef,
+  validateDissentRefs,
+  validateCurrentRevisions,
 } from '../../src/runner/team-cognition/schema.mjs';
 
 function baseSource(overrides = {}) {
@@ -91,5 +94,60 @@ test('validateRequiredDisclosures rejects an empty array', () => {
   assert.throws(
     () => validateRequiredDisclosures([]),
     (err) => err instanceof AggregationError && /non-empty array/.test(err.message),
+  );
+});
+
+// --- dissentRefs (P07.2) --------------------------------------------------
+
+test('validateDissentRef accepts a well-formed entry', () => {
+  assert.doesNotThrow(() => validateDissentRef({ sourceOperationRef: 'op-research', resolved: false }, 0));
+});
+
+test('validateDissentRef rejects an unknown field (whitelist)', () => {
+  assert.throws(
+    () => validateDissentRef({ sourceOperationRef: 'op-research', resolved: false, weight: 1 }, 0),
+    (err) => err instanceof AggregationError && /unknown field "weight"/.test(err.message),
+  );
+});
+
+test('validateDissentRef rejects a non-boolean resolved field', () => {
+  assert.throws(
+    () => validateDissentRef({ sourceOperationRef: 'op-research', resolved: 'yes' }, 0),
+    (err) => err instanceof AggregationError && /resolved must be a boolean/.test(err.message),
+  );
+});
+
+test('validateDissentRefs accepts an empty array (no disclosed dissent)', () => {
+  assert.doesNotThrow(() => validateDissentRefs([]));
+});
+
+test('validateDissentRefs rejects a non-array', () => {
+  assert.throws(
+    () => validateDissentRefs({}),
+    (err) => err instanceof AggregationError && /dissentRefs must be an array/.test(err.message),
+  );
+});
+
+// --- currentRevisions (P07.2) --------------------------------------------
+
+test('validateCurrentRevisions accepts a well-formed map', () => {
+  assert.doesNotThrow(() => validateCurrentRevisions({ 'artifact://findings.md': 'rev_abc123' }));
+});
+
+test('validateCurrentRevisions accepts an empty map', () => {
+  assert.doesNotThrow(() => validateCurrentRevisions({}));
+});
+
+test('validateCurrentRevisions rejects a non-object', () => {
+  assert.throws(
+    () => validateCurrentRevisions(null),
+    (err) => err instanceof AggregationError && /currentRevisions must be a non-null object/.test(err.message),
+  );
+});
+
+test('validateCurrentRevisions rejects a non-string revision value', () => {
+  assert.throws(
+    () => validateCurrentRevisions({ 'artifact://findings.md': 123 }),
+    (err) => err instanceof AggregationError && /must be a non-empty string/.test(err.message),
   );
 });

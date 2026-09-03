@@ -117,3 +117,50 @@ export function validateRequiredDisclosures(requiredDisclosures) {
     fail('validation', 'requiredDisclosures must be a non-empty array of non-empty strings');
   }
 }
+
+// One caller-declared record (P07.2): a specific declared source operation
+// carries disclosed dissent, and whether that dissent has been resolved.
+// Candidate contract naming precedent (P00.2.md §3): `dissentRefs`/
+// `unresolvedContributionRefs` -- non-contract, but the name this module
+// follows for internal consistency.
+const DISSENT_REF_FIELDS = new Set(['sourceOperationRef', 'resolved']);
+
+/**
+ * Validate one `dissentRefs[]` entry's shape. Throws `AggregationError`
+ * ('validation') on the first violation. Does not cross-reference against
+ * `sources[]` -- that belongs to aggregation-evaluator.mjs, which has both
+ * lists on hand.
+ */
+export function validateDissentRef(entry, index) {
+  const label = `dissentRefs[${index}]`;
+  if (!isPlainObject(entry)) fail('validation', `${label} must be a non-null object`);
+  assertOnlyAcceptedFields(entry, DISSENT_REF_FIELDS, label);
+  if (!isNonEmptyString(entry.sourceOperationRef)) fail('validation', `${label}.sourceOperationRef must be a non-empty string`);
+  if (typeof entry.resolved !== 'boolean') fail('validation', `${label}.resolved must be a boolean`);
+}
+
+/**
+ * Validate the full `dissentRefs[]` array shape. May be empty -- an
+ * aggregation with no disclosed dissent supplies `[]`.
+ */
+export function validateDissentRefs(dissentRefs) {
+  if (!Array.isArray(dissentRefs)) fail('validation', 'dissentRefs must be an array');
+  dissentRefs.forEach(validateDissentRef);
+}
+
+/**
+ * Validate the `currentRevisions` map: a caller-supplied, pure-function
+ * lookup of each artifact's actual current revision, keyed by
+ * `artifactRef`. This module has no store access (P07.3 integration
+ * concern, per P07.1's own Gaps), so staleness can only be checked against
+ * whatever map the caller provides here -- validating its shape (rather
+ * than trusting it blindly) is what keeps a garbage/empty map from
+ * silently letting every source through as current.
+ */
+export function validateCurrentRevisions(currentRevisions) {
+  if (!isPlainObject(currentRevisions)) fail('validation', 'currentRevisions must be a non-null object');
+  for (const [artifactRef, revision] of Object.entries(currentRevisions)) {
+    if (!isNonEmptyString(artifactRef)) fail('validation', 'currentRevisions has an empty-string key');
+    if (!isNonEmptyString(revision)) fail('validation', `currentRevisions["${artifactRef}"] must be a non-empty string`);
+  }
+}
