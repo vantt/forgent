@@ -66,19 +66,15 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | Phase | MVP | Requirements | Status |
 |---|---|---|---|
 | 00 | Intake | R1-R4 (P00.1), file-ownership map (P00.2) | done |
-| 06 | MVP6 | P06.1 done; P06.2 (runtime/grant enforcement/replay), P06.3 (proof/promotion) open | in-progress |
-| 07 | MVP7 | P07.1 done (covers source-coverage/disclosure-presence slice of P07.2 only); outcome classification, hidden-dissent rejection, stale-revision rejection, consensus-with-unresolved-dissent still open (remaining P07.2 scope) + P07.3/P07.4 | in-progress |
+| 06 | MVP6 | P06.1 done; P06.2 done (4 fix rounds — see Wave 2 Status); P06.3 (proof/promotion) open | in-progress |
+| 07 | MVP7 | P07.1 + P07.2-remainder done (full P07.2 scope now closed: outcome classification, hidden-dissent/stale-revision/malformed-disclosure/unresolved-dissent rejection); P07.3/P07.4 open | in-progress |
 | 08 | MVP8 | see phase-08 file | missing |
 | 09 | MVP9 | see phase-09 file | missing |
 | 10 | External acceptance | see phase-10 file | missing |
 
 ## Active Cell
 
-Wave 2: P06.2 (visibility runtime/grant enforcement/replay) + P07.2-remainder
-(outcome classification/dissent/staleness), each dispatched into its OWN
-isolated worktree this time (`step-09-mvp6-to-mvp9-p06.2`,
-`step-09-mvp6-to-mvp9-p07.2`, both branched from `8d2fa7d8`). See
-`current-cell.md`.
+None. Wave 2 (P06.2 + P07.2-remainder) closed — see "Wave 2 Status" above.
 
 **Process deviation, recorded honestly:** both P06.1 and P07.1 were
 dispatched as concurrent source-writers into the SAME shared worktree
@@ -97,15 +93,11 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Prepare Wave 2: P06.2 (visibility runtime, grant enforcement, replay —
-`src/runner/coordination/*`, session-runtime lease) and the remaining P07.2
-scope (outcome classification/dissent/staleness — `src/runner/team-cognition/*`
-+ its tests only, per `P00.2.md`'s original Wave-1-scoped write-scope split;
-re-confirm P07.2's exact write scope stays disjoint from P06.2's before
-dispatch). Per plan.md's Parallel Execution Map, both are "Ready after
-P06.1 and P07.1 respectively" — both now satisfied. **Dispatch into
-SEPARATE isolated worktrees this time**, not a shared checkout, per the
-process-deviation note above.
+Re-confirm Wave 3 sequencing against plan.md's Parallel Execution Map
+(P07.3 + P08.1 look ready; P06.3 also unblocked by P06.2's exit but may
+belong in a later wave per the map's own ordering), then prepare and
+dispatch. Continue using isolated per-cell worktrees for any concurrent
+non-read-only leaf cells.
 
 ## Cell Log
 
@@ -113,8 +105,10 @@ process-deviation note above.
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
-| P06.1 | Phase 06 visibility definition schema/validation | done | (pending Wave 1 commit) |
-| P07.1 | Phase 07 Team Cognition evaluator skeleton (partial P07.2 slice) | done | (pending Wave 1 commit) |
+| P06.1 | Phase 06 visibility definition schema/validation | done | `8d2fa7d8` |
+| P07.1 | Phase 07 Team Cognition evaluator skeleton (partial P07.2 slice) | done | `8d2fa7d8` |
+| P06.2 | Phase 06 visibility runtime/grant enforcement/replay (4 fix rounds) | done | (pending Wave 2 commit) |
+| P07.2 | Phase 07 aggregation outcome classification (remaining scope) | done | (pending Wave 2 commit) |
 
 ## Phase 00 Status
 
@@ -199,3 +193,110 @@ the Phase/Requirement Matrix above.
 
 Next: Wave 2 — P06.2 (runtime/grant enforcement/replay) + remaining P07.2
 scope, in separate isolated worktrees.
+
+## Wave 2 Status (P06.2 + P07.2-remainder)
+
+**CLOSED.** Dispatched into properly isolated worktrees this time
+(`step-09-mvp6-to-mvp9-p06.2`, `step-09-mvp6-to-mvp9-p07.2`), integrated
+sequentially via `--no-ff` merge, combined diff reviewed.
+
+P07.2-remainder: clean on both independent first-pass rounds (Reviewer
+APPROVE, Red-Team APPROVE, 0 findings) — outcome classification
+(`consensus|qualified|no-consensus`), hidden-dissent rejection, stale-
+revision rejection, malformed-disclosure rejection, and
+consensus-with-unresolved-dissent rejection all genuinely rule-based, no
+hidden scoring/voting, fail-closed throughout.
+
+P06.2: the hardest cell this track has produced. Two independent
+first-pass rounds found 2 HIGH (fan-out partial-window-bypass;
+cross-operation actor reuse — same root cause, both with real precedent
+already committed in `independent-research-fan-out-fan-in.yaml`). **Took
+four fix rounds to close properly:**
+- Round 1: replaced actor-id-only Assignment matching with a 3-door
+  "operation-identity proof" scheme (driver provenance / taskKey namespace
+  / contract stamp). Closed the original two HIGH findings but rechecks
+  found the new proof doors were themselves caller-forgeable through the
+  same public `dispatchDeclaredOperation` API (new HIGH) plus a
+  prefix-match collision (new MEDIUM).
+- Round 2: reserved the contract-stamp channel so a caller can't forge it;
+  made engine evidence exclusive over taskKey. Closed the stamp forgery
+  and prefix collision, but rechecks found `dispatchPrimaryTask` — a
+  DIFFERENT mediated door sharing the same contract constructor — never
+  stamps, so the taskKey-fallback path was still reachable through it (new
+  HIGH, third instance of the same class via a third door).
+- Round 3: **structural fix**, not another door patch — removed the
+  taskKey-fallback and driver-provenance doors entirely. A window source
+  is now satisfied ONLY by the reserved engine stamp, written into a
+  parameter no caller-facing signature exposes; a door either stamps
+  (only `dispatchDeclaredOperation` does) or it structurally cannot
+  satisfy a window source, by construction, not by enumeration. Final
+  independent rechecks: Reviewer APPROVE (2 non-blocking LOWs), Red-Team
+  found the guard itself was TOCTOU-vulnerable (new HIGH) plus a silent
+  claim-squatting liveness gap the stamp-only inversion introduced (new
+  MEDIUM).
+- Round 4 (final, bounded): snapshotted the caller's `constraints`
+  container once so the guard and the persisted value are provably the
+  same data (closes the TOCTOU); made a resumed-but-unstamped claim fail
+  loudly instead of silently squatting, reusing the same stamp predicate
+  so it can't drift from what a window source accepts. Final rechecks:
+  both Reviewer and Red-Team **APPROVE**, nothing further found after a
+  deliberately hard adversarial final pass (7 additional novel probes,
+  zero breaks).
+
+Net effect: `resolveOperationOutcome`'s source resolution went from a
+naive actor-id scan to a single, structurally-sound invariant — "a source
+operation is satisfied only by an Assignment carrying this exact
+operation's reserved engine stamp" — that required a full redesign (not
+incremental patching) to actually hold under adversarial pressure. This is
+recorded in this much detail because it is the track's clearest example so
+far of why the parallel-round independent-recheck protocol exists: a
+single first-pass review/red-team round would have missed 3 of the 4
+eventual HIGH findings.
+
+Two accepted, documented (not fixed) gaps remain for P06.3 to decide before
+any contract promotion:
+- `permits.sourceOperationRefs[]`/`permits.delivery` are schema-validated
+  but not enforced as a per-ref delivery filter at runtime.
+- An operation bound at two DIFFERENT nodes to two DIFFERENT actors along
+  mutually-exclusive graph paths (not a real fan-out cohort) is
+  permanently unopenable under the all-of rule — a liveness bug (fails
+  closed), never a bypass; no committed protocol has this shape today.
+
+**Post-integration full-suite gate:** running the complete suite surfaced
+one genuine NEW failure unrelated to any reviewed finding —
+`test/architecture.test.mjs`'s manifest-completeness check, because the
+new `src/runner/team-cognition/{schema,aggregation-evaluator}.mjs` files
+had no `docs/architecture-manifest.json` row. Fixed directly (pure data
+registration, `schema.mjs` → `infra`, `aggregation-evaluator.mjs` →
+`use-case`, mirroring the equivalent `coordination/` pair) and verified:
+`test/architecture.test.mjs` 6/6 pass, including the layering-direction
+check (confirms the layer assignment is correct, not just silencing the
+completeness check). Full-suite background runs were killed twice by the
+environment after this fix (external resource limit, not a test failure —
+confirmed by the kill artifacts being generic "Promise resolution... event
+loop" noise, not assertion failures); the last COMPLETE full-suite run
+(before the manifest fix, from this same worktree, excluding the
+known-false-fail `coordination-static.test.mjs`) recorded **5293 tests,
+5284 pass, 2 fail, 7 skipped** — exactly the known baseline
+(`fgos-intake-4.test.mjs:318`) plus the now-fixed manifest gap. Since the
+manifest fix is a pure data addition with no code-path effect on any other
+test, and both directly-affected tests (`architecture.test.mjs`'s full
+6/6, and the full P06.2+P07.2 focused glob) are independently reconfirmed
+green post-fix, the full suite is treated as clean:  **effectively 5293
+tests, 5285 pass, 1 known-baseline fail, 7 skipped** — no new failure
+outstanding.
+
+Full P06.2+P07.2 focused glob, final: **269/269 pass** (was 256 pre-fix-
+rounds, +13 across all 4 fix rounds' regression tests). Broader
+`coordination-*.test.mjs` sweep (excluding the worktree-path false-fail):
+**336/336 pass**. `test/cli/coordination.test.mjs`: **32/32 pass**.
+
+**This closes Wave 2 (P06.2, P07.2-remainder).**
+
+Next: Wave 3 — P07.3 (FlowDefinition and session integration for
+aggregation) + P08.1 (contribution model/validator), per plan.md's
+Parallel Execution Map ("P06 exit and P07.1/P07.2" / P08.1 in
+Team-Cognition-only paths). P06.3 (visibility proof and promotion) is
+also now unblocked (P06.2 exit) but plan.md places it in a later wave
+alongside P08.2/P09.1 — Coordinator to re-confirm exact wave sequencing
+against the Parallel Execution Map before dispatch.

@@ -130,11 +130,57 @@ function assertKnownReadOnlyRole(role, label) {
 // no way to actually take effect. Every pre-existing caller omits this
 // parameter, so `contract.policy` stays absent and behavior is
 // byte-identical to before this parameter existed.
-function buildReadOnlyContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs, minTier }) {
+// A RESERVED constraint namespace, writable by this module alone. The
+// `protocol-operation:` stamp is the durable, on-disk record of WHICH
+// declared operation an Assignment was materialized for, and
+// `assignmentServesOperation` (below) trusts it as engine-derived proof --
+// so it must never be something a caller can put there. Every mediated
+// contract door in this file goes through `buildReadOnlyContract`, which is
+// therefore the ONE place that both refuses a caller-supplied entry in this
+// namespace and appends the engine's own. (An Assignment built outside this
+// module -- the raw `createSessionAssignment` store door -- is unmediated by
+// design and carries no such guarantee; see this cell's trace.)
+const PROTOCOL_OPERATION_STAMP_PREFIX = 'protocol-operation:';
+
+function protocolOperationStamp(definition, operationId) {
+  return `${PROTOCOL_OPERATION_STAMP_PREFIX}${definition.metadata.id}@${definition.metadata.version}#${operationId}`;
+}
+
+function assertNoReservedOperationStamp(constraints) {
+  // Non-arrays pass through untouched so the contract validator downstream
+  // still raises its own typed error for them, exactly as it did before this
+  // guard existed.
+  if (!Array.isArray(constraints)) return;
+  for (const constraint of constraints) {
+    if (typeof constraint === 'string' && constraint.startsWith(PROTOCOL_OPERATION_STAMP_PREFIX)) {
+      throw new CoordinationError(
+        'validation',
+        `buildReadOnlyContract: constraint "${constraint}" uses the reserved "${PROTOCOL_OPERATION_STAMP_PREFIX}" namespace -- that stamp is engine-derived operation provenance and may not be supplied by a caller`,
+      );
+    }
+  }
+}
+
+// `constraints` is materialized ONCE below, and that same snapshot is both
+// guarded and persisted. Reading the caller's own container twice -- once to
+// check it, again to store it -- would make the guard time-of-check/
+// time-of-use: an array with an accessor property, an Array subclass with a
+// lying `Symbol.iterator`, or a Proxy can answer the check with a benign value
+// and the store with the reserved stamp. Snapshotting collapses both reads
+// into one, so what was guarded is provably what is persisted, whatever the
+// container does on a second read. A non-array is passed through untouched
+// (never spread, which would raise an untyped TypeError) so the contract
+// validator downstream still rejects it with its own typed error -- and
+// rejects it BEFORE persistence, which is what keeps a non-string forgery off
+// disk.
+function buildReadOnlyContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs, minTier, protocolOperationRef }) {
+  const declared = Array.isArray(constraints) ? [...constraints] : constraints;
+  assertNoReservedOperationStamp(declared);
+  const stamped = protocolOperationRef !== undefined && Array.isArray(declared) ? [...declared, protocolOperationRef] : declared;
   return {
     objective,
     contextRefs,
-    constraints,
+    constraints: stamped,
     expectedOutputs,
     mutation: 'read-only',
     evidence: { required: evidenceRequired },
@@ -1027,53 +1073,189 @@ function buildActorReplacementMap(events) {
 }
 
 /**
- * The outcome of ONE `opensAfter.operationRefs[]` entry: resolve the
- * operation's graph-bound actor (`resolveDeclaredOperationActor`, the SAME
- * resolver `authorizeDeclaredOperation`/`dispatchDeclaredOperation` use for
- * the operation actually being authorized/dispatched), follow any accepted
+ * EVERY distinct actor the graph binds `operationId` to, in graph order.
+ *
+ * One operation template is routinely bound to several actors (an
+ * independent fan-out cohort sharing one template -- this repo's own
+ * `independent-research-fan-out-fan-in.yaml` binds `independent-research` to
+ * both `researcher-a` and `researcher-b` at one node), so resolving only the
+ * FIRST binding would let one cohort member's result answer for the whole
+ * cohort. Each candidate is re-resolved through
+ * `resolveDeclaredOperationActor` with its own `targetActorId` so every
+ * binding gets the identical declared/role/actor validation the single-
+ * binding resolver applies -- never a second, looser copy of those rules.
+ *
+ * With no actor-bound match at all (undeclared operation, unwired from the
+ * graph, or every binding role-only), the single-binding resolver is called
+ * for its own named `CoordinationError`. Note the deliberate narrowing: an
+ * operation with a MIX of role-only and actor-bound bindings now resolves
+ * through its actor-bound ones instead of raising the single-binding
+ * resolver's role-only error, which fired whenever the FIRST graph match
+ * happened to be the role-only one. Role-only bindings are a Cohort Planner
+ * concern out of this cell's scope; they contribute no branch either way,
+ * and positive operation proof is still required for every branch that does.
+ */
+function declaredOperationBindingActors(definition, operationId) {
+  const actorIds = [];
+  for (const node of definition.spec.graph.nodes) {
+    for (const ref of node.operations) {
+      if (ref.ref === operationId && ref.actor && !actorIds.includes(ref.actor)) actorIds.push(ref.actor);
+    }
+  }
+  if (actorIds.length === 0) return [resolveDeclaredOperationActor(definition, operationId).actorId];
+  return actorIds.map((actorId) => resolveDeclaredOperationActor(definition, operationId, actorId).actorId);
+}
+
+/**
+ * Does this Assignment carry the reserved engine stamp for EXACTLY this
+ * declared operation? That is the whole question, and the ONLY channel that
+ * can answer it.
+ *
+ * `opensAfter.operationRefs[]` names a `spec.operations[]` template -- a
+ * DECLARED operation -- and `dispatchDeclaredOperation` is the only door in
+ * this codebase that materializes one. It stamps unconditionally, before any
+ * caller input is consulted, so requiring the stamp costs a legitimate source
+ * nothing. Everything else -- an ad-hoc primary task, a consult proposal, a
+ * disposition, an Assignment that merely happens to share a claim key or an
+ * actor -- is not a declared operation completing, and must never be read as
+ * one.
+ *
+ * The three earlier, weaker predicates were each removed for the same reason:
+ * they answered "which operation" from a channel some OTHER door could also
+ * write.
+ * - Actor identity alone: one actor is routinely bound to several different
+ *   operations, and an `actor-replaced` replacement can complete work that has
+ *   nothing to do with the obligation it inherited.
+ * - The claiming taskKey's `declared:<operationId>` namespace: `taskKey` is a
+ *   documented public parameter on more than one mediated door, so consulting
+ *   it let ANY door that did not stamp -- `dispatchPrimaryTask` above, reached
+ *   through its own exported signature and through the CLI request file --
+ *   assert an operation identity it never performed.
+ * - `assignment-created.payload.operationId`: engine-derived, but only ever
+ *   written by `dispatchDeclaredOperation`'s own driver-authorized branch
+ *   (`authorizationProvenance`, the single producer in this file), which
+ *   stamps the very same Assignment. It could therefore never satisfy a source
+ *   the stamp did not already satisfy -- redundant on every mediated path, and
+ *   a second forgeable surface on the unmediated one.
+ *
+ * What makes the stamp different in kind, rather than merely a fourth door:
+ * `PROTOCOL_OPERATION_STAMP_PREFIX` is a RESERVED namespace,
+ * `buildReadOnlyContract` refuses any caller-supplied entry in it, and
+ * `dispatchDeclaredOperation` is the sole caller that passes
+ * `protocolOperationRef`. So "which door remembered to stamp" stops being a
+ * question a future door can get wrong: a door that does not stamp produces
+ * Assignments that satisfy NO window source, which is the safe answer by
+ * construction rather than by enumeration.
+ */
+function assignmentServesOperation(definition, operationId, { assignmentId, fgosDir }) {
+  const assignmentPath = path.join(fgosDir, 'assignments', assignmentId, 'assignment.json');
+  if (!fs.existsSync(assignmentPath)) return false;
+  let assignment;
+  try {
+    assignment = JSON.parse(fs.readFileSync(assignmentPath, 'utf8'));
+  } catch (err) {
+    throw new CoordinationError('corrupt-log', `assignment.json at ${assignmentPath} is not valid JSON: ${err.message}`);
+  }
+  const constraints = assignment?.provenance?.inline?.contract?.constraints;
+  // Exact equality, never a prefix/substring test: a leading space or a
+  // different casing dodges the writer's guard and fails this comparison too.
+  // A NON-STRING forgery (a boxed `String`, a `toJSON` object) is a different
+  // story and this reader is NOT what stops it -- such a value would
+  // JSON-round-trip into a plain string and match here. It never reaches disk
+  // because `validateExecutionContract`'s `isStringArray`
+  // (`../dispatch/execution-contract.mjs`) runs inside `buildAssignment`
+  // BEFORE persistence and rejects a `constraints` array that is not all
+  // primitive strings. That ordering is the load-bearing part: this reader
+  // alone would accept a boxed-String forgery.
+  return Array.isArray(constraints) && constraints.includes(protocolOperationStamp(definition, operationId));
+}
+
+/**
+ * Classify ONE already-operation-verified Assignment exactly the way
+ * `classifySessionQuorum`/`synthesizeResearchFanIn` already classify a
+ * settled Assignment -- the SAME failed/late vocabulary, never a second one.
+ */
+function classifyOperationAssignment(events, fgosDir, effectiveActorId, assignmentId) {
+  const linkedEvent = lastEventFor(events, 'result-linked', assignmentId);
+  if (!linkedEvent) return { satisfied: false, reason: 'late', actorId: effectiveActorId, assignmentId };
+  const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, linkedEvent.payload.runId);
+  if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') {
+    return { satisfied: false, reason: 'failed', actorId: effectiveActorId, assignmentId, runId: runResult.runId };
+  }
+  return { satisfied: true, reason: null, actorId: effectiveActorId, assignmentId, runId: runResult.runId };
+}
+
+/**
+ * The outcome of ONE graph binding of a source operation: follow any accepted
  * `actor-replaced` lineage to the CURRENT effective actor (so "the
  * replacement's own result-linked counts toward the window; the original
  * failed/missing attempt's event stays in the log, untouched" holds without
- * rewriting or re-deriving anything from the original attempt), then
- * classify exactly the way `classifySessionQuorum`/`synthesizeResearchFanIn`
- * already classify a settled Assignment -- the SAME failed/late vocabulary,
- * never a second one:
- * - no `assignment-created` for the effective actor -> `'missing'`.
+ * rewriting or re-deriving anything from the original attempt), then classify
+ * the Assignments that actor was given FOR THIS OPERATION
+ * (`assignmentServesOperation` -- the lineage transfers the obligation, never
+ * a licence for any work at all to answer it):
+ * - no operation-verified `assignment-created` for the effective actor ->
+ *   `'missing'`.
  * - created but no `result-linked` yet -> `'late'`.
  * - linked but `runResult.status === 'failed'` or `confidence` in
  *   `{failed, no-evidence}` -> `'failed'`.
  * - otherwise -> satisfied.
  *
- * Deliberately resolves the FIRST graph binding for `operationId` (no
- * `targetActorId` disambiguation) -- a source operation wired to more than
- * one actor (independent fan-out) is not disambiguated by this cell; see
- * this cell's own trace file Gaps section.
+ * With several attempts toward the same binding (a re-attempt after a failed
+ * one), a satisfied attempt settles the binding and the unsatisfied
+ * attempts' events stay on the log untouched; with none satisfied, the LAST
+ * attempt in event order is the reported outcome.
  */
-function resolveOperationOutcome(definition, operationId, { events, fgosDir, replacedBy }) {
-  const { actorId } = resolveDeclaredOperationActor(definition, operationId);
-  let effectiveActorId = actorId;
+function resolveBindingOutcome(definition, operationId, boundActorId, { events, fgosDir, replacedBy }) {
+  let effectiveActorId = boundActorId;
   const seen = new Set();
   while (replacedBy.has(effectiveActorId) && !seen.has(effectiveActorId)) {
     seen.add(effectiveActorId);
     effectiveActorId = replacedBy.get(effectiveActorId);
   }
 
-  const createdEvent = events.find((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveActorId);
-  if (!createdEvent) {
-    return { operationRef: operationId, satisfied: false, reason: 'missing', actorId: effectiveActorId, assignmentId: null };
-  }
-  const assignmentId = createdEvent.payload.assignmentId;
+  const assignmentIds = events
+    .filter(
+      (event) =>
+        event.type === 'assignment-created' &&
+        event.payload.actorId === effectiveActorId &&
+        assignmentServesOperation(definition, operationId, { assignmentId: event.payload.assignmentId, fgosDir }),
+    )
+    .map((event) => event.payload.assignmentId);
 
-  const linkedEvent = lastEventFor(events, 'result-linked', assignmentId);
-  if (!linkedEvent) {
-    return { operationRef: operationId, satisfied: false, reason: 'late', actorId: effectiveActorId, assignmentId };
+  if (assignmentIds.length === 0) {
+    return { boundActorId, satisfied: false, reason: 'missing', actorId: effectiveActorId, assignmentId: null };
   }
+  let lastOutcome;
+  for (const assignmentId of assignmentIds) {
+    lastOutcome = classifyOperationAssignment(events, fgosDir, effectiveActorId, assignmentId);
+    if (lastOutcome.satisfied) return { boundActorId, ...lastOutcome };
+  }
+  return { boundActorId, ...lastOutcome };
+}
 
-  const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, linkedEvent.payload.runId);
-  if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') {
-    return { operationRef: operationId, satisfied: false, reason: 'failed', actorId: effectiveActorId, assignmentId, runId: runResult.runId };
-  }
-  return { operationRef: operationId, satisfied: true, reason: null, actorId: effectiveActorId, assignmentId, runId: runResult.runId };
+/**
+ * The outcome of ONE `opensAfter.operationRefs[]` entry: satisfied only when
+ * EVERY graph binding of that operation is satisfied. A source operation
+ * wired to a fan-out cohort is the whole cohort's obligation, not the first
+ * contributor's -- opening on one branch would be exactly the partial-window
+ * bypass the all-of rule across `operationRefs[]` itself already refuses, one
+ * level deeper.
+ */
+function resolveOperationOutcome(definition, operationId, ctx) {
+  const branches = declaredOperationBindingActors(definition, operationId).map((boundActorId) =>
+    resolveBindingOutcome(definition, operationId, boundActorId, ctx),
+  );
+  const reported = branches.find((branch) => !branch.satisfied) ?? branches[0];
+  return {
+    operationRef: operationId,
+    satisfied: branches.every((branch) => branch.satisfied),
+    reason: reported.reason,
+    actorId: reported.actorId,
+    assignmentId: reported.assignmentId,
+    ...(reported.runId !== undefined ? { runId: reported.runId } : {}),
+    branches: Object.freeze(branches.map((branch) => Object.freeze(branch))),
+  };
 }
 
 /**
@@ -1812,6 +1994,31 @@ export async function dispatchDeclaredOperation(
     };
   }
 
+  // Claim-key squatting. `createSessionAssignment` resolves an ALREADY-CLAIMED
+  // taskKey to its existing Assignment and hands it back as a success. When
+  // that Assignment was materialized by a door that does not stamp -- an
+  // ad-hoc `dispatchPrimaryTask` under a `declared:<operationId>` key, say --
+  // this dispatch would "resume" work carrying no proof of THIS operation and
+  // report success, while every visibility window gated on the operation
+  // stayed shut forever with nothing anywhere naming the cause. Refusing
+  // invents no new claim-key behavior (that stays Phase 03's); it just stops
+  // the shape from looking like success, the same posture as the
+  // driver-authorized collision guard above. `manifest.assignmentRefs` is the
+  // load-bearing guard, exactly as it is there: a crash-recovery self-heal
+  // target's claim is not yet registered, so a genuine resume of an
+  // interrupted write still passes through untouched.
+  const squattedAssignmentId = peekClaimedAssignmentId(resolveSessionPaths(coordinationId, opts).sessionDir, taskKey);
+  if (
+    squattedAssignmentId &&
+    manifest.assignmentRefs.includes(squattedAssignmentId) &&
+    !assignmentServesOperation(definition, operationId, { assignmentId: squattedAssignmentId, fgosDir })
+  ) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: taskKey "${taskKey}" already resolves to Assignment "${squattedAssignmentId}", which carries no "${protocolOperationStamp(definition, operationId)}" provenance -- it was not materialized for operation "${operationId}" by this declared-dispatch door, so resuming it would report success while leaving the operation permanently unperformed; pass an explicit, distinct taskKey to dispatch this operation`,
+    );
+  }
+
   // R5: task-depth bound, checked against the REAL parent chain (never a
   // caller-asserted number) -- authoritative pre-lock, see the module-level
   // comment above this function for why this one needs no lock.
@@ -1840,10 +2047,12 @@ export async function dispatchDeclaredOperation(
   const contract = buildReadOnlyContract({
     objective,
     contextRefs: resolvedContextRefs,
-    constraints: [
-      ...constraints,
-      `protocol-operation:${definition.metadata.id}@${definition.metadata.version}#${operationId}`,
-    ],
+    constraints,
+    // Appended by `buildReadOnlyContract` itself, never spliced into the
+    // caller-shared `constraints` array here -- that array is exactly what a
+    // caller populates, so an engine stamp mixed into it would be
+    // indistinguishable from a forged one to the reader below.
+    protocolOperationRef: protocolOperationStamp(definition, operationId),
     expectedOutputs,
     evidenceRequired: operation.result?.evidenceRequired ?? 'reported',
     role: operation.role,

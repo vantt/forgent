@@ -37,6 +37,8 @@
     "src/runner/coordination/replay.mjs": "use-case",
     "src/runner/coordination/session-engine.mjs": "use-case",
     "src/runner/coordination/cohort-planner.mjs": "use-case",
+    "src/runner/team-cognition/schema.mjs": "infra",
+    "src/runner/team-cognition/aggregation-evaluator.mjs": "use-case",
     "src/runner/definitions/schema.mjs": "infra",
     "src/runner/definitions/workflow-adapter.mjs": "infra",
     "src/runner/definitions/protocol-loader.mjs": "infra",
