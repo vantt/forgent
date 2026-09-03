@@ -1,5 +1,5 @@
 ---
-authoritative_for: catchup/approve structural deadlock when a root branch needs a real content-conflict manual merge, two irreconcilable .fgos precondition checks, merge=union fix later superseded by moving diagnostic logs to a gitignored bucket, tsk-1wk sharded-file follow-up, tsk-4gi implements the deferred option-b restore-before-reject
+authoritative_for: catchup/approve structural deadlock when a root branch needs a real content-conflict manual merge, two irreconcilable .fgos precondition checks, merge=union fix later superseded by moving diagnostic logs to a gitignored bucket, tsk-1wk sharded-file follow-up, tsk-4gi implements the deferred option-b restore-before-reject, tsk-2ep resolves a genuine .fgos-only modify/delete git conflict (extends tsk-4gi to the throw path, not just the clean-stage path)
 ---
 
 # A real structural deadlock — two guards required two different `.fgos` values, satisfiable by no snapshot at all
@@ -119,3 +119,49 @@ nothing at all rather than just skipping that one path.
 Further follow-up items building on this same restore mechanism
 (`tsk-4s6` and others) exist in later git history but are outside this
 item's own scope — not detailed here.
+
+## The remaining gap `tsk-4gi` couldn't reach — a genuine git *conflict*, not a clean auto-stage
+
+`tsk-4gi`'s own restore-then-recheck only fires once `git merge` has
+already **succeeded** and cleanly staged a `merge=union` path (no
+exception thrown). `tsk-2ep` closed the other half: a real git *conflict*
+on a `merge=union` path. A worker branch that at some point recorded a
+deletion of a `.fgos/` shard (e.g. an earlier manual `git rm --cached`
+recovery from an unrelated conflict) raises a genuine **modify/delete**
+conflict the moment the same session's own subsequent event-append grows
+that shard on the other side — `merge=union` never resolves a
+modify/delete; deletion is never handled by a content-merge driver,
+union or otherwise, regardless of attribute. Both `performCatchUp`
+(target→branch) and `mergeRunnerItemLocked` (branch→main) reported this
+as a genuine conflict — a false one, entirely self-inflicted by the
+calling session's own writes, since neither side has any legitimate
+claim over the other's `.fgos` state (ADR0020).
+
+A new `resolveFgosOnlyConflict(repoRoot, keepRef)` resolves every
+conflicted path when — and only when — **every** conflicted path in the
+merge is under `.fgos/` and genuinely declared `merge=union` (reusing
+`isMergeUnionPath`, same restriction and same reasoning as `tsk-4gi`'s
+own gate: never silently discard a real, non-append-only `.fgos/`
+write). Each conflicted path is restored to the trusted side's own
+committed version (`checkout <keepRef> -- <path>`); if that side never
+had the path at all, it's removed instead (`git rm -f`) rather than left
+half-resolved. A single non-`.fgos/` conflicted path, or a `.fgos/` path
+without the attribute, leaves the conflict completely untouched — the
+caller still treats it as genuine. Wired into both merge directions'
+conflict-catch blocks.
+
+**A naming oddity worth recording plainly**: the shipped code's own
+comment tags this fix `tsk-tr9`, not `tsk-2ep` — but `tsk-2ep` is the
+item whose own merge (`93960ec8`, 2026-08-24) actually carries the
+`resolveFgosOnlyConflict` source change. `tsk-tr9` is a separate item,
+submitted with the *identical* title and description as `tsk-2ep`,
+delivered three days later (2026-08-27) with its own distinct merge
+commit — but that later merge added no source code at all, only
+`RESEARCH.md`/`plan.md`. The coherent read: `tsk-tr9` was a duplicate
+report of the same bug, investigated after `tsk-2ep`'s fix had already
+landed, and closed as already-fixed — the same "verified duplicate, no
+code needed" shape as [`tsk-1t2`](general-verb-events-baseline-write-verified-fixed.md)
+elsewhere in this history. The code comment's own `tsk-tr9` reference is
+most likely a naming slip during implementation (citing the sibling
+duplicate id instead of the item actually being worked), not evidence of
+a separate, unrecorded fix.
