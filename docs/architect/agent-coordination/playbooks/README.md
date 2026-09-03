@@ -17,6 +17,11 @@ Canonical for: engineering bootstrap and manual fallback procedures only
 - [Step 07 Design Discussion Handoff](prompts/step-07-design-discussion-handoff.md)
   restores the unresolved Step 07 architecture context in a fresh chat without
   treating proposals as accepted or starting implementation.
+- [MVP6+ Dogfood Handoff](mvp6-dogfood-handoff.md) is the concrete, cited
+  starting point for using the real `fgos coordination` runtime/surface path
+  (not the manual Master Prompt) to coordinate MVP6+ plan/artifact review
+  work: input shape, command/surface, roles, artifacts, resume, and what
+  stays outside coordination authority.
 
 Playbooks explain how people and agents work. They do not define runtime
 entities, lifecycle authority, or machine contracts.

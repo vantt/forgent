@@ -49,16 +49,17 @@ own work.
 | 01 | MVP3 | R1-R8 (see phase file) | done |
 | 02 | MVP4 | R1-R6 (see phase file; split P02.1 R1-R4 / P02.2 R5-R6) | done |
 | 03 | Config | R1-R8 (see phase file) | done |
-| 04 | MVP5 | R1-R8 (see phase file; split P04.1 R1-R7 / P04.2 R8) | in-progress |
+| 04 | MVP5 | R1-R8 (see phase file; split P04.1 R1-R7 / P04.2 R8) | done |
 
 ## Active Cell
 
-None.
+None. **All cells closed — this plan's entire MVP3-MVP5 scope is done.**
 
 ## Next Action
 
-Prepare P04.2 (Phase 04 — MVP5 R8: dogfood handoff docs; closes Phase 04
-and the whole plan).
+None. Track complete. Any further work (the still-open limitations named
+in `mvp6-dogfood-handoff.md`'s own "Still-open limitations" section, or
+MVP6-9 future expansion) is a NEW track, not a continuation of this one.
 
 ## Cell Log
 
@@ -70,6 +71,45 @@ and the whole plan).
 | P02.2 | Phase 02 R5-R6 (closes Phase 02) | done | `c963f2a7` |
 | P03.1 | Phase 03 R1-R8 (closes Phase 03) | done | `53a88522` |
 | P04.1 | Phase 04 R1-R7 | done | `9435663a` |
+| P04.2 | Phase 04 R8 (closes Phase 04 and this plan) | done | pending |
+
+## Phase 04 Status
+
+**CLOSED.** R1-R8 via P04.1 (R1-R7) + P04.2 (R8). P04.2 wrote
+`docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md` —
+the concrete, fully-cited MVP6+ dogfood handoff: input shape, command/
+surface (`launch-master-loop` to start, `run --file` for authorize/
+revise/recheck/disposition follow-up rounds against the same
+coordinationId), expected roles/artifacts, the real resume mechanism plus
+its hard writerId-identity constraint, what stays outside coordination
+authority (explicit, citing the plan's own Non-Negotiable Boundaries), and
+MVP6-9 named as future expansion, not hidden prerequisites. Also produced
+a whole-plan Plan-Level Acceptance check (all 10 bullets, each cited to
+the closed cell satisfying it) confirming nothing slipped through now
+that every phase is done.
+
+Reviewer round (APPROVE WITH CONCERNS, 1 MEDIUM — a miscount in the
+trace's own summary sentence) ran in parallel with Red-Team round
+(APPROVE WITH CONCERNS, 1 HIGH + 1 MEDIUM — the handoff's own
+"Still-open limitations" section omitted the crash-bricked-coordinationId
+window, directly relevant since the handoff recommends a fixed
+coordinationId for resume; plus a false "zero diff to store.mjs in P01.1"
+citation). Single Fixer pass, docs-only: added the missing limitation
+bullet citing P00.1's Gap #15, corrected the store.mjs citation to P01.1's
+real `assertDispositionRefOwnedBySession` change, fixed the bullet-count
+miscount. Reviewer-recheck and Red-Team-recheck both ran in parallel
+against the fix — both APPROVE, all findings CONFIRMED-RESOLVED, no new
+issue found on a fresh end-to-end read of the whole handoff document.
+
+No `src/`/`core/`/`test/` file touched anywhere in this phase's second
+cell — docs-only throughout.
+
+Full suite (final, whole-plan close): 5197 tests, 5190 pass, 1 fail —
+exactly the track's recorded baseline (`test/cli/fgos-intake-4.test.mjs:318`);
+no new failure across the entire plan's history.
+
+**This closes Phase 04 (MVP5) and the entire step-09-mvp3-to-mvp5 plan's
+scope.**
 
 ## Phase 04 Status (in progress)
 

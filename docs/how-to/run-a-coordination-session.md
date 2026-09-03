@@ -10,10 +10,18 @@ framework).
 
 ## `fgos coordination run --file <request>`
 
-Reads a JSON request file, opens a session, dispatches every declared step
-synchronously (in V1, one CLI call runs the whole session to completion or
-to its best-effort terminal state), attempts to close the session, and
-prints an `fgos.v1` envelope reporting what happened.
+Reads a JSON request file, dispatches every declared step synchronously (in
+V1, one CLI call runs the whole session to completion or to its best-effort
+terminal state), attempts to close the session, and prints an `fgos.v1`
+envelope reporting what happened.
+
+If `coordinationId` is omitted, a new session is opened. If it names an
+EXISTING, still-`active` session, the call resumes that session instead of
+refusing — the follow-up request's `writerId` must equal the original
+session's own driver identity exactly, or the call is refused before any
+step dispatches. A request naming a `coordinationId` that does not exist yet
+always opens fresh. See "launch-master-loop", below, for the shape of a
+follow-up (resume) request.
 
 ```sh
 fgos coordination run --file docs/how-to/coordination-examples/agent-led-request.json
