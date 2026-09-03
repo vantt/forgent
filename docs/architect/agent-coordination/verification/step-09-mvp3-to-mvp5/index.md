@@ -69,7 +69,7 @@ and the whole plan).
 | P02.1 | Phase 02 R1-R4 | done | `fb18c372` |
 | P02.2 | Phase 02 R5-R6 (closes Phase 02) | done | `c963f2a7` |
 | P03.1 | Phase 03 R1-R8 (closes Phase 03) | done | `53a88522` |
-| P04.1 | Phase 04 R1-R7 | done | pending |
+| P04.1 | Phase 04 R1-R7 | done | `9435663a` |
 
 ## Phase 04 Status (in progress)
 
