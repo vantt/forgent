@@ -329,6 +329,36 @@ const EVENT_SPECS = {
   // event log itself (`run-retried`/`actor-replaced`), these are just a
   // durable, at-a-glance final-state snapshot on the terminal event.
   'session-partial': { required: ['missingActors'], accepted: ['missingActors', 'failedActors', 'lateActors', 'replacedActors', 'dissentingActors'] },
+  // Phase 07 (Step 09 MVP7): a cognitive aggregation was VALIDATED against
+  // this session's own evidence. Deliberately NOT a terminal event and not a
+  // status: it is terminal INPUT. `session-engine.mjs` keeps sole terminal-
+  // transition authority; a validated aggregation can only ever REFUSE a
+  // close, never cause one (`closeSessionByQuorum`'s optional `aggregationId`).
+  //
+  // `validatedBy` carries the SAME `{type: "driver", id}` shape
+  // `operation-authorized`/`driver-disposition-recorded` use, pinned by
+  // store.mjs's shared `assertDriverIdentity` to the session's own
+  // `provenanceRoot.writerId`. That is what makes a validated aggregate
+  // driver-authored ledger state rather than something a worker's own
+  // RunResult could assert about itself.
+  'aggregation-validated': {
+    required: ['aggregationId', 'method', 'outcome', 'sourceResultRefs', 'validatedBy'],
+    accepted: [
+      'aggregationId',
+      'method',
+      'outcome',
+      'sourceResultRefs',
+      'validatedBy',
+      'assignmentId',
+      'runId',
+      'outputArtifactRef',
+      'dissentRefs',
+      'unresolvedContributionRefs',
+      'missingActors',
+      'failedActors',
+      'artifactRevisionRefs',
+    ],
+  },
   'session-failed': { required: ['reason'], accepted: ['reason'] },
   // R4: cancellation "records in-flight outcomes" -- `inFlightAssignmentIds`
   // is a snapshot (assignment-created with no result-linked yet) taken at
@@ -353,6 +383,22 @@ const OPTIONAL_STRING_FIELDS = new Set(['actorId', 'operationId', 'nodeId', 'aut
 // `authorizationId` itself -- none of them is meaningful, or checkable, on an
 // Assignment that names no authorization (see validateEventPayload below).
 const DRIVER_PROVENANCE_COMPANION_FIELDS = ['operationId', 'nodeId', 'invocationKey', 'contextGrant'];
+
+// Phase 07 (MVP7). Duplicated from `src/runner/definitions/schema.mjs`'s own
+// `AGGREGATION_METHOD_VALUES` rather than imported: this module sits in the
+// coordination layer and imports nothing from `definitions/`, the same
+// self-contained-schema posture `src/runner/team-cognition/schema.mjs`
+// already took for the identical reason. One legal method in MVP7.
+export const AGGREGATION_METHOD_VALUES = Object.freeze(['evidence-preserving-synthesis']);
+export const AGGREGATION_OUTCOME_VALUES = Object.freeze(['consensus', 'qualified', 'no-consensus']);
+
+// `aggregation-validated`'s own optional fields. Kept local to this kind
+// rather than folded into OPTIONAL_STRING_ARRAY_FIELDS/OPTIONAL_STRING_FIELDS
+// above, so adding this event kind changes the validation path of no
+// existing kind at all (`missingActors` in particular is REQUIRED and
+// non-empty on `session-partial`, but merely optional here).
+const AGGREGATION_OPTIONAL_STRING_FIELDS = new Set(['assignmentId', 'runId', 'outputArtifactRef']);
+const AGGREGATION_OPTIONAL_ARRAY_FIELDS = new Set(['dissentRefs', 'unresolvedContributionRefs', 'missingActors', 'artifactRevisionRefs']);
 
 const AUTHORIZED_BY_FIELDS = new Set(['type', 'id']);
 const CONTEXT_GRANT_FIELDS = new Set(['refs']);
@@ -407,8 +453,20 @@ export function validateEventPayload(type, payload) {
       if (!isPlainObject(value)) fail('validation', `event "${type}" payload.provenanceRoot must be a non-null object`);
       continue;
     }
-    if (field === 'authorizedBy') {
-      validateAuthorizedBy(value, `event "${type}" payload.authorizedBy`);
+    if (field === 'authorizedBy' || field === 'validatedBy') {
+      // `validatedBy` is the same driver-provenance shape under a name that
+      // says what the driver did (validated an aggregation, rather than
+      // authorized an operation) -- one validator, never a second copy.
+      validateAuthorizedBy(value, `event "${type}" payload.${field}`);
+      continue;
+    }
+    if (field === 'sourceResultRefs') {
+      // NON-empty, unlike `grantedContextRefs`/`evidenceRefs` below: an
+      // aggregation validated against zero source results is an aggregate
+      // asserting itself with no evidence behind it.
+      if (!isStringArray(value) || value.length === 0) {
+        fail('validation', `event "${type}" payload.sourceResultRefs must be a non-empty array of non-empty strings`);
+      }
       continue;
     }
     if (field === 'grantedContextRefs' || field === 'evidenceRefs') {
@@ -465,6 +523,36 @@ export function validateEventPayload(type, payload) {
       fail(
         'validation',
         `event "assignment-created" payload carries driver-authorization provenance (${orphaned.join(', ')}) without "authorizationId" -- these fields travel together or not at all`,
+      );
+    }
+  }
+  if (type === 'aggregation-validated') {
+    if (!AGGREGATION_METHOD_VALUES.includes(body.method)) {
+      fail('validation', `event "aggregation-validated" payload.method must be one of ${AGGREGATION_METHOD_VALUES.join(', ')}`);
+    }
+    if (!AGGREGATION_OUTCOME_VALUES.includes(body.outcome)) {
+      fail('validation', `event "aggregation-validated" payload.outcome must be one of ${AGGREGATION_OUTCOME_VALUES.join(', ')}`);
+    }
+    for (const field of AGGREGATION_OPTIONAL_STRING_FIELDS) {
+      if (body[field] !== undefined && !isNonEmptyString(body[field])) {
+        fail('validation', `event "aggregation-validated" payload.${field} must be a non-empty string when provided`);
+      }
+    }
+    for (const field of AGGREGATION_OPTIONAL_ARRAY_FIELDS) {
+      if (body[field] !== undefined && !isStringArray(body[field])) {
+        fail('validation', `event "aggregation-validated" payload.${field} must be an array of non-empty strings when provided`);
+      }
+    }
+    // Self-validated aggregate truth, structural form: the Assignment that
+    // PRODUCED the aggregate may not also be counted among the results the
+    // aggregate was validated against. Enforced here rather than only in the
+    // store door, so `replaySession` (which validates every event payload as
+    // it walks the log) refuses a hand-written log carrying this shape too --
+    // one rule, both the write path and the read path.
+    if (body.assignmentId !== undefined && body.sourceResultRefs.includes(body.assignmentId)) {
+      fail(
+        'validation',
+        `event "aggregation-validated" payload names its own output assignment "${body.assignmentId}" in sourceResultRefs -- an aggregate may not be its own evidence`,
       );
     }
   }

@@ -1114,6 +1114,137 @@ export function recordDriverDisposition(coordinationId, { targetRef, disposition
   });
 }
 
+/**
+ * Append one `aggregation-validated` event: the driver's record that a
+ * cognitive aggregation was validated against this session's own evidence.
+ *
+ * Same door shape as `authorizeOperation`/`recordDriverDisposition` above --
+ * payload shape validated first, then manifest read + active-status check +
+ * driver-identity pin + append, all inside ONE `withEventsLock` critical
+ * section. Three properties follow from that shape rather than from anything
+ * this function invents:
+ *
+ * - **Not worker-authorable.** `validatedBy.id` must be the identity that
+ *   opened the session (`assertDriverIdentity`, shared verbatim with the two
+ *   driver doors above). No RunResult field, no execution contract field, and
+ *   no worker-reachable path produces this event.
+ * - **Not a terminal transition.** This door never touches `manifest.status`.
+ *   A validated outcome is INPUT that `session-engine.mjs` may consult;
+ *   terminal authority stays with `transitionSessionStatus`.
+ * - **Written while the session is still `active`,** so an aggregation can
+ *   never be appended to justify a close that already happened.
+ *
+ * `sourceResultRefs` must every one be an Assignment this session actually
+ * owns -- checked against `manifest.assignmentRefs` directly (exact
+ * membership, not the looser segment scan `assertDispositionRefOwnedBySession`
+ * needs for opaque artifact refs), so an aggregate cannot be validated
+ * against another session's work or against an Assignment that does not
+ * exist.
+ *
+ * Idempotent on a byte-identical payload, mirroring `recordDriverDisposition`.
+ * Re-using one `aggregationId` for a DIFFERENT payload is a hard
+ * `duplicate-ref`, never a silent second opinion: a validated verdict is not
+ * overwritable in place.
+ */
+export function recordAggregationValidation(
+  coordinationId,
+  {
+    aggregationId,
+    method,
+    outcome,
+    sourceResultRefs,
+    validatedBy,
+    assignmentId,
+    runId,
+    outputArtifactRef,
+    dissentRefs,
+    unresolvedContributionRefs,
+    missingActors,
+    failedActors,
+    artifactRevisionRefs,
+  },
+  opts = {},
+) {
+  const { fgosDir, sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const payload = {
+    aggregationId,
+    method,
+    outcome,
+    sourceResultRefs,
+    validatedBy,
+    ...(assignmentId !== undefined ? { assignmentId } : {}),
+    ...(runId !== undefined ? { runId } : {}),
+    ...(outputArtifactRef !== undefined ? { outputArtifactRef } : {}),
+    ...(dissentRefs !== undefined ? { dissentRefs } : {}),
+    ...(unresolvedContributionRefs !== undefined ? { unresolvedContributionRefs } : {}),
+    ...(missingActors !== undefined ? { missingActors } : {}),
+    ...(failedActors !== undefined ? { failedActors } : {}),
+    ...(artifactRevisionRefs !== undefined ? { artifactRevisionRefs } : {}),
+  };
+  validateEventPayload('aggregation-validated', payload);
+
+  return withEventsLock(eventsPath, () => {
+    const manifest = readManifestRaw(manifestPath);
+    assertSchemaVersionCurrent(manifest, manifestPath);
+    if (manifest.status !== 'active') {
+      throw new CoordinationError(
+        'validation',
+        `recordAggregationValidation: session "${coordinationId}" is not active (status: "${manifest.status}") -- an aggregation cannot be validated into a session that has already closed`,
+      );
+    }
+    assertDriverIdentity(manifest, validatedBy, {
+      coordinationId,
+      label: 'recordAggregationValidation',
+      subject: 'a validated aggregation',
+    });
+
+    const owned = new Set(manifest.assignmentRefs);
+    for (const [i, ref] of sourceResultRefs.entries()) {
+      if (!owned.has(ref)) {
+        throw new CoordinationError(
+          'foreign-ref',
+          `recordAggregationValidation: sourceResultRefs[${i}] "${ref}" is not an Assignment of session "${coordinationId}" -- an aggregation may only be validated against this session's own results`,
+        );
+      }
+    }
+    if (assignmentId !== undefined && !owned.has(assignmentId)) {
+      throw new CoordinationError(
+        'foreign-ref',
+        `recordAggregationValidation: assignmentId "${assignmentId}" is not an Assignment of session "${coordinationId}"`,
+      );
+    }
+    if (outputArtifactRef !== undefined) {
+      assertDispositionRefOwnedBySession(outputArtifactRef, {
+        coordinationId,
+        assignmentRefs: manifest.assignmentRefs,
+        fgosDir,
+        label: 'recordAggregationValidation: outputArtifactRef',
+      });
+    }
+
+    // Same canonicalization reasoning as `recordDriverDisposition`: the only
+    // caller-supplied nested object is the driver-provenance one, so
+    // normalizing its two keys is enough to make key-insertion order stop
+    // mattering.
+    const canonicalize = (value) =>
+      JSON.stringify({ ...value, validatedBy: { type: value.validatedBy?.type, id: value.validatedBy?.id } });
+    const serialized = canonicalize(payload);
+    const priorForId = readEvents(eventsPath).find(
+      (event) => event.type === 'aggregation-validated' && event.payload?.aggregationId === aggregationId,
+    );
+    if (priorForId) {
+      if (canonicalize(priorForId.payload) === serialized) return Object.freeze({ ...payload, appended: false });
+      throw new CoordinationError(
+        'duplicate-ref',
+        `recordAggregationValidation: aggregationId "${aggregationId}" in session "${coordinationId}" was already recorded with a different result (outcome "${priorForId.payload.outcome}", now "${outcome}") -- a validated aggregation is never overwritten in place; record a new aggregationId instead`,
+      );
+    }
+
+    appendEventLocked(eventsPath, { type: 'aggregation-validated', payload }, sessionDir);
+    return Object.freeze({ ...payload, appended: true });
+  });
+}
+
 // R6 (Phase 06, cell P06.2, round 2): full-shape validation for a `runId`
 // claimed to belong to `assignmentId`. The real convention every genuine
 // dispatch in this codebase produces is exactly

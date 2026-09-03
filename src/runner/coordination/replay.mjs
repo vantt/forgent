@@ -97,6 +97,12 @@ export function replaySession(coordinationId, opts = {}) {
   const assignments = [];
   const results = [];
   const dispositions = [];
+  // Phase 07 (MVP7): validated cognitive aggregations, reconstructed the same
+  // way authorizations are -- valid ones in `aggregations`, post-terminal ones
+  // neutralized into `ignoredAggregations` rather than silently dropped.
+  const aggregations = [];
+  const ignoredAggregations = [];
+  const aggregationIds = new Set();
 
   const authorizations = [];
   const ignoredAuthorizations = [];
@@ -144,6 +150,96 @@ export function replaySession(coordinationId, opts = {}) {
         consumedByAssignmentId: null,
       };
       (terminalSeen ? ignoredAuthorizations : authorizations).push(record);
+    } else if (event.type === 'aggregation-validated') {
+      // Read-time rejection of worker-shaped aggregate truth. `validateEventPayload`
+      // (above) has already refused a `validatedBy.type` other than `"driver"`
+      // and an aggregate naming its own output Assignment among its sources;
+      // what THIS check adds is the session-scoped identity question the pure
+      // shape validator cannot answer without a manifest: the driver named
+      // must be THIS session's own driver. A worker actor id, or any other
+      // session's driver, is refused -- so a hand-appended aggregation cannot
+      // stand as validated truth merely by being well-formed.
+      //
+      // Boundary, stated plainly: this proves the event was written under the
+      // session's own driver identity, NOT that a driver in the real world
+      // authored it. A log editor who both writes to `events.jsonl` directly
+      // and copies `provenanceRoot.writerId` out of the adjacent manifest
+      // still produces an accepted event. That is the same unmediated-store-
+      // door trust boundary Phase 06's visibility-window residuals already
+      // name; nothing here narrows it.
+      const { aggregationId, validatedBy } = event.payload;
+      if (validatedBy.id !== manifest.provenanceRoot.writerId) {
+        throw new CoordinationError(
+          'foreign-ref',
+          `session "${coordinationId}": "aggregation-validated" event "${aggregationId}" was validated by "${validatedBy.id}", which is not this session's driver identity ("${manifest.provenanceRoot.writerId}") -- a validated aggregation is driver-authored session state, never a participant's own claim about its work`,
+        );
+      }
+      if (aggregationIds.has(aggregationId)) {
+        throw new CoordinationError(
+          'duplicate-ref',
+          `session "${coordinationId}": duplicate "aggregation-validated" event for aggregation "${aggregationId}"`,
+        );
+      }
+      aggregationIds.add(aggregationId);
+      // Every cited source result must ALREADY have an accepted `result-linked`
+      // earlier in this same log. An aggregate citing a result that this
+      // session never linked -- or that only settles later -- is claiming
+      // evidence it did not have when it was validated.
+      for (const ref of event.payload.sourceResultRefs) {
+        if ((linkedCountByAssignment.get(ref) ?? 0) === 0) {
+          throw new CoordinationError(
+            'out-of-order-ref',
+            `session "${coordinationId}": "aggregation-validated" event "${aggregationId}" cites source result "${ref}", which has no accepted "result-linked" event before it in this session's log`,
+          );
+        }
+      }
+      // Internal-consistency check on a claimed `consensus`. A real
+      // `classifyAggregationOutcome` run reached through
+      // `validateSessionAggregation` can NEVER produce `consensus` alongside a
+      // named missing/failed actor or an unresolved contribution: an
+      // unsatisfied or unpinned binding makes its whole source operation
+      // contribute nothing, which fails the evaluator's own coverage check and
+      // forces `no-consensus`. So an event asserting all of it at once did not
+      // come from a real validation call, whatever wrote it.
+      //
+      // Honest scope: this catches an INCONSISTENT forgery, not a careful one.
+      // A forger who omits these fields still produces an accepted event --
+      // see this cell's trace for the full boundary.
+      if (event.payload.outcome === 'consensus') {
+        for (const field of ['missingActors', 'failedActors', 'unresolvedContributionRefs']) {
+          if ((event.payload[field] ?? []).length > 0) {
+            throw new CoordinationError(
+              'validation',
+              `session "${coordinationId}": "aggregation-validated" event "${aggregationId}" claims outcome "consensus" while naming ${field} [${event.payload[field].join(', ')}] -- a real evidence-preserving validation cannot reach consensus with an unsatisfied or unpinned source binding`,
+            );
+          }
+        }
+      }
+      const record = {
+        aggregationId,
+        method: event.payload.method,
+        outcome: event.payload.outcome,
+        sourceResultRefs: Object.freeze([...event.payload.sourceResultRefs]),
+        validatedBy: event.payload.validatedBy,
+        ...(event.payload.assignmentId !== undefined ? { assignmentId: event.payload.assignmentId } : {}),
+        ...(event.payload.runId !== undefined ? { runId: event.payload.runId } : {}),
+        ...(event.payload.outputArtifactRef !== undefined ? { outputArtifactRef: event.payload.outputArtifactRef } : {}),
+        ...(event.payload.dissentRefs !== undefined ? { dissentRefs: Object.freeze([...event.payload.dissentRefs]) } : {}),
+        ...(event.payload.unresolvedContributionRefs !== undefined
+          ? { unresolvedContributionRefs: Object.freeze([...event.payload.unresolvedContributionRefs]) }
+          : {}),
+        ...(event.payload.missingActors !== undefined ? { missingActors: Object.freeze([...event.payload.missingActors]) } : {}),
+        ...(event.payload.failedActors !== undefined ? { failedActors: Object.freeze([...event.payload.failedActors]) } : {}),
+        ...(event.payload.artifactRevisionRefs !== undefined
+          ? { artifactRevisionRefs: Object.freeze([...event.payload.artifactRevisionRefs]) }
+          : {}),
+        ts: event.ts,
+      };
+      // Post-terminal: neutralized exactly like a post-terminal authorization
+      // -- excluded from `aggregations` (the only list a terminal-input
+      // consumer reads), reported separately, never silently dropped, and
+      // never a throw that would make the whole session unreadable.
+      (terminalSeen ? ignoredAggregations : aggregations).push(record);
     } else if (event.type === 'driver-disposition-recorded') {
       dispositions.push({
         targetRef: event.payload.targetRef,
@@ -298,6 +394,8 @@ export function replaySession(coordinationId, opts = {}) {
     assignments: Object.freeze(assignments.map((record) => Object.freeze(record))),
     results: Object.freeze(results.map((record) => Object.freeze(record))),
     dispositions: Object.freeze(dispositions.map((record) => Object.freeze(record))),
+    aggregations: Object.freeze(aggregations.map((record) => Object.freeze(record))),
+    ignoredAggregations: Object.freeze(ignoredAggregations.map((record) => Object.freeze(record))),
     sessionDir,
   });
 }
