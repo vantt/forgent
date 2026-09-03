@@ -274,7 +274,7 @@ local socket transport may replace framing without renaming the operation.
 External discovery is data-first. The host scans a static manifest and never
 executes unknown provider code merely to discover what it claims.
 
-A `component.yaml` plugin manifest declares at least:
+A `manifest.yaml` provider declaration declares at least:
 
 - plugin ID, version, publisher, and component protocol range;
 - provided `OperationId` values or named extension points;
@@ -283,6 +283,19 @@ A `component.yaml` plugin manifest declares at least:
 - requested host capabilities;
 - platform compatibility and integrity metadata;
 - health and post-selection `describe` operations.
+
+`manifest.yaml` is the one canonical filename for authored, static provider
+declarations. The `kind` field distinguishes the declaration shape, for
+example `fgos.component`, `fgos.plugin`, or `fgos.domain`; every kind shares
+the common `manifestVersion`, `id`, `version`, `provides`, `requires`, and
+`capabilities` fields before its kind-specific fields are validated.
+
+The word **registry** is reserved for the host's derived runtime index (and
+its lock/cache), not for another authored file. Discovery scans
+`manifest.yaml`, validates by `kind`, then links accepted claims into the
+provider registry. Existing authored files named `registry.yaml` are a legacy
+alias during migration; a directory containing both names must fail closed
+rather than silently choosing one.
 
 The registry linker:
 

@@ -89,7 +89,7 @@ Use this document when deciding:
 - whether a refactor is clarifying an authority boundary or merely moving
   files.
 
-For folder-level domain authoring shape, domain registry/workflow files,
+For folder-level domain authoring shape, domain manifest/workflow files,
 domain-scoped doctrine, task-spec placement, skill/agent authoring sources, and
 domain-siloing enforcement, use
 [Domainization Architecture](../domainization/README.md).

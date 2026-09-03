@@ -48,7 +48,7 @@ A domain is a self-contained authoring unit:
 
 ```txt
 domains/<name>/
-  registry.yaml
+  manifest.yaml
   workflows/*.yaml
   skills/*.md
   task-specs/*.md
@@ -68,7 +68,7 @@ parsing, validation, normalization, and runtime projection.
 |---|---|---|---|
 | Work store | One shared fgOS store/event log | Domain identity and domain-local fields | Domains do not get separate fgOS installs or stores. |
 | Work fields | Top-level work schema and closed editable field set | `domainFields.<domain>.*` | Top-level fields are platform ports; domain fields are adapter territory. |
-| Workflow engine | Domain/workflow resolver and normalized runtime shape | `registry.yaml` and `workflows/*.yaml` | Core loads and validates; domains declare vocabulary and legal operations. |
+| Workflow engine | Domain/workflow resolver and normalized runtime shape | `manifest.yaml` and `workflows/*.yaml` | Core loads and validates; domains declare vocabulary and legal operations. |
 | Task-specs | `core/task-specs/` for domain-agnostic skills | `domains/<name>/task-specs/` | Task-spec is executable contract by task kind, not work-item field schema. |
 | Skills | `core/skills/` for shared skills | `domains/<name>/skills/` | Authoring source is split; generated skill trees remain render targets. |
 | Knowledge | Platform-wide decisions and shared knowledge registries | `domains/<name>/knowledge/` | Knowledge is curated expertise, distinct from raw feature context. |
@@ -77,9 +77,9 @@ parsing, validation, normalization, and runtime projection.
 | Agent types | `core/agents/` for domain-agnostic agent types | `domains/<name>/agents/` | Location records authorship/flavor, not an execution-use restriction. |
 | External render targets | `.agents/skills/`, `.claude/skills/`, `.claude/agents/`, plugin skill trees | None | Render targets keep host-facing shape stable while authoring sources move. |
 
-## 5. Registry And Workflow Boundary
+## 5. Manifest And Workflow Boundary
 
-`registry.yaml` owns domain-level selector and policy data:
+`manifest.yaml` owns domain-level identity, selector, and policy data:
 
 ```txt
 roleGraph
@@ -108,6 +108,13 @@ The `workflows` map is not authored. Core derives it by scanning
 Core then normalizes author-friendly YAML into the runtime shape consumed by
 existing resolver functions such as `getDomain`, `resolveWorkflow`,
 `skillForStage`, and future path/bundle resolvers.
+
+The filename is uniform across authored extension kinds. `kind` (for example
+`fgos.domain`) selects the schema; it is not encoded in a second filename.
+The runtime registry is a derived index built after manifests and workflows
+are validated, so authors do not maintain both a manifest and a registry.
+During transition, `registry.yaml` may be read as a deprecated alias for
+`manifest.yaml`, but both files present together are an error.
 
 ## 6. Resolver Boundary
 
@@ -254,7 +261,7 @@ flavor; contracts decide legal use.
 
 The domainization material decomposes into these implementation slices:
 
-- split domain registry into `registry.yaml` plus `workflows/*.yaml`, with core
+- split domain declaration into `manifest.yaml` plus `workflows/*.yaml`, with core
   aggregation and normalization;
 - move coding task-specs from `docs/task-specs/coding/` to
   `domains/coding/task-specs/`;
