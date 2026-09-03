@@ -64,7 +64,7 @@ Prepare P02.1 (Phase 02 — MVP4 thin surface launcher).
 | Cell | Requirements | Status | Commit |
 |---|---|---|---|
 | P00.1 | Phase 00 R1, R2, R3, R4 (closes Phase 00) | done | `95f7971c` |
-| P01.1 | Phase 01 R1-R8 (closes Phase 01) | done | pending |
+| P01.1 | Phase 01 R1-R8 (closes Phase 01) | done | `633da1f5` |
 
 ## Phase 01 Status
 
