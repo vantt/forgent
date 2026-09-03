@@ -47,6 +47,13 @@ Doer fixes accepted findings
 Coordinator closes the cell with proof
 ```
 
+Reviewer and Red-team may run in parallel after the Coordinator has verified a
+stable Doer candidate. Multiple fixes may be batched only under the
+master prompt's parallelism policy: shared-checkout Fixers produce patch
+proposals or reports, while source-writing Fixers require isolated workspaces
+and a recorded Fix Batch Plan. The Coordinator applies or merges fixes
+sequentially and verifies the combined diff before close.
+
 This is not a new runtime subsystem. It is a disciplined artifact and prompt
 workflow that keeps independent agents aligned without making every agent read
 all architecture docs.
@@ -209,6 +216,9 @@ Rules:
 - Red-team reads `current-cell.md`, cell trace, diff, and tests.
 - Coordinator may read architecture docs and prepare the compact contract.
 - A second coordinator run must resume from `current-cell.md`, not restart.
+- Parallel Reviewer/Red-team or Fixer activity must still preserve trace
+  ownership, mutation attribution, one active cell, and independent first-pass
+  reports.
 
 ## 8. Cell Trace Contract
 
