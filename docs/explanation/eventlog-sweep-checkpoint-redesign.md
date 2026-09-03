@@ -123,7 +123,10 @@ how-to, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md`
 three were marked historical and repointed at the actual current
 mechanism (Tầng A's sharded `.fgos/events/` layout plus this item's
 merge-time sweep/fallback commit). Other `.fgos/*.jsonl` `merge=union`
-entries (`tsk-2xg`) were confirmed untouched and still valid.
+entries ([`tsk-2xg`](catchup-manual-merge-fgos-write-rejected-deadlock.md))
+were confirmed untouched and still valid at the time — those entries were
+later superseded, not by this item, by moving their target files off git
+tracking entirely (see that item's own doc for the full timeline).
 
 ## Not a duplicate
 
