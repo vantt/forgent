@@ -113,8 +113,6 @@ The filename is uniform across authored extension kinds. `kind` (for example
 `fgos.domain`) selects the schema; it is not encoded in a second filename.
 The runtime registry is a derived index built after manifests and workflows
 are validated, so authors do not maintain both a manifest and a registry.
-During transition, `registry.yaml` may be read as a deprecated alias for
-`manifest.yaml`, but both files present together are an error.
 
 ## 6. Resolver Boundary
 

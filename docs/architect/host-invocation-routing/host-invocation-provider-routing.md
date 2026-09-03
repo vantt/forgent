@@ -293,9 +293,7 @@ the common `manifestVersion`, `id`, `version`, `provides`, `requires`, and
 The word **registry** is reserved for the host's derived runtime index (and
 its lock/cache), not for another authored file. Discovery scans
 `manifest.yaml`, validates by `kind`, then links accepted claims into the
-provider registry. Existing authored files named `registry.yaml` are a legacy
-alias during migration; a directory containing both names must fail closed
-rather than silently choosing one.
+provider registry.
 
 The registry linker:
 
