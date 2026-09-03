@@ -74,9 +74,11 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 
 ## Active Cell
 
-None. Wave 1 (P06.1 + P07.1) closed — see Phase 06/07 status below and
-`current-cell.md`'s Wave 1 Disposition for the full review/red-team/fix
-history.
+Wave 2: P06.2 (visibility runtime/grant enforcement/replay) + P07.2-remainder
+(outcome classification/dissent/staleness), each dispatched into its OWN
+isolated worktree this time (`step-09-mvp6-to-mvp9-p06.2`,
+`step-09-mvp6-to-mvp9-p07.2`, both branched from `8d2fa7d8`). See
+`current-cell.md`.
 
 **Process deviation, recorded honestly:** both P06.1 and P07.1 were
 dispatched as concurrent source-writers into the SAME shared worktree

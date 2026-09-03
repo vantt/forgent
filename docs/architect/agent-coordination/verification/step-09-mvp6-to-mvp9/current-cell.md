@@ -1,205 +1,205 @@
-# Current Cell(s): none (idle — Wave 1 closed, Wave 2 not yet dispatched)
+# Current Cell(s): P06.2 + P07.2-remainder (Wave 2, parallel, ISOLATED worktrees)
 
-Status: closed (Wave 1) / idle
+Status: in-progress
 Owner: Coordinator (this session)
 Last updated: 2026-09-04
-Next action: prepare and dispatch Wave 2 (P06.2 + remaining P07.2 scope),
-each into its OWN isolated worktree this time — see index.md's Next Action
-and process-deviation note. This file's P06.1/P07.1 sections below are kept
-as the historical closed-cell contract; a new "## Wave 2" section will be
-added above them when Wave 2 is prepared.
+Next action: dispatch both Doers in parallel, each into its OWN isolated
+worktree (lesson from Wave 1's process deviation)
 
-## Wave 1 Disposition (post Reviewer+Red-Team parallel first pass)
+Wave 1 (P06.1 + P07.1) closed and committed (`8d2fa7d8`) — see index.md's
+"Wave 1 Status" section and `P06.1.md`/`P07.1.md` for full history.
 
-Both rounds: APPROVE WITH CONCERNS, 0 HIGH. Reviewer: 2 MEDIUM + 2 LOW + 1 nit.
-Red-Team: 2 MEDIUM (0 LOW). Overlap: Reviewer's "frozen at every level" finding
-and Red-Team's "mutable sub-function results" finding are the same defect at
-different depth — consolidated into one fix below.
+## CRITICAL: working roots (TWO separate isolated worktrees this wave)
 
-**Accepted, routed to Fixer (P07.1 scope only, sequential, single Fixer):**
-1. `P07.1.md` Scope line overclaims P07.2 as covered — reword; `index.md` must
-   not record P07.2 as closed.
-2. Immutability: `validateSourceCoverage`/`validateRequiredDisclosureCoverage`
-   return mutable objects/arrays/Map despite the trace's blanket claim; even
-   `evaluateAggregationCoverage`'s frozen output has an unfrozen nested array
-   inside `missingDisclosuresBySource`. Freeze every exported function's
-   result at every nesting level; extend "result is frozen" test to check a
-   nested value too.
-3. `team-cognition-static.test.mjs`'s forbidden-import guard is one-hop only
-   (proven by Red-Team's synthetic PoC) — make it a real recursive resolver
-   over relative imports.
-4. No test proves the evaluator's inputs are left unmutated (named Bug
-   Taxonomy item) — add one.
-
-**Not accepted / no action:** Reviewer's LOW #4 (shared-worktree process
-deviation — already disclosed by Coordinator, not a code defect, no further
-action) and LOW #5 (current-cell.md wording nit re: "graph.nodes[]" — will
-fix as a free docs-only line while the Fixer is already in this file's
-neighborhood, not because it's a real requirement gap).
-
-P06.1 has zero findings routed to it — clean.
-
-## CRITICAL: working root
-
-ALL edits (source, tests, and this cell's own trace file) happen inside the
-dedicated worktree:
-`/home/vantt/projects/forgentX/.claude/worktrees/step-09-mvp6-to-mvp9/`
-(branch `step-09-mvp6-to-mvp9`). Do NOT write under
-`/home/vantt/projects/forgentX/` directly — that is the main checkout, on
-branch `main`, shared by unrelated concurrent work. (A prior Coordinator
-slip wrote Phase 00's trace files to the main-checkout path by accident and
-had to be moved before commit — do not repeat it.)
-
-Run focused/full test commands from THAT SAME worktree root
-(`cd /home/vantt/projects/forgentX/.claude/worktrees/step-09-mvp6-to-mvp9 &&
-FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test '<glob>'`) — this is where
-the edited code actually lives, so this is the only cwd that tests it.
-Exception: `test/runner/coordination-static.test.mjs` false-fails from this
-path (see index.md's Baseline note, it substring-matches "worktree" in
-resolved import paths) — neither P06.1's nor P07.1's own focused glob
-includes that file, so it does not apply here unless a Doer widens the
-glob, in which case run that one file's check from the main checkout
-instead and say so in the trace.
-
-Phase 00 (P00.1 + P00.2) closed — see index.md Cell Log. Full-suite baseline
-recorded in index.md.
-
-## P06.1 — Visibility Definition Schema And Validation (Phase 06, MVP6)
-
-### Goal
-Add `CoordinationProtocol`-profile-only visibility-window fields to
-FlowDefinition validation: `spec.profile.topology.visibilityWindows[]`
-(`id`, `opensAfter.milestone: listed-results-linked`,
-`opensAfter.operationRefs[]`, `permits.sourceOperationRefs[]`,
-`permits.delivery: artifact-refs`) and
-`graph.nodes[].operations[].contextAccess.visibilityWindowRef`. Reject
-unknown windows, dangling operation refs, duplicate ids, illegal delivery
-values, and any use on a `Workflow`-profile definition. A definition with no
-`visibilityWindows` must stay byte/behavior compatible (no new required
-field, no changed validation outcome for existing fixtures).
-
-### Non-Goals
-No runtime enforcement (window-open/closed state, grant-time legality check)
-— that is P06.2, a later Wave 2 cell, not this one. No touching
-`grantedContextRefs`/`contextGrant.refs` concrete-authority mechanics. No
-promoting this candidate contract into
-`docs/architect/agent-coordination/contracts/flow-definition.md` yet (P06.3
-does that, after proof).
-
-### Must Read
-- `plans/260903-2334-step09-mvp6-to-mvp9/phase-06-mvp6-visibility-windows.md`
-- `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md` §1.1, §4 (P06.1)
-- `docs/architect/agent-coordination/contracts/flow-definition.md`
-- `src/runner/definitions/schema.mjs` (existing `validateFlowDefinition`, `ACTIVATION_MODE_VALUES`-style enum pattern to mirror)
-- `test/runner/flow-definition-standalone-master-coordination-loop.test.mjs` (existing test-shape precedent)
-
-### May Inspect
-`src/runner/definitions/protocol-loader.mjs` (read-only unless a new
-discovery-tier behavior is genuinely needed — flag any edit here loudly),
-`core/coordination-protocols/*.yaml` (all except
-`group-cognition-framework.yaml`), `test/runner/coordination-schema.test.mjs`.
-
-### Do Not Touch
-`core/coordination-protocols/group-cognition-framework.yaml` (non-negotiable,
-never touched). `src/runner/coordination/*` (session-runtime — P06.2's later
-scope). `src/verbs/coordination/*` (public-surface). `src/runner/team-cognition/*`
-(P07.1's new path — sibling cell, disjoint scope). `index.md`/`current-cell.md`.
-
-### Tests First
-Write validation tests first: a definition with no `visibilityWindows` still
-validates identically to before (regression); a definition with a
-well-formed `visibilityWindows[]` validates; each rejection case (unknown
-window ref, dangling operationRef, duplicate id, illegal `delivery` value,
-`Workflow`-profile definition carrying `visibilityWindows`) has its own
-negative test. Focused command:
-`cd /home/vantt/projects/forgentX && FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/runner/flow-definition*.test.mjs' 'test/runner/coordination-schema.test.mjs'`
-(run from the MAIN CHECKOUT, not this worktree — see index.md's Baseline
-section for why: `test/runner/coordination-static.test.mjs` false-fails when
-run from a path containing the substring "worktree").
-
-### Acceptance
-`validateFlowDefinition` accepts the new fields only under `CoordinationProtocol`
-profile; every named negative case is a validation error, not a silent
-pass-through or crash; zero behavior change for existing fixtures lacking
-`visibilityWindows`; new tests pass; no regression in
-`test/runner/flow-definition*.test.mjs`.
-
-### Bug Taxonomy
-Accepting `visibilityWindows` on a `Workflow` profile; a dangling
-`operationRefs`/`sourceOperationRefs` entry silently accepted instead of
-rejected; a definition with zero windows changing behavior/shape; validation
-that only checks presence, not that referenced operation ids actually exist
-in `spec.operations[]` (the same operation-id namespace every other
-operation ref in this schema resolves against).
-
-### Trace Update
-Doer writes `P06.1.md` (Requirements/Proof Matrix/Commands/Gaps). Coordinator
-integrates into index.md after both P06.1 and P07.1 return and are reviewed.
+- **P06.2** works ONLY in: `/home/vantt/projects/forgentX/.claude/worktrees/step-09-mvp6-to-mvp9-p06.2`
+  (branch `step-09-mvp6-to-mvp9-p06.2`, branched from `step-09-mvp6-to-mvp9`
+  tip `8d2fa7d8`).
+- **P07.2-remainder** works ONLY in: `/home/vantt/projects/forgentX/.claude/worktrees/step-09-mvp6-to-mvp9-p07.2`
+  (branch `step-09-mvp6-to-mvp9-p07.2`, same base `8d2fa7d8`).
+- Neither Doer touches `/home/vantt/projects/forgentX` (main checkout,
+  branch `main`) or the OTHER isolated worktree.
+- Run test commands from each Doer's OWN worktree root.
+- The Coordinator integrates both branches back into `step-09-mvp6-to-mvp9`
+  sequentially after both close, reviews the combined diff, and reruns gate
+  tests — per `plan.md`'s Shared-File Lease Rule (isolated workspaces
+  required for concurrent non-read-only leaf cells).
 
 ---
 
-## P07.1 — Team Cognition Evaluator Skeleton (Phase 07, MVP7)
+## P06.2 — Visibility Runtime, Grant Enforcement, And Replay (Phase 06, MVP6)
 
 ### Goal
-Establish the minimal Team Cognition module/port boundary at
-`src/runner/team-cognition/` (brand-new directory, per P00.2.md §2 — no
-existing module to move). Validate structured source coverage and required
-disclosures against immutable RunResult/artifact refs. The evaluator must
-never rewrite evidence, alter confidence, dispatch work, or transition a
-CoordinationSession — it is a pure validation function callable in isolation.
+Wire real runtime enforcement of visibility windows into the existing
+context-grant mechanism (`authorizeDeclaredOperation`/`dispatchDeclaredOperation`
+in `src/runner/coordination/session-engine.mjs`), on top of P06.1's schema:
+- Derive milestone state (window open/closed) from listed `result-linked`
+  events already in the session's event log — no new stored "window state"
+  field, computed at read time.
+- A window stays closed while any of its `opensAfter.operationRefs[]` has no
+  matching `result-linked` event, or that event records a failed/late
+  result (exact failure semantics: read how `result-linked` already
+  represents failure — do not invent a second vocabulary).
+- An accepted `actor-replaced` lineage may satisfy the original source
+  obligation without rewriting history (the replacement's own `result-linked`
+  counts toward the window; the original failed/missing attempt's event
+  stays in the log, untouched).
+- At BOTH authorization time (`authorizeDeclaredOperation`) and dispatch time
+  (`dispatchDeclaredOperation`), every granted context ref must satisfy BOTH
+  existing same-session ownership (`assertRefsOwnedBySession`, unchanged)
+  AND active-window legality (new) before being granted/legal.
+- "Persist no duplicate `visibility-window-applied` truth" — do not add a new
+  event type or a redundant stored flag for window-open state; it must be a
+  pure derivation from existing events (`result-linked`, `actor-replaced`),
+  recomputed identically by `replay.mjs`.
 
 ### Non-Goals
-No FlowDefinition/session integration (that is P07.3, Wave 3, after P06
-exits and P07.1/P07.2 land). No wiring into `run.mjs`/`session-engine.mjs`.
-No fixtures/tests beyond what proves the evaluator function itself in
-isolation (P07.2 is the fixtures/tests cell — if the scope is small enough,
-this Doer may cover both P07.1+P07.2 in one cell; state explicitly in the
-trace which phase-file cells were covered).
+No changes to P06.1's schema shape (already shipped). No promoting the
+candidate contract into `flow-definition.md`/`coordination-session.md` yet
+(P06.3's job, after proof). No touching `src/runner/team-cognition/*`,
+`src/verbs/coordination/*`, or `core/coordination-protocols/group-cognition-framework.yaml`.
 
 ### Must Read
-- `plans/260903-2334-step09-mvp6-to-mvp9/phase-07-mvp7-evidence-preserving-aggregation.md`
-- `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md` §2, §3 (MVP7 candidate names), §4 (P07.1)
-- `docs/architect/proposals/component-authority-boundary-map.md` §6 (Team Cognition Engine authority row — "Must not own" list)
-- `src/runner/coordination/schema.mjs` (pattern precedent: how this repo shapes a validation module — `CoordinationError`, `assertNoForbiddenFieldsDeep` style)
+- `plans/260903-2334-step09-mvp6-to-mvp9/phase-06-mvp6-visibility-windows.md` (P06.2 cell + Exit bullets)
+- `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.1.md` "Existing visibility / context-grant primitives" section (exact file+line citations for the mechanism you're extending)
+- `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1.md` (the schema shape you're now enforcing at runtime — `visibilityWindows[]`/`contextAccess.visibilityWindowRef`)
+- `src/runner/coordination/session-engine.mjs` — read `authorizeDeclaredOperation` (~line 1047-1116) and `dispatchDeclaredOperation` (~line 1368-1841) IN FULL, especially the `assertRefsOwnedBySession` call sites (~line 1087, ~line 1609) and `legalContextRefs` construction (~line 1639) — this is exactly where the new window-legality check is added, alongside the existing ownership check, not replacing it
+- `src/runner/coordination/schema.mjs` — `EVENT_KINDS`/`validateEventPayload` (how `result-linked`/`actor-replaced` events are shaped today)
+- `src/runner/coordination/replay.mjs` — how state is reconstructed read-only; your window-state derivation function must be callable identically from both the live dispatch path and replay, so replay independently reaches the same legality decision (Phase 06 Exit bullet)
 
 ### May Inspect
-`src/runner/coordination/replay.mjs` (read-only, to understand RunResult/
-artifact-ref shape the evaluator will validate against), any existing
-`RunResult`/artifact-ref type definitions under `src/runner/coordination/`.
+`test/runner/coordination-session-engine.test.mjs`, `test/runner/coordination-replay.test.mjs`, `test/runner/coordination-driver-authorization.test.mjs` (existing test-shape precedent for authorization/dispatch tests).
 
 ### Do Not Touch
-`src/runner/coordination/*`, `src/runner/definitions/*`,
-`src/verbs/coordination/*`, `core/coordination-protocols/*`,
-`index.md`/`current-cell.md`. No dispatch of work, no session mutation
-anywhere in this cell's code.
+`src/runner/definitions/*` (P06.1's already-closed scope — read-only reference only). `src/runner/team-cognition/*`. `src/verbs/coordination/*`. `core/coordination-protocols/group-cognition-framework.yaml` (non-negotiable). `index.md`/`current-cell.md`.
 
 ### Tests First
-New isolated fixtures under `test/runner/team-cognition-*.test.mjs`. Cover:
-structured source coverage validation, required-disclosures validation
-against real (fixture) artifact refs, and a negative case proving the
-evaluator refuses to validate when a required disclosure is missing.
-Positive/negative for whatever surface this skeleton actually exposes (even
-if outcome classification `consensus|qualified|no-consensus` is P07.2/P07.3
-scope, this cell's tests must prove the skeleton's own real behavior, not a
-stub). Focused command:
-`cd /home/vantt/projects/forgentX && FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/runner/team-cognition*.test.mjs'`
-(run from the MAIN CHECKOUT — same worktree-path caveat as P06.1).
+Cover, each with its own test: window stays closed with zero source
+`result-linked` events; window stays closed with a partial subset of
+required source events; window opens once ALL `opensAfter.operationRefs[]`
+have a qualifying `result-linked`; a failed/late result does NOT open the
+window; an `actor-replaced` lineage satisfies the original obligation
+without the original failed event disappearing from the log; authorization
+is refused when a granted ref's window is not yet open even though
+same-session ownership passes; dispatch is refused (not just authorization)
+under the same condition (defense in depth — test both gates independently,
+not just one); replay independently reconstructs the same window-open/closed
+decision as the live path for at least one non-trivial scenario. Focused
+command: `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/runner/coordination-session-engine.test.mjs' 'test/runner/coordination-replay.test.mjs' 'test/runner/coordination-driver-authorization.test.mjs' 'test/runner/flow-definition*.test.mjs'`
+(run from `.claude/worktrees/step-09-mvp6-to-mvp9-p06.2`, the ONLY worktree
+that has your changes; do not include `coordination-static.test.mjs` in
+your own glob — false-fails from a worktree path, out of scope here too).
 
 ### Acceptance
-`src/runner/team-cognition/` exists with a real, callable evaluator
-function/module; zero writes to any Work/session/dispatch surface anywhere
-in the new code (grep-verifiable, mirroring `coordination-static.test.mjs`'s
-own forbidden-import pattern — consider adding an equivalent static check
-for the new directory); tests pass; module boundary matches
-`component-authority-boundary-map.md` §6's "Must not own" constraints.
+No anonymization/aggregate-transformation/partial-window-exception
+introduced (plan.md Non-Negotiable Deferrals). `grantedContextRefs`'s
+existing same-session-ownership gate is unchanged/still enforced (regression
+tests for the pre-existing behavior must still pass). Window legality is a
+genuinely separate, additive gate — never a replacement for ownership.
+Replay reaches the identical decision as live dispatch for every new test
+scenario. Zero new stored/duplicated "window state" field.
 
 ### Bug Taxonomy
-Evaluator silently mutating an artifact ref or RunResult; evaluator invoking
-any dispatch/session-transition function even indirectly (transitive import
-of `session-engine.mjs`/`store.mjs`); evaluator treating an unresolved
-dissent as resolved consensus; evaluator accepting a stale artifact revision
-as current.
+A partial-window bypass (accepting a ref because SOME but not all sources
+are linked); a window that silently stays permanently open once any single
+source links (should re-check per-request, not cache/latch); an
+`actor-replaced` path that lets a NEW unrelated operation ref piggyback on
+someone else's satisfied obligation; authorization passing but dispatch
+independently re-deriving a DIFFERENT (looser) legality decision than
+authorization did (two gates disagreeing is itself a bug even if both
+individually look plausible); replay reconstructing a different verdict
+than the live path recorded (non-determinism); any change that weakens the
+existing `assertRefsOwnedBySession` check as a side effect of adding the new
+one.
 
 ### Trace Update
-Doer writes `P07.1.md`. Coordinator integrates after both P06.1 and P07.1
-return and are reviewed.
+Doer writes `P06.2.md` in ITS OWN worktree
+(`.claude/worktrees/step-09-mvp6-to-mvp9-p06.2/docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md`).
+Coordinator integrates the branch and the trace file into the main track
+worktree after both Wave 2 cells close and are reviewed.
+
+---
+
+## P07.2-remainder — Aggregation Outcome Classification And Adversarial Fixtures (Phase 07, MVP7)
+
+P07.1 already closed the source-coverage/disclosure-presence slice of this
+phase-file cell (see `P07.1.md`). This cell covers what's left, named
+explicitly in `phase-07-mvp7-evidence-preserving-aggregation.md`'s own P07.2
+bullets and confirmed still-open by the Wave 1 Reviewer's finding.
+
+### Goal
+Still isolated from shared session files (do NOT integrate with
+`src/runner/coordination/*`/`src/verbs/coordination/*` yet — that's P07.3,
+a later wave). Add to `src/runner/team-cognition/`:
+- Outcome classification: `consensus | qualified | no-consensus`, built on
+  top of P07.1's existing `evaluateAggregationCoverage` (extend, do not
+  fork — read it first).
+- Hidden-dissent rejection: reject a claimed `consensus` outcome when a
+  disclosed dissent/objection exists that the aggregation input doesn't
+  surface (i.e. the evaluator must not let a caller claim "consensus" while
+  quietly omitting a `dissentRefs`/`unresolvedContributionRefs`-shaped
+  entry — see the candidate contract names frozen in `P00.2.md` §3 for the
+  MVP7 field vocabulary, still non-contract but useful as your own internal
+  parameter naming).
+- Stale artifact-revision-provenance rejection: build on P07.1's existing
+  `revision`-presence check — this cell adds the "is it CURRENT" half P07.1
+  explicitly left open (P07.1.md's own Gaps section: "cannot check the pin
+  is current, no store access"). Since this cell still has no store access
+  (integration is P07.3), implement this as: given a caller-supplied
+  "current revision" reference map alongside the sources (a pure-function
+  input, not a store read), reject any source whose `revision` doesn't match
+  the corresponding current-revision entry. Document this input-shape choice
+  explicitly in your trace.
+- Malformed-disclosure rejection: expand beyond P07.1's presence-only check
+  — validate disclosure VALUE shape is at least well-typed per whatever
+  minimal shape you define (document the shape you chose; P07.1's Gaps
+  section explicitly left this open for "a later cell that defines
+  disclosure semantics").
+- Reject a claimed `consensus` outcome that coexists with any unresolved
+  dissent reference.
+
+### Non-Goals
+No FlowDefinition/session integration (P07.3). No wiring into
+`run.mjs`/`session-engine.mjs`. No touching `src/runner/coordination/*`,
+`src/runner/definitions/*`, `src/verbs/coordination/*`.
+
+### Must Read
+- `plans/260903-2334-step09-mvp6-to-mvp9/phase-07-mvp7-evidence-preserving-aggregation.md` (P07.2 bullets + Candidate Contract block)
+- `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` IN FULL, including both Fix Round sections — this is the exact module/shape you're extending, not forking
+- `src/runner/team-cognition/aggregation-evaluator.mjs`, `src/runner/team-cognition/schema.mjs` (the real current code)
+- `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md` §3 (frozen MVP7 candidate names — `outcome`, `dissentRefs`/`unresolvedContributionRefs`, `artifactRevisionRefs` — still non-contract, but the naming precedent to follow for internal consistency)
+
+### May Inspect
+`test/runner/team-cognition-*.test.mjs` (existing tests you're extending, not replacing).
+
+### Do Not Touch
+`src/runner/definitions/*`, `src/runner/coordination/*`, `src/verbs/coordination/*`, `core/coordination-protocols/*`, `index.md`/`current-cell.md`.
+
+### Tests First
+One test per outcome (`consensus`/`qualified`/`no-consensus`) with a
+deterministic, documented rule for which is which. Negative: hidden dissent
+with a claimed-consensus input rejected; a stale-revision source rejected;
+a malformed disclosure value rejected; consensus-with-unresolved-dissent
+rejected. Focused command:
+`FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/runner/team-cognition*.test.mjs'`
+(run from `.claude/worktrees/step-09-mvp6-to-mvp9-p07.2`).
+
+### Acceptance
+Every P07.2 bullet above has its own passing positive+negative test. No
+vote/rank-tally/weighted-scoring/convergence-engine/prose-parsing
+introduced anywhere (plan.md Non-Negotiable Deferrals — this is the exact
+phase where that temptation is highest; read the Deferrals list before
+writing the outcome-classification logic). P07.1's existing tests/behavior
+unchanged (extend, verify old tests still pass).
+
+### Bug Taxonomy
+Classifying `consensus` from source-coverage alone without actually
+checking for dissent; a `qualified`/`no-consensus` boundary that's
+arbitrary/undocumented rather than a named rule; accepting a stale revision
+because the "current revision" input itself wasn't validated against
+anything (garbage-in-garbage-out silently accepted); any hidden numeric
+scoring/weighting that is actually a vote in disguise.
+
+### Trace Update
+Doer writes `P07.2.md` in ITS OWN worktree
+(`.claude/worktrees/step-09-mvp6-to-mvp9-p07.2/docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.2.md`).
+Coordinator integrates after both Wave 2 cells close and are reviewed.
