@@ -1,77 +1,157 @@
 # Current Cell
 
-Cell: P02.2
-Status: done (closes Phase 02)
+Cell: P03.1
+Status: done (Phase 03 R1-R4)
 Owner: Coordinator
 Last updated: 2026-09-03
-Next action: P03.1 (Phase 03 -- see plan.md)
+Next action: P03.2 (Phase 03 R5-R7 -- see plan.md)
 
 ## Goal
 
-Implement Phase 02 R5-R8, closing Phase 02: `invocationKey` exactly-once
-session-scoped consumption, context-grant enforcement at dispatch time,
-binding-cap-vs-aggregate-cap interaction with fresh on-disk counting, and
-driver-authority identity pinning. P02.1 already threaded `invocationKey`
-and `grantedContextRefs`/`contextGrant` end to end but deliberately did not
-enforce them — that enforcement is this cell's job.
+Implement Phase 03 R1-R4, the mechanism half of the phase: persist/expose
+artifact refs through the existing RunResult/evidence path (R1); make
+recheck create a genuinely NEW Assignment against a new artifact revision
+without ever superseding the original Assignment's RunResult/verdict (R2);
+add the `driver-disposition-recorded` event as driver-authored ledger state,
+never a worker result (R3); and make session replay reconstruct
+authorization, assignment provenance, result links, recheck lineage, and
+dispositions without chat history (R4). R5-R7 (the live CLI/no-Work proof,
+the negative-proof battery, and surface-readiness docs) are P03.2's job —
+this cell proves the mechanism with focused tests, not the live end-to-end
+run.
 
 ## Non-Goals
 
-- Do not implement recheck semantics or `driver-disposition-recorded`
-  (Phase 03).
-- Do not touch `src/runner/coordination/cohort-planner.mjs`.
-- Do not fix the three forward gaps recorded in `index.md`'s "Forward
-  Notes For Later Phases" (`cohort-planner.mjs` disambiguation,
-  `resolveDeclaredOperationActor` node-selection, unlocked-replay-vs-
-  concurrent-commit `dangling-ref`) unless this cell's own R5-R8 work
-  cannot honestly proceed without touching one of them — if so, STOP and
-  report rather than silently expanding scope.
-- Do not touch `group-cognition-framework.yaml`, `declared-consult.yaml`,
-  or `independent-research-fan-out-fan-in.yaml`.
+- Do not implement or touch the live CLI/no-Work proof (R5) — no `fgos
+  coordination run` invocation, no request-file helper, no launcher surface.
+  That is P03.2.
+- Do not write the phase's negative-proof battery (R6) as its own deliverable
+  — individual negative tests for THIS cell's own R1-R4 surfaces are
+  expected and required (Tests First below), but the phase's consolidated
+  negative-proof pass is P03.2's.
+- Do not implement R7 (surface-readiness documentation) — no new skill/slash
+  surface, no thin-launcher design doc.
+- Do not touch `core/coordination-protocols/group-cognition-framework.yaml`,
+  `declared-consult.yaml`, or `independent-research-fan-out-fan-in.yaml`.
+- Do not touch `src/runner/dispatch/**`.
 - Do not touch any `docs/architect/agent-coordination/contracts/*.md` file
-  — the accepted text already fully specifies R5-R8 (see Must Read); if you
-  find it's genuinely insufficient, STOP and report rather than extending it.
+  — the accepted text (see Must Read) already fully specifies R1-R4; if you
+  find it genuinely insufficient, STOP and report rather than extending it.
+- Do not fix the shipped-fixture fan-out taskKey collision recorded in
+  `index.md`'s forward notes (the `required`-mode/topology-edge branch) —
+  named there for a reason (out of every current cell's Files list); leave
+  it alone unless truly blocking.
+- Do not touch the four pre-existing session-wide caps' self-heal gap
+  (`maxAssignmentsForSession`/`maxRoundsForSession`/`maxConcurrencyForSession`/
+  `maxRoundsForActor`) — also a recorded forward gap, not this cell's.
 
 ## Must Read
 
-- `plans/260903-0004-step09-group-thinking-mvp1-mvp2/phase-02-driver-authorization-primitive.md` (full R1-R8; you implement R5-R8)
-- `docs/architect/agent-coordination/contracts/coordination-session.md`'s "Driver-Authorized Optional Operations And Recheck" section — already specifies: `invocationKey` session-scoped uniqueness, context-grant enforcement (`grantedContextRefs` entries must resolve within the same `coordinationId`), and driver-authority provenance requirements. This text was Red-Team-hardened in Phase 00 — implement it exactly.
-- `docs/architect/agent-coordination/contracts/flow-definition.md`'s "Activation" section — `maxInvocations` must be "counted fresh from the on-disk `operation-authorized` events for that exact binding (never from in-memory state)".
-- `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md` — read the FULL Gaps section (exactly what R5-R8 inherit) and the Red-Team section (HIGH-1/MEDIUM-1 and how `assertAuthorizationSpendable` works — R5's invocationKey check likely belongs in or beside this same function).
-- `src/runner/coordination/store.mjs`: `authorizeOperation` (~line 749), `assertAuthorizationSpendable` (~line 389), `createSessionAssignment` (the lock-held critical section R7's binding-cap check will live in, following the exact pattern of the existing `opts.maxAssignmentsForSession`/`maxRoundsForSession`/`maxConcurrencyForSession` opt-in checks in the same function).
-- `src/runner/coordination/session-engine.mjs`: `authorizeDeclaredOperation` (~line 953), `dispatchDeclaredOperation` (the R4 gate cell just added), and wherever the dispatched contract's `contextRefs` are actually built (search for where an Assignment's contract inputs/context are assembled) — this is where R6's enforcement must filter/reject context outside `grantedContextRefs`.
-- `src/runner/coordination/schema.mjs`: `EVENT_SPECS['operation-authorized']`, `validateProvenanceRoot` (existing, used for `session-opened`'s `provenanceRoot` — R8 needs to compare an authorization's `authorizedBy.id` against this same session provenance root shape).
-- `test/runner/coordination-driver-authorization.test.mjs` (the 20-test suite P02.1 built — extend this, do not duplicate its scaffolding).
+- `plans/260903-0004-step09-group-thinking-mvp1-mvp2/phase-03-recheck-disposition-live-proof.md`
+  (full R1-R7; you implement R1-R4).
+- `docs/architect/agent-coordination/contracts/coordination-session.md`'s
+  full "Driver-Authorized Optional Operations And Recheck" section —
+  already specifies: the `assignment-created` event's additive
+  `contextGrant`/`invocationKey`/`authorizationId` fields (already
+  implemented, P02.1/P02.2), the `driver-disposition-recorded` event shape
+  (`targetRef`, `disposition`, `rationale`, `evidenceRefs`, `authorizedBy`,
+  `ts` — NOT YET in `schema.mjs`'s `EVENT_SPECS`, confirmed by grep before
+  this cell started), and the full "Recheck Is Not Retry" clause (a
+  recheck's `taskKey` MUST incorporate the new artifact/evidence revision or
+  the authorizing `invocationKey`/`authorizationId`, so it can never
+  taskKey-collide with the original reviewing Assignment — this is the
+  REAL fix for the taskKey-derivation forward gap P02.2 left open; read that
+  gap note in `index.md` before starting).
+- `docs/architect/agent-coordination/contracts/coordination-session.md`'s
+  "Recovery Rule" and "Required Negative Tests" sections — R4's replay
+  reconstruction and this cell's own negative tests are graded against
+  these literally.
+- `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md`
+  — read the WHOLE file: Phase 02 Status (what R1-R8 already built,
+  directly underneath this cell), and every entry in "Forward Notes For
+  Later Phases" (the sibling-cap gap, the P02.2 taskKey-derivation note —
+  THIS is the recheck taskKey work, R8's driver-handoff narrowing, and the
+  shipped-fixture HIGH — know what is already tracked so you do not
+  re-report it as new).
+- `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.2.md`
+  — R5-R8's Proof Matrix and Gaps, for the exact shape `authorizationProvenance`/
+  `assignment-created` already carries (R2's recheck Assignment and R3's
+  disposition event both build on this, not a parallel shape).
+- `src/runner/coordination/schema.mjs`: `EVENT_SPECS` (add
+  `driver-disposition-recorded` following the exact pattern
+  `operation-authorized`/`assignment-created` already use — required vs.
+  accepted fields, `OPTIONAL_STRING_ARRAY_FIELDS` if `evidenceRefs` fits
+  that bucket), `validateAuthorizedBy` (reuse for
+  `driver-disposition-recorded.authorizedBy`, do not invent a second
+  identity check).
+- `src/runner/coordination/store.mjs`: `createSessionAssignment` (R2's
+  recheck Assignment is created through this SAME door, not a new one —
+  read the full function, including this session's own R5-R8 additions:
+  `assertAuthorizationSpendable`, `assertWithinBindingInvocationCap`),
+  `authorizeOperation` (the pattern a new `recordDriverDisposition`-style
+  door should follow: lock-held, fresh-read, driver-identity-pinned, exactly
+  as `authorizeOperation` already is).
+- `src/runner/coordination/session-engine.mjs`: `dispatchDeclaredOperation`
+  (R2: where a recheck's `taskKey` must be derived so it cannot collide with
+  the original reviewing Assignment's default taskKey — read the "Minimal
+  safety guard" comment block this session's own P02.2 work just added,
+  understand exactly why the default taskKey collides today, then fix the
+  ROOT CAUSE for the recheck case specifically, per the contract's explicit
+  instruction to incorporate the new artifact/evidence revision or
+  `invocationKey`/`authorizationId`).
+- `src/runner/coordination/replay.mjs`: `replaySession` (R4: what it already
+  reconstructs — `assignmentRefs`, `authorizations`, `ignoredAuthorizations`
+  — and where `driver-disposition-recorded` events need to be folded into
+  its return shape so a caller can read disposition state without replaying
+  chat history).
+- `test/runner/coordination-driver-authorization.test.mjs` and
+  `test/runner/coordination-store.test.mjs` (this session's own P02.2 work —
+  extend the existing scaffolding for R1/R2/R4, do not duplicate it).
 
 ## May Inspect
 
-- `core/coordination-protocols/standalone-master-coordination-loop.yaml` (read-only)
-- `src/runner/dispatch/execution-contract.mjs` (read-only, for how existing Assignment context/inputs are structured, to enforce R6 without inventing a parallel shape)
+- `src/verbs/coordination/{run,show}.mjs` (read-only — R5's CLI door, next
+  cell's job, but understand its current shape so R1-R4's implementation
+  does not paint P03.2 into a corner).
+- `src/runner/dispatch/assignment.mjs` (read-only, for how RunResult/evidence
+  refs already flow, so R1 threads artifact refs through the EXISTING path
+  rather than inventing a parallel one).
 
 ## Do Not Touch
 
-- `core/coordination-protocols/group-cognition-framework.yaml`, `declared-consult.yaml`, `independent-research-fan-out-fan-in.yaml`
-- `src/runner/coordination/cohort-planner.mjs`
-- `src/runner/coordination/replay.mjs`'s manifest/event read ordering (the LOW-1 forward gap — do not fix incidentally while touching this file for other reasons)
+- `core/coordination-protocols/group-cognition-framework.yaml`,
+  `declared-consult.yaml`, `independent-research-fan-out-fan-in.yaml`
 - `src/runner/dispatch/**`
 - Any `docs/architect/agent-coordination/contracts/*.md`
+- `src/verbs/coordination/**` (P03.2's door to open, not this cell's)
 
 ## Tests First
 
 ```bash
 FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test \
-  'test/runner/flow-definition*.test.mjs' \
-  'test/runner/coordination*.test.mjs'
+  'test/runner/flow-definition*.test.mjs' 'test/runner/coordination*.test.mjs'
 ```
 
-Required coverage (from the phase file's R5-R8 list):
-- reused `invocationKey` rejects (both: same binding twice, AND two different bindings in the same session reusing one `invocationKey` string — the exact loophole P01's own contract Red-Team named);
-- crash/resume does not duplicate an already-authorized/created Assignment (extend P02.1's existing crash-state tests to also cover invocationKey consumption, not just authorizationId consumption);
-- context outside `grantedContextRefs` rejects at dispatch (construct a driver-authorized dispatch whose contract would otherwise read a sibling Assignment's output not named in the grant, and confirm it's rejected — reuse the existing sibling-isolation test pattern already used elsewhere in this codebase for `contextVisibility: isolated-until-fan-in` if one exists);
-- `grantedContextRefs` entry naming a ref from a DIFFERENT `coordinationId` rejects (per the accepted contract's cross-session scope rule);
-- binding `maxInvocations` rejects the N+1 dispatch, counted fresh from on-disk `operation-authorized` events (not an in-memory counter — write a test that would fail if the count were process-local);
-- aggregate bounds still reject even when binding cap allows more (binding caps narrow, never widen);
-- an `authorizedBy.id` that doesn't match the session's own provenance/writer identity is rejected (R8) — check exactly what identity comparison the accepted contract actually specifies before implementing; if it's underspecified for what "matching" means precisely, this may be exactly the kind of gap P02.1's own R8 Gap note anticipated ("`writerId` alone is not enough if the existing API cannot distinguish an arbitrary event writer from the driver") — read that note in P02.1.md's Gaps section before implementing, and if you hit real ambiguity, document your interpretation explicitly in this cell's trace rather than silently picking one.
+Required coverage (from the phase file's Tests First list, scoped to R1-R4):
+
+- recheck creates a new Assignment and leaves the prior verdict/RunResult
+  immutable (both readable afterward, per the contract's explicit
+  requirement that neither is superseded/rewritten/deleted);
+- a recheck's `taskKey` cannot collide with the original reviewing
+  Assignment's `taskKey` — construct the exact shape the contract calls out
+  by name (deriving it the same way as the original binding) and confirm it
+  is REJECTED or structurally impossible, not merely discouraged;
+- `driver-disposition-recorded` is event-log state, appended through a
+  driver-identity-pinned door (reuse the R8 `authorizedBy.id ===
+  manifest.provenanceRoot.writerId` pattern), never writable as a worker
+  RunResult field;
+- replay preserves accepted/rejected disposition and recheck lineage
+  (original Assignment id, recheck Assignment id, which artifact/evidence
+  revision each is against) without needing anything outside
+  `events.jsonl`/`session.json`;
+- artifact refs survive the existing RunResult/evidence path and are
+  readable from a recheck's own grant/context the same way P02.2's R6
+  already enforces for `grantedContextRefs`.
 
 Run the full suite before closing:
 
@@ -79,24 +159,60 @@ Run the full suite before closing:
 FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'
 ```
 
+Known baseline: 7 failures by name (see `index.md`'s Baseline table), plus
+occasionally ONE extra load-induced live-subprocess timing flake (differs
+run to run: `herdr-spawn-adapter`'s live timeout, or
+`dispatch.test.mjs`'s maxBuffer-kill stdout-capture test) — re-run any
+extra failure in isolation before treating it as new; P02.2 confirmed this
+pattern twice.
+
 ## Acceptance
 
-- `invocationKey` is consumed exactly once, checked against the WHOLE session's `operation-authorized` events (not per-binding) — matching the accepted contract's explicit session-scoped uniqueness rule.
-- A dispatched worker for a driver-authorized operation can only read `grantedContextRefs` plus its own always-legal base inputs; anything else is rejected. Every `grantedContextRefs` entry must resolve to a ref owned by the same `coordinationId`.
-- `activation.maxInvocations` is enforced, counted fresh from on-disk `operation-authorized` events for that exact binding; binding caps never widen `aggregateBounds.maxAssignments`/`maxRounds`/`maxConcurrency`, and aggregate caps always win when stricter.
-- Authorization/disposition writer identity is tied to the session's own driver/provenance root, per whatever precise mechanism this cell determines the codebase can actually support (document the exact comparison implemented).
-- Full test suite: no new failure beyond this track's recorded baseline (index.md).
-- This cell's trace records anything genuinely deferred further (there should be little left after this cell — R1-R8 is the entirety of Phase 02).
+- R1: artifact refs are persisted/exposed through the existing
+  RunResult/evidence path; CoordinationSession links refs but is not a
+  second artifact authority (no new artifact storage invented).
+- R2: a recheck materializes as a genuinely new `assignment-created` event
+  and Assignment id; the original Assignment's `result-linked`
+  event/RunResult is never superseded, rewritten, or deleted by the
+  recheck. The recheck's `taskKey` provably cannot collide with the
+  original's.
+- R3: `driver-disposition-recorded` is appended through a
+  driver-identity-pinned, lock-held door, following `authorizeOperation`'s
+  established pattern; `EVENT_SPECS` validates its shape;
+  `authorizedBy.id` is checked against `manifest.provenanceRoot.writerId`
+  exactly as R8 already does.
+- R4: `replaySession` (or a caller reading its return shape) can answer
+  "what was authorized, what was dispatched, what results linked, which
+  recheck followed which original, and what disposition was recorded" from
+  `events.jsonl`/`session.json` alone.
+- Full test suite: no new failure beyond this track's recorded baseline
+  (index.md), accounting for the known load-induced-flake pattern above.
+- This cell's trace records anything genuinely deferred to P03.2 (R5-R7,
+  by design) or further (there should be little else).
 
 ## Bug Taxonomy
 
-- Checking `invocationKey` uniqueness per-binding instead of session-wide (repeats the exact ambiguity P00's own Red-Team found and fixed in the CONTRACT text — do not reintroduce it in the IMPLEMENTATION).
-- Implementing context-grant enforcement as an advisory filter that a caller could bypass rather than an actual gate inside the dispatch path itself.
-- Implementing `maxInvocations` counting via any in-memory/process-local counter (must be fresh from disk every time, matching `aggregateBounds`'s own established pattern in this same file).
-- Implementing R8's identity check in a way that's either (a) so strict it breaks P02.1's existing tests (which use synthetic `authorizedBy.id` values), or (b) so loose it doesn't actually verify anything (accepting any string) — if the existing test fixtures need updating to use a real, checkable driver identity, that's expected and fine; document it.
-- Silently touching `cohort-planner.mjs`, `replay.mjs`'s read ordering, or `resolveDeclaredOperationActor`'s node selection while implementing R5-R8 "since you're already in the file" — those are named forward gaps for a REASON (each has its own blast radius/scope tradeoff already decided); leave them alone unless truly blocking.
+- Deriving a recheck's `taskKey` in a way that still collides with the
+  original binding's default derivation "since it's convenient" — this is
+  the EXACT shape the contract's "Recheck Is Not Retry" clause names by
+  name as forbidden; do not reintroduce it while claiming to fix it.
+- Implementing disposition as a worker-authored RunResult field instead of
+  a driver-authored ledger event — the contract is explicit that
+  disposition is "never a worker-authored result."
+- Letting a recheck rewrite, supersede, or delete the original Assignment's
+  RunResult/verdict, even implicitly (e.g. via `linkResult`'s existing
+  `allowSupersede` retry-supersession path) — recheck is NOT retry;
+  reusing the retry-supersession mechanism for recheck would be exactly the
+  conflation the contract distinguishes.
+- Inventing a second artifact-storage mechanism instead of threading refs
+  through the existing RunResult/evidence path (R1's own stated risk in the
+  phase file: "treating artifact production as repo mutation").
+- Adding `driver-disposition-recorded` without reusing `validateAuthorizedBy`
+  / the R8 identity-pinning pattern — inventing a second, divergent identity
+  check here would repeat this session's own L1 finding (duplicated rather
+  than shared validation logic).
 
 ## Trace Update
 
-Doer writes findings/evidence into `P02.2.md` (Proof Matrix, Commands, Gaps).
-Coordinator writes Review/Red-Team disposition and close verdict.
+Doer writes findings/evidence into `P03.1.md` (Proof Matrix, Commands,
+Gaps). Coordinator writes Review/Red-Team disposition and close verdict.

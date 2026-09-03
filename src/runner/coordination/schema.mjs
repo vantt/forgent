@@ -297,6 +297,17 @@ const EVENT_SPECS = {
       'targetArtifactRef',
     ],
   },
+  // A driver records disposition on a finding/artifact. "Disposition
+  // (accepting or rejecting a finding, or closing a round) is a driver
+  // event, never a worker-authored result" -- so it carries the SAME
+  // `authorizedBy` shape `operation-authorized` does (one shared
+  // `validateAuthorizedBy` below, one shared identity pin in store.mjs), and
+  // no assignmentId/runId of its own: it is ledger state about a ref, not a
+  // field on anybody's result.
+  'driver-disposition-recorded': {
+    required: ['targetRef', 'disposition', 'rationale', 'evidenceRefs', 'authorizedBy'],
+    accepted: ['targetRef', 'disposition', 'rationale', 'evidenceRefs', 'authorizedBy'],
+  },
   'result-linked': { required: ['assignmentId', 'runId'], accepted: ['assignmentId', 'runId'] },
   // Phase 06 R2: retry creates a new Run for the SAME Assignment. Declared
   // BEFORE dispatch (store.mjs's recordRunRetry appends this first, matching
@@ -356,8 +367,9 @@ function isStringArray(value) {
  * here rather than an open label. This module is pure (no session on hand),
  * so it enforces only the shape the contract's field table names; tying that
  * `id` to the session's own `provenanceRoot.writerId` is done where the
- * manifest is actually readable, lock-held in `store.mjs`'s
- * `authorizeOperation`.
+ * manifest is actually readable, lock-held in `store.mjs`'s shared
+ * `assertDriverIdentity` (used by every door that writes a driver-authored
+ * event: `authorizeOperation` and `recordDriverDisposition`).
  */
 function validateAuthorizedBy(authorizedBy, label) {
   if (!isPlainObject(authorizedBy)) fail('validation', `${label} must be a non-null object`);
@@ -399,11 +411,12 @@ export function validateEventPayload(type, payload) {
       validateAuthorizedBy(value, `event "${type}" payload.authorizedBy`);
       continue;
     }
-    if (field === 'grantedContextRefs') {
+    if (field === 'grantedContextRefs' || field === 'evidenceRefs') {
       // An EMPTY array is legal and meaningful: the authorization grants no
-      // extra refs beyond the Assignment's own always-legal base context.
+      // extra refs beyond the Assignment's own always-legal base context,
+      // and a disposition may rest on the target ref alone.
       if (!isStringArray(value)) {
-        fail('validation', `event "${type}" payload.grantedContextRefs must be an array of non-empty strings`);
+        fail('validation', `event "${type}" payload.${field} must be an array of non-empty strings`);
       }
       continue;
     }

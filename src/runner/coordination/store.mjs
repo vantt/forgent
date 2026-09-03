@@ -128,8 +128,25 @@ export function readManifestRaw(manifestPath) {
   return manifest;
 }
 
+// Written via a same-directory temp file + `renameSync`, never a direct
+// `writeFileSync` over the existing manifest: `writeFileSync` is
+// O_TRUNC-then-write, a window in which an UNLOCKED reader (`readManifest`,
+// the first statement of every dispatch; `replaySession`) can observe a
+// truncated/partial file and throw `corrupt-log "not valid JSON"` against a
+// perfectly healthy session, empirically reproduced end-to-end. Every
+// manifest reader in this module already reads without the events lock, by
+// design (Recovery Rule point 5's own split of advisory pre-lock reads from
+// authoritative lock-held ones), so the write side has to be the one that
+// closes this, not the readers. `rename` within one directory is atomic on
+// POSIX -- a concurrent reader always observes either the complete OLD file
+// or the complete NEW one, never a partial write.
+let manifestTmpCounter = 0;
 function writeManifestRaw(manifestPath, manifest) {
-  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+  const dir = path.dirname(manifestPath);
+  manifestTmpCounter += 1;
+  const tmpPath = path.join(dir, `.session.json.tmp-${process.pid}-${Date.now()}-${manifestTmpCounter}`);
+  fs.writeFileSync(tmpPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+  fs.renameSync(tmpPath, manifestPath);
 }
 
 /**
@@ -840,6 +857,25 @@ export function createSessionAssignment(
   });
 }
 
+// Driver authority: `authorizedBy.id` is pinned to this session's OWN driver
+// identity -- `manifest.provenanceRoot.writerId`, the caller identity that
+// opened the session, which is the only durable driver identity a
+// CoordinationSession records. Shape validation alone
+// (`schema.mjs`'s `validateAuthorizedBy`) would accept any non-empty string,
+// so without this a driver-authored event could name an arbitrary driver that
+// has nothing to do with this session. ONE implementation, shared by every
+// door that writes a driver-authored event (`authorizeOperation`,
+// `recordDriverDisposition`), so the two can never drift apart. Always called
+// on a manifest read INSIDE the caller's held events lock.
+function assertDriverIdentity(manifest, authorizedBy, { coordinationId, label, subject }) {
+  if (authorizedBy?.id !== manifest.provenanceRoot.writerId) {
+    throw new CoordinationError(
+      'validation',
+      `${label}: authorizedBy.id "${authorizedBy?.id}" is not the driver identity of session "${coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- ${subject} may only be written under the session's own driver/provenance-root identity`,
+    );
+  }
+}
+
 /**
  * Append one `operation-authorized` event for a `driver-authorized` node-
  * operation binding.
@@ -904,22 +940,14 @@ export function authorizeOperation(
       );
     }
 
-    // Driver authority: `authorizedBy.id` is pinned to this session's OWN
-    // driver identity -- `manifest.provenanceRoot.writerId`, the caller
-    // identity that opened the session, which is the only durable driver
-    // identity a CoordinationSession records. Shape validation alone
-    // (`validateAuthorizedBy`) would accept any non-empty string, so without
-    // this an authorization could name an arbitrary driver that has nothing
-    // to do with this session. Enforced HERE, in the one door every
-    // authorization goes through (the definition-aware
-    // `authorizeDeclaredOperation` delegates to it), so there is no
-    // lower-level door that skips it.
-    if (authorizedBy?.id !== manifest.provenanceRoot.writerId) {
-      throw new CoordinationError(
-        'validation',
-        `authorizeOperation: authorizedBy.id "${authorizedBy?.id}" is not the driver identity of session "${coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- an authorization may only be written under the session's own driver/provenance-root identity`,
-      );
-    }
+    // Enforced HERE, in the one door every authorization goes through (the
+    // definition-aware `authorizeDeclaredOperation` delegates to it), so
+    // there is no lower-level door that skips it.
+    assertDriverIdentity(manifest, authorizedBy, {
+      coordinationId,
+      label: 'authorizeOperation',
+      subject: 'an authorization',
+    });
 
     const events = readEvents(eventsPath);
     const alreadyAuthorized = events.some(
@@ -964,6 +992,73 @@ export function authorizeOperation(
     }
 
     appendEventLocked(eventsPath, { type: 'operation-authorized', payload }, sessionDir);
+    return Object.freeze({ ...payload, appended: true });
+  });
+}
+
+/**
+ * Append one `driver-disposition-recorded` event: the driver's own
+ * accept/reject/close-a-round decision on a finding or artifact ref.
+ *
+ * Deliberately the SAME door shape as `authorizeOperation` above -- payload
+ * shape validated first, then manifest read + active-status check + driver-
+ * identity pin + append, all inside ONE `withEventsLock` critical section on
+ * the session's own `events.lock`. That is what makes disposition ledger
+ * state a driver writes rather than something a worker could author: there is
+ * no RunResult field, no contract field, and no worker-reachable path that
+ * produces this event, and `authorizedBy.id` must be the identity that opened
+ * the session (`assertDriverIdentity`, shared with `authorizeOperation`).
+ *
+ * Idempotent on a byte-identical payload (crash-resume self-heal, mirroring
+ * `authorizeOperation`'s `authorizationId` return and
+ * `recordActorReplacement`'s pair check): a repeated call recording exactly
+ * the same decision, on the same ref, with the same rationale and evidence
+ * appends nothing. A genuinely different decision -- a later round's
+ * `accepted` after an earlier `rejected`, a different rationale, different
+ * evidence -- is a new record and always appends, so the full disposition
+ * history stays readable in order.
+ *
+ * Session-status: refused once the session leaves `active`, on the same
+ * footing as `authorizeOperation`/`recordRunRetry` -- a closed session's
+ * ledger is not reopened.
+ */
+export function recordDriverDisposition(coordinationId, { targetRef, disposition, rationale, evidenceRefs, authorizedBy }, opts = {}) {
+  const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const payload = { targetRef, disposition, rationale, evidenceRefs, authorizedBy };
+  validateEventPayload('driver-disposition-recorded', payload);
+
+  return withEventsLock(eventsPath, () => {
+    const manifest = readManifestRaw(manifestPath);
+    assertSchemaVersionCurrent(manifest, manifestPath);
+    if (manifest.status !== 'active') {
+      throw new CoordinationError(
+        'validation',
+        `recordDriverDisposition: session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot record a disposition once the session has closed`,
+      );
+    }
+    assertDriverIdentity(manifest, authorizedBy, {
+      coordinationId,
+      label: 'recordDriverDisposition',
+      subject: 'a disposition',
+    });
+
+    // Idempotency compares a CANONICAL shape, not the raw payload:
+    // `JSON.stringify` is key-insertion-order sensitive, and `authorizedBy`
+    // is a caller-supplied nested object stored verbatim -- two calls
+    // describing the exact same decision with `authorizedBy`'s two fields
+    // in a different order would otherwise compare unequal and silently
+    // append twice -- empirically reproduced. Every other field is
+    // a flat, caller-owned value already in fixed key order from the
+    // destructure above, so only `authorizedBy` needs normalizing.
+    const canonicalize = (value) =>
+      JSON.stringify({ ...value, authorizedBy: { type: value.authorizedBy?.type, id: value.authorizedBy?.id } });
+    const serialized = canonicalize(payload);
+    const alreadyRecorded = readEvents(eventsPath).some(
+      (event) => event.type === 'driver-disposition-recorded' && canonicalize(event.payload) === serialized,
+    );
+    if (alreadyRecorded) return Object.freeze({ ...payload, appended: false });
+
+    appendEventLocked(eventsPath, { type: 'driver-disposition-recorded', payload }, sessionDir);
     return Object.freeze({ ...payload, appended: true });
   });
 }

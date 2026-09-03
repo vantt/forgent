@@ -539,15 +539,98 @@ test('R4: one operation template bound to TWO actors at ONE node -- an authoriza
   assert.deepEqual(readManifest('coord_da_one_op_two_actors', opts).assignmentRefs, [branchA.assignment.assignmentId]);
 });
 
-test('the silent-discard guard also refuses a FAN-OUT taskKey collision -- one operation, two actors, no explicit taskKey', async () => {
-  // Same fixture shape as the test above, but with BOTH dispatches omitting
-  // an explicit taskKey, so both derive the identical default
-  // `declared:independent-research` -- a DIFFERENT binding (targetActorId)
-  // than the guard's original same-binding shape, previously invisible to
-  // it: `resolveBindingAuthorization` never matches researcher-b's OWN,
+test('the silent-discard guard also refuses a FAN-OUT taskKey collision -- one operation, two actors, one shared taskKey', async () => {
+  // Same fixture shape as the test above, with BOTH dispatches passing the
+  // IDENTICAL taskKey -- a DIFFERENT binding (targetActorId) colliding on
+  // one claim, rather than the guard's original same-binding shape:
+  // `resolveBindingAuthorization` never matches researcher-b's OWN,
   // still-unconsumed authorization to researcher-a's already-registered
-  // Assignment, so the old guard's `consumedByAssignmentId ===
-  // resumedAssignmentId` condition was never true and never fired.
+  // Assignment, so a guard keyed only on `consumedByAssignmentId ===
+  // resumedAssignmentId` would never fire and researcher-b's caller would be
+  // handed researcher-a's Assignment and RunResult as its own.
+  //
+  // A caller-supplied taskKey is the way this collision is still reachable:
+  // the default derivation now carries each invocation's own
+  // `authorizationId` (see the companion test immediately below), so two
+  // bindings can no longer collide on it by omission.
+  const tempDir = mkTempDir();
+  writeDefinition(tempDir, 'one-operation-two-actors-shared-taskkey.json', {
+    roles: ['researcher'],
+    actors: [
+      { id: 'researcher-a', role: 'researcher' },
+      { id: 'researcher-b', role: 'researcher' },
+    ],
+    operations: [{ id: 'independent-research', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } }],
+    graph: {
+      entry: 'phase-fan-out',
+      nodes: [
+        {
+          id: 'phase-fan-out',
+          operations: [
+            { ref: 'independent-research', actor: 'researcher-a', activation: { mode: 'driver-authorized' } },
+            { ref: 'independent-research', actor: 'researcher-b', activation: { mode: 'driver-authorized' } },
+          ],
+          transitions: [],
+        },
+      ],
+    },
+  });
+
+  const opts = { cwd: tempDir, repoRoot: tempDir };
+  const runnerConfig = fakeExecutor(tempDir);
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_da_fanout_shared_taskkey', objective: 'Fan-out, one shared taskKey.', writerId: 'coordinator-1' },
+    opts,
+  );
+
+  authorizeDeclaredOperation(
+    'coord_da_fanout_shared_taskkey',
+    authorization({ operationId: 'independent-research', targetActorId: 'researcher-a', authorizationId: 'auth_1', invocationKey: 'research:branch-a' }),
+    opts,
+  );
+  authorizeDeclaredOperation(
+    'coord_da_fanout_shared_taskkey',
+    authorization({ operationId: 'independent-research', targetActorId: 'researcher-b', authorizationId: 'auth_2', invocationKey: 'research:branch-b' }),
+    opts,
+  );
+
+  const dispatchSharedTaskKey = (targetActorId) =>
+    dispatchDeclaredOperation(
+      'coord_da_fanout_shared_taskkey',
+      {
+        operationId: 'independent-research',
+        targetActorId,
+        taskKey: 'research-shared',
+        objective: `Research, actor ${targetActorId}.`,
+        expectedOutputs: ['agent-result.json (status, summary)'],
+        writerId: 'coordinator-1',
+      },
+      { ...opts, runnerConfig },
+    );
+
+  const branchA = await dispatchSharedTaskKey('researcher-a');
+  assert.equal(branchA.resumed, false);
+
+  await assert.rejects(
+    dispatchSharedTaskKey('researcher-b'),
+    (err) =>
+      err instanceof CoordinationError &&
+      /not the one that Assignment consumed/.test(err.message) &&
+      new RegExp(`Assignment "${branchA.assignment.assignmentId}"`).test(err.message),
+    "researcher-b's own authorization must not be silently discarded in favor of researcher-a's already-registered Assignment",
+  );
+
+  // researcher-b's authorization is untouched -- still unconsumed, still
+  // available to a caller that supplies a distinct taskKey.
+  assert.deepEqual(readManifest('coord_da_fanout_shared_taskkey', opts).assignmentRefs, [branchA.assignment.assignmentId]);
+  const events = readSessionEvents('coord_da_fanout_shared_taskkey', opts);
+  assert.equal(events.filter((e) => e.type === 'assignment-created').length, 1);
+});
+
+test('a FAN-OUT dispatch with no explicit taskKey no longer collides at all -- each branch claims its own authorization-derived key', async () => {
+  // The companion to the test above: with the taskKey left to the default
+  // derivation, each actor's invocation carries its OWN authorizationId, so
+  // the two bindings claim two different keys and both branches really run.
   const tempDir = mkTempDir();
   writeDefinition(tempDir, 'one-operation-two-actors-default-taskkey.json', {
     roles: ['researcher'],
@@ -578,16 +661,13 @@ test('the silent-discard guard also refuses a FAN-OUT taskKey collision -- one o
     opts,
   );
 
-  authorizeDeclaredOperation(
-    'coord_da_fanout_default_taskkey',
-    authorization({ operationId: 'independent-research', targetActorId: 'researcher-a', authorizationId: 'auth_1', invocationKey: 'research:branch-a' }),
-    opts,
-  );
-  authorizeDeclaredOperation(
-    'coord_da_fanout_default_taskkey',
-    authorization({ operationId: 'independent-research', targetActorId: 'researcher-b', authorizationId: 'auth_2', invocationKey: 'research:branch-b' }),
-    opts,
-  );
+  for (const [actor, suffix] of [['researcher-a', 'a'], ['researcher-b', 'b']]) {
+    authorizeDeclaredOperation(
+      'coord_da_fanout_default_taskkey',
+      authorization({ operationId: 'independent-research', targetActorId: actor, authorizationId: `auth_${suffix}`, invocationKey: `research:branch-${suffix}` }),
+      opts,
+    );
+  }
 
   const dispatchNoTaskKey = (targetActorId) =>
     dispatchDeclaredOperation(
@@ -603,22 +683,16 @@ test('the silent-discard guard also refuses a FAN-OUT taskKey collision -- one o
     );
 
   const branchA = await dispatchNoTaskKey('researcher-a');
+  const branchB = await dispatchNoTaskKey('researcher-b');
   assert.equal(branchA.resumed, false);
+  assert.equal(branchB.resumed, false);
+  assert.notEqual(branchB.assignment.assignmentId, branchA.assignment.assignmentId);
 
-  await assert.rejects(
-    dispatchNoTaskKey('researcher-b'),
-    (err) =>
-      err instanceof CoordinationError &&
-      /not the one that Assignment consumed/.test(err.message) &&
-      new RegExp(`Assignment "${branchA.assignment.assignmentId}"`).test(err.message),
-    "researcher-b's own authorization must not be silently discarded in favor of researcher-a's already-registered Assignment",
-  );
-
-  // researcher-b's authorization is untouched -- still unconsumed, still
-  // available to a caller that supplies a distinct taskKey.
-  assert.deepEqual(readManifest('coord_da_fanout_default_taskkey', opts).assignmentRefs, [branchA.assignment.assignmentId]);
   const events = readSessionEvents('coord_da_fanout_default_taskkey', opts);
-  assert.equal(events.filter((e) => e.type === 'assignment-created').length, 1);
+  const created = events.filter((e) => e.type === 'assignment-created');
+  assert.equal(created.length, 2);
+  assert.deepEqual(created.map((e) => e.payload.actorId), ['researcher-a', 'researcher-b']);
+  assert.deepEqual(created.map((e) => e.payload.authorizationId), ['auth_a', 'auth_b']);
 });
 
 test('the silent-discard guard does not block a genuine crash-recovery resume of its OWN unregistered claim', async () => {
@@ -705,15 +779,17 @@ test('R4: a second authorization lets a genuinely new dispatch through', async (
   assert.equal(readManifest('coord_da_second_auth', ctx.opts).assignmentRefs.length, 2);
 });
 
-test('a fresh unconsumed authorization is refused rather than silently discarded by a same-DEFAULT-taskKey resume', async () => {
-  // This fixture declares no `topology`, so `reviewer-recheck` dispatches
-  // through the no-incomingEdge branch, whose default taskKey
-  // (`declared:${operationId}`) carries no per-invocation discriminator --
-  // exactly the shape where a second real authorization would otherwise be
-  // silently ignored by a taskKey-collision resume.
+test('a fresh unconsumed authorization is refused rather than silently discarded by a same-taskKey resume', async () => {
+  // A caller-supplied taskKey reused across two invocations of ONE binding:
+  // the second, genuinely authorized invocation would otherwise be silently
+  // ignored by a taskKey-collision resume that hands back the first
+  // invocation's Assignment and discards the real authorization. (Left to
+  // the default derivation this can no longer happen -- each invocation's
+  // key carries its own authorizationId; a caller-supplied key is what still
+  // reaches this shape.)
   const ctx = setup('coord_da_silent_resume_guard');
   authorizeDeclaredOperation('coord_da_silent_resume_guard', authorization(), ctx.opts);
-  const first = await dispatch('coord_da_silent_resume_guard', ctx);
+  const first = await dispatch('coord_da_silent_resume_guard', ctx, { taskKey: 'recheck-shared' });
   assert.equal(first.resumed, false);
 
   authorizeDeclaredOperation(
@@ -723,7 +799,7 @@ test('a fresh unconsumed authorization is refused rather than silently discarded
   );
 
   await assert.rejects(
-    dispatch('coord_da_silent_resume_guard', ctx),
+    dispatch('coord_da_silent_resume_guard', ctx, { taskKey: 'recheck-shared' }),
     (err) => err instanceof CoordinationError && /fresher unconsumed authorization "auth_recheck_2"/.test(err.message),
   );
 

@@ -870,8 +870,8 @@ function resolveDeclaredOperationActor(definition, operationId, targetActorId) {
  * never spends a second authorization to redo work the first one already
  * paid for.
  */
-function resolveBindingAuthorization(authorizations, { nodeId, operationId, targetActorId, resumedAssignmentId }) {
-  const forThisBinding = authorizations.filter(
+function bindingAuthorizations(authorizations, { nodeId, operationId, targetActorId }) {
+  return authorizations.filter(
     // Do NOT drop `record.nodeId === nodeId` as "redundant" on the strength
     // of a mutation test. Through the engine doors it can never discriminate
     // on its own -- `authorizeDeclaredOperation` writes `node.id` from the
@@ -884,10 +884,55 @@ function resolveBindingAuthorization(authorizations, { nodeId, operationId, targ
     // and this comparison is what refuses the dispatch.
     (record) => record.nodeId === nodeId && record.operationId === operationId && record.targetActorId === targetActorId,
   );
+}
+
+function resolveBindingAuthorization(authorizations, { nodeId, operationId, targetActorId, resumedAssignmentId }) {
+  const forThisBinding = bindingAuthorizations(authorizations, { nodeId, operationId, targetActorId });
   const resumeMatch = resumedAssignmentId
     ? forThisBinding.find((record) => record.consumedByAssignmentId === resumedAssignmentId)
     : undefined;
   return resumeMatch ?? forThisBinding.find((record) => record.consumedByAssignmentId === null);
+}
+
+/**
+ * "A recheck's idempotent-claim key (`taskKey`) MUST incorporate the new
+ * artifact/evidence revision or the authorizing `invocationKey`/
+ * `authorizationId`, so it can never collide with (be claim-equal to) the
+ * original reviewing Assignment's own `taskKey`" (coordination-session.md,
+ * "Recheck Is Not Retry"). This picks the authorization whose id becomes that
+ * discriminator, BEFORE any taskKey exists to peek a claim record with:
+ *
+ * - an UNCONSUMED authorization for this binding is the invocation being
+ *   spent, so its id keys a genuinely new Assignment -- structurally unable
+ *   to be claim-equal to any earlier invocation's, or to the original
+ *   binding's `nodeId`+`operationId`+`actorId`-derived key;
+ * - with none left, the sole ALREADY-CONSUMED one (when there is exactly
+ *   one) keeps a repeat call landing on the key its own invocation first
+ *   claimed, so a genuine idempotent/crash resume still resolves to its own
+ *   Assignment rather than minting a second one;
+ * - two or more consumed and none pending is AMBIGUOUS -- a keyless caller
+ *   cannot mean any specific one of them, and guessing would silently
+ *   substitute a different invocation's Assignment/RunResult for the
+ *   caller's own. Returns `null` in this case too.
+ *
+ * Returns `null` when the binding has no authorization at all -- the dispatch
+ * gate below is what refuses that, with its own message.
+ */
+function resolveTaskKeyAuthorization(authorizations, binding) {
+  const forThisBinding = bindingAuthorizations(authorizations, binding);
+  const unconsumed = forThisBinding.find((record) => record.consumedByAssignmentId === null);
+  if (unconsumed) return unconsumed;
+  // No fresh authorization pending: this is either a genuine idempotent
+  // resume (exactly one prior invocation was ever consumed at this binding
+  // -- the ONLY shape resume actually needs) or an AMBIGUOUS repeat (two or
+  // more invocations already consumed, none pending). Guessing "most
+  // recent" in the ambiguous case would silently hand a keyless caller a
+  // DIFFERENT invocation's Assignment/RunResult under its own key -- refuse
+  // by returning null instead (the caller falls through to the unsuffixed
+  // default taskKey, which no claim yet owns, and the dispatch gate's own
+  // existing "no unconsumed authorization" refusal fires cleanly).
+  const consumed = forThisBinding.filter((record) => record.consumedByAssignmentId !== null);
+  return consumed.length === 1 ? consumed[0] : null;
 }
 
 /**
@@ -1045,6 +1090,18 @@ export function authorizeDeclaredOperation(
     fgosDir,
     label: `authorizeDeclaredOperation: grantedContextRefs`,
   });
+  // The artifact revision this authorization names is a session-linked ref
+  // too, checked by the same rule as the grant (the dispatch gate re-checks
+  // it, for the same reason it re-checks the grant: the raw store door has no
+  // session awareness of its own).
+  if (targetArtifactRef !== undefined) {
+    assertRefsOwnedBySession([targetArtifactRef], {
+      coordinationId,
+      assignmentRefs: manifest.assignmentRefs,
+      fgosDir,
+      label: `authorizeDeclaredOperation: targetArtifactRef`,
+    });
+  }
 
   return authorizeOperation(
     coordinationId,
@@ -1357,6 +1414,31 @@ export async function dispatchDeclaredOperation(
   const topology = definition.spec.profile.topology;
   const incomingEdge = topology?.edges?.find((edge) => edge.to === actorId);
 
+  // One reconstruction per dispatch, shared by the edge validation below and
+  // the driver-authorization gate further down (nothing writes in between).
+  let replayed = null;
+  const replayOnce = () => (replayed ??= replaySession(coordinationId, opts));
+
+  const isDriverAuthorized = activationModeOf(binding) === 'driver-authorized';
+
+  // Recheck-vs-retry: a driver-authorized invocation's default claim key
+  // carries the id of the authorization it spends, so a recheck reaches a NEW
+  // Assignment instead of resuming the original binding's one. Derived here,
+  // before the key is built, because the key is what a claim record is looked
+  // up by (see `resolveTaskKeyAuthorization`). A caller-supplied `taskKey` is
+  // left exactly as given -- the caller owns its own claim identity, and the
+  // gate below still refuses a key that would resume somebody else's
+  // Assignment.
+  let authorizationKeySuffix = '';
+  if (isDriverAuthorized && explicitTaskKey === undefined) {
+    const keyAuthorization = resolveTaskKeyAuthorization(replayOnce().authorizations, {
+      nodeId: node.id,
+      operationId,
+      targetActorId: actorId,
+    });
+    if (keyAuthorization) authorizationKeySuffix = `:auth:${keyAuthorization.authorizationId}`;
+  }
+
   let resolvedContextRefs;
   let resolvedIntent = null;
   let taskKey;
@@ -1368,7 +1450,7 @@ export async function dispatchDeclaredOperation(
         `dispatchDeclaredOperation: operation "${operationId}" is reached by a declared topology edge from "${incomingEdge.from}" -- fromAssignmentId is required`,
       );
     }
-    const { assignmentRefs, events } = replaySession(coordinationId, opts);
+    const { assignmentRefs, events } = replayOnce();
     if (!assignmentRefs.includes(fromAssignmentId)) {
       throw new CoordinationError(
         'validation',
@@ -1393,7 +1475,7 @@ export async function dispatchDeclaredOperation(
       );
     }
 
-    taskKey = explicitTaskKey ?? `declared:${operationId}:round-${round}`;
+    taskKey = explicitTaskKey ?? `declared:${operationId}:round-${round}${authorizationKeySuffix}`;
     const { sessionDir } = resolveSessionPaths(coordinationId, opts);
     const taskClaimPath = path.join(sessionDir, 'tasks', `${hashTaskKey(taskKey)}.json`);
     const isResumeOfThisRound = fs.existsSync(taskClaimPath);
@@ -1417,7 +1499,7 @@ export async function dispatchDeclaredOperation(
     // reach this branch at all.
     resolvedContextRefs = [fromAssignmentId];
   } else {
-    taskKey = explicitTaskKey ?? `declared:${operationId}`;
+    taskKey = explicitTaskKey ?? `declared:${operationId}${authorizationKeySuffix}`;
     resolvedContextRefs = Array.isArray(contextRefs) ? contextRefs : [];
   }
 
@@ -1434,9 +1516,9 @@ export async function dispatchDeclaredOperation(
   // pre-lock-advisory / lock-held-authoritative split the round and
   // aggregate-bounds caps already use.
   let authorizationProvenance;
-  if (activationModeOf(binding) === 'driver-authorized') {
+  if (isDriverAuthorized) {
     const { sessionDir } = resolveSessionPaths(coordinationId, opts);
-    const { authorizations, ignoredAuthorizations } = replaySession(coordinationId, opts);
+    const { authorizations, ignoredAuthorizations } = replayOnce();
     const resumedAssignmentId = peekClaimedAssignmentId(sessionDir, taskKey);
     const authorization = resolveBindingAuthorization(authorizations, {
       nodeId: node.id,
@@ -1530,6 +1612,21 @@ export async function dispatchDeclaredOperation(
       fgosDir,
       label: `dispatchDeclaredOperation: authorization "${authorization.authorizationId}" grantedContextRefs`,
     });
+
+    //     `targetArtifactRef` -- the artifact revision this invocation is
+    //     revising or rechecking -- is a ref the session LINKS, on the same
+    //     footing as the granted refs, so it is scope-checked identically.
+    //     A session that could name another session's artifact revision as
+    //     what it is rechecking would be recording cross-session lineage the
+    //     grant clause exists to keep out.
+    if (authorization.targetArtifactRef !== undefined) {
+      assertRefsOwnedBySession([authorization.targetArtifactRef], {
+        coordinationId,
+        assignmentRefs: manifest.assignmentRefs,
+        fgosDir,
+        label: `dispatchDeclaredOperation: authorization "${authorization.authorizationId}" targetArtifactRef`,
+      });
+    }
 
     // (b) The dispatched worker may read ONLY the granted refs plus the base
     //     context that is always legal for this Assignment. The single base

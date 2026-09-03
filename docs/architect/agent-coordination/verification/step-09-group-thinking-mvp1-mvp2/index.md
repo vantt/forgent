@@ -62,15 +62,17 @@ This list may only shrink; any new failure beyond it blocks cell close.
 | 00 | R1-R4 | done |
 | 01 | R1-R6 | done |
 | 02 | R1-R8 | done |
-| 03 | R1-R7 | missing |
+| 03 | R1-R7 | in-progress |
 
 ## Active Cell
 
-None — P02.2 closed. Phase 03 not yet started.
+None — P03.1 closed. P03.2 not yet started.
 
 ## Next Action
 
-Prepare P03.1 (Phase 03: recheck, disposition, and live standalone proof).
+Prepare P03.2 (Phase 03 R5-R7: live CLI/no-Work proof, negative-proof
+battery, surface-readiness docs — closes Phase 03 and this plan's
+MVP1/MVP2 scope).
 
 ## Cell Log
 
@@ -79,7 +81,8 @@ Prepare P03.1 (Phase 03: recheck, disposition, and live standalone proof).
 | P00.1 | Phase 00 R1, R2, R3, R4 (closes Phase 00) | done | `e579fc6a` |
 | P01.1 | Phase 01 R1, R2, R3, R4, R5, R6 (closes Phase 01) | done | `bec5e7f8` |
 | P02.1 | Phase 02 R1, R2, R3, R4 | done | `82610e7f` |
-| P02.2 | Phase 02 R5, R6, R7, R8 (closes Phase 02) | done | (pending commit) |
+| P02.2 | Phase 02 R5, R6, R7, R8 (closes Phase 02) | done | `bc65df22` |
+| P03.1 | Phase 03 R1, R2, R3, R4 | done | (pending commit) |
 
 ## Phase 00 Status
 
@@ -247,6 +250,60 @@ below), and a pre-existing HIGH-severity defect live in a shipped fixture
 Full suite (final): 5116 tests, 5104 pass, 7 fail — exactly this track's
 recorded baseline by name; no new failure. Focused glob 350/350 pass.
 
+## Phase 03 Status (in progress)
+
+**P03.1 CLOSED (Phase 03 R1-R4; R5-R7 open as P03.2).** Artifact refs
+linked (not re-stored) through the existing RunResult/evidence path;
+recheck as a genuinely new Assignment via a ROOT-CAUSE fix to the default
+`taskKey` derivation (`declared:<op>[:round-N]:auth:<authorizationId>`,
+both taskKey branches), closing the gap P02.2 deliberately deferred;
+`driver-disposition-recorded` as a new driver-identity-pinned ledger door
+sharing R8's identity check (not a second copy); `replaySession`
+reconstructing `assignments`/`results`/`dispositions` alongside the
+pre-existing `authorizations`.
+
+Reviewer round (opus): APPROVE WITH CONCERNS, 3 MEDIUM + 6 LOW. MEDIUM-1
+(a keyless repeat with ≥2 consumed authorizations silently guessed the
+most-recent one — a real regression this cell introduced, converting a
+loud P02.2 refusal into a silent wrong-value substitution) and MEDIUM-2
+(the topology-edge taskKey branch was entirely untested and mutation-silent
+— third recurrence of "Proof Matrix claims coverage the tests don't have"
+this phase alone) both fixed and confirmed. MEDIUM-3 (R4's "recheck
+lineage" claim exceeded what replay actually reconstructs) resolved by
+correcting the claim rather than extending the contract — ruled correctly
+out of this cell's authority to add a predecessor-ref field unilaterally.
+All five of the Doer's flagged interpretation items ruled on and adopted.
+Recheck: APPROVE, both MEDIUMs independently re-verified and
+mutation-proven; two cosmetic LOWs from the fix round itself (an audit-label
+slip, a stale JSDoc) folded in.
+
+Red-Team round (opus): **APPROVE WITH CONCERNS, 2 MEDIUM**, no BLOCK —
+~330 real multi-process dispatches, 40 genuine `SIGKILL`s (16 confirmed
+crash states), and a pre-cell (HEAD) comparison tree to separate new
+defects from pre-existing ones by evidence. MEDIUM-1 (this cell's own
+code): `recordDriverDisposition`'s idempotency was JSON key-order sensitive
+on the caller-supplied `authorizedBy`, silently duplicating a disposition
+record. MEDIUM-2 (pre-existing, fixed in-cell as a direct P03.2
+prerequisite): `session.json` was written non-atomically, letting an
+unlocked reader observe a torn file and throw `corrupt-log` against a
+healthy session — reproduced up to ~2.45M read attempts, one realistic-rate
+trial genuinely aborting a legitimate dispatch. Both fixed (canonicalized
+idempotency compare; atomic temp-file+rename write, mirroring the pattern
+`src/state/events.mjs` already uses). Red-Team's three handed-over
+concurrency attack targets (a concurrent MEDIUM-1 variant, pre-lock
+snapshot staleness, the residual unsuffixed-key edge) and the newly-in-scope
+`edge.maxRounds` target were all attacked with real multi-process trials
+and could NOT be broken as new defects — one genuine timing-dependent race
+was found (Target 2) but proven identical on pre-cell HEAD, not introduced
+by this cell. Recheck: APPROVE, both MEDIUMs independently re-verified
+(MEDIUM-2: 0 corrupt-log errors in 7.27M reads across 27 real dispatches
+and 25 genuine SIGKILLs, vs. 7 on the unfixed control); two more cosmetic
+LOWs from the fix round (an unguarded property access reintroducing a
+TypeError class, two more audit-label slips) fixed.
+
+Full suite (final): 5134 tests, 5122 pass, 7 fail — exactly this track's
+recorded baseline; no new failure. Focused glob 368/368 pass.
+
 ## Forward Notes For Later Phases
 
 **cohort-planner.mjs actor disambiguation (from Phase 01's Red-Team).**
@@ -285,21 +342,32 @@ future phase relies on this pattern being reachable, thread `nodeId` into
 ambiguous shape at `validateGraph` time instead. Full detail: `P02.1.md`'s
 Review MED-2 and Gaps section.
 
-**Unlocked-replay-vs-concurrent-commit spurious `dangling-ref` (from P02.1's
-Red-Team LOW-1, pre-existing, not this cell's defect).** `replaySession`
-reads `session.json` before `events.jsonl` (`replay.mjs`) while
-`completeAssignmentRegistration` appends the event before writing the
-manifest — an unlocked reader straddling a concurrent commit can throw a
-spurious `dangling-ref` (measured 4-12 per 3-second window against 2
-concurrent dispatchers in 18/20 trials; final replay always clean). Predates
-this track entirely; P02.1's R4 gate just adds one more unlocked
-`replaySession` consumer onto an already-existing pattern, so a legal
-driver-authorized dispatch can now also transiently abort for this
-pre-existing reason under concurrency. Not fixed in P02.1 (out of scope —
-would mean re-ordering a pre-existing write/read sequence this track didn't
-introduce). Worth a real fix (likely: read events before manifest, or hold
-a shared/read lock) before Phase 03's live proof, which will run real
-concurrent dispatches. Full detail: `P02.1.md`'s Red-Team LOW-1.
+**`session.json` reads/writes need the same care `events.jsonl` already
+gets — two distinct mechanisms, one now fixed, one still open.**
+
+1. *Non-atomic write, unlocked reader sees a torn file (from P03.1's
+   Red-Team MEDIUM-2) — RESOLVED.* `writeManifestRaw` (`store.mjs`) used a
+   plain `writeFileSync` (O_TRUNC then write) while every reader
+   (`readManifest`, the first statement of every dispatch; `replaySession`)
+   reads outside the events lock by design. A concurrent reader could
+   observe a truncated file mid-write and throw `corrupt-log "not valid
+   JSON"` against a perfectly healthy session — reproduced end-to-end (up
+   to ~2.45M read attempts across three probe shapes; one realistic-rate
+   trial genuinely aborted a legitimate dispatch). Fixed in P03.1: writes
+   now go to a same-directory temp file, then `fs.renameSync` — atomic on
+   POSIX, so a reader always sees either the complete old file or the
+   complete new one.
+2. *Unlocked-replay-vs-concurrent-commit spurious `dangling-ref` (from
+   P02.1's Red-Team LOW-1) — STILL OPEN, a different mechanism.*
+   `replaySession` reads `session.json` before `events.jsonl` while
+   `completeAssignmentRegistration` appends the event before writing the
+   manifest — an unlocked reader straddling a concurrent commit can still
+   throw a spurious `dangling-ref` even with MEDIUM-2's fix (measured 4-12
+   per 3-second window against 2 concurrent dispatchers in 18/20 trials;
+   final replay always clean). Predates this track entirely. Not fixed —
+   would mean re-ordering a pre-existing read sequence, or holding a
+   shared/read lock, neither owned by any cell so far. Full detail:
+   `P02.1.md`'s Red-Team LOW-1.
 
 **Pre-existing session-wide caps share the self-heal-branch gap MED-2 fixed
 for the binding cap alone (from P02.2's Review; UPGRADED by Red-Team with
@@ -340,18 +408,59 @@ thread `targetActorId` into the topology-edge taskKey derivation too (same
 shape as the driver-authorized fix). Independent of Phase 03's recheck-
 semantics work — does not need to wait for it.
 
-**Default `taskKey` derivation makes a second driver-authorized invocation
-at one binding unreachable without a caller-supplied `taskKey` (from
-P02.2's Review, MED-3).** `dispatchDeclaredOperation`'s no-incoming-edge
-default (`declared:${operationId}`) carries no per-invocation
-discriminator, so a second authorized invocation resolves to the SAME
-Assignment via taskKey collision. P02.2 added a guard that refuses rather
-than silently resuming when a fresher unconsumed authorization is being
-discarded, but did not change taskKey derivation (that is recheck
-semantics, Non-Goals). Phase 03 should derive the default `taskKey` from
-`invocationKey`/`authorizationId` so a second invocation reaches a NEW
-Assignment on its own, rather than requiring a caller-supplied `taskKey` or
-hitting P02.2's refusal guard.
+**RESOLVED by P03.1.** Default `taskKey` derivation for a driver-authorized
+binding now carries `:auth:<authorizationId>` on both taskKey branches
+(no-incoming-edge and the round-scoped topology-edge one), so a second
+authorized invocation reaches a genuinely NEW Assignment instead of
+colliding — the fix this note originally asked for. Superseded by two new
+items below from P03.1's own Review (a real regression the fix introduced,
+now fixed, plus a P03.2 precondition it surfaced).
+
+**A keyless repeat dispatch must not guess which prior invocation the
+caller means (from P03.1's Review, MEDIUM-1 — FIXED in P03.1, noted here
+only so a future reader does not reintroduce it).**
+`resolveTaskKeyAuthorization`'s fallback, when no fresh authorization is
+pending and MORE THAN ONE has already been consumed at a binding, now
+refuses (returns `null`, which cascades to the existing "no unconsumed
+operation-authorized event" error) rather than guessing the most recent —
+guessing would have silently handed a keyless caller a DIFFERENT
+invocation's Assignment/RunResult under its own key.
+
+**P03.2 precondition: recheck lineage in `replaySession`'s return shape is
+artifact-revision-scoped and best-effort, not a guaranteed original→recheck
+edge (from P03.1's Review, MEDIUM-3).** The `assignments[].authorizationId
+→ authorizations[].targetArtifactRef` join is the only link replay
+reconstructs, and `targetArtifactRef` is OPTIONAL on `operation-authorized`
+— omit it and replay carries no link at all. There is no actual
+original-Assignment → recheck-Assignment pointer in the shape. `show.mjs`
+must not assume a stronger guarantee than this when rendering recheck
+history; if a hard predecessor edge is genuinely needed, that is a new
+contract decision, not something to add unilaterally.
+
+**P03.2 precondition: a disposition's `targetRef`/`evidenceRefs` carry no
+session-scope check yet (from P03.1's Review, ruling on the Doer's item
+2).** Inert today (nothing reads them into a contract/prompt/gate), same
+"close it when it is read" posture already applied to `targetArtifactRef`
+in P03.1. If P03.2's `show.mjs` (or any future surface) renders a
+disposition's refs into worker-visible context, the same
+`assertRefsOwnedBySession` call belongs at that door first. Also noted: a
+post-terminal disposition currently reads indistinguishably from a
+legitimate one (no `ignoredDispositions` counterpart, deliberately —
+Recovery Rule point 5's read-time neutralization is scoped to
+`operation-authorized` specifically) — a renderer should mark it rather
+than present it as authoritative.
+
+**Handed to P03.2's Red-Team: two concrete concurrency targets (from
+P03.1's Review, ruling on the Doer's item 4).** (a) A genuinely CONCURRENT
+variant of the MEDIUM-1 shape above (P03.1's own regression test reproduces
+it sequentially only) — two dispatchers deriving DIFFERENT keys from
+DIFFERENT authorizations while racing the same claim directory. (b) The
+pre-lock `replaySession` snapshot in `dispatchDeclaredOperation` now runs
+earlier (ahead of the edge-branch checks) and is memoized for the gate, so
+the advisory data the silent-discard guard reasons over is staler than when
+P02.2's Red-Team measured that guard — the authoritative lock-held checks
+are unchanged, which is why this is a target to attack rather than a
+standing finding.
 
 **Driver handoff is structurally impossible under R8's implemented identity
 check (from P02.2's Review, R8 ruling).** `authorizedBy.id ===
@@ -377,6 +486,30 @@ most one Assignment; the binding cap still counts by `authorizationId`),
 only R3's descriptive completeness. Same shape as P02.1's own MEDIUM-1b
 rule (require the companion fields whenever `authorizationId` is present);
 a future cell should apply that same rule here.
+
+**Is the silent-discard guard a hard guarantee or advisory (from P03.1's
+Red-Team, Target 2)?** `dispatchDeclaredOperation`'s guard against silently
+discarding a fresher authorization reasons over a pre-lock, unlocked
+`replaySession` snapshot — a real, reproduced 8/8 timing-dependent race
+exists where the guard's decision can be stale (confirmed identical on
+pre-cell HEAD, not introduced by P03.1). The guard's own comment reads as a
+hard guarantee; its implementation is snapshot-dependent by construction.
+A future cell should either move the check inside `createSessionAssignment`'s
+lock (hard guarantee) or reword the comment to state it is advisory/
+best-effort (matching what it actually is today) — not a defect either way,
+but a documentation/design-intent gap.
+
+**Residual unsuffixed-key edge in the P03.1 ambiguous-repeat guard (from
+P03.1's Red-Team, Target 3) — P03.2 precondition.** When a prior dispatch
+claimed the literal unsuffixed default key (`declared:<operationId>`) via
+an explicit caller-supplied `taskKey`, a keyless ambiguous-repeat call can
+still land on that claim and silently resume the wrong Assignment
+(reproduced both sequentially and concurrently; identical on pre-cell HEAD
+via the explicit-key route it already had, so not a P03.1 regression).
+Reachable only when a caller deliberately supplies that exact string.
+`src/verbs/coordination/run.mjs` forwards an optional `step.taskKey` —
+P03.2 should be aware this specific string is not safe to reuse as a
+"default" sentinel.
 
 Next: P03.1 (Phase 03 — recheck as a new Assignment, `driver-disposition-recorded`,
 and a live no-Work standalone Master Coordination proof through the declared

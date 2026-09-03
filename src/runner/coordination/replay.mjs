@@ -86,6 +86,18 @@ export function replaySession(coordinationId, opts = {}) {
   // authorize anything would be a strictly worse failure mode than
   // neutralizing it, and the safety property ("it can never authorize a
   // dispatch") holds identically either way.
+  // The reconstructed answers to "what was dispatched", "what results
+  // linked", and "what disposition was recorded" -- built from the event log
+  // alone, so a caller can read the whole loop (authorization -> dispatch
+  // provenance -> result -> recheck lineage -> disposition) without chat
+  // history and without opening a single Assignment or RunResult file.
+  // Recheck lineage is the join `assignments[].authorizationId` ->
+  // `authorizations[].targetArtifactRef`: which artifact revision each
+  // Assignment ran against, and which authorization made it legal.
+  const assignments = [];
+  const results = [];
+  const dispositions = [];
+
   const authorizations = [];
   const ignoredAuthorizations = [];
   const authorizationIds = new Set();
@@ -132,6 +144,15 @@ export function replaySession(coordinationId, opts = {}) {
         consumedByAssignmentId: null,
       };
       (terminalSeen ? ignoredAuthorizations : authorizations).push(record);
+    } else if (event.type === 'driver-disposition-recorded') {
+      dispositions.push({
+        targetRef: event.payload.targetRef,
+        disposition: event.payload.disposition,
+        rationale: event.payload.rationale,
+        evidenceRefs: Object.freeze([...event.payload.evidenceRefs]),
+        authorizedBy: event.payload.authorizedBy,
+        ts: event.ts,
+      });
     }
 
     if (event.type === 'assignment-created') {
@@ -140,6 +161,18 @@ export function replaySession(coordinationId, opts = {}) {
         throw new CoordinationError('duplicate-ref', `session "${coordinationId}": duplicate "assignment-created" event for assignment "${id}"`);
       }
       createdIds.set(id, event);
+      assignments.push({
+        assignmentId: id,
+        actorId: event.payload.actorId,
+        operationId: event.payload.operationId,
+        nodeId: event.payload.nodeId,
+        authorizationId: event.payload.authorizationId,
+        invocationKey: event.payload.invocationKey,
+        ...(event.payload.contextGrant !== undefined
+          ? { contextGrant: Object.freeze({ refs: Object.freeze([...event.payload.contextGrant.refs]) }) }
+          : { contextGrant: undefined }),
+        ts: event.ts,
+      });
     } else if (event.type === 'run-retried') {
       const id = event.payload.assignmentId;
       if (!createdIds.has(id)) {
@@ -170,6 +203,11 @@ export function replaySession(coordinationId, opts = {}) {
       }
       linkedCountByAssignment.set(id, priorLinks + 1);
       retriedCountAtLastLink.set(id, retriedCountByAssignment.get(id) ?? 0);
+      // Every accepted link, in log order -- a caller takes the LAST entry
+      // for an assignmentId as the current authoritative view (the same rule
+      // the retry-supersession clause above states), with the earlier links
+      // still present as the historical record they are.
+      results.push({ assignmentId: id, runId: event.payload.runId, ts: event.ts });
     } else if (event.type === 'actor-replaced') {
       // No ordering invariant beyond the generic shape check
       // (validateEventPayload above) -- replaceSessionActor's own
@@ -257,6 +295,9 @@ export function replaySession(coordinationId, opts = {}) {
     events: Object.freeze(events),
     authorizations: Object.freeze(authorizations.map((record) => Object.freeze(record))),
     ignoredAuthorizations: Object.freeze(ignoredAuthorizations.map((record) => Object.freeze(record))),
+    assignments: Object.freeze(assignments.map((record) => Object.freeze(record))),
+    results: Object.freeze(results.map((record) => Object.freeze(record))),
+    dispositions: Object.freeze(dispositions.map((record) => Object.freeze(record))),
     sessionDir,
   });
 }
