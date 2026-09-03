@@ -47,7 +47,7 @@ own work.
 |---|---|---|---|
 | 00 | Intake | R1-R4 | done |
 | 01 | MVP3 | R1-R8 (see phase file) | done |
-| 02 | MVP4 | R1-R6 (see phase file; split P02.1 R1-R4 / P02.2 R5-R6) | in-progress |
+| 02 | MVP4 | R1-R6 (see phase file; split P02.1 R1-R4 / P02.2 R5-R6) | done |
 | 03 | Config | R1-Rn (see phase file) | missing |
 | 04 | MVP5 | R1-Rn (see phase file) | missing |
 
@@ -57,7 +57,7 @@ None.
 
 ## Next Action
 
-Prepare P02.2 (Phase 02 — MVP4 R5-R6: resume/show rendering + setup/doctor).
+Prepare P03.1 (Phase 03 — Config: role execution policy readiness).
 
 ## Cell Log
 
@@ -66,6 +66,45 @@ Prepare P02.2 (Phase 02 — MVP4 R5-R6: resume/show rendering + setup/doctor).
 | P00.1 | Phase 00 R1, R2, R3, R4 (closes Phase 00) | done | `95f7971c` |
 | P01.1 | Phase 01 R1-R8 (closes Phase 01) | done | `633da1f5` |
 | P02.1 | Phase 02 R1-R4 | done | `fb18c372` |
+| P02.2 | Phase 02 R5-R6 (closes Phase 02) | done | pending |
+
+## Phase 02 Status
+
+**CLOSED.** R1-R6 via P02.1 (R1-R4) + P02.2 (R5-R6). P02.2 added: a
+`nextAction` field on `launch-master-loop`'s output (coordination id +
+concrete next step, plain-terms refusal explanation, never implying a
+resume door that doesn't exist); `show.mjs` now renders `authorizations`,
+`ignoredAuthorizations`, `dispositions`, and `pendingDriverAuthorizations`
+sourced from `replaySession`'s existing reconstruction — closing P00.1's
+Gap #18. Both P00.1-named rendering constraints honored: recheck lineage
+never presented as a guaranteed original→recheck edge; disposition refs
+gated by a verified-equivalent mirror of P01.1's
+`assertDispositionRefOwnedBySession`, and post-terminal dispositions
+marked (not hidden), using the same terminal-event-type list `replay.mjs`/
+`store.mjs` already use. R6: nothing new needed setup/doctor registration
+— verified by grep (only two `fs.existsSync` calls, both against an
+already-established path convention), stated explicitly rather than
+skipped.
+
+Reviewer round (APPROVE, 0 findings) ran in parallel with Red-Team round
+(APPROVE, 0 findings) — 7 attacks each, all held: `show`'s read-only
+invariant confirmed intact (no write primitive anywhere in the new code,
+`replaySession` itself is pure-read); the reimplemented ownership check
+independently compared segment-by-segment against `store.mjs`'s original,
+byte-for-byte equivalent logic; no recheck-lineage overclaim found
+anywhere in the rendered output or docs; post-terminal-marking's
+terminal-event-type list confirmed to exactly match both `replay.mjs`'s
+and `store.mjs`'s internal lists; `describeNextAction` confirmed sane on
+both the closed-successfully and refused branches, with no invented
+resume command. No fix round required.
+
+Full suite (final): 5185 tests, 5178 pass, 1 fail — exactly the track's
+recorded baseline; no new failure. Focused glob
+(`test/verbs/coordination*.test.mjs`) 47/47 pass throughout.
+
+**This closes Phase 02 (MVP4) entirely.**
+
+Next: P03.1 (Phase 03 — Config, role execution policy readiness).
 
 ## Phase 02 Status (in progress)
 

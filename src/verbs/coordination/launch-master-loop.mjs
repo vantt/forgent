@@ -146,6 +146,31 @@ export function buildMasterLoopRequest(ctx, params = {}) {
   };
 }
 
+// R5 (Step 09 Phase 02): the launcher's own output must always state the
+// coordination id and a concrete next action, provable without any chat
+// context (this cell's Acceptance). This is display text ONLY -- it never
+// implies a resume/continue door exists (none does yet; that is Phase 04/
+// MVP5's own future work per thin-launcher-surface-readiness.md's "No
+// resume door" gap, out of scope here) and never claims a specific
+// follow-up command is available beyond `fgos coordination show`, which
+// this cell's own R5 half (`show.mjs`) is what makes that command useful
+// for exactly this situation.
+export function describeNextAction({ coordinationId, closed, closeRefusalReason }) {
+  const showHint = `Run \`fgos coordination show ${coordinationId}\` to see authorizations issued, dispositions recorded, and which declared operations are still awaiting driver authorization.`;
+  if (closed) {
+    return `Coordination session "${coordinationId}" closed. ${showHint}`;
+  }
+  if (closeRefusalReason) {
+    return (
+      `Coordination session "${coordinationId}" is still open -- it did not close because: ${closeRefusalReason} ` +
+      `This is expected: this launcher only runs the fixture's required first pass (produce/review/red-team); ` +
+      `any later step (e.g. revise-candidate) is a driver-authorized operation that a person must review this run's evidence and separately authorize before the session can progress further. ` +
+      showHint
+    );
+  }
+  return `Coordination session "${coordinationId}" did not close, and no refusal reason was recorded. ${showHint}`;
+}
+
 /**
  * Compose, then run, through the ONE existing runtime door (R2). Never
  * opens a session, dispatches, authorizes, or dispositions itself -- it
@@ -155,10 +180,11 @@ export function buildMasterLoopRequest(ctx, params = {}) {
  *
  * @param {object} ctx Same shape `runCoordinationUseCase` takes: `{cwd, repoRoot, runnerConfig?, timeoutMs?, packageRoot?}`.
  * @param {object} params `buildMasterLoopRequest`'s own params, plus optional `cliExecutor`/`cliModel`/`cliTier` trusted global policy (forwarded verbatim, same as `fgos coordination run`'s own `--executor`/`--model`/`--tier`).
- * @returns {Promise<object>} The `fgos.v1` data payload `runCoordinationUseCase` returns.
+ * @returns {Promise<object>} The `fgos.v1` data payload `runCoordinationUseCase` returns, plus this cell's own `nextAction` (R5): a plain-text coordination id + next-step message.
  */
 export async function launchMasterLoopUseCase(ctx, params = {}) {
   const { cliExecutor, cliModel, cliTier, ...requestParams } = params;
   const requestObject = buildMasterLoopRequest(ctx, requestParams);
-  return runCoordinationUseCase(ctx, { requestObject, cliExecutor, cliModel, cliTier });
+  const result = await runCoordinationUseCase(ctx, { requestObject, cliExecutor, cliModel, cliTier });
+  return { ...result, nextAction: describeNextAction(result) };
 }

@@ -58,7 +58,7 @@ If any entry condition fails, stop before code changes and record the blocker.
 |---|---|---|---|---|
 | 00 | Intake | [Consume MVP1/MVP2 handoff and freeze scope](phase-00-consume-handoff-and-freeze-scope.md) | MVP1/MVP2 handoff | done (P00.1) — Handoff accepted; no overlap with active MVP1/MVP2 work |
 | 01 | MVP3 | [Recheck lineage and driver disposition](phase-01-mvp3-recheck-lineage-and-disposition.md) | 00 | done (P01.1) — Handoff semantics are accepted or the exact remaining MVP3 gaps are closed; recheck and disposition are replayable, immutable, and distinct from retry |
-| 02 | MVP4 | [Thin surface launcher](phase-02-mvp4-thin-surface-launcher.md) | 01 | User can invoke the declared fixture without prompt-copy logic in the surface |
+| 02 | MVP4 | [Thin surface launcher](phase-02-mvp4-thin-surface-launcher.md) | 01 | done (P02.1, P02.2) — User can invoke the declared fixture without prompt-copy logic in the surface |
 | 03 | Config | [Role execution policy readiness](phase-03-role-execution-policy-readiness.md) | 02 | Doer, Reviewer, Red-Team, Fixer, and Recheck resolve to intentional provider/model/tier policy |
 | 04 | MVP5 | [Usable standalone live proof](phase-04-mvp5-usable-standalone-live-proof.md) | 03 | Full no-Work Master Coordination loop runs, resumes, and closes with evidence |
 

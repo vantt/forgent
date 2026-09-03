@@ -16,7 +16,7 @@
 
 import { test } from 'node:test';
 import { assert, envelopeData, fs, path, run, tmpCwd } from '../cli/helpers/fgos-cli-harness.mjs';
-import { buildMasterLoopRequest, launchMasterLoopUseCase, MASTER_LOOP_PROTOCOL_ID } from '../../src/verbs/coordination/launch-master-loop.mjs';
+import { buildMasterLoopRequest, launchMasterLoopUseCase, MASTER_LOOP_PROTOCOL_ID, describeNextAction } from '../../src/verbs/coordination/launch-master-loop.mjs';
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
 import { StoreError } from '../../src/state/store.mjs';
@@ -302,6 +302,38 @@ test('R1/R2 live: launchMasterLoopUseCase reaches the real runtime through runCo
   // follow-up-request door) picks up later, not a bug here.
   assert.equal(data.closed, false);
   assert.match(data.closeRefusalReason, /missing required actor\(s\) \[fixer\]/);
+
+  // R5 (Step 09 Phase 02): the launcher's own output must always state the
+  // coordination id and a concrete next action, without depending on chat
+  // history -- assert the ACTUAL message content, not just that some
+  // string exists.
+  assert.match(data.nextAction, /coord_launcher_live/);
+  assert.match(data.nextAction, /fgos coordination show coord_launcher_live/);
+  assert.match(data.nextAction, /missing required actor\(s\) \[fixer\]/);
+  assert.match(data.nextAction, /driver-authorized operation/);
+  // Must not imply a resume/continue door exists -- that is explicitly
+  // Phase 04/MVP5's own future work, not this cell's.
+  assert.doesNotMatch(data.nextAction, /--resume/);
+});
+
+// `describeNextAction` is pure (no engine call) -- unit-tested directly for
+// its other two branches, since the shipped fixture's 4-required-actor
+// shape (§P00.1.md Frozen Scope) makes `closed: true` structurally
+// unreachable through the real launcher today (the composer only ever
+// dispatches 3 of the fixture's 4 required SessionActors) -- not a gap in
+// this test, a fact about the fixture this launcher targets.
+test('R5: describeNextAction states the coordination id and points at show when the session closed cleanly', () => {
+  const message = describeNextAction({ coordinationId: 'coord_x', closed: true, closeRefusalReason: null });
+  assert.match(message, /coord_x/);
+  assert.match(message, /closed/);
+  assert.match(message, /fgos coordination show coord_x/);
+});
+
+test('R5: describeNextAction states the coordination id even when closed is false with no refusal reason recorded', () => {
+  const message = describeNextAction({ coordinationId: 'coord_y', closed: false, closeRefusalReason: null });
+  assert.match(message, /coord_y/);
+  assert.match(message, /fgos coordination show coord_y/);
+  assert.doesNotMatch(message, /--resume/);
 });
 
 // ---------------------------------------------------------------------
@@ -331,6 +363,10 @@ test('CLI: `fgos coordination launch-master-loop --plan --objective --writer-id`
   assert.equal(data.coordinationId, 'coord_launcher_cli');
   assert.equal(data.definitionRef.id, MASTER_LOOP_PROTOCOL_ID);
   assert.deepEqual(data.steps.map((s) => s.as), ['produce', 'review', 'red-team']);
+  // R5: the CLI's own JSON envelope carries the next-action message too,
+  // not just the in-process return value.
+  assert.match(data.nextAction, /coord_launcher_cli/);
+  assert.match(data.nextAction, /fgos coordination show coord_launcher_cli/);
 });
 
 test('CLI: `fgos coordination launch-master-loop` without --plan fails actionably', () => {

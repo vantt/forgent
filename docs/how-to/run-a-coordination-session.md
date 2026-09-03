@@ -42,14 +42,64 @@ field is rejected.
 ## `fgos coordination show <id> --json`
 
 Read-only. Prints the session's current manifest, phase, and quorum
-(which required actors are completed/failed/late/missing/replaced), plus
-the raw event count — enough for a stranger to understand a session's
-status without any prior chat history. Never mutates anything and never
-has an external effect.
+(which required actors are completed/failed/late/missing/replaced), the
+raw event count, and — for a declared-protocol session — the driver-facing
+state a stranger needs to understand what happened and what is left:
+
+- `authorizations` — every `operation-authorized` event issued, with the
+  operation/node/actor it targets and whether it has already been consumed
+  by a dispatched Assignment.
+- `ignoredAuthorizations` — an authorization that was written to disk
+  after the session had already closed; it never authorized anything and
+  is reported separately rather than hidden.
+- `dispositions` — every driver disposition recorded (target, decision,
+  rationale, evidence), each marked `postTerminal: true` if it was somehow
+  recorded after the session already closed (not authoritative), and each
+  ref marked `...OwnedBySession` — a ref that resolves to a real
+  Assignment belonging to a *different* coordination session is marked
+  `false`, never presented as if it were this session's own.
+- `pendingDriverAuthorizations` — every declared `activation.mode:
+  driver-authorized` operation the session's FlowDefinition names that has
+  no matching authorization yet (`null` for an agent-led session, which
+  has no FlowDefinition to check).
+
+Recheck lineage (which Assignment reviewed which artifact revision) is
+NOT rendered as a guaranteed pointer — the underlying join is best-effort
+and artifact-revision-scoped, not a hard original→recheck edge, so this
+command does not claim more precision than the data actually carries.
+
+Never mutates anything and never has an external effect.
 
 ```sh
 fgos coordination show coord_abc123
 ```
+
+## `fgos coordination launch-master-loop --plan <path> --objective <text> --writer-id <id>`
+
+A thin composer for the shipped `standalone-master-coordination-loop`
+fixture: given a plan/artifact path, an objective, and a writer identity,
+it builds a declared-protocol request covering only the fixture's
+*required* first pass (produce → review + red-team) and runs it through
+the same door as `run`. It never authorizes or dispositions the fixture's
+driver-authorized `revise-candidate`/`reviewer-recheck`/`red-team-recheck`
+operations itself — those remain a driver decision, made after reading
+this run's own evidence.
+
+```sh
+fgos coordination launch-master-loop \
+  --plan docs/plan.md \
+  --objective "Ship the thing" \
+  --writer-id driver-1
+```
+
+The result always carries a `nextAction` message naming the coordination
+id and a concrete next step — including, in plain terms, why the session
+did not close yet when a driver-authorized step is still pending. It does
+not imply any resume/continue command exists: today, continuing past the
+required first pass means hand-authoring a follow-up `run --file` request
+with the needed `authorize`/`operation`/`disposition` steps against the
+same fixture (see "Request file shape" below); use `coordination show` to
+see exactly what is still outstanding before writing one.
 
 ## Request file shape
 

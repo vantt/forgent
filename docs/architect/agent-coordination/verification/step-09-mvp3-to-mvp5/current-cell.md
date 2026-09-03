@@ -1,11 +1,11 @@
 # Current Cell
 
 Cell: none
-Status: idle -- P02.1 closed (Phase 02 R1-R4 done, R5-R6 open as P02.2)
+Status: idle -- Phase 02 closed via P02.1 + P02.2
 Owner: Coordinator
 Last updated: 2026-09-03
-Next action: prepare P02.2 (Phase 02 -- MVP4 R5-R6)
+Next action: prepare P03.1 (Phase 03 -- Config)
 
-P02.1 is done. See `index.md`'s "Phase 02 Status" section and `P02.1.md`
-for the full record. This file will be rewritten when the next cell
-(P02.2) is prepared.
+Phase 02 (MVP4) is done in full. See `index.md`'s "Phase 02 Status"
+section and `P02.1.md`/`P02.2.md` for the full record. This file will be
+rewritten when the next cell (P03.1) is prepared.

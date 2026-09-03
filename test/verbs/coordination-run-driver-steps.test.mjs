@@ -32,7 +32,7 @@ import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
 import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
 import { StoreError } from '../../src/state/store.mjs';
 import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
-import { readSessionEvents, readManifest } from '../../src/runner/coordination/store.mjs';
+import { readSessionEvents, readManifest, resolveSessionPaths, appendEvent, transitionSessionStatus } from '../../src/runner/coordination/store.mjs';
 import { openDeclaredProtocolSession } from '../../src/runner/coordination/session-engine.mjs';
 
 const DEFINITION_ID = 'test.coordination-protocol.master-loop-driver-steps';
@@ -629,4 +629,136 @@ test('show stays read-only over a session carrying authorization and disposition
   assert.deepEqual(fs.readFileSync(path.join(sessionDir, 'events.jsonl')), eventsBefore);
   assert.deepEqual(fs.readFileSync(path.join(sessionDir, 'session.json')), manifestBefore);
   assert.deepEqual(fs.readdirSync(sessionDir).sort(), dirBefore);
+});
+
+// ─── R5 (Step 09 Phase 02): show renders disposition/recheck state a user
+// actually needs, sourced from replaySession's own reconstruction ────────
+
+test('show renders authorizations issued (consumed), dispositions recorded, and which declared operations are still awaiting driver authorization', async () => {
+  const { tempDir, ctx } = setup();
+  const data = await runCoordinationUseCase(ctx, {
+    requestObject: request({ steps: [produceStep(), reviewStep(), authorizeStep(), recheckStep(), dispositionStep()] }),
+  });
+  const opts = { cwd: tempDir, repoRoot: tempDir };
+
+  const shown = showCoordinationUseCase(opts, { id: data.coordinationId });
+
+  // Authorizations issued: the one real `authorizeStep()` above, consumed
+  // by the recheck Assignment it authorized.
+  assert.equal(shown.authorizations.length, 1);
+  assert.deepEqual(shown.authorizations[0], {
+    authorizationId: 'auth_recheck_1',
+    operationId: 'reviewer-recheck',
+    nodeId: 'phase-recheck',
+    targetActorId: 'reviewer',
+    consumed: true,
+  });
+  assert.deepEqual(shown.ignoredAuthorizations, []);
+
+  // Dispositions recorded: the one real `dispositionStep()` above, with its
+  // $ref:produce/$ref:review placeholders already resolved to real,
+  // session-owned Assignment ids by run.mjs -- both marked owned, and NOT
+  // post-terminal (the session never closed in this test).
+  assert.equal(shown.dispositions.length, 1);
+  const disposition = shown.dispositions[0];
+  assert.equal(disposition.disposition, 'accepted');
+  assert.equal(disposition.rationale, 'The recheck confirmed the revision closed the finding.');
+  assert.equal(disposition.postTerminal, false);
+  assert.equal(disposition.targetRefOwnedBySession, true);
+  assert.deepEqual(disposition.evidenceRefsOwnedBySession, [true]);
+  const manifest = readManifest(data.coordinationId, opts);
+  assert.ok(manifest.assignmentRefs.includes(disposition.targetRef), 'targetRef should have resolved to a real session Assignment id');
+
+  // Declared driver-authorized operations still awaiting authorization:
+  // revise-candidate and red-team-recheck (reviewer-recheck was just
+  // authorized above, so it must NOT appear here).
+  assert.deepEqual(
+    shown.pendingDriverAuthorizations.map((b) => b.operationId).sort(),
+    ['red-team-recheck', 'revise-candidate'],
+  );
+  assert.ok(!shown.pendingDriverAuthorizations.some((b) => b.operationId === 'reviewer-recheck'));
+});
+
+test('show marks a disposition recorded after a terminal event as postTerminal, without hiding it (a hand-crafted/racing write recordDriverDisposition itself would refuse today)', async () => {
+  const { tempDir, ctx } = setup();
+  const data = await runCoordinationUseCase(ctx, {
+    requestObject: request({ steps: [produceStep(), reviewStep(), authorizeStep(), recheckStep()] }),
+  });
+  const opts = { cwd: tempDir, repoRoot: tempDir };
+  const manifest = readManifest(data.coordinationId, opts);
+  assert.equal(manifest.status, 'active', 'this fixture never dispatches red-team/fixer, so quorum close must not have happened yet');
+
+  transitionSessionStatus(data.coordinationId, 'cancelled', { reason: 'stopped for the test' }, opts);
+  const { eventsPath, sessionDir } = resolveSessionPaths(data.coordinationId, opts);
+  appendEvent(
+    eventsPath,
+    {
+      type: 'driver-disposition-recorded',
+      payload: {
+        targetRef: manifest.assignmentRefs[0],
+        disposition: 'accepted',
+        rationale: 'Written after the session already closed.',
+        evidenceRefs: [],
+        authorizedBy: { type: 'driver', id: WRITER_ID },
+      },
+    },
+    sessionDir,
+  );
+
+  const shown = showCoordinationUseCase(opts, { id: data.coordinationId });
+  assert.equal(shown.dispositions.length, 1);
+  assert.equal(shown.dispositions[0].postTerminal, true);
+  assert.equal(shown.dispositions[0].targetRefOwnedBySession, true);
+});
+
+test('show marks a disposition ref as NOT session-owned when it names a real Assignment belonging to a different coordination session (defense-in-depth mirror of store.mjs\'s own assertDispositionRefOwnedBySession, against a write path that bypassed recordDriverDisposition entirely)', async () => {
+  const { tempDir, ctx } = setup();
+  const opts = { cwd: tempDir, repoRoot: tempDir };
+
+  const other = await runCoordinationUseCase(ctx, { requestObject: request({ coordinationId: 'coord_show_foreign_owner', steps: [produceStep()] }) });
+  const foreignAssignmentId = readManifest(other.coordinationId, opts).assignmentRefs[0];
+
+  const data = await runCoordinationUseCase(ctx, {
+    requestObject: request({ coordinationId: 'coord_show_foreign_ref', steps: [produceStep(), reviewStep(), authorizeStep(), recheckStep()] }),
+  });
+  const manifest = readManifest(data.coordinationId, opts);
+  const { eventsPath, sessionDir } = resolveSessionPaths(data.coordinationId, opts);
+  appendEvent(
+    eventsPath,
+    {
+      type: 'driver-disposition-recorded',
+      payload: {
+        targetRef: manifest.assignmentRefs[0],
+        disposition: 'accepted',
+        rationale: 'Hand-crafted: cites another session\'s own Assignment as evidence.',
+        evidenceRefs: [foreignAssignmentId],
+        authorizedBy: { type: 'driver', id: WRITER_ID },
+      },
+    },
+    sessionDir,
+  );
+
+  const shown = showCoordinationUseCase(opts, { id: data.coordinationId });
+  assert.equal(shown.dispositions.length, 1);
+  assert.equal(shown.dispositions[0].targetRefOwnedBySession, true);
+  assert.deepEqual(shown.dispositions[0].evidenceRefsOwnedBySession, [false]);
+});
+
+test('show: an agent-led session (no definitionRef) reports pendingDriverAuthorizations as null, not an invented empty list', async () => {
+  const { tempDir, ctx } = setup();
+  const opts = { cwd: tempDir, repoRoot: tempDir };
+  const data = await runCoordinationUseCase(ctx, {
+    requestObject: {
+      kind: 'agent-led',
+      objective: 'Agent-led, no FlowDefinition bound.',
+      writerId: WRITER_ID,
+      primaryRole: 'researcher',
+      task: { expectedOutputs: ['agent-result.json (status, summary)'], evidenceRequired: 'reported' },
+    },
+  });
+  const shown = showCoordinationUseCase(opts, { id: data.coordinationId });
+  assert.equal(shown.definitionRef, null);
+  assert.equal(shown.pendingDriverAuthorizations, null);
+  assert.deepEqual(shown.authorizations, []);
+  assert.deepEqual(shown.dispositions, []);
 });
