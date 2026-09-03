@@ -47,7 +47,7 @@ own work.
 |---|---|---|---|
 | 00 | Intake | R1-R4 | done |
 | 01 | MVP3 | R1-R8 (see phase file) | done |
-| 02 | MVP4 | R1-Rn (see phase file) | missing |
+| 02 | MVP4 | R1-R6 (see phase file; split P02.1 R1-R4 / P02.2 R5-R6) | in-progress |
 | 03 | Config | R1-Rn (see phase file) | missing |
 | 04 | MVP5 | R1-Rn (see phase file) | missing |
 
@@ -57,7 +57,7 @@ None.
 
 ## Next Action
 
-Prepare P02.1 (Phase 02 — MVP4 thin surface launcher).
+Prepare P02.2 (Phase 02 — MVP4 R5-R6: resume/show rendering + setup/doctor).
 
 ## Cell Log
 
@@ -65,6 +65,54 @@ Prepare P02.1 (Phase 02 — MVP4 thin surface launcher).
 |---|---|---|---|
 | P00.1 | Phase 00 R1, R2, R3, R4 (closes Phase 00) | done | `95f7971c` |
 | P01.1 | Phase 01 R1-R8 (closes Phase 01) | done | `633da1f5` |
+| P02.1 | Phase 02 R1-R4 | done | pending |
+
+## Phase 02 Status (in progress)
+
+**P02.1 CLOSED (Phase 02 R1-R4; R5-R6 open as P02.2).** New thin launcher
+surface: `src/verbs/coordination/launch-master-loop.mjs` +
+`fgos coordination launch-master-loop` CLI wiring
+(`bin/fgos.mjs`/`src/cli/command-registry.mjs`), targeting
+`standalone-master-coordination-loop` exclusively. Confirmed by both
+independent rounds: zero fork of engine logic — the launcher calls the
+existing `runCoordinationUseCase` door and nothing else; no direct import
+of `session-engine`/`store`/`replay`. All six R4 validation cases (bad file
+path, unknown fixture id/version, Work fields, missing objective, invalid
+bounds, forbidden context ref) covered with real actionable-error tests.
+No skill/slash file created — command path only, per R1's own "prefer a
+command/request-file helper first, a skill may wrap it later."
+
+Reviewer round (APPROVE, 1 LOW — a `--plan` path-resolution edge case
+under `--dir`, rated untested/non-blocking) ran in parallel with Red-Team
+round (APPROVE WITH CONCERNS, 1 MEDIUM + 1 LOW) — the Red-Team live-
+reproduced the SAME code fact the Reviewer had only read: a real `plan.md`
+in the caller's cwd was falsely rejected as "does not exist" once `--dir`
+was passed, because `--plan` resolved against `--dir`-derived
+`repoRootForCoordination` instead of `process.cwd()` (the sibling
+`run --file` branch's actual pattern). Coordinator accepted the MEDIUM
+over the Reviewer's LOW rating on the strength of the live reproduction.
+Single Fixer pass: one-line resolution fix in `bin/fgos.mjs` mirroring
+`run --file` exactly, plus a regression test reproducing the two-directory
+scenario. Reviewer-recheck and Red-Team-recheck both ran in parallel
+against the fix — both APPROVE, MEDIUM CONFIRMED-RESOLVED (Red-Team-recheck
+additionally live-tested absolute-path, `..`-traversal, and empty-`--plan`
+edge cases against the fix, all held); Reviewer-recheck explicitly
+reconciled its own original LOW against the Red-Team's more accurate
+MEDIUM. 1 LOW (informational — the "unknown fixture id" negative test is
+only reachable via direct object mutation, not the real CLI, since
+`protocolRef.id` is a pinned constant with no override flag; not a
+defect) recorded as follow-up, non-blocking.
+
+Full suite (final): 5179 tests, 5171 pass, 2 fail at first run — one
+matched the recorded baseline (`fgos-intake-4.test.mjs:318`), the other
+(`test/runner/dispatch.test.mjs`'s `spawnWorker` maxBuffer test) did not
+reproduce in isolation (354/354 pass on `test/runner/dispatch.test.mjs`
+alone) and is recorded as a load-induced flake per this track's own
+documented pattern for subprocess-timing tests, not a new failure. Focused
+glob (`test/verbs/coordination*.test.mjs`) 41/41 pass throughout.
+
+Next: P02.2 (Phase 02 R5-R6 — resume/show path rendering, setup/doctor
+discipline; closes Phase 02).
 
 ## Phase 01 Status
 
