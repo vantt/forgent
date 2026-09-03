@@ -509,6 +509,195 @@ test('rejects a Workflow-profile definition carrying graph.nodes[].operations[].
 });
 
 // ---------------------------------------------------------------------------
+// Specialist slots (Step 09 MVP9 P09.1 -- schema/static-legality only, no
+// runtime authorization/binding; see docs/architect/agent-coordination/
+// verification/step-09-mvp6-to-mvp9/phase-09-mvp9-bounded-specialist-binding.md
+// for the candidate-contract freeze).
+// ---------------------------------------------------------------------------
+
+function withSpecialistSlot(overrides = {}) {
+  const def = protocolDefinitionWithTwoOperations();
+  def.spec.operations[1].capabilities = ['list-tool'];
+  def.spec.profile.topology.visibilityWindows = [
+    {
+      id: 'window-1',
+      opensAfter: { milestone: 'listed-results-linked', operationRefs: ['op-list-results'] },
+      permits: { sourceOperationRefs: ['op-research'], delivery: 'artifact-refs' },
+    },
+  ];
+  def.spec.profile.topology.specialistSlots = [
+    {
+      id: 'slot-1',
+      role: 'researcher',
+      operationRefs: ['op-list-results'],
+      requiredCapabilities: ['list-tool'],
+      allowedVisibilityWindows: ['window-1'],
+      maxBindings: 1,
+      maxAssignments: 3,
+      ...overrides,
+    },
+  ];
+  return def;
+}
+
+test('a definition with no specialistSlots stays byte/behavior-identical (regression)', () => {
+  const def = protocolDefinitionWithTwoOperations();
+  const result = validateFlowDefinition(def);
+  assert.equal(result.spec.profile.topology.specialistSlots, undefined);
+});
+
+test('accepts a well-formed CoordinationProtocol specialistSlots[] definition', () => {
+  const def = withSpecialistSlot();
+  const result = validateFlowDefinition(def);
+  assert.deepEqual(result.spec.profile.topology.specialistSlots, [
+    {
+      id: 'slot-1',
+      role: 'researcher',
+      operationRefs: ['op-list-results'],
+      requiredCapabilities: ['list-tool'],
+      allowedVisibilityWindows: ['window-1'],
+      maxBindings: 1,
+      maxAssignments: 3,
+    },
+  ]);
+  assert.ok(Object.isFrozen(result.spec.profile.topology.specialistSlots));
+  assert.ok(Object.isFrozen(result.spec.profile.topology.specialistSlots[0]));
+});
+
+test('rejects a specialistSlots[] entry with an unknown field', () => {
+  const def = withSpecialistSlot({ authorizedBy: 'driver' });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/specialistSlots\[0\] has unknown field "authorizedBy"/),
+  );
+});
+
+test('rejects a duplicate specialistSlots[] id', () => {
+  const def = protocolDefinitionWithTwoOperations();
+  def.spec.operations[1].capabilities = ['list-tool'];
+  const slot = {
+    role: 'researcher',
+    operationRefs: ['op-list-results'],
+    requiredCapabilities: ['list-tool'],
+    allowedVisibilityWindows: [],
+    maxBindings: 1,
+    maxAssignments: 1,
+  };
+  def.spec.profile.topology.specialistSlots = [
+    { id: 'slot-1', ...slot },
+    { id: 'slot-1', ...slot },
+  ];
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/specialistSlots carries duplicate slot id "slot-1"/),
+  );
+});
+
+test("rejects a specialistSlots[] entry's role not declared in spec.roles", () => {
+  const def = withSpecialistSlot({ role: 'ghost-role' });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/specialistSlots\[0\]\.role "ghost-role" is not declared in spec\.roles/),
+  );
+});
+
+test('rejects a dangling specialistSlots[].operationRefs[] entry', () => {
+  const def = withSpecialistSlot({ operationRefs: ['no-such-op'] });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/specialistSlots\[0\]\.operationRefs\[0\] "no-such-op" does not reference a declared spec\.operations\[\] id/),
+  );
+});
+
+test('rejects a dangling specialistSlots[].requiredCapabilities[] entry', () => {
+  const def = withSpecialistSlot({ requiredCapabilities: ['no-such-capability'] });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/specialistSlots\[0\]\.requiredCapabilities\[0\] "no-such-capability" does not reference a capability declared on any spec\.operations\[\] entry/),
+  );
+});
+
+test('rejects a dangling specialistSlots[].allowedVisibilityWindows[] entry', () => {
+  const def = withSpecialistSlot({ allowedVisibilityWindows: ['no-such-window'] });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/specialistSlots\[0\]\.allowedVisibilityWindows\[0\] "no-such-window" does not reference a declared spec\.profile\.topology\.visibilityWindows\[\] id/),
+  );
+});
+
+test('rejects a non-positive-integer specialistSlots[].maxBindings', () => {
+  for (const bad of [0, -1, 1.5, '2']) {
+    const def = withSpecialistSlot({ maxBindings: bad });
+    assert.throws(
+      () => validateFlowDefinition(def),
+      throwsFlowDefinitionError(/specialistSlots\[0\]\.maxBindings must be a positive integer/),
+      `expected maxBindings ${JSON.stringify(bad)} to be rejected`,
+    );
+  }
+});
+
+test('rejects a non-positive-integer specialistSlots[].maxAssignments', () => {
+  for (const bad of [0, -1, 1.5, '2']) {
+    const def = withSpecialistSlot({ maxAssignments: bad });
+    assert.throws(
+      () => validateFlowDefinition(def),
+      throwsFlowDefinitionError(/specialistSlots\[0\]\.maxAssignments must be a positive integer/),
+      `expected maxAssignments ${JSON.stringify(bad)} to be rejected`,
+    );
+  }
+});
+
+test('rejects a Workflow-profile definition carrying spec.profile.topology.specialistSlots', () => {
+  const def = minimalWorkflowDefinition({
+    spec: {
+      ...minimalWorkflowDefinition().spec,
+      profile: {
+        kind: 'Workflow',
+        topology: {
+          specialistSlots: [
+            {
+              id: 'slot-1',
+              role: 'implementer',
+              operationRefs: ['op-implement'],
+              requiredCapabilities: [],
+              allowedVisibilityWindows: [],
+              maxBindings: 1,
+              maxAssignments: 1,
+            },
+          ],
+        },
+      },
+    },
+  });
+  assert.throws(() => validateFlowDefinition(def), throwsFlowDefinitionError(/spec\.profile has unknown field "topology"/));
+});
+
+test('rejects an explicit topology.edges[] entry naming a declared specialist slot id', () => {
+  const fromDef = withSpecialistSlot();
+  fromDef.spec.profile.topology.edges = [{ from: 'slot-1', to: 'actor-1' }];
+  assert.throws(
+    () => validateFlowDefinition(fromDef),
+    throwsFlowDefinitionError(/topology\.edges\[0\]\.from "slot-1" references a declared specialist slot id -- slots are declarative capacity, never a routable topology edge endpoint/),
+  );
+
+  const toDef = withSpecialistSlot();
+  toDef.spec.profile.topology.edges = [{ from: 'actor-1', to: 'slot-1' }];
+  assert.throws(
+    () => validateFlowDefinition(toDef),
+    throwsFlowDefinitionError(/topology\.edges\[0\]\.to "slot-1" references a declared specialist slot id -- slots are declarative capacity, never a routable topology edge endpoint/),
+  );
+});
+
+test('a graph node operation binding referencing an undeclared specialist slot id as its actor stays statically closed (rejected as an unknown actor, no slot-expansion path)', () => {
+  const def = protocolDefinitionWithTwoOperations();
+  def.spec.graph.nodes[0].operations[0].actor = 'slot-ghost';
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/operations\[0\]\.actor "slot-ghost" does not reference a declared spec\.actors\[\] id/),
+  );
+});
+
+// ---------------------------------------------------------------------------
 // Determinism / immutability
 // ---------------------------------------------------------------------------
 
