@@ -1,22 +1,27 @@
-# Agent Coordination Component Boundary Advisory
+# fgOS Component Boundary Advisory
 
 Document type: Proposal
 Design status: Discussion / Visionary advisory
 Implementation: N/A
 Last reviewed: 2026-09-01
 Canonical for: nothing; architectural advisory only
-Related: [Agent Coordination Foundation Vision](../vision.md), [Concept Relationships](../vocabulary/concept-relationships.md), [Dispatch Control Plane](../architecture/dispatch-control-plane.md), [Protocol Model](../architecture/protocol-model.md), [CoordinationSession Contract](../contracts/coordination-session.md), [FlowDefinition Contract](../contracts/flow-definition.md)
+Related: [Architecture Map](../../architecture-map.md), [System Overview](../../specs/system-overview.md), [Platform Foundations](../../platform-foundations.md), [Domainization Architecture](../domainization/README.md), [Agent Coordination Foundation Vision](../agent-coordination/vision.md), [Concept Relationships](../agent-coordination/vocabulary/concept-relationships.md), [Dispatch Control Plane](../agent-coordination/architecture/dispatch-control-plane.md), [Protocol Model](../agent-coordination/architecture/protocol-model.md), [CoordinationSession Contract](../agent-coordination/contracts/coordination-session.md), [FlowDefinition Contract](../agent-coordination/contracts/flow-definition.md)
 
 ## 1. Purpose
 
-This note records an architecture advisory view of Agent Coordination under
+This note records an architecture advisory view of fgOS as a whole under
 single-responsibility and hexagonal-architecture criteria. It is intentionally
 not an implementation plan and does not approve new contracts. Its goal is to
-make the candidate component and bounded-context boundaries easier to discuss
-before Step 07/08 runtime work grows larger.
+make the candidate component, bounded-context, and authority boundaries easier
+to discuss before any one area grows into a system-shaped module by accident.
+
+The scope is the whole forgentX system: Work Lifecycle, Agent
+Coordination, Dispatch And Execution, Run Result Evaluation, Domain Components,
+Host And Surface, setup/doctor/distribution, gateway/Herdr,
+knowledge/learning, and Node/Rust implementation boundaries.
 
 Read this document as a refactoring compass, not as a rebuild mandate. It
-describes the direction for gradually moving existing behavior toward clearer
+describes the direction for moving existing behavior toward clearer
 component, bounded-context, and authority ownership as implementation slices
 create a natural opening. It should help reviewers decide whether a slice is
 placing behavior behind the right boundary. It should not be used to require a
@@ -26,13 +31,13 @@ need.
 The central recommendation is:
 
 ```txt
-Keep Agent Coordination core small.
+Keep each platform engine small.
 Separate component packaging, bounded contexts, and authority boundaries.
 Make dispatch, cognition/protocols, domain harnesses, execution adapters, and
 evidence evaluation replaceable through explicit ports.
 ```
 
-## 2. Current Architectural Reading
+## 2. Architectural Reading
 
 The accepted documents already point in the right direction:
 
@@ -57,7 +62,7 @@ dispatch / executor adapter / run runtime / evidence evaluator / work driver
 ```
 
 These names describe different responsibilities. If they share one implicit
-control path, future changes such as a Rust dispatcher, new protocol families,
+control path, changes such as a Rust dispatcher, new protocol families,
 Herdr/headless parity, provider diversity, or Work-attached mutation will be
 harder to introduce safely.
 
@@ -117,23 +122,27 @@ An authority boundary may cross a module boundary. A module may call another
 module to apply a decision, but it must not privately re-derive or overwrite
 that module's authority.
 
-## 5. High-Level Component View
+## 5. High-Level Component Authority Register
 
 The lower-level boundaries below should not be mapped one-to-one into
 top-level modules, services, or packages. That would make the implementation
 too fragmented. They are a mix of bounded contexts and authority boundaries,
 and should be grouped into a smaller set of practical components.
 
-A more practical component map is:
+A component boundary can link to several documents because ownership is split
+between product spec, architecture contract, and implementation reality. The
+table below is the management view for the whole system.
 
-| Component | Role | Internal boundaries |
-|---|---|---|
-| Work Lifecycle Engine | Sibling fgOS component that owns domain-agnostic Work-unit management: item identity, status, stage, claim/return, related info, context, documents, questions, and Work verbs. It may use Agent Coordination for selected operations, but Agent Coordination never owns this lifecycle. | Work item state machine, domain-agnostic stage/status, claim/return ownership, related refs, context/document refs, human gates. |
-| Agent Coordination Engine | Domain-neutral collaboration runtime. It owns a coordination invocation, session/task progress, Assignment membership, team-cognition invocation, and synthesis lifecycle. | CoordinationSession, AdhocTask, session event log, task readiness, Assignment creation, aggregate outcome, Team Cognition Engine. |
-| Dispatch And Execution Engine | Governed execution of one approved Assignment. It chooses the allowed executor/provider/model/tier/mechanism and supervises the Run. | dispatch policy resolver, executor registry, governance/egress, DispatchPlan, Run creation, launch/timeout/cancel/retry, executor adapters. |
-| Run Result Evaluator | Truth boundary for one Assignment Run. It turns the Assignment contract, Run settlement, worker claim, artifacts, and evidence into a RunResult confidence decision. | worker result parser, evidence collectors, freshness checks, artifact refs/store, confidence evaluator, RunResult normalizer. |
-| Domain Components And Extension Layer | Domain packages and smaller extension packages that use the engines while owning domain-specific behavior. A domain package may be large enough to have its own core and sub-workflows. | Coding Domain Component, Marketing Domain Component, Workflow/CoordinationProtocol definitions, TaskSpecs, Skills, domain harnesses, protocol packages, org policy/persona/tier preferences, evidence policy adapters. |
-| Host And Surface Layer | Inbound/outbound surfaces and operator visibility. It translates CLI/API/plugin/dashboard/webhook/chat/Herdr interactions into calls against the engines, without becoming lifecycle or evidence truth. | CLI/API/plugin adapters, Herdr/dashboard visibility, future host adapters, surface auth, command/API envelopes. |
+| Component | Role | Internal boundaries | Owning / reference documents |
+|---|---|---|---|
+| Work Lifecycle Engine | fgOS component that owns domain-agnostic Work-unit management: item identity, status, stage, claim/return, related info, context, documents, questions, and Work verbs. It may use Agent Coordination for selected operations, but Agent Coordination never owns this lifecycle. | Work item state machine, domain-agnostic stage/status, claim/return ownership, related refs, context/document refs, human gates. | [Work-State Spec](../../specs/work-state.md), [Work Item Lifecycle Vision](../../work-item-lifecycle-vision.md), [System Overview](../../specs/system-overview.md) |
+| Agent Coordination Engine | Domain-neutral collaboration runtime. It owns a coordination invocation, session/task progress, Assignment membership, team-cognition invocation, and synthesis lifecycle. | CoordinationSession, AdhocTask, session event log, task readiness, Assignment creation, aggregate outcome, Team Cognition Engine. | [Agent Coordination Portal](../agent-coordination/README.md), [CoordinationSession Contract](../agent-coordination/contracts/coordination-session.md), [FlowDefinition Contract](../agent-coordination/contracts/flow-definition.md), [Assignment/Run/RunResult Contract](../agent-coordination/contracts/assignment-run-runresult.md) |
+| Dispatch And Execution Engine | Governed execution of one approved Assignment. It chooses the allowed executor/provider/model/tier/mechanism and supervises the Run. | dispatch policy resolver, executor registry, governance/egress, DispatchPlan, Run creation, launch/timeout/cancel/retry, executor adapters. | [Runner Spec](../../specs/runner.md), [Dispatch Control Plane](../agent-coordination/architecture/dispatch-control-plane.md), [Assignment/Run/RunResult Contract](../agent-coordination/contracts/assignment-run-runresult.md) |
+| Run Result Evaluator | Truth boundary for one Assignment Run. It turns the Assignment contract, Run settlement, worker claim, artifacts, and evidence into a RunResult confidence decision. | worker result parser, evidence collectors, freshness checks, artifact refs/store, confidence evaluator, RunResult normalizer. | [Evidence And Results](../agent-coordination/architecture/evidence-and-results.md), [Assignment/Run/RunResult Contract](../agent-coordination/contracts/assignment-run-runresult.md), [Runner Spec](../../specs/runner.md) |
+| Domain Components And Extension Layer | Domain packages and smaller extension packages that use the engines while owning domain-specific behavior. A domain package may be large enough to have its own core and sub-workflows. | Coding Domain Component, Marketing Domain Component, Workflow/CoordinationProtocol definitions, TaskSpecs, Skills, domain harnesses, protocol packages, org policy/persona/tier preferences, evidence policy adapters. | [Domainization Architecture](../domainization/README.md), [System Overview](../../specs/system-overview.md), [Work Item Lifecycle Vision](../../work-item-lifecycle-vision.md), `domains/<domain>/AGENTS.md`, `domains/<domain>/registry.yaml`, `domains/<domain>/workflows/` |
+| Host And Surface Layer | Inbound/outbound surfaces and operator visibility. It translates CLI/API/plugin/dashboard/webhook/chat/Herdr interactions into calls against the engines, without becoming lifecycle or evidence truth. | CLI/API/plugin adapters, Herdr/dashboard visibility, host adapters, surface auth, command/API envelopes. | [fgOS Plugin Spec](../../specs/fgos-plugin.md), [Herdr Web Dashboard Spec](../../specs/herdr-web-dashboard.md), [Visibility And Herdr](../agent-coordination/architecture/visibility-and-herdr.md), [IO Contract](../../io-contract.md) |
+| Setup, Doctor, And Distribution Health | Platform support component that owns install shape, config defaults, health checks, repair posture, and global/project precedence. | setup config merge, doctor check registry, distribution packaging, shell integration, dependency/default discoverability. | [Distribution Spec](../../specs/distribution.md), [Distribution Vision](../../distribution-vision.md), [Reading Map setup entries](../../specs/reading-map.md) |
+| Knowledge, Learning, And Documentation Registry | Lifecycle-adjacent learning component that owns retrospective knowledge, doc/topic registry, end-user document indexing, trace, and evolve signals. | knowledge registry, doc registry, Diataxis index, item trace, friction/outcome learning, evolve candidates. | [Enduser Docs Authoring Spec](../../specs/enduser-docs-authoring.md), [Enduser Docs Index Spec](../../specs/enduser-docs-index.md), [System Overview](../../specs/system-overview.md) |
 
 The collaboration shape should stay:
 
@@ -167,12 +176,10 @@ operations, coding, or another domain can use Work items to manage units of
 work without inheriting coding-specific Git, worktree, merge, or technical
 approval behavior.
 
-This is an advisory refinement of the current wording in accepted Work
-integration docs, which often mention approval, branch, and merge together with
-Work lifecycle. The proposed split is: the Work engine owns domain-agnostic
-work-unit lifecycle and human gates; a domain extension owns domain-specific
-approval semantics, resource isolation, branch/worktree behavior, and merge
-mechanics when that domain needs them.
+The split is: the Work engine owns domain-agnostic work-unit lifecycle and
+human gates; a domain extension owns domain-specific approval semantics,
+resource isolation, branch/worktree behavior, and merge mechanics when that
+domain needs them.
 
 A Coding Domain Component is a high-level domain package, not a small
 extension. Its job is to own coding-specific product and technical behavior
@@ -201,16 +208,16 @@ This advisory should not re-open decisions that the repo has already made. The
 important recovered constraints are:
 
 1. `domain -> N workflow -> item` is already the intended hierarchy.
-   `coding` currently runs one default workflow, `feature`, but the accepted
-   direction is to un-gộp coding into `feature`, `bugfix`, and `lightweight`.
+   `coding` has a default workflow, `feature`, and the domain model separates
+   coding into `feature`, `bugfix`, and `lightweight` workflows.
    Workflow selection belongs to the domain registry through `workflowFor`
    keyed by item `kind`; it is not an Agent Coordination decision.
 2. A domain owns stage vocabulary, step mapping, legal stage transitions,
    stage-to-skill mapping, legal operations, `worktreeBacked`, status labels,
    park reasons, and classification vocabulary. A domain does not own the
    global status FSM.
-3. The current coding feature workflow already declares `planning.validate-plan`
-   as a legal operation: role `reviewer`, reason `review`, task-spec
+3. The coding feature workflow declares `planning.validate-plan` as a legal
+   operation: role `reviewer`, reason `review`, task-spec
    `validate-plan`, skill `fgos-coding-validating`, with policy hints
    `minTier: standard`, `preferPersona: code-reviewer`, and
    `preferExecutor: claude`.
@@ -226,8 +233,8 @@ important recovered constraints are:
    task-spec is the executable contract; skill is executor know-how; knowledge
    is domain expertise; context is instance-specific material and references.
 8. Collaboration triggers belong in task-specs per call edge and workflow/stage:
-   when to call, why, to whom, and what return shape is expected. The current
-   doctrine is: prose teaches, the soul decides, guard blocks.
+   when to call, why, to whom, and what return shape is expected. The doctrine
+   is: prose teaches, the soul decides, guard blocks.
 9. RoleGraph should stay small: implementer, researcher, reviewer, helper, and
    advisor. New specialties should normally be expressed as task-spec/skill
    combinations, not new core roles.
@@ -278,22 +285,22 @@ re-derive it privately.
 
 | Existing contract or rule | Primary owner | Important consumers | Ownership note |
 |---|---|---|---|
-| [Workflow Stage Operation Contract](../contracts/workflow-stage-operation.md) | Domain Components And Extension Layer, as consumed by Work Lifecycle Engine | Agent Coordination Engine, Assignment Builder | Owns declared domain Work-stage operation normalization and compatibility. Coding Feature Workflow and Bugfix Workflow are coding-domain subcomponents, not Agent Coordination core. |
-| [FlowDefinition Contract](../contracts/flow-definition.md) | Domain Components And Extension Layer, with validation consumed by Agent Coordination Engine | Team Cognition Engine, Work Lifecycle Engine, Dispatch/Execution | Owns schema/IR for graph, roles, actors, operations, profiles, and declared policy hints. It should not own runtime state, executor choice, or evidence truth. |
-| [CoordinationSession Contract](../contracts/coordination-session.md) | Agent Coordination Engine | Team Cognition Engine, Dispatch/Execution, Run Result Evaluator, Work Lifecycle Engine | Owns session manifest, event stream, assignment membership, aggregate bounds, topology state, and recovery. It should reference Assignment/Run/RunResult records, not duplicate them. |
-| Assignment section of [Assignment, Run, And RunResult Contract](../contracts/assignment-run-runresult.md) | Agent Coordination Engine / Assignment Builder | Domain Components And Extension Layer, Domain Harnesses, Dispatch/Execution | Owns immutable semantic request shape and provenance. It should freeze mutation/evidence/budget/policy inputs before dispatch. |
-| Run section of [Assignment, Run, And RunResult Contract](../contracts/assignment-run-runresult.md) | Dispatch And Execution Engine | Run Result Evaluator, Host/Surface, Agent Coordination Engine | Owns one concrete attempt and its resolved DispatchPlan/mechanism metadata. It should not become semantic task identity. |
-| RunResult and Confidence sections of [Assignment, Run, And RunResult Contract](../contracts/assignment-run-runresult.md) | Run Result Evaluator | Agent Coordination Engine, Work Lifecycle Engine, Team Cognition Engine | Owns normalized outcome, confidence, accepted/rejected evidence, and failure classification. It should not authorize lifecycle mutation. |
-| [Dispatch Control Plane](../architecture/dispatch-control-plane.md) | Dispatch And Execution Engine | Agent Coordination Engine, Domain Components And Extension Layer, Host/Surface | Owns executor/provider/model/tier/mechanism/adapter/governance resolution. It should not choose semantic operations or interpret success. |
-| [Evidence And Result Architecture](../architecture/evidence-and-results.md) | Run Result Evaluator | Dispatch/Execution, Agent Coordination Engine, Work Lifecycle Engine, Domain Components And Extension Layer | Owns confidence boundaries, evidence freshness, and false-success rules. Adapters and domain evidence policy should feed it evidence, not replace it. |
-| [Work Integration Boundaries](../architecture/work-integration.md) | Work Lifecycle Engine | Agent Coordination Engine, Domain Components And Extension Layer, Run Result Evaluator | Owns the rule that only Work verbs move domain-agnostic Work lifecycle state. Domain-specific lifecycle effects such as coding merge/technical approval belong to the relevant domain component. Sessions and RunResults may inform drivers only. |
-| [Visibility And Herdr](../architecture/visibility-and-herdr.md) | Host And Surface Layer | Dispatch/Execution, Run Result Evaluator, Agent Coordination Engine | Owns observation and operator visibility. It must consume canonical Run/RunResult state where possible and must not become truth. |
-| [ADR-007 Domain Harness Seam](../decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md) | Domain Components And Extension Layer | Assignment Builder, Agent Coordination Engine, Work Lifecycle Engine | Owns domain-specific enrichment/rejection before normalization. It may add constraints/evidence/policy hints, but may not dispatch or mutate lifecycle. |
+| [Workflow Stage Operation Contract](../agent-coordination/contracts/workflow-stage-operation.md) | Domain Components And Extension Layer, as consumed by Work Lifecycle Engine | Agent Coordination Engine, Assignment Builder | Owns declared domain Work-stage operation normalization and compatibility. Coding Feature Workflow and Bugfix Workflow are coding-domain subcomponents, not Agent Coordination core. |
+| [FlowDefinition Contract](../agent-coordination/contracts/flow-definition.md) | Domain Components And Extension Layer, with validation consumed by Agent Coordination Engine | Team Cognition Engine, Work Lifecycle Engine, Dispatch/Execution | Owns schema/IR for graph, roles, actors, operations, profiles, and declared policy hints. It should not own runtime state, executor choice, or evidence truth. |
+| [CoordinationSession Contract](../agent-coordination/contracts/coordination-session.md) | Agent Coordination Engine | Team Cognition Engine, Dispatch/Execution, Run Result Evaluator, Work Lifecycle Engine | Owns session manifest, event stream, assignment membership, aggregate bounds, topology state, and recovery. It should reference Assignment/Run/RunResult records, not duplicate them. |
+| Assignment section of [Assignment, Run, And RunResult Contract](../agent-coordination/contracts/assignment-run-runresult.md) | Agent Coordination Engine / Assignment Builder | Domain Components And Extension Layer, Domain Harnesses, Dispatch/Execution | Owns immutable semantic request shape and provenance. It should freeze mutation/evidence/budget/policy inputs before dispatch. |
+| Run section of [Assignment, Run, And RunResult Contract](../agent-coordination/contracts/assignment-run-runresult.md) | Dispatch And Execution Engine | Run Result Evaluator, Host/Surface, Agent Coordination Engine | Owns one concrete attempt and its resolved DispatchPlan/mechanism metadata. It should not become semantic task identity. |
+| RunResult and Confidence sections of [Assignment, Run, And RunResult Contract](../agent-coordination/contracts/assignment-run-runresult.md) | Run Result Evaluator | Agent Coordination Engine, Work Lifecycle Engine, Team Cognition Engine | Owns normalized outcome, confidence, accepted/rejected evidence, and failure classification. It should not authorize lifecycle mutation. |
+| [Dispatch Control Plane](../agent-coordination/architecture/dispatch-control-plane.md) | Dispatch And Execution Engine | Agent Coordination Engine, Domain Components And Extension Layer, Host/Surface | Owns executor/provider/model/tier/mechanism/adapter/governance resolution. It should not choose semantic operations or interpret success. |
+| [Evidence And Result Architecture](../agent-coordination/architecture/evidence-and-results.md) | Run Result Evaluator | Dispatch/Execution, Agent Coordination Engine, Work Lifecycle Engine, Domain Components And Extension Layer | Owns confidence boundaries, evidence freshness, and false-success rules. Adapters and domain evidence policy should feed it evidence, not replace it. |
+| [Work Integration Boundaries](../agent-coordination/architecture/work-integration.md) | Work Lifecycle Engine | Agent Coordination Engine, Domain Components And Extension Layer, Run Result Evaluator | Owns the rule that only Work verbs move domain-agnostic Work lifecycle state. Domain-specific lifecycle effects such as coding merge/technical approval belong to the relevant domain component. Sessions and RunResults may inform drivers only. |
+| [Visibility And Herdr](../agent-coordination/architecture/visibility-and-herdr.md) | Host And Surface Layer | Dispatch/Execution, Run Result Evaluator, Agent Coordination Engine | Owns observation and operator visibility. It must consume canonical Run/RunResult state where possible and must not become truth. |
+| [ADR-007 Domain Harness Seam](../agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md) | Domain Components And Extension Layer | Assignment Builder, Agent Coordination Engine, Work Lifecycle Engine | Owns domain-specific enrichment/rejection before normalization. It may add constraints/evidence/policy hints, but may not dispatch or mutate lifecycle. |
 | Domain registry and workflow declarations (`domains/<domain>/registry.yaml`, `workflows/*.yaml`) | Domain Components And Extension Layer | Work Lifecycle Engine, Agent Coordination Engine, Assignment Builder, Dispatch And Execution Engine | Own stage vocabulary, legal operations, stage skill/taskSpec mapping, workflow selection, and domain policy hints. Other components read them; they do not reinterpret them. |
 | Domain task-specs (`domains/<domain>/task-specs/*.md`) | Domain Components And Extension Layer | Agent Coordination Engine, Assignment Builder, Skills, Run Result Evaluator | Own executable contract, collaboration triggers, required skill/agent hints, expected outputs, gates, and return shape for an operation. They are not runtime state and should not choose executor transport. |
 | Domain skills (`domains/<domain>/skills/*` or `.agents/skills/*`) | Domain Components And Extension Layer | Executors, Assignment Builder, Host/Surface | Own operational know-how for an executor. They must not silently replace task-spec authority, domain workflow legality, dispatch policy, or Work lifecycle verbs. |
 
-Two current contract files deserve special care:
+Two contract files deserve special care:
 
 1. `assignment-run-runresult.md` is a chain contract, not a single-component
    ownership contract. Assignment, Run, and RunResult should remain separate
@@ -303,7 +310,7 @@ Two current contract files deserve special care:
    to Dispatch And Execution, and confidence computation belongs to the Run
    Result Evaluator.
 
-Three current coding-domain sources deserve the same treatment:
+Three coding-domain sources deserve the same treatment:
 
 1. `domains/coding/workflows/feature.yaml` is the source for the feature
    workflow's legal stage operations. `planning.validate-plan` should be read
@@ -443,7 +450,7 @@ test command evidence collector
 Work engine verb adapter
 ```
 
-This split makes future replacement easier. For example, dispatch governance,
+This split makes replacement easier. For example, dispatch governance,
 FlowDefinition validation, session DAG scheduling, Run supervision, or evidence
 collection could move to Rust without requiring protocol packages or Skills to
 move with them.
@@ -585,7 +592,7 @@ The most important architectural consequences are:
 4. Coding workflows should call into platform engines through contracts:
    Work verbs for lifecycle, Assignment for collaboration work, DispatchPlan
    for execution, and RunResult for confidence.
-5. Marketing can later use the same Work lifecycle primitives while owning very
+5. Marketing can use the same Work lifecycle primitives while owning very
    different task-specs, skills, knowledge, context assets, gates, and
    dashboards.
 
@@ -682,7 +689,7 @@ They should lower every executable action into the same Assignment path. A
 protocol package should not spawn executors directly and should not create a
 private result/evidence format.
 
-This keeps "team cognition" reusable and replaceable. A future organization
+This keeps "team cognition" reusable and replaceable. An organization
 could provide a different debate framework, research doctrine, or cohort
 allocation strategy without changing dispatch or Assignment/Run stores.
 
@@ -773,11 +780,11 @@ finally: add marketplace or dynamic plugin loading
 This follows the accepted rule that the foundation should not generalize from
 one hypothetical consumer.
 
-## 17. Compatibility With Agent Coordination
+## 17. Related Agent Coordination Contract Set
 
-This advisory is compatible with the accepted Agent Coordination documents as
-long as it is read at the same authority level as its header: useful discussion
-guidance, not a normative contract or roadmap.
+The system-wide boundary map is compatible with the Agent Coordination
+documents as long as it is read at the same authority level as its header:
+useful discussion guidance, not a normative contract or roadmap.
 
 Whole-system alignment:
 
@@ -815,7 +822,7 @@ Whole-system alignment:
   runtime. The advisory matches this by separating Team Cognition Engine from
   protocol packages and by keeping protocol packages declarative.
 
-Step 08 alignment:
+CoordinationSession and FlowDefinition alignment:
 
 - ADR-008 makes `CoordinationSession` the V1 executable/recovery root and keeps
   Assignment session-blind through one-way session-to-Assignment membership.
@@ -848,26 +855,22 @@ The main caution for ongoing implementation is naming and placement drift:
 - Do not let standalone protocol work borrow coding Stage vocabulary merely to
   reach dispatch. A declared `CoordinationProtocol` uses Phase semantics; an
   agent-led session may lower directly to validated execution contracts.
-- Do not make a declared protocol mandatory for standalone coordination. Step
-  08 must still prove at least one agent-led session with no Work, no Stage,
-  and no predeclared protocol.
+- Do not make a declared protocol mandatory for standalone coordination. A
+  valid standalone agent-led session may have no Work, no Stage, and no
+  predeclared protocol.
 - Do not treat FlowDefinition policy fields as effective dispatch decisions.
   They are declared inputs; Dispatch And Execution still resolves the concrete
   executor/provider/model/mechanism under governance.
 - Do not treat Run settlement or worker output as semantic truth. Run Result
   Evaluator remains the confidence boundary for one Assignment Run.
-- Do not move Coding Domain responsibilities into the foundation while adding
-  Work-attached mutation later. Resource conflicts, worktree/branch isolation,
+- Do not move Coding Domain responsibilities into the foundation when adding
+  Work-attached mutation. Resource conflicts, worktree/branch isolation,
   merge/catch-up, verification expectations, and technical approval are the
   coding domain's authority.
 
-The advisory therefore supports Step 08 Phase 01 through Phase 08.Final as an
-incremental path: first establish the session ledger and agent-led read-only
-proof, then add the shared FlowDefinition/profile validators, then layer
-declared protocols, topology, fan-out/fan-in, cohort allocation, recovery, and
-external surfaces. None of those phases require a broad component split first,
-but each phase should leave newly built behavior owned by the component whose
-authority it exercises.
+The practical requirement is simple: coordination runtime, FlowDefinition,
+dispatch, RunResult, Work lifecycle, and coding-domain authority stay separate
+even when a single feature path exercises all of them.
 
 ## 18. Implementation Reality: Additional Boundaries Found In Code
 
@@ -895,7 +898,7 @@ Likely additional or more explicit boundaries:
    `domains/*/registry.yaml` and workflow definitions owns stage vocabulary,
    legal operations, workflow selection, skill/taskSpec mappings, and role
    graph metadata. This looks like a Domain Components And Extension Layer
-   boundary, even if its current physical placement is in `src/state` for
+   boundary, even if its physical placement is in `src/state` for
    dependency reasons.
 
 3. Claim And Runtime Occupancy Coordination.
@@ -924,9 +927,8 @@ Likely additional or more explicit boundaries:
    `src/runner/iron-law-gate.mjs`, and repository adapters owns worktree,
    branch, merge readiness, drift, cleanup, verification, and approval gates.
    Architecturally this should be discussed as a subcomponent of Coding Domain
-   Core, not as a generic foundation component. Its current location under
-   `runner`, `state`, and `verbs` is implementation history and should not
-   decide ownership by itself.
+   Core, not as a generic foundation component. Its location under `runner`,
+   `state`, and `verbs` should not decide ownership by itself.
 
 6. Setup, Doctor, And Distribution Health.
 
@@ -961,12 +963,11 @@ Naming risks found during the scan:
 - `session.mjs` manages git checkout sessions, not coordination sessions.
 - `graph-harness.mjs` and `cleanup-harness.mjs` are not ADR-007 domain
   harnesses; they are merge/readiness and cleanup lifecycle gates.
-- `operation-choice.mjs` currently lives under dispatch, but its responsibility
-  is closer to Work Driver / Workflow Interpreter than to Dispatch Control
-  Plane.
-- `assignment-runner.mjs` and `result-ladder.mjs` currently carry some result
-  interpretation behavior in the dispatch path. That is acceptable as
-  implementation history, but the target authority split should remain:
+- `operation-choice.mjs` lives under dispatch, but its responsibility is closer
+  to Work Driver / Workflow Interpreter than to Dispatch Control Plane.
+- `assignment-runner.mjs` and `result-ladder.mjs` carry some result
+  interpretation behavior in the dispatch path. The target authority split
+  remains:
   dispatch governs execution attempts; Run Result Evaluator governs confidence
   over one Assignment Run.
 
@@ -1023,8 +1024,8 @@ early:
 ## 21. Suggested Next Discussion Artifact
 
 If this advisory is accepted as useful, the next useful document is a canonical
-or near-canonical "Component, Bounded-Context, And Authority Map" for Agent
-Coordination. It should record:
+or near-canonical "Component, Bounded-Context, And Authority Map" for fgOS as a
+whole. It should record:
 
 - each high-level component's packaging responsibility;
 - each bounded context's model and vocabulary;
@@ -1035,9 +1036,9 @@ Coordination. It should record:
 - forbidden dependencies;
 - whether it belongs to foundation, domain, integration, visibility, or plugin
   layer;
-- which seams are ready now and which are only preserved for later.
+- which seams are active boundaries and which are preserved extension points.
 
 That document should not be a roadmap. It should be an ownership map that lets
-future implementation slices stay small without losing the architecture, while
+implementation slices stay small without losing the architecture, while
 also preventing a convenient module boundary from silently becoming authority
 over state it does not own.

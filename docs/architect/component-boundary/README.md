@@ -1,11 +1,21 @@
 # Component Boundary Architecture
 
 This folder collects vision-level architecture notes about how fgOS should name,
-separate, and eventually place its high-level components.
+separate, and eventually place its high-level components across the whole
+system.
 
 These documents are not implementation plans. They are refactoring compass
-documents: use them to keep new slices moving toward clearer boundaries without
-forcing a large rebuild before the system proves the need.
+documents: use them to keep slices moving toward clearer boundaries without
+forcing a large rebuild.
+
+The scope is all of forgentX: Work Lifecycle, domain components,
+dispatch/execution, result evaluation, host surfaces, setup/doctor/distribution,
+gateway/Herdr, learning, and runtime implementation boundaries.
+
+For the domain-specific split itself, read
+[Domainization Architecture](../domainization/README.md). This folder keeps the
+whole-system component map; domainization is the deep dive for the Domain
+Components And Extension Layer.
 
 ## 1. How To Read This Folder
 
@@ -55,10 +65,10 @@ should not create authority by convenience of file location.
 vision document for component responsibility, bounded context, and authority
 boundary.
 
-It asks whether current and planned Agent Coordination work is split at the
-right conceptual boundaries: Work Lifecycle, Agent Coordination, Dispatch And
-Execution, Run Result Evaluation, Domain Components, Host Surfaces, and the
-additional boundaries already visible in code.
+It asks whether fgOS is split at the right conceptual boundaries: Work
+Lifecycle, Agent Coordination, Dispatch And Execution, Run Result Evaluation,
+Domain Components, Host Surfaces, setup/doctor/distribution, gateway/Herdr,
+learning, and the additional boundaries already visible in code.
 
 Use this document when deciding:
 
@@ -67,8 +77,13 @@ Use this document when deciding:
 - whether Work Lifecycle remains domain-agnostic;
 - whether Dispatch, RunResult evaluation, workflow driving, and domain harnesses
   are overlapping;
-- whether a future refactor is clarifying an authority boundary or merely moving
+- whether a refactor is clarifying an authority boundary or merely moving
   files.
+
+For folder-level domain authoring shape, domain registry/workflow files,
+domain-scoped doctrine, task-spec placement, skill/agent authoring sources, and
+domain-siloing enforcement, use
+[Domainization Architecture](../domainization/README.md).
 
 ### Repo Layout Vision
 
@@ -76,9 +91,8 @@ Use this document when deciding:
 physical source layout.
 
 It describes the `apps/` plus `packages/` direction: apps are thin entrypoints
-and packages hold reusable implementation logic. Its current concrete scope is
-the Rust/web `herdr-plugin` split. The Node side is explicitly left for later
-discussion.
+and packages hold reusable implementation logic. Its concrete scope is the
+Rust/web `herdr-plugin` split. The Node side is outside this document.
 
 Use this document when deciding:
 
@@ -148,11 +162,14 @@ settled decision is later extracted into the owning canonical document.
   workflow and coding-specific lifecycle mapping.
 - [Distribution Vision](../../distribution-vision.md) — install/setup/doctor
   direction and config/default registration posture.
+- [Domainization Architecture](../domainization/README.md) — core vs domain
+  authoring, resolver, doctrine, workflow, skill, task-spec, knowledge, and
+  agent boundaries.
 
-### Agent Coordination Architecture
+### Related Agent Coordination Contracts
 
 - [Agent Coordination Portal](../agent-coordination/README.md) — reading entry
-  for the current accepted Agent Coordination architecture set.
+  for the Agent Coordination architecture set.
 - [Agent Coordination Foundation Vision](../agent-coordination/vision.md) —
   foundation/domain split, runtime contracts, and small-core constraints.
 - [System Context](../agent-coordination/architecture/system-context.md) —

@@ -22,6 +22,7 @@ inside their own subtrees, such as `agent-coordination/` and
 
 - [Agent Coordination](agent-coordination/README.md)
 - [Component Boundary](component-boundary/README.md)
+- [Domainization](domainization/README.md)
 
 ## Cross-Area Proposals
 
