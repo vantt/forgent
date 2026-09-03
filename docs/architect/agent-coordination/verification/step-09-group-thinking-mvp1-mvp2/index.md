@@ -85,7 +85,7 @@ Phases" below for the full list this plan hands off.
 | P02.1 | Phase 02 R1, R2, R3, R4 | done | `82610e7f` |
 | P02.2 | Phase 02 R5, R6, R7, R8 (closes Phase 02) | done | `bc65df22` |
 | P03.1 | Phase 03 R1, R2, R3, R4 | done | `6c41b561` |
-| P03.2 | Phase 03 R5, R6, R7 (closes Phase 03) | done | (pending commit) |
+| P03.2 | Phase 03 R5, R6, R7 (closes Phase 03) | done | `ebddfbda` |
 
 ## Phase 00 Status
 
