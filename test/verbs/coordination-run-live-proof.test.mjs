@@ -276,7 +276,137 @@ test('one live `fgos coordination run` drives the whole Master Coordination loop
   assert.deepEqual(fs.readFileSync(path.join(sessionDir, 'session.json')), manifestBefore);
 });
 
-test('re-running the same live request file is refused at session open: no Assignment is duplicated and no invocationKey is reconsumed', () => {
+// R4 substitution helper: no `$ref:` label survives across two separate
+// `fgos coordination run` invocations (each call starts its own in-memory
+// `labels` map in run.mjs) -- resolveRef's own documented "already
+// safe-charset-checked id, an advanced/resume use case" path is exactly
+// what a real resuming caller uses instead: the SECOND call's request names
+// the FIRST call's own Assignment ids literally. Walks every string field a
+// step can carry a `$ref:<label>` in (contextRefs/grantedContextRefs/
+// targetArtifactRef/targetRef/evidenceRefs/fromAssignmentId).
+function substituteAcrossCallBoundary(value, labelToAssignmentId) {
+  if (typeof value === 'string' && value.startsWith('$ref:')) {
+    const label = value.slice('$ref:'.length);
+    return label in labelToAssignmentId ? labelToAssignmentId[label] : value;
+  }
+  if (Array.isArray(value)) return value.map((v) => substituteAcrossCallBoundary(v, labelToAssignmentId));
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, substituteAcrossCallBoundary(v, labelToAssignmentId)]));
+  }
+  return value;
+}
+
+test('R4: a real SECOND `fgos coordination run` invocation against the SAME coordinationId continues the session -- no duplicate Assignment, no reconsumed invocationKey, no lost disposition, no hidden-context leakage', () => {
+  const cwd = tmpCwd();
+  writeFakeExecutorConfig(cwd);
+  const workEventsBefore = eventLines(cwd);
+  const workStateBefore = stateView(cwd);
+
+  const full = masterLoopRequest();
+  // Call 1 stops right after the revision is AUTHORIZED, before "fixer" (the
+  // 4th and last required actor) ever runs -- a genuine mid-flight
+  // interruption point: at least one Assignment (produce/review/red-team)
+  // AND one authorization (authorize-revision) already landed, per R4's own
+  // acceptance wording, but quorum cannot yet close the session (evaluated
+  // per required-actor coverage: doer/reviewer/red-team done, fixer still
+  // missing), so the session is provably still `active` when Call 2 starts.
+  const firstSteps = full.steps.slice(0, 4); // produce, review, red-team, authorize-revision
+  const secondStepsTemplate = full.steps.slice(4); // revise .. accept-revision
+  assert.deepEqual(
+    firstSteps.map((s) => s.as),
+    ['produce', 'review', 'red-team', 'authorize-revision'],
+  );
+
+  const firstPath = writeRequest(cwd, 'master-loop-part1.json', { ...full, steps: firstSteps });
+  const firstResult = run(cwd, ['coordination', 'run', '--file', firstPath]);
+  assert.equal(firstResult.status, 0, firstResult.stderr);
+  const firstData = envelopeData(firstResult.stdout);
+  assert.equal(firstData.coordinationId, COORDINATION_ID);
+  assert.equal(firstData.closed, false, 'quorum cannot close yet -- required actor "fixer" has not run');
+  assert.deepEqual(firstData.quorum.missing.map((m) => m.actorId), ['fixer']);
+
+  const labelToAssignmentId = Object.fromEntries(
+    firstData.steps.filter((s) => s.type === 'operation').map((s) => [s.as, s.assignmentId]),
+  );
+  assert.equal(Object.keys(labelToAssignmentId).length, 3); // produce, review, red-team
+
+  const assignmentsAfterFirst = fs.readdirSync(path.join(cwd, '.fgos', 'assignments')).sort();
+  assert.equal(assignmentsAfterFirst.length, 3);
+  const manifestAfterFirst = readManifest(COORDINATION_ID, { cwd, repoRoot: cwd });
+  assert.equal(manifestAfterFirst.status, 'active', 'the session must genuinely still be active when Call 2 starts -- not already closed');
+
+  const secondSteps = substituteAcrossCallBoundary(secondStepsTemplate, labelToAssignmentId);
+  const secondPath = writeRequest(cwd, 'master-loop-part2.json', { ...full, steps: secondSteps });
+  const secondResult = run(cwd, ['coordination', 'run', '--file', secondPath]);
+  assert.equal(secondResult.status, 0, secondResult.stderr);
+  const secondData = envelopeData(secondResult.stdout);
+  assert.equal(secondData.coordinationId, COORDINATION_ID);
+  assert.equal(secondData.closed, true);
+  assert.equal(secondData.status, 'completed');
+  assert.deepEqual(secondData.quorum.missing, []);
+  assert.deepEqual(secondData.quorum.failed, []);
+
+  const opts = { cwd, repoRoot: cwd };
+  const manifest = readManifest(COORDINATION_ID, opts);
+  // No duplicate Assignment: exactly 6 total across BOTH calls (4 from Call
+  // 1, 2 rechecks from Call 2) -- Call 2 never re-materialized produce/
+  // review/red-team/revise.
+  assert.equal(manifest.assignmentRefs.length, 6);
+  const assignmentsAfterSecond = fs.readdirSync(path.join(cwd, '.fgos', 'assignments')).sort();
+  assert.equal(assignmentsAfterSecond.length, 6);
+  for (const id of assignmentsAfterFirst) assert.ok(assignmentsAfterSecond.includes(id), `Call 1's Assignment "${id}" must survive Call 2 unchanged`);
+
+  const events = readSessionEvents(COORDINATION_ID, opts);
+  const kinds = events.reduce((acc, event) => ({ ...acc, [event.type]: (acc[event.type] ?? 0) + 1 }), {});
+  assert.equal(kinds['assignment-created'], 6);
+  assert.equal(kinds['result-linked'], 6);
+  // No reconsumed invocationKey: exactly 3 `operation-authorized` across
+  // BOTH calls (1 from Call 1, 2 from Call 2), 3 distinct invocationKeys.
+  assert.equal(kinds['operation-authorized'], 3);
+  const authEvents = events.filter((e) => e.type === 'operation-authorized');
+  assert.equal(new Set(authEvents.map((e) => e.payload.invocationKey)).size, 3);
+  assert.equal(new Set(authEvents.map((e) => e.payload.authorizationId)).size, 3);
+  // No lost disposition: both Call 2 dispositions present, in log order.
+  assert.equal(kinds['driver-disposition-recorded'], 2);
+  const dispositionEvents = events.filter((e) => e.type === 'driver-disposition-recorded');
+  assert.deepEqual(dispositionEvents.map((e) => e.payload.disposition), ['rejected', 'accepted']);
+  assert.equal(kinds['run-retried'], undefined);
+
+  // No hidden-context leakage: every Assignment Call 2 dispatched carries
+  // EXACTLY the contextRefs the request declared for it (the revised
+  // artifact's own Assignment id, resolved from Call 1's real output, not a
+  // wider or stale set).
+  const reviseId = secondData.steps.find((s) => s.as === 'revise').assignmentId;
+  const reviewerRecheckId = secondData.steps.find((s) => s.as === 'reviewer-recheck').assignmentId;
+  const reviewerRecheckAssignment = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'assignments', reviewerRecheckId, 'assignment.json'), 'utf8'));
+  assert.deepEqual(reviewerRecheckAssignment.contextRefs, [reviseId]);
+
+  const replayed = replaySession(COORDINATION_ID, opts);
+  assert.deepEqual(
+    replayed.authorizations.map((record) => record.authorizationId).sort(),
+    ['auth_red_team_recheck_1', 'auth_reviewer_recheck_1', 'auth_revision_1'],
+  );
+  assert.ok(replayed.authorizations.every((record) => record.consumedByAssignmentId !== null));
+
+  // R7: `coordination show` renders the final disposition/status for a
+  // session Call 2 resumed, exactly as it already does for a single-call
+  // session (P02.2's own rendering, confirmed unchanged, not reinvented).
+  const shown = run(cwd, ['coordination', 'show', COORDINATION_ID, '--json']);
+  assert.equal(shown.status, 0, shown.stderr);
+  const shownData = envelopeData(shown.stdout);
+  assert.equal(shownData.status, 'completed');
+  assert.equal(shownData.assignmentRefs.length, 6);
+  assert.deepEqual(shownData.dispositions.map((d) => d.disposition), ['rejected', 'accepted']);
+  assert.equal(shownData.authorizations.length, 3);
+  assert.deepEqual(shownData.pendingDriverAuthorizations, []);
+
+  // No Work, no git, no repo mutation -- across BOTH calls together.
+  assert.deepEqual(eventLines(cwd), workEventsBefore);
+  assert.deepEqual(stateView(cwd), workStateBefore);
+  assert.equal(fs.existsSync(path.join(cwd, '.git')), false);
+});
+
+test('R5 (resume-specific): once a session reaches a terminal status, a further CLI invocation naming the SAME coordinationId is refused -- terminal statuses stay absorbing across the resume door too, not just at open', () => {
   const cwd = tmpCwd();
   writeFakeExecutorConfig(cwd);
   const reqPath = writeRequest(cwd, 'master-loop.json', masterLoopRequest());
@@ -286,10 +416,14 @@ test('re-running the same live request file is refused at session open: no Assig
   const eventsBefore = fs.readFileSync(path.join(sessionDir, 'events.jsonl'));
   const manifestBefore = fs.readFileSync(path.join(sessionDir, 'session.json'));
   const assignmentsBefore = fs.readdirSync(path.join(cwd, '.fgos', 'assignments')).sort();
+  assert.equal(JSON.parse(manifestBefore).status, 'completed');
 
+  // Same request file, same coordinationId -- resume now SKIPS the old
+  // "already exists" refusal and reaches the dispatch door instead, which
+  // refuses for the real reason: the session is no longer active.
   const second = run(cwd, ['coordination', 'run', '--file', reqPath]);
   assert.notEqual(second.status, 0);
-  assert.match(second.stderr, /coordination session "coord_master_loop_live" already exists/);
+  assert.match(second.stderr, /session "coord_master_loop_live" is not active \(status: "completed"\)/);
 
   assert.deepEqual(fs.readFileSync(path.join(sessionDir, 'events.jsonl')), eventsBefore);
   assert.deepEqual(fs.readFileSync(path.join(sessionDir, 'session.json')), manifestBefore);

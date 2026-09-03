@@ -74,6 +74,7 @@ import { mergeList, mergeNext } from '../src/verbs/merge/merge.mjs';
 import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
 import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
 import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
+import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -3113,7 +3114,7 @@ async function runVerb(verb, flags, positional, dir) {
     // existing, hardened session-engine.mjs exports (P00-P06) -- this
     // adapter never touches session/Assignment/Run state directly.
     case 'coordination': {
-      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show> ...');
+      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show|launch-master-loop> ...');
       // Same repoRoot resolution `catchup`/`merge next` already use:
       // `--dir` names the main checkout's `.fgos/`, so its parent is the
       // repo root; omitted, the caller's own cwd is the repo root.
@@ -3141,7 +3142,36 @@ async function runVerb(verb, flags, positional, dir) {
         // envelope is always JSON, so the flag changes nothing.
         return showCoordinationUseCase({ cwd: repoRootForCoordination, repoRoot: repoRootForCoordination }, { id });
       }
-      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: run, show).`);
+      if (sub === 'launch-master-loop') {
+        // MVP4 (Step 09, Phase 02) R1-R4: a thin, mechanical composer for
+        // the shipped standalone-master-coordination-loop fixture's
+        // required first pass ONLY -- never an authorize/disposition/
+        // revise/recheck step (see launch-master-loop.mjs's own header
+        // comment). Same door as `run` above: `launchMasterLoopUseCase`
+        // composes a request object and hands it to the SAME
+        // `runCoordinationUseCase` this file already calls for `run`.
+        const planPath = path.resolve(process.cwd(), requireField(flags.plan, 'coordination launch-master-loop requires --plan <path>'));
+        const objective = requireField(flags.objective, 'coordination launch-master-loop requires --objective <text>');
+        const writerId = requireField(flags['writer-id'], 'coordination launch-master-loop requires --writer-id <id>');
+        return await launchMasterLoopUseCase(
+          {
+            cwd: repoRootForCoordination,
+            repoRoot: repoRootForCoordination,
+            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
+          },
+          {
+            planPath,
+            objective,
+            writerId,
+            coordinationId: flags['coordination-id'],
+            expectedFixtureVersion: flags['fixture-version'],
+            cliExecutor: flags.executor,
+            cliModel: flags.model,
+            cliTier: flags.tier,
+          },
+        );
+      }
+      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: run, show, launch-master-loop).`);
     }
 
     case 'rebuild': {

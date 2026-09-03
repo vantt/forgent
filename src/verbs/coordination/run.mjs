@@ -29,6 +29,18 @@
 // before this function returns; a `fan-out` step dispatches its own
 // branches concurrently (via dispatchResearchFanOut, itself part of the
 // hardened engine), but steps themselves never overlap.
+//
+// Resume: a request naming an EXISTING `coordinationId` continues that
+// session instead of refusing at `openSession`'s "already exists" guard
+// (`findExistingManifest`, below). This reaches the SAME
+// dispatchDeclaredOperation/authorizeDeclaredOperation/recordDriverDisposition
+// doors every other request already uses -- never a parallel dispatch path
+// -- because those doors re-read `readManifest(coordinationId, opts)` fresh
+// from disk on every call; they do not care whether the session was opened
+// in this process or a prior one. `findExistingManifest` refuses the whole
+// request up front when a resumed request's `writerId` does not match the
+// session's own `provenanceRoot.writerId` -- resume's own identity gate,
+// since ordinary dispatch has no per-call identity check of its own.
 import fs from 'node:fs';
 import path from 'node:path';
 import { StoreError } from '../../state/store.mjs';
@@ -36,6 +48,7 @@ import { CoordinationError } from '../../runner/coordination/schema.mjs';
 import {
   openStandaloneSession,
   openDeclaredProtocolSession,
+  resumeSession,
   dispatchPrimaryTask,
   dispatchDeclaredOperation,
   dispatchResearchFanOut,
@@ -84,6 +97,52 @@ function actorPolicyFields(actorEntry, { globalExecutor, globalTier } = {}) {
 
 function findActor(actors, id) {
   return actors.find((a) => a.id === id);
+}
+
+// R4 (resume): a request naming an EXISTING `coordinationId` continues that
+// session's own dispatch/authorize/disposition doors instead of refusing at
+// `openSession`'s "already exists" guard. `resumeSession` (session-engine.mjs)
+// is the one blessed resume door -- literally `replaySession`, re-exported
+// under that name for exactly this purpose per its own doc comment ("so
+// callers have one obvious 'resume' door on this module rather than reaching
+// into replay.mjs directly") -- never reached into replay.mjs itself here.
+// Returns the session's manifest (byte-identical in shape to what
+// `openStandaloneSession`/`openDeclaredProtocolSession` themselves return,
+// since both read the same `session.json` via `readManifestRaw`) when the id
+// already names an open session on disk, or `undefined` when the id is unset
+// or genuinely new -- the caller opens one in that case, unchanged. No
+// caller-supplied id is ever ambiguous with "auto-generate": resume is only
+// ever attempted for an EXPLICIT `coordinationId`.
+//
+// Identity gate: `dispatchDeclaredOperation`/`dispatchPrimaryTask`/
+// `dispatchResearchFanOut` never compare their caller's `writerId` against
+// `manifest.provenanceRoot.writerId` -- only `authorize`/`disposition` steps
+// carry that check (`assertDriverIdentity`, store.mjs). Before resume
+// existed this was unreachable: a single request always supplied the SAME
+// `writerId` for both `openParams` and every dispatch call by construction.
+// Resume removes that natural gate -- a second, independent request can name
+// an EXISTING `coordinationId` with a writerId of its own choosing and reach
+// ordinary dispatch under someone else's already-open session, spending the
+// original driver's still-unconsumed authorizations. Asserted here, once, at
+// the resume boundary, for every step kind -- mirroring
+// `assertDriverIdentity`'s own check -- so a resumed request can never
+// dispatch a single step under a foreign identity.
+function findExistingManifest(coordinationId, writerId, engineOpts) {
+  if (coordinationId === undefined) return undefined;
+  let manifest;
+  try {
+    manifest = resumeSession(coordinationId, engineOpts).manifest;
+  } catch (err) {
+    if (err instanceof CoordinationError && err.category === 'not-found') return undefined;
+    throw err;
+  }
+  if (manifest.provenanceRoot.writerId !== writerId) {
+    throw new CoordinationError(
+      'validation',
+      `coordination run: writerId "${writerId}" is not the driver identity of session "${coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- a resumed request may only dispatch under the session's own driver/provenance-root identity`,
+    );
+  }
+  return manifest;
 }
 
 // dispatchDeclaredOperation (session-engine.mjs) builds its OWN
@@ -187,7 +246,9 @@ export async function runCoordinationUseCase(ctx, options = {}) {
   let fanOutFailure = null;
 
   if (request.kind === 'agent-led') {
-    manifest = openStandaloneSession({ ...openParams, primaryRole: request.primaryRole }, engineOpts);
+    manifest =
+      findExistingManifest(request.coordinationId, request.writerId, engineOpts) ??
+      openStandaloneSession({ ...openParams, primaryRole: request.primaryRole }, engineOpts);
     const primaryActor = findActor(request.actors, 'primary');
     const cliOverride = {
       ...actorPolicyFields(primaryActor, { globalExecutor: cliExecutor, globalTier: cliTier }),
@@ -239,7 +300,9 @@ export async function runCoordinationUseCase(ctx, options = {}) {
         );
       }
     }
-    manifest = openDeclaredProtocolSession({ ...openParams, definitionId: request.protocolRef.id }, engineOpts);
+    manifest =
+      findExistingManifest(request.coordinationId, request.writerId, engineOpts) ??
+      openDeclaredProtocolSession({ ...openParams, definitionId: request.protocolRef.id }, engineOpts);
 
     // The driver whose authority an "authorize"/"disposition" step writes
     // under. There is exactly one legal value: the engine pins both events

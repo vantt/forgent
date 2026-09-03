@@ -118,3 +118,66 @@ test('standalone-master-coordination-loop rejects a mutated copy that injects ba
     (err) => err instanceof FlowDefinitionError && /spec\.profile has unknown field "baseStepMap"/.test(err.message),
   );
 });
+
+// ─── Phase 03 (Step 09 P03.1) R2/R3/R4: role execution policy readiness ───
+
+test('standalone-master-coordination-loop declares the intended cheap-by-default / analytical-by-default policy.minTier per role operation', () => {
+  const def = loadCoordinationProtocol(FIXTURE_ID, { cwd: mkTempDir('flow-definition-master-loop-policy-') });
+  const minTierByOp = Object.fromEntries(def.spec.operations.map((op) => [op.id, op.policy?.minTier]));
+
+  // Doer/Fixer: cheap-by-default (R4).
+  assert.equal(minTierByOp['produce-candidate'], 'standard');
+  assert.equal(minTierByOp['revise-candidate'], 'standard');
+  // Reviewer/Recheck: analytical read-only default (R4/R5).
+  assert.equal(minTierByOp['review-candidate'], 'analytical');
+  assert.equal(minTierByOp['reviewer-recheck'], 'analytical');
+  // Red-Team/Recheck: analytical default, escalated to critical only via a
+  // caller-supplied assignment/cli-scope PolicyPatch at dispatch time (see
+  // test/runner/dispatch-coordination-role-tiers.test.mjs for the live
+  // escalation proof) -- a portable operation/role/actor/definition scope
+  // can never pin `critical` unconditionally without also raising the
+  // floor for every OTHER round this operation dispatches, defeating "cheap
+  // by default" (R6).
+  assert.equal(minTierByOp['red-team-candidate'], 'analytical');
+  assert.equal(minTierByOp['red-team-recheck'], 'analytical');
+
+  // No operation declares `capabilities[]` (R1 audit finding: inert for
+  // this fixture's non-cohort dispatch path -- see P03.1.md).
+  for (const op of def.spec.operations) {
+    assert.equal(op.capabilities, undefined, `operation "${op.id}" must not declare capabilities[] (inert on this dispatch path)`);
+  }
+});
+
+test('standalone-master-coordination-loop declares no literal provider/model name anywhere (R3: capability/minTier only)', () => {
+  // Comment lines (this fixture's own explanatory `#` prose, e.g. naming
+  // `preferExecutor` as a concept it deliberately does NOT declare) are
+  // stripped before scanning -- this test asserts no MACHINE-READABLE YAML
+  // field carries a literal pin, not that the concept is never discussed in
+  // prose.
+  const machineReadableText = fs
+    .readFileSync(FIXTURE_PATH, 'utf8')
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('#'))
+    .join('\n');
+  // Every concrete model string this repo's own committed .fgos/config.json
+  // modelPolicies table names for any provider (claude/gemini/openai-codex/
+  // z-ai), plus the bare provider/CLI-command identifiers themselves -- a
+  // portable protocol file must name NONE of them (flow-definition.md
+  // PolicyPatch: "a portable ... definition expresses requirements ...
+  // never literal executor/model pins").
+  const forbiddenLiterals = [
+    'haiku', 'sonnet', 'opus', 'claude-3', 'claude-4', 'claude-5',
+    'gemini-', 'gpt-', 'glm-', 'z-ai',
+    'preferExecutor',
+  ];
+  for (const literal of forbiddenLiterals) {
+    assert.ok(!machineReadableText.toLowerCase().includes(literal.toLowerCase()), `fixture must not contain literal "${literal}" outside comments`);
+  }
+
+  // Same assertion, structurally: the VALIDATED/parsed definition (schema.mjs
+  // strips nothing, but this proves the field is genuinely absent from the
+  // normalized IR, not merely absent from this one raw-text scan) never
+  // carries a `preferExecutor`/`preferPersona` key anywhere at any depth.
+  const def = loadCoordinationProtocol(FIXTURE_ID, { cwd: mkTempDir('flow-definition-master-loop-no-pin-') });
+  assert.ok(!JSON.stringify(def).includes('preferExecutor'), 'validated definition must not carry preferExecutor anywhere');
+});

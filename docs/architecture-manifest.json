@@ -127,6 +127,7 @@
     "src/verbs/coordination/schema.mjs": "use-case",
     "src/verbs/coordination/run.mjs": "use-case",
     "src/verbs/coordination/show.mjs": "use-case",
+    "src/verbs/coordination/launch-master-loop.mjs": "use-case",
     "src/runner/coordination/headless-adapter.mjs": "use-case",
     "src/report/item-trace.mjs": "domain",
     "src/util/format-bytes.mjs": "kernel",
