@@ -214,6 +214,42 @@ NON-NEGOTIABLE RULES
 17. Never weaken, skip, or delete a failing test to make a cell pass; fix the
     code or record a gate.
 
+PARALLELISM POLICY
+
+Use concurrency where it shortens elapsed time without weakening evidence,
+mutation attribution, or independence:
+
+1. Reviewer and Red-Team first-pass checks may run in parallel after the
+   Coordinator has verified the Doer's candidate diff and proof command output.
+   Give both workers the same immutable scope/base, current-cell, actual diff,
+   touched files, proof refs, and role-specific instructions. Do not show either
+   worker the other's draft before both first-pass reports are complete.
+2. Independent Researcher calls may run in parallel only when each question is
+   explicit, bounded, and has disjoint output ownership.
+3. Concurrent source-writing Fixers are forbidden in a shared checkout. If the
+   environment provides only one writable checkout, parallel Fixers may produce
+   patch proposals or reports in separate report/proof paths; the Coordinator
+   applies accepted patches sequentially, reruns tests after each apply or after
+   a deliberate combined apply, and records attribution.
+4. Concurrent source-writing Fixers are allowed only with isolated
+   workspaces/branches and a recorded Fix Batch Plan. The Coordinator merges or
+   applies each result sequentially into BRANCH and verifies the combined diff.
+5. A Fix Batch Plan is required before any parallel fix attempt. It lists
+   finding ids, intended files/symbols, expected tests, workspace mode
+   (`shared-patch-proposal` or `isolated-workspace`), apply order,
+   conflict-risk classification, and fallback to sequential fixing.
+6. Findings that touch overlapping files/symbols, dispatch/self-host hooks,
+   session/replay/schema core, shared invariants, migrations, or test harness
+   foundations default to sequential fixing unless an explicit recorded reason
+   proves isolation is sufficient.
+7. After any batched or parallel fix, Reviewer recheck and Red-Team recheck may
+   run in parallel against the combined post-fix diff. Their reports must not be
+   treated as independent proof of each individual Fixer's private branch; the
+   proof target is the integrated cell state.
+8. Parallelism never relaxes the one-active-cell rule, Do Not Touch paths,
+   trace ownership, evidence requirements, commit policy, or Work lifecycle
+   authority.
+
 TEST BASELINE
 
 Before the first cell, run the repository's full test command once and record
@@ -378,16 +414,23 @@ E. REVIEW (INDEPENDENT REVIEWER)
 4. Reviewer updates only the Review section/proof artifacts.
 5. HIGH blocks close. MEDIUM requires fix or explicit coordinator deferral with
    owner/rationale. LOW may become follow-up.
-6. If actionable findings exist, set Next action fix; otherwise red-team.
+6. If Reviewer and Red-Team were run in parallel, wait for both reports before
+   deciding fix, close, or recheck. If Reviewer ran alone and actionable
+   findings exist, set Next action fix; otherwise red-team.
 
 F. FIX REVIEW FINDINGS (DOER/FIXER)
 1. Coordinator records accepted/rejected/deferred disposition by finding ID.
 2. Dispatch Doer/Fixer only for accepted findings.
-3. Require a regression test or defensible proof for each fix.
-4. Preserve original findings and add disposition/fix evidence; never erase
+3. If multiple accepted findings exist, classify them for a Fix Batch Plan
+   before dispatch: sequential, shared-patch-proposal, or isolated-workspace.
+4. Require a regression test or defensible proof for each fix.
+5. Preserve original findings and add disposition/fix evidence; never erase
    history.
-5. Material review fixes return to independent Reviewer.
-6. When review is clean, set Next action red-team.
+6. Material review fixes return to independent Reviewer. If Red-Team has already
+   produced first-pass findings, run the relevant Reviewer recheck and Red-Team
+   recheck in parallel only after the combined post-fix diff is ready.
+7. When review is clean, set Next action red-team unless Red-Team already ran in
+   parallel and is also clean; then set Next action close.
 
 G. RED-TEAM (INDEPENDENT)
 1. Dispatch independent Red-Team with current-cell, trace, diff, tests, review,
@@ -410,7 +453,9 @@ G. RED-TEAM (INDEPENDENT)
    - primary stage.skill/taskSpec compatibility regression.
 3. Red-Team updates only Red-Team section/proof artifacts.
 4. If findings exist, route accepted findings to Fixer and rerun relevant
-   attack/review. Otherwise set Next action close.
+   attack/review. Otherwise set Next action close. If Reviewer and Red-Team ran
+   in parallel, close is legal only after both reports are clean or every
+   accepted finding has been fixed and rechecked against the combined diff.
 
 H. CLOSE CELL (COORDINATOR)
 1. Inspect actual diff, trace, proofs, tests, Review, Red-Team, and findings.
