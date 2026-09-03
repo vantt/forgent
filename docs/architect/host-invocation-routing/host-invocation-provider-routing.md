@@ -394,7 +394,128 @@ layout. Every new location, cache, executable expectation, config default, or
 runtime dependency registers with `fgos setup` and `fgos doctor` and respects
 project-over-global configuration.
 
-## 12. Open Questions
+## 12. Technical Consequences And Tradeoffs
+
+### Same-Process Built-Ins Versus Runtime Extensions
+
+The router presents one semantic interface but does not force one deployment
+mechanism onto every provider.
+
+A built-in Rust provider is compiled into the host and called through a typed
+trait. This is the fastest path: there is no serialization, process startup,
+context switch, or runtime ABI. Static linking is appropriate because host and
+foundation component are released atomically.
+
+An external extension is installed and versioned independently, so it pays a
+runtime boundary in exchange for language neutrality, failure isolation, and
+no-recompile installation. A persistent process is the baseline for plugins
+that need normal operating-system capabilities; WASM is the stronger sandbox
+for pure or capability-scoped extensions.
+
+The architecture deliberately does not promise both hot replacement and direct
+function-call performance for the same provider. Built-in and external are two
+trust/distribution classes behind one semantic port, not one binary mechanism.
+
+### Cross-Process Cost
+
+Cold process startup is materially more expensive than communication with an
+already running provider. Startup includes runtime initialization, imports,
+configuration, and protocol negotiation. It is acceptable for a coarse,
+infrequent operation but not for thousands of helper-sized calls.
+
+A persistent stdio connection or local socket removes repeated startup cost.
+Even then, serialization, scheduling, and backpressure remain. Ports therefore
+expose complete use-case operations and batch hot loops behind one request.
+
+For a normal one-shot CLI invocation, keeping a Node or plugin process alive
+beyond the host lifetime adds daemon lifecycle without necessarily saving work.
+Persistence is justified for the remote host, interactive sessions, or a single
+invocation that performs repeated provider calls.
+
+### Legacy Node Adapter Modes
+
+The `LegacyNode` provider has two compatibility modes:
+
+1. **Transparent mode:** pass raw argv and inherited stdin/stdout/stderr to the
+   legacy entry. This maximizes byte compatibility, but the router cannot
+   observe a semantic result.
+2. **Structured bridge mode:** send a framed legacy invocation and receive
+   captured stdout, stderr, status, and diagnostics. This adds lifecycle,
+   cancellation, and tracing control without pretending the legacy output is a
+   `ProviderOutcome`.
+
+Both modes delegate a complete operation. A host must not split one state
+transaction between native and legacy providers unless a component contract
+already defines locking, atomicity, recovery, and authority at that boundary.
+
+The adapter resolves the legacy payload relative to the installed host, never
+from the caller's cwd, and invokes the Node entry directly rather than spawning
+`fgos` recursively.
+
+### Command Metadata And Parser Ownership
+
+The router needs operation identity and provider metadata, but it does not need
+to parse every host's full input grammar. Metadata is separated into:
+
+- host-visible identity, summary, namespace, and provider mapping;
+- host-owned projection from CLI/REST/MCP input to an operation request;
+- provider-owned semantic validation;
+- transitional provider-owned CLI parsing for `LegacyNode`.
+
+While a CLI verb is legacy, the Rust CLI recognizes its identity and forwards
+the remaining `OsString` arguments unchanged. When it becomes native, its option
+grammar and typed request conversion move together. This avoids two independent
+parsers accepting subtly different inputs.
+
+A deterministic generated command descriptor may bridge the current Node
+registry into the Rust host during migration. Generated metadata is validated
+for drift; it is not a second manually edited source of truth.
+
+### Public Presentation Versus Semantic Outcome
+
+`fgos.v1` belongs to the CLI presenter, not to the provider protocol. Likewise,
+HTTP status and MCP tool results belong to the remote presenter.
+
+Native providers return `ProviderOutcome`; the calling presenter wraps it once.
+Transparent legacy output is already a public presentation and passes through
+unchanged. It must never be parsed and wrapped in a second `fgos.v1` envelope.
+
+Cross-runtime envelope compatibility requires hashing the exact compact JSON
+bytes used for `data`, preserving field order and number/string encoding, and
+then embedding the same serialized value in the public envelope. Golden vectors
+must cover nested values, Unicode, and error/exit mappings.
+
+### Authority Does Not Follow Implementation
+
+Selecting a different provider does not silently transfer authority. A provider
+that replaces calculation returns a result or proof; the existing authority
+owner still applies lifecycle transitions and writes state.
+
+Authority moves only when the owning component contract explicitly moves it.
+This applies equally to built-in, legacy, and external providers. In particular:
+
+- Work Lifecycle remains the only owner of Work transitions;
+- Run Result Evaluation may compute confidence without choosing the next Work
+  status;
+- Dispatch may execute an approved assignment without inventing its operation;
+- Coding Domain owns repository semantics without leaking them into foundation;
+- an external manifest claim never grants `.fgos`, Git, process, network, or
+  secret access.
+
+### Rust Host First: Benefit And Cost
+
+Making Rust the host before migrating components places the final composition
+root, peer host use cases, provider registry, and plugin seam in their permanent
+runtime immediately. Every native migration then removes a `LegacyNode` edge
+instead of building more infrastructure into a temporary Node host.
+
+The cost is temporary: a legacy CLI call pays both the small Rust launcher and
+Node startup, distribution must ship both runtimes, and compatibility failures
+can occur before any command becomes faster. The architecture only pays off if
+the first Rust host remains thin and forwards legacy behavior rather than
+rewriting every parser and use case at once.
+
+## 13. Open Questions
 
 1. May explicit configuration replace a built-in provider, or may plugins only
    add vendor operations and implement published extension points?

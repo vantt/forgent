@@ -13,6 +13,11 @@ operations, one legacy Node route, one external process fixture, and both CLI
 and remote host use-case paths. It deliberately does not migrate a state writer
 in the first milestone.
 
+Architecture ownership remains with `host-invocation-provider-routing.md`;
+provider mechanics and technical tradeoffs repeated here are executable steps,
+not a competing design source. Migration ordering remains with
+`node-to-rust-component-migration.md`.
+
 ## 1. Outcome
 
 At the end of this plan:
