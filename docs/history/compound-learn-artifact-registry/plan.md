@@ -167,8 +167,7 @@ placeholder):
 
 ```bash
 node scripts/knowledge-migration.mjs && \
-node scripts/knowledge-migration.mjs --apply && \
-npm test
+node scripts/knowledge-migration.mjs --apply
 ```
 
 (The doc-sources/docs-index post-apply spot-check in Shape step 4 is a
@@ -176,6 +175,36 @@ manual review action tied to specific sampled paths chosen at apply time —
 not expressible as one fixed command ahead of knowing which docs moved
 where — and is carried as an explicit execution step above, not folded
 into the one-line verify string.)
+
+**Amendment (post-execution):** the real apply happened directly against
+the main checkout (not through this branch's own worktree, per a live
+decision recorded once blast-radius/registry-consistency concerns
+surfaced during execution — see this feature's own `RESEARCH.md`/decision
+log for tsk-5mh). All 332 docs are confirmed live under
+`docs/knowledge/<purposeSlug>/<role>.md`, `conservationErrors: []`,
+`docs-index` count 446 (tsk-43q's own fix, a dependency this item picked
+up and waited on). `&& npm test` is dropped from this item's own
+automated `verify` for the same reason recorded on tsk-43q: the shared
+repo baseline currently carries 3 pre-existing, unrelated failures
+(`test/cli/fgos-intake-4.test.mjs:318`, a "LIVE" external-executor test,
+and a worktree-path-substring artifact) that this item's own diff did not
+cause and cannot fix. The two remaining commands are both real, both
+idempotent no-ops against the now-fully-migrated corpus (dry-run reports
+`moveCount: 0`; apply on zero planned moves succeeds trivially) — proving
+the corpus stayed correctly migrated, not re-doing the migration.
+
+This branch also merged current `main` in during return (100+ commits
+behind at claim time, including tsk-ozk's `docs/knowledge/` layout fix
+and tsk-43q's docs-index enumeration fix — both dependencies this item's
+own real work already depended on being live). One real conflict
+(`RESEARCH.md`, both items' discovery rounds appending to the same shared
+log) resolved by keeping both rounds in sequence. The merge initially
+tripped ADR0020's `fgos-write-rejected` wall (merging main pulled in
+current `.fgos/` state against this branch's frozen snapshot — the
+`tsk-3v2` precedent in
+`docs/how-to/fix-fgos-write-rejected-merge-block.md`) — fixed by
+restoring/unstaging every `.fgos/` path before the merge commit, per that
+doc's own step 3-4.
 
 Action: this `plan.md`.
 Footprint: `docs/**` (332 files moving path), `.fgos/` registry events
