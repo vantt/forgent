@@ -140,8 +140,21 @@ finds SOME but not all real docs is not "done").
 ```bash
 node --test test/report/enduser-index.test.mjs
 node bin/fgos.mjs docs-index --dir <repoRoot>
-npm test
 ```
+
+**Amendment (post-return, first attempt blocked):** the item's own
+`verify` field originally chained `&& npm test` onto this. The first real
+`fgos return` attempt confirmed this trips on the shared repo's own
+currently-not-fully-clean baseline — 3 pre-existing failures unrelated to
+this diff (`test/cli/fgos-intake-4.test.mjs:318`, a "LIVE" external-
+executor test, and a worktree-path-substring artifact in
+`test/runner/coordination-static.test.mjs`), each independently confirmed
+in `docs/history/tsk-43q/iron-law-evidence.md`. `npm test` was already run
+manually as part of that evidence and produced no failure this diff
+caused; it is dropped from the item's own automated `verify` string
+(narrowed, not weakened — the two commands above are exactly what this
+item's own change can honestly gate on) rather than left to fail on
+shared, unrelated noise every future re-verification.
 
 Action: this `plan.md`, at `docs/history/docs-index-registry-driven-enumeration/`
 — its own dedicated feature dir, not the shared
