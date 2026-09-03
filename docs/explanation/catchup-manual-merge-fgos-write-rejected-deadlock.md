@@ -1,5 +1,5 @@
 ---
-authoritative_for: catchup/approve structural deadlock when a root branch needs a real content-conflict manual merge, two irreconcilable .fgos precondition checks, merge=union fix later superseded by moving diagnostic logs to a gitignored bucket, tsk-1wk sharded-file follow-up
+authoritative_for: catchup/approve structural deadlock when a root branch needs a real content-conflict manual merge, two irreconcilable .fgos precondition checks, merge=union fix later superseded by moving diagnostic logs to a gitignored bucket, tsk-1wk sharded-file follow-up, tsk-4gi implements the deferred option-b restore-before-reject
 ---
 
 # A real structural deadlock — two guards required two different `.fgos` values, satisfiable by no snapshot at all
@@ -78,3 +78,44 @@ cycles. Fixed by adding `.fgos/events/*.jsonl merge=union` to
 remains live and unaffected by the diagnostic-logs bucketing above, since
 the sharded event-log files stay git-tracked (they are the event log
 itself, not a diagnostic side-channel).
+
+## The deferred half of this item's own original proposal, implemented later — `tsk-4gi`
+
+This item's own original filed report proposed two fixes: (a)
+`merge=union` in `.gitattributes` (what actually shipped above), and (b)
+auto `git checkout --ours` for every `.fgos/*` path immediately after a
+successful `git merge --no-commit`, before the staged-diff check — so a
+**clean** union auto-resolution would never even reach the rejection
+check. Only (a) shipped at the time; `mergeRunnerItemLocked`'s own
+`fgos-write-rejected` check still fired on ANY staged `.fgos/` path after
+a merge, whether it came from a genuine conflict or a clean `merge=union`
+auto-resolution — since `main` sits under constant concurrent write load,
+a long-lived branch's frozen `.fgos/*.jsonl` snapshot almost always
+differs from `main`'s current growing copy by approve time, so this
+tripped on nearly every approve for an old-lived branch. Confirmed live
+blocking [`tsk-3tp`](eventlog-sweep-checkpoint-redesign.md)'s and
+[`tsk-34o5`](dispatch-attestation-level-2-enforcement-halt.md)'s own
+approve repeatedly, each requiring a manual `git checkout HEAD --
+<path>` plus re-commit to work around.
+
+`tsk-4gi` implemented option (b), narrowly: a new `isMergeUnionPath`
+check (`git check-attr merge -- <path>`) restores a staged `.fgos/` path
+to the **target's own pre-merge committed version** only when
+`.gitattributes` genuinely declares `merge=union` for that exact path —
+discarding whatever the union driver staged for it, then re-checking.
+Deliberately *not* a blanket restore: `git checkout HEAD -- <path>` is
+oblivious to *why* a path is staged, so applying it to every `.fgos/`
+path would also silently discard a real, non-append-only `.fgos/` write
+that happened to auto-merge cleanly (two edits on non-overlapping
+lines) — exactly the write ADR0020's guard exists to catch, not
+discard. Restricting the restore to genuinely `merge=union`-attributed
+paths keeps that protection intact for everything else. Each path is
+restored individually, not batched, because a path the branch introduced
+for the first time (never on target's own `HEAD` at all) has no `HEAD`
+pathspec to check out — `git checkout` throws and aborts its *entire*
+batch on the first non-matching pathspec, which would silently restore
+nothing at all rather than just skipping that one path.
+
+Further follow-up items building on this same restore mechanism
+(`tsk-4s6` and others) exist in later git history but are outside this
+item's own scope — not detailed here.
