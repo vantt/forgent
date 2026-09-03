@@ -264,18 +264,26 @@ The following are named in the original substrate proposal
 language only — not built) as later capability, not as something MVP6+
 dogfooding needs before it can start:
 
-- **MVP6 — visibility windows.** First-pass isolation, post-verdict
-  controlled sharing, aggregate/anonymized feedback, judge-only visibility.
-  Deferred schema/runtime (proposal line 355).
-- **MVP7 — aggregation rules.** Completion modes such as
-  `synthesize-with-dissent`, `vote`, `rank`, `convergence`, `judge`,
-  `no-consensus`. Deferred schema/runtime (proposal line 356).
-- **MVP8 — deliberation memory.** Typed records such as `proposal`,
-  `challenge`, `response`, `clarification`, `rank`, `disposition`. Deferred
-  schema/runtime (proposal line 357).
-- **MVP9 — dynamic specialist pull-in.** Opt-in `addSessionEdge` or topology
-  overlay, only after authorization/context/replay are solid. Deferred large
-  feature (proposal line 358).
+- **MVP6 — visibility windows.** Fail-closed private-first-pass and
+  post-independent-pass legality, with exact runtime authority still carried
+  by `grantedContextRefs`. Anonymization and aggregate transformation remain
+  deferred.
+- **MVP7 — evidence-preserving aggregation.** One validated synthesis method
+  with explicit source coverage, dissent, unresolved objections, omissions,
+  failures, artifact revisions, and `consensus | qualified | no-consensus`
+  outcome. Vote/rank/convergence remain deferred.
+- **MVP8 — deliberation memory.** Artifact-backed `proposal`, `objection`,
+  `response`, `clarification`, `rank`, and `specialist-request` contributions
+  with replayable lineage, never mailbox/chat semantics.
+- **MVP9 — bounded specialist pull-in.** Driver-authorized binding into a
+  predeclared specialist slot. Arbitrary `addSessionEdge` and topology overlay
+  remain deferred.
+
+After MVP9, an external Group-Thinking Protocol Pack and Conformance Suite use
+RFC-review-lite, Nominal-Group-lite, and Delphi-feedback-lite to prove the
+public substrate. A thin `fgos-group-thinking` skill may launch those
+definitions, but none of these layers owns session, visibility, aggregation,
+or disposition truth.
 
 None of these four block starting MVP6+ dogfooding through the path
 described above — the produce/review/red-team/revise/recheck/disposition/

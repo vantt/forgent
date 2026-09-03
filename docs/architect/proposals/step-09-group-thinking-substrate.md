@@ -359,10 +359,77 @@ RFC review, adversarial triads, and specialist pull-in.
 | 3 | Recheck and disposition. | Recheck is a new Assignment against a new artifact revision; disposition is a driver event, not worker self-report. | Schema/runtime after MVP 2. | Old verdict remains immutable; new verdict links to revision; synthesis preserves dissent and unresolved findings. | Retry remains attempt supersession, not recheck. |
 | 4 | Surface launcher. | A skill/slash surface builds a request for a declared fixture and calls `fgos coordination run --file`, then reads `coordination show`/evidence. | Surface only; no group-thinking logic inside the skill. | Launcher cannot bypass FlowDefinition/session authorization. | Surface is not truth or coordination mechanism. |
 | 5 | Live standalone proof. | Run the Master Coordination loop with no Work: input plan, Doer artifact, Reviewer report, Red-Team report, driver-authorized fix, revision, recheck, final disposition. | CLI/headless run. | CLI/headless parity, crash/resume no duplicate, unauthorized optional operation rejected, hidden context rejected, bounds enforced. | No Work lifecycle, git, merge, or repo mutation. |
-| 6 | Visibility windows. | First-pass isolation, post-verdict controlled sharing, aggregate/anonymized feedback, judge-only visibility. | Deferred schema/runtime. | RFC/NGT/Delphi fixtures can express their defining visibility rules. | Isolation-heavy fixtures still reject these windows unless opted in. |
-| 7 | Aggregation rules. | Completion modes such as `synthesize-with-dissent`, `vote`, `rank`, `convergence`, `judge`, and `no-consensus`. | Deferred schema/runtime. | Synthesis cannot hide dissent, failed actors, missing actors, or unsupported claims. | Aggregation never upgrades evidence confidence. |
-| 8 | Deliberation memory. | Typed records such as `proposal`, `challenge`, `response`, `clarification`, `rank`, and `disposition`. | Deferred schema/runtime. | Replay preserves why a decision happened without chat history. | Not a mailbox or live chat system. |
-| 9 | Dynamic specialist pull-in. | Opt-in `addSessionEdge` or topology overlay after authorization/context/replay are solid. | Deferred large feature. | Same action works in an opt-in fixture and is rejected in isolation fixture. | No global dynamic topology. |
+| 6 | Visibility windows. | Topology declares fail-closed private-first-pass and post-independent-pass windows; operation bindings select a window; runtime authorization carries the exact eligible `grantedContextRefs`. | Deferred schema/runtime. | Post-milestone sharing works only in an opt-in fixture; pre-window, foreign-session, late/failed-source, and unchanged isolation-fixture access reject. | FlowDefinition is legality, context grant is invocation authority, and isolation-heavy fixtures remain unchanged. |
+| 7 | Evidence-preserving aggregation. | Keep completion eligibility separate from one `evidence-preserving-synthesis` method with `consensus`, `qualified`, or `no-consensus` outcome and mandatory disclosure fields. | Deferred schema/runtime plus Team Cognition boundary. | Validation rejects hidden source gaps, dissent, unresolved objections, failed/missing actors, or stale artifact revisions. | Aggregation never upgrades RunResult confidence or becomes driver disposition. |
+| 8 | Deliberation memory. | Session events link immutable artifacts as `proposal`, `objection`, `response`, `clarification`, `rank`, or `specialist-request` contributions with explicit lineage. | Deferred schema/runtime. | Replay reconstructs contribution chains using artifact refs without chat history. | No recipient, inbox, unread, delivery, arbitrary message body, or mutable record status. |
+| 9 | Bounded dynamic specialist pull-in. | The driver binds a specialist identity into a predeclared role/capability/assignment-capped specialist slot, then authorizes declared operations normally. | Deferred schema/runtime. | Opt-in slot works; undeclared slot, second/over-cap binding, unauthorized writer, terminal session, and isolation fixtures reject. | No arbitrary runtime edge, autonomous recruitment, or global dynamic topology. |
+
+### 8.1 Locked MVP6-MVP9 Shape
+
+The discussion round on 2026-09-03 narrows the four remaining MVPs as follows.
+These are planning inputs, not accepted runtime contracts until each slice is
+implemented, proved, and promoted into the canonical contracts.
+
+**MVP6 ownership and shape.** `spec.profile.topology.visibilityWindows`
+declares static legality. A node-operation binding may select one window using
+`contextAccess.visibilityWindowRef`. The first slice supports only
+private-first-pass and post-independent-pass sharing of same-session artifact
+refs. The milestone is replay-derived from listed first-pass `result-linked`
+events; missing, failed, or late sources keep it closed, while a formally
+recorded replacement may satisfy the original obligation. Partial-window
+exceptions, anonymization, aggregate transformation, and cross-session grants
+remain deferred. `operation-authorized.grantedContextRefs` and
+`assignment-created.contextGrant.refs` remain the exact invocation authority
+and replay proof.
+
+**MVP7 ownership and shape.** Existing `completion.mode` keeps its completion-
+eligibility meaning. A separate `completion.aggregation` declaration selects
+`evidence-preserving-synthesis`, names source and output operations, and
+requires disclosure of source coverage, dissent, unresolved objections,
+missing/failed actors, and artifact revisions. Team Cognition validates a
+linked RunResult artifact and records an `aggregation-validated` fact with
+outcome `consensus | qualified | no-consensus`; Agent Coordination alone
+decides whether the session may transition terminal. Vote, rank tally,
+weighted scoring, convergence, and prose-parsed pseudo-voting remain deferred.
+
+**MVP8 ownership and shape.** Operations declare allowed contribution types;
+the session ledger records `deliberation-contribution-linked` with contribution
+identity/type, Assignment/Run/artifact provenance, anchors, response lineage,
+round key, and visibility-window provenance. Contribution content remains in
+immutable artifacts. Existing `driver-disposition-recorded` may target a
+contribution and remains the only final disposition primitive. No general
+AgentMessage, mailbox, recipient, delivery, unread, mutable thread status, or
+arbitrary event-body protocol is introduced.
+
+**MVP9 ownership and shape.** `topology.specialistSlots` predeclares legal
+role, capability, operation, visibility-window, binding, and Assignment caps.
+The external driver records `specialist-authorized`; the runtime atomically
+binds the session-scoped actor and then uses existing `operation-authorized`
+for each invocation. Workers may emit `specialist-request` contributions but
+cannot recruit or dispatch. Expiry stops future materialization and never
+erases history. `addSessionEdge`, arbitrary topology overlays, driver handoff,
+persistent organization membership, and peer-invited specialists remain
+deferred.
+
+### 8.2 Post-MVP9 Acceptance Layer
+
+The post-MVP9 acceptance work is outside the Agent Coordination kernel:
+
+```txt
+Group-Thinking Protocol Pack
+  -> RFC-review-lite, Nominal-Group-lite, Delphi-feedback-lite definitions
+Group-Thinking Conformance Suite
+  -> public-contract, replay, isolation, CLI/headless parity proofs
+fgos-group-thinking skill
+  -> thin request/launch/resume/render surface over the pack
+```
+
+FlowDefinition `metadata.id@version` remains the protocol identity; a pack
+registry only indexes it. Protocol definitions are data-first. Request
+adapters and renderers may contain code but may use only public contracts and
+must not decide visibility legality, aggregate validity, specialist authority,
+or terminal truth. Passing this external suite is the Step 09 exit gate; it
+does not make the suite part of core runtime authority.
 
 Step 10 starts after the relevant Step 09 substrate slice exists. Coding Domain
 adoption then consumes the substrate for Work-attached review/fix/red-team/
@@ -391,8 +458,10 @@ candidate deltas:
 | Edge disambiguation | Materialization must select the exact node-operation/edge binding, not just the first incoming edge for an actor. | One actor may receive first-pass and recheck operations from different sources. |
 | Invocation caps | Binding-level `maxInvocations` or equivalent; `aggregateBounds.maxRounds` remains a hard session cap. | A semantic round may contain multiple Assignments; Assignment count is not round semantics. |
 | Driver authority | Pin an authorized driver identity or provenance root for authorization/disposition events. | `writerId` alone is provenance, not a complete authority model. |
-| Visibility windows | Deferred field/contract for phase-limited context grants. | Needed for RFC/NGT/Delphi later, not required for the first Master Coordination proof. |
-| Dynamic specialist pull-in | Deferred `addSessionEdge` or equivalent. | Useful later; too broad for first slice. |
+| Visibility windows | Deferred topology declaration plus binding reference for phase-limited context legality; concrete grants remain on authorization/Assignment provenance. | Needed for RFC/NGT/Delphi later without weakening fixture-local isolation. |
+| Aggregation validation | Deferred `completion.aggregation` declaration and Team-Cognition-owned `aggregation-validated` result linked to RunResult evidence. | Completion eligibility, cognitive interpretation, and terminal authority must not collapse into one worker synthesis. |
+| Deliberation contribution | Deferred artifact-backed `deliberation-contribution-linked` event with typed lineage. | Durable reasoning must remain auditable without becoming a mailbox. |
+| Dynamic specialist pull-in | Deferred predeclared `topology.specialistSlots` plus driver-owned `specialist-authorized`. | Covers bounded unknown-identity recruitment without arbitrary runtime topology mutation. |
 
 ## 10. Read-Only And Mutation Stance
 
@@ -482,7 +551,8 @@ Minimum proof for MVP1/MVP2:
 ## 15. Explicitly Not Proposed
 
 - no generalized mailbox or AgentMessage thread in this step;
-- no dynamic `addSessionEdge` in the MVP;
+- no arbitrary dynamic `addSessionEdge` or topology overlay; MVP9 is limited to
+  predeclared specialist slots;
 - no global closed intent vocabulary in the MVP;
 - no Delphi/NGT/RFC full implementation in the MVP;
 - no Work-attached mutation;

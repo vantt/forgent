@@ -203,21 +203,26 @@ Capability expansion should happen in layers:
    review/recheck loops, RFC follow-up, and adversarial rechecks without
    dynamic topology mutation.
 2. **Visibility windows / context grants** — let the fixture say what an actor
-   may see before and after named milestones. This unlocks NGT/RFC patterns
-   without destroying first-pass independence.
+   may see before and after named milestones. Windows are static legality;
+   `grantedContextRefs` remain the concrete per-invocation grant. The first
+   slice is fail-closed private-first-pass and post-independent-pass sharing,
+   not anonymization or aggregate transformation.
 3. **Request/disposition events** — let actors request another round, and let
    the driver accept/reject with evidence refs. This unlocks judge/triad and
    master-coordinator auditability.
-4. **Typed deliberation events** — add durable, artifact-backed events such as
-   `propose`, `challenge`, `clarify`, `respond`, `rank`, and `disposition`.
-   This is not a live peer-chat mailbox; it is structured deliberation state
-   the runtime can audit.
-5. **Richer aggregation modes** — extend beyond coarse `synthesize` toward
-   vote/rank/convergence/dissent/no-consensus modes where the fixture needs
-   them.
-6. **Dynamic specialist edges** — add `addSessionEdge` only after the previous
-   layers prove insufficient. This is useful, but it is a larger and riskier
-   axis than optional declared rounds.
+4. **Evidence-preserving aggregation** — validate one honest synthesis method
+   first, with explicit source coverage, dissent, unresolved objections,
+   omissions, failures, and artifact revisions. Vote, rank tally, and
+   convergence remain later candidates until typed inputs exist.
+5. **Typed deliberation events** — add durable, artifact-backed contributions
+   such as `proposal`, `objection`, `response`, `clarification`, `rank`, and
+   `specialist-request`. This is not a live peer-chat mailbox; it is structured
+   deliberation state the runtime can audit. Driver disposition remains the
+   existing driver-owned event rather than a worker contribution type.
+6. **Bounded specialist binding** — let the external driver bind a specialist
+   identity into a predeclared, capped topology slot. Arbitrary
+   `addSessionEdge` remains deferred until multiple real consumers prove that
+   declared slots are insufficient.
 
 ## 8. First Safe Slice: `bounded-review-loop.yaml`
 
@@ -668,10 +673,17 @@ Skill / surface = thin launcher only
 | 3 | Recheck and disposition. | Recheck is a new Assignment against a new artifact revision; disposition is a driver event, not worker self-report. | Schema/runtime after MVP 2. | Old verdict remains immutable; new verdict links to revision; synthesis preserves dissent and unresolved findings. |
 | 4 | Surface launcher. | A skill/slash surface builds a request for a declared fixture and calls `fgos coordination run --file`, then reads `coordination show`/evidence. | Surface only; no group-thinking logic inside the skill. | Launcher cannot bypass FlowDefinition/session authorization. |
 | 5 | Live standalone proof. | Run the Master Coordination loop with no Work: input plan, Doer artifact, Reviewer report, Red-Team report, driver-authorized fix, revision, recheck, final disposition. | CLI/headless run. | CLI/headless parity, crash/resume no duplicate, unauthorized optional operation rejected, hidden context rejected, bounds enforced. |
-| 6 | Visibility windows. | First-pass isolation, post-verdict controlled sharing, aggregate/anonymized feedback, judge-only visibility. | Deferred schema/runtime. | RFC/NGT/Delphi fixtures can express their defining visibility rules. |
-| 7 | Aggregation rules. | Completion modes such as `synthesize-with-dissent`, `vote`, `rank`, `convergence`, `judge`, and `no-consensus`. | Deferred schema/runtime. | Synthesis cannot hide dissent, failed actors, missing actors, or unsupported claims, and cannot upgrade evidence confidence. |
-| 8 | Deliberation memory. | Typed records such as `proposal`, `challenge`, `response`, `clarification`, `rank`, and `disposition`. | Deferred schema/runtime. | Replay preserves why a decision happened without chat history. |
-| 9 | Dynamic specialist pull-in. | Opt-in `addSessionEdge` or topology overlay after authorization/context/replay are solid. | Deferred large feature. | Same action works in an opt-in fixture and is rejected in isolation fixtures. |
+| 6 | Visibility windows. | Topology declares fail-closed private-first-pass and post-independent-pass windows; operation bindings select a window; authorization and Assignment provenance retain exact `grantedContextRefs`. | Deferred schema/runtime. | Opt-in fixtures share only eligible same-session artifact refs after the milestone; unchanged isolation fixtures still reject sibling leakage. |
+| 7 | Evidence-preserving aggregation. | Keep completion eligibility separate from one `evidence-preserving-synthesis` method whose validated outcome is `consensus`, `qualified`, or `no-consensus`. | Deferred schema/runtime plus Team Cognition boundary. | Aggregate output cannot hide source coverage, dissent, unresolved objections, failed/missing actors, or artifact revisions, and cannot upgrade evidence confidence. |
+| 8 | Deliberation memory. | Link immutable, artifact-backed `proposal`, `objection`, `response`, `clarification`, `rank`, and `specialist-request` contributions into the session ledger. | Deferred schema/runtime. | Replay preserves contribution lineage without recipient, inbox, unread, delivery, or arbitrary message-body semantics. |
+| 9 | Bounded dynamic specialist pull-in. | The driver binds one specialist into a predeclared, capability- and assignment-capped specialist slot, then uses existing operation authorization. | Deferred schema/runtime. | Opt-in fixture accepts the bounded binding; undeclared slots, over-cap binding, foreign context, unauthorized writers, and unchanged isolation fixtures reject it. |
+
+After MVP9, concrete RFC-lite, Nominal-Group-lite, and Delphi-feedback-lite
+definitions belong in an external **Group-Thinking Protocol Pack**. A
+**Group-Thinking Conformance Suite** proves those definitions use only public
+contracts, and a thin `fgos-group-thinking` skill launches them. These are an
+acceptance layer for Step 09, not protocol-specific code inside the Agent
+Coordination kernel.
 
 Step 09 considers read-only/mutation as an execution-effect dimension, but its
 MVP uses only read-only/session-local artifact production. Work, git, repo

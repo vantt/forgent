@@ -86,6 +86,7 @@ Component category:
 | Component | Platform layer | Component category |
 |---|---|---|
 | Agent Coordination Engine | Platform core | Foundation engine |
+| Team Cognition Engine | Platform core | Foundation engine |
 | Dispatch And Execution Engine | Platform core | Foundation engine |
 | Run Result Evaluator | Platform core | Foundation engine |
 | Work Lifecycle Engine | Platform core | Foundation engine |
@@ -94,6 +95,8 @@ Component category:
 | Setup, Doctor, And Distribution Health | Platform support | Support infrastructure |
 | Coding Domain Component | Domain | Domain component |
 | Host And Surface Layer | Host surface | Adapter/surface |
+| Group-Thinking Protocol Pack | Plugin/extension | Extension package |
+| `fgos-group-thinking` Skill | Host surface | Adapter/surface |
 
 Boundary rule:
 
@@ -119,8 +122,11 @@ Platform Core
   Agent Coordination
     Agent Coordination Engine
       CoordinationSession Runtime
-      Team Cognition Engine
       Assignment Builder
+    Team Cognition Engine
+      Aggregation Validator
+      Deliberation Model
+      Cognitive Protocol Interpreter
     Dispatch And Execution Engine
       Dispatch Control Plane
       Run Runtime
@@ -147,6 +153,11 @@ Host Surface
   Gateway
   Herdr
   Plugin/API adapters
+  fgos-group-thinking Skill
+
+Extension Layer
+  Group-Thinking Protocol Pack
+  Group-Thinking Conformance Suite
 
 Domain Layer
   Coding Domain Component
@@ -160,8 +171,10 @@ Domain Layer
 Reading the tree:
 
 - `Agent Coordination` is an umbrella responsibility group.
-- `Agent Coordination Engine`, `Dispatch And Execution Engine`, and `Run Result
-  Evaluator` are sibling authority components under that umbrella.
+- `Agent Coordination Engine`, `Team Cognition Engine`, `Dispatch And Execution
+  Engine`, and `Run Result Evaluator` are sibling authority components under
+  that umbrella. Agent Coordination invokes Team Cognition but does not absorb
+  cognitive interpretation into session truth.
 - `Work Core` is a separate platform-core group because Work lifecycle and
   Work/domain driving can exist without CoordinationSession. Work Driver is a
   child responsibility under Work Core.
@@ -175,12 +188,15 @@ Reading the tree:
 | Work Lifecycle Engine | Work identity, status, stage, claim/return, related refs, context refs, document refs, questions, human gates, lifecycle verbs, domain-agnostic Work event truth. | Agent runtime, Assignment membership, executor choice, evidence confidence, coding merge/worktree/technical approval. |
 | Work Driver / Domain Workflow Interpreter | Ready-work selection, automation loop policy, declared Stage Operation choice, cross-flow routing, park/halt behavior, recovery/anti-loop around Work execution, invoking lifecycle verbs and dispatch surfaces. | Domain workflow semantics, lifecycle writes outside Work Lifecycle verbs, dispatch target choice, RunResult confidence, coding repository isolation, CoordinationSession progress. |
 | Agent Coordination Engine | CoordinationSession manifest/events, Assignment membership, actor/topology/bounds, session recovery, session synthesis boundary, Team Cognition invocation, optional protocol/dynamic planning consumption. | Work stage/status/claim/return, declared Work operation selection, dispatch mechanism, provider/model choice, coding worktree/merge authority. |
+| Team Cognition Engine | Typed deliberation interpretation, aggregation-method semantics, source/dissent/omission coverage validation, and cognitive outcomes linked to immutable RunResult/artifact evidence. | CoordinationSession terminal transitions, context-grant authority, Assignment dispatch, RunResult confidence upgrades, Work lifecycle, chat/mailbox delivery, or protocol-specific RFC/NGT/Delphi control flow. |
 | Dispatch And Execution Engine | Assignment-to-DispatchPlan resolution, executor/provider/model/tier/mechanism/adapter selection, governance/egress, Run creation, launch, timeout, cancellation, retry attempt metadata, in-process Run mechanism. | Semantic operation choice, Work lifecycle, evidence confidence, coding merge/approval. |
 | Run Result Evaluator | Worker result parsing, evidence collection coordination, artifact freshness/provenance checks, confidence decision, RunResult normalization, failure classification for one Assignment Run. | Executor launch, provider choice, Work lifecycle, session completion policy, domain-specific evidence collection ownership. |
 | Domain Registry And Definition Loader | General runtime definition registry and config loader for domains, workflows, workflow/stage/operation declarations, task-spec/skill references, roles, and FlowDefinition validation/projection. | Runtime session state, dispatch target choice, Work lifecycle writes, evidence confidence, setup/distribution config authority. |
 | Coding Domain Component | Coding Domain Core plus product/design, cook, bugfix, and possible small-change policies; repo scope, footprint, worktree/branch/isolation, merge/catchup, technical approval, code verification doctrine, coding evidence adapters. | Generic Work lifecycle, generic Agent Coordination runtime, direct executor launch, final confidence outside Run Result Evaluator. |
 | Setup, Doctor, And Distribution Health | Config defaults, config merge, global/project precedence, doctor checks/fixes registry, install/upgrade/distribution health, required binaries/services/directories. | Domain behavior, lifecycle mutation, dispatch or evidence truth. |
 | Host And Surface Layer | CLI/API/plugin/gateway/Herdr/webhook/chat entrypoints, auth, envelopes, visibility, process control, operator diagnostics. | Work truth, CoordinationSession truth, dispatch governance, evidence confidence. |
+| Group-Thinking Protocol Pack | Versioned, data-first CoordinationProtocol definitions and public-contract request/renderer adapters for reusable group-thinking methods. | Session state, visibility legality, aggregation validity, terminal authority, dispatch, Work lifecycle, or hidden protocol semantics in prompts/adapters. |
+| `fgos-group-thinking` Skill | Selects an explicit registered protocol, builds a public request, launches/resumes through coordination surfaces, and renders public replay/evidence. | Group-thinking runtime logic, hidden actor/topology changes, context grants, aggregate validation, specialist authorization, or Work/git mutation. |
 | Learning, Knowledge, And Documentation Registry | Retrospective knowledge capture, doc slot/topic registry, projections, traces, end-user docs index, learning outputs. | Work lifecycle, Agent Coordination runtime, RunResult confidence. |
 
 ## 7. Contract Dependency Matrix
@@ -189,11 +205,15 @@ Reading the tree:
 |---|---|---|
 | Agent Coordination Engine -> Dispatch And Execution Engine | May call Dispatch through Assignment/DispatchPlan contracts. | Must not choose executor/provider/model directly or bypass dispatch. |
 | Agent Coordination Engine -> Run Result Evaluator | May consume RunResult/evidence refs. | Must not compute confidence or upgrade evidence in synthesis. |
+| Agent Coordination Engine -> Team Cognition Engine | May ask Team Cognition to validate typed contributions and aggregation against immutable result/artifact refs, then use the validated outcome as one input to terminal legality. | Must not delegate session transition authority or let a worker/self-reported aggregate close the session. |
+| Team Cognition Engine -> Run Result Evaluator outputs | May interpret already-normalized RunResult/artifact/evidence refs without rewriting them. | Must not recollect evidence, change confidence, or create a second artifact authority. |
 | Work Driver -> Work Lifecycle Engine | May read Work view and invoke lifecycle verbs. | Must not write Work event truth directly or create a second lifecycle path. |
 | Work Driver -> Domain Registry And Definition Loader | May load legal workflow/stage/operation declarations and cross-flow rules. | Must not invent undeclared domain operations. |
 | Work Driver -> Agent Coordination | May open Work-attached sessions and dispatch Assignments through Agent Coordination contracts. | Must not make Agent Coordination own Work lifecycle or domain workflow routing. |
 | Domain Component -> Work Driver / Agent Coordination | May supply workflow declarations, TaskSpecs, Skills, policies, harness advice, evidence adapters, and resource/isolation constraints. | Must not call executors privately or mutate Work outside lifecycle verbs. |
 | Host Surface -> platform engines | May route commands/API calls into component ports. | Must not become source of truth for lifecycle, dispatch governance, or evidence. |
+| Group-Thinking Protocol Pack -> Agent Coordination / Team Cognition | May declare versioned protocols and invoke only public request, replay, contribution, and aggregation contracts. | Must not read private session storage, add protocol-specific branches to core, or bypass legality/validation. |
+| `fgos-group-thinking` Skill -> Group-Thinking Protocol Pack / Host Surface | May select an indexed `metadata.id@version`, assemble inputs/bounds, and call the public coordination surface. | Must not implement RFC/NGT/Delphi semantics in skill prose or switch protocols invisibly during a session. |
 | Sibling components under one parent | May collaborate through declared ports/events and shared immutable references. | Must not reach into each other's private state or rely on physical nesting as API. |
 
 Placement rule:
