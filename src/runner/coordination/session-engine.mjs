@@ -42,6 +42,7 @@
 // self-heals by linking the already-completed run rather than dispatching
 // a second one.
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -60,6 +61,7 @@ import {
   hashTaskKey,
   assertSafeCoordinationId,
   assertValidRunIdForAssignment,
+  recordAggregationValidation,
 } from './store.mjs';
 import { replaySession } from './replay.mjs';
 import { CoordinationError } from './schema.mjs';
@@ -70,6 +72,12 @@ import { TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import { mergePolicyStack, activationModeOf } from '../definitions/schema.mjs';
 import { planCohort, verifyPlannedAllocationAgainstCurrentConfig } from './cohort-planner.mjs';
+// The Team Cognition evaluator is CALLED, never forked: `classifyAggregationOutcome`
+// is P07.1/P07.2's own hardened pure function, and this module supplies it
+// session-derived evidence rather than re-deriving its rules. The dependency
+// points one way only -- team-cognition still imports nothing from
+// `src/runner/coordination/**` (`team-cognition-static.test.mjs` enforces it).
+import { classifyAggregationOutcome } from '../team-cognition/aggregation-evaluator.mjs';
 
 export const PRIMARY_ACTOR_ID = 'primary';
 export const DEFAULT_SPECIALIST_ACTOR_ID = 'specialist';
@@ -2811,9 +2819,12 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir) {
  * @param {string} coordinationId
  * @param {object} [params]
  * @param {string[]} [params.dissentingActorIds]
+ * @param {string} [params.aggregationId] Phase 07: consult this session's own
+ *   validated aggregation as terminal input. Can only REFUSE a close (see the
+ *   inline note); omitting it leaves every path here unchanged.
  * @returns {Readonly<object>} The transitioned manifest.
  */
-export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [] } = {}, opts = {}) {
+export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [], aggregationId } = {}, opts = {}) {
   // The classification (which actors are complete/missing/failed/late) and
   // the terminal write both happen INSIDE this ONE held lock, from a fresh
   // `replaySession()` taken after acquiring it -- never from an earlier
@@ -2827,7 +2838,38 @@ export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [] }
   return withSessionLock(
     coordinationId,
     (paths) => {
-      const { manifest, events } = replaySession(coordinationId, opts);
+      const replayed = replaySession(coordinationId, opts);
+      const { manifest, events } = replayed;
+
+      // Phase 07 (MVP7): a validated cognitive aggregation used as terminal
+      // INPUT. Strictly a NARROWING -- the only thing it can do is refuse a
+      // close that quorum would otherwise have allowed. It never selects a
+      // status, never relaxes the partialPolicy rules below, and never closes
+      // a session quorum would have refused, so terminal-transition authority
+      // stays entirely with this function. Omitting `aggregationId` leaves
+      // every path below byte-identical to what it was before aggregation
+      // existed.
+      //
+      // The outcome is read from `replayed.aggregations` -- the event log,
+      // inside this same held lock -- never from a caller-supplied verdict,
+      // and never from `ignoredAggregations` (a post-terminal event, which by
+      // definition cannot inform a close that already happened).
+      if (aggregationId !== undefined) {
+        const validated = replayed.aggregations.find((record) => record.aggregationId === aggregationId);
+        if (!validated) {
+          throw new CoordinationError(
+            'dangling-ref',
+            `closeSessionByQuorum: session "${coordinationId}" has no valid "aggregation-validated" event for aggregation "${aggregationId}" -- refusing to close against an aggregation this session never validated`,
+          );
+        }
+        if (validated.outcome !== 'consensus') {
+          throw new CoordinationError(
+            'validation',
+            `closeSessionByQuorum: aggregation "${aggregationId}" of session "${coordinationId}" validated as "${validated.outcome}", not "consensus" -- refusing to close; resolve the aggregation and validate a new one, or close this session by another declared route`,
+          );
+        }
+      }
+
       const quorum = classifySessionQuorum(coordinationId, manifest, events, paths.fgosDir);
       const incomplete = [...quorum.failed, ...quorum.late, ...quorum.missing];
       const incompleteActorIds = incomplete.map((entry) => entry.actorId);
@@ -2881,6 +2923,262 @@ export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [] }
     },
     opts,
   );
+}
+
+// ─── Phase 07 (Step 09 MVP7): evidence-preserving aggregation ──────────────
+//
+// The Team Cognition evaluator (`../team-cognition/aggregation-evaluator.mjs`)
+// is a pure function with no session or store access, by its own design. This
+// section is the ONE place that gives it session-derived evidence and records
+// what it decided. The split of authority is the point of the whole phase:
+//
+//   evaluator  -> decides the cognitive OUTCOME from evidence handed to it
+//   this file  -> decides what evidence is real, and owns every transition
+//
+// so a validated outcome is terminal INPUT (`closeSessionByQuorum`'s optional
+// `aggregationId` below), never a transition of its own.
+
+const AGGREGATION_METHOD = 'evidence-preserving-synthesis';
+
+// The disclosure ids this engine can derive from session evidence. Every one
+// is ENGINE-classified, never worker-asserted: `status`/`confidence` come from
+// `classifyRunEvidence`'s verdict on the filesystem (assignment-runner.mjs),
+// not from the worker's own `agentClaim`. A definition whose
+// `requiredDisclosures[]` names anything outside this set gets a disclosure
+// coverage failure from the evaluator -- fail-closed, never a silently
+// skipped requirement.
+function deriveDisclosures(runResult) {
+  return {
+    status: runResult.status,
+    confidence: runResult.confidence,
+    // A contribution that came back `blocked` is a settled result that
+    // nonetheless carries an objection. Surfacing it as a `dissent` disclosure
+    // is what lets the evaluator's hidden-dissent check do real work here: if
+    // the driver's own `dissentRefs` never names that source operation, the
+    // aggregation quietly counted an objecting contribution as agreement.
+    // A fixed marker, never the worker's own summary text -- no prose is
+    // parsed for meaning anywhere in this path (plan.md Non-Negotiable
+    // Deferrals).
+    dissent: runResult.status === 'blocked' ? 'blocked' : 'none',
+  };
+}
+
+function sha256OfFile(filePath) {
+  try {
+    return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Turn ONE satisfied source binding into the evaluator's `AggregationSource`
+ * shape, plus the artifact's CURRENT revision for staleness checking.
+ *
+ * The immutability pin is `settleReports[].sha256` -- the hash
+ * `assignment-runner.mjs` takes of the exact report bytes it classified, for
+ * exactly this purpose ("a report planted or edited after settle is not in
+ * the set (or no longer matches) and can never satisfy a report gate"). The
+ * current revision is that same file's hash recomputed now, so a report edited
+ * after settle makes its source stale and the outcome `no-consensus`.
+ *
+ * The file is located by DERIVING its path from the validated
+ * `assignmentId`/`runId` (identical derivation to `readLinkedRunResultFromDisk`
+ * above, including the full-shape runId check), never by joining the
+ * `settleReports[].path` string out of `result.json`. That string is recorded
+ * provenance and is used only as an opaque map key: joining it into a
+ * filesystem path would make a hand-edited `result.json` a traversal surface,
+ * which is precisely the class R6 closed for `runId`.
+ *
+ * Returns `null` when the run carries no usable pin -- the caller records that
+ * contribution as unresolved rather than feeding an unpinned source in.
+ */
+function aggregationSourceFrom(fgosDir, sourceOperationRef, assignmentId, runId, runResult) {
+  const settleReports = Array.isArray(runResult.settleReports) ? runResult.settleReports : [];
+  // Today's runner records at most one settle report per run (the single
+  // `agent-report.md`), so this is a guard against a shape this code has no
+  // rule for, not a routine branch: with several artifacts there is no
+  // declared way to pick which one the revision pin refers to.
+  if (settleReports.length !== 1) return null;
+  const [report] = settleReports;
+  if (typeof report?.path !== 'string' || typeof report?.sha256 !== 'string') return null;
+
+  assertValidRunIdForAssignment(assignmentId, runId, 'aggregationSourceFrom (settle-report artifact)');
+  const attemptStr = runId.slice(`run_${assignmentId}_`.length);
+  const reportPath = path.join(fgosDir, 'assignments', assignmentId, 'runs', attemptStr, 'agent-report.md');
+
+  return {
+    source: {
+      sourceOperationRef,
+      assignmentId,
+      runId,
+      artifactRef: report.path,
+      revision: report.sha256,
+      disclosures: deriveDisclosures(runResult),
+    },
+    currentRevision: sha256OfFile(reportPath),
+  };
+}
+
+/**
+ * Validate one cognitive aggregation for `coordinationId` against this
+ * session's own evidence, and record the result as an `aggregation-validated`
+ * event.
+ *
+ * What is DERIVED from the session (never taken from the caller):
+ * - which operations are sources -- `definition`'s own
+ *   `completion.aggregation.sourceOperationRefs[]`;
+ * - which Assignments answer them -- `resolveOperationOutcome`, the SAME
+ *   stamp-verified derivation visibility windows use, so an Assignment that
+ *   merely shares an actor or a claim key answers nothing;
+ * - each source's artifact ref, revision pin, and disclosures -- read off the
+ *   linked RunResult on disk;
+ * - the outcome itself -- `classifyAggregationOutcome`, called, never forked.
+ *
+ * What the CALLER supplies: identity (`aggregationId`, `validatedBy`), the
+ * aggregate's own output (`assignmentId`/`runId`/`outputArtifactRef`), and
+ * `dissentRefs` -- declared dissent, on exactly the footing
+ * `synthesizeResearchFanIn`'s `contradictions` and `closeSessionByQuorum`'s
+ * `dissentingActorIds` already established: this engine has no semantic model
+ * of disagreement and never infers it, it only records what a driver already
+ * knows. There is no `outcome` parameter: a caller cannot assert a verdict,
+ * only submit evidence and receive one.
+ *
+ * Never transitions the session. See `closeSessionByQuorum`'s `aggregationId`
+ * for how a validated outcome is consumed as terminal input.
+ *
+ * @param {string} coordinationId
+ * @param {object} params
+ * @param {object} params.definition Loaded FlowDefinition declaring `completion.aggregation`.
+ * @param {string} params.aggregationId
+ * @param {{type: 'driver', id: string}} params.validatedBy
+ * @param {string} [params.assignmentId] The aggregate's own output Assignment.
+ * @param {string} [params.runId]
+ * @param {string} [params.outputArtifactRef]
+ * @param {{sourceOperationRef: string, resolved: boolean}[]} [params.dissentRefs]
+ * @returns {Readonly<{outcome: string, classification: object, event: object}>}
+ */
+export function validateSessionAggregation(
+  coordinationId,
+  { definition, aggregationId, validatedBy, assignmentId, runId, outputArtifactRef, dissentRefs = [] },
+  opts = {},
+) {
+  if (!isNonEmptyString(aggregationId)) {
+    throw new CoordinationError('validation', 'validateSessionAggregation: aggregationId is required');
+  }
+  const declaration = definition?.spec?.profile?.completion?.aggregation;
+  if (!declaration) {
+    throw new CoordinationError(
+      'validation',
+      `validateSessionAggregation: protocol "${definition?.metadata?.id}" declares no spec.profile.completion.aggregation -- there is nothing to validate against`,
+    );
+  }
+  if (declaration.method !== AGGREGATION_METHOD) {
+    throw new CoordinationError(
+      'validation',
+      `validateSessionAggregation: aggregation method "${declaration.method}" is not supported (only "${AGGREGATION_METHOD}" exists in MVP7)`,
+    );
+  }
+
+  const replayed = replaySession(coordinationId, opts);
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  const replacedBy = buildActorReplacementMap(replayed.events);
+
+  const sources = [];
+  const currentRevisions = {};
+  const sourceResultRefs = [];
+  const artifactRevisionRefs = [];
+  const unresolvedContributionRefs = [];
+  const missingActors = [];
+  const failedActors = [];
+
+  for (const sourceOperationRef of declaration.sourceOperationRefs) {
+    const outcome = resolveOperationOutcome(definition, sourceOperationRef, { events: replayed.events, fgosDir, replacedBy });
+
+    // All-of over the operation's bindings, exactly the rule
+    // `resolveOperationOutcome` already computes for visibility windows: a
+    // source operation wired to a fan-out cohort is the WHOLE cohort's
+    // obligation. When any binding is unsatisfied, this operation contributes
+    // NO source at all -- so the evaluator's own coverage check fails it and
+    // the outcome can only be `no-consensus`. Contributing the satisfied
+    // branches alone would let a half-answered cohort read as fully covered,
+    // which is the partial-cohort bypass P06 refused one layer down.
+    if (!outcome.satisfied) {
+      for (const branch of outcome.branches) {
+        if (branch.satisfied) continue;
+        // Named, never dropped: a contribution that never arrived or failed
+        // is recorded on the event, so an aggregate can never look complete
+        // by omission. `late` (created, not yet settled) counts as missing
+        // for the same reason `classifySessionQuorum` treats it as incomplete.
+        if (branch.reason === 'failed') failedActors.push(branch.actorId);
+        else missingActors.push(branch.actorId);
+      }
+      continue;
+    }
+
+    // Same all-of discipline one level deeper: every binding of this operation
+    // must yield a revision-pinned source, or the operation contributes none.
+    // A cohort where one contributor settled without an immutable pin is not
+    // fully evidence-backed, and letting its pinned siblings cover for it
+    // would be the same partial-cohort bypass in a different coat.
+    const built = outcome.branches.map((branch) => {
+      const runResult = readLinkedRunResultFromDisk(fgosDir, branch.assignmentId, branch.runId);
+      return { branch, pinned: aggregationSourceFrom(fgosDir, sourceOperationRef, branch.assignmentId, branch.runId, runResult) };
+    });
+    if (built.some((entry) => entry.pinned === null)) {
+      // Named, never dropped -- and since this operation now contributes no
+      // source, the evaluator's coverage check fails it and the outcome can
+      // only be `no-consensus`.
+      for (const entry of built) unresolvedContributionRefs.push(entry.branch.assignmentId);
+      continue;
+    }
+    for (const { branch, pinned } of built) {
+      sources.push(pinned.source);
+      sourceResultRefs.push(branch.assignmentId);
+      artifactRevisionRefs.push(`${pinned.source.artifactRef}@${pinned.source.revision}`);
+      // A source whose artifact cannot be hashed now gets NO entry here, and
+      // `validateSourceRevisionCurrency` fails closed on a missing entry --
+      // an unreadable artifact is stale, never assumed current.
+      if (pinned.currentRevision !== undefined) currentRevisions[pinned.source.artifactRef] = pinned.currentRevision;
+    }
+  }
+
+  if (sourceResultRefs.length === 0) {
+    throw new CoordinationError(
+      'validation',
+      `validateSessionAggregation: no declared source operation of protocol "${definition.metadata.id}" resolved to a usable, revision-pinned result in session "${coordinationId}" -- refusing to validate an aggregation with no evidence behind it`,
+    );
+  }
+
+  const classification = classifyAggregationOutcome({
+    sourceOperationRefs: [...declaration.sourceOperationRefs],
+    sources,
+    requiredDisclosures: [...declaration.requiredDisclosures],
+    dissentRefs,
+    currentRevisions,
+  });
+
+  const event = recordAggregationValidation(
+    coordinationId,
+    {
+      aggregationId,
+      method: AGGREGATION_METHOD,
+      outcome: classification.outcome,
+      sourceResultRefs,
+      validatedBy,
+      ...(assignmentId !== undefined ? { assignmentId } : {}),
+      ...(runId !== undefined ? { runId } : {}),
+      ...(outputArtifactRef !== undefined ? { outputArtifactRef } : {}),
+      ...(dissentRefs.length > 0 ? { dissentRefs: dissentRefs.map((entry) => entry.sourceOperationRef) } : {}),
+      ...(unresolvedContributionRefs.length > 0 ? { unresolvedContributionRefs } : {}),
+      ...(missingActors.length > 0 ? { missingActors } : {}),
+      ...(failedActors.length > 0 ? { failedActors } : {}),
+      ...(artifactRevisionRefs.length > 0 ? { artifactRevisionRefs } : {}),
+    },
+    opts,
+  );
+
+  return Object.freeze({ outcome: classification.outcome, classification, event });
 }
 
 // A retry must always declare WHY (records intent, never a silent

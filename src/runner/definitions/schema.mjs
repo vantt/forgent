@@ -33,6 +33,14 @@ export const VISIBILITY_VALUES = Object.freeze(['headless', 'visible']);
 export const RESULT_KIND_VALUES = Object.freeze(['advisory', 'gate-verdict', 'work-product']);
 export const EVIDENCE_REQUIRED_VALUES = Object.freeze(['reported', 'verified']);
 export const COMPLETION_MODE_VALUES = Object.freeze(['synthesize', 'all-required', 'explicit-partial']);
+
+// Cognitive aggregation is declared SEPARATELY from `completion.mode`, never
+// as another mode value: phase-07's whole point is that completion
+// eligibility (mode) and cognitive validation (aggregation) are different
+// questions with different authorities. One method only in MVP7 -- "prove one
+// honest synthesis method before introducing voting or convergence
+// machinery."
+export const AGGREGATION_METHOD_VALUES = Object.freeze(['evidence-preserving-synthesis']);
 export const CONTEXT_VISIBILITY_VALUES = Object.freeze(['mediated', 'isolated-until-fan-in', 'broadcast']);
 export const COHORT_INDEPENDENCE_VALUES = Object.freeze(['isolated-until-fan-in']);
 
@@ -81,7 +89,8 @@ const WORKFLOW_WORK_FIELDS = new Set(['baseStepMap']);
 // `work`/`baseStepMap` absent from this whitelist closes "CoordinationProtocol
 // forbidden: profile.work, baseStepMap" structurally, not by naming them.
 const PROTOCOL_PROFILE_FIELDS = new Set(['kind', 'completion', 'topology', 'cohort']);
-const PROTOCOL_COMPLETION_FIELDS = new Set(['mode']);
+const PROTOCOL_COMPLETION_FIELDS = new Set(['mode', 'aggregation']);
+const PROTOCOL_COMPLETION_AGGREGATION_FIELDS = new Set(['method', 'outputOperationRef', 'sourceOperationRefs', 'requiredDisclosures']);
 const PROTOCOL_TOPOLOGY_FIELDS = new Set(['contextVisibility', 'edges', 'visibilityWindows']);
 const PROTOCOL_TOPOLOGY_EDGE_FIELDS = new Set(['from', 'to', 'intents', 'maxRounds']);
 const PROTOCOL_COHORT_FIELDS = new Set(['count', 'distinctProviderFamilies', 'requiredRoles', 'independence']);
@@ -335,6 +344,54 @@ function validateVisibilityWindow(window, label) {
   });
 }
 
+/**
+ * Validate `spec.profile.completion.aggregation` -- the cognitive-aggregation
+ * declaration, which is INDEPENDENT of `completion.mode`. Declaring it changes
+ * nothing about how `mode` is validated, defaulted, or interpreted; a
+ * definition that omits it produces a byte-identical `completion` object to
+ * the one this schema produced before aggregation existed.
+ *
+ * Cross-referential checks (every operation ref resolving to a real
+ * `spec.operations[]` id) happen after `operations` is computed, in
+ * `assertAggregationReferencesRealOperations` -- the same split
+ * `validateVisibilityWindow` already uses for the same reason.
+ *
+ * `sourceOperationRefs` must be NON-EMPTY, and `outputOperationRef` must not
+ * appear among them. An aggregate declaring zero sources, or declaring itself
+ * as one of its own sources, is self-validated truth by construction -- it
+ * would let a synthesis operation's own output stand as the evidence that
+ * validates it. Refused here at the earliest possible layer, so no session
+ * ever gets the chance to record such an aggregation as validated.
+ */
+function validateAggregationDeclaration(aggregation, label) {
+  if (!isPlainObject(aggregation)) fail(`${label} must be an object when provided`);
+  assertOnlyAcceptedFields(aggregation, PROTOCOL_COMPLETION_AGGREGATION_FIELDS, label);
+
+  if (!AGGREGATION_METHOD_VALUES.includes(aggregation.method)) {
+    fail(`${label}.method must be one of ${AGGREGATION_METHOD_VALUES.join(' | ')}`);
+  }
+  if (!isNonEmptyString(aggregation.outputOperationRef)) {
+    fail(`${label}.outputOperationRef must be a non-empty string`);
+  }
+  assertStringArray(aggregation.sourceOperationRefs, `${label}.sourceOperationRefs`);
+  if (aggregation.sourceOperationRefs.length === 0) {
+    fail(`${label}.sourceOperationRefs must name at least one source operation -- an aggregation with no declared sources is self-validated truth`);
+  }
+  if (aggregation.sourceOperationRefs.includes(aggregation.outputOperationRef)) {
+    fail(
+      `${label}.outputOperationRef "${aggregation.outputOperationRef}" also appears in ${label}.sourceOperationRefs -- an aggregation may not cite its own output operation as one of its own sources`,
+    );
+  }
+  assertStringArray(aggregation.requiredDisclosures, `${label}.requiredDisclosures`);
+
+  return Object.freeze({
+    method: aggregation.method,
+    outputOperationRef: aggregation.outputOperationRef,
+    sourceOperationRefs: Object.freeze([...aggregation.sourceOperationRefs]),
+    requiredDisclosures: Object.freeze([...aggregation.requiredDisclosures]),
+  });
+}
+
 function validateWorkflowProfile(profile) {
   assertOnlyAcceptedFields(profile, WORKFLOW_PROFILE_FIELDS, 'spec.profile');
   const result = { kind: 'Workflow' };
@@ -379,7 +436,11 @@ function validateProtocolProfile(profile) {
     if (!COMPLETION_MODE_VALUES.includes(profile.completion.mode)) {
       fail(`spec.profile.completion.mode must be one of ${COMPLETION_MODE_VALUES.join(' | ')}`);
     }
-    result.completion = Object.freeze({ mode: profile.completion.mode });
+    const completion = { mode: profile.completion.mode };
+    if (profile.completion.aggregation !== undefined) {
+      completion.aggregation = validateAggregationDeclaration(profile.completion.aggregation, 'spec.profile.completion.aggregation');
+    }
+    result.completion = Object.freeze(completion);
   }
 
   if (profile.topology !== undefined) {
@@ -766,6 +827,27 @@ function assertVisibilityWindowsReferenceRealOperations(profile, operationIds) {
   });
 }
 
+/**
+ * `completion.aggregation`'s `outputOperationRef` and `sourceOperationRefs[]`
+ * must resolve to real `spec.operations[]` ids -- checked here, after
+ * `operations` is computed, exactly like
+ * `assertVisibilityWindowsReferenceRealOperations` above and for the same
+ * ordering reason.
+ */
+function assertAggregationReferencesRealOperations(profile, operationIds) {
+  const aggregation = profile.completion?.aggregation;
+  if (!aggregation) return;
+  const label = 'spec.profile.completion.aggregation';
+  if (!operationIds.has(aggregation.outputOperationRef)) {
+    fail(`${label}.outputOperationRef "${aggregation.outputOperationRef}" does not reference a declared spec.operations[] id`);
+  }
+  aggregation.sourceOperationRefs.forEach((ref, i) => {
+    if (!operationIds.has(ref)) {
+      fail(`${label}.sourceOperationRefs[${i}] "${ref}" does not reference a declared spec.operations[] id`);
+    }
+  });
+}
+
 function validateSpec(spec) {
   if (!isPlainObject(spec)) fail('spec must be a non-null object');
   assertOnlyAcceptedFields(spec, SPEC_FIELDS, 'spec');
@@ -777,6 +859,7 @@ function validateSpec(spec) {
   const operations = validateOperations(spec.operations, roleSet, profile.kind);
   const operationIds = new Set(operations.map((op) => op.id));
   assertVisibilityWindowsReferenceRealOperations(profile, operationIds);
+  assertAggregationReferencesRealOperations(profile, operationIds);
   const windowIds = new Set((profile.topology?.visibilityWindows ?? []).map((w) => w.id));
   const graph = validateGraph(spec.graph, operations, actors, profile.kind, windowIds);
   const policy = spec.policy !== undefined ? validatePolicyPatch(spec.policy, 'spec.policy') : undefined;
