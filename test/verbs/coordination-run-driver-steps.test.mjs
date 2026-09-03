@@ -570,28 +570,224 @@ test('a repeated authorize step reports the PERSISTED authorization, not the sec
   assert.deepEqual(authorized[0].payload.grantedContextRefs, first.grantedContextRefs);
 });
 
-test('re-running a request that names an existing coordinationId is refused, leaving the session byte-identical -- no duplicated Assignment, no reconsumed invocationKey', async () => {
+test('R4: a SECOND request naming an EXISTING coordinationId resumes it instead of refusing at open -- reaches the SAME dispatch/authorize/disposition doors, no duplicated Assignment, no reconsumed invocationKey, disposition preserved', async () => {
   const { tempDir, ctx } = setup();
   const coordinationId = 'coord_run_resume_probe';
-  const requestObject = request({
-    coordinationId,
-    steps: [produceStep(), reviewStep(), authorizeStep(), recheckStep()],
-  });
-  const first = await runCoordinationUseCase(ctx, { requestObject });
-  assert.equal(first.coordinationId, coordinationId);
 
-  const sessionDir = path.join(tempDir, '.fgos', 'coordination', 'sessions', coordinationId);
-  const eventsBefore = fs.readFileSync(path.join(sessionDir, 'events.jsonl'));
-  const manifestBefore = fs.readFileSync(path.join(sessionDir, 'session.json'));
+  // Call 1: produce, review, authorize a recheck. Stops short of the recheck
+  // itself and the disposition -- a genuine mid-flight interruption point
+  // (at least one Assignment AND one authorization already landed, per R4's
+  // own acceptance wording).
+  const first = await runCoordinationUseCase(ctx, {
+    requestObject: request({ coordinationId, steps: [produceStep(), reviewStep(), authorizeStep()] }),
+  });
+  assert.equal(first.coordinationId, coordinationId);
+  const produceId = first.steps.find((s) => s.as === 'produce').assignmentId;
+  const reviewId = first.steps.find((s) => s.as === 'review').assignmentId;
+  assert.match(produceId, /^asgn_/);
+
+  const assignmentsAfterFirst = fs.readdirSync(path.join(tempDir, '.fgos', 'assignments')).sort();
+  assert.equal(assignmentsAfterFirst.length, 2);
+
+  // Call 2, same coordinationId: no `$ref:` label survives across separate
+  // requests (each call starts its own `labels` map), so this call names
+  // Call 1's own Assignment ids LITERALLY -- resolveRef's own documented
+  // "already safe-charset-checked id, an advanced/resume use case" path.
+  const second = await runCoordinationUseCase(ctx, {
+    requestObject: request({
+      coordinationId,
+      steps: [
+        recheckStep({ contextRefs: [produceId] }),
+        dispositionStep({ targetRef: produceId, evidenceRefs: [reviewId] }),
+      ],
+    }),
+  });
+  assert.equal(second.coordinationId, coordinationId);
+  const recheckStepResult = second.steps.find((s) => s.as === 'recheck');
+  assert.equal(recheckStepResult.status, 'done');
+  const dispositionStepResult = second.steps.find((s) => s.as === 'close-round');
+  assert.equal(dispositionStepResult.appended, true);
+  assert.equal(dispositionStepResult.disposition, 'accepted');
+
+  // No duplicate Assignment: exactly 3 total across BOTH calls (produce,
+  // review, recheck) -- the recheck did not re-materialize produce/review.
+  const assignmentsAfterSecond = fs.readdirSync(path.join(tempDir, '.fgos', 'assignments')).sort();
+  assert.equal(assignmentsAfterSecond.length, 3);
+  assert.deepEqual(assignmentsAfterSecond.slice(0, 2), assignmentsAfterFirst);
+
+  // No reconsumed invocationKey: exactly the ONE `operation-authorized` Call
+  // 1 wrote; Call 2 issued no new authorization.
+  const authEvents = eventsOfType(tempDir, coordinationId, 'operation-authorized');
+  assert.equal(authEvents.length, 1);
+  assert.equal(authEvents[0].payload.authorizationId, 'auth_recheck_1');
+
+  // No lost disposition: exactly the ONE Call 2 recorded, still readable.
+  const dispositionEvents = eventsOfType(tempDir, coordinationId, 'driver-disposition-recorded');
+  assert.equal(dispositionEvents.length, 1);
+  assert.equal(dispositionEvents[0].payload.disposition, 'accepted');
+
+  // No hidden-context leakage: the recheck's own recorded contextRefs are
+  // exactly the authorization's grantedContextRefs -- nothing wider reached
+  // the executor across the resume boundary.
+  const manifest = readManifest(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  const recheckAssignmentPath = path.join(tempDir, '.fgos', 'assignments', recheckStepResult.assignmentId, 'assignment.json');
+  const recheckAssignment = JSON.parse(fs.readFileSync(recheckAssignmentPath, 'utf8'));
+  assert.deepEqual(recheckAssignment.contextRefs, [produceId]);
+  assert.equal(manifest.assignmentRefs.length, 3);
+});
+
+test('R5 (resume-specific): a SECOND request cannot reconsume an invocationKey the FIRST request already consumed', async () => {
+  const { tempDir, ctx } = setup();
+  const coordinationId = 'coord_run_resume_invocation_key_probe';
+  const first = await runCoordinationUseCase(ctx, {
+    requestObject: request({ coordinationId, steps: [produceStep(), reviewStep(), authorizeStep()] }),
+  });
+  const produceId = first.steps.find((s) => s.as === 'produce').assignmentId;
 
   await assert.rejects(
-    runCoordinationUseCase(ctx, { requestObject }),
-    (err) => err instanceof CoordinationError && /already exists/.test(err.message),
+    runCoordinationUseCase(ctx, {
+      requestObject: request({
+        coordinationId,
+        // A different authorizationId, but the SAME invocationKey authorizeStep()
+        // already consumed in Call 1 -- reused across the resume boundary.
+        steps: [authorizeStep({ authorizationId: 'auth_recheck_2', grantedContextRefs: [produceId] })],
+      }),
+    }),
+    (err) => err instanceof CoordinationError && /invocationKey ".*" in session ".*" was already used by authorization/.test(err.message),
+  );
+  assert.equal(eventsOfType(tempDir, coordinationId, 'operation-authorized').length, 1);
+});
+
+test('R5 (resume-specific): a session-wide cap declared at open time still governs across the resume boundary -- a SECOND request cannot exceed the ORIGINAL aggregateBounds.maxAssignments, and cannot loosen it by declaring a different one', async () => {
+  const { tempDir, ctx } = setup();
+  const coordinationId = 'coord_run_resume_over_cap_probe';
+  const first = await runCoordinationUseCase(ctx, {
+    requestObject: request({ coordinationId, aggregateBounds: { maxAssignments: 2 }, steps: [produceStep(), reviewStep()] }),
+  });
+  assert.equal(first.coordinationId, coordinationId);
+  assert.equal(first.steps.length, 2);
+
+  // Call 2 declares a WIDER cap (10) -- inert on resume, since `aggregateBounds`
+  // is only ever consulted at `openSession` time, which this call never
+  // reaches again. The session's ORIGINAL cap (2, already met by produce +
+  // review) is what actually governs, so a 3rd Assignment is still refused.
+  await assert.rejects(
+    runCoordinationUseCase(ctx, {
+      requestObject: request({
+        coordinationId,
+        aggregateBounds: { maxAssignments: 10 },
+        steps: [{ type: 'operation', as: 'red-team', operationId: 'red-team-candidate', targetActorId: 'red-team', objective: 'Red-team the candidate.', expectedOutputs: ['agent-result.json (status, summary)'], contextRefs: [] }],
+      }),
+    }),
+    (err) => err instanceof CoordinationError && /at or above the declared aggregateBounds\.maxAssignments cap of 2/.test(err.message),
   );
 
-  assert.deepEqual(fs.readFileSync(path.join(sessionDir, 'events.jsonl')), eventsBefore);
-  assert.deepEqual(fs.readFileSync(path.join(sessionDir, 'session.json')), manifestBefore);
-  assert.equal(eventsOfType(tempDir, coordinationId, 'operation-authorized').length, 1);
+  const manifest = readManifest(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(manifest.aggregateBounds.maxAssignments, 2, 'the ORIGINAL cap must still be on record -- a resumed request cannot rewrite it');
+  assert.equal(manifest.assignmentRefs.length, 2);
+});
+
+test('R5 (resume-specific, HIGH): a SECOND request naming an EXISTING coordinationId with a DIFFERENT writerId is refused before any step dispatches -- cannot spend the original driver\'s authorization or inject work under a foreign identity', async () => {
+  const { tempDir, ctx } = setup();
+  const coordinationId = 'coord_run_resume_foreign_writer_probe';
+
+  // Call 1, real driver: produce, review, and authorize a driver-authorized
+  // recheck -- leaves one still-unconsumed `operation-authorized` grant on
+  // the session, exactly the shape the live-reproduced attack spent.
+  const first = await runCoordinationUseCase(ctx, {
+    requestObject: request({ coordinationId, steps: [produceStep(), reviewStep(), authorizeStep()] }),
+  });
+  const produceId = first.steps.find((s) => s.as === 'produce').assignmentId;
+
+  const manifestBefore = readManifest(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(manifestBefore.assignmentRefs.length, 2);
+  assert.equal(manifestBefore.provenanceRoot.writerId, WRITER_ID);
+  const authEventsBefore = eventsOfType(tempDir, coordinationId, 'operation-authorized');
+  assert.equal(authEventsBefore.length, 1);
+
+  // Call 2, a SECOND, independent request naming the SAME coordinationId but
+  // a writerId of the caller's own choosing -- never issued its own
+  // authorization, and knows nothing but the coordinationId and the
+  // protocol's own public operation/actor names. This is the exact shape
+  // Red-Team live-reproduced: an ordinary "operation" step (the driver-
+  // authorized recheck) resolving and consuming the ORIGINAL driver's
+  // still-unconsumed grant under a foreign identity.
+  await assert.rejects(
+    runCoordinationUseCase(ctx, {
+      requestObject: request({
+        coordinationId,
+        writerId: 'attacker-writer-id-not-the-original-driver',
+        steps: [recheckStep({ contextRefs: [produceId] })],
+      }),
+    }),
+    (err) =>
+      err instanceof CoordinationError &&
+      err.category === 'validation' &&
+      /is not the driver identity of session "coord_run_resume_foreign_writer_probe"/.test(err.message) &&
+      /attacker-writer-id-not-the-original-driver/.test(err.message) &&
+      new RegExp(`provenanceRoot\\.writerId is "${WRITER_ID}"`).test(err.message),
+  );
+
+  // No side effect from the rejected attempt: no new Assignment materialized
+  // (dispatchDeclaredOperation was never reached), and the ONE authorization
+  // Call 1 wrote is still unconsumed-by-a-second-authorization-event (still
+  // exactly 1 operation-authorized event -- the grant itself is spendable by
+  // a real recheck, but the rejected attempt above must not have spent it or
+  // recorded anything under the foreign identity).
+  const manifestAfter = readManifest(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(manifestAfter.assignmentRefs.length, 2, 'the rejected foreign-writerId request must not have dispatched any Assignment');
+  assert.equal(fs.readdirSync(path.join(tempDir, '.fgos', 'assignments')).length, 2);
+  const authEventsAfter = eventsOfType(tempDir, coordinationId, 'operation-authorized');
+  assert.equal(authEventsAfter.length, 1, 'the rejected foreign-writerId request must not have consumed or re-issued an authorization');
+
+  // Confirms the request door refuses BEFORE dispatch, not that dispatch
+  // itself later rejects the attacker: a legitimate resume under the SAME
+  // (real) writerId still reaches the recheck and spends the grant normally.
+  const legit = await runCoordinationUseCase(ctx, {
+    requestObject: request({ coordinationId, steps: [recheckStep({ contextRefs: [produceId] })] }),
+  });
+  assert.equal(legit.steps.find((s) => s.as === 'recheck').status, 'done');
+});
+
+test('R5 (resume-specific, LOW): resuming against a session with a malformed session.json fails closed with a corrupt-log error, never silently falls through to a fresh open', async () => {
+  const { tempDir, ctx } = setup();
+  const coordinationId = 'coord_run_resume_malformed_manifest_probe';
+  const { sessionDir, manifestPath } = resolveSessionPaths(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  fs.mkdirSync(sessionDir, { recursive: true });
+  fs.writeFileSync(manifestPath, '{not valid json');
+
+  await assert.rejects(
+    runCoordinationUseCase(ctx, { requestObject: request({ coordinationId, steps: [produceStep()] }) }),
+    (err) => err instanceof CoordinationError && err.category === 'corrupt-log' && /is not valid JSON/.test(err.message),
+  );
+
+  // Fails closed, not silently treated as "new": no fresh openSession attempt
+  // ever ran (the broken session.json is untouched, no Assignment created).
+  assert.equal(fs.readFileSync(manifestPath, 'utf8'), '{not valid json');
+  assert.equal(fs.existsSync(path.join(tempDir, '.fgos', 'assignments')), false);
+});
+
+test('R5 (resume-specific, LOW): resuming against a coordinationId whose session directory exists but has no session.json (a crash between mkdirSync and writeManifestRaw) fails closed, never silently opens fresh over it', async () => {
+  const { tempDir, ctx } = setup();
+  const coordinationId = 'coord_run_resume_dangling_dir_probe';
+  const { sessionDir } = resolveSessionPaths(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  fs.mkdirSync(sessionDir, { recursive: true });
+
+  // `findExistingManifest` sees `not-found` (ENOENT on session.json) and
+  // correctly treats this as "no existing session" -- falls through to
+  // `openStandaloneSession`/`openDeclaredProtocolSession`, whose own
+  // `openSession` then hits its OWN `mkdirSync` EEXIST guard on the
+  // already-present directory. Still fails closed -- no session.json is ever
+  // written and no Assignment is created -- just at the pre-existing "already
+  // exists" door rather than the resume identity gate (this shape has no
+  // provenanceRoot.writerId to compare against yet).
+  await assert.rejects(
+    runCoordinationUseCase(ctx, { requestObject: request({ coordinationId, steps: [produceStep()] }) }),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /already exists/.test(err.message),
+  );
+
+  assert.equal(fs.existsSync(path.join(sessionDir, 'session.json')), false);
+  assert.equal(fs.existsSync(path.join(tempDir, '.fgos', 'assignments')), false);
 });
 
 test('two runs under one writer identity stay two disjoint membership records -- one writer never merges two sessions', async () => {

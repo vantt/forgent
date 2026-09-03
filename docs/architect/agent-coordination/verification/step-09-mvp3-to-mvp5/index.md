@@ -49,7 +49,7 @@ own work.
 | 01 | MVP3 | R1-R8 (see phase file) | done |
 | 02 | MVP4 | R1-R6 (see phase file; split P02.1 R1-R4 / P02.2 R5-R6) | done |
 | 03 | Config | R1-R8 (see phase file) | done |
-| 04 | MVP5 | R1-Rn (see phase file) | missing |
+| 04 | MVP5 | R1-R8 (see phase file; split P04.1 R1-R7 / P04.2 R8) | in-progress |
 
 ## Active Cell
 
@@ -57,7 +57,8 @@ None.
 
 ## Next Action
 
-Prepare P04.1 (Phase 04 — MVP5: usable standalone live proof).
+Prepare P04.2 (Phase 04 — MVP5 R8: dogfood handoff docs; closes Phase 04
+and the whole plan).
 
 ## Cell Log
 
@@ -68,6 +69,75 @@ Prepare P04.1 (Phase 04 — MVP5: usable standalone live proof).
 | P02.1 | Phase 02 R1-R4 | done | `fb18c372` |
 | P02.2 | Phase 02 R5-R6 (closes Phase 02) | done | `c963f2a7` |
 | P03.1 | Phase 03 R1-R8 (closes Phase 03) | done | `53a88522` |
+| P04.1 | Phase 04 R1-R7 | done | pending |
+
+## Phase 04 Status (in progress)
+
+**P04.1 CLOSED (Phase 04 R1-R7; R8 open as P04.2).** Built the plan's one
+genuinely new capability: resume. `resumeSession()` in `session-engine.mjs`
+turned out to be a read-only `replaySession` alias, not an attach-and-
+continue door — the real fix was a small, surgical branch in
+`src/verbs/coordination/run.mjs`'s `findExistingManifest()`: when a
+request names an existing `coordinationId`, skip the open-and-refuse path
+and dispatch straight into the SAME `dispatchDeclaredOperation`/
+`authorizeDeclaredOperation`/`recordDriverDisposition` doors every
+fresh-open request already uses. No `session-engine.mjs`/`store.mjs`/
+`replay.mjs`/`schema.mjs` changes needed — confirmed by both independent
+rounds. Live-proved with two real `fgos coordination run` CLI subprocess
+invocations against the same coordinationId, split so the session was
+provably still active between calls: no duplicate Assignment, no
+reconsumed invocationKey, no lost disposition, no hidden-context leakage;
+a third call against the now-terminal session correctly refused.
+
+Reviewer round (initially APPROVE-leaning, revised) ran in parallel with
+Red-Team round — Red-Team live-reproduced a real **HIGH**: a resumed
+request carrying a foreign `writerId` could dispatch ordinary operation/
+fan-out steps into someone else's session and silently consume the
+original driver's already-issued authorization, a session-hijack
+primitive that was categorically unreachable before this cell's resume
+door existed (any second call used to die at the open-refusal guard
+before any dispatch ran). The Reviewer independently re-derived the same
+mechanism and concurred, revising their own initial LOW rating to BLOCK
+in the same round — a clean example of the parallel-round process working
+as designed even when the two roles' first passes disagreed. `authorize`/
+`disposition` steps were already correctly identity-gated; only ordinary
+dispatch through the resume door was exposed. Also 1 LOW (resume against
+a broken/corrupted session lacked a direct regression test, though
+Red-Team proved live in their own section it already failed closed).
+
+Single Fixer pass: `findExistingManifest()` now asserts
+`manifest.provenanceRoot.writerId === request.writerId` before any step
+dispatches, at both call sites (agent-led and declared-protocol) — refuses
+with a clear error on mismatch, mirroring `authorize`/`disposition`'s own
+identity-gate shape. 3 new regression tests: the exact HIGH reproduction
+with zero-side-effect assertions (Assignment/event counts unchanged by
+the rejected attempt), plus the two broken-session LOW cases (malformed
+`session.json`, missing `session.json`).
+
+Reviewer-recheck and Red-Team-recheck both ran in parallel against the
+combined fix — both APPROVE. Red-Team-recheck went further than a mere
+retest: built an independent from-scratch attack script (real CLI
+subprocesses, fresh workspaces) covering 5 scenarios/25 assertions,
+attacked the OTHER call site the Fixer's own test didn't exercise
+(agent-led, not just declared-protocol), confirmed a missing/null
+`writerId` fails closed one layer upstream at schema validation (not
+merely by the new equality check), and re-verified zero-side-effects
+directly off disk rather than trusting test output. Reviewer-recheck
+independently confirmed no `undefined !== undefined` false-negative path
+exists (both `request.writerId` and `manifest.provenanceRoot.writerId`
+are non-empty-string-required at their respective write points). No
+further findings. HIGH and LOW both CONFIRMED-RESOLVED.
+
+Full suite (final): 5197 tests, 5189 pass, 2 fail at first run — one
+matched the recorded baseline (`fgos-intake-4.test.mjs:318`), the other
+(`test/runner/dispatch.test.mjs`'s `spawnWorker` maxBuffer test) did not
+reproduce in isolation (354/354), confirming this track's now
+four-times-observed load-induced flake pattern, not a new failure.
+Focused glob (`test/runner/coordination*.test.mjs test/verbs/coordination*.test.mjs`)
+367/367 pass throughout.
+
+Next: P04.2 (Phase 04 R8 — dogfood handoff docs; closes Phase 04 and this
+plan's entire scope).
 
 ## Phase 03 Status
 
