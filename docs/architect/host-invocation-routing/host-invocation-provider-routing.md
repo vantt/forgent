@@ -14,6 +14,8 @@ or an external plugin.
 
 For the staged replacement of the current Node implementation, read
 [Node To Rust Component Migration](./node-to-rust-component-migration.md).
+For the first executable proof, read
+[Rust CLI And Proof Components Implementation Plan](./rust-cli-and-proof-components-plan.md).
 
 ## 1. Architecture Name
 

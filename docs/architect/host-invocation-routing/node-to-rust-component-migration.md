@@ -14,6 +14,8 @@ implementation by Rust while keeping caller-visible contracts stable. The
 general host/router architecture, including peer CLI and remote host use cases,
 provider kinds, plugin discovery, and capability routing, lives in
 [Host Invocation And Provider Routing Architecture](./host-invocation-provider-routing.md).
+The first executable proof is scoped in
+[Rust CLI And Proof Components Implementation Plan](./rust-cli-and-proof-components-plan.md).
 
 ## 1. Migration Question
 
