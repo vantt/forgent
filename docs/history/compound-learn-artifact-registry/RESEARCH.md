@@ -136,3 +136,76 @@ recommending the item's classification be updated to match.
 (plan.md's own Acceptance section: `npm test` green including new
 harnesses, `fgos doctor` green including the 8 new knowledge checks phase
 08 registers).
+
+## Round 4 (2026-09-03) — tsk-43q, stage `discovery`
+
+**Asked:** is tsk-43q's goal (make `enduser-index-generate.mjs`'s
+enumeration registry-aware instead of pure directory-scan, without
+breaking the tsk-f31 unreachable-store fallback) clear enough to skip
+`exploring` and move to `planning`?
+
+**Routed mechanically:**
+
+- Confirmed the bug is still live a week later, and has already damaged
+  `main`: `docs/enduser-docs-index.json` currently holds only **4
+  entries** (should be 332) — a subsequent `docs-index` run after
+  tsk-5mh's own session wiped it further and landed uncaught
+  (`dc8a61c5`, `4a4d3d67`).
+- All 332 docs confirmed still live, `provisional`, 100% under
+  `docs/knowledge/<purposeSlug>/<role>.md` (unchanged since tsk-5mh).
+- **Real fix design found, simpler than a full registry-driven rewrite:**
+  the migration script already writes a `mode` field into every migrated
+  doc's own frontmatter (`mode: how-to|explanation|reference|tutorial`),
+  matching `QUADRANTS` vocabulary (`tutorial` singular needs mapping to
+  `tutorials`). Verified live: **332/332 files** carry a non-empty `mode`
+  (vs. the legacy `type` field, present on only 181/332 — `type` is not
+  reliable, `mode` is, because THIS migration wrote it fresh to every
+  file). This means enumeration can add a new `docs/knowledge/**/*.md`
+  recursive scan tagged by each file's own frontmatter `mode`, entirely
+  independent of the registry/`.fgos` — the existing
+  `scanDirAsQuadrant`/QUADRANTS/alias logic stays untouched, so every
+  `tsk-f31` unreachable-store test keeps passing unmodified (verified:
+  `node --test test/report/enduser-index.test.mjs` → **19/19 pass right
+  now**, including all three unreachable-store tests).
+- **New, unrelated-but-relevant finding:** `docs/how-to/` (an old,
+  supposedly-retired quadrant dir) has fresh content again — several
+  files modified today, clearly new compound-learn captures from ongoing
+  work (the concurrent agent-coordination MVP work / the currently-running
+  retro-loop session), landing at LEGACY paths despite
+  `docRegistry.enforce: true` still being on. This is a real registry-
+  enforcement gap, but orthogonal to tsk-43q's own fix: the planned dual
+  scan (existing quadrant-dir logic + new `docs/knowledge/` scan) finds
+  real docs correctly regardless of *why* some still land at legacy
+  paths. Not blocking; worth flagging to the user, not worth expanding
+  this item's scope to fix the enforcement gap too.
+- **Smaller adjacent finding:** `docs/decisions/index.md` is a
+  machine-generated projection (`fgos decision-index`, `bin/fgos.mjs`
+  `case 'decision-index'`) written to a hardcoded path independent of the
+  registry — the original classifier/inventory incorrectly treated it as
+  a migratable "doc" (topicId `decisions-index`), so it now exists at
+  BOTH its old path (regenerated fresh by `decision-index`) and its new
+  registry path. Cosmetic duplication in the manifest, not a correctness
+  bug for THIS item's fix; not worth blocking on either.
+- Two existing tests hardcode now-stale real-repo assumptions
+  (`docs/how-to/check-rollup-progress.md`'s specific `type`/
+  `source_capture_ids` values) — currently passing again only because
+  unrelated new work happened to recreate a file at that same path today;
+  fragile, but not this item's root cause. Left as-is unless implement
+  finds they need updating for the actual fix.
+
+**Verdict:** **clear.**
+
+Root cause, blast radius (confirmed real production damage on `main`,
+not hypothetical), and a concrete, minimal, test-preserving fix design
+are all grounded in evidence gathered this round. `tier`/`kind`/`risk`
+already read `heavy`/`bug`/`heavy` on the item, matching the evidence
+(already-manifested data loss on `main`, corpus-wide blast radius) — no
+`fgos edit` needed.
+
+**Verify (real, runnable):**
+
+```bash
+node --test test/report/enduser-index.test.mjs   # all pass, incl. 3 unreachable-store tests unmodified
+node bin/fgos.mjs docs-index --dir <repoRoot>     # regenerates enduser-docs-index.json with ~332+ entries (not 4)
+npm test                                          # full suite green
+```
