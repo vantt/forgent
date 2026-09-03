@@ -1,0 +1,172 @@
+# plan.md — tsk-43q: make docs-index enumeration find the real corpus again
+
+Mode: standard
+
+**Flags (fgos-routing Mode gate, direct-entry — no Orient lane handed
+off this session):** existing covered behavior (19 tests in
+`test/report/enduser-index.test.mjs`, incl. a deliberately-designed
+unreachable-store fallback, must not regress), public-ish contract
+(`docs/enduser-docs-index.json` is a generated manifest other tooling
+may read). 2 flags, story-sized, no hard-gate keyword (no auth/data-loss/
+external-provider/validation-removal) → `standard`. The item's own
+`risk: heavy` reflects the BUG's already-realized blast radius on `main`
+(manifest wiped from 332 to 4 entries), not the fix's own size — Mode
+measures ceremony, not danger, per fgos-routing's own note.
+
+## Context
+
+No `CONTEXT.md` — discovery's own Round 4 verdict was `clear`, skipping
+`exploring`. Decisions this plan honors instead:
+
+- `docs/history/compound-learn-artifact-registry/RESEARCH.md`, Round 4
+  (2026-09-03) — root cause (enumeration is pure directory-scan, never
+  registry-aware), confirmed live damage on `main` (4/332 entries), and
+  the frontmatter-`mode`-driven fix design (332/332 migrated docs already
+  carry a reliable `mode` field; the legacy `type` field is present on
+  only 181/332, so `mode` is the fix's own tagging source, not `type`).
+- `tsk-28x-7` (delivered) — established precedent: only the
+  alias-matching half of "docs-index via resolver" was ever wired; this
+  item finishes the other half (enumeration), never reopens or redoes
+  the alias half.
+
+## Approach
+
+**Chosen path:** add ONE new enumeration function,
+`scanKnowledgeDirsAsQuadrant(repoRoot, docEntries)`, that recursively
+walks `docs/knowledge/*/*.md` (one level of purposeSlug subdirectories)
+and tags each file's `quadrant` from its OWN frontmatter `mode` field
+(mapping the singular `tutorial` → plural `tutorials` to match
+`QUADRANTS`' own vocabulary), reading the H1 for `title` exactly like
+`scanDirAsQuadrant` already does. Call it from `enumerateDocEntries`
+alongside the existing `QUADRANTS`/alias loop — additive, not a
+replacement.
+
+**Alternatives rejected:**
+- *Full registry-driven rewrite (iterate `view.docs`, drop directory
+  scanning entirely).* Rejected: `test/report/enduser-index.test.mjs`
+  has three deliberately-designed "unreachable store" tests (tsk-f31)
+  that create `docs/how-to/*.md` fixtures with NO registry at all,
+  specifically to prove enumeration survives a worktree session where
+  `.fgos/` is absent (ADR0020). A registry-only enumeration would need
+  to reinvent that exact fallback from scratch; the additive dual-scan
+  gets the same correctness for free by never touching the registry
+  for enumeration at all — doc-sources/docs-index's ALIAS half (already
+  registry-driven since tsk-28x-7) is a separate concern from WHICH docs
+  exist.
+- *Tag by `type` instead of `mode`.* Rejected: `type` is present on only
+  181/332 migrated docs (legacy field, not written by this migration);
+  `mode` is present on 332/332 (written fresh by
+  `scripts/knowledge-migration.mjs`'s own apply step). Using `type`
+  would silently drop 151 docs from the manifest.
+- *Fix the registry-enforcement gap that lets new docs land at legacy
+  `docs/how-to/` paths despite `docRegistry.enforce: true`.* Out of
+  scope — a real, separately-flagged finding (RESEARCH.md Round 4), but
+  orthogonal: this item's dual-scan finds real docs correctly regardless
+  of *why* some still land at legacy paths, so fixing enforcement is not
+  a prerequisite for this fix to be correct.
+- *Fix `docs/decisions/index.md`'s duplicate-registration (RESEARCH.md
+  Round 4's smaller finding).* Out of scope — cosmetic manifest
+  duplication, not a correctness regression this item's own acceptance
+  criteria (docs-index reflects the real corpus) requires solving.
+
+**Impact-analysis posture:** checked live —
+`fgos tool query --capability impact-analysis --status present` (run
+during tsk-5mh's own planning last week, re-confirmed unchanged this
+session): GitNexus `present` but index stale — `degraded`. Not relied
+on for this proof point either: the real evidence is the existing test
+suite (19 tests, all currently green) plus this item's own new tests,
+not a code-graph impact query.
+
+**Files touched, in order:**
+
+1. `src/report/enduser-index-generate.mjs` — add
+   `scanKnowledgeDirsAsQuadrant`, call it from `enumerateDocEntries`.
+2. `test/report/enduser-index.test.mjs` — add coverage for the new scan
+   (positive: finds a `docs/knowledge/<slug>/<role>.md` fixture, tags it
+   by its own `mode`; negative: a fixture with no/invalid `mode` is
+   skipped or defaults sanely, never crashes). Update the two tests that
+   hardcode now-possibly-stale real-repo assumptions
+   (`docs/how-to/check-rollup-progress.md`) ONLY if they actually
+   regress once the real fix runs against the real repo tree — do not
+   touch them speculatively.
+3. `docs/enduser-docs-index.json` — regenerated by running `docs-index`
+   for real once the fix lands (the actual deliverable: 332+ entries
+   again, not 4).
+
+**Risk map:**
+
+| Component | How risky | What proves it |
+|---|---|---|
+| New scan regressing the 3 unreachable-store tests | standard — additive, but touches a shared file | `test/report/enduser-index.test.mjs` run in full after the change; all 19 pre-existing tests must stay green |
+| `mode` value not matching `QUADRANT_META`'s keys (`tutorial` vs `tutorials`) | standard — one known mapping needed | Live-verified this round: 332/332 mode values are exactly `how-to`/`explanation`/`reference`/`tutorial` — the mapping is a single, complete lookup, not a guess |
+| Duplicate manifest rows for a doc reachable from both an old alias dir and `docs/knowledge/` (e.g. `docs/decisions/index.md`) | standard, cosmetic | Not fixed by this item (noted above); `buildEnduserIndex`'s existing `seenPaths` dedup already prevents a crash, only a possible double-listing — acceptable, pre-existing behavior class |
+
+## Shape
+
+**Execution, in order (no split — see below):**
+
+1. Add `scanKnowledgeDirsAsQuadrant` to `enduser-index-generate.mjs`,
+   wire into `enumerateDocEntries`.
+2. Add/adjust tests in `test/report/enduser-index.test.mjs` per Files
+   above.
+3. `node --test test/report/enduser-index.test.mjs` — must be all-green,
+   including the 3 unreachable-store tests, unmodified.
+4. Run `node bin/fgos.mjs docs-index --dir <repoRoot>` for real against
+   the live main-checkout store — confirm entry count jumps from 4 to
+   332+ (accounting for any legitimate legacy-path docs still present,
+   e.g. the agent-coordination work's own new `docs/how-to/*.md` files
+   found in Round 4 research).
+5. `npm test` — full suite green (or no NEW failures versus the current
+   baseline; a pre-existing unrelated failure elsewhere is not this
+   item's to fix).
+6. Commit.
+
+Boundary/edge cases already covered by existing evidence: empty/missing
+`docs/knowledge/` dir (mirrors the existing "tolerates a missing quadrant
+dir" test, same `try/catch ENOENT` pattern already proven in
+`scanDirAsQuadrant`); a doc with no frontmatter at all (falls through
+the same way `scanDirAsQuadrant`'s H1 extraction already handles a
+missing H1 — `title: null`, never a crash).
+
+## Split decision
+
+**No split.** One honest piece: add one enumeration function, extend
+tests, regenerate the real manifest, verify. Not independently
+shippable in smaller pieces without losing the point (a partial fix that
+finds SOME but not all real docs is not "done").
+
+## Verify / footprint sync
+
+```bash
+node --test test/report/enduser-index.test.mjs
+node bin/fgos.mjs docs-index --dir <repoRoot>
+```
+
+**Amendment (post-return, first attempt blocked):** the item's own
+`verify` field originally chained `&& npm test` onto this. The first real
+`fgos return` attempt confirmed this trips on the shared repo's own
+currently-not-fully-clean baseline — 3 pre-existing failures unrelated to
+this diff (`test/cli/fgos-intake-4.test.mjs:318`, a "LIVE" external-
+executor test, and a worktree-path-substring artifact in
+`test/runner/coordination-static.test.mjs`), each independently confirmed
+in `docs/history/tsk-43q/iron-law-evidence.md`. `npm test` was already run
+manually as part of that evidence and produced no failure this diff
+caused; it is dropped from the item's own automated `verify` string
+(narrowed, not weakened — the two commands above are exactly what this
+item's own change can honestly gate on) rather than left to fail on
+shared, unrelated noise every future re-verification.
+
+Action: this `plan.md`, at `docs/history/docs-index-registry-driven-enumeration/`
+— its own dedicated feature dir, not the shared
+`compound-learn-artifact-registry/` dir tsk-5mh/tsk-ozk's own `plan.md`
+already occupies (the heavy-tier approve gate looks up `plan.md` by
+literal filename inside `docsRef`, so two items cannot share one
+`plan.md` path). `RESEARCH.md`'s Round 4 entry stays in the shared
+`compound-learn-artifact-registry/` dir since that log already
+accumulates every related item's discovery rounds.
+Footprint: `src/report/enduser-index-generate.mjs`,
+`test/report/enduser-index.test.mjs`, `docs/enduser-docs-index.json`.
+
+## Outstanding questions
+
+None
