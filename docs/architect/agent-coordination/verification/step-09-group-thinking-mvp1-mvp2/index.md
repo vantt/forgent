@@ -61,16 +61,16 @@ This list may only shrink; any new failure beyond it blocks cell close.
 |---|---|---|
 | 00 | R1-R4 | done |
 | 01 | R1-R6 | done |
-| 02 | R1-R8 | missing |
+| 02 | R1-R8 | done |
 | 03 | R1-R7 | missing |
 
 ## Active Cell
 
-None — P02.1 closed (Phase 02 R1-R4 only; R5-R8 open as P02.2).
+None — P02.2 closed. Phase 03 not yet started.
 
 ## Next Action
 
-prepare P02.2 (Phase 02 R5-R8)
+Prepare P03.1 (Phase 03: recheck, disposition, and live standalone proof).
 
 ## Cell Log
 
@@ -78,7 +78,8 @@ prepare P02.2 (Phase 02 R5-R8)
 |---|---|---|---|
 | P00.1 | Phase 00 R1, R2, R3, R4 (closes Phase 00) | done | `e579fc6a` |
 | P01.1 | Phase 01 R1, R2, R3, R4, R5, R6 (closes Phase 01) | done | `bec5e7f8` |
-| P02.1 | Phase 02 R1, R2, R3, R4 | done | (pending commit) |
+| P02.1 | Phase 02 R1, R2, R3, R4 | done | `82610e7f` |
+| P02.2 | Phase 02 R5, R6, R7, R8 (closes Phase 02) | done | (pending commit) |
 
 ## Phase 00 Status
 
@@ -146,7 +147,7 @@ fixed and Red-Team-recheck-confirmed resolved. Full suite not required for
 this cell (docs/fixture+test only, zero shared loader/schema diff); focused
 suite 49/49 pass throughout.
 
-## Phase 02 Status (in progress)
+## Phase 02 Status
 
 **P02.1 CLOSED** (Phase 02 R1-R4; R5-R8 open as P02.2): implemented the
 `activation` schema field (`src/runner/definitions/schema.mjs`), the
@@ -196,6 +197,55 @@ safe to close.
 Full suite: 5090 tests, 5078 pass, 7 fail — all match this track's recorded
 baseline by name (the herdr-spawn live-timeout item, environment-dependent,
 was simply absent that run); no new failure. Focused glob 324/324 pass.
+
+**P02.2 CLOSED (Phase 02 R5-R8; closes Phase 02).** Implemented all four:
+`invocationKey` consumed exactly once, session-wide, not per-binding;
+context-grant enforcement as a real gate inside the dispatch path (not
+advisory); `activation.maxInvocations` counted fresh from on-disk events,
+binding caps narrowing but never widening the session-wide aggregate
+bounds; and driver-authority identity pinned to the session's own
+`provenanceRoot.writerId`.
+
+Reviewer round (opus): APPROVE WITH CONCERNS, 4 MEDIUM + 4 LOW. MED-1
+(provenance companion fields never checked against the authorization they
+name — forgeable), MED-2 (binding cap enforced on only one of two writing
+branches — P02.1's own HIGH-1 class recurring), and MED-4+L1 (grant-scope
+check whole-string-prefix-anchored, missing path-form refs; duplicated
+rather than shared with `validateConsultProposal`) all fixed and confirmed.
+MED-3 (default taskKey makes a second invocation a silent no-op) given a
+minimal non-recheck safety guard, full fix correctly deferred to Phase 03.
+R7 and R8 rulings recorded (R7: issuance layer deliberately stricter than
+the contract's literal "consumed" wording; R8: comparison accepted but NOT
+recorded as closed — satisfied-modulo-a-named-follow-on, per the phase
+text's own escape clause). Reviewer recheck: CONFIRMED-RESOLVED on all
+four MEDIUMs, plus one coverage regression the fix round introduced (R5's
+dispatch-side key check lost its only test when MED-1 started intercepting
+the same forged shape one line earlier) closed with a dedicated forged-log
+test reaching the check the one way MED-1 cannot.
+
+Red-Team round (opus): **APPROVE WITH CONCERNS, 2 MEDIUM + 4 LOW**, no
+BLOCK — ~260 real multi-process trials plus 30 genuine `SIGKILL`s against
+every lock-held check this cell added or moved, all held (0
+double-consumptions, 0 cap overruns, 0 bricked sessions). MEDIUM-1: the new
+MED-3 guard could not fire on a FAN-OUT taskKey collision (one operation,
+two actors) — worse than the original bug, silently substituting one
+actor's Assignment/RunResult for another's. MEDIUM-2: the MED-4 fix checked
+a `coord_` naming CONVENTION rather than disk existence, missing a real
+foreign session named without that prefix. Both fixed (broadened guard
+condition; existence-based scope check mirroring the `asgn_` half) and
+Red-Team-recheck-confirmed resolved by re-running the ORIGINAL reproduction
+scripts against the fixed tree, plus a fresh mutation-proof that all three
+new regression tests discriminate. One LOW raised IN the recheck (the fixed
+guard's own crash-recovery exemption term was mutation-silent/untested)
+closed with a dedicated crash-state regression test, Coordinator
+mutation-verified. Also surfaced, correctly out of this cell's scope: the
+sibling session-wide-cap gap is worse than previously recorded (12/20 real
+concurrent trials overran a cap of 1, not just a sequential gap — see
+below), and a pre-existing HIGH-severity defect live in a shipped fixture
+(see below).
+
+Full suite (final): 5116 tests, 5104 pass, 7 fail — exactly this track's
+recorded baseline by name; no new failure. Focused glob 350/350 pass.
 
 ## Forward Notes For Later Phases
 
@@ -251,8 +301,86 @@ introduce). Worth a real fix (likely: read events before manifest, or hold
 a shared/read lock) before Phase 03's live proof, which will run real
 concurrent dispatches. Full detail: `P02.1.md`'s Red-Team LOW-1.
 
-Next: P02.2 (Phase 02 R5-R8 — idempotency, context-grant enforcement,
-bounds interaction, driver authority pinning).
+**Pre-existing session-wide caps share the self-heal-branch gap MED-2 fixed
+for the binding cap alone (from P02.2's Review; UPGRADED by Red-Team with
+real-concurrency evidence).** `maxAssignmentsForSession`,
+`maxRoundsForSession`, `maxConcurrencyForSession`, and `maxRoundsForActor`
+(`store.mjs`'s `createSessionAssignment`) are all checked only on the
+genuinely-new-taskKey path, below the same claim-file branch the binding
+invocation cap used to skip too. This is not merely a sequential/theoretical
+gap: Red-Team's real 2-process reproduction against `maxAssignmentsForSession:
+1` materialized TWO Assignments in **12 of 20 genuine concurrent trials**
+(every trial where the new-taskKey process won the lock), replay staying
+clean each time — a silent overrun live on the declared dispatch path today
+(`dispatchDeclaredOperation` forwards `maxAssignmentsForSession`
+unconditionally). P02.2 fixed only the binding cap (its own R7 scope); these
+four pre-existing siblings still share the gap, now demonstrated to be a
+real-concurrency defect, not a hypothetical one. Before any future phase
+relies on these caps holding under a crash/self-heal sequence, apply the
+same fix (call each check on the self-heal branch too, using its own
+exemption) — the MED-2 fix's own 0-overrun result under the identical race
+shape is the proof this closes it.
+
+**HIGH SEVERITY, PRE-EXISTING, LIVE IN A SHIPPED FIXTURE TODAY — flagged for
+a separate tracked item (from P02.2's Red-Team round).**
+`core/coordination-protocols/independent-research-fan-out-fan-in.yaml`'s
+fan-out cohort (one operation wired to two actors via a declared topology
+edge, `required` activation, no authorization involved) silently collapses
+to ONE researcher: `dispatchDeclaredOperation`'s round-scoped default taskKey
+for topology-edge dispatches (`declared:${operationId}:round-${round}`,
+Phase 04 R5-era, predates this whole track) is `targetActorId`-blind, so
+both actors' dispatches collide on one claim and the SECOND researcher never
+runs — its result silently reported as the caller's own.
+`cohort.distinctProviderFamilies: 2`/`independence: isolated-until-fan-in`
+are unenforceable through this door as a result. This is the SAME root
+cause as the MEDIUM-1 fan-out finding P02.2 fixed for the driver-authorized
+branch, but in the `required`/topology-edge branch instead, on a SHIPPED,
+already-used fixture, outside any current cell's Files list. Fix direction:
+thread `targetActorId` into the topology-edge taskKey derivation too (same
+shape as the driver-authorized fix). Independent of Phase 03's recheck-
+semantics work — does not need to wait for it.
+
+**Default `taskKey` derivation makes a second driver-authorized invocation
+at one binding unreachable without a caller-supplied `taskKey` (from
+P02.2's Review, MED-3).** `dispatchDeclaredOperation`'s no-incoming-edge
+default (`declared:${operationId}`) carries no per-invocation
+discriminator, so a second authorized invocation resolves to the SAME
+Assignment via taskKey collision. P02.2 added a guard that refuses rather
+than silently resuming when a fresher unconsumed authorization is being
+discarded, but did not change taskKey derivation (that is recheck
+semantics, Non-Goals). Phase 03 should derive the default `taskKey` from
+`invocationKey`/`authorizationId` so a second invocation reaches a NEW
+Assignment on its own, rather than requiring a caller-supplied `taskKey` or
+hitting P02.2's refusal guard.
+
+**Driver handoff is structurally impossible under R8's implemented identity
+check (from P02.2's Review, R8 ruling).** `authorizedBy.id ===
+manifest.provenanceRoot.writerId` means a session opened by writer A can
+only ever be authorized by A — there is no `replaceDriver`/provenance-
+transfer path (`replaceSessionActor` covers actors, not the driver). Nothing
+regresses today (no shipped fixture declares `activation`), but Phase 03's
+`driver-disposition-recorded` will inherit the same pin, and a legitimate
+operator/process handover mid-session cannot issue authorizations under the
+current design. Worth an explicit product decision before this becomes load-
+bearing: either accept single-driver-for-session-lifetime as permanent, or
+give Phase 03 a real writer-identity/handoff primitive.
+
+**Provenance-vs-authorization consistency only checks fields that are
+present, not that the descriptive companions are present at all (from
+P02.2's Review recheck, MED-1 residual).** `assertAuthorizationSpendable`
+(`store.mjs`) refuses any `operationId`/`nodeId`/`invocationKey`/
+`contextGrant` that MISMATCHES the real issued event, but a provenance
+naming only `authorizationId` (companions omitted entirely) still passes,
+consuming a real authorization while recording no key and no grant. No
+safety invariant is lost by this (one authorization still materializes at
+most one Assignment; the binding cap still counts by `authorizationId`),
+only R3's descriptive completeness. Same shape as P02.1's own MEDIUM-1b
+rule (require the companion fields whenever `authorizationId` is present);
+a future cell should apply that same rule here.
+
+Next: P03.1 (Phase 03 — recheck as a new Assignment, `driver-disposition-recorded`,
+and a live no-Work standalone Master Coordination proof through the declared
+fixture; closes this plan's MVP1/MVP2 scope).
 
 ## Phase 00 Audit Notes
 

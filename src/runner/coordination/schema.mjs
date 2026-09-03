@@ -353,9 +353,11 @@ function isStringArray(value) {
 /**
  * `authorizedBy: {type: "driver", id: <driver-identity>}` -- the driver is
  * never a `spec.actors[]` worker, so `type` is a closed single-value enum
- * here rather than an open label. Tying that `id` to the session's own
- * provenance root is a separate, later requirement (driver authority); this
- * only enforces the shape the contract's field table names.
+ * here rather than an open label. This module is pure (no session on hand),
+ * so it enforces only the shape the contract's field table names; tying that
+ * `id` to the session's own `provenanceRoot.writerId` is done where the
+ * manifest is actually readable, lock-held in `store.mjs`'s
+ * `authorizeOperation`.
  */
 function validateAuthorizedBy(authorizedBy, label) {
   if (!isPlainObject(authorizedBy)) fail('validation', `${label} must be a non-null object`);

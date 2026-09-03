@@ -15,6 +15,7 @@ import {
   hashTaskKey,
   appendEvent,
   authorizeOperation,
+  resolveSessionPaths,
 } from '../../src/runner/coordination/store.mjs';
 import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
@@ -788,7 +789,10 @@ function issueAuthorization(coordinationId, authorizationId, tempDir) {
       nodeId: 'phase-recheck',
       targetActorId: 'reviewer',
       invocationKey: `recheck:${authorizationId}`,
-      authorizedBy: { type: 'driver', id: 'driver-1' },
+      // Must be the session's own driver identity -- every session in this
+      // file opens with `provenanceRoot: {writerId: 'writer-1'}`, and an
+      // authorization naming any other driver is refused at write time.
+      authorizedBy: { type: 'driver', id: 'writer-1' },
       reason: 'Recheck the revised candidate.',
       grantedContextRefs: [],
     },
@@ -965,6 +969,262 @@ test('createSessionAssignment refuses provenance naming an authorizationId no op
   const events = readSessionEvents('coord_fabricated_auth', { cwd: tempDir });
   assert.equal(events.filter((e) => e.type === 'assignment-created').length, 0);
   assert.doesNotThrow(() => replaySession('coord_fabricated_auth', { cwd: tempDir }));
+});
+
+test('createSessionAssignment refuses provenance whose invocationKey another Assignment already consumed, on BOTH writing paths', () => {
+  // `authorizeOperation` already refuses to ISSUE two authorizations sharing
+  // one invocationKey, so this shape can only arrive as forged provenance:
+  // a real, unconsumed `authorizationId` carrying a key some other Assignment
+  // has already spent. One logical invocation still materializes at most one
+  // Assignment, so both writing paths have to refuse it.
+  //
+  // Since issuance already guarantees two DIFFERENT real authorizations
+  // never share a real invocationKey, this specific shape can only be
+  // reached by a provenance whose claimed `invocationKey` does not match
+  // its own `authorizationId`'s real issued event -- exactly the forgery
+  // `assertAuthorizationSpendable`'s provenance-consistency check (added
+  // one check earlier) now refuses FIRST, one line earlier than the dedicated
+  // already-spent-key check below it. Both are still on the one lock-held
+  // read, both still refuse on both writing paths, and the outcome this
+  // test cares about (the double-spend never materializes) is unchanged --
+  // only which check names it changed.
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_key_double_spend', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+  issueAuthorization('coord_key_double_spend', 'auth_a', tempDir);
+  issueAuthorization('coord_key_double_spend', 'auth_b', tempDir);
+
+  const winner = createSessionAssignment(
+    {
+      coordinationId: 'coord_key_double_spend',
+      taskKey: 'invocation-a',
+      actorId: 'reviewer',
+      contract: inlineContract(),
+      caller: { writerId: 'writer-1' },
+      authorizationProvenance: authorizedProvenance('auth_a'),
+    },
+    { cwd: tempDir },
+  );
+
+  const forged = { ...authorizedProvenance('auth_b'), invocationKey: 'recheck:auth_a' };
+  for (const taskKey of ['invocation-b-new', 'invocation-b-crashed']) {
+    // The second iteration drives the SELF-HEAL branch, so the check is
+    // proven on both writing paths rather than only the new-taskKey one.
+    if (taskKey === 'invocation-b-crashed') writeUnregisteredClaim(tempDir, 'coord_key_double_spend', taskKey, 'asgn_writer_1_op_600');
+
+    assert.throws(
+      () =>
+        createSessionAssignment(
+          {
+            coordinationId: 'coord_key_double_spend',
+            taskKey,
+            actorId: 'reviewer',
+            contract: inlineContract(),
+            caller: { writerId: 'writer-1' },
+            authorizationProvenance: forged,
+          },
+          { cwd: tempDir },
+        ),
+      (err) =>
+        err instanceof CoordinationError &&
+        err.category === 'validation' &&
+        /auth_b/.test(err.message) &&
+        /provenance field\(s\) \[invocationKey\] do not match/.test(err.message),
+      `expected the already-spent invocationKey to be refused on the "${taskKey}" path`,
+    );
+  }
+
+  const events = readSessionEvents('coord_key_double_spend', { cwd: tempDir });
+  assert.equal(events.filter((e) => e.type === 'assignment-created' && e.payload.invocationKey === 'recheck:auth_a').length, 1);
+  assert.deepEqual(readManifest('coord_key_double_spend', { cwd: tempDir }).assignmentRefs, [winner.assignmentId]);
+  assert.doesNotThrow(() => replaySession('coord_key_double_spend', { cwd: tempDir }));
+});
+
+test('assertAuthorizationSpendable\'s dedicated already-spent-invocationKey check still refuses a forged log where the provenance IS internally consistent with its own event', () => {
+  // The provenance-vs-authorization consistency check (above) refuses any provenance that lies
+  // about its own authorization's fields, and issuance already guarantees
+  // two REAL authorizations never share a real invocationKey -- so the
+  // ONLY way to reach the dedicated already-spent-`invocationKey` check
+  // (store.mjs, immediately below that consistency check) is a forged LOG: two
+  // `operation-authorized` events sharing one key, each internally
+  // consistent, written straight past `authorizeOperation`'s own
+  // issuance-time keyCollision guard via the raw event-log append. This is
+  // the shape that check exists for -- distinct from the test above, which
+  // exercises the earlier consistency check instead now that it sits one line above this one.
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_forged_log_key_collision', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const { sessionDir, eventsPath } = resolveSessionPaths('coord_forged_log_key_collision', { cwd: tempDir });
+  const sharedKey = 'recheck:forged-shared-key';
+  for (const authorizationId of ['auth_forged_x', 'auth_forged_y']) {
+    appendEvent(
+      eventsPath,
+      {
+        type: 'operation-authorized',
+        payload: {
+          authorizationId,
+          operationId: 'reviewer-recheck',
+          nodeId: 'phase-recheck',
+          targetActorId: 'reviewer',
+          invocationKey: sharedKey,
+          authorizedBy: { type: 'driver', id: 'writer-1' },
+          reason: 'Forged straight onto the log, bypassing issuance.',
+          grantedContextRefs: [],
+        },
+      },
+      sessionDir,
+    );
+  }
+
+  const winner = createSessionAssignment(
+    {
+      coordinationId: 'coord_forged_log_key_collision',
+      taskKey: 'invocation-x',
+      actorId: 'reviewer',
+      contract: inlineContract(),
+      caller: { writerId: 'writer-1' },
+      authorizationProvenance: {
+        operationId: 'reviewer-recheck',
+        nodeId: 'phase-recheck',
+        authorizationId: 'auth_forged_x',
+        invocationKey: sharedKey,
+        contextGrant: { refs: [] },
+      },
+    },
+    { cwd: tempDir },
+  );
+
+  // Internally consistent with auth_forged_y's OWN forged event -- the provenance-vs-authorization consistency check
+  // passes -- but the key it names was already spent by `winner`.
+  assert.throws(
+    () =>
+      createSessionAssignment(
+        {
+          coordinationId: 'coord_forged_log_key_collision',
+          taskKey: 'invocation-y',
+          actorId: 'reviewer',
+          contract: inlineContract(),
+          caller: { writerId: 'writer-1' },
+          authorizationProvenance: {
+            operationId: 'reviewer-recheck',
+            nodeId: 'phase-recheck',
+            authorizationId: 'auth_forged_y',
+            invocationKey: sharedKey,
+            contextGrant: { refs: [] },
+          },
+        },
+        { cwd: tempDir },
+      ),
+    (err) =>
+      err instanceof CoordinationError &&
+      new RegExp(`invocationKey "${sharedKey}"`).test(err.message) &&
+      new RegExp(`already consumed by Assignment "${winner.assignmentId}"`).test(err.message),
+  );
+
+  assert.deepEqual(readManifest('coord_forged_log_key_collision', { cwd: tempDir }).assignmentRefs, [winner.assignmentId]);
+  // The forged log itself (two operation-authorized events sharing a key)
+  // is the pre-existing shape replay already refuses to read past --
+  // orthogonal to this check, not asserted here.
+});
+
+test('assertAuthorizationSpendable refuses provenance whose operationId/nodeId lie about the authorization they name', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_provenance_mismatch', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+  issueAuthorization('coord_provenance_mismatch', 'auth_real', tempDir);
+
+  const forgedNode = { ...authorizedProvenance('auth_real'), nodeId: 'some-other-node' };
+  assert.throws(
+    () =>
+      createSessionAssignment(
+        { coordinationId: 'coord_provenance_mismatch', taskKey: 'invocation-1', actorId: 'reviewer', contract: inlineContract(), caller: { writerId: 'writer-1' }, authorizationProvenance: forgedNode },
+        { cwd: tempDir },
+      ),
+    (err) => err instanceof CoordinationError && /provenance field\(s\) \[nodeId\] do not match/.test(err.message),
+  );
+
+  const forgedGrant = { ...authorizedProvenance('auth_real'), contextGrant: { refs: ['artifact:never-granted'] } };
+  assert.throws(
+    () =>
+      createSessionAssignment(
+        { coordinationId: 'coord_provenance_mismatch', taskKey: 'invocation-1', actorId: 'reviewer', contract: inlineContract(), caller: { writerId: 'writer-1' }, authorizationProvenance: forgedGrant },
+        { cwd: tempDir },
+      ),
+    (err) => err instanceof CoordinationError && /provenance field\(s\) \[contextGrant\.refs\] do not match/.test(err.message),
+  );
+
+  assert.equal(readManifest('coord_provenance_mismatch', { cwd: tempDir }).assignmentRefs.length, 0);
+});
+
+test('the binding invocation cap gates the self-heal writing branch too, not only the genuinely-new-taskKey path', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_binding_cap_self_heal', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+  issueAuthorization('coord_binding_cap_self_heal', 'auth_1', tempDir);
+  issueAuthorization('coord_binding_cap_self_heal', 'auth_2', tempDir);
+  issueAuthorization('coord_binding_cap_self_heal', 'auth_3', tempDir);
+  const cap = { maxInvocations: 2, nodeId: 'phase-recheck', operationId: 'reviewer-recheck', targetActorId: 'reviewer' };
+  const create = (taskKey, authorizationId) =>
+    createSessionAssignment(
+      {
+        coordinationId: 'coord_binding_cap_self_heal',
+        taskKey,
+        actorId: 'reviewer',
+        contract: inlineContract(),
+        caller: { writerId: 'writer-1' },
+        authorizationProvenance: authorizedProvenance(authorizationId),
+      },
+      { cwd: tempDir, bindingInvocationCap: cap },
+    );
+
+  create('invocation-1', 'auth_1');
+  create('invocation-2', 'auth_2');
+
+  // Control: a genuinely new taskKey for the 3rd invocation is refused by
+  // the cap on the already-covered new-taskKey path.
+  assert.throws(
+    () => create('invocation-3-new', 'auth_3'),
+    (err) => err instanceof CoordinationError && /activation\.maxInvocations cap of 2/.test(err.message),
+  );
+
+  // The SAME 3rd invocation, reached via a crash-produced unregistered
+  // claim (self-heal), must be refused identically -- not silently
+  // completed past the cap because it took the other writing branch.
+  writeUnregisteredClaim(tempDir, 'coord_binding_cap_self_heal', 'invocation-3-crashed', 'asgn_binding_cap_orphan');
+  assert.throws(
+    () => create('invocation-3-crashed', 'auth_3'),
+    (err) => err instanceof CoordinationError && /activation\.maxInvocations cap of 2/.test(err.message),
+  );
+
+  assert.equal(readManifest('coord_binding_cap_self_heal', { cwd: tempDir }).assignmentRefs.length, 2);
+  assert.doesNotThrow(() => replaySession('coord_binding_cap_self_heal', { cwd: tempDir }));
+});
+
+test('authorizeOperation refuses a second authorization reusing an invocationKey, and stays idempotent on a repeat of the same authorizationId', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_key_unique_store', objective: 'Consult.', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir });
+  issueAuthorization('coord_key_unique_store', 'auth_a', tempDir);
+
+  // A repeat of the identical authorization is still a no-op, not a
+  // self-collision on its own key.
+  issueAuthorization('coord_key_unique_store', 'auth_a', tempDir);
+  assert.equal(readSessionEvents('coord_key_unique_store', { cwd: tempDir }).filter((e) => e.type === 'operation-authorized').length, 1);
+
+  assert.throws(
+    () =>
+      authorizeOperation(
+        'coord_key_unique_store',
+        {
+          authorizationId: 'auth_b',
+          operationId: 'reviewer-recheck',
+          nodeId: 'phase-recheck',
+          targetActorId: 'reviewer',
+          invocationKey: 'recheck:auth_a',
+          authorizedBy: { type: 'driver', id: 'writer-1' },
+          reason: 'Reusing a key that is already spoken for.',
+          grantedContextRefs: [],
+        },
+        { cwd: tempDir },
+      ),
+    (err) => err instanceof CoordinationError && /invocationKey "recheck:auth_a"/.test(err.message) && /auth_a/.test(err.message),
+  );
+  assert.equal(readSessionEvents('coord_key_unique_store', { cwd: tempDir }).filter((e) => e.type === 'operation-authorized').length, 1);
 });
 
 // ─── MEDIUM fix regression: claim-file naming is collision-resistant

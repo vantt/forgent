@@ -21,6 +21,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { Worker } from 'node:worker_threads';
+import { execFileSync } from 'node:child_process';
 import {
   openDeclaredProtocolSession,
   dispatchDeclaredOperation,
@@ -116,7 +117,7 @@ function fakeExecutor(tempDir, { status = 'done', summary = 'Validated.' } = {})
   };
 }
 
-function setup(coordinationId, fixtureOptions) {
+function setup(coordinationId, fixtureOptions, sessionOptions = {}) {
   const tempDir = mkTempDir();
   writeFixture(tempDir, fixtureOptions);
   openDeclaredProtocolSession(
@@ -125,10 +126,56 @@ function setup(coordinationId, fixtureOptions) {
       coordinationId,
       objective: 'Prove driver-authorized optional operations gate on a real authorization.',
       writerId: 'coordinator-1',
+      ...sessionOptions,
     },
     { cwd: tempDir },
   );
   return { tempDir, runnerConfig: fakeExecutor(tempDir), opts: { cwd: tempDir, repoRoot: tempDir } };
+}
+
+// A second session in the SAME workspace, so a ref belonging to it is a
+// genuinely foreign-but-on-disk ref rather than a made-up string.
+function openSecondSession(tempDir, coordinationId) {
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId, objective: 'A different session entirely.', writerId: 'coordinator-1' },
+    { cwd: tempDir },
+  );
+}
+
+function dispatchProduce(coordinationId, ctx, overrides = {}) {
+  return dispatchDeclaredOperation(
+    coordinationId,
+    {
+      operationId: 'produce-candidate',
+      targetActorId: 'doer',
+      objective: 'Produce the first candidate.',
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      writerId: 'coordinator-1',
+      ...overrides,
+    },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+}
+
+// The raw store door: no FlowDefinition awareness, so no binding cap and no
+// grant-scope check of its own. Used below to prove the gates that matter are
+// enforced where a forged record still has to pass them.
+function rawAuthorize(coordinationId, ctx, overrides = {}) {
+  return authorizeOperation(
+    coordinationId,
+    {
+      authorizationId: 'auth_raw',
+      operationId: 'reviewer-recheck',
+      nodeId: 'phase-recheck',
+      targetActorId: 'reviewer',
+      invocationKey: 'recheck:raw',
+      authorizedBy: { type: 'driver', id: 'coordinator-1' },
+      reason: 'Written straight through the raw store door.',
+      grantedContextRefs: [],
+      ...overrides,
+    },
+    ctx.opts,
+  );
 }
 
 function authorization(overrides = {}) {
@@ -492,6 +539,129 @@ test('R4: one operation template bound to TWO actors at ONE node -- an authoriza
   assert.deepEqual(readManifest('coord_da_one_op_two_actors', opts).assignmentRefs, [branchA.assignment.assignmentId]);
 });
 
+test('the silent-discard guard also refuses a FAN-OUT taskKey collision -- one operation, two actors, no explicit taskKey', async () => {
+  // Same fixture shape as the test above, but with BOTH dispatches omitting
+  // an explicit taskKey, so both derive the identical default
+  // `declared:independent-research` -- a DIFFERENT binding (targetActorId)
+  // than the guard's original same-binding shape, previously invisible to
+  // it: `resolveBindingAuthorization` never matches researcher-b's OWN,
+  // still-unconsumed authorization to researcher-a's already-registered
+  // Assignment, so the old guard's `consumedByAssignmentId ===
+  // resumedAssignmentId` condition was never true and never fired.
+  const tempDir = mkTempDir();
+  writeDefinition(tempDir, 'one-operation-two-actors-default-taskkey.json', {
+    roles: ['researcher'],
+    actors: [
+      { id: 'researcher-a', role: 'researcher' },
+      { id: 'researcher-b', role: 'researcher' },
+    ],
+    operations: [{ id: 'independent-research', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } }],
+    graph: {
+      entry: 'phase-fan-out',
+      nodes: [
+        {
+          id: 'phase-fan-out',
+          operations: [
+            { ref: 'independent-research', actor: 'researcher-a', activation: { mode: 'driver-authorized' } },
+            { ref: 'independent-research', actor: 'researcher-b', activation: { mode: 'driver-authorized' } },
+          ],
+          transitions: [],
+        },
+      ],
+    },
+  });
+
+  const opts = { cwd: tempDir, repoRoot: tempDir };
+  const runnerConfig = fakeExecutor(tempDir);
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_da_fanout_default_taskkey', objective: 'Fan-out, default taskKey.', writerId: 'coordinator-1' },
+    opts,
+  );
+
+  authorizeDeclaredOperation(
+    'coord_da_fanout_default_taskkey',
+    authorization({ operationId: 'independent-research', targetActorId: 'researcher-a', authorizationId: 'auth_1', invocationKey: 'research:branch-a' }),
+    opts,
+  );
+  authorizeDeclaredOperation(
+    'coord_da_fanout_default_taskkey',
+    authorization({ operationId: 'independent-research', targetActorId: 'researcher-b', authorizationId: 'auth_2', invocationKey: 'research:branch-b' }),
+    opts,
+  );
+
+  const dispatchNoTaskKey = (targetActorId) =>
+    dispatchDeclaredOperation(
+      'coord_da_fanout_default_taskkey',
+      {
+        operationId: 'independent-research',
+        targetActorId,
+        objective: `Research, actor ${targetActorId}.`,
+        expectedOutputs: ['agent-result.json (status, summary)'],
+        writerId: 'coordinator-1',
+      },
+      { ...opts, runnerConfig },
+    );
+
+  const branchA = await dispatchNoTaskKey('researcher-a');
+  assert.equal(branchA.resumed, false);
+
+  await assert.rejects(
+    dispatchNoTaskKey('researcher-b'),
+    (err) =>
+      err instanceof CoordinationError &&
+      /not the one that Assignment consumed/.test(err.message) &&
+      new RegExp(`Assignment "${branchA.assignment.assignmentId}"`).test(err.message),
+    "researcher-b's own authorization must not be silently discarded in favor of researcher-a's already-registered Assignment",
+  );
+
+  // researcher-b's authorization is untouched -- still unconsumed, still
+  // available to a caller that supplies a distinct taskKey.
+  assert.deepEqual(readManifest('coord_da_fanout_default_taskkey', opts).assignmentRefs, [branchA.assignment.assignmentId]);
+  const events = readSessionEvents('coord_da_fanout_default_taskkey', opts);
+  assert.equal(events.filter((e) => e.type === 'assignment-created').length, 1);
+});
+
+test('the silent-discard guard does not block a genuine crash-recovery resume of its OWN unregistered claim', async () => {
+  // The guard's outer condition requires `resumedAssignmentId` to already be
+  // REGISTERED (`manifest.assignmentRefs.includes(resumedAssignmentId)`) --
+  // load-bearing specifically against a genuine crash between the claim
+  // write and the event/ref append completing (self-heal's own target
+  // state), where the id is NOT yet registered. Simulated here by rolling
+  // back exactly the two artifacts that crash window leaves missing, after
+  // a real dispatch produced them: the `assignment-created` event and the
+  // `assignmentRefs` entry. The claim file and assignment.json (never rolled
+  // back) are what a real crash also leaves behind.
+  const ctx = setup('coord_da_crash_resume_guard');
+  authorizeDeclaredOperation('coord_da_crash_resume_guard', authorization(), ctx.opts);
+  const first = await dispatch('coord_da_crash_resume_guard', ctx);
+  assert.equal(first.resumed, false);
+  const assignmentId = first.assignment.assignmentId;
+
+  // Roll back EVERY event this assignment produced -- a real crash between
+  // the claim/assignment.json write and `completeAssignmentRegistration`
+  // happens before the dispatch/execution even starts, so no
+  // `assignment-created`, `result-linked`, or run event exists yet either.
+  const { eventsPath, manifestPath } = resolveSessionPaths('coord_da_crash_resume_guard', ctx.opts);
+  const remainingLines = fs
+    .readFileSync(eventsPath, 'utf8')
+    .split('\n')
+    .filter((line) => line.trim().length > 0)
+    .filter((line) => JSON.parse(line).payload?.assignmentId !== assignmentId);
+  fs.writeFileSync(eventsPath, `${remainingLines.join('\n')}\n`);
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  manifest.assignmentRefs = manifest.assignmentRefs.filter((id) => id !== assignmentId);
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+
+  assert.equal(readSessionEvents('coord_da_crash_resume_guard', ctx.opts).filter((e) => e.payload?.assignmentId === assignmentId).length, 0);
+  assert.deepEqual(readManifest('coord_da_crash_resume_guard', ctx.opts).assignmentRefs, []);
+  assert.doesNotThrow(() => replaySession('coord_da_crash_resume_guard', ctx.opts), 'the simulated crash state must itself be a clean/replayable shape');
+
+  const resumed = await dispatch('coord_da_crash_resume_guard', ctx);
+  assert.equal(resumed.assignment.assignmentId, assignmentId, 'crash-recovery self-heal must resume the SAME Assignment, not be refused by the new guard');
+  assert.equal(readSessionEvents('coord_da_crash_resume_guard', ctx.opts).filter((e) => e.type === 'assignment-created').length, 1);
+  assert.deepEqual(readManifest('coord_da_crash_resume_guard', ctx.opts).assignmentRefs, [assignmentId]);
+});
+
 // ─── R4: authorization consumption ─────────────────────────────────────────
 
 test('R4: one authorization cannot silently authorize a SECOND, different dispatch', async () => {
@@ -533,6 +703,44 @@ test('R4: a second authorization lets a genuinely new dispatch through', async (
   const second = await dispatch('coord_da_second_auth', ctx, { taskKey: 'recheck-round-2' });
   assert.equal(second.resumed, false);
   assert.equal(readManifest('coord_da_second_auth', ctx.opts).assignmentRefs.length, 2);
+});
+
+test('a fresh unconsumed authorization is refused rather than silently discarded by a same-DEFAULT-taskKey resume', async () => {
+  // This fixture declares no `topology`, so `reviewer-recheck` dispatches
+  // through the no-incomingEdge branch, whose default taskKey
+  // (`declared:${operationId}`) carries no per-invocation discriminator --
+  // exactly the shape where a second real authorization would otherwise be
+  // silently ignored by a taskKey-collision resume.
+  const ctx = setup('coord_da_silent_resume_guard');
+  authorizeDeclaredOperation('coord_da_silent_resume_guard', authorization(), ctx.opts);
+  const first = await dispatch('coord_da_silent_resume_guard', ctx);
+  assert.equal(first.resumed, false);
+
+  authorizeDeclaredOperation(
+    'coord_da_silent_resume_guard',
+    authorization({ authorizationId: 'auth_recheck_2', invocationKey: 'recheck:candidate@3' }),
+    ctx.opts,
+  );
+
+  await assert.rejects(
+    dispatch('coord_da_silent_resume_guard', ctx),
+    (err) => err instanceof CoordinationError && /fresher unconsumed authorization "auth_recheck_2"/.test(err.message),
+  );
+
+  // Nothing new materialized, and the fresh authorization is still
+  // genuinely unconsumed -- available to a caller that supplies a distinct
+  // taskKey (proven by "R4: a second authorization lets a genuinely new
+  // dispatch through", immediately above).
+  assert.equal(readManifest('coord_da_silent_resume_guard', ctx.opts).assignmentRefs.length, 1);
+});
+
+test('a genuine idempotent resume with no fresh authorization pending is unaffected by the silent-discard guard', async () => {
+  const ctx = setup('coord_da_silent_resume_ok');
+  authorizeDeclaredOperation('coord_da_silent_resume_ok', authorization(), ctx.opts);
+  const first = await dispatch('coord_da_silent_resume_ok', ctx);
+  const second = await dispatch('coord_da_silent_resume_ok', ctx);
+  assert.equal(second.resumed, true);
+  assert.equal(second.assignment.assignmentId, first.assignment.assignmentId);
 });
 
 // ─── R2: authorization validity against the declared graph ─────────────────
@@ -785,4 +993,475 @@ test('replay fails closed on an assignment-created that claims an authorizationI
     () => replaySession('coord_da_replay_dangling', ctx.opts),
     (err) => err instanceof CoordinationError && /auth_never_issued/.test(err.message),
   );
+});
+
+// ─── R5: invocationKey is consumed exactly once, SESSION-scoped ─────────────
+
+test('R5: the SAME binding cannot be authorized twice under one invocationKey', () => {
+  const ctx = setup('coord_da_key_same_binding');
+  authorizeDeclaredOperation('coord_da_key_same_binding', authorization(), ctx.opts);
+
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_da_key_same_binding',
+        // A genuinely different authorization instance, reusing the key.
+        authorization({ authorizationId: 'auth_recheck_2' }),
+        ctx.opts,
+      ),
+    (err) =>
+      err instanceof CoordinationError &&
+      /invocationKey "recheck:candidate@2"/.test(err.message) &&
+      /auth_recheck_1/.test(err.message),
+  );
+
+  assert.equal(readSessionEvents('coord_da_key_same_binding', ctx.opts).filter((e) => e.type === 'operation-authorized').length, 1);
+});
+
+test('R5: TWO DIFFERENT bindings in one session cannot reuse one invocationKey -- uniqueness is session-scoped, not per-binding', () => {
+  // The exact loophole a per-binding check would leave open: each binding
+  // sees its own first use of the key, so a per-binding implementation would
+  // let both through. The contract scopes uniqueness to the session's own
+  // events.jsonl, across every binding.
+  const tempDir = mkTempDir();
+  writeDefinition(tempDir, 'two-bindings-key-scope.json', {
+    roles: ['reviewer'],
+    actors: [{ id: 'reviewer', role: 'reviewer' }],
+    operations: [
+      { id: 'review-candidate', role: 'reviewer', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+      { id: 'reviewer-recheck', role: 'reviewer', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+    ],
+    graph: {
+      entry: 'phase-first-pass',
+      nodes: [
+        { id: 'phase-first-pass', operations: [{ ref: 'review-candidate', actor: 'reviewer', activation: { mode: 'driver-authorized' } }], transitions: ['phase-recheck'] },
+        { id: 'phase-recheck', operations: [{ ref: 'reviewer-recheck', actor: 'reviewer', activation: { mode: 'driver-authorized' } }], transitions: [] },
+      ],
+    },
+  });
+  const opts = { cwd: tempDir, repoRoot: tempDir };
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_da_key_scope', objective: 'Key scope.', writerId: 'coordinator-1' },
+    opts,
+  );
+
+  authorizeDeclaredOperation('coord_da_key_scope', authorization({ invocationKey: 'shared-key' }), opts);
+
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_da_key_scope',
+        authorization({
+          operationId: 'review-candidate',
+          authorizationId: 'auth_first_pass_1',
+          invocationKey: 'shared-key',
+        }),
+        opts,
+      ),
+    (err) =>
+      err instanceof CoordinationError &&
+      /invocationKey "shared-key"/.test(err.message) &&
+      /across every binding/.test(err.message),
+    'a DIFFERENT binding reusing the same invocationKey string must be refused session-wide',
+  );
+
+  const authorized = readSessionEvents('coord_da_key_scope', opts).filter((e) => e.type === 'operation-authorized');
+  assert.equal(authorized.length, 1);
+  assert.equal(authorized[0].payload.operationId, 'reviewer-recheck');
+});
+
+test('R5: crash between authorization and Assignment creation -- the resume treats the invocationKey as already issued and dispatches exactly once', async () => {
+  const ctx = setup('coord_da_key_crash_resume');
+
+  // The authorization landed; the process died before any Assignment existed.
+  authorizeDeclaredOperation('coord_da_key_crash_resume', authorization(), ctx.opts);
+  assert.deepEqual(readManifest('coord_da_key_crash_resume', ctx.opts).assignmentRefs, []);
+
+  // On resume the driver re-issues the SAME logical invocation. It is refused
+  // as already issued rather than silently minting a second authorization
+  // that would later materialize a second Assignment for one invocation.
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_da_key_crash_resume', authorization({ authorizationId: 'auth_recheck_resumed' }), ctx.opts),
+    (err) => err instanceof CoordinationError && /invocationKey "recheck:candidate@2"/.test(err.message),
+  );
+
+  // The resume then spends the authorization the crashed attempt already got.
+  const resumed = await dispatch('coord_da_key_crash_resume', ctx);
+  assert.equal(resumed.resumed, false);
+  const events = readSessionEvents('coord_da_key_crash_resume', ctx.opts);
+  assert.equal(events.filter((e) => e.type === 'operation-authorized').length, 1);
+  assert.equal(events.filter((e) => e.type === 'assignment-created' && e.payload.invocationKey === 'recheck:candidate@2').length, 1);
+  assert.deepEqual(readManifest('coord_da_key_crash_resume', ctx.opts).assignmentRefs, [resumed.assignment.assignmentId]);
+
+  // Re-issuing the key after it has actually been CONSUMED is refused too.
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_da_key_crash_resume', authorization({ authorizationId: 'auth_recheck_after' }), ctx.opts),
+    (err) => err instanceof CoordinationError && /invocationKey "recheck:candidate@2"/.test(err.message),
+  );
+});
+
+test('R5: replay fails closed on two operation-authorized events claiming ONE invocationKey', () => {
+  const ctx = setup('coord_da_key_replay');
+  authorizeDeclaredOperation('coord_da_key_replay', authorization(), ctx.opts);
+  const { eventsPath, sessionDir } = resolveSessionPaths('coord_da_key_replay', ctx.opts);
+
+  // A log that could only come from a write path that skipped the door above.
+  appendEvent(
+    eventsPath,
+    {
+      type: 'operation-authorized',
+      payload: {
+        authorizationId: 'auth_recheck_forged',
+        operationId: 'reviewer-recheck',
+        nodeId: 'phase-recheck',
+        targetActorId: 'reviewer',
+        invocationKey: 'recheck:candidate@2',
+        authorizedBy: { type: 'driver', id: 'coordinator-1' },
+        reason: 'Forged onto the log.',
+        grantedContextRefs: [],
+      },
+    },
+    sessionDir,
+  );
+
+  assert.throws(
+    () => replaySession('coord_da_key_replay', ctx.opts),
+    (err) =>
+      err instanceof CoordinationError &&
+      err.category === 'duplicate-ref' &&
+      /recheck:candidate@2/.test(err.message) &&
+      /auth_recheck_1/.test(err.message) &&
+      /auth_recheck_forged/.test(err.message),
+  );
+});
+
+// ─── R6: context-grant enforcement at dispatch ─────────────────────────────
+
+test('R6: a sibling Assignment\'s output not named in grantedContextRefs is rejected at dispatch', async () => {
+  const ctx = setup('coord_da_grant_sibling');
+
+  // A real sibling: the doer's own Assignment in this same session.
+  const sibling = await dispatchProduce('coord_da_grant_sibling', ctx);
+
+  // The driver grants nothing at all.
+  authorizeDeclaredOperation('coord_da_grant_sibling', authorization({ grantedContextRefs: [] }), ctx.opts);
+
+  await assert.rejects(
+    dispatch('coord_da_grant_sibling', ctx, { contextRefs: [sibling.assignment.assignmentId] }),
+    (err) =>
+      err instanceof CoordinationError &&
+      /is not granted by authorization "auth_recheck_1"/.test(err.message) &&
+      new RegExp(sibling.assignment.assignmentId).test(err.message),
+  );
+
+  // Refused before anything materialized: the doer's Assignment is still the
+  // only member, and the authorization is still unspent.
+  assert.deepEqual(readManifest('coord_da_grant_sibling', ctx.opts).assignmentRefs, [sibling.assignment.assignmentId]);
+  const replayed = replaySession('coord_da_grant_sibling', ctx.opts);
+  assert.equal(replayed.authorizations[0].consumedByAssignmentId, null);
+});
+
+test('R6: the SAME sibling ref dispatches once the driver actually grants it, and the contract carries exactly the granted refs', async () => {
+  const ctx = setup('coord_da_grant_allowed');
+  const sibling = await dispatchProduce('coord_da_grant_allowed', ctx);
+
+  authorizeDeclaredOperation(
+    'coord_da_grant_allowed',
+    authorization({ grantedContextRefs: [sibling.assignment.assignmentId] }),
+    ctx.opts,
+  );
+
+  const recheck = await dispatch('coord_da_grant_allowed', ctx, { contextRefs: [sibling.assignment.assignmentId] });
+  assert.equal(recheck.resumed, false);
+
+  const contract = recheck.assignment.provenance.inline.contract;
+  assert.deepEqual(contract.contextRefs, [sibling.assignment.assignmentId]);
+  const created = readSessionEvents('coord_da_grant_allowed', ctx.opts).find(
+    (e) => e.type === 'assignment-created' && e.payload.assignmentId === recheck.assignment.assignmentId,
+  );
+  assert.deepEqual(created.payload.contextGrant, { refs: [sibling.assignment.assignmentId] });
+});
+
+test('R6: a grantedContextRefs entry naming a DIFFERENT coordinationId is rejected before the authorization is written', () => {
+  const ctx = setup('coord_da_grant_cross_session');
+  openSecondSession(ctx.tempDir, 'coord_da_grant_other');
+
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_da_grant_cross_session',
+        authorization({ grantedContextRefs: ['coord_da_grant_other'] }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && /names a different coordination session/.test(err.message),
+  );
+  assert.equal(readSessionEvents('coord_da_grant_cross_session', ctx.opts).filter((e) => e.type === 'operation-authorized').length, 0);
+});
+
+test('a PATH-FORM grantedContextRefs entry into a different session is rejected the same as a bare id', () => {
+  const ctx = setup('coord_da_grant_cross_session_path');
+  openSecondSession(ctx.tempDir, 'coord_da_grant_other_path');
+
+  // A whole-string `/^coord_/` prefix test never fires on this shape --
+  // the string does not itself start with "coord_" -- but the foreign
+  // session id is still present as its own path SEGMENT.
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_da_grant_cross_session_path',
+        authorization({ grantedContextRefs: ['.fgos/coordination/sessions/coord_da_grant_other_path/events.jsonl'] }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && /names a different coordination session/.test(err.message),
+  );
+  assert.equal(readSessionEvents('coord_da_grant_cross_session_path', ctx.opts).filter((e) => e.type === 'operation-authorized').length, 0);
+});
+
+test('a real foreign session is rejected by DISK EXISTENCE even when its id carries no "coord_" prefix', () => {
+  // Session ids carry no required prefix (`assertSafeCoordinationId` only
+  // requires alnum/underscore/hyphen) -- a `coord_`-prefix test on the ref
+  // string would miss a real, on-disk foreign session named plainly.
+  const ctx = setup('coord_da_grant_unprefixed_foreign');
+  openSecondSession(ctx.tempDir, 'privatebox');
+
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_da_grant_unprefixed_foreign',
+        authorization({ grantedContextRefs: ['.fgos/coordination/sessions/privatebox/events.jsonl'] }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && /names a different coordination session/.test(err.message),
+  );
+  assert.equal(readSessionEvents('coord_da_grant_unprefixed_foreign', ctx.opts).filter((e) => e.type === 'operation-authorized').length, 0);
+
+  // Control: a session id that merely LOOKS foreign but was never opened
+  // (nothing on disk) is left alone -- this check polices real leaks, not
+  // naming conventions, same as the `asgn_` half.
+  assert.doesNotThrow(() =>
+    authorizeDeclaredOperation(
+      'coord_da_grant_unprefixed_foreign',
+      authorization({ authorizationId: 'auth_control', invocationKey: 'recheck:control', grantedContextRefs: ['never-opened-session-id'] }),
+      ctx.opts,
+    ),
+  );
+});
+
+test('a non-string grantedContextRefs entry is refused with a clean CoordinationError, not a raw TypeError', () => {
+  const ctx = setup('coord_da_grant_non_string');
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_da_grant_non_string', authorization({ grantedContextRefs: [123] }), ctx.opts),
+    (err) => err instanceof CoordinationError && /ref must be a string/.test(err.message),
+  );
+});
+
+test('R6: a grantedContextRefs entry naming a real Assignment owned by ANOTHER session is rejected', async () => {
+  const ctx = setup('coord_da_grant_foreign_asgn');
+  openSecondSession(ctx.tempDir, 'coord_da_grant_foreign_owner');
+
+  // A real, on-disk Assignment that belongs to the other session.
+  const foreign = await dispatchProduce('coord_da_grant_foreign_owner', ctx);
+
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_da_grant_foreign_asgn',
+        authorization({ grantedContextRefs: [foreign.assignment.assignmentId] }),
+        ctx.opts,
+      ),
+    (err) =>
+      err instanceof CoordinationError &&
+      /is not a member of coordination session "coord_da_grant_foreign_asgn"/.test(err.message),
+  );
+  assert.equal(readSessionEvents('coord_da_grant_foreign_asgn', ctx.opts).filter((e) => e.type === 'operation-authorized').length, 0);
+});
+
+test('R6: the enforcement is a dispatch-path GATE -- a cross-session grant forged through the raw store door is still refused', async () => {
+  const ctx = setup('coord_da_grant_raw_door');
+  openSecondSession(ctx.tempDir, 'coord_da_grant_raw_other');
+
+  // The raw door has no session-membership awareness, so this record reaches
+  // the log. The gate inside dispatchDeclaredOperation is what has to stop it.
+  const written = rawAuthorize('coord_da_grant_raw_door', ctx, {
+    authorizationId: 'auth_recheck_1',
+    invocationKey: 'recheck:candidate@2',
+    grantedContextRefs: ['coord_da_grant_raw_other'],
+  });
+  assert.equal(written.appended, true);
+
+  await assert.rejects(
+    dispatch('coord_da_grant_raw_door', ctx),
+    (err) => err instanceof CoordinationError && /names a different coordination session/.test(err.message),
+  );
+  assert.deepEqual(readManifest('coord_da_grant_raw_door', ctx.opts).assignmentRefs, []);
+});
+
+// ─── R7: binding maxInvocations, counted fresh from disk ───────────────────
+
+const CAPPED = { recheckActivation: { mode: 'driver-authorized', maxInvocations: 2 } };
+
+async function useBindingInvocation(coordinationId, ctx, n) {
+  authorizeDeclaredOperation(
+    coordinationId,
+    authorization({ authorizationId: `auth_recheck_${n}`, invocationKey: `recheck:candidate@${n}` }),
+    ctx.opts,
+  );
+  return dispatch(coordinationId, ctx, { taskKey: `recheck-round-${n}` });
+}
+
+test('R7: activation.maxInvocations admits exactly N invocations at that binding and refuses the N+1th', async () => {
+  const ctx = setup('coord_da_cap', CAPPED);
+
+  await useBindingInvocation('coord_da_cap', ctx, 1);
+  await useBindingInvocation('coord_da_cap', ctx, 2);
+  assert.equal(readManifest('coord_da_cap', ctx.opts).assignmentRefs.length, 2);
+
+  // The N+1th authorization never gets issued in the first place.
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_da_cap',
+        authorization({ authorizationId: 'auth_recheck_3', invocationKey: 'recheck:candidate@3' }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && /activation\.maxInvocations cap of 2/.test(err.message),
+  );
+
+  // ...and even when an authorization is forged past that door, the N+1th
+  // DISPATCH is refused by the lock-held count inside createSessionAssignment.
+  assert.equal(
+    rawAuthorize('coord_da_cap', ctx, { authorizationId: 'auth_recheck_3', invocationKey: 'recheck:candidate@3' }).appended,
+    true,
+  );
+  await assert.rejects(
+    dispatch('coord_da_cap', ctx, { taskKey: 'recheck-round-3' }),
+    (err) =>
+      err instanceof CoordinationError &&
+      /has already been invoked 2 time\(s\)/.test(err.message) &&
+      /activation\.maxInvocations cap of 2/.test(err.message),
+  );
+  assert.equal(readManifest('coord_da_cap', ctx.opts).assignmentRefs.length, 2);
+});
+
+test('R7: the invocation count is recomputed from disk in a genuinely separate OS process, never from process-local state', async () => {
+  // A process-local counter would start this child at zero and let both the
+  // authorization AND the dispatch through. The child shares nothing with
+  // this process but the session directory on disk.
+  const ctx = setup('coord_da_cap_fresh_process', CAPPED);
+  await useBindingInvocation('coord_da_cap_fresh_process', ctx, 1);
+  await useBindingInvocation('coord_da_cap_fresh_process', ctx, 2);
+
+  const engineUrl = new URL('../../src/runner/coordination/session-engine.mjs', import.meta.url).href;
+  const storeUrl = new URL('../../src/runner/coordination/store.mjs', import.meta.url).href;
+  const probeFile = path.join(ctx.tempDir, 'cold-process-cap-probe.mjs');
+  fs.writeFileSync(
+    probeFile,
+    `
+import { authorizeDeclaredOperation, dispatchDeclaredOperation } from ${JSON.stringify(engineUrl)};
+import { authorizeOperation } from ${JSON.stringify(storeUrl)};
+
+const opts = { cwd: ${JSON.stringify(ctx.tempDir)}, repoRoot: ${JSON.stringify(ctx.tempDir)} };
+const id = 'coord_da_cap_fresh_process';
+const out = {};
+
+try {
+  authorizeDeclaredOperation(id, {
+    operationId: 'reviewer-recheck', targetActorId: 'reviewer',
+    authorizationId: 'auth_cold_1', invocationKey: 'recheck:cold-1',
+    authorizedBy: { type: 'driver', id: 'coordinator-1' },
+    reason: 'Cold process, third invocation.', grantedContextRefs: [],
+  }, opts);
+  out.authorize = 'ACCEPTED';
+} catch (err) {
+  out.authorize = err.message;
+}
+
+// Forge one past the definition-aware door, then try to actually dispatch it.
+authorizeOperation(id, {
+  authorizationId: 'auth_cold_2', operationId: 'reviewer-recheck', nodeId: 'phase-recheck',
+  targetActorId: 'reviewer', invocationKey: 'recheck:cold-2',
+  authorizedBy: { type: 'driver', id: 'coordinator-1' },
+  reason: 'Forged in a cold process.', grantedContextRefs: [],
+}, opts);
+
+try {
+  await dispatchDeclaredOperation(id, {
+    operationId: 'reviewer-recheck', targetActorId: 'reviewer', taskKey: 'recheck-cold',
+    objective: 'Recheck from a cold process.',
+    expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'coordinator-1',
+  }, opts);
+  out.dispatch = 'ACCEPTED';
+} catch (err) {
+  out.dispatch = err.message;
+}
+
+process.stdout.write(JSON.stringify(out));
+`,
+  );
+
+  const raw = execFileSync(process.execPath, [probeFile], { encoding: 'utf8' });
+  const probe = JSON.parse(raw);
+  assert.match(probe.authorize, /activation\.maxInvocations cap of 2/, 'a cold process must still see the 2 invocations already on disk');
+  assert.match(probe.dispatch, /has already been invoked 2 time\(s\)/, 'the dispatch-side count must be recomputed from disk too');
+  assert.equal(readManifest('coord_da_cap_fresh_process', ctx.opts).assignmentRefs.length, 2);
+});
+
+test('R7: an aggregate bound still rejects even when the binding cap would allow more -- binding caps narrow, never widen', async () => {
+  const ctx = setup(
+    'coord_da_cap_vs_aggregate',
+    { recheckActivation: { mode: 'driver-authorized', maxInvocations: 5 } },
+    { aggregateBounds: { maxAssignments: 1 } },
+  );
+
+  await useBindingInvocation('coord_da_cap_vs_aggregate', ctx, 1);
+
+  // The binding's own cap (5) has room for four more; the session-wide cap
+  // does not, and it is the one that refuses.
+  await assert.rejects(
+    useBindingInvocation('coord_da_cap_vs_aggregate', ctx, 2),
+    (err) =>
+      err instanceof CoordinationError &&
+      /aggregateBounds\.maxAssignments cap of 1/.test(err.message) &&
+      !/activation\.maxInvocations/.test(err.message),
+  );
+  assert.equal(readManifest('coord_da_cap_vs_aggregate', ctx.opts).assignmentRefs.length, 1);
+});
+
+// ─── R8: driver authority is pinned to the session's provenance root ───────
+
+test('R8: an authorizedBy.id that is not the session\'s provenanceRoot.writerId is rejected at both doors', () => {
+  const ctx = setup('coord_da_authority', undefined, { writerId: 'the-real-driver' });
+  assert.equal(readManifest('coord_da_authority', ctx.opts).provenanceRoot.writerId, 'the-real-driver');
+
+  // The definition-aware door.
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_da_authority', authorization(), ctx.opts),
+    (err) =>
+      err instanceof CoordinationError &&
+      /authorizedBy\.id "coordinator-1" is not the driver identity/.test(err.message) &&
+      /provenanceRoot\.writerId is "the-real-driver"/.test(err.message),
+  );
+
+  // ...and the raw store door, which is the one a caller could otherwise use
+  // to name an arbitrary driver with no definition in sight.
+  assert.throws(
+    () => rawAuthorize('coord_da_authority', ctx),
+    (err) => err instanceof CoordinationError && /is not the driver identity/.test(err.message),
+  );
+
+  assert.equal(readSessionEvents('coord_da_authority', ctx.opts).filter((e) => e.type === 'operation-authorized').length, 0);
+});
+
+test('R8: the session\'s own driver identity authorizes and dispatches normally', async () => {
+  const ctx = setup('coord_da_authority_ok', undefined, { writerId: 'the-real-driver' });
+  authorizeDeclaredOperation(
+    'coord_da_authority_ok',
+    authorization({ authorizedBy: { type: 'driver', id: 'the-real-driver' } }),
+    ctx.opts,
+  );
+
+  const result = await dispatch('coord_da_authority_ok', ctx);
+  assert.equal(result.resumed, false);
+  const authorized = readSessionEvents('coord_da_authority_ok', ctx.opts).find((e) => e.type === 'operation-authorized');
+  assert.deepEqual(authorized.payload.authorizedBy, { type: 'driver', id: 'the-real-driver' });
 });

@@ -89,6 +89,7 @@ export function replaySession(coordinationId, opts = {}) {
   const authorizations = [];
   const ignoredAuthorizations = [];
   const authorizationIds = new Set();
+  const invocationKeys = new Map(); // invocationKey -> the authorizationId that first claimed it
   let terminalSeen = false;
 
   for (const event of events) {
@@ -105,6 +106,20 @@ export function replaySession(coordinationId, opts = {}) {
         );
       }
       authorizationIds.add(authorizationId);
+      // Read-time mirror of `authorizeOperation`'s session-scoped
+      // `invocationKey` uniqueness rule, at exact parity with the
+      // duplicate-`authorizationId` check just above it: a log carrying two
+      // authorizations for one key could only come from a write path that
+      // never went through that door, and accepting it would let one logical
+      // invocation be issued twice.
+      const { invocationKey } = event.payload;
+      if (invocationKeys.has(invocationKey)) {
+        throw new CoordinationError(
+          'duplicate-ref',
+          `session "${coordinationId}": invocationKey "${invocationKey}" is claimed by more than one "operation-authorized" event ("${invocationKeys.get(invocationKey)}" and "${authorizationId}") -- an invocationKey is consumed exactly once per session`,
+        );
+      }
+      invocationKeys.set(invocationKey, authorizationId);
       const record = {
         authorizationId,
         operationId: event.payload.operationId,
