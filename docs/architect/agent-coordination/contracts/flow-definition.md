@@ -26,7 +26,15 @@ the committed opt-in fixture
 `core/coordination-protocols/independent-research-fan-out-fan-in-gated.yaml`
 (P06.3, `test/runner/coordination-visibility-window-fixture.test.mjs`).
 Promoted with the named limitations in Visibility Windows below, not
-without them. Full per-phase trace:
+without them.
+Phase 07 (Step 09 MVP7): `spec.profile.completion.aggregation` accepted and
+implemented — schema/validation in `src/runner/definitions/schema.mjs` and
+the runtime validation door in
+`src/runner/coordination/session-engine.mjs` (P07.3), enforced at the request
+door in `src/verbs/coordination/run.mjs` (P07.4). Promoted with the named
+limitations in `completion.aggregation` below and in the CoordinationSession
+contract's own Evidence-Preserving Aggregation section, not without them.
+Full per-phase trace:
 `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`.)
 Last reviewed: 2026-09-04
 Canonical for: the FlowDefinition IR schema, the Workflow/CoordinationProtocol profile discriminator, the operation primitive, and PolicyPatch provenance
@@ -188,6 +196,7 @@ profile:
   kind: CoordinationProtocol
   completion:
     mode: synthesize | all-required | explicit-partial
+    aggregation: { ... }                # optional; see completion.aggregation below
   topology:
     contextVisibility: mediated | isolated-until-fan-in | broadcast
     edges:
@@ -214,6 +223,59 @@ profile:
 - **Forbidden under `Workflow`:** `topology`, `cohort`, `completion.mode`.
   A `Workflow` FlowDefinition that declares any of these fields is rejected
   at validation.
+
+#### `completion.aggregation` (Phase 07, Step 09 MVP7)
+
+```yaml
+profile:
+  kind: CoordinationProtocol
+  completion:
+    mode: synthesize
+    aggregation:
+      method: evidence-preserving-synthesis
+      outputOperationRef: <operation-id>
+      sourceOperationRefs: [<operation-id>, ...]
+      requiredDisclosures: [<disclosure-id>, ...]
+```
+
+Cognitive aggregation is declared **separately from `completion.mode`**, never
+as another mode value. That separation is the phase's whole point: completion
+eligibility (which actors must finish), cognitive validation (whether the
+contributions actually cohere), and terminal authority (who transitions the
+session) stay three different things. Declaring `aggregation` changes nothing
+about how `mode` is validated or what it means, and a definition that omits it
+produces a byte-identical `completion` object.
+
+| Field | Notes |
+|---|---|
+| `method` | `evidence-preserving-synthesis` is the only legal value; any other is rejected. One honest method before any voting/ranking machinery. |
+| `outputOperationRef` | The operation that produces the aggregate. Must reference a declared `spec.operations[]` id; a dangling ref is rejected. |
+| `sourceOperationRefs[]` | The contributions being aggregated. Non-empty, deduplicated, each a declared operation id, and none of them may be `outputOperationRef` itself — an aggregation may not be its own source. |
+| `requiredDisclosures[]` | Non-empty. Each id the runtime cannot derive from session evidence fails the evaluator's disclosure coverage and forces `no-consensus`; a requirement is never silently skipped. |
+
+**Declaring it makes it mandatory for that protocol.** A session bound to a
+definition that declares `completion.aggregation` may not close on quorum
+alone: the request door refuses the close until an aggregation has been
+validated for that session, and the engine independently refuses any close
+whose named aggregation did not reach `consensus`. See
+[Evidence-Preserving Aggregation](coordination-session.md#evidence-preserving-aggregation-mvp7-step-09)
+in the CoordinationSession contract for the runtime half — the
+`aggregation-validated` event, what replay refuses, and why a validated
+outcome can only ever narrow a close, never cause or upgrade one.
+
+**Opt-in, and opt-in at the schema level.** `aggregation` is optional. No
+protocol shipped under `core/` declares one today, and a definition without it
+reaches exactly the close it reached before this field existed.
+
+**Named limitations.** `mode` remains *required* whenever `completion` is
+present, so declaring `aggregation` alone is still rejected — pre-existing
+behavior, deliberately left alone. The runtime-side limitations (a careful
+same-driver forgery of the validation event, and the definition being pinned
+by `{id, version}` rather than by content) are named in full in the
+CoordinationSession contract section linked above and are **not** closed here.
+
+- **Forbidden under `Workflow`:** `completion` entirely, and therefore
+  `completion.aggregation` structurally.
 
 #### Visibility Windows (Phase 06, Step 09 MVP6)
 

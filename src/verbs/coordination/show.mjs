@@ -80,6 +80,39 @@ function collectDriverAuthorizedBindings(definition) {
   return bindings;
 }
 
+// Phase 07 (MVP7): one validated cognitive aggregation, rendered whole.
+//
+// Every field the `aggregation-validated` event can carry is present on the
+// rendered record, always. An optional list the event omitted renders as `[]`
+// and an optional scalar as `null` -- never dropped from the object -- so a
+// reader can never mistake "this aggregation named no dissent" for "dissent
+// exists but `show` does not surface it". That distinction is the whole point
+// of an evidence-preserving method: the gaps are the record.
+function renderAggregation(record) {
+  return {
+    aggregationId: record.aggregationId,
+    method: record.method,
+    outcome: record.outcome,
+    // Sources, and the immutability pin each one was validated against.
+    sourceResultRefs: [...record.sourceResultRefs],
+    artifactRevisionRefs: [...(record.artifactRevisionRefs ?? [])],
+    // Dissent and unresolved contributions.
+    dissentRefs: [...(record.dissentRefs ?? [])],
+    unresolvedContributionRefs: [...(record.unresolvedContributionRefs ?? [])],
+    // Failures and omissions: who never answered, who failed, and which
+    // declared source operation had no binding to answer it at all.
+    missingActors: [...(record.missingActors ?? [])],
+    failedActors: [...(record.failedActors ?? [])],
+    unboundSourceOperationRefs: [...(record.unboundSourceOperationRefs ?? [])],
+    // The aggregate's own output.
+    assignmentId: record.assignmentId ?? null,
+    runId: record.runId ?? null,
+    outputArtifactRef: record.outputArtifactRef ?? null,
+    validatedBy: record.validatedBy,
+    ts: record.ts,
+  };
+}
+
 /**
  * @param {object} ctx `{cwd, repoRoot, packageRoot?}`
  * @param {object} options `{id}`
@@ -125,6 +158,8 @@ export function showCoordinationUseCase(ctx, { id }) {
   let ignoredAuthorizations = null;
   let dispositions = null;
   let pendingDriverAuthorizations = null;
+  let aggregations = null;
+  let ignoredAggregations = null;
 
   if (coordinationState) {
     authorizations = coordinationState.authorizations.map((a) => ({
@@ -144,6 +179,14 @@ export function showCoordinationUseCase(ctx, { id }) {
       nodeId: a.nodeId,
       targetActorId: a.targetActorId,
     }));
+
+    // Post-terminal aggregations are reported separately rather than hidden,
+    // the SAME "neutralize, don't hide" posture replay.mjs already applies to
+    // authorizations: a driver must be able to see that an aggregation they
+    // validated arrived after the session had already closed, and therefore
+    // informed nothing.
+    aggregations = coordinationState.aggregations.map(renderAggregation);
+    ignoredAggregations = coordinationState.ignoredAggregations.map(renderAggregation);
 
     const { fgosDir } = resolveSessionPaths(id, engineOpts);
     const refOwnedOpts = { coordinationId: id, assignmentRefs: coordinationState.assignmentRefs, fgosDir };
@@ -208,6 +251,8 @@ export function showCoordinationUseCase(ctx, { id }) {
     ignoredAuthorizations,
     dispositions,
     pendingDriverAuthorizations,
+    aggregations,
+    ignoredAggregations,
     ...(coordinationStateError !== null ? { coordinationStateError } : {}),
   };
 }
