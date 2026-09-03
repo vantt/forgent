@@ -1,5 +1,5 @@
 ---
-authoritative_for: main-checkout.lock "still waiting" poll line labeling self vs. other-session holder identity, distinct from tsk-6ci's ETA/progress gap
+authoritative_for: main-checkout.lock "still waiting" poll line labeling self vs. other-session holder identity, and (tsk-6ci) surfacing lock age / remaining TTL / staleness hint in the same poll line
 ---
 
 # The lock-wait poll line couldn't tell a session its own overlapping call from a stranger's
@@ -57,3 +57,34 @@ qualifier is appended to the existing line — `" — likely your own
 session's other in-flight call"` when it matches, `" — a different
 pid/session"` when it doesn't — leaving the original identity string
 printed either way, just no longer bare and ambiguous.
+
+## A second gap in the same poll line — no ETA, no staleness signal — `tsk-6ci`
+
+Distinct but adjacent gap in the same `withLockRetry` poll line: it
+carried no queue position, no ETA, no indication of what the holder was
+doing or how much longer the wait might take. Confirmed live on
+`tsk-4oq` (2026-08-20): `fgos approve --acknowledge-iron-law` printed 35
+of these poll lines (0s, 1s, 2s, 4s, 6s, 8s... up to 64s elapsed) before
+finally acquiring the lock — over 65 seconds of pure opaque waiting on a
+busy shared dev machine (confirmed via `ps aux` showing several other
+concurrent sessions' own `agy`/`dispatch.mjs` processes against the same
+main checkout). A person or driving session watching this had no way to
+tell whether the wait was nearly over, whether the holder had crashed
+and the lock was actually stale (a real category `fgos-unlock` already
+handles, but nothing in the poll line hinted at it), or whether to keep
+waiting versus investigate.
+
+Fixed by surfacing data the lock-held error already carried (attached
+since `tsk-5z2`, just never printed): `err.lockAgeMs` and
+`err.remainingTtlMs`, formatted via the existing `formatLockDurationMs`
+and appended to the same poll line — `lock age <duration>, remaining TTL
+<duration>`. When `remainingTtlMs` reads exactly `0`, the line appends
+`" — TTL EXPIRED, may be stale: consider fgos-unlock"` — the plain
+"this is likely fine, still waiting" vs. "this may be stale" framing the
+item's own description asked for, driven by data already computed
+elsewhere rather than a new heuristic.
+
+Related but distinct from [`tsk-2qp`](approve-lock-lost-mid-merge-guard.md)
+— a different angle on the same lock: that item's own held span doesn't
+cover the full git merge/commit sequence, causing a collision *failure*,
+not this opaque-wait *UX* gap.
