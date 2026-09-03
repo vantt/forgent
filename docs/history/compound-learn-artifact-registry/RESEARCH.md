@@ -137,6 +137,81 @@ recommending the item's classification be updated to match.
 harnesses, `fgos doctor` green including the 8 new knowledge checks phase
 08 registers).
 
+## Round 3 (2026-08-27) — tsk-5mh, stage `discovery`
+
+**Asked:** is tsk-5mh's goal (run the real `--apply` of
+`scripts/knowledge-migration.mjs` — plan.md's phase 11/§11 steps 9-10 —
+against the live 332-doc corpus, then verify B3's doc-sources/docs-index
+resolver subset holds after real paths change) clear enough to skip
+`exploring` and move straight to `planning`?
+
+**Routed mechanically:**
+
+- Preconditions from the item's own description — checked live, not
+  trusted from status text: `.fgos/config.json`'s `docRegistry.enforce` is
+  `true` (confirmed by direct read, not by citing tsk-1uj's "delivered"
+  status alone — matches CLAUDE.md's Impact-analysis gate discipline of
+  never trusting a status label over a live check). `tsk-5mh`'s own `deps`
+  is `["tsk-1uj"]`, and that item is `delivered` per `fgos list`.
+- `scripts/knowledge-migration.mjs` dry-run, run live against the real
+  store (`node scripts/knowledge-migration.mjs`, no `--apply`): clean
+  report — `moveCount: 332`, `alreadyMigratedCount: 0`,
+  `conservationErrors: []`. Zero errors on the actual corpus, not a
+  synthetic fixture.
+- `test/scripts/knowledge-migration.test.mjs` (749 lines) — found:
+  extensive apply/rollback/conservation coverage against a synthetic
+  store (path+content rollback on partial-apply failure, duplicate-source
+  and duplicate-target conservation errors, missing-source-file refusal,
+  not-registered/not-live/non-active-topic refusals, shell-metacharacter
+  path safety via `execFileSync`). This is the tsk-3uc hardening the item
+  description cites, confirmed present, not just claimed.
+- B3's resolver mechanism (item's own acceptance-criteria subset: only the
+  doc-sources/docs-index half of full B3, not `compound`'s
+  no-new-path/no-auto-promote half) — found already built and wired, not
+  something this item needs to construct:
+  - `src/state/knowledge-registry.mjs:772-789` (`doc.path-move` reducer):
+    on every move, the doc's OLD `currentPath` is pushed into its
+    `aliases` array before `currentPath` is overwritten — this is what
+    makes an old path keep resolving after a real move, mechanically, not
+    by convention.
+  - `bin/fgos.mjs:3143` (`doc-sources` verb) calls
+    `findSourceCaptureIds` (`src/report/enduser-index.mjs:74`), which
+    calls `resolveDocPath` (`src/report/knowledge-resolver.mjs:31-45`) —
+    that resolver checks both `currentPath` AND `aliases` for a match.
+    Old-path lookups after migration hit the alias branch; new-path
+    lookups hit the currentPath branch; both resolve to the same `docId`.
+  - `buildEnduserIndex` (`src/report/enduser-index.mjs:111`, the `docs-index`
+    verb's core) also calls `resolveDocPath` per doc and surfaces its
+    `aliases` in the output entry — a moved doc's index entry is not
+    expected to null out its source.
+  - No dedicated "B5 doctor check" (`doc-alias-broken` etc.) exists yet
+    (`rg` for those names in `src/setup/checks.mjs`/`bin/fgos.mjs`: zero
+    hits) — that is separately-scoped future work (DISCUSSION.md's own
+    B5 section), not something tsk-5mh's verify can lean on; this item's
+    own verify has to check the resolver directly instead.
+- Minor non-blocking discrepancy: the item's own description says "330/332
+  doc vẫn ở currentPath cũ", but the live dry-run reports `moveCount: 332`
+  / `alreadyMigratedCount: 0` (i.e., all 332, not 330). This is a stale
+  approximate count in the submitted text, not a real conservation gap —
+  the dry-run's own `conservationErrors: []` is the authoritative live
+  answer, and it is clean. Not something `exploring` needs a person to
+  resolve.
+
+**Verdict:** **clear.**
+
+Every precondition the item's own description names is independently
+confirmed live (not just cited from another item's "delivered" status),
+the migration script's dry-run against the real corpus is clean, its
+apply/rollback/conservation logic is already unit-tested, and the
+resolver mechanism the item's own acceptance criteria (B3 subset) depends
+on is already built and already does the aliasing this item needs — none
+of this requires a product decision or a person's judgment call, only
+execution + real-corpus verification. `tier`/`kind`/`risk` already read
+`heavy`/`feature`/`heavy` on the item, matching this round's own evidence
+(330 live files, producer-enforcement already on, no partial-apply safety
+net beyond this script's own rollback) — no `fgos edit` needed, values
+already correct.
+
 ## Round 4 (2026-09-03) — tsk-43q, stage `discovery`
 
 **Asked:** is tsk-43q's goal (make `enduser-index-generate.mjs`'s
@@ -202,10 +277,21 @@ already read `heavy`/`bug`/`heavy` on the item, matching the evidence
 (already-manifested data loss on `main`, corpus-wide blast radius) — no
 `fgos edit` needed.
 
-**Verify (real, runnable):**
+**Verify (real, runnable) — tsk-5mh:**
+
+```bash
+npm test                                    # full suite green, incl. test/scripts/knowledge-migration.test.mjs
+node scripts/knowledge-migration.mjs        # dry-run: moveCount 332, conservationErrors: [], reviewed by a person before --apply
+node scripts/knowledge-migration.mjs --apply
+# then, for >=3 sampled moved docs (old + new path each):
+node bin/fgos.mjs doc-sources <oldPath>     # same capture ids as pre-apply (resolves via new alias)
+node bin/fgos.mjs doc-sources <newPath>     # same capture ids (resolves via currentPath)
+node bin/fgos.mjs docs-index --dir <repoRoot>  # regenerates docs/enduser-docs-index.json with all 332 docs still present, none nulled
+```
+
+**Verify (real, runnable) — tsk-43q:**
 
 ```bash
 node --test test/report/enduser-index.test.mjs   # all pass, incl. 3 unreachable-store tests unmodified
 node bin/fgos.mjs docs-index --dir <repoRoot>     # regenerates enduser-docs-index.json with ~332+ entries (not 4)
-npm test                                          # full suite green
 ```
