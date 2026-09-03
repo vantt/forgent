@@ -74,8 +74,10 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 
 ## Active Cell
 
-None. P06.3 closed — Phase 06 (MVP6) is now fully done. See "P06.3 /
-Phase 06 Status" below.
+Wave 3: P07.3 (FlowDefinition/session integration for aggregation) +
+P08.1 (contribution model/validation), each in its own isolated worktree
+(`step-09-mvp6-to-mvp9-p07.3`, `step-09-mvp6-to-mvp9-p08.1`, both branched
+from `487771aa`). See `current-cell.md`.
 
 **Process deviation, recorded honestly:** both P06.1 and P07.1 were
 dispatched as concurrent source-writers into the SAME shared worktree
