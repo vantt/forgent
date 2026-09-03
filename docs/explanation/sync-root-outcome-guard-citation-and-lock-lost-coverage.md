@@ -1,5 +1,5 @@
 ---
-authoritative_for: sync-root-unhandled-outcome guard regression test, stale doc citation after fgos.test.mjs split into per-verb files, new lock-lost-mid-merge coverage
+authoritative_for: sync-root-unhandled-outcome guard regression test, stale doc citation after fgos.test.mjs split into per-verb files, new lock-lost-mid-merge and merge-failed-unclassified coverage
 ---
 
 # The guard's own test still existed — just cited under a file that no longer did
@@ -53,11 +53,33 @@ Two things, in one commit (`e1919fd4`):
   case specifically — so a future reader doesn't need to re-derive which
   test covers which case.
 
+## A third case, found the same way — `merge-failed-unclassified`
+
+`tsk-12o` closed one more specific gap in the same guard, found the same
+way this item's own gap was found: while implementing `tsk-3df` itself,
+noted as out of that item's own scope and submitted separately.
+`mergeRunnerItem` can return `merge-failed-unclassified`
+(`src/runner/merge.mjs:1261,1270`) — already unit-tested at the
+`mergeRunnerItem` level (`test/runner/merge.test.mjs:468,697`) but never
+exercised through `sync-root`'s own CLI call path, unlike the adjacent
+`merge-blocked-other-item` (`test/cli/fgos-merge.test.mjs:1123`) and this
+item's own new `lock-lost-mid-merge` test (line 1160). Fixed
+(`6d5e0487`) with a CLI-level regression test in the same file, reusing
+`makeDriftedRoot`'s verify-injection technique
+(`test/cli/helpers/fgos-cli-harness.mjs:605`) to force `mergeRunnerItem`
+to return `merge-failed-unclassified` for a `sync-root` call, asserting
+outcome `blocked`, reason `merge-failed-unclassified`, and a frictions
+entry carrying `errorClass: sync-root-unhandled-outcome` — never
+`synced`. Between `tsk-1cp`'s original test, `tsk-3df`'s
+`lock-lost-mid-merge` addition, and this item's `merge-failed-unclassified`
+addition, the guard's own three known unrecognized-outcome shapes are now
+each independently covered at the CLI level.
+
 ## Not a duplicate
 
 [`tsk-2qp`](approve-lock-lost-mid-merge-guard.md) — the item that
-introduced the `lock-lost-mid-merge` outcome this item's new test
-exercises; found during that item's own implementation but explicitly
-out of its scope, submitted as a separate item instead of folded in.
-`tsk-1cp` — the original item that documented the guard's existence; its
-own record is corrected here, not superseded.
+introduced the `lock-lost-mid-merge` outcome `tsk-3df`'s test exercises;
+found during that item's own implementation but explicitly out of its
+scope, submitted as a separate item instead of folded in. `tsk-1cp` — the
+original item that documented the guard's existence; its own record is
+corrected here, not superseded.
