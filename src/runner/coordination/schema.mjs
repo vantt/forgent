@@ -267,7 +267,47 @@ export function validateManifest(manifest) {
 const EVENT_SPECS = {
   'session-opened': { required: ['coordinationId', 'provenanceRoot'], accepted: ['coordinationId', 'provenanceRoot'] },
   'actor-bound': { required: ['actorId', 'role'], accepted: ['actorId', 'role', 'persona', 'policy'] },
-  'assignment-created': { required: ['assignmentId'], accepted: ['assignmentId', 'actorId'] },
+  // `operationId`/`nodeId`/`authorizationId`/`invocationKey`/`contextGrant`
+  // are ADDITIVE driver-authorization provenance, present only on a
+  // dispatch that a driver actually authorized ("so replay can explain why
+  // the worker ran and which grant made its context legal"). Every existing
+  // agent-led dispatch (`dispatchPrimaryTask`/`proposeConsult`) and every
+  // `activation.mode: required` declared dispatch keeps emitting exactly
+  // `{assignmentId, actorId?}` -- these fields are accepted, never required.
+  'assignment-created': {
+    required: ['assignmentId'],
+    accepted: ['assignmentId', 'actorId', 'operationId', 'nodeId', 'authorizationId', 'invocationKey', 'contextGrant'],
+  },
+  // A driver authorizes ONE `activation.mode: driver-authorized` node-
+  // operation binding for dispatch. The binding is identified by the full
+  // (nodeId, operationId, targetActorId) triple -- one actor is routinely
+  // bound to several different operations at several different graph nodes,
+  // so no single one of the three identifies a binding on its own.
+  'operation-authorized': {
+    required: ['authorizationId', 'operationId', 'nodeId', 'targetActorId', 'invocationKey', 'authorizedBy', 'reason', 'grantedContextRefs'],
+    accepted: [
+      'authorizationId',
+      'operationId',
+      'nodeId',
+      'targetActorId',
+      'invocationKey',
+      'authorizedBy',
+      'reason',
+      'grantedContextRefs',
+      'targetArtifactRef',
+    ],
+  },
+  // A driver records disposition on a finding/artifact. "Disposition
+  // (accepting or rejecting a finding, or closing a round) is a driver
+  // event, never a worker-authored result" -- so it carries the SAME
+  // `authorizedBy` shape `operation-authorized` does (one shared
+  // `validateAuthorizedBy` below, one shared identity pin in store.mjs), and
+  // no assignmentId/runId of its own: it is ledger state about a ref, not a
+  // field on anybody's result.
+  'driver-disposition-recorded': {
+    required: ['targetRef', 'disposition', 'rationale', 'evidenceRefs', 'authorizedBy'],
+    accepted: ['targetRef', 'disposition', 'rationale', 'evidenceRefs', 'authorizedBy'],
+  },
   'result-linked': { required: ['assignmentId', 'runId'], accepted: ['assignmentId', 'runId'] },
   // Phase 06 R2: retry creates a new Run for the SAME Assignment. Declared
   // BEFORE dispatch (store.mjs's recordRunRetry appends this first, matching
@@ -304,6 +344,40 @@ export const EVENT_KINDS = Object.freeze(Object.keys(EVENT_SPECS));
 // in exactly one place.
 const OPTIONAL_STRING_ARRAY_FIELDS = new Set(['failedActors', 'lateActors', 'replacedActors', 'dissentingActors', 'inFlightAssignmentIds']);
 
+// Optional non-empty-string fields shared by more than one event kind, in
+// the same "checked regardless of kind, only ever ACCEPTED where the kind's
+// own `accepted` list allows it" shape as OPTIONAL_STRING_ARRAY_FIELDS above.
+const OPTIONAL_STRING_FIELDS = new Set(['actorId', 'operationId', 'nodeId', 'authorizationId', 'invocationKey', 'targetArtifactRef']);
+
+// The `assignment-created` driver-authorization provenance fields OTHER than
+// `authorizationId` itself -- none of them is meaningful, or checkable, on an
+// Assignment that names no authorization (see validateEventPayload below).
+const DRIVER_PROVENANCE_COMPANION_FIELDS = ['operationId', 'nodeId', 'invocationKey', 'contextGrant'];
+
+const AUTHORIZED_BY_FIELDS = new Set(['type', 'id']);
+const CONTEXT_GRANT_FIELDS = new Set(['refs']);
+
+function isStringArray(value) {
+  return Array.isArray(value) && value.every(isNonEmptyString);
+}
+
+/**
+ * `authorizedBy: {type: "driver", id: <driver-identity>}` -- the driver is
+ * never a `spec.actors[]` worker, so `type` is a closed single-value enum
+ * here rather than an open label. This module is pure (no session on hand),
+ * so it enforces only the shape the contract's field table names; tying that
+ * `id` to the session's own `provenanceRoot.writerId` is done where the
+ * manifest is actually readable, lock-held in `store.mjs`'s shared
+ * `assertDriverIdentity` (used by every door that writes a driver-authored
+ * event: `authorizeOperation` and `recordDriverDisposition`).
+ */
+function validateAuthorizedBy(authorizedBy, label) {
+  if (!isPlainObject(authorizedBy)) fail('validation', `${label} must be a non-null object`);
+  assertOnlyAcceptedFields(authorizedBy, AUTHORIZED_BY_FIELDS, label);
+  if (authorizedBy.type !== 'driver') fail('validation', `${label}.type must be "driver"`);
+  if (!isNonEmptyString(authorizedBy.id)) fail('validation', `${label}.id must be a non-empty string`);
+}
+
 /**
  * Validate one event's `type` + `payload` against the contract's Event Log
  * table. Throws `CoordinationError('validation', ...)` on an unknown kind,
@@ -333,6 +407,19 @@ export function validateEventPayload(type, payload) {
       if (!isPlainObject(value)) fail('validation', `event "${type}" payload.provenanceRoot must be a non-null object`);
       continue;
     }
+    if (field === 'authorizedBy') {
+      validateAuthorizedBy(value, `event "${type}" payload.authorizedBy`);
+      continue;
+    }
+    if (field === 'grantedContextRefs' || field === 'evidenceRefs') {
+      // An EMPTY array is legal and meaningful: the authorization grants no
+      // extra refs beyond the Assignment's own always-legal base context,
+      // and a disposition may rest on the target ref alone.
+      if (!isStringArray(value)) {
+        fail('validation', `event "${type}" payload.${field} must be an array of non-empty strings`);
+      }
+      continue;
+    }
     if (!isNonEmptyString(value)) fail('validation', `event "${type}" payload.${field} must be a non-empty string`);
   }
 
@@ -352,7 +439,35 @@ export function validateEventPayload(type, payload) {
   if (body.allocationProvenance !== undefined && !isPlainObject(body.allocationProvenance)) {
     fail('validation', `event "${type}" payload.allocationProvenance must be an object when provided`);
   }
+  for (const field of OPTIONAL_STRING_FIELDS) {
+    if (body[field] === undefined) continue;
+    if (!isNonEmptyString(body[field])) {
+      fail('validation', `event "${type}" payload.${field} must be a non-empty string when provided`);
+    }
+  }
+  if (body.contextGrant !== undefined) {
+    const label = `event "${type}" payload.contextGrant`;
+    if (!isPlainObject(body.contextGrant)) fail('validation', `${label} must be an object when provided`);
+    assertOnlyAcceptedFields(body.contextGrant, CONTEXT_GRANT_FIELDS, label);
+    if (!isStringArray(body.contextGrant.refs)) fail('validation', `${label}.refs must be an array of non-empty strings`);
+  }
 
+  if (type === 'assignment-created') {
+    // The driver-authorization provenance group travels together.
+    // `authorizationId` is the member that makes the rest verifiable -- it
+    // is the only one that names an `operation-authorized` event a reader
+    // can check the others against. Without it, an Assignment could record
+    // a `contextGrant` no driver ever issued and still replay clean, which
+    // would make "replay can explain why the worker ran and which grant
+    // made its context legal" unenforced rather than merely unenforced-yet.
+    const orphaned = DRIVER_PROVENANCE_COMPANION_FIELDS.filter((field) => body[field] !== undefined);
+    if (orphaned.length > 0 && body.authorizationId === undefined) {
+      fail(
+        'validation',
+        `event "assignment-created" payload carries driver-authorization provenance (${orphaned.join(', ')}) without "authorizationId" -- these fields travel together or not at all`,
+      );
+    }
+  }
   if (type === 'session-opened') {
     validateProvenanceRoot(body.provenanceRoot, `event "session-opened" payload.provenanceRoot`);
   }

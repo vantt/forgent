@@ -1,19 +1,19 @@
-# Step 09 Draft Component, Bounded-Context, And Authority Map
+# Component Authority Boundary Map
 
 Document type: Proposal artifact
-Design status: Draft / Step 1A discussion
+Design status: Draft / architect-level discussion
 Implementation: Not started
 Last reviewed: 2026-09-02
-Canonical for: nothing until Step 1B promotes or replaces it after Step 08 P07.2
-Related: [Step 09 proposal](step-09-coding-domain-adoption.md), [Agent Coordination Vision](../agent-coordination/vision.md), [Intent Preservation Ledger](../agent-coordination/intent-preservation-ledger.md), [Architecture Intent](../architecture-intent.md), [Component Boundary Advisory](../component-boundary/component-boundary-advisory.md), [Repo Layout Vision](../component-boundary/repo-layout-vision.md), [Node To Rust Component Migration](../component-boundary/node-to-rust-component-migration.md)
+Canonical for: nothing until promoted or replaced by an accepted boundary document
+Related: [Step 09 Group Thinking Substrate](step-09-group-thinking-substrate.md), [Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md), [Agent Coordination Vision](../agent-coordination/vision.md), [Intent Preservation Ledger](../agent-coordination/intent-preservation-ledger.md), [Architecture Intent](../architecture-intent.md), [Component Boundary Advisory](../component-boundary/component-boundary-advisory.md), [Repo Layout Vision](../component-boundary/repo-layout-vision.md), [Node To Rust Component Migration](../component-boundary/node-to-rust-component-migration.md)
 
 ## 1. Status And Reading Rule
 
-This is the Step 1A draft requested by
-[Step 09](step-09-coding-domain-adoption.md#81-step-1a--1b-output-shape).
+This is an architect-level boundary draft, not a child of Step 09 or Step 10.
 It is not accepted architecture, not a roadmap, and not permission to move
-files. It names likely ownership so Step 1B can reconcile the map with Step 08's
-final Deferral Audit before any coding-domain adoption implementation starts.
+files. It names likely ownership so group-thinking substrate work and later
+coding-domain adoption can place primitives under the right authority before
+any implementation or physical layout move starts.
 
 Read this draft under the accepted constraints:
 
@@ -67,8 +67,8 @@ Consequences:
 
 Physical placement must follow authority; it does not define authority. A file
 under `src/runner` or `src/state` may belong to a domain or platform component.
-Moving it later does not make the authority true unless this map or its Step 1B
-successor says so.
+Moving it later does not make the authority true unless this map or its
+accepted boundary successor says so.
 
 ## 4. Two Classification Axes
 
@@ -95,7 +95,7 @@ Component category:
 | Coding Domain Component | Domain | Domain component |
 | Host And Surface Layer | Host surface | Adapter/surface |
 
-Step 1B rule:
+Boundary rule:
 
 ```txt
 Do not label a component "foundation" when the intended meaning is merely
@@ -303,7 +303,7 @@ choices, cross-component sequencing, or unresolved product decisions.
 ```
 
 The small-change path is still open. It should not be named as a real workflow
-until Step 1B decides whether "small" means a separate workflow, a mode inside
+until an accepted coding-domain design decides whether "small" means a separate workflow, a mode inside
 `cook`, or only a routing policy that skips the upstream product/design flow.
 
 The test for whether a concern belongs in Coding Domain Core:
@@ -407,13 +407,14 @@ not mean one module owns every decision.
 | Flow / Router + Driver | Work Driver / Domain Workflow Interpreter and Agent Coordination session routing | Chooses legal domain flow/operation or session-local task/actor route; does not select concrete executor infrastructure. |
 | Execution / Dispatcher | Dispatch And Execution Engine | Resolves and launches one Assignment under governance; does not choose semantic operation or lifecycle result. |
 
-Step 1B should decide whether this spine is named as its own platform-core
-contract, or recorded as a required cross-component contract spanning Work
-Driver, Agent Coordination, Dispatch, and Host Surface.
+The eventual accepted boundary document should decide whether this spine is
+named as its own platform-core contract, or recorded as a required
+cross-component contract spanning Work Driver, Agent Coordination, Dispatch,
+and Host Surface.
 
 ## 12. Work-Attached Coding Collaboration Chain
 
-The draft chain for Step 09 remains:
+The draft chain for Step 10 coding adoption remains:
 
 ```txt
 Work Driver / Domain Workflow Interpreter
@@ -459,8 +460,8 @@ Examples:
 
 ## 13. Draft Ports
 
-These are proposal-level names for future facades. Step 1A does not require
-creating them.
+These are proposal-level names for future facades. This boundary draft does
+not require creating them.
 
 | Port | Owned by | Shape |
 |---|---|---|
@@ -517,26 +518,25 @@ Layout constraints:
   behavior, and current state authority stay stable through moves.
 - Setup/doctor must learn any new binary, service, directory, config default,
   or writable path introduced by a future implementation slice.
-- Physical movement follows Step 1B authority acceptance, not Step 1A draft
-  vocabulary.
+- Physical movement follows accepted boundary authority, not draft vocabulary.
 
-## 15. Code Scan Findings For Step 1A
+## 15. Code Scan Findings For Boundary Drafting
 
 Scan date: 2026-09-02. This scan read the current Node implementation only to
 shape the proposal. It did not run tests, edit runtime code, or claim Work.
 
 | Finding | Evidence | Architecture read | Recommendation |
 |---|---|---|---|
-| A. `operation-choice.mjs` is the highest-risk boundary knot. | `chooseStageOperation()` line 649, `interpretAssignmentRunResult()` line 1671, `executeDriverOperationChoice()` line 2144 in a 2,260-line file. GitNexus shows callers from `dispatchClaimedItem()`, `runOnce()`, and tests. | The file spans Work Driver, Assignment/Dispatch invocation, and RunResult interpretation. It is a compatibility join point, not the long-term component home. | Treat `executeDriverOperationChoice()` as the temporary adapter seam for Step 2. Step 1B should target `WorkDriverPort.chooseOperation() -> AssignmentBuilderPort.freezeDeclaredOperation() -> DispatchRuntimePort.runAssignment() -> RunResultEvaluatorPort.evaluate() -> WorkDriverPort.consumeRunResult()`. |
+| A. `operation-choice.mjs` is the highest-risk boundary knot. | `chooseStageOperation()` line 649, `interpretAssignmentRunResult()` line 1671, `executeDriverOperationChoice()` line 2144 in a 2,260-line file. GitNexus shows callers from `dispatchClaimedItem()`, `runOnce()`, and tests. | The file spans Work Driver, Assignment/Dispatch invocation, and RunResult interpretation. It is a compatibility join point, not the long-term component home. | Treat `executeDriverOperationChoice()` as the temporary adapter seam for Step 10 slice 2. The accepted boundary should target `WorkDriverPort.chooseOperation() -> AssignmentBuilderPort.freezeDeclaredOperation() -> DispatchRuntimePort.runAssignment() -> RunResultEvaluatorPort.evaluate() -> WorkDriverPort.consumeRunResult()`. |
 | B. Secondary operations use Assignment/RunResult; primary executing still uses `spawnWorker`. | `src/runner/loop.mjs` chooses operations and calls `executeDriverOperationChoice()` for assignment dispatch, but still falls through to `spawnWorker()` around executing/research paths. `assignment-runner.mjs` persists Run, dispatch plan, result, evidence, dirty-before state, and hashes. | The repo has two execution cores: `Assignment -> DispatchPlan -> Run -> RunResult` and legacy `spawnWorker -> goal-check -> settleClaim`. | Keep Step 2 narrow on read-only `validate-plan`. Mark `spawnWorker` primary execution as a legacy path to retire behind `DispatchRuntimePort`; goal-check becomes a coding evidence adapter. |
 | C. CoordinationSession bounds and worker slots are separate caps. | Coordination defaults `aggregateBounds.maxConcurrency` and enforces session assignment creation; worker slots are computed from Work claims and optional ceiling. | Both caps are legitimate but currently have no shared port. Work-attached fan-out or mutation could create conflicting answers to "is there room?" | Step 2 should use concurrency 1 and borrow the host Work claim. Before fan-out/mutation, accept an `OccupancyPort` rule that clamps session materialization against Work runtime slots and coding resource claims. |
 | D. CoordinationSession is correctly lifecycle-blind today. | `openSession()` accepts `workRef`; session engine builds read-only inline contracts; inline mutating contracts are rejected. | Session can reference Work but does not own lifecycle/isolation/merge and cannot run mutating inline Assignments. | Do not extend CoordinationSession into a Work/Stage resolver. Add declared Assignment handoff from Work Driver + Assignment Builder into session membership. |
-| E. Coding harness is pure and read-only, but too narrow for mutation proof. | `domains/coding/harness/enrich-and-validate-contract.mjs` validates declared stage operation and appends context/policy hints without filesystem, store, network, dispatch, or executor choice. | This is a good ADR-007 seam. It lacks footprint/resource/isolation advice and opaque workspace refs needed for mutating proof. | Extend harness I/O only after Step 1B: enriched contract + policy + evidencePolicy + resourceClaims + isolationAdvice + `workspaceRef?`. |
-| F. Domain workflow declarations already contain legal operation truth. | `domains/coding/workflows/feature.yaml` declares `validate-plan`, `implement-item`, `review-item`, `fix-verify-red`, `scoped-subtask`, `scout-blast-radius`, and `resolve-question`; `assignment.mjs` rejects unknown declared operations. | Step 09 does not need a new place to decide legal operations. It needs a clean path for declared operation truth to enter a Work-attached session. | For Step 2: Work Driver selects `planning.validate-plan`; Assignment Builder freezes; Session store appends membership; Dispatch executes; Run Result Evaluator evaluates; Work Driver consumes verdict and calls lifecycle verbs if allowed. |
-| G. Coding Repository Integration Core is scattered but authority is clear. | `src/runner/worktree.mjs`, `src/runner/merge.mjs`, `src/verbs/merge/**`, readiness/cleanup/drift state files. | These concerns are coding-specific because they depend on Git branches, worktrees, repo deltas, verification, merge readiness, and technical approval. | Do not move files in Step 1A or Step 2. Step 1B should mark them as Coding Domain Core and require a `CodingRepositoryPort` facade before layout moves. |
-| H. Setup/Doctor is already a real platform boundary. | `src/setup/registrations.mjs`, `src/setup/checks.mjs`, `src/setup/config-merge.mjs`, shared config helpers. | Clean architecture on paper is not enough if new files/config/executors/services are undiscoverable in real projects. | Make setup/doctor registration part of Step 1B's implementation gate. |
+| E. Coding harness is pure and read-only, but too narrow for mutation proof. | `domains/coding/harness/enrich-and-validate-contract.mjs` validates declared stage operation and appends context/policy hints without filesystem, store, network, dispatch, or executor choice. | This is a good ADR-007 seam. It lacks footprint/resource/isolation advice and opaque workspace refs needed for mutating proof. | Extend harness I/O only after the boundary and Step 10 readiness gates: enriched contract + policy + evidencePolicy + resourceClaims + isolationAdvice + `workspaceRef?`. |
+| F. Domain workflow declarations already contain legal operation truth. | `domains/coding/workflows/feature.yaml` declares `validate-plan`, `implement-item`, `review-item`, `fix-verify-red`, `scoped-subtask`, `scout-blast-radius`, and `resolve-question`; `assignment.mjs` rejects unknown declared operations. | Step 10 does not need a new place to decide legal operations. It needs a clean path for declared operation truth to enter a Work-attached session. | For Step 10 slice 2: Work Driver selects `planning.validate-plan`; Assignment Builder freezes; Session store appends membership; Dispatch executes; Run Result Evaluator evaluates; Work Driver consumes verdict and calls lifecycle verbs if allowed. |
+| G. Coding Repository Integration Core is scattered but authority is clear. | `src/runner/worktree.mjs`, `src/runner/merge.mjs`, `src/verbs/merge/**`, readiness/cleanup/drift state files. | These concerns are coding-specific because they depend on Git branches, worktrees, repo deltas, verification, merge readiness, and technical approval. | Do not move files in the boundary draft or Step 10 slice 2. The accepted boundary should mark them as Coding Domain Core and require a `CodingRepositoryPort` facade before layout moves. |
+| H. Setup/Doctor is already a real platform boundary. | `src/setup/registrations.mjs`, `src/setup/checks.mjs`, `src/setup/config-merge.mjs`, shared config helpers. | Clean architecture on paper is not enough if new files/config/executors/services are undiscoverable in real projects. | Make setup/doctor registration part of implementation gates for Step 09/Step 10 changes that introduce new config, files, services, or directories. |
 
-## 16. Step 1B Promotion Checklist
+## 16. Boundary Promotion Checklist
 
 Before this draft can become accepted architecture:
 
@@ -556,21 +556,24 @@ Before this draft can become accepted architecture:
 6. Choose whether Node repo-layout overlay is accepted now, deferred as
    migration-only guidance, or split into a separate distribution/component
    document.
-7. Add accepted-source links from Step 09 before any Step 2+ implementation
-   plan claims readiness.
+7. Add accepted-source links from Step 09 and Step 10 before any coding
+   adoption implementation plan claims readiness.
 
 ## 17. Recommended Next Architecture Moves
 
-1. Accept this draft only as Step 1A discussion input.
-2. Before Step 1B, run one focused review against Step 08 P07.2 final audit.
-3. For Step 1B, decide three gates explicitly: `OccupancyPort`, `fgos handoff`
+1. Keep this draft as architect-level discussion input until promoted.
+2. Run one focused review against Step 08's final audit and the Step 09
+   substrate direction before accepting boundary rules.
+3. Decide three gates explicitly: `OccupancyPort`, `fgos handoff`
    truth/projection, and in-process Run minimum record.
-4. For Step 2, implement only Work-attached read-only `validate-plan` session
-   after Step 1B. Keep session concurrency at 1 and do not introduce fan-out.
-5. For Step 3, extract coding-specific result interpretation toward a coding
-   evidence adapter feeding Run Result Evaluator.
-6. For Step 5, lift the mutation gate only through a new ADR with live proof;
-   do not edit ADR-010 in place.
+4. For Step 10 slice 2, implement only Work-attached read-only `validate-plan`
+   session after the relevant Step 09 substrate primitive and boundary
+   guardrails are accepted. Keep session concurrency at 1 and do not introduce
+   fan-out.
+5. For Step 10 slice 3, extract coding-specific result interpretation toward a
+   coding evidence adapter feeding Run Result Evaluator.
+6. For Step 10 mutating proof, lift the mutation gate only through a new ADR
+   with live proof; do not edit ADR-010 in place.
 
 ## 18. Agent Coordination Documentation Organization Pressure
 
@@ -607,7 +610,7 @@ partly true but needs precision: Dispatch and Run Result Evaluation belong
 inside the **Agent Coordination** umbrella, but they are not submodules of the
 narrower **Agent Coordination Engine**.
 
-Recommended documentation overlay for Step 1B:
+Recommended documentation overlay for boundary promotion:
 
 ```txt
 docs/architect/agent-coordination/
@@ -651,7 +654,7 @@ Draft component-to-doc reading map:
 | Agent Coordination Engine | `architecture/{system-context,protocol-model,runtime-model}.md`, `contracts/coordination-session.md`, `contracts/flow-definition.md` | Core Agent Coordination-owned docs. |
 | Dispatch And Execution Engine | `architecture/dispatch-control-plane.md`, Run section of `contracts/assignment-run-runresult.md`, dispatch proposals | Adjacent platform-core engine under the foundation umbrella, not a submodule owned by session runtime. |
 | Run Result Evaluator | `architecture/evidence-and-results.md`, RunResult/confidence section of `contracts/assignment-run-runresult.md` | Split from dispatch even if source files are still together. |
-| Work Lifecycle / Work Driver integration | `architecture/work-integration.md`, Team Dispatch roadmap, Step 09 proposals | Work Driver is a platform-core integration engine that uses Agent Coordination, not an Agent Coordination subcomponent. |
+| Work Lifecycle / Work Driver integration | `architecture/work-integration.md`, Team Dispatch roadmap, Step 10 proposal | Work Driver is a platform-core integration engine that uses Agent Coordination, not an Agent Coordination subcomponent. |
 | Host/visibility | `architecture/visibility-and-herdr.md`, gateway docs | Visibility stays out of runtime truth and evidence authority. |
 | Rings / router / launcher / driver vocabulary | `vocabulary/concept-relationships.md`, roadmap Team Dispatch docs | Ring vocabulary becomes a component-neutral map. |
 

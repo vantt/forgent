@@ -7,8 +7,10 @@ Step 08 Phase 02; Workflow-profile projection additive at zero diff to
 `src/state/workflow-stage-graphs.mjs`; CoordinationProtocol-profile fixtures
 ship in `core/coordination-protocols/` and are discoverable from a real
 external consuming project, proven live at P07.2 R6. Full per-phase trace:
-`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`)
-Last reviewed: 2026-09-02
+`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`.
+Phase 00 (Step 09): driver-authorized optional operations, disposition,
+recheck-vs-retry contract text accepted — implementation in Phases 01-03.)
+Last reviewed: 2026-09-03
 Canonical for: the FlowDefinition IR schema, the Workflow/CoordinationProtocol profile discriminator, the operation primitive, and PolicyPatch provenance
 Related: [ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md), [Protocol Model](../architecture/protocol-model.md), [Workflow Stage Operation Contract](workflow-stage-operation.md), [CoordinationSession Contract](coordination-session.md)
 
@@ -63,6 +65,9 @@ graph:
       operations:
         - ref: <operation-id>
           actor: <actor-id>           # optional; omitted when the operation is Role-only
+          activation:                 # optional; see Activation below
+            mode: required | driver-authorized
+            maxInvocations: <n>
       transitions: [<node-id>, ...]
 ```
 
@@ -75,6 +80,31 @@ graph:
 - A node's `operations[].ref` must reference a declared `spec.operations[].id`.
 - A node's `operations[].actor`, when present, must reference a declared
   `spec.actors[].id`.
+
+### Activation (Phase 00, Step 09 MVP1/MVP2)
+
+Accepted contract text, scoped to MVP1/MVP2 of the Step 09 group-thinking
+substrate ([Step 09 Group Thinking Substrate](../../proposals/step-09-group-thinking-substrate.md#7-mvp2---driver-authorization-primitive)
+remains a Discussion-status document; only `activation` as described here is
+promoted out of it). This does not accept deliberation memory, visibility
+windows, richer aggregation modes, or `addSessionEdge` (Step 09 MVP6-9) —
+those stay deferred/discussion. This cell treats substrate MVP2 (§7) and
+MVP3 recheck/disposition (§8) as one accepted MVP1/MVP2 slice; only MVP6-9
+concepts above remain deferred/discussion.
+
+`graph.nodes[].operations[].activation` is scoped to the node-operation
+**binding**, never to the reusable `spec.operations[]` template. The same
+`operations[].id` may be declared `required` at one graph position and
+`driver-authorized` at another — `activation` on the shared operation
+template itself is not a legal field and must be rejected.
+
+| Field | Notes |
+|---|---|
+| `mode` | `required` (default whenever `mode` itself is absent — whether `activation` is omitted entirely or present without a `mode` key, e.g. `activation: {maxInvocations: 3}`): the binding materializes through the normal graph path. `driver-authorized`: the binding cannot materialize into an Assignment without a matching `operation-authorized` CoordinationSession event for that exact binding (see [CoordinationSession Contract](coordination-session.md#driver-authorized-optional-operations-and-recheck-mvp1mvp2-step-09)). |
+| `maxInvocations` | Optional per-binding invocation cap. It only NARROWS usage at that one binding — it can never widen `aggregateBounds.maxAssignments`, `aggregateBounds.maxRounds`, or `aggregateBounds.maxConcurrency` from the CoordinationSession contract. Aggregate session caps always win when they are stricter than a binding's `maxInvocations`. The binding's consumed-invocation count is counted fresh from the on-disk `operation-authorized` events for that exact binding (never from in-memory state) — the same freshness guarantee `aggregateBounds` carries in the CoordinationSession contract. |
+
+An unknown `activation.mode` value is rejected at validation, the same as any
+other unrecognized enum value in this contract.
 
 ## Operation Primitive
 
@@ -239,3 +269,8 @@ references.
   `Workflow`-profile FlowDefinition adapter output is checked separately and
   never replaces that normalized shape as the loader's return value in this
   phase.
+- An `activation.mode` value other than `required` or `driver-authorized` is
+  rejected (Phase 00, Step 09 MVP1/MVP2).
+- An `activation` field declared on a `spec.operations[]` template entry
+  (rather than on a `graph.nodes[].operations[]` binding) is rejected —
+  `activation` is binding-scoped only (Phase 00, Step 09 MVP1/MVP2).

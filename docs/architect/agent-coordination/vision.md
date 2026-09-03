@@ -391,5 +391,8 @@ Vision. They must be answered without reopening V-001 through V-012 implicitly.
    session/task/planning/isolation design still open under this Vision.
 7. [Step 08](proposals/step-08-standalone-coordination-protocols.md) develops
    optional reusable protocols and agent-led standalone adoption.
-8. [Step 09](../proposals/step-09-coding-domain-adoption.md) discusses bringing the
-   existing coding domain onto that foundation as its second unlike consumer.
+8. [Step 09](../proposals/step-09-group-thinking-substrate.md) discusses the
+   standalone group-thinking substrate expansion, and
+   [Step 10](../proposals/step-10-coding-domain-adoption.md) discusses bringing
+   the existing coding domain onto that foundation as its second unlike
+   consumer.

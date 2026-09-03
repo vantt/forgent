@@ -3,7 +3,7 @@
 Document type: Architecture
 Design status: Accepted
 Implementation: Implemented for Steps 00-08 delivered surface; deferred items named below
-Last reviewed: 2026-09-02
+Last reviewed: 2026-09-03
 Canonical for: accepted Step 00-08 Agent Coordination foundation shape after promotion from roadmap/proposal history
 
 Related: [Vision](../vision.md), [Runtime Model](runtime-model.md),
@@ -14,7 +14,8 @@ Related: [Vision](../vision.md), [Runtime Model](runtime-model.md),
 [Step 07 proposal history](../proposals/step-07-coordination-session-adhoc-task.md),
 [Step 08 proposal history](../proposals/step-08-standalone-coordination-protocols.md),
 [Team Dispatch V1 verification](../verification/team-dispatch-v1/index.md),
-[Step 08 verification](../verification/step-08-standalone-coordination/index.md)
+[Step 08 verification](../verification/step-08-standalone-coordination/index.md),
+[Step 09 MVP1/MVP2 group-thinking verification](../verification/step-09-group-thinking-mvp1-mvp2/index.md)
 
 ## Purpose
 
@@ -115,8 +116,12 @@ These Step 07/08 topics remain deferred or unaccepted:
 - richer group-cognitive methods beyond the hardened V1 fixtures.
 
 Deferring these does not mean they are rejected. The active architecture-wide
-intent is tracked in [Architecture Intent](../../architecture-intent.md), and
-coding-domain adoption is tracked in the Step 09 architect-level proposals.
+intent is tracked in [Architecture Intent](../../architecture-intent.md), the
+group-thinking substrate expansion is tracked in Step 09, and coding-domain
+adoption is tracked in Step 10.
+
+See the [Master Multi-Agent Implementation Coordinator](../playbooks/prompts/master-coordinator.md)
+playbook's own Runtime Boundary section for its manual-only status.
 
 ## Reading Rule
 

@@ -15,9 +15,10 @@ their scope crosses the area boundary.
 
 ## Active Proposals
 
-- [Step 09: Coding Domain Adoption Of The Coordination Foundation](step-09-coding-domain-adoption.md)
-- [Step 09 Draft Component, Bounded-Context, And Authority Map](step-09-component-authority-layout-map.md)
+- [Step 09: Group Thinking Substrate](step-09-group-thinking-substrate.md)
+- [Step 10: Coding Domain Adoption Of The Coordination Foundation](step-10-coding-domain-adoption.md)
+- [Component Authority Boundary Map](component-authority-boundary-map.md)
 
 ## Handoff Prompts
 
-- [Step 8b / Step 09 Replan Handoff Prompt](step-08b-step-09-replan-handoff-prompt.md)
+- [Step 09 / Step 10 Replan Handoff Prompt](step-09-step-10-replan-handoff-prompt.md)

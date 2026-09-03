@@ -15,8 +15,10 @@ both invoking this store through the one shared engine, capability parity
 live-proved — `src/runner/coordination/{schema,store,replay,session-engine}.mjs`,
 `src/verbs/coordination/{schema,run,show}.mjs`,
 `src/runner/coordination/headless-adapter.mjs`. Full per-phase trace:
-`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`)
-Last reviewed: 2026-09-02
+`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`.
+Phase 00 (Step 09): driver-authorized optional operations, disposition,
+recheck-vs-retry contract text accepted — implementation in Phases 01-03.)
+Last reviewed: 2026-09-03
 Canonical for: CoordinationSession manifest/event schema, storage layout, session-to-Assignment membership, and recovery rules
 Related: [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md), [Assignment, Run, And RunResult Contract](assignment-run-runresult.md), [Runtime Model](../architecture/runtime-model.md), [Work Integration](../architecture/work-integration.md)
 
@@ -117,6 +119,8 @@ reference discipline as `assignmentRefs`. Minimum event kinds:
 | `session-partial` | Terminal `partial` transition. | `ts`, `missingActors` (named, non-empty), `failedActors?`, `lateActors?`, `replacedActors?`, `dissentingActors?` |
 | `session-failed` | Terminal `failed` transition. | `ts`, `reason` |
 | `session-cancelled` | Phase 06 R4: terminal `cancelled` transition. | `ts`, `reason`, `inFlightAssignmentIds?` |
+| `operation-authorized` | Phase 00 (Step 09) MVP2: a driver authorizes a declared `driver-authorized` optional operation binding for dispatch (see [Driver-Authorized Optional Operations And Recheck](#driver-authorized-optional-operations-and-recheck-mvp1mvp2-step-09) below). | `authorizationId`, `operationId`, `nodeId`, `targetActorId`, `invocationKey`, `authorizedBy`, `reason`, `grantedContextRefs`, `targetArtifactRef?`, `ts` |
+| `driver-disposition-recorded` | Phase 00 (Step 09) MVP2: a driver records disposition on a finding/artifact; never a worker-authored result. | `targetRef`, `disposition`, `rationale`, `evidenceRefs`, `authorizedBy`, `ts` |
 
 Additional event kinds may be added by a future phase without breaking this
 contract as long as they do not change the meaning of the kinds above.
@@ -132,6 +136,109 @@ for an `assignmentId` is always the current authoritative view. A second
 `result-linked` for the same `assignmentId` with no intervening
 `run-retried` is rejected as `duplicate-ref`, at both write time and replay
 time.
+
+## Driver-Authorized Optional Operations And Recheck (MVP1/MVP2, Step 09)
+
+Accepted contract text, scoped to MVP1/MVP2 of the Step 09 group-thinking
+substrate ([Step 09 Group Thinking Substrate](../../proposals/step-09-group-thinking-substrate.md#7-mvp2---driver-authorization-primitive)
+remains a Discussion-status document; only the primitives below are promoted
+out of it). This section does NOT accept deliberation memory, visibility
+windows, richer aggregation modes, or `addSessionEdge` (Step 09 MVP6-9)
+— those stay deferred/discussion. This cell treats substrate MVP2 (§7) and
+MVP3 recheck/disposition (§8) as one accepted MVP1/MVP2 slice; only MVP6-9
+concepts above remain deferred/discussion.
+
+### `operation-authorized`
+
+A binding whose [FlowDefinition](flow-definition.md#graph)
+`graph.nodes[].operations[].activation.mode` is `driver-authorized` must not
+materialize an Assignment without a matching `operation-authorized` session
+event preceding that Assignment's `assignment-created` event. Fields, per the
+Event Log row above:
+
+| Field | Notes |
+|---|---|
+| `authorizationId` | Unique id for this authorization instance. |
+| `operationId` | The `spec.operations[].id` being authorized. |
+| `nodeId` | The graph node/binding where the operation activates. |
+| `targetActorId` | The actor the authorization targets. |
+| `invocationKey` | Idempotency key for this logical optional-operation invocation (see below). |
+| `authorizedBy` | `{type: "driver", id: <driver-identity>}`; the driver is not a `spec.actors[]` worker. |
+| `reason` | Human-readable authorization rationale. |
+| `grantedContextRefs` | Refs the resulting Assignment may read (see Context-Grant Enforcement). |
+| `targetArtifactRef` | Optional; the artifact ref the authorized operation is revising or rechecking (the substrate's §7 JSON example name for what §8/§9's gap tables call `artifactRevision`). |
+| `ts` | ISO 8601 timestamp. |
+
+The `assignment-created` event for a driver-authorized operation additionally
+carries `operationId`, `nodeId`, `authorizationId`, `invocationKey`, and
+`contextGrant: {refs: [...]}` so replay can explain why the worker ran and
+which grant made its context legal.
+
+### `driver-disposition-recorded`
+
+Disposition (accepting or rejecting a finding, or closing a round) is a driver
+event, never a worker-authored result:
+
+| Field | Notes |
+|---|---|
+| `targetRef` | The finding or artifact ref the disposition applies to. |
+| `disposition` | e.g. `accepted \| rejected`. |
+| `rationale` | Human-readable reason. |
+| `evidenceRefs` | RunResult/artifact refs supporting the disposition. |
+| `authorizedBy` | Driver provenance, same shape as `operation-authorized.authorizedBy`. |
+| `ts` | ISO 8601 timestamp. |
+
+### `invocationKey` Idempotency
+
+Each `invocationKey` is consumed exactly once per logical optional-operation
+invocation. A second `operation-authorized` (or the Assignment dispatch it
+would trigger) reusing an already-consumed `invocationKey` is rejected. A
+crash between authorization and Assignment creation, followed by resume, must
+not re-dispatch the same logical invocation twice — resume replays
+`events.jsonl` (per Recovery Rule below) and treats an already-consumed
+`invocationKey` as already issued.
+
+`invocationKey` uniqueness is scoped to the CoordinationSession — checked
+against that session's own `events.jsonl`; reuse of the same `invocationKey`
+string across different sessions is not this contract's concern.
+
+### Context-Grant Enforcement
+
+A dispatched worker for a driver-authorized operation may read only the refs
+listed in that authorization's `grantedContextRefs`, plus whatever base
+session context is always legal for that Assignment (its own declared
+inputs). A hidden sibling Assignment's output not named in
+`grantedContextRefs` remains illegal to read, on the same footing as the
+existing `contextVisibility: isolated-until-fan-in` rule under Topology.
+
+Every `grantedContextRefs` entry must resolve to an artifact/ref owned by
+this same `coordinationId` (this session); a ref belonging to a different
+CoordinationSession is rejected. Cross-session grant authority is out of
+scope — no design intent for it exists anywhere in the substrate proposal.
+
+### Recheck Is Not Retry
+
+`run-retried` (above) is unchanged: retry supersedes a Run for the SAME
+Assignment.
+
+Recheck is a distinct, newly-accepted concept: a recheck is a NEW Assignment
+created against a new artifact/evidence revision (typically following a
+`revise-candidate`-style operation), never a retry of the original reviewing
+Assignment. The original Assignment's RunResult and verdict are never
+superseded, rewritten, or deleted by a recheck — both the original and the
+recheck RunResult remain readable, and session synthesis must be able to
+present both without hiding the earlier verdict.
+
+A recheck's idempotent-claim key (`taskKey`, the same hash key the `wx`/
+idempotent-claim precedent cited in the Recovery Rule below already uses to
+decide "already issued, don't recreate") MUST incorporate the new
+artifact/evidence revision or the authorizing `invocationKey`/
+`authorizationId`, so it can never collide with (be claim-equal to) the
+original reviewing Assignment's own `taskKey`. A recheck implementation that
+derives its `taskKey` the same way as the original binding (e.g. by
+`nodeId`+`operationId`+`actorId` alone) would incorrectly resume the
+original Assignment instead of creating a new one — this clause exists
+precisely to forbid that.
 
 ## Recovery Rule
 
@@ -149,6 +256,13 @@ A resumed session must not duplicate a completed Assignment. This requires
 4. A schema/version mismatch between a session's persisted `schemaVersion`
    and the running contract version fails recovery with a named reason; it
    never silently reinterprets the old shape.
+5. Checking whether a session is still `active` and appending an
+   `operation-authorized` event happen as part of the same atomic/serialized
+   write path already used for `assignment-created` (point 2 above) — never
+   a plain check-then-act against a concurrent `transitionSessionStatus`
+   call. Regardless of write-time ordering, replay must treat any
+   `operation-authorized` event appearing after a terminal event in
+   `events.jsonl` as invalid/ignored.
 
 ## Topology
 
@@ -242,3 +356,18 @@ approval/merge state in `.fgos/coordination/`.
   (`openDeclaredProtocolSession`) — boundary-equal (the Nth Assignment under
   a cap of N succeeds, the N+1th is rejected), never bypassable by a fresh
   process/restart (Phase 06 R5).
+- A `driver-authorized` optional-operation binding's Assignment dispatch with
+  no preceding `operation-authorized` event for it is rejected (Phase 00,
+  Step 09 MVP2).
+- A second `operation-authorized` event (or the Assignment dispatch it would
+  trigger) reusing an already-consumed `invocationKey` is rejected, including
+  after a crash/resume replay of `events.jsonl` (Phase 00, Step 09 MVP2).
+- An `operation-authorized` event issued after a session has left `active`
+  (any terminal status) is rejected (Phase 00, Step 09 MVP2).
+- An Assignment dispatched under a `contextGrant` that attempts to read a
+  context ref outside its authorization's `grantedContextRefs` is rejected
+  (Phase 00, Step 09 MVP2).
+- A recheck creates a NEW Assignment against a new artifact/evidence revision
+  without rewriting, superseding, or deleting the original Assignment's
+  RunResult or verdict; both remain readable after the recheck (Phase 00,
+  Step 09 MVP2/MVP3).

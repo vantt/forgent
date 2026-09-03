@@ -48,6 +48,7 @@ import {
   openSession,
   bindActor,
   createSessionAssignment,
+  authorizeOperation,
   linkResult,
   recordRunRetry,
   recordActorReplacement,
@@ -67,7 +68,7 @@ import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
-import { mergePolicyStack } from '../definitions/schema.mjs';
+import { mergePolicyStack, activationModeOf } from '../definitions/schema.mjs';
 import { planCohort, verifyPlannedAllocationAgainstCurrentConfig } from './cohort-planner.mjs';
 
 export const PRIMARY_ACTOR_ID = 'primary';
@@ -277,11 +278,11 @@ async function runExecutorAttempt(assignment, opts) {
  * error is always rethrown unchanged either way; this only ever affects
  * whether the claim file survives the throw.
  */
-async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, contract, caller }, opts = {}) {
+async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance }, opts = {}) {
   const reconciled = replaySession(coordinationId, opts);
   const { fgosDir } = resolveSessionPaths(coordinationId, opts);
 
-  const assignment = createSessionAssignment({ coordinationId, taskKey, actorId, contract, caller }, opts);
+  const assignment = createSessionAssignment({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance }, opts);
 
   const priorLink = lastEventFor(reconciled.events, 'result-linked', assignment.assignmentId);
   if (priorLink) {
@@ -570,23 +571,12 @@ export function validateConsultProposal(
   // execution-contract validator (it only requires contextRefs to be
   // strings) -- this check exists to catch a genuine foreign-state leak,
   // not to police contextRef naming conventions.
-  for (const ref of contextRefs) {
-    if (/^asgn_/.test(ref)) {
-      const exists = fs.existsSync(path.join(fgosDir, 'assignments', ref, 'assignment.json'));
-      if (exists && !assignmentRefs.includes(ref)) {
-        throw new CoordinationError(
-          'validation',
-          `proposeConsult: contextRefs entry "${ref}" references an Assignment outside this session -- sibling/foreign context leakage is rejected`,
-        );
-      }
-    }
-    if (/^coord_/.test(ref) && ref !== coordinationId) {
-      throw new CoordinationError(
-        'validation',
-        `proposeConsult: contextRefs entry "${ref}" references a different coordination session -- cross-session leakage is rejected`,
-      );
-    }
-  }
+  assertRefsOwnedBySession(contextRefs, {
+    coordinationId,
+    assignmentRefs,
+    fgosDir,
+    label: 'proposeConsult: contextRefs entry',
+  });
 
   return { manifest, assignmentRefs };
 }
@@ -852,7 +842,286 @@ function resolveDeclaredOperationActor(definition, operationId, targetActorId) {
     );
   }
 
-  return { operation, actorId: actorEntry.id, actorEntry, node: matchedNode };
+  // `binding` is the node-operation binding itself (`{ref, actor,
+  // activation?}`) -- the ONLY scope `activation` is ever declared at, so
+  // every caller that needs the activation mode reads it from here rather
+  // than from the shared `operation` template, which can never carry one.
+  return { operation, actorId: actorEntry.id, actorEntry, node: matchedNode, binding: matchedRef };
+}
+
+/**
+ * Resolve the ONE `operation-authorized` record (if any) that legitimately
+ * authorizes this exact node-operation binding for this dispatch.
+ *
+ * Matching is by the FULL `(nodeId, operationId, targetActorId)` triple --
+ * never by actor alone and never by operation id alone. Neither is
+ * sufficient on its own, and both failure modes are real rather than
+ * theoretical: one actor is routinely bound to several DIFFERENT operations
+ * at several different graph nodes (a `reviewer` doing both the first-pass
+ * review and a later recheck), and one operation template is routinely
+ * bound at several different nodes and/or actors (an independent fan-out
+ * cohort sharing one template). Under-disambiguating either way would let an
+ * authorization issued for one graph position silently materialize a
+ * different one.
+ *
+ * `resumedAssignmentId`, when supplied, is the Assignment a prior attempt
+ * already claimed for this same taskKey. Its own already-consumed
+ * authorization is preferred over an unconsumed one, so an idempotent resume
+ * never spends a second authorization to redo work the first one already
+ * paid for.
+ */
+function bindingAuthorizations(authorizations, { nodeId, operationId, targetActorId }) {
+  return authorizations.filter(
+    // Do NOT drop `record.nodeId === nodeId` as "redundant" on the strength
+    // of a mutation test. Through the engine doors it can never discriminate
+    // on its own -- `authorizeDeclaredOperation` writes `node.id` from the
+    // same deterministic `resolveDeclaredOperationActor(definition,
+    // operationId, targetActorId)` call this gate resolves through, so nodeId
+    // is a pure function of the other two and no fixture can make dropping it
+    // fail. It is still load-bearing at runtime: an authorization forged
+    // straight through the raw `store.authorizeOperation` door with a real
+    // operationId + targetActorId but a MISMATCHED nodeId reaches the log,
+    // and this comparison is what refuses the dispatch.
+    (record) => record.nodeId === nodeId && record.operationId === operationId && record.targetActorId === targetActorId,
+  );
+}
+
+function resolveBindingAuthorization(authorizations, { nodeId, operationId, targetActorId, resumedAssignmentId }) {
+  const forThisBinding = bindingAuthorizations(authorizations, { nodeId, operationId, targetActorId });
+  const resumeMatch = resumedAssignmentId
+    ? forThisBinding.find((record) => record.consumedByAssignmentId === resumedAssignmentId)
+    : undefined;
+  return resumeMatch ?? forThisBinding.find((record) => record.consumedByAssignmentId === null);
+}
+
+/**
+ * "A recheck's idempotent-claim key (`taskKey`) MUST incorporate the new
+ * artifact/evidence revision or the authorizing `invocationKey`/
+ * `authorizationId`, so it can never collide with (be claim-equal to) the
+ * original reviewing Assignment's own `taskKey`" (coordination-session.md,
+ * "Recheck Is Not Retry"). This picks the authorization whose id becomes that
+ * discriminator, BEFORE any taskKey exists to peek a claim record with:
+ *
+ * - an UNCONSUMED authorization for this binding is the invocation being
+ *   spent, so its id keys a genuinely new Assignment -- structurally unable
+ *   to be claim-equal to any earlier invocation's, or to the original
+ *   binding's `nodeId`+`operationId`+`actorId`-derived key;
+ * - with none left, the sole ALREADY-CONSUMED one (when there is exactly
+ *   one) keeps a repeat call landing on the key its own invocation first
+ *   claimed, so a genuine idempotent/crash resume still resolves to its own
+ *   Assignment rather than minting a second one;
+ * - two or more consumed and none pending is AMBIGUOUS -- a keyless caller
+ *   cannot mean any specific one of them, and guessing would silently
+ *   substitute a different invocation's Assignment/RunResult for the
+ *   caller's own. Returns `null` in this case too.
+ *
+ * Returns `null` when the binding has no authorization at all -- the dispatch
+ * gate below is what refuses that, with its own message.
+ */
+function resolveTaskKeyAuthorization(authorizations, binding) {
+  const forThisBinding = bindingAuthorizations(authorizations, binding);
+  const unconsumed = forThisBinding.find((record) => record.consumedByAssignmentId === null);
+  if (unconsumed) return unconsumed;
+  // No fresh authorization pending: this is either a genuine idempotent
+  // resume (exactly one prior invocation was ever consumed at this binding
+  // -- the ONLY shape resume actually needs) or an AMBIGUOUS repeat (two or
+  // more invocations already consumed, none pending). Guessing "most
+  // recent" in the ambiguous case would silently hand a keyless caller a
+  // DIFFERENT invocation's Assignment/RunResult under its own key -- refuse
+  // by returning null instead (the caller falls through to the unsuffixed
+  // default taskKey, which no claim yet owns, and the dispatch gate's own
+  // existing "no unconsumed authorization" refusal fires cleanly).
+  const consumed = forThisBinding.filter((record) => record.consumedByAssignmentId !== null);
+  return consumed.length === 1 ? consumed[0] : null;
+}
+
+/**
+ * "Every `grantedContextRefs` entry must resolve to an artifact/ref owned by
+ * this same `coordinationId` (this session); a ref belonging to a different
+ * CoordinationSession is rejected."
+ *
+ * The ONE rule both `dispatchDeclaredOperation`'s grant-scope gate and
+ * `validateConsultProposal`'s sibling/foreign-leakage check apply -- not two
+ * divergent copies: a ref naming a real, on-disk Assignment that is not a
+ * member of this session is a genuine foreign-state leak and is refused; a
+ * ref naming a coordination session other than this one is refused BY DISK
+ * EXISTENCE, not by a `coord_`-prefix naming convention (session ids carry
+ * no required prefix), checked by PATH SEGMENT so a path-form ref into
+ * another session's directory is caught the same as a bare id (see
+ * `refSegments`); and a string that merely resembles an id but resolves to
+ * nothing on disk is left alone, because this codebase has no artifact
+ * registry to resolve it against and policing naming conventions is not
+ * what this clause is for.
+ */
+// Checked by SEGMENT, not by whole-string prefix: a bare id like
+// "coord_other" or "asgn_x" is its own single segment and keeps behaving
+// exactly as before, but a PATH-FORM ref naming the same foreign
+// session/Assignment (e.g. ".fgos/coordination/sessions/coord_other/
+// events.jsonl") is caught too -- a whole-string `/^coord_/`/`/^asgn_/`
+// test never fires on that shape, because the string does not itself start
+// with either prefix.
+function refSegments(ref) {
+  return ref.split(/[\\/]/).filter(Boolean);
+}
+
+function assertRefsOwnedBySession(refs, { coordinationId, assignmentRefs, fgosDir, label }) {
+  for (const ref of refs) {
+    if (typeof ref !== 'string') {
+      throw new CoordinationError('validation', `${label}: ref must be a string, got ${typeof ref}`);
+    }
+    for (const segment of refSegments(ref)) {
+      // Checked by DISK EXISTENCE, not by a `coord_` naming convention:
+      // `openSession`/`openDeclaredProtocolSession` accept any
+      // `assertSafeCoordinationId`-legal id (alnum/underscore/hyphen, no
+      // required prefix), so a real foreign session named e.g. "privatebox"
+      // is invisible to a prefix test. Mirrors the `asgn_` existence check
+      // immediately below rather than diverging from it.
+      if (segment !== coordinationId && fs.existsSync(path.join(fgosDir, 'coordination', 'sessions', segment, 'session.json'))) {
+        throw new CoordinationError(
+          'validation',
+          `${label}: ref "${ref}" names a different coordination session -- cross-session grant authority is out of scope`,
+        );
+      }
+      if (/^asgn_/.test(segment)) {
+        const exists = fs.existsSync(path.join(fgosDir, 'assignments', segment, 'assignment.json'));
+        if (exists && !assignmentRefs.includes(segment)) {
+          throw new CoordinationError(
+            'validation',
+            `${label}: ref "${ref}" resolves to an Assignment that is not a member of coordination session "${coordinationId}" -- every granted ref must resolve to a ref owned by this same coordinationId`,
+          );
+        }
+      }
+    }
+  }
+}
+
+/**
+ * The Assignment id a prior attempt already claimed for `taskKey`, or
+ * `null`. Read-only peek at `createSessionAssignment`'s own claim record
+ * (`store.mjs`'s `tasks/<hashTaskKey>.json`) -- never a second claim
+ * mechanism, and never written here.
+ */
+function peekClaimedAssignmentId(sessionDir, taskKey) {
+  const taskClaimPath = path.join(sessionDir, 'tasks', `${hashTaskKey(taskKey)}.json`);
+  if (!fs.existsSync(taskClaimPath)) return null;
+  try {
+    const claim = JSON.parse(fs.readFileSync(taskClaimPath, 'utf8'));
+    return claim.taskKey === taskKey && isNonEmptyString(claim.assignmentId) ? claim.assignmentId : null;
+  } catch (err) {
+    throw new CoordinationError('corrupt-log', `task claim record for taskKey "${taskKey}" at ${taskClaimPath} is not valid JSON: ${err.message}`);
+  }
+}
+
+/**
+ * Authorize ONE `activation.mode: driver-authorized` node-operation binding
+ * of the protocol bound to `coordinationId`, appending the
+ * `operation-authorized` event `dispatchDeclaredOperation`'s gate then
+ * requires (R2/R4).
+ *
+ * This is the door that can answer what `store.mjs`'s `authorizeOperation`
+ * structurally cannot: whether `(nodeId, operationId, targetActorId)` names
+ * a REAL binding in this session's own declared protocol, and whether that
+ * binding is actually `driver-authorized`. An authorization naming an
+ * undeclared operation, an actor the graph never pairs with that operation,
+ * or a node that does not host that pairing is rejected before anything is
+ * appended. Authorizing a `required` binding is rejected too: it would be a
+ * meaningless record that no gate will ever consult.
+ *
+ * `nodeId` is optional and derived from the resolved binding when omitted;
+ * when supplied it must name the node that actually hosts this
+ * operation/actor pairing.
+ *
+ * @param {string} coordinationId Must already have a non-null `definitionRef`.
+ * @param {object} params
+ * @param {string} params.operationId
+ * @param {string} [params.targetActorId] Disambiguates which actor binding when the operation is wired to more than one.
+ * @param {string} [params.nodeId] Checked against the resolved binding's node when supplied.
+ * @param {string} params.authorizationId Unique id for this authorization instance.
+ * @param {string} params.invocationKey Idempotency key for this logical optional-operation invocation.
+ * @param {{type: 'driver', id: string}} params.authorizedBy
+ * @param {string} params.reason
+ * @param {string[]} [params.grantedContextRefs] Refs the resulting Assignment may read; defaults to none.
+ * @param {string} [params.targetArtifactRef] The artifact revision being revised/rechecked.
+ * @param {object} [opts] Workspace options ({ cwd, repoRoot, packageRoot })
+ */
+export function authorizeDeclaredOperation(
+  coordinationId,
+  { operationId, targetActorId, nodeId, authorizationId, invocationKey, authorizedBy, reason, grantedContextRefs = [], targetArtifactRef },
+  opts = {},
+) {
+  const manifest = readManifest(coordinationId, opts);
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeDeclaredOperation: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no binding for an authorization to name`,
+    );
+  }
+  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeDeclaredOperation: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to authorize against a drifted definition`,
+    );
+  }
+
+  const { actorId, node, binding } = resolveDeclaredOperationActor(definition, operationId, targetActorId);
+  if (nodeId !== undefined && nodeId !== node.id) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeDeclaredOperation: nodeId "${nodeId}" does not host operation "${operationId}" bound to actor "${actorId}" (that binding lives at node "${node.id}")`,
+    );
+  }
+  const mode = activationModeOf(binding);
+  if (mode !== 'driver-authorized') {
+    throw new CoordinationError(
+      'validation',
+      `authorizeDeclaredOperation: operation "${operationId}" at node "${node.id}" for actor "${actorId}" declares activation.mode "${mode}" -- only a "driver-authorized" binding can be authorized`,
+    );
+  }
+
+  // The grant's same-session scope is checked HERE as well as at dispatch:
+  // refusing an out-of-session ref before the authorization is ever written
+  // keeps an illegal grant off the log entirely, rather than leaving a
+  // permanently unusable authorization behind for the gate to refuse later.
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  assertRefsOwnedBySession(grantedContextRefs, {
+    coordinationId,
+    assignmentRefs: manifest.assignmentRefs,
+    fgosDir,
+    label: `authorizeDeclaredOperation: grantedContextRefs`,
+  });
+  // The artifact revision this authorization names is a session-linked ref
+  // too, checked by the same rule as the grant (the dispatch gate re-checks
+  // it, for the same reason it re-checks the grant: the raw store door has no
+  // session awareness of its own).
+  if (targetArtifactRef !== undefined) {
+    assertRefsOwnedBySession([targetArtifactRef], {
+      coordinationId,
+      assignmentRefs: manifest.assignmentRefs,
+      fgosDir,
+      label: `authorizeDeclaredOperation: targetArtifactRef`,
+    });
+  }
+
+  return authorizeOperation(
+    coordinationId,
+    {
+      authorizationId,
+      operationId,
+      nodeId: node.id,
+      targetActorId: actorId,
+      invocationKey,
+      authorizedBy,
+      reason,
+      grantedContextRefs,
+      targetArtifactRef,
+    },
+    // `activation.maxInvocations` lives on the binding, which only this
+    // definition-aware door can read; store.mjs enforces it lock-held.
+    binding.activation?.maxInvocations !== undefined
+      ? { ...opts, maxInvocationsForBinding: binding.activation.maxInvocations }
+      : opts,
+  );
 }
 
 // ─── Phase 03 R5: session bounds, enforced before materialization/launch ──
@@ -1141,9 +1410,34 @@ export async function dispatchDeclaredOperation(
     );
   }
 
-  const { operation, actorId, actorEntry } = resolveDeclaredOperationActor(definition, operationId, targetActorId);
+  const { operation, actorId, actorEntry, node, binding } = resolveDeclaredOperationActor(definition, operationId, targetActorId);
   const topology = definition.spec.profile.topology;
   const incomingEdge = topology?.edges?.find((edge) => edge.to === actorId);
+
+  // One reconstruction per dispatch, shared by the edge validation below and
+  // the driver-authorization gate further down (nothing writes in between).
+  let replayed = null;
+  const replayOnce = () => (replayed ??= replaySession(coordinationId, opts));
+
+  const isDriverAuthorized = activationModeOf(binding) === 'driver-authorized';
+
+  // Recheck-vs-retry: a driver-authorized invocation's default claim key
+  // carries the id of the authorization it spends, so a recheck reaches a NEW
+  // Assignment instead of resuming the original binding's one. Derived here,
+  // before the key is built, because the key is what a claim record is looked
+  // up by (see `resolveTaskKeyAuthorization`). A caller-supplied `taskKey` is
+  // left exactly as given -- the caller owns its own claim identity, and the
+  // gate below still refuses a key that would resume somebody else's
+  // Assignment.
+  let authorizationKeySuffix = '';
+  if (isDriverAuthorized && explicitTaskKey === undefined) {
+    const keyAuthorization = resolveTaskKeyAuthorization(replayOnce().authorizations, {
+      nodeId: node.id,
+      operationId,
+      targetActorId: actorId,
+    });
+    if (keyAuthorization) authorizationKeySuffix = `:auth:${keyAuthorization.authorizationId}`;
+  }
 
   let resolvedContextRefs;
   let resolvedIntent = null;
@@ -1156,7 +1450,7 @@ export async function dispatchDeclaredOperation(
         `dispatchDeclaredOperation: operation "${operationId}" is reached by a declared topology edge from "${incomingEdge.from}" -- fromAssignmentId is required`,
       );
     }
-    const { assignmentRefs, events } = replaySession(coordinationId, opts);
+    const { assignmentRefs, events } = replayOnce();
     if (!assignmentRefs.includes(fromAssignmentId)) {
       throw new CoordinationError(
         'validation',
@@ -1181,7 +1475,7 @@ export async function dispatchDeclaredOperation(
       );
     }
 
-    taskKey = explicitTaskKey ?? `declared:${operationId}:round-${round}`;
+    taskKey = explicitTaskKey ?? `declared:${operationId}:round-${round}${authorizationKeySuffix}`;
     const { sessionDir } = resolveSessionPaths(coordinationId, opts);
     const taskClaimPath = path.join(sessionDir, 'tasks', `${hashTaskKey(taskKey)}.json`);
     const isResumeOfThisRound = fs.existsSync(taskClaimPath);
@@ -1205,8 +1499,161 @@ export async function dispatchDeclaredOperation(
     // reach this branch at all.
     resolvedContextRefs = [fromAssignmentId];
   } else {
-    taskKey = explicitTaskKey ?? `declared:${operationId}`;
+    taskKey = explicitTaskKey ?? `declared:${operationId}${authorizationKeySuffix}`;
     resolvedContextRefs = Array.isArray(contextRefs) ? contextRefs : [];
+  }
+
+  // R4 driver-authorization gate. Applies ONLY to a binding that actually
+  // declares `activation.mode: driver-authorized`; a `required` binding (the
+  // default, and every pre-existing fixture) never reaches this branch and
+  // its dispatch path is byte-for-byte unchanged.
+  //
+  // This read is unlocked, like every other pre-lock check in this function,
+  // so it is a fast-fail. The AUTHORITATIVE "one authorization materializes
+  // at most one Assignment" enforcement is `createSessionAssignment`'s own
+  // lock-held check on `authorizationProvenance.authorizationId`
+  // (store.mjs), reached via the provenance forwarded below -- the same
+  // pre-lock-advisory / lock-held-authoritative split the round and
+  // aggregate-bounds caps already use.
+  let authorizationProvenance;
+  if (isDriverAuthorized) {
+    const { sessionDir } = resolveSessionPaths(coordinationId, opts);
+    const { authorizations, ignoredAuthorizations } = replayOnce();
+    const resumedAssignmentId = peekClaimedAssignmentId(sessionDir, taskKey);
+    const authorization = resolveBindingAuthorization(authorizations, {
+      nodeId: node.id,
+      operationId,
+      targetActorId: actorId,
+      resumedAssignmentId,
+    });
+    if (!authorization) {
+      // An authorization for this exact binding that replay neutralized as
+      // post-terminal is reported alongside the refusal, so an operator can
+      // tell "none was ever issued" apart from "one was issued but landed
+      // after the session closed" -- the only observability cost of replay's
+      // ignore-rather-than-throw reading of Recovery Rule point 5.
+      const neutralized = ignoredAuthorizations.filter(
+        (record) => record.nodeId === node.id && record.operationId === operationId && record.targetActorId === actorId,
+      );
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: operation "${operationId}" at node "${node.id}" for actor "${actorId}" declares activation.mode "driver-authorized", and no unconsumed "operation-authorized" event in session "${coordinationId}" authorizes that exact binding -- refusing to materialize an Assignment${
+          neutralized.length > 0
+            ? ` (${neutralized.length} "operation-authorized" event(s) for this binding were ignored as post-terminal: ${neutralized.map((record) => `"${record.authorizationId}"`).join(', ')})`
+            : ''
+        }`,
+      );
+    }
+
+    // Minimal safety guard, NOT recheck semantics (Phase 03's job, Non-Goals):
+    // with no explicit `taskKey`, this operation's default derivation
+    // (`declared:${operationId}`, above) carries no per-invocation
+    // discriminator -- and, for THIS branch specifically, no `targetActorId`
+    // discriminator either -- so a taskKey can collide two ways: a SECOND
+    // authorized invocation at the SAME binding, or (fan-out: one
+    // operationId wired to two different actors) a DIFFERENT binding
+    // entirely. Either way `resumedAssignmentId` resolves to an
+    // ALREADY-REGISTERED Assignment that a DIFFERENT authorization never
+    // consumed, and `createSessionAssignment`'s claim-branch early return
+    // would hand that Assignment (and its RunResult) back as if it were the
+    // caller's own, discarding the real authorization with no error. Fail
+    // loudly instead: refusing invents no new taskKey-derivation behavior
+    // (that stays Phase 03's), it just stops this shape from looking like
+    // success. `manifest.assignmentRefs.includes(...)` is the load-bearing
+    // guard against firing on a genuine crash-recovery self-heal target,
+    // whose claim is NOT yet registered.
+    if (resumedAssignmentId && manifest.assignmentRefs.includes(resumedAssignmentId)) {
+      if (authorization.consumedByAssignmentId !== resumedAssignmentId) {
+        // Cross-binding collision (fan-out): the authorization THIS call
+        // resolved to (by its own nodeId/operationId/targetActorId triple)
+        // was never the one that produced the Assignment this taskKey
+        // already claims -- a different binding's authorization, still
+        // unconsumed, is about to be silently discarded while this caller
+        // is handed the OTHER binding's result as its own.
+        throw new CoordinationError(
+          'validation',
+          `dispatchDeclaredOperation: taskKey "${taskKey}" already resolves to Assignment "${resumedAssignmentId}", but authorization "${authorization.authorizationId}" for this exact binding (node "${node.id}", operation "${operationId}", actor "${actorId}") is not the one that Assignment consumed -- resuming would silently substitute a different binding's result for this one; pass an explicit, distinct taskKey (e.g. including the target actor) to invoke this binding`,
+        );
+      }
+      // Same-binding collision: `authorization` IS the one resumedAssignmentId
+      // already consumed (a genuine resume-match) -- still refuse if a
+      // FRESHER unconsumed sibling authorization for this exact triple
+      // exists, so a caller-issued second invocation at the SAME binding is
+      // never silently ignored either.
+      const freshUnconsumed = authorizations.find(
+        (record) =>
+          record.nodeId === node.id &&
+          record.operationId === operationId &&
+          record.targetActorId === actorId &&
+          record.consumedByAssignmentId === null,
+      );
+      if (freshUnconsumed) {
+        throw new CoordinationError(
+          'validation',
+          `dispatchDeclaredOperation: taskKey "${taskKey}" already resolves to Assignment "${resumedAssignmentId}", but a fresher unconsumed authorization "${freshUnconsumed.authorizationId}" exists for this same binding (node "${node.id}", operation "${operationId}", actor "${actorId}") -- resuming would silently discard that authorization instead of consuming it; pass an explicit, distinct taskKey to invoke this binding again`,
+        );
+      }
+    }
+
+    // Context-grant enforcement, both halves, INSIDE the dispatch path --
+    // between resolving the authorization and building the contract this
+    // function then hands to the executor. There is no other route to a
+    // driver-authorized dispatch (this block is the only producer of
+    // `authorizationProvenance`), so this is a gate, not an advisory filter
+    // a caller could skip.
+    //
+    // (a) The grant itself must stay inside this session. Re-checked here
+    //     even though `authorizeDeclaredOperation` already refused it at
+    //     write time, because the raw `store.authorizeOperation` door has no
+    //     session-membership awareness and can put such a record on the log.
+    assertRefsOwnedBySession(authorization.grantedContextRefs, {
+      coordinationId,
+      assignmentRefs: manifest.assignmentRefs,
+      fgosDir,
+      label: `dispatchDeclaredOperation: authorization "${authorization.authorizationId}" grantedContextRefs`,
+    });
+
+    //     `targetArtifactRef` -- the artifact revision this invocation is
+    //     revising or rechecking -- is a ref the session LINKS, on the same
+    //     footing as the granted refs, so it is scope-checked identically.
+    //     A session that could name another session's artifact revision as
+    //     what it is rechecking would be recording cross-session lineage the
+    //     grant clause exists to keep out.
+    if (authorization.targetArtifactRef !== undefined) {
+      assertRefsOwnedBySession([authorization.targetArtifactRef], {
+        coordinationId,
+        assignmentRefs: manifest.assignmentRefs,
+        fgosDir,
+        label: `dispatchDeclaredOperation: authorization "${authorization.authorizationId}" targetArtifactRef`,
+      });
+    }
+
+    // (b) The dispatched worker may read ONLY the granted refs plus the base
+    //     context that is always legal for this Assignment. The single base
+    //     ref is the mediated-visibility upstream request under a declared
+    //     topology edge -- structurally imposed by the topology (already
+    //     validated to belong to the edge's declared `from` actor) and never
+    //     caller-widenable. Everything else on a driver-authorized dispatch
+    //     is caller-supplied and must be named by the grant, so a sibling
+    //     Assignment's output the driver never granted stays illegal to read.
+    const legalContextRefs = new Set(authorization.grantedContextRefs);
+    if (incomingEdge) legalContextRefs.add(fromAssignmentId);
+    for (const ref of resolvedContextRefs) {
+      if (!legalContextRefs.has(ref)) {
+        throw new CoordinationError(
+          'validation',
+          `dispatchDeclaredOperation: contextRefs entry "${ref}" is not granted by authorization "${authorization.authorizationId}" (grantedContextRefs: [${authorization.grantedContextRefs.join(', ')}]) -- a driver-authorized worker may read only the granted refs plus its own always-legal base context`,
+        );
+      }
+    }
+
+    authorizationProvenance = {
+      operationId,
+      nodeId: node.id,
+      authorizationId: authorization.authorizationId,
+      invocationKey: authorization.invocationKey,
+      contextGrant: { refs: [...authorization.grantedContextRefs] },
+    };
   }
 
   // R5: task-depth bound, checked against the REAL parent chain (never a
@@ -1302,7 +1749,7 @@ export async function dispatchDeclaredOperation(
   // `createSessionAssignment`'s own lock (store.mjs), never decided by a
   // pre-lock read in this function.
   const dispatchResult = await createAndExecuteSessionTask(
-    { coordinationId, taskKey, actorId, contract, caller },
+    { coordinationId, taskKey, actorId, contract, caller, authorizationProvenance },
     {
       ...opts,
       cliOverride,
@@ -1310,6 +1757,23 @@ export async function dispatchDeclaredOperation(
       maxConcurrencyForSession: manifest.aggregateBounds.maxConcurrency,
       maxRoundsForSession: manifest.aggregateBounds.maxRounds,
       ...(incomingEdge ? { maxRoundsForActor: incomingEdge.maxRounds ?? Infinity } : {}),
+      // A binding cap only ever NARROWS this one binding; store.mjs runs it
+      // after every session-wide cap, so an aggregate bound that is stricter
+      // still refuses first and a binding cap can never widen one. Forwarded
+      // regardless of activation mode: the count comes from
+      // `operation-authorized` events, which a `required` binding never has,
+      // so declaring `maxInvocations` without `driver-authorized` stays inert
+      // rather than silently meaning something different.
+      ...(binding.activation?.maxInvocations !== undefined
+        ? {
+            bindingInvocationCap: {
+              maxInvocations: binding.activation.maxInvocations,
+              nodeId: node.id,
+              operationId,
+              targetActorId: actorId,
+            },
+          }
+        : {}),
     },
   );
 

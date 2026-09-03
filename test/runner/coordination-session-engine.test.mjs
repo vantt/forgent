@@ -488,12 +488,12 @@ test('proposeConsult rejects a contextRef that leaks a foreign Assignment belong
         { ...consultParams(primaryId), contextRefs: [foreignAssignment.assignmentId] },
         { cwd: tempDir },
       ),
-    (err) => err instanceof CoordinationError && /sibling\/foreign context leakage/.test(err.message),
+    (err) => err instanceof CoordinationError && /is not a member of coordination session "coord_consult_leak"/.test(err.message),
   );
 
   assert.throws(
     () => validateConsultProposal('coord_consult_leak', { ...consultParams(primaryId), contextRefs: ['coord_unrelated'] }, { cwd: tempDir }),
-    (err) => err instanceof CoordinationError && /cross-session leakage/.test(err.message),
+    (err) => err instanceof CoordinationError && /cross-session grant authority is out of scope/.test(err.message),
   );
 });
 
