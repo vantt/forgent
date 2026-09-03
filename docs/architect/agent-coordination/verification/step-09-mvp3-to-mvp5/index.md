@@ -48,7 +48,7 @@ own work.
 | 00 | Intake | R1-R4 | done |
 | 01 | MVP3 | R1-R8 (see phase file) | done |
 | 02 | MVP4 | R1-R6 (see phase file; split P02.1 R1-R4 / P02.2 R5-R6) | done |
-| 03 | Config | R1-Rn (see phase file) | missing |
+| 03 | Config | R1-R8 (see phase file) | done |
 | 04 | MVP5 | R1-Rn (see phase file) | missing |
 
 ## Active Cell
@@ -57,7 +57,7 @@ None.
 
 ## Next Action
 
-Prepare P03.1 (Phase 03 — Config: role execution policy readiness).
+Prepare P04.1 (Phase 04 — MVP5: usable standalone live proof).
 
 ## Cell Log
 
@@ -67,6 +67,52 @@ Prepare P03.1 (Phase 03 — Config: role execution policy readiness).
 | P01.1 | Phase 01 R1-R8 (closes Phase 01) | done | `633da1f5` |
 | P02.1 | Phase 02 R1-R4 | done | `fb18c372` |
 | P02.2 | Phase 02 R5-R6 (closes Phase 02) | done | `c963f2a7` |
+| P03.1 | Phase 03 R1-R8 (closes Phase 03) | done | pending |
+
+## Phase 03 Status
+
+**CLOSED.** R1-R8 via P03.1, one cell. R1 audit found every one of the
+fixture's 6 operations collapsed to identical `standard`-tier dispatch
+resolution today, with `capabilities[]` inert for this fixture's
+non-cohort dispatch path (confirmed independently by both Reviewer and
+Red-Team via full-`src/` grep, not just cited). Added `policy.minTier` to
+all 6 operations — the only portable field actually wired into
+resolution: Doer/Fixer `standard`, Reviewer/Red-Team/Recheck `analytical`.
+Deliberately did not add `capabilities[]` (inert) or `preferExecutor`
+(barred at portable scope by `assertNoPortableExecutorPin`).
+
+R4 (Red-Team critical escalation) and R5 (read-only-executor preference)
+closed via existing, already-wired mechanisms rather than new fixture/
+schema plumbing — assignment/CLI-scope PolicyPatch and the pre-existing
+`executors.claude-reviewer` config entry. Red-Team's independent
+verification found this is MORE usable today than the Doer's own trace
+claimed: `fgos coordination run --file <request.json>` already accepts
+per-actor tier overrides live, so escalation doesn't need to wait for
+Phase 04 work.
+
+Reviewer round (APPROVE, 2 LOW — cosmetic prose nits in the trace itself,
+not the shipped code) ran in parallel with Red-Team round (APPROVE, 3 LOW
+— documentation/completeness notes only). 7 Red-Team attacks all held:
+fail-closed tier resolution proven to have no alternate silent-downgrade
+path across every dispatch entry point (declared-operation, primary-task,
+retry, fan-out); `capabilities[]` inertness re-confirmed independently;
+tier monotonicity confirmed by-design, not an over-constraint; R8's 4 new
+tests confirmed genuinely end-to-end (real fixture, real session-engine,
+real child-process fake executor, no stub). No fix round required — 5 LOW
+findings recorded as follow-up, non-blocking.
+
+R7: nothing new needed setup/doctor registration — `policy.minTier` is a
+pre-existing schema field, `claude-reviewer` executor already existed.
+
+Full suite (final): 5191 tests, 5184 pass, 1 fail — exactly the track's
+recorded baseline; no new failure. Focused glob
+(`test/runner/dispatch*.test.mjs test/runner/flow-definition*.test.mjs`)
+418/418 pass throughout.
+
+**This closes Phase 03 (Config) entirely.**
+
+Next: P04.1 (Phase 04 — MVP5, usable standalone live proof; the plan's
+final phase).
 
 ## Phase 02 Status
 

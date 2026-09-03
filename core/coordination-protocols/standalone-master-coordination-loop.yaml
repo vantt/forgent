@@ -56,34 +56,71 @@ spec:
     - id: fixer
       role: fixer
 
+  # Phase 03 (Step 09 P03.1) R2-R6: `policy.minTier` per operation is the
+  # ONLY portable lever that actually changes dispatch resolution outcome
+  # for this fixture's own (non-cohort) materialization path
+  # (`dispatchDeclaredOperation` -> `resolveAssignmentDispatchPolicy`,
+  # `src/runner/dispatch/assignment-policy.mjs`) -- `capabilities[]` is
+  # deliberately NOT declared here: per flow-definition.md's own Operation
+  # Primitive table ("stored and validated, does not resolve execution
+  # infrastructure directly") it is read only by the Cohort Planner
+  # (`cohort-planner.mjs`'s `planCohort`, candidate-matching for a
+  # `spec.profile.cohort` allocation), and this fixture declares no
+  # `profile.topology`/`profile.cohort` at all -- adding it here would be
+  # inert metadata with nothing to prove via a real dispatch test (P03.1.md
+  # R1 audit). `preferExecutor` (e.g. pinning the read-only-scoped
+  # `executors.claude-reviewer` config entry for Reviewer/Red-Team) is
+  # deliberately NOT declared here either -- `assertNoPortableExecutorPin`
+  # (session-engine.mjs) refuses a literal executor pin at this portable
+  # operation/role/actor/definition scope by design (flow-definition.md
+  # PolicyPatch: "a portable ... definition expresses requirements ...
+  # never literal executor/model pins"); that selection belongs to a
+  # trusted per-dispatch-call scope (`assignmentPolicy`/`cliPolicy`, or a
+  # `kind:"declared-protocol"` request's own `actors[].executor` field,
+  # `src/verbs/coordination/schema.mjs`) supplied by whichever driver
+  # invokes this fixture -- see P03.1.md's Final Intended Mapping for the
+  # concrete recommendation left for that caller (Phase 04's own scope, not
+  # this cell's).
   operations:
     - id: produce-candidate
       role: doer
+      policy:
+        minTier: standard
       result:
         kind: work-product
         evidenceRequired: reported
     - id: review-candidate
       role: reviewer
+      policy:
+        minTier: analytical
       result:
         kind: advisory
         evidenceRequired: reported
     - id: red-team-candidate
       role: red-team
+      policy:
+        minTier: analytical
       result:
         kind: advisory
         evidenceRequired: reported
     - id: revise-candidate
       role: fixer
+      policy:
+        minTier: standard
       result:
         kind: work-product
         evidenceRequired: reported
     - id: reviewer-recheck
       role: reviewer
+      policy:
+        minTier: analytical
       result:
         kind: advisory
         evidenceRequired: reported
     - id: red-team-recheck
       role: red-team
+      policy:
+        minTier: analytical
       result:
         kind: advisory
         evidenceRequired: reported
