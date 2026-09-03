@@ -63,7 +63,7 @@ Prepare P01.1 (Phase 01 — MVP3 recheck lineage and driver disposition).
 
 | Cell | Requirements | Status | Commit |
 |---|---|---|---|
-| P00.1 | Phase 00 R1, R2, R3, R4 (closes Phase 00) | done | pending |
+| P00.1 | Phase 00 R1, R2, R3, R4 (closes Phase 00) | done | `95f7971c` |
 
 ## Phase 00 Status
 
