@@ -29,8 +29,8 @@ single shared `current-cell.md`.
 
 | Phase | Requirement | Status |
 |---|---|---|
-| P01 | R1-R9 (mutation unlock, kernel) | missing |
-| P02 | R1-R8 (chain verb, pack registration) | missing |
+| P01 | R1-R9 (mutation unlock, kernel) | in-progress (P01.1 fixing accepted HIGH red-team finding) |
+| P02 | R1-R8 (chain verb, pack registration) | done (P02.1 closed and merged) |
 | P03 | live proof + skill | missing (blocked on P01+P02 close) |
 
 ## Corrections found during cell preparation (grounded, not assumed)
@@ -83,8 +83,28 @@ that introduced it.
 
 | Cell | Status | Owner | Worktree | Next action |
 |---|---|---|---|---|
-| P01.1 | review-needed | Coordinator | `.claude/worktrees/agent-ab7ff2ac5eda7a106` / `worktree-agent-ab7ff2ac5eda7a106` @ `8b24c8a2` | reviewer+red-team (dispatching, parallel) |
-| P02.1 | review-needed | Coordinator | `.claude/worktrees/agent-a1cf5464f865986fb` / `worktree-agent-a1cf5464f865986fb` @ `42af6508` | reviewer+red-team (running, resumed after rate limit) |
+| P01.1 | fixes-needed | Coordinator | `.claude/worktrees/agent-ab7ff2ac5eda7a106` / `worktree-agent-ab7ff2ac5eda7a106` @ `8b24c8a2` | fixer-p01-1 running (accepted HIGH: forgeable stamp bypass) |
+| P02.1 | **done** | Coordinator | merged into `group-thinking-plan-loop` (Doer `42af6508`, Fixer `a39a920f`) | closed |
+
+## P01.1 disposition (kernel cell — HIGH red-team finding)
+
+Reviewer APPROVE (0H/0M/1L). Red-Team REJECT (1 HIGH): a caller
+importing the exported `PROTOCOL_OPERATION_STAMP_PREFIX` and calling
+`buildAssignment`+`executeAssignment` directly (bypassing
+`session-engine.mjs` entirely) could self-forge the "engine-reserved"
+stamp and produce a real mutating file write with none of R1/R2/R3's
+checks ever running — genuinely new attack surface from this cell.
+Accepted; fixer-p01-1 dispatched to re-verify R2/R3 at the actual
+dispatch-layer execution point (defense in depth), not merely hide the
+stamp constant. Full disposition in P01.1.md's own "Coordinator
+Disposition (P01.1)" section.
+
+## P02.1 close
+
+Both Reviewer and Red-Team APPROVE on the post-fix recheck (F1 HIGH + F2
+MEDIUM genuinely fixed, verified against real seeded fixtures beyond what
+either original attack covered). 174/174 focused tests pass. Merged into
+`group-thinking-plan-loop`. Phase 02 is fully done (its only cell).
 
 ## P01.1 Coordinator independent verification (before dispatching Reviewer/Red-Team)
 
@@ -127,7 +147,9 @@ from this track's own coordination.
 
 ## Next action
 
-P01.1 Doer still running. P02.1 verified by Coordinator, dispatching
-independent Reviewer + Red-Team in parallel now.
+P02.1 closed and merged. Waiting on fixer-p01-1 for the accepted HIGH
+finding, then a full Reviewer+Red-Team recheck of P01.1 (kernel cell, no
+shortcut). Once P01.1 closes and merges too, re-run the full suite once
+(Wave 1 complete), then open Wave 2 (P03.1).
 current-cell contracts: `current-cell-P01.1.md`, `current-cell-P02.1.md`.
 Cell traces: `P01.1.md`, `P02.1.md`.
