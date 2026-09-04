@@ -126,3 +126,38 @@ documented working recovery recipe for a future live incident, not just
 a re-baseline-and-move-on. Root-causing *which* process runs the raw git
 command against the shared checkout remains open — out of this item's
 own scope, tracked separately.
+
+## A latent footgun in the guard's own default `fileKey` (`tsk-myq`)
+
+`checkEventsJsonlTruncationGuard`/`advanceEventsJsonlTruncationGuard`
+(`src/state/events-jsonl-truncation-guard.mjs`) both default their
+`fileKey` parameter to `path.basename(logPath)` when a caller omits it.
+For a per-writer shard file under `.fgos/events/<writer-id>-<ts>.jsonl`,
+every other real caller — `discoverGuardedFiles` (same file), `fgos
+doctor`'s `checkEventsJsonlNotTruncated` check
+(`src/setup/registrations.mjs`), and `tsk-46v`'s
+`forceRebaselineTruncationGuard()` — computes the fileKey as
+`events/<name>`, WITH the `events/` prefix. A caller invoking the
+module's `--check`/`--advance` CLI modes directly against a shard path
+(exactly the pattern `docs/how-to/resolve-an-events-jsonl-truncation.md`'s
+own pre-`tsk-46v` example encouraged, and the mistake made once during
+this session's own `tsk-46v` investigation) silently reads/writes a
+*different* sidecar entry than the one doctor and the opportunistic
+checks above actually consult — a real break, or a real re-baseline,
+goes invisible under the wrong key.
+
+`tsk-46v`'s own `--force-rebaseline-all` addition was unaffected on
+purpose — it computes every fileKey correctly via `discoverGuardedFiles`
+internally, so it never hit this path. `tsk-myq` closed the older
+single-file `--check`/`--advance` CLI modes' own gap: a new
+`deriveFileKeyFromLogPath(logPath)` helper (same file) returns
+`events/<name>` when the log's parent directory is `events`, else falls
+back to `path.basename(logPath)` — matching the exact convention
+`discoverGuardedFiles` already used — and both
+`checkEventsJsonlTruncationGuard` and `advanceEventsJsonlTruncationGuard`
+now default their `fileKey` parameter to that helper instead of the bare
+`path.basename`. The item's own plan started with the scope genuinely
+open ("chưa xác định — cần research thêm" between requiring `--file-key`
+explicitly vs. auto-deriving it) but landed on auto-derive, since it
+could reuse the same convention `discoverGuardedFiles` already encoded
+rather than introducing a second flag callers would need to remember.
