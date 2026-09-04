@@ -1,0 +1,55 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Collect three private proposals, then have the facilitator share them together.",
+  "writerId": "nominal-group-driver",
+  "coordinationId": "coord_nominal_group_example",
+  "protocolRef": { "id": "core.coordination-protocol.group-thinking-nominal-group-lite" },
+  "steps": [
+    {
+      "type": "operation",
+      "as": "proposeA",
+      "operationId": "private-propose",
+      "targetActorId": "participant-a",
+      "taskKey": "nominal-group-propose-a",
+      "objective": "Privately propose an idea, without seeing the other participants' own proposals.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "proposeB",
+      "operationId": "private-propose",
+      "targetActorId": "participant-b",
+      "taskKey": "nominal-group-propose-b",
+      "objective": "Privately propose an idea, without seeing the other participants' own proposals.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "proposeC",
+      "operationId": "private-propose",
+      "targetActorId": "participant-c",
+      "taskKey": "nominal-group-propose-c",
+      "objective": "Privately propose an idea, without seeing the other participants' own proposals.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "authorize",
+      "as": "authShare",
+      "operationId": "share",
+      "targetActorId": "facilitator-actor",
+      "authorizationId": "auth_nominal_group_example_share",
+      "invocationKey": "nominal-group-example-share:1",
+      "reason": "All three private proposals have settled -- open the controlled share.",
+      "grantedContextRefs": ["$ref:proposeA", "$ref:proposeB", "$ref:proposeC"]
+    },
+    {
+      "type": "operation",
+      "as": "share",
+      "operationId": "share",
+      "targetActorId": "facilitator-actor",
+      "taskKey": "nominal-group-share",
+      "objective": "Share the three proposals together, once, as one revealed set.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    }
+  ]
+}

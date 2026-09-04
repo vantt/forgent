@@ -1,0 +1,79 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Resume the same Nominal-Group-Lite session: open clarification, then each participant privately ranks the shared proposals.",
+  "writerId": "nominal-group-driver",
+  "coordinationId": "coord_nominal_group_example",
+  "protocolRef": { "id": "core.coordination-protocol.group-thinking-nominal-group-lite" },
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authClarify",
+      "operationId": "clarify",
+      "targetActorId": "facilitator-actor",
+      "authorizationId": "auth_nominal_group_example_clarify",
+      "invocationKey": "nominal-group-example-clarify:1",
+      "reason": "Share has settled -- open clarification.",
+      "grantedContextRefs": ["<the share assignmentId from the first call's own result>"]
+    },
+    {
+      "type": "operation",
+      "as": "clarify",
+      "operationId": "clarify",
+      "targetActorId": "facilitator-actor",
+      "taskKey": "nominal-group-clarify",
+      "objective": "Clarify the shared proposals for the participants.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "rankA",
+      "operationId": "private-rank",
+      "targetActorId": "participant-a",
+      "taskKey": "nominal-group-rank-a",
+      "objective": "Privately rank the clarified proposals.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "rankB",
+      "operationId": "private-rank",
+      "targetActorId": "participant-b",
+      "taskKey": "nominal-group-rank-b",
+      "objective": "Privately rank the clarified proposals.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "rankC",
+      "operationId": "private-rank",
+      "targetActorId": "participant-c",
+      "taskKey": "nominal-group-rank-c",
+      "objective": "Privately rank the clarified proposals.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "contribution",
+      "as": "linkRankA",
+      "contributionId": "nominal_group_example_rank_a",
+      "contributionType": "rank",
+      "assignmentId": "$ref:rankA",
+      "roundKey": "round-1"
+    },
+    {
+      "type": "contribution",
+      "as": "linkRankB",
+      "contributionId": "nominal_group_example_rank_b",
+      "contributionType": "rank",
+      "assignmentId": "$ref:rankB",
+      "roundKey": "round-1"
+    },
+    {
+      "type": "contribution",
+      "as": "linkRankC",
+      "contributionId": "nominal_group_example_rank_c",
+      "contributionType": "rank",
+      "assignmentId": "$ref:rankC",
+      "roundKey": "round-1"
+    }
+  ]
+}

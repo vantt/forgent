@@ -1,0 +1,71 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Run a two-round Delphi feedback cycle: private round-1 proposals, a mediated aggregate, then bounded round-2 proposals informed by the aggregate.",
+  "writerId": "delphi-feedback-driver",
+  "coordinationId": "coord_delphi_feedback_example",
+  "protocolRef": { "id": "core.coordination-protocol.group-thinking-delphi-feedback-lite" },
+  "actors": [
+    { "id": "panelist-a", "executor": "codex-cli" },
+    { "id": "panelist-b", "executor": "agy-cli" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "convene",
+      "operationId": "convene",
+      "targetActorId": "facilitator-actor",
+      "taskKey": "delphi-convene",
+      "objective": "Frame the question the panel is giving feedback on.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "round1A",
+      "operationId": "propose-round1",
+      "targetActorId": "panelist-a",
+      "fromAssignmentId": "$ref:convene",
+      "taskKey": "delphi-round1-a",
+      "objective": "Give a private, independent round-1 answer.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "round1B",
+      "operationId": "propose-round1",
+      "targetActorId": "panelist-b",
+      "fromAssignmentId": "$ref:convene",
+      "taskKey": "delphi-round1-b",
+      "objective": "Give a private, independent round-1 answer.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "aggregate",
+      "operationId": "aggregate",
+      "targetActorId": "facilitator-actor",
+      "taskKey": "delphi-aggregate",
+      "objective": "Produce a mediated, evidence-preserving aggregate of both round-1 answers -- summarize positions, never attribute a specific answer to a specific panelist.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "round2A",
+      "operationId": "propose-round2",
+      "targetActorId": "panelist-a",
+      "fromAssignmentId": "$ref:aggregate",
+      "taskKey": "delphi-round2-a",
+      "objective": "Give a round-2 answer informed by the aggregate, revising or holding your original position.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "round2B",
+      "operationId": "propose-round2",
+      "targetActorId": "panelist-b",
+      "fromAssignmentId": "$ref:aggregate",
+      "taskKey": "delphi-round2-b",
+      "objective": "Give a round-2 answer informed by the aggregate, revising or holding your original position.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    }
+  ]
+}

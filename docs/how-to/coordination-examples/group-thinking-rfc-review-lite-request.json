@@ -1,0 +1,71 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Settle the proposer and both objectors on an RFC-Review-Lite round; stop before authorizing the proposer's response.",
+  "writerId": "rfc-review-driver",
+  "coordinationId": "coord_rfc_review_example",
+  "protocolRef": { "id": "core.coordination-protocol.group-thinking-rfc-review-lite" },
+  "steps": [
+    {
+      "type": "operation",
+      "as": "convene",
+      "operationId": "convene",
+      "targetActorId": "coordinator-actor",
+      "taskKey": "rfc-review-convene",
+      "objective": "State the RFC under review and open the round.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "propose",
+      "operationId": "propose",
+      "targetActorId": "proposer-actor",
+      "taskKey": "rfc-review-propose",
+      "objective": "Write the proposal being reviewed.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "objectA",
+      "operationId": "object",
+      "targetActorId": "objector-a-actor",
+      "taskKey": "rfc-review-object-a",
+      "objective": "Raise an independent objection to the proposal, without seeing objector-b's own objection.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "objectB",
+      "operationId": "object",
+      "targetActorId": "objector-b-actor",
+      "taskKey": "rfc-review-object-b",
+      "objective": "Raise an independent objection to the proposal, without seeing objector-a's own objection.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "contribution",
+      "as": "linkProposal",
+      "contributionId": "rfc_review_example_proposal",
+      "contributionType": "proposal",
+      "assignmentId": "$ref:propose",
+      "roundKey": "round-1"
+    },
+    {
+      "type": "contribution",
+      "as": "linkObjectionA",
+      "contributionId": "rfc_review_example_objection_a",
+      "contributionType": "objection",
+      "assignmentId": "$ref:objectA",
+      "roundKey": "round-1",
+      "respondsTo": "rfc_review_example_proposal"
+    },
+    {
+      "type": "contribution",
+      "as": "linkObjectionB",
+      "contributionId": "rfc_review_example_objection_b",
+      "contributionType": "objection",
+      "assignmentId": "$ref:objectB",
+      "roundKey": "round-1",
+      "respondsTo": "rfc_review_example_proposal"
+    }
+  ]
+}

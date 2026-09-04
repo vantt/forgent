@@ -1,0 +1,46 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Resume the same RFC-Review-Lite session, authorize and dispatch the proposer's response, then record the driver's disposition.",
+  "writerId": "rfc-review-driver",
+  "coordinationId": "coord_rfc_review_example",
+  "protocolRef": { "id": "core.coordination-protocol.group-thinking-rfc-review-lite" },
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authRespond",
+      "operationId": "respond",
+      "targetActorId": "proposer-actor",
+      "authorizationId": "auth_rfc_review_example_respond",
+      "invocationKey": "rfc-review-example-respond:1",
+      "reason": "Both independent objections have settled -- reveal them together and let the proposer respond.",
+      "grantedContextRefs": ["<objectA assignmentId from the first call's own result>", "<objectB assignmentId from the first call's own result>"]
+    },
+    {
+      "type": "operation",
+      "as": "respond",
+      "operationId": "respond",
+      "targetActorId": "proposer-actor",
+      "taskKey": "rfc-review-respond",
+      "objective": "Respond to both objections together.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "contribution",
+      "as": "linkResponse",
+      "contributionId": "rfc_review_example_response",
+      "contributionType": "response",
+      "assignmentId": "$ref:respond",
+      "roundKey": "round-1",
+      "respondsTo": "rfc_review_example_objection_a",
+      "anchors": ["rfc_review_example_objection_b"]
+    },
+    {
+      "type": "disposition",
+      "as": "disposeResponse",
+      "targetRef": "$ref:respond",
+      "disposition": "accepted",
+      "rationale": "The response satisfactorily addresses both independent objections.",
+      "evidenceRefs": []
+    }
+  ]
+}
