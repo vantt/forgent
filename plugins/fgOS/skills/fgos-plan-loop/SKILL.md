@@ -134,9 +134,9 @@ filename.
      "coordinationId": "<track>--cell-01",
      "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
      "actors": [
-       { "id": "doer", "executor": "codex-cli", "tier": "standard", "persona": "meticulous-implementer" },
+       { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "meticulous-implementer" },
        { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "skeptical-reviewer" },
-       { "id": "red-team", "executor": "agy-cli", "tier": "analytical", "persona": "adversarial-tester" }
+       { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "adversarial-tester" }
      ],
      "steps": [
        {
@@ -305,9 +305,9 @@ resuming the SAME `coordinationId`:
   "coordinationId": "<track>--cell-01",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "fixer", "executor": "codex-cli", "tier": "standard", "persona": "pragmatic-fixer" },
+    { "id": "fixer", "executor": "agy-cli", "tier": "standard", "persona": "pragmatic-fixer" },
     { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "detail-oriented-rechecker" },
-    { "id": "red-team", "executor": "agy-cli", "tier": "analytical", "persona": "relentless-attacker" }
+    { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "relentless-attacker" }
   ],
   "steps": [
     {
@@ -423,9 +423,9 @@ the recorded baseline (master-coordinator.md section H, `CLOSE CELL`):
   "coordinationId": "<track>--cell-01",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "doer", "executor": "codex-cli", "tier": "standard", "persona": "delivery-focused-closer" },
+    { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "delivery-focused-closer" },
     { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "final-sign-off-reviewer" },
-    { "id": "red-team", "executor": "agy-cli", "tier": "analytical", "persona": "closing-adversary" }
+    { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "closing-adversary" }
   ],
   "steps": [
     {
