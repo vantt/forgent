@@ -113,6 +113,21 @@ This root item (`tsk-28x`) carried the design-shaping work (`DISCUSSION.md`,
 verdict — 12 children implement the actual registry/CLI/skill surface,
 each synthesized separately by this same retro-loop.
 
+### Child 1 — the domain model itself (`tsk-28x-1`)
+
+`src/state/knowledge-registry.mjs` is the first child, and the literal
+machinery every `fgos topic register`/`fgos doc reserve`/`fgos doc
+promote`/`fgos knowledge attest` call this same retro-loop session has
+made runs on: the schema plus reducer for the `topic.*` and `doc.*` event
+families, with lifecycle states `reserved → provisional → active`, ending
+in `superseded` or `retired`. Written doc-first, per the plan's own
+convention — the phase file (context, requirements, files, steps, tests,
+risks) committed before any code — honoring `D-tsk28x-6`/`D-tsk28x-14`/
+`D-tsk28x-15` above. The cardinality invariant
+(`activeDoc(topicId, role) <= 1`) is enforced right at the write, inside
+the reducer itself — never checked afterward as a separate validation
+pass. This piece moved no files; it's pure domain model.
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
