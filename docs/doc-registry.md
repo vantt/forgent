@@ -2578,3 +2578,663 @@ generated: true
   - `decision-record` (provisional): `docs/knowledge/decisions-index/decision-record.md`
     - Aliases: `docs/decisions/index.md`
 
+### Executor dispatch manual in-session logging gap (`executor-dispatch-manual-log-gap`)
+- Status: **active**
+- Purpose Slug: `executor-dispatch-manual-log-gap`
+- Docs:
+  - `why-step-b5-was-added` (active): `docs/explanation/executor-dispatch-manual-log-gap-and-step-b5-fix.md`
+
+### Worktree-isolation guard refuses compound dispatch command (`worktree-guard-refuses-compound-dispatch`)
+- Status: **active**
+- Purpose Slug: `worktree-guard-refuses-compound-dispatch`
+- Docs:
+  - `wrapper-script-mitigation` (active): `docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md`
+
+### enduser-docs-index-stale doctor check gains orphan detection (`enduser-docs-index-orphan-detection`)
+- Status: **active**
+- Purpose Slug: `enduser-docs-index-orphan-detection`
+- Docs:
+  - `why-check-was-one-directional` (active): `docs/explanation/enduser-docs-index-stale-orphan-detection-gap.md`
+
+### Dispatch activation and handoff redesign (`dispatch-activation-and-handoff-redesign`)
+- Status: **active**
+- Purpose Slug: `dispatch-activation-and-handoff-redesign`
+- Docs:
+  - `why-and-what-changed` (active): `docs/explanation/dispatch-activation-and-handoff-redesign.md`
+
+### src/runner/dispatch module boundaries (`dispatch-module-boundaries`)
+- Status: **active**
+- Purpose Slug: `dispatch-module-boundaries`
+- Docs:
+  - `what-lives-in-each-file` (active): `docs/reference/dispatch-module-boundaries.md`
+
+### coding-worker-contract.md shape and proof history (`coding-worker-contract-shape`)
+- Status: **active**
+- Purpose Slug: `coding-worker-contract-shape`
+- Docs:
+  - `two-layer-shape-and-cross-provider-proof` (active): `docs/reference/coding-worker-contract-shape.md`
+
+### runner.capabilities advise/execute slots (`runner-capabilities-advise-execute-slots`)
+- Status: **active**
+- Purpose Slug: `runner-capabilities-advise-execute-slots`
+- Docs:
+  - `how-the-slots-got-filled` (active): `docs/reference/runner-capabilities-advise-execute-slots.md`
+
+### agy replaced --dangerously-skip-permissions with a denylist, not an allowlist (`agy-permission-denylist-not-allowlist`)
+- Status: **active**
+- Purpose Slug: `agy-permission-denylist-not-allowlist`
+- Docs:
+  - `why-denylist-not-allowlist` (active): `docs/explanation/agy-permission-denylist-not-allowlist.md`
+
+### 1788-finding citation baseline cleanup, calibration-slice scoping (`citation-baseline-cleanup-calibration-slice`)
+- Status: **active**
+- Purpose Slug: `citation-baseline-cleanup-calibration-slice`
+- Docs:
+  - `status-and-scoping-lesson` (active): `docs/explanation/citation-baseline-cleanup-calibration-slice.md`
+
+### pi as an fgOS executor runtime capacity (`pi-runtime-capacity`)
+- Status: **active**
+- Purpose Slug: `pi-runtime-capacity`
+- Docs:
+  - `what-pi-solves-and-the-anthropic-usage-cap-gotcha` (active): `docs/explanation/pi-runtime-capacity.md`
+
+### RUL11 tùm lum doctrine and anchor phrase (`rul11-tum-lum-doctrine`)
+- Status: **active**
+- Purpose Slug: `rul11-tum-lum-doctrine`
+- Docs:
+  - `why-and-the-anchor-phrase-mechanism` (active): `docs/explanation/rul11-tum-lum-doctrine.md`
+
+### codebase scatter consolidation roadmap (RUL11 applied beyond dispatch) (`codebase-scatter-consolidation-roadmap`)
+- Status: **active**
+- Purpose Slug: `codebase-scatter-consolidation-roadmap`
+- Docs:
+  - `ranked-files-and-what-not-to-consolidate` (active): `docs/reference/codebase-scatter-consolidation-roadmap.md`
+
+### how to fix a bare-citation finding (`fix-bare-citation-findings`)
+- Status: **active**
+- Purpose Slug: `fix-bare-citation-findings`
+- Docs:
+  - `add-a-one-line-gloss` (active): `docs/how-to/fix-bare-citation-findings.md`
+
+### fgos edit's --role human|session flag (`fgos-edit-role-flag`)
+- Status: **active**
+- Purpose Slug: `fgos-edit-role-flag`
+- Docs:
+  - `why-default-stays-human` (active): `docs/explanation/fgos-edit-role-flag.md`
+
+### dispatch-redesign batch final verify pass findings (`dispatch-redesign-batch-final-verify`)
+- Status: **active**
+- Purpose Slug: `dispatch-redesign-batch-final-verify`
+- Docs:
+  - `decision-verb-fix-and-open-worker-boundary-gap` (active): `docs/explanation/dispatch-redesign-batch-final-verify.md`
+
+### codex CLI wired as a bypass-all executor (`codex-bypass-executor`)
+- Status: **active**
+- Purpose Slug: `codex-bypass-executor`
+- Docs:
+  - `why-workspace-write-cant-work-and-the-tradeoff` (active): `docs/explanation/codex-bypass-executor.md`
+
+### tsk-2sp scope narrowed to disjoint split with tsk-56w (`citation-drift-backlog-scope-split-with-tsk-56w`)
+- Status: **active**
+- Purpose Slug: `citation-drift-backlog-scope-split-with-tsk-56w`
+- Docs:
+  - `why-children-3-and-4-were-retired-wontfix` (active): `docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md`
+
+### claude registered as a named runner.executors entry (`claude-named-executor`)
+- Status: **active**
+- Purpose Slug: `claude-named-executor`
+- Docs:
+  - `why-no-cross-provider-flags` (active): `docs/reference/claude-named-executor.md`
+
+### how to fix a d-local-outside-home finding (`fix-d-local-outside-home-findings`)
+- Status: **active**
+- Purpose Slug: `fix-d-local-outside-home-findings`
+- Docs:
+  - `inline-or-delete-the-d-id` (active): `docs/how-to/fix-d-local-outside-home-findings.md`
+
+### citation-format cleanup applied to docs/specs/runner.md (`citation-drift-runner-md-cleanup`)
+- Status: **active**
+- Purpose Slug: `citation-drift-runner-md-cleanup`
+- Docs:
+  - `summary` (active): `docs/explanation/citation-drift-runner-md-cleanup.md`
+
+### citation-format cleanup applied to the remaining docs/*.md files (`citation-drift-remaining-docs-cleanup`)
+- Status: **active**
+- Purpose Slug: `citation-drift-remaining-docs-cleanup`
+- Docs:
+  - `summary` (active): `docs/explanation/citation-drift-remaining-docs-cleanup.md`
+
+### claude executor D4 proof-test RED finding (`claude-executor-d4-proof-test-red`)
+- Status: **active**
+- Purpose Slug: `claude-executor-d4-proof-test-red`
+- Docs:
+  - `summary` (active): `docs/explanation/claude-executor-d4-proof-test-red.md`
+
+### tsk-1dsr traces tsk-1jt's RED finding to a machine-local rtk hook (`claude-executor-rtk-hook-root-cause`)
+- Status: **active**
+- Purpose Slug: `claude-executor-rtk-hook-root-cause`
+- Docs:
+  - `summary` (active): `docs/explanation/claude-executor-rtk-hook-root-cause.md`
+
+### fgOS skill prose cleanup: SKILL.md/references split, citation-boundary-by-role (`skill-prose-cleanup-design`)
+- Status: **active**
+- Purpose Slug: `skill-prose-cleanup-design`
+- Docs:
+  - `the-6-locked-decisions-and-qa-process` (active): `docs/explanation/skill-prose-cleanup-design.md`
+
+### fgos-fanout SKILL.md/references split (`skill-prose-cleanup-fgos-fanout`)
+- Status: **active**
+- Purpose Slug: `skill-prose-cleanup-fgos-fanout`
+- Docs:
+  - `summary` (active): `docs/explanation/skill-prose-cleanup-fgos-fanout.md`
+
+### fgos-coding-exploring SKILL.md/references split (`skill-prose-cleanup-fgos-coding-exploring`)
+- Status: **active**
+- Purpose Slug: `skill-prose-cleanup-fgos-coding-exploring`
+- Docs:
+  - `summary` (active): `docs/explanation/skill-prose-cleanup-fgos-coding-exploring.md`
+
+### fgos-coding-planning SKILL.md/references split (`skill-prose-cleanup-fgos-coding-planning`)
+- Status: **active**
+- Purpose Slug: `skill-prose-cleanup-fgos-coding-planning`
+- Docs:
+  - `summary` (active): `docs/explanation/skill-prose-cleanup-fgos-coding-planning.md`
+
+### fgos-coding-validating SKILL.md/references split (`skill-prose-cleanup-fgos-coding-validating`)
+- Status: **active**
+- Purpose Slug: `skill-prose-cleanup-fgos-coding-validating`
+- Docs:
+  - `summary` (active): `docs/explanation/skill-prose-cleanup-fgos-coding-validating.md`
+
+### fgos-coding-implement SKILL.md/references split (`skill-prose-cleanup-fgos-coding-implement`)
+- Status: **active**
+- Purpose Slug: `skill-prose-cleanup-fgos-coding-implement`
+- Docs:
+  - `summary` (active): `docs/explanation/skill-prose-cleanup-fgos-coding-implement.md`
+
+### merge-loop SKILL.md/references split (`skill-prose-cleanup-merge-loop`)
+- Status: **active**
+- Purpose Slug: `skill-prose-cleanup-merge-loop`
+- Docs:
+  - `summary` (active): `docs/explanation/skill-prose-cleanup-merge-loop.md`
+
+### 23 skill CLI-wrapper boilerplate consolidated to _shared/ (`skill-prose-cleanup-cli-fallback-dedupe`)
+- Status: **active**
+- Purpose Slug: `skill-prose-cleanup-cli-fallback-dedupe`
+- Docs:
+  - `summary` (active): `docs/explanation/skill-prose-cleanup-cli-fallback-dedupe.md`
+
+### remaining bare citations cleaned: fgos-routing, approve, pick (`skill-prose-cleanup-remaining-bare-citations`)
+- Status: **active**
+- Purpose Slug: `skill-prose-cleanup-remaining-bare-citations`
+- Docs:
+  - `summary` (active): `docs/explanation/skill-prose-cleanup-remaining-bare-citations.md`
+
+### RUL11 anchor-phrase test updated for a glossed ADR0036 citation (`rul11-anchor-test-citation-gloss-update`)
+- Status: **active**
+- Purpose Slug: `rul11-anchor-test-citation-gloss-update`
+- Docs:
+  - `summary` (active): `docs/explanation/rul11-anchor-test-citation-gloss-update.md`
+
+### tsk-56w's smoke-test QA pass, per-skill throwaway chores (`skill-prose-cleanup-smoke-tests`)
+- Status: **active**
+- Purpose Slug: `skill-prose-cleanup-smoke-tests`
+- Docs:
+  - `summary` (active): `docs/explanation/skill-prose-cleanup-smoke-tests.md`
+
+### removed the capabilities.prefer <-> executor.for symmetry requirement (`capabilities-prefer-symmetry-removed`)
+- Status: **active**
+- Purpose Slug: `capabilities-prefer-symmetry-removed`
+- Docs:
+  - `why-and-how-it-happened` (active): `docs/explanation/capabilities-prefer-symmetry-removed.md`
+
+### dispatch execute per-item concurrency guard (dispatch-in-flight lock) (`dispatch-execute-concurrency-guard`)
+- Status: **active**
+- Purpose Slug: `dispatch-execute-concurrency-guard`
+- Docs:
+  - `why-and-how` (active): `docs/explanation/dispatch-execute-concurrency-guard.md`
+
+### worktree isolation: pinned-agent EnterWorktree(existing path) stays broken, out-of-process sidesteps it (`worktree-isolation-existing-path-hazard`)
+- Status: **active**
+- Purpose Slug: `worktree-isolation-existing-path-hazard`
+- Docs:
+  - `the-precise-failure-mode-and-the-fix-that-works` (active): `docs/explanation/worktree-isolation-existing-path-hazard.md`
+
+### fgos-fanout gained a real out-of-process firing path (`fgos-fanout-out-of-process-dispatch`)
+- Status: **active**
+- Purpose Slug: `fgos-fanout-out-of-process-dispatch`
+- Docs:
+  - `why-and-what-shipped` (active): `docs/explanation/fgos-fanout-out-of-process-dispatch.md`
+
+### fgos faults read surface for the invocation-fault side log (`fgos-faults-read-surface`)
+- Status: **active**
+- Purpose Slug: `fgos-faults-read-surface`
+- Docs:
+  - `what-it-is-and-what-it-covers` (active): `docs/reference/fgos-faults-read-surface.md`
+
+### gate-bypass keyword floor false positives fixed (`gate-bypass-keyword-floor-false-positives`)
+- Status: **active**
+- Purpose Slug: `gate-bypass-keyword-floor-false-positives`
+- Docs:
+  - `three-real-false-positives-and-the-fixes` (active): `docs/explanation/gate-bypass-keyword-floor-false-positives.md`
+
+### mergedSha missing on a real delivered event, unreproduced, diagnostic logging added (`mergedsha-missing-unreproduced-race`)
+- Status: **active**
+- Purpose Slug: `mergedsha-missing-unreproduced-race`
+- Docs:
+  - `what-was-tried-and-where-to-look-next` (active): `docs/explanation/mergedsha-missing-unreproduced-race.md`
+
+### fanout-proof-agy demo: two independent pieces for testing fgos-fanout concurrent dispatch (`fanout-proof-agy-demo`)
+- Status: **active**
+- Purpose Slug: `fanout-proof-agy-demo`
+- Docs:
+  - `purpose-and-shape` (active): `docs/explanation/fanout-proof-agy-demo.md`
+
+### fgOS core/ vs domains/<name>/ architecture split (`core-foundation-domain-boundary`)
+- Status: **active**
+- Purpose Slug: `core-foundation-domain-boundary`
+- Docs:
+  - `the-locked-decisions-and-end-state` (active): `docs/explanation/core-foundation-domain-boundary.md`
+
+### npm run build:skills automates .agents/skills to plugins/fgOS/skills sync (`build-skills-mirror-dev-skills-into-plugin`)
+- Status: **active**
+- Purpose Slug: `build-skills-mirror-dev-skills-into-plugin`
+- Docs:
+  - `why-and-what-it-does` (active): `docs/explanation/build-skills-mirror-dev-skills-into-plugin.md`
+
+### manual merge conflict resolution can silently revert .fgos/ blobs, now mechanically guarded (`worktree-manual-merge-fgos-blob-safety-net`)
+- Status: **active**
+- Purpose Slug: `worktree-manual-merge-fgos-blob-safety-net`
+- Docs:
+  - `the-incident-and-the-pre-commit-guard` (active): `docs/explanation/worktree-manual-merge-fgos-blob-safety-net.md`
+
+### verify-cadence rule added, root cause not fully confirmed (`dispatch-verify-run-once-cadence`)
+- Status: **active**
+- Purpose Slug: `dispatch-verify-run-once-cadence`
+- Docs:
+  - `the-finding-the-fix-and-the-open-a-b-test` (active): `docs/explanation/dispatch-verify-run-once-cadence.md`
+
+### scripts/write-wrapper-script.mjs replaces hand-rolled dispatch wrapper .sh files (`write-wrapper-script-shared-helper`)
+- Status: **active**
+- Purpose Slug: `write-wrapper-script-shared-helper`
+- Docs:
+  - `how-to-use-it` (active): `docs/how-to/write-wrapper-script-for-worktree-guard-refusal.md`
+
+### fanout-execute-consolidation (`fanout-execute-consolidation`)
+- Status: **active**
+- Purpose Slug: `fanout-execute-consolidation`
+- Docs:
+  - `overview` (active): `docs/explanation/fanout-execute-consolidation.md`
+
+### dispatch-execute-prompt-file-flag (`dispatch-execute-prompt-file-flag`)
+- Status: **active**
+- Purpose Slug: `dispatch-execute-prompt-file-flag`
+- Docs:
+  - `overview` (active): `docs/explanation/dispatch-execute-prompt-file-flag.md`
+
+### expr-eval-chain-passthrough-vs-split (`expr-eval-chain-passthrough-vs-split`)
+- Status: **active**
+- Purpose Slug: `expr-eval-chain-passthrough-vs-split`
+- Docs:
+  - `overview` (active): `docs/explanation/expr-eval-chain-passthrough-vs-split.md`
+
+### tsk-397-post-merge-review-remediation (`tsk-397-post-merge-review-remediation`)
+- Status: **active**
+- Purpose Slug: `tsk-397-post-merge-review-remediation`
+- Docs:
+  - `overview` (active): `docs/explanation/tsk-397-post-merge-review-remediation.md`
+
+### state-write-single-stringify (`state-write-single-stringify`)
+- Status: **active**
+- Purpose Slug: `state-write-single-stringify`
+- Docs:
+  - `overview` (active): `docs/explanation/state-write-single-stringify.md`
+
+### fanout-batch-background-execution-and-orphan-recovery (`fanout-batch-background-execution-and-orphan-recovery`)
+- Status: **active**
+- Purpose Slug: `fanout-batch-background-execution-and-orphan-recovery`
+- Docs:
+  - `overview` (active): `docs/explanation/fanout-batch-background-execution-and-orphan-recovery.md`
+
+### dispatch-execute-unsignaled-outcome (`dispatch-execute-unsignaled-outcome`)
+- Status: **active**
+- Purpose Slug: `dispatch-execute-unsignaled-outcome`
+- Docs:
+  - `overview` (active): `docs/explanation/dispatch-execute-unsignaled-outcome.md`
+
+### return-approve-background-execution-guidance (`return-approve-background-execution-guidance`)
+- Status: **active**
+- Purpose Slug: `return-approve-background-execution-guidance`
+- Docs:
+  - `overview` (active): `docs/explanation/return-approve-background-execution-guidance.md`
+
+### postland-drift-notify-consumer (`postland-drift-notify-consumer`)
+- Status: **active**
+- Purpose Slug: `postland-drift-notify-consumer`
+- Docs:
+  - `overview` (active): `docs/explanation/postland-drift-notify-consumer.md`
+
+### list-id-callthreads-leak-fix (`list-id-callthreads-leak-fix`)
+- Status: **active**
+- Purpose Slug: `list-id-callthreads-leak-fix`
+- Docs:
+  - `overview` (active): `docs/explanation/list-id-callthreads-leak-fix.md`
+
+### list-id-fields-flag-lightweight-projection (`list-id-fields-flag-lightweight-projection`)
+- Status: **active**
+- Purpose Slug: `list-id-fields-flag-lightweight-projection`
+- Docs:
+  - `overview` (active): `docs/explanation/list-id-fields-flag-lightweight-projection.md`
+
+### dispatch-waiting-rule-end-turn-no-tool-call (`dispatch-waiting-rule-end-turn-no-tool-call`)
+- Status: **active**
+- Purpose Slug: `dispatch-waiting-rule-end-turn-no-tool-call`
+- Docs:
+  - `overview` (active): `docs/explanation/dispatch-waiting-rule-end-turn-no-tool-call.md`
+
+### merge-next-inline-approve-invocation (`merge-next-inline-approve-invocation`)
+- Status: **active**
+- Purpose Slug: `merge-next-inline-approve-invocation`
+- Docs:
+  - `overview` (active): `docs/explanation/merge-next-inline-approve-invocation.md`
+
+### wontfix-worktree-reclaim-startup-reap (`wontfix-worktree-reclaim-startup-reap`)
+- Status: **active**
+- Purpose Slug: `wontfix-worktree-reclaim-startup-reap`
+- Docs:
+  - `overview` (active): `docs/explanation/wontfix-worktree-reclaim-startup-reap.md`
+
+### root-resolution-two-call-split-propagation (`root-resolution-two-call-split-propagation`)
+- Status: **active**
+- Purpose Slug: `root-resolution-two-call-split-propagation`
+- Docs:
+  - `overview` (active): `docs/explanation/root-resolution-two-call-split-propagation.md`
+
+### events-jsonl-concurrent-data-loss-investigation (`events-jsonl-concurrent-data-loss-investigation`)
+- Status: **active**
+- Purpose Slug: `events-jsonl-concurrent-data-loss-investigation`
+- Docs:
+  - `overview` (active): `docs/explanation/events-jsonl-concurrent-data-loss-investigation.md`
+
+### events-jsonl-opportunistic-truncation-check (`events-jsonl-opportunistic-truncation-check`)
+- Status: **active**
+- Purpose Slug: `events-jsonl-opportunistic-truncation-check`
+- Docs:
+  - `overview` (active): `docs/explanation/events-jsonl-opportunistic-truncation-check.md`
+
+### dispatch-execute-repo-root-cwd-separation (`dispatch-execute-repo-root-cwd-separation`)
+- Status: **active**
+- Purpose Slug: `dispatch-execute-repo-root-cwd-separation`
+- Docs:
+  - `overview` (active): `docs/explanation/dispatch-execute-repo-root-cwd-separation.md`
+
+### gitignore-docs-history-reverify (`gitignore-docs-history-reverify`)
+- Status: **active**
+- Purpose Slug: `gitignore-docs-history-reverify`
+- Docs:
+  - `overview` (active): `docs/explanation/gitignore-docs-history-reverify.md`
+
+### retro-next-shared-driving (`retro-next-shared-driving`)
+- Status: **active**
+- Purpose Slug: `retro-next-shared-driving`
+- Docs:
+  - `overview` (active): `docs/explanation/retro-next-shared-driving.md`
+
+### discover-stage-graph-post-audit-cleanup (`discover-stage-graph-post-audit-cleanup`)
+- Status: **active**
+- Purpose Slug: `discover-stage-graph-post-audit-cleanup`
+- Docs:
+  - `overview` (active): `docs/explanation/discover-stage-graph-post-audit-cleanup.md`
+
+### approve-lock-lost-mid-merge-guard (`approve-lock-lost-mid-merge-guard`)
+- Status: **active**
+- Purpose Slug: `approve-lock-lost-mid-merge-guard`
+- Docs:
+  - `overview` (active): `docs/explanation/approve-lock-lost-mid-merge-guard.md`
+
+### driving-loop-worktree-resync-on-reentry (`driving-loop-worktree-resync-on-reentry`)
+- Status: **active**
+- Purpose Slug: `driving-loop-worktree-resync-on-reentry`
+- Docs:
+  - `overview` (active): `docs/explanation/driving-loop-worktree-resync-on-reentry.md`
+
+### dispatch-buildprompt-docsref-pointer (`dispatch-buildprompt-docsref-pointer`)
+- Status: **active**
+- Purpose Slug: `dispatch-buildprompt-docsref-pointer`
+- Docs:
+  - `overview` (active): `docs/explanation/dispatch-buildprompt-docsref-pointer.md`
+
+### spawnworker-idletimeout-flaky-test-margin (`spawnworker-idletimeout-flaky-test-margin`)
+- Status: **active**
+- Purpose Slug: `spawnworker-idletimeout-flaky-test-margin`
+- Docs:
+  - `overview` (active): `docs/explanation/spawnworker-idletimeout-flaky-test-margin.md`
+
+### session-identity-3hop-walk-flaky-test (`session-identity-3hop-walk-flaky-test`)
+- Status: **active**
+- Purpose Slug: `session-identity-3hop-walk-flaky-test`
+- Docs:
+  - `overview` (active): `docs/explanation/session-identity-3hop-walk-flaky-test.md`
+
+### catchup-self-recovery-shared-reference (`catchup-self-recovery-shared-reference`)
+- Status: **active**
+- Purpose Slug: `catchup-self-recovery-shared-reference`
+- Docs:
+  - `overview` (active): `docs/explanation/catchup-self-recovery-shared-reference.md`
+
+### merged-tree-verified-disjoint-main-advance (`merged-tree-verified-disjoint-main-advance`)
+- Status: **active**
+- Purpose Slug: `merged-tree-verified-disjoint-main-advance`
+- Docs:
+  - `overview` (active): `docs/explanation/merged-tree-verified-disjoint-main-advance.md`
+
+### unsignaled-detection-backtick-false-positive (`unsignaled-detection-backtick-false-positive`)
+- Status: **active**
+- Purpose Slug: `unsignaled-detection-backtick-false-positive`
+- Docs:
+  - `overview` (active): `docs/explanation/unsignaled-detection-backtick-false-positive.md`
+
+### discovered-work-risk-kind-vocabulary-coercion (`discovered-work-risk-kind-vocabulary-coercion`)
+- Status: **active**
+- Purpose Slug: `discovered-work-risk-kind-vocabulary-coercion`
+- Docs:
+  - `overview` (active): `docs/explanation/discovered-work-risk-kind-vocabulary-coercion.md`
+
+### fgos-return-skip-redundant-verify (`fgos-return-skip-redundant-verify`)
+- Status: **active**
+- Purpose Slug: `fgos-return-skip-redundant-verify`
+- Docs:
+  - `overview` (active): `docs/explanation/fgos-return-skip-redundant-verify.md`
+
+### mode-gate-tiny-small-skip-load (`mode-gate-tiny-small-skip-load`)
+- Status: **active**
+- Purpose Slug: `mode-gate-tiny-small-skip-load`
+- Docs:
+  - `overview` (active): `docs/explanation/mode-gate-tiny-small-skip-load.md`
+
+### fgos-write-rejected-structural-deadlock (`fgos-write-rejected-structural-deadlock`)
+- Status: **active**
+- Purpose Slug: `fgos-write-rejected-structural-deadlock`
+- Docs:
+  - `overview` (active): `docs/explanation/fgos-write-rejected-structural-deadlock.md`
+
+### routing-orient-stale-postdelivery-advisory (`routing-orient-stale-postdelivery-advisory`)
+- Status: **active**
+- Purpose Slug: `routing-orient-stale-postdelivery-advisory`
+- Docs:
+  - `overview` (active): `docs/explanation/routing-orient-stale-postdelivery-advisory.md`
+
+### planning-passthrough-action-footprint-sync (`planning-passthrough-action-footprint-sync`)
+- Status: **active**
+- Purpose Slug: `planning-passthrough-action-footprint-sync`
+- Docs:
+  - `overview` (active): `docs/explanation/planning-passthrough-action-footprint-sync.md`
+
+### no-stuck-merge-abort-doctor-check (`no-stuck-merge-abort-doctor-check`)
+- Status: **active**
+- Purpose Slug: `no-stuck-merge-abort-doctor-check`
+- Docs:
+  - `overview` (active): `docs/explanation/no-stuck-merge-abort-doctor-check.md`
+
+### opportunistic-checks-test-regression-fgos-oet (`opportunistic-checks-test-regression-fgos-oet`)
+- Status: **active**
+- Purpose Slug: `opportunistic-checks-test-regression-fgos-oet`
+- Docs:
+  - `overview` (active): `docs/explanation/opportunistic-checks-test-regression-fgos-oet.md`
+
+### loop-descendant-dedup-false-premise (`loop-descendant-dedup-false-premise`)
+- Status: **active**
+- Purpose Slug: `loop-descendant-dedup-false-premise`
+- Docs:
+  - `overview` (active): `docs/explanation/loop-descendant-dedup-false-premise.md`
+
+### approve-owns-self-recovery-merge-loop-thin-caller (`approve-owns-self-recovery-merge-loop-thin-caller`)
+- Status: **active**
+- Purpose Slug: `approve-owns-self-recovery-merge-loop-thin-caller`
+- Docs:
+  - `overview` (active): `docs/explanation/approve-owns-self-recovery-merge-loop-thin-caller.md`
+
+### cleanup-harness-checkmerge-blind-spots (`cleanup-harness-checkmerge-blind-spots`)
+- Status: **active**
+- Purpose Slug: `cleanup-harness-checkmerge-blind-spots`
+- Docs:
+  - `overview` (active): `docs/explanation/cleanup-harness-checkmerge-blind-spots.md`
+
+### opportunistic-checks-regression-root-cause-bisection (`opportunistic-checks-regression-root-cause-bisection`)
+- Status: **active**
+- Purpose Slug: `opportunistic-checks-regression-root-cause-bisection`
+- Docs:
+  - `overview` (active): `docs/explanation/opportunistic-checks-regression-root-cause-bisection.md`
+
+### resolve-park-reason-verb (`resolve-park-reason-verb`)
+- Status: **active**
+- Purpose Slug: `resolve-park-reason-verb`
+- Docs:
+  - `overview` (active): `docs/explanation/resolve-park-reason-verb.md`
+
+### eventlog-guard-fail-closed-event-count-checkpoint (`eventlog-guard-fail-closed-event-count-checkpoint`)
+- Status: **active**
+- Purpose Slug: `eventlog-guard-fail-closed-event-count-checkpoint`
+- Docs:
+  - `overview` (active): `docs/explanation/eventlog-guard-fail-closed-event-count-checkpoint.md`
+
+### partial-claim-event-loss-covered-by-tsk-1vc (`partial-claim-event-loss-covered-by-tsk-1vc`)
+- Status: **active**
+- Purpose Slug: `partial-claim-event-loss-covered-by-tsk-1vc`
+- Docs:
+  - `overview` (active): `docs/explanation/partial-claim-event-loss-covered-by-tsk-1vc.md`
+
+### precommit-fgos-content-precedence-guard (`precommit-fgos-content-precedence-guard`)
+- Status: **active**
+- Purpose Slug: `precommit-fgos-content-precedence-guard`
+- Docs:
+  - `overview` (active): `docs/explanation/pre-commit-fgos-content-precedence-guard.md`
+
+### eventlog-tier-a-multifile-content-hash-redesign (`eventlog-tier-a-multifile-content-hash-redesign`)
+- Status: **active**
+- Purpose Slug: `eventlog-tier-a-multifile-content-hash-redesign`
+- Docs:
+  - `overview` (active): `docs/explanation/eventlog-tier-a-multifile-content-hash-redesign.md`
+
+### planning-split-root-verify-sync (`planning-split-root-verify-sync`)
+- Status: **active**
+- Purpose Slug: `planning-split-root-verify-sync`
+- Docs:
+  - `overview` (active): `docs/explanation/planning-split-root-verify-sync.md`
+
+### lock-wait-self-vs-other-holder-identity (`lock-wait-self-vs-other-holder-identity`)
+- Status: **active**
+- Purpose Slug: `lock-wait-self-vs-other-holder-identity`
+- Docs:
+  - `overview` (active): `docs/explanation/lock-wait-self-vs-other-holder-identity.md`
+
+### checkpoint-commit-self-collides-own-lock-holder (`checkpoint-commit-self-collides-own-lock-holder`)
+- Status: **active**
+- Purpose Slug: `checkpoint-commit-self-collides-own-lock-holder`
+- Docs:
+  - `overview` (active): `docs/explanation/checkpoint-commit-self-collides-own-lock-holder.md`
+
+### driving-pane-rename-resolved-path (`driving-pane-rename-resolved-path`)
+- Status: **active**
+- Purpose Slug: `driving-pane-rename-resolved-path`
+- Docs:
+  - `overview` (active): `docs/explanation/driving-pane-rename-resolved-path.md`
+
+### sync-root-outcome-guard-citation-and-lock-lost-coverage (`sync-root-outcome-guard-citation-and-lock-lost-coverage`)
+- Status: **active**
+- Purpose Slug: `sync-root-outcome-guard-citation-and-lock-lost-coverage`
+- Docs:
+  - `overview` (active): `docs/explanation/sync-root-outcome-guard-citation-and-lock-lost-coverage.md`
+
+### dispatch-execute-lost-uncommitted-paths-warning (`dispatch-execute-lost-uncommitted-paths-warning`)
+- Status: **active**
+- Purpose Slug: `dispatch-execute-lost-uncommitted-paths-warning`
+- Docs:
+  - `overview` (active): `docs/explanation/dispatch-execute-lost-uncommitted-paths-warning.md`
+
+### loop-family-scheduleWakeup-self-reference-gap (`loop-family-scheduleWakeup-self-reference-gap`)
+- Status: **active**
+- Purpose Slug: `loop-family-scheduleWakeup-self-reference-gap`
+- Docs:
+  - `overview` (active): `docs/explanation/loop-family-scheduleWakeup-self-reference-gap.md`
+
+### eventlog-sweep-checkpoint-redesign (`eventlog-sweep-checkpoint-redesign`)
+- Status: **active**
+- Purpose Slug: `eventlog-sweep-checkpoint-redesign`
+- Docs:
+  - `overview` (active): `docs/explanation/eventlog-sweep-checkpoint-redesign.md`
+
+### claim-ambiguous-lock-inline-self-heal (`claim-ambiguous-lock-inline-self-heal`)
+- Status: **active**
+- Purpose Slug: `claim-ambiguous-lock-inline-self-heal`
+- Docs:
+  - `overview` (active): `docs/explanation/claim-ambiguous-lock-inline-self-heal.md`
+
+### dispatch-attestation-level-2-enforcement-halt (`dispatch-attestation-level-2-enforcement-halt`)
+- Status: **active**
+- Purpose Slug: `dispatch-attestation-level-2-enforcement-halt`
+- Docs:
+  - `overview` (active): `docs/explanation/dispatch-attestation-level-2-enforcement-halt.md`
+
+### catchup-manual-merge-fgos-write-rejected-deadlock (`catchup-manual-merge-fgos-write-rejected-deadlock`)
+- Status: **active**
+- Purpose Slug: `catchup-manual-merge-fgos-write-rejected-deadlock`
+- Docs:
+  - `overview` (active): `docs/explanation/catchup-manual-merge-fgos-write-rejected-deadlock.md`
+
+### return-ephemeral-worktree-fgos-strip (`return-ephemeral-worktree-fgos-strip`)
+- Status: **active**
+- Purpose Slug: `return-ephemeral-worktree-fgos-strip`
+- Docs:
+  - `overview` (active): `docs/explanation/return-ephemeral-worktree-fgos-strip.md`
+
+### noise-only-paths-truncation-guard-exemption (`noise-only-paths-truncation-guard-exemption`)
+- Status: **active**
+- Purpose Slug: `noise-only-paths-truncation-guard-exemption`
+- Docs:
+  - `overview` (active): `docs/explanation/noise-only-paths-truncation-guard-exemption.md`
+
+### general-verb-events-baseline-write-verified-fixed (`general-verb-events-baseline-write-verified-fixed`)
+- Status: **active**
+- Purpose Slug: `general-verb-events-baseline-write-verified-fixed`
+- Docs:
+  - `overview` (active): `docs/explanation/general-verb-events-baseline-write-verified-fixed.md`
+
+### test-suite-wallclock-file-split (`test-suite-wallclock-file-split`)
+- Status: **active**
+- Purpose Slug: `test-suite-wallclock-file-split`
+- Docs:
+  - `overview` (active): `docs/explanation/test-suite-wallclock-file-split.md`
+
+### submit-deps-direction-blocked-vs-superseded (`submit-deps-direction-blocked-vs-superseded`)
+- Status: **active**
+- Purpose Slug: `submit-deps-direction-blocked-vs-superseded`
+- Docs:
+  - `overview` (active): `docs/explanation/submit-deps-direction-blocked-vs-superseded.md`
+
+### fanout-batch-concurrent-dispatch (`fanout-batch-concurrent-dispatch`)
+- Status: **active**
+- Purpose Slug: `fanout-batch-concurrent-dispatch`
+- Docs:
+  - `overview` (active): `docs/explanation/fanout-batch-concurrent-dispatch.md`
+
