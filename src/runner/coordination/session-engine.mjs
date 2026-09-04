@@ -74,6 +74,8 @@ import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
+import { PROTOCOL_OPERATION_STAMP_PREFIX } from '../dispatch/execution-contract.mjs';
+import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import { mergePolicyStack, activationModeOf } from '../definitions/schema.mjs';
 import { planCohort, verifyPlannedAllocationAgainstCurrentConfig } from './cohort-planner.mjs';
@@ -144,17 +146,20 @@ function assertKnownReadOnlyRole(role, label) {
 // parameter, so `contract.policy` stays absent and behavior is
 // byte-identical to before this parameter existed.
 // A RESERVED constraint namespace, writable by this module alone. The
-// `protocol-operation:` stamp is the durable, on-disk record of WHICH
+// `protocol-operation:` stamp (imported from dispatch/execution-contract.mjs
+// -- the ONE definition either side of the coordination/dispatch layer
+// boundary trusts, Phase 01 R6a) is the durable, on-disk record of WHICH
 // declared operation an Assignment was materialized for, and
 // `assignmentServesOperation` (below) trusts it as engine-derived proof --
 // so it must never be something a caller can put there. Every mediated
-// contract door in this file goes through `buildReadOnlyContract`, which is
+// contract door in this file goes through `buildSessionContract`, which is
 // therefore the ONE place that both refuses a caller-supplied entry in this
 // namespace and appends the engine's own. (An Assignment built outside this
 // module -- the raw `createSessionAssignment` store door -- is unmediated by
-// design and carries no such guarantee; see this cell's trace.)
-const PROTOCOL_OPERATION_STAMP_PREFIX = 'protocol-operation:';
-
+// design and carries no such guarantee; see this cell's trace.) The SAME
+// stamp is also what lets a mutating inline contract past
+// `execution-contract.mjs`'s/`assignment-normalizer.mjs`'s own gates (R6a)
+// -- this module is the ONLY legal minter of it.
 function protocolOperationStamp(definition, operationId) {
   return `${PROTOCOL_OPERATION_STAMP_PREFIX}${definition.metadata.id}@${definition.metadata.version}#${operationId}`;
 }
@@ -168,7 +173,7 @@ function assertNoReservedOperationStamp(constraints) {
     if (typeof constraint === 'string' && constraint.startsWith(PROTOCOL_OPERATION_STAMP_PREFIX)) {
       throw new CoordinationError(
         'validation',
-        `buildReadOnlyContract: constraint "${constraint}" uses the reserved "${PROTOCOL_OPERATION_STAMP_PREFIX}" namespace -- that stamp is engine-derived operation provenance and may not be supplied by a caller`,
+        `buildSessionContract: constraint "${constraint}" uses the reserved "${PROTOCOL_OPERATION_STAMP_PREFIX}" namespace -- that stamp is engine-derived operation provenance and may not be supplied by a caller`,
       );
     }
   }
@@ -186,7 +191,19 @@ function assertNoReservedOperationStamp(constraints) {
 // validator downstream still rejects it with its own typed error -- and
 // rejects it BEFORE persistence, which is what keeps a non-string forgery off
 // disk.
-function buildReadOnlyContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs, minTier, protocolOperationRef }) {
+//
+// Phase 01 mutation-unlock (R4): renamed from `buildReadOnlyContract` --
+// "read-only" stopped being an accurate name once this can build either
+// posture. `mutation` defaults to `'read-only'`, which every pre-existing
+// caller (`dispatchPrimaryTask`, `proposeConsult`) still relies on
+// implicitly by never passing it -- byte-identical contract shape for both.
+// Only `dispatchDeclaredOperation` ever passes `mutation: 'mutating'`, and
+// only after its OWN R2/R3 checks (operation declares `result.kind:
+// 'work-product'`; `cwd` resolves to a linked worktree, never the main
+// checkout) have already passed -- this function trusts its caller for that
+// legality decision and only shapes the contract, exactly like every other
+// field here.
+function buildSessionContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs, minTier, protocolOperationRef, mutation = 'read-only' }) {
   const declared = Array.isArray(constraints) ? [...constraints] : constraints;
   assertNoReservedOperationStamp(declared);
   const stamped = protocolOperationRef !== undefined && Array.isArray(declared) ? [...declared, protocolOperationRef] : declared;
@@ -195,7 +212,7 @@ function buildReadOnlyContract({ objective, contextRefs, constraints, expectedOu
     contextRefs,
     constraints: stamped,
     expectedOutputs,
-    mutation: 'read-only',
+    mutation,
     evidence: { required: evidenceRequired },
     role,
     ...(capabilities !== undefined ? { capabilities } : {}),
@@ -270,15 +287,30 @@ function findLatestRunResult(fgosDir, assignmentId) {
 /**
  * The engine's ONE literal `executeAssignment()` call site (a static
  * structural test in `coordination-declared-consult.test.mjs` enforces
- * this file never grows a second one) -- both `createAndExecuteSessionTask`
- * (first dispatch) and `retrySessionTask` (Phase 06 R2, a new Run for an
- * EXISTING Assignment) call through this same tiny wrapper rather than
- * reaching `executeAssignment` directly, so "retry re-resolution through
- * EXISTING dispatch APIs, never a new dispatch surface" holds structurally,
- * not just by convention.
+ * this file never grows a second one; a SECOND, codebase-wide static test,
+ * `test/architecture.test.mjs`, additionally enforces this is the only real
+ * call site anywhere allowed to ever pass `isReadOnlyMode: false`, Phase 01
+ * R6b) -- both `createAndExecuteSessionTask` (first dispatch) and
+ * `retrySessionTask` (Phase 06 R2, a new Run for an EXISTING Assignment)
+ * call through this same tiny wrapper rather than reaching
+ * `executeAssignment` directly, so "retry re-resolution through EXISTING
+ * dispatch APIs, never a new dispatch surface" holds structurally, not just
+ * by convention.
+ *
+ * Phase 01 mutation-unlock (R5): `isReadOnlyMode` is derived from the
+ * Assignment's OWN already-stamped `mutation` field, never a second,
+ * independently-decided boolean -- `assignment.mutation` is set once, by
+ * `buildSessionContract`+`stampInlineAssignment` (assignment-normalizer.mjs),
+ * before this function ever runs, so there is exactly one place upstream
+ * that ever decides "mutating is legal here" (`dispatchDeclaredOperation`'s
+ * own R2/R3 gate) and exactly one place downstream that acts on it. Every
+ * pre-existing caller (`dispatchPrimaryTask`, `proposeConsult`) only ever
+ * builds `mutation: 'read-only'` contracts, so `assignment.mutation` is
+ * always `'read-only'` for them and this resolves to `isReadOnlyMode: true`
+ * byte-identically to before this parameter existed.
  */
 async function runExecutorAttempt(assignment, opts) {
-  return executeAssignment(assignment, { ...opts, isReadOnlyMode: true });
+  return executeAssignment(assignment, { ...opts, isReadOnlyMode: assignment.mutation !== 'mutating' });
 }
 
 /**
@@ -483,7 +515,7 @@ export async function dispatchPrimaryTask(
   const { fgosDir } = resolveSessionPaths(coordinationId, opts);
   assertWithinTaskDepth(fgosDir, parentAssignmentId, manifest.aggregateBounds.maxTaskDepth, 'dispatchPrimaryTask');
 
-  const contract = buildReadOnlyContract({
+  const contract = buildSessionContract({
     objective,
     contextRefs,
     constraints,
@@ -710,7 +742,7 @@ export async function proposeConsult(
     );
   }
 
-  const contract = buildReadOnlyContract({
+  const contract = buildSessionContract({
     objective,
     contextRefs,
     constraints,
@@ -1475,7 +1507,7 @@ function actorGatingOperationIds(definition, actorId) {
  *
  * What makes the stamp different in kind, rather than merely a fourth door:
  * `PROTOCOL_OPERATION_STAMP_PREFIX` is a RESERVED namespace,
- * `buildReadOnlyContract` refuses any caller-supplied entry in it, and
+ * `buildSessionContract` refuses any caller-supplied entry in it, and
  * `dispatchDeclaredOperation` is the sole caller that passes
  * `protocolOperationRef`. So "which door remembered to stamp" stops being a
  * question a future door can get wrong: a door that does not stamp produces
@@ -2100,6 +2132,78 @@ export function openDeclaredProtocolSession(
 }
 
 /**
+ * Phase 01 mutation-unlock (R1-R3): the narrow, testable four-condition gate
+ * a declared `operation` step's `mutation: 'mutating'` must clear BEFORE
+ * `dispatchDeclaredOperation` materializes anything. A no-op for `'read-only'`
+ * (R1's own default/every pre-existing caller) and for `undefined`. Throws a
+ * `CoordinationError('validation', ...)` naming the SPECIFIC failed condition
+ * -- never a generic message -- for every other case, including an illegal
+ * `mutation` value outright.
+ *
+ * R2: the bound operation must declare `result.kind: 'work-product'` --
+ * read from the definition's own resolved operation (never trusted from a
+ * caller-supplied claim; there is no parameter path for one here at all).
+ *
+ * R3: `opts.cwd` must resolve to a LINKED WORKTREE, never the main checkout,
+ * and never fail open on an unresolvable root. The exact comparison (this
+ * cell's own direct investigation, phase-01-mutation-unlock.md R3):
+ * `resolveMainCheckoutRoot(cwd) === resolveRepoRoot(cwd)` -- i.e. the
+ * toplevel of `cwd` IS the main checkout root -- refuses, since `cwd` may
+ * legitimately be a SUBDIRECTORY of either the main checkout or a worktree
+ * (comparing against raw `cwd` directly would wrongly refuse that case). A
+ * `null` `resolveMainCheckoutRoot` result (cwd outside any git checkout
+ * entirely) also refuses -- fail closed, never fail open.
+ *
+ * @param {'read-only'|'mutating'|undefined} mutation
+ * @param {{ operationId: string, operation: object, cwd: string|undefined }} ctx
+ */
+function assertMutatingDispatchAllowed(mutation, { operationId, operation, cwd }) {
+  if (mutation === undefined || mutation === 'read-only') return;
+  if (mutation !== 'mutating') {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: mutation "${mutation}" is not a legal value (expected "read-only" or "mutating")`,
+    );
+  }
+
+  const declaredKind = operation.result?.kind;
+  if (declaredKind !== 'work-product') {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: operation "${operationId}" declares result.kind "${declaredKind ?? 'undefined'}" -- a mutating dispatch requires the bound operation to declare result.kind "work-product"`,
+    );
+  }
+
+  let mainCheckoutRoot;
+  try {
+    mainCheckoutRoot = resolveMainCheckoutRoot(cwd);
+  } catch {
+    mainCheckoutRoot = null;
+  }
+  if (mainCheckoutRoot === null) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: mutation "mutating" refused for operation "${operationId}" -- cwd "${cwd}" does not resolve inside any git checkout (fail closed on an unresolvable root, never fail open)`,
+    );
+  }
+  let repoRoot;
+  try {
+    repoRoot = resolveRepoRoot(cwd);
+  } catch (err) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: mutation "mutating" refused for operation "${operationId}" -- cwd "${cwd}" toplevel could not be resolved (${err.message}); fail closed, never fail open`,
+    );
+  }
+  if (mainCheckoutRoot === repoRoot) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: mutation "mutating" refused for operation "${operationId}" -- cwd "${cwd}" resolves to the main checkout ("${repoRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`,
+    );
+  }
+}
+
+/**
  * Materialize and dispatch ONE declared operation of the protocol bound to
  * `coordinationId` (R1), through the declared topology's request/response
  * edges (R2) and the full policy precedence chain (R3), reusing
@@ -2181,6 +2285,7 @@ export function openDeclaredProtocolSession(
  * @param {object} [params.rolePolicy] Role-scope PolicyPatch fragment.
  * @param {object} [params.assignmentPolicy] Assignment-scope PolicyPatch fragment.
  * @param {object} [params.cliPolicy] Human/CLI-scope PolicyPatch fragment (the one scope legally allowed to carry a literal `preferExecutor`).
+ * @param {'read-only'|'mutating'} [params.mutation] Phase 01 mutation-unlock (R1). Default `'read-only'`, byte-identical to every pre-existing caller. `'mutating'` is refused unless the bound operation declares `result.kind: 'work-product'` (R2) AND `opts.cwd` resolves to a linked git worktree, never the main checkout (R3) -- see `assertMutatingDispatchAllowed`.
  * @param {object} [opts] Forwarded to `createAndExecuteSessionTask`/`executeAssignment` (cwd, repoRoot, packageRoot, runnerConfig, timeoutMs, options, ...)
  */
 export async function dispatchDeclaredOperation(
@@ -2204,6 +2309,14 @@ export async function dispatchDeclaredOperation(
     rolePolicy = {},
     assignmentPolicy = {},
     cliPolicy = {},
+    // Phase 01 mutation-unlock (R1/R4): default 'read-only' preserves every
+    // pre-existing caller's behavior byte-for-byte -- only a caller that
+    // explicitly passes 'mutating' ever reaches assertMutatingDispatchAllowed
+    // below, and only dispatchDeclaredOperation itself (never
+    // dispatchPrimaryTask/proposeConsult/recordConsultDisposition, none of
+    // which accept this parameter at all) can ever thread a non-default
+    // value into buildSessionContract.
+    mutation = 'read-only',
   },
   opts = {},
 ) {
@@ -2245,6 +2358,14 @@ export async function dispatchDeclaredOperation(
     ? resolveLiveSpecialistBindings(replayOnce())
     : undefined;
   const { operation, actorId, actorEntry, node, binding } = resolveDeclaredOperationActor(definition, operationId, targetActorId, specialistBindings);
+
+  // Phase 01 mutation-unlock (R1-R3): refused BEFORE any further
+  // materialization work, with an error naming the SPECIFIC condition that
+  // failed -- never a generic validation message. A no-op (returns
+  // immediately) for every pre-existing caller, since `mutation` defaults to
+  // `'read-only'` above.
+  assertMutatingDispatchAllowed(mutation, { operationId, operation, cwd: opts.cwd });
+
   const topology = definition.spec.profile.topology;
   const incomingEdge = topology?.edges?.find((edge) => edge.to === actorId);
 
@@ -2557,11 +2678,11 @@ export async function dispatchDeclaredOperation(
     policyProvenance,
   };
 
-  const contract = buildReadOnlyContract({
+  const contract = buildSessionContract({
     objective,
     contextRefs: resolvedContextRefs,
     constraints,
-    // Appended by `buildReadOnlyContract` itself, never spliced into the
+    // Appended by `buildSessionContract` itself, never spliced into the
     // caller-shared `constraints` array here -- that array is exactly what a
     // caller populates, so an engine stamp mixed into it would be
     // indistinguishable from a forged one to the reader below.
@@ -2572,6 +2693,10 @@ export async function dispatchDeclaredOperation(
     capabilities: capabilities ?? operation.capabilities,
     budget,
     timeoutMs: opts.timeoutMs,
+    // Phase 01 mutation-unlock (R1/R4): already refused above
+    // (assertMutatingDispatchAllowed) if this is 'mutating' and R2/R3 don't
+    // both hold -- reaching this line means it is legal to persist verbatim.
+    mutation,
     // Step 08 P04.2b: thread the composed policy stack's own resolved
     // `minTier` into the inline contract's own `policy.minTier` ONLY when it
     // resolves BELOW `resolveAssignmentDispatchPolicy`'s hardcoded default
@@ -2802,7 +2927,7 @@ export async function recordConsultDisposition(
   const { fgosDir } = resolveSessionPaths(coordinationId, opts);
   assertWithinTaskDepth(fgosDir, consultantAssignmentId, manifest.aggregateBounds.maxTaskDepth, 'recordConsultDisposition');
 
-  const contract = buildReadOnlyContract({
+  const contract = buildSessionContract({
     objective: `Record disposition for consult advice from assignment "${consultantAssignmentId}".`,
     contextRefs: [consultantAssignmentId],
     constraints: [`disposition:${disposition}`, `rationale:${rationale}`],

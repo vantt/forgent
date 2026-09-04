@@ -113,11 +113,21 @@ function assertNoWorkLifecycleKeys(value, pathLabel = 'request') {
   }
 }
 
-function assertMutationReadOnly(value, pathLabel) {
+// Phase 01 mutation-unlock: a declared `operation` step may opt into a
+// real, mutating dispatch (`allowMutating: true`, `validateOperationStep`
+// below) -- every other step/branch/task shape stays hard-refused for
+// anything but "read-only", unchanged. `allowMutating` never widens WHICH
+// values are legal (still exactly "read-only" | "mutating"), only whether
+// "mutating" itself is one of them for this particular caller.
+function assertMutationAllowed(value, pathLabel, { allowMutating = false } = {}) {
   if (value === undefined) return;
-  if (value !== 'read-only') {
-    fail(`field "mutation" at ${pathLabel} must be "read-only" -- the whole standalone-session CLI surface is read-only in V1 (plan.md Locked Product Decisions)`);
-  }
+  if (value === 'read-only') return;
+  if (allowMutating && value === 'mutating') return;
+  fail(
+    allowMutating
+      ? `field "mutation" at ${pathLabel} must be "read-only" or "mutating"`
+      : `field "mutation" at ${pathLabel} must be "read-only" -- only a declared "operation" step may opt into a real, mutating dispatch (Phase 01 mutation-unlock); every other step type stays read-only-only`,
+  );
 }
 
 const ACTOR_ALLOWED_KEYS = new Set(['id', 'persona', 'executor', 'model', 'tier']);
@@ -201,7 +211,7 @@ const TASK_ALLOWED_KEYS = new Set(['taskKey', 'contextRefs', 'constraints', 'exp
 function validateTask(task) {
   if (!isPlainObject(task)) fail('"task" is required and must be an object when kind is "agent-led"');
   assertAllowedKeys(task, TASK_ALLOWED_KEYS, '"task"');
-  assertMutationReadOnly(task.mutation, 'task.mutation');
+  assertMutationAllowed(task.mutation, 'task.mutation');
   if (task.taskKey !== undefined) assertSafeId(task.taskKey, 'task.taskKey');
   const contextRefs = validateStringArray(task.contextRefs, 'task.contextRefs');
   contextRefs.forEach((ref, i) => assertSafeRefOrId(ref, `task.contextRefs[${i}]`));
@@ -247,7 +257,7 @@ const OPERATION_STEP_ALLOWED_KEYS = new Set([
 
 function validateOperationStep(step, i) {
   assertAllowedKeys(step, OPERATION_STEP_ALLOWED_KEYS, `steps[${i}] (type "operation")`);
-  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertMutationAllowed(step.mutation, `steps[${i}].mutation`, { allowMutating: true });
   if (!isNonEmptyString(step.operationId)) fail(`steps[${i}].operationId is required`);
   if (step.targetActorId !== undefined) assertSafeId(step.targetActorId, `steps[${i}].targetActorId`);
   if (!isNonEmptyString(step.objective)) fail(`steps[${i}].objective is required`);
@@ -275,6 +285,12 @@ function validateOperationStep(step, i) {
     intent: step.intent,
     round: step.round,
     taskKey: step.taskKey,
+    // Phase 01 mutation-unlock (R1): only ever "read-only" | "mutating" |
+    // undefined past assertMutationAllowed above -- carried through
+    // verbatim (never defaulted here) so a caller-omitted field stays
+    // byte-identical to every pre-existing request (session-engine.mjs's
+    // own dispatchDeclaredOperation applies the "read-only" default).
+    mutation: step.mutation,
   };
 }
 
@@ -303,7 +319,7 @@ function assertNoAuthorizedBy(step, label) {
 function validateAuthorizeStep(step, i) {
   assertNoAuthorizedBy(step, `steps[${i}] (type "authorize")`);
   assertAllowedKeys(step, AUTHORIZE_STEP_ALLOWED_KEYS, `steps[${i}] (type "authorize")`);
-  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
   if (!isNonEmptyString(step.operationId)) fail(`steps[${i}].operationId is required`);
   if (step.targetActorId !== undefined) assertSafeId(step.targetActorId, `steps[${i}].targetActorId`);
   if (step.nodeId !== undefined) assertSafeId(step.nodeId, `steps[${i}].nodeId`);
@@ -343,7 +359,7 @@ const DISPOSITION_MAX_LENGTH = 200;
 function validateDispositionStep(step, i) {
   assertNoAuthorizedBy(step, `steps[${i}] (type "disposition")`);
   assertAllowedKeys(step, DISPOSITION_STEP_ALLOWED_KEYS, `steps[${i}] (type "disposition")`);
-  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
   assertSafeRefOrId(step.targetRef, `steps[${i}].targetRef`);
   // Shape only, deliberately not a closed vocabulary: the accepted contract
   // says "e.g. accepted | rejected" and names closing a round as a third
@@ -371,7 +387,7 @@ const FAN_OUT_BRANCH_ALLOWED_KEYS = new Set(['actorId', 'objective', 'expectedOu
 function validateFanOutBranch(branch, i, j) {
   if (!isPlainObject(branch)) fail(`steps[${i}].branches[${j}] must be an object`);
   assertAllowedKeys(branch, FAN_OUT_BRANCH_ALLOWED_KEYS, `steps[${i}].branches[${j}]`);
-  assertMutationReadOnly(branch.mutation, `steps[${i}].branches[${j}].mutation`);
+  assertMutationAllowed(branch.mutation, `steps[${i}].branches[${j}].mutation`);
   assertSafeId(branch.actorId, `steps[${i}].branches[${j}].actorId`);
   if (!isNonEmptyString(branch.objective)) fail(`steps[${i}].branches[${j}].objective is required`);
   const expectedOutputs = validateStringArray(branch.expectedOutputs, `steps[${i}].branches[${j}].expectedOutputs`, { required: true });
@@ -397,7 +413,7 @@ const FAN_OUT_STEP_ALLOWED_KEYS = new Set(['type', 'as', 'operationId', 'branche
 
 function validateFanOutStep(step, i) {
   assertAllowedKeys(step, FAN_OUT_STEP_ALLOWED_KEYS, `steps[${i}] (type "fan-out")`);
-  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
   if (!isNonEmptyString(step.operationId)) fail(`steps[${i}].operationId is required`);
   if (!Array.isArray(step.branches) || step.branches.length === 0) fail(`steps[${i}].branches must be a non-empty array`);
   const branches = step.branches.map((branch, j) => validateFanOutBranch(branch, i, j));
@@ -442,7 +458,7 @@ function assertNoLinkedBy(step, label) {
 function validateContributionStep(step, i) {
   assertNoLinkedBy(step, `steps[${i}] (type "contribution")`);
   assertAllowedKeys(step, CONTRIBUTION_STEP_ALLOWED_KEYS, `steps[${i}] (type "contribution")`);
-  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
   assertSafeId(step.contributionId, `steps[${i}].contributionId`);
   if (!isNonEmptyString(step.contributionType) || !CONTRIBUTION_TYPE_SET.has(step.contributionType)) {
     fail(`steps[${i}].contributionType must be one of the closed MVP8 contribution types (${CONTRIBUTION_TYPES.join(' | ')})`);

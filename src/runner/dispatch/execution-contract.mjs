@@ -10,7 +10,11 @@
 // cell (ADR-006 §6 -- first slice is read-only only, no session/coordination
 // reference this slice):
 //   - `mutation: 'mutating'` is rejected by name, not merely because it maps
-//     to an "unrecognized" value.
+//     to an "unrecognized" value -- UNLESS the contract carries the
+//     engine-reserved protocol-operation stamp (Phase 01 mutation-unlock,
+//     R6a, `carriesProtocolOperationStamp` below), proof it was built by
+//     session-engine.mjs's own mediated `dispatchDeclaredOperation` door and
+//     not forged by a bare caller.
 //   - `coordinationId` (and other session/coordination field names) is
 //     rejected by name, not merely because it happens to be absent from the
 //     accepted field set today -- so a future accidental addition to that
@@ -19,6 +23,30 @@
 import { MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
 
 export const CONTRACT_POLICY_VERSION = '1';
+
+// Phase 01 mutation-unlock (R6a): the ONE reserved `contract.constraints`
+// namespace that marks an inline contract as ENGINE-derived operation
+// provenance, minted exclusively by session-engine.mjs's own
+// `buildSessionContract`/`assertNoReservedOperationStamp` mechanism for a
+// declared `dispatchDeclaredOperation` call. Defined here (dispatch/infra
+// layer) rather than in session-engine.mjs (coordination/use-case layer) so
+// this module and assignment-normalizer.mjs -- both infra-layer, per
+// docs/architecture-manifest.json -- never import upward from
+// src/runner/coordination/** (the one-directional-layer rule
+// test/architecture.test.mjs enforces); session-engine.mjs imports this
+// constant from here instead of re-declaring it, so there is exactly one
+// definition either side of the layer boundary trusts.
+export const PROTOCOL_OPERATION_STAMP_PREFIX = 'protocol-operation:';
+
+/** `true` when `constraints` carries at least one entry stamped with the
+ * reserved `PROTOCOL_OPERATION_STAMP_PREFIX` namespace -- the one signal
+ * that lets `validateExecutionContract` (below) and
+ * `assignment-normalizer.mjs`'s `stampInlineAssignment` distinguish a
+ * mutating inline contract session-engine.mjs itself built from one any
+ * other caller could have forged by hand. */
+export function carriesProtocolOperationStamp(constraints) {
+  return Array.isArray(constraints) && constraints.some((entry) => typeof entry === 'string' && entry.startsWith(PROTOCOL_OPERATION_STAMP_PREFIX));
+}
 
 const ACCEPTED_CONTRACT_FIELDS = new Set([
   'objective',
@@ -146,14 +174,21 @@ export function validateExecutionContract({ contract, caller } = {}) {
   }
 
   // ADR-006 §6: the single most safety-critical check in this module --
-  // first slice is read-only only. Named explicitly, not folded into the
-  // generic "must equal read-only" branch below, so this exact failure mode
-  // always reports its own reason.
+  // first slice is read-only only, UNLESS the contract carries the
+  // engine-reserved protocol-operation stamp (Phase 01 mutation-unlock,
+  // R6a) -- proof this exact contract was built by session-engine.mjs's
+  // own mediated `dispatchDeclaredOperation` door, never a bare caller
+  // forging `mutation: 'mutating'` by hand. Named explicitly, not folded
+  // into the generic "must equal read-only" branch below, so each failure
+  // mode always reports its own, distinct reason.
   if (contract.mutation === 'mutating') {
-    fail('contract.mutation "mutating" is rejected -- first slice is read-only only (ADR-006 §6)');
-  }
-  if (contract.mutation !== 'read-only') {
-    fail('contract.mutation must be "read-only" (missing, or any value other than "read-only", is rejected)');
+    if (!carriesProtocolOperationStamp(contract.constraints)) {
+      fail(
+        'contract.mutation "mutating" is rejected -- only an inline contract carrying the engine-reserved protocol-operation stamp in its constraints (session-engine.mjs\'s own mediated dispatchDeclaredOperation door) may declare "mutating"; every other caller stays read-only-only (ADR-006 §6)',
+      );
+    }
+  } else if (contract.mutation !== 'read-only') {
+    fail('contract.mutation must be "read-only" or "mutating" (missing, or any other value, is rejected)');
   }
 
   if (!isPlainObject(contract.evidence)) {
