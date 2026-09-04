@@ -55,3 +55,30 @@ descriptor's own shape.
 Merged into `fgw/tsk-5x7` (the parent's own integration branch, not main
 directly) — this is a decomposed child; the parent's own `sync-root`
 later carries the combined change to main.
+
+## The deferred `fanoutBatchExecutorCli` porting landed (`tsk-4jo`)
+
+This doc's own §(0b) named `fanoutBatchExecutorCli` as deliberately NOT
+ported in the minimal piece — only `decideExecutorCli` proved the seam.
+`tsk-4jo` did that deferred porting: `fanoutBatchExecutorCli`
+(`src/runner/dispatch/cli.mjs:687-701`) stopped hand-computing mechanism
+via `executorIdForWork` +
+`decideDispatchMechanism`/`decideExecutorDispatchMechanism` directly, and
+now calls the same canonical `compileDispatchPlan(cfg, { work, workItem,
+hasLiveTaskAccess })` every other dispatch caller uses — one function-body
+swap, output contract unchanged (`fired`/`mechanismChanged`/`unavailable`/
+`deferred`). A new test asserts a governance-blocked candidate is never
+reported dispatchable through this path either. Verified: `node --test
+test/runner/dispatch.test.mjs`, 328/328 passing, plus an independently
+confirmed red-before/green-after Iron Law transcript for the new test.
+
+**Why this item's own fgOS lifecycle record starts mid-stream.** The
+original `tsk-4jo`'s `.fgos` event-log history was destructively lost —
+an unrelated `git reset --hard` on the main checkout during recovery from
+a broken out-of-process dispatch that had committed straight to main
+instead of this item's own worktree branch. The real implementation,
+its test, and the Iron Law evidence were already committed on
+`fgw/tsk-4jo` (commits `1e878dda`/`163ef53`) before the event-log loss and
+remained independently verifiable, so the item was re-submitted under the
+same id (the store had no record of the old one) rather than fabricating
+a from-scratch discovery/planning narrative for work already done.
