@@ -231,6 +231,21 @@ registry already has the matching `currentPath` → the doc becomes
 doc. This is a hard gate: the migration to the new corpus (later children)
 is not allowed to run until this canary is green.
 
+### Child 11 — the real 268-document migration, dry-run first (`tsk-28x-11`)
+
+`scripts/knowledge-migration.mjs` is the migration that moved the existing
+corpus into the new `docs/<purpose>/<role>.md` layout — the reason every
+doc this retro-loop session has read or written already lives at its
+current path. Dry-run runs first: build the `oldPath → target` inventory
+and check a conservation gate (every file appears exactly once at its
+target, or carries an explicit exclude reason; no target ends up with zero
+sources yet stays active; no source gets folded in a way that loses its
+lineage). Apply only runs once the dry-run is clean: commit the registry +
+aliases, move/fold files to their targets, rebuild the index, then run the
+duplicate/lineage harness. Parallelism is scoped strictly by target, never
+by source file independently — two sources folding into the same target
+can't race each other.
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
