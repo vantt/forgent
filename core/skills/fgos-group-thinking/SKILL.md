@@ -75,9 +75,16 @@ Build a request object/file in the exact shape `fgos coordination run
 ([`src/verbs/coordination/schema.mjs`](../../../src/verbs/coordination/schema.mjs)):
 `kind: "declared-protocol"`, `protocolRef: {id: "<the id you selected in
 step 1>"}`, `writerId`, `objective`, and one `operation` / `authorize` /
-`disposition` / `fan-out` step per action, following that protocol's own
-declared graph from step 2. `$ref:<label>` placeholders resolve within one
-call only — a resumed request needs the earlier call's real assignment ids.
+`disposition` / `fan-out` / `contribution` step per action, following
+that protocol's own declared graph from step 2. A `contribution` step
+records a contribution-typed deliberation-ledger entry (`proposal` /
+`objection` / `response` / `clarification` / `rank` / `specialist-request`,
+`operation`'s own `contributions.allowedTypes[]` narrows which are legal)
+backed by a settled `assignmentId`, with optional `anchors[]`/`respondsTo`
+lineage — never a `linkedBy`, which the engine always derives from the
+session's own driver identity. `$ref:<label>` placeholders resolve within
+one call only — a resumed request needs the earlier call's real
+assignment ids.
 
 **Per-actor provider/tier is a first-class part of this request shape —
 never one hardcoded provider for the whole session.** Add an `actors[]`
@@ -156,10 +163,14 @@ never exposed them as caller-invocable actions in the first place:
   request already uses, with the same context-grant enforcement. This
   skill adds no second grant path — it only forwards the request object.
 - **Validate its own aggregate.** `run.mjs`'s public request vocabulary
-  has exactly four step kinds: `operation`, `authorize`, `disposition`,
-  `fan-out`. None of them calls `validateSessionAggregation` or any other
-  aggregation-validation door — that capability simply is not reachable
-  through this surface.
+  has exactly five step kinds: `operation`, `authorize`, `disposition`,
+  `fan-out`, `contribution`. None of them calls
+  `validateSessionAggregation` or any other aggregation-validation door —
+  that capability simply is not reachable through this surface (the
+  `contribution` step forwards only into `linkSessionContribution`, a
+  separate, already-independently-mediated door — see
+  `docs/architect/agent-coordination/contracts/coordination-session.md`'s
+  "Group-Thinking Protocol Pack" section for the full proof).
 - **Authorize a specialist.** For the same reason: no step kind reaches
   `authorizeSpecialistSlot` / `recordSpecialistAuthorization`. Specialist
   authorization is not in `run.mjs`'s public request vocabulary at all.
