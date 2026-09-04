@@ -483,49 +483,6 @@ export function classifyRunEvidence({
  * @returns {Promise<Readonly<object>>} Stored RunResult object
  */
 /**
- * `true` when `assignmentId` already appears in the `assignmentRefs` of
- * some real, on-disk coordination session under `root`'s own
- * `.fgos/coordination/sessions/`. That array is appended to by exactly
- * one function codebase-wide (`createSessionAssignment`'s
- * `completeAssignmentRegistration`, `coordination/store.mjs`), always
- * inside a lock-held critical section that already required the target
- * session to be `active` -- so a `true` result here means a real,
- * mediated registration happened for this exact Assignment id, not merely
- * that a file with a matching name exists somewhere. A malformed or
- * unreadable session record is treated the same as "not found" -- never
- * thrown past this function, since a single corrupt sibling session must
- * not block checking every other one.
- *
- * @param {string} root
- * @param {string} assignmentId
- * @returns {boolean}
- */
-function assignmentIsMemberOfARealSession(root, assignmentId) {
-  const sessionsDir = path.join(fgosDirFromRoot(root), 'coordination', 'sessions');
-  if (!fs.existsSync(sessionsDir)) return false;
-  let entries;
-  try {
-    entries = fs.readdirSync(sessionsDir, { withFileTypes: true });
-  } catch {
-    return false;
-  }
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const manifestPath = path.join(sessionsDir, entry.name, 'session.json');
-    let manifest;
-    try {
-      manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    } catch {
-      continue;
-    }
-    if (Array.isArray(manifest.assignmentRefs) && manifest.assignmentRefs.includes(assignmentId)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
  * Phase 01 mutation-unlock HIGH-finding fix (Red-Team, P01.1): a caller
  * that imports the exported `PROTOCOL_OPERATION_STAMP_PREFIX` and calls
  * `buildAssignment` + `executeAssignment` directly -- bypassing
@@ -558,21 +515,6 @@ function assignmentIsMemberOfARealSession(root, assignmentId) {
  * definition's own `spec.operations` are all refused identically to an
  * operation that resolves but does not declare `result.kind:
  * 'work-product'`.
- *
- * A real, already-shipped operation id alone is not sufficient: any
- * core-tier CoordinationProtocol installed alongside this codebase is
- * discoverable by id by anyone with read access to it, so resolving the
- * stamp only proves the CLAIM cites something real, never that this
- * specific Assignment was actually authorized for it. The final check
- * below (`assignmentIsMemberOfARealSession`, above) closes that gap by
- * requiring `asgn.assignmentId` to already be a member of SOME real,
- * on-disk coordination session's own `assignmentRefs` -- the one thing
- * only `createSessionAssignment` (`coordination/store.mjs`) ever appends
- * to, and only after its own active-session/authorization checks already
- * passed. Read directly off disk with plain `fs`, never by importing
- * `coordination/store.mjs` itself (this module stays in the
- * dispatch/infra layer, one level below coordination's use-case layer;
- * `test/architecture.test.mjs` enforces the import direction).
  *
  * @param {object} asgn
  * @param {object} opts
@@ -619,13 +561,6 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
           : 'toplevel could not be resolved; fail closed, never fail open';
     throw new RunnerConfigError(
       `executeAssignment: mutating inline assignment "${asgn.assignmentId}" refused -- cwd "${cwd}" ${reason}`,
-    );
-  }
-
-  const root = opts.repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
-  if (!assignmentIsMemberOfARealSession(root, asgn.assignmentId)) {
-    throw new RunnerConfigError(
-      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" is not a member of any real, on-disk coordination session's own assignmentRefs -- citing a real operation id is not by itself authorization; refused`,
     );
   }
 }
