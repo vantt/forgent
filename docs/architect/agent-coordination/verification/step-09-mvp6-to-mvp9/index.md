@@ -108,7 +108,7 @@ P09.1's schema prep "cannot integrate before the MVP8 product gate."
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
-| P08.2 | Phase 08 session ledger, replay, visibility (2 fix rounds) | done | (pending commit) |
+| P08.2 | Phase 08 session ledger, replay, visibility (2 fix rounds) | done | `a24c250a` |
 | P07.4 | Phase 07 surface/regression proof, contract promotion (closes Phase 07; 1 HIGH fixed) | done | `9b81427c` |
 | P09.1 | Phase 09 specialist slot schema, static-only prep | done | `9b81427c` |
 | P06.1 | Phase 06 visibility definition schema/validation | done | `8d2fa7d8` |
