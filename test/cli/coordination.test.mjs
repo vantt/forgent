@@ -15,12 +15,15 @@ import {
   envelopeData,
   execFileSync,
   fs,
+  os,
   path,
   run,
   tmpCwd,
 } from './helpers/fgos-cli-harness.mjs';
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
 import { StoreError } from '../../src/state/store.mjs';
+import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
+import { openSession } from '../../src/runner/coordination/store.mjs';
 
 // ─── Fake executor wiring for real-subprocess run tests ───────────────────
 // Same real Node-subprocess fake executor shape session-engine.mjs's own
@@ -444,6 +447,136 @@ test('fgos coordination run --file <declared consult>: dispatches both declared 
   assert.equal(runData.steps[0].as, 'request');
   assert.equal(runData.steps[1].as, 'response');
   assert.equal(runData.steps[1].status, 'done');
+});
+
+// ─── R7: `--cwd <path>` ─────────────────────────────────────────────────
+
+test('fgos coordination run --cwd <worktree> --file <request naming a mutating step> reaches runCoordinationUseCase with ctx.cwd set to that worktree -- the session genuinely opens (session.json + the Assignment claim written) under the worktree\'s own .fgos/, never the repo root\'s', () => {
+  const repoRootDir = tmpCwd();
+  writeFakeExecutorConfig(repoRootDir);
+  const worktreeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-cwd-worktree-'));
+  const coordinationId = 'coord_cwd_wiring_probe';
+  const reqPath = writeRequest(repoRootDir, 'agent-led-cwd.json', agentLedRequest({ coordinationId }));
+
+  // This request genuinely dispatches a mutating step (`openSession` +
+  // `createSessionAssignment`, both real writes) -- not asserted here is
+  // full Run SETTLEMENT (the fake executor's own agent-result.json), which
+  // depends on a separate, dispatch-layer (`src/runner/dispatch/**`)
+  // cwd/repoRoot split this cell's own lease excludes touching (a named
+  // Gap in this cell's trace); the CLI call may therefore still exit
+  // non-zero. What this test proves, and only this: `ctx.cwd` really
+  // reached `runCoordinationUseCase`, and the session's own on-disk state
+  // (session.json, the Assignment's claim files) landed under the `--cwd`
+  // worktree, never the repo root -- a direct filesystem assertion, not
+  // merely a non-crashing exit code.
+  run(repoRootDir, ['coordination', 'run', '--cwd', worktreeDir, '--file', reqPath]);
+
+  const worktreeSessionManifest = path.join(worktreeDir, '.fgos', 'coordination', 'sessions', coordinationId, 'session.json');
+  assert.ok(fs.existsSync(worktreeSessionManifest), 'expected the session to genuinely open under the --cwd worktree\'s own .fgos/');
+
+  const repoRootSessionDir = path.join(repoRootDir, '.fgos', 'coordination', 'sessions', coordinationId);
+  assert.equal(fs.existsSync(repoRootSessionDir), false, 'the session must NOT also land under the repo root\'s own .fgos/ when --cwd names a different directory');
+});
+
+test('fgos coordination show --cwd <worktree> <id> reads the session back from the SAME worktree, and cannot see it at all when --cwd is omitted -- the read-side wiring is symmetric with run\'s write side, isolated here from the dispatch-layer Gap noted above', () => {
+  const repoRootDir = tmpCwd();
+  const worktreeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-cwd-show-worktree-'));
+  const coordinationId = 'coord_cwd_show_probe';
+
+  // Opens a real session directly under the worktree (setup only, through
+  // store.mjs's own write door -- no Assignment dispatch involved, so this
+  // is independent of the dispatch-layer Gap noted in the sibling test
+  // above) so this test isolates exactly what `--cwd` on `show` controls.
+  openSession(
+    { coordinationId, objective: 'Prove show --cwd reads the correct workspace.', provenanceRoot: { writerId: 'coordination-cli-test' } },
+    { cwd: worktreeDir, repoRoot: worktreeDir },
+  );
+
+  const showResult = run(repoRootDir, ['coordination', 'show', coordinationId, '--cwd', worktreeDir, '--json']);
+  assert.equal(showResult.status, 0, showResult.stderr);
+  assert.equal(envelopeData(showResult.stdout).coordinationId, coordinationId);
+
+  // Without --cwd, the CLI reads the repo root's own .fgos/ (byte-identical
+  // default behavior) -- the session opened only under the worktree must
+  // not be visible there at all.
+  const showWithoutCwd = run(repoRootDir, ['coordination', 'show', coordinationId, '--json']);
+  assert.notEqual(showWithoutCwd.status, 0, 'the session must not be visible against the repo root when --cwd is omitted');
+});
+
+test('fgos coordination run --file <request> with --cwd OMITTED behaves byte-identically to today: the session lands under the repo root\'s own .fgos/', () => {
+  const cwd = tmpCwd();
+  writeFakeExecutorConfig(cwd);
+  const reqPath = writeRequest(cwd, 'agent-led-no-cwd.json', agentLedRequest());
+
+  const runResult = run(cwd, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  const runData = envelopeData(runResult.stdout);
+  assert.equal(runData.closed, true);
+
+  const sessionManifest = path.join(cwd, '.fgos', 'coordination', 'sessions', runData.coordinationId, 'session.json');
+  assert.ok(fs.existsSync(sessionManifest), 'omitting --cwd must default the working directory to the resolved repo root, exactly as before this flag existed');
+});
+
+// ─── R2-R5: `fgos coordination chain <track>` ──────────────────────────────
+
+test('fgos coordination chain <track>: lists cells reconstructed from real sessions, names activeCell and nextAction for the still-open one', () => {
+  const cwd = tmpCwd();
+  writeFakeExecutorConfig(cwd);
+  const reqPath = writeRequest(cwd, 'agent-led-chain.json', agentLedRequest({ coordinationId: 'cli-chain--cellA' }));
+
+  const runResult = run(cwd, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  assert.equal(envelopeData(runResult.stdout).closed, true);
+
+  const chainResult = run(cwd, ['coordination', 'chain', 'cli-chain', '--json']);
+  assert.equal(chainResult.status, 0, chainResult.stderr);
+  const chainData = envelopeData(chainResult.stdout);
+  assert.equal(chainData.track, 'cli-chain');
+  assert.deepEqual(chainData.cells.map((c) => c.cellId), ['cellA']);
+  assert.equal(chainData.cells[0].status, 'completed');
+  assert.equal(chainData.activeCell, null);
+});
+
+test('fgos coordination chain <track> on a track with zero matching sessions is a validation-free empty result, not an error', () => {
+  const cwd = tmpCwd();
+  const chainResult = run(cwd, ['coordination', 'chain', 'never-opened-track']);
+  assert.equal(chainResult.status, 0, chainResult.stderr);
+  const chainData = envelopeData(chainResult.stdout);
+  assert.deepEqual(chainData, { track: 'never-opened-track', cells: [], activeCell: null, nextAction: null });
+});
+
+test('fgos coordination chain requires a track argument', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['coordination', 'chain']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /coordination chain requires a track/);
+});
+
+// ─── R5: every enumerated-subcommand string names "chain" ─────────────────
+
+test('R5: every place that enumerates the coordination sub-verb list (help text, error messages, the registry description) names "chain"', () => {
+  const source = fs.readFileSync(FGOS, 'utf8');
+  assert.match(
+    source,
+    /coordination requires a sub-verb: fgos coordination <run\|show\|launch-master-loop\|chain>/,
+    'requireField usage message must enumerate "chain"',
+  );
+  assert.match(
+    source,
+    /coordination: unknown sub-verb "\$\{sub\}" \(known: run, show, launch-master-loop, chain\)/,
+    'unknown-sub-verb error message must enumerate "chain"',
+  );
+
+  const entry = COMMAND_REGISTRY.find((e) => e.name === 'coordination');
+  assert.ok(entry, 'the "coordination" registry entry must exist');
+  assert.match(entry.invoke, /chain/, 'registry invoke string must enumerate "chain"');
+  assert.ok(entry.parameters.properties.sub.enum.includes('chain'), 'registry sub enum must include "chain"');
+  assert.match(entry.description, /"chain"/, 'registry description must document "chain"');
+  assert.ok(entry.examples.some((e) => e.includes('chain')), 'registry examples must include a "chain" example');
+
+  const unknownSubResult = run(tmpCwd(), ['coordination', 'bogus-sub-verb']);
+  assert.notEqual(unknownSubResult.status, 0);
+  assert.match(unknownSubResult.stderr, /known: run, show, launch-master-loop, chain/);
 });
 
 // `execFileSync` re-export sanity: confirms the harness genuinely spawns a

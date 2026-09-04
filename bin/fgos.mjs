@@ -75,6 +75,7 @@ import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
 import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
 import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
 import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
+import { chainCoordinationUseCase } from '../src/verbs/coordination/chain.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -3114,16 +3115,23 @@ async function runVerb(verb, flags, positional, dir) {
     // existing, hardened session-engine.mjs exports (P00-P06) -- this
     // adapter never touches session/Assignment/Run state directly.
     case 'coordination': {
-      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show|launch-master-loop> ...');
+      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show|launch-master-loop|chain> ...');
       // Same repoRoot resolution `catchup`/`merge next` already use:
       // `--dir` names the main checkout's `.fgos/`, so its parent is the
       // repo root; omitted, the caller's own cwd is the repo root.
       const repoRootForCoordination = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
+      // R7: `--cwd <path>` names the worker/session working directory this
+      // adapter opens/reads a session against -- distinct from `--dir`
+      // above (the main checkout root, used ONLY to resolve
+      // `repoRootForCoordination` and the runner config). Omitted, `cwd`
+      // stays identical to `repoRootForCoordination`, byte-identical to
+      // this adapter's behavior before this flag existed.
+      const cwdForCoordination = flags.cwd !== undefined ? path.resolve(process.cwd(), flags.cwd) : repoRootForCoordination;
       if (sub === 'run') {
         const filePath = requireField(flags.file, 'coordination run requires --file <request-path>: fgos coordination run --file <request.json>');
         return await runCoordinationUseCase(
           {
-            cwd: repoRootForCoordination,
+            cwd: cwdForCoordination,
             repoRoot: repoRootForCoordination,
             runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
           },
@@ -3140,7 +3148,7 @@ async function runVerb(verb, flags, positional, dir) {
         // `--json` is accepted as a no-op, same convention the existing
         // `show` (work-item) verb already documents in the registry: the
         // envelope is always JSON, so the flag changes nothing.
-        return showCoordinationUseCase({ cwd: repoRootForCoordination, repoRoot: repoRootForCoordination }, { id });
+        return showCoordinationUseCase({ cwd: cwdForCoordination, repoRoot: repoRootForCoordination }, { id });
       }
       if (sub === 'launch-master-loop') {
         // MVP4 (Step 09, Phase 02) R1-R4: a thin, mechanical composer for
@@ -3155,7 +3163,7 @@ async function runVerb(verb, flags, positional, dir) {
         const writerId = requireField(flags['writer-id'], 'coordination launch-master-loop requires --writer-id <id>');
         return await launchMasterLoopUseCase(
           {
-            cwd: repoRootForCoordination,
+            cwd: cwdForCoordination,
             repoRoot: repoRootForCoordination,
             runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
           },
@@ -3171,7 +3179,15 @@ async function runVerb(verb, flags, positional, dir) {
           },
         );
       }
-      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: run, show, launch-master-loop).`);
+      if (sub === 'chain') {
+        // Step 09 Phase 02 R2-R5: a read-only status read across a whole
+        // chain of cell-sessions -- thin door onto
+        // src/verbs/coordination/chain.mjs, which never appends an event,
+        // dispatches, authorizes, dispositions, or closes a session.
+        const track = requireField(positional[1] ?? flags.track, 'coordination chain requires a track: fgos coordination chain <track> [--json]');
+        return chainCoordinationUseCase({ cwd: cwdForCoordination, repoRoot: repoRootForCoordination }, { track });
+      }
+      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: run, show, launch-master-loop, chain).`);
     }
 
     case 'rebuild': {

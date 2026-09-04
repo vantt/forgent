@@ -7,6 +7,7 @@
   "members": [
     { "id": "core.coordination-protocol.group-thinking-rfc-review-lite", "version": "1.0.0" },
     { "id": "core.coordination-protocol.group-thinking-nominal-group-lite", "version": "1.0.0" },
-    { "id": "core.coordination-protocol.group-thinking-delphi-feedback-lite", "version": "1.0.0" }
+    { "id": "core.coordination-protocol.group-thinking-delphi-feedback-lite", "version": "1.0.0" },
+    { "id": "core.coordination-protocol.standalone-master-coordination-loop", "version": "1.0.0" }
   ]
 }
