@@ -38,6 +38,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/branch-content-mismatch-fgos-exclusion.md",
+    "title": "The check the previous two syntheses had to work around, finally fixed",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/build-skills-mirror-dev-skills-into-plugin.md",
     "title": "`npm run build:skills` now auto-syncs `plugins/fgOS/skills`",
     "sourceCaptureId": null
@@ -62,8 +70,24 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/catchup-movework-reopens-fgos-divergence.md",
+    "title": "A merge that manufactured its own next conflict",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/catchup-self-recovery-shared-reference.md",
     "title": "Three items each fixed self-recovery in one skill file — none of them shared it",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/catchup-spurious-not-uptodate-merge-refusal.md",
+    "title": "A merge refusal git explained clearly, that the code still mishandled",
     "sourceCaptureId": null
   },
   {
@@ -150,8 +174,40 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/compound-learn-artifact-registry.md",
+    "title": "The registry this session's own retrospective synthesis runs on, decided here",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/core-foundation-domain-boundary.md",
     "title": "`core/` vs `domains/<name>/` — fgOS's own architecture boundary",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/cross-provider-egress-governance.md",
+    "title": "The gate checked the command name, not where the data actually went",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/d3-goal-check-rationale-trace.md",
+    "title": "D3's rationale outlived its own citation, and pointed to the wrong threat model anyway",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/decide-for-prefer-fix-and-dispatchplan-minimal.md",
+    "title": "`decide --for` ignored the exact config field it was supposed to read",
     "sourceCaptureId": null
   },
   {
@@ -198,6 +254,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/dispatch-config-cache-scope-narrowed.md",
+    "title": "A caching proposal whose motivating scenario the target architecture cannot support",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/dispatch-execute-concurrency-guard.md",
     "title": "Why `dispatch.mjs execute` needed a per-item concurrency guard",
     "sourceCaptureId": null
@@ -232,6 +296,14 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/dispatch-execute-unsignaled-outcome.md",
     "title": "`dispatch execute` now flags a worker that never signaled `[DONE]`/`[BLOCKED]`",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/dispatch-plan-protocol-redesign.md",
+    "title": "An 8-phase redesign, deliberately cut to 3 shippable pieces before any code landed",
     "sourceCaptureId": null
   },
   {
@@ -358,6 +430,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fanout-batch-per-child-sync-spawn-and-listwork.md",
+    "title": "One narrow fix landed from a three-part fanout-batch performance proposal — the other two stayed out for good reasons",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/fanout-execute-consolidation.md",
     "title": "The out-of-process fanout wave loop is now one verb, not spelled-out bash",
     "sourceCaptureId": null
@@ -390,6 +470,30 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-gateway-lifecycle-verb.md",
+    "title": "Why the gateway needs its own CLI door, not a hand-rolled background process",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
+    "title": "Two different desync bugs, confirmed live, only one of them was this item's own fix",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-preflight-verb.md",
+    "title": "Three checks that already ran fast, but only got read after the slow suite finished",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/fgos-return-skip-redundant-verify.md",
     "title": "`fgos return` no longer re-verifies a tree the worker already proved green",
     "sourceCaptureId": null
@@ -400,6 +504,14 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/fgos-write-rejected-structural-deadlock.md",
     "title": "`fgos catchup`/`approve` can deadlock identically forever — the error now says why",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/footprint-diff-research-md-noise.md",
+    "title": "A third \"100% guaranteed noise\" path in `footprintDiffHits`, fixed the same way as the first two",
     "sourceCaptureId": null
   },
   {
@@ -424,6 +536,30 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/gitignore-docs-history-reverify.md",
     "title": "`docs/history/` staying un-ignored is now tested, not just a backlog memory",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/glm-openrouter-executor.md",
+    "title": "Giving one executor its own environment without touching the default one",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/herdr-spawn-adapter-fresh-pane.md",
+    "title": "Watching an agent work in a real pane, without letting the next dispatch talk to a stranger's session",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/iron-law-classification-recipe-path.md",
+    "title": "A documented recipe's bare relative path silently returned \"no items\" instead of an error",
     "sourceCaptureId": null
   },
   {
@@ -464,6 +600,22 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/loop-family-scheduleWakeup-self-reference-gap.md",
     "title": "`merge-loop` ran exactly one item then silently stopped continuing — the recurring prompt named the wrong skill",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/main-checkout-lock-release-early-compound-cleanup.md",
+    "title": "A sweep loop's own commits held the shared lock \"hot\" for its entire run",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/main-checkout-lock-scope-audit.md",
+    "title": "A suspected over-broad lock, audited and confirmed already fine",
     "sourceCaptureId": null
   },
   {
@@ -590,6 +742,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/restore-verifiedsha-docs-on-main.md",
+    "title": "A revert that vanished at the next merge, because it reverted instead of restoring",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/retro-next-shared-driving.md",
     "title": "`/fgOS:retro-next` became a thin launcher — and the whole retro-loop this doc set was written by runs on it",
     "sourceCaptureId": null
@@ -640,6 +800,14 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/rul11-tum-lum-doctrine.md",
     "title": "RUL11 — why \"heavy\" was the wrong diagnosis",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/runtime-claim-doing-separation.md",
+    "title": "`doing` was never supposed to be durable history — it was live coordination masquerading as an event",
     "sourceCaptureId": null
   },
   {
@@ -758,6 +926,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/sync-root-error-propagation.md",
+    "title": "`sync-root`'s unclassified-outcome guard knew the real git error and dropped it anyway",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/sync-root-outcome-guard-citation-and-lock-lost-coverage.md",
     "title": "The guard's own test still existed — just cited under a file that no longer did",
     "sourceCaptureId": null
@@ -809,6 +985,22 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/worker-prompt-inline-completion-signal.md",
+    "title": "The completion-signal instruction was three file-hops away from the worker that needed to read it",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+    "title": "Out-of-process worker prompts never mentioned Iron Law evidence — so it never got produced when it was cheapest",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/worktree-isolation-existing-path-hazard.md",
     "title": "The worktree-isolation race in concurrent fanout, precisely characterized — and the fix that actually works",
     "sourceCaptureId": null
@@ -819,6 +1011,22 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/worktree-manual-merge-fgos-blob-safety-net.md",
     "title": "Manually resolving a merge conflict in a worktree can silently revert `.fgos/` — now mechanically guarded",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/write-rejected-no-diff-check.md",
+    "title": "A blob-equality proof that couldn't handle \"never existed at all\"",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/write-rejected-trust-branchheadattake.md",
+    "title": "A worker branch that never touched `.fgos/` still got blocked as if it had",
     "sourceCaptureId": null
   },
   {
