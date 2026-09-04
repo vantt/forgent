@@ -246,6 +246,20 @@ duplicate/lineage harness. Parallelism is scoped strictly by target, never
 by source file independently — two sources folding into the same target
 can't race each other.
 
+### Child 12 — deprecating `fgos compound`, the first real use of this repo's own deprecation path (`tsk-28x-12`)
+
+`fgos compound` is marked deprecated in `command-registry.mjs`, pointing
+at `fgos knowledge attest` (matching the `fgos --help` output referenced
+in this project's own `AGENTS.md`). Deprecate, never delete: the old verb
+keeps running for at least one full release cycle. This item is notable
+for a reason beyond its own scope: it's the first time this repo's
+deprecation path has actually been exercised — every other verb's
+`deprecated` field was still `null` before this item — so it had to
+verify things nobody had verified yet: does a deprecated verb still run,
+what does `--help --json` render for it, and does the `fgos-manifest` test
+actually catch the new field. Spec, hard rule, and one `CHANGELOG.md`
+`Unreleased` line were updated to match.
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
