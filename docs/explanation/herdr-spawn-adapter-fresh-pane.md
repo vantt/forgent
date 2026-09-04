@@ -189,3 +189,37 @@ failing-test-first sequence across `config.mjs`/`resolve.mjs`/
 `transport.mjs`/`cli.mjs`. First return attempt hit the same detached-
 worktree `.fgos/`-presence `verify-miss` friction pattern documented
 elsewhere in this doc's own `tsk-2ii` section; the retry passed clean.
+
+## Flipping the default from headless to interactive (`tsk-4zi`)
+
+`tsk-10j` built the `-i`/`interactiveMode` completion-detection path as an
+opt-in mode — `executors.agy-herdr` itself stayed on `agy -p` (headless)
+by default. `tsk-4zi` flipped that default: `executors.agy-herdr` now
+runs `agy -i` with `interactiveMode: { exitCommand: '/exit' }` wired in,
+so `fgos-coding-implement`'s own default dispatch path (which already
+prefers `agy-herdr` per `tsk-2ii`'s wiring) actually exercises the real
+interactive TTY pane a person watching sees, instead of the plain `-p`
+text dump.
+
+Same landing pattern as `tsk-2ii`: a direct main-checkout commit under
+ADR0020, not a full leaf-into-root merge cycle, since this is a
+config-only flip with no new code path (`tsk-10j` already built and
+tested the mechanism this item switches on). Verified: the scoped suite
+(`dispatch.test.mjs` + `herdr-spawn-adapter.test.mjs`, 357/357) plus one
+real live dispatch (`node src/runner/dispatch.mjs execute agy-herdr`)
+confirming `agy`'s actual interactive TUI banner renders in the pane,
+exit code `0`, and the pane auto-closes (confirmed gone from `herdr pane
+list` afterward) — the same kind of real, non-mocked proof this whole
+adapter lineage (`tsk-5x7-3`/`tsk-5jl`/`tsk-10j`) has required throughout.
+
+**Landing had its own friction, unrelated to the flip itself:** the
+original commit (`6c5538cb`) was wiped by an unrelated concurrent
+session's `git reset --hard` on `main`, taking this item's own event
+history with it. The work itself had already been verified correct
+before that happened, so it was re-submitted as `tsk-4zi` and re-landed
+as a cherry-pick of the same already-proven content (`1ffc61a0`) — not
+redone from scratch. This is a live instance of the shared-checkout
+data-loss risk the retro-loop has run into before in this session (a
+transient `.fgos/main-checkout.lock` contention was the milder version of
+the same underlying hazard: concurrent sessions operating on one main
+checkout).
