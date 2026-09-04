@@ -270,3 +270,59 @@ the same class of merge-block this retro-loop session already documented
 fixes for elsewhere (`tsk-4s6`, `tsk-198`). Not itself a new finding;
 noted here only because it delayed this item's own landing three separate
 times.
+
+### Child 13 — a code-review follow-on found 4 real gaps in lifecycle enforcement (`tsk-3uc`)
+
+A code review of the `tsk-28x` series found the registry's lifecycle
+state machine had 4 real, still-open holes, each fixed here with a
+regression test:
+
+- **`doc.register` bypassed the lifecycle state machine.** Re-registering
+  an existing `docId` let the call overwrite `docLifecycle` freely — a
+  register without `--lifecycle` could silently demote `active` back to
+  `provisional`, or resurrect a `retired`/`superseded` doc back to
+  `active`, defeating `doc.promote` as the sole `provisional -> active`
+  gate. Fixed: `doc.register` on an existing `docId` now preserves the
+  current lifecycle and rejects any lifecycle transition it's handed,
+  not just the `(topicId, role)` slot check `assertDocSlotAvailable`
+  already did.
+- **`attest` still resolved against a `superseded` doc.**
+  `knowledge-resolver.mjs`'s live resolver excluded only `retired` docs,
+  and the reducer's attest guard only rejected writes into `retired` —
+  so `knowledge attest --doc-path <old-current-path>` could still resolve
+  and write a capture linkage onto a doc that was no longer authoritative.
+  Fixed: the resolver now excludes `superseded` too, and the reducer
+  rejects `doc.attest` into a `superseded` doc, not just `retired`.
+- **`topic.merge`/`topic.split` didn't check source/target status.**
+  `topic.merge` only checked that `targetTopicId` existed — merging into
+  an already-`retired` topic silently locked out all future writes.
+  `topic.split` only checked the source existed — splitting an
+  already-`retired` topic created a new `active` successor out of an
+  ended lineage. Fixed: both now require `status === 'active'` on the
+  relevant topic, with regression tests for each rejected case.
+- **`topic.retire` on a nonexistent `topicId` was a silent no-op**
+  instead of throwing — the CLI reported success with no actual state
+  change. Fixed: fails closed, matching the already-correct behavior of
+  `doc.retire`/`doc.supersede`.
+
+**Landing hit its own real infrastructure friction, not a code defect.**
+`fgos return` got stuck mid-item on a `settleClaim` CAS mismatch (a
+`fgos edit` call made while holding the claim had bumped the durable
+revision out from under the claim's own captured `preClaimRevision`, and
+no release-claim verb existed to recover) — the user explicitly approved
+a manual `move --to awaiting-approval` bypass after being shown the
+blocker, backed by 17 commits and a repeatedly green full `npm test` run.
+Landing then hit `fgos approve`'s own merge/move state machine losing a
+durably-written `awaiting-approval` event within seconds of being
+confirmed present, then crashing on retry instead of returning a clean
+structured block — reproduced 3 times with a fresh `fgos list` each time,
+confirmed no other session was touching the item. The user again
+explicitly chose to bypass `fgos approve` and land the branch with a
+manual `git merge --no-commit --no-ff` plus manual conflict resolution
+(a real `CHANGELOG.md` content conflict, plus `.fgos/` path noise resolved
+by keeping main's own current `.fgos/` state per ADR0020), verified by a
+full `npm test` pass (4238 tests, 4233 pass, 0 fail, 5 skipped) before
+committing the merge. Both the CAS-mismatch dead-end and the vanishing
+awaiting-approval event were logged as tool bugs to report separately —
+this doc records them as landing friction for this item, not as a claim
+they were fixed here.
