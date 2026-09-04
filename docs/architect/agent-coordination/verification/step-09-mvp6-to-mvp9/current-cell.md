@@ -213,3 +213,58 @@ should not ship a door with an obviously missing refusal)
 
 ### Reports Path
 `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/`
+
+## P09.2 Disposition (independent Reviewer + Red-Team, round 1)
+
+Reviewer: no findings (all 13 checklist items independently verified clean
+by reading the real diff and re-running tests).
+
+Red-Team: 1 HIGH, empirically confirmed, ACCEPTED, fix required before
+close:
+
+- **[HIGH] Expiry (`expiresAfterRound`) is not enforced against real
+  session progress.** `resolveLiveSpecialistBindings` gates liveness on
+  `round <= record.expiresAfterRound`, where `round` is a bare,
+  caller-supplied parameter (`session-engine.mjs:1645`, default `1`) with
+  no monotonicity/derivation from real session state anywhere in the
+  codebase. The one production caller of `authorizeDeclaredOperation`
+  (`src/verbs/coordination/run.mjs`'s "authorize" step, ~line 415) never
+  forwards `step.round` at all — always defaults to `1`. Since
+  `expiresAfterRound` is schema-validated as a positive integer (always
+  ≥1), the default `round: 1` structurally never expires anything through
+  this path, regardless of real time/progress elapsed. Empirically
+  reproduced: 5 real `authorizeDeclaredOperation` calls (round omitted,
+  matching real production usage) all succeeded against an authorization
+  with `expiresAfterRound: 1`. Directly contradicts this cell's own
+  Acceptance ("Expiry prevents future Assignments") and the phase's own
+  Exit-relevant requirement.
+  **Fixer must**: (1) determine and report whether this reaches actual
+  Assignment materialization or is scoped to over-broad `operation-authorized`
+  grants (trace `dispatchDeclaredOperation`'s own independent
+  `resolveLiveSpecialistBindings({round})` call, ~line 2054, whose `round`
+  IS forwarded by `run.mjs`'s "operation" step — determine if this
+  independently blocks a stale specialist even when authorize wrongly
+  granted it); (2) fix the root cause — either derive the round used for
+  specialist-liveness checking internally from real, replayed session
+  state (no caller trust at all), or make the one real production call
+  path forward a correctly-derived, monotonic round and make that
+  structurally required, not opt-in; (3) add a regression test
+  reproducing Red-Team's exact empirical probe shape (round omitted,
+  matching real `run.mjs` usage) and proving the fixed version correctly
+  refuses.
+
+Two LOW/INFO items, not required fixes, Fixer's judgment on whether worth
+closing while already in this code:
+- **[LOW/INFO]** No disjointness check between a driver-chosen
+  `specialistActorId` and real `spec.actors[]` ids. Red-Team could not
+  construct an actual exploit (operation-id-scoped matching + per-operation
+  role invariance blocks the paths tried). Add a cheap guard if trivial;
+  otherwise document as a named residual in P09.2.md's Gaps, not silently
+  dropped.
+- **[INFO]** The `replacement:` test never explicitly asserts dispatch
+  against the OLD (superseded) specialist's id is refused post-replacement
+  (verified correct by Red-Team's code trace, just untested). Add the
+  missing assertion — cheap, mechanical.
+
+Both independent rounds' full reports are preserved in this conversation's
+own record; not re-filed as separate documents this round.
