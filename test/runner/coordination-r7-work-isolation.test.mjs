@@ -114,6 +114,88 @@ test('R7: no exported function/const/class name anywhere in src/runner/coordinat
   assert.deepEqual(violations, [], `forbidden Work-lifecycle-shaped exports found:\n${violations.join('\n')}`);
 });
 
+// ─── Phase 09 P09.3: structural absence of addSessionEdge/topology-overlay/
+// Work/git/coding mutation surface through the specialist-slot mechanism
+// (current-cell.md item 2, closing Phase 09). A proof of ABSENCE, not a
+// runtime refusal: `addSessionEdge`/`addSharedEdge` do not exist anywhere in
+// `src/` at all (confirmed by repo-wide grep before writing this test), and
+// none of the new MVP9 functions (P09.1 schema, P09.2 runtime) accept a
+// caller-suppliable topology-mutation-shaped parameter. This extends the R7
+// scan above (which already covers `src/runner/coordination/**` dynamically
+// -- every new P09.2 export, e.g. `authorizeSpecialistSlot`/
+// `recordSpecialistAuthorization`, is included automatically with zero
+// changes needed to that test or this one) to ALSO cover
+// `src/runner/definitions/**`, P09.1's own schema-only scope, which the
+// original Phase 06 R7 scans never had reason to cover since no
+// definitions-side binding surface existed yet. ───────────────────────────
+
+const definitionsDir = path.resolve(coordinationDir, '../definitions');
+
+test('P09.3: no exported function/const/class name anywhere in src/runner/definitions/** is shaped like a branch/worktree/merge/approve/Work-transition operation, and neither src/runner/coordination/** nor src/runner/definitions/** contains the identifier addSessionEdge or addSharedEdge anywhere in source (not merely unexported)', () => {
+  const coordinationFiles = listModuleFiles(coordinationDir);
+  const definitionsFiles = listModuleFiles(definitionsDir);
+
+  // `src/runner/definitions/**` is a schema/PolicyPatch module, not
+  // `src/runner/coordination/**` -- it genuinely exports `mergePolicyStack`
+  // (PolicyPatch scope-layer resolution, `minTier`/`preferPersona`/etc.,
+  // predates and is unrelated to MVP9), a real false positive for the
+  // substring "merge" that `src/runner/coordination/**` never produces
+  // (confirmed: it exports nothing matching "merge" today). Named and
+  // excluded explicitly, not silently widened.
+  const KNOWN_NON_WORK_LIFECYCLE_EXCEPTIONS = new Set(['mergePolicyStack']);
+
+  const violations = [];
+  let totalExports = 0;
+  for (const file of definitionsFiles) {
+    const source = fs.readFileSync(file, 'utf8');
+    const names = extractExportedNames(source);
+    totalExports += names.length;
+    for (const name of names) {
+      if (KNOWN_NON_WORK_LIFECYCLE_EXCEPTIONS.has(name)) continue;
+      const lower = name.toLowerCase();
+      for (const forbidden of FORBIDDEN_EXPORT_NAME_SUBSTRINGS) {
+        if (lower.includes(forbidden)) {
+          violations.push(`${path.relative(definitionsDir, file)} exports "${name}" (matches forbidden substring "${forbidden}")`);
+        }
+      }
+    }
+  }
+  assert.ok(totalExports > 5, `sanity check: expected to find a real, non-trivial number of exports from src/runner/definitions/** (found ${totalExports})`);
+  assert.deepEqual(violations, [], `forbidden Work-lifecycle-shaped exports found in src/runner/definitions/**:\n${violations.join('\n')}`);
+
+  // A private, unexported mutation helper reachable only internally would
+  // still be a real topology-overlay mutation path, so this checks the
+  // identifier's presence in source at all, not only the export surface.
+  for (const file of [...coordinationFiles, ...definitionsFiles]) {
+    const source = fs.readFileSync(file, 'utf8');
+    assert.ok(!/\baddSessionEdge\b/.test(source), `addSessionEdge must not appear anywhere in ${file}`);
+    assert.ok(!/\baddSharedEdge\b/.test(source), `addSharedEdge must not appear anywhere in ${file}`);
+  }
+});
+
+test('P09.3: authorizeSpecialistSlot/recordSpecialistAuthorization/resolveLiveSpecialistBindings accept no caller-suppliable "mutation"/"edge"/"topologyOverlay"/"overlay" parameter (static source scan of their own parameter destructuring) -- the specialist-slot mechanism introduces no new topology-mutation surface', () => {
+  const sessionEngineSource = fs.readFileSync(path.join(coordinationDir, 'session-engine.mjs'), 'utf8');
+  const storeSource = fs.readFileSync(path.join(coordinationDir, 'store.mjs'), 'utf8');
+  const forbiddenParamNames = ['mutation', 'edge', 'topologyOverlay', 'overlay', 'addSessionEdge', 'addSharedEdge'];
+
+  for (const [label, source, fnName] of [
+    ['session-engine.mjs', sessionEngineSource, 'authorizeSpecialistSlot'],
+    ['session-engine.mjs', sessionEngineSource, 'resolveLiveSpecialistBindings'],
+    ['store.mjs', storeSource, 'recordSpecialistAuthorization'],
+  ]) {
+    const fnStart = source.indexOf(`export function ${fnName}(`);
+    assert.ok(fnStart >= 0, `expected to find "${fnName}" exported from ${label}`);
+    const window = source.slice(fnStart, fnStart + 1200);
+    const paramsBlock = window.slice(window.indexOf('('), window.indexOf(') {') + 1);
+    for (const forbidden of forbiddenParamNames) {
+      assert.ok(
+        !new RegExp(`\\b${forbidden}\\b`, 'i').test(paramsBlock),
+        `"${fnName}" (${label}) must not destructure a caller-suppliable "${forbidden}" field -- found in: ${paramsBlock}`,
+      );
+    }
+  }
+});
+
 // ─── Behavioral: mutation is structurally impossible everywhere in this
 // engine, so "two concurrent mutating actors" cannot occur -- proven at
 // every entry point that has ANY mutation-adjacent surface at all ────────

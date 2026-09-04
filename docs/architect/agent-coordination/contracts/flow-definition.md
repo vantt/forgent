@@ -42,6 +42,18 @@ accepted and implemented — schema/validation in
 opt-in fixtures under `core/coordination-protocols/deliberation-*-chain.yaml`
 (P08.3). See the CoordinationSession contract's own Deliberation
 Contribution Ledger section for the runtime half.
+Phase 09 (Step 09 MVP9): `spec.profile.topology.specialistSlots[]` and
+`graph.nodes[].operations[].specialistSlotRef` accepted and implemented —
+schema/validation in `src/runner/definitions/schema.mjs` (P09.1, plus a Wave
+4 fix round closing slot-id disjointness and role/operation consistency
+gaps), runtime authorization/binding/dispatch resolution in
+`src/runner/coordination/{session-engine,store,replay}.mjs` (P09.2, 1 HIGH
+fixed — see the CoordinationSession contract's own Specialist Slot Binding
+section), negative/crash-recovery/structural-absence proof in
+`test/runner/{coordination-specialist-binding,coordination-r7-work-isolation}.test.mjs`
+(P09.3, closing Phase 09). Promoted with the named limitations in Specialist
+Slots below and in the CoordinationSession contract's own Specialist Slot
+Binding section, not without them.
 Full per-phase trace:
 `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`.)
 Last reviewed: 2026-09-04
@@ -99,6 +111,7 @@ graph:
       operations:
         - ref: <operation-id>
           actor: <actor-id>           # optional; omitted when the operation is Role-only
+          specialistSlotRef: <slot-id> # optional; ALTERNATIVE to actor -- see Specialist Slots below
           activation:                 # optional; see Activation below
             mode: required | driver-authorized
             maxInvocations: <n>
@@ -114,6 +127,10 @@ graph:
 - A node's `operations[].ref` must reference a declared `spec.operations[].id`.
 - A node's `operations[].actor`, when present, must reference a declared
   `spec.actors[].id`.
+- A node's `operations[].specialistSlotRef` (Phase 09, Step 09 MVP9) is the
+  ALTERNATIVE to `actor` — never legal in combination with it on the same
+  binding — and must reference a declared `spec.profile.topology.specialistSlots[].id`.
+  See [Specialist Slots](#specialist-slots-phase-09-step-09-mvp9) below.
 
 ### Activation (Phase 00, Step 09 MVP1/MVP2)
 
@@ -216,6 +233,7 @@ profile:
         intents: [<intent>]
         maxRounds: <n>
     visibilityWindows: [ ... ]          # optional; see Visibility Windows below
+    specialistSlots: [ ... ]            # optional; see Specialist Slots below
   cohort:
     count: <n>
     distinctProviderFamilies: <n>
@@ -435,6 +453,96 @@ this session's log.
   of `topology`) and `contextAccess` on any node-operation binding. A
   `Workflow` FlowDefinition declaring either is rejected at validation.
 
+#### Specialist Slots (Phase 09, Step 09 MVP9)
+
+```yaml
+profile:
+  kind: CoordinationProtocol
+  topology:
+    specialistSlots:
+      - id: <slot-id>
+        role: <role-id>
+        operationRefs: [<operation-id>, ...]
+        requiredCapabilities: [<capability>, ...]
+        allowedVisibilityWindows: [<window-id>, ...]
+        maxBindings: <n>
+        maxAssignments: <n>
+
+graph:
+  nodes:
+    - id: <node-id>
+      operations:
+        - ref: <operation-id>
+          specialistSlotRef: <slot-id>
+          activation:
+            mode: driver-authorized
+```
+
+A specialist slot declares a **bounded, predeclared capacity** for a
+previously-unknown specialist identity to fill — never an open-ended actor
+pool, and never a runtime topology edge. Filling one is a two-step, fully
+mediated process: the driver authorizes a specialist actor identity into a
+declared slot (`specialist-authorized`, see the
+[CoordinationSession Contract](coordination-session.md#specialist-slot-binding-mvp9-step-09)
+for the runtime half), and only then may a `specialistSlotRef` binding
+resolve to a dispatchable actor.
+
+| Field | Notes |
+|---|---|
+| `specialistSlots[].id` | Slot identity, unique within the definition and disjoint from every other declared id space (`spec.actors[].id`, `spec.roles[]`, `spec.operations[].id`, `spec.graph.nodes[].id`) — a slot id colliding with any of them is rejected. |
+| `specialistSlots[].role` | Must reference a declared `spec.roles[]` id, and must equal the `role` of every operation named in this slot's own `operationRefs[]` — a slot naming an operation of a different role is statically unfillable and rejected. |
+| `specialistSlots[].operationRefs[]` | Non-empty, deduplicated, each a declared `spec.operations[].id`. A specialist bound to this slot may act ONLY on these operations — never any operation outside this list, and never via an undeclared expansion path. |
+| `specialistSlots[].requiredCapabilities[]` | Each must resolve against the definition-wide union of every declared operation's `capabilities[]`. May be empty — an empty list means "no gate on that dimension" (any capability set satisfies it), not "unfillable." An authorized specialist's own `capabilities[]` must be a SUPERSET of this list (the slot names a floor, not a ceiling). |
+| `specialistSlots[].allowedVisibilityWindows[]` | Each must reference a declared `visibilityWindows[].id`. May be empty (same "no gate on that dimension" reading as `requiredCapabilities[]`). |
+| `specialistSlots[].maxBindings` | Positive integer. A hard, monotonic ceiling on how many DISTINCT specialist actor identities may EVER be authorized into this slot across the session's whole history — never decremented by expiry or replacement. Re-authorizing the SAME actor already occupying the slot does not consume a new binding. |
+| `specialistSlots[].maxAssignments` | Positive integer. A ceiling on the TOTAL `operation-authorized` invocations one authorized specialist actor may receive across every operation its slot declares (not a per-operation cap — a specialist filling two operations in the same slot shares one pool). |
+
+A `graph.nodes[].operations[].specialistSlotRef` binding is the ALTERNATIVE
+to `actor` (see Graph above) — mutually exclusive with it on the same
+binding, never legal in combination — and must reference a declared
+`specialistSlots[].id`. It must also declare `activation.mode:
+driver-authorized`; the `required` (default) activation mode is not legal on
+a specialist-slot binding, since a slot has no default occupant to
+materialize against.
+
+**"Undeclared slot expansion" is a structural closure property, not a
+runtime check.** No schema field anywhere resolves `actor` against a slot
+id — a slot id is never a member of the `spec.actors[]` id set a `actor`
+binding validates against — so an operation binding can never "expand into"
+a slot except through the one declared `specialistSlotRef` field. This is
+proven by absence (no such resolution code path exists), not by a runtime
+refusal, and is the same reading `topology.edges[]` uses: an edge naming a
+declared specialist slot id as its `from`/`to` is rejected, since a slot is
+declarative capacity, never a routable topology edge endpoint.
+
+**Named limitations, not omitted.**
+
+1. `requiredCapabilities[]`/`allowedVisibilityWindows[]` resolve against
+   definition-wide unions (every declared operation's capabilities; every
+   declared window), not against only the slot's own `operationRefs[]` —
+   a slot may name a capability or window scoped to an operation outside
+   its own operation list. Such a slot is over-declared, not unfillable:
+   nothing about it is statically undispatchable. Narrowing either to the
+   slot's own operations was named as a product decision for a later cell
+   and has not been taken.
+2. `allowedVisibilityWindows[]` is declared on the slot but not yet
+   cross-checked against a specialist's dispatched operation binding's own
+   `contextAccess.visibilityWindowRef` at authorize or dispatch time — the
+   pre-existing `deriveVisibilityWindowState` gate applies unchanged and
+   uniformly to a slot-bound operation exactly as it does to a
+   statically-bound one, but nothing yet refuses an authorization naming a
+   visibility window outside the slot's own declared list specifically.
+3. `allowedContextRefs` (declared on the `specialist-authorized` event
+   itself, not on the slot) is validated for session ownership at
+   authorization time but not yet enforced as a ceiling on the later,
+   per-invocation `operation-authorized.grantedContextRefs` choice. See the
+   CoordinationSession contract's Specialist Slot Binding section for the
+   full reasoning.
+
+- **Forbidden under `Workflow`:** `specialistSlots` (structurally, as part
+  of `topology`) and `specialistSlotRef` on any node-operation binding. A
+  `Workflow` FlowDefinition declaring either is rejected at validation.
+
 Both profiles reject an operation whose `role` is not declared in
 `spec.roles`, and reject a `spec.actors[]` entry whose `role` is not declared
 in `spec.roles` (no implicit Role creation from an actor declaration).
@@ -489,7 +597,7 @@ references.
 |---|---|---|
 | Any `FlowDefinition` operation | `purpose` | ADR-009 Decision 5; no second consumer yet. |
 | Any graph node | `kind` | Derived from `spec.profile.kind`; ADR-009 Decision 3. |
-| `Workflow` profile | `topology` (`visibilityWindows` included), `cohort`, `completion.mode`, `contextAccess` on a node-operation binding | Protocol-only; no Work lifecycle concept needs them. |
+| `Workflow` profile | `topology` (`visibilityWindows`/`specialistSlots` included), `cohort`, `completion.mode`, `contextAccess`/`specialistSlotRef` on a node-operation binding | Protocol-only; no Work lifecycle concept needs them. |
 | Any `spec.operations[]` template | `contextAccess` | Binding-scoped only, exactly like `activation` (Phase 06, Step 09 MVP6). |
 | `CoordinationProtocol` profile | `profile.work`, `baseStepMap`, mandatory `task.taskSpec`, `result.kind: gate-verdict` | Would import Work lifecycle authority into a standalone protocol. |
 | Any `FlowDefinition` | a `missionId` field anywhere | ADR-008 Decision 5; Mission stays deferred-preserved. |
@@ -536,3 +644,20 @@ references.
 - A window whose `opensAfter.operationRefs[]` is EMPTY is accepted by
   validation and is permanently open, gating nothing — the degenerate case is
   named in the field table rather than rejected (Phase 06, runtime).
+- A `specialistSlots[]` entry with a dangling `role`, `operationRefs[]`,
+  `requiredCapabilities[]`, or `allowedVisibilityWindows[]` reference; a
+  non-positive-integer `maxBindings`/`maxAssignments`; an empty or
+  duplicate-containing `operationRefs[]`; a `role` that does not match every
+  named operation's own declared `role`; or a slot id colliding with a
+  declared actor, role, operation, or graph node id is rejected (Phase 09,
+  Step 09 MVP9).
+- A `topology.edges[]` entry naming a declared specialist slot id as its
+  `from`/`to` is rejected — a slot is declarative capacity, never a routable
+  topology edge endpoint (Phase 09, Step 09 MVP9).
+- A `graph.nodes[].operations[].specialistSlotRef` binding declaring both
+  `actor` and `specialistSlotRef`, naming an undeclared slot id, naming an
+  operation not among the slot's own `operationRefs[]`, or declaring
+  `activation.mode` other than `driver-authorized` (including the default
+  omitted case) is rejected (Phase 09, Step 09 MVP9).
+- A `Workflow`-profile definition declaring `specialistSlots` or any binding
+  `specialistSlotRef` is rejected (Phase 09, Step 09 MVP9).

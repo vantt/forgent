@@ -42,7 +42,22 @@ namespace on `driver-disposition-recorded` accepted and implemented —
 `src/runner/deliberation/schema.mjs` (P08.1, called never forked), method-
 shaped proof against three real fixtures under `core/coordination-protocols/`
 (P08.3). Promoted with the named limitations in Deliberation Contribution
-Ledger below, not without them. Full per-phase trace:
+Ledger below, not without them.
+Phase 09 (Step 09 MVP9): the `specialist-authorized` event, its atomic
+authorize-and-bind write door, its replay reconstruction, and the
+`specialistSlotRef` node-operation binding resolution against currently-live
+specialist bindings accepted and implemented —
+`src/runner/coordination/{schema,store,replay,session-engine}.mjs` (P09.2,
+1 HIGH fixed: authorization expiry was gated on a caller-suppliable `round`
+that the one real production caller never forwarded, closed by deriving the
+session's current round internally from replayed `assignment-created`
+events), `src/runner/definitions/schema.mjs` (P09.1, the
+`topology.specialistSlots[]` schema — see the
+[FlowDefinition Contract](flow-definition.md#specialist-slots-phase-09-step-09-mvp9)),
+negative/crash-recovery/structural-absence proof
+(`test/runner/{coordination-specialist-binding,coordination-r7-work-isolation}.test.mjs`,
+P09.3, closing Phase 09). Promoted with the named limitations in Specialist
+Slot Binding below, not without them. Full per-phase trace:
 `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`.)
 Last reviewed: 2026-09-04
 Canonical for: CoordinationSession manifest/event schema, storage layout, session-to-Assignment membership, and recovery rules
@@ -149,6 +164,7 @@ reference discipline as `assignmentRefs`. Minimum event kinds:
 | `driver-disposition-recorded` | Phase 00 (Step 09) MVP2: a driver records disposition on a finding/artifact; never a worker-authored result. | `targetRef`, `disposition`, `rationale`, `evidenceRefs`, `authorizedBy`, `ts` |
 | `aggregation-validated` | Phase 07 (Step 09) MVP7: a driver-authored record of one evidence-preserving aggregation the engine validated over this session's own evidence (see [Evidence-Preserving Aggregation](#evidence-preserving-aggregation-mvp7-step-09) below). Never a transition of its own. | `aggregationId`, `method`, `outcome`, `sourceResultRefs`, `validatedBy`, `ts`; optional `assignmentId?`, `runId?`, `outputArtifactRef?`, `dissentRefs?`, `unresolvedContributionRefs?`, `missingActors?`, `failedActors?`, `unboundSourceOperationRefs?`, `artifactRevisionRefs?` |
 | `deliberation-contribution-linked` | Phase 08 (Step 09) MVP8: a driver-authored, immutable lineage record linking ONE typed deliberation contribution — ref and revision pin only, never artifact content — into this session's ledger (see [Deliberation Contribution Ledger](#deliberation-contribution-ledger-mvp8-step-09) below). Never a transition of its own. | `contributionId`, `operationRef`, `type`, `assignmentId`, `runId`, `artifactRef`, `revision`, `roundKey`, `visibilityWindowRef`, `linkedBy`, `ts`; optional `anchors?`, `respondsTo?` |
+| `specialist-authorized` | Phase 09 (Step 09) MVP9: a driver-authored event that atomically authorizes AND session-scoped-binds a previously-unknown specialist actor identity to a declared `topology.specialistSlots[]` slot, in one write (see [Specialist Slot Binding](#specialist-slot-binding-mvp9-step-09) below). Never a transition of its own. | `specialistAuthorizationId`, `slotId`, `specialistActorId`, `role`, `capabilities`, `authorizedBy`, `reason`, `triggerEvidenceRefs`, `allowedContextRefs`, `maxAssignments`, `expiresAfterRound`, `ts` |
 
 Additional event kinds may be added by a future phase without breaking this
 contract as long as they do not change the meaning of the kinds above.
@@ -480,6 +496,132 @@ session never linked resolves nothing.
    `specialist-request` is left for whichever cell wires MVP9 bounded
    specialist binding.
 
+## Specialist Slot Binding (MVP9, Step 09)
+
+A bounded, predeclared capacity for the driver to recruit ONE previously-
+unknown specialist identity per declared `topology.specialistSlots[]` slot
+(see the [FlowDefinition Contract](flow-definition.md#specialist-slots-phase-09-step-09-mvp9)
+for the schema half) — never an open-ended actor pool, never a runtime
+topology mutation, and never a worker-authored recruitment. A worker may
+request a specialist (the `specialist-request` deliberation contribution
+type, above); only the driver may authorize one.
+
+**One event does both jobs.** `specialist-authorized` is simultaneously the
+authorization record AND the session-scoped actor binding — there is no
+separate `specialist-bound`/`actor-bound` event for a specialist. This meets
+the phase's own atomicity requirement ("atomically record authorization and
+session-scoped actor binding before any Assignment is issued") structurally:
+`recordSpecialistAuthorization` (`store.mjs`) performs every check (session
+active, driver identity, `maxBindings` cap) and the append as ONE
+`appendEventLocked` call inside a single `withEventsLock` critical section —
+there are not two writes for a crash to land between. This is a deliberate
+departure from `replaceSessionActor`'s own precedent (a `bindActor` call
+followed by a separate `recordActorReplacement` call, two appends with a
+real window a crash-resume claim-file has to paper over): a specialist is
+never added to `manifest.actors[]` at all — it is a synthesized `{id, role}`
+pair, resolved fresh from the live `specialist-authorized` record on every
+dispatch, never a second stored structure that could itself drift out of
+sync with the authorization that created it.
+
+**"Live" occupant = last-write-wins per slot; expiry is a pure read-side
+filter, never a rewrite.** The MOST RECENT (log-order) `specialist-authorized`
+record for a given `slotId` is that slot's current occupant — a later
+authorization for the same slot IS the supersession signal (mirroring
+`actor-replaced`'s own "last wins" semantics), so there is no separate
+"specialist-superseded" event kind. `expiresAfterRound` bounds ONLY future
+Assignments: a slot whose live record's `expiresAfterRound` is behind the
+session's real, internally-derived current round is simply absent from the
+live-bindings view for that round — the record itself, and every event tied
+to it, is never erased, rewritten, or hidden. The current round is derived
+purely from the replayed event log (one plus the count of
+`assignment-created` events, session-wide) — never a caller-supplied value,
+closing the class of bug this event kind's own Fix Round 1 found (below).
+
+**`maxBindings` is cumulative-ever, not concurrent.** A slot has exactly one
+LIVE occupant at a time by construction (last-write-wins, above), so
+`maxBindings` is read as a hard ceiling on how many DISTINCT
+`specialistActorId` values may EVER be authorized for a given slot across
+the session's whole history — never decremented by expiry or supersession.
+Re-authorizing the SAME specialist actor already occupying the slot does not
+consume a new binding.
+
+**`maxAssignments` is a separate cap from the pre-existing per-binding
+invocation cap.** A specialist's `maxAssignments` bounds its TOTAL
+`operation-authorized` invocation allowance across every operation its slot
+declares (a slot's `operationRefs[]` may name more than one operation) —
+counted by `targetActorId` alone, which is safe because a live
+`specialistActorId` is unique to one occupant of one slot at a time. This is
+distinct from `activation.maxInvocations`, which bounds one exact
+`(nodeId, operationId, targetActorId)` binding.
+
+**Every specialist invocation still goes through the pre-existing
+`operation-authorized` door**, exactly as for a statically-`actor`-bound
+operation — no new dispatch gate was introduced. `dispatchDeclaredOperation`
+resolves a `specialistSlotRef` binding's effective actor id by looking up
+the slot in a freshly-derived live-bindings map before resolving the
+authorization, then proceeds through the SAME context-grant enforcement,
+visibility-window re-derivation, and read-only contract construction
+(`buildReadOnlyContract`, hardcoded `mutation: 'read-only'`) every other
+dispatch path uses — a specialist-dispatched Assignment introduces no new
+mutation-capable surface (proved in
+`test/runner/coordination-r7-work-isolation.test.mjs` and
+`test/runner/coordination-specialist-binding.test.mjs`, P09.3).
+
+**No `addSessionEdge`/topology-overlay mutation path exists.** Neither
+`addSessionEdge` nor `addSharedEdge` is defined anywhere in this codebase — a
+structural absence, not a runtime refusal (`test/runner/coordination-r7-work-isolation.test.mjs`,
+P09.3, scans both `src/runner/coordination/**` and `src/runner/definitions/**`
+for the identifier and for any exported name shaped like a branch/worktree/
+merge/approve/Work-transition operation). A specialist slot is declarative
+capacity, never a routable topology edge: `topology.edges[]` rejects an
+entry naming a declared specialist slot id as its `from`/`to`
+(FlowDefinition Contract), and no schema field resolves a graph operation's
+static `actor` against a slot id.
+
+**Named limitations, not omitted.**
+
+1. **`allowedContextRefs` is validated for session ownership at authorize
+   time but not yet enforced as a per-invocation ceiling.** The Candidate
+   Contract lists `allowedContextRefs` as slot-LEVEL capacity data on
+   `specialist-authorized` itself; the field that actually gates what one
+   dispatched Assignment may read is `operation-authorized`'s own
+   `grantedContextRefs`, reused unchanged for every specialist invocation.
+   Read this way, `allowedContextRefs` is the ceiling a driver's later
+   `grantedContextRefs` choice SHOULD stay within; this cell validates it is
+   session-owned but does not yet enforce that later per-invocation grants
+   stay within it. Additional wiring inside `dispatchDeclaredOperation`'s
+   existing context-grant block would close this, not a new mechanism.
+2. **`allowedVisibilityWindows[]` (declared on the slot) is not yet
+   cross-checked against the dispatched operation binding's own
+   `contextAccess.visibilityWindowRef`.** The pre-existing
+   `deriveVisibilityWindowState` gate still applies unchanged and uniformly
+   to a slot-bound operation exactly as to a statically-bound one, but
+   nothing yet refuses an authorization naming a visibility window outside
+   the slot's own declared list specifically — an over-declared slot, not an
+   unfillable one.
+3. **The definition is pinned by `{id, version}`, never by content** — the
+   same systemic exposure named for Evidence-Preserving Aggregation and the
+   Deliberation Contribution Ledger above, shared by every
+   definition-consuming door in this engine including `authorizeSpecialistSlot`
+   and `dispatchDeclaredOperation`'s specialist-binding resolution. Not
+   closed here.
+
+### Fix Round 1 (P09.2): specialist-liveness round derivation
+
+The originally-shipped `resolveLiveSpecialistBindings` accepted a bare,
+caller-supplied `round` parameter (default `1`) to compare against
+`expiresAfterRound`. The one real production call path
+(`src/verbs/coordination/run.mjs`'s "authorize" step) never forwarded it at
+all, so `expiresAfterRound` structurally never fired through real usage —
+empirically reproduced (5 real calls, `round` omitted, all wrongly
+succeeded against `expiresAfterRound: 1`). Closed by deriving the session's
+current round internally, purely from the replayed event log (one plus the
+count of `assignment-created` events, session-wide) — a real, monotonic
+quantity no caller input can move. `resolveLiveSpecialistBindings` now
+accepts no `round` parameter at all; `dispatchDeclaredOperation`'s own
+pre-existing `round` parameter is fully decoupled and unaffected, remaining
+a per-edge taskKey/`maxRounds` disambiguator only.
+
 ## Recovery Rule
 
 A resumed session must not duplicate a completed Assignment. This requires
@@ -611,3 +753,31 @@ approval/merge state in `.fgos/coordination/`.
   without rewriting, superseding, or deleting the original Assignment's
   RunResult or verdict; both remain readable after the recheck (Phase 00,
   Step 09 MVP2/MVP3).
+- A `specialist-authorized` event is refused when: `authorizedBy` does not
+  name this session's own driver identity; `slotId` names no declared slot;
+  `role`/`capabilities` do not satisfy the slot's own declared
+  `role`/`requiredCapabilities`; the slot is already at its declared
+  `maxBindings` cap for a NEW distinct specialist actor;
+  `triggerEvidenceRefs`/`allowedContextRefs` name a different
+  CoordinationSession; `specialistActorId` collides with a
+  statically-declared `spec.actors[]` id; or the session has left `active`
+  status (Phase 09, Step 09 MVP9).
+- A specialist's dispatch is refused once real session progress (Assignments
+  materialized, session-wide) has passed its authorization's own
+  `expiresAfterRound` — the authorization event itself is never erased, and
+  the refusal holds even when `round` is never supplied by the caller
+  (matching real production usage) (Phase 09, Step 09 MVP9).
+- A specialist cannot be authorized for dispatch beyond its own
+  `maxAssignments` cap, counted across every operation its slot declares
+  (Phase 09, Step 09 MVP9).
+- Retrying an already-durably-written `specialist-authorized` request (same
+  `specialistAuthorizationId`) resumes idempotently, never mints a second
+  authorization event, and leaves the slot's live binding unaffected; retrying
+  an already-dispatched specialist request resumes the SAME Assignment,
+  never double-authorizes or double-dispatches (Phase 09, Step 09 MVP9,
+  crash recovery).
+- No exported name anywhere in `src/runner/coordination/**` or
+  `src/runner/definitions/**` is shaped like a branch/worktree/merge/approve/
+  Work-transition operation, and neither `addSessionEdge` nor
+  `addSharedEdge` appears anywhere in either directory's source (Phase 09,
+  Step 09 MVP9, extending Phase 06 R7's existing scan).

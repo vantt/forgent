@@ -242,6 +242,20 @@ test('a non-driver identity cannot authorize a specialist into a slot', () => {
   assert.equal(readSessionEvents('coord_spec_worker', ctx.opts).filter((e) => e.type === 'specialist-authorized').length, 0);
 });
 
+// A genuinely worker-shaped authorizedBy is a distinct case from the
+// id-mismatch test above (a driver-typed identity naming the wrong id) --
+// this proves the generic authorizedBy.type schema gate (the same one
+// coordination-recheck-disposition.test.mjs:471 already proves for the
+// sibling `disposition` event kind) also refuses `specialist-authorized`.
+test('a worker-typed identity (not merely a wrong driver id) cannot authorize a specialist into a slot', () => {
+  const ctx = setup('coord_spec_worker_type');
+  assert.throws(
+    () => authorizeSpecialistSlot('coord_spec_worker_type', specialistAuthorization({ authorizedBy: { type: 'worker', id: 'reviewer' } }), ctx.opts),
+    (err) => err instanceof CoordinationError && /authorizedBy\.type must be "driver"/.test(err.message),
+  );
+  assert.equal(readSessionEvents('coord_spec_worker_type', ctx.opts).filter((e) => e.type === 'specialist-authorized').length, 0);
+});
+
 // ─── Bug Taxonomy: unknown slot id refused ──────────────────────────────────
 
 test('an unknown slotId is refused', () => {
@@ -494,4 +508,96 @@ test('a repeated call with the same specialistAuthorizationId is idempotent (no 
   assert.equal(first.appended, true);
   assert.equal(second.appended, false);
   assert.equal(readSessionEvents('coord_spec_idempotent', ctx.opts).filter((e) => e.type === 'specialist-authorized').length, 1);
+});
+
+// ─── Phase 09 P09.3: no addSessionEdge/topology-overlay/Work/git/coding
+// mutation path is reachable through the specialist mechanism -- R7's
+// existing hardcoded-read-only guarantee still applies uniformly to a
+// specialist-dispatched Assignment, not just a statically-actor-bound one
+// (current-cell.md item 2/3). `dispatchDeclaredOperation` has exactly ONE
+// `buildReadOnlyContract(...)` call site (session-engine.mjs), reached
+// identically whether `resolveDeclaredOperationActor` resolved `actorId` via
+// a static `actor` or via a live `specialistSlotRef` binding -- the
+// specialist-binding branch (`specialistBindings`) only ever changes WHICH
+// actorId is resolved, never how the contract that actorId is dispatched
+// under is built. This test proves it behaviorally against a REAL dispatched
+// specialist Assignment, complementing (not duplicating)
+// coordination-r7-work-isolation.test.mjs's own static param-destructuring
+// scan of `dispatchDeclaredOperation` by name (already covers this function
+// generically) and its dynamic forbidden-export-name scan over the whole
+// `src/runner/coordination/**` directory (already covers every new P09.2
+// export, including `authorizeSpecialistSlot`/`recordSpecialistAuthorization`,
+// with zero changes needed to that test). ─────────────────────────────────
+
+test('R7: a specialist-dispatched Assignment carries the same hardcoded mutation: "read-only" contract every statically-actor-bound Assignment does -- specialistSlotRef introduces no new mutation-capable path', async () => {
+  const ctx = setup('coord_spec_r7_readonly');
+  authorizeSpecialistSlot('coord_spec_r7_readonly', specialistAuthorization(), ctx.opts);
+  authorizeDeclaredOperation('coord_spec_r7_readonly', operationAuthorization(), ctx.opts);
+  const { assignment } = await dispatchSpecialist('coord_spec_r7_readonly', ctx);
+  assert.equal(assignment.mutation, 'read-only');
+});
+
+// ─── Phase 09 P09.3: crash recovery between authorization, actor binding,
+// and Assignment creation -- resumes without duplicate actors or Assignments
+// (current-cell.md item 1). Modeled on
+// coordination-recovery-and-quorum.test.mjs's own "crash point ..." naming
+// convention and its "construct the exact durable on-disk state a crash
+// would leave, then prove the SAME real call resumes cleanly" house style
+// (never a literal process kill). Since P09.2's own
+// `recordSpecialistAuthorization` is a SINGLE `appendEventLocked` call
+// inside one `withEventsLock` critical section (Design Notes, P09.2.md --
+// "authorized" and "bound" are the same write, so there is no window
+// between them to construct a fixture for), the two real crash points this
+// mechanism actually has are: (a) the caller never learned whether its
+// `specialist-authorized` write committed before crashing, and retries with
+// the same `specialistAuthorizationId`; (b) the caller never learned
+// whether its dispatch request materialized an Assignment for the newly-
+// bound specialist before crashing, and retries the identical dispatch
+// request. ───────────────────────────────────────────────────────────────
+
+test('crash point "specialist-authorized write outcome unknown to caller": retrying authorizeSpecialistSlot with the SAME specialistAuthorizationId resumes idempotently -- never mints a second authorization event, the slot\'s live binding is unaffected, and dispatch still proceeds normally afterward', async () => {
+  const ctx = setup('coord_spec_crash_authorize_retry');
+  const first = authorizeSpecialistSlot('coord_spec_crash_authorize_retry', specialistAuthorization(), ctx.opts);
+  assert.equal(first.appended, true);
+
+  // The caller crashed right after this call returned (or before it learned
+  // the result) and, on restart, retries the exact same authorization
+  // request -- indistinguishable, from the caller's side, from "did my
+  // first call ever durably commit?".
+  const retried = authorizeSpecialistSlot('coord_spec_crash_authorize_retry', specialistAuthorization(), ctx.opts);
+  assert.equal(retried.appended, false, 'the retry must resume, never mint a second specialist-authorized event');
+
+  const replayed = replaySession('coord_spec_crash_authorize_retry', ctx.opts);
+  assert.equal(replayed.specialistAuthorizations.length, 1, 'exactly one authorization exists after the retry -- no duplicate actor binding');
+  const live = resolveLiveSpecialistBindings(replayed);
+  assert.equal(live.size, 1);
+  assert.equal(live.get('review-slot').specialistActorId, 'specialist-alpha');
+
+  // Full recovery, not just an event count: the resumed session still
+  // dispatches a real Assignment to the (unchanged) live specialist.
+  authorizeDeclaredOperation('coord_spec_crash_authorize_retry', operationAuthorization(), ctx.opts);
+  const { assignment, runResult } = await dispatchSpecialist('coord_spec_crash_authorize_retry', ctx);
+  assert.equal(runResult.status, 'done');
+  assert.equal(assignment.role, 'specialist');
+});
+
+test('crash point "specialist-authorized and operation-authorized durably written, caller never learned whether the Assignment materialized": retrying the identical dispatch request resumes the SAME Assignment, never double-dispatches or double-authorizes', async () => {
+  const ctx = setup('coord_spec_crash_dispatch_retry');
+  authorizeSpecialistSlot('coord_spec_crash_dispatch_retry', specialistAuthorization(), ctx.opts);
+  authorizeDeclaredOperation('coord_spec_crash_dispatch_retry', operationAuthorization(), ctx.opts);
+
+  const first = await dispatchSpecialist('coord_spec_crash_dispatch_retry', ctx);
+  assert.equal(first.resumed, false, 'the first call genuinely dispatches');
+
+  // The caller crashed before it ever saw this response and, on restart,
+  // retries the IDENTICAL dispatch request (same operationId/targetActorId,
+  // no explicit taskKey -- exactly what a resumed process would replay).
+  const retried = await dispatchSpecialist('coord_spec_crash_dispatch_retry', ctx);
+  assert.equal(retried.resumed, true, 'the retry must resume the existing Assignment, not dispatch a new one');
+  assert.equal(retried.assignment.assignmentId, first.assignment.assignmentId, 'same Assignment id -- no duplicate Assignment for the same specialist invocation');
+
+  const events = readSessionEvents('coord_spec_crash_dispatch_retry', ctx.opts);
+  assert.equal(events.filter((e) => e.type === 'specialist-authorized').length, 1, 'no duplicate specialist-authorized event from the retry');
+  assert.equal(events.filter((e) => e.type === 'operation-authorized').length, 1, 'no duplicate operation-authorized event from the retry');
+  assert.equal(events.filter((e) => e.type === 'assignment-created').length, 1, 'no duplicate assignment-created event from the retry -- exactly one Assignment for this specialist invocation');
 });

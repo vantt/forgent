@@ -69,13 +69,13 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | 06 | MVP6 | P06.1 + P06.2 (4 fix rounds) + P06.3 all done | **done** |
 | 07 | MVP7 | P07.1-P07.4 all done (2 HIGH fixed across the phase) | **done** |
 | 08 | MVP8 | P08.1 + P08.2 + P08.3 all done (contribution model, ledger/replay/visibility, method-shaped proofs + `contributions.allowedTypes[]` schema close) | **done** |
-| 09 | MVP9 | P09.1 + P09.2 done (slot schema; authorization/binding/replay, 1 HIGH fixed); P09.3 open (negative and recovery proof — closes Phase 09) | in-progress |
+| 09 | MVP9 | P09.1 + P09.2 + P09.3 all done (slot schema; authorization/binding/replay, 1 HIGH fixed; negative and recovery proof, 1 MEDIUM fixed) | **done** |
 | 10 | External acceptance | see phase-10 file | missing |
 
 ## Active Cell
 
-None. P09.2 closed (1 HIGH fixed, independently rechecked) — see "P09.2
-Status" below.
+None. P09.3 closed (1 MEDIUM fixed) — **Phase 09 (MVP9) is done.** See
+"P09.3 Status" below.
 
 **Process deviation, recorded honestly:** both P06.1 and P07.1 were
 dispatched as concurrent source-writers into the SAME shared worktree
@@ -94,21 +94,22 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Prepare P09.3 (Negative And Recovery Proof) — closes Phase 09, same role
-P06.3/P07.4/P08.3 each played for their phases. Per phase-09.md: reject
-worker/peer authorization, unknown slot, role/capability mismatch, second
-or over-cap binding, foreign context, over-cap Assignment, expired or
-terminal session, and slot use in isolation fixtures (most of these
-already have a real mediated-door test from P09.2's own Bug Taxonomy
-work and its Fix Round 1 — this cell's job is to make the negative-proof
-COVERAGE deliberate and complete, not start from zero, plus the items
-P09.2 didn't cover: crash recovery between authorization/binding/
-Assignment-creation resuming without duplicate actors or Assignments, and
-proving no `addSessionEdge`/topology-overlay/Work/git/coding mutation
-path is reachable). Also carries forward contract-doc promotion
-(`coordination-session.md`/`flow-definition.md` for `specialist-authorized`
-and `specialistSlotRef`), deferred by P09.2 to this cell per the
-established P06.3/P07.4/P08.3 pattern.
+**Phase 09 is done.** Prepare P10.1 (Pack Registry And Public Surface) —
+the first cell of Phase 10, per
+`plans/260903-2334-step09-mvp6-to-mvp9/phase-10-group-thinking-protocol-pack-conformance-and-closeout.md`:
+index protocols by canonical `FlowDefinition metadata.id@version` (no
+second protocol identity), keep protocol definitions data-first, define
+public request-adapter/replay-renderer boundaries, and build a thin
+`fgos-group-thinking` skill/surface that selects an explicit registered
+protocol, launches/resumes coordination, and renders public replay —
+never hiding protocol semantics in skill prose. Phase 10 is large (10
+cells, two parallel lanes: P10.2-P10.4 after P10.1, P10.6-P10.9 after
+P10.5) and everything downstream depends on P10.1's registry/boundary
+shape, so read the full phase-10 file before writing P10.1's contract.
+**Given this track's own documented process deviation earlier (P06.1/P07.1
+sharing a checkout unsafely) — when P10.2-P10.4 and P10.6-P10.9 come up,
+each concurrent non-read-only leaf cell MUST get its own isolated
+worktree per plan.md's Shared-File Lease Rule, no exceptions this time.**
 
 ## Cell Log
 
@@ -116,6 +117,7 @@ established P06.3/P07.4/P08.3 pattern.
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
+| P09.3 | Phase 09 negative and recovery proof (closes Phase 09; 1 MEDIUM fixed) | done | (pending commit) |
 | P09.2 | Phase 09 specialist authorization, binding, replay (1 HIGH fixed, independently rechecked) | done | `efe1bc68` |
 | P08.3 | Phase 08 method-shaped proofs + allowedTypes[] schema close (closes Phase 08; 1 LOW fixed) | done | `f9c98501` |
 | P08.2 | Phase 08 session ledger, replay, visibility (2 fix rounds) | done | `a24c250a` |
@@ -764,3 +766,90 @@ capability gate.
 
 **Phase 09 is not yet done.** Next: P09.3 (Negative And Recovery Proof),
 which closes it.
+
+## P09.3 Status (Negative And Recovery Proof — closes Phase 09)
+
+**CLOSED, 1 MEDIUM fixed. Phase 09 (MVP9 Bounded Specialist Binding) is
+done.** Solo cell, shared track worktree. A proof cell, not an
+implementation cell — zero files under `src/` touched, confirmed
+independently by both review rounds.
+
+Confirmed most of the phase's own negative-proof list (worker/peer
+authorization, unknown slot, role/capability mismatch, over-cap
+binding/assignment, foreign context, expired/terminal session) was
+already covered by real, mediated-door tests from P09.2's own Bug
+Taxonomy work — cited with exact test names, not re-derived from scratch.
+Added the genuinely missing coverage: an R7 mutation-uniformity test
+proving a specialist-dispatched Assignment carries the same hardcoded
+`mutation: 'read-only'` contract as any statically-bound one; two real
+crash-recovery tests shaped around P09.2's own proven atomicity (a single
+`appendEventLocked` write for authorization+binding means there is no
+on-disk intermediate state to construct — so the two real, distinguishable
+crash points are caller-visible retries: (a) retrying
+`authorizeSpecialistSlot` with the same `specialistAuthorizationId`
+resumes idempotently with the live binding unaffected and a full dispatch
+still succeeding afterward, (b) retrying an identical dispatch request
+resumes the SAME Assignment, never double-dispatching); and two structural
+absence-of-mutation-path proofs extending the pre-existing Phase 06 R7
+isolation-fixture methodology to `src/runner/definitions/**` and to the
+two specific identifiers (`addSessionEdge`/`addSharedEdge`) that don't
+exist anywhere in `src/`, confirmed by repo-wide grep before any test was
+written.
+
+Also found and closed a real gap current-cell.md itself got wrong:
+`topology.specialistSlots[]` was never actually contract-promoted into
+`flow-definition.md` (P09.1's own Gaps section said so explicitly; no
+later cell had closed it), even though current-cell.md assumed P09.1 had
+already done it. Promoted both `specialistSlots[]` and `specialistSlotRef`
+together, named the discrepancy rather than silently treating the wrong
+assumption as true.
+
+Both independent Reviewer and Red-Team rounds ran in parallel. Reviewer:
+zero findings across every checked claim (proof-matrix citations, all 5
+new tests, both structural scans, the `specialistSlots[]` promotion
+accuracy, contract-doc fidelity, the P09.2 atomicity premise this cell's
+whole crash-recovery design rests on). Red-Team: no HIGH/CRITICAL. Two
+MEDIUM/LOW evidentiary-completeness findings, both with the underlying
+mechanism independently verified sound by direct trace — the cited proof
+for Exit bullet #3 ("workers may request but never authorize") proved an
+id-mismatch refusal rather than a genuinely worker-TYPED identity's
+refusal (mechanism itself confirmed sound — closed directly with a
+one-line mirrored test, matching an identical proof already established
+for a sibling event kind); and the static forbidden-name scan's
+literal-substring/exports-only methodology has a theoretical evasion gap
+that is a PRE-EXISTING property of Phase 06's own original R7 pattern,
+faithfully extended (not introduced) by this cell — named as a residual
+for whichever future cell next touches that isolation-fixture family, not
+fixed here.
+
+Final counts: touched-file focused suite 28/28 (up from 27/27
+pre-disposition); combined focused regression 634/635 (the 1 non-pass is
+the standing `coordination-static.test.mjs` worktree-path false-fail);
+full-repo sweep, independently re-run by Red-Team from this worktree:
+**5501 tests, 5493 pass, 1 fail, 7 skipped** — the single failure is
+exactly this track's own standing baseline
+(`fgos-intake-4.test.mjs:318`), no surprises.
+
+Phase 09's own three Exit bullets checked off against real evidence in
+P09.3.md §7: unknown specialist identities can fill a bounded cognitive
+need (proven positively by P09.2's own end-to-end dispatch test, bounded
+negatively by this cell's full negative matrix); topology class and
+operation legality remain predeclared (proven by P09.1's schema closure
+plus this cell's new structural absence proofs); workers may request but
+never authorize recruitment (proven by the driver-only gate, now covering
+both the id-mismatch AND genuinely worker-typed-identity shapes).
+
+**Deferred, named honestly, not fixed here:** `specialist-request` still
+has no real dispatched-session proof (carried unchanged from P08.3.md —
+no method in this phase's own Candidate Contract calls for it); the three
+P09.2 runtime residuals (`allowedContextRefs` ceiling enforcement,
+`allowedVisibilityWindows[]` cross-check, definition pinned by id+version)
+are carried forward exactly as P09.2.md disclosed them, now also named in
+the promoted contract text; `requiredCapabilities[]`/
+`allowedVisibilityWindows[]` resolving against definition-wide unions
+rather than a slot's own `operationRefs[]` (carried from P09.1.md's Gap
+#14); the R7 static-scan methodology gap named above.
+
+**Phase 09 (MVP9 Bounded Specialist Binding) is done.** This track has
+now closed Phases 00, 06, 07, 08, and 09. Next: Phase 10 (External
+Acceptance) — the final phase, starting with P10.1.
