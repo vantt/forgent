@@ -128,6 +128,16 @@ risks) committed before any code — honoring `D-tsk28x-6`/`D-tsk28x-14`/
 the reducer itself — never checked afterward as a separate validation
 pass. This piece moved no files; it's pure domain model.
 
+### Child 2 — the docPath resolver, aliases only (`tsk-28x-2`)
+
+`src/report/knowledge-resolver.mjs` adds `resolveDocPath(path)`: exact
+`currentPath` match → doc; an old, aliased path → the same doc; a path
+neither current nor aliased → `null`. No consumer was switched over to it
+at this step — that migration comes later. Honors `D-tsk28x-9` directly:
+an old `docPath` is historical fact and is never rewritten; this resolver
+is the mechanism that lets "where does topic X actually live now" be
+answered without touching the historical record.
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
