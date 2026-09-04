@@ -34,6 +34,10 @@ import {
 import { resolveSessionPaths } from '../../src/runner/coordination/store.mjs';
 import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
+import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { PROTOCOL_OPERATION_STAMP_PREFIX } from '../../src/runner/dispatch/execution-contract.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 
 const DEFINITION_ID = 'test.coordination-protocol.mutation-unlock';
 
@@ -575,4 +579,121 @@ test('R8: resolveSessionPaths keys .fgos on the resolved MAIN CHECKOUT root, nev
   assert.equal(paths.fgosDir, path.join(repoRoot, '.fgos'));
   assert.notEqual(paths.fgosDir, path.join(worktreeRoot, '.fgos'));
   assert.equal(paths.root, repoRoot);
+});
+
+// ─── Fix round (HIGH finding, Red-Team P01.1 first pass): dispatch-layer
+// R2/R3 re-verification ─────────────────────────────────────────────────
+//
+// The Red-Team's own reproduction: a caller that imports the exported
+// `PROTOCOL_OPERATION_STAMP_PREFIX` and calls `buildAssignment` +
+// `executeAssignment` directly -- bypassing `dispatchDeclaredOperation`/
+// `assertMutatingDispatchAllowed` entirely, so R1/R2/R3 never run at all --
+// could self-forge the "engine-reserved" stamp and reach a real mutating
+// write. These tests reproduce that EXACT shape (never touching
+// session-engine.mjs) and prove `assignment-runner.mjs`'s new
+// `assertInlineMutatingAssignmentAuthorized` gate now refuses it, for both
+// the R2 (result.kind) and R3 (main-checkout) axes independently, while
+// still letting a genuinely well-formed inline mutating Assignment through.
+
+/** Build a hand-forged inline mutating Assignment carrying `stamp` as its
+ * ONE `protocol-operation:` constraint -- the same `buildAssignment({
+ * provenance: { kind: 'inline', ... } })` shape any real caller uses, never
+ * going through `session-engine.mjs`. */
+function forgedInlineMutatingAssignment(stamp) {
+  return buildAssignment({
+    provenance: {
+      kind: 'inline',
+      contract: {
+        objective: 'Direct forged mutating dispatch (bypassing session-engine.mjs entirely).',
+        contextRefs: [],
+        constraints: [stamp],
+        expectedOutputs: ['CANARY-attack.txt'],
+        mutation: 'mutating',
+        evidence: { required: 'reported' },
+        role: 'doer',
+        budget: { timeoutMs: 5000, maxRuns: 1 },
+      },
+      caller: { writerId: 'attacker-1' },
+    },
+    options: {},
+  });
+}
+
+test('Fix round: a direct buildAssignment + executeAssignment call (never through dispatchDeclaredOperation) with a forged protocol-operation stamp naming a NONEXISTENT definition is refused, no canary file written', async () => {
+  const { repoRoot } = initTempRepoWithWorktree();
+  const stamp = `${PROTOCOL_OPERATION_STAMP_PREFIX}forged.definition@0.0.0#not-a-real-operation`;
+  const assignment = forgedInlineMutatingAssignment(stamp);
+
+  await assert.rejects(
+    executeAssignment(assignment, { cwd: repoRoot }),
+    (err) => err instanceof RunnerConfigError && /does not resolve to a real CoordinationProtocol/.test(err.message),
+  );
+  assert.equal(fs.existsSync(path.join(repoRoot, 'CANARY-attack.txt')), false);
+});
+
+test('Fix round R3: a forged stamp naming a REAL definition + a REAL work-product operation is still refused when cwd resolves to the MAIN CHECKOUT (never a linked worktree), no canary file written', async () => {
+  const { repoRoot } = initTempRepoWithWorktree();
+  writeFixture(repoRoot);
+  const stamp = `${PROTOCOL_OPERATION_STAMP_PREFIX}${DEFINITION_ID}@1.0.0#produce-mutating`;
+  const assignment = forgedInlineMutatingAssignment(stamp);
+
+  await assert.rejects(
+    executeAssignment(assignment, { cwd: repoRoot }),
+    (err) => err instanceof RunnerConfigError && /main checkout/.test(err.message),
+  );
+  assert.equal(fs.existsSync(path.join(repoRoot, 'CANARY-attack.txt')), false);
+});
+
+test('Fix round R2: a forged stamp naming a REAL definition but an operation that does NOT declare result.kind "work-product" is refused, even against a real linked worktree cwd, no canary file written', async () => {
+  const { worktreeRoot } = initTempRepoWithWorktree();
+  writeFixture(worktreeRoot);
+  const stamp = `${PROTOCOL_OPERATION_STAMP_PREFIX}${DEFINITION_ID}@1.0.0#produce-advisory`;
+  const assignment = forgedInlineMutatingAssignment(stamp);
+
+  await assert.rejects(
+    executeAssignment(assignment, { cwd: worktreeRoot }),
+    (err) => err instanceof RunnerConfigError && /does not declare result\.kind "work-product"/.test(err.message),
+  );
+  assert.equal(fs.existsSync(path.join(worktreeRoot, 'CANARY-attack.txt')), false);
+});
+
+test('Fix round: a direct buildAssignment + executeAssignment call whose stamp genuinely matches a real work-product operation, against a real linked worktree cwd, is still allowed through (the new gate does not over-refuse a well-formed inline mutating Assignment)', async () => {
+  const { repoRoot, worktreeRoot } = initTempRepoWithWorktree();
+  writeFixture(worktreeRoot);
+  const stamp = `${PROTOCOL_OPERATION_STAMP_PREFIX}${DEFINITION_ID}@1.0.0#produce-mutating`;
+  const assignment = forgedInlineMutatingAssignment(stamp);
+  const assignmentsRoot = path.join(repoRoot, '.fgos', 'assignments');
+  const runnerConfig = fakeExecutor(worktreeRoot, assignmentsRoot, { writeFile: 'direct-output.txt' });
+
+  const runResult = await executeAssignment(assignment, { cwd: worktreeRoot, runnerConfig });
+  assert.equal(runResult.status, 'done');
+  assert.equal(fs.existsSync(path.join(worktreeRoot, 'direct-output.txt')), true);
+});
+
+test('Fix round: the LEGITIMATE path (dispatchDeclaredOperation, real definitionRef, real linked worktree) is unaffected by the new dispatch-layer gate', async () => {
+  const { repoRoot, worktreeRoot } = initTempRepoWithWorktree();
+  writeFixture(worktreeRoot);
+  openDeclaredProtocolSession(
+    { definitionId: DEFINITION_ID, coordinationId: 'coord_fixround_legit', objective: 'Prove the legitimate dispatch path still works after the R2/R3 dispatch-layer fix.', writerId: 'coordinator-1' },
+    { cwd: worktreeRoot },
+  );
+  const assignmentsRoot = path.join(repoRoot, '.fgos', 'assignments');
+  const runnerConfig = fakeExecutor(worktreeRoot, assignmentsRoot, { writeFile: 'legit-output.txt' });
+
+  const { assignment, runResult } = await dispatchDeclaredOperation(
+    'coord_fixround_legit',
+    {
+      operationId: 'produce-mutating',
+      objective: 'Produce a real work-product artifact.',
+      expectedOutputs: ['legit-output.txt'],
+      writerId: 'coordinator-1',
+      mutation: 'mutating',
+    },
+    { cwd: worktreeRoot, runnerConfig },
+  );
+
+  assert.equal(assignment.mutation, 'mutating');
+  assert.equal(runResult.status, 'done');
+  assert.equal(runResult.confidence, 'verified');
+  assert.equal(fs.existsSync(path.join(worktreeRoot, 'legit-output.txt')), true);
 });

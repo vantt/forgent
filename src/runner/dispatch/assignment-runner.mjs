@@ -28,6 +28,8 @@ import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim 
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
+import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
+import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 
 // ADR-006 R7 (P02.4 Red-Team HIGH fix): executeAssignment's own
 // `effectiveAssignment` derivation reads a stored assignment.json back from
@@ -480,6 +482,89 @@ export function classifyRunEvidence({
  * @param {object} [opts.options]
  * @returns {Promise<Readonly<object>>} Stored RunResult object
  */
+/**
+ * Phase 01 mutation-unlock HIGH-finding fix (Red-Team, P01.1): a caller
+ * that imports the exported `PROTOCOL_OPERATION_STAMP_PREFIX` and calls
+ * `buildAssignment` + `executeAssignment` directly -- bypassing
+ * session-engine.mjs's `dispatchDeclaredOperation`/
+ * `assertMutatingDispatchAllowed` entirely -- can self-forge the
+ * "engine-reserved" stamp (a bare `string.startsWith()` check, never a real
+ * capability) and reach a real mutating write with none of R1/R2/R3 ever
+ * having run. This re-verifies R2 (bound operation declares
+ * `result.kind: 'work-product'`) and R3 (cwd resolves to a linked git
+ * worktree, never the main checkout) AT THE ACTUAL POINT mutation is
+ * honored -- independent of which caller reached `executeAssignment`, and
+ * using the SAME shared predicates (`operationDeclaresWorkProduct`/
+ * `resolveMutatingCwdPosture`, dispatch/execution-contract.mjs)
+ * session-engine.mjs's own pre-check uses, so the two enforcement points
+ * cannot independently drift.
+ *
+ * Scoped to `provenance.kind === 'inline'` only: before this cell, an
+ * inline contract's `mutation: 'mutating'` was unconditionally refused
+ * (ADR-006 §6) regardless of any stamp -- this cell is what first made an
+ * inline mutating Assignment constructible at all, so this is exactly
+ * (and only) the new attack surface it introduced. A declared-shape
+ * Assignment's mutation posture is the pre-existing, unrelated
+ * `classifyDeclaredMutation` mechanism (assignment-normalizer.mjs),
+ * untouched and out of scope here.
+ *
+ * The stamp is re-resolved from scratch against a REAL, on-disk
+ * CoordinationProtocol -- never trusted as a caller-supplied claim: a
+ * missing/malformed/ambiguous stamp, a definition id that does not
+ * resolve, a version mismatch, or an operation id not declared in that
+ * definition's own `spec.operations` are all refused identically to an
+ * operation that resolves but does not declare `result.kind:
+ * 'work-product'`.
+ *
+ * @param {object} asgn
+ * @param {object} opts
+ */
+function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
+  if (asgn.mutation !== 'mutating' || asgn.provenance?.kind !== 'inline') return;
+
+  const stamp = extractProtocolOperationStamp(asgn.provenance?.inline?.contract?.constraints);
+  if (!stamp) {
+    throw new RunnerConfigError(
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" carries no single, well-formed engine-reserved protocol-operation stamp -- refused (Phase 01 mutation-unlock R2/R3 re-verification)`,
+    );
+  }
+
+  const cwd = opts.cwd ?? process.cwd();
+
+  let definition;
+  try {
+    definition = loadCoordinationProtocol(stamp.definitionId, { cwd, packageRoot: opts.packageRoot });
+  } catch (err) {
+    throw new RunnerConfigError(
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims protocol-operation stamp for definition "${stamp.definitionId}", which does not resolve to a real CoordinationProtocol -- refused (${err.message})`,
+    );
+  }
+  if (definition.metadata.version !== stamp.definitionVersion) {
+    throw new RunnerConfigError(
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" stamp names definition version "${stamp.definitionVersion}", but the resolved definition "${stamp.definitionId}" is version "${definition.metadata.version}" -- refused (stale or forged stamp)`,
+    );
+  }
+  const operation = definition.spec.operations?.find((op) => op.id === stamp.operationId);
+  if (!operation || operation.result?.kind !== 'work-product') {
+    throw new RunnerConfigError(
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims operation "${stamp.operationId}" in definition "${stamp.definitionId}" -- that operation does not declare result.kind "work-product" -- refused (Phase 01 mutation-unlock R2 re-verification)`,
+    );
+  }
+
+  const posture = resolveMutatingCwdPosture(cwd);
+  if (!posture.ok) {
+    const reason =
+      posture.reason === 'main-checkout'
+        ? `resolves to the main checkout ("${posture.repoRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`
+        : posture.reason === 'outside-git'
+          ? 'does not resolve inside any git checkout (fail closed on an unresolvable root, never fail open)'
+          : 'toplevel could not be resolved; fail closed, never fail open';
+    throw new RunnerConfigError(
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" refused -- cwd "${cwd}" ${reason} (Phase 01 mutation-unlock R3 re-verification)`,
+    );
+  }
+}
+
 function validateAssignmentLegality(asgn, opts = {}) {
   if (!asgn || typeof asgn !== 'object') {
     throw new RunnerConfigError('executeAssignment requires an assignment object');
@@ -533,6 +618,13 @@ function validateAssignmentLegality(asgn, opts = {}) {
       `cannot execute mutating operation "${asgn.operation}" (role: "${asgn.role}") in mission-lite mode — mission-lite is strictly read-only`,
     );
   }
+
+  // Phase 01 mutation-unlock HIGH-finding fix: re-verify R2/R3 at the actual
+  // point mutation is honored, independent of `opts.isReadOnlyMode` (a
+  // direct `buildAssignment` + `executeAssignment` caller controls `opts`
+  // itself and can simply omit this flag) -- see
+  // `assertInlineMutatingAssignmentAuthorized`'s own doc comment.
+  assertInlineMutatingAssignmentAuthorized(asgn, opts);
 
   return matchedOp;
 }

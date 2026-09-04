@@ -19,8 +19,25 @@
 //     rejected by name, not merely because it happens to be absent from the
 //     accepted field set today -- so a future accidental addition to that
 //     set could never silently re-admit one of these.
+//
+// Phase 01 mutation-unlock HIGH-finding fix (Red-Team, P01.1): the reserved
+// stamp above proves an inline contract CLAIMS engine provenance, but
+// `carriesProtocolOperationStamp` is a bare `string.startsWith()` check --
+// forgeable by any caller that imports this module's own exported
+// `PROTOCOL_OPERATION_STAMP_PREFIX` and hand-builds the string, bypassing
+// session-engine.mjs's `dispatchDeclaredOperation`/`assertMutatingDispatchAllowed`
+// entirely. `extractProtocolOperationStamp`/`resolveMutatingCwdPosture` below
+// are the shared, pure(ish) R2/R3 predicates BOTH session-engine.mjs's own
+// pre-check (fast, honest refusal before any work starts) and
+// `assignment-runner.mjs`'s dispatch-layer re-verification (the real,
+// unforgeable-by-caller gate, at the actual point mutation is honored) call
+// -- so the two enforcement points can never independently drift. This adds
+// read-only git inspection (via `../paths.mjs`) to this module, a narrow,
+// deliberate exception to the "no fs" header above -- inspection only, never
+// a contract-validation side effect, and never a write.
 
 import { MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
+import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
 
 export const CONTRACT_POLICY_VERSION = '1';
 
@@ -46,6 +63,93 @@ export const PROTOCOL_OPERATION_STAMP_PREFIX = 'protocol-operation:';
  * other caller could have forged by hand. */
 export function carriesProtocolOperationStamp(constraints) {
   return Array.isArray(constraints) && constraints.some((entry) => typeof entry === 'string' && entry.startsWith(PROTOCOL_OPERATION_STAMP_PREFIX));
+}
+
+// `protocol-operation:${definitionId}@${definitionVersion}#${operationId}`
+// -- the exact shape `session-engine.mjs`'s `protocolOperationStamp()` mints.
+// `definitionId` is assumed to contain no `@`, and `definitionVersion` no
+// `#` (true for every real FlowDefinition metadata.id/version, both plain
+// slugs per `definitions/schema.mjs`); a stamp that violates that shape
+// fails to match and is treated as absent -- fail closed, never a guess.
+const PROTOCOL_OPERATION_STAMP_RE = /^([^@]+)@([^#]+)#(.+)$/;
+
+/**
+ * Parse the SINGLE `PROTOCOL_OPERATION_STAMP_PREFIX`-namespaced entry out of
+ * `constraints` into `{ definitionId, definitionVersion, operationId }`.
+ * Returns `null` -- never throws -- when zero or more than one such entry is
+ * present, or the one present entry does not match the expected shape: a
+ * missing/ambiguous/malformed stamp is exactly as unauthorized as no stamp
+ * at all to this function's own callers (R2/R3 re-verification, below).
+ *
+ * @param {unknown} constraints
+ * @returns {{definitionId: string, definitionVersion: string, operationId: string}|null}
+ */
+export function extractProtocolOperationStamp(constraints) {
+  if (!Array.isArray(constraints)) return null;
+  const matches = constraints.filter((entry) => typeof entry === 'string' && entry.startsWith(PROTOCOL_OPERATION_STAMP_PREFIX));
+  if (matches.length !== 1) return null;
+  const rest = matches[0].slice(PROTOCOL_OPERATION_STAMP_PREFIX.length);
+  const m = PROTOCOL_OPERATION_STAMP_RE.exec(rest);
+  if (!m) return null;
+  const [, definitionId, definitionVersion, operationId] = m;
+  return { definitionId, definitionVersion, operationId };
+}
+
+/**
+ * `true` when a declared operation's own resolved definition (`operation`,
+ * as returned by `definition.spec.operations.find(...)`) declares
+ * `result.kind: 'work-product'` (Phase 01 mutation-unlock R2). Shared,
+ * trivial predicate -- both session-engine.mjs's pre-check and
+ * assignment-runner.mjs's dispatch-layer re-verification read the SAME
+ * field the SAME way.
+ *
+ * @param {object|undefined|null} operation
+ * @returns {boolean}
+ */
+export function operationDeclaresWorkProduct(operation) {
+  return Boolean(operation) && operation.result?.kind === 'work-product';
+}
+
+/**
+ * Resolve whether `cwd` is safe for a mutating dispatch (Phase 01
+ * mutation-unlock R3): it must resolve to a LINKED git worktree, never the
+ * main checkout, and never fail open on an unresolvable root. Never throws
+ * itself -- returns a descriptor so each caller (session-engine.mjs's
+ * `CoordinationError`, assignment-runner.mjs's `RunnerConfigError`) can
+ * report the SAME underlying resolution outcome in its own idiomatic error
+ * type/message without this module depending on either.
+ *
+ * The exact comparison (Phase 01's own direct investigation, unchanged by
+ * this fix): `resolveMainCheckoutRoot(cwd) === resolveRepoRoot(cwd)` --
+ * i.e. the toplevel of `cwd` IS the main checkout root -- refuses, since
+ * `cwd` may legitimately be a SUBDIRECTORY of either the main checkout or a
+ * worktree (comparing against raw `cwd` would wrongly refuse that case).
+ * `resolveMainCheckoutRoot` never throws by its own documented contract
+ * (returns `null` outside any git checkout) -- no defensive try/catch
+ * around it here (Reviewer LOW finding, P01.1: the pre-fix code carried one
+ * around this exact call, dead since the function it wrapped never throws).
+ *
+ * @param {string|undefined} cwd
+ * @returns {{ok: true, mainCheckoutRoot: string, repoRoot: string}
+ *   | {ok: false, reason: 'outside-git'}
+ *   | {ok: false, reason: 'unresolvable', error: Error}
+ *   | {ok: false, reason: 'main-checkout', repoRoot: string}}
+ */
+export function resolveMutatingCwdPosture(cwd) {
+  const mainCheckoutRoot = resolveMainCheckoutRoot(cwd);
+  if (mainCheckoutRoot === null) {
+    return { ok: false, reason: 'outside-git' };
+  }
+  let repoRoot;
+  try {
+    repoRoot = resolveRepoRoot(cwd);
+  } catch (err) {
+    return { ok: false, reason: 'unresolvable', error: err };
+  }
+  if (mainCheckoutRoot === repoRoot) {
+    return { ok: false, reason: 'main-checkout', repoRoot };
+  }
+  return { ok: true, mainCheckoutRoot, repoRoot };
 }
 
 const ACCEPTED_CONTRACT_FIELDS = new Set([

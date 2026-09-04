@@ -74,8 +74,7 @@ import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
-import { PROTOCOL_OPERATION_STAMP_PREFIX } from '../dispatch/execution-contract.mjs';
-import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
+import { PROTOCOL_OPERATION_STAMP_PREFIX, operationDeclaresWorkProduct, resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import { mergePolicyStack, activationModeOf } from '../definitions/schema.mjs';
 import { planCohort, verifyPlannedAllocationAgainstCurrentConfig } from './cohort-planner.mjs';
@@ -2143,10 +2142,16 @@ export function openDeclaredProtocolSession(
  * R2: the bound operation must declare `result.kind: 'work-product'` --
  * read from the definition's own resolved operation (never trusted from a
  * caller-supplied claim; there is no parameter path for one here at all).
+ * Delegated to `operationDeclaresWorkProduct` (dispatch/execution-contract.mjs)
+ * -- the SAME predicate assignment-runner.mjs's dispatch-layer
+ * re-verification calls, so the two can never independently drift
+ * (Phase 01 mutation-unlock HIGH-finding fix, P01.1).
  *
  * R3: `opts.cwd` must resolve to a LINKED WORKTREE, never the main checkout,
- * and never fail open on an unresolvable root. The exact comparison (this
- * cell's own direct investigation, phase-01-mutation-unlock.md R3):
+ * and never fail open on an unresolvable root. Delegated to
+ * `resolveMutatingCwdPosture` (dispatch/execution-contract.mjs, same shared
+ * predicate as R2 above) -- the exact comparison (this cell's own direct
+ * investigation, phase-01-mutation-unlock.md R3):
  * `resolveMainCheckoutRoot(cwd) === resolveRepoRoot(cwd)` -- i.e. the
  * toplevel of `cwd` IS the main checkout root -- refuses, since `cwd` may
  * legitimately be a SUBDIRECTORY of either the main checkout or a worktree
@@ -2166,39 +2171,31 @@ function assertMutatingDispatchAllowed(mutation, { operationId, operation, cwd }
     );
   }
 
-  const declaredKind = operation.result?.kind;
-  if (declaredKind !== 'work-product') {
+  if (!operationDeclaresWorkProduct(operation)) {
+    const declaredKind = operation.result?.kind;
     throw new CoordinationError(
       'validation',
       `dispatchDeclaredOperation: operation "${operationId}" declares result.kind "${declaredKind ?? 'undefined'}" -- a mutating dispatch requires the bound operation to declare result.kind "work-product"`,
     );
   }
 
-  let mainCheckoutRoot;
-  try {
-    mainCheckoutRoot = resolveMainCheckoutRoot(cwd);
-  } catch {
-    mainCheckoutRoot = null;
-  }
-  if (mainCheckoutRoot === null) {
+  const posture = resolveMutatingCwdPosture(cwd);
+  if (!posture.ok) {
+    if (posture.reason === 'outside-git') {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: mutation "mutating" refused for operation "${operationId}" -- cwd "${cwd}" does not resolve inside any git checkout (fail closed on an unresolvable root, never fail open)`,
+      );
+    }
+    if (posture.reason === 'unresolvable') {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: mutation "mutating" refused for operation "${operationId}" -- cwd "${cwd}" toplevel could not be resolved (${posture.error.message}); fail closed, never fail open`,
+      );
+    }
     throw new CoordinationError(
       'validation',
-      `dispatchDeclaredOperation: mutation "mutating" refused for operation "${operationId}" -- cwd "${cwd}" does not resolve inside any git checkout (fail closed on an unresolvable root, never fail open)`,
-    );
-  }
-  let repoRoot;
-  try {
-    repoRoot = resolveRepoRoot(cwd);
-  } catch (err) {
-    throw new CoordinationError(
-      'validation',
-      `dispatchDeclaredOperation: mutation "mutating" refused for operation "${operationId}" -- cwd "${cwd}" toplevel could not be resolved (${err.message}); fail closed, never fail open`,
-    );
-  }
-  if (mainCheckoutRoot === repoRoot) {
-    throw new CoordinationError(
-      'validation',
-      `dispatchDeclaredOperation: mutation "mutating" refused for operation "${operationId}" -- cwd "${cwd}" resolves to the main checkout ("${repoRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`,
+      `dispatchDeclaredOperation: mutation "mutating" refused for operation "${operationId}" -- cwd "${cwd}" resolves to the main checkout ("${posture.repoRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`,
     );
   }
 }
