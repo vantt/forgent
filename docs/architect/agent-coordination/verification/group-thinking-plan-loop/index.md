@@ -29,9 +29,9 @@ single shared `current-cell.md`.
 
 | Phase | Requirement | Status |
 |---|---|---|
-| P01 | R1-R9 (mutation unlock, kernel) | in-progress (P01.1 fixing accepted HIGH red-team finding) |
+| P01 | R1-R9 (mutation unlock, kernel) | done (P01.1 closed and merged, 4 fix rounds) |
 | P02 | R1-R8 (chain verb, pack registration) | done (P02.1 closed and merged) |
-| P03 | live proof + skill | missing (blocked on P01+P02 close) |
+| P03 | live proof + skill | preparing (Wave 1 fully closed, opening Wave 2) |
 
 ## Corrections found during cell preparation (grounded, not assumed)
 
@@ -83,8 +83,18 @@ that introduced it.
 
 | Cell | Status | Owner | Worktree | Next action |
 |---|---|---|---|---|
-| P01.1 | fixes-needed | Coordinator | `.claude/worktrees/agent-ab7ff2ac5eda7a106` / `worktree-agent-ab7ff2ac5eda7a106` @ `8b24c8a2` | fixer-p01-1 running (accepted HIGH: forgeable stamp bypass) |
+| P01.1 | **done** | Coordinator | merged into `group-thinking-plan-loop` (Doer `8b24c8a2`, Fixer R1-R4) | closed |
 | P02.1 | **done** | Coordinator | merged into `group-thinking-plan-loop` (Doer `42af6508`, Fixer `a39a920f`) | closed |
+
+## Wave 1 — closed
+
+Both P01.1 and P02.1 closed and merged into `group-thinking-plan-loop`.
+P01.1 (the plan's one kernel cell) went through 4 real fix rounds — see
+its own trace file's "Close (Coordinator)" section for the full history:
+a forged-stamp bypass, a confusion-of-authority/ticket-reuse bypass, a
+consulted-and-verified trust-boundary reframe (kongming, independently
+re-checked against source), and a small overclaim correction. Full
+regression re-verification pending below, then Wave 2 opens.
 
 ## P01.1 disposition (kernel cell — HIGH red-team finding)
 
