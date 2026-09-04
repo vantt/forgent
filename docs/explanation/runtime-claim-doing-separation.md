@@ -116,3 +116,25 @@ The merge attempt first failed `verify-fail-post-merge` (goal-check exit
 load-induced flake, not a real regression from this item's own diff. No
 code change was needed; the item moved `blocked → awaiting-approval` on
 retry.
+
+## The prose docs still described the old durable-doing model (`tsk-4kn`)
+
+Landing the code (this doc's own D1-D6) didn't touch `docs/specs/runner.md`
+or `docs/specs/work-state.md` — both still described claiming an item as a
+durable `todo -> doing` write, the exact model D1 retired. `tsk-4kn`
+corrected both specs' prose (take/return claim language, Data Dictionary
+#4/#14 in `work-state.md`; "Một vòng --once", entry-points, and "Gặt lại
+lúc khởi động" in `runner.md`) to state plainly that new claims do not
+durably write into `doing`, and to name the distinction this doc's D1/D4
+already draw: durable status vs. the runtime-claim-overlay effective
+status. Docs-only change, scope-bounded to those two spec files.
+
+The diff was implemented, verified (47/47), and committed once already
+(`fgw/tsk-4kn`, commits `ef2dd826`/`cff86806`/`83eb4065`/`8d28f3ba`) — then
+lost before it could return, when a shared-main-checkout event-log
+truncation incident (13:42-13:44Z) wiped the item's fgOS history mid-flight
+(the same bug class tracked in
+[`fgos-lifecycle-tracking-concurrent-desync`](fgos-lifecycle-tracking-concurrent-desync.md)'s
+still-open write-side event-loss half). `tsk-4kn` itself is the resubmit
+that drove a fresh item through the lifecycle to reapply and formally
+return that already-proven diff, rather than a second design pass.
