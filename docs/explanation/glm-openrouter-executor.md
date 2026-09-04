@@ -58,6 +58,18 @@ Implementing this surfaced a governance gap in the cross-provider
 dispatch gate — filed as its own follow-up item (`tsk-2y7`), not detailed
 here since it's out of this item's own scope.
 
+## Confirmed live end-to-end
+
+`tsk-3gr` dispatched a real prompt through
+`node src/runner/dispatch.mjs execute glm --prompt ...`, using the real
+OpenRouter key from `.fgos/secrets.local.env`, and confirmed a genuine
+reply came back through GLM 5.2 rather than the config merely validating.
+This isn't a redundant re-check: config validation passing only proves the
+schema is well-formed, not that the `${VAR}` substitution and env merge
+actually take effect at spawn time — the first live run had been lost to
+an unrelated event-log durability bug (`tsk-4uv`) before this smoke test
+re-ran and reconfirmed it end-to-end.
+
 ## The merge itself hit the same false-positive integrity check as `tsk-2ewi`
 
 Landing this item's merge required the same workaround already documented
