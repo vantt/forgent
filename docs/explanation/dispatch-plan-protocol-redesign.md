@@ -100,3 +100,39 @@ retro-loop.
 (327+ tests). A stale session claim from the originating session (gone,
 but under the 24h automatic-reclaim threshold) was manually released once
 the real work was confirmed safely landed on main.
+
+## A spike checked the deferred half and found no real consumer yet (`tsk-3rn`)
+
+D6's own Deferred | Pull-in-condition table left `AgentMessage`,
+`DispatchAssignment`, artifact store, and mailbox/Herdr transport
+undelivered on purpose. `tsk-3rn` was a docs-only research spike — not an
+implementation — surveying whether a real consumer for that deferred
+protocol layer exists today among the four candidates the redesign itself
+named: Herdr async handoff, dashboard replay, compliance report, external
+provider.
+
+**Finding, per candidate (all repo-search-first, file:line cited):**
+
+- **Herdr async handoff** — `herdrSpawnAdapter`/`herdrSpawnInteractiveAdapter`
+  (`src/runner/dispatch/transport.mjs:881-1327`) already observe completion
+  via a scrollback exit sentinel; no async question/answer channel exists
+  or is requested anywhere in the Herdr integration.
+- **Dashboard replay** — the Herdr dashboard reads state digests off REST
+  endpoints and normalizes results through the existing 3-rung confidence
+  ladder (`src/runner/dispatch/result-ladder.mjs:1-55`); nothing replays a
+  structured message envelope.
+- **Compliance report** — egress governance (`tsk-5x7-2`) already records
+  `providerFamily`/`egress` descriptors straight on dispatch events; no
+  consumer wraps them in an `AgentMessage` envelope.
+- **External provider** — all 3 registered adapters (`cli-spawn`, `http`,
+  `herdr-spawn`, `src/runner/dispatch/transport.mjs:1323-1327`) still
+  communicate via plain prompt/stdout or HTTP body only.
+
+A repo-wide grep (`AgentMessage|DispatchAssignment|mailbox|ArtifactRef`)
+confirmed **zero implementation exists anywhere in `src/`**, and git log
+shows exactly one docs-only commit ever mentioning these terms.
+
+**Decision: defer further.** No implementation item was spun off — the
+deferred table in D6 stays exactly as it was, now with direct evidence
+(rather than just intent) that nothing has quietly created a real need for
+it since `tsk-5x7` landed.
