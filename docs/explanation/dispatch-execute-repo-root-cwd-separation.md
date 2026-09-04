@@ -97,3 +97,28 @@ whenever `--repo-root` is passed and the two differ, or refuse to run a
 worker against the bare repo root at all when dispatched from an isolated
 worktree context; confirm whether the `herdr-spawn` adapter's own spawn
 call actually honors `cwd` independent of `repoRoot`.
+
+## Same family, different symptom: correct commit, wrong `verifiedSha` metadata (`tsk-22bm`)
+
+`tsk-22bm` reproduced a third variant while driving `tsk-10n` via
+`/fgOS:cook`: `dispatch.mjs execute` called with no `--repo-root` and no
+`--cwd` at all (from inside `fgw/tsk-10n`'s own cwd). This time the
+worker's real commit (`f2c475b1`) landed correctly on the right branch —
+**not** the wrong-location symptom above. But the JSON result's own
+`verifiedSha` field read `21966be3...`, which turned out to be `main`'s
+own HEAD at read time (an unrelated concurrent commit), not an ancestor
+of `fgw/tsk-10n` at all.
+
+The existing safety net held: `fgos-coding-implement`'s own hard rule to
+independently confirm the worker's commit (`git log -1`/`git
+status`/`git cat-file`) rather than trust `verifiedSha` on faith caught
+the bad metadata before `fgos return --worker-verified-sha` could be
+called with it. `tsk-22bm` treated this as confirm-only — no code
+changed. It shipped `RESEARCH.md` (committed at discovery) as the full
+deliverable, tracing `verifiedSha`'s bad-HEAD computation to the same
+upstream `repoRoot`-vs-`cwd` resolution confusion documented above, and
+left one question explicitly still open: whether `fgos return` itself
+validates a passed `--worker-verified-sha` against the real branch tip
+before accepting it, or would silently accept a mismatched sha if a
+caller skipped the independent check — not confirmed as part of this
+item, noted for whoever picks it up next.
