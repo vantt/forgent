@@ -392,3 +392,58 @@ all 247 affected topics via the existing `fgos topic rename` verb, plus
 recording and implementing the `docs/knowledge/` prefix decision. Verify
 proved it against the canonical store, not a sample: 0 active topics left
 over 60 bytes. `tsk-5mh`'s real apply resumed only after this landed.
+
+## `tsk-28x-11` built the migration script; `tsk-5mh` is the item that actually ran it live
+
+Child 11 above shipped `scripts/knowledge-migration.mjs` and its dry-run
+gate — but "delivered" there meant the *script* was built and tested, not
+that `--apply` had ever run against the live 332-doc corpus. `tsk-5mh`
+is that real run, and it took three attempts to land clean.
+
+**Attempt 1 — wrong checkout.** Running `--apply` from `tsk-5mh`'s own
+`fgw/tsk-5mh` worktree would have written `.fgos/` registry events
+(`currentPath`) to the shared live event log immediately, while the
+actual `git mv` file moves would only exist on the unmerged branch —
+every other session's live `doc-sources`/`docs-index` against `main`
+would see a `currentPath` pointing at a file that doesn't exist there
+until merge. So `--apply` ran directly against the main checkout's own
+working tree instead, landing 332 per-target commits straight on `main`'s
+history (the item's own rollback plan — `git revert` per target commit —
+only makes sense for commits already on the trunk other work depends on).
+This surfaced a real bug in the script: `scripts/knowledge-migration.mjs`
+hardcoded one `repoRoot` for both the `.fgos` registry read and the git
+file moves, so it silently read an empty registry view (332 false
+"not registered" errors) whenever `process.cwd()` was a worktree with no
+`.fgos/` per ADR0020. Fixed with a separate `fgosRoot`/`--dir` flag plus a
+fail-loud guard instead of the silent empty-view fallback.
+
+**Attempt 2 — crashed at 181/332, exposed `tsk-ozk`.** The corrected
+direct-apply crashed with `ENAMETOOLONG`: one topic's `purposeSlug` was
+307 characters (the classifier used the full explanatory doc title
+verbatim for most "why-..." docs) — systemic, not a one-off: 247/332
+topics (74%) exceeded 60 bytes. The 180 partially-applied moves (files +
+registry `doc.path-move`/`demote` events) were fully reverted and
+verified clean (dry-run back to `moveCount 332`, `conservationErrors []`,
+all `preLifecycle` active again) before parking. This — plus the
+`docs/knowledge/` prefix reconsideration — is exactly what `tsk-ozk`
+(above) fixed.
+
+**Attempt 3 — succeeded, exposed `tsk-43q`.** With `tsk-ozk` landed, the
+real apply ran clean: all 332 docs moved to
+`docs/knowledge/<purposeSlug>/<role>.md`, one commit per target plus one
+`doc-registry.json`/`.md` projection commit, all on `main`. B3's
+`doc-sources` half was spot-checked live on 3 sampled docs (old-path and
+new-path resolve to the identical capture id via the alias mechanism) and
+passed. But `fgos docs-index` afterward returned `count:0` and overwrote
+`docs/enduser-docs-index.json` down to an empty array (caught before
+commit, reverted — no data lost): `src/report/enduser-index-generate.mjs`'s
+`enumerateDocEntries` still scanned the old fixed Diataxis quadrant
+directories (`docs/how-to/`, `docs/explanation/`, ...), never the
+registry — `tsk-28x-7` above had only wired the alias-matching half of
+B3, not the enumeration half, a pre-existing gap this item's real apply
+was the first thing to actually exercise. Filed as `tsk-43q`
+(registry-independent enumeration via a `docs/knowledge/**/*.md` scan
+tagged by frontmatter `mode`); once it landed, `docs-index` returned
+`count: 446` (was 4) against the real corpus, and `tsk-5mh` closed with
+both migration and both B3 halves verified against live state, not a
+sample.
