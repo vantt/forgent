@@ -61,3 +61,39 @@ corrected convention explicitly: for a worktree-backed item, pass
 **separate** flags — never pass the main checkout as `--dir` alone. The
 old single-`--dir` convention is no longer safe guidance for a
 worktree-backed dispatch.
+
+## The two-flag fix didn't close the gap — it only relocated it (`tsk-322`)
+
+`tsk-43z` made `--repo-root` and `--cwd` separately *passable*, but never
+made `--cwd` *required* once `--repo-root` is present. `tsk-322`
+reproduced the identical symptom (a genuinely correct, successful
+`agy`/`herdr-spawn` implementation landing on the shared main checkout
+instead of the caller's worktree branch — commit `26d16fbd`, confirmed
+via `git branch --all --contains <sha>` returning only `main`) from a
+caller that passed `--repo-root <main checkout>` but **omitted `--cwd`**,
+letting it silently default to `execute`'s own `process.cwd()`.
+`fanoutBatchExecutorCli`'s own internal call to the same dispatch layer
+always passes both `cwd: wtPath` and `repoRoot: root` — this incident's
+caller only passed one of the two, and nothing in the CLI enforced the
+pair.
+
+Root cause not confirmed at synthesis time — left as two live hypotheses
+for whoever picks this up: (a) the `herdr-spawn`/`agy` adapter resolves
+its own working directory from `repoRoot` rather than the passed `cwd`
+once `repoRoot` is present, or (b) `execute`'s own `--repo-root` handling
+silently drops or overrides an unset `--cwd` instead of defaulting it to
+the real `process.cwd()`. Also flagged as possibly the same underlying
+`agy` defect surfacing a third time — [[project_agy_cwd_bug_wrong_worktree_commit]]
+documents `agy` ignoring an *explicitly passed* `cwd` once before
+(2026-08-17, via `spawnWorker`/`cliSpawnAdapter`, landed on a different
+item's branch that time), and `tsk-5cr`/`tsk-5fn` (filed the same day as
+this item) are two more `agy`-herdr dispatch-location/completion bugs —
+three in one day was enough to flag `agy`/herdr as a dispatch backend for
+a broader reliability audit before further real-scale reliance, not yet
+scheduled as of this write-up.
+
+**Suggested fix directions, not yet implemented:** require `--cwd`
+whenever `--repo-root` is passed and the two differ, or refuse to run a
+worker against the bare repo root at all when dispatched from an isolated
+worktree context; confirm whether the `herdr-spawn` adapter's own spawn
+call actually honors `cwd` independent of `repoRoot`.
