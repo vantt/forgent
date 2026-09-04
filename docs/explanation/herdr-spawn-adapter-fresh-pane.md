@@ -319,3 +319,48 @@ this whole body of work (`tsk-5jl`, `tsk-2ii`, `tsk-10j`, `tsk-4zi`,
 bullet under `## [Unreleased] -> ### Changed` summarizing the
 config-driven adapter, the `agy-herdr` executor rename/flip history, and
 the false-idle polling race fix — no code change, doc-only.
+
+## Removing the non-interactive paths outright: herdr's only job is real TTY visibility (`tsk-by0`)
+
+Everything above added an opt-in `interactiveMode` alongside the
+original plain/`liveOutput` paths. `tsk-by0` went the other direction —
+an explicit user decision to delete both non-interactive mechanisms from
+`herdrSpawnAdapter` entirely, leaving `herdrSpawnInteractiveAdapter`
+(the `-i`/`interactiveMode` path) as herdr-spawn's ONE supported
+mechanism. Rationale: the plain sh-wrapper/sentinel path and the
+`liveOutput`/tee/PIPESTATUS mechanism both hide real content behind a
+translated/echoed script — the same class of problem `cli-spawn` already
+solves for genuinely non-interactive dispatch, so keeping them on
+`herdr-spawn` too was functionally redundant and defeated the whole
+point of paying for a real pane.
+
+**What shipped:** `transport.mjs`'s non-interactive body (the plain
+wrapper-script branch plus the `liveOutput`/tee/`PIPESTATUS` pipeline)
+was deleted outright; an invocation missing `interactiveMode` now throws
+a named `invalid-config` `DispatchError` instead of silently falling
+through to a removed path. The two live-renderer scripts
+(`claude-stream-json.mjs`, `pi-agent-session.mjs`) were deleted along
+with their `docs/architecture-manifest.json` entries — dead code the
+moment `liveOutput` stopped existing. `test/runner/herdr-spawn-adapter.test.mjs`
+lost the plain-path (mocked + live) and `liveOutput`/renderer-format
+tests; every `interactiveMode` test (including `tsk-2rr`'s own) stayed,
+plus one new test asserting the adapter now rejects a missing-`interactiveMode`
+invocation.
+
+**A real repo-state conflict surfaced and got a live decision, not a
+guess:** the item's own locked plan assumed the deleted paths were purely
+dead weight, but `fgos-coding-validating`'s reality gate found
+`.fgos/config.json` still carried `claude-herdr`/`pi-herdr`/`codex-herdr`
+as real dormant-but-configured executors depending on exactly what would
+be deleted. Handed back to a person mid-drive rather than silently
+overridden: the answer (D1) was to proceed as planned anyway — those
+three executors are fine to lose since equivalent plain executors
+(`claude`/`codex`/`pi` via `cli-spawn`) already cover non-interactive
+dispatch for those CLIs, and `agy-herdr`'s own interactive-mode
+prompt-delivery bug (`tsk-5cr`, above) stays explicitly out of this
+item's scope — a pre-existing bug on the ONE path this item keeps, not
+something removing the other two paths could or should fix.
+
+Landed via `fgw/tsk-by0` (merged `d5b503cd`); Iron Law satisfied via
+`--acknowledge-iron-law` against `transport.mjs` and the two deleted
+live-renderer modules.
