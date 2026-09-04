@@ -51,7 +51,7 @@ const require = createRequire(import.meta.url);
 // R7: the two shipped core fixtures discover and normalize cleanly.
 // ---------------------------------------------------------------------------
 
-test('discoverCoordinationProtocols finds all shipped core fixtures (declared-consult, independent-research fan-out/fan-in and its visibility-window-gated variant, the three P08.3 deliberation method-shaped fixtures, group-cognition-framework, standalone-master-coordination-loop) and normalizes them', () => {
+test('discoverCoordinationProtocols finds all shipped core fixtures (declared-consult, independent-research fan-out/fan-in and its visibility-window-gated variant, the three P08.3 deliberation method-shaped fixtures, group-cognition-framework, standalone-master-coordination-loop, and the three Phase 10 group-thinking-lite protocols: RFC-Review-Lite, Nominal-Group-Lite, Delphi-Feedback-Lite) and normalizes them', () => {
   const entries = discoverCoordinationProtocols({ cwd: mkTempDir('flow-definition-loader-empty-cwd-') });
   const ids = entries.map((e) => e.definition.metadata.id).sort();
   assert.deepEqual(ids, [
@@ -60,7 +60,9 @@ test('discoverCoordinationProtocols finds all shipped core fixtures (declared-co
     'core.coordination-protocol.deliberation-nominal-group-chain',
     'core.coordination-protocol.deliberation-rfc-chain',
     'core.coordination-protocol.group-cognition-framework',
+    'core.coordination-protocol.group-thinking-delphi-feedback-lite',
     'core.coordination-protocol.group-thinking-nominal-group-lite',
+    'core.coordination-protocol.group-thinking-rfc-review-lite',
     'core.coordination-protocol.independent-research-fan-out-fan-in',
     'core.coordination-protocol.independent-research-fan-out-fan-in-gated',
     'core.coordination-protocol.standalone-master-coordination-loop',
