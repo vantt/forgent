@@ -70,12 +70,16 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | 07 | MVP7 | P07.1-P07.4 all done (2 HIGH fixed across the phase) | **done** |
 | 08 | MVP8 | P08.1 + P08.2 + P08.3 all done (contribution model, ledger/replay/visibility, method-shaped proofs + `contributions.allowedTypes[]` schema close) | **done** |
 | 09 | MVP9 | P09.1 + P09.2 + P09.3 all done (slot schema; authorization/binding/replay, 1 HIGH fixed; negative and recovery proof, 1 MEDIUM fixed) | **done** |
-| 10 | External acceptance | P10.1-P10.4 done (pack registry/skill 1 HIGH fixed; three group-thinking-lite protocol definitions, 3 parallel cells merged); P10.5 open (integration and usability proof) | in-progress |
+| 10 | External acceptance | P10.1-P10.5 done (pack registry/skill 1 HIGH fixed; three group-thinking-lite protocols defined and registered; CLI/headless parity proven); P10.6-P10.9 open (parallel conformance lanes) | in-progress |
 
 ## Active Cell
 
-None. P10.2, P10.3, P10.4 all closed and merged — see "## P10.2/P10.3/
-P10.4 Status" below. All three isolated worktrees/branches removed
+None. P10.5 closed — no fix round needed. See "## P10.5 Status" below.
+Pack (`core/protocol-packs/group-thinking.json`) now has all three
+group-thinking-lite protocols registered.
+
+Previously: P10.2, P10.3, P10.4 all closed and merged — see "## P10.2/
+P10.3/P10.4 Status" below. All three isolated worktrees/branches removed
 (fully merged into `step-09-mvp6-to-mvp9` before deletion, verified via
 `git merge-base --is-ancestor`).
 
@@ -129,30 +133,42 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Prepare P10.5 (Integration And Usability Proof) — solo cell, per
-phase-10.md's own text:
-- Register all three group-thinking-lite definitions
-  (`group-thinking-rfc-review-lite`, `group-thinking-nominal-group-lite`,
-  `group-thinking-delphi-feedback-lite`, all now merged into
-  `core/coordination-protocols/`) through ONE writer into P10.1's pack
-  registry (`core/protocol-packs/group-thinking.json`, currently
-  `members: []`).
-- Prove the SAME request path works through both CLI and headless entry
-  points for at least one registered protocol.
-- Prove the skill cannot switch protocols silently, bypass grants,
-  validate its own aggregate, authorize a specialist, or close a session
-  directly — EXTENDING P10.1's own 5-bypass structural proof (P10.1.md
-  §5) against the now-populated pack, not repeating it from scratch; in
-  particular, re-verify P10.1's own Fix Round 1 HIGH-finding fix (the
-  resume-path protocol cross-check) still holds once real protocols are
-  registered, not just the empty-pack shape it was proven against.
-- This cell also inherits the confirmed-satisfied per-actor
-  provider/tier requirement (P10.3 built a live, working cross-provider
-  proof; P10.2/P10.4 both independently confirmed why a portable
-  definition-level pin is illegal and correctly deferred to the
-  request-level mechanism P10.1 already proved) — no further proof of
-  that specific requirement is needed here unless P10.5's own
-  CLI/headless-parity proof surfaces a new gap.
+Prepare P10.6/P10.7/P10.8/P10.9 — four parallel, independent cells per
+phase-10.md's own "Parallel Conformance Lanes" ("run in parallel after
+P10.5 and own separate evidence paths. They do not edit canonical
+contracts."). Per this track's own established rule, each gets its OWN
+isolated worktree/branch off this track's current HEAD:
+- **P10.6 (RFC-Review-Lite Conformance)**: end-to-end independent
+  review, reveal, response, disposition, replay, and RESUME proof —
+  P10.2 already proved the chain end-to-end via direct engine calls;
+  this cell's own job is proving the SAME properties reachable THROUGH
+  the pack gate (`runGroupThinkingRequest`/the skill), plus the resume
+  case P10.2 didn't cover.
+- **P10.7 (Nominal-Group-Lite Conformance)**: end-to-end private
+  proposal, reveal, clarification, private rank capture, replay — no
+  tally semantics claimed — same "through the pack gate" framing as
+  P10.6, against P10.3's definition.
+- **P10.8 (Delphi-Feedback-Lite Conformance)**: end-to-end private
+  input, mediated aggregate feedback, bounded next round, replay — no
+  strong anonymity/convergence claimed — same framing, against P10.4's
+  definition.
+- **P10.9 (Isolation, Security, And Authority Regression)**: the
+  broadest cell — unchanged Group Cognition fixture, foreign refs,
+  premature visibility, unauthorized aggregation/specialist, over-cap/
+  race/recovery, terminal absorption, governance-final dispatch,
+  evidence confidence, CLI/headless parity, and Work/export-boundary
+  checks, across the WHOLE MVP6-9 mechanism this track built (not just
+  the three new Phase 10 protocols) — this is the track's own final
+  security/regression sweep before P10.10 closes everything.
+
+None of the four may edit `core/protocol-packs/group-thinking.json`,
+`src/verbs/coordination/group-thinking-pack.mjs`,
+`core/skills/fgos-group-thinking/SKILL.md`, or any kernel file under
+`src/runner/**` — "own separate evidence paths," proof/test-only cells.
+After all four close, P10.10 (Promotion And Closeout) reads live
+test/evidence state from every lane, classifies any residual finding,
+promotes proved semantics into canonical contracts, and runs the final
+full-suite/change-scope review that closes the whole track.
 
 ## Cell Log
 
@@ -160,6 +176,7 @@ phase-10.md's own text:
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
+| P10.5 | Phase 10 pack registration, CLI/headless parity, bypass re-verification | done | (pending commit) |
 | P10.2 | Phase 10 RFC-Review-Lite protocol definition (parallel, own worktree) | done | `1727f5b9` (merged `72a095d8`) |
 | P10.3 | Phase 10 Nominal-Group-Lite protocol definition (parallel, own worktree, per-actor provider proof) | done | `f23a29eb` (merged `72a095d8`) |
 | P10.4 | Phase 10 Delphi-Feedback-Lite protocol definition (parallel, own worktree) | done | `2a4eb625` (merged `72a095d8`) |
@@ -1087,3 +1104,68 @@ worktree-path false-fail); `architecture.test.mjs` 6/6 (no new `.mjs`
 module from any of the three cells).
 
 Next: P10.5 (Integration And Usability Proof).
+
+## P10.5 Status (Integration And Usability Proof)
+
+**CLOSED, no fix round needed.** Solo cell, shared track worktree. Gates
+Phase 10's four parallel conformance lanes (P10.6-P10.9).
+
+Registered all three group-thinking-lite protocols
+(`group-thinking-rfc-review-lite`, `group-thinking-nominal-group-lite`,
+`group-thinking-delphi-feedback-lite`, all v1.0.0) into P10.1's pack
+registry (`core/protocol-packs/group-thinking.json`) in one edit, with
+ids/versions read directly from the real committed FlowDefinition files
+rather than trusted from any cached list.
+
+Made and justified the CLI/headless-parity interpretation call
+current-cell.md explicitly left open: the skill's own `node -e
+"import(...)"` invocation of `runGroupThinkingRequest` IS the
+CLI-equivalent path — no new `bin/fgos.mjs` subcommand exists or was
+needed, since `runGroupThinkingRequest` and the real headless entry
+point (`runCoordinationHeadless`) both forward into the identical
+`runCoordinationUseCase` door, and `runGroupThinkingRequest` never
+rewrites the request beyond its own protocol-identity gate. Proved this
+concretely: the identical request dispatched through both paths into two
+independent sessions produced byte-identical `steps[]`, including
+`assignmentId` — both review rounds independently traced the real
+generation code and confirmed this id is genuinely deterministic
+(writerId + operation + on-disk sequence counter), not a lucky
+coincidence between two random values.
+
+Re-verified P10.1's own Fix Round 1 HIGH-finding fix (the resume-path
+protocol cross-check) for the first time against two REAL, pack-
+registered protocols instead of P10.1's own synthetic non-pack PoC —
+both review rounds confirmed this exercises the identical code path
+(the check compares by id alone, with no special-casing for pack
+membership) but is a genuine real-world plausibility strengthening, not
+an overclaimed "new" test. Re-confirmed bypasses #2/#3/#4 by dispatching
+a real chain through an `authorize` step and reading the actual
+persisted event log for the complete, independently-enumerated 11-event
+vocabulary; bypass #5 reasoning re-checked directly against all three
+new protocols' `completion` blocks (all `mode: synthesize`, identical to
+P10.1's own already-tested shape — no new interaction to retest).
+
+Both independent Reviewer and Red-Team rounds returned clean: zero
+HIGH/MEDIUM findings from either. One LOW cosmetic typo in this cell's
+own report (a foreign-anomaly filename misspelled), fixed directly. One
+LOW/INFO note, already honestly disclosed by the cell's own test
+comments: the CLI/headless parity proof is structurally near-guaranteed
+by both paths sharing one underlying call, so the real evidentiary
+surface is narrower than "parity" sounds on first read — genuine,
+correctly scoped, not overclaimed.
+
+Final counts: touched-file focused suite 23/23; combined focused
+regression 737/738 (the 1 non-pass is the standing
+`coordination-static.test.mjs` worktree-path false-fail); full-repo
+sweep from this worktree: 5527/5535 pass, 7 skipped, the single failure
+being this track's own standing baseline
+(`fgos-intake-4.test.mjs:318`).
+
+**Deferred, named honestly:** per-actor provider/tier not re-proven
+here (already confirmed-satisfied by P10.1/P10.3, no new gap surfaced);
+the systemic definition-pinned-by-`{id,version}`-not-content exposure
+carries forward unchanged; no real codex-cli/agy-cli subprocess
+exercised (same fake-executor precedent every prior cell used).
+
+Next: P10.6/P10.7/P10.8/P10.9, four parallel conformance lanes, each in
+its own isolated worktree.

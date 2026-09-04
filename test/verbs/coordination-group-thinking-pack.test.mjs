@@ -80,12 +80,20 @@ function writePack(tempDir, { members = [] } = {}) {
 // ---------------------------------------------------------------------
 // 1. The shipped registry itself.
 
-test('the shipped group-thinking pack registry loads, is well-formed, and ships with zero members', () => {
+test('the shipped group-thinking pack registry loads and is well-formed', () => {
+  // P10.1 shipped this pack empty (`members: []`) by design -- P10.5
+  // registers RFC-Review-Lite/Nominal-Group-Lite/Delphi-Feedback-Lite
+  // through one writer. This test only re-asserts the registry's own shape
+  // invariants (P10.1's own scope); the real registered membership is
+  // covered by test/verbs/coordination-group-thinking-pack-registration.test.mjs
+  // (P10.5), which is the one test file expected to change when membership
+  // changes -- this file should not need editing again for a future
+  // registration change.
   const pack = loadProtocolPack();
   assert.equal(pack.apiVersion, 'fgos.dev/v1alpha1');
   assert.equal(pack.kind, 'ProtocolPack');
   assert.equal(pack.metadata.id, 'group-thinking');
-  assert.deepEqual(pack.members, [], 'P10.1 ships an empty pack -- P10.5 registers RFC/Nominal/Delphi through one writer, not this cell');
+  assert.ok(Array.isArray(pack.members), 'members must be an array (possibly populated -- P10.5 registers the three group-thinking-lite protocols here)');
   assert.ok(fs.existsSync(REAL_PACK_PATH), 'sanity: the default packPath really does resolve to the committed file');
 });
 
