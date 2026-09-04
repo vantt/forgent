@@ -60,6 +60,7 @@ test('discoverCoordinationProtocols finds all shipped core fixtures (declared-co
     'core.coordination-protocol.deliberation-nominal-group-chain',
     'core.coordination-protocol.deliberation-rfc-chain',
     'core.coordination-protocol.group-cognition-framework',
+    'core.coordination-protocol.group-thinking-nominal-group-lite',
     'core.coordination-protocol.independent-research-fan-out-fan-in',
     'core.coordination-protocol.independent-research-fan-out-fan-in-gated',
     'core.coordination-protocol.standalone-master-coordination-loop',

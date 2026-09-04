@@ -1,0 +1,223 @@
+# core/coordination-protocols/group-thinking-nominal-group-lite.yaml --
+# Phase 10 (Step 09) cell P10.3: the real, pack-registrable Nominal-Group-Lite
+# protocol named by phase-10-group-thinking-protocol-pack-conformance-and-
+# closeout.md ("Private proposals, controlled sharing, clarification, and
+# private rank contributions. No formal tally/winner semantics in this
+# step."). Genuinely distinct from the Phase 08 (MVP8) proof fixture at
+# `deliberation-nominal-group-chain.yaml`, not a copy of it: a different
+# `metadata.id`, a 3-participant cohort (not 2), and "controlled sharing" is
+# its own explicit facilitator-authored operation (`share`) separate from
+# `clarify` -- the plan's own bullet names sharing and clarification as two
+# distinct things, and this definition takes that literally rather than
+# folding both into one `clarify` step the way the MVP8 proof fixture did.
+#
+# NO formal tally/winner/aggregate semantics anywhere in this document: no
+# `completion.aggregation` is declared, and no operation or contribution type
+# computes, ranks, or declares a winner. `private-rank`'s contributions are
+# recorded (closed MVP8 `rank` type) as durable, per-participant ledger
+# entries -- nothing reads or reduces them into a group verdict. That is
+# deliberately out of scope for this step (see P10.4's own "no claim of
+# strong anonymity or statistical convergence" sibling framing -- the whole
+# Phase 10 "-Lite" family avoids formal social-choice machinery).
+#
+# Chain: private-propose (3 participants, isolated) -> share (facilitator,
+# driver-authorized, controlled reveal) -> clarify (facilitator,
+# driver-authorized) -> private-rank (3 participants, isolated).
+#
+# Four visibility windows, each gating a genuinely LATER, different
+# operation than the one it protects -- never self-referential. This is not
+# a style choice: `linkSessionContribution` compares a Run's own
+# AUTHORIZATION position against the window's opening position, and an
+# operation's own authorization always precedes the settlement a
+# self-referential window would need to wait for, so a contribution can
+# never be gated by a window that opens only after that SAME operation's own
+# cohort settles (P08.3's Design Notes name this exact structural finding in
+# full, reached empirically against this same engine). Concretely:
+#   - `private-open` (vacuous, opensAfter.operationRefs: []) gates
+#     private-propose -- each participant's own private reasoning is always
+#     free to become a durable ledger record, exactly per the schema's own
+#     documented degenerate "open from session start" case.
+#   - `shared` (opens after ALL THREE private-propose bindings settle) gates
+#     `share` -- the facilitator cannot be granted read access to any
+#     private proposal until the whole cohort has proposed.
+#   - `clarified` (opens after `share` settles -- a real, later, different
+#     operation) gates `clarify`.
+#   - `ranking-open` (opens after `clarify` settles) gates private-rank --
+#     each participant's private ranking is informed by what was shared and
+#     clarified, never by a raw, unmediated read of the other proposals.
+#
+# Per-actor policy: `spec.actors[].policy.minTier` differs by role
+# (facilitator: standard, participant: lightweight) -- a real per-actor
+# REQUIREMENT declared in this portable definition. A literal
+# `preferExecutor` pin is deliberately NOT declared here:
+# `assertNoPortableExecutorPin` (session-engine.mjs) rejects a concrete
+# executor/model pin at any portable definition/operation/role/actor scope
+# (flow-definition.md's own PolicyPatch section: "a portable
+# CoordinationProtocol... expresses requirements, not literal executor/model
+# pins") -- only the `assignment`/`cli` scopes may legally carry one. The
+# real per-actor DIFFERENT-EXECUTOR dispatch this phase's user-driven
+# requirement asks for is therefore proved live in
+# test/runner/coordination-nominal-group-lite.test.mjs via `cliPolicy` at
+# dispatch time (the correct, contract-aligned channel), not by (illegally)
+# declaring one here.
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.group-thinking-nominal-group-lite
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: isolated-until-fan-in
+      visibilityWindows:
+        - id: private-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: []
+          permits:
+            sourceOperationRefs: [private-propose]
+            delivery: artifact-refs
+        - id: shared
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [private-propose]
+          permits:
+            sourceOperationRefs: [private-propose]
+            delivery: artifact-refs
+        - id: clarified
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [share]
+          permits:
+            sourceOperationRefs: [share]
+            delivery: artifact-refs
+        - id: ranking-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [clarify]
+          permits:
+            sourceOperationRefs: [clarify]
+            delivery: artifact-refs
+
+  roles:
+    - facilitator
+    - participant
+
+  actors:
+    - id: facilitator-actor
+      role: facilitator
+      policy:
+        minTier: standard
+    - id: participant-a
+      role: participant
+      policy:
+        minTier: lightweight
+    - id: participant-b
+      role: participant
+      policy:
+        minTier: lightweight
+    - id: participant-c
+      role: participant
+      policy:
+        minTier: lightweight
+
+  operations:
+    - id: private-propose
+      role: participant
+      policy:
+        minTier: lightweight
+      task:
+        contractTemplate: nominal-group-lite-private-propose
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: share
+      role: facilitator
+      policy:
+        minTier: standard
+      task:
+        contractTemplate: nominal-group-lite-share
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: clarify
+      role: facilitator
+      policy:
+        minTier: standard
+      task:
+        contractTemplate: nominal-group-lite-clarify
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [clarification]
+    - id: private-rank
+      role: participant
+      policy:
+        minTier: lightweight
+      task:
+        contractTemplate: nominal-group-lite-private-rank
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [rank]
+
+  graph:
+    entry: phase-private-propose
+    nodes:
+      - id: phase-private-propose
+        operations:
+          - ref: private-propose
+            actor: participant-a
+            contextAccess:
+              visibilityWindowRef: private-open
+          - ref: private-propose
+            actor: participant-b
+            contextAccess:
+              visibilityWindowRef: private-open
+          - ref: private-propose
+            actor: participant-c
+            contextAccess:
+              visibilityWindowRef: private-open
+        transitions: [phase-share]
+      - id: phase-share
+        operations:
+          - ref: share
+            actor: facilitator-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: shared
+        transitions: [phase-clarify]
+      - id: phase-clarify
+        operations:
+          - ref: clarify
+            actor: facilitator-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: clarified
+        transitions: [phase-private-rank]
+      - id: phase-private-rank
+        operations:
+          - ref: private-rank
+            actor: participant-a
+            contextAccess:
+              visibilityWindowRef: ranking-open
+          - ref: private-rank
+            actor: participant-b
+            contextAccess:
+              visibilityWindowRef: ranking-open
+          - ref: private-rank
+            actor: participant-c
+            contextAccess:
+              visibilityWindowRef: ranking-open
+        transitions: []
