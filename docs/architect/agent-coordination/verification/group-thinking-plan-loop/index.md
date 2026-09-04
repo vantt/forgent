@@ -31,7 +31,7 @@ single shared `current-cell.md`.
 |---|---|---|
 | P01 | R1-R9 (mutation unlock, kernel) | done (P01.1 closed and merged, 4 fix rounds) |
 | P02 | R1-R8 (chain verb, pack registration) | done (P02.1 closed and merged) |
-| P03 | live proof + skill | preparing (Wave 1 fully closed, opening Wave 2) |
+| P03 | live proof + skill | R1-R4 done (skill authored, closed, merged); R5-R7 paused, needs user decision |
 
 ## Corrections found during cell preparation (grounded, not assumed)
 
@@ -85,6 +85,7 @@ that introduced it.
 |---|---|---|---|---|
 | P01.1 | **done** | Coordinator | merged into `group-thinking-plan-loop` (Doer `8b24c8a2`, Fixer R1-R4) | closed |
 | P02.1 | **done** | Coordinator | merged into `group-thinking-plan-loop` (Doer `42af6508`, Fixer `a39a920f`) | closed |
+| P03.1 | **R1-R4 done**, R5-R7 paused | Coordinator | merged into `group-thinking-plan-loop` (Doer `362be7e9`, Fixer `2eb5a203`) | R5 needs user decision |
 
 ## Wave 1 — closed and integration-verified
 
@@ -185,11 +186,46 @@ verifies each cell's full-suite run from the MAIN checkout going forward
 to avoid this false signal, and will file it as a backlog item separately
 from this track's own coordination.
 
-## Next action
+## Track status (2026-09-05) — natural completion point, stop gate on R5
 
-P02.1 closed and merged. Waiting on fixer-p01-1 for the accepted HIGH
-finding, then a full Reviewer+Red-Team recheck of P01.1 (kernel cell, no
-shortcut). Once P01.1 closes and merges too, re-run the full suite once
-(Wave 1 complete), then open Wave 2 (P03.1).
-current-cell contracts: `current-cell-P01.1.md`, `current-cell-P02.1.md`.
-Cell traces: `P01.1.md`, `P02.1.md`.
+Every cell this Coordinator can drive autonomously is closed and merged:
+
+- **P01.1 (kernel mutation-unlock)**: done. 4 real fix rounds, each
+  independently reviewed and red-teamed: a forged-stamp bypass, a
+  confusion-of-authority/ticket-reuse bypass, a Round-2 fix found to be
+  a no-op (led to consulting `kongming` and independently re-verifying
+  this repo's own pre-existing, locked trust-boundary decision — see
+  `docs/specs/runner.md` decision 0035), and a small overclaim
+  correction (an unrelated, pre-existing dead-code gap, filed
+  separately as `tsk-2bu`).
+- **P02.1 (chain verb + pack registration)**: done. 1 real fix round
+  (per-cell fault isolation + an import-check bypass), reviewed clean.
+- **Wave 1 integration**: a real cross-cell bug surfaced at the
+  mandatory post-merge regression (P02.1's `--cwd` tests assumed
+  pre-R8 semantics) — found, fixed, merged. Full suite: 5604/5614,
+  exactly the 4 known pre-existing baseline failures, zero new
+  regressions.
+- **P03.1 (fgos-plan-loop skill), R1-R4**: done. 1 real fix round
+  (missing persona-diversity demonstration), reviewed clean.
+- **P03.1, R5-R7 (the live proof)**: PAUSED, not attempted. R5 requires
+  mutating a SEPARATE real project
+  (`/home/vantt/projects/fgos-test-drive`, which has genuine
+  in-progress work already on it) and killing real OS processes; that
+  project currently has only ONE executor configured (`claude`), not
+  the cross-provider setup R5 requires. This matches
+  master-coordinator.md's own named stop gate verbatim ("a live proof
+  needs a configured executor that is absent") and was also weighed as
+  a hard-to-reverse, cross-system action warranting the user's own
+  go-ahead rather than an unattended run. Full reasoning in
+  `P03.1.md`'s own "Coordinator note on R5".
+
+**Next action for the user**: decide (a) whether to configure a second/
+third real executor on `fgos-test-drive` (or a different, disposable
+host project instead) and (b) give explicit go-ahead to run R5's live
+proof there — kill-and-resume test included. Once that's decided, resume
+this track (`fgos-plan-loop`'s own skill, now merged and live, or this
+same master-coordinator.md prompt) to execute R5-R7 and formally
+complete the plan.
+
+current-cell contracts: `current-cell-P01.1.md`, `current-cell-P02.1.md`,
+`current-cell-P03.1.md`. Cell traces: `P01.1.md`, `P02.1.md`, `P03.1.md`.
