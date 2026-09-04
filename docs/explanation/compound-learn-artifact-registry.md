@@ -221,6 +221,16 @@ was kept. A rendered doc always lands `provisional` first (`D-tsk28x-17`,
 already covered above). The skill directory itself was renamed from its
 old `compound`-era name to `fgos-coding-knowledge`, per `D-tsk28x-16`.
 
+### Child 10 — the end-to-end writer canary, a gate on the migration itself (`tsk-28x-10`)
+
+`test/e2e/knowledge-writer-canary.test.mjs`: a real item or fixture goes
+all the way through the new writer path — `topic register`/`doc.reserve`
+→ write a new doc in the new layout → `attest` succeeds because the
+registry already has the matching `currentPath` → the doc becomes
+`provisional` → `doc-sources` returns the capture → `docs-index` shows the
+doc. This is a hard gate: the migration to the new corpus (later children)
+is not allowed to run until this canary is green.
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
