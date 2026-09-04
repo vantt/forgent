@@ -184,6 +184,17 @@ registry (`src/setup/checks.mjs`) — never a standalone, undiscoverable
 config knob. Any refusal message names the fix directly, pointing at
 `fgos doc reserve`.
 
+### Child 7 — switching real consumers to the resolver, a hard checkpoint (`tsk-28x-7`)
+
+`findAllSourceCaptureIds`, `fgos doc-sources`, and `fgos docs-index` (all
+in `src/report/enduser-index.mjs`/`bin/fgos.mjs`) switch from plain
+string-matching to the resolver (child 2) for real. Required: an old
+`oldPath` must still resolve to its capture after the switch, and
+`currentPath` must gather both old and new captures. This is a hard
+checkpoint — the item's own action names it explicitly: no other file may
+change until this piece is done, since every downstream consumer depends
+on the resolver actually being wired in correctly first.
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
