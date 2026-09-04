@@ -1330,6 +1330,27 @@ test('a real foreign session is rejected by DISK EXISTENCE even when its id carr
   );
 });
 
+test('a grantedContextRefs entry in the reserved "contribution:" namespace is refused -- a contribution is not grantable context', () => {
+  // The ownership rule has three copies (this one, store.mjs's
+  // `assertDispositionRefOwnedBySession`, show.mjs's `isRefOwnedBySession`).
+  // MVP8's reserved namespace is recognized by all three rather than by two,
+  // so no copy silently accepts a ref shape the others police. Here it is
+  // refused flatly: this door grants READ access, and a contribution is
+  // content-free by construction, so there is nothing behind such a ref to
+  // grant. A contribution is targetable by a disposition, never grantable.
+  const ctx = setup('coord_da_grant_contribution_ns');
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_da_grant_contribution_ns',
+        authorization({ grantedContextRefs: ['contribution:contrib_1'] }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && /is not a grantable context ref/.test(err.message),
+  );
+  assert.equal(readSessionEvents('coord_da_grant_contribution_ns', ctx.opts).filter((e) => e.type === 'operation-authorized').length, 0);
+});
+
 test('a non-string grantedContextRefs entry is refused with a clean CoordinationError, not a raw TypeError', () => {
   const ctx = setup('coord_da_grant_non_string');
   assert.throws(

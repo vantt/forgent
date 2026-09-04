@@ -68,13 +68,13 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | 00 | Intake | R1-R4 (P00.1), file-ownership map (P00.2) | done |
 | 06 | MVP6 | P06.1 + P06.2 (4 fix rounds) + P06.3 all done | **done** |
 | 07 | MVP7 | P07.1-P07.4 all done (2 HIGH fixed across the phase) | **done** |
-| 08 | MVP8 | P08.1 done (contribution model/validation); P08.2/P08.3 open | in-progress |
+| 08 | MVP8 | P08.1 + P08.2 done (ledger/replay/visibility, 2 fix rounds); P08.3 open (method-shaped proofs — required for full "P08 exit" per phase-08.md's own Exit bullets, incl. the still-open `contributions.allowedTypes[]` schema gap) | in-progress |
 | 09 | MVP9 | P09.1 done (specialist slot schema, static-only prep); P09.2/P09.3 open (blocked on MVP8 gate) | in-progress |
 | 10 | External acceptance | see phase-10 file | missing |
 
 ## Active Cell
 
-None. Wave 4 (P07.4 + P09.1) closed — see "Wave 4 Status" below.
+None. P08.2 closed (2 fix rounds) — see "P08.2 Status" below.
 
 **Process deviation, recorded honestly:** both P06.1 and P07.1 were
 dispatched as concurrent source-writers into the SAME shared worktree
@@ -93,11 +93,14 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Prepare P08.2 (Session Ledger, Replay, And Visibility) — now ready
-("P07 exit" and P08.1 both satisfied per plan.md's Wave 4 readiness
-condition). P09.2 stays blocked until the MVP8 product gate (P08 exit) —
-phase-09.md is explicit that P09.1's schema prep "cannot integrate before
-the MVP8 product gate."
+Prepare P08.3 (Method-Shaped Proofs — RFC/Nominal-Group/Delphi chains),
+the last cell needed for full "P08 exit" per phase-08.md's own Exit
+bullets. Consider whether the still-open `contributions.allowedTypes[]`
+FlowDefinition schema gap (P08.2's self-disclosed, correctly-scoped-out
+finding) needs its own small schema cell first, since P08.3's Exit
+bullet "bounded by declared operation types" depends on it. P09.2 stays
+blocked until the MVP8 product gate — phase-09.md is explicit that
+P09.1's schema prep "cannot integrate before the MVP8 product gate."
 
 ## Cell Log
 
@@ -105,8 +108,9 @@ the MVP8 product gate."
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
-| P07.4 | Phase 07 surface/regression proof, contract promotion (closes Phase 07; 1 HIGH fixed) | done | (pending commit) |
-| P09.1 | Phase 09 specialist slot schema, static-only prep | done | (pending commit) |
+| P08.2 | Phase 08 session ledger, replay, visibility (2 fix rounds) | done | (pending commit) |
+| P07.4 | Phase 07 surface/regression proof, contract promotion (closes Phase 07; 1 HIGH fixed) | done | `9b81427c` |
+| P09.1 | Phase 09 specialist slot schema, static-only prep | done | `9b81427c` |
 | P06.1 | Phase 06 visibility definition schema/validation | done | `8d2fa7d8` |
 | P07.1 | Phase 07 Team Cognition evaluator skeleton (partial P07.2 slice) | done | `8d2fa7d8` |
 | P07.3 | Phase 07 FlowDefinition/session aggregation integration (1 HIGH fixed) | done | `7263a15c` |
@@ -515,3 +519,75 @@ gate per phase-09.md's own explicit constraint).
 
 Next: P08.2 (Session Ledger, Replay, And Visibility) — ready now that
 "P07 exit" and P08.1 are both satisfied.
+
+## P08.2 Status (Session Ledger, Replay, And Visibility)
+
+**CLOSED.** Solo cell, shared track worktree (nothing else ready to pair
+with it this round). Wired P08.1's already-closed contribution validator
+into real session persistence, mirroring P07.3's now-battle-tested
+pattern (new event kind + store door + replay projection).
+
+**The recurring caller-supplied-definition bug class (3 prior HIGH
+bypasses across Phases 06-07) was genuinely absent from the start** —
+both independent first-pass reviewers verified `linkSessionContribution`
+takes no definition/window/operation parameter, confirmed by a real
+static signature test, not by trust. Good evidence the lesson from the
+earlier phases actually propagated into how this cell was built.
+
+Two independent first-pass rounds still found 10 real findings (0 HIGH,
+several MEDIUM), closed in one fix round; a final recheck then found the
+hardest fix (window checked at link time vs. reasoning time) was only
+partially closed — the demonstrated attack was shut, but a narrower
+bypass survived through the *legitimate* crash-retry self-heal path
+(`retrySessionTask`), where a Run that executed while a window was
+closed could still get linked under a later-opened window because the
+check compared against a `result-linked` event's position (when the
+result was written to the log) rather than the Run's actual authorization
+position (when it started). A second, bounded fix round closed both that
+gap and its mirror-image false-negative (retrying an already-satisfied
+window source wrongly un-opened a monotone window) with one root-cause
+fix: compare against the Run's authorizing event (`assignment-created`/
+`run-retried`) on the backing side, and the earliest-satisfying
+`result-linked` per branch on the source side — never the latest link
+position on either side.
+
+Also closed in the fix rounds: a bare (unprefixed) contribution id
+silently no-op'd as a disposition target while `show` reported it as
+session-owned even for a foreign session; replay's open/resolved
+derivation was order-blind (a disposition appended before its target's
+link still resolved it); replay never checked a resolving disposition's
+driver identity (a raw-appended worker-authored disposition could flip
+open→resolved); unbounded free-text fields in the immutable ledger; no
+shape constraint on contribution ids; a third, unsynchronized copy of
+the ownership-rule check; and a raw-door legality boundary now pinned by
+a test (precedent parity with P07.3, not a defect).
+
+**Two things carried forward, not fixed here (both explicitly named,
+neither silent):**
+- The already-disclosed "definition pinned by id+version, never content"
+  residual has a WORSE consequence at this specific door than at
+  P07.3's — a same-version content swap doesn't just shift which
+  evidence a verdict derives over, it removes the entire MVP6 window/
+  context-legality property this cell's Acceptance depends on. Systemic
+  across all 5 definition-consuming doors in this codebase; not fixable
+  in one cell.
+- `contributions.allowedTypes[]` has no FlowDefinition schema field
+  (`src/runner/definitions/*` was Do Not Touch for this cell), so the
+  operation/type gate is tautologically satisfied on the mediated path
+  rather than genuinely narrowed — phase-08.md's own Exit bullet
+  "bounded by declared operation types" is not yet true. Named as
+  required follow-up, most likely before or during P08.3.
+
+Full sweep, final: 5453 tests, 1 known baseline failure
+(`fgos-intake-4.test.mjs:318`) plus load-induced flakes that vary run to
+run under this environment's heavy concurrent-worktree load (confirmed
+in isolation each time: `dispatch.test.mjs` 354/354,
+`herdr-spawn-adapter.test.mjs` and `session.test.mjs` both clean alone)
+— zero real regressions across both fix rounds. Focused ledger suite,
+final: 31/31.
+
+**This closes P08.2.** Phase 08 remains in-progress — P08.3 (method-
+shaped proofs) is the last cell needed for full "P08 exit."
+
+Next: P08.3, possibly preceded by a small schema cell for
+`contributions.allowedTypes[]` if P08.3's own Exit bullet needs it.

@@ -115,8 +115,11 @@ export function replaySession(coordinationId, opts = {}) {
   // replaces a mutable status field: a contribution is RESOLVED iff some later
   // `driver-disposition-recorded` event's `targetRef` names it, and OPEN
   // otherwise. Nothing about that state is ever stored on the contribution
-  // itself, so it cannot drift from the events it is derived from and no write
-  // path exists that could flip it.
+  // itself, so it cannot drift from the events it is derived from. The
+  // resolving edge carries the same two read-time guards the contribution's
+  // own branch does -- this session's driver identity, and the target already
+  // walked -- so a hand-written log cannot resolve what the write door would
+  // have refused.
   const contributions = [];
   const ignoredContributions = [];
   const contributionIds = new Set();
@@ -346,7 +349,26 @@ export function replaySession(coordinationId, opts = {}) {
       // disk after the session closed cannot change what the closed session
       // had settled.
       if (!terminalSeen && event.payload.targetRef.startsWith(CONTRIBUTION_REF_PREFIX)) {
-        resolvedContributionIds.add(event.payload.targetRef.slice(CONTRIBUTION_REF_PREFIX.length));
+        // Same driver-identity question the contribution branch above asks,
+        // asked here for the same reason: resolving a contribution is derived
+        // session state, so the event that flips it must carry this session's
+        // own driver identity. `validateEventPayload` is shape-only by design
+        // and answers `authorizedBy.type === 'driver'`, never WHICH driver.
+        if (event.payload.authorizedBy.id !== manifest.provenanceRoot.writerId) {
+          throw new CoordinationError(
+            'foreign-ref',
+            `session "${coordinationId}": "driver-disposition-recorded" event targeting "${event.payload.targetRef}" was authorized by "${event.payload.authorizedBy.id}", which is not this session's driver identity ("${manifest.provenanceRoot.writerId}") -- resolving a contribution is driver-authored session state`,
+          );
+        }
+        // A disposition can only resolve a contribution the walk has ALREADY
+        // seen. The write door refuses a `contribution:` ref for an unlinked
+        // id, so this is the same ordering discipline the contribution branch
+        // above applies to its own backing assignment, applied to the
+        // disposition -> contribution edge.
+        const targetContributionId = event.payload.targetRef.slice(CONTRIBUTION_REF_PREFIX.length);
+        if (contributionIds.has(targetContributionId)) {
+          resolvedContributionIds.add(targetContributionId);
+        }
       }
       dispositions.push({
         targetRef: event.payload.targetRef,

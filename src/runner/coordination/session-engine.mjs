@@ -68,7 +68,7 @@ import {
 } from './store.mjs';
 import { validateContributionLineage, CONTRIBUTION_TYPES } from '../deliberation/schema.mjs';
 import { replaySession } from './replay.mjs';
-import { CoordinationError } from './schema.mjs';
+import { CoordinationError, CONTRIBUTION_REF_PREFIX } from './schema.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
@@ -1026,6 +1026,21 @@ function assertRefsOwnedBySession(refs, { coordinationId, assignmentRefs, fgosDi
   for (const ref of refs) {
     if (typeof ref !== 'string') {
       throw new CoordinationError('validation', `${label}: ref must be a string, got ${typeof ref}`);
+    }
+    // The third copy of the ownership rule (store.mjs's
+    // `assertDispositionRefOwnedBySession` and show.mjs's
+    // `isRefOwnedBySession` are the other two) recognizes MVP8's reserved
+    // `contribution:` namespace too, so no copy silently accepts a ref shape
+    // the others police. This door grants an Assignment READ access, and a
+    // contribution is content-free by construction -- ref + revision, never a
+    // body -- so there is nothing behind such a ref to grant. Refused flatly
+    // rather than resolved against a contribution set: fail-closed, and it
+    // needs no replay this pre-write path does not already have.
+    if (ref.startsWith(CONTRIBUTION_REF_PREFIX)) {
+      throw new CoordinationError(
+        'validation',
+        `${label}: ref "${ref}" is in the reserved "${CONTRIBUTION_REF_PREFIX}" namespace -- a contribution carries no content to grant, so it is not a grantable context ref (it is targetable only by a disposition)`,
+      );
     }
     for (const segment of refSegments(ref)) {
       // Checked by DISK EXISTENCE, not by a `coord_` naming convention:
@@ -3240,6 +3255,74 @@ export function validateSessionAggregation(
 // (`contributionId`, `type`, `roundKey`, lineage refs) and nothing that a
 // legality decision is made from.
 
+// Same posture as DISPOSITION_RATIONALE_MAX_LENGTH/CONSULT_OBJECTIVE_MAX_LENGTH
+// above: a caller-supplied string persisted verbatim into the immutable ledger
+// is bounded at the mediated door, generously but really. Without it, the
+// content-freedom discipline is closed against field NAMES and wide open
+// against field VOLUME -- an artifact body does not need a `content` field, it
+// needs a long `roundKey`.
+const CONTRIBUTION_FIELD_MAX_LENGTH = 2000;
+
+/**
+ * The log `seq` at which ONE satisfied binding branch became satisfied: the
+ * EARLIEST `result-linked` for its settling Assignment whose run classified as
+ * satisfied, using `classifyOperationAssignment`'s own failed/no-evidence rule.
+ *
+ * Earliest, never latest. Satisfaction is sticky in `resolveBindingOutcome`
+ * and windows are monotone closed->open, so a branch opened when its first
+ * satisfying run linked; a later retry of an already-satisfied source appends
+ * another `result-linked` without re-closing anything, and reading the latest
+ * would move "opened at" forward for a window that never moved.
+ */
+function branchSatisfiedAtSeq(events, fgosDir, assignmentId) {
+  for (const event of events) {
+    if (event.type !== 'result-linked' || event.payload.assignmentId !== assignmentId) continue;
+    const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, event.payload.runId);
+    if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') continue;
+    return event.seq;
+  }
+  return 0;
+}
+
+/**
+ * The log `seq` at which the window actually opened: the latest position at
+ * which any of its `opensAfter` source branches became satisfied. Only
+ * meaningful for an already-open window, where every branch is satisfied.
+ */
+function visibilityWindowOpenedAtSeq(events, fgosDir, sources) {
+  let openedAt = 0;
+  for (const source of sources) {
+    for (const branch of source.branches) {
+      const seq = branchSatisfiedAtSeq(events, fgosDir, branch.assignmentId);
+      if (seq > openedAt) openedAt = seq;
+    }
+  }
+  return openedAt;
+}
+
+/**
+ * The log `seq` of the event that AUTHORIZED the Run `linkedEvent` settled --
+ * `assignment-created` for a first attempt, the `run-retried` that declared it
+ * for a retry. In log terms that is simply the most recent authorization for
+ * this Assignment before the link.
+ *
+ * This, not the `result-linked` position, is the Run's REASONING position. The
+ * two coincide in the ordinary case and diverge exactly where it matters:
+ * `retrySessionTask`'s documented crash self-heal links a Run that executed
+ * long before at a fresh, high `seq`, so a link position would place reasoning
+ * after events it could never have seen.
+ */
+function runAuthorizedAtSeq(events, assignmentId, linkedEvent) {
+  let authorizedAt = 0;
+  for (const event of events) {
+    if (event.seq >= linkedEvent.seq) break;
+    if (event.type !== 'assignment-created' && event.type !== 'run-retried') continue;
+    if (event.payload.assignmentId !== assignmentId) continue;
+    authorizedAt = event.seq;
+  }
+  return authorizedAt;
+}
+
 /**
  * Which DECLARED operation an Assignment of this session actually performed,
  * or `null`. Answered only through the reserved `protocol-operation:` stamp --
@@ -3304,8 +3387,10 @@ function knownStampedAssignments(definition, replayed, coordinationId, fgosDir) 
  *
  * What the CALLER supplies: `contributionId`, the contribution's `type` (its
  * own semantic claim, bounded by the closed MVP8 enum), `roundKey` (an opaque
- * grouping label, on the same footing as `reason`/`rationale` elsewhere in
- * this file), the backing `assignmentId`, its `anchors`/`respondsTo` lineage
+ * grouping label, length-bounded here exactly as `rationale`/`objective` are
+ * at the sibling mediated doors -- a verbatim string reaching the immutable
+ * ledger is never unbounded by omission), the backing `assignmentId`, its
+ * `anchors`/`respondsTo` lineage
  * claims (each checked against the real ledger), and `linkedBy`.
  *
  * Never transitions the session, and never copies artifact content: the event
@@ -3327,8 +3412,17 @@ export function linkSessionContribution(
   { contributionId, type, assignmentId, roundKey, linkedBy, anchors, respondsTo },
   opts = {},
 ) {
-  if (!isNonEmptyString(contributionId)) {
-    throw new CoordinationError('validation', 'linkSessionContribution: contributionId is required');
+  if (!isNonEmptyString(contributionId) || contributionId.length > CONTRIBUTION_FIELD_MAX_LENGTH) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: contributionId must be a non-empty, bounded string (max ${CONTRIBUTION_FIELD_MAX_LENGTH} characters)`,
+    );
+  }
+  if (!isNonEmptyString(roundKey) || roundKey.length > CONTRIBUTION_FIELD_MAX_LENGTH) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: roundKey must be a non-empty, bounded string (max ${CONTRIBUTION_FIELD_MAX_LENGTH} characters)`,
+    );
   }
   if (!isNonEmptyString(assignmentId)) {
     throw new CoordinationError('validation', 'linkSessionContribution: assignmentId is required');
@@ -3388,7 +3482,7 @@ export function linkSessionContribution(
       `linkSessionContribution: operation "${operationRef}" at node "${node.id}" for actor "${actorId}" declares no contextAccess.visibilityWindowRef -- a contribution records the window its reasoning was legal under, so an ungated binding has no window provenance to record and cannot contribute`,
     );
   }
-  const { open } = deriveVisibilityWindowState(definition, visibilityWindowRef, replayed, fgosDir);
+  const { open, sources } = deriveVisibilityWindowState(definition, visibilityWindowRef, replayed, fgosDir);
   if (!open) {
     throw new CoordinationError(
       'validation',
@@ -3403,6 +3497,35 @@ export function linkSessionContribution(
       `linkSessionContribution: assignment "${assignmentId}" has no linked RunResult -- a contribution is backed by a settled Run, never by one still in flight`,
     );
   }
+  // The window claim is about the REASONING, not about the clock at write
+  // time. "The window is open now" is not the same statement as "this
+  // reasoning was produced under an open window": a Run that STARTED before
+  // the window opened demonstrably could not have seen what the window
+  // admits, so recording `visibilityWindowRef` for it would put a provenance
+  // claim on the immutable ledger that the Run could never have witnessed.
+  //
+  // That shape is reachable today, not hypothetical: `dispatchDeclaredOperation`'s
+  // own window gate sits inside its `driver-authorized` branch, so a binding
+  // with `activation.mode: required` is dispatched and settles with no window
+  // check at all. Comparing log positions is what turns the link-time verdict
+  // into a reasoning-time one -- the same event log, the same derivation, one
+  // more question asked of it.
+  //
+  // BOTH positions are the Run's own, never a link position: the backing side
+  // is the Run's authorization (`assignment-created`/`run-retried`), and each
+  // window source is the EARLIEST link that satisfied it. A `result-linked`
+  // `seq` says when a result was RECORDED, which diverges from when its
+  // reasoning happened across a crash-resume (backing side) and across a retry
+  // of an already-satisfied source (window side).
+  const windowOpenedAtSeq = visibilityWindowOpenedAtSeq(replayed.events, fgosDir, sources);
+  const runAuthorizedSeq = runAuthorizedAtSeq(replayed.events, assignmentId, linkedEvent);
+  if (runAuthorizedSeq <= windowOpenedAtSeq) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: the run of assignment "${assignmentId}" that settled at log position ${linkedEvent.seq} was authorized at log position ${runAuthorizedSeq}, not after visibility window "${visibilityWindowRef}" opened at log position ${windowOpenedAtSeq} -- its reasoning could not have seen what that window admits, so it carries no "${visibilityWindowRef}" provenance to record; re-run the operation under the open window instead`,
+    );
+  }
+
   const runId = linkedEvent.payload.runId;
   const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, runId);
   const pinned = aggregationSourceFrom(fgosDir, operationRef, assignmentId, runId, runResult);

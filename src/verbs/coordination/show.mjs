@@ -62,6 +62,10 @@ function isRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, con
   if (ref.startsWith(CONTRIBUTION_REF_PREFIX)) {
     return contributionIds.has(ref.slice(CONTRIBUTION_REF_PREFIX.length));
   }
+  // A BARE id of one of this session's own contributions targets nothing; the
+  // write door refuses that near-miss outright, so the mirror must not render
+  // it as an owned ref.
+  if (contributionIds.has(ref)) return false;
   for (const segment of ref.split(/[\\/]/).filter(Boolean)) {
     if (segment !== coordinationId && fs.existsSync(path.join(fgosDir, 'coordination', 'sessions', segment, 'session.json'))) {
       return false;

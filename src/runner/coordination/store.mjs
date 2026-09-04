@@ -1031,6 +1031,17 @@ function assertDispositionRefOwnedBySession(ref, { coordinationId, assignmentRef
     }
     return;
   }
+  // A BARE contribution id that names one of this session's own linked
+  // contributions is refused rather than treated as an opaque ref: it would be
+  // accepted, rendered, and resolve nothing at all, leaving the contribution
+  // open forever with no error anywhere. The reserved prefix is the only shape
+  // that targets a contribution, so the near-miss is named as such.
+  if (contributionIds.has(ref)) {
+    throw new CoordinationError(
+      'validation',
+      `${label}: ref "${ref}" is the bare id of a contribution this session linked, which targets nothing -- write "${CONTRIBUTION_REF_PREFIX}${ref}" to target that contribution`,
+    );
+  }
   for (const segment of ref.split(/[\\/]/).filter(Boolean)) {
     if (segment !== coordinationId && fs.existsSync(path.join(fgosDir, 'coordination', 'sessions', segment, 'session.json'))) {
       throw new CoordinationError(
@@ -1145,6 +1156,24 @@ export function recordDriverDisposition(coordinationId, { targetRef, disposition
  * disposition door's `contribution:` ref check and by the contribution door's
  * own duplicate/lineage checks, so both read the same ledger the same way.
  */
+/**
+ * The minimum shape a contribution id must have. P08.1 deliberately leaves the
+ * id NAMESPACE free, which is not the same as leaving path separators and the
+ * reserved ref prefix legal inside it: a path-shaped id reads as session-owned
+ * at the ownership doors while its text claims cross-session reach, and a
+ * `contribution:`-prefixed id would make `contribution:<id>` ambiguous. Same
+ * discipline `assertValidRunIdForAssignment` already applies to `runId`.
+ */
+function assertContributionIdShape(contributionId, label) {
+  if (typeof contributionId !== 'string' || contributionId.length === 0) return; // shape validation owns the empty case
+  if (/[\\/]/.test(contributionId) || contributionId.includes('..') || contributionId.startsWith(CONTRIBUTION_REF_PREFIX)) {
+    throw new CoordinationError(
+      'validation',
+      `${label}: contributionId "${contributionId}" must not contain a path separator or "..", and must not itself start with "${CONTRIBUTION_REF_PREFIX}"`,
+    );
+  }
+}
+
 function linkedContributionIds(events) {
   const ids = new Set();
   for (const event of events) {
@@ -1226,6 +1255,7 @@ export function recordContributionLink(
   { contributionId, operationRef, type, assignmentId, runId, artifactRef, revision, roundKey, visibilityWindowRef, anchors, respondsTo, linkedBy },
   opts = {},
 ) {
+  assertContributionIdShape(contributionId, 'recordContributionLink');
   const { fgosDir, sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
   const payload = {
     contributionId,

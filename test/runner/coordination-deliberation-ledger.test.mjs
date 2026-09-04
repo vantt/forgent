@@ -28,6 +28,7 @@ import {
   openDeclaredProtocolSession,
   dispatchDeclaredOperation,
   linkSessionContribution,
+  retrySessionTask,
 } from '../../src/runner/coordination/session-engine.mjs';
 import {
   openSession,
@@ -37,6 +38,7 @@ import {
   transitionSessionStatus,
   recordContributionLink,
   recordDriverDisposition,
+  recordRunRetry,
   resolveSessionPaths,
 } from '../../src/runner/coordination/store.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
@@ -492,6 +494,173 @@ test('open/resolved is DERIVED at replay time from immutable events -- disposing
   );
 });
 
+/** Append a raw, un-mediated `driver-disposition-recorded` event -- the
+ *  hand-written-log shape the write door itself would refuse. */
+function forgeDisposition(coordinationId, opts, overrides = {}) {
+  const { sessionDir, eventsPath } = resolveSessionPaths(coordinationId, opts);
+  appendEvent(
+    eventsPath,
+    {
+      type: 'driver-disposition-recorded',
+      payload: {
+        targetRef: 'some-artifact',
+        disposition: 'accepted',
+        rationale: 'Forged.',
+        evidenceRefs: [],
+        authorizedBy: driver(),
+        ...overrides,
+      },
+    },
+    sessionDir,
+  );
+}
+
+test('replay: a disposition that resolves a contribution must carry THIS session\'s driver identity', () => {
+  const coordinationId = 'delib-resolve-identity';
+  const { opts, assignmentIds } = sessionWithLinkedAssignments(coordinationId);
+  recordContributionLink(coordinationId, storePayload(assignmentIds[0], { contributionId: 'contrib_1' }), opts);
+  assert.deepEqual(replaySession(coordinationId, opts).openContributionIds, ['contrib_1']);
+
+  // The write door pins `authorizedBy.id` to the session's driver, so this
+  // shape only reaches disk on a hand-written log -- exactly the threat model
+  // replay exists to refuse, and the same check the contribution branch itself
+  // already performs on `linkedBy`.
+  forgeDisposition(coordinationId, opts, {
+    targetRef: `${CONTRIBUTION_REF_PREFIX}contrib_1`,
+    authorizedBy: { type: 'driver', id: 'researcher-a' },
+  });
+  assert.throws(
+    () => replaySession(coordinationId, opts),
+    (err) => err instanceof CoordinationError && err.category === 'foreign-ref' && /not this session's driver identity/.test(err.message),
+    'a worker-authored disposition must not flip a contribution open -> resolved',
+  );
+});
+
+test('replay: a disposition appended BEFORE its target contribution resolves nothing -- the same ordering the write door enforces', () => {
+  const coordinationId = 'delib-resolve-order';
+  const { opts, assignmentIds } = sessionWithLinkedAssignments(coordinationId);
+  const [assignmentId] = assignmentIds;
+
+  // Disposition first, link second. The write door refuses this ordering
+  // outright (a `contribution:` ref for an id nothing has linked yet is a
+  // dangling ref), so replay must not accept a resolution it would refuse.
+  forgeDisposition(coordinationId, opts, { targetRef: `${CONTRIBUTION_REF_PREFIX}contrib_future` });
+  recordContributionLink(coordinationId, storePayload(assignmentId, { contributionId: 'contrib_future' }), opts);
+
+  const replayed = replaySession(coordinationId, opts);
+  assert.deepEqual(replayed.openContributionIds, ['contrib_future']);
+  assert.deepEqual(replayed.resolvedContributionIds, []);
+});
+
+test('disposition: a BARE contribution id is refused with the prefixed form named, instead of silently resolving nothing', () => {
+  const coordinationId = 'delib-bare-ref';
+  const { tempDir, opts, assignmentIds } = sessionWithLinkedAssignments(coordinationId);
+  recordContributionLink(coordinationId, storePayload(assignmentIds[0], { contributionId: 'contrib_mine' }), opts);
+
+  assert.throws(
+    () =>
+      recordDriverDisposition(
+        coordinationId,
+        { targetRef: 'contrib_mine', disposition: 'accepted', rationale: 'Reviewed.', evidenceRefs: [], authorizedBy: driver() },
+        opts,
+      ),
+    (err) => err instanceof CoordinationError && new RegExp(`write "${CONTRIBUTION_REF_PREFIX}contrib_mine"`).test(err.message),
+    'a near-miss that would be accepted, rendered, and resolve nothing is refused instead',
+  );
+
+  // The read-side mirror agrees: a bare id of an own contribution is not an
+  // owned ref, because it targets nothing.
+  forgeDisposition(coordinationId, opts, { targetRef: 'contrib_mine' });
+  const shown = showCoordinationUseCase({ cwd: tempDir, repoRoot: tempDir }, { id: coordinationId });
+  assert.deepEqual(
+    shown.dispositions.map((d) => [d.targetRef, d.targetRefOwnedBySession]),
+    [['contrib_mine', false]],
+  );
+});
+
+test('store door: a contributionId may not carry a path separator, "..", or the reserved ref prefix', () => {
+  const coordinationId = 'delib-id-shape';
+  const { opts, assignmentIds } = sessionWithLinkedAssignments(coordinationId);
+  const [assignmentId] = assignmentIds;
+
+  for (const contributionId of ['../../../../etc/passwd', 'a\\b', 'x/y', `${CONTRIBUTION_REF_PREFIX}ghost`]) {
+    assert.throws(
+      () => recordContributionLink(coordinationId, storePayload(assignmentId, { contributionId }), opts),
+      (err) => err instanceof CoordinationError && err.category === 'validation' && /path separator/.test(err.message),
+      `"${contributionId}" must not be mintable as a contribution id`,
+    );
+  }
+  // The namespace itself stays free -- only separators and the reserved
+  // prefix are refused, not a naming convention.
+  assert.doesNotThrow(() =>
+    recordContributionLink(coordinationId, storePayload(assignmentId, { contributionId: 'Any.Free-Form_Id:42' }), opts),
+  );
+});
+
+test('mediated door: roundKey and contributionId are length-bounded, exactly as the sibling mediated door bounds its own free text', () => {
+  const coordinationId = 'delib-bounds';
+  const { opts, assignmentIds } = sessionWithLinkedAssignments(coordinationId);
+  const tooLong = 'x'.repeat(2001);
+
+  assert.throws(
+    () =>
+      linkSessionContribution(
+        coordinationId,
+        { contributionId: tooLong, type: 'proposal', assignmentId: assignmentIds[0], roundKey: 'round-1', linkedBy: driver() },
+        opts,
+      ),
+    (err) => err instanceof CoordinationError && /contributionId must be a non-empty, bounded string/.test(err.message),
+  );
+  assert.throws(
+    () =>
+      linkSessionContribution(
+        coordinationId,
+        { contributionId: 'contrib_1', type: 'proposal', assignmentId: assignmentIds[0], roundKey: tooLong, linkedBy: driver() },
+        opts,
+      ),
+    (err) => err instanceof CoordinationError && /roundKey must be a non-empty, bounded string/.test(err.message),
+    'an artifact body does not need a "content" field -- it needs a long roundKey',
+  );
+});
+
+test('boundary: the raw store door accepts an operation/window pair the mediated door would refuse -- precedent parity, not a defect', () => {
+  // `recordContributionLink` sits BELOW `session-engine.mjs` in the import
+  // graph and holds no FlowDefinition, so it structurally cannot ask whether
+  // `operationRef` is declared or whether `visibilityWindowRef` names an open
+  // window -- exactly the boundary `recordAggregationValidation` shipped with
+  // in P07.3. This test pins that boundary so a later cell adding a caller
+  // cannot mistake the raw door for the enforced one. It asserts current,
+  // intended behavior; it is not a bug report.
+  const coordinationId = 'delib-raw-boundary';
+  const { opts, assignmentIds } = sessionWithLinkedAssignments(coordinationId);
+  const [assignmentId] = assignmentIds;
+
+  const written = recordContributionLink(
+    coordinationId,
+    storePayload(assignmentId, {
+      contributionId: 'contrib_unmediated',
+      operationRef: 'no-such-declared-operation',
+      visibilityWindowRef: 'no-such-window',
+    }),
+    opts,
+  );
+  assert.equal(written.appended, true, 'the raw door has no definition to judge either value against');
+  assert.deepEqual(replaySession(coordinationId, opts).contributions.map((c) => c.operationRef), ['no-such-declared-operation']);
+
+  // The mediated door refuses the same session outright: it has no bound
+  // protocol at all, so there is no declared operation or window to judge
+  // against and nothing gets written.
+  assert.throws(
+    () =>
+      linkSessionContribution(
+        coordinationId,
+        { contributionId: 'contrib_mediated', type: 'proposal', assignmentId, roundKey: 'round-1', linkedBy: driver() },
+        opts,
+      ),
+    (err) => err instanceof CoordinationError && /has no declared protocol bound/.test(err.message),
+  );
+});
+
 // ─── Layer 3: a REAL dispatched session, with real window legality ─────────
 
 function protocolDoc() {
@@ -612,14 +781,15 @@ async function dispatch(coordinationId, ctx, operationId, targetActorId) {
   return created.assignmentId;
 }
 
-test('runtime: a contribution is linked only once its binding\'s visibility window is open, and every legality-relevant value is derived from the session', async () => {
-  const coordinationId = 'delib-runtime';
+test('runtime: a contribution whose reasoning PREDATES the window is refused, both while the window is closed and after it later opens', async () => {
+  const coordinationId = 'delib-runtime-order';
   const ctx = openDeliberationSession(coordinationId);
 
   // Only ONE of the window's two source bindings has settled, so the window is
   // closed. The `deliberate` binding is `required`, so dispatch itself does not
   // gate on the window (that gate is driver-authorized-only) -- which makes the
-  // link door the real enforcement point for this shape.
+  // link door the real enforcement point for this shape: the Run executes and
+  // settles with the window still closed.
   await dispatch(coordinationId, ctx, 'research', 'researcher-a');
   const deliberateAssignmentId = await dispatch(coordinationId, ctx, 'deliberate', 'coordinator-actor');
 
@@ -635,8 +805,39 @@ test('runtime: a contribution is linked only once its binding\'s visibility wind
   );
   assert.equal(replaySession(coordinationId, ctx.opts).contributions.length, 0, 'nothing was written by the refused call');
 
-  // The second binding settles; the window opens; the SAME call now succeeds.
+  // The second binding settles and the window opens -- but the `deliberate`
+  // Run never re-ran. Its reasoning demonstrably could not have seen
+  // researcher-b's output, which did not exist when it settled. "The window is
+  // open now" is not "this reasoning was produced under an open window", so the
+  // link stays refused rather than recording a window-provenance claim the Run
+  // could never have witnessed.
   await dispatch(coordinationId, ctx, 'research', 'researcher-b');
+  assert.throws(
+    () =>
+      linkSessionContribution(
+        coordinationId,
+        { contributionId: 'contrib_1', type: 'proposal', assignmentId: deliberateAssignmentId, roundKey: 'round-1', linkedBy: driver() },
+        ctx.opts,
+      ),
+    (err) =>
+      err instanceof CoordinationError &&
+      /was authorized at log position \d+, not after visibility window "post-research" opened at log position \d+/.test(err.message),
+    'a Run that settled before the window opened carries no provenance for that window',
+  );
+  assert.equal(replaySession(coordinationId, ctx.opts).contributions.length, 0, 'still nothing was written');
+});
+
+test('runtime: a contribution is linked once its binding\'s window is open and its reasoning was produced under it, and every legality-relevant value is derived from the session', async () => {
+  const coordinationId = 'delib-runtime';
+  const ctx = openDeliberationSession(coordinationId);
+
+  // Both window sources settle FIRST, so the window is already open when the
+  // `deliberate` Run executes: its reasoning really was produced under the
+  // window whose ref the contribution then records.
+  await dispatch(coordinationId, ctx, 'research', 'researcher-a');
+  await dispatch(coordinationId, ctx, 'research', 'researcher-b');
+  const deliberateAssignmentId = await dispatch(coordinationId, ctx, 'deliberate', 'coordinator-actor');
+
   const linked = linkSessionContribution(
     coordinationId,
     { contributionId: 'contrib_1', type: 'proposal', assignmentId: deliberateAssignmentId, roundKey: 'round-1', linkedBy: driver() },
@@ -672,6 +873,122 @@ test('runtime: a contribution is linked only once its binding\'s visibility wind
   replayed = replaySession(coordinationId, ctx.opts);
   assert.deepEqual(replayed.resolvedContributionIds, ['contrib_1']);
   assert.deepEqual(replayed.openContributionIds, []);
+});
+
+/** Leave the exact disk state a crashed retry leaves behind: the retry is
+ *  DECLARED on the log and its run has really settled on disk, but the process
+ *  died before `linkResult`. Built by copying the already-settled attempt 01
+ *  (real artifacts, real settle-report sha) into attempt 02 and renaming its
+ *  runId -- never a synthesized result whose pin would not match its bytes. */
+function crashedRetryOnDisk(ctx, assignmentId, coordinationId, previousRunId) {
+  recordRunRetry(
+    coordinationId,
+    { assignmentId, reason: 'Executor crashed before the result was linked.', previousRunId, maxRetries: 1 },
+    ctx.opts,
+  );
+  const runsDir = path.join(ctx.tempDir, '.fgos', 'assignments', assignmentId, 'runs');
+  fs.cpSync(path.join(runsDir, '01'), path.join(runsDir, '02'), { recursive: true });
+  const resultPath = path.join(runsDir, '02', 'result.json');
+  const result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+  result.runId = `run_${assignmentId}_02`;
+  fs.writeFileSync(resultPath, JSON.stringify(result, null, 2));
+  return result.runId;
+}
+
+test('runtime: a crash-resumed Run that executed under a CLOSED window is refused, even though its result is linked after the window opens', async () => {
+  const coordinationId = 'delib-crash-resume';
+  const ctx = openDeliberationSession(coordinationId);
+
+  // 1-2. Only researcher-a has settled, so the window is closed when the
+  //      `deliberate` Run executes.
+  await dispatch(coordinationId, ctx, 'research', 'researcher-a');
+  const deliberateAssignmentId = await dispatch(coordinationId, ctx, 'deliberate', 'coordinator-actor');
+
+  // 3. A retry is declared and its Run settles on disk -- still with the window
+  //    closed -- and the process dies before `linkResult`. This is precisely
+  //    the crash window `retrySessionTask`'s self-heal branch exists to recover.
+  const retriedRunId = crashedRetryOnDisk(ctx, deliberateAssignmentId, coordinationId, `run_${deliberateAssignmentId}_01`);
+
+  // 4. researcher-b settles; the window opens.
+  await dispatch(coordinationId, ctx, 'research', 'researcher-b');
+
+  // 5. The self-heal resumes and links that closed-window Run NOW, at a fresh
+  //    log position well after the window opened.
+  const resumed = await retrySessionTask(
+    coordinationId,
+    { assignmentId: deliberateAssignmentId, reason: 'Resume the crashed retry.' },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+  assert.deepEqual(
+    { retried: resumed.retried, resumed: resumed.resumed, runId: resumed.runResult.runId },
+    { retried: false, resumed: true, runId: retriedRunId },
+    'the fixture must exercise the self-heal branch, not a fresh retry dispatch',
+  );
+
+  // The link position genuinely postdates the window opening -- so a check that
+  // compared `result-linked` positions would accept this. The reasoning position
+  // does not, and that is what is compared.
+  const events = replaySession(coordinationId, ctx.opts).events;
+  const resumedLink = events.find((e) => e.type === 'result-linked' && e.payload.runId === retriedRunId);
+  const windowOpened = events.filter((e) => e.type === 'result-linked').map((e) => e.seq)[1];
+  assert.ok(resumedLink.seq > windowOpened, 'fixture precondition: the resumed link lands after the window opened');
+
+  // 6. Refused: the Run was authorized (and ran) while the window was closed.
+  assert.throws(
+    () =>
+      linkSessionContribution(
+        coordinationId,
+        { contributionId: 'contrib_crash', type: 'proposal', assignmentId: deliberateAssignmentId, roundKey: 'round-1', linkedBy: driver() },
+        ctx.opts,
+      ),
+    (err) =>
+      err instanceof CoordinationError &&
+      /was authorized at log position \d+, not after visibility window "post-research" opened at log position \d+/.test(err.message),
+  );
+  assert.equal(replaySession(coordinationId, ctx.opts).contributions.length, 0);
+});
+
+test('runtime: retrying an already-satisfied window SOURCE does not move when the window opened, so an honest link is neither invalidated nor refused', async () => {
+  const coordinationId = 'delib-source-retry';
+  const ctx = openDeliberationSession(coordinationId);
+
+  const researchAssignmentId = await dispatch(coordinationId, ctx, 'research', 'researcher-a');
+  await dispatch(coordinationId, ctx, 'research', 'researcher-b');
+  const deliberateAssignmentId = await dispatch(coordinationId, ctx, 'deliberate', 'coordinator-actor');
+
+  const linked = linkSessionContribution(
+    coordinationId,
+    { contributionId: 'contrib_1', type: 'proposal', assignmentId: deliberateAssignmentId, roundKey: 'round-1', linkedBy: driver() },
+    ctx.opts,
+  );
+  assert.equal(linked.appended, true);
+
+  // Retry a window SOURCE that was already satisfied. Windows are monotone
+  // closed -> open and satisfaction is sticky, so this appends a second
+  // `result-linked` for that source without the window ever having re-closed:
+  // the position at which it OPENED cannot move.
+  const retried = await retrySessionTask(
+    coordinationId,
+    { assignmentId: researchAssignmentId, reason: 'Re-run the research pass with fresh inputs.' },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+  assert.equal(retried.retried, true, 'the fixture must exercise a real retry dispatch of a window source');
+
+  // The earlier link stands, and replay still reconstructs it.
+  const replayed = replaySession(coordinationId, ctx.opts);
+  assert.deepEqual(replayed.contributions.map((c) => c.contributionId), ['contrib_1']);
+
+  // And an honest link in the same state still succeeds -- reading the LATEST
+  // `result-linked` per source instead of the earliest satisfying one would
+  // refuse this, with a message asserting a window-opening position that never
+  // happened.
+  const second = linkSessionContribution(
+    coordinationId,
+    { contributionId: 'contrib_2', type: 'objection', assignmentId: deliberateAssignmentId, roundKey: 'round-1', linkedBy: driver() },
+    ctx.opts,
+  );
+  assert.equal(second.appended, true);
+  assert.equal(second.visibilityWindowRef, WINDOW_ID);
 });
 
 test('runtime: an artifact edited after settle can no longer be linked -- the pin must still match the bytes', async () => {
@@ -756,7 +1073,12 @@ test('static: linkSessionContribution takes no definition, no visibility-window,
     'utf8',
   );
   const signature = source.slice(source.indexOf('export function linkSessionContribution'));
-  const params = signature.slice(signature.indexOf('{'), signature.indexOf('}'));
+  // The WHOLE parameter list, through the closing `)` -- not just the
+  // destructured object. An `opts.definition` would be exactly the same
+  // caller-supplied-config bypass, and a capture that stops at the first `}`
+  // would never see it.
+  const params = signature.slice(signature.indexOf('('), signature.indexOf(') {') + 1);
+  assert.ok(/\bopts\b/.test(params), 'the capture must reach the whole parameter list, opts included');
   for (const forbidden of ['definition', 'visibilityWindowRef', 'operationRef', 'revision', 'artifactRef', 'declaredOperations']) {
     assert.ok(
       !new RegExp(`\\b${forbidden}\\b`).test(params),
