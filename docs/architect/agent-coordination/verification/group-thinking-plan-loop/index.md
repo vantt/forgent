@@ -120,8 +120,11 @@ Filed `tsk-2bu` (fgOS backlog) for the separate, pre-existing
 own red-team review — not fixed in this track (out of scope), tracked
 there instead.
 
-Full test suite re-run once, in progress (background); will record the
-result here, then Wave 2 opens.
+Full test suite re-run once at the merged track tip: 5604/5614 pass, 4
+failures = exactly the 4 known baseline items (one intermittent
+external-network live-executor test now names `glm-cli` instead of
+`codex-cli` — same class, expected). Zero new regressions. Wave 1 is
+genuinely, fully verified complete. Wave 2 (P03.1) opened.
 
 ## P01.1 disposition (kernel cell — HIGH red-team finding)
 
