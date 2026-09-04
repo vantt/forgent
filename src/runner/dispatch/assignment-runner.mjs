@@ -525,7 +525,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
   const stamp = extractProtocolOperationStamp(asgn.provenance?.inline?.contract?.constraints);
   if (!stamp) {
     throw new RunnerConfigError(
-      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" carries no single, well-formed engine-reserved protocol-operation stamp -- refused (Phase 01 mutation-unlock R2/R3 re-verification)`,
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" carries no single, well-formed engine-reserved protocol-operation stamp -- refused`,
     );
   }
 
@@ -547,7 +547,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
   const operation = definition.spec.operations?.find((op) => op.id === stamp.operationId);
   if (!operation || operation.result?.kind !== 'work-product') {
     throw new RunnerConfigError(
-      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims operation "${stamp.operationId}" in definition "${stamp.definitionId}" -- that operation does not declare result.kind "work-product" -- refused (Phase 01 mutation-unlock R2 re-verification)`,
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims operation "${stamp.operationId}" in definition "${stamp.definitionId}" -- that operation does not declare result.kind "work-product" -- refused`,
     );
   }
 
@@ -560,7 +560,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
           ? 'does not resolve inside any git checkout (fail closed on an unresolvable root, never fail open)'
           : 'toplevel could not be resolved; fail closed, never fail open';
     throw new RunnerConfigError(
-      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" refused -- cwd "${cwd}" ${reason} (Phase 01 mutation-unlock R3 re-verification)`,
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" refused -- cwd "${cwd}" ${reason}`,
     );
   }
 }
