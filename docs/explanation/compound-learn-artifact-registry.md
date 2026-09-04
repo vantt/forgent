@@ -150,6 +150,16 @@ job not two) and `D-tsk28x-18` (this classifier runs at step 3, before
 bootstrap at step 4, precisely because the classifier's own output IS the
 bootstrap data).
 
+### Child 4 — bootstrap the registry from the classifier's output (`tsk-28x-4`)
+
+`scripts/knowledge-bootstrap.mjs` reads the classifier's output (child 3)
+and creates a registry entry for the entire 268-document corpus, with
+`currentPath = oldPath` — the bootstrap doesn't relocate anything, it just
+gives every existing document a registry row. Idempotent by requirement:
+safe to rerun. Refuses to run at all if the classifier hasn't finished —
+this item depends on both `tsk-28x-1` (the domain model it writes into)
+and `tsk-28x-3` (the data it bootstraps from).
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
