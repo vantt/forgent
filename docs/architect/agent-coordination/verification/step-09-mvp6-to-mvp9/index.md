@@ -70,27 +70,23 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | 07 | MVP7 | P07.1-P07.4 all done (2 HIGH fixed across the phase) | **done** |
 | 08 | MVP8 | P08.1 + P08.2 + P08.3 all done (contribution model, ledger/replay/visibility, method-shaped proofs + `contributions.allowedTypes[]` schema close) | **done** |
 | 09 | MVP9 | P09.1 + P09.2 + P09.3 all done (slot schema; authorization/binding/replay, 1 HIGH fixed; negative and recovery proof, 1 MEDIUM fixed) | **done** |
-| 10 | External acceptance | P10.1-P10.5 done (pack registry/skill 1 HIGH fixed; three group-thinking-lite protocols defined and registered; CLI/headless parity proven); P10.6-P10.9 open (parallel conformance lanes) | in-progress |
+| 10 | External acceptance | P10.1-P10.9 done (pack registry/skill 1 HIGH fixed; three group-thinking-lite protocols defined, registered, and proven through the pack gate; CLI/headless parity proven; final security/regression sweep clean); P10-KERNEL-FIX done (user-authorized kernel fix, 3 rounds, see below); P10.10 (Promotion And Closeout) open | in-progress |
 
 ## Active Cell
 
-**P10.6, P10.7, P10.8, P10.9 — running in parallel, each its own
-isolated worktree/branch** (this track's final parallel wave before
-P10.10 closes everything):
-- P10.6 (RFC-Review-Lite Conformance): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-6`,
-  branch `step-09-mvp6-to-mvp9-p10-6`, contract committed `4f38b5c7`.
-- P10.7 (Nominal-Group-Lite Conformance): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-7`,
-  branch `step-09-mvp6-to-mvp9-p10-7`, contract committed `cb786553`.
-- P10.8 (Delphi-Feedback-Lite Conformance): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-8`,
-  branch `step-09-mvp6-to-mvp9-p10-8`, contract committed `0a794fff`.
-- P10.9 (Isolation, Security, And Authority Regression):
-  `.claude/worktrees/step-09-mvp6-to-mvp9-p10-9`, branch
-  `step-09-mvp6-to-mvp9-p10-9`, contract committed `45053eab`.
+**None — idle, ready for P10.10.** See "## Next Action" below.
 
-All four branched off this track's own HEAD at P10.5's close
-(`2da3f9a3`). Each cell's own `current-cell.md` is its authoritative
-contract — do not duplicate per-cell narrative here until each closes
-and merges back.
+Previously: **P10-KERNEL-FIX closed** (user-authorized kernel change to
+`classifySessionQuorum`/`closeSessionByQuorum`, `session-engine.mjs`,
+committed `3ed076a2`) — see "## P10-KERNEL-FIX Status" below for the full
+record. Three independent Reviewer+Red-Team-driven fix rounds; final
+independent recheck: APPROVE.
+
+Previously: **P10.6, P10.7, P10.8, P10.9 all closed and merged** — see
+"## P10.6-P10.9 Status" below. All four isolated worktrees/branches
+removed (fully merged into `step-09-mvp6-to-mvp9` before deletion). Their
+convergence on the same kernel-level `classifySessionQuorum` bug, across
+three independent protocols, is what triggered P10-KERNEL-FIX.
 
 Previously: P10.5 closed — no fix round needed. See "## P10.5 Status"
 below. Pack (`core/protocol-packs/group-thinking.json`) now has all
@@ -151,47 +147,49 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Prepare P10.6/P10.7/P10.8/P10.9 — four parallel, independent cells per
-phase-10.md's own "Parallel Conformance Lanes" ("run in parallel after
-P10.5 and own separate evidence paths. They do not edit canonical
-contracts."). Per this track's own established rule, each gets its OWN
-isolated worktree/branch off this track's current HEAD:
-- **P10.6 (RFC-Review-Lite Conformance)**: end-to-end independent
-  review, reveal, response, disposition, replay, and RESUME proof —
-  P10.2 already proved the chain end-to-end via direct engine calls;
-  this cell's own job is proving the SAME properties reachable THROUGH
-  the pack gate (`runGroupThinkingRequest`/the skill), plus the resume
-  case P10.2 didn't cover.
-- **P10.7 (Nominal-Group-Lite Conformance)**: end-to-end private
-  proposal, reveal, clarification, private rank capture, replay — no
-  tally semantics claimed — same "through the pack gate" framing as
-  P10.6, against P10.3's definition.
-- **P10.8 (Delphi-Feedback-Lite Conformance)**: end-to-end private
-  input, mediated aggregate feedback, bounded next round, replay — no
-  strong anonymity/convergence claimed — same framing, against P10.4's
-  definition.
-- **P10.9 (Isolation, Security, And Authority Regression)**: the
-  broadest cell — unchanged Group Cognition fixture, foreign refs,
-  premature visibility, unauthorized aggregation/specialist, over-cap/
-  race/recovery, terminal absorption, governance-final dispatch,
-  evidence confidence, CLI/headless parity, and Work/export-boundary
-  checks, across the WHOLE MVP6-9 mechanism this track built (not just
-  the three new Phase 10 protocols) — this is the track's own final
-  security/regression sweep before P10.10 closes everything.
+**P10.10 (Promotion And Closeout) — the track's final cell.** All
+prerequisite cells are now closed: Phases 00/06/07/08/09 done; Phase 10's
+P10.1-P10.9 done; the user-authorized P10-KERNEL-FIX done (3 rounds,
+final independent recheck APPROVE). Per phase-10.md's own definition,
+P10.10 reads live test/evidence state from every lane, classifies any
+residual finding, promotes proved semantics into canonical contracts, and
+runs the final full-suite/change-scope review that closes the whole
+track.
 
-None of the four may edit `core/protocol-packs/group-thinking.json`,
-`src/verbs/coordination/group-thinking-pack.mjs`,
-`core/skills/fgos-group-thinking/SKILL.md`, or any kernel file under
-`src/runner/**` — "own separate evidence paths," proof/test-only cells.
-After all four close, P10.10 (Promotion And Closeout) reads live
-test/evidence state from every lane, classifies any residual finding,
-promotes proved semantics into canonical contracts, and runs the final
-full-suite/change-scope review that closes the whole track.
+Two live findings P10.10 must explicitly classify and decide (not
+silently drop), both surfaced during P10.6-P10.9:
+- **The contribution-lineage-unreachable-through-pack gap** (first found
+  by P10.6, pack-wide across all three group-thinking-lite protocols):
+  the pack gate's closed step vocabulary (`operation`/`authorize`/
+  `disposition`/`fan-out`) never reaches `linkSessionContribution`, so
+  contribution-typed lineage records can never be created through the
+  pack for any protocol — contradicting phase-10.md's own "artifact-
+  backed lineage" goal. Named a candidate "shared missing primitive" by
+  P10.6/P10.7/P10.8; whether P10.10 fixes it, defers it to a future
+  track, or documents it as an accepted limitation is P10.10's own call
+  to make and justify, not assumed by this note.
+- **The `run.mjs:236`/`aggregationCloseParams` resolution-failure Gap**
+  (found during P10-KERNEL-FIX's own recheck rounds): pre-existing,
+  fails safe, outside that cell's authorized kernel-file boundary. Named
+  precisely in `P10-KERNEL-FIX.md` §5 with exact line numbers for
+  whichever cell picks it up next — P10.10 should at minimum classify
+  whether it belongs in canonical contract text as a known limitation.
+
+P10.10 may (unlike P10.1-P10.9) touch canonical contract docs and, if it
+judges either finding above warrants it, kernel files — but any such
+change should get the same Reviewer+Red-Team rigor every kernel-adjacent
+change in this track has required, not a lighter bar just because it's
+the closing cell.
 
 ## Cell Log
 
 | Cell | Requirements | Status | Commit |
 |---|---|---|---|
+| P10-KERNEL-FIX | User-authorized `classifySessionQuorum`/`closeSessionByQuorum` multi-op fix (3 fix rounds, 5 independent review rounds) | done | `3ed076a2` |
+| P10.9 | Isolation, security, and authority regression (final track-wide sweep) | done | merged `41cebcf6` |
+| P10.8 | Delphi-Feedback-Lite conformance through the pack gate | done | merged `41cebcf6` |
+| P10.7 | Nominal-Group-Lite conformance through the pack gate (found + live-reproduced the quorum bug) | done | merged `41cebcf6` |
+| P10.6 | RFC-Review-Lite conformance through the pack gate (first found the quorum bug) | done | merged `41cebcf6` |
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
 | P10.5 | Phase 10 pack registration, CLI/headless parity, bypass re-verification | done | `7dee3f7a` |
@@ -1187,3 +1185,126 @@ exercised (same fake-executor precedent every prior cell used).
 
 Next: P10.6/P10.7/P10.8/P10.9, four parallel conformance lanes, each in
 its own isolated worktree.
+
+## P10.6-P10.9 Status (Parallel Conformance Lanes + Final Regression Sweep)
+
+**CLOSED, all four.** Four isolated worktrees/branches, each proving its
+own protocol reachable through the pack gate (`runGroupThinkingRequest`),
+plus P10.9's own track-wide security/regression sweep. Merged
+sequentially into a detached integration worktree (the main track
+worktree's git index was blocked by the pre-existing foreign
+staged/conflicted state documented above), track branch force-moved to
+the merge result, all four temporary worktrees/branches removed after
+verifying full ancestry.
+
+P10.6 (RFC-Review-Lite), P10.7 (Nominal-Group-Lite), and P10.8
+(Delphi-Feedback-Lite) each independently proved their own protocol's
+full chain (propose/private-round → reveal → response/clarify/aggregate
+→ disposition → replay) through the real pack gate, plus the RESUME case
+(a genuinely separate later call reaching a later declared operation).
+**All three independently converged on the SAME kernel-level bug** in
+`classifySessionQuorum`/`closeSessionByQuorum`: a session auto-closes to
+terminal `completed` the instant every declared actor has completed just
+ONE assignment, regardless of how many more phases the protocol (or that
+actor) still has declared — because the classifier only checked an
+actor's FIRST `assignment-created` event, a semantics correct for every
+pre-Phase-10 mechanism (one operation per actor) but wrong for Phase 10's
+multi-operation-per-actor protocols. P10.7's own Red-Team escalated this
+to CRITICAL by live-reproducing it against P10.6's own already-closed,
+merged protocol under entirely normal, documented "launch, resume"
+usage — proving the bug was already live in shipped code, not
+hypothetical. A SEPARATE, pack-wide finding (also first surfaced by
+P10.6): the pack gate's closed step vocabulary never reaches
+`linkSessionContribution`, so contribution-typed lineage records can
+never be created through the pack for any of the three protocols —
+flagged as a candidate "shared missing primitive" for P10.10, not fixed
+by any of P10.6-P10.9 (out of their own scope, which forbids editing
+`src/runner/**`).
+
+P10.9 ran this track's final, broadest security/regression sweep across
+the WHOLE MVP6-9 mechanism (not just the three new protocols): unchanged
+Group Cognition fixture, foreign refs, premature visibility, unauthorized
+aggregation/specialist, over-cap/race/recovery, terminal absorption,
+governance-final dispatch, evidence confidence, CLI/headless parity, and
+Work/export-boundary checks. Clean — zero HIGH/MEDIUM findings surfaced
+by this sweep itself (the quorum bug was found by P10.6/P10.7/P10.8, not
+P10.9). P10.9's own re-confirmations were time-bound to its isolated
+worktree snapshot, explicitly named as such in its own Gaps.
+
+Post-merge, full-suite gate (re-run by the Coordinator against the fully
+integrated tree, not merely trusted from each cell's own isolated
+snapshot): combined regression 685/684 pass (1 known
+`coordination-static.test.mjs` worktree-path false-fail); R7-isolation-
+plus-architecture 13/13 pass.
+
+The quorum bug's convergence across three independent cells, escalating
+to a live cross-cell reproduction, was surfaced directly to the user
+rather than silently deferred — the user explicitly authorized fixing it
+immediately ("1 fix it now"), extending this track's scope beyond
+P10.10's original "no kernel file" boundary for exactly this one cell.
+See "## P10-KERNEL-FIX Status" below.
+
+Next (at the time): the user-authorized kernel fix (P10-KERNEL-FIX), then
+P10.10 (Promotion And Closeout).
+
+## P10-KERNEL-FIX Status (User-Authorized Kernel Fix — `classifySessionQuorum`)
+
+**CLOSED, 3 fix rounds.** Solo cell, main track worktree (no parallel
+siblings running). The ONLY cell in this entire track authorized to touch
+`src/runner/coordination/session-engine.mjs` — every other Phase 10 cell
+was explicitly forbidden from it. Full record:
+`P10-KERNEL-FIX.md` (13 sections: Design Notes, Proof Matrix, Commands,
+GitNexus gate, Gaps, then three full disposition→fix-round cycles, then a
+Final Disposition closing the cell) plus five standalone Reviewer/
+Red-Team report files in the same directory.
+
+Fixed the bug P10.6/P10.7/P10.8 converged on: an actor's graph-declared
+operation binding now gates its own quorum completion when it is
+`required`, or when it is `driver-authorized` AND also declares a
+`contextAccess.visibilityWindowRef` (real MVP6 access control, not a
+genuinely-skippable driver's-choice branch) — an actor with zero gating
+bindings falls back to the original, byte-identical "first assignment"
+logic. The naive "wait for required only" fix would not have fixed
+RFC-Review-Lite/Nominal-Group-Lite at all (their blocking bindings are
+`driver-authorized`); the naive "wait for everything" fix would have
+regressed a real, already-shipped fixture
+(`standalone-master-coordination-loop.yaml`'s genuinely-optional revision
+steps) — both confirmed by real investigation, not assumed.
+
+**Three fix rounds, each triggered by a genuinely independent
+Reviewer+Red-Team (or recheck) pair finding real, evidence-backed
+defects — convergence, not process overhead**, defect count strictly
+decreasing each round (9 → 7 → 0 code defects):
+- **Round 1** fixed the three protocols' bug plus a second real
+  multi-operation shape found empirically while running the regression
+  suite (MVP7 aggregation-close's `coordinator-actor`, bound to two
+  required ops).
+- **Round 2** fixed an uncaught-`FlowDefinitionError` regression breaking
+  `fgos coordination show` on any unresolvable protocol, a silent
+  version-drift mis-resolution silently flipping a completed actor to
+  `missing`, a false "byte-identical fallback" claim, and extended
+  fixture cross-check coverage from 3 to 8 actually-affected shipped
+  protocols (5 of which had zero prior quorum-level test coverage).
+- **Round 3** closed a real test-coverage gap Round 2's own two HIGH
+  fixes shipped with (proven via a full-block revert leaving the suite
+  green — the logic was correct but unguarded) with two individually
+  falsifiable tests, plus five documentation corrections.
+
+Final independent recheck: **APPROVE**, zero remaining code defects,
+two non-blocking polish notes only. One deliberate, Coordinator-decided
+scope boundary: `run.mjs:236`'s own separate, pre-existing
+`aggregationCloseParams` resolution-failure crash (which pre-empts this
+fix's own close-door refusal from reaching `fgos coordination run`'s
+production door) stays a named Gap, not a fix — genuinely pre-existing,
+fails safe (never wrongly completes), and outside this cell's own
+authorized kernel-file boundary (`session-engine.mjs` only, per the
+user's original "fix it now" authorization scope).
+
+Final regression: touched-file focused suite 31/31; combined focused
+regression 762/763 (1 known worktree-path false-fail); full-repo sweep
+5552/5560 pass, 1 known baseline failure, 7 skipped. Committed
+`3ed076a2` (via the same detached-integration-worktree pattern as
+P10.6-P10.9's own merge, since the foreign conflicted state still blocks
+`git commit` directly in the main track worktree, not only `git merge`).
+
+Next: P10.10 (Promotion And Closeout) — the track's final cell.
