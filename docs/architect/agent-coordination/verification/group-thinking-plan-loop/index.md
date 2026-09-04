@@ -102,9 +102,13 @@ that introduced it.
   Coordination Contract point 7, it gets the SAME rigor step-09 required:
   independent Reviewer + Red-Team, fix rounds until both APPROVE, no
   shortcut for diff size.
-- Full suite re-run independently in progress (background) to confirm
-  against the full known-baseline list before Reviewer/Red-Team dispatch
-  completes.
+- Full suite re-run independently by the Coordinator (background job
+  complete): 5577/5588 pass, 4 failures = exactly the 3 known baseline
+  items (`fgos-intake-4`, `enduser-index`, `coordination-doctor-check`)
+  plus the known worktree-path false positive
+  (`coordination-static.test.mjs`). The external `codex-cli-glm-cli-live-executors`
+  baseline item did not fail this run (network-dependent, expected to be
+  intermittent). Zero new regressions confirmed independently.
 
 ## Known non-blocking environment finding (repo-wide, not this track's scope)
 
