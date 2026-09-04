@@ -1,0 +1,56 @@
+---
+authoritative_for: herdr-spawn adapter launching a dispatched worker inside a real Herdr pane instead of a stdout-captured subprocess, so a person can watch the agent work; hard constraint always create a fresh pane (herdr pane split) and never reuse an existing one, because herdr pane run/send-text types into whatever process currently holds the pane and a finished worker's pane keeps an idle interactive REPL alive since tsk-1zq dropped --autoClose, so reuse would deliver the next dispatch as a chat message into someone else's live session
+---
+
+# Watching an agent work in a real pane, without letting the next dispatch talk to a stranger's session
+
+`tsk-5x7-3` is the third of `tsk-5x7`'s three dependency-free children —
+the `herdr-spawn` adapter, satisfying the one real immediate need D6
+carved out from the larger redesign: let a person watch a dispatched
+agent work in a real terminal pane instead of a blind stdout capture.
+
+## What shipped
+
+A `herdr-spawn` entry was added to `EXECUTOR_ADAPTERS`
+(`transport.mjs`), launching the worker inside a Herdr pane instead of a
+stdout-captured subprocess. Selected purely by `executor.adapter` — the
+executor keeps `invocations[].via: "cli"` unchanged, so `resolve.mjs:280`'s
+existing cli gate passes unchanged and no protocol work was required:
+`transport.mjs:148` already read `executor.adapter ?? DEFAULT_ADAPTER`
+before this item (the same route `tsk-49o` separately proposes
+`sandboxed-cli-spawn` through). Results still come back through the
+existing confidence ladder — structured if present, else the
+`[DONE]`/`[BLOCKED]` token, else `headBefore`/`headAfter` git inference —
+this piece introduces no new result protocol and makes no telemetry claim.
+`cli-spawn` stays byte-identical: purely additive, opt-in per executor.
+
+## The hard constraint that made this safe
+
+Validating surfaced live evidence (`tsk-1nih`) of a real danger: `herdr
+pane run`/`send-text` types into whatever process currently holds the
+target pane. Since `tsk-1zq` dropped `--autoClose`, a finished worker's
+pane keeps an idle interactive agent REPL alive. If this adapter reused an
+existing pane instead of creating a fresh one, the next dispatch would be
+delivered as a **chat message into someone else's live session** — with an
+item parked at `awaiting-human` as the sharpest failure case (a real
+person's answer landing in the wrong conversation).
+
+The resulting hard constraint: this adapter must ALWAYS create a fresh
+pane (`herdr pane split`) and must NEVER reuse an existing one, and must
+never verify a target pane's foreground process as a substitute for
+creating a fresh one. Completion is observed via `herdr pane wait-output
+--regex` plus `herdr pane read`, rather than assuming a captured stdout
+stream exists the way `cli-spawn` can.
+
+## The other locked constraint this item still had to satisfy
+
+Per `tsk-5x7`'s D2, a surviving hard constraint required a test asserting
+that a Herdr runtime signal ALONE never changes task status, review
+outcome, blocker resolution, or artifact acceptance — only real fgOS state
+transitions do. Herdr stays a visibility/runtime transport, never a
+second source of truth for task lifecycle.
+
+## Landing note
+
+Merged into `fgw/tsk-5x7` (the parent's own integration branch) — a
+decomposed child, carried to main via the parent's own `sync-root`.
