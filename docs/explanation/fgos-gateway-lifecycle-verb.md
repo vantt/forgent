@@ -41,6 +41,33 @@ liveness — informational only, no new config default needed since it
 reads the existing `gateway.token`/`port`/`bind` from `~/.fgos/config.json`
 rather than adding anything new to merge into `fgos setup`.
 
+## Four real bugs found on code review, fixed before this shipped further (`tsk-2n2`)
+
+Reviewing `tsk-31v`'s own diff surfaced four real gaps, fixed in a
+follow-up before they could bite:
+
+1. **No lock around `start`/`stop`'s read-check-write registry sequence.**
+   Two concurrent `fgos gateway start` calls could both pass the
+   not-running check before either wrote — and both shared the SAME fixed
+   `.fgos/logs/gateway.log` path, so one invocation's startup-confirmation
+   poll could see the OTHER invocation's "listening on" line and record
+   the wrong pid. Fixed with a `session.mjs`-style PID-liveness lock
+   (`.fgos/gateway.lock`, deliberately no TTL — the critical section can
+   run 60-90s during a cold `cargo` build, where a TTL would be wrong),
+   plus a unique per-invocation log filename (timestamp+pid) as an
+   independent second fix even without the lock.
+2. **`gatewayStatus`'s `fetch()` to `/v1/contract` had no timeout** — a
+   gateway that's alive but hung made `fgos gateway status` hang forever
+   instead of quickly reporting `reachable: false`. Fixed with
+   `AbortSignal.timeout()`.
+3. **`execFileSync`'s cargo build call used the 1MB default `maxBuffer`**,
+   risking `ENOBUFS` on a verbose cold build. Bumped.
+4. **`stopGateway` cleared the registry immediately after `SIGTERM`**
+   without confirming the process actually died, so a `status` call right
+   after `stop` could briefly still report `running: true`. Fixed by
+   briefly polling `isPidAlive` after `SIGTERM` (`SIGKILL` as a last
+   resort) before clearing the registry.
+
 ## The mandatory doctrine this item planted
 
 A short doctrine line was added to `AGENTS.md` (near the existing
