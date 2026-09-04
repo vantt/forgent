@@ -90,6 +90,24 @@ resolve to exactly one winner, with the loser getting a typed conflict
 that never touches the eventlog; and existing tests were updated to the
 new contract, not just patched to pass.
 
+## Post-landing audit found one real gap, tracked as its own known-gap header (`tsk-1sl`)
+
+A follow-up re-audit re-ran the design doc's own §17 grep sweep against
+real `src/` state and cross-checked all 14 §15 acceptance criteria — all
+14 confirmed pass with cited evidence, zero unclassified hit. But the
+audit itself surfaced one real, live-reproduced gap not covered by those
+14 criteria: §16.3's "settlement after durable revision drift fails or
+goes through explicit reconcile" only had the fail half implemented —
+`settleClaim` had no reconcile path, so `fgos return` refused for any
+claimed item edited mid-lifecycle (the routine, expected
+`fgos-coding-planning`/`fgos-coding-discovering` pattern), even when the
+SAME claim-holder made every edit. This exact gap is
+[`settleclaim-revision-drift-self-caused`](settleclaim-revision-drift-self-caused.md)
+(`tsk-1hq`/`tsk-1ht`) — the design doc's own status header was updated
+from "implemented" to "partially implemented" to name it, rather than
+silently claiming full completion while a known, reproduced gap sat
+unfixed.
+
 ## Landing hit a same-day flake, resolved via catchup, not a code change
 
 The merge attempt first failed `verify-fail-post-merge` (goal-check exit
