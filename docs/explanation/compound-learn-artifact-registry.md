@@ -195,6 +195,18 @@ checkpoint — the item's own action names it explicitly: no other file may
 change until this piece is done, since every downstream consumer depends
 on the resolver actually being wired in correctly first.
 
+### Child 8 — the two projections plus doctor checks (`tsk-28x-8`)
+
+`src/report/knowledge-projection.mjs` generates `docs/doc-registry.json`
+(machine-read) and `docs/doc-registry.md` (human-skim, the file this
+retro-loop session has queried via `fgos authoritative-match` before
+every topic registration) — the human projection must surface lineage,
+topics with no doc yet, docs stuck `provisional` too long, topics over a
+size threshold, and any role with more than one doc. 8 doctor checks were
+registered (`src/setup/checks.mjs`); notably `doc-near-duplicate` finally
+wired up the `--check-duplicates` backstop that had sat dead since it was
+added — until this item, its only caller was its own unit test.
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
