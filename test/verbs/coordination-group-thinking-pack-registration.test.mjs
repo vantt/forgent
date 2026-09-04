@@ -52,10 +52,12 @@ import {
 import { runCoordinationHeadless } from '../../src/runner/coordination/headless-adapter.mjs';
 import { openDeclaredProtocolSession } from '../../src/runner/coordination/session-engine.mjs';
 import { StoreError } from '../../src/state/store.mjs';
+import { buildMasterLoopRequest, MASTER_LOOP_PROTOCOL_ID } from '../../src/verbs/coordination/launch-master-loop.mjs';
 
 const RFC_REVIEW_LITE_ID = 'core.coordination-protocol.group-thinking-rfc-review-lite';
 const NOMINAL_GROUP_LITE_ID = 'core.coordination-protocol.group-thinking-nominal-group-lite';
 const DELPHI_FEEDBACK_LITE_ID = 'core.coordination-protocol.group-thinking-delphi-feedback-lite';
+const MASTER_COORDINATION_LOOP_ID = 'core.coordination-protocol.standalone-master-coordination-loop';
 
 const OUTPUTS = ['agent-result.json (status, summary)'];
 
@@ -126,15 +128,15 @@ function fakeRunnerConfig(tempDir) {
 // 1. Registration correctness -- the real, committed pack, not a synthetic
 //    fixture (no `packPath` override anywhere in this section).
 
-test('all three group-thinking-lite protocols are registered in the real, committed pack with no leftover placeholder and no forgotten fourth entry', () => {
+test('all three group-thinking-lite protocols are registered in the real, committed pack, alongside standalone-master-coordination-loop (Step 09 Phase 02 R1) and no other entry', () => {
   const pack = loadProtocolPack();
   const registeredIds = new Set(pack.members.map((m) => m.id));
   assert.deepEqual(
     registeredIds,
-    new Set([RFC_REVIEW_LITE_ID, NOMINAL_GROUP_LITE_ID, DELPHI_FEEDBACK_LITE_ID]),
-    'the real pack must list exactly RFC-Review-Lite, Nominal-Group-Lite, and Delphi-Feedback-Lite -- no more, no fewer',
+    new Set([RFC_REVIEW_LITE_ID, NOMINAL_GROUP_LITE_ID, DELPHI_FEEDBACK_LITE_ID, MASTER_COORDINATION_LOOP_ID]),
+    'the real pack must list exactly RFC-Review-Lite, Nominal-Group-Lite, Delphi-Feedback-Lite, and standalone-master-coordination-loop -- no more, no fewer',
   );
-  assert.equal(pack.members.length, 3, 'no duplicate member entries');
+  assert.equal(pack.members.length, 4, 'no duplicate member entries');
 });
 
 test('resolvePackProtocol resolves each of the three real, registered protocols against the real pack, with no version drift -- not just refusing correctly against an empty pack (P10.1\'s own proof)', () => {
@@ -394,4 +396,70 @@ test('a full RFC-Review-Lite chain (including an authorize step) dispatched enti
   assert.ok(eventTypes.includes('operation-authorized'), 'the real grant door really wrote its own event -- bypass #2 (bypass grants) confirmed against real, persisted data');
   assert.equal(eventTypes.includes('aggregation-validated'), false, 'bypass #3 (validate its own aggregate) -- no such event exists in this session\'s real log');
   assert.equal(eventTypes.includes('specialist-authorized'), false, 'bypass #4 (authorize a specialist) -- no such event exists in this session\'s real log');
+});
+
+// ---------------------------------------------------------------------
+// Step 09 Phase 02 R1/Tests First #5-#6: `standalone-master-coordination-loop`
+// registered as the pack's fourth member, dispatchable through the SAME
+// gate the three group-thinking-lite protocols above already use.
+
+test('standalone-master-coordination-loop is registered in the real, committed pack, resolvable with no version drift', () => {
+  const pack = loadProtocolPack();
+  const registeredIds = new Set(pack.members.map((m) => m.id));
+  assert.ok(registeredIds.has(MASTER_COORDINATION_LOOP_ID), 'the real pack must list standalone-master-coordination-loop as a member');
+  assert.equal(pack.members.length, 4, 'exactly the three group-thinking-lite protocols plus standalone-master-coordination-loop -- no forgotten fifth entry');
+
+  const resolved = resolvePackProtocol(MASTER_COORDINATION_LOOP_ID);
+  assert.equal(resolved.id, MASTER_COORDINATION_LOOP_ID);
+  assert.equal(resolved.definition.metadata.id, MASTER_COORDINATION_LOOP_ID);
+  assert.equal(resolved.version, resolved.definition.metadata.version, 'the pack-pinned version must not have drifted from the real, committed FlowDefinition');
+  assert.equal(resolved.definition.spec.profile.kind, 'CoordinationProtocol');
+});
+
+test('a request naming standalone-master-coordination-loop dispatches successfully through runGroupThinkingRequest -- the SAME gate the three group-thinking-lite protocols already use -- proving the registration is real, not just a JSON edit that looks right', async () => {
+  const tempDir = mkTempDir();
+  const planPath = path.join(tempDir, 'plan.md');
+  fs.writeFileSync(planPath, '# Plan\nProve the pack registration is real.\n');
+
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [path.join(tempDir, 'fake-executor.mjs'), '{prompt}'] },
+    modelPolicies: { claude: { lightweight: 'test-model', standard: 'test-model', analytical: 'test-model' } },
+    timeoutMs: 8000,
+  };
+  fs.writeFileSync(
+    path.join(tempDir, 'fake-executor.mjs'),
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const assignmentsRoot = path.join(process.cwd(), '.fgos', 'assignments');
+    if (fs.existsSync(assignmentsRoot)) {
+      for (const asgn of fs.readdirSync(assignmentsRoot)) {
+        const runsDir = path.join(assignmentsRoot, asgn, 'runs');
+        if (!fs.existsSync(runsDir)) continue;
+        for (const run of fs.readdirSync(runsDir)) {
+          const runDir = path.join(runsDir, run);
+          if (fs.existsSync(runDir) && !fs.existsSync(path.join(runDir, 'agent-result.json'))) {
+            fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nSettled by the P02.1 registration test executor.\\n');
+            fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Settled by the P02.1 registration test executor.' }));
+          }
+        }
+      }
+    }
+    process.stdout.write('done\\n');
+    `,
+  );
+
+  const requestObject = buildMasterLoopRequest({ cwd: tempDir }, { planPath, objective: 'Prove pack registration is real.', writerId: 'p02-1-pack-registration-test' });
+  assert.equal(requestObject.protocolRef.id, MASTER_LOOP_PROTOCOL_ID);
+  assert.equal(MASTER_LOOP_PROTOCOL_ID, MASTER_COORDINATION_LOOP_ID, 'launch-master-loop.mjs\'s own protocol id constant must name the SAME fixture this pack member registers');
+
+  const result = await runGroupThinkingRequest(
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+    { protocolId: MASTER_COORDINATION_LOOP_ID, requestObject },
+  );
+
+  assert.equal(result.kind, 'declared-protocol');
+  assert.equal(result.definitionRef.id, MASTER_COORDINATION_LOOP_ID);
+  assert.deepEqual(result.steps.map((s) => s.as), ['produce', 'review', 'red-team']);
+  assert.ok(result.steps.every((s) => s.status === 'done'), 'every required first-pass step must have really dispatched and settled through the real engine');
 });
