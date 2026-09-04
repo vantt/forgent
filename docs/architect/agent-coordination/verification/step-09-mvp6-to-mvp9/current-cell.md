@@ -142,6 +142,43 @@ mechanism.** What this cell actually needs to design and build:
   protocol definitions themselves — that is P10.2/P10.3/P10.4's job, each
   in its own isolated worktree, after this cell closes.
 
+### ADDENDUM (added mid-flight, 2026-09-04 — user-driven requirement)
+**The skill/request-adapter boundary this cell builds MUST preserve
+per-actor provider/model/tier customization — not collapse a
+group-thinking session onto one provider.** This capability already
+exists at two levels and must not be stripped or hard-coded away:
+- `spec.actors[].policy` (`src/runner/definitions/schema.mjs`,
+  `POLICY_PATCH_FIELDS = {minTier, preferPersona, preferExecutor,
+  fallbackExecutors, visibility}`) already lets a FlowDefinition declare a
+  DIFFERENT executor/tier per actor.
+- `src/verbs/coordination/run.mjs`'s `actorPolicyFields` already resolves
+  `actorEntry?.executor`/`actorEntry?.tier` per actor (falling back to a
+  global default only when the actor doesn't declare its own), and
+  forwards it as `cliPolicy` into `dispatchDeclaredOperation`.
+- fgOS's own executor registry (`.fgos/config.json`) already has real,
+  working `codex-cli`, `agy-cli`/`agy-herdr` executors dispatched via the
+  `cli-spawn` adapter (real subprocesses, not simulated) — Claude,
+  Codex, and Antigravity (agy) collaborating within one session is
+  already mechanically possible today, at the kernel layer.
+User's explicit bar: "ít nhất phải collab giữa claude, codex và agy trên
+mô hình cli-spawn" (at minimum, Claude/Codex/agy must be able to
+collaborate under the cli-spawn model) — this is a hard requirement, not
+a nice-to-have. Concretely for THIS cell: whatever request-adapter
+boundary you build MUST pass through a caller's (or a definition's own)
+per-actor `executor`/`tier`/`preferPersona`/`fallbackExecutors` choices
+unchanged, end to end — never defaulting every actor to one hardcoded
+provider, never dropping the field when building the thin wrapper around
+`run.mjs`. Add this to your Proof Matrix explicitly: name where in your
+skill/adapter a caller can express "actor A uses provider X, actor B uses
+provider Y" and confirm it reaches `run.mjs`'s real `actorPolicyFields`
+resolution unchanged. If the skill's own request shape doesn't yet expose
+this (e.g. it only accepts a single global executor), that is a real gap
+— name it loudly in P10.1.md's Gaps, don't silently narrow scope. Full
+proof that RFC-review-lite/Nominal-Group-lite/Delphi-feedback-lite
+(P10.2-P10.4) actually ASSIGN different providers to different
+personas/roles is those cells' own job, not this one's — but this cell
+must not build a boundary that makes that impossible.
+
 ### Acceptance
 - `protocol-loader.mjs` reused, not forked or duplicated — confirm and
   state this explicitly in P10.1.md rather than assuming a reader will
