@@ -138,6 +138,18 @@ an old `docPath` is historical fact and is never rewritten; this resolver
 is the mechanism that lets "where does topic X actually live now" be
 answered without touching the historical record.
 
+### Child 3 — the doc-only classifier over the existing 268-document corpus (`tsk-28x-3`)
+
+`scripts/knowledge-classifier.mjs` reads-only scans all 268 existing
+end-user documents and emits a classification table with confidence +
+evidence per file. It edits no document and writes nothing to the
+registry — its output is data, doubling as both the raw vocabulary source
+and the bootstrap input for the next child. Honors `D-tsk28x-11` (the
+per-file classification pass is itself the vocabulary-generation step, one
+job not two) and `D-tsk28x-18` (this classifier runs at step 3, before
+bootstrap at step 4, precisely because the classifier's own output IS the
+bootstrap data).
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
