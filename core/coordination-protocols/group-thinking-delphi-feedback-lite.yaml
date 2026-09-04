@@ -1,0 +1,214 @@
+# core/coordination-protocols/group-thinking-delphi-feedback-lite.yaml --
+# Phase 10 P10.4: Delphi-Feedback-Lite, one of the three Group-Thinking
+# Protocol Pack member definitions (phase-10-group-thinking-protocol-pack-
+# conformance-and-closeout.md's own P10.4 bullets). A genuinely new,
+# independently pack-registrable protocol -- NOT a copy of Phase 08's own
+# `deliberation-delphi-chain.yaml` proof fixture (different metadata.id,
+# different mechanism for the round bound; see below).
+#
+# Shape: private round-1 proposals -> a mediated, non-contribution aggregate
+# artifact -> bounded round-2 ("next-round") proposals anchored to round 1.
+#
+# No claim of strong anonymity: every input's provenance is traceable
+# through this session's own event log/replay (MVP6 context-grant
+# mechanism), never information-theoretically hidden from the driver, who
+# has full ledger visibility by design across this whole track (same
+# discipline P08.3's own Nominal-Group section already states for
+# "privacy" language).
+#
+# No claim of statistical convergence: "aggregate" is a plain declared
+# operation that produces ONE mediated artifact from the round-1 proposals
+# -- no vote, no rank, no formal consensus method is declared or implied.
+#
+# `propose-round1`/`propose-round2` are two DISTINCT declared operation ids
+# (like Phase 08's own precedent), not one operation id reused at two graph
+# positions. This is a real engine constraint, confirmed empirically, not a
+# stylistic echo of Phase 08: `dispatchDeclaredOperation`'s actor resolution
+# (`resolveDeclaredOperationActor`) matches a `{operationId, targetActorId}`
+# pair against the FIRST node in graph order whose binding's actor agrees --
+# it has no node/round discriminator -- so one operation id bound to the
+# SAME actor at two different nodes would make the second binding
+# permanently unreachable, always resolving to the first. Two operation ids
+# make both bindings independently addressable.
+#
+# Bounded next-round proposals, via a REAL enforced ceiling, not merely a
+# structural absence of a third graph node. `topology.edges[]` declares one
+# edge per panelist, `facilitator-actor -> panelist-*`, `maxRounds: 2`. Both
+# `propose-round1` and `propose-round2` are bound to the SAME panelist
+# actor, and the edge is matched by actor alone
+# (`incomingEdge = topology.edges.find(edge => edge.to === actorId)` in
+# session-engine.mjs, never filtered by operationId), so dispatching EITHER
+# operation to that actor counts as one round against the SAME shared
+# `maxRounds: 2` cap -- round 1 and round 2 together consume it exactly, and
+# a round-3 attempt (dispatching either operation id a further time) is
+# refused by the engine itself ("...allows at most 2 round(s)..."), not
+# merely undispatchable because no round-3 graph node exists. This is
+# `declared-consult.yaml`'s own `maxRounds: 1` mechanism, applied here for
+# the first time to a two-round deliberation shape. Round-2's
+# `fromAssignmentId` names the facilitator's "aggregate" Assignment, so
+# "next round" is dispatched FROM the mediated artifact, not merely gated
+# by it.
+#
+# Round ORDERING (a round-2 proposal cannot be linked as a durable
+# contribution before "aggregate" settles) is enforced by the SAME MVP6
+# visibility-window mechanism `deliberation-delphi-chain.yaml` already
+# proved -- reused, never reimplemented: `round1-open` is vacuously open
+# from session start (`opensAfter.operationRefs: []`); `round2-open` opens
+# only once `aggregate` (a genuinely different, later operation) settles.
+# The round BOUND (at most 2 rounds ever) and the round ORDER (round 2
+# after aggregate) are therefore two independently enforced properties,
+# from two different mechanisms, not one mechanism doing double duty.
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.group-thinking-delphi-feedback-lite
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: isolated-until-fan-in
+      edges:
+        - from: facilitator-actor
+          to: panelist-a
+          intents: [propose]
+          maxRounds: 2
+        - from: facilitator-actor
+          to: panelist-b
+          intents: [propose]
+          maxRounds: 2
+      visibilityWindows:
+        - id: round1-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: []
+          permits:
+            sourceOperationRefs: [propose-round1]
+            delivery: artifact-refs
+        - id: round2-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [aggregate]
+          permits:
+            sourceOperationRefs: [aggregate]
+            delivery: artifact-refs
+
+  roles:
+    - facilitator
+    - panelist
+
+  actors:
+    # Real spec.actors[].policy.minTier usage on both roles (legal, portable
+    # -- unlike preferExecutor, checked below). Facilitator synthesizes the
+    # mediated artifact from both panelists' private reasoning, a
+    # higher-stakes judgment than either individual proposal, so its floor
+    # is raised further at the actor scope than the panelists' own.
+    # Deliberately NOT "standard" for either role: `resolveAssignmentDispatchPolicy`
+    # (session-engine.mjs) starts its own effective-tier floor at "standard"
+    # by hardcoded default, and its provenance-update comparison is a
+    # STRICT `>` (a tie never updates attribution) -- an actor-scope
+    # `minTier: standard` would resolve the CORRECT value but get
+    # misattributed provenance (`{scope: 'default'}` instead of
+    # `{scope: 'actor', ...}`), confirmed empirically while building this
+    # definition's own proof test. "analytical"/"critical" both sit above
+    # that default floor, so the real actor-scope source is provably
+    # attributed, not merely coincidentally correct in value.
+    #
+    # spec.actors[].policy.preferExecutor was deliberately NOT declared
+    # here, and this is a real finding, not an oversight: session-engine.mjs's
+    # `assertNoPortableExecutorPin` rejects a literal `preferExecutor` pin on
+    # ANY portable scope, and 'actor' is one of the five scopes in its own
+    # `PORTABLE_POLICY_SCOPES` set (runner, definition, operation, role,
+    # actor) -- declaring one here would make every dispatch against this
+    # definition throw at the policy-resolution gate, not merely be a
+    # no-op. Per-actor EXECUTOR/provider selection is a session/request-time
+    # concern (the request's own `actors[].executor` field, resolved through
+    # `actorPolicyFields`/`run.mjs`, exactly as P10.1 already proved for the
+    # group-thinking pack gate), never a portable FlowDefinition field --
+    # see P10.4.md for the full trace.
+    - id: facilitator-actor
+      role: facilitator
+      policy:
+        minTier: critical
+    - id: panelist-a
+      role: panelist
+      policy:
+        minTier: analytical
+    - id: panelist-b
+      role: panelist
+      policy:
+        minTier: analytical
+
+  operations:
+    - id: convene
+      role: facilitator
+      task:
+        contractTemplate: delphi-feedback-lite-convene
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: propose-round1
+      role: panelist
+      task:
+        contractTemplate: delphi-feedback-lite-propose
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: aggregate
+      role: facilitator
+      task:
+        contractTemplate: delphi-feedback-lite-aggregate
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: propose-round2
+      role: panelist
+      task:
+        contractTemplate: delphi-feedback-lite-propose
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+
+  graph:
+    entry: phase-convene
+    nodes:
+      - id: phase-convene
+        operations:
+          - ref: convene
+            actor: facilitator-actor
+        transitions: [phase-round1]
+      - id: phase-round1
+        operations:
+          - ref: propose-round1
+            actor: panelist-a
+            contextAccess:
+              visibilityWindowRef: round1-open
+          - ref: propose-round1
+            actor: panelist-b
+            contextAccess:
+              visibilityWindowRef: round1-open
+        transitions: [phase-aggregate]
+      - id: phase-aggregate
+        operations:
+          - ref: aggregate
+            actor: facilitator-actor
+        transitions: [phase-round2]
+      - id: phase-round2
+        operations:
+          - ref: propose-round2
+            actor: panelist-a
+            contextAccess:
+              visibilityWindowRef: round2-open
+          - ref: propose-round2
+            actor: panelist-b
+            contextAccess:
+              visibilityWindowRef: round2-open
+        transitions: []

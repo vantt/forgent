@@ -19,6 +19,7 @@
 // check function and its own dedicated negative test (test/cli/coordination.test.mjs).
 
 import { StoreError } from '../../state/store.mjs';
+import { CONTRIBUTION_TYPES } from '../../runner/deliberation/schema.mjs';
 
 // Same safe filesystem charset session-engine.mjs's own
 // `assertSafeCoordinationId` enforces (store.mjs), applied here too so a
@@ -409,6 +410,68 @@ function validateFanOutStep(step, i) {
   return { type: 'fan-out', as: step.as, operationId: step.operationId, branches, fromAssignmentId: step.fromAssignmentId };
 }
 
+// A contribution step reaches `linkSessionContribution` (session-engine.mjs)
+// -- the already-existing, already-proven mediated door (P08.2/P08.3) that
+// records a contribution-typed deliberation-ledger entry (proposal |
+// objection | response | clarification | rank | specialist-request), with
+// `anchors`/`respondsTo` lineage, backed by a settled Assignment. Before
+// this step type existed, `run.mjs`'s closed four-kind step vocabulary
+// (operation | authorize | disposition | fan-out) never reached that door
+// at all, so no request-driven caller -- including the group-thinking
+// Protocol Pack gate -- could ever create a contribution-typed lineage
+// record (P10.6/P10.7/P10.8's own shared finding; classified and closed by
+// P10.10 as a scoped pack-layer wiring gap, not a new kernel capability).
+const CONTRIBUTION_STEP_ALLOWED_KEYS = new Set([
+  'type', 'as', 'contributionId', 'contributionType', 'assignmentId', 'roundKey', 'anchors', 'respondsTo', 'mutation',
+]);
+
+const CONTRIBUTION_TYPE_SET = new Set(CONTRIBUTION_TYPES);
+
+// Mirrors session-engine.mjs's own `CONTRIBUTION_FIELD_MAX_LENGTH`
+// (`linkSessionContribution`'s bound on `contributionId`/`roundKey`) so an
+// overlong value is rejected here, at the request boundary, with an
+// attributable reason, instead of only later inside the engine door.
+const CONTRIBUTION_FIELD_MAX_LENGTH = 2000;
+
+function assertNoLinkedBy(step, label) {
+  if ('linkedBy' in step) {
+    fail(`${label} declares "linkedBy" -- driver provenance is pinned to the session's own top-level "writerId" (the session's provenanceRoot.writerId), so a request may never name a second driver identity`);
+  }
+}
+
+function validateContributionStep(step, i) {
+  assertNoLinkedBy(step, `steps[${i}] (type "contribution")`);
+  assertAllowedKeys(step, CONTRIBUTION_STEP_ALLOWED_KEYS, `steps[${i}] (type "contribution")`);
+  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertSafeId(step.contributionId, `steps[${i}].contributionId`);
+  if (!isNonEmptyString(step.contributionType) || !CONTRIBUTION_TYPE_SET.has(step.contributionType)) {
+    fail(`steps[${i}].contributionType must be one of the closed MVP8 contribution types (${CONTRIBUTION_TYPES.join(' | ')})`);
+  }
+  assertSafeRefOrId(step.assignmentId, `steps[${i}].assignmentId`);
+  if (!isNonEmptyString(step.roundKey) || step.roundKey.length > CONTRIBUTION_FIELD_MAX_LENGTH) {
+    fail(`steps[${i}].roundKey is required and must be a non-empty string of at most ${CONTRIBUTION_FIELD_MAX_LENGTH} characters`);
+  }
+  // An empty `anchors: []` and an omitted `anchors` key are the same claim
+  // ("no anchors") and must normalize identically -- otherwise
+  // `recordContributionLink`'s canonicalize sees them as different content
+  // and a byte-identical idempotent repeat is wrongly refused as a
+  // `duplicate-ref`.
+  let anchors = step.anchors !== undefined ? validateStringArray(step.anchors, `steps[${i}].anchors`) : undefined;
+  if (anchors !== undefined) anchors.forEach((ref, j) => assertSafeId(ref, `steps[${i}].anchors[${j}]`));
+  if (anchors !== undefined && anchors.length === 0) anchors = undefined;
+  if (step.respondsTo !== undefined) assertSafeId(step.respondsTo, `steps[${i}].respondsTo`);
+  return {
+    type: 'contribution',
+    as: step.as,
+    contributionId: step.contributionId,
+    contributionType: step.contributionType,
+    assignmentId: step.assignmentId,
+    roundKey: step.roundKey,
+    anchors,
+    respondsTo: step.respondsTo,
+  };
+}
+
 function validateSteps(steps) {
   if (!Array.isArray(steps) || steps.length === 0) fail('"steps" is required and must be a non-empty array when kind is "declared-protocol"');
   const seenLabels = new Set();
@@ -421,7 +484,8 @@ function validateSteps(steps) {
     if (step.type === 'fan-out') return validateFanOutStep(step, i);
     if (step.type === 'authorize') return validateAuthorizeStep(step, i);
     if (step.type === 'disposition') return validateDispositionStep(step, i);
-    fail(`steps[${i}].type must be "operation", "fan-out", "authorize", or "disposition"`);
+    if (step.type === 'contribution') return validateContributionStep(step, i);
+    fail(`steps[${i}].type must be "operation", "fan-out", "authorize", "disposition", or "contribution"`);
     return undefined; // unreachable, keeps linters happy
   });
 }

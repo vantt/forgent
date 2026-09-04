@@ -26,6 +26,10 @@ import {
   openDeclaredProtocolSession,
   dispatchDeclaredOperation,
   authorizeDeclaredOperation,
+  replaceSessionActor,
+  deriveVisibilityWindowState,
+  dispatchPrimaryTask,
+  PRIMARY_ACTOR_ID,
 } from '../../src/runner/coordination/session-engine.mjs';
 import {
   authorizeOperation,
@@ -34,9 +38,12 @@ import {
   transitionSessionStatus,
   appendEvent,
   resolveSessionPaths,
+  createSessionAssignment,
+  linkResult,
 } from '../../src/runner/coordination/store.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
+import { loadCoordinationProtocol } from '../../src/runner/definitions/protocol-loader.mjs';
 
 const DEFINITION_ID = 'test.coordination-protocol.driver-authorized-recheck';
 
@@ -1323,6 +1330,27 @@ test('a real foreign session is rejected by DISK EXISTENCE even when its id carr
   );
 });
 
+test('a grantedContextRefs entry in the reserved "contribution:" namespace is refused -- a contribution is not grantable context', () => {
+  // The ownership rule has three copies (this one, store.mjs's
+  // `assertDispositionRefOwnedBySession`, show.mjs's `isRefOwnedBySession`).
+  // MVP8's reserved namespace is recognized by all three rather than by two,
+  // so no copy silently accepts a ref shape the others police. Here it is
+  // refused flatly: this door grants READ access, and a contribution is
+  // content-free by construction, so there is nothing behind such a ref to
+  // grant. A contribution is targetable by a disposition, never grantable.
+  const ctx = setup('coord_da_grant_contribution_ns');
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_da_grant_contribution_ns',
+        authorization({ grantedContextRefs: ['contribution:contrib_1'] }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && /is not a grantable context ref/.test(err.message),
+  );
+  assert.equal(readSessionEvents('coord_da_grant_contribution_ns', ctx.opts).filter((e) => e.type === 'operation-authorized').length, 0);
+});
+
 test('a non-string grantedContextRefs entry is refused with a clean CoordinationError, not a raw TypeError', () => {
   const ctx = setup('coord_da_grant_non_string');
   assert.throws(
@@ -1540,4 +1568,1010 @@ test('R8: the session\'s own driver identity authorizes and dispatches normally'
   assert.equal(result.resumed, false);
   const authorized = readSessionEvents('coord_da_authority_ok', ctx.opts).find((e) => e.type === 'operation-authorized');
   assert.deepEqual(authorized.payload.authorizedBy, { type: 'driver', id: 'the-real-driver' });
+});
+
+// ─── Phase 06 R2 (P06.2): visibility windows -- runtime, grant enforcement,
+// and replay ─────────────────────────────────────────────────────────────
+//
+// Fixture: two REQUIRED research operations (`research-a`/`research-b`,
+// one actor each) feed a `post-research-window` visibility window; a
+// DRIVER-AUTHORIZED `synthesize` operation's node-operation binding names
+// that window via `contextAccess.visibilityWindowRef`. This is the
+// paradigm case P00.1 itself names ("private-first-pass vs.
+// post-independent-pass") -- the window's sources are ordinary required
+// dispatches, never driver-authorized themselves, proving window-state
+// derivation does not depend on `assignment-created.operationId` (only
+// populated for driver-authorized bindings) at all.
+
+const VISIBILITY_DEFINITION_ID = 'test.coordination-protocol.visibility-window';
+
+// `overrides` exists for the Fix Round's own shapes below (a source actor
+// ALSO bound to an unrelated operation; one source operation bound to a
+// whole fan-out cohort). Every default is the original fixture, so every
+// pre-existing caller writes a byte-identical definition.
+function writeVisibilityWindowFixture(
+  tempDir,
+  {
+    windowOperationRefs = ['research-a', 'research-b'],
+    operations = [
+      { id: 'research-a', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+      { id: 'research-b', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+    ],
+    entry = 'phase-research',
+    sourceNodes = [
+      {
+        id: 'phase-research',
+        operations: [
+          { ref: 'research-a', actor: 'researcher-a' },
+          { ref: 'research-b', actor: 'researcher-b' },
+        ],
+        transitions: ['phase-synthesize'],
+      },
+    ],
+  } = {},
+) {
+  const dir = path.join(tempDir, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(dir, { recursive: true });
+  const definition = {
+    apiVersion: 'fgos.dev/v1alpha1',
+    kind: 'FlowDefinition',
+    metadata: { id: VISIBILITY_DEFINITION_ID, version: '1.0.0' },
+    spec: {
+      profile: {
+        kind: 'CoordinationProtocol',
+        topology: {
+          visibilityWindows: [
+            {
+              id: 'post-research-window',
+              opensAfter: { milestone: 'listed-results-linked', operationRefs: windowOperationRefs },
+              permits: { sourceOperationRefs: windowOperationRefs, delivery: 'artifact-refs' },
+            },
+          ],
+        },
+      },
+      roles: ['researcher', 'synth'],
+      actors: [
+        { id: 'researcher-a', role: 'researcher' },
+        { id: 'researcher-b', role: 'researcher' },
+        { id: 'synth', role: 'synth' },
+      ],
+      operations: [...operations, { id: 'synthesize', role: 'synth', result: { kind: 'advisory', evidenceRequired: 'reported' } }],
+      graph: {
+        entry,
+        nodes: [
+          ...sourceNodes,
+          {
+            id: 'phase-synthesize',
+            operations: [
+              {
+                ref: 'synthesize',
+                actor: 'synth',
+                activation: { mode: 'driver-authorized' },
+                contextAccess: { visibilityWindowRef: 'post-research-window' },
+              },
+            ],
+            transitions: [],
+          },
+        ],
+      },
+    },
+  };
+  fs.writeFileSync(path.join(dir, 'visibility-window.json'), `${JSON.stringify(definition, null, 2)}\n`);
+}
+
+function setupVisibilityWindow(coordinationId, fixtureOverrides) {
+  const tempDir = mkTempDir();
+  writeVisibilityWindowFixture(tempDir, fixtureOverrides);
+  openDeclaredProtocolSession(
+    {
+      definitionId: VISIBILITY_DEFINITION_ID,
+      coordinationId,
+      objective: 'Prove visibility-window runtime enforcement.',
+      writerId: 'coordinator-1',
+    },
+    { cwd: tempDir },
+  );
+  return { tempDir, runnerConfig: fakeExecutor(tempDir), opts: { cwd: tempDir, repoRoot: tempDir } };
+}
+
+function inlineResearchContract(overrides = {}) {
+  return {
+    objective: 'Research.',
+    contextRefs: [],
+    constraints: [],
+    expectedOutputs: ['agent-result.json (status, summary)'],
+    mutation: 'read-only',
+    evidence: { required: 'reported' },
+    role: 'researcher',
+    budget: { timeoutMs: 60000, maxRuns: 1 },
+    ...overrides,
+  };
+}
+
+async function dispatchResearch(coordinationId, ctx, operationId, targetActorId, runnerConfig) {
+  return dispatchDeclaredOperation(
+    coordinationId,
+    {
+      operationId,
+      targetActorId,
+      objective: `Perform ${operationId}.`,
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      writerId: 'coordinator-1',
+    },
+    { ...ctx.opts, runnerConfig: runnerConfig ?? ctx.runnerConfig },
+  );
+}
+
+function synthesizeAuthorization(overrides = {}) {
+  return {
+    operationId: 'synthesize',
+    targetActorId: 'synth',
+    authorizationId: 'auth_synth_1',
+    invocationKey: 'synth:1',
+    authorizedBy: { type: 'driver', id: 'coordinator-1' },
+    reason: 'Synthesize once both research operations settle.',
+    grantedContextRefs: [],
+    ...overrides,
+  };
+}
+
+function dispatchSynthesize(coordinationId, ctx) {
+  return dispatchDeclaredOperation(
+    coordinationId,
+    {
+      operationId: 'synthesize',
+      targetActorId: 'synth',
+      objective: 'Synthesize the research.',
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      writerId: 'coordinator-1',
+    },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+}
+
+test('visibility window stays closed with zero source result-linked events -- authorization is refused', () => {
+  const ctx = setupVisibilityWindow('coord_vw_zero_sources');
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_zero_sources', synthesizeAuthorization(), ctx.opts),
+    (err) =>
+      err instanceof CoordinationError &&
+      /visibility window "post-research-window"/.test(err.message) &&
+      /is not open/.test(err.message),
+  );
+  assert.equal(
+    readSessionEvents('coord_vw_zero_sources', ctx.opts).filter((e) => e.type === 'operation-authorized').length,
+    0,
+    'a window-refused authorization must not be appended to the log',
+  );
+});
+
+test('visibility window stays closed with a partial subset of required source events (research-a linked, research-b never dispatched)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_partial_sources');
+  await dispatchResearch('coord_vw_partial_sources', ctx, 'research-a', 'researcher-a');
+
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_partial_sources', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+  );
+});
+
+test('visibility window opens once ALL opensAfter.operationRefs[] have a qualifying result-linked, and both authorization and dispatch then succeed', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_open');
+  await dispatchResearch('coord_vw_open', ctx, 'research-a', 'researcher-a');
+  await dispatchResearch('coord_vw_open', ctx, 'research-b', 'researcher-b');
+
+  authorizeDeclaredOperation('coord_vw_open', synthesizeAuthorization(), ctx.opts);
+  const result = await dispatchSynthesize('coord_vw_open', ctx);
+  assert.equal(result.resumed, false);
+  assert.equal(result.runResult.status, 'done');
+});
+
+test('a failed source result does NOT open the window (research-a fails, research-b succeeds)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_failed_source');
+  await dispatchResearch('coord_vw_failed_source', ctx, 'research-a', 'researcher-a', fakeExecutor(ctx.tempDir, { status: 'failed' }));
+  await dispatchResearch('coord_vw_failed_source', ctx, 'research-b', 'researcher-b');
+
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_failed_source', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+  );
+});
+
+test('a "late" source (created, never result-linked) does NOT open the window even though the other source already settled', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_late_source');
+  await dispatchResearch('coord_vw_late_source', ctx, 'research-b', 'researcher-b');
+  // research-a is materialized through the raw store door, deliberately
+  // never linked (settled) -- the exact "late" shape classifySessionQuorum
+  // already names.
+  createSessionAssignment(
+    { coordinationId: 'coord_vw_late_source', taskKey: 'declared:research-a', actorId: 'researcher-a', contract: inlineResearchContract(), caller: { writerId: 'coordinator-1' } },
+    ctx.opts,
+  );
+
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_late_source', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+  );
+});
+
+test('an accepted actor-replaced lineage satisfies the original source obligation without the original failed event disappearing from the log', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_actor_replaced');
+  await dispatchResearch('coord_vw_actor_replaced', ctx, 'research-a', 'researcher-a', fakeExecutor(ctx.tempDir, { status: 'failed' }));
+  await dispatchResearch('coord_vw_actor_replaced', ctx, 'research-b', 'researcher-b');
+
+  const beforeEvents = readSessionEvents('coord_vw_actor_replaced', ctx.opts);
+  const originalCreated = beforeEvents.find((e) => e.type === 'assignment-created' && e.payload.actorId === 'researcher-a');
+  const originalLinked = beforeEvents.find((e) => e.type === 'result-linked' && e.payload.assignmentId === originalCreated.payload.assignmentId);
+  assert.ok(originalCreated && originalLinked, 'the original failed attempt must be on the log before replacement');
+
+  // Window still closed right after the failure -- research-a's ONLY
+  // linked result is the failed one.
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_actor_replaced', synthesizeAuthorization({ authorizationId: 'auth_too_early', invocationKey: 'synth:too-early' }), ctx.opts),
+    (err) => err instanceof CoordinationError && /is not open/.test(err.message),
+  );
+
+  replaceSessionActor(
+    'coord_vw_actor_replaced',
+    { oldActorId: 'researcher-a', newActorId: 'researcher-a-v2', reason: 'Original attempt failed; reassigning.' },
+    ctx.opts,
+  );
+
+  // The replacement's own attempt, materialized through the raw store door
+  // -- the FlowDefinition's static graph never learns about a dynamically
+  // allocated replacement actor, the same posture the existing R2 recovery/
+  // quorum fixtures already take for a replacement's re-dispatch. It declares
+  // the operation it discharges through the reserved stamp, the only channel
+  // a window source reads; its taskKey is irrelevant to that decision.
+  completeThroughRawStoreDoor('coord_vw_actor_replaced', ctx, {
+    taskKey: 'replacement:research-a',
+    actorId: 'researcher-a-v2',
+    objective: 'Research A, redone by the replacement.',
+    servesOperation: 'research-a',
+  });
+
+  // Now open: the replacement's own result-linked satisfies research-a's
+  // obligation; research-b already settled successfully.
+  authorizeDeclaredOperation('coord_vw_actor_replaced', synthesizeAuthorization(), ctx.opts);
+  const result = await dispatchSynthesize('coord_vw_actor_replaced', ctx);
+  assert.equal(result.resumed, false);
+
+  // The original failed attempt's events are STILL on the log, untouched --
+  // never rewritten, never removed.
+  const afterEvents = readSessionEvents('coord_vw_actor_replaced', ctx.opts);
+  assert.ok(
+    afterEvents.some((e) => e.type === 'assignment-created' && e.payload.assignmentId === originalCreated.payload.assignmentId),
+    'the original failed assignment-created event must remain on the log',
+  );
+  assert.ok(
+    afterEvents.some((e) => e.type === 'result-linked' && e.payload.assignmentId === originalCreated.payload.assignmentId),
+    'the original failed result-linked event must remain on the log',
+  );
+});
+
+test('authorization is refused when a granted ref\'s window is not yet open, even though the ref itself passes same-session ownership', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_ownership_vs_window');
+  const research = await dispatchResearch('coord_vw_ownership_vs_window', ctx, 'research-a', 'researcher-a');
+
+  // A ref naming research-a's OWN real, session-member Assignment --
+  // assertRefsOwnedBySession alone would accept it. research-b has not
+  // settled yet, so the window itself is still closed.
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_vw_ownership_vs_window',
+        synthesizeAuthorization({ grantedContextRefs: [research.assignment.assignmentId] }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+  );
+});
+
+test('dispatch independently refuses a window-gated operation even when authorization was forged straight through the raw store door (defense in depth)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_dispatch_defense_in_depth');
+  // Neither research-a nor research-b has settled -- the window is closed.
+  // Bypass authorizeDeclaredOperation entirely (which would itself refuse)
+  // and forge the "operation-authorized" event straight through the raw
+  // store door, exactly like this file's own `rawAuthorize` helper does for
+  // the ownership gate above.
+  authorizeOperation(
+    'coord_vw_dispatch_defense_in_depth',
+    {
+      authorizationId: 'auth_forged',
+      operationId: 'synthesize',
+      nodeId: 'phase-synthesize',
+      targetActorId: 'synth',
+      invocationKey: 'synth:forged',
+      authorizedBy: { type: 'driver', id: 'coordinator-1' },
+      reason: 'Forged straight through the raw store door.',
+      grantedContextRefs: [],
+    },
+    ctx.opts,
+  );
+
+  await assert.rejects(
+    dispatchSynthesize('coord_vw_dispatch_defense_in_depth', ctx),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+  );
+  assert.deepEqual(readManifest('coord_vw_dispatch_defense_in_depth', ctx.opts).assignmentRefs, []);
+});
+
+test('the existing same-session ownership gate stays enforced even when the visibility window is open (additive, never a replacement)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_ownership_still_enforced');
+  await dispatchResearch('coord_vw_ownership_still_enforced', ctx, 'research-a', 'researcher-a');
+  await dispatchResearch('coord_vw_ownership_still_enforced', ctx, 'research-b', 'researcher-b');
+
+  // A second, foreign session in the same workspace.
+  openDeclaredProtocolSession(
+    { definitionId: VISIBILITY_DEFINITION_ID, coordinationId: 'coord_vw_ownership_still_enforced_foreign', objective: 'Foreign.', writerId: 'coordinator-1' },
+    ctx.opts,
+  );
+
+  assert.throws(
+    () =>
+      authorizeDeclaredOperation(
+        'coord_vw_ownership_still_enforced',
+        synthesizeAuthorization({ grantedContextRefs: ['coord_vw_ownership_still_enforced_foreign'] }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && /names a different coordination session/.test(err.message),
+  );
+});
+
+test('replay independently reconstructs the same window-open/closed decision as the live path (open scenario)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_replay_open');
+  await dispatchResearch('coord_vw_replay_open', ctx, 'research-a', 'researcher-a');
+  await dispatchResearch('coord_vw_replay_open', ctx, 'research-b', 'researcher-b');
+  authorizeDeclaredOperation('coord_vw_replay_open', synthesizeAuthorization(), ctx.opts);
+  const dispatched = await dispatchSynthesize('coord_vw_replay_open', ctx);
+  assert.equal(dispatched.resumed, false);
+
+  // A fresh, independent reconstruction -- never the live path's own
+  // in-memory state.
+  const definition = loadCoordinationProtocol(VISIBILITY_DEFINITION_ID, { cwd: ctx.tempDir });
+  const replayed = replaySession('coord_vw_replay_open', ctx.opts);
+  const { fgosDir } = resolveSessionPaths('coord_vw_replay_open', ctx.opts);
+  const { open, sources } = deriveVisibilityWindowState(definition, 'post-research-window', replayed, fgosDir);
+  assert.equal(open, true);
+  assert.ok(sources.every((s) => s.satisfied));
+});
+
+test('replay independently reconstructs the same window-open/closed decision as the live path (closed scenario, failed source)', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_replay_closed');
+  await dispatchResearch('coord_vw_replay_closed', ctx, 'research-a', 'researcher-a', fakeExecutor(ctx.tempDir, { status: 'failed' }));
+  await dispatchResearch('coord_vw_replay_closed', ctx, 'research-b', 'researcher-b');
+
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_replay_closed', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /is not open/.test(err.message),
+  );
+
+  const definition = loadCoordinationProtocol(VISIBILITY_DEFINITION_ID, { cwd: ctx.tempDir });
+  const replayed = replaySession('coord_vw_replay_closed', ctx.opts);
+  const { fgosDir } = resolveSessionPaths('coord_vw_replay_closed', ctx.opts);
+  const { open, sources } = deriveVisibilityWindowState(definition, 'post-research-window', replayed, fgosDir);
+  assert.equal(open, false);
+  const researchA = sources.find((s) => s.operationRef === 'research-a');
+  assert.equal(researchA.satisfied, false);
+  assert.equal(researchA.reason, 'failed');
+});
+
+// ─── Fix Round: a window source is satisfied only by work actually done
+// TOWARD that operation, by EVERY actor bound to it ───────────────────────
+//
+// Both scenarios below were reproduced as live bypasses against the
+// actor-id-only source resolution this section originally shipped: the
+// window opened while the operation it gates on had never been performed.
+// Each now asserts the window stays CLOSED.
+
+function windowState(coordinationId, ctx) {
+  const definition = loadCoordinationProtocol(VISIBILITY_DEFINITION_ID, { cwd: ctx.tempDir });
+  const { fgosDir } = resolveSessionPaths(coordinationId, ctx.opts);
+  return deriveVisibilityWindowState(definition, 'post-research-window', replaySession(coordinationId, ctx.opts), fgosDir);
+}
+
+// `servesOperation`, when given, writes the reserved operation stamp
+// `dispatchDeclaredOperation` would have written -- the ONE channel a window
+// source reads. The raw `createSessionAssignment` store door bypasses
+// `buildReadOnlyContract`'s reserved-namespace guard by design (it is
+// unmediated, and it is how a replacement's re-attempt is materialized
+// today), so this is exactly how a trusted engine-internal caller declares
+// which declared operation its Assignment discharges. Omitted, the
+// Assignment declares no operation and can satisfy no window source.
+function completeThroughRawStoreDoor(coordinationId, ctx, { taskKey, actorId, objective, servesOperation }) {
+  const contract = inlineResearchContract({
+    objective,
+    ...(servesOperation !== undefined ? { constraints: [`protocol-operation:${VISIBILITY_DEFINITION_ID}@1.0.0#${servesOperation}`] } : {}),
+  });
+  const assignment = createSessionAssignment(
+    { coordinationId, taskKey, actorId, contract, caller: { writerId: 'coordinator-1' } },
+    ctx.opts,
+  );
+  const runDir = path.join(ctx.tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const runId = `run_${assignment.assignmentId}_01`;
+  fs.writeFileSync(
+    path.join(runDir, 'result.json'),
+    JSON.stringify({ runId, assignmentId: assignment.assignmentId, status: 'done', confidence: 'reported' }, null, 2),
+  );
+  linkResult(coordinationId, { assignmentId: assignment.assignmentId, runId }, ctx.opts);
+  return assignment;
+}
+
+test('a source actor ALSO bound to an unrelated operation does not satisfy the window by completing that unrelated operation', async () => {
+  // researcher-a is bound to BOTH `noise-op` and the window source
+  // `research-a` -- the "one actor, several different operations" shape this
+  // file's own header calls the hardest case.
+  const ctx = setupVisibilityWindow('coord_vw_multiop_actor', {
+    operations: [
+      { id: 'research-a', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+      { id: 'research-b', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+      { id: 'noise-op', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+    ],
+    entry: 'phase-noise',
+    sourceNodes: [
+      { id: 'phase-noise', operations: [{ ref: 'noise-op', actor: 'researcher-a' }], transitions: ['phase-research'] },
+      {
+        id: 'phase-research',
+        operations: [
+          { ref: 'research-a', actor: 'researcher-a' },
+          { ref: 'research-b', actor: 'researcher-b' },
+        ],
+        transitions: ['phase-synthesize'],
+      },
+    ],
+  });
+
+  // researcher-a successfully completes noise-op. research-a itself is NEVER
+  // dispatched. research-b settles legitimately.
+  await dispatchResearch('coord_vw_multiop_actor', ctx, 'noise-op', 'researcher-a');
+  await dispatchResearch('coord_vw_multiop_actor', ctx, 'research-b', 'researcher-b');
+
+  const { open, sources } = windowState('coord_vw_multiop_actor', ctx);
+  assert.equal(open, false, 'the window must stay closed -- research-a was never performed');
+  const researchA = sources.find((s) => s.operationRef === 'research-a');
+  assert.equal(researchA.satisfied, false);
+  assert.equal(researchA.reason, 'missing');
+  assert.equal(sources.find((s) => s.operationRef === 'research-b').satisfied, true);
+
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_multiop_actor', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+  );
+});
+
+test('an actor-replaced replacement completing UNRELATED work does not satisfy the obligation its lineage inherited', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_replacement_piggyback');
+  await dispatchResearch('coord_vw_replacement_piggyback', ctx, 'research-b', 'researcher-b');
+
+  // research-a is never dispatched at all -- researcher-a has no Assignment
+  // whatsoever before being replaced.
+  replaceSessionActor(
+    'coord_vw_replacement_piggyback',
+    { oldActorId: 'researcher-a', newActorId: 'researcher-a-v2', reason: 'Reassigning before research-a ever started.' },
+    ctx.opts,
+  );
+  // Unrelated work, and it even claims research-a's own default claim key --
+  // which buys it nothing, because the claim key is not a channel a window
+  // source reads at all.
+  completeThroughRawStoreDoor('coord_vw_replacement_piggyback', ctx, {
+    taskKey: 'declared:research-a',
+    actorId: 'researcher-a-v2',
+    objective: 'File the quarterly expense report -- nothing to do with research-a.',
+  });
+
+  const { open, sources } = windowState('coord_vw_replacement_piggyback', ctx);
+  assert.equal(open, false, 'the window must stay closed -- the replacement never performed research-a');
+  const researchA = sources.find((s) => s.operationRef === 'research-a');
+  assert.equal(researchA.satisfied, false);
+  assert.equal(researchA.reason, 'missing');
+  assert.equal(researchA.actorId, 'researcher-a-v2', 'the lineage is still followed -- it is the WORK that fails to qualify');
+
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_replacement_piggyback', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /is not open/.test(err.message),
+  );
+
+  // Same lineage, same raw store door, but work that actually DECLARES
+  // research-a through the reserved stamp -- the obligation is satisfied and
+  // the window opens. Note this one's taskKey is not in any `declared:`
+  // namespace: the stamp decides, the claim key never does.
+  completeThroughRawStoreDoor('coord_vw_replacement_piggyback', ctx, {
+    taskKey: 'replacement:research-a',
+    actorId: 'researcher-a-v2',
+    objective: 'Research A, redone by the replacement.',
+    servesOperation: 'research-a',
+  });
+  assert.equal(windowState('coord_vw_replacement_piggyback', ctx).open, true);
+  authorizeDeclaredOperation('coord_vw_replacement_piggyback', synthesizeAuthorization(), ctx.opts);
+});
+
+test('a fan-out source operation (ONE operation bound to MANY actors) needs every bound actor settled, not just the first', async () => {
+  // `independent-research-fan-out-fan-in.yaml`'s real shape: one operation
+  // template wired once per cohort member at one node, each branch
+  // dispatched under its own caller-chosen taskKey (the convention
+  // `dispatchResearchFanOut` itself uses).
+  const ctx = setupVisibilityWindow('coord_vw_fan_out_source', {
+    windowOperationRefs: ['research-a'],
+    operations: [{ id: 'research-a', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } }],
+    sourceNodes: [
+      {
+        id: 'phase-research',
+        operations: [
+          { ref: 'research-a', actor: 'researcher-a' },
+          { ref: 'research-a', actor: 'researcher-b' },
+        ],
+        transitions: ['phase-synthesize'],
+      },
+    ],
+  });
+  const dispatchBranch = (targetActorId) =>
+    dispatchDeclaredOperation(
+      'coord_vw_fan_out_source',
+      {
+        operationId: 'research-a',
+        targetActorId,
+        taskKey: `research-branch:${targetActorId}`,
+        objective: `Independent research by ${targetActorId}.`,
+        expectedOutputs: ['agent-result.json (status, summary)'],
+        writerId: 'coordinator-1',
+      },
+      { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+    );
+
+  await dispatchBranch('researcher-a');
+  const partial = windowState('coord_vw_fan_out_source', ctx);
+  assert.equal(partial.open, false, 'one cohort member reporting must not open the whole cohort\'s window');
+  assert.deepEqual(
+    partial.sources[0].branches.map((b) => [b.boundActorId, b.satisfied, b.reason]),
+    [
+      ['researcher-a', true, null],
+      ['researcher-b', false, 'missing'],
+    ],
+  );
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_fan_out_source', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /is not open/.test(err.message),
+  );
+
+  await dispatchBranch('researcher-b');
+  assert.equal(windowState('coord_vw_fan_out_source', ctx).open, true, 'the window opens once the whole cohort has settled');
+  authorizeDeclaredOperation('coord_vw_fan_out_source', synthesizeAuthorization(), ctx.opts);
+});
+
+// ─── Fix Round 2: the operation-identity proof must be engine-derived, and
+// the claim-key namespace exact ───────────────────────────────────────────
+//
+// The proof doors above are only worth anything if a caller cannot write
+// them. Both scenarios below were live-reproduced through the ORDINARY
+// public `dispatchDeclaredOperation` API -- no raw store door, just one
+// extra caller parameter -- and both now leave the window CLOSED. The third
+// needs no attacker at all: operation ids carry no character restriction, so
+// a sibling id can collide with a source id's claim-key namespace by naming
+// coincidence.
+
+const MULTIOP_FIXTURE = {
+  operations: [
+    { id: 'research-a', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+    { id: 'research-b', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+    { id: 'noise-op', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+  ],
+  entry: 'phase-noise',
+  sourceNodes: [
+    { id: 'phase-noise', operations: [{ ref: 'noise-op', actor: 'researcher-a' }], transitions: ['phase-research'] },
+    {
+      id: 'phase-research',
+      operations: [
+        { ref: 'research-a', actor: 'researcher-a' },
+        { ref: 'research-b', actor: 'researcher-b' },
+      ],
+      transitions: ['phase-synthesize'],
+    },
+  ],
+};
+
+test('a caller cannot forge the engine\'s protocol-operation stamp through dispatchDeclaredOperation\'s own constraints parameter', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_forged_stamp', MULTIOP_FIXTURE);
+  await dispatchResearch('coord_vw_forged_stamp', ctx, 'research-b', 'researcher-b');
+
+  // researcher-a dispatches the UNRELATED noise-op, carrying a hand-written
+  // copy of the stamp the engine would have written for research-a.
+  await assert.rejects(
+    dispatchDeclaredOperation(
+      'coord_vw_forged_stamp',
+      {
+        operationId: 'noise-op',
+        targetActorId: 'researcher-a',
+        constraints: [`protocol-operation:${VISIBILITY_DEFINITION_ID}@1.0.0#research-a`],
+        objective: 'Noise, dressed up as research-a.',
+        expectedOutputs: ['agent-result.json (status, summary)'],
+        writerId: 'coordinator-1',
+      },
+      { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+    ),
+    (err) => err instanceof CoordinationError && /reserved "protocol-operation:" namespace/.test(err.message),
+    'the reserved stamp namespace must be refused at the dispatch door, not merely disbelieved later',
+  );
+
+  assert.equal(windowState('coord_vw_forged_stamp', ctx).open, false);
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_forged_stamp', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /is not open/.test(err.message),
+  );
+});
+
+test('a caller-chosen taskKey in another operation\'s declared namespace does not satisfy that operation\'s window source', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_forged_taskkey', MULTIOP_FIXTURE);
+  await dispatchResearch('coord_vw_forged_taskkey', ctx, 'research-b', 'researcher-b');
+
+  // The dispatch itself is legal -- `taskKey` is a documented public
+  // override, and refusing it here would break recheck's own claim-key
+  // semantics. What makes it harmless is that the Assignment carries the
+  // engine's own stamp for `noise-op`, and an engine stamp settles the
+  // question exclusively: the caller's claim key never gets a second vote.
+  const noise = await dispatchDeclaredOperation(
+    'coord_vw_forged_taskkey',
+    {
+      operationId: 'noise-op',
+      targetActorId: 'researcher-a',
+      taskKey: 'declared:research-a',
+      objective: 'Noise, claimed under research-a\'s key.',
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      writerId: 'coordinator-1',
+    },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+  assert.equal(noise.runResult.status, 'done', 'the unrelated operation itself really did succeed');
+
+  const { open, sources } = windowState('coord_vw_forged_taskkey', ctx);
+  assert.equal(open, false, 'the window must stay closed -- research-a was never performed');
+  assert.equal(sources.find((s) => s.operationRef === 'research-a').reason, 'missing');
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_forged_taskkey', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /is not open/.test(err.message),
+  );
+});
+
+test('a sibling operation whose id begins with the source id never cross-satisfies it, through any door', async () => {
+  // `research:deep` is a legal operation id (ids are validated as non-empty
+  // strings only), and its own default claim key is `declared:research:deep`
+  // -- which a claim-key-namespace match would have accepted for window
+  // source `research`. No attacker, just a naming coincidence.
+  const ctx = setupVisibilityWindow('coord_vw_sibling_prefix', {
+    windowOperationRefs: ['research'],
+    operations: [
+      { id: 'research', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+      { id: 'research:deep', role: 'researcher', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+    ],
+    sourceNodes: [
+      {
+        id: 'phase-research',
+        operations: [
+          { ref: 'research', actor: 'researcher-a' },
+          { ref: 'research:deep', actor: 'researcher-a' },
+        ],
+        transitions: ['phase-synthesize'],
+      },
+    ],
+  });
+
+  // Through the ordinary dispatch door (the Assignment carries the engine's
+  // own stamp, for `research:deep`).
+  await dispatchResearch('coord_vw_sibling_prefix', ctx, 'research:deep', 'researcher-a');
+  assert.equal(windowState('coord_vw_sibling_prefix', ctx).open, false);
+
+  // And through the raw store door, under the hardest claim key of all: one
+  // that is EXACTLY what source `research`'s own engine-derived key would
+  // look like (`declared:research` + the real `:round-<n>` discriminator).
+  // It cross-satisfies nothing, because the window source does not read claim
+  // keys from any door -- only the reserved stamp, which this Assignment does
+  // not carry.
+  completeThroughRawStoreDoor('coord_vw_sibling_prefix', ctx, {
+    taskKey: 'declared:research:round-2',
+    actorId: 'researcher-a',
+    objective: 'A deeper pass, still not "research".',
+  });
+
+  const { open, sources } = windowState('coord_vw_sibling_prefix', ctx);
+  assert.equal(open, false, 'the window must stay closed -- operation "research" was never dispatched');
+  assert.equal(sources.find((s) => s.operationRef === 'research').reason, 'missing');
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_sibling_prefix', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /is not open/.test(err.message),
+  );
+});
+
+// ─── Fix Round 3: only a stamped declared operation counts ────────────────
+//
+// `dispatchDeclaredOperation` is the one door that materializes a declared
+// operation, and the one caller that writes the reserved stamp. Every OTHER
+// mediated door in `session-engine.mjs` builds its contract through the same
+// guarded constructor WITHOUT a stamp, so its Assignments satisfy no window
+// source at all -- by construction, not because each door was found and
+// patched. `dispatchPrimaryTask` is the door that proved this matters: it is
+// exported, reachable from the CLI request file, and honours a caller-chosen
+// `taskKey`.
+
+test('a mediated door that does not stamp (dispatchPrimaryTask) cannot satisfy a window source, even under the source operation\'s own claim key and actor', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_primary_door');
+  await dispatchResearch('coord_vw_primary_door', ctx, 'research-b', 'researcher-b');
+
+  // research-a is NEVER dispatched. Instead the source actor is replaced by
+  // one named `primary` -- `replaceSessionActor` deliberately does not require
+  // the replacement to be a declared `spec.actors` member, and
+  // `resolveBindingOutcome` follows that lineage -- which makes the stock
+  // fixture reach `dispatchPrimaryTask`'s own actor with no naming
+  // precondition on the protocol at all.
+  replaceSessionActor(
+    'coord_vw_primary_door',
+    { oldActorId: 'researcher-a', newActorId: PRIMARY_ACTOR_ID, reason: 'Reassigning before research-a ever started.' },
+    ctx.opts,
+  );
+
+  const primary = await dispatchPrimaryTask(
+    'coord_vw_primary_door',
+    {
+      taskKey: 'declared:research-a',
+      objective: 'Anything at all, claimed under research-a\'s own key.',
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      evidenceRequired: 'reported',
+      writerId: 'coordinator-1',
+    },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+  assert.equal(primary.runResult.status, 'done', 'the primary task itself really did succeed');
+  const stored = JSON.parse(
+    fs.readFileSync(path.join(ctx.tempDir, '.fgos', 'assignments', primary.assignment.assignmentId, 'assignment.json'), 'utf8'),
+  );
+  assert.ok(
+    !stored.provenance.inline.contract.constraints.some((c) => c.startsWith('protocol-operation:')),
+    'dispatchPrimaryTask must not write an operation stamp -- it does not materialize a declared operation',
+  );
+
+  const { open, sources } = windowState('coord_vw_primary_door', ctx);
+  assert.equal(open, false, 'the window must stay closed -- research-a was never performed');
+  const researchA = sources.find((s) => s.operationRef === 'research-a');
+  assert.equal(researchA.satisfied, false);
+  assert.equal(researchA.reason, 'missing');
+  assert.equal(researchA.actorId, PRIMARY_ACTOR_ID, 'the lineage is still followed -- it is the WORK that fails to qualify');
+
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_primary_door', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /visibility window "post-research-window"/.test(err.message) && /is not open/.test(err.message),
+    'no authorization may be issued for the window-gated operation',
+  );
+  assert.equal(
+    readSessionEvents('coord_vw_primary_door', ctx.opts).filter((e) => e.type === 'operation-authorized').length,
+    0,
+  );
+});
+
+// ─── Fix Round 4: the guard must inspect the value that actually persists ──
+//
+// The reserved-namespace guard is only worth what it inspects. Reading the
+// caller's own container twice -- once to check, once to store -- let a
+// container that answers differently on each read pass the guard clean and
+// still land the stamp on disk. These three shapes are the ones that were
+// live-reproduced; each must now leave the window CLOSED.
+
+const FORGED_STAMP = `protocol-operation:${VISIBILITY_DEFINITION_ID}@1.0.0#research-a`;
+
+// Each returns an `Array.isArray`-true container whose FIRST read yields the
+// benign value and every later read the forged stamp.
+const twoFacedContainers = {
+  'accessor property on a plain array': () => {
+    let reads = 0;
+    const arr = ['benign'];
+    Object.defineProperty(arr, '0', {
+      enumerable: true,
+      configurable: true,
+      get() {
+        reads += 1;
+        return reads === 1 ? 'benign' : FORGED_STAMP;
+      },
+    });
+    return arr;
+  },
+  'Array subclass with a lying Symbol.iterator': () => {
+    class TwoFaced extends Array {}
+    const arr = TwoFaced.from([FORGED_STAMP]);
+    let reads = 0;
+    Object.defineProperty(arr, Symbol.iterator, {
+      configurable: true,
+      value() {
+        reads += 1;
+        const view = reads === 1 ? ['benign'] : [FORGED_STAMP];
+        return view[Symbol.iterator]();
+      },
+    });
+    return arr;
+  },
+  'Proxy intercepting the first Symbol.iterator read': () => {
+    let reads = 0;
+    return new Proxy([FORGED_STAMP], {
+      get(target, prop, receiver) {
+        if (prop === Symbol.iterator) {
+          reads += 1;
+          const view = reads === 1 ? ['benign'] : [FORGED_STAMP];
+          return view[Symbol.iterator].bind(view);
+        }
+        return Reflect.get(target, prop, receiver);
+      },
+    });
+  },
+};
+
+function storedConstraints(ctx, assignmentId) {
+  const stored = JSON.parse(
+    fs.readFileSync(path.join(ctx.tempDir, '.fgos', 'assignments', assignmentId, 'assignment.json'), 'utf8'),
+  );
+  return stored.provenance.inline.contract.constraints;
+}
+
+for (const [shape, makeContainer] of Object.entries(twoFacedContainers)) {
+  test(`a constraints container that answers differently on each read (${shape}) cannot smuggle the reserved stamp past the guard`, async () => {
+    const coordinationId = `coord_vw_toctou_${shape.replace(/\W+/g, '_').toLowerCase()}`;
+    const ctx = setupVisibilityWindow(coordinationId);
+    await dispatchResearch(coordinationId, ctx, 'research-b', 'researcher-b');
+
+    // research-a is NEVER dispatched; the source actor is replaced by one
+    // named `primary` so an ordinary unstamped door is reachable on the
+    // stock fixture (the RT-H2 shape).
+    replaceSessionActor(
+      coordinationId,
+      { oldActorId: 'researcher-a', newActorId: PRIMARY_ACTOR_ID, reason: 'Reassigning before research-a ever started.' },
+      ctx.opts,
+    );
+
+    let refused = null;
+    let assignmentId = null;
+    try {
+      const primary = await dispatchPrimaryTask(
+        coordinationId,
+        {
+          taskKey: 'totally-unrelated',
+          objective: 'File the quarterly expense report.',
+          constraints: makeContainer(),
+          expectedOutputs: ['agent-result.json (status, summary)'],
+          evidenceRequired: 'reported',
+          writerId: 'coordinator-1',
+        },
+        { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+      );
+      assignmentId = primary.assignment.assignmentId;
+    } catch (err) {
+      refused = err;
+    }
+
+    // Either outcome is safe, and which one occurs depends only on what the
+    // container returns on its single read: refused outright, or persisted
+    // without the forged stamp. What must never happen is the stamp reaching
+    // disk.
+    if (!refused) {
+      assert.ok(
+        !storedConstraints(ctx, assignmentId).includes(FORGED_STAMP),
+        'the forged stamp must never be persisted',
+      );
+    }
+
+    const { open, sources } = windowState(coordinationId, ctx);
+    assert.equal(open, false, 'the window must stay closed -- research-a was never performed');
+    assert.equal(sources.find((s) => s.operationRef === 'research-a').reason, 'missing');
+    assert.throws(
+      () => authorizeDeclaredOperation(coordinationId, synthesizeAuthorization(), ctx.opts),
+      (err) => err instanceof CoordinationError && /is not open/.test(err.message),
+    );
+    assert.equal(readSessionEvents(coordinationId, ctx.opts).filter((e) => e.type === 'operation-authorized').length, 0);
+  });
+}
+
+test('a two-faced constraints container cannot smuggle a foreign operation stamp through dispatchDeclaredOperation either', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_toctou_declared', MULTIOP_FIXTURE);
+  await dispatchResearch('coord_vw_toctou_declared', ctx, 'research-b', 'researcher-b');
+
+  // Dispatch the UNRELATED noise-op, smuggling research-a's stamp alongside
+  // the engine's own -- the state the reserved namespace exists to prevent.
+  const noise = await dispatchDeclaredOperation(
+    'coord_vw_toctou_declared',
+    {
+      operationId: 'noise-op',
+      targetActorId: 'researcher-a',
+      constraints: twoFacedContainers['accessor property on a plain array'](),
+      objective: 'Noise, smuggling research-a\'s stamp.',
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      writerId: 'coordinator-1',
+    },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+
+  const persisted = storedConstraints(ctx, noise.assignment.assignmentId);
+  assert.ok(!persisted.includes(FORGED_STAMP), 'no foreign operation stamp may sit beside the engine\'s own');
+  assert.ok(
+    persisted.includes(`protocol-operation:${VISIBILITY_DEFINITION_ID}@1.0.0#noise-op`),
+    'the engine\'s own stamp for the operation actually performed must still be written',
+  );
+
+  assert.equal(windowState('coord_vw_toctou_declared', ctx).open, false);
+  assert.throws(
+    () => authorizeDeclaredOperation('coord_vw_toctou_declared', synthesizeAuthorization(), ctx.opts),
+    (err) => err instanceof CoordinationError && /is not open/.test(err.message),
+  );
+});
+
+test('a declared dispatch refuses to resume an Assignment squatting its claim key without this operation\'s stamp, instead of silently reporting success', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_claim_squat');
+  await dispatchResearch('coord_vw_claim_squat', ctx, 'research-b', 'researcher-b');
+  replaceSessionActor(
+    'coord_vw_claim_squat',
+    { oldActorId: 'researcher-a', newActorId: PRIMARY_ACTOR_ID, reason: 'Reassigning before research-a ever started.' },
+    ctx.opts,
+  );
+
+  // An unstamped door seizes research-a's own default claim key.
+  await dispatchPrimaryTask(
+    'coord_vw_claim_squat',
+    {
+      taskKey: 'declared:research-a',
+      objective: 'Squat the claim slot.',
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      evidenceRequired: 'reported',
+      writerId: 'coordinator-1',
+    },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+
+  // The legitimate declared dispatch must NOT quietly resume that Assignment
+  // and report success -- doing so would leave the window permanently shut
+  // with nothing naming the cause.
+  await assert.rejects(
+    dispatchResearch('coord_vw_claim_squat', ctx, 'research-a', 'researcher-a'),
+    (err) =>
+      err instanceof CoordinationError &&
+      /already resolves to Assignment/.test(err.message) &&
+      /carries no "protocol-operation:/.test(err.message) &&
+      /permanently unperformed/.test(err.message),
+  );
+
+  assert.equal(windowState('coord_vw_claim_squat', ctx).open, false);
+});
+
+test('a driver-authorized operation used AS a window source is stamp-anchored exactly like a required one', async () => {
+  const ctx = setupVisibilityWindow('coord_vw_driver_authorized_source', {
+    sourceNodes: [
+      {
+        id: 'phase-research',
+        operations: [
+          { ref: 'research-a', actor: 'researcher-a', activation: { mode: 'driver-authorized' } },
+          { ref: 'research-b', actor: 'researcher-b' },
+        ],
+        transitions: ['phase-synthesize'],
+      },
+    ],
+  });
+  await dispatchResearch('coord_vw_driver_authorized_source', ctx, 'research-b', 'researcher-b');
+
+  // Authorizing the source is not performing it.
+  authorizeDeclaredOperation(
+    'coord_vw_driver_authorized_source',
+    synthesizeAuthorization({
+      operationId: 'research-a',
+      targetActorId: 'researcher-a',
+      authorizationId: 'auth_research_a',
+      invocationKey: 'research-a:1',
+      reason: 'Authorize the driver-gated research pass.',
+    }),
+    ctx.opts,
+  );
+  assert.equal(windowState('coord_vw_driver_authorized_source', ctx).open, false, 'an authorization alone is not work');
+
+  const dispatched = await dispatchResearch('coord_vw_driver_authorized_source', ctx, 'research-a', 'researcher-a');
+  assert.ok(
+    storedConstraints(ctx, dispatched.assignment.assignmentId).includes(
+      `protocol-operation:${VISIBILITY_DEFINITION_ID}@1.0.0#research-a`,
+    ),
+    'the stamp is written on the common path, before the activation-mode branch',
+  );
+
+  assert.equal(windowState('coord_vw_driver_authorized_source', ctx).open, true, 'no false negative for this shape');
+  authorizeDeclaredOperation('coord_vw_driver_authorized_source', synthesizeAuthorization(), ctx.opts);
 });

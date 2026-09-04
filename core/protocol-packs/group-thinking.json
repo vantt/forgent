@@ -1,0 +1,12 @@
+{
+  "apiVersion": "fgos.dev/v1alpha1",
+  "kind": "ProtocolPack",
+  "metadata": {
+    "id": "group-thinking"
+  },
+  "members": [
+    { "id": "core.coordination-protocol.group-thinking-rfc-review-lite", "version": "1.0.0" },
+    { "id": "core.coordination-protocol.group-thinking-nominal-group-lite", "version": "1.0.0" },
+    { "id": "core.coordination-protocol.group-thinking-delphi-feedback-lite", "version": "1.0.0" }
+  ]
+}

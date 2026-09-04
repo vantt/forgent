@@ -219,6 +219,30 @@ function dispositionStep(overrides = {}) {
   };
 }
 
+// P10.10 (Promotion And Closeout): the fifth step kind, reaching
+// `linkSessionContribution`. This fixture's own operations declare no
+// `contributions.allowedTypes`/`contextAccess.visibilityWindowRef`, so an
+// end-to-end dispatch through THIS fixture is out of scope here (would only
+// re-derive `linkSessionContribution`'s own already-proven engine-level
+// checks) -- the real end-to-end proof, against a real
+// contributions/window-declaring protocol, is
+// test/verbs/coordination-group-thinking-rfc-review-lite-pack-conformance.test.mjs's
+// own dedicated P10.10 test. What is proven HERE, matching this file's own
+// established split (see this file's header comment), is that the request
+// boundary shapes/rejects a "contribution" step correctly before it ever
+// reaches the engine.
+function contributionStep(overrides = {}) {
+  return {
+    type: 'contribution',
+    as: 'link-review',
+    contributionId: 'contrib_review_1',
+    contributionType: 'proposal',
+    assignmentId: '$ref:produce',
+    roundKey: 'round-1',
+    ...overrides,
+  };
+}
+
 function eventsOfType(tempDir, coordinationId, type) {
   return readSessionEvents(coordinationId, { cwd: tempDir, repoRoot: tempDir }).filter((event) => event.type === type);
 }
@@ -285,11 +309,80 @@ test('validateCoordinationRequest: a "disposition" step missing targetRef/dispos
   }
 });
 
-test('validateCoordinationRequest: the unknown-step-type message names all four supported types', () => {
+test('validateCoordinationRequest: the unknown-step-type message names all five supported types', () => {
   assert.throws(
     () => validateCoordinationRequest(request({ steps: [{ type: 'authorise', as: 'typo' }] })),
-    (err) => err instanceof StoreError && /steps\[0\]\.type must be "operation", "fan-out", "authorize", or "disposition"/.test(err.message),
+    (err) => err instanceof StoreError && /steps\[0\]\.type must be "operation", "fan-out", "authorize", "disposition", or "contribution"/.test(err.message),
   );
+});
+
+test('validateCoordinationRequest: a "contribution" step may not declare linkedBy -- driver provenance comes from the request\'s own writerId', () => {
+  assert.throws(
+    () => validateCoordinationRequest(request({ steps: [produceStep(), contributionStep({ linkedBy: { type: 'driver', id: 'someone-else' } })] })),
+    (err) => err instanceof StoreError && /declares "linkedBy"/.test(err.message) && /driver provenance is pinned to the session's own top-level "writerId"/.test(err.message),
+  );
+});
+
+test('validateCoordinationRequest: an unknown field on a "contribution" step is rejected', () => {
+  assert.throws(
+    () => validateCoordinationRequest(request({ steps: [produceStep(), contributionStep({ linkedByOverride: 'nope' }) ] })),
+    (err) => err instanceof StoreError && /unknown field "linkedByOverride" in steps\[1\] \(type "contribution"\)/.test(err.message),
+  );
+});
+
+test('validateCoordinationRequest: a "contribution" step missing contributionId/assignmentId/roundKey is rejected, one message each', () => {
+  for (const [field, pattern] of [
+    ['contributionId', /steps\[1\]\.contributionId must be a non-empty string/],
+    ['assignmentId', /steps\[1\]\.assignmentId must be a non-empty string/],
+    ['roundKey', /steps\[1\]\.roundKey is required/],
+  ]) {
+    const step = contributionStep();
+    delete step[field];
+    assert.throws(
+      () => validateCoordinationRequest(request({ steps: [produceStep(), step] })),
+      (err) => err instanceof StoreError && pattern.test(err.message),
+      `expected a dedicated refusal for a missing ${field}`,
+    );
+  }
+});
+
+test('validateCoordinationRequest: a "contribution" step\'s contributionType must be one of the closed MVP8 contribution types', () => {
+  assert.throws(
+    () => validateCoordinationRequest(request({ steps: [produceStep(), contributionStep({ contributionType: 'comment' })] })),
+    (err) => err instanceof StoreError && /contributionType must be one of the closed MVP8 contribution types/.test(err.message),
+  );
+  assert.throws(
+    () => validateCoordinationRequest(request({ steps: [produceStep(), (() => { const s = contributionStep(); delete s.contributionType; return s; })()] })),
+    (err) => err instanceof StoreError && /contributionType must be one of the closed MVP8 contribution types/.test(err.message),
+  );
+});
+
+test('validateCoordinationRequest: a path-escaping contributionId is rejected', () => {
+  assert.throws(
+    () => validateCoordinationRequest(request({ steps: [produceStep(), contributionStep({ contributionId: '../../evil' })] })),
+    (err) => err instanceof StoreError && /steps\[1\]\.contributionId .* path escape rejected/s.test(err.message),
+  );
+});
+
+test('validateCoordinationRequest: a well-formed "contribution" step normalizes to exactly the engine-call fields, anchors/respondsTo included', () => {
+  const normalized = validateCoordinationRequest(
+    request({ steps: [produceStep(), contributionStep({ anchors: ['contrib_prior_1'], respondsTo: 'contrib_prior_1' })] }),
+  );
+  assert.deepEqual(normalized.steps[1], {
+    type: 'contribution',
+    as: 'link-review',
+    contributionId: 'contrib_review_1',
+    contributionType: 'proposal',
+    assignmentId: '$ref:produce',
+    roundKey: 'round-1',
+    anchors: ['contrib_prior_1'],
+    respondsTo: 'contrib_prior_1',
+  });
+});
+
+test('validateCoordinationRequest: a "contribution" step\'s empty anchors array normalizes to undefined (P10.10 Fix Round 1, L1 -- so "anchors: []" and an omitted anchors key produce byte-identical downstream behavior, preserving the idempotent-repeat path)', () => {
+  const normalized = validateCoordinationRequest(request({ steps: [produceStep(), contributionStep({ anchors: [] })] }));
+  assert.strictEqual(normalized.steps[1].anchors, undefined);
 });
 
 test('validateCoordinationRequest: the Work-lifecycle deep scan still catches a smuggled key inside an authorize step', () => {

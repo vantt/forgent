@@ -20,12 +20,15 @@
 //   - a disposition's targetRef/evidenceRefs carry no session-scope check
 //     in `replaySession` itself, and a post-terminal disposition reads
 //     indistinguishably from a legitimate one. `isRefOwnedBySession`
-//     below is a boolean-returning, byte-for-byte mirror of store.mjs's
+//     below is a boolean-returning, rule-for-rule mirror of store.mjs's
 //     own (unexported, write-time) `assertDispositionRefOwnedBySession` --
 //     duplicated rather than imported because store.mjs sits below this
 //     module in the import graph and is on this cell's Do Not Touch list;
 //     the SAME segment/asgn_-prefix logic is reused, not reinvented, so
-//     this stays a mirror rather than a second, divergent policy.
+//     this stays a mirror rather than a second, divergent policy. Every
+//     rule the write door gains has to be mirrored here in the same
+//     commit, or the two silently disagree about a ref shape only one of
+//     them recognizes (MVP8's `contribution:` namespace is one such).
 // `postTerminal` marking mirrors the SAME "neutralize, don't hide"
 // posture replay.mjs already applies to authorizations
 // (`ignoredAuthorizations`) -- replay.mjs does not apply it to
@@ -34,7 +37,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { StoreError } from '../../state/store.mjs';
-import { CoordinationError } from '../../runner/coordination/schema.mjs';
+import { CoordinationError, CONTRIBUTION_REF_PREFIX } from '../../runner/coordination/schema.mjs';
 import { evaluateSessionQuorum, deriveSessionPhase } from '../../runner/coordination/session-engine.mjs';
 import { readManifest, readSessionEvents, resolveSessionPaths } from '../../runner/coordination/store.mjs';
 import { replaySession } from '../../runner/coordination/replay.mjs';
@@ -46,11 +49,23 @@ import { loadCoordinationProtocol } from '../../runner/definitions/protocol-load
 // Do-Not-Touch/no-export reason documented above.
 const TERMINAL_EVENT_TYPES = new Set(['session-completed', 'session-partial', 'session-failed', 'session-cancelled']);
 
-// Byte-for-byte mirror of store.mjs's private `assertDispositionRefOwnedBySession`,
+// Rule-for-rule mirror of store.mjs's private `assertDispositionRefOwnedBySession`,
 // as a boolean check instead of a throw: a render-time gate must not take
 // down the whole `show` command over one bad ref, it must mark it.
-function isRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir }) {
+function isRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, contributionIds = new Set() }) {
   if (typeof ref !== 'string') return false;
+  // Phase 08 (MVP8): a ref in the reserved `contribution:` namespace names a
+  // deliberation contribution, which has no `.fgos/` directory for the segment
+  // scan below to resolve. It is owned iff THIS session's own log linked it --
+  // the same question the write door asks, mirrored here so the two cannot
+  // disagree about a ref shape only one of them recognizes.
+  if (ref.startsWith(CONTRIBUTION_REF_PREFIX)) {
+    return contributionIds.has(ref.slice(CONTRIBUTION_REF_PREFIX.length));
+  }
+  // A BARE id of one of this session's own contributions targets nothing; the
+  // write door refuses that near-miss outright, so the mirror must not render
+  // it as an owned ref.
+  if (contributionIds.has(ref)) return false;
   for (const segment of ref.split(/[\\/]/).filter(Boolean)) {
     if (segment !== coordinationId && fs.existsSync(path.join(fgosDir, 'coordination', 'sessions', segment, 'session.json'))) {
       return false;
@@ -78,6 +93,60 @@ function collectDriverAuthorizedBindings(definition) {
     }
   }
   return bindings;
+}
+
+// Phase 07 (MVP7): one validated cognitive aggregation, rendered whole.
+//
+// Every field the `aggregation-validated` event can carry is present on the
+// rendered record, always. An optional list the event omitted renders as `[]`
+// and an optional scalar as `null` -- never dropped from the object -- so a
+// reader can never mistake "this aggregation named no dissent" for "dissent
+// exists but `show` does not surface it". That distinction is the whole point
+// of an evidence-preserving method: the gaps are the record.
+function renderAggregation(record) {
+  return {
+    aggregationId: record.aggregationId,
+    method: record.method,
+    outcome: record.outcome,
+    // Sources, and the immutability pin each one was validated against.
+    sourceResultRefs: [...record.sourceResultRefs],
+    artifactRevisionRefs: [...(record.artifactRevisionRefs ?? [])],
+    // Dissent and unresolved contributions.
+    dissentRefs: [...(record.dissentRefs ?? [])],
+    unresolvedContributionRefs: [...(record.unresolvedContributionRefs ?? [])],
+    // Failures and omissions: who never answered, who failed, and which
+    // declared source operation had no binding to answer it at all.
+    missingActors: [...(record.missingActors ?? [])],
+    failedActors: [...(record.failedActors ?? [])],
+    unboundSourceOperationRefs: [...(record.unboundSourceOperationRefs ?? [])],
+    // The aggregate's own output.
+    assignmentId: record.assignmentId ?? null,
+    runId: record.runId ?? null,
+    outputArtifactRef: record.outputArtifactRef ?? null,
+    validatedBy: record.validatedBy,
+    ts: record.ts,
+  };
+}
+
+// Phase 09 (MVP9): render one `specialist-authorized` record -- the same
+// shape `replaySession`'s own `specialistAuthorizations`/
+// `ignoredSpecialistAuthorizations` entries carry, so a caller of `show`
+// never has to reconstruct it from raw events.
+function renderSpecialistAuthorization(record) {
+  return {
+    specialistAuthorizationId: record.specialistAuthorizationId,
+    slotId: record.slotId,
+    specialistActorId: record.specialistActorId,
+    role: record.role,
+    capabilities: [...record.capabilities],
+    reason: record.reason,
+    triggerEvidenceRefs: [...record.triggerEvidenceRefs],
+    allowedContextRefs: [...record.allowedContextRefs],
+    maxAssignments: record.maxAssignments,
+    expiresAfterRound: record.expiresAfterRound,
+    authorizedBy: record.authorizedBy,
+    ts: record.ts,
+  };
 }
 
 /**
@@ -125,6 +194,10 @@ export function showCoordinationUseCase(ctx, { id }) {
   let ignoredAuthorizations = null;
   let dispositions = null;
   let pendingDriverAuthorizations = null;
+  let aggregations = null;
+  let ignoredAggregations = null;
+  let specialistAuthorizations = null;
+  let ignoredSpecialistAuthorizations = null;
 
   if (coordinationState) {
     authorizations = coordinationState.authorizations.map((a) => ({
@@ -145,8 +218,30 @@ export function showCoordinationUseCase(ctx, { id }) {
       targetActorId: a.targetActorId,
     }));
 
+    // Post-terminal aggregations are reported separately rather than hidden,
+    // the SAME "neutralize, don't hide" posture replay.mjs already applies to
+    // authorizations: a driver must be able to see that an aggregation they
+    // validated arrived after the session had already closed, and therefore
+    // informed nothing.
+    aggregations = coordinationState.aggregations.map(renderAggregation);
+    ignoredAggregations = coordinationState.ignoredAggregations.map(renderAggregation);
+
+    // Phase 09 (MVP9): specialist-slot bindings, rendered the same way
+    // authorizations are -- a driver must be able to see WHO is currently
+    // bound to a slot and why a post-terminal authorization never took
+    // effect, without opening events.jsonl by hand.
+    specialistAuthorizations = coordinationState.specialistAuthorizations.map(renderSpecialistAuthorization);
+    ignoredSpecialistAuthorizations = coordinationState.ignoredSpecialistAuthorizations.map(renderSpecialistAuthorization);
+
     const { fgosDir } = resolveSessionPaths(id, engineOpts);
-    const refOwnedOpts = { coordinationId: id, assignmentRefs: coordinationState.assignmentRefs, fgosDir };
+    const refOwnedOpts = {
+      coordinationId: id,
+      assignmentRefs: coordinationState.assignmentRefs,
+      fgosDir,
+      // Only the contributions replay ACCEPTED count -- a post-terminal one
+      // (`ignoredContributions`) informed nothing and owns no ref.
+      contributionIds: new Set(coordinationState.contributions.map((record) => record.contributionId)),
+    };
     let terminalSeen = false;
     dispositions = [];
     for (const event of coordinationState.events) {
@@ -208,6 +303,10 @@ export function showCoordinationUseCase(ctx, { id }) {
     ignoredAuthorizations,
     dispositions,
     pendingDriverAuthorizations,
+    aggregations,
+    ignoredAggregations,
+    specialistAuthorizations,
+    ignoredSpecialistAuthorizations,
     ...(coordinationStateError !== null ? { coordinationStateError } : {}),
   };
 }

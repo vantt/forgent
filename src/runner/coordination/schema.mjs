@@ -8,6 +8,16 @@
 // up (session, not Assignment). Fails closed (throws CoordinationError) on
 // anything outside the contract's exact field table.
 
+// The closed MVP8 contribution-type enum is IMPORTED, never duplicated the way
+// `AGGREGATION_METHOD_VALUES` below is duplicated from `definitions/schema.mjs`.
+// The two cases differ: `definitions/` is a layer this module deliberately does
+// not depend on, whereas `deliberation/schema.mjs` is a pure, dependency-free
+// data module (it imports nothing at all, including nothing from here), so the
+// edge is one-way and adds no layering. A second copy of a closed enum is a
+// drift surface, and this one is the enum two independent validators
+// (`validateContributionLineage` and this event's payload check) must agree on.
+import { CONTRIBUTION_TYPES } from '../deliberation/schema.mjs';
+
 export const SCHEMA_VERSION = '1';
 
 export const STATUS_VALUES = new Set(['active', 'completed', 'partial', 'failed', 'cancelled']);
@@ -329,6 +339,134 @@ const EVENT_SPECS = {
   // event log itself (`run-retried`/`actor-replaced`), these are just a
   // durable, at-a-glance final-state snapshot on the terminal event.
   'session-partial': { required: ['missingActors'], accepted: ['missingActors', 'failedActors', 'lateActors', 'replacedActors', 'dissentingActors'] },
+  // Phase 07 (Step 09 MVP7): a cognitive aggregation was VALIDATED against
+  // this session's own evidence. Deliberately NOT a terminal event and not a
+  // status: it is terminal INPUT. `session-engine.mjs` keeps sole terminal-
+  // transition authority; a validated aggregation can only ever REFUSE a
+  // close, never cause one (`closeSessionByQuorum`'s optional `aggregationId`).
+  //
+  // `validatedBy` carries the SAME `{type: "driver", id}` shape
+  // `operation-authorized`/`driver-disposition-recorded` use, pinned by
+  // store.mjs's shared `assertDriverIdentity` to the session's own
+  // `provenanceRoot.writerId`. That is what makes a validated aggregate
+  // driver-authored ledger state rather than something a worker's own
+  // RunResult could assert about itself.
+  'aggregation-validated': {
+    required: ['aggregationId', 'method', 'outcome', 'sourceResultRefs', 'validatedBy'],
+    accepted: [
+      'aggregationId',
+      'method',
+      'outcome',
+      'sourceResultRefs',
+      'validatedBy',
+      'assignmentId',
+      'runId',
+      'outputArtifactRef',
+      'dissentRefs',
+      'unresolvedContributionRefs',
+      'missingActors',
+      'failedActors',
+      'artifactRevisionRefs',
+      'unboundSourceOperationRefs',
+    ],
+  },
+  // Phase 08 (Step 09 MVP8): one typed deliberation contribution was LINKED
+  // into this session's ledger. A link, never a message: it carries the
+  // artifact's `artifactRef` + `revision` PIN and nothing of the artifact's
+  // own content, the same discipline `aggregation-validated`'s
+  // `artifactRevisionRefs` already follows.
+  //
+  // Two fields from the P08.1 contribution shape are deliberately absent:
+  // - `sessionId` -- a FORBIDDEN_FIELD_NAMES entry (ADR-008 Decision 5),
+  //   rejected at any nesting depth in any payload. The session identity of a
+  //   contribution is the log it lives in; the doors reconstruct it from
+  //   `coordinationId` rather than trusting a field a caller could set.
+  // - `ts` -- `state/events.mjs` stamps every event's timestamp on the
+  //   envelope, so no kind in this table carries one as a payload field. The
+  //   Candidate Contract's "timestamp" is that envelope stamp, projected back
+  //   onto the record by `replay.mjs` exactly as it is for every other kind.
+  //
+  // `linkedBy` carries the same `{type: "driver", id}` shape
+  // `operation-authorized`/`driver-disposition-recorded`/`aggregation-validated`
+  // use, pinned by store.mjs's shared `assertDriverIdentity`: linking a
+  // contribution is ledger state the session's driver writes, never something a
+  // worker's own RunResult asserts about itself.
+  'deliberation-contribution-linked': {
+    required: [
+      'contributionId',
+      'operationRef',
+      'type',
+      'assignmentId',
+      'runId',
+      'artifactRef',
+      'revision',
+      'roundKey',
+      'visibilityWindowRef',
+      'linkedBy',
+    ],
+    accepted: [
+      'contributionId',
+      'operationRef',
+      'type',
+      'assignmentId',
+      'runId',
+      'artifactRef',
+      'revision',
+      'roundKey',
+      'visibilityWindowRef',
+      'linkedBy',
+      'anchors',
+      'respondsTo',
+    ],
+  },
+  // Phase 09 (Step 09 MVP9): a previously-unknown specialist actor identity
+  // is authorized to occupy a bounded `topology.specialistSlots[]` slot.
+  // Modeled closely on `operation-authorized`'s own shape (real
+  // authorization data, not content-free) rather than on
+  // `aggregation-validated`/`deliberation-contribution-linked`'s
+  // ref+revision-only shape -- this event carries the actual authorization
+  // (role, capabilities, caps), not a pointer to evidence recorded
+  // elsewhere.
+  //
+  // ONE event does BOTH "record authorization" AND "record the session-
+  // scoped actor binding" -- there is no separate `specialist-bound` event.
+  // The phase's own requirement ("atomically record authorization and
+  // session-scoped actor binding before any Assignment is issued") is met
+  // structurally: a single `appendEventLocked` call has no window between
+  // the two, because there are not two writes to have a window between.
+  //
+  // `capabilities`/`triggerEvidenceRefs`/`allowedContextRefs` MAY be empty
+  // (same "empty list is a legal, meaningful declaration" posture
+  // `grantedContextRefs`/`evidenceRefs` already take) -- see
+  // `EMPTY_ARRAY_ALLOWED_FIELDS` below.
+  'specialist-authorized': {
+    required: [
+      'specialistAuthorizationId',
+      'slotId',
+      'specialistActorId',
+      'role',
+      'capabilities',
+      'authorizedBy',
+      'reason',
+      'triggerEvidenceRefs',
+      'allowedContextRefs',
+      'maxAssignments',
+      'expiresAfterRound',
+    ],
+    accepted: [
+      'specialistAuthorizationId',
+      'slotId',
+      'specialistActorId',
+      'role',
+      'capabilities',
+      'authorizedBy',
+      'reason',
+      'triggerEvidenceRefs',
+      'allowedContextRefs',
+      'maxAssignments',
+      'expiresAfterRound',
+    ],
+  },
   'session-failed': { required: ['reason'], accepted: ['reason'] },
   // R4: cancellation "records in-flight outcomes" -- `inFlightAssignmentIds`
   // is a snapshot (assignment-created with no result-linked yet) taken at
@@ -353,6 +491,48 @@ const OPTIONAL_STRING_FIELDS = new Set(['actorId', 'operationId', 'nodeId', 'aut
 // `authorizationId` itself -- none of them is meaningful, or checkable, on an
 // Assignment that names no authorization (see validateEventPayload below).
 const DRIVER_PROVENANCE_COMPANION_FIELDS = ['operationId', 'nodeId', 'invocationKey', 'contextGrant'];
+
+// Phase 07 (MVP7). Duplicated from `src/runner/definitions/schema.mjs`'s own
+// `AGGREGATION_METHOD_VALUES` rather than imported: this module sits in the
+// coordination layer and imports nothing from `definitions/`, the same
+// self-contained-schema posture `src/runner/team-cognition/schema.mjs`
+// already took for the identical reason. One legal method in MVP7.
+export const AGGREGATION_METHOD_VALUES = Object.freeze(['evidence-preserving-synthesis']);
+export const AGGREGATION_OUTCOME_VALUES = Object.freeze(['consensus', 'qualified', 'no-consensus']);
+
+// `aggregation-validated`'s own optional fields. Kept local to this kind
+// rather than folded into OPTIONAL_STRING_ARRAY_FIELDS/OPTIONAL_STRING_FIELDS
+// above, so adding this event kind changes the validation path of no
+// existing kind at all (`missingActors` in particular is REQUIRED and
+// non-empty on `session-partial`, but merely optional here).
+const AGGREGATION_OPTIONAL_STRING_FIELDS = new Set(['assignmentId', 'runId', 'outputArtifactRef']);
+const AGGREGATION_OPTIONAL_ARRAY_FIELDS = new Set([
+  'dissentRefs',
+  'unresolvedContributionRefs',
+  'missingActors',
+  'artifactRevisionRefs',
+  // A declared source operation with no graph binding at all: nobody was ever
+  // wired to answer it, so there is no actor to name in missingActors and no
+  // Assignment to name in unresolvedContributionRefs. It gets its own field
+  // rather than falling through unexplained -- the operation still failed the
+  // evaluator's coverage check, and the event has to say which one and why.
+  'unboundSourceOperationRefs',
+]);
+
+// Phase 08 (MVP8): the reserved ref namespace that makes a
+// `driver-disposition-recorded.targetRef`/`evidenceRefs[]` entry name a
+// DELIBERATION CONTRIBUTION rather than an opaque artifact ref.
+//
+// It exists because a contribution id is pure ledger state -- unlike an
+// Assignment it has no `.fgos/` directory, so the segment-existence scan
+// `assertDispositionRefOwnedBySession` uses for `asgn_` refs has nothing to
+// resolve against and a bare contribution id would sail through unchecked.
+// Requiring an explicit namespace makes "does this ref name one of MY
+// contributions" a question with an answer: the suffix must be a contribution
+// this session's own log linked. A bare id keeps its existing meaning (an
+// opaque ref this codebase has no registry to resolve) and can never target a
+// contribution.
+export const CONTRIBUTION_REF_PREFIX = 'contribution:';
 
 const AUTHORIZED_BY_FIELDS = new Set(['type', 'id']);
 const CONTEXT_GRANT_FIELDS = new Set(['refs']);
@@ -407,16 +587,51 @@ export function validateEventPayload(type, payload) {
       if (!isPlainObject(value)) fail('validation', `event "${type}" payload.provenanceRoot must be a non-null object`);
       continue;
     }
-    if (field === 'authorizedBy') {
-      validateAuthorizedBy(value, `event "${type}" payload.authorizedBy`);
+    if (field === 'authorizedBy' || field === 'validatedBy' || field === 'linkedBy') {
+      // `validatedBy`/`linkedBy` are the same driver-provenance shape under a
+      // name that says what the driver did (validated an aggregation, linked a
+      // contribution, rather than authorized an operation) -- one validator,
+      // never a second copy.
+      validateAuthorizedBy(value, `event "${type}" payload.${field}`);
       continue;
     }
-    if (field === 'grantedContextRefs' || field === 'evidenceRefs') {
-      // An EMPTY array is legal and meaningful: the authorization grants no
-      // extra refs beyond the Assignment's own always-legal base context,
-      // and a disposition may rest on the target ref alone.
+    if (field === 'sourceResultRefs') {
+      // Shape only here. Emptiness is legal in exactly one case, enforced in
+      // the `aggregation-validated` block below: a `no-consensus` that names
+      // the gap it found. Anything else with zero sources is an aggregate
+      // asserting itself with no evidence behind it.
+      if (!isStringArray(value)) {
+        fail('validation', `event "${type}" payload.sourceResultRefs must be an array of non-empty strings`);
+      }
+      continue;
+    }
+    if (
+      field === 'grantedContextRefs' ||
+      field === 'evidenceRefs' ||
+      field === 'capabilities' ||
+      field === 'triggerEvidenceRefs' ||
+      field === 'allowedContextRefs'
+    ) {
+      // An EMPTY array is legal and meaningful in every one of these: the
+      // authorization grants no extra refs beyond the Assignment's own
+      // always-legal base context, a disposition may rest on the target ref
+      // alone, and a specialist authorization may declare no extra
+      // capabilities/trigger evidence/context beyond its bare role (P09.1's
+      // own "empty gate list means no gate on that dimension" reading,
+      // carried over to the authorization that fills a slot).
       if (!isStringArray(value)) {
         fail('validation', `event "${type}" payload.${field} must be an array of non-empty strings`);
+      }
+      continue;
+    }
+    if (field === 'maxAssignments' || field === 'expiresAfterRound') {
+      // Positive integers, not strings -- the SAME shape `isPositiveInteger`
+      // already enforces for `specialistSlots[].maxAssignments` in
+      // `definitions/schema.mjs`, checked again here because this module is
+      // the pure kernel that is the actual gate a hand-written log passes
+      // through.
+      if (!isPositiveInteger(value)) {
+        fail('validation', `event "${type}" payload.${field} must be a positive integer`);
       }
       continue;
     }
@@ -466,6 +681,86 @@ export function validateEventPayload(type, payload) {
         'validation',
         `event "assignment-created" payload carries driver-authorization provenance (${orphaned.join(', ')}) without "authorizationId" -- these fields travel together or not at all`,
       );
+    }
+  }
+  if (type === 'aggregation-validated') {
+    if (!AGGREGATION_METHOD_VALUES.includes(body.method)) {
+      fail('validation', `event "aggregation-validated" payload.method must be one of ${AGGREGATION_METHOD_VALUES.join(', ')}`);
+    }
+    if (!AGGREGATION_OUTCOME_VALUES.includes(body.outcome)) {
+      fail('validation', `event "aggregation-validated" payload.outcome must be one of ${AGGREGATION_OUTCOME_VALUES.join(', ')}`);
+    }
+    for (const field of AGGREGATION_OPTIONAL_STRING_FIELDS) {
+      if (body[field] !== undefined && !isNonEmptyString(body[field])) {
+        fail('validation', `event "aggregation-validated" payload.${field} must be a non-empty string when provided`);
+      }
+    }
+    for (const field of AGGREGATION_OPTIONAL_ARRAY_FIELDS) {
+      if (body[field] !== undefined && !isStringArray(body[field])) {
+        fail('validation', `event "aggregation-validated" payload.${field} must be an array of non-empty strings when provided`);
+      }
+    }
+    // Zero source results is honest ONLY as a `no-consensus` that names why
+    // no source survived. A cohort where every contributor is missing or
+    // failed still has to leave a record saying so -- "named, never dropped"
+    // must not degrade into "nothing was written at all" just because the
+    // protocol declared a single source operation. Any other outcome, or a
+    // `no-consensus` naming no gap, remains evidence-free truth and is
+    // refused, on both the write path and the replay read path.
+    if (body.sourceResultRefs.length === 0) {
+      const named = ['missingActors', 'failedActors', 'unresolvedContributionRefs', 'unboundSourceOperationRefs'].some(
+        (field) => (body[field] ?? []).length > 0,
+      );
+      if (body.outcome !== 'no-consensus' || !named) {
+        fail(
+          'validation',
+          `event "aggregation-validated" payload.sourceResultRefs is empty -- only a "no-consensus" outcome naming missingActors, failedActors, unresolvedContributionRefs, or unboundSourceOperationRefs may be validated against zero source results`,
+        );
+      }
+    }
+    // Self-validated aggregate truth, structural form: the Assignment that
+    // PRODUCED the aggregate may not also be counted among the results the
+    // aggregate was validated against. Enforced here rather than only in the
+    // store door, so `replaySession` (which validates every event payload as
+    // it walks the log) refuses a hand-written log carrying this shape too --
+    // one rule, both the write path and the read path.
+    if (body.assignmentId !== undefined && body.sourceResultRefs.includes(body.assignmentId)) {
+      fail(
+        'validation',
+        `event "aggregation-validated" payload names its own output assignment "${body.assignmentId}" in sourceResultRefs -- an aggregate may not be its own evidence`,
+      );
+    }
+  }
+  if (type === 'deliberation-contribution-linked') {
+    // The enum itself is P08.1's, imported (see the header note) so this
+    // payload check and `validateContributionLineage` can never disagree about
+    // which six types exist.
+    if (!CONTRIBUTION_TYPES.includes(body.type)) {
+      fail('validation', `event "deliberation-contribution-linked" payload.type must be one of ${CONTRIBUTION_TYPES.join(' | ')}`);
+    }
+    if (body.anchors !== undefined && !isStringArray(body.anchors)) {
+      fail('validation', 'event "deliberation-contribution-linked" payload.anchors must be an array of non-empty strings when provided');
+    }
+    if (body.respondsTo !== undefined && !isNonEmptyString(body.respondsTo)) {
+      fail('validation', 'event "deliberation-contribution-linked" payload.respondsTo must be a non-empty string when provided');
+    }
+    // The one rule from `validateContributionShape` that has to be restated
+    // here rather than delegated: this payload is not the P08.1 contribution
+    // object (no `sessionId`, no `ts`), so that function cannot be called on
+    // it. A "response" with nothing to respond to is not a response, and a
+    // hand-written log must not be able to carry one.
+    if (body.type === 'response' && body.respondsTo === undefined) {
+      fail('validation', 'event "deliberation-contribution-linked" payload of type "response" must set respondsTo');
+    }
+    // A contribution may not anchor or respond to itself. Both are also
+    // impossible by construction on an append-only log (its own id is not yet
+    // in the ledger when it is linked, and every lineage ref must already be),
+    // but a hand-written log is exactly what replay exists to refuse.
+    if (body.respondsTo === body.contributionId) {
+      fail('validation', `event "deliberation-contribution-linked" payload "${body.contributionId}" responds to itself`);
+    }
+    if ((body.anchors ?? []).includes(body.contributionId)) {
+      fail('validation', `event "deliberation-contribution-linked" payload "${body.contributionId}" anchors itself`);
     }
   }
   if (type === 'session-opened') {

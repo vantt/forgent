@@ -22,7 +22,10 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import {
   openStandaloneSession,
+  openDeclaredProtocolSession,
   dispatchPrimaryTask,
+  dispatchDeclaredOperation,
+  authorizeDeclaredOperation,
   retrySessionTask,
   replaceSessionActor,
   cancelSession,
@@ -167,6 +170,277 @@ test('evaluateSessionQuorum classifies completed/failed/late/missing/replaced br
   assert.deepEqual(quorum.replaced, [{ actorId: 'e', replacedBy: 'e2' }]);
   // e2 is never evaluated as its own separate top-level required slot
   assert.ok(!quorum.completed.some((x) => x.actorId === 'e2'));
+});
+
+// ─── P10-KERNEL-FIX: multi-operation-per-actor quorum classification ───────
+//
+// A project-tier declared-protocol fixture, at the quorum-MECHANISM level
+// (evaluateSessionQuorum/closeSessionByQuorum directly, never through a
+// protocol-specific conformance test) proving `actorGatingOperationIds`'s
+// two-part rule: (1) an actor bound to a REQUIRED operation AND a
+// `driver-authorized` operation that ALSO declares
+// `contextAccess.visibilityWindowRef` must settle BOTH before counting
+// complete; (2) an actor bound to a REQUIRED operation AND an UNGATED
+// `driver-authorized` operation (no visibility window at all -- the real
+// `standalone-master-coordination-loop.yaml` shape) counts complete once
+// its required operation alone settles, exactly as before this fix.
+
+function multiOpQuorumDefinition() {
+  return {
+    apiVersion: 'fgos.dev/v1alpha1',
+    kind: 'FlowDefinition',
+    metadata: { id: 'test.coordination-protocol.multi-op-quorum-gating', version: '1.0.0' },
+    spec: {
+      profile: {
+        kind: 'CoordinationProtocol',
+        topology: {
+          visibilityWindows: [
+            {
+              id: 'vacuously-open',
+              opensAfter: { milestone: 'listed-results-linked', operationRefs: [] },
+              permits: { sourceOperationRefs: ['op-gated-driver-auth'], delivery: 'artifact-refs' },
+            },
+          ],
+        },
+      },
+      roles: ['gated', 'ungated'],
+      actors: [
+        { id: 'gated-actor', role: 'gated' },
+        { id: 'ungated-actor', role: 'ungated' },
+      ],
+      operations: [
+        { id: 'op-required', role: 'gated', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+        { id: 'op-gated-driver-auth', role: 'gated', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+        { id: 'op-required-2', role: 'ungated', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+        { id: 'op-ungated-driver-auth', role: 'ungated', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+      ],
+      graph: {
+        entry: 'phase-required',
+        nodes: [
+          {
+            id: 'phase-required',
+            operations: [
+              { ref: 'op-required', actor: 'gated-actor' },
+              { ref: 'op-required-2', actor: 'ungated-actor' },
+            ],
+            transitions: ['phase-optional'],
+          },
+          {
+            id: 'phase-optional',
+            operations: [
+              { ref: 'op-gated-driver-auth', actor: 'gated-actor', activation: { mode: 'driver-authorized' }, contextAccess: { visibilityWindowRef: 'vacuously-open' } },
+              { ref: 'op-ungated-driver-auth', actor: 'ungated-actor', activation: { mode: 'driver-authorized' } },
+            ],
+            transitions: [],
+          },
+        ],
+      },
+    },
+  };
+}
+
+function setupMultiOpQuorumFixture(coordinationId) {
+  const tempDir = mkTempDir();
+  const dir = path.join(tempDir, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'multi-op-quorum-gating.json'), `${JSON.stringify(multiOpQuorumDefinition(), null, 2)}\n`);
+  openDeclaredProtocolSession(
+    { definitionId: 'test.coordination-protocol.multi-op-quorum-gating', coordinationId, objective: 'P10-KERNEL-FIX multi-operation-per-actor quorum fixture.', writerId: 'writer-1' },
+    { cwd: tempDir },
+  );
+  return { tempDir, runnerConfig: fakeExecutor(tempDir), opts: { cwd: tempDir, repoRoot: tempDir } };
+}
+
+test('P10-KERNEL-FIX: an actor bound to a REQUIRED operation and a GATED (visibility-window-declaring) driver-authorized operation stays incomplete until BOTH settle, while an actor bound to a REQUIRED operation and an UNGATED driver-authorized operation completes on the required operation alone', async () => {
+  const coordinationId = 'coord_p10_kernel_fix_multi_op_gating';
+  const ctx = setupMultiOpQuorumFixture(coordinationId);
+
+  // Phase 1: only each actor's REQUIRED operation settles.
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-required', targetActorId: 'gated-actor', objective: 'The required first pass.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-required-2', targetActorId: 'ungated-actor', objective: 'The required first pass.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+
+  const afterPhase1 = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(
+    afterPhase1.missing.map((x) => x.actorId),
+    ['gated-actor'],
+    'gated-actor is still incomplete -- it owes its own GATED driver-authorized binding (op-gated-driver-auth); ungated-actor is already complete -- its driver-authorized binding (op-ungated-driver-auth) has no visibility window at all, so it never gates completion, exactly like standalone-master-coordination-loop.yaml\'s "reviewer" completing on "review-candidate" alone',
+  );
+  assert.deepEqual(afterPhase1.completed.map((x) => x.actorId), ['ungated-actor']);
+  assert.throws(
+    () => closeSessionByQuorum(coordinationId, {}, ctx.opts),
+    (err) => err instanceof CoordinationError && /missing required actor\(s\) \[gated-actor\]/.test(err.message),
+    'closeSessionByQuorum must refuse to close while gated-actor still owes its gated binding',
+  );
+
+  // Phase 2: gated-actor's own gated driver-authorized operation is
+  // authorized, then dispatched.
+  await authorizeDeclaredOperation(
+    coordinationId,
+    {
+      operationId: 'op-gated-driver-auth',
+      targetActorId: 'gated-actor',
+      authorizationId: 'auth_gated_1',
+      invocationKey: 'gated:1',
+      authorizedBy: { type: 'driver', id: 'writer-1' },
+      reason: 'Authorize the gated optional-looking-but-actually-mandatory phase.',
+      grantedContextRefs: [],
+    },
+    ctx.opts,
+  );
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-gated-driver-auth', targetActorId: 'gated-actor', objective: 'The gated second phase.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+
+  const afterPhase2 = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(afterPhase2.missing, []);
+  assert.deepEqual(afterPhase2.completed.map((x) => x.actorId).sort(), ['gated-actor', 'ungated-actor']);
+
+  const closed = closeSessionByQuorum(coordinationId, {}, ctx.opts);
+  assert.equal(closed.status, 'completed');
+
+  // ungated-actor's own driver-authorized binding was NEVER authorized or
+  // dispatched at all -- the session closed cleanly regardless, proving the
+  // "legitimately skippable" branch really stays skippable.
+  const replayed = replaySession(coordinationId, ctx.opts);
+  assert.equal(replayed.assignments.filter((a) => a.actorId === 'ungated-actor').length, 1, 'ungated-actor has exactly one Assignment ever -- op-required-2 -- op-ungated-driver-auth was correctly never needed');
+  assert.equal(replayed.assignments.filter((a) => a.actorId === 'gated-actor').length, 2, 'gated-actor has exactly two Assignments -- op-required and op-gated-driver-auth -- both needed before it counted complete');
+});
+
+// ─── P10-KERNEL-FIX Fix Round 3 (R2-HIGH-A): committed regression coverage
+// for Fix Round 2's N1 (close-door resolution-failure refusal) and
+// N2/NEW-HIGH-A (read-door drift honesty) -- both HIGH fixes shipped in Fix
+// Round 2 with only a throwaway scratchpad probe as evidence
+// (P10-KERNEL-FIX.md §11, both independent recheck rounds against Fix Round
+// 2: reverting the whole resolution block back to Fix Round 1's shape left
+// the coordination suite byte-identically green). These two tests exercise
+// `classifySessionQuorum`'s resolution/drift block directly through the real
+// engine doors, using the same `multiOpQuorumDefinition`/
+// `setupMultiOpQuorumFixture` fixture the test immediately above already
+// established.
+
+test('P10-KERNEL-FIX Fix Round 3 (N1): closeSessionByQuorum refuses explicitly when the bound protocol cannot be resolved at close time, never silently falling back and closing anyway', async () => {
+  const coordinationId = 'coord_p10_kernel_fix_n1_resolution_failure';
+  const ctx = setupMultiOpQuorumFixture(coordinationId);
+
+  // Only gated-actor's REQUIRED operation settles -- its own GATED
+  // driver-authorized operation (op-gated-driver-auth) is deliberately left
+  // undispatched, so gated-actor is genuinely, provably incomplete. Under
+  // Fix Round 1's shape (a resolution failure silently degrades to
+  // `definition = null` on BOTH doors), the fallback "first
+  // assignment-created event" rule would count gated-actor complete on
+  // op-required alone and close would silently succeed -- exactly the
+  // premature-close bug this whole cell exists to eliminate.
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-required', targetActorId: 'gated-actor', objective: 'The required first pass.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-required-2', targetActorId: 'ungated-actor', objective: 'The required first pass.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+
+  // Drop an unrelated, malformed sibling protocol file into the SAME
+  // project-tier registry directory the real bound protocol lives in --
+  // `discoverCoordinationProtocols` scans the whole directory, so this
+  // breaks resolution of the bound protocol id too, without touching or
+  // removing the bound protocol's own file.
+  const registryDir = path.join(ctx.tempDir, '.fgos', 'coordination-protocols');
+  fs.writeFileSync(path.join(registryDir, 'zz-broken-sibling.json'), '{ this is not valid json');
+
+  assert.throws(
+    () => closeSessionByQuorum(coordinationId, {}, ctx.opts),
+    (err) => err instanceof CoordinationError && /could not be resolved -- refusing to close against an unresolvable definition/.test(err.message),
+    'closeSessionByQuorum must refuse explicitly on a resolution failure, never silently degrade to the loose fallback rule and close the session anyway',
+  );
+  assert.equal(readManifest(coordinationId, ctx.opts).status, 'active', 'a refused close must never leave the session anywhere but its pre-close status');
+
+  // The READ door, by contrast, must keep working under the exact same
+  // broken registry (posture stays asymmetric by design -- `show` must
+  // never break just because a sibling protocol file is malformed). It
+  // degrades to the loose pre-existing fallback rule, so it reports
+  // gated-actor complete on its first (op-required) assignment alone --
+  // this is the pre-existing, intentional READ-side laxness `show` has
+  // always had; only CLOSE (asserted above) must refuse.
+  const readUnderFailure = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(readUnderFailure.missing, []);
+});
+
+test('P10-KERNEL-FIX Fix Round 3 (N2/NEW-HIGH-A): evaluateSessionQuorum (the read door) reports the honest pre-fix completion under a version-drifted bound protocol, never a false "missing" for a genuinely-completed actor', async () => {
+  const coordinationId = 'coord_p10_kernel_fix_n2_drift_read';
+  const ctx = setupMultiOpQuorumFixture(coordinationId);
+
+  // Every required actor genuinely, fully completes BEFORE the protocol
+  // drifts -- gated-actor settles both of its gating operations,
+  // ungated-actor settles its one required operation.
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-required', targetActorId: 'gated-actor', objective: 'The required first pass.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-required-2', targetActorId: 'ungated-actor', objective: 'The required first pass.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+  await authorizeDeclaredOperation(
+    coordinationId,
+    {
+      operationId: 'op-gated-driver-auth',
+      targetActorId: 'gated-actor',
+      authorizationId: 'auth_gated_n2',
+      invocationKey: 'gated:n2',
+      authorizedBy: { type: 'driver', id: 'writer-1' },
+      reason: 'Authorize the gated phase before drifting the protocol.',
+      grantedContextRefs: [],
+    },
+    ctx.opts,
+  );
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-gated-driver-auth', targetActorId: 'gated-actor', objective: 'The gated second phase.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+  );
+
+  const beforeDrift = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(beforeDrift.missing, []);
+  assert.deepEqual(beforeDrift.completed.map((x) => x.actorId).sort(), ['gated-actor', 'ungated-actor']);
+
+  // Bump the bound protocol's own version in place (same file, same id) --
+  // a real author edit, not a removal/corruption (that is N1's scenario
+  // above). Every already-settled Assignment's own protocol-operation stamp
+  // still embeds the ORIGINAL version, so it can no longer match the
+  // newly-resolved (drifted) definition.
+  const registryPath = path.join(ctx.tempDir, '.fgos', 'coordination-protocols', 'multi-op-quorum-gating.json');
+  const drifted = multiOpQuorumDefinition();
+  drifted.metadata.version = '1.0.1';
+  fs.writeFileSync(registryPath, `${JSON.stringify(drifted, null, 2)}\n`);
+
+  const afterDrift = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(
+    afterDrift.missing,
+    [],
+    'a version-drifted READ must report the honest pre-fix fallback answer -- a genuinely-completed actor must NOT be misreported as missing just because its stamps embed a version the read can no longer match',
+  );
+  assert.deepEqual(afterDrift.completed.map((x) => x.actorId).sort(), ['gated-actor', 'ungated-actor']);
+
+  // The CLOSE door, in contrast, must still refuse explicitly under the
+  // same drift (Fix Round 1's own HIGH-2, unaffected by this round).
+  assert.throws(
+    () => closeSessionByQuorum(coordinationId, {}, ctx.opts),
+    (err) => err instanceof CoordinationError && /refusing to close against a drifted definition/.test(err.message),
+  );
 });
 
 test('closeSessionByQuorum refuses to close while a required actor is missing and no partialPolicy is declared -- default completion requires every required actor', () => {

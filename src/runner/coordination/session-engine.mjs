@@ -42,6 +42,7 @@
 // self-heals by linking the already-completed run rather than dispatching
 // a second one.
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -60,9 +61,15 @@ import {
   hashTaskKey,
   assertSafeCoordinationId,
   assertValidRunIdForAssignment,
+  recordAggregationValidation,
+  recordContributionLink,
+  recordSpecialistAuthorization,
+  knownContributionsFromEvents,
+  asCoordinationError,
 } from './store.mjs';
+import { validateContributionLineage } from '../deliberation/schema.mjs';
 import { replaySession } from './replay.mjs';
-import { CoordinationError } from './schema.mjs';
+import { CoordinationError, CONTRIBUTION_REF_PREFIX } from './schema.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
@@ -70,6 +77,12 @@ import { TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import { mergePolicyStack, activationModeOf } from '../definitions/schema.mjs';
 import { planCohort, verifyPlannedAllocationAgainstCurrentConfig } from './cohort-planner.mjs';
+// The Team Cognition evaluator is CALLED, never forked: `classifyAggregationOutcome`
+// is P07.1/P07.2's own hardened pure function, and this module supplies it
+// session-derived evidence rather than re-deriving its rules. The dependency
+// points one way only -- team-cognition still imports nothing from
+// `src/runner/coordination/**` (`team-cognition-static.test.mjs` enforces it).
+import { classifyAggregationOutcome } from '../team-cognition/aggregation-evaluator.mjs';
 
 export const PRIMARY_ACTOR_ID = 'primary';
 export const DEFAULT_SPECIALIST_ACTOR_ID = 'specialist';
@@ -130,11 +143,57 @@ function assertKnownReadOnlyRole(role, label) {
 // no way to actually take effect. Every pre-existing caller omits this
 // parameter, so `contract.policy` stays absent and behavior is
 // byte-identical to before this parameter existed.
-function buildReadOnlyContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs, minTier }) {
+// A RESERVED constraint namespace, writable by this module alone. The
+// `protocol-operation:` stamp is the durable, on-disk record of WHICH
+// declared operation an Assignment was materialized for, and
+// `assignmentServesOperation` (below) trusts it as engine-derived proof --
+// so it must never be something a caller can put there. Every mediated
+// contract door in this file goes through `buildReadOnlyContract`, which is
+// therefore the ONE place that both refuses a caller-supplied entry in this
+// namespace and appends the engine's own. (An Assignment built outside this
+// module -- the raw `createSessionAssignment` store door -- is unmediated by
+// design and carries no such guarantee; see this cell's trace.)
+const PROTOCOL_OPERATION_STAMP_PREFIX = 'protocol-operation:';
+
+function protocolOperationStamp(definition, operationId) {
+  return `${PROTOCOL_OPERATION_STAMP_PREFIX}${definition.metadata.id}@${definition.metadata.version}#${operationId}`;
+}
+
+function assertNoReservedOperationStamp(constraints) {
+  // Non-arrays pass through untouched so the contract validator downstream
+  // still raises its own typed error for them, exactly as it did before this
+  // guard existed.
+  if (!Array.isArray(constraints)) return;
+  for (const constraint of constraints) {
+    if (typeof constraint === 'string' && constraint.startsWith(PROTOCOL_OPERATION_STAMP_PREFIX)) {
+      throw new CoordinationError(
+        'validation',
+        `buildReadOnlyContract: constraint "${constraint}" uses the reserved "${PROTOCOL_OPERATION_STAMP_PREFIX}" namespace -- that stamp is engine-derived operation provenance and may not be supplied by a caller`,
+      );
+    }
+  }
+}
+
+// `constraints` is materialized ONCE below, and that same snapshot is both
+// guarded and persisted. Reading the caller's own container twice -- once to
+// check it, again to store it -- would make the guard time-of-check/
+// time-of-use: an array with an accessor property, an Array subclass with a
+// lying `Symbol.iterator`, or a Proxy can answer the check with a benign value
+// and the store with the reserved stamp. Snapshotting collapses both reads
+// into one, so what was guarded is provably what is persisted, whatever the
+// container does on a second read. A non-array is passed through untouched
+// (never spread, which would raise an untyped TypeError) so the contract
+// validator downstream still rejects it with its own typed error -- and
+// rejects it BEFORE persistence, which is what keeps a non-string forgery off
+// disk.
+function buildReadOnlyContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs, minTier, protocolOperationRef }) {
+  const declared = Array.isArray(constraints) ? [...constraints] : constraints;
+  assertNoReservedOperationStamp(declared);
+  const stamped = protocolOperationRef !== undefined && Array.isArray(declared) ? [...declared, protocolOperationRef] : declared;
   return {
     objective,
     contextRefs,
-    constraints,
+    constraints: stamped,
     expectedOutputs,
     mutation: 'read-only',
     evidence: { required: evidenceRequired },
@@ -796,7 +855,127 @@ function resolveDeclaredPolicyStack(scopeStack) {
  * keeps the exact prior behavior (first match across all nodes, in graph
  * order) byte-for-byte unchanged.
  */
-function resolveDeclaredOperationActor(definition, operationId, targetActorId) {
+/**
+ * `true` when `operationId` is wired, ANYWHERE in `definition`'s graph, to a
+ * binding that names `specialistSlotRef` rather than a static `actor`.
+ *
+ * A cheap, definition-only pre-check (no I/O) so `authorizeDeclaredOperation`/
+ * `dispatchDeclaredOperation` only ever pay for a `replaySession()` call
+ * when a specialist-slot binding is actually in play -- every pre-P09.2
+ * fixture (no `specialistSlotRef` anywhere) takes byte-for-byte the same
+ * path it always did, with zero extra replay cost.
+ */
+function definitionOperationUsesSpecialistSlot(definition, operationId) {
+  for (const node of definition.spec.graph.nodes) {
+    for (const ref of node.operations) {
+      if (ref.ref === operationId && ref.specialistSlotRef !== undefined) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * The session-wide "current round" used ONLY to gate specialist-slot
+ * liveness (`resolveLiveSpecialistBindings`, below) -- never the same value
+ * as `dispatchDeclaredOperation`'s own caller-supplied `round` parameter,
+ * which remains a per-edge taskKey/maxRounds disambiguator unrelated to this
+ * gate (see that function's own doc comment).
+ *
+ * Round-1 fix (Phase 09 P09.2, post-Red-Team): the ORIGINAL P09.2 shape
+ * reused `dispatchDeclaredOperation`'s caller-supplied `round` for this gate
+ * too. The one real production caller (`src/verbs/coordination/run.mjs`'s
+ * "authorize" step) never forwarded `step.round` at all, so it always
+ * defaulted to `1` -- and since `expiresAfterRound` is schema-validated as a
+ * positive integer (always >= 1), that default structurally NEVER expired
+ * anything through the real request-step path, no matter how much real
+ * session progress had elapsed. Trusting a caller-supplied number for a
+ * legality decision is exactly the bug class this track has already closed
+ * four times (P06.2, P07.3, P07.4, P08.2); this gate now derives its own
+ * round purely from replayed session state instead, with no caller input at
+ * all.
+ *
+ * Derivation: one plus the count of `assignment-created` events already in
+ * this session, session-wide (not scoped to any one actor/slot). This is a
+ * real, monotonic quantity -- it can only ever increase, and only when a
+ * real Assignment actually materializes -- so it cannot be gamed by a
+ * caller the way a bare parameter could. It starts at 1 for a brand-new
+ * session (matching the pre-fix default's own round-1 starting point, so an
+ * authorization with `expiresAfterRound: 1` is still live for the session's
+ * very first Assignment), and advances to 2 the moment that first Assignment
+ * is created -- so `expiresAfterRound: 1` correctly means "good for exactly
+ * one Assignment, session-wide, then expired."
+ *
+ * @param {ReturnType<import('./replay.mjs').replaySession>} replayed
+ * @returns {number}
+ */
+function resolveCurrentSessionRound(replayed) {
+  return replayed.events.filter((event) => event.type === 'assignment-created').length + 1;
+}
+
+/**
+ * The specialist currently bound to each `topology.specialistSlots[]` slot,
+ * for dispatch purposes, "now" meaning the REAL, internally-derived current
+ * round (`resolveCurrentSessionRound`, above; Phase 09, P09.2, round-1 fix).
+ *
+ * "Live" is derived, never stored: the LAST (most recent, log-order)
+ * pre-terminal `specialist-authorized` record for a given `slotId` is that
+ * slot's current occupant -- a later authorization for the SAME slot IS the
+ * supersession signal (mirroring `actor-replaced`'s own "last wins"
+ * semantics, `buildActorReplacementMap` elsewhere in this file), so there
+ * is no separate "specialist-superseded" event to look for. A slot with no
+ * `specialist-authorized` record at all is simply absent from the returned
+ * map.
+ *
+ * Expiry ("`expiresAfterRound` prevents future Assignments but never erases
+ * actor/event history") is applied HERE, as a pure filter on the read side,
+ * never by rewriting or deleting the authorization event: a slot whose
+ * current authorization's `expiresAfterRound` is behind the real, derived
+ * current round is treated as having no live occupant right now --
+ * `resolveDeclaredOperationActor`'s existing "no specialist is currently
+ * bound to that slot" refusal covers it for free, with no separate
+ * expiry-specific error path to maintain. The expired record itself is
+ * untouched in `replayed.specialistAuthorizations` and remains fully
+ * inspectable there.
+ *
+ * Deliberately takes NO caller-supplied `round` at all (unlike the original
+ * P09.2 shape) -- see `resolveCurrentSessionRound`'s own doc comment for
+ * why a caller-trusted value is never acceptable for this specific legality
+ * decision.
+ *
+ * @param {ReturnType<import('./replay.mjs').replaySession>} replayed
+ * @returns {Map<string, object>} slotId -> live specialistAuthorization record
+ */
+export function resolveLiveSpecialistBindings(replayed) {
+  const round = resolveCurrentSessionRound(replayed);
+  const currentBySlot = new Map();
+  for (const record of replayed.specialistAuthorizations) {
+    currentBySlot.set(record.slotId, record); // log order: last write wins
+  }
+  const live = new Map();
+  for (const [slotId, record] of currentBySlot) {
+    if (round <= record.expiresAfterRound) live.set(slotId, record);
+  }
+  return live;
+}
+
+/**
+ * Resolve the node-operation binding for `operationId` (optionally pinned to
+ * `targetActorId`) into a concrete actor -- either a statically declared
+ * `spec.actors[]` entry (`binding.actor`), or the currently-live specialist
+ * bound to a declared slot (`binding.specialistSlotRef`, resolved against
+ * `specialistBindings`, Phase 09 P09.2). This function stays pure/
+ * definition-only: it does no I/O of its own, so a `specialistSlotRef`
+ * binding is resolvable only when its CALLER already took a fresh
+ * `replaySession()` and passed the live bindings in via
+ * `resolveLiveSpecialistBindings` -- the exact same "caller reads the
+ * session, this function only reasons about the definition" split
+ * `deriveVisibilityWindowState`'s callers already follow.
+ *
+ * `specialistBindings` defaults to an empty Map, under which this function
+ * is byte-for-byte identical to its pre-P09.2 behavior: no fixture without a
+ * `specialistSlotRef` binding anywhere can observe any difference.
+ */
+function resolveDeclaredOperationActor(definition, operationId, targetActorId, specialistBindings = new Map()) {
   const operation = definition.spec.operations.find((op) => op.id === operationId);
   if (!operation) {
     throw new CoordinationError(
@@ -811,8 +990,29 @@ function resolveDeclaredOperationActor(definition, operationId, targetActorId) {
       if (ref.ref === operationId) matches.push({ node, ref });
     }
   }
-  const picked = targetActorId !== undefined ? matches.find((m) => m.ref.actor === targetActorId) : matches[0];
+  // The effective actor id a binding currently resolves to -- a static
+  // `actor` resolves to itself; a `specialistSlotRef` resolves to whichever
+  // specialist is currently live for that slot (or `undefined`, if none is).
+  // Matching by this derived id, rather than by `ref.actor` alone, is what
+  // lets a caller find a specialist-filled binding by `targetActorId` the
+  // exact same way it already finds a statically-bound one.
+  const effectiveActorIdOf = (ref) =>
+    ref.actor !== undefined ? ref.actor : ref.specialistSlotRef !== undefined ? specialistBindings.get(ref.specialistSlotRef)?.specialistActorId : undefined;
+
+  const picked = targetActorId !== undefined ? matches.find((m) => effectiveActorIdOf(m.ref) === targetActorId) : matches[0];
   if (!picked) {
+    // A `targetActorId` that names the specialist a slot-bound ref USED to
+    // (or will) resolve to, but does not RIGHT NOW (no live binding, or an
+    // expired one), gets its own more actionable refusal instead of the
+    // generic "not wired" message below -- the binding IS wired to that
+    // slot, it simply has no live occupant this round.
+    const unboundSlotMatch = matches.find((m) => m.ref.specialistSlotRef !== undefined && specialistBindings.get(m.ref.specialistSlotRef) === undefined);
+    if (targetActorId !== undefined && unboundSlotMatch) {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: operation "${operationId}" at node "${unboundSlotMatch.node.id}" is bound to specialist slot "${unboundSlotMatch.ref.specialistSlotRef}" -- no specialist is currently authorized for that slot in this session (or its authorization has expired), so this materialization requires an authorized specialist actor first`,
+      );
+    }
     throw new CoordinationError(
       'validation',
       targetActorId !== undefined
@@ -821,19 +1021,36 @@ function resolveDeclaredOperationActor(definition, operationId, targetActorId) {
     );
   }
   const { node: matchedNode, ref: matchedRef } = picked;
-  if (!matchedRef.actor) {
+
+  let actorEntry;
+  if (matchedRef.specialistSlotRef !== undefined) {
+    const bound = specialistBindings.get(matchedRef.specialistSlotRef);
+    if (!bound) {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: operation "${operationId}" at node "${matchedNode.id}" is bound to specialist slot "${matchedRef.specialistSlotRef}" -- no specialist is currently authorized for that slot in this session (or its authorization has expired), so this materialization requires an authorized specialist actor first`,
+      );
+    }
+    // Synthesized, not looked up in `spec.actors[]` -- a specialist is by
+    // definition a previously-unknown identity the static actor roster
+    // never declared. `id`/`role` are the only two fields any caller below
+    // reads off an `actorEntry` (`persona`/`policy` are never populated for
+    // a specialist; `dispatchDeclaredOperation`'s own policy stack reads
+    // `actorEntry.policy ?? {}`, which degrades cleanly to `{}`).
+    actorEntry = Object.freeze({ id: bound.specialistActorId, role: bound.role });
+  } else if (matchedRef.actor === undefined) {
     throw new CoordinationError(
       'validation',
       `dispatchDeclaredOperation: operation "${operationId}" is role-only (no actor binding at node "${matchedNode.id}") -- this materialization requires a bound SessionActor`,
     );
-  }
-
-  const actorEntry = (definition.spec.actors ?? []).find((a) => a.id === matchedRef.actor);
-  if (!actorEntry) {
-    throw new CoordinationError(
-      'validation',
-      `dispatchDeclaredOperation: operation "${operationId}" node "${matchedNode.id}" references actor "${matchedRef.actor}", which is not declared in spec.actors`,
-    );
+  } else {
+    actorEntry = (definition.spec.actors ?? []).find((a) => a.id === matchedRef.actor);
+    if (!actorEntry) {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: operation "${operationId}" node "${matchedNode.id}" references actor "${matchedRef.actor}", which is not declared in spec.actors`,
+      );
+    }
   }
   if (actorEntry.role !== operation.role) {
     throw new CoordinationError(
@@ -842,11 +1059,22 @@ function resolveDeclaredOperationActor(definition, operationId, targetActorId) {
     );
   }
 
-  // `binding` is the node-operation binding itself (`{ref, actor,
-  // activation?}`) -- the ONLY scope `activation` is ever declared at, so
-  // every caller that needs the activation mode reads it from here rather
-  // than from the shared `operation` template, which can never carry one.
-  return { operation, actorId: actorEntry.id, actorEntry, node: matchedNode, binding: matchedRef };
+  // `binding` is the node-operation binding itself (`{ref, actor|
+  // specialistSlotRef, activation?}`) -- the ONLY scope `activation` is
+  // ever declared at, so every caller that needs the activation mode reads
+  // it from here rather than from the shared `operation` template, which
+  // can never carry one. `specialistAuthorization`, when present, is the
+  // live `specialist-authorized` record this resolution used -- callers
+  // that need the specialist's own `maxAssignments` cap (authorization
+  // gating) read it from here rather than re-resolving it a second time.
+  return {
+    operation,
+    actorId: actorEntry.id,
+    actorEntry,
+    node: matchedNode,
+    binding: matchedRef,
+    ...(matchedRef.specialistSlotRef !== undefined ? { specialistAuthorization: specialistBindings.get(matchedRef.specialistSlotRef) } : {}),
+  };
 }
 
 /**
@@ -969,6 +1197,21 @@ function assertRefsOwnedBySession(refs, { coordinationId, assignmentRefs, fgosDi
     if (typeof ref !== 'string') {
       throw new CoordinationError('validation', `${label}: ref must be a string, got ${typeof ref}`);
     }
+    // The third copy of the ownership rule (store.mjs's
+    // `assertDispositionRefOwnedBySession` and show.mjs's
+    // `isRefOwnedBySession` are the other two) recognizes MVP8's reserved
+    // `contribution:` namespace too, so no copy silently accepts a ref shape
+    // the others police. This door grants an Assignment READ access, and a
+    // contribution is content-free by construction -- ref + revision, never a
+    // body -- so there is nothing behind such a ref to grant. Refused flatly
+    // rather than resolved against a contribution set: fail-closed, and it
+    // needs no replay this pre-write path does not already have.
+    if (ref.startsWith(CONTRIBUTION_REF_PREFIX)) {
+      throw new CoordinationError(
+        'validation',
+        `${label}: ref "${ref}" is in the reserved "${CONTRIBUTION_REF_PREFIX}" namespace -- a contribution carries no content to grant, so it is not a grantable context ref (it is targetable only by a disposition)`,
+      );
+    }
     for (const segment of refSegments(ref)) {
       // Checked by DISK EXISTENCE, not by a `coord_` naming convention:
       // `openSession`/`openDeclaredProtocolSession` accept any
@@ -995,6 +1238,393 @@ function assertRefsOwnedBySession(refs, { coordinationId, assignmentRefs, fgosDi
   }
 }
 
+// ─── Phase 06 R2 (P06.2): visibility-window runtime derivation ────────────
+//
+// A window's open/closed state is NEVER stored -- it is recomputed, fresh,
+// from the SAME event-log primitives every other read-side reconstruction
+// in this file already uses (`assignment-created`/`result-linked`/
+// `actor-replaced`, plus the on-disk RunResult a `result-linked` event
+// points at). `deriveVisibilityWindowState` is the ONE function both
+// `authorizeDeclaredOperation` and `dispatchDeclaredOperation` call --
+// never two independently-maintained copies -- and it is exported so a
+// caller holding an independently-taken `replaySession()` result (replay's
+// own reconstruction, or a test proving parity) reaches the identical
+// verdict the live dispatch path would have reached from the same disk
+// state, with no cache/latch anywhere in between (Bug Taxonomy: "a window
+// that silently stays permanently open once any single source links").
+
+/**
+ * `oldActorId -> replacementActorId` for every ACCEPTED `actor-replaced`
+ * event in `events`. Built once per `deriveVisibilityWindowState` call and
+ * threaded through to `resolveOperationOutcome`, mirroring
+ * `classifySessionQuorum`'s own `resolveEffectiveActor` map exactly (same
+ * lineage-following semantics, independently built here so this module
+ * stays a single self-contained read of the event log per call).
+ */
+function buildActorReplacementMap(events) {
+  const map = new Map();
+  for (const event of events) {
+    if (event.type === 'actor-replaced') map.set(event.payload.oldActorId, event.payload.replacementActorId);
+  }
+  return map;
+}
+
+/**
+ * EVERY distinct actor the graph binds `operationId` to, in graph order.
+ *
+ * One operation template is routinely bound to several actors (an
+ * independent fan-out cohort sharing one template -- this repo's own
+ * `independent-research-fan-out-fan-in.yaml` binds `independent-research` to
+ * both `researcher-a` and `researcher-b` at one node), so resolving only the
+ * FIRST binding would let one cohort member's result answer for the whole
+ * cohort. Each candidate is re-resolved through
+ * `resolveDeclaredOperationActor` with its own `targetActorId` so every
+ * binding gets the identical declared/role/actor validation the single-
+ * binding resolver applies -- never a second, looser copy of those rules.
+ *
+ * With no actor-bound match at all (undeclared operation, unwired from the
+ * graph, or every binding role-only), the single-binding resolver is called
+ * for its own named `CoordinationError`. Note the deliberate narrowing: an
+ * operation with a MIX of role-only and actor-bound bindings now resolves
+ * through its actor-bound ones instead of raising the single-binding
+ * resolver's role-only error, which fired whenever the FIRST graph match
+ * happened to be the role-only one. Role-only bindings are a Cohort Planner
+ * concern out of this cell's scope; they contribute no branch either way,
+ * and positive operation proof is still required for every branch that does.
+ */
+/** Does any graph node pair `operationId` with a concrete actor? */
+function hasBoundActor(definition, operationId) {
+  return definition.spec.graph.nodes.some((node) => node.operations.some((ref) => ref.ref === operationId && ref.actor));
+}
+
+function declaredOperationBindingActors(definition, operationId) {
+  const actorIds = [];
+  for (const node of definition.spec.graph.nodes) {
+    for (const ref of node.operations) {
+      if (ref.ref === operationId && ref.actor && !actorIds.includes(ref.actor)) actorIds.push(ref.actor);
+    }
+  }
+  if (actorIds.length === 0) return [resolveDeclaredOperationActor(definition, operationId).actorId];
+  return actorIds.map((actorId) => resolveDeclaredOperationActor(definition, operationId, actorId).actorId);
+}
+
+/**
+ * P10-KERNEL-FIX (Step 09 MVP6-9, Phase 10 group-thinking-lite cross-cell
+ * finding -- P10.6/P10.7/P10.8): the graph-declared operation ids that GATE
+ * `actorId`'s own quorum completion for a declared-protocol session --
+ * `classifySessionQuorum`'s multi-operation-aware path, below.
+ *
+ * Every `required` binding gates completion (this is `classifySessionQuorum`'s
+ * pre-existing, always-correct semantics for the single-op-per-actor shape
+ * this mechanism was originally built for -- unchanged). ADDITIONALLY, a
+ * `driver-authorized` binding gates completion too, but ONLY when it ALSO
+ * declares `contextAccess.visibilityWindowRef` -- a REAL, later phase of the
+ * SAME actor's own work, gated by the MVP6 visibility-window mechanism
+ * purely for ACCESS CONTROL (the driver must explicitly grant read access to
+ * upstream context before this actor may act), never a genuinely optional
+ * branch. RFC-Review-Lite's `respond`, Nominal-Group-Lite's `share`/`clarify`
+ * are exactly this shape: each is `driver-authorized` (the driver must
+ * `authorizeDeclaredOperation` it before it can dispatch), but the protocol's
+ * own fixed 4-phase pipeline always reaches it -- there is no real usage
+ * where the driver decides to skip it forever.
+ *
+ * A `driver-authorized` binding with NO `contextAccess.visibilityWindowRef`
+ * is deliberately EXCLUDED from the gating set -- it is a free-standing
+ * driver's-choice branch, not a graph-gated later phase of the same actor's
+ * work. `standalone-master-coordination-loop.yaml`'s `revise-candidate`/
+ * `reviewer-recheck`/`red-team-recheck` are exactly this shape (no
+ * `spec.profile.topology`/visibility windows declared anywhere in that
+ * fixture at all): the driver may legitimately never authorize a revision
+ * round, and `coordination-launch-master-loop.test.mjs`'s own
+ * `coord_launcher_live` case already proves and depends on the session
+ * correctly staying open (actor "fixer" reported `missing`) when that
+ * happens -- counting an ungated driver-authorized binding here would
+ * regress that real, already-shipped test. See this file's own
+ * P10-KERNEL-FIX.md Design Notes for the full investigation (including why
+ * the simpler "count every required binding, ignore every driver-authorized
+ * one" framing this cell started from is not sufficient on its own: it
+ * reproduces P10.6/P10.7's own bug unchanged, since RFC-Review-Lite's
+ * `respond` and Nominal-Group-Lite's `share`/`clarify` are ALL
+ * `driver-authorized`, never `required`).
+ *
+ * Returns `[]` when `actorId` has no gating binding anywhere in the graph
+ * (every binding it has, if any, is an ungated driver-authorized one) --
+ * `classifySessionQuorum`'s caller falls back to the pre-existing
+ * "first-assignment-ever, for this actor" rule for exactly that actor. That
+ * fallback is NOT byte-identical behavior for a gating actor, only for a
+ * NON-gating one (P10-KERNEL-FIX Fix Round 1, HIGH-3, redteam-report.md):
+ * the fallback accepts ANY `assignment-created` event for the actor,
+ * however it arrived, while the gating path above demands an
+ * operation-stamped, settled Assignment (`resolveBindingOutcome` /
+ * `assignmentServesOperation`). An actor with at least one gating binding
+ * genuinely trades the loose fallback for the stricter stamped check --
+ * this is what keeps `fixer`, above, `missing` until its own sole binding
+ * actually dispatches, and what keeps every single-op-per-actor fixture
+ * -- declared-consult, standalone sessions, research fan-out/fan-in, MVP7
+ * aggregation-close, group-cognition-framework -- passing today, since
+ * their own Assignments arrive stamped through `dispatchDeclaredOperation`.
+ * A single-`required`-op actor whose Assignment instead arrives through a
+ * non-stamping public door (`createSessionAssignment`/`dispatchPrimaryTask`/
+ * `proposeConsult` -- `assertNoReservedOperationStamp` actively forbids a
+ * caller-supplied stamp on those) can never satisfy a gating binding and
+ * would be permanently unclosable. Confirmed currently LATENT: no
+ * `runCoordinationUseCase` path reaches this today (the `agent-led` branch
+ * uses `openStandaloneSession`, which has no `definitionRef`) -- named here,
+ * and in P10-KERNEL-FIX.md's own Gaps, for whichever door reaches this path
+ * next.
+ */
+function actorGatingOperationIds(definition, actorId) {
+  // MVP7 (Phase 07): the protocol's own `completion.aggregation.
+  // outputOperationRef`, when declared, names the operation that the
+  // aggregation's OWN output represents -- but `validateSessionAggregation`
+  // never requires a dispatched Assignment for it (its own `assignmentId`/
+  // `runId`/`outputArtifactRef` params are all optional, and every real
+  // caller -- test/verbs/coordination-aggregation-surface.test.mjs,
+  // test/runner/coordination-aggregation.test.mjs -- validates without
+  // supplying any of them). Its completion is represented by the validated
+  // `aggregation-validated` event `closeSessionByQuorum`'s own `aggregationId`
+  // param consults, a SEPARATE narrowing gate on top of quorum, never by a
+  // literal operation-stamped Assignment -- so it is excluded from gating
+  // here, or it would permanently block the bound actor (confirmed
+  // empirically: without this exclusion, this fixture's own coordinator-actor,
+  // bound to both `review` [required] and `synthesize` [required,
+  // `outputOperationRef`], never settles `synthesize` as a real Assignment
+  // anywhere in either test file, and would stay "missing" forever).
+  //
+  // P10-KERNEL-FIX Fix Round 1 (MEDIUM-5, redteam-report.md): the exclusion
+  // is scoped to the actor the graph itself binds to the aggregation's
+  // `outputOperationRef` -- never to every actor who happens to share that
+  // operation id for an unrelated reason. A different actor bound to the
+  // same operation id keeps that binding as an ordinary gating operation,
+  // needing its own real settled Assignment like any other.
+  //
+  // P10-KERNEL-FIX Fix Round 2 (N4/NEW-MEDIUM-C, redteam-recheck-report.md):
+  // Fix Round 1 designated "the" aggregation actor as whichever binding came
+  // FIRST in graph order -- ambiguous and authoring-order-dependent when 2+
+  // actors legitimately bind the same `outputOperationRef` (a semantic no-op
+  // reordering of two sibling entries in one node's `operations[]` silently
+  // flipped who was excused and who deadlocked permanently, since
+  // `validateSessionAggregation` never materializes an Assignment for this
+  // operation for ANY actor). This is a kernel session-engine cell, not a
+  // schema cell, so no heuristic picks a "correct" designated actor: the
+  // exclusion applies ONLY when EXACTLY ONE actor's binding matches
+  // `outputOperationRef` anywhere in the graph. When 2+ distinct actors bind
+  // it, NO exclusion applies to any of them -- every such actor falls back
+  // to ordinary required-operation gating, the same conservative default
+  // this fix already uses elsewhere for ambiguous/unclear cases. See
+  // P10-KERNEL-FIX.md §5 Gaps for the 2+-actors shape (a future cell may
+  // want schema-level rejection instead -- not built here).
+  const aggregationOutputOperationRef = definition.spec.profile.completion?.aggregation?.outputOperationRef;
+  let aggregationActorId;
+  if (aggregationOutputOperationRef !== undefined) {
+    const boundActorIds = new Set();
+    for (const node of definition.spec.graph.nodes) {
+      for (const ref of node.operations) {
+        if (ref.ref === aggregationOutputOperationRef && ref.actor) boundActorIds.add(ref.actor);
+      }
+    }
+    if (boundActorIds.size === 1) {
+      [aggregationActorId] = boundActorIds;
+    }
+  }
+
+  const operationIds = [];
+  for (const node of definition.spec.graph.nodes) {
+    for (const ref of node.operations) {
+      if (ref.actor !== actorId) continue;
+      if (ref.ref === aggregationOutputOperationRef && actorId === aggregationActorId) continue;
+      const mode = activationModeOf(ref);
+      const gates = mode === 'required' || (mode === 'driver-authorized' && ref.contextAccess?.visibilityWindowRef !== undefined);
+      if (gates && !operationIds.includes(ref.ref)) operationIds.push(ref.ref);
+    }
+  }
+  return operationIds;
+}
+
+/**
+ * Does this Assignment carry the reserved engine stamp for EXACTLY this
+ * declared operation? That is the whole question, and the ONLY channel that
+ * can answer it.
+ *
+ * `opensAfter.operationRefs[]` names a `spec.operations[]` template -- a
+ * DECLARED operation -- and `dispatchDeclaredOperation` is the only door in
+ * this codebase that materializes one. It stamps unconditionally, before any
+ * caller input is consulted, so requiring the stamp costs a legitimate source
+ * nothing. Everything else -- an ad-hoc primary task, a consult proposal, a
+ * disposition, an Assignment that merely happens to share a claim key or an
+ * actor -- is not a declared operation completing, and must never be read as
+ * one.
+ *
+ * The three earlier, weaker predicates were each removed for the same reason:
+ * they answered "which operation" from a channel some OTHER door could also
+ * write.
+ * - Actor identity alone: one actor is routinely bound to several different
+ *   operations, and an `actor-replaced` replacement can complete work that has
+ *   nothing to do with the obligation it inherited.
+ * - The claiming taskKey's `declared:<operationId>` namespace: `taskKey` is a
+ *   documented public parameter on more than one mediated door, so consulting
+ *   it let ANY door that did not stamp -- `dispatchPrimaryTask` above, reached
+ *   through its own exported signature and through the CLI request file --
+ *   assert an operation identity it never performed.
+ * - `assignment-created.payload.operationId`: engine-derived, but only ever
+ *   written by `dispatchDeclaredOperation`'s own driver-authorized branch
+ *   (`authorizationProvenance`, the single producer in this file), which
+ *   stamps the very same Assignment. It could therefore never satisfy a source
+ *   the stamp did not already satisfy -- redundant on every mediated path, and
+ *   a second forgeable surface on the unmediated one.
+ *
+ * What makes the stamp different in kind, rather than merely a fourth door:
+ * `PROTOCOL_OPERATION_STAMP_PREFIX` is a RESERVED namespace,
+ * `buildReadOnlyContract` refuses any caller-supplied entry in it, and
+ * `dispatchDeclaredOperation` is the sole caller that passes
+ * `protocolOperationRef`. So "which door remembered to stamp" stops being a
+ * question a future door can get wrong: a door that does not stamp produces
+ * Assignments that satisfy NO window source, which is the safe answer by
+ * construction rather than by enumeration.
+ */
+function assignmentServesOperation(definition, operationId, { assignmentId, fgosDir }) {
+  const assignmentPath = path.join(fgosDir, 'assignments', assignmentId, 'assignment.json');
+  if (!fs.existsSync(assignmentPath)) return false;
+  let assignment;
+  try {
+    assignment = JSON.parse(fs.readFileSync(assignmentPath, 'utf8'));
+  } catch (err) {
+    throw new CoordinationError('corrupt-log', `assignment.json at ${assignmentPath} is not valid JSON: ${err.message}`);
+  }
+  const constraints = assignment?.provenance?.inline?.contract?.constraints;
+  // Exact equality, never a prefix/substring test: a leading space or a
+  // different casing dodges the writer's guard and fails this comparison too.
+  // A NON-STRING forgery (a boxed `String`, a `toJSON` object) is a different
+  // story and this reader is NOT what stops it -- such a value would
+  // JSON-round-trip into a plain string and match here. It never reaches disk
+  // because `validateExecutionContract`'s `isStringArray`
+  // (`../dispatch/execution-contract.mjs`) runs inside `buildAssignment`
+  // BEFORE persistence and rejects a `constraints` array that is not all
+  // primitive strings. That ordering is the load-bearing part: this reader
+  // alone would accept a boxed-String forgery.
+  return Array.isArray(constraints) && constraints.includes(protocolOperationStamp(definition, operationId));
+}
+
+/**
+ * Classify ONE already-operation-verified Assignment exactly the way
+ * `classifySessionQuorum`/`synthesizeResearchFanIn` already classify a
+ * settled Assignment -- the SAME failed/late vocabulary, never a second one.
+ */
+function classifyOperationAssignment(events, fgosDir, effectiveActorId, assignmentId) {
+  const linkedEvent = lastEventFor(events, 'result-linked', assignmentId);
+  if (!linkedEvent) return { satisfied: false, reason: 'late', actorId: effectiveActorId, assignmentId };
+  const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, linkedEvent.payload.runId);
+  if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') {
+    return { satisfied: false, reason: 'failed', actorId: effectiveActorId, assignmentId, runId: runResult.runId };
+  }
+  return { satisfied: true, reason: null, actorId: effectiveActorId, assignmentId, runId: runResult.runId };
+}
+
+/**
+ * The outcome of ONE graph binding of a source operation: follow any accepted
+ * `actor-replaced` lineage to the CURRENT effective actor (so "the
+ * replacement's own result-linked counts toward the window; the original
+ * failed/missing attempt's event stays in the log, untouched" holds without
+ * rewriting or re-deriving anything from the original attempt), then classify
+ * the Assignments that actor was given FOR THIS OPERATION
+ * (`assignmentServesOperation` -- the lineage transfers the obligation, never
+ * a licence for any work at all to answer it):
+ * - no operation-verified `assignment-created` for the effective actor ->
+ *   `'missing'`.
+ * - created but no `result-linked` yet -> `'late'`.
+ * - linked but `runResult.status === 'failed'` or `confidence` in
+ *   `{failed, no-evidence}` -> `'failed'`.
+ * - otherwise -> satisfied.
+ *
+ * With several attempts toward the same binding (a re-attempt after a failed
+ * one), a satisfied attempt settles the binding and the unsatisfied
+ * attempts' events stay on the log untouched; with none satisfied, the LAST
+ * attempt in event order is the reported outcome.
+ */
+function resolveBindingOutcome(definition, operationId, boundActorId, { events, fgosDir, replacedBy }) {
+  let effectiveActorId = boundActorId;
+  const seen = new Set();
+  while (replacedBy.has(effectiveActorId) && !seen.has(effectiveActorId)) {
+    seen.add(effectiveActorId);
+    effectiveActorId = replacedBy.get(effectiveActorId);
+  }
+
+  const assignmentIds = events
+    .filter(
+      (event) =>
+        event.type === 'assignment-created' &&
+        event.payload.actorId === effectiveActorId &&
+        assignmentServesOperation(definition, operationId, { assignmentId: event.payload.assignmentId, fgosDir }),
+    )
+    .map((event) => event.payload.assignmentId);
+
+  if (assignmentIds.length === 0) {
+    return { boundActorId, satisfied: false, reason: 'missing', actorId: effectiveActorId, assignmentId: null };
+  }
+  let lastOutcome;
+  for (const assignmentId of assignmentIds) {
+    lastOutcome = classifyOperationAssignment(events, fgosDir, effectiveActorId, assignmentId);
+    if (lastOutcome.satisfied) return { boundActorId, ...lastOutcome };
+  }
+  return { boundActorId, ...lastOutcome };
+}
+
+/**
+ * The outcome of ONE `opensAfter.operationRefs[]` entry: satisfied only when
+ * EVERY graph binding of that operation is satisfied. A source operation
+ * wired to a fan-out cohort is the whole cohort's obligation, not the first
+ * contributor's -- opening on one branch would be exactly the partial-window
+ * bypass the all-of rule across `operationRefs[]` itself already refuses, one
+ * level deeper.
+ */
+function resolveOperationOutcome(definition, operationId, ctx) {
+  const branches = declaredOperationBindingActors(definition, operationId).map((boundActorId) =>
+    resolveBindingOutcome(definition, operationId, boundActorId, ctx),
+  );
+  const reported = branches.find((branch) => !branch.satisfied) ?? branches[0];
+  return {
+    operationRef: operationId,
+    satisfied: branches.every((branch) => branch.satisfied),
+    reason: reported.reason,
+    actorId: reported.actorId,
+    assignmentId: reported.assignmentId,
+    ...(reported.runId !== undefined ? { runId: reported.runId } : {}),
+    branches: Object.freeze(branches.map((branch) => Object.freeze(branch))),
+  };
+}
+
+/**
+ * Derive whether `windowId` (a `spec.profile.topology.visibilityWindows[]`
+ * entry on `definition`) is currently OPEN: true iff EVERY
+ * `opensAfter.operationRefs[]` entry resolves to a satisfied
+ * `resolveOperationOutcome` (see above) -- a partial subset never opens it
+ * (Bug Taxonomy: "a partial-window bypass"). Pure function of `replayed`
+ * (a `replaySession()` result -- live dispatch and an independently-taken
+ * replay both pass one) and `fgosDir`; never reads or writes any stored
+ * "window state" of its own.
+ *
+ * @param {object} definition Loaded FlowDefinition (`loadCoordinationProtocol`).
+ * @param {string} windowId
+ * @param {{manifest: object, events: object[]}} replayed A `replaySession()` result.
+ * @param {string} fgosDir
+ * @returns {Readonly<{window: object, open: boolean, sources: Readonly<object>[]}>}
+ */
+export function deriveVisibilityWindowState(definition, windowId, replayed, fgosDir) {
+  const window = (definition.spec.profile.topology?.visibilityWindows ?? []).find((w) => w.id === windowId);
+  if (!window) {
+    throw new CoordinationError(
+      'dangling-ref',
+      `deriveVisibilityWindowState: visibility window "${windowId}" is not declared on protocol "${definition.metadata.id}@${definition.metadata.version}"`,
+    );
+  }
+  const replacedBy = buildActorReplacementMap(replayed.events);
+  const sources = window.opensAfter.operationRefs.map((operationRef) =>
+    resolveOperationOutcome(definition, operationRef, { events: replayed.events, fgosDir, replacedBy }),
+  );
+  const open = sources.every((source) => source.satisfied);
+  return Object.freeze({ window, open, sources: Object.freeze(sources.map((s) => Object.freeze(s))) });
+}
+
 /**
  * The Assignment id a prior attempt already claimed for `taskKey`, or
  * `null`. Read-only peek at `createSessionAssignment`'s own claim record
@@ -1010,6 +1640,158 @@ function peekClaimedAssignmentId(sessionDir, taskKey) {
   } catch (err) {
     throw new CoordinationError('corrupt-log', `task claim record for taskKey "${taskKey}" at ${taskClaimPath} is not valid JSON: ${err.message}`);
   }
+}
+
+/**
+ * Bind a previously-unknown `specialistActorId` to a declared
+ * `topology.specialistSlots[]` slot (Phase 09, P09.2), appending the
+ * `specialistAuthorizationId`-keyed `specialist-authorized` event.
+ *
+ * This is the definition-aware door `store.mjs`'s `recordSpecialistAuthorization`
+ * structurally cannot be on its own: it resolves `slotId` against the
+ * session's own bound protocol, and refuses an authorization that could
+ * never legally fill it --
+ *
+ * - `slotId` must name a real `topology.specialistSlots[]` entry.
+ * - `role` must equal that slot's own declared `role` exactly (mirrors
+ *   `resolveDeclaredOperationActor`'s existing actor/operation role-mismatch
+ *   gate -- a specialist whose role does not match could never be dispatched
+ *   for any of the slot's operations anyway).
+ * - `capabilities` must be a SUPERSET of the slot's own
+ *   `requiredCapabilities[]` (every capability the slot requires must be
+ *   among the ones this specialist is authorized with; a specialist may
+ *   carry MORE than the slot requires -- the slot names a floor, not a
+ *   ceiling).
+ * - `triggerEvidenceRefs`/`allowedContextRefs` must resolve to refs this
+ *   session actually owns -- the SAME `assertRefsOwnedBySession` check
+ *   `authorizeDeclaredOperation` already applies to `grantedContextRefs`,
+ *   reused rather than re-implemented (Bug Taxonomy: "Foreign context
+ *   refused... reusing assertRefsOwnedBySession, never a freshly-invented
+ *   check").
+ * - The slot's own `maxBindings` cap is forwarded to
+ *   `recordSpecialistAuthorization` as `opts.maxBindingsForSlot`, enforced
+ *   lock-held there against fresh on-disk events (see that function's doc
+ *   comment for exactly what "binding" counts).
+ *
+ * Driver-only: enforced by `recordSpecialistAuthorization`'s own
+ * `assertDriverIdentity` call (the SAME shared check `authorizeOperation`
+ * uses), not re-implemented here -- `authorizedBy.id` must equal this
+ * session's own `provenanceRoot.writerId`, so a worker/peer can never
+ * self-authorize into a slot.
+ *
+ * @param {string} coordinationId Must already have a non-null `definitionRef`.
+ * @param {object} params
+ * @param {string} params.slotId
+ * @param {string} params.specialistActorId The previously-unknown identity being recruited.
+ * @param {string} params.role Must equal the slot's own declared role.
+ * @param {string[]} [params.capabilities] Must be a superset of the slot's requiredCapabilities; defaults to none.
+ * @param {{type: 'driver', id: string}} params.authorizedBy
+ * @param {string} params.reason
+ * @param {string[]} [params.triggerEvidenceRefs] Session-owned refs; defaults to none.
+ * @param {string[]} [params.allowedContextRefs] Session-owned refs the specialist may read; defaults to none.
+ * @param {number} params.maxAssignments This authorization's own dispatch cap.
+ * @param {number} params.expiresAfterRound Last round this authorization may still authorize a new Assignment for.
+ * @param {string} params.specialistAuthorizationId Unique id for this authorization instance.
+ * @param {object} [opts] Workspace options ({ cwd, repoRoot, packageRoot })
+ */
+export function authorizeSpecialistSlot(
+  coordinationId,
+  {
+    slotId,
+    specialistActorId,
+    role,
+    capabilities = [],
+    authorizedBy,
+    reason,
+    triggerEvidenceRefs = [],
+    allowedContextRefs = [],
+    maxAssignments,
+    expiresAfterRound,
+    specialistAuthorizationId,
+  },
+  opts = {},
+) {
+  const manifest = readManifest(coordinationId, opts);
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no slot for an authorization to name`,
+    );
+  }
+  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to authorize against a drifted definition`,
+    );
+  }
+
+  const slot = (definition.spec.profile.topology?.specialistSlots ?? []).find((s) => s.id === slotId);
+  if (!slot) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: slot "${slotId}" is not declared in this protocol's spec.profile.topology.specialistSlots`,
+    );
+  }
+  if (role !== slot.role) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: role "${role}" does not match specialist slot "${slotId}"'s own declared role "${slot.role}" -- a specialist of this role could never be dispatched for any of the slot's operations`,
+    );
+  }
+  // Cheap identity-disjointness guard (Red-Team round 1, LOW/INFO): a
+  // specialist is by definition a previously-unknown identity, never one of
+  // the protocol's own statically-declared `spec.actors[]`. No exploit was
+  // constructed through the real doors (operation-id-scoped matching plus
+  // per-operation role invariance already blocks the paths tried), but
+  // refusing the collision outright at authorization time is free here and
+  // keeps a specialist's synthesized `actorEntry` (`resolveDeclaredOperationActor`)
+  // from ever aliasing a real, statically-bound actor id.
+  if ((definition.spec.actors ?? []).some((actorEntry) => actorEntry.id === specialistActorId)) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: specialistActorId "${specialistActorId}" collides with a statically-declared spec.actors[] id -- a specialist must be a previously-unknown identity`,
+    );
+  }
+  const missingCapabilities = slot.requiredCapabilities.filter((cap) => !capabilities.includes(cap));
+  if (missingCapabilities.length > 0) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: capabilities [${capabilities.join(', ')}] do not satisfy specialist slot "${slotId}"'s own declared requiredCapabilities -- missing [${missingCapabilities.join(', ')}]`,
+    );
+  }
+
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  assertRefsOwnedBySession(triggerEvidenceRefs, {
+    coordinationId,
+    assignmentRefs: manifest.assignmentRefs,
+    fgosDir,
+    label: `authorizeSpecialistSlot: triggerEvidenceRefs`,
+  });
+  assertRefsOwnedBySession(allowedContextRefs, {
+    coordinationId,
+    assignmentRefs: manifest.assignmentRefs,
+    fgosDir,
+    label: `authorizeSpecialistSlot: allowedContextRefs`,
+  });
+
+  return recordSpecialistAuthorization(
+    coordinationId,
+    {
+      specialistAuthorizationId,
+      slotId,
+      specialistActorId,
+      role,
+      capabilities,
+      authorizedBy,
+      reason,
+      triggerEvidenceRefs,
+      allowedContextRefs,
+      maxAssignments,
+      expiresAfterRound,
+    },
+    { ...opts, maxBindingsForSlot: { slotId, cap: slot.maxBindings } },
+  );
 }
 
 /**
@@ -1064,7 +1846,16 @@ export function authorizeDeclaredOperation(
     );
   }
 
-  const { actorId, node, binding } = resolveDeclaredOperationActor(definition, operationId, targetActorId);
+  // Only a `specialistSlotRef` binding ever needs a live replay to resolve
+  // its actor -- see `definitionOperationUsesSpecialistSlot`'s own doc
+  // comment for why this stays a no-op (no extra replay call) for every
+  // pre-P09.2 fixture. `resolveLiveSpecialistBindings` derives its own
+  // current round internally (round-1 fix, Phase 09 P09.2) -- no `round`
+  // input from this door at all.
+  const specialistBindings = definitionOperationUsesSpecialistSlot(definition, operationId)
+    ? resolveLiveSpecialistBindings(replaySession(coordinationId, opts))
+    : undefined;
+  const { actorId, node, binding, specialistAuthorization } = resolveDeclaredOperationActor(definition, operationId, targetActorId, specialistBindings);
   if (nodeId !== undefined && nodeId !== node.id) {
     throw new CoordinationError(
       'validation',
@@ -1103,6 +1894,27 @@ export function authorizeDeclaredOperation(
     });
   }
 
+  // Visibility-window legality (Phase 06 R2, additive alongside the
+  // same-session ownership checks above -- never a replacement for them).
+  // Only a binding that actually declares `contextAccess.visibilityWindowRef`
+  // is gated; a binding with none stays byte/behavior-identical to before
+  // this check existed. Re-derived fresh from a NEW `replaySession()` call
+  // every time (never cached/latched -- Bug Taxonomy), so a window that was
+  // closed a moment ago and only just opened is picked up correctly, and one
+  // that silently closes again (it cannot, under the current append-only
+  // event vocabulary, but this call never assumes otherwise) is too.
+  const visibilityWindowRef = binding.contextAccess?.visibilityWindowRef;
+  if (visibilityWindowRef !== undefined) {
+    const replayedForWindow = replaySession(coordinationId, opts);
+    const { open } = deriveVisibilityWindowState(definition, visibilityWindowRef, replayedForWindow, fgosDir);
+    if (!open) {
+      throw new CoordinationError(
+        'validation',
+        `authorizeDeclaredOperation: operation "${operationId}" at node "${node.id}" for actor "${actorId}" requires visibility window "${visibilityWindowRef}" to be open before any context may be granted, and it is not open yet -- refusing to authorize`,
+      );
+    }
+  }
+
   return authorizeOperation(
     coordinationId,
     {
@@ -1116,11 +1928,17 @@ export function authorizeDeclaredOperation(
       grantedContextRefs,
       targetArtifactRef,
     },
-    // `activation.maxInvocations` lives on the binding, which only this
-    // definition-aware door can read; store.mjs enforces it lock-held.
-    binding.activation?.maxInvocations !== undefined
-      ? { ...opts, maxInvocationsForBinding: binding.activation.maxInvocations }
-      : opts,
+    // `activation.maxInvocations` lives on the binding, and a specialist's
+    // own `maxAssignments` cap lives on its live authorization -- both only
+    // this definition-aware door can read; store.mjs enforces both
+    // lock-held.
+    {
+      ...opts,
+      ...(binding.activation?.maxInvocations !== undefined ? { maxInvocationsForBinding: binding.activation.maxInvocations } : {}),
+      ...(specialistAuthorization !== undefined
+        ? { maxAssignmentsForSpecialist: { specialistActorId: actorId, cap: specialistAuthorization.maxAssignments } }
+        : {}),
+    },
   );
 }
 
@@ -1410,14 +2228,25 @@ export async function dispatchDeclaredOperation(
     );
   }
 
-  const { operation, actorId, actorEntry, node, binding } = resolveDeclaredOperationActor(definition, operationId, targetActorId);
-  const topology = definition.spec.profile.topology;
-  const incomingEdge = topology?.edges?.find((edge) => edge.to === actorId);
-
-  // One reconstruction per dispatch, shared by the edge validation below and
-  // the driver-authorization gate further down (nothing writes in between).
+  // One reconstruction per dispatch, shared by specialist-slot resolution
+  // (below), the edge validation, and the driver-authorization gate further
+  // down (nothing writes in between).
   let replayed = null;
   const replayOnce = () => (replayed ??= replaySession(coordinationId, opts));
+
+  // Only a `specialistSlotRef` binding ever needs the replay taken above --
+  // see `definitionOperationUsesSpecialistSlot`'s own doc comment for why
+  // this stays a no-op (`replayOnce()` never actually called) for every
+  // pre-P09.2 fixture. `resolveLiveSpecialistBindings` derives its own
+  // current round internally (round-1 fix, Phase 09 P09.2) -- this
+  // function's own `round` parameter is unrelated: it stays a per-edge
+  // taskKey/maxRounds disambiguator only, below.
+  const specialistBindings = definitionOperationUsesSpecialistSlot(definition, operationId)
+    ? resolveLiveSpecialistBindings(replayOnce())
+    : undefined;
+  const { operation, actorId, actorEntry, node, binding } = resolveDeclaredOperationActor(definition, operationId, targetActorId, specialistBindings);
+  const topology = definition.spec.profile.topology;
+  const incomingEdge = topology?.edges?.find((edge) => edge.to === actorId);
 
   const isDriverAuthorized = activationModeOf(binding) === 'driver-authorized';
 
@@ -1628,6 +2457,28 @@ export async function dispatchDeclaredOperation(
       });
     }
 
+    // (a2) Visibility-window legality, independently re-derived HERE at
+    //      dispatch time -- never trusting whatever `authorizeDeclaredOperation`
+    //      concluded earlier, the same "defense in depth, not merely two call
+    //      sites of one cached answer" posture the ownership checks above
+    //      already take (both re-run `assertRefsOwnedBySession`, not just
+    //      authorize time). Uses the SAME `deriveVisibilityWindowState`
+    //      function and the SAME already-taken `replayOnce()` reconstruction
+    //      this dispatch is already using for the edge/authorization checks
+    //      above, so a genuinely different verdict between authorize and
+    //      dispatch can only mean the underlying event log itself changed
+    //      between the two calls -- never a second, divergent derivation.
+    const visibilityWindowRef = binding.contextAccess?.visibilityWindowRef;
+    if (visibilityWindowRef !== undefined) {
+      const { open } = deriveVisibilityWindowState(definition, visibilityWindowRef, replayOnce(), fgosDir);
+      if (!open) {
+        throw new CoordinationError(
+          'validation',
+          `dispatchDeclaredOperation: operation "${operationId}" at node "${node.id}" for actor "${actorId}" requires visibility window "${visibilityWindowRef}" to be open, and it is not open -- refusing to dispatch a driver-authorized worker whose granted context is not yet legal`,
+        );
+      }
+    }
+
     // (b) The dispatched worker may read ONLY the granted refs plus the base
     //     context that is always legal for this Assignment. The single base
     //     ref is the mediated-visibility upstream request under a declared
@@ -1654,6 +2505,31 @@ export async function dispatchDeclaredOperation(
       invocationKey: authorization.invocationKey,
       contextGrant: { refs: [...authorization.grantedContextRefs] },
     };
+  }
+
+  // Claim-key squatting. `createSessionAssignment` resolves an ALREADY-CLAIMED
+  // taskKey to its existing Assignment and hands it back as a success. When
+  // that Assignment was materialized by a door that does not stamp -- an
+  // ad-hoc `dispatchPrimaryTask` under a `declared:<operationId>` key, say --
+  // this dispatch would "resume" work carrying no proof of THIS operation and
+  // report success, while every visibility window gated on the operation
+  // stayed shut forever with nothing anywhere naming the cause. Refusing
+  // invents no new claim-key behavior (that stays Phase 03's); it just stops
+  // the shape from looking like success, the same posture as the
+  // driver-authorized collision guard above. `manifest.assignmentRefs` is the
+  // load-bearing guard, exactly as it is there: a crash-recovery self-heal
+  // target's claim is not yet registered, so a genuine resume of an
+  // interrupted write still passes through untouched.
+  const squattedAssignmentId = peekClaimedAssignmentId(resolveSessionPaths(coordinationId, opts).sessionDir, taskKey);
+  if (
+    squattedAssignmentId &&
+    manifest.assignmentRefs.includes(squattedAssignmentId) &&
+    !assignmentServesOperation(definition, operationId, { assignmentId: squattedAssignmentId, fgosDir })
+  ) {
+    throw new CoordinationError(
+      'validation',
+      `dispatchDeclaredOperation: taskKey "${taskKey}" already resolves to Assignment "${squattedAssignmentId}", which carries no "${protocolOperationStamp(definition, operationId)}" provenance -- it was not materialized for operation "${operationId}" by this declared-dispatch door, so resuming it would report success while leaving the operation permanently unperformed; pass an explicit, distinct taskKey to dispatch this operation`,
+    );
   }
 
   // R5: task-depth bound, checked against the REAL parent chain (never a
@@ -1684,10 +2560,12 @@ export async function dispatchDeclaredOperation(
   const contract = buildReadOnlyContract({
     objective,
     contextRefs: resolvedContextRefs,
-    constraints: [
-      ...constraints,
-      `protocol-operation:${definition.metadata.id}@${definition.metadata.version}#${operationId}`,
-    ],
+    constraints,
+    // Appended by `buildReadOnlyContract` itself, never spliced into the
+    // caller-shared `constraints` array here -- that array is exactly what a
+    // caller populates, so an engine stamp mixed into it would be
+    // indistinguishable from a forged one to the reader below.
+    protocolOperationRef: protocolOperationStamp(definition, operationId),
     expectedOutputs,
     evidenceRequired: operation.result?.evidenceRequired ?? 'reported',
     role: operation.role,
@@ -2347,7 +3225,7 @@ export function synthesizeResearchFanIn(coordinationId, { branchActorIds, contra
 export function evaluateSessionQuorum(coordinationId, opts = {}) {
   const { manifest, events } = replaySession(coordinationId, opts);
   const { fgosDir } = resolveSessionPaths(coordinationId, opts);
-  return classifySessionQuorum(coordinationId, manifest, events, fgosDir);
+  return classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts);
 }
 
 // Shared classification body behind `evaluateSessionQuorum` (its own
@@ -2356,8 +3234,89 @@ export function evaluateSessionQuorum(coordinationId, opts = {}) {
 // independently-maintained copies, regardless of which caller supplies
 // `{manifest, events}` (a fresh unlocked read for the former, a fresh read
 // taken INSIDE the terminal write's lock for the latter).
-function classifySessionQuorum(coordinationId, manifest, events, fgosDir) {
+//
+// P10-KERNEL-FIX: `manifest.definitionRef` set (a declared-protocol session)
+// additionally loads that definition so each actor can be classified against
+// `actorGatingOperationIds` (ALL of that actor's gating bindings, not just
+// its first-ever settled Assignment) via `resolveBindingOutcome` -- the same
+// per-operation classifier `resolveOperationOutcome`/visibility windows
+// already use, reused here rather than reimplemented. An actor with no
+// gating binding at all (or a session with no declared protocol,
+// `definitionRef: null`) falls through to the ORIGINAL "first
+// assignment-created event for this actor, anywhere" rule, byte-for-byte
+// unchanged -- see `actorGatingOperationIds`'s own doc comment for exactly
+// which bindings gate and why, and P10-KERNEL-FIX.md for the full
+// investigation.
+//
+// P10-KERNEL-FIX Fix Round 1 (HIGH-1/HIGH-2) + Fix Round 2 (N1/N2/NEW-HIGH-A,
+// reviewer-recheck-report.md / redteam-recheck-report.md): this is a
+// read/close-decision path invoked on EVERY request against a
+// declared-protocol session, including `coordination show`. Two failure
+// classes can stop the bound definition from classifying cleanly --
+// RESOLUTION failure (registry cannot resolve the id at all: a malformed
+// sibling file, a removed/renamed protocol, a missing `yaml` module) and
+// VERSION DRIFT (resolution succeeds, but to a version other than the one
+// this session was opened against). Both are now handled SYMMETRICALLY
+// across the two doors this function serves, by posture rather than by
+// cause:
+//
+// - READ (`evaluateSessionQuorum`, and `show.mjs`'s use of it) always
+//   degrades to `definition = null` -- the pre-existing fallback path,
+//   below -- on EITHER failure class, and never throws. `show` must keep
+//   working under an unresolvable OR a drifted definition (its own stated
+//   invariant); a drifted read reports the honest pre-fix answer (the loose
+//   fallback rule) rather than silently misclassifying an already-settled
+//   actor as "missing" under stamps that embed a version the read can no
+//   longer match (Fix Round 2, N2/NEW-HIGH-A: this was a genuine new
+//   regression against pre-fix HEAD, not "pre-existing laxness" as an
+//   earlier draft of this comment and P10-KERNEL-FIX.md §7.2 both,
+//   incorrectly, claimed).
+// - CLOSE (`closeSessionByQuorum`, only -- `opts.enforceDefinitionVersion`,
+//   below) requires a CLEANLY-RESOLVED, VERSION-MATCHED definition, or
+//   refuses explicitly with an honest, correctly-attributed reason -- never
+//   a silent fallback for either failure class. A resolution failure at
+//   close time is a MUTATION-door failure (Fix Round 2, N1,
+//   reviewer-recheck-report.md): falling back silently there disables the
+//   whole multi-operation gating rule this cell exists to add and restores
+//   this cell's own premature-close bug (one unrelated half-written
+//   protocol file in the registry would silently reopen it). Both failure
+//   classes therefore refuse through the SAME mechanism at close -- one
+//   unified "a close needs a real, matching definition" path, not two
+//   independent special cases -- matching every sibling definition-consuming
+//   mutation door in this file (`authorizeDeclaredOperation`/
+//   `dispatchDeclaredOperation`/`validateSessionAggregation`/
+//   `linkSessionContribution`).
+function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts = {}) {
   const requiredActorIds = (manifest.actors ?? []).map((actor) => actor.id);
+
+  let definition = null;
+  if (manifest.definitionRef) {
+    let resolved = null;
+    try {
+      resolved = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+    } catch {
+      resolved = null;
+    }
+    const drifted = resolved !== null && resolved.metadata.version !== manifest.definitionRef.version;
+
+    if (opts.enforceDefinitionVersion) {
+      if (resolved === null) {
+        throw new CoordinationError(
+          'validation',
+          `classifySessionQuorum: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the definition could not be resolved -- refusing to close against an unresolvable definition`,
+        );
+      }
+      if (drifted) {
+        throw new CoordinationError(
+          'validation',
+          `classifySessionQuorum: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${resolved.metadata.version}" -- refusing to close against a drifted definition`,
+        );
+      }
+      definition = resolved;
+    } else {
+      definition = drifted ? null : resolved;
+    }
+  }
 
   const replacedBy = new Map(); // oldActorId -> replacementActorId
   const replacementTargets = new Set(); // every id that is SOMEONE's replacement (never evaluated as its own top-level slot)
@@ -2390,6 +3349,47 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir) {
       replaced.push({ actorId: originalActorId, replacedBy: effectiveId });
     }
 
+    const gatingOperationIds = definition ? actorGatingOperationIds(definition, originalActorId) : [];
+    if (gatingOperationIds.length > 0) {
+      // Multi-operation-aware path (P10-KERNEL-FIX): EVERY gating binding
+      // for this actor must resolve to a satisfied, operation-stamped
+      // Assignment -- `resolveBindingOutcome` already follows the SAME
+      // `actor-replaced` lineage (`replacedBy`, built above) and the SAME
+      // failed/late/missing vocabulary this function's own fallback path
+      // (below) uses, so both paths report through one shared vocabulary.
+      const outcomes = gatingOperationIds.map((operationId) => resolveBindingOutcome(definition, operationId, originalActorId, { events, fgosDir, replacedBy }));
+      const unsatisfied = outcomes.find((outcome) => !outcome.satisfied);
+      if (!unsatisfied) {
+        const last = outcomes[outcomes.length - 1];
+        completed.push({ actorId: originalActorId, assignmentId: last.assignmentId, runId: last.runId });
+      } else if (unsatisfied.reason === 'missing') {
+        missing.push({ actorId: originalActorId });
+      } else if (unsatisfied.reason === 'late') {
+        late.push({ actorId: originalActorId, assignmentId: unsatisfied.assignmentId });
+      } else {
+        failed.push({ actorId: originalActorId, assignmentId: unsatisfied.assignmentId, runId: unsatisfied.runId });
+      }
+      continue;
+    }
+
+    // Fallback (pre-existing, unchanged): no gating binding anywhere for
+    // this actor -- either this session has no declared protocol at all, or
+    // every binding this actor has is an ungated driver-authorized one
+    // (`actorGatingOperationIds`). "First assignment-created event for this
+    // actor, anywhere" is exactly correct for a session with no protocol
+    // (no graph to consult in the first place) and for the real shipped
+    // shape this fallback exists to preserve (`standalone-master-
+    // coordination-loop.yaml`'s "fixer", whose only binding, revise-
+    // candidate, is a single ungated driver-authorized operation --
+    // `coordination-launch-master-loop.test.mjs`'s own `coord_launcher_live`
+    // proves and depends on "missing until dispatched" for exactly this
+    // shape). A HYPOTHETICAL actor with two-or-more ungated
+    // driver-authorized bindings and no required binding at all would still
+    // see this fallback count it complete after only the FIRST of those
+    // settles -- the same limitation this whole fix addresses for gating
+    // bindings, just not (yet) extended to the ungated case, because no
+    // real fixture in this repo has that shape today (P10-KERNEL-FIX.md
+    // Gaps).
     const createdEvent = events.find((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveId);
     if (!createdEvent) {
       missing.push({ actorId: originalActorId });
@@ -2446,9 +3446,12 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir) {
  * @param {string} coordinationId
  * @param {object} [params]
  * @param {string[]} [params.dissentingActorIds]
+ * @param {string} [params.aggregationId] Phase 07: consult this session's own
+ *   validated aggregation as terminal input. Can only REFUSE a close (see the
+ *   inline note); omitting it leaves every path here unchanged.
  * @returns {Readonly<object>} The transitioned manifest.
  */
-export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [] } = {}, opts = {}) {
+export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [], aggregationId } = {}, opts = {}) {
   // The classification (which actors are complete/missing/failed/late) and
   // the terminal write both happen INSIDE this ONE held lock, from a fresh
   // `replaySession()` taken after acquiring it -- never from an earlier
@@ -2462,8 +3465,39 @@ export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [] }
   return withSessionLock(
     coordinationId,
     (paths) => {
-      const { manifest, events } = replaySession(coordinationId, opts);
-      const quorum = classifySessionQuorum(coordinationId, manifest, events, paths.fgosDir);
+      const replayed = replaySession(coordinationId, opts);
+      const { manifest, events } = replayed;
+
+      // Phase 07 (MVP7): a validated cognitive aggregation used as terminal
+      // INPUT. Strictly a NARROWING -- the only thing it can do is refuse a
+      // close that quorum would otherwise have allowed. It never selects a
+      // status, never relaxes the partialPolicy rules below, and never closes
+      // a session quorum would have refused, so terminal-transition authority
+      // stays entirely with this function. Omitting `aggregationId` leaves
+      // every path below byte-identical to what it was before aggregation
+      // existed.
+      //
+      // The outcome is read from `replayed.aggregations` -- the event log,
+      // inside this same held lock -- never from a caller-supplied verdict,
+      // and never from `ignoredAggregations` (a post-terminal event, which by
+      // definition cannot inform a close that already happened).
+      if (aggregationId !== undefined) {
+        const validated = replayed.aggregations.find((record) => record.aggregationId === aggregationId);
+        if (!validated) {
+          throw new CoordinationError(
+            'dangling-ref',
+            `closeSessionByQuorum: session "${coordinationId}" has no valid "aggregation-validated" event for aggregation "${aggregationId}" -- refusing to close against an aggregation this session never validated`,
+          );
+        }
+        if (validated.outcome !== 'consensus') {
+          throw new CoordinationError(
+            'validation',
+            `closeSessionByQuorum: aggregation "${aggregationId}" of session "${coordinationId}" validated as "${validated.outcome}", not "consensus" -- refusing to close; resolve the aggregation and validate a new one, or close this session by another declared route`,
+          );
+        }
+      }
+
+      const quorum = classifySessionQuorum(coordinationId, manifest, events, paths.fgosDir, { ...opts, enforceDefinitionVersion: true });
       const incomplete = [...quorum.failed, ...quorum.late, ...quorum.missing];
       const incompleteActorIds = incomplete.map((entry) => entry.actorId);
 
@@ -2513,6 +3547,669 @@ export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [] }
         },
         paths,
       );
+    },
+    opts,
+  );
+}
+
+// ─── Phase 07 (Step 09 MVP7): evidence-preserving aggregation ──────────────
+//
+// The Team Cognition evaluator (`../team-cognition/aggregation-evaluator.mjs`)
+// is a pure function with no session or store access, by its own design. This
+// section is the ONE place that gives it session-derived evidence and records
+// what it decided. The split of authority is the point of the whole phase:
+//
+//   evaluator  -> decides the cognitive OUTCOME from evidence handed to it
+//   this file  -> decides what evidence is real, and owns every transition
+//
+// so a validated outcome is terminal INPUT (`closeSessionByQuorum`'s optional
+// `aggregationId` below), never a transition of its own.
+
+const AGGREGATION_METHOD = 'evidence-preserving-synthesis';
+
+// The disclosure ids this engine can derive from session evidence. Every one
+// is ENGINE-classified, never worker-asserted: `status`/`confidence` come from
+// `classifyRunEvidence`'s verdict on the filesystem (assignment-runner.mjs),
+// not from the worker's own `agentClaim`. A definition whose
+// `requiredDisclosures[]` names anything outside this set gets a disclosure
+// coverage failure from the evaluator -- fail-closed, never a silently
+// skipped requirement.
+function deriveDisclosures(runResult) {
+  return {
+    status: runResult.status,
+    confidence: runResult.confidence,
+    // A contribution that came back `blocked` is a settled result that
+    // nonetheless carries an objection. Surfacing it as a `dissent` disclosure
+    // is what lets the evaluator's hidden-dissent check do real work here: if
+    // the driver's own `dissentRefs` never names that source operation, the
+    // aggregation quietly counted an objecting contribution as agreement.
+    // A fixed marker, never the worker's own summary text -- no prose is
+    // parsed for meaning anywhere in this path (plan.md Non-Negotiable
+    // Deferrals).
+    dissent: runResult.status === 'blocked' ? 'blocked' : 'none',
+  };
+}
+
+function sha256OfFile(filePath) {
+  try {
+    return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Turn ONE satisfied source binding into the evaluator's `AggregationSource`
+ * shape, plus the artifact's CURRENT revision for staleness checking.
+ *
+ * The immutability pin is `settleReports[].sha256` -- the hash
+ * `assignment-runner.mjs` takes of the exact report bytes it classified, for
+ * exactly this purpose ("a report planted or edited after settle is not in
+ * the set (or no longer matches) and can never satisfy a report gate"). The
+ * current revision is that same file's hash recomputed now, so a report edited
+ * after settle makes its source stale and the outcome `no-consensus`.
+ *
+ * The file is located by DERIVING its path from the validated
+ * `assignmentId`/`runId` (identical derivation to `readLinkedRunResultFromDisk`
+ * above, including the full-shape runId check), never by joining the
+ * `settleReports[].path` string out of `result.json`. That string is recorded
+ * provenance and is used only as an opaque map key: joining it into a
+ * filesystem path would make a hand-edited `result.json` a traversal surface,
+ * which is precisely the class R6 closed for `runId`.
+ *
+ * Returns `null` when the run carries no usable pin -- the caller records that
+ * contribution as unresolved rather than feeding an unpinned source in.
+ */
+function aggregationSourceFrom(fgosDir, sourceOperationRef, assignmentId, runId, runResult) {
+  const settleReports = Array.isArray(runResult.settleReports) ? runResult.settleReports : [];
+  // Today's runner records at most one settle report per run (the single
+  // `agent-report.md`), so this is a guard against a shape this code has no
+  // rule for, not a routine branch: with several artifacts there is no
+  // declared way to pick which one the revision pin refers to.
+  if (settleReports.length !== 1) return null;
+  const [report] = settleReports;
+  if (typeof report?.path !== 'string' || typeof report?.sha256 !== 'string') return null;
+
+  assertValidRunIdForAssignment(assignmentId, runId, 'aggregationSourceFrom (settle-report artifact)');
+  const attemptStr = runId.slice(`run_${assignmentId}_`.length);
+  const reportPath = path.join(fgosDir, 'assignments', assignmentId, 'runs', attemptStr, 'agent-report.md');
+
+  return {
+    source: {
+      sourceOperationRef,
+      assignmentId,
+      runId,
+      artifactRef: report.path,
+      revision: report.sha256,
+      disclosures: deriveDisclosures(runResult),
+    },
+    currentRevision: sha256OfFile(reportPath),
+  };
+}
+
+/**
+ * Validate one cognitive aggregation for `coordinationId` against this
+ * session's own evidence, and record the result as an `aggregation-validated`
+ * event.
+ *
+ * What is DERIVED from the session (never taken from the caller):
+ * - the FlowDefinition itself -- loaded from `manifest.definitionRef`, with
+ *   the same version-drift refusal every other definition-consuming door
+ *   here already applies. A caller-supplied definition would let the caller
+ *   choose which operations count as sources and which bindings form each
+ *   cohort, which is the entire input the verdict is derived from;
+ * - which operations are sources -- the bound definition's own
+ *   `completion.aggregation.sourceOperationRefs[]`;
+ * - which Assignments answer them -- `resolveOperationOutcome`, the SAME
+ *   stamp-verified derivation visibility windows use, so an Assignment that
+ *   merely shares an actor or a claim key answers nothing;
+ * - each source's artifact ref, revision pin, and disclosures -- read off the
+ *   linked RunResult on disk;
+ * - the outcome itself -- `classifyAggregationOutcome`, called, never forked.
+ *
+ * What the CALLER supplies: identity (`aggregationId`, `validatedBy`), the
+ * aggregate's own output (`assignmentId`/`runId`/`outputArtifactRef`), and
+ * `dissentRefs` -- declared dissent, on exactly the footing
+ * `synthesizeResearchFanIn`'s `contradictions` and `closeSessionByQuorum`'s
+ * `dissentingActorIds` already established: this engine has no semantic model
+ * of disagreement and never infers it, it only records what a driver already
+ * knows. There is no `outcome` parameter: a caller cannot assert a verdict,
+ * only submit evidence and receive one.
+ *
+ * Never transitions the session. See `closeSessionByQuorum`'s `aggregationId`
+ * for how a validated outcome is consumed as terminal input.
+ *
+ * @param {string} coordinationId
+ * @param {object} params
+ * @param {string} params.aggregationId
+ * @param {{type: 'driver', id: string}} params.validatedBy
+ * @param {string} [params.assignmentId] The aggregate's own output Assignment.
+ * @param {string} [params.runId]
+ * @param {string} [params.outputArtifactRef]
+ * @param {{sourceOperationRef: string, resolved: boolean}[]} [params.dissentRefs]
+ * @returns {Readonly<{outcome: string, classification: object, event: object}>}
+ */
+export function validateSessionAggregation(
+  coordinationId,
+  { aggregationId, validatedBy, assignmentId, runId, outputArtifactRef, dissentRefs = [] },
+  opts = {},
+) {
+  if (!isNonEmptyString(aggregationId)) {
+    throw new CoordinationError('validation', 'validateSessionAggregation: aggregationId is required');
+  }
+
+  const manifest = readManifest(coordinationId, opts);
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `validateSessionAggregation: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no declared aggregation to validate against`,
+    );
+  }
+  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `validateSessionAggregation: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to validate against a drifted definition`,
+    );
+  }
+
+  const declaration = definition?.spec?.profile?.completion?.aggregation;
+  if (!declaration) {
+    throw new CoordinationError(
+      'validation',
+      `validateSessionAggregation: protocol "${definition?.metadata?.id}" declares no spec.profile.completion.aggregation -- there is nothing to validate against`,
+    );
+  }
+  if (declaration.method !== AGGREGATION_METHOD) {
+    throw new CoordinationError(
+      'validation',
+      `validateSessionAggregation: aggregation method "${declaration.method}" is not supported (only "${AGGREGATION_METHOD}" exists in MVP7)`,
+    );
+  }
+
+  const replayed = replaySession(coordinationId, opts);
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  const replacedBy = buildActorReplacementMap(replayed.events);
+
+  const sources = [];
+  const currentRevisions = {};
+  const sourceResultRefs = [];
+  const artifactRevisionRefs = [];
+  const unresolvedContributionRefs = [];
+  const missingActors = [];
+  const failedActors = [];
+  const unboundSourceOperationRefs = [];
+
+  for (const sourceOperationRef of declaration.sourceOperationRefs) {
+    // A declared source operation that no node pairs with an actor has no
+    // cohort to resolve at all. `resolveOperationOutcome` would raise the
+    // binding resolver's own dispatch-shaped error here -- accurate, but it
+    // names neither this aggregation nor which declared source went
+    // unanswerable, and it leaves nothing on the ledger. Named, never
+    // dropped: the operation contributes no source (so the evaluator's
+    // coverage check still forces `no-consensus`) and the record says which
+    // one and why.
+    if (!hasBoundActor(definition, sourceOperationRef)) {
+      unboundSourceOperationRefs.push(sourceOperationRef);
+      continue;
+    }
+    const outcome = resolveOperationOutcome(definition, sourceOperationRef, { events: replayed.events, fgosDir, replacedBy });
+
+    // All-of over the operation's bindings, exactly the rule
+    // `resolveOperationOutcome` already computes for visibility windows: a
+    // source operation wired to a fan-out cohort is the WHOLE cohort's
+    // obligation. When any binding is unsatisfied, this operation contributes
+    // NO source at all -- so the evaluator's own coverage check fails it and
+    // the outcome can only be `no-consensus`. Contributing the satisfied
+    // branches alone would let a half-answered cohort read as fully covered,
+    // which is the partial-cohort bypass P06 refused one layer down.
+    if (!outcome.satisfied) {
+      for (const branch of outcome.branches) {
+        if (branch.satisfied) continue;
+        // Named, never dropped: a contribution that never arrived or failed
+        // is recorded on the event, so an aggregate can never look complete
+        // by omission. `late` (created, not yet settled) counts as missing
+        // for the same reason `classifySessionQuorum` treats it as incomplete.
+        if (branch.reason === 'failed') failedActors.push(branch.actorId);
+        else missingActors.push(branch.actorId);
+      }
+      continue;
+    }
+
+    // Same all-of discipline one level deeper: every binding of this operation
+    // must yield a revision-pinned source, or the operation contributes none.
+    // A cohort where one contributor settled without an immutable pin is not
+    // fully evidence-backed, and letting its pinned siblings cover for it
+    // would be the same partial-cohort bypass in a different coat.
+    const built = outcome.branches.map((branch) => {
+      const runResult = readLinkedRunResultFromDisk(fgosDir, branch.assignmentId, branch.runId);
+      return { branch, pinned: aggregationSourceFrom(fgosDir, sourceOperationRef, branch.assignmentId, branch.runId, runResult) };
+    });
+    if (built.some((entry) => entry.pinned === null)) {
+      // Named, never dropped -- and since this operation now contributes no
+      // source, the evaluator's coverage check fails it and the outcome can
+      // only be `no-consensus`.
+      for (const entry of built) unresolvedContributionRefs.push(entry.branch.assignmentId);
+      continue;
+    }
+    for (const { branch, pinned } of built) {
+      sources.push(pinned.source);
+      sourceResultRefs.push(branch.assignmentId);
+      artifactRevisionRefs.push(`${pinned.source.artifactRef}@${pinned.source.revision}`);
+      // A source whose artifact cannot be hashed now gets NO entry here, and
+      // `validateSourceRevisionCurrency` fails closed on a missing entry --
+      // an unreadable artifact is stale, never assumed current.
+      if (pinned.currentRevision !== undefined) currentRevisions[pinned.source.artifactRef] = pinned.currentRevision;
+    }
+  }
+
+  // Zero surviving sources is a real verdict, not an error to raise at the
+  // driver. With a single declared source operation -- the likeliest protocol
+  // shape -- one missing or failed contributor wipes out every source, and
+  // throwing here would drop the very names this function just accumulated:
+  // the gap would exist with nothing on the ledger saying so. The evaluator's
+  // own coverage check turns an empty source set into `no-consensus`, and the
+  // event carries the named missing/failed/unbound reason with it.
+  const classification = classifyAggregationOutcome({
+    sourceOperationRefs: [...declaration.sourceOperationRefs],
+    sources,
+    requiredDisclosures: [...declaration.requiredDisclosures],
+    dissentRefs,
+    currentRevisions,
+  });
+
+  const event = recordAggregationValidation(
+    coordinationId,
+    {
+      aggregationId,
+      method: AGGREGATION_METHOD,
+      outcome: classification.outcome,
+      sourceResultRefs,
+      validatedBy,
+      ...(assignmentId !== undefined ? { assignmentId } : {}),
+      ...(runId !== undefined ? { runId } : {}),
+      ...(outputArtifactRef !== undefined ? { outputArtifactRef } : {}),
+      ...(dissentRefs.length > 0 ? { dissentRefs: dissentRefs.map((entry) => entry.sourceOperationRef) } : {}),
+      ...(unresolvedContributionRefs.length > 0 ? { unresolvedContributionRefs } : {}),
+      ...(missingActors.length > 0 ? { missingActors } : {}),
+      ...(failedActors.length > 0 ? { failedActors } : {}),
+      ...(unboundSourceOperationRefs.length > 0 ? { unboundSourceOperationRefs } : {}),
+      ...(artifactRevisionRefs.length > 0 ? { artifactRevisionRefs } : {}),
+    },
+    opts,
+  );
+
+  return Object.freeze({ outcome: classification.outcome, classification, event });
+}
+
+// ─── Phase 08 (Step 09 MVP8): deliberation contribution ledger ─────────────
+//
+// `../deliberation/schema.mjs` is a pure lineage validator with no session or
+// store access, by its own design (P08.1). This section is the ONE place that
+// gives it session-derived truth and records what it accepted -- the same
+// split of authority Phase 07 drew around the aggregation evaluator:
+//
+//   deliberation/schema.mjs -> decides whether a contribution's SHAPE and
+//                              LINEAGE are legal, given a context
+//   this file               -> decides what that context actually IS
+//
+// Every value that context is built from comes off the session or its bound
+// definition. A caller supplies identity and its own semantic claims
+// (`contributionId`, `type`, `roundKey`, lineage refs) and nothing that a
+// legality decision is made from.
+
+// Same posture as DISPOSITION_RATIONALE_MAX_LENGTH/CONSULT_OBJECTIVE_MAX_LENGTH
+// above: a caller-supplied string persisted verbatim into the immutable ledger
+// is bounded at the mediated door, generously but really. Without it, the
+// content-freedom discipline is closed against field NAMES and wide open
+// against field VOLUME -- an artifact body does not need a `content` field, it
+// needs a long `roundKey`.
+const CONTRIBUTION_FIELD_MAX_LENGTH = 2000;
+
+/**
+ * The log `seq` at which ONE satisfied binding branch became satisfied: the
+ * EARLIEST `result-linked` for its settling Assignment whose run classified as
+ * satisfied, using `classifyOperationAssignment`'s own failed/no-evidence rule.
+ *
+ * Earliest, never latest. Satisfaction is sticky in `resolveBindingOutcome`
+ * and windows are monotone closed->open, so a branch opened when its first
+ * satisfying run linked; a later retry of an already-satisfied source appends
+ * another `result-linked` without re-closing anything, and reading the latest
+ * would move "opened at" forward for a window that never moved.
+ */
+function branchSatisfiedAtSeq(events, fgosDir, assignmentId) {
+  for (const event of events) {
+    if (event.type !== 'result-linked' || event.payload.assignmentId !== assignmentId) continue;
+    const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, event.payload.runId);
+    if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') continue;
+    return event.seq;
+  }
+  return 0;
+}
+
+/**
+ * The log `seq` at which the window actually opened: the latest position at
+ * which any of its `opensAfter` source branches became satisfied. Only
+ * meaningful for an already-open window, where every branch is satisfied.
+ */
+function visibilityWindowOpenedAtSeq(events, fgosDir, sources) {
+  let openedAt = 0;
+  for (const source of sources) {
+    for (const branch of source.branches) {
+      const seq = branchSatisfiedAtSeq(events, fgosDir, branch.assignmentId);
+      if (seq > openedAt) openedAt = seq;
+    }
+  }
+  return openedAt;
+}
+
+/**
+ * The log `seq` of the event that AUTHORIZED the Run `linkedEvent` settled --
+ * `assignment-created` for a first attempt, the `run-retried` that declared it
+ * for a retry. In log terms that is simply the most recent authorization for
+ * this Assignment before the link.
+ *
+ * This, not the `result-linked` position, is the Run's REASONING position. The
+ * two coincide in the ordinary case and diverge exactly where it matters:
+ * `retrySessionTask`'s documented crash self-heal links a Run that executed
+ * long before at a fresh, high `seq`, so a link position would place reasoning
+ * after events it could never have seen.
+ */
+function runAuthorizedAtSeq(events, assignmentId, linkedEvent) {
+  let authorizedAt = 0;
+  for (const event of events) {
+    if (event.seq >= linkedEvent.seq) break;
+    if (event.type !== 'assignment-created' && event.type !== 'run-retried') continue;
+    if (event.payload.assignmentId !== assignmentId) continue;
+    authorizedAt = event.seq;
+  }
+  return authorizedAt;
+}
+
+/**
+ * Which DECLARED operation an Assignment of this session actually performed,
+ * or `null`. Answered only through the reserved `protocol-operation:` stamp --
+ * the same single channel `deriveVisibilityWindowState` consults, for the same
+ * reason it consults nothing else: `payload.operationId`, the claiming
+ * taskKey, and the actor binding are all writable by doors that never
+ * performed the operation, and this codebase already refused each of them one
+ * boundary down.
+ */
+function stampedOperationRefOf(definition, assignmentId, fgosDir) {
+  for (const operation of definition.spec.operations) {
+    if (assignmentServesOperation(definition, operation.id, { assignmentId, fgosDir })) return operation.id;
+  }
+  return null;
+}
+
+/**
+ * `Map<assignmentId, {sessionId, operationRef}>` over every Assignment of this
+ * session that carries a declared-operation stamp -- the real-store
+ * `knownAssignments` channel P08.1 declared and left for its caller to
+ * populate ("Assignment existence can only ever be known to a caller that has
+ * a store"). Assignments with no stamp are deliberately absent: an ad-hoc
+ * primary task or a consult proposal performed no declared operation, so it
+ * can back no contribution.
+ */
+function knownStampedAssignments(definition, replayed, coordinationId, fgosDir) {
+  const known = new Map();
+  for (const event of replayed.events) {
+    if (event.type !== 'assignment-created') continue;
+    const operationRef = stampedOperationRefOf(definition, event.payload.assignmentId, fgosDir);
+    if (operationRef === null) continue;
+    known.set(event.payload.assignmentId, { sessionId: coordinationId, operationRef });
+  }
+  return known;
+}
+
+/**
+ * Link ONE typed deliberation contribution into `coordinationId`'s ledger
+ * (MVP8), enforcing MVP6 window/context legality on the way in.
+ *
+ * What is DERIVED from the session (never taken from the caller):
+ * - the **FlowDefinition** -- loaded from `manifest.definitionRef`, with the
+ *   same version-drift refusal every other definition-consuming door here
+ *   applies. This is the value three earlier cells in this track shipped a
+ *   bypass by accepting as a parameter; it is not a parameter here;
+ * - the **operationRef** the contribution answers -- read off the backing
+ *   Assignment's reserved `protocol-operation:` stamp, so an Assignment that
+ *   merely shares an actor or a claim key can back no contribution;
+ * - the **visibilityWindowRef** -- read off that operation's own node binding
+ *   (`contextAccess.visibilityWindowRef`), so a caller cannot choose which
+ *   window rule its contribution is judged against;
+ * - whether that window is **open** -- `deriveVisibilityWindowState`, called,
+ *   never reimplemented, and re-derived fresh from a new `replaySession()`
+ *   rather than trusting that the dispatch-time gate already ran;
+ * - the **runId** -- the latest accepted `result-linked` for that Assignment;
+ * - the **artifactRef and revision pin** -- `aggregationSourceFrom`, the same
+ *   settle-report derivation MVP7's sources use, so the pin is the hash of the
+ *   bytes the runner classified. An artifact edited since settle is refused
+ *   outright rather than linked under a pin it no longer matches;
+ * - the **lineage context** -- `knownContributions` and `knownAssignments`
+ *   built from this session's own log.
+ *
+ * What the CALLER supplies: `contributionId`, the contribution's `type` (its
+ * own semantic claim, bounded by the closed MVP8 enum), `roundKey` (an opaque
+ * grouping label, length-bounded here exactly as `rationale`/`objective` are
+ * at the sibling mediated doors -- a verbatim string reaching the immutable
+ * ledger is never unbounded by omission), the backing `assignmentId`, its
+ * `anchors`/`respondsTo` lineage
+ * claims (each checked against the real ledger), and `linkedBy`.
+ *
+ * Never transitions the session, and never copies artifact content: the event
+ * carries `artifactRef` + `revision` and nothing else about the artifact.
+ *
+ * @param {string} coordinationId
+ * @param {object} params
+ * @param {string} params.contributionId
+ * @param {string} params.type One of the closed MVP8 contribution types.
+ * @param {string} params.assignmentId The Assignment whose settled Run backs this contribution.
+ * @param {string} params.roundKey
+ * @param {{type: 'driver', id: string}} params.linkedBy
+ * @param {string[]} [params.anchors]
+ * @param {string} [params.respondsTo]
+ * @param {object} [opts] Workspace options ({ cwd, repoRoot, packageRoot })
+ */
+export function linkSessionContribution(
+  coordinationId,
+  { contributionId, type, assignmentId, roundKey, linkedBy, anchors, respondsTo },
+  opts = {},
+) {
+  if (!isNonEmptyString(contributionId) || contributionId.length > CONTRIBUTION_FIELD_MAX_LENGTH) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: contributionId must be a non-empty, bounded string (max ${CONTRIBUTION_FIELD_MAX_LENGTH} characters)`,
+    );
+  }
+  if (!isNonEmptyString(roundKey) || roundKey.length > CONTRIBUTION_FIELD_MAX_LENGTH) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: roundKey must be a non-empty, bounded string (max ${CONTRIBUTION_FIELD_MAX_LENGTH} characters)`,
+    );
+  }
+  if (!isNonEmptyString(assignmentId)) {
+    throw new CoordinationError('validation', 'linkSessionContribution: assignmentId is required');
+  }
+
+  const manifest = readManifest(coordinationId, opts);
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no declared operation or visibility window for a contribution to be judged against`,
+    );
+  }
+  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to link a contribution against a drifted definition`,
+    );
+  }
+
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  const replayed = replaySession(coordinationId, opts);
+
+  const createdEvent = lastEventFor(replayed.events, 'assignment-created', assignmentId);
+  if (!createdEvent) {
+    throw new CoordinationError(
+      'foreign-ref',
+      `linkSessionContribution: assignment "${assignmentId}" was never created in session "${coordinationId}" -- a contribution may only be backed by this session's own work`,
+    );
+  }
+  // The stamp is asked first, because it is the more fundamental question: an
+  // Assignment that performed no declared operation can back no contribution
+  // whatever else is true of it.
+  const operationRef = stampedOperationRefOf(definition, assignmentId, fgosDir);
+  if (operationRef === null) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: assignment "${assignmentId}" carries no declared-operation provenance stamp for protocol "${definition.metadata.id}@${definition.metadata.version}" -- it did not materialize a declared operation, so it can back no contribution`,
+    );
+  }
+  const actorId = createdEvent.payload.actorId;
+  if (!isNonEmptyString(actorId)) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: assignment "${assignmentId}" names no actor -- there is no node binding to resolve its declared operation's context access from`,
+    );
+  }
+
+  // Window/context legality, MVP6's own mechanism. The ref comes from the
+  // binding, not the caller; the verdict comes from the shared derivation, not
+  // a second copy of the rule.
+  const { binding, node } = resolveDeclaredOperationActor(definition, operationRef, actorId);
+  const visibilityWindowRef = binding.contextAccess?.visibilityWindowRef;
+  if (visibilityWindowRef === undefined) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: operation "${operationRef}" at node "${node.id}" for actor "${actorId}" declares no contextAccess.visibilityWindowRef -- a contribution records the window its reasoning was legal under, so an ungated binding has no window provenance to record and cannot contribute`,
+    );
+  }
+  const { open, sources } = deriveVisibilityWindowState(definition, visibilityWindowRef, replayed, fgosDir);
+  if (!open) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: operation "${operationRef}" at node "${node.id}" requires visibility window "${visibilityWindowRef}" to be open before its reasoning may enter the deliberation ledger, and it is not open yet -- refusing to link contribution "${contributionId}"`,
+    );
+  }
+
+  const linkedEvent = lastEventFor(replayed.events, 'result-linked', assignmentId);
+  if (!linkedEvent) {
+    throw new CoordinationError(
+      'dangling-ref',
+      `linkSessionContribution: assignment "${assignmentId}" has no linked RunResult -- a contribution is backed by a settled Run, never by one still in flight`,
+    );
+  }
+  // The window claim is about the REASONING, not about the clock at write
+  // time. "The window is open now" is not the same statement as "this
+  // reasoning was produced under an open window": a Run that STARTED before
+  // the window opened demonstrably could not have seen what the window
+  // admits, so recording `visibilityWindowRef` for it would put a provenance
+  // claim on the immutable ledger that the Run could never have witnessed.
+  //
+  // That shape is reachable today, not hypothetical: `dispatchDeclaredOperation`'s
+  // own window gate sits inside its `driver-authorized` branch, so a binding
+  // with `activation.mode: required` is dispatched and settles with no window
+  // check at all. Comparing log positions is what turns the link-time verdict
+  // into a reasoning-time one -- the same event log, the same derivation, one
+  // more question asked of it.
+  //
+  // BOTH positions are the Run's own, never a link position: the backing side
+  // is the Run's authorization (`assignment-created`/`run-retried`), and each
+  // window source is the EARLIEST link that satisfied it. A `result-linked`
+  // `seq` says when a result was RECORDED, which diverges from when its
+  // reasoning happened across a crash-resume (backing side) and across a retry
+  // of an already-satisfied source (window side).
+  const windowOpenedAtSeq = visibilityWindowOpenedAtSeq(replayed.events, fgosDir, sources);
+  const runAuthorizedSeq = runAuthorizedAtSeq(replayed.events, assignmentId, linkedEvent);
+  if (runAuthorizedSeq <= windowOpenedAtSeq) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: the run of assignment "${assignmentId}" that settled at log position ${linkedEvent.seq} was authorized at log position ${runAuthorizedSeq}, not after visibility window "${visibilityWindowRef}" opened at log position ${windowOpenedAtSeq} -- its reasoning could not have seen what that window admits, so it carries no "${visibilityWindowRef}" provenance to record; re-run the operation under the open window instead`,
+    );
+  }
+
+  const runId = linkedEvent.payload.runId;
+  const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, runId);
+  const pinned = aggregationSourceFrom(fgosDir, operationRef, assignmentId, runId, runResult);
+  if (pinned === null) {
+    throw new CoordinationError(
+      'dangling-ref',
+      `linkSessionContribution: run "${runId}" of assignment "${assignmentId}" carries no single settle-report revision pin -- a contribution without immutable artifact backing is not a contribution`,
+    );
+  }
+  if (pinned.currentRevision !== pinned.source.revision) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: the artifact backing assignment "${assignmentId}" no longer matches its settle-time revision pin -- it was edited after settle, so linking it would pin a revision the file no longer has`,
+    );
+  }
+
+  // Every declared operation of the BOUND protocol, narrowed to the REAL
+  // per-operation `contributions.allowedTypes[]` declaration
+  // (`src/runner/definitions/schema.mjs`'s `spec.operations[]` whitelist,
+  // P08.3). Derived from the definition, never from the caller. An operation
+  // with no `contributions` key at all, or with `allowedTypes: []`, converges
+  // on the SAME meaning: "declares no allowed types", which
+  // `validateOperationDeclaresType` (../deliberation/schema.mjs) already
+  // treats as reject-everything for an empty/absent entry -- so both shapes
+  // are represented identically here, as `allowedTypes: []`, rather than
+  // omitting the operation from the map (an absent operationRef is refused
+  // one layer up as `foreign-provenance` before this map is even consulted,
+  // via `stampedOperationRefOf`, so this map never needs to represent "no
+  // such operation").
+  const declaredOperations = Object.fromEntries(
+    definition.spec.operations.map((operation) => [
+      operation.id,
+      { allowedTypes: operation.contributions?.allowedTypes ? [...operation.contributions.allowedTypes] : [] },
+    ]),
+  );
+
+  const contribution = {
+    contributionId,
+    sessionId: coordinationId,
+    operationRef,
+    type,
+    assignmentId,
+    runId,
+    artifactRef: pinned.source.artifactRef,
+    revision: pinned.source.revision,
+    roundKey,
+    visibilityWindowRef,
+    ts: new Date().toISOString(),
+    ...(anchors !== undefined ? { anchors } : {}),
+    ...(respondsTo !== undefined ? { respondsTo } : {}),
+  };
+  try {
+    validateContributionLineage(contribution, {
+      sessionId: coordinationId,
+      declaredOperations,
+      knownContributions: knownContributionsFromEvents(replayed.events, coordinationId),
+      knownAssignments: knownStampedAssignments(definition, replayed, coordinationId, fgosDir),
+    });
+  } catch (err) {
+    asCoordinationError(err, `linkSessionContribution: session "${coordinationId}" contribution "${contributionId}"`);
+  }
+
+  // `sessionId` and `ts` stay out of the persisted payload: the first is a
+  // forbidden field (the log IS the session), the second is stamped on the
+  // event envelope. Both were needed only to hand P08.1's validator a complete
+  // contribution object.
+  return recordContributionLink(
+    coordinationId,
+    {
+      contributionId,
+      operationRef,
+      type,
+      assignmentId,
+      runId,
+      artifactRef: contribution.artifactRef,
+      revision: contribution.revision,
+      roundKey,
+      visibilityWindowRef,
+      linkedBy,
+      ...(anchors !== undefined ? { anchors } : {}),
+      ...(respondsTo !== undefined ? { respondsTo } : {}),
     },
     opts,
   );

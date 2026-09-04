@@ -1,0 +1,125 @@
+# core/coordination-protocols/deliberation-delphi-chain.yaml -- Phase 08
+# (MVP8) P08.3 method-shaped proof: the Delphi chain named by
+# phase-08-mvp8-deliberation-memory.md's Candidate Contract -- "private
+# proposal -> mediated aggregate artifact -> next-round proposal."
+#
+# Two windows. `round1-open` is vacuously open from session start
+# (`opensAfter.operationRefs: []`, the schema's own documented degenerate
+# case) and gates `propose-round1`'s OWN contribution: a window that opened
+# only after `propose-round1` itself settled could never gate
+# `propose-round1`'s own link -- `linkSessionContribution` requires a
+# contribution's backing Run to have been AUTHORIZED strictly after its
+# window opened (P08.2 Fix Round 2), and an operation's own authorization
+# always precedes the settlement a self-referential window would wait for.
+# Each panelist's round-1 reasoning is therefore always free to become a
+# durable record. `aggregate` (facilitator) is a plain, non-contribution-
+# bearing operation that produces the mediated aggregate artifact; it
+# declares no `contributions` field, since none of the six closed MVP8
+# contribution types names "aggregate". `round2-open` is the REAL gate --
+# opening only once `aggregate` (a genuinely different, later operation)
+# settles -- and governs `propose-round2`, a second-round `proposal`
+# contribution that cites the round-1 contributions it builds on via
+# `anchors[]` at LINK time (a runtime concern, not a fixture concern).
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.deliberation-delphi-chain
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: isolated-until-fan-in
+      visibilityWindows:
+        - id: round1-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: []
+          permits:
+            sourceOperationRefs: [propose-round1]
+            delivery: artifact-refs
+        - id: round2-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [aggregate]
+          permits:
+            sourceOperationRefs: [aggregate]
+            delivery: artifact-refs
+
+  roles:
+    - facilitator
+    - panelist
+
+  actors:
+    - id: facilitator-actor
+      role: facilitator
+    - id: panelist-a
+      role: panelist
+    - id: panelist-b
+      role: panelist
+
+  operations:
+    - id: propose-round1
+      role: panelist
+      policy:
+        minTier: lightweight
+      task:
+        contractTemplate: delphi-propose-round1
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: aggregate
+      role: facilitator
+      task:
+        contractTemplate: delphi-aggregate
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: propose-round2
+      role: panelist
+      policy:
+        minTier: lightweight
+      task:
+        contractTemplate: delphi-propose-round2
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+
+  graph:
+    entry: phase-round1
+    nodes:
+      - id: phase-round1
+        operations:
+          - ref: propose-round1
+            actor: panelist-a
+            contextAccess:
+              visibilityWindowRef: round1-open
+          - ref: propose-round1
+            actor: panelist-b
+            contextAccess:
+              visibilityWindowRef: round1-open
+        transitions: [phase-aggregate]
+      - id: phase-aggregate
+        operations:
+          - ref: aggregate
+            actor: facilitator-actor
+        transitions: [phase-round2]
+      - id: phase-round2
+        operations:
+          - ref: propose-round2
+            actor: panelist-a
+            contextAccess:
+              visibilityWindowRef: round2-open
+          - ref: propose-round2
+            actor: panelist-b
+            contextAccess:
+              visibilityWindowRef: round2-open
+        transitions: []

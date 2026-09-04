@@ -33,6 +33,14 @@ export const VISIBILITY_VALUES = Object.freeze(['headless', 'visible']);
 export const RESULT_KIND_VALUES = Object.freeze(['advisory', 'gate-verdict', 'work-product']);
 export const EVIDENCE_REQUIRED_VALUES = Object.freeze(['reported', 'verified']);
 export const COMPLETION_MODE_VALUES = Object.freeze(['synthesize', 'all-required', 'explicit-partial']);
+
+// Cognitive aggregation is declared SEPARATELY from `completion.mode`, never
+// as another mode value: phase-07's whole point is that completion
+// eligibility (mode) and cognitive validation (aggregation) are different
+// questions with different authorities. One method only in MVP7 -- "prove one
+// honest synthesis method before introducing voting or convergence
+// machinery."
+export const AGGREGATION_METHOD_VALUES = Object.freeze(['evidence-preserving-synthesis']);
 export const CONTEXT_VISIBILITY_VALUES = Object.freeze(['mediated', 'isolated-until-fan-in', 'broadcast']);
 export const COHORT_INDEPENDENCE_VALUES = Object.freeze(['isolated-until-fan-in']);
 
@@ -51,7 +59,15 @@ const GRAPH_FIELDS = new Set(['entry', 'nodes']);
 // spec.profile.kind, never a stored field on the node object (ADR-009
 // Decision 3). Any explicit `kind` key here is rejected by the whitelist.
 const NODE_FIELDS = new Set(['id', 'operations', 'transitions']);
-const NODE_OPERATION_REF_FIELDS = new Set(['ref', 'actor', 'activation']);
+// `specialistSlotRef` (Step 09 MVP9, P09.2) is the ALTERNATIVE to `actor` --
+// never both on one binding (validateNodeOperationRef rejects the
+// combination) -- naming a declared `spec.profile.topology.specialistSlots[]`
+// id instead of a static `spec.actors[]` id. It names WHO may fill the
+// binding as "whoever is currently authorized to occupy this slot", resolved
+// at authorize/dispatch time (session-engine.mjs), never at definition-
+// validation time -- this module stays a pure, session-blind kernel and does
+// no actor-binding resolution of its own.
+const NODE_OPERATION_REF_FIELDS = new Set(['ref', 'actor', 'specialistSlotRef', 'activation', 'contextAccess']);
 const ACTIVATION_FIELDS = new Set(['mode', 'maxInvocations']);
 
 // `activation` is scoped to the node-operation BINDING, never to the
@@ -65,9 +81,20 @@ export const DEFAULT_ACTIVATION_MODE = 'required';
 
 // Deliberately no `purpose` -- V1 omits it on purpose (ADR-009 Decision 5);
 // any explicit `purpose` key here is rejected by the whitelist below.
-const OPERATION_FIELDS = new Set(['id', 'role', 'capabilities', 'task', 'policy', 'result']);
+const OPERATION_FIELDS = new Set(['id', 'role', 'capabilities', 'task', 'policy', 'result', 'contributions']);
 const OPERATION_TASK_FIELDS = new Set(['taskSpec', 'contractTemplate']);
 const OPERATION_RESULT_FIELDS = new Set(['kind', 'evidenceRequired']);
+const OPERATION_CONTRIBUTIONS_FIELDS = new Set(['allowedTypes']);
+
+// Deliberation contribution types (Step 09 MVP8, candidate contract --
+// phase-08-mvp8-deliberation-memory.md's Candidate Contract). Duplicated
+// locally rather than imported from `../deliberation/schema.mjs`'s own
+// `CONTRIBUTION_TYPES`, matching this file's existing precedent for
+// `AGGREGATION_METHOD_VALUES` (defined here, not imported from
+// `team-cognition/schema.mjs`): this module is a zero-dependency pure kernel
+// (header comment above), and every other cross-boundary enum it validates
+// against is a local, independently-declared copy for the same reason.
+const CONTRIBUTION_TYPE_VALUES = Object.freeze(['proposal', 'objection', 'response', 'clarification', 'rank', 'specialist-request']);
 
 // SessionActor shape (ADR-008): id, declared role, optional persona,
 // optional PolicyPatch.
@@ -81,10 +108,47 @@ const WORKFLOW_WORK_FIELDS = new Set(['baseStepMap']);
 // `work`/`baseStepMap` absent from this whitelist closes "CoordinationProtocol
 // forbidden: profile.work, baseStepMap" structurally, not by naming them.
 const PROTOCOL_PROFILE_FIELDS = new Set(['kind', 'completion', 'topology', 'cohort']);
-const PROTOCOL_COMPLETION_FIELDS = new Set(['mode']);
-const PROTOCOL_TOPOLOGY_FIELDS = new Set(['contextVisibility', 'edges']);
+const PROTOCOL_COMPLETION_FIELDS = new Set(['mode', 'aggregation']);
+const PROTOCOL_COMPLETION_AGGREGATION_FIELDS = new Set(['method', 'outputOperationRef', 'sourceOperationRefs', 'requiredDisclosures']);
+const PROTOCOL_TOPOLOGY_FIELDS = new Set(['contextVisibility', 'edges', 'visibilityWindows', 'specialistSlots']);
 const PROTOCOL_TOPOLOGY_EDGE_FIELDS = new Set(['from', 'to', 'intents', 'maxRounds']);
 const PROTOCOL_COHORT_FIELDS = new Set(['count', 'distinctProviderFamilies', 'requiredRoles', 'independence']);
+
+// Visibility windows (Step 09 MVP6, candidate contract --
+// docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md
+// §3 -- schema-shaped only, no runtime enforcement here). Legal only under
+// `CoordinationProtocol` because `visibilityWindows` lives inside
+// `topology`, and `topology` is already absent from WORKFLOW_PROFILE_FIELDS
+// -- a `Workflow` profile carrying `topology.visibilityWindows` is rejected
+// as an unknown `topology` field before this shape is ever inspected.
+const VISIBILITY_WINDOW_FIELDS = new Set(['id', 'opensAfter', 'permits']);
+const VISIBILITY_WINDOW_OPENS_AFTER_FIELDS = new Set(['milestone', 'operationRefs']);
+const VISIBILITY_WINDOW_PERMITS_FIELDS = new Set(['sourceOperationRefs', 'delivery']);
+export const VISIBILITY_WINDOW_MILESTONE_VALUES = Object.freeze(['listed-results-linked']);
+export const VISIBILITY_WINDOW_DELIVERY_VALUES = Object.freeze(['artifact-refs']);
+
+// `contextAccess` is a graph.nodes[].operations[] binding field (same
+// binding scope as `activation`), never a spec.operations[] template field.
+const CONTEXT_ACCESS_FIELDS = new Set(['visibilityWindowRef']);
+
+// Specialist slots (Step 09 MVP9, candidate contract --
+// docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/
+// phase-09-mvp9-bounded-specialist-binding.md -- schema-shaped only, no
+// runtime authorization/binding here; that is P09.2). Legal only under
+// `CoordinationProtocol` for the same structural reason as
+// `visibilityWindows`: `specialistSlots` lives inside `topology`, and
+// `topology` is already absent from WORKFLOW_PROFILE_FIELDS, so a
+// `Workflow` profile carrying `topology.specialistSlots` is rejected as an
+// unknown `topology` field before this shape is ever inspected.
+const SPECIALIST_SLOT_FIELDS = new Set([
+  'id',
+  'role',
+  'operationRefs',
+  'requiredCapabilities',
+  'allowedVisibilityWindows',
+  'maxBindings',
+  'maxAssignments',
+]);
 
 /**
  * Error raised by this module. `category` is a stable, caller-inspectable
@@ -279,6 +343,158 @@ function validateTopologyEdge(edge, label) {
   return Object.freeze(result);
 }
 
+/**
+ * Validate one `spec.profile.topology.visibilityWindows[]` entry against
+ * its exact field table. Cross-referential checks (operationRefs/
+ * sourceOperationRefs resolving to a real spec.operations[] id, duplicate
+ * window id) happen after this shape check -- the former needs `operations`,
+ * which is not computed yet at profile-validation time (see validateSpec).
+ */
+function validateVisibilityWindow(window, label) {
+  if (!isPlainObject(window)) fail(`${label} must be an object`);
+  assertOnlyAcceptedFields(window, VISIBILITY_WINDOW_FIELDS, label);
+  if (!isNonEmptyString(window.id)) fail(`${label}.id must be a non-empty string`);
+
+  if (!isPlainObject(window.opensAfter)) fail(`${label}.opensAfter must be an object`);
+  assertOnlyAcceptedFields(window.opensAfter, VISIBILITY_WINDOW_OPENS_AFTER_FIELDS, `${label}.opensAfter`);
+  if (!VISIBILITY_WINDOW_MILESTONE_VALUES.includes(window.opensAfter.milestone)) {
+    fail(`${label}.opensAfter.milestone must be one of ${VISIBILITY_WINDOW_MILESTONE_VALUES.join(' | ')}`);
+  }
+  assertStringArray(window.opensAfter.operationRefs, `${label}.opensAfter.operationRefs`);
+
+  if (!isPlainObject(window.permits)) fail(`${label}.permits must be an object`);
+  assertOnlyAcceptedFields(window.permits, VISIBILITY_WINDOW_PERMITS_FIELDS, `${label}.permits`);
+  assertStringArray(window.permits.sourceOperationRefs, `${label}.permits.sourceOperationRefs`);
+  if (!VISIBILITY_WINDOW_DELIVERY_VALUES.includes(window.permits.delivery)) {
+    fail(`${label}.permits.delivery must be one of ${VISIBILITY_WINDOW_DELIVERY_VALUES.join(' | ')}`);
+  }
+
+  return Object.freeze({
+    id: window.id,
+    opensAfter: Object.freeze({
+      milestone: window.opensAfter.milestone,
+      operationRefs: Object.freeze([...window.opensAfter.operationRefs]),
+    }),
+    permits: Object.freeze({
+      sourceOperationRefs: Object.freeze([...window.permits.sourceOperationRefs]),
+      delivery: window.permits.delivery,
+    }),
+  });
+}
+
+/**
+ * Validate one `spec.profile.topology.specialistSlots[]` entry against its
+ * exact field table. All seven candidate-contract fields are required --
+ * unlike `visibilityWindows`' optional sub-fields, a slot with a missing
+ * `role`/`operationRefs`/`requiredCapabilities`/`allowedVisibilityWindows`/
+ * `maxBindings`/`maxAssignments` is not a partially-declared slot, it is an
+ * incomplete one (the whole point of a slot is bounding WHO may fill it,
+ * WHAT it may do, and HOW MANY times -- omitting any of those leaves the
+ * bound unbounded). Cross-referential checks (role/operationRefs/
+ * requiredCapabilities/allowedVisibilityWindows resolving to something real
+ * elsewhere in the definition) happen after this shape check, in
+ * `assertSpecialistSlotsReferenceRealEntities` -- the same split
+ * `validateVisibilityWindow` already uses for the same reason (`operations`
+ * is not computed yet at profile-validation time; see validateSpec).
+ */
+function validateSpecialistSlot(slot, label) {
+  if (!isPlainObject(slot)) fail(`${label} must be an object`);
+  assertOnlyAcceptedFields(slot, SPECIALIST_SLOT_FIELDS, label);
+  if (!isNonEmptyString(slot.id)) fail(`${label}.id must be a non-empty string`);
+  if (!isNonEmptyString(slot.role)) fail(`${label}.role must be a non-empty string`);
+  assertStringArray(slot.operationRefs, `${label}.operationRefs`);
+  // Non-empty and deduplicated, matching `completion.aggregation.sourceOperationRefs`'s
+  // existing precedent in this same file and for the same reason: a slot that
+  // may perform nothing bounds nothing, which is exactly the unboundedness the
+  // all-fields-required rule above exists to prevent.
+  if (slot.operationRefs.length === 0) {
+    fail(`${label}.operationRefs must name at least one operation -- a slot that may perform nothing bounds nothing`);
+  }
+  if (new Set(slot.operationRefs).size !== slot.operationRefs.length) {
+    fail(`${label}.operationRefs carries a duplicate entry -- each operation may appear at most once in one slot`);
+  }
+  // `requiredCapabilities` and `allowedVisibilityWindows` MAY be empty, and
+  // that is a decision rather than a side effect of the generic array
+  // validator: an empty list means "no gate on that dimension" (any capability
+  // set, any visibility window), which is a legitimate slot to declare. They
+  // differ from `operationRefs` because an empty `operationRefs` removes the
+  // slot's only positive statement of what it is for, while an empty gate list
+  // still leaves the slot bounded by its role, its operations, and its caps.
+  assertStringArray(slot.requiredCapabilities, `${label}.requiredCapabilities`);
+  assertStringArray(slot.allowedVisibilityWindows, `${label}.allowedVisibilityWindows`);
+  if (!isPositiveInteger(slot.maxBindings)) fail(`${label}.maxBindings must be a positive integer`);
+  if (!isPositiveInteger(slot.maxAssignments)) fail(`${label}.maxAssignments must be a positive integer`);
+
+  return Object.freeze({
+    id: slot.id,
+    role: slot.role,
+    operationRefs: Object.freeze([...slot.operationRefs]),
+    requiredCapabilities: Object.freeze([...slot.requiredCapabilities]),
+    allowedVisibilityWindows: Object.freeze([...slot.allowedVisibilityWindows]),
+    maxBindings: slot.maxBindings,
+    maxAssignments: slot.maxAssignments,
+  });
+}
+
+/**
+ * Validate `spec.profile.completion.aggregation` -- the cognitive-aggregation
+ * declaration, which is INDEPENDENT of `completion.mode`. Declaring it changes
+ * nothing about how `mode` is validated, defaulted, or interpreted; a
+ * definition that omits it produces a byte-identical `completion` object to
+ * the one this schema produced before aggregation existed.
+ *
+ * Cross-referential checks (every operation ref resolving to a real
+ * `spec.operations[]` id) happen after `operations` is computed, in
+ * `assertAggregationReferencesRealOperations` -- the same split
+ * `validateVisibilityWindow` already uses for the same reason.
+ *
+ * `sourceOperationRefs` must be NON-EMPTY, and `outputOperationRef` must not
+ * appear among them. An aggregate declaring zero sources, or declaring itself
+ * as one of its own sources, is self-validated truth by construction -- it
+ * would let a synthesis operation's own output stand as the evidence that
+ * validates it. Refused here at the earliest possible layer, so no session
+ * ever gets the chance to record such an aggregation as validated.
+ */
+function validateAggregationDeclaration(aggregation, label) {
+  if (!isPlainObject(aggregation)) fail(`${label} must be an object when provided`);
+  assertOnlyAcceptedFields(aggregation, PROTOCOL_COMPLETION_AGGREGATION_FIELDS, label);
+
+  if (!AGGREGATION_METHOD_VALUES.includes(aggregation.method)) {
+    fail(`${label}.method must be one of ${AGGREGATION_METHOD_VALUES.join(' | ')}`);
+  }
+  if (!isNonEmptyString(aggregation.outputOperationRef)) {
+    fail(`${label}.outputOperationRef must be a non-empty string`);
+  }
+  assertStringArray(aggregation.sourceOperationRefs, `${label}.sourceOperationRefs`);
+  if (aggregation.sourceOperationRefs.length === 0) {
+    fail(`${label}.sourceOperationRefs must name at least one source operation -- an aggregation with no declared sources is self-validated truth`);
+  }
+  if (new Set(aggregation.sourceOperationRefs).size !== aggregation.sourceOperationRefs.length) {
+    fail(`${label}.sourceOperationRefs carries a duplicate entry -- each declared source operation may appear at most once`);
+  }
+  if (aggregation.sourceOperationRefs.includes(aggregation.outputOperationRef)) {
+    fail(
+      `${label}.outputOperationRef "${aggregation.outputOperationRef}" also appears in ${label}.sourceOperationRefs -- an aggregation may not cite its own output operation as one of its own sources`,
+    );
+  }
+  assertStringArray(aggregation.requiredDisclosures, `${label}.requiredDisclosures`);
+  // Non-empty for the same reason as `sourceOperationRefs` above, and so the
+  // two layers agree: the evaluator this declaration is consumed by refuses an
+  // empty list outright, so accepting one here would only defer an authoring
+  // mistake to session runtime, surfacing as an error type from another
+  // boundary rather than a definition-validation failure.
+  if (aggregation.requiredDisclosures.length === 0) {
+    fail(`${label}.requiredDisclosures must name at least one disclosure -- an aggregation requiring no disclosure preserves no evidence`);
+  }
+
+  return Object.freeze({
+    method: aggregation.method,
+    outputOperationRef: aggregation.outputOperationRef,
+    sourceOperationRefs: Object.freeze([...aggregation.sourceOperationRefs]),
+    requiredDisclosures: Object.freeze([...aggregation.requiredDisclosures]),
+  });
+}
+
 function validateWorkflowProfile(profile) {
   assertOnlyAcceptedFields(profile, WORKFLOW_PROFILE_FIELDS, 'spec.profile');
   const result = { kind: 'Workflow' };
@@ -323,7 +539,11 @@ function validateProtocolProfile(profile) {
     if (!COMPLETION_MODE_VALUES.includes(profile.completion.mode)) {
       fail(`spec.profile.completion.mode must be one of ${COMPLETION_MODE_VALUES.join(' | ')}`);
     }
-    result.completion = Object.freeze({ mode: profile.completion.mode });
+    const completion = { mode: profile.completion.mode };
+    if (profile.completion.aggregation !== undefined) {
+      completion.aggregation = validateAggregationDeclaration(profile.completion.aggregation, 'spec.profile.completion.aggregation');
+    }
+    result.completion = Object.freeze(completion);
   }
 
   if (profile.topology !== undefined) {
@@ -341,6 +561,54 @@ function validateProtocolProfile(profile) {
       topology.edges = Object.freeze(
         profile.topology.edges.map((edge, i) => validateTopologyEdge(edge, `spec.profile.topology.edges[${i}]`)),
       );
+    }
+    if (profile.topology.visibilityWindows !== undefined) {
+      if (!Array.isArray(profile.topology.visibilityWindows)) {
+        fail('spec.profile.topology.visibilityWindows must be an array when provided');
+      }
+      const seenWindowIds = new Set();
+      topology.visibilityWindows = Object.freeze(
+        profile.topology.visibilityWindows.map((window, i) => {
+          const validated = validateVisibilityWindow(window, `spec.profile.topology.visibilityWindows[${i}]`);
+          if (seenWindowIds.has(validated.id)) {
+            fail(`spec.profile.topology.visibilityWindows carries duplicate window id "${validated.id}"`);
+          }
+          seenWindowIds.add(validated.id);
+          return validated;
+        }),
+      );
+    }
+    if (profile.topology.specialistSlots !== undefined) {
+      if (!Array.isArray(profile.topology.specialistSlots)) {
+        fail('spec.profile.topology.specialistSlots must be an array when provided');
+      }
+      const seenSlotIds = new Set();
+      topology.specialistSlots = Object.freeze(
+        profile.topology.specialistSlots.map((slot, i) => {
+          const validated = validateSpecialistSlot(slot, `spec.profile.topology.specialistSlots[${i}]`);
+          if (seenSlotIds.has(validated.id)) {
+            fail(`spec.profile.topology.specialistSlots carries duplicate slot id "${validated.id}"`);
+          }
+          seenSlotIds.add(validated.id);
+          return validated;
+        }),
+      );
+
+      // Slots are declarative capacity, never a routable topology node
+      // (phase-09.md P09.1 candidate contract): an explicit `edges[]`
+      // entry naming a declared slot id as its `from`/`to` is rejected
+      // here, before either sub-object is frozen into `topology`, so both
+      // `edges` and `specialistSlots` are available to check against each
+      // other regardless of declaration order in the source document.
+      for (const [i, edge] of (topology.edges ?? []).entries()) {
+        const label = `spec.profile.topology.edges[${i}]`;
+        if (seenSlotIds.has(edge.from)) {
+          fail(`${label}.from "${edge.from}" references a declared specialist slot id -- slots are declarative capacity, never a routable topology edge endpoint`);
+        }
+        if (seenSlotIds.has(edge.to)) {
+          fail(`${label}.to "${edge.to}" references a declared specialist slot id -- slots are declarative capacity, never a routable topology edge endpoint`);
+        }
+      }
     }
     result.topology = Object.freeze(topology);
   }
@@ -496,6 +764,30 @@ function validateOperations(operations, roleSet, profileKind) {
       result0.result = Object.freeze(resultShape);
     }
 
+    if (op.contributions !== undefined) {
+      if (!isPlainObject(op.contributions)) fail(`${label}.contributions must be an object when provided`);
+      assertOnlyAcceptedFields(op.contributions, OPERATION_CONTRIBUTIONS_FIELDS, `${label}.contributions`);
+      // `allowedTypes` MAY be empty -- that is a legal, meaningful declaration
+      // ("this operation accepts no deliberation contribution type"), not a
+      // side effect of a generic array validator. It differs from
+      // `completion.aggregation.sourceOperationRefs`-style non-empty
+      // requirements elsewhere in this file because an omitted `contributions`
+      // key and an explicit `allowedTypes: []` are meant to converge on the
+      // SAME runtime meaning (reject every type) -- see
+      // `linkSessionContribution`'s `declaredOperations` synthesis, which
+      // treats both identically.
+      assertStringArray(op.contributions.allowedTypes, `${label}.contributions.allowedTypes`);
+      for (const type of op.contributions.allowedTypes) {
+        if (!CONTRIBUTION_TYPE_VALUES.includes(type)) {
+          fail(`${label}.contributions.allowedTypes carries "${type}", which is not one of ${CONTRIBUTION_TYPE_VALUES.join(' | ')}`);
+        }
+      }
+      if (new Set(op.contributions.allowedTypes).size !== op.contributions.allowedTypes.length) {
+        fail(`${label}.contributions.allowedTypes carries a duplicate entry -- each contribution type may appear at most once`);
+      }
+      result0.contributions = Object.freeze({ allowedTypes: Object.freeze([...op.contributions.allowedTypes]) });
+    }
+
     return Object.freeze(result0);
   });
 
@@ -532,11 +824,42 @@ export function activationModeOf(binding) {
   return binding?.activation?.mode ?? DEFAULT_ACTIVATION_MODE;
 }
 
-function validateNodeOperationRef(opRef, label, operationIds, actorIds) {
+/**
+ * `contextAccess.visibilityWindowRef` is a CoordinationProtocol-only
+ * binding field -- rejected explicitly on any other profile kind rather
+ * than left to fall through to "unknown window ref" (windowIds is always
+ * empty for a non-CoordinationProtocol profile, so the fallthrough would
+ * still reject, but with a message that hides the real reason).
+ */
+function validateContextAccess(contextAccess, label, windowIds) {
+  if (!isPlainObject(contextAccess)) fail(`${label} must be an object`);
+  assertOnlyAcceptedFields(contextAccess, CONTEXT_ACCESS_FIELDS, label);
+
+  const result = {};
+  if (contextAccess.visibilityWindowRef !== undefined) {
+    if (!isNonEmptyString(contextAccess.visibilityWindowRef)) {
+      fail(`${label}.visibilityWindowRef must be a non-empty string when provided`);
+    }
+    if (!windowIds.has(contextAccess.visibilityWindowRef)) {
+      fail(`${label}.visibilityWindowRef "${contextAccess.visibilityWindowRef}" does not reference a declared spec.profile.topology.visibilityWindows[] id`);
+    }
+    result.visibilityWindowRef = contextAccess.visibilityWindowRef;
+  }
+  return Object.freeze(result);
+}
+
+function validateNodeOperationRef(opRef, label, operationIds, actorIds, profileKind, windowIds, slotsById) {
   if (!isPlainObject(opRef)) fail(`${label} must be an object`);
   assertOnlyAcceptedFields(opRef, NODE_OPERATION_REF_FIELDS, label);
   if (!isNonEmptyString(opRef.ref)) fail(`${label}.ref must be a non-empty string`);
   if (!operationIds.has(opRef.ref)) fail(`${label}.ref "${opRef.ref}" does not reference a declared spec.operations[] id`);
+
+  // A binding may be filled by a static `actor` OR by an authorized occupant
+  // of `specialistSlotRef` -- never both. Checked before either branch below
+  // so the error names the real ambiguity, not one field's own shape.
+  if (opRef.actor !== undefined && opRef.specialistSlotRef !== undefined) {
+    fail(`${label} declares both "actor" and "specialistSlotRef" -- a binding is filled by a static actor OR an authorized specialist slot occupant, never both`);
+  }
 
   const result = { ref: opRef.ref };
   if (opRef.actor !== undefined) {
@@ -544,13 +867,48 @@ function validateNodeOperationRef(opRef, label, operationIds, actorIds) {
     if (!actorIds.has(opRef.actor)) fail(`${label}.actor "${opRef.actor}" does not reference a declared spec.actors[] id`);
     result.actor = opRef.actor;
   }
+  if (opRef.specialistSlotRef !== undefined) {
+    // Same structural reason as `contextAccess` below: legal only under
+    // CoordinationProtocol because `specialistSlots` itself only exists
+    // there (topology is absent from WORKFLOW_PROFILE_FIELDS).
+    if (profileKind !== 'CoordinationProtocol') {
+      fail(`${label}.specialistSlotRef is legal only under the CoordinationProtocol profile (profile is "${profileKind}")`);
+    }
+    if (!isNonEmptyString(opRef.specialistSlotRef)) fail(`${label}.specialistSlotRef must be a non-empty string when provided`);
+    const slot = slotsById.get(opRef.specialistSlotRef);
+    if (!slot) {
+      fail(`${label}.specialistSlotRef "${opRef.specialistSlotRef}" does not reference a declared spec.profile.topology.specialistSlots[] id`);
+    }
+    // A specialist may act ONLY on the slot's own declared operationRefs[]
+    // (current-cell.md's own closure requirement) -- checked here, at the
+    // binding itself, rather than left as a looser "some slot somewhere
+    // names this operation" reading.
+    if (!slot.operationRefs.includes(opRef.ref)) {
+      fail(`${label}.specialistSlotRef "${opRef.specialistSlotRef}" does not declare operation "${opRef.ref}" among its own operationRefs[] -- a specialist may act only on the slot's own declared operations`);
+    }
+    result.specialistSlotRef = opRef.specialistSlotRef;
+  }
   if (opRef.activation !== undefined) {
     result.activation = validateActivation(opRef.activation, `${label}.activation`);
+  }
+  // A specialist identity is unknown until a driver authorizes one into the
+  // slot -- a binding that could materialize by DEFAULT (`required`, or
+  // `driver-authorized` never named) would have no actor to run it with at
+  // open time. Only a binding a driver must explicitly authorize each
+  // invocation of may ever name a slot.
+  if (opRef.specialistSlotRef !== undefined && (result.activation?.mode ?? DEFAULT_ACTIVATION_MODE) !== 'driver-authorized') {
+    fail(`${label} declares specialistSlotRef "${opRef.specialistSlotRef}" but activation.mode is not "driver-authorized" -- an unknown specialist identity may only fill a binding a driver explicitly authorizes, never one materialized by default`);
+  }
+  if (opRef.contextAccess !== undefined) {
+    if (profileKind !== 'CoordinationProtocol') {
+      fail(`${label}.contextAccess is legal only under the CoordinationProtocol profile (profile is "${profileKind}")`);
+    }
+    result.contextAccess = validateContextAccess(opRef.contextAccess, `${label}.contextAccess`, windowIds);
   }
   return Object.freeze(result);
 }
 
-function validateGraph(graph, operations, actors) {
+function validateGraph(graph, operations, actors, profileKind, windowIds, slotsById) {
   if (!isPlainObject(graph)) fail('spec.graph must be a non-null object');
   assertOnlyAcceptedFields(graph, GRAPH_FIELDS, 'spec.graph');
   if (!isNonEmptyString(graph.entry)) fail('spec.graph.entry must be a non-empty string');
@@ -573,7 +931,7 @@ function validateGraph(graph, operations, actors) {
     let nodeOperations = [];
     if (node.operations !== undefined) {
       if (!Array.isArray(node.operations)) fail(`${label}.operations must be an array when provided`);
-      nodeOperations = node.operations.map((opRef, j) => validateNodeOperationRef(opRef, `${label}.operations[${j}]`, operationIds, actorIds));
+      nodeOperations = node.operations.map((opRef, j) => validateNodeOperationRef(opRef, `${label}.operations[${j}]`, operationIds, actorIds, profileKind, windowIds, slotsById));
     }
 
     let transitions = [];
@@ -639,6 +997,159 @@ function assertAdvisoryReachableFromEntry(graph, operations) {
   }
 }
 
+/**
+ * `visibilityWindows[].opensAfter.operationRefs[]` and
+ * `.permits.sourceOperationRefs[]` must resolve to a real `spec.operations[]`
+ * id declared elsewhere in the same definition -- checked here, after
+ * `operations` is computed, rather than inside `validateProtocolProfile`
+ * (which runs before `operations` exists in `validateSpec`'s own order).
+ */
+function assertVisibilityWindowsReferenceRealOperations(profile, operationIds) {
+  const windows = profile.topology?.visibilityWindows;
+  if (!windows) return;
+  windows.forEach((window, i) => {
+    const label = `spec.profile.topology.visibilityWindows[${i}]`;
+    window.opensAfter.operationRefs.forEach((ref, j) => {
+      if (!operationIds.has(ref)) {
+        fail(`${label}.opensAfter.operationRefs[${j}] "${ref}" does not reference a declared spec.operations[] id`);
+      }
+    });
+    window.permits.sourceOperationRefs.forEach((ref, j) => {
+      if (!operationIds.has(ref)) {
+        fail(`${label}.permits.sourceOperationRefs[${j}] "${ref}" does not reference a declared spec.operations[] id`);
+      }
+    });
+  });
+}
+
+/**
+ * `specialistSlots[].role` must resolve to a declared `spec.roles[]` entry;
+ * `.operationRefs[]` to real `spec.operations[]` ids; `.requiredCapabilities[]`
+ * to a capability declared on at least one `spec.operations[]` entry
+ * anywhere in the definition; `.allowedVisibilityWindows[]` to a declared
+ * `spec.profile.topology.visibilityWindows[]` id -- same "reference
+ * something real elsewhere in the definition, dangling refs rejected"
+ * discipline as `assertVisibilityWindowsReferenceRealOperations`, checked
+ * here (after `operations`/`roleSet` are computed) for the same ordering
+ * reason.
+ *
+ * Known, deliberate limitation of the two dangling-ref checks below:
+ * `requiredCapabilities[]` resolves against the definition-wide union of
+ * operation capabilities, and `allowedVisibilityWindows[]` against every
+ * declared window, so a slot may name a capability or a window that is
+ * scoped to an operation outside its own `operationRefs[]`. Such a slot is
+ * over-declared rather than unfillable (unlike the role mismatch below,
+ * which makes it undispatchable), and narrowing either to the slot's own
+ * operations is a product decision left to P09.2 rather than an oversight.
+ *
+ * A slot's `role` must also match the role of every operation it lists.
+ * `dispatchDeclaredOperation` (session-engine.mjs) refuses a binding whose
+ * actor role differs from the operation's declared role, so a slot naming an
+ * operation of another role is statically impossible to fill AND dispatch --
+ * an unfillable slot is an authoring error, not a legal declaration.
+ *
+ * `graph.nodes[].operations[].actor` referencing a slot id (declared or
+ * not) needs no dedicated check here: `actor` only ever resolves against
+ * `spec.actors[]` ids (see `validateNodeOperationRef`), and a slot id is
+ * never added to that set -- which `assertSpecialistSlotIdsAreDisjoint`
+ * below now enforces rather than assumes -- so any such reference is
+ * already rejected by the existing "actor not declared in spec.actors"
+ * check, proving a graph operation binding can never statically expand into
+ * an undeclared (or any) specialist slot without new runtime authorization
+ * logic (P09.2).
+ */
+function assertSpecialistSlotsReferenceRealEntities(profile, roleSet, operations, capabilityIds, windowIds) {
+  const slots = profile.topology?.specialistSlots;
+  if (!slots) return;
+  const operationsById = new Map(operations.map((op) => [op.id, op]));
+  slots.forEach((slot, i) => {
+    const label = `spec.profile.topology.specialistSlots[${i}]`;
+    if (!roleSet.has(slot.role)) fail(`${label}.role "${slot.role}" is not declared in spec.roles`);
+    slot.operationRefs.forEach((ref, j) => {
+      const operation = operationsById.get(ref);
+      if (operation === undefined) {
+        fail(`${label}.operationRefs[${j}] "${ref}" does not reference a declared spec.operations[] id`);
+      }
+      if (operation.role !== slot.role) {
+        fail(
+          `${label}.operationRefs[${j}] "${ref}" is declared for role "${operation.role}", but the slot declares role "${slot.role}" -- a specialist of the slot's role could never be dispatched for it`,
+        );
+      }
+    });
+    slot.requiredCapabilities.forEach((cap, j) => {
+      if (!capabilityIds.has(cap)) {
+        fail(`${label}.requiredCapabilities[${j}] "${cap}" does not reference a capability declared on any spec.operations[] entry`);
+      }
+    });
+    slot.allowedVisibilityWindows.forEach((ref, j) => {
+      if (!windowIds.has(ref)) {
+        fail(`${label}.allowedVisibilityWindows[${j}] "${ref}" does not reference a declared spec.profile.topology.visibilityWindows[] id`);
+      }
+    });
+  });
+}
+
+/**
+ * A `specialistSlots[].id` must not collide with any other declared id space
+ * in the same definition -- `spec.actors[].id`, `spec.roles[]`,
+ * `spec.operations[].id`, or `spec.graph.nodes[].id`.
+ *
+ * Both directions of a collision are wrong, and the edges check in
+ * `validateProtocolProfile` cannot tell them apart without this: an
+ * `edges[]` entry between two REAL actors is rejected as "references a
+ * declared specialist slot id" when one actor's id happens to equal a slot
+ * id (false rejection), while a `graph.nodes[].operations[].actor` naming
+ * that same string resolves against `spec.actors[]` and binds -- making the
+ * slot id routable after all (false acceptance). Disjointness is what makes
+ * "a slot id is never in the actor id space" a property rather than an
+ * assumption. FlowDefinitions are portable protocol content, not
+ * operator-authored trusted data, so "an author would not do that" is not
+ * the applicable standard.
+ *
+ * Runs after `validateGraph` because `graph.nodes[].id` is only known then.
+ */
+function assertSpecialistSlotIdsAreDisjoint(profile, roleSet, actors, operationIds, graph, windowIds) {
+  const slots = profile.topology?.specialistSlots;
+  if (!slots) return;
+  const spaces = [
+    ['spec.actors[].id', new Set((actors ?? []).map((actor) => actor.id))],
+    ['spec.roles[]', roleSet],
+    ['spec.operations[].id', operationIds],
+    ['spec.graph.nodes[].id', new Set(graph.nodes.map((node) => node.id))],
+    ['spec.profile.topology.visibilityWindows[].id', windowIds],
+  ];
+  slots.forEach((slot, i) => {
+    for (const [space, ids] of spaces) {
+      if (ids.has(slot.id)) {
+        fail(
+          `spec.profile.topology.specialistSlots[${i}].id "${slot.id}" collides with a declared ${space} -- a slot id must be disjoint from every other declared id space, so a slot can never be reached as a routable actor, role, operation, or node`,
+        );
+      }
+    }
+  });
+}
+
+/**
+ * `completion.aggregation`'s `outputOperationRef` and `sourceOperationRefs[]`
+ * must resolve to real `spec.operations[]` ids -- checked here, after
+ * `operations` is computed, exactly like
+ * `assertVisibilityWindowsReferenceRealOperations` above and for the same
+ * ordering reason.
+ */
+function assertAggregationReferencesRealOperations(profile, operationIds) {
+  const aggregation = profile.completion?.aggregation;
+  if (!aggregation) return;
+  const label = 'spec.profile.completion.aggregation';
+  if (!operationIds.has(aggregation.outputOperationRef)) {
+    fail(`${label}.outputOperationRef "${aggregation.outputOperationRef}" does not reference a declared spec.operations[] id`);
+  }
+  aggregation.sourceOperationRefs.forEach((ref, i) => {
+    if (!operationIds.has(ref)) {
+      fail(`${label}.sourceOperationRefs[${i}] "${ref}" does not reference a declared spec.operations[] id`);
+    }
+  });
+}
+
 function validateSpec(spec) {
   if (!isPlainObject(spec)) fail('spec must be a non-null object');
   assertOnlyAcceptedFields(spec, SPEC_FIELDS, 'spec');
@@ -648,7 +1159,21 @@ function validateSpec(spec) {
   const roleSet = new Set(roles);
   const actors = validateActors(spec.actors, roleSet);
   const operations = validateOperations(spec.operations, roleSet, profile.kind);
-  const graph = validateGraph(spec.graph, operations, actors);
+  const operationIds = new Set(operations.map((op) => op.id));
+  assertVisibilityWindowsReferenceRealOperations(profile, operationIds);
+  assertAggregationReferencesRealOperations(profile, operationIds);
+  const windowIds = new Set((profile.topology?.visibilityWindows ?? []).map((w) => w.id));
+  const capabilityIds = new Set(operations.flatMap((op) => op.capabilities ?? []));
+  assertSpecialistSlotsReferenceRealEntities(profile, roleSet, operations, capabilityIds, windowIds);
+  // Available here (before validateGraph) because `assertSpecialistSlotsReferenceRealEntities`
+  // above already ran on the same `profile.topology.specialistSlots` --
+  // threaded into validateGraph/validateNodeOperationRef the same way
+  // `windowIds` is, so a node-operation binding's `specialistSlotRef` can be
+  // checked against real slot ids (and each slot's own `operationRefs[]`) at
+  // the binding itself, in the same pass.
+  const slotsById = new Map((profile.topology?.specialistSlots ?? []).map((slot) => [slot.id, slot]));
+  const graph = validateGraph(spec.graph, operations, actors, profile.kind, windowIds, slotsById);
+  assertSpecialistSlotIdsAreDisjoint(profile, roleSet, actors, operationIds, graph, windowIds);
   const policy = spec.policy !== undefined ? validatePolicyPatch(spec.policy, 'spec.policy') : undefined;
 
   // Definition-scope (`spec.policy`) is the least-specific declared scope
