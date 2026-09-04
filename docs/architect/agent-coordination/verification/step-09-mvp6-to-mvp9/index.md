@@ -117,7 +117,7 @@ worktree per plan.md's Shared-File Lease Rule, no exceptions this time.**
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
-| P09.3 | Phase 09 negative and recovery proof (closes Phase 09; 1 MEDIUM fixed) | done | (pending commit) |
+| P09.3 | Phase 09 negative and recovery proof (closes Phase 09; 1 MEDIUM fixed) | done | `52c05597` |
 | P09.2 | Phase 09 specialist authorization, binding, replay (1 HIGH fixed, independently rechecked) | done | `efe1bc68` |
 | P08.3 | Phase 08 method-shaped proofs + allowedTypes[] schema close (closes Phase 08; 1 LOW fixed) | done | `f9c98501` |
 | P08.2 | Phase 08 session ledger, replay, visibility (2 fix rounds) | done | `a24c250a` |
