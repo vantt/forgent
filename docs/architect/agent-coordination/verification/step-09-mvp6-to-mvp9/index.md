@@ -74,7 +74,23 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 
 ## Active Cell
 
-None. P10.1 closed (1 HIGH fixed) — see "P10.1 Status" below.
+**P10.2, P10.3, P10.4 — running in parallel, each its own isolated
+worktree/branch** (per this track's own P06.1/P07.1 lesson, no shared
+checkout):
+- P10.2 (RFC-Review-Lite): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-2`,
+  branch `step-09-mvp6-to-mvp9-p10-2`, contract committed `a6ce7b52`.
+- P10.3 (Nominal-Group-Lite): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-3`,
+  branch `step-09-mvp6-to-mvp9-p10-3`, contract committed `2678e421`.
+- P10.4 (Delphi-Feedback-Lite): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-4`,
+  branch `step-09-mvp6-to-mvp9-p10-4`, contract committed `3e864e33`.
+
+All three branched off this track's own HEAD at P10.1's close (`995ba45e`).
+Each cell's own `current-cell.md` (inside its own worktree, same relative
+path) is its authoritative contract — this shared `index.md` stays the
+single status board for all three; do not duplicate per-cell narrative
+here until each closes and merges back.
+
+Previously: P10.1 closed (1 HIGH fixed) — see "P10.1 Status" below.
 
 **Anomaly found and left untouched, recorded honestly:** while closing
 P10.1, this worktree's git index was found to already carry unrelated,
