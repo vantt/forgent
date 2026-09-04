@@ -113,3 +113,22 @@ default path — this generalization is additive, never a breaking change
 to the adapter this doc's own earlier section (`tsk-5x7-3`) shipped.
 Scope stayed bounded to the adapter + config + renderers + tests + one
 real live proof — `herdr-plugin/src/*.rs` itself was never touched.
+
+## Why the config wiring had to land as a separate hand-edit commit on main (`tsk-2ii`)
+
+`tsk-5jl`'s own worker branch could not carry its `.fgos/config.json`
+change to completion: ADR0020 blocks any worker branch from committing a
+change under `.fgos/` at all (`docs/how-to/fix-fgos-write-rejected-merge-block.md`,
+precedent `tsk-5ge`/`tsk-28o`). The config content itself — the
+`executors.agy` → `executors.agy-cli` rename, the new ACTIVE
+`executors.agy-herdr` (`capabilities.fgos-coding-implement.prefer`
+rewired to it), and the three dormant `claude-herdr`/`pi-herdr`/
+`codex-herdr` entries — was already fully validated inside `tsk-5jl`'s own
+worktree during development (valid JSON, passed
+`loadRunnerConfigFromDir`, real live-tested against the `agy-herdr` path).
+`tsk-2ii` landed that exact, already-proven content as a plain
+single-parent commit directly on `main` (commit `b32ec6fa`), the same
+shape `tsk-5ge` used for its own `.fgos/`-touching change — never through
+a worker branch. The first landing attempt hit a `verify-miss` friction
+event (goal-check failed on `main`, exit 1); the retry passed, confirming
+`agy-herdr` wiring live and `npm test` green.
