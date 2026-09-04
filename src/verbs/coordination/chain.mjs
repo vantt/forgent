@@ -75,9 +75,12 @@ function describeNextActionForCell(cellId, sessionShow) {
 // stranger needs to understand one cell's own status without opening its
 // session by hand.
 //
-// Fault-isolated per cell: a broken/corrupt/unreadable session (a real,
-// reachable outcome of a genuinely diverged `--cwd`, see R7's Gap note)
-// must never take down every OTHER cell's own render. On a read failure
+// Fault-isolated per cell: a broken/corrupt/unreadable session -- ANY
+// cause, not specifically `--cwd` (Phase 01 R8, store.mjs's
+// `resolveCoordinationPaths`, fixed session/read storage to always be
+// governed by `repoRoot`, never raw `cwd`, so `--cwd` alone can no longer
+// diverge a session's storage/read location the way this comment used to
+// assume) -- must never take down every OTHER cell's own render. On a read failure
 // this returns a degraded record carrying `renderError` (which read step
 // failed, plus the error message) instead of throwing -- the caller
 // excludes it from `activeCell`/`nextAction` computation (no `status`
