@@ -85,3 +85,29 @@ already the mechanism that closed the D0026 gap.
 No dispatch decision or logic changed — pure narrative reconciliation
 against what already shipped. Phase 5 (`agy`)'s deferred/YAGNI status was
 not reopened for debate — only accurately reflected in the docs.
+
+## A follow-up added the current-vocabulary overlay this reconciliation implied (`tsk-4he`)
+
+`tsk-17m` fixed the narrative's own accuracy; `tsk-4he` added the piece a
+reader still needed: a dedicated "Từ vựng dispatch hiện hành" (current
+dispatch vocabulary) section in `docs/specs/runner.md`, placed before the
+historical "Lịch sử quyết định" section so current terms are read first.
+It gives a current-term ↔ superseded-term table:
+
+| Current | Superseded | Meaning | Reference |
+|---|---|---|---|
+| `work` | `rootTask` | the root work unit (`tsk-*`), holds T1 role when active | ADR 0029 |
+| `child work` | `subTask` | a work item decomposed from a parent work | ADR 0029 |
+| `executor` | `capacity` (execution unit sense) | the concrete execution target (agentType/cli/task/mcp) | ADR 0034 |
+| `capability` | `capacity` (behavior-promise sense) | the named abstract behavior an executor provides | ADR 0034 |
+| `launcher` | `orchestrator` (old `0026` sense) | activates work, stands it up, then lets go | ADR 0028 |
+| `driver` | (unchanged) | stays engaged with work start to finish | ADR 0029/0031 |
+| `orchestrator` | (re-assigned, `0029`) | the T0 layer managing N work units, stays engaged | ADR 0029/0031 |
+| `DispatchPlan` | (new) | the resolved dispatch plan: mechanism, target, metadata | `src/runner/dispatch/plan.mjs` |
+| `DispatchAssignment` | (new) | a concrete dispatch assignment binding an executor to a work item | `src/runner/dispatch/plan.mjs` |
+
+Also fixed two stale `capacities.<id>` mentions left over from D0034's
+rename to `capabilities.<id>`/`executors.<id>` — plain leftover text in
+the same D0026 section this whole doc covers, corrected alongside the
+vocabulary table. `rootTask`/`subTask` are named explicitly as fully
+removed from the dispatch vocabulary per ADR 0029, not merely deprecated.
