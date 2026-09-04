@@ -271,3 +271,41 @@ work items dispatched through `agy-herdr` during the brief window it was
 ACTIVE (`tsk-4kn` and possibly others) may have received a false
 `success` with zero actual work done and needed a re-check, not blind
 trust in their own recorded outcome.
+
+## A second, separate bug found in the same window: multi-line prompts corrupt `pane run`'s typed command line (`tsk-5cr`)
+
+Parallel to `tsk-2rr`'s find, `tsk-5cr` investigated the same symptom
+(`agy-herdr` returning `outcome:unsignaled`, `headBefore==headAfter`,
+banner-only stdout) starting from a different hypothesis — a completion-
+detection timing bug. Live evidence proved that hypothesis wrong and
+surfaced a distinct, earlier-stage mechanism: `herdr pane run` types the
+whole constructed command line into the pane's pty as literal keystrokes,
+and an embedded literal newline inside a single-quoted shell argument
+corrupts what `agy` actually receives as argv.
+
+Controlled comparison (real `herdr`/`agy` binaries, one variable changed —
+prompt line count): a single-line prompt delivered correctly and `agy`
+reached its real `accept-edits` banner with model/email/cwd shown. A
+multi-line prompt (the shape every real `buildPrompt` dispatch produces —
+markdown headers, multiple sections) left `agy` at "You are currently not
+signed in... Signing in..." with no model or project context, and
+`herdr pane get`'s `terminal_title` showed the prompt argument AND the
+trailing `--model` value both empty — reproduced twice independently.
+This explains why `fgos-coding-implement`'s real dispatches would hit
+this on effectively every call, not intermittently: every real prompt
+this domain builds is multi-line.
+
+This is upstream of and independent from `tsk-2rr`'s `-i`-vs-`-p`
+auto-submit gap above — two separate real bugs found investigating the
+same window, not one bug described two ways. `tsk-5cr` scoped itself down
+to root-cause-and-document (the operational risk was already closed by
+the same `21966be3` revert `tsk-2rr` cites): it deferred the actual fix —
+switching `herdrSpawnInteractiveAdapter` from embedding the prompt in
+`pane run`'s command line to `herdr pane send-text` (launch bare `agy -i
+--mode accept-edits --new-project --model <model>` with no prompt in the
+command line, wait for the input box to be ready, then send-text the real
+multi-line prompt, then submit via `send-keys`) — as separate, unstarted
+follow-up work, since confirming that shape end-to-end with a real
+multi-line prompt reaching a real `accept-edits`-mode task was more
+verification than one discovery-stage pass could responsibly cover.
+Full findings: `docs/history/agy-herdr-interactive-mode-multiline-prompt-corruption/RESEARCH.md`.
