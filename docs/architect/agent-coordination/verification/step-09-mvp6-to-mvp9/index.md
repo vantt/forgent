@@ -1,5 +1,14 @@
 # Track: step-09-mvp6-to-mvp9
 
+**Status: CLOSED (2026-09-04).** All phases (00, 06, 07, 08, 09, 10) done;
+P10.10 (Promotion And Closeout) resolved the track's single most
+consequential decision — the contribution-lineage finding is a scoped
+implementation bug, not a shared missing primitive — and closed normally
+per three independent review rounds. See "## P10.10 Status" below for the
+full record, and "## Step 09 Exit Contract — Final Check" for the
+bullet-by-bullet closure verification. Pending: merge `step-09-mvp6-to-mvp9`
+into `main`.
+
 Plan: `plans/260903-2334-step09-mvp6-to-mvp9/plan.md`
 Branch: `step-09-mvp6-to-mvp9`
 Worktree: `.claude/worktrees/step-09-mvp6-to-mvp9`
@@ -70,11 +79,12 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | 07 | MVP7 | P07.1-P07.4 all done (2 HIGH fixed across the phase) | **done** |
 | 08 | MVP8 | P08.1 + P08.2 + P08.3 all done (contribution model, ledger/replay/visibility, method-shaped proofs + `contributions.allowedTypes[]` schema close) | **done** |
 | 09 | MVP9 | P09.1 + P09.2 + P09.3 all done (slot schema; authorization/binding/replay, 1 HIGH fixed; negative and recovery proof, 1 MEDIUM fixed) | **done** |
-| 10 | External acceptance | P10.1-P10.9 done (pack registry/skill 1 HIGH fixed; three group-thinking-lite protocols defined, registered, and proven through the pack gate; CLI/headless parity proven; final security/regression sweep clean); P10-KERNEL-FIX done (user-authorized kernel fix, 3 rounds, see below); P10.10 (Promotion And Closeout) open | in-progress |
+| 10 | External acceptance | P10.1-P10.9 done (pack registry/skill 1 HIGH fixed; three group-thinking-lite protocols defined, registered, and proven through the pack gate; CLI/headless parity proven; final security/regression sweep clean); P10-KERNEL-FIX done (user-authorized kernel fix, 3 rounds); P10.10 done (contribution-lineage classified and fixed in-scope; track closed normally) | **done** |
 
 ## Active Cell
 
-**None — idle, ready for P10.10.** See "## Next Action" below.
+**None — track CLOSED.** All phases done; P10.10 was the track's final
+cell. Only remaining step: merge `step-09-mvp6-to-mvp9` into `main`.
 
 Previously: **P10-KERNEL-FIX closed** (user-authorized kernel change to
 `classifySessionQuorum`/`closeSessionByQuorum`, `session-engine.mjs`,
@@ -147,44 +157,21 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-**P10.10 (Promotion And Closeout) — the track's final cell.** All
-prerequisite cells are now closed: Phases 00/06/07/08/09 done; Phase 10's
-P10.1-P10.9 done; the user-authorized P10-KERNEL-FIX done (3 rounds,
-final independent recheck APPROVE). Per phase-10.md's own definition,
-P10.10 reads live test/evidence state from every lane, classifies any
-residual finding, promotes proved semantics into canonical contracts, and
-runs the final full-suite/change-scope review that closes the whole
-track.
-
-Two live findings P10.10 must explicitly classify and decide (not
-silently drop), both surfaced during P10.6-P10.9:
-- **The contribution-lineage-unreachable-through-pack gap** (first found
-  by P10.6, pack-wide across all three group-thinking-lite protocols):
-  the pack gate's closed step vocabulary (`operation`/`authorize`/
-  `disposition`/`fan-out`) never reaches `linkSessionContribution`, so
-  contribution-typed lineage records can never be created through the
-  pack for any protocol — contradicting phase-10.md's own "artifact-
-  backed lineage" goal. Named a candidate "shared missing primitive" by
-  P10.6/P10.7/P10.8; whether P10.10 fixes it, defers it to a future
-  track, or documents it as an accepted limitation is P10.10's own call
-  to make and justify, not assumed by this note.
-- **The `run.mjs:236`/`aggregationCloseParams` resolution-failure Gap**
-  (found during P10-KERNEL-FIX's own recheck rounds): pre-existing,
-  fails safe, outside that cell's authorized kernel-file boundary. Named
-  precisely in `P10-KERNEL-FIX.md` §5 with exact line numbers for
-  whichever cell picks it up next — P10.10 should at minimum classify
-  whether it belongs in canonical contract text as a known limitation.
-
-P10.10 may (unlike P10.1-P10.9) touch canonical contract docs and, if it
-judges either finding above warrants it, kernel files — but any such
-change should get the same Reviewer+Red-Team rigor every kernel-adjacent
-change in this track has required, not a lighter bar just because it's
-the closing cell.
+**Merge `step-09-mvp6-to-mvp9` into `main`.** This is the only remaining
+step. P10.10 (Promotion And Closeout) is closed — see "## P10.10 Status"
+below for the full record and "## Step 09 Exit Contract — Final Check"
+for the bullet-by-bullet verification against `phase-10.md`'s own exit
+criteria. After the merge, write the practical `fgos-group-thinking`
+usage guide (the user's own standing goal for this whole track, recorded
+in session memory) and consider whether this track's branch/worktree
+should be removed per this track's own established cleanup precedent
+(P10.2-P10.9's temporary worktrees).
 
 ## Cell Log
 
 | Cell | Requirements | Status | Commit |
 |---|---|---|---|
+| P10.10 | Promotion And Closeout — contribution-lineage classification, new `contribution` step, 22-item residual sweep, contract promotion (1 fix round, 3 independent review rounds) | done | `a98a8583` |
 | P10-KERNEL-FIX | User-authorized `classifySessionQuorum`/`closeSessionByQuorum` multi-op fix (3 fix rounds, 5 independent review rounds) | done | `3ed076a2` |
 | P10.9 | Isolation, security, and authority regression (final track-wide sweep) | done | merged `41cebcf6` |
 | P10.8 | Delphi-Feedback-Lite conformance through the pack gate | done | merged `41cebcf6` |
@@ -1306,5 +1293,145 @@ regression 762/763 (1 known worktree-path false-fail); full-repo sweep
 `3ed076a2` (via the same detached-integration-worktree pattern as
 P10.6-P10.9's own merge, since the foreign conflicted state still blocks
 `git commit` directly in the main track worktree, not only `git merge`).
+
+## P10.10 Status (Promotion And Closeout — the track's final cell)
+
+**CLOSED, 1 fix round, 3 independent review rounds.** The single most
+consequential decision in the whole track: whether the pack-wide
+"contribution lineage unreachable through the pack gate" finding
+(independently found by P10.6, re-confirmed by P10.7/P10.8) is a genuine
+"shared missing primitive" — which, per `phase-10.md`'s own governing
+rule, would force the WHOLE TRACK to stay open with a named proposal —
+or a smaller, in-scope "implementation bug." **Three independent review
+rounds (first-pass Reviewer, first-pass Red-Team, and a final recheck)
+each independently re-derived the classification from first principles
+and all three agreed: implementation bug. Normal closure. "Leave Step 09
+open" does not trigger.**
+
+Investigated concretely, not assumed: `linkSessionContribution`
+(session-engine.mjs) was already a complete, self-mediating door,
+proven since P08.2/P08.3 — the FlowDefinition, operation stamp,
+visibility-window state, reasoning-time ordering, and artifact revision
+pin are all derived internally, never caller-supplied. The gap was
+narrowly that `run.mjs`'s closed four-kind step vocabulary
+(`operation`/`authorize`/`disposition`/`fan-out`) never reached it.
+Closed with a fifth `contribution` step type
+(`src/verbs/coordination/{run,schema}.mjs`), structurally identical to
+the existing `authorize`/`disposition` steps — a strict narrowing over
+the existing door (`linkedBy` always derived from `driverIdentity`,
+defended at two independent layers per Red-Team's own probe; verified
+against all three group-thinking-lite protocols, not just the one
+tested end-to-end). Zero kernel files touched by the initial
+implementation.
+
+Also found and fixed, while investigating a separately-named
+`P10-KERNEL-FIX.md` Gap (`run.mjs:236`/`aggregationCloseParams`'s own
+unguarded resolution-failure crash): a SECOND, earlier, previously
+unnamed instance of the identical failure class in `run.mjs`'s own
+request-boundary actor-membership check — reached far more often in
+practice (every declared-protocol request, not just close). Both fixed
+by mirroring `classifySessionQuorum`'s own established try/catch
+pattern.
+
+**Full 22-item residual-finding classification sweep** across P10.1-P10.9
+and P10-KERNEL-FIX, each item sorted into `phase-10.md`'s own five-
+category taxonomy with reasoning shown. One explicit Coordinator ruling,
+recorded plainly rather than left implicit: the "leave Step 09 open"
+consequence is scoped to a primitive Phase 10's OWN pack/skill needs and
+structurally lacks — not a pre-existing, whole-kernel property untouched
+by this track's own scope. Applying this ruling, four items initially
+mislabeled "shared missing primitive" were re-classified (two to
+"implementation bug, deferred," one to "contract ambiguity, deferred,"
+one to "fixture convenience"), leaving the definition-pinned-by-
+`{id,version}`-not-content residual as the ONLY genuine shared missing
+primitive in the whole sweep — correctly non-blocking because it predates
+Phase 10, is shared identically by every MVP1-9 protocol, and blocks no
+literal Step 09 Exit Contract bullet.
+
+Contract promotion: new "Multi-Operation Quorum Completion" and
+"Group-Thinking Protocol Pack" sections in `coordination-session.md`
+(the gating rule, the five-kind step vocabulary, the five verified
+bypass-refusals, per-actor provider/tier proof); a new Forbidden Fields
+row in `flow-definition.md`; the Step 09 proposal's status updated to
+reflect MVP6-9 + the Post-MVP9 Acceptance Layer are implemented, with
+every genuinely-deferred capability (vote/convergence/anonymization/
+topology) explicitly re-stated as still deferred — no capability claimed
+beyond what this track's own tests prove.
+
+One bounded fix round closed 9 small findings both independent
+first-pass rounds raised (none blocking the classification): error-cause
+preservation on both resolution-failure fixes, an idempotency edge case
+in the new `contribution` step's `anchors` handling, an inaccurate claim
+in the promoted "Five bypasses" contract text, a factual correction to
+the definition-pinning residual's own "not worsened" claim (Phase 10's
+new step DOES increase its reachability, though not its severity), a new
+22nd residual (a pre-existing base-door resume asymmetry the closing
+cell's own new regression test is coupled to), a missing positive
+end-to-end proof for Nominal-Group-Lite, and a documented, unrelated
+concurrency flake. The one fix touching a kernel file
+(`src/runner/coordination/store.mjs`) is a minimal, backward-compatible
+default-parameter addition, independently verified safe against all 5
+real call sites by two separate review rounds.
+
+A final independent recheck found two more small, non-blocking items
+(all three code fixes shipped with zero regression-test coverage of
+their own; one further mislabeled sentence in the corrected "Five
+bypasses" text) — both closed directly by the Coordinator (four one-line
+test-assertion tightenings plus one sentence correction), independently
+re-verified clean.
+
+Final regression: touched-file suites 87/87 and 132/132; combined
+focused regression 742/743 (the single failure alternates between the
+standing worktree-path false-fail and a pre-existing, already-named,
+confirmed-unrelated `coordination-store.test.mjs` concurrency flake —
+clean 43/43 in isolation every time); full-repo sweep 5562/5570 pass, 1
+known baseline failure, 7 skipped. Committed `a98a8583` (same
+detached-integration-worktree pattern).
+
+**This closes Phase 10 (MVP6-9's external-acceptance/group-thinking
+layer) and the whole `step-09-mvp6-to-mvp9` track.**
+
+## Step 09 Exit Contract — Final Check (phase-10.md's own seven bullets)
+
+1. **Three unlike protocols run with no protocol-specific kernel
+   branch.** True — `classifySessionQuorum`'s gating rule and the pack's
+   `contribution` step are both protocol-agnostic; RFC-Review-Lite,
+   Nominal-Group-Lite, and Delphi-Feedback-Lite each proven end-to-end
+   through the same generic mechanism (P10.6/P10.7/P10.8, P10.10's own
+   positive tests).
+2. **Replay explains every visibility grant, aggregation validation,
+   contribution lineage, and specialist authorization.** True as of
+   P10.10 — contribution lineage was the one gap (pack-wide, all three
+   protocols), now closed and proven via `replaySession` reconstruction
+   for all three (P10.10's own positive tests, including the new
+   Nominal-Group-Lite one added in its fix round).
+3. **Public CLI/headless surfaces preserve semantic parity.** True —
+   proven by P10.5, re-confirmed unaffected by every later cell (the
+   `contribution` step reaches the identical `runCoordinationUseCase`
+   door every other step type already does).
+4. **Isolation fixtures remain unchanged and green.** True — P10.9's own
+   sweep, re-confirmed by every later cell's own regression runs;
+   `core/coordination-protocols/group-cognition-framework.yaml` remains
+   untouched throughout (confirmed empirically at every cell boundary,
+   including P10.10's own).
+5. **No behavior depends on chat history or hidden driver-only prose.**
+   True — every mechanism this track built resolves from the session's
+   own real, replayed event log and bound FlowDefinition, never from
+   conversational context (a property independently re-verified by
+   nearly every review round in this track, most recently P10.10's own
+   Reviewer §1).
+6. **Every adaptive action is authorized, bounded, evidence-linked, and
+   idempotent.** True — the new `contribution` step is bounded by the
+   same window/provenance/lineage checks every mediated door already
+   enforces, `linkedBy` always derived; idempotency independently
+   verified (P10.10 Fix Round 1's L1, re-verified by the final recheck's
+   own additional immutability probe).
+7. **No Work/Coding/git/worktree/merge/mutation authority moved into the
+   substrate.** True — confirmed explicitly by P10.10's own §1c sweep
+   (classified "explicitly out-of-scope authority," a feature not a gap)
+   and by every prior cell's own May-Touch list never proposing it.
+
+All seven bullets hold. **Step 09 closes normally — the "shared missing
+primitive" consequence never triggered.**
 
 Next: P10.10 (Promotion And Closeout) — the track's final cell.
