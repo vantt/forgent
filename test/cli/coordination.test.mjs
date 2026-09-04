@@ -15,6 +15,7 @@ import {
   envelopeData,
   execFileSync,
   fs,
+  initGitCwdWithWorktree,
   os,
   path,
   run,
@@ -23,7 +24,6 @@ import {
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
 import { StoreError } from '../../src/state/store.mjs';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
-import { openSession } from '../../src/runner/coordination/store.mjs';
 
 // ─── Fake executor wiring for real-subprocess run tests ───────────────────
 // Same real Node-subprocess fake executor shape session-engine.mjs's own
@@ -55,6 +55,56 @@ function writeFakeExecutorConfig(cwd) {
     `,
   );
   const configPath = path.join(cwd, '.fgos', 'config.json');
+  const existing = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  const config = {
+    ...existing,
+    runner: {
+      ...(existing.runner ?? {}),
+      executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+      models: { standard: 'test-model', lightweight: 'test-model' },
+      timeoutMs: 20000,
+    },
+  };
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+}
+
+// Fake-executor variant for the R7 `--cwd` tests below: writes a REAL
+// marker file into its own `process.cwd()` before settling the assignment
+// -- proves the dispatched worker's own subprocess cwd genuinely is
+// whatever `--cwd` resolved to (`assignment-runner.mjs`'s `executeAssignment`
+// spawns the executor CLI with `cwd: opts.cwd`, never `opts.repoRoot` --
+// confirmed by reading its own `executeExecutorCli(...)` call site, which
+// passes `cwd` straight through). `assignmentsRoot` is taken as an
+// EXPLICIT parameter, never derived from the worker's own `process.cwd()`
+// the way `writeFakeExecutorConfig` above does -- because `.fgos/assignments/`
+// always lives under repoRoot (Phase 01 R8), which genuinely diverges from
+// the worker's own cwd in exactly the `--cwd` case these tests exercise
+// (same reason test/runner/coordination-mutation-unlock.test.mjs's own
+// `fakeExecutor` takes `assignmentsRoot` explicitly too).
+function writeCwdMarkerExecutorConfig(repoRootDir, assignmentsRoot) {
+  const executorScript = path.join(repoRootDir, 'fake-executor-cwd-marker.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    fs.writeFileSync(path.join(cwd, 'cwd-marker.txt'), cwd + '\\n');
+    const assignmentsRoot = ${JSON.stringify(assignmentsRoot)};
+    if (fs.existsSync(assignmentsRoot)) {
+      for (const asgn of fs.readdirSync(assignmentsRoot)) {
+        const runDir = path.join(assignmentsRoot, asgn, 'runs', '01');
+        if (fs.existsSync(runDir) && !fs.existsSync(path.join(runDir, 'agent-result.json'))) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nValidated.\\n');
+          fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Validated.' }));
+        }
+      }
+    }
+    process.stdout.write('Validated.\\n');
+    process.exit(0);
+    `,
+  );
+  const configPath = path.join(repoRootDir, '.fgos', 'config.json');
   const existing = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
   const config = {
     ...existing,
@@ -450,57 +500,99 @@ test('fgos coordination run --file <declared consult>: dispatches both declared 
 });
 
 // ─── R7: `--cwd <path>` ─────────────────────────────────────────────────
+//
+// CORRECTED (Wave 1 integration fix, group-thinking-plan-loop): the two
+// tests below used to assert that `--cwd` relocates WHERE `.fgos/` session
+// state lives (under the `--cwd` worktree). That was true only against
+// P02.1's own pre-merge worktree state, where `store.mjs`'s
+// `resolveCoordinationPaths` still had the Phase 01 R8 bug (`fgosDir`
+// keyed on raw `cwd` unconditionally, even when `opts.repoRoot` was
+// explicitly passed). Once P01.1's R8 fix merged into this same branch,
+// `resolveCoordinationPaths` ALWAYS honors `opts.repoRoot` for `fgosDir`
+// when present -- and `bin/fgos.mjs`'s `coordination` case ALWAYS passes
+// `repoRoot: repoRootForCoordination` explicitly, completely independent
+// of `--cwd` (confirmed by reading both sites directly). So `--cwd` now
+// has ZERO effect on where session/Assignment state lives; it only ever
+// threads into `ctx.cwd`, which matters for OTHER things (the dispatched
+// worker's own subprocess cwd; R3's worktree-vs-main-checkout mutation
+// gate, `session-engine.mjs`'s `assertMutatingDispatchAllowed` -- not
+// exercised below because `src/verbs/coordination/run.mjs` does not yet
+// forward a request step's `mutation` field to the engine at all, `grep -n
+// "mutation" src/verbs/coordination/run.mjs` finds zero matches, an
+// already-documented, pre-existing gap (P01.1.md); the mutation-unlock
+// feature is engine-level-only today, unreachable through this CLI).
 
-test('fgos coordination run --cwd <worktree> --file <request naming a mutating step> reaches runCoordinationUseCase with ctx.cwd set to that worktree -- the session genuinely opens (session.json + the Assignment claim written) under the worktree\'s own .fgos/, never the repo root\'s', () => {
-  const repoRootDir = tmpCwd();
-  writeFakeExecutorConfig(repoRootDir);
-  const worktreeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-cwd-worktree-'));
-  const coordinationId = 'coord_cwd_wiring_probe';
-  const reqPath = writeRequest(repoRootDir, 'agent-led-cwd.json', agentLedRequest({ coordinationId }));
+test('fgos coordination run --cwd <worktree>: session/Assignment storage is governed by repoRoot (--dir), never relocated by --cwd (Phase 01 R8); ctx.cwd genuinely threads to the dispatched worker\'s own subprocess cwd instead, proven by a real marker file the worker writes into its own process.cwd()', () => {
+  const { cwd: repoRootDir, worktreePath: worktreeDir } = initGitCwdWithWorktree();
+  const assignmentsRoot = path.join(repoRootDir, '.fgos', 'assignments');
+  writeCwdMarkerExecutorConfig(repoRootDir, assignmentsRoot);
 
-  // This request genuinely dispatches a mutating step (`openSession` +
-  // `createSessionAssignment`, both real writes) -- not asserted here is
-  // full Run SETTLEMENT (the fake executor's own agent-result.json), which
-  // depends on a separate, dispatch-layer (`src/runner/dispatch/**`)
-  // cwd/repoRoot split this cell's own lease excludes touching (a named
-  // Gap in this cell's trace); the CLI call may therefore still exit
-  // non-zero. What this test proves, and only this: `ctx.cwd` really
-  // reached `runCoordinationUseCase`, and the session's own on-disk state
-  // (session.json, the Assignment's claim files) landed under the `--cwd`
-  // worktree, never the repo root -- a direct filesystem assertion, not
-  // merely a non-crashing exit code.
-  run(repoRootDir, ['coordination', 'run', '--cwd', worktreeDir, '--file', reqPath]);
+  // (a) --cwd names a REAL linked worktree (not a bare mkdtemp dir --
+  // R3-adjacent cwd/worktree resolution shells out to real git, so a
+  // genuine `git worktree add` is the only fixture that can stand in for
+  // it credibly, matching test/runner/coordination-mutation-unlock.test.mjs's
+  // own established pattern).
+  // Not asserted here: `run`'s own success/closed status. The worker's
+  // marker write is a REAL, uncommitted change inside the (real) git
+  // worktree, so R1's own pre-existing read-only-contract enforcement
+  // (`classifyRunEvidence`, assignment-runner.mjs: a read-only-declared
+  // Assignment that mutates repo state fails closed, confidence:
+  // 'failed') correctly grades this dispatch as failed -- expected,
+  // unrelated to what this test proves, and deliberately not worked
+  // around by asserting a fake "verified" grading. What this test proves,
+  // and only this: `ctx.cwd` really reached the dispatched worker's own
+  // subprocess, and the session's own on-disk state stays repoRoot-
+  // governed -- both direct filesystem assertions, not exit-code claims.
+  const idWithCwd = 'coord_cwd_wiring_probe_worktree';
+  const reqWithCwd = writeRequest(repoRootDir, 'agent-led-with-cwd.json', agentLedRequest({ coordinationId: idWithCwd }));
+  run(repoRootDir, ['coordination', 'run', '--cwd', worktreeDir, '--file', reqWithCwd]);
 
-  const worktreeSessionManifest = path.join(worktreeDir, '.fgos', 'coordination', 'sessions', coordinationId, 'session.json');
-  assert.ok(fs.existsSync(worktreeSessionManifest), 'expected the session to genuinely open under the --cwd worktree\'s own .fgos/');
+  // ctx.cwd genuinely reached the dispatched worker: the marker it wrote
+  // into its own process.cwd() landed under the --cwd worktree, never the
+  // repo root -- a direct filesystem assertion, not an inferred claim.
+  assert.ok(fs.existsSync(path.join(worktreeDir, 'cwd-marker.txt')), 'the dispatched worker\'s own subprocess cwd must be the --cwd worktree');
+  assert.equal(fs.existsSync(path.join(repoRootDir, 'cwd-marker.txt')), false, '--cwd must not also leave the worker running against the repo root');
 
-  const repoRootSessionDir = path.join(repoRootDir, '.fgos', 'coordination', 'sessions', coordinationId);
-  assert.equal(fs.existsSync(repoRootSessionDir), false, 'the session must NOT also land under the repo root\'s own .fgos/ when --cwd names a different directory');
-});
-
-test('fgos coordination show --cwd <worktree> <id> reads the session back from the SAME worktree, and cannot see it at all when --cwd is omitted -- the read-side wiring is symmetric with run\'s write side, isolated here from the dispatch-layer Gap noted above', () => {
-  const repoRootDir = tmpCwd();
-  const worktreeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-cwd-show-worktree-'));
-  const coordinationId = 'coord_cwd_show_probe';
-
-  // Opens a real session directly under the worktree (setup only, through
-  // store.mjs's own write door -- no Assignment dispatch involved, so this
-  // is independent of the dispatch-layer Gap noted in the sibling test
-  // above) so this test isolates exactly what `--cwd` on `show` controls.
-  openSession(
-    { coordinationId, objective: 'Prove show --cwd reads the correct workspace.', provenanceRoot: { writerId: 'coordination-cli-test' } },
-    { cwd: worktreeDir, repoRoot: worktreeDir },
+  // Phase 01 R8: session storage is governed by repoRoot regardless of
+  // --cwd -- the session opens under the REPO ROOT's own .fgos/, never
+  // the --cwd worktree's.
+  assert.ok(
+    fs.existsSync(path.join(repoRootDir, '.fgos', 'coordination', 'sessions', idWithCwd, 'session.json')),
+    'the session must open under the repo root\'s own .fgos/, governed by repoRoot, not --cwd',
+  );
+  assert.equal(
+    fs.existsSync(path.join(worktreeDir, '.fgos', 'coordination', 'sessions', idWithCwd)),
+    false,
+    '--cwd must never relocate session storage to the worktree',
   );
 
-  const showResult = run(repoRootDir, ['coordination', 'show', coordinationId, '--cwd', worktreeDir, '--json']);
-  assert.equal(showResult.status, 0, showResult.stderr);
-  assert.equal(envelopeData(showResult.stdout).coordinationId, coordinationId);
+  // (b) The SAME kind of request dispatched with --cwd OMITTED: ctx.cwd
+  // defaults to repoRootForCoordination -- the marker now lands under the
+  // repo root instead, proving ctx.cwd really did switch between the two
+  // calls (never a no-op flag that just happens to always resolve the
+  // same way).
+  const idWithoutCwd = 'coord_cwd_wiring_probe_no_cwd';
+  const reqWithoutCwd = writeRequest(repoRootDir, 'agent-led-without-cwd.json', agentLedRequest({ coordinationId: idWithoutCwd }));
+  const resultWithoutCwd = run(repoRootDir, ['coordination', 'run', '--file', reqWithoutCwd]);
+  assert.equal(resultWithoutCwd.status, 0, resultWithoutCwd.stderr);
+  assert.ok(fs.existsSync(path.join(repoRootDir, 'cwd-marker.txt')), 'omitting --cwd must default ctx.cwd to the repo root');
+});
 
-  // Without --cwd, the CLI reads the repo root's own .fgos/ (byte-identical
-  // default behavior) -- the session opened only under the worktree must
-  // not be visible there at all.
-  const showWithoutCwd = run(repoRootDir, ['coordination', 'show', coordinationId, '--json']);
-  assert.notEqual(showWithoutCwd.status, 0, 'the session must not be visible against the repo root when --cwd is omitted');
+test('fgos coordination show --cwd <anything>: repoRoot (--dir), never --cwd, governs which session is read -- a session opened at the repo root reads identically whether --cwd names a real linked worktree, an unrelated directory, or is omitted entirely (Phase 01 R8: --cwd has zero storage/read-location effect)', () => {
+  const { cwd: repoRootDir, worktreePath: worktreeDir } = initGitCwdWithWorktree();
+  writeFakeExecutorConfig(repoRootDir);
+  const coordinationId = 'coord_cwd_show_probe';
+  const reqPath = writeRequest(repoRootDir, 'agent-led-show-cwd.json', agentLedRequest({ coordinationId }));
+  const runResult = run(repoRootDir, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+
+  const unrelatedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-cwd-show-unrelated-'));
+
+  for (const cwdFlag of [[], ['--cwd', worktreeDir], ['--cwd', unrelatedDir]]) {
+    const showResult = run(repoRootDir, ['coordination', 'show', coordinationId, ...cwdFlag, '--json']);
+    assert.equal(showResult.status, 0, showResult.stderr);
+    assert.equal(envelopeData(showResult.stdout).coordinationId, coordinationId);
+  }
 });
 
 test('fgos coordination run --file <request> with --cwd OMITTED behaves byte-identically to today: the session lands under the repo root\'s own .fgos/', () => {
