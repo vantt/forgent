@@ -309,3 +309,13 @@ follow-up work, since confirming that shape end-to-end with a real
 multi-line prompt reaching a real `accept-edits`-mode task was more
 verification than one discovery-stage pass could responsibly cover.
 Full findings: `docs/history/agy-herdr-interactive-mode-multiline-prompt-corruption/RESEARCH.md`.
+
+## CHANGELOG entry landed (`tsk-r81`)
+
+Per `AGENTS.md`'s own rule ("Does this change something a user of fgOS
+would see? If yes, add a line to `## [Unreleased]` in `CHANGELOG.md`"),
+this whole body of work (`tsk-5jl`, `tsk-2ii`, `tsk-10j`, `tsk-4zi`,
+`tsk-2rr`) had shipped without a CHANGELOG entry. `tsk-r81` added one
+bullet under `## [Unreleased] -> ### Changed` summarizing the
+config-driven adapter, the `agy-herdr` executor rename/flip history, and
+the false-idle polling race fix — no code change, doc-only.
