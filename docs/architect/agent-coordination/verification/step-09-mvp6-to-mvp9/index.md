@@ -111,7 +111,7 @@ P09.2 lands, same "closes the phase" role P06.3/P07.4/P08.3 each played.
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
-| P08.3 | Phase 08 method-shaped proofs + allowedTypes[] schema close (closes Phase 08; 1 LOW fixed) | done | (pending commit) |
+| P08.3 | Phase 08 method-shaped proofs + allowedTypes[] schema close (closes Phase 08; 1 LOW fixed) | done | `f9c98501` |
 | P08.2 | Phase 08 session ledger, replay, visibility (2 fix rounds) | done | `a24c250a` |
 | P07.4 | Phase 07 surface/regression proof, contract promotion (closes Phase 07; 1 HIGH fixed) | done | `9b81427c` |
 | P09.1 | Phase 09 specialist slot schema, static-only prep | done | `9b81427c` |
