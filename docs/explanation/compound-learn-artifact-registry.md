@@ -207,6 +207,20 @@ registered (`src/setup/checks.mjs`); notably `doc-near-duplicate` finally
 wired up the `--check-duplicates` backstop that had sat dead since it was
 added — until this item, its only caller was its own unit test.
 
+### Child 9 — the writer skill itself, renamed to `fgos-coding-knowledge` (`tsk-28x-9`)
+
+This item is the direct origin of `fgos-coding-knowledge`
+(`.agents/skills/fgos-coding-knowledge/`, `.claude/skills/fgos-coding-knowledge/`)
+— the skill this whole retro-loop session has invoked on every single
+iteration. Before this item, the writer skill picked its own quadrant and
+made up its own path; after, the flow is: capture → classify → ask the
+registry/resolver → a strong match grows the existing doc, a weak match
+lands `provisional`, and wanting a genuinely new topic requires going
+through `topic register` explicitly. The "write first, tag second" rule
+was kept. A rendered doc always lands `provisional` first (`D-tsk28x-17`,
+already covered above). The skill directory itself was renamed from its
+old `compound`-era name to `fgos-coding-knowledge`, per `D-tsk28x-16`.
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
