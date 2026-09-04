@@ -326,3 +326,38 @@ committing the merge. Both the CAS-mismatch dead-end and the vanishing
 awaiting-approval event were logged as tool bugs to report separately —
 this doc records them as landing friction for this item, not as a claim
 they were fixed here.
+
+## The gate went from built to live: `docRegistry.enforce: true` (`tsk-1uj`)
+
+`tsk-28x-6` built the 4-condition `knowledge attest` gate, but
+`.fgos/config.json`'s `docRegistry.enforce` stayed `false` — so the gate
+ran soft-fail (`{attested:false, reason:...}`) on any unregistered path
+instead of actually refusing. `tsk-1uj` is step 5 of the design doc's own
+"Correct Implementation Order" (`docs/architect/knowledge-registry-redesign.md`
+§11): flip that flag to `true`, closing the gap between "the gate exists"
+and "the gate enforces."
+
+Safe to flip because both preconditions were verified live first, not
+assumed: bootstrap had registered 332/332 topics and 332/332 docs active
+(`fgos knowledge status`), and the writer canary (`tsk-28x-10`) was green.
+Per ADR0020, the branch itself carried only a stale-title touch-up in
+`test/cli/knowledge-attest-gate.test.mjs`; the actual `.fgos/config.json`
+flip landed as a separate, direct single-parent commit on main
+(`6cce97ab`), never through the branch.
+
+**Live proof, not the sandboxed canary.** `scripts/knowledge-canary.mjs`
+always drives a disposable tmpdir per its own source comment — running it
+again would have proven nothing about the real registry. Two real
+`fgos knowledge attest` calls against the live repo did instead: an
+unregistered path (`package.json`) now correctly refuses with exit 4
+("is not registered in knowledge registry"), where it previously
+soft-failed; a real registered `currentPath` still attests normally. One
+side note logged for next time: the second smoke call wrote a real
+`sourceCaptureIds` entry onto that doc's live history — harmless and
+clearly labeled, but a read-only `fgos doc-sources` check would have
+proven the same point without touching a real document.
+
+This item is also the migration apply's own prerequisite: the design
+doc's stated safety property is "enforcement is enabled before files are
+moved into the new layout," so `tsk-28x-11`'s real-migration-apply item
+was blocked-by this one.
