@@ -223,7 +223,7 @@ test('store door: linking is driver-authored, and refused once the session has c
 
   assert.throws(
     () => recordContributionLink(coordinationId, storePayload(assignmentId, { linkedBy: { type: 'driver', id: 'researcher-a' } }), opts),
-    (err) => err instanceof CoordinationError && /not the driver identity/.test(err.message),
+    (err) => err instanceof CoordinationError && /linkedBy\.id .* is not the driver identity/.test(err.message),
   );
 
   transitionSessionStatus(coordinationId, 'completed', {}, opts);

@@ -1,10 +1,30 @@
 # Step 09 - Group Thinking Substrate
 
 Document type: Proposal
-Design status: Discussion
-Implementation: Not started
-Last reviewed: 2026-09-03
-Canonical for: nothing until explicitly accepted
+Design status: Accepted for the implemented slice (MVP0-9 plus the Post-MVP9
+Acceptance Layer); Discussion for every item this document still names as
+deferred (vote/rank tally/weighted scoring/convergence, anonymization,
+partial-window exceptions, aggregate transformation, cross-session grants,
+`addSessionEdge`/arbitrary topology overlays, driver handoff, persistent
+organization membership, peer-invited specialists — none of these are
+implemented or claimed by any cell in this track).
+Implementation: MVP0-5 implemented per `step-09-group-thinking-mvp1-mvp2`
+(MVP1/MVP2) and `step-09-mvp3-to-mvp5` (MVP3-MVP5). MVP6-9 (§8.1's own
+"Locked MVP6-MVP9 Shape") plus the Post-MVP9 Acceptance Layer (§8.2: the
+Group-Thinking Protocol Pack, three conformance-proven protocol
+definitions, and the `fgos-group-thinking` skill) implemented and closed by
+`step-09-mvp6-to-mvp9` (Phases 00/06/07/08/09/10, including the
+user-authorized P10-KERNEL-FIX quorum fix) — see that track's own
+verification index for the full per-phase evidence trail and the
+[CoordinationSession Contract](../agent-coordination/contracts/coordination-session.md)/
+[FlowDefinition Contract](../agent-coordination/contracts/flow-definition.md)
+for the promoted contract text, each with its own named limitations.
+Last reviewed: 2026-09-04
+Canonical for: nothing until explicitly accepted; the implemented MVP0-9 +
+Post-MVP9 Acceptance Layer slice is canonical only through the
+CoordinationSession/FlowDefinition contracts it was promoted into, above —
+this proposal document itself never becomes canonical by implementation
+alone
 Original date: 2026-09-02
 Scope: preserve and narrow the next Agent Coordination design frontier after
 Step 08: make fgOS able to express richer group-thinking and problem-solving
@@ -22,17 +42,30 @@ Related: [Coordination Foundation Baseline](../agent-coordination/architecture/c
 [Step 09 MVP3-MVP5 verification](../agent-coordination/verification/step-09-mvp3-to-mvp5/index.md),
 [MVP6+ Dogfood Handoff](../agent-coordination/playbooks/mvp6-dogfood-handoff.md)
 
-Implementation note: nothing in this proposal is implemented, except the
-MVP1-MVP5 slice promoted starting Phase 00 — see the two verification
-indexes above (`step-09-group-thinking-mvp1-mvp2` for MVP1/MVP2,
-`step-09-mvp3-to-mvp5` for MVP3-MVP5: recheck lineage/disposition
-hardening, a thin CLI launcher, intentional role-tier dispatch policy, and
-session resume). This document does not authorize runtime/schema changes
-and does not accept a design beyond that promoted slice — MVP6 visibility
+Implementation note (updated by `step-09-mvp6-to-mvp9`'s own closing cell,
+P10.10 — Step 09 is now closed): MVP1-MVP5 promoted starting Phase 00 — see
+`step-09-group-thinking-mvp1-mvp2` (MVP1/MVP2) and `step-09-mvp3-to-mvp5`
+(MVP3-MVP5: recheck lineage/disposition hardening, a thin CLI launcher,
+intentional role-tier dispatch policy, and session resume). MVP6 visibility
 windows, MVP7 aggregation rules, MVP8 deliberation memory, and MVP9
-dynamic specialist pull-in remain Discussion-only, not implemented. It
-exists so deferred implementation slices do not narrow the original
-intent into only the currently convenient fixture.
+dynamic specialist pull-in — §8.1's own "Locked MVP6-MVP9 Shape" — are now
+IMPLEMENTED AND PROVEN, along with the Post-MVP9 Acceptance Layer (§8.2):
+the Group-Thinking Protocol Pack, three real, conformance-proven protocol
+definitions (RFC-Review-Lite, Nominal-Group-Lite, Delphi-Feedback-Lite),
+and the `fgos-group-thinking` skill — see
+`docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`
+for the full evidence trail and the CoordinationSession/FlowDefinition
+contracts for the promoted text. This document still does not authorize
+any runtime/schema change beyond what those contracts now accept — every
+item this document names elsewhere as deferred (§8.1's per-MVP "remain
+deferred" clauses; §15 "Explicitly Not Proposed") is STILL deferred, not
+implemented by this track: no vote/rank tally/weighted scoring/convergence
+semantics, no anonymization, no partial-window exceptions, no aggregate
+transformation, no cross-session grants, no `addSessionEdge`/arbitrary
+topology overlay, no driver handoff, no persistent organization
+membership, no peer-invited specialists. It exists so a future deferred
+slice does not narrow the original intent into only the currently
+convenient fixture.
 
 ## 1. Why This Step Exists
 

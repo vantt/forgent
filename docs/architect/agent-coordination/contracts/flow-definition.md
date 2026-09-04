@@ -54,6 +54,18 @@ section), negative/crash-recovery/structural-absence proof in
 (P09.3, closing Phase 09). Promoted with the named limitations in Specialist
 Slots below and in the CoordinationSession contract's own Specialist Slot
 Binding section, not without them.
+Phase 10 (Step 09 external acceptance, closing Step 09): three new, real
+CoordinationProtocol FlowDefinitions
+(`core/coordination-protocols/group-thinking-{rfc-review-lite,
+nominal-group-lite,delphi-feedback-lite}.yaml`) exercising the MVP6-MVP9
+mechanisms above through no protocol-specific kernel branch (P10.2-P10.4),
+registered and proven reachable through a real external Group-Thinking
+Protocol Pack (P10.1/P10.5-P10.9) — see the CoordinationSession contract's
+own Group-Thinking Protocol Pack section for the pack-layer semantics. No
+new FlowDefinition schema field added by Phase 10; one Forbidden Fields
+Summary table row added below, closing a pre-existing contract-text gap
+(`policy.preferExecutor` illegal on a portable definition) named by P10.2's
+own Reviewer.
 Full per-phase trace:
 `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`.)
 Last reviewed: 2026-09-04
@@ -601,6 +613,7 @@ references.
 | Any `spec.operations[]` template | `contextAccess` | Binding-scoped only, exactly like `activation` (Phase 06, Step 09 MVP6). |
 | `CoordinationProtocol` profile | `profile.work`, `baseStepMap`, mandatory `task.taskSpec`, `result.kind: gate-verdict` | Would import Work lifecycle authority into a standalone protocol. |
 | Any `FlowDefinition` | a `missionId` field anywhere | ADR-008 Decision 5; Mission stays deferred-preserved. |
+| A literal `policy.preferExecutor` at definition/role/actor/operation scope, on any portable `CoordinationProtocol` or `Workflow` document | `preferExecutor` | A *portable* definition expresses requirements (`minTier`, `capabilities`), never a literal executor pin — that authority is trusted session/human/project-scope only (PolicyPatch, above). Runtime-enforced by `assertNoPortableExecutorPin` (`session-engine.mjs`); a request's own trusted per-actor `actors[].executor` field is the correct channel instead (proven protocol-agnostic, `P10.1.md`/`P10.3.md`, Step 09 Phase 10). Named as a contract-text gap by P10.2's own Reviewer (found investigating RFC-Review-Lite's own objector-actor `policy.minTier` elevation), closed here by P10.10. |
 
 ## Required Negative Tests
 

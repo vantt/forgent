@@ -45,6 +45,7 @@ import { runCoordinationHeadless } from '../../src/runner/coordination/headless-
 import { validateSessionAggregation } from '../../src/runner/coordination/session-engine.mjs';
 import { readManifest, resolveSessionPaths } from '../../src/runner/coordination/store.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
+import { StoreError } from '../../src/state/store.mjs';
 
 const FGOS_CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../bin/fgos.mjs');
 const PROTOCOL_ID = 'test.coordination-protocol.aggregation-surface';
@@ -569,6 +570,171 @@ test('regression: a protocol that declares NO aggregation closes exactly as it d
   assert.equal(data.closed, true);
   assert.equal(data.closeRefusalReason, undefined);
   assert.equal(readManifest(coordinationId, opts).status, 'completed');
+});
+
+// P10.10 (Promotion And Closeout): TWO separate, previously-unguarded
+// `loadCoordinationProtocol` calls in `run.mjs`, both fixed together
+// because they are the SAME failure class at two different points of the
+// SAME function:
+//
+// 1. The request-boundary actor-membership check (`else` branch, resolves
+//    `request.protocolRef.id`) -- runs FIRST, unconditionally, on EVERY
+//    declared-protocol request (open or resume), before the steps loop
+//    even starts. NOT previously named by P10-KERNEL-FIX.md's own §5 Gap
+//    text (which named only #2 below) -- found while investigating that
+//    Gap, and fixed the same way, because it is reached earlier and more
+//    often: any resolution failure here crashes before either fix below
+//    ever runs, which is why it is proven FIRST.
+// 2. `aggregationCloseParams` (P10-KERNEL-FIX.md §5's own N3/R2-MEDIUM-C
+//    Gap, `run.mjs:236`-at-the-time) -- reads `manifest.definitionRef.id`
+//    UNCONDITIONALLY, seven lines before its own check for whether an
+//    aggregation is even declared, so a resolution failure used to throw a
+//    raw, uncaught `FlowDefinitionError` for EVERY declared-protocol
+//    session, not only ones declaring `completion.aggregation`.
+//
+// Both are pre-existing, fail safe (a session never wrongly closes), but
+// never previously reached the SAME honest, correctly-attributed
+// `CoordinationError`/`StoreError` refusal `classifySessionQuorum`
+// (session-engine.mjs) already gives its own resolution-failure case.
+// Fixed by wrapping each load in a try/catch, mirroring that pattern.
+//
+// Because fix #1 runs first and resolves `request.protocolRef.id` (not
+// necessarily the SAME value as the session's own bound
+// `manifest.definitionRef.id` -- this base `runCoordinationUseCase` door,
+// unlike the pack gate, does not cross-check the two), a genuinely broken
+// PROJECT-TIER REGISTRY DIRECTORY always fails BOTH resolutions together
+// (`discoverCoordinationProtocols` scans the whole directory before
+// filtering by id, so one malformed sibling file breaks every id in that
+// tier, including whichever protocol fix #1 is asked to resolve) -- so the
+// second test below isolates fix #2 specifically by making the session's
+// own bound protocol NOT-FOUND (its file removed, not a corrupted sibling)
+// while a genuinely different, still-resolvable protocol satisfies fix #1.
+test('P10.10: a resolution failure at the request-boundary actor-membership check no longer crashes runCoordinationUseCase with a raw FlowDefinitionError', async () => {
+  const coordinationId = 'coord_agg_surface_resolution_failure_request';
+  const { ctx, tempDir } = setup({ withAggregation: false });
+
+  // Break the registry BEFORE the very first call -- this check runs before
+  // any session even opens.
+  const registryDir = path.join(tempDir, '.fgos', 'coordination-protocols');
+  fs.writeFileSync(path.join(registryDir, 'zz-broken-sibling.json'), '{ this is not valid json');
+
+  await assert.rejects(
+    () =>
+      runCoordinationUseCase(ctx, {
+        requestObject: {
+          kind: 'declared-protocol',
+          objective: 'Open under a broken protocol registry.',
+          writerId: WRITER_ID,
+          coordinationId,
+          protocolRef: { id: PROTOCOL_ID },
+          steps: [{ type: 'disposition', as: 'd', targetRef: coordinationId, disposition: 'noted', rationale: 'P10.10 resolution-failure regression probe.' }],
+        },
+      }),
+    (err) =>
+      err instanceof StoreError &&
+      err.category === 'validation' &&
+      /protocol "test\.coordination-protocol\.aggregation-surface" could not be resolved/.test(err.message) &&
+      err.cause instanceof Error &&
+      /zz-broken-sibling\.json/.test(err.message),
+    'runCoordinationUseCase must refuse the request with an honest, attributable StoreError (naming the REAL broken registry file, not just the healthy requested protocol id) -- never a raw, uncaught FlowDefinitionError, and never silently discard the original cause',
+  );
+});
+
+test('P10.10: a resolution failure at aggregationCloseParams specifically no longer crashes runCoordinationUseCase with a raw FlowDefinitionError -- it refuses explicitly, exactly like a version-drifted definition already does', async () => {
+  const coordinationId = 'coord_agg_surface_resolution_failure_close';
+  const { ctx, opts, tempDir } = setup({ withAggregation: false });
+
+  // A second, genuinely resolvable protocol in the SAME project-tier
+  // registry directory -- stays intact throughout. Its only job is to let
+  // call 2's own request-boundary check (fix #1, above) succeed while the
+  // SESSION's real bound protocol (below) is separately made unresolvable,
+  // isolating fix #2's own catch specifically.
+  const decoyId = 'test.coordination-protocol.aggregation-surface-decoy';
+  fs.writeFileSync(
+    path.join(tempDir, '.fgos', 'coordination-protocols', 'decoy.json'),
+    `${JSON.stringify(
+      {
+        apiVersion: 'fgos.dev/v1alpha1',
+        kind: 'FlowDefinition',
+        metadata: { id: decoyId, version: '1.0.0' },
+        spec: {
+          profile: { kind: 'CoordinationProtocol' },
+          roles: ['coordinator'],
+          actors: [{ id: 'coordinator-actor', role: 'coordinator' }],
+          operations: [{ id: 'noop', role: 'coordinator', result: { kind: 'advisory', evidenceRequired: 'reported' } }],
+          graph: { entry: 'phase-noop', nodes: [{ id: 'phase-noop', operations: [{ ref: 'noop', actor: 'coordinator-actor' }], transitions: [] }] },
+        },
+      },
+      null,
+      2,
+    )}\n`,
+  );
+
+  // Leave coordinator-actor's own required "review"/"synthesize" operations
+  // undispatched -- the session stays genuinely "active" after call 1, so
+  // call 2 (below) reaches the request door's own steps loop, not an
+  // already-closed-session refusal.
+  const call1 = await runCoordinationUseCase(ctx, {
+    requestObject: {
+      kind: 'declared-protocol',
+      objective: 'Only the two independent research passes -- leave the coordinator phase for call 2.',
+      writerId: WRITER_ID,
+      coordinationId,
+      protocolRef: { id: PROTOCOL_ID },
+      steps: [
+        { type: 'operation', as: 'research-a', operationId: 'research', targetActorId: 'researcher-a', taskKey: 'declared-research-researcher-a', objective: 'Independent research pass A.', expectedOutputs: OUTPUTS },
+        { type: 'operation', as: 'research-b', operationId: 'research', targetActorId: 'researcher-b', taskKey: 'declared-research-researcher-b', objective: 'Independent research pass B.', expectedOutputs: OUTPUTS },
+      ],
+    },
+  });
+  assert.equal(call1.closed, false, 'sanity: coordinator-actor still owes review/synthesize -- the session must genuinely still be active');
+  assert.equal(readManifest(coordinationId, opts).status, 'active');
+
+  // Remove the SESSION's own bound protocol file entirely (not a corrupted
+  // sibling -- that would also break the decoy's own resolution, since
+  // `discoverCoordinationProtocols` scans the whole directory before
+  // filtering by id). The decoy file is untouched and stays resolvable.
+  fs.rmSync(path.join(tempDir, '.fgos', 'coordination-protocols', 'aggregation-surface.json'));
+
+  // Call 2 claims the DECOY protocol (satisfies fix #1's own check -- it
+  // resolves fine) with an empty actors[] (so the decoy's own, unrelated
+  // actor set is never checked) and a "disposition"-only step (the one
+  // step kind that never resolves any protocol at all -- run.mjs's own
+  // header comment: `recordDriverDisposition` "resolves no binding,
+  // materializes nothing, and has no FlowDefinition-aware counterpart...
+  // to delegate to"). The session's REAL bound protocol
+  // (`manifest.definitionRef.id`, still `PROTOCOL_ID`) is untouched by any
+  // of this -- resume never lets a request's claimed `protocolRef.id`
+  // override it. This isolates the failure to `aggregationCloseParams`'s
+  // own call, run unconditionally after the steps loop.
+  //
+  // Coupling note: this isolation technique works ONLY because
+  // `runCoordinationUseCase`'s base door does not cross-check a resumed
+  // session's CLAIMED `protocolRef.id` (here, the decoy) against its REAL
+  // bound `manifest.definitionRef.id` -- only the group-thinking pack gate
+  // has that cross-check. If a future change hardens `run.mjs` with the
+  // pack gate's own cross-check, this test's own call 2 will be refused
+  // before it ever reaches `aggregationCloseParams`, and this specific
+  // isolation will need to be redesigned, not just re-asserted.
+  const call2 = await runCoordinationUseCase(ctx, {
+    requestObject: {
+      kind: 'declared-protocol',
+      objective: 'Attempt to close a session whose own bound protocol has been removed.',
+      writerId: WRITER_ID,
+      coordinationId,
+      protocolRef: { id: decoyId },
+      actors: [],
+      steps: [{ type: 'disposition', as: 'd', targetRef: coordinationId, disposition: 'noted', rationale: 'P10.10 resolution-failure regression probe.' }],
+    },
+  });
+
+  assert.equal(call2.closed, false, 'a resolution failure must refuse the close, never silently succeed');
+  assert.match(
+    call2.closeRefusalReason ?? '',
+    /could not be resolved -- refusing to close against an unresolvable definition/,
+    'runCoordinationUseCase must surface the SAME honest, correctly-attributed refusal classifySessionQuorum already gives its own resolution-failure case -- never a raw, uncaught FlowDefinitionError',
+  );
+  assert.equal(readManifest(coordinationId, opts).status, 'active', 'a refused close must never leave the session anywhere but its pre-close status');
 });
 
 // ─── 3. `show` renders the whole validated record ──────────────────────────

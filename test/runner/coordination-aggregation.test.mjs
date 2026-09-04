@@ -421,7 +421,7 @@ test("store door: validatedBy.id must be the session's own driver identity (shar
         storePayload(assignmentIds, { validatedBy: { type: 'driver', id: 'researcher-a' } }),
         opts,
       ),
-    (err) => err instanceof CoordinationError && /is not the driver identity of session/.test(err.message),
+    (err) => err instanceof CoordinationError && /validatedBy\.id .* is not the driver identity of session/.test(err.message),
   );
 });
 

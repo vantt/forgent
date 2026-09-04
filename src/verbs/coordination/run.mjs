@@ -53,6 +53,7 @@ import {
   dispatchDeclaredOperation,
   dispatchResearchFanOut,
   authorizeDeclaredOperation,
+  linkSessionContribution,
   evaluateSessionQuorum,
   closeSessionByQuorum,
   deriveSessionPhase,
@@ -233,7 +234,30 @@ function aggregationCloseParams(coordinationId, engineOpts) {
   // An agent-led session has no FlowDefinition bound at all -- nothing can
   // declare an aggregation over it.
   if (!manifest.definitionRef) return {};
-  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: engineOpts.cwd, packageRoot: engineOpts.packageRoot });
+  // P10.10 (Promotion And Closeout): this load used to run unguarded, so ANY
+  // resolution failure (an unrelated malformed sibling protocol file, a
+  // removed protocol, a missing optional `yaml` module) threw a raw,
+  // uncaught `FlowDefinitionError` straight out of `runCoordinationUseCase`
+  // -- P10-KERNEL-FIX.md §5's own N3/R2-MEDIUM-C Gap, pre-existing, fails
+  // safe (manifest.status never left "active"), but never previously turned
+  // into the same honest, correctly-attributed `CoordinationError` refusal
+  // `classifySessionQuorum` (session-engine.mjs) already gives its own
+  // resolution-failure case. Mirrors that exact pattern -- one caught
+  // resolve, one explicit refusal -- so a resolution failure now reaches
+  // this function's own caller (the `catch (err) { if (err instanceof
+  // CoordinationError) ... }` block, below) exactly the way a drifted
+  // version already does two lines down, instead of crashing.
+  let definition;
+  try {
+    definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: engineOpts.cwd, packageRoot: engineOpts.packageRoot });
+  } catch (err) {
+    const wrapped = new CoordinationError(
+      'validation',
+      `coordination run: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the definition could not be resolved -- refusing to close against an unresolvable definition: ${err.message}`,
+    );
+    wrapped.cause = err;
+    throw wrapped;
+  }
   if (definition.metadata.version !== manifest.definitionRef.version) {
     throw new CoordinationError(
       'validation',
@@ -340,7 +364,30 @@ export async function runCoordinationUseCase(ctx, options = {}) {
     );
     stepResults.push({ as: 'primary', type: 'operation', actorId: 'primary', ...summarizeDispatch(dispatch) });
   } else {
-    const definition = loadCoordinationProtocol(request.protocolRef.id, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
+    // P10.10 (Promotion And Closeout): this load ran unguarded too, on every
+    // declared-protocol request (open AND resume alike) -- the SAME
+    // resolution-failure class named for `aggregationCloseParams`, below,
+    // but reached EARLIER and unconditionally, before the steps loop ever
+    // runs. Wrapped for the same reason: a genuinely malformed/removed
+    // sibling protocol file must never crash `runCoordinationUseCase` with a
+    // raw `FlowDefinitionError`. Thrown as a `StoreError('validation', ...)`
+    // (not `CoordinationError`), matching this exact block's own sibling
+    // "actors[].id not declared" refusal two lines down -- resolving the
+    // request's own claimed protocol is a request-validation concern here,
+    // never a soft close-time refusal (unlike `aggregationCloseParams`,
+    // this runs before any step dispatches, so there is nothing yet to
+    // "refuse to close").
+    let definition;
+    try {
+      definition = loadCoordinationProtocol(request.protocolRef.id, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
+    } catch (err) {
+      const wrapped = new StoreError(
+        'validation',
+        `coordination request: protocol "${request.protocolRef.id}" could not be resolved -- refusing the request rather than crashing with an unresolvable-definition error: ${err.message}`,
+      );
+      wrapped.cause = err;
+      throw wrapped;
+    }
     const declaredActorIds = new Set((definition.spec.actors ?? []).map((a) => a.id));
     for (const actorEntry of request.actors) {
       if (!declaredActorIds.has(actorEntry.id)) {
@@ -480,6 +527,47 @@ export async function runCoordinationUseCase(ctx, options = {}) {
           disposition: disposition.disposition,
           evidenceRefs: disposition.evidenceRefs,
           appended: disposition.appended,
+        });
+      } else if (step.type === 'contribution') {
+        // Forwards into `linkSessionContribution` (session-engine.mjs) --
+        // the already-existing, already-proven mediated door (P08.2/P08.3)
+        // -- exactly the way "authorize"/"disposition" already forward into
+        // their own mediated doors: the request supplies only what the
+        // engine cannot derive itself (contributionId/contributionType/
+        // assignmentId/roundKey/anchors/respondsTo); `linkedBy` is NEVER
+        // caller-supplied (schema.mjs's assertNoLinkedBy), always the same
+        // derived `driverIdentity` every other driver-authority step here
+        // uses. Every window/provenance/lineage check
+        // `linkSessionContribution` already performs runs unchanged -- this
+        // step adds no new trust, it only reaches an existing door.
+        const assignmentId = resolveRef(step.assignmentId, labels, `steps[${step.as}].assignmentId`);
+        const contribution = linkSessionContribution(
+          manifest.coordinationId,
+          {
+            contributionId: step.contributionId,
+            type: step.contributionType,
+            assignmentId,
+            roundKey: step.roundKey,
+            linkedBy: driverIdentity,
+            anchors: step.anchors,
+            respondsTo: step.respondsTo,
+          },
+          engineOpts,
+        );
+        // No `labels[step.as]` entry: a contribution step materializes no
+        // Assignment (matching "authorize", above) -- a later `$ref:<label>`
+        // pointing at it has nothing to resolve to and is refused by
+        // resolveRef's own unknown-label check.
+        stepResults.push({
+          as: step.as,
+          type: 'contribution',
+          contributionId: contribution.contributionId,
+          contributionType: contribution.type,
+          assignmentId: contribution.assignmentId,
+          roundKey: contribution.roundKey,
+          anchors: contribution.anchors ?? [],
+          respondsTo: contribution.respondsTo ?? null,
+          appended: contribution.appended,
         });
       } else {
         const fromAssignmentId = resolveRef(step.fromAssignmentId, labels, `steps[${step.as}].fromAssignmentId`);

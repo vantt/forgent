@@ -284,12 +284,147 @@ test('Nominal-Group-Lite chain end-to-end through the real pack gate (runGroupTh
   assert.deepEqual(clarifyAuth.grantedContextRefs, [shareAssignment.assignmentId], 'clarify was only ever granted share\'s own assignment');
 });
 
-// ---------------------------------------------------------------------
-// 2. The closed step vocabulary structurally excludes contribution
-//    linking -- proven empirically against the real schema, not merely
-//    argued from a static read of run.mjs/schema.mjs.
+// P10.10 (Promotion And Closeout, Fix Round 1): the positive proof that the
+// pack-wide contribution-lineage fix (§1a of P10.10.md) is genuinely
+// reachable for THIS protocol too, not only RFC-Review-Lite -- a real
+// `rank`-typed contribution (`private-rank`'s own closed `contributions.
+// allowedTypes: [rank]`), linked through the pack gate's new "contribution"
+// step, gated by the SAME `ranking-open` visibility window (opens only
+// after "clarify" settles) the direct-call engine proof already exercises.
+// A genuine 3-call chain, mirroring
+// `coordination-group-thinking-rfc-review-lite-pack-conformance.test.mjs`'s
+// own positive proof shape: reconstructed from `replaySession` alone, never
+// from this test's own local step-order memory.
+test('P10.10: Nominal-Group-Lite\'s private-rank contribution lineage is now reachable through the real pack gate via the new "contribution" step -- reconstructed from replaySession alone', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeRunnerConfig(tempDir);
+  const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig };
+  const coordinationId = 'ngl-pack-p10-10-rank-contribution';
+  const writerId = 'p10-10-ngl-driver';
 
-test('runGroupThinkingRequest refuses a "link" step with the real schema\'s own closed-vocabulary message -- linkSessionContribution has no step-type door through the pack gate for ANY protocol, confirmed live', async () => {
+  function contributionStep(as, overrides = {}) {
+    return { type: 'contribution', as, contributionType: 'rank', roundKey: 'round-1', ...overrides };
+  }
+
+  // Call 1: the three private proposals plus the controlled share --
+  // stops BEFORE authorizing "clarify", so facilitator-actor still owes its
+  // own gated "clarify" binding and the session stays genuinely open.
+  const call1 = await runGroupThinkingRequest(ctx, {
+    protocolId: NOMINAL_GROUP_LITE_ID,
+    requestObject: baseRequest({
+      coordinationId,
+      writerId,
+      steps: [
+        proposeStep('proposeA', 'participant-a'),
+        proposeStep('proposeB', 'participant-b'),
+        proposeStep('proposeC', 'participant-c'),
+        {
+          type: 'authorize',
+          as: 'authShare',
+          operationId: 'share',
+          targetActorId: 'facilitator-actor',
+          authorizationId: 'auth_share_p10_10_rank',
+          invocationKey: 'share:p10-10-rank:1',
+          reason: 'All three private proposals have settled -- open the controlled share.',
+          grantedContextRefs: ['$ref:proposeA', '$ref:proposeB', '$ref:proposeC'],
+        },
+        { type: 'operation', as: 'share', operationId: 'share', targetActorId: 'facilitator-actor', taskKey: 'declared-share-facilitator-actor', objective: 'Controlled share of the three proposals.', expectedOutputs: OUTPUTS },
+      ],
+    }),
+  });
+  assert.equal(call1.closed, false, 'sanity: facilitator-actor still owes its own gated "clarify" binding -- the session must NOT auto-close after call 1');
+  const shareAssignmentId = call1.steps.find((s) => s.as === 'share').assignmentId;
+
+  // Call 2: a genuinely SEPARATE, later call -- authorize+dispatch
+  // "clarify" (which opens "ranking-open"), then dispatch and link
+  // participant-a's own private-rank contribution in the SAME call, the
+  // same "authorize/dispatch/link in one call" shape the RFC-Review-Lite
+  // proof already establishes for "respond". `authClarify`'s own grant
+  // names call 1's real "share" assignmentId literally -- call 1's own
+  // `labels` scope ("share") is gone by the time this genuinely separate
+  // call runs, the same cross-call-`$ref:` constraint the "Resume through
+  // the pack gate (A)" test above already establishes.
+  const call2 = await runGroupThinkingRequest(ctx, {
+    protocolId: NOMINAL_GROUP_LITE_ID,
+    requestObject: baseRequest({
+      coordinationId,
+      writerId,
+      steps: [
+        {
+          type: 'authorize',
+          as: 'authClarify',
+          operationId: 'clarify',
+          targetActorId: 'facilitator-actor',
+          authorizationId: 'auth_clarify_p10_10_rank',
+          invocationKey: 'clarify:p10-10-rank:1',
+          reason: 'Share has settled -- open clarification.',
+          grantedContextRefs: [shareAssignmentId],
+        },
+        { type: 'operation', as: 'clarify', operationId: 'clarify', targetActorId: 'facilitator-actor', taskKey: 'declared-clarify-facilitator-actor', objective: 'Clarify the shared proposals.', expectedOutputs: OUTPUTS },
+        rankStep('rankA', 'participant-a'),
+        contributionStep('linkRankA', { contributionId: 'p10_10_rank_a', assignmentId: '$ref:rankA' }),
+      ],
+    }),
+  });
+  const linkRankA = call2.steps.find((s) => s.as === 'linkRankA');
+  assert.equal(linkRankA.type, 'contribution');
+  assert.equal(linkRankA.contributionType, 'rank');
+  assert.equal(linkRankA.appended, true);
+  assert.equal(call2.closed, false, 'participant-b and participant-c still owe their own gated "private-rank" binding -- the session must NOT auto-close after call 2');
+
+  // Call 3: a THIRD, genuinely separate call finishes the graph -- the
+  // remaining two ranks, each linked as its own "rank" contribution -- and
+  // the session now closes naturally.
+  const call3 = await runGroupThinkingRequest(ctx, {
+    protocolId: NOMINAL_GROUP_LITE_ID,
+    requestObject: baseRequest({
+      coordinationId,
+      writerId,
+      steps: [
+        rankStep('rankB', 'participant-b'),
+        contributionStep('linkRankB', { contributionId: 'p10_10_rank_b', assignmentId: '$ref:rankB' }),
+        rankStep('rankC', 'participant-c'),
+        contributionStep('linkRankC', { contributionId: 'p10_10_rank_c', assignmentId: '$ref:rankC' }),
+      ],
+    }),
+  });
+  assert.equal(call3.steps.find((s) => s.as === 'linkRankB').appended, true);
+  assert.equal(call3.steps.find((s) => s.as === 'linkRankC').appended, true);
+  assert.equal(call3.closed, true, 'the full graph is now complete across THREE separate calls -- this really is the natural end of the session');
+
+  // Chat-history-free replay: the whole rank-contribution lineage
+  // reconstructed from `replaySession` alone, across three separate
+  // pack-gate calls -- proving this is a real, durable ledger record for
+  // Nominal-Group-Lite specifically, not merely an inference from the
+  // request/response shape RFC-Review-Lite already proved.
+  const replayed = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(replayed.contributions.length, 3, 'three private-rank contributions, reconstructed from replay alone -- one per participant');
+  const byId = Object.fromEntries(replayed.contributions.map((c) => [c.contributionId, c]));
+  for (const id of ['p10_10_rank_a', 'p10_10_rank_b', 'p10_10_rank_c']) {
+    assert.equal(byId[id].type, 'rank');
+    assert.equal(byId[id].operationRef, 'private-rank', 'each contribution\'s own operationRef is derived by the engine from the backing Assignment\'s stamp, never accepted from the request');
+  }
+  assert.deepEqual(replayed.aggregations, [], 'no-tally semantics still holds -- linking rank contributions adds no aggregate/winner computation');
+});
+
+// ---------------------------------------------------------------------
+// 2. AT THE TIME THIS CELL (P10.7) RAN, the closed step vocabulary
+//    structurally excluded contribution linking -- proven empirically
+//    against the real schema, not merely argued from a static read of
+//    run.mjs/schema.mjs. P10.10 (Promotion And Closeout) closed that gap:
+//    a real "contribution" step now exists (`run.mjs`'s own
+//    "contribution" branch, `schema.mjs`'s `validateContributionStep`),
+//    forwarding into `linkSessionContribution` the same way
+//    "authorize"/"disposition" already forward into their own mediated
+//    doors. `test/verbs/coordination-group-thinking-rfc-review-lite-pack-conformance.test.mjs`
+//    now proves that door open, end to end. The test below is UPDATED,
+//    not removed: "link" was never a real step-type spelling (this
+//    protocol's own request used it as a strawman for "no such door"), so
+//    it still proves the closed-vocabulary refusal genuinely fires for a
+//    misspelled/unknown step type -- only the expected message text
+//    changed, to name all five real step types including "contribution".
+
+test('runGroupThinkingRequest refuses a "link" step (an unknown step-type spelling, never a real one) with the real schema\'s own closed-vocabulary message', async () => {
   const tempDir = mkTempDir();
   const coordinationId = 'ngl-pack-no-link-step';
   const writerId = 'p10-7-no-link-step';
@@ -310,7 +445,7 @@ test('runGroupThinkingRequest refuses a "link" step with the real schema\'s own 
           }),
         },
       ),
-    (err) => err instanceof StoreError && err.category === 'validation' && /steps\[1\]\.type must be "operation", "fan-out", "authorize", or "disposition"/.test(err.message),
+    (err) => err instanceof StoreError && err.category === 'validation' && /steps\[1\]\.type must be "operation", "fan-out", "authorize", "disposition", or "contribution"/.test(err.message),
   );
 });
 

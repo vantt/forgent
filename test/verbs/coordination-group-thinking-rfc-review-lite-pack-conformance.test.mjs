@@ -12,30 +12,44 @@
 //
 // A genuine, structural finding surfaced while building this file, verified
 // by direct code read before writing a single assertion around it (never
-// assumed): `run.mjs`'s entire request step vocabulary is closed to four
-// kinds -- "operation" | "authorize" | "disposition" | "fan-out"
-// (run.mjs's own step-loop, confirmed by reading its body in full). None of
-// the four ever calls `linkSessionContribution` (session-engine.mjs) --
-// grepped every call site of that function across `src/`: the only callers
-// anywhere in this codebase are test files (P08's/P10.2's own suites).
-// `deriveVisibilityWindowState`/`resolveBindingOutcome`
-// (session-engine.mjs:1411-1490, read in full) derive every visibility
-// window's open/closed state purely from `assignment-created` +
-// Run-settlement events -- never from `deliberation-contribution-linked`
-// events -- so the real REVEAL privacy gate (the property this protocol
-// exists to prove) is fully reachable and provable through the pack gate.
-// But the CONTRIBUTION-typed ledger records themselves (proposal/objection/
+// assumed), AT THE TIME THIS CELL (P10.6) RAN: `run.mjs`'s entire request
+// step vocabulary was closed to four kinds -- "operation" | "authorize" |
+// "disposition" | "fan-out" (run.mjs's own step-loop). None of the four
+// ever called `linkSessionContribution` (session-engine.mjs) -- the only
+// callers anywhere in this codebase were test files (P08's/P10.2's own
+// suites). `deriveVisibilityWindowState`/`resolveBindingOutcome`
+// (session-engine.mjs:1411-1490) derive every visibility window's
+// open/closed state purely from `assignment-created` + Run-settlement
+// events -- never from `deliberation-contribution-linked` events -- so the
+// real REVEAL privacy gate (the property this protocol exists to prove) is
+// fully reachable and provable through the pack gate regardless. But the
+// CONTRIBUTION-typed ledger records themselves (proposal/objection/
 // response, with `anchors`/`respondsTo` lineage) -- the specific artifacts
-// P10.2's own replay assertions read -- can only ever be created by a DIRECT
-// `linkSessionContribution` call; there is no request-step shape that
-// reaches that door. This is out of May-Touch scope to fix here (`run.mjs`/
-// `schema.mjs` are not in this cell's May-Touch list, and adding a new step
-// kind is exactly the kind of shared, cross-cell-collision, kernel-adjacent
-// change current-cell.md's Do-Not-Touch text says to report, never patch
-// silently) -- named explicitly, and proven empirically (not merely
-// asserted in prose) by this file's own `replayed.contributions.length ===
-// 0` assertion below, after driving the protocol's full window-gated chain
-// end to end through nothing but the pack gate.
+// P10.2's own replay assertions read -- could, at the time, only ever be
+// created by a DIRECT `linkSessionContribution` call; there was no
+// request-step shape that reached that door. Out of P10.6's own May-Touch
+// scope to fix (`run.mjs`/`schema.mjs` were not on this cell's May-Touch
+// list) -- named explicitly, and proven empirically (not merely asserted in
+// prose) by this file's own `replayed.contributions.length === 0` assertion
+// below, after driving the protocol's full window-gated chain end to end
+// through nothing but the pack gate.
+//
+// **P10.10 (Promotion And Closeout) closed this gap**, classified
+// "implementation bug" (in-scope, pack-layer wiring gap, not a "shared
+// missing primitive" -- `linkSessionContribution` already existed and was
+// already fully proven; only the request vocabulary reaching it was
+// missing): `run.mjs`/`schema.mjs` now accept a fifth step kind,
+// "contribution", that forwards into `linkSessionContribution` exactly the
+// way "authorize"/"disposition" already forward into their own mediated
+// doors, adding no new trust (see `run.mjs`'s own "contribution" branch and
+// `schema.mjs`'s `validateContributionStep`). The assertion below is
+// UNCHANGED and still accurate: THIS test's own request never uses the new
+// step, so it still produces zero contribution records -- what changed is
+// only that "can never exist through the pack gate, for any request" is no
+// longer true as a categorical claim. The new positive test immediately
+// below this one proves the door open, driving the SAME protocol's
+// proposal/objection/response contributions end to end through nothing but
+// `runGroupThinkingRequest`.
 //
 // What IS proven end to end through the pack gate, entirely from
 // `replaySession`'s projection: the real "independent objections before
@@ -303,16 +317,172 @@ test('RFC-Review-Lite through the real pack gate: interrupt-then-resume across F
   assert.equal(replayed.dispositions[0].targetRef, respondId);
   assert.equal(replayed.dispositions[0].disposition, 'accepted');
 
-  // The genuine, out-of-May-Touch-scope gap named in this file's header
-  // comment, proven empirically rather than merely asserted in prose: the
-  // pack gate's closed four-kind step vocabulary never reaches
-  // linkSessionContribution, so a protocol driven end to end purely through
-  // it accumulates zero deliberation-ledger contribution records, even
+  // This request never uses the "contribution" step (P10.10 added it after
+  // this test was first written -- see this file's header comment), so it
+  // still produces zero deliberation-ledger contribution records here, even
   // though every window-gating/authorization/disposition property those
-  // records would eventually back is itself fully proven above.
-  assert.equal(replayed.contributions.length, 0, 'no contribution-typed record can exist on a session driven end to end purely through the pack gate\'s request vocabulary -- see this file\'s header comment');
+  // records would eventually back is itself fully proven above. The
+  // positive test immediately below this one proves the door is genuinely
+  // open when a request DOES use it.
+  assert.equal(replayed.contributions.length, 0, 'this request never attempts a "contribution" step, so it produces zero contribution records -- see the positive test below for the door itself');
   assert.deepEqual(replayed.resolvedContributionIds, []);
   assert.deepEqual(replayed.openContributionIds, []);
+});
+
+// P10.10 (Promotion And Closeout): the positive proof that the gap named
+// above is genuinely closed -- the SAME RFC-Review-Lite chain the test
+// above proves through nothing but the pack gate, this time also using the
+// new "contribution" step to record the real proposal/objection/response
+// lineage (`anchors`/`respondsTo`, the exact shape P10.2's own DIRECT
+// engine-call test proves), reconstructed from `replaySession` alone.
+test('P10.10: RFC-Review-Lite\'s full proposal/objection/response contribution lineage is now reachable through the real pack gate via the new "contribution" step -- reconstructed from replaySession alone', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeRunnerConfig(tempDir);
+  const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig };
+  const coordinationId = 'coord_p10_10_rfc_contribution_lineage';
+  const writerId = 'p10-10-rfc-driver';
+
+  function contributionStep(as, overrides = {}) {
+    return { type: 'contribution', as, roundKey: 'round-1', ...overrides };
+  }
+
+  // Call 1 deliberately stops BEFORE authorizing/dispatching "respond" --
+  // the SAME interrupt point the "P10-KERNEL-FIX" test immediately below
+  // this one already establishes (proposer-actor's own gated "respond"
+  // binding is what keeps the session genuinely open across the call
+  // boundary), so a genuinely separate LATER call can still link a
+  // contribution while the session is still active.
+  const call1 = await runGroupThinkingRequest(ctx, {
+    protocolId: RFC_REVIEW_LITE_ID,
+    requestObject: {
+      kind: 'declared-protocol',
+      objective: 'Settle both objectors and their contribution lineage through the pack gate; stop before authorizing or dispatching "respond".',
+      writerId,
+      coordinationId,
+      protocolRef: { id: RFC_REVIEW_LITE_ID },
+      steps: [
+        opStep('convene', 'convene', 'coordinator-actor'),
+        opStep('propose', 'propose', 'proposer-actor'),
+        contributionStep('linkProposal', { contributionId: 'p10_10_proposal', contributionType: 'proposal', assignmentId: '$ref:propose' }),
+        opStep('objectA', 'object', 'objector-a-actor'),
+        contributionStep('linkObjectionA', { contributionId: 'p10_10_objection_a', contributionType: 'objection', assignmentId: '$ref:objectA', anchors: ['p10_10_proposal'] }),
+        opStep('objectB', 'object', 'objector-b-actor'),
+        contributionStep('linkObjectionB', { contributionId: 'p10_10_objection_b', contributionType: 'objection', assignmentId: '$ref:objectB', anchors: ['p10_10_proposal'] }),
+      ],
+    },
+  });
+
+  const linkProposal = call1.steps.find((s) => s.as === 'linkProposal');
+  const linkObjectionA = call1.steps.find((s) => s.as === 'linkObjectionA');
+  const linkObjectionB = call1.steps.find((s) => s.as === 'linkObjectionB');
+
+  assert.equal(linkProposal.type, 'contribution');
+  assert.equal(linkProposal.contributionType, 'proposal');
+  assert.equal(linkProposal.appended, true);
+  assert.equal(linkObjectionA.appended, true);
+  assert.equal(linkObjectionB.appended, true);
+  assert.equal(
+    call1.closed,
+    false,
+    'proposer-actor still owes its own gated "respond" binding -- the session must genuinely still be active when call 2 starts',
+  );
+
+  // Call 2: a genuinely SEPARATE, later call, naming the SAME
+  // coordinationId, while the session is still active. Repeats the
+  // identical proposal contribution link (a truthful idempotent no-op,
+  // matching "authorize"'s own documented idempotent path) and attempts to
+  // smuggle a caller-declared "linkedBy" (refused at the request boundary,
+  // driver provenance always derived from the session's own writerId).
+  const call2 = await runGroupThinkingRequest(ctx, {
+    protocolId: RFC_REVIEW_LITE_ID,
+    requestObject: {
+      kind: 'declared-protocol',
+      objective: 'Repeat the identical proposal contribution link in a genuinely separate later call.',
+      writerId,
+      coordinationId,
+      protocolRef: { id: RFC_REVIEW_LITE_ID },
+      steps: [{ type: 'contribution', as: 'linkProposalRepeat', contributionId: 'p10_10_proposal', contributionType: 'proposal', assignmentId: linkProposal.assignmentId, roundKey: 'round-1' }],
+    },
+  });
+  assert.equal(call2.steps.find((s) => s.as === 'linkProposalRepeat').appended, false, 'an identical repeat of an already-linked contributionId must be a truthful no-op, never a second link');
+
+  await assert.rejects(
+    () =>
+      runGroupThinkingRequest(ctx, {
+        protocolId: RFC_REVIEW_LITE_ID,
+        requestObject: {
+          kind: 'declared-protocol',
+          objective: 'Attempt to smuggle a caller-declared linkedBy identity.',
+          writerId,
+          coordinationId,
+          protocolRef: { id: RFC_REVIEW_LITE_ID },
+          steps: [{ type: 'contribution', as: 'linkForged', contributionId: 'p10_10_forged', contributionType: 'proposal', assignmentId: linkProposal.assignmentId, roundKey: 'round-1', linkedBy: { type: 'driver', id: 'someone-else' } }],
+        },
+      }),
+    /declares "linkedBy"/,
+    'a request may never name its own "linkedBy" -- driver provenance is pinned to the session\'s own writerId',
+  );
+
+  // Call 3: a THIRD, genuinely separate call finishes the round -- authorize
+  // + dispatch "respond", link its own response contribution (anchors both
+  // objections, responds to objection A), and record the driver's
+  // disposition. Every gating binding is now settled, so the session
+  // correctly closes at the end of THIS call.
+  const call3 = await runGroupThinkingRequest(ctx, {
+    protocolId: RFC_REVIEW_LITE_ID,
+    requestObject: {
+      kind: 'declared-protocol',
+      objective: 'Finish the round: authorize+dispatch respond, link its response contribution, and dispose it.',
+      writerId,
+      coordinationId,
+      protocolRef: { id: RFC_REVIEW_LITE_ID },
+      steps: [
+        {
+          type: 'authorize',
+          as: 'authRespond',
+          operationId: 'respond',
+          targetActorId: 'proposer-actor',
+          authorizationId: 'auth_p10_10_respond',
+          invocationKey: 'p10-10-respond:1',
+          reason: 'Reveal both independent objections for a driver-authorized response.',
+          grantedContextRefs: [linkObjectionA.assignmentId, linkObjectionB.assignmentId],
+        },
+        opStep('respond', 'respond', 'proposer-actor'),
+        contributionStep('linkResponse', {
+          contributionId: 'p10_10_response',
+          contributionType: 'response',
+          assignmentId: '$ref:respond',
+          respondsTo: 'p10_10_objection_a',
+          anchors: ['p10_10_objection_a', 'p10_10_objection_b'],
+        }),
+        { type: 'disposition', as: 'disposeResponse', targetRef: '$ref:respond', disposition: 'accepted', rationale: 'The response satisfactorily addresses both independent objections.', evidenceRefs: [] },
+      ],
+    },
+  });
+  const linkResponse = call3.steps.find((s) => s.as === 'linkResponse');
+  assert.equal(linkResponse.appended, true);
+  assert.equal(linkResponse.contributionType, 'response');
+  assert.deepEqual(new Set(linkResponse.anchors), new Set(['p10_10_objection_a', 'p10_10_objection_b']));
+  assert.equal(linkResponse.respondsTo, 'p10_10_objection_a');
+  assert.equal(call3.closed, true, 'every gating binding is now settled -- the session correctly closes at the end of this call');
+
+  // Chat-history-free replay: the WHOLE contribution-typed lineage
+  // reconstructed from replaySession alone, across three separate pack-gate
+  // calls -- proving this is a real, durable ledger record, not a
+  // request-scoped echo.
+  const replayed = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(replayed.contributions.length, 4, 'proposal + 2 objections + response, reconstructed from replay alone');
+  const byId = Object.fromEntries(replayed.contributions.map((c) => [c.contributionId, c]));
+  assert.equal(byId.p10_10_proposal.type, 'proposal');
+  assert.equal(byId.p10_10_objection_a.type, 'objection');
+  assert.deepEqual(byId.p10_10_objection_a.anchors, ['p10_10_proposal']);
+  assert.equal(byId.p10_10_objection_b.type, 'objection');
+  assert.deepEqual(byId.p10_10_objection_b.anchors, ['p10_10_proposal']);
+  assert.equal(byId.p10_10_response.type, 'response');
+  assert.equal(byId.p10_10_response.respondsTo, 'p10_10_objection_a');
+  assert.deepEqual(new Set(byId.p10_10_response.anchors), new Set(['p10_10_objection_a', 'p10_10_objection_b']));
+  assert.equal(byId.p10_10_proposal.operationRef, 'propose', 'each contribution\'s own operationRef is derived by the engine from the backing Assignment\'s stamp, never accepted from the request');
+  assert.equal(byId.p10_10_response.operationRef, 'respond');
 });
 
 test('P10-KERNEL-FIX: a genuinely SEPARATE later runGroupThinkingRequest call reaches proposer-actor\'s remaining declared operation ("respond") successfully -- the exact bug this fix corrects -- and no re-authorization of an already-settled step is possible once the session has naturally closed', async () => {

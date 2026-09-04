@@ -869,11 +869,11 @@ export function createSessionAssignment(
 // door that writes a driver-authored event (`authorizeOperation`,
 // `recordDriverDisposition`), so the two can never drift apart. Always called
 // on a manifest read INSIDE the caller's held events lock.
-function assertDriverIdentity(manifest, authorizedBy, { coordinationId, label, subject }) {
+function assertDriverIdentity(manifest, authorizedBy, { coordinationId, label, subject, fieldName = 'authorizedBy' }) {
   if (authorizedBy?.id !== manifest.provenanceRoot.writerId) {
     throw new CoordinationError(
       'validation',
-      `${label}: authorizedBy.id "${authorizedBy?.id}" is not the driver identity of session "${coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- ${subject} may only be written under the session's own driver/provenance-root identity`,
+      `${label}: ${fieldName}.id "${authorizedBy?.id}" is not the driver identity of session "${coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- ${subject} may only be written under the session's own driver/provenance-root identity`,
     );
   }
 }
@@ -1426,6 +1426,7 @@ export function recordContributionLink(
       coordinationId,
       label: 'recordContributionLink',
       subject: 'a linked contribution',
+      fieldName: 'linkedBy',
     });
 
     if (!manifest.assignmentRefs.includes(assignmentId)) {
@@ -1558,6 +1559,7 @@ export function recordAggregationValidation(
       coordinationId,
       label: 'recordAggregationValidation',
       subject: 'a validated aggregation',
+      fieldName: 'validatedBy',
     });
 
     const owned = new Set(manifest.assignmentRefs);

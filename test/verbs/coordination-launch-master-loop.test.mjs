@@ -159,9 +159,17 @@ test('R4: a request naming an unregistered fixture id is refused end to end by t
   const built = buildMasterLoopRequest({ cwd }, { planPath, objective: 'Ship the thing.', writerId: WRITER_ID });
   built.protocolRef = { id: 'core.coordination-protocol.does-not-exist' };
 
+  // P10.10 (Promotion And Closeout): `run.mjs`'s own resolution of
+  // `protocolRef.id` now catches this exact failure and refuses with a
+  // clean, attributable `StoreError` (matching `classifySessionQuorum`'s own
+  // resolution-failure posture) instead of leaking the raw
+  // `FlowDefinitionError` message straight from `loadCoordinationProtocol` --
+  // still the SAME reused call, not a duplicated check (`err.category ===
+  // 'validation'` and the wrapped message naming the same unregistered id
+  // is what proves that, not the raw upstream wording).
   await assert.rejects(
     runCoordinationUseCase({ cwd, repoRoot: cwd }, { requestObject: built }),
-    (err) => /no CoordinationProtocol definition found for id/.test(err.message),
+    (err) => err instanceof StoreError && err.category === 'validation' && /protocol "core\.coordination-protocol\.does-not-exist" could not be resolved/.test(err.message),
   );
 });
 

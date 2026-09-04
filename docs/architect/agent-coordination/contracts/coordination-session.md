@@ -57,7 +57,18 @@ events), `src/runner/definitions/schema.mjs` (P09.1, the
 negative/crash-recovery/structural-absence proof
 (`test/runner/{coordination-specialist-binding,coordination-r7-work-isolation}.test.mjs`,
 P09.3, closing Phase 09). Promoted with the named limitations in Specialist
-Slot Binding below, not without them. Full per-phase trace:
+Slot Binding below, not without them.
+Phase 10 (Step 09 external acceptance, closing Step 09): the multi-operation
+quorum-completion rule (`classifySessionQuorum`/`closeSessionByQuorum`,
+`session-engine.mjs`, P10-KERNEL-FIX, user-authorized) and the
+Group-Thinking Protocol Pack (`core/protocol-packs/group-thinking.json`,
+`src/verbs/coordination/group-thinking-pack.mjs`, three registered
+protocols, P10.1-P10.9) accepted and implemented, including the pack
+request door's fifth step kind (`contribution`, forwarding into
+`linkSessionContribution`) and two resolution-failure crash fixes in
+`src/verbs/coordination/run.mjs` (P10.10, closing the track). Promoted with
+the named limitations in Multi-Operation Quorum Completion and
+Group-Thinking Protocol Pack below, not without them. Full per-phase trace:
 `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`.)
 Last reviewed: 2026-09-04
 Canonical for: CoordinationSession manifest/event schema, storage layout, session-to-Assignment membership, and recovery rules
@@ -621,6 +632,173 @@ quantity no caller input can move. `resolveLiveSpecialistBindings` now
 accepts no `round` parameter at all; `dispatchDeclaredOperation`'s own
 pre-existing `round` parameter is fully decoupled and unaffected, remaining
 a per-edge taskKey/`maxRounds` disambiguator only.
+
+## Multi-Operation Quorum Completion (Phase 10, Step 09, P10-KERNEL-FIX)
+
+`classifySessionQuorum`/`closeSessionByQuorum` (`session-engine.mjs`) decide
+whether every declared actor has done enough to let a session close. Before
+this fix, an actor counted complete the instant its FIRST-ever
+`assignment-created` event existed — correct for every pre-Phase-10 mechanism
+(one operation per actor), but wrong once a single actor legally performs
+MORE THAN ONE declared operation across a session's life (a real shape all
+three group-thinking-lite protocols below have): the session auto-closed
+after that actor's first operation settled, silently and permanently
+refusing any later, genuinely separate call that tried to reach the actor's
+remaining declared work.
+
+**The real rule.** An actor's graph-declared operation binding gates its own
+quorum completion when it is `required`, OR when it is `driver-authorized`
+AND ALSO declares `contextAccess.visibilityWindowRef` (real MVP6 access
+control, not a skippable driver's-choice branch). An actor with zero gating
+bindings falls back to the original, byte-identical "first assignment" rule
+— this fix narrows a false completion, it never widens a true one. Proven
+directly: three independent conformance cells (P10.6/RFC-Review-Lite,
+P10.7/Nominal-Group-Lite, P10.8/Delphi-Feedback-Lite) each independently
+converged on the identical root cause on a different protocol; P10.7's
+Red-Team live-reproduced it against P10.6's own already-closed, already-
+merged protocol under normal "launch, resume" usage, proving it was already
+live in shipped code. Fixed and independently rechecked (`P10-KERNEL-FIX.md`,
+3 fix rounds, final recheck APPROVE); regression coverage:
+`test/runner/coordination-recovery-and-quorum.test.mjs`'s own
+`multiOpQuorumDefinition` fixture and both `P10-KERNEL-FIX Fix Round 3`
+tests (resolution-failure refusal, version-drift read honesty).
+
+**Named residual, not fixed here.** An operation id bound to the SAME actor
+at two DIFFERENT graph nodes deduplicates to one gating entry (settling
+either node's own Assignment satisfies both) — a real, unfixed instance of
+the premature-close bug for that one authoring shape. No shipped protocol
+has it today (`P10-KERNEL-FIX.md` §5, MEDIUM-6); closing it would require
+gating on `(operationId, nodeId)` pairs, judged out of scope for a
+kernel-classification fix.
+
+## Group-Thinking Protocol Pack (Phase 10, Step 09)
+
+A small, data-first application layer OUTSIDE this kernel
+(`core/protocol-packs/group-thinking.json`,
+`src/verbs/coordination/group-thinking-pack.mjs`) that indexes real
+FlowDefinition protocols by `metadata.id@version` and gates
+`fgos-group-thinking`-style requests to an explicitly-selected pack member
+before forwarding them, byte-for-byte, into this contract's own
+`runCoordinationUseCase` (`src/verbs/coordination/run.mjs`) — the SAME door
+`fgos coordination run --file` and the headless adapter already use. The
+pack never decides visibility legality, aggregate validity, specialist
+authority, or terminal truth; every one of those stays owned by this
+kernel, unchanged, per the Pack Integration Gate
+(`plans/260903-2334-step09-mvp6-to-mvp9/phase-10-group-thinking-protocol-pack-conformance-and-closeout.md`).
+
+**Three registered protocols**
+(`core/protocol-packs/group-thinking.json`, all `1.0.0`), each a genuinely
+new FlowDefinition, not a clone of an earlier fixture, each proven end to
+end through the real pack gate (not merely by direct engine call):
+`group-thinking-rfc-review-lite` (two independent objectors before a
+controlled, driver-authorized reveal and response —
+`test/verbs/coordination-group-thinking-rfc-review-lite-pack-conformance.test.mjs`),
+`group-thinking-nominal-group-lite` (private proposals, controlled sharing,
+clarification, private ranks, a real 3-actor cohort —
+`test/verbs/coordination-group-thinking-nominal-group-lite-pack.test.mjs`),
+and `group-thinking-delphi-feedback-lite` (private round-1 proposals feeding
+a mediated, non-contribution aggregate that gates a bounded round-2, with an
+engine-enforced round cap —
+`test/verbs/coordination-group-thinking-delphi-feedback-lite-pack-conformance.test.mjs`).
+
+**Request step vocabulary — five kinds.** `run.mjs`'s request `steps[]`
+(`src/verbs/coordination/schema.mjs`'s `validateSteps`) accepts exactly
+`operation` | `authorize` | `disposition` | `fan-out` | `contribution`.
+The fifth kind, `contribution` (added Phase 10, P10.10), forwards into
+`linkSessionContribution` (Deliberation Contribution Ledger, above) the same
+way `authorize`/`disposition` already forward into their own mediated doors
+— `linkedBy` is never caller-supplied, always the request's own derived
+driver identity, and every window/provenance/lineage check
+`linkSessionContribution` already performs runs unchanged. Before this, the
+pack's closed four-kind vocabulary never reached that door at all, so no
+contribution-typed lineage record (proposal/objection/response, with
+`anchors`/`respondsTo`) could ever be created through the pack, for any of
+the three protocols above — first found by P10.6, re-confirmed by
+P10.7/P10.8, classified by P10.10 as a scoped pack-layer wiring gap (the
+underlying door already existed and was already proven, P08.2/P08.3; only
+the request-vocabulary channel reaching it was missing), not a new kernel
+capability, and closed without touching any kernel file (`src/runner/**`) —
+see `test/verbs/coordination-group-thinking-rfc-review-lite-pack-conformance.test.mjs`'s
+own positive proof (full proposal/objection/response lineage, reconstructed
+from `replaySession` alone, across three separate pack-gate calls),
+`test/verbs/coordination-group-thinking-nominal-group-lite-pack.test.mjs`'s
+own positive proof (a real `rank`-typed contribution linked for the
+`private-rank` operation, same three-call/replay-reconstruction shape),
+and `test/verbs/coordination-group-thinking-delphi-feedback-lite-pack-conformance.test.mjs`'s
+own round-order proof (an early link attempt refused by the SAME
+window-not-open message `linkSessionContribution` already gives directly)
+— positive end-to-end proof now exists for all three registered protocols.
+The request boundary's `contributionId`/`anchors`/`respondsTo` charset
+(`assertSafeId`, `^[A-Za-z0-9_-]+$`) is stricter than the engine's own
+`assertContributionIdShape` (`store.mjs`, which permits dots and colons) —
+a narrowing-only, safe direction, but disclosed here explicitly: a
+contribution created through a direct engine call with a dotted or
+colon'd id cannot be named as an `anchor` or `respondsTo` through this
+request boundary.
+
+**Five bypasses, verified structurally impossible** (`P10.1.md` §5/§11,
+re-verified against two real registered protocols by `P10.5.md` §4-5):
+(1) switch protocols silently — the pack's own explicit-selection check
+plus, on resume, a cross-check against the session's REAL bound protocol
+(`manifest.definitionRef.id`, via `resumeSession`) fixed by P10.1's own Fix
+Round 1 after Red-Team proved a resume-path gap in the original design;
+(3) validate its own aggregate, (4) authorize a specialist, (5) close a
+session directly — `run.mjs`'s public request vocabulary never exposes any
+of these three as caller-invokable actions at all (`closeSessionByQuorum`
+in particular is called unconditionally, and only, inside `run.mjs` itself
+at the end of its own steps loop, never as a request-selectable action);
+(2) bypass grants — `run.mjs`'s public vocabulary DOES expose an
+`authorize` step, but it dispatches through `authorizeDeclaredOperation`,
+the exact same mediated door with the exact same context-grant enforcement
+every hand-authored request already uses — this gate's own explicit-
+selection checks run before, and add nothing to, `run.mjs`'s existing
+enforcement, so the bypass is refused by mediation, not by absence from the
+vocabulary (`P10.1.md`'s own accurate framing, quoted rather than
+paraphrased: three bypasses — validate-aggregate, authorize-specialist,
+close-directly — are refused because `run.mjs`'s vocabulary never exposes
+them at all; two — switch-protocols, bypass-grants — are refused because
+the pack gate's own explicit-selection checks run before, and add nothing
+to, `run.mjs`'s existing enforcement. This is NOT "upstream mediation" in
+`run.mjs` itself: the base `runCoordinationUseCase` door has no
+resumed-session protocol cross-check of its own — see this document's
+"Group-Thinking Protocol Pack" section, residual #22 — so switch-protocols
+is refused by the PACK gate's own explicit check, not by anything
+`run.mjs` enforces upstream).
+
+**Per-actor provider/tier customization, proven live, never collapsed onto
+one hardcoded provider** (the user's own mid-flight requirement,
+`P10.1.md` §3a, `P10.3.md`): the pack gate never reads or touches
+`requestObject.actors`, so per-actor `executor`/`model`/`tier`/`persona`
+selection reaches `run.mjs`'s real `actorPolicyFields` resolution
+completely unchanged. Proven with two genuinely different registered
+executors dispatching as two different actors in one session (P10.1), and
+with Nominal-Group-Lite's facilitator/participant roles resolving to two
+different registered executors/providers via `cliPolicy`
+(`test/runner/coordination-group-thinking-nominal-group-lite.test.mjs`,
+P10.3).
+
+**Two resolution-failure crashes fixed (Phase 10, P10.10), never a kernel
+change.** `run.mjs` had two separate, previously-unguarded
+`loadCoordinationProtocol` calls — the request-boundary actor-membership
+check (resolves `request.protocolRef.id`, runs first, on every
+declared-protocol request) and `aggregationCloseParams` (resolves
+`manifest.definitionRef.id`, P10-KERNEL-FIX.md §5's own N3/R2-MEDIUM-C
+Gap) — both of which threw a raw, uncaught `FlowDefinitionError` on a
+resolution failure (a malformed sibling protocol file, a removed protocol)
+instead of the same honest, correctly-attributed refusal
+`classifySessionQuorum` already gives its own resolution-failure case.
+Pre-existing, always failed safe (a session never wrongly closed); fixed by
+wrapping each load in a try/catch mirroring `classifySessionQuorum`'s own
+pattern — see
+`test/verbs/coordination-aggregation-surface.test.mjs`'s two P10.10
+regression tests and `test/verbs/coordination-launch-master-loop.test.mjs`'s
+updated R4 test.
+
+**Named limitation, not closed here.** The definition-pinned-by-`{id,
+version}`-not-content exposure (Deliberation Contribution Ledger, above)
+applies identically to every pack-registered protocol; the pack registry
+adds real `{id, version}` pairs, it does not close or worsen this
+systemic, already-disclosed, whole-kernel limitation.
 
 ## Recovery Rule
 

@@ -238,11 +238,24 @@ test('Delphi-Feedback-Lite: round BOUND -- a third invocation for the same panel
 
 // ---------------------------------------------------------------------
 // 3. Round ORDER -- proved reachable at the DISPATCH level (parity with
-//    P10.4's direct-call behavior), then the gap itself proved concretely:
-//    the LINK-time refusal that actually enforces round order has no door
-//    in the pack's public request vocabulary at all.
+//    P10.4's direct-call behavior). AT THE TIME THIS CELL (P10.8) RAN, the
+//    LINK-time refusal that actually enforces round order (P10.4.md §2/§6:
+//    the round2-open visibility-window check inside
+//    `linkSessionContribution`) had no door in the pack's public request
+//    vocabulary at all -- this test originally proved exactly that.
+//
+//    P10.10 (Promotion And Closeout) closed that gap: `run.mjs`/
+//    `schema.mjs` now accept a "contribution" step that forwards into
+//    `linkSessionContribution`. This test is UPDATED, not removed: it now
+//    proves the round-order refusal genuinely reachable through the pack
+//    gate -- the SAME early round-2 Assignment this test already dispatches
+//    (still succeeding, dispatch-level parity is unchanged and still
+//    proven first) is refused when a "contribution" step attempts to link
+//    it BEFORE "aggregate" opens the round2-open window, with the SAME
+//    refusal message `linkSessionContribution`, called directly, already
+//    gives per P10.4's own proof.
 
-test('Delphi-Feedback-Lite: round ORDER -- dispatching "propose-round2" through the pack gate BEFORE "aggregate" has settled succeeds identically to P10.4\'s direct-call behavior (dispatch-level parity); the pack introduces no NEW bypass, but the visibility-window refusal that actually enforces round order lives only in linkSessionContribution, which this surface cannot reach at all', async () => {
+test('Delphi-Feedback-Lite: round ORDER -- dispatching "propose-round2" through the pack gate BEFORE "aggregate" has settled succeeds identically to P10.4\'s direct-call behavior (dispatch-level parity); linking it as a contribution before round2-open has opened is refused through the pack gate\'s new "contribution" step, with the same window-not-open message linkSessionContribution already gives directly', async () => {
   const tempDir = mkTempDir();
   const runnerConfig = fakeRunnerConfig(tempDir);
   const coordinationId = 'delphi-lite-pack-order';
@@ -270,17 +283,16 @@ test('Delphi-Feedback-Lite: round ORDER -- dispatching "propose-round2" through 
   );
   assert.equal(result.steps[2].status, 'done', 'the early round-2 dispatch itself succeeds through the pack gate too -- identical to P10.4\'s direct-call finding, not a NEW bypass the pack introduces');
 
-  // The genuine gap, proved concretely rather than merely asserted: there is
-  // no step kind in run.mjs's public vocabulary that reaches
-  // linkSessionContribution at all (schema.mjs's own validateSteps rejects
-  // any step.type outside "operation"/"fan-out"/"authorize"/"disposition").
-  // So the ONE place round order is actually enforced
-  // (P10.4.md §2/§6: the round2-open visibility-window check inside
-  // linkSessionContribution) cannot be reached, refused, or even attempted
-  // through this surface -- not because the pack weakens the protection
-  // (linkSessionContribution itself, called directly, still refuses this
-  // exact shape unconditionally per P10.4's own proof), but because the
-  // door to it does not exist on this public surface at all.
+  // P10.10: the round-order refusal, proved reachable through the pack
+  // gate's new "contribution" step -- a genuinely separate later call,
+  // naming the SAME coordinationId (panelist-b never dispatched anything,
+  // so the session stays active), attempts to link the just-dispatched
+  // early round-2 Assignment as a "proposal" contribution. round2-open
+  // opens only after "aggregate" (never dispatched in this test), so
+  // `linkSessionContribution` -- reached genuinely THROUGH the pack now,
+  // not called directly -- refuses with the SAME window-not-open message
+  // P10.4's own direct-call proof already established, before any
+  // contribution event is appended.
   await assert.rejects(
     () =>
       runGroupThinkingRequest(
@@ -288,15 +300,18 @@ test('Delphi-Feedback-Lite: round ORDER -- dispatching "propose-round2" through 
         {
           protocolId: DELPHI_ID,
           requestObject: baseRequest({
-            coordinationId: 'delphi-lite-pack-order-unknown-step',
+            coordinationId,
             writerId,
-            steps: [{ type: 'contribution', as: 'linkAttempt', contributionId: 'x', roundKey: 'round-2', assignmentId: 'whatever' }],
+            steps: [{ type: 'contribution', as: 'linkRound2Early', contributionId: 'p10_10_round2_early', contributionType: 'proposal', assignmentId: result.steps[2].assignmentId, roundKey: 'round-2' }],
           }),
         },
       ),
-    (err) => err instanceof StoreError && err.category === 'validation' && /steps\[0\]\.type must be "operation", "fan-out", "authorize", or "disposition"/.test(err.message),
-    'run.mjs\'s public request vocabulary has no "contribution"/"link" step kind at all -- confirmed live, not merely read from source -- so linkSessionContribution (and therefore Delphi-Feedback-Lite\'s own round-order enforcement) is genuinely unreachable through the pack gate',
+    (err) => err instanceof CoordinationError && /visibility window "round2-open" to be open/.test(err.message),
+    'round order is genuinely enforced through the pack gate now: linkSessionContribution\'s own window-not-open refusal fires for a real early link attempt, reached through the new "contribution" step -- no NEW bypass, and the gap this test originally proved is now closed',
   );
+
+  const replayedOrder = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(replayedOrder.contributions.length, 0, 'the refused link attempt must append zero contribution events');
 });
 
 // ---------------------------------------------------------------------
