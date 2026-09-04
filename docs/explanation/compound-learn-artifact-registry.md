@@ -160,6 +160,18 @@ safe to rerun. Refuses to run at all if the classifier hasn't finished —
 this item depends on both `tsk-28x-1` (the domain model it writes into)
 and `tsk-28x-3` (the data it bootstraps from).
 
+### Child 5 — the `topic`/`doc` CLI verbs themselves (`tsk-28x-5`)
+
+`bin/fgos.mjs` + `src/cli/command-registry.mjs` gain the `topic` and `doc`
+verbs — the exact commands `fgos-coding-knowledge` (and this retro-loop
+session's own synthesis, every iteration) calls: `fgos topic register`,
+`fgos doc reserve`, `fgos doc mark-rendered`, `fgos doc promote`. `doc
+promote` locks all five preconditions `D-tsk28x-17` named: only
+provisional → active; refuses if an active doc already occupies that
+`(topicId, role)`; refuses if `currentPath` is absent from HEAD; refuses
+an alias path; requires a valid topic/role. `promote` only moves registry
+state — it never writes prose itself.
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
