@@ -74,9 +74,27 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 
 ## Active Cell
 
-None. P10.5 closed — no fix round needed. See "## P10.5 Status" below.
-Pack (`core/protocol-packs/group-thinking.json`) now has all three
-group-thinking-lite protocols registered.
+**P10.6, P10.7, P10.8, P10.9 — running in parallel, each its own
+isolated worktree/branch** (this track's final parallel wave before
+P10.10 closes everything):
+- P10.6 (RFC-Review-Lite Conformance): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-6`,
+  branch `step-09-mvp6-to-mvp9-p10-6`, contract committed `4f38b5c7`.
+- P10.7 (Nominal-Group-Lite Conformance): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-7`,
+  branch `step-09-mvp6-to-mvp9-p10-7`, contract committed `cb786553`.
+- P10.8 (Delphi-Feedback-Lite Conformance): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-8`,
+  branch `step-09-mvp6-to-mvp9-p10-8`, contract committed `0a794fff`.
+- P10.9 (Isolation, Security, And Authority Regression):
+  `.claude/worktrees/step-09-mvp6-to-mvp9-p10-9`, branch
+  `step-09-mvp6-to-mvp9-p10-9`, contract committed `45053eab`.
+
+All four branched off this track's own HEAD at P10.5's close
+(`2da3f9a3`). Each cell's own `current-cell.md` is its authoritative
+contract — do not duplicate per-cell narrative here until each closes
+and merges back.
+
+Previously: P10.5 closed — no fix round needed. See "## P10.5 Status"
+below. Pack (`core/protocol-packs/group-thinking.json`) now has all
+three group-thinking-lite protocols registered.
 
 Previously: P10.2, P10.3, P10.4 all closed and merged — see "## P10.2/
 P10.3/P10.4 Status" below. All three isolated worktrees/branches removed
