@@ -19,7 +19,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
+import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { appendEvent, appendEventLocked, withEventsLock, readEvents } from '../../state/events.mjs';
 import { buildAssignment, claimAssignmentId } from '../dispatch/assignment.mjs';
 import {
@@ -43,17 +43,32 @@ const MAX_SESSION_ID_CLAIM_ATTEMPTS = 8;
 /**
  * Resolve `.fgos/coordination/sessions` for a given workspace, mirroring
  * mission-lite.mjs's own `resolveMissionsDir` shape exactly (same
- * `cwd`/`repoRoot` resolution order, same `fgosDirFromRoot(cwd)` call).
+ * `cwd`/`repoRoot` resolution order). `fgosDir` is keyed on the resolved
+ * MAIN CHECKOUT root (`root`), never raw `cwd` -- Phase 01 R8 fix: when
+ * `cwd` is a linked worktree, `.fgos/` there is wiped on creation (ADR0020),
+ * so keying on `cwd` silently pointed every session/assignment/claim path
+ * this module resolves at a phantom, worktree-local `.fgos/` instead of the
+ * real one at the main checkout (confirmed empirically before this fix,
+ * this cell's own report).
+ *
+ * The fallback chain stays anchored to `cwd` throughout -- never a second,
+ * independent `resolveMainCheckoutRoot(process.cwd())` probe against the
+ * CALLING PROCESS's own cwd (a real, empirically-confirmed sibling bug this
+ * same R8 fix surfaced: with that probe still in place, a caller passing a
+ * genuinely non-git `cwd` -- every pre-existing test fixture that never
+ * `git init`s its temp dir -- silently resolved `root` to whatever git repo
+ * the TEST RUNNER PROCESS happened to be sitting in, not the caller's own
+ * workspace at all). `resolveRepoRoot(cwd, {strict: true})` never shells out
+ * to git and simply returns `cwd` unresolved -- the same non-git fallback
+ * shape `dispatch/assignment-runner.mjs`'s own (already-correct, per this
+ * cell's grep) `root` resolution uses, mirrored here exactly.
  */
 function resolveCoordinationPaths(opts = {}) {
   const cwd = opts.cwd ?? process.cwd();
   let root = opts.repoRoot;
-  if (!root) {
-    root = resolveMainCheckoutRoot(cwd);
-    if (!root) root = resolveMainCheckoutRoot(process.cwd());
-  }
-  if (!root) root = process.cwd();
-  const fgosDir = fgosDirFromRoot(cwd);
+  if (!root) root = resolveMainCheckoutRoot(cwd);
+  if (!root) root = resolveRepoRoot(cwd, { strict: true });
+  const fgosDir = fgosDirFromRoot(root);
   const sessionsDir = path.join(fgosDir, 'coordination', 'sessions');
   return { root, cwd, fgosDir, sessionsDir };
 }

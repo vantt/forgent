@@ -571,10 +571,12 @@ operation — no new dispatch gate was introduced. `dispatchDeclaredOperation`
 resolves a `specialistSlotRef` binding's effective actor id by looking up
 the slot in a freshly-derived live-bindings map before resolving the
 authorization, then proceeds through the SAME context-grant enforcement,
-visibility-window re-derivation, and read-only contract construction
-(`buildReadOnlyContract`, hardcoded `mutation: 'read-only'`) every other
-dispatch path uses — a specialist-dispatched Assignment introduces no new
-mutation-capable surface (proved in
+visibility-window re-derivation, and contract construction
+(`buildSessionContract`, defaulting `mutation: 'read-only'`) every other
+`dispatchDeclaredOperation` call uses — a specialist-dispatched Assignment
+introduces no NEW mutation mechanism of its own; it is subject to the exact
+same Mutation Rule (see below) as any other declared `operation` step,
+statically-bound or specialist-slot-bound alike (proved in
 `test/runner/coordination-r7-work-isolation.test.mjs` and
 `test/runner/coordination-specialist-binding.test.mjs`, P09.3).
 
@@ -866,6 +868,74 @@ A session's `workRef` is read-only context. Per
 or verb defined by this contract may move Work status/stage, accept, approve,
 claim, return, or merge. A session cannot duplicate Work stage/status/
 approval/merge state in `.fgos/coordination/`.
+
+## Mutation Rule (declared `operation` steps, group-thinking-plan-loop Phase 01)
+
+Every dispatch door in this contract defaults to read-only
+(`buildSessionContract`'s own `mutation = 'read-only'` default, byte-identical
+to every caller that predates this section). `dispatchPrimaryTask` and
+`proposeConsult` (the agent-led, undeclared-protocol path) keep their own,
+separate, hard read-only assertions unconditionally — this section applies
+ONLY to `dispatchDeclaredOperation`'s own path, and only to a declared
+`operation` step specifically (never `authorize`/`disposition`/`fan-out`/
+`contribution`, which stay hard-refused for anything but `"read-only"` at the
+request-schema boundary, `src/verbs/coordination/schema.mjs`).
+
+A declared `operation` step may set `mutation: 'mutating'` and dispatch as a
+real, mutating worker — producing an actual git delta the dispatch evidence
+ladder grades `verified` — ONLY when ALL four conditions hold, checked in
+`dispatchDeclaredOperation` before any Assignment is materialized, refused
+with an error naming the SPECIFIC failed condition otherwise (never a generic
+validation message):
+
+1. **Declared on an `operation` step.** The request-schema boundary accepts
+   `mutation: 'mutating'` only on a `type: "operation"` step; every other
+   step/branch type is refused at the schema layer before this rule is ever
+   reached.
+2. **The bound operation declares `result.kind: 'work-product'`.** Read from
+   the FlowDefinition's own resolved operation at dispatch time — never
+   trusted from a caller-supplied claim. An operation declaring
+   `result.kind: 'advisory'` (or any other value) is refused, naming the
+   operation's own declared kind.
+3. **The dispatch `cwd` resolves to a linked git worktree, never the main
+   checkout.** Exact comparison: `resolveMainCheckoutRoot(cwd) ===
+   resolveRepoRoot(cwd)` (the toplevel of `cwd` IS the main checkout root)
+   refuses — never `resolveMainCheckoutRoot(cwd) === cwd`, since `cwd` may
+   legitimately be a subdirectory of either checkout. A `null`
+   `resolveMainCheckoutRoot` result (cwd outside any git checkout at all)
+   also refuses — fail closed, never fail open on an unresolvable root.
+4. **The inline execution contract carries the engine's own reserved
+   `protocol-operation:` provenance stamp.** `dispatchDeclaredOperation` is
+   the ONLY minter of this stamp (`session-engine.mjs`'s
+   `assertNoReservedOperationStamp`/stamp-append mechanism); a bare inline
+   contract built by any OTHER caller (e.g. a hand-crafted
+   `provenance.kind: 'inline'` Assignment) that sets `mutation: 'mutating'`
+   without this stamp is still rejected by `execution-contract.mjs`'s/
+   `assignment-normalizer.mjs`'s own gates — the schema/normalizer-level door
+   alone is forgeable and is NOT by itself sufficient.
+
+**The invariant that actually enforces this at execution time**:
+`runExecutorAttempt` (`session-engine.mjs`) is the ONLY code path anywhere in
+this codebase allowed to pass `isReadOnlyMode: false` into `executeAssignment`
+— it derives that flag from the Assignment's own already-stamped `mutation`
+field (`isReadOnlyMode: assignment.mutation !== 'mutating'`), never a
+second, independently-decided boolean. A static, codebase-wide enumeration
+test (`test/architecture.test.mjs`) asserts every other real
+`executeAssignment(...)` call site keeps a provably safe posture.
+
+A step that omits `mutation` entirely behaves byte-identically to before this
+rule existed — read-only, `isReadOnlyMode: true` — and a reviewer/red-team/
+consult dispatch that mutates a file regardless still fails closed (the
+pre-existing read-only-violation gate in `dispatch/assignment-runner.mjs`,
+unaffected by this rule).
+
+**Open, out-of-scope consideration** (not decided by this section): nothing
+here gives two DIFFERENT declared `operation` dispatches — from two different
+actors, potentially concurrent — a workspace-exclusivity guarantee if a
+caller happened to target the SAME linked worktree `cwd` for both. Condition
+3 only ever refuses the MAIN CHECKOUT; it says nothing about two mutating
+dispatches sharing one worktree. This is a real, open question for whichever
+cell/ADR next addresses multi-actor workspace allocation, not resolved here.
 
 ## Required Negative Tests
 

@@ -2633,3 +2633,35 @@ sửa lại để phản ánh đúng, cùng một dòng comment lịch sử gi�
 - `docs/history/capacity-naming-rename/` — DISCUSSION.md/CONTEXT.md/
   plan.md/iron-law-evidence.md của chính tsk-225, toàn bộ scout + bằng
   chứng thật cho quyết định này
+
+### 0035 — Ranh giới tin cậy của cổng mutation-gate: caller trong-tiến-trình cùng lớp tin cậy với user, không phải kẻ tấn công
+
+#### Quyết định
+
+Một caller có thể `import` trực tiếp module dispatch nội bộ của codebase
+này (vd `buildAssignment`/`executeAssignment`, `src/runner/dispatch/**`)
+và ghi file dưới `.fgos/` thuộc CÙNG lớp tin cậy với chính user đã gọi nó
+— không phải một lớp kẻ tấn công bên ngoài. Ba điều khoản đã chốt từ
+trước (`docs/routing-handoff-contract.md`: containment chỉ là chỉ-dẫn +
+nhánh vứt-được, không phải sandbox, không chặn được một worker cố ý phá
+hoại; một work item phải xuất phát từ user thật; `.fgos/config.json`'s
+`runner` section là config THỰC THI ĐƯỢC — ai sửa được file này quyết
+định runner spawn tiến trình gì với tham số gì), cộng với TRUSTED-CONFIG
+NOTE của `src/runner/dispatch/config.mjs` và SAME-USER TRUST INVARIANT
+của `src/runner/worktree.mjs`, đã xác nhận điều này từ trước khi cổng
+`mutation: 'mutating'` cho một Assignment inline tồn tại — mọi worker
+runner này dispatch, kể cả worker "read-only", đã luôn chạy với
+`--permission-mode acceptEdits`; "read-only" chưa bao giờ là một ranh
+giới cấp hệ điều hành, chỉ được chấm điểm/rollback sau khi worker chạy
+xong. Do đó, cổng re-verify `result.kind`/worktree-vs-main-checkout cho
+một Assignment inline mutating (`assignment-runner.mjs`'s
+`assertInlineMutatingAssignmentAuthorized`) là mistake-proofing cho một
+caller trong-tiến-trình cư xử đúng đắn nhưng vô ý (chặn tai nạn thực tế:
+quên gắn cờ `isReadOnlyMode: false`, hoặc dispatch mutating nhầm vào main
+checkout) — KHÔNG phải authentication chống lại một caller trong-tiến-
+trình cố ý phá hoại, vì caller đó đã ở lớp tin cậy kiến trúc này chấp
+nhận từ trước, giống hệt mọi worker khác. Phạm vi tấn công còn ý nghĩa
+với cổng này là INPUT DỮ LIỆU mà thôi — request document, file
+FlowDefinition/CoordinationProtocol, cờ CLI, prompt của skill — không
+bao giờ là thực thi mã trong-tiến-trình hay ghi file `.fgos/` trực tiếp,
+cả hai đã nằm ngoài phạm vi theo chính quyết định kiến trúc này.

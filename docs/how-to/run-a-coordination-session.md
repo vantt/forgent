@@ -199,8 +199,16 @@ never a silent acceptance:
   being opened (an unregistered actor override);
 - an `actors[]` entry carrying `role` (an actor-role rewrite);
 - the same actor id bound more than once (undeclared actor multiplicity);
-- any `mutation` field set to anything other than `"read-only"` (the
-  whole CLI surface is read-only in V1);
+- any `mutation` field set to anything other than `"read-only"`, UNLESS the
+  field is on a declared `operation` step, where `"mutating"` is also
+  accepted at the schema layer -- every other step type (`authorize`,
+  `disposition`, `fan-out`, `contribution`) stays hard-refused for anything
+  but `"read-only"`. A `"mutating"` `operation` step is further refused by
+  the session engine itself, before any dispatch, unless the bound
+  operation declares `result.kind: "work-product"` AND the dispatch runs in
+  a linked git worktree (never the main checkout) -- see
+  `docs/architect/agent-coordination/contracts/coordination-session.md`'s
+  own mutation-rule section for the exact four conditions;
 - any field carrying Work lifecycle authority (`approve`, `merge`,
   `claim`, `workStatus`, and similar — a coordination session can never
   move, accept, approve, claim, return, or merge Work, per ADR-001);

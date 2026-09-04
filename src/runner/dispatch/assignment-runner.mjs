@@ -28,6 +28,8 @@ import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim 
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
+import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
+import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 
 // ADR-006 R7 (P02.4 Red-Team HIGH fix): executeAssignment's own
 // `effectiveAssignment` derivation reads a stored assignment.json back from
@@ -480,6 +482,115 @@ export function classifyRunEvidence({
  * @param {object} [opts.options]
  * @returns {Promise<Readonly<object>>} Stored RunResult object
  */
+/**
+ * Fail-closed gate PLUS mistake-proofing for an inline mutating
+ * Assignment, whichever caller reaches `executeAssignment`.
+ *
+ * Trust boundary, stated plainly so a future reader does not mistake this
+ * for authentication against a hostile caller: a caller able to `import`
+ * this codebase's own dispatch modules and write files under `.fgos/` is,
+ * by this repo's own already-locked architecture, in the SAME trust class
+ * as the user who invoked it -- not an external attacker class. See
+ * `docs/routing-handoff-contract.md`'s three locked invariants
+ * (containment is instructions plus a throwaway branch, never a sandbox;
+ * work items must originate from the real user; `.fgos/config.json`'s
+ * `runner` section is executable config, whoever can edit it decides what
+ * the runner spawns) and `dispatch/config.mjs`'s own TRUSTED-CONFIG NOTE
+ * and `runner/worktree.mjs`'s SAME-USER TRUST INVARIANT -- both already
+ * state this codebase never treats "can run code in this process" as a
+ * hostile boundary. Every worker this runner spawns, including read-only
+ * ones, already runs with `--permission-mode acceptEdits`; "read-only" is
+ * graded/rolled back after the fact, never OS-enforced. Chasing an
+ * on-disk cross-check against that trust class is unwinnable: the
+ * attacker already has the same read/write access as the check itself, so
+ * any file the check trusts, the attacker can also just write.
+ *
+ * What this function actually protects against, in scope: an
+ * ACCIDENTAL or well-behaved-but-unaware in-process caller -- code that
+ * imports `buildAssignment`/`executeAssignment` (both pre-existing,
+ * already-exported primitives) without going through
+ * `session-engine.mjs`'s own mediated `dispatchDeclaredOperation` door,
+ * and would otherwise silently mutate real files with no interlock at
+ * all. Two independent conditions, both required:
+ *
+ * 1. The caller must explicitly assert `opts.isReadOnlyMode === false` --
+ *    an omitted or truthy flag is refused, never treated as permission.
+ *    `runExecutorAttempt` (session-engine.mjs) already computes and
+ *    passes this from the Assignment's own stamped `mutation` field for
+ *    every real dispatch, so this is a no-op for the legitimate path and
+ *    a hard stop for any caller that forgot the flag entirely.
+ * 2. The claimed `definitionId@version#operationId` stamp must resolve to
+ *    a REAL, on-disk CoordinationProtocol operation declaring
+ *    `result.kind: 'work-product'`, and `cwd` must resolve to a linked
+ *    git worktree, never the main checkout -- catching the realistic
+ *    accident of a well-behaved caller dispatching mutating work into the
+ *    wrong place, not a hostile forgery (a caller in the trust class
+ *    above can already write whatever `cwd`/stamp it wants; this is
+ *    mistake-proofing, not a barrier to it).
+ *
+ * Scoped to `provenance.kind === 'inline'` only: before this cell, an
+ * inline contract's `mutation: 'mutating'` was unconditionally refused
+ * (ADR-006 §6) regardless of any stamp -- this cell is what first made an
+ * inline mutating Assignment constructible at all. A declared-shape
+ * Assignment's mutation posture is the pre-existing, unrelated
+ * `classifyDeclaredMutation` mechanism (assignment-normalizer.mjs),
+ * untouched and out of scope here.
+ *
+ * @param {object} asgn
+ * @param {object} opts
+ */
+function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
+  if (asgn.mutation !== 'mutating' || asgn.provenance?.kind !== 'inline') return;
+
+  if (opts.isReadOnlyMode !== false) {
+    throw new RunnerConfigError(
+      `executeAssignment: inline mutating assignment "${asgn.assignmentId}" refused -- mutation requires the caller to assert isReadOnlyMode: false explicitly (an omitted flag is read-only)`,
+    );
+  }
+
+  const stamp = extractProtocolOperationStamp(asgn.provenance?.inline?.contract?.constraints);
+  if (!stamp) {
+    throw new RunnerConfigError(
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" carries no single, well-formed engine-reserved protocol-operation stamp -- refused`,
+    );
+  }
+
+  const cwd = opts.cwd ?? process.cwd();
+
+  let definition;
+  try {
+    definition = loadCoordinationProtocol(stamp.definitionId, { cwd, packageRoot: opts.packageRoot });
+  } catch (err) {
+    throw new RunnerConfigError(
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims protocol-operation stamp for definition "${stamp.definitionId}", which does not resolve to a real CoordinationProtocol -- refused (${err.message})`,
+    );
+  }
+  if (definition.metadata.version !== stamp.definitionVersion) {
+    throw new RunnerConfigError(
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" stamp names definition version "${stamp.definitionVersion}", but the resolved definition "${stamp.definitionId}" is version "${definition.metadata.version}" -- refused (stale or forged stamp)`,
+    );
+  }
+  const operation = definition.spec.operations?.find((op) => op.id === stamp.operationId);
+  if (!operation || operation.result?.kind !== 'work-product') {
+    throw new RunnerConfigError(
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims operation "${stamp.operationId}" in definition "${stamp.definitionId}" -- that operation does not declare result.kind "work-product" -- refused`,
+    );
+  }
+
+  const posture = resolveMutatingCwdPosture(cwd);
+  if (!posture.ok) {
+    const reason =
+      posture.reason === 'main-checkout'
+        ? `resolves to the main checkout ("${posture.repoRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`
+        : posture.reason === 'outside-git'
+          ? 'does not resolve inside any git checkout (fail closed on an unresolvable root, never fail open)'
+          : 'toplevel could not be resolved; fail closed, never fail open';
+    throw new RunnerConfigError(
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" refused -- cwd "${cwd}" ${reason}`,
+    );
+  }
+}
+
 function validateAssignmentLegality(asgn, opts = {}) {
   if (!asgn || typeof asgn !== 'object') {
     throw new RunnerConfigError('executeAssignment requires an assignment object');
@@ -533,6 +644,13 @@ function validateAssignmentLegality(asgn, opts = {}) {
       `cannot execute mutating operation "${asgn.operation}" (role: "${asgn.role}") in mission-lite mode — mission-lite is strictly read-only`,
     );
   }
+
+  // Phase 01 mutation-unlock HIGH-finding fix: re-verify R2/R3 at the actual
+  // point mutation is honored, independent of `opts.isReadOnlyMode` (a
+  // direct `buildAssignment` + `executeAssignment` caller controls `opts`
+  // itself and can simply omit this flag) -- see
+  // `assertInlineMutatingAssignmentAuthorized`'s own doc comment.
+  assertInlineMutatingAssignmentAuthorized(asgn, opts);
 
   return matchedOp;
 }
