@@ -2,9 +2,11 @@
 
 **Status:** Selected migration direction, not an implementation plan.
 **Date:** 2026-09-01.
-**Selected direction (2026-09-03):** ship the Rust `fgos` host first, delegate
-complete legacy operations to Node, then replace them one component at a time
-with native Rust providers. Runtime loading remains for external extensions.
+**Selected direction (2026-09-03; revised 2026-09-04):** ship the distributable
+Rust `fgos` CLI host in R1, with every unmigrated selector routed to the
+CLI-only legacy Node compatibility provider; prove external process providers
+in R2 and the production remote peer in R3; then replace semantic operations
+one component at a time with native Rust providers.
 **Source:** Product-owner planning and follow-up component-boundary discussion.
 
 This document discusses only migration options, ordering, transition stages,
@@ -12,8 +14,13 @@ cutover, and rollback. The stable host model, peer CLI/remote host use cases,
 Operation Provider Router, provider mechanics, protocols, plugin registry,
 authority, and technical tradeoffs live in
 [Host Invocation And Provider Routing Architecture](./host-invocation-provider-routing.md).
+Component ownership, authority boundaries, and the physical placement compass
+for files/crates/components live in
+[fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md);
+every native migration slice must read it before choosing where a provider or
+component module lives.
 The executable work breakdown lives in
-[Rust CLI And Proof Components Implementation Plan](./rust-cli-and-proof-components-plan.md).
+[Rust Host And Proof Providers Implementation Plan](./rust-cli-and-proof-components-plan.md).
 
 ## 1. Migration Question
 
@@ -30,6 +37,16 @@ operation keeps working until its complete component boundary is ready to move?
 
 The migration must preserve current commands, `fgos.v1`, errors, state
 authority, install behavior, and rollback until each replacement is proven.
+
+It must also preserve a visible repair path: an unmigrated selector remains
+owned by the named Node payload at
+`packages/legacy-node/node/fgos.mjs` (installed as
+`libexec/fgos/legacy-node/fgos.mjs`), not by an ambiguous historical
+`bin/fgos.mjs` path. The generated command-route descriptor tells a
+contributor whether a selector is `legacy-cli` or `native`, its owner path,
+and its required compatibility tests. A selector cannot be made native merely
+by changing a Rust parser; its descriptor and complete provider binding change
+together.
 
 ## 2. Options Considered
 
@@ -50,14 +67,15 @@ until after substantial Node restructuring.
 
 ```txt
 thin Rust host/router
-  -> delegate each unmigrated operation intact to Node
+  -> default every unmigrated CLI selector to Node compatibility
   -> move one complete operation/component to native Rust
   -> remove its Node path after proof
 ```
 
 This establishes the permanent composition root first. It keeps the initial
-Rust change narrow and lets boundary extraction happen only when a component is
-actually migrated.
+Rust change narrow without making a disposable wrapper. R1 already has the
+router and compatibility shape that can survive a long migration;
+boundary extraction still happens only when a component is actually migrated.
 
 ### Option C: Big-Bang Rust Rewrite
 
@@ -72,8 +90,9 @@ is rejected.
 
 ### Selected Option
 
-Option B is selected. The first Rust release is an intentionally small host and
-legacy dispatcher, not an immediate rewrite of all Node semantics.
+Option B is selected. The first Rust release is an intentionally small,
+distributable host/router with CLI-only Node compatibility as the default for
+unmigrated selectors, not an immediate rewrite of all Node semantics.
 
 ## 3. Why The Sequence Is Selected
 
@@ -139,70 +158,90 @@ component rather than in one repository-wide Node-thinning phase.
 These remain whole legacy operations until their transaction and authority
 boundaries can move together.
 
-## 5. Stage 0: Freeze Existing Behavior
+## 5. Release R1: Distributable Rust CLI Host
 
-Before changing the installed entry point:
+R1 is the smallest honest meaning of “ship the Rust host”. It is not merely a
+binary that passes repository tests. The installed product entry becomes Rust,
+all unmigrated CLI selectors retain transparent whole-invocation Node
+compatibility, `fgos-runner` remains a separately proven Node public entry, and
+`version` proves one typed built-in operation.
 
-1. Capture Node command, output, error, and exit behavior in executable
-   compatibility fixtures.
-2. Export the current command registry deterministically for the Rust host.
-3. Add cross-runtime `fgos.v1` envelope/hash golden vectors.
-4. Build one harness that can run the same case through Node or Rust.
-5. Establish a process-spy assertion so native completion is proven directly,
-   not inferred from timing.
+The migration order is:
 
-Exit condition: the harness can identify a behavior difference before any
-native component is introduced.
+1. decide the supported target matrix, archive/install mechanism, upgrade and
+   rollback channels;
+2. relocate the Node CLI to its named legacy payload and retain only a thin,
+   temporary source-tree compatibility shim at `bin/fgos.mjs`;
+3. freeze executable Node compatibility evidence and the checked command-route
+   descriptor, including the owner and test suite for every selector;
+4. land the Rust invocation kernel with immutable static bindings and the
+   two-stage authority path;
+5. route every current CLI selector through the CLI-only legacy passthrough
+   provider unless it has an explicit native binding;
+6. migrate `version` to native `distribution.build.show`;
+7. prove build, install, setup/doctor, upgrade, rollback, and uninstall from an
+   external temp project on every supported target, using a staged artifact
+   rather than a source checkout;
+8. flip the installed default only after the compatibility and distribution
+   gates pass.
 
-## 6. Stage 1: Land The Rust Outer Host
+External-process discovery, WASM, chat, and production gateway adoption do not
+block R1. They prove later parts of the permanent architecture without delaying
+the first usable release.
 
-The Rust executable becomes the candidate product entry point and delegates
-every existing operation to Node without reinterpreting provider-owned flags.
+Exit condition: every existing CLI invocation still reaches Node unchanged or
+an explicitly native provider, `version` creates no Node process, the Rust host
+is reproducibly installed as the default, and the previous Node entry remains a
+named rollback channel. For every legacy selector, `explain-command-route`
+identifies the canonical Node owner and required parity suite; no contributor
+must infer ownership from a stale `bin/fgos.mjs` reference. The activated Rust
+host, legacy payload, and Node runner always come from one versioned artifact
+manifest; no release mixes them across versions.
 
-Required steps:
+## 6. Release R2: External Process Provider Preview
 
-1. Package a thin Rust executable and resolve its legacy Node payload relative
-   to the installation, never relative to caller cwd.
-2. Identify the operation while preserving the remaining argv/stdin/stdout/
-   stderr behavior.
-3. Delegate the entire invocation to the current Node entry.
-4. Propagate success, typed failure exit codes, signals, and public output.
-5. Run the Stage 0 matrix against both entry points.
+R2 proves runtime extension after R1 has established the host:
 
-Exit condition: all existing commands can enter through Rust with no intentional
-semantic change, and the Node CLI remains independently runnable for rollback.
+1. freeze the framed component protocol and conformance fixtures;
+2. implement bounded process supervision, handshake, cancellation, crash and
+   completion-unknown behavior;
+3. validate a static test/dev manifest without executing it during discovery;
+4. invoke one vendor-scoped fixture operation through the same router;
+5. expose provider/registry diagnostics through an explicit diagnostics
+   surface, never compatibility output.
 
-## 7. Stage 2: Establish The Shared Host Path
+Full marketplace/signature policy, core replacement, WASM, and broad
+project/global discovery UX remain separate ecosystem work. R2 exits when the
+process adapter and protocol are real and fail closed, not when every future
+plugin product concern is solved.
 
-Connect the Rust CLI host use case to the common host/router architecture and
-prove the remote host use case is a peer consumer of the same semantic path.
+## 7. Release R3: Production Remote Host
 
-Required steps:
+Adopt the common invocation service route by route:
 
-1. Register every current command as a legacy operation.
-2. Add deterministic provider selection and diagnostics.
-3. Exercise one in-memory operation from CLI and remote host use cases.
-4. Prove each host applies its own public presentation.
-5. Add a test-only external provider to prove the extension route without
-   migrating a production component.
+1. inventory current gateway routes by semantic operation and side effect;
+2. replace `VerbGateway` for one native read with a remote projector and
+   presenter calling the shared invocation service;
+3. keep REST/MCP authentication and transport presentation in the gateway;
+4. for a route that must remain on Node, build a real per-operation Node
+   semantic bridge or leave that route on the old chokepoint during its named
+   rollback window;
+5. never parse `fgos.v1` or captured CLI stdout as the remote internal API;
+6. delete the CLI-shelling chokepoint after no route uses it.
 
-Exit condition: built-in, legacy, and test external providers are distinguishable
-through one router, and neither host use case calls the other.
+Captured/supervised legacy CLI output is not a semantic provider outcome and
+cannot serve this stage. This stage gets a separate blast-radius review because
+the current Herdr crate combines gateway, TUI, Axum, MCP, auth, and web concerns.
 
-## 8. Stage 3: Migrate Small Read-Only Proofs
+Chat becomes a peer host only when a real chat adapter and its own contracts
+exist. Host extensibility is preserved meanwhile; a speculative chat proof is
+not a release gate.
 
-Migrate two operations before touching state writes.
+## 8. Migrate The Next Small Read-Only Proof
 
-### Proof 1: `version`
+Migrate one more read-only operation before touching state writes.
 
-Use `version` to prove the Rust binary, generated command metadata, build/commit
-identity, native result presentation, and `fgos.v1` parity. It requires no
-`.fgos` store.
-
-Exit condition: `fgos version` produces equivalent data through Rust and a
-process spy proves Node was not started.
-
-### Proof 2: `gate-bypass`
+### `gate-bypass`
 
 Port only the read of the configured bypass level. This proves a real project
 filesystem/config path, precedence over the legacy standalone file, malformed
@@ -219,14 +258,17 @@ equivalent and the operation performs no writes or Node spawn.
 `ready` appears small at the CLI but depends on event loading, replay, domain
 stage mapping, lineage/dependency semantics, and effective runtime claims.
 Porting it first would silently turn a host proof into a Work Lifecycle read
-model migration. It is a good later read-side slice after the two small proofs.
+model migration. It is a good later read-side slice after `version` and
+`gate-bypass`.
 
-## 9. Stage 4: Repeat By Component Boundary
+## 9. Repeat By Component Boundary
 
 For each subsequent component:
 
-1. Name responsibility, semantic operations, authority, state, and side
-   effects.
+1. Read
+   [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md)
+   and name responsibility, semantic operations, authority, state, side
+   effects, component class, and physical placement.
 2. Select a complete operation/use-case boundary rather than private helpers.
 3. Capture current Node behavior as shared fixtures.
 4. Extract only the Node boundary needed for this migration slice.
@@ -240,7 +282,7 @@ For each subsequent component:
 Near-thin read-only operations come before complex write owners. File size alone
 does not choose order.
 
-## 10. Stage 5: Migrate Read Models Before Writers
+## 10. Migrate Read Models Before Writers
 
 The next meaningful proof after the small operations should be a Work Lifecycle
 read-side component, potentially the dependencies needed by `ready`.
@@ -257,7 +299,7 @@ Sequence it internally:
 
 This creates reusable Rust read models before any event writer moves.
 
-## 11. Stage 6: Migrate State-Writing Components
+## 11. Migrate State-Writing Components
 
 Move a writer only when all of these are explicit and tested:
 
@@ -274,42 +316,7 @@ Move a writer only when all of these are explicit and tested:
 Never dual-run a write for shadow comparison. Use fixtures, isolated temp stores,
 and replay equivalence instead.
 
-## 12. Stage 7: Connect The Production Remote Host
-
-After the common host path and native proofs are stable:
-
-1. replace the gateway's CLI/Node-shelling chokepoint with its peer
-   `remote-host-use-case`;
-2. keep REST/MCP authentication and presentation in the remote adapter;
-3. let the common router select legacy or native providers;
-4. compare CLI and remote semantic outcomes for migrated reads;
-5. retain transport-specific response/error tests.
-
-This stage changes how the existing gateway reaches fgOS semantics, so it gets a
-separate blast-radius review from the initial CLI proof.
-
-## 13. Stage 8: Distribution Cutover
-
-The Rust host becomes the installed default only after its distribution path is
-reproducible. The transition package contains the Rust executable plus the Node
-payload/runtime needed by remaining legacy operations.
-
-Required steps:
-
-1. define supported build targets;
-2. produce tested, checksummed release artifacts;
-3. update distribution vision/spec before changing the current GitHub npm
-   installation mechanism;
-4. prove clean install, upgrade, rollback, and uninstall outside this repo;
-5. register all new binaries, payloads, manifests, config, and health checks in
-   setup/doctor;
-6. update user-visible install documentation and changelog;
-7. retain the previous install path through a named compatibility window.
-
-Do not require a Rust toolchain on consuming projects and do not hide a native
-build or download inside an existing no-lifecycle-script installation path.
-
-## 14. Stage 9: Remove Node
+## 12. Remove Node
 
 Remove the Node runtime/payload only when:
 
@@ -323,7 +330,7 @@ Remove the Node runtime/payload only when:
 
 Node removal is a consequence of zero remaining routes, not a calendar target.
 
-## 15. Rollback Rules
+## 13. Rollback Rules
 
 - Keep legacy and native implementations side by side only for the observation
   window of their operation.
@@ -337,31 +344,29 @@ Node removal is a consequence of zero remaining routes, not a calendar target.
 - The Rust host itself rolls back through the distribution mechanism, while the
   legacy Node entry remains directly invocable during early releases.
 
-## 16. Verification Gates
+## 14. Verification Gates
 
 Every stage must leave a reproducible gate:
 
 | Stage | Minimum proof |
 |---|---|
-| 0 | Node baseline, manifest drift, envelope golden fixtures |
-| 1 | whole-command Rust-to-Node parity across stdout/stderr/exit/stdin |
-| 2 | one router, peer CLI/remote hosts, built-in/legacy/external fixture selection |
-| 3 | `version` and `gate-bypass` native with no Node process |
-| 4 | per-component semantic parity and explicit rollback |
-| 5 | Rust replay/frontier determinism against Node fixtures |
-| 6 | writer atomicity, recovery, concurrency, and cross-version replay |
-| 7 | production remote-host contract and gateway regression suite |
-| 8 | external install/upgrade/rollback/uninstall on every supported target |
-| 9 | zero legacy routes and zero setup/doctor/runtime dependency on Node |
+| R1 Rust CLI | Node baseline; invocation kernel; transparent CLI fallback parity across argv/stdin/stdout/stderr/cwd/env/exit/signal; native `version`; external install/upgrade/rollback/uninstall; setup/doctor on every supported target |
+| R2 process preview | framed-protocol conformance, manifest-without-execution discovery, bounded cancel/backpressure, crash/completion-unknown mapping, vendor fixture through the common router |
+| R3 remote peer | at least one native semantic route through the production gateway, transport-specific contract suite, and no internal `fgos.v1` parsing on migrated routes |
+| Next read proof | `gate-bypass` or another authority-confirmed read runs natively with no Node process and no writes |
+| Work read model | Rust event decode/replay/frontier determinism against Node fixtures |
+| First writer | atomicity, recovery, concurrency, mutual exclusion, idempotency, and cross-version replay |
+| Node removal | zero compatibility bindings and zero setup/doctor/runtime dependency on Node |
 
 Repository-wide proof remains `npm test` plus the new Rust workspace's
 `cargo test --workspace` until Node tests are retired deliberately.
 
-## 17. Remaining Migration Decisions
+## 15. Remaining Migration Decisions
 
 1. Which supported target matrix gates the first distributed Rust host?
 2. Which post-npm release/install mechanism owns native artifacts?
 3. How long is the provider rollback observation window?
-4. Which Work Lifecycle read operation follows the two small proofs?
+4. Does `gate-bypass` remain the next proof after its component ownership is
+   confirmed, or should an already-settled component read replace it?
 5. Which state-writing component is the first eligible writer after Rust replay
    parity exists?

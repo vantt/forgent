@@ -24,6 +24,7 @@ inside their own subtrees, such as `agent-coordination/` and
 - [Component Boundary](component-boundary/README.md)
 - [Domainization](domainization/README.md)
 - [Host Invocation And Provider Routing](host-invocation-routing/host-invocation-provider-routing.md)
+- [Packaging And Distribution](packaging-distribution/README.md)
 
 ## Cross-Area Proposals
 

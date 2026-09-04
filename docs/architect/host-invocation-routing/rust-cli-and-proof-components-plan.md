@@ -1,622 +1,511 @@
-# Rust CLI And Proof Components Implementation Plan
+# Rust Host And Proof Providers Implementation Plan
 
-**Status:** Proposed implementation plan.
-**Date:** 2026-09-03.
-**Architecture:**
-[Host Invocation And Provider Routing](./host-invocation-provider-routing.md).
-**Migration direction:**
-[Node To Rust Component Migration](./node-to-rust-component-migration.md).
+**Status:** Proposed execution plan; blocked only by the named decisions in §3.
+**Date:** 2026-09-04.
+**Architecture:** [Host Invocation And Provider Routing](./host-invocation-provider-routing.md).
+**Migration strategy:** [Node To Rust Component Migration](./node-to-rust-component-migration.md).
+**Component placement:** [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md).
 
-This plan ships the permanent Rust `fgos` entry point before porting the main
-Node implementation. It proves the architecture with two small native read-only
-operations, one legacy Node route, one external process fixture, and both CLI
-and remote host use-case paths. It deliberately does not migrate a state writer
-in the first milestone.
-
-Architecture ownership remains with `host-invocation-provider-routing.md`;
-provider mechanics and technical tradeoffs repeated here are executable steps,
-not a competing design source. Migration ordering remains with
-`node-to-rust-component-migration.md`.
+This document contains execution order, deliverables, gates, verification, and
+rollback. Semantic contracts, provider lifecycle, authority, framing, registry
+rules, compatibility modes, and technical trade-offs are owned by the
+architecture document and are intentionally not redefined here.
 
 ## 1. Outcome
 
-At the end of this plan:
+Execution is complete in three independently shippable releases:
 
-- a Rust `fgos` binary is the tested host/router implementation;
-- every existing command still works through whole-operation `LegacyNode`
-  fallback;
-- `version` runs as a built-in Rust provider with byte/contract parity;
-- `gate-bypass` runs as a second built-in Rust provider and proves real project
-  config resolution plus fail-closed behavior;
-- a fixture plugin proves external manifest discovery and framed process RPC;
-- `cli-host-use-case` and `remote-host-use-case` both invoke the same Operation
-  Provider Router in tests;
-- provider diagnostics reveal which implementation serves each operation;
-- the production entry-point flip is gated on a reproducible binary distribution
-  mechanism, setup/doctor coverage, and the full compatibility suite.
+1. **R1 — distributable Rust CLI host:** installed `fgos` is Rust; every
+   unmigrated CLI invocation transparently reaches Node; `version` is native;
+   install, setup/doctor, upgrade, rollback, and uninstall are reproducible.
+2. **R2 — external process preview:** one vendor fixture proves the framed
+   process protocol and fail-closed provider path without expanding into a full
+   plugin marketplace.
+3. **R3 — production remote peer:** at least one native gateway route calls the
+   shared invocation service directly; migrated routes neither shell through
+   CLI nor parse `fgos.v1` internally.
 
-The milestone proves the architecture, not Rust coverage percentage.
+R1 is useful without R2 or R3. R2 and R3 may start after the R1 runtime kernel
+is stable, but neither delays the R1 installed-entry flip.
 
-## 2. Explicit Non-Goals
+## 2. Non-Goals
 
-- Do not port Work Lifecycle writes, event append, claim/return, merge, setup,
-  doctor, runner, or coordination execution in this milestone.
-- Do not make the remote gateway call the CLI or parse `fgos.v1` internally.
-- Do not pull the existing `herdr-plugin` crate into the new workspace until its
-  gateway adapter is deliberately migrated.
-- Do not make Rust dynamic libraries a plugin ABI.
-- Do not build a permanent daemon only to avoid one Node startup per shell
-  invocation.
-- Do not rewrite all CLI option parsing in Rust before a command becomes native.
-- Do not change public command names, successful envelope shape, or exit codes.
+- No Work Lifecycle writer, event append, claim/return, merge, runner, or
+  coordination execution migration.
+- No repository-wide Node thinning before a component is selected.
+- No production WASM provider, marketplace, publisher trust, or signature
+  system.
+- No core-provider replacement and no speculative chat adapter.
+- No parser rewrite while a command remains on Node compatibility.
+- No Node deletion in the same change that flips its binding.
+- No Rust toolchain or hidden lifecycle build on consuming projects.
 
-## 3. Grounded Starting Point
+## 3. Decisions Required Before R1 Execution
 
-The plan is based on these current facts:
+These are product/release inputs, not implementation details to guess:
 
-| Surface | Current implementation | Consequence |
-|---|---|---|
-| CLI entry | `package.json` maps `fgos` to `bin/fgos.mjs` | entry-point cutover is a distribution change, not only a Rust code change |
-| CLI dispatch | `bin/fgos.mjs` has one large verb switch and wraps successful results at `main()` | legacy fallback must delegate a whole verb and must never double-wrap `fgos.v1` |
-| Command metadata | `src/cli/command-registry.mjs`, schema `2.0` | Rust needs a generated/checked descriptor, not a second hand-maintained verb list |
-| Public result | `src/state/envelope.mjs` hashes compact `JSON.stringify(data)` into `fgos.v1` | Rust serialization and hashing need cross-runtime golden vectors |
-| Error mapping | `src/state/store.mjs` `EXIT_CODES` plus runner busy code | transparent legacy execution must propagate exact status; native errors need one Rust mapping table verified against Node |
-| Existing Rust | `herdr-plugin/Cargo.toml` is a standalone crate, not a root workspace member | introduce the host workspace without changing the gateway crate's dependency graph first |
-| Remote gateway | `herdr-plugin/src/ports.rs` `VerbGateway` and gateway adapter shell to `node bin/fgos.mjs` | eventual remote integration replaces this chokepoint with `remote-host-use-case`, not another CLI wrapper |
-| `version` | `src/cli/version.mjs` returns `{packageVersion, gitCommit, verbs}` | smallest host-local native parity proof |
-| `gate-bypass` | `src/state/gate-bypass.mjs` reads project config then a legacy standalone file and fails closed to `off` | small filesystem/config proof with meaningful safety semantics |
+1. supported R1 target matrix;
+2. native archive publication and installation mechanism;
+3. upgrade and rollback channel plus compatibility-window duration;
+4. release artifact naming and integrity/checksum policy;
+5. whether the first public R1 is preview or immediate stable default.
+6. whether setup/doctor may ever select or download an upgrade; R1 defaults to
+   read-only doctor and named local `--fix` repairs unless this policy is
+   explicitly changed.
 
-## 4. Target Source Shape
+Record them in `docs/distribution-vision.md` and
+`docs/specs/distribution.md` before Work Package 6 changes installation. Local
+P1–P5 work may proceed; the public entry flip may not infer these decisions.
 
-Create a root Cargo workspace without changing `herdr-plugin` yet:
+## 4. Delivery Graph
+
+```mermaid
+flowchart LR
+    P0[P0 decisions + inventory] --> P1[P1 compatibility harness]
+    P0 --> P2[P2 workspace + artifacts]
+    P1 --> P3[P3 invocation kernel]
+    P2 --> P3
+    P3 --> P4[P4 Node passthrough]
+    P3 --> P5[P5 native version]
+    P4 --> P6[P6 distribution + flip]
+    P5 --> P6
+    P3 --> P7[P7 external process preview]
+    P5 --> P8[P8 remote native route]
+    P6 --> P9[P9 next native read]
+```
+
+P7 does not block P8 when the first production remote route is native
+`distribution.build.show`.
+
+## 5. P0 — Lock Release Inputs And Baseline Inventory
+
+### Deliverables
+
+- Distribution decision update covering §3.
+- Machine-readable inventory of every public command selector/subcommand mode.
+- Each selector classified as compatibility-only or projected to an existing
+  semantic operation.
+- Checked command-route descriptor for every selector, with route kind,
+  canonical owner path, required compatibility suites, and no ambiguous
+  native/legacy binding.
+- Approved relocation from `bin/fgos.mjs` to the architecture's canonical Node
+  legacy payload source path; source-tree shim and installed payload policy are
+  recorded before any public-entry cutover.
+- Confirmed component owner for `distribution.build.show`.
+- Confirmed ownership of `gate-bypass`, or a different next read proof.
+- R1 runtime inventory includes the separately public Node `fgos-runner`, its
+  payload/dependency closure, and its compatibility tests; it is not assumed
+  migrated with `fgos`.
+
+### Scout evidence
+
+- `package.json` current binaries and package files.
+- `src/cli/command-registry.mjs` selector inventory.
+- `bin/fgos.mjs` global parsing, presentation, and error mapping.
+- `src/cli/version.mjs` and `src/state/envelope.mjs` behavior.
+- Every direct `bin/fgos.mjs` caller, classified as public CLI use, test-only
+  fixture, or an obsolete direct-entry dependency that must be removed.
+- Herdr `VerbGateway` call sites in `ports.rs` and `gateway.rs`.
+
+### Exit gate
+
+No selector is absent; every future binary, payload, cache, config, or runtime
+dependency has a planned setup/doctor owner; unresolved distribution choices
+are named as the only P6 blockers. Every selector has one repair owner and
+proof suite; no caller treats the private legacy payload as a public entry.
+
+### Verify
+
+```sh
+node bin/fgos.mjs --help --json
+npm test
+```
+
+## 6. P1 — Compatibility Harness
+
+### Changed areas
+
+```txt
+test/rust-host/
+packages/component-protocol/contracts/
+scripts/export-command-selectors.mjs
+scripts/explain-command-route.mjs
+```
+
+### Steps
+
+1. Build one harness that invokes Node or a candidate Rust binary with identical
+   argv bytes, stdin, cwd, selected environment, and timeout.
+2. Capture stdout/stderr bytes, normal exit, signal termination, filesystem
+   diff, and spawned-process evidence.
+3. Generate a checked command-route descriptor from the current command
+   registry plus explicit migration annotations; do not hand-maintain a second
+   command list. Require one `legacy-cli` or `native` route kind, one canonical
+   owner path, and one or more required proof suites for every selector.
+4. Add a byte drift test for the generated artifact.
+5. Add Node-generated `fgos.v1` vectors and the architecture's differential
+   serialization corpus.
+6. Add `scripts/explain-command-route.mjs <selector>` as a developer-only view
+   over that same checked artifact; its output names the owner path and suites
+   to run for a bug repair.
+7. Declare comparison mode per case: exact bytes, semantic JSON plus timestamp
+   predicate, filesystem delta, or signal.
+8. Prove the harness detects an injected stdout byte, exit-code change, missing
+   argv token, and unexpected child process.
+
+### Coverage floor
+
+- Every selector: recognition and help/syntax passthrough.
+- Every selector: route descriptor has exactly one active route, an owner, and
+  a required proof suite; unknown selectors and ambiguous routes fail closed.
+- Every exit category: stdout/stderr/status.
+- Reads `version` and `ready`; one validation failure; unknown verb.
+- Isolated write: `init` then `add` in a temp repository.
+- `--dir`, caller cwd distinct from product root, stdin consumer if present.
+- Target-specific signal/process-tree behavior.
+
+### Exit gate and verify
+
+The harness fails on every injected difference and passes Node-against-Node.
+
+```sh
+node --test test/rust-host/envelope-contract.test.mjs
+node scripts/export-command-selectors.mjs --check
+```
+
+## 7. P2 — Rust Workspace And Generated Inputs
+
+### Target areas
 
 ```txt
 Cargo.toml
 Cargo.lock
-
-apps/
-  fgos/
-    Cargo.toml
-    src/main.rs
-
-packages/
-  component-protocol/
-    contracts/
-      command-manifest.v2.json
-      envelope-golden.json
-      process-rpc-fixtures.json
-    rust/
-      Cargo.toml
-      src/lib.rs
-  host-runtime/
-    rust/
-      Cargo.toml
-      src/
-        lib.rs
-        cli_host_use_case.rs
-        remote_host_use_case.rs
-        authority_gate.rs
-        operation_provider_router.rs
-        registry.rs
-        error.rs
-        providers/
-          mod.rs
-          legacy_node.rs
-          external_process.rs
-  distribution-health/
-    rust/
-      Cargo.toml
-      src/lib.rs                 # native version provider
-  gate-policy/
-    rust/
-      Cargo.toml
-      src/lib.rs                 # native gate-bypass read provider
-
-scripts/
-  export-command-manifest.mjs
-
-test/rust-cli/
-  parity-harness.mjs
-  legacy-fallback.test.mjs
-  version-parity.test.mjs
-  gate-bypass-parity.test.mjs
-  external-provider.test.mjs
+apps/fgos/
+packages/component-protocol/rust/
+packages/host-runtime/rust/
+packages/legacy-node/rust/
+packages/distribution-health/rust/
+scripts/build-rust-distribution.mjs
+scripts/run-rust-dev-host.mjs
 ```
 
-The small proof operations live inside their owning component package; do not
-create one crate per verb as a lasting convention. `distribution-health` and
-`gate-policy` are initial ownership names subject to validation against the
-component registry before implementation.
+Start adapters as modules unless dependency/lifecycle pressure justifies a
+crate. Do not add a `gate-policy` component for migration convenience.
 
-The root workspace lists only the new crates. Explicitly exclude
-`herdr-plugin` and every `upstreams/*` crate so `cargo test --workspace` for the
-new host does not silently absorb unrelated binaries, lockfiles, or dependency
-upgrades.
+### Steps
 
-## 5. Core Rust Interfaces
+1. Add explicit workspace members/excludes.
+2. Keep `herdr-plugin` and `upstreams/*` outside the new dependency graph.
+3. Prove excluded nested crates still build independently.
+4. Embed/include the generated selector and contract artifacts.
+5. Add one explicit development launcher that runs the source Rust host with
+   source payloads, never an ambient PATH `fgos`; it verifies generated inputs
+   before execution.
+6. Add one staging builder that materializes the exact release layout into a
+   disposable directory, emits a versioned manifest with target/payload/artifact
+   digests, and never compiles or downloads during consumer installation.
+7. Add formatting, lint, warnings-as-errors, tests, and target CI cache.
 
-Start synchronous. The CLI and first proof providers do not need an async trait;
-the external process adapter may supervise blocking I/O inside its own adapter.
-A later remote integration can add an async boundary without changing semantic
-request/result types.
+### Exit gate and verify
 
-```rust
-pub struct HostInvocation {
-    pub id: InvocationId,
-    pub host: HostKind,
-    pub cwd: PathBuf,
-    pub deadline: Option<Instant>,
-    pub principal: Principal,
-}
-
-pub struct OperationRequest {
-    pub operation_id: OperationId,
-    pub schema_version: String,
-    pub input: serde_json::Value,
-}
-
-pub trait OperationProvider: Send + Sync {
-    fn descriptor(&self) -> &ProviderDescriptor;
-    fn invoke(
-        &self,
-        invocation: &HostInvocation,
-        request: OperationRequest,
-    ) -> Result<ProviderOutcome, HostError>;
-}
-
-pub trait ProviderRegistry: Send + Sync {
-    fn resolve(
-        &self,
-        operation: &OperationId,
-        schema_version: &str,
-    ) -> Result<Arc<dyn OperationProvider>, RegistryError>;
-}
-```
-
-`CliHostUseCase` and `RemoteHostUseCase` receive the same registry/router and
-authority-gate ports. Neither imports or invokes the other. Presenters remain
-host-specific.
-
-The initial authority gate is conservative:
-
-- built-in and legacy operations retain their existing authority classification;
-- external plugin operations may use only vendor namespaces;
-- external plugins cannot replace a built-in operation;
-- requested capabilities outside the fixture's empty capability set are
-  rejected.
-
-Do not invent a permissive placeholder that later needs tightening.
-
-## 6. Phase 0: Freeze Compatibility Evidence
-
-### Changes
-
-1. Add a test harness able to invoke either `node bin/fgos.mjs` or a supplied
-   Rust binary with the same cwd, argv, stdin, and environment.
-2. Record comparisons as structured assertions, not checked-in terminal output.
-3. Add envelope golden vectors covering:
-   - object field order;
-   - nested objects and arrays;
-   - Unicode strings;
-   - integers, booleans, null, and escaped characters;
-   - stable SHA-256 over the compact serialized `data` bytes;
-   - UTC timestamp shape with millisecond precision.
-4. Export `src/cli/command-registry.mjs` into
-   `packages/component-protocol/contracts/command-manifest.v2.json` using a
-   deterministic script.
-5. Add a drift test that regenerates the manifest in memory and compares bytes
-   with the checked-in artifact.
-
-### Important implementation rule
-
-Rust `EnvelopeWriter` serializes `data` once into compact JSON bytes, hashes
-those exact bytes, and embeds the same bytes in the final envelope. Enable
-order-preserving JSON maps and verify output against Node golden vectors. Do not
-hash a separately reconstructed Rust value whose key/number serialization may
-differ from the emitted payload.
-
-### Proof
+The workspace contains only intended members and causes no Herdr dependency or
+lockfile drift. The dev launcher cannot read an installed payload accidentally,
+and the staged layout can run without source-tree paths.
 
 ```sh
-node --test test/rust-cli/contract-fixtures.test.mjs
-node scripts/export-command-manifest.mjs --check
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+cargo test --manifest-path herdr-plugin/Cargo.toml
 ```
 
-## 7. Phase 1: Rust Bootstrap And Transparent Legacy Provider
+## 8. P3 — Invocation Kernel Vertical Slice
 
-### `apps/fgos`
+### Deliverables
 
-Use `std::env::args_os()` for the bootstrap scanner. Do not put all legacy
-commands into `clap`: a strict Rust parser would reject or reinterpret flags
-that Node still owns.
+- IDs and encoded-message types.
+- Minimum operation catalog with `distribution.build.show` and one fixture.
+- Immutable registry snapshot and exact selector.
+- Caller-admission and selected-provider-grant ports, deny by default.
+- Async invocation, cancellation, event sink, outcome, and closed errors.
+- Shared invocation service.
+- CLI projector/presenter and in-memory remote projector/presenter proof.
 
-The scanner must:
+### Steps
 
-1. preserve every `OsString` after the executable name;
-2. identify the command for provider lookup without normalizing remaining argv;
-3. recognize only truly host-global behavior;
-4. resolve the product installation root independently of cwd;
-5. select `LegacyNode` for every operation not registered as native;
-6. spawn the legacy script directly with `node`, never recursively invoke
-   `fgos`;
-7. inherit stdin/stdout/stderr in transparent mode;
-8. propagate exit status exactly, with an explicit tested policy for signal
-   termination.
+1. Write failing tests for duplicate/missing bindings, incompatible contracts,
+   disallowed host, and denied provider capability.
+2. Implement catalog validation and immutable snapshot construction.
+3. Implement exact binding without priority or scan-order fallback.
+4. Implement admission → selection → grant → invoke.
+5. Propagate cancellation/deadline through an in-memory provider.
+6. Project one semantic outcome independently for CLI and remote tests.
+7. Assert no host adapter imports or invokes another.
+8. Capture diagnostics in trace/evidence; stable output changes only under an
+   explicit diagnostics mode.
 
-### Legacy entry resolution
+### Exit gate and verify
 
-Resolution order:
+Both host projectors reach the same provider and all negative cases fail closed.
+No Node/process/filesystem/production-gateway dependency is involved.
 
-1. `FGOS_LEGACY_NODE_ENTRY` only as a test/development override;
-2. the installed `libexec/fgos/node/bin/fgos.mjs` relative to the Rust
-   executable;
-3. a checkout-relative development path validated by an ancestor marker.
-
-Never resolve `bin/fgos.mjs` from the caller's cwd. A project using fgOS may
-contain an unrelated file at that path.
-
-### Recursion guard
-
-Set an internal `FGOS_LEGACY_CHILD=1` environment marker on the Node child. The
-Rust bootstrap refuses to delegate if it is already running as that marked
-child. Tests cover accidental `fgos` resolution in PATH pointing back to the
-Rust binary.
-
-### Proof
-
-Run a representative matrix through both entry points:
-
-- `--help`, `--help --json`, and `<verb> --help`;
-- one read (`ready`), one validation failure, one unknown verb;
-- one fixture-backed mutation (`init` then `add`) in a temp repository;
-- `--dir`, stdout/stderr separation, and all known exit categories;
-- stdin passthrough for any command that consumes it.
-
-Transparent fallback output must be byte-identical except for explicitly
-nondeterministic fields such as `generated_at`; the harness normalizes only
-those named fields.
-
-## 8. Phase 2: Host Runtime And Router
-
-Implement:
-
-- `OperationId` and immutable provider descriptors;
-- compile-time built-in registration;
-- one deterministic registry merge;
-- exact-match routing with schema compatibility;
-- fail-closed duplicate/incompatible provider handling;
-- provider identity in diagnostics;
-- `CliHostUseCase` and `RemoteHostUseCase` over the same router;
-- host-specific presenters.
-
-The provider table initially contains:
-
-```txt
-all current core operations -> LegacyNode
-system.version              -> BuiltIn(version)
-policy.gate_bypass.read     -> BuiltIn(gate-policy), after Phase 4
-vendor.fixture.echo         -> ExternalProcess, tests only
+```sh
+cargo test --workspace host_runtime
+cargo test --workspace invocation_service
 ```
 
-CLI command projection remains separate:
+## 9. P4 — Transparent Node CLI Compatibility
 
-```txt
-fgos version       -> system.version
-fgos gate-bypass   -> policy.gate_bypass.read
-other known verb   -> legacy.<verb> compatibility operation
+### Deliverables
+
+- Candidate Rust `fgos` executable.
+- CLI-only compatibility binding for every unmigrated selector.
+- Executable-relative Node payload resolution, recursion protection, and
+  process evidence.
+- Relocated, named Node payload at `packages/legacy-node/node/fgos.mjs` in the
+  source tree and `libexec/fgos/legacy-node/fgos.mjs` in an installed artifact;
+  a colocated ownership note and payload header guide legacy bug fixes.
+
+### Steps
+
+1. Relocate the current Node entry to the canonical legacy payload path before
+   changing public entry wiring. Keep `bin/fgos.mjs` only as a source-tree
+   compatibility shim until checkout tooling uses the Rust development entry;
+   prove the shim is implementation-free.
+2. Scan only host-global options and a checked selector using `args_os`; keep
+   all provider-owned arguments as `OsString`.
+3. Resolve installation root independently from caller cwd.
+4. Resolve the legacy entry by explicit test override, installed relative
+   payload, then validated checkout path.
+5. Invoke `node` and the named legacy payload directly, never `fgos`.
+6. Preserve stdin/stdout/stderr, cwd, environment, exit, and signal behavior;
+   add only a private recursion marker.
+7. Run every P1 case through both entry points.
+8. Test an unrelated caller, source-tree shim, installed payload, and PATH
+   recursion trap. Reject a production direct spawn of the private payload
+   outside the compatibility provider.
+
+### Exit gate and verify
+
+Stable bytes, status, and filesystem effects match P1. Provider identity is
+visible in captured diagnostics without changing public output. Node remains
+directly runnable at its named payload path. `explain-command-route` identifies
+the legacy owner and proof suite for every unmigrated selector.
+
+```sh
+node --test test/rust-host/legacy-compatibility.test.mjs
+cargo test --workspace legacy_node
 ```
 
-The `legacy.<verb>` identity is explicitly transitional and cannot be claimed
-by external plugins.
+## 10. P5 — Native `version`
 
-### Peer-host proof
+### Deliverables
 
-Use an in-memory provider and invoke the same operation once through
-`CliHostUseCase` and once through `RemoteHostUseCase`. Assert:
+- Typed `distribution.build.show` contracts and built-in provider.
+- CLI `version` projection and cross-runtime/no-Node proof.
 
-- both reach the same provider and semantic input;
-- authority rejection is identical;
-- CLI output is `fgos.v1` plus exit code;
-- remote output is a remote result/status object, never `fgos.v1`;
-- cancellation reaches the provider through both paths;
-- neither use case imports, constructs, or shells to the other.
+### Steps
 
-Do not integrate `herdr-plugin` yet; this test establishes the reusable seam
-before changing the production gateway.
+1. Port package version, product-checkout commit, and sorted public verb data.
+2. Test transition-time version equality with root `package.json`.
+3. Resolve Git against product root and return `null` outside a checkout.
+4. Read the embedded generated selector inventory for verbs.
+5. Return a semantic outcome; let CLI presenter create exactly one envelope.
+6. Run serialization and focused version differential cases.
+7. Prove no Node child with the process spy.
 
-## 9. Phase 3: Native Proof 1 - `version`
+### Exit gate and verify
 
-### Contract
+The immutable binding selects built-in `version`, matches Node contract, and
+creates no Node process.
 
-Preserve current data exactly:
-
-```json
-{
-  "packageVersion": "0.1.0",
-  "gitCommit": "<short-hash-or-null>",
-  "verbs": ["<sorted-public-cli-verbs>"]
-}
+```sh
+node --test test/rust-host/version-parity.test.mjs
+cargo test --workspace distribution_build_show
 ```
 
-### Implementation
+## 11. P6 — Distribution And Installed-Entry Cutover
 
-- `packageVersion`: compile from the Rust package version, with a test requiring
-  it to equal root `package.json` during transition.
-- `gitCommit`: attempt `git rev-parse --short HEAD` against the resolved product
-  root; return `null` outside a checkout, matching Node.
-- `verbs`: read the embedded generated command manifest, sorted exactly as the
-  Node implementation does.
-- return semantic data to `CliHostUseCase`; the provider never constructs
-  `fgos.v1` itself.
+P6 is part of R1, not late cleanup.
 
-### Parity tests
+### Steps
 
-- fresh cwd without `.fgos`;
-- checkout commit is the product checkout, never the caller's cwd;
-- installed-layout fixture without `.git` returns `null`;
-- verb set includes `plan` and excludes retired `decompose`;
-- Node and Rust `data` values are equal;
-- Rust envelope hash matches the Node algorithm.
+1. Update distribution vision/spec and architecture manifest before adding a
+   new installation module.
+2. Implement the release builder before installer work: stage the Rust `fgos`,
+   Node `fgos-runner`, legacy CLI payload, their declared dependency closure,
+   generated artifacts, and a content-addressed release manifest. Prove the
+   staged bundle uses no checkout-relative path.
+3. Build one reproducible target artifact, then the approved matrix; publish
+   the manifest and integrity metadata according to §3.
+4. Implement an atomic Distribution Manager transition: verify target and
+   manifest before switching the active release pointer; preserve the prior
+   complete release for rollback; never mix Rust/Node files between releases.
+5. Install into an external temp project with no Rust toolchain or source tree.
+6. Register checks for Rust binary/version/target, public `fgos-runner`, Node
+   runtime/payload while
+   compatibility bindings remain, catalog/selector drift, registry load, and
+   release integrity.
+7. Register safe fixes/defaults through existing registries, preserving
+   project-over-global and customized settings; doctor validates the active
+   manifest without regenerating build inputs or changing releases by default.
+8. Prove clean install, repeated setup, read-only doctor, `doctor --fix` only
+   repairs named local conditions, upgrade, rollback,
+   uninstall, and global/project configurations.
+9. Update README/end-user install docs and `CHANGELOG.md`.
+10. Flip the installed entry in a separately revertible change.
+11. Observe the named compatibility window.
 
-### Exit criterion
+### Exit gate and verify
 
-`version` is permanently routed to `BuiltIn`; no Node process appears in a
-process-spy test.
+All targets pass P1/P5 from outside the repo; missing Node payload is diagnosed
+before legacy invocation; a broken runner payload is diagnosed separately; no
+lifecycle script builds/downloads implicitly; rollback restores one complete
+prior release without work-state mutation.
 
-## 10. Phase 4: Native Proof 2 - `gate-bypass`
-
-This proves a real filesystem/config operation without touching Work state.
-
-### Contract
-
-Preserve current success data:
-
-```json
-{ "level": "off|light|standard|heavy" }
+```sh
+npm test
+cargo test --workspace
+node --test test/install-packaging.test.mjs
 ```
 
-The provider accepts the resolved `.fgos` directory from host context. It does
-not independently reinterpret cwd or CLI flags.
+Add explicit matrix commands after §3 is decided.
 
-### Read order and failure behavior
+## 12. P7 — External Process Provider Preview
 
-1. Read `<repo>/.fgos/config.json` and accept `gateBypass.level` only when it is
-   a recognized string.
-2. If absent/invalid, read legacy `<repo>/.fgos/gate-bypass.json` and accept its
-   recognized `level`.
-3. Missing files, malformed JSON, wrong shapes, and unknown levels all return
-   `off` rather than raising or failing open.
-4. Never create `.fgos`, config, cache, or repair output during this read.
+### Steps
 
-The implementation ports only `readGateBypassLevel`; it does not yet port
-`canAutoApprove`, risk keywords, or merged-gate policy. Those remain Node
-operations until their owning use case migrates.
+1. Create the provider fixture in a temp external directory.
+2. Validate its static manifest without execution.
+3. Prove handshake identity/digest/version/concurrency negotiation.
+4. Prove framed request/response, stderr logging, events, and ID correlation.
+5. Prove maximum frame, bounded queue, backpressure, deadline, cancellation,
+   crash, protocol violation, and completion-unknown.
+6. Refuse core namespaces, duplicates, unknown capabilities, and handshake drift.
+7. Invoke the fixture through CLI and remote test projectors.
+8. Keep roots explicit and test/dev-scoped; defer broad ecosystem discovery.
 
-### Parity tests
+### Exit gate and verify
 
-Reuse/adapt the fixtures in `test/state/gate-bypass.test.mjs` for:
+Built-in, compatibility, and process providers are distinguishable through one
+router; all negative cases fail closed; no production component moved.
 
-- no files;
-- project shared config value;
-- legacy standalone fallback;
-- shared value winning over legacy value;
-- malformed JSON and invalid levels;
-- `.fgos`-less linked-worktree warning behavior at the CLI presenter;
-- `--dir` pointing at the main checkout.
-
-### Exit criterion
-
-`fgos gate-bypass` produces semantically identical data and warnings through
-the Rust provider, performs zero writes, and never spawns Node.
-
-## 11. Phase 5: External Process Provider Proof
-
-Create a test-only plugin outside the source tree during each test. Its static
-manifest claims only `vendor.fixture.echo`, requests no capabilities, and names
-a fixture executable.
-
-Use newline-delimited JSON-RPC 2.0 for the first proof:
-
-- exactly one compact JSON object per stdout line;
-- stderr reserved for logs;
-- request ID correlation;
-- handshake/describe after manifest selection, never for discovery;
-- deadline and cancellation;
-- maximum frame size;
-- protocol violation and crash mapped to typed provider errors.
-
-The test proves:
-
-- project/global scan precedence;
-- static discovery without executing the plugin;
-- duplicate namespace failure;
-- refusal to claim a core operation;
-- unknown capability refusal;
-- successful CLI and remote invocations through the same provider;
-- logs never corrupt protocol stdout;
-- timeout/crash does not become a semantic success.
-
-Keep the provider client connection-capable, but a normal one-shot CLI may
-start one plugin process for its own lifetime. Persistence across invocations is
-not required for this proof.
-
-## 12. Phase 6: Structured Legacy Bridge
-
-After transparent parity is stable, add an internal Node bridge mode rather
-than forking the public CLI output parser.
-
-The bridge returns:
-
-- captured stdout bytes;
-- captured stderr bytes;
-- exit status/category;
-- whether the response is already a public legacy presentation;
-- invocation/provider diagnostics.
-
-Rust reproduces the bytes and status unchanged. It does not parse a successful
-`fgos.v1` envelope and wrap it again.
-
-Only switch a command from transparent mode to structured bridge after its
-golden CLI matrix proves no output or error regression. The bridge is useful
-for cancellation/tracing and for the future remote migration, but is not a
-prerequisite for native `version`.
-
-## 13. Phase 7: Remote Host Integration
-
-Once the common runtime passes peer-host tests, replace the production gateway's
-CLI-shelling chokepoint deliberately:
-
-1. Keep REST/MCP parsing and authentication in the gateway adapter.
-2. Construct `RemoteHostUseCase` with the same authority/router contracts used
-   by the CLI host.
-3. Replace `VerbGateway` with a semantic invocation port; do not forward argv.
-4. For operations still served by Node, let the router choose `LegacyNode`.
-5. For native operations, call their Rust provider directly.
-6. Project `ProviderOutcome` into REST/MCP responses; do not consume or expose
-   `fgos.v1` internally.
-
-This phase may require separating gateway code from `herdr-plugin` into a thin
-app plus reusable package. Treat that as its own reviewed footprint because the
-current crate also contains TUI, Axum, MCP, auth, and embedded web dependencies.
-
-Proof includes CLI/remote semantic parity for `system.version` and
-`policy.gate_bypass.read`, plus existing gateway contract tests.
-
-## 14. Phase 8: Distribution Cutover
-
-The Rust host is not the installed default until distribution is reproducible.
-The current direct-GitHub npm installation ships JavaScript source and forbids
-install lifecycle builds, so it cannot silently compile Rust on a consumer's
-machine.
-
-### Required release shape
-
-Produce per-supported-target release archives containing:
-
-```txt
-bin/fgos                         # Rust executable
-libexec/fgos/node/bin/fgos.mjs  # legacy provider entry
-libexec/fgos/node/src/...       # legacy payload
-share/fgos/...                  # required manifests/contracts
+```sh
+cargo test --workspace external_process
+node --test test/rust-host/external-provider.test.mjs
 ```
 
-CI builds, tests, signs/checksums, and publishes the archives. Installation
-selects an explicit supported target and installs the archive atomically. It
-must not require a Rust toolchain on the consuming project.
+## 13. P8 — Production Remote Native Route
 
-Before implementation chooses an installer mechanism, update
-`docs/distribution-vision.md` and `docs/specs/distribution.md`; this is a real
-change from the current GitHub npm-package path. Preserve the old npm entry as a
-documented compatibility channel until the new install/upgrade/rollback path is
-proven.
+Use `distribution.build.show` first unless another already-native read has more
+product value. Do not choose a Node-only route merely to justify a bridge.
 
-### Setup/doctor registrations
+### Steps
 
-Add checks for:
+1. Compose the production remote projector/presenter around the shared service.
+2. Replace only the selected route's `VerbGateway` call.
+3. Preserve gateway auth, request validation, rate/session context, status, and
+   response schema.
+4. Assert the migrated route neither spawns CLI/Node nor parses `fgos.v1`.
+5. Run CLI/remote semantic equality and transport response tests.
+6. Keep untouched routes on the old adapter with an explicit consumer list.
+7. Repeat route by route; add a Node semantic bridge only where a required
+   operation cannot migrate first.
+8. Delete `VerbGateway` when its consumer list is empty.
 
-- Rust host binary version and target;
-- Node legacy runtime and payload while any operation uses it;
-- command-manifest drift;
-- provider registry load and duplicate claims;
-- configured external plugin executables/modules;
-- host/provider mapping diagnostics;
-- release asset integrity.
+### Exit gate and verify
 
-Add fixes only for conditions safely repairable without overwriting customized
-project/global config. Every new config default uses the existing config-merge
-registry.
+One production route is a true peer invocation. Remaining old routes are
+visible and no migrated route can fall back to envelope parsing.
 
-### Cutover gate
+```sh
+cargo test --manifest-path herdr-plugin/Cargo.toml
+npm test
+```
 
-Change the installed `fgos` entry only when:
+## 14. P9 — Next Native Read
 
-- all supported targets pass the same CLI parity suite;
-- install, upgrade, rollback, and uninstall are proven from an external temp
-  project;
-- no install path downloads or builds code implicitly without documented user
-  intent;
-- `fgos doctor` names a missing Node runtime/payload before a legacy invocation;
-- changelog and end-user install documentation are updated.
+`gate-bypass` is a candidate, not a pre-created component. Confirm authority
+and placement first. If selected: freeze precedence/malformed fixtures; port
+only the read; consume resolved project context; prove zero writes and zero Node
+spawn; flip binding separately from Node deletion. If ownership stays unclear,
+choose another settled read instead of inventing a component boundary.
 
-## 15. Test Matrix
+```sh
+node --test test/rust-host/gate-bypass-parity.test.mjs
+cargo test --workspace
+```
 
-| Layer | Required proof |
+## 15. Test And Review Gates
+
+| Gate | Required proof |
 |---|---|
-| Rust units | registry resolution, duplicate failure, authority floor, envelope/hash, error mapping, provider adapters |
-| Node units | deterministic command-manifest export and drift guard |
-| Cross-runtime contract | Node/Rust envelope vectors, `version`, `gate-bypass`, exit taxonomy |
-| CLI integration | transparent fallback argv/stdin/stdout/stderr/status parity; native commands do not spawn Node |
-| Remote integration | peer-host semantic equality; remote presenter never emits `fgos.v1` |
-| External plugin | manifest discovery, handshake, echo, logs, timeout, crash, capability refusal |
-| Distribution | archive install/upgrade/rollback/uninstall on every supported target |
-| Full regression | `npm test` and `cargo test --workspace` |
+| Per commit | focused tests; Rust format and lint |
+| R1 integration | compatibility inventory, native no-Node proof, `npm test`, workspace tests |
+| R1 release | external install/upgrade/rollback/uninstall and setup/doctor on every target |
+| R2 | protocol conformance and fail-closed negative cases |
+| R3 | gateway suite, CLI/remote semantic equality, no CLI/envelope on migrated routes |
+| Future writer | replay, lock, atomicity, recovery, idempotency, mutual exclusion, rollback compatibility |
 
-Run Rust tests with warnings denied in CI. Add a process-spy fixture rather than
-inferring provider choice from timing.
+Use process-spy evidence, not timing. Use filesystem snapshots for zero-write
+claims. Use explicit timestamp predicates; never normalize arbitrary differences.
 
-## 16. Commit And Review Slices
+## 16. Commit And Rollback Slices
 
-Keep implementation commits independently revertible:
+Independently revertible slices:
 
-1. **Contract fixtures:** manifest exporter, envelope vectors, parity harness.
-2. **Workspace skeleton:** root workspace, protocol and host-runtime crates.
-3. **Legacy bootstrap:** Rust binary plus transparent Node delegation.
-4. **Router and peer hosts:** provider registry, CLI/remote use cases, in-memory
-   tests.
-5. **Native version:** distribution-health provider and parity tests.
-6. **Native gate-bypass:** gate-policy provider and parity tests.
-7. **External process proof:** fixture manifest/provider and negative tests.
-8. **Structured Node bridge:** lifecycle/cancellation/tracing without output
-   changes.
-9. **Remote gateway adapter:** replace CLI-shelling `VerbGateway` through a
-   separately reviewed gateway footprint.
-10. **Distribution:** release assets, installer path, setup/doctor, docs, and
-    installed-entry cutover.
+1. harness and generated selector artifact;
+2. workspace skeleton;
+3. invocation kernel/in-memory providers;
+4. Node compatibility;
+5. native `version` binding;
+6. artifact production;
+7. setup/doctor and external install tests;
+8. installed-entry flip;
+9. process protocol fixture/adapter;
+10. first remote route;
+11. each later native binding;
+12. each Node deletion after its observation window.
 
-Do not combine a provider flip with deletion of its Node implementation. The
-rollback observation window is a separate slice.
+Before P6, discard the candidate binary. After P6, use the distribution
+rollback channel. Roll back a read by changing one binding. Never shadow-run or
+auto-retry a writer. Never delete a Node writer before cross-version recovery is
+proven or the cutover is explicitly irreversible.
 
 ## 17. Risks And Controls
 
 | Risk | Control |
 |---|---|
-| Rust bootstrap accidentally reparses legacy flags | retain `OsString` argv and delegate remainder unchanged |
-| Double `fgos.v1` envelope | legacy output is pass-through; only native semantic outcomes reach Rust envelope writer |
-| `data_hash` differs across runtimes | hash once-serialized compact data bytes; cross-runtime golden vectors |
-| Provider split divides a write transaction | route whole use case; no write provider in proof milestone |
-| Rust CLI resolves Node from caller cwd | executable-relative installed layout plus explicit test override |
-| Plugin claims core authority | reserved namespace and fail-closed authority gate |
-| Root Cargo workspace changes existing Herdr build | exclude `herdr-plugin` and upstream crates initially |
-| New binary cannot ship through current npm path | distribution cutover is a hard gate with spec update and release artifacts |
-| Native proof operations become fake micro-components | place them under existing ownership and treat verbs as operations, not one-crate components |
-| Remote host remains a CLI wrapper | peer-host contract tests and later replacement of `VerbGateway` with semantic invocation |
+| Rust re-parses legacy flags | `args_os`, checked selector, argv corpus |
+| Double envelope | compatibility bytes pass through; semantic outcomes alone reach presenter |
+| Hash drift | Node differential corpus plus golden vectors |
+| Wrong root | installation/caller/project/`.fgos` roots are distinct fixtures |
+| Silent override | immutable exact binding; named replacement only |
+| Capability escalation | admission then least-privilege provider grant |
+| Remote wraps CLI | no-spawn/no-envelope assertions per route |
+| “Ship” without install | distribution is in R1 |
+| `fgos-runner` silently points at a different release | public-entry mapping and single release manifest/pointer proof |
+| checkout-only success hides missing payload | staged-bundle proof before external install |
+| doctor mutates or upgrades unexpectedly | read-only default; named `--fix` scope; explicit upgrade contract |
+| Fake proof component | component advisory gate before package creation |
+| Workspace absorbs Herdr | explicit excludes and independent build proof |
+| Crash becomes success | completion-unknown; idempotency-gated retry only |
+| Diagnostics break output | trace/evidence or explicit diagnostics surface |
 
 ## 18. Definition Of Done
 
-The proof milestone is done when all of the following hold:
-
-1. Rust CLI delegates every unmigrated command with tested compatibility.
-2. `version` and `gate-bypass` run natively and a process-spy proves no Node
-   child is created.
-3. CLI and remote host use cases call one Operation Provider Router and produce
-   different host presentations from the same semantic outcome.
-4. External fixture discovery and invocation pass positive and fail-closed
-   negative tests.
-5. `npm test` and `cargo test --workspace` are green.
-6. Setup/doctor changes required by the new workspace/runtime are registered.
-7. The Rust binary is not made the distributed default until Phase 8's install
-   and rollback gates pass.
-8. A stranger can start with the architecture and migration documents linked at
-   the top and reproduce every proof command.
-
-## 19. Decisions Still Required Before Execution
-
-1. Confirm `distribution-health` and `gate-policy` as ownership locations for
-   the two proof operations, or map them into already-registered component
-   packages before creating directories.
-2. Name the initially supported release target matrix from the current product
-   support policy; do not infer platforms from CI availability.
-3. Choose the post-npm distribution mechanism before Phase 8 implementation.
-4. Decide the rollback observation window before deleting either Node path.
-5. Decide whether explicit external-provider replacement of a built-in remains
-   deferred; this plan assumes it is prohibited.
+1. R1 installs Rust on every approved target while every unmigrated selector
+   preserves Node behavior.
+2. `version` is typed, native, compatible, and proven not to spawn Node.
+3. Setup/doctor diagnoses every new binary, payload, config, registry, and
+   integrity dependency.
+4. External install, upgrade, rollback, and uninstall reproduce without Rust
+   toolchain or lifecycle build.
+5. R2 process conformance passes positive and fail-closed cases.
+6. R3 has a production gateway route using the semantic path with no CLI API.
+7. `npm test`, workspace tests, and independent Herdr tests are green at their
+   owning gates.
+8. Architecture owns contracts/trade-offs, migration owns sequence policy, and
+   this file contains no competing technical design.
+9. A stranger starting at `docs/specs/reading-map.md` can reproduce each proof
+   and identify every rollback point.
