@@ -73,3 +73,15 @@ engine's own internal write sequence (a priority-bump edit plus a stage
 move) invalidated its own `preClaimRevision` before its own `settleClaim`
 step, so the parking-to-`awaiting-human` leg threw the identical
 `"durable revision changed"` error while investigating this very item.
+
+## The scope was wider than just `return` (`tsk-1ht`'s own live repro)
+
+While diagnosing this against `tsk-1sl`, trying to park that item with
+`fgos ask` after finding the `return`-side bug hit the identical CAS
+conflict (`settleClaim` revision-drift, exit 3) — not a `return`-specific
+bug. Every exit path off a claimed-and-edited item (`return`, `ask`/park)
+runs through `settleClaim`, so before this fix there was no sanctioned way
+to move a mid-lifecycle-edited claimed item out of `status:doing` at all,
+not even to park it for a person to answer. `tsk-1sl` itself was stuck in
+exactly this state at diagnosis time — confirming the gap was general to
+`settleClaim`, not local to one caller.
