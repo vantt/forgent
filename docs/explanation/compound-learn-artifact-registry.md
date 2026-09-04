@@ -361,3 +361,34 @@ This item is also the migration apply's own prerequisite: the design
 doc's stated safety property is "enforcement is enabled before files are
 moved into the new layout," so `tsk-28x-11`'s real-migration-apply item
 was blocked-by this one.
+
+## Two bugs the real migration dry-run surfaced before it could apply (`tsk-ozk`)
+
+Running `tsk-5mh`'s real migration apply against the live registry hit
+`ENAMETOOLONG` at target 181/332 — a `mkdir` path component over the
+filesystem's 255-byte limit. Root cause: 247 of 332 topics (74%) had a
+`purposeSlug` the classifier had set to the full explanatory doc title
+verbatim (up to 420 bytes) instead of a short, directory-shaped slug —
+confirmed live, not theoretical, the moment a real apply actually walked
+the registry instead of a dry-run.
+
+Separately, the user reviewing that same dry-run's output reacted to the
+resulting flat `docs/<purposeSlug>/<role>.md` layout — `D-tsk28x-5`'s own
+locked clause, cited above — dumping ~180 new single-purpose directories
+directly under `docs/` as "too messy," and asked for a `docs/knowledge/`
+prefix instead. Because this changes a locked layout clause rather than
+just fixing a bug, it went through a proper decision
+(`fgos decision --relation supersedes:D-tsk28x-5`), not an ad-hoc
+mid-execution patch — the anti-duplication mechanism `D-tsk28x-5`
+actually protects (path-as-identity-pair, per `D-tsk28x-13` above) stayed
+untouched; only the literal path prefix changed to
+`docs/knowledge/<purposeSlug>/<role>.md`.
+
+`tsk-ozk` fixed both, as one pass-through item (heavy risk, confirmed by
+the user rather than split — no `CONTEXT.md` existed to cite decision ids
+for children, and both halves gate the same downstream item, `tsk-5mh`,
+the same way): a length-bound + collision-safe-truncation rule applied to
+all 247 affected topics via the existing `fgos topic rename` verb, plus
+recording and implementing the `docs/knowledge/` prefix decision. Verify
+proved it against the canonical store, not a sample: 0 active topics left
+over 60 bytes. `tsk-5mh`'s real apply resumed only after this landed.
