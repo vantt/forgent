@@ -209,3 +209,69 @@ must not build a boundary that makes that impossible.
 
 ### Reports Path
 `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/`
+
+## P10.1 Disposition (independent Reviewer + Red-Team, round 1)
+
+Reviewer: no findings — every claim independently re-derived from the
+real diff and re-run tests, including the mid-flight addendum's
+per-actor provider requirement (verified genuinely real via a live
+dispatch showing two distinct executors invoked).
+
+Red-Team: 1 HIGH, empirically confirmed with a live PoC, ACCEPTED, fix
+required before close:
+
+- **[HIGH] The pack's protocol-selection gate is not actually enforced
+  on session RESUME.** `resolvePackProtocol`/`runGroupThinkingRequest`'s
+  self-consistency check (`peeked.protocolRef.id === protocolId`) only
+  verifies the CALLER's own claimed protocol id is (a) internally
+  self-consistent and (b) a pack member — it never cross-references that
+  claimed id against the SESSION's actual, real bound protocol
+  (`manifest.definitionRef.id`) when the request resumes an EXISTING
+  `coordinationId`. Live PoC: opened a session directly under a
+  non-pack-member protocol (`independent-research-fan-out-fan-in`), then
+  called `runGroupThinkingRequest` against the SAME `coordinationId` with
+  `protocolId`/`protocolRef.id` both naming a DIFFERENT, pack-registered
+  protocol (`declared-consult`) — self-consistent, gate passes — with a
+  `disposition` step (which has no protocol-binding check of its own).
+  Dispatch succeeded; the session's real governing definition remained
+  `independent-research-fan-out-fan-in` the whole time, while the gate
+  believed and reported `declared-consult` was selected. This directly
+  falsifies P10.1.md §5 bypass #1's proof as literally written, and means
+  ANY non-pack protocol — including `group-cognition-framework.yaml`,
+  which this cell's own Do-Not-Touch section forbids ever reaching —
+  could be dispatched against through the `fgos-group-thinking` surface
+  today on an existing session, contradicting the surface's entire reason
+  for existing. Not exploitable beyond the raw `run.mjs` door's own
+  existing authority (still requires the resuming session's real
+  `writerId`), but a real, undocumented failure of THIS wrapper's own
+  headline promise, not a mere residual.
+  **Fixer must**: make the gate cross-check the claimed protocol id
+  against the session's REAL bound protocol whenever `coordinationId`
+  names an EXISTING session — resolve the real manifest (same mechanism
+  `run.mjs`/`session-engine.mjs` already use, e.g. `readManifest`/
+  `findExistingManifest`) and refuse if `manifest.definitionRef.id` does
+  not match the pack-checked `protocolId`, before forwarding anything to
+  `runCoordinationUseCase`. A fresh (not-yet-existing) session has no real
+  bound protocol yet, so the existing self-consistency check is
+  sufficient there — only the resume path needs the new cross-check.
+  Add a regression test reproducing the PoC shape (resume an existing
+  session under protocol A, request protocol B via the pack gate,
+  confirm refusal) plus a positive test (resume under the SAME protocol
+  the session was really opened with, confirm it still succeeds).
+
+One LOW/INFO item, not required, Fixer's judgment on whether cheap to
+close while already in this code:
+- **[LOW/INFO]** `requestPath` mode reads the request file twice,
+  unlocked, at two different instants (once for the gate's `peekRequest`,
+  once inside `runCoordinationUseCase`'s own `readRequestFile`) — a
+  concurrent writer to the same path in that sub-millisecond window could
+  make the gated bytes diverge from the executed bytes. Not exploited
+  live; bounded by this codebase's own existing "the request file is
+  operator-authored and trusted" posture (same as `schema.mjs`'s header
+  already states). If cheap given the HIGH fix's own changes (e.g. if the
+  fix already needs to touch this code path), consider reading once and
+  forwarding the parsed object instead of the path string — otherwise
+  document as a named residual in P10.1.md's Gaps, not silently dropped.
+
+Both independent rounds' full reports preserved in this conversation's
+own record.
