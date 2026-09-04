@@ -196,6 +196,48 @@ test('P09.3: authorizeSpecialistSlot/recordSpecialistAuthorization/resolveLiveSp
   }
 });
 
+// ─── Phase 10 P10.9: extend the SAME static-scan methodology to
+// `src/verbs/coordination/**` -- the group-thinking Protocol Pack's own
+// public-surface directory (`group-thinking-pack.mjs`, P10.1/P10.5), which
+// the original Phase 06 R7 scan (src/runner/coordination/**) and the P09.3
+// extension (src/runner/definitions/**) never had reason to cover, since
+// neither existed when those scans were written. Verified as a genuine gap
+// before writing this test: no existing test in this repo walks
+// `src/verbs/coordination/**` for forbidden-shaped export names (confirmed
+// by `grep -rln "FORBIDDEN_EXPORT_NAME_SUBSTRINGS\|listModuleFiles" test/`
+// returning only this file, `coordination-static.test.mjs` (import-only,
+// scoped to `src/runner/coordination`), `deliberation-static.test.mjs`
+// (scoped to `src/runner/deliberation`), and `team-cognition-static.test.mjs`
+// (scoped to `src/runner/team-cognition`) -- none scan the verbs-side
+// public-surface directory at all). ─────────────────────────────────────
+
+const verbsCoordinationDir = path.resolve(coordinationDir, '../../verbs/coordination');
+
+test('P10.9: no exported function/const/class name anywhere in src/verbs/coordination/** (the group-thinking Protocol Pack\'s own public-surface directory, plus run.mjs/show.mjs/launch-master-loop.mjs) is shaped like a branch/worktree/merge/approve/Work-transition operation, and it contains neither addSessionEdge nor addSharedEdge anywhere in source', () => {
+  const files = listModuleFiles(verbsCoordinationDir);
+  const violations = [];
+  let totalExports = 0;
+
+  for (const file of files) {
+    const source = fs.readFileSync(file, 'utf8');
+    const names = extractExportedNames(source);
+    totalExports += names.length;
+    for (const name of names) {
+      const lower = name.toLowerCase();
+      for (const forbidden of FORBIDDEN_EXPORT_NAME_SUBSTRINGS) {
+        if (lower.includes(forbidden)) {
+          violations.push(`${path.relative(verbsCoordinationDir, file)} exports "${name}" (matches forbidden substring "${forbidden}")`);
+        }
+      }
+    }
+    assert.ok(!/\baddSessionEdge\b/.test(source), `addSessionEdge must not appear anywhere in ${file}`);
+    assert.ok(!/\baddSharedEdge\b/.test(source), `addSharedEdge must not appear anywhere in ${file}`);
+  }
+
+  assert.ok(totalExports > 5, `sanity check: expected to find a real, non-trivial number of exports from src/verbs/coordination/** (found ${totalExports})`);
+  assert.deepEqual(violations, [], `forbidden Work-lifecycle-shaped exports found in src/verbs/coordination/**:\n${violations.join('\n')}`);
+});
+
 // ─── Behavioral: mutation is structurally impossible everywhere in this
 // engine, so "two concurrent mutating actors" cannot occur -- proven at
 // every entry point that has ANY mutation-adjacent surface at all ────────
