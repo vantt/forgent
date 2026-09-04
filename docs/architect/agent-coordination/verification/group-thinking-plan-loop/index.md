@@ -83,8 +83,28 @@ that introduced it.
 
 | Cell | Status | Owner | Worktree | Next action |
 |---|---|---|---|---|
-| P01.1 | in-progress | Doer (running) | `.claude/worktrees/agent-ab7ff2ac5eda7a106` / `worktree-agent-ab7ff2ac5eda7a106` | doer |
-| P02.1 | review-needed | Coordinator | `.claude/worktrees/agent-a1cf5464f865986fb` / `worktree-agent-a1cf5464f865986fb` @ `42af6508` | reviewer+red-team (dispatching, parallel) |
+| P01.1 | review-needed | Coordinator | `.claude/worktrees/agent-ab7ff2ac5eda7a106` / `worktree-agent-ab7ff2ac5eda7a106` @ `8b24c8a2` | reviewer+red-team (dispatching, parallel) |
+| P02.1 | review-needed | Coordinator | `.claude/worktrees/agent-a1cf5464f865986fb` / `worktree-agent-a1cf5464f865986fb` @ `42af6508` | reviewer+red-team (running, resumed after rate limit) |
+
+## P01.1 Coordinator independent verification (before dispatching Reviewer/Red-Team)
+
+- Re-ran focused command in the Doer's worktree: 659/660 pass — matches
+  Doer's claim exactly (the 1 fail is the same known worktree-path
+  false-positive in `coordination-static.test.mjs`; excluding that file:
+  658/658 clean).
+- `git diff --stat 86d0106c..HEAD` (the cell's OWN commit only) confirms
+  zero touches to any Do-Not-Touch/P02.1-lease path
+  (`bin/fgos.mjs`, `src/cli/command-registry.mjs`, `test/cli/**`,
+  `core/protocol-packs/group-thinking.json`, `src/verbs/coordination/chain.mjs`,
+  `src/verbs/coordination/launch-master-loop.mjs`) — confirmed by an
+  explicit `git diff --stat` scoped to those exact paths returning empty.
+- This is the plan's only kernel-touching cell — per plan.md's Master
+  Coordination Contract point 7, it gets the SAME rigor step-09 required:
+  independent Reviewer + Red-Team, fix rounds until both APPROVE, no
+  shortcut for diff size.
+- Full suite re-run independently in progress (background) to confirm
+  against the full known-baseline list before Reviewer/Red-Team dispatch
+  completes.
 
 ## Known non-blocking environment finding (repo-wide, not this track's scope)
 
