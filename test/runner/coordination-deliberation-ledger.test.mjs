@@ -690,7 +690,16 @@ function protocolDoc() {
       ],
       operations: [
         { id: 'research', role: 'researcher', result: { kind: 'advisory', evidenceRequired: 'reported' } },
-        { id: 'deliberate', role: 'coordinator', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+        {
+          id: 'deliberate',
+          role: 'coordinator',
+          result: { kind: 'advisory', evidenceRequired: 'reported' },
+          // P08.3: `declaredOperations` now reads the REAL per-operation
+          // declaration instead of the closed MVP8 enum wholesale, so this
+          // fixture must declare which types `deliberate` actually produces
+          // -- every type this file's runtime layer links through it.
+          contributions: { allowedTypes: ['proposal', 'objection'] },
+        },
       ],
       graph: {
         entry: 'phase-research',

@@ -238,6 +238,80 @@ test('accepts result.kind "gate-verdict" under Workflow', () => {
   assert.doesNotThrow(() => validateFlowDefinition(def));
 });
 
+// ─── contributions.allowedTypes[] (Step 09 MVP8, P08.3) ─────────────────────
+// The Candidate Contract's per-operation declaration channel:
+// "Operation results declare contributions.allowedTypes[]." Additive and
+// optional, so every existing fixture/test with no `contributions` key on
+// any operation keeps validating unchanged -- proven by every OTHER test in
+// this file (none declares it) plus the two below that assert it explicitly.
+
+test('accepts an operation declaring contributions.allowedTypes with real, deduplicated CONTRIBUTION_TYPES members', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.operations[0].contributions = { allowedTypes: ['proposal', 'objection', 'response', 'clarification', 'rank', 'specialist-request'] };
+  const validated = validateFlowDefinition(def);
+  assert.deepEqual(validated.spec.operations[0].contributions.allowedTypes, [
+    'proposal', 'objection', 'response', 'clarification', 'rank', 'specialist-request',
+  ]);
+});
+
+test('an operation with no contributions key validates unchanged, and carries no contributions field at all', () => {
+  const def = minimalProtocolDefinition();
+  const validated = validateFlowDefinition(def);
+  assert.equal('contributions' in validated.spec.operations[0], false);
+});
+
+test('accepts an explicit contributions.allowedTypes: [] -- a legal declaration, not an error', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.operations[0].contributions = { allowedTypes: [] };
+  const validated = validateFlowDefinition(def);
+  assert.deepEqual(validated.spec.operations[0].contributions.allowedTypes, []);
+});
+
+test('rejects an unknown field on contributions', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.operations[0].contributions = { allowedTypes: ['proposal'], extra: true };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/operations\[0\]\.contributions has unknown field "extra"/),
+  );
+});
+
+test('rejects contributions when it is not an object', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.operations[0].contributions = ['proposal'];
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/operations\[0\]\.contributions must be an object when provided/),
+  );
+});
+
+test('rejects contributions.allowedTypes when it is not an array of strings', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.operations[0].contributions = { allowedTypes: 'proposal' };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/operations\[0\]\.contributions\.allowedTypes must be an array of non-empty strings/),
+  );
+});
+
+test('rejects a contributions.allowedTypes entry outside the closed MVP8 CONTRIBUTION_TYPES enum', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.operations[0].contributions = { allowedTypes: ['proposal', 'vote'] };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/operations\[0\]\.contributions\.allowedTypes carries "vote", which is not one of proposal \| objection \| response \| clarification \| rank \| specialist-request/),
+  );
+});
+
+test('rejects a duplicate entry in contributions.allowedTypes', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.operations[0].contributions = { allowedTypes: ['proposal', 'proposal'] };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/operations\[0\]\.contributions\.allowedTypes carries a duplicate entry/),
+  );
+});
+
 test('rejects completion.mode "synthesize" with no reachable advisory operation', () => {
   const def = minimalProtocolDefinition();
   def.spec.operations[0].result = { kind: 'work-product' };

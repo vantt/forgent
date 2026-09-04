@@ -66,7 +66,7 @@ import {
   knownContributionsFromEvents,
   asCoordinationError,
 } from './store.mjs';
-import { validateContributionLineage, CONTRIBUTION_TYPES } from '../deliberation/schema.mjs';
+import { validateContributionLineage } from '../deliberation/schema.mjs';
 import { replaySession } from './replay.mjs';
 import { CoordinationError, CONTRIBUTION_REF_PREFIX } from './schema.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
@@ -3542,20 +3542,24 @@ export function linkSessionContribution(
     );
   }
 
-  // Every declared operation of the BOUND protocol, each carrying the closed
-  // MVP8 type enum. Derived from the definition, never from the caller.
-  //
-  // Stated plainly rather than dressed up: this narrows the operation/type
-  // gate to "the operationRef is a real declared operation of this protocol"
-  // and no further, because `contributions.allowedTypes[]` -- the Candidate
-  // Contract's per-operation declaration -- has no field in the FlowDefinition
-  // schema yet, and `src/runner/definitions/*` is closed to this cell. The
-  // alternative, accepting the map from the caller, is exactly the
-  // caller-supplied-config bypass this track has already shipped three times;
-  // an unnarrowed but session-derived declaration is the honest option, and
-  // the residual is named in this cell's trace.
+  // Every declared operation of the BOUND protocol, narrowed to the REAL
+  // per-operation `contributions.allowedTypes[]` declaration
+  // (`src/runner/definitions/schema.mjs`'s `spec.operations[]` whitelist,
+  // P08.3). Derived from the definition, never from the caller. An operation
+  // with no `contributions` key at all, or with `allowedTypes: []`, converges
+  // on the SAME meaning: "declares no allowed types", which
+  // `validateOperationDeclaresType` (../deliberation/schema.mjs) already
+  // treats as reject-everything for an empty/absent entry -- so both shapes
+  // are represented identically here, as `allowedTypes: []`, rather than
+  // omitting the operation from the map (an absent operationRef is refused
+  // one layer up as `foreign-provenance` before this map is even consulted,
+  // via `stampedOperationRefOf`, so this map never needs to represent "no
+  // such operation").
   const declaredOperations = Object.fromEntries(
-    definition.spec.operations.map((operation) => [operation.id, { allowedTypes: [...CONTRIBUTION_TYPES] }]),
+    definition.spec.operations.map((operation) => [
+      operation.id,
+      { allowedTypes: operation.contributions?.allowedTypes ? [...operation.contributions.allowedTypes] : [] },
+    ]),
   );
 
   const contribution = {

@@ -1,0 +1,138 @@
+# core/coordination-protocols/deliberation-nominal-group-chain.yaml -- Phase
+# 08 (MVP8) P08.3 method-shaped proof: the Nominal-Group chain named by
+# phase-08-mvp8-deliberation-memory.md's Candidate Contract -- "private
+# proposal -> controlled reveal -> clarification -> private rank
+# contribution."
+#
+# Two windows, both the SAME MVP6 mechanism reused for two different
+# purposes -- never a self-referential one. `private-propose`'s own
+# contribution CANNOT be gated by a window that opens only after
+# `private-propose` itself settles: `linkSessionContribution` requires a
+# contribution's backing Run to have been AUTHORIZED (dispatched) strictly
+# after its window opened (P08.2 Fix Round 2), and an operation's own
+# authorization always precedes the settlement that a self-referential
+# window would wait for -- so `private-propose` binds to `private-open`, a
+# vacuously-open window (`opensAfter.operationRefs: []`, the schema's own
+# documented degenerate "open from session start" case): each participant's
+# own private reasoning is always free to become a durable ledger record.
+#
+# `reveal` is the REAL gate, opening only once BOTH `private-propose` Runs
+# have settled. It governs `clarify` -- made `driver-authorized` so MVP6's
+# existing context-grant/window-legality gate actually applies at
+# authorize/dispatch time (a `required` binding's `contextAccess` is
+# schema-valid but runtime-inert, per the FlowDefinition contract) -- which
+# is how this fixture proves the "controlled reveal": the facilitator cannot
+# be GRANTED, and so cannot be dispatched to read, either participant's
+# private proposal until the whole cohort has been revealed together.
+# `private-rank` also binds to `reveal` (a genuinely later, different
+# operation, so the same reasoning-time check holds honestly): each
+# participant's private ranking is informed by what reveal admits.
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.deliberation-nominal-group-chain
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: isolated-until-fan-in
+      visibilityWindows:
+        - id: private-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: []
+          permits:
+            sourceOperationRefs: [private-propose]
+            delivery: artifact-refs
+        - id: reveal
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [private-propose]
+          permits:
+            sourceOperationRefs: [private-propose]
+            delivery: artifact-refs
+
+  roles:
+    - facilitator
+    - participant
+
+  actors:
+    - id: facilitator-actor
+      role: facilitator
+    - id: participant-a
+      role: participant
+    - id: participant-b
+      role: participant
+
+  operations:
+    - id: private-propose
+      role: participant
+      policy:
+        minTier: lightweight
+      task:
+        contractTemplate: nominal-group-private-propose
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: clarify
+      role: facilitator
+      task:
+        contractTemplate: nominal-group-clarify
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [clarification]
+    - id: private-rank
+      role: participant
+      policy:
+        minTier: lightweight
+      task:
+        contractTemplate: nominal-group-private-rank
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [rank]
+
+  graph:
+    entry: phase-private-propose
+    nodes:
+      - id: phase-private-propose
+        operations:
+          - ref: private-propose
+            actor: participant-a
+            contextAccess:
+              visibilityWindowRef: private-open
+          - ref: private-propose
+            actor: participant-b
+            contextAccess:
+              visibilityWindowRef: private-open
+        transitions: [phase-clarify]
+      - id: phase-clarify
+        operations:
+          - ref: clarify
+            actor: facilitator-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: reveal
+        transitions: [phase-private-rank]
+      - id: phase-private-rank
+        operations:
+          - ref: private-rank
+            actor: participant-a
+            contextAccess:
+              visibilityWindowRef: reveal
+          - ref: private-rank
+            actor: participant-b
+            contextAccess:
+              visibilityWindowRef: reveal
+        transitions: []

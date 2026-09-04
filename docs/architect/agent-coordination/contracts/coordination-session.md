@@ -33,8 +33,16 @@ input accepted and implemented —
 `src/runner/coordination/{schema,store,replay,session-engine}.mjs` (P07.3),
 enforced at the request door and rendered by `show` in
 `src/verbs/coordination/{run,show}.mjs` (P07.4). Promoted with the named
-limitations in Evidence-Preserving Aggregation below, not without them. Full
-per-phase trace:
+limitations in Evidence-Preserving Aggregation below, not without them.
+Phase 08 (Step 09 MVP8): the `deliberation-contribution-linked` event, its
+raw and mediated write doors, its replay reconstruction and refusals, the
+derived open/resolved contribution views, and the `contribution:` ref
+namespace on `driver-disposition-recorded` accepted and implemented —
+`src/runner/coordination/{schema,store,replay,session-engine}.mjs` (P08.2),
+`src/runner/deliberation/schema.mjs` (P08.1, called never forked), method-
+shaped proof against three real fixtures under `core/coordination-protocols/`
+(P08.3). Promoted with the named limitations in Deliberation Contribution
+Ledger below, not without them. Full per-phase trace:
 `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`.)
 Last reviewed: 2026-09-04
 Canonical for: CoordinationSession manifest/event schema, storage layout, session-to-Assignment membership, and recovery rules
@@ -140,6 +148,7 @@ reference discipline as `assignmentRefs`. Minimum event kinds:
 | `operation-authorized` | Phase 00 (Step 09) MVP2: a driver authorizes a declared `driver-authorized` optional operation binding for dispatch (see [Driver-Authorized Optional Operations And Recheck](#driver-authorized-optional-operations-and-recheck-mvp1mvp2-step-09) below). | `authorizationId`, `operationId`, `nodeId`, `targetActorId`, `invocationKey`, `authorizedBy`, `reason`, `grantedContextRefs`, `targetArtifactRef?`, `ts` |
 | `driver-disposition-recorded` | Phase 00 (Step 09) MVP2: a driver records disposition on a finding/artifact; never a worker-authored result. | `targetRef`, `disposition`, `rationale`, `evidenceRefs`, `authorizedBy`, `ts` |
 | `aggregation-validated` | Phase 07 (Step 09) MVP7: a driver-authored record of one evidence-preserving aggregation the engine validated over this session's own evidence (see [Evidence-Preserving Aggregation](#evidence-preserving-aggregation-mvp7-step-09) below). Never a transition of its own. | `aggregationId`, `method`, `outcome`, `sourceResultRefs`, `validatedBy`, `ts`; optional `assignmentId?`, `runId?`, `outputArtifactRef?`, `dissentRefs?`, `unresolvedContributionRefs?`, `missingActors?`, `failedActors?`, `unboundSourceOperationRefs?`, `artifactRevisionRefs?` |
+| `deliberation-contribution-linked` | Phase 08 (Step 09) MVP8: a driver-authored, immutable lineage record linking ONE typed deliberation contribution — ref and revision pin only, never artifact content — into this session's ledger (see [Deliberation Contribution Ledger](#deliberation-contribution-ledger-mvp8-step-09) below). Never a transition of its own. | `contributionId`, `operationRef`, `type`, `assignmentId`, `runId`, `artifactRef`, `revision`, `roundKey`, `visibilityWindowRef`, `linkedBy`, `ts`; optional `anchors?`, `respondsTo?` |
 
 Additional event kinds may be added by a future phase without breaking this
 contract as long as they do not change the meaning of the kinds above.
@@ -378,6 +387,98 @@ post-terminal authorization is.
    end to end.** Both are covered at the event-schema and evaluator-unit
    layers; no session-level fixture produces the RunResult shapes that would
    exercise them through real dispatch.
+
+## Deliberation Contribution Ledger (MVP8, Step 09)
+
+Typed reasoning lineage across rounds — proposal, objection, response,
+clarification, rank, specialist-request — persisted as immutable
+`deliberation-contribution-linked` links, never a general message/thread/
+mailbox subsystem. The closed contribution-type enum, the shape validator,
+and the lineage rules (dangling anchor/response, cycle, foreign-session ref,
+operation/type mismatch) are owned by
+[`src/runner/deliberation/schema.mjs`](../../../../src/runner/deliberation/schema.mjs)
+(P08.1) — this session engine calls that validator, never forks it. A
+contribution carries `artifactRef` + `revision` only; no content ever
+reaches the log.
+
+**Two doors, the same split Evidence-Preserving Aggregation above already
+uses.** `store.mjs`'s `recordContributionLink` has no FlowDefinition and
+answers only what the manifest and log alone can: driver identity, session
+membership, runId shape, contribution-id shape/uniqueness, and lineage
+resolution. `session-engine.mjs`'s `linkSessionContribution` is the mediated
+door that derives everything definition-dependent — which declared operation
+backed the contribution (the same reserved `protocol-operation:` stamp
+window derivation uses), which window gates it, whether that window is open,
+and the immutable artifact pin — and accepts no definition, window, or
+revision as a caller parameter.
+
+**`contributions.allowedTypes[]` (Phase 08 MVP8) narrows the operation/type
+gate for real.** Declared per operation in the bound
+[FlowDefinition](flow-definition.md#operation-primitive), `session-engine.mjs`
+reads the real declaration off `definition.spec.operations[]` — an operation
+with no `contributions` key, or an explicit `allowedTypes: []`, both mean
+"declares no allowed types" (reject every type), never "all types allowed".
+An operation that never declares a type can back no contribution of that
+type, even through the mediated door.
+
+**Window/context legality is the EXISTING MVP6 mechanism, reused, never
+reimplemented.** A contribution's binding must declare
+`contextAccess.visibilityWindowRef`; linking is refused while that window is
+shut. Beyond "shut right now", the window claim is a REASONING-time claim,
+not a link-time one: the backing Run must have been AUTHORIZED (dispatched)
+strictly after the window opened, not merely settled or linked after — a Run
+that executed while the window was shut carries no legitimate provenance for
+it, however long the driver waits to link it. One structural consequence: an
+operation's own contribution can never be gated by a window that opens only
+after that SAME operation's own cohort settles (its authorization always
+precedes such a window's opening) — a protocol that wants "private, then
+revealed to the group" must gate the CONSUMING operation's context grant
+(the pre-existing MVP6 mechanism) rather than the producing operation's own
+link. See `core/coordination-protocols/deliberation-nominal-group-chain.yaml`
+(P08.3) for a worked fixture.
+
+**The `contribution:` ref namespace on `driver-disposition-recorded`.** A
+disposition's `targetRef`/`evidenceRefs` entries may name a contribution of
+THIS session using the reserved prefix `contribution:<contributionId>`; an
+unknown id, a bare (unprefixed) id that happens to match one of this
+session's own linked contributions, or a ref naming another session's
+contribution are all refused (a bare near-miss is refused rather than
+silently accepted-and-resolving-nothing). `src/verbs/coordination/show.mjs`'s
+read-side ownership mirror agrees with this write-door rule.
+
+**Open/resolved are DERIVED, never a stored mutable status.**
+`replaySession` returns `contributions` (accepted links) and
+`ignoredContributions` (post-terminal, neutralized) — records with no status
+field of any kind — plus `openContributionIds`/`resolvedContributionIds`,
+computed at replay time as the partition against pre-terminal dispositions
+naming a `contribution:` ref. A disposition naming a contribution this
+session never linked resolves nothing.
+
+**Named limitations, not omitted.**
+
+1. **The definition is pinned by `{id, version}`, never by content** — the
+   same exposure named for aggregation above, shared by every
+   definition-consuming door in this engine including this one. At this
+   door specifically, a same-`{id, version}` content swap does not merely
+   change evidence a verdict is derived over; it can remove the window gate
+   entirely and launder a false `visibilityWindowRef` claim into a permanent,
+   replay-accepted record. Not closed here; the systemic fix (pinning
+   `definitionRef` by content hash, once, for all five definition-consuming
+   doors) is out of scope for any single cell.
+2. **`revision` currency is checked once, at link time.** An artifact edited
+   after linking leaves the link standing with a pin that no longer matches
+   current bytes — correct for an immutable lineage record, but a reader
+   wanting "is this still current" must recompute it; no helper does that.
+3. **No CLI/`show` rendering yet.** `replaySession`'s four contribution-shaped
+   return values are ready to render; nothing under `src/verbs/coordination/`
+   renders them beyond the ownership set `show`'s disposition mirror already
+   consumes.
+4. **`specialist-request` has no real dispatched-session proof.** All six
+   contribution types are proven legal at the event-schema layer; the three
+   method-shaped fixtures (P08.3) exercise `proposal`, `objection`,
+   `response`, `clarification`, and `rank` end to end through real dispatch —
+   `specialist-request` is left for whichever cell wires MVP9 bounded
+   specialist binding.
 
 ## Recovery Rule
 

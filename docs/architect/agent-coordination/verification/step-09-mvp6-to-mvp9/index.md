@@ -68,13 +68,14 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | 00 | Intake | R1-R4 (P00.1), file-ownership map (P00.2) | done |
 | 06 | MVP6 | P06.1 + P06.2 (4 fix rounds) + P06.3 all done | **done** |
 | 07 | MVP7 | P07.1-P07.4 all done (2 HIGH fixed across the phase) | **done** |
-| 08 | MVP8 | P08.1 + P08.2 done (ledger/replay/visibility, 2 fix rounds); P08.3 open (method-shaped proofs — required for full "P08 exit" per phase-08.md's own Exit bullets, incl. the still-open `contributions.allowedTypes[]` schema gap) | in-progress |
-| 09 | MVP9 | P09.1 done (specialist slot schema, static-only prep); P09.2/P09.3 open (blocked on MVP8 gate) | in-progress |
+| 08 | MVP8 | P08.1 + P08.2 + P08.3 all done (contribution model, ledger/replay/visibility, method-shaped proofs + `contributions.allowedTypes[]` schema close) | **done** |
+| 09 | MVP9 | P09.1 done (specialist slot schema, static-only prep); P09.2/P09.3 now unblocked (MVP8 gate closed) | in-progress |
 | 10 | External acceptance | see phase-10 file | missing |
 
 ## Active Cell
 
-None. P08.2 closed (2 fix rounds) — see "P08.2 Status" below.
+None. P08.3 closed (1 small direct disposition fix) — Phase 08 is now
+**done**. See "P08.3 Status" below.
 
 **Process deviation, recorded honestly:** both P06.1 and P07.1 were
 dispatched as concurrent source-writers into the SAME shared worktree
@@ -93,14 +94,16 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Prepare P08.3 (Method-Shaped Proofs — RFC/Nominal-Group/Delphi chains),
-the last cell needed for full "P08 exit" per phase-08.md's own Exit
-bullets. Consider whether the still-open `contributions.allowedTypes[]`
-FlowDefinition schema gap (P08.2's self-disclosed, correctly-scoped-out
-finding) needs its own small schema cell first, since P08.3's Exit
-bullet "bounded by declared operation types" depends on it. P09.2 stays
-blocked until the MVP8 product gate — phase-09.md is explicit that
-P09.1's schema prep "cannot integrate before the MVP8 product gate."
+Phase 08 is done — the MVP8 product gate phase-09.md named is now closed.
+Prepare P09.2 (Authorization, Binding, And Replay): serialize slot
+authorization against terminal transition and competing slot claims,
+atomically record authorization + session-scoped actor binding before any
+Assignment issues, reuse the existing `operation-authorized` door for each
+specialist invocation, and get expiry/replacement semantics right per
+phase-09.md's Candidate Contract. P09.1 (closed, `9b81427c`) is
+static-schema-only prep — read it first for the `specialistSlots[]` shape
+this cell binds against. P09.3 (Negative And Recovery Proof) follows once
+P09.2 lands, same "closes the phase" role P06.3/P07.4/P08.3 each played.
 
 ## Cell Log
 
@@ -108,6 +111,7 @@ P09.1's schema prep "cannot integrate before the MVP8 product gate."
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
+| P08.3 | Phase 08 method-shaped proofs + allowedTypes[] schema close (closes Phase 08; 1 LOW fixed) | done | (pending commit) |
 | P08.2 | Phase 08 session ledger, replay, visibility (2 fix rounds) | done | `a24c250a` |
 | P07.4 | Phase 07 surface/regression proof, contract promotion (closes Phase 07; 1 HIGH fixed) | done | `9b81427c` |
 | P09.1 | Phase 09 specialist slot schema, static-only prep | done | `9b81427c` |
@@ -591,3 +595,87 @@ shaped proofs) is the last cell needed for full "P08 exit."
 
 Next: P08.3, possibly preceded by a small schema cell for
 `contributions.allowedTypes[]` if P08.3's own Exit bullet needs it.
+
+## P08.3 Status (Method-Shaped Proofs — closes Phase 08)
+
+**CLOSED. Phase 08 (MVP8 Deliberation Memory) is done.** Solo cell, shared
+track worktree. Two deliverables folded into one cell by design (see the
+cell's own contract for the rationale): closed the
+`contributions.allowedTypes[]` schema gap P08.1 and P08.2 had both
+independently found and explicitly assigned forward to "whichever cell
+owns `src/runner/definitions/*` next," and built the three method-shaped
+deliberation proofs (RFC, Nominal-Group, Delphi) the phase spec names.
+
+**Schema close**: one optional, backward-compatible field on
+`spec.operations[]` (`contributions.allowedTypes[]`), closed-enum
+validated, empty array explicitly legal. `linkSessionContribution`'s
+`declaredOperations` synthesis now reads the real per-operation
+declaration instead of spreading the full contribution-type enum for
+every operation — the vacuous gate P08.2 shipped as an honestly-named
+residual is gone. Missing key and explicit `allowedTypes: []` both
+converge on reject-everything, never accept-everything.
+
+**Three fixtures**, `core/coordination-protocols/deliberation-{rfc,
+nominal-group,delphi}-chain.yaml`, each proven end-to-end through real
+dispatch and the real mediated `linkSessionContribution` door, plus a
+chat-history-free replay reconstruction per chain — the phase's own Exit
+bullet. One genuine structural finding along the way, independently
+verified true by both review rounds: a contribution-bearing operation can
+never be gated by a visibility window that opens only after that same
+operation's own cohort settles, because `linkSessionContribution`
+compares the Run's *authorization* position against the window's *opened*
+position (P08.2 Fix Round 2's own fix), and an operation's authorization
+always precedes such a window's opening — the comparison is structurally
+guaranteed true, refusal 100% of the time. Fixtures were redesigned
+around this (a pre-existing, already-documented MVP6 vacuously-open-window
+shape) rather than fighting it. The Nominal-Group "privacy" requirement
+was proven via the Bug Taxonomy's own literal OR-clause: "rejected **or**
+provably not visible to other participants' context" — since the reject
+branch is structurally impossible for this shape, the visibility branch
+was proven instead, via the pre-existing MVP6 context-grant gate on the
+facilitator's `clarify` binding.
+
+Both independent Reviewer and Red-Team rounds ran in parallel against the
+real diff and came back with **zero HIGH/MEDIUM findings** — every
+headline claim (schema backward-compatibility, correct default direction,
+absence of the caller-supplied-definition bug class that shipped 3 times
+earlier in this track, the self-referential-window math, the privacy
+substitution's legitimacy) was independently re-derived, not just
+re-read. One real LOW finding from Red-Team, closed directly by the
+Coordinator without a separate Fixer round (single test file, mechanical,
+root cause already understood): a test titled "absent-key shape" didn't
+actually probe an operation with the `contributions` key entirely
+omitted — it probed the narrowing pattern instead. Renamed that test to
+describe what it actually proves and added a real absent-key test via a
+synthetic protocol document, dispatched and linked through the real
+mediated door. Two Red-Team INFO observations recorded as documentation
+opportunities, not defects: the vacuously-open-window shape is a
+pre-existing MVP6 degenerate case a careless protocol author could lean
+on (a property of the whole window-declaration model, not a runtime
+bypass this cell introduces); and the privacy proof is correctly scoped
+to context-injection control, not driver-visible ledger secrecy (by
+design, matching P07.3's definition-blind replay precedent).
+
+Final counts: touched-file focused suite 9/9 (up from 8/8 pre-disposition
+fix); broader focused regression across 4 directly-touched files 125/125;
+full sweep (Doer's run, from this worktree — not independently re-run
+from the main checkout this round given the clean disposition) 5460/5462
+pass with both non-passing tests verified NOT regressions by isolated
+re-run (`fgos-intake-4.test.mjs:318`, the standing track baseline; one
+load-induced `herdr-spawn-adapter.test.mjs` debounce flake, same
+already-documented class as P08.2 hit twice, unrelated to any file this
+cell touched).
+
+**Deferred, named honestly, not fixed here (matches this cell's own
+Acceptance scope, which was proofs + schema, not a rendering surface):**
+the definition-content-pinning residual (shared by every
+definition-consuming door, systemic); no CLI/`show` rendering of the
+contribution-derived views (P08.2's own carried-forward Gap); GitNexus's
+`impact()` gave unreliable answers for both edited symbols this cell
+touched (cross-checked by grep per the repo's own capability gate — worth
+a re-index before a future cell trusts it on these files);
+`specialist-request` has no dispatched-session proof (no method in this
+phase's Candidate Contract calls for it).
+
+**Phase 08 is done.** Next: P09.2 (Authorization, Binding, And Replay),
+now unblocked.

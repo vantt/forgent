@@ -73,9 +73,20 @@ export const DEFAULT_ACTIVATION_MODE = 'required';
 
 // Deliberately no `purpose` -- V1 omits it on purpose (ADR-009 Decision 5);
 // any explicit `purpose` key here is rejected by the whitelist below.
-const OPERATION_FIELDS = new Set(['id', 'role', 'capabilities', 'task', 'policy', 'result']);
+const OPERATION_FIELDS = new Set(['id', 'role', 'capabilities', 'task', 'policy', 'result', 'contributions']);
 const OPERATION_TASK_FIELDS = new Set(['taskSpec', 'contractTemplate']);
 const OPERATION_RESULT_FIELDS = new Set(['kind', 'evidenceRequired']);
+const OPERATION_CONTRIBUTIONS_FIELDS = new Set(['allowedTypes']);
+
+// Deliberation contribution types (Step 09 MVP8, candidate contract --
+// phase-08-mvp8-deliberation-memory.md's Candidate Contract). Duplicated
+// locally rather than imported from `../deliberation/schema.mjs`'s own
+// `CONTRIBUTION_TYPES`, matching this file's existing precedent for
+// `AGGREGATION_METHOD_VALUES` (defined here, not imported from
+// `team-cognition/schema.mjs`): this module is a zero-dependency pure kernel
+// (header comment above), and every other cross-boundary enum it validates
+// against is a local, independently-declared copy for the same reason.
+const CONTRIBUTION_TYPE_VALUES = Object.freeze(['proposal', 'objection', 'response', 'clarification', 'rank', 'specialist-request']);
 
 // SessionActor shape (ADR-008): id, declared role, optional persona,
 // optional PolicyPatch.
@@ -743,6 +754,30 @@ function validateOperations(operations, roleSet, profileKind) {
         resultShape.evidenceRequired = op.result.evidenceRequired;
       }
       result0.result = Object.freeze(resultShape);
+    }
+
+    if (op.contributions !== undefined) {
+      if (!isPlainObject(op.contributions)) fail(`${label}.contributions must be an object when provided`);
+      assertOnlyAcceptedFields(op.contributions, OPERATION_CONTRIBUTIONS_FIELDS, `${label}.contributions`);
+      // `allowedTypes` MAY be empty -- that is a legal, meaningful declaration
+      // ("this operation accepts no deliberation contribution type"), not a
+      // side effect of a generic array validator. It differs from
+      // `completion.aggregation.sourceOperationRefs`-style non-empty
+      // requirements elsewhere in this file because an omitted `contributions`
+      // key and an explicit `allowedTypes: []` are meant to converge on the
+      // SAME runtime meaning (reject every type) -- see
+      // `linkSessionContribution`'s `declaredOperations` synthesis, which
+      // treats both identically.
+      assertStringArray(op.contributions.allowedTypes, `${label}.contributions.allowedTypes`);
+      for (const type of op.contributions.allowedTypes) {
+        if (!CONTRIBUTION_TYPE_VALUES.includes(type)) {
+          fail(`${label}.contributions.allowedTypes carries "${type}", which is not one of ${CONTRIBUTION_TYPE_VALUES.join(' | ')}`);
+        }
+      }
+      if (new Set(op.contributions.allowedTypes).size !== op.contributions.allowedTypes.length) {
+        fail(`${label}.contributions.allowedTypes carries a duplicate entry -- each contribution type may appear at most once`);
+      }
+      result0.contributions = Object.freeze({ allowedTypes: Object.freeze([...op.contributions.allowedTypes]) });
     }
 
     return Object.freeze(result0);

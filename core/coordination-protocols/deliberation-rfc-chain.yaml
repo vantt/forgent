@@ -1,0 +1,117 @@
+# core/coordination-protocols/deliberation-rfc-chain.yaml -- Phase 08 (MVP8)
+# P08.3 method-shaped proof: the RFC chain named by
+# phase-08-mvp8-deliberation-memory.md's Candidate Contract --
+# "proposal -> objection -> response -> driver disposition."
+#
+# One round, three contribution-bearing operations, each declaring exactly
+# the ONE type it may produce via the new `contributions.allowedTypes[]`
+# field (P08.3, src/runner/definitions/schema.mjs). All three bind to the
+# SAME visibility window, `rfc-open`, which opens once the coordinator's
+# `convene` operation settles -- so no contribution may enter the ledger
+# before the round has genuinely started, and every contribution's
+# `visibilityWindowRef` provenance is real (reused MVP6 mechanism, not
+# reimplemented). `respond`'s target contribution is closed out through the
+# EXISTING `driver-disposition-recorded` door and the `contribution:` ref
+# namespace P08.2 added -- this fixture introduces no new disposition
+# mechanism.
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.deliberation-rfc-chain
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: mediated
+      visibilityWindows:
+        - id: rfc-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [convene]
+          permits:
+            sourceOperationRefs: [convene]
+            delivery: artifact-refs
+
+  roles:
+    - coordinator
+    - proposer
+    - objector
+
+  actors:
+    - id: coordinator-actor
+      role: coordinator
+    - id: proposer-actor
+      role: proposer
+    - id: objector-actor
+      role: objector
+
+  operations:
+    - id: convene
+      role: coordinator
+      task:
+        contractTemplate: rfc-convene
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: propose
+      role: proposer
+      task:
+        contractTemplate: rfc-propose
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: object
+      role: objector
+      task:
+        contractTemplate: rfc-object
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [objection]
+    - id: respond
+      role: proposer
+      task:
+        contractTemplate: rfc-respond
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [response]
+
+  graph:
+    entry: phase-convene
+    nodes:
+      - id: phase-convene
+        operations:
+          - ref: convene
+            actor: coordinator-actor
+        transitions: [phase-propose]
+      - id: phase-propose
+        operations:
+          - ref: propose
+            actor: proposer-actor
+            contextAccess:
+              visibilityWindowRef: rfc-open
+        transitions: [phase-object]
+      - id: phase-object
+        operations:
+          - ref: object
+            actor: objector-actor
+            contextAccess:
+              visibilityWindowRef: rfc-open
+        transitions: [phase-respond]
+      - id: phase-respond
+        operations:
+          - ref: respond
+            actor: proposer-actor
+            contextAccess:
+              visibilityWindowRef: rfc-open
+        transitions: []

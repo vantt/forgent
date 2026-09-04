@@ -34,6 +34,14 @@ the runtime validation door in
 door in `src/verbs/coordination/run.mjs` (P07.4). Promoted with the named
 limitations in `completion.aggregation` below and in the CoordinationSession
 contract's own Evidence-Preserving Aggregation section, not without them.
+Phase 08 (Step 09 MVP8): `spec.operations[].contributions.allowedTypes[]`
+accepted and implemented — schema/validation in
+`src/runner/definitions/schema.mjs` (P08.3), consumed by
+`linkSessionContribution`'s real (non-vacuous) operation/type narrowing in
+`src/runner/coordination/session-engine.mjs`, proved against three committed
+opt-in fixtures under `core/coordination-protocols/deliberation-*-chain.yaml`
+(P08.3). See the CoordinationSession contract's own Deliberation
+Contribution Ledger section for the runtime half.
 Full per-phase trace:
 `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`.)
 Last reviewed: 2026-09-04
@@ -149,6 +157,8 @@ operations:
     result:
       kind: advisory | gate-verdict | work-product
       evidenceRequired: reported | verified
+    contributions:
+      allowedTypes: [proposal | objection | response | clarification | rank | specialist-request, ...]
 ```
 
 | Field | Notes |
@@ -160,6 +170,7 @@ operations:
 | `policy` | A PolicyPatch fragment (see below); carries constraints/hints, never commands, credentials, or lifecycle authority. |
 | `result.kind` | Governs interpretation; `gate-verdict` is legal only under `Workflow` (see Profiles). |
 | `result.evidenceRequired` | `verified` or `reported`, per the accepted [Assignment, Run, And RunResult Contract](assignment-run-runresult.md#confidence) confidence rules. |
+| `contributions.allowedTypes[]` | Optional (Phase 08, Step 09 MVP8). Each entry must be one of the closed MVP8 contribution-type enum; no duplicates. **May be empty, and an ABSENT `contributions` key means the same thing as an explicit `allowedTypes: []`: this operation declares no allowed contribution type**, never "all types allowed" — see the CoordinationSession contract's [Deliberation Contribution Ledger](coordination-session.md#deliberation-contribution-ledger-mvp8-step-09) section for how `linkSessionContribution` consumes this field. Legal under either profile (like `capabilities`/`policy`); only `CoordinationProtocol` sessions can ever call `linkSessionContribution` to consume it. |
 
 **V1 deliberately omits a `purpose` field on this primitive.** Operation `id`,
 `role`, `capabilities`, and `policy` are the routing surface (ADR-009
