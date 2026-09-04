@@ -70,25 +70,28 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | 07 | MVP7 | P07.1-P07.4 all done (2 HIGH fixed across the phase) | **done** |
 | 08 | MVP8 | P08.1 + P08.2 + P08.3 all done (contribution model, ledger/replay/visibility, method-shaped proofs + `contributions.allowedTypes[]` schema close) | **done** |
 | 09 | MVP9 | P09.1 + P09.2 + P09.3 all done (slot schema; authorization/binding/replay, 1 HIGH fixed; negative and recovery proof, 1 MEDIUM fixed) | **done** |
-| 10 | External acceptance | P10.1 done (pack registry, fgos-group-thinking skill, 1 HIGH fixed); P10.2-P10.4 open (parallel protocol definitions) | in-progress |
+| 10 | External acceptance | P10.1-P10.4 done (pack registry/skill 1 HIGH fixed; three group-thinking-lite protocol definitions, 3 parallel cells merged); P10.5 open (integration and usability proof) | in-progress |
 
 ## Active Cell
 
-**P10.2, P10.3, P10.4 — running in parallel, each its own isolated
-worktree/branch** (per this track's own P06.1/P07.1 lesson, no shared
-checkout):
-- P10.2 (RFC-Review-Lite): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-2`,
-  branch `step-09-mvp6-to-mvp9-p10-2`, contract committed `a6ce7b52`.
-- P10.3 (Nominal-Group-Lite): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-3`,
-  branch `step-09-mvp6-to-mvp9-p10-3`, contract committed `2678e421`.
-- P10.4 (Delphi-Feedback-Lite): `.claude/worktrees/step-09-mvp6-to-mvp9-p10-4`,
-  branch `step-09-mvp6-to-mvp9-p10-4`, contract committed `3e864e33`.
+None. P10.2, P10.3, P10.4 all closed and merged — see "## P10.2/P10.3/
+P10.4 Status" below. All three isolated worktrees/branches removed
+(fully merged into `step-09-mvp6-to-mvp9` before deletion, verified via
+`git merge-base --is-ancestor`).
 
-All three branched off this track's own HEAD at P10.1's close (`995ba45e`).
-Each cell's own `current-cell.md` (inside its own worktree, same relative
-path) is its authoritative contract — this shared `index.md` stays the
-single status board for all three; do not duplicate per-cell narrative
-here until each closes and merges back.
+**Merge-back mechanics, recorded for the next multi-parallel-cell wave:**
+the main track worktree's git index had unrelated foreign
+staged/conflicted state (below) that blocked `git merge` from running
+there directly, so all three merges were done in a temporary detached
+integration worktree (`git worktree add --detach`) instead, then the
+track branch ref was force-moved (`git branch -f`) to the resulting
+commit. That force-move succeeded silently but left the main worktree's
+own index/working-tree stale relative to its new HEAD (every file the
+merges touched showed as a spurious D/M) — fixed with a scoped
+`git checkout HEAD -- <exact file list>`, never a blanket reset, so the
+still-untouched foreign state was never disturbed. Saved as a session
+memory (`feedback_branch_force_move_leaves_other_worktree_stale`) for
+future cells that hit the same blocked-main-worktree situation.
 
 Previously: P10.1 closed (1 HIGH fixed) — see "P10.1 Status" below.
 
@@ -126,26 +129,30 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Prepare P10.2/P10.3/P10.4 (RFC-Review-Lite / Nominal-Group-Lite /
-Delphi-Feedback-Lite protocol definitions) — three parallel, independent
-cells per phase-10.md ("run in parallel in separate fixture directories
-and may not edit the shared registry or skill. They return
-definition/test artifacts to P10.5."). Per this track's own documented
-P06.1/P07.1 process-deviation lesson, each gets its OWN isolated
-worktree/branch off this track's current HEAD, no exceptions. All three
-build ON TOP OF P10.1's now-closed `core/protocol-packs/group-thinking.json`
-pack shape and `src/verbs/coordination/group-thinking-pack.mjs` gate, but
-must NOT edit either file — only add new protocol definitions + tests in
-their own scope. Per the user's own explicit requirement (recorded in
-this session's memory), each definition's actor/role declarations should
-demonstrate real per-actor `policy.{preferExecutor,minTier}` usage where
-it fits the protocol's own shape (e.g. an objector/reviewer role
-preferring a different CLI provider than a proposer role) — not required
-of every actor, but at least one worked example across the three
-definitions. After all three close, P10.5 (Integration And Usability
-Proof) registers them through ONE writer and proves CLI/headless parity
-plus the skill's own bypass-freedom (extending, not repeating, P10.1's
-own 5-bypass structural reasoning).
+Prepare P10.5 (Integration And Usability Proof) — solo cell, per
+phase-10.md's own text:
+- Register all three group-thinking-lite definitions
+  (`group-thinking-rfc-review-lite`, `group-thinking-nominal-group-lite`,
+  `group-thinking-delphi-feedback-lite`, all now merged into
+  `core/coordination-protocols/`) through ONE writer into P10.1's pack
+  registry (`core/protocol-packs/group-thinking.json`, currently
+  `members: []`).
+- Prove the SAME request path works through both CLI and headless entry
+  points for at least one registered protocol.
+- Prove the skill cannot switch protocols silently, bypass grants,
+  validate its own aggregate, authorize a specialist, or close a session
+  directly — EXTENDING P10.1's own 5-bypass structural proof (P10.1.md
+  §5) against the now-populated pack, not repeating it from scratch; in
+  particular, re-verify P10.1's own Fix Round 1 HIGH-finding fix (the
+  resume-path protocol cross-check) still holds once real protocols are
+  registered, not just the empty-pack shape it was proven against.
+- This cell also inherits the confirmed-satisfied per-actor
+  provider/tier requirement (P10.3 built a live, working cross-provider
+  proof; P10.2/P10.4 both independently confirmed why a portable
+  definition-level pin is illegal and correctly deferred to the
+  request-level mechanism P10.1 already proved) — no further proof of
+  that specific requirement is needed here unless P10.5's own
+  CLI/headless-parity proof surfaces a new gap.
 
 ## Cell Log
 
@@ -153,6 +160,9 @@ own 5-bypass structural reasoning).
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
+| P10.2 | Phase 10 RFC-Review-Lite protocol definition (parallel, own worktree) | done | `1727f5b9` (merged `72a095d8`) |
+| P10.3 | Phase 10 Nominal-Group-Lite protocol definition (parallel, own worktree, per-actor provider proof) | done | `f23a29eb` (merged `72a095d8`) |
+| P10.4 | Phase 10 Delphi-Feedback-Lite protocol definition (parallel, own worktree) | done | `2a4eb625` (merged `72a095d8`) |
 | P10.1 | Phase 10 pack registry, fgos-group-thinking skill, public surface (opens Phase 10; 1 HIGH fixed) | done | `9b91aa9f` |
 | P09.3 | Phase 09 negative and recovery proof (closes Phase 09; 1 MEDIUM fixed) | done | `52c05597` |
 | P09.2 | Phase 09 specialist authorization, binding, replay (1 HIGH fixed, independently rechecked) | done | `efe1bc68` |
@@ -994,3 +1004,86 @@ definition-consuming door in this engine carries.
 
 Next: P10.2/P10.3/P10.4, three parallel cells, each in its own isolated
 worktree.
+
+## P10.2/P10.3/P10.4 Status (three group-thinking-lite protocol definitions, parallel)
+
+**All three CLOSED and merged.** Each ran in its own isolated
+worktree/branch off P10.1's close (`995ba45e`), per this track's own
+documented P06.1/P07.1 lesson — genuinely disjoint file footprints,
+confirmed by each cell's own `git status --short` and by both review
+rounds. Each built a real, new, `metadata.id`-unique FlowDefinition
+under `core/coordination-protocols/` plus a real end-to-end proof test —
+none is a proof-fixture clone of its Phase 08 mechanism precedent, and
+none registers into P10.1's pack (that's P10.5's own job, by design).
+
+- **P10.2 (RFC-Review-Lite)**: two objectors record objections
+  independently; the proposer's response cannot be authorized until BOTH
+  have settled (a real AND-cohort gate, independently traced by both
+  review rounds — not a vacuous or single-objector-suffices check).
+  Response anchors both objections, resolves through the existing
+  disposition/`contribution:` mechanism, no new door. Demonstrated a
+  real actor-scope `minTier` policy override with correct provenance
+  attribution; found and documented (independently confirmed by both
+  P10.3 and P10.4) that `preferExecutor` is structurally illegal at
+  actor scope — the request-level mechanism P10.1 already proved is the
+  correct channel, and this cell correctly deferred re-proving it here.
+  Reviewer: 3 LOW notes (a wording overclaim, fixed directly; two
+  pre-existing doc/reasoning nuances, no action needed). Red-Team: no
+  findings.
+- **P10.3 (Nominal-Group-Lite)**: 3-participant cohort (not 2, a real
+  difference from the Phase 08 precedent); `share` is its own explicit,
+  driver-authorized operation, genuinely distinct from `clarify` at the
+  schema/sequencing level (though — an honest nuance both this cell and
+  its Phase 08 precedent share — the tests prove grant-legality timing,
+  not differential content visibility, since neither threads
+  `contextRefs` into a dispatched worker's contract; corrected in
+  P10.3.md's own Design Notes after Red-Team flagged it). Four windows,
+  each strictly forward-chained, applying P08.3's self-referential-window
+  finding from the start rather than rediscovering it. **This cell built
+  the per-actor provider/tier requirement live** — a real dispatch test
+  proving a facilitator role and participant roles resolve to two
+  genuinely different registered CLI executors (confirmed in the raw
+  dispatch log by both review rounds), satisfying the user's explicit
+  "Claude/Codex/agy must be able to collaborate" requirement for this
+  phase. Reviewer: no findings. Red-Team: one MEDIUM/INFO documentation
+  nuance (the share/clarify claim above), corrected directly; no HIGH.
+- **P10.4 (Delphi-Feedback-Lite)**: private round-1 proposals feed a
+  mediated, non-contribution aggregate (structurally barred from ever
+  being linked as a contribution — `allowedTypes: []` reject-all,
+  independently confirmed) which gates bounded round-2 proposals. Uses
+  a genuinely engine-ENFORCED round cap (`topology.edges[].maxRounds`,
+  independently traced to a real actor-keyed check at both the pre-lock
+  and lock-held/TOCTOU-safe paths — not just "no round-3 node exists"
+  the way the Phase 08 precedent bounds it), plus the pre-existing
+  visibility-window mechanism for round ORDER, proven by two separate
+  negative tests for two independently-enforced properties. Found (and
+  named, not just fixed) two real empirical engine constraints:
+  reusing one operation id across two graph nodes bound to the same
+  actor is unreachable at the second node (first-match-only resolution,
+  confirmed structural by both review rounds — not a design choice this
+  cell could have avoided), and an actor-scope `minTier` tied to the
+  engine's hardcoded default floor never gets provenance-attributed
+  (fixed by choosing tiers above the floor). Reviewer: one MEDIUM
+  integration-policy note (this cell's edit to the shared
+  `flow-definition-protocol-loader.test.mjs` sits in tension with its
+  own Do-Not-Touch clause — a Coordinator-level merge decision, not a
+  Doer defect). Red-Team: no HIGH/CRITICAL; one real MEDIUM — this
+  cell's own self-report understated its edit to that shared file (it
+  also rewrote a descriptive test-title string, not just the sorted
+  array) — corrected directly in P10.4.md.
+
+**Merge-back**: all three merged cleanly except a single, fully expected
+conflict on the shared `flow-definition-protocol-loader.test.mjs`
+fixture-id array and title string (P10.2 correctly left this file
+untouched per its own Do-Not-Touch reasoning; P10.3 added its own array
+entry; P10.4 added its own array entry AND rewrote the title). Resolved
+by hand: all three ids merged into the sorted array (P10.2's own entry
+was added during the merge, since P10.2 never touched the file itself),
+title string updated to name all three new protocols by name. Verified:
+`flow-definition-protocol-loader.test.mjs` 14/14; combined regression
+across `coordination-*`/`flow-definition*`/`verbs/coordination-*`
+663/662/1 (the 1 non-pass is the standing `coordination-static.test.mjs`
+worktree-path false-fail); `architecture.test.mjs` 6/6 (no new `.mjs`
+module from any of the three cells).
+
+Next: P10.5 (Integration And Usability Proof).
