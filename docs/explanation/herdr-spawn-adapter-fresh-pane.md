@@ -223,3 +223,51 @@ data-loss risk the retro-loop has run into before in this session (a
 transient `.fgos/main-checkout.lock` contention was the milder version of
 the same underlying hazard: concurrent sessions operating on one main
 checkout).
+
+## The default flip immediately exposed a silent false-success bug (`tsk-2rr`)
+
+Flipping `executors.agy-herdr` to `agy -i` in `tsk-4zi` put real
+production dispatches through `herdrSpawnInteractiveAdapter`
+(`transport.mjs:538+`) for the first time — and every single one of them
+did **zero real work while still reporting `success`**. The two-phase
+sequence `tsk-10j` designed typed the prompt as part of the SAME command
+line that launched `agy -i` (`agy -i <prompt> --mode accept-edits
+--new-project --model <model>`), the same shape as the `-p` headless
+invocation it replaced. Under `-p`, `agy` auto-submits that positional
+argument as chat input; under `-i` it does not — `agy` just opens its
+real interactive REPL and sits at its idle "Accept-edits mode" banner,
+never having received the prompt at all. `checkIdle`'s `agent_status`
+polling then correctly and honestly reports `idle` (the process genuinely
+is idle), the exit sequence fires, and the adapter returns `success` with
+`headBefore == headAfter` and stdout containing only the startup banner —
+a structurally silent false-positive, confirmed reproducible on 3
+separate real dispatches across 2 sessions, not a rare flake.
+
+**Why `tsk-10j`'s own live tests didn't catch this:** those tests used
+trivial single-line print prompts and asserted only `res.status === 0`,
+explicitly deferring stdout-content verification as an accepted
+best-effort limitation (screen-clear-on-exit). A dispatch that did zero
+real work but still exited `0` looked identical to a real success under
+that assertion. The gap was never "stdout retention is lossy" — it was
+"the prompt is never delivered at all", a more fundamental defect the
+existing tests structurally could not distinguish from the accepted
+limitation.
+
+**Fix:** a `sawWorking` gate on `checkIdle` — `agent_status` idle/done is
+only trusted as real completion after `agent_status === "working"` has
+been observed at least once, decoupled so only `idle` needs the gate
+(`done` never showed a false-positive live, and gating it too risked
+reintroducing a different `tsk-10j` bug), plus a 3-poll debounce. Landed
+via `fgw/tsk-2rr` (merged `adce0fc4`), Iron Law satisfied via
+`--acknowledge-iron-law` with real failing-before/passing-after proof,
+32/32 suite. Two independent reviews caught only comment-wording nits
+(no further logic changes).
+
+**Blast radius:** `capabilities.fgos-coding-implement.prefer` had already
+been reverted from `agy-herdr` back to `agy-cli` within the same session
+this was found (commit `21966be3`), before `tsk-2rr` landed the real fix —
+production dispatch was safe again by the time of discovery, but any real
+work items dispatched through `agy-herdr` during the brief window it was
+ACTIVE (`tsk-4kn` and possibly others) may have received a false
+`success` with zero actual work done and needed a re-check, not blind
+trust in their own recorded outcome.
