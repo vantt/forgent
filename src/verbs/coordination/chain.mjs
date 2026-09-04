@@ -74,12 +74,31 @@ function describeNextActionForCell(cellId, sessionShow) {
 // pendingDriverAuthorizations, and its Assignment ids -- everything a
 // stranger needs to understand one cell's own status without opening its
 // session by hand.
+//
+// Fault-isolated per cell: a broken/corrupt/unreadable session (a real,
+// reachable outcome of a genuinely diverged `--cwd`, see R7's Gap note)
+// must never take down every OTHER cell's own render. On a read failure
+// this returns a degraded record carrying `renderError` (which read step
+// failed, plus the error message) instead of throwing -- the caller
+// excludes it from `activeCell`/`nextAction` computation (no `status`
+// field means it never matches `ACTIVE_STATUS`) but keeps it listed.
 function renderCell(track, sessionId, ctx, engineOpts) {
-  const manifest = readManifest(sessionId, engineOpts);
-  const show = showCoordinationUseCase(ctx, { id: sessionId });
+  const cellId = sessionId.slice(trackPrefix(track).length);
+  let manifest;
+  try {
+    manifest = readManifest(sessionId, engineOpts);
+  } catch (err) {
+    return { cellId, sessionId, renderError: { step: 'readManifest', message: err.message } };
+  }
+  let show;
+  try {
+    show = showCoordinationUseCase(ctx, { id: sessionId });
+  } catch (err) {
+    return { cellId, sessionId, createdAt: manifest.createdAt, renderError: { step: 'showCoordinationUseCase', message: err.message } };
+  }
   const dispositions = Array.isArray(show.dispositions) ? show.dispositions : [];
   return {
-    cellId: sessionId.slice(trackPrefix(track).length),
+    cellId,
     sessionId,
     createdAt: manifest.createdAt,
     status: show.status,
@@ -100,7 +119,11 @@ function renderCell(track, sessionId, ctx, engineOpts) {
  *   cell id of the most-recently-created session still `active` (or
  *   `null` if none -- a track that has not opened its first cell yet is a
  *   legitimate state, not an error), `nextAction` a plain-text hint for
- *   that active cell (or `null` when there is none).
+ *   that active cell (or `null` when there is none). A cell whose own
+ *   session read failed renders as `{cellId, sessionId, renderError:
+ *   {step, message}}` (no `status`, so it is never picked as `activeCell`)
+ *   instead of throwing out of the whole call -- every other cell in the
+ *   track still renders normally.
  */
 export function chainCoordinationUseCase(ctx, { track }) {
   if (typeof track !== 'string' || track.trim() === '') {
