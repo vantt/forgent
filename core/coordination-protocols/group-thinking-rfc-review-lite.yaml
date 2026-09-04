@@ -1,0 +1,178 @@
+# core/coordination-protocols/group-thinking-rfc-review-lite.yaml -- Phase 10
+# (Step 09), cell P10.2. A REAL, pack-registrable protocol definition (P10.5
+# registers it into core/protocol-packs/group-thinking.json), not another
+# proof fixture -- and a genuinely different shape from Phase 08's own
+# `deliberation-rfc-chain.yaml`, not a clone of it (metadata.id below is a
+# distinct, unique identity -- grep-checked against every existing
+# core/coordination-protocols/*.yaml id before being chosen).
+#
+# Phase 08's fixture has exactly one objector and never gates who may see an
+# objection before another exists. This definition's own three bullets
+# (phase-10-group-thinking-protocol-pack-conformance-and-closeout.md) ask for
+# something structurally different: TWO objectors submit independently, and
+# the proposer may not be granted read access to EITHER objection until BOTH
+# have settled -- "independent objections before controlled reveal" is a
+# real privacy gate, not narrative framing. That gate reuses the exact same
+# MVP6 visibility-window + driver-authorized-grant mechanism Phase 08's
+# Nominal-Group-chain fixture already proved for an analogous shape
+# (private-propose -> reveal -> clarify), applied here to REVIEW rather than
+# NOMINATION semantics: `respond` (not a facilitator-clarify step) is the
+# driver-authorized binding gated on the SAME cohort-of-objectors window.
+#
+# Three windows, each opening after a DIFFERENT, strictly earlier operation
+# than the one it gates -- never self-referential (P08.3's own documented
+# structural finding: a window that opens only after its OWN gated
+# operation's cohort settles can never open, because authorization always
+# precedes settlement):
+#   rfc-open        opens after convene   -> gates propose
+#   objection-open  opens after propose   -> gates object (both objectors)
+#   reveal          opens after object    -> gates respond (driver-authorized)
+#
+# "No general comments/thread service": every piece of reasoning here is one
+# of the existing closed MVP8 contribution types (proposal | objection |
+# response | clarification | rank | specialist-request) -- proposal,
+# objection, response are the three this chain uses. No new message/thread
+# concept is introduced.
+#
+# Real per-actor PolicyPatch example (user-driven requirement, session-
+# recorded in P10.2.md): objector-a-actor/objector-b-actor declare
+# `policy.minTier: critical`, a genuine, legal, worked elevation over the
+# runtime default ('standard') -- proven end to end by
+# test/runner/coordination-group-thinking-rfc-review-lite.test.mjs's
+# provenance assertion. `policy.preferExecutor` is deliberately NOT declared
+# at actor scope anywhere in this document: flow-definition.md's PolicyPatch
+# section ("a portable CoordinationProtocol or Workflow definition expresses
+# requirements ... not literal executor/model pins") and
+# session-engine.mjs's `assertNoPortableExecutorPin` both make a literal
+# preferExecutor at actor/role/operation/definition scope a hard runtime
+# refusal -- see P10.2.md for the full finding and why the per-actor
+# CLI-provider-diversity half of the requirement is left to the
+# request-level mechanism P10.1 already proved (protocol-agnostic), not
+# duplicated here.
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.group-thinking-rfc-review-lite
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: mediated
+      visibilityWindows:
+        - id: rfc-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [convene]
+          permits:
+            sourceOperationRefs: [convene]
+            delivery: artifact-refs
+        - id: objection-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [propose]
+          permits:
+            sourceOperationRefs: [propose]
+            delivery: artifact-refs
+        - id: reveal
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [object]
+          permits:
+            sourceOperationRefs: [object]
+            delivery: artifact-refs
+
+  roles:
+    - coordinator
+    - proposer
+    - objector
+
+  actors:
+    - id: coordinator-actor
+      role: coordinator
+    - id: proposer-actor
+      role: proposer
+    - id: objector-a-actor
+      role: objector
+      policy:
+        minTier: critical
+    - id: objector-b-actor
+      role: objector
+      policy:
+        minTier: critical
+
+  operations:
+    - id: convene
+      role: coordinator
+      task:
+        contractTemplate: rfc-review-lite-convene
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: propose
+      role: proposer
+      task:
+        contractTemplate: rfc-review-lite-propose
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: object
+      role: objector
+      task:
+        contractTemplate: rfc-review-lite-object
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [objection]
+    - id: respond
+      role: proposer
+      task:
+        contractTemplate: rfc-review-lite-respond
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [response]
+
+  graph:
+    entry: phase-convene
+    nodes:
+      - id: phase-convene
+        operations:
+          - ref: convene
+            actor: coordinator-actor
+        transitions: [phase-propose]
+      - id: phase-propose
+        operations:
+          - ref: propose
+            actor: proposer-actor
+            contextAccess:
+              visibilityWindowRef: rfc-open
+        transitions: [phase-object]
+      - id: phase-object
+        operations:
+          - ref: object
+            actor: objector-a-actor
+            contextAccess:
+              visibilityWindowRef: objection-open
+          - ref: object
+            actor: objector-b-actor
+            contextAccess:
+              visibilityWindowRef: objection-open
+        transitions: [phase-respond]
+      - id: phase-respond
+        operations:
+          - ref: respond
+            actor: proposer-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: reveal
+        transitions: []
