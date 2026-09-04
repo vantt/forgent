@@ -86,15 +86,42 @@ that introduced it.
 | P01.1 | **done** | Coordinator | merged into `group-thinking-plan-loop` (Doer `8b24c8a2`, Fixer R1-R4) | closed |
 | P02.1 | **done** | Coordinator | merged into `group-thinking-plan-loop` (Doer `42af6508`, Fixer `a39a920f`) | closed |
 
-## Wave 1 — closed
+## Wave 1 — closed and integration-verified
 
 Both P01.1 and P02.1 closed and merged into `group-thinking-plan-loop`.
 P01.1 (the plan's one kernel cell) went through 4 real fix rounds — see
 its own trace file's "Close (Coordinator)" section for the full history:
 a forged-stamp bypass, a confusion-of-authority/ticket-reuse bypass, a
 consulted-and-verified trust-boundary reframe (kongming, independently
-re-checked against source), and a small overclaim correction. Full
-regression re-verification pending below, then Wave 2 opens.
+re-checked against source), and a small overclaim correction.
+
+A real cross-cell integration bug surfaced at the mandatory post-merge
+focused regression: P02.1's own `--cwd` CLI tests assumed `--cwd`
+relocates `.fgos/` session storage to the named worktree — true only
+before P01.1's R8 fix landed. Traced the real code
+(`bin/fgos.mjs`'s coordination case always passes `repoRoot` explicitly,
+independent of `--cwd`; `store.mjs`'s `resolveCoordinationPaths` uses
+`opts.repoRoot` when present, never re-deriving it from `cwd`) — `--cwd`
+genuinely only affects `ctx.cwd` (which matters for R3's own
+worktree-vs-main-checkout distinction), never where `.fgos/` bookkeeping
+lands. Fixed (`0f1de244`), merged, re-verified: 718/718 pass at the main
+checkout with zero known-false-positive noise (the worktree-path
+substring quirk only triggers when run from inside a
+`.claude/worktrees/` path, which the main checkout is not). This same
+fix pass also independently re-confirmed a documented, pre-existing gap:
+`src/verbs/coordination/run.mjs` never forwards a request step's
+`mutation` field to the engine — the mutation-unlock mechanism has zero
+live CLI/data-input reachable surface today, exactly as P01.1's own
+Red-Team already found and documented; Phase 3's own skill work is
+expected to close this wiring gap for real.
+
+Filed `tsk-2bu` (fgOS backlog) for the separate, pre-existing
+`rollbackReadOnlyMutations`-has-zero-callers gap found during P01.1's
+own red-team review — not fixed in this track (out of scope), tracked
+there instead.
+
+Full test suite re-run once, in progress (background); will record the
+result here, then Wave 2 opens.
 
 ## P01.1 disposition (kernel cell — HIGH red-team finding)
 

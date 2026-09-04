@@ -54,9 +54,9 @@ kernel-file work in this plan.
 
 | # | Phase | Product dependency | Exit | Status |
 |---|---|---|---|---|
-| 01 | [Mutation unlock](phase-01-mutation-unlock.md) | Entry Conditions | A declared `operation` step may dispatch `mutation: 'mutating'` only under the four-condition rule; every existing read-only-role test stays green; the cwd/repoRoot session-path bug is fixed and covered | in-progress — P01.1 fixing an accepted HIGH red-team finding (forgeable engine-stamp bypass), full recheck pending |
+| 01 | [Mutation unlock](phase-01-mutation-unlock.md) | Entry Conditions | A declared `operation` step may dispatch `mutation: 'mutating'` only under the four-condition rule; every existing read-only-role test stays green; the cwd/repoRoot session-path bug is fixed and covered | **done** (2026-09-05) — P01.1 closed after 4 real fix rounds (forged-stamp bypass, confusion-of-authority bypass, a verified trust-boundary reframe, an overclaim correction), merged into `group-thinking-plan-loop` |
 | 02 | [Chain verb and pack registration](phase-02-chain-verb-and-pack-registration.md) | Entry Conditions | `fgos coordination chain <track>` renders a correct, real status board from nothing but the session chain's own event logs; `standalone-master-coordination-loop` is a group-thinking pack member | **done** (2026-09-05) — P02.1 closed, merged into `group-thinking-plan-loop` |
-| 03 | [Plan-loop skill and live proof](phase-03-plan-loop-skill-and-live-proof.md) | 01 and 02 both closed | `fgos-plan-loop` skill exists and a real, two-cell live proof on a separate host/dogfood project (never `forgentX`) confirms the whole loop: cross-provider dispatch, a real forced fix round, a killed-and-resumed cell, a merged result, zero Work engine touched | planned — blocked on 01 |
+| 03 | [Plan-loop skill and live proof](phase-03-plan-loop-skill-and-live-proof.md) | 01 and 02 both closed | `fgos-plan-loop` skill exists and a real, two-cell live proof on a separate host/dogfood project (never `forgentX`) confirms the whole loop: cross-provider dispatch, a real forced fix round, a killed-and-resumed cell, a merged result, zero Work engine touched | opening — Wave 1 fully closed and integration-verified (718/718 focused, full suite in progress) |
 
 ## Parallel Execution Map
 
