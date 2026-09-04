@@ -70,12 +70,28 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | 07 | MVP7 | P07.1-P07.4 all done (2 HIGH fixed across the phase) | **done** |
 | 08 | MVP8 | P08.1 + P08.2 + P08.3 all done (contribution model, ledger/replay/visibility, method-shaped proofs + `contributions.allowedTypes[]` schema close) | **done** |
 | 09 | MVP9 | P09.1 + P09.2 + P09.3 all done (slot schema; authorization/binding/replay, 1 HIGH fixed; negative and recovery proof, 1 MEDIUM fixed) | **done** |
-| 10 | External acceptance | see phase-10 file | missing |
+| 10 | External acceptance | P10.1 done (pack registry, fgos-group-thinking skill, 1 HIGH fixed); P10.2-P10.4 open (parallel protocol definitions) | in-progress |
 
 ## Active Cell
 
-None. P09.3 closed (1 MEDIUM fixed) — **Phase 09 (MVP9) is done.** See
-"P09.3 Status" below.
+None. P10.1 closed (1 HIGH fixed) — see "P10.1 Status" below.
+
+**Anomaly found and left untouched, recorded honestly:** while closing
+P10.1, this worktree's git index was found to already carry unrelated,
+foreign staged/conflicted state not produced by this track's own work:
+two modified `.claude/skills/fgos-coding-implement/references/*.md`
+files (staged) and one unresolved "both added" conflict on
+`docs/history/worker-prompt-iron-law-evidence-timing/plan.md` (a
+different task, `tsk-3ys`, per its own git history). No `MERGE_HEAD`
+exists, so this is not an active in-progress merge — likely another
+concurrent session using this exact worktree path outside this
+Coordinator's own dispatch. Neither touched nor discarded (git safety
+protocol: investigate, never blindly overwrite unfamiliar state). Every
+commit in this track from this point on uses an explicit pathspec (never
+a bare `git commit` or `git add -A`) specifically so this foreign state
+can never be swept into a track commit by accident. If this state is
+still present when a future cell starts, re-investigate before assuming
+it's still someone else's — it may need surfacing to the user directly.
 
 **Process deviation, recorded honestly:** both P06.1 and P07.1 were
 dispatched as concurrent source-writers into the SAME shared worktree
@@ -94,22 +110,26 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-**Phase 09 is done.** Prepare P10.1 (Pack Registry And Public Surface) —
-the first cell of Phase 10, per
-`plans/260903-2334-step09-mvp6-to-mvp9/phase-10-group-thinking-protocol-pack-conformance-and-closeout.md`:
-index protocols by canonical `FlowDefinition metadata.id@version` (no
-second protocol identity), keep protocol definitions data-first, define
-public request-adapter/replay-renderer boundaries, and build a thin
-`fgos-group-thinking` skill/surface that selects an explicit registered
-protocol, launches/resumes coordination, and renders public replay —
-never hiding protocol semantics in skill prose. Phase 10 is large (10
-cells, two parallel lanes: P10.2-P10.4 after P10.1, P10.6-P10.9 after
-P10.5) and everything downstream depends on P10.1's registry/boundary
-shape, so read the full phase-10 file before writing P10.1's contract.
-**Given this track's own documented process deviation earlier (P06.1/P07.1
-sharing a checkout unsafely) — when P10.2-P10.4 and P10.6-P10.9 come up,
-each concurrent non-read-only leaf cell MUST get its own isolated
-worktree per plan.md's Shared-File Lease Rule, no exceptions this time.**
+Prepare P10.2/P10.3/P10.4 (RFC-Review-Lite / Nominal-Group-Lite /
+Delphi-Feedback-Lite protocol definitions) — three parallel, independent
+cells per phase-10.md ("run in parallel in separate fixture directories
+and may not edit the shared registry or skill. They return
+definition/test artifacts to P10.5."). Per this track's own documented
+P06.1/P07.1 process-deviation lesson, each gets its OWN isolated
+worktree/branch off this track's current HEAD, no exceptions. All three
+build ON TOP OF P10.1's now-closed `core/protocol-packs/group-thinking.json`
+pack shape and `src/verbs/coordination/group-thinking-pack.mjs` gate, but
+must NOT edit either file — only add new protocol definitions + tests in
+their own scope. Per the user's own explicit requirement (recorded in
+this session's memory), each definition's actor/role declarations should
+demonstrate real per-actor `policy.{preferExecutor,minTier}` usage where
+it fits the protocol's own shape (e.g. an objector/reviewer role
+preferring a different CLI provider than a proposer role) — not required
+of every actor, but at least one worked example across the three
+definitions. After all three close, P10.5 (Integration And Usability
+Proof) registers them through ONE writer and proves CLI/headless parity
+plus the skill's own bypass-freedom (extending, not repeating, P10.1's
+own 5-bypass structural reasoning).
 
 ## Cell Log
 
@@ -117,6 +137,7 @@ worktree per plan.md's Shared-File Lease Rule, no exceptions this time.**
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
+| P10.1 | Phase 10 pack registry, fgos-group-thinking skill, public surface (opens Phase 10; 1 HIGH fixed) | done | (pending commit) |
 | P09.3 | Phase 09 negative and recovery proof (closes Phase 09; 1 MEDIUM fixed) | done | `52c05597` |
 | P09.2 | Phase 09 specialist authorization, binding, replay (1 HIGH fixed, independently rechecked) | done | `efe1bc68` |
 | P08.3 | Phase 08 method-shaped proofs + allowedTypes[] schema close (closes Phase 08; 1 LOW fixed) | done | `f9c98501` |
@@ -853,3 +874,107 @@ rather than a slot's own `operationRefs[]` (carried from P09.1.md's Gap
 **Phase 09 (MVP9 Bounded Specialist Binding) is done.** This track has
 now closed Phases 00, 06, 07, 08, and 09. Next: Phase 10 (External
 Acceptance) — the final phase, starting with P10.1.
+
+## P10.1 Status (Pack Registry And Public Surface — opens Phase 10)
+
+**CLOSED, 1 HIGH fixed.** Solo cell, shared track worktree. This is the
+first Phase-10 (External Acceptance) cell — deliberately an
+APPLICATION-layer cell, physically outside the Agent Coordination kernel
+(zero files under `src/runner/**` touched, confirmed by both review
+rounds).
+
+Built: `core/protocol-packs/group-thinking.json` — a small, data-first
+pack registry, a genuine sibling of `core/coordination-protocols/` (never
+inside it, to avoid colliding with `protocol-loader.mjs`'s own discovery
+scan), shipping empty (`members: []`), ready for P10.2-P10.4 to add their
+three definitions to. `src/verbs/coordination/group-thinking-pack.mjs` —
+one gate (`loadProtocolPack`/`resolvePackProtocol`/
+`runGroupThinkingRequest`) that is a thin, byte-for-byte pass-through
+into the EXISTING `runCoordinationUseCase` (`run.mjs`) — the same door
+`fgos coordination run --file` already uses — after checking only that
+the caller's claimed protocol id is a real pack member. `core/skills/
+fgos-group-thinking/SKILL.md` — the thin skill itself, at this repo's
+real skill-source location (see the mid-cell correction below), reading
+a protocol's own operations live from the FlowDefinition rather than
+hardcoding them in skill prose.
+
+**Mid-flight, the user added a hard requirement**: the skill/gate must
+never collapse a group-thinking session onto one hardcoded provider —
+Claude, Codex, and Antigravity (agy) must be able to collaborate as
+different actors within one session under the existing `cli-spawn`
+executor model. This capability already existed at the schema level
+(`spec.actors[].policy.{preferExecutor,minTier,preferPersona,fallbackExecutors}`)
+and the kernel level (`run.mjs`'s `actorPolicyFields`, real
+`codex-cli`/`agy-cli` executors already registered in `.fgos/config.json`)
+— the risk was this cell's own thin wrapper silently stripping it. The
+Doer addressed this correctly and proved it LIVE (not just asserted): a
+real dispatch test with two actors each naming a different registered
+executor, showing two genuinely different executors invoked in the raw
+dispatch log.
+
+Both independent Reviewer and Red-Team rounds ran in parallel. Reviewer:
+zero findings across every checked claim, including the per-actor
+provider proof (independently re-run and confirmed real). Red-Team: **one
+real, empirically-confirmed HIGH** — the pack's own headline promise
+("requires explicit protocol selection... never switch protocols
+silently") was falsified on session RESUME: the gate only checked the
+caller's claimed protocol id for internal self-consistency and pack
+membership, never cross-referenced it against the session's REAL bound
+protocol. Live PoC: a session opened directly under a non-pack protocol
+could still be dispatched against through this surface while the gate
+believed (and reported) a different, pack-registered protocol was in
+use — meaning any non-pack protocol, including the permanently-forbidden
+`group-cognition-framework.yaml`, could be reached through this surface
+on an existing session. One LOW/INFO alongside it (an unlocked
+double-read of the request file in path mode — a TOCTOU gap, bounded by
+this codebase's own existing "the request file is trusted" posture, not
+exploited live).
+
+Fix Round 1 closed the HIGH at the root: the gate now cross-checks the
+claimed protocol id against the session's real bound protocol (via
+`resumeSession`, the exact same door `run.mjs`'s own manifest resolution
+already uses — reused, not reimplemented) whenever `coordinationId` names
+an EXISTING session; a genuinely fresh session correctly skips the check
+(nothing to cross-check yet); an `agent-led` session (`definitionRef:
+null`) is also correctly refused. Compared by `id` alone, not `id@version`
+— reasoned and independently re-verified: every door that actually
+governs a session's life already independently re-checks the session's
+own pinned version regardless of what this gate believes, so an
+id-only compare adds no real residual gap. The LOW/INFO TOCTOU was closed
+as a side effect (the fix already needed to peek the request body once;
+the module now forwards the parsed object instead of re-reading the
+path). An independent final recheck then re-verified everything from
+scratch — its OWN standalone PoC (not the Fixer's committed test),
+confirmed refused-with-zero-events against the fixed code, confirmed
+silently-succeeds when the check is mechanically stripped (proving the
+check is genuinely load-bearing, not decorative) — and found no remaining
+gaps.
+
+Final counts: touched-file focused suite 17/17 (up from 15/15
+pre-disposition); combined focused regression 721/722 (the 1 non-pass is
+the standing `coordination-static.test.mjs` worktree-path false-fail);
+full-repo sweep from this worktree (uncommitted diff, matching this
+track's own established precedent — P08.3/P09.3 recorded the identical
+reasoning): 5511/5519 pass, 7 skipped, the single failure being this
+track's own standing baseline (`fgos-intake-4.test.mjs:318`).
+
+**Anomaly found while closing this cell, not caused by it**: this
+worktree's git index carries unrelated foreign staged/conflicted state
+(see "Active Cell" section above) — investigated, left untouched, and
+every commit from here forward uses an explicit pathspec so it can never
+be swept in by accident.
+
+**Deferred, named honestly:** no real group-thinking protocol is
+registered in the pack yet (by design — P10.2-P10.4 build the
+definitions, P10.5 registers them through one writer); the pack registry
+has no discovery-tier flexibility of its own (a deliberate YAGNI scope
+limit, not an oversight); the per-actor provider proof uses a fake
+`runnerConfig.executors` fixture (matching an established precedent
+elsewhere in this repo) — it proves the WIRING is genuinely unbroken, not
+that real `codex-cli`/`agy-cli` subprocesses have yet cooperated in a
+live end-to-end run; the definition-pinned-by-`{id,version}`-not-content
+exposure is the same systemic, already-disclosed limitation every sibling
+definition-consuming door in this engine carries.
+
+Next: P10.2/P10.3/P10.4, three parallel cells, each in its own isolated
+worktree.

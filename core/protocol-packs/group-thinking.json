@@ -1,0 +1,8 @@
+{
+  "apiVersion": "fgos.dev/v1alpha1",
+  "kind": "ProtocolPack",
+  "metadata": {
+    "id": "group-thinking"
+  },
+  "members": []
+}
