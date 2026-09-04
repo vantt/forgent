@@ -619,45 +619,58 @@ function forgedInlineMutatingAssignment(stamp) {
   });
 }
 
-test('Fix round: a direct buildAssignment + executeAssignment call (never through dispatchDeclaredOperation) with a forged protocol-operation stamp naming a NONEXISTENT definition is refused, no canary file written', async () => {
+test('Fix round: a direct buildAssignment + executeAssignment call (never through dispatchDeclaredOperation) with isReadOnlyMode: false explicitly asserted and a forged protocol-operation stamp naming a NONEXISTENT definition is refused, no canary file written', async () => {
   const { repoRoot } = initTempRepoWithWorktree();
   const stamp = `${PROTOCOL_OPERATION_STAMP_PREFIX}forged.definition@0.0.0#not-a-real-operation`;
   const assignment = forgedInlineMutatingAssignment(stamp);
 
   await assert.rejects(
-    executeAssignment(assignment, { cwd: repoRoot }),
+    executeAssignment(assignment, { cwd: repoRoot, isReadOnlyMode: false }),
     (err) => err instanceof RunnerConfigError && /does not resolve to a real CoordinationProtocol/.test(err.message),
   );
   assert.equal(fs.existsSync(path.join(repoRoot, 'CANARY-attack.txt')), false);
 });
 
-test('Fix round R3: a forged stamp naming a REAL definition + a REAL work-product operation is still refused when cwd resolves to the MAIN CHECKOUT (never a linked worktree), no canary file written', async () => {
+test('Fix round R3: with isReadOnlyMode: false explicitly asserted, a forged stamp naming a REAL definition + a REAL work-product operation is still refused when cwd resolves to the MAIN CHECKOUT (never a linked worktree), no canary file written', async () => {
   const { repoRoot } = initTempRepoWithWorktree();
   writeFixture(repoRoot);
   const stamp = `${PROTOCOL_OPERATION_STAMP_PREFIX}${DEFINITION_ID}@1.0.0#produce-mutating`;
   const assignment = forgedInlineMutatingAssignment(stamp);
 
   await assert.rejects(
-    executeAssignment(assignment, { cwd: repoRoot }),
+    executeAssignment(assignment, { cwd: repoRoot, isReadOnlyMode: false }),
     (err) => err instanceof RunnerConfigError && /main checkout/.test(err.message),
   );
   assert.equal(fs.existsSync(path.join(repoRoot, 'CANARY-attack.txt')), false);
 });
 
-test('Fix round R2: a forged stamp naming a REAL definition but an operation that does NOT declare result.kind "work-product" is refused, even against a real linked worktree cwd, no canary file written', async () => {
+test('Fix round R2: with isReadOnlyMode: false explicitly asserted, a forged stamp naming a REAL definition but an operation that does NOT declare result.kind "work-product" is refused, even against a real linked worktree cwd, no canary file written', async () => {
   const { worktreeRoot } = initTempRepoWithWorktree();
   writeFixture(worktreeRoot);
   const stamp = `${PROTOCOL_OPERATION_STAMP_PREFIX}${DEFINITION_ID}@1.0.0#produce-advisory`;
   const assignment = forgedInlineMutatingAssignment(stamp);
 
   await assert.rejects(
-    executeAssignment(assignment, { cwd: worktreeRoot }),
+    executeAssignment(assignment, { cwd: worktreeRoot, isReadOnlyMode: false }),
     (err) => err instanceof RunnerConfigError && /does not declare result\.kind "work-product"/.test(err.message),
   );
   assert.equal(fs.existsSync(path.join(worktreeRoot, 'CANARY-attack.txt')), false);
 });
 
-test('Fix round: a direct buildAssignment + executeAssignment call whose stamp genuinely matches a real work-product operation, against a real linked worktree cwd, is still allowed through (the new gate does not over-refuse a well-formed inline mutating Assignment)', async () => {
+test('Fix round: a direct buildAssignment + executeAssignment call satisfying R2/R3 (real work-product operation, real linked worktree cwd) is STILL refused when isReadOnlyMode is OMITTED from opts -- an omitted flag is read-only, never permission, no canary file written', async () => {
+  const { worktreeRoot } = initTempRepoWithWorktree();
+  writeFixture(worktreeRoot);
+  const stamp = `${PROTOCOL_OPERATION_STAMP_PREFIX}${DEFINITION_ID}@1.0.0#produce-mutating`;
+  const assignment = forgedInlineMutatingAssignment(stamp);
+
+  await assert.rejects(
+    executeAssignment(assignment, { cwd: worktreeRoot }),
+    (err) => err instanceof RunnerConfigError && /requires the caller to assert isReadOnlyMode: false explicitly/.test(err.message),
+  );
+  assert.equal(fs.existsSync(path.join(worktreeRoot, 'CANARY-attack.txt')), false);
+});
+
+test('Fix round: the SAME direct buildAssignment + executeAssignment call, with isReadOnlyMode: false explicitly asserted this time, proceeds (the gate does not over-refuse a well-formed inline mutating Assignment)', async () => {
   const { repoRoot, worktreeRoot } = initTempRepoWithWorktree();
   writeFixture(worktreeRoot);
   const stamp = `${PROTOCOL_OPERATION_STAMP_PREFIX}${DEFINITION_ID}@1.0.0#produce-mutating`;
@@ -665,12 +678,12 @@ test('Fix round: a direct buildAssignment + executeAssignment call whose stamp g
   const assignmentsRoot = path.join(repoRoot, '.fgos', 'assignments');
   const runnerConfig = fakeExecutor(worktreeRoot, assignmentsRoot, { writeFile: 'direct-output.txt' });
 
-  const runResult = await executeAssignment(assignment, { cwd: worktreeRoot, runnerConfig });
+  const runResult = await executeAssignment(assignment, { cwd: worktreeRoot, runnerConfig, isReadOnlyMode: false });
   assert.equal(runResult.status, 'done');
   assert.equal(fs.existsSync(path.join(worktreeRoot, 'direct-output.txt')), true);
 });
 
-test('Fix round: the LEGITIMATE path (dispatchDeclaredOperation, real definitionRef, real linked worktree) is unaffected by the new dispatch-layer gate', async () => {
+test('Fix round: the LEGITIMATE path (dispatchDeclaredOperation, real definitionRef, real linked worktree) is unaffected by the new dispatch-layer gate -- runExecutorAttempt already asserts isReadOnlyMode: false for a real mutating dispatch', async () => {
   const { repoRoot, worktreeRoot } = initTempRepoWithWorktree();
   writeFixture(worktreeRoot);
   openDeclaredProtocolSession(

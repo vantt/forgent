@@ -483,44 +483,70 @@ export function classifyRunEvidence({
  * @returns {Promise<Readonly<object>>} Stored RunResult object
  */
 /**
- * Phase 01 mutation-unlock HIGH-finding fix (Red-Team, P01.1): a caller
- * that imports the exported `PROTOCOL_OPERATION_STAMP_PREFIX` and calls
- * `buildAssignment` + `executeAssignment` directly -- bypassing
- * session-engine.mjs's `dispatchDeclaredOperation`/
- * `assertMutatingDispatchAllowed` entirely -- can self-forge the
- * "engine-reserved" stamp (a bare `string.startsWith()` check, never a real
- * capability) and reach a real mutating write with none of R1/R2/R3 ever
- * having run. This re-verifies R2 (bound operation declares
- * `result.kind: 'work-product'`) and R3 (cwd resolves to a linked git
- * worktree, never the main checkout) AT THE ACTUAL POINT mutation is
- * honored -- independent of which caller reached `executeAssignment`, and
- * using the SAME shared predicates (`operationDeclaresWorkProduct`/
- * `resolveMutatingCwdPosture`, dispatch/execution-contract.mjs)
- * session-engine.mjs's own pre-check uses, so the two enforcement points
- * cannot independently drift.
+ * Fail-closed gate PLUS mistake-proofing for an inline mutating
+ * Assignment, whichever caller reaches `executeAssignment`.
+ *
+ * Trust boundary, stated plainly so a future reader does not mistake this
+ * for authentication against a hostile caller: a caller able to `import`
+ * this codebase's own dispatch modules and write files under `.fgos/` is,
+ * by this repo's own already-locked architecture, in the SAME trust class
+ * as the user who invoked it -- not an external attacker class. See
+ * `docs/routing-handoff-contract.md`'s three locked invariants
+ * (containment is instructions plus a throwaway branch, never a sandbox;
+ * work items must originate from the real user; `.fgos/config.json`'s
+ * `runner` section is executable config, whoever can edit it decides what
+ * the runner spawns) and `dispatch/config.mjs`'s own TRUSTED-CONFIG NOTE
+ * and `runner/worktree.mjs`'s SAME-USER TRUST INVARIANT -- both already
+ * state this codebase never treats "can run code in this process" as a
+ * hostile boundary. Every worker this runner spawns, including read-only
+ * ones, already runs with `--permission-mode acceptEdits`; "read-only" is
+ * graded/rolled back after the fact, never OS-enforced. Chasing an
+ * on-disk cross-check against that trust class is unwinnable: the
+ * attacker already has the same read/write access as the check itself, so
+ * any file the check trusts, the attacker can also just write.
+ *
+ * What this function actually protects against, in scope: an
+ * ACCIDENTAL or well-behaved-but-unaware in-process caller -- code that
+ * imports `buildAssignment`/`executeAssignment` (both pre-existing,
+ * already-exported primitives) without going through
+ * `session-engine.mjs`'s own mediated `dispatchDeclaredOperation` door,
+ * and would otherwise silently mutate real files with no interlock at
+ * all. Two independent conditions, both required:
+ *
+ * 1. The caller must explicitly assert `opts.isReadOnlyMode === false` --
+ *    an omitted or truthy flag is refused, never treated as permission.
+ *    `runExecutorAttempt` (session-engine.mjs) already computes and
+ *    passes this from the Assignment's own stamped `mutation` field for
+ *    every real dispatch, so this is a no-op for the legitimate path and
+ *    a hard stop for any caller that forgot the flag entirely.
+ * 2. The claimed `definitionId@version#operationId` stamp must resolve to
+ *    a REAL, on-disk CoordinationProtocol operation declaring
+ *    `result.kind: 'work-product'`, and `cwd` must resolve to a linked
+ *    git worktree, never the main checkout -- catching the realistic
+ *    accident of a well-behaved caller dispatching mutating work into the
+ *    wrong place, not a hostile forgery (a caller in the trust class
+ *    above can already write whatever `cwd`/stamp it wants; this is
+ *    mistake-proofing, not a barrier to it).
  *
  * Scoped to `provenance.kind === 'inline'` only: before this cell, an
  * inline contract's `mutation: 'mutating'` was unconditionally refused
  * (ADR-006 §6) regardless of any stamp -- this cell is what first made an
- * inline mutating Assignment constructible at all, so this is exactly
- * (and only) the new attack surface it introduced. A declared-shape
+ * inline mutating Assignment constructible at all. A declared-shape
  * Assignment's mutation posture is the pre-existing, unrelated
  * `classifyDeclaredMutation` mechanism (assignment-normalizer.mjs),
  * untouched and out of scope here.
- *
- * The stamp is re-resolved from scratch against a REAL, on-disk
- * CoordinationProtocol -- never trusted as a caller-supplied claim: a
- * missing/malformed/ambiguous stamp, a definition id that does not
- * resolve, a version mismatch, or an operation id not declared in that
- * definition's own `spec.operations` are all refused identically to an
- * operation that resolves but does not declare `result.kind:
- * 'work-product'`.
  *
  * @param {object} asgn
  * @param {object} opts
  */
 function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
   if (asgn.mutation !== 'mutating' || asgn.provenance?.kind !== 'inline') return;
+
+  if (opts.isReadOnlyMode !== false) {
+    throw new RunnerConfigError(
+      `executeAssignment: inline mutating assignment "${asgn.assignmentId}" refused -- mutation requires the caller to assert isReadOnlyMode: false explicitly (an omitted flag is read-only)`,
+    );
+  }
 
   const stamp = extractProtocolOperationStamp(asgn.provenance?.inline?.contract?.constraints);
   if (!stamp) {
