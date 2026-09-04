@@ -138,3 +138,29 @@ truncation incident (13:42-13:44Z) wiped the item's fgOS history mid-flight
 still-open write-side event-loss half). `tsk-4kn` itself is the resubmit
 that drove a fresh item through the lifecycle to reapply and formally
 return that already-proven diff, rather than a second design pass.
+
+## The skill docs that ACT on D5 hadn't caught up either (`tsk-4lh`)
+
+`tsk-4kn` fixed the two spec docs; `src/runner/worktree.mjs:1054-1060` had
+already stated D5 correctly (both the retired pre-`tsk-40m` behavior and
+the current one). But `.agents/skills/fgos-coding-validating/SKILL.md`'s
+own Handoff section — the doc a session actually reads mid-workflow to
+decide whether it needs to re-claim before calling
+`fgos-coding-implement` — still asserted the retired behavior as present
+fact: "the `fgos plan` call also releases the item's claim back to `todo`
+the moment the item reaches `executing` — this is expected and correct."
+Live-reproduced in this same run (`tsk-myq`): calling `fgos plan
+tsk-myq --verdict pass-through` then immediately reading `fgos list --id
+tsk-myq --json` back showed status `doing`, not `todo` — confirming via
+source (`plan.mjs`'s `releaseClaimOnExecuting` stub, D5 above) this was
+the doc lying, not a fluke.
+
+`tsk-4lh` corrected `fgos-coding-validating/SKILL.md`'s Handoff section
+and `fgos-coding-implement/references/worker-contract-and-orient.md`'s
+matching "re-check claim status" framing to state D5's actual current
+behavior — the claim persists unbroken through `clarify -> executing`,
+no release/reclaim window exists — modeled on `worktree.mjs`'s already-
+correct wording, then ran `npm run build:skills` to propagate the fix
+into `.agents/skills/**` and `plugins/fgOS/skills/**`. Docs-only, no code
+change, scope-bounded to the two skill-doc sources plus their generated
+copies.
