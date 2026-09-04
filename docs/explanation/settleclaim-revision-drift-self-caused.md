@@ -1,5 +1,5 @@
 ---
-authoritative_for: fgos edit not refreshing an active claim's preClaimRevision snapshot, so settleClaim's CAS check (from tsk-40m's runtime-claim/doing separation) rejected an item legitimately edited by its own claiming session between pick and return — "settleClaim: item durable revision changed from X to Y" — even though the SAME writer caused the change, not a real concurrent conflict; blocked the common pick -> edit --verify -> return workflow this session itself relies on; fixed via revisionDriftIsSelfCaused (tsk-1ht)
+authoritative_for: fgos edit not refreshing an active claim's preClaimRevision snapshot, so settleClaim's CAS check (from tsk-40m's runtime-claim/doing separation) rejected an item legitimately edited by its own claiming session between pick and return — "settleClaim: item durable revision changed from X to Y" — even though the SAME writer caused the change, not a real concurrent conflict; fixed via revisionDriftIsSelfCaused (tsk-1ht); also covers a second, independent failure mode of the same helper — missing payload.writer on work.add/decision/discovery/gate-approve events making it fail closed — fixed by stamping item.writer on addWork (tsk-1sr), with the still-open gap of no CLI verb to release a single orphaned runtime claim file
 ---
 
 # A CAS check that couldn't tell "I changed this myself" from "someone else changed this"
@@ -85,3 +85,49 @@ to move a mid-lifecycle-edited claimed item out of `status:doing` at all,
 not even to park it for a person to answer. `tsk-1sl` itself was stuck in
 exactly this state at diagnosis time — confirming the gap was general to
 `settleClaim`, not local to one caller.
+
+## A second, distinct way the same helper fails closed: missing `payload.writer` (`tsk-1sr`)
+
+`revisionDriftIsSelfCaused` (`store.mjs:1043`) itself has a second gap,
+independent of the stale-`preClaimRevision` bug above: it compares
+`event.payload?.writer?.id !== claim.writerId` for every in-window event,
+and treats a MISSING `writer` field as a DIFFERENT writer — so it fails
+closed the moment it hits ANY event that simply never stamps
+`payload.writer` in the first place, even when every event in the window
+came from the exact same session. `work.add`/`work.decision`/
+`work.discovery`/`work.gate-approve` all omitted `payload.writer` (only
+`work.edit`/`work.stage` populated it) — an inconsistency across verbs,
+not an intentional two-tier design.
+
+Confirmed live three independent times on 2026-08-26: once on `tsk-4jo`
+(recovering from a `main-checkout-reset`-discarded `events.jsonl`, then
+resubmitting the same id fresh — the stale `.fgos/runtime/claims/<id>.json`
+survived the reset since it's gitignored/untracked, carrying the OLD
+`preClaimRevision`, and the very first unstamped event the self-heal
+examined made it fail closed), and independently again on `tsk-10n` (same
+shape: an unrelated `events.jsonl` loss, a resubmit whose `work.add` had
+no `payload.writer`, `revisionDriftIsSelfCaused` failing closed on it).
+Both were recovered by hand — `tsk-4jo` by deleting the orphaned claim
+file directly (`rm .fgos/runtime/claims/tsk-4jo.json`; `readClaim` treats
+`ENOENT` as "no active claim", so this is a de-facto but unsupported
+release path), `tsk-10n` by hand-bumping the claim's `acquiredAt` past the
+unstamped event — both workarounds, not fixes.
+
+**The fix**: `addWork` now stamps `item.writer = resolveWriterIdentity(dir)`
+on the item before `appendEventLocked`, mirroring the three existing
+sibling call sites (`editWork`/`moveWork`/`replay.mjs`) that already did
+this — a single-line additive change, plus a regression test in
+`test/state/runtime-coordination.test.mjs` proving a post-claim
+`work.add` now reconciles instead of failing closed. Landed under
+`tsk-1sr`, commit `a111c239`.
+
+**Still open, not fixed by this item**: there is still no CLI verb to
+release a single orphaned runtime claim
+(`.fgos/runtime/claims/<id>.json`) once it's genuinely stale — `pick`/
+`take` refuse with "already claimed", and the reclaim-eligibility path
+(`isReclaimEligible`, `claim-liveness.mjs`) is gated on a ~24h
+activity-staleness threshold that a just-orphaned claim won't clear for a
+long time. `tsk-1sr` names `fgos-unlock`'s own shape (verify liveness,
+refuse and report the holder identity if genuinely live) as the right
+pattern to reuse for a single item's claim file, currently scoped only to
+`main-checkout.lock` — left as a suggested direction, not implemented.
