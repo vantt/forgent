@@ -657,17 +657,34 @@ test('Fix round R2: a forged stamp naming a REAL definition but an operation tha
   assert.equal(fs.existsSync(path.join(worktreeRoot, 'CANARY-attack.txt')), false);
 });
 
-test('Fix round: a direct buildAssignment + executeAssignment call whose stamp genuinely matches a real work-product operation, against a real linked worktree cwd, is still allowed through (the new gate does not over-refuse a well-formed inline mutating Assignment)', async () => {
-  const { repoRoot, worktreeRoot } = initTempRepoWithWorktree();
+test('Fix round 2: a direct buildAssignment + executeAssignment call whose stamp resolves to a REAL work-product operation, against a real linked worktree cwd, is STILL refused when no real coordination session ever registered this Assignment (citing a real operation id is not by itself authorization)', async () => {
+  const { worktreeRoot } = initTempRepoWithWorktree();
   writeFixture(worktreeRoot);
   const stamp = `${PROTOCOL_OPERATION_STAMP_PREFIX}${DEFINITION_ID}@1.0.0#produce-mutating`;
   const assignment = forgedInlineMutatingAssignment(stamp);
-  const assignmentsRoot = path.join(repoRoot, '.fgos', 'assignments');
-  const runnerConfig = fakeExecutor(worktreeRoot, assignmentsRoot, { writeFile: 'direct-output.txt' });
 
-  const runResult = await executeAssignment(assignment, { cwd: worktreeRoot, runnerConfig });
-  assert.equal(runResult.status, 'done');
-  assert.equal(fs.existsSync(path.join(worktreeRoot, 'direct-output.txt')), true);
+  await assert.rejects(
+    executeAssignment(assignment, { cwd: worktreeRoot }),
+    (err) => err instanceof RunnerConfigError && /is not a member of any real, on-disk coordination session/.test(err.message),
+  );
+  assert.equal(fs.existsSync(path.join(worktreeRoot, 'CANARY-attack.txt')), false);
+});
+
+test("Fix round 2: Red-Team's own exact reproduction -- an unrelated objective citing a REAL, already-shipped core-tier operation id, zero coordination fixture written anywhere, direct buildAssignment + executeAssignment (never dispatchDeclaredOperation), is refused", async () => {
+  const { worktreeRoot } = initTempRepoWithWorktree();
+  // Deliberately no writeFixture() call here -- zero coordination fixture
+  // written anywhere, matching Red-Team's own reproduction exactly. The
+  // stamp cites a REAL core-tier protocol shipped with this codebase
+  // (core/coordination-protocols/standalone-master-coordination-loop.yaml),
+  // discoverable by id alone, with no fixture write required.
+  const stamp = `${PROTOCOL_OPERATION_STAMP_PREFIX}core.coordination-protocol.standalone-master-coordination-loop@1.0.0#produce-candidate`;
+  const assignment = forgedInlineMutatingAssignment(stamp);
+
+  await assert.rejects(
+    executeAssignment(assignment, { cwd: worktreeRoot }),
+    (err) => err instanceof RunnerConfigError && /is not a member of any real, on-disk coordination session/.test(err.message),
+  );
+  assert.equal(fs.existsSync(path.join(worktreeRoot, 'CANARY-attack.txt')), false);
 });
 
 test('Fix round: the LEGITIMATE path (dispatchDeclaredOperation, real definitionRef, real linked worktree) is unaffected by the new dispatch-layer gate', async () => {
