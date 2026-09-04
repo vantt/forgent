@@ -56,3 +56,16 @@ guard — lives in `docs/specs/runner.md` (mục "### 0031 — Bỏ guard cấm 
 "Launcher" itself remains the correct, unretired name for the one-item,
 fire-and-forget role `0026` originally described — only the *guard*
 enforcing that was removed, not the naming decision itself.
+
+## Pointer maintenance (`tsk-4ah`)
+
+The citation above once pointed at a since-deleted file,
+`0031-bo-guard-cam-tu-orchestrator-sau-khi-0029-gan-nghia-moi.md` — dead
+the moment `0031`'s own cleanup removed it, per this doc's own account of
+that retirement. `tsk-4ah` repointed it at the surviving source
+(`docs/specs/runner.md`'s own `0031` section, cited above), added a
+disambiguation banner to `docs/history/orchestrator-worker-slots/
+DISCUSSION.md` (the newly-assigned "orchestrator" meaning from `0029` D17
+this doc's own §"What happened right after" describes), and added a
+pinned-term pointer to `docs/specs/reading-map.md`. No other content
+changed.
