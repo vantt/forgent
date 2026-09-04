@@ -176,7 +176,7 @@ full-suite/change-scope review that closes the whole track.
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
-| P10.5 | Phase 10 pack registration, CLI/headless parity, bypass re-verification | done | (pending commit) |
+| P10.5 | Phase 10 pack registration, CLI/headless parity, bypass re-verification | done | `7dee3f7a` |
 | P10.2 | Phase 10 RFC-Review-Lite protocol definition (parallel, own worktree) | done | `1727f5b9` (merged `72a095d8`) |
 | P10.3 | Phase 10 Nominal-Group-Lite protocol definition (parallel, own worktree, per-actor provider proof) | done | `f23a29eb` (merged `72a095d8`) |
 | P10.4 | Phase 10 Delphi-Feedback-Lite protocol definition (parallel, own worktree) | done | `2a4eb625` (merged `72a095d8`) |
