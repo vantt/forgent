@@ -20,12 +20,15 @@
 //   - a disposition's targetRef/evidenceRefs carry no session-scope check
 //     in `replaySession` itself, and a post-terminal disposition reads
 //     indistinguishably from a legitimate one. `isRefOwnedBySession`
-//     below is a boolean-returning, byte-for-byte mirror of store.mjs's
+//     below is a boolean-returning, rule-for-rule mirror of store.mjs's
 //     own (unexported, write-time) `assertDispositionRefOwnedBySession` --
 //     duplicated rather than imported because store.mjs sits below this
 //     module in the import graph and is on this cell's Do Not Touch list;
 //     the SAME segment/asgn_-prefix logic is reused, not reinvented, so
-//     this stays a mirror rather than a second, divergent policy.
+//     this stays a mirror rather than a second, divergent policy. Every
+//     rule the write door gains has to be mirrored here in the same
+//     commit, or the two silently disagree about a ref shape only one of
+//     them recognizes (MVP8's `contribution:` namespace is one such).
 // `postTerminal` marking mirrors the SAME "neutralize, don't hide"
 // posture replay.mjs already applies to authorizations
 // (`ignoredAuthorizations`) -- replay.mjs does not apply it to
@@ -34,7 +37,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { StoreError } from '../../state/store.mjs';
-import { CoordinationError } from '../../runner/coordination/schema.mjs';
+import { CoordinationError, CONTRIBUTION_REF_PREFIX } from '../../runner/coordination/schema.mjs';
 import { evaluateSessionQuorum, deriveSessionPhase } from '../../runner/coordination/session-engine.mjs';
 import { readManifest, readSessionEvents, resolveSessionPaths } from '../../runner/coordination/store.mjs';
 import { replaySession } from '../../runner/coordination/replay.mjs';
@@ -46,11 +49,19 @@ import { loadCoordinationProtocol } from '../../runner/definitions/protocol-load
 // Do-Not-Touch/no-export reason documented above.
 const TERMINAL_EVENT_TYPES = new Set(['session-completed', 'session-partial', 'session-failed', 'session-cancelled']);
 
-// Byte-for-byte mirror of store.mjs's private `assertDispositionRefOwnedBySession`,
+// Rule-for-rule mirror of store.mjs's private `assertDispositionRefOwnedBySession`,
 // as a boolean check instead of a throw: a render-time gate must not take
 // down the whole `show` command over one bad ref, it must mark it.
-function isRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir }) {
+function isRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, contributionIds = new Set() }) {
   if (typeof ref !== 'string') return false;
+  // Phase 08 (MVP8): a ref in the reserved `contribution:` namespace names a
+  // deliberation contribution, which has no `.fgos/` directory for the segment
+  // scan below to resolve. It is owned iff THIS session's own log linked it --
+  // the same question the write door asks, mirrored here so the two cannot
+  // disagree about a ref shape only one of them recognizes.
+  if (ref.startsWith(CONTRIBUTION_REF_PREFIX)) {
+    return contributionIds.has(ref.slice(CONTRIBUTION_REF_PREFIX.length));
+  }
   for (const segment of ref.split(/[\\/]/).filter(Boolean)) {
     if (segment !== coordinationId && fs.existsSync(path.join(fgosDir, 'coordination', 'sessions', segment, 'session.json'))) {
       return false;
@@ -189,7 +200,14 @@ export function showCoordinationUseCase(ctx, { id }) {
     ignoredAggregations = coordinationState.ignoredAggregations.map(renderAggregation);
 
     const { fgosDir } = resolveSessionPaths(id, engineOpts);
-    const refOwnedOpts = { coordinationId: id, assignmentRefs: coordinationState.assignmentRefs, fgosDir };
+    const refOwnedOpts = {
+      coordinationId: id,
+      assignmentRefs: coordinationState.assignmentRefs,
+      fgosDir,
+      // Only the contributions replay ACCEPTED count -- a post-terminal one
+      // (`ignoredContributions`) informed nothing and owns no ref.
+      contributionIds: new Set(coordinationState.contributions.map((record) => record.contributionId)),
+    };
     let terminalSeen = false;
     dispositions = [];
     for (const event of coordinationState.events) {

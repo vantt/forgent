@@ -62,7 +62,11 @@ import {
   assertSafeCoordinationId,
   assertValidRunIdForAssignment,
   recordAggregationValidation,
+  recordContributionLink,
+  knownContributionsFromEvents,
+  asCoordinationError,
 } from './store.mjs';
+import { validateContributionLineage, CONTRIBUTION_TYPES } from '../deliberation/schema.mjs';
 import { replaySession } from './replay.mjs';
 import { CoordinationError } from './schema.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
@@ -3218,6 +3222,267 @@ export function validateSessionAggregation(
   );
 
   return Object.freeze({ outcome: classification.outcome, classification, event });
+}
+
+// ─── Phase 08 (Step 09 MVP8): deliberation contribution ledger ─────────────
+//
+// `../deliberation/schema.mjs` is a pure lineage validator with no session or
+// store access, by its own design (P08.1). This section is the ONE place that
+// gives it session-derived truth and records what it accepted -- the same
+// split of authority Phase 07 drew around the aggregation evaluator:
+//
+//   deliberation/schema.mjs -> decides whether a contribution's SHAPE and
+//                              LINEAGE are legal, given a context
+//   this file               -> decides what that context actually IS
+//
+// Every value that context is built from comes off the session or its bound
+// definition. A caller supplies identity and its own semantic claims
+// (`contributionId`, `type`, `roundKey`, lineage refs) and nothing that a
+// legality decision is made from.
+
+/**
+ * Which DECLARED operation an Assignment of this session actually performed,
+ * or `null`. Answered only through the reserved `protocol-operation:` stamp --
+ * the same single channel `deriveVisibilityWindowState` consults, for the same
+ * reason it consults nothing else: `payload.operationId`, the claiming
+ * taskKey, and the actor binding are all writable by doors that never
+ * performed the operation, and this codebase already refused each of them one
+ * boundary down.
+ */
+function stampedOperationRefOf(definition, assignmentId, fgosDir) {
+  for (const operation of definition.spec.operations) {
+    if (assignmentServesOperation(definition, operation.id, { assignmentId, fgosDir })) return operation.id;
+  }
+  return null;
+}
+
+/**
+ * `Map<assignmentId, {sessionId, operationRef}>` over every Assignment of this
+ * session that carries a declared-operation stamp -- the real-store
+ * `knownAssignments` channel P08.1 declared and left for its caller to
+ * populate ("Assignment existence can only ever be known to a caller that has
+ * a store"). Assignments with no stamp are deliberately absent: an ad-hoc
+ * primary task or a consult proposal performed no declared operation, so it
+ * can back no contribution.
+ */
+function knownStampedAssignments(definition, replayed, coordinationId, fgosDir) {
+  const known = new Map();
+  for (const event of replayed.events) {
+    if (event.type !== 'assignment-created') continue;
+    const operationRef = stampedOperationRefOf(definition, event.payload.assignmentId, fgosDir);
+    if (operationRef === null) continue;
+    known.set(event.payload.assignmentId, { sessionId: coordinationId, operationRef });
+  }
+  return known;
+}
+
+/**
+ * Link ONE typed deliberation contribution into `coordinationId`'s ledger
+ * (MVP8), enforcing MVP6 window/context legality on the way in.
+ *
+ * What is DERIVED from the session (never taken from the caller):
+ * - the **FlowDefinition** -- loaded from `manifest.definitionRef`, with the
+ *   same version-drift refusal every other definition-consuming door here
+ *   applies. This is the value three earlier cells in this track shipped a
+ *   bypass by accepting as a parameter; it is not a parameter here;
+ * - the **operationRef** the contribution answers -- read off the backing
+ *   Assignment's reserved `protocol-operation:` stamp, so an Assignment that
+ *   merely shares an actor or a claim key can back no contribution;
+ * - the **visibilityWindowRef** -- read off that operation's own node binding
+ *   (`contextAccess.visibilityWindowRef`), so a caller cannot choose which
+ *   window rule its contribution is judged against;
+ * - whether that window is **open** -- `deriveVisibilityWindowState`, called,
+ *   never reimplemented, and re-derived fresh from a new `replaySession()`
+ *   rather than trusting that the dispatch-time gate already ran;
+ * - the **runId** -- the latest accepted `result-linked` for that Assignment;
+ * - the **artifactRef and revision pin** -- `aggregationSourceFrom`, the same
+ *   settle-report derivation MVP7's sources use, so the pin is the hash of the
+ *   bytes the runner classified. An artifact edited since settle is refused
+ *   outright rather than linked under a pin it no longer matches;
+ * - the **lineage context** -- `knownContributions` and `knownAssignments`
+ *   built from this session's own log.
+ *
+ * What the CALLER supplies: `contributionId`, the contribution's `type` (its
+ * own semantic claim, bounded by the closed MVP8 enum), `roundKey` (an opaque
+ * grouping label, on the same footing as `reason`/`rationale` elsewhere in
+ * this file), the backing `assignmentId`, its `anchors`/`respondsTo` lineage
+ * claims (each checked against the real ledger), and `linkedBy`.
+ *
+ * Never transitions the session, and never copies artifact content: the event
+ * carries `artifactRef` + `revision` and nothing else about the artifact.
+ *
+ * @param {string} coordinationId
+ * @param {object} params
+ * @param {string} params.contributionId
+ * @param {string} params.type One of the closed MVP8 contribution types.
+ * @param {string} params.assignmentId The Assignment whose settled Run backs this contribution.
+ * @param {string} params.roundKey
+ * @param {{type: 'driver', id: string}} params.linkedBy
+ * @param {string[]} [params.anchors]
+ * @param {string} [params.respondsTo]
+ * @param {object} [opts] Workspace options ({ cwd, repoRoot, packageRoot })
+ */
+export function linkSessionContribution(
+  coordinationId,
+  { contributionId, type, assignmentId, roundKey, linkedBy, anchors, respondsTo },
+  opts = {},
+) {
+  if (!isNonEmptyString(contributionId)) {
+    throw new CoordinationError('validation', 'linkSessionContribution: contributionId is required');
+  }
+  if (!isNonEmptyString(assignmentId)) {
+    throw new CoordinationError('validation', 'linkSessionContribution: assignmentId is required');
+  }
+
+  const manifest = readManifest(coordinationId, opts);
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no declared operation or visibility window for a contribution to be judged against`,
+    );
+  }
+  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to link a contribution against a drifted definition`,
+    );
+  }
+
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  const replayed = replaySession(coordinationId, opts);
+
+  const createdEvent = lastEventFor(replayed.events, 'assignment-created', assignmentId);
+  if (!createdEvent) {
+    throw new CoordinationError(
+      'foreign-ref',
+      `linkSessionContribution: assignment "${assignmentId}" was never created in session "${coordinationId}" -- a contribution may only be backed by this session's own work`,
+    );
+  }
+  // The stamp is asked first, because it is the more fundamental question: an
+  // Assignment that performed no declared operation can back no contribution
+  // whatever else is true of it.
+  const operationRef = stampedOperationRefOf(definition, assignmentId, fgosDir);
+  if (operationRef === null) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: assignment "${assignmentId}" carries no declared-operation provenance stamp for protocol "${definition.metadata.id}@${definition.metadata.version}" -- it did not materialize a declared operation, so it can back no contribution`,
+    );
+  }
+  const actorId = createdEvent.payload.actorId;
+  if (!isNonEmptyString(actorId)) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: assignment "${assignmentId}" names no actor -- there is no node binding to resolve its declared operation's context access from`,
+    );
+  }
+
+  // Window/context legality, MVP6's own mechanism. The ref comes from the
+  // binding, not the caller; the verdict comes from the shared derivation, not
+  // a second copy of the rule.
+  const { binding, node } = resolveDeclaredOperationActor(definition, operationRef, actorId);
+  const visibilityWindowRef = binding.contextAccess?.visibilityWindowRef;
+  if (visibilityWindowRef === undefined) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: operation "${operationRef}" at node "${node.id}" for actor "${actorId}" declares no contextAccess.visibilityWindowRef -- a contribution records the window its reasoning was legal under, so an ungated binding has no window provenance to record and cannot contribute`,
+    );
+  }
+  const { open } = deriveVisibilityWindowState(definition, visibilityWindowRef, replayed, fgosDir);
+  if (!open) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: operation "${operationRef}" at node "${node.id}" requires visibility window "${visibilityWindowRef}" to be open before its reasoning may enter the deliberation ledger, and it is not open yet -- refusing to link contribution "${contributionId}"`,
+    );
+  }
+
+  const linkedEvent = lastEventFor(replayed.events, 'result-linked', assignmentId);
+  if (!linkedEvent) {
+    throw new CoordinationError(
+      'dangling-ref',
+      `linkSessionContribution: assignment "${assignmentId}" has no linked RunResult -- a contribution is backed by a settled Run, never by one still in flight`,
+    );
+  }
+  const runId = linkedEvent.payload.runId;
+  const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, runId);
+  const pinned = aggregationSourceFrom(fgosDir, operationRef, assignmentId, runId, runResult);
+  if (pinned === null) {
+    throw new CoordinationError(
+      'dangling-ref',
+      `linkSessionContribution: run "${runId}" of assignment "${assignmentId}" carries no single settle-report revision pin -- a contribution without immutable artifact backing is not a contribution`,
+    );
+  }
+  if (pinned.currentRevision !== pinned.source.revision) {
+    throw new CoordinationError(
+      'validation',
+      `linkSessionContribution: the artifact backing assignment "${assignmentId}" no longer matches its settle-time revision pin -- it was edited after settle, so linking it would pin a revision the file no longer has`,
+    );
+  }
+
+  // Every declared operation of the BOUND protocol, each carrying the closed
+  // MVP8 type enum. Derived from the definition, never from the caller.
+  //
+  // Stated plainly rather than dressed up: this narrows the operation/type
+  // gate to "the operationRef is a real declared operation of this protocol"
+  // and no further, because `contributions.allowedTypes[]` -- the Candidate
+  // Contract's per-operation declaration -- has no field in the FlowDefinition
+  // schema yet, and `src/runner/definitions/*` is closed to this cell. The
+  // alternative, accepting the map from the caller, is exactly the
+  // caller-supplied-config bypass this track has already shipped three times;
+  // an unnarrowed but session-derived declaration is the honest option, and
+  // the residual is named in this cell's trace.
+  const declaredOperations = Object.fromEntries(
+    definition.spec.operations.map((operation) => [operation.id, { allowedTypes: [...CONTRIBUTION_TYPES] }]),
+  );
+
+  const contribution = {
+    contributionId,
+    sessionId: coordinationId,
+    operationRef,
+    type,
+    assignmentId,
+    runId,
+    artifactRef: pinned.source.artifactRef,
+    revision: pinned.source.revision,
+    roundKey,
+    visibilityWindowRef,
+    ts: new Date().toISOString(),
+    ...(anchors !== undefined ? { anchors } : {}),
+    ...(respondsTo !== undefined ? { respondsTo } : {}),
+  };
+  try {
+    validateContributionLineage(contribution, {
+      sessionId: coordinationId,
+      declaredOperations,
+      knownContributions: knownContributionsFromEvents(replayed.events, coordinationId),
+      knownAssignments: knownStampedAssignments(definition, replayed, coordinationId, fgosDir),
+    });
+  } catch (err) {
+    asCoordinationError(err, `linkSessionContribution: session "${coordinationId}" contribution "${contributionId}"`);
+  }
+
+  // `sessionId` and `ts` stay out of the persisted payload: the first is a
+  // forbidden field (the log IS the session), the second is stamped on the
+  // event envelope. Both were needed only to hand P08.1's validator a complete
+  // contribution object.
+  return recordContributionLink(
+    coordinationId,
+    {
+      contributionId,
+      operationRef,
+      type,
+      assignmentId,
+      runId,
+      artifactRef: contribution.artifactRef,
+      revision: contribution.revision,
+      roundKey,
+      visibilityWindowRef,
+      linkedBy,
+      ...(anchors !== undefined ? { anchors } : {}),
+      ...(respondsTo !== undefined ? { respondsTo } : {}),
+    },
+    opts,
+  );
 }
 
 // A retry must always declare WHY (records intent, never a silent

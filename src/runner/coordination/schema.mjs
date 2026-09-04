@@ -8,6 +8,16 @@
 // up (session, not Assignment). Fails closed (throws CoordinationError) on
 // anything outside the contract's exact field table.
 
+// The closed MVP8 contribution-type enum is IMPORTED, never duplicated the way
+// `AGGREGATION_METHOD_VALUES` below is duplicated from `definitions/schema.mjs`.
+// The two cases differ: `definitions/` is a layer this module deliberately does
+// not depend on, whereas `deliberation/schema.mjs` is a pure, dependency-free
+// data module (it imports nothing at all, including nothing from here), so the
+// edge is one-way and adds no layering. A second copy of a closed enum is a
+// drift surface, and this one is the enum two independent validators
+// (`validateContributionLineage` and this event's payload check) must agree on.
+import { CONTRIBUTION_TYPES } from '../deliberation/schema.mjs';
+
 export const SCHEMA_VERSION = '1';
 
 export const STATUS_VALUES = new Set(['active', 'completed', 'partial', 'failed', 'cancelled']);
@@ -360,6 +370,55 @@ const EVENT_SPECS = {
       'unboundSourceOperationRefs',
     ],
   },
+  // Phase 08 (Step 09 MVP8): one typed deliberation contribution was LINKED
+  // into this session's ledger. A link, never a message: it carries the
+  // artifact's `artifactRef` + `revision` PIN and nothing of the artifact's
+  // own content, the same discipline `aggregation-validated`'s
+  // `artifactRevisionRefs` already follows.
+  //
+  // Two fields from the P08.1 contribution shape are deliberately absent:
+  // - `sessionId` -- a FORBIDDEN_FIELD_NAMES entry (ADR-008 Decision 5),
+  //   rejected at any nesting depth in any payload. The session identity of a
+  //   contribution is the log it lives in; the doors reconstruct it from
+  //   `coordinationId` rather than trusting a field a caller could set.
+  // - `ts` -- `state/events.mjs` stamps every event's timestamp on the
+  //   envelope, so no kind in this table carries one as a payload field. The
+  //   Candidate Contract's "timestamp" is that envelope stamp, projected back
+  //   onto the record by `replay.mjs` exactly as it is for every other kind.
+  //
+  // `linkedBy` carries the same `{type: "driver", id}` shape
+  // `operation-authorized`/`driver-disposition-recorded`/`aggregation-validated`
+  // use, pinned by store.mjs's shared `assertDriverIdentity`: linking a
+  // contribution is ledger state the session's driver writes, never something a
+  // worker's own RunResult asserts about itself.
+  'deliberation-contribution-linked': {
+    required: [
+      'contributionId',
+      'operationRef',
+      'type',
+      'assignmentId',
+      'runId',
+      'artifactRef',
+      'revision',
+      'roundKey',
+      'visibilityWindowRef',
+      'linkedBy',
+    ],
+    accepted: [
+      'contributionId',
+      'operationRef',
+      'type',
+      'assignmentId',
+      'runId',
+      'artifactRef',
+      'revision',
+      'roundKey',
+      'visibilityWindowRef',
+      'linkedBy',
+      'anchors',
+      'respondsTo',
+    ],
+  },
   'session-failed': { required: ['reason'], accepted: ['reason'] },
   // R4: cancellation "records in-flight outcomes" -- `inFlightAssignmentIds`
   // is a snapshot (assignment-created with no result-linked yet) taken at
@@ -411,6 +470,21 @@ const AGGREGATION_OPTIONAL_ARRAY_FIELDS = new Set([
   // evaluator's coverage check, and the event has to say which one and why.
   'unboundSourceOperationRefs',
 ]);
+
+// Phase 08 (MVP8): the reserved ref namespace that makes a
+// `driver-disposition-recorded.targetRef`/`evidenceRefs[]` entry name a
+// DELIBERATION CONTRIBUTION rather than an opaque artifact ref.
+//
+// It exists because a contribution id is pure ledger state -- unlike an
+// Assignment it has no `.fgos/` directory, so the segment-existence scan
+// `assertDispositionRefOwnedBySession` uses for `asgn_` refs has nothing to
+// resolve against and a bare contribution id would sail through unchecked.
+// Requiring an explicit namespace makes "does this ref name one of MY
+// contributions" a question with an answer: the suffix must be a contribution
+// this session's own log linked. A bare id keeps its existing meaning (an
+// opaque ref this codebase has no registry to resolve) and can never target a
+// contribution.
+export const CONTRIBUTION_REF_PREFIX = 'contribution:';
 
 const AUTHORIZED_BY_FIELDS = new Set(['type', 'id']);
 const CONTEXT_GRANT_FIELDS = new Set(['refs']);
@@ -465,10 +539,11 @@ export function validateEventPayload(type, payload) {
       if (!isPlainObject(value)) fail('validation', `event "${type}" payload.provenanceRoot must be a non-null object`);
       continue;
     }
-    if (field === 'authorizedBy' || field === 'validatedBy') {
-      // `validatedBy` is the same driver-provenance shape under a name that
-      // says what the driver did (validated an aggregation, rather than
-      // authorized an operation) -- one validator, never a second copy.
+    if (field === 'authorizedBy' || field === 'validatedBy' || field === 'linkedBy') {
+      // `validatedBy`/`linkedBy` are the same driver-provenance shape under a
+      // name that says what the driver did (validated an aggregation, linked a
+      // contribution, rather than authorized an operation) -- one validator,
+      // never a second copy.
       validateAuthorizedBy(value, `event "${type}" payload.${field}`);
       continue;
     }
@@ -585,6 +660,38 @@ export function validateEventPayload(type, payload) {
         'validation',
         `event "aggregation-validated" payload names its own output assignment "${body.assignmentId}" in sourceResultRefs -- an aggregate may not be its own evidence`,
       );
+    }
+  }
+  if (type === 'deliberation-contribution-linked') {
+    // The enum itself is P08.1's, imported (see the header note) so this
+    // payload check and `validateContributionLineage` can never disagree about
+    // which six types exist.
+    if (!CONTRIBUTION_TYPES.includes(body.type)) {
+      fail('validation', `event "deliberation-contribution-linked" payload.type must be one of ${CONTRIBUTION_TYPES.join(' | ')}`);
+    }
+    if (body.anchors !== undefined && !isStringArray(body.anchors)) {
+      fail('validation', 'event "deliberation-contribution-linked" payload.anchors must be an array of non-empty strings when provided');
+    }
+    if (body.respondsTo !== undefined && !isNonEmptyString(body.respondsTo)) {
+      fail('validation', 'event "deliberation-contribution-linked" payload.respondsTo must be a non-empty string when provided');
+    }
+    // The one rule from `validateContributionShape` that has to be restated
+    // here rather than delegated: this payload is not the P08.1 contribution
+    // object (no `sessionId`, no `ts`), so that function cannot be called on
+    // it. A "response" with nothing to respond to is not a response, and a
+    // hand-written log must not be able to carry one.
+    if (body.type === 'response' && body.respondsTo === undefined) {
+      fail('validation', 'event "deliberation-contribution-linked" payload of type "response" must set respondsTo');
+    }
+    // A contribution may not anchor or respond to itself. Both are also
+    // impossible by construction on an append-only log (its own id is not yet
+    // in the ledger when it is linked, and every lineage ref must already be),
+    // but a hand-written log is exactly what replay exists to refuse.
+    if (body.respondsTo === body.contributionId) {
+      fail('validation', `event "deliberation-contribution-linked" payload "${body.contributionId}" responds to itself`);
+    }
+    if ((body.anchors ?? []).includes(body.contributionId)) {
+      fail('validation', `event "deliberation-contribution-linked" payload "${body.contributionId}" anchors itself`);
     }
   }
   if (type === 'session-opened') {

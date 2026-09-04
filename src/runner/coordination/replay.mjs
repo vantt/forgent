@@ -20,8 +20,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readEvents } from '../../state/events.mjs';
-import { resolveSessionPaths, readManifestRaw } from './store.mjs';
-import { CoordinationError, validateEventPayload, assertAssignmentIsSessionBlind, assertSchemaVersionCurrent } from './schema.mjs';
+import { resolveSessionPaths, readManifestRaw, asCoordinationError } from './store.mjs';
+import {
+  CoordinationError,
+  validateEventPayload,
+  assertAssignmentIsSessionBlind,
+  assertSchemaVersionCurrent,
+  CONTRIBUTION_REF_PREFIX,
+} from './schema.mjs';
+import { validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 
 // Same parse+validate path store.mjs's own read/write operations use (never
 // a second, independently-maintained copy); this only adds the extra
@@ -103,6 +110,21 @@ export function replaySession(coordinationId, opts = {}) {
   const aggregations = [];
   const ignoredAggregations = [];
   const aggregationIds = new Set();
+  // Phase 08 (MVP8): linked deliberation contributions, reconstructed exactly
+  // the way aggregations are. `resolvedContributionIds` is the derivation that
+  // replaces a mutable status field: a contribution is RESOLVED iff some later
+  // `driver-disposition-recorded` event's `targetRef` names it, and OPEN
+  // otherwise. Nothing about that state is ever stored on the contribution
+  // itself, so it cannot drift from the events it is derived from and no write
+  // path exists that could flip it.
+  const contributions = [];
+  const ignoredContributions = [];
+  const contributionIds = new Set();
+  const resolvedContributionIds = new Set();
+  // The `knownContributions` input P08.1's lineage validators take, grown as
+  // the log is walked so each contribution is only ever checked against the
+  // ones that genuinely preceded it.
+  const knownContributionsSoFar = new Map();
 
   const authorizations = [];
   const ignoredAuthorizations = [];
@@ -262,7 +284,70 @@ export function replaySession(coordinationId, opts = {}) {
       // consumer reads), reported separately, never silently dropped, and
       // never a throw that would make the whole session unreadable.
       (terminalSeen ? ignoredAggregations : aggregations).push(record);
+    } else if (event.type === 'deliberation-contribution-linked') {
+      // Same three read-time questions the aggregation branch above asks, for
+      // the same reasons: the driver identity is this session's own, the id is
+      // claimed once, and the evidence really settled before it was cited.
+      const { contributionId, linkedBy, assignmentId } = event.payload;
+      if (linkedBy.id !== manifest.provenanceRoot.writerId) {
+        throw new CoordinationError(
+          'foreign-ref',
+          `session "${coordinationId}": "deliberation-contribution-linked" event "${contributionId}" was linked by "${linkedBy.id}", which is not this session's driver identity ("${manifest.provenanceRoot.writerId}") -- linking a contribution is driver-authored session state, never a participant's own claim about its work`,
+        );
+      }
+      if (contributionIds.has(contributionId)) {
+        throw new CoordinationError(
+          'duplicate-ref',
+          `session "${coordinationId}": duplicate "deliberation-contribution-linked" event for contribution "${contributionId}"`,
+        );
+      }
+      if ((linkedCountByAssignment.get(assignmentId) ?? 0) === 0) {
+        throw new CoordinationError(
+          'out-of-order-ref',
+          `session "${coordinationId}": "deliberation-contribution-linked" event "${contributionId}" is backed by assignment "${assignmentId}", which has no accepted "result-linked" event before it in this session's log -- a contribution is backed by a settled Run, never by one that only settles later`,
+        );
+      }
+      // Lineage, checked with P08.1's own validators against the contributions
+      // accepted SO FAR in this walk. That ordering is what makes a cycle
+      // unrepresentable rather than merely detected: every anchor/respondsTo
+      // must already have been linked earlier in the same log, and an
+      // append-only log admits no back edge.
+      try {
+        validateAnchors(event.payload, knownContributionsSoFar, coordinationId);
+        validateResponseLineage(event.payload, knownContributionsSoFar, coordinationId);
+      } catch (err) {
+        asCoordinationError(err, `session "${coordinationId}": contribution "${contributionId}"`);
+      }
+      contributionIds.add(contributionId);
+      knownContributionsSoFar.set(contributionId, {
+        sessionId: coordinationId,
+        ...(event.payload.respondsTo !== undefined ? { respondsTo: event.payload.respondsTo } : {}),
+      });
+      const record = {
+        contributionId,
+        operationRef: event.payload.operationRef,
+        type: event.payload.type,
+        assignmentId,
+        runId: event.payload.runId,
+        artifactRef: event.payload.artifactRef,
+        revision: event.payload.revision,
+        roundKey: event.payload.roundKey,
+        visibilityWindowRef: event.payload.visibilityWindowRef,
+        linkedBy: event.payload.linkedBy,
+        ...(event.payload.anchors !== undefined ? { anchors: Object.freeze([...event.payload.anchors]) } : {}),
+        ...(event.payload.respondsTo !== undefined ? { respondsTo: event.payload.respondsTo } : {}),
+        ts: event.ts,
+      };
+      (terminalSeen ? ignoredContributions : contributions).push(record);
     } else if (event.type === 'driver-disposition-recorded') {
+      // A disposition naming a contribution is what RESOLVES it. Collected
+      // only while the session is pre-terminal, on the same footing as every
+      // other post-terminal neutralization here: a disposition that reached
+      // disk after the session closed cannot change what the closed session
+      // had settled.
+      if (!terminalSeen && event.payload.targetRef.startsWith(CONTRIBUTION_REF_PREFIX)) {
+        resolvedContributionIds.add(event.payload.targetRef.slice(CONTRIBUTION_REF_PREFIX.length));
+      }
       dispositions.push({
         targetRef: event.payload.targetRef,
         disposition: event.payload.disposition,
@@ -418,6 +503,14 @@ export function replaySession(coordinationId, opts = {}) {
     dispositions: Object.freeze(dispositions.map((record) => Object.freeze(record))),
     aggregations: Object.freeze(aggregations.map((record) => Object.freeze(record))),
     ignoredAggregations: Object.freeze(ignoredAggregations.map((record) => Object.freeze(record))),
+    contributions: Object.freeze(contributions.map((record) => Object.freeze(record))),
+    ignoredContributions: Object.freeze(ignoredContributions.map((record) => Object.freeze(record))),
+    // Open/resolved, derived here and nowhere else. A disposition naming a
+    // contribution this session never linked resolves nothing (the write door
+    // refuses one, and this intersection refuses it again on a hand-written
+    // log), so the two lists always partition the linked set exactly.
+    resolvedContributionIds: Object.freeze(contributions.filter((c) => resolvedContributionIds.has(c.contributionId)).map((c) => c.contributionId)),
+    openContributionIds: Object.freeze(contributions.filter((c) => !resolvedContributionIds.has(c.contributionId)).map((c) => c.contributionId)),
     sessionDir,
   });
 }

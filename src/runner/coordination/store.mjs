@@ -30,7 +30,9 @@ import {
   validateEventPayload,
   applyAggregateBoundDefaults,
   assertSchemaVersionCurrent,
+  CONTRIBUTION_REF_PREFIX,
 } from './schema.mjs';
+import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 
 // Same retry ceiling as mission-lite.mjs's own MAX_ASSIGNMENT_CLAIM_ATTEMPTS
 // / assignment.mjs's MAX_ASSIGNMENT_ID_CLAIM_ATTEMPTS -- a local constant,
@@ -1009,9 +1011,25 @@ export function authorizeOperation(
 // resembles an id but resolves to nothing on disk is left alone -- this
 // codebase has no artifact registry to resolve it against, matching the
 // established precedent exactly rather than inventing a stronger guarantee.
-function assertDispositionRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, label }) {
+// Phase 08 (MVP8): `contributionIds` is the set of contribution ids THIS
+// session's own log has linked, supplied by the caller that already holds the
+// lock and has read the events. A ref in the reserved `contribution:`
+// namespace must name one of them. Passing no set at all means the caller
+// knows of no contributions, in which case every `contribution:` ref is
+// refused -- fail-closed, never "unchecked because unknown".
+function assertDispositionRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, label, contributionIds = new Set() }) {
   if (typeof ref !== 'string') {
     throw new CoordinationError('validation', `${label}: ref must be a string, got ${typeof ref}`);
+  }
+  if (ref.startsWith(CONTRIBUTION_REF_PREFIX)) {
+    const contributionId = ref.slice(CONTRIBUTION_REF_PREFIX.length);
+    if (!contributionIds.has(contributionId)) {
+      throw new CoordinationError(
+        'dangling-ref',
+        `${label}: ref "${ref}" names contribution "${contributionId}", which coordination session "${coordinationId}" never linked -- a disposition may only target a contribution of its own session`,
+      );
+    }
+    return;
   }
   for (const segment of ref.split(/[\\/]/).filter(Boolean)) {
     if (segment !== coordinationId && fs.existsSync(path.join(fgosDir, 'coordination', 'sessions', segment, 'session.json'))) {
@@ -1078,11 +1096,17 @@ export function recordDriverDisposition(coordinationId, { targetRef, disposition
       subject: 'a disposition',
     });
 
+    // Read once, lock-held, so a `contribution:` ref is resolved against the
+    // log as it actually is at the moment the disposition is written -- never
+    // against a snapshot taken before the lock.
+    const eventsForRefs = readEvents(eventsPath);
+    const contributionIds = linkedContributionIds(eventsForRefs);
     assertDispositionRefOwnedBySession(targetRef, {
       coordinationId,
       assignmentRefs: manifest.assignmentRefs,
       fgosDir,
       label: 'recordDriverDisposition: targetRef',
+      contributionIds,
     });
     evidenceRefs.forEach((ref, i) =>
       assertDispositionRefOwnedBySession(ref, {
@@ -1090,6 +1114,7 @@ export function recordDriverDisposition(coordinationId, { targetRef, disposition
         assignmentRefs: manifest.assignmentRefs,
         fgosDir,
         label: `recordDriverDisposition: evidenceRefs[${i}]`,
+        contributionIds,
       }),
     );
 
@@ -1104,12 +1129,177 @@ export function recordDriverDisposition(coordinationId, { targetRef, disposition
     const canonicalize = (value) =>
       JSON.stringify({ ...value, authorizedBy: { type: value.authorizedBy?.type, id: value.authorizedBy?.id } });
     const serialized = canonicalize(payload);
-    const alreadyRecorded = readEvents(eventsPath).some(
+    const alreadyRecorded = eventsForRefs.some(
       (event) => event.type === 'driver-disposition-recorded' && canonicalize(event.payload) === serialized,
     );
     if (alreadyRecorded) return Object.freeze({ ...payload, appended: false });
 
     appendEventLocked(eventsPath, { type: 'driver-disposition-recorded', payload }, sessionDir);
+    return Object.freeze({ ...payload, appended: true });
+  });
+}
+
+/**
+ * Every contribution id this session's log has LINKED, in log order. The one
+ * place that answers "is this a contribution of mine" -- used by the
+ * disposition door's `contribution:` ref check and by the contribution door's
+ * own duplicate/lineage checks, so both read the same ledger the same way.
+ */
+function linkedContributionIds(events) {
+  const ids = new Set();
+  for (const event of events) {
+    if (event.type === 'deliberation-contribution-linked') ids.add(event.payload.contributionId);
+  }
+  return ids;
+}
+
+/**
+ * Map<contributionId, {sessionId, respondsTo?}> over the contributions this
+ * session's log has linked -- the real-ledger `knownContributions` input
+ * P08.1's `validateContributionLineage` was designed to receive from a caller
+ * that HAS a session (`deliberation/schema.mjs` has no store access by
+ * design). Every entry carries this session's own id, so a foreign-session
+ * lineage ref is impossible by construction rather than by a second check.
+ */
+export function knownContributionsFromEvents(events, coordinationId) {
+  const known = new Map();
+  for (const event of events) {
+    if (event.type !== 'deliberation-contribution-linked') continue;
+    known.set(event.payload.contributionId, {
+      sessionId: coordinationId,
+      ...(event.payload.respondsTo !== undefined ? { respondsTo: event.payload.respondsTo } : {}),
+    });
+  }
+  return known;
+}
+
+/**
+ * Re-raise a `DeliberationError` from P08.1's validators as the
+ * `CoordinationError` every caller of this module already handles. The
+ * deliberation module is deliberately independent of this one and raises its
+ * own error type; letting that type escape `recordContributionLink` or
+ * `replaySession` would slip past every `err instanceof CoordinationError`
+ * handler in the codebase. The original category is preserved in the message.
+ */
+export function asCoordinationError(err, context) {
+  if (!(err instanceof DeliberationError)) throw err;
+  const category = err.category.startsWith('dangling') ? 'dangling-ref' : 'validation';
+  throw new CoordinationError(category, `${context}: ${err.message} (deliberation category "${err.category}")`);
+}
+
+/**
+ * Append one `deliberation-contribution-linked` event: one typed contribution
+ * linked into this session's deliberation ledger (MVP8).
+ *
+ * Same door shape as `recordDriverDisposition`/`recordAggregationValidation`
+ * above -- payload shape validated first, then manifest read + active-status
+ * check + driver-identity pin + append, all inside ONE `withEventsLock`
+ * critical section.
+ *
+ * What this door can check, and does:
+ * - **The artifact is pinned, never copied.** The payload carries
+ *   `artifactRef` + `revision` and no artifact content; the shape whitelist in
+ *   `schema.mjs` makes any content-bearing field unrepresentable.
+ * - **The provenance is this session's own.** `assignmentId` must be a member
+ *   of `manifest.assignmentRefs` (exact membership, as
+ *   `recordAggregationValidation` requires of its sources), and `runId` must
+ *   have the full `run_<assignmentId>_<digits>` shape of a Run of that
+ *   Assignment -- never a prefix-only check (R6).
+ * - **The lineage resolves inside this session.** `anchors[]`/`respondsTo` are
+ *   checked with P08.1's OWN `validateAnchors`/`validateResponseLineage`
+ *   against a `knownContributions` map built from this log, so a dangling or
+ *   cyclic lineage ref is refused here and not only at replay.
+ * - **A contribution id is claimed once.** A byte-identical repeat is an
+ *   idempotent no-op (crash-resume self-heal); the same id carrying anything
+ *   different is a hard `duplicate-ref`. This closes the duplicate-id gap
+ *   P08.1's own trace named as a P08.2 ledger-layer obligation.
+ *
+ * What this door structurally CANNOT check, and does not pretend to: whether
+ * the contribution's `type` is one this operation declares, and whether its
+ * `visibilityWindowRef` names a window that is open. Both need the bound
+ * FlowDefinition, which lives one layer up -- `session-engine.mjs`'s
+ * `linkSessionContribution` is the mediated door that derives every one of
+ * those values from the session itself and takes none of them from a caller.
+ */
+export function recordContributionLink(
+  coordinationId,
+  { contributionId, operationRef, type, assignmentId, runId, artifactRef, revision, roundKey, visibilityWindowRef, anchors, respondsTo, linkedBy },
+  opts = {},
+) {
+  const { fgosDir, sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const payload = {
+    contributionId,
+    operationRef,
+    type,
+    assignmentId,
+    runId,
+    artifactRef,
+    revision,
+    roundKey,
+    visibilityWindowRef,
+    linkedBy,
+    ...(anchors !== undefined ? { anchors } : {}),
+    ...(respondsTo !== undefined ? { respondsTo } : {}),
+  };
+  validateEventPayload('deliberation-contribution-linked', payload);
+
+  return withEventsLock(eventsPath, () => {
+    const manifest = readManifestRaw(manifestPath);
+    assertSchemaVersionCurrent(manifest, manifestPath);
+    if (manifest.status !== 'active') {
+      throw new CoordinationError(
+        'validation',
+        `recordContributionLink: session "${coordinationId}" is not active (status: "${manifest.status}") -- a contribution cannot be linked into a session that has already closed`,
+      );
+    }
+    assertDriverIdentity(manifest, linkedBy, {
+      coordinationId,
+      label: 'recordContributionLink',
+      subject: 'a linked contribution',
+    });
+
+    if (!manifest.assignmentRefs.includes(assignmentId)) {
+      throw new CoordinationError(
+        'foreign-ref',
+        `recordContributionLink: assignmentId "${assignmentId}" is not an Assignment of session "${coordinationId}" -- a contribution may only be backed by this session's own work`,
+      );
+    }
+    assertValidRunIdForAssignment(assignmentId, runId, 'recordContributionLink');
+    assertDispositionRefOwnedBySession(artifactRef, {
+      coordinationId,
+      assignmentRefs: manifest.assignmentRefs,
+      fgosDir,
+      label: 'recordContributionLink: artifactRef',
+    });
+
+    const events = readEvents(eventsPath);
+    const prior = events.find(
+      (event) => event.type === 'deliberation-contribution-linked' && event.payload?.contributionId === contributionId,
+    );
+    if (prior) {
+      const canonicalize = (value) =>
+        JSON.stringify({ ...value, linkedBy: { type: value.linkedBy?.type, id: value.linkedBy?.id } });
+      if (canonicalize(prior.payload) === canonicalize(payload)) return Object.freeze({ ...payload, appended: false });
+      throw new CoordinationError(
+        'duplicate-ref',
+        `recordContributionLink: contributionId "${contributionId}" in session "${coordinationId}" was already linked with different content -- a contribution link is immutable; record a new contributionId instead`,
+      );
+    }
+
+    // P08.1's own lineage validators, called (never forked) against the real
+    // ledger. The candidate's own id is deliberately absent from this map --
+    // it has not been appended yet -- so a self-anchor or a self-response is a
+    // dangling ref here, and a lineage cycle cannot be built at all: every ref
+    // must already exist, and an append-only log has no back edges.
+    const known = knownContributionsFromEvents(events, coordinationId);
+    try {
+      validateAnchors(payload, known, coordinationId);
+      validateResponseLineage(payload, known, coordinationId);
+    } catch (err) {
+      asCoordinationError(err, `recordContributionLink: session "${coordinationId}" contribution "${contributionId}"`);
+    }
+
+    appendEventLocked(eventsPath, { type: 'deliberation-contribution-linked', payload }, sessionDir);
     return Object.freeze({ ...payload, appended: true });
   });
 }
