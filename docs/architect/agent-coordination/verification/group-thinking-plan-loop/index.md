@@ -83,11 +83,27 @@ that introduced it.
 
 | Cell | Status | Owner | Worktree | Next action |
 |---|---|---|---|---|
-| P01.1 | in-progress | Doer (dispatching) | (to be created) | doer |
-| P02.1 | in-progress | Doer (dispatching) | (to be created) | doer |
+| P01.1 | in-progress | Doer (running) | `.claude/worktrees/agent-ab7ff2ac5eda7a106` / `worktree-agent-ab7ff2ac5eda7a106` | doer |
+| P02.1 | review-needed | Coordinator | `.claude/worktrees/agent-a1cf5464f865986fb` / `worktree-agent-a1cf5464f865986fb` @ `42af6508` | reviewer+red-team (dispatching, parallel) |
+
+## Known non-blocking environment finding (repo-wide, not this track's scope)
+
+`test/runner/coordination-static.test.mjs`'s `FORBIDDEN_IMPORT_SUBSTRINGS`
+check matches the literal string "worktree" against each import's fully
+RESOLVED ABSOLUTE PATH, not the specifier — so it false-fails whenever the
+checkout itself lives under a `.claude/worktrees/agent-*`-style path (this
+repo's own dispatch convention). Confirmed independently by the
+Coordinator: fails in the P02.1 worktree, passes cleanly (2/2) at the main
+checkout. Not caused by any cell in this track. Worth a standalone repo
+bug fix (match against the specifier or a path relative to repo root
+instead) — out of scope for this track's own cells; the Coordinator
+verifies each cell's full-suite run from the MAIN checkout going forward
+to avoid this false signal, and will file it as a backlog item separately
+from this track's own coordination.
 
 ## Next action
 
-Dispatch independent Doers concurrently in isolated worktrees (Wave 1).
+P01.1 Doer still running. P02.1 verified by Coordinator, dispatching
+independent Reviewer + Red-Team in parallel now.
 current-cell contracts: `current-cell-P01.1.md`, `current-cell-P02.1.md`.
 Cell traces: `P01.1.md`, `P02.1.md`.
