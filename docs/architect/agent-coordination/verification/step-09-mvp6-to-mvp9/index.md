@@ -137,7 +137,7 @@ own 5-bypass structural reasoning).
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
-| P10.1 | Phase 10 pack registry, fgos-group-thinking skill, public surface (opens Phase 10; 1 HIGH fixed) | done | (pending commit) |
+| P10.1 | Phase 10 pack registry, fgos-group-thinking skill, public surface (opens Phase 10; 1 HIGH fixed) | done | `9b91aa9f` |
 | P09.3 | Phase 09 negative and recovery proof (closes Phase 09; 1 MEDIUM fixed) | done | `52c05597` |
 | P09.2 | Phase 09 specialist authorization, binding, replay (1 HIGH fixed, independently rechecked) | done | `efe1bc68` |
 | P08.3 | Phase 08 method-shaped proofs + allowedTypes[] schema close (closes Phase 08; 1 LOW fixed) | done | `f9c98501` |
