@@ -132,3 +132,60 @@ shape `tsk-5ge` used for its own `.fgos/`-touching change — never through
 a worker branch. The first landing attempt hit a `verify-miss` friction
 event (goal-check failed on `main`, exit 1); the retry passed, confirming
 `agy-herdr` wiring live and `npm test` green.
+
+## A second, opt-in completion-detection mode for real interactive TUIs (`tsk-10j`)
+
+`tsk-5jl`/`tsk-2ii` deliberately kept `agy-herdr` on `agy -p` (headless)
+rather than `agy -i` (real interactive mode), because `-p` gives a
+deterministic subprocess exit code the sentinel mechanism needs, at the
+cost of a plain non-interactive-looking pane. `tsk-10j` designed and
+shipped a second, config-selected completion-detection path so a person
+watching the pane sees `agy`'s real rich TUI (banner, live spinner,
+box-drawn status bar) instead of a `-p` text dump, while still returning
+a correct, deterministic `{status, stdout}`.
+
+**What was live-verified before design, not guessed:** `agy -i` never
+exits on its own after answering (process stays alive, sitting at its own
+"? for shortcuts" idle prompt) — confirmed by process listing. Asking the
+model itself to run `/exit` fails; `agy` explicitly refuses ("I cannot
+directly execute slash commands"), confirming slash commands are
+UI-input-layer only. An *external* `herdr pane run` typing `/exit` into
+the pane from the herdr side, after the model goes idle, does make the
+process genuinely terminate, returns to a plain shell prompt, and a
+follow-up pane-run echoing the shell's own exit status captures the real
+underlying exit code. Naively grepping the pane's raw text for a
+first-match completion token is unreliable the same way the pre-`tsk-5jl`
+sentinel design already learned: an instruction like "print token X when
+done" gets echoed into the pane by the interactive UI itself, producing a
+false-positive match while the model is still visibly generating — the
+real completion only shows up as the *second* occurrence, correlating
+with the status bar's own "Generating…"/"Working…" → idle transition. The
+item's own discovery-stage research found the reliable signal instead:
+`herdr pane list`/`get` exposes a structured `agent_status` field
+(`"working"` → `"idle"`) for the pane's detected foreground process — any
+correct implementation of this mode must anchor on that structured field,
+never raw-text token matching.
+
+**Shape of what shipped:** an adapter-driven two-phase sequence, selected
+per-executor by config (`interactiveMode`, additive alongside the
+existing `liveOutput` field, never a replacement): (1) type
+`agy -i {prompt}` straight into the fresh pane — no disposable wrapper
+script for this path, the prompt is the model's real first interactive
+turn; (2) poll `herdr pane get`'s `agent_status` field for the
+`working → idle` transition instead of text-matching; (3) once idle, send
+a second `herdr pane run` typing `/exit`, wait for the shell prompt to
+return; (4) send a third `herdr pane run` echoing a sentinel plus the
+real shell exit status, parse it, close the pane. Scope stayed bounded to
+`executors.agy-herdr` only — `agy`'s own verified interactive-mode/idle-
+signal/external-exit behavior does not automatically generalize to
+`claude-herdr`/`pi-herdr`/`codex-herdr`, each of which would need the same
+kind of live verification separately before adopting this mode. The
+existing sentinel-based default path (what every other executor still
+uses) is untouched — this is a new, additional, opt-in detection mode.
+
+Landed via `fgw/tsk-10j` (merged `761cc571`); the Iron Law gate required
+proof and was satisfied via `--acknowledge-iron-law` with a
+failing-test-first sequence across `config.mjs`/`resolve.mjs`/
+`transport.mjs`/`cli.mjs`. First return attempt hit the same detached-
+worktree `.fgos/`-presence `verify-miss` friction pattern documented
+elsewhere in this doc's own `tsk-2ii` section; the retry passed clean.
