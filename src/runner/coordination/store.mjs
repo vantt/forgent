@@ -993,7 +993,147 @@ export function authorizeOperation(
       }
     }
 
+    // Phase 09 (P09.2): opt-in specialist-invocation cap, forwarded by
+    // session-engine.mjs's `authorizeDeclaredOperation` only when the
+    // resolved binding is filled by an authorized specialist -- the SAME
+    // opt-in shape as `maxInvocationsForBinding` above, one lock-held count
+    // against fresh on-disk events, just keyed by `targetActorId` ALONE
+    // rather than the full (nodeId, operationId, targetActorId) triple.
+    // A specialist's own `specialist-authorized.maxAssignments` bounds its
+    // TOTAL invocation allowance across every operationRefs[] its slot
+    // declares, not one binding at a time -- a specialist filling two
+    // different operations in the same slot must not get
+    // `maxInvocationsForBinding`-many invocations on EACH independently,
+    // which is exactly what the narrower per-triple count above would allow.
+    if (opts.maxAssignmentsForSpecialist !== undefined) {
+      const { specialistActorId: capActorId, cap } = opts.maxAssignmentsForSpecialist;
+      const alreadyAuthorizedForSpecialist = events.filter(
+        (event) => event.type === 'operation-authorized' && event.payload?.targetActorId === capActorId,
+      ).length;
+      if (alreadyAuthorizedForSpecialist >= cap) {
+        throw new CoordinationError(
+          'validation',
+          `authorizeOperation: specialist actor "${capActorId}" in session "${coordinationId}" already has ${alreadyAuthorizedForSpecialist} "operation-authorized" event(s), at or above its specialist authorization's declared maxAssignments cap of ${cap} -- refusing to authorize another invocation`,
+        );
+      }
+    }
+
     appendEventLocked(eventsPath, { type: 'operation-authorized', payload }, sessionDir);
+    return Object.freeze({ ...payload, appended: true });
+  });
+}
+
+/**
+ * Append one `specialist-authorized` event, binding a previously-unknown
+ * `specialistActorId` to a declared `topology.specialistSlots[]` slot
+ * (Phase 09, P09.2).
+ *
+ * ONE event does BOTH jobs the phase's own requirement names ("atomically
+ * record authorization and session-scoped actor binding before any
+ * Assignment is issued") -- there is no separate `specialist-bound` event
+ * and no second write for this door to interleave with. This is the reason
+ * `specialist-authorized` is not built the way `replaceSessionActor` builds
+ * an actor replacement (a `bindActor` call followed by a SEPARATE
+ * `recordActorReplacement` call, two appends with a real window between
+ * them): a specialist slot's occupant is not a `spec.actors[]` SessionActor
+ * at all (it is never in `manifest.actors[]`, never reachable through
+ * `bindActor`), so there is no second store structure for a second write to
+ * populate. One `appendEventLocked` call is the whole binding.
+ *
+ * This door validates SHAPE, session status, driver identity, and (opt-in)
+ * the slot's own `maxBindings` cap -- the SAME "shape + session, definition
+ * awareness stays with the caller" split `authorizeOperation` already takes.
+ * Whether `slotId` names a real slot, whether `role`/`capabilities` satisfy
+ * that slot's own declared `role`/`requiredCapabilities`, is a question only
+ * a caller holding the FlowDefinition can answer -- `session-engine.mjs`'s
+ * `authorizeSpecialistSlot` is that caller.
+ *
+ * Idempotent on `specialistAuthorizationId`, mirroring `authorizeOperation`.
+ *
+ * `opts.maxBindingsForSlot: { slotId, cap }` is opt-in, forwarded by the
+ * definition-aware caller that can read `specialistSlots[].maxBindings`.
+ * Counted as the number of DISTINCT `specialistActorId` values ever
+ * authorized for `slotId` across this session's whole history (never
+ * decremented by a later supersession or expiry) -- a slot's `maxBindings`
+ * is a hard ceiling on how many times its occupant may ever be
+ * swapped/recruited, not a concurrency limit (a slot has exactly one LIVE
+ * occupant at a time by construction: the most recent, non-expired
+ * `specialist-authorized` record for that `slotId` -- see
+ * `resolveLiveSpecialistBindings`, session-engine.mjs). A repeat
+ * authorization for an ALREADY-SEEN `specialistActorId` (e.g. extending an
+ * existing specialist's own cap) does not consume a new binding.
+ */
+export function recordSpecialistAuthorization(
+  coordinationId,
+  {
+    specialistAuthorizationId,
+    slotId,
+    specialistActorId,
+    role,
+    capabilities,
+    authorizedBy,
+    reason,
+    triggerEvidenceRefs,
+    allowedContextRefs,
+    maxAssignments,
+    expiresAfterRound,
+  },
+  opts = {},
+) {
+  const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const payload = {
+    specialistAuthorizationId,
+    slotId,
+    specialistActorId,
+    role,
+    capabilities,
+    authorizedBy,
+    reason,
+    triggerEvidenceRefs,
+    allowedContextRefs,
+    maxAssignments,
+    expiresAfterRound,
+  };
+  validateEventPayload('specialist-authorized', payload);
+
+  return withEventsLock(eventsPath, () => {
+    const manifest = readManifestRaw(manifestPath);
+    assertSchemaVersionCurrent(manifest, manifestPath);
+    if (manifest.status !== 'active') {
+      throw new CoordinationError(
+        'validation',
+        `recordSpecialistAuthorization: session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot authorize a specialist once new materialization has stopped`,
+      );
+    }
+
+    assertDriverIdentity(manifest, authorizedBy, {
+      coordinationId,
+      label: 'recordSpecialistAuthorization',
+      subject: 'a specialist authorization',
+    });
+
+    const events = readEvents(eventsPath);
+    const alreadyAuthorized = events.some(
+      (event) => event.type === 'specialist-authorized' && event.payload?.specialistAuthorizationId === specialistAuthorizationId,
+    );
+    if (alreadyAuthorized) return Object.freeze({ ...payload, appended: false });
+
+    if (opts.maxBindingsForSlot !== undefined) {
+      const { slotId: capSlotId, cap } = opts.maxBindingsForSlot;
+      const distinctActorsForSlot = new Set(
+        events
+          .filter((event) => event.type === 'specialist-authorized' && event.payload?.slotId === capSlotId)
+          .map((event) => event.payload.specialistActorId),
+      );
+      if (!distinctActorsForSlot.has(specialistActorId) && distinctActorsForSlot.size >= cap) {
+        throw new CoordinationError(
+          'validation',
+          `recordSpecialistAuthorization: specialist slot "${capSlotId}" in session "${coordinationId}" already has ${distinctActorsForSlot.size} distinct specialist actor(s) authorized, at or above its declared maxBindings cap of ${cap} -- refusing to authorize a new specialist actor "${specialistActorId}" for this slot`,
+        );
+      }
+    }
+
+    appendEventLocked(eventsPath, { type: 'specialist-authorized', payload }, sessionDir);
     return Object.freeze({ ...payload, appended: true });
   });
 }

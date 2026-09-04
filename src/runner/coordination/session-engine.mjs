@@ -63,6 +63,7 @@ import {
   assertValidRunIdForAssignment,
   recordAggregationValidation,
   recordContributionLink,
+  recordSpecialistAuthorization,
   knownContributionsFromEvents,
   asCoordinationError,
 } from './store.mjs';
@@ -854,7 +855,127 @@ function resolveDeclaredPolicyStack(scopeStack) {
  * keeps the exact prior behavior (first match across all nodes, in graph
  * order) byte-for-byte unchanged.
  */
-function resolveDeclaredOperationActor(definition, operationId, targetActorId) {
+/**
+ * `true` when `operationId` is wired, ANYWHERE in `definition`'s graph, to a
+ * binding that names `specialistSlotRef` rather than a static `actor`.
+ *
+ * A cheap, definition-only pre-check (no I/O) so `authorizeDeclaredOperation`/
+ * `dispatchDeclaredOperation` only ever pay for a `replaySession()` call
+ * when a specialist-slot binding is actually in play -- every pre-P09.2
+ * fixture (no `specialistSlotRef` anywhere) takes byte-for-byte the same
+ * path it always did, with zero extra replay cost.
+ */
+function definitionOperationUsesSpecialistSlot(definition, operationId) {
+  for (const node of definition.spec.graph.nodes) {
+    for (const ref of node.operations) {
+      if (ref.ref === operationId && ref.specialistSlotRef !== undefined) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * The session-wide "current round" used ONLY to gate specialist-slot
+ * liveness (`resolveLiveSpecialistBindings`, below) -- never the same value
+ * as `dispatchDeclaredOperation`'s own caller-supplied `round` parameter,
+ * which remains a per-edge taskKey/maxRounds disambiguator unrelated to this
+ * gate (see that function's own doc comment).
+ *
+ * Round-1 fix (Phase 09 P09.2, post-Red-Team): the ORIGINAL P09.2 shape
+ * reused `dispatchDeclaredOperation`'s caller-supplied `round` for this gate
+ * too. The one real production caller (`src/verbs/coordination/run.mjs`'s
+ * "authorize" step) never forwarded `step.round` at all, so it always
+ * defaulted to `1` -- and since `expiresAfterRound` is schema-validated as a
+ * positive integer (always >= 1), that default structurally NEVER expired
+ * anything through the real request-step path, no matter how much real
+ * session progress had elapsed. Trusting a caller-supplied number for a
+ * legality decision is exactly the bug class this track has already closed
+ * four times (P06.2, P07.3, P07.4, P08.2); this gate now derives its own
+ * round purely from replayed session state instead, with no caller input at
+ * all.
+ *
+ * Derivation: one plus the count of `assignment-created` events already in
+ * this session, session-wide (not scoped to any one actor/slot). This is a
+ * real, monotonic quantity -- it can only ever increase, and only when a
+ * real Assignment actually materializes -- so it cannot be gamed by a
+ * caller the way a bare parameter could. It starts at 1 for a brand-new
+ * session (matching the pre-fix default's own round-1 starting point, so an
+ * authorization with `expiresAfterRound: 1` is still live for the session's
+ * very first Assignment), and advances to 2 the moment that first Assignment
+ * is created -- so `expiresAfterRound: 1` correctly means "good for exactly
+ * one Assignment, session-wide, then expired."
+ *
+ * @param {ReturnType<import('./replay.mjs').replaySession>} replayed
+ * @returns {number}
+ */
+function resolveCurrentSessionRound(replayed) {
+  return replayed.events.filter((event) => event.type === 'assignment-created').length + 1;
+}
+
+/**
+ * The specialist currently bound to each `topology.specialistSlots[]` slot,
+ * for dispatch purposes, "now" meaning the REAL, internally-derived current
+ * round (`resolveCurrentSessionRound`, above; Phase 09, P09.2, round-1 fix).
+ *
+ * "Live" is derived, never stored: the LAST (most recent, log-order)
+ * pre-terminal `specialist-authorized` record for a given `slotId` is that
+ * slot's current occupant -- a later authorization for the SAME slot IS the
+ * supersession signal (mirroring `actor-replaced`'s own "last wins"
+ * semantics, `buildActorReplacementMap` elsewhere in this file), so there
+ * is no separate "specialist-superseded" event to look for. A slot with no
+ * `specialist-authorized` record at all is simply absent from the returned
+ * map.
+ *
+ * Expiry ("`expiresAfterRound` prevents future Assignments but never erases
+ * actor/event history") is applied HERE, as a pure filter on the read side,
+ * never by rewriting or deleting the authorization event: a slot whose
+ * current authorization's `expiresAfterRound` is behind the real, derived
+ * current round is treated as having no live occupant right now --
+ * `resolveDeclaredOperationActor`'s existing "no specialist is currently
+ * bound to that slot" refusal covers it for free, with no separate
+ * expiry-specific error path to maintain. The expired record itself is
+ * untouched in `replayed.specialistAuthorizations` and remains fully
+ * inspectable there.
+ *
+ * Deliberately takes NO caller-supplied `round` at all (unlike the original
+ * P09.2 shape) -- see `resolveCurrentSessionRound`'s own doc comment for
+ * why a caller-trusted value is never acceptable for this specific legality
+ * decision.
+ *
+ * @param {ReturnType<import('./replay.mjs').replaySession>} replayed
+ * @returns {Map<string, object>} slotId -> live specialistAuthorization record
+ */
+export function resolveLiveSpecialistBindings(replayed) {
+  const round = resolveCurrentSessionRound(replayed);
+  const currentBySlot = new Map();
+  for (const record of replayed.specialistAuthorizations) {
+    currentBySlot.set(record.slotId, record); // log order: last write wins
+  }
+  const live = new Map();
+  for (const [slotId, record] of currentBySlot) {
+    if (round <= record.expiresAfterRound) live.set(slotId, record);
+  }
+  return live;
+}
+
+/**
+ * Resolve the node-operation binding for `operationId` (optionally pinned to
+ * `targetActorId`) into a concrete actor -- either a statically declared
+ * `spec.actors[]` entry (`binding.actor`), or the currently-live specialist
+ * bound to a declared slot (`binding.specialistSlotRef`, resolved against
+ * `specialistBindings`, Phase 09 P09.2). This function stays pure/
+ * definition-only: it does no I/O of its own, so a `specialistSlotRef`
+ * binding is resolvable only when its CALLER already took a fresh
+ * `replaySession()` and passed the live bindings in via
+ * `resolveLiveSpecialistBindings` -- the exact same "caller reads the
+ * session, this function only reasons about the definition" split
+ * `deriveVisibilityWindowState`'s callers already follow.
+ *
+ * `specialistBindings` defaults to an empty Map, under which this function
+ * is byte-for-byte identical to its pre-P09.2 behavior: no fixture without a
+ * `specialistSlotRef` binding anywhere can observe any difference.
+ */
+function resolveDeclaredOperationActor(definition, operationId, targetActorId, specialistBindings = new Map()) {
   const operation = definition.spec.operations.find((op) => op.id === operationId);
   if (!operation) {
     throw new CoordinationError(
@@ -869,8 +990,29 @@ function resolveDeclaredOperationActor(definition, operationId, targetActorId) {
       if (ref.ref === operationId) matches.push({ node, ref });
     }
   }
-  const picked = targetActorId !== undefined ? matches.find((m) => m.ref.actor === targetActorId) : matches[0];
+  // The effective actor id a binding currently resolves to -- a static
+  // `actor` resolves to itself; a `specialistSlotRef` resolves to whichever
+  // specialist is currently live for that slot (or `undefined`, if none is).
+  // Matching by this derived id, rather than by `ref.actor` alone, is what
+  // lets a caller find a specialist-filled binding by `targetActorId` the
+  // exact same way it already finds a statically-bound one.
+  const effectiveActorIdOf = (ref) =>
+    ref.actor !== undefined ? ref.actor : ref.specialistSlotRef !== undefined ? specialistBindings.get(ref.specialistSlotRef)?.specialistActorId : undefined;
+
+  const picked = targetActorId !== undefined ? matches.find((m) => effectiveActorIdOf(m.ref) === targetActorId) : matches[0];
   if (!picked) {
+    // A `targetActorId` that names the specialist a slot-bound ref USED to
+    // (or will) resolve to, but does not RIGHT NOW (no live binding, or an
+    // expired one), gets its own more actionable refusal instead of the
+    // generic "not wired" message below -- the binding IS wired to that
+    // slot, it simply has no live occupant this round.
+    const unboundSlotMatch = matches.find((m) => m.ref.specialistSlotRef !== undefined && specialistBindings.get(m.ref.specialistSlotRef) === undefined);
+    if (targetActorId !== undefined && unboundSlotMatch) {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: operation "${operationId}" at node "${unboundSlotMatch.node.id}" is bound to specialist slot "${unboundSlotMatch.ref.specialistSlotRef}" -- no specialist is currently authorized for that slot in this session (or its authorization has expired), so this materialization requires an authorized specialist actor first`,
+      );
+    }
     throw new CoordinationError(
       'validation',
       targetActorId !== undefined
@@ -879,19 +1021,36 @@ function resolveDeclaredOperationActor(definition, operationId, targetActorId) {
     );
   }
   const { node: matchedNode, ref: matchedRef } = picked;
-  if (!matchedRef.actor) {
+
+  let actorEntry;
+  if (matchedRef.specialistSlotRef !== undefined) {
+    const bound = specialistBindings.get(matchedRef.specialistSlotRef);
+    if (!bound) {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: operation "${operationId}" at node "${matchedNode.id}" is bound to specialist slot "${matchedRef.specialistSlotRef}" -- no specialist is currently authorized for that slot in this session (or its authorization has expired), so this materialization requires an authorized specialist actor first`,
+      );
+    }
+    // Synthesized, not looked up in `spec.actors[]` -- a specialist is by
+    // definition a previously-unknown identity the static actor roster
+    // never declared. `id`/`role` are the only two fields any caller below
+    // reads off an `actorEntry` (`persona`/`policy` are never populated for
+    // a specialist; `dispatchDeclaredOperation`'s own policy stack reads
+    // `actorEntry.policy ?? {}`, which degrades cleanly to `{}`).
+    actorEntry = Object.freeze({ id: bound.specialistActorId, role: bound.role });
+  } else if (matchedRef.actor === undefined) {
     throw new CoordinationError(
       'validation',
       `dispatchDeclaredOperation: operation "${operationId}" is role-only (no actor binding at node "${matchedNode.id}") -- this materialization requires a bound SessionActor`,
     );
-  }
-
-  const actorEntry = (definition.spec.actors ?? []).find((a) => a.id === matchedRef.actor);
-  if (!actorEntry) {
-    throw new CoordinationError(
-      'validation',
-      `dispatchDeclaredOperation: operation "${operationId}" node "${matchedNode.id}" references actor "${matchedRef.actor}", which is not declared in spec.actors`,
-    );
+  } else {
+    actorEntry = (definition.spec.actors ?? []).find((a) => a.id === matchedRef.actor);
+    if (!actorEntry) {
+      throw new CoordinationError(
+        'validation',
+        `dispatchDeclaredOperation: operation "${operationId}" node "${matchedNode.id}" references actor "${matchedRef.actor}", which is not declared in spec.actors`,
+      );
+    }
   }
   if (actorEntry.role !== operation.role) {
     throw new CoordinationError(
@@ -900,11 +1059,22 @@ function resolveDeclaredOperationActor(definition, operationId, targetActorId) {
     );
   }
 
-  // `binding` is the node-operation binding itself (`{ref, actor,
-  // activation?}`) -- the ONLY scope `activation` is ever declared at, so
-  // every caller that needs the activation mode reads it from here rather
-  // than from the shared `operation` template, which can never carry one.
-  return { operation, actorId: actorEntry.id, actorEntry, node: matchedNode, binding: matchedRef };
+  // `binding` is the node-operation binding itself (`{ref, actor|
+  // specialistSlotRef, activation?}`) -- the ONLY scope `activation` is
+  // ever declared at, so every caller that needs the activation mode reads
+  // it from here rather than from the shared `operation` template, which
+  // can never carry one. `specialistAuthorization`, when present, is the
+  // live `specialist-authorized` record this resolution used -- callers
+  // that need the specialist's own `maxAssignments` cap (authorization
+  // gating) read it from here rather than re-resolving it a second time.
+  return {
+    operation,
+    actorId: actorEntry.id,
+    actorEntry,
+    node: matchedNode,
+    binding: matchedRef,
+    ...(matchedRef.specialistSlotRef !== undefined ? { specialistAuthorization: specialistBindings.get(matchedRef.specialistSlotRef) } : {}),
+  };
 }
 
 /**
@@ -1340,6 +1510,158 @@ function peekClaimedAssignmentId(sessionDir, taskKey) {
 }
 
 /**
+ * Bind a previously-unknown `specialistActorId` to a declared
+ * `topology.specialistSlots[]` slot (Phase 09, P09.2), appending the
+ * `specialistAuthorizationId`-keyed `specialist-authorized` event.
+ *
+ * This is the definition-aware door `store.mjs`'s `recordSpecialistAuthorization`
+ * structurally cannot be on its own: it resolves `slotId` against the
+ * session's own bound protocol, and refuses an authorization that could
+ * never legally fill it --
+ *
+ * - `slotId` must name a real `topology.specialistSlots[]` entry.
+ * - `role` must equal that slot's own declared `role` exactly (mirrors
+ *   `resolveDeclaredOperationActor`'s existing actor/operation role-mismatch
+ *   gate -- a specialist whose role does not match could never be dispatched
+ *   for any of the slot's operations anyway).
+ * - `capabilities` must be a SUPERSET of the slot's own
+ *   `requiredCapabilities[]` (every capability the slot requires must be
+ *   among the ones this specialist is authorized with; a specialist may
+ *   carry MORE than the slot requires -- the slot names a floor, not a
+ *   ceiling).
+ * - `triggerEvidenceRefs`/`allowedContextRefs` must resolve to refs this
+ *   session actually owns -- the SAME `assertRefsOwnedBySession` check
+ *   `authorizeDeclaredOperation` already applies to `grantedContextRefs`,
+ *   reused rather than re-implemented (Bug Taxonomy: "Foreign context
+ *   refused... reusing assertRefsOwnedBySession, never a freshly-invented
+ *   check").
+ * - The slot's own `maxBindings` cap is forwarded to
+ *   `recordSpecialistAuthorization` as `opts.maxBindingsForSlot`, enforced
+ *   lock-held there against fresh on-disk events (see that function's doc
+ *   comment for exactly what "binding" counts).
+ *
+ * Driver-only: enforced by `recordSpecialistAuthorization`'s own
+ * `assertDriverIdentity` call (the SAME shared check `authorizeOperation`
+ * uses), not re-implemented here -- `authorizedBy.id` must equal this
+ * session's own `provenanceRoot.writerId`, so a worker/peer can never
+ * self-authorize into a slot.
+ *
+ * @param {string} coordinationId Must already have a non-null `definitionRef`.
+ * @param {object} params
+ * @param {string} params.slotId
+ * @param {string} params.specialistActorId The previously-unknown identity being recruited.
+ * @param {string} params.role Must equal the slot's own declared role.
+ * @param {string[]} [params.capabilities] Must be a superset of the slot's requiredCapabilities; defaults to none.
+ * @param {{type: 'driver', id: string}} params.authorizedBy
+ * @param {string} params.reason
+ * @param {string[]} [params.triggerEvidenceRefs] Session-owned refs; defaults to none.
+ * @param {string[]} [params.allowedContextRefs] Session-owned refs the specialist may read; defaults to none.
+ * @param {number} params.maxAssignments This authorization's own dispatch cap.
+ * @param {number} params.expiresAfterRound Last round this authorization may still authorize a new Assignment for.
+ * @param {string} params.specialistAuthorizationId Unique id for this authorization instance.
+ * @param {object} [opts] Workspace options ({ cwd, repoRoot, packageRoot })
+ */
+export function authorizeSpecialistSlot(
+  coordinationId,
+  {
+    slotId,
+    specialistActorId,
+    role,
+    capabilities = [],
+    authorizedBy,
+    reason,
+    triggerEvidenceRefs = [],
+    allowedContextRefs = [],
+    maxAssignments,
+    expiresAfterRound,
+    specialistAuthorizationId,
+  },
+  opts = {},
+) {
+  const manifest = readManifest(coordinationId, opts);
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no slot for an authorization to name`,
+    );
+  }
+  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to authorize against a drifted definition`,
+    );
+  }
+
+  const slot = (definition.spec.profile.topology?.specialistSlots ?? []).find((s) => s.id === slotId);
+  if (!slot) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: slot "${slotId}" is not declared in this protocol's spec.profile.topology.specialistSlots`,
+    );
+  }
+  if (role !== slot.role) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: role "${role}" does not match specialist slot "${slotId}"'s own declared role "${slot.role}" -- a specialist of this role could never be dispatched for any of the slot's operations`,
+    );
+  }
+  // Cheap identity-disjointness guard (Red-Team round 1, LOW/INFO): a
+  // specialist is by definition a previously-unknown identity, never one of
+  // the protocol's own statically-declared `spec.actors[]`. No exploit was
+  // constructed through the real doors (operation-id-scoped matching plus
+  // per-operation role invariance already blocks the paths tried), but
+  // refusing the collision outright at authorization time is free here and
+  // keeps a specialist's synthesized `actorEntry` (`resolveDeclaredOperationActor`)
+  // from ever aliasing a real, statically-bound actor id.
+  if ((definition.spec.actors ?? []).some((actorEntry) => actorEntry.id === specialistActorId)) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: specialistActorId "${specialistActorId}" collides with a statically-declared spec.actors[] id -- a specialist must be a previously-unknown identity`,
+    );
+  }
+  const missingCapabilities = slot.requiredCapabilities.filter((cap) => !capabilities.includes(cap));
+  if (missingCapabilities.length > 0) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: capabilities [${capabilities.join(', ')}] do not satisfy specialist slot "${slotId}"'s own declared requiredCapabilities -- missing [${missingCapabilities.join(', ')}]`,
+    );
+  }
+
+  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  assertRefsOwnedBySession(triggerEvidenceRefs, {
+    coordinationId,
+    assignmentRefs: manifest.assignmentRefs,
+    fgosDir,
+    label: `authorizeSpecialistSlot: triggerEvidenceRefs`,
+  });
+  assertRefsOwnedBySession(allowedContextRefs, {
+    coordinationId,
+    assignmentRefs: manifest.assignmentRefs,
+    fgosDir,
+    label: `authorizeSpecialistSlot: allowedContextRefs`,
+  });
+
+  return recordSpecialistAuthorization(
+    coordinationId,
+    {
+      specialistAuthorizationId,
+      slotId,
+      specialistActorId,
+      role,
+      capabilities,
+      authorizedBy,
+      reason,
+      triggerEvidenceRefs,
+      allowedContextRefs,
+      maxAssignments,
+      expiresAfterRound,
+    },
+    { ...opts, maxBindingsForSlot: { slotId, cap: slot.maxBindings } },
+  );
+}
+
+/**
  * Authorize ONE `activation.mode: driver-authorized` node-operation binding
  * of the protocol bound to `coordinationId`, appending the
  * `operation-authorized` event `dispatchDeclaredOperation`'s gate then
@@ -1391,7 +1713,16 @@ export function authorizeDeclaredOperation(
     );
   }
 
-  const { actorId, node, binding } = resolveDeclaredOperationActor(definition, operationId, targetActorId);
+  // Only a `specialistSlotRef` binding ever needs a live replay to resolve
+  // its actor -- see `definitionOperationUsesSpecialistSlot`'s own doc
+  // comment for why this stays a no-op (no extra replay call) for every
+  // pre-P09.2 fixture. `resolveLiveSpecialistBindings` derives its own
+  // current round internally (round-1 fix, Phase 09 P09.2) -- no `round`
+  // input from this door at all.
+  const specialistBindings = definitionOperationUsesSpecialistSlot(definition, operationId)
+    ? resolveLiveSpecialistBindings(replaySession(coordinationId, opts))
+    : undefined;
+  const { actorId, node, binding, specialistAuthorization } = resolveDeclaredOperationActor(definition, operationId, targetActorId, specialistBindings);
   if (nodeId !== undefined && nodeId !== node.id) {
     throw new CoordinationError(
       'validation',
@@ -1464,11 +1795,17 @@ export function authorizeDeclaredOperation(
       grantedContextRefs,
       targetArtifactRef,
     },
-    // `activation.maxInvocations` lives on the binding, which only this
-    // definition-aware door can read; store.mjs enforces it lock-held.
-    binding.activation?.maxInvocations !== undefined
-      ? { ...opts, maxInvocationsForBinding: binding.activation.maxInvocations }
-      : opts,
+    // `activation.maxInvocations` lives on the binding, and a specialist's
+    // own `maxAssignments` cap lives on its live authorization -- both only
+    // this definition-aware door can read; store.mjs enforces both
+    // lock-held.
+    {
+      ...opts,
+      ...(binding.activation?.maxInvocations !== undefined ? { maxInvocationsForBinding: binding.activation.maxInvocations } : {}),
+      ...(specialistAuthorization !== undefined
+        ? { maxAssignmentsForSpecialist: { specialistActorId: actorId, cap: specialistAuthorization.maxAssignments } }
+        : {}),
+    },
   );
 }
 
@@ -1758,14 +2095,25 @@ export async function dispatchDeclaredOperation(
     );
   }
 
-  const { operation, actorId, actorEntry, node, binding } = resolveDeclaredOperationActor(definition, operationId, targetActorId);
-  const topology = definition.spec.profile.topology;
-  const incomingEdge = topology?.edges?.find((edge) => edge.to === actorId);
-
-  // One reconstruction per dispatch, shared by the edge validation below and
-  // the driver-authorization gate further down (nothing writes in between).
+  // One reconstruction per dispatch, shared by specialist-slot resolution
+  // (below), the edge validation, and the driver-authorization gate further
+  // down (nothing writes in between).
   let replayed = null;
   const replayOnce = () => (replayed ??= replaySession(coordinationId, opts));
+
+  // Only a `specialistSlotRef` binding ever needs the replay taken above --
+  // see `definitionOperationUsesSpecialistSlot`'s own doc comment for why
+  // this stays a no-op (`replayOnce()` never actually called) for every
+  // pre-P09.2 fixture. `resolveLiveSpecialistBindings` derives its own
+  // current round internally (round-1 fix, Phase 09 P09.2) -- this
+  // function's own `round` parameter is unrelated: it stays a per-edge
+  // taskKey/maxRounds disambiguator only, below.
+  const specialistBindings = definitionOperationUsesSpecialistSlot(definition, operationId)
+    ? resolveLiveSpecialistBindings(replayOnce())
+    : undefined;
+  const { operation, actorId, actorEntry, node, binding } = resolveDeclaredOperationActor(definition, operationId, targetActorId, specialistBindings);
+  const topology = definition.spec.profile.topology;
+  const incomingEdge = topology?.edges?.find((edge) => edge.to === actorId);
 
   const isDriverAuthorized = activationModeOf(binding) === 'driver-authorized';
 

@@ -59,7 +59,15 @@ const GRAPH_FIELDS = new Set(['entry', 'nodes']);
 // spec.profile.kind, never a stored field on the node object (ADR-009
 // Decision 3). Any explicit `kind` key here is rejected by the whitelist.
 const NODE_FIELDS = new Set(['id', 'operations', 'transitions']);
-const NODE_OPERATION_REF_FIELDS = new Set(['ref', 'actor', 'activation', 'contextAccess']);
+// `specialistSlotRef` (Step 09 MVP9, P09.2) is the ALTERNATIVE to `actor` --
+// never both on one binding (validateNodeOperationRef rejects the
+// combination) -- naming a declared `spec.profile.topology.specialistSlots[]`
+// id instead of a static `spec.actors[]` id. It names WHO may fill the
+// binding as "whoever is currently authorized to occupy this slot", resolved
+// at authorize/dispatch time (session-engine.mjs), never at definition-
+// validation time -- this module stays a pure, session-blind kernel and does
+// no actor-binding resolution of its own.
+const NODE_OPERATION_REF_FIELDS = new Set(['ref', 'actor', 'specialistSlotRef', 'activation', 'contextAccess']);
 const ACTIVATION_FIELDS = new Set(['mode', 'maxInvocations']);
 
 // `activation` is scoped to the node-operation BINDING, never to the
@@ -840,11 +848,18 @@ function validateContextAccess(contextAccess, label, windowIds) {
   return Object.freeze(result);
 }
 
-function validateNodeOperationRef(opRef, label, operationIds, actorIds, profileKind, windowIds) {
+function validateNodeOperationRef(opRef, label, operationIds, actorIds, profileKind, windowIds, slotsById) {
   if (!isPlainObject(opRef)) fail(`${label} must be an object`);
   assertOnlyAcceptedFields(opRef, NODE_OPERATION_REF_FIELDS, label);
   if (!isNonEmptyString(opRef.ref)) fail(`${label}.ref must be a non-empty string`);
   if (!operationIds.has(opRef.ref)) fail(`${label}.ref "${opRef.ref}" does not reference a declared spec.operations[] id`);
+
+  // A binding may be filled by a static `actor` OR by an authorized occupant
+  // of `specialistSlotRef` -- never both. Checked before either branch below
+  // so the error names the real ambiguity, not one field's own shape.
+  if (opRef.actor !== undefined && opRef.specialistSlotRef !== undefined) {
+    fail(`${label} declares both "actor" and "specialistSlotRef" -- a binding is filled by a static actor OR an authorized specialist slot occupant, never both`);
+  }
 
   const result = { ref: opRef.ref };
   if (opRef.actor !== undefined) {
@@ -852,8 +867,37 @@ function validateNodeOperationRef(opRef, label, operationIds, actorIds, profileK
     if (!actorIds.has(opRef.actor)) fail(`${label}.actor "${opRef.actor}" does not reference a declared spec.actors[] id`);
     result.actor = opRef.actor;
   }
+  if (opRef.specialistSlotRef !== undefined) {
+    // Same structural reason as `contextAccess` below: legal only under
+    // CoordinationProtocol because `specialistSlots` itself only exists
+    // there (topology is absent from WORKFLOW_PROFILE_FIELDS).
+    if (profileKind !== 'CoordinationProtocol') {
+      fail(`${label}.specialistSlotRef is legal only under the CoordinationProtocol profile (profile is "${profileKind}")`);
+    }
+    if (!isNonEmptyString(opRef.specialistSlotRef)) fail(`${label}.specialistSlotRef must be a non-empty string when provided`);
+    const slot = slotsById.get(opRef.specialistSlotRef);
+    if (!slot) {
+      fail(`${label}.specialistSlotRef "${opRef.specialistSlotRef}" does not reference a declared spec.profile.topology.specialistSlots[] id`);
+    }
+    // A specialist may act ONLY on the slot's own declared operationRefs[]
+    // (current-cell.md's own closure requirement) -- checked here, at the
+    // binding itself, rather than left as a looser "some slot somewhere
+    // names this operation" reading.
+    if (!slot.operationRefs.includes(opRef.ref)) {
+      fail(`${label}.specialistSlotRef "${opRef.specialistSlotRef}" does not declare operation "${opRef.ref}" among its own operationRefs[] -- a specialist may act only on the slot's own declared operations`);
+    }
+    result.specialistSlotRef = opRef.specialistSlotRef;
+  }
   if (opRef.activation !== undefined) {
     result.activation = validateActivation(opRef.activation, `${label}.activation`);
+  }
+  // A specialist identity is unknown until a driver authorizes one into the
+  // slot -- a binding that could materialize by DEFAULT (`required`, or
+  // `driver-authorized` never named) would have no actor to run it with at
+  // open time. Only a binding a driver must explicitly authorize each
+  // invocation of may ever name a slot.
+  if (opRef.specialistSlotRef !== undefined && (result.activation?.mode ?? DEFAULT_ACTIVATION_MODE) !== 'driver-authorized') {
+    fail(`${label} declares specialistSlotRef "${opRef.specialistSlotRef}" but activation.mode is not "driver-authorized" -- an unknown specialist identity may only fill a binding a driver explicitly authorizes, never one materialized by default`);
   }
   if (opRef.contextAccess !== undefined) {
     if (profileKind !== 'CoordinationProtocol') {
@@ -864,7 +908,7 @@ function validateNodeOperationRef(opRef, label, operationIds, actorIds, profileK
   return Object.freeze(result);
 }
 
-function validateGraph(graph, operations, actors, profileKind, windowIds) {
+function validateGraph(graph, operations, actors, profileKind, windowIds, slotsById) {
   if (!isPlainObject(graph)) fail('spec.graph must be a non-null object');
   assertOnlyAcceptedFields(graph, GRAPH_FIELDS, 'spec.graph');
   if (!isNonEmptyString(graph.entry)) fail('spec.graph.entry must be a non-empty string');
@@ -887,7 +931,7 @@ function validateGraph(graph, operations, actors, profileKind, windowIds) {
     let nodeOperations = [];
     if (node.operations !== undefined) {
       if (!Array.isArray(node.operations)) fail(`${label}.operations must be an array when provided`);
-      nodeOperations = node.operations.map((opRef, j) => validateNodeOperationRef(opRef, `${label}.operations[${j}]`, operationIds, actorIds, profileKind, windowIds));
+      nodeOperations = node.operations.map((opRef, j) => validateNodeOperationRef(opRef, `${label}.operations[${j}]`, operationIds, actorIds, profileKind, windowIds, slotsById));
     }
 
     let transitions = [];
@@ -1121,7 +1165,14 @@ function validateSpec(spec) {
   const windowIds = new Set((profile.topology?.visibilityWindows ?? []).map((w) => w.id));
   const capabilityIds = new Set(operations.flatMap((op) => op.capabilities ?? []));
   assertSpecialistSlotsReferenceRealEntities(profile, roleSet, operations, capabilityIds, windowIds);
-  const graph = validateGraph(spec.graph, operations, actors, profile.kind, windowIds);
+  // Available here (before validateGraph) because `assertSpecialistSlotsReferenceRealEntities`
+  // above already ran on the same `profile.topology.specialistSlots` --
+  // threaded into validateGraph/validateNodeOperationRef the same way
+  // `windowIds` is, so a node-operation binding's `specialistSlotRef` can be
+  // checked against real slot ids (and each slot's own `operationRefs[]`) at
+  // the binding itself, in the same pass.
+  const slotsById = new Map((profile.topology?.specialistSlots ?? []).map((slot) => [slot.id, slot]));
+  const graph = validateGraph(spec.graph, operations, actors, profile.kind, windowIds, slotsById);
   assertSpecialistSlotIdsAreDisjoint(profile, roleSet, actors, operationIds, graph, windowIds);
   const policy = spec.policy !== undefined ? validatePolicyPatch(spec.policy, 'spec.policy') : undefined;
 

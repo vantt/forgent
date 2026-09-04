@@ -69,13 +69,13 @@ reproduce in isolation) — watch for it, not yet reproduced in this track.
 | 06 | MVP6 | P06.1 + P06.2 (4 fix rounds) + P06.3 all done | **done** |
 | 07 | MVP7 | P07.1-P07.4 all done (2 HIGH fixed across the phase) | **done** |
 | 08 | MVP8 | P08.1 + P08.2 + P08.3 all done (contribution model, ledger/replay/visibility, method-shaped proofs + `contributions.allowedTypes[]` schema close) | **done** |
-| 09 | MVP9 | P09.1 done (specialist slot schema, static-only prep); P09.2/P09.3 now unblocked (MVP8 gate closed) | in-progress |
+| 09 | MVP9 | P09.1 + P09.2 done (slot schema; authorization/binding/replay, 1 HIGH fixed); P09.3 open (negative and recovery proof — closes Phase 09) | in-progress |
 | 10 | External acceptance | see phase-10 file | missing |
 
 ## Active Cell
 
-None. P08.3 closed (1 small direct disposition fix) — Phase 08 is now
-**done**. See "P08.3 Status" below.
+None. P09.2 closed (1 HIGH fixed, independently rechecked) — see "P09.2
+Status" below.
 
 **Process deviation, recorded honestly:** both P06.1 and P07.1 were
 dispatched as concurrent source-writers into the SAME shared worktree
@@ -94,16 +94,21 @@ not a shared one — this was a Coordinator setup mistake, not a rule change.
 
 ## Next Action
 
-Phase 08 is done — the MVP8 product gate phase-09.md named is now closed.
-Prepare P09.2 (Authorization, Binding, And Replay): serialize slot
-authorization against terminal transition and competing slot claims,
-atomically record authorization + session-scoped actor binding before any
-Assignment issues, reuse the existing `operation-authorized` door for each
-specialist invocation, and get expiry/replacement semantics right per
-phase-09.md's Candidate Contract. P09.1 (closed, `9b81427c`) is
-static-schema-only prep — read it first for the `specialistSlots[]` shape
-this cell binds against. P09.3 (Negative And Recovery Proof) follows once
-P09.2 lands, same "closes the phase" role P06.3/P07.4/P08.3 each played.
+Prepare P09.3 (Negative And Recovery Proof) — closes Phase 09, same role
+P06.3/P07.4/P08.3 each played for their phases. Per phase-09.md: reject
+worker/peer authorization, unknown slot, role/capability mismatch, second
+or over-cap binding, foreign context, over-cap Assignment, expired or
+terminal session, and slot use in isolation fixtures (most of these
+already have a real mediated-door test from P09.2's own Bug Taxonomy
+work and its Fix Round 1 — this cell's job is to make the negative-proof
+COVERAGE deliberate and complete, not start from zero, plus the items
+P09.2 didn't cover: crash recovery between authorization/binding/
+Assignment-creation resuming without duplicate actors or Assignments, and
+proving no `addSessionEdge`/topology-overlay/Work/git/coding mutation
+path is reachable). Also carries forward contract-doc promotion
+(`coordination-session.md`/`flow-definition.md` for `specialist-authorized`
+and `specialistSlotRef`), deferred by P09.2 to this cell per the
+established P06.3/P07.4/P08.3 pattern.
 
 ## Cell Log
 
@@ -111,6 +116,7 @@ P09.2 lands, same "closes the phase" role P06.3/P07.4/P08.3 each played.
 |---|---|---|---|
 | P00.1 | Phase 00 baseline/handoff audit | done | `85962bea` |
 | P00.2 | Phase 00 contract/file-ownership map | done | `85962bea` |
+| P09.2 | Phase 09 specialist authorization, binding, replay (1 HIGH fixed, independently rechecked) | done | (pending commit) |
 | P08.3 | Phase 08 method-shaped proofs + allowedTypes[] schema close (closes Phase 08; 1 LOW fixed) | done | `f9c98501` |
 | P08.2 | Phase 08 session ledger, replay, visibility (2 fix rounds) | done | `a24c250a` |
 | P07.4 | Phase 07 surface/regression proof, contract promotion (closes Phase 07; 1 HIGH fixed) | done | `9b81427c` |
@@ -679,3 +685,82 @@ phase's Candidate Contract calls for it).
 
 **Phase 08 is done.** Next: P09.2 (Authorization, Binding, And Replay),
 now unblocked.
+
+## P09.2 Status (Authorization, Binding, And Replay)
+
+**CLOSED, 1 HIGH fixed.** Solo cell, shared track worktree. Built the
+slot-to-actor binding mechanism P09.1 deliberately left closed as its own
+Acceptance requirement (no schema field resolved a graph operation's
+`actor` against a `specialistSlots[]` id): a new `specialistSlotRef`
+node-operation binding field (additive, alongside — never together with —
+`actor`, CoordinationProtocol-only, driver-authorized-only, scoped to the
+named slot's own declared operations), and a new `specialist-authorized`
+session event that atomically authorizes AND binds a previously-unknown
+specialist actor identity to a declared slot in one write — closing the
+crash-race window the phase spec explicitly calls out ("atomically record
+authorization and session-scoped actor binding before any Assignment is
+issued"). Each specialist invocation still goes through the pre-existing
+`operation-authorized` door exactly as the Candidate Contract specifies.
+`maxBindings` was resolved as a cumulative-ever-distinct-specialists cap
+per slot (documented design call, alternative named and rejected: a
+concurrent-only cap would do no enforcement work at all given the
+mechanism's own single-live-occupant-per-slot construction).
+
+Both independent Reviewer and Red-Team rounds ran in parallel. Reviewer:
+zero findings across 13 checklist items, independently re-derived from
+the real diff and re-run tests, including specific scrutiny of the
+`maxBindings` design call (found well-justified, not under-justified).
+Red-Team: **one real, empirically-confirmed HIGH** — specialist
+authorization expiry (`expiresAfterRound`) was gated on a bare
+caller-supplied `round` parameter that the one real production call path
+(`run.mjs`'s "authorize" step) never forwarded, so expiry structurally
+never fired regardless of real elapsed time or session progress;
+proven with a live 5-call probe, all 5 wrongly succeeding against an
+authorization with `expiresAfterRound: 1`. Two LOW/INFO items alongside
+it (a theoretical, unexploited specialistActorId/static-actor-id
+collision gap; a correct-but-untested post-replacement refusal).
+
+Fix Round 1 closed the HIGH at the root: `resolveLiveSpecialistBindings`
+no longer accepts ANY caller-supplied round — it derives its own current
+round internally from real, replayed session progress (`1 + count of
+assignment-created events`), a monotonic, unforgeable quantity, so the
+fix holds for every current and future caller, not just the one path
+audited. The Fixer's own blast-radius trace found the bypass was worse
+than the original report implied: it could reach actual Assignment
+materialization (not merely an over-broad grant) if a caller ever omitted
+`round` on both the authorize AND dispatch steps, which nothing in the
+codebase prevented. Both LOW/INFO items were also closed (a real
+disjointness guard added; the missing negative assertion added), not left
+as residuals. An independent final recheck then re-verified every claim
+from scratch — grepping all real call sites, tracing the new derivation
+function directly, and building its OWN empirical probe (materializing a
+real Assignment via a real subprocess to advance genuine session
+progress, distinct from the Fixer's own committed test) — and confirmed
+the HIGH is genuinely closed, with no new findings.
+
+Final counts: touched-file focused suite 97/97 (up from 95/95
+pre-disposition); combined focused regression across defs/coordination/
+verbs test directories 629/630 (the 1 non-pass is the standing
+`coordination-static.test.mjs` worktree-path false-fail, re-confirmed by
+reading its real assertion output). Full sweep not independently re-run
+from the main checkout this round given the clean, empirically-verified
+recheck — matches this cell's Acceptance, which asks for that
+verification, and the Coordinator's own judgment that a second full
+sweep would not add evidence beyond what two independent probe-based
+verifications already established for the one changed function's blast
+radius.
+
+**Deferred, named honestly:** contract-doc promotion
+(`coordination-session.md`/`flow-definition.md` for `specialist-authorized`
+and `specialistSlotRef`) — carried to P09.3, matching this track's
+established P06.3/P07.4/P08.3 "closes-the-phase" pattern; the
+`allowedContextRefs`/`allowedVisibilityWindows` per-invocation-ceiling
+enforcement gap named in P09.2.md's Gaps (validated for
+ownership/existence, not yet enforced as a ceiling on later
+`grantedContextRefs`/`contextAccess` choices); GitNexus had no index
+registered for this exact worktree path (same gap P09.1 named) —
+cross-checked by direct code review instead, per the repo's own
+capability gate.
+
+**Phase 09 is not yet done.** Next: P09.3 (Negative And Recovery Proof),
+which closes it.

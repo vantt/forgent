@@ -830,6 +830,112 @@ test('a graph node operation binding referencing an undeclared specialist slot i
 });
 
 // ---------------------------------------------------------------------------
+// specialistSlotRef node-operation binding (Step 09 MVP9 P09.2 -- wiring a
+// declared slot into the graph as an ALTERNATIVE to a static actor; runtime
+// resolution is session-engine.mjs's job, this section is schema-shape only).
+// ---------------------------------------------------------------------------
+
+function withSpecialistSlotRefBinding(overrides = {}) {
+  const def = withSpecialistSlot();
+  // `withSpecialistSlot()`'s slot names `op-list-results` in its own
+  // operationRefs[] -- bind exactly that operation, at the SAME node it is
+  // already wired to, to a specialist slot instead of the static actor.
+  def.spec.graph.nodes[0].operations[1] = {
+    ref: 'op-list-results',
+    specialistSlotRef: 'slot-1',
+    activation: { mode: 'driver-authorized' },
+    ...overrides,
+  };
+  return def;
+}
+
+test('accepts a node-operation binding filled by specialistSlotRef instead of actor', () => {
+  const def = withSpecialistSlotRefBinding();
+  const result = validateFlowDefinition(def);
+  const binding = result.spec.graph.nodes[0].operations[1];
+  assert.equal(binding.specialistSlotRef, 'slot-1');
+  assert.equal(binding.actor, undefined);
+  assert.equal(binding.activation.mode, 'driver-authorized');
+});
+
+test('rejects a node-operation binding declaring both actor and specialistSlotRef', () => {
+  const def = withSpecialistSlot();
+  def.spec.graph.nodes[0].operations[1] = {
+    ref: 'op-list-results',
+    actor: 'actor-1',
+    specialistSlotRef: 'slot-1',
+    activation: { mode: 'driver-authorized' },
+  };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(
+      /operations\[1\] declares both "actor" and "specialistSlotRef" -- a binding is filled by a static actor OR an authorized specialist slot occupant, never both/,
+    ),
+  );
+});
+
+test('rejects a specialistSlotRef binding naming an undeclared specialist slot id', () => {
+  const def = withSpecialistSlotRefBinding({ specialistSlotRef: 'ghost-slot' });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/operations\[1\]\.specialistSlotRef "ghost-slot" does not reference a declared spec\.profile\.topology\.specialistSlots\[\] id/),
+  );
+});
+
+test("rejects a specialistSlotRef binding naming an operation not among the slot's own operationRefs[]", () => {
+  const def = withSpecialistSlot();
+  // `op-research` is real, but "slot-1" only declares `op-list-results` in
+  // its own operationRefs[] -- a specialist may act only on the slot's own
+  // declared operations.
+  def.spec.graph.nodes[0].operations[0] = {
+    ref: 'op-research',
+    specialistSlotRef: 'slot-1',
+    activation: { mode: 'driver-authorized' },
+  };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(
+      /operations\[0\]\.specialistSlotRef "slot-1" does not declare operation "op-research" among its own operationRefs\[\] -- a specialist may act only on the slot's own declared operations/,
+    ),
+  );
+});
+
+test('rejects a specialistSlotRef binding whose activation.mode is not driver-authorized (default omitted)', () => {
+  const def = withSpecialistSlot();
+  def.spec.graph.nodes[0].operations[1] = { ref: 'op-list-results', specialistSlotRef: 'slot-1' };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(
+      /operations\[1\] declares specialistSlotRef "slot-1" but activation\.mode is not "driver-authorized" -- an unknown specialist identity may only fill a binding a driver explicitly authorizes, never one materialized by default/,
+    ),
+  );
+});
+
+test('rejects a specialistSlotRef binding whose activation.mode is explicitly "required"', () => {
+  const def = withSpecialistSlotRefBinding({ activation: { mode: 'required' } });
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/operations\[1\] declares specialistSlotRef "slot-1" but activation\.mode is not "driver-authorized"/),
+  );
+});
+
+test('rejects specialistSlotRef under the Workflow profile', () => {
+  const def = minimalWorkflowDefinition();
+  def.spec.graph.nodes[0].operations[0] = { ref: 'op-implement', specialistSlotRef: 'slot-1', activation: { mode: 'driver-authorized' } };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/operations\[0\]\.specialistSlotRef is legal only under the CoordinationProtocol profile \(profile is "Workflow"\)/),
+  );
+});
+
+test('a definition with no specialistSlotRef binding stays byte/behavior-identical (regression)', () => {
+  const def = protocolDefinitionWithTwoOperations();
+  const result = validateFlowDefinition(def);
+  assert.equal(result.spec.graph.nodes[0].operations[1].specialistSlotRef, undefined);
+  assert.equal(result.spec.graph.nodes[0].operations[1].actor, 'actor-1');
+});
+
+// ---------------------------------------------------------------------------
 // Determinism / immutability
 // ---------------------------------------------------------------------------
 

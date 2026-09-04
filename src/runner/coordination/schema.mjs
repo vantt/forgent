@@ -419,6 +419,54 @@ const EVENT_SPECS = {
       'respondsTo',
     ],
   },
+  // Phase 09 (Step 09 MVP9): a previously-unknown specialist actor identity
+  // is authorized to occupy a bounded `topology.specialistSlots[]` slot.
+  // Modeled closely on `operation-authorized`'s own shape (real
+  // authorization data, not content-free) rather than on
+  // `aggregation-validated`/`deliberation-contribution-linked`'s
+  // ref+revision-only shape -- this event carries the actual authorization
+  // (role, capabilities, caps), not a pointer to evidence recorded
+  // elsewhere.
+  //
+  // ONE event does BOTH "record authorization" AND "record the session-
+  // scoped actor binding" -- there is no separate `specialist-bound` event.
+  // The phase's own requirement ("atomically record authorization and
+  // session-scoped actor binding before any Assignment is issued") is met
+  // structurally: a single `appendEventLocked` call has no window between
+  // the two, because there are not two writes to have a window between.
+  //
+  // `capabilities`/`triggerEvidenceRefs`/`allowedContextRefs` MAY be empty
+  // (same "empty list is a legal, meaningful declaration" posture
+  // `grantedContextRefs`/`evidenceRefs` already take) -- see
+  // `EMPTY_ARRAY_ALLOWED_FIELDS` below.
+  'specialist-authorized': {
+    required: [
+      'specialistAuthorizationId',
+      'slotId',
+      'specialistActorId',
+      'role',
+      'capabilities',
+      'authorizedBy',
+      'reason',
+      'triggerEvidenceRefs',
+      'allowedContextRefs',
+      'maxAssignments',
+      'expiresAfterRound',
+    ],
+    accepted: [
+      'specialistAuthorizationId',
+      'slotId',
+      'specialistActorId',
+      'role',
+      'capabilities',
+      'authorizedBy',
+      'reason',
+      'triggerEvidenceRefs',
+      'allowedContextRefs',
+      'maxAssignments',
+      'expiresAfterRound',
+    ],
+  },
   'session-failed': { required: ['reason'], accepted: ['reason'] },
   // R4: cancellation "records in-flight outcomes" -- `inFlightAssignmentIds`
   // is a snapshot (assignment-created with no result-linked yet) taken at
@@ -557,12 +605,33 @@ export function validateEventPayload(type, payload) {
       }
       continue;
     }
-    if (field === 'grantedContextRefs' || field === 'evidenceRefs') {
-      // An EMPTY array is legal and meaningful: the authorization grants no
-      // extra refs beyond the Assignment's own always-legal base context,
-      // and a disposition may rest on the target ref alone.
+    if (
+      field === 'grantedContextRefs' ||
+      field === 'evidenceRefs' ||
+      field === 'capabilities' ||
+      field === 'triggerEvidenceRefs' ||
+      field === 'allowedContextRefs'
+    ) {
+      // An EMPTY array is legal and meaningful in every one of these: the
+      // authorization grants no extra refs beyond the Assignment's own
+      // always-legal base context, a disposition may rest on the target ref
+      // alone, and a specialist authorization may declare no extra
+      // capabilities/trigger evidence/context beyond its bare role (P09.1's
+      // own "empty gate list means no gate on that dimension" reading,
+      // carried over to the authorization that fills a slot).
       if (!isStringArray(value)) {
         fail('validation', `event "${type}" payload.${field} must be an array of non-empty strings`);
+      }
+      continue;
+    }
+    if (field === 'maxAssignments' || field === 'expiresAfterRound') {
+      // Positive integers, not strings -- the SAME shape `isPositiveInteger`
+      // already enforces for `specialistSlots[].maxAssignments` in
+      // `definitions/schema.mjs`, checked again here because this module is
+      // the pure kernel that is the actual gate a hand-written log passes
+      // through.
+      if (!isPositiveInteger(value)) {
+        fail('validation', `event "${type}" payload.${field} must be a positive integer`);
       }
       continue;
     }

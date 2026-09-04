@@ -133,6 +133,18 @@ export function replaySession(coordinationId, opts = {}) {
   const ignoredAuthorizations = [];
   const authorizationIds = new Set();
   const invocationKeys = new Map(); // invocationKey -> the authorizationId that first claimed it
+  // Phase 09 (MVP9): specialist-slot authorizations, reconstructed the same
+  // way `authorizations` is -- valid ones (pre-terminal) in
+  // `specialistAuthorizations`, post-terminal ones neutralized into
+  // `ignoredSpecialistAuthorizations` rather than silently dropped. "Live
+  // now" (which specialist currently occupies a given slot) is a further
+  // derivation on top of this raw list -- session-engine.mjs's
+  // `resolveLiveSpecialistBindings`, not computed here, because "live" also
+  // depends on the caller's own current round, which replay has no notion
+  // of.
+  const specialistAuthorizations = [];
+  const ignoredSpecialistAuthorizations = [];
+  const specialistAuthorizationIds = new Set();
   let terminalSeen = false;
 
   for (const event of events) {
@@ -175,6 +187,44 @@ export function replaySession(coordinationId, opts = {}) {
         consumedByAssignmentId: null,
       };
       (terminalSeen ? ignoredAuthorizations : authorizations).push(record);
+    } else if (event.type === 'specialist-authorized') {
+      // Same driver-identity and duplicate-id questions the aggregation/
+      // contribution branches below ask, for the same reason: authorizing a
+      // specialist into a slot is driver-authored session state, and an id
+      // is claimed exactly once.
+      const { specialistAuthorizationId, authorizedBy } = event.payload;
+      if (authorizedBy.id !== manifest.provenanceRoot.writerId) {
+        throw new CoordinationError(
+          'foreign-ref',
+          `session "${coordinationId}": "specialist-authorized" event "${specialistAuthorizationId}" was authorized by "${authorizedBy.id}", which is not this session's driver identity ("${manifest.provenanceRoot.writerId}") -- authorizing a specialist is driver-authored session state, never a participant's own claim`,
+        );
+      }
+      if (specialistAuthorizationIds.has(specialistAuthorizationId)) {
+        throw new CoordinationError(
+          'duplicate-ref',
+          `session "${coordinationId}": duplicate "specialist-authorized" event for authorization "${specialistAuthorizationId}"`,
+        );
+      }
+      specialistAuthorizationIds.add(specialistAuthorizationId);
+      const record = {
+        specialistAuthorizationId,
+        slotId: event.payload.slotId,
+        specialistActorId: event.payload.specialistActorId,
+        role: event.payload.role,
+        capabilities: Object.freeze([...event.payload.capabilities]),
+        authorizedBy: event.payload.authorizedBy,
+        reason: event.payload.reason,
+        triggerEvidenceRefs: Object.freeze([...event.payload.triggerEvidenceRefs]),
+        allowedContextRefs: Object.freeze([...event.payload.allowedContextRefs]),
+        maxAssignments: event.payload.maxAssignments,
+        expiresAfterRound: event.payload.expiresAfterRound,
+        ts: event.ts,
+      };
+      // Post-terminal: neutralized exactly like a post-terminal
+      // authorization/aggregation -- excluded from `specialistAuthorizations`
+      // (the only list `resolveLiveSpecialistBindings` reads), reported
+      // separately, never silently dropped.
+      (terminalSeen ? ignoredSpecialistAuthorizations : specialistAuthorizations).push(record);
     } else if (event.type === 'aggregation-validated') {
       // Read-time rejection of worker-shaped aggregate truth. `validateEventPayload`
       // (above) has already refused a `validatedBy.type` other than `"driver"`
@@ -520,6 +570,8 @@ export function replaySession(coordinationId, opts = {}) {
     events: Object.freeze(events),
     authorizations: Object.freeze(authorizations.map((record) => Object.freeze(record))),
     ignoredAuthorizations: Object.freeze(ignoredAuthorizations.map((record) => Object.freeze(record))),
+    specialistAuthorizations: Object.freeze(specialistAuthorizations.map((record) => Object.freeze(record))),
+    ignoredSpecialistAuthorizations: Object.freeze(ignoredSpecialistAuthorizations.map((record) => Object.freeze(record))),
     assignments: Object.freeze(assignments.map((record) => Object.freeze(record))),
     results: Object.freeze(results.map((record) => Object.freeze(record))),
     dispositions: Object.freeze(dispositions.map((record) => Object.freeze(record))),

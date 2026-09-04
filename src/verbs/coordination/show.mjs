@@ -128,6 +128,27 @@ function renderAggregation(record) {
   };
 }
 
+// Phase 09 (MVP9): render one `specialist-authorized` record -- the same
+// shape `replaySession`'s own `specialistAuthorizations`/
+// `ignoredSpecialistAuthorizations` entries carry, so a caller of `show`
+// never has to reconstruct it from raw events.
+function renderSpecialistAuthorization(record) {
+  return {
+    specialistAuthorizationId: record.specialistAuthorizationId,
+    slotId: record.slotId,
+    specialistActorId: record.specialistActorId,
+    role: record.role,
+    capabilities: [...record.capabilities],
+    reason: record.reason,
+    triggerEvidenceRefs: [...record.triggerEvidenceRefs],
+    allowedContextRefs: [...record.allowedContextRefs],
+    maxAssignments: record.maxAssignments,
+    expiresAfterRound: record.expiresAfterRound,
+    authorizedBy: record.authorizedBy,
+    ts: record.ts,
+  };
+}
+
 /**
  * @param {object} ctx `{cwd, repoRoot, packageRoot?}`
  * @param {object} options `{id}`
@@ -175,6 +196,8 @@ export function showCoordinationUseCase(ctx, { id }) {
   let pendingDriverAuthorizations = null;
   let aggregations = null;
   let ignoredAggregations = null;
+  let specialistAuthorizations = null;
+  let ignoredSpecialistAuthorizations = null;
 
   if (coordinationState) {
     authorizations = coordinationState.authorizations.map((a) => ({
@@ -202,6 +225,13 @@ export function showCoordinationUseCase(ctx, { id }) {
     // informed nothing.
     aggregations = coordinationState.aggregations.map(renderAggregation);
     ignoredAggregations = coordinationState.ignoredAggregations.map(renderAggregation);
+
+    // Phase 09 (MVP9): specialist-slot bindings, rendered the same way
+    // authorizations are -- a driver must be able to see WHO is currently
+    // bound to a slot and why a post-terminal authorization never took
+    // effect, without opening events.jsonl by hand.
+    specialistAuthorizations = coordinationState.specialistAuthorizations.map(renderSpecialistAuthorization);
+    ignoredSpecialistAuthorizations = coordinationState.ignoredSpecialistAuthorizations.map(renderSpecialistAuthorization);
 
     const { fgosDir } = resolveSessionPaths(id, engineOpts);
     const refOwnedOpts = {
@@ -275,6 +305,8 @@ export function showCoordinationUseCase(ctx, { id }) {
     pendingDriverAuthorizations,
     aggregations,
     ignoredAggregations,
+    specialistAuthorizations,
+    ignoredSpecialistAuthorizations,
     ...(coordinationStateError !== null ? { coordinationStateError } : {}),
   };
 }
