@@ -78,3 +78,51 @@ module to a different item id than `tsk-1ji`, evidence of later rework
 this doc does not attempt to fully trace. This doc covers `tsk-1ji`'s own
 diagnosis-and-opportunistic-wiring scope only, not every subsequent
 change to that file.
+
+## Detect-and-warn wasn't enough to actually recover — `tsk-46v` added the remediation path
+
+`tsk-46v` confirmed the same failure class was **still recurring live** on
+2026-08-26, actively eating freshly-created work items (not just old
+history): `fgos submit` + `fgos pick` for a new item succeeded and stayed
+readable for ~10 minutes, then vanished completely — zero hits for its id
+across every `.fgos/events/*.jsonl` shard, no shard file for the writing
+session's own writer id anywhere on disk, only an orphaned
+`.fgos/runtime/claims/<id>.json` and the git branch surviving.
+`fgos doctor`'s `events-jsonl-not-truncated` check was failing with
+`reason:regressed` at the time, naming 8 affected files — the same
+documented cause class (a raw `git stash`/`checkout --`/`reset --hard`/
+`clean` against the shared, git-tracked main checkout while
+`.fgos/events.jsonl` had live uncommitted appends), never conclusively
+attributed to a specific actor since a worktree-isolated session has no
+reflog/history access to identify who ran it.
+
+The gap this item closed: the opportunistic check above only detects and
+warns — it deliberately never auto-recovers (D1's detect-and-warn-never-
+block decision, and the fallback auto-commit fails closed on an
+unacknowledged break rather than advancing past it). Once a break was
+flagged, nothing actually cleared it back to a healthy mark. `tsk-46v`
+added `forceRebaselineTruncationGuard()` (unconditional mark write,
+unlike `advanceEventsJsonlTruncationGuard`'s never-move-past-a-break
+behavior) plus a `--force-rebaseline-all` CLI mode, fixed a wrong path/
+broken command in `docs/how-to/resolve-an-events-jsonl-truncation.md`,
+and added tests proving the force path clears a real break while
+`advanceEventsJsonlTruncationGuard`'s own guarantee stays unchanged. The
+force function is additive-only — never imported or called by
+`runOpportunisticMainCheckoutChecks`, reachable only through the new
+explicit CLI flag, so the automatic detect-and-warn path's own behavior
+is untouched.
+
+**Independently reconfirmed the same day, twice more:** `tsk-10n`'s own
+`/fgOS:cook` run (~13:44-13:56 UTC, same day) hit the identical pattern —
+a freshly submitted+picked item readable once, then unrecoverable via
+`fgos list` (not-found, exit 4) within ~4 minutes, `.fgos/state.json`
+also gone from disk, no shard for that session's writer id anywhere.
+Recovery that worked: resubmitting the identical text returned the same
+deterministic id (nothing referenced the vanished one), then
+`fgos rebuild` re-derived a matching claim from the still-intact git
+branch/worktree (`source:branch`, same `claimId`/`acquiredAt`) — no data
+was permanently lost, and this resubmit-then-rebuild path is now a
+documented working recovery recipe for a future live incident, not just
+a re-baseline-and-move-on. Root-causing *which* process runs the raw git
+command against the shared checkout remains open — out of this item's
+own scope, tracked separately.
