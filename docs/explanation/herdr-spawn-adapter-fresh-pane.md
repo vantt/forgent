@@ -54,3 +54,62 @@ second source of truth for task lifecycle.
 
 Merged into `fgw/tsk-5x7` (the parent's own integration branch) — a
 decomposed child, carried to main via the parent's own `sync-root`.
+
+## Generalizing beyond the first target CLI (`tsk-5jl`)
+
+`tsk-5jl` generalized `herdrSpawnAdapter` so ANY agent CLI (`claude`,
+`agy`, `codex`, `pi`) can be launched via a real Herdr pane purely by
+config, achieving two goals at once: live TTY visibility matching each
+CLI's real streaming behavior, and a correct synchronous
+`{status, stdout}` result for the dispatch ladder, with the pane
+auto-closed once truly done. It also fixed a real gap in the original
+adapter: the success path never closed the pane (only a timeout did) —
+`herdr pane close <paneId>` now runs on success too.
+
+**Per-CLI streaming behavior, researched not guessed:** Claude Code's
+`-p` text mode buffers with no live output until done (per its own
+headless docs), but does exit with a real subprocess exit code;
+`--output-format stream-json --verbose --include-partial-messages`
+streams live but as JSON-lines needing translation. `agy`'s own `-p`
+headless mode already streams live plain text natively (already
+live-verified in this repo). `pi --mode json` emits a real
+`AgentSessionEvent` JSONL stream (evidence fixtures already existed under
+`docs/history/pi-executor-runtime-capacity/evidence/`). `codex exec`'s
+live-streaming default was left explicitly UNVERIFIED — treated as
+unknown, never guessed.
+
+**What shipped:** an optional `liveOutput: { streamFlags, renderer }`
+field on an executor invocation (validated in `config.mjs`, consumed in
+`transport.mjs`). When present: `streamFlags` are appended to args, the
+wrapper script's shebang switches `sh` → `bash` (needed for
+`${PIPESTATUS[0]}`), the command pipes through `tee <raw-jsonl> | node
+<renderer>`, and the real exit code is captured via `PIPESTATUS[0]`. When
+absent: byte-identical to the pre-existing behavior — no regression. Two
+renderer scripts were added under `src/runner/dispatch/live-renderers/`:
+`claude-stream-json.mjs` and `pi-agent-session.mjs`, the latter built
+against the real evidence fixtures already captured for `pi`.
+
+**Config wiring:** `executors.agy` renamed to `executors.agy-cli`
+(every other reference to the old id updated repo-wide); a new
+`executors.agy-herdr` (adapter `herdr-spawn`, no `liveOutput`) made
+ACTIVE, with `capabilities.fgos-coding-implement.prefer` rewired to it,
+replacing `claude-herdr`. `claude-herdr` gained `liveOutput` but stayed
+dormant/unreferenced; new `executors.pi-herdr` (with `liveOutput`/renderer)
+and `executors.codex-herdr` (no `liveOutput`, streaming unverified) were
+both added dormant, each with a description explaining how to activate it.
+
+**Required proof, not mocked:** beyond the mocked regression tests for
+pane-close-on-success and the `liveOutput`/`PIPESTATUS` pipeline, the item
+required dispatching one real fgOS work item through `executors.agy-herdr`
+against the actually-installed `herdr` and `agy` binaries — confirming
+live pane visibility, auto-close on completion, correct real
+`status`/`stdout`, and that the dispatched item's own fgOS state actually
+advanced. This item also explicitly consolidates and supersedes `tsk-3d5`
+(an earlier empty placeholder with the same stated goal).
+
+The existing `herdrSpawnAdapter` return contract
+(`{status, stdout, paneId}`) was preserved exactly for the no-`liveOutput`
+default path — this generalization is additive, never a breaking change
+to the adapter this doc's own earlier section (`tsk-5x7-3`) shipped.
+Scope stayed bounded to the adapter + config + renderers + tests + one
+real live proof — `herdr-plugin/src/*.rs` itself was never touched.
