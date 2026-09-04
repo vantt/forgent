@@ -305,33 +305,66 @@ test('Delphi-Feedback-Lite: round ORDER -- dispatching "propose-round2" through 
 //     Doer surfaced for Nominal-Group-Lite and asked every sibling cell to
 //     check against its own protocol.
 
-test('Delphi-Feedback-Lite: the auto-close boundary is EARLIER than "after aggregate" -- a session closes to "completed" the moment BOTH round-1 proposals settle, BEFORE "aggregate" ever dispatches, blocking aggregate itself (not just round-2) across a call boundary there', async () => {
+test('P10-KERNEL-FIX: the auto-close boundary that used to sit EARLIER than "after aggregate" is gone -- a session pausing right after both round-1 proposals settle stays open, and a genuinely separate later call reaches facilitator-actor\'s remaining declared operation ("aggregate") and both round-2 proposals successfully', async () => {
   const tempDir = mkTempDir();
   const runnerConfig = fakeRunnerConfig(tempDir);
-  const coordinationId = 'delphi-lite-pack-early-close-boundary';
-  const writerId = 'p10-8-early-close';
+  const coordinationId = 'delphi-lite-pack-early-close-boundary-fixed';
+  const writerId = 'p10-kernel-fix-delphi-early-close';
 
   // Call 1: convene + BOTH round-1 proposals -- the natural "round 1 is
   // done" checkpoint a real driver might split calls at. "aggregate" has
   // NOT been dispatched yet.
+  //
+  // P10-KERNEL-FIX (session-engine.mjs's `classifySessionQuorum` /
+  // `actorGatingOperationIds`): Delphi-Feedback-Lite declares NO
+  // `driver-authorized` binding anywhere -- `convene`/`propose-round1`/
+  // `aggregate`/`propose-round2` are ALL `required` (the YAML's own default,
+  // no `activation:` block on any of them). `actorGatingOperationIds`
+  // therefore gates on ALL of them: facilitator-actor now needs BOTH
+  // `convene` AND `aggregate` settled, and each panelist now needs BOTH
+  // `propose-round1` AND `propose-round2` settled, before counting
+  // complete -- exactly closing this bug. BEFORE this fix, quorum counted
+  // every actor complete the moment it had ANY one settled Assignment
+  // (facilitator via convene, both panelists via round-1 alone), so the
+  // session auto-closed here, BEFORE "aggregate" ever dispatched -- this
+  // was the sharpest of the three concrete bug cases P10.6/P10.7/P10.8
+  // converged on (a whole protocol phase permanently unreachable, not just
+  // "resume is harder"), independently reproduced by this file's own
+  // Red-Team and escalated to the user directly.
   const first = await runGroupThinkingRequest(
     { cwd: tempDir, repoRoot: tempDir, runnerConfig },
     { protocolId: DELPHI_ID, requestObject: baseRequest({ coordinationId, writerId, steps: [convene(), proposeRound1('panelist-a', '$ref:convene'), proposeRound1('panelist-b', '$ref:convene')] }) },
   );
-  assert.equal(first.closed, true, 'quorum classifies every declared actor "completed" the moment each has ANY one settled Assignment -- facilitator via convene, both panelists via round-1 -- with no notion that "aggregate" and both round-2 proposals are still owed');
-  assert.equal(first.status, 'completed');
-
-  // Call 2: even "aggregate" itself -- not just round-2 -- is now
-  // unreachable through a second call. This is a STRICTLY EARLIER and more
-  // severe boundary than the "after aggregate settles" split point
-  // current-cell.md's own hint text suggested (see the resume test below):
-  // splitting there was already known to fail; this proves the failure
-  // surface starts even one phase earlier.
-  await assert.rejects(
-    () => runGroupThinkingRequest({ cwd: tempDir, repoRoot: tempDir, runnerConfig }, { protocolId: DELPHI_ID, requestObject: baseRequest({ coordinationId, writerId, steps: [aggregate()] }) }),
-    (err) => err instanceof CoordinationError && /is not active \(status: "completed"\)/.test(err.message),
-    'a real driver that pauses between round-1 and aggregate -- a natural place to pause, e.g. to let a human review both proposals before synthesizing -- can never resume through the pack at all',
+  assert.equal(
+    first.closed,
+    false,
+    'P10-KERNEL-FIX: the session must NOT auto-close here -- facilitator-actor still owes "aggregate", and both panelists still owe their own "propose-round2"',
   );
+  assert.deepEqual(
+    first.quorum.missing.map((m) => m.actorId).sort(),
+    ['facilitator-actor', 'panelist-a', 'panelist-b'],
+    'every declared actor is honestly reported incomplete -- nobody is falsely counted done off a single settled Assignment',
+  );
+
+  // Call 2: a genuinely SEPARATE, later runGroupThinkingRequest call
+  // reaches "aggregate" AND both round-2 proposals successfully -- refused
+  // outright before this fix (the session was already "completed").
+  const conveneAssignmentId = first.steps[0].assignmentId;
+  const second = await runGroupThinkingRequest(
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+    { protocolId: DELPHI_ID, requestObject: baseRequest({ coordinationId, writerId, steps: [aggregate(), proposeRound2('panelist-a', '$ref:aggregate'), proposeRound2('panelist-b', '$ref:aggregate')] }) },
+  );
+  for (const step of second.steps) {
+    assert.equal(step.status, 'done', 'P10-KERNEL-FIX: "aggregate" and both round-2 proposals now dispatch successfully in a genuinely separate, later call');
+  }
+  assert.equal(second.closed, true, 'every gating binding is now settled -- the session correctly closes at the end of THIS call');
+  assert.deepEqual(second.quorum.missing, []);
+
+  const replayed = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(replayed.assignments.filter((a) => a.actorId === 'facilitator-actor').length, 2, 'facilitator-actor dispatched exactly twice across the whole chain -- convene (call 1), aggregate (call 2) -- no duplicate dispatch of either');
+  assert.equal(replayed.assignments.filter((a) => a.actorId === 'panelist-a').length, 2, 'panelist-a dispatched exactly twice -- round-1 (call 1), round-2 (call 2)');
+  assert.equal(replayed.assignments.filter((a) => a.actorId === 'panelist-b').length, 2, 'panelist-b dispatched exactly twice -- round-1 (call 1), round-2 (call 2)');
+  assert.ok(conveneAssignmentId);
 });
 
 test('Delphi-Feedback-Lite: the early auto-close above does NOT undermine this file\'s own single-call full-chain proof -- closeSessionByQuorum is attempted exactly once, after run.mjs\'s entire steps loop finishes, never mid-loop', async () => {

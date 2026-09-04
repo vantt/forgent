@@ -30,6 +30,8 @@ import {
   dispatchResearchFanOut,
   authorizeDeclaredOperation,
   deriveVisibilityWindowState,
+  evaluateSessionQuorum,
+  closeSessionByQuorum,
 } from '../../src/runner/coordination/session-engine.mjs';
 import {
   readManifest,
@@ -775,4 +777,43 @@ test('REPLAY PARITY: an independent replay of the real fixture reaches the same 
   assert.equal(events.filter((e) => /visibility/i.test(e.type)).length, 0, 'no visibility-window event kind may be persisted');
   const rawFixture = fs.readFileSync(GATED_FIXTURE_PATH, 'utf8');
   assert.match(rawFixture, /visibilityWindows:/, 'the window is declared in the committed fixture, not synthesized by a test');
+});
+
+// ─── P10-KERNEL-FIX Fix Round 1 (HIGH-4): quorum/close coverage ────────────
+//
+// Neither this file nor coordination-research-fan-out.test.mjs ever called
+// evaluateSessionQuorum/closeSessionByQuorum against this fixture before
+// this test (redteam-report.md HIGH-4) -- so the driver-authorized +
+// window-gated `synthesize-findings` binding's own quorum-gating behavior
+// (actorGatingOperationIds, session-engine.mjs) was entirely unproven at the
+// close level, even though every OTHER door onto this same fixture (window
+// state, authorization refusal, dispatch) was already covered above.
+
+test('P10-KERNEL-FIX quorum: coordinator-actor stays incomplete (and close is refused) once dispatch-research + the full research cohort have settled but synthesize-findings has not, and closes once it does', async () => {
+  const coordinationId = 'coord_vwf_quorum_gating';
+  const ctx = setup(coordinationId);
+  const dispatch = await dispatchCoordinatorFanOut(coordinationId, ctx);
+  const fan = await fanOut(coordinationId, ctx, ['researcher-a', 'researcher-b'], dispatch.assignment.assignmentId);
+  const branchAssignmentIds = fan.branches.map((b) => b.result.assignment.assignmentId);
+
+  // The whole cohort has settled and the window is open, but the gated
+  // `synthesize-findings` binding itself has neither been authorized nor
+  // dispatched yet -- coordinator-actor must stay incomplete, and close must
+  // refuse, exactly the premature-close bug this cell exists to eliminate.
+  const beforeSynthesis = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(beforeSynthesis.missing.map((x) => x.actorId), ['coordinator-actor']);
+  assert.throws(
+    () => closeSessionByQuorum(coordinationId, {}, ctx.opts),
+    (err) => err instanceof CoordinationError && /missing required actor\(s\) \[coordinator-actor\]/.test(err.message),
+    'closeSessionByQuorum must refuse to close while the gated synthesize-findings binding is still unsettled',
+  );
+
+  authorizeDeclaredOperation(coordinationId, synthesisAuthorization({ grantedContextRefs: branchAssignmentIds }), ctx.opts);
+  await dispatchSynthesis(coordinationId, ctx, { contextRefs: branchAssignmentIds });
+
+  const afterSynthesis = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(afterSynthesis.missing, []);
+  assert.deepEqual(afterSynthesis.completed.map((x) => x.actorId).sort(), ['coordinator-actor', 'researcher-a', 'researcher-b']);
+  const closed = closeSessionByQuorum(coordinationId, {}, ctx.opts);
+  assert.equal(closed.status, 'completed');
 });

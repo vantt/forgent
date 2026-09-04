@@ -315,47 +315,33 @@ test('RFC-Review-Lite through the real pack gate: interrupt-then-resume across F
   assert.deepEqual(replayed.openContributionIds, []);
 });
 
-test('RFC-Review-Lite through the pack gate: no re-authorization of an already-settled step -- a same-call repeat of the identical authorize step is a truthful idempotent no-op, and a genuinely SEPARATE, later runGroupThinkingRequest call attempting the same re-authorization is refused outright, once quorum has naturally closed the session', async () => {
+test('P10-KERNEL-FIX: a genuinely SEPARATE later runGroupThinkingRequest call reaches proposer-actor\'s remaining declared operation ("respond") successfully -- the exact bug this fix corrects -- and no re-authorization of an already-settled step is possible once the session has naturally closed', async () => {
   const tempDir = mkTempDir();
   const runnerConfig = fakeRunnerConfig(tempDir);
   const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig };
-  const coordinationId = 'coord_p10_6_rfc_idempotent_authorize';
-  const writerId = 'p10-6-idempotent-driver';
+  const coordinationId = 'coord_p10_kernel_fix_rfc_resume';
+  const writerId = 'p10-kernel-fix-rfc-driver';
 
-  const authorizeStep = {
-    type: 'authorize',
-    as: 'authRespond',
-    operationId: 'respond',
-    targetActorId: 'proposer-actor',
-    authorizationId: 'auth_p10_6_idem_respond',
-    invocationKey: 'p10-6-idem-respond:1',
-    reason: 'Reveal both independent objections for a driver-authorized response.',
-  };
-
-  // Design note, verified empirically before writing this test (not
-  // assumed): `evaluateSessionQuorum`/`classifySessionQuorum`
-  // (session-engine.mjs:3104) requires EVERY actor declared on the
-  // manifest to have completed at least one result -- not "every required
-  // operation". RFC-Review-Lite declares exactly 4 actors
-  // (coordinator/proposer/objector-a/objector-b), and "respond" is
-  // driver-authorized (never required), so the SAME moment objector-b
-  // settles is ALSO the moment all 4 actors have completed -- quorum is
-  // met, and `closeSessionByQuorum` (called unconditionally at the end of
-  // EVERY request, run.mjs) closes the session automatically at the end of
-  // THAT SAME request. Since "reveal" cannot open before objector-b
-  // settles either, there is structurally NO legal window in which
-  // "authorize" could be granted in one call and the session could still
-  // be open for a genuinely SEPARATE, later call to attempt re-authorizing
-  // it -- confirmed empirically below, not merely reasoned about: the
-  // first authorize (same-call idempotency) and the automatic close both
-  // happen inside call 1, and a real second call afterward is refused
-  // outright by the engine's own active-session guard, not accepted as a
-  // no-op.
+  // Design note (P10-KERNEL-FIX, session-engine.mjs's `classifySessionQuorum`
+  // / `actorGatingOperationIds`): BEFORE this fix, quorum counted
+  // `proposer-actor` complete the instant `propose` (its FIRST-ever
+  // assignment) settled -- ignoring that `respond` is a real, later,
+  // still-pending phase of the SAME actor's own work, gated by the SAME
+  // "reveal" visibility window this call also opens. That made the session
+  // auto-close at the end of THIS call, before the driver ever got a
+  // chance to authorize+dispatch "respond" in a genuinely later, separate
+  // call -- RFC-Review-Lite's own normal "objections raised now, proposer
+  // responds later" flow, silently and permanently refused (P10.7's own
+  // Red-Team finding, reproduced live against this exact, already-closed
+  // P10.6 protocol). AFTER this fix, `respond` is a GATING binding for
+  // proposer-actor (driver-authorized + `contextAccess.visibilityWindowRef`
+  // declared) -- proposer-actor stays incomplete, and the session stays
+  // open, until it too settles.
   const call1 = await runGroupThinkingRequest(ctx, {
     protocolId: RFC_REVIEW_LITE_ID,
     requestObject: {
       kind: 'declared-protocol',
-      objective: 'Settle both objectors, grant the real authorization, and re-issue the IDENTICAL authorize step again within the same call.',
+      objective: 'Settle both objectors through the pack gate; stop before authorizing or dispatching "respond".',
       writerId,
       coordinationId,
       protocolRef: { id: RFC_REVIEW_LITE_ID },
@@ -364,55 +350,103 @@ test('RFC-Review-Lite through the pack gate: no re-authorization of an already-s
         opStep('propose', 'propose', 'proposer-actor'),
         opStep('objectA', 'object', 'objector-a-actor'),
         opStep('objectB', 'object', 'objector-b-actor'),
-        { ...authorizeStep, as: 'authRespondFirst', grantedContextRefs: ['$ref:objectA', '$ref:objectB'] },
-        // Same authorizationId + invocationKey, repeated within the SAME
-        // request -- run.mjs's own documented idempotent-authorize path
-        // (readSessionEvents fallback on appended:false, run.mjs:433-446)
-        // must report the REAL, already-persisted grant back, never a
-        // second live authorization.
-        { ...authorizeStep, as: 'authRespondRepeat', grantedContextRefs: ['$ref:objectA', '$ref:objectB'] },
       ],
     },
   });
-  const firstGrant = call1.steps.find((s) => s.as === 'authRespondFirst');
-  const repeatGrant = call1.steps.find((s) => s.as === 'authRespondRepeat');
   const objectAId = assignmentIdFor(call1, 'objectA');
   const objectBId = assignmentIdFor(call1, 'objectB');
-  assert.equal(firstGrant.appended, true, 'the FIRST authorize step really granted a new authorization');
+  assert.equal(
+    call1.closed,
+    false,
+    'P10-KERNEL-FIX: the session must NOT auto-close here -- proposer-actor still owes its own gated "respond" binding, even though "propose" (its first-ever assignment) already settled',
+  );
+  assert.deepEqual(
+    call1.quorum.missing.map((m) => m.actorId),
+    ['proposer-actor'],
+    'proposer-actor, and only proposer-actor, is reported incomplete -- coordinator/objector-a/objector-b have no further gating binding and are correctly complete already',
+  );
+  const eventsAfterCall1 = countEventLines(tempDir, coordinationId);
+  assert.equal(replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir }).manifest.status, 'active', 'the session must genuinely still be active -- not prematurely closed -- when call 2 starts');
+
+  // ── Call 2: a genuinely SEPARATE, later runGroupThinkingRequest call,
+  //    naming the SAME coordinationId. Authorizes "respond" (twice --
+  //    proving the same-call idempotent no-op still holds), dispatches it,
+  //    and records the driver's disposition -- THE scenario silently,
+  //    permanently refused before this fix.
+  const authorizeStep = {
+    type: 'authorize',
+    as: 'authRespondFirst',
+    operationId: 'respond',
+    targetActorId: 'proposer-actor',
+    authorizationId: 'auth_p10_kernel_fix_respond',
+    invocationKey: 'p10-kernel-fix-respond:1',
+    reason: 'Reveal both independent objections for a driver-authorized response, in a genuinely separate later call.',
+    grantedContextRefs: [objectAId, objectBId],
+  };
+  const call2 = await runGroupThinkingRequest(ctx, {
+    protocolId: RFC_REVIEW_LITE_ID,
+    requestObject: {
+      kind: 'declared-protocol',
+      objective: 'Resume the same session, authorize (twice) and dispatch "respond", then record the driver\'s disposition.',
+      writerId,
+      coordinationId,
+      protocolRef: { id: RFC_REVIEW_LITE_ID },
+      steps: [
+        authorizeStep,
+        // Same authorizationId + invocationKey, repeated within THIS
+        // (genuinely separate) request -- run.mjs's own documented
+        // idempotent-authorize path (readSessionEvents fallback on
+        // appended:false, run.mjs:433-446) must report the REAL,
+        // already-persisted grant back, never a second live authorization.
+        { ...authorizeStep, as: 'authRespondRepeat' },
+        opStep('respond', 'respond', 'proposer-actor'),
+        { type: 'disposition', as: 'disposeResponse', targetRef: '$ref:respond', disposition: 'accepted', rationale: 'The response satisfactorily addresses both independent objections.', evidenceRefs: [] },
+      ],
+    },
+  });
+  const firstGrant = call2.steps.find((s) => s.as === 'authRespondFirst');
+  const repeatGrant = call2.steps.find((s) => s.as === 'authRespondRepeat');
+  assert.equal(firstGrant.appended, true, 'the FIRST authorize step, in this genuinely separate call, really granted a new authorization');
   assert.equal(repeatGrant.appended, false, 'the immediate, same-call repeat of the identical authorizationId is a truthful no-op, not a fresh grant');
   assert.equal(repeatGrant.authorizationId, firstGrant.authorizationId);
-  assert.equal(repeatGrant.invocationKey, firstGrant.invocationKey);
-  assert.deepEqual(new Set(repeatGrant.grantedContextRefs), new Set(firstGrant.grantedContextRefs), 'the idempotent read-back must report the REAL persisted grant, byte-identical to the first, never the repeat step\'s own echoed intent');
-  assert.equal(call1.closed, true, 'sanity for the design note above: quorum really is met -- and the session really did auto-close -- the instant all 4 actors have completed, with no dependency on "respond" ever running');
+  assert.deepEqual(new Set(repeatGrant.grantedContextRefs), new Set(firstGrant.grantedContextRefs), 'the idempotent read-back must report the REAL persisted grant, byte-identical to the first');
+  assert.equal(
+    call2.steps.find((s) => s.as === 'respond').status,
+    'done',
+    'P10-KERNEL-FIX: "respond" now dispatches successfully in a genuinely separate, later call -- refused outright before this fix (session already "completed")',
+  );
+  assert.equal(call2.steps.find((s) => s.as === 'disposeResponse').appended, true);
+  const respondId = assignmentIdFor(call2, 'respond');
+  assert.equal(call2.steps.find((s) => s.as === 'disposeResponse').targetRef, respondId);
+  assert.equal(call2.closed, true, 'every gating binding is now settled -- the session correctly closes at the end of THIS call');
 
-  const eventsAfterCall1 = countEventLines(tempDir, coordinationId);
-  const replayedAfterCall1 = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
-  assert.equal(replayedAfterCall1.authorizations.length, 1, 'replay alone must show exactly ONE authorization ever took effect, even after call 1\'s own same-call repeat');
+  const replayedAfterCall2 = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(replayedAfterCall2.authorizations.length, 1, 'replay alone must show exactly ONE authorization ever took effect, even after call 2\'s own same-call repeat');
+  assert.equal(replayedAfterCall2.assignments.filter((a) => a.actorId === 'proposer-actor').length, 2, 'the proposer is bound twice (propose in call 1, respond in call 2) -- both, and only those two, reconstructable from replay');
 
-  // ── A genuinely SEPARATE, later runGroupThinkingRequest call, naming the
-  //    SAME coordinationId, attempting to re-authorize the identical,
-  //    already-settled step. Per the design note above, the session has
-  //    already naturally closed -- this must be refused outright by the
-  //    engine's own active-session guard, never silently accepted as a
-  //    second no-op grant.
+  // ── Call 3: a genuinely SEPARATE, THIRD call, attempting to re-authorize
+  //    the identical, already-settled step AFTER the session has naturally
+  //    closed. Must be refused outright -- never a silent second grant.
+  const eventsAfterCall2 = countEventLines(tempDir, coordinationId);
   await assert.rejects(
     () =>
       runGroupThinkingRequest(ctx, {
         protocolId: RFC_REVIEW_LITE_ID,
         requestObject: {
           kind: 'declared-protocol',
-          objective: 'Attempt to re-authorize the identical, already-settled step in a genuinely later, separate call.',
+          objective: 'Attempt to re-authorize the identical, already-settled step after the session has naturally closed.',
           writerId,
           coordinationId,
           protocolRef: { id: RFC_REVIEW_LITE_ID },
-          steps: [{ ...authorizeStep, grantedContextRefs: [objectAId, objectBId] }],
+          steps: [{ ...authorizeStep, as: 'authRespondFirst' }],
         },
       }),
     (err) => err instanceof CoordinationError && /is not active \(status: "completed"\)/.test(err.message),
     'a genuinely separate, later call attempting to re-authorize an already-settled step must be refused outright once the session has closed -- never a silent second grant',
   );
-  assert.equal(countEventLines(tempDir, coordinationId), eventsAfterCall1, 'the refused later call must write zero new events');
+  assert.equal(countEventLines(tempDir, coordinationId), eventsAfterCall2, 'the refused later call must write zero new events');
+  assert.ok(eventsAfterCall1 < eventsAfterCall2, 'sanity: call 2 really appended new events on top of call 1');
 
-  const replayed = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
-  assert.equal(replayed.authorizations.length, 1, 'replay alone must still show exactly ONE authorization ever took effect, after both the same-call repeat and the later separate-call refusal');
+  const replayedFinal = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(replayedFinal.authorizations.length, 1, 'replay alone must still show exactly ONE authorization ever took effect, after the same-call repeat and the later post-close refusal');
 });

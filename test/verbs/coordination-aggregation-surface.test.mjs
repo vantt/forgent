@@ -195,6 +195,97 @@ function dispatchRequest(coordinationId) {
   };
 }
 
+// P10-KERNEL-FIX (session-engine.mjs's `actorGatingOperationIds`): when
+// `completion.aggregation` is declared, `synthesize` -- its own
+// `outputOperationRef` -- is deliberately excluded from coordinator-actor's
+// gating set, because its completion is represented by the validated
+// `aggregation-validated` event (`validateSessionAggregation`'s own
+// `assignmentId`/`runId`/`outputArtifactRef` params are all optional, and
+// every test in this file validates without supplying any of them), never
+// by a dispatched Assignment. WITHOUT a declared aggregation there is no
+// such substitute mechanism, so `synthesize` is a perfectly ordinary
+// `required` binding like any other -- it now genuinely needs its own
+// settled Assignment before coordinator-actor counts complete, exactly like
+// `review`. Used ONLY by the two `withAggregation: false` tests below
+// (`dispatchRequest`, above, stays untouched -- every `withAggregation: true`
+// test in this file already passes unmodified, thanks to the exclusion).
+function dispatchRequestNoAggregation(coordinationId) {
+  const request = dispatchRequest(coordinationId);
+  request.steps.push({
+    type: 'operation',
+    as: 'synthesize',
+    operationId: 'synthesize',
+    targetActorId: 'coordinator-actor',
+    taskKey: 'declared-synthesize-coordinator-actor',
+    objective: 'Synthesize the collected research (no aggregation declared -- an ordinary required operation).',
+    expectedOutputs: OUTPUTS,
+  });
+  return request;
+}
+
+// P10-KERNEL-FIX Fix Round 1 (MEDIUM-5, redteam-report.md), revised by Fix
+// Round 2 (N4/NEW-MEDIUM-C, redteam-recheck-report.md): a variant of the
+// SAME declared-aggregation protocol above, with a SECOND actor,
+// analyst-actor, ALSO bound to `synthesize` -- the aggregation's own
+// `outputOperationRef` -- at the same graph node, for a reason unrelated to
+// the aggregation entirely (an authoring coincidence of operation-id reuse,
+// not a second aggregation output). With 2 DISTINCT actors bound to it, the
+// exclusion applies to NEITHER (Fix Round 2 replaced Fix Round 1's
+// "designate whichever binding comes first in graph order" heuristic, which
+// was ambiguous and authoring-order-dependent) -- both actors' own
+// `synthesize` bindings stay ordinary required operations.
+//
+// P10-KERNEL-FIX Fix Round 2 (NEW-HIGH-B, redteam-recheck-report.md):
+// analyst-actor also gets a SECOND, ordinary, unrelated declared operation
+// (`analyst-review`), so the regression test below is genuinely falsifiable
+// against a reverted actor-aware exclusion. Without it, if the exclusion
+// wrongly applied to analyst-actor's own `synthesize` binding too (the
+// pre-Fix-Round-1 bug: keyed on operation id alone), analyst-actor would
+// have an EMPTY gating set and fall through to the pre-existing fallback
+// ("first assignment-created event for this actor, anywhere") -- which,
+// with no Assignment dispatched for it yet, would ALSO read "missing",
+// passing the assertion for the wrong reason entirely. With `analyst-review`
+// declared and settled before the "missing" assertions below, a wrongly
+// -applied exclusion instead leaves analyst-actor's gating set non-empty but
+// ALREADY SATISFIED (that one binding alone), so it would incorrectly read
+// "completed" -- discriminating the fix from the bug.
+function protocolDocCrossActorSynthesize() {
+  const advisory = { kind: 'advisory', evidenceRequired: 'reported' };
+  const doc = protocolDoc({ withAggregation: true });
+  // "synthesize" declares role "coordinator" (protocolDoc's own operations
+  // list) -- analyst-actor must share that role for the binding to be
+  // schema-legal at all, exactly like coordinator-actor's own binding to it.
+  doc.spec.actors.push({ id: 'analyst-actor', role: 'coordinator' });
+  doc.spec.graph.nodes[1].operations.push({ ref: 'synthesize', actor: 'analyst-actor' });
+  doc.spec.operations.push({ id: 'analyst-review', role: 'coordinator', result: advisory });
+  doc.spec.graph.nodes[1].operations.push({ ref: 'analyst-review', actor: 'analyst-actor' });
+  return doc;
+}
+
+function writeCrossActorProtocol(tempDir) {
+  const dir = path.join(tempDir, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'aggregation-surface.json'), `${JSON.stringify(protocolDocCrossActorSynthesize(), null, 2)}\n`);
+}
+
+// The same dispatch `dispatchRequest` performs, plus analyst-actor's own
+// unrelated `analyst-review` step -- settled early so the cross-actor test
+// below is genuinely falsifiable (NEW-HIGH-B, see the comment above
+// `protocolDocCrossActorSynthesize`).
+function dispatchRequestCrossActor(coordinationId) {
+  const request = dispatchRequest(coordinationId);
+  request.steps.push({
+    type: 'operation',
+    as: 'analyst-review',
+    operationId: 'analyst-review',
+    targetActorId: 'analyst-actor',
+    taskKey: 'declared-analyst-review-analyst-actor',
+    objective: 'Unrelated ordinary analyst review pass -- settles before either actor\'s "synthesize" to make the exclusion\'s actor-awareness falsifiable.',
+    expectedOutputs: OUTPUTS,
+  });
+  return request;
+}
+
 // A resume request that dispatches nothing: one driver disposition over an
 // Assignment the session already owns. Its only job is to reach the same
 // close the first request reached, now that an aggregation has been
@@ -307,6 +398,98 @@ test('a validated NO-CONSENSUS aggregation still refuses the close, with the eng
   assert.equal(readManifest(coordinationId, opts).status, 'active');
 });
 
+test('P10-KERNEL-FIX Fix Round 2 N4/NEW-MEDIUM-C (a): the single-actor case still excuses correctly -- no regression from the exactly-one-actor rule', async () => {
+  const coordinationId = 'coord_agg_surface_single_actor_excused';
+  const { ctx, opts } = setup();
+
+  const first = await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+  assert.equal(first.closed, false);
+  assert.deepEqual(
+    first.quorum.missing.map((x) => x.actorId),
+    [],
+    'coordinator-actor is the ONLY actor bound to "synthesize" (the aggregation\'s own outputOperationRef) -- the exactly-one-actor rule still excludes it exactly as before Fix Round 2, and it needs no Assignment for it',
+  );
+
+  const validated = validateSessionAggregation(coordinationId, { aggregationId: 'agg_surface_single_actor', validatedBy: validatedBy() }, opts);
+  assert.equal(validated.outcome, 'consensus');
+
+  const second = await runCoordinationUseCase(ctx, { requestObject: resumeRequest(coordinationId, anAssignmentOf(coordinationId, opts)) });
+  assert.equal(second.closed, true, 'closes cleanly -- coordinator-actor\'s "synthesize" binding stays excused, never dispatched');
+  assert.equal(readManifest(coordinationId, opts).status, 'completed');
+});
+
+test('P10-KERNEL-FIX Fix Round 2 N4/NEW-MEDIUM-C (b) + NEW-HIGH-B: when 2 DISTINCT actors bind the aggregation\'s own outputOperationRef, NEITHER is silently excused, and neither is permanently deadlocked', async () => {
+  const coordinationId = 'coord_agg_surface_cross_actor';
+  const tempDir = mkTempDir();
+  writeCrossActorProtocol(tempDir);
+  const runnerConfig = fakeRunnerConfig(tempDir);
+  const opts = { cwd: tempDir, repoRoot: tempDir };
+  const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig };
+
+  // Dispatch every declared step except EITHER actor's own "synthesize"
+  // binding -- including analyst-actor's unrelated "analyst-review", which
+  // settles here (see the falsifiability comment above
+  // `protocolDocCrossActorSynthesize`).
+  const first = await runCoordinationUseCase(ctx, { requestObject: dispatchRequestCrossActor(coordinationId) });
+  assert.equal(first.closed, false);
+  assert.deepEqual(
+    first.quorum.missing.map((x) => x.actorId).sort(),
+    ['analyst-actor', 'coordinator-actor'],
+    'coordinator-actor and analyst-actor both bind "synthesize" -- with 2 distinct actors bound, the exclusion applies to NEITHER (N4/NEW-MEDIUM-C), so both still owe their own real settled Assignment for it, even though analyst-actor\'s unrelated "analyst-review" binding has already settled',
+  );
+  assert.match(first.closeRefusalReason, /declares completion\.aggregation, but session "coord_agg_surface_cross_actor" has validated no aggregation/);
+
+  // Validate the aggregation FIRST, isolating the actor-completion refusal
+  // below from the separate "no validated aggregation" gate above. Its own
+  // `sourceOperationRefs: ['research']` only ever consults researcher-a/b
+  // (already settled) -- neither actor's "synthesize" binding has any
+  // bearing on the aggregation's own consensus verdict.
+  const validated = validateSessionAggregation(coordinationId, { aggregationId: 'agg_surface_cross_actor', validatedBy: validatedBy() }, opts);
+  assert.equal(validated.outcome, 'consensus');
+
+  const second = await runCoordinationUseCase(ctx, { requestObject: resumeRequest(coordinationId, anAssignmentOf(coordinationId, opts)) });
+  assert.equal(second.closed, false, 'the aggregation gate is satisfied now -- the refusal below is the quorum engine\'s own, not aggregationCloseParams\'s');
+  assert.deepEqual(second.quorum.missing.map((x) => x.actorId).sort(), ['analyst-actor', 'coordinator-actor']);
+  assert.match(
+    second.closeRefusalReason,
+    /missing required actor\(s\)/,
+    'closeSessionByQuorum itself refuses -- neither actor\'s binding to "synthesize" is excused when 2 distinct actors bind it',
+  );
+
+  // Settle BOTH actors' own "synthesize" -- proving neither is permanently
+  // deadlocked by an arbitrary "designated actor" choice (N4/NEW-MEDIUM-C).
+  const thirdRequest = {
+    kind: 'declared-protocol',
+    objective: 'Aggregate two independent research passes.',
+    writerId: WRITER_ID,
+    coordinationId,
+    protocolRef: { id: PROTOCOL_ID },
+    steps: [
+      {
+        type: 'operation',
+        as: 'synthesize-coordinator',
+        operationId: 'synthesize',
+        targetActorId: 'coordinator-actor',
+        taskKey: 'declared-synthesize-coordinator-actor',
+        objective: 'Coordinator\'s own synthesize -- no longer excused once 2 actors bind it.',
+        expectedOutputs: OUTPUTS,
+      },
+      {
+        type: 'operation',
+        as: 'synthesize-analyst',
+        operationId: 'synthesize',
+        targetActorId: 'analyst-actor',
+        taskKey: 'declared-synthesize-analyst-actor',
+        objective: 'Unrelated analyst synthesis pass -- no aggregation relationship at all.',
+        expectedOutputs: OUTPUTS,
+      },
+    ],
+  };
+  const third = await runCoordinationUseCase(ctx, { requestObject: thirdRequest });
+  assert.equal(third.closed, true, 'every actor, including both coordinator-actor and analyst-actor, is now complete, and the earlier validated consensus aggregation still stands');
+  assert.equal(readManifest(coordinationId, opts).status, 'completed');
+});
+
 // ─── 1b. The gate reads the SESSION's definition, never the request's ──────
 
 // A structurally identical protocol under a DIFFERENT id that declares no
@@ -381,7 +564,7 @@ test('regression: a protocol that declares NO aggregation closes exactly as it d
   const coordinationId = 'coord_agg_surface_optin';
   const { ctx, opts } = setup({ withAggregation: false });
 
-  const data = await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+  const data = await runCoordinationUseCase(ctx, { requestObject: dispatchRequestNoAggregation(coordinationId) });
 
   assert.equal(data.closed, true);
   assert.equal(data.closeRefusalReason, undefined);
@@ -460,7 +643,7 @@ test('show reports a post-terminal aggregation as NEUTRALIZED rather than hiding
   const coordinationId = 'coord_agg_surface_post_terminal';
   const { ctx, opts } = setup({ withAggregation: false });
 
-  await runCoordinationUseCase(ctx, { requestObject: dispatchRequest(coordinationId) });
+  await runCoordinationUseCase(ctx, { requestObject: dispatchRequestNoAggregation(coordinationId) });
   assert.equal(readManifest(coordinationId, opts).status, 'completed');
 
   // The store door refuses to validate into a closed session, so a

@@ -35,6 +35,8 @@ import {
   dispatchDeclaredOperation,
   authorizeDeclaredOperation,
   linkSessionContribution,
+  evaluateSessionQuorum,
+  closeSessionByQuorum,
 } from '../../src/runner/coordination/session-engine.mjs';
 import { recordDriverDisposition } from '../../src/runner/coordination/store.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
@@ -406,6 +408,115 @@ test('Delphi chain: a round-2 proposal cannot link before the mediated aggregate
     (err) => err instanceof CoordinationError && /visibility window "round2-open" to be open/.test(err.message),
     'round-2 cannot open before the mediated aggregate operation has settled',
   );
+});
+
+// ─── P10-KERNEL-FIX Fix Round 1 (HIGH-4): quorum/close coverage ────────────
+//
+// None of these three chains' own actors -- RFC's proposer-actor (`propose`
+// + `respond`), Nominal-Group's participant-a/participant-b (`private-
+// propose` + `private-rank`) and single-binding facilitator-actor
+// (`clarify`, driver-authorized + window-gated), Delphi's panelist-a/
+// panelist-b (`propose-round1` + `propose-round2`) -- ever had
+// evaluateSessionQuorum/closeSessionByQuorum called against them before this
+// test (redteam-report.md HIGH-4: `grep -c "closeSessionByQuorum\|
+// evaluateSessionQuorum" test/runner/coordination-deliberation-method-chains
+// .test.mjs` was 0). Every green assertion above this banner proves the
+// mediated-contribution/window/authorization doors work; none of them prove
+// the actual multi-operation-per-actor quorum-gating rule this whole cell
+// exists for holds on these three real, shipped fixtures.
+
+test('RFC chain P10-KERNEL-FIX quorum: proposer-actor (bound to BOTH propose and respond) stays incomplete and close is refused until respond settles too, then closes once it does', async () => {
+  const coordinationId = 'delib-rfc-quorum';
+  const ctx = openProtocolSession(RFC_ID, coordinationId, 'Probe multi-operation-per-actor quorum gating.');
+
+  await dispatch(coordinationId, ctx, 'convene', 'coordinator-actor');
+  await dispatch(coordinationId, ctx, 'propose', 'proposer-actor');
+  await dispatch(coordinationId, ctx, 'object', 'objector-actor');
+
+  const beforeRespond = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(
+    beforeRespond.missing.map((x) => x.actorId),
+    ['proposer-actor'],
+    'proposer-actor still owes its second required binding, "respond", even though its first, "propose", already settled',
+  );
+  assert.throws(
+    () => closeSessionByQuorum(coordinationId, {}, ctx.opts),
+    (err) => err instanceof CoordinationError && /missing required actor\(s\) \[proposer-actor\]/.test(err.message),
+    'closeSessionByQuorum must refuse to close while proposer-actor still owes "respond"',
+  );
+
+  await dispatch(coordinationId, ctx, 'respond', 'proposer-actor');
+  const afterRespond = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(afterRespond.missing, []);
+  const closed = closeSessionByQuorum(coordinationId, {}, ctx.opts);
+  assert.equal(closed.status, 'completed');
+});
+
+test('Nominal-Group chain P10-KERNEL-FIX quorum: participant-a/participant-b (bound to BOTH private-propose and private-rank) stay incomplete and close is refused until private-rank settles too, while single-binding facilitator-actor completes on its own gated "clarify" alone', async () => {
+  const coordinationId = 'delib-ng-quorum';
+  const ctx = openProtocolSession(NOMINAL_GROUP_ID, coordinationId, 'Probe multi-operation-per-actor quorum gating.');
+
+  const { a: proposeA, b: proposeB } = await settleBothPrivateProposals(coordinationId, ctx);
+  link(coordinationId, ctx, { contributionId: 'ng_quorum_proposal_a', type: 'proposal', assignmentId: proposeA, roundKey: 'round-1' });
+  link(coordinationId, ctx, { contributionId: 'ng_quorum_proposal_b', type: 'proposal', assignmentId: proposeB, roundKey: 'round-1' });
+
+  authorizeDeclaredOperation(coordinationId, clarifyAuthorization({ grantedContextRefs: [proposeA, proposeB] }), ctx.opts);
+  await dispatch(coordinationId, ctx, 'clarify', 'facilitator-actor');
+
+  const beforeRank = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(
+    beforeRank.missing.map((x) => x.actorId).sort(),
+    ['participant-a', 'participant-b'],
+    'both participants still owe their own second required binding, "private-rank", even though "private-propose" already settled',
+  );
+  assert.deepEqual(
+    beforeRank.completed.map((x) => x.actorId),
+    ['facilitator-actor'],
+    'facilitator-actor\'s ONLY binding, the driver-authorized + window-gated "clarify", is already a real stamped Assignment, so it completes alone',
+  );
+  assert.throws(
+    () => closeSessionByQuorum(coordinationId, {}, ctx.opts),
+    (err) => err instanceof CoordinationError && /missing required actor\(s\)/.test(err.message),
+    'closeSessionByQuorum must refuse to close while either participant still owes "private-rank"',
+  );
+
+  await dispatch(coordinationId, ctx, 'private-rank', 'participant-a');
+  await dispatch(coordinationId, ctx, 'private-rank', 'participant-b');
+
+  const afterRank = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(afterRank.missing, []);
+  const closed = closeSessionByQuorum(coordinationId, {}, ctx.opts);
+  assert.equal(closed.status, 'completed');
+});
+
+test('Delphi chain P10-KERNEL-FIX quorum: panelist-a/panelist-b (bound to BOTH propose-round1 and propose-round2) stay incomplete and close is refused until round-2 settles too, then closes once it does', async () => {
+  const coordinationId = 'delib-delphi-quorum';
+  const ctx = openProtocolSession(DELPHI_ID, coordinationId, 'Probe multi-operation-per-actor quorum gating.');
+
+  await dispatch(coordinationId, ctx, 'propose-round1', 'panelist-a');
+  await dispatch(coordinationId, ctx, 'propose-round1', 'panelist-b');
+  await dispatch(coordinationId, ctx, 'aggregate', 'facilitator-actor');
+
+  const beforeRound2 = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(
+    beforeRound2.missing.map((x) => x.actorId).sort(),
+    ['panelist-a', 'panelist-b'],
+    'both panelists still owe their own second required binding, "propose-round2", even though round-1 and the mediated aggregate already settled',
+  );
+  assert.deepEqual(beforeRound2.completed.map((x) => x.actorId), ['facilitator-actor']);
+  assert.throws(
+    () => closeSessionByQuorum(coordinationId, {}, ctx.opts),
+    (err) => err instanceof CoordinationError && /missing required actor\(s\)/.test(err.message),
+    'closeSessionByQuorum must refuse to close while either panelist still owes "propose-round2"',
+  );
+
+  await dispatch(coordinationId, ctx, 'propose-round2', 'panelist-a');
+  await dispatch(coordinationId, ctx, 'propose-round2', 'panelist-b');
+
+  const afterRound2 = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(afterRound2.missing, []);
+  const closed = closeSessionByQuorum(coordinationId, {}, ctx.opts);
+  assert.equal(closed.status, 'completed');
 });
 
 // ─── Missing-field default direction, second shape: an explicit empty array ─

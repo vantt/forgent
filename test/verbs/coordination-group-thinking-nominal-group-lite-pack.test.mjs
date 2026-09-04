@@ -319,28 +319,33 @@ test('runGroupThinkingRequest refuses a "link" step with the real schema\'s own 
 //    runGroupThinkingRequest calls against the SAME coordinationId.
 //
 // A GENUINE FINDING surfaced building this section, named honestly rather
-// than engineered around: `run.mjs` calls `closeSessionByQuorum`
-// UNCONDITIONALLY at the end of EVERY request (P10.1.md/P10.5.md's own
-// bypass-#5 note). `classifySessionQuorum` (session-engine.mjs) closes a
-// session the moment EVERY id in `manifest.actors[]` has AT LEAST ONE
-// settled `assignment-created` event -- it is a PER-ACTOR model, not a
-// per-graph-node/per-operation one, and it takes the FIRST matching
-// assignment for each actor id, not "all of that actor's assignments
-// across the whole graph". For Nominal-Group-Lite, the facilitator's FIRST
-// operation is `share` (phase 2 of 4) and each participant's FIRST
-// operation is `private-propose` (phase 1 of 4) -- so the instant `share`
-// settles, EVERY declared actor already has one settled assignment, and
-// the session auto-completes, two whole phases (`clarify`, `private-rank`)
-// before the graph itself is done. This is a SHARED kernel gap
-// (session-engine.mjs, `src/runner/**`, Do-Not-Touch per this cell's own
-// current-cell.md) in the quorum machinery itself, not a defect in this
-// protocol's own definition or in the pack gate -- any declared protocol
-// where one actor is bound to more than one operation across the graph is
-// at risk of it, not just Nominal-Group-Lite. Proven directly below (test
-// B), not hidden, per the phase-10 exit contract's own text ("If a shared
-// missing primitive is proven, do not hide it in the Protocol Pack or
-// skill."). Test A proves resume genuinely works at a split point that
-// does not trip this gap.
+// than engineered around, and since FIXED at the kernel level
+// (P10-KERNEL-FIX; session-engine.mjs's `classifySessionQuorum`, gated by
+// explicit user authorization after P10.6/P10.7/P10.8 independently
+// converged on the identical root cause): `run.mjs` calls
+// `closeSessionByQuorum` UNCONDITIONALLY at the end of EVERY request
+// (P10.1.md/P10.5.md's own bypass-#5 note). `classifySessionQuorum`
+// (session-engine.mjs) USED TO close a session the moment EVERY id in
+// `manifest.actors[]` had AT LEAST ONE settled `assignment-created` event --
+// a PER-ACTOR model, not a per-graph-node/per-operation one, taking the
+// FIRST matching assignment for each actor id, never "all of that actor's
+// GATING assignments across the whole graph". For Nominal-Group-Lite, the
+// facilitator's FIRST operation is `share` (phase 2 of 4) and each
+// participant's FIRST operation is `private-propose` (phase 1 of 4) -- so
+// the instant `share` settled, EVERY declared actor already had one settled
+// assignment, and the session auto-completed, two whole phases (`clarify`,
+// `private-rank`) before the graph itself was done. This was a SHARED
+// kernel gap in the quorum machinery itself, not a defect in this
+// protocol's own definition or in the pack gate -- confirmed live against
+// RFC-Review-Lite too (P10.7's own Red-Team) and against Delphi-Feedback-
+// Lite (P10.8) before the user authorized fixing it directly.
+// `actorGatingOperationIds` (session-engine.mjs) now requires EVERY
+// `required` binding, PLUS every `driver-authorized` binding that ALSO
+// declares `contextAccess.visibilityWindowRef` (exactly `share`/`clarify`'s
+// own shape), to settle before an actor counts complete -- test B below now
+// proves the literal "after share, before clarify" scenario SUCCEEDS,
+// across three genuinely separate calls. Test A proves resume at a split
+// point that never depended on the bug either way.
 
 test('Resume through the pack gate (A): interrupting BEFORE the facilitator ever dispatches (mid private-propose) and resuming with a second runGroupThinkingRequest call correctly continues and completes the WHOLE remaining chain -- no duplicate proposal dispatch, no-tally holds at the end', async () => {
   const tempDir = mkTempDir();
@@ -438,11 +443,11 @@ test('Resume through the pack gate (A): interrupting BEFORE the facilitator ever
   }
 });
 
-test('Resume through the pack gate (B): the exact "interrupt after share settles, resume before clarify" scenario is REFUSED -- a genuine, named finding: run.mjs\'s own unconditional close-on-quorum already auto-completes a Nominal-Group-Lite session after just phase 2 of 4, because classifySessionQuorum is per-actor, not per-graph-node', async () => {
+test('P10-KERNEL-FIX: the exact "interrupt after share settles, resume before clarify" scenario now SUCCEEDS -- a genuinely separate later runGroupThinkingRequest call reaches facilitator-actor\'s remaining declared operation ("clarify") successfully, across THREE separate calls total', async () => {
   const tempDir = mkTempDir();
   const runnerConfig = fakeRunnerConfig(tempDir);
-  const coordinationId = 'ngl-pack-resume-premature-close';
-  const writerId = 'p10-7-resume-premature-close';
+  const coordinationId = 'ngl-pack-resume-kernel-fix';
+  const writerId = 'p10-kernel-fix-ngl-resume';
   const engineOpts = { cwd: tempDir, repoRoot: tempDir };
 
   const firstSteps = [
@@ -454,8 +459,8 @@ test('Resume through the pack gate (B): the exact "interrupt after share settles
       as: 'authShare',
       operationId: 'share',
       targetActorId: 'facilitator-actor',
-      authorizationId: 'auth_share_premature',
-      invocationKey: 'share:premature:1',
+      authorizationId: 'auth_share_kernel_fix',
+      invocationKey: 'share:kernel-fix:1',
       reason: 'All three private proposals have settled -- open the controlled share.',
       grantedContextRefs: ['$ref:proposeA', '$ref:proposeB', '$ref:proposeC'],
     },
@@ -466,45 +471,85 @@ test('Resume through the pack gate (B): the exact "interrupt after share settles
     { protocolId: NOMINAL_GROUP_LITE_ID, requestObject: baseRequest({ coordinationId, writerId, steps: firstSteps }) },
   );
 
-  // THE FINDING, proven directly on call 1's own returned result: every
-  // declared actor (participant-a/b/c via propose, facilitator-actor via
-  // share) now has one settled assignment, so run.mjs's own unconditional
-  // end-of-request close call succeeds -- the session is "completed" after
-  // only phases 1-2 of 4, with `clarify`/`private-rank` never reached.
-  assert.equal(first.closed, true, 'FINDING: the session auto-closes after share settles, even though clarify/private-rank never ran -- classifySessionQuorum only requires each actor id to have ONE settled assignment, not the whole graph to be traversed');
-  assert.equal(first.status, 'completed');
-
-  // Confirmatory: a second runGroupThinkingRequest call attempting to
-  // continue is refused, not by the pack gate's own resume cross-check
-  // (P10.1's fix -- that would name a protocol mismatch), but by the
-  // engine's own terminal-session guard -- proving the refusal's REAL
-  // cause is session lifecycle, not a pack-gate defect.
-  await assert.rejects(
-    () =>
-      runGroupThinkingRequest(
-        { ...engineOpts, runnerConfig },
-        {
-          protocolId: NOMINAL_GROUP_LITE_ID,
-          requestObject: baseRequest({
-            coordinationId,
-            writerId,
-            steps: [
-              {
-                type: 'authorize',
-                as: 'authClarify',
-                operationId: 'clarify',
-                targetActorId: 'facilitator-actor',
-                authorizationId: 'auth_clarify_premature',
-                invocationKey: 'clarify:premature:1',
-                reason: 'Share has settled -- open clarification.',
-                grantedContextRefs: [first.steps.find((s) => s.as === 'share').assignmentId],
-              },
-            ],
-          }),
-        },
-      ),
-    (err) => /is not active \(status: "completed"\)/.test(err.message),
+  // P10-KERNEL-FIX (session-engine.mjs's `classifySessionQuorum` /
+  // `actorGatingOperationIds`): `share` and `clarify` are BOTH
+  // `driver-authorized` bindings for facilitator-actor, each ALSO declaring
+  // its own `contextAccess.visibilityWindowRef` -- so both now GATE
+  // facilitator-actor's own completion. The session must NOT auto-close
+  // here even though facilitator-actor already has a settled assignment
+  // (share). BEFORE this fix, `classifySessionQuorum` counted
+  // facilitator-actor complete the instant its FIRST-ever assignment
+  // (share) settled, auto-closing the session two whole phases early --
+  // P10.7's own Finding #2, escalated to CRITICAL by its own Red-Team after
+  // it reproduced the identical root mechanism live against a different,
+  // already-closed protocol (P10.6/RFC-Review-Lite).
+  assert.equal(
+    first.closed,
+    false,
+    'P10-KERNEL-FIX: the session must NOT auto-close after share settles -- facilitator-actor still owes its own gated "clarify" binding',
   );
+  assert.deepEqual(
+    first.quorum.missing.map((m) => m.actorId).sort(),
+    ['facilitator-actor', 'participant-a', 'participant-b', 'participant-c'],
+    'facilitator-actor is incomplete (owes its own gated "clarify" binding), and all three participants are ALSO incomplete (private-rank is a required binding of their own, not yet dispatched) -- nobody is falsely reported complete',
+  );
+
+  // ── Call 2: a genuinely SEPARATE, later runGroupThinkingRequest call --
+  //    THE literal "interrupt after share settles, resume before clarify"
+  //    scenario this test's own title names -- authorizes and dispatches
+  //    "clarify" successfully. Refused outright before this fix (the
+  //    session was already "completed").
+  const shareId = first.steps.find((s) => s.as === 'share').assignmentId;
+  const second = await runGroupThinkingRequest(
+    { ...engineOpts, runnerConfig },
+    {
+      protocolId: NOMINAL_GROUP_LITE_ID,
+      requestObject: baseRequest({
+        coordinationId,
+        writerId,
+        steps: [
+          {
+            type: 'authorize',
+            as: 'authClarify',
+            operationId: 'clarify',
+            targetActorId: 'facilitator-actor',
+            authorizationId: 'auth_clarify_kernel_fix',
+            invocationKey: 'clarify:kernel-fix:1',
+            reason: 'Share has settled -- open clarification.',
+            grantedContextRefs: [shareId],
+          },
+          { type: 'operation', as: 'clarify', operationId: 'clarify', targetActorId: 'facilitator-actor', taskKey: 'declared-clarify-facilitator-actor', objective: 'Clarify the shared proposals.', expectedOutputs: OUTPUTS },
+        ],
+      }),
+    },
+  );
+  assert.equal(
+    second.steps.find((s) => s.as === 'clarify').status,
+    'done',
+    'P10-KERNEL-FIX: "clarify" now dispatches successfully in a genuinely separate, later call -- refused outright before this fix (session already "completed")',
+  );
+  assert.equal(second.closed, false, 'the session correctly stays open -- all three participants still owe their own gated private-rank binding');
+  assert.deepEqual(second.quorum.missing.map((m) => m.actorId).sort(), ['participant-a', 'participant-b', 'participant-c']);
+
+  // ── Call 3: a THIRD, genuinely separate call finishes the graph -- all
+  //    three private ranks -- and the session now closes naturally.
+  const third = await runGroupThinkingRequest(
+    { ...engineOpts, runnerConfig },
+    { protocolId: NOMINAL_GROUP_LITE_ID, requestObject: baseRequest({ coordinationId, writerId, steps: [rankStep('rankA', 'participant-a'), rankStep('rankB', 'participant-b'), rankStep('rankC', 'participant-c')] }) },
+  );
+  assert.equal(third.closed, true, 'the full graph is now complete across THREE separate calls -- this really is the natural end of the session');
+  assert.deepEqual(third.quorum.missing, []);
+
+  const replayed = replaySession(coordinationId, engineOpts);
+  assert.deepEqual(replayed.aggregations, [], 'no-tally semantics still holds after a resumed chain spanning three separate calls');
+  assert.equal(
+    replayed.assignments.filter((a) => a.actorId === 'facilitator-actor').length,
+    2,
+    'facilitator-actor dispatched exactly twice across the whole chain -- share (call 1), clarify (call 2) -- no duplicate dispatch of either',
+  );
+  for (const actorId of ['participant-a', 'participant-b', 'participant-c']) {
+    assert.equal(replayed.assignments.filter((a) => a.actorId === actorId).length, 2, `"${actorId}" dispatched exactly twice (propose in call 1, rank in call 3) -- no duplication`);
+  }
 });
 
 // ---------------------------------------------------------------------

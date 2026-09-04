@@ -1309,6 +1309,139 @@ function declaredOperationBindingActors(definition, operationId) {
 }
 
 /**
+ * P10-KERNEL-FIX (Step 09 MVP6-9, Phase 10 group-thinking-lite cross-cell
+ * finding -- P10.6/P10.7/P10.8): the graph-declared operation ids that GATE
+ * `actorId`'s own quorum completion for a declared-protocol session --
+ * `classifySessionQuorum`'s multi-operation-aware path, below.
+ *
+ * Every `required` binding gates completion (this is `classifySessionQuorum`'s
+ * pre-existing, always-correct semantics for the single-op-per-actor shape
+ * this mechanism was originally built for -- unchanged). ADDITIONALLY, a
+ * `driver-authorized` binding gates completion too, but ONLY when it ALSO
+ * declares `contextAccess.visibilityWindowRef` -- a REAL, later phase of the
+ * SAME actor's own work, gated by the MVP6 visibility-window mechanism
+ * purely for ACCESS CONTROL (the driver must explicitly grant read access to
+ * upstream context before this actor may act), never a genuinely optional
+ * branch. RFC-Review-Lite's `respond`, Nominal-Group-Lite's `share`/`clarify`
+ * are exactly this shape: each is `driver-authorized` (the driver must
+ * `authorizeDeclaredOperation` it before it can dispatch), but the protocol's
+ * own fixed 4-phase pipeline always reaches it -- there is no real usage
+ * where the driver decides to skip it forever.
+ *
+ * A `driver-authorized` binding with NO `contextAccess.visibilityWindowRef`
+ * is deliberately EXCLUDED from the gating set -- it is a free-standing
+ * driver's-choice branch, not a graph-gated later phase of the same actor's
+ * work. `standalone-master-coordination-loop.yaml`'s `revise-candidate`/
+ * `reviewer-recheck`/`red-team-recheck` are exactly this shape (no
+ * `spec.profile.topology`/visibility windows declared anywhere in that
+ * fixture at all): the driver may legitimately never authorize a revision
+ * round, and `coordination-launch-master-loop.test.mjs`'s own
+ * `coord_launcher_live` case already proves and depends on the session
+ * correctly staying open (actor "fixer" reported `missing`) when that
+ * happens -- counting an ungated driver-authorized binding here would
+ * regress that real, already-shipped test. See this file's own
+ * P10-KERNEL-FIX.md Design Notes for the full investigation (including why
+ * the simpler "count every required binding, ignore every driver-authorized
+ * one" framing this cell started from is not sufficient on its own: it
+ * reproduces P10.6/P10.7's own bug unchanged, since RFC-Review-Lite's
+ * `respond` and Nominal-Group-Lite's `share`/`clarify` are ALL
+ * `driver-authorized`, never `required`).
+ *
+ * Returns `[]` when `actorId` has no gating binding anywhere in the graph
+ * (every binding it has, if any, is an ungated driver-authorized one) --
+ * `classifySessionQuorum`'s caller falls back to the pre-existing
+ * "first-assignment-ever, for this actor" rule for exactly that actor. That
+ * fallback is NOT byte-identical behavior for a gating actor, only for a
+ * NON-gating one (P10-KERNEL-FIX Fix Round 1, HIGH-3, redteam-report.md):
+ * the fallback accepts ANY `assignment-created` event for the actor,
+ * however it arrived, while the gating path above demands an
+ * operation-stamped, settled Assignment (`resolveBindingOutcome` /
+ * `assignmentServesOperation`). An actor with at least one gating binding
+ * genuinely trades the loose fallback for the stricter stamped check --
+ * this is what keeps `fixer`, above, `missing` until its own sole binding
+ * actually dispatches, and what keeps every single-op-per-actor fixture
+ * -- declared-consult, standalone sessions, research fan-out/fan-in, MVP7
+ * aggregation-close, group-cognition-framework -- passing today, since
+ * their own Assignments arrive stamped through `dispatchDeclaredOperation`.
+ * A single-`required`-op actor whose Assignment instead arrives through a
+ * non-stamping public door (`createSessionAssignment`/`dispatchPrimaryTask`/
+ * `proposeConsult` -- `assertNoReservedOperationStamp` actively forbids a
+ * caller-supplied stamp on those) can never satisfy a gating binding and
+ * would be permanently unclosable. Confirmed currently LATENT: no
+ * `runCoordinationUseCase` path reaches this today (the `agent-led` branch
+ * uses `openStandaloneSession`, which has no `definitionRef`) -- named here,
+ * and in P10-KERNEL-FIX.md's own Gaps, for whichever door reaches this path
+ * next.
+ */
+function actorGatingOperationIds(definition, actorId) {
+  // MVP7 (Phase 07): the protocol's own `completion.aggregation.
+  // outputOperationRef`, when declared, names the operation that the
+  // aggregation's OWN output represents -- but `validateSessionAggregation`
+  // never requires a dispatched Assignment for it (its own `assignmentId`/
+  // `runId`/`outputArtifactRef` params are all optional, and every real
+  // caller -- test/verbs/coordination-aggregation-surface.test.mjs,
+  // test/runner/coordination-aggregation.test.mjs -- validates without
+  // supplying any of them). Its completion is represented by the validated
+  // `aggregation-validated` event `closeSessionByQuorum`'s own `aggregationId`
+  // param consults, a SEPARATE narrowing gate on top of quorum, never by a
+  // literal operation-stamped Assignment -- so it is excluded from gating
+  // here, or it would permanently block the bound actor (confirmed
+  // empirically: without this exclusion, this fixture's own coordinator-actor,
+  // bound to both `review` [required] and `synthesize` [required,
+  // `outputOperationRef`], never settles `synthesize` as a real Assignment
+  // anywhere in either test file, and would stay "missing" forever).
+  //
+  // P10-KERNEL-FIX Fix Round 1 (MEDIUM-5, redteam-report.md): the exclusion
+  // is scoped to the actor the graph itself binds to the aggregation's
+  // `outputOperationRef` -- never to every actor who happens to share that
+  // operation id for an unrelated reason. A different actor bound to the
+  // same operation id keeps that binding as an ordinary gating operation,
+  // needing its own real settled Assignment like any other.
+  //
+  // P10-KERNEL-FIX Fix Round 2 (N4/NEW-MEDIUM-C, redteam-recheck-report.md):
+  // Fix Round 1 designated "the" aggregation actor as whichever binding came
+  // FIRST in graph order -- ambiguous and authoring-order-dependent when 2+
+  // actors legitimately bind the same `outputOperationRef` (a semantic no-op
+  // reordering of two sibling entries in one node's `operations[]` silently
+  // flipped who was excused and who deadlocked permanently, since
+  // `validateSessionAggregation` never materializes an Assignment for this
+  // operation for ANY actor). This is a kernel session-engine cell, not a
+  // schema cell, so no heuristic picks a "correct" designated actor: the
+  // exclusion applies ONLY when EXACTLY ONE actor's binding matches
+  // `outputOperationRef` anywhere in the graph. When 2+ distinct actors bind
+  // it, NO exclusion applies to any of them -- every such actor falls back
+  // to ordinary required-operation gating, the same conservative default
+  // this fix already uses elsewhere for ambiguous/unclear cases. See
+  // P10-KERNEL-FIX.md §5 Gaps for the 2+-actors shape (a future cell may
+  // want schema-level rejection instead -- not built here).
+  const aggregationOutputOperationRef = definition.spec.profile.completion?.aggregation?.outputOperationRef;
+  let aggregationActorId;
+  if (aggregationOutputOperationRef !== undefined) {
+    const boundActorIds = new Set();
+    for (const node of definition.spec.graph.nodes) {
+      for (const ref of node.operations) {
+        if (ref.ref === aggregationOutputOperationRef && ref.actor) boundActorIds.add(ref.actor);
+      }
+    }
+    if (boundActorIds.size === 1) {
+      [aggregationActorId] = boundActorIds;
+    }
+  }
+
+  const operationIds = [];
+  for (const node of definition.spec.graph.nodes) {
+    for (const ref of node.operations) {
+      if (ref.actor !== actorId) continue;
+      if (ref.ref === aggregationOutputOperationRef && actorId === aggregationActorId) continue;
+      const mode = activationModeOf(ref);
+      const gates = mode === 'required' || (mode === 'driver-authorized' && ref.contextAccess?.visibilityWindowRef !== undefined);
+      if (gates && !operationIds.includes(ref.ref)) operationIds.push(ref.ref);
+    }
+  }
+  return operationIds;
+}
+
+/**
  * Does this Assignment carry the reserved engine stamp for EXACTLY this
  * declared operation? That is the whole question, and the ONLY channel that
  * can answer it.
@@ -3092,7 +3225,7 @@ export function synthesizeResearchFanIn(coordinationId, { branchActorIds, contra
 export function evaluateSessionQuorum(coordinationId, opts = {}) {
   const { manifest, events } = replaySession(coordinationId, opts);
   const { fgosDir } = resolveSessionPaths(coordinationId, opts);
-  return classifySessionQuorum(coordinationId, manifest, events, fgosDir);
+  return classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts);
 }
 
 // Shared classification body behind `evaluateSessionQuorum` (its own
@@ -3101,8 +3234,89 @@ export function evaluateSessionQuorum(coordinationId, opts = {}) {
 // independently-maintained copies, regardless of which caller supplies
 // `{manifest, events}` (a fresh unlocked read for the former, a fresh read
 // taken INSIDE the terminal write's lock for the latter).
-function classifySessionQuorum(coordinationId, manifest, events, fgosDir) {
+//
+// P10-KERNEL-FIX: `manifest.definitionRef` set (a declared-protocol session)
+// additionally loads that definition so each actor can be classified against
+// `actorGatingOperationIds` (ALL of that actor's gating bindings, not just
+// its first-ever settled Assignment) via `resolveBindingOutcome` -- the same
+// per-operation classifier `resolveOperationOutcome`/visibility windows
+// already use, reused here rather than reimplemented. An actor with no
+// gating binding at all (or a session with no declared protocol,
+// `definitionRef: null`) falls through to the ORIGINAL "first
+// assignment-created event for this actor, anywhere" rule, byte-for-byte
+// unchanged -- see `actorGatingOperationIds`'s own doc comment for exactly
+// which bindings gate and why, and P10-KERNEL-FIX.md for the full
+// investigation.
+//
+// P10-KERNEL-FIX Fix Round 1 (HIGH-1/HIGH-2) + Fix Round 2 (N1/N2/NEW-HIGH-A,
+// reviewer-recheck-report.md / redteam-recheck-report.md): this is a
+// read/close-decision path invoked on EVERY request against a
+// declared-protocol session, including `coordination show`. Two failure
+// classes can stop the bound definition from classifying cleanly --
+// RESOLUTION failure (registry cannot resolve the id at all: a malformed
+// sibling file, a removed/renamed protocol, a missing `yaml` module) and
+// VERSION DRIFT (resolution succeeds, but to a version other than the one
+// this session was opened against). Both are now handled SYMMETRICALLY
+// across the two doors this function serves, by posture rather than by
+// cause:
+//
+// - READ (`evaluateSessionQuorum`, and `show.mjs`'s use of it) always
+//   degrades to `definition = null` -- the pre-existing fallback path,
+//   below -- on EITHER failure class, and never throws. `show` must keep
+//   working under an unresolvable OR a drifted definition (its own stated
+//   invariant); a drifted read reports the honest pre-fix answer (the loose
+//   fallback rule) rather than silently misclassifying an already-settled
+//   actor as "missing" under stamps that embed a version the read can no
+//   longer match (Fix Round 2, N2/NEW-HIGH-A: this was a genuine new
+//   regression against pre-fix HEAD, not "pre-existing laxness" as an
+//   earlier draft of this comment and P10-KERNEL-FIX.md §7.2 both,
+//   incorrectly, claimed).
+// - CLOSE (`closeSessionByQuorum`, only -- `opts.enforceDefinitionVersion`,
+//   below) requires a CLEANLY-RESOLVED, VERSION-MATCHED definition, or
+//   refuses explicitly with an honest, correctly-attributed reason -- never
+//   a silent fallback for either failure class. A resolution failure at
+//   close time is a MUTATION-door failure (Fix Round 2, N1,
+//   reviewer-recheck-report.md): falling back silently there disables the
+//   whole multi-operation gating rule this cell exists to add and restores
+//   this cell's own premature-close bug (one unrelated half-written
+//   protocol file in the registry would silently reopen it). Both failure
+//   classes therefore refuse through the SAME mechanism at close -- one
+//   unified "a close needs a real, matching definition" path, not two
+//   independent special cases -- matching every sibling definition-consuming
+//   mutation door in this file (`authorizeDeclaredOperation`/
+//   `dispatchDeclaredOperation`/`validateSessionAggregation`/
+//   `linkSessionContribution`).
+function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts = {}) {
   const requiredActorIds = (manifest.actors ?? []).map((actor) => actor.id);
+
+  let definition = null;
+  if (manifest.definitionRef) {
+    let resolved = null;
+    try {
+      resolved = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+    } catch {
+      resolved = null;
+    }
+    const drifted = resolved !== null && resolved.metadata.version !== manifest.definitionRef.version;
+
+    if (opts.enforceDefinitionVersion) {
+      if (resolved === null) {
+        throw new CoordinationError(
+          'validation',
+          `classifySessionQuorum: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the definition could not be resolved -- refusing to close against an unresolvable definition`,
+        );
+      }
+      if (drifted) {
+        throw new CoordinationError(
+          'validation',
+          `classifySessionQuorum: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${resolved.metadata.version}" -- refusing to close against a drifted definition`,
+        );
+      }
+      definition = resolved;
+    } else {
+      definition = drifted ? null : resolved;
+    }
+  }
 
   const replacedBy = new Map(); // oldActorId -> replacementActorId
   const replacementTargets = new Set(); // every id that is SOMEONE's replacement (never evaluated as its own top-level slot)
@@ -3135,6 +3349,47 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir) {
       replaced.push({ actorId: originalActorId, replacedBy: effectiveId });
     }
 
+    const gatingOperationIds = definition ? actorGatingOperationIds(definition, originalActorId) : [];
+    if (gatingOperationIds.length > 0) {
+      // Multi-operation-aware path (P10-KERNEL-FIX): EVERY gating binding
+      // for this actor must resolve to a satisfied, operation-stamped
+      // Assignment -- `resolveBindingOutcome` already follows the SAME
+      // `actor-replaced` lineage (`replacedBy`, built above) and the SAME
+      // failed/late/missing vocabulary this function's own fallback path
+      // (below) uses, so both paths report through one shared vocabulary.
+      const outcomes = gatingOperationIds.map((operationId) => resolveBindingOutcome(definition, operationId, originalActorId, { events, fgosDir, replacedBy }));
+      const unsatisfied = outcomes.find((outcome) => !outcome.satisfied);
+      if (!unsatisfied) {
+        const last = outcomes[outcomes.length - 1];
+        completed.push({ actorId: originalActorId, assignmentId: last.assignmentId, runId: last.runId });
+      } else if (unsatisfied.reason === 'missing') {
+        missing.push({ actorId: originalActorId });
+      } else if (unsatisfied.reason === 'late') {
+        late.push({ actorId: originalActorId, assignmentId: unsatisfied.assignmentId });
+      } else {
+        failed.push({ actorId: originalActorId, assignmentId: unsatisfied.assignmentId, runId: unsatisfied.runId });
+      }
+      continue;
+    }
+
+    // Fallback (pre-existing, unchanged): no gating binding anywhere for
+    // this actor -- either this session has no declared protocol at all, or
+    // every binding this actor has is an ungated driver-authorized one
+    // (`actorGatingOperationIds`). "First assignment-created event for this
+    // actor, anywhere" is exactly correct for a session with no protocol
+    // (no graph to consult in the first place) and for the real shipped
+    // shape this fallback exists to preserve (`standalone-master-
+    // coordination-loop.yaml`'s "fixer", whose only binding, revise-
+    // candidate, is a single ungated driver-authorized operation --
+    // `coordination-launch-master-loop.test.mjs`'s own `coord_launcher_live`
+    // proves and depends on "missing until dispatched" for exactly this
+    // shape). A HYPOTHETICAL actor with two-or-more ungated
+    // driver-authorized bindings and no required binding at all would still
+    // see this fallback count it complete after only the FIRST of those
+    // settles -- the same limitation this whole fix addresses for gating
+    // bindings, just not (yet) extended to the ungated case, because no
+    // real fixture in this repo has that shape today (P10-KERNEL-FIX.md
+    // Gaps).
     const createdEvent = events.find((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveId);
     if (!createdEvent) {
       missing.push({ actorId: originalActorId });
@@ -3242,7 +3497,7 @@ export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [], 
         }
       }
 
-      const quorum = classifySessionQuorum(coordinationId, manifest, events, paths.fgosDir);
+      const quorum = classifySessionQuorum(coordinationId, manifest, events, paths.fgosDir, { ...opts, enforceDefinitionVersion: true });
       const incomplete = [...quorum.failed, ...quorum.late, ...quorum.missing];
       const incompleteActorIds = incomplete.map((entry) => entry.actorId);
 
