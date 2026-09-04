@@ -172,6 +172,18 @@ provisional → active; refuses if an active doc already occupies that
 an alias path; requires a valid topic/role. `promote` only moves registry
 state — it never writes prose itself.
 
+### Child 6 — the `knowledge attest` gate (`tsk-28x-6`)
+
+The `knowledge attest` verb this retro-loop session has called at the end
+of every synthesis gained its enforcement gate here: four conditions —
+committed at HEAD, enforcement currently on, path is the live doc slot's
+own `currentPath`, and path is NOT merely an alias (this fourth condition
+is what closes the loophole). The `doc-registry.enforce` config default
+was registered into `fgos setup`'s config-merge AND `fgos doctor`'s check
+registry (`src/setup/checks.mjs`) — never a standalone, undiscoverable
+config knob. Any refusal message names the fix directly, pointing at
+`fgos doc reserve`.
+
 ## Landing this item hit the same fgos-write-rejected block 3 times
 
 Approving this item's merge hit `fgos-write-blocked` (ADR0020: staged
