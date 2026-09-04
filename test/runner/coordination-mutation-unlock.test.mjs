@@ -68,7 +68,7 @@ function initTempRepoWithWorktree() {
  * `fromAssignmentId`) -- `produce-mutating` (doer, result.kind:
  * work-product), `produce-advisory` (doer, result.kind: advisory, for R2's
  * negative test), `review-candidate` (reviewer, result.kind: advisory, for
- * the rollback/hard-refusal regression, Tests First #5). */
+ * the read-only-violation status-grading regression, Tests First #5). */
 function writeFixture(cwd) {
   const dir = path.join(cwd, '.fgos', 'coordination-protocols');
   fs.mkdirSync(dir, { recursive: true });
@@ -463,9 +463,10 @@ test('Tests First #4: a step that does NOT declare mutation at all behaves byte-
   assert.equal(runResult.confidence, 'reported');
 });
 
-// ─── Tests First #5: reviewer/red-team rollback + hard read-only carve-out ─
+// ─── Tests First #5: reviewer/red-team read-only-violation status grading
+// + hard read-only carve-out ───────────────────────────────────────────
 
-test('Tests First #5(a): a reviewer role dispatched normally (unchanged request shape, mutation omitted) still fails closed if its own worker script mutates a file -- the pre-existing read-only-violation gate, unaffected by mutation-unlock', async () => {
+test('Tests First #5(a): a reviewer role dispatched normally (unchanged request shape, mutation omitted) still grades status/confidence "failed" if its own worker script mutates a file -- the pre-existing read-only-violation gate, unaffected by mutation-unlock', async () => {
   const { repoRoot, worktreeRoot } = initTempRepoWithWorktree();
   writeFixture(worktreeRoot);
   openDeclaredProtocolSession(
@@ -496,6 +497,13 @@ test('Tests First #5(a): a reviewer role dispatched normally (unchanged request 
   assert.equal(runResult.status, 'failed');
   assert.equal(runResult.confidence, 'failed');
   assert.ok(runResult.evidence.changedFiles.includes('illegal-reviewer-write.txt'));
+  // What this asserts: the STATUS/CONFIDENCE grading (above) for a
+  // read-only operation that produced a real file mutation. What this
+  // does NOT assert, and never has: that `illegal-reviewer-write.txt` is
+  // actually removed from disk. `rollbackReadOnlyMutations`
+  // (assignment-runner.mjs) has zero callers codebase-wide -- a real,
+  // pre-existing gap (predates this cell), tracked separately, not
+  // exercised or fixed by this test.
 });
 
 test('Tests First #5(b): dispatchPrimaryTask and proposeConsult keep their OWN, separate, hard read-only assertions completely unchanged -- R4\'s explicit carve-out, this mutation-unlock never reaches either path', async () => {
