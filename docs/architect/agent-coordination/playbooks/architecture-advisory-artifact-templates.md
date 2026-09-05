@@ -470,7 +470,80 @@ Missing provenance.
 
 ---
 
-## 9. Dialogue Turn — `human/<n>-person.md`
+## 9. Human-Facing Explanation — `explanation.md`
+
+**Why this exists.** This is Phase 8's output and the only artifact written to be
+read by the person rather than by the panel. It is a separate file from
+`synthesis.md` deliberately: the packet is the panel's record, complete with
+provenance and unchecked criteria, and the explanation is the handover. Merging
+them produces a document that is too internal to hand over and too edited to
+audit. The explanation's job is ownership — the person has to be able to defend
+this decision to a colleague who was not here, using their own words.
+
+```text
+# Explanation — <case slug>
+
+<provenance header — lead advisor; Reads: synthesis.md, intake.md, and every
+human/ turn. Never a shaper's private notes>
+
+Revision: v<n> — <if v2+, what dialogue turn prompted it. Append below the
+previous revision; never overwrite one>
+
+## What We Think You Should Do
+
+<the recommendation, in their vocabulary and at their altitude. If they said
+"job" and "EOD", this section says "job" and "EOD">
+
+## What This Means For Your System, Concretely
+
+<name real paths and real behaviors. "You will be able to change the intraday
+path without re-testing EOD" — not "this improves modularity">
+
+## What Gets Easier
+
+<...>
+
+## What Gets Harder
+
+<every architecture trades something, and the person needs to have been told
+what before they commit, not after. Name who feels it and how often>
+
+## The First Reversible Step
+
+<what to do this week that validates or kills this cheaply, and what it costs>
+
+## When You Should Reverse This
+
+<the observed condition — a number, a rate, an event they will actually see —
+that means this was the wrong call. "If cross-pipeline breakages exceed 3 a
+month after the change, this did not work">
+
+## What We Are Not Sure About
+
+<the panel's live uncertainty, in plain terms, including any dissent that
+survived into the packet, attributed. Do not smooth it>
+
+## What Stays Yours
+
+<explicitly: the judgment the panel cannot make for them, and why it is theirs.
+Usually a values or appetite call — how much disruption is acceptable, how much
+optionality is worth paying for. Name it as a decision, not as a caveat>
+```
+
+**Bad fill.** Restating `synthesis.md` with the provenance stripped out — that is
+a shorter packet, not an explanation, and the tell is that it still uses the
+panel's vocabulary rather than the person's. A "what gets harder" section that
+lists only mild costs while the constraint advocate's HIGH finding stays in the
+packet. Surviving dissent softened to "some considerations", which is the same
+laundering the packet forbids, committed one document later where nobody is
+checking. And an explanation with no "what stays yours" section, or one that
+reads as a disclaimer ("of course, the final decision is yours") rather than
+naming the specific judgment — that sentence is the difference between a person
+owning a decision and a person complying with one.
+
+---
+
+## 10. Dialogue Turn — `human/<n>-person.md`
 
 **Why this exists.** The person's words are evidence with the highest authority
 in the session. They are stored alone, unedited, so that no later artifact can be
@@ -500,7 +573,7 @@ even if the guess was correct.
 
 ---
 
-## 10. Dialogue Impact Assessment — `dialogue/<n>-impact.md`
+## 11. Dialogue Impact Assessment — `dialogue/<n>-impact.md`
 
 **Why this exists.** A dialogue turn is not self-interpreting. This artifact is
 where the lead advisor says what it thinks the turn means, what it changes, and
@@ -556,7 +629,69 @@ interpretation into the person's voice, and a reopen with unbounded scope
 
 ---
 
-## 11. Disposition Entry — `dispositions.md` (append-only)
+## 12. Dialogue Response — `dialogue/<n>-response.md`
+
+**Why this exists.** This is the fourth and last layer of the Dialogue Turn
+Protocol, and the one most likely to go unwritten — because a clarification
+answered in conversation feels finished. It is not: a successor coordinator
+reading `human/3-person.md` with no `dialogue/3-response.md` beside it cannot
+tell whether the person was answered or dropped, and that is exactly the state
+crash recovery is supposed to make impossible.
+
+It is also the layer where authority leaks. The response is produced under the
+driver's authorization, and naming that authorization here is what makes it
+checkable later that the panel did what it was permitted to do and not more.
+
+Every turn gets one, including the small ones. A one-paragraph response with a
+citation is complete; a missing file is not.
+
+```text
+# Dialogue Response <n>
+
+<provenance header — the role that authored the response. For a clarification
+this is normally the lead advisor; for a reopen it is whichever advisors ran>
+
+Responds to: human/<n>-person.md
+Reading applied: dialogue/<n>-impact.md
+Authorized by: dispositions.md § <D-id> — <the authorization in one line>
+
+## What The Panel Says Back
+
+<the actual response, in the person's vocabulary. If it defends a claim, it
+cites the artifact the claim rests on; if it concedes, it says so plainly>
+
+## What Ran To Produce This
+
+<none — answered from existing artifacts | the actors dispatched, with their
+run records. "None" is a legitimate and common answer for a clarification>
+
+## What Changed As A Result
+
+Artifacts revised: <path and revision, or: none>
+Recommendation: <unchanged | changed, and how>
+
+## What Did Not Change, And Why
+
+<the conclusions this turn left standing. Stating these is what stops one
+comment from being remembered later as having overturned more than it did>
+
+## Still Open After This Turn
+
+<or: nothing — the turn is closed>
+```
+
+**Bad fill.** A response with no `Authorized by` line, which means either the
+authorization was never recorded or the panel answered on its own initiative —
+both are findings for a red-team. A response that quietly exceeds its
+authorization: authorized to answer a clarification, it also revises the
+recommendation. A response that answers the impact assessment's reading rather
+than the person's actual words — the tell is that it never quotes or cites
+`human/<n>-person.md`. And the worst one, because it is invisible: no file at
+all, for a turn the coordinator answered in conversation and considered handled.
+
+---
+
+## 13. Disposition Entry — `dispositions.md` (append-only)
 
 **Why this exists.** Disposition is an authority act. Recording it with its
 evidence is what makes the authority auditable, and what lets a red-team catch a
@@ -583,9 +718,35 @@ wrote itself and no residual. `answered` with no citation. And any disposition o
 a finding about the driver's own conduct — those escalate, they never
 self-clear.
 
+### Dialogue Authorization — sub-shape in the same file
+
+A dialogue turn's authorization is recorded here too, under its own id, because
+it is the same kind of act: the driver saying what the panel may do. It is not a
+disposition of a finding, so it takes a shorter shape:
+
+```text
+## <D-id> — authorization for dialogue turn <n>
+
+Turn: human/<n>-person.md
+Reading applied: dialogue/<n>-impact.md
+Authorized: <what the panel may do — which phase reopens, which actors run, what
+the response may cover>
+NOT authorized: <the adjacent thing the panel may not do on this turn. Naming it
+is what makes an overreach detectable>
+Reopen consumed: <yes | no>
+Response: dialogue/<n>-response.md
+```
+
+**Bad fill.** An authorization phrased as an opinion about the architecture
+("authorized: option B does look stronger, revisit it") — the authorization
+grants permission and says nothing about which option is right, and a driver
+that editorializes here is one step from its authorization being read later as
+the person's decision. An empty `NOT authorized` line for a reopen, which turns
+a bounded reopen into an unbounded one.
+
 ---
 
-## 12. Session Status Board — `session.md`
+## 14. Session Status Board — `session.md`
 
 **Why this exists.** This is the crash-recovery entry point. A fresh coordinator
 with no chat history reads this file first and must be oriented by it alone.
@@ -633,7 +794,7 @@ that says "in progress" for three phases at once.
 
 ---
 
-## 13. Prompt Package — `prompts/<role>.md`
+## 15. Prompt Package — `prompts/<role>.md`
 
 **Why this exists.** The prompt is the isolation. In manual mode, "the shapers
 could not see each other" means precisely "these files contained no sibling
@@ -682,7 +843,7 @@ evidence that isolation held.
 
 ---
 
-## 14. Run Record — `runs/<ordinal>-<role>.json`
+## 16. Run Record — `runs/<ordinal>-<role>.json`
 
 **Why this exists.** Provenance the packet's claims are checked against. The
 red-team opens these files; a roster claim with no matching run record is an
@@ -711,7 +872,132 @@ better information than implying a tier choice that changed nothing.
 
 ---
 
-## 15. Rubric Assessment — `rubric.md`
+## 17. Red-Team Report — `redteam.md`
+
+**Why this exists.** The role doctrine requires the independent red-team to
+produce this file, so it needs a shape nobody has to invent. Its structure is
+adversarial on purpose: the unit is an *attack*, not a *section*, because a
+red-team organized by topic drifts into being a second, softer critique. An
+attack names what was checked, what was found in the artifact, and what that
+means — and attacks that failed are reported at the same weight as attacks that
+landed, because "I tried to break this and could not" is the report's only source
+of positive evidence.
+
+The red-team attacks the packet and the panel, not the proposals. It writes
+before seeing `review.md`, and the reviewer writes before seeing this file.
+
+```text
+# Red-Team — <case slug> (verdict: <APPROVE | REVISE | INSUFFICIENT-EVIDENCE>)
+
+<provenance header — must be a different provider family from the synthesizer;
+Reads: the full evidence directory, including prompts/ and runs/>
+
+## Attack <letter> — <what I tried to falsify>: <PASSED | FAILED | PARTIAL>
+
+What I checked: <the files opened, by path. Not "I reviewed the artifacts">
+What I found: <the observation, quoted or cited>
+What it means: <not proven | false | holds — and these are different>
+Severity: <HIGH | MEDIUM | LOW> — <only for FAILED and PARTIAL>
+Named remedy: <the specific thing that would close it. A finding with no remedy
+is harder to disposition and easier to wave away>
+
+## Attacks That Failed, Reported
+
+<the ones where the session held up. Omitting these makes the report look
+thorough and makes it useless as evidence that anything was tested>
+
+## Process, Authority, And Provenance
+
+<the attacks that are not about architecture at all: did the isolation hold, do
+the run records match the roster claims, did any disposition decide a technical
+question without an advisor's evidence, is any human turn unsourced, do the
+falsification timestamps precede the critique they claim to>
+
+## Verdict
+
+<APPROVE | REVISE | INSUFFICIENT-EVIDENCE>
+<one paragraph: which findings drive it. INSUFFICIENT-EVIDENCE is a real verdict
+for a session whose artifacts do not let you check it — never a polite REVISE>
+```
+
+**Bad fill.** A report with no file paths, which means the artifacts were never
+opened. An empty "attacks that failed" section. Cosmetic findings — ordering,
+conciseness, numeric confidence — presented beside an authority violation at the
+same weight; note that recommending numeric confidence also pushes against the
+panel's own bounds. A verdict of `APPROVE` where no attack section shows a
+`runs/` file was read. And the subtle one: a red-team that only attacked the
+architecture, producing a competent second critique while the process, the
+provenance, and the driver's authority went unchecked.
+
+---
+
+## 18. Reviewer Assessment — `review.md`
+
+**Why this exists.** The reviewer is a separate actor from the red-team with a
+separate job, so it gets a separate file. The red-team assumes the session is
+wrong and hunts for the mechanism. The reviewer asks whether the session did what
+it set out to do — whether each phase's obligations were actually met, whether
+the artifacts a fresh coordinator would need exist and are usable, whether the
+rubric's dimensions are answerable from what is on disk.
+
+The two run independently and neither reads the other before writing. Merging
+them into one file destroys that independence and, in practice, produces one
+document in the voice of whichever ran first.
+
+```text
+# Review — <case slug> (verdict: <PASS | REVISE | INSUFFICIENT-EVIDENCE>)
+
+<provenance header — Reads: the full evidence directory. Explicitly NOT
+redteam.md, and state that>
+
+## Obligation Check, Per Phase
+
+| Phase | Obligation | Met | Evidence |
+|---|---|---|---|
+| 1 Intake | verbatim words frozen before interpretation | <yes/no/partial> | intake.md |
+| ... | | | |
+
+<one row per phase that ran. A "partial" needs a sentence naming exactly what is
+missing — "partial" with no specifics is the most common way a review says
+nothing at length>
+
+## Recovery Test
+
+<the real test, performed rather than asserted: read session.md, then intake.md,
+then the newest human/ turn, and state what you would do next. If you could not
+tell, that is the finding, and it outranks everything else in this file>
+
+## Findings
+
+### REV-<id> (<HIGH | MEDIUM | LOW>) — <one line>
+
+What is wrong: <the defect>
+Where: <path, and line or section>
+Why it matters: <what it costs the session or a successor — not "best practice">
+What would close it: <concrete>
+
+## What I Checked And Found Sound
+
+<the same discipline the red-team owes: name what held, so the verdict is
+readable as evidence rather than as a mood>
+
+## Verdict
+
+<PASS | REVISE | INSUFFICIENT-EVIDENCE> — <which findings drive it>
+```
+
+**Bad fill.** A review that duplicates the red-team's job — attacking the
+architecture, hunting for fabrication — and never checks whether the phases met
+their obligations, which leaves the one thing only the reviewer was looking for
+unchecked. An obligation table filled entirely with "yes" and no evidence
+column. A recovery test that says "recovery appears possible" without having
+been run: the whole value of that section is that someone actually tried. And
+findings phrased as preferences ("this section would read better first") at the
+same severity as a missing artifact.
+
+---
+
+## 19. Rubric Assessment — `rubric.md`
 
 **Why this exists.** The person's own judgment of the session is evidence, and it
 must be captured before any evaluator can anchor them. The file's ordering
@@ -741,7 +1027,10 @@ Recorded: <timestamp — must be after Part 1>
 
 ## Part 3 — Reviewer And Red-Team
 
-<recorded last, after both Part 1 and Part 2 exist>
+<recorded last, after both Part 1 and Part 2 exist. This part is a pointer, not
+a copy: the reviewer's own output lives in review.md and the red-team's in
+redteam.md, each with its own provenance and verdict. Summarize here which
+dimensions each one bears on, and cite the file>
 ```
 
 **Bad fill.** Part 1 written by anyone other than the person. Part 1 timestamped
@@ -763,18 +1052,29 @@ failure of the whole assessment, not a procedural nit.
   decision-request.md
   human/1-person.md
   dialogue/1-impact.md
+  dialogue/1-response.md
   proposals/system-shaper.md
   proposals/alternative-shaper.md
   proposals/constraint-advocate.md
   proposals/specialist-<topic>.md
   critiques/architecture-critic.md
   synthesis.md
+  explanation.md
   redteam.md
+  review.md
   dispositions.md
   rubric.md
   prompts/<role>.md
   runs/<ordinal>-<role>.json
 ```
+
+These names are the same ones the
+[coordinator prompt](prompts/architecture-advisory-coordinator.md)'s PERSISTENT
+STATE tree fixes, and they are fixed for one reason: a coordinator resuming with
+no chat history must never have to guess where the previous one put something. If
+a session needs an artifact neither document names, that is a gap in the playbook
+— record it in `session.md` rather than coining a filename a successor will not
+know to look for.
 
 A session is finished when a coordinator who has never seen the conversation can
 read `session.md`, then `intake.md`, then the newest `human/` turn, and know

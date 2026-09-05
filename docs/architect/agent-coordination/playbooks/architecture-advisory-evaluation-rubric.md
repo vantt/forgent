@@ -248,9 +248,9 @@ untested authorship.
 **What it is really asking.** Can they now defend this choice to someone else,
 without the panel in the room?
 
-**Where to look.** The Phase 8 explanation, and Part 1 of `rubric.md` — the
-person's own words are the primary evidence for this dimension and outrank the
-evaluator's reading of it.
+**Where to look.** `explanation.md` (the Phase 8 output), and Part 1 of
+`rubric.md` — the person's own words are the primary evidence for this dimension
+and outrank the evaluator's reading of it.
 
 **Strong.** The explanation uses their vocabulary and altitude, leads with
 consequences rather than architecture, names the first reversible step, names the
@@ -279,12 +279,17 @@ inferable, and it should be tested.
 
 **Strong.** `session.md` names the phase and one imperative next action.
 `intake.md` and the newest `human/` turn give ground truth. Every dispatched
-prompt has a matching run record. Someone genuinely unfamiliar with the session
-read these and knew what to do.
+prompt has a matching run record. Every `human/<n>-person.md` has its
+`dialogue/<n>-impact.md` and `dialogue/<n>-response.md` beside it. Someone
+genuinely unfamiliar with the session read these and knew what to do.
 
 **Weak.** "Next action: continue the session." Prompts with no results, so a
-successor cannot tell what was interrupted. A phase ledger showing three phases
-in progress at once. Critical reasoning that exists only in narration.
+successor cannot tell what was interrupted. A human turn with no recorded
+response, so a successor cannot tell whether the person was answered or dropped.
+A phase ledger showing three phases in progress at once. Critical reasoning that
+exists only in narration. Any artifact under a filename neither the coordinator
+prompt's persistent-state tree nor the artifact templates names — an invented
+path is one a successor does not know to look for.
 
 **False pass.** Every file exists and is well-formed, but the artifacts do not
 say why the panel is where it is. Completeness is not resumability. The only

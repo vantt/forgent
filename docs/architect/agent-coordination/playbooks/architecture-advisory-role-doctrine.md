@@ -79,9 +79,14 @@ dispositions; it never occupies a box.
 
 ### Purpose
 
-Own the relationship between the person and the panel in both directions:
-interpret what they asked, and translate what the panel concluded back into
-something they can act on and defend to someone else.
+Keep the architecture question the panel answers tied to the architecture
+question the person actually has — reading their own words for intent, altitude,
+and vocabulary on the way in, and handing the chosen design back on the way out
+in terms of what changes about *their* system: what becomes easier to change,
+what becomes harder, what the first reversible step is, and what would mean they
+should reverse it. The test is not whether the explanation is clear. It is
+whether the person can defend this decision to the colleagues who will live in
+that codebase.
 
 ### Posture
 
@@ -154,8 +159,9 @@ get to smuggle them in through the explanation.
 
 ### Handoff Shape
 
-Produces `interpretation.md` in Phase 2 and the human-facing explanation in
-Phase 8; drafts the Decision Request in Phase 4 for the driver to authorize.
+Produces `interpretation.md` in Phase 2 and `explanation.md` in Phase 8; drafts
+`decision-request.md` in Phase 4 for the driver to authorize, and
+`dialogue/<n>-impact.md` for each turn in Phase 9.
 Everything it writes is labelled as *its* reading. It never writes into
 `intake.md` or into `human/`. It never authorizes; it never dispositions.
 
@@ -749,24 +755,67 @@ reversible, and the cheapest mitigation. Ranked, not listed flat.
 
 > **Constraint findings — vnflow (constraint advocate)**
 >
-> All proposals carry risk and should be carefully evaluated.
+> **1. Unified-abstraction proposal — migration risk (MEDIUM).** Moving both
+> pipelines onto one engine touches `eod/runner.py` and `intraday/runner.py`,
+> and the EOD path runs unattended overnight. The cutover needs a staged
+> rollout and a tested rollback.
+> *Mitigation:* migrate behind a flag, intraday first, and keep the old path
+> callable for a release.
 >
-> - Security: ensure proper input validation and access control.
-> - Scalability: consider load under peak conditions.
-> - Maintainability: ensure documentation and test coverage.
-> - Operations: ensure monitoring and alerting are in place.
-> - Migration: plan the migration carefully and have a rollback strategy.
+> **2. Contract-test proposal — CI cost (MEDIUM).** The conformance gate lands
+> on `common/schema.py`, the module the scout report shows changes most, so it
+> will run often.
+> *Mitigation:* watch CI duration after it lands and tune if it becomes a
+> bottleneck.
 >
-> Recommendation: proceed with caution.
+> **3. Schema-duplication proposal — drift (MEDIUM).** Two definitions of the
+> same shape will diverge; the scout report found no test covering both paths
+> against one schema version.
+> *Mitigation:* a review convention that schema changes are applied to both
+> copies in the same PR.
+>
+> **4. No-build path — accumulating cost (MEDIUM).** The observed breakage rate
+> is rising quarter over quarter and there is no reason to expect it to level
+> off on its own.
+> *Mitigation:* revisit at the next planning cycle.
+>
+> All four are workable with the mitigations above.
 
-This is bad because it is unfalsifiable and could be pasted into any review of
-any system: nothing in it references a file, a proposal, or an observation. It is
-flat, so it conveys nothing about which candidate is riskier — which is the only
-thing the panel needed from this role. It never distinguishes reversible from
-irreversible, so the genuinely irreversible data risk is buried at the same
-weight as "ensure documentation". It offers no mitigation, so every concern is
-pure cost. And "proceed with caution" is the advocate declining to make the
-judgment it exists to make.
+This one is much harder to catch, and that is the point: it does everything the
+role's checklist appears to ask. It names each proposal, cites real paths, quotes
+the scout report, assigns a severity, and attaches a mitigation to every finding.
+It still fails at the role's actual job, in four ways that are worth naming
+separately.
+
+**Flat ranking wearing a severity label.** Every finding is MEDIUM. The template
+asks for a rank because the synthesizer needs to know which candidate is riskier,
+and four MEDIUMs answer that question with "no comment" while looking like they
+answered it. The advocate's own heuristic — *which one concern, if unaddressed,
+actually sinks this?* — is unanswered.
+
+**No reversibility judgment anywhere**, which is the one call nobody else in the
+panel is making. And its absence is not merely a missing field: because nobody
+asked which step is irreversible, the genuinely irreversible one was never
+looked for. Finding 1 stops at "the cutover needs a staged rollout" — a true
+sentence about any migration — instead of going to `eod/runner.py:112` and
+finding that the EOD path writes straight to the reporting table with no staging
+step and no idempotency key, so a partial run under new code cannot be safely
+re-run. The specific mechanism is absent, and a generality stands in its place.
+
+**Process mitigations instead of engineering ones.** "Watch CI duration", "a
+review convention", "revisit at the next planning cycle" — each depends on
+sustained human attention, which is precisely what the scout report's evidence
+about abandoned `common/` modules says this team does not have to spare. The
+cheapest thing that would make a concern survivable is usually a small piece of
+work (an idempotency key, a schema-version assertion at startup, a scheduled
+drift diff), not a promise to be careful. A mitigation nobody can implement in an
+afternoon is a way of noting a concern while declining to make it survivable.
+
+**Magnitudes asserted, never counted.** "Runs often", "rising quarter over
+quarter", "will diverge". The scout report contains the actual numbers; this
+report gestures at them. And the closing line — "all four are workable with the
+mitigations above" — is the same abdication as *proceed with caution*, in more
+competent clothing. The advocate surveyed. It did not judge.
 
 ---
 
@@ -919,8 +968,11 @@ sharpen the very decision the panel exists to sharpen.
 
 ### Purpose
 
-Integrate the entire ledger into one Decision Packet: a decisive, calibrated
-recommendation that preserves dissent, uncertainty, and provenance.
+Resolve the panel's competing candidate architectures into one named
+recommendation about this system — which design to build, which designs that
+choice is being made against, and what observed evidence it rests on — calibrated
+claim by claim, with every surviving objection, unchecked falsification
+criterion, and actor provenance still legible in the Decision Packet.
 
 ### Posture
 

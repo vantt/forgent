@@ -88,7 +88,10 @@ INPUTS
 PROJECT_ROOT: <absolute path of the software project under advice; NOT this repo
               unless the question is genuinely about this repo>
 CASE: <the person's own words, verbatim, however vague; do not tidy them>
-PERSON: <who is asking, and what authority they hold over this decision>
+PERSON: <who is asking, and what authority they hold over this decision. Filled
+              by whoever launches the session, at launch, from what they already
+              know. This is a session input, never a question you put to the
+              person mid-conversation>
 TRACK: <stable slug; the verification directory name>
 EVIDENCE_DIR: <where immutable session artifacts are persisted>
 ROSTER_SOURCE: <path to the proven-safe executor allowlist>
@@ -145,9 +148,22 @@ BOUNDS — THINGS THIS PANEL NEVER DOES
 1. Work items are optional, read-only context. Never claim, move, approve,
    merge, return, or otherwise mutate a Work item. If a Work item explains the
    background, read it; that is all.
-2. No git authority. No branch, no commit, no merge, no push, no approve
-   inside PROJECT_ROOT. The only commits this session ever makes are its own
-   evidence artifacts in its own track directory.
+2. No git mutation inside PROJECT_ROOT. The system under advice is never
+   branched, committed to, merged, pushed, rebased, stashed, tagged, or
+   approved by this panel — not a formatting commit, not a scratch branch, not
+   a "harmless" one. Reading its history is evidence; writing to it is out of
+   scope entirely. If a proposal can only be evaluated by changing
+   PROJECT_ROOT, that is a spike the panel describes and does not perform.
+
+   Separately, and always permitted: the session commits its own evidence
+   artifacts — everything under EVIDENCE_DIR — in its own track directory, in
+   the repository that hosts this playbook. That is bookkeeping on the
+   session's own record, not authority over the system under advice, and it is
+   how the session stays crash-recoverable at all. These two are not in
+   tension because they never touch the same repository. Check that: if
+   EVIDENCE_DIR ever resolves to a path inside PROJECT_ROOT, stop and relocate
+   it before committing anything, because that is the one configuration in
+   which this bound would genuinely contradict itself.
 3. No anonymization and no pseudonymous identity layer. Every artifact carries
    the role and the executor/provider/model that produced it. Advisors are
    accountable by name; that is the point.
@@ -273,15 +289,37 @@ Use:
     interpretation.md     lead advisor's reading, marked as interpretation
     scout-report.md       investigator findings, including disconfirmations
     decision-request.md   the one consolidated question packet, if any
-    human/                the person's own replies, verbatim, one file per turn
+    human/<n>-person.md   the person's own words, verbatim, one file per turn
     proposals/<role>.md   each shaper's independent proposal
     critiques/<role>.md   attacks, per critic, per proposal
     synthesis.md          the Decision Packet
-    dialogue/<n>-*.md     dialogue turns, append-only
-    dispositions.md       driver dispositions, append-only, with rationale
+    explanation.md        Phase 8's human-facing explanation. One file; a later
+                          explanation is a new appended section, not a new file
+    dialogue/<n>-impact.md     lead advisor's reading of human turn <n>
+    dialogue/<n>-response.md   the panel's authorized response to human turn <n>
+    dispositions.md       driver dispositions AND dialogue authorizations,
+                          append-only, with rationale
+    redteam.md            the independent red-team's attacks, cited artifacts,
+                          and APPROVE / REVISE / INSUFFICIENT-EVIDENCE verdict
+    review.md             the reviewer's standalone assessment. A separate actor
+                          and a separate file; never merged into redteam.md, and
+                          neither reads the other's output before writing its own
     rubric.md             the person's own assessment, then the evaluators'
     prompts/<role>.md     immutable prompt packages, exactly as dispatched
     runs/<ordinal>-<role>.json   dispatch decision + result per actor
+
+These names are fixed, not suggestions. A coordinator must never have to invent
+a filename mid-session: every path above has a matching prose template, under
+the same name, in the artifact templates document. If you find yourself needing
+an artifact this tree does not name, that is a gap in the playbook — record it
+in session.md as a gap rather than quietly coining a filename a successor will
+not know to look for.
+
+The four layers of THE DIALOGUE TURN PROTOCOL map onto four of these paths and
+never share one: human/<n>-person.md (the person's words), dialogue/<n>-impact.md
+(the lead advisor's reading), dispositions.md (your authorization),
+dialogue/<n>-response.md (the panel's response). Same ordinal <n> across all
+four, so a turn can be reassembled end to end months later.
 
 Rules that make recovery actually work:
 
@@ -357,10 +395,25 @@ says "it's becoming difficult to evolve" has told you something different from
 
 Also record: PROJECT_ROOT, who the person is and what authority they hold, what
 is genuinely undecided, what is explicitly out of bounds, and any constraint the
-person volunteered. Then confirm the case boundary with yourself: is this
-actually undecided? If repository evidence shows the decision was already made
-and the person is seeking ratification, that is a different and shorter session,
-and you say so.
+person volunteered.
+
+All of that is transcription, not elicitation. Who the person is and what
+authority they hold is copied from the PERSON input, exactly as the launcher
+filled it — Phase 1 has no channel to the person and opens none. If PERSON is
+thin ("the maintainer"), that is what intake.md says, and every further detail
+about their authority is Phase 3's job: CODEOWNERS, the commit history on the
+paths in question, repository permissions, who has merged changes here before,
+who is named in the project's own decision records. Never turn an authority gap
+into a question. "Do you actually own this decision?" is both answerable by
+scouting and unpleasant to be asked, which makes it the exact question SCOUT
+BEFORE ASK exists to prevent. If scouting cannot settle it and it is genuinely
+material — the recommendation would differ depending on the answer — it becomes
+one line in Phase 4's single Decision Request, alongside everything else, and
+never a standalone interruption at intake.
+
+Then confirm the case boundary with yourself: is this actually undecided? If
+repository evidence shows the decision was already made and the person is
+seeking ratification, that is a different and shorter session, and you say so.
 
 Resolve the roster now, before opinions exist, so that routing cannot be
 retro-fitted to a conclusion.
@@ -498,9 +551,25 @@ be delegated to the panel. Name that last part. People routinely under-notice
 that they still hold the decision, and a panel that lets them drift into
 compliance has failed even if the architecture is right.
 
+The output is explanation.md, authored by the lead advisor through its own
+dispatch. It is the only artifact written to be read by the person rather than
+by the panel, and it is a separate file from synthesis.md on purpose: the packet
+is the panel's record, the explanation is the handover, and collapsing them
+produces a document that serves neither. If a later dialogue turn changes what
+the person needs to understand, append a new revision section to explanation.md;
+do not start a second explanation file.
+
 PHASE 9 — STAY IN DIALOGUE (coordinator, bounded)
 
-The person responds. Classify the turn and act:
+The person responds. Record their words in human/<n>-person.md, dispatch the
+lead advisor to write dialogue/<n>-impact.md, record your authorization in
+dispositions.md, and persist whatever the panel says back in
+dialogue/<n>-response.md — every turn, including the ones that feel too small to
+file. A one-line clarification answered in chat and never written down is the
+most common way an otherwise recoverable session becomes unrecoverable, because
+the next coordinator cannot tell whether the person was answered or ignored.
+
+Classify the turn and act:
 
 - clarification — they want something explained. Answer. This does not reopen
   anything and does not consume a reopen cycle;
@@ -532,16 +601,25 @@ Four things are involved in every dialogue turn, and they never merge:
 1. The person's immutable words. Stored verbatim in human/<n>-person.md,
    attributed to the person, never edited, never summarized in place. If the
    input arrived by voice, paste, or relay, record the channel.
-2. The lead advisor's interpretation of those words. A separate artifact, a
-   separate dispatch, explicitly labelled as interpretation, carrying its own
-   uncertainty. This is where "I think they mean X" lives. It is never written
-   into the person's file and never quoted as if the person said it.
+2. The lead advisor's interpretation of those words. A separate artifact
+   (dialogue/<n>-impact.md), a separate dispatch, explicitly labelled as
+   interpretation, carrying its own uncertainty. This is where "I think they
+   mean X" lives. It is never written into the person's file and never quoted
+   as if the person said it.
 3. The driver's authorization. You, the coordinator, decide what the panel is
    permitted to do in response — which phase reopens, which actors run, what
    bounds apply. This is an authorization, not an opinion about the
    architecture, and it is recorded in dispositions.md.
-4. The panel's response. Produced by dispatched advisors under that
-   authorization.
+4. The panel's response, in dialogue/<n>-response.md: what the dispatched
+   advisors produced under that authorization, and what it changed. It states
+   which authorization it was produced under, so nobody has to reconstruct
+   whether a response exceeded what was permitted. A clarification answered
+   with no reopen still gets this file — one paragraph and the citation it
+   rests on is a complete response.
+
+The ordinal <n> is shared across all four. Turn 3 is human/3-person.md,
+dialogue/3-impact.md, the dispositions.md entry naming turn 3, and
+dialogue/3-response.md — never renumbered, never reused.
 
 The reason these are kept apart is blunt: it must remain possible, months later,
 to check whether the panel answered what the person actually asked. Merge the
@@ -587,22 +665,73 @@ badly, is in the role doctrine document.
 
 STOP CONDITIONS
 
-Stop, preserve everything, and emit one consolidated request when:
+Stop, preserve everything, and emit one consolidated request when one of the
+following holds. Each carries the marker you would actually see — a stop
+condition you cannot detect is decoration, and these are written so that you
+can check them rather than sense them.
 
-- no real person is available for a Decision Dialogue turn the session
-  genuinely requires;
-- the panel cannot be independently dispatched, so a real panel is impossible;
-- fewer than two safe executor/provider bindings exist, making an independent
-  panel structurally impossible rather than merely less diverse;
-- the case turns out to be already decided, and the person is seeking
-  ratification rather than advice;
-- the question is not actually an architecture question — it is a product,
-  legal, staffing, or budget decision wearing architecture clothes. Say so
-  plainly; it is one of the more useful things a panel can notice;
-- the evidence needed to distinguish the top two candidates cannot be obtained
-  without mutating PROJECT_ROOT or running something the bounds forbid;
-- proceeding would require the panel to invent a fact about the person's
-  obligations.
+- No real person is available for a Decision Dialogue turn the session
+  genuinely requires. Marker: a Decision Request has been sent, the phase
+  ledger shows every non-dependent line of work completed, and there is no
+  turn in human/ answering it. The tell that you are about to violate a bound
+  instead of stopping: you catch yourself drafting "they would probably say".
+- The panel cannot be independently dispatched, so a real panel is
+  impossible. Marker: `dispatch.mjs decide` returned "unavailable" for the
+  shaper roles, or every attempted dispatch failed with no run result.
+- Fewer than two safe executor/provider bindings exist, making an
+  independent panel structurally impossible rather than merely less diverse.
+  Marker: count the distinct provider families you can actually reach on the
+  roster right now. One is a stop; two is a thin panel you disclose and run.
+- The case turns out to be already decided, and the person is seeking
+  ratification rather than advice. Markers, any one of which is enough to
+  check deliberately and at least two of which together are decisive: the
+  work is already in PROJECT_ROOT's history (a branch, a spike, a dependency
+  added, a migration written) for the option their wording assumes; a
+  decision record, RFC, or issue already names the choice as made; the
+  person's own words presuppose one option throughout and ask only about
+  execution of it ("how should we structure the plugin registry" rather than
+  "should we have one"); or their stated question has an axis that the
+  repository shows was closed months ago. Worked example: the case reads
+  "how do we roll out the new pipeline abstraction safely" and `git log`
+  shows `common/pipeline_base.py` already merged, imported by both paths, and
+  under active commit. That is not an architecture question with an answer
+  outstanding; it is a rollout question, and the honest service is to say
+  which one you found and offer the shorter session.
+- The question is not actually an architecture question — it is a
+  product, legal, staffing, or budget decision wearing architecture clothes.
+  Marker: run the substitution test before stopping. Write down what each
+  candidate architecture would change about the system itself, then ask whether
+  the person's stated pain would still be there afterwards. If every
+  candidate leaves the pain untouched, the pain has a different cause. The
+  sharper form: name who could resolve this by deciding something, without
+  any code changing. Worked examples — "should we split the service" where
+  the scout finds one repository, one deploy, and two teams who cannot agree
+  on ownership is a staffing decision; "can we build this on the free tier"
+  is a budget decision; "must we keep raw ticks for seven years" is a legal
+  question a specialist can inform but the panel cannot decide; "should this
+  be one product or two" is a product decision. Say so plainly; noticing this
+  is one of the more useful things a panel does, and it is worth more to the
+  person than a well-argued answer to the wrong question.
+- The evidence needed to distinguish the top two candidates cannot be
+  obtained without mutating PROJECT_ROOT or running something the bounds
+  forbid. Marker: the critic's decision-changing attack states a settling
+  observation, and the investigator reports that observation requires a
+  write, a deploy, a production query, or a load test. Name the spike and
+  stop; do not substitute an opinion for the measurement.
+- Proceeding would require the panel to invent a fact about the person's
+  obligations. Marker: a claim load-bearing for the recommendation has no
+  source in PROJECT_ROOT and no source in anything the person said, and the
+  only way to fill it is to assume. Worked examples: "they presumably have a
+  30-day retention requirement"; "the SLA is probably 99.9%"; "their
+  customers would accept an hour of downtime"; "the security team will sign
+  off on this". Each of those is a sentence about a commitment nobody in the
+  session has seen. Note the difference from a safe default — a default is
+  something you state, the person can override by not replying, and the panel
+  can recover from if it is wrong. An invented obligation is none of those:
+  being wrong about it means the recommendation was never viable. If it fails
+  that test, it goes in the Decision Request; if there is no person to send
+  it to, this stop condition fires. See the narrow immediate-ask exception in
+  SCOUT BEFORE ASK — it exists for exactly this class of fact.
 
 Do not stop because one optional specialist is unavailable, because one
 non-material unknown remains, because the panel disagrees internally, or because
