@@ -6,8 +6,13 @@ as a necessary step; 2 of 3 (system shaper, constraint advocate) recommend
 staying thin; alternative shaper's primary is to delete the shell entirely,
 with "stay thin + fix launcher" as its own stated smaller path. Genuine,
 isolated divergence — not manufactured.
-Next action: Phase 6 critic dispatched (agy-bwrap) against all 3 proposals
-together. Then Phase 7 synthesizer.
+Phase 6 (critic) done: 5 attacks, 1 conceded failed, 2 decision-changing
+(reversibility-illusion on Proposal 1, "punishing success" flips Proposal
+2's deletion premise). Phase 7 (synthesizer) done: ONE recommendation
+("Thin Shell, Measured First"), both live disagreements preserved
+unresolved with attribution, 14 calibrated claims, explicit costs.
+Next action: Phase 8 (lead advisor explanation.md) dispatched. Coordinator
+STOPS after Phase 8 -- Phase 9 (Decision Dialogue) needs the real person.
 
 Roster: see intake.md's Roster Resolved At Intake table.
 
