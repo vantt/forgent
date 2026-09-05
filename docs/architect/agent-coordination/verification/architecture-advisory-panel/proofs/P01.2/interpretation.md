@@ -1,4 +1,9 @@
-# interpretation.md
+Role: Lead Advisor | Cell: P01.2 | Requested: `claude` via bwrap, tier `critical` | Derived: provider `claude`, model `opus`
+Dispatch: bwrap (kongming-verified: --tmpfs /tmp before re-pinning PROJECT_ROOT/EVIDENCE_DIR) -- see intake.md's Scratch-Bind Design section
+Prompt: `proofs/P01.2/prompts/lead-advisor-interpretation.md`
+Raw run: `proofs/P01.2/runs/2-lead-advisor-interpretation-raw.log`
+
+---
 
 > **This is interpretation, not intake.** Everything below except the block quoted under "What they actually said" is my inference. It has not been confirmed by the person and must not be merged into `intake.md` or quoted back as if it were their framing.
 
@@ -107,4 +112,3 @@ Each of these is held open on purpose, with the evidence that would collapse it:
 ## Note for the panel
 
 Do not treat the CASE's bundling of "registry/render/search" as a settled unit, and do not treat my reframe ("what is the shell allowed to cost the daemon") as the person's framing — it is mine, and it is provisional. If the scout report contradicts any inference above, the scout wins; this document was written blind by design.
-EXIT:0
