@@ -31,7 +31,7 @@ single shared `current-cell.md`.
 |---|---|---|
 | P01 | R1-R9 (mutation unlock, kernel) | done (P01.1 closed and merged, 4 fix rounds) |
 | P02 | R1-R8 (chain verb, pack registration) | done (P02.1 closed and merged) |
-| P03 | live proof + skill | R1-R4 done (skill authored, closed, merged); R5-R7 paused, needs user decision |
+| P03 | live proof + skill | done (R1-R7 all closed; live proof executed for real on `fgos-test-drive`) |
 
 ## Corrections found during cell preparation (grounded, not assumed)
 
@@ -85,7 +85,7 @@ that introduced it.
 |---|---|---|---|---|
 | P01.1 | **done** | Coordinator | merged into `group-thinking-plan-loop` (Doer `8b24c8a2`, Fixer R1-R4) | closed |
 | P02.1 | **done** | Coordinator | merged into `group-thinking-plan-loop` (Doer `42af6508`, Fixer `a39a920f`) | closed |
-| P03.1 | **R1-R4 done**, R5-R7 paused | Coordinator | merged into `group-thinking-plan-loop` (Doer `362be7e9`, Fixer `2eb5a203`) | R5 needs user decision |
+| P03.1 | **done** | Coordinator | merged into `group-thinking-plan-loop` (Doer `362be7e9`, Fixer `2eb5a203`); live proof run against `/home/vantt/projects/fgos-test-drive` | closed |
 
 ## Wave 1 — closed and integration-verified
 
@@ -186,9 +186,19 @@ verifies each cell's full-suite run from the MAIN checkout going forward
 to avoid this false signal, and will file it as a backlog item separately
 from this track's own coordination.
 
-## Track status (2026-09-05) — natural completion point, stop gate on R5
+## Track status (2026-09-05) — COMPLETE, all cells closed
 
-Every cell this Coordinator can drive autonomously is closed and merged:
+R5's stop gate (below) was resolved by the user: explicit go-ahead given,
+a second/third executor (`codex-cli`/`agy-cli`) configured on
+`fgos-test-drive`, and the live proof executed for real — see P03.1.md's
+"Coordinator Disposition (P03.1)" and "Close (P03.1, full — R1-R7)"
+sections for the complete R5-R7 record, including the independent
+Reviewer + Red-Team pass against the real evidence (2 MEDIUM findings,
+both accepted and fixed) and the resulting `tsk-371` follow-up (Gap 1:
+`run.mjs` never forwards `step.mutation` to the engine — filed as its
+own out-of-scope backlog item, not fixed in this track).
+
+Every cell in this track is closed and merged:
 
 - **P01.1 (kernel mutation-unlock)**: done. 4 real fix rounds, each
   independently reviewed and red-teamed: a forged-stamp bypass, a
@@ -207,25 +217,27 @@ Every cell this Coordinator can drive autonomously is closed and merged:
   regressions.
 - **P03.1 (fgos-plan-loop skill), R1-R4**: done. 1 real fix round
   (missing persona-diversity demonstration), reviewed clean.
-- **P03.1, R5-R7 (the live proof)**: PAUSED, not attempted. R5 requires
-  mutating a SEPARATE real project
-  (`/home/vantt/projects/fgos-test-drive`, which has genuine
-  in-progress work already on it) and killing real OS processes; that
-  project currently has only ONE executor configured (`claude`), not
-  the cross-provider setup R5 requires. This matches
-  master-coordinator.md's own named stop gate verbatim ("a live proof
-  needs a configured executor that is absent") and was also weighed as
-  a hard-to-reverse, cross-system action warranting the user's own
-  go-ahead rather than an unattended run. Full reasoning in
-  `P03.1.md`'s own "Coordinator note on R5".
+- **P03.1, R5-R7 (the live proof)**: DONE. User gave explicit go-ahead
+  and a second/third real executor (`codex-cli`/`agy-cli`) was
+  configured on `fgos-test-drive`. Live proof executed for real: 3
+  distinct-executor dispatches, a genuine seeded-bug catch-and-fix
+  cycle, a real `kill -9` of a live PID followed by a genuinely
+  zero-hand-fed-history resume, real merges, and an independently
+  reproducible zero-touch measurement of `fgos-test-drive`'s own Work
+  state across its ENTIRE git history. R6 filed the one HIGH finding as
+  `tsk-371`. R7 edited `docs/specs/runner.md`'s Work-boundary stop-gate
+  paragraph honestly (Work-independent mutation-unlock now real+proven;
+  Work-attached mutation stop gate explicitly still open). Independent
+  Reviewer (APPROVE) + Red-Team (APPROVE_WITH_CONCERNS, 2 MEDIUM) both
+  ran against the real evidence; both MEDIUMs accepted and fixed,
+  re-verified by the Coordinator. Full record: `P03.1.md`.
 
-**Next action for the user**: decide (a) whether to configure a second/
-third real executor on `fgos-test-drive` (or a different, disposable
-host project instead) and (b) give explicit go-ahead to run R5's live
-proof there — kill-and-resume test included. Once that's decided, resume
-this track (`fgos-plan-loop`'s own skill, now merged and live, or this
-same master-coordinator.md prompt) to execute R5-R7 and formally
-complete the plan.
+**Track complete.** The plan-loop skill (`core/skills/fgos-plan-loop/`)
+is authored, mirrored, and live-proven end-to-end on a real separate
+project. The only carried-forward item is `tsk-371` (needs its own
+properly-scoped fix cell — out of this track's authorized scope) and
+the Work-attached mutation stop gate in `docs/specs/runner.md`, which
+remains genuinely open and was never claimed closed by this track.
 
 current-cell contracts: `current-cell-P01.1.md`, `current-cell-P02.1.md`,
 `current-cell-P03.1.md`. Cell traces: `P01.1.md`, `P02.1.md`, `P03.1.md`.

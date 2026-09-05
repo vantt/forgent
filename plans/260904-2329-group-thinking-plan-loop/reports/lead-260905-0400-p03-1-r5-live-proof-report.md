@@ -261,17 +261,36 @@ whose ENTIRE prompt was: read SKILL.md, then run
 `node .../bin/fgos.mjs coordination chain fgos-plan-loop-live-proof --dir ...`
 to see what's done/next, then finish cell-2 (zero hand-fed chat history —
 only the SKILL.md doc pointer and a description of 3 known runtime gaps
-to work around, which is documentation, not conversation state). **Its
-own first tool call and correct next-action decision** (from its own
-final report, quoted verbatim): *"The killed process had already
-dispatched the first pass (produce/review/red-team) but never got to
-disposition or fix. On resume: 1. Dispositioned 6 findings... 2.
-Attempted `fix-1.json` dispatch → refused with exit code 4: session
-wall-time budget... had already elapsed... 3. Per that precedent, I
-implemented the fix directly..."* — it independently rediscovered cell-1's
-own wall-time-budget precedent (Gap 8) from the persisted event log
-alone and made the SAME Lead-substitution judgment call cell-1 required,
-entirely on its own.
+to work around, which is documentation, not conversation state). The
+exact 3 pre-fed gaps, named here so a reader can judge directly (verbatim
+from the real prompt file used to launch this process,
+`child-b-prompt.txt`, preserved at
+`/tmp/claude-1000/-home-vantt-projects-forgentX/a2984232-9072-4663-9d8a-440469a8964c/scratchpad/r5-live-proof/child-b-prompt.txt`
+— session scratchpad, not yet in the permanent evidence archive): (1) Gap 1 —
+`run.mjs` never forwards a step's declared `mutation: "mutating"`, so a
+real produce/revise commit still comes back graded `failed`; (2) Gap 2 —
+`agent-result.json`'s `status` vocabulary and the `error`-field
+requirement for `status: "failed"`; (3) Gap 3 — `partialPolicy` must be
+declared at session-open time, and the session's internal `status` may
+stay `"active"` even after a real `disposition: "cell-closed"` + merge.
+**None of these 3 pre-fed gaps is Gap 8 (the wall-time-budget gap)** —
+so the wall-time-budget rediscovery specifically was not one of the
+hints handed to this process. **Its own first tool call and correct
+next-action decision** (from its own final report, quoted verbatim):
+*"The killed process had already dispatched the first pass
+(produce/review/red-team) but never got to disposition or fix. On
+resume: 1. Dispositioned 6 findings... 2. Attempted `fix-1.json` dispatch
+→ refused with exit code 4: session wall-time budget... had already
+elapsed... 3. Per that precedent, I implemented the fix directly..."* —
+it independently rediscovered cell-1's own wall-time-budget precedent
+(Gap 8) from the persisted event log alone and made the SAME
+Lead-substitution judgment call cell-1 required, entirely on its own.
+(The only artifact surviving from this process's own run is its final
+self-report, `child-b.log` — no tool-call transcript — so while the 3
+pre-fed hints are now verifiably disclosed and verifiably do not include
+Gap 8, the process's own internal reasoning path to Gap 8 still cannot be
+replayed step-by-step; the claim rests on the prompt file's disclosed
+content plus the final report's consistency, not on a transcript.)
 
 - **Doer** (pre-kill, from the completed first pass) — `codex-cli`,
   assignment `asgn_lead_r5_childa2_op_001`, real commit `dab9691` "Add
@@ -485,6 +504,22 @@ commit on `master` — unrelated to `.fgos/` state, does not affect the
 Work-state-untouched measurement above, which was captured before this
 archival commit). `fgos-test-drive` `master` HEAD after archival:
 `ed5deb0`.
+
+**Disclosed post-hoc**: a third worktree,
+`/home/vantt/projects/fgos-plan-loop-r5-mutation-probe` (branch
+`fgos-plan-loop-r5-mutation-probe`, off commit `c3b2776`), was left on
+disk after this report was first written — used both for Gap 1's
+mutating-dispatch probe (the `PROBE.txt` commit cited above) and for
+negative check (b)'s `NEGATIVE-CHECK-B.md` reviewer-mutation evidence.
+Unlike cell-1/cell-2's worktrees, it was never mentioned as removed or
+kept on purpose; this was a real disclosure gap, not an intentional
+retention. It has since been removed
+(`git worktree remove --force` + `git branch -D`), and the raw evidence
+it held (the `c3b2776` commit diff, `PROBE.txt`, `NEGATIVE-CHECK-B.md`,
+and the neg2b run's `evidence.json`/`agent-result.json`) is now preserved
+at `docs/history/r5-live-proof-evidence/mutation-probe-worktree-archive.md`
+on `fgos-test-drive` (commit `2e5c65e`, a plain docs commit on `master`,
+same category as `ed5deb0` above — no `.fgos/` state touched).
 
 ## Unresolved questions
 

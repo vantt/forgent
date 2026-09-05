@@ -1,6 +1,6 @@
 # Group-Thinking Plan Loop
 
-Status: Phases 01-02 done, Phase 03 R1-R4 done, R5-R7 paused pending user decision (see `docs/architect/agent-coordination/verification/group-thinking-plan-loop/index.md`'s own "Track status") | Created: 2026-09-04 | Owner: maintainer
+Status: COMPLETE — all phases (01, 02, 03 incl. R5-R7 live proof) closed and merged (see `docs/architect/agent-coordination/verification/group-thinking-plan-loop/index.md`'s own "Track status") | Created: 2026-09-04 | Owner: maintainer
 
 Execution track: `group-thinking-plan-loop`
 
@@ -56,7 +56,7 @@ kernel-file work in this plan.
 |---|---|---|---|---|
 | 01 | [Mutation unlock](phase-01-mutation-unlock.md) | Entry Conditions | A declared `operation` step may dispatch `mutation: 'mutating'` only under the four-condition rule; every existing read-only-role test stays green; the cwd/repoRoot session-path bug is fixed and covered | **done** (2026-09-05) — P01.1 closed after 4 real fix rounds (forged-stamp bypass, confusion-of-authority bypass, a verified trust-boundary reframe, an overclaim correction), merged into `group-thinking-plan-loop` |
 | 02 | [Chain verb and pack registration](phase-02-chain-verb-and-pack-registration.md) | Entry Conditions | `fgos coordination chain <track>` renders a correct, real status board from nothing but the session chain's own event logs; `standalone-master-coordination-loop` is a group-thinking pack member | **done** (2026-09-05) — P02.1 closed, merged into `group-thinking-plan-loop` |
-| 03 | [Plan-loop skill and live proof](phase-03-plan-loop-skill-and-live-proof.md) | 01 and 02 both closed | `fgos-plan-loop` skill exists and a real, two-cell live proof on a separate host/dogfood project (never `forgentX`) confirms the whole loop: cross-provider dispatch, a real forced fix round, a killed-and-resumed cell, a merged result, zero Work engine touched | **R1-R4 done** (2026-09-05) — `fgos-plan-loop` skill authored, merged, live. **R5-R7 paused** — needs the user's decision on `/home/vantt/projects/fgos-test-drive` (cross-provider executor setup + explicit go-ahead for a live-fire proof, including a real process kill, against a project with genuine in-progress work already on it). Matches master-coordinator.md's own named stop gate. |
+| 03 | [Plan-loop skill and live proof](phase-03-plan-loop-skill-and-live-proof.md) | 01 and 02 both closed | `fgos-plan-loop` skill exists and a real, two-cell live proof on a separate host/dogfood project (never `forgentX`) confirms the whole loop: cross-provider dispatch, a real forced fix round, a killed-and-resumed cell, a merged result, zero Work engine touched | **done** (2026-09-05) — `fgos-plan-loop` skill authored, merged, live. R5-R7 live proof executed for real against `/home/vantt/projects/fgos-test-drive` (user go-ahead given, cross-provider executors configured): real kill+resume, real cross-provider dispatch, real fix round, zero Work-state touch confirmed. Independent Reviewer + Red-Team both APPROVE(-with-fixed-concerns). One HIGH gap filed as its own follow-up (`tsk-371`: `run.mjs` never forwards `step.mutation`) — out of this cell's scope. |
 
 ## Parallel Execution Map
 
