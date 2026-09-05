@@ -40,21 +40,16 @@ itself needs a `plan.md`/multiple `phase-NN-*.md` files and cross-cell
 sequencing; use this skill when someone just wants ONE change implemented
 and independently checked.
 
-## Non-Goals (inherited from `fgos-plan-loop`, restated because they
-still apply here)
+## Non-Goals
 
-- No fgOS Work items, claims, `fgos pick/cook/submit`, or a fgos-runner
-  loop, ever -- enforced at the schema boundary
-  (`WORK_LIFECYCLE_KEYS`/`assertNoWorkLifecycleKeys`,
-  `schema.mjs:46-50,98-114`), not merely by this skill's own discipline.
-- No lifecycle stage, no `fgos-routing` involvement, no dashboard/UI of
-  any kind. This is deliberately NOT a member of the `fgos-coding-*`
-  stage-routed family (`fgos-coding-discovering/planning/validating/...`)
-  even though both operate in the same repo -- this skill never reads or
-  writes an item's `stage`, never claims anything through the pull door.
-- No git authority inside the session -- the Lead merges the cell's
-  worktree branch by hand, outside any coordination request, exactly as
-  `fgos-plan-loop` requires.
+Same as `fgos-plan-loop`'s own "Non-Goals" section (no Work items ever,
+no git authority inside the session) -- not repeated here, same
+drift-avoidance reason as the known-gap section above. One goal specific
+to THIS skill, not `fgos-plan-loop`'s concern: it is deliberately NOT a
+member of the `fgos-coding-*` stage-routed family
+(`fgos-coding-discovering/planning/validating/...`) even though both
+operate in the same repo -- this skill never reads or writes an item's
+`stage`, never claims anything through the pull door.
 
 ## Known gap this skill inherits (`tsk-371`, not fixed yet)
 
@@ -98,45 +93,23 @@ default above), but keep the roster's shape (doer/fixer, reviewer,
 red-team) and the executor/tier mapping unless there is a real reason to
 diverge.
 
-## Quick recipe
+## Recipe: `fgos-plan-loop`'s sections 1-4, with two substitutions
 
-1. **Create the worktree** (plain git, outside any request -- Mutation
-   Rule condition 3):
+Follow `fgos-plan-loop`'s own sections "1. Open a cell" through "4. Close
+a cell" exactly as written there (worktree creation, `open.json`, reading
+results/disposition, `fix-N.json`, `close.json`, the Lead's own merge) --
+not restated here. Only two things differ for this skill, both naming
+substitutions, nothing procedural:
 
-   ```sh
-   git worktree add ../<change-slug> -b code-panel--<change-slug> <base-branch>
-   ```
+1. Wherever that walkthrough names `<track>-<cell-id>` (worktree path)
+   and `<track>--cell-01` (`coordinationId`), use `<change-slug>` and
+   `code-panel--<change-slug>` instead -- there is no track, so there is
+   no separate cell-id component.
+2. Wherever `objective` would point at a `phase-NN-*.md` file, write the
+   actual code change directly as plain text instead -- no phase file is
+   required for a single-cell change.
 
-2. **Open the cell** -- one `open.json` with `coordinationId:
-   "code-panel--<change-slug>"`, the roster above, and the three
-   required-first-pass steps (`produce-candidate` for `doer`,
-   `review-candidate` for `reviewer`, `red-team-candidate` for
-   `red-team`) exactly as `fgos-plan-loop`'s own section 1 shows --
-   `objective` on the `produce` step names the actual code change in
-   plain text (a one-paragraph task description is enough; no
-   `phase-NN.md` file is required for a single-cell change). Dispatch:
-
-   ```sh
-   fgos coordination run --cwd ../<change-slug> --file open.json
-   ```
-
-3. **Read results, disposition findings** -- `fgos coordination show
-   <coordinationId> --json`, map Reviewer/Red-Team findings to
-   accept/reject/deferred exactly as `fgos-plan-loop`'s own section 2
-   describes (verifying the doer's real outcome yourself first, per the
-   known gap above).
-
-4. **Authorize + dispatch a fix round if needed** (`fix-1.json`,
-   `fix-2.json`, ...) -- same shape as `fgos-plan-loop`'s own section 3,
-   fixer/reviewer/red-team roster from above.
-
-5. **Close** -- a `disposition` step with `disposition: "cell-closed"`,
-   same as `fgos-plan-loop`'s own section 4. Then, outside the session:
-
-   ```sh
-   git -C <main checkout> merge --no-ff code-panel--<change-slug>
-   git worktree remove ../<change-slug>
-   ```
-
-No `index.md`, no track directory, no cross-cell sequencing -- one
-change, one cell, done.
+Use the actor roster above (not `fgos-plan-loop`'s own generic personas)
+in every `open.json`/`fix-N.json`/`close.json` you compose this way. No
+`index.md`, no track directory, no cross-cell sequencing -- one change,
+one cell, done.
