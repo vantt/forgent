@@ -1056,6 +1056,27 @@ registerFix({
   fix: () => fixAgyPermissionsConfigured(),
 });
 
+export function checkBwrapAvailable() {
+  try {
+    execFileSync('bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' });
+    return {
+      passed: true,
+      message: 'bwrap is available on PATH and smoke test (bwrap --ro-bind / / -- true) passed',
+    };
+  } catch (err) {
+    return {
+      passed: false,
+      message: `bwrap is unavailable or failed smoke test: ${err.message}`,
+    };
+  }
+}
+
+registerCheck({
+  id: 'bwrap-available',
+  description: 'bwrap binary resolves on PATH and minimal smoke test (bwrap --ro-bind / / -- true) exits 0',
+  check: () => checkBwrapAvailable(),
+});
+
 // tsk-5m7 (docs/history/tsk-3bn-merge-conductor-harness-v2/): a real
 // actionable problem, same class as the hook/config checks above — a root
 // branch that's drifted ahead of its target with nothing having synced it

@@ -27,9 +27,7 @@ The person's initial request asked to start at Phase 01. Phase 01 (P01.1) declar
 
 ## Baseline
 
-Full suite (`FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 npm test`) executed: 1325 passed, 1 failed.
-The 1 failing test is: `ask/answer round-trip on a genuinely legacy durable-doing item (no claim): answer clamps to todo — awaiting-human -> doing no longer exists`.
-Drift from plan's recorded 4 known failures: The baseline failure count shrank from 4 to 1 (missing-quadrant docs-index, live codex usage-limit, and invalid placeholder characters passed/were bypassed in this environment; no new failures introduced).
+Full suite (`FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 npm test`) Lead authoritative committed baseline: 5614 tests total (5604 pass, 4 fail, 6 skip; see git commit `55c0de9c`).
 
 ## Cells
 
@@ -41,14 +39,14 @@ Drift from plan's recorded 4 known failures: The baseline failure count shrank f
 
 The following safe executor/mechanism pairs are live-proven and admitted for Phase 01+ advisory dispatches:
 
-1. `claude-reviewer` (Native CLI config, `out-of-process`) — Provider: `claude` (Anthropic). Tier: `analytical`/`standard` -> `sonnet`, `critical` -> `opus`. Tool-family gate drops git-write grants while acceptEdits permits evidence output writing.
-2. `claude-bwrap` (OS mount, `out-of-process`) — Provider: `claude` (Anthropic). Tier: `analytical`/`standard` -> `sonnet`, `critical` -> `opus`. Hard OS kernel `bwrap --ro-bind / /` read-only mount.
-3. `codex-readonly` (Native sandbox, `out-of-process`) — Provider: `openai-codex` (OpenAI). Tier: `standard`/`analytical`/`critical` -> `gpt-5.5`. Provider-native `-s read-only` sandbox flag.
-4. `codex-bwrap` (OS mount, `out-of-process`) — Provider: `openai-codex` (OpenAI). Tier: `standard`/`analytical`/`critical` -> `gpt-5.5`. Hard OS kernel `bwrap --ro-bind / /` read-only mount containing bypass-all CLI.
-5. `agy-plan` (Native mode, `out-of-process`) — Provider: `gemini` (Google DeepMind). Tier: `standard` -> `gemini-3.6-flash-medium`, `analytical` -> `gemini-3.1-pro-low`, `critical` -> `gemini-3.1-pro-high`. Provider-native `--mode plan` disables file edits/commits.
-6. `agy-bwrap` (OS mount, `out-of-process`) — Provider: `gemini` (Google DeepMind). Tier: `standard` -> `gemini-3.6-flash-medium`, `analytical` -> `gemini-3.1-pro-low`, `critical` -> `gemini-3.1-pro-high`. Hard OS kernel `bwrap --ro-bind / /` read-only mount.
+1. `claude-bwrap` (OS mount, `out-of-process`) — Provider: `claude` (Anthropic). Tier: `analytical`/`standard` -> `sonnet`, `critical` -> `opus`. Corrected bwrap mount with explicit `--chdir` to fresh disposable checkout (`bwrap --ro-bind / / --dev /dev --proc /proc --bind <evidenceDir> <evidenceDir> --chdir <checkoutDir> -- claude ...`). Hard OS kernel `bwrap --ro-bind / /` read-only mount.
+2. `codex-readonly` (Native sandbox, `out-of-process`) — Provider: `openai-codex` (OpenAI). Tier: `standard`/`analytical`/`critical` -> `gpt-5.5`. Provider-native `-s read-only` sandbox flag.
+3. `agy-bwrap` (OS mount, `out-of-process`) — Provider: `gemini` (Google DeepMind). Tier: `standard` -> `gemini-3.6-flash-medium`, `analytical` -> `gemini-3.1-pro-low`, `critical` -> `gemini-3.1-pro-high`. Corrected bwrap mount with explicit `--chdir` to fresh disposable checkout (`bwrap --ro-bind / / --dev /dev --proc /proc --bind <evidenceDir> <evidenceDir> --chdir <checkoutDir> -- agy ...`). Hard OS kernel `bwrap --ro-bind / /` read-only mount.
 
-Excluded Unsafe Pairs:
+Excluded Unsafe / Non-Runnable Pairs:
+- `claude-reviewer` (`unconfined config`): EXCLUDED (falsified — authorized in-tree write succeeded).
+- `agy-plan` (`--mode plan`): EXCLUDED (falsified — wrote file outside checkout).
+- `codex-bwrap` (`bwrap OS mount`): EXCLUDED (non-runnable startup crash `os error 30`).
 - `codex-cli` (`--dangerously-bypass-approvals-and-sandbox` unconfined): EXCLUDED (mutated target repo).
 - `agy-cli` (`--mode accept-edits` unconfined): EXCLUDED (mutated target repo).
 - `agy-sandbox` (`--mode accept-edits --sandbox`): EXCLUDED (mutated target repo despite `--sandbox` flag).
