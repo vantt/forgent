@@ -1282,6 +1282,22 @@ một live proof ở domain coding chứng minh được cô lập/merge/recover
 quyền chuyển Work thật. Quyết định nền:
 `docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md`.
 
+**Cập nhật (group-thinking-plan-loop, P01.1/P03.1, 2026-09-05):** mutation
+Work-ĐỘC-LẬP (một `operation` step dispatch `mutation: 'mutating'`, không
+đụng Work item nào) nay đã có cơ chế thật (P01.1's mutation-unlock, 4 vòng
+fix, kernel-level) VÀ một live proof thật, hai-cell, trên một project riêng
+biệt (`fgos-plan-loop` skill, P03.1's R5 — báo cáo đầy đủ:
+`plans/260904-2329-group-thinking-plan-loop/reports/lead-260905-0400-p03-1-r5-live-proof-report.md`),
+đo được zero Work engine touched suốt live proof (state.json/events.jsonl
+sha256 identical trước/sau). Đây KHÔNG phải live proof mà đoạn stop gate
+này yêu cầu — R5 tự nó luôn Work-độc-lập theo thiết kế, chưa từng chạm một
+Work item nào, nên KHÔNG chứng minh cô lập/merge/recovery/thẩm quyền
+chuyển Work thật. Stop gate mutation-gắn-Work vẫn còn nguyên, chưa đóng.
+Ghi nhận riêng: R5's own report tìm ra `src/verbs/coordination/run.mjs`
+chưa forward `step.mutation` vào engine — mutation-unlock chưa có đường
+CLI thật nào chạm tới hôm nay (`tsk-371`), một khoảng trống cần đóng
+trước khi domain coding có thể thử nghiệm mutation-gắn-Work qua CLI.
+
 ## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
 
 Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
