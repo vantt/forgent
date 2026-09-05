@@ -1,13 +1,13 @@
 # Session Status Board — P01.2 (mdview, clear case)
 
 Case: thin-client vs local-ownership decision for mdview's native desktop shell.
-Phase: 3 (Understand the Problem) complete — real scout report in hand,
-falsifies the initial hypothesis with strong evidence (see scout-report.md).
-Phase 2 (Understand the Person) dispatched, awaiting result.
-Next action: once Phase 2 lands, do Phase 4 (ask-reluctantly check — the
-scout report surfaced a genuine "local ownership scope" ambiguity and a
-stale-PRD-decision tension, both noted in scout-report.md's Coordinator
-note), then Phase 5 (dispatch 3 shapers, isolated).
+Phase 1-5 complete. All 3 shapers converge on "fix the 4 real launcher bugs"
+as a necessary step; 2 of 3 (system shaper, constraint advocate) recommend
+staying thin; alternative shaper's primary is to delete the shell entirely,
+with "stay thin + fix launcher" as its own stated smaller path. Genuine,
+isolated divergence — not manufactured.
+Next action: Phase 6 critic dispatched (agy-bwrap) against all 3 proposals
+together. Then Phase 7 synthesizer.
 
 Roster: see intake.md's Roster Resolved At Intake table.
 

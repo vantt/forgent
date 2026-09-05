@@ -195,3 +195,54 @@ ERROR: logging before google.Init: I0906 06:47:02.266635     213 experiment_mana
 ERROR: logging before google.Init: I0906 06:47:02.266827     571 manager.go:1270] Reloading system slash commands
 ERROR: logging before google.Init: I0906 06:47:02.271777     571 manager.go:1274] Slash commands unchanged, skipping update
 ERROR: logging before google.Init: I0906 06:47:06.003337     535 http_helpers.go:296] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x556ca2c57f4726b4 ResponseID: 9amcare7Ebm-vr0PzrbsuQ8
+```md
+## Priors Applied
+1. **Activity signals actual priority (Investment follows value):** A component with 0 commits since July 20, a frozen version (`0.1.0` vs workspace `0.7.6`), disabled bundling, and no tests or CI is a stalled spike. It is not currently a primary product surface.
+2. **Reversibility is the primary metric for spikes:** When dealing with an "experimental" surface of uncertain future, the optimal architecture is the one that makes the spike cheapest to delete. Reimplementation of domain logic in a spike maximizes sunk cost; keeping it thin or deleting it maximizes reversibility.
+
+## The Candidate: Delete the Experiment
+The best architecture for the desktop shell is to remove it from the repository entirely.
+
+Instead of deciding between thin-client strain (launcher coordination) and thick-client cost (reimplementing the registry/search/render logic in the desktop package), you should formally pause the native shell experiment and delete its 144 lines of code.
+
+The scout report shows the daemon is thriving (recent capability growth in background indexing, short-links, and editing) and successfully serving other clients (CLI, MCP) that bypass the HTTP daemon and share the SQLite registry directly. The desktop shell, meanwhile, is abandoned and causing operational drag (cold-start races, wrong-port fallback, raw-bind-host bugs) without contributing active product value. 
+
+By deleting the shell:
+- You instantly eliminate the launcher coordination strain.
+- You relieve the single maintainer of supporting an unused surface.
+- If a native desktop app is validated as a product necessity in the future, 144 lines of thin-client wrapper can be recreated in an afternoon.
+
+## The Smaller Path: The "Launcher Fix" (Strict Thin Client)
+If deleting the shell is unpalatable to the maintainer, the smaller path is to reframe the premise: this is not an architecture boundary problem, it is a deployment bug.
+
+- **Consequences:** The shell remains exactly as it is (a pure web view pointed at the daemon). You do not acquire local ownership. Instead, you spend your complexity budget strictly on fixing the cold-start race and the raw-bind-host bug in the launcher coordination logic.
+- **Trigger:** You explicitly defer any architectural shift until a verifiable metric (e.g., user-perceived UI latency) proves that the HTTP daemon hop is an actual bottleneck for a real workflow. Until that trigger fires, no domain logic crosses into the shell.
+
+## Abandoned Alternative
+**The "Read-Only Local Search" (Partial Ownership):** I considered a variant where the shell behaves like the CLI/MCP—opening a direct, read-only connection to the shared SQLite registry for fast local search, while delegating writes and rendering to the daemon. 
+
+*Why I abandoned it:* Opening the SQLite file directly from a GUI introduces concurrent file locking complexity and requires building out a local `Engine` inside the desktop shell. For a feature with disabled bundling and zero CI coverage, this is a massive over-investment that violates the core prior of reversibility.
+
+## Falsification Criteria
+My candidate (delete the shell) or smaller path (fix the launcher only) is wrong if:
+- The lack of commits since July is misleading ERROR: logging before google.Init: E0906 06:47:27.680864     403 errorreport.go:224] mkdir /home/vantt/.gemini/antigravity-cli/brain/e5bfacb6-a8ee-4eee-8f83-97accd7d10a0: read-only file system
+ERROR: logging before google.Init: E0906 06:47:27.680912     101 stager.go:117] Failed to save message for e5bfacb6-a8ee-4eee-8f83-97accd7d10a0: open /home/vantt/.gemini/antigravity-cli/conversations/e5bfacb6-a8ee-4eee-8f83-97accd7d10a0.d78e4884-e13e-4ccb-ba7e-62e1a5dc0d42.tmp: read-only file system
+ERROR: logging before google.Init: E0906 06:47:27.680958     101 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/e5bfacb6-a8ee-4eee-8f83-97accd7d10a0.d78e4884-e13e-4ccb-ba7e-62e1a5dc0d42.tmp: read-only file system
+ERROR: logging before google.Init: E0906 06:47:27.681708     101 stager.go:117] Failed to save message for e5bfacb6-a8ee-4eee-8f83-97accd7d10a0: open /home/vantt/.gemini/antigravity-cli/conversations/e5bfacb6-a8ee-4eee-8f83-97accd7d10a0.c3c996ba-0fb8-4439-ab78-162afa624b5d.tmp: read-only file system
+ERROR: logging before google.Init: E0906 06:47:27.681742     101 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/e5bfacb6-a8ee-4eee-8f83-97accd7d10a0.c3c996ba-0fb8-4439-ab78-162afa624b5d.tmp: read-only file system
+ERROR: logging before google.Init: E0906 06:47:27.682163     101 stager.go:117] Failed to save message for e5bfacb6-a8ee-4eee-8f83-97accd7d10a0: open /home/vantt/.gemini/antigravity-cli/conversations/e5bfacb6-a8ee-4eee-8f83-97accd7d10a0.b3f59f48-13bb-4fe5-8912-8f58afc7de57.tmp: read-only file system
+ERROR: logging before google.Init: E0906 06:47:27.682186     101 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/e5bfacb6-a8ee-4eee-8f83-97accd7d10a0.b3f59f48-13bb-4fe5-8912-8f58afc7de57.tmp: read-only file system
+(e.g., the maintainer has been building out the daemon's backend *specifically* to unblock a massive desktop push planned for next week).
+- The launcher coordination issues are structurally unfixable as long as the UI and daemon remain separate processes, making local ownership a strict technical necessity rather than an architectural choice.
+```
+ERROR: logging before google.Init: I0906 06:47:27.898276       1 manager.go:769] CLI store manager shutting down
+ERROR: logging before google.Init: E0906 06:47:27.900283       1 cache_manager.go:37] failed to persist last conversation to cache: failed to write last conversations: open /home/vantt/.gemini/antigravity-cli/cache/last_conversations.json.45a53b46-3805-4c59-b1a5-e0168f78d3c7.tmp: read-only file system
+ERROR: logging before google.Init: I0906 06:47:27.900320       1 conversation_manager.go:752] Stopping conversation stream
+ERROR: logging before google.Init: I0906 06:47:27.900550     359 server.go:1209] Stream goroutine exited for e5bfacb6-a8ee-4eee-8f83-97accd7d10a0, sending completion signal
+ERROR: logging before google.Init: I0906 06:47:27.900634     359 conversation_manager.go:886] Stream completed for e5bfacb6-a8ee-4eee-8f83-97accd7d10a0, clearing ResponsePending
+ERROR: logging before google.Init: I0906 06:47:27.900942     198 server.go:2803] Language server shutting down
+ERROR: logging before google.Init: I0906 06:47:27.900960     198 server.go:2808] Waiting for migrations to complete to prevent partial migration state...
+ERROR: logging before google.Init: E0906 06:47:27.901154     597 telemetry.go:82] error recording trajectory segment analytics: Post "https://daily-cloudcode-pa.googleapis.com/v1internal:recordTrajectoryAnalytics": context canceled
+ERROR: logging before google.Init: E0906 06:47:27.902623     103 file_watcher.go:194] skipping empty or temp file: 
+ERROR: logging before google.Init: E0906 06:47:27.902684     103 file_watcher.go:194] skipping empty or temp file: 
+EXIT:0

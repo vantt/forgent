@@ -1,0 +1,12 @@
+{
+  "ordinal": 3,
+  "role": "system-shaper",
+  "requested": { "executor": "claude-bwrap", "tier": "analytical", "persona": "system-shaper" },
+  "derived": { "provider": "claude", "model": "sonnet", "tierMaterial": true },
+  "mechanism": "direct bwrap invocation, kongming-verified scratch-bind pattern",
+  "promptPath": "proofs/P01.2/prompts/system-shaper.md",
+  "rawLogPath": "proofs/P01.2/runs/3-system-shaper-raw.log",
+  "outputArtifact": "proofs/P01.2/proposals/system-shaper.md",
+  "exitCode": 0,
+  "isolationCheck": "prompt embedded only CASE/interpretation/scout-report/Phase-4-defaults, no sibling proposal content; output shows no reference to alternative-shaper or constraint-advocate framing"
+}

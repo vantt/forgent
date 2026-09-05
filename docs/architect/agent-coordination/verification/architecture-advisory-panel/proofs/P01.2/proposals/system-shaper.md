@@ -1,4 +1,10 @@
-# proposals/system-shaper.md
+Role: System Shaper | Cell: P01.2 | Requested: `claude` via bwrap, tier `analytical` | Derived: provider `claude`, model `sonnet`
+Dispatch: bwrap (kongming-verified scratch-bind pattern)
+Prompt: `proofs/P01.2/prompts/system-shaper.md` (isolated -- no sibling proposal visible)
+Raw run: `proofs/P01.2/runs/3-system-shaper-raw.log`
+
+---
+
 
 ## Frame I worked from
 
