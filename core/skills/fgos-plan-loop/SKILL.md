@@ -33,6 +33,11 @@ FlowDefinition, which declares exactly this loop's own worker graph:
 `doer` -> `reviewer`/`red-team` (first pass, required) -> `fixer` ->
 `reviewer`/`red-team` recheck (driver-authorized, optional).
 
+For a single, standalone code change that does not need a
+`plan.md`/`phase-NN-*.md` track of its own, see
+[`fgos-code-panel`](../fgos-code-panel/SKILL.md) instead -- same
+mechanism, one cell, no track bookkeeping.
+
 Every request this skill composes is re-validated end to end by
 `validateCoordinationRequest`
 ([`src/verbs/coordination/schema.mjs`](../../../src/verbs/coordination/schema.mjs))
