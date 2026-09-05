@@ -76,3 +76,39 @@ instruction, but the actual confinement mechanism is the direct `bwrap`
 command, never `dispatch.mjs execute` with a fake executor id. Flagged as a
 finding for Phase 02's capability-fit audit: either register these as real
 executors, or correct the playbook's own ROLE ROUTING text.
+
+## Scratch-Bind Design (kongming consult, live-verified)
+
+P00.1's own Known Limitation carried forward: `claude`/`agy` under a bare
+`--ro-bind / /` cannot initialize their own private/scratch state. Consulted
+`kongming` (per standing instruction to check unfamiliar infra design before
+self-implementing) rather than guess. Its answer, strace-verified live on
+this host against a real read+shell+write task:
+
+- Add `--tmpfs /tmp` **before** re-pinning `PROJECT_ROOT`/`EVIDENCE_DIR` —
+  bwrap mounts in argument order, so a later `--ro-bind`/`--bind` shadows the
+  earlier tmpfs. This is what fixes P00.1's original "checkout under host
+  `/tmp` got masked" bug without dropping the tmpfs entirely (P00.1's
+  original invocation dropped `--tmpfs /tmp` altogether to avoid that
+  masking; this reintroduces it safely by re-pinning afterward).
+- `/tmp` alone is sufficient: covers Claude's own `/tmp/claude-<uid>/...`
+  scratch dir, its `/tmp/ck-session-*.json` hook state, and agy's
+  `/tmp/unleash-*.json`. No bind on `~/.claude` or `~/.gemini` needed or
+  wanted — both hold real OAuth credentials and a real 715MB install; a
+  `--tmpfs` mask there would silently drop auth, and a real `--bind` there
+  would be exactly the persistence-leak vector this whole confinement
+  exercise exists to prevent.
+- Strip `CLAUDECODE`/`CLAUDE_CODE_SESSION_ID`/`CLAUDE_CODE_CHILD_SESSION`/`CLAUDE_PID`
+  env vars (`env -u ...`) so a nested `claude -p` derives a clean child
+  scratch path instead of inheriting the parent session's.
+- Live-verified: both CLIs exit 0, reply DONE, and write the evidence file
+  under this exact pattern; every private-state write attempt fails EROFS
+  and is silently swallowed (non-fatal).
+- Noted, not applicable to this cell: `--ro-bind / /` plus network access
+  means the agent can technically READ any host secret and phone home —
+  mutation-safety is not exfiltration-safety. Real hardening (`--tmpfs
+  ~/.ssh`, etc.) is a Phase 02+ concern if this mechanism gets productized,
+  not something this proof cell needs to solve.
+
+Full verified invocation recorded in `current-cell.md`'s Exact Commands
+section.

@@ -53,21 +53,24 @@ per the gap above):
 
 ```sh
 # codex-readonly (native sandbox, no bwrap needed)
-codex exec -s read-only --cd /home/vantt/projects/mdview "<prompt>"
+codex exec -s read-only -C /home/vantt/projects/mdview "<prompt>"
 
-# claude via bwrap (confirmed scratch-bind design before use)
-bwrap --ro-bind / / --dev /dev --proc /proc \
+# claude / agy via bwrap — kongming-verified pattern (strace-confirmed live,
+# see intake.md's Scratch-Bind Design section): --tmpfs /tmp FIRST, then
+# re-pin PROJECT_ROOT and EVIDENCE_DIR explicitly (bwrap mounts in argument
+# order; a later bind shadows an earlier tmpfs). Never bind ~/.claude or
+# ~/.gemini real dirs (creds live there) or tmpfs-mask them (loses auth).
+env -u CLAUDECODE -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u CLAUDE_PID \
+bwrap \
+  --ro-bind / / \
+  --dev /dev --proc /proc \
+  --tmpfs /tmp \
+  --ro-bind /home/vantt/projects/mdview /home/vantt/projects/mdview \
   --bind <evidenceDir> <evidenceDir> \
-  --bind <scratch> <scratch> \
   --chdir /home/vantt/projects/mdview \
   -- claude -p "<prompt>" --model <tier-model> --permission-mode acceptEdits
 
-# agy via bwrap (confirmed scratch-bind design before use)
-bwrap --ro-bind / / --dev /dev --proc /proc \
-  --bind <evidenceDir> <evidenceDir> \
-  --bind <scratch> <scratch> \
-  --chdir /home/vantt/projects/mdview \
-  -- agy -p "<prompt>" --mode accept-edits --model <tier-model>
+# agy: same shape, -- agy -p "<prompt>" --mode accept-edits --model <tier-model>
 ```
 
 ## Stop Gates (from plan.md + the playbook's own STOP CONDITIONS)
