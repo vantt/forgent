@@ -1,107 +1,42 @@
-# Current Cell: P01.1 (Author The Soul)
+# Current Cell: none open — track parked at a Stop Gate
 
-Status: in-progress
-Owner: Doer (to be dispatched)
+Status: parked
 Last updated: 2026-09-05
-Next action: dispatch Doer via `fgos coordination run`
+Next action: person confirms the P01.2 proof case, or names a replacement
 
-## Objective
+## Why parked
 
-Create exactly 4 files under `docs/architect/agent-coordination/playbooks/`:
-`prompts/architecture-advisory-coordinator.md`,
-`architecture-advisory-role-doctrine.md`,
-`architecture-advisory-artifact-templates.md`,
-`architecture-advisory-evaluation-rubric.md`. The coordinator prompt must be
-self-contained: input block, authority order, scout-before-ask rule, role
-routing, nine-phase cognitive loop, persistence/recovery, Decision Dialogue,
-bounds, stop conditions. Every role spec needs purpose, posture, what to
-notice, judgment heuristics, anti-patterns, handoff shape, and >=1 good/bad
-example — a role name plus expected-output fields is insufficient.
+P01.1 (author the soul) is closed and merged. Phase 01's next cell, P01.2
+(clear-input manual proof), requires a real advisory session on a real
+external project. Plan.md's own named clear case is
+`/home/vantt/projects/mdview`: decide whether the experimental native
+desktop shell should remain a thin client of the existing single-daemon
+registry/render/search authority or acquire local ownership.
 
-## Must Read
+Plan.md's "Proof Cases And Human Boundary" section states plainly: "Before
+dispatch, the person confirms each question is genuinely undecided. If
+either is already settled, that proof cell parks and requests one
+replacement real project/question; it never substitutes `fgos-test-drive`
+or a fake case." This has not been confirmed with the person and must not
+be assumed — the question may already be settled since the plan was written
+(2026-09-05), or the person may prefer a different real project/question.
 
-- `plans/260905-architecture-advisory-panel/phase-01-advisory-soul-and-manual-proof.md` (full — P01.1 section, Soul Deliverables, Required Doctrine)
-- `plans/260905-architecture-advisory-panel/plan.md` (Read This First — Trong Mem Ngoai Cung; the soft-inside-first mandate this whole phase exists to satisfy)
-- `docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md` (the proven manual pattern this soul is "analogous in usability to")
-- `docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md` (the now-closed allowlist this track already proved — NOT used for P01.1's own file-writing dispatch, only for P01.2/P01.3's external-project advisory dispatch)
+## One consolidated question for the person
 
-## Requirements (from phase-01.md, P01.1 section + Soul Deliverables + Required Doctrine)
+1. Is the mdview thin-client-vs-local-ownership question still genuinely
+   undecided? If yes, P01.2 opens against it as written. If no (already
+   decided, or no longer relevant), name a replacement real project and
+   question.
+2. Confirm dispatching a real advisory panel (Doer/Reviewer/Red-Team-shaped
+   roles, using the P00.1 allowlist for read-only inspection) against
+   `/home/vantt/projects/mdview` is authorized — it is outside this repo.
+3. P01.3's own named unclear case is `/home/vantt/projects/vnflow` ("EOD and
+   intraday evolution is becoming difficult" — keep separate pipelines with
+   shared contracts, one pluggable abstraction, or reframe elsewhere). Same
+   two questions apply to it, though P01.3 does not open until P01.2 closes.
 
-- One-entry manual coordinator playbook analogous to `master-coordinator.md`.
-- Role doctrine for: lead advisor, investigator, system shaper, alternative
-  shaper, constraint advocate, critic, synthesizer, red-team, specialist.
-- Artifact prose/templates — reasoning aids, not schema-only.
-- Recovery handoff letting a fresh coordinator resume from persisted
-  artifacts alone.
-- Qualitative evaluation rubric for advisory quality.
-- Role-routing roster: how the coordinator independently selects a
-  proven-safe executor/confinement pair, tier, persona per actor and
-  records derived provider/model.
-- Driver-disposition doctrine: `accepted`/`answered`/`mitigated`/`deferred`/
-  `unresolved`/`invalidated-by-evidence`, incl. when the driver must not
-  disposition without another advisor's evidence.
-- Headless Dialogue Turn Protocol: person's immutable words vs. lead-advisor
-  interpretation vs. driver authorization vs. panel response, kept separate.
-- Encode the 8 Required Doctrine principles (Understand person/problem, Ask
-  reluctantly, Diverge honestly, Debate claims, Converge without flattening,
-  Explain for ownership, Stay in dialogue).
+## What can continue independently while parked
 
-## Files
-
-May touch only: the 4 new playbook/doctrine/artifact files above, plus this
-cell's own verification report/trace files
-(`docs/architect/agent-coordination/verification/architecture-advisory-panel/{P01.1.md,proofs/P01.1/**}`,
-`plans/260905-architecture-advisory-panel/reports/**`). Matches the
-`panel-soul` lease from plan.md.
-
-## Do Not Touch
-
-Production skills, protocol definitions, runtime, schemas, contracts, CLI,
-pack registry, canonical specs, `index.md`, `current-cell.md` (Coordinator-owned).
-
-## Role Roster
-
-Not the Phase 00 read-only allowlist — this cell writes real files inside
-`forgentX`'s own worktree (normal mutating work, same class as P00.1's own
-Doer/Fixer), not advisory inspection of an external project. The Phase 00
-allowlist (`claude-bwrap`/`codex-readonly`/`agy-bwrap`) is for P01.2/P01.3's
-external-project advisory dispatch only.
-
-- Doer: `claude`, tier `critical`, persona `principal-architecture-writer`
-  (switched from `agy-cli` this round — P00.1 showed a real pattern of
-  agy-cli-driven work overclaiming containment/evidence quality; using
-  `claude` for the primary authored deliverable this time, per person's
-  direct request to watch agy-cli's behavior more critically)
-- Reviewer: `codex-cli`, tier `analytical`, persona `skeptical-reviewer`
-- Red-Team: `agy-cli`, tier `analytical`, persona `adversarial-tester`
-  (kept in the loop specifically to keep observing its real behavior, in a
-  role where overclaiming is cheap to independently verify)
-
-## Exact Commands
-
-```sh
-fgos coordination chain architecture-advisory-panel --json
-git worktree add ../architecture-advisory-panel-p01-1 -b architecture-advisory-panel--p01-1 group-thinking-plan-loop
-fgos coordination run --cwd ../architecture-advisory-panel-p01-1 --file docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.1/requests/open.json
-fgos coordination show architecture-advisory-panel--p01-1 --json
-```
-
-## Stop Gates
-
-- Any playbook change would move empathy/materiality judgment/reframing/
-  alternative quality/debate style/recommendation calibration/explanation
-  into kernel enums (plan.md's own "MUST NOT" list) — stop, this is a
-  product-policy question for the person.
-- A role spec reduces to "name + expected-output fields" with no real
-  doctrine — Reviewer/Red-Team must block this, not let it pass as done.
-- A concurrent track claims any file in the `panel-soul` lease.
-
-## Trace Update
-
-Doer/Reviewer/Red-Team write to `P01.1.md`. Coordinator owns `index.md` and
-this file exclusively.
-
-## Report
-
-`plans/260905-architecture-advisory-panel/reports/doer-260905-2110-p01-1-advisory-soul-report.md`
-End with: `Status: DONE | DONE_WITH_CONCERNS | BLOCKED` and a two-line summary.
+Nothing else in this track is unblocked by this question — Phase 02 depends
+on both P01.2 and P01.3 closing. This is a genuine full-track pause, not a
+partial one.

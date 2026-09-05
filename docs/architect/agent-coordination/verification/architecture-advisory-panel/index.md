@@ -19,7 +19,7 @@ The person's initial request asked to start at Phase 01. Phase 01 (P01.1) declar
 | Phase | Requirement | Status |
 |---|---|---|
 | 00 | Live-proven read-only executor/mechanism allowlist | done (P00.1 proven) |
-| 01 | Advisory soul and manual proof | in progress (P01.1 opened) |
+| 01 | Advisory soul and manual proof | P01.1 done; P01.2 blocked on real human interaction (see Stop Gate below) |
 | 02 | Capability-fit audit | blocked on 01 |
 | 03 | Minimal hard shell and protocol | blocked on 02 |
 | 04 | Production skill and Decision Dialogue | blocked on 03 |
@@ -75,7 +75,7 @@ self-reported numbers.
 | Cell | Coordination id | Status | Notes |
 |---|---|---|---|
 | P00.1 | `architecture-advisory-panel--p00-1` | done | Read-only dispatch readiness proven; Allowlist produced |
-| P01.1 | `architecture-advisory-panel--p01-1` | opening | Author the soul (coordinator prompt, role doctrine, artifact templates, evaluation rubric) |
+| P01.1 | `architecture-advisory-panel--p01-1` (fix round + close on `--p01-1-fix1`, see session-workaround note in P01.1.md) | done | Soul authored (3434 lines), 1 HIGH + 4 MEDIUM + 2 LOW findings fixed in 1 round, both rechecks clean |
 
 ## Admitted Read-Only Advisory Executor Allowlist
 
@@ -92,3 +92,15 @@ Excluded Unsafe / Non-Runnable Pairs:
 - `codex-cli` (`--dangerously-bypass-approvals-and-sandbox` unconfined): EXCLUDED (mutated target repo).
 - `agy-cli` (`--mode accept-edits` unconfined): EXCLUDED (mutated target repo).
 - `agy-sandbox` (`--mode accept-edits --sandbox`): EXCLUDED (mutated target repo despite `--sandbox` flag).
+
+## Stop Gate — P01.2 parked, needs the person
+
+P01.2 (clear-input manual proof) requires a real advisory session on
+`/home/vantt/projects/mdview`, deciding whether the experimental native
+desktop shell should remain a thin client of the existing single-daemon
+registry/render/search authority or acquire local ownership (plan.md's own
+named clear case). Per plan.md's "Proof Cases And Human Boundary": "Before
+dispatch, the person confirms each question is genuinely undecided." This
+has not been confirmed and cannot be inferred — parking here rather than
+assuming. Also needs confirmation that dispatching a real advisory panel
+against `mdview` (read access, not owned by this repo) is authorized.
