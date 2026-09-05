@@ -58,18 +58,11 @@ still apply here)
 
 ## Known gap this skill inherits (`tsk-371`, not fixed yet)
 
-`src/verbs/coordination/run.mjs`'s operation-step dispatch does not yet
-forward a step's own declared `mutation: "mutating"` field into the
-engine -- confirmed live during `group-thinking-plan-loop`'s own R5 proof.
-Every mutating dispatch through `fgos coordination run` today is silently
-graded `status: "failed"` regardless of whether the real work landed
-correctly. **Until `tsk-371` lands, verify the doer/fixer's real outcome
-yourself**, independently of the RunResult's own grading: check `git
-log`/`git diff` in the cell's own worktree for the expected commit, and
-run this project's real test command there. If the real commit and real
-tests both check out, treat the step as genuinely successful for your own
-disposition/close decisions, and note in the disposition rationale that
-the `"failed"` grading is this known gap, not a real defect.
+Same gap as `fgos-plan-loop`'s own "Known gap this skill runs into today"
+section -- read that section for the full description and the required
+workaround (verify the doer/fixer's real commit + real test run yourself,
+independently of the RunResult's own grading). Not repeated here to avoid
+the two copies drifting apart.
 
 ## Default actor roster (the coding-flavored delta)
 

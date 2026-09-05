@@ -75,6 +75,21 @@ ground truth.
   branch into the track/main branch; the coordination session itself
   never merges, and this skill never automates that merge step.
 
+## Known gap this skill runs into today (`tsk-371`, not fixed yet)
+
+`src/verbs/coordination/run.mjs`'s operation-step dispatch does not yet
+forward a step's own declared `mutation: "mutating"` field into the
+engine -- confirmed live during this track's own R5 proof (real
+`produce-candidate`/`revise-candidate` commits landing correctly but
+still graded `status: "failed"`, four separate times). **Until `tsk-371`
+lands, verify the doer/fixer's real outcome yourself**, independently of
+the RunResult's own grading: check `git log`/`git diff` in the cell's own
+worktree for the expected commit, and run the target project's real test
+command there. If the real commit and real tests both check out, treat
+the step as genuinely successful for your own disposition/close
+decisions, and note in the disposition rationale that the `"failed"`
+grading is this known gap, not a real defect.
+
 ## 0. Resume: `fgos coordination chain <track>`
 
 Read-only, reconstructed entirely from each matching session's own
