@@ -3,7 +3,7 @@
 Document type: Index
 Design status: N/A
 Implementation: Active
-Last reviewed: 2026-09-01
+Last reviewed: 2026-09-04
 Canonical for: traceability of explicitly preserved intent, not architecture or runtime contracts
 
 ## Reading Rule
@@ -43,6 +43,30 @@ Every Agent Coordination implementation plan must include:
 Only human-confirmed product intentions belong here. Ordinary ideas and feature
 backlog items stay in proposals or backlog so this ledger does not become an
 unbounded wish list.
+
+## Deferred Capability Inventory
+
+This inventory orders preserved deferred capabilities by expected impact on
+real consuming projects first, then by breadth of reuse across protocols,
+domains, and host surfaces. It is a prioritization aid, not implementation
+approval. A later plan still needs its own intent traceability, proof, and
+must-not-preclude checks.
+
+| Priority | Capability | Intent Bucket | Impact / Reuse Reason | Revisit Trigger |
+|---|---|---|---|---|
+| 1 | Work-attached mutating coordination with domain-owned isolation | AC-I009, AC-I008 | Highest direct value for Coding Domain adoption: enables implementer/helper/reviewer collaboration without giving Agent Coordination git, merge, or Work-transition authority. Also proves the second unlike consumer required by V-012. | Step 10 mutating live proof after Workspace Topology resolver/root migration can enforce worker workspace, footprint, lease, and coordination roots. |
+| 2 | Evidence-preserving aggregation | AC-I004, AC-I006 | Broadly useful across review, research, RFC, Delphi-like feedback, and coding validation. Prevents synthesis from hiding dissent, failed actors, missing sources, stale artifacts, or unsupported claims. | A second real protocol or Coding Domain review path needs aggregate output that must remain auditable rather than prose-only. |
+| 3 | Visibility windows and context grants | AC-I004, AC-I008, AC-I009 | Enables private first pass, post-verdict sharing, reviewer/red-team recheck, RFC-style staged visibility, and Work-attached evidence reuse without sibling leakage. | Read-only Step 10 bridge or a group-thinking protocol needs controlled sharing beyond static topology edges. |
+| 4 | Driver-authorized optional rounds and recheck distinct from retry | AC-I002, AC-I004, AC-I006 | Reusable backbone for master-coordinator, review/fix/recheck, adversarial triad, RFC follow-up, and coding plan validation loops. Keeps stop/go authority outside worker self-report. | A protocol needs a new judgment on a new artifact revision while preserving prior verdicts and idempotent authorization. |
+| 5 | Typed deliberation memory | AC-I004 | Useful for RFC, NGT, adversarial review, and long-running design discussions: proposal, objection, response, clarification, rank, specialist-request, and disposition lineage survive compaction. | Evidence-preserving aggregation or a design/review protocol needs structured contribution lineage that Assignment artifacts alone cannot explain. |
+| 6 | Bounded specialist pull-in through predeclared slots | AC-I002, AC-I004, AC-I005 | High leverage for research/review sessions, but narrower than visibility/aggregation because V1 can often predeclare optional specialists. | Two real sessions need unknown-at-start expertise and declared optional slots prove too narrow or too manual. |
+| 7 | Organization overlay syntax / extension SDK | AC-I005 | Important for external adoption and business workflows, but should follow two real consumers so the seam does not become speculative. | A second organization or domain consumer cannot express needed doctrine/protocol/policy through current project/domain/core definition loading. |
+| 8 | Cross-session grants and Mission-level grouping | AC-I007, AC-I004 | Valuable for long initiatives and multi-session objectives, but less urgent than single-session Coding Domain adoption. | One objective demonstrably needs multiple independently executable sessions with auditable shared context. |
+| 9 | Vote/rank/weighted scoring/convergence semantics | AC-I004 | Important for Delphi/NGT and decision methods, but should wait until typed deliberation and aggregation exist so scoring does not become ungrounded prose parsing. | Two real protocols need first-class scoring over typed inputs and evidence-preserving aggregation cannot represent the outcome honestly. |
+| 10 | Anonymization or pseudonymous feedback | AC-I004 | Required for richer Delphi-like methods, but costly because it touches identity, visibility, audit, and operator trust. | A Delphi/NGT-style protocol has a real user and cannot work with visible actor identities or aggregate-only feedback. |
+| 11 | Arbitrary `addSessionEdge` / runtime topology overlay | AC-I002, AC-I004 | Powerful but high-risk: it can weaken static FlowDefinition legality and isolation fixtures. Prefer declared optional operations and predeclared specialist slots first. | Multiple real consumers prove that declared optional operations plus specialist slots cannot express the needed runtime graph change. |
+| 12 | Driver handoff and persistent organization membership | AC-I002, AC-I005, AC-I007 | Operationally useful for long-lived teams, but not needed for the next Coding Domain adoption proof and likely depends on Mission/organization concepts. | Long-lived sessions or organization workflows need durable driver transfer or roster continuity across sessions. |
+| 13 | Peer-invited specialists | AC-I004, AC-I005 | Useful later, but it changes authority: workers would influence recruitment. Keep driver-owned specialist authorization until proven insufficient. | Driver-owned specialist slots repeatedly block valid workflows and a human-approved ADR accepts worker request semantics without worker dispatch authority. |
 
 ## Preserved Intentions
 

@@ -3,7 +3,7 @@
 Document type: Architecture intention / discussion
 Design status: Discussion
 Implementation: Not started
-Last reviewed: 2026-09-02
+Last reviewed: 2026-09-05
 Canonical for: nothing until explicitly accepted
 
 Scope: preserve architecture-wide design intent across deferred capabilities,
@@ -16,6 +16,7 @@ review loops, without weakening the already-proven isolation-heavy
 `group-cognition-framework.yaml`.
 
 Related:
+- `docs/architect/system-vision-trong-mem-ngoai-cung.md`
 - `docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md`
 - `docs/architect/proposals/step-09-group-thinking-substrate.md`
 - `docs/architect/proposals/step-10-coding-domain-adoption.md`
@@ -30,6 +31,26 @@ runtime behavior, and does not authorize implementation.
 | Thread | Status | Purpose |
 |---|---|---|
 | Group-cognitive coordination | Active discussion | Preserve the original intent to grow fgOS beyond strict fan-out/fan-in into broader group-thinking/problem-solving capability. |
+| Trong mem, ngoai cung | Guiding vision | Preserve the system-wide balance between hard contracts/harnesses and soft soul/prose/skill so fgOS stays both verifiable and alive enough for real agent operation. |
+
+## 0.1 System-Wide Vision
+
+[System Vision: Trong Mem Ngoai Cung](system-vision-trong-mem-ngoai-cung.md)
+is the cross-system reminder behind this intent file:
+
+```txt
+Outside hard:
+  contract, state, capability, topology, proof, audit
+
+Inside soft:
+  soul, prose, skill, judgment, collaboration, domain intelligence
+```
+
+Step 09 showed why this reminder is necessary. Harness/schema/test work made
+the group-thinking substrate safer, but over-centering harness risked losing
+the soul/prose/skill surface needed to make Master Coordination deployable as a
+living operating pattern. Future architecture plans must preserve both sides:
+hard enough to verify, soft enough to think and adapt.
 
 ## 1. One-Screen Summary
 
