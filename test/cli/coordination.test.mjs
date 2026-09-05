@@ -515,12 +515,12 @@ test('fgos coordination run --file <declared consult>: dispatches both declared 
 // has ZERO effect on where session/Assignment state lives; it only ever
 // threads into `ctx.cwd`, which matters for OTHER things (the dispatched
 // worker's own subprocess cwd; R3's worktree-vs-main-checkout mutation
-// gate, `session-engine.mjs`'s `assertMutatingDispatchAllowed` -- not
-// exercised below because `src/verbs/coordination/run.mjs` does not yet
-// forward a request step's `mutation` field to the engine at all, `grep -n
-// "mutation" src/verbs/coordination/run.mjs` finds zero matches, an
-// already-documented, pre-existing gap (P01.1.md); the mutation-unlock
-// feature is engine-level-only today, unreachable through this CLI).
+// gate, `session-engine.mjs`'s `assertMutatingDispatchAllowed`). The two
+// tests immediately below dispatch an agent-led (read-only) request, so
+// they never touch a request step's `mutation` field at all -- see the
+// "mutation: 'mutating' forwarding" tests further down this file for CLI
+// coverage of `run.mjs` threading an operation step's own `mutation`
+// field into `dispatchDeclaredOperation`.
 
 test('fgos coordination run --cwd <worktree>: session/Assignment storage is governed by repoRoot (--dir), never relocated by --cwd (Phase 01 R8); ctx.cwd genuinely threads to the dispatched worker\'s own subprocess cwd instead, proven by a real marker file the worker writes into its own process.cwd()', () => {
   const { cwd: repoRootDir, worktreePath: worktreeDir } = initGitCwdWithWorktree();
@@ -607,6 +607,91 @@ test('fgos coordination run --file <request> with --cwd OMITTED behaves byte-ide
 
   const sessionManifest = path.join(cwd, '.fgos', 'coordination', 'sessions', runData.coordinationId, 'session.json');
   assert.ok(fs.existsSync(sessionManifest), 'omitting --cwd must default the working directory to the resolved repo root, exactly as before this flag existed');
+});
+
+// ─── mutation: "mutating" forwarding through the CLI run door ─────────────
+//
+// A declared `operation` step's own `mutation` field must reach
+// `dispatchDeclaredOperation` (session-engine.mjs) through this real CLI
+// subprocess, not just at the schema/engine layers already covered by
+// test/runner/coordination-mutation-unlock.test.mjs. `run.mjs` forwards
+// `step.mutation` into the dispatch call only when the field is present,
+// so a request that omits it stays byte-identical to every pre-existing
+// caller (implicit `'read-only'` default).
+
+test('fgos coordination run --file <declared operation step, mutation:"mutating", result.kind:"work-product">, --cwd <linked worktree>: the request\'s mutation field reaches dispatchDeclaredOperation, so a real work-product mutation grades done/verified instead of being fail-closed by the read-only gate, and the persisted Assignment record itself carries mutation:"mutating"', () => {
+  const { cwd: repoRootDir, worktreePath: worktreeDir } = initGitCwdWithWorktree();
+  const assignmentsRoot = path.join(repoRootDir, '.fgos', 'assignments');
+  writeCwdMarkerExecutorConfig(repoRootDir, assignmentsRoot);
+
+  const req = {
+    kind: 'declared-protocol',
+    objective: 'Prove a request step\'s mutation field reaches the engine through the CLI run door.',
+    writerId: 'coordination-cli-test',
+    protocolRef: { id: 'core.coordination-protocol.standalone-master-coordination-loop' },
+    steps: [
+      {
+        type: 'operation',
+        as: 'produce',
+        operationId: 'produce-candidate',
+        targetActorId: 'doer',
+        objective: 'Produce a real work-product artifact.',
+        expectedOutputs: ['cwd-marker.txt'],
+        mutation: 'mutating',
+      },
+    ],
+  };
+  const reqPath = writeRequest(repoRootDir, 'mutating-produce-candidate.json', req);
+
+  const runResult = run(repoRootDir, ['coordination', 'run', '--cwd', worktreeDir, '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  const runData = envelopeData(runResult.stdout);
+  assert.equal(
+    runData.steps[0].status,
+    'done',
+    `a mutating dispatch with real external evidence must grade "done", not fail-closed by the read-only gate; got ${JSON.stringify(runData.steps[0])}`,
+  );
+  assert.equal(runData.steps[0].confidence, 'verified');
+
+  // Real external evidence: the worker's own marker file landed in the
+  // worktree the dispatch actually ran against.
+  assert.ok(fs.existsSync(path.join(worktreeDir, 'cwd-marker.txt')));
+
+  // The persisted Assignment record itself carries mutation: "mutating" --
+  // proof the request's own field reached dispatchDeclaredOperation, not
+  // an inferred status from the step result alone.
+  const assignmentId = runData.steps[0].assignmentId;
+  const assignmentRecord = JSON.parse(
+    fs.readFileSync(path.join(repoRootDir, '.fgos', 'assignments', assignmentId, 'assignment.json'), 'utf8'),
+  );
+  assert.equal(assignmentRecord.mutation, 'mutating');
+});
+
+test('fgos coordination run --file <declared operation step, mutation:"mutating", on an advisory operation>: refused by name through the CLI door -- an operation must declare result.kind:"work-product" before it may opt into a real, mutating dispatch', () => {
+  const cwd = tmpCwd();
+  const req = {
+    kind: 'declared-protocol',
+    objective: 'Prove an advisory operation cannot be dispatched as mutating through the CLI run door.',
+    writerId: 'coordination-cli-test',
+    protocolRef: { id: 'core.coordination-protocol.standalone-master-coordination-loop' },
+    steps: [
+      {
+        type: 'operation',
+        as: 'review',
+        operationId: 'review-candidate',
+        targetActorId: 'reviewer',
+        objective: 'Review a candidate.',
+        expectedOutputs: ['review-notes.md'],
+        mutation: 'mutating',
+      },
+    ],
+  };
+  const reqPath = writeRequest(cwd, 'mutating-advisory-refused.json', req);
+
+  const result = run(cwd, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /operation "review-candidate" declares result\.kind "advisory"/);
+  assert.match(result.stderr, /a mutating dispatch requires the bound operation to declare result\.kind "work-product"/);
 });
 
 // ─── R2-R5: `fgos coordination chain <track>` ──────────────────────────────

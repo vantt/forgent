@@ -450,6 +450,7 @@ export async function runCoordinationUseCase(ctx, options = {}) {
             round: step.round,
             taskKey: step.taskKey,
             ...(Object.keys(cliPolicy).length > 0 ? { cliPolicy } : {}),
+            ...(step.mutation !== undefined ? { mutation: step.mutation } : {}),
           },
           engineOpts,
         );
