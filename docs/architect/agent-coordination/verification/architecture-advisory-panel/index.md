@@ -44,12 +44,45 @@ cell P00.1, not P01.1.
 
 ## Baseline
 
-Full suite (`FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 npm test`) launched at track
-start; result to be recorded here once it completes. Plan's own recorded
-starting baseline from the completed `group-thinking-plan-loop` track is four
-known failures: legacy durable-doing ask/answer, missing-quadrant docs-index,
-live codex usage-limit, and invalid placeholder characters in two resume
-examples. This track's own P00.1 run confirms or corrects that list below.
+Full suite run at track start (`FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 npm
+test`), 2026-09-05: **5614 tests, 5604 pass, 4 fail, 6 skipped**
+(`duration_ms 178257`, log saved at
+`docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log`).
+
+Plan's own recorded starting baseline (from the completed
+`group-thinking-plan-loop` track) named four known failures: legacy
+durable-doing ask/answer, missing-quadrant docs-index, live codex
+usage-limit, and invalid placeholder characters in two resume examples.
+This run's actual four failures:
+
+1. `test/cli/fgos-intake-4.test.mjs` — ask/answer round-trip on a legacy
+   durable-doing item (seq 3 vs expected seq 2). Matches "legacy
+   durable-doing ask/answer".
+2. `test/report/enduser-index.test.mjs` — docs-index missing-quadrant
+   tolerance (`docs/tutorials` now exists, so the test's own hide-the-dir
+   setup assumption no longer holds). Matches "missing-quadrant docs-index".
+3. `test/setup/coordination-doctor-check.test.mjs` —
+   `coordination-example-requests-valid`: two published resume-request
+   examples (`group-thinking-nominal-group-lite-resume-request.json`,
+   `group-thinking-rfc-review-lite-resume-request.json`) still carry the
+   placeholder `grantedContextRefs` text, which fails the safe-charset
+   check. Matches "invalid placeholder characters in two resume examples".
+4. `test/runner/codex-cli-glm-cli-live-executors.test.mjs` — **drift**: the
+   plan named "live codex usage-limit" as the fourth known failure; the
+   actual fourth failure today is a different live-executor test, the
+   GLM-cli self-identification probe returning `MODEL=claude-opus-5`
+   instead of a genuine z-ai/GLM identification (OpenRouter route not
+   taking effect, or a silent fallback). Both are live/external-service
+   flakes in the same class (a real network-dependent executor probe), but
+   they are not the same test — named here as required drift, not silently
+   folded into the old label. Not independently re-run multiple times yet
+   to confirm flake vs regression; P00.1's Doer/Reviewer should re-run this
+   one test in isolation before treating it as environment-only.
+
+Net: still exactly four failures, same class (pre-existing environment/live
+dependencies unrelated to this track's own work), but item 4's identity
+changed. No new failure beyond four. This does not block P00.1 — see Stop
+Gates in `current-cell.md` — but must not be silently mislabeled at close.
 
 ## Cells
 
