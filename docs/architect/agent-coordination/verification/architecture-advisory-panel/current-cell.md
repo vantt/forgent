@@ -1,4 +1,4 @@
-# Current Cell: P00.1 (Read-Only Dispatch Readiness)
+# Current Cell: P01.1 (Author The Soul)
 
 Status: in-progress
 Owner: Doer (to be dispatched)
@@ -7,89 +7,101 @@ Next action: dispatch Doer via `fgos coordination run`
 
 ## Objective
 
-Establish a hard, live-proven read-only confinement envelope before any
-advisory agent inspects a real proof project. Probe `claude`, `codex`, `agy`
-(and any replacement) for a real read-only mode or outer OS/filesystem
-confinement; run every admitted pair against a disposable checkout with a
-prompt that explicitly tries to modify/commit a sentinel file; record exit
-result, before/after git status/hash, and refusal/containment evidence.
-Capture the current full-suite baseline against the plan's recorded four
-known failures.
+Create exactly 4 files under `docs/architect/agent-coordination/playbooks/`:
+`prompts/architecture-advisory-coordinator.md`,
+`architecture-advisory-role-doctrine.md`,
+`architecture-advisory-artifact-templates.md`,
+`architecture-advisory-evaluation-rubric.md`. The coordinator prompt must be
+self-contained: input block, authority order, scout-before-ask rule, role
+routing, nine-phase cognitive loop, persistence/recovery, Decision Dialogue,
+bounds, stop conditions. Every role spec needs purpose, posture, what to
+notice, judgment heuristics, anti-patterns, handoff shape, and >=1 good/bad
+example — a role name plus expected-output fields is insufficient.
 
 ## Must Read
 
-- `plans/260905-architecture-advisory-panel/phase-00-read-only-dispatch-readiness.md` (full requirement source)
-- `plans/260905-architecture-advisory-panel/plan.md` (Read This First, Entry Conditions, Plan-Level Invariants, Stop Gates)
-- `.fgos/config.json` (`runner.executors.*` — current claude/codex/agy invocation shapes; `codex` is flagged bypass-all/no-sandbox in its own description)
-- `src/setup/checks.mjs` (doctor check registry, if a new config default is needed)
-- `docs/architect/agent-coordination/verification/architecture-advisory-panel/index.md` (this track's audit + deviations)
+- `plans/260905-architecture-advisory-panel/phase-01-advisory-soul-and-manual-proof.md` (full — P01.1 section, Soul Deliverables, Required Doctrine)
+- `plans/260905-architecture-advisory-panel/plan.md` (Read This First — Trong Mem Ngoai Cung; the soft-inside-first mandate this whole phase exists to satisfy)
+- `docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md` (the proven manual pattern this soul is "analogous in usability to")
+- `docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md` (the now-closed allowlist this track already proved — NOT used for P01.1's own file-writing dispatch, only for P01.2/P01.3's external-project advisory dispatch)
 
-## Requirements (from phase-00.md)
+## Requirements (from phase-01.md, P01.1 section + Soul Deliverables + Required Doctrine)
 
-- Compare provider-native sandbox flags, executor variants, OS/filesystem
-  sandboxing/read-only mounts; select the smallest general mechanism.
-- Reuse `claude-reviewer` only after re-proving mutation-negative behavior.
-- Do not admit current `codex-cli` (bypass-all, no sandbox) unless an outer
-  OS/filesystem envelope independently contains it.
-- Probe `agy` for a real read-only mode + outer confinement; exclude if unsafe
-  or absent.
-- Live mutation-attack probe per admitted pair against a disposable checkout
-  (never accept the checkout itself as confinement).
-- If a new config default/executor variant/confinement dependency becomes a
-  product dependency, register it via setup config-merge + doctor checks.
-- Capture full-suite baseline; name any drift from the plan's recorded four
-  known failures.
+- One-entry manual coordinator playbook analogous to `master-coordinator.md`.
+- Role doctrine for: lead advisor, investigator, system shaper, alternative
+  shaper, constraint advocate, critic, synthesizer, red-team, specialist.
+- Artifact prose/templates — reasoning aids, not schema-only.
+- Recovery handoff letting a fresh coordinator resume from persisted
+  artifacts alone.
+- Qualitative evaluation rubric for advisory quality.
+- Role-routing roster: how the coordinator independently selects a
+  proven-safe executor/confinement pair, tier, persona per actor and
+  records derived provider/model.
+- Driver-disposition doctrine: `accepted`/`answered`/`mitigated`/`deferred`/
+  `unresolved`/`invalidated-by-evidence`, incl. when the driver must not
+  disposition without another advisor's evidence.
+- Headless Dialogue Turn Protocol: person's immutable words vs. lead-advisor
+  interpretation vs. driver authorization vs. panel response, kept separate.
+- Encode the 8 Required Doctrine principles (Understand person/problem, Ask
+  reluctantly, Diverge honestly, Debate claims, Converge without flattening,
+  Explain for ownership, Stay in dialogue).
 
 ## Files
 
-Lease: `readonly-dispatch` —
-`docs/architect/agent-coordination/verification/architecture-advisory-panel/{index.md,current-cell.md,P00.1.md,proofs/P00.1/**}`;
-`.fgos/config.json`, `src/setup/checks.mjs`, the exact existing config-default
-owner proved by this cell's own audit, matching dispatch/setup tests, and
-`CHANGELOG.md` only if the selected mechanism requires them.
+May touch only: the 4 new playbook/doctrine/artifact files above, plus this
+cell's own verification report/trace files
+(`docs/architect/agent-coordination/verification/architecture-advisory-panel/{P01.1.md,proofs/P01.1/**}`,
+`plans/260905-architecture-advisory-panel/reports/**`). Matches the
+`panel-soul` lease from plan.md.
 
 ## Do Not Touch
 
-Anything outside the `readonly-dispatch` lease above. No protocol/skill files.
-No `Work` items, claims, `fgos pick/cook/submit`. No git merge into
-`group-thinking-plan-loop` — Lead performs that by hand after close.
+Production skills, protocol definitions, runtime, schemas, contracts, CLI,
+pack registry, canonical specs, `index.md`, `current-cell.md` (Coordinator-owned).
 
 ## Role Roster
 
-- Doer: `agy-cli`, tier `standard`, persona `meticulous-implementer`
-- Reviewer: `claude`, tier `analytical`, persona `skeptical-reviewer`
-- Red-Team: `codex-cli` (proof/investigation dispatch only — never treated as
-  an admitted target of its own probe by virtue of being used as Red-Team),
-  tier `analytical`, persona `adversarial-tester`
+Not the Phase 00 read-only allowlist — this cell writes real files inside
+`forgentX`'s own worktree (normal mutating work, same class as P00.1's own
+Doer/Fixer), not advisory inspection of an external project. The Phase 00
+allowlist (`claude-bwrap`/`codex-readonly`/`agy-bwrap`) is for P01.2/P01.3's
+external-project advisory dispatch only.
+
+- Doer: `claude`, tier `critical`, persona `principal-architecture-writer`
+  (switched from `agy-cli` this round — P00.1 showed a real pattern of
+  agy-cli-driven work overclaiming containment/evidence quality; using
+  `claude` for the primary authored deliverable this time, per person's
+  direct request to watch agy-cli's behavior more critically)
+- Reviewer: `codex-cli`, tier `analytical`, persona `skeptical-reviewer`
+- Red-Team: `agy-cli`, tier `analytical`, persona `adversarial-tester`
+  (kept in the loop specifically to keep observing its real behavior, in a
+  role where overclaiming is cheap to independently verify)
 
 ## Exact Commands
 
 ```sh
 fgos coordination chain architecture-advisory-panel --json
-fgos coordination run --cwd ../architecture-advisory-panel-p00-1 --file open.json
-fgos coordination show architecture-advisory-panel--p00-1 --json
-FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/runner/coordination-*.test.mjs' 'test/verbs/coordination-*.test.mjs' 'test/cli/coordination.test.mjs' 'test/architecture.test.mjs'
+git worktree add ../architecture-advisory-panel-p01-1 -b architecture-advisory-panel--p01-1 group-thinking-plan-loop
+fgos coordination run --cwd ../architecture-advisory-panel-p01-1 --file docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.1/requests/open.json
+fgos coordination show architecture-advisory-panel--p01-1 --json
 ```
 
 ## Stop Gates
 
-- Fewer than two safe executor/provider bindings — park heterogeneous proof,
-  do not admit an unsafe pair.
-- Any live mutation-attack probe succeeds against tracked/untracked source
-  outside the evidence-output boundary — treat that pair as unsafe, do not
-  soften the finding.
-- A concurrent track claims any file in the `readonly-dispatch` lease.
-- Full-suite baseline shows a failure beyond the plan's recorded four.
+- Any playbook change would move empathy/materiality judgment/reframing/
+  alternative quality/debate style/recommendation calibration/explanation
+  into kernel enums (plan.md's own "MUST NOT" list) — stop, this is a
+  product-policy question for the person.
+- A role spec reduces to "name + expected-output fields" with no real
+  doctrine — Reviewer/Red-Team must block this, not let it pass as done.
+- A concurrent track claims any file in the `panel-soul` lease.
 
 ## Trace Update
 
-Doer/Reviewer/Red-Team write to `P00.1.md` (Proof Matrix, Commands, Review,
-Red-Team, Gaps sections). Coordinator (this session) owns `index.md` and this
-file exclusively.
+Doer/Reviewer/Red-Team write to `P01.1.md`. Coordinator owns `index.md` and
+this file exclusively.
 
 ## Report
 
-`plans/260905-architecture-advisory-panel/reports/doer-260905-1821-p00-1-readonly-dispatch-report.md`
-(role, cell, outcome, exact executor/mechanism pairs admitted/excluded,
-mutation-attack evidence, baseline result). End with:
-`Status: DONE | DONE_WITH_CONCERNS | BLOCKED` and a two-line summary.
+`plans/260905-architecture-advisory-panel/reports/doer-260905-2110-p01-1-advisory-soul-report.md`
+End with: `Status: DONE | DONE_WITH_CONCERNS | BLOCKED` and a two-line summary.

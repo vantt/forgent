@@ -19,7 +19,7 @@ The person's initial request asked to start at Phase 01. Phase 01 (P01.1) declar
 | Phase | Requirement | Status |
 |---|---|---|
 | 00 | Live-proven read-only executor/mechanism allowlist | done (P00.1 proven) |
-| 01 | Advisory soul and manual proof | ready for P01.1 |
+| 01 | Advisory soul and manual proof | in progress (P01.1 opened) |
 | 02 | Capability-fit audit | blocked on 01 |
 | 03 | Minimal hard shell and protocol | blocked on 02 |
 | 04 | Production skill and Decision Dialogue | blocked on 03 |
@@ -75,6 +75,7 @@ self-reported numbers.
 | Cell | Coordination id | Status | Notes |
 |---|---|---|---|
 | P00.1 | `architecture-advisory-panel--p00-1` | done | Read-only dispatch readiness proven; Allowlist produced |
+| P01.1 | `architecture-advisory-panel--p01-1` | opening | Author the soul (coordinator prompt, role doctrine, artifact templates, evaluation rubric) |
 
 ## Admitted Read-Only Advisory Executor Allowlist
 
