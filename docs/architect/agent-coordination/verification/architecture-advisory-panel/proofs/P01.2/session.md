@@ -11,8 +11,11 @@ Phase 6 (critic) done: 5 attacks, 1 conceded failed, 2 decision-changing
 2's deletion premise). Phase 7 (synthesizer) done: ONE recommendation
 ("Thin Shell, Measured First"), both live disagreements preserved
 unresolved with attribution, 14 calibrated claims, explicit costs.
-Next action: Phase 8 (lead advisor explanation.md) dispatched. Coordinator
-STOPS after Phase 8 -- Phase 9 (Decision Dialogue) needs the real person.
+Phase 8 (lead advisor explanation.md) done. Cell PAUSED here, not closed --
+Phase 9 (Decision Dialogue) needs the real person's real response, which
+cannot be simulated. Next action: present explanation.md to the person and
+wait for a real reply (clarification, challenge, new context, alternative
+request, composition request, decision, or deferral).
 
 Roster: see intake.md's Roster Resolved At Intake table.
 

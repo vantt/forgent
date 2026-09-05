@@ -1,4 +1,8 @@
-I couldn't verify the desktop-shell file paths in this repo (the scout hook blocks the searches I'd need), so below I anchor on behaviors and on the entry points I can confirm from the project's own docs — `mdview open`, the `mdview_view_file` MCP call — rather than inventing file paths.
+Role: Lead Advisor (Phase 8) | Cell: P01.2 | Requested: `claude` via bwrap, tier `critical` | Derived: provider `claude`, model `opus`
+Dispatch: bwrap (kongming-verified scratch-bind pattern)
+Prompt: `proofs/P01.2/prompts/lead-advisor-explanation.md` (full synthesis.md Decision Packet)
+Raw run: `proofs/P01.2/runs/8-lead-advisor-explanation-raw.log`
+Note: agent flagged upfront it could not verify exact file paths in this sandboxed dispatch (a real tool limitation), and anchored on documented behaviors/entry points instead of inventing paths -- an honest, disciplined response, not a defect.
 
 ---
 
@@ -80,4 +84,3 @@ That second disagreement is also why "delete the shell entirely" is not on this 
 **Whether the experimental desktop shell is a real product bet or a spike you're allowed to drop.** The panel deliberately did not answer this, in Phase 4 and every phase since. It's not a disclaimer — it's the specific judgment that determines how much of the above is worth doing at all. Every recommendation here is downstream of it: if the shell is a bet, launcher-coordination investment is obviously worth making and the measure-first order buys you good information. If it's a spike, most of this is care spent on something you're going to close. Nobody can tell from the code which one it is, because the code looks identical either way. Only you know whether you want it.
 
 **And this: if the reversibility dispute above matters to you more than shipping something visible, take the fix-first order instead.** Fix launcher coordination now and measure later. That was the original proposal on the table, and it is a coherent position — it just weighs "get the bugs out of the way" above "don't entrench anything before you have numbers." That weighing is a values call. The synthesizer declined to make it for you, and so do we.
-EXIT:0
