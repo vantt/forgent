@@ -153,6 +153,7 @@
       "codex-cli": {
         "kind": "agent",
         "description": "OpenAI Codex CLI (bypass-all -- no sandbox boundary, see docs/history/codex-bypass-executor/)",
+        "providerModel": "openai-codex",
         "allowCrossProvider": true,
         "invocations": [
           {
