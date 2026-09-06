@@ -1,36 +1,39 @@
-# Current Cell: none open — ready for P04.2
+# Current Cell: none open — ready for P05.1
 
 Status: parked, unblocked
 Last updated: 2026-09-06
-Next action: proceed to P04.2 (surface, examples, and dialogue) whenever
-ready — no person input required to start it.
+Next action: proceed to P05.1 (hard conformance and recovery proof)
+whenever ready — no person input required for P05.1.
 
 ## Why parked
 
-P04.1 (production skill) is closed — see
-`docs/architect/agent-coordination/verification/architecture-advisory-panel/P04.1.md`.
-`core/skills/fgos-architecture-panel/SKILL.md` is live (910 lines,
-projected into `.agents/`/`.claude/`/`plugins/fgOS/`), independently
-reviewed AND red-teamed across 2 fix rounds for both hard correctness
-and "loss of soul" per phase-04's own explicit mandate.
+P04.2 (surface, examples, dialogue) is closed — see
+`docs/architect/agent-coordination/verification/architecture-advisory-panel/P04.2.md`.
+Phase 04 is now fully done (P04.1 + P04.2). Phase 05 — the FINAL phase —
+has two cells with different dependency profiles:
 
-Phase 04's remaining cell, **P04.2**, per the plan:
+- **P05.1 (hard conformance and recovery proof)** — fully autonomous.
+  Exercise the installed product path against immutable fixtures for
+  every authority/visibility/aggregation/routing/bound/replay claim; kill
+  the driver mid-session and resume from a fresh process with only the
+  installed skill + session id. No person input needed to run this.
+- **P05.2 (comparative live proof and promotion)** — **requires the real
+  person**, same as P01.2/P01.3. The phase's own "Live Proof Boundary"
+  section is explicit: "A scripted fake-human transcript cannot prove
+  the Decision Dialogue." This cell needs: a real external project
+  outside forgentX with a genuinely undecided architecture question, the
+  real person in a real Decision Dialogue turn, and a manual-vs-product
+  qualitative comparison. This is the track's final closing cell —
+  after it, promote to canonical docs and close the track for good.
 
-- First prove whether `fgos-group-thinking` plus
-  `fgos coordination run/show` already provides the required entry/resume
-  path — add a use-case or CLI verb ONLY for an evidenced ergonomic or
-  provenance gap.
-- Create `docs/how-to/use-fgos-architecture-panel.md` and the example
-  families: clear start, unclear start, consolidated Decision
-  Request/resume, clarification/challenge, material-context reopen,
-  alternative/composite reopen, final decision/defer.
-- Include a heterogeneous example (independently routed roles) plus a
-  homogeneous fallback for single-provider hosts.
-- Run `npm run build:skills`, located projection tests, the focused
-  command, relative-link checks, and full `npm test` after this cell
-  (per phase-04's own "Tests And Review" section).
+## Plan for continuing autonomously
 
-Nothing here requires a person decision to start.
+P05.1 will be run now without further person input. P05.2 will need the
+person to either reuse a genuinely still-undecided real case (if one
+exists) or name a new one, the same way P01.2 (mdview) and P01.3
+(vnflow) were confirmed — this will be surfaced as a consolidated
+question once P05.1 closes, not before (per this session's own priority
+on batching questions and not blocking work that can still proceed).
 
 ## Also resolved, independent of the track
 
@@ -39,7 +42,3 @@ person authorized it, `fullstack-developer` implemented kongming's
 3-step plan on vnflow, verified independently by the Coordinator
 (1658/1673 pass, zero regressions vs. main), pushed, and opened as
 https://github.com/vantt/vnstock-analysis/pull/1.
-
-## What can continue independently while parked
-
-P04.2 is fully unblocked and can start without further person input.
