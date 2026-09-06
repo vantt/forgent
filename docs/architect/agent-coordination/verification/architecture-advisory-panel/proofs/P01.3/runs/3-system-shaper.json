@@ -1,0 +1,13 @@
+{
+  "ordinal": 3,
+  "role": "system-shaper",
+  "requested": { "executor": "claude-bwrap", "tier": "analytical", "persona": "system-shaper" },
+  "derived": { "provider": "claude", "model": "sonnet", "tierMaterial": true },
+  "mechanism": "direct bwrap invocation, kongming-verified scratch-bind pattern",
+  "command": "bwrap --ro-bind / / --dev /dev --proc /proc --tmpfs /tmp --ro-bind /home/vantt/projects/vnflow /home/vantt/projects/vnflow --bind <evidenceDir> <evidenceDir> --chdir /home/vantt/projects/vnflow -- claude -p \"<prompt>\" --model sonnet --permission-mode acceptEdits",
+  "promptPath": "proofs/P01.3/prompts/system-shaper.md",
+  "rawLogPath": "proofs/P01.3/runs/3-system-shaper-raw.log",
+  "outputArtifact": "proofs/P01.3/proposals/system-shaper.md",
+  "exitCode": 0,
+  "isolationCheck": "prompt embedded only CASE/interpretation/scout-report/Phase-4-defaults, no sibling proposal content; output resolves to option C for reasons independent of, and materially different from, the alternative-shaper's own C-leaning proposal (this one: harden 4 named seams beneath the existing shared engine; alternative-shaper: formalize runtime data/state contracts and leave structure alone) -- genuine convergence on 'not A/B as framed' from different specific mechanisms, not cosmetic agreement"
+}

@@ -10,12 +10,11 @@ section allowing either path for a manual proof.
 | 3 | Understand the Problem (Context Investigator) | done — `scout-report.md` (see note on a fixed doctrine-access retry) |
 | 2 | Understand the Person (Lead Advisor) | done — `interpretation.md`, formed blind to the scout report |
 | 4 | Ask Reluctantly But Clearly | done — `decision-request.md`, no question sent, 4 defaults carried into Phase 5 |
-| 5 | Diverge Honestly (3 shapers) | not started |
+| 5 | Diverge Honestly (3 shapers) | done — `proposals/{system-shaper,alternative-shaper,constraint-advocate}.md`, genuine convergence on "don't restructure, harden seams" via 3 independent mechanisms |
 | 6 | Debate Claims (Critic) | not started |
 | 7 | Converge Without Flattening (Synthesizer) | not started |
 | 8 | Explain For Ownership (Lead Advisor) | not started |
 | 9 | Stay In Dialogue (real human turns) | not started — requires the actual person |
 
-Next action: dispatch Phase 5's three isolated shapers (system shaper,
-alternative shaper, constraint advocate), each carrying the 4 defaults
-from `decision-request.md`, scout-report.md, and interpretation.md.
+Next action: dispatch Phase 6 (Architecture Critic, `agy-bwrap`), attacking
+all three proposals for real weaknesses.
