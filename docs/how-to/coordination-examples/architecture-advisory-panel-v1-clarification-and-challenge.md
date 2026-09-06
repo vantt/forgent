@@ -22,14 +22,23 @@ bytes, never from a caller's claim:
 
 ```json
 {
-  "type": "human-turn",
-  "as": "personTurn1",
-  "turnId": "turn_1",
-  "turnOrdinal": 1,
-  "channel": "claude-code-chat",
-  "artifactRef": "human/1-person.md",
-  "externalRef": "claude-code-transcript:sess-1:uuid-1",
-  "attributedTo": { "type": "person", "id": "the-user" }
+  "kind": "declared-protocol",
+  "objective": "Continue aap_vnflow_example: record Turn 1 (clarify).",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap_vnflow_example",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    {
+      "type": "human-turn",
+      "as": "personTurn1",
+      "turnId": "turn_1",
+      "turnOrdinal": 1,
+      "channel": "claude-code-chat",
+      "artifactRef": "human/1-person.md",
+      "externalRef": "claude-code-transcript:sess-1:uuid-1",
+      "attributedTo": { "type": "person", "id": "the-user" }
+    }
+  ]
 }
 ```
 
@@ -49,16 +58,30 @@ plainer restatement of the same two open questions, nothing new argued.
 ## Challenge (constructed, grounded in a real, still-unresolved dispute)
 
 Both real sessions to date left one dispute genuinely unresolved through to
-their final response: P01.2's "does hardening the shell's launcher
-coordination make the architecture easier or harder to reverse later" —
-the recommendation assumed easier, one objection in the panel held the
-opposite, and neither side produced evidence that settled it. A real
-`challenge` turn against that exact recommendation might read:
+their final response: P01.2's Attack 1, "the 'Stay Thin' reversibility
+illusion." Its real target claim, stated precisely because the constructed
+turn below must attack what was actually recommended, not a stronger
+straw version of it: fixing the shell's launcher bugs "is notoriously
+complex state-machine engineering... by successfully engineering this
+coordination, you deeply entrench the multi-process architecture"
+([`critiques/architecture-critic.md`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/critiques/architecture-critic.md)).
+**What the real recommendation actually commits to, and what it explicitly
+does not:** put the shell in CI, fix three specific, deterministic bugs
+(silent fallback, wrong-port connection, raw-bind-host URL), ship
+telemetry — and, in the same breath, decline the harder cold-start-race
+coordination work Attack 1 worried about most
+([`explanation.md:18`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/explanation.md),
+Step 4: "Do not build robust cold-start coordination yet"). A challenge
+that accuses the panel of recommending the declined work would be
+attacking a position nobody holds. This one attacks the part that was
+actually recommended:
 
-> "You're recommending we harden the launcher coordination because it keeps
-> our options open — but isn't that the same as saying the multi-process
-> split becomes 'the thing that works,' and gets harder to walk back the
-> more we invest in it? What would actually change your mind here?"
+> "You're recommending we fix the three launcher bugs and put the shell in
+> CI — but your own critic said fixing this kind of coordination is what
+> entrenches the multi-process split, win or lose on the cold-start
+> question. Isn't shipping CI and three bug fixes still 'successfully
+> engineering the coordination' in the sense your critic meant? What would
+> actually change your mind here?"
 
 **Classification: `challenge` — disputes a specific claim.** Per the
 Decision Dialogue table, this authorizes "defend with existing evidence, or
@@ -68,31 +91,61 @@ if it actually changes something.** Two real, honest outcomes are both
 legitimate here, and the coordinator does not get to pick the flattering
 one:
 
-1. **Defend, no reopen.** If the synthesis already carries this exact
-   objection as a live, attributed, unresolved disagreement (which, in the
-   real P01.2 case, it does — this is not a new claim, it is the same
-   Attack 1 the person is now pushing on directly), the honest answer is to
-   say so plainly: "this is the same open disagreement the panel already
-   named and did not resolve — nothing new has been argued on either side
-   since." No `revise-*` dispatch, no reopen spent, because nothing about
-   the packet actually changed.
+1. **Defend, no reopen.** The real
+   [`synthesis.md:83`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/synthesis.md)
+   already states this exact posture toward Attack 1, precisely enough to
+   quote rather than paraphrase: *"partially concessive, not resolving.
+   Step 4 declines exactly the state-machine work Attack 1 names as
+   entrenching, which removes the attack's near-term bite. It does **not**
+   settle the underlying claim, because the claim is about relative cost
+   and no cost comparison was ever performed."* That is the honest answer
+   to this exact turn: the riskiest part of what the challenge fears
+   (cold-start coordination) was already declined, but whether even the
+   three named bug fixes plus CI meaningfully entrenches the split is
+   genuinely unresolved — nothing new has been argued on either side since.
+   No `revise-*` dispatch, no reopen spent.
 2. **Concede and reopen.** If the challenge surfaces something the panel's
-   own ledger did not already carry (a reason the reversibility premise is
-   wrong that no advisor stated), THAT is what authorizes
-   `revise-synthesis` — citing the human turn's own `reason` field, per the
-   Known-Gaps workaround for `tsk-44p` (no schema-legal `human-turn:` ref
-   exists in any `authorize` step's structured fields today):
+   own ledger did not already carry (a reason the cost-comparison claim is
+   wrong that no advisor stated — e.g. a real estimate of the hours either
+   path would cost), THAT is what authorizes `revise-synthesis` — citing
+   the human turn's own `reason` field, per the Known-Gaps workaround for
+   `tsk-44p` (no schema-legal `human-turn:` ref exists in any `authorize`
+   step's structured fields today). `grantedContextRefs` must name the
+   real ledger the synthesizer is re-weighing — never `[]`, which is
+   schema-legal but silently starves the reopen of every prior proposal,
+   critique, and synthesis (verified live; see the how-to guide's own note
+   and its committed proof evidence):
 
 ```json
 {
-  "type": "authorize",
-  "as": "authRevise",
-  "operationId": "revise-synthesis",
-  "targetActorId": "synthesizer-actor",
-  "authorizationId": "auth_revise_challenge_1",
-  "invocationKey": "ik_revise_challenge_1",
-  "reason": "Bounded reopen per human turn \"turn_2\": the person surfaced a reason the reversibility premise may be wrong that no advisor's own critique had stated.",
-  "grantedContextRefs": []
+  "kind": "declared-protocol",
+  "objective": "Continue aap_mdview_example: bounded reopen per Turn 2's challenge.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap_mdview_example",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authRevise",
+      "operationId": "revise-synthesis",
+      "targetActorId": "synthesizer-actor",
+      "authorizationId": "auth_revise_challenge_1",
+      "invocationKey": "ik_revise_challenge_1",
+      "reason": "Bounded reopen per human turn \"turn_2\": the person supplied a real hours estimate for the cost-comparison Attack 1's own settling evidence names, which no advisor's critique had.",
+      "grantedContextRefs": ["<this session's real synthesize-recommendation assignmentId>", "<this session's real critique-proposals assignmentId>"]
+    },
+    {
+      "type": "operation",
+      "as": "revise",
+      "operationId": "revise-synthesis",
+      "targetActorId": "synthesizer-actor",
+      "objective": "Re-weigh Attack 1's cost-comparison claim against the person's new hours estimate.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    }
+  ]
 }
 ```
 

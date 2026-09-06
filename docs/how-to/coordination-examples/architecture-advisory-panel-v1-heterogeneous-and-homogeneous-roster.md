@@ -15,17 +15,32 @@ registration gap.
 request would carry:
 
 ```json
-"actors": [
-  { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical", "persona": "person-facing-advisory-lead" },
-  { "id": "context-investigator-actor", "executor": "codex-readonly", "tier": "analytical", "persona": "disconfirmation-seeking-scout" },
-  { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical", "persona": "direct-response-architect" },
-  { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical", "persona": "different-priors-designer" },
-  { "id": "constraint-advocate-actor", "executor": "codex-readonly", "tier": "analytical", "persona": "production-reality-advocate" },
-  { "id": "architecture-critic-actor", "executor": "codex-readonly", "tier": "analytical", "persona": "cross-proposal-attacker" },
-  { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical", "persona": "whole-ledger-integrator" },
-  { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical", "persona": "process-and-authority-attacker" }
-]
+{
+  "kind": "declared-protocol",
+  "objective": "Heterogeneous roster: independently routed shaper/alternative/critic/synthesizer/red-team.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap_heterogeneous_example",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical", "persona": "person-facing-advisory-lead" },
+    { "id": "context-investigator-actor", "executor": "codex-readonly", "tier": "analytical", "persona": "disconfirmation-seeking-scout" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical", "persona": "direct-response-architect" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical", "persona": "different-priors-designer" },
+    { "id": "constraint-advocate-actor", "executor": "codex-readonly", "tier": "analytical", "persona": "production-reality-advocate" },
+    { "id": "architecture-critic-actor", "executor": "codex-readonly", "tier": "analytical", "persona": "cross-proposal-attacker" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical", "persona": "whole-ledger-integrator" },
+    { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical", "persona": "process-and-authority-attacker" }
+  ],
+  "steps": [
+    { "type": "operation", "as": "interpret", "operationId": "interpret-request", "targetActorId": "lead-advisor-actor", "objective": "Interpret the person's intent.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "investigate", "operationId": "investigate-context", "targetActorId": "context-investigator-actor", "objective": "Scout the real repository.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}
 ```
+
+Same opening shape as the clear-start/unclear-start examples — this file
+exists to show the roster and its rationale, not a new case.
 
 Three provider families reachable (`claude`, `openai-codex`, `gemini`),
 deliberately not collapsed onto one — the alternative shaper sits on a
@@ -84,17 +99,48 @@ sibling's private notes, no shared context beyond what a visibility window
 explicitly grants):
 
 ```json
-"actors": [
-  { "id": "lead-advisor-actor", "executor": "claude", "tier": "critical" },
-  { "id": "context-investigator-actor", "executor": "claude", "tier": "analytical" },
-  { "id": "system-shaper-actor", "executor": "claude", "tier": "analytical" },
-  { "id": "alternative-shaper-actor", "executor": "claude", "tier": "analytical" },
-  { "id": "constraint-advocate-actor", "executor": "claude", "tier": "analytical" },
-  { "id": "architecture-critic-actor", "executor": "claude", "tier": "analytical" },
-  { "id": "synthesizer-actor", "executor": "claude", "tier": "critical" },
-  { "id": "red-team-actor", "executor": "claude", "tier": "critical" }
-]
+{
+  "kind": "declared-protocol",
+  "objective": "Homogeneous fallback: one confined provider, still 8 isolated roles, tier-differentiated.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap_homogeneous_example",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "context-investigator-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "claude-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    { "type": "operation", "as": "interpret", "operationId": "interpret-request", "targetActorId": "lead-advisor-actor", "objective": "Interpret the person's intent.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "investigate", "operationId": "investigate-context", "targetActorId": "context-investigator-actor", "objective": "Scout the real repository.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}
 ```
+
+**Never bind an advisory role to a bare `claude`/`agy`/`codex-cli` executor
+name — only to the confined `-bwrap`/`-readonly` suffix.** An earlier
+draft of this file used bare `claude` here. Confirmed against the live
+`.fgos/config.json`: `claude` (unlike `claude-bwrap`) really is a
+registered executor, and it resolves to `claude -p ... --permission-mode
+acceptEdits --allowedTools Bash(git add:*),Bash(git commit:*),...` — a
+real, working, git-write-capable, unconfined invocation. Naming it here
+would not fail loudly the way naming an *unregistered* executor does
+(`tsk-1o4`'s WARNING, above) — it would actually run, with edit and
+git-commit permissions, against the person's own PROJECT_ROOT, directly
+violating `SKILL.md`'s BOUNDS #2 ("No git mutation inside PROJECT_ROOT,
+ever."). This is why the corrected roster above uses `claude-bwrap` for
+every role even in the "same provider" case: **homogeneous means "same
+confined provider family," never "whatever bare executor name happens to
+already be registered."** If no confined single-provider pair exists on a
+host at all, homogeneous fallback is not currently safe to run — say so to
+the person rather than substituting an unconfined name to make the roster
+"work."
 
 **Homogeneous means "same provider," never "same context or session."**
 Nothing about a single-provider host collapses the 8 roles into fewer

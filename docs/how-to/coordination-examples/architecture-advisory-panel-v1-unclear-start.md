@@ -35,6 +35,17 @@ ambiguity forward rather than resolving it early:
   "writerId": "coordinator-driver",
   "coordinationId": "aap_vnflow_example",
   "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "context-investigator-actor", "executor": "codex-readonly", "tier": "analytical" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "codex-readonly", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "codex-readonly", "tier": "analytical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical" }
+  ],
   "steps": [
     {
       "type": "operation",
@@ -55,6 +66,12 @@ ambiguity forward rather than resolving it early:
   ]
 }
 ```
+
+Same roster as the clear-start example, resolved once at intake — see
+that file's own note on what omitting `actors[]` would cost, and the
+how-to guide's own notes on why `aggregateBounds` is declared here and why
+`actors[]` must be repeated on every later call that dispatches one of
+these roles.
 
 ## What actually happened (real, P01.3)
 

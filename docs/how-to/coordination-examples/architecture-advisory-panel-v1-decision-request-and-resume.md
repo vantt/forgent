@@ -14,7 +14,10 @@ nor P01.3 ever sent a Decision Request to the person. Both wrote the file
 anyway, because "we decided not to ask" is itself a decision that needs a
 record — a successor coordinator should never re-derive it from nothing, or
 worse, re-ask what was already reasoned through. Here is P01.2's real
-verdict table, reproduced in full because the reasoning IS the artifact:
+verdict table, **condensed from the source** (the reasoning is the
+artifact — read
+[`decision-request.md`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/decision-request.md)
+itself for the full, unabridged text of every cell):
 
 | Candidate gap | User-exclusive? | Material now? | Disposition |
 |---|---|---|---|
@@ -34,35 +37,111 @@ the final explanation as something that remains the person's own call.
 ## Part 2 — a constructed case where a Decision Request WOULD send
 
 No real session to date has crossed both bars for more than one gap at
-once, so this half is deliberately marked as constructed for illustration —
-doctrinally shaped the same way, not a copy of a real send. Say a case
-arrives with a genuine, undefaultable compliance fact bound up in the
-architecture question (`SKILL.md`'s own named exception: "if proceeding
-requires inventing a fact about the person's own obligations that cannot be
-defaulted safely, ask immediately and say why waiting would have been
-worse"). A single, consolidated message — never a first question, then a
+once, so this half is deliberately marked as constructed for illustration
+— a hypothetical layered on top of the real vnflow case (P01.3), not a
+copy of a real send and not a real scout finding. The opening request that
+started this same case is the
+[unclear-start example](architecture-advisory-panel-v1-unclear-start.md)'s
+own — same `protocolRef.id`, same `actors[]` roster, same `coordinationId`
+(`aap_vnflow_example`) — a Decision Request never opens a new session or a
+new roster of its own; it happens inside Phase 4, before Phase 5 dispatches
+against that already-resolved roster, reproduced here for this file's own
+self-containment:
+
+```json
+"actors": [
+  { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" },
+  { "id": "context-investigator-actor", "executor": "codex-readonly", "tier": "analytical" },
+  { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+  { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+  { "id": "constraint-advocate-actor", "executor": "codex-readonly", "tier": "analytical" },
+  { "id": "architecture-critic-actor", "executor": "codex-readonly", "tier": "analytical" },
+  { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+  { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical" }
+]
+```
+
+Say P01.3's real
+[`scout-report.md`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/scout-report.md)
+had additionally surfaced this constructed twist: the real
+`alert_dispatch_intraday.py` path writes trade-signal alerts to a log with
+no configured retention policy, and separately, whether the standing
+2026-06-22 decision's real 7-day EOD-context staleness window is compliant
+depends on which instrument class is running through it — both are
+regulatory-obligation facts that live with the person's own compliance
+team, not in the repository, and per `SKILL.md`'s own named exception
+("if proceeding requires inventing a fact about the person's own
+obligations that cannot be defaulted safely, ask immediately and say why
+waiting would have been worse"), scouting further cannot resolve either
+one. A single, consolidated message — never a first question, then a
 second one three minutes later:
 
-> Before the panel diverges on designs, two things only you can settle,
-> together, not two separate messages:
+> Before the panel diverges on the three-seam design, two things only you
+> can settle, together, not two separate messages:
 >
-> 1. **Data residency.** Does this system need to keep data inside one
->    legal jurisdiction? This changes which storage topologies are even
->    legal candidates before a single shaper starts, so we can't default it.
-> 2. **Existing commitment.** Is there already a contractual SLA number for
->    this service, or are we free to propose one? If one exists, every
->    shaper needs it as a hard constraint, not a target to invent.
+> 1. **Alert-log retention.** Which regulatory retention window applies to
+>    intraday trade-signal alerts — 90 days, 1 year, 7 years? This decides
+>    whether `alert_dispatch_intraday.py` needs a durable, auditable log or
+>    an ephemeral one, before any shaper proposes a mechanism for it.
+> 2. **EOD-context staleness compliance.** Is the existing 7-day acceptance
+>    window (your own 2026-06-22 decision) compliant for every instrument
+>    class this pipeline now handles, or does a subset need a shorter one?
+>    This bounds what "a checked input" can mean for the third seam.
 >
 > Everything else we found was either answerable by reading the repository
-> (see scout-report.md) or doesn't change what a first proposal looks like —
-> we're proceeding on those without asking. If we don't hear back, we'll
-> proceed with [named default] for #1 and [named default] for #2, both
-> reversible before Phase 7.
+> (see scout-report.md) or doesn't change what a first proposal looks
+> like — we're proceeding on those without asking. If we don't hear back:
+> we'll assume a 1-year retention window for #1 (the conservative default
+> for trade-signal logs — cheap to shorten later, expensive to have
+> discarded data you needed), and treat the existing 7-day window as
+> compliant for every instrument class for #2 (matching your own standing
+> decision already in force) — both stated as explicit, named assumptions
+> in every shaper's prompt, not silently assumed.
 
 This is the "ask reluctantly, but clearly, and only once" shape: batched,
 each question stated with why it can't wait and why it can't be defaulted,
-and a named fallback stated up front rather than leaving the person to
-guess what happens if they don't answer.
+and a real, substantive named default for each — never a placeholder — so
+the person can see exactly what happens if they say nothing.
+
+Recording the person's real answer, once it arrives, is the same
+`human-turn` mechanism every other family in this guide uses — this
+protocol has no separate "decision request answered" step, because
+Phase 4 is coordinator bookkeeping, not a graph operation (see this file's
+own opening paragraph):
+
+```json
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap_vnflow_example: record the person's answer to the compliance Decision Request.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap_vnflow_example",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    {
+      "type": "human-turn",
+      "as": "personTurn1",
+      "turnId": "turn_1",
+      "turnOrdinal": 1,
+      "channel": "claude-code-chat",
+      "artifactRef": "human/1-person.md",
+      "externalRef": "claude-code-transcript:sess-1:uuid-1",
+      "attributedTo": { "type": "person", "id": "the-user" }
+    }
+  ]
+}
+```
+
+No `actors[]` override is needed on this particular call — a `human-turn`
+step records a turn, it does not dispatch an operation against a
+role-bound actor, so there is nothing here for a per-actor executor
+override to apply to. The roster this session actually dispatches through
+is the one declared at `aap_vnflow_example`'s own opening call (the
+[unclear-start example](architecture-advisory-panel-v1-unclear-start.md))
+— and per the how-to guide's own note, that `actors[]` block must be
+repeated on any LATER call in this same file's Part 2/3 sequence that goes
+on to authorize or dispatch an operation (e.g. a `revise-synthesis`
+following this turn, shaped exactly like the
+[material-context reopen example](architecture-advisory-panel-v1-material-context-reopen.md)).
 
 ## Part 3 — resuming a session, from durable artifacts and `show` alone
 

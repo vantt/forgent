@@ -13,8 +13,8 @@ is "worth using" for — the person or other users; invest now or park
 safely):
 
 > 1. "cho người khác. mdview có cách render khá đẹp và anh sử dụng đã ổn
->    [...] tuy nhiên desktop là 1 mode hoạt động như một standalone viewer,
->    giúp cho lowtech user có thể bật và xem 1 file md trên windows
+>    [...] tuy nhiên deskop [sic] là 1 mode hoạt động như một standalone
+>    viewer, giúp cho lowtech user có thể bật và xem 1 file md trên windows
 >    desktop." (for other people — [...] the desktop mode exists as a
 >    standalone viewer so a low-tech user can open and view a markdown file
 >    on Windows)
@@ -42,14 +42,23 @@ brevity as decisiveness would have misclassified this turn.
 
 ```json
 {
-  "type": "human-turn",
-  "as": "personTurn2",
-  "turnId": "turn_2",
-  "turnOrdinal": 2,
-  "channel": "claude-code-chat",
-  "artifactRef": "human/2-person.md",
-  "externalRef": "claude-code-transcript:sess-1:uuid-2",
-  "attributedTo": { "type": "person", "id": "the-user" }
+  "kind": "declared-protocol",
+  "objective": "Continue aap_mdview_example: record Turn 2 (decide).",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap_mdview_example",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    {
+      "type": "human-turn",
+      "as": "personTurn2",
+      "turnId": "turn_2",
+      "turnOrdinal": 2,
+      "channel": "claude-code-chat",
+      "artifactRef": "human/2-person.md",
+      "externalRef": "claude-code-transcript:sess-1:uuid-2",
+      "attributedTo": { "type": "person", "id": "the-user" }
+    }
+  ]
 }
 ```
 
@@ -57,26 +66,43 @@ brevity as decisiveness would have misclassified this turn.
 follows from this turn. What follows instead is `close-dialogue`, the
 lead advisor's own third gating binding, and the ONLY thing that brings this
 actor — and, once every other actor is already settled, the whole session —
-to quorum completion:
+to quorum completion. `grantedContextRefs` must name the real explanation
+(and, if a reopen happened first, the real revision) — never `[]`, which
+is schema-legal but produces a real Assignment with an empty context grant
+(verified live; see the how-to guide's own note and its committed proof
+evidence). `actors[]` is repeated for `lead-advisor-actor` because it does
+not persist from the opening call:
 
 ```json
 {
-  "type": "authorize",
-  "as": "authClose",
-  "operationId": "close-dialogue",
-  "targetActorId": "lead-advisor-actor",
-  "authorizationId": "auth_close_1",
-  "invocationKey": "ik_close_1",
-  "reason": "post-explanation-open is open; the person's turn_2 stated a real decision and no further reopen is needed.",
-  "grantedContextRefs": []
-},
-{
-  "type": "operation",
-  "as": "closeDialogue",
-  "operationId": "close-dialogue",
-  "targetActorId": "lead-advisor-actor",
-  "objective": "Close the dialogue: no further human turn or reopen is coming.",
-  "expectedOutputs": ["agent-result.json (status, summary)"]
+  "kind": "declared-protocol",
+  "objective": "Continue aap_mdview_example: close the dialogue.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap_mdview_example",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authClose",
+      "operationId": "close-dialogue",
+      "targetActorId": "lead-advisor-actor",
+      "authorizationId": "auth_close_1",
+      "invocationKey": "ik_close_1",
+      "reason": "post-explanation-open is open; the person's turn_2 stated a real decision and no further reopen is needed.",
+      "grantedContextRefs": ["<this session's real explain-recommendation assignmentId>"]
+    },
+    {
+      "type": "operation",
+      "as": "closeDialogue",
+      "operationId": "close-dialogue",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "Close the dialogue: no further human turn or reopen is coming.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    }
+  ]
 }
 ```
 

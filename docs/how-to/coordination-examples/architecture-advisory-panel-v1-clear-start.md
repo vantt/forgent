@@ -37,6 +37,17 @@ session:
   "writerId": "coordinator-driver",
   "coordinationId": "aap_mdview_example",
   "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "context-investigator-actor", "executor": "codex-readonly", "tier": "analytical" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "codex-readonly", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "codex-readonly", "tier": "analytical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical" }
+  ],
   "steps": [
     {
       "type": "operation",
@@ -58,11 +69,32 @@ session:
 }
 ```
 
-Note what is absent: no `actors[]` override naming a bwrap-wrapped executor
-here — see the
+The roster is resolved once, here, at intake — before Phase 5 runs, not
+per-role as each phase arrives — matching SKILL.md's own Executor Roster
+table (three provider families: `claude`, `openai-codex`, `gemini`).
+`aggregateBounds` is declared here too, once, at session open (see the
+how-to guide's own note on why the platform default of 10 rounds is too
+low for this protocol's full flow). **What omitting `actors[]` would have
+cost, stated explicitly rather than left implicit:** without it, every one
+of the 8 roles above would have resolved through this host's single global
+default executor — the exact "collapses the panel to one session-wide
+provider" failure `SKILL.md` and phase-04's own Requirements forbid, and
+something a live run of this exact shape actually produces when `actors[]`
+is dropped. See the
 [heterogeneous/homogeneous example](architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md)
-for that shape and its own live registration caveat; this file stays focused
-on the entry/framing mechanics.
+for the full cognitive rationale per role and this roster's own live
+registration caveat (none of these three executor ids is registered in
+this repository's dispatch config today — read that file's WARNING before
+dispatching a real session from this one). **`actors[]` must be repeated
+on every later call that dispatches one of these roles** — it is read
+fresh per request, never persisted on the session (see the how-to guide's
+own note on this). This exact request is also shipped as a real,
+schema-validated fixture —
+[`architecture-advisory-panel-v1-request.json`](architecture-advisory-panel-v1-request.json)
+— covered by this repository's own `coordination-example-requests-valid`
+doctor check, so a future regression like an empty `grantedContextRefs`
+or a dropped `aggregateBounds` in the *opening* request shape is caught
+mechanically, not just by review.
 
 ## What actually happened (real, P01.2)
 

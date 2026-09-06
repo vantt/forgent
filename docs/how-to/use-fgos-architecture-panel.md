@@ -43,6 +43,63 @@ a real session:
 Neither sentence names a protocol, a role, or an executor. Both are real,
 both ran, both reached a real outcome (see the two example families below).
 
+## The platform's default round cap is too low for this protocol — raise it
+
+**Read this before running any request shown below.** `fgos coordination
+run`'s own request schema defaults every session to
+`aggregateBounds.maxRounds: 10` when a request doesn't declare its own
+(`src/verbs/coordination/schema.mjs`). This protocol's mandatory
+pre-dialogue path — `interpret-request`, `investigate-context`, the three
+shapers, `critique-proposals`, `assess-constraints`,
+`synthesize-recommendation`, `red-team-packet`, `explain-recommendation` —
+is exactly **10 operations**, so `explain-recommendation` lands on round 10
+and consumes the entire default budget before Phase 9 (Decision Dialogue)
+ever gets a turn. Every `revise-synthesis`/`revise-explanation`/
+`close-dialogue` dispatch needs round 11 or later — and `close-dialogue` is
+the *only* route to `lead-advisor-actor`'s quorum, so a session opened with
+the platform default can never reach quorum completion at all, not even
+for a pure `decide` turn that spends no reopen. This was confirmed live,
+not inferred: an opening request with no `aggregateBounds` reaches round 10
+cleanly, then every Phase-9 operation is refused at the dispatch door with
+`"...has already used 10 round(s) session-wide, at or above the declared
+aggregateBounds.maxRounds cap of 10..."` (exit 4).
+
+**Declare `aggregateBounds` in your opening request, once, at session
+open** — it is read from the session manifest thereafter and does not need
+repeating on later calls (unlike `actors[]`, next section):
+
+```json
+"aggregateBounds": { "maxRounds": 20, "maxAssignments": 30 }
+```
+
+`maxRounds: 20` matches this repository's own conformance suite
+(`test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs`),
+which raises it for the identical reason and says so in its own comment:
+"this full chain dispatches 12 real Assignments, above the default
+session-wide cap of 10." Verified live for this fix: a session opened with
+this exact bound ran all 12 real operations across 6 separate CLI
+invocations — including a Phase-9 `revise-synthesis` at round 11 and
+`close-dialogue` at round 12 — and closed `"status": "completed"`. Every
+request/response file for that run is committed at
+[`proofs/P04.2/fix-round-1-live-proof/`](../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/fix-round-1-live-proof/).
+
+## `actors[]` is per-call — it does not persist across a resumed session
+
+**A second finding from the same live run, not documented anywhere before
+this guide.** Unlike `aggregateBounds`, a request's `actors[]` override is
+read fresh from *that request only* — `run.mjs`'s own per-actor resolution
+looks up `actors[]` on the current call, never on the manifest or on an
+earlier call. Confirmed live: an opening request bound every role to a
+specific confined executor; a **later, separate call that omitted
+`actors[]`** dispatched that same role through the global default executor
+instead — silently, with no error. For any role you route away from the
+default in your opening request, **repeat that role's `actors[]` entry on
+every later call that dispatches it** — a reopen/close fragment that drops
+`actors[]` silently un-confines that role for that one dispatch, which is
+exactly the class of risk the Executor Roster warning below exists to
+prevent. Every example below that shows a resume/reopen fragment repeats
+the relevant `actors[]` entry for this reason.
+
 ## Do you need to know the CLI at all?
 
 No — but this guide shows the real request JSON alongside the prose anyway,
@@ -85,7 +142,7 @@ Every reply you give is classified before anything happens next — never
 assumed from tone. This is the actual table `SKILL.md` operates from,
 restated for what each looks like from your side:
 
-| If you... | The panel... | Costs one of your two reopens? |
+| If you... | The panel... | Costs a reopen invocation? |
 |---|---|---|
 | Ask what something means, dispute nothing | Answers from what's already been written — no new panel work | No |
 | Dispute a specific claim | Defends it with existing evidence, or concedes and revises | Only if the concession actually changes something |
@@ -154,11 +211,15 @@ history and no raw log involved:
   (`explain-recommendation`, `close-dialogue`) too — a real, load-bearing
   behavior of the multi-operation quorum rule, not a quirk;
 - every `driver-authorized` operation still awaiting authorization
-  (`pendingDriverAuthorizations`), naming the exact node, operation, and
-  actor for each — `critique-proposals`, `assess-constraints`,
+  (`pendingDriverAuthorizations`) — **nine** entries, naming the exact
+  node and operation for each, and the actor too for eight of them:
+  `critique-proposals`, `assess-constraints`, `answer-specialist-question`,
   `synthesize-recommendation`, `red-team-packet`, `explain-recommendation`,
   `revise-synthesis`, `revise-explanation`, `close-dialogue`, all present
-  and named before any of them had run;
+  and named before any of them had run. `answer-specialist-question` is
+  the ninth and carries no `actorId` at all — correctly, since the
+  specialist has no static actor to name (see the Executor Roster's own
+  note on the specialist slot);
 - a real event count, growing correctly across the second call.
 
 No `decision-request.md`/`session.md`/`interpretation.md` was needed to

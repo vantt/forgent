@@ -45,14 +45,23 @@ same way regardless of what it turns out to need:
 
 ```json
 {
-  "type": "human-turn",
-  "as": "personTurn1",
-  "turnId": "turn_1",
-  "turnOrdinal": 1,
-  "channel": "claude-code-chat",
-  "artifactRef": "human/1-person.md",
-  "externalRef": "claude-code-transcript:sess-1:uuid-1",
-  "attributedTo": { "type": "person", "id": "the-user" }
+  "kind": "declared-protocol",
+  "objective": "Continue aap_mdview_example: record Turn 1 and evaluate the bounded reopen.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap_mdview_example",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    {
+      "type": "human-turn",
+      "as": "personTurn1",
+      "turnId": "turn_1",
+      "turnOrdinal": 1,
+      "channel": "claude-code-chat",
+      "artifactRef": "human/1-person.md",
+      "externalRef": "claude-code-transcript:sess-1:uuid-1",
+      "attributedTo": { "type": "person", "id": "the-user" }
+    }
+  ]
 }
 ```
 
@@ -62,22 +71,58 @@ of it this turn is actually on:
 **If the new fact is integrable from the existing ledger** — the
 synthesizer can incorporate it into a revised recommendation using what's
 already been argued plus the turn's own content, without needing a fresh
-independent investigation:
+independent investigation. **`grantedContextRefs` must name the real
+ledger — never `[]`.** An empty grant is schema-legal and dispatches
+without error, but it hands the synthesizer none of the proposals, none of
+the critique, and not even its own prior synthesis — silently
+contradicting the very sentence that follows it ("re-weighted against it").
+Confirmed live: an authorization with `grantedContextRefs: []` produces a
+real Assignment whose own `contextGrant.refs` is empty, while the correct
+shape below produces a `contextGrant.refs` array naming all seven prior
+Assignments (see the how-to guide's committed live-proof evidence). The
+three placeholder-shaped ids below stand for this session's own real
+`interpret-request`/`shape-*`/`critique-proposals`/`assess-constraints`
+assignmentIds — substitute the real ones `fgos coordination show
+aap_mdview_example --json` reports before dispatching:
 
 ```json
 {
-  "type": "authorize",
-  "as": "authRevise",
-  "operationId": "revise-synthesis",
-  "targetActorId": "synthesizer-actor",
-  "authorizationId": "auth_revise_1",
-  "invocationKey": "ik_revise_1",
-  "reason": "Bounded reopen per human turn \"turn_1\": the person named a third state (valued-but-unwatched) neither original hypothesis covered; the existing ledger's three candidates can be re-weighted against it without a fresh shaper pass.",
-  "grantedContextRefs": []
+  "kind": "declared-protocol",
+  "objective": "Continue aap_mdview_example: bounded reopen of the synthesis.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap_mdview_example",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authRevise",
+      "operationId": "revise-synthesis",
+      "targetActorId": "synthesizer-actor",
+      "authorizationId": "auth_revise_1",
+      "invocationKey": "ik_revise_1",
+      "reason": "Bounded reopen per human turn \"turn_1\": the person named a third state (valued-but-unwatched) neither original hypothesis covered; the existing ledger's three candidates can be re-weighted against it without a fresh shaper pass.",
+      "grantedContextRefs": ["<this session's real synthesize-recommendation assignmentId>", "<this session's real critique-proposals assignmentId>", "<this session's real assess-constraints assignmentId>"]
+    },
+    {
+      "type": "operation",
+      "as": "revise",
+      "operationId": "revise-synthesis",
+      "targetActorId": "synthesizer-actor",
+      "objective": "Re-weigh the three candidates against the valued-but-unwatched state, using the granted ledger.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    }
+  ]
 }
 ```
 
 This consumes one of the synthesizer's two `revise-synthesis` invocations.
+`actors[]` is repeated here because it does not persist from the opening
+call (see the how-to guide's own note) — dropping it would silently
+dispatch the synthesizer through the global default executor instead of
+the confined roster.
 
 **If the new fact genuinely requires fresh investigation** — as it did for
 real here, since "does the shell still build against the current daemon"
@@ -96,6 +141,9 @@ pass, and open a **new cell** — a new `coordinationId`, a fresh
   "writerId": "coordinator-driver",
   "coordinationId": "aap_mdview_example--followup-1",
   "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "context-investigator-actor", "executor": "codex-readonly", "tier": "analytical" }
+  ],
   "steps": [
     {
       "type": "operation",
