@@ -553,6 +553,14 @@ function validateInvocationShape(invocation, label, capabilityNames) {
   if (invocation.interactiveMode !== undefined) {
     validateInteractiveModeShape(invocation.interactiveMode, `${label} "interactiveMode"`);
   }
+  // Same vocabulary as the executor-level declaration: an invocation may
+  // override how the prompt reaches its worker, and both spellings are
+  // checked against one list so they cannot drift apart.
+  if (invocation.promptDelivery !== undefined && !PROMPT_DELIVERIES.includes(invocation.promptDelivery)) {
+    throw new RunnerConfigError(
+      `runner config (${label}) "promptDelivery" must be one of ${PROMPT_DELIVERIES.join('/')}, got: ${JSON.stringify(invocation.promptDelivery)}.`,
+    );
+  }
   if (invocation.liveOutput !== undefined) {
     if (!invocation.liveOutput || typeof invocation.liveOutput !== 'object' || Array.isArray(invocation.liveOutput)) {
       throw new RunnerConfigError(`runner config (${label}) "liveOutput" must be an object when present.`);
@@ -574,6 +582,51 @@ function validateInteractiveModeShape(interactiveMode, label) {
   }
   if (typeof interactiveMode.exitCommand !== 'string' || !interactiveMode.exitCommand.trim()) {
     throw new RunnerConfigError(`runner config (${label}) "exitCommand" must be a non-empty string when present.`);
+  }
+  // `kind` names which interactive agent herdr should start. The set of legal
+  // kinds belongs to herdr, not here -- duplicating its list would go stale
+  // silently, and herdr already refuses an unknown one by name. All this can
+  // check is the shape it must have to be passed at all.
+  if (interactiveMode.kind !== undefined) {
+    if (typeof interactiveMode.kind !== 'string' || !/^[a-z][a-z0-9_-]*$/.test(interactiveMode.kind)) {
+      throw new RunnerConfigError(
+        `runner config (${label}) "kind" must be a lowercase agent-kind name when present, got: ${JSON.stringify(interactiveMode.kind)}.`,
+      );
+    }
+  }
+  // A deadline shorter than herdr's own 5000ms stall detector wins the race
+  // against it, and the caller gets a bare timeout instead of the real reason
+  // the brief did not land. Measured upstream: 5s broke, 20s worked.
+  if (interactiveMode.promptTimeoutMs !== undefined) {
+    if (!Number.isInteger(interactiveMode.promptTimeoutMs) || interactiveMode.promptTimeoutMs < 10000) {
+      throw new RunnerConfigError(
+        `runner config (${label}) "promptTimeoutMs" must be an integer of at least 10000 -- a shorter deadline fires before herdr's own 5000ms stall detector can report why. Got: ${JSON.stringify(interactiveMode.promptTimeoutMs)}.`,
+      );
+    }
+  }
+  if (interactiveMode.readyTimeoutMs !== undefined) {
+    if (!Number.isInteger(interactiveMode.readyTimeoutMs) || interactiveMode.readyTimeoutMs <= 0) {
+      throw new RunnerConfigError(
+        `runner config (${label}) "readyTimeoutMs" must be a positive integer when present, got: ${JSON.stringify(interactiveMode.readyTimeoutMs)}.`,
+      );
+    }
+  }
+  // How long to leave a delivered brief unacknowledged before offering it
+  // again. Deliberately separate from `promptTimeoutMs`: one is how long a
+  // single herdr call may run, the other is how patient to be with a worker.
+  if (interactiveMode.resendAfterMs !== undefined) {
+    if (!Number.isInteger(interactiveMode.resendAfterMs) || interactiveMode.resendAfterMs <= 0) {
+      throw new RunnerConfigError(
+        `runner config (${label}) "resendAfterMs" must be a positive integer when present, got: ${JSON.stringify(interactiveMode.resendAfterMs)}.`,
+      );
+    }
+  }
+  if (interactiveMode.maxResends !== undefined) {
+    if (!Number.isInteger(interactiveMode.maxResends) || interactiveMode.maxResends < 0) {
+      throw new RunnerConfigError(
+        `runner config (${label}) "maxResends" must be a non-negative integer when present, got: ${JSON.stringify(interactiveMode.maxResends)}.`,
+      );
+    }
   }
 }
 

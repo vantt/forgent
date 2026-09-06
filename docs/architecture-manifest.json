@@ -156,6 +156,8 @@
     "src/report/knowledge-projection.mjs": "domain",
     "src/state/fgos-file-registry.mjs": "kernel",
     "src/state/runtime-coordination.mjs": "infra",
+    "src/runner/dispatch/brief.mjs": "infra",
+    "src/runner/dispatch/herdr-agent.mjs": "infra",
     "src/runner/dispatch/trust-store.mjs": "infra",
     "src/runner/dispatch/worker-home.mjs": "infra",
     "src/runner/dispatch/worker-session.mjs": "infra"

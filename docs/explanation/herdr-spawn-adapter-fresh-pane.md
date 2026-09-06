@@ -364,3 +364,52 @@ something removing the other two paths could or should fix.
 Landed via `fgw/tsk-by0` (merged `d5b503cd`); Iron Law satisfied via
 `--acknowledge-iron-law` against `transport.mjs` and the two deleted
 live-renderer modules.
+
+## The adapter stops reading the terminal as evidence (dispatch visibility V0, Phase 02)
+
+Every section above shares one assumption: the pane is where the answer
+comes from. The prompt is typed into it, `agent_status` is read off it, and
+completion is inferred from a sentinel echoed into its scrollback. Two of
+the bugs recorded above (`tsk-2rr`'s false idle, `tsk-5cr`'s corrupted
+multi-line command line) are not independent defects — they are the same
+assumption failing twice, in two different places.
+
+This phase replaces the assumption rather than tuning around it. herdr
+remains transport and failure detector; it is never truth and never a
+receipt. What ends a round is a file the worker itself wrote.
+
+**Startup.** `herdr agent start <name> --kind <k> --pane <p> --timeout <ms>`
+replaces `herdr pane run`. herdr returns only once it has confirmed a ready
+agent in the pane, which is what absorbs the shell boot race the old path
+had to poll around, and it fails by name (`agent_not_ready`) instead of
+hanging. The `pane run` startup path and the exit sentinel it required are
+both gone.
+
+**Prompt delivery.** The prompt is written to `brief-<round>.md` in the run
+directory, and only a one-line pointer is submitted to the agent. This is
+what makes `tsk-5cr`'s corruption structurally impossible rather than
+unlikely: there is no multi-line text on any command line to corrupt. Live
+probing (P6) established that `agent prompt` does deliver a multi-line
+prompt intact to `claude`, so the file is no longer the only shape that
+works — but it stays the default because one shape that works for every
+agent kind is cheaper than one shape per provider, and because a round-
+numbered brief is the anchor that tells a stale report from a current one.
+`promptDelivery: "inline"` is a declared per-executor alternative.
+
+**Completion.** `outbox/result-<round>.json` appearing ends the round.
+`agent_status` is no longer read as completion anywhere; it only answers
+"is it safe to type at this agent right now", which is the only question it
+was ever able to answer. `outbox/ack-<round>.json` is the worker's
+acknowledgement that it read the brief — a round fast enough to skip it is
+not a failure.
+
+**Failure.** Three transport failures that used to arrive as one generic
+timeout are now three named outcomes: `agent_not_ready`,
+`agent_prompt_stalled`, and `agent_blocked`, the last carrying the line
+that was on screen. A failed dispatch leaves its pane open, because that
+screen is the only place the reason is still legible. A brief that is never
+acknowledged is offered again only once the agent is back at rest — never
+while it is working, which would interrupt the very turn being waited for.
+
+The fresh-pane constraint this document is named for is unchanged and still
+absolute.

@@ -194,7 +194,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // a command-less/adapter-less/invocation-less executor with no static
   // agentType of its own -- see resolveAgentTypeForWork's own doc comment.
   const resolvedAgentType = resolveAgentTypeForWork(work, cwd, opts.stage);
-  const { command, args, env, liveOutput, interactiveMode, adapter, provider, baseCommit, headRef, governance } = resolveExecutorCommand(cfg, {
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, adapter, provider, baseCommit, headRef, governance } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -233,7 +233,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
 
-  return adapterFn({ command, args, env, liveOutput, interactiveMode }, {
+  return adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery }, {
     cwd,
     timeoutMs,
     idleTimeoutMs,
@@ -350,6 +350,11 @@ export async function executeExecutorCli(
     onChunk,
     work,
     stage,
+    // Where this run's artifacts live. An interactive adapter writes the
+    // brief here and waits for the worker's own files to appear here; a
+    // caller that has no run directory (an ad-hoc `execute`) leaves it unset
+    // and the adapter uses a private temporary one instead.
+    runDir,
   } = {},
 ) {
   if (!executorIdArg && !purpose) {
@@ -445,7 +450,7 @@ export async function executeExecutorCli(
     rigorOverrides: capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides,
   });
   const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
-  const { command, args, env, liveOutput, interactiveMode, adapter, provider } = resolveExecutorCommand(cfg, {
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, adapter, provider } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -502,7 +507,7 @@ export async function executeExecutorCli(
     );
     const headBefore = captureHeadSha(cwd);
     const dirtyBefore = checkoutDirtyPaths(root, cwd);
-    const result = await adapterFn({ command, args, env, liveOutput, interactiveMode }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
+    const result = await adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model, runDir });
     const headAfter = captureHeadSha(cwd);
     const dirtyAfter = checkoutDirtyPaths(root, cwd);
     let lostUncommittedPaths;

@@ -807,6 +807,7 @@ export async function executeAssignment(assignment, opts = {}) {
       onChunk: opts.onChunk,
       work: opts.work,
       stage: effectiveAssignment.stage,
+      runDir: path.resolve(runDir),
     });
   } catch (err) {
     executionError = err;

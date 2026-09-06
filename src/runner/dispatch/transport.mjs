@@ -38,6 +38,8 @@ import os from 'node:os';
 import { spawn, execFileSync } from 'node:child_process';
 import { RunnerConfigError } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
+import { createHerdrClient, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
+import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 
 /** Env var a spawned child reads to know its own nested-dispatch depth,
  * threaded by `cliSpawnAdapter` on every spawn (current depth + 1) — a
@@ -162,6 +164,13 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
   return {
     command: executor.command,
     args,
+    // The args BEFORE substitution. An adapter that must NOT put the prompt on
+    // a command line (herdr-spawn: the prompt goes to a file, one pointer goes
+    // through the terminal) needs to know exactly which entries carried it,
+    // and the `{prompt}` placeholder says so precisely where string-matching
+    // the substituted result only guesses. Additive: every existing caller
+    // destructures a subset of this object and is unaffected.
+    argsTemplate: executor.args,
     env: executor.env,
     liveOutput: executor.liveOutput,
     interactiveMode: executor.interactiveMode,
@@ -177,6 +186,9 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     // resolve.mjs's own deriveProviderFamily(executorEntry,
     // executor.command) result, already computed correctly a few lines
     // above in resolveExecutorConfig — the correct fallback.
+    // How the prompt reaches an interactive worker: `file-pointer` (default)
+    // writes it to disk and types a pointer, `inline` types it whole.
+    promptDelivery: executor.promptDelivery,
     provider: executor.provider ?? executor.governance.providerFamily,
     baseCommit: attestation.baseCommit,
     headRef: attestation.headRef,
@@ -534,22 +546,48 @@ async function httpAdapter(invocation, opts) {
 }
 
 /**
- * D3/D6 (tsk-5x7-3): `herdr-spawn` executor adapter.
- * Launches the worker inside a Herdr pane instead of a stdout-captured
- * subprocess, allowing a person to watch the agent work live.
+ * The `herdr-spawn` executor adapter: run the worker as a real interactive
+ * agent in a pane a person can watch, and conclude nothing about the work
+ * from anything except a file the worker itself wrote.
  *
- * HARD CONSTRAINT (tsk-1nih, live evidence): this adapter MUST ALWAYS create a
- * fresh pane (`herdr pane split`) on every dispatch and MUST NEVER reuse an
- * existing pane. Reusing a finished worker's pane delivers the next dispatch
- * as a chat message into an idle interactive agent REPL.
+ * Three things this adapter refuses to do, each because doing it failed in
+ * production:
  *
- * Results come back through the existing ladder (stdout captured via `herdr pane read`).
- * Selected purely by `executor.adapter === 'herdr-spawn'`.
+ * 1. It never types the prompt as a shell command. The old path quoted the
+ *    prompt into an argv string and let `herdr pane run` type it as
+ *    keystrokes, which corrupts every multi-line prompt there is -- and a
+ *    real implementation prompt is always multi-line. The prompt goes to
+ *    disk; one line pointing at it goes through the terminal.
+ *
+ * 2. It never treats `agent_status` as completion. That reading was wrong
+ *    twice in measured production: `idle` before the agent had started at
+ *    all, and an `idle`-looking dip between two tool calls of one turn.
+ *    Completion is `outbox/result-<round>.json` existing, nothing else.
+ *
+ * 3. It never closes the pane on failure. A failed dispatch's pane is the
+ *    only place the reason is still legible, so it stays open and the error
+ *    carries its id.
+ *
+ * HARD CONSTRAINT (tsk-1nih, live evidence): always a FRESH pane, never a
+ * reused one. Delivering a dispatch into a finished worker's pane sends it
+ * as chat to an idle REPL.
+ *
+ * Startup goes through `herdr agent start`, which returns only once herdr
+ * has confirmed a ready agent in the pane -- that is what absorbs the shell
+ * boot race the old path had to poll around, and it fails by name
+ * (`agent_not_ready`) instead of hanging.
  */
 function herdrSpawnInteractiveAdapter(invocation, opts) {
-  const { command, args, env: rawEnv, interactiveMode } = invocation;
-  const { exitCommand } = interactiveMode;
-  const { cwd, timeoutMs, workId, tier, model, herdrBin: optsHerdrBin, onChunk } = opts;
+  const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery } = invocation;
+  const {
+    exitCommand,
+    kind,
+    readyTimeoutMs = DEFAULT_READY_TIMEOUT_MS,
+    promptTimeoutMs = DEFAULT_PROMPT_TIMEOUT_MS,
+    maxResends = DEFAULT_MAX_RESENDS,
+    resendAfterMs,
+  } = interactiveMode;
+  const { cwd, timeoutMs, workId, tier, model, herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir } = opts;
 
   const depth = currentDispatchDepth();
   if (depth >= MAX_DISPATCH_DEPTH) {
@@ -560,415 +598,261 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     ));
   }
 
+  // herdr launches the canonical executable for a kind; `command` only tells
+  // us which kind that is. An unrecognized kind is herdr's own refusal, and
+  // it is reported as one -- never silently downgraded to typing at a shell.
+  const agentKind = kind ?? (command ? path.basename(command) : null);
+  if (!agentKind) {
+    return Promise.reject(new DispatchError(
+      'invalid-config',
+      `executor for work "${workId}" refused: herdr-spawn needs an agent kind -- declare interactiveMode.kind, or a command whose basename names one.`,
+      { workId, tier, model },
+    ));
+  }
+
   const resolvedEnv = resolveExecutorEnv(rawEnv);
   const herdrBin = optsHerdrBin ?? process.env.FGOS_HERDR_BIN ?? 'herdr';
   const fullEnv = { ...process.env, ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) };
+  const delivery = promptDelivery ?? 'file-pointer';
 
-  return new Promise((resolve, reject) => {
-    const splitArgs = ['pane', 'split', '--direction', 'right', '--no-focus'];
-    if (cwd) {
-      splitArgs.push('--cwd', cwd);
-    }
-    for (const [key, value] of Object.entries(resolvedEnv)) {
-      splitArgs.push('--env', `${key}=${value}`);
-    }
-
-    let splitOutput;
-    try {
-      splitOutput = execFileSync(herdrBin, splitArgs, {
-        cwd,
-        env: fullEnv,
-        encoding: 'utf8',
-        shell: false,
-        stdio: ['ignore', 'pipe', 'pipe'],
-      });
-    } catch (err) {
-      return reject(new DispatchError(
-        'worker-spawn-fail',
-        `executor failed to start for work "${workId}": herdr pane split failed (exit code ${err.status ?? 'unknown'}).`,
-        { workId, tier, model, cause: 'herdr pane split failed', exitCode: err.status ?? null },
-      ));
-    }
-
-    let paneId;
-    try {
-      const parsed = JSON.parse(splitOutput);
-      paneId = parsed?.result?.pane?.pane_id ?? parsed?.result?.pane_id ?? parsed?.result?.root_pane?.pane_id ?? parsed?.pane_id;
-    } catch {
-      paneId = splitOutput ? splitOutput.trim() : null;
-    }
-
-    if (!paneId) {
-      return reject(new DispatchError(
-        'worker-spawn-fail',
-        `executor failed to start for work "${workId}": could not parse pane_id from herdr pane split output: "${splitOutput}"`,
-        { workId, tier, model, cause: 'invalid pane split output' },
-      ));
-    }
-
-    const posixShellQuote = (value) => `'${String(value).replace(/'/g, `'\\''`)}'`;
-    const effectiveArgs = args || [];
-    const quotedCmd = [command, ...effectiveArgs].map(posixShellQuote).join(' ');
-
-    try {
-      execFileSync(herdrBin, ['pane', 'run', paneId, quotedCmd], {
-        cwd,
-        env: fullEnv,
-        encoding: 'utf8',
-        shell: false,
-        stdio: ['ignore', 'pipe', 'pipe'],
-      });
-    } catch (err) {
-      return reject(new DispatchError(
-        'worker-spawn-fail',
-        `executor failed to start for work "${workId}": herdr pane run failed: ${err.message}`,
-        { workId, tier, model, cause: err.message },
-      ));
-    }
-
-    let settled = false;
-    let sawWorking = false;
-    let consecutiveTerminalPolls = 0;
-    let pollInterval = null;
-    let timeoutTimer = null;
-    let waitChild = null;
-
-    const cleanupTimers = () => {
-      if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
-      if (timeoutTimer) { clearTimeout(timeoutTimer); timeoutTimer = null; }
-    };
-
-    const closePaneBestEffort = () => {
-      try {
-        execFileSync(herdrBin, ['pane', 'close', paneId], {
-          cwd,
-          env: fullEnv,
-          encoding: 'utf8',
-          shell: false,
-          stdio: ['ignore', 'pipe', 'pipe'],
-          timeout: 5000,
-        });
-      } catch {}
-    };
-
-    if (timeoutMs) {
-      timeoutTimer = setTimeout(() => {
-        if (settled) return;
-        settled = true;
-        cleanupTimers();
-        if (waitChild) {
-          try { killChildTree(waitChild, 'SIGTERM'); } catch {}
-          try { waitChild.stdout.destroy(); } catch {}
-        }
-        closePaneBestEffort();
-        reject(new DispatchError(
-          'worker-timeout',
-          `executor timed out after ${timeoutMs}ms for work "${workId}".`,
-          { workId, tier, model },
-        ));
-      }, timeoutMs);
-    }
-
-    const checkIdle = () => {
-      if (settled) return;
-      let getOutput;
-      try {
-        getOutput = execFileSync(herdrBin, ['pane', 'get', paneId], {
-          cwd,
-          env: fullEnv,
-          encoding: 'utf8',
-          shell: false,
-          stdio: ['ignore', 'pipe', 'pipe'],
-        });
-      } catch {
-        return;
-      }
-
-      let agentStatus;
-      try {
-        const parsed = JSON.parse(getOutput);
-        agentStatus = parsed?.result?.pane?.agent_status ?? parsed?.result?.agent_status ?? parsed?.pane?.agent_status ?? parsed?.agent_status;
-      } catch {}
-
-      if (agentStatus === 'working') {
-        sawWorking = true;
-      }
-
-      // Real live testing found TWO distinct terminal states herdr reports
-      // for a finished agent turn, not just one -- a longer multi-second
-      // response settled at "idle" while a short single-line answer
-      // settled at "done" instead (confirmed live: both are stable,
-      // neither is a transient step toward the other). Treat both as
-      // "the agent has genuinely stopped generating and it is safe to
-      // send the exit command" -- matching only "idle" left short
-      // responses hanging until the JS timeout, confirmed live.
-      //
-      // False-idle race fix (tsk-2rr): only trust an "idle" reading if
-      // checkIdle has already observed "working" at least once during this
-      // turn. Early premature "idle" reports before the agent starts generation
-      // are ignored, continuing to poll until "working" then a real terminal
-      // state. ("done" is handled differently -- see the asymmetry comment
-      // below.)
-      //
-      // Mid-turn debounce (tsk-2rr follow-up): a single "working" sighting is
-      // not enough on its own -- a multi-step turn (e.g. edit a file, THEN
-      // run a shell command) can show a brief idle-looking gap BETWEEN two
-      // real tool calls, live-confirmed to intermittently fool a one-shot
-      // "sawWorking" gate into exiting mid-turn (~25% of live runs before
-      // this debounce -- see docs/history/agy-herdr-false-idle-polling-race/
-      // RESEARCH.md Round 3). Require three consecutive 500ms polls that
-      // are each terminal (idle or done, not necessarily the same one of
-      // the two -- consecutiveTerminalPolls counts any idle/done reading,
-      // per the asymmetry below) before trusting it -- a
-      // genuine finish stays idle/done for many poll cycles, while a
-      // mid-turn gap flips back to "working" within one or two cycles
-      // almost every time (two consecutive polls closed most of the gap
-      // live-confirmed, three closes the residual flake seen specifically
-      // under full-suite concurrent load, RESEARCH.md Round 3).
-      //
-      // "idle" vs "done" asymmetry (review finding, RESEARCH.md Round 4):
-      // every confirmed false-positive in this whole investigation (startup
-      // race, mid-turn race) was herdr reporting "idle" -- never "done".
-      // Live-probing several genuinely ultra-short prompts found them
-      // settling at "idle" too (through a real "working" phase first), never
-      // at "done" at all in this agy/herdr version -- "done" could not be
-      // reproduced on demand, so there is no live evidence it is ever a
-      // false startup signal, and gating it behind sawWorking risks hanging
-      // an agent whose first-ever response is fast enough to report "done"
-      // before any poll ever samples "working" (the exact regression tsk-10j
-      // bug #2 already fixed once for the pre-tsk-2rr code, which this must
-      // not reintroduce). Only "idle" requires sawWorking; "done" only needs
-      // the 3-consecutive-poll debounce on its own.
-      if (agentStatus === 'idle') {
-        if (sawWorking) {
-          consecutiveTerminalPolls += 1;
-        } else {
-          consecutiveTerminalPolls = 0;
-        }
-      } else if (agentStatus === 'done') {
-        consecutiveTerminalPolls += 1;
-      } else {
-        consecutiveTerminalPolls = 0;
-      }
-
-      // No separate sawWorking check here -- it is already enforced above:
-      // the "idle" branch only increments consecutiveTerminalPolls when
-      // sawWorking is true (reset to 0 otherwise), so reaching 3 via "idle"
-      // implies sawWorking is already true. The "done" branch increments
-      // unconditionally by design (see the asymmetry comment above).
-      if (consecutiveTerminalPolls >= 3) {
-        if (pollInterval) {
-          clearInterval(pollInterval);
-          pollInterval = null;
-        }
-        runExitSequence();
-      }
-    };
-
-    pollInterval = setInterval(checkIdle, 500);
-
-    const runExitSequence = () => {
-      if (settled) return;
-
-      try {
-        execFileSync(herdrBin, ['pane', 'run', paneId, exitCommand], {
-          cwd,
-          env: fullEnv,
-          encoding: 'utf8',
-          shell: false,
-          stdio: ['ignore', 'pipe', 'pipe'],
-        });
-      } catch (err) {
-        if (settled) return;
-        settled = true;
-        cleanupTimers();
-        closePaneBestEffort();
-        return reject(new DispatchError(
-          'worker-spawn-fail',
-          `executor failed to observe completion for work "${workId}": herdr pane run exit command failed: ${err.message}`,
-          { workId, tier, model, cause: err.message },
-        ));
-      }
-
-      // RACE CONDITION, confirmed live: typing `exitCommand` and the
-      // sentinel echo back-to-back (no gap) sent the echo text to `agy`
-      // itself, not the shell -- `agy` had not actually torn down yet
-      // (real teardown takes on the order of ~1s: it writes its own
-      // "Resume with -c ..." conversation-resume hint before the process
-      // truly exits), so the echo was swallowed as more chat input and
-      // the sentinel never printed at all. Poll `pane get` until the
-      // pane's own reported foreground `agent` is gone (confirming the
-      // shell, not agy, now owns the pane) before sending the echo --
-      // bounded and best-effort: if it never clears, fall through anyway
-      // and let the existing "no sentinel found" rejection below catch it
-      // honestly rather than hang past this adapter's own real timeout.
-      const exitConfirmDeadline = Date.now() + 10000;
-      while (Date.now() < exitConfirmDeadline) {
-        let stillPresent = true;
-        try {
-          const getOutput = execFileSync(herdrBin, ['pane', 'get', paneId], {
-            cwd,
-            env: fullEnv,
-            encoding: 'utf8',
-            shell: false,
-            stdio: ['ignore', 'pipe', 'pipe'],
-          });
-          const parsed = JSON.parse(getOutput);
-          const agent = parsed?.result?.pane?.agent ?? parsed?.result?.agent ?? parsed?.pane?.agent ?? parsed?.agent;
-          stillPresent = Boolean(agent);
-        } catch {
-          stillPresent = false;
-        }
-        if (!stillPresent) break;
-        // Synchronous sleep (same `Atomics.wait` pattern already used
-        // elsewhere in this codebase, e.g. runtime-coordination.mjs's
-        // `sleepSync`) -- this whole exit sequence is deliberately
-        // synchronous end to end, matching every other `execFileSync`
-        // call around it.
-        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 250);
-      }
-
-      const sentinel = `__fgos_herdr_exit_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}__`;
-      const echoCmd = `echo "${sentinel}:$?"`;
-      try {
-        execFileSync(herdrBin, ['pane', 'run', paneId, echoCmd], {
-          cwd,
-          env: fullEnv,
-          encoding: 'utf8',
-          shell: false,
-          stdio: ['ignore', 'pipe', 'pipe'],
-        });
-      } catch (err) {
-        if (settled) return;
-        settled = true;
-        cleanupTimers();
-        closePaneBestEffort();
-        return reject(new DispatchError(
-          'worker-spawn-fail',
-          `executor failed to observe completion for work "${workId}": herdr pane run sentinel echo failed: ${err.message}`,
-          { workId, tier, model, cause: err.message },
-        ));
-      }
-
-      const waitArgs = ['pane', 'wait-output', paneId, '--regex', `(?m)^${sentinel}:\\d+`, '--source', 'recent-unwrapped', '--lines', '500'];
-      waitChild = spawn(herdrBin, waitArgs, {
-        cwd,
-        env: fullEnv,
-        shell: false,
-        detached: true,
-        stdio: ['ignore', 'pipe', 'pipe'],
-      });
-
-      let waitStdout = '';
-      waitChild.stdout.setEncoding('utf8');
-      waitChild.stdout.on('data', (chunk) => { waitStdout += chunk; });
-
-      waitChild.on('error', (err) => {
-        if (settled) return;
-        settled = true;
-        cleanupTimers();
-        closePaneBestEffort();
-        reject(new DispatchError(
-          'worker-spawn-fail',
-          `executor failed to observe completion for work "${workId}": ${err.message}`,
-          { workId, tier, model, cause: err.message },
-        ));
-      });
-
-      waitChild.on('close', (code, signal) => {
-        if (settled) return;
-
-        if (code !== 0) {
-          settled = true;
-          cleanupTimers();
-          closePaneBestEffort();
-          reject(new DispatchError(
-            'worker-spawn-fail',
-            `executor failed to observe completion for work "${workId}": herdr pane wait-output exited with code ${code}${signal ? ` (signal ${signal})` : ''}.`,
-            { workId, tier, model, cause: 'herdr pane wait-output observer failure', exitCode: code },
-          ));
-          return;
-        }
-
-        let rawStdout;
-        try {
-          const parsed = JSON.parse(waitStdout);
-          rawStdout = typeof parsed?.result?.read?.text === 'string' ? parsed.result.read.text : undefined;
-        } catch {
-          rawStdout = undefined;
-        }
-
-        if (rawStdout === undefined) {
-          settled = true;
-          cleanupTimers();
-          closePaneBestEffort();
-          reject(new DispatchError(
-            'worker-spawn-fail',
-            `executor for work "${workId}" could not confirm completion: herdr pane wait-output reported success but its response carried no readable scrollback.`,
-            { workId, tier, model, cause: 'herdr pane wait-output response missing result.read.text' },
-          ));
-          return;
-        }
-
-        // BEST-EFFORT stdout, accepted scope decision (tsk-10j, confirmed
-        // live): agy's own full-screen redraw on `/exit` means herdr's
-        // "recent-unwrapped" scrollback capture does not reliably retain
-        // the conversation content from BEFORE that screen clear -- a
-        // real, structural difference from the headless (`-p`) path's
-        // plain, never-cleared transcript, not a bug in the stripping
-        // logic below. The two guarantees this path actually keeps are
-        // the real exit code (from the sentinel, unaffected by this) and
-        // the pane auto-closing -- full response text landing in the
-        // returned `stdout` is opportunistic, not promised, for
-        // `interactiveMode` dispatches specifically.
-        const sentinelPattern = new RegExp(`${sentinel}:(?:\\$\\?|\\d+)`);
-        const sentinelIdx = rawStdout.search(sentinelPattern);
-        const searchRegion = sentinelIdx === -1 ? rawStdout : rawStdout.slice(0, sentinelIdx);
-
-        // Strip initial typed command echo
-        const initialEchoIdx = searchRegion.lastIndexOf(quotedCmd);
-        const stdoutAfterInitial = initialEchoIdx === -1 ? searchRegion : searchRegion.slice(initialEchoIdx + quotedCmd.length);
-
-        // Strip exit command echo (from the first occurrence after initial echo)
-        const exitEchoIdx = stdoutAfterInitial.indexOf(exitCommand);
-        let stdout = exitEchoIdx === -1 ? stdoutAfterInitial : stdoutAfterInitial.slice(0, exitEchoIdx);
-        stdout = stdout.replace(/^\r?\n+/, '').replace(/\r?\n+$/, '');
-
-        const sentinelMatch = rawStdout.match(new RegExp(`${sentinel}:(\\d+)`));
-        if (!sentinelMatch) {
-          settled = true;
-          cleanupTimers();
-          closePaneBestEffort();
-          reject(new DispatchError(
-            'worker-spawn-fail',
-            `executor for work "${workId}" could not confirm completion: no sentinel found in the captured output.`,
-            { workId, tier, model, cause: 'sentinel not found in post-echo stdout' },
-          ));
-          return;
-        }
-        const realStatus = Number(sentinelMatch[1]);
-
-        settled = true;
-        cleanupTimers();
-
-        if (onChunk && stdout) {
-          teeChunk(onChunk, 'stdout', stdout);
-        }
-
-        closePaneBestEffort();
-
-        resolve({
-          status: realStatus,
-          signal,
-          stdout,
-          stderr: '',
-          tier,
-          model,
-          paneId,
-        });
-      });
-    };
+  return runHerdrRound({
+    client: createHerdrClient({ herdrBin, cwd, env: fullEnv }),
+    agentKind,
+    agentArgs: agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }),
+    prompt: prompt ?? '',
+    delivery,
+    exitCommand,
+    readyTimeoutMs,
+    promptTimeoutMs,
+    maxResends,
+    resendAfterMs: resendAfterMs ?? promptTimeoutMs,
+    runDir: optsRunDir,
+    paneEnv: resolvedEnv,
+    cwd,
+    timeoutMs,
+    workId,
+    tier,
+    model,
+    onChunk,
   });
+}
+
+/** herdr's own stall detector fires at 5000ms; anything shorter on this side
+ * wins the race and hands the caller a bare timeout instead of the real
+ * reason. Measured upstream: 5s broke, 20s worked. */
+const DEFAULT_PROMPT_TIMEOUT_MS = 20000;
+/** `agent start`'s own documented default. */
+const DEFAULT_READY_TIMEOUT_MS = 30000;
+/** A brief that never landed is worth re-sending a couple of times; a brief
+ * that never lands twice is a broken transport, not a slow one. */
+const DEFAULT_MAX_RESENDS = 2;
+/** How often the receipt poll looks at the outbox. */
+const RECEIPT_POLL_MS = 500;
+/** How long the exit sequence waits for the agent process to actually leave
+ * the pane before giving up and closing anyway. */
+const EXIT_DRAIN_MS = 10000;
+
+const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
+
+/**
+ * The agent's own argv, with the prompt taken out of it.
+ *
+ * `argsTemplate` is the executor's args BEFORE substitution, so an entry that
+ * carried the prompt is identifiable exactly -- by the `{prompt}` placeholder
+ * itself, not by string-matching the substituted result. The fallback for a
+ * caller that passes no template compares against the prompt text, which is
+ * long and unique enough to be reliable but is a fallback, not the contract.
+ */
+function agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }) {
+  if (Array.isArray(argsTemplate)) {
+    return argsTemplate
+      .filter((arg) => typeof arg === 'string' && !arg.includes('{prompt}'))
+      .map((arg) => arg.split('{model}').join(model ?? ''));
+  }
+  const effective = Array.isArray(args) ? args : [];
+  if (!prompt) return effective;
+  return effective.filter((arg) => !String(arg).includes(prompt));
+}
+
+/** The last line on screen with anything on it -- what a person would read to
+ * see why an agent is blocked. Screen text explains a failure; it never
+ * establishes that work happened. */
+function lastScreenLine(text) {
+  const lines = String(text ?? '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  return lines.length > 0 ? lines[lines.length - 1] : null;
+}
+
+/**
+ * One round: pane, agent, brief, receipt, exit.
+ *
+ * Every failure below keeps the pane open and names its reason, so three
+ * genuinely different transport failures stay three different answers rather
+ * than collapsing into one timeout: the agent never became ready, the brief
+ * was never accepted, or the agent is sitting on a prompt it cannot pass.
+ */
+async function runHerdrRound(ctx) {
+  const {
+    client, agentKind, agentArgs, prompt, delivery, exitCommand,
+    readyTimeoutMs, promptTimeoutMs, maxResends, resendAfterMs,
+    paneEnv, cwd, timeoutMs, workId, tier, model, onChunk,
+  } = ctx;
+
+  const round = 1;
+  const runDir = ctx.runDir
+    ? path.resolve(ctx.runDir)
+    : fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-'));
+  const paths = briefPaths(runDir, round);
+  fs.mkdirSync(paths.outbox, { recursive: true });
+
+  const agentName = normalizeAgentName(`fgos-${workId ?? 'run'}-${Date.now().toString(36)}`);
+  const briefText = renderBrief({ prompt, round, runDir, agentName });
+  fs.writeFileSync(paths.briefPath, briefText);
+
+  const deadline = timeoutMs ? Date.now() + timeoutMs : null;
+  const outOfTime = () => deadline !== null && Date.now() >= deadline;
+
+  let paneId = null;
+  const fail = (errorClass, reason, message, extra = {}) => new DispatchError(
+    errorClass,
+    message,
+    { workId, tier, model, reason, paneId, runDir, agentName, ...extra },
+  );
+
+  try {
+    paneId = client.paneSplit({ cwd, env: paneEnv });
+  } catch (err) {
+    throw fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
+      `executor failed to start for work "${workId}": herdr could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
+  }
+
+  try {
+    client.agentStart(agentName, { kind: agentKind, paneId, timeoutMs: readyTimeoutMs, agentArgs });
+  } catch (err) {
+    // The pane stays open on purpose: whatever stopped the agent from
+    // becoming ready is still on that screen.
+    throw fail('worker-spawn-fail', err.code ?? 'agent_not_ready',
+      `executor failed to start for work "${workId}": herdr could not bring a "${agentKind}" agent to ready in pane ${paneId} (${err.code ?? 'unknown'}): ${err.message}`);
+  }
+
+  // One line so a person watching the runner's own stderr can find the pane
+  // to watch and the directory the round's files will appear in. Diagnostic
+  // only -- nothing reads it back.
+  process.stderr.write(`fgos: herdr-spawn work=${workId} pane=${paneId} agent=${agentName} runDir=${runDir}\n`);
+
+  // What actually gets typed. `file-pointer` is the default because one shape
+  // works for every agent kind; `inline` is a declared choice with its own
+  // evidence, not a fallback taken when something goes wrong.
+  const message = delivery === 'inline' ? briefText : renderPointer({ runDir, round });
+
+  const deliver = () => {
+    try {
+      // `--until working` confirms the submission was accepted and the turn
+      // began. Waiting for a settled state instead would block this call for
+      // the entire turn, and the turn is what the receipt poll is for.
+      client.agentPrompt(agentName, message, { wait: true, until: ['working'], timeoutMs: promptTimeoutMs });
+      return null;
+    } catch (err) {
+      return err;
+    }
+  };
+
+  const promptError = deliver();
+  if (promptError) {
+    let screen = null;
+    if (promptError.code === 'agent_blocked') {
+      try { screen = lastScreenLine(client.agentRead(agentName, { lines: 40 })); } catch { screen = null; }
+    }
+    throw fail('worker-spawn-fail', promptError.code ?? 'agent_prompt_failed',
+      `executor failed to brief the worker for work "${workId}": ${promptError.message}${screen ? ` -- last line on screen: ${screen}` : ''}`,
+      screen ? { screen } : {});
+  }
+
+  // Receipt, not status. The ack proves the worker read the brief; the result
+  // file ends the round. A round short enough to produce the result before the
+  // first poll never shows an ack, and that is not a failure.
+  let ackSeen = false;
+  let resends = 0;
+  let lastResendAt = Date.now();
+
+  while (!fs.existsSync(paths.resultPath)) {
+    if (outOfTime()) {
+      throw fail('worker-timeout', ackSeen ? 'result_never_written' : 'brief_never_acknowledged',
+        `executor timed out after ${timeoutMs}ms for work "${workId}": ${ackSeen
+          ? `the worker acknowledged the brief but never wrote ${paths.resultPath}`
+          : `no acknowledgement ever appeared at ${paths.ackPath}`}. Pane ${paneId} is left open.`);
+    }
+
+    if (!ackSeen && fs.existsSync(paths.ackPath)) ackSeen = true;
+
+    if (!ackSeen && resends < maxResends && Date.now() - lastResendAt >= resendAfterMs) {
+      // Re-send only when the agent is back at rest with still no ack. An
+      // agent that is `working` has the brief and is acting on it; typing at
+      // it again on a timer would interrupt the very turn being waited for.
+      let state = 'unknown';
+      try { state = client.agentGet(agentName).agentStatus; } catch { state = 'unknown'; }
+      if (isReadyState(state)) {
+        resends += 1;
+        lastResendAt = Date.now();
+        const retryError = deliver();
+        if (retryError) {
+          throw fail('worker-spawn-fail', retryError.code ?? 'agent_prompt_failed',
+            `executor failed to re-brief the worker for work "${workId}" (attempt ${resends + 1}): ${retryError.message}`);
+        }
+      }
+    }
+
+    await sleep(RECEIPT_POLL_MS);
+  }
+
+  let stdout = '';
+  try {
+    stdout = fs.existsSync(paths.reportPath)
+      ? fs.readFileSync(paths.reportPath, 'utf8')
+      : fs.readFileSync(paths.resultPath, 'utf8');
+  } catch {
+    stdout = '';
+  }
+
+  // Exit sequence. The agent is asked to leave, then the pane is watched until
+  // nothing but its own shell is running in the foreground -- an agent that
+  // has not finished tearing down would swallow anything sent after it.
+  try {
+    client.agentPrompt(agentName, exitCommand, { wait: false, timeoutMs: promptTimeoutMs });
+  } catch {
+    // A worker that already produced its result but will not take /exit is
+    // still a completed round; the pane close below is what actually ends it.
+  }
+
+  const drainDeadline = Date.now() + EXIT_DRAIN_MS;
+  while (Date.now() < drainDeadline) {
+    let stillRunning = true;
+    try {
+      const info = client.paneProcessInfo(paneId);
+      stillRunning = info.foregroundProcesses.some((p) => p.pid && p.pid !== info.shellPid);
+    } catch {
+      stillRunning = false;
+    }
+    if (!stillRunning) break;
+    await sleep(250);
+  }
+
+  if (onChunk && stdout) {
+    teeChunk(onChunk, 'stdout', stdout);
+  }
+
+  client.paneClose(paneId);
+
+  return {
+    status: 0,
+    signal: null,
+    stdout,
+    stderr: '',
+    tier,
+    model,
+    paneId,
+    runDir,
+    resultPath: paths.resultPath,
+  };
 }
 
 function herdrSpawnAdapter(invocation, opts) {
