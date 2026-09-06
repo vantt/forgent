@@ -23,7 +23,7 @@ The person's initial request asked to start at Phase 01. Phase 01 (P01.1) declar
 | 02 | Capability-fit audit | done (P02.1 closed — see P02.1.md) |
 | 03 | Minimal hard shell and protocol | done (P03.1 + P03.2 both closed) |
 | 04 | Production skill and Decision Dialogue | done (P04.1 + P04.2 both closed) |
-| 05 | Comparative proof and promotion | unblocked, not yet started |
+| 05 | Comparative proof and promotion | P05.1 done (see P05.1.md); P05.2 blocked on real person |
 
 ## Baseline
 
@@ -83,6 +83,7 @@ self-reported numbers.
 | P03.2 | manual dispatch (Doer/Reviewer, no coordination session; see P03.2.md) | done | Registered `architecture-advisory-panel-v1` protocol + pack entry + 13-case conformance suite. Real bug found+fixed during construction (quorum would auto-close before a human turn could arrive; fixed with driver-only `close-dialogue` gate). 0 HIGH + 3 MEDIUM findings, all fixed and independently rechecked (Reviewer reproduced the Doer's own falsification proofs, not just read the diff). Focused suite 728→757, zero regressions on pre-existing RFC/NGT/Delphi/master-loop conformance tests. Filed 2 request-schema gaps found while building the suite as separate work items (tsk-44p, tsk-3xk). |
 | P04.1 | manual dispatch (Doer/Reviewer/Red-Team, no coordination session; see P04.1.md) | done | Authored `core/skills/fgos-architecture-panel/SKILL.md` (910 lines) projecting Phase 01's ~4700-line doctrine into a production skill. Reviewer + Red-Team both required per phase-04's own "assess hard correctness AND loss of soul" mandate. 1 HIGH (roster names 3 unregistered executors that silently fall back to an unconfined, git-write-capable default — independently verified live by the Coordinator) + 3 more HIGH from Red-Team (explanation standard absent; 3 lead-advisor artifacts had no graph operation; driver disposition rules never stated) + many MEDIUM/LOW citation and doc-accuracy findings, all fixed across 2 rounds. Fix round 1's own report inaccurately claimed complete coverage (5 LOW findings were silently dropped) — caught by the Reviewer's recheck and corrected in round 2, which explicitly disposition-tabled every one of the 22 distinct findings from both rounds. Focused suite 757/757 and skill-projection tests 39/39 unchanged throughout (prose-only cell, zero kernel/protocol touch). |
 | P04.2 | manual dispatch (Doer/Reviewer/Red-Team, no coordination session; see P04.2.md) | done | How-to guide + 8 example families for the panel. Step 1 investigation confirmed existing `fgos coordination run/show` doors are sufficient; no new verb added. Red-Team found 1 BLOCKING defect (independently verified live by the Coordinator): no example declared `aggregateBounds`, so the documented flow's mandatory 10-op pre-dialogue path exhausted the platform's default round cap before Phase 9 could ever dispatch — the panel could never reach `close-dialogue`, not even for a zero-reopen `decide`. Reviewer separately found 3 HIGH: every published reopen passed an empty context grant (silent no-context dispatch); a homogeneous-fallback example used a bare, unconfined, git-write-capable executor (independently confirmed live — worse than tsk-1o4, this one actually runs); 0 of 8 examples satisfied phase-04's own protocol-id+routing requirement despite a CHANGELOG claim that all 8 did. All fixed across 2 rounds, each independently re-verified live (Red-Team rebuilt the full 12-op/6-call session from scratch to confirm the blocker's fix). A new kernel gap found and confirmed by both Doer and Red-Team (`actors[]` doesn't persist across resumed calls, silently losing confinement) filed as `tsk-3bf`. Also fixed 2 unrelated regressions from earlier cells (P03.2's protocol missing from a test's fixture list; P04.1's stale decision-citation) surfaced by this cell's own full-suite run. Focused suite 757/757 throughout; full suite back to the track's own 4-item baseline, 0 new failures. |
+| P05.1 | manual dispatch (Doer/Reviewer/Red-Team, no coordination session; see P05.1.md) | done | Hard conformance and recovery proof, driven entirely through the real installed `fgos coordination run/show` CLI in an isolated workspace, including a genuine `kill -9` of a real dispatch process and resume from a fresh process. Original claim ("all 6 areas hold") was FALSE under adversarial testing and was honestly corrected, not softened: 3 of 6 areas (Routing, Bounds, Replay/crash-resume) have a real, independently-reproduced bypass. 5 HIGH-severity findings, each independently reproduced by both Reviewer and Red-Team from source, not just report text: unauthenticated `result.json` provenance spoofable by any executor subprocess (`tsk-63z`); `revise-synthesis`'s human-turn precondition is prose-only, not kernel-enforced (`tsk-3ru`); `aggregateBounds` silently discarded on resume, permanently wedging an under-budgeted session (`tsk-1zk`); and a crash-recovery cluster — no owner identity on `dispatch.claim`, a second lock with a deterministic 35-minute SIGKILL-survival window whose documented recovery workaround permanently poisons the assignment, and event-log corruption that can make the session undiagnosable (`tsk-47l`, amended twice, including an upward self-correction by Red-Team on their own recheck). No kernel/protocol source touched — every gap filed, not fixed, per this cell's own evidence-only scope. Focused suite 757/757 throughout. |
 
 ## Admitted Read-Only Advisory Executor Allowlist
 
@@ -100,14 +101,24 @@ Excluded Unsafe / Non-Runnable Pairs:
 - `agy-cli` (`--mode accept-edits` unconfined): EXCLUDED (mutated target repo).
 - `agy-sandbox` (`--mode accept-edits --sandbox`): EXCLUDED (mutated target repo despite `--sandbox` flag).
 
-## Stop Gate — none currently blocking
+## Stop Gate — P05.2 blocked on the real person
 
-Phase 03 is done (P03.1 + P03.2 both closed). Phase 04's P04.1
-(production skill) is done — see P04.1.md. P04.2 (surface, examples, and
-Decision Dialogue — first prove whether `fgos-group-thinking` plus
-`fgos coordination run/show` already provides the required entry/resume
-path before adding anything new; `docs/how-to/use-fgos-architecture-panel.md`)
-is next per the plan and is unblocked; not yet started.
+Phase 04 is done (P04.1 + P04.2 both closed). Phase 05's P05.1 (hard
+conformance and recovery proof) is done — see P05.1.md. **P05.2
+(comparative live proof and promotion) — the track's final cell — cannot
+proceed without the real person.** Per the phase's own "Live Proof
+Boundary" text: "A scripted fake-human transcript cannot prove the
+Decision Dialogue." P05.2 needs: a real external project outside
+forgentX with a genuinely undecided architecture question, the real
+person taking a real Decision Dialogue turn, and a manual-vs-product
+qualitative comparison. This is the one point in the track where
+"continue until done" cannot mean "continue without the person" — it is
+surfaced to the person directly, not silently deferred.
+
+Carried forward into P05.2's own scope (Reviewer's note from P05.1, not
+filed as a separate work item): `grantedContextRefs` accepts
+dangling/unvalidated refs — check this when P05.2 exercises the same
+mechanism.
 
 The separate, track-independent question about authorizing real
 implementation work against `/home/vantt/projects/vnflow` is resolved:

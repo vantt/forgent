@@ -140,6 +140,21 @@ The orphan then wrote `agent-result.json`/`agent-report.md` into both `runs/01`
 and the already-settled `runs/02`, so run 02's on-disk artifacts say `done`
 while its linked `result.json` says `failed`.
 
+**Correction, added at final recheck — I understated the exposure window.** My
+sandbox ran with `runner.timeoutMs: 60000`, so the contending lock cleared in
+seconds and I described the window as lasting only while the orphan runs. That
+is wrong for this repo. The blocking lock is `src/runner/dispatch/cli.mjs:480`'s
+per-cwd dispatch lock, acquired with `ttlMs: cfg.timeoutMs`, and this repo's own
+`.fgos/config.json` sets `runner.timeoutMs: 2100000` — **35 minutes**. Worse,
+`cli.mjs` builds a *string* identity (`${pid}:${Date.now()}:${random}`), which
+in `main-checkout-lock.mjs`'s `tryAcquireOnce` takes the branch judged by
+`ttlMs` freshness **alone, with no PID-liveness probe** ("no process to probe",
+line ~284). So after a SIGKILL the lock reads as held for the full 35 minutes
+whether or not anything is still alive, and every resume attempted inside that
+window permanently poisons the assignment. The window is deterministic and
+large, not incidental — this raises the practical severity of F2 rather than
+lowering it.
+
 Net effect on this cell's Area 6 claim: "after that one manual reconciliation
 step … the identical resume request succeeded" holds only when the orphan is
 already dead — a precondition the system gives you no way to establish.

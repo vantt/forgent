@@ -1,44 +1,64 @@
-# Current Cell: none open — ready for P05.1
+# Current Cell: none open — P05.1 closed, P05.2 blocked on the real person
 
-Status: parked, unblocked
+Status: parked, blocked (not a failure — this is the track's designed
+stopping point)
 Last updated: 2026-09-06
-Next action: proceed to P05.1 (hard conformance and recovery proof)
-whenever ready — no person input required for P05.1.
+Next action: P05.2 requires the person; cannot proceed autonomously.
 
 ## Why parked
 
-P04.2 (surface, examples, dialogue) is closed — see
-`docs/architect/agent-coordination/verification/architecture-advisory-panel/P04.2.md`.
-Phase 04 is now fully done (P04.1 + P04.2). Phase 05 — the FINAL phase —
-has two cells with different dependency profiles:
+P05.1 (hard conformance and recovery proof) is closed — see
+`docs/architect/agent-coordination/verification/architecture-advisory-panel/P05.1.md`.
+It was run entirely through the real installed CLI in an isolated
+workspace, independently reviewed and red-teamed, and its original claim
+("all 6 areas hold") was honestly corrected after adversarial testing
+showed 3 of 6 had a real, independently-reproduced bypass. Five HIGH
+findings were filed as separate work items rather than fixed in-cell
+(`tsk-63z`, `tsk-3ru`, `tsk-1zk`, `tsk-47l` amended twice) — this cell's
+own scope is evidence, not remediation.
 
-- **P05.1 (hard conformance and recovery proof)** — fully autonomous.
-  Exercise the installed product path against immutable fixtures for
-  every authority/visibility/aggregation/routing/bound/replay claim; kill
-  the driver mid-session and resume from a fresh process with only the
-  installed skill + session id. No person input needed to run this.
-- **P05.2 (comparative live proof and promotion)** — **requires the real
-  person**, same as P01.2/P01.3. The phase's own "Live Proof Boundary"
-  section is explicit: "A scripted fake-human transcript cannot prove
-  the Decision Dialogue." This cell needs: a real external project
-  outside forgentX with a genuinely undecided architecture question, the
-  real person in a real Decision Dialogue turn, and a manual-vs-product
-  qualitative comparison. This is the track's final closing cell —
-  after it, promote to canonical docs and close the track for good.
+**P05.2 (comparative live proof and promotion) is the track's final
+cell, and it genuinely cannot be run without the real person.** The
+phase's own "Live Proof Boundary" section states this as a hard
+requirement, not a preference: "A scripted fake-human transcript cannot
+prove the Decision Dialogue." It needs:
 
-## Plan for continuing autonomously
+1. A real external project outside forgentX with a genuinely undecided
+   architecture question (not yet decided by the person, not
+   reconstructable from a closed case).
+2. The real person taking a real Decision Dialogue turn on that
+   question through the actual panel.
+3. A qualitative manual-vs-product comparison from the person's own
+   experience of both.
 
-P05.1 will be run now without further person input. P05.2 will need the
-person to either reuse a genuinely still-undecided real case (if one
-exists) or name a new one, the same way P01.2 (mdview) and P01.3
-(vnflow) were confirmed — this will be surfaced as a consolidated
-question once P05.1 closes, not before (per this session's own priority
-on batching questions and not blocking work that can still proceed).
+This is the one point in the track where the standing "continue until
+done" instruction cannot be honored autonomously — it is surfaced
+directly rather than deferred, worked around, or fabricated, matching
+every prior "needs the person" juncture in this track (P00→P01
+sequencing, P01.2's mdview confirmation, P01.3's vnflow confirmation).
+
+## What the person needs to decide
+
+Name a real external project and a real, currently-undecided
+architecture question to run P05.2 against — or confirm none exists yet,
+in which case P05.2 stays parked until one does. Once named, P05.2 runs
+the same way P01.2/P01.3 did: full panel dispatch, a real Decision
+Dialogue turn with the person, then promotion (canonical Coordination
+contracts + domain doctrine/skill docs updated with what P05.1 proved
+and disproved, reading maps and examples updated, final full-suite +
+skill-projection + conformance verification, closing commit) — the
+track's own final step.
+
+## Also carried forward
+
+`grantedContextRefs` accepting dangling/unvalidated refs (P05.1
+Reviewer's note, not filed separately) should be checked when P05.2
+exercises the same mechanism live.
 
 ## Also resolved, independent of the track
 
 The vnflow implementation question (from P01.3's Phase 9) is closed: the
 person authorized it, `fullstack-developer` implemented kongming's
-3-step plan on vnflow, verified independently by the Coordinator
-(1658/1673 pass, zero regressions vs. main), pushed, and opened as
+3-step plan on vnflow, verified independently by the Coordinator (1658/1673
+pass, zero regressions vs. main), pushed, and opened as
 https://github.com/vantt/vnstock-analysis/pull/1.
