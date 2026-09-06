@@ -26,6 +26,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
@@ -309,10 +310,12 @@ test('validateCoordinationRequest: a "disposition" step missing targetRef/dispos
   }
 });
 
-test('validateCoordinationRequest: the unknown-step-type message names all five supported types', () => {
+test('validateCoordinationRequest: the unknown-step-type message names all six supported types', () => {
   assert.throws(
     () => validateCoordinationRequest(request({ steps: [{ type: 'authorise', as: 'typo' }] })),
-    (err) => err instanceof StoreError && /steps\[0\]\.type must be "operation", "fan-out", "authorize", "disposition", or "contribution"/.test(err.message),
+    (err) =>
+      err instanceof StoreError &&
+      /steps\[0\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", or "human-turn"/.test(err.message),
   );
 });
 
@@ -1050,4 +1053,216 @@ test('show: an agent-led session (no definitionRef) reports pendingDriverAuthori
   assert.equal(shown.pendingDriverAuthorizations, null);
   assert.deepEqual(shown.authorizations, []);
   assert.deepEqual(shown.dispositions, []);
+});
+
+// ─── Phase 03.1: the "human-turn" request step (trusted external-input/
+// human-decision provenance door, P02.1's BL4 row) ──────────────────────────
+
+function humanTurnStep(overrides = {}) {
+  return {
+    type: 'human-turn',
+    as: 'person-turn-1',
+    turnId: 'turn_1',
+    turnOrdinal: 1,
+    channel: 'claude-code-chat',
+    artifactRef: 'human/1-person.md',
+    externalRef: 'claude-code-transcript:sess-1:uuid-1',
+    attributedTo: { type: 'person', id: 'the-user' },
+    ...overrides,
+  };
+}
+
+test('validateCoordinationRequest: a "human-turn" step may not declare revision -- run.mjs computes it from real bytes', () => {
+  assert.throws(
+    () => validateCoordinationRequest(request({ steps: [produceStep(), humanTurnStep({ revision: 'sha256:deadbeef' })] })),
+    (err) => err instanceof StoreError && /unknown field "revision" in steps\[1\] \(type "human-turn"\)/.test(err.message),
+  );
+});
+
+test('validateCoordinationRequest: a "human-turn" step may not declare recordedBy -- driver provenance comes from the request\'s own writerId', () => {
+  assert.throws(
+    () => validateCoordinationRequest(request({ steps: [produceStep(), humanTurnStep({ recordedBy: { type: 'driver', id: 'someone-else' } })] })),
+    (err) => err instanceof StoreError && /unknown field "recordedBy" in steps\[1\] \(type "human-turn"\)/.test(err.message),
+  );
+});
+
+test('validateCoordinationRequest: a "human-turn" step missing turnId/turnOrdinal/channel/artifactRef/externalRef/attributedTo is rejected, one message each', () => {
+  for (const [field, pattern] of [
+    ['turnId', /steps\[1\]\.turnId must be a non-empty string/],
+    ['turnOrdinal', /steps\[1\]\.turnOrdinal must be a positive integer/],
+    ['channel', /steps\[1\]\.channel is required/],
+    ['artifactRef', /steps\[1\]\.artifactRef is required/],
+    ['externalRef', /steps\[1\]\.externalRef is required/],
+    ['attributedTo', /steps\[1\]\.attributedTo is required/],
+  ]) {
+    const step = humanTurnStep();
+    delete step[field];
+    assert.throws(
+      () => validateCoordinationRequest(request({ steps: [produceStep(), step] })),
+      (err) => err instanceof StoreError && pattern.test(err.message),
+      `expected a dedicated refusal for a missing ${field}`,
+    );
+  }
+});
+
+test('validateCoordinationRequest: a "human-turn" step\'s attributedTo.type must be "person"', () => {
+  assert.throws(
+    () => validateCoordinationRequest(request({ steps: [produceStep(), humanTurnStep({ attributedTo: { type: 'driver', id: 'x' } })] })),
+    (err) => err instanceof StoreError && /attributedTo\.type must be "person"/.test(err.message),
+  );
+});
+
+test('validateCoordinationRequest: a "human-turn" step\'s attributedTo may carry no field beyond {type, id}', () => {
+  assert.throws(
+    () =>
+      validateCoordinationRequest(
+        request({ steps: [produceStep(), humanTurnStep({ attributedTo: { type: 'person', id: 'x', kind: 'decision' } })] }),
+      ),
+    (err) => err instanceof StoreError && /unknown field "kind"/.test(err.message),
+  );
+});
+
+test('validateCoordinationRequest: a path-escaping turnId is rejected', () => {
+  assert.throws(
+    () => validateCoordinationRequest(request({ steps: [produceStep(), humanTurnStep({ turnId: '../../evil' })] })),
+    (err) => err instanceof StoreError && /steps\[1\]\.turnId .* path escape rejected/s.test(err.message),
+  );
+});
+
+test('validateCoordinationRequest: a well-formed "human-turn" step normalizes to exactly the engine-call fields, no revision/recordedBy present', () => {
+  const normalized = validateCoordinationRequest(
+    request({ steps: [produceStep(), humanTurnStep({ respondsToRefs: ['turn_0'] })] }),
+  );
+  assert.deepEqual(normalized.steps[1], {
+    type: 'human-turn',
+    as: 'person-turn-1',
+    turnId: 'turn_1',
+    turnOrdinal: 1,
+    channel: 'claude-code-chat',
+    artifactRef: 'human/1-person.md',
+    externalRef: 'claude-code-transcript:sess-1:uuid-1',
+    attributedTo: { type: 'person', id: 'the-user' },
+    respondsToRefs: ['turn_0'],
+  });
+});
+
+test('validateCoordinationRequest: a "human-turn" step\'s respondsToRefs entries are bare turn ids -- a reserved-prefix/path-escaping value is rejected', () => {
+  assert.throws(
+    () => validateCoordinationRequest(request({ steps: [produceStep(), humanTurnStep({ respondsToRefs: ['human-turn:turn_0'] })] })),
+    (err) => err instanceof StoreError && /steps\[1\]\.respondsToRefs\[0\] .* path escape rejected/s.test(err.message),
+  );
+});
+
+test('a "human-turn" step reaches recordHumanTurn: revision is computed from the real file bytes, never accepted from the caller', async () => {
+  const { tempDir, ctx } = setup();
+  fs.mkdirSync(path.join(tempDir, 'human'), { recursive: true });
+  const artifactPath = path.join(tempDir, 'human', '1-person.md');
+  fs.writeFileSync(artifactPath, 'The person said: ship it.\n');
+  const expectedRevision = `sha256:${createHash('sha256').update(fs.readFileSync(artifactPath)).digest('hex')}`;
+
+  const data = await runCoordinationUseCase(ctx, {
+    requestObject: request({ steps: [produceStep(), humanTurnStep()] }),
+  });
+
+  const result = data.steps.find((step) => step.as === 'person-turn-1');
+  assert.equal(result.type, 'human-turn');
+  assert.equal(result.appended, true);
+  assert.equal(result.turnId, 'turn_1');
+  assert.equal(result.revision, expectedRevision);
+  assert.deepEqual(result.attributedTo, { type: 'person', id: 'the-user' });
+
+  const recorded = eventsOfType(tempDir, data.coordinationId, 'human-turn-recorded');
+  assert.equal(recorded.length, 1);
+  assert.equal(recorded[0].payload.revision, expectedRevision);
+  assert.deepEqual(recorded[0].payload.recordedBy, { type: 'driver', id: WRITER_ID });
+});
+
+test('a "human-turn" step fails loudly when artifactRef does not resolve to a real file, instead of recording an unverified provenance stamp', async () => {
+  const { ctx } = setup();
+  await assert.rejects(
+    runCoordinationUseCase(ctx, {
+      requestObject: request({ steps: [produceStep(), humanTurnStep({ artifactRef: 'human/does-not-exist.md' })] }),
+    }),
+    (err) => err instanceof StoreError && /does not resolve to a real file/.test(err.message),
+  );
+});
+
+test('a "human-turn" step attributing the turn to the request\'s own writerId is refused (self-attribution reaches the real engine door, not just the schema boundary)', async () => {
+  const { tempDir, ctx } = setup();
+  fs.mkdirSync(path.join(tempDir, 'human'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'human', '1-person.md'), 'Ship it.\n');
+  await assert.rejects(
+    runCoordinationUseCase(ctx, {
+      requestObject: request({ steps: [produceStep(), humanTurnStep({ attributedTo: { type: 'person', id: WRITER_ID } })] }),
+    }),
+    (err) => err instanceof CoordinationError && /cannot attribute a human turn to itself/.test(err.message),
+  );
+});
+
+test('a "human-turn" step attributing the turn to a declared panel actor is refused by the real engine door', async () => {
+  const { tempDir, ctx } = setup();
+  fs.mkdirSync(path.join(tempDir, 'human'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'human', '1-person.md'), 'Ship it.\n');
+  await assert.rejects(
+    runCoordinationUseCase(ctx, {
+      requestObject: request({ steps: [produceStep(), humanTurnStep({ attributedTo: { type: 'person', id: 'doer' } })] }),
+    }),
+    (err) => err instanceof CoordinationError && /declared panel actor/.test(err.message),
+  );
+});
+
+test('a "human-turn" step\'s respondsToRefs (bare turn ids) are prefixed with the reserved namespace before reaching the engine', async () => {
+  const { tempDir, ctx } = setup();
+  fs.mkdirSync(path.join(tempDir, 'human'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'human', '1-person.md'), 'First turn.\n');
+  fs.writeFileSync(path.join(tempDir, 'human', '2-person.md'), 'Second turn.\n');
+  const data = await runCoordinationUseCase(ctx, {
+    requestObject: request({
+      steps: [
+        produceStep(),
+        humanTurnStep(),
+        humanTurnStep({
+          as: 'person-turn-2',
+          turnId: 'turn_2',
+          turnOrdinal: 2,
+          artifactRef: 'human/2-person.md',
+          externalRef: 'claude-code-transcript:sess-1:uuid-2',
+          respondsToRefs: ['turn_1'],
+        }),
+      ],
+    }),
+  });
+  const second = data.steps.find((step) => step.as === 'person-turn-2');
+  assert.deepEqual(second.respondsToRefs, ['human-turn:turn_1']);
+
+  const recorded = eventsOfType(tempDir, data.coordinationId, 'human-turn-recorded').find((e) => e.payload.turnId === 'turn_2');
+  assert.deepEqual(recorded.payload.respondsToRefs, ['human-turn:turn_1']);
+});
+
+test('a "human-turn" step\'s respondsToRefs entry naming a turn this session never recorded is refused by the real engine door', async () => {
+  const { tempDir, ctx } = setup();
+  fs.mkdirSync(path.join(tempDir, 'human'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'human', '1-person.md'), 'First turn.\n');
+  await assert.rejects(
+    runCoordinationUseCase(ctx, {
+      requestObject: request({ steps: [produceStep(), humanTurnStep({ respondsToRefs: ['turn_nope'] })] }),
+    }),
+    (err) => err instanceof CoordinationError && err.category === 'dangling-ref' && /never recorded/.test(err.message),
+  );
+});
+
+test('show renders humanTurns as its own labelled section, never merged into dispositions', async () => {
+  const { tempDir, ctx } = setup();
+  fs.mkdirSync(path.join(tempDir, 'human'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'human', '1-person.md'), 'Go ahead.\n');
+  const data = await runCoordinationUseCase(ctx, {
+    requestObject: request({ steps: [produceStep(), humanTurnStep(), dispositionStep({ targetRef: '$ref:produce', evidenceRefs: [] })] }),
+  });
+  const shown = showCoordinationUseCase({ cwd: tempDir, repoRoot: tempDir }, { id: data.coordinationId });
+  assert.equal(shown.humanTurns.length, 1);
+  assert.equal(shown.humanTurns[0].turnId, 'turn_1');
+  assert.deepEqual(shown.humanTurns[0].attributedTo, { type: 'person', id: 'the-user' });
+  assert.deepEqual(shown.ignoredHumanTurns, []);
+  assert.equal(shown.dispositions.length, 1);
+  assert.ok(!('turnId' in shown.dispositions[0]), 'a human turn must never be merged into the dispositions list');
 });

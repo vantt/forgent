@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { openSession, createSessionAssignment, linkResult } from '../../src/runner/coordination/store.mjs';
+import { openSession, createSessionAssignment, linkResult, recordHumanTurn } from '../../src/runner/coordination/store.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { CoordinationError, SCHEMA_VERSION } from '../../src/runner/coordination/schema.mjs';
 import { EventLogError } from '../../src/state/events.mjs';
@@ -184,6 +184,184 @@ test('replaySession bubbles state/events.mjs\'s own corrupt-log detection unchan
     () => replaySession('coord_replay_corrupt', { cwd: tempDir }),
     (err) => err instanceof EventLogError && err.category === 'corrupt-log',
   );
+});
+
+// ─── Phase 03.1: human-turn-recorded replay-time re-validation ─────────────
+//
+// `recordHumanTurn` (store.mjs) already enforces every one of these at write
+// time; these cases prove `replaySession` re-checks the SAME properties
+// independently against a hand-crafted log that never went through that
+// door -- defense in depth, matching this file's own established pattern
+// for `assignment-created`/`result-linked` above.
+
+function openHumanTurnSession(tempDir, coordinationId, overrides = {}) {
+  openSession(
+    {
+      coordinationId,
+      objective: 'Prove human-turn replay re-validation.',
+      provenanceRoot: { writerId: 'writer-1' },
+      actors: [{ id: 'reviewer', role: 'reviewer' }],
+      ...overrides,
+    },
+    { cwd: tempDir },
+  );
+}
+
+function humanTurnPayload(overrides = {}) {
+  return {
+    turnId: 'turn_1',
+    turnOrdinal: 1,
+    channel: 'claude-code-chat',
+    artifactRef: 'human/1-person.md',
+    revision: `sha256:${'a'.repeat(64)}`,
+    externalRef: 'claude-code-transcript:sess-1:uuid-1',
+    attributedTo: { type: 'person', id: 'the-user' },
+    recordedBy: { type: 'driver', id: 'writer-1' },
+    ...overrides,
+  };
+}
+
+function appendRawHumanTurn(eventsPath, seq, payloadOverrides = {}) {
+  fs.appendFileSync(
+    eventsPath,
+    `${JSON.stringify({ seq, ts: new Date().toISOString(), v: '1', type: 'human-turn-recorded', payload: humanTurnPayload(payloadOverrides) })}\n`,
+  );
+}
+
+test('replaySession reconstructs a real human turn cleanly and never throws for it', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_clean');
+  recordHumanTurn('coord_replay_ht_clean', humanTurnPayload(), { cwd: tempDir });
+  const replayed = replaySession('coord_replay_ht_clean', { cwd: tempDir });
+  assert.equal(replayed.humanTurns.length, 1);
+  assert.equal(replayed.humanTurns[0].turnId, 'turn_1');
+});
+
+test('replaySession rejects a human-turn-recorded event whose recordedBy is not this session\'s driver identity', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_foreign_driver');
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_foreign_driver');
+  appendRawHumanTurn(eventsPath, 99, { recordedBy: { type: 'driver', id: 'someone-else' } });
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_foreign_driver', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'foreign-ref' && /not this session's driver identity/.test(err.message),
+  );
+});
+
+test('replaySession rejects a human-turn-recorded event that attributes the turn to its own recordedBy (self-attribution)', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_self_attrib');
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_self_attrib');
+  appendRawHumanTurn(eventsPath, 99, { attributedTo: { type: 'person', id: 'writer-1' } });
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_self_attrib', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /cannot attribute a human turn to itself/.test(err.message),
+  );
+});
+
+test('replaySession rejects a human-turn-recorded event that attributes the turn to a declared panel actor', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_panel_actor');
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_panel_actor');
+  appendRawHumanTurn(eventsPath, 99, { attributedTo: { type: 'person', id: 'reviewer' } });
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_panel_actor', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /declared panel actor/.test(err.message),
+  );
+});
+
+test('replaySession rejects a non-contiguous turnOrdinal (a gap, hand-crafted past the write door)', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_ordinal_gap');
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_ordinal_gap');
+  appendRawHumanTurn(eventsPath, 99, { turnOrdinal: 2 }); // no ordinal 1 exists
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_ordinal_gap', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /no gaps, no ordinal reuse/.test(err.message),
+  );
+});
+
+test('replaySession rejects a duplicate turnId (hand-crafted past the write door)', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_dup_turn');
+  recordHumanTurn('coord_replay_ht_dup_turn', humanTurnPayload(), { cwd: tempDir });
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_dup_turn');
+  appendRawHumanTurn(eventsPath, 99, { turnOrdinal: 2, externalRef: 'claude-code-transcript:sess-1:uuid-2' });
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_dup_turn', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'duplicate-ref' && /duplicate "human-turn-recorded"/.test(err.message),
+  );
+});
+
+test('replaySession rejects a reused externalRef across two different turnIds (hand-crafted past the write door)', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_dup_external');
+  recordHumanTurn('coord_replay_ht_dup_external', humanTurnPayload(), { cwd: tempDir });
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_dup_external');
+  appendRawHumanTurn(eventsPath, 99, { turnId: 'turn_2', turnOrdinal: 2 }); // same default externalRef as turn_1
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_dup_external', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'duplicate-ref' && /may back at most one real human turn/.test(err.message),
+  );
+});
+
+test('replaySession rejects a driver-disposition-recorded event citing a human-turn: ref not yet recorded at that point in the log', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_disposition_early');
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_disposition_early');
+  // No "human-turn-recorded" event exists anywhere in this log.
+  fs.appendFileSync(
+    eventsPath,
+    `${JSON.stringify({
+      seq: 99,
+      ts: new Date().toISOString(),
+      v: '1',
+      type: 'driver-disposition-recorded',
+      payload: {
+        targetRef: 'human-turn:turn_never_recorded',
+        disposition: 'accepted',
+        rationale: 'x',
+        evidenceRefs: [],
+        authorizedBy: { type: 'driver', id: 'writer-1' },
+      },
+    })}\n`,
+  );
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_disposition_early', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'out-of-order-ref' && /has no "human-turn-recorded" event before it/.test(err.message),
+  );
+});
+
+test('replaySession accepts a driver-disposition-recorded event citing a human-turn: ref recorded earlier in the log', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_disposition_ok');
+  recordHumanTurn('coord_replay_ht_disposition_ok', humanTurnPayload(), { cwd: tempDir });
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_disposition_ok');
+  fs.appendFileSync(
+    eventsPath,
+    `${JSON.stringify({
+      seq: 99,
+      ts: new Date().toISOString(),
+      v: '1',
+      type: 'driver-disposition-recorded',
+      payload: {
+        targetRef: 'human-turn:turn_1',
+        disposition: 'accepted',
+        rationale: 'x',
+        evidenceRefs: [],
+        authorizedBy: { type: 'driver', id: 'writer-1' },
+      },
+    })}\n`,
+  );
+
+  assert.doesNotThrow(() => replaySession('coord_replay_ht_disposition_ok', { cwd: tempDir }));
 });
 
 test('replaySession rejects a manifest carrying missionId (validated on every load, not just at creation)', () => {
