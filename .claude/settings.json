@@ -8,7 +8,7 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/dev-rules-reminder.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/dev-rules-reminder.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -17,7 +17,7 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/plan-format-kanban.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/plan-format-kanban.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -26,7 +26,7 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/session-state.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/session-state.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -35,7 +35,7 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/usage-quota-cache-refresh.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/usage-quota-cache-refresh.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -46,7 +46,7 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/precompact-capture.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/precompact-capture.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -66,7 +66,7 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/descriptive-name.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/descriptive-name.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -75,7 +75,7 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/privacy-block.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/privacy-block.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -84,7 +84,7 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/scout-block.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/scout-block.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -104,7 +104,7 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/session-init.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/session-init.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -115,15 +115,15 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/cook-after-plan-reminder.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/cook-after-plan-reminder.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           },
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/session-state.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/session-state.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           },
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/usage-quota-cache-refresh.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/usage-quota-cache-refresh.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -134,11 +134,11 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/subagent-init.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/subagent-init.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           },
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/team-context-inject.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/team-context-inject.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -149,7 +149,7 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/session-state.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/session-state.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -160,11 +160,11 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/secret-output-guardrail.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/secret-output-guardrail.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           },
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/simplify-gate.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/simplify-gate.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
@@ -173,19 +173,19 @@
       {
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/secret-output-guardrail.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/secret-output-guardrail.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           },
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/dev-rules-reminder.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/dev-rules-reminder.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           },
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/simplify-gate.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/simplify-gate.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           },
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/usage-quota-cache-refresh.cjs\"",
+            "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/usage-quota-cache-refresh.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\"",
             "type": "command"
           }
         ],
