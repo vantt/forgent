@@ -35,9 +35,21 @@ R4. Ghi trust là atomic (tmp rồi rename), idempotent, và **fail loud** khi s
 
 R5. Entry trust bị xoá khi worktree teardown. Store hiện đã 145 entry; V0 không được làm nó phình vô hạn.
 
-R6. Worker chạy với HOME riêng cho mỗi Run, không dùng HOME thật của người.
-Điều này đóng luôn hai thứ: lỗ socket herdr của P7, và private-scratch mà P00.1's
-Known Limitation đã đòi cho bwrap.
+R6. **Đã đo lại 2026-09-06, phát biểu cũ sai và đã sửa** — xem
+[findings](../../docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/findings.md).
+Worker chạy với HOME riêng cho mỗi Run: giữ, vì nó đóng được đường `$HOME/.config/herdr`
+và đồng thời là private-scratch mà P00.1's Known Limitation đã đòi cho bwrap — một cơ
+chế giải hai bài. Nhưng nó **không đủ**: `HERDR_SOCKET_PATH` do herdr tự tiêm và không
+thể xoá hay chuyển hướng bằng `--env`, đã chứng minh hai lần (giá trị rỗng ở P7, giá trị
+giả khác rỗng ở probe D). Chừng nào worker còn chạy trong một pane thuộc session herdr
+của người vận hành thì nó còn chạm được cockpit. Cô lập worker vì vậy **không phải bài
+toán biến môi trường mà là bài toán topology session**. Ba phương án còn lại, theo chi
+phí tăng dần: session herdr riêng cho worker, mount namespace bằng `bwrap`, hoặc user OS
+riêng. Phase này phải chọn và chứng minh một trong ba trước khi Phase 02 dựa vào.
+
+R6b. Cho tới khi một trong ba được chứng minh, capability profile của `herdr-spawn` mang
+nhãn `unsafe: worker-can-drive-cockpit`, và mechanism không được dùng cho executor mà
+người vận hành chưa tin sẵn.
 
 R7. `fgos doctor` có check cho: herdr có trên PATH, integration của agent kind đang dùng
 có `current` không, và trust store có đọc/ghi được không.
