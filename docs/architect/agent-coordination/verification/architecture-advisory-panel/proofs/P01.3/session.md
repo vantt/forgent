@@ -7,7 +7,7 @@ section allowing either path for a manual proof.
 | Phase | Role | Status |
 |---|---|---|
 | 1 | Intake and Framing | done — `intake.md` |
-| 3 | Understand the Problem (Context Investigator) | not started |
+| 3 | Understand the Problem (Context Investigator) | done — `scout-report.md` (see note on a fixed doctrine-access retry) |
 | 2 | Understand the Person (Lead Advisor) | not started |
 | 4 | Ask Reluctantly But Clearly | not started |
 | 5 | Diverge Honestly (3 shapers) | not started |
@@ -16,6 +16,6 @@ section allowing either path for a manual proof.
 | 8 | Explain For Ownership (Lead Advisor) | not started |
 | 9 | Stay In Dialogue (real human turns) | not started — requires the actual person |
 
-Next action: dispatch Phase 3 (Context Investigator, `codex-readonly`)
-against `/home/vantt/projects/vnflow`, carrying the Pre-Dispatch Context lead
-from `intake.md` and the two safety exclusions verbatim.
+Next action: dispatch Phase 2 (Lead Advisor interpretation, `claude` via
+bwrap), dispatched blind to the scout report by design (same pattern as
+P01.2).
