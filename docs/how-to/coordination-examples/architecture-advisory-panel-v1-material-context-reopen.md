@@ -81,7 +81,7 @@ real Assignment whose own `contextGrant.refs` is empty, while the correct
 shape below produces a `contextGrant.refs` array naming all seven prior
 Assignments (see the how-to guide's committed live-proof evidence). The
 three placeholder-shaped ids below stand for this session's own real
-`interpret-request`/`shape-*`/`critique-proposals`/`assess-constraints`
+`synthesize-recommendation`/`critique-proposals`/`assess-constraints`
 assignmentIds — substitute the real ones `fgos coordination show
 aap_mdview_example --json` reports before dispatching:
 
@@ -141,6 +141,7 @@ pass, and open a **new cell** — a new `coordinationId`, a fresh
   "writerId": "coordinator-driver",
   "coordinationId": "aap_mdview_example--followup-1",
   "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30 },
   "actors": [
     { "id": "context-investigator-actor", "executor": "codex-readonly", "tier": "analytical" }
   ],
@@ -156,6 +157,14 @@ pass, and open a **new cell** — a new `coordinationId`, a fresh
   ]
 }
 ```
+
+Every opening request in this guide declares `aggregateBounds` — this one
+included, even though a single-operation session like this one is nowhere
+near the platform's default 10-round cap. The discipline is the request
+shape, not a per-example risk judgment: a reader who extends this new-cell
+pattern with more phases inherits a request that already raises the cap,
+rather than rediscovering the same blocking bug the how-to guide's own
+note describes.
 
 **Said to the person plainly, every time this fork resolves the second
 way:** "a full re-run of [the scout check] needs a new session; here is
