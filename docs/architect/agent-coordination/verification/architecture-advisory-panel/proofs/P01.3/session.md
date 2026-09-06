@@ -11,10 +11,10 @@ section allowing either path for a manual proof.
 | 2 | Understand the Person (Lead Advisor) | done — `interpretation.md`, formed blind to the scout report |
 | 4 | Ask Reluctantly But Clearly | done — `decision-request.md`, no question sent, 4 defaults carried into Phase 5 |
 | 5 | Diverge Honestly (3 shapers) | done — `proposals/{system-shaper,alternative-shaper,constraint-advocate}.md`, genuine convergence on "don't restructure, harden seams" via 3 independent mechanisms |
-| 6 | Debate Claims (Critic) | not started |
+| 6 | Debate Claims (Critic) | done — `critiques/architecture-critic.md`, 5 attacks + 1 conceded, 2 independently re-verified against real source |
 | 7 | Converge Without Flattening (Synthesizer) | not started |
 | 8 | Explain For Ownership (Lead Advisor) | not started |
 | 9 | Stay In Dialogue (real human turns) | not started — requires the actual person |
 
-Next action: dispatch Phase 6 (Architecture Critic, `agy-bwrap`), attacking
-all three proposals for real weaknesses.
+Next action: dispatch Phase 7 (Synthesizer, `claude-bwrap`, critical
+tier), producing ONE recommendation that survives the critique.
