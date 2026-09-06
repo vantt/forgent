@@ -19,7 +19,7 @@ The person's initial request asked to start at Phase 01. Phase 01 (P01.1) declar
 | Phase | Requirement | Status |
 |---|---|---|
 | 00 | Live-proven read-only executor/mechanism allowlist | done (P00.1 proven) |
-| 01 | Advisory soul and manual proof | P01.1 + P01.2 done; P01.3 blocked on real human interaction (see Stop Gate below) |
+| 01 | Advisory soul and manual proof | P01.1 + P01.2 done; P01.3 open (see Cells table) |
 | 02 | Capability-fit audit | blocked on 01 |
 | 03 | Minimal hard shell and protocol | blocked on 02 |
 | 04 | Production skill and Decision Dialogue | blocked on 03 |
@@ -77,6 +77,7 @@ self-reported numbers.
 | P00.1 | `architecture-advisory-panel--p00-1` | done | Read-only dispatch readiness proven; Allowlist produced |
 | P01.1 | `architecture-advisory-panel--p01-1` (fix round + close on `--p01-1-fix1`, see session-workaround note in P01.1.md) | done | Soul authored (3434 lines), 1 HIGH + 4 MEDIUM + 2 LOW findings fixed in 1 round, both rechecks clean |
 | P01.2 | manual dispatch, no coordination session (see P01.2.md) | done | Real clear-input proof on mdview: 8 phases + 2 real Decision Dialogue turns with the actual person; found a real production bug (auth token lost on stdout); final outcome: fix 4 named first-run defects, defer Windows packaging, drop telemetry-first sequencing |
+| P01.3 | manual dispatch, no coordination session (see P01.3.md) | open | Real unclear-input proof on vnflow (EOD/intraday pipeline evolution); Phase 1 done, Phase 3 dispatch next |
 
 ## Admitted Read-Only Advisory Executor Allowlist
 
@@ -94,11 +95,12 @@ Excluded Unsafe / Non-Runnable Pairs:
 - `agy-cli` (`--mode accept-edits` unconfined): EXCLUDED (mutated target repo).
 - `agy-sandbox` (`--mode accept-edits --sandbox`): EXCLUDED (mutated target repo despite `--sandbox` flag).
 
-## Stop Gate — P01.3, needs the person
+## Stop Gate — P01.3, resolved
 
-P01.2 is done. P01.3 (unclear-input manual proof) requires the same
-confirmation P01.2 needed: the person confirms `/home/vantt/projects/vnflow`'s
-named case ("EOD and intraday evolution is becoming difficult" — keep
-separate pipelines with shared contracts, one pluggable abstraction, or
-reframe elsewhere) is still genuinely undecided, and authorizes dispatching
-a real advisory panel against it. Not yet asked.
+P01.2 is done. P01.3's required confirmation was given 2026-09-06: the
+person confirmed `/home/vantt/projects/vnflow`'s named case ("EOD and
+intraday evolution is becoming difficult" — keep separate pipelines with
+shared contracts, one pluggable abstraction, or reframe elsewhere) is
+still genuinely undecided, independently corroborated by a kongming
+pre-check, and authorized real panel dispatch against it. Cell is open —
+see `P01.3.md`.
