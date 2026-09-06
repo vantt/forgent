@@ -847,7 +847,11 @@ Reviewer R-P03.1-05/Red-Team Finding 3: `run.mjs` refuses a resolved path
 outside `ctx.cwd`, closing a `../` traversal or absolute-path escape a
 hand-authored request could otherwise use to pin a hash against a file the
 repo itself never contains, which no later reader holding only the repo
-could ever re-verify). `channel`/`externalRef` are opaque, non-empty
+could ever re-verify) -- checked on `fs.realpathSync`-resolved paths on
+BOTH sides of the comparison since fix round 2 (Reviewer + Red-Team,
+independently: a lexical-only check let an IN-WORKSPACE symlink pointing
+OUTSIDE the workspace pass containment and have its outside target's bytes
+hashed instead). `channel`/`externalRef` are opaque, non-empty
 strings by documented convention (`channel`: `claude-code-chat` |
 `fgos-answer` | `herdr-dashboard` | `relay`; `externalRef`:
 `claude-code-transcript:<sessionId>:<uuid>` | `fgos-answer:<workId>:<eventTs>`),
@@ -883,8 +887,11 @@ refuses a `driver-disposition-recorded` event citing a `human-turn:` ref
 for a turn not yet walked at that point in the log (`out-of-order-ref`) --
 a referential-integrity check, not a "did this resolve anything" question
 the way contribution resolution is -- and, since fix round 1, applies the
-IDENTICAL out-of-order-ref/dangling-ref/near-miss checks to a
-`human-turn-recorded` event's own `respondsToRefs[]` entries.
+same out-of-order-ref/dangling-ref/near-miss checks to a
+`human-turn-recorded` event's own `respondsToRefs[]` entries, for the two
+reserved namespaces and the bare-id near-miss ONLY -- see T8's own row
+below for the one place this is narrower than the write door's full
+cross-session segment scan.
 
 **Threat model -- what this door closes, and what it explicitly does not.**
 The coordinator process (an AI agent, same OS user, with Bash access) has
@@ -904,7 +911,7 @@ false attestation, never an invisible one.
 | T5 | A disposition cites a human turn as its decision basis that this session never actually recorded, or that is cited before it exists in the log | **Closed** | `human-turn:` ref ownership (`assertDispositionRefOwnedBySession`, write time) + out-of-order-ref check (replay) |
 | T6 | The coordinator process itself fabricates the underlying artifact bytes and records them as if a real human produced them | **Open, by design -- cannot be closed in-process** | None; same privilege level as every other write this process makes. Fabrication becomes a detectable, attributable false attestation (a real, permanent, immutable record naming a specific driver and a specific artifact revision) rather than an invisible one -- narrowing, never closing |
 | T7 | A crash or race during recording leaves a partially-written or duplicated ledger entry | **Closed** | Same `withEventsLock` critical section + idempotent-append-on-identical-payload discipline every other driver-authored door in store.mjs already uses |
-| T8 | A hand-crafted or corrupted `events.jsonl` (bypassing `recordHumanTurn` entirely) presents a forged `human-turn-recorded` event as legitimate | **Narrowed, not fully closed** | `replay.mjs` independently re-validates driver identity, self-attribution, panel-actor attribution, the `asgn_`/`contribution:`/`human-turn:` ref-shape check, ordinal contiguity, duplicate turnId/externalRef, AND `respondsToRefs[]` ownership (all as of fix round 1) against a hand-written log. What it cannot catch: a forger who ALSO holds the real driver identity and mirrors every one of these shapes exactly -- the same "careful forgery is narrowed, not closed" residual already disclosed for `aggregation-validated`/`specialist-authorized` above, not a new or worse exposure |
+| T8 | A hand-crafted or corrupted `events.jsonl` (bypassing `recordHumanTurn` entirely) presents a forged `human-turn-recorded` event as legitimate | **Narrowed, not fully closed** | `replay.mjs` independently re-validates driver identity, self-attribution, panel-actor attribution, the `asgn_`/`contribution:`/`human-turn:` ref-shape check, ordinal contiguity, and duplicate turnId/externalRef against a hand-written log (all as of fix round 1). `respondsToRefs[]` re-validation is NARROWER than the write door's own check (fix round 2, Reviewer-flagged doc-precision correction): replay recognizes only the two reserved `human-turn:`/`contribution:` namespaces plus the bare-id near-miss, not the full cross-session segment scan `assertDispositionRefOwnedBySession` runs at write time -- a hand-written `respondsToRefs` entry naming a path like `coordination/sessions/victim/session.json` replays clean, while the write door would refuse it (no realistic harm: nothing legitimate can rely on a ref shape replay does not itself resolve to anything). What replay cannot catch, beyond that: a forger who ALSO holds the real driver identity and mirrors every one of the checked shapes exactly -- the same "careful forgery is narrowed, not closed" residual already disclosed for `aggregation-validated`/`specialist-authorized` above, not a new or worse exposure |
 
 **Named limitation, not closed here.** `respondsToRefs` (optional, on the
 event) is validated for session ownership via the SAME

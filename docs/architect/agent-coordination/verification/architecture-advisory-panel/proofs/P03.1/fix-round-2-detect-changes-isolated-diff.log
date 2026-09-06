@@ -1,0 +1,13 @@
+Changes: 4 files, 5 symbols
+Affected processes: 1
+Risk level: medium
+
+Changed symbols:
+  Symbol CoordinationSession Persistence And Recovery Contract → docs/architect/agent-coordination/contracts/coordination-session.md
+  Symbol Topology → docs/architect/agent-coordination/contracts/coordination-session.md
+  Symbol PolicyPatch Provenance → docs/architect/agent-coordination/contracts/coordination-session.md
+  Symbol Mutation Rule (declared `operation` steps, group-thinking-plan-loop Phase 01) → docs/architect/agent-coordination/contracts/coordination-session.md
+  Symbol runCoordinationUseCase → src/verbs/coordination/run.mjs
+
+Affected execution flows:
+  • RunCoordinationUseCase → StoreError (5 steps) — changed: runCoordinationUseCase
