@@ -1,0 +1,159 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-06T15:15:39.746Z",
+  "data_hash": "5fb4bf502c7f7d47e667fe4a019c7bab73746bed9d069af23cc821600e9a7492",
+  "data": {
+    "coordinationId": "aap_p051_main",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "P05.1 hard conformance and recovery proof: real architecture-advisory-panel-v1 session, main chain.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap_p051_main\" is missing required actor(s) [lead-advisor-actor, synthesizer-actor, red-team-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_aap_driver_op_003",
+          "runId": "run_asgn_aap_driver_op_003_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_004",
+          "runId": "run_asgn_aap_driver_op_004_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_005",
+          "runId": "run_asgn_aap_driver_op_005_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_aap_driver_op_008",
+          "runId": "run_asgn_aap_driver_op_008_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_aap_driver_op_007",
+          "runId": "run_asgn_aap_driver_op_007_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        },
+        {
+          "actorId": "red-team-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "authCritique",
+        "type": "authorize",
+        "operationId": "critique-proposals",
+        "nodeId": "phase-critique",
+        "actorId": "architecture-critic-actor",
+        "authorizationId": "auth_critique_1",
+        "invocationKey": "ik_critique_1",
+        "grantedContextRefs": [
+          "asgn_aap_driver_op_002",
+          "asgn_aap_driver_op_003",
+          "asgn_aap_driver_op_004",
+          "asgn_aap_driver_op_005",
+          "asgn_aap_driver_op_006"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "critique",
+        "type": "operation",
+        "actorId": "architecture-critic-actor",
+        "assignmentId": "asgn_aap_driver_op_007",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "analytical"
+      },
+      {
+        "as": "linkCritique",
+        "type": "contribution",
+        "contributionId": "p051_objection_critique",
+        "contributionType": "objection",
+        "assignmentId": "asgn_aap_driver_op_007",
+        "roundKey": "round-1",
+        "anchors": [
+          "p051_proposal_system",
+          "p051_proposal_alt",
+          "p051_proposal_constraint"
+        ],
+        "respondsTo": null,
+        "appended": true
+      },
+      {
+        "as": "authAssess",
+        "type": "authorize",
+        "operationId": "assess-constraints",
+        "nodeId": "phase-critique",
+        "actorId": "constraint-advocate-actor",
+        "authorizationId": "auth_assess_1",
+        "invocationKey": "ik_assess_1",
+        "grantedContextRefs": [
+          "asgn_aap_driver_op_004",
+          "asgn_aap_driver_op_005",
+          "asgn_aap_driver_op_006"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "assess",
+        "type": "operation",
+        "actorId": "constraint-advocate-actor",
+        "assignmentId": "asgn_aap_driver_op_008",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "analytical"
+      },
+      {
+        "as": "linkAssess",
+        "type": "contribution",
+        "contributionId": "p051_objection_assess",
+        "contributionType": "objection",
+        "assignmentId": "asgn_aap_driver_op_008",
+        "roundKey": "round-1",
+        "anchors": [
+          "p051_proposal_system",
+          "p051_proposal_alt",
+          "p051_proposal_constraint"
+        ],
+        "respondsTo": null,
+        "appended": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-06T15:20:21.993Z",
+  "data_hash": "31a463b12d64dd7751fb7a02ab2b777c0c34c1f17891c928740a041d768885c2",
+  "data": {
+    "coordinationId": "aap_p051_authority_attack2",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "P05.1 authority ATTACK #2 setup: complete the Phase-5 trio so post-shaping-open is legally open (isolating the attack to the missing authorization, not a visibility-window refusal).",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap_p051_authority_attack2\" is missing required actor(s) [lead-advisor-actor, context-investigator-actor, constraint-advocate-actor, architecture-critic-actor, synthesizer-actor, red-team-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_019",
+          "runId": "run_asgn_aap_driver_op_019_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_020",
+          "runId": "run_asgn_aap_driver_op_020_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "context-investigator-actor"
+        },
+        {
+          "actorId": "constraint-advocate-actor"
+        },
+        {
+          "actorId": "architecture-critic-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        },
+        {
+          "actorId": "red-team-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "shapeSystem",
+        "type": "operation",
+        "actorId": "system-shaper-actor",
+        "assignmentId": "asgn_aap_driver_op_019",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "analytical"
+      },
+      {
+        "as": "shapeAlt",
+        "type": "operation",
+        "actorId": "alternative-shaper-actor",
+        "assignmentId": "asgn_aap_driver_op_020",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "analytical"
+      },
+      {
+        "as": "shapeConstraint",
+        "type": "operation",
+        "actorId": "constraint-advocate-actor",
+        "assignmentId": "asgn_aap_driver_op_021",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "analytical"
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 main chain: real human-turn door + first bounded reopen.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_main",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "human-turn", "as": "personTurn1", "turnId": "turn_1", "turnOrdinal": 1, "channel": "claude-code-chat", "artifactRef": "human/1-person.md", "externalRef": "claude-code-session:p05-1-doer:turn-1", "attributedTo": { "type": "person", "id": "the-user" } },
+    { "type": "authorize", "as": "authRevise1", "operationId": "revise-synthesis", "targetActorId": "synthesizer-actor", "authorizationId": "auth_revise_1", "invocationKey": "ik_revise_1", "reason": "Bounded reopen authorized per real human turn \"turn_1\": the person raised a concern about the reversibility argument.", "grantedContextRefs": ["asgn_aap_driver_op_009", "asgn_aap_driver_op_007", "asgn_aap_driver_op_008"] },
+    { "type": "operation", "as": "revise1", "operationId": "revise-synthesis", "targetActorId": "synthesizer-actor", "objective": "Revise the synthesis incorporating the human turn's concern about reversibility, using the existing ledger.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-06T15:19:53.749Z",
+  "data_hash": "2b2219a3dcf27d0da840574e12cf433fcbd9238dca12fbdb3c1ecb44a641286b",
+  "data": {
+    "coordinationId": "aap_p051_visibility",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "P05.1 visibility attack: partial Phase-5 fan-out (2 of 3 shapers).",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap_p051_visibility\" is missing required actor(s) [lead-advisor-actor, context-investigator-actor, constraint-advocate-actor, architecture-critic-actor, synthesizer-actor, red-team-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_016",
+          "runId": "run_asgn_aap_driver_op_016_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_017",
+          "runId": "run_asgn_aap_driver_op_017_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "context-investigator-actor"
+        },
+        {
+          "actorId": "constraint-advocate-actor"
+        },
+        {
+          "actorId": "architecture-critic-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        },
+        {
+          "actorId": "red-team-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "shapeConstraint",
+        "type": "operation",
+        "actorId": "constraint-advocate-actor",
+        "assignmentId": "asgn_aap_driver_op_018",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "analytical"
+      },
+      {
+        "as": "authCritiqueLate",
+        "type": "authorize",
+        "operationId": "critique-proposals",
+        "nodeId": "phase-critique",
+        "actorId": "architecture-critic-actor",
+        "authorizationId": "auth_critique_late",
+        "invocationKey": "ik_critique_late",
+        "grantedContextRefs": [
+          "asgn_aap_driver_op_016",
+          "asgn_aap_driver_op_017",
+          "asgn_aap_driver_op_018"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      }
+    ]
+  }
+}

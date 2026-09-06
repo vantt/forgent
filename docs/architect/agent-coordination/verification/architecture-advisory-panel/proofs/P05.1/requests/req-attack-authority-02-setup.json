@@ -1,0 +1,12 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 authority ATTACK #2 setup: complete the Phase-5 trio so post-shaping-open is legally open (isolating the attack to the missing authorization, not a visibility-window refusal).",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_authority_attack2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "operation", "as": "shapeSystem", "operationId": "shape-system-proposal", "targetActorId": "system-shaper-actor", "objective": "Shape system proposal.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "shapeAlt", "operationId": "shape-alternative-proposal", "targetActorId": "alternative-shaper-actor", "objective": "Shape alternative proposal.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "shapeConstraint", "operationId": "shape-constraint-proposal", "targetActorId": "constraint-advocate-actor", "objective": "Shape constraint proposal.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

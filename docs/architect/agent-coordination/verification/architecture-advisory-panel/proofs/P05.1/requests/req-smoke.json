@@ -1,0 +1,10 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 smoke test.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_smoke",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "operation", "as": "interpret", "operationId": "interpret-request", "targetActorId": "lead-advisor-actor", "objective": "Smoke test.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

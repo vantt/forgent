@@ -1,0 +1,12 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 visibility attack: partial Phase-5 fan-out (2 of 3 shapers).",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_visibility",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "operation", "as": "interpret", "operationId": "interpret-request", "targetActorId": "lead-advisor-actor", "objective": "Interpret.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "shapeSystem", "operationId": "shape-system-proposal", "targetActorId": "system-shaper-actor", "objective": "Shape system proposal.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "shapeAlt", "operationId": "shape-alternative-proposal", "targetActorId": "alternative-shaper-actor", "objective": "Shape alternative proposal.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

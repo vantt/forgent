@@ -1,0 +1,1 @@
+fgos: authorizeDeclaredOperation: operation "critique-proposals" at node "phase-critique" for actor "architecture-critic-actor" requires visibility window "post-shaping-open" to be open before any context may be granted, and it is not open yet -- refusing to authorize
