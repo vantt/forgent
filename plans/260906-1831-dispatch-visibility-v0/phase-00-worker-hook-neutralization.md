@@ -90,6 +90,29 @@ Không đụng: `.claude/hooks/*.cjs` (kit sở hữu), `.gitignore`, `src/`.
 - **Chọn nhầm cách A khi command không qua shell** sẽ làm mọi hook hỏng cùng lúc. Chặn: bước 1 là điều kiện chặn, không được đoán.
 - **Rollback**: `settings.json` nằm trong git, hoàn nguyên một file là xong; shim nếu có thì không ai gọi nữa.
 
+## Hai ý kiến phản biện đã bị bác, kèm nguồn kiểm chứng
+
+Trong lúc làm phase này có hai claim từ agent phụ mâu thuẫn với đo đạc trực tiếp. Cả hai bị bác,
+ghi lại để người sau không đào lại:
+
+1. **"`exec` làm mất stdin, hook nhận pipe đã đóng."** Sai. POSIX `exec` thay ảnh tiến trình
+   nhưng **kế thừa** mọi file descriptor. Kiểm chứng hai lần: (a) `printf '<json>' | sh -c '… exec node "$P"'`
+   với script đọc stdin ghi ra file — nhận đủ payload, exit 2 giữ nguyên; (b) cài chính guard có `exec`
+   vào đường hook thật của Claude Code qua `settings.local.json` và kích — script nhận đủ JSON thật
+   (`session_id`, `transcript_path`, …). Giữ `exec` vì nó tiết kiệm một tiến trình mỗi lần hook chạy.
+
+2. **"Cả 20 registration đều trỏ file được track, 20/20 vẫn chạy trong worktree."** Sai, và đây là
+   claim nguy hiểm nhất vì nếu tin thì phase này vô nghĩa. Bác bằng bốn bằng chứng độc lập:
+   `git ls-files .claude/hooks` trả **0** file; `.gitignore:58` là `/.claude/*` và ngoại lệ chỉ có
+   `skills/`, `settings.json`, `agents/`; `ls .claude/hooks` trong worktree báo không tồn tại; và
+   chính lỗi `Cannot find module` đo được từ agent thật là bằng chứng trực tiếp. Nhiều khả năng
+   agent đó kiểm tra sự tồn tại trong main checkout rồi suy ra là được track.
+
+Phần đúng và hữu ích từ cùng báo cáo đó, đã dùng: bốn script chặn được là `dispatch-decide-hook`
+(được track nên không thuộc phạm vi phase này), `privacy-block`, `scout-block`, và `simplify-gate` —
+cái cuối chặn bằng `{"continue":false}` trên `UserPromptSubmit`, một cơ chế chặn mà bảng ban đầu
+của tôi chưa tính tới. Guard xử lý đúng cả bốn vì khi script có mặt thì nó chạy y như cũ.
+
 ## Ghi chú phạm vi
 
 Có một cách sửa khác, rộng hơn, mà phase này **không** làm: tách hẳn hai loại registration —
