@@ -20,8 +20,8 @@ The person's initial request asked to start at Phase 01. Phase 01 (P01.1) declar
 |---|---|---|
 | 00 | Live-proven read-only executor/mechanism allowlist | done (P00.1 proven) |
 | 01 | Advisory soul and manual proof | done (P01.1 + P01.2 + P01.3 all closed) |
-| 02 | Capability-fit audit | unblocked, not yet started |
-| 03 | Minimal hard shell and protocol | blocked on 02 |
+| 02 | Capability-fit audit | done (P02.1 closed — see P02.1.md) |
+| 03 | Minimal hard shell and protocol | unblocked, not yet started |
 | 04 | Production skill and Decision Dialogue | blocked on 03 |
 | 05 | Comparative proof and promotion | blocked on 04 |
 
@@ -78,6 +78,7 @@ self-reported numbers.
 | P01.1 | `architecture-advisory-panel--p01-1` (fix round + close on `--p01-1-fix1`, see session-workaround note in P01.1.md) | done | Soul authored (3434 lines), 1 HIGH + 4 MEDIUM + 2 LOW findings fixed in 1 round, both rechecks clean |
 | P01.2 | manual dispatch, no coordination session (see P01.2.md) | done | Real clear-input proof on mdview: 8 phases + 2 real Decision Dialogue turns with the actual person; found a real production bug (auth token lost on stdout); final outcome: fix 4 named first-run defects, defer Windows packaging, drop telemetry-first sequencing |
 | P01.3 | manual dispatch, no coordination session (see P01.3.md) | done | Real unclear-input proof on vnflow (EOD/intraday pipeline evolution): full 8-phase panel run + 1 real Decision Dialogue turn; person sought and accepted an independent (kongming) verdict; a factual correction to the panel's own evidence was independently verified by the coordinator; final recommendation attributed, not merged into the panel's own voice |
+| P02.1 | audit only, no coordination session opened (see P02.1.md) | done | Capability-fit/hard-soft placement audit; 4 tables produced; re-diagnosed a Phase 01 finding (revise/recheck reachability) as a symptom of the `partialPolicy` premature-close bug via a live passing test, not an independent defect; N+1 reauthorization probe answered live (`activation.maxInvocations`, not `aggregateBounds.maxRounds`); 4-item closed Phase 03 blocker list produced; full focused suite 680/680 pass |
 
 ## Admitted Read-Only Advisory Executor Allowlist
 
@@ -95,11 +96,11 @@ Excluded Unsafe / Non-Runnable Pairs:
 - `agy-cli` (`--mode accept-edits` unconfined): EXCLUDED (mutated target repo).
 - `agy-sandbox` (`--mode accept-edits --sandbox`): EXCLUDED (mutated target repo despite `--sandbox` flag).
 
-## Stop Gate — Phase 02, needs the person
+## Stop Gate — Phase 03, needs the person
 
-Phase 01 is fully done (P01.1 + P01.2 + P01.3 all closed). Phase 02
-(capability-fit audit) is unblocked per the plan but not yet started.
-Also open, independent of the track: whether to separately authorize a
+Phase 02 is done (P02.1 closed — see P02.1.md's 4-item closed blocker
+list). Phase 03 (minimal hard shell and protocol) is unblocked per the
+plan but not yet started. Also open, independent of the track: whether to separately authorize a
 real implementation task against `/home/vantt/projects/vnflow` acting on
 kongming's P01.3 recommendation (same pattern as mdview in P01.2) — see
 `current-cell.md` for the consolidated question.
