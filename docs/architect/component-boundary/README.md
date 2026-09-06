@@ -25,6 +25,7 @@ Read boundary before layout:
 2. [Repo Layout Vision](./repo-layout-vision.md)
 3. [Host Invocation And Provider Routing](../host-invocation-routing/host-invocation-provider-routing.md)
 4. [Node To Rust Component Migration](../host-invocation-routing/node-to-rust-component-migration.md)
+5. [Packaging And Distribution Architecture](../packaging-distribution/README.md)
 
 The first document answers:
 
@@ -61,6 +62,17 @@ Which parts of fgos are already thin, partly thin, or not thin yet?
 How does fgos keep the same CLI and envelope while implementation changes?
 How does the Rust host delegate whole operations to the legacy Node provider?
 When does implementation movement become authority movement?
+```
+
+The fifth document answers:
+
+```txt
+How is the project-local fgOS runtime payload selected, installed, verified,
+repaired, and upgraded?
+Where is the boundary between global bootstrap, shared web/gateway, project
+runtime adapter, and local project fgOS semantics?
+How do skills, agents, prose, runner, legacy Node payload, Rust host, and docs
+fit into one distributable payload identity?
 ```
 
 Do not invert that order. Folder layout should express component boundaries; it
@@ -147,6 +159,9 @@ Use this document when deciding:
 `host-invocation-provider-routing.md` defines the host/provider invocation map.
 `node-to-rust-component-migration.md` defines an implementation migration map
 from the legacy Node provider to built-in Rust providers.
+`packaging-distribution/README.md` defines the emerging install/runtime
+authority map that keeps global machine services separate from project-local
+fgOS semantic authority.
 
 They are related but not interchangeable:
 
@@ -158,6 +173,12 @@ They are related but not interchangeable:
   of Coding Domain Core, not as a generic foundation package;
 - runtime-language migration should happen behind component contracts, not by
   treating a Node file or Rust crate as authority;
+- shared web/gateway can aggregate many projects, but must delegate mutating
+  project semantics through the selected project's local runtime adapter and
+  payload;
+- global bootstrap/control and project workflow authority are different
+  components: `fgctl` installs/manages; local `fgos` drives workspace
+  semantics;
 - layout refactors should happen only after the component authority is clear.
 
 ## 4. Current Status

@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Corrected the Group Thinking guide's declared-protocol routing contract:
+  per-actor `executor`/`tier`/`persona` are supported, while `actors[].model`
+  is currently rejected and the concrete model is derived through executor
+  `providerModel` plus tier policy.
 - Reframed `docs/architect/component-boundary/` as a whole-system fgOS
   component-boundary advisory set, with a component authority register linking
   each boundary to its owning/reference documents instead of centering the
@@ -87,11 +91,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `fgos coordination run --file <request>` now forwards a declared `operation` step's own `mutation: "mutating"` field into the engine dispatch (`tsk-371`) — previously every real mutating Doer/Fixer dispatch through this CLI door ran read-only and was graded `status: "failed"` even when the work and its commit were correct. A fan-out branch's `mutation` field still cannot be `"mutating"` — that stays refused by design, both at the schema layer and because the fan-out dispatch entry point has no per-branch mutation channel at all.
 - `glm-cli` executor (`.fgos/config.json`) was missing `allowCrossProvider: true`, so every dispatch to it was rejected by the cross-provider egress governance gate before ever spawning ("resolves to cross-provider egress target ... would leave the Claude ecosystem") -- the executor genuinely does route to OpenRouter by design (its own config description says so), so this was a missing declaration, not an intentional block. Confirmed fixed live: a real self-identification dispatch now returns `MODEL=z-ai/glm-5.2`.
 - Closed a series of real gaps in the knowledge registry's lifecycle/migration/bootstrap enforcement (tsk-3uc, follow-on to tsk-28x): `doc.register` could silently move an existing doc's lifecycle (demoting `active` back to `provisional` on a bare re-register, or resurrecting a `retired`/`superseded` doc); `doc.attest`/`doc-current-path-missing`/`doc-source-unreachable`/`doc-source-conservation` treated a `superseded` doc as still live; `topic.merge`/`topic.split` accepted a non-`active` target/source; `topic.retire` on a nonexistent topic was a silent no-op; `doc.supersede` accepted an unvalidated `supersededBy` pointer; `doc.mark-rendered` silently no-oped on a non-`reserved` doc; `scripts/knowledge-migration.mjs` could partially apply (file moved before the registry write, which could then fail), never validated conservation against the full inventory (only the still-pending subset), used shell-interpolated `git mv`/`git add`, and its "already migrated" shortcut accepted a dead doc or an unreachable file as success; `scripts/knowledge-bootstrap.mjs` could partially write across rows in one inventory (an earlier row durably created before a later row's own drift/validation failure) and treated a `retired`/`superseded` doc or `purposeSlug`/`framework`/`mode` drift as idempotent success.
 - `settleClaim` (`src/state/store.mjs`) no longer refuses `fgos return`/
   `fgos plan`/`putInAwaiting` on a durable revision drift caused entirely
-- `fgos coordination run --file <request>` now forwards a declared `operation` step's own `mutation: "mutating"` field into the engine dispatch (`tsk-371`) — previously every real mutating Doer/Fixer dispatch through this CLI door ran read-only and was graded `status: "failed"` even when the work and its commit were correct. A fan-out branch's `mutation` field still cannot be `"mutating"` — that stays refused by design, both at the schema layer and because the fan-out dispatch entry point has no per-branch mutation channel at all.
   by the SAME writer that holds the claim — the routine mid-lifecycle
   `fgos edit` calls `fgos-coding-planning`/`fgos-coding-discovering` make
   by design. It now reconciles when every event touching the item since
