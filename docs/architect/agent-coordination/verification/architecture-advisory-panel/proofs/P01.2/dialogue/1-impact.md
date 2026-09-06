@@ -1,4 +1,7 @@
-Below is the full content of `dialogue/1-impact.md`. I have not written it to disk, per your instruction.
+Role: Lead Advisor (Phase 9, Turn 1 impact) | Cell: P01.2 | Requested: `claude` via bwrap, tier `critical` | Derived: provider `claude`, model `opus`
+Dispatch: bwrap (kongming-verified scratch-bind pattern)
+Prompt: `proofs/P01.2/prompts/lead-advisor-dialogue-1-impact.md`
+Raw run: `proofs/P01.2/runs/9-lead-advisor-dialogue-1-impact-raw.log`
 
 ---
 
@@ -121,4 +124,3 @@ I am not proposing this as a fourth candidate and I am not ranking it. I am noti
 4. **Does the shell currently work against the current daemon?** Now the sharpest cheap question in the session, and it did not exist before this turn — it was created by learning that nobody was watching. — **Moderate-High.**
 
 **A caution I want on the record.** The person answered a question about their own attention. They did not ratify the Decision Packet, endorse "Thin Shell, Measured First," or express any view on the daemon-as-sole-authority position. One sentence about forgetting a feature is not architectural assent, and I would resist any downstream document that treats it as such. — **High.**
-EXIT:0

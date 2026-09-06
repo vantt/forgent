@@ -1,0 +1,1101 @@
+Reading additional input from stdin...
+OpenAI Codex v0.153.2
+--------
+workdir: /home/vantt/projects/mdview
+model: gpt-6-astra
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: low
+reasoning summaries: none
+session id: 01a07439-2e28-7012-a45c-cfb1e882d3c6
+--------
+user
+You are the Context Investigator again, doing a narrow, real, follow-up
+check authorized after a real dialogue turn with the person (they revealed
+the desktop shell's silence since July 20 was neglect from being busy, not
+a judgment that it was finished or dead — nobody has actually checked
+whether it still works against the current daemon).
+
+Same doctrine as before applies: report observations with paths, no
+recommendation, distinguish "I looked and it's not there" from "I didn't
+look."
+
+You are working inside PROJECT_ROOT (read-only) at /home/vantt/projects/mdview.
+
+Your ONE question: **does the desktop shell (`crates/mdview-desktop`)
+still build and function correctly against the current daemon code, or has
+it silently drifted out of sync since its last real change (July 20)?**
+
+Concretely, check:
+1. Does `crates/mdview-desktop` still compile against the current
+   workspace (check Cargo.toml dependency versions/paths against what
+   changed since July 20 in `crates/mdview-core` and `crates/mdview` --
+   any breaking API changes to functions/types the desktop code calls?).
+2. Do the specific functions/types the desktop shell calls from
+   `mdview-core`/`mdview` (daemon discovery, process detach, DaemonInfo,
+   etc.) still exist with compatible signatures, or did any of them change
+   shape since July 20?
+3. Is there anything in the Sept 3-5 commits (background indexing,
+   short-link resolution, in-place editing) that changes a URL shape,
+   response format, or protocol the desktop shell's WebView navigation
+   depends on?
+4. If you have a way to actually attempt a build (`cargo check` or
+   `cargo build` scoped to the desktop crate only, read-only, no
+   installation/execution of the resulting binary) without violating your
+   read-only sandbox, do so and report the real result. If you cannot
+   safely attempt a build, say so plainly and report only the static
+   source-level compatibility check instead -- do not guess at whether it
+   would compile.
+
+Report your real finding directly in your response as markdown, citing
+paths and line numbers. State clearly whether you could determine
+compile-compatibility or only reviewed it statically, and what would
+determine it if you could not.
+codex
+I’ll trace the desktop shell’s calls into the current daemon code and inspect the relevant history. I’m using the GitNexus debugging skill for this check; I’ll keep the project read-only and attempt compilation only if build writes can stay outside it.
+exec
+/usr/bin/zsh -lc 'cat /home/vantt/.agents/skills/gitnexus-debugging/SKILL.md' in /home/vantt/projects/mdview
+ succeeded in 0ms:
+---
+name: gitnexus-debugging
+description: "Use when the user is debugging a bug, tracing an error, or asking why something fails. Examples: \"Why is X failing?\", \"Where does this error come from?\", \"Trace this bug\""
+---
+
+# Debugging with GitNexus
+
+## When to Use
+
+- "Why is this function failing?"
+- "Trace where this error comes from"
+- "Who calls this method?"
+- "This endpoint returns 500"
+- Investigating bugs, errors, or unexpected behavior
+
+## Workflow
+
+```
+1. query({search_query: "<error or symptom>"})            → Find related execution flows
+2. context({name: "<suspect>"})                    → See callers/callees/processes
+3. READ gitnexus://repo/{name}/process/{name}                → Trace execution flow
+4. cypher({statement: "MATCH path..."})                 → Custom traces if needed
+```
+
+> If "Index is stale" → run `node .gitnexus/run.cjs analyze` in terminal.
+
+## Checklist
+
+```
+- [ ] Understand the symptom (error message, unexpected behavior)
+- [ ] query for error text or related code
+- [ ] Identify the suspect function from returned processes
+- [ ] context to see callers and callees
+- [ ] Trace execution flow via process resource if applicable
+- [ ] cypher for custom call chain traces if needed
+- [ ] Read source files to confirm root cause
+```
+
+## Debugging Patterns
+
+| Symptom              | GitNexus Approach                                          |
+| -------------------- | ---------------------------------------------------------- |
+| Error message        | `query` for error text → `context` on throw sites |
+| Wrong return value   | `context` on the function → trace callees for data flow    |
+| Intermittent failure | `context` → look for external calls, async deps            |
+| Performance issue    | `context` → find symbols with many callers (hot paths)     |
+| Recent regression    | `detect_changes` to see what your changes affect           |
+| "How does A reach B?" | `trace` between the two symbols — shortest call chain in one call |
+
+## Tools
+
+**query** — find code related to error:
+
+```
+query({search_query: "payment validation error"})
+→ Processes: CheckoutFlow, ErrorHandling
+→ Symbols: validatePayment, handlePaymentError, PaymentException
+```
+
+**context** — full context for a suspect:
+
+```
+context({name: "validatePayment"})
+→ Incoming calls: processCheckout, webhookHandler
+→ Outgoing calls: verifyCard, fetchRates (external API!)
+→ Processes: CheckoutFlow (step 3/7)
+```
+
+**cypher** — custom call chain traces:
+
+```cypher
+MATCH path = (a)-[:CodeRelation {type: 'CALLS'}*1..2]->(b:Function {name: "validatePayment"})
+RETURN [n IN nodes(path) | n.name] AS chain
+```
+
+**trace** — shortest call chain between two symbols ("how does A reach B?"), one call instead of chaining `context` hops:
+
+```
+trace({ from: "processCheckout", to: "fetchRates" })
+→ status: ok, hopCount: 3
+→ hops: processCheckout → validatePayment → verifyCard → fetchRates
+→ edges: CALLS (1.0), CALLS (0.95), CALLS (1.0)
+```
+
+When no path exists, `trace` reports the furthest reachable node — exactly where the chain breaks (dynamic dispatch, reflection, or an external boundary).
+
+## Example: "Payment endpoint returns 500 intermittently"
+
+```
+1. query({search_query: "payment error handling"})
+   → Processes: CheckoutFlow, ErrorHandling
+   → Symbols: validatePayment, handlePaymentError
+
+2. context({name: "validatePayment"})
+   → Outgoing calls: verifyCard, fetchRates (external API!)
+
+3. READ gitnexus://repo/my-app/process/CheckoutFlow
+   → Step 3: validatePayment → calls fetchRates (external)
+
+4. Root cause: fetchRates calls external API without proper timeout
+```
+
+exec
+/usr/bin/zsh -lc "pwd; git status --short; rg --files -g AGENTS.md -g Cargo.toml -g Cargo.lock -g rust-toolchain\\* -g .cargo/config\\*; git log -12 --date=iso --format='%h %ad %s'" in /home/vantt/projects/mdview
+ succeeded in 0ms:
+/home/vantt/projects/mdview
+Cargo.lock
+AGENTS.md
+crates/mdview-core/Cargo.toml
+crates/mdview-desktop/Cargo.toml
+crates/mdview-desktop/Cargo.lock
+Cargo.toml
+crates/mdview/Cargo.toml
+docs/design/AGENTS.md
+7477f0a 2026-09-05 03:00:26 +0700 feat(mdview): edit and save markdown in place from the Docs page
+4ba589d 2026-09-05 03:00:18 +0700 fix(mdview): resolve short links on demand before the index catches up
+6d2e1bc 2026-09-03 17:42:22 +0700 chore: bump version to 0.7.6
+084552c 2026-09-03 16:53:34 +0700 chore(mdview): preserve uncommitted worktree artifacts before inode cleanup
+9516e2c 2026-09-03 16:53:28 +0700 docs(mdview): update agent/skill templates and system overview
+4436f44 2026-09-03 16:53:23 +0700 fix(mdview): stop double-toggling Docs folder bar and over-grabbing partial-highlight copy
+203911e 2026-09-03 16:53:17 +0700 feat(mdview): defer project indexing to background, redirect after login, add folder landing pages
+84a6710 2026-09-01 22:10:24 +0700 chore: bump version to 0.7.5
+cac1928 2026-09-01 22:10:21 +0700 feat(mdview): auto-clean stale registry records after a period of inactivity
+cc2f9b5 2026-08-31 14:37:06 +0700 fix(mdview): react to Docs folder clicks and floor narrow-table width
+d99a57e 2026-08-31 13:48:53 +0700 fix(mdview): let wide tables break out of the reading column
+6875119 2026-08-14 19:59:44 +0700 chore: bump version to 0.7.3
+
+exec
+/usr/bin/zsh -lc "cat AGENTS.md; nl -ba Cargo.toml; nl -ba crates/mdview-desktop/Cargo.toml; rg --files crates/mdview-desktop; git log --date=short --format='%h %ad %s' -- crates/mdview-desktop; rg -n 'mdview_core|mdview::|DaemonInfo|detach|discover|url|navigation' crates/mdview-desktop" in /home/vantt/projects/mdview
+ succeeded in 0ms:
+# mdview
+
+<!-- [unknown] one-line project description - replace me -->
+
+- README.md
+
+<!-- mdview:START -->
+## Documentation Viewing (MDView)
+
+After creating or updating any markdown file, make it viewable in ONE call —
+no project registration step needed:
+
+### Using MCP (preferred)
+
+Call `mdview_view_file` with:
+
+- `project_root`: absolute path to the project root
+- `relative_path`: the file path relative to that root
+
+It returns a browser `url`. Tell the user: "You can view this at: `<url>`".
+The server auto-registers the project on first use and indexes the file
+immediately.
+
+### Using CLI fallback
+
+```sh
+mdview open <absolute-path-to-file.md>
+```
+
+### When to render
+
+Spin up a preview for long docs, tables, Mermaid diagrams, multi-file document
+sets, or when the user asks to "preview"/"render". Skip it for short, trivial
+snippets.
+<!-- mdview:END -->
+     1	[workspace]
+     2	resolver = "2"
+     3	members = ["crates/mdview-core", "crates/mdview"]
+     4	# Desktop shell (Tauri) is excluded from the default workspace build because it
+     5	# requires system libraries (webkit2gtk/gtk3 on Linux) not present everywhere.
+     6	# Build it explicitly from its own directory — see crates/mdview-desktop/README.md.
+     7	exclude = ["crates/mdview-desktop"]
+     8	
+     9	[workspace.package]
+    10	version = "0.7.6"
+    11	edition = "2021"
+    12	license = "MIT"
+    13	authors = ["Van Tran"]
+    14	repository = "https://github.com/vantt/mdview"
+    15	
+    16	[workspace.dependencies]
+    17	serde = { version = "1", features = ["derive"] }
+    18	serde_json = "1"
+    19	toml = "0.8"
+    20	toml_edit = "0.22"
+    21	thiserror = "1"
+    22	anyhow = "1"
+    23	tracing = "0.1"
+    24	tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+    25	dirs = "5"
+    26	time = { version = "0.3", features = ["formatting", "parsing", "serde"] }
+    27	
+    28	# rendering
+    29	comrak = "0.29"
+    30	syntect = "5"
+    31	ammonia = "4"
+    32	
+    33	# storage / indexing
+    34	rusqlite = { version = "0.32", features = ["bundled"] }
+    35	ignore = "0.4"
+    36	notify = "6"
+    37	notify-debouncer-full = "0.3"
+    38	nucleo-matcher = "0.3"
+    39	
+    40	# server / cli
+    41	axum = { version = "0.7", features = ["ws"] }
+    42	tokio = { version = "1", features = ["full"] }
+    43	tower = "0.5"
+    44	tower-http = { version = "0.6", features = ["cors", "trace"] }
+    45	clap = { version = "4", features = ["derive"] }
+    46	minijinja = { version = "2", features = ["loader"] }
+    47	
+    48	# auth (token + Cloudflare Access)
+    49	jsonwebtoken = "9"
+    50	reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+    51	async-trait = "0.1"
+    52	rand = "0.8"
+    53	base64 = "0.22"
+    54	
+    55	# platform
+    56	libc = "0.2"
+    57	
+    58	[profile.release]
+    59	opt-level = "s"
+    60	lto = true
+    61	codegen-units = 1
+    62	panic = "abort"
+    63	strip = true
+     1	[package]
+     2	name = "mdview-desktop"
+     3	version = "0.1.0"
+     4	edition = "2021"
+     5	license = "MIT"
+     6	authors = ["Van Tran"]
+     7	description = "Native desktop shell for mdview (Tauri v2) — a window onto the local daemon"
+     8	
+     9	# Standalone (not part of the root workspace) so the verified core/CLI build never
+    10	# depends on Tauri's system libraries. See README.md for build prerequisites.
+    11	[workspace]
+    12	
+    13	[build-dependencies]
+    14	tauri-build = { version = "2", features = [] }
+    15	
+    16	[dependencies]
+    17	mdview-core = { path = "../mdview-core" }
+    18	tauri = { version = "2", features = ["tray-icon"] }
+    19	tauri-plugin-single-instance = "2"
+    20	serde = { version = "1", features = ["derive"] }
+    21	serde_json = "1"
+    22	
+    23	[features]
+    24	# Reserved for a custom protocol build later.
+    25	default = []
+crates/mdview-desktop/ui/index.html
+crates/mdview-desktop/icons/icon.png
+crates/mdview-desktop/Cargo.lock
+crates/mdview-desktop/src/main.rs
+crates/mdview-desktop/README.md
+crates/mdview-desktop/tauri.conf.json
+crates/mdview-desktop/Cargo.toml
+crates/mdview-desktop/build.rs
+crates/mdview-desktop/gen/schemas/acl-manifests.json
+crates/mdview-desktop/gen/schemas/capabilities.json
+crates/mdview-desktop/gen/schemas/desktop-schema.json
+crates/mdview-desktop/gen/schemas/linux-schema.json
+7184a42 2026-07-20 chore: update mdview-desktop/Cargo.lock (libc dependency via mdview-core)
+83a17f1 2026-07-20 feat(windows-daemon-fixes-3): detach mdview-desktop's spawned daemon via shared apply_detach
+e3b02cd 2026-07-16 style(splash): use Atelier colors with prefers-color-scheme
+28446e8 2026-07-15 fix(desktop): graceful message when no display (SSH), not a GTK panic
+f4ac34c 2026-07-15 feat(desktop): add window icon; desktop now compiles, links, and runs
+b2abd6c 2026-07-15 feat(desktop): Tauri shell + shared daemon coordination module
+crates/mdview-desktop/Cargo.lock:56: "url",
+crates/mdview-desktop/Cargo.lock:1354:name = "form_urlencoded"
+crates/mdview-desktop/Cargo.lock:3285: "url",
+crates/mdview-desktop/Cargo.lock:3360: "url",
+crates/mdview-desktop/Cargo.lock:3874: "url",
+crates/mdview-desktop/Cargo.lock:3942: "url",
+crates/mdview-desktop/Cargo.lock:3992: "url",
+crates/mdview-desktop/Cargo.lock:4046: "url",
+crates/mdview-desktop/Cargo.lock:4071: "url",
+crates/mdview-desktop/Cargo.lock:4110: "url",
+crates/mdview-desktop/Cargo.lock:4111: "urlpattern",
+crates/mdview-desktop/Cargo.lock:4431: "url",
+crates/mdview-desktop/Cargo.lock:4603:name = "url"
+crates/mdview-desktop/Cargo.lock:4608: "form_urlencoded",
+crates/mdview-desktop/Cargo.lock:4616:name = "urlpattern"
+crates/mdview-desktop/Cargo.lock:4624: "url",
+crates/mdview-desktop/Cargo.lock:5464: "url",
+crates/mdview-desktop/src/main.rs:11:use mdview_core::daemon;
+crates/mdview-desktop/src/main.rs:46:            let url = tauri::Url::parse(&base).expect("valid daemon url");
+crates/mdview-desktop/src/main.rs:47:            let window = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))
+crates/mdview-desktop/src/main.rs:106:        return info.base_url();
+crates/mdview-desktop/src/main.rs:112:            return info.base_url();
+crates/mdview-desktop/src/main.rs:115:    let cfg = mdview_core::Config::load();
+crates/mdview-desktop/src/main.rs:125:    mdview_core::process::apply_detach(&mut cmd);
+crates/mdview-desktop/README.md:45:   (`mdview_core::daemon`). If no daemon answers, it spawns `mdview serve` and
+crates/mdview-desktop/gen/schemas/desktop-schema.json:57:          "description": "Configure remote URLs that can use the capability permissions.\n\nThis setting is optional and defaults to not being set, as our default use case is that the content is served from our local application.\n\n:::caution Make sure you understand the security implications of providing remote sources with local system access. :::\n\n## Example\n\n```json { \"urls\": [\"https://*.mydomain.dev\"] } ```",
+crates/mdview-desktop/gen/schemas/desktop-schema.json:110:        "urls"
+crates/mdview-desktop/gen/schemas/desktop-schema.json:113:        "urls": {
+crates/mdview-desktop/gen/schemas/desktop-schema.json:114:          "description": "Remote domains this capability refers to using the [URLPattern standard](https://urlpattern.spec.whatwg.org/).\n\n## Examples\n\n- \"https://*.mydomain.dev\": allows subdomains of mydomain.dev - \"https://mydomain.dev/api/*\": allows any subpath of mydomain.dev/api",
+crates/mdview-desktop/gen/schemas/linux-schema.json:57:          "description": "Configure remote URLs that can use the capability permissions.\n\nThis setting is optional and defaults to not being set, as our default use case is that the content is served from our local application.\n\n:::caution Make sure you understand the security implications of providing remote sources with local system access. :::\n\n## Example\n\n```json { \"urls\": [\"https://*.mydomain.dev\"] } ```",
+crates/mdview-desktop/gen/schemas/linux-schema.json:110:        "urls"
+crates/mdview-desktop/gen/schemas/linux-schema.json:113:        "urls": {
+crates/mdview-desktop/gen/schemas/linux-schema.json:114:          "description": "Remote domains this capability refers to using the [URLPattern standard](https://urlpattern.spec.whatwg.org/).\n\n## Examples\n\n- \"https://*.mydomain.dev\": allows subdomains of mydomain.dev - \"https://mydomain.dev/api/*\": allows any subpath of mydomain.dev/api",
+
+exec
+/usr/bin/zsh -lc 'nl -ba crates/mdview-desktop/src/main.rs; nl -ba crates/mdview-core/src/daemon.rs; nl -ba crates/mdview-core/src/process.rs; nl -ba crates/mdview-desktop/build.rs; nl -ba crates/mdview-desktop/tauri.conf.json; nl -ba crates/mdview-core/Cargo.toml; git diff 83a17f1 HEAD -- crates/mdview-core/src/daemon.rs crates/mdview-core/src/process.rs crates/mdview-core/src/config.rs crates/mdview-core/src/lib.rs; git show --stat 203911e 4ba589d 7477f0a' in /home/vantt/projects/mdview
+ succeeded in 0ms:
+     1	//! mdview desktop shell (Tauri v2). A thin native window onto the local mdview
+     2	//! daemon (PRD §7.1/§7.5): ensure the daemon is up (spawn `mdview serve` if
+     3	//! not), open a window pointing at its URL, keep it alive in the tray, and
+     4	//! coordinate a single instance.
+     5	//!
+     6	//! NOTE: not compiled in the default workspace build — Tauri needs system libs
+     7	//! (webkit2gtk/gtk3 on Linux). See README.md for prerequisites.
+     8	
+     9	#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+    10	
+    11	use mdview_core::daemon;
+    12	use std::path::PathBuf;
+    13	use std::process::Stdio;
+    14	use std::time::Duration;
+    15	use tauri::menu::{Menu, MenuItem};
+    16	use tauri::tray::{TrayIconBuilder, TrayIconEvent};
+    17	use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent};
+    18	
+    19	fn main() {
+    20	    // Single daemon owns the registry; the window is just a client.
+    21	    let base = ensure_daemon();
+    22	
+    23	    // A native window needs a graphical display. Over a plain SSH session there
+    24	    // is none, and GTK init would panic with a cryptic error. Detect that and
+    25	    // point the user at the web UI (the daemon is already running) instead.
+    26	    #[cfg(target_os = "linux")]
+    27	    if std::env::var_os("DISPLAY").is_none() && std::env::var_os("WAYLAND_DISPLAY").is_none() {
+    28	        eprintln!("mdview-desktop needs a graphical display, but none was found");
+    29	        eprintln!("(DISPLAY / WAYLAND_DISPLAY unset — e.g. a plain SSH session).\n");
+    30	        eprintln!("The mdview server is running — just open it in a browser:");
+    31	        eprintln!("    {base}\n");
+    32	        eprintln!("To get the native window, run this on a desktop session, or over");
+    33	        eprintln!("SSH with X forwarding: ssh -X <host>");
+    34	        std::process::exit(0);
+    35	    }
+    36	
+    37	    tauri::Builder::default()
+    38	        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+    39	            // Second launch → focus the existing window instead of opening another.
+    40	            if let Some(w) = app.get_webview_window("main") {
+    41	                let _ = w.show();
+    42	                let _ = w.set_focus();
+    43	            }
+    44	        }))
+    45	        .setup(move |app| {
+    46	            let url = tauri::Url::parse(&base).expect("valid daemon url");
+    47	            let window = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))
+    48	                .title("mdview")
+    49	                .inner_size(1200.0, 800.0)
+    50	                .min_inner_size(600.0, 400.0)
+    51	                .build()?;
+    52	
+    53	            // Close-to-tray: hide instead of quitting, so the daemon keeps
+    54	            // serving the agent workflow (PRD §7.5).
+    55	            let hide_target = window.clone();
+    56	            window.on_window_event(move |event| {
+    57	                if let WindowEvent::CloseRequested { api, .. } = event {
+    58	                    api.prevent_close();
+    59	                    let _ = hide_target.hide();
+    60	                }
+    61	            });
+    62	
+    63	            build_tray(app.handle())?;
+    64	            Ok(())
+    65	        })
+    66	        .run(tauri::generate_context!())
+    67	        .expect("error while running mdview desktop");
+    68	}
+    69	
+    70	fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
+    71	    let show = MenuItem::with_id(app, "show", "Show mdview", true, None::<&str>)?;
+    72	    let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+    73	    let menu = Menu::with_items(app, &[&show, &quit])?;
+    74	
+    75	    let mut builder = TrayIconBuilder::new()
+    76	        .tooltip("mdview")
+    77	        .menu(&menu)
+    78	        .on_menu_event(|app, event| match event.id.as_ref() {
+    79	            "show" => show_main(app),
+    80	            "quit" => app.exit(0),
+    81	            _ => {}
+    82	        })
+    83	        .on_tray_icon_event(|tray, event| {
+    84	            if let TrayIconEvent::Click { .. } = event {
+    85	                show_main(tray.app_handle());
+    86	            }
+    87	        });
+    88	
+    89	    if let Some(icon) = app.default_window_icon().cloned() {
+    90	        builder = builder.icon(icon);
+    91	    }
+    92	    builder.build(app)?;
+    93	    Ok(())
+    94	}
+    95	
+    96	fn show_main(app: &tauri::AppHandle) {
+    97	    if let Some(w) = app.get_webview_window("main") {
+    98	        let _ = w.show();
+    99	        let _ = w.set_focus();
+   100	    }
+   101	}
+   102	
+   103	/// Attach to a running daemon, or spawn `mdview serve` and wait for it.
+   104	fn ensure_daemon() -> String {
+   105	    if let Some(info) = daemon::running_daemon() {
+   106	        return info.base_url();
+   107	    }
+   108	    let _ = spawn_mdview_serve();
+   109	    for _ in 0..30 {
+   110	        std::thread::sleep(Duration::from_millis(150));
+   111	        if let Some(info) = daemon::running_daemon() {
+   112	            return info.base_url();
+   113	        }
+   114	    }
+   115	    let cfg = mdview_core::Config::load();
+   116	    format!("http://{}:{}", cfg.server.host, cfg.server.port)
+   117	}
+   118	
+   119	fn spawn_mdview_serve() -> std::io::Result<()> {
+   120	    let mut cmd = std::process::Command::new(find_mdview());
+   121	    cmd.arg("serve")
+   122	        .stdin(Stdio::null())
+   123	        .stdout(Stdio::null())
+   124	        .stderr(Stdio::null());
+   125	    mdview_core::process::apply_detach(&mut cmd);
+   126	    cmd.spawn().map(|_| ())
+   127	}
+   128	
+   129	/// Prefer a `mdview` binary next to this executable; else rely on PATH.
+   130	fn find_mdview() -> PathBuf {
+   131	    if let Ok(exe) = std::env::current_exe() {
+   132	        if let Some(dir) = exe.parent() {
+   133	            let sibling = dir.join(if cfg!(windows) {
+   134	                "mdview.exe"
+   135	            } else {
+   136	                "mdview"
+   137	            });
+   138	            if sibling.exists() {
+   139	                return sibling;
+   140	            }
+   141	        }
+   142	    }
+   143	    PathBuf::from("mdview")
+   144	}
+     1	//! Single-daemon coordination: the `~/.mdview/daemon.lock` (pid + port) and a
+     2	//! health probe. Shared by the CLI/daemon and the desktop shell so every
+     3	//! launcher agrees on one server (PRD §7.1/§7.5).
+     4	
+     5	use crate::config::{self, write_atomic};
+     6	use crate::error::Result;
+     7	use serde::{Deserialize, Serialize};
+     8	use std::io::{Read, Write};
+     9	use std::net::TcpStream;
+    10	use std::path::PathBuf;
+    11	use std::time::Duration;
+    12	
+    13	#[derive(Debug, Clone, Serialize, Deserialize)]
+    14	pub struct DaemonInfo {
+    15	    pub pid: u32,
+    16	    pub host: String,
+    17	    pub port: u16,
+    18	    pub started_at: String,
+    19	    /// Version of the binary that started this daemon.
+    20	    ///
+    21	    /// Optional because lock files written by builds before this field existed
+    22	    /// have to keep parsing — a daemon that predates it reads as `None`, which is
+    23	    /// itself the signal that it is older than the current binary.
+    24	    #[serde(default)]
+    25	    pub version: Option<String>,
+    26	}
+    27	
+    28	impl DaemonInfo {
+    29	    pub fn base_url(&self) -> String {
+    30	        format!("http://{}:{}", self.host, self.port)
+    31	    }
+    32	}
+    33	
+    34	pub fn lock_path() -> PathBuf {
+    35	    config::daemon_lock_path()
+    36	}
+    37	
+    38	pub fn write_lock(info: &DaemonInfo) -> Result<()> {
+    39	    let bytes =
+    40	        serde_json::to_vec_pretty(info).map_err(|e| crate::error::Error::Other(e.to_string()))?;
+    41	    write_atomic(&lock_path(), &bytes)
+    42	}
+    43	
+    44	pub fn read_lock() -> Option<DaemonInfo> {
+    45	    let text = std::fs::read_to_string(lock_path()).ok()?;
+    46	    serde_json::from_str(&text).ok()
+    47	}
+    48	
+    49	pub fn remove_lock() {
+    50	    let _ = std::fs::remove_file(lock_path());
+    51	}
+    52	
+    53	/// The daemon in the lock, but only if it actually answers on its port.
+    54	/// A stale lock (process gone) reads as not-running.
+    55	pub fn running_daemon() -> Option<DaemonInfo> {
+    56	    let info = read_lock()?;
+    57	    if health_check(&info.host, info.port) {
+    58	        Some(info)
+    59	    } else {
+    60	        None
+    61	    }
+    62	}
+    63	
+    64	/// True if `host` is a wildcard bind address (`0.0.0.0` / `::` / `[::]`).
+    65	/// Duplicated from `mdview`'s `runtime.rs::is_wildcard` rather than shared:
+    66	/// `mdview-core` cannot depend on the binary crate (wrong dependency
+    67	/// direction), and this is a 2-line pure predicate with no drift risk.
+    68	fn is_wildcard(host: &str) -> bool {
+    69	    matches!(host, "0.0.0.0" | "::" | "[::]")
+    70	}
+    71	
+    72	/// The version the *running* daemon reports on `/health`, not the version in the
+    73	/// lock file.
+    74	///
+    75	/// Upgrading the binary does not restart a daemon that is already serving, so the
+    76	/// live process can be older than the CLI that just wrote to the database. That
+    77	/// mismatch is invisible until a short link 404s, because the old process has no
+    78	/// `/s/` route. `None` means the daemon did not answer, or answered without a
+    79	/// version — both of which mean "older than this build" for a caller's purposes.
+    80	pub fn daemon_version(host: &str, port: u16) -> Option<String> {
+    81	    let body = health_body(host, port)?;
+    82	    let key = "\"version\"";
+    83	    let start = body.find(key)? + key.len();
+    84	    let rest = &body[start..];
+    85	    let open = rest.find('"')? + 1;
+    86	    let close = rest[open..].find('"')? + open;
+    87	    Some(rest[open..close].to_string())
+    88	}
+    89	
+    90	/// Minimal blocking HTTP GET /health; true if it looks like mdview.
+    91	pub fn health_check(host: &str, port: u16) -> bool {
+    92	    match health_body(host, port) {
+    93	        Some(buf) => buf.contains("\"mdview\"") || buf.contains("200 OK"),
+    94	        None => false,
+    95	    }
+    96	}
+    97	
+    98	/// Raw `GET /health` response text, or `None` if the daemon did not answer.
+    99	fn health_body(host: &str, port: u16) -> Option<String> {
+   100	    // A wildcard-bound daemon can't be dialed back on its own bind address on
+   101	    // every platform (e.g. WSAEADDRNOTAVAIL on macOS/Windows), so connect to
+   102	    // loopback instead. Only the connect target changes -- the `Host:` header
+   103	    // below keeps using the original, unsubstituted `host`.
+   104	    let connect_host = if is_wildcard(host) {
+   105	        if host == "0.0.0.0" {
+   106	            "127.0.0.1"
+   107	        } else {
+   108	            "::1"
+   109	        }
+   110	    } else {
+   111	        host
+   112	    };
+   113	    let mut stream = TcpStream::connect(format!("{connect_host}:{port}")).ok()?;
+   114	    stream
+   115	        .set_read_timeout(Some(Duration::from_millis(500)))
+   116	        .ok();
+   117	    stream
+   118	        .set_write_timeout(Some(Duration::from_millis(500)))
+   119	        .ok();
+   120	    let req = format!("GET /health HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\n\r\n");
+   121	    stream.write_all(req.as_bytes()).ok()?;
+   122	    let mut buf = String::new();
+   123	    let _ = stream.take(4096).read_to_string(&mut buf);
+   124	    Some(buf)
+   125	}
+   126	
+   127	#[cfg(test)]
+   128	mod tests {
+   129	    use super::*;
+   130	
+   131	    #[test]
+   132	    fn daemon_info_serde_roundtrip() {
+   133	        let info = DaemonInfo {
+   134	            pid: 42,
+   135	            host: "127.0.0.1".into(),
+   136	            port: 7700,
+   137	            started_at: "2026-07-15T00:00:00Z".into(),
+   138	            version: Some("0.5.2".into()),
+   139	        };
+   140	        let s = serde_json::to_string(&info).unwrap();
+   141	        let back: DaemonInfo = serde_json::from_str(&s).unwrap();
+   142	        assert_eq!(back.pid, 42);
+   143	        assert_eq!(back.base_url(), "http://127.0.0.1:7700");
+   144	        assert_eq!(back.version.as_deref(), Some("0.5.2"));
+   145	    }
+   146	
+   147	    /// A lock file written before `version` existed must still parse — a daemon
+   148	    /// from an older build is exactly the case this field exists to detect, so
+   149	    /// failing to read its lock would defeat the purpose.
+   150	    #[test]
+   151	    fn a_lock_file_without_version_still_parses() {
+   152	        let legacy =
+   153	            r#"{"pid":42,"host":"127.0.0.1","port":7700,"started_at":"2026-07-15T00:00:00Z"}"#;
+   154	        let info: DaemonInfo = serde_json::from_str(legacy).unwrap();
+   155	        assert_eq!(info.pid, 42);
+   156	        assert_eq!(info.version, None);
+   157	    }
+   158	
+   159	    #[test]
+   160	    fn daemon_version_is_none_when_nothing_answers() {
+   161	        assert_eq!(daemon_version("127.0.0.1", 59_998), None);
+   162	    }
+   163	
+   164	    #[test]
+   165	    fn health_check_false_on_dead_port() {
+   166	        // Nothing listening on this port → false, no panic.
+   167	        assert!(!health_check("127.0.0.1", 59_999));
+   168	    }
+   169	
+   170	    #[test]
+   171	    fn health_check_dials_loopback_for_wildcard_host() {
+   172	        // A daemon bound to a wildcard host ("0.0.0.0") can't be dialed back
+   173	        // on that address on every platform (macOS/Windows reject it), so
+   174	        // health_check must substitute loopback at the connect call site.
+   175	        // This test proves that substitution by listening on 127.0.0.1 only
+   176	        // and calling health_check with "0.0.0.0".
+   177	        use std::net::TcpListener;
+   178	
+   179	        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+   180	        let port = listener.local_addr().unwrap().port();
+   181	
+   182	        let handle = std::thread::spawn(move || {
+   183	            if let Ok((mut stream, _)) = listener.accept() {
+   184	                // Drain the request so the client's write doesn't block/hang.
+   185	                let mut buf = [0u8; 512];
+   186	                let _ = stream.read(&mut buf);
+   187	                let _ = stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n");
+   188	            }
+   189	        });
+   190	
+   191	        assert!(health_check("0.0.0.0", port));
+   192	
+   193	        handle.join().unwrap();
+   194	    }
+   195	}
+     1	//! Cross-platform process-spawn helpers shared by every crate that launches
+     2	//! a detached daemon (`mdview` binary today, `mdview-desktop` next).
+     3	
+     4	/// Apply the platform detach settings to `cmd` so a spawned child outlives its
+     5	/// spawner: a new session on Unix (`setsid`), a detached console + new process
+     6	/// group on Windows. Extracted from `spawn_daemon_detached` so the detach itself
+     7	/// is testable without launching the full daemon.
+     8	pub fn apply_detach(cmd: &mut std::process::Command) {
+     9	    #[cfg(unix)]
+    10	    {
+    11	        use std::os::unix::process::CommandExt;
+    12	        // SAFETY: setsid() is async-signal-safe and is the only call made in the
+    13	        // forked child before exec. It puts the child in its own new session (as
+    14	        // session leader), detaching it from the spawner's controlling terminal
+    15	        // and process group so neither a SIGHUP on session close nor a
+    16	        // process-group-directed signal can reach it.
+    17	        unsafe {
+    18	            cmd.pre_exec(|| {
+    19	                if libc::setsid() == -1 {
+    20	                    return Err(std::io::Error::last_os_error());
+    21	                }
+    22	                Ok(())
+    23	            });
+    24	        }
+    25	    }
+    26	
+    27	    #[cfg(windows)]
+    28	    {
+    29	        use std::os::windows::process::CommandExt;
+    30	        // DETACHED_PROCESS: no inherited console. CREATE_NEW_PROCESS_GROUP: the
+    31	        // daemon does not receive Ctrl+C/Ctrl+Break sent to the spawner's group.
+    32	        const DETACHED_PROCESS: u32 = 0x0000_0008;
+    33	        const CREATE_NEW_PROCESS_GROUP: u32 = 0x0000_0200;
+    34	        cmd.creation_flags(DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP);
+    35	    }
+    36	}
+     1	fn main() {
+     2	    tauri_build::build();
+     3	}
+     1	{
+     2	  "$schema": "https://schema.tauri.app/config/2",
+     3	  "productName": "mdview",
+     4	  "version": "0.1.0",
+     5	  "identifier": "dev.mdview.app",
+     6	  "build": {
+     7	    "frontendDist": "./ui"
+     8	  },
+     9	  "app": {
+    10	    "withGlobalTauri": false,
+    11	    "windows": [],
+    12	    "security": {
+    13	      "csp": null
+    14	    }
+    15	  },
+    16	  "bundle": {
+    17	    "active": false,
+    18	    "targets": "all",
+    19	    "category": "DeveloperTool",
+    20	    "shortDescription": "Markdown viewer for AI agent workflows",
+    21	    "icon": ["icons/icon.png"]
+    22	  }
+    23	}
+     1	[package]
+     2	name = "mdview-core"
+     3	version.workspace = true
+     4	edition.workspace = true
+     5	license.workspace = true
+     6	authors.workspace = true
+     7	repository.workspace = true
+     8	
+     9	[dependencies]
+    10	serde.workspace = true
+    11	serde_json.workspace = true
+    12	toml.workspace = true
+    13	thiserror.workspace = true
+    14	anyhow.workspace = true
+    15	tracing.workspace = true
+    16	dirs.workspace = true
+    17	time.workspace = true
+    18	comrak.workspace = true
+    19	syntect.workspace = true
+    20	ammonia.workspace = true
+    21	rusqlite.workspace = true
+    22	ignore.workspace = true
+    23	notify.workspace = true
+    24	notify-debouncer-full.workspace = true
+    25	nucleo-matcher.workspace = true
+    26	libc.workspace = true
+diff --git a/crates/mdview-core/src/config.rs b/crates/mdview-core/src/config.rs
+index 73f7b32..6049d3a 100644
+--- a/crates/mdview-core/src/config.rs
++++ b/crates/mdview-core/src/config.rs
+@@ -26,6 +26,19 @@ pub struct ServerConfig {
+     #[serde(alias = "host_name")]
+     pub hostname: Option<String>,
+     pub open_browser_on_start: bool,
++    /// The token a `POST /api/login` must present to receive a session
++    /// cookie. `None`/empty means auth is unusably misconfigured (login
++    /// fails closed) — `serve()` auto-generates and persists one on first
++    /// start rather than leaving this unset
++    /// (`docs/history/daemon-auth-token-cf-access/CONTEXT.md` D3).
++    pub web_secret: Option<String>,
++    /// Cloudflare Access team domain (e.g. `https://team.cloudflareaccess.com`).
++    /// CF Access only activates when this AND `cf_access_aud` are both set
++    /// (D5) — one without the other leaves it fully off, never a partial
++    /// check.
++    pub cf_access_team_domain: Option<String>,
++    /// Cloudflare Access Application Audience tag. See `cf_access_team_domain`.
++    pub cf_access_aud: Option<String>,
+ }
+ 
+ #[derive(Debug, Clone, Serialize, Deserialize)]
+@@ -68,6 +81,9 @@ impl Default for ServerConfig {
+             host: "0.0.0.0".into(),
+             hostname: None,
+             open_browser_on_start: false,
++            web_secret: None,
++            cf_access_team_domain: None,
++            cf_access_aud: None,
+         }
+     }
+ }
+@@ -220,4 +236,41 @@ mod tests {
+         assert_eq!(loaded.server.hostname.as_deref(), Some("my-machine.local"));
+         std::fs::remove_dir_all(&dir).ok();
+     }
++
++    #[test]
++    fn auth_fields_default_unset_and_roundtrip_when_set() {
++        assert_eq!(ServerConfig::default().web_secret, None);
++        assert_eq!(ServerConfig::default().cf_access_team_domain, None);
++        assert_eq!(ServerConfig::default().cf_access_aud, None);
++
++        let dir = std::env::temp_dir().join(format!("mdview-cfg-auth-{}", std::process::id()));
++        let p = dir.join("config.toml");
++        let mut c = Config::default();
++        c.server.web_secret = Some("s3cret".into());
++        c.server.cf_access_team_domain = Some("https://team.cloudflareaccess.com".into());
++        c.server.cf_access_aud = Some("aud-tag".into());
++        c.save_to(&p).unwrap();
++        let loaded = Config::load_from(&p);
++        assert_eq!(loaded.server.web_secret.as_deref(), Some("s3cret"));
++        assert_eq!(
++            loaded.server.cf_access_team_domain.as_deref(),
++            Some("https://team.cloudflareaccess.com")
++        );
++        assert_eq!(loaded.server.cf_access_aud.as_deref(), Some("aud-tag"));
++        std::fs::remove_dir_all(&dir).ok();
++    }
++
++    #[test]
++    fn config_missing_auth_fields_entirely_loads_as_unset() {
++        // A config.toml written before this feature existed has none of
++        // these keys at all — must load cleanly with auth off, not fail.
++        let dir = std::env::temp_dir().join(format!("mdview-cfg-preauth-{}", std::process::id()));
++        let p = dir.join("config.toml");
++        std::fs::create_dir_all(&dir).unwrap();
++        std::fs::write(&p, "[server]\nport = 7700\nhost = \"0.0.0.0\"\n").unwrap();
++        let loaded = Config::load_from(&p);
++        assert_eq!(loaded.server.web_secret, None);
++        assert_eq!(loaded.server.cf_access_team_domain, None);
++        std::fs::remove_dir_all(&dir).ok();
++    }
+ }
+diff --git a/crates/mdview-core/src/daemon.rs b/crates/mdview-core/src/daemon.rs
+index b5105fb..7aa35a8 100644
+--- a/crates/mdview-core/src/daemon.rs
++++ b/crates/mdview-core/src/daemon.rs
+@@ -16,6 +16,13 @@ pub struct DaemonInfo {
+     pub host: String,
+     pub port: u16,
+     pub started_at: String,
++    /// Version of the binary that started this daemon.
++    ///
++    /// Optional because lock files written by builds before this field existed
++    /// have to keep parsing — a daemon that predates it reads as `None`, which is
++    /// itself the signal that it is older than the current binary.
++    #[serde(default)]
++    pub version: Option<String>,
+ }
+ 
+ impl DaemonInfo {
+@@ -62,12 +69,38 @@ fn is_wildcard(host: &str) -> bool {
+     matches!(host, "0.0.0.0" | "::" | "[::]")
+ }
+ 
++/// The version the *running* daemon reports on `/health`, not the version in the
++/// lock file.
++///
++/// Upgrading the binary does not restart a daemon that is already serving, so the
++/// live process can be older than the CLI that just wrote to the database. That
++/// mismatch is invisible until a short link 404s, because the old process has no
++/// `/s/` route. `None` means the daemon did not answer, or answered without a
++/// version — both of which mean "older than this build" for a caller's purposes.
++pub fn daemon_version(host: &str, port: u16) -> Option<String> {
++    let body = health_body(host, port)?;
++    let key = "\"version\"";
++    let start = body.find(key)? + key.len();
++    let rest = &body[start..];
++    let open = rest.find('"')? + 1;
++    let close = rest[open..].find('"')? + open;
++    Some(rest[open..close].to_string())
++}
++
+ /// Minimal blocking HTTP GET /health; true if it looks like mdview.
+ pub fn health_check(host: &str, port: u16) -> bool {
++    match health_body(host, port) {
++        Some(buf) => buf.contains("\"mdview\"") || buf.contains("200 OK"),
++        None => false,
++    }
++}
++
++/// Raw `GET /health` response text, or `None` if the daemon did not answer.
++fn health_body(host: &str, port: u16) -> Option<String> {
+     // A wildcard-bound daemon can't be dialed back on its own bind address on
+     // every platform (e.g. WSAEADDRNOTAVAIL on macOS/Windows), so connect to
+-    // loopback instead. Only the connect target changes -- the `Host:`
+-    // header below keeps using the original, unsubstituted `host`.
++    // loopback instead. Only the connect target changes -- the `Host:` header
++    // below keeps using the original, unsubstituted `host`.
+     let connect_host = if is_wildcard(host) {
+         if host == "0.0.0.0" {
+             "127.0.0.1"
+@@ -77,9 +110,7 @@ pub fn health_check(host: &str, port: u16) -> bool {
+     } else {
+         host
+     };
+-    let Ok(mut stream) = TcpStream::connect(format!("{connect_host}:{port}")) else {
+-        return false;
+-    };
++    let mut stream = TcpStream::connect(format!("{connect_host}:{port}")).ok()?;
+     stream
+         .set_read_timeout(Some(Duration::from_millis(500)))
+         .ok();
+@@ -87,12 +118,10 @@ pub fn health_check(host: &str, port: u16) -> bool {
+         .set_write_timeout(Some(Duration::from_millis(500)))
+         .ok();
+     let req = format!("GET /health HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\n\r\n");
+-    if stream.write_all(req.as_bytes()).is_err() {
+-        return false;
+-    }
++    stream.write_all(req.as_bytes()).ok()?;
+     let mut buf = String::new();
+     let _ = stream.take(4096).read_to_string(&mut buf);
+-    buf.contains("\"mdview\"") || buf.contains("200 OK")
++    Some(buf)
+ }
+ 
+ #[cfg(test)]
+@@ -106,11 +135,30 @@ mod tests {
+             host: "127.0.0.1".into(),
+             port: 7700,
+             started_at: "2026-07-15T00:00:00Z".into(),
++            version: Some("0.5.2".into()),
+         };
+         let s = serde_json::to_string(&info).unwrap();
+         let back: DaemonInfo = serde_json::from_str(&s).unwrap();
+         assert_eq!(back.pid, 42);
+         assert_eq!(back.base_url(), "http://127.0.0.1:7700");
++        assert_eq!(back.version.as_deref(), Some("0.5.2"));
++    }
++
++    /// A lock file written before `version` existed must still parse — a daemon
++    /// from an older build is exactly the case this field exists to detect, so
++    /// failing to read its lock would defeat the purpose.
++    #[test]
++    fn a_lock_file_without_version_still_parses() {
++        let legacy =
++            r#"{"pid":42,"host":"127.0.0.1","port":7700,"started_at":"2026-07-15T00:00:00Z"}"#;
++        let info: DaemonInfo = serde_json::from_str(legacy).unwrap();
++        assert_eq!(info.pid, 42);
++        assert_eq!(info.version, None);
++    }
++
++    #[test]
++    fn daemon_version_is_none_when_nothing_answers() {
++        assert_eq!(daemon_version("127.0.0.1", 59_998), None);
+     }
+ 
+     #[test]
+diff --git a/crates/mdview-core/src/lib.rs b/crates/mdview-core/src/lib.rs
+index 3e8fdd3..dc82ee6 100644
+--- a/crates/mdview-core/src/lib.rs
++++ b/crates/mdview-core/src/lib.rs
+@@ -4,17 +4,20 @@
+ //! (SQLite, notify) live here behind ports; the HTTP/MCP/CLI wiring is in the
+ //! `mdview` binary crate.
+ 
++pub mod code_source;
+ pub mod config;
+ pub mod daemon;
+ pub mod domain;
+ pub mod engine;
+ pub mod error;
+ pub mod fuzzy;
++mod hash;
+ pub mod indexer;
+ pub mod link_resolver;
+ pub mod process;
+ pub mod render;
+ pub mod repository;
++pub mod short_link;
+ 
+ pub use config::Config;
+ pub use engine::Engine;
+commit 203911ea26f2292a2ba270007e517d3a1fd5c361
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Thu Sep 3 16:53:17 2026 +0700
+
+    feat(mdview): defer project indexing to background, redirect after login, add folder landing pages
+    
+    - register/open/mdview_view_file no longer block on a full recursive
+      scan: a newly-registered project's row is created empty and a
+      detached `mdview refresh` process backfills it, while the requested
+      file is still indexed synchronously the moment its URL is opened.
+    - Login now returns the visitor to the page that required auth (via a
+      short-lived mdv_next cookie) instead of always redirecting to /.
+    - A folder with no matching file redirects to its direct README/index.md
+      child, same landing convention the project root already used.
+    
+    Claude-Session: https://claude.ai/code/session_01DYjuWR4qnpb8tyMBURgXUd
+
+ .fgos/events.jsonl                   |  22 +++++
+ crates/mdview-core/src/engine.rs     |  61 +++++++++-----
+ crates/mdview-core/src/repository.rs |   5 ++
+ crates/mdview/src/auth.rs            |  83 ++++++++++++++++---
+ crates/mdview/src/cleanup.rs         |  21 ++++-
+ crates/mdview/src/cli.rs             |  26 +++++-
+ crates/mdview/src/mcp.rs             |  15 +++-
+ crates/mdview/src/runtime.rs         |  19 +++++
+ crates/mdview/src/server.rs          | 152 +++++++++++++++++++++++++++++++----
+ crates/mdview/src/watch.rs           |  11 ++-
+ 10 files changed, 364 insertions(+), 51 deletions(-)
+
+commit 4ba589d90b6303d0c3e28e4785b4d171576f9b4a
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Sat Sep 5 03:00:18 2026 +0700
+
+    fix(mdview): resolve short links on demand before the index catches up
+    
+    `view_file` hands out a `/s/<code>` derived from the path hash without
+    indexing anything, so a click before the background refresh or watcher
+    caught up missed the hash lookup and 404ed while the long `/p/...` URL
+    worked. `resolve_short_code` now falls back to a filename-only scan of
+    registered projects, hashes each candidate to find the code's file, and
+    indexes just that one.
+    
+    Claude-Session: https://claude.ai/code/session_01WHEjSMCTiBzxgnjHiAKXEB
+
+ crates/mdview-core/src/engine.rs | 63 ++++++++++++++++++++++++++++++++++++++++
+ crates/mdview/src/server.rs      | 11 ++++---
+ 2 files changed, 70 insertions(+), 4 deletions(-)
+
+commit 7477f0a7d6804e2b9960a56a615c4cca4844c2ee
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Sat Sep 5 03:00:26 2026 +0700
+
+    feat(mdview): edit and save markdown in place from the Docs page
+    
+    An Edit button beside Copy swaps the rendered article for a CodeMirror 6
+    editor over the raw source (markdown highlighting, line numbers, undo,
+    search, light/dark theme), with a plain textarea as the fallback if the
+    bundle fails to load. Save (Ctrl/Cmd+S) PUTs the text to
+    /api/projects/:id/files/*path; the daemon writes the file atomically and
+    re-indexes it in the same step so title, search, and backlinks update at
+    once.
+    
+    The page ships a hash of the source it rendered and the editor sends it
+    back, so a file an agent or another tab changed meanwhile is refused with
+    409 and overwriting becomes an explicit second action. Only files already
+    in the index are writable. A live-reload event for the file being edited
+    is parked while the draft is dirty.
+    
+    The CodeMirror bundle is vendored (tools/codemirror-bundle builds
+    assets/codemirror.min.js), served locally, and fetched only on the first
+    Edit click.
+    
+    Claude-Session: https://claude.ai/code/session_01WHEjSMCTiBzxgnjHiAKXEB
+
+ README.md                              |   1 +
+ crates/mdview-core/src/engine.rs       | 113 +++++++++++++++++
+ crates/mdview-core/src/error.rs        |   3 +
+ crates/mdview/assets/app.css           |  91 ++++++++++++++
+ crates/mdview/assets/app.js            | 223 ++++++++++++++++++++++++++++++++-
+ crates/mdview/assets/codemirror.min.js |  29 +++++
+ crates/mdview/src/server.rs            |  68 +++++++++-
+ crates/mdview/src/views.rs             |  46 ++++++-
+ crates/mdview/tests/e2e_open.rs        | 170 +++++++++++++++++++++++++
+ docs/specs/system-overview.md          |   4 +
+ docs/specs/web-interface.md            |  46 ++++++-
+ tools/codemirror-bundle/.gitignore     |   2 +
+ tools/codemirror-bundle/entry.js       |  35 ++++++
+ tools/codemirror-bundle/package.json   |  21 ++++
+ 14 files changed, 837 insertions(+), 15 deletions(-)
+
