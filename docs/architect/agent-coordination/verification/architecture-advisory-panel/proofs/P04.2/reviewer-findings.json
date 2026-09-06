@@ -1,0 +1,92 @@
+[
+  {
+    "id": "R1",
+    "severity": "high",
+    "category": "hard-correctness",
+    "summary": "Every published reopen/close `authorize` fragment passes `\"grantedContextRefs\": []`, which dispatches the synthesizer with a literally empty context grant -- no access to the existing ledger it is being asked to re-weigh. Schema-legal, so it never fails loudly; it silently produces a context-starved reopen.",
+    "location": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md:67-78; architecture-advisory-panel-v1-alternative-and-composite-reopen.md:42-51; architecture-advisory-panel-v1-clarification-and-challenge.md:86-97; architecture-advisory-panel-v1-final-decision-and-defer.md:62-72",
+    "evidence": "Empirically proven, not inferred. I copied test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs's own passing full-chain test and changed ONLY its revise-synthesis authorize from `grantedContextRefs: [synthId, critiqueId, assessId]` to `[]` (the exact shape the examples publish). Result: the test still passes -- and the reopened Assignment's grant is `contextGrant = {\"refs\":[]}`, versus the original synthesis Assignment's `{\"refs\":[\"asgn_..._op_001\" ... \"asgn_..._op_007\"]}` (7 refs). src/runner/coordination/session-engine.mjs:2608-2624 is the mechanism: `const legalContextRefs = new Set(authorization.grantedContextRefs)` and `contextGrant: { refs: [...authorization.grantedContextRefs] }` -- for a driver-authorized binding the grant is the ONLY context channel (I separately confirmed `required` bindings carry `contextGrant: undefined`, i.e. isolation is opt-in-grant-only exactly as the FlowDefinition header claims). The examples' own prose contradicts their own JSON: material-context-reopen.md:75 says 'the existing ledger's three candidates can be re-weighted against it', alternative-and-composite-reopen.md:84 says 'revise-synthesis evaluates the alternative directly', and core/skills/fgos-architecture-panel/SKILL.md:494 states the synthesizer's 'Evidence it seeks: the whole ledger -- every proposal, every critique'. With `[]` the synthesizer receives none of it.",
+    "recommendation": "Replace `[]` in every reopen fragment with the real ledger refs the reopen needs, matching the conformance test (`[<synthesis assignmentId>, <critique assignmentId>, <assess-constraints assignmentId>]` for `revise-synthesis`; `[<explain assignmentId>, <revise assignmentId>]` for `close-dialogue`). If a literal id cannot be shown in a doc, use an explicitly-marked substitution token AND say in prose that an empty grant starves the reopen -- do not publish `[]` as if it were complete."
+  },
+  {
+    "id": "R2",
+    "severity": "high",
+    "category": "hard-correctness",
+    "summary": "Phase-04's explicit requirement -- 'Each pins the protocol id and shows explicit per-actor routing without pinning it in FlowDefinition' -- is not met by any of the 8 examples, and CHANGELOG.md asserts to users that it is.",
+    "location": "plans/260905-architecture-advisory-panel/phase-04-production-skill-and-dialogue.md:68-70 (requirement); CHANGELOG.md:15 (false claim); all 8 files under docs/how-to/coordination-examples/architecture-advisory-panel-v1-*.md",
+    "evidence": "Grep-counted across all 8 files. Files naming `core.coordination-protocol.architecture-advisory-panel-v1`: 3 of 8 (clear-start, unclear-start, material-context-reopen). Files containing an `\"actors\"` block with per-role executor/tier/persona: 1 of 8 (heterogeneous-and-homogeneous-roster). Files doing BOTH: 0 of 8 -- the one file that shows per-actor routing never names the protocol id. clear-start.md:61-65 explicitly acknowledges the deviation ('Note what is absent: no `actors[]` override naming a bwrap-wrapped executor here') and delegates to the heterogeneous file. Meanwhile CHANGELOG.md:15 tells users the 8 families are 'each pinning the real protocol id and showing explicit per-actor `actors[]` routing without pinning it in the FlowDefinition.'",
+    "recommendation": "Either add a protocolRef + a per-actor `actors[]` fragment to each example (the DRY objection is weak -- one 3-line `actors[]` excerpt per file is cheap), or get the requirement formally amended in phase-04 and correct CHANGELOG.md:15 to describe what actually shipped. Do not leave a user-facing changelog asserting a property the artifacts do not have."
+  },
+  {
+    "id": "R3",
+    "severity": "high",
+    "category": "hard-correctness",
+    "summary": "The homogeneous fallback publishes a copy-pasteable block binding all 8 advisory actors to `\"executor\": \"claude\"` -- a REGISTERED, unconfined, `--permission-mode acceptEdits` + `Bash(git add:*),Bash(git commit:*)` invocation -- with no safety warning, immediately below a heterogeneous half that carries a loud one.",
+    "location": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md:86-97",
+    "evidence": "`.fgos/config.json`'s `runner.executors.claude` is `{via: cli, adapter: cli-spawn, command: 'claude', args: ['-p','{prompt}','--model','{model}','--permission-mode','acceptEdits','--allowedTools','Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)']}` -- read directly from the live config. This is materially the shape P00.1 falsified and rejected (P00.1.md:144 'claude-reviewer -- an *authorized* in-tree write ... Verdict: allowlist-rejected'). SKILL.md:203-205 states 'Do not use any other executor for an advisory role -- no other pair has a live-proven confinement envelope for this project's read-only advisory work', and SKILL.md's BOUNDS #2 (line 829) states 'No git mutation inside PROJECT_ROOT, ever.' Critically, the failure mode here is WORSE than the documented `tsk-1o4` one: naming `claude-bwrap` silently falls back, but naming `claude` actually resolves and runs, with edit and git-commit permissions, against the person's own PROJECT_ROOT. The file's own heterogeneous half (lines 41-55) carries a full warning; the homogeneous half carries none, and is the block a single-provider host will actually copy.",
+    "recommendation": "Either drop the literal `claude` binding from the homogeneous block (use an unresolvable placeholder plus prose: 'name your host's single PROVEN-SAFE, read-only-confined executor here'), or carry the same warning verbatim over the homogeneous block naming the exact `acceptEdits`/git-write args and the BOUNDS #2 conflict. Also state that homogeneous fallback is only legal once at least one confined single-provider pair exists -- SKILL.md's STOP CONDITION ('fewer than two safe provider families' is a real stop) is quoted in this file but not applied to its own example."
+  },
+  {
+    "id": "R4",
+    "severity": "medium",
+    "category": "hard-correctness",
+    "summary": "P01.2's real Phase-4 verdict table is presented as 'reproduced in full because the reasoning IS the artifact', but every cell is paraphrased and condensed -- the reasoning that was said to be the point is the part that was cut.",
+    "location": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md:17-25 vs. docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/decision-request.md",
+    "evidence": "All 5 rows are present, so the row count is faithful; the cell text is not. Row 1 disposition, source: 'Not asked yet -- each Phase 5 shaper states its own explicit working definition instead (doctrine already requires this); if shapers converge on materially different scopes, the disagreement itself becomes the question, sharper than asking blind now.' Example: 'Not asked yet -- each shaper states its own explicit working definition instead; divergence here is useful signal.' Row 4 'Material now?', source: 'Affects how much investment is worth recommending, but does not flip the underlying technical recommendation itself (the technical answer to \"should the shell own registry/render/search locally\" doesn't change based on this; the *investment level* to recommend building it out does).' Example: 'Doesn't flip the technical recommendation, only the investment level.' Row 5 'User-exclusive?', source: 'N/A -- already answered by the person directly on 2026-09-06 (\"mdview vẫn chưa quyết\") after being told this exact question.' Example: 'N/A -- already answered directly by the person before dispatch.' This is the same citation-drift class the repo already guards against with test/scripts/check-decision-citation-drift.test.mjs.",
+    "recommendation": "Change 'reproduced in full' to 'condensed; read the source for the full reasoning' and keep the link, OR paste the real table verbatim. Both are fine; asserting the stronger one while doing the weaker one is not."
+  },
+  {
+    "id": "R5",
+    "severity": "medium",
+    "category": "loss-of-soul",
+    "summary": "The constructed `challenge` turn attributes to the panel a recommendation the real P01.2 artifacts explicitly DECLINE, which destroys the example's own teaching point -- the honest real answer would have been 'your premise is not what we recommended', a sharper lesson than the one the file teaches.",
+    "location": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md:57-61",
+    "evidence": "The constructed turn opens 'You're recommending we harden the launcher coordination because it keeps our options open -- but isn't that the same as saying the multi-process split becomes \"the thing that works\"...'. The real explanation.md:18 says the opposite: '4. **Do not** build robust cold-start coordination yet.' The real synthesis.md:83 is explicit that this was deliberate: 'Step 4 declines exactly the state-machine work Attack 1 names as entrenching, which removes the attack's near-term bite.' The panel recommended fixing three named deterministic launcher bugs while declining the hardening work the constructed turn accuses it of recommending. The file then teaches 'defend, no reopen -- this is the same open disagreement the panel already named', which is the right verb but the wrong defense: the real defense is that the premise misreads the recommendation.",
+    "recommendation": "Re-ground the constructed turn on what the recommendation actually says (e.g. challenge the reversibility claim behind Step 6's 'only reopen the ownership question once you have measured numbers'), or keep the turn and add the premise-mismatch as a third legal outcome -- 'defend by correcting the premise' is a real, common, and currently-missing branch of the challenge verb."
+  },
+  {
+    "id": "R6",
+    "severity": "medium",
+    "category": "loss-of-soul",
+    "summary": "The constructed Decision Request is the one place the docs must demonstrate 'state your current default up front', and it prints the literal placeholder '[named default]' twice instead of stating one; its two questions are stock-generic with zero repository grounding.",
+    "location": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md:46-60",
+    "evidence": "Line 59-60: 'If we don't hear back, we'll proceed with [named default] for #1 and [named default] for #2, both reversible before Phase 7.' The two questions are 'Does this system need to keep data inside one legal jurisdiction?' and 'Is there already a contractual SLA number for this service?' -- neither is attached to any case, any scout finding, or any repository. SKILL.md:449-452 names exactly this shape as the constraint-advocate anti-pattern ('generic risk recitation ... for every candidate regardless of relevance'), and SKILL.md:562-577's third test ('material NOW ... would genuinely differ depending on the answer, today') cannot be evaluated against a question with no case behind it. Read adversarially, this section demonstrates the FORM of a good Decision Request (batched, one message, why-it-can't-wait) without demonstrating its SUBSTANCE.",
+    "recommendation": "Anchor the constructed case in a one-paragraph concrete scenario and fill in two real, named defaults, so the example proves the discipline instead of describing it. Note this is the only clear ceremony/filler section I found -- the other seven files read as genuine advisory work (see reviewer-report.md's loss-of-soul verdicts)."
+  },
+  {
+    "id": "R7",
+    "severity": "low",
+    "category": "hard-correctness",
+    "summary": "None of the 8 examples' embedded request JSON is covered by the repository's own `coordination-example-requests-valid` doctor check, because that check only reads `*.json` files and this protocol ships no `.json` fixture -- unlike every sibling protocol in the same directory.",
+    "location": "docs/how-to/coordination-examples/ (13 sibling `*-request.json` fixtures, zero for architecture-advisory-panel-v1); src/setup/checks.mjs `coordination-example-requests-valid`; test/setup/coordination-doctor-check.test.mjs:42",
+    "evidence": "The directory listing shows `declared-consult-request.json`, `group-thinking-rfc-review-lite-request.json`, `research-protocol-request.json` etc. for every other protocol, and only `.md` files for this one. test/setup/coordination-doctor-check.test.mjs copies `docs/how-to/coordination-examples/*` and runs `validateCoordinationRequest` over the `.json` files; the AAP families are invisible to it. Consequence: R1 above (an `actors[]`-less, grant-less reopen) is exactly the class of defect that check exists to catch, and it could not.",
+    "recommendation": "Ship at least one `architecture-advisory-panel-v1-request.json` (and ideally a `-reopen-request.json`) so the doctor check validates this protocol's published shapes too. This also gives R1's corrected grant shape a mechanically-verified home."
+  },
+  {
+    "id": "R8",
+    "severity": "low",
+    "category": "hard-correctness",
+    "summary": "A block quote presented as the person's verbatim words silently corrects a typo present in the immutable source record.",
+    "location": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md:20 vs. docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/human/2-person.md",
+    "evidence": "Example: 'tuy nhiên desktop là 1 mode hoạt động như một standalone viewer'. Source (whose own header reads 'The person's words, verbatim, nothing else'): 'tuy nhiên deskop là 1 mode hoạt động như một standalone viewer'. The elisions marked '[...]' are properly disclosed; this single-character change is not. Low impact in isolation, but human-turn records are the one artifact class this protocol treats as append-only and hash-verified (SKILL.md:646-651), so silently normalizing them sets the wrong precedent.",
+    "recommendation": "Reproduce the source bytes exactly, or mark it '[sic]'."
+  },
+  {
+    "id": "R9",
+    "severity": "low",
+    "category": "hard-correctness",
+    "summary": "The how-to's Decision Dialogue table implies a single shared budget of two reopens; the protocol grants two per binding (up to four invocations).",
+    "location": "docs/how-to/use-fgos-architecture-panel.md:88 (table header 'Costs one of your two reopens?')",
+    "evidence": "core/coordination-protocols/architecture-advisory-panel-v1.yaml:514-523 declares `activation.maxInvocations: 2` separately on `revise-synthesis` AND on `revise-explanation`. The guide's own prose two paragraphs later (line 97-99) states this correctly ('are each hard-capped at 2 invocations'), so the table header contradicts its own body.",
+    "recommendation": "Change the header to 'Costs a reopen invocation?' and let the prose carry the per-binding cap."
+  },
+  {
+    "id": "R10",
+    "severity": "low",
+    "category": "hard-correctness",
+    "summary": "The how-to's live entry/resume proof cites a specific throwaway session (`aap_entry_proof_1`) and specific `show --json` readings, but no artifact for it is committed under proofs/P04.2/ -- only doer-report.md exists. The claim is correct (I reproduced it independently), but it is not independently checkable from the repository.",
+    "location": "docs/how-to/use-fgos-architecture-panel.md:144-168; docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/ (contains only doer-report.md)",
+    "evidence": "I re-derived the claim myself rather than trusting it -- see reviewer-report.md 'Independent reproduction of the Step-1 investigation claim'. The one specific sub-claim I could not reproduce in my own run (lead-advisor-actor showing in `quorum.missing` after `interpret-request` reports done) is nonetheless corroborated by a real passing assertion in test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs:313-319, so I am not disputing it.",
+    "recommendation": "Commit the throwaway session's two request files and the `show --json` capture under proofs/P04.2/, or cite the conformance test assertion (which is durable) instead of an uncommitted session id."
+  }
+]
