@@ -1,24 +1,26 @@
-# Current Cell: none open — ready for P03.2
+# Current Cell: none open — ready for Phase 04
 
 Status: parked, unblocked
 Last updated: 2026-09-06
-Next action: proceed to P03.2 (protocol and artifact envelope) whenever
+Next action: proceed to P04.1 (production skill authoring) whenever
 ready — no person input required to start it.
 
 ## Why parked
 
-P03.1 (human-turn trusted-input/decision-provenance door) is closed —
-see `docs/architect/agent-coordination/verification/architecture-advisory-panel/P03.1.md`
-for the full trace: a real kernel slice, independently reviewed and
-red-teamed across 2 fix rounds, all findings resolved, both rounds
-independently re-verified by the Coordinator (not taken on the
-sub-agents' word).
+P03.2 (protocol and artifact envelope) is closed — see
+`docs/architect/agent-coordination/verification/architecture-advisory-panel/P03.2.md`.
+Phase 03 is now fully done (P03.1 + P03.2). Phase 04 builds on Phase 01's
+proven operating intelligence:
 
-Phase 03's remaining cell, P03.2, builds the actual protocol/artifact
-envelope on top of P03.1's slice:
-`core/coordination-protocols/architecture-advisory-panel-v1.yaml`, the
-artifact envelope/templates, the `core/protocol-packs/group-thinking.json`
-pack entry, and `test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs`.
+- **P04.1** — author `core/skills/fgos-architecture-panel/SKILL.md`, run
+  the repository's assembly mechanism (`npm run build:skills`) to
+  produce the `.agents`/`.claude`/plugin projections. Never edit
+  generated projections independently.
+- **P04.2** — surface, examples, and Decision Dialogue: first prove
+  whether `fgos-group-thinking` plus `fgos coordination run/show`
+  already provides the required entry/resume path before adding
+  anything new; `docs/how-to/use-fgos-architecture-panel.md`.
+
 Nothing here requires a person decision to start.
 
 ## Also resolved, independent of the track
@@ -31,4 +33,4 @@ https://github.com/vantt/vnstock-analysis/pull/1.
 
 ## What can continue independently while parked
 
-P03.2 is fully unblocked and can start without further person input.
+P04.1 is fully unblocked and can start without further person input.

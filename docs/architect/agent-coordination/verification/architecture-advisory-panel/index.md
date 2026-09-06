@@ -21,8 +21,8 @@ The person's initial request asked to start at Phase 01. Phase 01 (P01.1) declar
 | 00 | Live-proven read-only executor/mechanism allowlist | done (P00.1 proven) |
 | 01 | Advisory soul and manual proof | done (P01.1 + P01.2 + P01.3 all closed) |
 | 02 | Capability-fit audit | done (P02.1 closed — see P02.1.md) |
-| 03 | Minimal hard shell and protocol | P03.1 done (see P03.1.md); P03.2 (protocol envelope) not yet started |
-| 04 | Production skill and Decision Dialogue | blocked on 03 |
+| 03 | Minimal hard shell and protocol | done (P03.1 + P03.2 both closed) |
+| 04 | Production skill and Decision Dialogue | unblocked, not yet started |
 | 05 | Comparative proof and promotion | blocked on 04 |
 
 ## Baseline
@@ -80,6 +80,7 @@ self-reported numbers.
 | P01.3 | manual dispatch, no coordination session (see P01.3.md) | done | Real unclear-input proof on vnflow (EOD/intraday pipeline evolution): full 8-phase panel run + 1 real Decision Dialogue turn; person sought and accepted an independent (kongming) verdict; a factual correction to the panel's own evidence was independently verified by the coordinator; final recommendation attributed, not merged into the panel's own voice |
 | P02.1 | audit only, no coordination session opened (see P02.1.md) | done | Capability-fit/hard-soft placement audit; 4 tables produced; re-diagnosed a Phase 01 finding (revise/recheck reachability) as a symptom of the `partialPolicy` premature-close bug via a live passing test, not an independent defect; N+1 reauthorization probe answered live (`activation.maxInvocations`, not `aggregateBounds.maxRounds`); 4-item closed Phase 03 blocker list produced; full focused suite 680/680 pass |
 | P03.1 | manual dispatch (Doer/Reviewer/Red-Team, no coordination session; see P03.1.md) | done | Human-turn trusted-input/decision-provenance door: 1 additive event kind + ref namespace + request-step type. Design consulted with kongming first (rejected prevention as unachievable in-process; built detect/attribute instead). 1 HIGH + 3 MEDIUM + 2 LOW findings in round 1, all fixed; 1 new MEDIUM (symlink bypass) found on recheck, fixed in round 2. Both rounds independently re-verified by the Coordinator (re-ran tests, read the actual code fixes). Focused suite 680→744, zero new failures. Filed 2 unrelated kernel bugs found by P02.1 as separate work items (tsk-5qj, tsk-1o4) rather than fixing them in this cell's scope. |
+| P03.2 | manual dispatch (Doer/Reviewer, no coordination session; see P03.2.md) | done | Registered `architecture-advisory-panel-v1` protocol + pack entry + 13-case conformance suite. Real bug found+fixed during construction (quorum would auto-close before a human turn could arrive; fixed with driver-only `close-dialogue` gate). 0 HIGH + 3 MEDIUM findings, all fixed and independently rechecked (Reviewer reproduced the Doer's own falsification proofs, not just read the diff). Focused suite 728→757, zero regressions on pre-existing RFC/NGT/Delphi/master-loop conformance tests. Filed 2 request-schema gaps found while building the suite as separate work items (tsk-44p, tsk-3xk). |
 
 ## Admitted Read-Only Advisory Executor Allowlist
 
@@ -99,9 +100,9 @@ Excluded Unsafe / Non-Runnable Pairs:
 
 ## Stop Gate — none currently blocking
 
-Phase 02 is done. Phase 03's P03.1 (the one `new-hard-capability` row
-P02.1 found) is done — see P03.1.md. P03.2 (protocol and artifact
-envelope, building on P03.1's slice) is next per the plan and is
+Phase 03 is done (P03.1 + P03.2 both closed). Phase 04 (production skill
+and Decision Dialogue — `core/skills/fgos-architecture-panel/SKILL.md`,
+`docs/how-to/use-fgos-architecture-panel.md`) is next per the plan and is
 unblocked; not yet started.
 
 The separate, track-independent question about authorizing real
