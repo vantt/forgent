@@ -547,6 +547,10 @@ Setup: worktree `--detach` dùng một lần dưới `/var/tmp`, trust pre-seed,
 mechanism: herdr-spawn
 lifecycleOwner: dispatch
 visibilityTransport: herdr
+# Đo 2026-09-06: posture KHAI ở đây, không thừa hưởng từ shell alias. `bypass` chỉ
+# hợp lệ khi đủ ba cờ confinement; thiếu thì config load từ chối có tên lỗi.
+permissionMode: ask | bypass
+confinement: { privateHome: true, isolatedSession: true, ownWorktree: true }
 capabilities:
   interactive: true
   observe: true            # pane + agent read, observer read-only, N observers

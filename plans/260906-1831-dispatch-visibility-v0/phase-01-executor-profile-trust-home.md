@@ -10,6 +10,27 @@ Lease: `executor-profile` | Vào được sau: Phase 00 | Ra khỏi: Phase 02 d�
 
 ## Requirements
 
+R0. **Permission posture khai trong profile, không bao giờ thừa hưởng từ shell** — đo và
+chứng minh 2026-09-06, xem
+[permission-posture-findings](../../docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md).
+herdr **không** tự thêm `--dangerously-skip-permissions`; cờ đó trên máy này đến từ
+`~/.zshrc:148` (`alias claude=...`), và dialog chấp thuận một lần của nó bị chặn bởi
+`~/.claude/settings.json`'s `skipDangerousModePermissionPrompt`. Hai dòng fgOS không nhìn
+thấy, trong hai file fgOS không sở hữu. Adapter phải truyền posture tường minh qua
+`agent start -- <args>`.
+
+R0b. **Bypass chỉ hợp lệ khi có confinement.** Trong profile:
+
+```yaml
+permissionMode: ask | bypass
+confinement: { privateHome: true, isolatedSession: true, ownWorktree: true }
+```
+
+`permissionMode: bypass` đòi đủ ba cờ confinement; thiếu thì **config load từ chối, có tên
+lỗi rõ ràng** — một invariant kiểm được, không phải một dòng bình luận. Khai `bypass` cũng
+kéo theo nghĩa vụ: provisioner phải ghi `skipDangerousModePermissionPrompt: true` vào
+`settings.json` của HOME riêng, thiếu thì agent dừng ở dialog chấp thuận.
+
 R1. Mechanism khai capability tường minh trong config, không suy diễn trong adapter:
 
 ```yaml
