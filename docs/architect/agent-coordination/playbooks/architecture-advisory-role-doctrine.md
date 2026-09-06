@@ -1585,13 +1585,15 @@ assignment, distinct prompt package); synthesizer →
 `claude-bwrap`/critical/`opus`; red-team → `agy-bwrap`/critical/
 `gemini-3.1-pro-high`, deliberately off the synthesizer's family.
 
-**Carry-forward runnability limitation.** Both `bwrap` pairs are proven safe at
-the OS-mount boundary, but under a bare `--ro-bind / /` the agent CLI may be
-unable to initialize its own private state and therefore unable to do real
-advisory work. Before routing a substantive role through either, add a narrow
-writable bind for the agent's own state directory — never for the target project
-checkout — and confirm the agent can actually function. Proving that a tool
-cannot mutate is not the same as proving it can think.
+**Bwrap runnability — proven fixed, not an open limitation.** Both `bwrap`
+pairs are proven safe at the OS-mount boundary, and a bare `--ro-bind / /`
+alone does break the agent CLI's own init (no writable scratch for its
+private state) — but the fix is proven and has been used live 13 times
+across P01.2 and P01.3 without a runnability failure: place `--tmpfs /tmp`
+before re-pinning `--ro-bind PROJECT_ROOT PROJECT_ROOT`/`--bind EVIDENCE_DIR
+EVIDENCE_DIR`, since bwrap mounts apply in argument order and a later bind
+shadows an earlier tmpfs (P02.1 B7). Use that mount order every time a
+substantive role is routed through either pair.
 
 **Diversity is a hedge, not a decoration.** At the end of the session, state what
 the diversity actually bought: which advisor saw something its counterpart did

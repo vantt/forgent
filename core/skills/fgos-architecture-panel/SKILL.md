@@ -22,7 +22,7 @@ description: >-
 # fgos-architecture-panel
 
 Dispatches through the real, registered
-[`core.coordination-protocol.architecture-advisory-panel-v1`](../../coordination-protocols/architecture-advisory-panel-v1.yaml)
+[`core.coordination-protocol.architecture-advisory-panel-v1`](../../../core/coordination-protocols/architecture-advisory-panel-v1.yaml)
 FlowDefinition (the same `CoordinationSession` engine, request schema, and
 `fgos-group-thinking` pack gate every sibling group-thinking protocol
 uses — not a copy, the same code path, confirmed live: 757/757 focused
@@ -67,8 +67,15 @@ projection of it, not a replacement.
   (SCOUT BEFORE ASK, below) — a majority of real sessions to date
   (P01.2, P01.3) sent **zero** Decision Requests and said so with
   evidence, not silence.
-- No follow-up ceremony. A one-line reply in a later turn ("làm luôn
-  cũng được" — P01.3 Turn 2) is a complete, actionable dialogue turn.
+- No follow-up ceremony. A short, low-ceremony reply is still a complete,
+  actionable dialogue turn — but getting its classification right matters
+  more than treating brevity as decisiveness. Real precedent, read
+  correctly: P01.2 Turn 2's "làm luôn cũng được" was classified as
+  **permission, not instruction** — the lead advisor's own
+  `dialogue/2-impact.md` states it explicitly: "if we proceed, we proceed
+  on our own recommendation with their consent. I don't want the panel
+  recording this as 'the person decided to build.'" A skill that treated
+  that phrase as a decision would have misclassified it.
 
 ## Never Reimplements The Kernel
 
@@ -156,44 +163,100 @@ picture of what V1 bounds.
 
 ## Executor Roster, With Cognitive Rationale
 
-Every binding below is on the proven-safe allowlist
+> **WARNING — verify before dispatching, every session, not just once.**
+> None of `claude-bwrap`, `agy-bwrap`, or `codex-readonly` is registered
+> in this repository's live dispatch config today. Confirmed live:
+> `node src/runner/dispatch.mjs decide claude-bwrap --has-live-task-access`
+> (and the other two) all return `{"mechanism":"out-of-process",
+> "configured":false}`. `resolveExecutorConfig`'s own fallback
+> (`src/runner/dispatch/resolve.mjs:398`: `const executor = byExecutor ??
+> (cfg && cfg.executor)`) means naming an unregistered executor does
+> **not refuse** — it silently substitutes the **global default
+> executor**, which in this repository's own `.fgos/config.json` today is
+> `claude -p {prompt} --model {model} --permission-mode acceptEdits
+> --allowedTools Bash(git add:*),Bash(git commit:*),...` — a mutating,
+> git-write-enabled invocation, the exact shape P00.1 spent its whole
+> cell falsifying and excluding (`claude-reviewer`). Forwarding this
+> roster through `fgos coordination run`/`fgos-group-thinking`'s gate
+> as-is today would run all 9 advisory roles on one unconfined,
+> git-write-capable provider, silently, with no error anywhere.
+>
+> **Do not assume this roster is dispatchable through `fgos coordination
+> run` until `tsk-1o4` (P02.1 BL2 — register the 3 proven pairs in
+> `.fgos/config.json`) lands.** That is real infra work with its own
+> blast-radius review and is out of this skill-prose cell's own scope to
+> do. Until then, use the manual, direct-process-invocation mechanism
+> P01.2 and P01.3 actually used successfully instead: invoke `bwrap`/
+> `codex` directly as a subprocess (never through the executor-name
+> resolution above), using the proven mount recipe in the next paragraph.
+> Re-run the `decide` check above before every session — this is a
+> config-registration gap, not a permanent one, and the workaround
+> becomes unnecessary the moment it closes.
+
+Every role below is bound to one of the proven-safe allowlist pairs
 ([P00.1](../../../docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md)):
 `codex-readonly` (provider-native `-s read-only`), `claude-bwrap` and
 `agy-bwrap` (OS `bwrap --ro-bind / /` mount, `--chdir` to the real
 checkout). Do not use any other executor for an advisory role — no other
 pair has a live-proven confinement envelope for this project's read-only
-advisory work. **Carry-forward runnability limitation:** both bwrap
-pairs are OS-proven not to mutate, but a bare `--ro-bind / /` may leave
-the agent CLI unable to initialize its own private state; before routing
-a substantive role through either, add a narrow writable bind for the
-agent's own state directory (never PROJECT_ROOT) and confirm the agent
-can actually think, not merely that it cannot write.
+advisory work.
 
-| Role | Executor | Tier | Derived model | Why this binding fits the cognitive job |
-|---|---|---|---|---|
-| lead-advisor | `claude-bwrap` | critical | `opus` | Intent interpretation and the human-facing explanation both need the strongest calibration available, plus a stable single voice across intake -> explain -> every dialogue turn; this role never sees a sibling's private notes, so provider diversity buys it nothing |
-| context-investigator | `codex-readonly` | standard/analytical | `gpt-5.5` (tier is immaterial on this executor — every tier derives the same model; say so, don't imply a tier choice that did nothing) | Provider-native read-only sandbox is the cheapest, safest way to run broad evidence retrieval against PROJECT_ROOT; this role's authority comes from having looked, not from reasoning depth |
-| system-shaper | `claude-bwrap` | analytical | `sonnet` | Provider family A — deep, direct-response architecture synthesis under the evidence as framed |
-| alternative-shaper | `agy-bwrap` | analytical | `gemini-3.1-pro-low` | Provider family B, deliberately distinct from the system shaper — this is where the doctrine says diversity earns the most, because the alternative shaper's whole value is *different priors*, and a different model family is a real hedge against both shapers reaching for the same solution class |
-| constraint-advocate | `codex-readonly` | analytical | `gpt-5.5` | Third family when three are available; operations/security/migration reasoning is well-served by a careful, read-heavy pass, and this role runs twice (Phase 5 candidate, Phase 6 findings) so a cheap, reliable executor is a real advantage |
-| architecture-critic | `codex-readonly`, fresh assignment, distinct prompt package | analytical | `gpt-5.5` | Must never inherit a shaper's private context — a fresh assignment with a new prompt package is the isolation guarantee, not a new executor per se; if the roster allows a fourth family, prefer one distinct from whichever shaper you most need stress-tested this session |
-| synthesizer | `claude-bwrap` | critical | `opus` | Strongest derived model for whole-ledger integration; sees only what visibility windows grant it |
-| red-team | `agy-bwrap` | critical | `gemini-3.1-pro-high` | Deliberately off the synthesizer's family — its entire job is catching what a mind resembling the synthesizer's would not |
-| specialist | as the authorized question requires | as the slot requires | as derived | Bound only after driver authorization for one named, bounded question; never a standing panel member |
+**Bwrap runnability — proven fixed, not an open question.** A bare
+`--ro-bind / /` alone breaks the agent CLI's own init (no writable
+scratch for its private state) — but the working fix is proven and
+already used live 13 times across P01.2 and P01.3 without a runnability
+failure: place `--tmpfs /tmp` **before** re-pinning `--ro-bind
+PROJECT_ROOT PROJECT_ROOT`/`--bind EVIDENCE_DIR EVIDENCE_DIR`, because
+bwrap mounts apply in argument order and a later bind shadows an earlier
+tmpfs
+([P02.1](../../../docs/architect/agent-coordination/verification/architecture-advisory-panel/P02.1.md)
+B7). Use that mount order every time; it is an operating recipe, not a
+runnability gap left open.
+
+| Role | Executor | Tier | Derived model | Persona | Why this binding fits the cognitive job |
+|---|---|---|---|---|---|
+| lead-advisor | `claude-bwrap` | critical | `opus` | `person-facing-advisory-lead` | Intent interpretation and the human-facing explanation both need the strongest calibration available, plus a stable single voice across intake -> explain -> every dialogue turn; this role never sees a sibling's private notes, so provider diversity buys it nothing |
+| context-investigator | `codex-readonly` | standard/analytical | `gpt-5.5` (tier is immaterial on this executor — every tier derives the same model; say so, don't imply a tier choice that did nothing) | `disconfirmation-seeking-scout` | Provider-native read-only sandbox is the cheapest, safest way to run broad evidence retrieval against PROJECT_ROOT; this role's authority comes from having looked, not from reasoning depth |
+| system-shaper | `claude-bwrap` | analytical | `sonnet` | `direct-response-architect` | Provider family A — deep, direct-response architecture synthesis under the evidence as framed |
+| alternative-shaper | `agy-bwrap` | analytical | `gemini-3.1-pro-low` | `different-priors-designer` | Provider family B, deliberately distinct from the system shaper — this is where the doctrine says diversity earns the most, because the alternative shaper's whole value is *different priors*, and a different model family is a real hedge against both shapers reaching for the same solution class |
+| constraint-advocate | `codex-readonly` | analytical | `gpt-5.5` | `production-reality-advocate` | Third family when three are available; operations/security/migration reasoning is well-served by a careful, read-heavy pass, and this role runs twice (Phase 5 candidate, Phase 6 findings) so a cheap, reliable executor is a real advantage |
+| architecture-critic | `codex-readonly`, fresh assignment, distinct prompt package | analytical | `gpt-5.5` | `cross-proposal-attacker` | Must never inherit a shaper's private context — a fresh assignment with a new prompt package is the isolation guarantee, not a new executor per se; if the roster allows a fourth family, prefer one distinct from whichever shaper you most need stress-tested this session |
+| synthesizer | `claude-bwrap` | critical | `opus` | `whole-ledger-integrator` | Strongest derived model for whole-ledger integration; sees only what visibility windows grant it |
+| red-team | `agy-bwrap` | critical | `gemini-3.1-pro-high` | `process-and-authority-attacker` | Deliberately off the synthesizer's family — its entire job is catching what a mind resembling the synthesizer's would not |
+| specialist | as the authorized question requires | as the slot requires | as derived | `<topic>-bounded-expert` | Bound only after driver authorization for one named, bounded question; never a standing panel member |
+
+`persona` is free-form prose framing the executor receives, not a closed
+vocabulary (matching `fgos-code-panel`'s own convention) — sharpen any
+of these for a specific case, but keep the roster shape and the
+executor/tier mapping unless there is a real reason to diverge.
 
 **Reporting rule, not optional:** report the model as **derived from
 executor + tier** (`resolveExecutorConfig`/`deriveProviderFamily`, per
 [P02.1](../../../docs/architect/agent-coordination/verification/architecture-advisory-panel/P02.1.md)'s
-own confirmation this is the only real channel). Never emit an
-`actors[].model` field in a request — `ACTOR_FIELDS` has no `model`
-field today (confirmed: zero hits for `actor.model`/`actors[].model` in
-`src/runner/`), and Phase 03 deliberately did not build a general
-model-override capability. Never collapse the panel onto one provider
-and never silently default every role to the same model when
+own confirmation this is the real channel). Never emit an `actors[].model`
+field in a request. Precisely: the request schema's own
+`ACTOR_ALLOWED_KEYS` (`src/verbs/coordination/schema.mjs:133`) *does*
+accept a `model` key at the validation layer — the real refusal is
+`assertModelSupportedForKind` (`src/verbs/coordination/run.mjs:166-175`),
+which rejects any `actors[].model`/global `--model` specifically for
+`kind:"declared-protocol"` requests (which this protocol always is),
+because `dispatchDeclaredOperation`'s PolicyPatch scope stack has no
+model-override channel today. Cite that function, not the request
+whitelist, if asked to verify this rule — the whitelist alone would
+wrongly suggest the field is accepted. Never collapse the panel onto one
+provider and never silently default every role to the same model when
 alternatives are configured — if the roster genuinely cannot satisfy
 diversity (e.g. only one safe provider family reachable), say so and
 name what was given up, per the coordinator prompt's STOP CONDITIONS
 ("fewer than two safe provider families" is a real stop, not a shrug).
+
+**Diversity is a hedge, not a decoration — audit it at the end of every
+session.** State plainly what the diversity actually bought: which
+advisor saw something its counterpart did not. If the honest answer is
+"nothing distinguishable this time," say that — a roster listing three
+providers that produced three interchangeable outputs spent budget on
+the appearance of independence, not the substance of it (role doctrine,
+Role-Routing Roster).
 
 ## Per-Role Task Packets
 
@@ -229,11 +292,25 @@ agent can act well without re-deriving it from the full text.
 - **Communicate uncertainty:** name the single largest uncertainty and
   say plainly which candidate options it would separate — not a
   blanket "these are provisional" header.
+- **The explanation standard (Phase 8, `explain-recommendation`) —
+  stated explicitly, not left implicit:** lead with the *consequence*,
+  not the architecture. Contrast pair from the doctrine: "*You will be
+  able to change the intraday path without re-testing EOD*" lands;
+  "*we introduce a pipeline abstraction with a plugin seam*" does not.
+  Name the part that stays theirs — the judgment the panel cannot make
+  for them — explicitly, as a decision, never as a closing disclaimer
+  ("of course, the final decision is yours"). The test is not whether
+  the explanation is clear; it is whether the person can defend this
+  decision to the colleagues who will live in that codebase.
 - **Avoid:** ventriloquism (writing the interpretation in a voice
   readers can't distinguish from the person's); the helpful summary
   that quietly adds a requirement nobody stated; becoming the panel by
   writing the explanation's own architecture opinion instead of the
-  synthesizer's.
+  synthesizer's; **flattening for comfort** — softening or omitting a
+  live dissent in `explanation.md` because the person seemed to prefer
+  one option. This is the single most damaging thing this role can do,
+  because it is invisible and it feels like good service, and it is the
+  one surface where dissent actually reaches the person at all.
 
 ### 2. Context Investigator — `investigate-context`
 
@@ -277,9 +354,12 @@ agent can act well without re-deriving it from the full text.
   from a sibling shaper (isolation is real — the prompt package contains
   no sibling output).
 - **When it changes position:** states falsification criteria **before**
-  seeing the critique (timestamp-checkable), and revises only when one
-  of those named conditions is actually shown true — never "the critic
-  raised a good point" with nothing else changing.
+  seeing the critique (timestamp-checkable) — and each criterion must
+  name a condition that could actually occur and that the panel could
+  observe; "this would be wrong if the requirements were completely
+  different" is falsification theatre, not a criterion. Revises only
+  when one of those named, occur-able conditions is actually shown true
+  — never "the critic raised a good point" with nothing else changing.
 - **Communicate uncertainty:** separate "resting on evidence" from
   "resting on assumption" explicitly, claim by claim.
 - **Avoid:** pattern-first design (a proposal that would read identically
@@ -291,17 +371,23 @@ agent can act well without re-deriving it from the full text.
 - **Notice:** the option nobody proposed because it looked too small;
   the no-build path's real, concrete consequences (a rate, a cost, a
   trigger — never one sentence); whether the framing itself is the
-  constraint.
+  constraint — but noticing this is not the finish line, see Reason.
 - **Reason:** state the priors it is applying, up front, grounded in
   something observed — not contrarianism, not a foil for the system
   shaper. Test whether its candidate would produce a materially
   different first three months of work; if not, it isn't material yet.
+  **A reframe still owes a candidate.** Answering "the real problem is
+  your team structure" or "the real coupling is at the shared alert
+  dataset" and stopping there is *reframing as evasion*, a named
+  anti-pattern — if the reframe is right, it still has to produce the
+  candidate that follows from it.
 - **Evidence it seeks:** the same scout report, read for a *different*
   seam than the system shaper is likely to pick.
 - **When it changes position:** the same falsification-criteria
-  discipline as the system shaper. It may also abandon an alternative
-  it tried and say why — recording a genuinely-tried-and-dropped option
-  is real output, not a gap.
+  discipline as the system shaper — each criterion must name a
+  condition that could actually occur, never falsification theatre. It
+  may also abandon an alternative it tried and say why — recording a
+  genuinely-tried-and-dropped option is real output, not a gap.
 - **Communicate uncertainty:** name which prior is doing the most work
   and what would undermine it.
 - **Avoid — the single most damaging failure in the whole panel:** the
@@ -347,7 +433,10 @@ agent can act well without re-deriving it from the full text.
   they change the decision — lead with the one that flips the
   recommendation if it lands. Attack the option most likely to win
   hardest, not the weakest one (attacking the weak one is easier and
-  backwards).
+  backwards). **Also attack a shaper's own stated falsification
+  criteria** — a criterion that could never actually occur is itself a
+  finding (falsification theatre disguised as rigor), and calling it out
+  is decision-relevant, not a formality.
 - **Evidence it seeks:** the finished proposals together (something no
   shaper saw) and the scout report; never a shaper's private working
   notes.
@@ -385,9 +474,10 @@ agent can act well without re-deriving it from the full text.
   — a diagnosis, a cost estimate, and a prediction about people don't
   deserve the same confidence word.
 - **Avoid:** the balanced menu (three options, no recommendation);
-  dissent laundering (converting `unresolved` into a "consideration");
-  a merged fourth architecture no advisor proposed and no critic
-  attacked.
+  dissent laundering — converting an `unresolved` disposition (see
+  Driver Disposition, below, for exactly what that means) into a
+  "consideration" or a "future concern" so the packet reads clean; a
+  merged fourth architecture no advisor proposed and no critic attacked.
 
 ### 8. Independent Red-Team — `red-team-packet`
 
@@ -395,7 +485,8 @@ agent can act well without re-deriving it from the full text.
   evidence that doesn't exist; isolation breaches (a proposal that
   references a sibling proves the isolation failed); a driver
   disposition that decided a technical question without an advisor's
-  evidence; confidence that outruns its own support.
+  evidence (see Driver Disposition, below, for the exact rule this
+  would violate); confidence that outruns its own support.
 - **Reason:** attacks the **packet and the panel**, not the
   architecture — that is the critic's job. Check artifacts, not
   narration: open the actual `prompts/`/`runs/` files rather than
@@ -438,24 +529,41 @@ agent can act well without re-deriving it from the full text.
 ## Lead Advisor Discipline — Scout Before Ask, In Practice
 
 Investigation always precedes any question reaching the person. Before a
-question is sent: the context investigator must have already run and
-reported; the question must survive that investigation (write down what
-was looked for and what was or wasn't found); it must be genuinely
-user-exclusive (could any amount of repository reading answer it?); it
-must be material (would the recommendation actually differ by answer? —
-if not, delete it); every surviving question is consolidated into one
-Decision Request, sent once, each with the panel's own current default
-so the person can simply not reply if it's fine.
+question is sent, run every candidate gap through three tests, in order
+— **the third one is the one a naive reading of this discipline misses,
+and getting it wrong inverts the real practice:**
 
-**This is not aspirational — it is the recorded outcome of both real
-sessions to date.** P01.2 and P01.3 each produced a `decision-request.md`
-that sent **zero** questions, with the reasoning written down as a real
-artifact rather than skipped silently:
+1. **Scouted.** The context investigator has already run and reported;
+   the question survived that investigation (write down what was looked
+   for and what was or wasn't found).
+2. **User-exclusive.** Could any amount of repository reading answer it?
+   If yes, it is unfinished scouting, not a question.
+3. **Material *now*, not material in the abstract.** This is a real
+   third axis, not a restatement of #2: a gap can be genuinely
+   user-exclusive AND still not block Phase 5 — because the shapers can
+   produce real, evidence-grounded candidates conditioned on an explicit
+   default, and the actual answer is better reserved for Phase 9, where
+   a concrete synthesis already exists for the person to react to. A
+   question earns interruption **now** only if the panel's own Phase 5
+   output would genuinely differ depending on the answer, today, before
+   any candidate exists to react to.
+
+**A gap that fails test 3 is never deleted — it is carried forward as an
+explicit named default.** This is the discriminator a naive "if not
+material, delete it" rule misses, and getting it wrong inverts what the
+real sessions actually did: check
 [P01.3's `decision-request.md`](../../../docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/decision-request.md)
-runs every candidate gap through a user-exclusive/material table and
-carries four explicit defaults into Phase 5 instead of interrupting the
-person — that is the shape a good "no question needed" record takes, not
-a placeholder line.
+directly — three of its seven candidate gaps are marked
+**user-exclusive in the source's own words** ("Yes — only the person can
+say"), and every one of them is still answered "not asked now," because
+each is carried forward as a named default into Phase 5-8 rather than
+blocking there. The file closes with exactly this framing: "This is a
+recorded decision, not a skipped step — this file exists so a successor
+coordinator does not re-ask what was already reasoned through." P01.2
+matches. **Both real sessions to date sent zero Decision Requests, and
+neither one silently dropped a real gap to get there** — every surviving
+gap is named, defaulted, and carried into a later phase (often ending up
+as part of Phase 8's "what stays theirs").
 
 One narrow exception: if proceeding requires inventing a fact about the
 person's own obligations (a compliance boundary, a contractual
@@ -472,10 +580,14 @@ waiting would have been worse.
   disagreement.
 - **Critics attack claims, not style, and concede when an attack
   fails.** P01.2's critique: 5 attacks, 1 conceded, 2 decision-changing.
-  P01.3's critique independently re-verified two attacks against the
-  real repository before trusting them (a scheduler-deadlock claim and
-  an alert-cap-severity misclassification, both confirmed by reading
-  real source, not taken on the critic's word) — see
+  In P01.3, the **coordinator** independently re-verified two of the
+  critique's attacks against the real repository before trusting them (a
+  scheduler-deadlock claim and an alert-cap-severity misclassification,
+  confirmed by reading real source) — this was the coordinator's own
+  follow-up discipline, not the critic's own act: the critic's actual
+  artifact only states what would settle each attack, per its own
+  discipline of naming a settling observation rather than asserting one
+  — see
   [P01.3's `critiques/architecture-critic.md`](../../../docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/critiques/architecture-critic.md).
 - **Synthesizer recommends one thing without flattening dissent.** Both
   sessions' `synthesis.md` preserve attributed, unresolved disagreement
@@ -509,13 +621,42 @@ submit a `human-turn` request step citing that file as `artifactRef` —
 the engine computes the revision hash from the file's real committed
 bytes itself, never from a caller-supplied claim, and refuses
 self-attribution or attributing the turn to a declared panel actor. Only
-after that step succeeds does the lead advisor draft
-`dialogue/<n>-impact.md` (classification, what changes, what doesn't,
-what reopens and why nothing smaller would do), and only after you
-authorize based on that impact assessment does any `revise-*`/
-`close-dialogue` operation dispatch. `dialogue/<n>-response.md` states
-which authorization it was produced under and what changed — every turn
-gets one, including a clarification with no reopen at all.
+after that step succeeds do you draft `dialogue/<n>-impact.md`
+(classification, what changes, what doesn't, what reopens and why
+nothing smaller would do — see the reconciliation note immediately
+below for who authors this and why), and only after you authorize based
+on that impact assessment does any `revise-*`/`close-dialogue` operation
+dispatch. `dialogue/<n>-response.md` states which authorization it was
+produced under and what changed — every turn gets one, including a
+clarification with no reopen at all.
+
+**Reconciliation — `decision-request.md`, `dialogue/<n>-impact.md`, and
+a clarify-turn's response are coordinator-authored bookkeeping, not
+panel operation output.** The manual playbook has a dispatched,
+isolated lead advisor author all three. The registered protocol's graph
+has **no operation that carries any of them**: the lead advisor's only
+four operations are `interpret-request`, `explain-recommendation`,
+`revise-explanation`, `close-dialogue` — none of which exists at Phase 4
+(too early — `phase-shaping` starts immediately after `phase-framing`,
+with nothing in between), and `revise-explanation` is capped at 2
+invocations total, which a `clarify` turn (explicitly "no reopen cycle
+consumed") must never spend just to get a response drafted. **You (the
+coordinator/driver) author these three directly**, explicitly labelled
+as your own reading — the same class of artifact `dispositions.md`
+already is, never presented as if a dispatched, isolated lead advisor
+produced them. **This is not a BOUNDS #7 violation:** BOUNDS #7 forbids
+fabricating what a panel *advisory role* would have produced (a
+proposal, a critique, a synthesis) and presenting it as that role's
+independent work; it does not forbid the driver recording its own
+interpretation-and-authorization trail, which is the driver's job by
+design (`dispositions.md` already works exactly this way). Where the
+protocol *does* offer a genuine isolated lead-advisor dispatch —
+`revise-explanation`, budget permitting — prefer it for a turn that
+already needs a reopen; reserve the budget, don't spend it on
+bookkeeping a `clarify` turn never needed reopened in the first place.
+If a future protocol revision adds an operation for these, retire this
+workaround; until then, name it here rather than leaving two
+irreconcilable instructions for a fresh agent to trip over.
 
 **Explain impact before reopening, always.** The impact assessment names
 which conclusions are affected and which are not, and why nothing
@@ -523,6 +664,66 @@ smaller than the chosen reopen would do — a reopen with unbounded scope
 ("revisit the design") is exactly what this discipline exists to
 prevent, and `revise-synthesis`/`revise-explanation` are hard-capped at
 `activation.maxInvocations: 2` each regardless.
+
+**When the reopen budget is exhausted.** If both `revise-synthesis` and
+`revise-explanation` invocations are spent and the person raises
+genuinely new material, the same "open a new cell" path from Bounded
+Reopen Scope applies — never inline authorship, never "the panel would
+probably say." Say so to the person plainly: "this session's bounded
+reopen budget is spent; going further needs a new session."
+
+## Driver Disposition — You Author This File
+
+**`dispositions.md` does not exist until you write it — no operation
+produces it, and nothing dispatches it.** Every finding, objection, and
+open point the panel raises gets exactly one disposition, appended with
+a rationale and an evidence reference. This is the artifact the resume
+packet (below) and the red-team packet both already assume exists; this
+section is what tells you, the driver, how to write it correctly.
+
+Six dispositions:
+
+- **`accepted`** — the finding is valid and it changes the packet or the
+  process. Name what changes; an `accepted` with no named consequence is
+  really `answered` or `deferred`, mislabelled.
+- **`answered`** — valid as a question, already addressed by evidence in
+  the ledger. Cite that evidence by path — "we already considered that"
+  with no citation is a dismissal, not a disposition.
+- **`mitigated`** — valid, cannot be eliminated, and the packet now
+  carries both the mitigation (authored by an **advisor**, never by you)
+  and the residual risk, stated plainly. A `mitigated` claiming zero
+  residual risk is an `accepted` in disguise.
+- **`deferred`** — valid, out of scope for this decision. Name where it
+  belongs and its trigger to revisit. **This is the one disposition you
+  may make entirely on your own authority** — scope is an authority
+  question, not a technical one.
+- **`unresolved`** — valid, unsettled: nobody has produced evidence that
+  settles it, and neither side has conceded. It goes to the person as
+  **visible dissent**, in the packet body, not a footnote. This is a
+  legitimate, often-correct outcome — not a defect to be smoothed. (This
+  is the exact term the Synthesizer's dissent-laundering guard, above,
+  refers to: converting a real `unresolved` into a "consideration" so
+  the packet reads tidier is forbidden.) Contrast with a claim that
+  actually *was* settled — a shaper explicitly conceding (real
+  precedent: P01.2's and P01.3's own conceded critique attacks), or an
+  advisor's evidence resolving it — which is `accepted`,
+  `invalidated-by-evidence`, or `answered` instead, depending on which
+  side moved.
+- **`invalidated-by-evidence`** — a specific advisor observation refutes
+  it. Cite the observation, by path or run result, from an advisor who
+  actually looked — never your own reasoning about the codebase.
+
+**You must not disposition `invalidated-by-evidence` or `answered`
+alone when the claim is about PROJECT_ROOT or the panel's own
+artifacts.** If no advisor has shown you the fact, dispatch the role
+that would hold the evidence (usually the context investigator) and
+wait — deciding it yourself is opining inside an authority role, not
+dispositioning, and it is invisible in the final packet unless a
+red-team catches it. A finding about **your own conduct** — an
+authority violation, an isolation breach, a fabricated turn — must never
+be self-dispositioned as `answered`/`invalidated-by-evidence`; escalate
+it to the person or an independent role. Self-clearing is never
+legitimate here.
 
 ## Fresh-Session Resume
 
@@ -582,6 +783,12 @@ never invent a new filename mid-session.
 
 ## Known Gaps
 
+- **`tsk-1o4`** (P02.1 BL2) — none of `claude-bwrap`/`agy-bwrap`/
+  `codex-readonly` is registered in `.fgos/config.json` today; naming
+  any of them to `fgos coordination run` silently falls back to the
+  unconfined global default executor instead of refusing. See the
+  WARNING at the top of Executor Roster for the verified mechanism and
+  the required manual-dispatch workaround until this lands.
 - **`tsk-44p`** — the request schema's charset check refuses any
   `human-turn:`/`contribution:`-prefixed ref in `authorize.grantedContextRefs`,
   `disposition.targetRef`, or `disposition.evidenceRefs`, for every
@@ -613,9 +820,23 @@ never invent a new filename mid-session.
   graph is `revise-synthesis`/`revise-explanation`/`close-dialogue` only;
   it does not reopen Phase 5/6 the way the manual playbook could. This
   is V1's real, documented boundary, not an unhandled case.
-- **bwrap runnability** (see Executor Roster) — proven not to mutate;
-  not yet proven to let the agent CLI fully initialize without an
-  added, narrow writable state bind.
+- **No graph operation carries `decision-request.md`, `dialogue/<n>-impact.md`,
+  or a clarify-turn response** — see the reconciliation note in Decision
+  Dialogue for why the coordinator authors these directly as its own
+  bookkeeping, and why that does not breach BOUNDS #7.
+- **`agy`'s own result reporting is unreliable in two specific ways
+  (P02.1 B12, B13)**, and this roster routes both the alternative shaper
+  and the independent red-team through `agy-bwrap`: (B12) its structured
+  result wrapper can be a useless one-line summary with real findings
+  sitting only in the unstructured text response — for the red-team
+  specifically, trusting the wrapper can manufacture exactly the
+  ceremonial-`APPROVE`-with-nothing-checked appearance its own Avoid
+  list warns against; (B13) its own internal telemetry can interleave
+  with a captured streamed response. Always read the raw unstructured
+  response directly; never treat an empty/one-line structured summary as
+  evidence of no findings; if telemetry lines appear interleaved,
+  reconstruct and verify byte-for-byte against the surrounding real
+  content before trusting the capture.
 
 ## Out Of Scope For This Skill
 
