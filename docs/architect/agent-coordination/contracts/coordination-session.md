@@ -841,7 +841,13 @@ pin the real bytes the transcription rests on -- `revision` is computed by
 the request door (`src/verbs/coordination/run.mjs`) from the file's actual
 content at record time, never accepted as a caller-supplied hash, so a
 hand-typed `sha256:...` still has to match bytes that genuinely existed
-when the turn was recorded. `channel`/`externalRef` are opaque, non-empty
+when the turn was recorded. `artifactRef` is also required to resolve
+INSIDE the working directory the session was opened against (fix round 1,
+Reviewer R-P03.1-05/Red-Team Finding 3: `run.mjs` refuses a resolved path
+outside `ctx.cwd`, closing a `../` traversal or absolute-path escape a
+hand-authored request could otherwise use to pin a hash against a file the
+repo itself never contains, which no later reader holding only the repo
+could ever re-verify). `channel`/`externalRef` are opaque, non-empty
 strings by documented convention (`channel`: `claude-code-chat` |
 `fgos-answer` | `herdr-dashboard` | `relay`; `externalRef`:
 `claude-code-transcript:<sessionId>:<uuid>` | `fgos-answer:<workId>:<eventTs>`),
@@ -851,25 +857,34 @@ session-scoped sequence (exactly one more than the highest ordinal already
 recorded), checked at both write time (`recordHumanTurn`, store.mjs) and
 replay time (`replay.mjs`), independently.
 
-**Refusals (write door and replay, independently).** `attributedTo.id ===
-recordedBy.id` (a driver cannot attribute a turn to itself);
-`attributedTo.id` names a declared `manifest.actors[]` panel actor (a panel
-actor cannot be "the person"); `attributedTo.id` is shaped like a
+**Refusals (write door and replay, independently -- verified true of BOTH
+layers after fix round 1; see the corrected T1/T8 rows below).**
+`attributedTo.id === recordedBy.id` (a driver cannot attribute a turn to
+itself); `attributedTo.id` names a declared `manifest.actors[]` panel actor
+(a panel actor cannot be "the person"); `attributedTo.id` is shaped like a
 driver-authored ref (`asgn_` Assignment prefix, or the reserved
 `contribution:`/`human-turn:` namespaces) (a driver-authored ref cannot
 occupy the human-decision slot); a non-contiguous `turnOrdinal` (no gaps,
 no reuse); a reused `externalRef` (no replaying one real turn as two); a
 `turnId` recorded a second time with different content (immutable once
 written -- a byte-identical repeat is an idempotent no-op, mirroring every
-other driver-authored door in store.mjs). The `human-turn:` ref namespace
-extends `driver-disposition-recorded`'s own existing ref-ownership door
-(`assertDispositionRefOwnedBySession`, store.mjs) exactly the way
-`contribution:` already does: a bare (unprefixed) turn id is refused as a
-near-miss, and a prefixed ref naming a turn this session never recorded is
-a `dangling-ref`. Replay additionally refuses a `driver-disposition-recorded`
-event citing a `human-turn:` ref for a turn not yet walked at that point in
-the log (`out-of-order-ref`) -- a referential-integrity check, not a
-"did this resolve anything" question the way contribution resolution is.
+other driver-authored door in store.mjs). `turnId` itself additionally gets
+a shape guard mirroring `assertContributionIdShape` (no path separator, no
+`..`, no reserved-prefix self-reference) -- fix round 1, closing a gap where
+a path-shaped `turnId` reachable only from a direct store API caller (never
+`fgos coordination run`, whose own request boundary already applies
+`assertSafeId`) could skip the generic cross-session segment scan. The
+`human-turn:` ref namespace extends `driver-disposition-recorded`'s own
+existing ref-ownership door (`assertDispositionRefOwnedBySession`,
+store.mjs) exactly the way `contribution:` already does: a bare
+(unprefixed) turn id is refused as a near-miss, and a prefixed ref naming a
+turn this session never recorded is a `dangling-ref`. Replay additionally
+refuses a `driver-disposition-recorded` event citing a `human-turn:` ref
+for a turn not yet walked at that point in the log (`out-of-order-ref`) --
+a referential-integrity check, not a "did this resolve anything" question
+the way contribution resolution is -- and, since fix round 1, applies the
+IDENTICAL out-of-order-ref/dangling-ref/near-miss checks to a
+`human-turn-recorded` event's own `respondsToRefs[]` entries.
 
 **Threat model -- what this door closes, and what it explicitly does not.**
 The coordinator process (an AI agent, same OS user, with Bash access) has
@@ -882,14 +897,14 @@ false attestation, never an invisible one.
 
 | # | Threat | Disposition | Mechanism |
 |---|---|---|---|
-| T1 | A driver-authored artifact or actor identity occupies the human-decision slot (self-attribution, a panel actor "being" the person, or a driver-authored ref shape standing in for a person) | **Closed** | `recordHumanTurn`'s `attributedTo` refusals (store.mjs), re-checked independently at replay |
+| T1 | A driver-authored artifact or actor identity occupies the human-decision slot (self-attribution, a panel actor "being" the person, or a driver-authored ref shape standing in for a person) | **Closed** | `recordHumanTurn`'s all-FOUR `attributedTo` refusals (store.mjs: self-attribution, panel actor, and the `asgn_`/`contribution:`/`human-turn:` ref-shape check), each re-checked independently at replay (`replay.mjs`) -- fix round 1 closed the ref-shape check's own replay-side gap; before that fix only the first two of the four were re-checked, an inconsistency Reviewer/Red-Team both caught |
 | T2 | A recorded human turn is silently edited or overwritten after the fact | **Closed** | `turnId` immutability: a second write with different content is a hard `duplicate-ref`, both at write time and replay |
 | T3 | One real human turn is replayed/duplicated into the ledger as if it were two separate turns | **Closed** | `externalRef` uniqueness (at most one real turn per externalRef), checked at write time and replay |
 | T4 | Turns are inserted out of order, or a turn's position in the sequence is silently altered (ordinal gaps/reuse) | **Closed** | `turnOrdinal` monotonic-contiguous check, checked at write time and replay |
 | T5 | A disposition cites a human turn as its decision basis that this session never actually recorded, or that is cited before it exists in the log | **Closed** | `human-turn:` ref ownership (`assertDispositionRefOwnedBySession`, write time) + out-of-order-ref check (replay) |
 | T6 | The coordinator process itself fabricates the underlying artifact bytes and records them as if a real human produced them | **Open, by design -- cannot be closed in-process** | None; same privilege level as every other write this process makes. Fabrication becomes a detectable, attributable false attestation (a real, permanent, immutable record naming a specific driver and a specific artifact revision) rather than an invisible one -- narrowing, never closing |
 | T7 | A crash or race during recording leaves a partially-written or duplicated ledger entry | **Closed** | Same `withEventsLock` critical section + idempotent-append-on-identical-payload discipline every other driver-authored door in store.mjs already uses |
-| T8 | A hand-crafted or corrupted `events.jsonl` (bypassing `recordHumanTurn` entirely) presents a forged `human-turn-recorded` event as legitimate | **Narrowed, not fully closed** | `replay.mjs` independently re-validates driver identity, self-attribution, panel-actor attribution, ordinal contiguity, and duplicate turnId/externalRef against a hand-written log. What it cannot catch: a forger who ALSO holds the real driver identity and mirrors every one of these shapes exactly -- the same "careful forgery is narrowed, not closed" residual already disclosed for `aggregation-validated`/`specialist-authorized` above, not a new or worse exposure |
+| T8 | A hand-crafted or corrupted `events.jsonl` (bypassing `recordHumanTurn` entirely) presents a forged `human-turn-recorded` event as legitimate | **Narrowed, not fully closed** | `replay.mjs` independently re-validates driver identity, self-attribution, panel-actor attribution, the `asgn_`/`contribution:`/`human-turn:` ref-shape check, ordinal contiguity, duplicate turnId/externalRef, AND `respondsToRefs[]` ownership (all as of fix round 1) against a hand-written log. What it cannot catch: a forger who ALSO holds the real driver identity and mirrors every one of these shapes exactly -- the same "careful forgery is narrowed, not closed" residual already disclosed for `aggregation-validated`/`specialist-authorized` above, not a new or worse exposure |
 
 **Named limitation, not closed here.** `respondsToRefs` (optional, on the
 event) is validated for session ownership via the SAME
