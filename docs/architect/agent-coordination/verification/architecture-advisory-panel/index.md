@@ -22,7 +22,7 @@ The person's initial request asked to start at Phase 01. Phase 01 (P01.1) declar
 | 01 | Advisory soul and manual proof | done (P01.1 + P01.2 + P01.3 all closed) |
 | 02 | Capability-fit audit | done (P02.1 closed — see P02.1.md) |
 | 03 | Minimal hard shell and protocol | done (P03.1 + P03.2 both closed) |
-| 04 | Production skill and Decision Dialogue | unblocked, not yet started |
+| 04 | Production skill and Decision Dialogue | P04.1 done (see P04.1.md); P04.2 (surface/examples/dialogue) not yet started |
 | 05 | Comparative proof and promotion | blocked on 04 |
 
 ## Baseline
@@ -81,6 +81,7 @@ self-reported numbers.
 | P02.1 | audit only, no coordination session opened (see P02.1.md) | done | Capability-fit/hard-soft placement audit; 4 tables produced; re-diagnosed a Phase 01 finding (revise/recheck reachability) as a symptom of the `partialPolicy` premature-close bug via a live passing test, not an independent defect; N+1 reauthorization probe answered live (`activation.maxInvocations`, not `aggregateBounds.maxRounds`); 4-item closed Phase 03 blocker list produced; full focused suite 680/680 pass |
 | P03.1 | manual dispatch (Doer/Reviewer/Red-Team, no coordination session; see P03.1.md) | done | Human-turn trusted-input/decision-provenance door: 1 additive event kind + ref namespace + request-step type. Design consulted with kongming first (rejected prevention as unachievable in-process; built detect/attribute instead). 1 HIGH + 3 MEDIUM + 2 LOW findings in round 1, all fixed; 1 new MEDIUM (symlink bypass) found on recheck, fixed in round 2. Both rounds independently re-verified by the Coordinator (re-ran tests, read the actual code fixes). Focused suite 680→744, zero new failures. Filed 2 unrelated kernel bugs found by P02.1 as separate work items (tsk-5qj, tsk-1o4) rather than fixing them in this cell's scope. |
 | P03.2 | manual dispatch (Doer/Reviewer, no coordination session; see P03.2.md) | done | Registered `architecture-advisory-panel-v1` protocol + pack entry + 13-case conformance suite. Real bug found+fixed during construction (quorum would auto-close before a human turn could arrive; fixed with driver-only `close-dialogue` gate). 0 HIGH + 3 MEDIUM findings, all fixed and independently rechecked (Reviewer reproduced the Doer's own falsification proofs, not just read the diff). Focused suite 728→757, zero regressions on pre-existing RFC/NGT/Delphi/master-loop conformance tests. Filed 2 request-schema gaps found while building the suite as separate work items (tsk-44p, tsk-3xk). |
+| P04.1 | manual dispatch (Doer/Reviewer/Red-Team, no coordination session; see P04.1.md) | done | Authored `core/skills/fgos-architecture-panel/SKILL.md` (910 lines) projecting Phase 01's ~4700-line doctrine into a production skill. Reviewer + Red-Team both required per phase-04's own "assess hard correctness AND loss of soul" mandate. 1 HIGH (roster names 3 unregistered executors that silently fall back to an unconfined, git-write-capable default — independently verified live by the Coordinator) + 3 more HIGH from Red-Team (explanation standard absent; 3 lead-advisor artifacts had no graph operation; driver disposition rules never stated) + many MEDIUM/LOW citation and doc-accuracy findings, all fixed across 2 rounds. Fix round 1's own report inaccurately claimed complete coverage (5 LOW findings were silently dropped) — caught by the Reviewer's recheck and corrected in round 2, which explicitly disposition-tabled every one of the 22 distinct findings from both rounds. Focused suite 757/757 and skill-projection tests 39/39 unchanged throughout (prose-only cell, zero kernel/protocol touch). |
 
 ## Admitted Read-Only Advisory Executor Allowlist
 
@@ -100,10 +101,12 @@ Excluded Unsafe / Non-Runnable Pairs:
 
 ## Stop Gate — none currently blocking
 
-Phase 03 is done (P03.1 + P03.2 both closed). Phase 04 (production skill
-and Decision Dialogue — `core/skills/fgos-architecture-panel/SKILL.md`,
-`docs/how-to/use-fgos-architecture-panel.md`) is next per the plan and is
-unblocked; not yet started.
+Phase 03 is done (P03.1 + P03.2 both closed). Phase 04's P04.1
+(production skill) is done — see P04.1.md. P04.2 (surface, examples, and
+Decision Dialogue — first prove whether `fgos-group-thinking` plus
+`fgos coordination run/show` already provides the required entry/resume
+path before adding anything new; `docs/how-to/use-fgos-architecture-panel.md`)
+is next per the plan and is unblocked; not yet started.
 
 The separate, track-independent question about authorizing real
 implementation work against `/home/vantt/projects/vnflow` is resolved:
