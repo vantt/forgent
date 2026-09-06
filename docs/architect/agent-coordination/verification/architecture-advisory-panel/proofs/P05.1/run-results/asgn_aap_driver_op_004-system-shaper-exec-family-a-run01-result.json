@@ -1,0 +1,108 @@
+{
+  "runId": "run_asgn_aap_driver_op_004_01",
+  "assignmentId": "asgn_aap_driver_op_004",
+  "workId": null,
+  "executorId": "exec-family-a",
+  "policy": {
+    "role": "system-shaper",
+    "executorPreference": [
+      "exec-family-a"
+    ],
+    "executorId": "exec-family-a",
+    "providerModel": "family-a",
+    "tier": "analytical",
+    "model": "model-a-analytical",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "exec-family-a",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "family-a",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "exec-family-a"
+        }
+      },
+      "model": {
+        "value": "model-a-analytical",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "family-a.analytical"
+        }
+      },
+      "tier": {
+        "value": "analytical",
+        "source": {
+          "scope": "operation",
+          "id": "shape-system-proposal"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_aap_driver_op_004"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "family-a"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "claimSha256": "ca340345d4fa916fe4e534e217dda5d82139aaea518dc8edf131f72569124561",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_aap_driver_op_004/runs/01/agent-report.md",
+      "sha256": "212468421e8d62e471af207da796135a6c03f446e3d6d1a825807ccbd3985eaf"
+    }
+  ],
+  "status": "done",
+  "confidence": "reported",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_aap_driver_op_004/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_aap_driver_op_004/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "done",
+    "summary": "Settled by family-a."
+  },
+  "evidence": {
+    "gitBefore": null,
+    "gitAfter": null,
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_aap_driver_op_004/runs/01/agent-report.md",
+      ".fgos/assignments/asgn_aap_driver_op_004/runs/01/agent-result.json"
+    ],
+    "tests": []
+  }
+}

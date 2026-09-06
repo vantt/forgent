@@ -1,0 +1,182 @@
+[
+  {
+    "attack_id": "RT-01",
+    "area": "authority",
+    "description": "Driver attributes a human turn to ITSELF (attributedTo.type is a legal \"person\", but attributedTo.id equals the session's own writerId). Distinct from the Doer's Attack 1, which used the schema-illegal attributedTo.type: \"driver\" and therefore never reached the engine.",
+    "command_or_script": "node bin/fgos.mjs coordination run --file req/rt-a1-i.json  # human-turn, attributedTo {type:person, id:\"rt-driver\"}, writerId \"rt-driver\"",
+    "expected": "Refused: a driver cannot occupy the human-decision slot.",
+    "actual": "exit 4 -- 'recordHumanTurn: attributedTo.id \"rt-driver\" is the same identity as recordedBy.id -- a driver cannot attribute a human turn to itself'. Refused at the store layer (T1 guard), before the idempotency read.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "critical"
+  },
+  {
+    "attack_id": "RT-02",
+    "area": "authority",
+    "description": "Driver cites its own asgn_* Assignment ref as the person in the human-decision slot -- the exact variant the task asked for.",
+    "command_or_script": "node bin/fgos.mjs coordination run --file req/rt-a1-ii.json  # attributedTo {type:person, id:\"asgn_rt_driver_op_001\"}",
+    "expected": "Refused: a driver-authored ref cannot be a person.",
+    "actual": "exit 4 -- 'attributedTo.id \"asgn_rt_driver_op_001\" is shaped like a driver-authored ref (an Assignment id, or the reserved \"contribution:\"/\"human-turn:\" namespace) -- a driver-authored ref cannot occupy the human-decision slot'.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "critical"
+  },
+  {
+    "attack_id": "RT-03",
+    "area": "authority",
+    "description": "Driver names a declared panel actor (lead-advisor-actor) as the person, laundering a machine opinion into a human decision.",
+    "command_or_script": "node bin/fgos.mjs coordination run --file req/rt-a1-iii.json",
+    "expected": "Refused: a panel actor is not a person.",
+    "actual": "exit 4 -- 'attributedTo.id \"lead-advisor-actor\" is a declared panel actor of session \"rt_auth\" -- a panel actor cannot occupy the human-decision slot'.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "critical"
+  },
+  {
+    "attack_id": "RT-04",
+    "area": "authority",
+    "description": "A DIFFERENT writerId (rt-impostor) records a human turn into a session it does not drive.",
+    "command_or_script": "node bin/fgos.mjs coordination run --file req/rt-a1-iv.json",
+    "expected": "Refused: only the session's own driver identity may write.",
+    "actual": "exit 4 -- 'writerId \"rt-impostor\" is not the driver identity of session \"rt_auth\" (its provenanceRoot.writerId is \"rt-driver\")'. Refused in run.mjs before any step dispatched.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "high"
+  },
+  {
+    "attack_id": "RT-05",
+    "area": "authority / ledger integrity",
+    "description": "Hand-craft an 'operation-authorized' event directly into events.jsonl (authorizationId auth_FORGED, src \"red-team-forger\", deliberately WRONG integrity hash h=0000000000000000) for critique-proposals in a session where post-shaping-open is genuinely CLOSED (only 2 of 3 shapers settled), then dispatch on it.",
+    "command_or_script": "fs.appendFileSync('.fgos/coordination/sessions/rt_forge/events.jsonl', JSON.stringify(forgedEvent)+'\\n'); node bin/fgos.mjs coordination run --file req/rt-forge-dispatch.json",
+    "expected": "Either the forged event is rejected as tampered, or the dispatch is refused.",
+    "actual": "SPLIT RESULT. (a) Capability: BLOCKED -- 'dispatchDeclaredOperation: ... requires visibility window \"post-shaping-open\" to be open, and it is not open -- refusing to dispatch a driver-authorized worker whose granted context is not yet legal' (exit 4). The dispatch door independently re-derives the window; the forged authorization bought nothing. (b) Detection: FAILED -- the forged event with a knowingly-wrong `h` was accepted by readEvents and rendered by `fgos coordination show` as a live, unconsumed authorization attributed to the real driver, with no error and no coordinationStateError. The per-event `h` field (crypto SHA-256 prefix, src/state/events.mjs:457) is never verified against content anywhere in src/; it is used only as a dedupe key in events-compaction.mjs:116 and replay.mjs:855. There is no hash chain (no prev-hash), so events are also freely reorderable/insertable.",
+    "verdict": "UNEXPECTED",
+    "severity_if_bypassed": "medium"
+  },
+  {
+    "attack_id": "RT-06",
+    "area": "authority / visibility",
+    "description": "Escalation of RT-05: fabricate the entire missing third shaper -- a synthetic .fgos/assignments/asgn_rt_driver_op_999/ (assignment.json naming shape-constraint-proposal + runs/01/result.json), plus forged assignment-created and result-linked events -- to force post-shaping-open open without ever running the operation.",
+    "command_or_script": "see redteam-report.md RT-06; three stages: (1) events only, (2) + patch session.json assignmentRefs, (3) authorize + dispatch critique-proposals",
+    "expected": "Refused, or at minimum flagged as inconsistent.",
+    "actual": "Stage 1 BLOCKED by a genuine second-source cross-check: 'session \"rt_forge\": \"assignment-created\" event for \"asgn_rt_driver_op_999\" has no corresponding assignmentRefs entry (interrupted write, or a corrupted manifest)' (exit 1). Stage 2, after also pushing the id into session.json's assignmentRefs: BYPASSED -- the authorize succeeded (appended: true) and critique-proposals then dispatched for real (exit 0, asgn_rt_driver_op_1000 created and result-linked). Requires write access to .fgos/ (two files + one fabricated directory).",
+    "verdict": "BYPASSED",
+    "severity_if_bypassed": "medium"
+  },
+  {
+    "attack_id": "RT-07",
+    "area": "visibility (timing)",
+    "description": "Timing attack on `show`: read a Phase-5 shaper's real OUTPUT CONTENT through `fgos coordination show`/`chain` after 2 of 3 shapers settled, before post-shaping-open opens.",
+    "command_or_script": "node bin/fgos.mjs coordination show rt_vis --json  # then substring-scan the whole payload; same for `coordination chain`",
+    "expected": "No artifact content in the output.",
+    "actual": "BLOCKED for content. show's payload carries no agentClaim, no summary, no agent-report text, no stdout (all four substring probes false). It does disclose metadata: assignmentRefs and quorum.completed name which shapers have settled and their assignment/run ids. That is driver-facing status, not the reveal boundary, and is consistent with show.mjs being read-only by construction. `chain` returned an empty track (no `<track>--` sessions) and leaked nothing.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "high"
+  },
+  {
+    "attack_id": "RT-08",
+    "area": "visibility (process boundary)",
+    "description": "Bind the third Phase-5 shaper to a curious executor (exec-nosy) that, during its own legitimate run, reads every sibling assignment's agent-report.md off the filesystem -- i.e. attack 'independent work, controlled reveal' at the process layer rather than the context-grant layer.",
+    "command_or_script": "node bin/fgos.mjs coordination run --file req/rt-vis-nosy.json  # exec-nosy walks .fgos/assignments/*/runs/*/agent-report.md; output in NOSY-LEAK.txt",
+    "expected": "A shaper should not be able to read its siblings' proposals before the reveal.",
+    "actual": "BYPASSED. The third shaper read all 12 sibling reports present in the workspace, including the two Phase-5 shapers that settled before it in its OWN session, and assignments belonging to OTHER sessions entirely (rt_forge's asgn_*_004/005 were read from inside an rt_vis dispatch). Assignment directories are workspace-global, not session-scoped, and every executor runs with cwd = the workspace. The visibility window governs what the engine PUTS IN the prompt, not what the process CAN READ.",
+    "verdict": "BYPASSED",
+    "severity_if_bypassed": "medium"
+  },
+  {
+    "attack_id": "RT-09",
+    "area": "aggregation (boundary)",
+    "description": "Find the real minimum aggregateBounds.maxRounds for the full protocol flow including one reopen, then probe the fencepost at min-1, min, and min+1 by driving three complete real sessions end to end.",
+    "command_or_script": "node drive.mjs rt_b12 12 ; node drive.mjs rt_b11 11 ; node drive.mjs rt_b13 13  (8 real CLI calls each: framing, shapers, critique, synth, redteam, explain, reopen1, close)",
+    "expected": "maxRounds: N admits exactly N assignments and refuses the N+1st, with no off-by-one.",
+    "actual": "BLOCKED, no fencepost error. Real minimum = 12. maxRounds:12 -> 12 assignments, status completed. maxRounds:11 -> fails exactly at close-dialogue ('has already used 11 round(s) session-wide, at or above the declared aggregateBounds.maxRounds cap of 11'), 11 assignments, status active. maxRounds:13 -> completes at 12. The guard is `manifest.assignmentRefs.length >= cap` (store.mjs:775), so N admits exactly N. Note: maxRounds and maxAssignments are enforced against the identical counter (assignmentRefs.length), so in this protocol they are indistinguishable and the stricter simply wins.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "medium"
+  },
+  {
+    "attack_id": "RT-10",
+    "area": "aggregation (recovery + confinement)",
+    "description": "Follow-on to RT-09: can a session whose round budget is exhausted one step short of close-dialogue be un-wedged by declaring higher bounds on a later call? And conversely, does declaring TIGHTER bounds mid-session actually tighten anything?",
+    "command_or_script": "node bin/fgos.mjs coordination run --file req/rt-b11-raise.json  (declares maxRounds:30 on wedged rt_b11) ; node bin/fgos.mjs coordination run --file req/rt-vis-rebound.json  (declares maxRounds:2, maxAssignments:2, maxConcurrency:1 on healthy rt_vis which already has 4 assignments)",
+    "expected": "Either the bounds update, or the request is refused for trying to change them.",
+    "actual": "BYPASSED, both directions, silently. Raise: exit 4 with the unrelated round-cap message; manifest still {maxRounds:11}; session permanently active, close-dialogue unreachable, lead-advisor quorum unsatisfiable, no CLI door recovers it. Tighten: exit 0 with NO warning, manifest unchanged at {maxRounds:20,maxAssignments:30,maxConcurrency:4}, and a 5th assignment dispatched past a declared cap of 2. aggregateBounds on a resumed request is silently discarded in both directions -- an operator tightening bounds to contain a runaway panel gets exit 0 and false confidence.",
+    "verdict": "BYPASSED",
+    "severity_if_bypassed": "high"
+  },
+  {
+    "attack_id": "RT-11",
+    "area": "routing (provenance spoofing)",
+    "description": "Make a RunResult falsely report an executor/provider/model it never used. Method: let an assignment be created but its dispatch fail (unregistered executor -> RunnerConfigError, which removes the dispatch claim), plant a hand-written runs/01/result.json declaring executor exec-family-b / provider family-b / model model-b-critical / tier critical, then re-issue the identical step through the real CLI while explicitly binding exec-family-a.",
+    "command_or_script": "node bin/fgos.mjs coordination run --file req/rt-route-setup.json  (actors[]: system-shaper-actor -> exec-does-not-exist) ; plant .fgos/assignments/asgn_rt_driver_op_1002/runs/01/result.json ; node bin/fgos.mjs coordination run --file req/rt-route-redispatch.json  (actors[]: system-shaper-actor -> exec-family-a)",
+    "expected": "The reported provenance matches the binding actually dispatched, or the unauthenticated result is rejected.",
+    "actual": "BYPASSED. exit 0. The CLI step result reported executor \"exec-family-b\", provider \"family-b\", tier \"critical\" -- none of which the request asked for and none of which ran. Zero real dispatches occurred (no 'dispatch capability' line on stderr). createAndExecuteSessionTask's findLatestRunResult self-heal path (session-engine.mjs:262) reads runs/<n>/result.json off disk with NO authenticity, signature, or shape validation and linkResult()s it as a genuine outcome. The reported RunResult provenance is therefore whatever an unauthenticated file says, not a record of the real dispatch. Reachable by any process with write access to .fgos/assignments/, which includes every executor subprocess the panel itself spawns (RT-08 demonstrates that access live).",
+    "verdict": "BYPASSED",
+    "severity_if_bypassed": "high"
+  },
+  {
+    "attack_id": "RT-12",
+    "area": "bounds (race / TOCTOU)",
+    "description": "Fire 2 reopen authorizations concurrently, from two separate OS processes, against the same revise-synthesis binding when exactly 1 slot remains under activation.maxInvocations: 2. Repeated on 10 fresh sessions.",
+    "command_or_script": "for i in $(seq 1 10); do ./racetrial.sh rt_rc$i; done  # each: open session, burn slot 1, then two backgrounded `fgos coordination run` processes racing on the last slot",
+    "expected": "Exactly one admitted, one refused, every time; never two.",
+    "actual": "BLOCKED, 10/10. Every trial ended with exactly 2 operation-authorized events for the binding. The refusal is 'authorizeOperation: binding ... already has 2 \"operation-authorized\" event(s), at or above its declared activation.maxInvocations cap of 2'. The winner alternated between process A and process B across trials (A won 4, B won 6), confirming the processes genuinely raced rather than serializing by accident. No double-admit, no TOCTOU gap.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "high"
+  },
+  {
+    "attack_id": "RT-13",
+    "area": "replay / crash (tsk-47l confirmation)",
+    "description": "Independent reproduction of tsk-47l in my own sandbox: SIGKILL a real `fgos coordination run` process mid-dispatch, in a session driven to synthesis-authorized, using my own slow executor (exec-rtslow, 30s) and my own crash driver -- not the Doer's process, script, or session.",
+    "command_or_script": "node bin/fgos.mjs coordination run --file req/rt-crash-dispatch.json & P=$!; wait for rtslow-started.marker; kill -9 $P",
+    "expected": "The stale dispatch.claim blocks CLI-only resume, exactly as disclosed.",
+    "actual": "CONFIRMED, gap is real as described. Parent PID gone; the executor survived as a detached orphan (matching the Doer's disclosure) and had to be reaped by hand; rtslow-finished.marker absent, so the kill genuinely landed pre-settlement. Fresh-process `show` correctly reported synthesizer-actor as `late` (not missing/failed/completed). Re-issuing the identical step: exit 4, 'createAndExecuteSessionTask: a dispatch is already in progress for assignment \"asgn_rt_driver_op_1073\" ... -- refusing to spawn a second concurrent executor run'. `fgos coordination --help` confirms the only sub-verbs are run|show|launch-master-loop|chain; none reconciles a claim.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a (confirmation of a disclosed gap, not a bypass)"
+  },
+  {
+    "attack_id": "RT-14",
+    "area": "replay / crash (tsk-47l premise)",
+    "description": "Check whether tsk-47l's own stated fix premise -- 'let show/run detect and safely reconcile a claim whose owning process is verifiably dead' -- and the Doer's documented manual workaround ('rm the claim after confirming the OS-level PID is dead') are actually performable from what a real crash leaves on disk.",
+    "command_or_script": "cat .fgos/assignments/asgn_rt_driver_op_1073/dispatch.claim ; wc -c ; grep -ril pid .fgos/assignments/asgn_rt_driver_op_1073/ ; cat runs/01/run.json",
+    "expected": "The claim, or some sibling file, names its owner so death can be verified.",
+    "actual": "UNEXPECTED, premise unmet. dispatch.claim is a ZERO-BYTE file (fs.openSync(path,'wx') then immediate closeSync, session-engine.mjs:391) -- no PID, no hostname, no timestamp, no owner identity. `grep -ril pid` across the whole assignment directory returns nothing. run.json records startedAt/cwd/timeoutMs/executorId but no process id for either the runner or the executor. There is therefore NO on-disk basis for 'verifiably dead' -- neither for a human operator nor for the automatic detection tsk-47l proposes. The Doer could confirm death only because their own crash-driver harness wrote the PIDs to an out-of-band marker file; a real incident leaves no such artifact, so the Doer's step-3 'OS-level confirmation' is not reproducible in production. Whoever picks up tsk-47l must add owner identity to the claim before the proposed fix is implementable.",
+    "verdict": "UNEXPECTED",
+    "severity_if_bypassed": "medium"
+  },
+  {
+    "attack_id": "RT-15",
+    "area": "replay / crash (WORSE variant, kill at a different lifecycle point)",
+    "description": "Kill mid-dispatch but do NOT reap the detached orphan executor, then perform exactly the manual reconciliation the Doer documents (rm dispatch.claim; resume) -- the realistic operator action given RT-14 (no way to check the orphan is dead).",
+    "command_or_script": "node bin/fgos.mjs coordination run --file req/rt-crash3-dispatch.json & kill -9 $! (orphan exec-rtlog still running, 20s); rm .fgos/assignments/asgn_rt_driver_op_1086/dispatch.claim; node bin/fgos.mjs coordination run --file req/rt-crash3-dispatch.json  (x2)",
+    "expected": "Either a clean resume, or a clean refusal that leaves the assignment retryable.",
+    "actual": "BYPASSED into a strictly WORSE failure mode than the disclosed stale lock. A second, cwd-level in-flight lock did correctly prevent real double-execution ('dispatch for cwd ... is already in flight (held for 2s)') -- good defense in depth. But that transient contention was NOT surfaced as a refusal: it was captured as a genuine RunResult{status:'failed', confidence:'failed'} in runs/02/result.json, link-resulted into the session event log, and the CLI exited 0. synthesizer-actor moved from `late` (recoverable, correctly diagnosed) to `quorum.failed` permanently. Re-running the identical step afterwards, with no executor running, returns the cached failed result via the priorLink short-circuit: exit 0, no runs/03, no new dispatch, forever. The assignment is permanently poisoned and the session can never reach quorum; no CLI door retries it. Additionally the orphan, on finishing, wrote agent-result.json/agent-report.md into BOTH runs/01 and the already-settled runs/02, so the on-disk artifacts for run 02 say status 'done' while its linked result.json says 'failed' -- the audit record and the evidence contradict each other.",
+    "verdict": "BYPASSED",
+    "severity_if_bypassed": "high"
+  },
+  {
+    "attack_id": "RT-16",
+    "area": "replay / crash (WORSE variant, partial event-log corruption)",
+    "description": "The second 'kill at a different point' variant the task asked for: a SIGKILL landing during the event-log append itself rather than during dispatch, leaving a truncated final JSONL line. Simulated byte-exactly by truncating the last line of a completed session's events.jsonl.",
+    "command_or_script": "truncate 40 bytes off .fgos/coordination/sessions/rt_b12/events.jsonl ; node bin/fgos.mjs coordination show rt_b12 --json ; node bin/fgos.mjs coordination run --file req/rt_b12-08-close.json",
+    "expected": "Degraded but diagnosable, or a documented repair door.",
+    "actual": "WORSE than tsk-47l, and undisclosed. BOTH show AND run exit 5 with 'Corrupt or truncated event log line 42 of 42 ... Unterminated string in JSON'. The session becomes completely unreadable -- unlike the stale-claim case, where show still works and the state is at least diagnosable. src/state/events.mjs already contains a repair() that handles exactly this shape (truncated FINAL line only, backs up to <logPath>.corrupt-<ts>), but no `fgos coordination` sub-verb exposes it, so recovery again requires hand-editing the file. Same missing-CLI-door family as tsk-47l, one severity level higher because it destroys diagnosis, not just recovery. Narrower window than the dispatch window (the append is fast and lock-held), but real.",
+    "verdict": "UNEXPECTED",
+    "severity_if_bypassed": "high"
+  },
+  {
+    "attack_id": "RT-17",
+    "area": "replay / crash (fabricated recovery)",
+    "description": "Attack the tsk-47l stale claim from the other side: instead of removing the lock, plant a fabricated result.json into the crashed runs/01 -- the shortcut a stuck agent with filesystem access would plausibly reach for.",
+    "command_or_script": "cp a sibling result.json into .fgos/assignments/asgn_rt_driver_op_1073/runs/01/result.json (rewritten runId/assignmentId, agentClaim 'FABRICATED recovery'); node bin/fgos.mjs coordination run --file req/rt-crash-dispatch.json  (stale dispatch.claim STILL present)",
+    "expected": "The stale claim blocks this too, or the unauthenticated result is rejected.",
+    "actual": "BYPASSED. exit 0. findLatestRunResult is consulted BEFORE the dispatch.claim check (session-engine.mjs:380 vs :389), so a planted result bypasses the lock entirely. The engine link-resulted the fabricated file, reported status 'done'/confidence 'reported', and `show` moved synthesizer-actor from `late` to `completed`. The session now presents as a legitimately-progressed panel with fabricated advisory content and provenance, and nothing marks it. This is the same unauthenticated-result-file root cause as RT-11, but here it doubles as a plausible, silently-corrupting 'fix' for the very gap tsk-47l discloses.",
+    "verdict": "BYPASSED",
+    "severity_if_bypassed": "high"
+  },
+  {
+    "attack_id": "RT-18",
+    "area": "my own attack -- bounded dialogue reopen precondition",
+    "description": "The protocol YAML's own header states revise-synthesis/revise-explanation are 'the bounded, driver-authorized CAPABILITY a driver may spend once a human turn has been recorded and read'. Test whether the 'once a human turn has been recorded' half is enforced, or only the numeric cap the Doer's Area 5 proved.",
+    "command_or_script": "node bin/fgos.mjs coordination run --file req/rt-nohuman-1.json  (open session, run interpret-request only) ; node bin/fgos.mjs coordination run --file req/rt-nohuman-2.json  (authorize + dispatch revise-synthesis in the session's SECOND call)",
+    "expected": "Refused: no human turn exists, and there is no synthesis to revise.",
+    "actual": "BYPASSED. exit 0, no refusal. revise-synthesis was authorized (appended: true) AND dispatched (asgn_rt_driver_op_1065, status done) in a session with ZERO human-turn-recorded events and ZERO synthesize-recommendation events -- skipping the entire graph (no shapers, no critique, no synthesis, no explanation). Cause: phase-dialogue-reopen's revise-* bindings deliberately declare no contextAccess.visibilityWindowRef (the YAML documents this choice, for quorum reasons), and graph `transitions` are not themselves a dispatch gate -- node ordering is enforced ONLY through visibility windows. So the cap is kernel-enforced but the precondition is prose-only: nothing links a reopen to a human turn. This compounds tsk-44p (the SAFE_ID_RE charset check refuses the human-turn: disposition ref), which the YAML already notes leaves the free-text `authorize.reason` as the only channel. Net effect on this cell's Area 5 claim: 'a revision informed by the person's turn' carries no kernel guarantee that any person ever spoke.",
+    "verdict": "BYPASSED",
+    "severity_if_bypassed": "high"
+  }
+]
