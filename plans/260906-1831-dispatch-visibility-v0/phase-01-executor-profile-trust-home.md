@@ -47,9 +47,28 @@ toán biến môi trường mà là bài toán topology session**. Ba phương �
 phí tăng dần: session herdr riêng cho worker, mount namespace bằng `bwrap`, hoặc user OS
 riêng. Phase này phải chọn và chứng minh một trong ba trước khi Phase 02 dựa vào.
 
-R6b. Cho tới khi một trong ba được chứng minh, capability profile của `herdr-spawn` mang
-nhãn `unsafe: worker-can-drive-cockpit`, và mechanism không được dùng cho executor mà
-người vận hành chưa tin sẵn.
+R6b. **Đã chọn và đã đo 2026-09-06** — xem
+[session-findings](../../docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/session-findings.md).
+Phương án là **session herdr riêng cho worker**, cộng HOME riêng của R6. Đo được:
+`herdr --session <tên> server` khởi headless, có socket riêng; pane tạo trong đó nhận
+`HERDR_SESSION` và socket **của chính session đó**; từ trong nhìn ra chỉ thấy pane của nó,
+trong khi cockpit người vận hành có 18 pane. Teardown bằng `session stop` rồi
+`session delete`, không để lại gì.
+
+R6c. Giới hạn phải ghi thẳng, không được tô hồng: đây là **ranh giới định tuyến, không
+phải ranh giới namespace**. Một worker gọi thẳng đường socket tuyệt đối của người vận hành
+vẫn thấy đủ 18 pane (đã đo). Đủ để chặn trôi dạt — đúng mối đe dọa mà ADR-0005 xác định và
+đúng hình dạng sự cố `tsk-1nih` từng xảy ra. Không đủ để chặn nhắm có chủ đích; muốn chặn
+cái đó phải `bwrap` hoặc user OS riêng, và chưa mối đe dọa nào quan sát được biện minh cho
+chi phí đó.
+
+R6d. Giá phải trả là khả năng quan sát: `herdr session attach` **bị từ chối** khi chạy
+trong một pane của session khác (`nested herdr is disabled by default`). Người xem worker
+bằng một cửa sổ terminal thứ hai, hoặc bật cờ thử nghiệm `[experimental] allow_nested`.
+Đây là quyết định của người vận hành, không phải mặc định phase này tự đặt.
+
+R6e. Dùng `HERDR_SESSION` làm **assertion** chứ không phải quy ước: trước khi khởi worker,
+adapter từ chối nếu session đích trùng session của người vận hành.
 
 R7. `fgos doctor` có check cho: herdr có trên PATH, integration của agent kind đang dùng
 có `current` không, và trust store có đọc/ghi được không.
