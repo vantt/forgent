@@ -77,8 +77,10 @@
 # only be authorized via a direct `authorizeSpecialistSlot` engine call
 # today, not through `fgos coordination run --file`/the pack gate -- the
 # SAME class of pre-existing wiring gap P10.10 named and later closed for
-# the `contribution` step type, left unfixed here per phase-03's own
-# "no speculative kernel work" instruction for this cell (this cell's
+# the `contribution` step type. Filed as `tsk-3xk` (general to every
+# protocol's own use of a specialist slot, not unique to this one), left
+# unfixed here per phase-03's own "no speculative kernel work" instruction
+# for this cell (this cell's
 # May-Touch list is the protocol/pack/test files below, not `run.mjs`).
 # See this cell's own doer-report.md for the conformance test's resulting
 # split between pack-gate-level and direct-engine-level assertions.
@@ -132,28 +134,29 @@
 #
 # `grantedContextRefs`/`human-turn:` decision, made deliberately NOT to
 # touch `session-engine.mjs` again in this cell (P03.1 already used this
-# phase's kernel-change budget): `assertRefsOwnedBySession`
-# (session-engine.mjs) recognizes and REFUSES the reserved `contribution:`
-# namespace explicitly, but has no equivalent recognition for `human-turn:`
-# at all -- a `human-turn:<id>` ref passed into an `authorize` step's
-# `grantedContextRefs` would pass through UNCHECKED (not validated against
-# `recordedHumanTurnIds`, unlike `assertDispositionRefOwnedBySession`, which
-# DOES validate that namespace for real). Rather than extend
-# `assertRefsOwnedBySession` here, this document's own bounded-reopen
-# capability relies entirely on the ALREADY-HARDENED, ALREADY-VALIDATED path
-# instead: a `disposition` step's `evidenceRefs`/`targetRef` may cite
-# `human-turn:<turnId>` today, and `assertDispositionRefOwnedBySession`
-# (store.mjs) genuinely resolves and checks it against this session's own
-# recorded human turns (P03.1's T1/T5 threat coverage). The intended
-# sequence a driver follows once a human turn is recorded: (1) `disposition`
-# step citing `human-turn:<turnId>` as `evidenceRefs`, recording the
-# driver's read of the turn; (2) `authorize` step for `revise-synthesis`/
-# `revise-explanation`, whose free-text `reason` field documents which
-# disposition/turn authorizes this reopen (unenforced prose, exactly like
-# every other `authorize` step's `reason` in every sibling protocol) --
-# never a `grantedContextRefs` entry naming the human-turn ref itself, since
-# that channel is unchecked. This is the workaround phase-03's own text
-# explicitly prefers over further kernel work.
+# phase's kernel-change budget), and corrected here after live-probing the
+# real request validator (`src/verbs/coordination/schema.mjs`) rather than
+# reasoning from the store layer alone: `SAFE_ID_RE`
+# (`/^[A-Za-z0-9_-]+$/`, schema.mjs) admits no colon, and `assertSafeRefOrId`
+# applies it uniformly to an `authorize` step's `grantedContextRefs`, a
+# `disposition` step's `targetRef`, AND a `disposition` step's
+# `evidenceRefs`. This means BOTH reserved namespaces (`human-turn:` and
+# `contribution:`) are refused at this request-schema charset check, in
+# EVERY ref field, for EVERY protocol -- not merely `grantedContextRefs`,
+# and not merely "unchecked" (an earlier draft of this comment understated
+# the gap this way; corrected per independent Review). The store-layer door
+# (`assertDispositionRefOwnedBySession`, store.mjs) DOES genuinely validate
+# a `human-turn:<id>` disposition ref against this session's own recorded
+# turns (P03.1's T1/T5 threat coverage) -- but a request reaching it through
+# `fgos coordination run --file`/the pack gate never gets there: it is
+# refused at the charset check first. Filed as `tsk-44p` (a request-schema
+# gap in `src/verbs/coordination/schema.mjs`, general to every protocol, not
+# fixed here per phase-03's own "no speculative kernel work" instruction for
+# this cell). The ONLY channel available today to document which human turn
+# authorizes a reopen is therefore the `authorize` step's own free-text
+# `reason` field (unenforced prose, exactly like every other `authorize`
+# step's `reason` in every sibling protocol) -- never a `disposition` step
+# citing the turn, and never a `grantedContextRefs` entry naming it.
 #
 # ── Portable, no literal executor/model pins ────────────────────────────────
 # `policy.minTier` per operation is the only literal lever declared here,

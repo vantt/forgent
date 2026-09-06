@@ -563,8 +563,8 @@ test('unauthorized specialist: answer-specialist-question cannot dispatch withou
         },
         opts,
       ),
-    (err) => err instanceof CoordinationError,
-    'a specialistSlotRef binding must refuse to materialize an Assignment for an actor never authorized into that slot',
+    (err) => err instanceof CoordinationError && /is bound to specialist slot "specialist-answer-slot" -- no specialist is currently authorized/.test(err.message),
+    'a specialistSlotRef binding must refuse to materialize an Assignment for an actor never authorized into that slot -- pinned to the slot-gate\'s own message so this test cannot pass for a DIFFERENT reason (e.g. a missing operation-authorized event)',
   );
 
   authorizeSpecialistSlot(
@@ -698,6 +698,126 @@ test('over-cap reopen: revise-synthesis admits exactly 2 invocations (activation
   const replayed = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
   const synthesizerAssignmentIds = new Set(replayed.assignments.filter((a) => a.actorId === 'synthesizer-actor').map((a) => a.assignmentId));
   assert.deepEqual(synthesizerAssignmentIds, new Set([synthId, revise1Id, revise2Id]), 'wrong recheck revision: exactly three distinct Assignments, original preserved alongside both reopens');
+});
+
+// ── revise-explanation: the OTHER half of bounded dialogue reopen ──────────
+// R2 (independent Review): `revise-explanation` had zero test coverage and
+// was provably deletable with no test failure -- an ungated
+// `driver-authorized` binding gates no quorum, appears in no visibility
+// window, and is inert to every other derivation. Mirrors the
+// `revise-synthesis` over-cap test above exactly, proving the SAME
+// mechanism for the lead advisor's own reopen: a genuinely new Assignment
+// each time, and `activation.maxInvocations: 2` refusing a 3rd.
+test('over-cap reopen (explanation): revise-explanation admits exactly 2 invocations (activation.maxInvocations) and refuses the 3rd', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeRunnerConfig(tempDir);
+  const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig };
+  const coordinationId = 'aap_over_cap_reopen_explanation';
+  const writerId = 'aap-driver';
+
+  const call1 = await run(ctx, coordinationId, writerId, [
+    opStep('shapeSystem', 'shape-system-proposal', 'system-shaper-actor'),
+    opStep('shapeAlt', 'shape-alternative-proposal', 'alternative-shaper-actor'),
+    opStep('shapeConstraint', 'shape-constraint-proposal', 'constraint-advocate-actor'),
+  ]);
+  const call2 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authCritique', 'critique-proposals', 'architecture-critic-actor', {
+      authorizationId: 'auth_critique',
+      invocationKey: 'ik_critique',
+      reason: 'post-shaping-open is open.',
+      grantedContextRefs: [assignmentIdFor(call1, 'shapeSystem')],
+    }),
+    opStep('critique', 'critique-proposals', 'architecture-critic-actor'),
+    authorizeStep('authAssess', 'assess-constraints', 'constraint-advocate-actor', {
+      authorizationId: 'auth_assess',
+      invocationKey: 'ik_assess',
+      reason: 'post-shaping-open is open.',
+      grantedContextRefs: [assignmentIdFor(call1, 'shapeConstraint')],
+    }),
+    opStep('assess', 'assess-constraints', 'constraint-advocate-actor'),
+  ]);
+  const call3 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authSynth', 'synthesize-recommendation', 'synthesizer-actor', {
+      authorizationId: 'auth_synth',
+      invocationKey: 'ik_synth',
+      reason: 'post-critique-open is open.',
+      grantedContextRefs: [assignmentIdFor(call2, 'critique'), assignmentIdFor(call2, 'assess')],
+    }),
+    opStep('synth', 'synthesize-recommendation', 'synthesizer-actor'),
+  ]);
+  const call4 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authRedteam', 'red-team-packet', 'red-team-actor', {
+      authorizationId: 'auth_redteam',
+      invocationKey: 'ik_redteam',
+      reason: 'post-synthesis-open is open.',
+      grantedContextRefs: [assignmentIdFor(call3, 'synth')],
+    }),
+    opStep('redteam', 'red-team-packet', 'red-team-actor'),
+  ]);
+  const call5 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authExplain', 'explain-recommendation', 'lead-advisor-actor', {
+      authorizationId: 'auth_explain',
+      invocationKey: 'ik_explain',
+      reason: 'post-redteam-open is open.',
+      grantedContextRefs: [assignmentIdFor(call3, 'synth'), assignmentIdFor(call4, 'redteam')],
+    }),
+    opStep('explain', 'explain-recommendation', 'lead-advisor-actor'),
+  ]);
+  const explainId = assignmentIdFor(call5, 'explain');
+
+  // Two legitimate reopens of the EXPLANATION -- both must succeed, each
+  // producing a genuinely new Assignment distinct from the original
+  // explain-recommendation.
+  const call6 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authReviseExplain1', 'revise-explanation', 'lead-advisor-actor', {
+      authorizationId: 'auth_revise_explain_1',
+      invocationKey: 'ik_revise_explain_1',
+      reason: 'First bounded reopen of the explanation.',
+      grantedContextRefs: [explainId],
+    }),
+    opStep('reviseExplain1', 'revise-explanation', 'lead-advisor-actor'),
+  ]);
+  assert.equal(call6.steps.find((s) => s.as === 'authReviseExplain1').appended, true);
+  const reviseExplain1Id = assignmentIdFor(call6, 'reviseExplain1');
+  assert.notEqual(reviseExplain1Id, explainId, 'a recheck/reopen must be a genuinely NEW Assignment, never a retry of the original explain-recommendation');
+
+  const call7 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authReviseExplain2', 'revise-explanation', 'lead-advisor-actor', {
+      authorizationId: 'auth_revise_explain_2',
+      invocationKey: 'ik_revise_explain_2',
+      reason: 'Second bounded reopen of the explanation.',
+      grantedContextRefs: [reviseExplain1Id],
+    }),
+    opStep('reviseExplain2', 'revise-explanation', 'lead-advisor-actor'),
+  ]);
+  assert.equal(call7.steps.find((s) => s.as === 'authReviseExplain2').appended, true);
+  const reviseExplain2Id = assignmentIdFor(call7, 'reviseExplain2');
+
+  const eventsBeforeThirdAttempt = countEventLines(tempDir, coordinationId);
+  await assert.rejects(
+    () =>
+      run(ctx, coordinationId, writerId, [
+        authorizeStep('authReviseExplain3', 'revise-explanation', 'lead-advisor-actor', {
+          authorizationId: 'auth_revise_explain_3',
+          invocationKey: 'ik_revise_explain_3',
+          reason: 'Third reopen attempt -- must be refused, the binding admits at most 2.',
+          grantedContextRefs: [reviseExplain2Id],
+        }),
+      ]),
+    (err) => err instanceof CoordinationError && /maxInvocations/.test(err.message),
+    'activation.maxInvocations: 2 must refuse a third authorization of revise-explanation, the SAME mechanism proven above for revise-synthesis',
+  );
+  assert.equal(countEventLines(tempDir, coordinationId), eventsBeforeThirdAttempt, 'the refused over-cap authorization must write zero new events');
+
+  // Both real reopens, and the ORIGINAL explanation, remain distinct and
+  // readable -- proving this is not the phantom-shaped, deletable binding
+  // R2 found: removing revise-explanation's own gating would make this
+  // assertion (and the maxInvocations refusal above) fail.
+  const replayed = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  const leadAdvisorReopenAssignmentIds = new Set(
+    replayed.assignments.filter((a) => a.actorId === 'lead-advisor-actor' && [explainId, reviseExplain1Id, reviseExplain2Id].includes(a.assignmentId)).map((a) => a.assignmentId),
+  );
+  assert.deepEqual(leadAdvisorReopenAssignmentIds, new Set([explainId, reviseExplain1Id, reviseExplain2Id]), 'exactly three distinct Assignments for the lead advisor\'s explanation lineage: original preserved alongside both reopens');
 });
 
 // ── Terminal mutation is refused ────────────────────────────────────────────
@@ -854,7 +974,7 @@ test('human-authority impersonation: a driver-attributed human-turn step is refu
         },
         opts,
       ),
-    (err) => err instanceof CoordinationError,
+    (err) => err instanceof CoordinationError && /names human turn "turn_never_recorded", which coordination session ".*" never recorded/.test(err.message),
     'the kernel\'s own write door refuses a "human-turn:" ref that was never recorded via recordHumanTurn, for this protocol\'s own bound session',
   );
 });
