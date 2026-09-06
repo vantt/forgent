@@ -584,6 +584,23 @@ export async function runCoordinationUseCase(ctx, options = {}) {
         // record time, or the step fails loudly rather than recording a
         // provenance stamp for bytes nobody verified.
         const resolvedArtifactPath = path.resolve(ctx.cwd, step.artifactRef);
+        // Workspace containment: schema.mjs's own `validateHumanTurnStep`
+        // deliberately does NOT charset-restrict `artifactRef` the way
+        // `turnId`/`respondsToRefs` are (a real relative file path needs
+        // path separators `assertSafeId` would reject) -- so the escape
+        // check belongs here instead, at the one place that actually
+        // resolves it to a filesystem path. A `../` traversal or an
+        // absolute path both resolve OUTSIDE `ctx.cwd`; `path.relative`
+        // starting with `..` (or itself absolute, the cross-drive/UNC
+        // edge Node's own path module can still produce) is the standard
+        // "escaped the root" test.
+        const relativeToWorkspace = path.relative(ctx.cwd, resolvedArtifactPath);
+        if (relativeToWorkspace.startsWith('..') || path.isAbsolute(relativeToWorkspace)) {
+          throw new StoreError(
+            'validation',
+            `coordination request: steps[${step.as}] (type "human-turn") artifactRef "${step.artifactRef}" resolves to "${resolvedArtifactPath}", outside the working directory "${ctx.cwd}" -- a human-turn artifact must live inside the workspace the session was opened against`,
+          );
+        }
         let artifactBytes;
         try {
           artifactBytes = fs.readFileSync(resolvedArtifactPath);

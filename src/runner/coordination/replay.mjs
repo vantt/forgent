@@ -266,6 +266,16 @@ export function replaySession(coordinationId, opts = {}) {
           `session "${coordinationId}": "human-turn-recorded" event "${turnId}" attributes the turn to "${attributedTo.id}", a declared panel actor of this session -- a panel actor cannot occupy the human-decision slot`,
         );
       }
+      // The FOURTH `attributedTo` refusal `recordHumanTurn` enforces
+      // (store.mjs) -- a driver-authored ref shape can never occupy the
+      // human-decision slot, re-checked here independently so a hand-written
+      // or in-process `appendEvent`-bypassed log cannot slip one past replay.
+      if (/^asgn_/.test(attributedTo.id) || attributedTo.id.startsWith(CONTRIBUTION_REF_PREFIX) || attributedTo.id.startsWith(HUMAN_TURN_REF_PREFIX)) {
+        throw new CoordinationError(
+          'validation',
+          `session "${coordinationId}": "human-turn-recorded" event "${turnId}" attributes the turn to "${attributedTo.id}", which is shaped like a driver-authored ref (an Assignment id, or the reserved "${CONTRIBUTION_REF_PREFIX}"/"${HUMAN_TURN_REF_PREFIX}" namespace) -- a driver-authored ref cannot occupy the human-decision slot`,
+        );
+      }
       if (humanTurnIds.has(turnId)) {
         throw new CoordinationError(
           'duplicate-ref',
@@ -284,6 +294,42 @@ export function replaySession(coordinationId, opts = {}) {
           'validation',
           `session "${coordinationId}": "human-turn-recorded" event "${turnId}" has turnOrdinal ${turnOrdinal}, expected ${expectedOrdinal} -- no gaps, no ordinal reuse`,
         );
+      }
+      // `respondsToRefs` ownership, re-checked at replay for the SAME reason
+      // a disposition's own `human-turn:` targetRef is (right beside this
+      // branch, below): `recordHumanTurn` (store.mjs) validates every entry
+      // through `assertDispositionRefOwnedBySession` at write time, and a
+      // hand-written or in-process `appendEvent`-bypassed log must not be
+      // able to carry a fabricated/dangling one unnoticed. Checked BEFORE
+      // this turn's own id is added to `humanTurnIds` below, so a turn
+      // cannot cite itself as something it responds to either (append-only
+      // ordering, mirroring the deliberation-contribution-linked branch's
+      // own "every ref must already exist" discipline).
+      if (event.payload.respondsToRefs !== undefined) {
+        for (const ref of event.payload.respondsToRefs) {
+          if (ref.startsWith(HUMAN_TURN_REF_PREFIX)) {
+            const respondsToTurnId = ref.slice(HUMAN_TURN_REF_PREFIX.length);
+            if (!humanTurnIds.has(respondsToTurnId)) {
+              throw new CoordinationError(
+                'out-of-order-ref',
+                `session "${coordinationId}": "human-turn-recorded" event "${turnId}" cites respondsToRefs entry "${ref}", naming human turn "${respondsToTurnId}", which has no "human-turn-recorded" event before it in this session's log`,
+              );
+            }
+          } else if (ref.startsWith(CONTRIBUTION_REF_PREFIX)) {
+            const respondsToContributionId = ref.slice(CONTRIBUTION_REF_PREFIX.length);
+            if (!contributionIds.has(respondsToContributionId)) {
+              throw new CoordinationError(
+                'dangling-ref',
+                `session "${coordinationId}": "human-turn-recorded" event "${turnId}" cites respondsToRefs entry "${ref}", naming contribution "${respondsToContributionId}", which this session never linked`,
+              );
+            }
+          } else if (humanTurnIds.has(ref) || contributionIds.has(ref)) {
+            throw new CoordinationError(
+              'validation',
+              `session "${coordinationId}": "human-turn-recorded" event "${turnId}" cites respondsToRefs entry "${ref}" as a bare id, which targets nothing -- the reserved "${HUMAN_TURN_REF_PREFIX}"/"${CONTRIBUTION_REF_PREFIX}" prefix is required to target it`,
+            );
+          }
+        }
       }
       maxHumanTurnOrdinal = expectedOrdinal;
       humanTurnIds.add(turnId);

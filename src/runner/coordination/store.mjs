@@ -1345,6 +1345,30 @@ function canonicalizeHumanTurnPayload(value) {
 }
 
 /**
+ * The minimum shape a `turnId` must have -- the SAME discipline
+ * `assertContributionIdShape` already applies to `contributionId`, mirrored
+ * rather than duplicated-with-drift: no path separator, no `..`, and must
+ * not itself start with either reserved ref prefix. Without this, a
+ * path-shaped `turnId` combined with `assertDispositionRefOwnedBySession`'s
+ * own early `return` for a `human-turn:`-prefixed ref could reach a
+ * `human-turn:<turnId>` disposition ref that never goes through the
+ * cross-session/`asgn_` segment scan the generic (unprefixed) branch of
+ * that function still runs -- reachable only from a direct store API
+ * caller (`fgos coordination run`'s own request boundary already applies
+ * `assertSafeId` to `turnId`, which is stricter than this), but this
+ * module's own doors validate at the boundary regardless of caller.
+ */
+function assertHumanTurnIdShape(turnId, label) {
+  if (typeof turnId !== 'string' || turnId.length === 0) return; // shape validation (validateEventPayload) owns the empty case
+  if (/[\\/]/.test(turnId) || turnId.includes('..') || turnId.startsWith(CONTRIBUTION_REF_PREFIX) || turnId.startsWith(HUMAN_TURN_REF_PREFIX)) {
+    throw new CoordinationError(
+      'validation',
+      `${label}: turnId "${turnId}" must not contain a path separator or "..", and must not itself start with "${CONTRIBUTION_REF_PREFIX}" or "${HUMAN_TURN_REF_PREFIX}"`,
+    );
+  }
+}
+
+/**
  * Append one `human-turn-recorded` event: the driver's transcription of one
  * REAL, person-attributed turn (Phase 03.1, the trusted external-input/
  * human-decision provenance door named by P02.1's BL4 row).
@@ -1395,6 +1419,7 @@ export function recordHumanTurn(
   { turnId, turnOrdinal, channel, artifactRef, revision, externalRef, attributedTo, recordedBy, respondsToRefs },
   opts = {},
 ) {
+  assertHumanTurnIdShape(turnId, 'recordHumanTurn');
   const { fgosDir, sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
   const payload = {
     turnId,

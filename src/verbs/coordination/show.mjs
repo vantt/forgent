@@ -28,7 +28,8 @@
 //     this stays a mirror rather than a second, divergent policy. Every
 //     rule the write door gains has to be mirrored here in the same
 //     commit, or the two silently disagree about a ref shape only one of
-//     them recognizes (MVP8's `contribution:` namespace is one such).
+//     them recognizes (MVP8's `contribution:` namespace and Phase 03.1's
+//     `human-turn:` namespace are two such).
 // `postTerminal` marking mirrors the SAME "neutralize, don't hide"
 // posture replay.mjs already applies to authorizations
 // (`ignoredAuthorizations`) -- replay.mjs does not apply it to
@@ -37,7 +38,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { StoreError } from '../../state/store.mjs';
-import { CoordinationError, CONTRIBUTION_REF_PREFIX } from '../../runner/coordination/schema.mjs';
+import { CoordinationError, CONTRIBUTION_REF_PREFIX, HUMAN_TURN_REF_PREFIX } from '../../runner/coordination/schema.mjs';
 import { evaluateSessionQuorum, deriveSessionPhase } from '../../runner/coordination/session-engine.mjs';
 import { readManifest, readSessionEvents, resolveSessionPaths } from '../../runner/coordination/store.mjs';
 import { replaySession } from '../../runner/coordination/replay.mjs';
@@ -52,7 +53,7 @@ const TERMINAL_EVENT_TYPES = new Set(['session-completed', 'session-partial', 's
 // Rule-for-rule mirror of store.mjs's private `assertDispositionRefOwnedBySession`,
 // as a boolean check instead of a throw: a render-time gate must not take
 // down the whole `show` command over one bad ref, it must mark it.
-function isRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, contributionIds = new Set() }) {
+function isRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, contributionIds = new Set(), humanTurnIds = new Set() }) {
   if (typeof ref !== 'string') return false;
   // Phase 08 (MVP8): a ref in the reserved `contribution:` namespace names a
   // deliberation contribution, which has no `.fgos/` directory for the segment
@@ -62,10 +63,18 @@ function isRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, con
   if (ref.startsWith(CONTRIBUTION_REF_PREFIX)) {
     return contributionIds.has(ref.slice(CONTRIBUTION_REF_PREFIX.length));
   }
+  // Phase 03.1: the SAME mirror obligation, for the `human-turn:` namespace
+  // store.mjs's `assertDispositionRefOwnedBySession` added -- owned iff THIS
+  // session's own log recorded the turn.
+  if (ref.startsWith(HUMAN_TURN_REF_PREFIX)) {
+    return humanTurnIds.has(ref.slice(HUMAN_TURN_REF_PREFIX.length));
+  }
   // A BARE id of one of this session's own contributions targets nothing; the
   // write door refuses that near-miss outright, so the mirror must not render
   // it as an owned ref.
   if (contributionIds.has(ref)) return false;
+  // Same near-miss discipline, for a bare human turn id.
+  if (humanTurnIds.has(ref)) return false;
   for (const segment of ref.split(/[\\/]/).filter(Boolean)) {
     if (segment !== coordinationId && fs.existsSync(path.join(fgosDir, 'coordination', 'sessions', segment, 'session.json'))) {
       return false;
@@ -268,9 +277,11 @@ export function showCoordinationUseCase(ctx, { id }) {
       coordinationId: id,
       assignmentRefs: coordinationState.assignmentRefs,
       fgosDir,
-      // Only the contributions replay ACCEPTED count -- a post-terminal one
-      // (`ignoredContributions`) informed nothing and owns no ref.
+      // Only the contributions/turns replay ACCEPTED count -- a post-terminal
+      // one (`ignoredContributions`/`ignoredHumanTurns`) informed nothing and
+      // owns no ref.
       contributionIds: new Set(coordinationState.contributions.map((record) => record.contributionId)),
+      humanTurnIds: new Set(coordinationState.humanTurns.map((record) => record.turnId)),
     };
     let terminalSeen = false;
     dispositions = [];
