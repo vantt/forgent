@@ -149,6 +149,27 @@ function renderSpecialistAuthorization(record) {
   };
 }
 
+// Phase 03.1 (Architecture Advisory Panel track): render one
+// `human-turn-recorded` record -- the "person-attributed turns" section.
+// Rendered as its OWN labelled section, never merged into `dispositions` or
+// any other driver-authored list: a human turn is transcribed BY the driver
+// but ATTRIBUTED TO a person, which is a distinct provenance shape from
+// every other event this module renders.
+function renderHumanTurn(record) {
+  return {
+    turnId: record.turnId,
+    turnOrdinal: record.turnOrdinal,
+    channel: record.channel,
+    artifactRef: record.artifactRef,
+    revision: record.revision,
+    externalRef: record.externalRef,
+    attributedTo: record.attributedTo,
+    recordedBy: record.recordedBy,
+    respondsToRefs: [...(record.respondsToRefs ?? [])],
+    ts: record.ts,
+  };
+}
+
 /**
  * @param {object} ctx `{cwd, repoRoot, packageRoot?}`
  * @param {object} options `{id}`
@@ -198,6 +219,8 @@ export function showCoordinationUseCase(ctx, { id }) {
   let ignoredAggregations = null;
   let specialistAuthorizations = null;
   let ignoredSpecialistAuthorizations = null;
+  let humanTurns = null;
+  let ignoredHumanTurns = null;
 
   if (coordinationState) {
     authorizations = coordinationState.authorizations.map((a) => ({
@@ -232,6 +255,13 @@ export function showCoordinationUseCase(ctx, { id }) {
     // effect, without opening events.jsonl by hand.
     specialistAuthorizations = coordinationState.specialistAuthorizations.map(renderSpecialistAuthorization);
     ignoredSpecialistAuthorizations = coordinationState.ignoredSpecialistAuthorizations.map(renderSpecialistAuthorization);
+
+    // Phase 03.1: person-attributed turns, rendered the same way
+    // authorizations/specialist authorizations are -- a driver must be able
+    // to see who a recorded turn is attributed to and why a post-terminal
+    // one never informed the session, without opening events.jsonl by hand.
+    humanTurns = coordinationState.humanTurns.map(renderHumanTurn);
+    ignoredHumanTurns = coordinationState.ignoredHumanTurns.map(renderHumanTurn);
 
     const { fgosDir } = resolveSessionPaths(id, engineOpts);
     const refOwnedOpts = {
@@ -307,6 +337,8 @@ export function showCoordinationUseCase(ctx, { id }) {
     ignoredAggregations,
     specialistAuthorizations,
     ignoredSpecialistAuthorizations,
+    humanTurns,
+    ignoredHumanTurns,
     ...(coordinationStateError !== null ? { coordinationStateError } : {}),
   };
 }

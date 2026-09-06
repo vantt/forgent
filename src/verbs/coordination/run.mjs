@@ -11,18 +11,21 @@
 // check below, which reuses the SAME loadCoordinationProtocol the engine
 // itself calls, never a second copy of protocol-loading logic.
 //
-// TWO deliberate exceptions to that import rule, both from store.mjs:
-// `recordDriverDisposition` and `readSessionEvents`. A disposition is
-// driver ledger state about a ref -- it resolves no binding, materializes
-// nothing, and has no FlowDefinition-aware counterpart in session-engine.mjs
-// to delegate to, so store.mjs's door IS the door (it does its own shape
-// validation, active-session check, driver-identity pin, and lock-held
-// append). `readSessionEvents` reads back the real persisted
-// `operation-authorized` event on an "authorize" step's idempotent
-// (appended: false) path, so the reported step result never echoes a
-// repeat call's own (possibly different) payload as if it were now in
-// force -- session-engine.mjs has no equivalent read either. Importing both
-// here reaches the real doors rather than reimplementing any part of them.
+// THREE deliberate exceptions to that import rule, all from store.mjs:
+// `recordDriverDisposition`, `recordHumanTurn`, and `readSessionEvents`. A
+// disposition is driver ledger state about a ref -- it resolves no binding,
+// materializes nothing, and has no FlowDefinition-aware counterpart in
+// session-engine.mjs to delegate to, so store.mjs's door IS the door (it
+// does its own shape validation, active-session check, driver-identity pin,
+// and lock-held append). `recordHumanTurn` (Phase 03.1) is the same shape --
+// a trusted-input/human-decision provenance record is definition-blind
+// ledger state, never a binding dispatch. `readSessionEvents` reads back the
+// real persisted `operation-authorized` event on an "authorize" step's
+// idempotent (appended: false) path, so the reported step result never
+// echoes a repeat call's own (possibly different) payload as if it were now
+// in force -- session-engine.mjs has no equivalent read either. Importing
+// all three here reaches the real doors rather than reimplementing any part
+// of them.
 //
 // "run is synchronous in V1" (R1): every step in a request's `steps` array
 // (or the single `task` for an agent-led request) is awaited in order
@@ -43,8 +46,9 @@
 // since ordinary dispatch has no per-call identity check of its own.
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { StoreError } from '../../state/store.mjs';
-import { CoordinationError } from '../../runner/coordination/schema.mjs';
+import { CoordinationError, HUMAN_TURN_REF_PREFIX } from '../../runner/coordination/schema.mjs';
 import {
   openStandaloneSession,
   openDeclaredProtocolSession,
@@ -58,7 +62,7 @@ import {
   closeSessionByQuorum,
   deriveSessionPhase,
 } from '../../runner/coordination/session-engine.mjs';
-import { recordDriverDisposition, readSessionEvents } from '../../runner/coordination/store.mjs';
+import { recordDriverDisposition, recordHumanTurn, readSessionEvents } from '../../runner/coordination/store.mjs';
 import { loadCoordinationProtocol } from '../../runner/definitions/protocol-loader.mjs';
 import { validateCoordinationRequest } from './schema.mjs';
 
@@ -569,6 +573,68 @@ export async function runCoordinationUseCase(ctx, options = {}) {
           anchors: contribution.anchors ?? [],
           respondsTo: contribution.respondsTo ?? null,
           appended: contribution.appended,
+        });
+      } else if (step.type === 'human-turn') {
+        // Phase 03.1: the request supplies everything EXCEPT `revision` and
+        // `recordedBy` -- this door computes both itself so neither can be
+        // hand-typed. `artifactRef` is resolved against the working
+        // directory (no existing file-based-ref resolution helper exists in
+        // this module to reuse -- see this file's own header comment on
+        // what IS/ISN'T reused); the file must genuinely exist on disk at
+        // record time, or the step fails loudly rather than recording a
+        // provenance stamp for bytes nobody verified.
+        const resolvedArtifactPath = path.resolve(ctx.cwd, step.artifactRef);
+        let artifactBytes;
+        try {
+          artifactBytes = fs.readFileSync(resolvedArtifactPath);
+        } catch (err) {
+          if (err.code === 'ENOENT' || err.code === 'EISDIR') {
+            throw new StoreError(
+              'validation',
+              `coordination request: steps[${step.as}] (type "human-turn") artifactRef "${step.artifactRef}" does not resolve to a real file at "${resolvedArtifactPath}" -- refusing to record a human-turn provenance stamp for bytes that were never verified to exist`,
+            );
+          }
+          throw err;
+        }
+        const revision = `sha256:${createHash('sha256').update(artifactBytes).digest('hex')}`;
+        // `step.respondsToRefs` carries bare turn ids of PRIOR human turns in
+        // THIS session (schema.mjs's own `assertSafeId`, not `assertSafeRefOrId`
+        // -- see its doc comment for why no `$ref:` resolution applies here);
+        // prefixed with the reserved namespace before reaching the engine,
+        // which is the shape `recordHumanTurn`/`assertDispositionRefOwnedBySession`
+        // (store.mjs) actually expect.
+        const respondsToRefs = step.respondsToRefs !== undefined ? step.respondsToRefs.map((turnId) => `${HUMAN_TURN_REF_PREFIX}${turnId}`) : undefined;
+        const humanTurn = recordHumanTurn(
+          manifest.coordinationId,
+          {
+            turnId: step.turnId,
+            turnOrdinal: step.turnOrdinal,
+            channel: step.channel,
+            artifactRef: step.artifactRef,
+            revision,
+            externalRef: step.externalRef,
+            attributedTo: step.attributedTo,
+            recordedBy: driverIdentity,
+            ...(respondsToRefs !== undefined ? { respondsToRefs } : {}),
+          },
+          engineOpts,
+        );
+        // No `labels[step.as]` entry: this step materializes no Assignment
+        // (matching "authorize"/"disposition"/"contribution", above) -- a
+        // later `$ref:<label>` pointing at it has nothing to resolve to and
+        // is refused by resolveRef's own unknown-label check.
+        stepResults.push({
+          as: step.as,
+          type: 'human-turn',
+          turnId: humanTurn.turnId,
+          turnOrdinal: humanTurn.turnOrdinal,
+          channel: humanTurn.channel,
+          artifactRef: humanTurn.artifactRef,
+          revision: humanTurn.revision,
+          externalRef: humanTurn.externalRef,
+          attributedTo: humanTurn.attributedTo,
+          respondsToRefs: humanTurn.respondsToRefs ?? [],
+          appended: humanTurn.appended,
         });
       } else {
         const fromAssignmentId = resolveRef(step.fromAssignmentId, labels, `steps[${step.as}].fromAssignmentId`);

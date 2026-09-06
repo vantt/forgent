@@ -488,6 +488,76 @@ function validateContributionStep(step, i) {
   };
 }
 
+// Phase 03.1 (Architecture Advisory Panel track): a "human-turn" step
+// reaches `recordHumanTurn` (store.mjs) -- the trusted external-input/
+// human-decision provenance door named by P02.1's BL4 row. Deliberately NOT
+// accepting `revision` here: `run.mjs` resolves `artifactRef` against the
+// working directory/repo root, reads its real bytes, and computes the
+// revision hash itself, so a caller cannot fake "these bytes existed at
+// record time" by hand-typing a hash.
+const HUMAN_TURN_STEP_ALLOWED_KEYS = new Set([
+  'type', 'as', 'turnId', 'turnOrdinal', 'channel', 'artifactRef', 'externalRef', 'attributedTo', 'respondsToRefs',
+]);
+
+const ATTRIBUTED_TO_ALLOWED_KEYS = new Set(['type', 'id']);
+
+// `attributedTo.id` is a real, caller-facing identity (typically a person's
+// name/handle), not concatenated into any derived key or path the way
+// `authorizationId`/`contributionId` are elsewhere in this module -- so it
+// gets the same safe-charset check every other id in this module gets
+// (defense in depth, not because this module knows of a specific
+// interpolation risk for it).
+function validateHumanTurnAttributedTo(attributedTo, label) {
+  if (!isPlainObject(attributedTo)) fail(`${label} is required and must be an object`);
+  assertAllowedKeys(attributedTo, ATTRIBUTED_TO_ALLOWED_KEYS, label);
+  if (attributedTo.type !== 'person') fail(`${label}.type must be "person"`);
+  assertSafeId(attributedTo.id, `${label}.id`);
+  return { type: 'person', id: attributedTo.id };
+}
+
+function validateHumanTurnStep(step, i) {
+  assertAllowedKeys(step, HUMAN_TURN_STEP_ALLOWED_KEYS, `steps[${i}] (type "human-turn")`);
+  assertSafeId(step.turnId, `steps[${i}].turnId`);
+  if (!Number.isInteger(step.turnOrdinal) || step.turnOrdinal < 1) {
+    fail(`steps[${i}].turnOrdinal must be a positive integer`);
+  }
+  if (!isNonEmptyString(step.channel)) fail(`steps[${i}].channel is required and must be a non-empty string`);
+  // `artifactRef` is a real filesystem path `run.mjs` resolves against the
+  // working directory/repo root -- not a `$ref:`/session-owned-ref shape, so
+  // it does NOT go through `assertSafeRefOrId` (which would reject the path
+  // separators every real relative path needs, e.g. "human/1-person.md").
+  // The request file is operator-authored trusted data (this module's own
+  // header comment); `run.mjs`'s own fs.existsSync + hash-at-read-time is
+  // what makes this ref meaningful, not a charset restriction here.
+  if (!isNonEmptyString(step.artifactRef)) fail(`steps[${i}].artifactRef is required and must be a non-empty string`);
+  if (!isNonEmptyString(step.externalRef)) fail(`steps[${i}].externalRef is required and must be a non-empty string`);
+  const attributedTo = validateHumanTurnAttributedTo(step.attributedTo, `steps[${i}].attributedTo`);
+  // Bare turn ids of PRIOR human turns in this same session -- the same
+  // "engine adds the meaning, the request boundary keeps the bare token"
+  // shape a "contribution" step's own `anchors`/`respondsTo` already take
+  // (`assertSafeId`, never `assertSafeRefOrId`): a human-turn step never
+  // gets a `labels[step.as]` entry (see run.mjs), so there is no
+  // Assignment-id `$ref:` this field could ever resolve through, and the
+  // reserved `human-turn:`/`contribution:` PREFIXED ref shape store.mjs's
+  // own `assertDispositionRefOwnedBySession` expects is not itself a legal
+  // charset here (a colon is outside `SAFE_ID_RE`) -- `run.mjs` prefixes each
+  // bare id with the reserved namespace before it ever reaches the engine.
+  let respondsToRefs = step.respondsToRefs !== undefined ? validateStringArray(step.respondsToRefs, `steps[${i}].respondsToRefs`) : undefined;
+  if (respondsToRefs !== undefined) respondsToRefs.forEach((ref, j) => assertSafeId(ref, `steps[${i}].respondsToRefs[${j}]`));
+  if (respondsToRefs !== undefined && respondsToRefs.length === 0) respondsToRefs = undefined;
+  return {
+    type: 'human-turn',
+    as: step.as,
+    turnId: step.turnId,
+    turnOrdinal: step.turnOrdinal,
+    channel: step.channel,
+    artifactRef: step.artifactRef,
+    externalRef: step.externalRef,
+    attributedTo,
+    respondsToRefs,
+  };
+}
+
 function validateSteps(steps) {
   if (!Array.isArray(steps) || steps.length === 0) fail('"steps" is required and must be a non-empty array when kind is "declared-protocol"');
   const seenLabels = new Set();
@@ -501,7 +571,8 @@ function validateSteps(steps) {
     if (step.type === 'authorize') return validateAuthorizeStep(step, i);
     if (step.type === 'disposition') return validateDispositionStep(step, i);
     if (step.type === 'contribution') return validateContributionStep(step, i);
-    fail(`steps[${i}].type must be "operation", "fan-out", "authorize", "disposition", or "contribution"`);
+    if (step.type === 'human-turn') return validateHumanTurnStep(step, i);
+    fail(`steps[${i}].type must be "operation", "fan-out", "authorize", "disposition", "contribution", or "human-turn"`);
     return undefined; // unreachable, keeps linters happy
   });
 }
