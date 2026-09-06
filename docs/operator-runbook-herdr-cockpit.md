@@ -1,6 +1,6 @@
 # Operator runbook — herdr cockpit
 
-The official fgOS operator cockpit (STR40 / decision D d3dbe7f5, supersedes the
+The official fgOS operator cockpit (STR40 / decision D d3dbe7f5 — its hard-law clause re-scoped 2026-09-06 by decision "RUL40 re-scope" (scope runner, supersedes d3dbe7f5; see docs/specs/runner.md RUL40) — which itself supersedes the
 earlier tmux-based D ef6ed305). herdr arranges panes; every pane runs the
 real fgOS CLI standalone — herdr is chrome, not a brain.
 
@@ -56,7 +56,7 @@ measured production bug elsewhere ("idle killed an agent", observed in this
 project's own dogfooding) precisely because it became a second, competing
 source of truth about what was happening. If you're extending this cockpit,
 do not reach for `herdr agent ...` commands or any `agent_status` field —
-read fgOS's own CLI instead. See decision D d3dbe7f5 for the full reasoning.
+read fgOS's own CLI instead. See decision D d3dbe7f5 for the original reasoning; superseded 2026-09-06 by decision "RUL40 re-scope" (docs/specs/runner.md RUL40): herdr is still never the source of truth, but Dispatch may use herdr's agent API as transport and failure detector.
 
 ## Multi-operator use
 

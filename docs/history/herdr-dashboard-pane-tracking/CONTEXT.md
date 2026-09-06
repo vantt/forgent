@@ -70,7 +70,7 @@ lifecycle.
   unresolved segments dropped), the format this item's scan must parse
   against.
 - `docs/history/herdr-fgos-tui-plugin/CONTEXT.md` D4 (citing STR40 decision
-  `d3dbe7f5`, a real production incident: "idle killed an agent") — the
+  `d3dbe7f5` — superseded 2026-09-06 by "RUL40 re-scope", see docs/specs/runner.md RUL40 —, a real production incident: "idle killed an agent") — the
   rule that herdr's own `agent_status`/process detection must never become
   a competing source of truth against fgOS's own `status` field. D0a/D0b
   above are this item's application of that same already-burned lesson.

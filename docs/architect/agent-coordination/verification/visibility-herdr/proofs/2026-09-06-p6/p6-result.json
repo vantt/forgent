@@ -1,0 +1,15 @@
+{
+  "agent_start_rc": 0,
+  "agent_start_ms": 3897,
+  "prompt_rc": 0,
+  "prompt_ms": 20143,
+  "ack_ms": 20147,
+  "result_ms": 20149,
+  "multiline_rc": 0,
+  "outbox": [
+    "ack-1.json",
+    "brief-1.md",
+    "multiline-1.json",
+    "result-1.json"
+  ]
+}
