@@ -1,31 +1,35 @@
-# Current Cell: P01.3 (vnflow, unclear-input manual proof)
+# Current Cell: none open — track parked at a Stop Gate
 
-Status: blocked — needs the real person for Phase 9
+Status: parked
 Last updated: 2026-09-06
-Next action: present `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/explanation.md`
-to the person and wait for a genuine reaction. Do not simulate a Phase 9
-turn.
+Next action: person confirms how the track proceeds (see below)
 
-## Why blocked
+## Why parked
 
-Phases 1 through 8 ran autonomously and are committed. The panel's
-recommendation for the real vnflow EOD/intraday case: keep the two
-pipelines and the existing shared runner, do not build a pluggable
-abstraction, close 3 named seams (make intraday's breadth-gate policy
-explicit; port EOD's schema-tolerance fix; make intraday's read of EOD's
-output a checked input). Two live disagreements were preserved
-unresolved, and two judgments were named as the person's alone: whether
-the breadth-gate fix should be required or deliberately exempted, and
-which of two readings of "evolution is becoming difficult" they meant —
-the second one, per `synthesis.md`, is the single fact that could flip
-the whole recommendation.
+P01.3 (unclear-input manual proof, vnflow) is closed — see
+`docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.3.md`
+for the full trace, including a real Phase 9 dialogue turn (the person
+sought and accepted an independent kongming verdict rather than answering
+the panel's own two open questions directly) and a Coordinator-verified
+factual correction to the panel's own evidence.
 
-Phase 9 (Stay In Dialogue) requires a real human turn per this track's
-own Plan-Level Invariant — it cannot be simulated. See `P01.3.md` for the
-full phase log and `proofs/P01.3/explanation.md` for the document to
-present.
+Phase 01 (advisory soul and manual proof) is now fully done: P01.1 +
+P01.2 + P01.3 all closed. Phase 02 (capability-fit audit) is next per
+`plans/260905-architecture-advisory-panel/plan.md`, and is unblocked.
 
-## What can continue independently while blocked
+## One consolidated question for the person
 
-Nothing else in this track is unblocked — Phase 02 depends on P01.3
-closing, and P01.3 cannot close without at least one real dialogue turn.
+1. Proceed to Phase 02 (capability-fit audit) now, per the plan's own
+   sequencing?
+2. Separately (does not block #1): authorize a real implementation task
+   against `/home/vantt/projects/vnflow` to act on kongming's ordered
+   plan from P01.3 — same pattern already used for mdview in P01.2 (a
+   separately dispatched, explicitly authorized task; the advisory panel
+   itself never gets git or implementation authority)? If yes, on what
+   scope (just the breadth-gate wiring, or the full 5-step plan)?
+
+## What can continue independently while parked
+
+Nothing in this track proceeds past Phase 01 without an answer to
+question 1. Question 2 is independent of the track and can be answered
+separately or not at all.

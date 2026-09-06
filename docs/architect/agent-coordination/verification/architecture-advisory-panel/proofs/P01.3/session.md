@@ -14,8 +14,9 @@ section allowing either path for a manual proof.
 | 6 | Debate Claims (Critic) | done — `critiques/architecture-critic.md`, 5 attacks + 1 conceded, 2 independently re-verified against real source |
 | 7 | Converge Without Flattening (Synthesizer) | done — `synthesis.md`, ONE recommendation (option A narrowly: no abstraction, close 3 named seams), live dissent preserved |
 | 8 | Explain For Ownership (Lead Advisor) | done — `explanation.md`, the human-facing deliverable |
-| 9 | Stay In Dialogue (real human turns) | **blocked on the actual person** — explanation.md ready to present |
+| 9 | Stay In Dialogue (real human turns) | **DONE, real outcome reached.** Turn 1: person sought and accepted an independent (kongming) verdict; Coordinator verified its key factual claim; cell closed |
 
-Next action: present `explanation.md` to the person (the real vnflow
-maintainer context) and wait for a genuine Phase 9 dialogue turn. Nothing
-else in this cell can proceed autonomously.
+Cell CLOSED. Next action outside this cell: ask the person which scope
+"tiếp theo là gì" carries (continue the fgos-plan-loop track toward Phase
+02, and/or separately authorize a real implementation task in vnflow) —
+see `dispositions.md` D3. Not resolved by this cell.
