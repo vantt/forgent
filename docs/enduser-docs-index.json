@@ -3594,6 +3594,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/use-fgos-architecture-panel.md",
+    "title": "How to use the `fgos-architecture-panel` skill",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/use-fgos-group-thinking.md",
     "title": "How to use the `fgos-group-thinking` skill",
     "sourceCaptureId": null
