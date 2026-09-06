@@ -27,6 +27,7 @@ import {
   assertAssignmentIsSessionBlind,
   assertSchemaVersionCurrent,
   CONTRIBUTION_REF_PREFIX,
+  HUMAN_TURN_REF_PREFIX,
 } from './schema.mjs';
 import { validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 
@@ -145,6 +146,18 @@ export function replaySession(coordinationId, opts = {}) {
   const specialistAuthorizations = [];
   const ignoredSpecialistAuthorizations = [];
   const specialistAuthorizationIds = new Set();
+  // Phase 03.1: recorded human turns, reconstructed the same way
+  // authorizations/specialist authorizations are -- valid ones (pre-terminal)
+  // in `humanTurns`, post-terminal ones neutralized into `ignoredHumanTurns`
+  // rather than silently dropped. `maxHumanTurnOrdinal`/`humanTurnExternalRefs`
+  // are running state, updated regardless of terminal status (mirroring how
+  // `authorizationIds`/`aggregationIds` are updated unconditionally above) --
+  // only which LIST a record lands in depends on `terminalSeen`.
+  const humanTurns = [];
+  const ignoredHumanTurns = [];
+  const humanTurnIds = new Set();
+  const humanTurnExternalRefs = new Map(); // externalRef -> the turnId that first claimed it
+  let maxHumanTurnOrdinal = 0;
   let terminalSeen = false;
 
   for (const event of events) {
@@ -225,6 +238,72 @@ export function replaySession(coordinationId, opts = {}) {
       // (the only list `resolveLiveSpecialistBindings` reads), reported
       // separately, never silently dropped.
       (terminalSeen ? ignoredSpecialistAuthorizations : specialistAuthorizations).push(record);
+    } else if (event.type === 'human-turn-recorded') {
+      // Same three read-time questions the specialist-authorization/
+      // aggregation branches ask, plus two new to this kind (ordinal
+      // contiguity, externalRef reuse) that only a caller holding the whole
+      // session's own log can answer -- `validateEventPayload` (above) has
+      // already refused a malformed `attributedTo`/`recordedBy` shape; what
+      // this adds is every session-scoped question the pure shape validator
+      // cannot answer alone.
+      const { turnId, turnOrdinal, externalRef, attributedTo, recordedBy } = event.payload;
+      if (recordedBy.id !== manifest.provenanceRoot.writerId) {
+        throw new CoordinationError(
+          'foreign-ref',
+          `session "${coordinationId}": "human-turn-recorded" event "${turnId}" was recorded by "${recordedBy.id}", which is not this session's driver identity ("${manifest.provenanceRoot.writerId}") -- recording a human turn is driver-authored session state, never a participant's own claim`,
+        );
+      }
+      if (attributedTo.id === recordedBy.id) {
+        throw new CoordinationError(
+          'validation',
+          `session "${coordinationId}": "human-turn-recorded" event "${turnId}" attributes the turn to "${attributedTo.id}", the same identity as its own recordedBy -- a driver cannot attribute a human turn to itself`,
+        );
+      }
+      const declaredActorIds = new Set((manifest.actors ?? []).map((actor) => actor.id));
+      if (declaredActorIds.has(attributedTo.id)) {
+        throw new CoordinationError(
+          'validation',
+          `session "${coordinationId}": "human-turn-recorded" event "${turnId}" attributes the turn to "${attributedTo.id}", a declared panel actor of this session -- a panel actor cannot occupy the human-decision slot`,
+        );
+      }
+      if (humanTurnIds.has(turnId)) {
+        throw new CoordinationError(
+          'duplicate-ref',
+          `session "${coordinationId}": duplicate "human-turn-recorded" event for turn "${turnId}"`,
+        );
+      }
+      if (humanTurnExternalRefs.has(externalRef)) {
+        throw new CoordinationError(
+          'duplicate-ref',
+          `session "${coordinationId}": "human-turn-recorded" event "${turnId}" reuses externalRef "${externalRef}", already used by turn "${humanTurnExternalRefs.get(externalRef)}" -- an externalRef may back at most one real human turn`,
+        );
+      }
+      const expectedOrdinal = maxHumanTurnOrdinal + 1;
+      if (turnOrdinal !== expectedOrdinal) {
+        throw new CoordinationError(
+          'validation',
+          `session "${coordinationId}": "human-turn-recorded" event "${turnId}" has turnOrdinal ${turnOrdinal}, expected ${expectedOrdinal} -- no gaps, no ordinal reuse`,
+        );
+      }
+      maxHumanTurnOrdinal = expectedOrdinal;
+      humanTurnIds.add(turnId);
+      humanTurnExternalRefs.set(externalRef, turnId);
+      const record = {
+        turnId,
+        turnOrdinal,
+        channel: event.payload.channel,
+        artifactRef: event.payload.artifactRef,
+        revision: event.payload.revision,
+        externalRef,
+        attributedTo,
+        recordedBy,
+        ...(event.payload.respondsToRefs !== undefined ? { respondsToRefs: Object.freeze([...event.payload.respondsToRefs]) } : {}),
+        ts: event.ts,
+      };
+      // Post-terminal: neutralized exactly like a post-terminal
+      // authorization/aggregation -- excluded from `humanTurns`, reported
+      // separately, never silently dropped.
+      (terminalSeen ? ignoredHumanTurns : humanTurns).push(record);
     } else if (event.type === 'aggregation-validated') {
       // Read-time rejection of worker-shaped aggregate truth. `validateEventPayload`
       // (above) has already refused a `validatedBy.type` other than `"driver"`
@@ -393,6 +472,22 @@ export function replaySession(coordinationId, opts = {}) {
       };
       (terminalSeen ? ignoredContributions : contributions).push(record);
     } else if (event.type === 'driver-disposition-recorded') {
+      // Phase 03.1: a disposition citing a `human-turn:` ref must name a
+      // turn already walked at this point in the log -- checked
+      // unconditionally (regardless of terminal status), unlike the
+      // contribution-resolving branch below: this is a referential-integrity/
+      // fabrication-resistance question ("did this turn exist yet"), never a
+      // "did this resolve anything" question the way contribution resolution
+      // is.
+      if (event.payload.targetRef.startsWith(HUMAN_TURN_REF_PREFIX)) {
+        const targetTurnId = event.payload.targetRef.slice(HUMAN_TURN_REF_PREFIX.length);
+        if (!humanTurnIds.has(targetTurnId)) {
+          throw new CoordinationError(
+            'out-of-order-ref',
+            `session "${coordinationId}": "driver-disposition-recorded" event targeting "${event.payload.targetRef}" names human turn "${targetTurnId}", which has no "human-turn-recorded" event before it in this session's log`,
+          );
+        }
+      }
       // A disposition naming a contribution is what RESOLVES it. Collected
       // only while the session is pre-terminal, on the same footing as every
       // other post-terminal neutralization here: a disposition that reached
@@ -572,6 +667,8 @@ export function replaySession(coordinationId, opts = {}) {
     ignoredAuthorizations: Object.freeze(ignoredAuthorizations.map((record) => Object.freeze(record))),
     specialistAuthorizations: Object.freeze(specialistAuthorizations.map((record) => Object.freeze(record))),
     ignoredSpecialistAuthorizations: Object.freeze(ignoredSpecialistAuthorizations.map((record) => Object.freeze(record))),
+    humanTurns: Object.freeze(humanTurns.map((record) => Object.freeze(record))),
+    ignoredHumanTurns: Object.freeze(ignoredHumanTurns.map((record) => Object.freeze(record))),
     assignments: Object.freeze(assignments.map((record) => Object.freeze(record))),
     results: Object.freeze(results.map((record) => Object.freeze(record))),
     dispositions: Object.freeze(dispositions.map((record) => Object.freeze(record))),

@@ -31,6 +31,7 @@ import {
   applyAggregateBoundDefaults,
   assertSchemaVersionCurrent,
   CONTRIBUTION_REF_PREFIX,
+  HUMAN_TURN_REF_PREFIX,
 } from './schema.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 
@@ -1172,7 +1173,7 @@ export function recordSpecialistAuthorization(
 // namespace must name one of them. Passing no set at all means the caller
 // knows of no contributions, in which case every `contribution:` ref is
 // refused -- fail-closed, never "unchecked because unknown".
-function assertDispositionRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, label, contributionIds = new Set() }) {
+function assertDispositionRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, label, contributionIds = new Set(), humanTurnIds = new Set() }) {
   if (typeof ref !== 'string') {
     throw new CoordinationError('validation', `${label}: ref must be a string, got ${typeof ref}`);
   }
@@ -1186,6 +1187,21 @@ function assertDispositionRefOwnedBySession(ref, { coordinationId, assignmentRef
     }
     return;
   }
+  // Phase 03.1: the SAME discipline as the `contribution:` branch above,
+  // applied to a recorded human turn -- a `human-turn:<id>` ref must name a
+  // turn this session's own log actually recorded. Checked before the
+  // generic segment scan below (a turn id carries no `.fgos/` directory of
+  // its own for that scan to resolve against).
+  if (ref.startsWith(HUMAN_TURN_REF_PREFIX)) {
+    const turnId = ref.slice(HUMAN_TURN_REF_PREFIX.length);
+    if (!humanTurnIds.has(turnId)) {
+      throw new CoordinationError(
+        'dangling-ref',
+        `${label}: ref "${ref}" names human turn "${turnId}", which coordination session "${coordinationId}" never recorded -- a disposition may only target a human turn of its own session`,
+      );
+    }
+    return;
+  }
   // A BARE contribution id that names one of this session's own linked
   // contributions is refused rather than treated as an opaque ref: it would be
   // accepted, rendered, and resolve nothing at all, leaving the contribution
@@ -1195,6 +1211,13 @@ function assertDispositionRefOwnedBySession(ref, { coordinationId, assignmentRef
     throw new CoordinationError(
       'validation',
       `${label}: ref "${ref}" is the bare id of a contribution this session linked, which targets nothing -- write "${CONTRIBUTION_REF_PREFIX}${ref}" to target that contribution`,
+    );
+  }
+  // Same near-miss discipline, for a bare human turn id.
+  if (humanTurnIds.has(ref)) {
+    throw new CoordinationError(
+      'validation',
+      `${label}: ref "${ref}" is the bare id of a human turn this session recorded, which targets nothing -- write "${HUMAN_TURN_REF_PREFIX}${ref}" to target that turn`,
     );
   }
   for (const segment of ref.split(/[\\/]/).filter(Boolean)) {
@@ -1262,17 +1285,20 @@ export function recordDriverDisposition(coordinationId, { targetRef, disposition
       subject: 'a disposition',
     });
 
-    // Read once, lock-held, so a `contribution:` ref is resolved against the
-    // log as it actually is at the moment the disposition is written -- never
-    // against a snapshot taken before the lock.
+    // Read once, lock-held, so a `contribution:`/`human-turn:` ref is
+    // resolved against the log as it actually is at the moment the
+    // disposition is written -- never against a snapshot taken before the
+    // lock.
     const eventsForRefs = readEvents(eventsPath);
     const contributionIds = linkedContributionIds(eventsForRefs);
+    const humanTurnIds = recordedHumanTurnIds(eventsForRefs);
     assertDispositionRefOwnedBySession(targetRef, {
       coordinationId,
       assignmentRefs: manifest.assignmentRefs,
       fgosDir,
       label: 'recordDriverDisposition: targetRef',
       contributionIds,
+      humanTurnIds,
     });
     evidenceRefs.forEach((ref, i) =>
       assertDispositionRefOwnedBySession(ref, {
@@ -1281,6 +1307,7 @@ export function recordDriverDisposition(coordinationId, { targetRef, disposition
         fgosDir,
         label: `recordDriverDisposition: evidenceRefs[${i}]`,
         contributionIds,
+        humanTurnIds,
       }),
     );
 
@@ -1301,6 +1328,173 @@ export function recordDriverDisposition(coordinationId, { targetRef, disposition
     if (alreadyRecorded) return Object.freeze({ ...payload, appended: false });
 
     appendEventLocked(eventsPath, { type: 'driver-disposition-recorded', payload }, sessionDir);
+    return Object.freeze({ ...payload, appended: true });
+  });
+}
+
+// `attributedTo.id`/`recordedBy.id` canonicalization for idempotency
+// comparison, shared shape with `recordDriverDisposition`'s own
+// `authorizedBy` normalization above (JSON.stringify is key-insertion-order
+// sensitive; both fields are caller-supplied nested objects).
+function canonicalizeHumanTurnPayload(value) {
+  return JSON.stringify({
+    ...value,
+    attributedTo: { type: value.attributedTo?.type, id: value.attributedTo?.id },
+    recordedBy: { type: value.recordedBy?.type, id: value.recordedBy?.id },
+  });
+}
+
+/**
+ * Append one `human-turn-recorded` event: the driver's transcription of one
+ * REAL, person-attributed turn (Phase 03.1, the trusted external-input/
+ * human-decision provenance door named by P02.1's BL4 row).
+ *
+ * Same door shape as `recordDriverDisposition`/`recordSpecialistAuthorization`
+ * above -- payload shape validated first, then manifest read + active-status
+ * check + driver-identity pin + append, all inside ONE `withEventsLock`
+ * critical section. That shape is what makes recording a human turn ledger
+ * state a driver writes, never something a worker or the "person" identity
+ * itself could author.
+ *
+ * This door validates SHAPE, session status, driver identity, and a fixed
+ * set of session-scoped refusals a hand-authored or mistaken request could
+ * still try to slip past a well-meaning caller -- it does NOT and cannot
+ * verify that the cited human being genuinely said what `artifactRef`
+ * claims (T6, out of scope for any in-process mechanism; see the contract
+ * doc's Human Turn Provenance section). What it closes: a driver-authored
+ * artifact or actor identity can never occupy the human-decision slot
+ * (T1), and a turn recorded without an internally-consistent, immutable,
+ * ordinal-contiguous, non-replayed attestation becomes illegal in the
+ * ledger (T2-T5) rather than merely undetectable.
+ *
+ * Refusals, each with its own dedicated test:
+ * - `attributedTo.id === recordedBy.id`: a driver cannot attribute a turn
+ *   to itself.
+ * - `attributedTo.id` names a declared `manifest.actors[]` panel actor: a
+ *   panel actor cannot be "the person".
+ * - `attributedTo.id` is shaped like a driver-authored ref (`asgn_`
+ *   Assignment prefix, or the reserved `contribution:`/`human-turn:`
+ *   namespaces): a driver-authored ref cannot occupy the human-decision
+ *   slot merely by being a well-formed id.
+ * - `turnOrdinal` is not exactly one more than the highest ordinal already
+ *   recorded for this session: no gaps, no ordinal reuse.
+ * - `externalRef` already backs a prior turn in this session: no replaying
+ *   one real turn as two.
+ * - `turnId` already recorded with a DIFFERENT payload: immutable once
+ *   written. The IDENTICAL canonical payload is an idempotent no-op
+ *   (`{appended: false}`), the same crash-resume self-heal shape every
+ *   other driver-authored door in this module already takes.
+ *
+ * `respondsToRefs`, when present, must every one already be owned by this
+ * session (a contribution, a human turn, or an Assignment of this session) --
+ * checked with the SAME `assertDispositionRefOwnedBySession` a disposition's
+ * own refs already go through, never a second, divergent ownership rule.
+ */
+export function recordHumanTurn(
+  coordinationId,
+  { turnId, turnOrdinal, channel, artifactRef, revision, externalRef, attributedTo, recordedBy, respondsToRefs },
+  opts = {},
+) {
+  const { fgosDir, sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const payload = {
+    turnId,
+    turnOrdinal,
+    channel,
+    artifactRef,
+    revision,
+    externalRef,
+    attributedTo,
+    recordedBy,
+    ...(respondsToRefs !== undefined ? { respondsToRefs } : {}),
+  };
+  validateEventPayload('human-turn-recorded', payload);
+
+  return withEventsLock(eventsPath, () => {
+    const manifest = readManifestRaw(manifestPath);
+    assertSchemaVersionCurrent(manifest, manifestPath);
+    if (manifest.status !== 'active') {
+      throw new CoordinationError(
+        'validation',
+        `recordHumanTurn: session "${coordinationId}" is not active (status: "${manifest.status}") -- a human turn cannot be recorded into a session that has already closed`,
+      );
+    }
+    assertDriverIdentity(manifest, recordedBy, {
+      coordinationId,
+      label: 'recordHumanTurn',
+      subject: 'a recorded human turn',
+      fieldName: 'recordedBy',
+    });
+
+    // T1: a driver-authored artifact/actor identity can never occupy the
+    // human-decision slot -- checked before the idempotency read below, so
+    // even a byte-identical repeat of an already-illegal payload is refused
+    // again rather than silently accepted as "already recorded".
+    if (attributedTo.id === recordedBy.id) {
+      throw new CoordinationError(
+        'validation',
+        `recordHumanTurn: attributedTo.id "${attributedTo.id}" is the same identity as recordedBy.id -- a driver cannot attribute a human turn to itself`,
+      );
+    }
+    const declaredActorIds = new Set((manifest.actors ?? []).map((actor) => actor.id));
+    if (declaredActorIds.has(attributedTo.id)) {
+      throw new CoordinationError(
+        'validation',
+        `recordHumanTurn: attributedTo.id "${attributedTo.id}" is a declared panel actor of session "${coordinationId}" -- a panel actor cannot occupy the human-decision slot`,
+      );
+    }
+    if (/^asgn_/.test(attributedTo.id) || attributedTo.id.startsWith(CONTRIBUTION_REF_PREFIX) || attributedTo.id.startsWith(HUMAN_TURN_REF_PREFIX)) {
+      throw new CoordinationError(
+        'validation',
+        `recordHumanTurn: attributedTo.id "${attributedTo.id}" is shaped like a driver-authored ref (an Assignment id, or the reserved "${CONTRIBUTION_REF_PREFIX}"/"${HUMAN_TURN_REF_PREFIX}" namespace) -- a driver-authored ref cannot occupy the human-decision slot`,
+      );
+    }
+
+    const events = readEvents(eventsPath);
+    const priorTurns = events.filter((event) => event.type === 'human-turn-recorded');
+
+    const priorForId = priorTurns.find((event) => event.payload.turnId === turnId);
+    if (priorForId) {
+      if (canonicalizeHumanTurnPayload(priorForId.payload) === canonicalizeHumanTurnPayload(payload)) {
+        return Object.freeze({ ...payload, appended: false });
+      }
+      throw new CoordinationError(
+        'duplicate-ref',
+        `recordHumanTurn: turnId "${turnId}" in session "${coordinationId}" was already recorded with different content -- a human turn is immutable; record a new turnId instead`,
+      );
+    }
+
+    const maxOrdinal = priorTurns.reduce((max, event) => Math.max(max, event.payload.turnOrdinal), 0);
+    if (turnOrdinal !== maxOrdinal + 1) {
+      throw new CoordinationError(
+        'validation',
+        `recordHumanTurn: turnOrdinal ${turnOrdinal} is not the next ordinal for session "${coordinationId}" (expected ${maxOrdinal + 1}) -- no gaps, no ordinal reuse`,
+      );
+    }
+
+    const externalRefCollision = priorTurns.find((event) => event.payload.externalRef === externalRef);
+    if (externalRefCollision) {
+      throw new CoordinationError(
+        'duplicate-ref',
+        `recordHumanTurn: externalRef "${externalRef}" in session "${coordinationId}" was already used by turn "${externalRefCollision.payload.turnId}" -- an externalRef may back at most one real human turn`,
+      );
+    }
+
+    if (respondsToRefs !== undefined) {
+      const contributionIds = linkedContributionIds(events);
+      const humanTurnIds = recordedHumanTurnIds(events);
+      respondsToRefs.forEach((ref, i) =>
+        assertDispositionRefOwnedBySession(ref, {
+          coordinationId,
+          assignmentRefs: manifest.assignmentRefs,
+          fgosDir,
+          label: `recordHumanTurn: respondsToRefs[${i}]`,
+          contributionIds,
+          humanTurnIds,
+        }),
+      );
+    }
+
+    appendEventLocked(eventsPath, { type: 'human-turn-recorded', payload }, sessionDir);
     return Object.freeze({ ...payload, appended: true });
   });
 }
@@ -1333,6 +1527,18 @@ function linkedContributionIds(events) {
   const ids = new Set();
   for (const event of events) {
     if (event.type === 'deliberation-contribution-linked') ids.add(event.payload.contributionId);
+  }
+  return ids;
+}
+
+// Phase 03.1: every turn id THIS session's log has recorded, mirroring
+// `linkedContributionIds` exactly -- the one place that answers "is this a
+// human turn of mine", used by the disposition door's `human-turn:` ref
+// check and by `recordHumanTurn`'s own respondsToRefs ownership check.
+function recordedHumanTurnIds(events) {
+  const ids = new Set();
+  for (const event of events) {
+    if (event.type === 'human-turn-recorded') ids.add(event.payload.turnId);
   }
   return ids;
 }
