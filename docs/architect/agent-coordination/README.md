@@ -51,12 +51,21 @@ definitions, statuses, or document placement.
 
 ### Continue The Design Discussion
 
+Read [Coordination Capability Envelope](../proposals/coordination-capability-envelope.md)
+for the 2026-09-06 conceptual response to the independent review: FlowDefinition,
+coordinator-owned deliberation, and programmable-master alternatives. Its
+recommendation remains Discussion and does not supersede accepted contracts.
+
 1. [Step 09: Group Thinking Substrate](../proposals/step-09-group-thinking-substrate.md)
-2. [Team Communication Protocol V1](proposals/team-communication-protocol-v1.md)
-3. [Dispatch Control Plane Redesign](proposals/dispatch-control-plane-redesign.md)
-4. [Step 10: Coding Domain Adoption Of The Coordination Foundation](../proposals/step-10-coding-domain-adoption.md)
-5. [Component Authority Boundary Map](../proposals/component-authority-boundary-map.md)
-6. [Architecture Intent](../architecture-intent.md)
+2. [Architecture Advisory Panel](../proposals/architecture-advisory-panel.md)
+   extends the implemented Group Thinking substrate with the next natural use
+   case after `fgos-code-panel`: problem discovery, architecture deliberation,
+   evidence-linked advice, and a bounded human decision dialogue.
+3. [Team Communication Protocol V1](proposals/team-communication-protocol-v1.md)
+4. [Dispatch Control Plane Redesign](proposals/dispatch-control-plane-redesign.md)
+5. [Step 10: Coding Domain Adoption Of The Coordination Foundation](../proposals/step-10-coding-domain-adoption.md)
+6. [Component Authority Boundary Map](../proposals/component-authority-boundary-map.md)
+7. [Architecture Intent](../architecture-intent.md)
    preserves broader architecture intent across deferred capabilities. Its
    first active thread covers group-thinking/problem-solving capability across
    Agent Coordination, Work Driver, Dispatch/Run, Run Result Evaluation, and

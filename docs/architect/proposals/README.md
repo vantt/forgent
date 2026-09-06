@@ -15,7 +15,15 @@ their scope crosses the area boundary.
 
 ## Active Proposals
 
+- [Coordination Capability Envelope](coordination-capability-envelope.md) —
+  discussion following the independent review: three architecture families,
+  hard/soft boundaries, recommendation, migration responsibilities, and probes;
+  not an accepted architecture or implementation plan.
 - [Step 09: Group Thinking Substrate](step-09-group-thinking-substrate.md)
+- [Architecture Advisory Panel](architecture-advisory-panel.md) — the next
+  Group Thinking use case after `fgos-code-panel`: investigate and frame a
+  software-system problem, deliberate on architectures, advise a person, and
+  support a bounded decision dialogue.
 - [Step 10: Coding Domain Adoption Of The Coordination Foundation](step-10-coding-domain-adoption.md)
 - [Component Authority Boundary Map](component-authority-boundary-map.md)
 
