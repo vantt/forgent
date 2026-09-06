@@ -1221,6 +1221,52 @@ test('a "human-turn" step\'s artifactRef is refused when it is an absolute path'
   );
 });
 
+// Fix round 2 (Reviewer + Red-Team, independently): the containment check
+// above was lexical (`path.resolve`/`path.relative` on the UNRESOLVED
+// path), but `fs.readFileSync` follows symlinks -- an IN-WORKSPACE symlink
+// pointing OUTSIDE the workspace passed the lexical check and had its
+// outside target's bytes hashed as the `revision`. Red-Team's own live
+// repro: a symlink at "human/1-person.md" pointing at "/etc/hostname" was
+// accepted with the hostname file's own hash. `run.mjs` now resolves both
+// the candidate path AND the workspace root with `fs.realpathSync` before
+// comparing.
+test('a "human-turn" step\'s artifactRef is refused when it is an in-workspace symlink pointing outside the workspace', async () => {
+  const { tempDir, ctx } = setup();
+  const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-human-turn-outside-'));
+  const outsideFile = path.join(outsideDir, 'secret.md');
+  fs.writeFileSync(outsideFile, 'Not part of this workspace.\n');
+  fs.mkdirSync(path.join(tempDir, 'human'), { recursive: true });
+  const symlinkPath = path.join(tempDir, 'human', '1-person.md');
+  fs.symlinkSync(outsideFile, symlinkPath);
+
+  await assert.rejects(
+    runCoordinationUseCase(ctx, {
+      requestObject: request({ steps: [produceStep(), humanTurnStep()] }),
+    }),
+    (err) => err instanceof StoreError && /outside the working directory/.test(err.message),
+  );
+});
+
+// The containment fix must not regress a genuine, non-symlinked, nested
+// in-workspace path -- Red-Team already confirmed this live before the fix
+// landed; this test pins it so a future change to the containment logic
+// cannot silently break the legitimate case.
+test('a "human-turn" step\'s artifactRef still works for a genuine nested in-workspace file (no symlink involved)', async () => {
+  const { tempDir, ctx } = setup();
+  fs.mkdirSync(path.join(tempDir, 'human', 'nested'), { recursive: true });
+  const nestedPath = path.join(tempDir, 'human', 'nested', '1-person.md');
+  fs.writeFileSync(nestedPath, 'A real, nested, in-workspace turn.\n');
+  const expectedRevision = `sha256:${createHash('sha256').update(fs.readFileSync(nestedPath)).digest('hex')}`;
+
+  const data = await runCoordinationUseCase(ctx, {
+    requestObject: request({ steps: [produceStep(), humanTurnStep({ artifactRef: 'human/nested/1-person.md' })] }),
+  });
+
+  const result = data.steps.find((step) => step.as === 'person-turn-1');
+  assert.equal(result.appended, true);
+  assert.equal(result.revision, expectedRevision);
+});
+
 test('a "human-turn" step attributing the turn to the request\'s own writerId is refused (self-attribution reaches the real engine door, not just the schema boundary)', async () => {
   const { tempDir, ctx } = setup();
   fs.mkdirSync(path.join(tempDir, 'human'), { recursive: true });

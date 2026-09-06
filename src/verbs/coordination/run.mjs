@@ -584,33 +584,51 @@ export async function runCoordinationUseCase(ctx, options = {}) {
         // record time, or the step fails loudly rather than recording a
         // provenance stamp for bytes nobody verified.
         const resolvedArtifactPath = path.resolve(ctx.cwd, step.artifactRef);
-        // Workspace containment: schema.mjs's own `validateHumanTurnStep`
-        // deliberately does NOT charset-restrict `artifactRef` the way
-        // `turnId`/`respondsToRefs` are (a real relative file path needs
-        // path separators `assertSafeId` would reject) -- so the escape
-        // check belongs here instead, at the one place that actually
-        // resolves it to a filesystem path. A `../` traversal or an
-        // absolute path both resolve OUTSIDE `ctx.cwd`; `path.relative`
-        // starting with `..` (or itself absolute, the cross-drive/UNC
-        // edge Node's own path module can still produce) is the standard
-        // "escaped the root" test.
-        const relativeToWorkspace = path.relative(ctx.cwd, resolvedArtifactPath);
+        const missingArtifactError = () =>
+          new StoreError(
+            'validation',
+            `coordination request: steps[${step.as}] (type "human-turn") artifactRef "${step.artifactRef}" does not resolve to a real file at "${resolvedArtifactPath}" -- refusing to record a human-turn provenance stamp for bytes that were never verified to exist`,
+          );
+        // Fix round 2: workspace containment must run on SYMLINK-RESOLVED
+        // paths, not the lexical `path.resolve` above -- a lexical-only
+        // check (lexical candidate compared against lexical `ctx.cwd`) lets
+        // an IN-WORKSPACE symlink whose TARGET is outside the workspace
+        // pass containment and then have its outside bytes hashed as the
+        // `revision` (Red-Team's own live reproduction: a symlink at
+        // "human/1-person.md" pointing at "/etc/hostname"). `realpathSync`
+        // resolves every symlink in the path (including any in `ctx.cwd`
+        // itself, e.g. a symlinked worktree or a macOS `/tmp` ->
+        // `/private/tmp` mount) and also confirms the path genuinely
+        // exists -- so a missing artifact is caught HERE, before the
+        // containment check ever runs, replacing the plain `fs.readFileSync`
+        // ENOENT catch this used to rely on for that message.
+        let realArtifactPath;
+        try {
+          realArtifactPath = fs.realpathSync(resolvedArtifactPath);
+        } catch (err) {
+          if (err.code === 'ENOENT' || err.code === 'ENOTDIR') throw missingArtifactError();
+          throw err;
+        }
+        const realWorkspaceRoot = fs.realpathSync(ctx.cwd);
+        // A `../` traversal or an absolute path both resolve OUTSIDE
+        // `ctx.cwd`; `path.relative` starting with `..` (or itself
+        // absolute, the cross-drive/UNC edge Node's own path module can
+        // still produce) is the standard "escaped the root" test --
+        // applied to the REAL (symlink-resolved) paths on both sides, so a
+        // symlink escape is caught the identical way a lexical traversal
+        // already is.
+        const relativeToWorkspace = path.relative(realWorkspaceRoot, realArtifactPath);
         if (relativeToWorkspace.startsWith('..') || path.isAbsolute(relativeToWorkspace)) {
           throw new StoreError(
             'validation',
-            `coordination request: steps[${step.as}] (type "human-turn") artifactRef "${step.artifactRef}" resolves to "${resolvedArtifactPath}", outside the working directory "${ctx.cwd}" -- a human-turn artifact must live inside the workspace the session was opened against`,
+            `coordination request: steps[${step.as}] (type "human-turn") artifactRef "${step.artifactRef}" resolves to "${realArtifactPath}" (via "${resolvedArtifactPath}"), outside the working directory "${realWorkspaceRoot}" -- a human-turn artifact must live inside the workspace the session was opened against`,
           );
         }
         let artifactBytes;
         try {
-          artifactBytes = fs.readFileSync(resolvedArtifactPath);
+          artifactBytes = fs.readFileSync(realArtifactPath);
         } catch (err) {
-          if (err.code === 'ENOENT' || err.code === 'EISDIR') {
-            throw new StoreError(
-              'validation',
-              `coordination request: steps[${step.as}] (type "human-turn") artifactRef "${step.artifactRef}" does not resolve to a real file at "${resolvedArtifactPath}" -- refusing to record a human-turn provenance stamp for bytes that were never verified to exist`,
-            );
-          }
+          if (err.code === 'EISDIR') throw missingArtifactError();
           throw err;
         }
         const revision = `sha256:${createHash('sha256').update(artifactBytes).digest('hex')}`;
