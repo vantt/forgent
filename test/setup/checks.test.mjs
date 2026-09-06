@@ -109,6 +109,10 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'coordination-protocol-fixtures-valid',
       'coordination-example-requests-valid',
       'workflow-flow-definition-projects-cleanly',
+      // Phase 01 group D: the three preconditions for an interactive dispatch.
+      'herdr-available',
+      'trust-store-readable',
+      'executor-confinement',
     ].sort(),
   );
 });

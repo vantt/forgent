@@ -623,6 +623,84 @@ function warnIfProviderFamilyUnreliable(executorId, executor) {
  * validated `cfg.capabilities` block and threaded through here, since this
  * function has no other way to see a sibling top-level field.
  */
+/** Vocabularies for the execution profile an executor may declare about itself
+ * (Phase 01 group A of plans/260906-1831-dispatch-visibility-v0). Each is a
+ * closed set rather than a free string for the same reason `for`/`carries`
+ * already are: a typo must fail at load, where it names itself, instead of at
+ * dispatch, where it looks like the agent misbehaving. */
+const PERMISSION_MODES = ['ask', 'bypass'];
+const PROMPT_DELIVERIES = ['file-pointer', 'inline'];
+const RECEIPT_KINDS = ['receiver-written-file'];
+const TRUST_STORE_KINDS = ['claude-json'];
+const CONFINEMENT_FLAGS = ['privateHome', 'isolatedSession', 'ownWorktree'];
+
+/**
+ * The execution profile, and the one invariant binding two of its fields (C5).
+ *
+ * `permissionMode: 'bypass'` hands the worker an agent that will not ask before
+ * acting. That is only defensible when the worker is confined, so the config door
+ * refuses the combination rather than trusting a reviewer to notice it. The
+ * refusal names the missing flag, because "confinement incomplete" sends a reader
+ * looking through three booleans for the one that is false.
+ *
+ * Why a door and not a comment: on a real machine this posture was supplied by a
+ * shell alias and a settings key that fgOS could not see, so nothing in any
+ * executor profile described what an agent would actually do. See
+ * docs/architect/agent-coordination/verification/visibility-herdr/proofs/
+ *   2026-09-06-isolation/permission-posture-findings.md
+ */
+function validateExecutionProfileShape(executor, label) {
+  if (executor.permissionMode !== undefined && !PERMISSION_MODES.includes(executor.permissionMode)) {
+    throw new RunnerConfigError(
+      `runner config (${label}) "permissionMode" must be one of ${PERMISSION_MODES.join('/')}, got: ${JSON.stringify(executor.permissionMode)}.`,
+    );
+  }
+  if (executor.promptDelivery !== undefined && !PROMPT_DELIVERIES.includes(executor.promptDelivery)) {
+    throw new RunnerConfigError(
+      `runner config (${label}) "promptDelivery" must be one of ${PROMPT_DELIVERIES.join('/')}, got: ${JSON.stringify(executor.promptDelivery)}.`,
+    );
+  }
+  if (executor.receipt !== undefined && !RECEIPT_KINDS.includes(executor.receipt)) {
+    throw new RunnerConfigError(
+      `runner config (${label}) "receipt" must be one of ${RECEIPT_KINDS.join('/')}, got: ${JSON.stringify(executor.receipt)}.`,
+    );
+  }
+  // `null` is a real, meaningful value here: this executor needs no trust store.
+  // Only an object with an unknown kind is an error.
+  if (executor.trustStore !== undefined && executor.trustStore !== null) {
+    if (typeof executor.trustStore !== 'object' || Array.isArray(executor.trustStore) || !TRUST_STORE_KINDS.includes(executor.trustStore.kind)) {
+      throw new RunnerConfigError(
+        `runner config (${label}) "trustStore" must be null or an object whose "kind" is one of ${TRUST_STORE_KINDS.join('/')}.`,
+      );
+    }
+  }
+  if (executor.confinement !== undefined) {
+    const c = executor.confinement;
+    if (!c || typeof c !== 'object' || Array.isArray(c)) {
+      throw new RunnerConfigError(`runner config (${label}) "confinement" must be an object when present.`);
+    }
+    for (const flag of CONFINEMENT_FLAGS) {
+      if (c[flag] !== undefined && typeof c[flag] !== 'boolean') {
+        throw new RunnerConfigError(`runner config (${label}) "confinement.${flag}" must be a boolean when present.`);
+      }
+    }
+  }
+
+  // C5, the invariant. Checked after the shapes above so its message can trust
+  // the values it reads.
+  if (executor.permissionMode === 'bypass') {
+    const c = executor.confinement ?? {};
+    const missing = CONFINEMENT_FLAGS.filter((flag) => c[flag] !== true);
+    if (missing.length > 0) {
+      throw new RunnerConfigError(
+        `runner config (${label}) declares "permissionMode": "bypass" without full confinement -- missing ${missing.join(', ')}. ` +
+        'A worker that never asks before acting is only defensible when it is confined, so bypass requires ' +
+        `${CONFINEMENT_FLAGS.join(', ')} to all be true.`,
+      );
+    }
+  }
+}
+
 function validateExecutorEntryShape(executor, label, capabilityNames) {
   if (!executor || typeof executor !== 'object' || Array.isArray(executor)) {
     throw new RunnerConfigError(`runner config (${label}) must be an object.`);
@@ -681,6 +759,7 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
   if (executor.interactiveMode !== undefined) {
     validateInteractiveModeShape(executor.interactiveMode, `${label} "interactiveMode"`);
   }
+  validateExecutionProfileShape(executor, label);
   if (executor.carries !== undefined && !EXECUTOR_CARRIES.includes(executor.carries)) {
     throw new RunnerConfigError(`runner config (${label}) "carries" must be one of ${EXECUTOR_CARRIES.join('/')}, got: ${JSON.stringify(executor.carries)}.`);
   }

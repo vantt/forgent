@@ -31,6 +31,7 @@ import { fileURLToPath } from 'node:url';
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
+import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { checkAgyPermissionsConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
@@ -3292,5 +3293,97 @@ registerCheck({
   id: 'coordination-example-requests-valid',
   description: 'published `fgos coordination run` example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef (Step 08 Phase 07 R3)',
   check: (cwd) => checkCoordinationExampleRequestsValid(cwd),
+});
+
+// Phase 01 group D (plans/260906-1831-dispatch-visibility-v0): the three things
+// that must hold before an interactive dispatch can work at all, each turned from
+// a runtime surprise into a doctor line.
+//
+// The confinement check is the odd one of the three, and the most important. The
+// config door already refuses `permissionMode: "bypass"` without full
+// confinement, so in principle this can never fire — but "in principle" is how a
+// permission posture ends up decided by something nobody can see, which is
+// exactly what was measured on 2026-09-06: the bypass flag reached agents through
+// a shell alias and its acceptance screen was suppressed by a settings key,
+// neither of them visible to any executor profile. A second, independent reading
+// of the same invariant is cheap, and it catches a config that arrived by some
+// route the loader never saw.
+
+/** herdr is the transport every interactive mechanism depends on; without it
+ * there is nothing to dispatch into. */
+export function checkHerdrAvailable() {
+  try {
+    const out = execFileSync('herdr', ['--version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    return { passed: true, message: `herdr is available on PATH (${out})` };
+  } catch (err) {
+    return { passed: false, message: `herdr is not usable on PATH: ${err.message}` };
+  }
+}
+
+/** The folder-trust store must be readable and well-formed, or every dispatch
+ * into a fresh worktree stops at a trust dialog with nobody there to answer it. */
+export function checkTrustStoreWritable(storePath = path.join(os.homedir(), '.claude.json')) {
+  let raw;
+  try {
+    raw = fs.readFileSync(storePath, 'utf8');
+  } catch (err) {
+    return { passed: false, message: `trust store at ${storePath} is unreadable: ${err.message}` };
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed.projects || typeof parsed.projects !== 'object' || Array.isArray(parsed.projects)) {
+      return { passed: false, message: `trust store at ${storePath} has no usable "projects" object -- its shape has changed` };
+    }
+    return { passed: true, message: `trust store at ${storePath} is readable (${Object.keys(parsed.projects).length} entries)` };
+  } catch (err) {
+    return { passed: false, message: `trust store at ${storePath} is not valid JSON: ${err.message}` };
+  }
+}
+
+/** Second reading of the config door's own C5 invariant. Names the executor and
+ * the specific flags, because "confinement incomplete" leaves a reader hunting
+ * through three booleans for the one that is false. */
+export function checkExecutorConfinement(runnerCfg = {}) {
+  const flags = ['privateHome', 'isolatedSession', 'ownWorktree'];
+  const offenders = [];
+  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
+    if (executor?.permissionMode !== 'bypass') continue;
+    const c = executor.confinement ?? {};
+    const missing = flags.filter((f) => c[f] !== true);
+    if (missing.length > 0) offenders.push(`${id} (missing ${missing.join(', ')})`);
+  }
+  if (offenders.length === 0) {
+    return { passed: true, message: 'every executor declaring bypass also declares full confinement' };
+  }
+  return {
+    passed: false,
+    message: `executors declare "permissionMode": "bypass" without full confinement: ${offenders.join('; ')}`,
+  };
+}
+
+registerCheck({
+  id: 'herdr-available',
+  description: 'herdr resolves on PATH and reports a version -- the transport every interactive dispatch mechanism needs',
+  check: () => checkHerdrAvailable(),
+});
+
+registerCheck({
+  id: 'trust-store-readable',
+  description: 'the agent folder-trust store is readable and carries a usable "projects" object, so a dispatch into a fresh worktree can be pre-trusted instead of stopping at a dialog',
+  check: () => checkTrustStoreWritable(),
+});
+
+registerCheck({
+  id: 'executor-confinement',
+  description: 'no executor declares "permissionMode": "bypass" without privateHome, isolatedSession and ownWorktree all true',
+  check: (cwd) => {
+    try {
+      return checkExecutorConfinement(loadRunnerConfigFromDir(cwd));
+    } catch (err) {
+      // A directory with no loadable runner config is not a confinement problem;
+      // saying otherwise would make doctor cry wolf everywhere fgOS is not set up.
+      return { passed: true, message: `runner config not loadable here, confinement not evaluated: ${err.message}` };
+    }
+  },
 });
 
