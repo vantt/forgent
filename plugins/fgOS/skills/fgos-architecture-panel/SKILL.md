@@ -727,8 +727,8 @@ rather than rely on this cell's improvisation"). If it happens again:
 3. **Independently re-verify the one load-bearing factual claim** it
    contributes before recording it as trusted — real precedent: the
    coordinator grepped the actual source to confirm kongming's key claim
-   before writing it into `dispositions.md` (P01.3 D1), rather than
-   accepting it on the consultation's own authority.
+   before writing it into `dispositions.md`, rather than accepting it on
+   the consultation's own authority.
 4. Record the authorization and the attribution discipline in
    `dispositions.md`, same as any other driver act — this is what kept
    the boundary real in the one case it happened, held by prose

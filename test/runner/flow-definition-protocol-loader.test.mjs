@@ -51,10 +51,11 @@ const require = createRequire(import.meta.url);
 // R7: the two shipped core fixtures discover and normalize cleanly.
 // ---------------------------------------------------------------------------
 
-test('discoverCoordinationProtocols finds all shipped core fixtures (declared-consult, independent-research fan-out/fan-in and its visibility-window-gated variant, the three P08.3 deliberation method-shaped fixtures, group-cognition-framework, standalone-master-coordination-loop, and the three Phase 10 group-thinking-lite protocols: RFC-Review-Lite, Nominal-Group-Lite, Delphi-Feedback-Lite) and normalizes them', () => {
+test('discoverCoordinationProtocols finds all shipped core fixtures (declared-consult, independent-research fan-out/fan-in and its visibility-window-gated variant, the three P08.3 deliberation method-shaped fixtures, group-cognition-framework, standalone-master-coordination-loop, the three Phase 10 group-thinking-lite protocols: RFC-Review-Lite, Nominal-Group-Lite, Delphi-Feedback-Lite, and the Phase 03 architecture-advisory-panel-v1 protocol) and normalizes them', () => {
   const entries = discoverCoordinationProtocols({ cwd: mkTempDir('flow-definition-loader-empty-cwd-') });
   const ids = entries.map((e) => e.definition.metadata.id).sort();
   assert.deepEqual(ids, [
+    'core.coordination-protocol.architecture-advisory-panel-v1',
     'core.coordination-protocol.declared-consult',
     'core.coordination-protocol.deliberation-delphi-chain',
     'core.coordination-protocol.deliberation-nominal-group-chain',
