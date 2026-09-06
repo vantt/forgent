@@ -26,7 +26,7 @@ Dispatches through the real, registered
 FlowDefinition (the same `CoordinationSession` engine, request schema, and
 `fgos-group-thinking` pack gate every sibling group-thinking protocol
 uses — not a copy, the same code path, confirmed live: 757/757 focused
-coordination tests, 12 conformance cases naming premature reveal, hidden
+coordination tests, 13 conformance cases naming premature reveal, hidden
 dissent, unauthorized specialist, over-cap reopen, human-authority
 impersonation, and heterogeneous actor/tier provenance — see
 [P03.2](../../../docs/architect/agent-coordination/verification/architecture-advisory-panel/P03.2.md)).
@@ -90,7 +90,10 @@ existing doors only:
   Pack (`core/protocol-packs/group-thinking.json`, P03.2). Read that
   skill's own steps 1-5 for the exact request shape, the `actors[]`
   per-role override shape, and why the gate cannot be bypassed; this
-  file does not restate them.
+  file does not restate them. **Before naming any executor in an
+  `actors[]` override, read the WARNING at the top of Executor Roster,
+  below** — the three proven-safe pairs are not yet registered for this
+  door, and naming one anyway does not fail loudly.
 - **Replay/status:** `fgos coordination show <coordinationId> --json`,
   unmodified.
 - **Human-turn recording:** the `human-turn` request-step type
@@ -120,7 +123,7 @@ skip a gate.
 |---|---|---|---|---|---|
 | 1 Intake and Framing | — (coordinator only) | none — freeze `intake.md`, resolve roster | you | — | — |
 | 1 (dispatch) / 2 Understand The Person / 3 Understand The Problem | `phase-framing` | `interpret-request`, `investigate-context` | lead-advisor, context-investigator | `required` | session open |
-| 4 Ask Reluctantly | — (coordinator + lead advisor) | none — `decision-request.md`, sent or explicitly not sent | you + lead-advisor | — | — |
+| 4 Ask Reluctantly | — (coordinator only — see Decision Dialogue's reconciliation note) | none — `decision-request.md`, sent or explicitly not sent | you | — | — |
 | 5 Diverge Honestly | `phase-shaping` | `shape-system-proposal`, `shape-alternative-proposal`, `shape-constraint-proposal` | 3 shapers | `required` | `framing-shaping-open` (open from session start — a vacuous window that exists only so these `proposal`-typed contributions have somewhere legal to record) |
 | 6 Debate Claims | `phase-critique` | `critique-proposals`, `assess-constraints`, (`answer-specialist-question` if authorized) | critic, constraint-advocate, specialist | `driver-authorized` | `post-shaping-open` — opens ONLY once all three Phase-5 bindings have a linked result; a partial trio never opens it (this is the real "premature reveal" refusal, mechanically enforced, not prose) |
 | 7 Converge Without Flattening | `phase-synthesis` | `synthesize-recommendation` | synthesizer | `driver-authorized` | `post-critique-open` — opens only once BOTH `critique-proposals` AND `assess-constraints` are linked; transitively unreachable until every Phase-5/6 branch settles |
@@ -169,7 +172,7 @@ picture of what V1 bounds.
 > `node src/runner/dispatch.mjs decide claude-bwrap --has-live-task-access`
 > (and the other two) all return `{"mechanism":"out-of-process",
 > "configured":false}`. `resolveExecutorConfig`'s own fallback
-> (`src/runner/dispatch/resolve.mjs:398`: `const executor = byExecutor ??
+> (`src/runner/dispatch/resolve.mjs:399`: `const executor = byExecutor ??
 > (cfg && cfg.executor)`) means naming an unregistered executor does
 > **not refuse** — it silently substitutes the **global default
 > executor**, which in this repository's own `.fgos/config.json` today is
@@ -213,6 +216,16 @@ tmpfs
 B7). Use that mount order every time; it is an operating recipe, not a
 runnability gap left open.
 
+**Role name -> real actor id.** The roles named below (`lead-advisor`,
+`system-shaper`, ...) map exactly to the protocol's own `<role>-actor`
+ids — `lead-advisor` -> `lead-advisor-actor`, `context-investigator` ->
+`context-investigator-actor`, and so on through all 8 statically-declared
+actors. An `actors[]` override entry's `id` field must carry the real
+`-actor` id, never the bare role name — `run.mjs` hard-refuses an
+undeclared `actors[].id` (`src/verbs/coordination/run.mjs:395-400`) with
+the exact list of declared actors in the error, so a wrong id fails
+loudly rather than silently.
+
 | Role | Executor | Tier | Derived model | Persona | Why this binding fits the cognitive job |
 |---|---|---|---|---|---|
 | lead-advisor | `claude-bwrap` | critical | `opus` | `person-facing-advisory-lead` | Intent interpretation and the human-facing explanation both need the strongest calibration available, plus a stable single voice across intake -> explain -> every dialogue turn; this role never sees a sibling's private notes, so provider diversity buys it nothing |
@@ -223,7 +236,19 @@ runnability gap left open.
 | architecture-critic | `codex-readonly`, fresh assignment, distinct prompt package | analytical | `gpt-5.5` | `cross-proposal-attacker` | Must never inherit a shaper's private context — a fresh assignment with a new prompt package is the isolation guarantee, not a new executor per se; if the roster allows a fourth family, prefer one distinct from whichever shaper you most need stress-tested this session |
 | synthesizer | `claude-bwrap` | critical | `opus` | `whole-ledger-integrator` | Strongest derived model for whole-ledger integration; sees only what visibility windows grant it |
 | red-team | `agy-bwrap` | critical | `gemini-3.1-pro-high` | `process-and-authority-attacker` | Deliberately off the synthesizer's family — its entire job is catching what a mind resembling the synthesizer's would not |
-| specialist | as the authorized question requires | as the slot requires | as derived | `<topic>-bounded-expert` | Bound only after driver authorization for one named, bounded question; never a standing panel member |
+| specialist | **no static actor id at all — see note below** | as the slot requires | as derived | `<topic>-bounded-expert` | Bound only after driver authorization for one named, bounded question; never a standing panel member |
+
+**Specialist binding works differently from the other 8 roles — do not
+treat this row as "the same shape, just filled in later."** The 8
+roles above are static, named actors (`role: lead-advisor` etc. in the
+protocol's own `actors[]`), each bindable up front in the request's own
+`actors[]` override. The specialist has **no such actor id to bind at
+all** — it is authorized on demand through the specialist-slot mechanism
+(`specialistSlotRef: specialist-answer-slot`, `authorizeSpecialistSlot`,
+see Known Gaps' `tsk-3xk` for the exact call path), naming the
+executor/tier/persona for that one question at authorization time, not
+in the session's opening roster. Never pre-declare a specialist actor id
+the way you would for the other 8.
 
 `persona` is free-form prose framing the executor receives, not a closed
 vocabulary (matching `fgos-code-panel`'s own convention) — sharpen any
@@ -369,9 +394,12 @@ agent can act well without re-deriving it from the full text.
 ### 4. Alternative Shaper — `shape-alternative-proposal`
 
 - **Notice:** the option nobody proposed because it looked too small;
-  the no-build path's real, concrete consequences (a rate, a cost, a
-  trigger — never one sentence); whether the framing itself is the
-  constraint — but noticing this is not the finish line, see Reason.
+  **solution classes, not variants** — buying instead of building,
+  deleting instead of abstracting, changing who owns the code instead of
+  changing the code, changing the process instead of the system; the
+  no-build path's real, concrete consequences (a rate, a cost, a trigger
+  — never one sentence); whether the framing itself is the constraint —
+  but noticing this is not the finish line, see Reason.
 - **Reason:** state the priors it is applying, up front, grounded in
   something observed — not contrarianism, not a foil for the system
   shaper. Test whether its candidate would produce a materially
@@ -658,6 +686,15 @@ If a future protocol revision adds an operation for these, retire this
 workaround; until then, name it here rather than leaving two
 irreconcilable instructions for a fresh agent to trip over.
 
+**This is a mechanical consequence of the registered graph, not a
+judgment call** — so the file's own opening precedence rule ("if a
+judgment call here and the deep doctrine ever disagree, the deep
+doctrine wins") does not apply to it. The deep doctrine correctly
+describes the manual playbook, where a dispatched lead advisor really
+could author these; it is not wrong, it is describing a shell this
+protocol's graph does not yet have an operation for. Do not resolve
+this divergence by deferring to the doctrine's own attribution.
+
 **Explain impact before reopening, always.** The impact assessment names
 which conclusions are affected and which are not, and why nothing
 smaller than the chosen reopen would do — a reopen with unbounded scope
@@ -671,6 +708,31 @@ genuinely new material, the same "open a new cell" path from Bounded
 Reopen Scope applies — never inline authorship, never "the panel would
 probably say." Say so to the person plainly: "this session's bounded
 reopen budget is spent; going further needs a new session."
+
+**Out-of-panel consultation (e.g. `kongming`) — a real, named
+convention, not an improvisation.** The person may, mid-dialogue, ask
+for an independent, non-panel, strong-reasoning consultation on a
+specific factual or directional question — this happened for real once
+(P01.3 Turn 1: the person asked for `kongming`'s directional read rather
+than answering the panel's own two open questions directly), and P02.1
+explicitly assigned documenting the convention to this skill (B11: "flag
+for Phase 03/04 consideration ... should have a documented convention
+rather than rely on this cell's improvisation"). If it happens again:
+
+1. This is a **separately-authorized** consultation, never a Phase 5/6/7
+   panel dispatch — it is not one of the 9 roles and does not consume a
+   `revise-*` reopen invocation.
+2. **Attribute every claim to it by name**, never merge it into the
+   panel's own voice as if a shaper or the synthesizer had produced it.
+3. **Independently re-verify the one load-bearing factual claim** it
+   contributes before recording it as trusted — real precedent: the
+   coordinator grepped the actual source to confirm kongming's key claim
+   before writing it into `dispositions.md` (P01.3 D1), rather than
+   accepting it on the consultation's own authority.
+4. Record the authorization and the attribution discipline in
+   `dispositions.md`, same as any other driver act — this is what kept
+   the boundary real in the one case it happened, held by prose
+   convention, not a schema check.
 
 ## Driver Disposition — You Author This File
 

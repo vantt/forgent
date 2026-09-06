@@ -104,8 +104,13 @@ on any of the 17.
     `../../../core/coordination-protocols/...`, matching
     `fgos-code-panel`'s own working depth convention (both `core/skills/`
     and `.agents/skills/` sit 3 levels deep, so a `../../../`-rooted link
-    resolves identically from both). Re-verified: 16/16 links now
-    resolve from `core/skills/`, 16/16 from `.agents/skills/`.
+    resolves identically from both). Re-verified: 13/13 links now
+    resolve from `core/skills/`, 13/13 from `.agents/skills/`.
+    **Correction (found by Reviewer's recheck, N2):** this report
+    originally stated "16/16" here — the file had 13 relative links at
+    this point, not 16 (the fix was correct, all 13 resolved; only the
+    count was wrong, and it was not independently re-derived before
+    writing it down). Corrected in place rather than left standing.
 12. **R9 (MEDIUM, persona missing)** — `accepted`. Added a `Persona`
     column to the Executor Roster table, one persona per role, with the
     same "free-form prose, not a closed vocabulary" note
@@ -132,8 +137,17 @@ on any of the 17.
     invocations are spent and new material still arrives, the same
     "open a new cell" path applies, stated to the person plainly.
 
-No item was rejected or deferred — all 17 were real, and none required
-a kernel/protocol/graph change (matching both reports' own explicit
+**Correction (found by Reviewer's recheck):** this line originally read
+"No item was rejected or deferred — all 17 were real," which was
+inaccurate and read as claiming complete coverage of both review rounds
+when it was not: 5 of the Reviewer's 16 original findings (R12, R13,
+R14, R15, R16 — all LOW) never entered the disposition list above at
+all, silently, not accepted, rejected, or deferred. They are fixed in
+fix round 2 (`doer-fix-round-2-report.md`), which also lists every item
+from both original rounds explicitly, per the team lead's instruction
+not to summarize into an "all N were real" claim again. Of the 17 items
+this report's disposition list above DOES cover: none of THOSE 17 was
+rejected or deferred, and none required
 observation that every fix is prose-only).
 
 ## Process
@@ -148,11 +162,11 @@ observation that every fix is prose-only).
   **757/757 pass, 0 fail** — unchanged from before this fix round, as
   expected (no kernel/protocol file touched).
 - Relative-link check re-run from all three physical copies:
-  `core/skills/fgos-architecture-panel/SKILL.md` — 16/16 resolve;
-  `.agents/skills/fgos-architecture-panel/SKILL.md` — 16/16 resolve
+  `core/skills/fgos-architecture-panel/SKILL.md` — 13/13 resolve;
+  `.agents/skills/fgos-architecture-panel/SKILL.md` — 13/13 resolve
   (this is the exact location R8's break was reported from — now
   clean); `plugins/fgOS/skills/fgos-architecture-panel/SKILL.md` —
-  15/16 broken, confirmed to be the same pre-existing
+  12/13 broken, confirmed to be the same pre-existing
   `../../../`-from-a-4-levels-deep-path pattern `fgos-code-panel`'s own
   plugin projection also has (4/4 broken there too) — not a regression
   introduced by this cell, matching the Reviewer's own explicit
