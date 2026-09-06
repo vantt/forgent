@@ -123,6 +123,25 @@ test('recordHumanTurn refuses attributedTo.id === recordedBy.id (a driver cannot
   assert.equal(readSessionEvents('coord_ht_self_attrib', ctx.opts).filter((e) => e.type === 'human-turn-recorded').length, 0);
 });
 
+// Fix round 1 (Red-Team Finding 4, investigated, not changed): every
+// identity comparison in this module (`assertDriverIdentity`, declared-actor
+// checks, this self-attribution check) is exact-string, case-sensitive --
+// grepped across src/runner/coordination/**/src/verbs/coordination/** for
+// toLowerCase/toUpperCase/localeCompare: zero hits. A case-variant id
+// passing this check is therefore CONSISTENT with the module's own
+// established convention, not a special-case bug -- this test documents
+// that as an intentional characterization, not a gap to silently leave
+// unexplained.
+test('recordHumanTurn self-attribution check is exact-string (case-sensitive), matching every other identity comparison in this module', () => {
+  const ctx = setup('coord_ht_self_attrib_case');
+  const result = recordHumanTurn(
+    'coord_ht_self_attrib_case',
+    humanTurn({ attributedTo: { type: 'person', id: WRITER_ID.toUpperCase() } }),
+    ctx.opts,
+  );
+  assert.equal(result.appended, true, 'a case-variant of the driver id is a DIFFERENT string and is not refused as self-attribution -- consistent with this module having no case-normalization anywhere');
+});
+
 test('recordHumanTurn refuses attributedTo.id naming a declared panel actor', () => {
   const ctx = setup('coord_ht_panel_actor');
   assert.throws(
@@ -152,6 +171,38 @@ test('recordHumanTurn refuses attributedTo.id shaped like a "human-turn:" ref', 
   assert.throws(
     () => recordHumanTurn('coord_ht_humanturn_shape', humanTurn({ attributedTo: { type: 'person', id: 'human-turn:t1' } }), ctx.opts),
     (err) => err instanceof CoordinationError && /shaped like a driver-authored ref/.test(err.message),
+  );
+});
+
+// Fix round 1 (Reviewer R-P03.1-03): `turnId` had no shape guard mirroring
+// `assertContributionIdShape` -- a path-shaped or reserved-prefix-shaped
+// `turnId` is refused at the request boundary (schema.mjs's `assertSafeId`)
+// but was NOT refused by a direct store API call, unlike `contributionId`.
+test('recordHumanTurn refuses a turnId containing a path separator', () => {
+  const ctx = setup('coord_ht_turnid_path_separator');
+  assert.throws(
+    () => recordHumanTurn('coord_ht_turnid_path_separator', humanTurn({ turnId: 'a/b' }), ctx.opts),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /must not contain a path separator/.test(err.message),
+  );
+});
+
+test('recordHumanTurn refuses a turnId containing ".."', () => {
+  const ctx = setup('coord_ht_turnid_traversal');
+  assert.throws(
+    () => recordHumanTurn('coord_ht_turnid_traversal', humanTurn({ turnId: '../evil' }), ctx.opts),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /must not contain a path separator or "\.\."/.test(err.message),
+  );
+});
+
+test('recordHumanTurn refuses a turnId that itself starts with the reserved "contribution:"/"human-turn:" namespace', () => {
+  const ctx = setup('coord_ht_turnid_reserved_prefix');
+  assert.throws(
+    () => recordHumanTurn('coord_ht_turnid_reserved_prefix', humanTurn({ turnId: 'contribution:x' }), ctx.opts),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /must not itself start with/.test(err.message),
+  );
+  assert.throws(
+    () => recordHumanTurn('coord_ht_turnid_reserved_prefix', humanTurn({ turnId: 'human-turn:x' }), ctx.opts),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /must not itself start with/.test(err.message),
   );
 });
 

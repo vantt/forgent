@@ -1187,6 +1187,40 @@ test('a "human-turn" step fails loudly when artifactRef does not resolve to a re
   );
 });
 
+// Fix round 1 (Reviewer R-P03.1-05 / Red-Team Finding 3, LOW): `artifactRef`
+// had no workspace containment check -- a `../` traversal or an absolute
+// path resolved and hashed a file OUTSIDE the working directory the session
+// was opened against, unlike `turnId`/`respondsToRefs` in the same step
+// (both charset-restricted at the request boundary to reject a path
+// escape). Both attack shapes confirmed live by Red-Team before this fix.
+test('a "human-turn" step\'s artifactRef is refused when it escapes the working directory via "../" traversal', async () => {
+  const { tempDir, ctx } = setup();
+  const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-human-turn-outside-'));
+  fs.writeFileSync(path.join(outsideDir, 'secret.md'), 'Not part of this workspace.\n');
+  const relativeEscape = path.relative(tempDir, path.join(outsideDir, 'secret.md'));
+
+  await assert.rejects(
+    runCoordinationUseCase(ctx, {
+      requestObject: request({ steps: [produceStep(), humanTurnStep({ artifactRef: relativeEscape })] }),
+    }),
+    (err) => err instanceof StoreError && /outside the working directory/.test(err.message),
+  );
+});
+
+test('a "human-turn" step\'s artifactRef is refused when it is an absolute path', async () => {
+  const { ctx } = setup();
+  const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-human-turn-outside-'));
+  const absolutePath = path.join(outsideDir, 'secret.md');
+  fs.writeFileSync(absolutePath, 'Not part of this workspace.\n');
+
+  await assert.rejects(
+    runCoordinationUseCase(ctx, {
+      requestObject: request({ steps: [produceStep(), humanTurnStep({ artifactRef: absolutePath })] }),
+    }),
+    (err) => err instanceof StoreError && /outside the working directory/.test(err.message),
+  );
+});
+
 test('a "human-turn" step attributing the turn to the request\'s own writerId is refused (self-attribution reaches the real engine door, not just the schema boundary)', async () => {
   const { tempDir, ctx } = setup();
   fs.mkdirSync(path.join(tempDir, 'human'), { recursive: true });
@@ -1265,4 +1299,46 @@ test('show renders humanTurns as its own labelled section, never merged into dis
   assert.deepEqual(shown.ignoredHumanTurns, []);
   assert.equal(shown.dispositions.length, 1);
   assert.ok(!('turnId' in shown.dispositions[0]), 'a human turn must never be merged into the dispositions list');
+});
+
+// Fix round 1 (Reviewer R-P03.1-01, HIGH): show.mjs's own `isRefOwnedBySession`
+// was not updated to mirror the two rules `recordHumanTurn`'s write door
+// added (the `human-turn:` prefix branch, and the bare-turnId near-miss
+// refusal) -- reproducible both directions before the fix: a bare `turn_1`
+// ref (which the write door refuses) rendered `owned: true`, and a valid
+// `human-turn:<id>` ref (which the write door accepts) rendered `owned:
+// false`. This test hand-crafts BOTH shapes onto one disposition (bypassing
+// `recordDriverDisposition` entirely via the raw `appendEvent` primitive,
+// the same technique the "show marks a disposition ref as NOT session-owned"
+// test above uses) so it fails under the pre-fix code in both directions.
+test('show marks a bare turnId disposition ref as NOT owned, and a human-turn:<id> ref as owned (isRefOwnedBySession mirrors the write door for the human-turn: namespace)', async () => {
+  const { tempDir, ctx } = setup();
+  const opts = { cwd: tempDir, repoRoot: tempDir };
+  fs.mkdirSync(path.join(tempDir, 'human'), { recursive: true });
+  fs.writeFileSync(path.join(tempDir, 'human', '1-person.md'), 'Go ahead.\n');
+  const data = await runCoordinationUseCase(ctx, {
+    requestObject: request({ steps: [produceStep(), humanTurnStep()] }),
+  });
+
+  const { eventsPath, sessionDir } = resolveSessionPaths(data.coordinationId, opts);
+  appendEvent(
+    eventsPath,
+    {
+      type: 'driver-disposition-recorded',
+      payload: {
+        targetRef: 'turn_1',
+        disposition: 'accepted',
+        rationale: 'Hand-crafted: targets the BARE turn id, never the reserved ref.',
+        evidenceRefs: ['human-turn:turn_1'],
+        authorizedBy: { type: 'driver', id: WRITER_ID },
+      },
+    },
+    sessionDir,
+  );
+
+  const shown = showCoordinationUseCase(opts, { id: data.coordinationId });
+  const found = shown.dispositions.find((d) => d.targetRef === 'turn_1');
+  assert.ok(found, 'the hand-crafted disposition must still be rendered');
+  assert.equal(found.targetRefOwnedBySession, false, 'a bare turn id must never render as an owned ref -- it targets nothing (the write door refuses it as a near-miss)');
+  assert.deepEqual(found.evidenceRefsOwnedBySession, [true], 'a real "human-turn:" ref to a recorded turn must render as owned, the same way the write door accepts it');
 });

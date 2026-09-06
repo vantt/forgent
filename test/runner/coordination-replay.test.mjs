@@ -273,6 +273,116 @@ test('replaySession rejects a human-turn-recorded event that attributes the turn
   );
 });
 
+// Fix round 1 (Reviewer R-P03.1-02 / Red-Team Finding 1): the write door
+// (`recordHumanTurn`, store.mjs) has FOUR `attributedTo` refusals -- self,
+// panel actor, and TWO driver-authored-ref shapes (`asgn_`/`contribution:`/
+// `human-turn:`). Only the first two were re-checked at replay before this
+// fix; a hand-written event with a driver-authored-ref-shaped
+// `attributedTo.id` replayed clean and rendered as a legitimate person
+// turn. These three cases (one per reserved shape) prove the fourth
+// refusal now has a real replay-side counterpart.
+test('replaySession rejects a human-turn-recorded event that attributes the turn to an Assignment-id-shaped ref ("asgn_" prefix)', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_asgn_shape');
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_asgn_shape');
+  appendRawHumanTurn(eventsPath, 99, { attributedTo: { type: 'person', id: 'asgn_deadbeefcafe0001' } });
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_asgn_shape', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /shaped like a driver-authored ref/.test(err.message),
+  );
+});
+
+test('replaySession rejects a human-turn-recorded event that attributes the turn to a "contribution:"-shaped ref', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_contribution_shape');
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_contribution_shape');
+  appendRawHumanTurn(eventsPath, 99, { attributedTo: { type: 'person', id: 'contribution:x1' } });
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_contribution_shape', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /shaped like a driver-authored ref/.test(err.message),
+  );
+});
+
+test('replaySession rejects a human-turn-recorded event that attributes the turn to a "human-turn:"-shaped ref', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_humanturn_shape');
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_humanturn_shape');
+  appendRawHumanTurn(eventsPath, 99, { attributedTo: { type: 'person', id: 'human-turn:t1' } });
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_humanturn_shape', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /shaped like a driver-authored ref/.test(err.message),
+  );
+});
+
+// Fix round 1 (Red-Team Finding 2): `respondsToRefs` ownership was
+// write-door-only -- replay copied it into the reconstructed record with no
+// re-check, unlike the disposition's own `human-turn:` targetRef right
+// beside it (which IS re-checked, see the "not yet recorded" test above).
+test('replaySession rejects a human-turn-recorded event whose respondsToRefs cites a human turn not yet recorded at that point in the log', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_responds_dangling');
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_responds_dangling');
+  appendRawHumanTurn(eventsPath, 99, { respondsToRefs: ['human-turn:turn_never_recorded'] });
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_responds_dangling', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'out-of-order-ref' && /respondsToRefs entry "human-turn:turn_never_recorded"/.test(err.message),
+  );
+});
+
+test('replaySession rejects a human-turn-recorded event whose respondsToRefs cites a contribution this session never linked', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_responds_contribution_dangling');
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_responds_contribution_dangling');
+  appendRawHumanTurn(eventsPath, 99, { respondsToRefs: ['contribution:never_linked'] });
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_responds_contribution_dangling', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'dangling-ref' && /respondsToRefs entry "contribution:never_linked"/.test(err.message),
+  );
+});
+
+test('replaySession rejects a human-turn-recorded event whose respondsToRefs cites a bare id as a near-miss', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_responds_bare');
+  const { eventsPath } = sessionPaths(tempDir, 'coord_replay_ht_responds_bare');
+  recordHumanTurn('coord_replay_ht_responds_bare', humanTurnPayload(), { cwd: tempDir }); // turn_1
+  appendRawHumanTurn(eventsPath, 99, {
+    turnId: 'turn_2',
+    turnOrdinal: 2,
+    externalRef: 'claude-code-transcript:sess-1:uuid-2',
+    respondsToRefs: ['turn_1'],
+  });
+
+  assert.throws(
+    () => replaySession('coord_replay_ht_responds_bare', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /targets nothing/.test(err.message),
+  );
+});
+
+test('replaySession accepts a human-turn-recorded event whose respondsToRefs cites a real, already-recorded human turn', () => {
+  const tempDir = mkTempDir();
+  openHumanTurnSession(tempDir, 'coord_replay_ht_responds_ok');
+  recordHumanTurn('coord_replay_ht_responds_ok', humanTurnPayload(), { cwd: tempDir }); // turn_1
+  recordHumanTurn(
+    'coord_replay_ht_responds_ok',
+    humanTurnPayload({
+      turnId: 'turn_2',
+      turnOrdinal: 2,
+      externalRef: 'claude-code-transcript:sess-1:uuid-2',
+      respondsToRefs: ['human-turn:turn_1'],
+    }),
+    { cwd: tempDir },
+  );
+
+  const replayed = replaySession('coord_replay_ht_responds_ok', { cwd: tempDir });
+  assert.equal(replayed.humanTurns.length, 2);
+  assert.deepEqual(replayed.humanTurns[1].respondsToRefs, ['human-turn:turn_1']);
+});
+
 test('replaySession rejects a non-contiguous turnOrdinal (a gap, hand-crafted past the write door)', () => {
   const tempDir = mkTempDir();
   openHumanTurnSession(tempDir, 'coord_replay_ht_ordinal_gap');
