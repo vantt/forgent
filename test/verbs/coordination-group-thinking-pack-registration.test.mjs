@@ -58,6 +58,7 @@ const RFC_REVIEW_LITE_ID = 'core.coordination-protocol.group-thinking-rfc-review
 const NOMINAL_GROUP_LITE_ID = 'core.coordination-protocol.group-thinking-nominal-group-lite';
 const DELPHI_FEEDBACK_LITE_ID = 'core.coordination-protocol.group-thinking-delphi-feedback-lite';
 const MASTER_COORDINATION_LOOP_ID = 'core.coordination-protocol.standalone-master-coordination-loop';
+const ARCHITECTURE_ADVISORY_PANEL_V1_ID = 'core.coordination-protocol.architecture-advisory-panel-v1';
 
 const OUTPUTS = ['agent-result.json (status, summary)'];
 
@@ -128,15 +129,15 @@ function fakeRunnerConfig(tempDir) {
 // 1. Registration correctness -- the real, committed pack, not a synthetic
 //    fixture (no `packPath` override anywhere in this section).
 
-test('all three group-thinking-lite protocols are registered in the real, committed pack, alongside standalone-master-coordination-loop (Step 09 Phase 02 R1) and no other entry', () => {
+test('all three group-thinking-lite protocols are registered in the real, committed pack, alongside standalone-master-coordination-loop (Step 09 Phase 02 R1) and architecture-advisory-panel-v1 (Architecture Advisory Panel track, P03.2) and no other entry', () => {
   const pack = loadProtocolPack();
   const registeredIds = new Set(pack.members.map((m) => m.id));
   assert.deepEqual(
     registeredIds,
-    new Set([RFC_REVIEW_LITE_ID, NOMINAL_GROUP_LITE_ID, DELPHI_FEEDBACK_LITE_ID, MASTER_COORDINATION_LOOP_ID]),
-    'the real pack must list exactly RFC-Review-Lite, Nominal-Group-Lite, Delphi-Feedback-Lite, and standalone-master-coordination-loop -- no more, no fewer',
+    new Set([RFC_REVIEW_LITE_ID, NOMINAL_GROUP_LITE_ID, DELPHI_FEEDBACK_LITE_ID, MASTER_COORDINATION_LOOP_ID, ARCHITECTURE_ADVISORY_PANEL_V1_ID]),
+    'the real pack must list exactly RFC-Review-Lite, Nominal-Group-Lite, Delphi-Feedback-Lite, standalone-master-coordination-loop, and architecture-advisory-panel-v1 -- no more, no fewer',
   );
-  assert.equal(pack.members.length, 4, 'no duplicate member entries');
+  assert.equal(pack.members.length, 5, 'no duplicate member entries');
 });
 
 test('resolvePackProtocol resolves each of the three real, registered protocols against the real pack, with no version drift -- not just refusing correctly against an empty pack (P10.1\'s own proof)', () => {
@@ -407,7 +408,7 @@ test('standalone-master-coordination-loop is registered in the real, committed p
   const pack = loadProtocolPack();
   const registeredIds = new Set(pack.members.map((m) => m.id));
   assert.ok(registeredIds.has(MASTER_COORDINATION_LOOP_ID), 'the real pack must list standalone-master-coordination-loop as a member');
-  assert.equal(pack.members.length, 4, 'exactly the three group-thinking-lite protocols plus standalone-master-coordination-loop -- no forgotten fifth entry');
+  assert.equal(pack.members.length, 5, 'exactly the three group-thinking-lite protocols plus standalone-master-coordination-loop plus architecture-advisory-panel-v1 -- no forgotten sixth entry');
 
   const resolved = resolvePackProtocol(MASTER_COORDINATION_LOOP_ID);
   assert.equal(resolved.id, MASTER_COORDINATION_LOOP_ID);
