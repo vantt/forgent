@@ -93,7 +93,19 @@ Không đụng: `transport.mjs` (Phase 02), `cli-spawn`, `herdr-plugin/`.
 1. Chạy impact analysis trên `resolveExecutorConfig` và `loadRunnerConfig` trước khi sửa; báo blast radius.
 2. Viết test đỏ trước cho từng invariant R3, R4, R5 — đặc biệt ca "root chưa được tin thì refuse".
 3. Cài `trust-store.mjs` với fixture `~/.claude.json` giả, không bao giờ đụng file thật trong test.
-4. Cài `worker-home.mjs`. **Trả lời câu hỏi mở số 3 trước khi đi tiếp**: dựng HOME rỗng rồi khởi động claude thật một lần, ghi lại nó cần tối thiểu những gì (auth, config, cache). Nếu không khởi động nổi với HOME rỗng, ghi rõ mức tối thiểu phải bind và tại sao, đừng lặng lẽ quay về HOME thật.
+4. Cài `worker-home.mjs`. **Câu hỏi mở số 3 đã trả lời 2026-09-06** — xem
+   [agent-in-session-findings](../../docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-findings.md).
+   HOME rỗng là HOME hỏng, không phải HOME riêng. Bốn thứ bắt buộc provision, mỗi thứ tìm
+   ra bằng cách vấp phải nó: `.zshrc` dù rỗng (thiếu thì zsh chạy wizard lần đầu và ăn mất
+   ký tự đầu của lệnh khởi động, `claude` thành `laude`); `.claude/.credentials.json`;
+   `.claude.json` với `hasCompletedOnboarding` cộng theme (thiếu thì agent kẹt ở wizard
+   onboarding **trong khi herdr báo `idle` và `interactive_ready`**); và entry trust cho cwd.
+   Thứ năm chưa chốt: **permission posture** — trong session của người vận hành herdr tự
+   thêm `--dangerously-skip-permissions`, trong session cô lập thì không, nên agent dừng ở
+   dialog xin quyền. Phải khai tường minh trong executor profile, không để phụ thuộc vào
+   việc nó tình cờ khởi trong session nào. Việc worker cầm credential của người vận hành
+   **không** được HOME riêng giải quyết; đó vẫn là khoảng trống `coordination-worker-provider-boundary.md`
+   đã nêu, để dành cho relay.
 5. Mở rộng schema config + resolve, giữ mọi executor cũ hợp lệ không sửa một dòng.
 6. Đăng ký doctor check.
 
