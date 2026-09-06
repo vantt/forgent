@@ -1,4 +1,9 @@
-# dialogue/2-impact.md
+Role: Lead Advisor (Phase 9, Turn 2 impact) | Cell: P01.2 | Requested: `claude` via bwrap, tier `critical` | Derived: provider `claude`, model `opus`
+Prompt: `proofs/P01.2/prompts/lead-advisor-dialogue-2-impact.md`
+Raw run: `proofs/P01.2/runs/11-lead-advisor-dialogue-2-impact-raw.log`
+
+---
+
 
 **Phase 9, Turn 2 — Lead Advisor reading of the person's answer**
 

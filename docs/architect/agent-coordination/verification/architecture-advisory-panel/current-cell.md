@@ -1,95 +1,38 @@
-# Current Cell: P01.2 (Clear-Input Manual Proof)
+# Current Cell: none open — track parked at a Stop Gate
 
-Status: in-progress (Phase 1 of the 9-phase advisory loop complete)
-Owner: Coordinator (this session), acting as the Architecture Advisory
-Coordinator per the newly-authored playbook
+Status: parked
 Last updated: 2026-09-06
-Next action: dispatch context investigator (Phase 3) against mdview
+Next action: person confirms the P01.3 proof case, or names a replacement
 
-## Objective
+## Why parked
 
-Run `docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md`
-for real against `/home/vantt/projects/mdview`'s thin-client-vs-local-ownership
-question. Person confirmed 2026-09-06 the question is genuinely undecided and
-authorized dispatch. Persist every phase's real artifacts under
-`proofs/P01.2/` per the playbook's own PERSISTENT STATE tree — no simulated
-roles, no coordinator-authored "human" turns.
+P01.2 (clear-input manual proof, mdview) is closed — see
+`docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.2.md`
+for the full trace, including 2 real Decision Dialogue turns with the
+person and a real production bug found (auth token lost on stdout in
+mdview's desktop shell).
 
-## Must Read
+Phase 01's last cell, P01.3 (unclear-input manual proof), requires the
+same confirmation P01.2 needed: plan.md's own named unclear case is
+`/home/vantt/projects/vnflow` — starting from the symptom "EOD and
+intraday evolution is becoming difficult," determine whether the right
+answer is to keep separate pipelines with shared contracts, introduce one
+pluggable pipeline abstraction, or reframe the problem elsewhere.
 
-- `docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md` (the playbook this cell executes, in full)
-- `docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md` (per-role doctrine for every dispatch)
-- `docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md` (exact shape for every persisted artifact)
-- `docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md` (what "done well" means for this cell)
-- `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/intake.md` (Phase 1 output, already written)
-- `docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md` (the proven allowlist this cell dispatches through)
+Plan.md's "Proof Cases And Human Boundary" section requires: "Before
+dispatch, the person confirms each question is genuinely undecided." Not
+yet asked for vnflow.
 
-## Files
+## One consolidated question for the person
 
-Lease `panel-proof-clear`: `verification/architecture-advisory-panel/P01.2.md`,
-`proofs/P01.2/**`, matching reports. Never touches `mdview` itself (read-only
-inspection only) and never touches production skills/protocol/schema/CLI.
+1. Is the vnflow EOD/intraday pipeline-evolution question still genuinely
+   undecided? If yes, P01.3 opens against it as written. If no, name a
+   replacement real project and question.
+2. Confirm dispatching a real advisory panel (read-only inspection via the
+   P00.1 allowlist) against `/home/vantt/projects/vnflow` is authorized.
 
-## Do Not Touch
+## What can continue independently while parked
 
-`mdview` (`/home/vantt/projects/mdview`) — read-only for the whole session,
-under real bwrap/sandbox confinement for every dispatched role, never a
-direct unconfined command against it. `index.md`, this file (Coordinator-owned).
-
-## Real Gap Found (recorded, not silently worked around)
-
-`dispatch.mjs decide/execute` does not actually recognize
-`claude-bwrap`/`agy-bwrap` as real executors (they were P00.1's own
-descriptive labels, never registered in `.fgos/config.json`) — confirmed by
-reading `src/runner/dispatch/mechanism.mjs`. This cell invokes `bwrap`
-directly by hand, exactly matching P00.1's own live-proved invocation,
-rather than trusting `dispatch.mjs`'s uninformative fallback answer. Full
-detail in `proofs/P01.2/intake.md`.
-
-## Exact Commands
-
-Each real dispatch is a direct shell invocation (not `dispatch.mjs execute`,
-per the gap above):
-
-```sh
-# codex-readonly (native sandbox, no bwrap needed)
-codex exec -s read-only -C /home/vantt/projects/mdview "<prompt>"
-
-# claude / agy via bwrap — kongming-verified pattern (strace-confirmed live,
-# see intake.md's Scratch-Bind Design section): --tmpfs /tmp FIRST, then
-# re-pin PROJECT_ROOT and EVIDENCE_DIR explicitly (bwrap mounts in argument
-# order; a later bind shadows an earlier tmpfs). Never bind ~/.claude or
-# ~/.gemini real dirs (creds live there) or tmpfs-mask them (loses auth).
-env -u CLAUDECODE -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u CLAUDE_PID \
-bwrap \
-  --ro-bind / / \
-  --dev /dev --proc /proc \
-  --tmpfs /tmp \
-  --ro-bind /home/vantt/projects/mdview /home/vantt/projects/mdview \
-  --bind <evidenceDir> <evidenceDir> \
-  --chdir /home/vantt/projects/mdview \
-  -- claude -p "<prompt>" --model <tier-model> --permission-mode acceptEdits
-
-# agy: same shape, -- agy -p "<prompt>" --mode accept-edits --model <tier-model>
-```
-
-## Stop Gates (from plan.md + the playbook's own STOP CONDITIONS)
-
-- No real person available for a Decision Dialogue turn the session genuinely
-  requires — park with a consolidated request, never simulate the person.
-- Fewer than two safe executor/provider bindings reachable.
-- The case turns out to already be decided (ratification, not advice).
-- The question is not actually an architecture question.
-- Evidence needed to distinguish top candidates requires mutating mdview.
-- Proceeding would require inventing a fact about the person's obligations.
-
-## Trace Update
-
-Coordinator (this session) writes to `proofs/P01.2/**` per the playbook's own
-named artifact tree, and to `P01.2.md` as the cell-level summary/trace.
-Owns `index.md` and this file exclusively.
-
-## Report
-
-`plans/260905-architecture-advisory-panel/reports/coordinator-260906-p01-2-mdview-proof-report.md`
-End with: `Status: DONE | DONE_WITH_CONCERNS | BLOCKED | PARKED` and a summary.
+Nothing else in this track is unblocked by this question — Phase 02
+depends on both P01.2 (done) and P01.3 (pending) closing. This is a
+full-track pause, not a partial one.
