@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execSync, execFileSync, execFile } from 'node:child_process';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment, resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { prepareDispatch } from '../../src/runner/dispatch/prepare.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
@@ -1731,3 +1731,113 @@ test('dispatch CLI execute subcommand with --contract computes distinct assignme
 });
 
 
+
+// Two dispatch contracts, one collector. A worker launched through cli-spawn
+// writes agent-result.json flat; one launched through herdr-spawn writes
+// outbox/result-<round>.json, because the outbox is the only place it is
+// allowed to write. Before this, the second one's claim was silently
+// discarded and the run was classified off git alone.
+
+function writeOutboxRound(runDir, round, { status = 'done', summary = 'did the thing', report = 'A real report about the work that was done.' } = {}) {
+  const outbox = path.join(runDir, 'outbox');
+  fs.mkdirSync(outbox, { recursive: true });
+  fs.writeFileSync(path.join(outbox, `result-${round}.json`), JSON.stringify({ status, summary, findings: [], evidenceRefs: [] }));
+  if (report !== null) fs.writeFileSync(path.join(outbox, `report-${round}.md`), report);
+}
+
+test('a claim written to the worker outbox is collected, not thrown away', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = path.join(tempDir, 'outbox-worker.mjs');
+  const runDirFor = path.join(tempDir, '.fgos', 'assignments');
+  fs.writeFileSync(executorScript, `
+import fs from 'node:fs';
+import path from 'node:path';
+// Behaves like an interactive worker: writes only inside its own outbox.
+const root = ${JSON.stringify(runDirFor)};
+const asgn = fs.readdirSync(root)[0];
+const runDir = path.join(root, asgn, 'runs', '01');
+fs.mkdirSync(path.join(runDir, 'outbox'), { recursive: true });
+fs.writeFileSync(path.join(runDir, 'outbox', 'report-1.md'), 'The worker explains what it actually changed here.');
+fs.writeFileSync(path.join(runDir, 'outbox', 'result-1.json'), JSON.stringify({ status: 'done', summary: 'wrote the thing', findings: [], evidenceRefs: [] }));
+console.log('done');
+`);
+
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 20000,
+  };
+  const work = { id: 'tsk-outbox', status: 'doing', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
+
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  assert.equal(result.agentClaim?.summary, 'wrote the thing', 'the worker\'s own account survives to the RunResult');
+  assert.equal(result.status, 'done');
+  assert.notEqual(result.confidence, 'no-evidence', 'a settled round with a real claim is never no-evidence');
+});
+
+test('the flat legacy name still works, so cli-spawn workers are untouched', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = path.join(tempDir, 'flat-worker.mjs');
+  const runDirFor = path.join(tempDir, '.fgos', 'assignments');
+  fs.writeFileSync(executorScript, `
+import fs from 'node:fs';
+import path from 'node:path';
+const root = ${JSON.stringify(runDirFor)};
+const asgn = fs.readdirSync(root)[0];
+const runDir = path.join(root, asgn, 'runs', '01');
+fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'The worker explains what it actually changed here.');
+fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'legacy shape', findings: [], evidenceRefs: [] }));
+console.log('done');
+`);
+
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 20000,
+  };
+  const work = { id: 'tsk-flat', status: 'doing', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
+
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+  assert.equal(result.agentClaim?.summary, 'legacy shape');
+  assert.equal(result.status, 'done');
+});
+
+
+test('resolveWorkerArtifactPath prefers the outbox, and orders rounds by number rather than by name', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, 'runs', '01');
+  const outbox = path.join(runDir, 'outbox');
+  fs.mkdirSync(outbox, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'agent-result.json'), '{}');
+
+  fs.writeFileSync(path.join(outbox, 'result-2.json'), '{}');
+  fs.writeFileSync(path.join(outbox, 'result-10.json'), '{}');
+  // Sorted as text, "result-10" comes before "result-2", so a naive sort would
+  // classify a resumed run on the older claim. Round order is numeric.
+  assert.equal(
+    resolveWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json'),
+    path.join(outbox, 'result-10.json'),
+  );
+});
+
+test('resolveWorkerArtifactPath falls back to the flat legacy name when the outbox has nothing', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, 'runs', '01');
+  fs.mkdirSync(path.join(runDir, 'outbox'), { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'outbox', 'ack-1.json'), '{}');
+
+  assert.equal(
+    resolveWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json'),
+    path.join(runDir, 'agent-result.json'),
+    'an ack is not a result, and a run dir with no outbox at all still resolves',
+  );
+  const noOutbox = path.join(tempDir, 'runs', '02');
+  fs.mkdirSync(noOutbox, { recursive: true });
+  assert.equal(
+    resolveWorkerArtifactPath(noOutbox, /^result-(\d+)\.json$/, 'agent-result.json'),
+    path.join(noOutbox, 'agent-result.json'),
+  );
+});
