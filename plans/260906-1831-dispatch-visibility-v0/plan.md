@@ -1,6 +1,6 @@
 # Dispatch Visibility V0 — interactive agent, quan sát được, không cần contact
 
-Status: IN PROGRESS — Phases 00-02 done, Phases 03-06 not started | Created: 2026-09-06 | Owner: maintainer
+Status: IN PROGRESS — Phases 00-03 done, Phases 04-06 not started | Created: 2026-09-06 | Owner: maintainer
 Execution track: `dispatch-visibility-v0`
 Design source: [Visibility và Interactive Contact](../../docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md) (§8b.1 mức V0, §11 recommendation, §12b–§12c evidence)
 
@@ -55,7 +55,7 @@ V0 là đưa hình dạng đó vào sản phẩm.
 | 00 ✅ | Worker trong worktree không còn chạy hook hỏng của repo | Điều kiện vào track | `worker-hook-neutral` |
 | 01 ✅ | Mechanism khai capability; trust và HOME của worker đúng trước khi khởi động | 00 | `executor-profile` |
 | 02 ✅ | Adapter đổi sang `agent start` + brief-as-file + `agent prompt`; receipt là ack file | 01 | `herdr-adapter` |
-| 03 | Ladder poll thay `agent_status`-là-hoàn-thành; outcome có type; pane giữ lại làm forensics | 02 | `herdr-adapter` |
+| 03 ✅ | Ladder poll thay `agent_status`-là-hoàn-thành; outcome có type; pane giữ lại làm forensics | 02 | `herdr-adapter` |
 | 04 | `VisibilitySession` bền; `run.json` phản ánh trạng thái thật; Run mồ côi được reconcile | 03 | `run-truth` |
 | 05 | Cửa quan sát chỉ-đọc; doctor; spec và docs cập nhật | 04 | `observe-surface` |
 | 06 | Proof sống: agy, gateway restart, thử vượt rào | 05 | `v0-proof` |
