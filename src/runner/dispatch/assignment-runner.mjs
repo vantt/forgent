@@ -27,6 +27,7 @@ import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
+import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 
 // ADR-006 R7 (P02.4 Red-Team HIGH fix): executeAssignment's own
@@ -1050,6 +1051,16 @@ export async function executeAssignment(assignment, opts = {}) {
   };
 
   fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
+
+  // Close the sentence run.json started. It was written `running` before the
+  // worker launched and, until now, was never written again -- so a run that
+  // finished an hour ago and a run whose process was killed mid-flight read
+  // identically off disk, and nothing could tell them apart afterwards.
+  //
+  // `settled` here means the run reached its end and produced a RunResult. It
+  // says nothing about whether the work succeeded; that verdict is the
+  // `status`/`confidence` pair inside result.json, one line above.
+  markRunSettled(runDir);
 
   return Object.freeze(runResult);
 }

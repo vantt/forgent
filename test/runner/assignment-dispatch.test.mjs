@@ -249,6 +249,14 @@ test('executeAssignment captures timeout with partial stdout and writes failed R
   assert.equal(exitData.exitCode, 124);
   assert.equal(exitData.signal, 'SIGTERM');
 
+  // run.json used to be written once as `running` and never again, so a run
+  // that ended and a run whose process was killed read identically off disk
+  // forever after. A run that reached its end says so -- including this one,
+  // whose work failed. Whether the WORK succeeded is result.json's business.
+  const runMeta = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+  assert.equal(runMeta.status, 'settled');
+  assert.ok(runMeta.settledAt, 'and records when it ended');
+
   // Work remains untouched
   assert.equal(work.status, 'doing');
   assert.equal(work.stage, 'planning');

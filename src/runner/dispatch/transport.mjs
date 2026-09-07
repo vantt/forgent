@@ -41,6 +41,7 @@ import { resolveExecutorConfig } from './resolve.mjs';
 import { createHerdrClient, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { evaluateLadder, paneFateFor } from './liveness.mjs';
+import { writeVisibility } from './visibility-session.mjs';
 
 /**
  * The ladder's outcome is the precise answer; `errorClass` stays the coarse
@@ -740,6 +741,16 @@ async function runHerdrRound(ctx) {
   const briefText = renderBrief({ prompt, round, runDir, agentName });
   fs.writeFileSync(paths.briefPath, briefText);
 
+  // Where the worker is, recorded as it becomes known. Every binding is
+  // written BEFORE it is used, so a dispatch process that dies mid-flight
+  // still leaves behind enough to find what it started. Never a gate: a
+  // visibility write that fails must not take a working dispatch down with
+  // it, so nothing here is allowed to throw.
+  const note = (patch) => {
+    try { writeVisibility(runDir, patch); } catch { /* a courtesy, not a contract */ }
+  };
+  note({ status: 'requested', agentName, round });
+
   let paneId = null;
   const fail = (errorClass, reason, message, extra = {}) => new DispatchError(
     errorClass,
@@ -754,6 +765,8 @@ async function runHerdrRound(ctx) {
       `executor failed to start for work "${workId}": herdr could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
   }
 
+  note({ status: 'pane-created', paneId });
+
   try {
     client.agentStart(agentName, { kind: agentKind, paneId, timeoutMs: readyTimeoutMs, agentArgs });
   } catch (err) {
@@ -761,6 +774,20 @@ async function runHerdrRound(ctx) {
     // becoming ready is still on that screen.
     throw fail('worker-spawn-fail', err.code ?? 'agent_not_ready',
       `executor failed to start for work "${workId}": herdr could not bring a "${agentKind}" agent to ready in pane ${paneId} (${err.code ?? 'unknown'}): ${err.message}`);
+  }
+
+  // The agent session id exists from the moment the agent is ready, so it is
+  // recorded now rather than at the first time something needs it -- a
+  // reattach after a gateway restart matches on this.
+  try {
+    const info = client.agentGet(agentName);
+    note({
+      status: 'agent-ready',
+      agentSession: info.agentSession,
+      stateChangeSeq: info.stateChangeSeq,
+    });
+  } catch {
+    note({ status: 'agent-ready' });
   }
 
   // One line so a person watching the runner's own stderr can find the pane
@@ -796,6 +823,8 @@ async function runHerdrRound(ctx) {
       screen ? { screen } : {});
   }
 
+  note({ status: 'briefed' });
+
   // A liveness probe that FAILS reports `unknown`, never `absent`. A pane
   // that still exists proves nothing about the agent: an idle pane always
   // lists its own shell, so "agent present" means a foreground process that
@@ -828,6 +857,7 @@ async function runHerdrRound(ctx) {
     if (!ackSeen && fs.existsSync(paths.ackPath)) {
       ackSeen = true;
       lastProgressAt = Date.now();
+      note({ status: 'working' });
     }
 
     let agentState = 'unknown';
@@ -889,6 +919,14 @@ async function runHerdrRound(ctx) {
     if (!screenLine) {
       try { screenLine = lastScreenLine(client.agentRead(agentName, { lines: 60 })); } catch { screenLine = null; }
     }
+    // `died` and `blocked` are states a watcher can act on; the timeouts have
+    // no state of their own, so they leave the last real one standing and add
+    // the outcome beside it rather than overwriting it with a worse word.
+    note({
+      ...(decision.outcome === 'died' || decision.outcome === 'blocked' ? { status: decision.outcome } : {}),
+      outcome: decision.outcome,
+      ...(screenLine ? { screen: screenLine } : {}),
+    });
     if (paneFateFor(decision.outcome, { closeAlways }) === 'close') {
       client.paneClose(paneId);
     }
@@ -918,6 +956,8 @@ async function runHerdrRound(ctx) {
   // Closing a pane is not cancelling a worker: measured, the foreground
   // process dies and a `setsid` descendant survives it. Nothing below reports
   // this round as cancelled, and nothing should.
+  note({ status: 'settling', outcome: 'settled' });
+
   try {
     client.agentPrompt(agentName, exitCommand, { wait: false, timeoutMs: promptTimeoutMs });
   } catch {
@@ -936,6 +976,7 @@ async function runHerdrRound(ctx) {
   }
 
   client.paneClose(paneId);
+  note({ status: 'reconciled' });
 
   return {
     status: 0,
