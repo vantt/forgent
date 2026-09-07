@@ -615,9 +615,11 @@ export const COMMAND_REGISTRY = [
   {
     name: 'stale',
     invoke: 'fgos stale',
-    description: 'Read-only advisory: items stuck in "doing" classified as stale by owner type (a person\'s claim gets far longer grace than an agent\'s). Classifies and suggests only — never reclaims.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos stale'],
+    description: 'Advisory on work and runs that have stopped moving. Items stuck in "doing", classified by owner type (a person\'s claim gets far longer grace than an agent\'s); items forgotten after merge; and runs whose run.json still says "running" though nothing is finishing them. Read-only by default — it classifies and suggests, and never reclaims a claim. Liveness is never probed, so an orphaned run reads as "settled" when the worker\'s own result file is on disk and "unknown" otherwise, never "died": that would assert something about a process nobody looked at. Passing --reconcile writes each orphaned run\'s real outcome back into its run.json, which is the one thing this verb does that is not read-only, and it has to be asked for.',
+    parameters: { type: 'object', properties: {
+        reconcile: { type: 'boolean', description: 'Write each orphaned run\'s real outcome back into its run.json instead of only reporting it. Off by default: this verb is read-only unless asked otherwise.' },
+      }, required: [] },
+    examples: ['fgos stale', 'fgos stale --reconcile'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,

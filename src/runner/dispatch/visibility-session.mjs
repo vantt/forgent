@@ -124,58 +124,20 @@ export function markDetached(runDir, opts = {}) {
   return writeVisibility(runDir, { status: 'detached' }, opts);
 }
 
-const isPidAliveDefault = (pid) => {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    // EPERM means the process exists but belongs to someone else.
-    return err.code === 'EPERM';
-  }
-};
-
-/**
- * Take the driving seat for this run.
- *
- * One actor at a time; any number of readers. A claim is refused only while
- * the current holder is BOTH unexpired and still running -- an expired lease
- * or a dead pid is a seat nobody is sitting in, and refusing to take it would
- * strand the run forever.
- */
-export function claimActor(runDir, { pid, token, leaseMs = 60000, now = Date.now(), isPidAlive = isPidAliveDefault } = {}) {
-  if (!Number.isInteger(pid) || pid <= 0) {
-    throw new VisibilityError('invalid-actor', `actor pid must be a positive integer, got: ${JSON.stringify(pid)}`);
-  }
-  if (typeof token !== 'string' || !token) {
-    throw new VisibilityError('invalid-actor', 'actor token must be a non-empty string');
-  }
-  const current = readVisibility(runDir)?.actor ?? null;
-  if (current && current.pid !== pid) {
-    const leaseUntil = Date.parse(current.leaseUntil ?? '');
-    const unexpired = Number.isFinite(leaseUntil) && leaseUntil > now;
-    if (unexpired && isPidAlive(current.pid)) {
-      throw new VisibilityError(
-        'actor-held',
-        `run is already being driven by pid ${current.pid} until ${current.leaseUntil}`,
-        { holderPid: current.pid, leaseUntil: current.leaseUntil },
-      );
-    }
-  }
-  const actor = { pid, token, leaseUntil: new Date(now + leaseMs).toISOString() };
-  writeVisibility(runDir, { actor });
-  return actor;
-}
-
-/** Release the seat. Identity is pid AND token together, so an actor that
- * already lost its lease to a takeover cannot delete the winner's claim on
- * its way out. */
-export function releaseActor(runDir, { pid, token } = {}) {
-  const current = readVisibility(runDir)?.actor ?? null;
-  if (!current) return false;
-  if (current.pid !== pid || current.token !== token) return false;
-  writeVisibility(runDir, { actor: null });
-  return true;
-}
+// The actor lease that used to sit here is gone, deliberately.
+//
+// It promised one-driver-at-a-time and could not deliver it: claim was a read
+// followed by a write with nothing between them, so two processes racing the
+// same run both saw a free seat and both took it. The tests asserted the
+// promise rather than the behaviour, which made an unenforceable guarantee
+// look enforced -- worse than having no lease at all, because a caller would
+// have relied on it.
+//
+// Nothing called it. V0 grants observation only, and observation needs no
+// lease: any number of readers, no coordination. When contact arrives in V1
+// there will be something real to serialise, and the lock it needs (an
+// atomic create, not a check-then-write) can be built against that real
+// requirement instead of guessed at now.
 
 /**
  * Find this run's agent among the ones herdr currently reports.
@@ -239,21 +201,64 @@ export function findWorkerResult(runDir) {
  * is still working) and never by becoming `died` (which would claim the
  * opposite on the same missing evidence).
  */
-export function reconcileRun(runDir, { liveness = 'unknown' } = {}) {
+/**
+ * What became of this run, deciding nothing and writing nothing.
+ *
+ * Split out from `reconcileRun` so a read-only caller -- `fgos stale`, which
+ * documents that it never writes -- can report on orphaned runs without
+ * quietly changing them. A reader that cannot probe liveness passes
+ * `unknown` and gets `unknown` back: saying so is the honest answer, and it
+ * is specifically NOT `died`, which would be an assertion about a process
+ * nobody looked at.
+ */
+export function classifyRunOutcome(runDir, { liveness = 'unknown' } = {}) {
   const dir = path.resolve(runDir);
-  const runFile = path.join(dir, RUN_FILE);
-  const runMeta = readJson(runFile);
+  const runMeta = readJson(path.join(dir, RUN_FILE));
   if (!runMeta) {
     throw new VisibilityError('missing-run', `no ${RUN_FILE} in ${dir}`, { runDir: dir });
   }
-
   const resultPath = findWorkerResult(dir);
   let outcome;
   if (resultPath) outcome = 'settled';
   else if (liveness === 'absent') outcome = 'died';
   else outcome = 'unknown';
+  return { outcome, resultPath, runMeta, changed: runMeta.status !== outcome };
+}
 
-  const changed = runMeta.status !== outcome;
+/** Every run under `fgosDir` still claiming to be running. Both layouts are
+ * scanned: assignment runs, and the flat dispatch-runs a runner dispatch
+ * writes when it has no Assignment of its own. */
+export function findRunningRuns(fgosDir) {
+  const roots = [path.join(fgosDir, 'assignments'), path.join(fgosDir, 'dispatch-runs')];
+  const found = [];
+  const listDirs = (d) => {
+    try {
+      return fs.readdirSync(d, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
+    } catch {
+      return [];
+    }
+  };
+  for (const root of roots) {
+    for (const first of listDirs(root)) {
+      // assignments/<id>/runs/<NN>, dispatch-runs/<workId>/<stamp>
+      const mid = path.join(root, first, 'runs');
+      const bases = fs.existsSync(mid) ? [mid] : [path.join(root, first)];
+      for (const base of bases) {
+        for (const leaf of listDirs(base)) {
+          const dir = path.join(base, leaf);
+          const meta = readJson(path.join(dir, RUN_FILE));
+          if (meta && meta.status === 'running') found.push({ runDir: dir, runId: meta.runId ?? null, startedAt: meta.startedAt ?? null });
+        }
+      }
+    }
+  }
+  return found;
+}
+
+export function reconcileRun(runDir, { liveness = 'unknown' } = {}) {
+  const dir = path.resolve(runDir);
+  const runFile = path.join(dir, RUN_FILE);
+  const { outcome, resultPath, runMeta, changed } = classifyRunOutcome(dir, { liveness });
   if (changed) {
     writeJsonAtomic(runFile, {
       ...runMeta,

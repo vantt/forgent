@@ -7,10 +7,10 @@ import {
   readVisibility,
   writeVisibility,
   markDetached,
-  claimActor,
-  releaseActor,
   findAgentBinding,
   findWorkerResult,
+  classifyRunOutcome,
+  findRunningRuns,
   reconcileRun,
   markRunSettled,
   VisibilityError,
@@ -70,57 +70,6 @@ test('losing the observer detaches the view and leaves the run alone', () => {
     assert.equal(readVisibility(dir).status, 'detached');
     assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'run.json'), 'utf8')).status, 'running',
       'a lost observer is not a dead worker');
-  } finally { cleanup(dir); }
-});
-
-test('one actor drives; a second is refused while the first is alive and unexpired', () => {
-  const dir = makeRunDir();
-  try {
-    claimActor(dir, { pid: 111, token: 't1', leaseMs: 60000, now: 1000, isPidAlive: () => true });
-    assert.throws(
-      () => claimActor(dir, { pid: 222, token: 't2', now: 2000, isPidAlive: () => true }),
-      (e) => e.code === 'actor-held' && e.holderPid === 111,
-    );
-  } finally { cleanup(dir); }
-});
-
-test('a dead holder does not strand the run -- the seat can be taken', () => {
-  const dir = makeRunDir();
-  try {
-    claimActor(dir, { pid: 111, token: 't1', leaseMs: 60000, now: 1000, isPidAlive: () => true });
-    const taken = claimActor(dir, { pid: 222, token: 't2', now: 2000, isPidAlive: () => false });
-    assert.equal(taken.pid, 222);
-    assert.equal(readVisibility(dir).actor.pid, 222);
-  } finally { cleanup(dir); }
-});
-
-test('an expired lease can be taken over even by a still-running holder', () => {
-  const dir = makeRunDir();
-  try {
-    claimActor(dir, { pid: 111, token: 't1', leaseMs: 1000, now: 1000, isPidAlive: () => true });
-    const taken = claimActor(dir, { pid: 222, token: 't2', now: 99999, isPidAlive: () => true });
-    assert.equal(taken.pid, 222);
-  } finally { cleanup(dir); }
-});
-
-test('the same actor renewing its own lease is never blocked by itself', () => {
-  const dir = makeRunDir();
-  try {
-    claimActor(dir, { pid: 111, token: 't1', leaseMs: 1000, now: 1000, isPidAlive: () => true });
-    const renewed = claimActor(dir, { pid: 111, token: 't1', leaseMs: 1000, now: 1500, isPidAlive: () => true });
-    assert.equal(renewed.pid, 111);
-  } finally { cleanup(dir); }
-});
-
-test('an actor that already lost the seat cannot release the winner claim on its way out', () => {
-  const dir = makeRunDir();
-  try {
-    claimActor(dir, { pid: 111, token: 't1', leaseMs: 1000, now: 1000, isPidAlive: () => true });
-    claimActor(dir, { pid: 222, token: 't2', now: 99999, isPidAlive: () => true });
-    assert.equal(releaseActor(dir, { pid: 111, token: 't1' }), false);
-    assert.equal(readVisibility(dir).actor.pid, 222, 'the winner still holds it');
-    assert.equal(releaseActor(dir, { pid: 222, token: 't2' }), true);
-    assert.equal(readVisibility(dir).actor, null);
   } finally { cleanup(dir); }
 });
 
@@ -239,4 +188,55 @@ test('the latest round is chosen by number, not by filename', () => {
     // the same files numerically; these two read one directory and must agree.
     assert.match(findWorkerResult(dir), /result-11\.json$/);
   } finally { cleanup(dir); }
+});
+
+
+test('classifyRunOutcome decides without writing anything', () => {
+  const dir = makeRunDir({ withResult: true });
+  try {
+    const before = fs.readFileSync(path.join(dir, 'run.json'), 'utf8');
+    const v = classifyRunOutcome(dir, { liveness: 'unknown' });
+    assert.equal(v.outcome, 'settled');
+    assert.equal(v.changed, true);
+    assert.equal(fs.readFileSync(path.join(dir, 'run.json'), 'utf8'), before,
+      'a read-only caller must be able to ask without changing the answer');
+  } finally { cleanup(dir); }
+});
+
+test('without a liveness probe the answer is unknown, never died', () => {
+  const dir = makeRunDir();
+  try {
+    // `fgos stale` has no herdr client and does not start one. Reporting
+    // "died" from that position would assert something about a process
+    // nobody looked at.
+    assert.equal(classifyRunOutcome(dir, { liveness: 'unknown' }).outcome, 'unknown');
+    assert.equal(classifyRunOutcome(dir, { liveness: 'absent' }).outcome, 'died');
+  } finally { cleanup(dir); }
+});
+
+test('findRunningRuns sees both run layouts and ignores runs that already settled', () => {
+  const fgosDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-scan-'));
+  try {
+    const mk = (rel, status, runId) => {
+      const d = path.join(fgosDir, rel);
+      fs.mkdirSync(d, { recursive: true });
+      fs.writeFileSync(path.join(d, 'run.json'), JSON.stringify({ runId, status }));
+      return d;
+    };
+    mk('assignments/asgn_a/runs/01', 'running', 'r-assignment');
+    mk('assignments/asgn_a/runs/02', 'settled', 'r-done');
+    // The flat layout a runner dispatch writes when it has no Assignment.
+    mk('dispatch-runs/tsk-x/1700000000000', 'running', 'r-dispatch');
+
+    const ids = findRunningRuns(fgosDir).map((r) => r.runId).sort();
+    assert.deepEqual(ids, ['r-assignment', 'r-dispatch']);
+  } finally { fs.rmSync(fgosDir, { recursive: true, force: true }); }
+});
+
+test('the actor lease is gone, not merely unused', async () => {
+  // It promised one-driver-at-a-time that a check-then-write cannot deliver.
+  // Leaving it exported would invite a caller to rely on it.
+  const mod = await import('../../src/runner/dispatch/visibility-session.mjs');
+  assert.equal(mod.claimActor, undefined);
+  assert.equal(mod.releaseActor, undefined);
 });

@@ -58,6 +58,7 @@ import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
 import { readClaim, releaseClaim } from '../src/state/runtime-coordination.mjs';
+import { findRunningRuns, classifyRunOutcome, reconcileRun } from '../src/runner/dispatch/visibility-session.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
@@ -2941,7 +2942,41 @@ async function runVerb(verb, flags, positional, dir) {
       const sharedConfig = readSharedConfig(repoRoot);
       const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;
       const postDelivery = stalePostDeliveryAdvisory(dir, { ttlDays });
-      return { ...doing, postDelivery };
+
+      // Runs whose dispatch process is gone but whose run.json still says
+      // "running". Read-only by default, because that is what this verb
+      // documents about itself; `--reconcile` is the explicit opt-in that
+      // actually writes the answer back.
+      //
+      // Liveness is never probed here -- `stale` has no herdr client and no
+      // business starting one -- so the answer is `settled` when the worker's
+      // own result file is on disk and `unknown` otherwise. It is specifically
+      // never `died`: that would be an assertion about a process nobody
+      // looked at.
+      const orphans = [];
+      for (const run of findRunningRuns(dir)) {
+        let verdict;
+        try {
+          verdict = classifyRunOutcome(run.runDir, { liveness: 'unknown' });
+        } catch {
+          continue;
+        }
+        if (!verdict.changed) continue;
+        const row = {
+          runId: run.runId,
+          runDir: path.relative(path.dirname(dir), run.runDir),
+          startedAt: run.startedAt,
+          wouldBecome: verdict.outcome,
+          hasWorkerResult: Boolean(verdict.resultPath),
+        };
+        if (flags.reconcile) {
+          reconcileRun(run.runDir, { liveness: 'unknown' });
+          row.reconciled = true;
+        }
+        orphans.push(row);
+      }
+
+      return { ...doing, postDelivery, orphanedRuns: orphans, reconciled: Boolean(flags.reconcile) };
     }
 
     // Request-class per D1 (same contract as `ready`/`graph`/`stale`): a pure
