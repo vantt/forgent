@@ -43,6 +43,7 @@ import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { evaluateLadder, paneFateFor } from './liveness.mjs';
 import { writeVisibility } from './visibility-session.mjs';
 import { createWorkerHome, removeWorkerHome } from './worker-home.mjs';
+import { seedTrust, seedCodexTrust } from './trust-store.mjs';
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 
 /**
@@ -615,6 +616,7 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     maxResends = DEFAULT_MAX_RESENDS,
     resendAfterMs,
     usageLimitPatterns,
+    trustStore,
   } = interactiveMode;
   const {
     cwd, timeoutMs, idleTimeoutMs, workId, tier, model,
@@ -665,6 +667,7 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     promptTimeoutMs,
     maxResends,
     resendAfterMs: resendAfterMs ?? promptTimeoutMs,
+    trustStore,
     runDir: optsRunDir,
     paneEnv: resolvedEnv,
     cwd,
@@ -736,7 +739,7 @@ async function runHerdrRound(ctx) {
   const {
     herdrBin, fullEnv, confinement, permissionMode,
     agentKind, agentArgs, prompt, delivery, exitCommand,
-    readyTimeoutMs, promptTimeoutMs, maxResends, resendAfterMs,
+    readyTimeoutMs, promptTimeoutMs, maxResends, resendAfterMs, trustStore,
     paneEnv, cwd, timeoutMs, idleTimeoutMs, usageLimitPatterns, closeAlways,
     workId, tier, model, onChunk,
   } = ctx;
@@ -828,6 +831,34 @@ async function runHerdrRound(ctx) {
   }
 
   note({ status: 'pane-created', paneId });
+
+  // Pre-trust the workspace, or the agent stops at a folder-trust dialog with
+  // nobody there to answer it and herdr reports `agent_not_ready`. Measured for
+  // both claude and codex; agy shows no such dialog, which is why this is
+  // DECLARED per executor rather than done for everyone -- an agent kind that
+  // does not ask is not given an entry it never needed.
+  //
+  // A confined run needs none of this: its private HOME is provisioned with the
+  // workspace already trusted, so seeding here would write into the operator's
+  // own store for a directory only the worker will ever see.
+  if (trustStore && !workerHomePath) {
+    const repoRootForTrust = ctx.repoRoot ?? path.dirname(path.resolve(cwd));
+    try {
+      if (trustStore.kind === 'codex-toml') {
+        seedCodexTrust(trustStore.path ?? path.join(fullEnv.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml'),
+          { projectPath: path.resolve(cwd), repoRoot: repoRootForTrust });
+      } else {
+        seedTrust(trustStore.path ?? path.join(os.homedir(), '.claude.json'),
+          { projectPath: path.resolve(cwd), repoRoot: repoRootForTrust });
+      }
+      note({ trustSeeded: trustStore.kind });
+    } catch (err) {
+      // Refusing here would be worse than trying: the agent may already be
+      // trusted by some other route, and the dialog it might hit is reported
+      // by name a few lines below anyway.
+      note({ trustSeedFailed: err.message });
+    }
+  }
 
   try {
     client.agentStart(agentName, { kind: agentKind, paneId, timeoutMs: readyTimeoutMs, agentArgs });

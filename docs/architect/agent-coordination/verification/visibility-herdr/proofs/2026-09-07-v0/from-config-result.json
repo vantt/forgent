@@ -1,0 +1,178 @@
+{
+  "startedAt": "2026-09-07T04:29:59.561Z",
+  "source": "/home/vantt/projects/forgentX/.fgos/config.json",
+  "executors": {
+    "agy-herdr": {
+      "command": "agy",
+      "kind": "agy",
+      "args": [
+        "{prompt}",
+        "--mode",
+        "accept-edits",
+        "--new-project",
+        "--model",
+        "{model}"
+      ],
+      "env": null,
+      "trustStore": null,
+      "model": "gemini-3.6-flash-medium",
+      "rounds": [
+        {
+          "round": 1,
+          "outcome": "settled",
+          "ms": 56271,
+          "ack": true,
+          "result": true
+        },
+        {
+          "round": 2,
+          "outcome": "settled",
+          "ms": 37657,
+          "ack": true,
+          "result": true
+        }
+      ],
+      "settled": 2,
+      "of": 2,
+      "verdict": "works from config"
+    },
+    "claude-herdr": {
+      "command": "claude",
+      "kind": "claude",
+      "args": [
+        "{prompt}",
+        "--model",
+        "{model}",
+        "--permission-mode",
+        "acceptEdits",
+        "--allowedTools",
+        "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+      ],
+      "env": null,
+      "trustStore": {
+        "kind": "claude-json"
+      },
+      "model": "haiku",
+      "rounds": [
+        {
+          "round": 1,
+          "outcome": "settled",
+          "ms": 48055,
+          "ack": true,
+          "result": true
+        },
+        {
+          "round": 2,
+          "outcome": "settled",
+          "ms": 41874,
+          "ack": true,
+          "result": true
+        }
+      ],
+      "settled": 2,
+      "of": 2,
+      "verdict": "works from config"
+    },
+    "pi-herdr": {
+      "command": "pi",
+      "kind": "pi",
+      "args": [
+        "--provider",
+        "openai-codex",
+        "--model",
+        "{model}",
+        "--tools",
+        "read,write,edit,bash,grep,find,ls",
+        "--approve",
+        "{prompt}"
+      ],
+      "env": null,
+      "trustStore": null,
+      "model": "haiku",
+      "rounds": [
+        {
+          "round": 1,
+          "outcome": "timed-out-ceiling",
+          "reason": "timed-out-ceiling",
+          "message": "executor for work \"pi-herdr-1\" ended as timed-out-ceiling: past the absolute ceiling of 180000ms. Pane w1:p6 is left open.",
+          "ms": 184838,
+          "ack": false,
+          "result": false
+        },
+        {
+          "round": 2,
+          "outcome": "timed-out-ceiling",
+          "reason": "timed-out-ceiling",
+          "message": "executor for work \"pi-herdr-2\" ended as timed-out-ceiling: past the absolute ceiling of 180000ms. Pane w1:p7 is left open.",
+          "ms": 184939,
+          "ack": false,
+          "result": false
+        }
+      ],
+      "settled": 0,
+      "of": 2,
+      "verdict": "does not work"
+    },
+    "codex-herdr": {
+      "command": "codex",
+      "kind": "codex",
+      "args": [
+        "{prompt}"
+      ],
+      "env": {
+        "CODEX_HOME": "${HOME}/.codex-tetnu"
+      },
+      "trustStore": {
+        "kind": "codex-toml"
+      },
+      "model": "gpt-5.5",
+      "rounds": [
+        {
+          "round": 1,
+          "outcome": "settled",
+          "ms": 50741,
+          "ack": true,
+          "result": true
+        },
+        {
+          "round": 2,
+          "outcome": "settled",
+          "ms": 50220,
+          "ack": true,
+          "result": true
+        }
+      ],
+      "settled": 2,
+      "of": 2,
+      "verdict": "works from config"
+    }
+  },
+  "finishedAt": "2026-09-07T04:40:54.738Z",
+  "operatorSessionsAfter": [
+    "default(running)"
+  ],
+  "log": [
+    "[04:29:59] herdr-spawn executors in the live config: agy-herdr, claude-herdr, pi-herdr, codex-herdr",
+    "[04:30:00] --- agy-herdr: command=agy kind=agy args=[\"{prompt}\",\"--mode\",\"accept-edits\",\"--new-project\",\"--model\",\"{model}\"]",
+    "[04:30:56]     round 1/2: outcome=settled ack=true result=true (56271ms)",
+    "[04:31:34]     round 2/2: outcome=settled ack=true result=true (37657ms)",
+    "[04:31:34]     => agy-herdr: 2/2 settled",
+    "[04:31:34] --- claude-herdr: command=claude kind=claude args=[\"{prompt}\",\"--model\",\"{model}\",\"--permission-mode\",\"acceptEdits\",\"--allowedTools\",\"Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)\"]",
+    "[04:32:22]     round 1/2: outcome=settled ack=true result=true (48055ms)",
+    "[04:33:03]     round 2/2: outcome=settled ack=true result=true (41874ms)",
+    "[04:33:03]     => claude-herdr: 2/2 settled",
+    "[04:33:03] --- pi-herdr: command=pi kind=pi args=[\"--provider\",\"openai-codex\",\"--model\",\"{model}\",\"--tools\",\"read,write,edit,bash,grep,find,ls\",\"--approve\",\"{prompt}\"]",
+    "[04:36:08]     round 1/2: outcome=timed-out-ceiling ack=false result=false (184838ms)",
+    "[04:36:08]       executor for work \"pi-herdr-1\" ended as timed-out-ceiling: past the absolute ceiling of 180000ms. Pane w1:p6 is left open.",
+    "[04:39:13]     round 2/2: outcome=timed-out-ceiling ack=false result=false (184939ms)",
+    "[04:39:13]       executor for work \"pi-herdr-2\" ended as timed-out-ceiling: past the absolute ceiling of 180000ms. Pane w1:p7 is left open.",
+    "[04:39:13]     => pi-herdr: 0/2 settled",
+    "[04:39:13] --- codex-herdr: command=codex kind=codex args=[\"{prompt}\"]",
+    "[04:40:04]     round 1/2: outcome=settled ack=true result=true (50741ms)",
+    "[04:40:54]     round 2/2: outcome=settled ack=true result=true (50220ms)",
+    "[04:40:54]     => codex-herdr: 2/2 settled",
+    "[04:40:54] removed codex trust entry from /home/vantt/.codex-tetnu/config.toml",
+    "[04:40:54] cleanup",
+    "[04:40:55] sessions left: default(running)"
+  ]
+}

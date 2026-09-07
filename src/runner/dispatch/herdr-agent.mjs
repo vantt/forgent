@@ -85,15 +85,28 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
       throw new HerdrError('herdr_call_timeout', `herdr ${args.join(' ')} was killed after ${timeoutMs}ms.`, { args });
     }
 
+    // MEASURED: herdr answers on stdout when it succeeds and on STDERR when it
+    // fails -- `agent start` timing out writes a perfectly well-formed
+    // {"error":{"code":"timeout"}} envelope to stderr and nothing to stdout.
+    // Reading only stdout turned that named failure into an unnamed one, which
+    // is the exact outcome this module exists to prevent. Both streams are
+    // tried, stdout first.
     let body;
-    try {
-      body = JSON.parse(res.stdout);
-    } catch {
-      // A herdr that neither answers JSON nor exits cleanly is a broken
-      // transport, and saying so beats guessing at the text.
+    for (const stream of [res.stdout, res.stderr]) {
+      if (typeof stream !== 'string' || !stream.trim()) continue;
+      try {
+        body = JSON.parse(stream);
+        break;
+      } catch {
+        // try the other stream before giving up
+      }
+    }
+    if (body === undefined) {
+      // A herdr that answers JSON on neither stream is a broken transport, and
+      // saying so beats guessing at the text.
       throw new HerdrError(
         'herdr_unparseable',
-        `herdr ${args.join(' ')} returned no parseable JSON (exit ${res.status ?? 'unknown'}): ${(res.stdout || res.stderr || '').slice(0, 400)}`,
+        `herdr ${args.join(' ')} returned no parseable JSON on stdout or stderr (exit ${res.status ?? 'unknown'}): ${(res.stdout || res.stderr || '').slice(0, 400)}`,
         { args, exitCode: res.status },
       );
     }

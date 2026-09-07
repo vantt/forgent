@@ -152,3 +152,40 @@ test('agent names are normalized to something herdr accepts as a target', () => 
   assert.equal(normalizeAgentName(''), 'fgos-agent');
   assert.ok(normalizeAgentName('x'.repeat(200)).length <= 48);
 });
+
+test('a herdr error envelope on STDERR is still a named failure, not an unparseable one', () => {
+  // Measured against herdr 0.8.2: `agent start` timing out writes a
+  // well-formed error envelope to stderr and NOTHING to stdout. Reading only
+  // stdout turned that named failure into `herdr_unparseable`, which is the
+  // exact outcome this module exists to prevent -- found live while probing
+  // the configured agy and codex executors.
+  const { run } = fakeBackend(() => ({
+    status: 1,
+    stdout: '',
+    stderr: JSON.stringify({ error: { code: 'timeout', message: 'timed out waiting for agent startup' }, id: 'cli:agent:start' }) + '\n',
+  }));
+  const client = createHerdrClient({ run });
+  assert.throws(
+    () => client.agentStart('w1', { kind: 'agy', paneId: 'p1' }),
+    (err) => err.code === 'timeout' && /timed out waiting for agent startup/.test(err.message),
+  );
+});
+
+test('stdout still wins when both streams carry something', () => {
+  const { run } = fakeBackend(() => ({
+    status: 0,
+    stdout: JSON.stringify({ id: 'x', result: { agent: { agent_status: 'idle' } } }),
+    stderr: 'a warning nobody should parse as the answer',
+  }));
+  const client = createHerdrClient({ run });
+  assert.equal(client.agentGet('w1').agentStatus, 'idle');
+});
+
+test('neither stream parseable is still reported as unparseable, naming both', () => {
+  const { run } = fakeBackend(() => ({ status: 2, stdout: 'not json', stderr: 'also not json' }));
+  const client = createHerdrClient({ run });
+  assert.throws(
+    () => client.agentGet('w1'),
+    (err) => err.code === 'herdr_unparseable' && /stdout or stderr/.test(err.message),
+  );
+});

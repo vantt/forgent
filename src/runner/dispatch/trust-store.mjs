@@ -172,3 +172,116 @@ export function removeTrust(storePath, projectPath) {
   writeStoreAtomic(storePath, store);
   return true;
 }
+
+// ---------------------------------------------------------------------------
+// The same policy, a second format.
+//
+// codex asks the identical question at startup -- "do you trust the contents of
+// this directory?" -- and blocks on it exactly the way claude does. herdr reports
+// that as `agent_not_ready`: "blocked during startup and is not ready for
+// prompts". Measured, and measured again after trying the cheaper ways out:
+// neither `-c projects."<path>".trust_level=trusted` as an invocation override
+// nor any of codex's `--dangerously-bypass-*` flags clears it. Only a persisted
+// entry does.
+//
+// It lives here rather than in a module of its own because the POLICY is the
+// same and must not drift: trust is only ever derived from a root that is
+// already trusted, keyed by exact path, written atomically. Only the file format
+// differs. Two files would be two chances for those rules to disagree.
+//
+// Where codex keeps that file is DECLARED by the executor, never guessed. A
+// shell alias may point `CODEX_HOME` somewhere other than ~/.codex -- on this
+// machine it does -- and a dispatch process cannot see a shell alias. Seeding
+// the wrong file leaves the dialog exactly where it was, with nothing to show
+// for it.
+
+/** Read codex's config.toml far enough to answer one question: is this exact
+ * path trusted? Deliberately not a TOML parser -- it looks for the one section
+ * shape codex writes, and says `null` when it cannot tell. */
+export function readCodexTrust(configPath, projectPath) {
+  if (typeof projectPath !== 'string' || !path.isAbsolute(projectPath)) {
+    throw new TrustStoreError('invalid-path', `readCodexTrust: projectPath must be absolute, got "${projectPath}".`);
+  }
+  let body;
+  try {
+    body = fs.readFileSync(configPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return null;
+    throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
+  }
+  const section = codexSectionPattern(projectPath);
+  const match = body.match(section);
+  if (!match) return null;
+  return /trust_level\s*=\s*"trusted"/.test(match[0]);
+}
+
+/** The `[projects."<path>"]` block for one path, up to the next section header
+ * or end of file. The path is embedded literally, so it is escaped for regex
+ * rather than interpolated raw. */
+function codexSectionPattern(projectPath) {
+  const escaped = projectPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`\\[projects\\."${escaped}"\\][^\\[]*`, 'm');
+}
+
+/**
+ * Trust one workspace for codex, deriving that trust from a root codex already
+ * trusts -- the same B1 rule the JSON store enforces, for the same reason:
+ * fgOS may propagate a trust decision a person already made, never invent one.
+ *
+ * Append-only and idempotent. An existing entry for the same path is left
+ * exactly as it is rather than rewritten, so this can never downgrade a
+ * decision or reformat a file somebody else maintains.
+ */
+export function seedCodexTrust(configPath, { projectPath, repoRoot } = {}) {
+  if (typeof projectPath !== 'string' || !path.isAbsolute(projectPath)) {
+    throw new TrustStoreError('invalid-path', `seedCodexTrust: projectPath must be absolute, got "${projectPath}".`);
+  }
+  if (typeof repoRoot !== 'string' || !path.isAbsolute(repoRoot)) {
+    throw new TrustStoreError('invalid-path', `seedCodexTrust: repoRoot must be absolute, got "${repoRoot}".`);
+  }
+  if (readCodexTrust(configPath, projectPath) === true) return false;
+  if (readCodexTrust(configPath, repoRoot) !== true) {
+    throw new TrustStoreError(
+      'untrusted-root',
+      `codex trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted in ${configPath}, so there is nothing to derive trust from.`,
+      { projectPath, repoRoot, configPath },
+    );
+  }
+  let body;
+  try {
+    body = fs.readFileSync(configPath, 'utf8');
+  } catch (err) {
+    throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
+  }
+  const entry = `\n[projects."${projectPath}"]\ntrust_level = "trusted"\n`;
+  const tmp = `${configPath}.tmp-${process.pid}-${Date.now().toString(36)}`;
+  try {
+    fs.writeFileSync(tmp, `${body.replace(/\n*$/, '\n')}${entry}`);
+    fs.renameSync(tmp, configPath);
+  } catch (err) {
+    try { fs.rmSync(tmp, { force: true }); } catch { /* the temp file is not worth a second failure */ }
+    throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
+  }
+  return true;
+}
+
+/** Drop one workspace's codex trust entry. Returns whether anything was there. */
+export function removeCodexTrust(configPath, projectPath) {
+  if (readCodexTrust(configPath, projectPath) === null) return false;
+  let body;
+  try {
+    body = fs.readFileSync(configPath, 'utf8');
+  } catch {
+    return false;
+  }
+  const next = body.replace(codexSectionPattern(projectPath), '');
+  const tmp = `${configPath}.tmp-${process.pid}-${Date.now().toString(36)}`;
+  try {
+    fs.writeFileSync(tmp, next);
+    fs.renameSync(tmp, configPath);
+  } catch (err) {
+    try { fs.rmSync(tmp, { force: true }); } catch { /* nothing further to do */ }
+    throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
+  }
+  return true;
+}
