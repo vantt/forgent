@@ -58,6 +58,27 @@ const ERROR_CLASS_FOR_OUTCOME = Object.freeze({
   'paused-limit': 'worker-timeout',
 });
 
+/**
+ * The transport's own deadlines.
+ *
+ * These are constants, not executor config. Each is a property of how herdr
+ * behaves, not of which agent is being run: how long herdr may take to bring an
+ * agent to ready, how long it may take to accept a submission, how patient to
+ * be with a brief nobody acknowledged. They were declarable per executor for a
+ * while; no executor ever set one, and nobody configuring an executor had a
+ * basis to choose a different value. What is genuinely a person's decision --
+ * how long the WORK may take -- stays in `timeoutMs`/`idleTimeoutMs`.
+ */
+/** `agent start`'s own documented default. */
+const READY_TIMEOUT_MS = 30000;
+/** herdr's own stall detector fires at 5000ms; anything shorter on this side
+ * wins the race and hands the caller a bare timeout instead of the real
+ * reason. Measured upstream: 5s broke, 20s worked. */
+const PROMPT_TIMEOUT_MS = 20000;
+/** A brief that never landed is worth re-sending a couple of times; a brief
+ * that never lands twice is a broken transport, not a slow one. */
+const MAX_RESENDS = 2;
+
 /** How often the receipt poll looks at the outbox. */
 const RECEIPT_POLL_MS = 500;
 /** How often the poll stamps `visibility.json` to say the driver is still
@@ -95,10 +116,16 @@ function lastScreenLine(text) {
  * the difference between a real decomposition and passing the whole context
  * to every function.
  */
-function groupDeadlines({ readyTimeoutMs, promptTimeoutMs, resendAfterMs, maxResends, idleTimeoutMs, timeoutMs }) {
+function groupDeadlines({ idleTimeoutMs, timeoutMs, transportDeadlines = {} }) {
+  const promptMs = transportDeadlines.promptTimeoutMs ?? PROMPT_TIMEOUT_MS;
   return {
-    startup: { readyMs: readyTimeoutMs, promptMs: promptTimeoutMs },
-    brief: { resendAfterMs, maxResends },
+    startup: { readyMs: transportDeadlines.readyTimeoutMs ?? READY_TIMEOUT_MS, promptMs },
+    brief: {
+      // A brief is re-offered no sooner than one submission is allowed to take;
+      // any less and the resend races the delivery it is waiting on.
+      resendAfterMs: transportDeadlines.resendAfterMs ?? promptMs,
+      maxResends: transportDeadlines.maxResends ?? MAX_RESENDS,
+    },
     round: { idleMs: idleTimeoutMs, ceilingMs: timeoutMs },
   };
 }
@@ -180,6 +207,16 @@ function prepareRunDir({ runDir, roundNumber, workId, tier, model }) {
  * socket while the profile claims it is confined.
  */
 async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin }) {
+  // Checked first, because it is the one flag that is already true or already
+  // false before anything is provisioned: a worker confined to its own
+  // worktree cannot be running in the checkout it was told to stay out of.
+  // The config door refuses `bypass` unless this is declared, so leaving it
+  // unenforced made that refusal partly ceremonial.
+  if (confinement?.ownWorktree && repoRoot && path.resolve(cwd) === path.resolve(repoRoot)) {
+    throw round.fail('invalid-config', 'own-worktree-unavailable',
+      `executor for work "${round.workId}" refused: confinement declares ownWorktree, but this dispatch runs in the repo root itself (${path.resolve(cwd)}) rather than a worktree of its own.`);
+  }
+
   let workerHomePath = null;
   try {
     if (confinement?.privateHome) {
@@ -194,7 +231,11 @@ async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot
       round.note({ workerHome: workerHomePath });
     }
     if (confinement?.isolatedSession) {
-      const session = await ensureWorkerSession(confinement.sessionName ?? DEFAULT_WORKER_SESSION, {
+      // One worker session, never named by config: a config-supplied name could
+      // point at the operator's own cockpit whenever that cockpit has a name
+      // and the dispatch runs outside herdr, where there is no HERDR_SESSION
+      // to compare it against.
+      const session = await ensureWorkerSession(DEFAULT_WORKER_SESSION, {
         callerEnv: fullEnv,
         workerHome: workerHomePath,
         cwd,

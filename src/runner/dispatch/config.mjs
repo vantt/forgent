@@ -594,40 +594,36 @@ function validateInteractiveModeShape(interactiveMode, label) {
       );
     }
   }
-  // A deadline shorter than herdr's own 5000ms stall detector wins the race
-  // against it, and the caller gets a bare timeout instead of the real reason
-  // the brief did not land. Measured upstream: 5s broke, 20s worked.
-  if (interactiveMode.promptTimeoutMs !== undefined) {
-    if (!Number.isInteger(interactiveMode.promptTimeoutMs) || interactiveMode.promptTimeoutMs < 10000) {
+  // `trustStore` is validated here rather than on the executor because here is
+  // where the adapter reads it. It used to be declared at the executor level
+  // with one legal kind and read from `interactiveMode` with no validation at
+  // all, so the live config's `codex-toml` was simultaneously rejected by the
+  // validator nobody consulted and accepted by the reader nobody checked.
+  //
+  // `null` is a real value: this executor needs no trust store. Only an object
+  // with an unknown kind is an error.
+  if (interactiveMode.trustStore !== undefined && interactiveMode.trustStore !== null) {
+    const t = interactiveMode.trustStore;
+    if (typeof t !== 'object' || Array.isArray(t) || !TRUST_STORE_KINDS.includes(t.kind)) {
       throw new RunnerConfigError(
-        `runner config (${label}) "promptTimeoutMs" must be an integer of at least 10000 -- a shorter deadline fires before herdr's own 5000ms stall detector can report why. Got: ${JSON.stringify(interactiveMode.promptTimeoutMs)}.`,
+        `runner config (${label}) "trustStore" must be null or an object whose "kind" is one of ${TRUST_STORE_KINDS.join('/')}.`,
       );
     }
-  }
-  if (interactiveMode.readyTimeoutMs !== undefined) {
-    if (!Number.isInteger(interactiveMode.readyTimeoutMs) || interactiveMode.readyTimeoutMs <= 0) {
-      throw new RunnerConfigError(
-        `runner config (${label}) "readyTimeoutMs" must be a positive integer when present, got: ${JSON.stringify(interactiveMode.readyTimeoutMs)}.`,
-      );
+    if (t.path !== undefined && (typeof t.path !== 'string' || !t.path.trim())) {
+      throw new RunnerConfigError(`runner config (${label}) "trustStore.path" must be a non-empty string when present.`);
     }
   }
-  // How long to leave a delivered brief unacknowledged before offering it
-  // again. Deliberately separate from `promptTimeoutMs`: one is how long a
-  // single herdr call may run, the other is how patient to be with a worker.
-  if (interactiveMode.resendAfterMs !== undefined) {
-    if (!Number.isInteger(interactiveMode.resendAfterMs) || interactiveMode.resendAfterMs <= 0) {
-      throw new RunnerConfigError(
-        `runner config (${label}) "resendAfterMs" must be a positive integer when present, got: ${JSON.stringify(interactiveMode.resendAfterMs)}.`,
-      );
-    }
-  }
-  if (interactiveMode.maxResends !== undefined) {
-    if (!Number.isInteger(interactiveMode.maxResends) || interactiveMode.maxResends < 0) {
-      throw new RunnerConfigError(
-        `runner config (${label}) "maxResends" must be a non-negative integer when present, got: ${JSON.stringify(interactiveMode.maxResends)}.`,
-      );
-    }
-  }
+
+  // Four transport deadlines used to be declarable here -- readyTimeoutMs,
+  // promptTimeoutMs, resendAfterMs, maxResends. They are gone. Every one was a
+  // property of the herdr transport rather than of an executor: how long herdr
+  // may take to bring an agent to ready, how long it may take to accept a
+  // submission, how patient to be with a brief nobody acknowledged. No executor
+  // ever set one, and nobody configuring an executor had any basis to pick a
+  // different value. They now live as constants in `herdr-round.mjs`, next to
+  // the poll interval and the exit drain, which were always constants for the
+  // same reason. What is left for a person to decide is `timeoutMs` and
+  // `idleTimeoutMs`: how long the WORK may take.
 }
 
 /**
@@ -683,8 +679,20 @@ function warnIfProviderFamilyUnreliable(executorId, executor) {
  * dispatch, where it looks like the agent misbehaving. */
 const PERMISSION_MODES = ['ask', 'bypass'];
 const PROMPT_DELIVERIES = ['file-pointer', 'inline'];
-const RECEIPT_KINDS = ['receiver-written-file'];
-const TRUST_STORE_KINDS = ['claude-json'];
+/**
+ * Declarations that no longer mean anything, and why -- so a config carrying
+ * one gets an answer instead of silence.
+ */
+const REMOVED_EXECUTOR_FIELDS = Object.freeze({
+  receipt: 'It had one legal value and no reader anywhere in the repo. The rule it stood for -- a round concludes only from a file the receiver wrote -- is not configurable and never was; it is what the herdr round does unconditionally.',
+  trustStore: 'Declare it on "interactiveMode" instead, which is where the adapter reads it. It used to be declared at the executor level and read from interactiveMode, so its one validated kind guarded a field nothing consulted.',
+});
+
+/** Both are real: claude keeps trust in `~/.claude.json`, codex in a
+ * `[projects."<abs>"]` block of its `config.toml`. `codex-toml` was live in
+ * this repo's own config while this list still refused it -- because the list
+ * guarded a field the adapter did not read. */
+const TRUST_STORE_KINDS = ['claude-json', 'codex-toml'];
 const CONFINEMENT_FLAGS = ['privateHome', 'isolatedSession', 'ownWorktree'];
 
 /**
@@ -713,18 +721,13 @@ function validateExecutionProfileShape(executor, label) {
       `runner config (${label}) "promptDelivery" must be one of ${PROMPT_DELIVERIES.join('/')}, got: ${JSON.stringify(executor.promptDelivery)}.`,
     );
   }
-  if (executor.receipt !== undefined && !RECEIPT_KINDS.includes(executor.receipt)) {
-    throw new RunnerConfigError(
-      `runner config (${label}) "receipt" must be one of ${RECEIPT_KINDS.join('/')}, got: ${JSON.stringify(executor.receipt)}.`,
-    );
-  }
-  // `null` is a real, meaningful value here: this executor needs no trust store.
-  // Only an object with an unknown kind is an error.
-  if (executor.trustStore !== undefined && executor.trustStore !== null) {
-    if (typeof executor.trustStore !== 'object' || Array.isArray(executor.trustStore) || !TRUST_STORE_KINDS.includes(executor.trustStore.kind)) {
-      throw new RunnerConfigError(
-        `runner config (${label}) "trustStore" must be null or an object whose "kind" is one of ${TRUST_STORE_KINDS.join('/')}.`,
-      );
+  // Fields that were removed rather than deprecated. A config still carrying
+  // one is told, because the alternative -- accepting it and doing nothing --
+  // is exactly the failure that got them removed: a declaration that looks
+  // like a contract and is read by nobody.
+  for (const [field, why] of Object.entries(REMOVED_EXECUTOR_FIELDS)) {
+    if (executor[field] !== undefined) {
+      throw new RunnerConfigError(`runner config (${label}) "${field}" was removed. ${why}`);
     }
   }
   if (executor.confinement !== undefined) {
@@ -735,6 +738,23 @@ function validateExecutionProfileShape(executor, label) {
     for (const flag of CONFINEMENT_FLAGS) {
       if (c[flag] !== undefined && typeof c[flag] !== 'boolean') {
         throw new RunnerConfigError(`runner config (${label}) "confinement.${flag}" must be a boolean when present.`);
+      }
+    }
+    // Unknown keys are refused rather than ignored. `sessionName` used to be
+    // accepted here and used to pick the herdr session a worker landed in --
+    // which meant a config could name the operator's own cockpit, if the
+    // cockpit had a name and the dispatch ran outside herdr where there is no
+    // `HERDR_SESSION` to compare against. There is one worker session now and
+    // it is not configurable. A config still carrying the key must be told,
+    // not quietly obeyed in a way it no longer means.
+    for (const key of Object.keys(c)) {
+      if (!CONFINEMENT_FLAGS.includes(key)) {
+        throw new RunnerConfigError(
+          `runner config (${label}) "confinement.${key}" is not a confinement flag. Legal flags: ${CONFINEMENT_FLAGS.join(', ')}.` +
+          (key === 'sessionName'
+            ? ' "sessionName" was removed: a worker always goes to the one fgOS worker session, so that this field can never name the operator\'s own.'
+            : ''),
+        );
       }
     }
   }

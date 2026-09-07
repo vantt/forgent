@@ -155,7 +155,7 @@ ok({});
   };
 }
 
-function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDelivery, timeoutMs = 5000, idleTimeoutMs, argsTemplate } = {}) {
+function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDelivery, timeoutMs = 5000, idleTimeoutMs, argsTemplate, transportDeadlines } = {}) {
   const runDir = path.join(tmpDir, 'run');
   fs.mkdirSync(runDir, { recursive: true });
   return EXECUTOR_ADAPTERS['herdr-spawn'](
@@ -166,9 +166,12 @@ function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDeli
       prompt,
       env: {},
       promptDelivery,
-      interactiveMode: { exitCommand: '/exit', resendAfterMs: 200, ...interactiveMode },
+      interactiveMode: { exitCommand: '/exit', ...interactiveMode },
     },
-    { cwd: tmpDir, timeoutMs, idleTimeoutMs, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin, runDir },
+    // Transport deadlines are not executor config any more; this is the seam
+    // that keeps a mock round short, and production never sets it.
+    { cwd: tmpDir, timeoutMs, idleTimeoutMs, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin, runDir,
+      transportDeadlines: { resendAfterMs: 200, ...transportDeadlines } },
   );
 }
 
@@ -195,9 +198,14 @@ test('herdr-spawn adapter validates interactiveMode config shape', () => {
     },
   });
 
-  fs.writeFileSync(cfgPath, withInteractiveMode({ exitCommand: '/exit', kind: 'agy', promptTimeoutMs: 20000 }));
+  fs.writeFileSync(cfgPath, withInteractiveMode({ exitCommand: '/exit', kind: 'agy', trustStore: { kind: 'codex-toml' } }));
   const loaded = loadRunnerConfig(cfgPath);
   assert.equal(loaded.executors.agyHerdr.interactiveMode.exitCommand, '/exit');
+  // `codex-toml` is a real store: codex keeps trust in a config.toml block.
+  // It was live in this repo's own config while the only validator that named
+  // trust kinds still refused it -- because that validator guarded a field at
+  // the executor level and the adapter read a different one here.
+  assert.equal(loaded.executors.agyHerdr.interactiveMode.trustStore.kind, 'codex-toml');
   assert.equal(loaded.executors.agyHerdr.interactiveMode.kind, 'agy');
 
   fs.writeFileSync(cfgPath, withInteractiveMode({ exitCommand: '' }));
@@ -208,8 +216,8 @@ test('herdr-spawn adapter validates interactiveMode config shape', () => {
 
   // Shorter than herdr's own 5000ms stall detector means this side always wins
   // the race and the caller never learns why the brief did not land.
-  fs.writeFileSync(cfgPath, withInteractiveMode({ exitCommand: '/exit', promptTimeoutMs: 3000 }));
-  assert.throws(() => loadRunnerConfig(cfgPath), /promptTimeoutMs/);
+  fs.writeFileSync(cfgPath, withInteractiveMode({ exitCommand: '/exit', trustStore: { kind: 'nonesuch' } }));
+  assert.throws(() => loadRunnerConfig(cfgPath), /trustStore/);
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
@@ -550,7 +558,7 @@ test('a premature idle can never end a round -- only the worker result file does
     () => dispatchThroughMock(tmpDir, mock, {
       prompt: 'do the thing',
       timeoutMs: 2500,
-      interactiveMode: { resendAfterMs: 100000 },
+      transportDeadlines: { resendAfterMs: 100000 },
     }),
     (err) => {
       assert.notEqual(err.outcome, 'settled');
@@ -574,7 +582,7 @@ test('re-briefing has a hard cap -- a brief that never lands twice is a broken t
     () => dispatchThroughMock(tmpDir, mock, {
       prompt: 'do the thing',
       timeoutMs: 3000,
-      interactiveMode: { resendAfterMs: 150, maxResends: 2 },
+      transportDeadlines: { resendAfterMs: 150, maxResends: 2 },
     }),
     () => true,
   );
@@ -640,25 +648,36 @@ test('confinement that cannot be established is refused, never quietly downgrade
   fs.rmSync(fakeHome, { recursive: true, force: true });
 });
 
-test('a worker is never placed in the operator session, whatever the config asks for', async () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-confine-default-'));
-  const mock = createMockHerdr(tmpDir);
-
-  await assert.rejects(
-    () => EXECUTOR_ADAPTERS['herdr-spawn'](
-      {
-        command: 'claude', args: [], argsTemplate: [], prompt: 'x', env: {},
+test('a config can no longer name the session a worker lands in', () => {
+  // This used to be a runtime refusal of `confinement.sessionName: "default"`.
+  // The refusal was real but partial: it could only recognise the operator's
+  // session by that literal name or by `HERDR_SESSION`, and a dispatch started
+  // outside herdr -- a runner daemon, cron, a plain shell -- has no
+  // `HERDR_SESSION` at all. A named cockpit plus a config that named it went
+  // straight through. The field is gone, so the question cannot be asked.
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-sessionname-'));
+  const cfgPath = path.join(tmpDir, '.fgos', 'config.json');
+  fs.mkdirSync(path.dirname(cfgPath), { recursive: true });
+  fs.writeFileSync(cfgPath, JSON.stringify({
+    executor: { command: 'node', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 60000,
+    executors: {
+      agyHerdr: {
+        kind: 'agent',
+        command: 'agy',
+        args: ['{prompt}'],
+        adapter: 'herdr-spawn',
         confinement: { isolatedSession: true, sessionName: 'default' },
-        interactiveMode: { exitCommand: '/exit', kind: 'claude' },
+        interactiveMode: { exitCommand: '/exit', kind: 'agy' },
       },
-      { cwd: tmpDir, runDir: path.join(tmpDir, 'run'), timeoutMs: 5000, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin },
-    ),
-    (err) => {
-      assert.equal(err.reason, 'operator-session');
-      return true;
     },
-  );
-
+  }));
+  assert.throws(() => loadRunnerConfig(cfgPath), (err) => {
+    assert.match(err.message, /sessionName/);
+    assert.match(err.message, /one fgOS worker session/);
+    return true;
+  });
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
@@ -710,4 +729,56 @@ test('the round and the adapters that call it never import each other', () => {
     'the round itself must not drift back into transport.mjs');
   // Callers have always taken DispatchError from transport; that stays true.
   assert.ok(new DispatchError('worker-timeout', 'x') instanceof Error);
+});
+
+test('ownWorktree is enforced, not merely declared', () => {
+  // It was the third leg of the "bypass requires full confinement" invariant
+  // and the only one nothing checked at runtime, which made that refusal
+  // partly ceremonial: a profile could declare bypass plus full confinement,
+  // be accepted, and then dispatch in the repo root it said it would stay out
+  // of.
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-ownwt-'));
+  const mock = createMockHerdr(tmpDir);
+  const invocation = {
+    command: 'claude', args: [], argsTemplate: [], prompt: 'x', env: {},
+    permissionMode: 'ask',
+    confinement: { ownWorktree: true },
+    interactiveMode: { exitCommand: '/exit', kind: 'claude' },
+  };
+
+  return assert.rejects(
+    () => EXECUTOR_ADAPTERS['herdr-spawn'](invocation, {
+      // cwd IS the repo root -- no worktree of its own.
+      cwd: tmpDir, repoRoot: tmpDir, runDir: path.join(tmpDir, 'run'),
+      timeoutMs: 5000, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin,
+    }),
+    (err) => {
+      assert.equal(err.errorClass, 'invalid-config');
+      assert.equal(err.reason, 'own-worktree-unavailable');
+      assert.ok(!mock.calls().some((c) => c[0] === 'pane' && c[1] === 'split'),
+        'refused before anything was launched');
+      return true;
+    },
+  ).finally(() => fs.rmSync(tmpDir, { recursive: true, force: true }));
+});
+
+test('a dispatch that really is in its own worktree passes the same check', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-ownwt-ok-'));
+  const worktree = path.join(tmpDir, 'wt');
+  fs.mkdirSync(worktree, { recursive: true });
+  const mock = createMockHerdr(tmpDir);
+  try {
+    const res = await EXECUTOR_ADAPTERS['herdr-spawn']({
+      command: 'claude', args: [], argsTemplate: [], prompt: 'x', env: {},
+      permissionMode: 'ask',
+      confinement: { ownWorktree: true },
+      interactiveMode: { exitCommand: '/exit', kind: 'claude' },
+    }, {
+      cwd: worktree, repoRoot: tmpDir, runDir: path.join(tmpDir, 'run'),
+      timeoutMs: 5000, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin,
+    });
+    assert.equal(res.outcome, 'settled');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 });

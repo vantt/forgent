@@ -140,7 +140,9 @@ function confinedExecutor(root) {
   return {
     ...HERDR_EXECUTOR,
     env: { HOME: home },
-    confinement: { privateHome: false, isolatedSession: true, sessionName: WORKER_SESSION },
+    // No `sessionName`: there is one worker session and a config cannot name
+    // it, which is what stops a config from naming the operator's own.
+    confinement: { privateHome: false, isolatedSession: true },
   };
 }
 
@@ -184,7 +186,7 @@ test('a confinement the config declares reaches herdr, from the config file down
   try {
     assert.deepEqual(
       loadRunnerConfigFromDir(root).executors['herdr-worker'].confinement,
-      { privateHome: false, isolatedSession: true, sessionName: WORKER_SESSION },
+      { privateHome: false, isolatedSession: true },
       'the config door accepted the declaration',
     );
 

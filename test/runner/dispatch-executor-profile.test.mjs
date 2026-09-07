@@ -49,8 +49,6 @@ test('A1: the declared profile survives the load intact', () => {
     lifecycleOwner: 'dispatch',
     visibilityTransport: 'herdr',
     promptDelivery: 'file-pointer',
-    receipt: 'receiver-written-file',
-    trustStore: { kind: 'claude-json' },
     permissionMode: 'bypass',
     confinement: FULL_CONFINEMENT,
   });
@@ -58,7 +56,6 @@ test('A1: the declared profile survives the load intact', () => {
   assert.equal(e.permissionMode, 'bypass');
   assert.deepEqual(e.confinement, FULL_CONFINEMENT);
   assert.equal(e.promptDelivery, 'file-pointer');
-  assert.equal(e.trustStore.kind, 'claude-json');
 });
 
 test('C5: bypass without any confinement is refused at load, by name', () => {
@@ -108,21 +105,40 @@ test('A1: confinement flags must be booleans, not truthy strings', () => {
   );
 });
 
-test('A1: an unknown promptDelivery or receipt value is refused', () => {
+test('A1: an unknown promptDelivery value is refused, and a removed field is named rather than ignored', () => {
   assert.throws(
     () => loadWith({ command: 'claude', args: ['{prompt}'], promptDelivery: 'telepathy' }),
     (err) => err instanceof RunnerConfigError && /promptDelivery/.test(err.message),
   );
   assert.throws(
-    () => loadWith({ command: 'claude', args: ['{prompt}'], receipt: 'exit-code' }),
-    (err) => err instanceof RunnerConfigError && /receipt/.test(err.message),
+    // `receipt` was removed: it had one legal value and no reader anywhere.
+    // A config still carrying it is told so, rather than having it quietly do
+    // nothing -- which is what a field nothing consults already does.
+    () => loadWith({ command: 'claude', args: ['{prompt}'], receipt: 'receiver-written-file' }),
+    (err) => err instanceof RunnerConfigError && /receipt/.test(err.message) && /removed/.test(err.message),
   );
 });
 
-test('A1: trustStore must be an object with a known kind, or null for none', () => {
-  assert.equal(loadWith({ command: 'c', args: ['{prompt}'], trustStore: null }).executors.sample.trustStore, null);
+test('A1: trustStore is declared where it is read, and only there', () => {
+  // It used to be declared on the executor and read from `interactiveMode`.
+  // The validator therefore guarded a field nothing consulted, which is how
+  // this repo's own config ran a `codex-toml` store that the only list of
+  // legal kinds did not contain.
   assert.throws(
-    () => loadWith({ command: 'c', args: ['{prompt}'], trustStore: { kind: 'sqlite' } }),
+    () => loadWith({ command: 'c', args: ['{prompt}'], trustStore: { kind: 'claude-json' } }),
+    (err) => err instanceof RunnerConfigError && /trustStore/.test(err.message) && /interactiveMode/.test(err.message),
+  );
+
+  const withMode = (trustStore) => loadWith({
+    command: 'c',
+    args: ['{prompt}'],
+    adapter: 'herdr-spawn',
+    interactiveMode: { exitCommand: '/exit', kind: 'claude', trustStore },
+  });
+  assert.equal(withMode(null).executors.sample.interactiveMode.trustStore, null);
+  assert.equal(withMode({ kind: 'codex-toml' }).executors.sample.interactiveMode.trustStore.kind, 'codex-toml');
+  assert.throws(
+    () => withMode({ kind: 'sqlite' }),
     (err) => err instanceof RunnerConfigError && /trustStore/.test(err.message),
   );
 });

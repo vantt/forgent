@@ -585,16 +585,7 @@ async function httpAdapter(invocation, opts) {
  */
 function herdrSpawnInteractiveAdapter(invocation, opts) {
   const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery, permissionMode, confinement } = invocation;
-  const {
-    exitCommand,
-    kind,
-    readyTimeoutMs = DEFAULT_READY_TIMEOUT_MS,
-    promptTimeoutMs = DEFAULT_PROMPT_TIMEOUT_MS,
-    maxResends = DEFAULT_MAX_RESENDS,
-    resendAfterMs,
-    usageLimitPatterns,
-    trustStore,
-  } = interactiveMode;
+  const { exitCommand, kind, usageLimitPatterns, trustStore } = interactiveMode;
   const {
     cwd, timeoutMs, idleTimeoutMs, workId, tier, model,
     herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir,
@@ -640,10 +631,9 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     prompt: prompt ?? '',
     delivery,
     exitCommand,
-    readyTimeoutMs,
-    promptTimeoutMs,
-    maxResends,
-    resendAfterMs: resendAfterMs ?? promptTimeoutMs,
+    // Not config: the round owns its transport deadlines. This is the seam a
+    // test uses to keep a mock round short, and production never sets it.
+    transportDeadlines: opts.transportDeadlines,
     trustStore,
     runDir: optsRunDir,
     paneEnv: resolvedEnv,
@@ -665,16 +655,6 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     return result;
   });
 }
-
-/** herdr's own stall detector fires at 5000ms; anything shorter on this side
- * wins the race and hands the caller a bare timeout instead of the real
- * reason. Measured upstream: 5s broke, 20s worked. */
-const DEFAULT_PROMPT_TIMEOUT_MS = 20000;
-/** `agent start`'s own documented default. */
-const DEFAULT_READY_TIMEOUT_MS = 30000;
-/** A brief that never landed is worth re-sending a couple of times; a brief
- * that never lands twice is a broken transport, not a slow one. */
-const DEFAULT_MAX_RESENDS = 2;
 
 /**
  * The agent's own argv, with the prompt taken out of it.
