@@ -535,3 +535,52 @@ test('herdr-spawn adapter (LIVE): dispatch a real agy-herdr interactiveMode exec
     fs.rmSync(tmpRoot, { recursive: true, force: true });
   }
 });
+
+// Live-proof matrix, fake side. Each of these encodes a question the live
+// runs also ask, so a regression shows up here first and cheaply.
+
+test('a premature idle can never end a round -- only the worker result file does', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-startup-race-'));
+  // The exact shape that produced two silent false successes in production:
+  // the agent reports idle from the very first poll, before it has done
+  // anything at all. Nothing here may read that as completion.
+  const mock = createMockHerdr(tmpDir, { worker: 'silent', statuses: ['idle'] });
+
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, {
+      prompt: 'do the thing',
+      timeoutMs: 2500,
+      interactiveMode: { resendAfterMs: 100000 },
+    }),
+    (err) => {
+      assert.notEqual(err.outcome, 'settled');
+      assert.equal(err.outcome, 'timed-out-ceiling');
+      return true;
+    },
+  );
+  assert.ok(
+    !fs.existsSync(path.join(tmpDir, 'run', 'outbox', 'result-1.json')),
+    'and it stayed honest: no result file was ever there to claim',
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('re-briefing has a hard cap -- a brief that never lands twice is a broken transport, not a slow one', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-resend-cap-'));
+  const mock = createMockHerdr(tmpDir, { worker: 'silent', statuses: ['done'] });
+
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, {
+      prompt: 'do the thing',
+      timeoutMs: 3000,
+      interactiveMode: { resendAfterMs: 150, maxResends: 2 },
+    }),
+    () => true,
+  );
+
+  const submissions = mock.calls().filter((c) => c[0] === 'agent' && c[1] === 'prompt' && !c[3].startsWith('/'));
+  assert.equal(submissions.length, 3, 'the first delivery plus exactly maxResends retries, however long the round runs');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});

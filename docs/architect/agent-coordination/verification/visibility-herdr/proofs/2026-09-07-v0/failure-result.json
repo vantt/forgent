@@ -1,0 +1,74 @@
+{
+  "startedAt": "2026-09-07T02:14:23.686Z",
+  "cases": {
+    "B_died": {
+      "killedPid": 2000708,
+      "paneId": "w1:p2",
+      "detectedAfterMs": 1525,
+      "driverResult": {
+        "outcome": "died",
+        "reason": "died",
+        "errorClass": "worker-spawn-fail",
+        "paneId": "w1:p2",
+        "message": "executor for work \"v0-proof-b\" ended as died: no agent process in the pane on 3 consecutive reads. Pane w1:p2 is left open."
+      },
+      "paneKeptForForensics": true,
+      "visibility": {
+        "status": "died",
+        "agentName": "fgos-v0-proof-b-mtqlxqfq",
+        "round": 1,
+        "lastSeenAt": "2026-09-07T02:14:38.770Z",
+        "paneId": "w1:p2",
+        "agentSession": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "2be24a73-39b8-4962-8ef2-3f02a9e9ccd0"
+        },
+        "stateChangeSeq": 1,
+        "outcome": "died"
+      }
+    },
+    "D_observer": {
+      "separateProcess": true,
+      "readings": 15,
+      "sample": [
+        "fgos: run=run_v0_mtqlxpza status=running pane=w1:p2 visibility=pane-created outbox=0",
+        "fgos: run=run_v0_mtqlxpza status=running pane=w1:p2 visibility=pane-created outbox=0",
+        "fgos: run=run_v0_mtqlxpza status=running pane=w1:p2 visibility=pane-created outbox=0",
+        "fgos: run=run_v0_mtqlxpza status=running pane=w1:p2 visibility=pane-created outbox=0",
+        "fgos: run=run_v0_mtqlxpza status=running pane=w1:p2 visibility=agent-ready outbox=0",
+        "fgos: run=run_v0_mtqlxpza status=running pane=w1:p2 visibility=briefed outbox=0"
+      ],
+      "neededNoLease": true
+    },
+    "P3_restart": {
+      "panesBefore": [
+        "w1:p1",
+        "w1:p2"
+      ],
+      "serverCameBack": true,
+      "panesAfter": [
+        "w1:p1",
+        "w1:p2"
+      ],
+      "panesSurvived": true,
+      "decision": "reattach-or-relaunch"
+    }
+  },
+  "finishedAt": "2026-09-07T02:14:44.629Z",
+  "operatorSessionsAfter": [
+    "default(running)"
+  ],
+  "log": [
+    "[02:14:24] isolated session up, root pane w1:p1",
+    "[02:14:24] CASE B+D: driving in one process, watching from another",
+    "[02:14:37] agent is working; killing pid 2000708 (claude) to prove death detection",
+    "[02:14:38] CASE B: outcome=died reason=died paneKept=true",
+    "[02:14:38] CASE D: a separate process took 15 readings while another drove the run",
+    "[02:14:38] CASE P3: restarting THIS probe's herdr session (never the operator default)",
+    "[02:14:44] CASE P3: panes before=2 after=2 -> resume: reattach-or-relaunch",
+    "[02:14:44] cleanup",
+    "[02:14:44] sessions left: default(running)"
+  ]
+}

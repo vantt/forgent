@@ -1,6 +1,6 @@
 # Dispatch Visibility V0 — interactive agent, quan sát được, không cần contact
 
-Status: IN PROGRESS — Phases 00-05 done, Phase 06 (live proof) not started | Created: 2026-09-06 | Owner: maintainer
+Status: IN PROGRESS — Phases 00-06 done; V0 closes on item 8 (worker confinement not yet wired) | Created: 2026-09-06 | Owner: maintainer
 Execution track: `dispatch-visibility-v0`
 Design source: [Visibility và Interactive Contact](../../docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md) (§8b.1 mức V0, §11 recommendation, §12b–§12c evidence)
 
@@ -58,12 +58,20 @@ V0 là đưa hình dạng đó vào sản phẩm.
 | 03 ✅ | Ladder poll thay `agent_status`-là-hoàn-thành; outcome có type; pane giữ lại làm forensics | 02 | `herdr-adapter` |
 | 04 ✅ | `VisibilitySession` bền; `run.json` phản ánh trạng thái thật; Run mồ côi được reconcile | 03 | `run-truth` |
 | 05 ✅ | Cửa quan sát chỉ-đọc; doctor; spec và docs cập nhật | 04 | `observe-surface` |
-| 06 | Proof sống: agy, gateway restart, thử vượt rào | 05 | `v0-proof` |
+| 06 ✅ | Proof sống: agy, gateway restart, thử vượt rào | 05 | `v0-proof` |
 
 Một cell mở tại một thời điểm. Phase 02 và 03 cùng chạm `transport.mjs` nên chia sẻ lease
 và phải tuần tự.
 
 ## Định nghĩa hoàn thành của V0
+
+**Đối chiếu 2026-09-07** (bằng chứng: `docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`):
+1 ✅ đo sống (claude, trust pre-seed, không dialog nào) · 2 ✅ brief mang nguyên văn prompt 7 dòng ·
+3 ✅ kết luận từ file worker ghi, `agent_status` không còn được đọc thành "xong" ở bất kỳ đâu ·
+4 ✅ `died` sau 1525 ms, pane giữ lại, lý do có tên · 5 ✅ `run.json` đóng sổ khi settle, reconcile ra settled/died/unknown ·
+6 ✅ process riêng chạy `fgos dispatch watch`, 15 lần đọc, không cần lease ·
+7 ✅ 5705 test, 5695 pass, 3 đỏ đều có sẵn trên main ·
+8 ⚠️ **chưa đạt** — capability profile phải mang nhãn `unsafe: worker-can-drive-cockpit` cho tới khi `worker-home.mjs`/`worker-session.mjs` được nối vào adapter.
 
 V0 đóng được khi tất cả đúng cùng lúc:
 
@@ -109,7 +117,7 @@ V0 đóng được khi tất cả đúng cùng lúc:
 
 ## Câu hỏi chưa giải quyết
 
-1. Pane herdr có sống qua `herdr server stop/start` không. Quyết định `resume` là reattach hay relaunch. Đo ở Phase 06, mặc định tạm `reattach-or-relaunch`.
+1. ~~Pane herdr có sống qua `herdr server stop/start` không.~~ **ĐÃ ĐO 2026-09-07 (P3, session riêng `fgos-v0-proof2`)**: pane SỐNG qua restart — trước `[w1:p1, w1:p2]`, sau `[w1:p1, w1:p2]`, cùng id. Chốt `resume: reattach-or-relaunch`. Log: `proofs/2026-09-07-v0/failure-result.json`.
 2. agy tuân thủ hợp đồng ack/result ở mức nào dưới `accept-edits`. Đo ở Phase 06; dưới ngưỡng thì agy mất nhãn interactive, không phải thiết kế sai.
 3. Có tách được HOME cho worker mà agent CLI vẫn khởi động bình thường không. Phase 01 phải trả lời trước khi Phase 02 dựa vào nó.
 4. Hang detection. Upstream đã park sau khi đo CPU và output counter đều không phân biệt được. V0 chấp nhận chỉ có idle-timeout và ceiling, ghi rõ là khoảng trống chứ không giả vờ có.

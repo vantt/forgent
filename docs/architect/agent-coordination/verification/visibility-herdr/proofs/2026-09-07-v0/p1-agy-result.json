@@ -1,0 +1,113 @@
+{
+  "startedAt": "2026-09-07T02:18:57.650Z",
+  "agent": "agy",
+  "rounds": [
+    {
+      "round": 1,
+      "outcome": "settled",
+      "ms": 26476,
+      "ack": true,
+      "result": true,
+      "report": true
+    },
+    {
+      "round": 2,
+      "outcome": "settled",
+      "ms": 25923,
+      "ack": true,
+      "result": true,
+      "report": true
+    },
+    {
+      "round": 3,
+      "outcome": "settled",
+      "ms": 23954,
+      "ack": true,
+      "result": true,
+      "report": true
+    },
+    {
+      "round": 4,
+      "outcome": "settled",
+      "ms": 26453,
+      "ack": true,
+      "result": true,
+      "report": true
+    },
+    {
+      "round": 5,
+      "outcome": "settled",
+      "ms": 27024,
+      "ack": true,
+      "result": true,
+      "report": true
+    },
+    {
+      "round": 6,
+      "outcome": "settled",
+      "ms": 26419,
+      "ack": true,
+      "result": true,
+      "report": true
+    },
+    {
+      "round": 7,
+      "outcome": "settled",
+      "ms": 50267,
+      "ack": true,
+      "result": true,
+      "report": true
+    },
+    {
+      "round": 8,
+      "outcome": "settled",
+      "ms": 30656,
+      "ack": true,
+      "result": true,
+      "report": true
+    },
+    {
+      "round": 9,
+      "outcome": "settled",
+      "ms": 24426,
+      "ack": true,
+      "result": true,
+      "report": true
+    },
+    {
+      "round": 10,
+      "outcome": "settled",
+      "ms": 25489,
+      "ack": true,
+      "result": true,
+      "report": true
+    }
+  ],
+  "verdict": {
+    "rounds": 10,
+    "acks": 10,
+    "ackThreshold": 9,
+    "resultOrNamedFailure": 10,
+    "passes": true,
+    "conclusion": "agy keeps its interactive label"
+  },
+  "finishedAt": "2026-09-07T02:23:45.308Z",
+  "operatorSessionsAfter": [
+    "default(running)"
+  ],
+  "log": [
+    "[02:18:58] isolated session up; running 10 agy rounds",
+    "[02:19:24] round 1/10: outcome=settled ack=true result=true (26476ms)",
+    "[02:19:50] round 2/10: outcome=settled ack=true result=true (25923ms)",
+    "[02:20:14] round 3/10: outcome=settled ack=true result=true (23954ms)",
+    "[02:20:41] round 4/10: outcome=settled ack=true result=true (26453ms)",
+    "[02:21:08] round 5/10: outcome=settled ack=true result=true (27024ms)",
+    "[02:21:34] round 6/10: outcome=settled ack=true result=true (26419ms)",
+    "[02:22:24] round 7/10: outcome=settled ack=true result=true (50267ms)",
+    "[02:22:55] round 8/10: outcome=settled ack=true result=true (30656ms)",
+    "[02:23:19] round 9/10: outcome=settled ack=true result=true (24426ms)",
+    "[02:23:45] round 10/10: outcome=settled ack=true result=true (25489ms)",
+    "[02:23:45] VERDICT: ack 10/10 (need 9), result-or-named 10/10 -> PASS",
+    "[02:23:45] cleanup"
+  ]
+}
