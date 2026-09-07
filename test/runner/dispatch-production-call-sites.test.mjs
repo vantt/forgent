@@ -289,3 +289,48 @@ test('the in-session entry point carries confinement too -- both call sites or n
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('the in-session door puts its run where the observe verbs look', async () => {
+  // It used to leave `runDir` unset, so the adapter opened a private temp
+  // directory: the brief, visibility.json and the worker's outbox all landed
+  // somewhere `fgos dispatch show-run`/`watch` do not look. A real dispatch
+  // through this door was observable in principle and unobservable in fact --
+  // found by watching one, not by reading it.
+  const root = fixtureRepo();
+  mockHerdr(root);
+  try {
+    await withMockHerdr(path.join(root, 'herdr'), () => executeExecutorCli('herdr-worker', {
+      prompt: 'do the thing',
+      repoRoot: root,
+      cwd: root,
+      tier: 'standard',
+    }));
+
+    const dir = soleRunDir(root);
+    assert.ok(fs.existsSync(path.join(dir, 'brief-1.md')), 'the brief is under .fgos/, not in /tmp');
+    assert.ok(fs.existsSync(path.join(dir, 'outbox')), 'and so is the worker outbox');
+    assert.equal(runStatus(dir), 'settled', 'and the run it opened is closed');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('a caller that supplies its own run directory keeps it', async () => {
+  const root = fixtureRepo();
+  mockHerdr(root);
+  const given = path.join(root, 'given-run-dir');
+  fs.mkdirSync(given, { recursive: true });
+  try {
+    await withMockHerdr(path.join(root, 'herdr'), () => executeExecutorCli('herdr-worker', {
+      prompt: 'do the thing',
+      repoRoot: root,
+      cwd: root,
+      tier: 'standard',
+      runDir: given,
+    }));
+    assert.ok(fs.existsSync(path.join(given, 'brief-1.md')), "the caller's own directory is used as given");
+    assert.ok(!fs.existsSync(path.join(root, '.fgos', 'dispatch-runs')), 'and no second run directory is invented');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});

@@ -38,8 +38,15 @@ export class HerdrError extends Error {
  * Length is trimmed from the MIDDLE, never the end. Names arrive as
  * `fgos-<workId>-<timestamp>`, so cutting the tail off a long workId takes
  * the timestamp with it -- and two rounds of that same item would then share
- * one agent name in one session, where herdr addresses agents by name. */
-export function normalizeAgentName(raw, { maxLength = 48 } = {}) {
+ * one agent name in one session, where herdr addresses agents by name.
+ *
+ * 32 is herdr's own limit, quoted from its refusal: "agent name must start
+ * with a lowercase letter and contain only lowercase letters, digits, '-' or
+ * '_' (1-32 characters)". This module trimmed at 48 for a long time, which is
+ * not a limit anything has -- it simply never bit, because every name measured
+ * in testing was short. The first dispatch of a real capability produced
+ * `fgos-fgos-coding-implement-<ts>` at 35 characters and herdr refused it. */
+export function normalizeAgentName(raw, { maxLength = 32 } = {}) {
   const cleaned = String(raw ?? '')
     .toLowerCase()
     .replace(/[^a-z0-9_-]+/g, '-')

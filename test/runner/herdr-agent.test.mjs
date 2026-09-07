@@ -195,13 +195,29 @@ test('a long work id loses its middle, never the suffix that makes it unique', (
   const first = normalizeAgentName(`fgos-${longId}-${(1700000000000).toString(36)}`);
   const second = normalizeAgentName(`fgos-${longId}-${(1700000000001).toString(36)}`);
 
-  assert.ok(first.length <= 48, 'still within what herdr accepts');
+  // 32 is herdr's own limit, from its own refusal message. This assertion
+  // said 48 and passed while the code was wrong: 48 is not a limit anything
+  // has, and the first dispatch of a real capability was refused at 35.
+  assert.ok(first.length <= 32, `still within what herdr accepts, got ${first.length}`);
   // Truncating the tail would take the timestamp with it, and herdr addresses
   // agents by name -- two rounds of one item would then be the same agent.
   assert.notEqual(first, second, 'two rounds of the same item are two agents');
-  assert.ok(first.startsWith('fgos-tsk-a-very-long'), 'enough head to recognise the item');
+  // Half the budget is head, half is the tail that makes it unique, so at
+  // herdr's 32 the recognisable prefix is 16 characters.
+  assert.ok(first.startsWith('fgos-tsk-a-very-'), `enough head to recognise the item, got ${first}`);
+  assert.ok(first.endsWith((1700000000000).toString(36)), 'and all of the suffix that distinguishes the round');
 });
 
 test('a name that already fits is untouched', () => {
   assert.equal(normalizeAgentName('fgos-tsk-1-abc'), 'fgos-tsk-1-abc');
+});
+
+test('a real capability id fits -- the name that herdr actually refused', () => {
+  // `executeExecutorCli` passes the capability id as the workId, so a dispatch
+  // of `fgos-coding-implement` builds `fgos-fgos-coding-implement-<ts36>`:
+  // 35 characters, three over what herdr accepts, and refused as
+  // `invalid_agent_name` after the pane was already open.
+  const name = normalizeAgentName(`fgos-fgos-coding-implement-${(1788794800000).toString(36)}`);
+  assert.ok(name.length <= 32, `got ${name.length}: ${name}`);
+  assert.match(name, /^[a-z][a-z0-9_-]*$/, "and still matches herdr's own character rule");
 });

@@ -172,6 +172,45 @@ export function resolveAgentTypeForWork(work, cwd, stage) {
  * `buildPrompt`'s own `stage` parameter — omitted (every pre-tsk-5mj call
  * site) keeps the default `'executing'` prompt byte-identical.
  */
+/**
+ * Open a run directory under `.fgos/` and record that it is running.
+ *
+ * Without one, an interactive adapter falls back to a private temp directory.
+ * That works and is invisible: the brief, `visibility.json` and the worker's
+ * outbox all land somewhere `fgos dispatch show-run`/`watch` do not look, so
+ * the run cannot be observed at all -- which is the whole point of dispatching
+ * through a pane. Both dispatch doors call this, because a run started through
+ * either is a run somebody may want to watch.
+ *
+ * Returns `{ runDir, closeRun }`. `closeRun` is how the run stops saying
+ * `running`: a run this function opened is a run its caller closes, on the
+ * failure branch as much as the success one, because a failed round ended and
+ * has a named answer. Both are inert when there is no `.fgos/` to write into.
+ */
+function openDispatchRun({ fgosDir, workId, executorId, cwd }) {
+  if (!fgosDir) return { runDir: undefined, closeRun: () => {} };
+
+  const runDir = path.join(fgosDir, 'dispatch-runs', String(workId ?? executorId), String(Date.now()));
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'run.json'), `${JSON.stringify({
+    runId: `${path.basename(path.dirname(runDir))}-${path.basename(runDir)}`,
+    workId: workId ?? null,
+    executorId,
+    cwd,
+    startedAt: new Date().toISOString(),
+    status: 'running',
+  }, null, 2)}\n`);
+
+  return {
+    runDir,
+    // `died` is the one failure that says something about the worker's own
+    // process; every other outcome ended the round without establishing that.
+    closeRun: (status) => {
+      try { markRunSettled(runDir, { status }); } catch { /* a run left open is not worth failing a finished dispatch */ }
+    },
+  };
+}
+
 export function spawnWorker(work, cfg, cwd, opts = {}) {
   // Setup stays synchronous and OUTSIDE the adapter call on purpose: a
   // malformed tier/config (RunnerConfigError, via modelForTier/
@@ -238,35 +277,9 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
 
-  // Where this dispatch's own artifacts go. Without it the adapter falls back
-  // to a private temp directory, which works but is invisible: the brief,
-  // visibility.json and the worker's outbox all land somewhere `fgos dispatch
-  // show-run`/`watch` do not look, so a run on this path could not be observed
-  // at all -- and this is the path a runner dispatch actually takes.
-  const workerRunDir = opts.fgosDir
-    ? path.join(opts.fgosDir, 'dispatch-runs', String(work?.id ?? executorId), String(Date.now()))
-    : undefined;
-  if (workerRunDir) {
-    fs.mkdirSync(workerRunDir, { recursive: true });
-    fs.writeFileSync(path.join(workerRunDir, 'run.json'), `${JSON.stringify({
-      runId: path.basename(path.dirname(workerRunDir)) + '-' + path.basename(workerRunDir),
-      workId: work?.id ?? null,
-      executorId,
-      cwd,
-      startedAt: new Date().toISOString(),
-      status: 'running',
-    }, null, 2)}\n`);
-  }
-
-  // A run this function opened is a run this function closes. `run.json` was
-  // written `running` above; leaving it there is exactly the defect
-  // `visibility-session.mjs` exists to fix, and this is the path a real
-  // implement dispatch takes. The round ended either way -- a failure has a
-  // named answer, it is not an unfinished run.
-  const closeRun = (status) => {
-    if (!workerRunDir) return;
-    try { markRunSettled(workerRunDir, { status }); } catch { /* a run left open is not worth failing a finished dispatch */ }
-  };
+  const { runDir: workerRunDir, closeRun } = openDispatchRun({
+    fgosDir: opts.fgosDir, workId: work?.id, executorId, cwd,
+  });
 
   return adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement }, {
     cwd,
@@ -554,7 +567,29 @@ export async function executeExecutorCli(
     );
     const headBefore = captureHeadSha(cwd);
     const dirtyBefore = checkoutDirtyPaths(root, cwd);
-    const result = await adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement }, { cwd, repoRoot: root, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model, runDir });
+
+    // A caller may hand us a run directory; when none is given, open one under
+    // `.fgos/` rather than letting the adapter fall back to a private temp
+    // directory. This door used to take that fallback, so a real dispatch
+    // through it left its brief, visibility and outbox somewhere
+    // `fgos dispatch show-run`/`watch` do not look -- observable in principle
+    // and unobservable in practice.
+    const opened = runDir
+      ? { runDir, closeRun: () => {} }
+      : openDispatchRun({ fgosDir, workId: work?.id, executorId, cwd });
+
+    let result;
+    try {
+      result = await adapterFn(
+        { command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement },
+        { cwd, repoRoot: root, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model, runDir: opened.runDir },
+      );
+    } catch (err) {
+      opened.closeRun(err?.outcome === 'died' ? 'died' : 'settled');
+      throw err;
+    }
+    opened.closeRun('settled');
+
     const headAfter = captureHeadSha(cwd);
     const dirtyAfter = checkoutDirtyPaths(root, cwd);
     let lostUncommittedPaths;
