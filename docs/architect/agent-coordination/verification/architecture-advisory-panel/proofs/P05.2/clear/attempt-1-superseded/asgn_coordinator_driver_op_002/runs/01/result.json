@@ -1,0 +1,108 @@
+{
+  "runId": "run_asgn_coordinator_driver_op_002_01",
+  "assignmentId": "asgn_coordinator_driver_op_002",
+  "workId": null,
+  "executorId": "agy-bwrap",
+  "policy": {
+    "role": "context-investigator",
+    "executorPreference": [
+      "agy-bwrap"
+    ],
+    "executorId": "agy-bwrap",
+    "providerModel": "gemini",
+    "tier": "analytical",
+    "model": "gemini-3.1-pro-low",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "agy-bwrap",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "agy-bwrap"
+        }
+      },
+      "model": {
+        "value": "gemini-3.1-pro-low",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "gemini.analytical"
+        }
+      },
+      "tier": {
+        "value": "analytical",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_coordinator_driver_op_002"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "claimSha256": "c38274723251e9ea133d1e7a7dde501d1b0add6b07fab32f35ea0e6b530f6071",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_coordinator_driver_op_002/runs/01/agent-report.md",
+      "sha256": "3c332b82fedd7350eb9cf9b34c0e1457b8c2f5b26ad2575a12e78b1316d02a0e"
+    }
+  ],
+  "status": "done",
+  "confidence": "reported",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_coordinator_driver_op_002/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_coordinator_driver_op_002/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "done",
+    "summary": "Scouted the herdr-gateway repo's block classification mechanisms. 1. block-classify.ts uses regex/logic to identify framing rules, choice menus, and summary pairs to decide if a block is structured (pan) or prose (wrap). 2. block-classify.test.ts provides robust coverage, verifying true positives (menus, footers) and rejecting false positives (stray bullets/arrows in prose). 3. terminal-detail.md (R21-R28) dictates splitting by blank lines, prioritizing panning for structured data, and defaulting to pan when uncertain (R25) to avoid irreversible layout destruction, a risk noted in Open Gaps. Inspection of commits 881fa33 and 15b1203 was blocked by a host read-only filesystem error preventing git execution, but the current state of the signals in the source files is fully evident."
+  },
+  "evidence": {
+    "gitBefore": "15b1203233cd97dccfcd62829fa3e81e15712363",
+    "gitAfter": "15b1203233cd97dccfcd62829fa3e81e15712363",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_coordinator_driver_op_002/runs/01/agent-report.md",
+      ".fgos/assignments/asgn_coordinator_driver_op_002/runs/01/agent-result.json"
+    ],
+    "tests": []
+  }
+}

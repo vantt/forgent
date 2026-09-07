@@ -1,0 +1,50 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-unclear-herdr-grammar-vs-heuristic-v3: Phase 6 (critique the proposals, assess constraints).",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-unclear-herdr-grammar-vs-heuristic-v3",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "claude-bwrap", "tier": "analytical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authCritique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "authorizationId": "auth_critique_uv3",
+      "invocationKey": "ik_critique_uv3",
+      "reason": "Phase 6: all three Phase 5 proposals are in, attack the strongest one.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_032", "asgn_coordinator_driver_op_033", "asgn_coordinator_driver_op_034"]
+    },
+    {
+      "type": "operation",
+      "as": "critique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "objective": "Attack the strongest of these three real proposals for whether herdr-gateway's terminal-detail classification (/home/vantt/projects/herdr-gateway/web/src/block-classify.ts) should stay a universal content-shape heuristic or move to a per-agent grammar. Proposal A (system-shaper): stay in-system -- the classifier already reads only a block's own text, never agent identity, and is locked into docs/specs/terminal-detail.md's fail-closed-toward-pan spec. Proposal B (alternative-shaper): a per-agent semantic grammar, inspired by the HarnessAdapter pattern in /home/vantt/projects/herdr-gateway/upstreams/collie. Proposal C (constraint-advocate): keep the universal-heuristic architecture, patched reactively per counter-example rather than via a maintained per-agent grammar. Use ONLY absolute paths for anything you read. Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "authorize",
+      "as": "authAssess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "authorizationId": "auth_assess_uv3",
+      "invocationKey": "ik_assess_uv3",
+      "reason": "Phase 6: rank operational risk across the three Phase 5 proposals.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_032", "asgn_coordinator_driver_op_033", "asgn_coordinator_driver_op_034"]
+    },
+    {
+      "type": "operation",
+      "as": "assess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "Rank the real operational risk of these three real proposals for herdr-gateway's terminal-detail classification. Proposal A: stay in-system with the universal content-shape classifier. Proposal B: a per-agent semantic grammar (HarnessAdapter-pattern, inspired by upstreams/collie). Proposal C (your own earlier proposal): keep the universal-heuristic architecture, patched reactively. Use absolute paths for anything you read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). This session's own coordination bookkeeping lives at /home/vantt/projects/forgentX/.fgos/ -- you are authorized to write your result artifacts at the exact runDir path this dispatch gives you under that tree. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "contextRefs": ["asgn_coordinator_driver_op_032", "asgn_coordinator_driver_op_033", "asgn_coordinator_driver_op_034"],
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

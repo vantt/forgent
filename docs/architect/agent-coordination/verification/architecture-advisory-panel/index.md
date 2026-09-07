@@ -23,7 +23,7 @@ The person's initial request asked to start at Phase 01. Phase 01 (P01.1) declar
 | 02 | Capability-fit audit | done (P02.1 closed — see P02.1.md) |
 | 03 | Minimal hard shell and protocol | done (P03.1 + P03.2 both closed) |
 | 04 | Production skill and Decision Dialogue | done (P04.1 + P04.2 both closed) |
-| 05 | Comparative proof and promotion | P05.1 done (see P05.1.md); P05.2 blocked on real person |
+| 05 | Comparative proof and promotion | done (P05.1 + P05.2 both closed) — **track closed** |
 
 ## Baseline
 
@@ -84,14 +84,19 @@ self-reported numbers.
 | P04.1 | manual dispatch (Doer/Reviewer/Red-Team, no coordination session; see P04.1.md) | done | Authored `core/skills/fgos-architecture-panel/SKILL.md` (910 lines) projecting Phase 01's ~4700-line doctrine into a production skill. Reviewer + Red-Team both required per phase-04's own "assess hard correctness AND loss of soul" mandate. 1 HIGH (roster names 3 unregistered executors that silently fall back to an unconfined, git-write-capable default — independently verified live by the Coordinator) + 3 more HIGH from Red-Team (explanation standard absent; 3 lead-advisor artifacts had no graph operation; driver disposition rules never stated) + many MEDIUM/LOW citation and doc-accuracy findings, all fixed across 2 rounds. Fix round 1's own report inaccurately claimed complete coverage (5 LOW findings were silently dropped) — caught by the Reviewer's recheck and corrected in round 2, which explicitly disposition-tabled every one of the 22 distinct findings from both rounds. Focused suite 757/757 and skill-projection tests 39/39 unchanged throughout (prose-only cell, zero kernel/protocol touch). |
 | P04.2 | manual dispatch (Doer/Reviewer/Red-Team, no coordination session; see P04.2.md) | done | How-to guide + 8 example families for the panel. Step 1 investigation confirmed existing `fgos coordination run/show` doors are sufficient; no new verb added. Red-Team found 1 BLOCKING defect (independently verified live by the Coordinator): no example declared `aggregateBounds`, so the documented flow's mandatory 10-op pre-dialogue path exhausted the platform's default round cap before Phase 9 could ever dispatch — the panel could never reach `close-dialogue`, not even for a zero-reopen `decide`. Reviewer separately found 3 HIGH: every published reopen passed an empty context grant (silent no-context dispatch); a homogeneous-fallback example used a bare, unconfined, git-write-capable executor (independently confirmed live — worse than tsk-1o4, this one actually runs); 0 of 8 examples satisfied phase-04's own protocol-id+routing requirement despite a CHANGELOG claim that all 8 did. All fixed across 2 rounds, each independently re-verified live (Red-Team rebuilt the full 12-op/6-call session from scratch to confirm the blocker's fix). A new kernel gap found and confirmed by both Doer and Red-Team (`actors[]` doesn't persist across resumed calls, silently losing confinement) filed as `tsk-3bf`. Also fixed 2 unrelated regressions from earlier cells (P03.2's protocol missing from a test's fixture list; P04.1's stale decision-citation) surfaced by this cell's own full-suite run. Focused suite 757/757 throughout; full suite back to the track's own 4-item baseline, 0 new failures. |
 | P05.1 | manual dispatch (Doer/Reviewer/Red-Team, no coordination session; see P05.1.md) | done | Hard conformance and recovery proof, driven entirely through the real installed `fgos coordination run/show` CLI in an isolated workspace, including a genuine `kill -9` of a real dispatch process and resume from a fresh process. Original claim ("all 6 areas hold") was FALSE under adversarial testing and was honestly corrected, not softened: 3 of 6 areas (Routing, Bounds, Replay/crash-resume) have a real, independently-reproduced bypass. 5 HIGH-severity findings, each independently reproduced by both Reviewer and Red-Team from source, not just report text: unauthenticated `result.json` provenance spoofable by any executor subprocess (`tsk-63z`); `revise-synthesis`'s human-turn precondition is prose-only, not kernel-enforced (`tsk-3ru`); `aggregateBounds` silently discarded on resume, permanently wedging an under-budgeted session (`tsk-1zk`); and a crash-recovery cluster — no owner identity on `dispatch.claim`, a second lock with a deterministic 35-minute SIGKILL-survival window whose documented recovery workaround permanently poisons the assignment, and event-log corruption that can make the session undiagnosable (`tsk-47l`, amended twice, including an upward self-correction by Red-Team on their own recheck). No kernel/protocol source touched — every gap filed, not fixed, per this cell's own evidence-only scope. Focused suite 757/757 throughout. |
+| P05.2 | `aap-p052-clear-herdr-heuristic-direction-v3` + `aap-p052-unclear-herdr-grammar-vs-heuristic-v3`, both real, both reached `status:"completed"`/`closed:true` (see P05.2.md) | done — **track's final cell** | Real clear+unclear cases against herdr-gateway (a real project outside forgentX) through the actual `fgos coordination run/show` product path — not manual dispatch, not a scripted transcript. Registering the 3 executors for real dispatch (closing `tsk-1o4`) surfaced 5 more real platform gaps along the way, each filed rather than silently worked around: `agy -p` ignores cwd for relative paths (`tsk-31d`); the engine expects `agent-result.json` at the run's own directory, not target cwd (disclosed inline, `tsk-63z`-adjacent); the auto-generated dispatch prompt never states the required result schema (`tsk-1ed`); `aggregateBounds` carries an undocumented third bound, `wallTimeMs` (default 1 hour), that permanently blocks a session regardless of unused round/assignment budget (`tsk-oed`); the mutation-detector is not causally isolated from unrelated concurrent editors of the same repo (`tsk-3yo`, confirmed live — a different real Claude Code session was independently verified active on herdr-gateway at the time). Both sessions ran real heterogeneous dispatch (claude-bwrap=Anthropic, agy-bwrap=Gemini) through all 9 phases with live disagreement preserved into both explanations. The person's real, single Decision Dialogue reply ("Làm theo khuyến nghị") was recorded as a real `human-turn` event and both dialogues closed for real. Both accepted recommendations were then actually implemented and verified against herdr-gateway: a real 25-fixture corpus + confusion-matrix scorer closed a real, hand-traced-then-executed 30.8%→0.0% false-wrap violation of the project's own R25 bar (4 real code bugs fixed: gutter-scan min-width, missing git-graph/diff/caret-underline detectors); the module's Claude-specific rules were named in place (no subsystem); and — going beyond what the panel itself could do with no shell access — two real Codex/Agy panes were captured live through `herdr agent start`/`agent read` to settle the panel's own disclosed-but-unverified glyph question: Codex's real menu used a different cursor glyph than Claude's (fixed); Agy's real menu used no glyph at all, color-only (left wrapping, disclosed, not force-fit). 2 real commits in herdr-gateway (268/268 tests, typecheck clean). Track-level final verification: focused suite 757/757, full suite at the track's own 4-item baseline (5695/5686/3), `.fgos/config.json`'s own diff against main confirmed purely additive. |
 
 ## Admitted Read-Only Advisory Executor Allowlist
 
-The following safe executor/mechanism pairs are live-proven and admitted for Phase 01+ advisory dispatches:
+The following safe executor/mechanism pairs are live-proven (P00.1) AND, as
+of P05.2, genuinely **registered** in `.fgos/config.json`'s executor
+registry (`tsk-1o4`, closed) — naming any of the three below in a real
+`actors[]` binding now dispatches through the real confined pair, not the
+unconfined global default:
 
-1. `claude-bwrap` (OS mount, `out-of-process`) — Provider: `claude` (Anthropic). Tier: `analytical`/`standard` -> `sonnet`, `critical` -> `opus`. Corrected bwrap mount with explicit `--chdir` to fresh disposable checkout (`bwrap --ro-bind / / --dev /dev --proc /proc --bind <evidenceDir> <evidenceDir> --chdir <checkoutDir> -- claude ...`). Hard OS kernel `bwrap --ro-bind / /` read-only mount.
-2. `codex-readonly` (Native sandbox, `out-of-process`) — Provider: `openai-codex` (OpenAI). Tier: `standard`/`analytical`/`critical` -> `gpt-5.5`. Provider-native `-s read-only` sandbox flag.
-3. `agy-bwrap` (OS mount, `out-of-process`) — Provider: `gemini` (Google DeepMind). Tier: `standard` -> `gemini-3.6-flash-medium`, `analytical` -> `gemini-3.1-pro-low`, `critical` -> `gemini-3.1-pro-high`. Corrected bwrap mount with explicit `--chdir` to fresh disposable checkout (`bwrap --ro-bind / / --dev /dev --proc /proc --bind <evidenceDir> <evidenceDir> --chdir <checkoutDir> -- agy ...`). Hard OS kernel `bwrap --ro-bind / /` read-only mount.
+1. `claude-bwrap` (OS mount, `out-of-process`) — Provider: `claude` (Anthropic). Tier: `analytical`/`standard` -> `sonnet`, `critical` -> `opus`. Registered mount, no `--chdir` (relies on the dispatch framework's own `cwd`), with one fixed additive writable exception (`.fgos/assignments`, this repo's own bookkeeping tree — see P05.2.md for why): `bwrap --ro-bind / / --dev /dev --proc /proc --bind <this repo>/.fgos/assignments <this repo>/.fgos/assignments -- claude ...`. Hard OS kernel `bwrap --ro-bind / /` read-only mount, re-verified live against a real target repo at P05.2.
+2. `codex-readonly` (Native sandbox, `out-of-process`) — Provider: `openai-codex` (OpenAI). Tier: `standard`/`analytical`/`critical` -> `gpt-5.5`. Provider-native `-s read-only` sandbox flag, registered. Cannot be given a writable exception without becoming unsafe (`-s workspace-write` proved too broad; bwrap-wrapping crashes it, matching P00.1's own `codex-bwrap` exclusion) — confirmed structurally incompatible with the coordination engine's own agent-result.json-write requirement at P05.2; usable for genuinely read-only, non-reporting work only.
+3. `agy-bwrap` (OS mount, `out-of-process`) — Provider: `gemini` (Google DeepMind). Tier: `standard` -> `gemini-3.6-flash-medium`, `analytical` -> `gemini-3.1-pro-low`, `critical` -> `gemini-3.1-pro-high`. Registered mount, same writable-exception shape as `claude-bwrap`, `--new-project` dropped (found to compound `tsk-31d`, agy's own cwd-relative-path bug, rather than fix it). Real, confirmed-live workaround for real dispatch: absolute paths throughout every prompt, never relative-to-cwd.
 
 Excluded Unsafe / Non-Runnable Pairs:
 - `claude-reviewer` (`unconfined config`): EXCLUDED (falsified — authorized in-tree write succeeded).
@@ -101,24 +106,24 @@ Excluded Unsafe / Non-Runnable Pairs:
 - `agy-cli` (`--mode accept-edits` unconfined): EXCLUDED (mutated target repo).
 - `agy-sandbox` (`--mode accept-edits --sandbox`): EXCLUDED (mutated target repo despite `--sandbox` flag).
 
-## Stop Gate — P05.2 blocked on the real person
+## Stop Gate — none. Track closed.
 
-Phase 04 is done (P04.1 + P04.2 both closed). Phase 05's P05.1 (hard
-conformance and recovery proof) is done — see P05.1.md. **P05.2
-(comparative live proof and promotion) — the track's final cell — cannot
-proceed without the real person.** Per the phase's own "Live Proof
-Boundary" text: "A scripted fake-human transcript cannot prove the
-Decision Dialogue." P05.2 needs: a real external project outside
-forgentX with a genuinely undecided architecture question, the real
-person taking a real Decision Dialogue turn, and a manual-vs-product
-qualitative comparison. This is the one point in the track where
-"continue until done" cannot mean "continue without the person" — it is
-surfaced to the person directly, not silently deferred.
+All five phases are done. P05.2 (comparative live proof and promotion),
+the track's final cell, closed with two real 9-phase sessions against a
+real external project (herdr-gateway), a real person's real Decision
+Dialogue turn, real implementation of both accepted recommendations
+verified against that project's own real test suite, and final
+verification at the track level (focused + full suites at baseline,
+`.fgos/config.json`'s own diff against `main` confirmed additive-only).
+See P05.2.md for the full closing report, including five further real
+platform gaps found and filed while wiring up the real dispatch path
+(`tsk-31d`, `tsk-1ed`, `tsk-oed`, `tsk-3yo`, plus `tsk-1o4` itself
+resolved) — none block this track's own closure; all describe real,
+still-open gaps in the coordination engine for future work.
 
-Carried forward into P05.2's own scope (Reviewer's note from P05.1, not
-filed as a separate work item): `grantedContextRefs` accepts
-dangling/unvalidated refs — check this when P05.2 exercises the same
-mechanism.
+`grantedContextRefs`'s own dangling-ref-acceptance gap (P05.1's carried-
+forward note) was not separately exercised in P05.2 and remains an open,
+unfiled observation for whoever next touches that mechanism.
 
 The separate, track-independent question about authorizing real
 implementation work against `/home/vantt/projects/vnflow` is resolved:

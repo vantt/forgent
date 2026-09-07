@@ -1,0 +1,9 @@
+I have analyzed the current block classification heuristics in `block-classify.ts` and proposed a genuinely different architecture: **Emitter-Aware Grammar Parsing**. 
+
+This approach shifts away from guessing structures based on plain-text regexes and instead injects out-of-band context (the active process) to apply declarative parser combinator grammars, turning text into structural Abstract Syntax Trees.
+
+I have written the requested structured result and the detailed report to the specified locations:
+- **Result JSON:** [agent-result.json](file:///home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_004/runs/01/agent-result.json)
+- **Report Markdown:** [agent-report.md](file:///home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_004/runs/01/agent-report.md)
+
+Let me know if you'd like to refine this design or if there is anything else you need!

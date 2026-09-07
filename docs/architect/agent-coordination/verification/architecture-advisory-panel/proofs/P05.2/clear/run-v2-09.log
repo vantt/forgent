@@ -1,0 +1,2 @@
+fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: dispatchDeclaredOperation: session "aap-p052-clear-herdr-heuristic-direction-v2" wall-time budget (aggregateBounds.wallTimeMs: 3600000ms) has elapsed (3696398ms since 2026-09-07T02:22:53.650Z) -- refusing to materialize a new Assignment

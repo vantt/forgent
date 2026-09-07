@@ -1,0 +1,30 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-clear-herdr-heuristic-direction-v3: record the person's real decide turn, then close the dialogue.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v3",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authClose2",
+      "operationId": "close-dialogue",
+      "targetActorId": "lead-advisor-actor",
+      "authorizationId": "auth_close_clear_v3b",
+      "invocationKey": "ik_close_clear_v3b",
+      "reason": "The person's turn_1 stated a real decide: follow the recommendation. No reopen needed.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_029"]
+    },
+    {
+      "type": "operation",
+      "as": "closeDialogue2",
+      "operationId": "close-dialogue",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "The person has decided: follow the recommendation (no architecture change to block-classify.ts, build the fixture corpus + confusion-matrix scorer). Close the dialogue. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

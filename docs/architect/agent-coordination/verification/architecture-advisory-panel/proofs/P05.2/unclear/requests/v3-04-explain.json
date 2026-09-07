@@ -1,0 +1,30 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-unclear-herdr-grammar-vs-heuristic-v3: Phase 8 (explain the recommendation for ownership, preserving the red-team's live dissent).",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-unclear-herdr-grammar-vs-heuristic-v3",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authExplain",
+      "operationId": "explain-recommendation",
+      "targetActorId": "lead-advisor-actor",
+      "authorizationId": "auth_explain_uv3",
+      "invocationKey": "ik_explain_uv3",
+      "reason": "Phase 7 and red-team are both in -- write the document the person actually reads, preserving the red-team's live dissent.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_037", "asgn_coordinator_driver_op_038"]
+    },
+    {
+      "type": "operation",
+      "as": "explain",
+      "operationId": "explain-recommendation",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "Write the one document meant for the person, about whether herdr-gateway's terminal-detail classification (/home/vantt/projects/herdr-gateway/web/src/block-classify.ts) should stay a universal heuristic or move to a per-agent grammar -- consequence first, architecture second, defensible to colleagues who will live in the resulting codebase. The real synthesis recommendation: stay in-system (Proposal A), evolve the existing classifier, with two conditions -- source a real fixture corpus from the repo's already-catalogued composer-testdata-ground-truth candidate (airemote, scored R2 E2 F2 in the repo's own prior-art log) rather than importing collie's own conformance suite (scored R3 E1 F3, single-source, high build cost), and explicitly name the Claude-specific rules already living inside the module instead of building a separate harness/ subsystem for them. Proposal B (a full per-agent HarnessAdapter grammar, collie-inspired) is refuted on a sharper ground than the critic's own cosmetic-risk argument: collie's OWN internal tier ladder classifies read-only lift (which is what wrap/pan classification is) as Tier 1, cosmetic-risk, and reserves its fixture-corpus/conformance/live-verify machinery for Tier 2, interactive send (keystroke injection, dialog-swallowing) -- so importing collie's full apparatus is importing Tier-2 machinery for a Tier-1 capability. Proposal C (keep patching reactively, no real change) is confirmed the highest-risk of the three, by observation not argument: the last three real releases (0.1.18, 0.1.19, 0.1.20) are each one more reactive Claude-specific patch, with no corpus and no cross-agent regression testing. State plainly, unresolved: nobody's proposal actually measured the real blast radius on Codex/Agy panes (PBI-061). A genuine, concrete mechanism for real damage was found during this session: MENU_CURSOR_ITEM (the panel's own recently-added detector) hardcodes Claude Code's own selection-cursor glyph (U+276F, '❯') -- but Codex's own real captured fixture data (already in the repo, per the composer-testdata source) uses a DIFFERENT cursor glyph (U+203A, '›') for the identical UI concept. This means the classifier, as it stands today, would silently fail to recognize a real Codex selection menu as structured -- exactly the failure this whole debate is about -- and nobody has captured a real Codex or Agy fixture to confirm or refute it. Relay the independent red-team's live, unresolved dissent plainly, do not smooth it over: the red-team called this a false dichotomy, noting the panel ignored that block-classify.ts already secretly contains hardcoded per-agent (Claude-specific) rules, that a real middle path -- formalizing those existing per-agent special cases into a lightweight, explicit, tested extension point, short of importing collie's full HarnessAdapter -- was never proposed or evaluated by any of the three shapers, and that ranking reactive-patching (C) as riskier than a full per-agent grammar (B) while still recommending 'do nothing structurally different from C, just be more disciplined about it' is in tension with the panel's own risk ranking. Use absolute paths for anything you read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). This session's own coordination bookkeeping lives at /home/vantt/projects/forgentX/.fgos/ -- you are authorized to write your result artifacts at the exact runDir path this dispatch gives you under that tree. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

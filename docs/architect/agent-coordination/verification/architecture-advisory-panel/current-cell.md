@@ -1,59 +1,64 @@
-# Current Cell: none open — P05.1 closed, P05.2 blocked on the real person
+# Current Cell: none — track closed
 
-Status: parked, blocked (not a failure — this is the track's designed
-stopping point)
-Last updated: 2026-09-06
-Next action: P05.2 requires the person; cannot proceed autonomously.
+Status: track complete
+Last updated: 2026-09-07
+Next action: none. All five phases of the architecture-advisory-panel
+track are done; P05.2, the track's final cell, closed with a real
+comparative live proof against a real external project and real
+implementation of both accepted recommendations.
 
-## Why parked
+## What closed this track
 
-P05.1 (hard conformance and recovery proof) is closed — see
-`docs/architect/agent-coordination/verification/architecture-advisory-panel/P05.1.md`.
-It was run entirely through the real installed CLI in an isolated
-workspace, independently reviewed and red-teamed, and its original claim
-("all 6 areas hold") was honestly corrected after adversarial testing
-showed 3 of 6 had a real, independently-reproduced bypass. Five HIGH
-findings were filed as separate work items rather than fixed in-cell
-(`tsk-63z`, `tsk-3ru`, `tsk-1zk`, `tsk-47l` amended twice) — this cell's
-own scope is evidence, not remediation.
+P05.2 (comparative live proof and promotion) ran two real 9-phase
+sessions through the actual `fgos coordination run/show` product path
+against herdr-gateway (a real project outside forgentX), with
+heterogeneous dispatch (claude-bwrap=Anthropic, agy-bwrap=Gemini), a
+real person's real Decision Dialogue turn ("Làm theo khuyến nghị"),
+and real implementation of both accepted recommendations — verified
+against herdr-gateway's own real test suite (268/268 passing), landed
+as two real commits there (0.1.20→0.1.22).
 
-**P05.2 (comparative live proof and promotion) is the track's final
-cell, and it genuinely cannot be run without the real person.** The
-phase's own "Live Proof Boundary" section states this as a hard
-requirement, not a preference: "A scripted fake-human transcript cannot
-prove the Decision Dialogue." It needs:
+Full detail: `P05.2.md`. Track-wide summary: `index.md`.
 
-1. A real external project outside forgentX with a genuinely undecided
-   architecture question (not yet decided by the person, not
-   reconstructable from a closed case).
-2. The real person taking a real Decision Dialogue turn on that
-   question through the actual panel.
-3. A qualitative manual-vs-product comparison from the person's own
-   experience of both.
+## Five further real platform gaps found closing this cell
 
-This is the one point in the track where the standing "continue until
-done" instruction cannot be honored autonomously — it is surfaced
-directly rather than deferred, worked around, or fabricated, matching
-every prior "needs the person" juncture in this track (P00→P01
-sequencing, P01.2's mdview confirmation, P01.3's vnflow confirmation).
+Getting from "register 3 executors" (`tsk-1o4`) to a genuinely
+completed real session surfaced five more real, previously-undocumented
+gaps in the coordination engine itself, each filed rather than worked
+around silently:
 
-## What the person needs to decide
+- `tsk-31d` — `agy -p` ignores the invoking OS cwd for relative paths.
+- `tsk-1ed` — the auto-generated dispatch prompt never states the
+  required `agent-result.json` schema.
+- `tsk-oed` — `aggregateBounds` carries an undocumented third bound
+  (`wallTimeMs`, default 1 hour) that can permanently block a session
+  regardless of unused round/assignment budget.
+- `tsk-3yo` — the mutation-detector cannot distinguish a real
+  confinement breach from an unrelated concurrent editor of the same
+  target repo.
+- The `agent-result.json` write-path (this repo's own `.fgos/assignments`,
+  not the target project's cwd) is disclosed inline in `claude-bwrap`'s
+  own config comment rather than filed separately.
 
-Name a real external project and a real, currently-undecided
-architecture question to run P05.2 against — or confirm none exists yet,
-in which case P05.2 stays parked until one does. Once named, P05.2 runs
-the same way P01.2/P01.3 did: full panel dispatch, a real Decision
-Dialogue turn with the person, then promotion (canonical Coordination
-contracts + domain doctrine/skill docs updated with what P05.1 proved
-and disproved, reading maps and examples updated, final full-suite +
-skill-projection + conformance verification, closing commit) — the
-track's own final step.
+None of these block anything already shipped; all are real, open
+platform-improvement opportunities for whoever picks them up next.
 
-## Also carried forward
+## If resuming work on this track's own subject matter later
 
-`grantedContextRefs` accepting dangling/unvalidated refs (P05.1
-Reviewer's note, not filed separately) should be checked when P05.2
-exercises the same mechanism live.
+This track itself is closed — there is no cell to reopen. Follow-up
+work belongs to whoever owns it:
+
+- `core/skills/fgos-architecture-panel/SKILL.md` and
+  `docs/how-to/use-fgos-architecture-panel.md` still say the three
+  executors are "not yet registered" — stale as of P05.2, named as a
+  loose end in P05.2.md's own Promotion section, not fixed in this
+  cell to avoid re-opening its own already-large scope.
+- herdr-gateway's own `web/src/block-classify.ts` and
+  `docs/specs/terminal-detail.md` are that project's own files —
+  further work there (e.g. Agy's own color-only menu shape, still
+  disclosed and unfixed) belongs to that project's own maintainers.
+- The five work items named above are real, standalone platform gaps —
+  pick any of them up independently of this track.
 
 ## Also resolved, independent of the track
 

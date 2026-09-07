@@ -1,0 +1,123 @@
+{
+  "runId": "run_asgn_coordinator_driver_op_003_01",
+  "assignmentId": "asgn_coordinator_driver_op_003",
+  "workId": null,
+  "executorId": "claude-bwrap",
+  "policy": {
+    "role": "system-shaper",
+    "executorPreference": [
+      "claude-bwrap"
+    ],
+    "executorId": "claude-bwrap",
+    "providerModel": "claude",
+    "tier": "analytical",
+    "model": "sonnet",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude-bwrap",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude-bwrap"
+        }
+      },
+      "model": {
+        "value": "sonnet",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "claude.analytical"
+        }
+      },
+      "tier": {
+        "value": "analytical",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_coordinator_driver_op_003"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "claimSha256": "4817270d8d5932639de04b236cef1cb697fbbc362d0e14ed566a95af61c8d3a8",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_coordinator_driver_op_003/runs/01/agent-report.md",
+      "sha256": "b3dac4dc834be0986e8178e80d10433a7f3be929fb7a776a49c138a798519b7e"
+    }
+  ],
+  "status": "done",
+  "confidence": "reported",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_coordinator_driver_op_003/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_coordinator_driver_op_003/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "done",
+    "summary": "Recommend staying with reactive per-shape detectors, not generalizing: block-classify.ts's looksStructured() already composes independent boolean detectors (gutters, framing rules, box-char ratio, pipe tables, menu cursor, Q&A summary pairs) via OR, one detector per real Claude Code UI shape discovered in the field, each with its own test fixture from spec docs/specs/terminal-detail.md R21-R27's documented asymmetric bias (wrongly panning prose is free; wrongly wrapping structure is unrecoverable). This OR-composition is monotonic: adding a new detector can only turn more blocks into 'pan', never flip an existing 'pan' back to 'wrap', which structurally guarantees R25's safety bias forever with zero coordination between detector authors -- a property a generalized/weighted/statistical classifier would give up. Building a general layout-detection model now would be premature generalization: it adds tuning surface, breaks the monotonicity invariant, and the spec's own Open Gaps section already accepts real-miss-rate-unmeasured as a live known gap rather than something needing a new architecture. Concrete recommendation: (1) keep adding one small pure detector function per newly observed real-world shape, following the existing convention (regex/threshold constant + doc comment naming the false positive it avoids + the real capture that motivated it + a describe() block with the actual lines as fixture); (2) do not extract a DETECTORS[] array/registry until the flat early-return chain in looksStructured() exceeds ~10-12 checks -- currently 6, so YAGNI says leave it as literal if-returns; (3) treat each new bug report as exactly the same shape of PR the last two commits already were (menu-cursor fix, Q&A-summary-pairs fix) -- this is the intended steady-state, not technical debt to eventually replace.",
+    "verdict": "stay-within-system",
+    "evidence": [
+      "web/src/block-classify.ts (read in full): looksStructured() is 6 independent detectors combined by early-return OR",
+      "web/test/block-classify.test.ts: one describe/it group per detector, each with a real-shape fixture and a comment naming the regression it guards",
+      "docs/specs/terminal-detail.md R21-R27: codifies the pan-by-default / wrap-must-prove-itself asymmetric bias as a business rule, not an implementation detail",
+      "docs/specs/terminal-detail.md Open Gaps: explicitly accepts unmeasured real miss-rate as a known, tracked gap rather than a defect requiring redesign",
+      "git log subjects (881fa33, 15b1203) show the last two changes were exactly this pattern: one new named UI shape, one new detector, one new test"
+    ],
+    "recommendation": {
+      "keep": "flat OR-chain of small named pure detector functions in looksStructured(), one per real-world UI shape, each with its own regex/threshold constants and its own test fixture",
+      "avoid": "a generalized/weighted/statistical/ML layout classifier, or a plugin/registry abstraction introduced before the flat chain actually becomes unwieldy",
+      "trigger_for_future_refactor": "only mechanically extract to a DETECTORS: Array<(content: string[]) => boolean> + .some() once the chain exceeds roughly 10-12 checks; this is an extraction, not a redesign of detection logic",
+      "key_invariant_to_preserve": "OR-composition is monotonic -- new detectors can only add 'pan' verdicts, never remove one -- which is what makes R25's safety bias hold automatically as the file grows"
+    },
+    "note_on_write_target": "This file was written directly by the agent's Write tool to the requested forgentX path; the agent's Bash tool was sandboxed to /home/vantt/projects/herdr-gateway for shell commands, so all repo investigation used the Read tool only (git log/grep were unavailable) -- this did not block the analysis since the file, its test suite, and the terminal-detail.md spec fully answered the question."
+  },
+  "evidence": {
+    "gitBefore": "15b1203233cd97dccfcd62829fa3e81e15712363",
+    "gitAfter": "15b1203233cd97dccfcd62829fa3e81e15712363",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_coordinator_driver_op_003/runs/01/agent-report.md",
+      ".fgos/assignments/asgn_coordinator_driver_op_003/runs/01/agent-result.json"
+    ],
+    "tests": []
+  }
+}

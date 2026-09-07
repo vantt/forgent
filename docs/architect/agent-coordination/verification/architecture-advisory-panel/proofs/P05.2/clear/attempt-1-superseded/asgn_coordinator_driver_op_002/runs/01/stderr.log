@@ -1,0 +1,269 @@
+ERROR: logging before google.Init: E0907 08:25:15.748379       1 main.go:626] Failed to redirect output for CLI: creating log file: opening log file: open /home/vantt/.gemini/antigravity-cli/log/cli-20260907_082515.log: read-only file system
+ERROR: logging before google.Init: I0907 08:25:15.749106       1 resolver.go:85] Model ID gemini-3.1-pro-low not in local config, defaulting to CCPA
+ERROR: logging before google.Init: I0907 08:25:15.749113       1 resolver.go:111] Model resolved via default
+ERROR: logging before google.Init: I0907 08:25:15.749216      51 server.go:1530] Starting language server process with pid 1924201
+ERROR: logging before google.Init: E0907 08:25:15.749259      51 server.go:1506] Failed to initialize crash reporter: failed to setup crash output: open /home/vantt/.gemini/antigravity-cli/crashes/crash_1924201_63921069-a10e-4bb6-96a9-d14164403de5.log: read-only file system
+ERROR: logging before google.Init: I0907 08:25:15.749390      51 server.go:1583] Language server version: 1.1.27
+ERROR: logging before google.Init: I0907 08:25:15.749396      51 server.go:591] Language server will attempt to listen on host localhost
+ERROR: logging before google.Init: I0907 08:25:15.749640      51 server.go:606] Language server listening on random port at 44007 for HTTPS (gRPC)
+ERROR: logging before google.Init: I0907 08:25:15.749672      51 server.go:614] Language server listening on random port at 45377 for HTTP
+ERROR: logging before google.Init: W0907 08:25:16.176930      90 crashreporter.go:122] No active crash reporter, cannot upload previous crashes
+ERROR: logging before google.Init: E0907 08:25:16.177247      89 errorreport.go:224] Failed to poll ListExperiments: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: I0907 08:25:16.177335      89 model_configs.go:65] Auth mode is unspecified, skipping fetchAvailableModels and returning empty response
+ERROR: logging before google.Init: W0907 08:25:16.178755      51 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.178788      51 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.178870      51 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.178883      51 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.179116      51 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.179132      51 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.179181      51 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.179193      51 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.179242      51 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.179256      51 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.179295      51 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.179308      51 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.179614      51 launchmanager.go:69] Entering local chrome mode! This is WRONG unless you are running tests or in eval mode on Linux.
+ERROR: logging before google.Init: W0907 08:25:16.179633     116 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.179684     116 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.179851      51 defaults.go:774] failed to get cs path: cs path /usr/bin/cs invalid
+ERROR: logging before google.Init: I0907 08:25:16.179877      51 manager.go:108] Creating trajectory store manager with proto store and SQLite store
+ERROR: logging before google.Init: E0907 08:25:16.182132      51 errorreport.go:224] remove /home/vantt/.gemini/antigravity-cli/conversations/0d66f311-77d1-462a-a7bb-644d8c732781.db: read-only file system
+ERROR: logging before google.Init: E0907 08:25:16.182210      51 errorreport.go:224] Failed to prune trajectory 0d66f311-77d1-462a-a7bb-644d8c732781: remove /home/vantt/.gemini/antigravity-cli/conversations/0d66f311-77d1-462a-a7bb-644d8c732781.db: read-only file system
+ERROR: logging before google.Init: E0907 08:25:16.182250      51 manager.go:383] Failed to prune trajectory 0d66f311-77d1-462a-a7bb-644d8c732781: remove /home/vantt/.gemini/antigravity-cli/conversations/0d66f311-77d1-462a-a7bb-644d8c732781.db: read-only file system
+ERROR: logging before google.Init: W0907 08:25:16.182281      51 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.182308      51 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.182364      51 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.182384      51 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: I0907 08:25:16.182603     162 manager.go:88] Migration [MIGRATION_ID_SIDECAR_USER_CONFIG_BYPASS] is disabled, skipping entirely
+ERROR: logging before google.Init: I0907 08:25:16.182635     162 manager.go:91] Migration [MIGRATION_ID_SANITY_CHECK_PROJECT_URIS] is enabled
+ERROR: logging before google.Init: I0907 08:25:16.182651     162 manager.go:100] Migration [MIGRATION_ID_SANITY_CHECK_PROJECT_URIS] already has status MIGRATION_STATUS_COMPLETED, skipping
+ERROR: logging before google.Init: I0907 08:25:16.182659     162 manager.go:91] Migration [MIGRATION_ID_PLUGIN_ENABLEMENT] is enabled
+ERROR: logging before google.Init: I0907 08:25:16.182673     162 manager.go:100] Migration [MIGRATION_ID_PLUGIN_ENABLEMENT] already has status MIGRATION_STATUS_COMPLETED, skipping
+ERROR: logging before google.Init: I0907 08:25:16.182679     162 manager.go:91] Migration [MIGRATION_ID_BUILTIN_SIDECARS_TO_PLUGINS] is enabled
+ERROR: logging before google.Init: I0907 08:25:16.182686     162 manager.go:100] Migration [MIGRATION_ID_BUILTIN_SIDECARS_TO_PLUGINS] already has status MIGRATION_STATUS_COMPLETED, skipping
+ERROR: logging before google.Init: I0907 08:25:16.182693     162 manager.go:88] Migration [MIGRATION_ID_LIN_BUILTIN_TO_MARKETPLACE] is disabled, skipping entirely
+ERROR: logging before google.Init: W0907 08:25:16.183925      26 mcp_manager.go:1294] Failed to write server states, eagerly loading all tools: failed to write tool mdview_view_file from server mdview to tmp file: open /home/vantt/.gemini/antigravity-cli/mcp/mdview/mdview_view_file.json.tmp: read-only file system
+ERROR: logging before google.Init: W0907 08:25:16.184111      72 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.184149      72 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.184252      72 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.184272      72 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.184414      73 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.184438      73 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.184499      73 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.184516      73 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: I0907 08:25:16.187897      51 server.go:2944] Auth succeeded, refreshing features and managers
+ERROR: logging before google.Init: E0907 08:25:16.187961      51 errorreport.go:224] Failed to poll ListExperiments: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: I0907 08:25:16.188017      51 server.go:2950] State refresh took 0ms
+ERROR: logging before google.Init: I0907 08:25:16.188025      51 server.go:2964] [RemoteControl] Subscription callback triggered.
+ERROR: logging before google.Init: I0907 08:25:16.188037      51 server.go:2967] [RemoteControl] RemoteControlEnabled value: false
+ERROR: logging before google.Init: I0907 08:25:16.188041      51 server.go:3459] [RemoteControl] CLI launched without --remote-control, staying disconnected
+ERROR: logging before google.Init: I0907 08:25:16.188045      51 server.go:3277] [RemoteControl] Resolved proxyServerURL: ""
+ERROR: logging before google.Init: I0907 08:25:16.188057      51 profiler.go:231] Continuous pprof profiling is disabled.
+ERROR: logging before google.Init: I0907 08:25:16.188206     165 manager.go:88] Migration [MIGRATION_ID_SIDECAR_USER_CONFIG_BYPASS] is disabled, skipping entirely
+ERROR: logging before google.Init: I0907 08:25:16.188224     165 manager.go:91] Migration [MIGRATION_ID_SANITY_CHECK_PROJECT_URIS] is enabled
+ERROR: logging before google.Init: I0907 08:25:16.188234     165 manager.go:100] Migration [MIGRATION_ID_SANITY_CHECK_PROJECT_URIS] already has status MIGRATION_STATUS_COMPLETED, skipping
+ERROR: logging before google.Init: I0907 08:25:16.188238     165 manager.go:91] Migration [MIGRATION_ID_PLUGIN_ENABLEMENT] is enabled
+ERROR: logging before google.Init: I0907 08:25:16.188242     165 manager.go:100] Migration [MIGRATION_ID_PLUGIN_ENABLEMENT] already has status MIGRATION_STATUS_COMPLETED, skipping
+ERROR: logging before google.Init: I0907 08:25:16.188245     165 manager.go:91] Migration [MIGRATION_ID_BUILTIN_SIDECARS_TO_PLUGINS] is enabled
+ERROR: logging before google.Init: I0907 08:25:16.188255     165 manager.go:100] Migration [MIGRATION_ID_BUILTIN_SIDECARS_TO_PLUGINS] already has status MIGRATION_STATUS_COMPLETED, skipping
+ERROR: logging before google.Init: I0907 08:25:16.188258     165 manager.go:88] Migration [MIGRATION_ID_LIN_BUILTIN_TO_MARKETPLACE] is disabled, skipping entirely
+ERROR: logging before google.Init: I0907 08:25:16.188252      51 server.go:2470] initialized server successfully in 439.010623ms
+ERROR: logging before google.Init: W0907 08:25:16.188357     168 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.188378     168 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.188402       1 auto_updater.go:245] Directory /home/vantt/.local/bin is not fully accessible (readable: true, writable: false), skipping update
+ERROR: logging before google.Init: W0907 08:25:16.188448     168 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: I0907 08:25:16.188457       1 common.go:150] Launching CLI mode
+ERROR: logging before google.Init: E0907 08:25:16.188465     168 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.188474       1 launchsteps.go:84] Failed to resolve GeminiDir ".gemini": .gemini must be an absolute path: path is not absolute, falling back to default
+ERROR: logging before google.Init: I0907 08:25:16.188493       1 common.go:172] CLI app data directory: /home/vantt/.gemini/antigravity-cli
+ERROR: logging before google.Init: I0907 08:25:16.188511       1 server.go:285] Creating CLI server backend: product=antigravity workspaceDirs=[/home/vantt/projects/herdr-gateway] appDataDir=/home/vantt/.gemini/antigravity-cli cascadeManager=true codeAssist=true
+ERROR: logging before google.Init: I0907 08:25:16.188557       1 composite_token_storage.go:123] Using file-based token storage because SSH session detected
+ERROR: logging before google.Init: I0907 08:25:16.188580       1 auth_provider.go:763] [AuthProvider] SetEnableBusinessLogin called with enable: true
+ERROR: logging before google.Init: E0907 08:25:16.188876       1 summary_store.go:226] summary store open failed (corrupt_on_open), recreating: summary_store: open db: unable to open database file: no such file or directory
+ERROR: logging before google.Init: E0907 08:25:16.188950       1 summary_store.go:231] summary store recreate failed: summary_store: open db: unable to open database file: no such file or directory
+ERROR: logging before google.Init: I0907 08:25:16.189069       1 server.go:1930] Backend project ID updated dynamically to: default-cli-project
+ERROR: logging before google.Init: I0907 08:25:16.189080       1 analytics.go:176] CLI startup completed (took 441.156103ms)
+ERROR: logging before google.Init: I0907 08:25:16.189087       1 printmode.go:173] Print mode: starting (promptLength=1542, model="gemini-3.1-pro-low", conversationID="")
+ERROR: logging before google.Init: I0907 08:25:16.189096       1 manager.go:415] Initializing CLI store manager for workspace /home/vantt/projects/herdr-gateway
+ERROR: logging before google.Init: W0907 08:25:16.189099      81 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.189153      81 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.189239      81 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: I0907 08:25:16.189264       1 cli_setting_manager.go:156] applyUserSettings: no shared config permissions from /home/vantt/.gemini/config/config.json
+ERROR: logging before google.Init: E0907 08:25:16.189269      81 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: I0907 08:25:16.189280       1 cli_setting_manager.go:924] Skipping telemetry propagation because user is not logged in
+ERROR: logging before google.Init: I0907 08:25:16.189284       1 cli_setting_manager.go:92] CLI settings initialized: permissions=&{Allow:[] Deny:[command(regex:^rm .*-rf) command(regex:^sudo ) command(regex:^git push .*(--force|-f\b)) command(regex:^git reset .*--hard) command(regex:^git stash) command(regex:^curl ) command(regex:^wget )] Ask:[]}, toolPermission=always-proceed
+ERROR: logging before google.Init: W0907 08:25:16.189367      81 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: I0907 08:25:16.189375       1 hooks_manager.go:53] loaded 0 named hooks from 0 hooks.json file(s)
+ERROR: logging before google.Init: I0907 08:25:16.189383       1 manager.go:589] CLI store manager initialized successfully
+ERROR: logging before google.Init: I0907 08:25:16.189393       1 printmode.go:726] Print mode: applying agent mode accept-edits
+ERROR: logging before google.Init: E0907 08:25:16.189397      81 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.189466      81 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: I0907 08:25:16.189397       1 manager.go:1341] SetCycleMode called: accept-edits
+ERROR: logging before google.Init: E0907 08:25:16.189485      81 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: I0907 08:25:16.189486       1 printmode.go:364] Print mode: not authenticated, trying silent auth
+ERROR: logging before google.Init: I0907 08:25:16.189545     171 keyring.go:64] keyringAuth: loaded token, expiry=2026-09-07 08:35:59.499144181 +0700 +07 expired=false
+ERROR: logging before google.Init: W0907 08:25:16.189574      81 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.189596      81 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.189658      81 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.189683      81 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.189771      81 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.189805      81 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.189880      81 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.189901      81 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.190017      81 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.190040      81 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.190103      81 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.190120      81 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.190229     226 cache.go:135] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.190255     226 errorreport.go:224] error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: W0907 08:25:16.190324     226 cache.go:135] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: E0907 08:25:16.190341     226 errorreport.go:224] failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+ERROR: logging before google.Init: I0907 08:25:16.505117       1 auth.go:148] ChainedAuth: authenticated via keyring (effective: keyring)
+ERROR: logging before google.Init: I0907 08:25:16.505138       1 server_oauth.go:192] applyAuthResult: email=tetnu26@gmail.com, authMethod=consumer, quotaProject=
+ERROR: logging before google.Init: I0907 08:25:16.505143       1 server_oauth.go:197] OAuth: authenticated successfully as tetnu26@gmail.com
+ERROR: logging before google.Init: I0907 08:25:16.505148       1 server_oauth.go:203] b.codeAssistClient.AuthProvider (0x264eda5c20) is same as b.cliAuth (0x264eda5c20)
+ERROR: logging before google.Init: W0907 08:25:16.505264     245 cache.go:163] Failed to refresh cache in background: admin controls not applicable
+ERROR: logging before google.Init: W0907 08:25:16.505282     152 cache.go:163] Failed to refresh cache in background: admin controls not applicable
+ERROR: logging before google.Init: E0907 08:25:17.907867      99 browser_context.go:179] failed to install playwright: could not install driver: could not install driver: error: got non 200 status code: 404 (404 Not Found) from https://playwright.azureedge.net/builds/driver/playwright-1.57.0-linux.zip
+error: got non 200 status code: 404 (404 Not Found) from https://playwright-akamai.azureedge.net/builds/driver/playwright-1.57.0-linux.zip
+error: got non 200 status code: 404 (404 Not Found) from https://playwright-verizon.azureedge.net/builds/driver/playwright-1.57.0-linux.zip
+ERROR: logging before google.Init: I0907 08:25:19.045100     148 http_helpers.go:296] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist Trace: 0x732f560ccd6a4c76
+ERROR: logging before google.Init: I0907 08:25:20.002457     148 http_helpers.go:296] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:fetchAvailableModels Trace: 0x2a0cdcbbd41057d6
+ERROR: logging before google.Init: I0907 08:25:20.096874       1 model_resolver.go:80] Resolving model gemini-3.1-pro-low
+ERROR: logging before google.Init: I0907 08:25:20.096895       1 model_config_manager.go:311] Propagating selected model override to backend: label="Gemini 3.1 Pro (Low)"
+ERROR: logging before google.Init: I0907 08:25:20.096952     202 quota_manager.go:45] doRefreshQuota: starting reload (force=true)
+ERROR: logging before google.Init: I0907 08:25:20.786021       1 printmode.go:366] Print mode: silent auth succeeded
+ERROR: logging before google.Init: I0907 08:25:20.786304     203 experiment_manager.go:56] Starting experiment refresh after login
+ERROR: logging before google.Init: I0907 08:25:21.136865     203 experiment_manager.go:60] Experiments refreshed after login
+ERROR: logging before google.Init: I0907 08:25:21.137203     216 manager.go:1270] Reloading system slash commands
+ERROR: logging before google.Init: I0907 08:25:21.209714     315 http_helpers.go:296] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist Trace: 0xc92cf0dc950b3122
+ERROR: logging before google.Init: I0907 08:25:22.251754     315 http_helpers.go:296] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist Trace: 0x9a6507c9c4c89292
+ERROR: logging before google.Init: I0907 08:25:22.371143     315 model_resolver.go:80] Resolving model gemini-3.1-pro-low
+ERROR: logging before google.Init: I0907 08:25:22.371248     315 model_config_manager.go:311] Propagating selected model override to backend: label="Gemini 3.1 Pro (Low)"
+ERROR: logging before google.Init: I0907 08:25:22.371749     325 model_resolver.go:80] Resolving model gemini-3.1-pro-low
+ERROR: logging before google.Init: I0907 08:25:22.371757     202 quota_manager.go:45] doRefreshQuota: starting reload (force=true)
+ERROR: logging before google.Init: I0907 08:25:22.371864     325 model_config_manager.go:311] Propagating selected model override to backend: label="Gemini 3.1 Pro (Low)"
+ERROR: logging before google.Init: I0907 08:25:22.386361       1 model_resolver.go:80] Resolving model gemini-3.1-pro-low
+ERROR: logging before google.Init: I0907 08:25:22.386561       1 conversation_manager.go:429] Starting new conversation (agent=false)
+ERROR: logging before google.Init: I0907 08:25:22.386638       1 server.go:1118] Creating new cascade trajectory (agentScript=false)
+ERROR: logging before google.Init: I0907 08:25:22.386723       1 server.go:1121] Conversation using project ID: default-cli-project
+ERROR: logging before google.Init: E0907 08:25:22.388241       1 errorreport.go:224] failed to create persistent trajectory in store 1: open backend /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.db: unable to open database file: no such file or directory
+ERROR: logging before google.Init: E0907 08:25:22.392200       1 errorreport.go:224] Failed to ensure artifact directories for cascade 7afa592e-066e-426c-bb9c-3536b7506329: mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:25:22.394597       1 cascade_run_state.go:162] Failed to register with artifacts watcher for 7afa592e-066e-426c-bb9c-3536b7506329: Failed to register with artifacts watcher for 7afa592e-066e-426c-bb9c-3536b7506329: Failed to create artifacts directory for 7afa592e-066e-426c-bb9c-3536b7506329: mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:25:22.395415       1 errorreport.go:224] Failed to register with artifacts watcher for 7afa592e-066e-426c-bb9c-3536b7506329: Failed to register with artifacts watcher for 7afa592e-066e-426c-bb9c-3536b7506329: Failed to create artifacts directory for 7afa592e-066e-426c-bb9c-3536b7506329: mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: I0907 08:25:22.396149       1 server.go:1153] Created conversation 7afa592e-066e-426c-bb9c-3536b7506329
+ERROR: logging before google.Init: I0907 08:25:22.396251       1 server.go:2811] GetConversationDetail: found conversation 7afa592e-066e-426c-bb9c-3536b7506329 (active=true)
+ERROR: logging before google.Init: I0907 08:25:22.398349       1 server.go:2811] GetConversationDetail: found conversation 7afa592e-066e-426c-bb9c-3536b7506329 (active=true)
+ERROR: logging before google.Init: I0907 08:25:22.398385       1 conversation_manager.go:476] project: switching to conversation belonging to project ID: default-cli-project
+ERROR: logging before google.Init: I0907 08:25:22.398541       1 server.go:1930] Backend project ID updated dynamically to: default-cli-project
+ERROR: logging before google.Init: I0907 08:25:22.398573       1 cli_setting_manager.go:218] ApplyProjectPermissionGrants: no grants for project "CLI Project", cleared project permissions
+ERROR: logging before google.Init: I0907 08:25:22.398605       1 conversation_manager.go:522] project: synced active project to "CLI Project" (id=default-cli-project) from conversation switch
+ERROR: logging before google.Init: I0907 08:25:22.398692       1 conversation_manager.go:795] Streaming conversation 7afa592e-066e-426c-bb9c-3536b7506329
+ERROR: logging before google.Init: I0907 08:25:22.398758       1 server.go:2811] GetConversationDetail: found conversation 7afa592e-066e-426c-bb9c-3536b7506329 (active=true)
+ERROR: logging before google.Init: I0907 08:25:22.398813     346 manager.go:1293] Reloading system slash commands and skills
+ERROR: logging before google.Init: I0907 08:25:22.398950     346 manager.go:1270] Reloading system slash commands
+ERROR: logging before google.Init: W0907 08:25:22.399790       1 presence.go:109] presence: open /home/vantt/.gemini/antigravity-cli/presence/7afa592e-066e-426c-bb9c-3536b7506329.lock: read-only file system
+ERROR: logging before google.Init: I0907 08:25:22.399825       1 server.go:1162] Starting conversation update stream for 7afa592e-066e-426c-bb9c-3536b7506329
+ERROR: logging before google.Init: I0907 08:25:22.399869       1 session.go:171] Print mode: conversation=7afa592e-066e-426c-bb9c-3536b7506329, sending message
+ERROR: logging before google.Init: I0907 08:25:22.399885       1 manager.go:1270] Reloading system slash commands
+ERROR: logging before google.Init: I0907 08:25:22.405986       1 manager.go:1274] Slash commands unchanged, skipping update
+ERROR: logging before google.Init: I0907 08:25:22.406035       1 conversation_manager.go:611] Forwarding user message to conversation 7afa592e-066e-426c-bb9c-3536b7506329 (items=1, media=0)
+ERROR: logging before google.Init: I0907 08:25:22.406044       1 server.go:1609] Sending user message to conversation 7afa592e-066e-426c-bb9c-3536b7506329 (items=1, media=0)
+ERROR: logging before google.Init: I0907 08:25:22.407284     346 manager.go:1274] Slash commands unchanged, skipping update
+ERROR: logging before google.Init: I0907 08:25:22.407784       1 latency_breakdown.go:142] SEND_USER_CASCADE_MESSAGE_LATENCY latency breakdown: map[active_user_state_latency_ms:0 blocking:false cascade_id:7afa592e-066e-426c-bb9c-3536b7506329 cascade_send_latency_ms:0 hydrate_slash_commands_latency_ms:0 load_trajectory_latency_ms:0 media_count:0 media_summaries_latency_ms:0 message_origin:AGENT_MESSAGE_ORIGIN_UNSPECIFIED refresh_browser_state_latency_ms:0 resolve_agent_config_latency_ms:0 save_media_latency_ms:0 saved_media_count:0 status:OK total_latency_ms:1 trajectory_id:1bacacb3-22bd-43d1-bb47-a75bdd2c831a]
+ERROR: logging before google.Init: W0907 08:25:22.422914     139 declarative_config_loader.go:251] skipping component during resolution: empty component: prompt section "user_rules"
+ERROR: logging before google.Init: W0907 08:25:22.422937     139 declarative_config_loader.go:251] skipping component during resolution: empty component: prompt section "subagent_reminder"
+ERROR: logging before google.Init: W0907 08:25:22.422940     139 declarative_config_loader.go:251] skipping component during resolution: empty component: prompt section "terminal_sandbox"
+ERROR: logging before google.Init: E0907 08:25:22.425566     139 errorreport.go:224] mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:25:22.425882     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.a2806b1f-5993-44cb-86cb-d0c44e411062.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:25:22.425929     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.a2806b1f-5993-44cb-86cb-d0c44e411062.tmp: read-only file system
+ERROR: logging before google.Init: I0907 08:25:22.948504     203 experiment_manager.go:56] Starting experiment refresh after login
+ERROR: logging before google.Init: I0907 08:25:23.053578     394 model_resolver.go:80] Resolving model gemini-3.1-pro-low
+ERROR: logging before google.Init: I0907 08:25:23.053699     394 model_config_manager.go:311] Propagating selected model override to backend: label="Gemini 3.1 Pro (Low)"
+ERROR: logging before google.Init: I0907 08:25:23.415072     402 http_helpers.go:296] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x65de131d13853db3 ResponseID: ghKeauqyNpSj9tMPgcKC0A8
+ERROR: logging before google.Init: E0907 08:25:23.424118     138 errorreport.go:224] writing generated conversation title for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/annotations/7afa592e-066e-426c-bb9c-3536b7506329.pbtxt.7d927d06-2bc0-41d8-b5d3-7a83c4680910.tmp: read-only file system
+ERROR: logging before google.Init: I0907 08:25:23.525494     393 http_helpers.go:296] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist Trace: 0x691823f269af5bd7
+ERROR: logging before google.Init: I0907 08:25:23.541648     203 experiment_manager.go:60] Experiments refreshed after login
+ERROR: logging before google.Init: I0907 08:25:23.542005     203 experiment_manager.go:56] Starting experiment refresh after login
+ERROR: logging before google.Init: I0907 08:25:23.542100     529 manager.go:1270] Reloading system slash commands
+ERROR: logging before google.Init: I0907 08:25:23.554741     529 manager.go:1274] Slash commands unchanged, skipping update
+ERROR: logging before google.Init: I0907 08:25:23.961587     202 quota_manager.go:45] doRefreshQuota: starting reload (force=true)
+ERROR: logging before google.Init: I0907 08:25:24.111309     203 experiment_manager.go:60] Experiments refreshed after login
+ERROR: logging before google.Init: I0907 08:25:24.111636     203 experiment_manager.go:56] Starting experiment refresh after login
+ERROR: logging before google.Init: I0907 08:25:24.111848     396 manager.go:1270] Reloading system slash commands
+ERROR: logging before google.Init: I0907 08:25:24.124801     396 manager.go:1274] Slash commands unchanged, skipping update
+ERROR: logging before google.Init: I0907 08:25:24.616189     203 experiment_manager.go:60] Experiments refreshed after login
+ERROR: logging before google.Init: I0907 08:25:24.616432     547 manager.go:1270] Reloading system slash commands
+ERROR: logging before google.Init: I0907 08:25:24.619881     547 manager.go:1274] Slash commands unchanged, skipping update
+ERROR: logging before google.Init: I0907 08:25:29.137354     478 http_helpers.go:296] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x77058843a31afece ResponseID: gxKeao7yBKrZ1e8Pvpnz4Q8
+ERROR: logging before google.Init: I0907 08:25:29.907783     347 tool_confirmation_manager.go:170] Always-proceed: auto-approving tool confirmation "ViewFile" at step 2
+ERROR: logging before google.Init: I0907 08:25:29.907814     550 server.go:2212] Tool confirmation for conversation 7afa592e-066e-426c-bb9c-3536b7506329 step 2 (type=*gemini_coder_go_proto.Step_Generic approved=true)
+ERROR: logging before google.Init: E0907 08:25:29.910230     536 errorreport.go:224] mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:25:29.910385     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.c623f0bc-70d2-47db-9076-a9fdec9beaf6.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:25:29.910517     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.c623f0bc-70d2-47db-9076-a9fdec9beaf6.tmp: read-only file system
+ERROR: logging before google.Init: I0907 08:25:30.493945     347 tool_confirmation_manager.go:170] Always-proceed: auto-approving tool confirmation "ViewFile" at step 3
+ERROR: logging before google.Init: I0907 08:25:30.494239     594 server.go:2212] Tool confirmation for conversation 7afa592e-066e-426c-bb9c-3536b7506329 step 3 (type=*gemini_coder_go_proto.Step_Generic approved=true)
+ERROR: logging before google.Init: E0907 08:25:30.501404     541 errorreport.go:224] mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:25:30.502188     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.753256b6-a53e-49da-a872-233e826ae680.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:25:30.502481     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.753256b6-a53e-49da-a872-233e826ae680.tmp: read-only file system
+ERROR: logging before google.Init: I0907 08:25:31.342342     347 tool_confirmation_manager.go:170] Always-proceed: auto-approving tool confirmation "ViewFile" at step 4
+ERROR: logging before google.Init: I0907 08:25:31.342558     628 server.go:2212] Tool confirmation for conversation 7afa592e-066e-426c-bb9c-3536b7506329 step 4 (type=*gemini_coder_go_proto.Step_Generic approved=true)
+ERROR: logging before google.Init: E0907 08:25:31.349825     369 errorreport.go:224] mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:25:31.350065     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.7ee9fe7a-94c7-47bd-a5ef-79ce8cbd271a.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:25:31.350102     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.7ee9fe7a-94c7-47bd-a5ef-79ce8cbd271a.tmp: read-only file system
+ERROR: logging before google.Init: W0907 08:25:31.351596     576 output_truncation.go:115] output truncation: failed to create output file: mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:25:31.351915     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.89840b63-9486-4c78-9f15-1dcb138884f1.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:25:31.351950     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.89840b63-9486-4c78-9f15-1dcb138884f1.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:25:31.357869     139 errorreport.go:224] mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:25:31.358343     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.f48c109f-5de1-42d3-9050-eb968a3ab5b4.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:25:31.358458     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.f48c109f-5de1-42d3-9050-eb968a3ab5b4.tmp: read-only file system
+ERROR: logging before google.Init: W0907 08:25:31.361074     661 output_truncation.go:115] output truncation: failed to create output file: mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:25:31.361588     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.d39d380e-ed1f-4174-ae3c-9cd0a0d9ae74.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:25:31.361644     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.d39d380e-ed1f-4174-ae3c-9cd0a0d9ae74.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:25:31.362691     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.d5af76b4-428b-465c-b662-b4ef49e7dc98.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:25:31.362750     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.d5af76b4-428b-465c-b662-b4ef49e7dc98.tmp: read-only file system
+ERROR: logging before google.Init: I0907 08:25:38.539799     268 http_helpers.go:296] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xd96726ea0a8284fa ResponseID: ixKeau3ZLJSj9tMPgcKC0A8
+ERROR: logging before google.Init: E0907 08:26:07.919513     139 errorreport.go:224] mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:26:07.920468     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.df5d3503-fbc3-4353-8edd-7a8a11323c75.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:07.920885     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.df5d3503-fbc3-4353-8edd-7a8a11323c75.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:07.923717     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.a5c8f7b0-6444-4eff-9bb4-50d18075bb1a.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:07.923950     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.a5c8f7b0-6444-4eff-9bb4-50d18075bb1a.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:07.926807     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.547e9b68-f657-4195-9769-9f0411c0bde4.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:07.927012     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.547e9b68-f657-4195-9769-9f0411c0bde4.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:07.930070     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.661201af-b816-4e2c-be4a-98893cd8135d.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:07.930261     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.661201af-b816-4e2c-be4a-98893cd8135d.tmp: read-only file system
+ERROR: logging before google.Init: I0907 08:26:14.747370     682 http_helpers.go:296] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xbd0cb0ac3bb4502f ResponseID: sBKeasXnNbDdvr0P8v3s8A4
+ERROR: logging before google.Init: I0907 08:26:19.838476     347 tool_confirmation_manager.go:170] Always-proceed: auto-approving tool confirmation "WriteToFile" at step 11
+ERROR: logging before google.Init: I0907 08:26:19.838648     690 server.go:2212] Tool confirmation for conversation 7afa592e-066e-426c-bb9c-3536b7506329 step 11 (type=*gemini_coder_go_proto.Step_Generic approved=true)
+ERROR: logging before google.Init: W0907 08:26:19.845809     668 output_truncation.go:115] output truncation: failed to create output file: mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:26:19.846426     668 errorreport.go:224] mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:26:19.848504     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.e247181c-d5e4-4e41-8369-0a59e2b497d2.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:19.848707     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.e247181c-d5e4-4e41-8369-0a59e2b497d2.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:19.970363     139 errorreport.go:224] mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:26:19.972852     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.2342293e-22bd-4e3b-ace2-cd5ef25822b3.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:19.973032     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.2342293e-22bd-4e3b-ace2-cd5ef25822b3.tmp: read-only file system
+ERROR: logging before google.Init: I0907 08:26:19.974559     347 tool_confirmation_manager.go:170] Always-proceed: auto-approving tool confirmation "WriteToFile" at step 12
+ERROR: logging before google.Init: I0907 08:26:19.974718     655 server.go:2212] Tool confirmation for conversation 7afa592e-066e-426c-bb9c-3536b7506329 step 12 (type=*gemini_coder_go_proto.Step_Generic approved=true)
+ERROR: logging before google.Init: W0907 08:26:19.978504     754 output_truncation.go:115] output truncation: failed to create output file: mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:26:19.979000     754 errorreport.go:224] mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:26:19.980860     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.ee356be9-bbf5-4318-bdda-3c601139a58a.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:19.980968     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.ee356be9-bbf5-4318-bdda-3c601139a58a.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:19.982207     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.67fdd954-3b6b-4f74-a289-f7d84b6ee3a1.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:19.982270     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.67fdd954-3b6b-4f74-a289-f7d84b6ee3a1.tmp: read-only file system
+ERROR: logging before google.Init: I0907 08:26:23.304319      61 http_helpers.go:296] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x404636b421b03b4a ResponseID: vBKeatP7F9GN1e8P3qip0Qw
+ERROR: logging before google.Init: E0907 08:26:25.837608     139 errorreport.go:224] mkdir /home/vantt/.gemini/antigravity-cli/brain/7afa592e-066e-426c-bb9c-3536b7506329: read-only file system
+ERROR: logging before google.Init: E0907 08:26:25.842532     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.083671e2-56da-4428-9285-0c1dc115d9d8.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:25.842686     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.083671e2-56da-4428-9285-0c1dc115d9d8.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:25.843318     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.93a7276a-ee19-4aa4-a704-03ddad0876aa.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:25.843373     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.93a7276a-ee19-4aa4-a704-03ddad0876aa.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:25.844240     117 stager.go:117] Failed to save message for 7afa592e-066e-426c-bb9c-3536b7506329: open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.f5009c0f-13f3-49d3-a64a-11dee573931c.tmp: read-only file system
+ERROR: logging before google.Init: E0907 08:26:25.844370     117 errorreport.go:224] open /home/vantt/.gemini/antigravity-cli/conversations/7afa592e-066e-426c-bb9c-3536b7506329.f5009c0f-13f3-49d3-a64a-11dee573931c.tmp: read-only file system
+ERROR: logging before google.Init: I0907 08:26:25.999143       1 manager.go:769] CLI store manager shutting down
+ERROR: logging before google.Init: E0907 08:26:26.001855       1 cache_manager.go:37] failed to persist last conversation to cache: failed to write last conversations: open /home/vantt/.gemini/antigravity-cli/cache/last_conversations.json.6f5f7a86-ec69-4c1b-9139-003cbb7e1b02.tmp: read-only file system
+ERROR: logging before google.Init: I0907 08:26:26.001904       1 conversation_manager.go:752] Stopping conversation stream
+ERROR: logging before google.Init: I0907 08:26:26.002088     347 server.go:1209] Stream goroutine exited for 7afa592e-066e-426c-bb9c-3536b7506329, sending completion signal
+ERROR: logging before google.Init: I0907 08:26:26.002175     347 conversation_manager.go:886] Stream completed for 7afa592e-066e-426c-bb9c-3536b7506329, clearing ResponsePending
+ERROR: logging before google.Init: I0907 08:26:26.002851     837 server.go:2803] Language server shutting down
+ERROR: logging before google.Init: I0907 08:26:26.002882     837 server.go:2808] Waiting for migrations to complete to prevent partial migration state...
+ERROR: logging before google.Init: E0907 08:26:26.003290     835 telemetry.go:82] error recording trajectory segment analytics: Post "https://daily-cloudcode-pa.googleapis.com/v1internal:recordTrajectoryAnalytics": context canceled
+ERROR: logging before google.Init: E0907 08:26:26.006021      70 file_watcher.go:194] skipping empty or temp file: 

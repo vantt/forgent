@@ -1,0 +1,50 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-clear-herdr-heuristic-direction-v3: Phase 6 (critique the proposals, assess constraints).",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v3",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "claude-bwrap", "tier": "analytical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authCritique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "authorizationId": "auth_critique_v3",
+      "invocationKey": "ik_critique_v3",
+      "reason": "Phase 6: all three Phase 5 proposals are in, attack the strongest one.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_021", "asgn_coordinator_driver_op_022", "asgn_coordinator_driver_op_023"]
+    },
+    {
+      "type": "operation",
+      "as": "critique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "objective": "Attack the strongest of these three real Phase 5 proposals for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification -- not the weakest. Proposal A (system-shaper): keep looksStructured() as a flat, ordered OR-chain of small named detectors, not a pluggable registry -- the only consumer (terminal-render.ts) reads just block.mode, never detector reasoning. Proposal B (alternative-shaper): a Pluggable Output Grammar architecture, a registry of layout signatures replacing the monolithic heuristics. Proposal C (constraint-advocate): keep the current architecture (pure, OR-combined, independently-testable structural detectors with hardcoded thresholds) because it is the only shape that stays cheaply unit-testable without a browser/corpus. Use ONLY absolute paths for anything you read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "authorize",
+      "as": "authAssess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "authorizationId": "auth_assess_v3",
+      "invocationKey": "ik_assess_v3",
+      "reason": "Phase 6: rank operational risk across the three Phase 5 proposals.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_021", "asgn_coordinator_driver_op_022", "asgn_coordinator_driver_op_023"]
+    },
+    {
+      "type": "operation",
+      "as": "assess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "Rank the real operational risk of these three real Phase 5 proposals for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification. Proposal A (system-shaper): keep looksStructured() as a flat, ordered OR-chain of small named detectors, not a pluggable registry. Proposal B (alternative-shaper): a Pluggable Output Grammar architecture, a registry of layout signatures replacing the monolithic heuristics. Proposal C (constraint-advocate, your own earlier proposal): keep the current architecture because it is the only shape that stays cheaply unit-testable without a browser/corpus. Use absolute paths for anything you read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "contextRefs": ["asgn_coordinator_driver_op_021", "asgn_coordinator_driver_op_022", "asgn_coordinator_driver_op_023"],
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}
