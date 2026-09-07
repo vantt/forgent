@@ -26,6 +26,7 @@ import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, EXECUTOR_ADAPTERS, DispatchError } from './transport.mjs';
+import { markRunSettled } from './visibility-session.mjs';
 import { buildPrompt } from './prepare.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
@@ -194,7 +195,11 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // a command-less/adapter-less/invocation-less executor with no static
   // agentType of its own -- see resolveAgentTypeForWork's own doc comment.
   const resolvedAgentType = resolveAgentTypeForWork(work, cwd, opts.stage);
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, adapter, provider, baseCommit, headRef, governance } = resolveExecutorCommand(cfg, {
+  // `permissionMode`/`confinement` are carried the whole way or the config
+  // door's "bypass requires full confinement" invariant is enforced at load
+  // and void at dispatch -- the profile would claim a confined worker and
+  // this call would run an unconfined one in the operator's own session.
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, baseCommit, headRef, governance } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -253,7 +258,17 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     }, null, 2)}\n`);
   }
 
-  return adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery }, {
+  // A run this function opened is a run this function closes. `run.json` was
+  // written `running` above; leaving it there is exactly the defect
+  // `visibility-session.mjs` exists to fix, and this is the path a real
+  // implement dispatch takes. The round ended either way -- a failure has a
+  // named answer, it is not an unfinished run.
+  const closeRun = (status) => {
+    if (!workerRunDir) return;
+    try { markRunSettled(workerRunDir, { status }); } catch { /* a run left open is not worth failing a finished dispatch */ }
+  };
+
+  return adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement }, {
     cwd,
     repoRoot: opts.fgosDir ? path.dirname(opts.fgosDir) : undefined,
     runDir: workerRunDir,
@@ -269,8 +284,16 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     // (tsk-33w D9)/governance (self-review finding, 2026-08-25): additive
     // only — every field this function already returned stays exactly
     // where it was.
-    (result) => ({ ...result, templateName, templateHash, executorId, provider, command, baseCommit, headRef, governance }),
+    (result) => {
+      closeRun('settled');
+      return { ...result, templateName, templateHash, executorId, provider, command, baseCommit, headRef, governance };
+    },
     (err) => {
+      // `died` is the one failure that says something about the worker's own
+      // process; every other outcome ended the round without establishing
+      // that, so it closes as `settled` -- a statement about the run reaching
+      // its end, never about the work having succeeded.
+      closeRun(err?.outcome === 'died' ? 'died' : 'settled');
       if (err instanceof DispatchError) {
         err.templateName = templateName;
         err.templateHash = templateHash;
@@ -472,7 +495,9 @@ export async function executeExecutorCli(
     rigorOverrides: capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides,
   });
   const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, adapter, provider } = resolveExecutorCommand(cfg, {
+  // Same reason as `spawnWorker`: a confinement the profile declares has to
+  // reach the adapter, or the invariant that accepted the profile is fiction.
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -529,7 +554,7 @@ export async function executeExecutorCli(
     );
     const headBefore = captureHeadSha(cwd);
     const dirtyBefore = checkoutDirtyPaths(root, cwd);
-    const result = await adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery }, { cwd, repoRoot: root, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model, runDir });
+    const result = await adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement }, { cwd, repoRoot: root, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model, runDir });
     const headAfter = captureHeadSha(cwd);
     const dirtyAfter = checkoutDirtyPaths(root, cwd);
     let lostUncommittedPaths;

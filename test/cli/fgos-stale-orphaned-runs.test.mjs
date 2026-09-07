@@ -97,3 +97,17 @@ test('a run that already settled is not an orphan and is left out of the report'
 
   assert.deepEqual(envelopeData(run(cwd, ['stale']).stdout).orphanedRuns, []);
 });
+
+test('a run being driven right now is left alone, even by --reconcile', () => {
+  const cwd = tmpCwd();
+  const dir = plantRun(cwd, 'dispatch-runs/tsk-live/1700000000001');
+  // The adapter stamps this every ten seconds for as long as it is driving.
+  fs.writeFileSync(path.join(dir, 'visibility.json'), JSON.stringify({
+    status: 'briefed', lastSeenAt: new Date().toISOString(),
+  }));
+
+  assert.deepEqual(envelopeData(run(cwd, ['stale']).stdout).orphanedRuns, [],
+    'a busy run is not an orphan');
+  run(cwd, ['stale', '--reconcile']);
+  assert.equal(statusOf(dir), 'running', 'and --reconcile does not stop it either');
+});

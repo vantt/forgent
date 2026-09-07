@@ -182,3 +182,34 @@ export function removeWorkerHome(homePath) {
   fs.rmSync(homePath, { recursive: true, force: true });
   return true;
 }
+
+/**
+ * Take the provider credential out of a home that is being kept.
+ *
+ * A failed round keeps its home for the same reason it keeps its pane: the
+ * settings and rc are the only record of what the worker was actually given.
+ * The credential is not part of that record. It is a plain copy of the
+ * operator's own, and one copy per failed round accumulating in a world-
+ * listable temp directory is a different thing from "the worker holds a copy
+ * while it runs".
+ *
+ * Same marker check as `removeWorkerHome`, for the same reason: this runs on
+ * error paths, where a wrong argument is most likely.
+ */
+export function redactWorkerHome(homePath) {
+  if (typeof homePath !== 'string' || homePath.length === 0) {
+    throw new WorkerHomeError('invalid-arg', 'redactWorkerHome: homePath is required.');
+  }
+  if (!fs.existsSync(homePath)) return false;
+  if (!fs.existsSync(path.join(homePath, MARKER))) {
+    throw new WorkerHomeError(
+      'not-a-worker-home',
+      `redactWorkerHome refused: "${homePath}" carries no ${MARKER} marker, so this module did not create it and will not touch it.`,
+      { homePath },
+    );
+  }
+  const credential = path.join(homePath, '.claude', '.credentials.json');
+  if (!fs.existsSync(credential)) return false;
+  fs.rmSync(credential, { force: true });
+  return true;
+}

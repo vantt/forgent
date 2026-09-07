@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
 import {
   readVisibility,
   writeVisibility,
@@ -239,4 +240,48 @@ test('the actor lease is gone, not merely unused', async () => {
   const mod = await import('../../src/runner/dispatch/visibility-session.mjs');
   assert.equal(mod.claimActor, undefined);
   assert.equal(mod.releaseActor, undefined);
+});
+
+test('a run whose driver just checked in is busy, not orphaned', () => {
+  const fgosDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-beat-'));
+  try {
+    const mk = (rel, runId, lastSeenAt) => {
+      const d = path.join(fgosDir, rel);
+      fs.mkdirSync(d, { recursive: true });
+      fs.writeFileSync(path.join(d, 'run.json'), JSON.stringify({ runId, status: 'running' }));
+      if (lastSeenAt) fs.writeFileSync(path.join(d, 'visibility.json'), JSON.stringify({ status: 'briefed', lastSeenAt }));
+    };
+    const now = Date.now();
+    mk('dispatch-runs/w/1', 'beating', new Date(now - 5000).toISOString());
+    mk('dispatch-runs/w/2', 'silent', new Date(now - 600000).toISOString());
+    mk('dispatch-runs/w/3', 'never-wrote-one', null);
+
+    // Writing `unknown` over a run five minutes into a 35-minute ceiling
+    // stops every watcher on a run that is still being driven.
+    const ids = findRunningRuns(fgosDir, { now: () => now }).map((r) => r.runId).sort();
+    assert.deepEqual(ids, ['never-wrote-one', 'silent']);
+
+    // The window is a parameter, not a belief: shrink it and the same live
+    // run reads as abandoned.
+    assert.equal(findRunningRuns(fgosDir, { now: () => now, driverFreshMs: 1000 }).length, 3);
+  } finally { fs.rmSync(fgosDir, { recursive: true, force: true }); }
+});
+
+test('a crashed cli-spawn run that did write its claim reconciles to settled, not unknown', () => {
+  const dir = makeRunDir();
+  try {
+    // The name a cli-spawn worker is told to use by the assignment prompt.
+    fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'settled' }));
+
+    // Both readers of this directory must reach the same file. They used not
+    // to: reconciliation knew only the outbox and the collector's own
+    // result.json, so a worker that HAD reported was read as having vanished.
+    assert.match(findWorkerResult(dir), /agent-result\.json$/);
+    assert.equal(
+      findWorkerResult(dir),
+      resolveWorkerArtifactPath(dir, /^result-(\d+)\.json$/, 'agent-result.json'),
+      'the collector and reconciliation resolve one claim to one path',
+    );
+    assert.equal(reconcileRun(dir, { liveness: 'absent' }).outcome, 'settled');
+  } finally { cleanup(dir); }
 });

@@ -189,3 +189,19 @@ test('neither stream parseable is still reported as unparseable, naming both', (
     (err) => err.code === 'herdr_unparseable' && /stdout or stderr/.test(err.message),
   );
 });
+
+test('a long work id loses its middle, never the suffix that makes it unique', () => {
+  const longId = 'tsk-a-very-long-work-item-identifier-indeed-here';
+  const first = normalizeAgentName(`fgos-${longId}-${(1700000000000).toString(36)}`);
+  const second = normalizeAgentName(`fgos-${longId}-${(1700000000001).toString(36)}`);
+
+  assert.ok(first.length <= 48, 'still within what herdr accepts');
+  // Truncating the tail would take the timestamp with it, and herdr addresses
+  // agents by name -- two rounds of one item would then be the same agent.
+  assert.notEqual(first, second, 'two rounds of the same item are two agents');
+  assert.ok(first.startsWith('fgos-tsk-a-very-long'), 'enough head to recognise the item');
+});
+
+test('a name that already fits is untouched', () => {
+  assert.equal(normalizeAgentName('fgos-tsk-1-abc'), 'fgos-tsk-1-abc');
+});

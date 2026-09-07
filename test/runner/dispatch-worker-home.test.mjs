@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { createWorkerHome, removeWorkerHome, WorkerHomeError } from '../../src/runner/dispatch/worker-home.mjs';
+import { createWorkerHome, removeWorkerHome, redactWorkerHome, WorkerHomeError } from '../../src/runner/dispatch/worker-home.mjs';
 
 // Phase 01 group C1. Nothing here touches the operator's real HOME: a synthetic
 // source home is built per test and every read comes from that.
@@ -169,4 +169,44 @@ test('the created home contains nothing beyond what was provisioned', () => {
         'a private home is a known, small set of files -- not a copy of the operator home');
     });
   } finally { src.cleanup(); }
+});
+
+test('a home kept for forensics keeps its settings and loses its credential', () => {
+  const src = synthSourceHome();
+  try {
+    withBase((base) => {
+      const { homePath } = createWorkerHome(base, {
+        runId: 'run-kept', sourceHome: src.dir, workspacePath: WORKSPACE, repoRoot: REPO_ROOT, permissionMode: 'bypass',
+      });
+      assert.equal(redactWorkerHome(homePath), true);
+
+      // The secret is gone: one copy per failed round accumulating in a
+      // world-listable temp directory is a different thing from "the worker
+      // holds a copy while it runs".
+      assert.ok(!fs.existsSync(path.join(homePath, '.claude', '.credentials.json')));
+      // Everything a person would open the home to read is still there --
+      // that is why the home is kept at all.
+      assert.ok(fs.existsSync(path.join(homePath, '.zshrc')));
+      assert.ok(fs.existsSync(path.join(homePath, '.claude.json')));
+
+      // Idempotent: a second pass has nothing left to take.
+      assert.equal(redactWorkerHome(homePath), false);
+      assert.equal(removeWorkerHome(homePath), true);
+    });
+  } finally { src.cleanup(); }
+});
+
+test('redact refuses a directory this module did not create', () => {
+  withBase((base) => {
+    const stranger = path.join(base, 'not-ours');
+    fs.mkdirSync(path.join(stranger, '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(stranger, '.claude', '.credentials.json'), 'x');
+    // Teardown runs on error paths, where a wrong argument is most likely.
+    assert.throws(() => redactWorkerHome(stranger), (err) => {
+      assert.ok(err instanceof WorkerHomeError);
+      assert.equal(err.code, 'not-a-worker-home');
+      return true;
+    });
+    assert.ok(fs.existsSync(path.join(stranger, '.claude', '.credentials.json')), 'it touched nothing');
+  });
 });

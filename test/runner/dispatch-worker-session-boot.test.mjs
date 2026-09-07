@@ -96,3 +96,54 @@ test('the shared worker session has a name, so a reader can see which one it is'
   assert.equal(DEFAULT_WORKER_SESSION, 'fgos-worker');
   assert.notEqual(DEFAULT_WORKER_SESSION, 'default');
 });
+
+test('a socket file a dead server left behind is cleared, not treated as a live session', async () => {
+  // The trap this closes: the file is evidence a server once ran, never that
+  // one is running. Read as "already up" it wedges every confined dispatch
+  // from then on, each refusing with confinement-unavailable until somebody
+  // deletes the file by hand.
+  let unlinked = null;
+  let spawned = 0;
+  let listCalls = 0;
+  const run = (bin, args) => {
+    const key = args.slice(0, 2).join(' ');
+    if (key === 'pane list') {
+      listCalls += 1;
+      // The first probe is the liveness check against the stale socket.
+      if (listCalls === 1) return { status: 1, stdout: '', stderr: JSON.stringify({ error: { code: 'connection_refused', message: 'nothing there' } }) };
+      return { status: 0, stdout: JSON.stringify({ id: 'x', result: { panes: [] } }), stderr: '' };
+    }
+    if (key === 'workspace create') return { status: 0, stdout: JSON.stringify({ id: 'x', result: { root_pane: { pane_id: 'w9:p1' } } }), stderr: '' };
+    return { status: 0, stdout: JSON.stringify({ id: 'x', result: {} }), stderr: '' };
+  };
+
+  // Present at first; gone once unlinked, then written again by the server.
+  let present = true;
+  const res = await ensureWorkerSession(DEFAULT_WORKER_SESSION, baseOpts({
+    run,
+    existsSync: () => present,
+    unlinkFn: (p) => { unlinked = p; present = false; },
+    spawnFn: () => { spawned += 1; present = true; return { unref() {} }; },
+  }));
+
+  assert.match(unlinked ?? '', /fgos-worker\/herdr\.sock$/, 'the dead socket was removed');
+  assert.equal(spawned, 1, 'and a server was actually started in its place');
+  assert.equal(res.startedServer, true);
+  assert.equal(res.rootPaneId, 'w9:p1');
+});
+
+test('a socket that answers is left alone -- a live session is never restarted', async () => {
+  const herdr = fakeHerdr({ panes: ['w1:p1'] });
+  let unlinked = 0;
+  let spawned = 0;
+  const res = await ensureWorkerSession(DEFAULT_WORKER_SESSION, baseOpts({
+    run: herdr.run,
+    existsSync: () => true,
+    unlinkFn: () => { unlinked += 1; },
+    spawnFn: () => { spawned += 1; return { unref() {} }; },
+  }));
+  assert.equal(unlinked, 0);
+  assert.equal(spawned, 0);
+  assert.equal(res.startedServer, false);
+  assert.equal(res.rootPaneId, 'w1:p1');
+});

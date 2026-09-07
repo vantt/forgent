@@ -35,7 +35,7 @@ import { createHerdrClient, normalizeAgentName, isReadyState } from './herdr-age
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { evaluateLadder, paneFateFor } from './liveness.mjs';
 import { writeVisibility } from './visibility-session.mjs';
-import { createWorkerHome, removeWorkerHome } from './worker-home.mjs';
+import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
 import { seedTrust, seedCodexTrust } from './trust-store.mjs';
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 
@@ -60,6 +60,11 @@ const ERROR_CLASS_FOR_OUTCOME = Object.freeze({
 
 /** How often the receipt poll looks at the outbox. */
 const RECEIPT_POLL_MS = 500;
+/** How often the poll stamps `visibility.json` to say the driver is still
+ * here. Nothing else on disk distinguishes a run being driven from a run
+ * abandoned mid-flight -- without this a reader has to guess, and the only
+ * safe guess for a long round is the wrong one. */
+const HEARTBEAT_MS = 10000;
 /** How long the exit sequence waits for the agent process to actually leave
  * the pane before giving up and closing anyway. */
 const EXIT_DRAIN_MS = 10000;
@@ -297,10 +302,20 @@ function submitBrief({ client, round, message, promptMs }) {
 
 /** The first submission. A brief the agent cannot even be handed is a spawn
  * failure, and `agent_blocked` means something is on screen worth quoting. */
-function deliverBrief({ client, round, message, promptMs }) {
+function deliverBrief({ client, round, message, promptMs, resultPath }) {
   const err = submitBrief({ client, round, message, promptMs });
   if (!err) {
     round.note({ status: 'briefed' });
+    return;
+  }
+  // `--until working` waits for herdr to observe the turn begin. A turn that
+  // finishes faster than herdr polls would never be observed in that state,
+  // and the wait would report a timeout for a brief that in fact landed and
+  // was answered. Unverifiable without herdr's source, so it is guarded
+  // instead of assumed: the worker's own result file outranks a transport
+  // timeout, here exactly as it does everywhere else.
+  if (err.code === 'timeout' && resultPath && fs.existsSync(resultPath)) {
+    round.note({ status: 'briefed', briefTimeoutWithResultOnDisk: true });
     return;
   }
   let screen = null;
@@ -372,7 +387,18 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     return evaluateLadder({ observation: { ...observation, screen }, limits, prior });
   };
 
+  let lastBeatAt = 0;
+
   for (;;) {
+    // Say the driver is still here. A round can run for half an hour with no
+    // state change at all, and `visibility.json` not moving for that long is
+    // indistinguishable from a dispatch process that died -- which is what
+    // makes an otherwise healthy run look abandoned to anyone reading it.
+    if (Date.now() - lastBeatAt >= HEARTBEAT_MS) {
+      lastBeatAt = Date.now();
+      round.note({});
+    }
+
     if (!ackSeen && fs.existsSync(paths.ackPath)) {
       ackSeen = true;
       lastProgressAt = Date.now();
@@ -509,11 +535,9 @@ async function settleRound({ client, round, paths, exitCommand, promptMs, readLi
  * a worker; open a step to see why it happens that way.
  */
 export async function runHerdrRound(ctx) {
-  const {
-    herdrBin, fullEnv, confinement, permissionMode, repoRoot,
-    agentKind, agentArgs, prompt, delivery, exitCommand, trustStore,
-    paneEnv, cwd, usageLimitPatterns, closeAlways, workId, tier, model,
-  } = ctx;
+  // Only what setting a round up needs; everything the round itself reads is
+  // unpacked in `driveRound`.
+  const { herdrBin, fullEnv, confinement, permissionMode, repoRoot, prompt, cwd, workId, tier, model } = ctx;
 
   const roundNumber = 1;
   const deadlines = groupDeadlines(ctx);
@@ -529,6 +553,33 @@ export async function runHerdrRound(ctx) {
   const { workerHomePath, sessionEnv } = await establishConfinement({
     confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin,
   });
+
+  // From here on the home exists, so every way out of this function that is
+  // not a settled round has to take the credential back out of it. The home
+  // itself is kept -- a failed round's settings and rc are worth reading --
+  // but the credential is a copy of the operator's own, and one left behind
+  // per failed round is an accumulating secret, not a diagnostic.
+  try {
+    return await driveRound({
+      ctx, round, paths, runDir, briefText, roundNumber, deadlines,
+      sessionEnv, workerHomePath,
+    });
+  } catch (err) {
+    if (workerHomePath) {
+      try { redactWorkerHome(workerHomePath); } catch { /* nothing further to do about a home we cannot read */ }
+    }
+    throw err;
+  }
+}
+
+/** The round proper, once its home and session exist. Split from
+ * `runHerdrRound` only so the credential teardown above wraps every exit
+ * from it -- not as a second seam. */
+async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, deadlines, sessionEnv, workerHomePath }) {
+  const {
+    herdrBin, fullEnv, repoRoot, agentKind, agentArgs, delivery, exitCommand,
+    trustStore, paneEnv, cwd, usageLimitPatterns, closeAlways, workId, tier, model,
+  } = ctx;
 
   const client = createHerdrClient({ herdrBin, cwd, env: sessionEnv });
   // A confined worker's pane gets the private HOME; herdr honours `--env` for
@@ -554,10 +605,10 @@ export async function runHerdrRound(ctx) {
   // One line so a person watching the runner's own stderr can find the pane to
   // watch and the directory this round's files will appear in. Diagnostic
   // only -- nothing reads it back.
-  process.stderr.write(`fgos: herdr-spawn work=${workId} pane=${round.paneId} agent=${agentName} runDir=${runDir}\n`);
+  process.stderr.write(`fgos: herdr-spawn work=${workId} pane=${round.paneId} agent=${round.agentName} runDir=${runDir}\n`);
 
   const message = briefMessage({ delivery, briefText, runDir, roundNumber });
-  deliverBrief({ client, round, message, promptMs: deadlines.startup.promptMs });
+  deliverBrief({ client, round, message, promptMs: deadlines.startup.promptMs, resultPath: paths.resultPath });
 
   const readLiveness = livenessProbe(client, round.paneId);
   const decision = await pollForOutcome({

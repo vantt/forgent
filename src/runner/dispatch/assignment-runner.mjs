@@ -15,6 +15,12 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
+
+// Shared with reconciliation, which must never disagree with this collector
+// about which file is the worker's claim. Re-exported because callers and
+// tests have always taken it from here.
+export { resolveWorkerArtifactPath };
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import {
@@ -138,43 +144,6 @@ export function isSubstantiveEvidenceRef(ref, opts = {}) {
   return !/^[a-z0-9_-]+$/i.test(trimmed) || trimmed.includes('/') || trimmed.includes('.');
 }
 
-/**
- * Where the worker's own claim and report actually are.
- *
- * Two dispatch contracts write the same two artifacts under different names.
- * A worker launched through `cli-spawn` is told by the assignment prompt to
- * write `agent-result.json` and `agent-report.md` flat in the run directory.
- * A worker launched through `herdr-spawn` is told by its brief to write
- * `outbox/result-<round>.json` and `outbox/report-<round>.md`, because the
- * outbox is the one directory an interactive worker is allowed to write in at
- * all.
- *
- * They are the same artifact under two names, so this reads both and prefers
- * the outbox: it is the newer contract, and it is the only one an interactive
- * worker was ever told about. Without it, an interactive round that settled
- * correctly had its structured claim silently discarded, and classification
- * fell back to inferring from git -- the worker's own account of its work
- * thrown away because it landed under the name it had been asked to use.
- *
- * The highest round wins when several are present: a later round supersedes an
- * earlier one, and a resumed Run must never be classified on a stale claim.
- */
-export function resolveWorkerArtifactPath(runDir, roundPattern, legacyName) {
-  const outbox = path.join(runDir, 'outbox');
-  let entries = [];
-  try {
-    entries = fs.readdirSync(outbox);
-  } catch {
-    entries = [];
-  }
-  const rounds = entries
-    .map((name) => ({ name, round: Number((name.match(roundPattern) ?? [])[1]) }))
-    .filter((e) => Number.isFinite(e.round))
-    .sort((a, b) => a.round - b.round);
-  const latest = rounds[rounds.length - 1];
-  if (latest) return path.join(outbox, latest.name);
-  return path.join(runDir, legacyName);
-}
 
 /**
  * Read git HEAD sha safely without emitting error noise on non-git directories.

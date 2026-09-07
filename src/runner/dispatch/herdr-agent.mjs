@@ -33,14 +33,23 @@ export class HerdrError extends Error {
 
 /** herdr rejects an agent name it cannot use as a target -- uppercase was
  * rejected outright in live probing. Normalize rather than fail late inside a
- * pane that is already open. */
-export function normalizeAgentName(raw) {
+ * pane that is already open.
+ *
+ * Length is trimmed from the MIDDLE, never the end. Names arrive as
+ * `fgos-<workId>-<timestamp>`, so cutting the tail off a long workId takes
+ * the timestamp with it -- and two rounds of that same item would then share
+ * one agent name in one session, where herdr addresses agents by name. */
+export function normalizeAgentName(raw, { maxLength = 48 } = {}) {
   const cleaned = String(raw ?? '')
     .toLowerCase()
     .replace(/[^a-z0-9_-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 48);
-  return cleaned || 'fgos-agent';
+    .replace(/^-+|-+$/g, '');
+  if (cleaned.length <= maxLength) return cleaned || 'fgos-agent';
+  // Keep enough of the head to recognise the item and all of the tail that
+  // makes it unique.
+  const tail = Math.min(16, Math.floor(maxLength / 2));
+  const head = maxLength - tail;
+  return `${cleaned.slice(0, head)}${cleaned.slice(-tail)}`;
 }
 
 function defaultRun(bin, args, { cwd, env, timeoutMs }) {

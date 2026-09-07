@@ -162,6 +162,7 @@
     "src/runner/dispatch/dispatch-error.mjs": "infra",
     "src/runner/dispatch/herdr-agent.mjs": "infra",
     "src/runner/dispatch/herdr-round.mjs": "infra",
+    "src/runner/dispatch/worker-artifacts.mjs": "infra",
     "src/runner/dispatch/liveness.mjs": "infra",
     "src/runner/dispatch/visibility-session.mjs": "infra",
     "src/runner/dispatch/trust-store.mjs": "infra",

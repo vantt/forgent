@@ -29,6 +29,19 @@ export const DEFAULT_WORKER_SESSION = 'fgos-worker';
 
 const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
+
+/** Is anything actually listening on this socket? Asked with the cheapest
+ * call herdr answers, and a failure is read as "no" -- the point is to
+ * distinguish a live server from the file a dead one left behind. */
+function answersOn(socketPath, { herdrBin, cwd, env, run }) {
+  try {
+    createHerdrClient({ herdrBin, cwd, env, ...(run ? { run } : {}) }).paneList();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Ensure `sessionName` is running and has at least one pane, and return the
  * environment that addresses it.
@@ -51,6 +64,7 @@ export async function ensureWorkerSession(sessionName = DEFAULT_WORKER_SESSION, 
   // without a herdr install and without a terminal.
   run,
   sleepFn = sleep,
+  unlinkFn = fs.unlinkSync,
   timeoutMs = 30000,
   pollMs = 500,
 } = {}) {
@@ -61,8 +75,20 @@ export async function ensureWorkerSession(sessionName = DEFAULT_WORKER_SESSION, 
   const socketPath = socketPathForSession(sessionName, { home: operatorHome });
   const env = isolatedSessionEnv(callerEnv, sessionName, { home: operatorHome });
 
+  // A server that died without unlinking leaves its socket file behind. Read
+  // as "already up", that file wedges every confined dispatch from then on:
+  // nothing listens, the workspace call fails, and each round refuses with
+  // `confinement-unavailable` until a person deletes the file by hand. The
+  // file is evidence a server once ran, never that one is running -- so a
+  // socket nobody answers is removed and started again.
+  let socketPresent = existsSync(socketPath);
+  if (socketPresent && !answersOn(socketPath, { herdrBin, cwd, env, run })) {
+    try { unlinkFn(socketPath); } catch { /* a socket we cannot remove is reported by the wait below */ }
+    socketPresent = existsSync(socketPath);
+  }
+
   let startedServer = false;
-  if (!existsSync(socketPath)) {
+  if (!socketPresent) {
     // Detached on purpose: the session has to outlive this dispatch, or the
     // next one pays the startup cost again and any pane kept for forensics
     // dies with the process that was reading it.

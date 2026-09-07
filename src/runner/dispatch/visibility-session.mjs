@@ -24,6 +24,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { findWorkerClaim } from './worker-artifacts.mjs';
 
 export class VisibilityError extends Error {
   constructor(code, message, details = {}) {
@@ -54,6 +55,12 @@ export const VISIBILITY_STATES = Object.freeze([
  * and wrote a RunResult -- it says nothing about whether the work succeeded.
  * `died` and `unknown` are reachable only through reconciliation. */
 export const RUN_STATUSES = Object.freeze(['running', 'settled', 'died', 'unknown']);
+
+/** How long a driver's last heartbeat stays evidence that it is still driving.
+ * The adapter beats every 10s, so this is six missed beats -- long enough that
+ * a slow filesystem or a busy machine never costs a live run its status, short
+ * enough that a killed dispatch shows up within a minute. */
+const DRIVER_FRESH_MS = 60000;
 
 const VISIBILITY_FILE = 'visibility.json';
 const RUN_FILE = 'run.json';
@@ -161,26 +168,23 @@ export function findAgentBinding(agents, visibility) {
   return null;
 }
 
-/** Did the worker leave a result behind? Its own file first -- after a crash
- * the collector never ran, so the collector's `result.json` proves nothing
- * about the worker. */
+/**
+ * Did the worker leave a result behind?
+ *
+ * The worker's own claim first, under either name it may have been written
+ * with -- the same lookup the collector performs, so the two readers of one
+ * directory cannot disagree about whether there is a claim at all.
+ *
+ * The collector's own `result.json` is the last resort and means something
+ * weaker but still real: not that the worker reported, but that the collector
+ * ran to completion, which it only does once the round has ended. That is
+ * enough to call the run settled; it is not enough to call the work done, and
+ * nothing here claims it is.
+ */
 export function findWorkerResult(runDir) {
   const dir = path.resolve(runDir);
-  const outbox = path.join(dir, 'outbox');
-  if (fs.existsSync(outbox)) {
-    let entries = [];
-    try { entries = fs.readdirSync(outbox); } catch { entries = []; }
-    // Numeric, not lexicographic: sorted as text "result-9" beats "result-11",
-    // which would reconcile a resumed Run on an older round's result. The
-    // collector orders the same files the same way; two readers of one
-    // directory must not disagree about which round is latest.
-    const hit = entries
-      .map((name) => ({ name, round: Number((name.match(/^result-(\d+)\.json$/) ?? [])[1]) }))
-      .filter((e) => Number.isFinite(e.round))
-      .sort((a, b) => a.round - b.round)
-      .pop();
-    if (hit) return path.join(outbox, hit.name);
-  }
+  const claim = findWorkerClaim(dir);
+  if (claim) return claim;
   const collected = path.join(dir, 'result.json');
   return fs.existsSync(collected) ? collected : null;
 }
@@ -228,9 +232,10 @@ export function classifyRunOutcome(runDir, { liveness = 'unknown' } = {}) {
 /** Every run under `fgosDir` still claiming to be running. Both layouts are
  * scanned: assignment runs, and the flat dispatch-runs a runner dispatch
  * writes when it has no Assignment of its own. */
-export function findRunningRuns(fgosDir) {
+export function findRunningRuns(fgosDir, { driverFreshMs = DRIVER_FRESH_MS, now = Date.now } = {}) {
   const roots = [path.join(fgosDir, 'assignments'), path.join(fgosDir, 'dispatch-runs')];
   const found = [];
+  const at = now();
   const listDirs = (d) => {
     try {
       return fs.readdirSync(d, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
@@ -247,7 +252,15 @@ export function findRunningRuns(fgosDir) {
         for (const leaf of listDirs(base)) {
           const dir = path.join(base, leaf);
           const meta = readJson(path.join(dir, RUN_FILE));
-          if (meta && meta.status === 'running') found.push({ runDir: dir, runId: meta.runId ?? null, startedAt: meta.startedAt ?? null });
+          if (!meta || meta.status !== 'running') continue;
+          // A run whose driver checked in moments ago is not orphaned, it is
+          // busy. Reading it as orphaned and writing `unknown` over it would
+          // stop every watcher on a run that is still being driven -- and a
+          // long round can go half an hour with nothing else to say.
+          const seen = readJson(path.join(dir, VISIBILITY_FILE))?.lastSeenAt;
+          const seenAt = seen ? Date.parse(seen) : NaN;
+          if (Number.isFinite(seenAt) && at - seenAt < driverFreshMs) continue;
+          found.push({ runDir: dir, runId: meta.runId ?? null, startedAt: meta.startedAt ?? null, lastSeenAt: seen ?? null });
         }
       }
     }

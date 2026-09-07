@@ -27,23 +27,96 @@ function makeRepo({ runId = 'run_1', status = 'running', outbox = [], log = null
 const cleanup = (root) => fs.rmSync(root, { recursive: true, force: true });
 
 // The guarantee that matters most for an observe door is not that it behaves,
-// but that it CANNOT misbehave. Both modules are checked for any route to a
-// write into somebody else's pane, including through what they import.
+// but that it CANNOT misbehave. Grepping the two verb files for forbidden
+// words was not that guarantee: it stopped at the file boundary, so a verb
+// that imported a writer and called it stayed green. What follows walks the
+// import graph and asks what NAMES are actually in scope along it.
 
-test('neither observe module can reach a pane -- no client, no adapter, no send', () => {
-  const forbidden = [
-    /agent\s+prompt/, /send-keys/, /send-text/, /pane\s+run/,
-    /createHerdrClient/, /herdr-agent\.mjs/, /transport\.mjs/, /execFileSync/, /\bspawn\b/,
-  ];
-  for (const file of ['src/verbs/dispatch/show-run.mjs', 'src/verbs/dispatch/watch.mjs']) {
-    const src = fs.readFileSync(path.join(REPO, file), 'utf8');
-    // Strip comments: the header explains what these doors must never do, and
-    // naming a thing in prose is not a code path to it.
+/** Every relative module the given entry points can reach, with the set of
+ * names each import binds. Bare specifiers ('node:fs', packages) are recorded
+ * as-is: reaching `node:child_process` anywhere on this path would matter as
+ * much as binding a writer. */
+function importClosure(entryFiles) {
+  const modules = new Map();
+  const bindings = new Set();
+  const bareSpecifiers = new Set();
+  const namespaceImports = [];
+  const queue = entryFiles.map((f) => path.resolve(REPO, f));
+
+  while (queue.length > 0) {
+    const file = queue.pop();
+    if (modules.has(file)) continue;
+    const src = fs.readFileSync(file, 'utf8');
+    modules.set(file, src);
     const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-    for (const pattern of forbidden) {
-      assert.doesNotMatch(code, pattern, `${file} must not be able to reach ${pattern}`);
+
+    for (const m of code.matchAll(/^import\s+([^;]*?)\s*from\s*['"]([^'"]+)['"]/gm)) {
+      const clause = m[1].trim();
+      const specifier = m[2];
+
+      if (/^\*\s+as\s+/.test(clause)) namespaceImports.push(`${file} -> ${specifier}`);
+      const named = clause.match(/\{([^}]*)\}/);
+      if (named) {
+        for (const part of named[1].split(',')) {
+          const name = part.trim().split(/\s+as\s+/)[0].trim();
+          if (name) bindings.add(name);
+        }
+      }
+
+      if (specifier.startsWith('.')) {
+        queue.push(path.resolve(path.dirname(file), specifier));
+      } else {
+        bareSpecifiers.add(specifier);
+      }
     }
   }
+  return { modules, bindings, bareSpecifiers, namespaceImports };
+}
+
+test('no observe door binds a name that could write, anywhere on its import path', () => {
+  const closure = importClosure(['src/verbs/dispatch/show-run.mjs', 'src/verbs/dispatch/watch.mjs']);
+
+  // Writers of the very files an observer reads. Observing and contacting are
+  // separate capabilities and this door grants only the first, so none of
+  // these may be in scope on any module it can reach.
+  const writers = [
+    'writeVisibility', 'markDetached', 'markRunSettled', 'reconcileRun',
+    'createHerdrClient', 'EXECUTOR_ADAPTERS', 'runHerdrRound', 'spawnWorker',
+  ];
+  for (const name of writers) {
+    assert.ok(!closure.bindings.has(name),
+      `an observe door reaches ${name}; observing must not be able to change what it watches`);
+  }
+
+  // No route to herdr, at any depth. This is the one that matters: contacting
+  // a worker means going through a herdr client or a dispatch adapter, and
+  // neither may be reachable from a door that only observes.
+  const contactRoutes = ['herdr-agent.mjs', 'herdr-round.mjs', 'transport.mjs', 'dispatch/cli.mjs'];
+  for (const file of closure.modules.keys()) {
+    for (const route of contactRoutes) {
+      assert.ok(!file.endsWith(route), `an observe door reaches ${route}`);
+    }
+  }
+
+  // `node:child_process` is checked on the verb files THEMSELVES rather than
+  // across the whole closure. Deeper in, `runner/paths.mjs` shells out to
+  // `git rev-parse` -- read-only plumbing that answers "where is the repo",
+  // not a way to reach a pane -- and failing on that would be asserting the
+  // wrong thing. A contact would be written in the verb, so that is where the
+  // absence has to hold.
+  for (const file of ['src/verbs/dispatch/show-run.mjs', 'src/verbs/dispatch/watch.mjs']) {
+    const src = fs.readFileSync(path.join(REPO, file), 'utf8');
+    assert.doesNotMatch(src, /from\s*['"]node:child_process['"]/, `${file} imports node:child_process`);
+  }
+
+  // A namespace import would hand a module every export including the writers
+  // above, which is exactly what the binding check cannot see through.
+  assert.deepEqual(closure.namespaceImports, [],
+    'a namespace import on this path would bind every export, writers included');
+
+  // The walk has to have actually walked, or this test proves nothing.
+  assert.ok(closure.modules.size >= 4, `expected a real import closure, saw ${closure.modules.size} modules`);
+  assert.ok(closure.bindings.has('readVisibility'), 'the reader the verbs do use was seen');
 });
 
 test('show-run finds a run by its id and reports what is on disk', () => {

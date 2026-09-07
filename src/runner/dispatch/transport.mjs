@@ -1,5 +1,14 @@
 // dispatch/transport.mjs — adapters, spawn, attestation, tee (D7,
-// tsk-2uf-1): the `DispatchError` type, worktree-dispatch attestation
+// tsk-2uf-1).
+//
+// WHERE THE HERDR PATH LIVES: not here. `EXECUTOR_ADAPTERS` is registered at
+// the bottom of this file, so a reader looking for the interactive dispatch
+// mechanism lands here first and finds only the forty lines that unpack an
+// invocation. The round itself -- pane, agent, brief, receipt, exit -- is
+// `herdr-round.mjs`. This file unpacks config and hands it over; that file
+// runs the worker.
+//
+// What IS here: the worktree-dispatch attestation
 // (`captureDispatchAttestation`), `resolveExecutorCommand` (the
 // prompt/model → argv substitution + cross-provider gate), live per-chunk
 // teeing (`teeChunk`), and the C9 v2 executor-adapter port
