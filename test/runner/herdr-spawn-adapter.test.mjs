@@ -689,3 +689,25 @@ test('a run directory that already holds this round\'s result is refused, not se
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
+
+
+test('the round and the adapters that call it never import each other', () => {
+  // `DispatchError` lives in its own module for exactly one reason: both
+  // sides raise it and neither may own it. Should a later edit reach across
+  // -- the round importing `transport.mjs` for a helper, or transport
+  // importing a step back out of the round -- the pair becomes circular and
+  // the split stops meaning anything. Cheaper to assert than to debug.
+  const roundSrc = fs.readFileSync(
+    path.resolve(import.meta.dirname, '../../src/runner/dispatch/herdr-round.mjs'), 'utf8');
+  assert.ok(!/from '\.\/transport\.mjs'/.test(roundSrc),
+    'herdr-round.mjs must not import transport.mjs');
+  assert.match(roundSrc, /from '\.\/dispatch-error\.mjs'/,
+    'it takes DispatchError from the module that owns it');
+
+  const transportSrc = fs.readFileSync(
+    path.resolve(import.meta.dirname, '../../src/runner/dispatch/transport.mjs'), 'utf8');
+  assert.ok(!/function runHerdrRound/.test(transportSrc),
+    'the round itself must not drift back into transport.mjs');
+  // Callers have always taken DispatchError from transport; that stays true.
+  assert.ok(new DispatchError('worker-timeout', 'x') instanceof Error);
+});
