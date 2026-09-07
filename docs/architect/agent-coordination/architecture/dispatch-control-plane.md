@@ -23,10 +23,20 @@ Assignment
   -> executor/target resolution
   -> governance and egress checks
   -> mechanism/adapter selection
+  -> execution capability set
   -> Run creation and launch
   -> settlement/result collection
   -> RunResult normalization
 ```
+
+`execution capability set` is a declared step, not a derived one. A mechanism
+having been selected does not tell the Run what that mechanism can and cannot
+do, so an executor declares it: how the prompt reaches the worker, what
+permission posture it runs under and what confinement that posture requires,
+what counts as a receipt, and whether the mechanism can be observed or
+contacted at all. A capability the mechanism does not have is refused by name
+rather than silently degraded, and a capability reachable in one execution
+mode but not the other has to say so (ADR-010 §3).
 
 ## Governance
 

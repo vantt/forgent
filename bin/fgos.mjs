@@ -75,6 +75,8 @@ import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
 import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
 import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
 import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
+import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
+import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -3113,6 +3115,29 @@ async function runVerb(verb, flags, positional, dir) {
     // src/verbs/coordination/{run,show}.mjs, which call ONLY through the
     // existing, hardened session-engine.mjs exports (P00-P06) -- this
     // adapter never touches session/Assignment/Run state directly.
+    // Observe only. Both use cases read files and nothing else -- neither
+    // imports a herdr client or a dispatch adapter, so there is no path from
+    // this case to sending anything into a pane.
+    case 'dispatch': {
+      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|watch> <runId>');
+      const repoRootForDispatch = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
+      const runId = requireField(positional[1] ?? flags['run-id'], `dispatch ${sub} requires a runId: fgos dispatch ${sub} <runId>`);
+      if (sub === 'show-run') {
+        return showRunUseCase({ cwd: repoRootForDispatch, repoRoot: repoRootForDispatch }, { runId });
+      }
+      if (sub === 'watch') {
+        return await watchRunUseCase(
+          { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch },
+          {
+            runId,
+            ...(flags.interval !== undefined ? { intervalMs: Number(flags.interval) } : {}),
+            ...(flags.ticks !== undefined ? { maxTicks: Number(flags.ticks) } : {}),
+          },
+        );
+      }
+      throw new Error(`unknown dispatch sub-verb "${sub}": expected show-run or watch`);
+    }
+
     case 'coordination': {
       const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show|launch-master-loop> ...');
       // Same repoRoot resolution `catchup`/`merge next` already use:

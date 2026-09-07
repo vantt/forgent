@@ -3361,10 +3361,125 @@ export function checkExecutorConfinement(runnerCfg = {}) {
   };
 }
 
+/** herdr's own list of agent kinds it can start, read from the command that
+ * enforces it rather than copied into this repo where it would go stale in
+ * silence. Returns null when herdr cannot be asked -- absence is already
+ * `herdr-available`'s business, and reporting it twice helps nobody. */
+export function readHerdrAgentKinds(run = defaultHerdrRun) {
+  const help = run(['agent', 'start', '--help']);
+  if (help === null) return null;
+  const match = help.match(/\[possible values:\s*([^\]]+)\]/);
+  if (!match) return null;
+  return match[1].split(',').map((s) => s.trim()).filter(Boolean);
+}
+
+/** herdr's per-agent integration hook status, as `name -> 'current' |
+ * 'outdated' | 'not installed'`. */
+export function readHerdrIntegrationStatus(run = defaultHerdrRun) {
+  const out = run(['integration', 'status']);
+  if (out === null) return null;
+  const status = {};
+  for (const line of out.split('\n')) {
+    const m = line.match(/^\s*([a-z0-9-]+):\s*(current|outdated|not installed)\b/i);
+    if (m) status[m[1]] = m[2].toLowerCase();
+  }
+  return status;
+}
+
+function defaultHerdrRun(args) {
+  try {
+    return execFileSync('herdr', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 10000 });
+  } catch {
+    return null;
+  }
+}
+
+/** herdr calls the Antigravity CLI `agy` when starting an agent but
+ * `antigravity-cli` when installing its integration hook. Same tool, two
+ * spellings, so a check that reads both surfaces has to bridge them. */
+const HERDR_KIND_TO_INTEGRATION = Object.freeze({ agy: 'antigravity-cli' });
+
+/**
+ * Every executor dispatched through a herdr pane must name an agent kind
+ * herdr can actually start, and that kind's integration hook must not be a
+ * stale version.
+ *
+ * An `outdated` hook fails: it is installed, so herdr reads agent state
+ * through it, and it is the wrong version, so what it reports may be wrong.
+ * `not installed` only warns -- herdr falls back to its own detection, and
+ * since nothing in this dispatch path concludes completion from agent state
+ * any more, a missing hook costs latency and precision rather than
+ * correctness.
+ */
+export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
+  // Presence, not truthiness: a caller passing `kinds: null` is saying "herdr
+  // could not be asked", which is a different statement from not passing it
+  // at all, and `??` cannot tell those two apart.
+  const hasKinds = Object.prototype.hasOwnProperty.call(injected, 'kinds');
+  const hasIntegrations = Object.prototype.hasOwnProperty.call(injected, 'integrations');
+  const executors = Object.entries(runnerCfg.executors ?? {});
+  const herdrExecutors = [];
+  for (const [id, executor] of executors) {
+    const invocation = (executor?.invocations ?? []).find((i) => i.via === 'cli') ?? executor ?? {};
+    if (invocation.adapter !== 'herdr-spawn') continue;
+    const declared = invocation.interactiveMode?.kind;
+    const command = invocation.command;
+    herdrExecutors.push({ id, kind: declared ?? (command ? path.basename(command) : null) });
+  }
+  if (herdrExecutors.length === 0) {
+    return { passed: true, message: 'no executor dispatches through a herdr pane' };
+  }
+
+  const supported = hasKinds ? injected.kinds : readHerdrAgentKinds();
+  if (!supported) {
+    return { passed: true, message: 'herdr could not be asked which agent kinds it supports; kinds not evaluated' };
+  }
+
+  const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));
+  if (unknown.length > 0) {
+    return {
+      passed: false,
+      message: `executors name an agent kind herdr cannot start: ${unknown.map((e) => `${e.id} (${e.kind ?? 'none declared'})`).join('; ')}. herdr supports: ${supported.join(', ')}`,
+    };
+  }
+
+  const status = hasIntegrations ? injected.integrations : readHerdrIntegrationStatus();
+  const notes = [];
+  const stale = [];
+  for (const e of herdrExecutors) {
+    const name = HERDR_KIND_TO_INTEGRATION[e.kind] ?? e.kind;
+    const state = status?.[name];
+    if (state === 'outdated') stale.push(`${e.id} (kind ${e.kind}, hook ${name})`);
+    else if (state === 'not installed') notes.push(`${e.id}: no ${name} integration hook installed`);
+  }
+  if (stale.length > 0) {
+    return {
+      passed: false,
+      message: `executors depend on an outdated herdr integration hook, so the agent state it reports may be wrong: ${stale.join('; ')}. Run: herdr integration install <name>`,
+    };
+  }
+  return {
+    passed: true,
+    message: `every herdr executor names a supported kind${notes.length > 0 ? ` (${notes.join('; ')})` : ''}`,
+  };
+}
+
 registerCheck({
   id: 'herdr-available',
   description: 'herdr resolves on PATH and reports a version -- the transport every interactive dispatch mechanism needs',
   check: () => checkHerdrAvailable(),
+});
+
+registerCheck({
+  id: 'herdr-executor-kinds',
+  description: 'every executor dispatched through a herdr pane names an agent kind herdr can start, and none depends on an outdated herdr integration hook',
+  check: (cwd) => {
+    try {
+      return checkHerdrExecutorKinds(loadRunnerConfigFromDir(cwd));
+    } catch (err) {
+      return { passed: true, message: `runner config not loadable here, herdr executor kinds not evaluated: ${err.message}` };
+    }
+  },
 });
 
 registerCheck({

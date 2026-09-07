@@ -773,6 +773,36 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'dispatch',
+    invoke: 'fgos dispatch <show-run|watch> <runId>',
+    description: 'Read-only observation of a dispatch Run. "show-run" reads that run\'s run.json, its visibility.json binding (pane, agent session, which process is driving it, when it was last seen) and the names/sizes/times of whatever the worker has written to its outbox, once. "watch" polls the same reading until the run stops, the tick budget runs out, or the watcher is interrupted, adding a short tail of the run log. Both are read-only by construction rather than by promise: neither module imports a herdr client or a dispatch adapter, so there is no code path from either to "agent prompt", "send-text" or "send-keys". Observing and contacting are separate capabilities and this door grants only the first -- any number of people may watch a run while exactly one process drives it, and a watcher needs no permission from that driver because it holds no lease and changes nothing.',
+    parameters: {
+      type: 'object',
+      properties: {
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'watch'] },
+        'run-id': { type: 'string', description: 'The runId to read (positional or --run-id).' },
+        interval: { type: 'string', description: '"watch" only: milliseconds between readings (default 1000).' },
+        ticks: { type: 'string', description: '"watch" only: stop after this many readings; omitted, watch until the run stops.' },
+        json: { type: 'boolean', description: 'Accepted as a no-op -- the envelope is always JSON.' },
+      },
+      positional: ['sub', 'run-id'],
+      required: ['sub'],
+    },
+    examples: [
+      'fgos dispatch show-run run_abc123',
+      'fgos dispatch watch run_abc123',
+      'fgos dispatch watch run_abc123 --interval 2000 --ticks 30',
+    ],
+    touchesState: false,
+    // Reads run directories and writes nothing, so per the registry's own
+    // rule it has no business requiring .fgos/ to pre-exist either -- a run
+    // that is not there is reported as not found, not as a broken install.
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'rebuild',
     invoke: 'fgos rebuild',
     description: 'Rebuild the derived view (.fgos/state.json) from the event log.',
