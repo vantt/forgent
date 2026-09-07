@@ -91,9 +91,10 @@ existing doors only:
   skill's own steps 1-5 for the exact request shape, the `actors[]`
   per-role override shape, and why the gate cannot be bypassed; this
   file does not restate them. **Before naming any executor in an
-  `actors[]` override, read the WARNING at the top of Executor Roster,
-  below** — the three proven-safe pairs are not yet registered for this
-  door, and naming one anyway does not fail loudly.
+  `actors[]` override, read the note at the top of Executor Roster,
+  below** — the three proven-safe pairs are registered for this door
+  (`tsk-1o4`, closed by P05.2), but a genuinely unregistered name still
+  does not fail loudly.
 - **Replay/status:** `fgos coordination show <coordinationId> --json`,
   unmodified.
 - **Human-turn recording:** the `human-turn` request-step type
@@ -166,35 +167,36 @@ picture of what V1 bounds.
 
 ## Executor Roster, With Cognitive Rationale
 
-> **WARNING — verify before dispatching, every session, not just once.**
-> None of `claude-bwrap`, `agy-bwrap`, or `codex-readonly` is registered
-> in this repository's live dispatch config today. Confirmed live:
-> `node src/runner/dispatch.mjs decide claude-bwrap --has-live-task-access`
-> (and the other two) all return `{"mechanism":"out-of-process",
-> "configured":false}`. `resolveExecutorConfig`'s own fallback
-> (`src/runner/dispatch/resolve.mjs:399`: `const executor = byExecutor ??
-> (cfg && cfg.executor)`) means naming an unregistered executor does
-> **not refuse** — it silently substitutes the **global default
-> executor**, which in this repository's own `.fgos/config.json` today is
+> **Executor registration — verified live (P05.2, `tsk-1o4` closed).**
+> `claude-bwrap`, `agy-bwrap`, and `codex-readonly` are registered in this
+> repository's `.fgos/config.json` and dispatch for real through `fgos
+> coordination run`. Reconfirm before a session if the config may have
+> changed since: `node src/runner/dispatch.mjs decide claude-bwrap
+> --has-live-task-access` (and the other two) should return
+> `{"mechanism":"out-of-process","configured":true}`. A `configured:false`
+> result means `resolveExecutorConfig`'s fallback
+> (`src/runner/dispatch/resolve.mjs:399`) is silently substituting the
+> **global default executor** instead — in this repository that is
 > `claude -p {prompt} --model {model} --permission-mode acceptEdits
-> --allowedTools Bash(git add:*),Bash(git commit:*),...` — a mutating,
+> --allowedTools Bash(git add:*),Bash(git commit:*),...`, a mutating,
 > git-write-enabled invocation, the exact shape P00.1 spent its whole
-> cell falsifying and excluding (`claude-reviewer`). Forwarding this
-> roster through `fgos coordination run`/`fgos-group-thinking`'s gate
-> as-is today would run all 9 advisory roles on one unconfined,
-> git-write-capable provider, silently, with no error anywhere.
+> cell falsifying and excluding (`claude-reviewer`); do not forward the
+> roster through `fgos coordination run` while that is the answer.
 >
-> **Do not assume this roster is dispatchable through `fgos coordination
-> run` until `tsk-1o4` (P02.1 BL2 — register the 3 proven pairs in
-> `.fgos/config.json`) lands.** That is real infra work with its own
-> blast-radius review and is out of this skill-prose cell's own scope to
-> do. Until then, use the manual, direct-process-invocation mechanism
-> P01.2 and P01.3 actually used successfully instead: invoke `bwrap`/
-> `codex` directly as a subprocess (never through the executor-name
-> resolution above), using the proven mount recipe in the next paragraph.
-> Re-run the `decide` check above before every session — this is a
-> config-registration gap, not a permanent one, and the workaround
-> becomes unnecessary the moment it closes.
+> Two real caveats P05.2 found closing the registration, both already
+> folded into the registered config rather than left as manual
+> workarounds: `claude-bwrap`/`agy-bwrap`'s bwrap mount adds one
+> additive writable exception, this repository's own `.fgos/assignments`
+> — the coordination engine writes/reads `agent-result.json` there
+> regardless of the target project's own `--cwd`, so a fully read-only
+> mount left every dispatch stuck at "no-evidence" even with a correct
+> agent-side result; and `codex-readonly`'s `-s read-only` has no
+> writable-exception mechanism and bwrap-wrapping it crashes it (`os
+> error 30`), so it stays usable for pure read-only advisory roles (its
+> intended use here) but cannot serve a role whose `expectedOutputs`
+> requires a written result file. See "Known Gaps" below for two further,
+> still-open gaps the same pass surfaced (`tsk-31d`, `tsk-oed`) and
+> `P05.2.md` for full evidence.
 
 Every role below is bound to one of the proven-safe allowlist pairs
 ([P00.1](../../../docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md)):
@@ -845,12 +847,25 @@ never invent a new filename mid-session.
 
 ## Known Gaps
 
-- **`tsk-1o4`** (P02.1 BL2) — none of `claude-bwrap`/`agy-bwrap`/
-  `codex-readonly` is registered in `.fgos/config.json` today; naming
-  any of them to `fgos coordination run` silently falls back to the
-  unconfined global default executor instead of refusing. See the
-  WARNING at the top of Executor Roster for the verified mechanism and
-  the required manual-dispatch workaround until this lands.
+- **`tsk-1o4`** (P02.1 BL2) — **closed by P05.2.** `claude-bwrap`,
+  `agy-bwrap`, and `codex-readonly` are registered in `.fgos/config.json`
+  and dispatch for real through `fgos coordination run`. See the
+  Executor Roster note above for the two caveats folded into that
+  registration, and `P05.2.md` for full evidence.
+- **`tsk-31d`** — `agy -p` ignores the invoking OS cwd for relative
+  paths; pass absolute paths in prompts targeting `agy-bwrap`.
+- **`tsk-1ed`** — the auto-generated dispatch prompt
+  (`renderAssignmentPrompt`) never states the required
+  `agent-result.json` schema (`status` enum, required fields); state it
+  explicitly in the objective text until this lands.
+- **`tsk-oed`** — `aggregateBounds` carries an undocumented third bound
+  (`wallTimeMs`, default 1 hour) that can permanently block a session
+  regardless of unused round/assignment budget; declare it explicitly
+  for a long session.
+- **`tsk-3yo`** — the mutation-detector cannot distinguish a real
+  confinement breach from an unrelated concurrent editor of the same
+  target repo; a `failed` assignment with an otherwise-correct
+  `agentClaim` is worth a second look before assuming a real breach.
 - **`tsk-44p`** — the request schema's charset check refuses any
   `human-turn:`/`contribution:`-prefixed ref in `authorize.grantedContextRefs`,
   `disposition.targetRef`, or `disposition.evidenceRefs`, for every

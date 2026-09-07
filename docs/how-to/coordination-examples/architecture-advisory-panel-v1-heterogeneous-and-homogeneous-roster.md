@@ -53,21 +53,22 @@ own `actors[]`, exactly as the protocol's own header comment requires
 ("concrete executor/tier/persona selection is the request's own `actors[]`
 field").
 
-**Read this before dispatching any of the above for real.** None of
-`claude-bwrap`/`agy-bwrap`/`codex-readonly` is registered in this
-repository's live `.fgos/config.json` today
+**Read this before dispatching any of the above for real.** `claude-bwrap`,
+`agy-bwrap`, and `codex-readonly` are registered in this repository's live
+`.fgos/config.json` (`tsk-1o4`, closed by P05.2)
 (`node src/runner/dispatch.mjs decide claude-bwrap --has-live-task-access`
-returns `{"mechanism":"out-of-process","configured":false}`).
-`resolveExecutorConfig`'s own fallback means naming one of these to `fgos
-coordination run` does **not** refuse — it silently substitutes the global
-default executor, an unconfined, git-write-capable invocation, with no
-error anywhere (`SKILL.md`'s own Executor Roster WARNING, and `tsk-1o4`).
-**Both real proof sessions (P01.2, P01.3) worked around this by invoking
-`bwrap`/`codex` directly as a subprocess** — never through
-`dispatch.mjs execute` with these names — using the kongming-verified mount
-order (`--tmpfs /tmp` before re-pinning `PROJECT_ROOT`/`EVIDENCE_DIR`).
-Re-run the `decide` check above before every session; this closes the
-moment `tsk-1o4` registers the three real executors, not before.
+returns `{"mechanism":"out-of-process","configured":true}`). Re-run the
+`decide` check above before a real session if the config may have changed
+since. **P01.2 and P01.3, the two earlier proof sessions, predate this
+registration and worked around its absence by invoking `bwrap`/`codex`
+directly as a subprocess** — never through `dispatch.mjs execute` with
+these names — using the kongming-verified mount order (`--tmpfs /tmp`
+before re-pinning `PROJECT_ROOT`/`EVIDENCE_DIR`); that workaround is no
+longer necessary. P05.2, the later comparative live-proof session, dispatched
+through the registered executors directly and found two further real gaps
+along the way: `tsk-31d` (`agy -p` ignores relative-path cwd — pass
+absolute paths) and `tsk-oed` (`aggregateBounds.wallTimeMs` defaults to 1
+hour and can block a long session — declare it explicitly).
 
 ## What the mechanism proves today, live (real, passing)
 
@@ -130,9 +131,9 @@ draft of this file used bare `claude` here. Confirmed against the live
 registered executor, and it resolves to `claude -p ... --permission-mode
 acceptEdits --allowedTools Bash(git add:*),Bash(git commit:*),...` — a
 real, working, git-write-capable, unconfined invocation. Naming it here
-would not fail loudly the way naming an *unregistered* executor does
-(`tsk-1o4`'s WARNING, above) — it would actually run, with edit and
-git-commit permissions, against the person's own PROJECT_ROOT, directly
+would not fail loudly the way naming a genuinely *unregistered* executor
+does (`resolveExecutorConfig`'s fallback, above) — it would actually run,
+with edit and git-commit permissions, against the person's own PROJECT_ROOT, directly
 violating `SKILL.md`'s BOUNDS #2 ("No git mutation inside PROJECT_ROOT,
 ever."). This is why the corrected roster above uses `claude-bwrap` for
 every role even in the "same provider" case: **homogeneous means "same

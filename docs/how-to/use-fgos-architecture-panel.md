@@ -250,15 +250,16 @@ with their workarounds in `SKILL.md`'s own Known Gaps section.
 ## Executor roster — never one collapsed provider
 
 `SKILL.md`'s own Executor Roster table names a specific executor, tier, and
-cognitive rationale per role, and warns loudly that the three proven-safe
-pairs (`claude-bwrap`, `agy-bwrap`, `codex-readonly`) are not yet registered
-in this repository's dispatch config (`tsk-1o4`) — naming one to `fgos
-coordination run` today silently falls back to the unconfined global default
-executor instead of refusing. Read that warning in full before dispatching
-any real session; the
+cognitive rationale per role. The three proven-safe pairs (`claude-bwrap`,
+`agy-bwrap`, `codex-readonly`) are registered in this repository's dispatch
+config (`tsk-1o4`, closed by P05.2) — naming one to `fgos coordination run`
+dispatches through the real confined pair. Read the Executor Roster note in
+`SKILL.md` in full before dispatching any real session, including the two
+caveats P05.2 found (the `.fgos/assignments` writable-exception bwrap needs
+to write `agent-result.json`, and `codex-readonly`'s lack of a writable
+exception); the
 [heterogeneous/homogeneous example](coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md)
-shows both the real `actors[]` override shape this roster resolves to and
-the manual-dispatch workaround the two real proof sessions actually used.
+shows the real `actors[]` override shape this roster resolves to.
 
 ## Related
 
