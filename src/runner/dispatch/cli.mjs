@@ -233,8 +233,30 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
 
+  // Where this dispatch's own artifacts go. Without it the adapter falls back
+  // to a private temp directory, which works but is invisible: the brief,
+  // visibility.json and the worker's outbox all land somewhere `fgos dispatch
+  // show-run`/`watch` do not look, so a run on this path could not be observed
+  // at all -- and this is the path a runner dispatch actually takes.
+  const workerRunDir = opts.fgosDir
+    ? path.join(opts.fgosDir, 'dispatch-runs', String(work?.id ?? executorId), String(Date.now()))
+    : undefined;
+  if (workerRunDir) {
+    fs.mkdirSync(workerRunDir, { recursive: true });
+    fs.writeFileSync(path.join(workerRunDir, 'run.json'), `${JSON.stringify({
+      runId: path.basename(path.dirname(workerRunDir)) + '-' + path.basename(workerRunDir),
+      workId: work?.id ?? null,
+      executorId,
+      cwd,
+      startedAt: new Date().toISOString(),
+      status: 'running',
+    }, null, 2)}\n`);
+  }
+
   return adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery }, {
     cwd,
+    repoRoot: opts.fgosDir ? path.dirname(opts.fgosDir) : undefined,
+    runDir: workerRunDir,
     timeoutMs,
     idleTimeoutMs,
     maxBuffer,
@@ -507,7 +529,7 @@ export async function executeExecutorCli(
     );
     const headBefore = captureHeadSha(cwd);
     const dirtyBefore = checkoutDirtyPaths(root, cwd);
-    const result = await adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model, runDir });
+    const result = await adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery }, { cwd, repoRoot: root, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model, runDir });
     const headAfter = captureHeadSha(cwd);
     const dirtyAfter = checkoutDirtyPaths(root, cwd);
     let lostUncommittedPaths;

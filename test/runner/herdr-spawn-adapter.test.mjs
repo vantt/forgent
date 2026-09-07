@@ -661,3 +661,31 @@ test('a worker is never placed in the operator session, whatever the config asks
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
+
+
+test('a run directory that already holds this round\'s result is refused, not settled on', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-stale-result-'));
+  const mock = createMockHerdr(tmpDir);
+  const runDir = path.join(tmpDir, 'run');
+  fs.mkdirSync(path.join(runDir, 'outbox'), { recursive: true });
+  // Somebody else's result, left behind in the same run directory.
+  fs.writeFileSync(path.join(runDir, 'outbox', 'result-1.json'), JSON.stringify({ status: 'settled', summary: 'from an earlier round' }));
+
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' }),
+    (err) => {
+      assert.equal(err.reason, 'stale-result-in-run-dir');
+      assert.equal(err.errorClass, 'invalid-config');
+      return true;
+    },
+  );
+  // The point of refusing: without it the first poll settles instantly and the
+  // exit sequence closes the pane of an agent that was just briefed and is
+  // about to start work.
+  assert.ok(
+    !mock.calls().some((c) => c[0] === 'agent' && c[1] === 'prompt' && c[3] === '/exit'),
+    'no healthy agent was told to exit',
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});

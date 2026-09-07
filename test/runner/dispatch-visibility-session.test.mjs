@@ -225,3 +225,18 @@ test('every declared visibility state is one writeVisibility will accept', () =>
     }
   } finally { cleanup(dir); }
 });
+
+
+test('the latest round is chosen by number, not by filename', () => {
+  const dir = makeRunDir();
+  try {
+    fs.mkdirSync(path.join(dir, 'outbox'), { recursive: true });
+    for (const n of [9, 11]) {
+      fs.writeFileSync(path.join(dir, 'outbox', `result-${n}.json`), JSON.stringify({ round: n }));
+    }
+    // Sorted as text, "result-9" comes after "result-11", so a lexicographic
+    // sort reconciles a resumed Run on the older round. The collector orders
+    // the same files numerically; these two read one directory and must agree.
+    assert.match(findWorkerResult(dir), /result-11\.json$/);
+  } finally { cleanup(dir); }
+});

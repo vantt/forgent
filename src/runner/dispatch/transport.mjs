@@ -671,6 +671,7 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     runDir: optsRunDir,
     paneEnv: resolvedEnv,
     cwd,
+    repoRoot: opts.repoRoot,
     timeoutMs,
     idleTimeoutMs,
     usageLimitPatterns,
@@ -750,6 +751,20 @@ async function runHerdrRound(ctx) {
     : fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-'));
   const paths = briefPaths(runDir, round);
   fs.mkdirSync(paths.outbox, { recursive: true });
+
+  // A run directory that already holds this round's result would settle on the
+  // very first poll -- before the worker just briefed has done anything -- and
+  // the exit sequence would then close the pane of a healthy agent mid-work.
+  // The ladder is right that a result file outranks everything; what it cannot
+  // know is whether the file belongs to THIS round. Refusing up front is the
+  // only place that distinction still exists.
+  if (fs.existsSync(paths.resultPath)) {
+    throw new DispatchError(
+      'invalid-config',
+      `executor for work "${workId}" refused: ${paths.resultPath} already exists before this round started, so its first poll would settle on somebody else's result and close a working agent's pane. Use a fresh run directory or a new round.`,
+      { workId, tier, model, reason: 'stale-result-in-run-dir', runDir, resultPath: paths.resultPath },
+    );
+  }
 
   const agentName = normalizeAgentName(`fgos-${workId ?? 'run'}-${Date.now().toString(36)}`);
   const briefText = renderBrief({ prompt, round, runDir, agentName });

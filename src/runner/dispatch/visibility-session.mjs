@@ -208,8 +208,16 @@ export function findWorkerResult(runDir) {
   if (fs.existsSync(outbox)) {
     let entries = [];
     try { entries = fs.readdirSync(outbox); } catch { entries = []; }
-    const hit = entries.filter((n) => /^result-\d+\.json$/.test(n)).sort().pop();
-    if (hit) return path.join(outbox, hit);
+    // Numeric, not lexicographic: sorted as text "result-9" beats "result-11",
+    // which would reconcile a resumed Run on an older round's result. The
+    // collector orders the same files the same way; two readers of one
+    // directory must not disagree about which round is latest.
+    const hit = entries
+      .map((name) => ({ name, round: Number((name.match(/^result-(\d+)\.json$/) ?? [])[1]) }))
+      .filter((e) => Number.isFinite(e.round))
+      .sort((a, b) => a.round - b.round)
+      .pop();
+    if (hit) return path.join(outbox, hit.name);
   }
   const collected = path.join(dir, 'result.json');
   return fs.existsSync(collected) ? collected : null;
