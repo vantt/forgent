@@ -43,10 +43,18 @@ export function buildDispatchResult({ mechanism, result, headBefore, headAfter, 
   const cleanStdout = stripBacktickQuoted(stdoutStr);
   const hasSignal = cleanStdout.includes('[DONE]') || cleanStdout.includes('[BLOCKED]');
   const isDone = cleanStdout.includes('[DONE]');
+  // An adapter that already knows how its round ended keeps that answer.
+  // `herdr-spawn` concludes from a file the worker wrote and reports a typed
+  // outcome (`settled`, `died`, `blocked`, `paused-limit`, ...); overwriting
+  // it with `unsignaled` would throw away the more precise fact in favour of
+  // a guess made from scanning stdout for a token. Adapters that report no
+  // outcome of their own -- `cli-spawn`, `http` -- take exactly the three
+  // rungs above, unchanged.
+  const adapterOutcome = result && typeof result.outcome === 'string' ? result.outcome : null;
   return {
     mechanism,
     ...result,
-    ...(hasSignal ? {} : { outcome: 'unsignaled', headBefore, headAfter }),
+    ...(hasSignal || adapterOutcome ? {} : { outcome: 'unsignaled', headBefore, headAfter }),
     ...(isDone && headAfter ? { verifiedSha: headAfter } : {}),
     ...(lostUncommittedPaths ? { lostUncommittedPaths } : {}),
     provider,

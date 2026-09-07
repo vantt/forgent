@@ -56,7 +56,7 @@ function createMockHerdr(tmpDir, scenario = {}) {
   const logPath = path.join(tmpDir, 'mock-log.jsonl');
   const scenarioPath = path.join(tmpDir, 'mock-scenario.json');
 
-  fs.writeFileSync(statePath, JSON.stringify({ prompts: 0, gets: 0 }));
+  fs.writeFileSync(statePath, JSON.stringify({ prompts: 0, gets: 0, exited: false }));
   fs.writeFileSync(logPath, '');
   fs.writeFileSync(scenarioPath, JSON.stringify({
     worker: 'ack-then-result',
@@ -87,7 +87,14 @@ const [group, action] = args;
 if (group === 'pane' && action === 'split') ok({ pane: { pane_id: 'mock-pane-1' } });
 if (group === 'pane' && action === 'close') ok({ closed: true });
 if (group === 'pane' && action === 'process-info') {
-  ok({ process_info: { pane_id: 'mock-pane-1', shell_pid: 100, foreground_process_group_id: 100, foreground_processes: [{ pid: 100, name: 'zsh' }] } });
+  // A real pane always lists its own shell. "The agent is there" means a
+  // foreground process that is NOT the shell -- so an agent that exited, or
+  // one the scenario says never survived, leaves the shell alone.
+  const gone = scenario.agentGone || readState().exited;
+  const foreground = gone
+    ? [{ pid: 100, name: 'zsh' }]
+    : [{ pid: 200, name: 'agy' }, { pid: 100, name: 'zsh' }];
+  ok({ process_info: { pane_id: 'mock-pane-1', shell_pid: 100, foreground_process_group_id: gone ? 100 : 200, foreground_processes: foreground } });
 }
 if (group === 'agent' && action === 'start') {
   if (scenario.startError) fail(scenario.startError, 'agent never reached a ready state');
@@ -104,7 +111,10 @@ if (group === 'agent' && action === 'prompt') {
   const text = args[3];
   // A slash command is the exit sequence, not a brief -- it neither counts as
   // a delivery attempt nor makes the worker do anything.
-  if (text.startsWith('/')) ok({ agent: { agent_status: 'idle' } });
+  if (text.startsWith('/')) {
+    writeState({ ...readState(), exited: true });
+    ok({ agent: { agent_status: 'idle' } });
+  }
 
   const state = readState();
   const attempt = state.prompts + 1;
@@ -145,7 +155,7 @@ ok({});
   };
 }
 
-function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDelivery, timeoutMs = 5000, argsTemplate } = {}) {
+function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDelivery, timeoutMs = 5000, idleTimeoutMs, argsTemplate } = {}) {
   const runDir = path.join(tmpDir, 'run');
   fs.mkdirSync(runDir, { recursive: true });
   return EXECUTOR_ADAPTERS['herdr-spawn'](
@@ -158,7 +168,7 @@ function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDeli
       promptDelivery,
       interactiveMode: { exitCommand: '/exit', resendAfterMs: 200, ...interactiveMode },
     },
-    { cwd: tmpDir, timeoutMs, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin, runDir },
+    { cwd: tmpDir, timeoutMs, idleTimeoutMs, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin, runDir },
   );
 }
 
@@ -339,8 +349,10 @@ test('a working agent is never interrupted with a second copy of its own brief',
   await assert.rejects(
     () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 1500 }),
     (err) => {
+      // A worker that stays busy past the absolute ceiling ends there, not on
+      // a staleness reading -- `working` is progress, so it never goes stale.
+      assert.equal(err.outcome, 'timed-out-ceiling');
       assert.equal(err.errorClass, 'worker-timeout');
-      assert.equal(err.reason, 'brief_never_acknowledged');
       return true;
     },
   );
@@ -385,9 +397,86 @@ test('the exit sequence asks the agent to leave, waits for the pane to be its ow
 
   const calls = mock.calls();
   const exitIdx = calls.findIndex((c) => c[0] === 'agent' && c[1] === 'prompt' && c[3] === '/exit');
-  const drainIdx = calls.findIndex((c) => c[0] === 'pane' && c[1] === 'process-info');
+  // process-info is also the liveness probe during the round, so the drain is
+  // the reading that comes AFTER the exit command, not the first one overall.
+  const drainIdx = calls.findIndex((c, i) => i > exitIdx && c[0] === 'pane' && c[1] === 'process-info');
   const closeIdx = calls.findIndex((c) => c[0] === 'pane' && c[1] === 'close');
-  assert.ok(exitIdx !== -1 && drainIdx > exitIdx && closeIdx > drainIdx, 'exit, then drain, then close');
+  assert.ok(exitIdx !== -1, 'the agent is asked to leave');
+  assert.ok(drainIdx > exitIdx, 'the pane is watched after the exit command');
+  assert.ok(closeIdx > drainIdx, 'and closed only once it is its own again');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('an agent that leaves the pane without writing a result is reported dead, and its pane is kept', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-died-'));
+  // The pane still exists and still lists its own shell -- what is gone is the
+  // agent process. A live pane is not a live agent.
+  const mock = createMockHerdr(tmpDir, { worker: 'silent', agentGone: true, statuses: ['idle'] });
+
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 20000 }),
+    (err) => {
+      assert.equal(err.outcome, 'died');
+      assert.equal(err.errorClass, 'worker-spawn-fail');
+      assert.match(err.message, /consecutive/);
+      return true;
+    },
+  );
+  assert.ok(
+    !mock.calls().some((c) => c[0] === 'pane' && c[1] === 'close'),
+    'the pane is forensics now, not rubbish',
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a stale worker whose screen names a provider limit is paused, not timed out', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-paused-'));
+  const mock = createMockHerdr(tmpDir, {
+    worker: 'silent',
+    statuses: ['idle'],
+    screen: 'Claude usage limit reached. Your limit will reset at 3pm.',
+  });
+
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 20000, idleTimeoutMs: 700 }),
+    (err) => {
+      assert.equal(err.outcome, 'paused-limit');
+      assert.match(err.screen, /usage limit/i);
+      assert.match(err.screen, /3pm/, 'the reset time survives into the error');
+      return true;
+    },
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a stale worker with an ordinary screen is an idle timeout that still quotes the screen', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-idle-'));
+  const mock = createMockHerdr(tmpDir, {
+    worker: 'silent',
+    statuses: ['idle'],
+    screen: 'waiting for you to say something',
+  });
+
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 20000, idleTimeoutMs: 700 }),
+    (err) => {
+      assert.equal(err.outcome, 'timed-out-idle');
+      assert.match(err.message, /Last line on screen: waiting for you/);
+      return true;
+    },
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a settled round reports its outcome so the confidence ladder does not overwrite it with a guess', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-outcome-'));
+  const mock = createMockHerdr(tmpDir);
+  const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
+  assert.equal(res.outcome, 'settled');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });

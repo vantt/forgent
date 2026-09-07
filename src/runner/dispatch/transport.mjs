@@ -40,6 +40,26 @@ import { RunnerConfigError } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
 import { createHerdrClient, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
+import { evaluateLadder, paneFateFor } from './liveness.mjs';
+
+/**
+ * The ladder's outcome is the precise answer; `errorClass` stays the coarse
+ * vocabulary `recovery.mjs` matches on, so the recovery matrix keeps working
+ * unchanged. A caller that wants the real reason reads `outcome`.
+ *
+ * A known seam, stated rather than hidden: `blocked` and `paused-limit` both
+ * map to `worker-timeout`, so the matrix will retry them like any other
+ * timeout even though neither is worth retrying immediately. Fixing that
+ * means giving the matrix its own entries, which belongs with Run truth, not
+ * with the adapter.
+ */
+const ERROR_CLASS_FOR_OUTCOME = Object.freeze({
+  died: 'worker-spawn-fail',
+  blocked: 'worker-timeout',
+  'timed-out-idle': 'worker-timeout',
+  'timed-out-ceiling': 'worker-timeout',
+  'paused-limit': 'worker-timeout',
+});
 
 /** Env var a spawned child reads to know its own nested-dispatch depth,
  * threaded by `cliSpawnAdapter` on every spawn (current depth + 1) — a
@@ -586,8 +606,16 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     promptTimeoutMs = DEFAULT_PROMPT_TIMEOUT_MS,
     maxResends = DEFAULT_MAX_RESENDS,
     resendAfterMs,
+    usageLimitPatterns,
   } = interactiveMode;
-  const { cwd, timeoutMs, workId, tier, model, herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir } = opts;
+  const {
+    cwd, timeoutMs, idleTimeoutMs, workId, tier, model,
+    herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir,
+    // An automated sweep may close the panes of failed rounds. It never
+    // closes one paused on a provider limit -- that screen is the only place
+    // the reset time is written.
+    closeAlways = false,
+  } = opts;
 
   const depth = currentDispatchDepth();
   if (depth >= MAX_DISPATCH_DEPTH) {
@@ -630,6 +658,9 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     paneEnv: resolvedEnv,
     cwd,
     timeoutMs,
+    idleTimeoutMs,
+    usageLimitPatterns,
+    closeAlways,
     workId,
     tier,
     model,
@@ -694,7 +725,8 @@ async function runHerdrRound(ctx) {
   const {
     client, agentKind, agentArgs, prompt, delivery, exitCommand,
     readyTimeoutMs, promptTimeoutMs, maxResends, resendAfterMs,
-    paneEnv, cwd, timeoutMs, workId, tier, model, onChunk,
+    paneEnv, cwd, timeoutMs, idleTimeoutMs, usageLimitPatterns, closeAlways,
+    workId, tier, model, onChunk,
   } = ctx;
 
   const round = 1;
@@ -707,9 +739,6 @@ async function runHerdrRound(ctx) {
   const agentName = normalizeAgentName(`fgos-${workId ?? 'run'}-${Date.now().toString(36)}`);
   const briefText = renderBrief({ prompt, round, runDir, agentName });
   fs.writeFileSync(paths.briefPath, briefText);
-
-  const deadline = timeoutMs ? Date.now() + timeoutMs : null;
-  const outOfTime = () => deadline !== null && Date.now() >= deadline;
 
   let paneId = null;
   const fail = (errorClass, reason, message, extra = {}) => new DispatchError(
@@ -767,30 +796,77 @@ async function runHerdrRound(ctx) {
       screen ? { screen } : {});
   }
 
+  // A liveness probe that FAILS reports `unknown`, never `absent`. A pane
+  // that still exists proves nothing about the agent: an idle pane always
+  // lists its own shell, so "agent present" means a foreground process that
+  // is not the shell.
+  const readLiveness = () => {
+    try {
+      const info = client.paneProcessInfo(paneId);
+      return info.foregroundProcesses.some((p) => p.pid && p.pid !== info.shellPid)
+        ? 'present'
+        : 'absent';
+    } catch {
+      return 'unknown';
+    }
+  };
+
   // Receipt, not status. The ack proves the worker read the brief; the result
   // file ends the round. A round short enough to produce the result before the
   // first poll never shows an ack, and that is not a failure.
+  const startedAt = Date.now();
   let ackSeen = false;
   let resends = 0;
-  let lastResendAt = Date.now();
+  let lastResendAt = startedAt;
+  let lastProgressAt = null;
+  let ladderPrior = { absentStreak: 0 };
+  let screen = null;
+  let decision = { outcome: null };
 
-  while (!fs.existsSync(paths.resultPath)) {
-    if (outOfTime()) {
-      throw fail('worker-timeout', ackSeen ? 'result_never_written' : 'brief_never_acknowledged',
-        `executor timed out after ${timeoutMs}ms for work "${workId}": ${ackSeen
-          ? `the worker acknowledged the brief but never wrote ${paths.resultPath}`
-          : `no acknowledgement ever appeared at ${paths.ackPath}`}. Pane ${paneId} is left open.`);
+  for (;;) {
+    const resultFilePresent = fs.existsSync(paths.resultPath);
+    if (!ackSeen && fs.existsSync(paths.ackPath)) {
+      ackSeen = true;
+      lastProgressAt = Date.now();
     }
 
-    if (!ackSeen && fs.existsSync(paths.ackPath)) ackSeen = true;
+    let agentState = 'unknown';
+    try { agentState = client.agentGet(agentName).agentStatus; } catch { agentState = 'unknown'; }
+    // `working` is a progress signal and nothing more. It never concludes a
+    // round -- only the worker's own result file does that.
+    if (agentState === 'working') lastProgressAt = Date.now();
+
+    decision = evaluateLadder({
+      observation: {
+        resultFilePresent,
+        liveness: readLiveness(),
+        agentState,
+        lastProgressAt,
+        startedAt,
+        now: Date.now(),
+        screen,
+      },
+      limits: { idleTimeoutMs, ceilingMs: timeoutMs, usageLimitPatterns },
+      prior: ladderPrior,
+    });
+    ladderPrior = decision;
+
+    // The ladder asks for the screen only once progress has stopped, and
+    // settles on the very next pass with it in hand -- so this never becomes
+    // a screen read per tick.
+    if (decision.needsScreen) {
+      try { screen = client.agentRead(agentName, { lines: 60 }); } catch { screen = ''; }
+      continue;
+    }
+    screen = null;
+
+    if (decision.outcome) break;
 
     if (!ackSeen && resends < maxResends && Date.now() - lastResendAt >= resendAfterMs) {
       // Re-send only when the agent is back at rest with still no ack. An
       // agent that is `working` has the brief and is acting on it; typing at
       // it again on a timer would interrupt the very turn being waited for.
-      let state = 'unknown';
-      try { state = client.agentGet(agentName).agentStatus; } catch { state = 'unknown'; }
-      if (isReadyState(state)) {
+      if (isReadyState(agentState)) {
         resends += 1;
         lastResendAt = Date.now();
         const retryError = deliver();
@@ -802,6 +878,28 @@ async function runHerdrRound(ctx) {
     }
 
     await sleep(RECEIPT_POLL_MS);
+  }
+
+  if (decision.outcome !== 'settled') {
+    // Any wait that gives up reads the screen on the way out, so the caller
+    // gets a line it can quote instead of the word "timeout". This costs one
+    // read on a round that has already failed, so a false positive costs
+    // nothing.
+    let screenLine = decision.screenLine;
+    if (!screenLine) {
+      try { screenLine = lastScreenLine(client.agentRead(agentName, { lines: 60 })); } catch { screenLine = null; }
+    }
+    if (paneFateFor(decision.outcome, { closeAlways }) === 'close') {
+      client.paneClose(paneId);
+    }
+    throw fail(
+      ERROR_CLASS_FOR_OUTCOME[decision.outcome] ?? 'worker-timeout',
+      decision.outcome,
+      `executor for work "${workId}" ended as ${decision.outcome}: ${decision.reason}.${
+        screenLine ? ` Last line on screen: ${screenLine}` : ''
+      }${paneFateFor(decision.outcome, { closeAlways }) === 'keep' ? ` Pane ${paneId} is left open.` : ''}`,
+      { outcome: decision.outcome, ...(screenLine ? { screen: screenLine } : {}) },
+    );
   }
 
   let stdout = '';
@@ -816,6 +914,10 @@ async function runHerdrRound(ctx) {
   // Exit sequence. The agent is asked to leave, then the pane is watched until
   // nothing but its own shell is running in the foreground -- an agent that
   // has not finished tearing down would swallow anything sent after it.
+  //
+  // Closing a pane is not cancelling a worker: measured, the foreground
+  // process dies and a `setsid` descendant survives it. Nothing below reports
+  // this round as cancelled, and nothing should.
   try {
     client.agentPrompt(agentName, exitCommand, { wait: false, timeoutMs: promptTimeoutMs });
   } catch {
@@ -825,14 +927,7 @@ async function runHerdrRound(ctx) {
 
   const drainDeadline = Date.now() + EXIT_DRAIN_MS;
   while (Date.now() < drainDeadline) {
-    let stillRunning = true;
-    try {
-      const info = client.paneProcessInfo(paneId);
-      stillRunning = info.foregroundProcesses.some((p) => p.pid && p.pid !== info.shellPid);
-    } catch {
-      stillRunning = false;
-    }
-    if (!stillRunning) break;
+    if (readLiveness() !== 'present') break;
     await sleep(250);
   }
 
@@ -852,6 +947,7 @@ async function runHerdrRound(ctx) {
     paneId,
     runDir,
     resultPath: paths.resultPath,
+    outcome: 'settled',
   };
 }
 
