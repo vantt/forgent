@@ -409,6 +409,10 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
   let resends = 0;
   let lastResendAt = startedAt;
   let lastProgressAt = null;
+  // How much of the current idle window nobody could see. Reset whenever
+  // progress happens, because that starts a new window.
+  let blindMs = 0;
+  let lastTickAt = startedAt;
   let prior = { absentStreak: 0 };
 
   /**
@@ -440,23 +444,43 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
       round.note({});
     }
 
+    const tickAt = Date.now();
+
     if (!ackSeen && fs.existsSync(paths.ackPath)) {
       ackSeen = true;
-      lastProgressAt = Date.now();
+      lastProgressAt = tickAt;
+      blindMs = 0;
       round.note({ status: 'working' });
     }
 
+    // Whether the status could be READ is tracked separately from what it
+    // said. An interval herdr could not answer in is not an interval spent
+    // watching a worker do nothing, so it is counted as blind and taken back
+    // out of the idle measurement by the ladder.
     let agentState = 'unknown';
-    try { agentState = client.agentGet(round.agentName).agentStatus; } catch { agentState = 'unknown'; }
+    let statusReadable = false;
+    try {
+      agentState = client.agentGet(round.agentName).agentStatus;
+      statusReadable = true;
+    } catch {
+      agentState = 'unknown';
+    }
+    if (!statusReadable) blindMs += tickAt - lastTickAt;
+    lastTickAt = tickAt;
+
     // `working` is a progress signal and nothing more. It never concludes a
     // round -- only the worker's own result file does that.
-    if (agentState === 'working') lastProgressAt = Date.now();
+    if (agentState === 'working') {
+      lastProgressAt = tickAt;
+      blindMs = 0;
+    }
 
     const decision = decide({
       resultFilePresent: fs.existsSync(paths.resultPath),
       liveness: readLiveness(),
       agentState,
       lastProgressAt,
+      blindMs,
       startedAt,
       now: Date.now(),
       screen: null,

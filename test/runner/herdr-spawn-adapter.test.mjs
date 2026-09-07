@@ -102,6 +102,9 @@ if (group === 'agent' && action === 'start') {
 }
 if (group === 'agent' && action === 'read') ok({ read: { text: scenario.screen ?? '' } });
 if (group === 'agent' && action === 'get') {
+  // A herdr that will not answer at all -- the outage case. The pane and the
+  // worker are both fine; only the status read is unavailable.
+  if (scenario.getError) fail(scenario.getError, 'the session is not answering');
   const state = readState();
   const status = scenario.statuses[Math.min(state.gets, scenario.statuses.length - 1)];
   writeState({ ...state, gets: state.gets + 1 });
@@ -778,6 +781,34 @@ test('a dispatch that really is in its own worktree passes the same check', asyn
       timeoutMs: 5000, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin,
     });
     assert.equal(res.outcome, 'settled');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('a herdr that stops answering does not turn a live round into an idle timeout', async () => {
+  // The scenario this closes: `agent get` fails for longer than the idle
+  // window while the worker is perfectly alive. Every failed read used to
+  // leave agentState 'unknown', which is not 'working', so the idle clock ran
+  // on evidence nobody had and ended a healthy round `timed-out-idle`.
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-blind-'));
+  const mock = createMockHerdr(tmpDir, { worker: 'silent', getError: 'connection_refused' });
+  try {
+    await assert.rejects(
+      () => dispatchThroughMock(tmpDir, mock, {
+        prompt: 'do the thing',
+        idleTimeoutMs: 400,
+        timeoutMs: 2500,
+        transportDeadlines: { maxResends: 0 },
+      }),
+      (err) => {
+        // The ceiling still bounds it -- that is an absolute limit on the
+        // round and makes no claim about the worker.
+        assert.equal(err.outcome, 'timed-out-ceiling',
+          `a blind round must end at the ceiling, not as idle; got ${err.outcome}`);
+        return true;
+      },
+    );
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

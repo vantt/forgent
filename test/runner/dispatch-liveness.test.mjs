@@ -150,3 +150,34 @@ test('matchUsageLimit returns the line itself and ignores blank noise', () => {
 test('an unknown outcome defaults to keeping the pane rather than closing it', () => {
   assert.equal(paneFateFor('something-nobody-declared'), 'keep');
 });
+
+test('an interval nobody could observe does not count towards stale', () => {
+  // Twelve seconds with a 5s idle window, but nine of them were an outage in
+  // which the agent's status could not be read at all. Three seconds of
+  // actual watching is not a stalled worker -- and calling it one would be a
+  // statement about a worker nobody looked at, which is the same mistake
+  // `unknown` liveness exists to prevent.
+  const observed = { agentState: 'idle', lastProgressAt: 1000, now: 13000 };
+  assert.equal(run(observed).needsScreen, true, 'without the blind time it reads as stale');
+  const seen = run({ ...observed, blindMs: 9000 });
+  assert.equal(seen.outcome, null, 'with it, the round is still running');
+  // `outcome: null` alone is not enough -- the ladder also returns that while
+  // asking for the screen, which is itself a step towards ending the round.
+  assert.equal(seen.needsScreen, false, 'and it is not even on the way to being called stale');
+});
+
+test('blind time only defers staleness, it does not cancel it', () => {
+  // Once the outage ends, the clock resumes rather than restarting: a worker
+  // that really has stopped is still caught, just not on evidence nobody had.
+  const r = run({ agentState: 'idle', lastProgressAt: 1000, now: 20000, blindMs: 9000, screen: 'ready' });
+  assert.equal(r.outcome, 'timed-out-idle');
+  assert.match(r.reason, /no progress for 10000ms/, 'the reported idle time excludes the blind interval');
+});
+
+test('the ceiling is not adjusted for blind time -- it bounds the round, not the worker', () => {
+  const r = run(
+    { agentState: 'idle', lastProgressAt: 1000, now: 70000, blindMs: 60000 },
+    { ...LIMITS, ceilingMs: 60000 },
+  );
+  assert.equal(r.outcome, 'timed-out-ceiling');
+});

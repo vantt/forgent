@@ -20,12 +20,19 @@
 //                  and only here can a paused-on-limit be told apart from a
 //                  genuinely idle worker.
 //
-// Two rules exist because getting them wrong kills healthy work:
+// Three rules exist because getting them wrong kills healthy work. All three
+// are the same rule: a reading that could not be taken is not evidence.
 //
 //   - A liveness read that FAILS is `unknown`, never `absent`. A gate may
 //     refuse on bad information; a decision to kill may not.
 //   - `died` requires consecutive `absent` readings, and a single `unknown`
 //     RESETS the count. absent/unknown/absent must never end a healthy run.
+//   - Time nobody could observe does not count towards `stale`. An interval
+//     in which `agent_status` could not be read is not an interval spent
+//     watching a worker do nothing, so the caller reports it as blind and it
+//     is taken back out of the idle measurement. A herdr outage longer than
+//     the idle window used to end a healthy round `timed-out-idle` -- a
+//     claim about a worker nobody looked at.
 //
 // `agent_status` appears here only as a progress hint and as the blocked
 // signal. It never concludes that work finished -- it was wrong about that
@@ -110,6 +117,8 @@ export function matchUsageLimit(screen, patterns = DEFAULT_USAGE_LIMIT_PATTERNS)
  *   liveness           'present' | 'absent' | 'unknown' (failed read -> unknown)
  *   agentState         herdr's agent_status, or 'unknown'
  *   lastProgressAt     epoch ms of the last progress signal, or null
+ *   blindMs            ms since `lastProgressAt` during which the caller
+ *                      could not read the agent's status at all
  *   startedAt          epoch ms the round began
  *   now                epoch ms
  *   screen             screen text, supplied ONLY after a previous call
@@ -130,6 +139,7 @@ export function evaluateLadder({ observation = {}, limits = {}, prior = {} } = {
     liveness = 'unknown',
     agentState = 'unknown',
     lastProgressAt = null,
+    blindMs = 0,
     startedAt = 0,
     now = Date.now(),
     screen = null,
@@ -170,9 +180,14 @@ export function evaluateLadder({ observation = {}, limits = {}, prior = {} } = {
     return settle('timed-out-ceiling', `past the absolute ceiling of ${ceilingMs}ms`);
   }
 
-  // 5. Stale. `working` is itself progress, so a busy agent is never stale.
+  // 5. Stale. `working` is itself progress, so a busy agent is never stale --
+  // and neither is one nobody could look at. `blindMs` is the part of this
+  // window in which the agent's status could not be read at all; taking it
+  // back out is what keeps a herdr outage from being reported as a worker
+  // that stopped working. The ceiling above is deliberately not adjusted:
+  // it is an absolute bound on the round, not a claim about the worker.
   const progressRef = lastProgressAt ?? startedAt;
-  const idleFor = now - progressRef;
+  const idleFor = Math.max(0, now - progressRef - blindMs);
   const stale = agentState !== 'working' && idleTimeoutMs > 0 && idleFor >= idleTimeoutMs;
   if (!stale) {
     return { outcome: null, reason: null, screenLine: null, absentStreak, needsScreen: false };
