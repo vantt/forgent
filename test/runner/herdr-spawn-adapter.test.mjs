@@ -584,3 +584,80 @@ test('re-briefing has a hard cap -- a brief that never lands twice is a broken t
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
+
+// Confinement, as the adapter actually applies it. The question these answer
+// is not "does the module work" -- that is covered elsewhere -- but "does the
+// adapter really use it, and does it refuse rather than pretend when it
+// cannot".
+
+test('an executor that declares no confinement keeps exactly the old behaviour', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-unconfined-'));
+  const mock = createMockHerdr(tmpDir);
+  const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
+
+  assert.equal(res.outcome, 'settled');
+  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
+  assert.ok(!split.some((a) => a.startsWith('HOME=')), 'no private HOME is injected when none was declared');
+  assert.ok(
+    !mock.calls().some((c) => c[0] === 'workspace'),
+    'and no worker session is bootstrapped behind the caller\'s back',
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('confinement that cannot be established is refused, never quietly downgraded', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-confine-refuse-'));
+  const mock = createMockHerdr(tmpDir);
+
+  // A private HOME is asked for against a source home with no trust and no
+  // credential to derive from. Running anyway would put a worker on the
+  // operator's own cockpit socket while the profile claims it is confined.
+  const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-nohome-'));
+  await assert.rejects(
+    () => EXECUTOR_ADAPTERS['herdr-spawn'](
+      {
+        command: 'claude', args: [], argsTemplate: [], prompt: 'x',
+        env: { HOME: fakeHome },
+        permissionMode: 'ask',
+        confinement: { privateHome: true, isolatedSession: true, ownWorktree: true },
+        interactiveMode: { exitCommand: '/exit', kind: 'claude' },
+      },
+      { cwd: tmpDir, runDir: path.join(tmpDir, 'run'), timeoutMs: 5000, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin },
+    ),
+    (err) => {
+      assert.equal(err.errorClass, 'invalid-config');
+      assert.match(err.message, /confinement was declared but could not be established/);
+      return true;
+    },
+  );
+  assert.ok(
+    !mock.calls().some((c) => c[0] === 'pane' && c[1] === 'split'),
+    'and nothing was launched before the refusal',
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+  fs.rmSync(fakeHome, { recursive: true, force: true });
+});
+
+test('a worker is never placed in the operator session, whatever the config asks for', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-confine-default-'));
+  const mock = createMockHerdr(tmpDir);
+
+  await assert.rejects(
+    () => EXECUTOR_ADAPTERS['herdr-spawn'](
+      {
+        command: 'claude', args: [], argsTemplate: [], prompt: 'x', env: {},
+        confinement: { isolatedSession: true, sessionName: 'default' },
+        interactiveMode: { exitCommand: '/exit', kind: 'claude' },
+      },
+      { cwd: tmpDir, runDir: path.join(tmpDir, 'run'), timeoutMs: 5000, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin },
+    ),
+    (err) => {
+      assert.equal(err.reason, 'operator-session');
+      return true;
+    },
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});

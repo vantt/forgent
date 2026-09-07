@@ -164,6 +164,7 @@
     "src/runner/dispatch/visibility-session.mjs": "infra",
     "src/runner/dispatch/trust-store.mjs": "infra",
     "src/runner/dispatch/worker-home.mjs": "infra",
-    "src/runner/dispatch/worker-session.mjs": "infra"
+    "src/runner/dispatch/worker-session.mjs": "infra",
+    "src/runner/dispatch/worker-session-boot.mjs": "infra"
   }
 }

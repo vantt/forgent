@@ -1,7 +1,7 @@
 # Dispatch Visibility V0 — live proof
 
 Date: 2026-09-07 | Branch: `dispatch-visibility-v0` | herdr 0.8.2
-Artifacts: [`proofs/2026-09-07-v0/`](proofs/2026-09-07-v0/) — three runnable scripts and the
+Artifacts: [`proofs/2026-09-07-v0/`](proofs/2026-09-07-v0/) — four runnable scripts and the
 JSON each one wrote.
 
 Every number below came out of a real run against a real herdr and a real agent.
@@ -9,10 +9,12 @@ Nothing here was read off a terminal, and nothing was inferred from a status wor
 
 ## Safety of the runs themselves
 
-All three probes created their own herdr session (`fgos-v0-proof`,
-`fgos-v0-proof2`, `fgos-v0-p1`), spoke only to that session's socket, and stopped
-and deleted only what they had created. Each one recorded the session list on the
-way out; all three recorded `default(running)`. The operator's session, with its
+All four probes created their own herdr session (`fgos-v0-proof`,
+`fgos-v0-proof2`, `fgos-v0-p1`, `fgos-worker`), spoke only to that session's socket,
+and stopped and deleted only what they had created. Each one recorded the session
+list on the way out; all four recorded `default(running)`. The confinement probe
+read the operator's agent list once, to have something to compare against, and
+never addressed it for a write. The operator's session, with its
 live work in it, was never addressed — including by the restart case, which
 restarted the probe's own session.
 
@@ -31,7 +33,7 @@ restarted the probe's own session.
 | Pane id reuse | ✅ | — | a handle that finds nothing means gone, never someone else's pane |
 | Crash before/after RunResult | ✅ | — | reconciles to `settled` / `died` / `unknown` |
 | P1. agy conformance | — | ✅ | see below |
-| Worker escapes its lane | — | measured earlier, **still open** | see below |
+| Worker escapes its lane | ✅ | ✅ | confined: worker session socket, private HOME, operator cockpit unreachable — see below |
 
 ## Case A — the shape works
 
@@ -104,6 +106,31 @@ Worth recording alongside it: `herdr integration status` reports
 agent state. Ten rounds still passed, which is the point of no longer concluding
 anything from agent state.
 
+## The escape lane — measured closed
+
+Asked from **inside a confined worker's own pane**, with the operator's session
+holding 16 live agents at the time:
+
+| Question | Answer |
+|---|---|
+| Which socket did herdr hand the worker? | `…/sessions/fgos-worker/herdr.sock` — the worker session's own, not the operator's |
+| Is `HOME` the private one? | yes (`/tmp/worker-confine-…`) |
+| Is the operator's cockpit socket reachable through `$HOME`? | **no** — the fallback is closed |
+| Can the worker enumerate the operator's agents? | no — it saw its own session, not the 16 |
+
+Both halves were needed and neither was sufficient. A private HOME closes the
+`$HOME/.config/herdr/herdr.sock` fallback a worker finds with no environment
+variable at all. It does **not** stop the worker reaching a cockpit, because
+herdr injects `HERDR_SOCKET_PATH` into every pane it creates and overwrites any
+override — so a worker cannot be denied a socket, only handed a different one.
+Putting the worker in its own session is what makes the socket it is handed
+harmless.
+
+The adapter now applies both when an executor declares them, and **refuses the
+dispatch** when confinement was declared and could not be established — running
+anyway would place a worker on the operator's socket while the profile claimed
+otherwise. An executor that declares nothing behaves exactly as before.
+
 ## Two findings the probes produced by failing first
 
 **`herdr pane split` needs a pane to split from.** The first run of probe A died in
@@ -124,21 +151,14 @@ an already-trusted root instead of loosening the rule.
 
 ## Still open, stated rather than closed quietly
 
-**A dispatched worker can still reach the operator's cockpit.** Measured on
-2026-09-06 (`proofs/2026-09-06-isolation/findings.md`) and unchanged: a private
-HOME closes the `$HOME/.config/herdr` fallback (case C there: `BLOCKED`), but
-`HERDR_SOCKET_PATH` is injected by herdr into every pane it creates and **cannot be
-cleared or redirected** through `--env` — herdr overwrites even a non-empty
-override with the real cockpit socket (case D there). So a private HOME alone does
-not close the hole; only giving the worker its own herdr session does.
+**The worker still holds a copy of the operator's provider credential.** The
+private HOME gets a copy so the agent can authenticate at all, and it is removed
+when the round settles. Only a relay removes the copy itself, and V0 has none.
 
-Both mechanisms exist and are tested — `worker-home.mjs` and `worker-session.mjs`,
-built in Phase 01 — and **neither is wired into the adapter yet**. Until that
-wiring lands, the capability profile for `herdr-spawn` must carry the label
-`unsafe: worker-can-drive-cockpit`. This case is recorded, not dropped.
-
-**The worker still holds a copy of the operator's provider credential.** Only a
-relay closes that, and V0 has none.
+**Workers share one session, so one worker could address another's pane.** The
+boundary proved below is worker-versus-operator, not worker-versus-worker. Given
+the recorded threat model — the real risk is unintentional drift, not malice —
+that is accepted for V0 and named here rather than left to be discovered.
 
 **Hang detection remains unsolved.** V0 has an idle timeout and a ceiling. Upstream
 measured that neither CPU nor an output counter distinguishes a thinking agent from

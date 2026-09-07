@@ -42,6 +42,8 @@ import { createHerdrClient, normalizeAgentName, isReadyState } from './herdr-age
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { evaluateLadder, paneFateFor } from './liveness.mjs';
 import { writeVisibility } from './visibility-session.mjs';
+import { createWorkerHome, removeWorkerHome } from './worker-home.mjs';
+import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 
 /**
  * The ladder's outcome is the precise answer; `errorClass` stays the coarse
@@ -210,6 +212,11 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     // How the prompt reaches an interactive worker: `file-pointer` (default)
     // writes it to disk and types a pointer, `inline` types it whole.
     promptDelivery: executor.promptDelivery,
+    // The declared execution posture. An adapter that can confine a worker
+    // needs to know what it was told to do, and the config door has already
+    // refused any bypass that did not declare full confinement.
+    permissionMode: executor.permissionMode,
+    confinement: executor.confinement,
     provider: executor.provider ?? executor.governance.providerFamily,
     baseCommit: attestation.baseCommit,
     headRef: attestation.headRef,
@@ -599,7 +606,7 @@ async function httpAdapter(invocation, opts) {
  * (`agent_not_ready`) instead of hanging.
  */
 function herdrSpawnInteractiveAdapter(invocation, opts) {
-  const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery } = invocation;
+  const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery, permissionMode, confinement } = invocation;
   const {
     exitCommand,
     kind,
@@ -645,7 +652,10 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
   const delivery = promptDelivery ?? 'file-pointer';
 
   return runHerdrRound({
-    client: createHerdrClient({ herdrBin, cwd, env: fullEnv }),
+    herdrBin,
+    fullEnv,
+    confinement,
+    permissionMode,
     agentKind,
     agentArgs: agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }),
     prompt: prompt ?? '',
@@ -724,7 +734,8 @@ function lastScreenLine(text) {
  */
 async function runHerdrRound(ctx) {
   const {
-    client, agentKind, agentArgs, prompt, delivery, exitCommand,
+    herdrBin, fullEnv, confinement, permissionMode,
+    agentKind, agentArgs, prompt, delivery, exitCommand,
     readyTimeoutMs, promptTimeoutMs, maxResends, resendAfterMs,
     paneEnv, cwd, timeoutMs, idleTimeoutMs, usageLimitPatterns, closeAlways,
     workId, tier, model, onChunk,
@@ -758,8 +769,59 @@ async function runHerdrRound(ctx) {
     { workId, tier, model, reason, paneId, runDir, agentName, ...extra },
   );
 
+  // ---- Confinement, applied before anything is launched ----
+  //
+  // Two measures, and neither closes the hole alone. A private HOME closes the
+  // `$HOME/.config/herdr/herdr.sock` fallback a worker would otherwise find
+  // with no environment variable at all. It does NOT stop the worker reaching
+  // the cockpit, because herdr injects `HERDR_SOCKET_PATH` into every pane it
+  // creates and overwrites any override -- measured. What that leaves is the
+  // one thing that does work: put the worker in a different session, so the
+  // socket it is handed controls only worker panes.
+  //
+  // Declared, never inferred. An executor that declares nothing keeps the old
+  // behaviour exactly, and the config door has already refused any `bypass`
+  // that did not declare all three confinement flags.
+  let workerHomePath = null;
+  let sessionEnv = fullEnv;
+  let sessionInfo = null;
   try {
-    paneId = client.paneSplit({ cwd, env: paneEnv });
+    if (confinement?.privateHome) {
+      const home = createWorkerHome(os.tmpdir(), {
+        runId: agentName,
+        sourceHome: fullEnv.HOME ?? os.homedir(),
+        workspacePath: path.resolve(cwd),
+        repoRoot: ctx.repoRoot ?? path.resolve(cwd),
+        permissionMode: permissionMode ?? 'ask',
+      });
+      workerHomePath = home.homePath;
+      note({ workerHome: workerHomePath });
+    }
+    if (confinement?.isolatedSession) {
+      sessionInfo = await ensureWorkerSession(confinement.sessionName ?? DEFAULT_WORKER_SESSION, {
+        callerEnv: fullEnv,
+        workerHome: workerHomePath,
+        cwd,
+        herdrBin,
+      });
+      sessionEnv = sessionInfo.env;
+      note({ workerSession: sessionInfo.sessionName });
+    }
+  } catch (err) {
+    // Confinement was asked for and could not be delivered. Refusing is the
+    // only honest answer: running anyway would put a worker on the operator's
+    // cockpit socket while the profile claims it is confined.
+    if (workerHomePath) { try { removeWorkerHome(workerHomePath); } catch { /* nothing left to do */ } }
+    throw fail('invalid-config', err.code ?? 'confinement-unavailable',
+      `executor for work "${workId}" refused: confinement was declared but could not be established: ${err.message}`);
+  }
+
+  const client = createHerdrClient({ herdrBin, cwd, env: sessionEnv });
+  // A confined worker's pane gets the private HOME; herdr honours `--env` for
+  // ordinary variables, which is exactly what this relies on.
+  const effectivePaneEnv = workerHomePath ? { ...paneEnv, HOME: workerHomePath } : paneEnv;
+  try {
+    paneId = client.paneSplit({ cwd, env: effectivePaneEnv });
   } catch (err) {
     throw fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
       `executor failed to start for work "${workId}": herdr could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
@@ -977,6 +1039,13 @@ async function runHerdrRound(ctx) {
 
   client.paneClose(paneId);
   note({ status: 'reconciled' });
+  // The private HOME held a copy of the operator's credential, so it is removed
+  // as soon as the round is over. A failed round keeps its home for the same
+  // reason it keeps its pane: someone may need to look. `removeWorkerHome`
+  // refuses any directory without the marker it wrote itself.
+  if (workerHomePath) {
+    try { removeWorkerHome(workerHomePath); } catch { /* a leftover home is not worth failing a settled round */ }
+  }
 
   return {
     status: 0,

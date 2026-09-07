@@ -1,0 +1,47 @@
+{
+  "startedAt": "2026-09-07T03:02:46.903Z",
+  "operatorAgentsVisibleToOperator": 16,
+  "workerHome": {
+    "path": "/tmp/worker-confine-mtqnny47-80JZSF",
+    "provisioned": [
+      ".zshrc",
+      ".claude/.credentials.json",
+      ".claude.json (onboarding + workspace trust)"
+    ]
+  },
+  "session": {
+    "name": "fgos-worker",
+    "socketPath": "/home/vantt/.config/herdr/sessions/fgos-worker/herdr.sock",
+    "rootPane": "w1:p1",
+    "startedServer": true
+  },
+  "fromInsideTheWorkerPane": {
+    "socket": "/home/vantt/.config/herdr/sessions/fgos-worker/herdr.sock",
+    "home": "/tmp/worker-confine-mtqnny47-80JZSF",
+    "session": "fgos-worker",
+    "agentBracesSeen": "2",
+    "operatorSocketReachableViaHome": "no"
+  },
+  "verdict": {
+    "socketIsWorkerSessionNotOperator": true,
+    "homeIsPrivate": true,
+    "homeFallbackToOperatorCockpitClosed": true,
+    "cannotEnumerateOperatorAgents": true,
+    "passes": true
+  },
+  "finishedAt": "2026-09-07T03:02:53.995Z",
+  "operatorSessionsAfter": [
+    "default(running)"
+  ],
+  "log": [
+    "[03:02:46] operator session currently holds 16 agents",
+    "[03:02:46] private HOME provisioned: .zshrc, .claude/.credentials.json, .claude.json (onboarding + workspace trust)",
+    "[03:02:47] worker session up: fgos-worker (/home/vantt/.config/herdr/sessions/fgos-worker/herdr.sock)",
+    "[03:02:47] worker pane w1:p2",
+    "[03:02:53] worker sees socket: /home/vantt/.config/herdr/sessions/fgos-worker/herdr.sock",
+    "[03:02:53] worker HOME private: true | operator socket reachable via HOME: no",
+    "[03:02:53] VERDICT: CONFINED",
+    "[03:02:53] cleanup",
+    "[03:02:54] sessions left: default(running)"
+  ]
+}

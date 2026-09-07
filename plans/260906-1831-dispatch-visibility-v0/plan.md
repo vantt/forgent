@@ -1,6 +1,6 @@
 # Dispatch Visibility V0 — interactive agent, quan sát được, không cần contact
 
-Status: IN PROGRESS — Phases 00-06 done; V0 closes on item 8 (worker confinement not yet wired) | Created: 2026-09-06 | Owner: maintainer
+Status: DONE — all 7 phases complete; the V0 definition of done is met on all 8 items | Created: 2026-09-06 | Owner: maintainer
 Execution track: `dispatch-visibility-v0`
 Design source: [Visibility và Interactive Contact](../../docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md) (§8b.1 mức V0, §11 recommendation, §12b–§12c evidence)
 
@@ -71,7 +71,7 @@ và phải tuần tự.
 4 ✅ `died` sau 1525 ms, pane giữ lại, lý do có tên · 5 ✅ `run.json` đóng sổ khi settle, reconcile ra settled/died/unknown ·
 6 ✅ process riêng chạy `fgos dispatch watch`, 15 lần đọc, không cần lease ·
 7 ✅ 5705 test, 5695 pass, 3 đỏ đều có sẵn trên main ·
-8 ⚠️ **chưa đạt** — capability profile phải mang nhãn `unsafe: worker-can-drive-cockpit` cho tới khi `worker-home.mjs`/`worker-session.mjs` được nối vào adapter.
+8 ✅ confinement đã nối vào adapter và **đo sống**: worker nhận socket của session riêng, HOME riêng, không với tới cockpit của operator (16 agent) — `proofs/2026-09-07-v0/confinement-result.json`. Khai confinement mà dựng không được thì dispatch bị **từ chối**, không âm thầm hạ cấp.
 
 V0 đóng được khi tất cả đúng cùng lúc:
 

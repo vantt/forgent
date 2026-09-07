@@ -128,6 +128,29 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
       return paneId;
     },
 
+    /** Panes this session currently has. A session that has just started has
+     * none, which is why a worker session has to be given one before anything
+     * can be split off it. */
+    paneList() {
+      const result = invoke(['pane', 'list']);
+      const panes = result?.panes ?? [];
+      return Array.isArray(panes) ? panes.map((p) => p.pane_id ?? p.paneId).filter(Boolean) : [];
+    },
+
+    /** Give a session its first pane. `env` here DOES take effect for ordinary
+     * variables such as HOME -- measured. It does not for `HERDR_*`, which
+     * herdr overwrites with the real values for the session that owns the
+     * pane; that is why a worker's isolation comes from being in a different
+     * session, not from an environment override. */
+    workspaceCreate({ cwd: wsCwd, label = 'fgos-worker', env: wsEnv } = {}) {
+      const args = ['workspace', 'create'];
+      if (wsCwd) args.push('--cwd', wsCwd);
+      if (label) args.push('--label', label);
+      for (const [key, value] of Object.entries(wsEnv ?? {})) args.push('--env', `${key}=${value}`);
+      const result = invoke(args);
+      return result?.root_pane?.pane_id ?? result?.pane?.pane_id ?? null;
+    },
+
     paneClose(paneId) {
       try {
         invoke(['pane', 'close', paneId], { timeoutMs: 5000 });
