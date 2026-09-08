@@ -156,6 +156,8 @@
     "src/report/knowledge-resolver.mjs": "domain",
     "src/report/knowledge-projection.mjs": "domain",
     "src/state/fgos-file-registry.mjs": "kernel",
-    "src/state/runtime-coordination.mjs": "infra"
+    "src/state/runtime-coordination.mjs": "infra",
+    "src/setup/version-guard.mjs": "domain",
+    "src/setup/fingerprint-ledger.mjs": "domain"
   }
 }
