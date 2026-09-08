@@ -30,3 +30,9 @@ The out-of-process coding executor ran the item's exact verify command before co
 `/home/vantt/projects/forgentX-worker-isolation/.fgos/dispatch-runs/fgos-coding-implement/1788862116528/outbox/result-1.json`
 
 Implementation commit before this evidence-only follow-up: `2ce0c56b`.
+
+## Branch-drift recovery proof
+
+The first return exposed upstream drift rather than a feature regression: the item branch lacked main's `d29f5154` fixture repair and `docs/tutorials/.gitkeep`. The canonical `code:implement` dispatch path selected `agy-herdr`, which merged current main and ran the exact item verify on merge commit `1f9c603c`: 1342 tests passed, 0 failed, and every prose/mirror/no-resolver-change assertion passed.
+
+The merge commit was then amended to `8fdbe9b9` so its committed `.fgos` tree exactly matches main; `git diff --name-only main...HEAD -- .fgos` is empty. This follow-up records that recovery after the item entered `blocked`, giving the retry a real post-claim evidence commit rather than an empty commit.
