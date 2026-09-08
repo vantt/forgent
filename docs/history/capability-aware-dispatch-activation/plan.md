@@ -86,3 +86,23 @@ Runtime prose comprehension is not claimed by this shell verify. After merge, ru
 ## Outstanding questions
 
 None
+
+## Validation result
+
+Verdict: **READY WITH CONSTRAINTS**.
+
+| Concern | Evidence from the current repo | Result |
+|---|---|---|
+| Can `domain:capability` use the current resolver? | `validateCapabilitiesShape` validates each map entry but does not constrain the key vocabulary; `resolveExecutorAndOverrides` performs an exact lookup at `cfg.capabilities[executorIdOrPurpose]`. | Ready; no resolver change. |
+| Is awareness distributable? | `package.json` ships `.agents`; `build-skill-wrappers.mjs` generates host wrappers and mirrors every `fgos-*` skill plus `_shared` into `plugins/fgOS/skills`. Root `AGENTS.md` is not the install surface. | Add one thin `fgos-capability-dispatching` skill and plugin mirror; root prose is dogfood guidance only. |
+| Is a new skill smaller than broadening `fgos-coding-implement`? | `fgos-coding-implement` is explicitly stage-bound to one claimed item at `executing`; making it trigger on raw coding requests would recreate the lifecycle coupling this item removes. | New awareness skill is the smallest honest entry surface. |
+| Will setup and doctor discover the new slot? | `DEFAULT_CAPABILITY_SLOTS` is merged through the existing `runner` config registration; `config-not-stale` catches a missing default while the dedicated capability check catches malformed present slots. | Extend the default and rename/generalize the dedicated check and its tests to cover all curated slots. |
+| Can prose guarantee every agent asks dispatch? | The existing hook guards Agent/Task calls only; direct file edits have no mutation guard. Skill prose can establish the default behavior but cannot prove universal compliance. | First slice remains an experiment. Do not claim hard enforcement; use fresh-session smoke evidence after merge. |
+| Does the plan preserve lifecycle boundaries? | Only the implementation skill's executor-selection step changes to `decide --for code:implement`; work id remains in claim, prompt, verification and return paths. | Ready; Work remains lifecycle context, not dispatch identity. |
+
+Constraints carried into execution:
+
+1. The first awareness catalog contains the canonical coding implementation capability `code:implement`; it may explain the generic `capability` / `domain:capability` grammar but must not invent or infer unregistered capability names.
+2. The awareness skill must say that one independently executable unit triggers one `decide --for <canonical-capability>` call; primitive reads/searches used inside that unit do not recursively dispatch.
+3. Live `.fgos/config.json` activation remains a main-checkout operation outside the worker commit. The branch only ships the portable empty-preference default.
+4. Runtime compliance is post-merge smoke evidence, not part of the deterministic shell proof and not a claim of this change.
