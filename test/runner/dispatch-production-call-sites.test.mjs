@@ -28,7 +28,7 @@ const IMPLEMENT_CAPABILITY = 'fgos-coding-implement';
  * Deliberately smaller than the adapter suite's mock: these tests ask what
  * reached herdr, not what the round did with the answers.
  */
-function mockHerdr(dir, { failWorkspaceCreate = false, silentWorker = false } = {}) {
+function mockHerdr(dir, { failWorkspaceCreate = false, silentWorker = false, writesTo = null } = {}) {
   const logPath = path.join(dir, 'herdr-calls.log');
   const exitedPath = path.join(dir, 'agent-exited');
   const scriptPath = path.join(dir, 'mock-herdr.mjs');
@@ -74,6 +74,13 @@ if (group === 'agent' && action === 'prompt') {
     if (ack) {
       const outbox = path.dirname(ack[1]);
       const write = (f, b) => { fs.writeFileSync(f + '.tmp', b); fs.renameSync(f + '.tmp', f); };
+      // A worker that does its work in the wrong checkout, then reports
+      // success anyway -- exactly what was measured on 2026-09-07.
+      const strayDir = ${JSON.stringify(writesTo)};
+      if (strayDir) {
+        fs.mkdirSync(strayDir, { recursive: true });
+        fs.writeFileSync(path.join(strayDir, 'wrong-place.mjs'), 'export const oops = true;');
+      }
       write(path.join(outbox, 'report-1.md'), 'report');
       write(path.join(outbox, 'result-1.json'), JSON.stringify({ status: 'settled', summary: 'done', findings: [], evidenceRefs: [] }));
     }
@@ -113,6 +120,11 @@ function fixtureRepo(makeExecutor = () => HERDR_EXECUTOR) {
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: root });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: root });
   execFileSync('git', ['commit', '-q', '--allow-empty', '-m', 'initial'], { cwd: root });
+  // The mock herdr writes its script, wrapper and bookkeeping into the repo
+  // root. Those are the harness, not the worker, so they are ignored the way a
+  // real repo ignores its own noise -- otherwise the stray-write guard would
+  // correctly report the test's own scaffolding.
+  fs.writeFileSync(path.join(root, '.gitignore'), ['herdr', 'mock-herdr.mjs', 'herdr-calls.log', 'agent-exited', ''].join('\n'));
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({
     runner: {
@@ -330,6 +342,83 @@ test('a caller that supplies its own run directory keeps it', async () => {
     }));
     assert.ok(fs.existsSync(path.join(given, 'brief-1.md')), "the caller's own directory is used as given");
     assert.ok(!fs.existsSync(path.join(root, '.fgos', 'dispatch-runs')), 'and no second run directory is invented');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('a worker that reports success from the wrong checkout is refused, and the stray paths are named', async () => {
+  // The failure this closes was measured, not imagined: agy was handed a
+  // worktree, wrote six files into the main checkout -- onto a branch
+  // belonging to somebody else's work -- and reported settled. The ladder
+  // cannot see it: its subject is whether the round ended, never where.
+  const root = fixtureRepo();
+  const worktree = path.join(root, 'wt');
+  fs.mkdirSync(worktree, { recursive: true });
+  // The worker writes into the repo root instead of the worktree it was given.
+  mockHerdr(root, { writesTo: path.join(root, 'src', 'setup') });
+  try {
+    await assert.rejects(
+      () => withMockHerdr(path.join(root, 'herdr'), () => executeExecutorCli('herdr-worker', {
+        prompt: 'do the thing',
+        repoRoot: root,
+        cwd: worktree,
+        tier: 'standard',
+      })),
+      (err) => {
+        assert.equal(err.errorClass, 'worktree-fail');
+        assert.equal(err.reason, 'wrote-outside-workspace');
+        // git collapses a wholly-untracked directory to one entry, so what is
+        // named here is `src/` rather than the file inside it. In the incident
+        // this guards against the directory already existed and git listed the
+        // individual files; either way the refusal points at where to look.
+        assert.ok(err.strayPaths.some((p) => p.startsWith('src')),
+          `the refusal names where it appeared, got: ${JSON.stringify(err.strayPaths)}`);
+        assert.match(err.message, /wrote outside its workspace/);
+        return true;
+      },
+    );
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('a worker that stays in its workspace is not accused of anything', async () => {
+  const root = fixtureRepo();
+  const worktree = path.join(root, 'wt');
+  fs.mkdirSync(worktree, { recursive: true });
+  mockHerdr(root);
+  try {
+    const res = await withMockHerdr(path.join(root, 'herdr'), () => executeExecutorCli('herdr-worker', {
+      prompt: 'do the thing',
+      repoRoot: root,
+      cwd: worktree,
+      tier: 'standard',
+    }));
+    assert.equal(res.status, 0);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('dirt that was already there is not blamed on the worker', async () => {
+  // The main checkout is a live working tree. Anything already dirty when the
+  // round starts belongs to whoever put it there, and a round must not be
+  // refused for it.
+  const root = fixtureRepo();
+  const worktree = path.join(root, 'wt');
+  fs.mkdirSync(worktree, { recursive: true });
+  fs.mkdirSync(path.join(root, 'src', 'setup'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'src', 'setup', 'someone-elses-wip.mjs'), 'export const wip = 1;\n');
+  mockHerdr(root);
+  try {
+    const res = await withMockHerdr(path.join(root, 'herdr'), () => executeExecutorCli('herdr-worker', {
+      prompt: 'do the thing',
+      repoRoot: root,
+      cwd: worktree,
+      tier: 'standard',
+    }));
+    assert.equal(res.status, 0, 'pre-existing dirt is not the worker\'s doing');
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

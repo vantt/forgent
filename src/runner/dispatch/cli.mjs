@@ -187,6 +187,64 @@ export function resolveAgentTypeForWork(work, cwd, stage) {
  * failure branch as much as the success one, because a failed round ended and
  * has a named answer. Both are inert when there is no `.fgos/` to write into.
  */
+/**
+ * Watch for work done outside the workspace the dispatch handed the worker.
+ *
+ * A round settles when the worker writes its own result file. That establishes
+ * the worker DID something; it establishes nothing about WHERE. Measured: agy
+ * was given a worktree, reported settled, and had written six files into the
+ * main checkout instead -- onto another track's branch. Nothing in the ladder
+ * can catch that, because the ladder's whole subject is whether the round
+ * ended, not where it ran.
+ *
+ * This compares the main checkout's dirty paths before and after. It is
+ * EVIDENCE, not proof: the main checkout is a live working tree and somebody
+ * else may dirty it while a round is in flight, so the refusal below names
+ * what it observed rather than asserting who did it. A false positive costs a
+ * re-run; the failure it exists to catch costs a stranger's branch.
+ *
+ * Nothing is watched when the worker was given the repo root itself as its
+ * workspace -- there is no outside to write to.
+ */
+function watchWritesOutsideWorkspace({ repoRoot, cwd }) {
+  const watching = Boolean(repoRoot) && Boolean(cwd) && path.resolve(cwd) !== path.resolve(repoRoot);
+
+  // The workspace usually lives INSIDE the repo root -- fgOS puts worktrees at
+  // `<repo>/.claude/worktrees/<id>` -- so the root's own status reports the
+  // workspace directory itself as untracked. Everything at or under the
+  // workspace is the worker's to write; only what lies outside it is stray.
+  const insideWorkspace = (relPath) => {
+    const rel = path.relative(path.resolve(cwd), path.resolve(repoRoot, relPath));
+    return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
+  };
+  const outsideOnly = () => (watching
+    ? checkoutDirtyPaths(repoRoot, repoRoot).filter((entry) => !insideWorkspace(entry))
+    : []);
+
+  const before = new Set(outsideOnly());
+  return {
+    watching,
+    /** Paths outside the workspace that are dirty now and were not before. */
+    strayPaths() {
+      return outsideOnly().filter((entry) => !before.has(entry));
+    },
+  };
+}
+
+/**
+ * The error a settled-but-misplaced round becomes. `worktree-fail` is the
+ * existing class for "the isolated checkout was not respected", so the
+ * recovery matrix already knows to retry it a bounded number of times rather
+ * than treating it as a worker that needs a person.
+ */
+function strayWriteError({ workId, tier, model, cwd, repoRoot, strayPaths }) {
+  return new DispatchError(
+    'worktree-fail',
+    `executor for work "${workId}" reported success but wrote outside its workspace. It was given ${cwd}; these paths became dirty in ${repoRoot} during the round: ${strayPaths.join(', ')}. The round is refused rather than accepted: work in the wrong checkout is not this item's work, and it may belong to whoever else has that checkout open.`,
+    { workId, tier, model, reason: 'wrote-outside-workspace', cwd, repoRoot, strayPaths },
+  );
+}
+
 function openDispatchRun({ fgosDir, workId, executorId, cwd }) {
   if (!fgosDir) return { runDir: undefined, closeRun: () => {} };
 
@@ -281,6 +339,9 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     fgosDir: opts.fgosDir, workId: work?.id, executorId, cwd,
   });
 
+  const repoRootForWatch = opts.fgosDir ? path.dirname(opts.fgosDir) : undefined;
+  const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: repoRootForWatch, cwd });
+
   return adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement }, {
     cwd,
     repoRoot: opts.fgosDir ? path.dirname(opts.fgosDir) : undefined,
@@ -299,6 +360,11 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     // where it was.
     (result) => {
       closeRun('settled');
+      // Settling says the worker finished. It does not say where.
+      const strayPaths = outsideWatch.strayPaths();
+      if (strayPaths.length > 0) {
+        throw strayWriteError({ workId: work.id, tier, model, cwd, repoRoot: repoRootForWatch, strayPaths });
+      }
       return { ...result, templateName, templateHash, executorId, provider, command, baseCommit, headRef, governance };
     },
     (err) => {
@@ -577,6 +643,7 @@ export async function executeExecutorCli(
     const opened = runDir
       ? { runDir, closeRun: () => {} }
       : openDispatchRun({ fgosDir, workId: work?.id, executorId, cwd });
+    const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: root, cwd });
 
     let result;
     try {
@@ -589,6 +656,12 @@ export async function executeExecutorCli(
       throw err;
     }
     opened.closeRun('settled');
+
+    // Same question as the runner path asks: the round ended, but where?
+    const strayPaths = outsideWatch.strayPaths();
+    if (strayPaths.length > 0) {
+      throw strayWriteError({ workId: executorId, tier, model, cwd, repoRoot: root, strayPaths });
+    }
 
     const headAfter = captureHeadSha(cwd);
     const dirtyAfter = checkoutDirtyPaths(root, cwd);
