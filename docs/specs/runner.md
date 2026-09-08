@@ -2633,3 +2633,11 @@ sửa lại để phản ánh đúng, cùng một dòng comment lịch sử gi�
 - `docs/history/capacity-naming-rename/` — DISCUSSION.md/CONTEXT.md/
   plan.md/iron-law-evidence.md của chính tsk-225, toàn bộ scout + bằng
   chứng thật cho quyết định này
+
+### Capability-aware dispatch activation (tsk-46f)
+
+#### Quyết định
+
+1. **Primitive capability & catalog:** `code:implement` được đăng ký làm canonical domain-scoped capability cho coding implementation execution (`runner.capabilities["code:implement"]`).
+2. **Decide-before-execute activation doctrine:** Agent chọn canonical capability từ catalog và hỏi `decide` trước khi thực hiện một execution unit (`node src/runner/dispatch.mjs decide --for code:implement [--has-live-task-access]`), chuyển dispatch identity khỏi định danh lifecycle-shaped `fgos-coding-implement`.
+3. **Planning capability awareness:** Planning (`plan.md`) ghi canonical dispatch capability cho từng executable unit độc lập, coi capability boundary làm tín hiệu split, không pin executor/provider/model.

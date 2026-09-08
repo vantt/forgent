@@ -61,7 +61,7 @@ on how you got here:
   `.fgos/config.json` resolves `out-of-process` *unconditionally* once
   configured — having live Task access does not change that; config
   wins, not "I already have full context so I'll do it myself". Run
-  `node src/runner/dispatch.mjs decide --work <id> --has-live-task-access`
+  `node src/runner/dispatch.mjs decide --for code:implement [--has-live-task-access]`
   as the very first action of Implement and branch on the real
   `mechanism` it returns. Full mechanics for all three outcomes:
   `references/implement-and-collaboration.md`.
