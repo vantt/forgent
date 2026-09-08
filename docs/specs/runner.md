@@ -1282,6 +1282,22 @@ một live proof ở domain coding chứng minh được cô lập/merge/recover
 quyền chuyển Work thật. Quyết định nền:
 `docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md`.
 
+**Cập nhật (group-thinking-plan-loop, P01.1/P03.1, 2026-09-05):** mutation
+Work-ĐỘC-LẬP (một `operation` step dispatch `mutation: 'mutating'`, không
+đụng Work item nào) nay đã có cơ chế thật (P01.1's mutation-unlock, 4 vòng
+fix, kernel-level) VÀ một live proof thật, hai-cell, trên một project riêng
+biệt (`fgos-plan-loop` skill, P03.1's R5 — báo cáo đầy đủ:
+`plans/260904-2329-group-thinking-plan-loop/reports/lead-260905-0400-p03-1-r5-live-proof-report.md`),
+đo được zero Work engine touched suốt live proof (state.json/events.jsonl
+sha256 identical trước/sau). Đây KHÔNG phải live proof mà đoạn stop gate
+này yêu cầu — R5 tự nó luôn Work-độc-lập theo thiết kế, chưa từng chạm một
+Work item nào, nên KHÔNG chứng minh cô lập/merge/recovery/thẩm quyền
+chuyển Work thật. Stop gate mutation-gắn-Work vẫn còn nguyên, chưa đóng.
+Ghi nhận riêng: R5's own report tìm ra `src/verbs/coordination/run.mjs`
+chưa forward `step.mutation` vào engine — mutation-unlock chưa có đường
+CLI thật nào chạm tới hôm nay (`tsk-371`), một khoảng trống cần đóng
+trước khi domain coding có thể thử nghiệm mutation-gắn-Work qua CLI.
+
 ## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
 
 Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
@@ -2633,3 +2649,35 @@ sửa lại để phản ánh đúng, cùng một dòng comment lịch sử gi�
 - `docs/history/capacity-naming-rename/` — DISCUSSION.md/CONTEXT.md/
   plan.md/iron-law-evidence.md của chính tsk-225, toàn bộ scout + bằng
   chứng thật cho quyết định này
+
+### 0035 — Ranh giới tin cậy của cổng mutation-gate: caller trong-tiến-trình cùng lớp tin cậy với user, không phải kẻ tấn công
+
+#### Quyết định
+
+Một caller có thể `import` trực tiếp module dispatch nội bộ của codebase
+này (vd `buildAssignment`/`executeAssignment`, `src/runner/dispatch/**`)
+và ghi file dưới `.fgos/` thuộc CÙNG lớp tin cậy với chính user đã gọi nó
+— không phải một lớp kẻ tấn công bên ngoài. Ba điều khoản đã chốt từ
+trước (`docs/routing-handoff-contract.md`: containment chỉ là chỉ-dẫn +
+nhánh vứt-được, không phải sandbox, không chặn được một worker cố ý phá
+hoại; một work item phải xuất phát từ user thật; `.fgos/config.json`'s
+`runner` section là config THỰC THI ĐƯỢC — ai sửa được file này quyết
+định runner spawn tiến trình gì với tham số gì), cộng với TRUSTED-CONFIG
+NOTE của `src/runner/dispatch/config.mjs` và SAME-USER TRUST INVARIANT
+của `src/runner/worktree.mjs`, đã xác nhận điều này từ trước khi cổng
+`mutation: 'mutating'` cho một Assignment inline tồn tại — mọi worker
+runner này dispatch, kể cả worker "read-only", đã luôn chạy với
+`--permission-mode acceptEdits`; "read-only" chưa bao giờ là một ranh
+giới cấp hệ điều hành, chỉ được chấm điểm/rollback sau khi worker chạy
+xong. Do đó, cổng re-verify `result.kind`/worktree-vs-main-checkout cho
+một Assignment inline mutating (`assignment-runner.mjs`'s
+`assertInlineMutatingAssignmentAuthorized`) là mistake-proofing cho một
+caller trong-tiến-trình cư xử đúng đắn nhưng vô ý (chặn tai nạn thực tế:
+quên gắn cờ `isReadOnlyMode: false`, hoặc dispatch mutating nhầm vào main
+checkout) — KHÔNG phải authentication chống lại một caller trong-tiến-
+trình cố ý phá hoại, vì caller đó đã ở lớp tin cậy kiến trúc này chấp
+nhận từ trước, giống hệt mọi worker khác. Phạm vi tấn công còn ý nghĩa
+với cổng này là INPUT DỮ LIỆU mà thôi — request document, file
+FlowDefinition/CoordinationProtocol, cờ CLI, prompt của skill — không
+bao giờ là thực thi mã trong-tiến-trình hay ghi file `.fgos/` trực tiếp,
+cả hai đã nằm ngoài phạm vi theo chính quyết định kiến trúc này.

@@ -15,12 +15,15 @@ import {
   envelopeData,
   execFileSync,
   fs,
+  initGitCwdWithWorktree,
+  os,
   path,
   run,
   tmpCwd,
 } from './helpers/fgos-cli-harness.mjs';
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
 import { StoreError } from '../../src/state/store.mjs';
+import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 
 // ─── Fake executor wiring for real-subprocess run tests ───────────────────
 // Same real Node-subprocess fake executor shape session-engine.mjs's own
@@ -52,6 +55,56 @@ function writeFakeExecutorConfig(cwd) {
     `,
   );
   const configPath = path.join(cwd, '.fgos', 'config.json');
+  const existing = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  const config = {
+    ...existing,
+    runner: {
+      ...(existing.runner ?? {}),
+      executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+      models: { standard: 'test-model', lightweight: 'test-model' },
+      timeoutMs: 20000,
+    },
+  };
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+}
+
+// Fake-executor variant for the R7 `--cwd` tests below: writes a REAL
+// marker file into its own `process.cwd()` before settling the assignment
+// -- proves the dispatched worker's own subprocess cwd genuinely is
+// whatever `--cwd` resolved to (`assignment-runner.mjs`'s `executeAssignment`
+// spawns the executor CLI with `cwd: opts.cwd`, never `opts.repoRoot` --
+// confirmed by reading its own `executeExecutorCli(...)` call site, which
+// passes `cwd` straight through). `assignmentsRoot` is taken as an
+// EXPLICIT parameter, never derived from the worker's own `process.cwd()`
+// the way `writeFakeExecutorConfig` above does -- because `.fgos/assignments/`
+// always lives under repoRoot (Phase 01 R8), which genuinely diverges from
+// the worker's own cwd in exactly the `--cwd` case these tests exercise
+// (same reason test/runner/coordination-mutation-unlock.test.mjs's own
+// `fakeExecutor` takes `assignmentsRoot` explicitly too).
+function writeCwdMarkerExecutorConfig(repoRootDir, assignmentsRoot) {
+  const executorScript = path.join(repoRootDir, 'fake-executor-cwd-marker.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    fs.writeFileSync(path.join(cwd, 'cwd-marker.txt'), cwd + '\\n');
+    const assignmentsRoot = ${JSON.stringify(assignmentsRoot)};
+    if (fs.existsSync(assignmentsRoot)) {
+      for (const asgn of fs.readdirSync(assignmentsRoot)) {
+        const runDir = path.join(assignmentsRoot, asgn, 'runs', '01');
+        if (fs.existsSync(runDir) && !fs.existsSync(path.join(runDir, 'agent-result.json'))) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nValidated.\\n');
+          fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Validated.' }));
+        }
+      }
+    }
+    process.stdout.write('Validated.\\n');
+    process.exit(0);
+    `,
+  );
+  const configPath = path.join(repoRootDir, '.fgos', 'config.json');
   const existing = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
   const config = {
     ...existing,
@@ -444,6 +497,263 @@ test('fgos coordination run --file <declared consult>: dispatches both declared 
   assert.equal(runData.steps[0].as, 'request');
   assert.equal(runData.steps[1].as, 'response');
   assert.equal(runData.steps[1].status, 'done');
+});
+
+// ─── R7: `--cwd <path>` ─────────────────────────────────────────────────
+//
+// CORRECTED (Wave 1 integration fix, group-thinking-plan-loop): the two
+// tests below used to assert that `--cwd` relocates WHERE `.fgos/` session
+// state lives (under the `--cwd` worktree). That was true only against
+// P02.1's own pre-merge worktree state, where `store.mjs`'s
+// `resolveCoordinationPaths` still had the Phase 01 R8 bug (`fgosDir`
+// keyed on raw `cwd` unconditionally, even when `opts.repoRoot` was
+// explicitly passed). Once P01.1's R8 fix merged into this same branch,
+// `resolveCoordinationPaths` ALWAYS honors `opts.repoRoot` for `fgosDir`
+// when present -- and `bin/fgos.mjs`'s `coordination` case ALWAYS passes
+// `repoRoot: repoRootForCoordination` explicitly, completely independent
+// of `--cwd` (confirmed by reading both sites directly). So `--cwd` now
+// has ZERO effect on where session/Assignment state lives; it only ever
+// threads into `ctx.cwd`, which matters for OTHER things (the dispatched
+// worker's own subprocess cwd; R3's worktree-vs-main-checkout mutation
+// gate, `session-engine.mjs`'s `assertMutatingDispatchAllowed`). The two
+// tests immediately below dispatch an agent-led (read-only) request, so
+// they never touch a request step's `mutation` field at all -- see the
+// "mutation: 'mutating' forwarding" tests further down this file for CLI
+// coverage of `run.mjs` threading an operation step's own `mutation`
+// field into `dispatchDeclaredOperation`.
+
+test('fgos coordination run --cwd <worktree>: session/Assignment storage is governed by repoRoot (--dir), never relocated by --cwd (Phase 01 R8); ctx.cwd genuinely threads to the dispatched worker\'s own subprocess cwd instead, proven by a real marker file the worker writes into its own process.cwd()', () => {
+  const { cwd: repoRootDir, worktreePath: worktreeDir } = initGitCwdWithWorktree();
+  const assignmentsRoot = path.join(repoRootDir, '.fgos', 'assignments');
+  writeCwdMarkerExecutorConfig(repoRootDir, assignmentsRoot);
+
+  // (a) --cwd names a REAL linked worktree (not a bare mkdtemp dir --
+  // R3-adjacent cwd/worktree resolution shells out to real git, so a
+  // genuine `git worktree add` is the only fixture that can stand in for
+  // it credibly, matching test/runner/coordination-mutation-unlock.test.mjs's
+  // own established pattern).
+  // Not asserted here: `run`'s own success/closed status. The worker's
+  // marker write is a REAL, uncommitted change inside the (real) git
+  // worktree, so R1's own pre-existing read-only-contract enforcement
+  // (`classifyRunEvidence`, assignment-runner.mjs: a read-only-declared
+  // Assignment that mutates repo state fails closed, confidence:
+  // 'failed') correctly grades this dispatch as failed -- expected,
+  // unrelated to what this test proves, and deliberately not worked
+  // around by asserting a fake "verified" grading. What this test proves,
+  // and only this: `ctx.cwd` really reached the dispatched worker's own
+  // subprocess, and the session's own on-disk state stays repoRoot-
+  // governed -- both direct filesystem assertions, not exit-code claims.
+  const idWithCwd = 'coord_cwd_wiring_probe_worktree';
+  const reqWithCwd = writeRequest(repoRootDir, 'agent-led-with-cwd.json', agentLedRequest({ coordinationId: idWithCwd }));
+  run(repoRootDir, ['coordination', 'run', '--cwd', worktreeDir, '--file', reqWithCwd]);
+
+  // ctx.cwd genuinely reached the dispatched worker: the marker it wrote
+  // into its own process.cwd() landed under the --cwd worktree, never the
+  // repo root -- a direct filesystem assertion, not an inferred claim.
+  assert.ok(fs.existsSync(path.join(worktreeDir, 'cwd-marker.txt')), 'the dispatched worker\'s own subprocess cwd must be the --cwd worktree');
+  assert.equal(fs.existsSync(path.join(repoRootDir, 'cwd-marker.txt')), false, '--cwd must not also leave the worker running against the repo root');
+
+  // Phase 01 R8: session storage is governed by repoRoot regardless of
+  // --cwd -- the session opens under the REPO ROOT's own .fgos/, never
+  // the --cwd worktree's.
+  assert.ok(
+    fs.existsSync(path.join(repoRootDir, '.fgos', 'coordination', 'sessions', idWithCwd, 'session.json')),
+    'the session must open under the repo root\'s own .fgos/, governed by repoRoot, not --cwd',
+  );
+  assert.equal(
+    fs.existsSync(path.join(worktreeDir, '.fgos', 'coordination', 'sessions', idWithCwd)),
+    false,
+    '--cwd must never relocate session storage to the worktree',
+  );
+
+  // (b) The SAME kind of request dispatched with --cwd OMITTED: ctx.cwd
+  // defaults to repoRootForCoordination -- the marker now lands under the
+  // repo root instead, proving ctx.cwd really did switch between the two
+  // calls (never a no-op flag that just happens to always resolve the
+  // same way).
+  const idWithoutCwd = 'coord_cwd_wiring_probe_no_cwd';
+  const reqWithoutCwd = writeRequest(repoRootDir, 'agent-led-without-cwd.json', agentLedRequest({ coordinationId: idWithoutCwd }));
+  const resultWithoutCwd = run(repoRootDir, ['coordination', 'run', '--file', reqWithoutCwd]);
+  assert.equal(resultWithoutCwd.status, 0, resultWithoutCwd.stderr);
+  assert.ok(fs.existsSync(path.join(repoRootDir, 'cwd-marker.txt')), 'omitting --cwd must default ctx.cwd to the repo root');
+});
+
+test('fgos coordination show --cwd <anything>: repoRoot (--dir), never --cwd, governs which session is read -- a session opened at the repo root reads identically whether --cwd names a real linked worktree, an unrelated directory, or is omitted entirely (Phase 01 R8: --cwd has zero storage/read-location effect)', () => {
+  const { cwd: repoRootDir, worktreePath: worktreeDir } = initGitCwdWithWorktree();
+  writeFakeExecutorConfig(repoRootDir);
+  const coordinationId = 'coord_cwd_show_probe';
+  const reqPath = writeRequest(repoRootDir, 'agent-led-show-cwd.json', agentLedRequest({ coordinationId }));
+  const runResult = run(repoRootDir, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+
+  const unrelatedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-cwd-show-unrelated-'));
+
+  for (const cwdFlag of [[], ['--cwd', worktreeDir], ['--cwd', unrelatedDir]]) {
+    const showResult = run(repoRootDir, ['coordination', 'show', coordinationId, ...cwdFlag, '--json']);
+    assert.equal(showResult.status, 0, showResult.stderr);
+    assert.equal(envelopeData(showResult.stdout).coordinationId, coordinationId);
+  }
+});
+
+test('fgos coordination run --file <request> with --cwd OMITTED behaves byte-identically to today: the session lands under the repo root\'s own .fgos/', () => {
+  const cwd = tmpCwd();
+  writeFakeExecutorConfig(cwd);
+  const reqPath = writeRequest(cwd, 'agent-led-no-cwd.json', agentLedRequest());
+
+  const runResult = run(cwd, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  const runData = envelopeData(runResult.stdout);
+  assert.equal(runData.closed, true);
+
+  const sessionManifest = path.join(cwd, '.fgos', 'coordination', 'sessions', runData.coordinationId, 'session.json');
+  assert.ok(fs.existsSync(sessionManifest), 'omitting --cwd must default the working directory to the resolved repo root, exactly as before this flag existed');
+});
+
+// ─── mutation: "mutating" forwarding through the CLI run door ─────────────
+//
+// A declared `operation` step's own `mutation` field must reach
+// `dispatchDeclaredOperation` (session-engine.mjs) through this real CLI
+// subprocess, not just at the schema/engine layers already covered by
+// test/runner/coordination-mutation-unlock.test.mjs. `run.mjs` forwards
+// `step.mutation` into the dispatch call only when the field is present,
+// so a request that omits it stays byte-identical to every pre-existing
+// caller (implicit `'read-only'` default).
+
+test('fgos coordination run --file <declared operation step, mutation:"mutating", result.kind:"work-product">, --cwd <linked worktree>: the request\'s mutation field reaches dispatchDeclaredOperation, so a real work-product mutation grades done/verified instead of being fail-closed by the read-only gate, and the persisted Assignment record itself carries mutation:"mutating"', () => {
+  const { cwd: repoRootDir, worktreePath: worktreeDir } = initGitCwdWithWorktree();
+  const assignmentsRoot = path.join(repoRootDir, '.fgos', 'assignments');
+  writeCwdMarkerExecutorConfig(repoRootDir, assignmentsRoot);
+
+  const req = {
+    kind: 'declared-protocol',
+    objective: 'Prove a request step\'s mutation field reaches the engine through the CLI run door.',
+    writerId: 'coordination-cli-test',
+    protocolRef: { id: 'core.coordination-protocol.standalone-master-coordination-loop' },
+    steps: [
+      {
+        type: 'operation',
+        as: 'produce',
+        operationId: 'produce-candidate',
+        targetActorId: 'doer',
+        objective: 'Produce a real work-product artifact.',
+        expectedOutputs: ['cwd-marker.txt'],
+        mutation: 'mutating',
+      },
+    ],
+  };
+  const reqPath = writeRequest(repoRootDir, 'mutating-produce-candidate.json', req);
+
+  const runResult = run(repoRootDir, ['coordination', 'run', '--cwd', worktreeDir, '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  const runData = envelopeData(runResult.stdout);
+  assert.equal(
+    runData.steps[0].status,
+    'done',
+    `a mutating dispatch with real external evidence must grade "done", not fail-closed by the read-only gate; got ${JSON.stringify(runData.steps[0])}`,
+  );
+  assert.equal(runData.steps[0].confidence, 'verified');
+
+  // Real external evidence: the worker's own marker file landed in the
+  // worktree the dispatch actually ran against.
+  assert.ok(fs.existsSync(path.join(worktreeDir, 'cwd-marker.txt')));
+
+  // The persisted Assignment record itself carries mutation: "mutating" --
+  // proof the request's own field reached dispatchDeclaredOperation, not
+  // an inferred status from the step result alone.
+  const assignmentId = runData.steps[0].assignmentId;
+  const assignmentRecord = JSON.parse(
+    fs.readFileSync(path.join(repoRootDir, '.fgos', 'assignments', assignmentId, 'assignment.json'), 'utf8'),
+  );
+  assert.equal(assignmentRecord.mutation, 'mutating');
+});
+
+test('fgos coordination run --file <declared operation step, mutation:"mutating", on an advisory operation>: refused by name through the CLI door -- an operation must declare result.kind:"work-product" before it may opt into a real, mutating dispatch', () => {
+  const cwd = tmpCwd();
+  const req = {
+    kind: 'declared-protocol',
+    objective: 'Prove an advisory operation cannot be dispatched as mutating through the CLI run door.',
+    writerId: 'coordination-cli-test',
+    protocolRef: { id: 'core.coordination-protocol.standalone-master-coordination-loop' },
+    steps: [
+      {
+        type: 'operation',
+        as: 'review',
+        operationId: 'review-candidate',
+        targetActorId: 'reviewer',
+        objective: 'Review a candidate.',
+        expectedOutputs: ['review-notes.md'],
+        mutation: 'mutating',
+      },
+    ],
+  };
+  const reqPath = writeRequest(cwd, 'mutating-advisory-refused.json', req);
+
+  const result = run(cwd, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /operation "review-candidate" declares result\.kind "advisory"/);
+  assert.match(result.stderr, /a mutating dispatch requires the bound operation to declare result\.kind "work-product"/);
+});
+
+// ─── R2-R5: `fgos coordination chain <track>` ──────────────────────────────
+
+test('fgos coordination chain <track>: lists cells reconstructed from real sessions, names activeCell and nextAction for the still-open one', () => {
+  const cwd = tmpCwd();
+  writeFakeExecutorConfig(cwd);
+  const reqPath = writeRequest(cwd, 'agent-led-chain.json', agentLedRequest({ coordinationId: 'cli-chain--cellA' }));
+
+  const runResult = run(cwd, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  assert.equal(envelopeData(runResult.stdout).closed, true);
+
+  const chainResult = run(cwd, ['coordination', 'chain', 'cli-chain', '--json']);
+  assert.equal(chainResult.status, 0, chainResult.stderr);
+  const chainData = envelopeData(chainResult.stdout);
+  assert.equal(chainData.track, 'cli-chain');
+  assert.deepEqual(chainData.cells.map((c) => c.cellId), ['cellA']);
+  assert.equal(chainData.cells[0].status, 'completed');
+  assert.equal(chainData.activeCell, null);
+});
+
+test('fgos coordination chain <track> on a track with zero matching sessions is a validation-free empty result, not an error', () => {
+  const cwd = tmpCwd();
+  const chainResult = run(cwd, ['coordination', 'chain', 'never-opened-track']);
+  assert.equal(chainResult.status, 0, chainResult.stderr);
+  const chainData = envelopeData(chainResult.stdout);
+  assert.deepEqual(chainData, { track: 'never-opened-track', cells: [], activeCell: null, nextAction: null });
+});
+
+test('fgos coordination chain requires a track argument', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['coordination', 'chain']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /coordination chain requires a track/);
+});
+
+// ─── R5: every enumerated-subcommand string names "chain" ─────────────────
+
+test('R5: every place that enumerates the coordination sub-verb list (help text, error messages, the registry description) names "chain"', () => {
+  const source = fs.readFileSync(FGOS, 'utf8');
+  assert.match(
+    source,
+    /coordination requires a sub-verb: fgos coordination <run\|show\|launch-master-loop\|chain>/,
+    'requireField usage message must enumerate "chain"',
+  );
+  assert.match(
+    source,
+    /coordination: unknown sub-verb "\$\{sub\}" \(known: run, show, launch-master-loop, chain\)/,
+    'unknown-sub-verb error message must enumerate "chain"',
+  );
+
+  const entry = COMMAND_REGISTRY.find((e) => e.name === 'coordination');
+  assert.ok(entry, 'the "coordination" registry entry must exist');
+  assert.match(entry.invoke, /chain/, 'registry invoke string must enumerate "chain"');
+  assert.ok(entry.parameters.properties.sub.enum.includes('chain'), 'registry sub enum must include "chain"');
+  assert.match(entry.description, /"chain"/, 'registry description must document "chain"');
+  assert.ok(entry.examples.some((e) => e.includes('chain')), 'registry examples must include a "chain" example');
+
+  const unknownSubResult = run(tmpCwd(), ['coordination', 'bogus-sub-verb']);
+  assert.notEqual(unknownSubResult.status, 0);
+  assert.match(unknownSubResult.stderr, /known: run, show, launch-master-loop, chain/);
 });
 
 // `execFileSync` re-export sanity: confirms the harness genuinely spawns a

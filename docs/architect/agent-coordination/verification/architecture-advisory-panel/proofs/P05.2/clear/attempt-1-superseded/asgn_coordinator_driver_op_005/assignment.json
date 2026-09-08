@@ -1,0 +1,53 @@
+{
+  "assignmentId": "asgn_coordinator_driver_op_005",
+  "workId": null,
+  "role": "constraint-advocate",
+  "dispatch": "assignment",
+  "objective": "Propose the architecture that best respects real operational constraints (test coverage, release cadence, no-UI-control per docs/specs/terminal-detail.md R24, the fail-closed asymmetry per R25) for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification. Use absolute paths for everything you read. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+  "contextRefs": [],
+  "expectedOutputs": [
+    "agent-result.json (status, summary)"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-07T02:15:19.543Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Propose the architecture that best respects real operational constraints (test coverage, release cadence, no-UI-control per docs/specs/terminal-detail.md R24, the fail-closed asymmetry per R25) for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification. Use absolute paths for everything you read. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+        "contextRefs": [],
+        "constraints": [
+          "protocol-operation:core.coordination-protocol.architecture-advisory-panel-v1@1.0.0#shape-constraint-proposal"
+        ],
+        "expectedOutputs": [
+          "agent-result.json (status, summary)"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "constraint-advocate",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 300000,
+          "maxRuns": 1
+        }
+      },
+      "caller": {
+        "writerId": "coordinator-driver"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

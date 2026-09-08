@@ -1,0 +1,13 @@
+{
+  "ordinal": 8,
+  "role": "lead-advisor-phase8",
+  "requested": { "executor": "claude-bwrap", "tier": "critical", "persona": "lead-advisor" },
+  "derived": { "provider": "claude", "model": "opus", "tierMaterial": true },
+  "mechanism": "direct bwrap invocation, kongming-verified scratch-bind pattern",
+  "promptPath": "proofs/P01.2/prompts/lead-advisor-explanation.md",
+  "rawLogPath": "proofs/P01.2/runs/8-lead-advisor-explanation-raw.log",
+  "outputArtifact": "proofs/P01.2/explanation.md",
+  "exitCode": 0,
+  "doctrineCheck": "follows the Human-Facing Explanation template exactly (8 sections); uses only the person's own vocabulary (daemon/thin client/authority/experimental/local ownership), no imported jargon; both live disagreements named in full, explicitly not resolved; What Stays Yours names two distinct things (spike-vs-bet altitude call, and the sequencing values call) rather than a generic disclaimer; separate file from synthesis.md, not a stripped restatement",
+  "note": "agent proactively disclosed a real tool limitation (could not verify exact file paths in this sandboxed dispatch) and anchored on documented entry points instead of fabricating paths -- honest behavior under a real constraint, not a defect"
+}

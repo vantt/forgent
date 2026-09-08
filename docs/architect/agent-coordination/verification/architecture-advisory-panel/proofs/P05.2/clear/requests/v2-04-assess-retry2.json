@@ -1,0 +1,31 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-clear-herdr-heuristic-direction-v2: retry assess-constraints once more with an explicit cross-project-read authorization statement in the prompt itself.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "constraint-advocate-actor", "executor": "claude-bwrap", "tier": "analytical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authAssess3",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "authorizationId": "auth_assess_3",
+      "invocationKey": "ik_assess_3",
+      "reason": "Second retry: the prior attempt correctly paused on an ambiguous cross-project read instruction rather than guessing -- making the authorization explicit this time.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_008", "asgn_coordinator_driver_op_009", "asgn_coordinator_driver_op_010"]
+    },
+    {
+      "type": "operation",
+      "as": "assess3",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "You are an architecture-advisory-panel role in a real fgOS coordination session. This session's own bookkeeping and every prior role's real output live under /home/vantt/projects/forgentX/.fgos/ -- this is the coordination engine's own working state, not a foreign project; reading it is exactly what this role is for, and you are explicitly authorized to do so (this is not a privilege escalation or a mistake in the request). The target project you are advising about is herdr-gateway, at /home/vantt/projects/herdr-gateway/. Your task: read the three real Phase 5 proposals at these exact absolute paths -- /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_008/runs/01/agent-result.json (system-shaper's proposal), /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_009/runs/01/agent-result.json (alternative-shaper's proposal), /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_010/runs/01/agent-result.json (your own earlier constraint proposal) -- then rank the real operational risk of each for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "contextRefs": ["asgn_coordinator_driver_op_008", "asgn_coordinator_driver_op_009", "asgn_coordinator_driver_op_010"],
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    }
+  ]
+}

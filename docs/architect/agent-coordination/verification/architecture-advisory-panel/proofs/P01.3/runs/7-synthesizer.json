@@ -1,0 +1,14 @@
+{
+  "ordinal": 7,
+  "role": "synthesizer",
+  "requested": { "executor": "claude-bwrap", "tier": "critical", "persona": "synthesizer" },
+  "derived": { "provider": "claude", "model": "opus", "tierMaterial": true },
+  "mechanism": "direct bwrap invocation, kongming-verified scratch-bind pattern",
+  "command": "bwrap --ro-bind / / --dev /dev --proc /proc --tmpfs /tmp --ro-bind /home/vantt/projects/vnflow /home/vantt/projects/vnflow --bind <evidenceDir> <evidenceDir> --chdir /home/vantt/projects/vnflow -- claude -p \"<prompt>\" --model opus --permission-mode acceptEdits",
+  "promptPath": "proofs/P01.3/prompts/synthesizer.md",
+  "rawLogPath": "proofs/P01.3/runs/7-synthesizer-raw.log",
+  "outputArtifact": "proofs/P01.3/synthesis.md",
+  "exitCode": 0,
+  "note": "Recommendation: keep the two pipelines, no new abstraction, close 3 named seams (breadth-gate policy, schema-loader parity, checked EOD-context read). Explicitly refused to pick between 3 competing mechanisms for the 3rd seam since no panel member supplied a separating observation -- named it an open, non-blocking mechanism choice rather than authoring a tiebreak itself, per its own doctrine's 'never introduce a new argument' rule. Correctly disclosed it worked from a scout-report SUMMARY (provided in the prompt) rather than the full scout-report.md file, and flagged the critic's own harness/model was undisclosed to it -- both are honest provenance gaps, not the synthesizer's fault (a manual-dispatch limitation of this cell), left visible in the Decision Packet as instructed.",
+  "isolationCheck": "prompt embedded interpretation summary, scout-report summary, full text of all 3 proposals, full critique text including coordinator-verification notes; read all of it per doctrine (unlike shapers, synthesizer is meant to see everything)"
+}

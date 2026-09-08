@@ -1,0 +1,71 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Fix round 1 for cell P00.1 (read-only dispatch readiness): apply the accepted Reviewer/Red-Team findings (D1-D9 in docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md's Driver Dispositions section) and get an independent recheck.",
+  "writerId": "p00-1-coordinator",
+  "coordinationId": "architecture-advisory-panel--p00-1",
+  "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
+  "actors": [
+    { "id": "fixer", "executor": "agy-cli", "tier": "standard", "persona": "pragmatic-fixer" },
+    { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "detail-oriented-rechecker" },
+    { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "relentless-attacker" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authRevise",
+      "operationId": "revise-candidate",
+      "targetActorId": "fixer",
+      "authorizationId": "auth_p00_1_fix1_revise",
+      "invocationKey": "p00-1:fix1:revise:1",
+      "reason": "Reviewer F1-F7 and Red-Team's independent falsification both accepted (D1-D9); apply the fixes."
+    },
+    {
+      "type": "operation",
+      "as": "revise",
+      "operationId": "revise-candidate",
+      "targetActorId": "fixer",
+      "taskKey": "revise-candidate-fixer",
+      "objective": "Read docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md in full first (Review, Red-Team, and Driver Dispositions D1-D9 sections are the exact spec for this fix round -- do not re-derive independently). Apply exactly these fixes, nothing else: (1) D1/D2: remove claude-reviewer and agy-plan entirely from P00.1.md's 'Admitted Safe Executor/Mechanism Allowlist' table and from index.md's allowlist section -- they are falsified, not deferred. (2) D3/D4: re-run claude-bwrap and agy-bwrap with the CORRECTED invocation Red-Team already proved works -- explicit --chdir (or equivalent bind+cwd) pointed at a fresh disposable checkout, and do NOT use --tmpfs /tmp when the disposable checkout or evidence dir lives under host /tmp (bind the real checkout path explicitly instead, or place the checkout somewhere the tmpfs doesn't shadow). Confirm the target repo is genuinely visible and attempt at least an in-tree write and an absolute-path-outside write; record before/after hash for BOTH the checkout and one outside-path sentinel. Update the Proof Matrix and Admitted allowlist table with the corrected command lines and evidence paths. (3) D5: leave codex-bwrap excluded (non-runnable); do not attempt to fix its startup crash in this cell -- that is P01+ scope, just record the exclusion clearly with the crash evidence already captured. (4) D6: replace P00.1.md's own 'Tests'/baseline section (and any baseline claim in this cell's files) with the Lead's authoritative committed baseline: 5614 tests, 5604 pass, 4 fail, 6 skip (see docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/baseline-full-test.log and index.md's own Baseline section, already correct there -- do not re-run npm test, just cite that evidence and remove/correct the two conflicting numbers previously written into P00.1.md). (5) D7: revert package-lock.json to its pre-cell state (git checkout <base-ref> -- package-lock.json, or equivalent) -- yaml is already a direct package.json dependency on both branches so this is a true no-op revert, verify with git diff before/after. (6) D8: register a bwrap-available doctor check in src/setup/registrations.mjs (NOT src/setup/checks.mjs, which is only a re-export shim per its own header comment -- registrations.mjs is the real registry) following the exact registerCheck/registerFix pattern already used for 'agy-permissions-configured' (see registrations.mjs around line 1049): the check should verify the bwrap binary resolves on PATH and a minimal 'bwrap --ro-bind / / -- true' smoke test exits 0; add a focused test alongside the existing setup/doctor tests. (7) D9: fix agy-sandbox's truncated after-hash in the Proof Matrix table to the full hash already in proofs/P00.1/summary.json. Update P00.1.md's 'Changed Paths' section to list every file this fix round actually touches. Stay strictly inside the readonly-dispatch lease (P00.1.md, index.md, proofs/P00.1/**, .fgos/config.json, src/setup/registrations.mjs/checks.mjs, matching doctor tests, package-lock.json revert, CHANGELOG.md only if truly needed) -- current-cell.md names the exact scope. Run the focused test command (FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/runner/coordination-*.test.mjs' 'test/verbs/coordination-*.test.mjs' 'test/cli/coordination.test.mjs' 'test/architecture.test.mjs' 'test/setup/*.test.mjs') and confirm zero new failures beyond the recorded baseline. Commit on this cell's own worktree branch when done.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md updated with corrected allowlist and Changed Paths", "a real git commit on this worktree's branch"],
+      "mutation": "mutating"
+    },
+    {
+      "type": "authorize",
+      "as": "authReviewRecheck",
+      "operationId": "reviewer-recheck",
+      "targetActorId": "reviewer",
+      "authorizationId": "auth_p00_1_fix1_reviewer_recheck",
+      "invocationKey": "p00-1:fix1:reviewer-recheck:1",
+      "reason": "Revision landed; recheck against D1-D9 and the corrected allowlist."
+    },
+    {
+      "type": "operation",
+      "as": "reviewRecheck",
+      "operationId": "reviewer-recheck",
+      "targetActorId": "reviewer",
+      "taskKey": "reviewer-recheck-reviewer",
+      "objective": "Recheck the revised P00.1.md/index.md/config/doctor-check changes against Driver Dispositions D1-D9. Specifically verify: claude-reviewer and agy-plan are actually removed from both allowlist tables (not just marked); the corrected claude-bwrap/agy-bwrap invocations genuinely include --chdir or equivalent cwd-binding and do not shadow the checkout with --tmpfs /tmp, with real before/after evidence for an outside-path sentinel this time, not just the checkout hash; the baseline section now cites exactly 5614/5604/4-fail/6-skip with no conflicting number left anywhere in P00.1.md; package-lock.json genuinely reverted (git diff against base-ref is empty for that file); the bwrap-available doctor check is real (resolves the binary, runs a real smoke test, has a registerFix pair) and has a passing test. Flag anything still wrong as a new finding, do not rubber-stamp.",
+      "expectedOutputs": ["agent-result.json (status, summary)"],
+      "contextRefs": ["$ref:revise"]
+    },
+    {
+      "type": "authorize",
+      "as": "authRedTeamRecheck",
+      "operationId": "red-team-recheck",
+      "targetActorId": "red-team",
+      "authorizationId": "auth_p00_1_fix1_red_team_recheck",
+      "invocationKey": "p00-1:fix1:red-team-recheck:1",
+      "reason": "Revision landed; recheck the corrected bwrap invocations with the same attack classes that falsified claude-reviewer/agy-plan and exposed the original masking defect."
+    },
+    {
+      "type": "operation",
+      "as": "redTeamRecheck",
+      "operationId": "red-team-recheck",
+      "targetActorId": "red-team",
+      "taskKey": "red-team-recheck-red-team",
+      "objective": "Re-attempt the same attack classes from your first pass (in-tree write, absolute-path outside write, in-tree symlink to outside target, .git/config mutation, .git/hooks/post-commit creation, redirected global git config) against the FIXER's corrected claude-bwrap and agy-bwrap invocations specifically -- confirm the --chdir/cwd fix genuinely exposes the real checkout to the sandboxed process this time (not masked again by a --tmpfs /tmp regression) and that every attack still fails read-only. Also confirm claude-reviewer and agy-plan are genuinely gone from the allowlist, not just relabeled. Report any attack that succeeds as a blocking finding.",
+      "expectedOutputs": ["agent-result.json (status, summary)"],
+      "contextRefs": ["$ref:revise"]
+    }
+  ]
+}

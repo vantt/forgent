@@ -103,6 +103,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'doc-role-underused',
       'doc-source-conservation',
       'agy-permissions-configured',
+      'bwrap-available',
       'main-checkout-guard-warnings',
       'events-compaction-verified',
       'no-stuck-merge-abort',

@@ -1,0 +1,16 @@
+Changes: 9 files, 11 symbols
+Affected processes: 0
+Risk level: low
+
+Changed symbols:
+  Symbol Decisions index → docs/decisions/index.md
+  Symbol herdr dashboard pane tracking — decision record → docs/history/herdr-dashboard-pane-tracking/CONTEXT.md
+  Symbol Scout evidence → docs/history/herdr-dashboard-pane-tracking/CONTEXT.md
+  Symbol herdr fgOS TUI plugin — decision record → docs/history/herdr-fgos-tui-plugin/CONTEXT.md
+  Symbol Locked decisions → docs/history/herdr-fgos-tui-plugin/CONTEXT.md
+  Symbol Scout evidence → docs/history/herdr-fgos-tui-plugin/CONTEXT.md
+  Symbol Operator runbook — herdr cockpit → docs/operator-runbook-herdr-cockpit.md
+  Symbol Hard rule → docs/operator-runbook-herdr-cockpit.md
+  Symbol Spec: Runner (vòng tự hành) → docs/specs/runner.md
+  Symbol Business Rules → docs/specs/runner.md
+  Symbol OUTPUTS → test/verbs/coordination-group-thinking-pack-registration.test.mjs

@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-09-06T02:57:34.610Z",
+  "classification": "OS-only synthetic environment proof; native adapter inheritance is static evidence",
+  "source": "src/runner/dispatch/transport.mjs",
+  "sha256": "2fa3d6bbf005426944057ff21bb49b032fc9ef70b1f66209062db9f870e38810",
+  "results": [
+    {
+      "clearEnvironment": false,
+      "status": 0,
+      "stdout": "{\"syntheticParentVisible\": true}\n",
+      "stderr": "",
+      "args": [
+        "--unshare-all",
+        "--die-with-parent",
+        "--tmpfs",
+        "/",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--symlink",
+        "usr/lib",
+        "/lib",
+        "--symlink",
+        "usr/lib64",
+        "/lib64",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--",
+        "/usr/bin/python3",
+        "-c",
+        "import os,json\nprint(json.dumps({\"syntheticParentVisible\":os.environ.get(\"FGOS_PROBE_SYNTHETIC_PARENT\")==\"SYNTHETIC_ONLY\"}))"
+      ]
+    },
+    {
+      "clearEnvironment": true,
+      "status": 0,
+      "stdout": "{\"syntheticParentVisible\": false}\n",
+      "stderr": "",
+      "args": [
+        "--unshare-all",
+        "--die-with-parent",
+        "--tmpfs",
+        "/",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--symlink",
+        "usr/lib",
+        "/lib",
+        "--symlink",
+        "usr/lib64",
+        "/lib64",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--clearenv",
+        "--setenv",
+        "PATH",
+        "/usr/bin",
+        "--",
+        "/usr/bin/python3",
+        "-c",
+        "import os,json\nprint(json.dumps({\"syntheticParentVisible\":os.environ.get(\"FGOS_PROBE_SYNTHETIC_PARENT\")==\"SYNTHETIC_ONLY\"}))"
+      ]
+    }
+  ],
+  "providerCalls": 0,
+  "agentDispatches": 0
+}

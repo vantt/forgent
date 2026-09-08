@@ -1,0 +1,14 @@
+{
+  "ordinal": 2,
+  "role": "lead-advisor",
+  "requested": { "executor": "claude-bwrap", "tier": "critical", "persona": "lead-advisor" },
+  "derived": { "provider": "claude", "model": "opus", "tierMaterial": true },
+  "mechanism": "direct bwrap invocation (claude-bwrap/agy-bwrap are not registered dispatch executors, see intake.md) -- kongming-verified scratch-bind pattern: --tmpfs /tmp before re-pinning PROJECT_ROOT and EVIDENCE_DIR, env -u CLAUDECODE -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u CLAUDE_PID",
+  "command": "bwrap --ro-bind / / --dev /dev --proc /proc --tmpfs /tmp --ro-bind /home/vantt/projects/vnflow /home/vantt/projects/vnflow --bind <evidenceDir> <evidenceDir> --chdir /home/vantt/projects/vnflow -- claude -p \"<prompt>\" --model opus --permission-mode acceptEdits",
+  "promptPath": "proofs/P01.3/prompts/lead-advisor-interpretation.md",
+  "rawLogPath": "proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log",
+  "outputArtifact": "proofs/P01.3/interpretation.md",
+  "exitCode": 0,
+  "note": "The role doctrine's own Good Example uses this exact case wording ('EOD and intraday evolution is becoming difficult') with fabricated specific inferences -- prompt carried an explicit warning not to reuse them. Output shows no contamination: independent inferences, different specific claims and confidence markers than the example.",
+  "contaminationCheck": "self-reported: formed from CASE+PERSON alone, had not read scout-report.md, consistent with dispatch order (investigator ran first but this prompt withheld its findings); manually cross-checked against scout-report.md -- no shared specific claims, confirming genuine independence"
+}

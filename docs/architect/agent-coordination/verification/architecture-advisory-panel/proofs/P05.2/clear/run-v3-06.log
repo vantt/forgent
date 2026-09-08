@@ -1,0 +1,121 @@
+fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-07T07:10:10.733Z",
+  "data_hash": "114b281a9ad9772daa88b43e62423edc8faff958160c5a35d31abed03a3121af",
+  "data": {
+    "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v3",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "Given the block-classify.ts fix just shipped in herdr-gateway (commits 881fa33, 15b1203: three narrow, evidence-scoped signals added reactively as real Claude Code CLI screens were found misclassified), is continuing to extend this universal visual-heuristic classifier with narrow, evidence-scoped signals the right ongoing strategy for terminal-detail's R21-R27 block classification, or should the project proactively invest in a more general primitive or refactor now, before shipping more one-off patches?",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap-p052-clear-herdr-heuristic-direction-v3\" is missing required actor(s) [lead-advisor-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_coordinator_driver_op_020",
+          "runId": "run_asgn_coordinator_driver_op_020_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_coordinator_driver_op_021",
+          "runId": "run_asgn_coordinator_driver_op_021_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_coordinator_driver_op_022",
+          "runId": "run_asgn_coordinator_driver_op_022_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_coordinator_driver_op_026",
+          "runId": "run_asgn_coordinator_driver_op_026_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_coordinator_driver_op_024",
+          "runId": "run_asgn_coordinator_driver_op_024_01"
+        },
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_coordinator_driver_op_027",
+          "runId": "run_asgn_coordinator_driver_op_027_01"
+        },
+        {
+          "actorId": "red-team-actor",
+          "assignmentId": "asgn_coordinator_driver_op_028",
+          "runId": "run_asgn_coordinator_driver_op_028_01"
+        }
+      ],
+      "failed": [
+        {
+          "actorId": "lead-advisor-actor",
+          "assignmentId": "asgn_coordinator_driver_op_040",
+          "runId": "run_asgn_coordinator_driver_op_040_01"
+        }
+      ],
+      "late": [],
+      "missing": [],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "personTurn1",
+        "type": "human-turn",
+        "turnId": "turn_1",
+        "turnOrdinal": 1,
+        "channel": "claude-code-chat",
+        "artifactRef": "/home/vantt/projects/forgentX/docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/human/1-person.md",
+        "revision": "sha256:61e7a06f0c8361d5c4a48c2428c811408828d396f24f0f62d79d0c73ce05972d",
+        "externalRef": "claude-code-transcript:P05.2-live-session:coordinator-driver",
+        "attributedTo": {
+          "type": "person",
+          "id": "the-user"
+        },
+        "respondsToRefs": [],
+        "appended": false
+      },
+      {
+        "as": "authClose",
+        "type": "authorize",
+        "operationId": "close-dialogue",
+        "nodeId": "phase-dialogue-reopen",
+        "actorId": "lead-advisor-actor",
+        "authorizationId": "auth_close_clear_v3",
+        "invocationKey": "ik_close_clear_v3",
+        "grantedContextRefs": [
+          "asgn_coordinator_driver_op_029"
+        ],
+        "targetArtifactRef": null,
+        "appended": false
+      },
+      {
+        "as": "closeDialogue",
+        "type": "operation",
+        "actorId": "lead-advisor-actor",
+        "assignmentId": "asgn_coordinator_driver_op_040",
+        "status": "failed",
+        "confidence": "failed",
+        "executor": "claude-bwrap",
+        "provider": "claude",
+        "tier": "critical"
+      }
+    ]
+  }
+}

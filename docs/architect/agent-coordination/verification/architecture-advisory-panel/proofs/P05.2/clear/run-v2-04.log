@@ -1,0 +1,103 @@
+fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: dispatch capability=(none declared) executor=claude-bwrap via=cli-spawn provider=claude model=sonnet tier=analytical
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-07T02:46:09.114Z",
+  "data_hash": "e3700c419b034c2cb135b450d6e63ce65a75293921b203f1f3e7749ddd3812a6",
+  "data": {
+    "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v2",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "Given the block-classify.ts fix just shipped in herdr-gateway (commits 881fa33, 15b1203: three narrow, evidence-scoped signals added reactively as real Claude Code CLI screens were found misclassified), is continuing to extend this universal visual-heuristic classifier with narrow, evidence-scoped signals the right ongoing strategy for terminal-detail's R21-R27 block classification, or should the project proactively invest in a more general primitive or refactor now, before shipping more one-off patches?",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap-p052-clear-herdr-heuristic-direction-v2\" is missing required actor(s) [constraint-advocate-actor, lead-advisor-actor, synthesizer-actor, red-team-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_coordinator_driver_op_007",
+          "runId": "run_asgn_coordinator_driver_op_007_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_coordinator_driver_op_008",
+          "runId": "run_asgn_coordinator_driver_op_008_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_coordinator_driver_op_009",
+          "runId": "run_asgn_coordinator_driver_op_009_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_coordinator_driver_op_011",
+          "runId": "run_asgn_coordinator_driver_op_011_01"
+        }
+      ],
+      "failed": [
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_coordinator_driver_op_014",
+          "runId": "run_asgn_coordinator_driver_op_014_01"
+        }
+      ],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        },
+        {
+          "actorId": "red-team-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "authAssess3",
+        "type": "authorize",
+        "operationId": "assess-constraints",
+        "nodeId": "phase-critique",
+        "actorId": "constraint-advocate-actor",
+        "authorizationId": "auth_assess_3",
+        "invocationKey": "ik_assess_3",
+        "grantedContextRefs": [
+          "asgn_coordinator_driver_op_008",
+          "asgn_coordinator_driver_op_009",
+          "asgn_coordinator_driver_op_010"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "assess3",
+        "type": "operation",
+        "actorId": "constraint-advocate-actor",
+        "assignmentId": "asgn_coordinator_driver_op_014",
+        "status": "no-evidence",
+        "confidence": "no-evidence",
+        "executor": "claude-bwrap",
+        "provider": "claude",
+        "tier": "analytical"
+      }
+    ]
+  }
+}

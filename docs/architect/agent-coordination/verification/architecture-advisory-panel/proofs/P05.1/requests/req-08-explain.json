@@ -1,0 +1,11 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 main chain: Phase 8 explanation.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_main",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "authorize", "as": "authExplain", "operationId": "explain-recommendation", "targetActorId": "lead-advisor-actor", "authorizationId": "auth_explain_1", "invocationKey": "ik_explain_1", "reason": "post-redteam-open is open: red-team-packet has settled.", "grantedContextRefs": ["asgn_aap_driver_op_009", "asgn_aap_driver_op_010"] },
+    { "type": "operation", "as": "explain", "operationId": "explain-recommendation", "targetActorId": "lead-advisor-actor", "objective": "Explain the recommendation for ownership: consequence first, name what stays theirs.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

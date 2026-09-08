@@ -1,0 +1,8 @@
+Both artifacts are written to the requested paths under `forgentX/.fgos/assignments/asgn_coordinator_driver_op_003/runs/01/`:
+
+- **`agent-result.json`** — `status: "done"`, structured verdict and evidence
+- **`agent-report.md`** — full human-readable rationale
+
+**Verdict: stay with reactive patching, don't generalize.** `block-classify.ts`'s `looksStructured()` is six independent detector functions (gutters, framing rules, box-char ratio, pipe tables, menu cursor, Q&A summary pairs) combined by OR, one added per real-world Claude Code UI shape discovered — exactly what the last two commits did. This is speced intent, not drift: `docs/specs/terminal-detail.md` R21–R27 codifies the asymmetric bias (wrongly panning prose is free, wrongly wrapping structure is unrecoverable) as a business rule, and its Open Gaps section already accepts unmeasured miss-rate as a tracked gap rather than a redesign trigger.
+
+The key architectural point: OR-composition of independent detectors is **monotonic** — a new detector can only add `pan` verdicts, never remove one — which is what guarantees the safety bias holds automatically as the file grows, with no coordination needed between detector authors. A generalized/weighted/statistical classifier would give up that invariant for no measured benefit. Recommendation: keep adding one small named detector + fixture per new shape; only extract a `DETECTORS[]` array once the chain passes ~10-12 checks (currently 6 — not warranted yet).

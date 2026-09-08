@@ -22,6 +22,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/approve-cas-mismatch-block.md",
+    "title": "`fgos approve` stopped crashing when the item it was about to block had already moved",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/approve-lock-lost-mid-merge-guard.md",
     "title": "`fgos approve` now detects a lost lock mid-merge instead of failing with a raw git error",
     "sourceCaptureId": null
@@ -32,6 +40,14 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/approve-owns-self-recovery-merge-loop-thin-caller.md",
     "title": "Self-recovery moved from `merge-loop` into `approve` itself",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/assert-plan-evidence-current-tree-fallback.md",
+    "title": "A heavy-risk item with no branch of its own had no path to `delivered`",
     "sourceCaptureId": null
   },
   {
@@ -198,6 +214,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md",
+    "title": "A doc's own opening paragraph contradicted its own table two screens down",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/d3-goal-check-rationale-trace.md",
     "title": "D3's rationale outlived its own citation, and pointed to the wrong threat model anyway",
     "sourceCaptureId": null
@@ -312,6 +336,22 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/dispatch-redesign-batch-final-verify.md",
     "title": "Final verify pass on the dispatch-redesign batch: one bug fixed, one gap disclosed",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/dispatch-result-confidence-reader.md",
+    "title": "Reading dispatch result confidence before writing a telemetry field for it",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/dispatch-result-normalization-ladder-extraction.md",
+    "title": "The result-confidence ladder had no seams — now it does",
     "sourceCaptureId": null
   },
   {
@@ -550,6 +590,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/herdr-orchestrator-terminology-boundary.md",
+    "title": "Herdr's `PaneOrchestrator` and fgOS's \"orchestrator\" are two different words that happen to be spelled the same",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/herdr-spawn-adapter-fresh-pane.md",
     "title": "Watching an agent work in a real pane, without letting the next dispatch talk to a stranger's session",
     "sourceCaptureId": null
@@ -622,6 +670,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/main-checkout-reset-ancestor-commit-loss-guard.md",
+    "title": "A clean tree isn't a safe tree — the main-checkout-reset guard only checked one of the two ways to lose work",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/merge-next-inline-approve-invocation.md",
     "title": "An Iron Law block now invokes `approve` in the same turn, not a follow-up command",
     "sourceCaptureId": null
@@ -680,6 +736,14 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/opportunistic-checks-test-regression-fgos-oet.md",
     "title": "A real 7-test regression from `tsk-1ji` — already fixed by the time this item ran",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md",
+    "title": "When a claim outlives the work it was claiming",
     "sourceCaptureId": null
   },
   {
@@ -822,6 +886,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/settleclaim-revision-drift-self-caused.md",
+    "title": "A CAS check that couldn't tell \"I changed this myself\" from \"someone else changed this\"",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/skill-prose-cleanup-cli-fallback-dedupe.md",
     "title": "Deduplicating the \"fgos CLI fallback\" boilerplate across 23 skills",
     "sourceCaptureId": null
@@ -912,6 +984,14 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/state-write-single-stringify.md",
     "title": "`state.json` writes now stringify the view once, not twice",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/submit-dependency-scan-delivered-blindspot.md",
+    "title": "A merged-but-not-yet-cleaned-up item was invisible to duplicate detection",
     "sourceCaptureId": null
   },
   {
@@ -3508,6 +3588,22 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/run-a-coordination-session.md",
     "title": "How to run a coordination session with `fgos coordination`",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/use-fgos-architecture-panel.md",
+    "title": "How to use the `fgos-architecture-panel` skill",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/use-fgos-group-thinking.md",
+    "title": "How to use the `fgos-group-thinking` skill",
     "sourceCaptureId": null
   },
   {

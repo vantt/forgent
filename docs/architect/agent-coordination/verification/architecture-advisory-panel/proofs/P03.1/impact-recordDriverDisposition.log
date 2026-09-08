@@ -1,0 +1,21 @@
+{
+  "target": {
+    "id": "Function:src/runner/coordination/store.mjs:recordDriverDisposition",
+    "name": "recordDriverDisposition",
+    "type": "Function",
+    "filePath": "src/runner/coordination/store.mjs"
+  },
+  "direction": "upstream",
+  "impactedCount": 0,
+  "risk": "LOW",
+  "epistemic": "exact",
+  "summary": {
+    "direct": 0,
+    "processes_affected": 0,
+    "modules_affected": 0
+  },
+  "byDepthCounts": {},
+  "affected_processes": [],
+  "affected_modules": [],
+  "byDepth": {}
+}

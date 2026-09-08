@@ -1,0 +1,11 @@
+{
+  "runId": "run_asgn_aap_driver_op_009_01",
+  "assignmentId": "asgn_aap_driver_op_009",
+  "attempt": 1,
+  "executorId": "exec-slow",
+  "dispatchPlanPath": ".fgos/assignments/asgn_aap_driver_op_009/runs/01/dispatch-plan.json",
+  "cwd": "/tmp/claude-1000/-home-vantt-projects-forgentX/1b6fb381-92ae-4764-b75e-f1a39844aa49/scratchpad/p05-1-work",
+  "startedAt": "2026-09-06T15:16:21.222Z",
+  "timeoutMs": 60000,
+  "status": "running"
+}

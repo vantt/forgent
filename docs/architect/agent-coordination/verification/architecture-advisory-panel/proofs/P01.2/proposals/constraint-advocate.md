@@ -1,0 +1,140 @@
+Role: Constraint Advocate | Cell: P01.2 | Requested: `codex-readonly`, tier `analytical` | Derived: provider `openai-codex`, model `gpt-5.5` (tier immaterial)
+Dispatch: `codex exec -s read-only -C /home/vantt/projects/mdview` (direct, no bwrap needed)
+Prompt: `proofs/P01.2/prompts/constraint-advocate.md` (isolated -- no sibling proposal visible)
+Raw run: `proofs/P01.2/runs/5-constraint-advocate-raw.log`
+
+---
+
+# Phase 5 Candidate: Keep Authority in the Daemon; Repair Desktop Attachment
+
+**Recommendation:** The desktop shell should remain a thin client of the existing daemon for registry, rendering, and search. Its local ownership should cover window state, presentation preferences, and connection status only.
+
+For this proposal, **local registry/render/search ownership** means genuine reimplementation in the shell: opening or maintaining registry data, managing indexing and watchers, rendering documents, or executing search independently of the daemon. I propose none of these. A daemon connection failure must produce a visible, recoverable connection failure—not silently activate a second authority.
+
+This is an operational boundary recommendation. It does not decide whether the shell should become a product.
+
+## The concern that sinks this proposal
+
+**A thin client that cannot reliably attach to the right daemon is not an operable architecture.** Launcher coordination is the first problem to fix, regardless of the eventual ownership decision.
+
+The scout reports four specific defects:
+
+- A plausible, unreproduced concurrent cold-start race: desktop lacks the atomic spawn gate used by CLI (`5887583`).
+- Ignored spawn failure followed by 30 × 150 ms sleeps: approximately **4.5 seconds of waiting**, then silent fallback.
+- A failed discovery poll can leave desktop using the wrong port; CLI has a lock-preferred fallback absent from desktop (`7e697fe`).
+- Desktop constructs URLs from the raw bind host, including default `0.0.0.0`, rather than applying CLI’s loopback substitution.
+
+*Evidence: Context Investigator’s scout report, launcher-coordination findings and cited commits.*
+
+These failures affect the entire desktop session before registry, render, or search quality matters. They also make architecture experiments difficult to interpret: a launcher failure can look like a daemon performance or availability problem.
+
+**Cheapest survivable mitigation:** make desktop use the same tested discovery-and-start coordination implementation as CLI, after checking that implementation’s behavior. Give it one bounded attempt, explicit failure reporting, correct connection-address construction, and a retry action. After an unsuccessful discovery attempt, do not claim success using an assumed port.
+
+This change is reversible and requires no registry migration. It is a prerequisite for this candidate, not justification for rebuilding the services locally.
+
+## Proposed operating boundary
+
+| Responsibility | Owner | Operational rule |
+|---|---|---|
+| Registry semantics and schema evolution | Existing daemon authority | Desktop never opens the registry database directly. |
+| Rendering and search | Daemon | Desktop submits requests and presents results or explicit errors. |
+| Index freshness and watcher enrollment | Daemon | Fix lifecycle gaps once in the existing authority. |
+| Daemon discovery and startup | Shared launcher implementation | CLI and desktop follow the same coordination rules. |
+| Window state and presentation preferences | Desktop | Disposable state; no authoritative document or index data. |
+| Connection health | Desktop | Show connecting, connected, and failed states with actionable diagnostics. |
+
+This preserves the existing authority; it does **not** assume the repository already enforces exclusive daemon access to SQLite. The registry explicitly supports concurrent access by daemon, CLI, MCP, and a detached refresh process. Keeping desktop thin avoids adding another database participant while that exposure is assessed.  
+*Evidence: scout report citing `repository.rs:34`.*
+
+## Ranked operational findings
+
+### 1. Launcher coordination currently threatens basic usability
+
+**Magnitude:** potentially every cold start; the actual incidence of the concurrent-start race remains unknown. The ignored-failure path already imposes roughly 4.5 seconds of waiting without explaining the cause.
+
+**Mitigation:** consolidate launcher behavior, surface spawn and discovery errors, and test concurrent starts, spawn failure, stale discovery information, nondefault ports, and wildcard bind addresses. Diagnostics should identify the discovery source, attempted endpoint, elapsed time, and failure stage.
+
+**Reversibility:** high. No data transformation or backfill is involved.
+
+**Owner and cost:** the solo maintainer owns one launcher implementation and its regression tests. Desktop integration adds coverage, but should stop requiring parallel fixes to copied launcher logic.
+
+### 2. Local ownership would create a second service implementation on an unmaintained surface
+
+**Magnitude:** every subsequent registry schema change, render behavior fix, and search/indexing change could require implementation and compatibility work in two places. Sharing a database would couple independent implementations to the same schema and locking behavior. Separate databases would introduce duplicate indexing and explicit freshness and reconciliation decisions.
+
+Neither arrangement is operationally free.
+
+The shell has no tests, is absent from CI, has bundling disabled, and remains at `0.1.0` against workspace `0.7.6`, with no commits since July 20. These are evidence of missing maintenance coverage, not proof that desktop can never be maintained. They make a second implementation a poor present allocation of the sole maintainer’s capacity.  
+*Evidence: scout report; `.github/workflows/ci.yml` and `release.yml` exclusions.*
+
+**Mitigation:** retain the thin boundary and add desktop compilation and focused launcher tests to CI. Do not make desktop a database schema or indexing participant.
+
+**Reversibility:** retaining a thin shell is highly reversible. Introducing local authoritative state becomes expensive to reverse once users depend on it: retirement then requires preserving or reconciling that state. That data commitment deserves more weight than the reversible cost of launcher repair.
+
+**Owner and cost:** this candidate adds a bounded desktop integration obligation. Local ownership adds ongoing service maintenance across three capabilities, plus whichever data lifecycle it chooses. There is no evidence supporting a credible hours-per-month estimate; the difference is in recurring responsibilities, not a defensible numeric multiplier.
+
+### 3. Existing registry contention is real exposure, but not yet a case for duplication
+
+**Magnitude:** SQLite, FTS5, `Mutex<Connection>`, and a documented 15-second busy timeout mean lock contention can dominate an interactive request. That timeout is a configured accommodation, **not evidence that requests currently wait 15 seconds**. Frequency and severity are unmeasured.
+
+*Evidence: scout report, including `repository.rs:34`.*
+
+**Mitigation:** first measure operation duration, in-process mutex wait, and SQLite busy/locked failures. Exercise overlapping refresh, CLI/MCP activity, and desktop search. Use the results to decide whether existing write paths need serialization or tighter daemon mediation.
+
+Do not first migrate all existing database callers: that would enlarge this decision unnecessarily.
+
+**Reversibility:** instrumentation and workload measurement are highly reversible. A later writer-ownership change needs its own migration plan.
+
+**Owner and cost:** one maintainer observes and fixes the existing contention problem once. Desktop-local ownership would not remove existing callers; it would either join them or create another index to operate.
+
+### 4. Index freshness has a known lifecycle gap
+
+**Magnitude:** an unrelated project registered after daemon startup is not dynamically enrolled in watchers. Its later changes can therefore escape watcher-driven refresh until another refresh mechanism or restart intervenes.
+
+*Evidence: scout report, watcher-enrollment finding.*
+
+**Mitigation:** connect successful project registration to daemon watcher enrollment, with repeatable enrollment and a visible failure result. Verify registration after startup followed by a file change. Define restart recovery from the registry so an interrupted enrollment can recover.
+
+**Reversibility:** high; this requires no second data store.
+
+**Owner and cost:** one lifecycle fix and a focused integration test. Reimplementing watchers in desktop would add another lifecycle while leaving this daemon defect intact.
+
+## Delivery and the half-migrated state
+
+Ship this as a sequence of independently useful changes:
+
+1. **Establish a desktop check in CI.** Compile the shell and exercise the launcher integration points. Its absence from current CI is an immediate maintenance blind spot.
+2. **Consolidate and repair attachment.** Preserve existing supported client behavior while moving desktop onto the common implementation.
+3. **Make failures diagnosable.** Expose connection state and useful launch/discovery errors; record request and contention signals in the daemon.
+4. **Repair watcher enrollment.** Verify that a project registered during a running daemon session becomes refreshable through watcher events.
+5. **Measure representative workloads.** Record cold startup, rendering, search, and concurrent refresh behavior before proposing a new execution boundary.
+
+During the transition, older desktop binaries may retain their launcher defects. Avoid coupling the launcher fix to a registry format or protocol break. The new shell should attach to a compatible running daemon without replacing it, and closing the shell should not terminate a daemon serving other clients.
+
+There is **no backfill, dual-write window, or authoritative data conversion** in this proposal. Rollback consists of reverting application changes while retaining the existing registry. Reverting desktop may restore its old launcher defects, but should not require data repair.
+
+## Security and failure containment
+
+Keeping registry access out of desktop avoids introducing another component that can modify authoritative state directly. It does not by itself establish that the existing daemon endpoint is secure.
+
+As part of attachment repair, verify that a locally launched daemon is reached through the intended local endpoint. Treat wildcard-bind-to-loopback substitution as connection-address handling; it does not change the daemon’s listening exposure. Any change to bind scope or authentication should be explicit and separately reviewable.
+
+Daemon failure will still interrupt desktop registry/render/search operations. The inexpensive containment is clear failure reporting and reconnection, not an emergency local implementation with different behavior and state.
+
+## Acceptance and reopening criteria
+
+Accept this candidate when:
+
+- Concurrent CLI and desktop cold starts converge on the intended daemon in regression tests.
+- Spawn and discovery failures produce a bounded, visible error.
+- Wildcard bind configuration and nondefault ports produce the correct connection endpoint.
+- Desktop changes receive CI coverage.
+- Newly registered projects receive watcher enrollment.
+- A repeatable workload establishes a baseline for request latency and contention.
+
+The PRD targets—startup under 2 seconds, rendering 1 MB under 100 ms, and search over 50,000 files under 200 ms—are **targets, not demonstrated performance**. They cannot currently distinguish thin execution from local execution.  
+*Evidence: scout report citing `PRD.md` and the absence of benchmarks.*
+
+Reopen the ownership boundary if measurements show an unacceptable limitation attributable to daemon execution or attachment after these repairs, and a local prototype demonstrates a material improvement with an explicit maintenance and data-retirement plan.
+
+Doing nothing also has a cost: silent launcher failures, wrong-endpoint behavior, stale indexing, and unmeasured contention remain. The proposed investment is therefore **thin-client repair with a bounded maintenance contract**, not preservation of the current defects.

@@ -150,9 +150,100 @@
           "heavy": "lightweight"
         }
       },
+      "claude-bwrap": {
+        "kind": "agent",
+        "description": "Claude Code CLI under an OS-level read-only mount (bwrap --ro-bind / /) -- the read-only-confined pair for architecture-advisory-panel dispatch (tsk-1o4; live-proven safe P00.1: claude-reviewer's own --allowedTools scoping was falsified, an authorized attack write still succeeded, while this exact bwrap wrap blocked the identical attack, admitted to the allowlist). `providerModel` is declared explicitly (`claude`) because the resolved `command` is `bwrap`, not one of `CLAUDE_CLI_COMMANDS` -- the implicit claude-provider inference (config.mjs's `deriveProviderFamily`) only fires off the literal command name, so a wrapped invocation has to say its own provider or model/tier resolution fails outright (found live while dispatching P05.2). A single, fixed writable exception is re-bound on top of the read-only mount: this repo's own `.fgos/assignments` tree, where the coordination engine expects every dispatched agent-result.json to land regardless of the target project's own cwd (assignment-runner.mjs's `runDir`, not `cwd` -- confirmed live: a fully read-only mount left a real advisory dispatch with real findings unable to report them at all, status stuck at `no-evidence`). This does not weaken the confinement this executor exists for: the target project the panel is advising about (whatever `--cwd` names) stays fully read-only, confirmed live by evidence.json's own git-hash before/after match; this bind only ever touches this repo's own bookkeeping tree, one level removed from anything the panel is meant to be judging. It carries the same write-breadth caveat already filed as tsk-63z (any executor process can read/write any OTHER assignment's own directory under this same tree, not just its own) -- a pre-existing platform property this bind does not add to.",
+        "providerModel": "claude",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--bind",
+              "/home/vantt/projects/forgentX/.fgos/assignments",
+              "/home/vantt/projects/forgentX/.fgos/assignments",
+              "--",
+              "claude",
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}",
+              "--permission-mode",
+              "acceptEdits"
+            ]
+          }
+        ]
+      },
+      "agy-bwrap": {
+        "kind": "agent",
+        "description": "Antigravity CLI under an OS-level read-only mount (bwrap --ro-bind / /) -- the read-only-confined pair for architecture-advisory-panel dispatch (tsk-1o4; live-proven safe P00.1: agy-cli's own --mode plan and --mode accept-edits --sandbox were both falsified, each still wrote outside the repo, while this exact bwrap wrap blocked the identical attack, admitted to the allowlist). Same writable exception as claude-bwrap (this repo's own .fgos/assignments tree, where the coordination engine expects agent-result.json regardless of the dispatched cwd) -- see that executor's own description for why this does not weaken confinement. Drops --new-project (tsk-31d): agy -p ignores the invoking OS cwd for RELATIVE paths and defaults to a stale internal scratch workspace, with or without this flag, with or without confinement -- --new-project only compounds it by spinning up a fresh throwaway one every call. The real, confirmed-live workaround is an absolute-path convention in every dispatched prompt (both for the material being read and the result file being written), not a flag -- callers of this executor must never rely on relative-to-cwd resolution.",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--bind",
+              "/home/vantt/projects/forgentX/.fgos/assignments",
+              "/home/vantt/projects/forgentX/.fgos/assignments",
+              "--",
+              "agy",
+              "-p",
+              "{prompt}",
+              "--mode",
+              "accept-edits",
+              "--model",
+              "{model}"
+            ]
+          }
+        ],
+        "providerModel": "gemini",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
+      },
+      "codex-readonly": {
+        "kind": "agent",
+        "description": "OpenAI Codex CLI under its own provider-native read-only sandbox (-s read-only) -- the read-only-confined pair for architecture-advisory-panel dispatch (tsk-1o4; live-proven safe P00.1: this flag blocked the same attack codex-cli's --dangerously-bypass-approvals-and-sandbox let through, admitted to the allowlist; codex-bwrap, the OS-mount alternative, was excluded for a non-runnable startup crash, not a safety failure).",
+        "providerModel": "openai-codex",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "codex",
+            "args": [
+              "exec",
+              "-s",
+              "read-only",
+              "{prompt}"
+            ]
+          }
+        ]
+      },
       "codex-cli": {
         "kind": "agent",
         "description": "OpenAI Codex CLI (bypass-all -- no sandbox boundary, see docs/history/codex-bypass-executor/)",
+        "providerModel": "openai-codex",
         "allowCrossProvider": true,
         "invocations": [
           {

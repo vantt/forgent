@@ -1,0 +1,30 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-clear-herdr-heuristic-direction-v3: Phase 8 (explain the recommendation for ownership, preserving the red-team's live dissent).",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v3",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authExplain",
+      "operationId": "explain-recommendation",
+      "targetActorId": "lead-advisor-actor",
+      "authorizationId": "auth_explain_v3",
+      "invocationKey": "ik_explain_v3",
+      "reason": "Phase 7 and red-team are both in -- write the document the person actually reads, preserving the red-team's live dissent rather than smoothing it away.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_027", "asgn_coordinator_driver_op_028"]
+    },
+    {
+      "type": "operation",
+      "as": "explain",
+      "operationId": "explain-recommendation",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "Write the one document meant for the person, about /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification strategy -- consequence first, architecture second, defensible to colleagues who will live in the resulting codebase, not a summary of what happened internally. The real synthesis recommendation: keep looksStructured() as a flat ordered OR-chain of small named detectors (Proposal A's shape, identical to C's status quo), reject Proposal B (a Pluggable Output Grammar registry) -- not on generic YAGNI grounds but because it is behaviourally equivalent to the current shape (pure OR chain) while splitting matched exclusion notes (e.g. BOX_CHARS excluding the arrow precisely so a summary detector can claim it) into files that would no longer explain each other, a real debuggability regression. No code change required. The one authorized action: build phase-04's never-built fixture corpus plus a confusion matrix scored on false-wrap rate (must stay at zero; false-pan is tolerated), per the operator's own 2026-08-11 locked decision (fully automatic, no UI control, err toward pan when unsure). The independent red-team's live, unresolved dissent -- state this plainly, do not smooth it over: the red-team called the panel's own conduct 'intellectually dishonest,' arguing the critic's valid attack on Proposal A was dismissed to protect the status quo, that Proposal B was a deliberately weak strawman, and that a real, legitimate hybrid nobody proposed -- an array of modular predicate functions (a Strategy-pattern refactor keeping the same behavior, same OR-composition, just each detector in its own named unit) -- was conspicuously never put forward or evaluated by any of the three shapers. Tell the person this dissent is real and unresolved, name the hybrid option honestly, and say what would change the recommendation if the person wants that hybrid evaluated (a new session, since Phase 5 shaping does not reopen within this protocol). Use absolute paths for anything you read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). This session's own coordination bookkeeping lives at /home/vantt/projects/forgentX/.fgos/ -- you are authorized to write your result artifacts at the exact runDir path this dispatch gives you under that tree. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

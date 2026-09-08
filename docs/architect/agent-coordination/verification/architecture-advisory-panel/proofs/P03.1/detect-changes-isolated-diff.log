@@ -1,0 +1,34 @@
+Changes: 9 files, 27 symbols
+Affected processes: 32
+Risk level: critical
+
+Changed symbols:
+  Symbol replaySession → src/runner/coordination/replay.mjs
+  Symbol artifactRevisionRefs → src/runner/coordination/replay.mjs
+  Symbol validateEventPayload → src/runner/coordination/schema.mjs
+  Symbol EVENT_KINDS → src/runner/coordination/schema.mjs
+  Symbol OPTIONAL_STRING_ARRAY_FIELDS → src/runner/coordination/schema.mjs
+  Symbol OPTIONAL_STRING_FIELDS → src/runner/coordination/schema.mjs
+  Symbol DRIVER_PROVENANCE_COMPANION_FIELDS → src/runner/coordination/schema.mjs
+  Symbol AGGREGATION_METHOD_VALUES → src/runner/coordination/schema.mjs
+  Symbol AGGREGATION_OUTCOME_VALUES → src/runner/coordination/schema.mjs
+  Symbol AGGREGATION_OPTIONAL_ARRAY_FIELDS → src/runner/coordination/schema.mjs
+  Symbol category → src/runner/coordination/store.mjs
+  Symbol assertDispositionRefOwnedBySession → src/runner/coordination/store.mjs
+  Symbol recordDriverDisposition → src/runner/coordination/store.mjs
+  Symbol canonicalize → src/runner/coordination/store.mjs
+  Symbol linkedContributionIds → src/runner/coordination/store.mjs
+... and 12 more
+
+Affected execution flows:
+  • ReplaceSessionActor → IsPlainObject (6 steps) — changed: replaySession
+  • RecordContributionLink → CoordinationError (5 steps) — changed: recordContributionLink, validateEventPayload
+  • RecordSpecialistAuthorization → CoordinationError (5 steps) — changed: validateEventPayload
+  • RecordConsultDisposition → CoordinationError (5 steps) — changed: replaySession
+  • RecordConsultDisposition → ResolveMainCheckoutRoot (5 steps) — changed: replaySession
+  • RecordConsultDisposition → ResolveRepoRoot (5 steps) — changed: replaySession
+  • RecordConsultDisposition → FgosDirFromRoot (5 steps) — changed: replaySession
+  • RecordConsultDisposition → EventLogError (5 steps) — changed: replaySession
+  • RecordConsultDisposition → IsPlainObject (5 steps) — changed: validateEventPayload, replaySession
+  • RecordAggregationValidation → CoordinationError (5 steps) — changed: recordAggregationValidation, validateEventPayload
+... and 22 more

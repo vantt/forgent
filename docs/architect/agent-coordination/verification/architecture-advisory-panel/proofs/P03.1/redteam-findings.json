@@ -1,0 +1,272 @@
+[
+  {
+    "attack_id": "A1a-write",
+    "description": "Self-attribution at the write door: record a human turn where attributedTo.id equals the driver's own recordedBy.id.",
+    "command_or_script": "recordHumanTurn('c_a1', {...attributedTo: {type:'person', id:'coordinator-1'}, recordedBy:{type:'driver', id:'coordinator-1'}}, opts)",
+    "expected": "Refused (contract Refusals paragraph + T1).",
+    "actual": "REFUSED -- CoordinationError/validation: 'recordHumanTurn: attributedTo.id \"coordinator-1\" is the same identity as recordedBy.id -- a driver cannot attribute a human turn to itself'",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A1b-write",
+    "description": "attributedTo.id names a declared manifest.actors[] panel actor ('reviewer').",
+    "command_or_script": "recordHumanTurn('c_a1', {...attributedTo:{type:'person', id:'reviewer'}}, opts)",
+    "expected": "Refused (T1).",
+    "actual": "REFUSED -- CoordinationError/validation: '... is a declared panel actor of session \"c_a1\" -- a panel actor cannot occupy the human-decision slot'",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A1c-write",
+    "description": "attributedTo.type set to 'driver' instead of 'person'.",
+    "command_or_script": "recordHumanTurn('c_a1', {...attributedTo:{type:'driver', id:'someone'}}, opts)",
+    "expected": "Refused by the closed single-value type enum.",
+    "actual": "REFUSED -- CoordinationError/validation: 'event \"human-turn-recorded\" payload.attributedTo.type must be \"person\"'",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A1d-write",
+    "description": "attributedTo.id shaped like a driver-authored ref: 'asgn_abc', 'contribution:x', 'human-turn:x'.",
+    "command_or_script": "recordHumanTurn('c_a1', {...attributedTo:{type:'person', id:'asgn_abc' | 'contribution:x' | 'human-turn:x'}}, opts)",
+    "expected": "All three refused (T1, third refusal in the contract's Refusals list).",
+    "actual": "ALL THREE REFUSED -- CoordinationError/validation: '... is shaped like a driver-authored ref (an Assignment id, or the reserved \"contribution:\"/\"human-turn:\" namespace) -- a driver-authored ref cannot occupy the human-decision slot'",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A1a-replay",
+    "description": "Hand-crafted events.jsonl carrying a self-attributed human-turn-recorded event; replaySession must refuse independently.",
+    "command_or_script": "fs.appendFileSync(<session>/events.jsonl, JSON.stringify({type:'human-turn-recorded', ts, payload:{...attributedTo:{type:'person',id:WRITER_ID}}})); replaySession(id, opts)",
+    "expected": "replaySession throws (T1 're-checked independently at replay', T8).",
+    "actual": "REPLAY REFUSED -- CoordinationError/validation: '... attributes the turn to \"coordinator-1\", the same identity as its own recordedBy'",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A1b-replay",
+    "description": "Hand-crafted panel-actor attribution in events.jsonl.",
+    "command_or_script": "same forge harness, attributedTo.id='reviewer'; replaySession(id, opts)",
+    "expected": "replaySession throws.",
+    "actual": "REPLAY REFUSED -- CoordinationError/validation: '... a declared panel actor of this session -- a panel actor cannot occupy the human-decision slot'",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A1c-replay",
+    "description": "Hand-crafted attributedTo.type='driver' in events.jsonl.",
+    "command_or_script": "same forge harness, attributedTo={type:'driver',id:'someone'}; replaySession(id, opts)",
+    "expected": "replaySession throws (validateEventPayload runs per event on replay).",
+    "actual": "REPLAY REFUSED -- CoordinationError/validation: 'payload.attributedTo.type must be \"person\"'",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A1d-replay",
+    "description": "PRIMARY FINDING. Hand-crafted events.jsonl attributing a human turn to a driver-authored ref shape ('asgn_abc', 'contribution:x', 'human-turn:x'). The write door refuses all three (A1d-write); replay must too, per the contract's 'Refusals (write door and replay, independently)' paragraph and T1's 'Mechanism: recordHumanTurn's attributedTo refusals (store.mjs), re-checked independently at replay'.",
+    "command_or_script": "forge('A1d_replay_asgn', turn({attributedTo:{type:'person', id:'asgn_abc'}})) etc.; replaySession(id, opts). Reproduced end-to-end via the exported store door too: appendEvent(eventsPath, {type:'human-turn-recorded', payload: turn({attributedTo:{type:'person',id:'asgn_driverartifact'}})}, sessionDir); replaySession(...); showCoordinationUseCase(opts,{id}).",
+    "expected": "replaySession throws with the driver-authored-ref-shape refusal, matching the write door.",
+    "actual": "REPLAY ACCEPTED for all three shapes. replaySession returns humanTurns=[{attributedTo:{type:'person', id:'asgn_abc'}}] and showCoordinationUseCase renders it in the humanTurns section as a legitimate person-attributed turn. src/runner/coordination/replay.mjs:241-306 implements only 3 of the write door's 4 attributedTo refusals -- the /^asgn_/ | CONTRIBUTION_REF_PREFIX | HUMAN_TURN_REF_PREFIX shape check present at store.mjs:1445 has no replay-side counterpart. No test in test/runner/coordination-replay.test.mjs covers this case (the three that exist cover recordedBy identity, self-attribution, and panel-actor attribution).",
+    "verdict": "BYPASSED",
+    "severity_if_bypassed": "MEDIUM -- only reachable via the T8 hand-crafted/bypassed-log path (already 'Narrowed, not fully closed'), so it does not widen the write-door guarantee. But it is a real doc-vs-reality mismatch: the contract's Refusals paragraph and T1's Mechanism column both claim replay re-checks this refusal, and it does not. It also makes the forged record survive replay AND render in `fgos coordination show`, so a driver-authored Assignment id can occupy the human-decision slot in every read surface a later reader has."
+  },
+  {
+    "attack_id": "A2a",
+    "description": "Driver artifact presented as a human decision: disposition targetRef is the BARE turnId (no 'human-turn:' prefix).",
+    "command_or_script": "recordDriverDisposition('c_a2', {targetRef:'turn_1', ...}, opts)",
+    "expected": "Refused as a near-miss.",
+    "actual": "REFUSED -- CoordinationError/validation: 'ref \"turn_1\" is the bare id of a human turn this session recorded, which targets nothing -- write \"human-turn:turn_1\" to target that turn'",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A2b",
+    "description": "Disposition citing 'human-turn:ghost', a turn this session never recorded.",
+    "command_or_script": "recordDriverDisposition('c_a2', {targetRef:'human-turn:ghost', ...}, opts)",
+    "expected": "dangling-ref (T5).",
+    "actual": "REFUSED -- CoordinationError/dangling-ref: '... names human turn \"ghost\", which coordination session \"c_a2\" never recorded'",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A2c",
+    "description": "Disposition targetRef is a bare, nonexistent Assignment id ('asgn_fabricated').",
+    "command_or_script": "recordDriverDisposition('c_a2', {targetRef:'asgn_fabricated', ...}, opts)",
+    "expected": "Unclear from the contract; the segment scan only refuses an asgn_ ref whose assignment.json EXISTS and is not a member.",
+    "actual": "ACCEPTED as an opaque ref. It is never interpreted as a human turn anywhere (only the 'human-turn:' prefix reaches the human-turn resolution path at replay.mjs:482), so it cannot occupy the human-decision slot. Pre-existing disposition-door behavior, unchanged by this cell.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a -- accepted, but not in the human-decision position; `show` already reports targetRefOwnedBySession for this."
+  },
+  {
+    "attack_id": "A2d/A2e/A2f",
+    "description": "'contribution:x' as targetRef; bare turnId inside evidenceRefs; 'human-turn:ghost' inside evidenceRefs.",
+    "command_or_script": "recordDriverDisposition with each shape.",
+    "expected": "All refused.",
+    "actual": "ALL REFUSED -- dangling-ref for contribution:x and human-turn:ghost, validation near-miss for the bare turnId in evidenceRefs. The human-turn: ownership rule applies to evidenceRefs[], not just targetRef.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A2g/A2h",
+    "description": "human-turn-recorded.respondsToRefs pointing at a nonexistent turn ('human-turn:ghost'), and at a bare unprefixed turn id.",
+    "command_or_script": "recordHumanTurn('c_a2', turn({turnId:'turn_2', turnOrdinal:2, respondsToRefs:['human-turn:ghost' | 'turn_1']}), opts)",
+    "expected": "Refused via the shared assertDispositionRefOwnedBySession.",
+    "actual": "BOTH REFUSED -- dangling-ref and the bare-id near-miss respectively, with 'recordHumanTurn: respondsToRefs[0]' labels.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A2j",
+    "description": "Forged log in which a driver-disposition-recorded citing 'human-turn:turn_1' appears BEFORE the human-turn-recorded event it cites.",
+    "command_or_script": "append disposition line, then human-turn line, to events.jsonl; replaySession(id, opts)",
+    "expected": "out-of-order-ref (T5, replay half).",
+    "actual": "REPLAY REFUSED -- CoordinationError/out-of-order-ref: '... names human turn \"turn_1\", which has no \"human-turn-recorded\" event before it in this session's log'",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A2k",
+    "description": "SECONDARY FINDING. Forged log in which a human-turn-recorded event carries respondsToRefs:['human-turn:never_recorded'].",
+    "command_or_script": "appendFileSync(events.jsonl, human-turn-recorded with respondsToRefs:['human-turn:never_recorded']); replaySession(id, opts)",
+    "expected": "Not explicitly claimed by the contract, but the disposition analogue (A2j) IS re-checked at replay, so the asymmetry is worth naming.",
+    "actual": "REPLAY ACCEPTED -- humanTurns[0].respondsToRefs === ['human-turn:never_recorded']. replay.mjs's human-turn branch copies respondsToRefs through without any ownership or out-of-order check; only the write door (recordHumanTurn -> assertDispositionRefOwnedBySession) validates them.",
+    "verdict": "UNEXPECTED",
+    "severity_if_bypassed": "LOW -- write-door-only enforcement, reachable only through the same T8 hand-crafted-log path. Not a claim the contract makes, but an inconsistency with how the disposition's own human-turn: refs are treated at replay."
+  },
+  {
+    "attack_id": "A3a/A3b",
+    "description": "Post-hoc rewrite: record the same turnId again with a different artifactRef, then with a different revision.",
+    "command_or_script": "recordHumanTurn('c_a3', turn({artifactRef:'human/1-person-EDITED.md'}), opts); recordHumanTurn('c_a3', turn({revision:'sha256:bbb...'}), opts)",
+    "expected": "Hard duplicate-ref both times, no silent overwrite, no duplicate entry (T2).",
+    "actual": "BOTH REFUSED -- CoordinationError/duplicate-ref: 'turnId \"turn_1\" ... was already recorded with different content -- a human turn is immutable; record a new turnId instead'. Event count stayed at 1.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A3c/A3d",
+    "description": "Same turnId with IDENTICAL content (idempotency), and the same content with the object keys supplied in a shuffled order.",
+    "command_or_script": "recordHumanTurn('c_a3', turn(), opts); recordHumanTurn('c_a3', {recordedBy, attributedTo, externalRef, revision, artifactRef, channel, turnOrdinal, turnId} /* reversed key order */, opts)",
+    "expected": "Accepted as a true no-op (appended:false), no second event.",
+    "actual": "BOTH ACCEPTED as no-ops; human-turn-recorded event count stayed at 1 after all four calls. canonicalizeHumanTurnPayload's key normalization holds against caller key-order variation.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a -- correct documented behavior"
+  },
+  {
+    "attack_id": "A4a/A4b",
+    "description": "Ordinal games: record ordinal 5 when the latest is 3 (gap); record ordinal 3 again under a new turnId (reuse).",
+    "command_or_script": "recordHumanTurn('c_a4', turn({turnId:'turn_5', turnOrdinal:5, ...}), opts); recordHumanTurn('c_a4', turn({turnId:'turn_3b', turnOrdinal:3, ...}), opts)",
+    "expected": "Both refused (T4).",
+    "actual": "BOTH REFUSED -- CoordinationError/validation: 'turnOrdinal 5 is not the next ordinal for session \"c_a4\" (expected 4) -- no gaps, no ordinal reuse' / same for 3.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A4c/A4d",
+    "description": "externalRef reuse under a new turnId; ordinal 0.",
+    "command_or_script": "recordHumanTurn with externalRef already claimed by turn_1; recordHumanTurn with turnOrdinal:0",
+    "expected": "duplicate-ref (T3); validation (positive-integer).",
+    "actual": "REFUSED -- duplicate-ref '... externalRef \"ct:s1:u1\" ... was already used by turn \"turn_1\"'; REFUSED -- validation 'payload.turnOrdinal must be a positive integer'.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A4f",
+    "description": "Record a human turn after the session reached a terminal status (session-completed).",
+    "command_or_script": "transitionSessionStatus('c_a4t','completed',{},opts); recordHumanTurn('c_a4t', turn({turnId:'turn_2', turnOrdinal:2, ...}), opts)",
+    "expected": "Refused at the door OR excluded from humanTurns on replay -- the design allows either.",
+    "actual": "REFUSED AT THE DOOR -- CoordinationError/validation: 'session \"c_a4t\" is not active (status: \"completed\") -- a human turn cannot be recorded into a session that has already closed'.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A4g/A7k",
+    "description": "Post-terminal human-turn-recorded event forced into the log (bypassing the door), then replayed.",
+    "command_or_script": "appendEvent(eventsPath, {type:'human-turn-recorded', payload: turn({turnId:'turn_2', turnOrdinal:2})}, sessionDir); replaySession(id, opts)",
+    "expected": "Accepted but neutralized into ignoredHumanTurns, per the documented 'excluded from humanTurns, reported separately, never silently dropped' shape.",
+    "actual": "As documented: humanTurns=['turn_1'], ignoredHumanTurns=['turn_2']. The post-terminal turn still advances maxHumanTurnOrdinal (running state updated unconditionally), which matches the code's own stated intent and the sibling authorization/aggregation branches.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a -- documented behavior confirmed"
+  },
+  {
+    "attack_id": "A5",
+    "description": "The honest gap (T6): record a human turn whose externalRef is a made-up transcript uuid and whose backing artifact was written by the coordinator itself, through the REAL request door (fgos coordination run, human-turn step).",
+    "command_or_script": "fs.writeFileSync(tempDir+'/human/1-person.md', 'I, the human, definitely said ship it. -- (written by the coordinator)'); runCoordinationUseCase(ctx, {requestObject: request({steps:[produceStep(), humanTurnStep({externalRef:'claude-code-transcript:00000000-...:ffffffff-...'})]})})",
+    "expected": "ACCEPTED -- T6 is disclosed as open by design and un-closeable in-process.",
+    "actual": "ACCEPTED -- appended:true, revision computed from the fabricated file's real bytes (sha256:6912bcda...), and the turn renders in showCoordinationUseCase's humanTurns section. Matches the design's own T6 claim exactly; the record does permanently name recordedBy=the driver and a specific artifact revision, so the fabrication is an attributable false attestation rather than an invisible one.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a -- disclosed residual, reality matches the doc"
+  },
+  {
+    "attack_id": "A6",
+    "description": "Worker/RunResult path: can a dispatched worker's own output ever become a human turn, bypassing the driver-only recordHumanTurn door?",
+    "command_or_script": "grep -rn 'human-turn-recorded' src/ bin/ ; grep -rn 'recordHumanTurn' src/ bin/ ; recordContributionLink('c_a6', {type:'human-turn', ...}, opts)",
+    "expected": "No such path.",
+    "actual": "NO SUCH PATH. Static trace: exactly one appendEventLocked({type:'human-turn-recorded'}) site (store.mjs:1497, inside recordHumanTurn), and exactly one caller of recordHumanTurn (src/verbs/coordination/run.mjs:607, the driver's own request-file step, which supplies recordedBy from the request's writerId, never from the step). linkResult/recordContributionLink cannot mint one: recordContributionLink with type:'human-turn' is REFUSED -- 'payload.type must be one of proposal | objection | response | clarification | rank | specialist-request'. A live session driven only through worker paths produced event kinds ['session-opened','actor-bound'] and nothing else.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A7j",
+    "description": "OWN ATTACK. store.mjs re-exports the generic appendEvent primitive ('re-exported only for tests'). Use it to append a human-turn-recorded event straight into a live session, bypassing recordHumanTurn's every refusal.",
+    "command_or_script": "import { appendEvent, resolveSessionPaths } from store.mjs; appendEvent(eventsPath, {type:'human-turn-recorded', payload:{...}}, sessionDir)",
+    "expected": "Write succeeds (the primitive does no coordination-schema validation), but replay must refuse whatever recordHumanTurn would have refused.",
+    "actual": "Write succeeds for every shape. Replay catches self-attribution (A7j1 refused) but NOT the driver-authored-ref shape (A7j2 accepted, and rendered by `show`). This is the same defect as A1d-replay, reached through a production-exported symbol rather than a hand-edited file -- it does not need filesystem tampering, only an in-process import of an exported store symbol.",
+    "verdict": "BYPASSED",
+    "severity_if_bypassed": "MEDIUM -- same underlying gap as A1d-replay. Worth noting separately because it lowers the bar for T8 from 'hand-crafted or corrupted events.jsonl' to 'call an exported store function', and appendEvent's own comment says it is re-exported for tests only while nothing enforces that."
+  },
+  {
+    "attack_id": "A7l",
+    "description": "OWN ATTACK. Append an invented event kind ('human-turn-verified') to make a forged turn look independently verified.",
+    "command_or_script": "appendEvent(eventsPath, {type:'human-turn-verified', payload:{turnId:'turn_1'}}, sessionDir); replaySession(id, opts)",
+    "expected": "Replay refuses an unknown kind.",
+    "actual": "REPLAY REFUSED -- CoordinationError/validation: 'unknown event kind \"human-turn-verified\" (expected one of ...)'. The event log is kind-closed at read time.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A7m",
+    "description": "OWN ATTACK. Prototype-pollution-shaped ids: turnId='__proto__' and attributedTo.id='__proto__'.",
+    "command_or_script": "recordHumanTurn('c_a7m', turn({turnId:'__proto__'}), opts); recordHumanTurn(..., attributedTo:{type:'person', id:'__proto__'}); replaySession(...)",
+    "expected": "Accepted as opaque strings without polluting any lookup structure.",
+    "actual": "ACCEPTED and harmless -- replay's turn/externalRef bookkeeping uses Set/Map, so '__proto__' is an ordinary key; replay returned ['__proto__','t2'] with no corruption. No finding.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A7g",
+    "description": "OWN ATTACK. artifactRef path traversal / absolute path / symlink at the real request door, to pin a 'human turn' to bytes outside the session's own workspace.",
+    "command_or_script": "runCoordinationUseCase with humanTurnStep({artifactRef:'../../../../etc/hostname'}), then {artifactRef:'/etc/hostname'}, then artifactRef pointing at an in-repo symlink whose target is swapped after recording",
+    "expected": "Undocumented. The request boundary explicitly does NOT charset-restrict artifactRef (schema.mjs:525-532, 'operator-authored trusted data'), unlike turnId/respondsToRefs which DO get a path-escape refusal.",
+    "actual": "ALL ACCEPTED. '../../../../etc/hostname' and '/etc/hostname' both recorded, revision matching /etc/hostname's real sha256. A swapped symlink target leaves the recorded revision pinned to the old bytes with nothing anywhere re-checking it. Read-only, same-privilege, so no escalation -- but the ledger's 'artifactRef + revision pin the real bytes the transcription rests on' claim can be satisfied by a file no reader of the repo can ever resolve or re-verify.",
+    "verdict": "UNEXPECTED",
+    "severity_if_bypassed": "LOW -- provenance quality, not a privilege issue. A recorded turn may cite bytes outside the repo/session, making the revision hash un-reverifiable by a later reader who only has the repo. Note the inconsistency: turnId and respondsToRefs[] get 'path escape rejected'; artifactRef does not."
+  },
+  {
+    "attack_id": "A7i",
+    "description": "OWN ATTACK. Case-variant self-attribution: attributedTo.id is the driver identity with different casing.",
+    "command_or_script": "runCoordinationUseCase with humanTurnStep({attributedTo:{type:'person', id:'MASTER-COORDINATOR-1'}}) against writerId 'master-coordinator-1'",
+    "expected": "Undocumented; the refusal is an exact string comparison.",
+    "actual": "ACCEPTED -- appended:true, attributedTo={type:'person', id:'MASTER-COORDINATOR-1'}. The self-attribution refusal is exact-match, so a confusable variant of the driver's own identity is legal in the human-decision slot.",
+    "verdict": "UNEXPECTED",
+    "severity_if_bypassed": "LOW -- a driver that wants to fabricate a person can simply pick any handle (T6 already covers that), so this adds no capability. It only makes a forged record visually confusable with the driver's own identity for a human reader."
+  },
+  {
+    "attack_id": "A7n",
+    "description": "OWN ATTACK. Cross-process TOCTOU: recordHumanTurn racing transitionSessionStatus('completed') from two separate OS processes, spin-synchronized to a shared start instant, 20 rounds.",
+    "command_or_script": "node attack7n-terminal-race-driver.mjs (spawns two node processes per round via execFile; each spins until a shared Date.now() target before calling its door)",
+    "expected": "The active-status check and the append are one withEventsLock critical section (T7), so a turn must never land after the terminal event.",
+    "actual": "0/20 violations. Every round was cleanly serialized: either TURN_REFUSED validation + CLOSE_OK (18 rounds, log = session-opened,session-completed) or TURN_OK + CLOSE_OK with the turn strictly BEFORE the terminal event (2 rounds). postTerminalTurn=0, no replay threw.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  },
+  {
+    "attack_id": "A7o",
+    "description": "OWN ATTACK. Cross-process ordinal collision: two processes each recording turnOrdinal 1 with distinct turnIds and externalRefs, spin-synchronized, 20 rounds.",
+    "command_or_script": "node attack7o-ordinal-race-driver.mjs",
+    "expected": "Exactly one winner per round; no duplicate ordinal ever written (T4/T7).",
+    "actual": "0/20 duplicate ordinals. Every round: one OK, one REFUSED validation; ordinals=[1] and replay reconstructed exactly 1 turn. Winner alternated between the two processes across rounds, confirming a real race window was hit and the lock closed it.",
+    "verdict": "BLOCKED",
+    "severity_if_bypassed": "n/a"
+  }
+]

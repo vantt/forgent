@@ -39,6 +39,7 @@
 // disagree for an operation this table doesn't name explicitly.
 
 import { RunnerConfigError } from './config.mjs';
+import { carriesProtocolOperationStamp } from './execution-contract.mjs';
 
 export const NORMALIZER_VERSION = '1';
 
@@ -148,13 +149,14 @@ export function stampDeclaredAssignment({ role, operation }) {
  * from its already-validated execution contract (ADR-006 R2). By the time
  * this runs, `execution-contract.mjs` has already rejected a contract with a
  * missing/invalid `mutation` or `evidence.required`, and already rejected
- * `mutation: 'mutating'` outright (ADR-006 §6, R3's job). The checks here are
- * a defensive second gate against that same first-slice read-only-only
- * invariant (this module's own universal invariant, not the primary
- * enforcement point) -- `mutation` for inline is therefore held to
- * `=== 'read-only'` specifically, not merely "one of the two known enum
- * values", so this function can never itself become the path that lets a
- * `'mutating'` inline contract through.
+ * `mutation: 'mutating'` unless it carried the engine-reserved
+ * protocol-operation stamp (ADR-006 §6 / Phase 01 mutation-unlock R6a). The
+ * check here is a defensive SECOND gate against that same invariant (this
+ * module's own universal guarantee, not the primary enforcement point) --
+ * `mutation: 'mutating'` is therefore held to the identical stamp
+ * requirement a second time, so this function can never itself become a
+ * path that lets an unstamped `'mutating'` inline contract through even if
+ * `execution-contract.mjs`'s own gate were ever bypassed or weakened.
  *
  * @param {object} contract Validated inline execution contract
  * @returns {Readonly<{ mutation: string, evidence: Readonly<{required: string}> }>}
@@ -163,9 +165,14 @@ export function stampInlineAssignment(contract) {
   const mutation = contract?.mutation;
   const evidenceRequired = contract?.evidence?.required;
 
-  if (mutation !== 'read-only') {
+  if (mutation !== 'read-only' && mutation !== 'mutating') {
     throw new RunnerConfigError(
-      'assignment-normalizer: inline contract missing/invalid "mutation" after normalization (first slice accepts "read-only" only, ADR-006 §6)',
+      'assignment-normalizer: inline contract missing/invalid "mutation" after normalization (must be "read-only" or "mutating", ADR-006 §6)',
+    );
+  }
+  if (mutation === 'mutating' && !carriesProtocolOperationStamp(contract?.constraints)) {
+    throw new RunnerConfigError(
+      'assignment-normalizer: inline contract mutation "mutating" carries no engine-reserved protocol-operation stamp -- rejected as a second, defensive gate (ADR-006 §6 / Phase 01 mutation-unlock R6a)',
     );
   }
   if (evidenceRequired !== 'reported' && evidenceRequired !== 'verified') {

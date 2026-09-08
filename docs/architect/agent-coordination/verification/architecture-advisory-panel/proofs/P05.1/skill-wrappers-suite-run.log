@@ -1,0 +1,47 @@
+✔ extractFrontmatter returns the --- fenced block verbatim, including both fences (0.784556ms)
+✔ extractFrontmatter returns an empty string when the content has no frontmatter block (0.12144ms)
+✔ generateWrapperContent keeps the source frontmatter byte-identical (0.125526ms)
+✔ generateWrapperContent names the given relative path in its redirect body (0.138338ms)
+✔ generateWrapperContent never includes the source body content — genuinely thin, not a copy (0.108131ms)
+✔ generateWrapperContent throws when the source has no frontmatter to copy (0.280741ms)
+✔ generateWrapperContent never cites a bare D-local id outside its own CONTEXT.md (tsk-352f: decision 0017), but keeps the tsk-1qi item id (0.118152ms)
+✔ generateAllSkillWrappers writes one wrapper per skill directory under agentsSkillsRoot (0.785893ms)
+✔ generateAllSkillWrappers skips _shared (a fragment folder, not a dispatchable skill with its own frontmatter) (0.357615ms)
+✔ generateAllSkillWrappers skips a directory with no SKILL.md inside it (0.926722ms)
+✔ generateAllSkillWrappers is a no-op returning [] when agentsSkillsRoot does not exist at all (0.534957ms)
+✔ materializeSkillsIntoProject copies .agents/skills into an external target project, then generates wrappers there (0.748806ms)
+✔ materializeSkillsIntoProject self-hosting: when packageRoot equals targetRoot, it regenerates wrappers in place without copying (0.339521ms)
+✔ materializeSkillsIntoProject is a no-op when packageRoot has no .agents/skills at all (0.148813ms)
+✔ materializeSkillsIntoProject never throws when assembling into packageRoot fails (round-2 review finding, tsk-397) -- a real global npm install can be root-owned/read-only; the already-shipped .agents/skills still materializes into the target project (0.481715ms)
+✔ assembleSkills assembles skills from core/skills/ and domains/*/skills/ into .agents/skills/ (0.477499ms)
+✔ assembleSkills is a safe no-op returning [] when neither core/skills nor domains/ exist (0.102888ms)
+✔ materializeSkillsIntoProject runs assembly first so core/skills and domains/*/skills materialize into target project (0.804448ms)
+✔ materializeSkillsIntoProject never deletes packageRoot base skills it just copied in, even when targetRoot has its own domains/*/skills but no core/skills (0.850553ms)
+✔ assembleSkills output matches the committed .agents/skills byte-for-byte (drift guard, review finding H6) -- catches a hand-edit to the render target OR a source-only edit that never landed there (10.421487ms)
+✔ assembleSkills throws on duplicate skill name collision across core and domains (0.386504ms)
+✔ assembleSkills prunes orphaned skills from .agents/skills when removed from source (0.371917ms)
+✔ generateAllSkillWrappers prunes orphaned wrappers from .claude/skills when source skill is gone (0.297098ms)
+✔ generateAllSkillWrappers never prunes a standalone skill under .claude/skills that was never a generated wrapper (regression: pruning by name-absence alone previously deleted a hand-authored skill directory) (0.231376ms)
+✔ mirrorDevSkillsIntoPlugin mirrors _shared and fgos-* dev-skills into plugin directory, skipping non-fgos skills (0.41929ms)
+✔ mirrorDevSkillsIntoPlugin is a safe no-op returning [] when agentsSkillsRoot does not exist (0.119842ms)
+✔ .claude/skills and .agents/skills declare the exact same set of fgos-* skill names (1.171348ms)
+✔ every .claude/skills/<name>/SKILL.md is exactly the wrapper generateWrapperContent would produce from its .agents/skills source (proves npm run build:skills is up to date) (1.778788ms)
+✔ every .claude/skills/<name>/SKILL.md wrapper carries the exact same frontmatter as its .agents/skills source (name/description stay correct for Claude Code's own skill listing) (0.839291ms)
+✔ every .claude/skills/<name>/SKILL.md wrapper is genuinely thin — much smaller than its .agents/skills source, not a stale pre-tsk-1qi full copy (0.488187ms)
+✔ .agents/skills and plugins/fgOS/skills declare the exact same set of fgos-* dev-skill names (0.186534ms)
+✔ every fgos-* dev-skill mirrored into plugins/fgOS/skills contains the exact same set of relative file paths as its .agents/skills source (1.408264ms)
+✔ every fgos-* dev-skill file pair mirrored into plugins/fgOS/skills is byte-identical to its .agents/skills source (1.617924ms)
+✔ .agents/skills/_shared and plugins/fgOS/skills/_shared mirror each other byte-identically (0.280514ms)
+✔ .claude/skills has no _shared directory of its own (retired, tsk-1qi — every wrapper redirects to .agents/skills, whose own _shared already covers every reference) (0.110726ms)
+✔ every fgos-* dev-skill source in .agents/skills carries user-invocable: false (0.699371ms)
+✔ every fgos-* dev-skill wrapper in .claude/skills inherits user-invocable: false from its source (frontmatter is copied verbatim) (0.276633ms)
+✔ every fgos-* dev-skill mirrored into plugins/fgOS/skills also carries user-invocable: false (kept byte-identical to its .agents/skills source) (0.611299ms)
+✔ distill (the one non-fgos-* skill mirrored in .agents/skills and .claude/skills) does NOT carry user-invocable: false — only the 14 dev-skills are in scope for D6 (0.113033ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 64.848434

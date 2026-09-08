@@ -1,0 +1,10 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 authority ATTACK #2: dispatch a driver-authorized operation (critique-proposals) with NO prior authorize step at all -- must be refused through the real CLI.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_authority_attack2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "operation", "as": "critiqueUnauthorized", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor", "objective": "ATTACK: attempt to dispatch a driver-authorized binding with no authorize step ever issued.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

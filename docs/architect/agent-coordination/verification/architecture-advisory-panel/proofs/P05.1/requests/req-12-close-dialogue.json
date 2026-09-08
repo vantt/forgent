@@ -1,0 +1,11 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 main chain: driver's own explicit close-dialogue, bringing quorum to completion.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_main",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "authorize", "as": "authClose", "operationId": "close-dialogue", "targetActorId": "lead-advisor-actor", "authorizationId": "auth_close_1", "invocationKey": "ik_close_1", "reason": "post-explanation-open is open; the reopen budget is spent (2/2) and no further reopen is needed.", "grantedContextRefs": ["asgn_aap_driver_op_011", "asgn_aap_driver_op_013"] },
+    { "type": "operation", "as": "closeDialogue", "operationId": "close-dialogue", "targetActorId": "lead-advisor-actor", "objective": "Close the dialogue -- no further reopen is needed.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "kind": "declared-protocol",
+  "objective": "herdr-gateway's terminal-detail screen reads every coding-agent TUI through one universal visual-shape heuristic (/home/vantt/projects/herdr-gateway/web/src/block-classify.ts) rather than per-agent knowledge. Two independent symptoms point at the same open architecture question: block-classify.ts keeps needing a new narrow signal for each newly-observed UI shape (three signals added across two recent releases, 0.1.18/0.1.19), and the terminal-detail spec's own Open Gaps section says the display-scroll fallback has only ever been verified live against one coding agent, with no fallback designed if a future agent reacts differently. A separate real project (upstreams/collie, vendored under herdr-gateway at /home/vantt/projects/herdr-gateway/upstreams/collie) already built a per-agent semantic grammar for Claude Code specifically instead of a universal heuristic. Should herdr-gateway continue with, and keep extending, the universal heuristic approach, or move toward a per-agent grammar system -- and if the latter, when and how, given the terminal surface must also work for agents herdr-gateway has not yet encountered?",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-unclear-herdr-grammar-vs-heuristic-v3",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30, "wallTimeMs": 14400000 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "context-investigator-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "interpret",
+      "operationId": "interpret-request",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "Interpret the person's intent: whether to keep the universal visual-heuristic classifier or move toward a per-agent grammar system, and on what timeline. Use absolute paths for everything you read. Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "investigate",
+      "operationId": "investigate-context",
+      "targetActorId": "context-investigator-actor",
+      "objective": "Scout the real herdr-gateway repository using ONLY absolute paths (do not rely on your own current directory): /home/vantt/projects/herdr-gateway/web/src/block-classify.ts and /home/vantt/projects/herdr-gateway/web/src/terminal-render.ts (the universal heuristic), /home/vantt/projects/herdr-gateway/docs/specs/terminal-detail.md's R21-R28 and Open Gaps, and /home/vantt/projects/herdr-gateway/upstreams/collie/web/src (the vendored per-agent grammar reference -- look for grammar/wizard.ts, prompt-select, and chrome-detection files) -- report what each approach actually costs and covers today, not in the abstract. Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "shape-system",
+      "operationId": "shape-system-proposal",
+      "targetActorId": "system-shaper-actor",
+      "objective": "Propose the strongest 'stay within the current system' architecture: continue and evolve the universal visual-heuristic classifier at /home/vantt/projects/herdr-gateway/web/src/block-classify.ts rather than adopting a per-agent grammar. Use absolute paths for everything you read. Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "shape-alternative",
+      "operationId": "shape-alternative-proposal",
+      "targetActorId": "alternative-shaper-actor",
+      "objective": "Propose a genuinely different architecture: a per-agent semantic grammar system (as already built for Claude Code in /home/vantt/projects/herdr-gateway/upstreams/collie/web/src) for herdr-gateway's own terminal-detail classification, replacing or supplementing the universal heuristic. Use ONLY absolute paths for everything you read (do not rely on your own current directory). Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "shape-constraint",
+      "operationId": "shape-constraint-proposal",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "Propose the architecture that best respects real operational constraints (must work for coding agents herdr-gateway has not yet encountered, no-UI-control per /home/vantt/projects/herdr-gateway/docs/specs/terminal-detail.md R24, the fail-closed asymmetry per R25, maintenance burden of per-agent grammars vs. reactive heuristic patches) for the universal-heuristic-vs-per-agent-grammar question. Use absolute paths for everything you read. Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

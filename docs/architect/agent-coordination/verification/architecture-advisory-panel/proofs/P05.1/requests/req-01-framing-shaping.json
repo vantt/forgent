@@ -1,0 +1,22 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 hard conformance and recovery proof: real architecture-advisory-panel-v1 session, main chain.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_main",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30 },
+  "actors": [
+    { "id": "system-shaper-actor", "executor": "exec-family-a" },
+    { "id": "alternative-shaper-actor", "executor": "exec-family-b" }
+  ],
+  "steps": [
+    { "type": "operation", "as": "interpret", "operationId": "interpret-request", "targetActorId": "lead-advisor-actor", "objective": "Interpret the raw case.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "investigate", "operationId": "investigate-context", "targetActorId": "context-investigator-actor", "objective": "Scout the repo for evidence.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "shapeSystem", "operationId": "shape-system-proposal", "targetActorId": "system-shaper-actor", "objective": "Shape the direct-response system proposal.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "contribution", "as": "linkSystem", "roundKey": "round-1", "contributionId": "p051_proposal_system", "contributionType": "proposal", "assignmentId": "$ref:shapeSystem" },
+    { "type": "operation", "as": "shapeAlt", "operationId": "shape-alternative-proposal", "targetActorId": "alternative-shaper-actor", "objective": "Shape the alternative proposal, different priors.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "contribution", "as": "linkAlt", "roundKey": "round-1", "contributionId": "p051_proposal_alt", "contributionType": "proposal", "assignmentId": "$ref:shapeAlt" },
+    { "type": "operation", "as": "shapeConstraint", "operationId": "shape-constraint-proposal", "targetActorId": "constraint-advocate-actor", "objective": "Shape the constraint proposal.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "contribution", "as": "linkConstraint", "roundKey": "round-1", "contributionId": "p051_proposal_constraint", "contributionType": "proposal", "assignmentId": "$ref:shapeConstraint" }
+  ]
+}

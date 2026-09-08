@@ -134,6 +134,7 @@
     "src/verbs/dispatch/watch.mjs": "use-case",
     "src/verbs/coordination/launch-master-loop.mjs": "use-case",
     "src/verbs/coordination/group-thinking-pack.mjs": "use-case",
+    "src/verbs/coordination/chain.mjs": "use-case",
     "src/runner/coordination/headless-adapter.mjs": "use-case",
     "src/report/item-trace.mjs": "domain",
     "src/util/format-bytes.mjs": "kernel",
@@ -168,6 +169,8 @@
     "src/runner/dispatch/trust-store.mjs": "infra",
     "src/runner/dispatch/worker-home.mjs": "infra",
     "src/runner/dispatch/worker-session.mjs": "infra",
-    "src/runner/dispatch/worker-session-boot.mjs": "infra"
+    "src/runner/dispatch/worker-session-boot.mjs": "infra",
+    "src/setup/version-guard.mjs": "domain",
+    "src/setup/fingerprint-ledger.mjs": "domain"
   }
 }

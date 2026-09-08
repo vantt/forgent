@@ -11,18 +11,21 @@
 // check below, which reuses the SAME loadCoordinationProtocol the engine
 // itself calls, never a second copy of protocol-loading logic.
 //
-// TWO deliberate exceptions to that import rule, both from store.mjs:
-// `recordDriverDisposition` and `readSessionEvents`. A disposition is
-// driver ledger state about a ref -- it resolves no binding, materializes
-// nothing, and has no FlowDefinition-aware counterpart in session-engine.mjs
-// to delegate to, so store.mjs's door IS the door (it does its own shape
-// validation, active-session check, driver-identity pin, and lock-held
-// append). `readSessionEvents` reads back the real persisted
-// `operation-authorized` event on an "authorize" step's idempotent
-// (appended: false) path, so the reported step result never echoes a
-// repeat call's own (possibly different) payload as if it were now in
-// force -- session-engine.mjs has no equivalent read either. Importing both
-// here reaches the real doors rather than reimplementing any part of them.
+// THREE deliberate exceptions to that import rule, all from store.mjs:
+// `recordDriverDisposition`, `recordHumanTurn`, and `readSessionEvents`. A
+// disposition is driver ledger state about a ref -- it resolves no binding,
+// materializes nothing, and has no FlowDefinition-aware counterpart in
+// session-engine.mjs to delegate to, so store.mjs's door IS the door (it
+// does its own shape validation, active-session check, driver-identity pin,
+// and lock-held append). `recordHumanTurn` (Phase 03.1) is the same shape --
+// a trusted-input/human-decision provenance record is definition-blind
+// ledger state, never a binding dispatch. `readSessionEvents` reads back the
+// real persisted `operation-authorized` event on an "authorize" step's
+// idempotent (appended: false) path, so the reported step result never
+// echoes a repeat call's own (possibly different) payload as if it were now
+// in force -- session-engine.mjs has no equivalent read either. Importing
+// all three here reaches the real doors rather than reimplementing any part
+// of them.
 //
 // "run is synchronous in V1" (R1): every step in a request's `steps` array
 // (or the single `task` for an agent-led request) is awaited in order
@@ -43,8 +46,9 @@
 // since ordinary dispatch has no per-call identity check of its own.
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { StoreError } from '../../state/store.mjs';
-import { CoordinationError } from '../../runner/coordination/schema.mjs';
+import { CoordinationError, HUMAN_TURN_REF_PREFIX } from '../../runner/coordination/schema.mjs';
 import {
   openStandaloneSession,
   openDeclaredProtocolSession,
@@ -58,7 +62,7 @@ import {
   closeSessionByQuorum,
   deriveSessionPhase,
 } from '../../runner/coordination/session-engine.mjs';
-import { recordDriverDisposition, readSessionEvents } from '../../runner/coordination/store.mjs';
+import { recordDriverDisposition, recordHumanTurn, readSessionEvents } from '../../runner/coordination/store.mjs';
 import { loadCoordinationProtocol } from '../../runner/definitions/protocol-loader.mjs';
 import { validateCoordinationRequest } from './schema.mjs';
 
@@ -450,6 +454,7 @@ export async function runCoordinationUseCase(ctx, options = {}) {
             round: step.round,
             taskKey: step.taskKey,
             ...(Object.keys(cliPolicy).length > 0 ? { cliPolicy } : {}),
+            ...(step.mutation !== undefined ? { mutation: step.mutation } : {}),
           },
           engineOpts,
         );
@@ -568,6 +573,103 @@ export async function runCoordinationUseCase(ctx, options = {}) {
           anchors: contribution.anchors ?? [],
           respondsTo: contribution.respondsTo ?? null,
           appended: contribution.appended,
+        });
+      } else if (step.type === 'human-turn') {
+        // Phase 03.1: the request supplies everything EXCEPT `revision` and
+        // `recordedBy` -- this door computes both itself so neither can be
+        // hand-typed. `artifactRef` is resolved against the working
+        // directory (no existing file-based-ref resolution helper exists in
+        // this module to reuse -- see this file's own header comment on
+        // what IS/ISN'T reused); the file must genuinely exist on disk at
+        // record time, or the step fails loudly rather than recording a
+        // provenance stamp for bytes nobody verified.
+        const resolvedArtifactPath = path.resolve(ctx.cwd, step.artifactRef);
+        const missingArtifactError = () =>
+          new StoreError(
+            'validation',
+            `coordination request: steps[${step.as}] (type "human-turn") artifactRef "${step.artifactRef}" does not resolve to a real file at "${resolvedArtifactPath}" -- refusing to record a human-turn provenance stamp for bytes that were never verified to exist`,
+          );
+        // Fix round 2: workspace containment must run on SYMLINK-RESOLVED
+        // paths, not the lexical `path.resolve` above -- a lexical-only
+        // check (lexical candidate compared against lexical `ctx.cwd`) lets
+        // an IN-WORKSPACE symlink whose TARGET is outside the workspace
+        // pass containment and then have its outside bytes hashed as the
+        // `revision` (Red-Team's own live reproduction: a symlink at
+        // "human/1-person.md" pointing at "/etc/hostname"). `realpathSync`
+        // resolves every symlink in the path (including any in `ctx.cwd`
+        // itself, e.g. a symlinked worktree or a macOS `/tmp` ->
+        // `/private/tmp` mount) and also confirms the path genuinely
+        // exists -- so a missing artifact is caught HERE, before the
+        // containment check ever runs, replacing the plain `fs.readFileSync`
+        // ENOENT catch this used to rely on for that message.
+        let realArtifactPath;
+        try {
+          realArtifactPath = fs.realpathSync(resolvedArtifactPath);
+        } catch (err) {
+          if (err.code === 'ENOENT' || err.code === 'ENOTDIR') throw missingArtifactError();
+          throw err;
+        }
+        const realWorkspaceRoot = fs.realpathSync(ctx.cwd);
+        // A `../` traversal or an absolute path both resolve OUTSIDE
+        // `ctx.cwd`; `path.relative` starting with `..` (or itself
+        // absolute, the cross-drive/UNC edge Node's own path module can
+        // still produce) is the standard "escaped the root" test --
+        // applied to the REAL (symlink-resolved) paths on both sides, so a
+        // symlink escape is caught the identical way a lexical traversal
+        // already is.
+        const relativeToWorkspace = path.relative(realWorkspaceRoot, realArtifactPath);
+        if (relativeToWorkspace.startsWith('..') || path.isAbsolute(relativeToWorkspace)) {
+          throw new StoreError(
+            'validation',
+            `coordination request: steps[${step.as}] (type "human-turn") artifactRef "${step.artifactRef}" resolves to "${realArtifactPath}" (via "${resolvedArtifactPath}"), outside the working directory "${realWorkspaceRoot}" -- a human-turn artifact must live inside the workspace the session was opened against`,
+          );
+        }
+        let artifactBytes;
+        try {
+          artifactBytes = fs.readFileSync(realArtifactPath);
+        } catch (err) {
+          if (err.code === 'EISDIR') throw missingArtifactError();
+          throw err;
+        }
+        const revision = `sha256:${createHash('sha256').update(artifactBytes).digest('hex')}`;
+        // `step.respondsToRefs` carries bare turn ids of PRIOR human turns in
+        // THIS session (schema.mjs's own `assertSafeId`, not `assertSafeRefOrId`
+        // -- see its doc comment for why no `$ref:` resolution applies here);
+        // prefixed with the reserved namespace before reaching the engine,
+        // which is the shape `recordHumanTurn`/`assertDispositionRefOwnedBySession`
+        // (store.mjs) actually expect.
+        const respondsToRefs = step.respondsToRefs !== undefined ? step.respondsToRefs.map((turnId) => `${HUMAN_TURN_REF_PREFIX}${turnId}`) : undefined;
+        const humanTurn = recordHumanTurn(
+          manifest.coordinationId,
+          {
+            turnId: step.turnId,
+            turnOrdinal: step.turnOrdinal,
+            channel: step.channel,
+            artifactRef: step.artifactRef,
+            revision,
+            externalRef: step.externalRef,
+            attributedTo: step.attributedTo,
+            recordedBy: driverIdentity,
+            ...(respondsToRefs !== undefined ? { respondsToRefs } : {}),
+          },
+          engineOpts,
+        );
+        // No `labels[step.as]` entry: this step materializes no Assignment
+        // (matching "authorize"/"disposition"/"contribution", above) -- a
+        // later `$ref:<label>` pointing at it has nothing to resolve to and
+        // is refused by resolveRef's own unknown-label check.
+        stepResults.push({
+          as: step.as,
+          type: 'human-turn',
+          turnId: humanTurn.turnId,
+          turnOrdinal: humanTurn.turnOrdinal,
+          channel: humanTurn.channel,
+          artifactRef: humanTurn.artifactRef,
+          revision: humanTurn.revision,
+          externalRef: humanTurn.externalRef,
+          attributedTo: humanTurn.attributedTo,
+          respondsToRefs: humanTurn.respondsToRefs ?? [],
+          appended: humanTurn.appended,
         });
       } else {
         const fromAssignmentId = resolveRef(step.fromAssignmentId, labels, `steps[${step.as}].fromAssignmentId`);
