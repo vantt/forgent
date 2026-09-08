@@ -13,7 +13,7 @@
       "authorizationId": "auth_nominal_group_example_clarify",
       "invocationKey": "nominal-group-example-clarify:1",
       "reason": "Share has settled -- open clarification.",
-      "grantedContextRefs": ["<the share assignmentId from the first call's own result>"]
+      "grantedContextRefs": ["FILL-IN-the-share-assignmentId-from-the-first-calls-own-result"]
     },
     {
       "type": "operation",
