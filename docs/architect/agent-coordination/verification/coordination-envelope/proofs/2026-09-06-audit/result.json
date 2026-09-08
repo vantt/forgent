@@ -1,0 +1,96 @@
+{
+  "timestamp": "2026-09-06T02:51:38.393Z",
+  "kind": "no-provider-capability-probe",
+  "root": "/home/vantt/projects/forgentX",
+  "node": "v24.18.0",
+  "fixture": "/tmp/fgos-envelope-canary-HUgOtY",
+  "sourceHashes": {
+    "src/verbs/coordination/schema.mjs": "1050f34ec16def45b2850a674a6fabefaf6af47d26601c510be2bb2216faa41a",
+    "src/verbs/coordination/run.mjs": "dbea6d812b5e3b39d2aeb10c05cfa7f08dffadc16b56dee3569aa4438561e925",
+    "src/runner/coordination/session-engine.mjs": "583063c4a5e0dcd90ae1ad53ccc2b4f6c00b1d1e3219249e1c1b1ae72c99d641",
+    "src/runner/coordination/store.mjs": "d90474e7a3c943774c649938e391be6345a3fdcdff5646091fdcc0d7940e6c90",
+    "src/runner/dispatch/assignment-runner.mjs": "2863111e46fe5139ec2f3ee487dffdbbe002d952a1de253db4820e92ec950489"
+  },
+  "sourceStable": true,
+  "validation": [
+    {
+      "name": "declared-control",
+      "accepted": true
+    },
+    {
+      "name": "agent-led-control",
+      "accepted": true
+    },
+    {
+      "name": "public-specialist",
+      "accepted": false,
+      "error": "coordination request: steps[0].type must be \"operation\", \"fan-out\", \"authorize\", \"disposition\", or \"contribution\""
+    },
+    {
+      "name": "public-retry",
+      "accepted": false,
+      "error": "coordination request: steps[0].type must be \"operation\", \"fan-out\", \"authorize\", \"disposition\", or \"contribution\""
+    },
+    {
+      "name": "public-cancel",
+      "accepted": false,
+      "error": "coordination request: steps[0].type must be \"operation\", \"fan-out\", \"authorize\", \"disposition\", or \"contribution\""
+    },
+    {
+      "name": "public-replace",
+      "accepted": false,
+      "error": "coordination request: steps[0].type must be \"operation\", \"fan-out\", \"authorize\", \"disposition\", or \"contribution\""
+    },
+    {
+      "name": "agent-led-new-actor",
+      "accepted": false,
+      "error": "coordination request: actors[].id \"compatibility-specialist\" is not a registered actor for an agent-led session -- only \"primary\" is declared before dispatch (unregistered actor override rejected)"
+    },
+    {
+      "name": "agent-led-mutating",
+      "accepted": false,
+      "error": "coordination request: field \"mutation\" at task.mutation must be \"read-only\" -- only a declared \"operation\" step may opt into a real, mutating dispatch (Phase 01 mutation-unlock); every other step type stays read-only-only"
+    },
+    {
+      "name": "agent-led-open-role",
+      "accepted": false,
+      "error": "coordination request: \"primaryRole\" is required and must be one of reviewer, researcher, advisor when kind is \"agent-led\""
+    },
+    {
+      "name": "declared-mutation-schema",
+      "accepted": true
+    }
+  ],
+  "mount": {
+    "command": "/usr/bin/bwrap",
+    "args": [
+      "--ro-bind",
+      "/",
+      "/",
+      "--dev",
+      "/dev",
+      "--proc",
+      "/proc",
+      "--bind",
+      "/tmp/fgos-envelope-canary-HUgOtY/evidence",
+      "/tmp/fgos-envelope-canary-HUgOtY/evidence",
+      "--chdir",
+      "/tmp/fgos-envelope-canary-HUgOtY/checkout",
+      "--",
+      "/usr/bin/python3",
+      "-c",
+      "import pathlib,json,sys\np=pathlib.Path(sys.argv[1])\nr={\"siblingRead\":p.read_text()}\ntry:\n p.write_text(\"MUTATED\")\n r[\"write\"]=\"succeeded\"\nexcept OSError as e:\n r[\"write\"]=\"denied\";r[\"errno\"]=e.errno\nprint(json.dumps(r))",
+      "/tmp/fgos-envelope-canary-HUgOtY/sibling-report.txt"
+    ],
+    "status": 0,
+    "stdout": "{\"siblingRead\": \"SYNTHETIC_PRIVATE_FIRST_PASS\", \"write\": \"denied\", \"errno\": 30}\n",
+    "stderr": "",
+    "sentinelUnchanged": true
+  },
+  "limits": {
+    "providerCalls": 0,
+    "agentDispatches": 0,
+    "timeoutMs": 10000,
+    "scope": "validator calls and synthetic canary only"
+  }
+}

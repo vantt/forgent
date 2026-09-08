@@ -7,19 +7,32 @@
 // test enforces this boundary."
 //
 // This engine's own answer to the FIRST half of R7 (verified below, not
-// just cited): the entire standalone-session slice hardcodes
-// `mutation: 'read-only'` (plan.md's Locked Product Decision, module header
-// of session-engine.mjs) -- `dispatchPrimaryTask`/`dispatchDeclaredOperation`/
-// `recordConsultDisposition` accept NO caller-suppliable `mutation` field at
-// all (confirmed by static source scan below, not merely by reading the
-// code once); `proposeConsult`/`validateConsultProposal` is the ONE place a
-// `mutation` value is caller-visible, and it explicitly REJECTS anything
-// other than `'read-only'` before any Assignment is created. Since mutation
-// is structurally impossible everywhere in this engine, "two concurrent
-// MUTATING actors sharing one workspace" cannot occur at all -- a stronger
-// guarantee than merely refusing the specific two-actor collision case,
-// and tested as such (attempting the weakest single-actor mutation case
-// already proves the stronger claim).
+// just cited), UPDATED for the group-thinking-plan-loop track's own Phase 01
+// mutation-unlock: `dispatchPrimaryTask`/`recordConsultDisposition` still
+// hardcode `mutation: 'read-only'` (no caller-suppliable field at all,
+// confirmed by static source scan below) -- unchanged, per Phase 01 R4's own
+// explicit carve-out. `proposeConsult`/`validateConsultProposal` remains the
+// ONE undeclared-protocol place a `mutation` value is caller-visible, and it
+// still explicitly REJECTS anything other than `'read-only'` before any
+// Assignment is created (unchanged, also proven below).
+// `dispatchDeclaredOperation` is the ONE exception: Phase 01 gives it a
+// narrowly-scoped, four-condition-gated `mutation` parameter (default
+// `'read-only'`, so every pre-existing caller stays byte-identical) --
+// verified in depth against a real git worktree in
+// test/runner/coordination-mutation-unlock.test.mjs, not re-duplicated here.
+// "Two concurrent MUTATING actors sharing one workspace" is therefore no
+// longer proven impossible SOLELY by mutation being structurally absent
+// everywhere -- the real invariant this file still proves is narrower and
+// honest about it: every UNDECLARED-protocol path (openStandaloneSession's
+// own dispatchPrimaryTask/proposeConsult/recordConsultDisposition trio)
+// stays mutation-incapable exactly as before, and the ONE declared-protocol
+// path that can mutate is gated by its own R1-R3 conditions (operation-step
+// only, `result.kind: 'work-product'`, a real linked worktree never the main
+// checkout) -- a genuinely NEW, narrower question (could two DIFFERENT
+// dispatchDeclaredOperation calls target the SAME worktree cwd
+// concurrently?) that Phase 01's own R1-R9 scope never asked and this file
+// does not claim to answer; flagged as a real, open consideration in that
+// cell's own report/Gaps, not silently absorbed into this comment's claim.
 //
 // The static import check for the SECOND half (no worktree/merge/approve/
 // Work-transition operation reachable via IMPORT) already exists in
@@ -274,17 +287,17 @@ test('R7: proposeConsult refuses a non-read-only mutation value BEFORE any Assig
   assert.equal(eventsAfter, eventsBefore, 'no new event of any kind was appended by any rejected mutation attempt');
 });
 
-test('R7: dispatchPrimaryTask/dispatchDeclaredOperation/recordConsultDisposition accept NO caller-suppliable "mutation" parameter at all (static source scan of their own parameter destructuring) -- mutation is hardcoded read-only, not merely defaulted', () => {
+test('R7: dispatchPrimaryTask/recordConsultDisposition accept NO caller-suppliable "mutation" parameter at all (static source scan of their own parameter destructuring) -- mutation is hardcoded read-only, not merely defaulted, unchanged by Phase 01 mutation-unlock (R4\'s own explicit carve-out)', () => {
   const sessionEnginePath = path.join(coordinationDir, 'session-engine.mjs');
   const source = fs.readFileSync(sessionEnginePath, 'utf8');
 
-  for (const fnName of ['dispatchPrimaryTask', 'dispatchDeclaredOperation', 'recordConsultDisposition']) {
+  for (const fnName of ['dispatchPrimaryTask', 'recordConsultDisposition']) {
     const fnStart = source.indexOf(`export async function ${fnName}(`);
     assert.ok(fnStart >= 0, `expected to find "${fnName}" exported from session-engine.mjs`);
     // Grab the parameter destructuring block: from the function's opening
     // paren through its matching closing paren of the SECOND-level `{...}`
     // params object (bounded scan window, generous enough for any of these
-    // 3 functions' real signatures, never the whole function body).
+    // functions' real signatures, never the whole function body).
     const window = source.slice(fnStart, fnStart + 1500);
     const paramsBlockMatch = window.match(/\(\s*coordinationId,\s*\{([\s\S]*?)\},\s*opts/);
     assert.ok(paramsBlockMatch, `expected to find "${fnName}"'s destructured params block`);
@@ -292,11 +305,27 @@ test('R7: dispatchPrimaryTask/dispatchDeclaredOperation/recordConsultDisposition
   }
 });
 
-test('R7: buildReadOnlyContract (the shared contract builder every dispatch entry point uses) hardcodes mutation: \'read-only\' as a literal, never a variable/parameter', () => {
+test('Phase 01 mutation-unlock: dispatchDeclaredOperation is the ONE session-engine.mjs dispatch entry point that now destructures a "mutation" parameter, defaulted to "read-only" so every pre-existing caller stays byte-identical -- narrow scoping proven in depth (real R1-R3 gate, real git worktree) in coordination-mutation-unlock.test.mjs, not re-duplicated here', () => {
   const sessionEnginePath = path.join(coordinationDir, 'session-engine.mjs');
   const source = fs.readFileSync(sessionEnginePath, 'utf8');
-  const fnStart = source.indexOf('function buildReadOnlyContract(');
-  assert.ok(fnStart >= 0);
-  const fnBody = source.slice(fnStart, fnStart + 800);
-  assert.match(fnBody, /mutation:\s*'read-only'/, 'buildReadOnlyContract must hardcode the literal string \'read-only\', not forward a caller-suppliable value');
+  const fnStart = source.indexOf('export async function dispatchDeclaredOperation(');
+  assert.ok(fnStart >= 0, 'expected to find "dispatchDeclaredOperation" exported from session-engine.mjs');
+  const window = source.slice(fnStart, fnStart + 2000);
+  const paramsBlockMatch = window.match(/\(\s*coordinationId,\s*\{([\s\S]*?)\},\s*opts/);
+  assert.ok(paramsBlockMatch, 'expected to find "dispatchDeclaredOperation"\'s destructured params block');
+  assert.match(
+    paramsBlockMatch[1],
+    /mutation\s*=\s*'read-only'/,
+    `"dispatchDeclaredOperation" must destructure "mutation" with a "read-only" default -- found: ${paramsBlockMatch[1]}`,
+  );
+});
+
+test('Phase 01 mutation-unlock: buildSessionContract (renamed from buildReadOnlyContract, the shared contract builder every dispatch entry point uses) defaults mutation to the literal "read-only" via its own parameter default, never an unrestricted caller-forwarded value', () => {
+  const sessionEnginePath = path.join(coordinationDir, 'session-engine.mjs');
+  const source = fs.readFileSync(sessionEnginePath, 'utf8');
+  const fnStart = source.indexOf('function buildSessionContract(');
+  assert.ok(fnStart >= 0, 'expected to find buildSessionContract in session-engine.mjs (renamed from buildReadOnlyContract)');
+  assert.equal(source.indexOf('function buildReadOnlyContract('), -1, 'buildReadOnlyContract must no longer exist under its old name');
+  const fnHeader = source.slice(fnStart, fnStart + 400);
+  assert.match(fnHeader, /mutation\s*=\s*'read-only'/, 'buildSessionContract must default its "mutation" parameter to the literal \'read-only\'');
 });

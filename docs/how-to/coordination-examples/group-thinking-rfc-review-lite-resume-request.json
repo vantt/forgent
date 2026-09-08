@@ -13,7 +13,7 @@
       "authorizationId": "auth_rfc_review_example_respond",
       "invocationKey": "rfc-review-example-respond:1",
       "reason": "Both independent objections have settled -- reveal them together and let the proposer respond.",
-      "grantedContextRefs": ["<objectA assignmentId from the first call's own result>", "<objectB assignmentId from the first call's own result>"]
+      "grantedContextRefs": ["FILL-IN-objectA-assignmentId-from-the-first-calls-own-result", "FILL-IN-objectB-assignmentId-from-the-first-calls-own-result"]
     },
     {
       "type": "operation",

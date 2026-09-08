@@ -1,0 +1,285 @@
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R4: a driver-authorized binding refuses to materialize an Assignment with no preceding operation-authorized event (51.650426ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R3/R4: an authorized driver-authorized binding dispatches, and its assignment-created event carries operationId/nodeId/authorizationId/invocationKey/contextGrant (107.783638ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R4 (regression guard): a binding with NO activation is still "required" and dispatches with no authorization at all (129.567436ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R4 (regression guard): an explicit activation.mode "required" binding dispatches with no authorization (89.835218ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R4: an authorization for (phase-recheck, reviewer-recheck, reviewer) does NOT authorize the SAME actor at a DIFFERENT binding (108.707897ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R4: two driver-authorized operations at ONE node for the SAME actor -- an authorization for one does not authorize the other (89.637144ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R4: one operation template bound to TWO actors at ONE node -- an authorization for one actor does not authorize the other (96.921738ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ the silent-discard guard also refuses a FAN-OUT taskKey collision -- one operation, two actors, one shared taskKey (102.692525ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a FAN-OUT dispatch with no explicit taskKey no longer collides at all -- each branch claims its own authorization-derived key (133.665093ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ the silent-discard guard does not block a genuine crash-recovery resume of its OWN unregistered claim (88.586081ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R4: one authorization cannot silently authorize a SECOND, different dispatch (90.825715ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R4: a resume of the SAME taskKey reuses its own already-consumed authorization instead of demanding a new one (99.739262ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R4: a second authorization lets a genuinely new dispatch through (137.64733ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a fresh unconsumed authorization is refused rather than silently discarded by a same-taskKey resume (118.569542ms)
+fatal: not a git repository (or any of the parent directories): .git
+✔ a genuine idempotent resume with no fresh authorization pending is unaffected by the silent-discard guard (102.909982ms)
+✔ R2: authorizeDeclaredOperation rejects an unknown operation, an unknown actor pairing, and a mismatched nodeId (52.388586ms)
+✔ R2: authorizeDeclaredOperation refuses to authorize a binding that is not driver-authorized (21.854245ms)
+✔ R2: authorizeDeclaredOperation is idempotent on authorizationId -- a repeated call appends no second event (36.573585ms)
+✔ Recovery Rule 5: an operation-authorized append is refused once the session has left active (39.474699ms)
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ Recovery Rule 5: the active-status check and the operation-authorized append share ONE held events-lock critical section (495.93696ms)
+✔ Recovery Rule 5: replay ignores an operation-authorized event that appears AFTER a terminal event, regardless of write-time ordering (48.125495ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ replay marks an authorization consumed by the assignment-created event that carries its authorizationId (74.906265ms)
+✔ replay fails closed on two assignment-created events claiming ONE authorizationId (26.656313ms)
+✔ the gate's refusal names an authorization replay neutralized as post-terminal (35.135698ms)
+✔ replay fails closed on an assignment-created that claims an authorizationId no operation-authorized event ever declared (13.870977ms)
+✔ R5: the SAME binding cannot be authorized twice under one invocationKey (48.374199ms)
+✔ R5: TWO DIFFERENT bindings in one session cannot reuse one invocationKey -- uniqueness is session-scoped, not per-binding (30.880466ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R5: crash between authorization and Assignment creation -- the resume treats the invocationKey as already issued and dispatches exactly once (100.314285ms)
+✔ R5: replay fails closed on two operation-authorized events claiming ONE invocationKey (23.260269ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R6: a sibling Assignment's output not named in grantedContextRefs is rejected at dispatch (95.997582ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R6: the SAME sibling ref dispatches once the driver actually grants it, and the contract carries exactly the granted refs (155.101061ms)
+✔ R6: a grantedContextRefs entry naming a DIFFERENT coordinationId is rejected before the authorization is written (51.568801ms)
+✔ a PATH-FORM grantedContextRefs entry into a different session is rejected the same as a bare id (34.382001ms)
+✔ a real foreign session is rejected by DISK EXISTENCE even when its id carries no "coord_" prefix (65.859875ms)
+✔ a grantedContextRefs entry in the reserved "contribution:" namespace is refused -- a contribution is not grantable context (35.970095ms)
+✔ a non-string grantedContextRefs entry is refused with a clean CoordinationError, not a raw TypeError (27.054019ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R6: a grantedContextRefs entry naming a real Assignment owned by ANOTHER session is rejected (121.542131ms)
+✔ R6: the enforcement is a dispatch-path GATE -- a cross-session grant forged through the raw store door is still refused (39.440577ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R7: activation.maxInvocations admits exactly N invocations at that binding and refuses the N+1th (158.129865ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R7: the invocation count is recomputed from disk in a genuinely separate OS process, never from process-local state (258.21803ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R7: an aggregate bound still rejects even when the binding cap would allow more -- binding caps narrow, never widen (114.779225ms)
+✔ R8: an authorizedBy.id that is not the session's provenanceRoot.writerId is rejected at both doors (39.018184ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ R8: the session's own driver identity authorizes and dispatches normally (75.441664ms)
+✔ visibility window stays closed with zero source result-linked events -- authorization is refused (45.718564ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ visibility window stays closed with a partial subset of required source events (research-a linked, research-b never dispatched) (74.330594ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ visibility window opens once ALL opensAfter.operationRefs[] have a qualifying result-linked, and both authorization and dispatch then succeed (199.343052ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a failed source result does NOT open the window (research-a fails, research-b succeeds) (133.133586ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a "late" source (created, never result-linked) does NOT open the window even though the other source already settled (95.085146ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ an accepted actor-replaced lineage satisfies the original source obligation without the original failed event disappearing from the log (226.299523ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ authorization is refused when a granted ref's window is not yet open, even though the ref itself passes same-session ownership (100.619677ms)
+✔ dispatch independently refuses a window-gated operation even when authorization was forged straight through the raw store door (defense in depth) (25.268844ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ the existing same-session ownership gate stays enforced even when the visibility window is open (additive, never a replacement) (165.788913ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ replay independently reconstructs the same window-open/closed decision as the live path (open scenario) (231.831207ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ replay independently reconstructs the same window-open/closed decision as the live path (closed scenario, failed source) (152.205469ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a source actor ALSO bound to an unrelated operation does not satisfy the window by completing that unrelated operation (171.28533ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ an actor-replaced replacement completing UNRELATED work does not satisfy the obligation its lineage inherited (117.63344ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a fan-out source operation (ONE operation bound to MANY actors) needs every bound actor settled, not just the first (166.105393ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a caller cannot forge the engine's protocol-operation stamp through dispatchDeclaredOperation's own constraints parameter (101.391886ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a caller-chosen taskKey in another operation's declared namespace does not satisfy that operation's window source (166.680004ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a sibling operation whose id begins with the source id never cross-satisfies it, through any door (100.5914ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a mediated door that does not stamp (dispatchPrimaryTask) cannot satisfy a window source, even under the source operation's own claim key and actor (169.509741ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a constraints container that answers differently on each read (accessor property on a plain array) cannot smuggle the reserved stamp past the guard (163.489567ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a constraints container that answers differently on each read (Array subclass with a lying Symbol.iterator) cannot smuggle the reserved stamp past the guard (172.536913ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a constraints container that answers differently on each read (Proxy intercepting the first Symbol.iterator read) cannot smuggle the reserved stamp past the guard (154.750537ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a two-faced constraints container cannot smuggle a foreign operation stamp through dispatchDeclaredOperation either (177.953281ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+✔ a declared dispatch refuses to resume an Assignment squatting its claim key without this operation's stamp, instead of silently reporting success (164.790828ms)
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=/home/vantt/.nvm/versions/node/v24.18.0/bin/node via=cli-spawn provider=/home/vantt/.nvm/versions/node/v24.18.0/bin/node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+✔ a driver-authorized operation used AS a window source is stamp-anchored exactly like a required one (187.025001ms)
+ℹ tests 67
+ℹ suites 0
+ℹ pass 67
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7429.409621

@@ -3,7 +3,7 @@
 Document type: Proposal
 Design status: Discussion
 Implementation: Not started
-Last reviewed: 2026-09-02
+Last reviewed: 2026-09-04
 Canonical for: nothing until explicitly accepted
 Original date: 2026-09-02
 Scope: capture the discussion about bringing the existing coding domain onto
@@ -15,6 +15,7 @@ Work-attached mutation gate before the proof ADR-010 §5 requires
 Intent traceability: [Agent Coordination Intent Preservation Ledger](../agent-coordination/intent-preservation-ledger.md),
 entries AC-I005, AC-I008, AC-I009; Vision V-012 (two unlike consumers)
 Related: [Step 09 Group Thinking Substrate](step-09-group-thinking-substrate.md),
+[Step 10 A0 Coding Domain Boundary And Facade Plan](step-10-a0-coding-domain-boundary-facade-plan.md),
 [Agent Coordination Vision](../agent-coordination/vision.md),
 [ADR-007](../agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md),
 [ADR-010](../agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md),
@@ -64,8 +65,9 @@ Current progress:
 | Track | Status | Notes |
 |---|---|---|
 | Boundary map — architect-level authority guardrail | `draft-ready` | Now tracked in `component-authority-boundary-map.md`, parallel to Step 09 and Step 10. |
-| Step 09 substrate dependency | `discussion-open` | Coding adoption should consume the standalone group-thinking substrate once accepted. |
-| Step 10 implementation | `waiting-step-09` | Must wait for the relevant Step 09 primitive plus boundary guardrails; mutating work also waits for the ADR-010 live proof gate. |
+| Step 09 substrate dependency | `accepted-prerequisite` | The implemented Step 09 slice is closed through the promoted CoordinationSession/FlowDefinition contracts; deferred substrate features remain parked in the architecture intent docs. |
+| Step 10 high-level adoption plan | `draft-ready` | This document now records the large plan for making Coding Domain a first-class fgOS domain consumer. |
+| Step 10 implementation | `implementation-ready` for read-only adoption; `waiting-topology` for mutating adoption | Read-only Work-attached sessions may start. Mutating work must wait for Workspace Topology resolver/root migration and the ADR-010 live proof gate. |
 
 ## 2. Question This Step Answers
 
@@ -88,11 +90,236 @@ AC-I009) whose lifting condition is exactly a coding-domain live proof. That
 proof is therefore the middle of Step 10, not something that happens on its
 own once Step 08 closes.
 
-## 3. Dependency On Step 08
+## 3. High-Level Adoption Plan
+
+**Proposed.** Step 10's goal is not to add one Agent Coordination feature.
+Its goal is to make Coding Domain a first-class fgOS domain that consumes the
+shared platform engines while keeping coding-specific authority in the coding
+domain.
+
+Target ownership shape:
+
+```txt
+Work Core
+  owns Work identity, status, stage, claim, ask/answer, return
+
+Work Driver
+  is platform core: a domain-aware workflow interpreter that chooses and runs
+  the next legal operation for a Work item from domain-owned declarations
+
+Agent Coordination
+  owns CoordinationSession, FlowDefinition, session topology, membership,
+  Assignment participation, Run/RunResult evidence ledger, recovery,
+  visibility, and bounded collaboration
+
+Dispatch And Run Runtime
+  owns executor selection, invocation, Run recording, and generic result
+  evaluation
+
+Coding Domain
+  owns coding workflow declarations, Coding Domain Adapter implementations,
+  repository footprint, worktree/branch policy, merge and technical approval
+  policy, verification evidence, coding-specific skills, prompts, harnesses,
+  and evidence adapters
+```
+
+The boundary rule is:
+
+```txt
+Work Driver Core is reusable platform core.
+It interprets domain-declared workflows and operations.
+
+Coding Domain does not own a separate driver.
+It owns coding workflow declarations and Coding Domain Adapter implementations
+consumed through the generic Domain Adapter ports owned by Work Driver Core.
+
+Any existing runner, skill, or operation-choice code that hardcodes coding
+workflow order, git/worktree/merge behavior, or verify semantics is migration
+debt unless it sits behind a coding-owned adapter/facade.
+```
+
+The same Work Driver Core should later be able to drive non-coding domains such
+as marketing or business workflows by loading their domain declarations and
+adapters. For example, a marketing domain may declare brief, audience research,
+draft, review, and publish-ready stages; the driver should not know brand voice
+or channel formatting, only the declared operation contract.
+
+Naming rule:
+
+```txt
+Domain Adapter Port
+  = generic platform-facing port shape owned by Work Driver Core.
+
+Coding Domain Adapter
+  = Coding Domain's implementation of that port.
+
+Marketing Domain Adapter
+  = a future Marketing Domain implementation of that same kind of port.
+```
+
+When this Step 10 proposal classifies concrete logic such as `plan.md`,
+`fgw/<id>`, git diff/status, verify commands, merge/catch-up, AGENTS/skills
+material, or coding-specific footprint rules, it should call that logic part of
+the Coding Domain Adapter, not the generic Domain Adapter.
+
+The adoption plan has eight layers:
+
+1. **Node-only component boundary and harness facade.** Inventory existing
+   coding harnesses, including the harnesses that touch Workspace Topology
+   concerns, classify authority, define stable Coding Domain Adapter facades
+   behind generic Domain Adapter ports, and add contract/forbidden-dependency
+   tests before any Rust migration or large physical move. This pass exists
+   because coding harnesses currently sit at the busiest boundary between
+   domain logic, Work Driver, Dispatch/Run, Agent Coordination, topology, and
+   packaging. If the pass finds a harness reading or writing workspace policy,
+   worker workspace state, claims, sessions, leases, hot history, projections,
+   or runtime command entries, it must resolve that harness behind
+   `TopologyContext` in the same slice or record a named blocker.
+2. **Coding Domain contract.** Define what Coding Domain owns and does not own,
+   including upstream product/design flow for ambiguous work, `cook` for
+   implementation-ready work, bugfix/debug flow, small-change/direct path,
+   review/validate/repair operations, and fan-out policy.
+3. **Workflow and operation model.** Make coding operations explicit:
+   required inputs, actor role, read-only versus mutating effect, expected
+   evidence, footprint/isolation needs, and allowed next Work transition.
+   Examples include `validate-plan`, `review-item`, `implement-item`,
+   `scout-blast-radius`, `resolve-question`, and `fix-verify-red`.
+4. **Coordination adoption.** Use CoordinationSession for operations that need
+   multi-actor collaboration, provenance, recovery, visibility control, or
+   evidence history. Start read-only with validation/review/research/scout;
+   open mutating sessions only after the topology and ADR-010 gates are met.
+5. **Topology and isolation integration.** Consume Workspace Topology for
+   worker workspace identity, branch-local config, runtime coordination root,
+   hot history placement, workspace installation capsules, footprint claims,
+   and leases. This is the gate between read-only Step 10 and mutating Step
+   10.
+6. **Evidence boundary.** Move coding-specific git/diff/verify interpretation
+   behind a Coding Domain evidence adapter, while Run Result Evaluator remains
+   the generic confidence owner.
+7. **Runner unification.** Collapse the current interactive skill loop and
+   headless runner loop into one Work Driver path. Skills become launchers;
+   headless and interactive differ by operator presence, not capability.
+8. **Domain packaging.** After the runtime shape is stable, package coding
+   skills/prompts/harnesses as runtime workshop material and project them into
+   host-visible files through the workspace projection ledger.
+
+Detailed plans derived from this section must preserve the high-level A0-G
+shape instead of replacing it with local task detail. If a detailed plan
+changes the sequence, scope, or exit criteria of any A0-G step, it must update
+this proposal and the project-level Architect Roadmap in the same review.
+
+The current detailed plan for A0 is
+[Step 10 A0 - Coding Domain Boundary And Facade Plan](step-10-a0-coding-domain-boundary-facade-plan.md).
+
+Recommended execution order:
+
+```txt
+A0. Inventory coding/topology harnesses and define Node-only Coding Domain Adapter facades
+A1. Lock Coding Domain contract and operation catalog
+B. Prove read-only Work-attached CoordinationSession adoption
+C. Build topology resolver and migrate legacy roots behind typed roots
+D. Add coding evidence adapter and occupancy/concurrency bridge
+E. Run the ADR-010 mutating live proof
+F. Unify runner/interactive execution through Work Driver
+G. Package Coding Domain material through distribution/projection
+```
+
+Parallelizable work:
+
+| Lane | Can proceed now | Must wait for |
+|---|---|---|
+| Node-only Coding Domain boundary/facade | Yes, first. Inventory coding harnesses plus topology-touching harnesses, classify owners, define Coding Domain Adapter facades behind generic Domain Adapter ports, resolve any raw topology root usage behind `TopologyContext`, and add contract/forbidden-dependency tests. | Rust migration and physical moves wait for facade proof. |
+| Coding Domain contract | Yes, after or beside A0. | It should consume A0's ownership classification. |
+| Operation catalog | Yes, after or beside A0. | Mutating operation execution waits for topology. |
+| Read-only coordination bridge | Yes after the minimum facade used by `validate-plan` exists. | It must not change Work mutation, git, merge, or lifecycle authority. |
+| Workspace Topology | Yes, in parallel | Implementation migration waits for resolver shape and legacy import rules. |
+| Evidence adapter design | Yes | Final mutating semantics wait for topology and ADR-010 proof. |
+| Component boundary cleanup | Yes at document/index level | Physical moves wait for Step 10 proof and facade tests. |
+| Packaging/projection | Docs may proceed | Runtime implementation waits for topology resolver and domain materialization contract. |
+
+Step 10 planning must not treat Workspace Topology and Packaging/Distribution
+as later cleanup. Every Step 10 implementation slice must explicitly check
+whether it touches any of these topology or distribution concerns and resolve
+the related contract gap in the same slice or record a named blocker:
+
+- branch/workspace policy reads, especially `.fgos/config.json` and
+  `.fgos/distribution.json`;
+- worker workspace creation, workspace identity, and whether the worker needs
+  a local `.fgos/installation/` capsule;
+- claim/session/assignment/lease placement under `runtimeCoordinationRoot`;
+- hot Work history writes and legacy import from existing `.fgos/events*`;
+- footprint claims, worktree leases, and mutation fencing;
+- projection ownership for coding skills, prompts, harnesses, AGENTS.md blocks,
+  `.agents/skills`, and `.claude/skills`;
+- active runtime identity, state-schema compatibility, and whether a local
+  `fgos` command is running under the workspace activation binding;
+- package/runtime materialization of Coding Domain assets as release workshop
+  material, not source-tree side effects.
+
+The A0 boundary/facade pass is the preferred place to handle topology-related
+harnesses. It should classify at least these harness families before Step 10B
+uses them: worktree and branch creation, merge/catch-up/approval, claim and
+runtime occupancy, goal-check and verification evidence, prompt/skill
+projection, config/default/doctor repair, and any coding harness that shells
+out through a local `fgos` command path. A0 may leave behavior in its current
+files, but callers should begin depending on typed facades rather than direct
+raw paths.
+
+If a slice is read-only, the check may conclude "not touched" for mutation,
+worktree, merge, and packaging materialization. If a slice creates or changes
+any worker, claim, event, projection, local command entry, or domain asset
+placement behavior, it must consume `TopologyContext` and align with
+`runtime-identity-and-activation.md` rather than introducing another raw
+`.fgos` path.
+
+### 3.1 A0 Exit Criteria
+
+A0 is done when the next agent can begin Step 10B without rediscovering coding
+harness ownership or guessing topology boundaries.
+
+Required outputs:
+
+1. **Harness inventory table.** Inventory at least contract enrich/validate,
+   worktree/branch, merge/catch-up/approval, claim/occupancy,
+   goal-check/verify evidence, prompt/skill material, config/doctor/projection,
+   and local `fgos` command entry.
+2. **Owner classification.** Each harness family has one authority owner:
+   Work Core, Work Driver Core, Workspace & Occupancy Substrate,
+   Dispatch/Run Runtime, Run Result Evaluator, Coding Domain Adapter, or
+   Packaging/Projection. Shared use is allowed; shared authority is not.
+3. **Minimal facade list.** Name the generic ports and the Coding Domain
+   Adapter facades Step 10B may call. The expected starting set is:
+   `describeCodingOperation`, `enrichCodingOperationContract`,
+   `planCodingWorkspaceNeeds`, `collectCodingEvidence`,
+   `interpretCodingEvidence`, and `resolveCodingPromptMaterial`, plus the
+   Workspace & Occupancy substrate calls `resolveTopology`,
+   `planWorkspaceUse`, `requestOccupancy`, and `releaseOccupancy`.
+4. **Forbidden dependency rules.** At minimum: Work Driver Core must not import
+   coding worktree/merge/verify modules directly; Agent Coordination must not
+   import coding repo mutation modules; Coding Domain Adapter must not write
+   Work state directly; Packaging/Distribution must not decide coding workflow
+   semantics.
+5. **Contract tests.** Add or name tests proving the first Step 10B path uses
+   facades rather than raw harness files, Work Driver can call a generic Domain
+   Adapter Port, Coding Domain Adapter can declare read-only workspace needs,
+   topology-touching harnesses do not introduce new raw `.fgos` paths, and
+   forbidden imports are rejected.
+
+No Rust migration, broad physical source move, or mutating Work-attached
+session is part of A0.
+
+## 4. Dependency On Step 08 And Step 09
 
 **Observed:** Step 08 has closed all 8 phases. The final Deferral Audit is now
 the reconciliation source for what Step 08 deliberately delivered, deferred,
 or proved out of scope.
+
+**Observed:** Step 09 has closed its implemented slice. The accepted substrate
+for Step 10 is the promoted CoordinationSession and FlowDefinition contracts,
+plus the implemented protocol/visibility/aggregation/deliberation/specialist
+slice they authorize. Step 09's broader deferred features remain preserved in
+the architecture intent docs; Step 10 should not pull them into scope unless a
+coding-domain proof actually needs one.
 
 **Proposed:** keep the authority map as a parallel architect-level
 prerequisite, not a child step of coding adoption. The
@@ -110,9 +337,9 @@ the Step 08 proofs for crash recovery and concurrent-mutating-actor refusal.
 - domain worktree allocation, merge, or Work transition inside
   `src/runner/coordination/**`.
 
-## 4. Current Coding-Domain Reality
+## 5. Current Coding-Domain Reality
 
-### 4.1 Coding already sits on the shared execution core
+### 5.1 Coding already sits on the shared execution core
 
 **Observed:** since Team Dispatch V1 Steps 02–06, coding Stage Operations
 lower to `Assignment -> DispatchPlan -> Run -> RunResult` through
@@ -123,7 +350,7 @@ onto the new architecture" is not a runtime replacement. What coding lacks is
 the *session* layer Step 08 adds: CoordinationSession ledger, topology,
 cohort allocation, session-wide budgets, and session recovery.
 
-### 4.2 Two doors, one shared function
+### 5.2 Two doors, one shared function
 
 **Observed:** coding has two Work-attached doors:
 
@@ -144,7 +371,7 @@ fact for Step 10: changing the interior of that function's `assignment`
 branch changes both doors at once, which is the ADR-010 parity property for
 free.
 
-### 4.3 Session engine already accepts `workRef`, nothing uses it
+### 5.3 Session engine already accepts `workRef`, nothing uses it
 
 **Observed:** both `openStandaloneSession` and
 `openDeclaredProtocolSession` accept `workRef` (read-only, contract-approved).
@@ -154,10 +381,10 @@ the session path. `buildReadOnlyContract` hard-codes `mutation: 'read-only'`
 and restricts roles to `READ_ONLY_ROLES`. The ledger has no workspace/isolation
 reference field yet (the contract permits one; P06 R7 adds the refusal).
 
-### 4.4 Inventory of duplicate mechanisms (the "tùm lum" list, RUL11)
+### 5.4 Inventory of duplicate mechanisms (the "tùm lum" list, RUL11)
 
 **Observed:** the following pairs each implement one responsibility twice.
-The Step 10 sequence in §8 is derived directly from this list.
+The Step 10 sequence in §9 is derived directly from this list.
 
 | # | Responsibility | Mechanism A | Mechanism B | Note |
 |---|---|---|---|---|
@@ -170,7 +397,7 @@ The Step 10 sequence in §8 is derived directly from this list.
 | D7 | Coding git core placement | `src/runner/{worktree,merge,iron-law-gate}.mjs`, `src/verbs/merge/*`, `src/state/{graph-harness,cleanup-harness,drift-status}.mjs` | — | One component scattered across three trees; advisory §18.5 names it Coding Repository Integration Core. |
 | D8 | Collaboration record | `fgos handoff` → role/holder Work events | session `actor-bound` / `assignment-created` events | Must not become two copies of one truth. |
 
-### 4.5 Foundation-vs-coding classification debt
+### 5.5 Foundation-vs-coding classification debt
 
 **Observed:** advisory §18 identifies several current code clusters that are
 used heavily by coding-domain workflows and therefore *look* coding-specific,
@@ -201,7 +428,7 @@ runtime occupancy, setup/doctor, host surfaces, and learning registries are
  `support-infrastructure`, `domain-component`, `adapter/surface`) so
  "foundation" does not become a vague synonym for "not coding-specific."
 
-## 5. Architectural Stance
+## 6. Architectural Stance
 
 **Proposed:** coding does not "migrate onto" Agent Coordination. Coding is a
 domain component that *consumes* four platform engines
@@ -222,7 +449,7 @@ merge and catch-up, technical approval, code verification doctrine, and
 coding evidence policy (Coding Repository Integration Core).
 
 ```txt
-Work driver / Workflow interpreter (one engine, two doors — see §8 step 7)
+Work driver / Workflow interpreter (one engine, two doors — see §9 step 7)
   └─ selects a legal declared Stage Operation
        (domains/coding/workflows/feature.yaml remains the hard constraint)
        ├─ primary operation      → stage skill / implementer actor
@@ -260,7 +487,7 @@ Three consequences:
    insufficient — the same deferral logic already applied to AgentMessage
    (Step 08 human decision 5).
 
-## 6. Seams
+## 7. Seams
 
 **Proposed.** Lettered so later documents can reference them.
 
@@ -283,13 +510,13 @@ Two hazards attached to the seams:
 - **D8 must be decided before Seam D ships:** Work event = holder truth;
   session ledger = collaboration evidence; no field copied between them.
 
-## 7. Foundation Capabilities Coding Requires That Standalone Never Did
+## 8. Foundation Capabilities Coding Requires That Standalone Never Did
 
 **Proposed.** Roughly seven tenths of Step 10 is normalization. The remaining
 three tenths is genuinely new capability, concentrated below. Standalone
 proofs never needed these because every Step 08 proof is read-only.
 
-| # | Capability | Why standalone did not need it | Lands in (§8) |
+| # | Capability | Why standalone did not need it | Lands in (§9) |
 |---|---|---|---|
 | N1 | Mutating Assignment inside a session: lift `buildReadOnlyContract`'s `mutation: read-only` and `READ_ONLY_ROLES` restriction for `evidence.required: verified` contracts; reuse `classifyRunEvidence`'s existing git-delta / dirty-before path | all Step 08 actors are read-only | step 5 |
 | N2 | Session Assignments with **declared** provenance: `createSessionAssignment` builds inline only; coding's operations are declared Stage Operations with TaskSpecs. Decision: Work driver + Assignment Builder create the declared Assignment (`work`, `stage`, `operation`, ADR-006 provenance), while the session store records membership. Do not make CoordinationSession a Workflow interpreter. | standalone has no Stage | step 2 (needs a small ADR or contract note) |
@@ -300,7 +527,7 @@ proofs never needed these because every Step 08 proof is read-only.
 | N7 | Session pause for a human: coding has `dispatch: human-only` operations and `fgos ask`. The CoordinationSession contract forbids "waiting on human" as a manifest status; it must be inferred from events. An event kind for park/resume is needed; replay already covers resume | standalone proofs never park | step 4 |
 | N8 | Work Driver verb shared by both doors (e.g. `fgos drive <id> --ceiling <stage:\|status:>`) | not foundation; Work Driver component | step 7 |
 
-## 8. Candidate Step Sequence
+## 9. Candidate Step Sequence
 
 **Proposed.** Ordered by two criteria: never open the ADR-010 §5 gate earlier
 than its proof, and leave visible value for a consuming project at each stop,
@@ -317,7 +544,7 @@ not only internal tidiness.
 | 7 | One Work Driver, two doors: `fgos-coding-driving` loop + `loop.mjs` driver logic → one engine (N8); skills become thin launchers; `fgos-fanout` calls the driver's batch dispatch instead of spawning Agents; interactive = driver with an operator attached | D1, D5 | 6, N3 | **direct**: "release con người" (priority #2); interactive/headless identical capability |
 | 8 | Physical placement (optional): `operation-choice` → driver; domain loader → domains; git core → under coding domain; first Rust candidate per the migration note | D7 | 7 | optional |
 
-### 8.1 Boundary Map Input Shape
+### 9.1 Boundary Map Input Shape
 
 The parallel Component Authority Boundary Map should produce ownership
 documents, not a file move and not accepted runtime authority. The minimum
@@ -368,7 +595,7 @@ boundary documents should accept, revise, or reject.
 
 **Proposed non-goals for Step 10:**
 
-- no AdhocTask entity (see §5 consequence 3);
+- no AdhocTask entity (see §6 consequence 3);
 - no Workflow-runtime migration onto FlowDefinition;
 - no Mission, AgentMessage, `purpose` routing, marketplace, telemetry
   backend;
@@ -380,7 +607,7 @@ boundary documents should accept, revise, or reject.
 7 into "driver engine" and "fan-out onto driver". Do not cut steps 3 and 4;
 they are what keeps step 5 and step 7 from collapsing.
 
-## 9. Business Cases For Live Proof
+## 10. Business Cases For Live Proof
 
 Retained from Step 07 §15 and refined:
 
@@ -391,10 +618,10 @@ Retained from Step 07 §15 and refined:
 - **Debate proof deferred from Step 07 §15.3** ("should coding planning
   validation run as a reviewer Assignment or stay same-session?") is answered
   by step 2's design, not debated again.
-- **Mutating proof (step 5):** exactly the scenario in §8 row 5. It is the
+- **Mutating proof (step 5):** exactly the scenario in §9 row 5. It is the
   proof ADR-010 §5 names; it is not a demo.
 
-## 10. Open Questions
+## 11. Open Questions
 
 1. **Q1 — `fgos handoff` after Step 10:** does it remain the write door for
    collaboration records, or become a projection from the session ledger onto
@@ -426,7 +653,7 @@ Retained from Step 07 §15 and refined:
    physical moves until the component has a facade and contract tests, matching
    `docs/architect/host-invocation-routing/node-to-rust-component-migration.md`.
 
-## 11. Intent Traceability
+## 12. Intent Traceability
 
 | Intent | Effect of this proposal | Must-not-preclude |
 |---|---|---|
@@ -438,14 +665,14 @@ Retained from Step 07 §15 and refined:
 Every implementation phase derived from this proposal must close with the
 ledger's Deferral Audit template.
 
-## 12. Discussion Log
+## 13. Discussion Log
 
 - **2026-09-02** — Initial discussion. Conclusions: (a) Step 08 done is
   necessary, not sufficient; read-only adoption is ready, mutating adoption
   is the gate's own proof; (b) coding consumes engines, does not migrate
   runtime; (c) eight-step sequence with the duplicate-mechanism inventory
-  (§4.4) as its derivation; (d) three-tenths of the work is new foundation
-  capability (§7), N3 being the least visible and most decisive. Nothing
+  (§5.4) as its derivation; (d) three-tenths of the work is new foundation
+  capability (§8), N3 being the least visible and most decisive. Nothing
   decided; Q1–Q6 open.
 - **2026-09-02** — Review update after architecture discussion. Changes:
   (a) authority moved out of `CoordinationSession` for Work/Stage/operation

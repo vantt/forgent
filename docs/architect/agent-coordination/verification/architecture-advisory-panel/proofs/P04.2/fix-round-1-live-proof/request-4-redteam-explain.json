@@ -1,0 +1,17 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Fix-round-1 verification call 4: red-team-packet then explain-recommendation.",
+  "writerId": "fix-round-1-driver",
+  "coordinationId": "aap_fixround1_full",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "red-team-actor", "executor": "exec-family-a", "tier": "critical" },
+    { "id": "lead-advisor-actor", "executor": "exec-family-a", "tier": "critical" }
+  ],
+  "steps": [
+    { "type": "authorize", "as": "authRedteam", "operationId": "red-team-packet", "targetActorId": "red-team-actor", "authorizationId": "auth_redteam_1", "invocationKey": "ik_redteam_1", "reason": "post-synthesis-open is open.", "grantedContextRefs": ["asgn_fix_round_1_driver_op_008"] },
+    { "type": "operation", "as": "redteam", "operationId": "red-team-packet", "targetActorId": "red-team-actor", "objective": "redteam", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "authorize", "as": "authExplain", "operationId": "explain-recommendation", "targetActorId": "lead-advisor-actor", "authorizationId": "auth_explain_1", "invocationKey": "ik_explain_1", "reason": "post-redteam-open is open.", "grantedContextRefs": ["asgn_fix_round_1_driver_op_008"] },
+    { "type": "operation", "as": "explain", "operationId": "explain-recommendation", "targetActorId": "lead-advisor-actor", "objective": "explain", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

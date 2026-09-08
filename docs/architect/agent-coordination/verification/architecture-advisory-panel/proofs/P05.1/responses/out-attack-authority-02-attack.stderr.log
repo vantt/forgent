@@ -1,0 +1,1 @@
+fgos: dispatchDeclaredOperation: operation "critique-proposals" at node "phase-critique" for actor "architecture-critic-actor" declares activation.mode "driver-authorized", and no unconsumed "operation-authorized" event in session "aap_p051_authority_attack2" authorizes that exact binding -- refusing to materialize an Assignment

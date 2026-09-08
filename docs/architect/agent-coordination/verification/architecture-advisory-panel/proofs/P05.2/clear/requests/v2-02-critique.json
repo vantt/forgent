@@ -1,0 +1,49 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-clear-herdr-heuristic-direction-v2: authorize and dispatch Phase 6 (critique the proposals, assess constraints).",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "claude-bwrap", "tier": "analytical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authCritique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "authorizationId": "auth_critique_1",
+      "invocationKey": "ik_critique_1",
+      "reason": "Phase 6: all three Phase 5 proposals are in, attack the strongest one.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_007", "asgn_coordinator_driver_op_008", "asgn_coordinator_driver_op_009", "asgn_coordinator_driver_op_010"]
+    },
+    {
+      "type": "operation",
+      "as": "critique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "objective": "Attack the strongest of the three Phase 5 proposals for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification -- not the weakest. Use ONLY absolute paths for everything you read. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "authorize",
+      "as": "authAssess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "authorizationId": "auth_assess_1",
+      "invocationKey": "ik_assess_1",
+      "reason": "Phase 6: rank operational risk across the three Phase 5 proposals.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_008", "asgn_coordinator_driver_op_009", "asgn_coordinator_driver_op_010"]
+    },
+    {
+      "type": "operation",
+      "as": "assess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "Rank the real operational risk of each of the three Phase 5 proposals for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification. Use absolute paths for everything you read. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    }
+  ]
+}

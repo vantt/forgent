@@ -1,0 +1,83 @@
+I couldn't verify the desktop-shell file paths in this repo (the scout hook blocks the searches I'd need), so below I anchor on behaviors and on the entry points I can confirm from the project's own docs — `mdview open`, the `mdview_view_file` MCP call — rather than inventing file paths.
+
+---
+
+## What We Think You Should Do
+
+Keep the daemon as the single authority. Registry, render, and search stay where they are — one daemon, one owner. The desktop shell stays a thin client: it owns its window, what it's presenting, and its connection to the daemon. Nothing else.
+
+But do not start with the launcher work. Start by getting the shell into CI and getting numbers out of it. In order:
+
+1. Put the desktop shell in CI.
+2. Fix the three launcher bugs that are deterministic and reproducible today: the silent fallback, the wrong-port connection, and the raw bind-host URL.
+3. Ship telemetry for time-to-interactive and search latency.
+4. **Do not** build robust cold-start coordination yet.
+5. Ask yourself the question nobody in this session has asked you: did shell development stop because the shell is abandoned, or because it's considered done?
+6. Only reopen the ownership question once you have measured numbers from your real workload.
+
+Step 5 is cheap and it changes everything downstream. If you can answer it today, answer it today — before step 1.
+
+We are recommending against local ownership in the shell. Not because it's wrong in principle, but because it would create a second unmaintained implementation of registry/render/search with one maintainer behind both, and once local state exists it is expensive to unwind. We also considered folding the daemon into the desktop binary; that is not free either — it's new work with its own surface, and calling it "simplification" would be doing you a disservice.
+
+## What This Means For Your System, Concretely
+
+The daemon keeps being the thing that knows what a project is, what files are indexed, how markdown becomes HTML, and what search returns. `mdview open <path>` and the `mdview_view_file` MCP call keep resolving through the daemon, and the daemon keeps auto-registering projects on first use. None of that moves.
+
+The desktop shell keeps asking the daemon and rendering the answer. After this work it stops doing three specific wrong things:
+
+- **Silent fallback.** Today, when the shell can't reach the daemon it degrades without telling you. After the fix it says so, out loud, in the window.
+- **Wrong port.** The shell connects to a port that isn't the one the daemon is listening on. That becomes deterministic: it connects to the right one or it reports the failure.
+- **Raw bind-host URL.** The URL the shell hands you is built from the daemon's bind host rather than a host you can actually open. That URL becomes one you can click.
+
+Then two numbers start existing that don't today: how long from launch to a usable window, and how long a search takes end to end. Right now, every argument about where authority should live — including ours — is being made without either number.
+
+And one thing explicitly does **not** get built: cold-start coordination for the case where the shell launches before the daemon is ready. That race has never been reproduced. We are choosing to leave it open.
+
+## What Gets Easier
+
+Three bugs you can reproduce on demand stop happening, and the failure modes that remain announce themselves instead of degrading quietly. CI means the shell stops being a component where "does it still build" is an open question.
+
+The bigger one: after telemetry lands, the ownership question stops being a debate about architecture taste and becomes a question with a measurement attached. If search through the daemon is fast enough on your real workload, local ownership stops being tempting and you can stop relitigating it. If it isn't, you'll know by how much, and that's a different and much easier conversation.
+
+## What Gets Harder
+
+**The cold-start race stays open, on purpose, while telemetry accumulates.** If it fires for you during that window, you will hit it with no coordination logic in place and no fix in flight. We are naming this as a cost we chose, not a gap we missed.
+
+**Steps 1–3 produce nothing a user can see.** CI and telemetry on a component labeled experimental is real work with zero visible improvement at the end of it. If your appetite for that is low, that is a legitimate reason to reorder, not a failure of discipline.
+
+**If step 5's answer is "abandoned," steps 1–3 were wasted.** That's the honest shape of it. Which is exactly why we're telling you to ask step 5 first if you can — the sequencing above is written as 1-through-6, but step 5 is the cheapest item on the list and the most decision-relevant.
+
+**The reversibility this whole plan leans on is disputed and untested.** We are recommending a measure-first order on the grounds that it keeps your options open. One objection in the panel says that premise is unproven. See below — we did not resolve it, and neither did anyone else.
+
+## The First Reversible Step
+
+This week: ask step 5, then land CI on the desktop shell and fix the three launcher bugs. That's a CI config plus three deterministic fixes with known reproductions — days, not weeks, and no new state, no new ownership, nothing that has to be unwound if you change direction.
+
+What it costs if it's wrong: the CI config and three bug fixes. The bug fixes are worth having under every option on the table, including deleting the shell's current launcher path entirely. The CI setup is the only genuinely sunk part.
+
+What it validates or kills: whether the shell is a thing you still want to maintain at all — you'll know from how it feels to put it in CI — and whether the daemon's registry/render/search is fast enough through a thin client on your real files.
+
+## When You Should Reverse This
+
+Reverse toward local ownership when telemetry on your real workload shows search latency through the daemon that you'd actually notice while using it, sustained — not a single slow start, a rate. You'll be looking at your own numbers by then, so set the line yourself before you look; deciding it afterward is how everyone talks themselves into the rewrite.
+
+Reverse toward deleting the shell if the answer to step 5 is "abandoned," or if the cold-start race fires repeatedly during the telemetry window while nobody is motivated to fix it. That second one is a signal about you, not about the code, and it's a valid one.
+
+Reverse the *order* — fix launcher coordination first, measure later — if the cold-start race actually reproduces for you before telemetry lands. An unreproduced race is a reason to wait. A reproduced one isn't.
+
+## What We Are Not Sure About
+
+Two disagreements went into this session and came out unresolved. Neither is a nuance. We are not picking a side on either.
+
+**1. Whether fixing launcher coordination well makes the architecture harder to change, not easier.** Our recommendation assumes that hardening the shell's connection to the daemon leaves you free to revisit ownership later. One objection holds the opposite: that building a real coordination state machine between two processes entrenches the split — every hour spent making the multi-process arrangement work well is an hour that argues against ever collapsing it. Nobody measured the comparison. Nobody could say what "more locked in" would look like as an observation. That objection is why step 4 says don't build the coordination work yet — but it also means the reversibility we're selling you here is itself contested, and untested in both directions.
+
+**2. What "0 commits since July, frozen version, no CI, no tests" actually means.** We read it as neglect. One objection reads exactly the same evidence as success: a thin client that needed zero changes when the daemon grew capability in September is a thin client doing its job. Both readings fit every fact we have. This is the single most decision-relevant open question in the entire session, and it is answerable by you, in one sentence, today. It was asked nowhere until now.
+
+That second disagreement is also why "delete the shell entirely" is not on this page as a rejected option. It was not refuted. It was deferred, behind your answer to step 5.
+
+## What Stays Yours
+
+**Whether the experimental desktop shell is a real product bet or a spike you're allowed to drop.** The panel deliberately did not answer this, in Phase 4 and every phase since. It's not a disclaimer — it's the specific judgment that determines how much of the above is worth doing at all. Every recommendation here is downstream of it: if the shell is a bet, launcher-coordination investment is obviously worth making and the measure-first order buys you good information. If it's a spike, most of this is care spent on something you're going to close. Nobody can tell from the code which one it is, because the code looks identical either way. Only you know whether you want it.
+
+**And this: if the reversibility dispute above matters to you more than shipping something visible, take the fix-first order instead.** Fix launcher coordination now and measure later. That was the original proposal on the table, and it is a coherent position — it just weighs "get the bugs out of the way" above "don't entrench anything before you have numbers." That weighing is a values call. The synthesizer declined to make it for you, and so do we.
+EXIT:0

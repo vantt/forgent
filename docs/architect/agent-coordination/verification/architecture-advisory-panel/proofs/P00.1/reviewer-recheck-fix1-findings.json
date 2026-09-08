@@ -1,0 +1,34 @@
+{
+  "status": "DONE_WITH_CONCERNS",
+  "summary": "Rechecked Fix Round 1 (commit d37b9518) against Driver Dispositions D1-D9. PASS: D1/D2 (claude-reviewer/agy-plan genuinely removed from Admitted status in both the Proof Matrix and the Allowlist table/index.md, not just relabeled), D6 (baseline reconciled to 5614 tests/5604 pass/4 fail/6 skip consistently in P00.1.md and index.md, no live conflicting number), D8 (bwrap-available doctor check is a real execFileSync smoke test, registered via registerCheck, has passing focused tests, and IS included in test/setup/checks.test.mjs's registry-snapshot array at line 106), D9 (agy-sandbox hash now full-length, matches summary.json). FAIL / new findings: (F1, HIGH) proofs/P00.1/claude-bwrap.log -- the Proof Matrix's own linked evidence for the corrected claude-bwrap admission -- contains only a plain refusal-for-lack-of-authorization with no attempted write, no --chdir mention, and no EROFS event; it does not substantiate the Proof Matrix's 'EROFS containment... writes blocked' claim or D3's citation of Red-Team's 'in-tree/absolute/.git/shell writes all EROFS-blocked' -- this is the same discretionary-refusal-not-enforced-confinement defect that disqualified claude-reviewer under D1, apparently unresolved for claude-bwrap. (F2, HIGH) D4's stated basis for admitting agy-bwrap, a file named bwrap-direct-escape.json documenting an independent OS-level escape test, does not exist anywhere in the repository (confirmed via whole-tree filename and content search); the actual linked evidence file proofs/P00.1/agy-bwrap.log shows only a CLI argument-parsing crash ('Error: unexpected argument \"BY\".') with no EROFS/mount/escape content -- the same non-runnable-process defect that correctly excluded codex-bwrap under D5, yet agy-bwrap is admitted instead of excluded. (Evidence gap, not confirmed) D7 package-lock.json revert could not be verified via git diff d3b2271b..HEAD -- every git invocation in this session (main session and two independently spawned Explore subagents) was blocked by a permission-approval requirement that never resolved; content inspection (37-line lockfile, single yaml dependency matching package.json exactly) is consistent with a clean revert but not diff-confirmed. Minor/LOW: P00.1.md's Fix Round 1 section claims a helper file src/setup/bwrap-check.mjs was created; no such file exists -- the check lives directly in src/setup/registrations.mjs (functionally fine, just an inaccurate description). Recommendation: do not close this cell as fully resolved -- F1 and F2 need either the real corrected-methodology evidence committed, or claude-bwrap/agy-bwrap re-evaluated for exclusion under the same standard applied to codex-bwrap.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "HIGH",
+      "location": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/claude-bwrap.log",
+      "claim_contradicted": "P00.1.md:18 Proof Matrix Mutation Result; D3 (P00.1.md:190); Red-Team narrative P00.1.md:135-137",
+      "description": "Evidence file contains only a discretionary refusal (no authorization), no attempted write, no --chdir/EROFS evidence of any kind; does not substantiate the claimed OS EROFS containment result."
+    },
+    {
+      "id": "F2",
+      "severity": "HIGH",
+      "location": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/agy-bwrap.log and cited bwrap-direct-escape.json",
+      "claim_contradicted": "D4 (P00.1.md:191); Red-Team narrative P00.1.md:146-155",
+      "description": "bwrap-direct-escape.json (the stated decisive OS-boundary evidence) does not exist anywhere in the repo; agy-bwrap.log itself shows only a CLI arg-parsing crash, not an EROFS-blocked mutation attempt."
+    },
+    {
+      "id": "gap-D7",
+      "severity": "MEDIUM",
+      "location": "package-lock.json",
+      "description": "Could not run git diff d3b2271b..HEAD -- package-lock.json in this session (all git commands blocked by unresolved approval requirement). Content is plausible (matches package.json's sole yaml dependency, no bloat) but not diff-confirmed."
+    },
+    {
+      "id": "cosmetic-D8",
+      "severity": "LOW",
+      "location": "docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md Fix Round 1 section",
+      "description": "Claims helper file src/setup/bwrap-check.mjs was created; it does not exist. The real, working check lives in src/setup/registrations.mjs instead. Functionally correct, description inaccurate."
+    }
+  ],
+  "passed_checks": ["D1", "D2", "D6", "D8-implementation", "D8-registry-snapshot", "D9"],
+  "environment_limitation": "Bash tool blocked all git invocations in this session (main session and subagents) with 'This command requires approval', which never resolved -- limited ability to independently confirm git diff / git log based claims."
+}

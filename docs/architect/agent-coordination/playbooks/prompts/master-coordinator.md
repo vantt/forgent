@@ -566,3 +566,6 @@ On later invocations, the same input resumes from `index.md` and
 When the runtime can natively execute this coordination protocol with validated
 Skills, TaskSpecs, configuration, Assignment, Run, and RunResult, this prompt is
 retained only as manual recovery/engineering fallback or archived.
+
+For a Work-independent track, `.agents/skills/fgos-plan-loop/SKILL.md` is the
+intended native path this prompt retires into.

@@ -1,0 +1,100 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-06T15:19:35.632Z",
+  "data_hash": "8151b902693dfc0c05a4af526820ab1d27598938e81f0ee564e028adcc3b7a75",
+  "data": {
+    "coordinationId": "aap_p051_visibility",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "P05.1 visibility attack: partial Phase-5 fan-out (2 of 3 shapers).",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap_p051_visibility\" is missing required actor(s) [lead-advisor-actor, context-investigator-actor, constraint-advocate-actor, architecture-critic-actor, synthesizer-actor, red-team-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_016",
+          "runId": "run_asgn_aap_driver_op_016_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_017",
+          "runId": "run_asgn_aap_driver_op_017_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "context-investigator-actor"
+        },
+        {
+          "actorId": "constraint-advocate-actor"
+        },
+        {
+          "actorId": "architecture-critic-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        },
+        {
+          "actorId": "red-team-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "interpret",
+        "type": "operation",
+        "actorId": "lead-advisor-actor",
+        "assignmentId": "asgn_aap_driver_op_015",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "critical"
+      },
+      {
+        "as": "shapeSystem",
+        "type": "operation",
+        "actorId": "system-shaper-actor",
+        "assignmentId": "asgn_aap_driver_op_016",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "analytical"
+      },
+      {
+        "as": "shapeAlt",
+        "type": "operation",
+        "actorId": "alternative-shaper-actor",
+        "assignmentId": "asgn_aap_driver_op_017",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "analytical"
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+[2026-09-06T15:16:21.072Z] Spawning real child process: node bin/fgos.mjs coordination run --file req-04-dispatch-synth-slow.json
+[2026-09-06T15:16:21.074Z] Real child PID launched: 3730502
+[2026-09-06T15:16:21.275Z] Real proof of mid-flight execution: exec-slow-started.marker written by the executor subprocess: {
+  "pid": 3730516,
+  "startedAt": "2026-09-06T15:16:21.258Z"
+}
+[2026-09-06T15:16:21.275Z] fgos coordination run PID 3730502 alive immediately before kill -9: true
+[2026-09-06T15:16:21.275Z] Sending REAL SIGKILL to PID 3730502 (the actual "fgos coordination run" process, mid-dispatch).
+[2026-09-06T15:16:21.278Z] Child process exited on its own (code=null, signal=SIGKILL) -- unexpected for this proof if it happened before the kill below.
+[2026-09-06T15:16:21.326Z] Confirmed dead (ESRCH on kill -0 probe) within 5s: true
+[2026-09-06T15:16:21.327Z] Child process 'exit' event fired: true
+[2026-09-06T15:16:21.327Z] exec-slow-finished.marker exists (would mean the executor settled before/despite the kill): false
+[2026-09-06T15:16:21.346Z] Orphaned executor subprocess(es) still running after parent kill (expected -- detached process group, transport.mjs): PID(s) 3730516, 3730523
+[2026-09-06T15:16:21.346Z] Explicitly reaped orphaned executor PID 3730516 with SIGKILL (cleanup, not part of the crash mechanism itself).
+[2026-09-06T15:16:21.346Z] pgrep found no matching orphan process (exit code nonzero) -- treating as "none left": kill ESRCH

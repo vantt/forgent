@@ -18,10 +18,15 @@
 // core/coordination-protocols/standalone-master-coordination-loop.yaml and
 // frozen in P00.1.md Sec.3); deciding to authorize one is a driver decision
 // a person makes after reading this run's own evidence, never something
-// this mechanical composer infers or defaults. A follow-up request (hand-
-// authored today; see docs/architect/agent-coordination/verification/
-// step-09-group-thinking-mvp1-mvp2/thin-launcher-surface-readiness.md's
-// "No resume door" gap) is required to reach the revision/recheck phase.
+// this mechanical composer infers or defaults. Reaching the revision/
+// recheck phase requires a follow-up request (hand-authored today; this
+// module composes and runs the first pass only) naming an `authorize` step
+// for the driver-authorized operation -- resuming the SAME `coordinationId`
+// this run opened, through `runCoordinationUseCase`'s own existing resume
+// door (`run.mjs`: a request naming an EXISTING `coordinationId` continues
+// that session). That resume door already exists and works; this composer
+// simply never drives it itself, because authorizing a revision/recheck is
+// a driver decision, not a mechanical one.
 //
 // `targetActorId` is deliberately omitted on every step: this fixture binds
 // exactly one actor per role at these graph positions, so the engine's own
@@ -149,12 +154,17 @@ export function buildMasterLoopRequest(ctx, params = {}) {
 // R5 (Step 09 Phase 02): the launcher's own output must always state the
 // coordination id and a concrete next action, provable without any chat
 // context (this cell's Acceptance). This is display text ONLY -- it never
-// implies a resume/continue door exists (none does yet; that is Phase 04/
-// MVP5's own future work per thin-launcher-surface-readiness.md's "No
-// resume door" gap, out of scope here) and never claims a specific
-// follow-up command is available beyond `fgos coordination show`, which
-// this cell's own R5 half (`show.mjs`) is what makes that command useful
-// for exactly this situation.
+// claims a specific follow-up command beyond `fgos coordination show`
+// (this cell's own R5 half, `show.mjs`, is what makes that command useful
+// for exactly this situation) and `fgos coordination chain <track>`
+// (Step 09 Phase 02 R2, a later addition, useful once this session's
+// coordinationId is part of a tracked chain of cell-sessions). A resume/
+// continue door DOES already exist -- `runCoordinationUseCase`'s own
+// existing resume path (`run.mjs`: a request naming this run's own
+// `coordinationId` continues the session) -- this text simply does not
+// name a specific follow-up command for it beyond `show`/`chain`, since
+// authorizing a revision/recheck is a driver decision this launcher never
+// infers or defaults.
 export function describeNextAction({ coordinationId, closed, closeRefusalReason }) {
   const showHint = `Run \`fgos coordination show ${coordinationId}\` to see authorizations issued, dispositions recorded, and which declared operations are still awaiting driver authorization.`;
   if (closed) {

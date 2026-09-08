@@ -1,0 +1,13 @@
+{
+  "ordinal": 5,
+  "role": "constraint-advocate",
+  "requested": { "executor": "codex-readonly", "tier": "analytical", "persona": "constraint-advocate" },
+  "derived": { "provider": "openai-codex", "model": "gpt-5.5", "tierMaterial": false },
+  "mechanism": "direct codex CLI invocation, provider-native -s read-only sandbox (no bwrap needed)",
+  "promptPath": "proofs/P01.2/prompts/constraint-advocate.md",
+  "rawLogPath": "proofs/P01.2/runs/5-constraint-advocate-raw.log",
+  "outputArtifact": "proofs/P01.2/proposals/constraint-advocate.md",
+  "exitCode": 0,
+  "tokensUsed": 7624,
+  "isolationCheck": "prompt embedded only CASE/interpretation/scout-report/Phase-4-defaults, no sibling proposal content"
+}

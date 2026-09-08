@@ -1,0 +1,13 @@
+{
+  "ordinal": 10,
+  "role": "context-investigator-followup",
+  "requested": { "executor": "codex-readonly", "tier": "analytical", "persona": "context-investigator" },
+  "derived": { "provider": "openai-codex", "model": "gpt-5.5", "tierMaterial": false },
+  "mechanism": "direct codex CLI invocation, provider-native -s read-only sandbox",
+  "authorizedBy": "dispositions.md Turn 1 authorization (narrow Phase 3 reopen)",
+  "promptPath": "proofs/P01.2/prompts/context-investigator-turn1-followup.md",
+  "rawLogPath": "proofs/P01.2/runs/10-context-investigator-followup-raw.log",
+  "outputArtifact": "proofs/P01.2/scout-report-followup-1.md",
+  "exitCode": 0,
+  "note": "Attempted a real cargo check in a disposable read-only-mounted copy (self-directed, no project files touched); reached exit 101 twice (stale lockfile, then an offline-unavailable dependency) without completing compilation -- honestly reported as inconclusive on compile status rather than guessing. Found a genuine, concrete, currently-live defect: desktop shell discards stdout so a fresh daemon's one-time-printed auth token is never shown to a first-time user, who would then be stuck at a login wall."
+}

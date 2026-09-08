@@ -1,0 +1,15 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Fix-round-1 verification call 5: human-turn + bounded revise-synthesis reopen with real grantedContextRefs, past round 10.",
+  "writerId": "fix-round-1-driver",
+  "coordinationId": "aap_fixround1_full",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "synthesizer-actor", "executor": "exec-family-a", "tier": "critical" }
+  ],
+  "steps": [
+    { "type": "human-turn", "as": "personTurn1", "turnId": "turn_1", "turnOrdinal": 1, "channel": "claude-code-chat", "artifactRef": "human/1-person.md", "externalRef": "claude-code-transcript:sess-1:uuid-1", "attributedTo": { "type": "person", "id": "the-user" } },
+    { "type": "authorize", "as": "authRevise", "operationId": "revise-synthesis", "targetActorId": "synthesizer-actor", "authorizationId": "auth_revise_1", "invocationKey": "ik_revise_1", "reason": "Bounded reopen per human turn \"turn_1\": re-check the reversibility premise.", "grantedContextRefs": ["asgn_fix_round_1_driver_op_008", "asgn_fix_round_1_driver_op_006", "asgn_fix_round_1_driver_op_007"] },
+    { "type": "operation", "as": "revise", "operationId": "revise-synthesis", "targetActorId": "synthesizer-actor", "objective": "revise", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

@@ -1,0 +1,530 @@
+# core/coordination-protocols/architecture-advisory-panel-v1.yaml -- Phase 03
+# (Architecture Advisory Panel track), cell P03.2: the minimum hard-shell
+# graph for the 9-real-role Architecture Advisory Panel
+# (docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md),
+# registering `core.coordination-protocol.architecture-advisory-panel-v1`.
+# Normalizes through the real, unmodified `validateFlowDefinition`
+# (src/runner/definitions/schema.mjs), same discovery path as every sibling
+# `core/coordination-protocols/*.yaml`.
+#
+# Per phase-03's own text, this file declares LEGALITY AND COLLABORATION
+# POSTURE ONLY -- who may act when, what must stay hidden from whom until
+# revealed, what requires driver authorization, what is bounded and how. It
+# does NOT duplicate the role doctrine or task prose Phase 04 projects onto
+# this graph: no `empathy`/`materiality`/`reframing-quality` field, no enum
+# encoding any advisory heuristic, no classification of what a human turn
+# MEANS. That intelligence stays entirely in
+# architecture-advisory-role-doctrine.md and Phase 04's own skill/prompt
+# layer -- this document is invisibly insufficient to operate a good panel
+# by itself, deliberately (phase-03's own Exit criterion).
+#
+# ── Minimum-graph rationale, one line per phase-03 Requirements bullet ──────
+#
+# "Independent work, controlled reveal" (phase 5 fan-out): `phase-shaping`
+# binds all three shapers (system/alternative/constraint) as `required`
+# (unbounded, unmediated) bindings -- the SAME shape
+# `independent-research-fan-out-fan-in-gated.yaml`'s own `independent-research`
+# cohort uses. Nothing auto-grants one shaper's output to a sibling (the
+# kernel's context-ref mechanism is opt-in-grant only, never
+# auto-propagated); the REAL, kernel-enforced reveal boundary sits one phase
+# later: `phase-critique`'s three bindings (critique, constraint-findings,
+# the on-demand specialist) are `driver-authorized` and gated by
+# `post-shaping-open`, which opens only once ALL THREE shaping operations
+# have a qualifying linked result -- a partial trio never opens it, mirroring
+# `independent-research-fan-out-fan-in-gated.yaml`'s own
+# `post-independent-pass` window exactly (per phase-03's own instruction to
+# "model this the same way ... already do it"). This is what the
+# "premature reveal" conformance case exercises: authorizing/dispatching
+# `phase-critique`'s bindings before all three `phase-shaping` bindings
+# settle is refused by this window, not by prose discipline.
+#
+# "Typed deliberation": the three shapers' operations declare
+# `contributions.allowedTypes: [proposal]`; `critique-proposals` and
+# `assess-constraints` declare `[objection]` (an attack against a proposal,
+# per the existing closed MVP8 enum -- no new type introduced);
+# `synthesize-recommendation` declares `[response]`. No new
+# contribution-type/mechanism is added anywhere in this document -- every
+# entry reuses `src/runner/deliberation/schema.mjs`'s existing closed enum.
+#
+# "Synthesis... after ALL Phase-5 branches AND the critique complete, a real
+# graph dependency": `synthesize-recommendation` is `driver-authorized` and
+# gated by `post-critique-open`, which opens only once BOTH
+# `critique-proposals` AND `assess-constraints` have a qualifying linked
+# result -- and since THOSE two are themselves gated by `post-shaping-open`
+# (all three shapers), synthesis is transitively unreachable until every
+# Phase-5 branch and the critique have settled. Not documentation: the
+# window-derivation mechanism (`deriveVisibilityWindowState`,
+# session-engine.mjs) recomputes this fresh from the event log on every
+# authorize/dispatch call, so it cannot be skipped by any request shape.
+#
+# "Recheck": `revise-synthesis`/`revise-explanation` (see Bounded Dialogue
+# Reopen below) reuse the exact "new Assignment under a distinct operation
+# id, never a retry of the original" shape
+# `standalone-master-coordination-loop.yaml`'s own `revise-candidate`/
+# `*-recheck` bindings already prove end to end
+# (`coordination-run-live-proof.test.mjs`, cited by P02.1's Table 3) --
+# the original `synthesize-recommendation`/`explain-recommendation`
+# Assignment and RunResult are never superseded, rewritten, or deleted.
+#
+# "Specialists": `answer-specialist-question` binds via
+# `specialistSlotRef: specialist-answer-slot`, reusing
+# `recordSpecialistAuthorization`/`dispatchDeclaredOperation`'s existing
+# specialist-slot mechanism unchanged (Phase 09, Step 09 MVP9) -- no new
+# step type, no new store/session-engine function. Named gap, not invented
+# here: `src/verbs/coordination/run.mjs`'s own request-step vocabulary
+# (`operation | authorize | disposition | contribution | human-turn |
+# fan-out`) has no `specialist-authorize` step, so a specialist slot can
+# only be authorized via a direct `authorizeSpecialistSlot` engine call
+# today, not through `fgos coordination run --file`/the pack gate -- the
+# SAME class of pre-existing wiring gap P10.10 named and later closed for
+# the `contribution` step type. Filed as `tsk-3xk` (general to every
+# protocol's own use of a specialist slot, not unique to this one), left
+# unfixed here per phase-03's own "no speculative kernel work" instruction
+# for this cell (this cell's
+# May-Touch list is the protocol/pack/test files below, not `run.mjs`).
+# See this cell's own doer-report.md for the conformance test's resulting
+# split between pack-gate-level and direct-engine-level assertions.
+#
+# "Park/resume": falls out of using `fgos coordination run`/the pack gate
+# against the same `coordinationId` correctly -- no new graph node needed,
+# proven generically by every sibling group-thinking-lite protocol's own
+# resume conformance case (P10.6/P10.7/P10.8) and re-exercised here.
+#
+# "Bounded dialogue reopen" (the new part P03.1 enables): human turns
+# themselves are NOT a graph concept at all -- `recordHumanTurn`'s
+# `human-turn` request-step type (P03.1) is session-level, protocol-agnostic
+# infrastructure, reachable regardless of which FlowDefinition a session is
+# bound to, exactly like `authorize`/`disposition` already are. What THIS
+# document adds is the bounded, driver-authorized CAPABILITY a driver may
+# spend once a human turn has been recorded and read: `revise-synthesis`
+# (role: synthesizer) and `revise-explanation` (role: lead-advisor), both
+# `driver-authorized` with `activation.maxInvocations: 2` -- a real,
+# monotonic, per-binding cap enforced by `authorizeOperation`'s lock-held
+# invocation count (`store.mjs`, the exact mechanism P02.1's own N+1 probe
+# against `test/runner/coordination-driver-authorization.test.mjs` R7
+# confirmed live) and independently re-checked at the dispatch door
+# (`createSessionAssignment`) -- never an arbitrary runtime edge or state
+# deletion, and never widened by declaring `partialPolicy` (deliberately not
+# declared anywhere in this document -- P02.1's BL1/tsk-5qj kernel bug is
+# out of this cell's scope to route around, and this protocol simply never
+# triggers it).
+#
+# `close-dialogue` exists for exactly one reason, found while building this
+# cell's own conformance test rather than assumed up front: per
+# `session-engine.mjs`'s multi-operation quorum rule (CoordinationSession
+# contract, "Multi-Operation Quorum Completion"), a binding gates an actor's
+# quorum completion only when `required`, or when `driver-authorized` AND it
+# ALSO declares `contextAccess.visibilityWindowRef`. `revise-synthesis`/
+# `revise-explanation` deliberately declare NEITHER a window (see the
+# `grantedContextRefs` reasoning below) -- so, without `close-dialogue`,
+# `lead-advisor-actor` would be quorum-complete the instant
+# `explain-recommendation` settles, and `closeSessionByQuorum` (called
+# unconditionally at the end of every `runCoordinationUseCase` call, per
+# the CoordinationSession contract's own Group-Thinking Protocol Pack
+# section) would close the session in that SAME call -- before a genuinely
+# later, separate call could ever record the person's real response. A
+# closed session refuses `human-turn`/`authorize` outright. `close-dialogue`
+# is lead-advisor's own THIRD gating binding (`driver-authorized`, gated by
+# `post-explanation-open`, which opens once `explain-recommendation`
+# settles): the driver authorizes it only once satisfied no further human
+# turn or reopen is coming, and only then does quorum -- and thus the
+# session -- ever complete. This is the graph's own answer to "who decides
+# the dialogue is over": never automatic, always one explicit, driver-
+# authorized, bounded step.
+#
+# `grantedContextRefs`/`human-turn:` decision, made deliberately NOT to
+# touch `session-engine.mjs` again in this cell (P03.1 already used this
+# phase's kernel-change budget), and corrected here after live-probing the
+# real request validator (`src/verbs/coordination/schema.mjs`) rather than
+# reasoning from the store layer alone: `SAFE_ID_RE`
+# (`/^[A-Za-z0-9_-]+$/`, schema.mjs) admits no colon, and `assertSafeRefOrId`
+# applies it uniformly to an `authorize` step's `grantedContextRefs`, a
+# `disposition` step's `targetRef`, AND a `disposition` step's
+# `evidenceRefs`. This means BOTH reserved namespaces (`human-turn:` and
+# `contribution:`) are refused at this request-schema charset check, in
+# EVERY ref field, for EVERY protocol -- not merely `grantedContextRefs`,
+# and not merely "unchecked" (an earlier draft of this comment understated
+# the gap this way; corrected per independent Review). The store-layer door
+# (`assertDispositionRefOwnedBySession`, store.mjs) DOES genuinely validate
+# a `human-turn:<id>` disposition ref against this session's own recorded
+# turns (P03.1's T1/T5 threat coverage) -- but a request reaching it through
+# `fgos coordination run --file`/the pack gate never gets there: it is
+# refused at the charset check first. Filed as `tsk-44p` (a request-schema
+# gap in `src/verbs/coordination/schema.mjs`, general to every protocol, not
+# fixed here per phase-03's own "no speculative kernel work" instruction for
+# this cell). The ONLY channel available today to document which human turn
+# authorizes a reopen is therefore the `authorize` step's own free-text
+# `reason` field (unenforced prose, exactly like every other `authorize`
+# step's `reason` in every sibling protocol) -- never a `disposition` step
+# citing the turn, and never a `grantedContextRefs` entry naming it.
+#
+# ── Portable, no literal executor/model pins ────────────────────────────────
+# `policy.minTier` per operation is the only literal lever declared here,
+# matching each role's cognitive-need floor from
+# architecture-advisory-role-doctrine.md's own "Cognitive Needs And Default
+# Tiers" table. No `capabilities[]` (inert without a declared `cohort`, per
+# `standalone-master-coordination-loop.yaml`'s own documented reasoning --
+# this document declares no `cohort` either, since every role here is a
+# static, named actor, not a dynamically-allocated pool) and no
+# `preferExecutor` anywhere (rejected outright by
+# `assertNoPortableExecutorPin` at every portable scope) -- concrete
+# executor/tier/persona selection is the request's own `actors[]` field,
+# proven protocol-agnostic by P10.1/P10.3 and re-exercised by this cell's
+# own heterogeneous-actor-bindings conformance case.
+#
+# ── Artifact envelope (phase-03 item 2) ─────────────────────────────────────
+# No new registry, no new schema field: `task.contractTemplate`
+# (`src/runner/definitions/schema.mjs`'s existing `OPERATION_TASK_FIELDS`,
+# already used by every sibling group-thinking-lite protocol) IS the
+# existing artifact-envelope mechanism this document reuses, one inline
+# template id per operation. Identity comes from the template id string
+# plus the operation id; type from `result.kind`/`contributions.allowedTypes`;
+# provenance and revision are the kernel's own, already-universal
+# Assignment/RunResult/PolicyPatch-provenance shape (no per-artifact
+# additions needed). See this cell's own doer-report.md for why item 5
+# (a focused definition-schema test for a new envelope field) does not
+# apply here -- no new field was introduced.
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.architecture-advisory-panel-v1
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: isolated-until-fan-in
+      visibilityWindows:
+        # Vacuous (opensAfter.operationRefs: [] -- open from session start,
+        # the same degenerate-but-schema-legal shape
+        # `group-thinking-nominal-group-lite.yaml`'s own "private-open"
+        # window uses). Gating a `required` binding is inert per the
+        # FlowDefinition contract's own Visibility Windows Limitation #3 --
+        # this window exists ONLY so the three Phase-5 shapers' own
+        # `proposal`-typed contributions have a window to record their
+        # reasoning as legal under (`linkSessionContribution` requires the
+        # backing operation binding to declare SOME
+        # `contextAccess.visibilityWindowRef`, gated or not).
+        - id: framing-shaping-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: []
+          permits:
+            sourceOperationRefs: [shape-system-proposal, shape-alternative-proposal, shape-constraint-proposal]
+            delivery: artifact-refs
+        - id: post-shaping-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [shape-system-proposal, shape-alternative-proposal, shape-constraint-proposal]
+          permits:
+            sourceOperationRefs: [shape-system-proposal, shape-alternative-proposal, shape-constraint-proposal]
+            delivery: artifact-refs
+        - id: post-critique-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [critique-proposals, assess-constraints]
+          permits:
+            sourceOperationRefs:
+              [
+                shape-system-proposal,
+                shape-alternative-proposal,
+                shape-constraint-proposal,
+                critique-proposals,
+                assess-constraints,
+              ]
+            delivery: artifact-refs
+        - id: post-synthesis-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [synthesize-recommendation]
+          permits:
+            sourceOperationRefs: [synthesize-recommendation]
+            delivery: artifact-refs
+        - id: post-redteam-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [red-team-packet]
+          permits:
+            sourceOperationRefs: [red-team-packet, synthesize-recommendation]
+            delivery: artifact-refs
+        - id: post-explanation-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [explain-recommendation]
+          permits:
+            sourceOperationRefs: [explain-recommendation]
+            delivery: artifact-refs
+      specialistSlots:
+        - id: specialist-answer-slot
+          role: specialist
+          operationRefs: [answer-specialist-question]
+          requiredCapabilities: []
+          allowedVisibilityWindows: [post-shaping-open]
+          maxBindings: 3
+          maxAssignments: 3
+
+  roles:
+    - lead-advisor
+    - context-investigator
+    - system-shaper
+    - alternative-shaper
+    - constraint-advocate
+    - architecture-critic
+    - synthesizer
+    - red-team
+    - specialist
+
+  actors:
+    - id: lead-advisor-actor
+      role: lead-advisor
+    - id: context-investigator-actor
+      role: context-investigator
+    - id: system-shaper-actor
+      role: system-shaper
+    - id: alternative-shaper-actor
+      role: alternative-shaper
+    - id: constraint-advocate-actor
+      role: constraint-advocate
+    - id: architecture-critic-actor
+      role: architecture-critic
+    - id: synthesizer-actor
+      role: synthesizer
+    - id: red-team-actor
+      role: red-team
+
+  operations:
+    - id: interpret-request
+      role: lead-advisor
+      policy:
+        minTier: critical
+      task:
+        contractTemplate: architecture-advisory-panel-v1-interpretation
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: investigate-context
+      role: context-investigator
+      policy:
+        minTier: standard
+      task:
+        contractTemplate: architecture-advisory-panel-v1-scout-report
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: shape-system-proposal
+      role: system-shaper
+      policy:
+        minTier: analytical
+      task:
+        contractTemplate: architecture-advisory-panel-v1-system-proposal
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: shape-alternative-proposal
+      role: alternative-shaper
+      policy:
+        minTier: analytical
+      task:
+        contractTemplate: architecture-advisory-panel-v1-alternative-proposal
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: shape-constraint-proposal
+      role: constraint-advocate
+      policy:
+        minTier: analytical
+      task:
+        contractTemplate: architecture-advisory-panel-v1-constraint-proposal
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: critique-proposals
+      role: architecture-critic
+      policy:
+        minTier: analytical
+      task:
+        contractTemplate: architecture-advisory-panel-v1-critique
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [objection]
+    - id: assess-constraints
+      role: constraint-advocate
+      policy:
+        minTier: analytical
+      task:
+        contractTemplate: architecture-advisory-panel-v1-constraint-findings
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [objection]
+    - id: answer-specialist-question
+      role: specialist
+      task:
+        contractTemplate: architecture-advisory-panel-v1-specialist-answer
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: synthesize-recommendation
+      role: synthesizer
+      policy:
+        minTier: critical
+      task:
+        contractTemplate: architecture-advisory-panel-v1-synthesis
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [response]
+    - id: red-team-packet
+      role: red-team
+      policy:
+        minTier: analytical
+      task:
+        contractTemplate: architecture-advisory-panel-v1-redteam
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: explain-recommendation
+      role: lead-advisor
+      policy:
+        minTier: critical
+      task:
+        contractTemplate: architecture-advisory-panel-v1-explanation
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: revise-synthesis
+      role: synthesizer
+      policy:
+        minTier: critical
+      task:
+        contractTemplate: architecture-advisory-panel-v1-synthesis
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [response]
+    - id: revise-explanation
+      role: lead-advisor
+      policy:
+        minTier: critical
+      task:
+        contractTemplate: architecture-advisory-panel-v1-explanation
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: close-dialogue
+      role: lead-advisor
+      policy:
+        minTier: standard
+      task:
+        contractTemplate: architecture-advisory-panel-v1-close-dialogue
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+  graph:
+    entry: phase-framing
+    nodes:
+      - id: phase-framing
+        operations:
+          - ref: interpret-request
+            actor: lead-advisor-actor
+          - ref: investigate-context
+            actor: context-investigator-actor
+        transitions: [phase-shaping]
+      - id: phase-shaping
+        operations:
+          - ref: shape-system-proposal
+            actor: system-shaper-actor
+            contextAccess:
+              visibilityWindowRef: framing-shaping-open
+          - ref: shape-alternative-proposal
+            actor: alternative-shaper-actor
+            contextAccess:
+              visibilityWindowRef: framing-shaping-open
+          - ref: shape-constraint-proposal
+            actor: constraint-advocate-actor
+            contextAccess:
+              visibilityWindowRef: framing-shaping-open
+        transitions: [phase-critique]
+      - id: phase-critique
+        operations:
+          - ref: critique-proposals
+            actor: architecture-critic-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-shaping-open
+          - ref: assess-constraints
+            actor: constraint-advocate-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-shaping-open
+          - ref: answer-specialist-question
+            specialistSlotRef: specialist-answer-slot
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-shaping-open
+        transitions: [phase-synthesis]
+      - id: phase-synthesis
+        operations:
+          - ref: synthesize-recommendation
+            actor: synthesizer-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-critique-open
+        transitions: [phase-redteam]
+      - id: phase-redteam
+        operations:
+          - ref: red-team-packet
+            actor: red-team-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-synthesis-open
+        transitions: [phase-explanation]
+      - id: phase-explanation
+        operations:
+          - ref: explain-recommendation
+            actor: lead-advisor-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-redteam-open
+        transitions: [phase-dialogue-reopen]
+      - id: phase-dialogue-reopen
+        operations:
+          - ref: revise-synthesis
+            actor: synthesizer-actor
+            activation:
+              mode: driver-authorized
+              maxInvocations: 2
+          - ref: revise-explanation
+            actor: lead-advisor-actor
+            activation:
+              mode: driver-authorized
+              maxInvocations: 2
+          - ref: close-dialogue
+            actor: lead-advisor-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-explanation-open
+        transitions: []

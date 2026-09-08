@@ -322,11 +322,13 @@ test('ask/answer round-trip on a genuinely legacy durable-doing item (no claim):
 
   const askResult = run(cwd, ['ask', 'gated-legacy-doing-item', '--text', VALID_ASK_TEXT]);
   assert.equal(askResult.status, 0);
-  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-legacy-doing-item', from: 'doing', to: 'awaiting-human', seq: 2 });
+  // seq 1 = addOk's work.add, seq 2 = moveToDurableDoingForTest's own
+  // work.move -- both real events on this item's log before ask ever runs.
+  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-legacy-doing-item', from: 'doing', to: 'awaiting-human', seq: 3 });
 
   const answerResult = run(cwd, ['answer', 'gated-legacy-doing-item', '--text', 'OAuth']);
   assert.equal(answerResult.status, 0);
-  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-legacy-doing-item', from: 'awaiting-human', to: 'todo', seq: 3 });
+  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-legacy-doing-item', from: 'awaiting-human', to: 'todo', seq: 4 });
   assert.equal(stateView(cwd).work['gated-legacy-doing-item'].status, 'todo');
 });
 

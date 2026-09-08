@@ -1,0 +1,10 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 main chain: ATTACK -- third reopen attempt, must be refused by activation.maxInvocations: 2.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_main",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "authorize", "as": "authRevise3", "operationId": "revise-synthesis", "targetActorId": "synthesizer-actor", "authorizationId": "auth_revise_3", "invocationKey": "ik_revise_3", "reason": "Third reopen attempt -- real CLI bounds attack, must be refused (binding admits at most 2).", "grantedContextRefs": [] }
+  ]
+}

@@ -445,7 +445,10 @@ test('runGroupThinkingRequest refuses a "link" step (an unknown step-type spelli
           }),
         },
       ),
-    (err) => err instanceof StoreError && err.category === 'validation' && /steps\[1\]\.type must be "operation", "fan-out", "authorize", "disposition", or "contribution"/.test(err.message),
+    (err) =>
+      err instanceof StoreError &&
+      err.category === 'validation' &&
+      /steps\[1\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", or "human-turn"/.test(err.message),
   );
 });
 

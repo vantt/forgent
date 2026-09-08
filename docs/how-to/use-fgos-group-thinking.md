@@ -165,11 +165,13 @@ hardcoded provider. `panelist-a` dispatches through `codex-cli`,
 `panelist-b` through `agy-cli`, `facilitator-actor` through whatever
 default the CLI's own `--executor` flag or this repo's `.fgos/config.json`
 resolves — Claude, Codex, and Antigravity genuinely collaborating as
-different actors within the same session. Add `model`/`tier`/`persona` to
-any `actors[]` entry the same way; give each step naming that actor an
-explicit `targetActorId` (already true in every example above) — the pack
-gate never reads or rewrites `actors[]`, so this works exactly as it
-would for a hand-authored `fgos coordination run --file` request.
+different actors within the same session. Add `tier` and `persona` to an
+`actors[]` entry when needed; give each step naming that actor an explicit
+`targetActorId` (already true in every example above). Declared-protocol
+requests currently reject `actors[].model`: the concrete model is derived
+from the selected executor's `providerModel` and tier through configured
+model policy. The pack gate forwards these supported per-actor fields
+unchanged.
 
 ## Reading replay, always
 

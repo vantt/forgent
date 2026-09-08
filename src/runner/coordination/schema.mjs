@@ -472,6 +472,38 @@ const EVENT_SPECS = {
   // is a snapshot (assignment-created with no result-linked yet) taken at
   // the moment of cancellation, never mutated afterward.
   'session-cancelled': { required: ['reason'], accepted: ['reason', 'inFlightAssignmentIds'] },
+  // Phase 03.1 (Architecture Advisory Panel track): a driver-transcribed
+  // record of one REAL, person-attributed turn -- the trusted-input door
+  // named by P02.1's BL4 row. This event never CLASSIFIES the turn (no
+  // decision/clarification/new-context field -- that judgment is a later
+  // layer's job, not this ledger's); it only pins WHO the turn is
+  // attributed to, WHAT bytes back it, and WHERE it came from, immutably.
+  //
+  // `recordedBy` is the driver that TRANSCRIBED the turn -- never its
+  // author -- so it is named distinctly from `authorizedBy`/`linkedBy` even
+  // though it shares their exact shape and the same `validateAuthorizedBy`
+  // validator (below). `attributedTo` is the actual human, `{type:
+  // "person", id}` only -- a closed single-value type, the same "closed
+  // enum, not an open label" posture `authorizedBy.type` already takes for
+  // "driver", so a worker/actor role can never occupy this slot merely by
+  // shape.
+  //
+  // `channel`/`externalRef` are opaque, non-empty strings by design --
+  // documented convention, not enforced shape, exactly like `reason`/
+  // `rationale` elsewhere in this table:
+  //   channel:     "claude-code-chat" | "fgos-answer" | "herdr-dashboard" | "relay"
+  //   externalRef: "claude-code-transcript:<sessionId>:<uuid>" |
+  //                "fgos-answer:<workId>:<eventTs>"
+  //
+  // `revision` is computed by the request door (`src/verbs/coordination/run.mjs`),
+  // never accepted from a hand-typed caller claim -- the door reads
+  // `artifactRef`'s real bytes off disk and hashes them itself, so a
+  // "sha256:<hex>" a caller invents by hand still has to match bytes that
+  // genuinely existed at record time to mean anything downstream.
+  'human-turn-recorded': {
+    required: ['turnId', 'turnOrdinal', 'channel', 'artifactRef', 'revision', 'externalRef', 'attributedTo', 'recordedBy'],
+    accepted: ['turnId', 'turnOrdinal', 'channel', 'artifactRef', 'revision', 'externalRef', 'attributedTo', 'recordedBy', 'respondsToRefs'],
+  },
 };
 
 export const EVENT_KINDS = Object.freeze(Object.keys(EVENT_SPECS));
@@ -480,7 +512,7 @@ export const EVENT_KINDS = Object.freeze(Object.keys(EVENT_SPECS));
 // above (beyond the REQUIRED `missingActors`, already handled inline in
 // `validateEventPayload`). Centralized here so a new bucket name is added
 // in exactly one place.
-const OPTIONAL_STRING_ARRAY_FIELDS = new Set(['failedActors', 'lateActors', 'replacedActors', 'dissentingActors', 'inFlightAssignmentIds']);
+const OPTIONAL_STRING_ARRAY_FIELDS = new Set(['failedActors', 'lateActors', 'replacedActors', 'dissentingActors', 'inFlightAssignmentIds', 'respondsToRefs']);
 
 // Optional non-empty-string fields shared by more than one event kind, in
 // the same "checked regardless of kind, only ever ACCEPTED where the kind's
@@ -534,8 +566,19 @@ const AGGREGATION_OPTIONAL_ARRAY_FIELDS = new Set([
 // contribution.
 export const CONTRIBUTION_REF_PREFIX = 'contribution:';
 
+// Phase 03.1 (Architecture Advisory Panel track): the reserved ref namespace
+// that makes a `driver-disposition-recorded.targetRef`/`evidenceRefs[]`
+// entry, or a `human-turn-recorded.respondsToRefs[]` entry, name a RECORDED
+// HUMAN TURN rather than an opaque artifact ref. Same reasoning as
+// `CONTRIBUTION_REF_PREFIX` immediately above: a turn id is pure ledger
+// state with no `.fgos/` directory of its own for a segment-existence scan
+// to resolve against, so a bare id would sail through unchecked without an
+// explicit namespace to require.
+export const HUMAN_TURN_REF_PREFIX = 'human-turn:';
+
 const AUTHORIZED_BY_FIELDS = new Set(['type', 'id']);
 const CONTEXT_GRANT_FIELDS = new Set(['refs']);
+const ATTRIBUTED_TO_FIELDS = new Set(['type', 'id']);
 
 function isStringArray(value) {
   return Array.isArray(value) && value.every(isNonEmptyString);
@@ -556,6 +599,23 @@ function validateAuthorizedBy(authorizedBy, label) {
   assertOnlyAcceptedFields(authorizedBy, AUTHORIZED_BY_FIELDS, label);
   if (authorizedBy.type !== 'driver') fail('validation', `${label}.type must be "driver"`);
   if (!isNonEmptyString(authorizedBy.id)) fail('validation', `${label}.id must be a non-empty string`);
+}
+
+/**
+ * `attributedTo: {type: "person", id}` -- the real human a recorded turn
+ * belongs to. `type` is a closed single-value enum, same posture as
+ * `authorizedBy.type`'s "driver": no other value (including "driver" or any
+ * actor role name) is legal, so a driver/worker identity can never occupy
+ * this slot merely by carrying the right shape. This module has no session
+ * on hand, so it enforces shape only -- confirming `id` names neither this
+ * session's own driver nor a declared panel actor is store.mjs's job
+ * (`recordHumanTurn`), on a manifest read inside the caller's held lock.
+ */
+function validateAttributedTo(attributedTo, label) {
+  if (!isPlainObject(attributedTo)) fail('validation', `${label} must be a non-null object`);
+  assertOnlyAcceptedFields(attributedTo, ATTRIBUTED_TO_FIELDS, label);
+  if (attributedTo.type !== 'person') fail('validation', `${label}.type must be "person"`);
+  if (!isNonEmptyString(attributedTo.id)) fail('validation', `${label}.id must be a non-empty string`);
 }
 
 /**
@@ -587,12 +647,18 @@ export function validateEventPayload(type, payload) {
       if (!isPlainObject(value)) fail('validation', `event "${type}" payload.provenanceRoot must be a non-null object`);
       continue;
     }
-    if (field === 'authorizedBy' || field === 'validatedBy' || field === 'linkedBy') {
-      // `validatedBy`/`linkedBy` are the same driver-provenance shape under a
-      // name that says what the driver did (validated an aggregation, linked a
-      // contribution, rather than authorized an operation) -- one validator,
-      // never a second copy.
+    if (field === 'authorizedBy' || field === 'validatedBy' || field === 'linkedBy' || field === 'recordedBy') {
+      // `validatedBy`/`linkedBy`/`recordedBy` are the same driver-provenance
+      // shape under a name that says what the driver did (validated an
+      // aggregation, linked a contribution, transcribed a human turn, rather
+      // than authorized an operation) -- one validator, never a second copy.
+      // `recordedBy` is named distinctly from `authorizedBy` on purpose: the
+      // driver TRANSCRIBES a human turn, it does not author it.
       validateAuthorizedBy(value, `event "${type}" payload.${field}`);
+      continue;
+    }
+    if (field === 'attributedTo') {
+      validateAttributedTo(value, `event "${type}" payload.${field}`);
       continue;
     }
     if (field === 'sourceResultRefs') {
@@ -624,12 +690,15 @@ export function validateEventPayload(type, payload) {
       }
       continue;
     }
-    if (field === 'maxAssignments' || field === 'expiresAfterRound') {
+    if (field === 'maxAssignments' || field === 'expiresAfterRound' || field === 'turnOrdinal') {
       // Positive integers, not strings -- the SAME shape `isPositiveInteger`
       // already enforces for `specialistSlots[].maxAssignments` in
       // `definitions/schema.mjs`, checked again here because this module is
       // the pure kernel that is the actual gate a hand-written log passes
-      // through.
+      // through. `turnOrdinal`'s own contiguity (no gaps, no reuse) is a
+      // cross-event, session-scoped question this pure per-payload validator
+      // cannot answer -- store.mjs's `recordHumanTurn` and replay.mjs both
+      // check it against the session's real log.
       if (!isPositiveInteger(value)) {
         fail('validation', `event "${type}" payload.${field} must be a positive integer`);
       }

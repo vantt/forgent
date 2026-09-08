@@ -1,0 +1,36 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Thin-client vs. local-ownership decision for the experimental native desktop shell (mdview).",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap_mdview_example",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "context-investigator-actor", "executor": "codex-readonly", "tier": "analytical" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "codex-readonly", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "codex-readonly", "tier": "analytical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "interpret",
+      "operationId": "interpret-request",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "Interpret the person's intent: thin-client vs. local-ownership for the desktop shell.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "operation",
+      "as": "investigate",
+      "operationId": "investigate-context",
+      "targetActorId": "context-investigator-actor",
+      "objective": "Scout the real repository for what the desktop shell actually owns today and what changed recently.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    }
+  ]
+}

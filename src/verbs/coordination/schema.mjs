@@ -113,11 +113,21 @@ function assertNoWorkLifecycleKeys(value, pathLabel = 'request') {
   }
 }
 
-function assertMutationReadOnly(value, pathLabel) {
+// Phase 01 mutation-unlock: a declared `operation` step may opt into a
+// real, mutating dispatch (`allowMutating: true`, `validateOperationStep`
+// below) -- every other step/branch/task shape stays hard-refused for
+// anything but "read-only", unchanged. `allowMutating` never widens WHICH
+// values are legal (still exactly "read-only" | "mutating"), only whether
+// "mutating" itself is one of them for this particular caller.
+function assertMutationAllowed(value, pathLabel, { allowMutating = false } = {}) {
   if (value === undefined) return;
-  if (value !== 'read-only') {
-    fail(`field "mutation" at ${pathLabel} must be "read-only" -- the whole standalone-session CLI surface is read-only in V1 (plan.md Locked Product Decisions)`);
-  }
+  if (value === 'read-only') return;
+  if (allowMutating && value === 'mutating') return;
+  fail(
+    allowMutating
+      ? `field "mutation" at ${pathLabel} must be "read-only" or "mutating"`
+      : `field "mutation" at ${pathLabel} must be "read-only" -- only a declared "operation" step may opt into a real, mutating dispatch (Phase 01 mutation-unlock); every other step type stays read-only-only`,
+  );
 }
 
 const ACTOR_ALLOWED_KEYS = new Set(['id', 'persona', 'executor', 'model', 'tier']);
@@ -201,7 +211,7 @@ const TASK_ALLOWED_KEYS = new Set(['taskKey', 'contextRefs', 'constraints', 'exp
 function validateTask(task) {
   if (!isPlainObject(task)) fail('"task" is required and must be an object when kind is "agent-led"');
   assertAllowedKeys(task, TASK_ALLOWED_KEYS, '"task"');
-  assertMutationReadOnly(task.mutation, 'task.mutation');
+  assertMutationAllowed(task.mutation, 'task.mutation');
   if (task.taskKey !== undefined) assertSafeId(task.taskKey, 'task.taskKey');
   const contextRefs = validateStringArray(task.contextRefs, 'task.contextRefs');
   contextRefs.forEach((ref, i) => assertSafeRefOrId(ref, `task.contextRefs[${i}]`));
@@ -247,7 +257,7 @@ const OPERATION_STEP_ALLOWED_KEYS = new Set([
 
 function validateOperationStep(step, i) {
   assertAllowedKeys(step, OPERATION_STEP_ALLOWED_KEYS, `steps[${i}] (type "operation")`);
-  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertMutationAllowed(step.mutation, `steps[${i}].mutation`, { allowMutating: true });
   if (!isNonEmptyString(step.operationId)) fail(`steps[${i}].operationId is required`);
   if (step.targetActorId !== undefined) assertSafeId(step.targetActorId, `steps[${i}].targetActorId`);
   if (!isNonEmptyString(step.objective)) fail(`steps[${i}].objective is required`);
@@ -275,6 +285,12 @@ function validateOperationStep(step, i) {
     intent: step.intent,
     round: step.round,
     taskKey: step.taskKey,
+    // Phase 01 mutation-unlock (R1): only ever "read-only" | "mutating" |
+    // undefined past assertMutationAllowed above -- carried through
+    // verbatim (never defaulted here) so a caller-omitted field stays
+    // byte-identical to every pre-existing request (session-engine.mjs's
+    // own dispatchDeclaredOperation applies the "read-only" default).
+    mutation: step.mutation,
   };
 }
 
@@ -303,7 +319,7 @@ function assertNoAuthorizedBy(step, label) {
 function validateAuthorizeStep(step, i) {
   assertNoAuthorizedBy(step, `steps[${i}] (type "authorize")`);
   assertAllowedKeys(step, AUTHORIZE_STEP_ALLOWED_KEYS, `steps[${i}] (type "authorize")`);
-  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
   if (!isNonEmptyString(step.operationId)) fail(`steps[${i}].operationId is required`);
   if (step.targetActorId !== undefined) assertSafeId(step.targetActorId, `steps[${i}].targetActorId`);
   if (step.nodeId !== undefined) assertSafeId(step.nodeId, `steps[${i}].nodeId`);
@@ -343,7 +359,7 @@ const DISPOSITION_MAX_LENGTH = 200;
 function validateDispositionStep(step, i) {
   assertNoAuthorizedBy(step, `steps[${i}] (type "disposition")`);
   assertAllowedKeys(step, DISPOSITION_STEP_ALLOWED_KEYS, `steps[${i}] (type "disposition")`);
-  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
   assertSafeRefOrId(step.targetRef, `steps[${i}].targetRef`);
   // Shape only, deliberately not a closed vocabulary: the accepted contract
   // says "e.g. accepted | rejected" and names closing a round as a third
@@ -371,7 +387,7 @@ const FAN_OUT_BRANCH_ALLOWED_KEYS = new Set(['actorId', 'objective', 'expectedOu
 function validateFanOutBranch(branch, i, j) {
   if (!isPlainObject(branch)) fail(`steps[${i}].branches[${j}] must be an object`);
   assertAllowedKeys(branch, FAN_OUT_BRANCH_ALLOWED_KEYS, `steps[${i}].branches[${j}]`);
-  assertMutationReadOnly(branch.mutation, `steps[${i}].branches[${j}].mutation`);
+  assertMutationAllowed(branch.mutation, `steps[${i}].branches[${j}].mutation`);
   assertSafeId(branch.actorId, `steps[${i}].branches[${j}].actorId`);
   if (!isNonEmptyString(branch.objective)) fail(`steps[${i}].branches[${j}].objective is required`);
   const expectedOutputs = validateStringArray(branch.expectedOutputs, `steps[${i}].branches[${j}].expectedOutputs`, { required: true });
@@ -397,7 +413,7 @@ const FAN_OUT_STEP_ALLOWED_KEYS = new Set(['type', 'as', 'operationId', 'branche
 
 function validateFanOutStep(step, i) {
   assertAllowedKeys(step, FAN_OUT_STEP_ALLOWED_KEYS, `steps[${i}] (type "fan-out")`);
-  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
   if (!isNonEmptyString(step.operationId)) fail(`steps[${i}].operationId is required`);
   if (!Array.isArray(step.branches) || step.branches.length === 0) fail(`steps[${i}].branches must be a non-empty array`);
   const branches = step.branches.map((branch, j) => validateFanOutBranch(branch, i, j));
@@ -442,7 +458,7 @@ function assertNoLinkedBy(step, label) {
 function validateContributionStep(step, i) {
   assertNoLinkedBy(step, `steps[${i}] (type "contribution")`);
   assertAllowedKeys(step, CONTRIBUTION_STEP_ALLOWED_KEYS, `steps[${i}] (type "contribution")`);
-  assertMutationReadOnly(step.mutation, `steps[${i}].mutation`);
+  assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
   assertSafeId(step.contributionId, `steps[${i}].contributionId`);
   if (!isNonEmptyString(step.contributionType) || !CONTRIBUTION_TYPE_SET.has(step.contributionType)) {
     fail(`steps[${i}].contributionType must be one of the closed MVP8 contribution types (${CONTRIBUTION_TYPES.join(' | ')})`);
@@ -472,6 +488,76 @@ function validateContributionStep(step, i) {
   };
 }
 
+// Phase 03.1 (Architecture Advisory Panel track): a "human-turn" step
+// reaches `recordHumanTurn` (store.mjs) -- the trusted external-input/
+// human-decision provenance door named by P02.1's BL4 row. Deliberately NOT
+// accepting `revision` here: `run.mjs` resolves `artifactRef` against the
+// working directory/repo root, reads its real bytes, and computes the
+// revision hash itself, so a caller cannot fake "these bytes existed at
+// record time" by hand-typing a hash.
+const HUMAN_TURN_STEP_ALLOWED_KEYS = new Set([
+  'type', 'as', 'turnId', 'turnOrdinal', 'channel', 'artifactRef', 'externalRef', 'attributedTo', 'respondsToRefs',
+]);
+
+const ATTRIBUTED_TO_ALLOWED_KEYS = new Set(['type', 'id']);
+
+// `attributedTo.id` is a real, caller-facing identity (typically a person's
+// name/handle), not concatenated into any derived key or path the way
+// `authorizationId`/`contributionId` are elsewhere in this module -- so it
+// gets the same safe-charset check every other id in this module gets
+// (defense in depth, not because this module knows of a specific
+// interpolation risk for it).
+function validateHumanTurnAttributedTo(attributedTo, label) {
+  if (!isPlainObject(attributedTo)) fail(`${label} is required and must be an object`);
+  assertAllowedKeys(attributedTo, ATTRIBUTED_TO_ALLOWED_KEYS, label);
+  if (attributedTo.type !== 'person') fail(`${label}.type must be "person"`);
+  assertSafeId(attributedTo.id, `${label}.id`);
+  return { type: 'person', id: attributedTo.id };
+}
+
+function validateHumanTurnStep(step, i) {
+  assertAllowedKeys(step, HUMAN_TURN_STEP_ALLOWED_KEYS, `steps[${i}] (type "human-turn")`);
+  assertSafeId(step.turnId, `steps[${i}].turnId`);
+  if (!Number.isInteger(step.turnOrdinal) || step.turnOrdinal < 1) {
+    fail(`steps[${i}].turnOrdinal must be a positive integer`);
+  }
+  if (!isNonEmptyString(step.channel)) fail(`steps[${i}].channel is required and must be a non-empty string`);
+  // `artifactRef` is a real filesystem path `run.mjs` resolves against the
+  // working directory/repo root -- not a `$ref:`/session-owned-ref shape, so
+  // it does NOT go through `assertSafeRefOrId` (which would reject the path
+  // separators every real relative path needs, e.g. "human/1-person.md").
+  // The request file is operator-authored trusted data (this module's own
+  // header comment); `run.mjs`'s own fs.existsSync + hash-at-read-time is
+  // what makes this ref meaningful, not a charset restriction here.
+  if (!isNonEmptyString(step.artifactRef)) fail(`steps[${i}].artifactRef is required and must be a non-empty string`);
+  if (!isNonEmptyString(step.externalRef)) fail(`steps[${i}].externalRef is required and must be a non-empty string`);
+  const attributedTo = validateHumanTurnAttributedTo(step.attributedTo, `steps[${i}].attributedTo`);
+  // Bare turn ids of PRIOR human turns in this same session -- the same
+  // "engine adds the meaning, the request boundary keeps the bare token"
+  // shape a "contribution" step's own `anchors`/`respondsTo` already take
+  // (`assertSafeId`, never `assertSafeRefOrId`): a human-turn step never
+  // gets a `labels[step.as]` entry (see run.mjs), so there is no
+  // Assignment-id `$ref:` this field could ever resolve through, and the
+  // reserved `human-turn:`/`contribution:` PREFIXED ref shape store.mjs's
+  // own `assertDispositionRefOwnedBySession` expects is not itself a legal
+  // charset here (a colon is outside `SAFE_ID_RE`) -- `run.mjs` prefixes each
+  // bare id with the reserved namespace before it ever reaches the engine.
+  let respondsToRefs = step.respondsToRefs !== undefined ? validateStringArray(step.respondsToRefs, `steps[${i}].respondsToRefs`) : undefined;
+  if (respondsToRefs !== undefined) respondsToRefs.forEach((ref, j) => assertSafeId(ref, `steps[${i}].respondsToRefs[${j}]`));
+  if (respondsToRefs !== undefined && respondsToRefs.length === 0) respondsToRefs = undefined;
+  return {
+    type: 'human-turn',
+    as: step.as,
+    turnId: step.turnId,
+    turnOrdinal: step.turnOrdinal,
+    channel: step.channel,
+    artifactRef: step.artifactRef,
+    externalRef: step.externalRef,
+    attributedTo,
+    respondsToRefs,
+  };
+}
+
 function validateSteps(steps) {
   if (!Array.isArray(steps) || steps.length === 0) fail('"steps" is required and must be a non-empty array when kind is "declared-protocol"');
   const seenLabels = new Set();
@@ -485,7 +571,8 @@ function validateSteps(steps) {
     if (step.type === 'authorize') return validateAuthorizeStep(step, i);
     if (step.type === 'disposition') return validateDispositionStep(step, i);
     if (step.type === 'contribution') return validateContributionStep(step, i);
-    fail(`steps[${i}].type must be "operation", "fan-out", "authorize", "disposition", or "contribution"`);
+    if (step.type === 'human-turn') return validateHumanTurnStep(step, i);
+    fail(`steps[${i}].type must be "operation", "fan-out", "authorize", "disposition", "contribution", or "human-turn"`);
     return undefined; // unreachable, keeps linters happy
   });
 }

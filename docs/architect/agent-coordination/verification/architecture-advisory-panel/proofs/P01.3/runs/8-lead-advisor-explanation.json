@@ -1,0 +1,14 @@
+{
+  "ordinal": 8,
+  "role": "lead-advisor",
+  "requested": { "executor": "claude-bwrap", "tier": "critical", "persona": "lead-advisor" },
+  "derived": { "provider": "claude", "model": "opus", "tierMaterial": true },
+  "mechanism": "direct bwrap invocation, kongming-verified scratch-bind pattern",
+  "command": "bwrap --ro-bind / / --dev /dev --proc /proc --tmpfs /tmp --ro-bind /home/vantt/projects/vnflow /home/vantt/projects/vnflow --bind <evidenceDir> <evidenceDir> --chdir /home/vantt/projects/vnflow -- claude -p \"<prompt>\" --model opus --permission-mode acceptEdits",
+  "promptPath": "proofs/P01.3/prompts/lead-advisor-explanation.md",
+  "rawLogPath": "proofs/P01.3/runs/8-lead-advisor-explanation-raw.log",
+  "outputArtifact": "proofs/P01.3/explanation.md",
+  "exitCode": 0,
+  "note": "Went further than the prompt's paraphrased citations -- independently re-cited exact real code locations (signal_rules.py:248, signal_engine.py:433, asset_runner.py:81/168, signal_engine_intraday_loaders.py:19/35/49/65/83) rather than just repeating the synthesis summary's prose, since it had live read access to the real vnflow checkout. Preserved both live disagreements and the values-choice framing without softening, per the template's own anti-pattern warnings.",
+  "vocabularyCheck": "used only EOD/intraday/pipelines/contracts/evolution/difficult; did not introduce batch/streaming/microservice/monolith or other words the person didn't use; did not claim production failure/breakage, framed throughout as a change-difficulty problem per the person's own wording"
+}

@@ -69,8 +69,18 @@ request door's fifth step kind (`contribution`, forwarding into
 `src/verbs/coordination/run.mjs` (P10.10, closing the track). Promoted with
 the named limitations in Multi-Operation Quorum Completion and
 Group-Thinking Protocol Pack below, not without them. Full per-phase trace:
-`docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`.)
-Last reviewed: 2026-09-04
+`docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md`.
+Phase 03.1 (Architecture Advisory Panel track, P02.1's BL4 row): the
+`human-turn-recorded` event, its write door (`recordHumanTurn`), its replay
+re-validation, the `human-turn:` ref namespace on
+`driver-disposition-recorded`, and the `human-turn` request-step type
+accepted and implemented —
+`src/runner/coordination/{schema,store,replay}.mjs`,
+`src/verbs/coordination/{schema,run,show}.mjs`. Promoted with the named
+limitation in Human Turn Provenance below (T6, same-privilege-level
+fabrication, cannot be closed in-process), not without it. Full trace:
+`docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/doer-report.md`.)
+Last reviewed: 2026-09-06
 Canonical for: CoordinationSession manifest/event schema, storage layout, session-to-Assignment membership, and recovery rules
 Related: [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md), [Assignment, Run, And RunResult Contract](assignment-run-runresult.md), [Runtime Model](../architecture/runtime-model.md), [Work Integration](../architecture/work-integration.md)
 
@@ -176,6 +186,7 @@ reference discipline as `assignmentRefs`. Minimum event kinds:
 | `aggregation-validated` | Phase 07 (Step 09) MVP7: a driver-authored record of one evidence-preserving aggregation the engine validated over this session's own evidence (see [Evidence-Preserving Aggregation](#evidence-preserving-aggregation-mvp7-step-09) below). Never a transition of its own. | `aggregationId`, `method`, `outcome`, `sourceResultRefs`, `validatedBy`, `ts`; optional `assignmentId?`, `runId?`, `outputArtifactRef?`, `dissentRefs?`, `unresolvedContributionRefs?`, `missingActors?`, `failedActors?`, `unboundSourceOperationRefs?`, `artifactRevisionRefs?` |
 | `deliberation-contribution-linked` | Phase 08 (Step 09) MVP8: a driver-authored, immutable lineage record linking ONE typed deliberation contribution — ref and revision pin only, never artifact content — into this session's ledger (see [Deliberation Contribution Ledger](#deliberation-contribution-ledger-mvp8-step-09) below). Never a transition of its own. | `contributionId`, `operationRef`, `type`, `assignmentId`, `runId`, `artifactRef`, `revision`, `roundKey`, `visibilityWindowRef`, `linkedBy`, `ts`; optional `anchors?`, `respondsTo?` |
 | `specialist-authorized` | Phase 09 (Step 09) MVP9: a driver-authored event that atomically authorizes AND session-scoped-binds a previously-unknown specialist actor identity to a declared `topology.specialistSlots[]` slot, in one write (see [Specialist Slot Binding](#specialist-slot-binding-mvp9-step-09) below). Never a transition of its own. | `specialistAuthorizationId`, `slotId`, `specialistActorId`, `role`, `capabilities`, `authorizedBy`, `reason`, `triggerEvidenceRefs`, `allowedContextRefs`, `maxAssignments`, `expiresAfterRound`, `ts` |
+| `human-turn-recorded` | Phase 03.1 (Architecture Advisory Panel track): a driver-transcribed, immutable record of one REAL, person-attributed turn -- the trusted external-input/human-decision provenance door P02.1's BL4 row named (see [Human Turn Provenance](#human-turn-provenance-phase-031-architecture-advisory-panel-track) below). Never a transition of its own, and never a classification of the turn (no decision/clarification/new-context field). | `turnId`, `turnOrdinal`, `channel`, `artifactRef`, `revision`, `externalRef`, `attributedTo`, `recordedBy`, `ts`; optional `respondsToRefs?` |
 
 Additional event kinds may be added by a future phase without breaking this
 contract as long as they do not change the meaning of the kinds above.
@@ -571,10 +582,12 @@ operation — no new dispatch gate was introduced. `dispatchDeclaredOperation`
 resolves a `specialistSlotRef` binding's effective actor id by looking up
 the slot in a freshly-derived live-bindings map before resolving the
 authorization, then proceeds through the SAME context-grant enforcement,
-visibility-window re-derivation, and read-only contract construction
-(`buildReadOnlyContract`, hardcoded `mutation: 'read-only'`) every other
-dispatch path uses — a specialist-dispatched Assignment introduces no new
-mutation-capable surface (proved in
+visibility-window re-derivation, and contract construction
+(`buildSessionContract`, defaulting `mutation: 'read-only'`) every other
+`dispatchDeclaredOperation` call uses — a specialist-dispatched Assignment
+introduces no NEW mutation mechanism of its own; it is subject to the exact
+same Mutation Rule (see below) as any other declared `operation` step,
+statically-bound or specialist-slot-bound alike (proved in
 `test/runner/coordination-r7-work-isolation.test.mjs` and
 `test/runner/coordination-specialist-binding.test.mjs`, P09.3).
 
@@ -800,6 +813,122 @@ applies identically to every pack-registered protocol; the pack registry
 adds real `{id, version}` pairs, it does not close or worsen this
 systemic, already-disclosed, whole-kernel limitation.
 
+## Human Turn Provenance (Phase 03.1, Architecture Advisory Panel track)
+
+A trusted external-input/human-decision provenance door, closing the gap
+P02.1's own capability-fit audit named as its ONE `new-hard-capability` row
+(BL4): nothing today distinguishes an authentic human-submitted turn from
+one the coordinator PROCESS ITSELF could write. The 4-layer Decision
+Dialogue provenance separation this door sits under (`human/<n>-person.md`
+verbatim / `dialogue/<n>-impact.md` lead-advisor reading / `dispositions.md`
+driver authorization / `dialogue/<n>-response.md` panel response) is real
+and reliable prose discipline, proven across 3 real dialogue turns
+(P01.2/P01.3) -- but it is prose discipline ONLY, with no schema backing at
+all. This door adds the schema backing for layer 1's own authenticity,
+nothing else: it does not harden the 4-layer split itself (P02.1 explicitly
+did not recommend that), and it adds no classification of what a turn
+MEANS (decision vs. clarification vs. new context stays a later layer's
+interpretation, never a schema enum here).
+
+**What one `human-turn-recorded` event pins.** `attributedTo: {type:
+"person", id}` names the real human the turn belongs to -- a closed
+single-value `type`, so a driver/worker identity can never occupy this slot
+merely by shape. `recordedBy` is the driver that TRANSCRIBED the turn,
+named distinctly from `authorizedBy`/`linkedBy` even though it shares their
+exact `{type: "driver", id}` shape and validator, because the driver
+transcribes a human turn, it never authors one. `artifactRef` + `revision`
+pin the real bytes the transcription rests on -- `revision` is computed by
+the request door (`src/verbs/coordination/run.mjs`) from the file's actual
+content at record time, never accepted as a caller-supplied hash, so a
+hand-typed `sha256:...` still has to match bytes that genuinely existed
+when the turn was recorded. `artifactRef` is also required to resolve
+INSIDE the working directory the session was opened against (fix round 1,
+Reviewer R-P03.1-05/Red-Team Finding 3: `run.mjs` refuses a resolved path
+outside `ctx.cwd`, closing a `../` traversal or absolute-path escape a
+hand-authored request could otherwise use to pin a hash against a file the
+repo itself never contains, which no later reader holding only the repo
+could ever re-verify) -- checked on `fs.realpathSync`-resolved paths on
+BOTH sides of the comparison since fix round 2 (Reviewer + Red-Team,
+independently: a lexical-only check let an IN-WORKSPACE symlink pointing
+OUTSIDE the workspace pass containment and have its outside target's bytes
+hashed instead). `channel`/`externalRef` are opaque, non-empty
+strings by documented convention (`channel`: `claude-code-chat` |
+`fgos-answer` | `herdr-dashboard` | `relay`; `externalRef`:
+`claude-code-transcript:<sessionId>:<uuid>` | `fgos-answer:<workId>:<eventTs>`),
+never enforced shape beyond non-emptiness -- this door has no channel
+registry to validate against. `turnOrdinal` is a monotonic, gap-free,
+session-scoped sequence (exactly one more than the highest ordinal already
+recorded), checked at both write time (`recordHumanTurn`, store.mjs) and
+replay time (`replay.mjs`), independently.
+
+**Refusals (write door and replay, independently -- verified true of BOTH
+layers after fix round 1; see the corrected T1/T8 rows below).**
+`attributedTo.id === recordedBy.id` (a driver cannot attribute a turn to
+itself); `attributedTo.id` names a declared `manifest.actors[]` panel actor
+(a panel actor cannot be "the person"); `attributedTo.id` is shaped like a
+driver-authored ref (`asgn_` Assignment prefix, or the reserved
+`contribution:`/`human-turn:` namespaces) (a driver-authored ref cannot
+occupy the human-decision slot); a non-contiguous `turnOrdinal` (no gaps,
+no reuse); a reused `externalRef` (no replaying one real turn as two); a
+`turnId` recorded a second time with different content (immutable once
+written -- a byte-identical repeat is an idempotent no-op, mirroring every
+other driver-authored door in store.mjs). `turnId` itself additionally gets
+a shape guard mirroring `assertContributionIdShape` (no path separator, no
+`..`, no reserved-prefix self-reference) -- fix round 1, closing a gap where
+a path-shaped `turnId` reachable only from a direct store API caller (never
+`fgos coordination run`, whose own request boundary already applies
+`assertSafeId`) could skip the generic cross-session segment scan. The
+`human-turn:` ref namespace extends `driver-disposition-recorded`'s own
+existing ref-ownership door (`assertDispositionRefOwnedBySession`,
+store.mjs) exactly the way `contribution:` already does: a bare
+(unprefixed) turn id is refused as a near-miss, and a prefixed ref naming a
+turn this session never recorded is a `dangling-ref`. Replay additionally
+refuses a `driver-disposition-recorded` event citing a `human-turn:` ref
+for a turn not yet walked at that point in the log (`out-of-order-ref`) --
+a referential-integrity check, not a "did this resolve anything" question
+the way contribution resolution is -- and, since fix round 1, applies the
+same out-of-order-ref/dangling-ref/near-miss checks to a
+`human-turn-recorded` event's own `respondsToRefs[]` entries, for the two
+reserved namespaces and the bare-id near-miss ONLY -- see T8's own row
+below for the one place this is narrower than the write door's full
+cross-session segment scan.
+
+**Threat model -- what this door closes, and what it explicitly does not.**
+The coordinator process (an AI agent, same OS user, with Bash access) has
+no way to be barred, in-process, from writing a fabricated
+`human/<n>-person.md` and treating it as real (same privilege level as
+every other write this process makes) -- that threat cannot be closed by
+any kernel mechanism this repo could add, and this door does not pretend
+otherwise. What it converts fabrication into is a DETECTABLE, ATTRIBUTABLE
+false attestation, never an invisible one.
+
+| # | Threat | Disposition | Mechanism |
+|---|---|---|---|
+| T1 | A driver-authored artifact or actor identity occupies the human-decision slot (self-attribution, a panel actor "being" the person, or a driver-authored ref shape standing in for a person) | **Closed** | `recordHumanTurn`'s all-FOUR `attributedTo` refusals (store.mjs: self-attribution, panel actor, and the `asgn_`/`contribution:`/`human-turn:` ref-shape check), each re-checked independently at replay (`replay.mjs`) -- fix round 1 closed the ref-shape check's own replay-side gap; before that fix only the first two of the four were re-checked, an inconsistency Reviewer/Red-Team both caught |
+| T2 | A recorded human turn is silently edited or overwritten after the fact | **Closed** | `turnId` immutability: a second write with different content is a hard `duplicate-ref`, both at write time and replay |
+| T3 | One real human turn is replayed/duplicated into the ledger as if it were two separate turns | **Closed** | `externalRef` uniqueness (at most one real turn per externalRef), checked at write time and replay |
+| T4 | Turns are inserted out of order, or a turn's position in the sequence is silently altered (ordinal gaps/reuse) | **Closed** | `turnOrdinal` monotonic-contiguous check, checked at write time and replay |
+| T5 | A disposition cites a human turn as its decision basis that this session never actually recorded, or that is cited before it exists in the log | **Closed** | `human-turn:` ref ownership (`assertDispositionRefOwnedBySession`, write time) + out-of-order-ref check (replay) |
+| T6 | The coordinator process itself fabricates the underlying artifact bytes and records them as if a real human produced them | **Open, by design -- cannot be closed in-process** | None; same privilege level as every other write this process makes. Fabrication becomes a detectable, attributable false attestation (a real, permanent, immutable record naming a specific driver and a specific artifact revision) rather than an invisible one -- narrowing, never closing |
+| T7 | A crash or race during recording leaves a partially-written or duplicated ledger entry | **Closed** | Same `withEventsLock` critical section + idempotent-append-on-identical-payload discipline every other driver-authored door in store.mjs already uses |
+| T8 | A hand-crafted or corrupted `events.jsonl` (bypassing `recordHumanTurn` entirely) presents a forged `human-turn-recorded` event as legitimate | **Narrowed, not fully closed** | `replay.mjs` independently re-validates driver identity, self-attribution, panel-actor attribution, the `asgn_`/`contribution:`/`human-turn:` ref-shape check, ordinal contiguity, and duplicate turnId/externalRef against a hand-written log (all as of fix round 1). `respondsToRefs[]` re-validation is NARROWER than the write door's own check (fix round 2, Reviewer-flagged doc-precision correction): replay recognizes only the two reserved `human-turn:`/`contribution:` namespaces plus the bare-id near-miss, not the full cross-session segment scan `assertDispositionRefOwnedBySession` runs at write time -- a hand-written `respondsToRefs` entry naming a path like `coordination/sessions/victim/session.json` replays clean, while the write door would refuse it (no realistic harm: nothing legitimate can rely on a ref shape replay does not itself resolve to anything). What replay cannot catch, beyond that: a forger who ALSO holds the real driver identity and mirrors every one of the checked shapes exactly -- the same "careful forgery is narrowed, not closed" residual already disclosed for `aggregation-validated`/`specialist-authorized` above, not a new or worse exposure |
+
+**Named limitation, not closed here.** `respondsToRefs` (optional, on the
+event) is validated for session ownership via the SAME
+`assertDispositionRefOwnedBySession` a disposition's own refs already use --
+no second, divergent ownership rule. At the request-file boundary
+(`src/verbs/coordination/schema.mjs`), a `human-turn` step's own
+`respondsToRefs` entries are bare turn ids (the same "engine adds the
+prefix, the request boundary keeps the bare token" shape a `contribution`
+step's own `anchors`/`respondsTo` already take), because a human-turn step
+never gets a `labels[step.as]` entry to `$ref:` against and the reserved
+`human-turn:`/`contribution:` prefixed shape itself falls outside the
+request boundary's safe charset (`SAFE_ID_RE` excludes `:`). This mirrors a
+pre-existing, already-disclosed narrowing for `contribution:`-prefixed
+disposition `targetRef`/`evidenceRefs` (the request boundary's charset was
+already stricter than the engine's own ref-shape acceptance before this
+door existed); this door does not widen or fix that pre-existing gap.
+
 ## Recovery Rule
 
 A resumed session must not duplicate a completed Assignment. This requires
@@ -866,6 +995,74 @@ A session's `workRef` is read-only context. Per
 or verb defined by this contract may move Work status/stage, accept, approve,
 claim, return, or merge. A session cannot duplicate Work stage/status/
 approval/merge state in `.fgos/coordination/`.
+
+## Mutation Rule (declared `operation` steps, group-thinking-plan-loop Phase 01)
+
+Every dispatch door in this contract defaults to read-only
+(`buildSessionContract`'s own `mutation = 'read-only'` default, byte-identical
+to every caller that predates this section). `dispatchPrimaryTask` and
+`proposeConsult` (the agent-led, undeclared-protocol path) keep their own,
+separate, hard read-only assertions unconditionally — this section applies
+ONLY to `dispatchDeclaredOperation`'s own path, and only to a declared
+`operation` step specifically (never `authorize`/`disposition`/`fan-out`/
+`contribution`, which stay hard-refused for anything but `"read-only"` at the
+request-schema boundary, `src/verbs/coordination/schema.mjs`).
+
+A declared `operation` step may set `mutation: 'mutating'` and dispatch as a
+real, mutating worker — producing an actual git delta the dispatch evidence
+ladder grades `verified` — ONLY when ALL four conditions hold, checked in
+`dispatchDeclaredOperation` before any Assignment is materialized, refused
+with an error naming the SPECIFIC failed condition otherwise (never a generic
+validation message):
+
+1. **Declared on an `operation` step.** The request-schema boundary accepts
+   `mutation: 'mutating'` only on a `type: "operation"` step; every other
+   step/branch type is refused at the schema layer before this rule is ever
+   reached.
+2. **The bound operation declares `result.kind: 'work-product'`.** Read from
+   the FlowDefinition's own resolved operation at dispatch time — never
+   trusted from a caller-supplied claim. An operation declaring
+   `result.kind: 'advisory'` (or any other value) is refused, naming the
+   operation's own declared kind.
+3. **The dispatch `cwd` resolves to a linked git worktree, never the main
+   checkout.** Exact comparison: `resolveMainCheckoutRoot(cwd) ===
+   resolveRepoRoot(cwd)` (the toplevel of `cwd` IS the main checkout root)
+   refuses — never `resolveMainCheckoutRoot(cwd) === cwd`, since `cwd` may
+   legitimately be a subdirectory of either checkout. A `null`
+   `resolveMainCheckoutRoot` result (cwd outside any git checkout at all)
+   also refuses — fail closed, never fail open on an unresolvable root.
+4. **The inline execution contract carries the engine's own reserved
+   `protocol-operation:` provenance stamp.** `dispatchDeclaredOperation` is
+   the ONLY minter of this stamp (`session-engine.mjs`'s
+   `assertNoReservedOperationStamp`/stamp-append mechanism); a bare inline
+   contract built by any OTHER caller (e.g. a hand-crafted
+   `provenance.kind: 'inline'` Assignment) that sets `mutation: 'mutating'`
+   without this stamp is still rejected by `execution-contract.mjs`'s/
+   `assignment-normalizer.mjs`'s own gates — the schema/normalizer-level door
+   alone is forgeable and is NOT by itself sufficient.
+
+**The invariant that actually enforces this at execution time**:
+`runExecutorAttempt` (`session-engine.mjs`) is the ONLY code path anywhere in
+this codebase allowed to pass `isReadOnlyMode: false` into `executeAssignment`
+— it derives that flag from the Assignment's own already-stamped `mutation`
+field (`isReadOnlyMode: assignment.mutation !== 'mutating'`), never a
+second, independently-decided boolean. A static, codebase-wide enumeration
+test (`test/architecture.test.mjs`) asserts every other real
+`executeAssignment(...)` call site keeps a provably safe posture.
+
+A step that omits `mutation` entirely behaves byte-identically to before this
+rule existed — read-only, `isReadOnlyMode: true` — and a reviewer/red-team/
+consult dispatch that mutates a file regardless still fails closed (the
+pre-existing read-only-violation gate in `dispatch/assignment-runner.mjs`,
+unaffected by this rule).
+
+**Open, out-of-scope consideration** (not decided by this section): nothing
+here gives two DIFFERENT declared `operation` dispatches — from two different
+actors, potentially concurrent — a workspace-exclusivity guarantee if a
+caller happened to target the SAME linked worktree `cwd` for both. Condition
+3 only ever refuses the MAIN CHECKOUT; it says nothing about two mutating
+dispatches sharing one worktree. This is a real, open question for whichever
+cell/ADR next addresses multi-actor workspace allocation, not resolved here.
 
 ## Required Negative Tests
 
@@ -959,3 +1156,23 @@ approval/merge state in `.fgos/coordination/`.
   Work-transition operation, and neither `addSessionEdge` nor
   `addSharedEdge` appears anywhere in either directory's source (Phase 09,
   Step 09 MVP9, extending Phase 06 R7's existing scan).
+- A `human-turn-recorded` event is refused when: `attributedTo.id` equals
+  its own `recordedBy.id`; `attributedTo.id` names a declared
+  `manifest.actors[]` panel actor; `attributedTo.id` is shaped like a
+  driver-authored ref (`asgn_` prefix, or the reserved
+  `contribution:`/`human-turn:` namespaces); `turnOrdinal` is not exactly
+  one more than the highest ordinal already recorded for the session;
+  `externalRef` already backs a prior turn in the session; or `turnId` is
+  already recorded with different content -- each checked independently at
+  BOTH `recordHumanTurn` (store.mjs) write time and `replaySession`
+  (replay.mjs) read time (Phase 03.1, Architecture Advisory Panel track).
+- A byte-identical repeat `human-turn-recorded` write for an
+  already-recorded `turnId` is an idempotent no-op (`{appended: false}`),
+  never a duplicate event or an error (Phase 03.1).
+- A `driver-disposition-recorded` event whose `targetRef`/`evidenceRefs`
+  cite a `human-turn:<id>` ref are refused when `id` names no turn this
+  session ever recorded (`dangling-ref`, write time) or names a turn not
+  yet recorded at that point in the log (`out-of-order-ref`, replay time);
+  a BARE (unprefixed) id matching one of the session's own recorded turns
+  is refused as a near-miss rather than silently accepted-and-resolving-
+  nothing (Phase 03.1).

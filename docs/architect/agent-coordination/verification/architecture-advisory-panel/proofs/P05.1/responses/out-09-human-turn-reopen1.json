@@ -1,0 +1,120 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-06T15:18:57.863Z",
+  "data_hash": "fd80c11cbbbac29be28f015b5e12104a839c064cd5169beda0ee032a45fe3106",
+  "data": {
+    "coordinationId": "aap_p051_main",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "P05.1 hard conformance and recovery proof: real architecture-advisory-panel-v1 session, main chain.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap_p051_main\" is missing required actor(s) [lead-advisor-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_aap_driver_op_003",
+          "runId": "run_asgn_aap_driver_op_003_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_004",
+          "runId": "run_asgn_aap_driver_op_004_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_005",
+          "runId": "run_asgn_aap_driver_op_005_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_aap_driver_op_008",
+          "runId": "run_asgn_aap_driver_op_008_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_aap_driver_op_007",
+          "runId": "run_asgn_aap_driver_op_007_01"
+        },
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_aap_driver_op_009",
+          "runId": "run_asgn_aap_driver_op_009_02"
+        },
+        {
+          "actorId": "red-team-actor",
+          "assignmentId": "asgn_aap_driver_op_010",
+          "runId": "run_asgn_aap_driver_op_010_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "personTurn1",
+        "type": "human-turn",
+        "turnId": "turn_1",
+        "turnOrdinal": 1,
+        "channel": "claude-code-chat",
+        "artifactRef": "human/1-person.md",
+        "revision": "sha256:36979b49727c5f8c79cf46a111d48c689f11756ae824ed536360f5519596ebbc",
+        "externalRef": "claude-code-session:p05-1-doer:turn-1",
+        "attributedTo": {
+          "type": "person",
+          "id": "the-user"
+        },
+        "respondsToRefs": [],
+        "appended": true
+      },
+      {
+        "as": "authRevise1",
+        "type": "authorize",
+        "operationId": "revise-synthesis",
+        "nodeId": "phase-dialogue-reopen",
+        "actorId": "synthesizer-actor",
+        "authorizationId": "auth_revise_1",
+        "invocationKey": "ik_revise_1",
+        "grantedContextRefs": [
+          "asgn_aap_driver_op_009",
+          "asgn_aap_driver_op_007",
+          "asgn_aap_driver_op_008"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "revise1",
+        "type": "operation",
+        "actorId": "synthesizer-actor",
+        "assignmentId": "asgn_aap_driver_op_012",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "critical"
+      }
+    ]
+  }
+}

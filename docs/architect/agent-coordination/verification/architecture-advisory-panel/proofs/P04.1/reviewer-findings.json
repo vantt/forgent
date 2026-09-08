@@ -1,0 +1,146 @@
+[
+  {
+    "id": "R1",
+    "severity": "high",
+    "category": "hard-correctness",
+    "summary": "Every executor in the skill's roster is unregistered in the live runner config; resolveExecutorConfig silently falls back to the global default `claude --permission-mode acceptEdits` (git-write allowed) instead of refusing, so following the roster literally collapses the whole panel onto one mutation-capable provider with no error.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:157-196 (Executor Roster) and :73-100 (Never Reimplements The Kernel); src/runner/dispatch/resolve.mjs:282-302, :398",
+    "evidence": "Live: `node src/runner/dispatch.mjs decide claude-bwrap|agy-bwrap|codex-readonly` -> {\"mechanism\":\"out-of-process\",\"configured\":false} for all three; `decide codex-cli` -> configured:true. Live resolve against the real config (ensureRunnerConfigForDir(cwd)): registered executors are claude, claude-reviewer, agy-cli, agy-herdr, codex-cli, codex-pi, glm-cli, claude-herdr, pi-herdr, codex-herdr, gitnexus, herdr, pi -- none of the three roster names. resolveExecutorAndOverrides returns {executorId:null, configured:false} without throwing; resolveExecutorConfig then does `const executor = byExecutor ?? (cfg && cfg.executor)` (resolve.mjs:398), and cfg.executor resolves live to {\"command\":\"claude\",\"args\":[\"-p\",\"{prompt}\",\"--model\",\"{model}\",\"--permission-mode\",\"acceptEdits\",\"--allowedTools\",\"Bash(git add:*),Bash(git commit:*),...\"]}. P00.1's own Proof Matrix falsified exactly this shape (`claude-reviewer` = claude -p ... --permission-mode acceptEdits -> 'MUTATION ATTACK SUCCEEDED under authorization' -> EXCLUDED). The gap was flagged as a Phase-04 carry-forward twice (P01.2 Real Gaps Found #1: 'either register these, or correct the playbook's ROLE ROUTING text'; P01.3 Real Gaps Found #1) and filed as P02.1 BL2; the skill's Known Gaps section does not mention it. The skill also drops the role doctrine's own selection step 5 ('Run the decision door -- node src/runner/dispatch.mjs decide <executor> --has-live-task-access -- and obey the mechanism it returns'), which is the one step that would surface this. The conformance suite's own heterogeneity case proves the mechanism only with synthetic fixture executors `exec-family-a`/`exec-family-b` (test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs:1030-1043), never the roster's real names -- and asserts 'two genuinely different registered executors, not one global default', naming this exact failure mode.",
+    "recommendation": "Add BL2 to Known Gaps explicitly: state that `claude-bwrap`/`agy-bwrap`/`codex-readonly` are NOT registered executors today, that `dispatch.mjs decide` returns configured:false for each, and that an unregistered name silently falls back to the mutating global default rather than refusing. Restore the doctrine's step-5 rule ('run `decide` per executor before routing; unavailable/unconfigured means record the gap, never route') into the roster section, and state the P01.2/P01.3 workaround actually used (direct bwrap/codex invocation by hand, evidence recorded) or require registering the three pairs in `.fgos/config.json` first. Until one of those lands, the roster section as written is unsafe to follow literally."
+  },
+  {
+    "id": "R2",
+    "severity": "medium",
+    "category": "loss-of-soul",
+    "summary": "The Scout-Before-Ask section states a materiality bar the proven sessions did not use, and tells the agent to 'delete' a surviving question -- the opposite of the recorded practice, which carries every unasked gap forward as a named default or dependency.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:438-463 (Lead Advisor Discipline)",
+    "evidence": "The skill's test is: user-exclusive AND 'material (would the recommendation actually differ by answer? -- if not, delete it)'. Against P01.3's real `proofs/P01.3/decision-request.md`, three of seven candidate gaps are explicitly marked user-exclusive ('Yes -- only the person can say' / 'Yes -- only the person has this') AND material in principle -- rows on 'difficult for whom', 'right in principle or right now', and 'is duplication/drift the dominant cost'. Under the skill's stated test all three qualify and would be asked; the real session asked zero. The real discriminator is a third axis the skill drops: material NOW, i.e. 'material enough to block Phase 5' / 'reserved for Phase 9's real dialogue, where a concrete synthesis exists to react to'. The real artifact also never deletes a surviving gap -- it carries four explicit named defaults into every shaper's prompt and requires Phase 7/8 to name the dependency plainly as 'what stays theirs' ('This is a recorded decision, not a skipped step'). Deleting a material, user-exclusive question is precisely how a panel silently assumes an answer, which the skill's own BOUNDS #6 forbids. Compounding it, the section's rhetorical weight lands on 'zero questions, both sessions', so a fresh agent gets one instruction that would fire three questions and one exemplar that says zero.",
+    "recommendation": "Replace the materiality bar with the real two-part one: material *now* (would Phase 5 produce something different?) versus material later (reserved for Phase 9 dialogue against a concrete synthesis). Replace 'if not, delete it' with the recorded behavior: carry it forward as an explicit named default in every shaper's prompt, and require Phase 7/8 to name it as a live dependency rather than silently assume an answer."
+  },
+  {
+    "id": "R3",
+    "severity": "medium",
+    "category": "hard-correctness",
+    "summary": "The `actors[].model` prohibition cites the wrong schema layer; the request-level actors[] field genuinely accepts `model`, and the real refusal comes from a different, kind-scoped check the skill never names.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:185-196 (Reporting rule)",
+    "evidence": "The skill claims: 'Never emit an `actors[].model` field in a request -- `ACTOR_FIELDS` has no `model` field today (confirmed: zero hits for `actor.model`/`actors[].model` in `src/runner/`)'. `ACTOR_FIELDS` (src/runner/definitions/schema.mjs:101 and src/runner/coordination/schema.mjs:46) governs the FlowDefinition's own `spec.actors[]` and the session manifest -- not the request. The REQUEST's actors[] whitelist is `ACTOR_ALLOWED_KEYS = new Set(['id','persona','executor','model','tier'])` (src/verbs/coordination/schema.mjs:133), which does include `model`, validates it as a non-empty string, and honors it for `kind:\"agent-led\"`. The actual refusal for this protocol is `assertModelSupportedForKind` (src/verbs/coordination/run.mjs:166-172): '--model / actors[].model is not supported for kind:\"declared-protocol\" requests -- dispatchDeclaredOperation's PolicyPatch scope stack has no model-override channel today ... pass --executor/--tier instead'. The skill's cited grep was scoped to `src/runner/` only, which structurally cannot see `src/verbs/`, so the 'confirmed' reads stronger than it is. The behavioral instruction is correct and satisfies phase-04's requirement; only the stated mechanism is wrong.",
+    "recommendation": "Keep the prohibition, fix the reason: cite `assertModelSupportedForKind` (src/verbs/coordination/run.mjs:166) and its `kind:\"declared-protocol\"` scoping, and note that the request schema does accept `actors[].model` shape-wise (ACTOR_ALLOWED_KEYS) but that this protocol's dispatch path has no PolicyPatch channel for it. That way a fresh agent debugging the real refusal message can find it from this file."
+  },
+  {
+    "id": "R4",
+    "severity": "medium",
+    "category": "citation",
+    "summary": "'làm luôn cũng được -- P01.3 Turn 2' is cited to the wrong cell: that quote is P01.2's Turn 2, and P01.3 recorded exactly one dialogue turn.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:70-72",
+    "evidence": "The quote lives at proofs/P01.2/human/2-person.md and proofs/P01.2/dialogue/2-impact.md; repo-wide grep for 'làm luôn' returns only P01.2 paths, zero P01.3 paths. proofs/P01.3/human/ contains only 1-person.md and proofs/P01.3/dialogue/ only 1-impact.md and 1-response.md; P01.3.md's Phase 9 log has a 'Turn 1' and no Turn 2. P02.1 Table 1 B8 states it directly: 'P01.2: 2 turns; P01.3: 1 turn'.",
+    "recommendation": "Change the citation to P01.2 Turn 2."
+  },
+  {
+    "id": "R5",
+    "severity": "medium",
+    "category": "loss-of-soul",
+    "summary": "That same citation is used as evidence for the reading the real session explicitly refused: the lead advisor ruled 'làm luôn cũng được' permission-not-instruction, while the skill presents it as 'a complete, actionable dialogue turn'.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:70-72 (What This Skill Does Not Require Of The Person)",
+    "evidence": "proofs/P01.2/dialogue/2-impact.md:70 -- '\"làm luôn cũng được\" is **permission, not instruction** `[high]`. If we proceed, we proceed on our own recommendation with their consent. I don't want the panel recording this as \"the person decided to build.\"' P01.2.md:65-66 records the same: 'delegated timing to the panel (\"làm luôn cũng được\" read precisely as permission, not instruction)'. The real turn is also not one line -- human/2-person.md is 937 bytes and the substance the panel acted on was the newly named audience (low-tech Windows users), not the timing phrase. The skill compresses this into 'A one-line reply in a later turn ... is a complete, actionable dialogue turn', which is exactly the over-reading the recorded impact assessment was written to prevent. The skill's own Decision Dialogue table draws the permission/decision line correctly under `decide`, so this is an inconsistency inside the file, not a doctrine the skill lacks.",
+    "recommendation": "Rewrite the bullet so the example carries its real lesson: a short, informal reply IS a legitimate turn that needs no ceremony, AND it must still be classified before it authorizes anything -- citing that this exact turn was read as permission, not as a decision."
+  },
+  {
+    "id": "R6",
+    "severity": "medium",
+    "category": "citation",
+    "summary": "A coordinator behavior is attributed to the architecture-critic role, inside the bullet that establishes critic doctrine.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:474-479 (Debate And Synthesis Discipline)",
+    "evidence": "The skill: 'P01.3's critique independently re-verified two attacks against the real repository before trusting them (a scheduler-deadlock claim and an alert-cap-severity misclassification, both confirmed by reading real source, not taken on the critic's word)'. P01.3.md Phase 6 says the opposite about who did it: 'Two decision-relevant attacks independently re-verified **by the coordinator** against the real repo (not taken on faith) ... confirmed via `interface/scheduler.py` ... confirmed via `alert_dispatch_intraday.py`'s own comments'. The linked artifact proofs/P01.3/critiques/architecture-critic.md only names what would settle it ('*What would settle it:* Read `src/vnflow/application/signals/alert_dispatch_intraday.py` (lines 17-23)') -- it did not do the verification. The skill's own parenthetical 'not taken on the critic's word' is in fact a description of the coordinator distrusting the critic, restated as the critic's own virtue.",
+    "recommendation": "Either re-attribute to the coordinator and move the lesson to the driver/coordinator discipline ('independently re-verify a decision-changing attack before dispositioning it'), or keep it in the critic packet but state it as what the critic SHOULD do, without claiming P01.3's critic did it. The genuinely critic-owned P01.3 fact -- 5 attacks, 1 conceded -- is already cited correctly and is enough on its own."
+  },
+  {
+    "id": "R7",
+    "severity": "medium",
+    "category": "hard-correctness",
+    "summary": "bwrap runnability is presented as an unsolved limitation, but the working invocation was found, used live across 13 real dispatches, and recorded in P02.1 -- the skill omits the recipe and states the opposite.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:165-170 (Executor Roster) and :616-618 (Known Gaps)",
+    "evidence": "The skill says 'a bare `--ro-bind / /` may leave the agent CLI unable to initialize its own private state ... confirm the agent can actually think' and, in Known Gaps, 'not yet proven to let the agent CLI fully initialize without an added, narrow writable state bind'. P02.1 Table 1 B7 records it as solved with a specific, order-sensitive recipe: 'the working fix is `--tmpfs /tmp` placed BEFORE re-pinning `--ro-bind PROJECT_ROOT PROJECT_ROOT`/`--bind EVIDENCE_DIR EVIDENCE_DIR`, because bwrap mounts apply in argument order and a later bind shadows an earlier tmpfs ... fixed via a kongming design consult before P01.2's first substantive dispatch'. It then worked live: P01.2.md Real Gaps #3 ('worked cleanly across all 6 bwrap dispatches'), P01.3 Real Gaps #3 ('7 dispatches'). P02.1 Table 2 assigns B7's verdict 'skill-task-prose' -- i.e. the class of thing this file exists to carry. The skill's text is a faithful copy of the role doctrine's own (now superseded) carry-forward paragraph, so the staleness is inherited, but the production skill is where it matters.",
+    "recommendation": "Replace the 'not yet proven' framing with the proven invocation, including the ordering constraint (mounts apply in argument order; `--tmpfs /tmp` must precede the `--ro-bind PROJECT_ROOT` / `--bind EVIDENCE_DIR` re-pins or a later bind shadows it), and cite P02.1 B7 plus the 6+7 real dispatches. Downgrade the Known Gaps entry to 'confirm per host' rather than 'not yet proven'."
+  },
+  {
+    "id": "R8",
+    "severity": "medium",
+    "category": "hard-correctness",
+    "summary": "The skill's link to the protocol FlowDefinition -- its single most load-bearing reference -- is dead in `.agents/skills/`, which is exactly where the `.claude/` wrapper sends every reader.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:25 (`../../coordination-protocols/architecture-advisory-panel-v1.yaml`)",
+    "evidence": "Resolved every relative link from all three projection roots. From `core/skills/fgos-architecture-panel/` all 13 links resolve. From `.agents/skills/fgos-architecture-panel/` 12 of 13 resolve; `../../coordination-protocols/architecture-advisory-panel-v1.yaml` resolves to `.agents/coordination-protocols/...`, which does not exist. `.claude/skills/fgos-architecture-panel/SKILL.md` (the thin wrapper) says 'The real skill content lives at `../../../.agents/skills/fgos-architecture-panel/SKILL.md`, this project's own canonical skill source. Read that file and follow it directly.' -- so the broken projection is the one an agent actually reads. The structural precedent gets this right: `core/skills/fgos-code-panel/SKILL.md` uses `../../../core/coordination-protocols/standalone-master-coordination-loop.yaml`, which resolves from both `core/skills/` and `.agents/skills/`. (The plugins/fgOS projection breaks all `../../../`-rooted links for both skills equally -- pre-existing and shared with the precedent, so not charged to this cell.)",
+    "recommendation": "Change `../../coordination-protocols/architecture-advisory-panel-v1.yaml` to `../../../core/coordination-protocols/architecture-advisory-panel-v1.yaml`, matching fgos-code-panel, then re-run `npm run build:skills`."
+  },
+  {
+    "id": "R9",
+    "severity": "medium",
+    "category": "hard-correctness",
+    "summary": "`persona` is absent from the skill entirely, though the phase requirement, the role doctrine's selection procedure, and the request schema all treat it as part of the per-role roster.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:157-196 (roster table has Role | Executor | Tier | Derived model | Why -- no persona column); word 'persona' appears zero times in the file",
+    "evidence": "phase-04-production-skill-and-dialogue.md Requirements: 'The skill selects or accepts an explicit per-role safe executor/confinement/tier/persona roster, explains the cognitive purpose of each binding, and forwards it unchanged through governed dispatch.' Role doctrine 'How Selection Actually Happens, Per Actor' step 4: 'Choose the persona for the slot, and record it. Persona is prose posture, not capability; it does not substitute for role doctrine and it never overrides this document.' The request schema accepts it: ACTOR_ALLOWED_KEYS includes `persona` (src/verbs/coordination/schema.mjs:133), and the FlowDefinition's own ACTOR_FIELDS includes `persona` too. The word 'confinement' appears once (line 164) but only in passing.",
+    "recommendation": "Add a persona column (or an explicit 'no persona bound this session, and why') to the roster table, and carry the doctrine's guardrail that persona is prose posture which never overrides role doctrine."
+  },
+  {
+    "id": "R10",
+    "severity": "medium",
+    "category": "loss-of-soul",
+    "summary": "The doctrine's 'diversity is a hedge, not a decoration' obligation is dropped: the skill argues at length for choosing a heterogeneous roster but never requires reporting what the heterogeneity actually bought.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:157-196 (Executor Roster) -- no end-of-session diversity audit anywhere in the file",
+    "evidence": "Role doctrine, closing the roster section: 'Diversity is a hedge, not a decoration. At the end of the session, state what the diversity actually bought: which advisor saw something its counterpart did not. If the honest answer is \"nothing distinguishable this time\", say that. A roster that lists three providers and produced three interchangeable outputs has spent budget on the appearance of independence, and the rubric asks about it directly.' The skill carries the selection half (three families, deliberate off-family red-team, per-binding rationale) and the failure half for the roster being unavailable ('if the roster genuinely cannot satisfy diversity ... say so and name what was given up'), but nothing about auditing the payoff after the fact. Without it, the elaborate per-binding rationale table is precisely the 'appearance of independence' the doctrine names -- and is the failure mode most likely to go unnoticed, since it reads well.",
+    "recommendation": "Add one line to the roster section requiring the session to close with a stated diversity outcome: which advisor saw what its counterpart did not, or an honest 'nothing distinguishable this time'."
+  },
+  {
+    "id": "R11",
+    "severity": "medium",
+    "category": "hard-correctness",
+    "summary": "Two known `agy` output-capture defects are omitted even though the roster routes the alternative-shaper and the red-team through `agy-bwrap` -- for the red-team, the defect manufactures exactly the ceremonial-APPROVE failure the skill's own packet warns against.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:172-183 (roster: alternative-shaper and red-team -> agy-bwrap) and :583-618 (Known Gaps)",
+    "evidence": "P02.1 Table 1 B12: agy's structured `agent-result.json` 'can be a useless one-line summary with no findings array even when the real substantive output exists in full in the unstructured text response -- a Lead/Coordinator reading only the structured summary would miss real findings entirely' (observed P01.1 on a Red-Team dispatch). B13: agy under the bwrap mount 'interleaves its own internal telemetry / read-only-filesystem-swallowed state-write error lines into the middle of its real streamed response ... a naive capture would corrupt the artifact' (observed P01.2 ordinal 4, P01.3 ordinals 4 and 6). P02.1 Table 2 gives both the verdict 'skill-task-prose' with the mitigation spelled out ('always read the unstructured report file directly, never trust an empty/one-line structured summary as evidence of no findings'; 'reconstruct + byte-for-byte verify against surrounding real content'). Neither appears in the skill. The skill's red-team packet warns against 'ceremonial APPROVE without having opened a single run file' -- B12 produces a result that LOOKS like an empty finding set even when the red-team did open the files.",
+    "recommendation": "Add both to Known Gaps, tied to the two agy-bwrap bindings by name: never treat an empty/one-line agy structured result as 'no findings' (read the unstructured output), and reconstruct-and-verify any agy transcript that shows interleaved telemetry before committing it as an artifact."
+  },
+  {
+    "id": "R12",
+    "severity": "low",
+    "category": "hard-correctness",
+    "summary": "The out-of-panel third-party consultation convention that P02.1 explicitly handed to Phase 04 is absent, despite being the shape of P01.3's only real dialogue turn.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md (Decision Dialogue section, :492-526 -- six verbs, none covering a non-panel advisory injection)",
+    "evidence": "P02.1 Table 2 B11: 'Attribution discipline for a THIRD-PARTY, non-panel consultation is outside this track's 9-phase design entirely ... worked fine as prose this once, but is a genuinely new interaction shape the original design didn't anticipate ... named here so Phase 04's production skill authors are aware it can happen and should have a documented convention rather than rely on this cell's improvisation.' P01.3's entire Phase 9 was this shape (kongming dispatched mid-dialogue at the person's request, its verdict partly correcting the panel's own Question 1). P01.3's Process Note records the working convention: attribute the third party's claims to it, never merge into the panel's voice, independently re-verify the one load-bearing factual claim before trusting it.",
+    "recommendation": "Add a short paragraph to Decision Dialogue capturing P01.3's own three-part convention. Low severity because the skill's BOUNDS #3 (no anonymization) and #6 (no fabricated human input) already push in the right direction, but neither names this case."
+  },
+  {
+    "id": "R13",
+    "severity": "low",
+    "category": "citation",
+    "summary": "Conformance case count is stated as 12; the suite has 13.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:29-32",
+    "evidence": "test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs contains 13 `test(` cases. All six the skill names by label do exist (premature reveal, hidden dissent, unauthorized specialist, over-cap reopen x2, human-authority impersonation, heterogeneous actor bindings), and the 757/757 focused-suite figure is exactly right.",
+    "recommendation": "Say 13, or drop the count and keep the named cases."
+  },
+  {
+    "id": "R14",
+    "severity": "low",
+    "category": "hard-correctness",
+    "summary": "The roster and phase tables identify actors by role name, but the request's actors[] must carry declared actor ids, which run.mjs hard-refuses when wrong.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:112-122 (phase table 'Actor' column) and :172-182 (roster 'Role' column)",
+    "evidence": "Both tables use `lead-advisor`, `system-shaper`, etc. The protocol declares actor ids `lead-advisor-actor`, `system-shaper-actor`, ... (architecture-advisory-panel-v1.yaml:281-297). src/verbs/coordination/run.mjs:395-400 refuses an actors[] entry whose id is not a declared actor: 'actors[].id \"...\" is not declared by protocol ... unregistered actor override rejected'. Mitigated because the skill defers request shape to fgos-group-thinking, whose step 2 tells the agent to read the protocol's declared actors from the loader rather than from skill prose.",
+    "recommendation": "One clarifying line under the roster: role names here map to the protocol's `<role>-actor` ids, which are what an actors[] entry must carry."
+  },
+  {
+    "id": "R15",
+    "severity": "low",
+    "category": "hard-correctness",
+    "summary": "The specialist roster row implies an executor/tier binding set the same way as the other eight, but a specialist is not a declared actor and cannot take an actors[] policy override.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:182 (roster, specialist row)",
+    "evidence": "The specialist has no `spec.actors[]` entry in architecture-advisory-panel-v1.yaml (only the eight named actors), and `authorizeSpecialistSlot` requires `specialistActorId` to be 'a previously-unknown identity' that 'collides with a statically-declared spec.actors[] id' is refused (session-engine.mjs:1784). run.mjs:400 would therefore refuse an actors[] override naming it. Its executor/tier arrive through the authorization call, not through actors[].",
+    "recommendation": "Note in the specialist row that its binding comes through `authorizeSpecialistSlot`'s own parameters, not an actors[] entry -- consistent with the tsk-3xk workaround the skill already documents."
+  },
+  {
+    "id": "R16",
+    "severity": "low",
+    "category": "loss-of-soul",
+    "summary": "The alternative-shaper packet drops the doctrine's most generative noticing item, 'solution classes, not variants'.",
+    "location": "core/skills/fgos-architecture-panel/SKILL.md:292-311 (4. Alternative Shaper)",
+    "evidence": "Role doctrine §4 What To Notice includes: 'Solution classes, not variants. Buying instead of building, deleting instead of abstracting, changing who owns the code instead of changing the code, changing the process instead of the system.' The skill's Notice bullet carries the too-small option, the no-build path, and the framing-as-constraint, but not this. The packet still meets phase-04's six required dimensions and correctly names the designated loser as the panel's most damaging failure, so this is a real but bounded condensation loss -- worth flagging because 'cosmetic difference' (also dropped from Avoid) is the failure this item prevents.",
+    "recommendation": "Add the solution-class list to the Notice bullet; it is one line and it is the concrete test that separates a real alternative from a renamed one."
+  }
+]

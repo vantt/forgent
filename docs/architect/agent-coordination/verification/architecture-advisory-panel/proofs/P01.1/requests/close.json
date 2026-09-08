@@ -1,0 +1,22 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Close cell P01.1: soul authored, independently reviewed and red-teamed, 1 HIGH + 2 MEDIUM + 2 LOW findings fixed in one round, both rechecks clean (Reviewer PASS no new findings; Red-Team all 4 recheck attacks failed). P5 acknowledged as a Phase 02/03 concern, not a P01.1 defect.",
+  "writerId": "p01-1-fix1-coordinator",
+  "coordinationId": "architecture-advisory-panel--p01-1-fix1",
+  "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
+  "actors": [
+    { "id": "doer", "executor": "claude", "tier": "critical", "persona": "principal-architecture-writer-fixer" },
+    { "id": "reviewer", "executor": "codex-cli", "tier": "analytical", "persona": "detail-oriented-rechecker" },
+    { "id": "red-team", "executor": "agy-cli", "tier": "analytical", "persona": "relentless-attacker" }
+  ],
+  "steps": [
+    {
+      "type": "disposition",
+      "as": "closeCell",
+      "targetRef": "asgn_p01_1_fix1_coordinator_op_001",
+      "disposition": "cell-closed",
+      "rationale": "Cell P01.1 (author the soul) done. Doer (claude, opus, critical) authored all 4 required playbook/doctrine files (3434 lines), independently spot-verified by the Lead as genuine judgment prose, not schema-dressed doctrine. Reviewer (codex-cli) verdict REVISE: 1 HIGH (missing persisted-artifact templates), 1 MEDIUM (git-authority wording contradiction); role/required-doctrine/rubric/scope audits all PASS. Red-Team (agy-cli) found 2 MEDIUM (undetectable stop conditions, Phase 1 authority-intake ambiguity) plus 2 LOW and 1 acknowledged-not-fixed (P5: no enforcement mechanism against a fabricated human decision -- exactly the gap plan.md assigns to Phase 03.1's trusted external-input door, out of P01.1's Files-section scope). Fix Round 1 applied via a fresh coordination session (architecture-advisory-panel--p01-1-fix1) because the original session (architecture-advisory-panel--p01-1) auto-closed to a terminal 'partial' status before a fix round could be authorized -- a real product gap, filed as feedback, worked around by never declaring partialPolicy and treating this disposition event as the authoritative closure record instead of manifest.status (same pattern as P00.1). Both rechecks clean: Reviewer PASS with zero new findings; Red-Team's all 4 recheck attacks failed (fixes hold), with a properly populated structured findings array this time. Lead independently spot-verified the P2 git-authority fix and the P1 explanation.md template directly against real file content before closing.",
+      "evidenceRefs": ["asgn_p01_1_fix1_coordinator_op_002", "asgn_p01_1_fix1_coordinator_op_003"]
+    }
+  ]
+}

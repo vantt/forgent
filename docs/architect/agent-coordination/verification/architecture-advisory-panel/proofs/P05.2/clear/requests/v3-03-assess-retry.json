@@ -1,0 +1,31 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-clear-herdr-heuristic-direction-v3: retry assess-constraints, repeating the exact absolute result-artifact path since the prior attempt produced correct content but never wrote it to disk.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v3",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "constraint-advocate-actor", "executor": "claude-bwrap", "tier": "analytical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authAssess2",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "authorizationId": "auth_assess_v3b",
+      "invocationKey": "ik_assess_v3b",
+      "reason": "Retry: prior attempt reasoned correctly (status: blocked, real ranking) but declined to write the artifact anywhere, unsure whether forgentX/.fgos/ was an authorized target -- repeating with the exact path stated explicitly.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_021", "asgn_coordinator_driver_op_022", "asgn_coordinator_driver_op_023"]
+    },
+    {
+      "type": "operation",
+      "as": "assess2",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "Rank the real operational risk of these three real Phase 5 proposals for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification. Proposal A (system-shaper): keep looksStructured() as a flat, ordered OR-chain of small named detectors. Proposal B (alternative-shaper): a Pluggable Output Grammar architecture, a registry of layout signatures replacing the monolithic heuristics. Proposal C (constraint-advocate, your own earlier proposal): keep the current architecture, cheaply unit-testable without a browser/corpus. Use absolute paths for anything you read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). This session's own coordination bookkeeping lives at /home/vantt/projects/forgentX/.fgos/ -- you are authorized to write your result artifacts there, at exactly this path, which is where this operation's result belongs regardless of what project you are advising about: /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_026/runs/01/agent-result.json for the structured JSON, and /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_026/runs/01/agent-report.md for the human-readable report. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "contextRefs": ["asgn_coordinator_driver_op_021", "asgn_coordinator_driver_op_022", "asgn_coordinator_driver_op_023"],
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

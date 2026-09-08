@@ -1,0 +1,299 @@
+{
+  "target": {
+    "id": "Function:src/runner/coordination/store.mjs:assertDispositionRefOwnedBySession",
+    "name": "assertDispositionRefOwnedBySession",
+    "type": "Function",
+    "filePath": "src/runner/coordination/store.mjs"
+  },
+  "direction": "upstream",
+  "impactedCount": 9,
+  "risk": "HIGH",
+  "epistemic": "exact",
+  "summary": {
+    "direct": 3,
+    "processes_affected": 4,
+    "modules_affected": 2
+  },
+  "byDepthCounts": {
+    "1": 3,
+    "2": 3,
+    "3": 3
+  },
+  "affected_processes": [
+    {
+      "name": "linkSessionContribution",
+      "type": "Function",
+      "filePath": "src/runner/coordination/session-engine.mjs",
+      "affected_process_count": 8,
+      "total_hits": 8,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "recordContributionLink",
+      "type": "Function",
+      "filePath": "src/runner/coordination/store.mjs",
+      "affected_process_count": 7,
+      "total_hits": 7,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "recordAggregationValidation",
+      "type": "Function",
+      "filePath": "src/runner/coordination/store.mjs",
+      "affected_process_count": 7,
+      "total_hits": 7,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "runCoordinationUseCase",
+      "type": "Function",
+      "filePath": "src/verbs/coordination/run.mjs",
+      "affected_process_count": 1,
+      "total_hits": 1,
+      "earliest_broken_step": 1
+    }
+  ],
+  "affected_modules": [
+    {
+      "name": "Coordination",
+      "hits": 8,
+      "impact": "direct"
+    },
+    {
+      "name": "R5-parity",
+      "hits": 1,
+      "impact": "indirect"
+    }
+  ],
+  "byDepth": {
+    "1": [
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:recordDriverDisposition",
+        "name": "recordDriverDisposition",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:recordContributionLink",
+        "name": "recordContributionLink",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_235_recordcontributionli",
+            "label": "RecordContributionLink → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_110_recordcontributionli",
+            "label": "RecordContributionLink → CoordinationError",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_237_recordcontributionli",
+            "label": "RecordContributionLink → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_239_recordcontributionli",
+            "label": "RecordContributionLink → EventLogError",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_236_recordcontributionli",
+            "label": "RecordContributionLink → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_240_recordcontributionli",
+            "label": "RecordContributionLink → SleepSync",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_238_recordcontributionli",
+            "label": "RecordContributionLink → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:recordAggregationValidation",
+        "name": "recordAggregationValidation",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_268_recordaggregationval",
+            "label": "RecordAggregationValidation → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_127_recordaggregationval",
+            "label": "RecordAggregationValidation → CoordinationError",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_271_recordaggregationval",
+            "label": "RecordAggregationValidation → SleepSync",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_269_recordaggregationval",
+            "label": "RecordAggregationValidation → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_266_recordaggregationval",
+            "label": "RecordAggregationValidation → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_267_recordaggregationval",
+            "label": "RecordAggregationValidation → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_270_recordaggregationval",
+            "label": "RecordAggregationValidation → EventLogError",
+            "processType": "intra_community",
+            "step": 1
+          }
+        ]
+      }
+    ],
+    "2": [
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:validateSessionAggregation",
+        "name": "validateSessionAggregation",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:linkSessionContribution",
+        "name": "linkSessionContribution",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_165_linksessioncontribut",
+            "label": "LinkSessionContribution → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_163_linksessioncontribut",
+            "label": "LinkSessionContribution → CoordinationError",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_166_linksessioncontribut",
+            "label": "LinkSessionContribution → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_164_linksessioncontribut",
+            "label": "LinkSessionContribution → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_168_linksessioncontribut",
+            "label": "LinkSessionContribution → FlowDefinitionError",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_169_linksessioncontribut",
+            "label": "LinkSessionContribution → RelativeToPackageRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_167_linksessioncontribut",
+            "label": "LinkSessionContribution → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_170_linksessioncontribut",
+            "label": "LinkSessionContribution → ReadDefinitionFile",
+            "processType": "cross_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/verbs/coordination/run.mjs:runCoordinationUseCase",
+        "name": "runCoordinationUseCase",
+        "filePath": "src/verbs/coordination/run.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_177_runcoordinationuseca",
+            "label": "RunCoordinationUseCase → StoreError",
+            "processType": "cross_community",
+            "step": 1
+          }
+        ]
+      }
+    ],
+    "3": [
+      {
+        "depth": 3,
+        "id": "Function:src/runner/coordination/headless-adapter.mjs:runCoordinationHeadless",
+        "name": "runCoordinationHeadless",
+        "filePath": "src/runner/coordination/headless-adapter.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:src/verbs/coordination/group-thinking-pack.mjs:runGroupThinkingRequest",
+        "name": "runGroupThinkingRequest",
+        "filePath": "src/verbs/coordination/group-thinking-pack.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:src/verbs/coordination/launch-master-loop.mjs:launchMasterLoopUseCase",
+        "name": "launchMasterLoopUseCase",
+        "filePath": "src/verbs/coordination/launch-master-loop.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      }
+    ]
+  }
+}
