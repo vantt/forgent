@@ -6,10 +6,14 @@ RFC reviewed: `docs/history/agent-coordination-state-root/rfc-state-root-fix.md`
 ## Conclusion: [DONE]
 
 Root cause confirmed with convergent cross-provider evidence. `isSessionWorktree`
-shipped, then wired into `bin/fgos.mjs`'s CLI dispatch as a hand-verified,
-scoped guard (§4/§5 below — this section was revised after the guard-wiring
-originally deferred in §5 was completed in a follow-up round of this same
-session, commit `692076c6`). Full suite: 5885 tests, 5878 pass, 0 fail, 7
+shipped (`8033890a`), wired into `bin/fgos.mjs`'s CLI dispatch as a
+hand-verified guard covering the 9 unambiguous verbs first (`692076c6`),
+then extended to all 44 `touchesState:true` verbs in a second, deeper
+pass at the user's explicit request (`ecd2a9bf`) — every one individually
+re-read against its own case block, sorted into 25 always-mutating and 7
+genuinely mixed-mode (per-invocation, not per-verb) guards. That second
+pass's own full-suite verification caught and fixed two real regressions
+before they landed (§4/§9). Full suite: 5894 tests, 5887 pass, 0 fail, 7
 skipped, zero regressions.
 
 ## 1. Root-cause decision
@@ -129,48 +133,61 @@ test suites above plus the architecture layering test; `isSessionWorktree`
 is a new, additive export with no existing call site, so blast radius is
 inherently zero until a follow-up wires it in.
 
-## 5. Guard-wiring into `bin/fgos.mjs`'s CLI dispatch (commit `692076c6`)
+## 5. Guard-wiring into `bin/fgos.mjs`'s CLI dispatch (commits `692076c6`, `ecd2a9bf`)
 
-Initially deferred pending a scoped design pass; completed in a follow-up
-round of this same session once that design was worked out:
+First pass (`692076c6`) covered the 9 most unambiguous verbs. At the
+user's explicit request for full, careful coverage, a second pass
+(`ecd2a9bf`) individually re-read **every one of the 44
+`touchesState: true` verbs'** own `bin/fgos.mjs` case block — not just
+the ones an RFC-review objector happened to name — and sorted each into
+exactly one bucket:
 
-- **Per-invocation classification, not `touchesState`.** `MUTATING_ONLY_VERBS`
-  is a hand-verified allowlist (`submit`, `take`, `pick`, `move`, `edit`,
-  `ask`, `answer`, `gate-approve`, `reject`) — each verb's own `case` block in
-  `bin/fgos.mjs` was individually read and confirmed to take a single
-  id/text argument with no subcommand branching (always mutating when
-  reached). Confirmed mixed-mode and explicitly excluded: `evolve` (bare vs.
-  `--pick`), `coordination` (`show`/`chain` vs. `run`), `session` (`list`
-  vs. `start`/`end`), `goal` (`show` vs. `set`), `tool` (`query` vs.
-  others), `merge` (`list` vs. `next` — found during this verification, not
-  named by either objector), `setup`/`doctor` (diagnostic by default).
-- **`approve`/`sync-root`/`promote-to-component`/`catchup`/`unclaim`
-  deliberately excluded** — each already computes its own `repoRoot`
-  (independent of the state-store `dir`) and is independently guarded via
-  `isMainWorktree` or an explicit `--dir`-derived root; a second guard on
-  `dir` alone would risk diverging from their own existing, tested refusal
-  text for no new coverage.
-- **The `main-checkout-lock-hook` fixtures are unaffected by construction**:
-  they exercise a git hook (`main-checkout-lock.mjs`, invoked at `git commit`
-  time) writing `.fgos/main-checkout.lock` directly — a completely separate
-  code path from `bin/fgos.mjs`'s CLI verb dispatch, never touched by this
-  guard.
-- **Bypass:** skipped entirely when `--dir` is passed explicitly (D1's own
-  escape hatch — the caller took responsibility for that root already).
-- **Admits the one other legitimate case:** `isSessionWorktree(repoRoot)`.
+- **25 always-mutating** (`MUTATING_ONLY_VERBS`, a hand-verified
+  allowlist, deliberately never `entry.touchesState` — too coarse):
+  `submit`, `take`, `pick`, `move`, `edit`, `ask`, `answer`,
+  `gate-approve`, `reject`, `add`, `discover`, `plan`, `retrospective`,
+  `cleanup`, `compound`, `resolve-park-reason`, `handoff`,
+  `handoff-return`, `decision`, `report`, `topic`, `doc`, `repair`,
+  `unlock`. Each takes a single id/text argument (or, for `topic`/`doc`,
+  a subcommand where *every* subcommand mutates), no read-only shape.
+- **7 genuinely mixed-mode**, guarded per-invocation via
+  `MUTATING_SUBCOMMAND_PREDICATES` (a `(positional, flags) => boolean`
+  per verb, not a second flat set): `session` (`start`/`end`/`gc` mutate,
+  `list` reads), `goal` (`set` vs. `show`), `gateway` (`start`/`stop` vs.
+  `status`), `knowledge` (`attest` vs. `status`), `coordination`
+  (`run`/`launch-master-loop` vs. `show`/`chain`), `merge` (`next` vs.
+  `list` — found during this pass, named by neither RFC-review objector),
+  `evolve` (`--submit <id>` vs. bare/`--pick` — **contrary to the
+  RFC-review round's own objector claim** ("bare vs. `--pick`"); the case
+  block's own D15 comment says `--pick` is read-only too, re-verified
+  against the current code rather than trusted secondhand).
+- **Deliberately excluded, each for a distinct, verified reason**:
+  `init`/`approve`/`sync-root`/`promote-to-component`/`catchup`/`unclaim`/`return`
+  already have their own, differently-worded, already-tested worktree
+  guard (see §9 for how `return`'s exclusion was actually discovered);
+  `setup`/`doctor`/`uninstall` already self-correct their `repoRoot` via
+  `resolveMainCheckoutRoot`; `rebuild`/`tool check` write only a local,
+  per-checkout, gitignored artifact by design, never a shared event;
+  `preflight` resolves its own root independently, never through
+  `.fgos/`.
+- The `main-checkout-lock-hook` fixtures are unaffected by construction:
+  they exercise a git hook (a separate code path from CLI dispatch),
+  never touched by this guard.
+- Bypass: skipped when `--dir` is passed explicitly. Admits the one other
+  legitimate non-main case: `isSessionWorktree(repoRoot)`.
 
-5 regression scenarios (`test/cli/fgos-disconnected-worktree-guard.test.mjs`):
-main checkout (unaffected), a real ad-hoc `git worktree add` carrying a
-git-tracked disconnected `.fgos/` (refused, exit 4, points at `--dir`), the
-same disconnected worktree with `--dir <mainRoot>` (bypasses, the event
-lands in main's own store — verified by event count), a genuine `fgos
-session start` worktree (unaffected), and a non-`MUTATING_ONLY_VERBS` verb
-(`list`) from the same disconnected worktree (unaffected). The 5th
-acceptance scenario, pick/return/approve, is proven by the existing
-`fgos-claim*`/`fgos-approve*`/`fgos-post-merge*` suites staying green
-unchanged, not duplicated.
+14 regression scenarios (`test/cli/fgos-disconnected-worktree-guard.test.mjs`):
+main checkout, a real ad-hoc `git worktree add` carrying a git-tracked
+disconnected `.fgos/` (refused, exit 4, points at `--dir`), the same
+worktree with `--dir <mainRoot>` (bypasses, verified by event count), a
+genuine `fgos session start` worktree, a non-guarded read verb (`list`),
+`return`'s exclusion pinned explicitly, and both the refused and
+unaffected invocation for all 7 subcommand-predicate verbs. The
+pick/return/approve acceptance scenario is proven by the existing
+`fgos-claim*`/`fgos-approve*`/`fgos-post-merge*`/`fgos-return.test.mjs`
+suites staying green unchanged, not duplicated.
 
-Full suite: 5885 tests, 5878 pass, 0 fail, 7 skipped, 0 regressions.
+Full suite: 5894 tests, 5887 pass, 0 fail, 7 skipped, 0 regressions.
 
 ## 6. Recovery runbook for a disconnected store (proposed, not executed)
 
@@ -242,17 +259,58 @@ in every store.
   so it isn't lost.
 - `forgentX-worker-isolation`'s disconnected store still holds `tsk-5x7-1`'s
   un-reconciled progress; §6's runbook is proposed, not applied.
-- The guard (§5) covers `MUTATING_ONLY_VERBS` only (9 verbs). `goal`, `tool`,
-  `topic`, `doc`, `knowledge`, `decision`, `report`, `handoff`,
-  `handoff-return`, `resolve-park-reason`, `rebuild`, `repair`,
-  `retrospective`, `cleanup`, `compound`, `discover`, `plan`, `add`,
-  `unlock`, `session start/end`, `gateway`, `coordination run` are all
-  `touchesState:true` but were NOT individually re-verified for hidden
-  read-only sub-invocations in this round and are NOT guarded — an ad-hoc
-  disconnected worktree can still silently write through any of these. A
-  follow-up should extend the same per-invocation audit to this remainder,
-  or (cleaner) push the check down to wherever each of these actually
-  writes, once that's confirmed not to violate the kernel/infra layering
-  rule (`store.mjs` cannot import `isMainWorktree`/`isSessionWorktree`
-  directly — both are infra, `store.mjs` is kernel; `test/architecture.test.mjs`
-  enforces this).
+- The guard (§5) now covers all 44 `touchesState:true` verbs (25
+  always-mutating + 7 per-invocation), closing the gap this bullet
+  previously named. Residual, deliberate, and documented: `tool check`
+  writes a local gitignored overlay by design (not guarded — see §5's
+  exclusion list); pushing the check down into `store.mjs` itself instead
+  of `bin/fgos.mjs`'s dispatch layer remains blocked by the kernel/infra
+  layering rule (`store.mjs` cannot import `isMainWorktree`/
+  `isSessionWorktree` — both are infra; `test/architecture.test.mjs`
+  enforces this), so the guard will need re-deriving at any FUTURE second
+  CLI entry point onto the same state (none exists today).
+- §9's own lesson: a verb's case block length is not something to assume
+  from its name. Two of the 21 verbs re-classified in the second pass
+  needed a live full-suite run to catch, not code reading alone —
+  applies equally to any future verb added to either list here.
+
+## 9. Two real regressions found and fixed during the second pass (`ecd2a9bf`)
+
+Not hypothetical, not caught by code review alone — both surfaced only
+when the full suite actually ran, and both are recorded here because the
+same class of mistake is reachable again by anyone extending this guard.
+
+**1. `return` was wrongly added to `MUTATING_ONLY_VERBS`.** Its own case
+block (`bin/fgos.mjs` ~line 3612–3973, ~360 lines — by far the longest
+of the 21 candidates checked in this pass) already has a deliberately
+MORE permissive worktree guard than this one: it checks
+`insideRegisteredSession` (via `listSessions`, matching `return`'s own
+semantics — a registered session is exempt because its `.fgos` is a live
+symlink) combined with `isMainWorktree(repoRoot)`, and refuses with its
+own distinct message, already pinned by an existing test
+(`test/cli/fgos-return.test.mjs`, `tsk-ikd`). Adding a second,
+differently-worded guard ahead of it in dispatch order didn't add
+coverage — it silently preempted the tested one, breaking that test.
+Found by: running the full suite, not by reading `return`'s case block
+(only its first ~35 lines were read initially, which look identical in
+shape to every other single-action verb; the guard sits 250+ lines
+later). Fix: excluded `return`, documented why inline at the
+`MUTATING_ONLY_VERBS` definition, and replaced the test with one that
+pins this guard's message never firing for `return`.
+
+**2. The guard lacked an `fs.existsSync(dir)` precondition.** `session
+start` inside a genuinely `.fgos/`-less, ADR0020-stripped linked
+worktree — the exact case that verb exists to serve, symlinking
+`.fgos/` in for the first time — was wrongly refused. The guard's
+original reasoning ("`.fgos/` exists here because the `requiresExistingStore`
+ENOENT check above already returned") is true for every
+`MUTATING_ONLY_VERBS` member (all `requiresExistingStore: true`) but
+false for `session`, whose `requiresExistingStore` is `false` by design.
+Found by: the full suite (`test/cli/fgos-claim.test.mjs`, "session start
+inside a `.fgos/`-less linked worktree still succeeds"). Fix: added
+`fs.existsSync(dir)` to the guard condition, so it only fires on a
+genuinely disconnected (present-but-wrong) store, never a not-yet-created
+one.
+
+Both fixes are in `ecd2a9bf`, verified by a subsequent full, clean suite
+run (5894 tests, 5887 pass, 0 fail) before that commit landed.
