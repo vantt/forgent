@@ -32,10 +32,12 @@
         "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
       },
       "advise": {
-        "description": "Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for advise -> codex, never built: no caller invokes this purpose yet)"
+        "description": "Async product-decision consult -- value comes from disagreement and never changes project state.",
+        "prefer": "claude-bwrap"
       },
       "execute": {
-        "description": "Compliance-driven work -- value comes from following the plan, changes files, must pass verify (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for execute -> agy, never built: no caller invokes this purpose yet)"
+        "description": "Compliance-driven work -- value comes from following the plan, changes files, and must pass verification.",
+        "prefer": "claude-herdr"
       },
       "fgos-coding-implement": {
         "description": "code-implement work for the coding domain's executing stage -- pinned to gemini-3.6-flash-medium via this capability's own providerModel/rigorOverrides (agy/gemini, lightweight policy tier; see modelPolicies.gemini.lightweight for the literal model string).\n\nFlipped to executors.agy-herdr on 2026-09-07, which is the condition the previous description set: \"do not flip prefer back to agy-herdr until this is fixed and re-verified live\". Both halves of the old failure are gone, and gone structurally rather than by tuning.\n\nThe prompt no longer travels on a command line at all -- it is written to brief-<round>.md and only a one-line pointer is submitted -- so the multi-line corruption that used to destroy every real implement prompt has nowhere left to happen. Completion is now the worker's own outbox/result-<round>.json appearing; agent_status is never read as completion, which is what produced the silent false successes (idle before the agent had started; an idle-looking gap mid-turn).\n\nEvidence: 10/10 settled with ack and result (P1, 2026-09-07), plus 2/2 again driven from this very config entry after the -i flag was removed from its args -- that flag made agy take the NEXT flag as its prompt value and never reach ready. Logs: docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/.\n\nBounded honestly: every one of those rounds ran a trivial task with a six-line prompt. What is proven is contract conformance -- agy reads the pointer, finds the brief, writes ack/report/result -- not that agy does hard implementation work well. The first real fgos-coding-implement dispatch is the real test.\n\nReverting is one field: set prefer back to \"agy-cli\". A failure now leaves a named outcome (agent_not_ready, agent_prompt_stalled, agent_blocked, died, timed-out-idle, timed-out-ceiling, paused-limit), an open pane with the reason still on screen, and a run.json that says settled/died/unknown instead of sitting at running forever -- so a bad flip is visible within one dispatch rather than silently burning a timeout window.",
@@ -50,19 +52,24 @@
         }
       },
       "code:implement": {
-        "description": "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)"
+        "description": "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)",
+        "prefer": "agy-herdr"
       },
       "code:review": {
-        "description": "Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
+        "description": "Canonical coding review capability -- independent read-only review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+        "prefer": "codex-readonly"
       },
       "code:test": {
-        "description": "Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
+        "description": "Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+        "prefer": "claude-herdr"
       },
       "code:debug": {
-        "description": "Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
+        "description": "Canonical coding debug capability -- read-only root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+        "prefer": "codex-readonly"
       },
       "code:refactor": {
-        "description": "Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
+        "description": "Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+        "prefer": "claude-herdr"
       }
     },
     "executors": {
@@ -250,6 +257,8 @@
               "exec",
               "-s",
               "read-only",
+              "--model",
+              "{model}",
               "{prompt}"
             ]
           }
