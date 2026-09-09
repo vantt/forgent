@@ -7,8 +7,12 @@ providers, models, and tiers with two explicit primitives:
 
 1. dispatch-execution: choose the executor by a canonical capability at the
    execution boundary;
-2. team cognition: coordinate multiple agents through the existing
-   CoordinationSession and registered group-thinking protocols.
+2. team cognition: activate and coordinate multiple agents through the
+   existing `fgos-group-thinking` skill, CoordinationSession, and registered
+   group-thinking protocols;
+3. research support: make research a first-class capability that can run
+   alone through `fgos-researching` or be coordinated as a group-thinking
+   round when the question benefits from several agents/providers.
 
 This plan covers P1–P4 only. State/root-resolution work is deliberately
 separate in `docs/history/agent-coordination-state-root/prompt.md`.
@@ -48,9 +52,14 @@ Establish one canonical identity vocabulary before broadening planner prose.
 Deliverables:
 
 - a shared capability catalog/reference defining generic and domain-scoped
-  forms (`implement`, `review`, `test`, `debug`, `code:implement`, etc.);
+  forms (`implement`, `review`, `test`, `debug`, `research`,
+  `code:implement`, etc.);
 - rules for choosing generic versus `domain:capability`;
 - semantics, examples, and fallback behavior for each registered capability;
+- research capability guidance: use `research` for a domain-neutral question,
+  use a domain-scoped form only when the research method is materially tied to
+  that domain, and hand the actual evidence-gathering to the existing
+  `fgos-researching` skill;
 - a clear statement that catalog entries never pin provider/model/executor;
 - setup/doctor/config registration only for capabilities with real configured
   executors.
@@ -59,6 +68,9 @@ Candidate existing work to reconcile, not blindly duplicate:
 
 - `tsk-4lc`, `tsk-49o`, `tsk-492`, `tsk-9tu`, `tsk-5x7-1`, `tsk-fli`,
   `tsk-5fn`, `tsk-62w`.
+- research/coordination consumers must also be inventoried before adding a
+  new capability: existing `fgos-researching`, coordination operation-step,
+  and group-thinking items are candidates for reuse, not new parallel paths.
 
 Acceptance:
 
@@ -132,18 +144,31 @@ mark `decide-before-dispatch` as historical terminology only.
 
 ## Team-cognition integration
 
-Use the existing master-prompt/coordination doors for multi-agent work:
+The activation surface for team cognition is the existing
+`fgos-group-thinking` skill. It is the convenient agent-facing entrypoint;
+the skill must remain a thin gate and launcher, not a second coordination
+engine. Use the existing master-prompt/coordination doors for multi-agent
+work:
 
+- invoke `fgos-group-thinking` when a task needs deliberation, independent
+  research passes, cross-provider review, or synthesis by several agents;
+- make the caller name a protocol registered in
+  `core/protocol-packs/group-thinking.json`;
+- let the skill build/forward the request to `fgos coordination run --file`,
+  preserving per-actor executor/model/tier overrides;
+- use `fgos-researching` for a single-agent evidence question, and use
+  group-thinking to coordinate multiple research contributions, objections,
+  responses, or synthesis; do not duplicate the researcher implementation in
+  the group-thinking skill;
 - use `fgos coordination launch-master-loop` only for its existing fixture
   contract;
-- use `fgos-group-thinking` for deliberative rounds, with an explicit
-  pack-registered protocol id;
 - use `fgos coordination run --file` for declared operations, per-actor
   executor/model/tier overrides, fan-out, authorization, and disposition;
 - use `fgos coordination show` as the replay/truth surface.
 
-Do not embed protocol semantics in new skill prose, spawn agents directly
-outside the coordination door, or hardcode one provider for a whole session.
+Do not embed protocol semantics in new skill prose, invent a second
+group-thinking activation mechanism, spawn agents directly outside the
+coordination door, or hardcode one provider for a whole session.
 
 ## Parallel worktree contract
 
@@ -157,6 +182,12 @@ conflict with state/root behavior is reported and deferred to the P0 stream.
 - catalog and shared planner instruction are readable by a stranger agent;
 - at least one multi-provider group-thinking run is replayable through
   `coordination show`;
+- the `fgos-group-thinking` skill can be invoked by an agent without knowing
+  provider/model/tier details, while still requiring an explicit registered
+  protocol;
+- at least one research question is handled through `fgos-researching`, and
+  at least one multi-agent research question is coordinated through the
+  group-thinking skill with contributions and replayable synthesis;
 - at least one coding execution proves `code:implement` resolution;
 - tests cover canonical capability validation and decide-before-execute
   behavior;
