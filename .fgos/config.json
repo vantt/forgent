@@ -45,9 +45,9 @@
         "overrides": {
           "providerModel": "gemini",
           "rigorOverrides": {
-            "light": "lightweight",
-            "standard": "lightweight",
-            "heavy": "lightweight"
+            "light": "standard",
+            "standard": "standard",
+            "heavy": "standard"
           }
         }
       },
@@ -57,7 +57,7 @@
       },
       "code:review": {
         "description": "Canonical coding review capability -- independent read-only review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
-        "prefer": "codex-readonly"
+        "prefer": "codex-bwrap"
       },
       "code:test": {
         "description": "Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
@@ -65,7 +65,7 @@
       },
       "code:debug": {
         "description": "Canonical coding debug capability -- read-only root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
-        "prefer": "codex-readonly"
+        "prefer": "codex-bwrap"
       },
       "code:refactor": {
         "description": "Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
@@ -207,7 +207,7 @@
       },
       "agy-bwrap": {
         "kind": "agent",
-        "description": "Antigravity CLI under an OS-level read-only mount (bwrap --ro-bind / /) -- the read-only-confined pair for architecture-advisory-panel dispatch (tsk-1o4; live-proven safe P00.1: agy-cli's own --mode plan and --mode accept-edits --sandbox were both falsified, each still wrote outside the repo, while this exact bwrap wrap blocked the identical attack, admitted to the allowlist). Same writable exception as claude-bwrap (this repo's own .fgos/assignments tree, where the coordination engine expects agent-result.json regardless of the dispatched cwd) -- see that executor's own description for why this does not weaken confinement. Drops --new-project (tsk-31d): agy -p ignores the invoking OS cwd for RELATIVE paths and defaults to a stale internal scratch workspace, with or without this flag, with or without confinement -- --new-project only compounds it by spinning up a fresh throwaway one every call. The real, confirmed-live workaround is an absolute-path convention in every dispatched prompt (both for the material being read and the result file being written), not a flag -- callers of this executor must never rely on relative-to-cwd resolution.",
+        "description": "Antigravity CLI under an OS-level read-only mount (bwrap --ro-bind / /) -- the read-only-confined pair for architecture-advisory-panel dispatch (tsk-1o4; live-proven safe P00.1: agy-cli's own --mode plan and --mode accept-edits --sandbox were both falsified, each still wrote outside the repo, while this exact bwrap wrap blocked the identical attack, admitted to the allowlist). Same writable exception as claude-bwrap (this repo's own .fgos/assignments tree, where the coordination engine expects agent-result.json regardless of the dispatched cwd) -- see that executor's own description for why this does not weaken confinement. Drops --new-project (tsk-31d): agy -p ignores the invoking OS cwd for RELATIVE paths and defaults to a stale internal scratch workspace, with or without this flag, with or without confinement -- --new-project only compounds it by spinning up a fresh throwaway one every call. The real, confirmed-live workaround is an absolute-path convention in every dispatched prompt (both for the material being read and the result file being written), not a flag -- callers of this executor must never rely on relative-to-cwd resolution. Carries --print-timeout 30m: without it agy's own print-mode default (~5 min) kills long advisory dispatches mid-run -- observed live on a red-team assignment that had to be retried with a shorter prompt. agy-cli already carried this flag; agy-bwrap did not.",
         "allowCrossProvider": true,
         "invocations": [
           {
@@ -231,6 +231,8 @@
               "{prompt}",
               "--mode",
               "accept-edits",
+              "--print-timeout",
+              "30m",
               "--model",
               "{model}"
             ]
@@ -245,7 +247,7 @@
       },
       "codex-readonly": {
         "kind": "agent",
-        "description": "OpenAI Codex CLI under its own provider-native read-only sandbox (-s read-only) -- the read-only-confined pair for architecture-advisory-panel dispatch (tsk-1o4; live-proven safe P00.1: this flag blocked the same attack codex-cli's --dangerously-bypass-approvals-and-sandbox let through, admitted to the allowlist; codex-bwrap, the OS-mount alternative, was excluded for a non-runnable startup crash, not a safety failure).",
+        "description": "RETIRED FOR DISPATCH -- do not bind this executor to any role. `-s read-only` has no writable-exception mechanism, so a dispatched agent can never write the agent-result.json that assignment-runner.mjs requires; every dispatch settles `no-evidence` regardless of how good the agent's actual findings were. Confirmed live (a real advisory panel dispatch failed this way and had to be retried on another executor) and by probe: `-s read-only --add-dir <dir>` still grants no write, which matches the CLI's documented design (--add-dir is meaningful only under workspace-write). Use codex-bwrap instead -- same provider family, OS-level confinement, and a real write path for its own result. Kept registered only so existing references resolve and this explanation stays discoverable. OpenAI Codex CLI under its own provider-native read-only sandbox (-s read-only) -- the read-only-confined pair for architecture-advisory-panel dispatch (tsk-1o4; live-proven safe P00.1: this flag blocked the same attack codex-cli's --dangerously-bypass-approvals-and-sandbox let through, admitted to the allowlist; codex-bwrap, the OS-mount alternative, was excluded for a non-runnable startup crash, not a safety failure).",
         "providerModel": "openai-codex",
         "allowCrossProvider": true,
         "invocations": [
@@ -510,6 +512,48 @@
           "standard": "lightweight",
           "heavy": "lightweight"
         }
+      },
+      "codex-bwrap": {
+        "kind": "agent",
+        "description": "OpenAI Codex CLI under an OS-level read-only mount (bwrap --ro-bind / /), with a per-run tmpfs CODEX_HOME -- the read-only-confined codex pair for advisory dispatch, replacing codex-readonly (which cannot dispatch at all: `-s read-only` has no writable-exception mechanism, so it can never write the agent-result.json every Assignment requires; confirmed live by a failed panel dispatch and by a probe showing `--add-dir` grants no write under read-only, which matches the CLI's documented design). `-s danger-full-access` is correct HERE and only here: the bwrap mount is the real confinement, exactly as claude-bwrap relies on the mount rather than --permission-mode. Codex cannot run with a read-only CODEX_HOME -- it writes models_cache.json, installation_id, tmp/arg0/*, and several SQLite DBs at that root during startup, and neither --ephemeral nor -c sqlite_home relocates all of them. So CODEX_HOME is redirected to a per-run tmpfs with only auth.json read-only bound in. That choice is what makes the user's real ~/.codex fully read-only (verified live: writes to ~/.codex/AGENTS.md and ~/.codex/config.toml are both BLOCKED) -- important because CODEX_HOME's AGENTS.md / AGENTS.override.md / config.toml / hooks.json / rules/ / skills/ / plugins/ are all loaded as INSTRUCTIONS at startup, so a writable CODEX_HOME would be a real cross-run prompt-injection and persistence vector. The per-run tmpfs also means no goals/memories/thread_history state carries between advisory dispatches, and none of the operator's own hooks/rules/skills load into an advisory agent. Confinement of the target project verified live by falsification: a write to the repo returns `read-only file system` and no file appears on the host. Same additive writable exception as its siblings: this repo's own .fgos/assignments tree (see claude-bwrap's description for why that does not weaken confinement). Benign startup warning to expect, not a fault: with CODEX_HOME under /tmp codex prints \"could not create PATH aliases: Refusing to create helper binaries under temporary dir\" and proceeds. Those helpers (codex-execve-wrapper, codex-linux-sandbox) exist for codex's OWN sandbox, which this executor deliberately does not use -- bwrap is the confinement. Verified live end to end after this warning: a `code:review` dispatch returned exit 0 with headBefore == headAfter (no repo mutation).",
+        "providerModel": "openai-codex",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--ro-bind",
+              "/home/vantt/.codex/auth.json",
+              "/tmp/cdxhome/auth.json",
+              "--setenv",
+              "CODEX_HOME",
+              "/tmp/cdxhome",
+              "--bind",
+              "/home/vantt/projects/forgentX/.fgos/assignments",
+              "/home/vantt/projects/forgentX/.fgos/assignments",
+              "--",
+              "codex",
+              "exec",
+              "--skip-git-repo-check",
+              "-s",
+              "danger-full-access",
+              "--model",
+              "{model}",
+              "{prompt}"
+            ]
+          }
+        ]
       }
     },
     "timeoutMs": 2100000,
@@ -522,25 +566,29 @@
         "lightweight": "haiku",
         "standard": "sonnet",
         "creative": "sonnet",
-        "analytical": "sonnet",
+        "analytical": "opus",
         "critical": "opus"
       },
       "gemini": {
-        "lightweight": "gemini-3.6-flash-medium",
-        "standard": "gemini-3.6-flash-high",
-        "creative": "gemini-3.6-flash-high",
+        "lightweight": "gemini-3.8-flash-low",
+        "standard": "gemini-3.8-flash-medium",
+        "creative": "gemini-3.8-flash-high",
         "analytical": "gemini-3.1-pro-low",
         "critical": "gemini-3.1-pro-high"
       },
       "openai-codex": {
-        "lightweight": "gpt-5.5",
-        "standard": "gpt-5.5",
-        "creative": "gpt-5.5",
-        "analytical": "gpt-5.5",
-        "critical": "gpt-5.5"
+        "lightweight": "gpt-5.6-luna",
+        "standard": "gpt-5.6-terra",
+        "creative": "gpt-5.6-terra",
+        "analytical": "gpt-5.6-terra",
+        "critical": "gpt-5.6-sol"
       },
       "z-ai": {
-        "lightweight": "z-ai/glm-5.2"
+        "lightweight": "z-ai/glm-5.2",
+        "standard": "z-ai/glm-5.2",
+        "creative": "z-ai/glm-5.2",
+        "analytical": "z-ai/glm-5.2",
+        "critical": "z-ai/glm-5.2"
       }
     },
     "models": {
