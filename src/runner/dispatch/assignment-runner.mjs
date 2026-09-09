@@ -29,7 +29,6 @@ import {
 } from '../../state/workflow-stage-graphs.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveContentRoot } from '../paths.mjs';
-import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
@@ -749,11 +748,22 @@ export async function executeAssignment(assignment, opts = {}) {
 
   validateAssignmentLegality(effectiveAssignment, opts);
 
-  // Enforce decide-first governance gate (Step 06)
+  // Enforce decide-first governance gate (Step 06). Dispatch Core Contract
+  // Normalization Slice D: compileDispatchPlan() now merges
+  // resolveAssignmentDispatchPolicy()'s tier/model/providerModel/provenance
+  // into the plan itself (compiledPlan.policy) and enforces the
+  // decided-executor-vs-policy-executor agreement internally -- this call
+  // site no longer resolves policy a second time or re-checks that
+  // agreement; both used to happen here, separately, and could only ever
+  // agree or throw, never usefully disagree. `workItem: opts.work` is
+  // threaded through so the merged policy resolution sees the real Work
+  // object for tier monotonicity (work.tier/work.risk), the same object
+  // the removed direct call used to pass as `work`.
   const compiledPlan = compileDispatchPlan(cfg, {
     assignment: effectiveAssignment.assignmentId,
     assignmentItem: effectiveAssignment,
     work: effectiveAssignment.workId,
+    workItem: opts.work,
     stage: effectiveAssignment.stage,
     hasLiveTaskAccess: opts.hasLiveTaskAccess ?? false,
     cliOverride: opts.cliOverride,
@@ -765,20 +775,7 @@ export async function executeAssignment(assignment, opts = {}) {
     throw new RunnerConfigError(`dispatch decide blocked operation "${effectiveAssignment.operation}": ${reason}`);
   }
 
-  const effectivePolicy = resolveAssignmentDispatchPolicy({
-    assignment: effectiveAssignment,
-    work: opts.work,
-    runnerConfig: cfg,
-    cliOverride: opts.cliOverride,
-    options: opts.options,
-  });
-
-  const decidedExecutor = compiledPlan.executorId ?? compiledPlan.invocation?.executorId;
-  if (decidedExecutor && decidedExecutor !== effectivePolicy.executorPreference[0]) {
-    throw new RunnerConfigError(
-      `dispatch decide mismatch for operation "${effectiveAssignment.operation}": decided executor "${decidedExecutor}" does not match execution policy executor "${effectivePolicy.executorPreference[0]}"`,
-    );
-  }
+  const effectivePolicy = compiledPlan.policy;
 
   // Reviewer/researcher/advisor executor scoping (Red-team finding, Cell 6.3
   // Fix Round 1; widened in Fix Round 2 to cover operation-based read-only

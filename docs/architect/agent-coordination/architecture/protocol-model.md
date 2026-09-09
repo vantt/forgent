@@ -5,6 +5,11 @@ Design status: Accepted
 Implementation: Implemented
 Last reviewed: 2026-09-01
 Canonical for: planning sources and graph, protocol, operation, TaskSpec, Skill, and Role responsibilities
+Related: [Dispatch Control Plane](dispatch-control-plane.md) — declared policy
+hints (`policy` on an operation, see the [FlowDefinition
+Contract](../contracts/flow-definition.md#policypatch)) become PolicyPatch
+input to a DispatchRequest; they never pin literal provider/model, and
+resolution stays dispatch-core authority
 
 ## Planning Sources
 

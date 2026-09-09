@@ -264,6 +264,57 @@ export function compileDispatchPlan(
 
   const governance = resolvedForDispatch?.governance ?? { providerFamily: null, egress: null };
 
+  // Dispatch Core Contract Normalization, Slice D: merge tier/model/
+  // providerModel/provenance into the DispatchPlan itself, additive-only,
+  // by delegating to the SAME policy resolver (resolveAssignmentDispatchPolicy)
+  // every dispatch already uses -- never a second, independently-derived
+  // computation. Uses the caller's real Assignment when one was given
+  // (assignment-runner.mjs's executeAssignment path); synthesizes a minimal
+  // one otherwise so --executor-id/--for/--work callers (including the
+  // decide-before-dispatch PreToolUse hook) get the same fields without
+  // requiring a real Assignment object. `preferExecutor: executorId` pins
+  // the synthesized resolution to the SAME executor this function already
+  // chose above, so the two resolvers agree by construction; the
+  // executorPreference[0] check below still catches the case where a
+  // caller-supplied cliOverride.preferExecutor disagrees anyway.
+  const realAssignmentForPolicy = assignmentItem ?? (typeof assignmentArg === 'object' && assignmentArg ? assignmentArg : null);
+  const assignmentForPolicy = realAssignmentForPolicy ?? {
+    operation: capability ?? executorId,
+    role: undefined,
+    policy: { preferExecutor: executorId },
+    skills: [],
+  };
+  let effectivePolicy = null;
+  try {
+    effectivePolicy = resolveAssignmentDispatchPolicy({
+      assignment: assignmentForPolicy,
+      work: workItem,
+      runnerConfig: cfg,
+      cliOverride,
+      options,
+    });
+  } catch (err) {
+    // A real Assignment's policy failure is a real failure -- propagate it,
+    // matching the pre-existing contract where a caller (assignment-runner.mjs)
+    // called resolveAssignmentDispatchPolicy separately and let it throw.
+    if (realAssignmentForPolicy) throw err;
+    // A synthesized assignment (no real Assignment given, e.g. `decide --for`)
+    // never crashes plan compilation over this -- decide-before-dispatch
+    // callers, including the hook, must keep working exactly as before; the
+    // new fields are simply left null.
+    effectivePolicy = null;
+  }
+  if (effectivePolicy && effectivePolicy.executorPreference[0] !== executorId) {
+    const message = `dispatch decide mismatch for operation "${assignmentForPolicy.operation}": decided executor "${executorId}" does not match execution policy executor "${effectivePolicy.executorPreference[0]}"`;
+    if (realAssignmentForPolicy) {
+      throw new RunnerConfigError(message);
+    }
+    // Same non-fatal posture as the catch block above: a synthesized
+    // assignment must never turn a working `decide` into a thrown error.
+    effectivePolicy = null;
+    reasonCodes.push('policy.executor-mismatch-ignored');
+  }
+
   return {
     selector,
     caller: callerObj,
@@ -276,5 +327,11 @@ export function compileDispatchPlan(
     ...(agentType ? { agentType } : {}),
     ...(mcpTool ? { mcpTool } : {}),
     configured,
+    bindingSource: resolved.bindingSource ?? null,
+    tier: effectivePolicy?.tier ?? null,
+    model: effectivePolicy?.model ?? null,
+    providerModel: effectivePolicy?.providerModel ?? null,
+    provenance: effectivePolicy?.provenance ?? null,
+    policy: effectivePolicy,
   };
 }

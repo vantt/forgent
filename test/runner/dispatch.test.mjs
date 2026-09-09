@@ -5918,6 +5918,152 @@ test('compileDispatchPlan mcp-handback (in-process) never attempts cli resolutio
   assert.equal(plan.invocation, null);
 });
 
+// --- DispatchPlan policy merge: bindingSource/tier/model/providerModel/
+// provenance/policy (Dispatch Core Contract Normalization, Slice D) ---
+//
+// compileDispatchPlan() used to leave these fields entirely off its return
+// value; a caller wanting tier/model/provenance had to call
+// resolveAssignmentDispatchPolicy() separately (assignment-runner.mjs did,
+// then cross-checked the two executor choices and threw on disagreement).
+// These tests pin the merged behavior: one resolution, additive fields,
+// same mismatch guarantee, now enforced inside compileDispatchPlan itself.
+
+const SLICE_D_MODELS = Object.freeze({ lightweight: 'haiku', standard: 'sonnet', creative: 'sonnet', analytical: 'sonnet', critical: 'opus' });
+
+test('compileDispatchPlan merges tier/model/providerModel/provenance/policy for an executor-id selector (Slice D)', () => {
+  const cfg = {
+    // `providerModel` declared explicitly: a bare (non-invocations[])
+    // executor entry with none of its own is a known, documented gap
+    // (config.mjs's warnIfProviderFamilyUnreliable) where
+    // resolveAssignmentDispatchPolicy's provider derivation defaults to
+    // "claude" -- pre-existing, orthogonal to what this test pins.
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], providerModel: 'agy', allowCrossProvider: true } },
+    models: SLICE_D_MODELS,
+  };
+  const plan = compileDispatchPlan(cfg, { executorId: 'agy' });
+  assert.equal(plan.executorId, 'agy');
+  assert.equal(plan.bindingSource, 'executor-id');
+  assert.equal(plan.tier, 'standard');
+  assert.equal(plan.model, 'sonnet');
+  assert.equal(plan.providerModel, 'agy');
+  assert.equal(plan.provenance.executor.value, 'agy');
+  assert.equal(plan.policy.executorPreference[0], 'agy');
+});
+
+test('compileDispatchPlan merges the same fields for a --for capability selector and records bindingSource: capability.prefer', () => {
+  const cfg = {
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+    models: SLICE_D_MODELS,
+  };
+  const plan = compileDispatchPlan(cfg, { for: 'fgos-coding-implement' });
+  assert.equal(plan.executorId, 'agy');
+  assert.equal(plan.bindingSource, 'capability.prefer');
+  assert.equal(plan.tier, 'standard');
+  assert.equal(plan.model, 'sonnet');
+  assert.equal(plan.policy.executorPreference[0], 'agy');
+});
+
+test('compileDispatchPlan records bindingSource: capability.for when resolution falls through to an executor\'s own "for" array (no capabilities.<name>.prefer)', () => {
+  const cfg = {
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    capabilities: { 'fgos-coding-implement': {} },
+    models: SLICE_D_MODELS,
+  };
+  const plan = compileDispatchPlan(cfg, { for: 'fgos-coding-implement' });
+  assert.equal(plan.executorId, 'agy');
+  assert.equal(plan.bindingSource, 'capability.for');
+});
+
+test('compileDispatchPlan merges policy fields from a real Assignment (assignmentItem), matching resolveAssignmentDispatchPolicy\'s own output', () => {
+  const cfg = {
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    models: SLICE_D_MODELS,
+  };
+  const assignmentItem = {
+    assignmentId: 'test-assignment-1',
+    operation: 'implement-item',
+    role: 'implementer',
+    policy: { preferExecutor: 'agy', minTier: 'critical' },
+    skills: [],
+  };
+  const plan = compileDispatchPlan(cfg, { assignment: assignmentItem.assignmentId, assignmentItem });
+  assert.equal(plan.executorId, 'agy');
+  assert.equal(plan.tier, 'critical');
+  assert.equal(plan.model, 'opus');
+  assert.equal(plan.provenance.tier.source.scope, 'opPolicy');
+  assert.equal(plan.provenance.tier.source.id, 'implement-item');
+  assert.equal(plan.policy.role, 'implementer');
+});
+
+test('compileDispatchPlan throws the dispatch-decide-mismatch error when a real Assignment\'s cliOverride.preferExecutor disagrees with the decided executor', () => {
+  const cfg = {
+    executors: {
+      agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
+      claude: { kind: 'agent', command: 'claude', args: ['{prompt}'] },
+    },
+    models: SLICE_D_MODELS,
+  };
+  const assignmentItem = {
+    assignmentId: 'test-assignment-mismatch',
+    operation: 'implement-item',
+    role: 'implementer',
+    policy: {},
+    skills: [],
+  };
+  // compileDispatchPlan itself decides "agy" (explicit executorId); the
+  // caller's cliOverride tells the policy resolver to prefer "claude"
+  // instead -- a real, structural disagreement, not a transient bug.
+  assert.throws(
+    () => compileDispatchPlan(cfg, {
+      executorId: 'agy',
+      assignment: assignmentItem.assignmentId,
+      assignmentItem,
+      cliOverride: { preferExecutor: 'claude' },
+    }),
+    /dispatch decide mismatch for operation "implement-item"/,
+  );
+});
+
+test('compileDispatchPlan never throws over a policy mismatch on a synthesized (non-Assignment) request -- decide --for/--executor-id stays non-fatal', () => {
+  const cfg = {
+    executors: {
+      agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
+      claude: { kind: 'agent', command: 'claude', args: ['{prompt}'] },
+    },
+    models: SLICE_D_MODELS,
+  };
+  // No assignment/assignmentItem at all -- plan.mjs synthesizes one
+  // internally. A caller-supplied cliOverride.preferExecutor that disagrees
+  // with the decided executorId must never turn a working `decide` call
+  // into a thrown error (the PreToolUse decide-before-dispatch hook depends
+  // on this staying non-fatal).
+  const plan = compileDispatchPlan(cfg, { executorId: 'agy', cliOverride: { preferExecutor: 'claude' } });
+  assert.equal(plan.executorId, 'agy');
+  assert.equal(plan.mechanism, 'out-of-process');
+  assert.equal(plan.tier, null);
+  assert.equal(plan.model, null);
+  assert.equal(plan.policy, null);
+  assert.ok(plan.reasonCodes.includes('policy.executor-mismatch-ignored'));
+});
+
+test('compileDispatchPlan governance-blocked and unavailable branches never populate the new policy fields (no partial/misleading merge)', () => {
+  const blockedCfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { blockedExec: { kind: 'agent', command: 'some-other-cli', args: ['{prompt}'] } },
+    models: SLICE_D_MODELS,
+  };
+  const blockedPlan = compileDispatchPlan(blockedCfg, { executorId: 'blockedExec' });
+  assert.equal(blockedPlan.mechanism, 'unavailable');
+  assert.equal(blockedPlan.tier, undefined);
+  assert.equal(blockedPlan.policy, undefined);
+
+  const unavailablePlan = compileDispatchPlan({}, { for: 'no-such-purpose' });
+  assert.equal(unavailablePlan.mechanism, 'unavailable');
+  assert.equal(unavailablePlan.tier, undefined);
+  assert.equal(unavailablePlan.policy, undefined);
+});
+
 test('logExecutorDispatch writes governance payload into executor.dispatch event generically (0c)', () => {
   const { fgosDir } = mkTempGitRepo();
   const gov = { carries: ['repo-content'], egress: null };

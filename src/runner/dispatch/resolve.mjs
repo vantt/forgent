@@ -282,7 +282,12 @@ export function resolveExecutorIdForPurpose(cfg, purpose) {
 export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
   const executors = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
   if (executors[executorIdOrPurpose]) {
-    return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], overrides: undefined, configured: true };
+    // `bindingSource` (Dispatch Core Contract Normalization, Slice D):
+    // additive-only provenance for WHICH resolution branch bound the
+    // returned executorId, surfaced on DispatchPlan.bindingSource by
+    // plan.mjs. Pre-existing callers that destructure only
+    // {executorId, executor, overrides, configured} are unaffected.
+    return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], overrides: undefined, configured: true, bindingSource: 'executor-id' };
   }
   const preferred = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[executorIdOrPurpose]?.prefer : undefined;
   if (preferred) {
@@ -292,13 +297,13 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
         `runner config capabilities.${executorIdOrPurpose}.prefer names "${preferred}" but no such executor is registered.`,
       );
     }
-    return { executorId: preferred, executor, overrides: cfg.capabilities[executorIdOrPurpose].overrides, configured: true };
+    return { executorId: preferred, executor, overrides: cfg.capabilities[executorIdOrPurpose].overrides, configured: true, bindingSource: 'capability.prefer' };
   }
   const found = resolveExecutorIdForPurpose(cfg, executorIdOrPurpose);
   if (found) {
-    return { executorId: found, executor: executors[found], overrides: undefined, configured: true };
+    return { executorId: found, executor: executors[found], overrides: undefined, configured: true, bindingSource: 'capability.for' };
   }
-  return { executorId: null, executor: undefined, overrides: undefined, configured: false };
+  return { executorId: null, executor: undefined, overrides: undefined, configured: false, bindingSource: null };
 }
 
 // Exported (additive, D7 module split): `dispatch/transport.mjs`'s

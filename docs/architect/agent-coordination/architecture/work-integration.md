@@ -3,8 +3,11 @@
 Document type: Architecture
 Design status: Accepted
 Implementation: Partial
-Last reviewed: 2026-09-01
+Last reviewed: 2026-09-09
 Canonical for: Work authority and coordination integration boundaries
+Related: [Dispatch Control Plane](dispatch-control-plane.md) for the
+DispatchRequest/PolicyPatch/DispatchPlan contracts the Work Driver hands off
+to once it has derived a target
 
 ## Core Invariant
 
@@ -44,6 +47,18 @@ claim, acceptance, approval, dependency, branch, merge, or resume behavior.
 Current planning tends to materialize every decomposed child as Work. The
 candidate AdhocTask distinction and hybrid materialization rules remain under
 discussion in [Step 07](../proposals/step-07-coordination-session-adhoc-task.md).
+
+## Work Driver Handoff To Dispatch
+
+The Work Driver (the component-outer caller that selects a legal declared
+Stage Operation for a Work item) derives a capability or an explicit
+executor-id, plus PolicyPatch and provenance, from
+`Work → domain/workflow/stage → legal operation → taskSpec/skill metadata`.
+It hands that off as a DispatchRequest to the [Dispatch Control
+Plane](dispatch-control-plane.md); it must not call `resolveExecutorConfig`
+or launch an executor directly. This mirrors the accepted rule above that
+Coordination "may not" own dispatch mechanism choice — the same boundary
+applies to the Work Driver whether or not a CoordinationSession is involved.
 
 ## Isolation
 
