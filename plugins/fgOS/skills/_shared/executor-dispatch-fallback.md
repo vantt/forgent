@@ -159,11 +159,26 @@ this dispatch without inferring it from a git commit:
 
 ```bash
 node "$root/src/runner/dispatch.mjs" log <EXECUTOR_ID> --id "<id>" \
-  --provider "<provider>" --command "<command>" [--model "<model>"]
+  --provider "<provider>" --command "<command>" [--model "<model>"] \
+  --capability "<PURPOSE>" --mechanism "out-of-process" [--tier "<tier>"] \
+  [--outcome "<status>"]
 ```
 
-`<provider>`, `<command>`, and `<model>` come straight from Step B's own
-JSON result above — no new value to resolve. `<id>` is the item currently
+`<provider>`, `<command>`, `<model>`, `<tier>`, and `<status>` come
+straight from Step B's own JSON result above (`status` there — e.g.
+`"done"`/`"failed"` — is `<status>` here) — no new value to resolve.
+`<PURPOSE>` is the same canonical capability Step A already asked
+`decide` for (this whole fragment consumes `capability-catalog.md`'s
+vocabulary), and `--mechanism` is always `"out-of-process"` here — Step
+B.5 is only ever reached after Step B's own `mechanism: "out-of-process"`
+branch (P4 observability, `docs/history/agent-coordination-foundation/plan.md`:
+this durably records the requested capability, dispatch mechanism/tier,
+and completion outcome alongside the executor/provider/model already
+logged — `--outcome` completes the read side `classifyDispatchConfidence`
+already had for a "reported" confidence event; a caller with no clean
+status omits `--outcome` and the existing log/inferred fallback ladder
+applies unchanged — so a later reader never has to re-derive any of this
+from a git commit or re-run `decide`). `<id>` is the item currently
 claimed by this session. This call is mechanical bookkeeping, never a
 gate: never stop, retry, or branch on its result — if it fails, continue
 exactly as if it had not been called; the dispatch itself already

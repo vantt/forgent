@@ -400,11 +400,36 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
  * `src/state/events.mjs`) — no extra locking needed here even when
  * multiple gather branches log concurrently.
  */
-export function logExecutorDispatch(fgosDir, { id, executorId, provider, command, model, governance, plan }) {
+// P4 observability (docs/history/agent-coordination-foundation/plan.md):
+// `capability`/`mechanism`/`tier`/`fallbackReason` are additive, optional
+// fields -- every existing caller that omits them keeps writing the exact
+// same payload shape it always has (null, same as baseCommit/headRef were
+// before any caller supplied them). Never required, never validated
+// against the capability catalog here -- this is a log line, not a gate.
+export function logExecutorDispatch(fgosDir, { id, executorId, provider, command, model, governance, plan, capability, mechanism, tier, fallbackReason, outcome }) {
   const gov = governance ?? plan?.governance ?? null;
   return appendEvent(resolveWriterLogPath(fgosDir), {
     type: 'executor.dispatch',
-    payload: { id, executorId, provider, command, model, baseCommit: null, headRef: null, governance: gov },
+    payload: {
+      id,
+      executorId,
+      provider,
+      command,
+      model,
+      baseCommit: null,
+      headRef: null,
+      governance: gov,
+      capability: capability ?? null,
+      mechanism: mechanism ?? null,
+      tier: tier ?? null,
+      fallbackReason: fallbackReason ?? null,
+      // classifyDispatchConfidence (src/report/dispatch-confidence.mjs)
+      // already reads payload.outcome as its highest-confidence
+      // ('reported') source when present and not 'unsignaled' -- this is
+      // the write side completing that already-designed read path, not a
+      // new classification concept.
+      outcome: outcome ?? null,
+    },
   });
 }
 
@@ -1392,15 +1417,20 @@ export async function runDispatchCli() {
       const provider = flagValue('--provider');
       const command = flagValue('--command');
       const model = flagValue('--model');
+      const capability = flagValue('--capability');
+      const mechanism = flagValue('--mechanism');
+      const tier = flagValue('--tier');
+      const fallbackReason = flagValue('--fallback-reason');
+      const outcome = flagValue('--outcome');
       if (!id || !executorId || !provider || !command) {
         process.stderr.write(
-          'usage: node src/runner/dispatch.mjs log <executorId> --id <workItemId> --provider <p> --command <c> [--model <m>]\n',
+          'usage: node src/runner/dispatch.mjs log <executorId> --id <workItemId> --provider <p> --command <c> [--model <m>] [--capability <name>] [--mechanism <m>] [--tier <t>] [--fallback-reason <text>] [--outcome <status>]\n',
         );
         process.exitCode = 1;
       } else {
         const root = resolveMainCheckoutRoot(process.cwd()) ?? resolveRepoRoot(process.cwd());
         const fgosDir = fgosDirFromRoot(root);
-        const event = logExecutorDispatch(fgosDir, { id, executorId, provider, command, model });
+        const event = logExecutorDispatch(fgosDir, { id, executorId, provider, command, model, capability, mechanism, tier, fallbackReason, outcome });
         process.stdout.write(`${JSON.stringify(event)}\n`);
       }
       break;

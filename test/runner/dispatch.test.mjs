@@ -5121,6 +5121,60 @@ test('logExecutorDispatch appends multiple sequential calls without corrupting t
   assert.equal(dispatchEvents.length, 4);
 });
 
+// --- P4 observability additive fields (docs/history/agent-coordination-
+// foundation/plan.md): capability/mechanism/tier/fallbackReason/outcome are
+// optional and default to null, byte-identical to every pre-existing caller
+// that never supplied them -------------------------------------------------
+
+test('logExecutorDispatch defaults capability/mechanism/tier/fallbackReason/outcome to null when omitted (backward compatible)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const event = logExecutorDispatch(fgosDir, {
+    id: 'tsk-2c1',
+    executorId: 'gather',
+    provider: 'agy',
+    command: 'agy',
+    model: 'gemini-flash',
+  });
+  assert.equal(event.payload.capability, null);
+  assert.equal(event.payload.mechanism, null);
+  assert.equal(event.payload.tier, null);
+  assert.equal(event.payload.fallbackReason, null);
+  assert.equal(event.payload.outcome, null);
+});
+
+test('logExecutorDispatch records capability/mechanism/tier/outcome when the caller supplies them', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const event = logExecutorDispatch(fgosDir, {
+    id: 'tsk-2c1',
+    executorId: 'gather',
+    provider: 'agy',
+    command: 'agy',
+    model: 'gemini-flash',
+    capability: 'code:review',
+    mechanism: 'out-of-process',
+    tier: 'standard',
+    outcome: 'done',
+  });
+  assert.equal(event.payload.capability, 'code:review');
+  assert.equal(event.payload.mechanism, 'out-of-process');
+  assert.equal(event.payload.tier, 'standard');
+  assert.equal(event.payload.outcome, 'done');
+  assert.equal(event.payload.fallbackReason, null);
+});
+
+test('logExecutorDispatch records a fallbackReason when the caller supplies one', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const event = logExecutorDispatch(fgosDir, {
+    id: 'tsk-2c1',
+    executorId: 'gather',
+    provider: 'agy',
+    command: 'agy',
+    model: 'gemini-flash',
+    fallbackReason: 'no executor configured for code:debug -- ran inline',
+  });
+  assert.equal(event.payload.fallbackReason, 'no executor configured for code:debug -- ran inline');
+});
+
 // --- CLI subcommand --cwd flag coverage ---------------------------------
 
 test('dispatch CLI execute subcommand respects --cwd flag', () => {
@@ -5161,6 +5215,43 @@ test('dispatch CLI decide subcommand respects --cwd flag', () => {
   const res = JSON.parse(out);
   assert.equal(res.mechanism, 'in-process');
   assert.equal(res.agentType, 'test');
+});
+
+test('dispatch CLI log subcommand accepts --capability/--mechanism/--tier/--fallback-reason/--outcome and records them (P4 observability)', () => {
+  const repo = mkTempGitRepo();
+  const dispatchScriptPath = path.resolve(process.cwd(), 'src/runner/dispatch.mjs');
+
+  const out = execFileSync(
+    process.execPath,
+    [
+      dispatchScriptPath,
+      'log',
+      'gather',
+      '--id',
+      'tsk-p4-cli',
+      '--provider',
+      'agy',
+      '--command',
+      'agy',
+      '--model',
+      'gemini-flash',
+      '--capability',
+      'code:review',
+      '--mechanism',
+      'out-of-process',
+      '--tier',
+      'standard',
+      '--outcome',
+      'done',
+    ],
+    { encoding: 'utf8', cwd: repo.repoRoot },
+  );
+  const event = JSON.parse(out);
+  assert.equal(event.type, 'executor.dispatch');
+  assert.equal(event.payload.capability, 'code:review');
+  assert.equal(event.payload.mechanism, 'out-of-process');
+  assert.equal(event.payload.tier, 'standard');
+  assert.equal(event.payload.outcome, 'done');
 });
 
 // --- fanout-batch and fgos schedule --candidates -------------------------
