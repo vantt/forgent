@@ -4656,6 +4656,36 @@ test('executeExecutorCli honors capabilities.<name>.overrides.tier/model directl
   assert.equal(payload.args[0], 'agy-override-model:p');
 });
 
+test('executeExecutorCli now enforces options.disallowedProviders/disallowedExecutors -- a real governance gap this function had no channel for at all before the Dispatch Core Contract Normalization unification with resolveAssignmentDispatchPolicy', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], for: ['fgos-coding-implement'], providerModel: 'gemini', allowCrossProvider: true } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'flash' } },
+    timeoutMs: 5000,
+  });
+
+  // Blocked by provider family.
+  await assert.rejects(
+    executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p', options: { disallowedProviders: ['gemini'] } }),
+    (err) => err instanceof RunnerConfigError && /governance gate rejected provider "gemini"/.test(err.message),
+  );
+
+  // Blocked by executor id, independently.
+  await assert.rejects(
+    executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p', options: { disallowedExecutors: ['agy'] } }),
+    (err) => err instanceof RunnerConfigError && /governance gate rejected executor "agy"/.test(err.message),
+  );
+
+  // A disallow list that names neither this provider nor this executor
+  // does not block -- the same dispatch still succeeds.
+  const allowed = await executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p', options: { disallowedProviders: ['some-other-provider'] } });
+  assert.equal(allowed.status, 0);
+});
+
 test('executeExecutorCli: an explicit caller-supplied --tier/--model always wins over capabilities.<name>.overrides -- overrides are a config default, never allowed to shadow a real caller request', async () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);

@@ -231,15 +231,46 @@ export function resolveAssignmentDispatchPolicy({
   // every bare-shape entry (including one whose flat `.command` is a
   // locally-swapped-in test executable that carries no real provider
   // signal of its own).
+  // Attempted follow-up, reverted (Dispatch Core Contract Normalization):
+  // falling back to a bare entry's own flat `.command` here (mirroring
+  // resolve.mjs's real-spawn derivation) is architecturally correct, but
+  // measured against the real test suite it broke 125 tests across
+  // coordination/group-thinking -- most fixtures use a bare-shape non-Claude
+  // test executor (a real script path, `process.execPath`, ...) with no
+  // declared `providerModel`, relying on this exact silent-default-to-
+  // 'claude' behavior, unrelated to what any of those tests actually probe.
+  // Checked against the real `.fgos/config.json`: every currently-registered
+  // production executor is either invocations[]-shaped (already correctly
+  // derived above) or declares `providerModel` explicitly (`claude-bwrap`,
+  // `codex-readonly`, ...) -- so live production dispatch was never exposed
+  // to the gap this would have closed, and the cross-provider
+  // `allowCrossProvider` gate in resolve.mjs's `resolveExecutorConfig`
+  // still catches a real bare-shape cross-provider executor at actual
+  // dispatch time regardless. Left as `warnIfProviderFamilyUnreliable`
+  // already recommends: declare `providerModel` explicitly on a bare-shape
+  // non-Claude executor, rather than widen this resolver's own derivation.
   const registeredExecutorCommand = registeredExecutorEntry?.invocations?.find((inv) => inv.via === 'cli')?.command;
-  const resolvedProvider = registeredExecutorEntry
-    ? deriveProviderFamily(registeredExecutorEntry, registeredExecutorCommand)
-    : isImplicitDefaultExecutor
-      ? deriveProviderFamily({ command: runnerConfig?.executor?.command }, primaryExecutor)
-      : primaryExecutor;
-  const providerSource = registeredExecutorEntry
-    ? { scope: 'registeredExecutor', id: primaryExecutor }
-    : executorSource;
+  // Explicit providerModel override channel (additive -- undefined for
+  // every pre-existing caller): lets a capability's own
+  // `overrides.providerModel` (config.mjs's `CAPABILITY_OVERRIDE_FIELDS`)
+  // retune which `modelPolicies` table this dispatch's tier resolves
+  // against, independent of the executor's own declared `providerModel`.
+  // Previously only `executeExecutorCli` (cli.mjs) read this field, via its
+  // own separate inline tier/model computation that never reached this
+  // resolver or its governance checks at all.
+  const explicitProviderModel = cliOverride.providerModel ?? opPolicy.providerModel;
+  const resolvedProvider = explicitProviderModel
+    ? explicitProviderModel
+    : registeredExecutorEntry
+      ? deriveProviderFamily(registeredExecutorEntry, registeredExecutorCommand)
+      : isImplicitDefaultExecutor
+        ? deriveProviderFamily({ command: runnerConfig?.executor?.command }, primaryExecutor)
+        : primaryExecutor;
+  const providerSource = explicitProviderModel
+    ? (cliOverride.providerModel ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId })
+    : registeredExecutorEntry
+      ? { scope: 'registeredExecutor', id: primaryExecutor }
+      : executorSource;
   let resolvedModel = null;
   // Phase 00 R7/F4: defaults to `{ scope: 'default' }` below when no
   // override/runnerConfig resolves a source -- provenance.model.source must

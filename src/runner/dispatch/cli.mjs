@@ -22,8 +22,9 @@ import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
 import { listWork, resolveWriterLogPath } from '../../state/store.mjs';
 import { appendEvent } from '../../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork } from './resolve.mjs';
+import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, EXECUTOR_ADAPTERS, DispatchError } from './transport.mjs';
 import { markRunSettled } from './visibility-session.mjs';
@@ -504,6 +505,13 @@ export async function executeExecutorCli(
     // caller that has no run directory (an ad-hoc `execute`) leaves it unset
     // and the adapter uses a private temporary one instead.
     runDir,
+    // Additive (Dispatch Core Contract Normalization follow-up): governance
+    // options (`disallowedProviders`/`disallowedExecutors`) forwarded to
+    // `resolveAssignmentDispatchPolicy` below. Undefined for every existing
+    // caller -- opens a real governance channel this function never had at
+    // all before (it computed tier/model with its own inline logic that
+    // never checked either list), without requiring any caller to opt in.
+    options,
   } = {},
 ) {
   if (!executorIdArg && !purpose) {
@@ -549,6 +557,20 @@ export async function executeExecutorCli(
   let executorId = executorIdArg;
   let resolvedExecutor;
   let capabilityOverrides;
+  // `realExecutorId`/`executorConfigured` (Dispatch Core Contract
+  // Normalization follow-up): the positional-executorIdArg branch below
+  // deliberately never reassigns `executorId` itself -- it stays as the
+  // caller's raw input (which may be capability-shaped, e.g.
+  // "fgos-coding-implement", per the comment above), while
+  // `resolveExecutorConfig` re-resolves it fresh downstream. The new
+  // resolveAssignmentDispatchPolicy() call below needs the REAL resolved
+  // executor id (e.g. "agy") for its own `preferExecutor` field, distinct
+  // from `executorId` -- and must never pass one at all when nothing
+  // resolved, since that resolver throws on an unregistered preferExecutor
+  // where THIS function's own contract never has (falls through to the
+  // global executor silently).
+  let realExecutorId;
+  let executorConfigured;
   if (!executorId) {
     const resolved = resolveExecutorAndOverrides(cfg, purpose);
     if (!resolved.executorId) {
@@ -559,10 +581,14 @@ export async function executeExecutorCli(
     executorId = resolved.executorId;
     resolvedExecutor = resolved.executor;
     capabilityOverrides = resolved.overrides;
+    realExecutorId = resolved.executorId;
+    executorConfigured = resolved.configured;
   } else {
     const resolved = resolveExecutorAndOverrides(cfg, executorId);
     resolvedExecutor = resolved.executor; // undefined when unconfigured -- falls through to the global executor below, unchanged
     capabilityOverrides = resolved.overrides;
+    realExecutorId = resolved.executorId ?? executorId;
+    executorConfigured = resolved.configured;
   }
 
   // Dispatch chokepoint visibility (both branches below): "capability" is
@@ -583,20 +609,62 @@ export async function executeExecutorCli(
   }
 
   const executor = resolvedExecutor;
-  // Precedence (D2): an explicit caller-supplied override always wins
-  // (tierOverride/modelOverride — e.g. a `--tier`/`--model` CLI flag);
-  // next, capabilities.<name>.overrides (this dispatch's own purpose
-  // asked for a different rigor than the executor's own default); next,
-  // the executor's own literal tier/model; finally the mechanical
-  // default. `capabilityOverrides?.tier`/`.model` were validated as
-  // legal fields (validateCapabilitiesShape) but never actually
-  // consulted here until this line -- found during self-review: they
-  // silently did nothing, the same class of bug D4 already found once
-  // for spawnWorker's own separate lookup.
+  // Dispatch Core Contract Normalization follow-up: governance/provenance
+  // now resolve through the SAME resolveAssignmentDispatchPolicy() every
+  // other dispatch path uses (Assignment dispatch, coordination dispatch,
+  // operation dispatch) -- this used to be a fully separate, inline
+  // computation that never consulted `options.disallowedProviders`/
+  // `.disallowedExecutors` at all, a real governance gap on the direct
+  // spawn path production dispatch actually runs (`execute --for`/`execute
+  // <executorId>`, not just Assignment-backed dispatch).
+  //
+  // The literal MODEL is still computed by the exact same formula as before
+  // (D2's precedence, untouched) and handed to the resolver as an
+  // already-resolved `cliOverride.model` -- deliberately never letting the
+  // resolver's own tier-driven model-table lookup run for this caller. That
+  // lookup (`resolvePolicyTierModel`) reads a legacy flat `cfg.models`
+  // table keyed by POLICY tier ("lightweight"/"standard"/.../"critical");
+  // `modelForTier` (used here, and by every existing `--tier`/
+  // `capabilities.overrides.tier`/`executor.tier` caller of this function)
+  // reads the SAME field name keyed by WORK tier ("light"/"standard"/
+  // "heavy") -- two genuinely incompatible legacy shapes under one config
+  // key that predate this unification; reconciling them is out of scope
+  // here. Precomputing the model sidesteps the conflict entirely: real
+  // production config always declares `modelPolicies` (provider-keyed,
+  // policy-tier), where both readings agree.
+  const rigorOverrides = capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides;
   const tier = tierOverride ?? capabilityOverrides?.tier ?? executor?.tier ?? DEFAULTS.tier;
   const model = modelOverride ?? capabilityOverrides?.model ?? executor?.model ?? modelForTier(cfg, tier, {
     providerModel: capabilityOverrides?.providerModel ?? executor?.providerModel,
-    rigorOverrides: capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides,
+    rigorOverrides,
+  });
+  // `minTier` is informational/provenance only here (nothing else raises
+  // it in this ad-hoc dispatch path -- no Work/Assignment risk
+  // classification is in play) -- translated via the SAME
+  // DEFAULT_TIER_TO_POLICY/rigorOverrides formula `modelForTier` just
+  // applied internally, so it reports the same rigor `model` was actually
+  // resolved against. A value that fails to translate (an invalid --tier)
+  // already failed inside `modelForTier` above before reaching here.
+  const policyTier = (rigorOverrides && rigorOverrides[tier]) || DEFAULT_TIER_TO_POLICY[tier];
+  resolveAssignmentDispatchPolicy({
+    assignment: {
+      operation: purpose ?? executorId,
+      role: undefined,
+      policy: {
+        minTier: policyTier,
+        providerModel: capabilityOverrides?.providerModel,
+        // Only when a real registered executor resolved -- an unconfigured
+        // executorId must fall through to resolveAssignmentDispatchPolicy's
+        // own global-executor default, exactly like resolveExecutorCommand
+        // does downstream, never throw "not a registered executor" for a
+        // case this function's own contract has never thrown for.
+        ...(executorConfigured ? { preferExecutor: realExecutorId } : {}),
+      },
+      skills: [],
+    },
+    runnerConfig: cfg,
+    cliOverride: { model },
+    options,
   });
   const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
   // Same reason as `spawnWorker`: a confinement the profile declares has to
