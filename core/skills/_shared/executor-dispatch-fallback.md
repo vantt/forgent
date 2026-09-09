@@ -27,9 +27,20 @@ parameters where the consuming skill's own reasoning step lives:
   for "reason about it yourself" (real example: "Classify it yourself"),
   the path every branch below falls through to.
 
+## Shared awareness cluster
+
+This is the dispatch half of a two-fragment shared cluster
+(`docs/history/agent-coordination-foundation/plan.md`). The planning half
+lives beside it at
+[`planning-capability-awareness.md`](./planning-capability-awareness.md)
+(assign one canonical capability per execution unit while planning); the
+capability vocabulary both fragments share lives at
+[`capability-catalog.md`](./capability-catalog.md). Neither sibling
+fragment is coding-specific.
+
 ## Activation doctrine: Decide before execute
 
-Before executing any independently executable unit (e.g. `code:implement` for coding implementation), select the canonical capability for the job and call `decide` (`node src/runner/dispatch.mjs decide --for <PURPOSE> [--has-live-task-access]`) before proceeding. The returned `mechanism` controls execution: `unavailable` means execute inline directly in this session; `in-process` or `out-of-process` delegates according to the control plane.
+Before executing any independently executable unit (e.g. `code:implement` for coding implementation), select the canonical capability for the job — see `capability-catalog.md` for the registered vocabulary — and call `decide` (`node src/runner/dispatch.mjs decide --for <PURPOSE> [--has-live-task-access]`) before proceeding. The returned `mechanism` controls execution: `unavailable` means execute inline directly in this session; `in-process` or `out-of-process` delegates according to the control plane. The resolved provider is not necessarily agent-shaped — a capability may resolve to an MCP/tool provider or another registered adapter instead of an agent executor (`capability-catalog.md`'s "Capability execution guidance"); read the resolved `mechanism`/executor `kind` rather than assuming an Agent/Task hand-off.
 
 Four valid reasons justify configuring an executor for a capability:
 a cheaper model, a different provider (e.g. Codex/agy), resource

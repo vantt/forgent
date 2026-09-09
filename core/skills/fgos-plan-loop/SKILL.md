@@ -75,6 +75,24 @@ ground truth.
   branch into the track/main branch; the coordination session itself
   never merges, and this skill never automates that merge step.
 
+## Capability awareness (planning input)
+
+This is a Work-independent, domain-agnostic planning surface — the same
+shared planning-awareness cluster the coding domain planner specializes
+applies here too:
+[`../_shared/planning-capability-awareness.md`](../_shared/planning-capability-awareness.md)
+(rule) and
+[`../_shared/capability-catalog.md`](../_shared/capability-catalog.md)
+(vocabulary). When authoring the `plan.md`/`phase-NN-*.md` files this
+skill resumes from, tag each independently executable requirement with
+its canonical capability (e.g. `code:implement`, `code:review`) — a
+planning-time signal for the Lead's own decomposition, distinct from and
+never a replacement for the per-actor `executor`/`model`/`tier` overrides
+`open.json`/`fix-N.json` declare below for team-cognition provider
+diversity. Capability annotation never pins the actor's executor; it only
+records what kind of work a requirement is, for whoever authors the next
+cell's request.
+
 ## 0. Resume: `fgos coordination chain <track>`
 
 Read-only, reconstructed entirely from each matching session's own

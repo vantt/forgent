@@ -2658,6 +2658,17 @@ sửa lại để phản ánh đúng, cùng một dòng comment lịch sử gi�
 2. **Decide-before-execute activation doctrine:** Agent chọn canonical capability từ catalog và hỏi `decide` trước khi thực hiện một execution unit (`node src/runner/dispatch.mjs decide --for code:implement [--has-live-task-access]`), chuyển dispatch identity khỏi định danh lifecycle-shaped `fgos-coding-implement`.
 3. **Planning capability awareness:** Planning (`plan.md`) ghi canonical dispatch capability cho từng executable unit độc lập, coi capability boundary làm tín hiệu split, không pin executor/provider/model.
 
+### Agent-coordination foundation — shared capability catalog & planning-awareness cluster (docs/history/agent-coordination-foundation/plan.md)
+
+#### Quyết định
+
+1. **Một shared awareness cluster, không phải hai chỗ rời rạc.** Global planning-awareness prose (`core/skills/_shared/planning-capability-awareness.md`) sống cạnh dispatch-awareness prose đã có (`core/skills/_shared/executor-dispatch-fallback.md`), cross-reference lẫn nhau, cùng đọc một catalog dùng chung (`core/skills/_shared/capability-catalog.md`). Domain planner (coding, và bất kỳ planning surface nào khác — kể cả track Work-independent qua `fgos-plan-loop`) đặc-biệt-hóa cluster này, không định nghĩa lại routing doctrine của nó.
+2. **Catalog phân biệt generic vs `domain:capability`**, không bao giờ ghi provider/model/tier/executor vào tên capability hay vào một plan. `prefer` là mối quan tâm config/execution-time (`resolveExecutorAndOverrides`), chưa từng là planning artifact.
+3. **Capability execution guidance:** một capability có thể được resolve tới agent executor HOẶC MCP/tool provider HOẶC adapter khác đã đăng ký (`EXECUTOR_KINDS = ['agent', 'tool']`; ví dụ sống: `impact-analysis` → `gitnexus`, `kind: "tool"`, `via: "mcp"`). `decide` không giả định mọi capability đều agent-shaped.
+4. **P2-runtime mở rộng theo tần suất quan sát được:** thêm `code:review`, `code:test`, `code:debug`, `code:refactor` vào `DEFAULT_CAPABILITY_SLOTS`, cùng khuôn mẫu không-pin-executor như `code:implement`. Không tạo capability `research` — `fgos-researching` là skill/workflow, không phải capability; research dùng capability cụ thể (ví dụ `impact-analysis`) khi thật sự cần dispatch, còn browser/web/repo-search vẫn là primitive tool call inline, không kích hoạt `decide`.
+5. **`decide-before-dispatch` là thuật ngữ lịch sử**, không phải một gate độc lập song song với `decide-before-execute`. Chỉ một điểm kích hoạt: ngay trước khi một execution unit thực thi.
+6. **Group cognition không đổi ranh giới đã có:** `fgos-group-thinking` vẫn là cổng chọn protocol mỏng trước `fgos coordination run/show`, điều phối nhiều research contribution nhưng không thay thế hay nhân bản `fgos-researching`; per-actor executor/model/tier override cho team-cognition (diversity giữa các provider) giữ nguyên, tách biệt khỏi capability annotation ở planning time.
+
 ### 0035 — Ranh giới tin cậy của cổng mutation-gate: caller trong-tiến-trình cùng lớp tin cậy với user, không phải kẻ tấn công
 
 #### Quyết định

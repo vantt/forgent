@@ -1673,6 +1673,26 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
     description:
       'Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)',
   },
+  // P2-runtime (docs/history/agent-coordination-foundation/plan.md):
+  // extended by observed frequency, in this priority order. Deliberately
+  // no `prefer`/`overrides` here either, same reasoning as `code:implement`
+  // above -- a curated default never pins which executor serves it.
+  'code:review': {
+    description:
+      'Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+  },
+  'code:test': {
+    description:
+      'Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+  },
+  'code:debug': {
+    description:
+      'Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+  },
+  'code:refactor': {
+    description:
+      'Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+  },
 });
 
 // tsk-47r: `pi` as a second `agent`-kind executor, layered onto this SAME
@@ -1748,6 +1768,13 @@ registerConfigDefault({
 // "missing", so `mergeConfigDefaults` has nothing to add, and `decide
 // --for advise`/`--for execute` would still fail validateCapabilitiesShape
 // with no doctor signal pointing at why.
+// Checked names are every curated slot `DEFAULT_CAPABILITY_SLOTS` declares
+// (D1, docs/history/agent-coordination-foundation/plan.md's P2-runtime) --
+// generalized from the original fixed ['advise', 'execute', 'code:implement']
+// list so a future curated addition is covered by this SAME check without a
+// second, drifting hardcoded list.
+const CURATED_CAPABILITY_NAMES = Object.keys(DEFAULT_CAPABILITY_SLOTS);
+
 function checkAdviseExecuteCapabilitiesConfigured(cwd) {
   const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
   if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
@@ -1756,7 +1783,7 @@ function checkAdviseExecuteCapabilitiesConfigured(cwd) {
       message: 'runner.capabilities section missing -- run fgos setup (decide --for advise/execute/code:implement cannot resolve until it exists)',
     };
   }
-  const missing = ['advise', 'execute', 'code:implement'].filter(
+  const missing = CURATED_CAPABILITY_NAMES.filter(
     (name) => !capabilities[name] || typeof capabilities[name] !== 'object' || Array.isArray(capabilities[name]),
   );
   if (missing.length > 0) {
@@ -1765,7 +1792,11 @@ function checkAdviseExecuteCapabilitiesConfigured(cwd) {
       message: `runner.capabilities is missing or has a malformed slot for: ${missing.join(', ')} -- run fgos setup`,
     };
   }
-  return { passed: true, message: 'runner.capabilities declares "advise", "execute", and "code:implement"' };
+  const extras = CURATED_CAPABILITY_NAMES.filter((name) => !['advise', 'execute', 'code:implement'].includes(name));
+  return {
+    passed: true,
+    message: `runner.capabilities declares "advise", "execute", and "code:implement" (plus ${extras.join(', ')})`,
+  };
 }
 
 registerCheck({

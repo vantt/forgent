@@ -34,6 +34,20 @@ in this file — reading a protocol's own declared graph, not this skill's
 prose, is how you learn what RFC-Review-Lite, Nominal-Group-Lite, or
 Delphi-Feedback-Lite actually do.
 
+## Role split: coordinates research, is never the researcher
+
+This skill coordinates multiple contributions — deliberation, independent
+research passes, cross-provider review, synthesis — across several
+actors through a registered protocol. It never replaces
+[`fgos-researching`](../fgos-researching/SKILL.md) (the single-agent
+"turn one question into one grounded finding" workflow) and never becomes
+a second research engine of its own: it has no research logic, no
+repo/web-search step, and no finding format of its own. A single research
+question stays with `fgos-researching`; this skill only enters when
+several agents' contributions genuinely need coordinating — e.g. several
+research passes need synthesizing, or the same question needs
+cross-provider review.
+
 ## 1. See which protocols are registered
 
 ```bash

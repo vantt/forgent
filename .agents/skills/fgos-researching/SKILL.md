@@ -25,6 +25,17 @@ verdict; it never guesses past a gap.
 
 ## Hard rules
 
+- **This skill is a workflow, never a capability (ontology boundary).**
+  `fgos-researching` itself is never a valid `decide --for` argument, and
+  no capability named `research` (or similar) is ever registered — see
+  `../_shared/capability-catalog.md`'s "Ontology boundary" section. When a
+  branch of a question genuinely needs a dispatched capability (for
+  example a code-graph blast-radius lookup via `impact-analysis`), ask
+  `decide` for that concrete capability per
+  `../_shared/executor-dispatch-fallback.md`. Repo search and external
+  lookups stay primitive tool calls (`Grep`/`rg`, `WebSearch`, `WebFetch`)
+  made inline inside this skill's own reasoning — never independently
+  executable units of their own, never a reason to call `decide`.
 - **Stage-agnostic (D4).** Never read or assume the caller's `stage`. Input
   is exactly *(the goal/question, and everything already known — item
   description, prior Q&A, prior verdicts)*. Output is exactly *(findings,

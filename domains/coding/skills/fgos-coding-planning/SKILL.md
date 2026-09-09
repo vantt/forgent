@@ -108,7 +108,9 @@ mechanics: `references/approach-and-shape.md`.
 
 ### Step 4: Decide the split, if any
 Some items are one honest piece; others need to become several
-independently workable ones. Each independently executable piece described in `plan.md` (whether pass-through or split child) must specify its canonical dispatch capability — for coding implementation execution, use `code:implement`. Capability boundaries serve as a decomposition signal (units needing different capabilities should be split), not a forced over-splitting rule. Never pin executor, provider, or model names in `plan.md` — execution-time `decide` is the sole authority for dispatch selection. If a split is right, write each piece's spec
+independently workable ones. Each independently executable piece described in `plan.md` (whether pass-through or split child) must specify its canonical dispatch capability, per the shared cluster this planner specializes:
+`../../../core/skills/_shared/planning-capability-awareness.md` (rule) and
+`../../../core/skills/_shared/capability-catalog.md` (vocabulary) — for coding implementation execution, use `code:implement`; a piece that is independently reviewable, testable, or debuggable in its own right uses `code:review`/`code:test`/`code:debug` instead. Capability boundaries serve as a decomposition signal (units needing different capabilities should be split), not a forced over-splitting rule. Never pin executor, provider, or model names in `plan.md` — execution-time `decide` is the sole authority for dispatch selection. If a split is right, write each piece's spec
 into `plan.md` as a validated JSON array and **create nothing** — no work
 item exists until `fgos-coding-validating` materializes them at the
 single gate. For a split root item, sync a still-placeholder `verify`
