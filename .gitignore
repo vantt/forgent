@@ -23,6 +23,7 @@
 .fgos/runtime/
 .fgos/assignments/
 .fgos/coordination/
+.fgos/dispatch-runs/
 cache/
 node_modules/
 

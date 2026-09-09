@@ -203,34 +203,37 @@ validated, never automatically dispatched as failover.
 An explicit executor override remains visible as an override; it must not
 silently replace the requested capability's own provenance.
 
-**Implementation status — real, tracked gap.** `compileDispatchPlan()`
-(`src/runner/dispatch/plan.mjs`) today returns
-`{selector, caller, mechanism, executorId, capability, invocation,
-governance, reasonCodes, configured}`. It does **not** carry
-`bindingSource`, `tier`, `model`, `providerModel`, or a structured
-`provenance` object. Those fields are computed by a second call,
-`resolveAssignmentDispatchPolicy()`, and `assignment-runner.mjs` calls both
-and then explicitly cross-checks them:
+**Implementation status.** Implemented for dispatchable plans.
+`compileDispatchPlan()` (`src/runner/dispatch/plan.mjs`) returns the legacy
+selector/mechanism fields plus `bindingSource`, `tier`, `model`,
+`providerModel`, structured field-level `provenance`, and the complete
+merged `policy`. It delegates those policy fields to
+`resolveAssignmentDispatchPolicy()` rather than re-deriving them, and
+`assignment-runner.mjs` now reads `compiledPlan.policy` directly instead of
+calling the policy resolver a second time.
 
-```txt
-compiledPlan = compileDispatchPlan(...)
-effectivePolicy = resolveAssignmentDispatchPolicy(...)
-if compiledPlan.executorId !== effectivePolicy.executorPreference[0]:
-  throw "dispatch decide mismatch"
-```
+For a real Assignment, policy resolution failure or a
+decided-executor-versus-policy-executor mismatch remains a hard
+`RunnerConfigError`. For a non-Assignment compatibility request
+(`decide --for`, `decide <executor-id>`, `decide --work`), `plan.mjs`
+synthesizes the smallest policy object needed for observability:
+`preferExecutor` is the already-selected executor, and capability
+`overrides.providerModel`/`overrides.model`/`overrides.tier`/
+`overrides.rigorOverrides` are folded into the synthesized policy so the
+reported model/tier matches the same capability-default path used by
+execution. If that synthesized policy would disagree with an explicit caller
+override, the plan stays dispatchable and records
+`policy.executor-mismatch-ignored`; the optional policy fields are left
+unset rather than turning a legacy `decide` probe into a thrown error.
 
-This is not a second private resolver — both calls read the same
-`runner.capabilities`/`runner.executors` config and the mismatch is asserted,
-not silently tolerated — but it is two objects doing overlapping work where
-the target contract wants one. Unifying them so `compileDispatchPlan()`
-either calls `resolveAssignmentDispatchPolicy()` internally or the two are
-merged into one canonical `DispatchPlan` return value is Slice D/E scope in
-the normalization plan; `compileDispatchPlan` remains the sole execution
-chooser either way.
+Governance-blocked and genuinely unavailable plans also leave
+`tier`/`model`/`providerModel`/`provenance`/`policy` unset so they never
+publish a partial policy for a Run that will not launch.
 
 `selector.type: 'purpose'` in the current implementation corresponds to
 `requestedTarget.kind: 'capability'` in the target contract above (see
-Routing Identities).
+Routing Identities). It is a compatibility label on the public shape, not a
+semantic third identity.
 
 ## Executor Kinds
 

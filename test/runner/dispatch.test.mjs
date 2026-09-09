@@ -5994,6 +5994,39 @@ test('compileDispatchPlan merges the same fields for a --for capability selector
   assert.equal(plan.policy.executorPreference[0], 'agy');
 });
 
+test('compileDispatchPlan applies capability overrides when synthesizing policy for a --for capability selector', () => {
+  const cfg = {
+    executors: {
+      'agy-herdr': {
+        kind: 'agent',
+        invocations: [{ via: 'cli', adapter: 'herdr-spawn', command: 'agy', args: ['{prompt}', '--model', '{model}'] }],
+        providerModel: 'gemini',
+        allowCrossProvider: true,
+      },
+    },
+    capabilities: {
+      'fgos-coding-implement': {
+        prefer: 'agy-herdr',
+        overrides: {
+          providerModel: 'gemini',
+          rigorOverrides: { standard: 'lightweight' },
+        },
+      },
+    },
+    modelPolicies: {
+      gemini: { lightweight: 'gemini-flash-medium', standard: 'gemini-flash-high' },
+    },
+  };
+
+  const plan = compileDispatchPlan(cfg, { for: 'fgos-coding-implement' });
+  assert.equal(plan.executorId, 'agy-herdr');
+  assert.equal(plan.bindingSource, 'capability.prefer');
+  assert.equal(plan.providerModel, 'gemini');
+  assert.equal(plan.tier, 'lightweight');
+  assert.equal(plan.model, 'gemini-flash-medium');
+  assert.equal(plan.provenance.provider.value, 'gemini');
+});
+
 test('compileDispatchPlan records bindingSource: capability.for when resolution falls through to an executor\'s own "for" array (no capabilities.<name>.prefer)', () => {
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },

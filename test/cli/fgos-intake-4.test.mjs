@@ -322,13 +322,15 @@ test('ask/answer round-trip on a genuinely legacy durable-doing item (no claim):
 
   const askResult = run(cwd, ['ask', 'gated-legacy-doing-item', '--text', VALID_ASK_TEXT]);
   assert.equal(askResult.status, 0);
-  // seq 1 = addOk's work.add, seq 2 = moveToDurableDoingForTest's own
-  // work.move -- both real events on this item's log before ask ever runs.
-  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-legacy-doing-item', from: 'doing', to: 'awaiting-human', seq: 3 });
+  // moveToDurableDoingForTest writes the legacy work.move into the baseline
+  // writer log, while addOk writes work.add through the CLI's event-shard
+  // writer. Sequence numbers are per physical writer log, so ask is seq 2
+  // in the baseline log even though eventLines(cwd) sees both records.
+  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-legacy-doing-item', from: 'doing', to: 'awaiting-human', seq: 2 });
 
   const answerResult = run(cwd, ['answer', 'gated-legacy-doing-item', '--text', 'OAuth']);
   assert.equal(answerResult.status, 0);
-  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-legacy-doing-item', from: 'awaiting-human', to: 'todo', seq: 4 });
+  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-legacy-doing-item', from: 'awaiting-human', to: 'todo', seq: 3 });
   assert.equal(stateView(cwd).work['gated-legacy-doing-item'].status, 'todo');
 });
 
