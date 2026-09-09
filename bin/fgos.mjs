@@ -96,7 +96,7 @@ import {
   formatLockDurationMs,
 } from '../src/runner/main-checkout-lock.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
-import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
+import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
@@ -4960,6 +4960,36 @@ const STORE_MISSING_WARNING_VERBS = new Set([
   'gate-bypass', 'doc-sources', 'lock-status', 'evolve', 'recheck-blocked',
 ]);
 
+// State/root-resolution investigation (docs/history/agent-coordination-state-root):
+// a worktree made OUTSIDE fgOS's own lifecycle (a plain `git worktree add`,
+// or an external harness's own worktree tool -- never `fgos pick`/`take`'s
+// `createWorktree`, which strips `.fgos/` per ADR0020, nor `fgos session
+// start`, which symlinks it) inherits a REAL, git-tracked, but
+// frozen-at-branch-point `.fgos/` snapshot. Because `.fgos/` exists there,
+// the `requiresExistingStore` ENOENT guard just above never fires, and
+// `dataDir()`'s cwd-strict resolution (D5) silently accepts that
+// disconnected snapshot as if it were the live store.
+//
+// This set is deliberately a hand-verified ALLOWLIST, not `entry.touchesState`
+// (RFC-review-lite round `coord_state_root_rfc_20260909`, objector-a: the
+// registry's own `touchesState` flag is too coarse -- it is `true` for
+// several verbs that also have a legitimate read-only invocation shape --
+// `evolve` (bare vs. `--pick`), `coordination` (`show`/`chain` vs. `run`),
+// `session` (`list` vs. `start`/`end`), `goal` (`show` vs. `set`), `tool`
+// (`query` vs. others), `merge` (`list` vs. `next`), `setup`/`doctor`
+// (diagnostic by default) -- a blanket guard keyed on `touchesState` would
+// false-positive on those real read-only workflows. Every verb below was
+// individually read in this file's own `case` block and confirmed to take
+// a single id/text argument with no subcommand branching -- always
+// mutating when it reaches its handler at all. `approve`/`sync-root`/
+// `promote-to-component`/`catchup`/`unclaim` are deliberately NOT here:
+// each already computes its own `repoRoot` (see their own case blocks'
+// comments) and is independently guarded by `isMainWorktree` or an
+// explicit `--dir`-derived root — adding a second, redundant guard on
+// `dir` alone would risk diverging from their own existing, tested
+// refusal text for no new coverage.
+const MUTATING_ONLY_VERBS = new Set(['submit', 'take', 'pick', 'move', 'edit', 'ask', 'answer', 'gate-approve', 'reject']);
+
 async function main() {
   const [, , verb, ...rest] = process.argv;
 
@@ -5004,6 +5034,31 @@ async function main() {
       throw new StoreError(
         'validation',
         `.fgos/ not found at "${dir}" -- run "fgos init" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,
+      );
+    }
+    // State/root-resolution investigation: `.fgos/` DOES exist at `dir` here
+    // (the ENOENT case above already returned/threw), so the phantom-store
+    // hazard is closed, but a disconnected-snapshot hazard remains — a
+    // worktree made outside fgOS's own lifecycle carries a real, frozen
+    // `.fgos/` copy that reads/writes here would silently target instead of
+    // the live main store. Skipped entirely when `--dir` was passed
+    // explicitly (tsk-56t D1's own escape hatch — the caller took
+    // responsibility for that root already, evaluating `isMainWorktree`/
+    // `isSessionWorktree` against `process.cwd()` in that case would check
+    // the wrong root). `isSessionWorktree` (never just a bare `.fgos`
+    // symlink presence check — see its own doc comment) admits the one
+    // other legitimate non-main case, `fgos session start`.
+    faultClass = 'disconnected-worktree-store';
+    if (
+      flags.dir === undefined &&
+      MUTATING_ONLY_VERBS.has(verb) &&
+      !isMainWorktree(process.cwd()) &&
+      !isSessionWorktree(process.cwd())
+    ) {
+      throw new StoreError(
+        'validation',
+        `"${verb}" refused: "${process.cwd()}" is a linked worktree whose .fgos/ at "${dir}" is a real but disconnected snapshot, never the shared store outside "fgos pick"/"fgos take" (ADR0020-stripped) or "fgos session start" (symlinked) -- pass --dir <mainRoot> to reach the real store explicitly, e.g. ` +
+          '`--dir "$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)"`.',
       );
     }
     faultClass = 'init-in-worktree';
