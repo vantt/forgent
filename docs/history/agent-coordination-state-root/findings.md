@@ -5,11 +5,12 @@ RFC reviewed: `docs/history/agent-coordination-state-root/rfc-state-root-fix.md`
 
 ## Conclusion: [DONE]
 
-Root cause confirmed with convergent cross-provider evidence. A safe, bounded,
-tested unit of the fix shipped (`isSessionWorktree`). The riskier guard-wiring
-into CLI dispatch is deliberately deferred — Pass 4's explicit "no safe bounded
-fix without more design → park and document" outcome, applied narrowly (only
-to the wiring, not to the whole investigation).
+Root cause confirmed with convergent cross-provider evidence. `isSessionWorktree`
+shipped, then wired into `bin/fgos.mjs`'s CLI dispatch as a hand-verified,
+scoped guard (§4/§5 below — this section was revised after the guard-wiring
+originally deferred in §5 was completed in a follow-up round of this same
+session, commit `692076c6`). Full suite: 5885 tests, 5878 pass, 0 fail, 7
+skipped, zero regressions.
 
 ## 1. Root-cause decision
 
@@ -128,28 +129,48 @@ test suites above plus the architecture layering test; `isSessionWorktree`
 is a new, additive export with no existing call site, so blast radius is
 inherently zero until a follow-up wires it in.
 
-## 5. Deferred: guard-wiring into `dataDir()` / CLI verbs
+## 5. Guard-wiring into `bin/fgos.mjs`'s CLI dispatch (commit `692076c6`)
 
-Not implemented this round — needs its own scoped design pass, not a rushed
-addition, because both objectors surfaced real specification gaps:
+Initially deferred pending a scoped design pass; completed in a follow-up
+round of this same session once that design was worked out:
 
-- Which verbs are unambiguously mutating (safe to hard-refuse) vs. mixed-mode
-  (need per-invocation, not per-verb, classification)? `submit`/`pick`/
-  `take`/`move`/`return`/`edit`/`ask`/`answer` look unambiguous but were not
-  individually re-verified against `command-registry.mjs` in this round.
-- The two `main-checkout-lock-hook` fixtures that deliberately write
-  non-main local `.fgos` state must be explicitly exempted, not broken.
-- The acceptance criteria's 5-scenario regression matrix (main checkout,
-  linked worktree, explicit `--dir`, pick/return/approve, concurrent/session
-  invocation) is real test-writing work, not safe to compress into this
-  already-long session.
+- **Per-invocation classification, not `touchesState`.** `MUTATING_ONLY_VERBS`
+  is a hand-verified allowlist (`submit`, `take`, `pick`, `move`, `edit`,
+  `ask`, `answer`, `gate-approve`, `reject`) — each verb's own `case` block in
+  `bin/fgos.mjs` was individually read and confirmed to take a single
+  id/text argument with no subcommand branching (always mutating when
+  reached). Confirmed mixed-mode and explicitly excluded: `evolve` (bare vs.
+  `--pick`), `coordination` (`show`/`chain` vs. `run`), `session` (`list`
+  vs. `start`/`end`), `goal` (`show` vs. `set`), `tool` (`query` vs.
+  others), `merge` (`list` vs. `next` — found during this verification, not
+  named by either objector), `setup`/`doctor` (diagnostic by default).
+- **`approve`/`sync-root`/`promote-to-component`/`catchup`/`unclaim`
+  deliberately excluded** — each already computes its own `repoRoot`
+  (independent of the state-store `dir`) and is independently guarded via
+  `isMainWorktree` or an explicit `--dir`-derived root; a second guard on
+  `dir` alone would risk diverging from their own existing, tested refusal
+  text for no new coverage.
+- **The `main-checkout-lock-hook` fixtures are unaffected by construction**:
+  they exercise a git hook (`main-checkout-lock.mjs`, invoked at `git commit`
+  time) writing `.fgos/main-checkout.lock` directly — a completely separate
+  code path from `bin/fgos.mjs`'s CLI verb dispatch, never touched by this
+  guard.
+- **Bypass:** skipped entirely when `--dir` is passed explicitly (D1's own
+  escape hatch — the caller took responsibility for that root already).
+- **Admits the one other legitimate case:** `isSessionWorktree(repoRoot)`.
 
-**Recommendation:** file a follow-up coding-domain item ("wire
-`isSessionWorktree` + a per-invocation mutation guard into `dataDir()`")
-scoped explicitly to the two gaps above, owned separately from this P0
-stream. `approve`'s own main-checkout guard (`isMainWorktree`, STR44/P44)
-already independently satisfies "approve still refuses to land from any
-linked worktree" — no change needed there.
+5 regression scenarios (`test/cli/fgos-disconnected-worktree-guard.test.mjs`):
+main checkout (unaffected), a real ad-hoc `git worktree add` carrying a
+git-tracked disconnected `.fgos/` (refused, exit 4, points at `--dir`), the
+same disconnected worktree with `--dir <mainRoot>` (bypasses, the event
+lands in main's own store — verified by event count), a genuine `fgos
+session start` worktree (unaffected), and a non-`MUTATING_ONLY_VERBS` verb
+(`list`) from the same disconnected worktree (unaffected). The 5th
+acceptance scenario, pick/return/approve, is proven by the existing
+`fgos-claim*`/`fgos-approve*`/`fgos-post-merge*` suites staying green
+unchanged, not duplicated.
+
+Full suite: 5885 tests, 5878 pass, 0 fail, 7 skipped, 0 regressions.
 
 ## 6. Recovery runbook for a disconnected store (proposed, not executed)
 
@@ -186,7 +207,7 @@ worktree, `forgentX-worker-isolation`)
 
 | id | class | do now? | reason / evidence |
 |---|---|---|---|
-| tsk-oyc | **root cause** | merge | Describes exactly this defect ("worker `.fgos` writes land in a disconnected store"). Recommend linking it to this investigation's findings/commit rather than duplicating scope; the deferred guard-wiring (§5) is its natural follow-up. |
+| tsk-oyc | **root cause** | merge | Describes exactly this defect ("worker `.fgos` writes land in a disconnected store"). Recommend linking it to this investigation's findings/commits (`8033890a`, `692076c6`) rather than duplicating scope; extending the guard to the remaining `touchesState:true` verbs (§8) is its natural follow-up. |
 | tsk-5x7-1 | **reproducer** | do now (recovery only, from main) | Live divergence confirmed (§2/§6) — apply the §6 runbook from the real main checkout, not a code fix. |
 | tsk-3rg5 | root-cause-adjacent | defer | "approve: dirty tracked `.fgos/*` in main checkout" — same architecture (`.fgos` is ordinary git-tracked content), different symptom, already has its own owner (`doing`). Cross-link, don't duplicate. |
 | tsk-5rg | root-cause-adjacent | defer | "approve/move state event disappears" — same architecture family, own owner (`doing`). Cross-link. |
@@ -221,7 +242,17 @@ in every store.
   so it isn't lost.
 - `forgentX-worker-isolation`'s disconnected store still holds `tsk-5x7-1`'s
   un-reconciled progress; §6's runbook is proposed, not applied.
-- The guard-wiring deferral (§5) means the underlying defect (an ad-hoc
-  worktree can still silently read/write a disconnected `.fgos`) is
-  unchanged in this commit — `isSessionWorktree` is a building block, not
-  yet load-bearing anywhere.
+- The guard (§5) covers `MUTATING_ONLY_VERBS` only (9 verbs). `goal`, `tool`,
+  `topic`, `doc`, `knowledge`, `decision`, `report`, `handoff`,
+  `handoff-return`, `resolve-park-reason`, `rebuild`, `repair`,
+  `retrospective`, `cleanup`, `compound`, `discover`, `plan`, `add`,
+  `unlock`, `session start/end`, `gateway`, `coordination run` are all
+  `touchesState:true` but were NOT individually re-verified for hidden
+  read-only sub-invocations in this round and are NOT guarded — an ad-hoc
+  disconnected worktree can still silently write through any of these. A
+  follow-up should extend the same per-invocation audit to this remainder,
+  or (cleaner) push the check down to wherever each of these actually
+  writes, once that's confirmed not to violate the kernel/infra layering
+  rule (`store.mjs` cannot import `isMainWorktree`/`isSessionWorktree`
+  directly — both are infra, `store.mjs` is kernel; `test/architecture.test.mjs`
+  enforces this).
