@@ -18,6 +18,29 @@ providers, models, and tiers with two explicit primitives:
 This plan covers P1–P4 only. State/root-resolution work is deliberately
 separate in `docs/history/agent-coordination-state-root/prompt.md`.
 
+## Shared global-awareness cluster
+
+The repository already has global dispatch awareness prose in
+`core/skills/_shared/executor-dispatch-fallback.md`. Global planning awareness
+must live beside it as one coherent shared instruction cluster, not as a rule
+hidden only inside the coding planner.
+
+The cluster has two complementary responsibilities:
+
+```text
+planning awareness:
+  identify the canonical capability for each independent execution unit
+
+dispatch awareness:
+  decide-before-execute for that capability immediately before execution
+```
+
+Both layers must use the same capability vocabulary and the same generic /
+`domain:capability` identity rules. Domain planners specialize the shared
+cluster; they do not redefine its routing doctrine. A stranger agent should
+be able to read the shared cluster and understand both what to write into a
+plan and what to ask dispatch at execution time.
+
 ## Locked direction
 
 - Planning records a canonical capability for each independently executable
@@ -86,7 +109,8 @@ Acceptance:
 
 ### P1 — global planning capability awareness
 
-Add a shared planning instruction layer consumed by every domain planner.
+Add the planning half of the global-awareness cluster next to the existing
+dispatch fragment, then make every domain planner consume that shared layer.
 
 Required behavior:
 
@@ -100,11 +124,19 @@ decompose a plan into execution units
 The coding planner remains a domain specialization and maps implementation to
 `code:implement`; it must not be the only place where this rule exists.
 
+The shared planning and dispatch fragments should cross-reference each other
+without duplicating or contradicting the doctrine. Keep the execution-time
+`decide-before-execute` rule in the dispatch fragment and the plan annotation
+rule in the planning fragment; neither fragment should become a lifecycle or
+Work-schema rule.
+
 Acceptance:
 
 - a non-coding planner also emits capability annotations;
 - plans with missing capability are identifiable before execution;
 - capability annotations do not create Work items or lifecycle transitions.
+- a stranger agent can discover both global awareness fragments from the core
+  skill cluster without first loading a coding-domain skill;
 
 ### P2-runtime — expand useful capabilities
 
