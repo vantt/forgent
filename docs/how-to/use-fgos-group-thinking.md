@@ -1,11 +1,15 @@
-# How to use the `fgos-group-thinking` skill
+# How to use group thinking
 
-Three pre-registered coordination protocols — RFC-Review-Lite,
-Nominal-Group-Lite, Delphi-Feedback-Lite — reachable through one gate,
-`fgos-group-thinking`, that adds exactly one thing over the plain
-`fgos coordination run --file` door: you must name an already-registered
-protocol id before anything runs. It never selects, infers, or defaults a
-protocol for you.
+Start with the outcome in ordinary language. For example: "review this proposal
+with a panel", "compare these three options", "red-team this decision", or
+"get independent opinions before I commit". `fgos-panel` selects the matching
+use-case preset; it never asks you for a protocol id.
+
+The lower-level `fgos-group-thinking` skill remains the pack gate. Its caller
+must name a registered protocol id before anything runs, but that caller is the
+surface skill or an operator, not the end user. The canonical preset map and
+the core/surface boundary live in the
+[Group Thinking Trigger Surface](../architect/agent-coordination/architecture/group-thinking-trigger-surface.md).
 
 This guide is deliberately example-driven. Every request file below is a
 real, committed, end-to-end-tested example (`docs/how-to/coordination-examples/`)
@@ -15,7 +19,7 @@ this guide's own prose; read the skill's own `SKILL.md`
 (`core/skills/fgos-group-thinking/SKILL.md`) for the full mechanism and the
 five bypasses it structurally cannot allow.
 
-## Before you start: see what's registered
+## Operator path: see what's registered
 
 ```bash
 node -e "

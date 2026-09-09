@@ -15,7 +15,9 @@ description: >-
   second/third opinion, not a whole multi-cell track. Examples: "implement
   this fix and get it reviewed+red-teamed", "run a code panel on this
   change", "get an independent review and red-team on this patch before I
-  merge it".
+  merge it". Do not use for advisory coding decisions such as plugin versus
+  core, option comparison, or architecture red-team; those route through
+  fgos-panel without mutation.
 ---
 
 This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.

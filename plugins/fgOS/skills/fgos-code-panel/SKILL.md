@@ -15,10 +15,18 @@ description: >-
   second/third opinion, not a whole multi-cell track. Examples: "implement
   this fix and get it reviewed+red-teamed", "run a code panel on this
   change", "get an independent review and red-team on this patch before I
-  merge it".
+  merge it". Do not use for advisory coding decisions such as plugin versus
+  core, option comparison, or architecture red-team; those route through
+  fgos-panel without mutation.
 ---
 
 # fgos-code-panel
+
+Despite the short name, this is a mutating implementation workflow. A request
+for a "coding panel" does not select it unless the person explicitly asks to
+implement/change/fix code. Advisory coding design and architecture choices
+start at [`fgos-panel`](../fgos-panel/SKILL.md), which routes without granting
+mutation authority.
 
 Dispatches through the exact same CoordinationSession engine
 ([`session-engine.mjs`](../../../src/runner/coordination/session-engine.mjs)),

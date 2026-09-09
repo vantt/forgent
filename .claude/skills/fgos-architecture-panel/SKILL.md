@@ -17,6 +17,8 @@ description: >-
   or keep it one", "get me a real panel opinion on this pipeline
   redesign, not just your take", "I disagree with the recommendation,
   here's why", "what would change your mind about that Postgres call".
+  This is advisory and can be selected by fgos-panel; it never implements
+  the chosen architecture.
 ---
 
 This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.

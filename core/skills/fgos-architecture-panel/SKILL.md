@@ -17,9 +17,18 @@ description: >-
   or keep it one", "get me a real panel opinion on this pipeline
   redesign, not just your take", "I disagree with the recommendation,
   here's why", "what would change your mind about that Postgres call".
+  This is advisory and can be selected by fgos-panel; it never implements
+  the chosen architecture.
 ---
 
 # fgos-architecture-panel
+
+This is the specialist surface for software-architecture advice. Generic
+business/product/policy panels start at
+[`fgos-panel`](../fgos-panel/SKILL.md). A coding design question belongs here
+when it needs repository-grounded alternatives and a recommendation; an
+explicit request to implement a concrete change belongs to `fgos-code-panel`
+only after the advice/implementation boundary is clear.
 
 Dispatches through the real, registered
 [`core.coordination-protocol.architecture-advisory-panel-v1`](../../../core/coordination-protocols/architecture-advisory-panel-v1.yaml)
