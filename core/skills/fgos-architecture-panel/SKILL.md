@@ -176,8 +176,8 @@ picture of what V1 bounds.
 
 ## Executor Roster, With Cognitive Rationale
 
-> **Executor registration — verified live (P05.2, `tsk-1o4` closed).**
-> `claude-bwrap`, `agy-bwrap`, and `codex-readonly` are registered in this
+> **Executor registration — verified live.**
+> `claude-bwrap`, `agy-bwrap`, and `codex-bwrap` are registered in this
 > repository's `.fgos/config.json` and dispatch for real through `fgos
 > coordination run`. Reconfirm before a session if the config may have
 > changed since: `node src/runner/dispatch.mjs decide claude-bwrap
@@ -192,28 +192,55 @@ picture of what V1 bounds.
 > cell falsifying and excluding (`claude-reviewer`); do not forward the
 > roster through `fgos coordination run` while that is the answer.
 >
-> Two real caveats P05.2 found closing the registration, both already
-> folded into the registered config rather than left as manual
-> workarounds: `claude-bwrap`/`agy-bwrap`'s bwrap mount adds one
-> additive writable exception, this repository's own `.fgos/assignments`
-> — the coordination engine writes/reads `agent-result.json` there
-> regardless of the target project's own `--cwd`, so a fully read-only
-> mount left every dispatch stuck at "no-evidence" even with a correct
-> agent-side result; and `codex-readonly`'s `-s read-only` has no
-> writable-exception mechanism and bwrap-wrapping it crashes it (`os
-> error 30`), so it stays usable for pure read-only advisory roles (its
-> intended use here) but cannot serve a role whose `expectedOutputs`
-> requires a written result file. See "Known Gaps" below for two further,
-> still-open gaps the same pass surfaced (`tsk-31d`, `tsk-oed`) and
-> `P05.2.md` for full evidence.
+> **`codex-readonly` is retired for dispatch — never bind it to a role.**
+> `-s read-only` has no writable-exception mechanism, so a dispatched
+> agent can never write the `agent-result.json` that
+> `assignment-runner.mjs` requires: every dispatch settles `no-evidence`
+> no matter how good the findings were. Confirmed live (a real panel
+> dispatch failed exactly this way and had to be retried on another
+> executor) and by probe — `-s read-only --add-dir <dir>` still grants no
+> write, matching the CLI's documented design (`--add-dir` is meaningful
+> only under `workspace-write`, and `workspace-write` would make the
+> target project writable, which is the thing confinement exists to
+> prevent). `codex-bwrap` replaces it: same provider family, OS-level
+> confinement, real write path for its own result.
+>
+> Three real caveats already folded into the registered config rather
+> than left as manual workarounds. (1) `claude-bwrap`/`agy-bwrap`'s bwrap
+> mount adds one additive writable exception, this repository's own
+> `.fgos/assignments` — the coordination engine writes/reads
+> `agent-result.json` there regardless of the target project's own
+> `--cwd`, so a fully read-only mount left every dispatch stuck at
+> "no-evidence" even with a correct agent-side result. (2) `agy-bwrap`
+> carries `--print-timeout 30m`; without it agy's own print-mode default
+> (~5 min) kills a long advisory dispatch mid-run — observed live on a
+> red-team assignment. (3) `codex-bwrap` cannot run with a read-only
+> `CODEX_HOME` (codex writes `models_cache.json`, `installation_id`,
+> `tmp/arg0/*` and several SQLite DBs at that root during startup;
+> neither `--ephemeral` nor `-c sqlite_home` relocates all of them), so
+> `CODEX_HOME` is redirected to a **per-run tmpfs** with only
+> `auth.json` read-only bound in. Do not "simplify" that to a writable
+> bind of the real `~/.codex`: that directory's `AGENTS.md`,
+> `AGENTS.override.md`, `config.toml`, `hooks.json`, `rules/`, `skills/`
+> and `plugins/` are all loaded as **instructions** at startup, so a
+> writable `CODEX_HOME` is a genuine cross-run prompt-injection and
+> persistence vector. The tmpfs also means no goals/memories/thread
+> state carries between advisory dispatches, and none of the operator's
+> own hooks/rules/skills load into an advisory agent. Verified live by
+> falsification: writes to `~/.codex/AGENTS.md`, `~/.codex/config.toml`
+> and to the target repo all return `read-only file system`, with no
+> file appearing on the host, while the agent's own
+> `agent-result.json` writes normally.
 
 Every role below is bound to one of the proven-safe allowlist pairs
 ([P00.1](../../../docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md)):
-`codex-readonly` (provider-native `-s read-only`), `claude-bwrap` and
-`agy-bwrap` (OS `bwrap --ro-bind / /` mount, `--chdir` to the real
-checkout). Do not use any other executor for an advisory role — no other
-pair has a live-proven confinement envelope for this project's read-only
-advisory work.
+`claude-bwrap`, `agy-bwrap` and `codex-bwrap` — all three an OS
+`bwrap --ro-bind / /` mount over the real checkout, each with one
+narrow, named writable exception (this repo's `.fgos/assignments`, plus
+a per-run tmpfs `CODEX_HOME` for `codex-bwrap`). Do not use any other
+executor for an advisory role — no other pair has a live-proven
+confinement envelope for this project's read-only advisory work, and
+`codex-readonly` in particular cannot report a result at all.
 
 **Bwrap runnability — proven fixed, not an open question.** A bare
 `--ro-bind / /` alone breaks the agent CLI's own init (no writable
@@ -239,15 +266,15 @@ loudly rather than silently.
 
 | Role | Executor | Tier | Derived model | Persona | Why this binding fits the cognitive job |
 |---|---|---|---|---|---|
-| lead-advisor | `claude-bwrap` | critical | `opus` | `person-facing-advisory-lead` | Intent interpretation and the human-facing explanation both need the strongest calibration available, plus a stable single voice across intake -> explain -> every dialogue turn; this role never sees a sibling's private notes, so provider diversity buys it nothing |
-| context-investigator | `codex-readonly` | standard/analytical | `gpt-5.5` (tier is immaterial on this executor — every tier derives the same model; say so, don't imply a tier choice that did nothing) | `disconfirmation-seeking-scout` | Provider-native read-only sandbox is the cheapest, safest way to run broad evidence retrieval against PROJECT_ROOT; this role's authority comes from having looked, not from reasoning depth |
-| system-shaper | `claude-bwrap` | analytical | `sonnet` | `direct-response-architect` | Provider family A — deep, direct-response architecture synthesis under the evidence as framed |
+| lead-advisor | `claude-bwrap` | critical | `opus` | `person-facing-advisory-lead` | Intent interpretation and the human-facing explanation both need the strongest calibration available, plus a stable single voice across intake -> explain -> every dialogue turn; this role never sees a sibling's private notes, so provider diversity buys it nothing. **Leave `actors[].tier` unset for `lead-advisor-actor`**: tier resolution is monotonic-max (`assignment-policy.mjs`), so pinning the actor at `critical` drags `close-dialogue` — pure bookkeeping — up to opus too. Unpinned, each operation derives from its own `minTier`: `interpret`/`explain`/`revise-explanation` at critical, `close-dialogue` at standard |
+| context-investigator | `claude-bwrap` | standard | `sonnet` | `disconfirmation-seeking-scout` | Read-heavy, shallow-reasoning work, but its output feeds every downstream role, so reliability of tool-use and absolute-path discipline matters more than raw depth. Do **not** drop this to `lightweight`/haiku: measured against this exact role's real objective, haiku got every line citation right and reached the same central finding, but over-claimed a caveat sonnet caught (`fallbackMutationForAssignment` returns `undefined` on a malformed operation, so "always present" is false) and — worse — added an architecture recommendation, the one thing this packet's Avoid list forbids, because three independent shapers read this report |
+| system-shaper | `claude-bwrap` | analytical | `opus` | `direct-response-architect` | Provider family A — deep, direct-response architecture synthesis under the evidence as framed. Note the claude ladder maps BOTH `analytical` and `critical` to opus, so this shaper and the synthesizer now derive the same model; their independence rests on brief and context isolation, not on a model difference |
 | alternative-shaper | `agy-bwrap` | analytical | `gemini-3.1-pro-low` | `different-priors-designer` | Provider family B, deliberately distinct from the system shaper — this is where the doctrine says diversity earns the most, because the alternative shaper's whole value is *different priors*, and a different model family is a real hedge against both shapers reaching for the same solution class |
-| constraint-advocate | `codex-readonly` | analytical | `gpt-5.5` | `production-reality-advocate` | Third family when three are available; operations/security/migration reasoning is well-served by a careful, read-heavy pass, and this role runs twice (Phase 5 candidate, Phase 6 findings) so a cheap, reliable executor is a real advantage |
-| architecture-critic | `codex-readonly`, fresh assignment, distinct prompt package | analytical | `gpt-5.5` | `cross-proposal-attacker` | Must never inherit a shaper's private context — a fresh assignment with a new prompt package is the isolation guarantee, not a new executor per se; if the roster allows a fourth family, prefer one distinct from whichever shaper you most need stress-tested this session |
+| constraint-advocate | `codex-bwrap` | analytical | `gpt-5.6-terra` | `production-reality-advocate` | Third family; operations/security/migration reasoning is well-served by a careful, read-heavy pass, and this role runs twice (Phase 5 candidate, Phase 6 findings) so a reliable executor is a real advantage |
+| architecture-critic | `agy-bwrap`, fresh assignment, distinct prompt package | **critical** | `gemini-3.1-pro-high` | `cross-proposal-attacker` | Attacking three proposals at once is the panel's second-largest quality lever after synthesis, so it gets a strong model — and pro-high is cheaper than opus. Must never inherit a shaper's private context — the fresh assignment with a new prompt package is the isolation guarantee, not the executor choice, which is why sharing a family with the alternative shaper (at a different model) is acceptable |
 | synthesizer | `claude-bwrap` | critical | `opus` | `whole-ledger-integrator` | Strongest derived model for whole-ledger integration; sees only what visibility windows grant it |
-| red-team | `agy-bwrap` | critical | `gemini-3.1-pro-high` | `process-and-authority-attacker` | Deliberately off the synthesizer's family — its entire job is catching what a mind resembling the synthesizer's would not |
-| specialist | **no static actor id at all — see note below** | as the slot requires | as derived | `<topic>-bounded-expert` | Bound only after driver authorization for one named, bounded question; never a standing panel member |
+| red-team | `codex-bwrap` | critical | `gpt-5.6-sol` (this family's top rung for automated dispatch) | `process-and-authority-attacker` | Deliberately off the synthesizer's family — its entire job is catching what a mind resembling the synthesizer's would not. Specifically **not** `agy-bwrap`, even though that also satisfies the off-family rule: agy's structured result wrapper can come back a useless one line with the real findings only in the unstructured text (see Known Gaps), and this is the one role where trusting that wrapper manufactures exactly the ceremonial-`APPROVE`-with-nothing-checked appearance its own Avoid list warns against. Restoring a third provider family is what buys this placement — it is the concrete reason the third family is worth its config surface, not "more diversity" in the abstract |
+| specialist | **no static actor id at all — see note below** | as the slot requires | as derived | `<topic>-bounded-expert` | Bound only after driver authorization for one named, bounded question; never a standing panel member. Default to `codex-bwrap` unless the topic argues for another lane |
 
 **Specialist binding works differently from the other 8 roles — do not
 treat this row as "the same shape, just filled in later."** The 8
@@ -856,11 +883,12 @@ never invent a new filename mid-session.
 
 ## Known Gaps
 
-- **`tsk-1o4`** (P02.1 BL2) — **closed by P05.2.** `claude-bwrap`,
-  `agy-bwrap`, and `codex-readonly` are registered in `.fgos/config.json`
-  and dispatch for real through `fgos coordination run`. See the
-  Executor Roster note above for the two caveats folded into that
-  registration, and `P05.2.md` for full evidence.
+- **`tsk-1o4`** (P02.1 BL2) — **closed.** `claude-bwrap`, `agy-bwrap`,
+  and `codex-bwrap` are registered in `.fgos/config.json` and dispatch
+  for real through `fgos coordination run`. `codex-readonly` was part of
+  this roster and is now retired for dispatch — it can never write its
+  own result file. See the Executor Roster note above for the three
+  caveats folded into the registration.
 - **`tsk-31d`** — `agy -p` ignores the invoking OS cwd for relative
   paths; pass absolute paths in prompts targeting `agy-bwrap`.
 - **`tsk-1ed`** — the auto-generated dispatch prompt
