@@ -14,7 +14,13 @@ re-read against its own case block, sorted into 25 always-mutating and 7
 genuinely mixed-mode (per-invocation, not per-verb) guards. That second
 pass's own full-suite verification caught and fixed two real regressions
 before they landed (§4/§9). Full suite: 5894 tests, 5887 pass, 0 fail, 7
-skipped, zero regressions.
+skipped, zero regressions. A live attempt at this document's own proposed
+recovery runbook (§6) then caught a third mistake — in this document's own
+original evidence, not the code — corrected in §10: `tsk-5x7-1`'s
+"divergence" needed no recovery; the disconnected store was stale, not
+ahead. `tsk-oyc` (the item describing this exact defect class) and
+`tsk-5zim` (a related coordination-engine DX gap found along the way) are
+now cross-linked to this investigation's commits.
 
 ## 1. Root-cause decision
 
@@ -47,10 +53,17 @@ mutating verb.
 
 Live inventory evidence (read-only `fgos show` sweep, 3 stores): `tsk-5x7-1`
 is `status:blocked` in main AND in this worktree, but `status:retrospective`
-in `forgentX-worker-isolation`'s own `.fgos` — several lifecycle stages
-further (delivered→retrospective only follows a real approve/merge). Those
-transition events were recorded only into worker-isolation's disconnected
-local store.
+in `forgentX-worker-isolation`'s own `.fgos`. **Corrected after §9's raw
+event-log comparison** (this section originally, wrongly, read the status
+NAME as a proxy for progress and concluded worker-isolation was ahead — it
+is not): by content hash, worker-isolation's 10 `tsk-5x7-1` events are all
+present in main; main additionally carries 4 more, later (2026-09-04)
+events worker-isolation never received. Worker-isolation is a stale,
+frozen-at-2026-09-03 snapshot, not a store holding progress main is
+missing — still a real instance of the disconnected-worktree mechanism
+(the two stores genuinely differ, for the root cause this document
+describes), but not a "lost write" needing recovery. See §9 for the full
+correction and why it matters.
 
 Prior precedent: `tsk-46f` (`docs/history/tsk-46f/iron-law-evidence.md`)
 already required a hand-amended merge commit so its `.fgos` tree matched
@@ -191,12 +204,29 @@ Full suite: 5894 tests, 5887 pass, 0 fail, 7 skipped, 0 regressions.
 
 ## 6. Recovery runbook for a disconnected store (proposed, not executed)
 
+**Correction (§10): step 1 below, as originally written, is not strong
+enough on its own.** Attempting this runbook for real against `tsk-5x7-1`
+(§10) showed that comparing folded `fgos show` output alone is not
+sufficient to tell "store A is missing store B's progress" apart from
+"store B is just stale" — the folded `status` field name is not a
+reliable proxy for which store is more advanced. Step 1 is revised below
+to compare raw event hashes, not folded status.
+
 Read-only-first, reversible, corrected for the sharded event-log shape:
 
-1. **Identify drift (read-only).** For the divergent item (e.g. `tsk-5x7-1`),
-   compare `fgos show <id> --json` output resolved against each store's
-   `--dir` (main vs. the disconnected worktree) to see exactly which fields
-   differ, before touching any file.
+1. **Identify drift (read-only), by raw event hash, not folded status.**
+   For the candidate item, extract every raw event mentioning its id from
+   each store's `.fgos/events.jsonl` + `.fgos/events/*.jsonl` (each event
+   carries a content hash, `h`), and diff the two sets by hash. Only
+   proceed past this step if one store's event set is a strict superset of
+   the other's — i.e. the "behind" store's events are ALL present in the
+   "ahead" store, plus the "ahead" store has strictly more. If the two
+   sets instead partially overlap with each holding events the other
+   lacks, that is a genuine fork/conflict, not a simple drift, and this
+   runbook does not apply — escalate instead of reconciling blindly. A
+   folded `fgos show <id> --json` comparison (main vs. the disconnected
+   store's own `--dir`) is a useful FIRST glance to spot that something
+   differs, but never the basis for deciding which side to copy from.
 2. **Locate the source events (read-only).** The disconnected store's new
    events live either in its `.fgos/events.jsonl` tail or in one/more
    `.fgos/events/<shard>.jsonl` files not present (or older) in main's own
@@ -225,7 +255,7 @@ worktree, `forgentX-worker-isolation`)
 | id | class | do now? | reason / evidence |
 |---|---|---|---|
 | tsk-oyc | **root cause** | merge | Describes exactly this defect ("worker `.fgos` writes land in a disconnected store"). Recommend linking it to this investigation's findings/commits (`8033890a`, `692076c6`) rather than duplicating scope; extending the guard to the remaining `touchesState:true` verbs (§8) is its natural follow-up. |
-| tsk-5x7-1 | **reproducer** | do now (recovery only, from main) | Live divergence confirmed (§2/§6) — apply the §6 runbook from the real main checkout, not a code fix. |
+| tsk-5x7-1 | **reproducer** | no recovery action needed (§10) | Divergence confirmed real (§2), but by raw event hash main already holds worker-isolation's full history plus more — worker-isolation is stale, not ahead. §6's runbook was attempted against it for real and correctly refused to proceed once this was found; do not apply. Its current `blocked` status may reflect a separate, unrelated cleanup-readiness bug (§10) — out of this P0's scope. |
 | tsk-3rg5 | root-cause-adjacent | defer | "approve: dirty tracked `.fgos/*` in main checkout" — same architecture (`.fgos` is ordinary git-tracked content), different symptom, already has its own owner (`doing`). Cross-link, don't duplicate. |
 | tsk-5rg | root-cause-adjacent | defer | "approve/move state event disappears" — same architecture family, own owner (`doing`). Cross-link. |
 | tsk-46f | root-cause instance (closed) | n/a (historical) | The prior hand-recovery precedent (§2); already resolved via manual workaround, cited as evidence only. |
@@ -254,11 +284,14 @@ in every store.
 - The coordination-engine DX gap noted in §3 (undocumented `agent-result.json`
   status enum + companion-artifact requirement for read-only "done" claims)
   will bite the next RFC-Review-Lite/Nominal-Group-Lite caller the same way.
-  Worth a small, separate fix to the engine's own default operation template
-  — not filed as a new item in this session (out of P0 scope), flagged here
-  so it isn't lost.
-- `forgentX-worker-isolation`'s disconnected store still holds `tsk-5x7-1`'s
-  un-reconciled progress; §6's runbook is proposed, not applied.
+  Filed as `tsk-5zim` (written to the real main store), out of this P0's own
+  scope; flagged to the `agent-coordination-foundation` stream (closer to
+  that engine's own scope) via direct message — that session confirmed it's
+  Run Result Evaluator/schema territory, not their own Dispatch/Execution
+  Engine routing scope, and left it unclaimed rather than picking it up.
+  Still open, unclaimed.
+- `forgentX-worker-isolation`'s disconnected store is stale, not ahead —
+  see §10's correction. No recovery action is needed for `tsk-5x7-1`.
 - The guard (§5) now covers all 44 `touchesState:true` verbs (25
   always-mutating + 7 per-invocation), closing the gap this bullet
   previously named. Residual, deliberate, and documented: `tool check`
@@ -314,3 +347,52 @@ one.
 
 Both fixes are in `ecd2a9bf`, verified by a subsequent full, clean suite
 run (5894 tests, 5887 pass, 0 fail) before that commit landed.
+
+## 10. Correction: `tsk-5x7-1` needed no recovery — worker-isolation is stale, not ahead
+
+Attempting §6's runbook for real (read-only steps only — nothing was
+copied or written) surfaced a mistake in this document's own original
+Pass-1 evidence (§2), corrected here rather than silently fixed in place,
+because the wrong conclusion could plausibly have led to a real, harmful
+write if the runbook had been followed as originally worded.
+
+**The mistake:** §2 originally read `tsk-5x7-1`'s folded status —
+`blocked` in main, `retrospective` in `forgentX-worker-isolation` — and
+concluded worker-isolation was ahead ("retrospective... only follows a
+real approve/merge... recorded only into worker-isolation's disconnected
+store"). This treated the STATUS NAME as a proxy for progress, without
+checking the actual events.
+
+**What raw events show** (`.fgos/events.jsonl` + `.fgos/events/*.jsonl`
+in both stores, filtered to `"tsk-5x7-1"`, compared by each event's own
+content hash, `h`): worker-isolation holds exactly 10 events for this id.
+All 10 are byte-identical (by hash) to 10 of main's 14. Main's remaining
+4 events are all dated 2026-09-04, after worker-isolation's newest
+(2026-09-03) — a `doc.attest`, a `retrospective→cleanup` move, a
+`decision` recording that move's own rationale, and a later
+`cleanup→blocked` move citing `"no outcome docType/docPath or decision
+record found for this item — retrospective may not have actually run"`.
+Worker-isolation's event set is a strict subset of main's: it is a
+snapshot frozen at whatever commit its branch was on around 2026-09-03,
+not a store that received writes main is missing. There is nothing to
+recover — main already holds the complete, authoritative history.
+
+**A secondary, separate finding, out of this P0's scope:** the
+`cleanup→blocked` event's own stated reason is factually wrong at the
+moment it fired — the decision it claims is missing was recorded
+2026-09-04T04:38:19, five hours before the block fired at
+2026-09-04T09:21:43. This looks like a real bug in whatever
+cleanup-readiness check produced that event (reading stale state, or a
+race), independent of state-root resolution. Not investigated further or
+filed as a new item here — flagged so it isn't lost, should whoever
+eventually reviews `tsk-5x7-1` want to also unblock it.
+
+**Why this matters beyond this one item:** it is the runbook's own step 1
+(now revised above) failing exactly the way it warned against — a folded
+view is not sufficient evidence for which side of a divergence to trust.
+Anyone reconciling a disconnected store for real must diff raw events by
+hash, never infer direction from a status field's name alone.
+
+No `.fgos` state was copied, reset, or mutated to reach this correction —
+only `fgos show --dir` (read) and `grep`/file reads against each store's
+own `.fgos/events*` were used, per this investigation's own rule 1.
