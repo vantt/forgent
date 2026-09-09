@@ -2928,7 +2928,10 @@ export async function recordConsultDisposition(
     objective: `Record disposition for consult advice from assignment "${consultantAssignmentId}".`,
     contextRefs: [consultantAssignmentId],
     constraints: [`disposition:${disposition}`, `rationale:${rationale}`],
-    expectedOutputs: expectedOutputs ?? ['agent-result.json (status, summary)'],
+    // tsk-5zim: name the real status enum inline -- see assignment.mjs's
+    // ALLOWED_AGENT_CLAIM_STATUSES; the generic "status" placeholder this
+    // replaced never told a dispatched actor which values are legal.
+    expectedOutputs: expectedOutputs ?? ['agent-result.json (status: done | blocked | failed | no-evidence, summary)'],
     evidenceRequired: 'reported',
     role: requesterRole,
     budget,

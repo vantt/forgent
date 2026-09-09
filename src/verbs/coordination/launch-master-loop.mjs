@@ -42,7 +42,10 @@ export const MASTER_LOOP_PROTOCOL_ID = 'core.coordination-protocol.standalone-ma
 
 // Descriptive only (fulfills schema.mjs's non-empty expectedOutputs
 // requirement) -- never read as an actor/operation choice.
-const EXPECTED_OUTPUTS = ['agent-result.json (status, summary)'];
+// tsk-5zim: name the real status enum (assignment.mjs's
+// ALLOWED_AGENT_CLAIM_STATUSES) inline -- the generic "status" placeholder
+// this replaced never told a dispatched actor which values are legal.
+const EXPECTED_OUTPUTS = ['agent-result.json (status: done | blocked | failed | no-evidence, summary)'];
 
 function fail(reason) {
   throw new StoreError('validation', `coordination launch-master-loop: ${reason}`);

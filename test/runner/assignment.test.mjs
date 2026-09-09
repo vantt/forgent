@@ -176,11 +176,35 @@ test('renderAssignmentPrompt includes concrete result artifact paths when runDir
 
   assert.match(prompt, /Result artifact:/m);
   assert.match(prompt, /Write structured JSON to .*agent-result\.json/m);
-  assert.match(prompt, /Optional human-readable report: .*agent-report\.md/m);
+  // tsk-5zim: validate-plan is a reviewer (read-only) operation -- the
+  // companion report is REQUIRED for its "done" status to count as
+  // evidenced (assignment-runner.mjs's classifyRunEvidence), not optional.
+  assert.match(prompt, /agent-report\.md -- REQUIRED for this read-only operation/m);
   assert.match(prompt, /Do not call Work lifecycle verbs/m);
   // Both artifact paths must include the runDir
   assert.ok(prompt.includes(path.join(runDir, 'agent-result.json')), 'prompt must contain absolute agent-result.json path');
   assert.ok(prompt.includes(path.join(runDir, 'agent-report.md')), 'prompt must contain absolute agent-report.md path');
+});
+
+test('renderAssignmentPrompt states the real agent-result.json status enum -- tsk-5zim: dispatched actors (claude-reviewer x2, codex-cli) wrote status:"DONE"/"objection" and failed schema validation because this was never disclosed', () => {
+  const assignment = buildAssignment({
+    workId: 'tsk-rd-test-2',
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+  const prompt = renderAssignmentPrompt(assignment, { runDir: '/tmp/fgos-asgn-rd-test-2/runs/01' });
+  assert.match(prompt, /"status" must be exactly one of: done \| blocked \| failed \| no-evidence/m);
+});
+
+test('renderAssignmentPrompt still calls the companion report Optional for a mutating operation -- classifyRunEvidence only requires it for read-only', () => {
+  const assignment = buildAssignment({
+    workId: 'tsk-rd-test-3',
+    stage: 'executing',
+    operation: 'implement-item',
+  });
+  assert.equal(isReadOnlyAssignment(assignment), false);
+  const prompt = renderAssignmentPrompt(assignment, { runDir: '/tmp/fgos-asgn-rd-test-3/runs/01' });
+  assert.match(prompt, /Optional human-readable report: .*agent-report\.md/m);
 });
 
 test('isReadOnlyAssignment reads the stamped mutation field directly, not role/operation (ADR-006 R7)', () => {

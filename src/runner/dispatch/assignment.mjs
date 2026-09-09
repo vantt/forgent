@@ -687,12 +687,31 @@ export function renderAssignmentPrompt(assignment, options = {}) {
 
   // Step 04 §5.1: include concrete result artifact paths when runDir is known.
   // Prefer absolute paths so the worker is unambiguous across worktrees.
+  //
+  // tsk-5zim fix: this block used to name agent-result.json without ever
+  // stating its `status` enum, and called agent-report.md "Optional"
+  // unconditionally -- real dispatched actors (claude-reviewer x2,
+  // codex-cli, found live in coord_state_root_rfc_20260909) wrote
+  // status:"DONE"/"objection" and failed schema validation
+  // (validateAgentResultClaim's own ALLOWED_AGENT_CLAIM_STATUSES, above),
+  // then a second real attempt still landed `no-evidence` because
+  // classifyRunEvidence (assignment-runner.mjs) requires this same report
+  // artifact for a read-only operation's "done" status to count as
+  // evidenced -- a requirement this prompt never disclosed. Both facts are
+  // now stated explicitly instead of discovered by two failed attempts.
   if (options.runDir) {
     const agentResultPath = path.join(options.runDir, 'agent-result.json');
     const agentReportPath = path.join(options.runDir, 'agent-report.md');
+    const readOnly = isReadOnlyAssignment(assignment);
     lines.push('Result artifact:');
     lines.push(`- Write structured JSON to ${agentResultPath}`);
-    lines.push(`- Optional human-readable report: ${agentReportPath}`);
+    lines.push(`  - "status" must be exactly one of: ${[...ALLOWED_AGENT_CLAIM_STATUSES].join(' | ')}`);
+    lines.push(`  - "summary" is a required non-empty string`);
+    lines.push(
+      readOnly
+        ? `- Also write a human-readable report to ${agentReportPath} -- REQUIRED for this read-only operation: a "done" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.`
+        : `- Optional human-readable report: ${agentReportPath}`,
+    );
     lines.push('- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.');
   }
 
