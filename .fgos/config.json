@@ -53,7 +53,7 @@
       },
       "code:implement": {
         "description": "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)",
-        "prefer": "agy-herdr"
+        "prefer": "claude"
       },
       "code:review": {
         "description": "Canonical coding review capability -- independent read-only review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
