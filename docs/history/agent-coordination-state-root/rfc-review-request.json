@@ -1,0 +1,87 @@
+{
+  "kind": "declared-protocol",
+  "objective": "RFC-Review-Lite: settle whether the state/root-resolution fix in docs/history/agent-coordination-state-root/rfc-state-root-fix.md is do-now or defer.",
+  "writerId": "state-root-coordinator",
+  "coordinationId": "coord_state_root_rfc_20260909",
+  "protocolRef": {
+    "id": "core.coordination-protocol.group-thinking-rfc-review-lite"
+  },
+  "actors": [
+    {
+      "id": "objector-a-actor",
+      "executor": "codex-cli"
+    },
+    {
+      "id": "objector-b-actor",
+      "executor": "agy-cli"
+    }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "convene",
+      "operationId": "convene",
+      "targetActorId": "coordinator-actor",
+      "objective": "State the RFC under review and open the round. Read docs/history/agent-coordination-state-root/rfc-state-root-fix.md in full before reporting; your result should summarize the RFC's root-cause claim and the four review questions at its end, and confirm the round is open.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary)"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "propose",
+      "operationId": "propose",
+      "targetActorId": "proposer-actor",
+      "objective": "Write the proposal being reviewed: read docs/history/agent-coordination-state-root/rfc-state-root-fix.md in full and restate its root-cause claim, evidence, and proposed fix shape as the formal proposal for this round.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary)"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "objectA",
+      "operationId": "object",
+      "targetActorId": "objector-a-actor",
+      "objective": "Independently review the proposal in docs/history/agent-coordination-state-root/rfc-state-root-fix.md (read it in full). You do NOT get to see any other objector's own review. Focus your independent read on questions 1 and 3 in the RFC: (1) whether the proposed dataDir()/isMainWorktree guard correctly distinguishes the 3 legitimate worktree cases from the illegitimate 4th without false-positiving on any real workflow -- check src/state/store.mjs, src/runner/session.mjs (the fgos-session symlink marker), and any existing test/fixture under test/ that deliberately writes into a non-main worktree's local .fgos/ on purpose; (3) whether fgos setup/doctor or scripts/fgos-shell-integration.sh needs a doctor/setup registration for this guard. Report concrete objections with file:line citations if you find any correctness gap, false-positive risk, or missing case; report 'no objection' plainly if the evidence holds up under your independent check.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary)"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "objectB",
+      "operationId": "object",
+      "targetActorId": "objector-b-actor",
+      "objective": "Independently review the proposal in docs/history/agent-coordination-state-root/rfc-state-root-fix.md (read it in full). You do NOT get to see any other objector's own review. Focus your independent read on questions 2 and 4 in the RFC: (2) whether reusing isMainWorktree (src/runner/worktree.mjs) at the new mutating-verb call site is sound, or whether it needs a distinct check that also recognizes a fgos-session-symlinked worktree as legitimate (isMainWorktree alone does not distinguish a session worktree from a plain non-main one); (4) given tsk-5x7-1's live status divergence (blocked in main vs retrospective in /home/vantt/projects/forgentX-worker-isolation/.fgos) and tsk-46f's prior hand-recovery (docs/history/tsk-46f/iron-law-evidence.md), propose a SAFE, REVERSIBLE, read-only-first recovery runbook for reconciling a disconnected .fgos store back into main -- do not execute anything, propose the runbook only. Report concrete objections with file:line citations if you find any correctness gap; report 'no objection' plainly if the evidence holds up under your independent check.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary)"
+      ]
+    },
+    {
+      "type": "contribution",
+      "as": "linkProposal",
+      "contributionId": "state_root_rfc_proposal",
+      "contributionType": "proposal",
+      "assignmentId": "$ref:propose",
+      "roundKey": "round-1"
+    },
+    {
+      "type": "contribution",
+      "as": "linkObjectionA",
+      "contributionId": "state_root_rfc_objection_a",
+      "contributionType": "objection",
+      "assignmentId": "$ref:objectA",
+      "roundKey": "round-1",
+      "respondsTo": "state_root_rfc_proposal"
+    },
+    {
+      "type": "contribution",
+      "as": "linkObjectionB",
+      "contributionId": "state_root_rfc_objection_b",
+      "contributionType": "objection",
+      "assignmentId": "$ref:objectB",
+      "roundKey": "round-1",
+      "respondsTo": "state_root_rfc_proposal"
+    }
+  ]
+}
