@@ -37,7 +37,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { fgosDirFromRoot } from './paths.mjs';
+import { fgosDirFromRoot, resolveMainCheckoutRoot } from './paths.mjs';
 
 const SESSIONS_FILE = 'sessions.json';
 const SESSIONS_LOCK = 'sessions.lock';
@@ -83,6 +83,49 @@ function sleepSync(ms) {
 
 function fgosDirOf(repoRoot) {
   return fgosDirFromRoot(repoRoot);
+}
+
+/**
+ * Whether `repoRoot` is a genuine `fgos session`-created worktree, never a
+ * plain (or forged) symlink pointing somewhere else: `.fgos` at `repoRoot`
+ * must be a symbolic link (`createSession`'s own `fs.symlinkSync` above,
+ * D10 -- never a checked-out copy) AND its realpath must equal the real
+ * main checkout's own `.fgos` realpath (`resolveMainCheckoutRoot`, which
+ * resolves via `--git-common-dir` and so cannot itself be redirected by a
+ * worktree-local symlink). A bare `isSymbolicLink()` check alone would be
+ * forgeable -- a worktree could carry a `.fgos` symlink pointing anywhere
+ * -- so both conditions are required; unlike `isMainWorktree`
+ * (worktree.mjs), which only tells the main checkout apart from every
+ * linked worktree and does not itself distinguish a legitimate session
+ * worktree from an ad-hoc one, this answers the narrower question a caller
+ * needs before treating a linked worktree's own `.fgos` as the real shared
+ * store rather than a stale, disconnected snapshot.
+ *
+ * Never throws: any filesystem error (missing `.fgos`, not inside a git
+ * checkout at all) means "not a session worktree", the safe answer.
+ */
+export function isSessionWorktree(repoRoot) {
+  const linkPath = path.join(repoRoot, '.fgos');
+  let linkStat;
+  try {
+    linkStat = fs.lstatSync(linkPath);
+  } catch {
+    return false;
+  }
+  if (!linkStat.isSymbolicLink()) return false;
+
+  const mainCheckoutRoot = resolveMainCheckoutRoot(repoRoot);
+  if (!mainCheckoutRoot) return false;
+
+  let linkRealPath;
+  let mainFgosRealPath;
+  try {
+    linkRealPath = fs.realpathSync(linkPath);
+    mainFgosRealPath = fs.realpathSync(fgosDirOf(mainCheckoutRoot));
+  } catch {
+    return false;
+  }
+  return linkRealPath === mainFgosRealPath;
 }
 
 /** Remove the `.fgos` symlink we created inside a session worktree. It is our
