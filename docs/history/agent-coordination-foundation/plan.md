@@ -10,9 +10,10 @@ providers, models, and tiers with two explicit primitives:
 2. team cognition: activate and coordinate multiple agents through the
    existing `fgos-group-thinking` skill, CoordinationSession, and registered
    group-thinking protocols;
-3. research support: make research a first-class capability that can run
-   alone through `fgos-researching` or be coordinated as a group-thinking
-   round when the question benefits from several agents/providers.
+3. research support: make research a first-class skill/workflow that can use
+   dispatched capabilities (browser/web, repository search, impact analysis,
+   and other evidence tools) or be coordinated as a group-thinking round when
+   the question benefits from several agents/providers.
 
 This plan covers P1–P4 only. State/root-resolution work is deliberately
 separate in `docs/history/agent-coordination-state-root/prompt.md`.
@@ -52,14 +53,17 @@ Establish one canonical identity vocabulary before broadening planner prose.
 Deliverables:
 
 - a shared capability catalog/reference defining generic and domain-scoped
-  forms (`implement`, `review`, `test`, `debug`, `research`,
-  `code:implement`, etc.);
+  forms (`implement`, `review`, `test`, `debug`, `code:implement`, etc.);
 - rules for choosing generic versus `domain:capability`;
 - semantics, examples, and fallback behavior for each registered capability;
-- research capability guidance: use `research` for a domain-neutral question,
-  use a domain-scoped form only when the research method is materially tied to
-  that domain, and hand the actual evidence-gathering to the existing
-  `fgos-researching` skill;
+- an ontology boundary: `fgos-researching` is a skill/workflow, not a
+  capability. Research chooses the concrete capabilities it needs, such as
+  browser/web access, repository search, symbol/context lookup, or
+  impact-analysis;
+- capability execution guidance: a capability may be served by an agent
+  executor, an MCP/tool provider, or another registered adapter. Dispatch
+  selects the provider of the capability; it does not assume every capability
+  is an agent-shaped executor;
 - a clear statement that catalog entries never pin provider/model/executor;
 - setup/doctor/config registration only for capabilities with real configured
   executors.
@@ -69,8 +73,9 @@ Candidate existing work to reconcile, not blindly duplicate:
 - `tsk-4lc`, `tsk-49o`, `tsk-492`, `tsk-9tu`, `tsk-5x7-1`, `tsk-fli`,
   `tsk-5fn`, `tsk-62w`.
 - research/coordination consumers must also be inventoried before adding a
-  new capability: existing `fgos-researching`, coordination operation-step,
-  and group-thinking items are candidates for reuse, not new parallel paths.
+  new capability: existing `fgos-researching`, browser/web tooling,
+  GitNexus impact-analysis/search, coordination operation-step, and
+  group-thinking items are candidates for reuse, not new parallel paths.
 
 Acceptance:
 
@@ -156,10 +161,12 @@ work:
   `core/protocol-packs/group-thinking.json`;
 - let the skill build/forward the request to `fgos coordination run --file`,
   preserving per-actor executor/model/tier overrides;
-- use `fgos-researching` for a single-agent evidence question, and use
-  group-thinking to coordinate multiple research contributions, objections,
-  responses, or synthesis; do not duplicate the researcher implementation in
-  the group-thinking skill;
+- use `fgos-researching` for a single-agent evidence question. That skill may
+  dispatch concrete research capabilities (for example browser/web or
+  GitNexus impact-analysis) even when no agent executor is involved;
+- use group-thinking to coordinate multiple research contributions,
+  objections, responses, or synthesis; do not duplicate the researcher
+  implementation or relabel the research skill itself as a capability;
 - use `fgos coordination launch-master-loop` only for its existing fixture
   contract;
 - use `fgos coordination run --file` for declared operations, per-actor
@@ -185,9 +192,10 @@ conflict with state/root behavior is reported and deferred to the P0 stream.
 - the `fgos-group-thinking` skill can be invoked by an agent without knowing
   provider/model/tier details, while still requiring an explicit registered
   protocol;
-- at least one research question is handled through `fgos-researching`, and
-  at least one multi-agent research question is coordinated through the
-  group-thinking skill with contributions and replayable synthesis;
+- at least one research question is handled through `fgos-researching` using
+  one or more concrete dispatched capabilities, and at least one multi-agent
+  research question is coordinated through the group-thinking skill with
+  contributions and replayable synthesis;
 - at least one coding execution proves `code:implement` resolution;
 - tests cover canonical capability validation and decide-before-execute
   behavior;
