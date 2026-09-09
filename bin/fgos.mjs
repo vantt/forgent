@@ -4970,25 +4970,101 @@ const STORE_MISSING_WARNING_VERBS = new Set([
 // `dataDir()`'s cwd-strict resolution (D5) silently accepts that
 // disconnected snapshot as if it were the live store.
 //
-// This set is deliberately a hand-verified ALLOWLIST, not `entry.touchesState`
-// (RFC-review-lite round `coord_state_root_rfc_20260909`, objector-a: the
-// registry's own `touchesState` flag is too coarse -- it is `true` for
-// several verbs that also have a legitimate read-only invocation shape --
-// `evolve` (bare vs. `--pick`), `coordination` (`show`/`chain` vs. `run`),
-// `session` (`list` vs. `start`/`end`), `goal` (`show` vs. `set`), `tool`
-// (`query` vs. others), `merge` (`list` vs. `next`), `setup`/`doctor`
-// (diagnostic by default) -- a blanket guard keyed on `touchesState` would
-// false-positive on those real read-only workflows. Every verb below was
-// individually read in this file's own `case` block and confirmed to take
-// a single id/text argument with no subcommand branching -- always
-// mutating when it reaches its handler at all. `approve`/`sync-root`/
-// `promote-to-component`/`catchup`/`unclaim` are deliberately NOT here:
-// each already computes its own `repoRoot` (see their own case blocks'
-// comments) and is independently guarded by `isMainWorktree` or an
-// explicit `--dir`-derived root — adding a second, redundant guard on
-// `dir` alone would risk diverging from their own existing, tested
-// refusal text for no new coverage.
-const MUTATING_ONLY_VERBS = new Set(['submit', 'take', 'pick', 'move', 'edit', 'ask', 'answer', 'gate-approve', 'reject']);
+// This is a hand-verified classification, not `entry.touchesState`
+// (COMMAND_REGISTRY) alone -- RFC-review-lite round `coord_state_root_rfc_20260909`
+// found that flag too coarse for several verbs. EVERY `touchesState: true`
+// verb (44 total) was individually read in this file's own `case` block for
+// this pass -- not just the ones a reviewer happened to name -- to sort into
+// exactly one of:
+//
+// 1. `MUTATING_ONLY_VERBS` -- a single id/text argument, no subcommand
+//    branching, always mutating when it reaches its handler at all.
+// 2. `MUTATING_SUBCOMMAND_PREDICATES` -- genuinely mixed: a real read-only
+//    invocation shape exists alongside a real mutating one. Each entry is a
+//    `(positional, flags) => boolean` answering "does THIS invocation
+//    mutate", read off that verb's own case block, never guessed:
+//      - `session`: `start`/`end`/`gc` mutate, `list` reads. `repoRoot`
+//        here is raw `process.cwd()` (see the case block), not
+//        `resolveMainCheckoutRoot` -- unlike group 4 below, this one
+//        genuinely needs the guard.
+//      - `goal`: `set` mutates (`setFocus`), `show` reads (`goalFocusShow`).
+//      - `gateway`: `start`/`stop` mutate the gateway process/registry,
+//        `status` only reads it.
+//      - `knowledge`: `attest` mutates, `status` only reads (`rebuild` +
+//        filtering, no write call).
+//      - `coordination`: `run`/`launch-master-loop` dispatch and can close
+//        a session; `show`/`chain` are explicitly commented "never appends
+//        an event" in their own case block.
+//      - `merge`: `next` mutates (`mergeNext`), `list` only reads
+//        (`mergeList`) -- found during this verification, named by neither
+//        RFC-review objector.
+//      - `evolve`: contrary to the RFC-review round's own objector claim
+//        ("bare vs. `--pick`"), the case block's own D15 comment says
+//        `--submit <id>` is the ONLY mutating action on the whole
+//        evolve/Gate A surface -- bare `evolve` AND `evolve --pick` are
+//        both read-only (rank/inspect candidates, no write). Re-verified
+//        against the current code rather than trusted secondhand.
+// 3. Deliberately NOT guarded, already self-correcting via
+//    `resolveMainCheckoutRoot(process.cwd())` when `--dir` is omitted (own
+//    case-block comments, same mechanism `approve`/`sync-root`/
+//    `promote-to-component`/`catchup`/`unclaim` already use, so a second
+//    guard here would be redundant, not additive): `setup`, `doctor`,
+//    `uninstall`.
+// 4. Deliberately NOT guarded, not the shared-truth hazard this guard
+//    exists for -- each writes only a local, per-checkout, gitignored
+//    artifact by design, never a shared event: `rebuild` (regenerates the
+//    local `state.json` cache FROM the local event log -- no new event),
+//    `tool` (both `check`, which writes only `.fgos/`'s local status
+//    overlay per its own case-block comment, and `query`, pure read).
+// 5. Deliberately NOT guarded, not an `.fgos` event-log operation at all --
+//    `preflight` resolves its own root independently via `git rev-parse
+//    --show-toplevel` against `--dir`-or-cwd, never through `dir`/`state.json`.
+// 6. Already excluded, each with its own dedicated, already-tested
+//    worktree guard predating this investigation entirely: `init` (own
+//    dedicated check just below), `approve`/`sync-root`/
+//    `promote-to-component`/`catchup`/`unclaim` (own `repoRoot`, own
+//    `isMainWorktree` guard), and `return` -- found the hard way (a live
+//    regression during this verification pass, not caught by only
+//    sampling the first ~15 lines of its case block the way the other 20
+//    verbs in group 1 were confirmed safe): `return`'s own registered-
+//    session check (`insideRegisteredSession` via `listSessions` +
+//    `isMainWorktree(repoRoot)`, ~line 3862) is deliberately MORE
+//    permissive than this guard's own `isSessionWorktree` -- it exempts
+//    ANY registered session worktree, spike-proven correct there, with
+//    its own distinct refusal message an existing test
+//    (`test/cli/fgos-return.test.mjs`) already pins. A second, differently-
+//    worded guard ahead of it would only ever preempt it, never add
+//    coverage. This file's own `return` case block is ~360 lines, by far
+//    the longest of the 21 candidates -- the lesson generalized: a short
+//    block sampled at its start is reliable, a long one is not, without
+//    reading (or grepping for `isMainWorktree`/`process.cwd()`) the whole
+//    thing.
+const MUTATING_ONLY_VERBS = new Set([
+  'submit', 'take', 'pick', 'move', 'edit', 'ask', 'answer', 'gate-approve', 'reject',
+  'add', 'discover', 'plan', 'retrospective', 'cleanup', 'compound', 'resolve-park-reason',
+  'handoff', 'handoff-return', 'decision', 'report', 'topic', 'doc', 'repair', 'unlock',
+]);
+
+const MUTATING_SUBCOMMAND_PREDICATES = {
+  session: (positional) => ['start', 'end', 'gc'].includes(positional[0]),
+  goal: (positional) => positional[0] === 'set',
+  gateway: (positional) => ['start', 'stop'].includes(positional[0]),
+  knowledge: (positional) => positional[0] === 'attest',
+  coordination: (positional) => ['run', 'launch-master-loop'].includes(positional[0]),
+  merge: (positional) => positional[0] === 'next',
+  evolve: (positional, flags) => flags.submit !== undefined,
+};
+
+// True iff THIS invocation (verb + already-parsed positional/flags) will
+// reach a handler that mutates `.fgos/` state -- the single predicate the
+// disconnected-worktree guard below gates on. Combines groups 1 and 2 above;
+// every other verb answers false (never reaches a mutating handler, or is
+// independently protected already, per groups 3-6).
+function isMutatingInvocation(verb, positional, flags) {
+  if (MUTATING_ONLY_VERBS.has(verb)) return true;
+  const predicate = MUTATING_SUBCOMMAND_PREDICATES[verb];
+  return predicate ? predicate(positional, flags) : false;
+}
 
 async function main() {
   const [, , verb, ...rest] = process.argv;
@@ -5036,22 +5112,33 @@ async function main() {
         `.fgos/ not found at "${dir}" -- run "fgos init" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,
       );
     }
-    // State/root-resolution investigation: `.fgos/` DOES exist at `dir` here
-    // (the ENOENT case above already returned/threw), so the phantom-store
-    // hazard is closed, but a disconnected-snapshot hazard remains — a
-    // worktree made outside fgOS's own lifecycle carries a real, frozen
-    // `.fgos/` copy that reads/writes here would silently target instead of
-    // the live main store. Skipped entirely when `--dir` was passed
-    // explicitly (tsk-56t D1's own escape hatch — the caller took
-    // responsibility for that root already, evaluating `isMainWorktree`/
-    // `isSessionWorktree` against `process.cwd()` in that case would check
-    // the wrong root). `isSessionWorktree` (never just a bare `.fgos`
-    // symlink presence check — see its own doc comment) admits the one
-    // other legitimate non-main case, `fgos session start`.
+    // State/root-resolution investigation: a disconnected-snapshot hazard
+    // remains distinct from the ENOENT case just above — a worktree made
+    // outside fgOS's own lifecycle carries a real, frozen `.fgos/` copy
+    // that reads/writes here would silently target instead of the live
+    // main store. `fs.existsSync(dir)` is REQUIRED here, not implied by the
+    // ENOENT check above: that check only throws for
+    // `requiresExistingStore: true` verbs (every `MUTATING_ONLY_VERBS`
+    // member is one), but `MUTATING_SUBCOMMAND_PREDICATES` also covers
+    // `session`, whose `requiresExistingStore` is `false` BY DESIGN --
+    // `fgos session start` from inside a genuinely `.fgos/`-less
+    // ADR0020-stripped worktree is the exact legitimate case that verb
+    // exists to serve (D10: symlink `.fgos/` INTO a worktree that does not
+    // have it yet), and would be wrongly refused here without this check
+    // (found live: a real regression in
+    // `test/cli/fgos-session.test.mjs` during this pass's own full-suite
+    // verification). Skipped entirely when `--dir` was passed explicitly
+    // (tsk-56t D1's own escape hatch — the caller took responsibility for
+    // that root already, evaluating `isMainWorktree`/`isSessionWorktree`
+    // against `process.cwd()` in that case would check the wrong root).
+    // `isSessionWorktree` (never just a bare `.fgos` symlink presence check
+    // — see its own doc comment) admits the one other legitimate non-main
+    // case, an ALREADY-CREATED `fgos session start` worktree.
     faultClass = 'disconnected-worktree-store';
     if (
       flags.dir === undefined &&
-      MUTATING_ONLY_VERBS.has(verb) &&
+      isMutatingInvocation(verb, positional, flags) &&
+      fs.existsSync(dir) &&
       !isMainWorktree(process.cwd()) &&
       !isSessionWorktree(process.cwd())
     ) {
