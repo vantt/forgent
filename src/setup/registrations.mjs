@@ -1669,6 +1669,10 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
     description:
       'Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
   },
+  'code:implement': {
+    description:
+      'Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)',
+  },
 });
 
 // tsk-47r: `pi` as a second `agent`-kind executor, layered onto this SAME
@@ -1749,10 +1753,10 @@ function checkAdviseExecuteCapabilitiesConfigured(cwd) {
   if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
     return {
       passed: false,
-      message: 'runner.capabilities section missing -- run fgos setup (decide --for advise/execute cannot resolve until it exists)',
+      message: 'runner.capabilities section missing -- run fgos setup (decide --for advise/execute/code:implement cannot resolve until it exists)',
     };
   }
-  const missing = ['advise', 'execute'].filter(
+  const missing = ['advise', 'execute', 'code:implement'].filter(
     (name) => !capabilities[name] || typeof capabilities[name] !== 'object' || Array.isArray(capabilities[name]),
   );
   if (missing.length > 0) {
@@ -1761,7 +1765,7 @@ function checkAdviseExecuteCapabilitiesConfigured(cwd) {
       message: `runner.capabilities is missing or has a malformed slot for: ${missing.join(', ')} -- run fgos setup`,
     };
   }
-  return { passed: true, message: 'runner.capabilities declares both "advise" and "execute"' };
+  return { passed: true, message: 'runner.capabilities declares "advise", "execute", and "code:implement"' };
 }
 
 registerCheck({

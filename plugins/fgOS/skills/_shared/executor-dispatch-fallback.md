@@ -27,31 +27,22 @@ parameters where the consuming skill's own reasoning step lives:
   for "reason about it yourself" (real example: "Classify it yourself"),
   the path every branch below falls through to.
 
-## Valid reasons to dispatch instead of doing it inline
+## Activation doctrine: Decide before execute
 
-Four, no more (`docs/history/two-layer-dispatch/DISCUSSION.md` D2, single
-source — no consuming skill restates this list, it points here instead):
+Before executing any independently executable unit (e.g. `code:implement` for coding implementation), select the canonical capability for the job and call `decide` (`node src/runner/dispatch.mjs decide --for <PURPOSE> [--has-live-task-access]`) before proceeding. The returned `mechanism` controls execution: `unavailable` means execute inline directly in this session; `in-process` or `out-of-process` delegates according to the control plane.
+
+Four valid reasons justify configuring an executor for a capability:
 a cheaper model, a different provider (e.g. Codex/agy), resource
 isolation, or running the step in parallel with other work to shorten
 wall-clock time (chạy song song cho nhanh — Ship Faster is priority #1,
-`AGENTS.md`; the original three-reason list predated that priority order
-and silently excluded the one reason that serves it). Anything else stays
-inline — the live session already has full context for it, and
-dispatching it anyway is the same "soul re-deriving what a live soul
-already knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind
-cli-spawn.
+`AGENTS.md`). When no executor is configured for that capability, `decide` answers `unavailable` and the unit executes inline in the live session.
 
 A single tool call the live session makes directly inside its own
 reasoning — `WebSearch`, `Read`, `Grep`, `Bash`, or any other primitive
-the session already has — is never itself a candidate for `decide`. It
+the session already has — is never itself an independently executable unit for `decide`. It
 spawns nothing of its own, so there is no in-process/out-of-process choice
-to make; it is exactly "doing it inline" in the sentence above, not a
-fifth reason to dispatch. This holds even for a burst of several such
-calls in a row (e.g. a research pass running `WebSearch` repeatedly) —
-`decide` coordinates whether a STEP a skill would otherwise do inline gets
-handed to a capacity/executor instead; it was never meant to gate the
-session's own direct tool use, the same way it has never gated a `Read` or
-a `Grep`.
+to make; it is exactly "doing it inline", not a separate unit to dispatch. This holds even for a burst of several such
+calls in a row (e.g. a research pass running `WebSearch` repeatedly).
 
 ## Step A — ask `decide` (never read the config yourself)
 

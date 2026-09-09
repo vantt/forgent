@@ -383,7 +383,7 @@ test('advise-execute-capabilities-configured passes when both slots are declared
   );
   const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
   assert.equal(passed, true);
-  assert.match(message, /declares both "advise" and "execute"/);
+  assert.match(message, /declares "advise", "execute", and "code:implement"/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 

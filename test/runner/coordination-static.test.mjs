@@ -12,7 +12,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const coordinationDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../src/runner/coordination');
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../');
+const coordinationDir = path.resolve(repoRoot, 'src/runner/coordination');
 
 // Substrings matched against each resolved import specifier's own path
 // segment/filename -- deliberately over-inclusive (e.g. "merge" also
@@ -65,7 +66,7 @@ test('src/runner/coordination/** imports no Work lifecycle, merge, worktree, tra
   for (const file of files) {
     const source = fs.readFileSync(file, 'utf8');
     for (const specifier of extractImportSpecifiers(source)) {
-      const resolved = specifier.startsWith('.') ? path.normalize(path.join(path.dirname(file), specifier)) : specifier;
+      const resolved = specifier.startsWith('.') ? path.relative(repoRoot, path.resolve(path.dirname(file), specifier)) : specifier;
       for (const forbidden of FORBIDDEN_IMPORT_SUBSTRINGS) {
         if (resolved.includes(forbidden)) {
           violations.push(`${path.relative(coordinationDir, file)} imports "${specifier}" (resolved: ${resolved}, matches forbidden "${forbidden}")`);
