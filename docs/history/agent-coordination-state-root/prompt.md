@@ -12,6 +12,39 @@ This is a standalone coordination stream. It may run in parallel with
 `docs/history/agent-coordination-foundation/plan.md`, but it must not change
 dispatch capability semantics or group-thinking protocol semantics.
 
+## Worktree and branch contract
+
+The repository's real main checkout is `/home/vantt/projects/forgentX`.
+Never treat `/home/vantt/projects/forgentX-worker-isolation` (or any other
+linked worktree) as main merely because it contains a `.fgos` directory.
+
+The coordinating agent must work on a fresh branch/worktree created from the
+current `main` tip, for example:
+
+```text
+worktree: /home/vantt/projects/forgentX/.claude/worktrees/agent-coordination-state-root
+branch:   fgw/agent-coordination-state-root
+base:     main
+```
+
+The capability foundation agent uses a separate worktree and branch:
+
+```text
+worktree: /home/vantt/projects/forgentX/.claude/worktrees/agent-coordination-foundation
+branch:   fgw/agent-coordination-foundation
+base:     main
+```
+
+Both worktrees must be created after the plan/prompt commits are present on
+`main`. Do not share a worktree, branch, or writable checkout between the two
+agents. Do not run `fgos approve` from either linked worktree; approval must
+run from the real main checkout after review.
+
+The existing `dispatch-visibility-v0` worktree is historical/runtime state
+and is not a base for either stream. Do not merge it wholesale, copy its
+`.fgos` directory, or clean it until this prompt's investigation identifies
+the authoritative state root and a reversible cleanup procedure.
+
 ## Operating rules
 
 1. Start with read-only inventory. Do not copy, truncate, reset, stash, or
