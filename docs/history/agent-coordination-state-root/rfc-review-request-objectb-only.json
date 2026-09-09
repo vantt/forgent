@@ -1,0 +1,21 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Resume coord_state_root_rfc_20260909: dispatch objector-B (agy-cli) with a companion report artifact so its result registers as evidenced.",
+  "writerId": "state-root-coordinator",
+  "coordinationId": "coord_state_root_rfc_20260909",
+  "protocolRef": { "id": "core.coordination-protocol.group-thinking-rfc-review-lite" },
+  "actors": [
+    { "id": "objector-b-actor", "executor": "agy-cli" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "objectB3",
+      "operationId": "object",
+      "targetActorId": "objector-b-actor",
+      "taskKey": "state-root-rfc-object-b-r3",
+      "objective": "Independently review the RFC proposal in docs/history/agent-coordination-state-root/rfc-state-root-fix.md (read it in full). Focus on: (2) whether reusing isMainWorktree (src/runner/worktree.mjs) at a new mutating-verb dataDir() call site is sound, or whether it needs a distinct check that also recognizes a fgos-session-symlinked worktree as legitimate (isMainWorktree alone does not distinguish a session worktree from a plain non-main one -- check src/runner/session.mjs for what symlink/marker exists today); (4) given tsk-5x7-1's live status divergence (blocked in main vs retrospective in /home/vantt/projects/forgentX-worker-isolation/.fgos, confirmed via fgos show in both stores) and tsk-46f's prior hand-recovery (docs/history/tsk-46f/iron-law-evidence.md), propose a SAFE, REVERSIBLE, read-only-first recovery runbook for reconciling a disconnected .fgos store back into main -- do not execute anything, propose the runbook only. Report concrete objections with file:line citations, or 'no objection' if the evidence holds up. IMPORTANT output format (two required files in your run directory): (a) agent-result.json as exactly {\"status\": \"done\", \"summary\": \"<one paragraph, your headline verdict>\"} -- status MUST be the literal lowercase word done, nothing else; (b) agent-report.md, a companion markdown file in the SAME directory, containing your full detailed findings (objections with citations, and the recovery runbook). Both files are required -- agent-result.json alone is not sufficient evidence.",
+      "expectedOutputs": ["agent-result.json (status:\"done\", summary)", "agent-report.md (full findings, companion artifact)"]
+    }
+  ]
+}

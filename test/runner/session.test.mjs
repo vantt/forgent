@@ -11,6 +11,7 @@ import {
   listSessions,
   reclaimOrphanedSessions,
   acquireSessionsLock,
+  isSessionWorktree,
   SessionError,
 } from '../../src/runner/session.mjs';
 
@@ -160,6 +161,54 @@ test('createSession succeeds when .fgos is git-committed into HEAD, still yieldi
     // the removal only touched the worktree copy — the real repoRoot store's
     // committed seed content is untouched.
     assert.equal(fs.readFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), 'utf8'), '{"seed":true}\n');
+  } finally {
+    cleanup(repoRoot, sessionsDir);
+  }
+});
+
+test('isSessionWorktree: true for a genuine createSession worktree, false for the main checkout itself', () => {
+  const repoRoot = initTempRepo();
+  const sessionsDir = mkSessionsDir();
+  try {
+    const sess = createSession(repoRoot, { sessionId: 'sess-predicate', sessionsDir });
+    assert.equal(isSessionWorktree(sess.worktreePath), true);
+    assert.equal(isSessionWorktree(repoRoot), false, 'the main checkout is not itself a session worktree');
+  } finally {
+    cleanup(repoRoot, sessionsDir);
+  }
+});
+
+test('isSessionWorktree: false for an ad-hoc worktree carrying a checked-out (non-symlink) .fgos copy', () => {
+  const repoRoot = initTempRepoWithCommittedFgos();
+  const sessionsDir = mkSessionsDir();
+  try {
+    // a plain `git worktree add`, never through createSession -- the exact
+    // shape an external harness's own worktree tool produces (state-root
+    // investigation's own root-cause finding): .fgos/ is a real checked-out
+    // directory, not a symlink.
+    const adHocPath = fs.mkdtempSync(path.join(sessionsDir, 'adhoc-'));
+    fs.rmdirSync(adHocPath);
+    execFileSync('git', ['worktree', 'add', '--detach', adHocPath, 'HEAD'], { cwd: repoRoot });
+    assert.ok(fs.existsSync(path.join(adHocPath, '.fgos', 'events.jsonl')), 'ad-hoc checkout carries a real .fgos copy');
+    assert.equal(fs.lstatSync(path.join(adHocPath, '.fgos')).isSymbolicLink(), false);
+    assert.equal(isSessionWorktree(adHocPath), false);
+  } finally {
+    cleanup(repoRoot, sessionsDir);
+  }
+});
+
+test('isSessionWorktree: false for a worktree whose .fgos symlink is forged to point somewhere else', () => {
+  const repoRoot = initTempRepoWithCommittedFgos();
+  const sessionsDir = mkSessionsDir();
+  try {
+    const forgedPath = fs.mkdtempSync(path.join(sessionsDir, 'forged-'));
+    fs.rmdirSync(forgedPath);
+    execFileSync('git', ['worktree', 'add', '--detach', forgedPath, 'HEAD'], { cwd: repoRoot });
+    fs.rmSync(path.join(forgedPath, '.fgos'), { recursive: true, force: true });
+    const decoyTarget = fs.mkdtempSync(path.join(sessionsDir, 'decoy-'));
+    fs.symlinkSync(decoyTarget, path.join(forgedPath, '.fgos'), 'dir');
+    assert.equal(fs.lstatSync(path.join(forgedPath, '.fgos')).isSymbolicLink(), true, 'a symlink exists, but points at the wrong target');
+    assert.equal(isSessionWorktree(forgedPath), false, 'a bare isSymbolicLink() check would have been fooled; the target check must not be');
   } finally {
     cleanup(repoRoot, sessionsDir);
   }

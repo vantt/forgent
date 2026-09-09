@@ -1,0 +1,75 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Resume coord_state_root_rfc_20260909 with corrected agent-result.json schema (status must be exactly the lowercase string \"done\") after round 1's three runs all failed schema validation.",
+  "writerId": "state-root-coordinator",
+  "coordinationId": "coord_state_root_rfc_20260909",
+  "protocolRef": { "id": "core.coordination-protocol.group-thinking-rfc-review-lite" },
+  "actors": [
+    { "id": "objector-a-actor", "executor": "codex-cli" },
+    { "id": "objector-b-actor", "executor": "agy-cli" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "convene2",
+      "operationId": "convene",
+      "targetActorId": "coordinator-actor",
+      "taskKey": "state-root-rfc-convene-r2",
+      "objective": "State the RFC under review and open the round. Read docs/history/agent-coordination-state-root/rfc-state-root-fix.md in full, then write .fgos-runner's agent-result.json to the path your dispatch instructions name, as a JSON object with EXACTLY these two required top-level string fields and no others required: {\"status\": \"done\", \"summary\": \"<your full summary text, one string>\"}. The status field's value must be the literal lowercase word done -- not DONE, not any other word -- this is a closed enum (done|blocked|failed|no-evidence) validated by the engine. Put your full findings/summary inside the summary string.",
+      "expectedOutputs": ["agent-result.json (status, summary) -- status MUST be exactly \"done\""]
+    },
+    {
+      "type": "operation",
+      "as": "propose2",
+      "operationId": "propose",
+      "targetActorId": "proposer-actor",
+      "taskKey": "state-root-rfc-propose-r2",
+      "objective": "Write the proposal being reviewed: read docs/history/agent-coordination-state-root/rfc-state-root-fix.md in full and restate its root-cause claim, evidence, and proposed fix shape as the formal proposal for this round. Write agent-result.json as {\"status\": \"done\", \"summary\": \"<your full proposal text>\"} -- status must be the literal lowercase word done, not any other value.",
+      "expectedOutputs": ["agent-result.json (status, summary) -- status MUST be exactly \"done\""]
+    },
+    {
+      "type": "contribution",
+      "as": "linkProposal",
+      "contributionId": "state_root_rfc_proposal_r2",
+      "contributionType": "proposal",
+      "assignmentId": "$ref:propose2",
+      "roundKey": "round-1"
+    },
+    {
+      "type": "operation",
+      "as": "objectA2",
+      "operationId": "object",
+      "targetActorId": "objector-a-actor",
+      "taskKey": "state-root-rfc-object-a-r2",
+      "objective": "Independently review the proposal in docs/history/agent-coordination-state-root/rfc-state-root-fix.md (read it in full). You do NOT get to see any other objector's own review. Focus on: (1) whether the proposed dataDir()/isMainWorktree guard correctly distinguishes the 3 legitimate worktree cases from the illegitimate 4th without false-positiving on any real workflow -- check src/state/store.mjs, src/runner/session.mjs, src/cli/command-registry.mjs's touchesState granularity, and any existing test/fixture under test/ that deliberately writes into a non-main worktree's local .fgos/ on purpose; (3) whether fgos setup/doctor or scripts/fgos-shell-integration.sh needs a doctor/setup registration for this guard. Report concrete objections with file:line citations, or 'no objection' if the evidence holds up. Write agent-result.json as {\"status\": \"done\", \"summary\": \"<your full objection/no-objection text with citations>\"} -- status must be the literal lowercase word done (never a custom word like 'objection'); put your actual finding inside summary.",
+      "expectedOutputs": ["agent-result.json (status, summary) -- status MUST be exactly \"done\""]
+    },
+    {
+      "type": "contribution",
+      "as": "linkObjectionA",
+      "contributionId": "state_root_rfc_objection_a_r2",
+      "contributionType": "objection",
+      "assignmentId": "$ref:objectA2",
+      "roundKey": "round-1",
+      "respondsTo": "state_root_rfc_proposal_r2"
+    },
+    {
+      "type": "operation",
+      "as": "objectB2",
+      "operationId": "object",
+      "targetActorId": "objector-b-actor",
+      "taskKey": "state-root-rfc-object-b-r2",
+      "objective": "Independently review the proposal in docs/history/agent-coordination-state-root/rfc-state-root-fix.md (read it in full). You do NOT get to see any other objector's own review. Focus on: (2) whether reusing isMainWorktree (src/runner/worktree.mjs) at the new mutating-verb call site is sound, or whether it needs a distinct check that also recognizes a fgos-session-symlinked worktree as legitimate; (4) given tsk-5x7-1's live status divergence (blocked in main vs retrospective in /home/vantt/projects/forgentX-worker-isolation/.fgos) and tsk-46f's prior hand-recovery (docs/history/tsk-46f/iron-law-evidence.md), propose a SAFE, REVERSIBLE, read-only-first recovery runbook for reconciling a disconnected .fgos store back into main -- do not execute anything, propose the runbook only. Report concrete objections with file:line citations, or 'no objection' if the evidence holds up. Write agent-result.json as {\"status\": \"done\", \"summary\": \"<your full objection/no-objection text plus the recovery runbook>\"} -- status must be the literal lowercase word done; put your actual finding inside summary.",
+      "expectedOutputs": ["agent-result.json (status, summary) -- status MUST be exactly \"done\""]
+    },
+    {
+      "type": "contribution",
+      "as": "linkObjectionB",
+      "contributionId": "state_root_rfc_objection_b_r2",
+      "contributionType": "objection",
+      "assignmentId": "$ref:objectB2",
+      "roundKey": "round-1",
+      "respondsTo": "state_root_rfc_proposal_r2"
+    }
+  ]
+}
